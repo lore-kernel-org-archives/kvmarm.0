@@ -1,106 +1,106 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF29321CC6A
-	for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 14:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DF81F09A8;
+	Wed, 15 Oct 2025 15:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760537095; cv=none; b=sWYr54mRo7/T4O0jDvT04n5qDn88RF5Wcm1ur8N7faVA0W+DNHq/Ig0Lze+x4/L1PsooUW+dwdjB+Z+S+PdvPeIE88IokaWsYyPAVpo5dwFzng1Gznopaj0ms5dSeU39RsXRQFsDDQyZz5d3sBSalEEbLtkC0dQ+6DNS3SbYsGs=
+	t=1760541585; cv=none; b=REqWzU/W7nf2+uqePwstg7N3ZWvXiZfkxODQERvA7tJ0HifktSqBwk2WBXOmc0K2wzCS9vV+y1NULCYLATMHKTv30kJyUZ5TFr78Cota5gGpuVQUlLrgkylwit4xIvxPN7gyItsJaFaRqURDeFTwkcPibNAS03cnyIW1yvmAkB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760537095; c=relaxed/simple;
-	bh=FKP112/g/eo72651dC5ZG86Ojol6zoySUjFxfFoQock=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MNH0tofIFxRXVsSRoGWLYufO0h0xSmcXhlLgr397YShaUyB8Y6em/XdgxeAMQSB4d7NlM19xXhAF31b5Zh8A1mPH7cjnJX3aOgLdyrG0ZtaweXoy0/ve5wUBCODbXflCV3e/zmWIjlBftuSB/V+y/QvTZ4J9xEXp9ZaerdVlR/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z2wZFdgm; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1760541585; c=relaxed/simple;
+	bh=kihGcKooyzuKWwRmWQbeCC0T0qW850ESsBNMHcdBZB4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PfxJZaGYrTUonEkuTfxcg8R+jl3BWFG6jLA284ITvoHkeqr5ZQ7XKOiWcq0q6+PQUIJSMdIaXnyyDv8NlQdDQTfX2SoHt45yIY85aWohlBHINbn1uao5qf4T1jJ1d8NLmLno1b7D9v5zXch0VFVAeGyDrEcm708w4kFmGLdicLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=vcGxIc4a; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z2wZFdgm"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befc08so22801156a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 07:04:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760537093; x=1761141893; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4DiBH4L2zFebqfEoDk29CwM1Bc3n2gl1Oz2cKH7YPo=;
-        b=z2wZFdgmAEvRkhhJ2uVr4LkHETugvu4qJbO23hlwBa636K76MOR1LfTE5FtWA9tntE
-         izTFDFUoJmR4ti//uIzEzzY7h8j4QJnyqxWS9IcKd2N1g3peQdDD5EfSTovKf1wwsT+5
-         GsNtcRmTXh2CdHwgCPZaMmGPqsyQhIaeJzAKwm4UM1HOIEBY+NqcuDveGUxUGQ3yze1O
-         wuZRO7a7I/K13ec06pcSX/940OJQhqsQ8aDIdSlD5c86TeyxkSBm8eL7/cp3wOtHfqNQ
-         DFoaLQYxR0n6uR2B88IKab8zerLrF6MoqNQpqtDE82RDomcEFcnEhKh/MW+c3jxEl57k
-         Zkvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760537093; x=1761141893;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4DiBH4L2zFebqfEoDk29CwM1Bc3n2gl1Oz2cKH7YPo=;
-        b=xERaa9GpBPSfd3ffIqxIbAzCvVaXzXghtIaZ/4v8TbetQ2BZIfEYG+8RbKJ2X7keYT
-         rKtmQyS6K31O6TEJeOx3sP4Fz9JC+HPWaimN2npIm+vqgyhOjMcySNtaL2pDOIUxq+TB
-         Hr6/dZp6LZvmaUcYe0k9zNFpeYYdMTcGWl46l+SBUxA+iGsi5BZqNpROPGcrY8IQeJ1L
-         IGSjGU2NXU170B/w1OeWZTqMLLFkBdxP3zLR8BqsGHIGqS/vgkAkVmcWWPmLLCoTMtk+
-         jGzWGfdtqwRDDj8UQtJGmbaB+/AkQ9mZ/1B/hVOG5o9PJuHaB/H4HT8sw3/Qdv8+vFyI
-         svcg==
-X-Forwarded-Encrypted: i=1; AJvYcCWU/Crh+x+SnZYI45VnXtWZAMispBhsfP3RlV+FnFrfcuWd8FzYUegNy1KBG6Wu9KC3tP9GJ/A=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxYwtVEuEJhED9gw1PcxfkLNC6fLGB0boCU9cA1N4IqIwcLmoQg
-	ydvL5xYyXlxwN1luCzSD6ubrs3H74azizfQ9A7/A11kDex7WQRJbauii8hFKN06gLdzZYIT0RHw
-	x+5SRWA==
-X-Google-Smtp-Source: AGHT+IE1+td5soWF05Hoahm6Hvpema7mHvLUqdyQlzOJZyQi5z9/sZLyyXRWNTOg3FlzXOK9GExt35QwxNQ=
-X-Received: from pjbkx5.prod.google.com ([2002:a17:90b:2285:b0:327:c20a:364])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3ec4:b0:32e:d16c:a8c6
- with SMTP id 98e67ed59e1d1-33b5111bd79mr42350202a91.16.1760537092984; Wed, 15
- Oct 2025 07:04:52 -0700 (PDT)
-Date: Wed, 15 Oct 2025 07:04:51 -0700
-In-Reply-To: <81af1654-5cb1-405a-bd42-670058dd22b6@redhat.com>
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="vcGxIc4a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1760541583;
+	bh=kihGcKooyzuKWwRmWQbeCC0T0qW850ESsBNMHcdBZB4=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=vcGxIc4aysQeimaHxNfu57XBzuSb18Yy24VPSWJX0jS7Eji66T1jJjGIF7kfR/DFy
+	 xRPWMFWKZPEDfIpF3xd3AWGJL67WB6OnhjkV7jFFf5ewsoS2cZMT7i+8OdZ36hr+ii
+	 /ZqVqIfRsz2pHte/zf+jVtxshid0uh+cwf7FtLnM=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id 7159A1C0340;
+	Wed, 15 Oct 2025 11:19:42 -0400 (EDT)
+Message-ID: <d5144c99d7c04e4ad09ed9965fa3512c203b5694.camel@HansenPartnership.com>
+Subject: Re: [RFC PATCH v1 11/38] KVM: arm64: CCA: register host tsm
+ platform device
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Greg KH <gregkh@linuxfoundation.org>
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Jeremy Linton
+ <jeremy.linton@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Dan Williams <dan.j.williams@intel.com>, linux-coco@lists.linux.dev,
+ kvmarm@lists.linux.dev,  linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, aik@amd.com,  lukas@wunner.de, Samuel Ortiz
+ <sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Suzuki K Poulose
+ <Suzuki.Poulose@arm.com>,  Steven Price <steven.price@arm.com>, Catalin
+ Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,  Will
+ Deacon <will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Date: Wed, 15 Oct 2025 11:19:41 -0400
+In-Reply-To: <20251015115044.GE3938986@ziepe.ca>
+References: <20250729181045.0000100b@huawei.com>
+	 <20250729231948.GJ26511@ziepe.ca> <yq5aqzxy9ij1.fsf@kernel.org>
+	 <20250730113827.000032b8@huawei.com> <20250730132333.00006fbf@huawei.com>
+	 <2025073035-bulginess-rematch-b92e@gregkh>
+	 <b3ec55da-822a-4098-b030-4d76825f358e@arm.com>
+	 <20251010135922.GC3833649@ziepe.ca> <yq5a347kmqzn.fsf@kernel.org>
+	 <2025101523-evil-dole-66a3@gregkh> <20251015115044.GE3938986@ziepe.ca>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251014122857.1250976-1-maz@kernel.org> <81af1654-5cb1-405a-bd42-670058dd22b6@redhat.com>
-Message-ID: <aO-qA0oz5PyqPtGj@google.com>
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.18, take #1
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Jan Kotas <jank@cadence.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Mukesh Ojha <mukesh.ojha@oss.qualcomm.com>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Osama Abdelkader <osama.abdelkader@gmail.com>, Sascha Bischoff <sascha.bischoff@arm.com>, 
-	Sebastian Ott <sebott@redhat.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Zenghui Yu <zenghui.yu@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 
-On Wed, Oct 15, 2025, Paolo Bonzini wrote:
-> On 10/14/25 14:28, Marc Zyngier wrote:
-> > You will notice that, just like I did with the main pull request, I'm
-> > adding message-ids to the tag instead of putting them into the
-> > individual patches. It looks rubbish, but I don't have a good
-> > alternative, and I'm not prepared to remove provenance information
-> > from the stuff I ferry upstream.
-> > 
-> > I'd welcome any guidance that would make things suck less for people
-> > reporting bugs and backporting stuff, despite the "Link: is bad"
-> > nonsense. Preferably something that we can adopt across architectures
-> > supporting KVM.
-> Because you're already unusually meticulous in tracking tags, I'm going to
-> say whatever floats your boat.  If you want to add it to each patch, I'm
-> certainly not going to be the one to complain, and/or to make your life
-> harder, because of something like "Link".
-> 
-> Personally I think that there's a different between adding something
-> mindlessly as a cargo cult, and adding it *unconditionally*.  Link is the
-> latter, it's unconditional because it may be needed *later*.  In some cases
-> it may not be strictly necessary (for example the tip bot used it to send
-> replies, and that is served by notes just fine), but overall I don't get the
-> hate either.
-> 
-> In fact, I'm very adamant about *needing* Link trailers for each patch in
-> the RISC-V pull requests, which are the ones I look at most closely since
-> the code is still in relative infancy.
+On Wed, 2025-10-15 at 08:50 -0300, Jason Gunthorpe wrote:
+> On Wed, Oct 15, 2025 at 11:58:25AM +0200, Greg KH wrote:
+[...]
+> > The real device that has the resources you wish to share access
+> > to.=C2=A0 Are there physical resources here you are sharing?=C2=A0 If s=
+o,
+> > that device is the parent.=C2=A0 If there is no such thing, then just
+> > make a bunch of faux devices and be done with it :)
+>=20
+> At the very bottom of the stack it looks like the PSCI interface is
+> discovered first through DT/ACPI. The PSCI interface has RPCs that
+> are then used to discover if SMC/etc/etc are present and along the
+> way it makes platform devices to plug in subsystems to it based on
+> what it can discover.
+>=20
+> It is just not sharing "resources" in the traditional sense, PSCI has
+> no registers or interrupts, yet it is a service provided by the
+> platform firmare.
+>=20
+> Again faux devices don't serve the need here to load modules and do
+> driver binding.
 
-FWIW, adding Link to every commit is a hill I'll die on (and Paolo has confirmed
-that he doesn't object), it's simply far too valuable.  And as Paolo has mentioned
-off-list, I don't think Linus will ever notice, so long as we don't send him
-garbage and thus give him cause to see what lies behind the Link.
+This came up for the SVSM as well: we want to expose things that can be
+virtual devices or other resources that the guest discovers.  Our
+conclusion was we either needed to share one of the virtual busses
+(like virtio) or do our own svsm bus.  The agreement was to implement
+our own bus, but we still haven't got around to it.
+
+Regards,
+
+James
+
