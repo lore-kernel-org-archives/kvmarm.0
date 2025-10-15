@@ -1,181 +1,131 @@
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C94332E74F
-	for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 16:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D4F264602
+	for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 18:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760547419; cv=none; b=LxML7eO3VRafB4VsFgEui6wS5DqTu60zfIgmYdVPpn/epTpLx5C5lgyUSTHFkKvCKlQf1GMlRqa76GLZ2DNIOGyW1W2U+5Pq/RylLDe5Gu5YdGp+q0p0fNrWDtijShp4WiCclHybWwWv5As9SYKoiSykDwwrUybrw2nDuVf3eg4=
+	t=1760554136; cv=none; b=uXBmsfb31cgD+dpzx5foPTcARhSuppx/3f2sbUw+XIxgTOqY6qlNFXHoHXBj8xF8BSGqvbAX2moXjBVJeN2KAROlCk9QMkFG6W7anHjiunVnZ36YZi0250e845jyVnEvgwfI0mWp5F7XpkORxREvW4k11BeOiGCbAG+pknRCxT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760547419; c=relaxed/simple;
-	bh=Br2ogEQs1/iRtN5J5jedL4Onti9Vib3S8PTIJFNEsWI=;
+	s=arc-20240116; t=1760554136; c=relaxed/simple;
+	bh=HqqF4x0s/r1hw3Xsgl35/OvKCY5LGibQ5keQMlJM4gM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tmo5R7qBKAqJJBxO0dWRwT1s2aFRRrbdA5WmD5YK0SC55dcUhheC8KDbq6zXMFSYtMf/53S5UwTRRDsnzx1EWWzyEIs5Yl0hw1uvzQzYfa20Nqo58qE18IxiLTAPxhqAQqYGQzuXVcleQe1ZHmui0SU6fTjNhv/C+UH+YAKZh5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZfHuHaH; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=bnrQby3osVH+0XVIEjH1iCJl6aWz6Xs2MyEi8S8ndV8bQMfhv3jD+FjEaAtiEbw1+t5U4ODRbBAJpHWS3dLI6RX486NADo5vxDO9JlzGLOXzlS4MC1FzAmZTFiGp4ZujlOB7lren+dhp5GUHRnmzJrHcZ3a0k4hAlvdtYd2leQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mWhm0kmJ; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZfHuHaH"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-335276a711cso13520112a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 09:56:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mWhm0kmJ"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33428befc5bso13385706a91.0
+        for <kvmarm@lists.linux.dev>; Wed, 15 Oct 2025 11:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760547417; x=1761152217; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CbYRjcxiLRGKL2LIFUGAiQXkDS5QuVlAtEitSDKwgNo=;
-        b=xZfHuHaHr50qUxcWSAsfZ93o/NF0RInPfvVWQgMU8C2JTojZsJzALd2nVEb5kPvhmC
-         7EMbPZQLEb0rtIVeKfDyP2+0K/goCCstwDLEB/Xu3OKIXU9reBwhu/bvkTgcFDJEjFmh
-         cwkJRisUmCl90OZWkMZwWtuu8dwac6tcAgD5EM31bYIJ01XNyL1f9QrbtdL2ayZM5Kd1
-         ywiG0trtqjlBE5EBeZKwflJCvoc42OkdxGB0vXoWMFwK36qIJ0rmJItmvZwnBBe4W3LZ
-         1ZyjnSDKEw9sV3JZizVUKbAJ1B/ZjgKo9URD5D8KEnU8iotvSb0DCAmPFwmANmFKEgg4
-         j14g==
+        d=google.com; s=20230601; t=1760554135; x=1761158935; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3naOg0AXa4lxy2J7qWFZUYdZmmuSUah42Rbajn2HebA=;
+        b=mWhm0kmJCL1L61gXPHUV3kDwysTvHNsrO7EwEnQsyt6+dtz+D86bjWiELe4NVAUOJl
+         nEIbyAnol6wQIxqW/AwHenpwp7ZTQXXkEdzBNi1aaZPz9hlnyfQFq00rJBd2pCg5CHM8
+         M+S4RMW/f3XKtPTbwHJLew+9ejnz3H7JCJD8puZ7r4SK0PTeH8FhaqgU4lo/GTSBt285
+         IUNqcNCBb6eVNGDcoy+d0QRF+PNQTHh4FMuK0AuLd5Tq2LaJx6P0qneGf5ZVuwsGdMCg
+         cgwgnPAtJQkTU67Pbiz1lv2KqRciEMyP3FvGNAO0LCMUWqKGzkz4iJ3Z+55DyFPfMq1+
+         zpKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760547417; x=1761152217;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CbYRjcxiLRGKL2LIFUGAiQXkDS5QuVlAtEitSDKwgNo=;
-        b=TPO70Sxcaw4RIwTuzUAfi76Jf2WZWA3mEKRULW2L/uOOa/74NltZ1a8J9/W2DhDoDa
-         5+kve7OSjRUG5SwpRFYrVFfwGp14hbelJRBgkvCggQPnkWPMJiXhEtBku7Zyvi7r8ZzV
-         2PMF6W1YLCZIftETuniih7orHU+KM+FKUhYFY//6xboTwAB2qBSL2MMEtpBAx/Dr2AHV
-         T80J/QHYGzdNhtsVfUeAdr6Ga60W2CjuhXPfyOjfo2g9fW0K+LWfefZUeHmgKllFIFRc
-         fmG4lmJK+82252CgDKklhMqc+awD61lSqujyn6nlRJcpfL7rFQnNve2YeSfE0EXWnHpV
-         OqdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSunzBi6LncdWQNefyDXNGGtGRXTCf4TP6ryCeGSPiT/D2ir5y3FKWd16sIz/BpX6neeIkkSs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywm5oYKfMNQn8XfhXQXZphv6KCmITNAwJJrc0R9Nwd4YARmwjwp
-	hGMnE357o8EL5JNdoWX9yMfh8MIFIYDGvlTikYConG7vCCWzgvmJkA3yRexWAKgNAkbb8+3FiDp
-	2at1VWg==
-X-Google-Smtp-Source: AGHT+IE8G6rCUXSY9kLglvAN1OT5mVOTch4nfQN3hIBfcNRFcG0ozBsKIivfelaBWpgamTPWwCFJi/Lz678=
-X-Received: from pjbgj15.prod.google.com ([2002:a17:90b:108f:b0:330:72b8:fcc0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3843:b0:330:bca5:13d9
- with SMTP id 98e67ed59e1d1-33b513b4c9cmr36865790a91.32.1760547417511; Wed, 15
- Oct 2025 09:56:57 -0700 (PDT)
-Date: Wed, 15 Oct 2025 09:56:55 -0700
-In-Reply-To: <diqzv7kmfmio.fsf@google.com>
+        d=1e100.net; s=20230601; t=1760554135; x=1761158935;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3naOg0AXa4lxy2J7qWFZUYdZmmuSUah42Rbajn2HebA=;
+        b=IEetMN4TlpveydflRFC7Hzx8+Nu1QC14vsqBsjdNrCPhbaq6X/Vj4x/qMCtrb0SA7g
+         EuoOkkEdp8gh/P0AJeGiF9F9FOhNZK7Wg2+cFmDzjOhR25XaOwHDfcxVhJDZPLn1XKGB
+         Ho9o6crL7FMPsiUFQVthhkgWIQRZ9eojyRAj6m3HorzZkmvEMDPqmzUI2WTq1b3Zh628
+         YWbmSOWJuMehsziepQyBwYvf53tQGCPnQHgXj/Xnb7YwZZ+5k1QjgpGEcb8u5wBVClBi
+         OCDcRnWJR18Pp8WfGmGxWcKRed6Qms7BVMbEy9DYidj3FfTxHQGH84aLGSK6mXDr/FER
+         I/ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUW8UsyrL/Snu71F0bw7xS0e1aAYFfUjw2g0nr1YpIyBmi+S1Y0UR8Qix474N5GjJWamjwk4V8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywn0D1FeDehVfBXktSusrGtsRJfpgNatVKb4EYWs504Vw4mtBrH
+	wuf2899M0LPGSCyDQT71J8Yc/Lkf52BcHi2apjZxBzMFX7KIphJhStFs3WfqnfdZSoQBQiRHBIV
+	cne83Ag==
+X-Google-Smtp-Source: AGHT+IE9eJmZgE8/vrWWkRhltj63ksxMU8MKwID4HHHoGFacVC2zof2bk9aQHK5Js4MPCgK0DcLQje9LyvY=
+X-Received: from pjpx13.prod.google.com ([2002:a17:90a:a38d:b0:33b:51fe:1a93])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3909:b0:336:bfcf:c50b
+ with SMTP id 98e67ed59e1d1-33b513865a2mr39206696a91.20.1760554134578; Wed, 15
+ Oct 2025 11:48:54 -0700 (PDT)
+Date: Wed, 15 Oct 2025 11:48:52 -0700
+In-Reply-To: <0276af52-c697-46c3-9db8-9284adb6beee@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20251007221420.344669-1-seanjc@google.com> <20251007221420.344669-6-seanjc@google.com>
- <diqzo6qfhgc9.fsf@google.com> <e9bd02ba-ff0e-47a3-a12e-9a53717dde9b@amd.com>
- <aOltikRvKzCy1DXN@google.com> <diqzv7kmfmio.fsf@google.com>
-Message-ID: <aO_SV0ee6h8rK9dZ@google.com>
-Subject: Re: [PATCH v12 05/12] KVM: guest_memfd: Enforce NUMA mempolicy using
- shared policy
+References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-33-seanjc@google.com>
+ <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com> <aN1vfykNs8Dmv_g0@google.com> <0276af52-c697-46c3-9db8-9284adb6beee@linux.intel.com>
+Message-ID: <aO_slNn8X1A84sI-@google.com>
+Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
+ MSRs for mediated vPMUs
 From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: Shivank Garg <shivankg@amd.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="us-ascii"
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Sandipan Das <sandidas@amd.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
+	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 10, 2025, Ackerley Tng wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Fri, Oct 10, 2025, Shivank Garg wrote:
-> >> >> @@ -112,6 +114,19 @@ static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
-> >> >>  	return r;
-> >> >>  }
-> >> >>  
-> >> >> +static struct mempolicy *kvm_gmem_get_folio_policy(struct gmem_inode *gi,
-> >> >> +						   pgoff_t index)
-> >> > 
-> >> > How about kvm_gmem_get_index_policy() instead, since the policy is keyed
-> >> > by index?
+On Thu, Oct 09, 2025, Dapeng Mi wrote:
+>=20
+> On 10/2/2025 2:14 AM, Sean Christopherson wrote:
+> > On Fri, Sep 26, 2025, Sandipan Das wrote:
+> >> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
+> >>> +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
+> >>>  	       pmu->counter_bitmask[KVM_PMC_GP] !=3D (BIT_ULL(kvm_host_pmu.=
+bit_width_gp) - 1) ||
+> >>>  	       pmu->counter_bitmask[KVM_PMC_FIXED] !=3D (BIT_ULL(kvm_host_p=
+mu.bit_width_fixed) - 1);
+> >>>  }
+> >> There is a case for AMD processors where the global MSRs are absent in=
+ the guest
+> >> but the guest still uses the same number of counters as what is advert=
+ised by the
+> >> host capabilities. So RDPMC interception is not necessary for all case=
+s where
+> >> global control is unavailable.o
+> > Hmm, I think Intel would be the same?  Ah, no, because the host will ha=
+ve fixed
+> > counters, but the guest will not.  However, that's not directly related=
+ to
+> > kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
 > >
-> > But isn't the policy tied to the folio?  I assume/hope that something will split
-> > folios if they have different policies for their indices when a folio contains
-> > more than one page.  In other words, how will this work when hugepage support
-> > comes along?
-> >
-> > So yeah, I agree that the lookup is keyed on the index, but conceptually aren't
-> > we getting the policy for the folio?  The index is a means to an end.
-> >
-> 
-> I think the policy is tied to the index.
-> 
-> When we mmap(), there may not be a folio at this index yet, so any folio
-> that gets allocated for this index then is taken from the right NUMA
-> node based on the policy.
-> 
-> If the folio is later truncated, the folio just goes back to the NUMA
-> node, but the memory policy remains for the next folio to be allocated
-> at this index.
+> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > index 4414d070c4f9..4c5b2712ee4c 100644
+> > --- a/arch/x86/kvm/pmu.c
+> > +++ b/arch/x86/kvm/pmu.c
+> > @@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned=
+ idx, u64 *data)
+> >         return 0;
+> >  }
+> > =20
+> > -bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
+> > +static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
+>=20
+> The function name kvm_need_pmc_intercept() seems a little bit misleading
+> and make users think this function is used to check if a certain PMC is
+> intercepted. Maybe we can rename the function to=C2=A0kvm_need_global_int=
+ercept().
 
-Right.  Though thinking about this more, there's no reason to have "index" in
-the name, kvm_gmem_get_policy() is sufficient.  E.g. we don't have "index" in
-the name for things like kvm_get_vcpu().
+Yeah, I don't love kvm_need_pmc_intercept() either.  But kvm_need_global_in=
+tercept()
+feels too close to kvm_need_perf_global_ctrl_intercept().
 
-Luckily, it's all made moot by Shivank's fixup :-)
-
-> >> >> +{
-> >> >> +#ifdef CONFIG_NUMA
-> >> >> +	struct mempolicy *mpol;
-> >> >> +
-> >> >> +	mpol = mpol_shared_policy_lookup(&gi->policy, index);
-> >> >> +	return mpol ? mpol : get_task_policy(current);
-> >> > 
-> >> > Should we be returning NULL if no shared policy was defined?
-> >> > 
-> >> > By returning NULL, __filemap_get_folio_mpol() can handle the case where
-> >> > cpuset_do_page_mem_spread().
-> >> > 
-> >> > If we always return current's task policy, what if the user wants to use
-> >> > cpuset_do_page_mem_spread()?
-> >> > 
-> >> 
-> >> I initially followed shmem's approach here.
-> >> I agree that returning NULL maintains consistency with the current default
-> >> behavior of cpuset_do_page_mem_spread(), regardless of CONFIG_NUMA.
-> >> 
-> >> I'm curious what could be the practical implications of cpuset_do_page_mem_spread()
-> >> v/s get_task_policy() as the fallback?
-> >
-> > Userspace could enable page spreading on the task that triggers guest_memfd
-> > allocation.  I can't conjure up a reason to do that, but I've been surprised
-> > more than once by KVM setups.
-> >
-> >> Which is more appropriate for guest_memfd when no policy is explicitly set
-> >> via mbind()?
-> >
-> > I don't think we need to answer that question?  Userspace _has_ set a policy,
-> > just through cpuset, not via mbind().  So while I can't imagine there's a sane
-> > use case for cpuset_do_page_mem_spread() with guest_memfd, I also don't see a
-> > reason why KVM should effectively disallow it.
-> >
-> > And unless I'm missing something, allocation will eventually fallback to
-> > get_task_policy() (in alloc_frozen_pages_noprof()), so by explicitly getting the
-> > task policy in guest_memfd, KVM is doing _more_ work than necessary _and_ is
-> > unnecessarily restricting usersepace.
-> >
-> > Add in that returning NULL would align this code with the ->get_policy hook (and
-> > could be shared again, I assume), and my vote is definitely to return NULL and
-> > not get in the way.
-> 
-> ... although if we are going to return NULL then we can directly use
-> mpol_shared_policy_lookup(), so the first discussion is moot.
-
-Ha!  Great minds think alike, right!!?!
-
-> Though looking slightly into the future, shareability (aka memory
-> attributes or shared/private state within guest_memfd inodes) are also
-> keyed by index, and is a property of the index and not the folio (since
-> shared/private state is defined even before folios are allocated for a
-> given index.
-
-Yeah, which further reinforces that having "index" in the function name is
-superfluous (and potentially confusing), e.g. IMO the proposed helpers:
-
-  kvm_gmem_get_attributes()
-  kvm_gmem_is_private_mem()
-  kvm_gmem_is_shared_mem()
-
-are far better than e.g.:
-
-  kvm_gmem_get_index_attributes()
-  kvm_gmem_is_index_private_mem()
-  kvm_gmem_is_index_shared_mem()
+Maybe something like kvm_need_any_pmc_intercept()?
