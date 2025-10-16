@@ -1,57 +1,57 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07CA3321B9
-	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 17:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEFC342CBE
+	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 17:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760635830; cv=none; b=kfwuVSkiaH65hO/HFyErZI/VMC3HWQ1SJm++FS6J5g2n9CXK9zsGLnyiS8i7vdfc5vYfp1t7qr7VG5JDEOV+HsOsdHM/W2IY7bZm5hQbkjDCQTe8ivu0Kq8htspnODNaN4mrDgWkfvfNCo6pnkamIqNoZ9U4UC13VIG39xXnUUY=
+	t=1760635831; cv=none; b=YaU4VnQ1Z3HJkvxgAzP2gDkRodkPxmy+QQimQts5d7urcbU3q2fzi5JMLP4s+dNxq56SYhZSWUSLY5xl/IqGX+2oX/2/4EnDZLx4CVeLxNrPX9ux6Biq25rnJ9iYC6vPaHXH7yyDX79mpR5vEMu/0KS8XMrHne2/7sPWiIFWLXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760635830; c=relaxed/simple;
-	bh=C2oacOVaYmakYuuj01sv0kUdLX8KmQYOY8HvA7F3pWg=;
+	s=arc-20240116; t=1760635831; c=relaxed/simple;
+	bh=u73IkWxovHfIqFa1WeugdviVlKOG53gOaetPwlyyztU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pcMRjbdo12WF5jj0Ec/u8g2YhFlkDPP1TEJO3m9Z+DgO/WsfUT0bnkST7r68/k5SHtoX2qYm8SHgVhpp5hp2Ek+IPh6Dp2HyRb5WztF2jGtar1k/KraIUCAHzCnzSdTFxm7xvGP8XVWMaIXz0H0Vythou8AE9DQEa0M4A+zMKEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gi8JvsnI; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=NRTiprH/FG2xjxlfhcmvQ3gqnFUM+8W0xhu2zfxzy8Z9zN3tFo64E6AceYuL0Bt2auzWGkTkcjXDUzRokrrHg/8K6hPBm5+sOUEkwoxUr6Htee80ZgpsYpXntq6BG6v4JDQko48ONgpgsRuLox8MHRhNQFyWKgWWBrznBs/uphU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DNC2+xGu; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gi8JvsnI"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-290bd7c835dso6032235ad.3
-        for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 10:30:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DNC2+xGu"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b630753cc38so1532109a12.1
+        for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 10:30:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760635828; x=1761240628; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1760635829; x=1761240629; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=RviFSJTeDXrAnxp03nizg0uEL1EB4BJAqQICQBGlk4U=;
-        b=Gi8JvsnIUlthnNlV+qHn24UToYtBVPom/d/vuuGh83S7556C5cq1NRr/RqC9Bh2Y7Y
-         kLkvPJB+CD8ATBLrLgnQssm1MflkDDl+8VqzAXSNBURIr7YPD9iDkKjUStyTp3Pepce3
-         Qymanh2i1PkXJbisxRBJcbKPVC8Lvc48uFB3U7U3EyPNoKLfsLr03iBQsKxzLhDqcZs2
-         /HWWiDUADnU+JojknS1RgZe1OwKNMqNOPs++Jq3HdqxCKOlbppIpZxWcsVTfNEJGpZ+2
-         /geFFWjGTM0x9HwHKqZDbG2gouhB/+LrqDgwx5F1PLYnKBJPvd9UIw5iVSZQeMKMFAMd
-         BeRw==
+        bh=hVBqs1fBWLjUqhKekNBXs2j0fRJmcNGrbmsvLjXeKrQ=;
+        b=DNC2+xGu4f9RT0c9ZiJaD88qym1fpQJ8R79oKfqDZcQq9cTPgp6M7RNKTqm9isJNmD
+         xyNJ2Ljhe2TOaJmY8+AKHasFn+iblGCHDy/ohFse9UZdo2HLTNdRGokG3TV/bxf5R/71
+         NWbvRDxsK+oOkSTzIDVplB51++PjlXEYp+SH3g7VvhSfCpJASwuZTslhmsZDMHVy0NAz
+         NGDgdOE1/Sy8u0+D6QwiwHcW3ukZKJqqlsbmfYg2EM9F0UuabbUnPwM0WB2g4efhZtPp
+         x347mtcUAbWdTxyz8JZ/36HDJ14iDMZZYHnZ4ENZY0I/oCWG7hOQn16c3+9n1QEJisGq
+         b3Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760635828; x=1761240628;
+        d=1e100.net; s=20230601; t=1760635829; x=1761240629;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RviFSJTeDXrAnxp03nizg0uEL1EB4BJAqQICQBGlk4U=;
-        b=D9uw9CFkXh7NZyyypAYy6i4F97Q5ATFroXKZ+3lf9DmeKpcBKkuy+Nq+fTWQ3l3y8/
-         ku79xUcu3yplXtHBAlVFpeysXM5XOnHXttR6MArgj63H+ZuPRnYy7u2e9+zjodUZwEas
-         YIBoSd+DhdQ/qh0ZScHkeZNNUkmkGd/izuFj3tS/huX+/W2cThBGNgGXRWmRQ2MoGOAi
-         tCheBh9xzJDel1eYef1odaKCiTGmgfjIOCy3inOCoR/bZYXZ+ss4ngVmu2wmUyHCZFiT
-         BptbfvbJrdYCLizdk3PfptwxyFBk07tllq1H07/BSVrgzVsVoBiWPgDFr71nsGCYTIK4
-         KnTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYSznjJkPfgVzEWSWWm6uu0Zkq8Oh0aybRafgru/jaXtq5n+NbpBL+QGdaZtulZd/FWPcKXkw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwC7CR6An9kIEaAbgyfUFlWubU2+CW708LBR4b+d+BM1qRIQbUr
-	QUW+7LqjtPibBrwCTzeALZivtQvX7RQqgHcPPeyXTeooak+ucyiJEoYCBNUG0HBVVUwPu/ESrxn
-	Y1xvWiQ==
-X-Google-Smtp-Source: AGHT+IF/2wryDBFn3Vm/ZItHrOO8Cutyh10iJkyo92xaEeL3XVP9OxJeQvoekCLXXPfR84HIRIYnmu6+FJY=
-X-Received: from plsq3.prod.google.com ([2002:a17:902:bd83:b0:27e:ec80:30c6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:b8b:b0:24c:ed95:2725
- with SMTP id d9443c01a7336-290c9c89badmr7138805ad.4.1760635828021; Thu, 16
- Oct 2025 10:30:28 -0700 (PDT)
+        bh=hVBqs1fBWLjUqhKekNBXs2j0fRJmcNGrbmsvLjXeKrQ=;
+        b=rUWR8a1Cy3OJxDEu3NGSKh9B8YAu7QrvleL99dz1/+5GHZ7owJyVSJ1gF/bA/Ayyk/
+         DUo3u2gGFvnAlE0WQtEpjzJsVfpqWmF6FUnZVERLuOzjwhMUZD8cI+VMX7jUbf/QHUWP
+         YrAX+xS1gUZyi7TiDxQwUQO2yQHHpVekSsY4QLWKO4MDi8nyKizgZRNwwT2olKXS4Bs8
+         1vdXOpod9RJGqcSfAQa/uZsTu2ehxC52GltzhqJfrd2HOz+R1ufijPgtRwfCm0IgqIaA
+         yi17lglUlplx9BMIAsHRLE2Mn31u+pa6nvTtL2ClD3BL2agbKVW+igqtTH2+OeIhCaYB
+         BvnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVzA4LY9avD3keqnbjNTgUDVuXwVm8HI4ot89vumFHBtwQdN2rvpY0+132ZdLBaCMdm+Vj2Kzc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy81aLnRCmM0ZuktnpGebM/HHg7/f4QbhGee7dnI891jqz5S8CT
+	TsHI4X+94wnebHH5/eKpKx8RCrBv/OzbUqa0K2Awurtu0szWqRV/0F2LPOOUXuMvQ2xr5uQKUPm
+	r2AfQUw==
+X-Google-Smtp-Source: AGHT+IGe2t05unDim4uDryBf0T+QferPUXjPaV2LK4Nd4NgexnAWeTiux+wqiz6ZgBu9e+7IBbrnySiYCWM=
+X-Received: from pja6.prod.google.com ([2002:a17:90b:5486:b0:33b:51fe:1a79])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:2590:b0:2e0:9b1a:640a
+ with SMTP id adf61e73a8af0-334a8485506mr977560637.3.1760635829602; Thu, 16
+ Oct 2025 10:30:29 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Oct 2025 10:28:52 -0700
+Date: Thu, 16 Oct 2025 10:28:53 -0700
 In-Reply-To: <20251016172853.52451-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251016172853.52451-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.0.858.gf9c4a03a3a-goog
-Message-ID: <20251016172853.52451-12-seanjc@google.com>
-Subject: [PATCH v13 11/12] KVM: selftests: Add guest_memfd tests for mmap and
- NUMA policy support
+Message-ID: <20251016172853.52451-13-seanjc@google.com>
+Subject: [PATCH v13 12/12] KVM: guest_memfd: Add gmem_inode.flags field
+ instead of using i_private
 From: Sean Christopherson <seanjc@google.com>
 To: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -75,162 +75,83 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Vlastimil Babka <vbabka@suse.cz>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Shivank Garg <shivankg@amd.com>
+Track a guest_memfd instance's flags in gmem_inode instead of burying them
+in i_private.  Burning an extra 8 bytes per inode is well worth the added
+clarity provided by explicit tracking.
 
-Add tests for NUMA memory policy binding and NUMA aware allocation in
-guest_memfd. This extends the existing selftests by adding proper
-validation for:
-  - KVM GMEM set_policy and get_policy() vm_ops functionality using
-    mbind() and get_mempolicy()
-  - NUMA policy application before and after memory allocation
-
-Run the NUMA mbind() test with and without INIT_SHARED, as KVM should allow
-doing mbind(), madvise(), etc. on guest-private memory, e.g. so that
-userspace can set NUMA policy for CoCo VMs.
-
-Run the NUMA allocation test only for INIT_SHARED, i.e. if the host can't
-fault-in memory (via direct access, madvise(), etc.) as move_pages()
-returns -ENOENT if the page hasn't been faulted in (walks the host page
-tables to find the associated folio)
-
-[sean: don't skip entire test when running on non-NUMA system, test mbind()
-       with private memory, provide more info in assert messages]
-
-Signed-off-by: Shivank Garg <shivankg@amd.com>
-Tested-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/guest_memfd_test.c  | 98 +++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ virt/kvm/guest_memfd.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
-index e7d9aeb418d3..618c937f3c90 100644
---- a/tools/testing/selftests/kvm/guest_memfd_test.c
-+++ b/tools/testing/selftests/kvm/guest_memfd_test.c
-@@ -19,6 +19,7 @@
- #include <sys/stat.h>
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 4463643bd0a2..20f6e7fab58d 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -30,6 +30,8 @@ struct gmem_file {
+ struct gmem_inode {
+ 	struct shared_policy policy;
+ 	struct inode vfs_inode;
++
++	u64 flags;
+ };
  
- #include "kvm_util.h"
-+#include "numaif.h"
- #include "test_util.h"
- #include "ucall_common.h"
+ static __always_inline struct gmem_inode *GMEM_I(struct inode *inode)
+@@ -154,7 +156,7 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
  
-@@ -75,6 +76,101 @@ static void test_mmap_supported(int fd, size_t total_size)
- 	kvm_munmap(mem, total_size);
+ static enum kvm_gfn_range_filter kvm_gmem_get_invalidate_filter(struct inode *inode)
+ {
+-	if ((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED)
++	if (GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED)
+ 		return KVM_FILTER_SHARED;
+ 
+ 	return KVM_FILTER_PRIVATE;
+@@ -385,9 +387,7 @@ static inline struct file *kvm_gmem_get_file(struct kvm_memory_slot *slot)
+ 
+ static bool kvm_gmem_supports_mmap(struct inode *inode)
+ {
+-	const u64 flags = (u64)inode->i_private;
+-
+-	return flags & GUEST_MEMFD_FLAG_MMAP;
++	return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
  }
  
-+static void test_mbind(int fd, size_t total_size)
-+{
-+	const unsigned long nodemask_0 = 1; /* nid: 0 */
-+	unsigned long nodemask = 0;
-+	unsigned long maxnode = 8;
-+	int policy;
-+	char *mem;
-+	int ret;
-+
-+	if (!is_multi_numa_node_system())
-+		return;
-+
-+	mem = kvm_mmap(total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
-+
-+	/* Test MPOL_INTERLEAVE policy */
-+	kvm_mbind(mem, page_size * 2, MPOL_INTERLEAVE, &nodemask_0, maxnode, 0);
-+	kvm_get_mempolicy(&policy, &nodemask, maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(policy == MPOL_INTERLEAVE && nodemask == nodemask_0,
-+		    "Wanted MPOL_INTERLEAVE (%u) and nodemask 0x%lx, got %u and 0x%lx",
-+		    MPOL_INTERLEAVE, nodemask_0, policy, nodemask);
-+
-+	/* Test basic MPOL_BIND policy */
-+	kvm_mbind(mem + page_size * 2, page_size * 2, MPOL_BIND, &nodemask_0, maxnode, 0);
-+	kvm_get_mempolicy(&policy, &nodemask, maxnode, mem + page_size * 2, MPOL_F_ADDR);
-+	TEST_ASSERT(policy == MPOL_BIND && nodemask == nodemask_0,
-+		    "Wanted MPOL_BIND (%u) and nodemask 0x%lx, got %u and 0x%lx",
-+		    MPOL_BIND, nodemask_0, policy, nodemask);
-+
-+	/* Test MPOL_DEFAULT policy */
-+	kvm_mbind(mem, total_size, MPOL_DEFAULT, NULL, 0, 0);
-+	kvm_get_mempolicy(&policy, &nodemask, maxnode, mem, MPOL_F_ADDR);
-+	TEST_ASSERT(policy == MPOL_DEFAULT && !nodemask,
-+		    "Wanted MPOL_DEFAULT (%u) and nodemask 0x0, got %u and 0x%lx",
-+		    MPOL_DEFAULT, policy, nodemask);
-+
-+	/* Test with invalid policy */
-+	ret = mbind(mem, page_size, 999, &nodemask_0, maxnode, 0);
-+	TEST_ASSERT(ret == -1 && errno == EINVAL,
-+		    "mbind with invalid policy should fail with EINVAL");
-+
-+	kvm_munmap(mem, total_size);
-+}
-+
-+static void test_numa_allocation(int fd, size_t total_size)
-+{
-+	unsigned long node0_mask = 1;  /* Node 0 */
-+	unsigned long node1_mask = 2;  /* Node 1 */
-+	unsigned long maxnode = 8;
-+	void *pages[4];
-+	int status[4];
-+	char *mem;
-+	int i;
-+
-+	if (!is_multi_numa_node_system())
-+		return;
-+
-+	mem = kvm_mmap(total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd);
-+
-+	for (i = 0; i < 4; i++)
-+		pages[i] = (char *)mem + page_size * i;
-+
-+	/* Set NUMA policy after allocation */
-+	memset(mem, 0xaa, page_size);
-+	kvm_mbind(pages[0], page_size, MPOL_BIND, &node0_mask, maxnode, 0);
-+	kvm_fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, page_size);
-+
-+	/* Set NUMA policy before allocation */
-+	kvm_mbind(pages[0], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	kvm_mbind(pages[2], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	memset(mem, 0xaa, total_size);
-+
-+	/* Validate if pages are allocated on specified NUMA nodes */
-+	kvm_move_pages(0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(status[0] == 1, "Expected page 0 on node 1, got it on node %d", status[0]);
-+	TEST_ASSERT(status[1] == 1, "Expected page 1 on node 1, got it on node %d", status[1]);
-+	TEST_ASSERT(status[2] == 0, "Expected page 2 on node 0, got it on node %d", status[2]);
-+	TEST_ASSERT(status[3] == 0, "Expected page 3 on node 0, got it on node %d", status[3]);
-+
-+	/* Punch hole for all pages */
-+	kvm_fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, 0, total_size);
-+
-+	/* Change NUMA policy nodes and reallocate */
-+	kvm_mbind(pages[0], page_size * 2, MPOL_BIND, &node0_mask, maxnode, 0);
-+	kvm_mbind(pages[2], page_size * 2, MPOL_BIND, &node1_mask, maxnode, 0);
-+	memset(mem, 0xaa, total_size);
-+
-+	kvm_move_pages(0, 4, pages, NULL, status, 0);
-+	TEST_ASSERT(status[0] == 0, "Expected page 0 on node 0, got it on node %d", status[0]);
-+	TEST_ASSERT(status[1] == 0, "Expected page 1 on node 0, got it on node %d", status[1]);
-+	TEST_ASSERT(status[2] == 1, "Expected page 2 on node 1, got it on node %d", status[2]);
-+	TEST_ASSERT(status[3] == 1, "Expected page 3 on node 1, got it on node %d", status[3]);
-+
-+	kvm_munmap(mem, total_size);
-+}
-+
- static void test_fault_sigbus(int fd, size_t accessible_size, size_t map_size)
- {
- 	const char val = 0xaa;
-@@ -273,11 +369,13 @@ static void __test_guest_memfd(struct kvm_vm *vm, uint64_t flags)
- 		if (flags & GUEST_MEMFD_FLAG_INIT_SHARED) {
- 			gmem_test(mmap_supported, vm, flags);
- 			gmem_test(fault_overflow, vm, flags);
-+			gmem_test(numa_allocation, vm, flags);
- 		} else {
- 			gmem_test(fault_private, vm, flags);
- 		}
+ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+@@ -399,7 +399,7 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+ 	if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
+ 		return VM_FAULT_SIGBUS;
  
- 		gmem_test(mmap_cow, vm, flags);
-+		gmem_test(mbind, vm, flags);
- 	} else {
- 		gmem_test(mmap_not_supported, vm, flags);
+-	if (!((u64)inode->i_private & GUEST_MEMFD_FLAG_INIT_SHARED))
++	if (!(GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_INIT_SHARED))
+ 		return VM_FAULT_SIGBUS;
+ 
+ 	folio = kvm_gmem_get_folio(inode, vmf->pgoff);
+@@ -588,7 +588,6 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 		goto err_fops;
  	}
+ 
+-	inode->i_private = (void *)(unsigned long)flags;
+ 	inode->i_op = &kvm_gmem_iops;
+ 	inode->i_mapping->a_ops = &kvm_gmem_aops;
+ 	inode->i_mode |= S_IFREG;
+@@ -598,6 +597,8 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+ 	/* Unmovable mappings are supposed to be marked unevictable as well. */
+ 	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+ 
++	GMEM_I(inode)->flags = flags;
++
+ 	file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
+ 	if (IS_ERR(file)) {
+ 		err = PTR_ERR(file);
+@@ -917,6 +918,8 @@ static struct inode *kvm_gmem_alloc_inode(struct super_block *sb)
+ 		return NULL;
+ 
+ 	mpol_shared_policy_init(&gi->policy, NULL);
++
++	gi->flags = 0;
+ 	return &gi->vfs_inode;
+ }
+ 
 -- 
 2.51.0.858.gf9c4a03a3a-goog
 
