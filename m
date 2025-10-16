@@ -1,125 +1,81 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431CB13AC1;
-	Thu, 16 Oct 2025 00:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9F718D656
+	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 02:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760573079; cv=none; b=kpyOT06pIxHgADwmU/S56GtP+6HMk5nhccXUcOoHEFux8Y9WcDs5xwfxWcXb7V+ya0Dw31ZEYYnyRWum8BE/+kX3U5LG8RO9hP7gspXlEzPJmh86x4XitATJByt6vpWvvEPCN76eq51NwM9kxpFmNeSYa4YKFZlI9I+dsCDmMoY=
+	t=1760580024; cv=none; b=mNw3fG69g54I9/qZOVdVsH6sGsAWFIBXw3bgm0aC/Pgw2pLDsVjUw0oKNJv9OmZNhzzX0AVfoezSv+XGhwscIgaF0EHXbpwAdG8qtC89fNbsBHrXrHjhTiLZYd2QehQQvV//BFF2lxBftb7t6HOeSIlolidsE8bHYjU0w+BhH74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760573079; c=relaxed/simple;
-	bh=+JrivgWyUgg+pmx0+52mYBdTXkR4tEzcKUO0ehqXf7s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ll0WhjdSOOIWRbyi+NR15letG9q3wO+fSVd21aodkzUkzYf5lRRNnjz0nJ5xoQVyIOf6nkyU7SDcuYq9sAxmWgswMfUVVNRySqpw6vf8dBIEIEUnqY009jclmTiNzgJSjirMknXhMlBIdCqGS1G5nH9vuNMeRLFbLEgLTdpsfEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eYHa8a4h; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eYHa8a4h"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1760573077; x=1792109077;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+JrivgWyUgg+pmx0+52mYBdTXkR4tEzcKUO0ehqXf7s=;
-  b=eYHa8a4htV2IfciglOX1GGDkSh5aNpu6St+uGz1QietzV5WXdnoVaIUS
-   Bgls4I8moOFTABQbdwfBVcFROJzoW7rrRVzw89Dga6MwVjYh7LNRgD6V5
-   2OeW0H5kJP8NyeSbMT6k2B2hl5fe1gR2tX4tCl6fvaY9yskk7Bj+UNCHB
-   LseQtlIMMwB6zJel08KclgnLqAO7JYykuJFxwWznXdccLSHhdYMx2Gsec
-   XFBIZPVTJ29bZ5Jpyl724QLErwYaBlM1K3V3QID0fVsfcn7MJSVI6sZ7T
-   yOsQDd7w/wNHaJAG0mPaiGDIMHquzrtcYIKPRp35aTW5TT7Pf3ESu9ATt
-   g==;
-X-CSE-ConnectionGUID: Aybk4fSKT+60KKw66AVK3g==
-X-CSE-MsgGUID: FLfkoAjcRE6ooMhxZnLN1A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11583"; a="85377195"
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="85377195"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 17:04:36 -0700
-X-CSE-ConnectionGUID: R752COMtRQqyVd5oHvt9WQ==
-X-CSE-MsgGUID: 3PO6qZFiQTmjq3l7JbpGAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,232,1754982000"; 
-   d="scan'208";a="182097810"
-Received: from unknown (HELO [10.238.2.75]) ([10.238.2.75])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2025 17:04:29 -0700
-Message-ID: <ea123839-80fd-4555-8da2-adbd060a2082@linux.intel.com>
-Date: Thu, 16 Oct 2025 08:04:26 +0800
+	s=arc-20240116; t=1760580024; c=relaxed/simple;
+	bh=YW36qZrDdDxLfRhtuQX2WvWZx4/obGYux/G0hx1ooZ4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=DO9lypZfVdbO2ZIc+rvFBKL4xZSVUlvSz/VPjRzs+97EvhLzG34ygMruU97j8DbsUEaUOA+b/XpI735KP29M/VQPXfImmQwBJ3gLoKYQx50bhqL2CqOGClnd5zragFTrwzdvgzQI3UDHFQ0lmocxvfFb+4D25Ln9BHFHKPBgJJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4cnB3d0q7szRhs2;
+	Thu, 16 Oct 2025 09:59:57 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0AF111402F2;
+	Thu, 16 Oct 2025 10:00:18 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 16 Oct 2025 10:00:13 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 16 Oct 2025 10:00:13 +0800
+Message-ID: <866aca63-1f6b-2109-fa76-6d68cb7c547a@hisilicon.com>
+Date: Thu, 16 Oct 2025 10:00:07 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 32/44] KVM: x86/pmu: Disable interception of select PMU
- MSRs for mediated vPMUs
-To: Sean Christopherson <seanjc@google.com>
-Cc: Sandipan Das <sandidas@amd.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
- Mingwei Zhang <mizhang@google.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Sandipan Das <sandipan.das@amd.com>
-References: <20250806195706.1650976-1-seanjc@google.com>
- <20250806195706.1650976-33-seanjc@google.com>
- <f896966e-8925-4b4f-8f0d-f1ae8aa197f7@amd.com> <aN1vfykNs8Dmv_g0@google.com>
- <0276af52-c697-46c3-9db8-9284adb6beee@linux.intel.com>
- <aO_slNn8X1A84sI-@google.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <aO_slNn8X1A84sI-@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Zhou Wang <wangzhou1@hisilicon.com>
+Subject: Question about heterogeneous VM live migration
+To: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
+Hi,
 
-On 10/16/2025 2:48 AM, Sean Christopherson wrote:
-> On Thu, Oct 09, 2025, Dapeng Mi wrote:
->> On 10/2/2025 2:14 AM, Sean Christopherson wrote:
->>> On Fri, Sep 26, 2025, Sandipan Das wrote:
->>>> On 8/7/2025 1:26 AM, Sean Christopherson wrote:
->>>>> +	return kvm_need_perf_global_ctrl_intercept(vcpu) ||
->>>>>  	       pmu->counter_bitmask[KVM_PMC_GP] != (BIT_ULL(kvm_host_pmu.bit_width_gp) - 1) ||
->>>>>  	       pmu->counter_bitmask[KVM_PMC_FIXED] != (BIT_ULL(kvm_host_pmu.bit_width_fixed) - 1);
->>>>>  }
->>>> There is a case for AMD processors where the global MSRs are absent in the guest
->>>> but the guest still uses the same number of counters as what is advertised by the
->>>> host capabilities. So RDPMC interception is not necessary for all cases where
->>>> global control is unavailable.o
->>> Hmm, I think Intel would be the same?  Ah, no, because the host will have fixed
->>> counters, but the guest will not.  However, that's not directly related to
->>> kvm_pmu_has_perf_global_ctrl(), so I think this would be correct?
->>>
->>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>> index 4414d070c4f9..4c5b2712ee4c 100644
->>> --- a/arch/x86/kvm/pmu.c
->>> +++ b/arch/x86/kvm/pmu.c
->>> @@ -744,16 +744,13 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
->>>         return 0;
->>>  }
->>>  
->>> -bool kvm_need_perf_global_ctrl_intercept(struct kvm_vcpu *vcpu)
->>> +static bool kvm_need_pmc_intercept(struct kvm_vcpu *vcpu)
->> The function name kvm_need_pmc_intercept() seems a little bit misleading
->> and make users think this function is used to check if a certain PMC is
->> intercepted. Maybe we can rename the function to kvm_need_global_intercept().
-> Yeah, I don't love kvm_need_pmc_intercept() either.  But kvm_need_global_intercept()
-> feels too close to kvm_need_perf_global_ctrl_intercept().
->
-> Maybe something like kvm_need_any_pmc_intercept()?
+We are now trying to do heterogeneous VM live migration among HiSilicon ARM
+servers, seems there are problems about disabling a feature in guest.
 
-It sounds good to me. Thanks.
+For a feature, if we disable it in VM by configure related ID register field,
+we should make it actually been disabled, e.g. configure related control
+register in EL2 or trap EL0/EL1 access to EL2.
 
+Possible problems:
 
+1. Some features can not be disabled actually in EL0/EL1, e.g. FEAT_AFP,
+   FEAT_RPRES, FEAT_CSSC, FEAT_LRCPC3...
+
+   Disabling it by ID can not avoid a stupid user to directly use it without ID
+   checking, which may bring subtle problem in heterogeneous VM live migration.
+
+2. For some features, it can be trapped, but KVM does not support yet. Not sure
+   if we should support them in future.
+
+   E.g. If we disable ID of FEAT_HAFT for guest, we need configure
+        HCRX_EL2.TCR2En to 0, so access to TCR2_EL1.HAFT will be trapped.
+
+        For FEAT_PAN3, it instroduces EPAN to SCTLR_EL1，if we disable ID of
+	FEAT_PAN3, we need make SCTLR_EL1 to trap by setting HFGRTR_EL2.SCTLR_EL1.
+
+   Seems there are no trap setting in above cases. Just a quick look, maybe I
+   miss something.
+
+I am not sure if we already consider above problems, any help will be appreciated.
+
+Best,
+Zhou
