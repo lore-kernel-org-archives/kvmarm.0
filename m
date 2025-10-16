@@ -1,233 +1,172 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CEE1419A9
-	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 14:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87E5262A6
+	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 16:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760623280; cv=none; b=QwzGdJkMTUJeaDeYVB5+kdkE0eUdIXDaPxAbkIUBW7tHyns6E2mujuNFgiWsGwcPBzdTICU5P9Xo/B1A0v1wCGc+skIhvUw6k3fRx9zUl0Gk5HxiyNwRpARdnl+6Qks4+3KTC9o8ykPzg2jTtn/LQH9P1Oc31rK6RE8algXZ78U=
+	t=1760633155; cv=none; b=Vy0RYB7DSZpEXwCK5beni22FLSbWBNPTtmp1N/DKQD5MLBzrChWezxTQvMuDFsBGTUVknji4+SLGWx42ZxrH3XdPe0VIzOwNVDm28/SzTGNGWnCzPBPsy3nVRGg6pdMuzw2svQaU9rPltRaMaPez9XDw98q2mI5a5ZX5qdw2Gg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760623280; c=relaxed/simple;
-	bh=589DrFu9KazghOPguQIWPB5Q4KJLDcH3rsDrzmHjzCY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h7geLxw6uGKzsrVXM5WVUHeZN8cx9HYuydWqxWttBbgIMbTFMjrPmgWXxS/4AELAp3IFutWPa0OdeBQHLWPHaffVVrQOp7Drollwf7oCMD11AQQEfEknWrF34xkFPBlyDygMmaCOSAWN01ASbAvhM6YV7mz4paGkPfoETVHn/1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 954AF1688;
-	Thu, 16 Oct 2025 07:01:10 -0700 (PDT)
-Received: from [10.57.2.131] (unknown [10.57.2.131])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 61C663F738;
-	Thu, 16 Oct 2025 07:01:16 -0700 (PDT)
-Message-ID: <808b30b8-a85a-4fe3-be49-bf11414cef93@arm.com>
-Date: Thu, 16 Oct 2025 15:01:14 +0100
+	s=arc-20240116; t=1760633155; c=relaxed/simple;
+	bh=Hm2zb7BbK6u0+sAv3frPUeGtmPDc9kHP8wj1uipzTww=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MLIvpPZIsYExCWRSVt7/CharP8TGcpwhgg72xCI6Ufd5+/zNY1vmSAOLrpjpyLA+XorhljReA1GXBY1rw/FL/ipRftbaEchw4FklEKSB+nWgqUXU0cdRNAxQSCrwr6xL6Ut+CdNXvhEUzgz06R20FTZWpXuyH1SQNoxpyMOTnqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uxUIP/22; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uxUIP/22"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4710d174c31so13419375e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 09:45:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760633151; x=1761237951; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o9SbmhQZwiusbuPbqM8RzBz4UGbORFM0qZTqA8aOS0k=;
+        b=uxUIP/22s1onr1IK3rEGgeNjaLoK/dEkziu5t82+/ol3sXI6eccjlOh4ROYmuzlIUV
+         +4B7eyxmXuSeTx8dnbp0nM7MZ3JKGyTSO+zO/FxrXyPqM/mhKQQRB7Ec/Cz6IpeTx3wv
+         EqaODMmT70lJGgzX3BK0Je3YnTcFrOJXNNzOO/5qtMXa48ZMWaIwVVr5zNBARVDwMVEI
+         sebxVfuwUQ396tDORPeoz5uQl5QPVLc/QOMRBo8ZUSQbqPJ3Dw/oVNQw8Y9QUXPD5gi2
+         54cLzPKEzuuN0efDc4juJR0ngOh0HN4sA0OCa95HJZIG1jP5VXkdcqdExEuvhnNJzRkb
+         s93A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760633151; x=1761237951;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o9SbmhQZwiusbuPbqM8RzBz4UGbORFM0qZTqA8aOS0k=;
+        b=HavbMW1bootzFvcNLqOszOdz+7c/o8DoK0wDU8plBk3o3Ws/nTsF28cuxO/XDxwQtK
+         ZCHP9cuFEo2WWQkv0/yP+KwxXPsAvGCM8MvFErNdiXf0ZRjc3YmwE0POKUIYIvtl8qsW
+         eb9W1aLtwia/CM0U7hX34r2jFwVdjh29zr5qzy3vLIlLMzNk/7RZtPwk7BilUq5OZJAF
+         c4E8OZRNOVNuAVgLxkDEgYHcIMjYRzH9yvD4i6lbuIy/vsDKV8e9kl650uXFuzCPoYRB
+         WmHW+jIyHV6X2XWa5nfzQcOIXlbe8aytCl4etiOkl3J1cUPkm7H6Q7oeL+uoqrzvNkfe
+         Dw8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUFcnhyYAJrB/APSKuF/S+vns7gg2DfhfHIO4XXru3VCpHLcKMO8CswyyNztlb+1geqI2N7A6A=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzss3JnbZt1WPt4HGyL86V9tRwDMlz8FqTcQMJGLSqniXNoknvs
+	S/cnlOpq4BcXsfUr0tFlYl9hmbx8TGYs0laysPR6eDAzYolt+gCn9K9Fk89TSKAdTgGvoRV7d2G
+	jKRA1j4ZmshvwbalOGblbQQ==
+X-Google-Smtp-Source: AGHT+IHO7bMt3ey0cBeCObbuEwgWLkRaJtIUMULZrT5bRJWCOB4Klpu3BVpGfBvD91ceBxusLc/jdHvwsQsn2up0
+X-Received: from wmbh9.prod.google.com ([2002:a05:600c:a109:b0:46e:2121:d406])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3b03:b0:471:6f4:602a with SMTP id 5b1f17b1804b1-471179068f6mr5540055e9.23.1760633151113;
+ Thu, 16 Oct 2025 09:45:51 -0700 (PDT)
+Date: Thu, 16 Oct 2025 17:45:41 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] KVM: arm64: Add pre_fault_memory implementation
-Content-Language: en-GB
-To: Jack Thomson <jackabt.amazon@gmail.com>, maz@kernel.org,
- oliver.upton@linux.dev, pbonzini@redhat.com
-Cc: joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com,
- roypat@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com
-References: <20251013151502.6679-1-jackabt.amazon@gmail.com>
- <20251013151502.6679-2-jackabt.amazon@gmail.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20251013151502.6679-2-jackabt.amazon@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.0.869.ge66316f041-goog
+Message-ID: <20251016164541.3771235-1-vdonnefort@google.com>
+Subject: [PATCH v3] KVM: arm64: Check range args for pKVM mem transitions
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org
+Cc: qperret@google.com, sebastianene@google.com, keirf@google.com, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kernel-team@android.com, 
+	Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi
+There's currently no verification for host issued ranges in most of the
+pKVM memory transitions. The end boundary might therefore be subject to
+overflow and later checks could be evaded.
 
-On 13/10/2025 16:14, Jack Thomson wrote:
-> From: Jack Thomson <jackabt@amazon.com>
-> 
-> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
-> off the stage-2 faulting logic to either gmem_abort() or
-> user_mem_abort().
-> 
-> Add an optional page_size output parameter to user_mem_abort() to
-> return the VMA page size, which is needed when pre-faulting.
-> 
-> Update the documentation to clarify x86 specific behaviour.
+Close this loophole with an additional pfn_range_is_valid() check on a
+per public function basis. Once this check has passed, it is safe to
+convert pfn and nr_pages into a phys_addr_t and a size.
 
-Thanks for the patch ! Do we care about faulting beyond the requested 
-range ? I understand this doesn't happen for anything that is not
-backed by gmem (which might change with hugetlbfs support) or normal
-VMs. But for coco VMs this might affect the measurement or even cause
-failure in "pre-faulting" because of the extra security checks.
-(e.g., trying to fault in twice, because the range is backed by say,
-1G page).
+host_unshare_guest transition is already protected via
+__check_host_shared_guest(), while assert_host_shared_guest() callers
+are already ignoring host checks.
 
-Of course these could be addressed via a separate patch, when this
-becomes a real requirement.
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-One way to solve this could be pass on the "pagesize" as the input
-parameter which could force the backend to limit the vma_pagesize
-that gets used for the stage2 mapping.
+---
 
-> 
-> Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> ---
->   Documentation/virt/kvm/api.rst |  3 +-
->   arch/arm64/kvm/Kconfig         |  1 +
->   arch/arm64/kvm/arm.c           |  1 +
->   arch/arm64/kvm/mmu.c           | 73 ++++++++++++++++++++++++++++++++--
->   4 files changed, 73 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c17a87a0a5ac..9e8cc4eb505d 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6461,7 +6461,8 @@ Errors:
->   KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
->   for the current vCPU state.  KVM maps memory as if the vCPU generated a
->   stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
-> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
-> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
-> +Accessed.
->   
->   In the case of confidential VM types where there is an initial set up of
->   private guest memory before the guest is 'finalized'/measured, this ioctl
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index bff62e75d681..1ac0605f86cb 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -25,6 +25,7 @@ menuconfig KVM
->   	select HAVE_KVM_CPU_RELAX_INTERCEPT
->   	select KVM_MMIO
->   	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> +	select KVM_GENERIC_PRE_FAULT_MEMORY
->   	select KVM_XFER_TO_GUEST_WORK
->   	select KVM_VFIO
->   	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 888f7c7abf54..65654a742864 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -322,6 +322,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_IRQFD_RESAMPLE:
->   	case KVM_CAP_COUNTER_OFFSET:
->   	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
-> +	case KVM_CAP_PRE_FAULT_MEMORY:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index a36426ccd9b5..82f122e4b08c 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1597,8 +1597,8 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   
->   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   			  struct kvm_s2_trans *nested,
-> -			  struct kvm_memory_slot *memslot, unsigned long hva,
-> -			  bool fault_is_perm)
-> +			  struct kvm_memory_slot *memslot, long *page_size,
-> +			  unsigned long hva, bool fault_is_perm)
->   {
->   	int ret = 0;
->   	bool topup_memcache;
-> @@ -1871,6 +1871,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->   	kvm_release_faultin_page(kvm, page, !!ret, writable);
->   	kvm_fault_unlock(kvm);
->   
-> +	if (page_size)
-> +		*page_size = vma_pagesize;
-> +
->   	/* Mark the page dirty only if the fault is handled successfully */
->   	if (writable && !ret)
->   		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> @@ -2069,8 +2072,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->   		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
->   				 esr_fsc_is_permission_fault(esr));
->   	else
-> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> -				     esr_fsc_is_permission_fault(esr));
-> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
-> +				     hva, esr_fsc_is_permission_fault(esr));
->   	if (ret == 0)
->   		ret = 1;
->   out:
-> @@ -2446,3 +2449,65 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->   
->   	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->   }
-> +
-> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> +				    struct kvm_pre_fault_memory *range)
-> +{
-> +	int ret, idx;
-> +	hva_t hva;
-> +	phys_addr_t end;
-> +	struct kvm_memory_slot *memslot;
-> +	struct kvm_vcpu_fault_info stored_fault, *fault_info;
-> +
-> +	long page_size = PAGE_SIZE;
-> +	phys_addr_t ipa = range->gpa;
-> +	gfn_t gfn = gpa_to_gfn(range->gpa);
-> +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-> +
-> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> +	if (!memslot) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	fault_info = &vcpu->arch.fault;
-> +	stored_fault = *fault_info;
-> +
-> +	/* Generate a synthetic abort for the pre-fault address */
-> +	fault_info->esr_el2 = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_DABT_CUR);
+v2 -> v3: 
+   * Test range against PA-range and make the func phys specific.
 
-minor nit: Any reason why we don't use ESR_ELx_EC_DABT_LOW ? We always
-get that for a data abort from the guest. Otherwise, this looks
-good to me.
+v1 -> v2:
+   * Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
+   * Rename to check_range_args().
 
-Suzuki
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index ddc8beb55eee..49db32f3ddf7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -367,6 +367,19 @@ static int host_stage2_unmap_dev_all(void)
+ 	return kvm_pgtable_stage2_unmap(pgt, addr, BIT(pgt->ia_bits) - addr);
+ }
+ 
++/*
++ * Ensure the PFN range is contained within PA-range.
++ *
++ * This check is also robust to overflows and is therefore a requirement before
++ * using a pfn/nr_pages pair from an untrusted source.
++ */
++static bool pfn_range_is_valid(u64 pfn, u64 nr_pages)
++{
++	u64 limit = BIT(kvm_phys_shift(&host_mmu.arch.mmu) - PAGE_SHIFT);
++
++	return pfn < limit && ((limit - pfn) >= nr_pages);
++}
++
+ struct kvm_mem_range {
+ 	u64 start;
+ 	u64 end;
+@@ -776,6 +789,9 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+ 	void *virt = __hyp_va(phys);
+ 	int ret;
+ 
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
+ 	host_lock_component();
+ 	hyp_lock_component();
+ 
+@@ -804,6 +820,9 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
+ 	u64 virt = (u64)__hyp_va(phys);
+ 	int ret;
+ 
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
+ 	host_lock_component();
+ 	hyp_lock_component();
+ 
+@@ -887,6 +906,9 @@ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
+ 	u64 size = PAGE_SIZE * nr_pages;
+ 	int ret;
+ 
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
+ 	host_lock_component();
+ 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
+ 	if (!ret)
+@@ -902,6 +924,9 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
+ 	u64 size = PAGE_SIZE * nr_pages;
+ 	int ret;
+ 
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
+ 	host_lock_component();
+ 	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED);
+ 	if (!ret)
+@@ -945,6 +970,9 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu
+ 	if (prot & ~KVM_PGTABLE_PROT_RWX)
+ 		return -EINVAL;
+ 
++	if (!pfn_range_is_valid(pfn, nr_pages))
++		return -EINVAL;
++
+ 	ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
+ 	if (ret)
+ 		return ret;
 
-
-> +	fault_info->esr_el2 &= ~ESR_ELx_ISV;
-> +	fault_info->esr_el2 |= ESR_ELx_FSC_FAULT_L(KVM_PGTABLE_LAST_LEVEL);
-> +
-> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
-> +		FIELD_PREP(HPFAR_EL2_FIPA, ipa >> 12);
-> +
-> +	if (kvm_slot_has_gmem(memslot)) {
-> +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
-> +	} else {
-> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> +		if (kvm_is_error_hva(hva)) {
-> +			ret = -EFAULT;
-> +			goto out;
-> +		}
-> +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
-> +				     false);
-> +	}
-> +
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	end = (range->gpa & ~(page_size - 1)) + page_size;
-> +	ret = min(range->size, end - range->gpa);
-> +
-> +out:
-> +	*fault_info = stored_fault;
-> +out_unlock:
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +	return ret;
-> +}
-m
+base-commit: 7ea30958b3054f5e488fa0b33c352723f7ab3a2a
+-- 
+2.51.0.869.ge66316f041-goog
 
