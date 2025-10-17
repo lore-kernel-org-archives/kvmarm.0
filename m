@@ -1,171 +1,131 @@
-Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A19621FF3F
-	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 16:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFFC2E7BA3
+	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 16:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760718003; cv=none; b=u4zq1yPewQAyys5Eb6rh/1ZqqScfiXzpnbt9trgT4G7u8aJfJQH4hLBlIiJ6n+rOX2y2yC0ZIthhmId1CZlb/EKQIhgko/G5zT6T5xFxz2Zh79itFXVl6EcRvxzJPpWtC1e32jWvz0Ht2AlFM3wJol8+tBhar5U4u4vWqnXDkZQ=
+	t=1760719762; cv=none; b=QpWcSYBEZtzbtjU+Gap9EL5fJshAqYpCrCSYweP9Auca6FBtsuelrvVf8PT/ZZXkTL2S8Y4QJYXTi3PwGvtETKguMFyNjSpEy3WGLFTV1lK6lCRmqZTOzOQlkN1Kc6Wep/naSadGWuRyPs5vOSf6KuLdXnUgE0E0vPPIk+NkJ90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760718003; c=relaxed/simple;
-	bh=/SgEYq5zZ6091CkGidwkN4U+TaXlaYnsAjqJEsJKnQs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g4C5ns04PI2LHPNfFoYUi9Rj8Bvcv3MOBlmBUJquDT+gvWDQB6wRyieErDppYCOygjQAUkpRxW+SMCgMO1Hd5Jx+/iJ0bjG8/NPghaUGG3zWMXdOFEX2mk7Z60fa0W95ks7Uo8QSKNbWcSX8Ffh0bil0Jw570degoQ9yKuGZW40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=GDvHiytV; arc=none smtp.client-ip=18.197.217.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1760719762; c=relaxed/simple;
+	bh=gVgiYRt/rqFaySiyrmr5fh20anzP3rCx+EcjH3amo/o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=JkvLnRUJXgtgpnOxGvtlMJpoTB/hZKfdo6p+CimmPu1sUvuNUycwuyyi0/CyQX5KUk0aw3gB4TZ27SQKEbleqUSZ3xr80SFM3l/EAsqxT3Nmj/aSfunTeYa1BQoJsH/iN7+viDDG8nvurm7i1Jq1Uii5MGAknnGiCJ9f4xqvrrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R9wdgm0N; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="GDvHiytV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R9wdgm0N"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29085106b99so22556645ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 09:49:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1760718001; x=1792254001;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D2nJT0TPpGHrtCf3T2K40DMg+dwtxR+G/m4g1KLFCNo=;
-  b=GDvHiytVXINQz59/zDIdOdYdSwXPMBcvb4GPRyp7oBJSFgqOa0FR9x37
-   5hgaxFkSbqDjWMku/yTsgGkb8I4bzvsAV7nQKK7GtMHbcOE1igdWMxtPZ
-   Zu0AZdW0TAYUJSjahMNKX8vLnb7NW5vNLZPHO17WE0ioxDF3yjri5phat
-   G2zn3s+qjPTbvL698n6UPPSef/EfldRkJPwW44cUt0tD1DNYLjLRutA1N
-   TMPPv1eik0UtVLOCyLsUvxMAA8QwS7fnpFEuPT1m4F0hrSWIQvGwouB5I
-   iBqhhZUAeZU/hlNPoKGTkQJPpzvhtwccIHj0mwbBfziZaH2rMOze9sR6f
-   A==;
-X-CSE-ConnectionGUID: dnjg3YGdSkepofo0QlGplw==
-X-CSE-MsgGUID: /EwhAQ4yRa6TpPU6AkX5EA==
-X-IronPort-AV: E=Sophos;i="6.19,236,1754956800"; 
-   d="scan'208";a="3779950"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2025 16:19:50 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:21471]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.18.241:2525] with esmtp (Farcaster)
- id 580d473a-31d3-407f-bbb8-194dd70ae947; Fri, 17 Oct 2025 16:19:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 580d473a-31d3-407f-bbb8-194dd70ae947
-Received: from EX19D016EUA001.ant.amazon.com (10.252.50.245) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20;
- Fri, 17 Oct 2025 16:19:40 +0000
-Received: from amazon.com (10.1.212.14) by EX19D016EUA001.ant.amazon.com
- (10.252.50.245) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.20; Fri, 17 Oct 2025
- 16:19:35 +0000
-From: Maximilian Dittgen <mdittgen@amazon.de>
-To: <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <pbonzini@redhat.com>, <shuah@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<mdittgen@amazon.de>, <epetron@amazon.de>, <nh-open-source@amazon.com>,
-	Maximilian Dittgen <mdittgen@amazon.com>
-Subject: [PATCH] KVM: selftests: fix ITS collection target addresses in vgic_lpi_stress
-Date: Fri, 17 Oct 2025 18:19:18 +0200
-Message-ID: <20251017161918.40711-1-mdittgen@amazon.de>
-X-Mailer: git-send-email 2.50.1
+        d=google.com; s=20230601; t=1760719760; x=1761324560; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hOIrByP8ZUQuvgPySyDlm6fhYAgi3WQo8mV8b43qPRw=;
+        b=R9wdgm0NdLyMmPTZ8KLuzKAynUC56dwsgMCDHBWGCMvQrcdEDlBZNmDP/2prXXBwSP
+         S7F2xNx/P2AW/2zog9egcAW0+nNTO9oi+FhQlr/Qt+a5VC56xIn3rY60B1MGz4BgFXbQ
+         uQXkP/j7fywYBRUN5XiXRpNoLwWJCIyd0Us/+KSFI+ZLnHJL+TyRYo9np2N/b1Nkwhmx
+         cep239VXLsHVAk65POv/xxBzjDHZTpoz5ZF6RcHm0aPQiJQ1yyhDSsNtsMHV/V0WFfxf
+         uE5q1BHswqeJ+qf+t9FOzIY99mUiBwyfQao8fABpc4s+Pw7D9t/8CK9x96iPD1pxcToB
+         5m5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760719760; x=1761324560;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hOIrByP8ZUQuvgPySyDlm6fhYAgi3WQo8mV8b43qPRw=;
+        b=HovqT8rlpcW01ymQGP4jwqUAvTPW7ixSRjJ9txwz1ASphGsXoFsWLcu5nG2cyObbpQ
+         CjaSFrRz3iYeizq2SUWAIL1csoztbHVKIwOr9CamIwPuhvjdgPszLHwVNchNwrKv0oTh
+         AnKUd7R33en/aaBZlJmW0UshfLUO5VkPbG+IoisNQYBkf5+s9Nd20nanotacCnVEx19k
+         N+IEY0dBxdcs6BRhdvilbNsMUpdNvILmgDKvaL9EKYGCV4Z3aj+YJu65Mo8wuC7tgsgM
+         DDkPZylc3x4XDb4gVfAwq9dsQ3eoTRI/f34q2Ialeax7r4hgoU2StbN5+MxAuEMndYUH
+         QN2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWKVOYXqvsjN3KD3diCYL/pMdJkyaXDwbWVPHvdxurv/+rGahHuSlFYhyq7meRjJi1TPKznaN4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzptX3qAWJ2WLcyjXzDod9EHVbpqfQycp1LHzkFXvpeXa+n4OQD
+	aoy7Q3XAaGzday3VYMShfhgNglajElmeBA75dLVqtlyT+XrS67BCkWsQc3z2pNoBoHwKOaWGWxL
+	8p5bolQ==
+X-Google-Smtp-Source: AGHT+IEuqhHVpbBVF4PRy6ZWRfMuRBmBaTfUEEN01d1cgDPtR7abw4umz8fmd13HoIYheHHmygdWMEDHdzI=
+X-Received: from plbkg4.prod.google.com ([2002:a17:903:604:b0:290:be3d:aff6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:40ca:b0:290:b928:cf3d
+ with SMTP id d9443c01a7336-290cbd35d7dmr53537195ad.59.1760719759868; Fri, 17
+ Oct 2025 09:49:19 -0700 (PDT)
+Date: Fri, 17 Oct 2025 09:49:17 -0700
+In-Reply-To: <CANiq72m0rNCaKandZgRa4dMhNOEN7ZanT5ht4kT8FLxYoWLVLQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D016EUA001.ant.amazon.com (10.252.50.245)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251016172853.52451-1-seanjc@google.com> <CANiq72ntKAeXRT_fEGJteUfuQuNUSjobmJCbQOuJWAcNFb1+9w@mail.gmail.com>
+ <aPFVcMdfFlxhgGZh@google.com> <CANiq72m6vWc9K+TLYoToGOWXXFB5tbAdf-crdx6U1UrBifEEBA@mail.gmail.com>
+ <diqzqzv2762z.fsf@google.com> <CANiq72m0rNCaKandZgRa4dMhNOEN7ZanT5ht4kT8FLxYoWLVLQ@mail.gmail.com>
+Message-ID: <aPJzjWzL4EbwDM66@google.com>
+Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
+From: Sean Christopherson <seanjc@google.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Ackerley Tng <ackerleytng@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shivank Garg <shivankg@amd.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-When mapping guest ITS collections, vgic_lpi_stress iterates over
-integers in the range [0, nr_cpus), passing them as the target_addr
-parameter to its_send_mapc_cmd(). These integers correspond to the
-selftest userspace vCPU IDs that we intend to map each ITS collection
-to.
+On Fri, Oct 17, 2025, Miguel Ojeda wrote:
+> On Fri, Oct 17, 2025 at 1:57=E2=80=AFAM Ackerley Tng <ackerleytng@google.=
+com> wrote:
+> >
+> > Using the command on virt/ would pick it up. Would it be better to add
+> > "virt/" to the "automation" + update .clang-format while we're at it?
+>=20
+> Yeah, that is what I was suggesting if you rely on it (and if the
+> maintainers of the relevant folders are OK with it).
 
-However, its_encode_target() within its_send_mapc_cmd() expects a
-vCPU's redistributor address--not the vCPU ID--as the target_addr
-parameter. This is evident from how its_encode_target() encodes the
-target_addr parameter as:
+Hmm, my vote would be to go all-or-nothing for KVM (x86), i.e. include ever=
+ything
+in KVM, or explicitly filter out KVM.  I don't see how auto-formatting can =
+be
+useful if it's wildly inconsistent, e.g. if it works for some KVM for-each =
+macros,
+but clobbers others.
 
-        its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16)
+And I'm leaning towards filtering out KVM, because I'm not sure I want to e=
+ncourage
+use of auto-formatting.  I can definitely see how it's useful, but so much =
+of the
+auto-formatting is just _awful_.
 
-This shows that we right-shift the input target_addr parameter by 16
-bits before encoding it. This makes sense when the parameter refers to
-redistributor addresses (e.g., 0x20000, 0x30000) but not vCPU IDs
-(e.g., 0x2, 0x3).
+E.g. I ran it on a few KVM files and it generated changes like this
 
-The current impact of passing vCPU IDs to its_send_mapc_cmd() is that
-all vCPU IDs become 0x0 after the bit shift. Thus, when
-vgic_its_cmd_handle_mapc() receives the ITS command in vgic-its.c, it
-always interprets the collection's target_vcpu as 0. All interrupts
-sent to collections will be processed by vCPU 0, which defeats the
-purpose of this multi-vCPU test.
+-       intel_pmu_enable_fixed_counter_bits(pmu, INTEL_FIXED_0_KERNEL |
+-                                                INTEL_FIXED_0_USER |
+-                                                INTEL_FIXED_0_ENABLE_PMI);
++       intel_pmu_enable_fixed_counter_bits(
++               pmu, INTEL_FIXED_0_KERNEL | INTEL_FIXED_0_USER |
++                            INTEL_FIXED_0_ENABLE_PMI);
 
-Fix by left-shifting the vCPU parameter received by its_send_mapc_cmd
-16 bits before passing it into its_encode_target for encoding.
+and=20
 
-Signed-off-by: Maximilian Dittgen <mdittgen@amazon.com>
----
-To validate the patch, I added the following debug code at the top of vgic_its_cmd_handle_mapc:
+-                       intel_pmu_enable_fixed_counter_bits(pmu, ICL_FIXED_=
+0_ADAPTIVE);
++                       intel_pmu_enable_fixed_counter_bits(
++                               pmu, ICL_FIXED_0_ADAPTIVE);
 
-	u64 raw_cmd2 = le64_to_cpu(its_cmd[2]);
-	u32 target_addr = its_cmd_get_target_addr(its_cmd);
+There are definitely plenty of good changes as well, but overall I find the=
+ results
+to be very net negative.  That's obviously highly subjective, and maybe the=
+re's
+settings in clangd I can tweak to make things more to my liking, but my ini=
+tial
+reaction is that I don't want to actively encourage use of auto-formatting =
+in KVM.
 
-	kvm_info("MAPC: coll_id=%d, raw_cmd[2]=0x%llx, parsed_target=%u\n", 
-		coll_id, raw_cmd2, target_addr);
-	vcpu = kvm_get_vcpu_by_id(kvm, its_cmd_get_target_addr(its_cmd));
-	kvm_info("MAPC: coll_id=%d, vcpu_id=%d\n", coll_id, vcpu ? vcpu->vcpu_id : -1);
-
-I then ran `./vgic_lpi_stress -v 3` to trigger the stress selftest with 3 vCPUs.
-
-Before the patch, the debug logs read:
-kvm [20832]: MAPC: coll_id=0, raw_cmd[2]=0x8000000000000000, parsed_target=0
-kvm [20832]: MAPC: coll_id=0, vcpu_id=0
-kvm [20832]: MAPC: coll_id=1, raw_cmd[2]=0x8000000000000001, parsed_target=0
-kvm [20832]: MAPC: coll_id=1, vcpu_id=0
-kvm [20832]: MAPC: coll_id=2, raw_cmd[2]=0x8000000000000002, parsed_target=0
-kvm [20832]: MAPC: coll_id=2, vcpu_id=0
-
-Note the last bit of the cmd string reflects the collection ID, but the rest of the cmd string reads 0. The handler parses out vCPU 0 for all 3 mapc calls.
-
-After the patch, the debug logs read:
-kvm [20019]: MAPC: coll_id=0, raw_cmd[2]=0x8000000000000000, parsed_target=0
-kvm [20019]: MAPC: coll_id=0, vcpu_id=0
-kvm [20019]: MAPC: coll_id=1, raw_cmd[2]=0x8000000000010001, parsed_target=1
-kvm [20019]: MAPC: coll_id=1, vcpu_id=1
-kvm [20019]: MAPC: coll_id=2, raw_cmd[2]=0x8000000000020002, parsed_target=2
-kvm [20019]: MAPC: coll_id=2, vcpu_id=2
-
-Note that the target vcpu and target collection are both visible in the cmd string. The handler parses out the correct vCPU for all 3 mapc calls.
----
- tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-index 09f270545646..23c46ad17221 100644
---- a/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c
-@@ -15,6 +15,8 @@
- #include "gic_v3.h"
- #include "processor.h"
- 
-+#define GITS_COLLECTION_TARGET_SHIFT 16
-+
- static u64 its_read_u64(unsigned long offset)
- {
- 	return readq_relaxed(GITS_BASE_GVA + offset);
-@@ -217,7 +219,7 @@ void its_send_mapc_cmd(void *cmdq_base, u32 vcpu_id, u32 collection_id, bool val
- 
- 	its_encode_cmd(&cmd, GITS_CMD_MAPC);
- 	its_encode_collection(&cmd, collection_id);
--	its_encode_target(&cmd, vcpu_id);
-+	its_encode_target(&cmd, vcpu_id << GITS_COLLECTION_TARGET_SHIFT);
- 	its_encode_valid(&cmd, valid);
- 
- 	its_send_cmd(cmdq_base, &cmd);
--- 
-2.50.1 (Apple Git-155)
-
-
-
-
-Amazon Web Services Development Center Germany GmbH
-Tamara-Danz-Str. 13
-10243 Berlin
-Geschaeftsfuehrung: Christian Schlaeger
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
-
+I think no matter what, any decision should be in a separate, dedicated pat=
+ch/thread.
+So for this series, I'll drop the .clang-format change when applying, assum=
+ing
+nothing else pops that requires a new version.
