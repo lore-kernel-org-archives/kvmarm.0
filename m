@@ -1,131 +1,99 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFFC2E7BA3
-	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 16:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E329D2F6578;
+	Fri, 17 Oct 2025 17:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760719762; cv=none; b=QpWcSYBEZtzbtjU+Gap9EL5fJshAqYpCrCSYweP9Auca6FBtsuelrvVf8PT/ZZXkTL2S8Y4QJYXTi3PwGvtETKguMFyNjSpEy3WGLFTV1lK6lCRmqZTOzOQlkN1Kc6Wep/naSadGWuRyPs5vOSf6KuLdXnUgE0E0vPPIk+NkJ90=
+	t=1760720789; cv=none; b=LxJ1T648jUUjnfQJKcN17pcbtyxN9e9xa32rvTtynwE/Ru8NnfsRwiR/5z8pwcZWHSXPK54EpBy5PyZfY4nG3aZrq92wKX97kGg16beKKb8TbcZp4S3TBDldjvbJY6MSG7Ucb0LCslC6T1ayxfpYPyzSBMxZ0Yygoty18OJhuaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760719762; c=relaxed/simple;
-	bh=gVgiYRt/rqFaySiyrmr5fh20anzP3rCx+EcjH3amo/o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JkvLnRUJXgtgpnOxGvtlMJpoTB/hZKfdo6p+CimmPu1sUvuNUycwuyyi0/CyQX5KUk0aw3gB4TZ27SQKEbleqUSZ3xr80SFM3l/EAsqxT3Nmj/aSfunTeYa1BQoJsH/iN7+viDDG8nvurm7i1Jq1Uii5MGAknnGiCJ9f4xqvrrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R9wdgm0N; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1760720789; c=relaxed/simple;
+	bh=owdsvpGuqtfJqt1yeEm2ukThStXdCZDt3cCbZJE06hA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LmavhAfe9GNa9+pjX6ZwssUCrNTwnfFWAw463sojdnA5PDYnDU0cboDOI40C12oukwhF3tsJIf9SLz7x2SlGgfM/5bzRlFqFgL9Ivf9Ge5rW4fhnafQEkbIedYGxMghw/B2eIYurPM7SeIcTxweShnuQlWGz6CgHDJXFO6cOBTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=srsVk+Ex; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R9wdgm0N"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29085106b99so22556645ad.1
-        for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 09:49:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760719760; x=1761324560; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hOIrByP8ZUQuvgPySyDlm6fhYAgi3WQo8mV8b43qPRw=;
-        b=R9wdgm0NdLyMmPTZ8KLuzKAynUC56dwsgMCDHBWGCMvQrcdEDlBZNmDP/2prXXBwSP
-         S7F2xNx/P2AW/2zog9egcAW0+nNTO9oi+FhQlr/Qt+a5VC56xIn3rY60B1MGz4BgFXbQ
-         uQXkP/j7fywYBRUN5XiXRpNoLwWJCIyd0Us/+KSFI+ZLnHJL+TyRYo9np2N/b1Nkwhmx
-         cep239VXLsHVAk65POv/xxBzjDHZTpoz5ZF6RcHm0aPQiJQ1yyhDSsNtsMHV/V0WFfxf
-         uE5q1BHswqeJ+qf+t9FOzIY99mUiBwyfQao8fABpc4s+Pw7D9t/8CK9x96iPD1pxcToB
-         5m5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760719760; x=1761324560;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hOIrByP8ZUQuvgPySyDlm6fhYAgi3WQo8mV8b43qPRw=;
-        b=HovqT8rlpcW01ymQGP4jwqUAvTPW7ixSRjJ9txwz1ASphGsXoFsWLcu5nG2cyObbpQ
-         CjaSFrRz3iYeizq2SUWAIL1csoztbHVKIwOr9CamIwPuhvjdgPszLHwVNchNwrKv0oTh
-         AnKUd7R33en/aaBZlJmW0UshfLUO5VkPbG+IoisNQYBkf5+s9Nd20nanotacCnVEx19k
-         N+IEY0dBxdcs6BRhdvilbNsMUpdNvILmgDKvaL9EKYGCV4Z3aj+YJu65Mo8wuC7tgsgM
-         DDkPZylc3x4XDb4gVfAwq9dsQ3eoTRI/f34q2Ialeax7r4hgoU2StbN5+MxAuEMndYUH
-         QN2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWKVOYXqvsjN3KD3diCYL/pMdJkyaXDwbWVPHvdxurv/+rGahHuSlFYhyq7meRjJi1TPKznaN4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzptX3qAWJ2WLcyjXzDod9EHVbpqfQycp1LHzkFXvpeXa+n4OQD
-	aoy7Q3XAaGzday3VYMShfhgNglajElmeBA75dLVqtlyT+XrS67BCkWsQc3z2pNoBoHwKOaWGWxL
-	8p5bolQ==
-X-Google-Smtp-Source: AGHT+IEuqhHVpbBVF4PRy6ZWRfMuRBmBaTfUEEN01d1cgDPtR7abw4umz8fmd13HoIYheHHmygdWMEDHdzI=
-X-Received: from plbkg4.prod.google.com ([2002:a17:903:604:b0:290:be3d:aff6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:40ca:b0:290:b928:cf3d
- with SMTP id d9443c01a7336-290cbd35d7dmr53537195ad.59.1760719759868; Fri, 17
- Oct 2025 09:49:19 -0700 (PDT)
-Date: Fri, 17 Oct 2025 09:49:17 -0700
-In-Reply-To: <CANiq72m0rNCaKandZgRa4dMhNOEN7ZanT5ht4kT8FLxYoWLVLQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="srsVk+Ex"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81C9AC4CEE7;
+	Fri, 17 Oct 2025 17:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1760720788;
+	bh=owdsvpGuqtfJqt1yeEm2ukThStXdCZDt3cCbZJE06hA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=srsVk+ExIl6UoFr8jbNWtHjqaCU7kGEh/aCI+er06jBrVykq/oX5SoRKZDVgAsPCz
+	 8jvZOTgIBP32o+Sw089bTZtPRh3qE5gY/+AB/C28STdV+PkV3yLAX+hERh0SWW1d5F
+	 qedQ3ePupiOP5b3OYDQXUw+xWfUoGNgQuGMmFAAOzEeSK/u54xP9gbucnPJ3WC6ZDp
+	 csMWGlgltGih3ceEXKN8oWrecFvo7mOif1VLT2q3iC6dltwQr/7Y74PLiMX14P2BXW
+	 23XEvGzrauJBcx7c6gfUWod0B3WH/bA3Ea0Eb2OSUB33EpclLdiM2eO/rqkMOpMPf7
+	 m1Wwx3LaVAVMw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1v9nuM-0000000EwrQ-0JKC;
+	Fri, 17 Oct 2025 17:06:26 +0000
+Date: Fri, 17 Oct 2025 18:06:25 +0100
+Message-ID: <86v7kdwj8u.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maximilian Dittgen <mdittgen@amazon.de>
+Cc: <oliver.upton@linux.dev>,
+	<pbonzini@redhat.com>,
+	<shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>,
+	<kvm@vger.kernel.org>,
+	<epetron@amazon.de>,
+	<nh-open-source@amazon.com>,
+	Maximilian Dittgen <mdittgen@amazon.com>
+Subject: Re: [PATCH] KVM: selftests: fix ITS collection target addresses in vgic_lpi_stress
+In-Reply-To: <20251017161918.40711-1-mdittgen@amazon.de>
+References: <20251017161918.40711-1-mdittgen@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251016172853.52451-1-seanjc@google.com> <CANiq72ntKAeXRT_fEGJteUfuQuNUSjobmJCbQOuJWAcNFb1+9w@mail.gmail.com>
- <aPFVcMdfFlxhgGZh@google.com> <CANiq72m6vWc9K+TLYoToGOWXXFB5tbAdf-crdx6U1UrBifEEBA@mail.gmail.com>
- <diqzqzv2762z.fsf@google.com> <CANiq72m0rNCaKandZgRa4dMhNOEN7ZanT5ht4kT8FLxYoWLVLQ@mail.gmail.com>
-Message-ID: <aPJzjWzL4EbwDM66@google.com>
-Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
-From: Sean Christopherson <seanjc@google.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shivank Garg <shivankg@amd.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, epetron@amazon.de, nh-open-source@amazon.com, mdittgen@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Oct 17, 2025, Miguel Ojeda wrote:
-> On Fri, Oct 17, 2025 at 1:57=E2=80=AFAM Ackerley Tng <ackerleytng@google.=
-com> wrote:
-> >
-> > Using the command on virt/ would pick it up. Would it be better to add
-> > "virt/" to the "automation" + update .clang-format while we're at it?
+On Fri, 17 Oct 2025 17:19:18 +0100,
+Maximilian Dittgen <mdittgen@amazon.de> wrote:
 >=20
-> Yeah, that is what I was suggesting if you rely on it (and if the
-> maintainers of the relevant folders are OK with it).
+> When mapping guest ITS collections, vgic_lpi_stress iterates over
+> integers in the range [0, nr_cpus), passing them as the target_addr
+> parameter to its_send_mapc_cmd(). These integers correspond to the
+> selftest userspace vCPU IDs that we intend to map each ITS collection
+> to.
+>=20
+> However, its_encode_target() within its_send_mapc_cmd() expects a
+> vCPU's redistributor address--not the vCPU ID--as the target_addr
+> parameter. This is evident from how its_encode_target() encodes the
+> target_addr parameter as:
+>=20
+>         its_mask_encode(&cmd->raw_cmd[2], target_addr >> 16, 51, 16)
+>=20
+> This shows that we right-shift the input target_addr parameter by 16
+> bits before encoding it. This makes sense when the parameter refers to
+> redistributor addresses (e.g., 0x20000, 0x30000) but not vCPU IDs
+> (e.g., 0x2, 0x3).
 
-Hmm, my vote would be to go all-or-nothing for KVM (x86), i.e. include ever=
-ything
-in KVM, or explicitly filter out KVM.  I don't see how auto-formatting can =
-be
-useful if it's wildly inconsistent, e.g. if it works for some KVM for-each =
-macros,
-but clobbers others.
+=46rom the KVM ITS emulation code:
 
-And I'm leaning towards filtering out KVM, because I'm not sure I want to e=
-ncourage
-use of auto-formatting.  I can definitely see how it's useful, but so much =
-of the
-auto-formatting is just _awful_.
+	 * We use linear CPU numbers for redistributor addressing,
+	 * so GITS_TYPER.PTA is 0.
 
-E.g. I ran it on a few KVM files and it generated changes like this
+It is not an address.
 
--       intel_pmu_enable_fixed_counter_bits(pmu, INTEL_FIXED_0_KERNEL |
--                                                INTEL_FIXED_0_USER |
--                                                INTEL_FIXED_0_ENABLE_PMI);
-+       intel_pmu_enable_fixed_counter_bits(
-+               pmu, INTEL_FIXED_0_KERNEL | INTEL_FIXED_0_USER |
-+                            INTEL_FIXED_0_ENABLE_PMI);
+	M.
 
-and=20
-
--                       intel_pmu_enable_fixed_counter_bits(pmu, ICL_FIXED_=
-0_ADAPTIVE);
-+                       intel_pmu_enable_fixed_counter_bits(
-+                               pmu, ICL_FIXED_0_ADAPTIVE);
-
-There are definitely plenty of good changes as well, but overall I find the=
- results
-to be very net negative.  That's obviously highly subjective, and maybe the=
-re's
-settings in clangd I can tweak to make things more to my liking, but my ini=
-tial
-reaction is that I don't want to actively encourage use of auto-formatting =
-in KVM.
-
-I think no matter what, any decision should be in a separate, dedicated pat=
-ch/thread.
-So for this series, I'll drop the .clang-format change when applying, assum=
-ing
-nothing else pops that requires a new version.
+--=20
+Without deviation from the norm, progress is not possible.
