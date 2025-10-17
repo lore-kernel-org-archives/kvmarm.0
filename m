@@ -1,139 +1,94 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E5A2E6CC9
-	for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 23:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9263FCC
+	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 00:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760659064; cv=none; b=leibUwBUVwTV/cRRi4fzDM9Pcwug4keSgWzYL6DCQQwO3oeyN7AJT9hHPef35dygIIooNA8JvwFijsalgUfGUa0hIs+q5ygdh+M6oOzt2GjPsBjKupHtYMj6o96udKyCWnVp/QoqfzD5eJl68f0s4Cf8hCRZvQf6FlUldkYWk3k=
+	t=1760659808; cv=none; b=ufqSoM/870cx3Ijhjsrd4NqUUYHzwHQdyJgtNN/Q7GRwgXZYE/sMDSv5VpX3jwACnF6xigRDrVmh5pqs+s3HlIYhzJNnyNjeEzp65yPuzIIUkdO7BzXJXSpEH4H7Tvr42fOzPMuEB06pG48R3s443fXgYqhU/pRDyslHO73e5Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760659064; c=relaxed/simple;
-	bh=vOAdDSYX83kzIXZY6k7808Nqc/n1Jrd8SmNl/kz/Z8U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vue+NIL38kmZ0sICZCsgzccDVSDs4pCOGuSzm7MetBlz4OiZEvn7OzE07NswkCzoc7fwS7fIWre0zxLAopO1AfPoLKHyMPpuydVLqJtz5a5YKaj93rciO7NtpmpL8DULhjdWVPZ0M1abvZ+f8u3lCdiX5rhXYaSSU8wbS8G81hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gHEn+qsX; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+	s=arc-20240116; t=1760659808; c=relaxed/simple;
+	bh=E1AC9iyyw2ScMA/Vd6Wp/4knwNlCQVVOev8xoskItFw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zxm6Ntm3H26fgK9TM/NyKZhuALfNx9D1oujrZI2KGEMKuPkEf8nAPP6yN0zTshfPigShoTKmC8zvIoSL+NguOv2/Uztj3PjanE0ELBAz/fCw4HyAdq+Hc9LmlYbbqd7q0jcx4KIofBVGi21nWV8E25wQ/Wa+iwpDrEYroK3cp0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TAxGBz1b; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gHEn+qsX"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6a33319cb6so711485a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 16:57:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TAxGBz1b"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-290aaff26c1so3373565ad.3
+        for <kvmarm@lists.linux.dev>; Thu, 16 Oct 2025 17:10:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760659062; x=1761263862; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W+gFerwj7sc87prcy/GQMGpAh3zQW+FK7X8HO9E9Qn8=;
-        b=gHEn+qsXd0Wm1b0yWTjTPEFtwdWZqd4Hqh1LeJlIcOTivyr1nUIIAI8pVpNQP27c+I
-         AVzyxgvVvza5Woy6JJIF9BP7SqRkK393xCvm8E9or8PK7/j6WWoTlfDkVwQploQFu4Xg
-         CryxSBmwHmcFWtk8x9o5T1AKu8/k1lg1gd3//jhVCpX2IaeQUaw8M9z5nHqEqExfBRTe
-         85fNSGYQbrWunzhuN0lmXuPiNK8J4y/1MtMY1eGZJlhNGJKosIYNJNjnuNzrpcg1bHUK
-         1REdBRjfktfIm+tsd8u1IAQFX/2GH+zk7zltT8HHFHJYCR/A7iuWGvFPFUQIq7o0xtSc
-         1z0A==
+        d=gmail.com; s=20230601; t=1760659806; x=1761264606; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E1AC9iyyw2ScMA/Vd6Wp/4knwNlCQVVOev8xoskItFw=;
+        b=TAxGBz1bP5y6ARqMTeYy46UznFwRcd65Hrzz9aEArQN8L2VJL762GBYyUhxM1zytiV
+         PmChw6TZIxtsXnP2K7iF6aAb0gEIaBYxhuTPv77Kuc1aej8wsxMORQ6ySN12NY7G5M1Z
+         N+zY/+VKMdKKVloqBNx7g1f4lIgbw/2RLcjdvBrJ+zdwfndYk7Efd03R9CImr17DAHwC
+         TV/KowxkrKyAv0b2yg9SWsgX7dr22VpntMJuXMLJGJQ/nRWnxXzPpRNCY0AiIc2tVMQe
+         JrsLFeAc2Gc+6BtKPGtOOP2KA23SetRMM49vUlbnkMqQDWWjQvaec7GbktB7S9Z2+xsj
+         VGmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760659062; x=1761263862;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=W+gFerwj7sc87prcy/GQMGpAh3zQW+FK7X8HO9E9Qn8=;
-        b=Dt68IXLtFnwmaxIzx4npuR9gT8iRRMWC2cQ5yYq3Kpcpwu8pdErgmVOBjiz4WY8kG+
-         UZ45YoK8bK6WK9RQtGn/6JdLNdTHnamnzcktWoaSR2XM9chGjIZAAM23xYNkL+2rsuQ7
-         sZgMOIvXhkJKvAP9dzFGqUaX/HcIKEmsxZpt8PnYzHEB0jnlp/uhz11PgfPUNa4GRLPu
-         6BvhMxT5YgiIXLep6NWGcjifrkKSt+cGVgjRxuhfrfJgJiZAOgfBU5MFMxu7LNdtnPwl
-         18PufrcDFtClFsHzs/vgBIjWtrIuPFWHuS/lW1Xyaz383rAnZ6em986GB85u/5HnnZna
-         w7RA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwnyIAtl3dR1AsCxxXv92RVqI/IvyobZhknkoAfeI+GZNfw+GsybKAatQXjm6bcsIjw1DOMi8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy+Ih2zjyyfJ+o6Ee+JEsDuF534eIzCOZIAFvC43cRcPAtLfE5W
-	PeVnuRKxU3zGKGK7l7Z75dCWphy7DnMqCFqfugecRYTLDwUNIv+l1TlOAbonbFXVin4bS2hSj3Y
-	obrHFkpDaFAUIS8QvTYkjzGs+jQ==
-X-Google-Smtp-Source: AGHT+IE2GZ6bYZtCSD13nlTnA7H2MPbbvOsHzo3LQjiehRmABnDXMBoSAsb+4L5uxVyy1gpfUlSoXNG9qcSb1xRc+Q==
-X-Received: from pjyj8.prod.google.com ([2002:a17:90a:e608:b0:33b:9959:6452])
- (user=ackerleytng job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:3992:b0:334:a99f:926 with SMTP id adf61e73a8af0-334a99f0c06mr1602497637.11.1760659061843;
- Thu, 16 Oct 2025 16:57:41 -0700 (PDT)
-Date: Thu, 16 Oct 2025 16:57:40 -0700
-In-Reply-To: <CANiq72m6vWc9K+TLYoToGOWXXFB5tbAdf-crdx6U1UrBifEEBA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1760659806; x=1761264606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E1AC9iyyw2ScMA/Vd6Wp/4knwNlCQVVOev8xoskItFw=;
+        b=wqkItWoVAYJtPWtdzDHj+SG7+gxgsNu7NtpF3pSwmGU7aBdLG24bcIBii8CGBc1Ohp
+         eA85PDlwFBk+cbvRYfUcZVMKozT107VZLYEH7N194KH3NdRmE3QnSOVSXOugtBPwCoXW
+         yGsZdeLQNNtqGy415CVuz2UoOBtyl/AhYF62vqnPL8yIcibHVwF43YYzZs9Rx07dJqtD
+         f3nzJBRLmDx6x4n5S/3jYbGocTQDdSMDy/1pI+cRaap8JMVNR8t2q11AKwV08kJxGfKB
+         ++b0+oXG35YI5VfVba6V/5NJPLpWi7i4zQNXGCWxgOGJvtBHzWV9hNibfo5qqT2V9Tkt
+         2jhg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHm3brNV1OImXuxY/odvIVGvsVk9QG+nipHp5JEO1ZxFx4bP+Ppd5R/V08nASQKQ4kjWKgfJ0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzaaQ8L7THHLlxdmhlNVImrp+5YOTJM2Dux0/OjFOmlgdTPPdA2
+	B018cWjdl7n73MJDHxscbp2DCxQdhObXtkHXqwBwrKI2D/ZvNyrbVF+a0XZclmRAy3BjRJU39TH
+	uWbjYd73wGrpDX8tKNNV0jGB1OsCTqBA=
+X-Gm-Gg: ASbGnctIqNR5SD6DdXlgTDT9HNyn+ndk0z2R1au/g/sv1TVPNW34vf2EkpEIR43t0g8
+	F5fjG3JYJpbImym9fMII6SQApm2QkgRmw+hhjvQ66OO9++kCJGhY0Pvo1QI37PY1M4cHilpHUfC
+	+tDXK1ty1PDUCEnlNqbhalxIpHXJaAe4Xd1wHo81yYrHO3xE8K4B1Avu76GSu445G98zh8jPVXK
+	ZMLN2R53sRitO9GM3iTYESJdd8mZBWNfLfipOUbkhVv+6kapCYmkgnq1xnjgXgeOkuhsJI3a7qC
+	g5A7qHaWq+MYEnzdmsgLKy+1XnF91fRmR30KXERQzeI/f6JQ3kJaH8wc+KnCA+1PRCBHTLsRQlL
+	7s+QTeaLgbNyIug==
+X-Google-Smtp-Source: AGHT+IHyIQx0yThg9KT154kOAtD8f8239Y2M/cEMXBlvtxveyWdxtgQX335VASRAYK/45RIQjcQyHtpm998s6Nd9ll8=
+X-Received: by 2002:a17:903:248:b0:275:c066:33dd with SMTP id
+ d9443c01a7336-290cba529f3mr11403495ad.10.1760659806208; Thu, 16 Oct 2025
+ 17:10:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20251016172853.52451-1-seanjc@google.com> <CANiq72ntKAeXRT_fEGJteUfuQuNUSjobmJCbQOuJWAcNFb1+9w@mail.gmail.com>
  <aPFVcMdfFlxhgGZh@google.com> <CANiq72m6vWc9K+TLYoToGOWXXFB5tbAdf-crdx6U1UrBifEEBA@mail.gmail.com>
-Message-ID: <diqzqzv2762z.fsf@google.com>
+ <diqzqzv2762z.fsf@google.com>
+In-Reply-To: <diqzqzv2762z.fsf@google.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 17 Oct 2025 02:09:52 +0200
+X-Gm-Features: AS18NWCDoiITBSs67Uq2rZ6IBFom-AeoZUx_UgHO9S2h4SATYKwpJteeHcfF5xU
+Message-ID: <CANiq72m0rNCaKandZgRa4dMhNOEN7ZanT5ht4kT8FLxYoWLVLQ@mail.gmail.com>
 Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
-From: Ackerley Tng <ackerleytng@google.com>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, 
-	Sean Christopherson <seanjc@google.com>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Shivank Garg <shivankg@amd.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
 	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+On Fri, Oct 17, 2025 at 1:57=E2=80=AFAM Ackerley Tng <ackerleytng@google.co=
+m> wrote:
+>
+> Using the command on virt/ would pick it up. Would it be better to add
+> "virt/" to the "automation" + update .clang-format while we're at it?
 
-> On Thu, Oct 16, 2025 at 10:28=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
->>
->> Oh, I take it .clang-format is auto-generated?  Is it a "formal" script,=
- or do
->> you literally just run the grep command in the comment?
->
-> I just run it and copy-paste the results there from time to time.
-> Yeah, a very low-tech solution :)
->
+Yeah, that is what I was suggesting if you rely on it (and if the
+maintainers of the relevant folders are OK with it).
 
-I assumed someone was doing this from time to time, and I ran the grep
-command in .clang-format but IIUC it only reads tools/ and include/
-(which doesn't cover this new macro) and so I thought the "automation"
-would miss this new macro, hence I suggested to manually add the macro.
-
-Using the command on virt/ would pick it up. Would it be better to add
-"virt/" to the "automation" + update .clang-format while we're at it?
-
-$ git grep -h '^#define [^[:space:]]*for_each[^[:space:]]*(' virt/ | sed "s=
-,^#define \([^[:space:]]*for_each[^[:space:]]*\)(.*$,  - '\1'," | LC_ALL=3D=
-C sort -u
-- 'kvm_for_each_memslot_in_hva_range'
-- 'kvm_gmem_for_each_file'
-
->> I don't think I care if it's in the list?  I honestly don't know for sur=
-e, because
->> it's entirely possible I'm consuming .clang-format without knowing it.  =
-I added
->> the entry based on someone else's request.
->>
->> Ackerley?
->
-> If you are not relying on it, then please just skip it, yeah.
->
-
-I'm using it, I believe clangd (my lsp server) uses it to reflow correctly.
-
->> Is it possible, and sensible, to have per-subsystem .clang-format files?=
-  KVM
->> (virt/kvm) and KVM x86 (arch/x86/kvm) both have has several for_each mac=
-ros,
->> pretty much all of which are more interesting than kvm_gmem_for_each_fil=
-e().
->
-> There is `InheritParentConfig` nowadays, but from a quick look I don't
-> see it supports merging lists.
->
-> So to do something fancier, we would do need something like we did for
-> rust-analyzer, i.e. a `make` target or similar that would generate it.
->
-> Otherwise, we can just add extra macros at the top meanwhile.
->
-> What we did last time is just to add `tools/` to that command --
-> increasing coverage is not an issue (I just started with `include/`
-> originally to be a bit conservative and avoid a huge list until we
-> knew the tool would be used).
->
-> Cheers,
-> Miguel
+Cheers,
+Miguel
