@@ -1,119 +1,117 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CE1337102;
-	Fri, 17 Oct 2025 14:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7302BE043
+	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 16:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760712910; cv=none; b=qZWp2zZKjlVrWxDAeblxXGyV+4oFx1wSN1nvS0EsTI+y3J8qxmE4otUyndc7EJ58once5vTZfB+TgeOkTuoGr4o0Jo6hhiqHzTy+vqDxjCvOP1122IwgqRDCBXzThEcekk3TPsGVVPzo9QRShcKA8NR2kqgJEVN2xJHeNnYRbLQ=
+	t=1760717905; cv=none; b=mdVEhRltD0jW9m3TddJMMgRdVekMroshSVh5ywJRZHZvJp1pFXSuw/EcwaKSkP1PE3OXesG7TBqWA4RU7kUTv1fZQcP5qgZfxzel0Yf2G7LY8alcsUd0bUeSpv/RYgbYSg08uxfOb/P9ZlCsk6nSWNe6kO4ceXEmPWjIiA9i7hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760712910; c=relaxed/simple;
-	bh=Vp8HhGM8KTiB8jGFS7+z9LvVlE4Sj+m2pqa3oGGzWCo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sBcCkYrHyoFPCTd6YZj8Pq+yYD8jsx00erVUZAuja1ttPoQE0+nYa1gei+5nZ36EvdtF677mmGhcIIevX2JeuZYn0WaREseR7bz7AJcPVmIRKUOGw2YJNnRATTEbZ//mmTfdC/xDeX3OjuUMO809VDhWjzM0h0V8RiNy5tYEPSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 522A7153B;
-	Fri, 17 Oct 2025 07:55:00 -0700 (PDT)
-Received: from [10.57.36.104] (unknown [10.57.36.104])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8C9463F66E;
-	Fri, 17 Oct 2025 07:55:03 -0700 (PDT)
-Message-ID: <461fa23f-9add-40e5-a0d0-759030e7c70b@arm.com>
-Date: Fri, 17 Oct 2025 15:55:01 +0100
+	s=arc-20240116; t=1760717905; c=relaxed/simple;
+	bh=dCo1MGrJD9Z3p+JSjI9DqLCn1a7bM1B+iqCsSzHDk9c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZduhaE2wzzeLpuBAYzdFPkuV592mXv4gJEbtj/BJboEtL5JU51eW/coqZlAPADPu8Oi6Up0pCRgkOXVPWnhSpy/9mjVuNFOVtrKN4krR/EYCJO3YQ57GBFYlvU7JtNaYzPRH2m8ACdjuyvrOQpuab2KQbNL2yTbGkWp42LwQK5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pv+Zo7sO; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pv+Zo7sO"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b62b7af4fddso1391920a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 09:18:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1760717903; x=1761322703; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h2EFLTX0PYpEWD6o7KiV0FgHN4LA5AiygCdXWH4JDp8=;
+        b=Pv+Zo7sO6UgHXHYoriWAc8vCgIB6qw2wiizfyDI4W0wEN1dBIf113G6wZDAO1MFt+k
+         An60eeH+p1D4gqGpFg00+QpXPEtnckwMY6RJNDjLZLAjUYJlkkPByUFJ3hrXCSo7sKCs
+         dnre2zq6ed9vXQn/LeXVd5iMrp0YoqLMKbw5SGqENo6F21GpJze0OfOiSYP1EiHnuoot
+         XaPtyYMK67anQB/H21gF8zjoKD5CWu9If/fNDUZAL9hD5XVu9jK+zjtnpR8e3c3trLmB
+         iMOb+XEtormed23VhuiyAYunMwY4mZKI8ZccfZF7lKG2s95ReQvxEShXbbME7N/lKC72
+         CP1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760717903; x=1761322703;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h2EFLTX0PYpEWD6o7KiV0FgHN4LA5AiygCdXWH4JDp8=;
+        b=PZ6MCfVr6va3AhbGjsIqwhcd/vxe3nDRRn8ZYDMDLLQsvVaWrLLuGAAE6okv+BQPij
+         lU3OOtTbUkQuvNIxgv/7SXwwAv5eqgwAE7PR01hQX/7eF7jhESMv61khl8MjESxuQaDp
+         9kr3F5IHuEhJHyW8qC+NDhki3FuR+gJH2dNINzs9TwXAR6E/lwCX4NfAZrZGkeUMWkW0
+         Se3Mx0fLsfM8oM1mmRuThNlWEjztSsVp6EhvNiqrT4lWKvTDJVvjOBr36HRShPqxPYx5
+         yqZ9gRN7D9QpKc202ch8GZytaoS2XQHKGEHXpGlQtGw73Uftd9uhVfmWu6PN4RuBU9Sk
+         h7YA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTTsAciaTbQZrN1b8myfAyvgHEIdT1oQcSdWFK45BIq9ni1iVT7xbbv1wpnCh+fxZLTzzpeAg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwSQkOXsLEts84Ku/VWqfVHfnaEiSJo9q9u+xv/t+jCz4F4X8DP
+	ZU0IPRU/l7BFmPhofDO96XW9ObIC/rIjwsVyHZSJv4PJMEojdSKVUcTQ66LNbxHvQEk9fndXnxN
+	bAfEeBQ==
+X-Google-Smtp-Source: AGHT+IFaZEr2a3gvr9j34mwQCkJH9r0m1tq7ki6LSm2/57IK1g+qw40tWnhbdWwdpyVbTfr8muq81KAy8bI=
+X-Received: from pjbta13.prod.google.com ([2002:a17:90b:4ecd:b0:332:5712:5242])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:ec8b:b0:327:ba77:a47
+ with SMTP id 98e67ed59e1d1-33bcf87b356mr4450218a91.15.1760717902777; Fri, 17
+ Oct 2025 09:18:22 -0700 (PDT)
+Date: Fri, 17 Oct 2025 09:18:21 -0700
+In-Reply-To: <5303684f-3acf-402a-8154-a02a2194ce34@amd.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH v11 00/42] arm64: Support for Arm CCA in KVM
-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20250820145606.180644-1-steven.price@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <20250820145606.180644-1-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251016172853.52451-1-seanjc@google.com> <20251016172853.52451-10-seanjc@google.com>
+ <5303684f-3acf-402a-8154-a02a2194ce34@amd.com>
+Message-ID: <aPJsTVxajpP6-vKV@google.com>
+Subject: Re: [PATCH v13 09/12] KVM: selftests: Use proper uAPI headers to pick
+ up mempolicy.h definitions
+From: Sean Christopherson <seanjc@google.com>
+To: Shivank Garg <shivankg@amd.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ackerley Tng <ackerleytng@google.com>, David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Vlastimil Babka <vbabka@suse.cz>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi all,
+On Fri, Oct 17, 2025, Shivank Garg wrote:
+> 
+> 
+> On 10/16/2025 10:58 PM, Sean Christopherson wrote:
+> > Drop the KVM's re-definitions of MPOL_xxx flags in numaif.h as they are
+> > defined by the already-included, kernel-provided mempolicy.h.  The only
+> > reason the duplicate definitions don't cause compiler warnings is because
+> > they are identical, but only on x86-64!  The syscall numbers in particular
+> > are subtly x86_64-specific, i.e. will cause problems if/when numaif.h is
+> > used outsize of x86.
+> > 
+> > Opportunistically clean up the file comment as the license information is
+> > covered by the SPDX header, the path is superfluous, and as above the
+> > comment about the contents is flat out wrong.
+> > 
+> > Fixes: 346b59f220a2 ("KVM: selftests: Add missing header file needed by xAPIC IPI tests")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/include/numaif.h | 32 +-------------------
+> >  1 file changed, 1 insertion(+), 31 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/numaif.h b/tools/testing/selftests/kvm/include/numaif.h
+> > index aaa4ac174890..1554003c40a1 100644
+> > --- a/tools/testing/selftests/kvm/include/numaif.h
+> > +++ b/tools/testing/selftests/kvm/include/numaif.h
+> > @@ -1,14 +1,5 @@
+> >  /* SPDX-License-Identifier: GPL-2.0-only */
+> > -/*
+> > - * tools/testing/selftests/kvm/include/numaif.h
+> > - *
+> > - * Copyright (C) 2020, Google LLC.
+> > - *
+> > - * This work is licensed under the terms of the GNU GPL, version 2.
+> > - *
+> > - * Header file that provides access to NUMA API functions not explicitly
+> > - * exported to user space.
+> > - */
+> > +/* Copyright (C) 2020, Google LLC. */
+> 
+> Given this file got a complete overhaul in this series, Should the copyright be 2020, 2025?
+> Not entirely sure what the rules are for this.
 
-v6.18-rc1 is out, so I've rebased and refreshed the series. Branches are
-below:
-
-kernel: https://gitlab.arm.com/linux-arm/linux-cca cca-host/v11
-kvmtool: https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v9
-
-However I'm not going to spam you all with the patches because there are
-some significant changes that are still to be worked out which Marc has
-pointed out (thanks for the review!). Specifically:
-
- * We've agreed that the uAPI should be more like "normal" KVM. So
-   rather than expose the underlying operations (create RECs, init
-   RIPAS, populate memory, activate), the VMM should set this up 'as
-   normal' (but using the guestmem_fd capabilities to mark the memory
-   private) and then on first vcpu run the realm should be configured,
-   RIPAS set based on the memslots/guestmem_fd and any data written in
-   the guestmem_fd populated into the realm.
-
-   The upshot of which is that a VMM will require only minimal changes
-   to support CCA, and the ordering requirements (for attestation of
-   setting up the realm will be handled by KVM).
-
-   Since this is a big change in the uAPI it's going to take a while to
-   prototype and figure out all the details, so please bear with me
-   while I work on an updated version.
-
- * There are issues with the PMU handling where the host is not provided
-   with as much flexibility it should. For the PMU it's not possible for
-   the host to maintain a PMU counter while the realm is executing. This
-   means that sensible uses like getting an overflow interrupt on the
-   cycle counter break with the use of a realm. This, however, will
-   require a spec update to fix as the RMM will need to in some cases
-   emulate the PMU registers.
-
- * The GIC handling is also more restrictive then it should be. Although
-   the host is responsible for emulating the GIC, it is unable to set
-   trap bits, restricting the host's ability to do this. There is
-   concern that this could limit the ability to implement hardware
-   workarounds in the future. Again a spec update is needed to fix this.
-
-However, changes that you can see (in the branch) include:
-
- * Fixing the naming of various symbols. There were previously a lot of
-   instances of "rme" in functions which were not directly related to
-   the hardware extension. These are now renamed to "rmi" reflecting
-   that they are part of the interface to the RMM.
-   (This is the only change affecting kvmtool, although it is also
-   binary compatible)
-
- * The code now checks with the hardware feature (RME) before probing
-   for RMI.
-
- * There is now an allowlist for CAPs rather than individually disabling
-   the ones known to be an issue with realms. (This also simplified the
-   code, dropping one patch).
-
- * Fixes for the vgic handling: make sure the VGIC v4 state is
-   synchronised and only populate valid lrs.
-
- * A few other minor updates from reviews, and some minor changes from
-   rebasing.
-
-Thanks,
-Steve
-
+Me either.  I just figure I can't really go totally wrong by doing nothing :-)
