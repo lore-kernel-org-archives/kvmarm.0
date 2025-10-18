@@ -1,115 +1,113 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7202FDC38
-	for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 22:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2CD24C07A
+	for <kvmarm@lists.linux.dev>; Sat, 18 Oct 2025 03:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760740756; cv=none; b=MYbbmfzso3KfcdYlWY1MfwBhHEMilSZM5cnngJh3m65emyR/QivWPz1pZDMqzECTCVcupGCWSPEVDd0evBTpnUr3K2zJ7/TNJNLDAbFYdAd+MFghtyWWS9BHtBEwywVVzuGANsHfBdo37ED4eKS9/POe+fLOsqsCvmAzSd1WjhA=
+	t=1760757457; cv=none; b=Ra5At65GdKm6m6B+ic9to3U8EaLMBVhTcOzO9TsdkXVIr2mnaCHyhBVVRx0DWF+mJIFv6Yp4+li/7tW3pHkRaxhqm9tthaaZbuiI2+kVwElN2ORskdIoNR3ucPexMwVZ2rzhVL0//Vuh/Bvcdg8AiIebVU0iO8Cdyof/F7YhYAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760740756; c=relaxed/simple;
-	bh=b9r/yE/BB1IF08a6BryFtLN5XeROQ9YihoNyBbj76Sw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RTjQJv7L9t/jz+q/6KFRYaq6XMWn5MhkFytPk3r+HVypb0fG2AxP7L4TlKthFZ3ygtDQZ3F0Alq8FSIK5CreatNqIza4/VrP19we+Y5I0YGowxTe74arIP5hXCpDFrZIsi0FYaqQvDgD6cpu4b4xqrTwM6bKG9WHIbRylcVMB4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3gAVpTZn; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3gAVpTZn"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-57da66e0dc9so2512788e87.0
-        for <kvmarm@lists.linux.dev>; Fri, 17 Oct 2025 15:39:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1760740753; x=1761345553; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BoqzKQNFCddpnwTwWMxWSsHCHOracpeEvFEON9b+5D0=;
-        b=3gAVpTZns62cdnwUE4CvONX6ECsusrOGQytzSSnTzCq2vy5+KTQoqrKTNmoEwYZE+6
-         dx5/yXm1ck0PGA+CQMTPPJLrrYNdwnBSaLkCeyF+YBDc6xP1EVs6XPX/iDPQe6+qdnoD
-         65YncjOVZa+bNN72DECFfrAIzBqFF41wFk04w1QOm5iQ+BcsZdq0XzEK4mnNhb/prnzz
-         g/AxqiP0rywBmcwMr720bDJmPskEjKt6OUhDIE+s6x/ov3tulRpq4dbitjVFS7aETdb1
-         gw+7Q8P1ufw1PvchdMzYa4u9LGlYMQVmAghk149CHgXDeLQemc86QMcvumFwAba6eRL8
-         TZPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1760740753; x=1761345553;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BoqzKQNFCddpnwTwWMxWSsHCHOracpeEvFEON9b+5D0=;
-        b=Tr2xou7xfysbl4QCmDOjA8wpPDEmhPXvJLiUtbX+UKHg3Ohp6uOSSFieGkMLHYsz+e
-         hb0sfLRyTHzp0SgXUrEWBqrEcLfcA62ASVzp6l4ftSfnOAB3XCTUtsgi+g8HUKuWrCNe
-         OOFfvVJeeZRiCNfrXBjVgl7k8IJs3rPd/DqZri9O7nW8GKexOWc5LrGDfmsfL3bc9Pyj
-         SjXO4CJSFqeYxt7AXEpbk6TII8nOP6ZWFlp+nZ6PLvLIQ2LZu4X21n/XFFfUvHKJ15WW
-         xvqvqr3VXlfkYhcu4ArrBBhqw5XglasQG5JMNHmtcDt98ilzDK3IFmlCmk0XEQx52kmg
-         Ovog==
-X-Forwarded-Encrypted: i=1; AJvYcCUcqltbmzN8yChEELWOKAHdyh10zwdGPYGJceWeLn7ZPlwPd2c2vJheV1r8OPDoOhzaRXxX1W0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzY22mikCKyRkdECEy/CtSIgAUtAllh0c/HuJ2UqFRA6peakqt2
-	lNQftWo08L0eAGXCLjZ9XclqiZI0byEyT0Iim2ICa44kxt8E8BP8JbFjN58OX1EDZKUABkfwc9T
-	hLcXI4q7k6xd5npYJMzfle+bwMkVcNaIcf8hbarLL
-X-Gm-Gg: ASbGnctiR/SxBnseU7K9zTJL/j70fFNCS5r8b7dcDoLDCSwojY6hTp1sTBdgb0SXnjH
-	cTCLSYD+Sln2OLGt8edxMpMdamMUfLgnmwGp2j9G+85P25g3fAW/OdGMqvPTFtkLutPOEFOfylX
-	BgKmKK5ivrodDnFHXXOxt/HwppWiFG52eE0WvVs+GfXoXNR5KCT9pis1IWDoa7bK/2WDNJ0DESZ
-	gTxeS13A5Za4ZgjphpFZYm4OsH9vmZTDm+WBOfM9VMpH/90hhVF1jUxfCVjfA83vuADbDq8
-X-Google-Smtp-Source: AGHT+IHS0n4/1zDhYDG11j/phEtQioVcSLIhzKZxyKRafka2oa60va2EzlIsG9E+0PXvk8E7U9fUvkCXKxOf+kRpoho=
-X-Received: by 2002:a05:6512:131d:b0:590:6119:6b73 with SMTP id
- 2adb3069b0e04-591d85aa092mr1710058e87.48.1760740752394; Fri, 17 Oct 2025
- 15:39:12 -0700 (PDT)
+	s=arc-20240116; t=1760757457; c=relaxed/simple;
+	bh=3N0cduiKQK/LRs3KE0nIV2g3d2wba9To1du2FFDNakY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=W8gF8tHyZK64j5yDdwBk+RSSuoFFc3o5gT+CaTztVkW+EOEovXdY/0r+uyNapJvg4I3aJgLeVUG2Sj/qEifQ24PexAhOwGQqyDDoh+LAxHKN6l7sA9VIi/2wSlqQ8wH7W7BH9vPQ9roQPsPrizseKkcWjbNzamtMQyTw9M5f7ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4cpRgg4m53z1prPw;
+	Sat, 18 Oct 2025 11:17:03 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0825918048E;
+	Sat, 18 Oct 2025 11:17:26 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 18 Oct 2025 11:17:25 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 18 Oct 2025 11:17:25 +0800
+Message-ID: <c349eb9f-9f8a-f268-c765-a59c94bf6613@hisilicon.com>
+Date: Sat, 18 Oct 2025 11:17:24 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250501183304.2433192-1-dmatlack@google.com> <aBPhs39MJz-rt_Ob@google.com>
-In-Reply-To: <aBPhs39MJz-rt_Ob@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Fri, 17 Oct 2025 15:38:45 -0700
-X-Gm-Features: AS18NWAC2AsnIEyOuBJBf6AwyLhxj7CRd7TcYAURWBeq_wPcJYz0GvazO3M1Rc0
-Message-ID: <CALzav=eqv0Fh9pzaBgjZ-fehwFbD4YscoLQz0=o0TKQT_zLTwQ@mail.gmail.com>
-Subject: Re: [PATCH 00/10] KVM: selftests: Convert to kernel-style types
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	James Houghton <jthoughton@google.com>, Colin Ian King <colin.i.king@gmail.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Question about heterogeneous VM live migration
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
+References: <866aca63-1f6b-2109-fa76-6d68cb7c547a@hisilicon.com>
+ <86wm4twu3c.wl-maz@kernel.org>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <86wm4twu3c.wl-maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-On Thu, May 1, 2025 at 2:03=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
-> On Thu, May 01, 2025, David Matlack wrote:
-> > This series renames types across all KVM selftests to more align with
-> > types used in the kernel:
-> >
-> >   vm_vaddr_t -> gva_t
-> >   vm_paddr_t -> gpa_t
->
-> 10000% on these.
->
-> >   uint64_t -> u64
-> >   uint32_t -> u32
-> >   uint16_t -> u16
-> >   uint8_t  -> u8
-> >
-> >   int64_t -> s64
-> >   int32_t -> s32
-> >   int16_t -> s16
-> >   int8_t  -> s8
->
-> I'm definitely in favor of these renames.  I thought I was the only one t=
-hat
-> tripped over the uintNN_t stuff; at this point, I've probably lost hours =
-of my
-> life trying to type those things out.
+On 2025/10/17 21:12, Marc Zyngier wrote:
+> On Thu, 16 Oct 2025 03:00:07 +0100,
+> Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>>
+>> Hi,
+>>
+>> We are now trying to do heterogeneous VM live migration among HiSilicon ARM
+>> servers, seems there are problems about disabling a feature in guest.
+>>
+>> For a feature, if we disable it in VM by configure related ID register field,
+>> we should make it actually been disabled, e.g. configure related control
+>> register in EL2 or trap EL0/EL1 access to EL2.
+> 
+> This is in general not possible.
+> 
+>> Possible problems:
+>>
+>> 1. Some features can not be disabled actually in EL0/EL1, e.g. FEAT_AFP,
+>>    FEAT_RPRES, FEAT_CSSC, FEAT_LRCPC3...
+>>
+>>    Disabling it by ID can not avoid a stupid user to directly use it without ID
+>>    checking, which may bring subtle problem in heterogeneous VM live migration.
+> 
+> Yes. There is no solution to that.
+> 
+>> 2. For some features, it can be trapped, but KVM does not support yet. Not sure
+>>    if we should support them in future.
+>>
+>>    E.g. If we disable ID of FEAT_HAFT for guest, we need configure
+>>         HCRX_EL2.TCR2En to 0, so access to TCR2_EL1.HAFT will be trapped.
+> 
+> That's wrong. If you force TCR2EN to 0, none of the TCR2_EL1 controls
+> will work. For example, you'd lose the POE/PIE controls.
 
-What should the next step be here? I'd be happy to spin a new version
-whenever on whatever base commit you prefer.
+Yes, it will impact other control bits, same as SCTLR_EL1 trapping mentioned below.
+
+> 
+>>         For FEAT_PAN3, it instroduces EPAN to SCTLR_EL1，if we disable ID of
+>> 	FEAT_PAN3, we need make SCTLR_EL1 to trap by setting HFGRTR_EL2.SCTLR_EL1.
+>>
+>>    Seems there are no trap setting in above cases. Just a quick look, maybe I
+>>    miss something.
+>>
+>> I am not sure if we already consider above problems, any help will be appreciated.
+> 
+> we know about most of these things already. In general, you cannot
+> hide features that the host has, other than indicating to the guest
+> that they may not exist. The underlying HW is still there and will act
+> as expected.
+> 
+> I think you're simply expecting too much from the architecture.
+
+Many thanks about above explanation, I get the situation now.
+
+Best,
+Zhou
+
+> 
+> 	M.
+> 
