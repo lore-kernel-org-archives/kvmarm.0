@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D649321457;
-	Mon, 20 Oct 2025 16:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535CE27E071;
+	Mon, 20 Oct 2025 16:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760978357; cv=none; b=uAHXjef45eCdtqZaddYawNkO1F0hokDy2XiHBp/Lb9RN3l6V0Kk778Jg4D3MwpClL2e/njfevi2Wio1UZBnoklnBcAr1oo6bKZKE58tOr8YldyuV11S4AS1IfiChXEQ/le+ZK2XdxKnqjSW4hY8AEAnXu/DPhpUflHRA2oZvEIA=
+	t=1760978928; cv=none; b=TYRSPMU/eh12jsUNDMyPdSeeq9AJFwupxWbaJ8MyAY2c5yNUKP0mEpNOtE1xfm0nE9WF/6AY9zz5XQuF5/dYGZHU16f38LM9P8++TwbjwImrGezFMZk2g17F9kWreDKXN695OcdI3Z3VA3T4h9jp6hYOWgRifqGDDNQVPyFkIdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760978357; c=relaxed/simple;
-	bh=eeCxTQhmLEWvE9BlEKDnreJyLFhJt0Baibzlj367w+c=;
+	s=arc-20240116; t=1760978928; c=relaxed/simple;
+	bh=zYqoYCQe4K7XudfmeVGpZr7tdm5vBdoL/LEBbTTO5iU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m9w3PMxMxLKrf1BuOL5ZGC4yejmbV2Iym99tDlaxPk6gijnFRYt6JdYP/7A1iWcujnrGkMKQa0SjpWHcqTNXyEANgM/bGyXmuyeLqA4xvkiI7w64JJvGxdCwSU42leZlPeWK54zUAVGVu6CiPZpfOLLMzDBYe3Mxr70yhp08c/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQsMR9Ok; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=fiZL34bV/43eY/MATVnnq9KjAR0lbBjYYaPCzPWWClkXoAt5mwfABtqmL5SrEGk17xnXcThCTcSlzKTgZ0YNCKCkHFfnAVPGqoIkLxkCCAKOpfNCg0EUoBRjVOHQ8xYtjF7bzYWKal1QG+APBUHkmbHK7ke2StgCKeluJ/YOasg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYg53VZA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQsMR9Ok"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 280ECC4CEF9;
-	Mon, 20 Oct 2025 16:39:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYg53VZA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B245AC4CEF9;
+	Mon, 20 Oct 2025 16:48:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760978356;
-	bh=eeCxTQhmLEWvE9BlEKDnreJyLFhJt0Baibzlj367w+c=;
+	s=k20201202; t=1760978926;
+	bh=zYqoYCQe4K7XudfmeVGpZr7tdm5vBdoL/LEBbTTO5iU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CQsMR9OkVjqYfwZfIiYj58LavMSP9Z1SzFU3bx51MNN7IRRorGu/mCR3C/f2SswJn
-	 /+Lwdv/mjLt7HcjyOEAX5oGu2dGldpjxlxBvgYHcjZt9ntQ9eKhcaQz5C8m3/H6Bph
-	 IUz7T3xdbO+hOm+MHq9d9179WyxV7/mNCVwSD43MqST4V/t98UxvCGTvcUF6mw72UJ
-	 dutwt6+PeKQw7gT++pYzgAFI1s939Zai7aRohv7LRtJjJ66SqW41LjeE46L/rz0CYv
-	 O3SyAXrRAhCPHRXkF1NLvXcPEe4C4JJfWVxirlGy1c5WGvNu/azJZe1KT4H4FGCecK
-	 5fkvRq77mNV8A==
+	b=dYg53VZAhN66E9XaBivc4JKX9/Sl92OsDM3o6ol9TGgJPfP0P/GsFMc22z1RtQtnt
+	 AdwdaC/WHquIcTzfheRpQ9XYtPMyWIdx/IZ+MjE+JUXg2/q9ggKsvvmskeyKNgu5jD
+	 p+RlWVRQ7lLItITmNpGAIXRDBXtZtpNVKvJiGdLf8BfX7RFTaYKfl/67WQNtjp+ZHq
+	 aER2ncF7Y+XwMuEAv4vMrNC5HhyMlMpyna3kBdCCZ24IQIkShnupcx38AG/Q+o2yrv
+	 xmHZp/muQvnP4hPCic6dRy8T6B9uhVIuq2Bm7Il4Dczr45dqY/iqK/UTdVevwea6hm
+	 mN7I0dKh1Nd9g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vAsuf-0000000FZt9-3Yhi;
-	Mon, 20 Oct 2025 16:39:13 +0000
-Date: Mon, 20 Oct 2025 17:39:13 +0100
-Message-ID: <86ldl5wmry.wl-maz@kernel.org>
+	id 1vAt3s-0000000Fa00-1car;
+	Mon, 20 Oct 2025 16:48:44 +0000
+Date: Mon, 20 Oct 2025 17:48:43 +0100
+Message-ID: <86jz0pwmc4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -53,10 +53,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	kasan-dev@googlegroups.com,
 	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH 03/16] arm64/insn: always inline aarch64_insn_decode_register()
-In-Reply-To: <20250923174903.76283-4-ada.coupriediaz@arm.com>
+Subject: Re: [RFC PATCH 06/16] arm64/insn: always inline aarch64_insn_gen_movewide()
+In-Reply-To: <20250923174903.76283-7-ada.coupriediaz@arm.com>
 References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
-	<20250923174903.76283-4-ada.coupriediaz@arm.com>
+	<20250923174903.76283-7-ada.coupriediaz@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,71 +72,110 @@ X-SA-Exim-Rcpt-To: ada.coupriediaz@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Sep 2025 18:48:50 +0100,
+On Tue, 23 Sep 2025 18:48:53 +0100,
 Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
 > 
-> As it is always called with an explicit register type, we can
+> As it is always called with an explicit movewide type, we can
 > check for its validity at compile time and remove the runtime error print.
 > 
-> This makes `aarch64_insn_decode_register()` self-contained and safe
-> for inlining and usage from patching callbacks.
+> The other error prints cannot be verified at compile time, but should not
+> occur in practice and will still lead to a fault BRK, so remove them.
+> 
+> This makes `aarch64_insn_gen_movewide()` safe for inlining
+> and usage from patching callbacks, as both
+> `aarch64_insn_encode_register()` and `aarch64_insn_encode_immediate()`
+> have been made safe in previous commits.
 > 
 > Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 > ---
->  arch/arm64/include/asm/insn.h | 32 ++++++++++++++++++++++++++++++--
->  arch/arm64/lib/insn.c         | 29 -----------------------------
->  2 files changed, 30 insertions(+), 31 deletions(-)
+>  arch/arm64/include/asm/insn.h | 58 ++++++++++++++++++++++++++++++++---
+>  arch/arm64/lib/insn.c         | 56 ---------------------------------
+>  2 files changed, 54 insertions(+), 60 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-> index 18c7811774d3..f6bce1a62dda 100644
+> index 5f5f6a125b4e..5a25e311717f 100644
 > --- a/arch/arm64/include/asm/insn.h
 > +++ b/arch/arm64/include/asm/insn.h
-> @@ -7,6 +7,7 @@
->   */
->  #ifndef	__ASM_INSN_H
->  #define	__ASM_INSN_H
-> +#include <linux/bits.h>
->  #include <linux/build_bug.h>
->  #include <linux/types.h>
+> @@ -624,6 +624,8 @@ static __always_inline bool aarch64_get_imm_shift_mask(
+>  #define ADR_IMM_LOSHIFT		29
+>  #define ADR_IMM_HISHIFT		5
 >  
-> @@ -558,8 +559,35 @@ enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
+> +#define AARCH64_INSN_SF_BIT	BIT(31)
+> +
+>  enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
 >  u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
->  u32 aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
->  				  u32 insn, u64 imm);
-> -u32 aarch64_insn_decode_register(enum aarch64_insn_register_type type,
-> -					 u32 insn);
-> +static __always_inline u32 aarch64_insn_decode_register(
-> +				 enum aarch64_insn_register_type type, u32 insn)
+>  
+> @@ -796,10 +798,58 @@ u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
+>  			      int immr, int imms,
+>  			      enum aarch64_insn_variant variant,
+>  			      enum aarch64_insn_bitfield_type type);
+> -u32 aarch64_insn_gen_movewide(enum aarch64_insn_register dst,
+> -			      int imm, int shift,
+> -			      enum aarch64_insn_variant variant,
+> -			      enum aarch64_insn_movewide_type type);
+> +
+> +static __always_inline u32 aarch64_insn_gen_movewide(
+> +				 enum aarch64_insn_register dst,
+> +				 int imm, int shift,
+> +				 enum aarch64_insn_variant variant,
+> +				 enum aarch64_insn_movewide_type type)
+
+nit: I personally find this definition style pretty unreadable, and
+would rather see the "static __always_inline" stuff put on a line of
+its own:
+
+static __always_inline
+u32 aarch64_insn_gen_movewide(enum aarch64_insn_register dst,
+			      int imm, int shift,
+			      enum aarch64_insn_variant variant,
+			      enum aarch64_insn_movewide_type type)
+
+But again, that's a personal preference, nothing else.
+
 > +{
-> +	compiletime_assert(type >= AARCH64_INSN_REGTYPE_RT &&
-> +		type <= AARCH64_INSN_REGTYPE_RS, "unknown register type encoding");
-> +	int shift;
+> +	compiletime_assert(type >=  AARCH64_INSN_MOVEWIDE_ZERO &&
+> +		type <= AARCH64_INSN_MOVEWIDE_INVERSE, "unknown movewide encoding");
+> +	u32 insn;
 > +
 > +	switch (type) {
-> +	case AARCH64_INSN_REGTYPE_RT:
-> +	case AARCH64_INSN_REGTYPE_RD:
-> +		shift = 0;
+> +	case AARCH64_INSN_MOVEWIDE_ZERO:
+> +		insn = aarch64_insn_get_movz_value();
 > +		break;
-> +	case AARCH64_INSN_REGTYPE_RN:
-> +		shift = 5;
+> +	case AARCH64_INSN_MOVEWIDE_KEEP:
+> +		insn = aarch64_insn_get_movk_value();
 > +		break;
-> +	case AARCH64_INSN_REGTYPE_RT2:
-> +	case AARCH64_INSN_REGTYPE_RA:
-> +		shift = 10;
-> +		break;
-> +	case AARCH64_INSN_REGTYPE_RM:
-> +	case AARCH64_INSN_REGTYPE_RS:
-> +		shift = 16;
+> +	case AARCH64_INSN_MOVEWIDE_INVERSE:
+> +		insn = aarch64_insn_get_movn_value();
 > +		break;
 > +	default:
-> +		return 0;
+> +		return AARCH64_BREAK_FAULT;
 
-Could you replace the above compiletime_assert() with something in the
-default: case instead (BUILD_BUG_ON() or otherwise)?
+Similar request to one of the previous patches: since you can check
+the validity at compile time, place it in the default: case, and drop
+the return statement.
 
-I'm a bit concerned that if we add an enum entry in the middle of the
-current lot, this code becomes broken without us noticing. It would
-also rid us of this "return 0" case, which is pretty brittle.
+> +	}
+> +
+> +	if (imm & ~(SZ_64K - 1)) {
+> +		return AARCH64_BREAK_FAULT;
+> +	}
+> +
+> +	switch (variant) {
+> +	case AARCH64_INSN_VARIANT_32BIT:
+> +		if (shift != 0 && shift != 16) {
+> +			return AARCH64_BREAK_FAULT;
+> +		}
+> +		break;
+> +	case AARCH64_INSN_VARIANT_64BIT:
+> +		insn |= AARCH64_INSN_SF_BIT;
+> +		if (shift != 0 && shift != 16 && shift != 32 && shift != 48) {
+> +			return AARCH64_BREAK_FAULT;
+> +		}
+> +		break;
+> +	default:
+> +		return AARCH64_BREAK_FAULT;
+
+You could also check the variant.
 
 Thanks,
 
