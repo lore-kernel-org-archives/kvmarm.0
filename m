@@ -1,113 +1,304 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2CD24C07A
-	for <kvmarm@lists.linux.dev>; Sat, 18 Oct 2025 03:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760757457; cv=none; b=Ra5At65GdKm6m6B+ic9to3U8EaLMBVhTcOzO9TsdkXVIr2mnaCHyhBVVRx0DWF+mJIFv6Yp4+li/7tW3pHkRaxhqm9tthaaZbuiI2+kVwElN2ORskdIoNR3ucPexMwVZ2rzhVL0//Vuh/Bvcdg8AiIebVU0iO8Cdyof/F7YhYAU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760757457; c=relaxed/simple;
-	bh=3N0cduiKQK/LRs3KE0nIV2g3d2wba9To1du2FFDNakY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=W8gF8tHyZK64j5yDdwBk+RSSuoFFc3o5gT+CaTztVkW+EOEovXdY/0r+uyNapJvg4I3aJgLeVUG2Sj/qEifQ24PexAhOwGQqyDDoh+LAxHKN6l7sA9VIi/2wSlqQ8wH7W7BH9vPQ9roQPsPrizseKkcWjbNzamtMQyTw9M5f7ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4cpRgg4m53z1prPw;
-	Sat, 18 Oct 2025 11:17:03 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0825918048E;
-	Sat, 18 Oct 2025 11:17:26 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E472EC080;
+	Mon, 20 Oct 2025 08:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1760950379; cv=fail; b=s1404Z1eP68+A1b4CNvDqDoVBvHCMcjoCBSZnKM5skLy8cKJN3Sp8USbF+m6Q2RVEvwsN18YEIVoyYbvICb1lRT1g9vuJwDzKQpL0o5Ktpu4+JTaI9+eHwDBhhM9onilV6BlJUFvSBGuRfsd6EEiscL1z1rftnFkNwEBymfHj+o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1760950379; c=relaxed/simple;
+	bh=R3/Ks3I+o/rolqTu05pxsoOaK92JoNY28685s2iEvpY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=cszLdQuXzFbvqEUzQjyZzIqg0XUESXBWjj6baSgbtWsT2NkiJjbQ2UlplGzvws/XPNuVSM6u++KqVvfZwUwY3oUFSzZX9T4/lAMR5MucdFWOb6knHB2s+Cdt9WQynEL5TarwK3wOMbA6mrebFl1SV6ZgrmL+nB8laXvJupGpepg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LnNeaV4+; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LnNeaV4+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1760950378; x=1792486378;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=R3/Ks3I+o/rolqTu05pxsoOaK92JoNY28685s2iEvpY=;
+  b=LnNeaV4+iPWHx5ilvw8XLkDBlAWWhTos6ABJUmwbL5d97ugJn1/ma5XU
+   WSZshPm03RwVZJuvc6j9KkgC80SDNKxWXJqUY7F/0+CNgd7ptSm4MQAB5
+   9bwCj5Yw415dK9kPopbY6eK9J+KoExhpTreMed2VqOCPblNEFUsIImRX3
+   ZfMbMFIc5gZ1ajZB7qY8Q3+/nTENDEttyCPU6ibTJQyLB9MjSVaEQljPm
+   foIoGpGL3w8d4yh265vAQqhu6QkkieTK6an2/uvk8PtyjwQoaxX4FpY8d
+   RHulbvePbLUauOZ6MV/51NvBxVuhQTwpPXyMhi50CHxh1Lmv5e5BZleUh
+   w==;
+X-CSE-ConnectionGUID: 8uO+lr0qQbyTQx+C05pKLw==
+X-CSE-MsgGUID: UwHZ8IDPQ6OkKK5zkpoTfg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11587"; a="50632561"
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="50632561"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 01:52:57 -0700
+X-CSE-ConnectionGUID: dLxTKFXJTY6MrdXUNZ/Zag==
+X-CSE-MsgGUID: NVuHT5VNRievNUCCIHDheg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,242,1754982000"; 
+   d="scan'208";a="220427697"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2025 01:52:55 -0700
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 18 Oct 2025 11:17:25 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ 15.2.2562.27; Mon, 20 Oct 2025 01:52:55 -0700
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 18 Oct 2025 11:17:25 +0800
-Message-ID: <c349eb9f-9f8a-f268-c765-a59c94bf6613@hisilicon.com>
-Date: Sat, 18 Oct 2025 11:17:24 +0800
+ 15.2.2562.27 via Frontend Transport; Mon, 20 Oct 2025 01:52:55 -0700
+Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.25) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 20 Oct 2025 01:52:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xVyFOuqpsBqYlmQPi5idK0W8vw1TEfusTu4ZSMG9W5QDjrepLaiZrePX1RZxfggloOJsbE/XZi/Z/uhHOuLNqI6JhFwA7tUfsG/AFoNG8qh2hL7Eelkb2fmhL86p2OpiNMeqQj1Ckr25/OqjUWtLmM1L/eVJMGEu/a2tnL8ZTP4lq3G5lnz881vHISbxBr5zso25Y6RtVDHJg8QQoxr6JlhXUF9qPux2ZVgGxHkx+hRG104MAIdXIA+zfxeViKSsPMqrLKIT5RRSQ4rG23W1KBedB3wBC28pLw5psnyS4yGtEPFz07JnWkVLmF0VR8vULfsGpaHSuoDnPWzNNJmQAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PpYZSNAz1ZH1FHiL/HmYYh2kOK9LqhQM0+AQtYwfaPc=;
+ b=KC8TnSvsV4l0NIjC9zi6p69WxUz8+cH3j0M+IY7mk97Nw4sAlZg/lS1+zUWEXT1TdqerRYXvSOcuOXZC9yXx568D308LnJnqiK1+am6m82bj5Hv8ItzSmWZbzwRSm95nntkheF+IemtjwTaEyV4BAOQt67yTmNQBFzMke/sG0gEf2d/n3/CYs5eprgZo1n1X5WwSLTaMlLYaB9Jq2O7POjB7Fp0XlpQl7iTPoplO76JK/De5sAT8X2nqil96oWEA9MkSQyVMv81N0DR41OPx+xNrcBa/z1/G+zareqkhBGLNYTKwoLRpjZwov3TatR7VAcv7IzlPXGMHYdrGHtgGGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ CO1PR11MB4833.namprd11.prod.outlook.com (2603:10b6:303:99::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.16; Mon, 20 Oct 2025 08:52:15 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9228.015; Mon, 20 Oct 2025
+ 08:52:15 +0000
+Date: Mon, 20 Oct 2025 16:50:18 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan
+	<maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, Paul Walmsley
+	<pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
+	<aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda
+	<imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, "Kirill A.
+ Shutemov" <kas@kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>, <loongarch@lists.linux.dev>,
+	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
+	<x86@kernel.org>, <linux-coco@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, Kai Huang
+	<kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>, Vishal Annapurve
+	<vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Ackerley Tng <ackerleytng@google.com>, Binbin Wu <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v3 25/25] KVM: TDX: Fix list_add corruption during
+ vcpu_load()
+Message-ID: <aPX3ymhrw1qcbyZX@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20251017003244.186495-1-seanjc@google.com>
+ <20251017003244.186495-26-seanjc@google.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251017003244.186495-26-seanjc@google.com>
+X-ClientProxiedBy: KL1PR02CA0002.apcprd02.prod.outlook.com
+ (2603:1096:820:c::7) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: Question about heterogeneous VM live migration
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-CC: <kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>
-References: <866aca63-1f6b-2109-fa76-6d68cb7c547a@hisilicon.com>
- <86wm4twu3c.wl-maz@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <86wm4twu3c.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CO1PR11MB4833:EE_
+X-MS-Office365-Filtering-Correlation-Id: 385ace61-8238-4ee3-defd-08de0fb5f7df
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?MSsAr5Rw1f9dxNMqfKvanA5mESHPHbuGTUlFPwwk+NO553lC3iwQZj5iWh8/?=
+ =?us-ascii?Q?I1yOZyIn26aWOnfcgtPRDcpz6u3S2Dima3I2cclMKqwKEOm41gE7blnGicP1?=
+ =?us-ascii?Q?3i9mlDNdp3QKxFaAm8WoC6nhDNCRDngq7N275GbSPZq7UDFTJzvseVQp2te1?=
+ =?us-ascii?Q?dh7D+h8gx+bUl65cnT6MtEilqtbjgWi7xxu8shdGeBwHfdJClZGfj+lRdwwY?=
+ =?us-ascii?Q?y0CE6YTHZi1mNXj7q+2iztuLr0q30f+fXumpQnrdcHxsUgKsSa4qW5fR6Qbv?=
+ =?us-ascii?Q?zNNcmBab8oy1yNqC3CUOsbbq68eMvrPCwVudC7NAwj0uq7XlzrogPYNbZBji?=
+ =?us-ascii?Q?UQXDo6V+O1L7/3ycUMHdTwd5rcMPGax0o0/m6kCnZiYR7y77yJIqdtEdt9ib?=
+ =?us-ascii?Q?tZdGk54MO9fTlJN8ASwpNo8a6gbUXwpBuWM4QbqK2/shGIsEcI8kx7zoQgaS?=
+ =?us-ascii?Q?MRplN4Lv2KYiWQldHoSWpmtaRVTg3urEZl193sARxbjUthiEbFNkQLV2ZoEs?=
+ =?us-ascii?Q?zRRn00rVUVu7ggoGKqhcdA2ISLRolRKCStHV2r+TVKwExKNGFDI1F4PiKV6i?=
+ =?us-ascii?Q?sAz8htnzS+X+Qaacs3wVWFlkQi2f+VOZRJouT2YHLd/NjCgNIEl94zycaDPS?=
+ =?us-ascii?Q?mCqDMGErCQYoufAjlO7wDb33XEns7xoBU4P+fpGfi5I9vJemCiyHotE+NwM9?=
+ =?us-ascii?Q?LdRptxWtah5DiX/BiTn6NlCUwfPEUehHAedwleEpmazDrYg4xPnSKuDvlutY?=
+ =?us-ascii?Q?77t6zkPrjIV/t8F/2iRF09UInnifuDJzG6hPqOpZWNHtp6PXwBCY6GQQokgN?=
+ =?us-ascii?Q?+AXBDgImEXHO7BFM55aK62Ze6W+WIxCOuBcJZXsC8KEKIQsIMhAiWnwQFYJO?=
+ =?us-ascii?Q?mLA9+T/uYQslyGHWjy31WbjEt/or49Iu5jIBK4wCd/B+HCxk9Vx0UkS70ab+?=
+ =?us-ascii?Q?/7MokDzZjJF/eHLW9Qj1zKz1wEVsEkCLOfxXc5SOvapqjtOWryoHuwNplmJy?=
+ =?us-ascii?Q?uurhnRN79Bobue0ZzfmeTo5ckFXrhP7EN+dd3e3Tn7+5ZF3jPqEgNXGGhNgs?=
+ =?us-ascii?Q?InR1NKKaUKY9rU0/T5NSSlM9XutMbpcW6Rztdh+XmUWeck7Y4TIqsdJUuTsa?=
+ =?us-ascii?Q?hb5o7i+Fvpn0alrc3WyaVQ8LbAqOfy9OEM/JTm1QO4QPXvPl9uKF/BDNzHro?=
+ =?us-ascii?Q?7jniVR7VWOqVeTv+zTJ5sgIw3zVtR+fqOjOb6qCJQ2zR/D2QVu4ZGs8qy8FV?=
+ =?us-ascii?Q?Vms07Ia1YmpYeG/04paZLYg0y/wOP6HPO+GJHCHk4m9qQiaPJnwjBwOJrLDc?=
+ =?us-ascii?Q?VjSNk2yY52UxLfZetUqkLJNPMGG7yMasO3fFyc/02IQrMLc9zL1O8DjUnNdu?=
+ =?us-ascii?Q?HxZTYd9tqc1IeMC4s+lZKJCTi/0yTtBR6A9VdB7A67MTu74M02lzgl5sKh9B?=
+ =?us-ascii?Q?x3VtDYCaOEX1c6Yo2LVEnfruex5HsJO5?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZD6qemoO7wSEGbsmKyJ1SxSayW39544IPzqIaCBYpZ8FR7d8Wexj/4xO3dzx?=
+ =?us-ascii?Q?ntVzfkNcvBfKl6c4RDnDiOzNYZXJ18fLjChHiB55q53Cr7HBtwh9A/mUTTFd?=
+ =?us-ascii?Q?WLoWQ1u8unCSD++aNkg0LWivSnA94BVeb5eu0kcUrQ2M2x/5GuNxnp5rWw+L?=
+ =?us-ascii?Q?yPG5Zd/M6tdymwTC8WbLWVVSGEeAWkoNvNq6Ts8rbJJSBzKfLPYarbt4O2hS?=
+ =?us-ascii?Q?v8ZAaGgrKxiiV4UudHuvoxpZVnh1LFgbYktYpg+Sf8MGuWmYmQqTZSUx9dLx?=
+ =?us-ascii?Q?mtywRfw4YCQ1oDgES+3Qa3r+zR430iIuRNWUQISJm1VHTJcnHNtswbFk2r7f?=
+ =?us-ascii?Q?mKkd1AXOiow++0+DVuxX7mwIfPbLVtfu4RWsrCG61U68hBomaexFoOfayOzN?=
+ =?us-ascii?Q?WGlPdbbyBc/5pb7aLC/KJp5lo5FCqpowO29DvjtPNmET05q7fD9HTlTD8w+2?=
+ =?us-ascii?Q?/A+0qQY3dhd0nm2K+cqFgH/ltAnM6Lkm39v/DhCTHOYDDFv3YDhKTQR7P6dj?=
+ =?us-ascii?Q?0eTTuNoEu31Lt0A8qHdePc/+ZJuMmskeTk41ITWuLrrA5IlVdRK0sswpnbx7?=
+ =?us-ascii?Q?sktRg1qk+T1hCrjuVfLqxidIpT/XCTPftZJl1HMZuXdPBfZjFG7SfhuxdDa/?=
+ =?us-ascii?Q?o5ZxWlrCl8fdP/utQxzYWpmHuMpFPTrBegJYyKFTgPm7fhbrCIut4uwr9uQI?=
+ =?us-ascii?Q?2WOrwGDuk7OgWMTBm5qYPl/KpSmGpPmbNWwjjJTIEIjKGa6itDe2K1NHLhJo?=
+ =?us-ascii?Q?fLYY/HNfwPxgJi1LewfWguhEkW6StvSmxwUzXGaY7SzmCa8O5wK/XYcbe397?=
+ =?us-ascii?Q?YD0xLMNgYblF6qFifz25gZc5WC7XwqAyZQcXnN5Sx/Bn6HF8wdWuoIvUkspV?=
+ =?us-ascii?Q?Zqgxbg2qkYparyOIcDuTQ90uSnFQ1ocpFIa2wPp5qvTkP7lmr7zqOaMmp5H4?=
+ =?us-ascii?Q?eaLOLHi8d0Hp6gOnZnicZ+okcQ3lo5bC/3NJihn6kBfbQ1i9W8zOB0YFBbp5?=
+ =?us-ascii?Q?Qd6df1WLl35RYKQKJQORtmOXizb4NvNilyKtDkZMmSliDMs4lCo/sdrGues1?=
+ =?us-ascii?Q?jlwXxM8143UBsJFRe5pM5w4d0R+I2MZSg8z0H3XrTuOxPBwZaCnAy09+o4eg?=
+ =?us-ascii?Q?VU3Uyab7U2jw9EUjjvH3+pMYnVT7XR6A5QBsm29boX7YgpaLblp0gbUzMkj1?=
+ =?us-ascii?Q?MPZPaE4DcGIqcHDU5eXCYWsRLzHrV9R33DXK7TKL3N2h71Q8pPS3KvDZzMqg?=
+ =?us-ascii?Q?0by5Fn/e7UGfM++ZS3HKC0fo047Lgaiusp31LvV39olMdqR1V/FuRkljakm1?=
+ =?us-ascii?Q?o4+IGEW20t2CA0+LKdiQY9bJWTbGJWh/aO8WOmdW7vybUxWMuHynHXZm/Qz1?=
+ =?us-ascii?Q?DQKdKf91ObG+319Mg2AOoySNqDI6xZCj3EncHSG586Ul5xuHZEDb5Qh4Zug2?=
+ =?us-ascii?Q?O6U3mQyf1vZdMZfIku4e6fYWhg/dKpkZuHrWuWckek0ATjVJXRkHDGEdMFmk?=
+ =?us-ascii?Q?QzocqoKJcUDtq+31mSC7xl1zbHCR+U4SvWU7vK/qUtjBRPJsU0sp2IQ4+y5g?=
+ =?us-ascii?Q?pdRuie3OHSPJg9pHLmxKoqQlO5fB6yFv+tX1qzCL?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 385ace61-8238-4ee3-defd-08de0fb5f7df
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2025 08:52:15.7729
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BH0rYeJWn5eNZLgR1OxzU5r+TGtu2eK1BP8GoO7/AUb528OlQNGXZrz07h4Hiqzo3U7Q/zq2EHyK0KHpx8GOfg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4833
+X-OriginatorOrg: intel.com
 
-On 2025/10/17 21:12, Marc Zyngier wrote:
-> On Thu, 16 Oct 2025 03:00:07 +0100,
-> Zhou Wang <wangzhou1@hisilicon.com> wrote:
->>
->> Hi,
->>
->> We are now trying to do heterogeneous VM live migration among HiSilicon ARM
->> servers, seems there are problems about disabling a feature in guest.
->>
->> For a feature, if we disable it in VM by configure related ID register field,
->> we should make it actually been disabled, e.g. configure related control
->> register in EL2 or trap EL0/EL1 access to EL2.
+On Thu, Oct 16, 2025 at 05:32:43PM -0700, Sean Christopherson wrote:
+> From: Yan Zhao <yan.y.zhao@intel.com>
 > 
-> This is in general not possible.
+> During vCPU creation, a vCPU may be destroyed immediately after
+> kvm_arch_vcpu_create() (e.g., due to vCPU id confiliction). However, the
+> vcpu_load() inside kvm_arch_vcpu_create() may have associate the vCPU to
+> pCPU via "list_add(&tdx->cpu_list, &per_cpu(associated_tdvcpus, cpu))"
+> before invoking tdx_vcpu_free().
 > 
->> Possible problems:
->>
->> 1. Some features can not be disabled actually in EL0/EL1, e.g. FEAT_AFP,
->>    FEAT_RPRES, FEAT_CSSC, FEAT_LRCPC3...
->>
->>    Disabling it by ID can not avoid a stupid user to directly use it without ID
->>    checking, which may bring subtle problem in heterogeneous VM live migration.
+> Though there's no need to invoke tdh_vp_flush() on the vCPU, failing to
+> dissociate the vCPU from pCPU (i.e., "list_del(&to_tdx(vcpu)->cpu_list)")
+> will cause list corruption of the per-pCPU list associated_tdvcpus.
 > 
-> Yes. There is no solution to that.
+> Then, a later list_add() during vcpu_load() would detect list corruption
+> and print calltrace as shown below.
 > 
->> 2. For some features, it can be trapped, but KVM does not support yet. Not sure
->>    if we should support them in future.
->>
->>    E.g. If we disable ID of FEAT_HAFT for guest, we need configure
->>         HCRX_EL2.TCR2En to 0, so access to TCR2_EL1.HAFT will be trapped.
+> Dissociate a vCPU from its associated pCPU in tdx_vcpu_free() for the vCPUs
+> destroyed immediately after creation which must be in
+> VCPU_TD_STATE_UNINITIALIZED state.
 > 
-> That's wrong. If you force TCR2EN to 0, none of the TCR2_EL1 controls
-> will work. For example, you'd lose the POE/PIE controls.
+> kernel BUG at lib/list_debug.c:29!
+> Oops: invalid opcode: 0000 [#2] SMP NOPTI
+> RIP: 0010:__list_add_valid_or_report+0x82/0xd0
+> 
+> Call Trace:
+>  <TASK>
+>  tdx_vcpu_load+0xa8/0x120
+>  vt_vcpu_load+0x25/0x30
+>  kvm_arch_vcpu_load+0x81/0x300
+>  vcpu_load+0x55/0x90
+>  kvm_arch_vcpu_create+0x24f/0x330
+>  kvm_vm_ioctl_create_vcpu+0x1b1/0x53
+>  kvm_vm_ioctl+0xc2/0xa60
+>   __x64_sys_ioctl+0x9a/0xf0
+>  x64_sys_call+0x10ee/0x20d0
+>  do_syscall_64+0xc3/0x470
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 43 +++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 38 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index d6541b08423f..daec88d4b88d 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -833,19 +833,52 @@ void tdx_vcpu_put(struct kvm_vcpu *vcpu)
+>  	tdx_prepare_switch_to_host(vcpu);
+>  }
+>  
+> +/*
+> + * Life cycles for a TD and a vCPU:
+> + * 1. KVM_CREATE_VM ioctl.
+> + *    TD state is TD_STATE_UNINITIALIZED.
+> + *    hkid is not assigned at this stage.
+> + * 2. KVM_TDX_INIT_VM ioctl.
+> + *    TD transitions to TD_STATE_INITIALIZED.
+> + *    hkid is assigned after this stage.
+> + * 3. KVM_CREATE_VCPU ioctl. (only when TD is TD_STATE_INITIALIZED).
+> + *    3.1 tdx_vcpu_create() transitions vCPU state to VCPU_TD_STATE_UNINITIALIZED.
+> + *    3.2 vcpu_load() and vcpu_put() in kvm_arch_vcpu_create().
+> + *    3.3 (conditional) if any error encountered after kvm_arch_vcpu_create()
+> + *        kvm_arch_vcpu_destroy() --> tdx_vcpu_free().
+> + * 4. KVM_TDX_INIT_VCPU ioctl.
+> + *    tdx_vcpu_init() transitions vCPU state to VCPU_TD_STATE_INITIALIZED.
+> + *    vCPU control structures are allocated at this stage.
+> + * 5. kvm_destroy_vm().
+> + *    5.1 tdx_mmu_release_hkid(): (1) tdh_vp_flush(), disassociates all vCPUs.
+> + *                                (2) puts hkid to !assigned state.
+> + *    5.2 kvm_destroy_vcpus() --> tdx_vcpu_free():
+> + *        transitions vCPU to VCPU_TD_STATE_UNINITIALIZED state.
+> + *    5.3 tdx_vm_destroy()
+> + *        transitions TD to TD_STATE_UNINITIALIZED state.
+> + *
+> + * tdx_vcpu_free() can be invoked only at 3.3 or 5.2.
+> + * - If at 3.3, hkid is still assigned, but the vCPU must be in
+> + *   VCPU_TD_STATE_UNINITIALIZED state.
+> + * - if at 5.2, hkid must be !assigned and all vCPUs must be in
+> + *   VCPU_TD_STATE_INITIALIZED state and have been dissociated.
+> + */
+>  void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+>  	struct vcpu_tdx *tdx = to_tdx(vcpu);
+>  	int i;
+>  
+> +	if (vcpu->cpu != -1) {
+> +		KVM_BUG_ON(tdx->state == VCPU_TD_STATE_INITIALIZED, vcpu->kvm);
+> +		tdx_disassociate_vp(vcpu);
+Sorry, I should use "tdx_flush_vp_on_cpu(vcpu);" rather than invoking
+tdx_disassociate_vp() directly.
 
-Yes, it will impact other control bits, same as SCTLR_EL1 trapping mentioned below.
+This is to ensure that list_del() in tdx_disassociate_vp() runs on the physical
+cpu that owns the list and to which the vcpu is associated with in the previous
+tdx_vcpu_load().
 
-> 
->>         For FEAT_PAN3, it instroduces EPAN to SCTLR_EL1，if we disable ID of
->> 	FEAT_PAN3, we need make SCTLR_EL1 to trap by setting HFGRTR_EL2.SCTLR_EL1.
->>
->>    Seems there are no trap setting in above cases. Just a quick look, maybe I
->>    miss something.
->>
->> I am not sure if we already consider above problems, any help will be appreciated.
-> 
-> we know about most of these things already. In general, you cannot
-> hide features that the host has, other than indicating to the guest
-> that they may not exist. The underlying HW is still there and will act
-> as expected.
-> 
-> I think you're simply expecting too much from the architecture.
-
-Many thanks about above explanation, I get the situation now.
-
-Best,
-Zhou
-
-> 
-> 	M.
+> +		return;
+> +	}
+> +
+>  	/*
+>  	 * It is not possible to reclaim pages while hkid is assigned. It might
+> -	 * be assigned if:
+> -	 * 1. the TD VM is being destroyed but freeing hkid failed, in which
+> -	 * case the pages are leaked
+> -	 * 2. TD VCPU creation failed and this on the error path, in which case
+> -	 * there is nothing to do anyway
+> +	 * be assigned if the TD VM is being destroyed but freeing hkid failed,
+> +	 * in which case the pages are leaked.
+>  	 */
+>  	if (is_hkid_assigned(kvm_tdx))
+>  		return;
+> -- 
+> 2.51.0.858.gf9c4a03a3a-goog
 > 
