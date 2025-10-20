@@ -1,179 +1,207 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4063E331A53;
-	Mon, 20 Oct 2025 17:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03765733E
+	for <kvmarm@lists.linux.dev>; Mon, 20 Oct 2025 23:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760980376; cv=none; b=Hd/ra5TTM6GHbbUtKQM/hOXjRCP6KxOyupPadYwVLenUVreHnQCFSWhbYeK880OyTjLi1FvPsdPRS16joBZY+R34fPqLxd2Du2Bwh8/6bMtPy7k1uLDVizjnsX5U1dSN37eRo0oeICiS29K3EtBqfB+PNP43ECcw2JVudDZZv84=
+	t=1761004544; cv=none; b=hTyvh29oSFzkYa4LNy5tongaq1KUPm8LkyJVjQFKIEwdmMDhEFD0D4q6hct4rNzqIhRfsiZ2hd1/RnzCZ77tCGqzRe5W8FZd1HJY2kjA+eK/TGat6FBZvGEnH3ze8PDUSREGE9OzsBWiggCj9Jg/Tvv0ol5PppXuBoEUnIr6MEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760980376; c=relaxed/simple;
-	bh=dwqtHQVfFZjxcm6Jo6c9XdBZqKfCUiwIrZyMMZjil70=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iX2rEH2De0sqaVzrvjx1/z7jB5KQjpQ12cMrbnfYQouQ3NvdgYTja5GC9vYH2+yCt1tkRc+FIuMDwnmAbw4iseNrUKz3vEJ5FX+zNEGJ+DAmLGSYCqv8fjeuRQ25bkJe3DjCzFzIvGYDelIjGfbj8FtL5ydwLwLxSB/z8dNQlOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oaX3Cypq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761004544; c=relaxed/simple;
+	bh=7B9Q949LyCTi/uWG8XxY/wlXF/2XkP8y6115YnUjfqM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQ96/s+pZ9yLmzf+xQ9ec1X/O9UUkwbAgeiIwAf18v72VxYl9u3ypvOqZnHq1rbw6lzux9B+zxCZedF1UDXk2o+NCf7t/Rm/XcUyh8d0h9XuCU9ByZhZqUds47bbUtN0V8EanpfiFXUdsk0MkuzwdtJgoMOLCOca8NOHZj5Yp/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=saJoZk18; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oaX3Cypq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F140C4CEF9;
-	Mon, 20 Oct 2025 17:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760980375;
-	bh=dwqtHQVfFZjxcm6Jo6c9XdBZqKfCUiwIrZyMMZjil70=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oaX3CypquTs6LmNjpxP0M7JcbmHhYPQkPrndJisq3Mq5CS4ChGkC6d2iyFuzYgjFS
-	 64GozyDfDWKZP+/igTX/fcUZXzI4pcNfgW9fwPpl6zAywwv0qC02O3C/Ol3CpyiMpO
-	 O5SaVua+JTHSQs4CLFzE5hfP3RiUb/AODW/Ml2QFKd2dwKdnT42DH1CkSRBTDd9LvI
-	 ys0G1HfP32V+N7vDdT/eoBlMxujAAsZ0iNZhYPC+dpAbJFa30tA/JfSSXCVf9snOQo
-	 lDwXn4jP5OHGXofzGV0kdwoCznluMpaz+Hrq8PIHlPAA9y7tVVYEkSqr2PajDz3jb0
-	 2MhbnFI9/8M4Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vAtRF-0000000FaSv-2Qhv;
-	Mon, 20 Oct 2025 17:12:53 +0000
-Date: Mon, 20 Oct 2025 18:12:53 +0100
-Message-ID: <86h5vtwl7u.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ada Couprie Diaz <ada.coupriediaz@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
-	Alexander Potapenko <glider@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kasan-dev@googlegroups.com,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH 14/16] arm64/insn: always inline aarch64_insn_encode_ldst_size()
-In-Reply-To: <20250923174903.76283-15-ada.coupriediaz@arm.com>
-References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
-	<20250923174903.76283-15-ada.coupriediaz@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="saJoZk18"
+Date: Mon, 20 Oct 2025 16:55:28 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761004539;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RnOhbJNV63wEIPrr4TL5LUq5z/Xh0OfjqLgXSuspKbM=;
+	b=saJoZk18Eu5/IeLbCS1m2/9ngWJfcDe/+fv2xc71Vd+Nk6ZJ4FzktRbjVyrQDU8uiHv5Xj
+	oWbNgAXSzFQ2o+b2wMWVpUDI0kAiyIvbzDK9hwCZUvNbMQrW/q6e96WXELO8Ml/nqzeIEB
+	vjdqaumTpI7w6mdRq4czjB9L6Nlrkdo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: kvmarm@lists.linux.dev
+Subject: Re: RFC KVM: arm64: selftest: stage 2 mapping helpers
+Message-ID: <aPbL8NCPCfLHIB3w@linux.dev>
+References: <10A5745B-411F-4EB3-A168-0BC6CA99FF4D@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ada.coupriediaz@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, ardb@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, ryabinin.a.a@gmail.com, glider@google.com, andreyknvl@gmail.com, dvyukov@google.com, vincenzo.frascino@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kasan-dev@googlegroups.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <10A5745B-411F-4EB3-A168-0BC6CA99FF4D@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 23 Sep 2025 18:49:01 +0100,
-Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
+Hi Itaru,
+
+Thanks for looking in to this.
+
+On Mon, Oct 20, 2025 at 06:08:58PM +0900, Itaru Kitayama wrote:
+> Hi,
 > 
-> The type and instruction checks cannot be made at compile time,
-> as they are dynamically created. However, we can remove the error print
-> as it should never appear in normal operation and will still lead to
-> a fault BRK.
-> 
-> This makes `aarch64_insn_encode_ldst_size()` safe for inlining
-> and usage from patching callbacks.
-> 
-> This is a change of visiblity, as previously the function was private to
-> lib/insn.c.
-> However, in order to inline more `aarch64_insn_` functions and make
-> patching callbacks safe, it needs to be accessible by those functions.
-> As it is more accessible than before, add a check so that only loads
-> or stores can be affected by the size encoding.
-> 
-> Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
-> ---
->  arch/arm64/include/asm/insn.h | 24 ++++++++++++++++++++++++
->  arch/arm64/lib/insn.c         | 19 +------------------
->  2 files changed, 25 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-> index 44435eede1f3..46d4d452e2e2 100644
-> --- a/arch/arm64/include/asm/insn.h
-> +++ b/arch/arm64/include/asm/insn.h
-> @@ -717,6 +717,30 @@ static __always_inline u32 aarch64_insn_encode_immediate(
->  
->  	return insn;
->  }
+> Below is my attempt to add stage 2 mapping helpers for the KVM selftest test framework as almost a duplicate of _virt_pg_map(), I thought for FEAT_NV2 feature testing, it’d be nice to have helpers rather than writing it in selftests. Comments are appreciated. 4KB page size, and 4 levels of stage 2 translation is assumed. 
+
+FYI, you've got some line wrapping issues here and in the diff itself.
+
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 11b6c5aa3f12..6fe9210eeeb6 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -106,6 +106,7 @@ struct kvm_vm {
+>  	bool pgd_created;
+>  	vm_paddr_t ucall_mmio_addr;
+>  	vm_paddr_t pgd;
+> +	vm_paddr_t s2_pgd;
+>  	vm_vaddr_t handlers;
+>  	uint32_t dirty_ring_size;
+>  	uint64_t gpa_tag_mask;
+
+A better approach would be to add a tracking structure for a stage-2 MMU
+context. Eventually we will need selftests to create multiple stage-2
+page tables, complete with the MMU context (VMID, VTCR, etc).
+
+e.g.
+
+struct s2_mmu_ctxt {
+	vm_paddr_t	pgd;
+	u64		vtcr;
+	u16		vmid;
+};
+
+> +void virt_arch_s2_map(struct kvm_vm *vm, u64 ipa, u64 paddr);
 > +
-> +extern const u32 aarch64_insn_ldst_size[];
-> +static __always_inline u32 aarch64_insn_encode_ldst_size(
-> +					 enum aarch64_insn_size_type type,
-> +					 u32 insn)
+> +static inline void virt_s2_map(struct kvm_vm *vm, u64 ipa, u64 paddr)
 > +{
-> +	u32 size;
-> +
-> +	if (type < AARCH64_INSN_SIZE_8 || type > AARCH64_INSN_SIZE_64) {
-> +		return AARCH64_BREAK_FAULT;
-> +	}
-> +
-> +	/* Don't corrput the top bits of other instructions which aren't a size. */
-> +	if (!aarch64_insn_is_ldst(insn)) {
-> +		return AARCH64_BREAK_FAULT;
-> +	}
-> +
-> +	size = aarch64_insn_ldst_size[type];
+> +	virt_arch_s2_map(vm, ipa, paddr);
+> +}
 
-Given that we have this:
+This is all going to be arm64-specific, no need for indirection through
+something pretending to be arch-generic.
 
-	enum aarch64_insn_size_type {
-		AARCH64_INSN_SIZE_8,
-		AARCH64_INSN_SIZE_16,
-		AARCH64_INSN_SIZE_32,
-		AARCH64_INSN_SIZE_64,
-	};
-
-[...]
-
-> +	insn &= ~GENMASK(31, 30);
-> +	insn |= size << 30;
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -124,6 +124,96 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+>  				     KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+>  				     vm->memslots[MEM_REGION_PT]);
+>  	vm->pgd_created = true;
 > +
-> +	return insn;
+> +	vm->s2_pgd = vm_phy_pages_alloc(vm, nr_pages,
+> +                                     KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +                                     vm->memslots[MEM_REGION_PT]);
 > +}
 > +
->  static __always_inline u32 aarch64_insn_encode_register(
->  				 enum aarch64_insn_register_type type,
->  				 u32 insn,
-> diff --git a/arch/arm64/lib/insn.c b/arch/arm64/lib/insn.c
-> index 71df4d72ac81..63564d236235 100644
-> --- a/arch/arm64/lib/insn.c
-> +++ b/arch/arm64/lib/insn.c
-> @@ -42,30 +42,13 @@ u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
->  	return (insn >> shift) & mask;
+
+Instead introduce a helper for initializing a "struct s2_mmu_ctxt" (or
+whatever you choose to name it).
+
+> +static void _virt_s2_map(struct kvm_vm *vm, uint64_t ipa, uint64_t paddr, uint64_t flags)
+> +{
+> +	uint8_t attr_idx = flags & (PTE_ATTRINDX_MASK >> PTE_ATTRINDX_SHIFT);
+> +	uint64_t pg_attr;
+> +	uint64_t *ptep;
+> +	uint64_t *pgdp;
+> +
+> +	ptep = addr_gpa2hva(vm, vm->s2_pgd) + pgd_index(vm, ipa) * 8;
+> +	if (!*ptep) {
+> +                *ptep = addr_pte(vm, vm_alloc_page_table(vm),
+> +                                 PGD_TYPE_TABLE | PTE_VALID);
+> +	}
+> +
+> +	switch (4) {
+
+Taking a constant here instead of the page table geometry.
+
+> +#define KVM_PTE_VALID                   BIT(0)
+> +
+> +#define KVM_PTE_ADDR_MASK               GENMASK(47, PAGE_SHIFT)
+> +#define KVM_PTE_ADDR_51_48              GENMASK(15, 12)
+> +#define KVM_PTE_ADDR_MASK_LPA2          GENMASK(49, PAGE_SHIFT)
+> +#define KVM_PTE_ADDR_51_50_LPA2         GENMASK(9, 8)
+> +
+> +#define KVM_PHYS_INVALID                (-1ULL)
+> +
+> +#define KVM_PTE_TYPE                    BIT(1)
+> +#define KVM_PTE_TYPE_BLOCK              0
+> +#define KVM_PTE_TYPE_PAGE               1
+> +#define KVM_PTE_TYPE_TABLE              1
+> +
+> +#define KVM_PTE_LEAF_ATTR_LO            GENMASK(11, 2)
+> +
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_ATTRIDX GENMASK(4, 2)
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP      GENMASK(7, 6)
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RO           \
+> +        ({ cpus_have_final_cap(ARM64_KVM_HVHE) ? 2 : 3; })
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_AP_RW           \
+> +        ({ cpus_have_final_cap(ARM64_KVM_HVHE) ? 0 : 1; })
+
+cpucaps don't exist in selftests.
+
+Actually -- we don't need to worry about creating a an EL2 stage-1 in
+selftests in the first place, so you can drop all these definitions.
+
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_SH      GENMASK(9, 8)
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_SH_IS   3
+> +#define KVM_PTE_LEAF_ATTR_LO_S1_AF      BIT(10)
+> +
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR GENMASK(5, 2)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R  BIT(6)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W  BIT(7)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_SH      GENMASK(9, 8)
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_SH_IS   3
+> +#define KVM_PTE_LEAF_ATTR_LO_S2_AF      BIT(10)
+> +
+> +#define KVM_PTE_LEAF_ATTR_HI            GENMASK(63, 50)
+> +
+> +#define KVM_PTE_LEAF_ATTR_HI_SW         GENMASK(58, 55)
+> +
+> +#define KVM_PTE_LEAF_ATTR_HI_S1_XN      BIT(54)
+> +
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_XN      BIT(54)
+> +
+> +#define KVM_PTE_LEAF_ATTR_HI_S1_GP      BIT(50)
+> +
+> +#define KVM_PTE_CLEAR_RSBZ_BIT10 (~(1ULL << 10))
+> +
+> +#define S2_PTE_LO_FLAGS_MASK 0x3FFF
+> +
+> +	pg_attr = KVM_PTE_VALID | FIELD_PREP(KVM_PTE_TYPE, KVM_PTE_TYPE_PAGE) | KVM_PTE_LEAF_ATTR_LO_S2_AF | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, KVM_PTE_LEAF_ATTR_LO_S2_SH_IS) & KVM_PTE_CLEAR_RSBZ_BIT10;
+> +
+> +        if (!use_lpa2_pte_format(vm))
+> +                pg_attr |= PTE_SHARED;
+> +        *ptep = addr_pte(vm, paddr, pg_attr);
+> +
 >  }
 >  
-> -static const u32 aarch64_insn_ldst_size[] = {
-> +const u32 aarch64_insn_ldst_size[] = {
->  	[AARCH64_INSN_SIZE_8] = 0,
->  	[AARCH64_INSN_SIZE_16] = 1,
->  	[AARCH64_INSN_SIZE_32] = 2,
->  	[AARCH64_INSN_SIZE_64] = 3,
->  };
+>  static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> @@ -186,6 +276,13 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+>  	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+>  }
+>  
+> +void virt_arch_s2_map(struct kvm_vm *vm, u64 ipa, u64 paddr)
+> +{
+> +	u64 attr_idx = MT_NORMAL;
 
-[...] this array is completely superfluous, and
+MT_NORMAL is a MAIR index. Memory attributes are conveyed directly in
+the stage-2 descriptor with the encoding dependent on HCR_EL2.FWB.
 
-	size = aarch64_insn_ldst_size[type];
-
-could be replaced by
-
-	size = type;
-
-But that's only a very minor improvement. On the plus side, your
-approach definitely makes it impossible to add a patching callback
-using aarch64_insn_encode_ldst_size() in a module!
+This is a good starting point but in order for us to pick up this
+upstream we will need a corresponding test. Even something simple like
+hello_el2 that demonstrates selftests can ERET to EL1 with the stage-2
+MMU enabled.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
