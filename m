@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535CE27E071;
-	Mon, 20 Oct 2025 16:48:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD80C330B2A;
+	Mon, 20 Oct 2025 17:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760978928; cv=none; b=TYRSPMU/eh12jsUNDMyPdSeeq9AJFwupxWbaJ8MyAY2c5yNUKP0mEpNOtE1xfm0nE9WF/6AY9zz5XQuF5/dYGZHU16f38LM9P8++TwbjwImrGezFMZk2g17F9kWreDKXN695OcdI3Z3VA3T4h9jp6hYOWgRifqGDDNQVPyFkIdE=
+	t=1760979906; cv=none; b=BZxK0U/vt6sXOzLvHzXewoSDY+PJENRqbAttFI9RY6yPYF9bd8bnl/xpHIEZ1vmGWePSPgySXnifgsNzTgDKphNXin3Hu1NnlC5kQVPuS3ucWZ4K534Bcs5FYEZdY+E08b8SUskVOmd7YY/Y43rZB2+qHxwWSX/i5T/g7aUj51Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760978928; c=relaxed/simple;
-	bh=zYqoYCQe4K7XudfmeVGpZr7tdm5vBdoL/LEBbTTO5iU=;
+	s=arc-20240116; t=1760979906; c=relaxed/simple;
+	bh=aOxVPX/stENfYbyxAxdQ2trXPVhmxu69UvS1Y1oOJF8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fiZL34bV/43eY/MATVnnq9KjAR0lbBjYYaPCzPWWClkXoAt5mwfABtqmL5SrEGk17xnXcThCTcSlzKTgZ0YNCKCkHFfnAVPGqoIkLxkCCAKOpfNCg0EUoBRjVOHQ8xYtjF7bzYWKal1QG+APBUHkmbHK7ke2StgCKeluJ/YOasg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYg53VZA; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ZIwgYF7TP7s6viwK0kdsj+9gnNVCi5NDes5+i6qUcUWAm/t//+9GCrOt/7q1RG3dEiShQy8CcI9KXp7yPpEWS67ytOaOmgN5NMYD548pujUKMnrth01WXUr0M/fOtfS1EGBRhnkSsQ18ag6hGIYa5oqMQNGbAFnF87mJZT/zJLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HlLf+uu1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYg53VZA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B245AC4CEF9;
-	Mon, 20 Oct 2025 16:48:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlLf+uu1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32B33C4CEF9;
+	Mon, 20 Oct 2025 17:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760978926;
-	bh=zYqoYCQe4K7XudfmeVGpZr7tdm5vBdoL/LEBbTTO5iU=;
+	s=k20201202; t=1760979906;
+	bh=aOxVPX/stENfYbyxAxdQ2trXPVhmxu69UvS1Y1oOJF8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dYg53VZAhN66E9XaBivc4JKX9/Sl92OsDM3o6ol9TGgJPfP0P/GsFMc22z1RtQtnt
-	 AdwdaC/WHquIcTzfheRpQ9XYtPMyWIdx/IZ+MjE+JUXg2/q9ggKsvvmskeyKNgu5jD
-	 p+RlWVRQ7lLItITmNpGAIXRDBXtZtpNVKvJiGdLf8BfX7RFTaYKfl/67WQNtjp+ZHq
-	 aER2ncF7Y+XwMuEAv4vMrNC5HhyMlMpyna3kBdCCZ24IQIkShnupcx38AG/Q+o2yrv
-	 xmHZp/muQvnP4hPCic6dRy8T6B9uhVIuq2Bm7Il4Dczr45dqY/iqK/UTdVevwea6hm
-	 mN7I0dKh1Nd9g==
+	b=HlLf+uu1A+9glk1xokZA2dQ7TAtEcg65CYsuIrXkDFUW/3iO5kbyLa1Nz22Gz4GZH
+	 R9teEXbX5glQ3aczLPG59dylLlIyqvwnGr2WlKnCPW0Wy52t5Zc+enhyLRnakWk8+5
+	 GC2X1llO4MAG7E+ufqUtS24JNbpQgarIL42C6yN7WHt8Kl2t/LFmta0l4wANSlgEy4
+	 YYCV5CGmAOW2vLmZIWJVFF73VIBBdhzvBKuqYm6qtRY6aBa9tXqV5lV/fhfV3s4i9U
+	 5nTMSxBe+XEoDcU9uyNffgYRGN3jDl5i2N2OLCAPtnLAk+U2AJDTEfxQIg20+pFv2+
+	 J5dVj48neEruQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vAt3s-0000000Fa00-1car;
-	Mon, 20 Oct 2025 16:48:44 +0000
-Date: Mon, 20 Oct 2025 17:48:43 +0100
-Message-ID: <86jz0pwmc4.wl-maz@kernel.org>
+	id 1vAtJf-0000000FaGq-3F9t;
+	Mon, 20 Oct 2025 17:05:04 +0000
+Date: Mon, 20 Oct 2025 18:05:03 +0100
+Message-ID: <86ikg9wlkw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -53,10 +53,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	kasan-dev@googlegroups.com,
 	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH 06/16] arm64/insn: always inline aarch64_insn_gen_movewide()
-In-Reply-To: <20250923174903.76283-7-ada.coupriediaz@arm.com>
+Subject: Re: [RFC PATCH 12/16] kvm/arm64: make alternative callbacks safe
+In-Reply-To: <20250923174903.76283-13-ada.coupriediaz@arm.com>
 References: <20250923174903.76283-1-ada.coupriediaz@arm.com>
-	<20250923174903.76283-7-ada.coupriediaz@arm.com>
+	<20250923174903.76283-13-ada.coupriediaz@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,110 +72,88 @@ X-SA-Exim-Rcpt-To: ada.coupriediaz@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Sep 2025 18:48:53 +0100,
+nit: please keep $SUBJECT in keeping with the subsystem you are
+patching: "KVM: arm64: Make alternative callbacks safe"
+
+On Tue, 23 Sep 2025 18:48:59 +0100,
 Ada Couprie Diaz <ada.coupriediaz@arm.com> wrote:
 > 
-> As it is always called with an explicit movewide type, we can
-> check for its validity at compile time and remove the runtime error print.
+> Alternative callback functions are regular functions, which means they
+> or any function they call could get patched or instrumented
+> by alternatives or other parts of the kernel.
+> Given that applying alternatives does not guarantee a consistent state
+> while patching, only once done, and handles cache maintenance manually,
+> it could lead to nasty corruptions and execution of bogus code.
 > 
-> The other error prints cannot be verified at compile time, but should not
-> occur in practice and will still lead to a fault BRK, so remove them.
+> Make the KVM alternative callbacks safe by marking them `noinstr` and
+> `__always_inline`'ing their helpers.
+> This is possible thanks to previous commits making `aarch64_insn_...`
+> functions used in the callbacks safe to inline.
 > 
-> This makes `aarch64_insn_gen_movewide()` safe for inlining
-> and usage from patching callbacks, as both
-> `aarch64_insn_encode_register()` and `aarch64_insn_encode_immediate()`
-> have been made safe in previous commits.
+> `kvm_update_va_mask()` is already marked as `__init`, which has its own
+> text section conflicting with the `noinstr` one.
+> Instead, use `__no_instr_section(".noinstr.text")` to add
+> all the function attributes added by `noinstr`, without the section
+> conflict.
+> This can be an issue, as kprobes seems to only block the text sections,
+> not based on function attributes.
 > 
 > Signed-off-by: Ada Couprie Diaz <ada.coupriediaz@arm.com>
 > ---
->  arch/arm64/include/asm/insn.h | 58 ++++++++++++++++++++++++++++++++---
->  arch/arm64/lib/insn.c         | 56 ---------------------------------
->  2 files changed, 54 insertions(+), 60 deletions(-)
+> This is missing `kvm_patch_vector_branch()`, which could receive the same
+> treatment, but the `WARN_ON_ONCE` in the early-exit check would make it
+> call into instrumentable code.
+> I do not currently know if this `WARN` can safely be removed or if it
+> has some importance.
+
+This is only debug code, which could be easily removed. However, I'd
+like to suggest that we add a method to indicate that a patching
+callback has failed for whatever reason. This doesn't have to be a
+complex piece of infrastructure, and can be best effort (you can only
+fail a single callback in a single location).
+
+But it would certainly help catching unexpected situations (been
+there, done that, ended up with visible scars...).
+
+> ---
+>  arch/arm64/kvm/va_layout.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-> index 5f5f6a125b4e..5a25e311717f 100644
-> --- a/arch/arm64/include/asm/insn.h
-> +++ b/arch/arm64/include/asm/insn.h
-> @@ -624,6 +624,8 @@ static __always_inline bool aarch64_get_imm_shift_mask(
->  #define ADR_IMM_LOSHIFT		29
->  #define ADR_IMM_HISHIFT		5
+> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> index 91b22a014610..3ebb7e0074f6 100644
+> --- a/arch/arm64/kvm/va_layout.c
+> +++ b/arch/arm64/kvm/va_layout.c
+> @@ -109,7 +109,7 @@ __init void kvm_apply_hyp_relocations(void)
+>  	}
+>  }
 >  
-> +#define AARCH64_INSN_SF_BIT	BIT(31)
-> +
->  enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
->  u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
+> -static u32 compute_instruction(int n, u32 rd, u32 rn)
+> +static __always_inline u32 compute_instruction(int n, u32 rd, u32 rn)
+>  {
+>  	u32 insn = AARCH64_BREAK_FAULT;
 >  
-> @@ -796,10 +798,58 @@ u32 aarch64_insn_gen_bitfield(enum aarch64_insn_register dst,
->  			      int immr, int imms,
->  			      enum aarch64_insn_variant variant,
->  			      enum aarch64_insn_bitfield_type type);
-> -u32 aarch64_insn_gen_movewide(enum aarch64_insn_register dst,
-> -			      int imm, int shift,
-> -			      enum aarch64_insn_variant variant,
-> -			      enum aarch64_insn_movewide_type type);
-> +
-> +static __always_inline u32 aarch64_insn_gen_movewide(
-> +				 enum aarch64_insn_register dst,
-> +				 int imm, int shift,
-> +				 enum aarch64_insn_variant variant,
-> +				 enum aarch64_insn_movewide_type type)
+> @@ -151,6 +151,7 @@ static u32 compute_instruction(int n, u32 rd, u32 rn)
+>  	return insn;
+>  }
+>  
+> +__noinstr_section(".init.text")
+>  void __init kvm_update_va_mask(struct alt_instr *alt,
+>  			       __le32 *origptr, __le32 *updptr, int nr_inst)
+>  {
+> @@ -241,7 +242,8 @@ void kvm_patch_vector_branch(struct alt_instr *alt,
+>  	*updptr++ = cpu_to_le32(insn);
+>  }
+>  
+> -static void generate_mov_q(u64 val, __le32 *origptr, __le32 *updptr, int nr_inst)
+> +static __always_inline void generate_mov_q(u64 val, __le32 *origptr,
+> +				 __le32 *updptr, int nr_inst)
+>  {
+>  	u32 insn, oinsn, rd;
+>
 
-nit: I personally find this definition style pretty unreadable, and
-would rather see the "static __always_inline" stuff put on a line of
-its own:
-
-static __always_inline
-u32 aarch64_insn_gen_movewide(enum aarch64_insn_register dst,
-			      int imm, int shift,
-			      enum aarch64_insn_variant variant,
-			      enum aarch64_insn_movewide_type type)
-
-But again, that's a personal preference, nothing else.
-
-> +{
-> +	compiletime_assert(type >=  AARCH64_INSN_MOVEWIDE_ZERO &&
-> +		type <= AARCH64_INSN_MOVEWIDE_INVERSE, "unknown movewide encoding");
-> +	u32 insn;
-> +
-> +	switch (type) {
-> +	case AARCH64_INSN_MOVEWIDE_ZERO:
-> +		insn = aarch64_insn_get_movz_value();
-> +		break;
-> +	case AARCH64_INSN_MOVEWIDE_KEEP:
-> +		insn = aarch64_insn_get_movk_value();
-> +		break;
-> +	case AARCH64_INSN_MOVEWIDE_INVERSE:
-> +		insn = aarch64_insn_get_movn_value();
-> +		break;
-> +	default:
-> +		return AARCH64_BREAK_FAULT;
-
-Similar request to one of the previous patches: since you can check
-the validity at compile time, place it in the default: case, and drop
-the return statement.
-
-> +	}
-> +
-> +	if (imm & ~(SZ_64K - 1)) {
-> +		return AARCH64_BREAK_FAULT;
-> +	}
-> +
-> +	switch (variant) {
-> +	case AARCH64_INSN_VARIANT_32BIT:
-> +		if (shift != 0 && shift != 16) {
-> +			return AARCH64_BREAK_FAULT;
-> +		}
-> +		break;
-> +	case AARCH64_INSN_VARIANT_64BIT:
-> +		insn |= AARCH64_INSN_SF_BIT;
-> +		if (shift != 0 && shift != 16 && shift != 32 && shift != 48) {
-> +			return AARCH64_BREAK_FAULT;
-> +		}
-> +		break;
-> +	default:
-> +		return AARCH64_BREAK_FAULT;
-
-You could also check the variant.
+generate_mov_q() (and others) start with a BUG_ON(), which may not be
+recoverable, just like WARN_ON() above. That's where we should be able
+to fail (more or less) gracefully and at least indicate the failure.
 
 Thanks,
 
