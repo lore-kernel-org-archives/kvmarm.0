@@ -1,219 +1,123 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011052.outbound.protection.outlook.com [40.107.208.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF1842065
-	for <kvmarm@lists.linux.dev>; Tue, 21 Oct 2025 05:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761026397; cv=fail; b=td8noJNK+ZiCoBkDhlwCzO2wCofktMSgaJtkUIZBNWf/rSysBiWWQex9vPyDYZvHykFcNgwWpy1uUn/6OnNeCellzkpfGuarXQGWFDD+nJtUUbZcjaiPB7VBlvieNL25G/Wf2PTyk4Hs4eXl1yqtoced+kezRGpgR0w3KxIGafs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761026397; c=relaxed/simple;
-	bh=f/A0uKYGS50bN2SB3b1IQvmBVVzIDKy8WyabcvwJtkQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=s/iSyqEpB9bTlxIL6e7XTTNeW+Nf+BWdkeKxI38hcuZOZQOUmNd+2rFqUyZ8OZt+lfSKfutwrSDiiZSG9bby3NMQxUMfzbdvmRLlipyIxi6gMdwwmHMZkhXIGkgCIeMe+Fn0CQYG5kx3nIvKdaQuwP8MaeoFudNbkes2ZMQj+Ws=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=thFjQEx7; arc=fail smtp.client-ip=40.107.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E69428DB71;
+	Tue, 21 Oct 2025 07:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761033026; cv=none; b=usGL4Frrkv4x6R3U1ixg7khmr3+tHzLwnkmdpX/aIHxwcTcLd1s2VTRThaZkFe7ahIqzgcQKsfZGXLRn1/693TDZ1zZHFYqT2avGTLM7KkKdtjkcKUTbUebGuhc8mT5DiONZwpBduKSBWaTEYK9U9ws6y+TXhCMNs34HKepGVUs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761033026; c=relaxed/simple;
+	bh=wcjQXdXyz4a64xPChG6OrBbIDGawzNQC7URHkyMcw9s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c01mGMhl+PdCPiySvgOG/z1uzQRTAlS4ycJJ+t+jx8HQKVHggqc9sREhZgak3gv0f0O3bu2rHcaICh0jeBegVrAwOPC5uXTC6LsmjprrN4XUVrECdnVpZbvq4RIlE0ySUSm9mYws5E56CJfL/FYe0sT1OtgdeEgtxjwvoAyisDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKp8C6Kk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="thFjQEx7"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=njtgDv1s1sp+ZapWoYis5skjIWQ7gecSChLEGv3+0+Nz1QBqtAqLu42kNXqd39bh903QCCDCAX3DNKHZi1QjNmOWBkeMU6fUcsEr9BBTgopTSgu5U28dSumhVBdPPRuzKzXGv+N4zi5vh9zAeAU2jk9duep15Z0jBISCBlv72bEwvYtpdmxeXNnO6AHXpSVBNvVt5pYt3jleJny2RgQqX7W+wjWYJiQ6mgfDlB/4Eb4+mIUfHHFfNPWKNPp2fXHg+Aafkij6U6lUnMDUv7Wmo3WWt02vECsuD10MYT+Gto5DuAWN3ovaKKTG9pyYih3JDuY4ZEuC8SADSwh9Tvu02g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iqD+azw9K+7ERU1FvMRulu29BBDkpnp4BPf9nV6bNso=;
- b=d0fs8LPIe0XzNv0qPNTAYqEepHEzPchW9dfN+LB5nwf2Vq9x6buVU5z8XhRjPUXAdnTKPaJb+m9qT7z3G65JLFUYNlk6k8ajKBp1dLvazzwkrMfz2Geng2jYUmBamwr8PjZ+fuD+eHjq38lUgDZq6F28nMcqIeqVf5bhmcCIDuW262pYzNATjGFpOpBYzHqNoTL9+Abb6H558v+QQ+xsUjr9tqLFVM+mYEE13RurxLw3m96n3x1ixleRF0AtmAhmzpvaZ8Id3KmZg4+H4WzpBHjtN+wQKjkn600oUzqBz+V0874trUaZreDm6rBQJv1fCpCnKHTsnqkvXF9x9p94Bg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iqD+azw9K+7ERU1FvMRulu29BBDkpnp4BPf9nV6bNso=;
- b=thFjQEx7rLq1p+XpTXhv9QbGTWvB+NceJ7UHquQuceUmjWSDRZVNk6n43hc+/RRPwWOnq3yBi/U9eIo1c5yAA4v0Lm2nmGG0k+zqMasWXmUtEyMFg89Txe3Cc60GytwdO/m/ESusqiiRD74y+3dx9p9wzMCsA7IW2/WJaBa7gKc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com (2603:10b6:208:40b::13)
- by CH3PR12MB8074.namprd12.prod.outlook.com (2603:10b6:610:12b::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.17; Tue, 21 Oct
- 2025 05:59:52 +0000
-Received: from IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823]) by IA0PR12MB8301.namprd12.prod.outlook.com
- ([fe80::e929:57f5:f4db:5823%4]) with mapi id 15.20.9228.015; Tue, 21 Oct 2025
- 05:59:52 +0000
-Message-ID: <115440a3-a035-4949-a767-19c0be4b6010@amd.com>
-Date: Tue, 21 Oct 2025 11:29:41 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 00/12] KVM: guest_memfd: Add NUMA mempolicy support
-To: Sean Christopherson <seanjc@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ackerley Tng <ackerleytng@google.com>, David Hildenbrand <david@redhat.com>,
- Fuad Tabba <tabba@google.com>, Ashish Kalra <ashish.kalra@amd.com>,
- Vlastimil Babka <vbabka@suse.cz>
-References: <20251016172853.52451-1-seanjc@google.com>
- <176097602114.439246.7705198528866990456.b4-ty@google.com>
-Content-Language: en-US
-From: "Garg, Shivank" <shivankg@amd.com>
-In-Reply-To: <176097602114.439246.7705198528866990456.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA1PR01CA0168.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:d::23) To IA0PR12MB8301.namprd12.prod.outlook.com
- (2603:10b6:208:40b::13)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKp8C6Kk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99228C4CEF7;
+	Tue, 21 Oct 2025 07:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761033025;
+	bh=wcjQXdXyz4a64xPChG6OrBbIDGawzNQC7URHkyMcw9s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mKp8C6KkuWJAne+5zLlmaPxKLDRxc161Dmorh/7VwBWhIa4rOhvF+9t5O7TfUkGVN
+	 5J8AZxqfUW3IoY6cvJCxl3akQySI1hE1HTLiqI81hBekdUbevEBVf6wMOpBFCvC4RB
+	 fJK80tE4UebXUiYLIb86fa5viFBux7BXSb+APfw2aW6K7hirWZAP5kC5kJQUaDbXEf
+	 D3+4ubqnMq76+F5kSiWBuuYzKPsHyGvQM5K+bhGM0B6h9NJq29ui1zi8Kz/6un/Y+W
+	 egkYBE9PEBsU0dQDzK+pfmBvipreHtG5jeD0a3d90cYvS/ZpzijvYK7WapUUBhC3kQ
+	 wVKrkvEKqxnYA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vB78R-0000000FkvS-0gGO;
+	Tue, 21 Oct 2025 07:50:23 +0000
+Date: Tue, 21 Oct 2025 08:50:22 +0100
+Message-ID: <86frbcwv5t.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH] KVM: arm64: gic-v3: Only set ICH_HCR traps for v2-on-v3 or v3 guests
+In-Reply-To: <23072856-6b8c-41e2-93d1-ea8a240a7079@sirena.org.uk>
+References: <20251007160704.1673584-1-sascha.bischoff@arm.com>
+	<23072856-6b8c-41e2-93d1-ea8a240a7079@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA0PR12MB8301:EE_|CH3PR12MB8074:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81ccabbe-1b56-4d1a-2a5f-08de10670d20
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cENJMldXUTYrT3pocjlVc2xrNG5iZjRENFNKdWkzU0o2MVN3aStvNFdiSUpv?=
- =?utf-8?B?dVFNKzkwZTkveWdvamsyTThDWE1uTEV6cG1OYyt4VGQ4ejNoaGtFYWRuR1BB?=
- =?utf-8?B?QkxPMWNmYWdUM3BnLy9TVi9mUWF0bWgxcVJzM0JsRlNmTkgzdi9qbjYvckRP?=
- =?utf-8?B?QVFXR2tvUW9OUVVvYVdFRW9kSjI4WXZEUys5U1gzbVR2RTdSanpIMzNTYkdK?=
- =?utf-8?B?MTNqNWV6ZmxMaklMTmtmQk53U0dTbWp1blNoUkhiOFBmNXJHMmYydFBpT2dl?=
- =?utf-8?B?eWFBeGgreUFhTjZNQ0xpL2w2SVBXTTVSblFqanRnL1NWci94TjNGMDBSN3Zy?=
- =?utf-8?B?WkV3TmtPMXBNOC9sTE1Bb1o5bk5GZlp2a3FGSWUyNVhZdUtNdjFYbFZnUENO?=
- =?utf-8?B?YlZmVHVGeEVaOWFHL1grT1Jlb0xIaUdHem9pTnE1Rm1DNzZWMVhSa2wvd1RH?=
- =?utf-8?B?L1NHbFRkdHJtam9SQWh1Y29pWXdQVkJnTlJQdGVVcjV5djlGZktTZGZha1B1?=
- =?utf-8?B?dGppamtoUXRLWkpZNno2QkY3a21LYk9jK2R3SUZpaUpyMWZUZzUyWlp4ZHNo?=
- =?utf-8?B?akVBaDJ3ckxqZ3c0ci9GVTdKQUVhaGcvRkJzMlNVd2xMWFRwTEhnWDNFd3RY?=
- =?utf-8?B?RVZ5TExKRks1TXE3bFRuL2VPZFIySGw0TDdIZ1Q3UC9yRWd1djJzK3VzSU1D?=
- =?utf-8?B?WDRjWkJXT3E0ZzBBbU9HQVRrSlFTeEtvZ2NYS29Hak9pSWN2eEV0eHU0TFV5?=
- =?utf-8?B?K3praklYKy9YMGpsNXBVTEhYSkNCQit5NDc4U2tZRndnVTR3Q3JNdGhMVkhz?=
- =?utf-8?B?R25rd0pyNXoySVZwWG1hem03UEVCVVZiN0h3WklidFhzR1l3Uzd5eG14OGtE?=
- =?utf-8?B?WU1WUGh6NGk5MG54RzEvODVqUEFYR3g0NHFvNzIrZlVOMmMva0JhV1NpcmRR?=
- =?utf-8?B?VzVZa2MraTJUN2o1ekRJREFhdi9Ub09LcWhoNlpiRjZudlprd2xOYUN4SlZM?=
- =?utf-8?B?MFg4eXpzSmcxeTNrRlc5MHM0SU01bFc2SmdyWkp0c1d5T1NsZEFrQVFxRC9i?=
- =?utf-8?B?d0hRMVpRUDBiQ2t0THJoUHhDTVBkeWNMYlg1VHBxWnBRQlJYWFRkNmJ6ZVJD?=
- =?utf-8?B?UUZ4ajMzZnIzNDNDWnpOMzVOWjZ1UFVYVSsvVWtNdFFKSEpGaHB1UnFReGtr?=
- =?utf-8?B?YnF2UnZiYUhuZWtabjRhVy94K0tEczlNK1NQY2ZaNVpxMzRpUzN0U2dwRUp3?=
- =?utf-8?B?Z1NxWWZpYytDNnA5TkhVK293VWdqVHdXSUd5clQvQTZxR2FYejVDb1Q2Ry96?=
- =?utf-8?B?TmtWbU5ZTVorQTEwOHV5ajdUM25HL3NjM2E1SDZUOWJpbFNJTUU2NzlSMG9Q?=
- =?utf-8?B?N3NaMWRkLzh3TmlxR2ZPcEpRWVBTYWVzekF4R3k4RFdmWjlWN1AyZEwvazFL?=
- =?utf-8?B?K3JwUjZMNHV3QURTcnhBM2hLWXJjdVRIMFM3eE9rNGtrNEpEZVplRWMybU1C?=
- =?utf-8?B?NVJNVjBpYzh4ZHRLTDF2YklFUGU3VkRNM1ZNd0wvU3ZSQVAzSUQxdEI1NUZP?=
- =?utf-8?B?djFzck9wZUJBRExURzVHYjBUalpZZUtUekU5a1BlQlJGa0hEenRZWm05Q2NW?=
- =?utf-8?B?SUxic21CZ3pjMWdCaHpPVlpVczlxcFJKcW01VjdyTVE4NmloUU9VL1RUWTJC?=
- =?utf-8?B?dm0yU0F4UHYxNXA2dWxNZ01tZUJOSGE2UmViUHRJV0tTSmdQMERyOFFJYjR6?=
- =?utf-8?B?NTk1cmp0OUJiMEU4eVRJWWp3dHA2K004ZktXT1dZVkRuTlZzK1Z4RlNOVzNC?=
- =?utf-8?B?T1NjV1MvZnJhYjNneVBLOERsTEhaZVpJNjVvVzVQdjhOWUQ4Uklzd2d2WEUy?=
- =?utf-8?B?QXpTVGR2Uzh3UjBiUGtQZ200bmZZeE5IZ2JiMThsMHVJZ1hZaE1GNDgwZ2k4?=
- =?utf-8?B?aTYzcENNcWVFd2ZDckJ5YkM3eG1UNE5DalE5MTFQN2NBZjVxbnRmalRjWjR3?=
- =?utf-8?B?M282S0QxZ2VnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA0PR12MB8301.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Wi9YV21iZVdYeldKRitraWZVU0pCVE5la2RTdDM1b3hubFNMdHF3NENYVWRT?=
- =?utf-8?B?RmM1MXAvS0ZLZ2F5ZEt3dmpmeGdNbFN4TXRSY0pUMTVkQVpjV29yYmJHdDNo?=
- =?utf-8?B?L25WRW4yYlFvdXBtbFhvaHJBeTRLek85WEdldllES0YxR2gyQTB0U1JLcHcw?=
- =?utf-8?B?THlKSmgwdjQ3ODBacm5pRS9zLzhITUhzdzZTYzRZOXc4RldSSlZNWVdyaXFD?=
- =?utf-8?B?RzF3WTlzWTFLSXJrWW13S3l0azBHem5OUGZTeE15amlmcFpLcjNBSmtNNHpE?=
- =?utf-8?B?d2Nmai9OUFpRRTVHL05SaWl6K2tkTFZEMXdoZFNoNUllNWtGTFJHQWlRQlY2?=
- =?utf-8?B?Tk5EWkdhNFExT1c4Y1g4aERIYTdscVF4bzFtSUpQNTVkY0pOcWtWUXFBZEtt?=
- =?utf-8?B?YU14aUx4c29GVTBSN0JXQ1VURW41aDJmVU1iN29NQjg2MnpSMFl6N0IyK3cv?=
- =?utf-8?B?VVlVb2w2TVpLSVEzQllGd0JEK2dkbWRoMXE5YkVzUmlBcFZCMTA1SnNLUVla?=
- =?utf-8?B?cG4zczIwejR6enp0Yko3ODZuakhYSjUxSzhYOUxrODlLM3JtSjFoRTlyWDZz?=
- =?utf-8?B?SmQxbFFEN1EwVWNtZWFvbmlNMkQ4b0wvZ3NCM3F6Vm9NbjFabmZTQy9lYy9l?=
- =?utf-8?B?U1ZWR3l1ZGVhNXJ3VXBTaTAvMnhYS1I4OU0wdzJ2SjhQeEl3bm9NcVdSYmhw?=
- =?utf-8?B?OWRMUzVqTFg4Nm4yZ0M3dDUyV2grakpPR2E3TWR6Uk9LRGt4R0JEdU12TVBV?=
- =?utf-8?B?ZjRnLzljSFN2OStUQUFvUmFIckwyTGZVb09hWERMWWk4K2M4cWlrbnNnVEFz?=
- =?utf-8?B?L2ZEYjl0QkhUL0kyYjJ2QytmVWdOenZYQmxZTHZqNVJoanBUVkR6RmVKbFFT?=
- =?utf-8?B?T0w4TmJmdkE2VkFleDB3UFZibVlVM1NGWko5Z0JYcnVGTGdGNzAvMTEvWW0z?=
- =?utf-8?B?WGhjOTVpcXNRaVNid2FEUm9aSXFzMHlPMFpjUGpmVDIzaWFiMFVpcVZqU1lq?=
- =?utf-8?B?ZTUxZXlLTDNmOWhnYUpHNnp0T3J5NHhUT0V0N0J1Wm9ZeVIxbVc1MmtZT3VR?=
- =?utf-8?B?MXViQVViWWVTSmhtWDJJbkFmNEsyMFhmM3NxcmRGQnQwWHVqcUpja2NKR09x?=
- =?utf-8?B?VzNpODlzZVBrZlY2emphMTVhb2Rac3h4S1kyQjEvMlFXV2ZHQkc1NWZRa1R1?=
- =?utf-8?B?RFNpK3RPY2hEL3ZtbVIyMW54UmN3QXpsUnlVZGJrNlU2bHBTc1FnaDVybi90?=
- =?utf-8?B?cFVvMEs0ZzhobW4vRnFFRjBLSGE4dTlId0QzeDIwaTFqWEszd2ErMEJrbmxm?=
- =?utf-8?B?YUo2aTVhcW5MVUNYMHpNemN3Q2lPbFBiZ3VLeEorb2pnY2REbDFEdnI5dEg1?=
- =?utf-8?B?UEV3NU5SUHdSc3N2OUUvWnMyUm9POFN5dDAycm9UbjNMTGE5U3hZKzdSaU4v?=
- =?utf-8?B?UVhlNmIzVHp2cklQdXg5VjZTbWduaUI1cjNPcU5OSlZvemwxbDFzM0UremVq?=
- =?utf-8?B?UEpad2JCMW5selltSUpaSjNaMWwveEZnSHR3Y3EvZU5iaHoyNDdqV01SaG5N?=
- =?utf-8?B?WEdrQzREUE1Mbm15RlRPNTRrUndUVGVXMzZMS0RJbUJQWlVCTTJLV283S2Qy?=
- =?utf-8?B?VnJYUHNsdTdvMng1WUJxRC9NTVc1dDVhQnU3cUl0MTRndjhNbERYcnVzOUkz?=
- =?utf-8?B?NlN6c1RKbzMyUUlvZ041d1dRR21RUXAvVGhLZ0ZUYjJnQkxrVjhRbUdxTXFw?=
- =?utf-8?B?NnE3bUpvWkVCTklJTC9xR00wRWxaeXNGK2NudWN4aE1MU1hFb1RwOVBzWkRF?=
- =?utf-8?B?ZzNRYlZxRjZOMWUzcmJRNkVGNTFaZVkwK0V3bFowc1NHSDV3RkZ4UzlMMGNT?=
- =?utf-8?B?Ky9oYWM2SG16bTk4b0x0NHJ1L3dqaUU5eHpPUFFwbElSL1M4S3JUb1hwaEFx?=
- =?utf-8?B?NExvNU9Ma0dnb0FMVFdRdmhqYjR4bUFLb21KeHZxY2dSb2JpSXg3eXRNNFVn?=
- =?utf-8?B?U1UrR0svZ1EwSVErYWdzZ2NNd3p5b1VzbDgvSzFpZFhVUFhzdG1KQkQwYmhZ?=
- =?utf-8?B?WGVVRUpWL1ZqN0cybHkwQXhXQ1ZTYUY0ZG1UR1B5SlZVd3RDa0xBVnpZVWdm?=
- =?utf-8?Q?pCu3Q97SR3R0capYRHCKM9qU6?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81ccabbe-1b56-4d1a-2a5f-08de10670d20
-X-MS-Exchange-CrossTenant-AuthSource: IA0PR12MB8301.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2025 05:59:52.3151
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zJU8zywRcybvEmioM7dexWcw4AWrHouFdO99B3dLL1+fMKDcyN/rHg+dBnIAn2joj8koFPNMw4fHIAVjoFYhcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8074
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, torvalds@linux-foundation.org, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-
-
-On 10/20/2025 10:03 PM, Sean Christopherson wrote:
-> On Thu, 16 Oct 2025 10:28:41 -0700, Sean Christopherson wrote:
->> Miguel, you got pulled in due to a one-line change to add a new iterator
->> macros in .clang-format.
->>
->> Shivank's series to add support for NUMA-aware memory placement in
->> guest_memfd.  Based on kvm-x86/next.
->>
->> Note, Ackerley pointed out that we should probably have testing for the
->> cpuset_do_page_mem_spread() behavior.  I 100% agree, but I'm also a-ok
->> merging without those tests.
->>
->> [...]
+On Tue, 21 Oct 2025 01:21:56 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Applied to kvm-x86 gmem, sans the .clang-format change.  Thanks!
+> On Tue, Oct 07, 2025 at 04:07:13PM +0000, Sascha Bischoff wrote:
+> > The ICH_HCR_EL2 traps are used when running on GICv3 hardware, or when
+> > running a GICv3-based guest using FEAT_GCIE_LEGACY on GICv5
+> > hardware. When running a GICv2 guest on GICv3 hardware the traps are
+> > used to ensure that the guest never sees any part of GICv3 (only GICv2
+> > is visible to the guest), and when running a GICv3 guest they are used
+> > to trap in specific scenarios. They are not applicable for a
+> > GICv2-native guest, and won't be applicable for a(n upcoming) GICv5
+> > guest.
 > 
-> [01/12] KVM: guest_memfd: Rename "struct kvm_gmem" to "struct gmem_file"
->         https://github.com/kvm-x86/linux/commit/497b1dfbcacf
-> [02/12] KVM: guest_memfd: Add macro to iterate over gmem_files for a mapping/inode
->         https://github.com/kvm-x86/linux/commit/392dd9d9488a
-> [03/12] KVM: guest_memfd: Use guest mem inodes instead of anonymous inodes
->         https://github.com/kvm-x86/linux/commit/a63ca4236e67
-> [04/12] KVM: guest_memfd: Add slab-allocated inode cache
->         https://github.com/kvm-x86/linux/commit/f609e89ae893
-> [05/12] KVM: guest_memfd: Enforce NUMA mempolicy using shared policy
->         https://github.com/kvm-x86/linux/commit/ed1ffa810bd6
-> [06/12] KVM: selftests: Define wrappers for common syscalls to assert success
->         https://github.com/kvm-x86/linux/commit/3223560c93eb
-> [07/12] KVM: selftests: Report stacktraces SIGBUS, SIGSEGV, SIGILL, and SIGFPE by default
->         https://github.com/kvm-x86/linux/commit/29dc539d74ab
-> [08/12] KVM: selftests: Add additional equivalents to libnuma APIs in KVM's numaif.h
->         https://github.com/kvm-x86/linux/commit/2189d78269c5
-> [09/12] KVM: selftests: Use proper uAPI headers to pick up mempolicy.h definitions
->         https://github.com/kvm-x86/linux/commit/fe7baebb99de
-> [10/12] KVM: selftests: Add helpers to probe for NUMA support, and multi-node systems
->         https://github.com/kvm-x86/linux/commit/e698e89b3ed1
-> [11/12] KVM: selftests: Add guest_memfd tests for mmap and NUMA policy support
->         https://github.com/kvm-x86/linux/commit/38ccc50ac037
-> [12/12] KVM: guest_memfd: Add gmem_inode.flags field instead of using i_private
->         https://github.com/kvm-x86/linux/commit/e66438bb81c4
+> v6.18-rc2 introduces a failure in the KVM no-vgic-v3 selftest on what
+> appears to be all arm64 platforms with a GICv3 in all of VHE, nVHE and
+> pKVM modes:
 > 
-> --
-> https://github.com/kvm-x86/linux/tree/next
+> # selftests: kvm: no-vgic-v3
+> # Random seed: 0x6b8b4567
+> # ==== Test Assertion Failure ====
+> #   arm64/no-vgic-v3.c:66: handled
+> #   pid=3469 tid=3469 errno=4 - Interrupted system call
+> #      1	0x0000000000402ff7: test_run_vcpu at no-vgic-v3.c:128
+> #      2	0x0000000000402213: test_guest_no_gicv3 at no-vgic-v3.c:155
+> #      3	 (inlined by) main at no-vgic-v3.c:174
+> #      4	0x0000ffff7fca7543: ?? ??:0
+> #      5	0x0000ffff7fca7617: ?? ??:0
+> #      6	0x00000000004023af: _start at ??:?
+> #   ICC_PMR_EL1 no read trap
+> not ok 25 selftests: kvm: no-vgic-v3 # exit=254
+> 
+> introduced by this patch, which is commit 3193287ddffb and which never
+> appeared in -next prior to being merged into mainline.
+> 
+> It didn't appear in -next since the arm64 KVM fixes tree is not directly
+> in -next and it was only pulled into Paolo's tree on Saturday, a few
+> hours before Paolo sent his pull request to Linus, so there was no
+> opportunity for it to be picked up.  As I've previously suggested it
+> does seem like it would be a good idea to include the fixes branches for
+> the KVM arch trees in -next (s390 is there, but I don't see the others),
 
-Hi Sean,
+As I explained to you more than once, the answer is still no. We keep
+the two branches separate for good reasons -- for a start, they are
+manager by different people.
 
-Thank you for handling all the changes in v12-v13. I appreciate you taking this on,
-especially the refactoring, improving selftests and code clarity.
+If you want to manage a -fixes tree, go for it. If you want to take
+the -fixes branch in your CI, I have no objection.  Do I support this?
+Absolutely not.
 
-Thanks to everyone who provided support, reviews, and suggestions throughout the series.
+	M.
 
-Best regards,
-Shivank
+-- 
+Without deviation from the norm, progress is not possible.
