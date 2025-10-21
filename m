@@ -1,82 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09004339708;
-	Tue, 21 Oct 2025 14:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CF7255F31;
+	Tue, 21 Oct 2025 14:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761055271; cv=none; b=PtHnbE2AThJNPoyemT8LoC+LEJk6WvLxbXiPFmXf0UM3GbuPCOb8IUUBTz95i2Z/5XEuKh3U82RfMMOhVFp7M542JExKOp1Oo9gwpek8oRyHAgCNstSwdNs9+yUqQhZ498iHKQgsSZjP65J8cBEEvJ52rV9+KZ2LCXSjTeJFFeo=
+	t=1761057484; cv=none; b=DCdE1wWBYFNRZgUDy/NNAhkzb9r6e66IR4KbBROmToWvh3/h8piuJfObQINOi7JkBTdSo/Sx+E8AIBBWiEuvO2kdZj5uf5auGEMr6A++W0HKLjadSN4f1cAsFgS01M6yrbXjdN53gcO4esFI9ImJPy/sKrK8FUkBzvjafRk5yjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761055271; c=relaxed/simple;
-	bh=2ehypxs6NqIrfQOZ7K1xfSYPtdTxoYI5fqmOmDSbLgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSJLfhIFC1dkE/hl8KuVTuvV06Oj29/69UVNvXQRNZgYFh9x1ggFRAQLmqRHasqoRhjKcxhCubGDrrorsm1xktHotOo+MftsiZ1ygMfoHsuHSSf0jESuiCQIfPRjCklWd6Ft/6dEKxXf1tCaEdjIcMa02jOdBl9jsYaf2z1Bx58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XK574YGT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761057484; c=relaxed/simple;
+	bh=wFbwZbsHTJiSSwxGm5j+8zH7cL1GYeO4xnLoFEPZCNY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=twIgx1hpT4z+ZR02v3oaAIyewW8d1a4BiJUc49Q+RzQcee6wbbn9xFFq2Tg6mc9rR7VseXvqVHYWzn5Spgbsxr70ZiW4XKopk7zpb/UbTVzPtrbjudjJzPXIvFMoDxQM0MoeeTg8Fj7aPpnFLbj09TI4fVBpqOe7GpCC6ko0xkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RE8W1iTx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XK574YGT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34EA9C4CEF1;
-	Tue, 21 Oct 2025 14:01:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RE8W1iTx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF02C4CEF1;
+	Tue, 21 Oct 2025 14:38:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761055270;
-	bh=2ehypxs6NqIrfQOZ7K1xfSYPtdTxoYI5fqmOmDSbLgo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XK574YGTNZ1ED6z+iqXzh/soXQPQY9IJy1rszRDAxB4RykMozZdqB04ZGQSr1aDGx
-	 Xam2bP9jq1weICQx2XXGsceGbI+u8S5kptMQvsy3kQAGV926bWxD4OUmgk4XYUyuPS
-	 dELjAvRFryKhscR4HxFo8mi9PiRLoFiBElOcRKwPjbq01amVPSExVDB5N7D+JDH/0X
-	 byMRJQz2wuReFrtJ9XHxzaFX9r6wTb/GbIh9DTkwYJCfsS9BmAiXT3YDTd4FD/HbhX
-	 SeK2TZuwOwfJsFqk/BjPWBRYp/lCQMKPYGS7TmPm6fqz8OVhkTJhgQmNyCpdi4cM39
-	 J6lnBGLxU0tRA==
-Date: Tue, 21 Oct 2025 15:01:03 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	s=k20201202; t=1761057482;
+	bh=wFbwZbsHTJiSSwxGm5j+8zH7cL1GYeO4xnLoFEPZCNY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RE8W1iTx33LnSMetMg4dLbUvYOYZSMVmXe0AE5llr3mbj/dkawF74r2l46bO7rs8N
+	 j849i5QTsa5QBJ9dBxmVf8zcEkhsGGYvVhsP2nHb6ornRGjE+eGgZrW3PlXzkgJcsT
+	 s2ltvMb3GRVAUQUkNillw5tBDlLvp9LBkzQbPetvEnNZV85WQajG3tmO0Cq80LZHsy
+	 //V4L7yU0mFCi9aeFmi5U0hrL/Yv11LZqqTUprKbqfyeJj3L6UrJCjP/G8bR4q2kZ1
+	 0Rfjp0myWpGDB42nTA7mO6IGpKs+A9Ixh1eFtK7z3m2ctZ96xWw5217gsf0HR+WXwG
+	 a6lBfXVU+tAQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vBDUu-0000000FsUT-1AY9;
+	Tue, 21 Oct 2025 14:38:00 +0000
+Date: Tue, 21 Oct 2025 15:37:59 +0100
+Message-ID: <86bjm0wcag.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
 	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
 	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
 	Joey Gouly <Joey.Gouly@arm.com>,
 	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
-Message-ID: <ca8e9756-6fef-423a-bbaf-3b4dd2105beb@sirena.org.uk>
-References: <20251021094358.1963807-1-sascha.bischoff@arm.com>
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH] KVM: arm64: gic-v3: Only set ICH_HCR traps for v2-on-v3 or v3 guests
+In-Reply-To: <78b0297c-4622-4b75-bcae-45c144c92c45@sirena.org.uk>
+References: <20251007160704.1673584-1-sascha.bischoff@arm.com>
+	<23072856-6b8c-41e2-93d1-ea8a240a7079@sirena.org.uk>
+	<86frbcwv5t.wl-maz@kernel.org>
+	<78b0297c-4622-4b75-bcae-45c144c92c45@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="IrhBdm47gVnop6o3"
-Content-Disposition: inline
-In-Reply-To: <20251021094358.1963807-1-sascha.bischoff@arm.com>
-X-Cookie: Accordion, n.:
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, torvalds@linux-foundation.org, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Tue, 21 Oct 2025 15:00:30 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> On Tue, Oct 21, 2025 at 08:50:22AM +0100, Marc Zyngier wrote:
+> > Mark Brown <broonie@kernel.org> wrote:
+> 
+> The only thing I can think of is that you are objecting to the idea of
+> having the KVM arm64 tree merge it's fixes branch into it's development
+> branch.  That is not what I am suggesting, I am suggesting putting the
+> fixes branch itself directly into -next to be merged by Stephen.  I am
+> not proposing any change to the content of the KVM arm64 branches.
 
---IrhBdm47gVnop6o3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Then I don't know why you even involve me here.
 
-On Tue, Oct 21, 2025 at 09:44:09AM +0000, Sascha Bischoff wrote:
-> If there is no in-kernel irqchip for a GICv3 host set all of the trap
-> bits to block all accesses. This fixes the no-vgic-v3 selftest again.
+You can pull anything you want in -next, and you don't need my
+approval for it. I still don't think this is a good idea because the
+life cycles are totally different, but if you like making your own
+life complicated, go ahead, I'm not going to stop you.
 
-Tested-by: Mark Brown <broonie@kernel.org>
+	M.
 
---IrhBdm47gVnop6o3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmj3kh4ACgkQJNaLcl1U
-h9DUqAf/QEERGOisXRAq9CnwcS80G6M2khAIySPsnBn8KAxqewg/FUc6Nov1YqoA
-UtpaWCV7P+z4WVv91UrkiElDSnZ3uvesUAMwPA4pdLXyJmWakNE19j59kHkngDPj
-62NO90HobyTNCHvjoghR0XLFJekpv6J6G3ZfJNtxcrTXgAfpKvbbWKh1JBuevJhx
-PizWl2nm9xc8PY/5jzjOTu//nOOgvCswkKP4L7Ted1y1JS6mcX/uOs34p6RfSyEq
-ndayWTYUAcs9O1C08j8UMz6LYwUsj/9eqLXqrTnDnNbqgYRi/zkTH2MDVEN7xdOY
-oNmByRdx66CWu3g5L1Iv8aduzyXHHQ==
-=ToAD
------END PGP SIGNATURE-----
-
---IrhBdm47gVnop6o3--
+-- 
+Without deviation from the norm, progress is not possible.
