@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7F0257448;
-	Wed, 22 Oct 2025 05:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E5622FE0A;
+	Wed, 22 Oct 2025 05:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761112598; cv=none; b=LghBTzUS8u8zf0FKwnLFeA7Ig83OdA8WEp5wWnoGbv4hO/LgjMu+HhlFMIaPxKr5ZK5lXA0a4DGc1gII1kE6HfMrjUmV8lV/BD6qsjoCqdV6GUMZUU3ZbGIpx7SRY1G+cDEMxuADRgsVb3SJPH+UgB+74YtwX3G/YUbUeNODcOE=
+	t=1761112633; cv=none; b=lHpxRfpGHnRnJii8jixy9dQjgEuDisWaKxAn2OHf779cyCjN+qYcVo2U2zsE1GRjXwDYkI9ZZKxmcL5y0fsucgNWNv4RJUVvibJJokmLZdkV2nhvt5vKWLSUnBuwvYtMDy9K8iEt5OE0qMjrwmNLeiBrNtBq0IYHD0lXSMgL5aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761112598; c=relaxed/simple;
-	bh=e0BNSEe8+JWm79ZsctEdZVSTDEu6ZAcAN5FVm7Wus1E=;
+	s=arc-20240116; t=1761112633; c=relaxed/simple;
+	bh=Oq4fzkS01zCv2I4qOypTEqukIE12MkuzMGCj+rV1CCw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTRU1FrSkNg+jKeEkDLhTtH6tQF1RUdM03m1aol2GGsuV3TE8mxNm6WgLX/fpnVbJi/D62SMZrGoTooXsN1Wxizegcl7ComKo4HQsRp7Pp8c7oh7mihBokPEZ+Vb1hk9ZcHk63nVGBvCtH3QbcgpPtjo4JHIDzp4okQ0Zuz2Sks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fq9beKtZ; arc=none smtp.client-ip=192.198.163.11
+	 In-Reply-To:Content-Type; b=V8beWpQYU8kDDB0hGfHzBb51xtmh4CrnUn99Xiit+whnvuJetiTkofomXtjkmXjupJu7U+4tgeh32jH2AmxvHImeW9sc5MQPaOZTNVEfc0QFIzfD8CfShQnfSKOo75SBsIMYQM2KIhGZyQopu76fCPY1Tbe/+GxPDw+ypRmUeJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E7Jfqqcd; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fq9beKtZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E7Jfqqcd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761112596; x=1792648596;
+  t=1761112631; x=1792648631;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=e0BNSEe8+JWm79ZsctEdZVSTDEu6ZAcAN5FVm7Wus1E=;
-  b=fq9beKtZpSZ9xtF+1HtgOxXkuuxjT4aQcwDE1euEyeV7Srf9KEC3+Wkp
-   N2HU5onhiIKNBycmOWo333J71u/xv0N8gUnRtNJokKeVJyn2u9b5JWOrf
-   ULvKNp+Snf9bPgTr3OWDqvyYHcqC5iju7Jx/zzBdGeelzj2gMGSPOuyiT
-   ySstzO4fXUxfPN7+M50NCYJ38POiG4+gc5+rLVt+Uf0P7itDQDwvV0izU
-   YXrXf86y0I/2f9OJccsLMHRs3VavY0uDXlJAxJ93CTcZBVQGz8006BBC8
-   PJ79/mKqSTUkt+PxuqCH5vQLdHmaFJEGOut9fksw+TVkHc0ihel32Ny9s
-   w==;
-X-CSE-ConnectionGUID: 8TI7yS9fTI2TcU0c6yuLXA==
-X-CSE-MsgGUID: zoC3j7yoSE+LiKmEiSu3PA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="73856210"
+  bh=Oq4fzkS01zCv2I4qOypTEqukIE12MkuzMGCj+rV1CCw=;
+  b=E7Jfqqcdu7VQT1dxrFmwMMNAG5K7CoSj6nOrzt4x7aIA+SIH9WASa5dI
+   i1AP78MKcZ87csLhzI+funJzjC1R+n7awfOxP2gYyMUNU5k7rgJeaoXVB
+   wpzZ9yfNenup1BpwBpvRAcoDhSzIBCK1Mv+q0Mi3bF1clrloQOrP/k1Is
+   4csnRM4NjzKFLc4rvl4RRjtrGgtf/Oq3nTGydaLfxZKovYO6Mk+b90t5s
+   5Tfw9lBgIXzkp9TYnhE/1rZ8st4YLBIfEoGkS2L7mKs/TBQGyySTzMzi5
+   4WixOG036XIQOZ7TvC27lkSBtBke8uDHVqoQeSmNEfGfvVnRYzBuLN6z0
+   A==;
+X-CSE-ConnectionGUID: DO1qtQB4SLGa4YG4iq7W8Q==
+X-CSE-MsgGUID: OmIDiPE9T6SDNdKtQIYUaw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63146730"
 X-IronPort-AV: E=Sophos;i="6.19,246,1754982000"; 
-   d="scan'208";a="73856210"
+   d="scan'208";a="63146730"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 22:56:35 -0700
-X-CSE-ConnectionGUID: oEyBARVoRTqxmx9FX15Ezg==
-X-CSE-MsgGUID: iu37FNdWT/WUX/u/fUlTIQ==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 22:57:11 -0700
+X-CSE-ConnectionGUID: jQ221r4UTleoxdP+jV1Nkg==
+X-CSE-MsgGUID: d9hLZVuOTp+rHjN7swLSrg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,246,1754982000"; 
-   d="scan'208";a="184184586"
+   d="scan'208";a="184184728"
 Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 22:56:28 -0700
-Message-ID: <7aa86887-b499-4618-b174-96cb0cd17d24@linux.intel.com>
-Date: Wed, 22 Oct 2025 13:56:26 +0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2025 22:57:02 -0700
+Message-ID: <bfe00290-6ab3-4c09-b0bf-46bb7af09d60@linux.intel.com>
+Date: Wed, 22 Oct 2025 13:57:00 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 05/25] Revert "KVM: x86/tdp_mmu: Add a helper function
- to walk down the TDP MMU"
+Subject: Re: [PATCH v3 06/25] KVM: x86/mmu: Rename kvm_tdp_map_page() to
+ kvm_tdp_page_prefault()
 To: Sean Christopherson <seanjc@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
  Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
@@ -75,21 +75,20 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
  Rick Edgecombe <rick.p.edgecombe@intel.com>,
  Ackerley Tng <ackerleytng@google.com>
 References: <20251017003244.186495-1-seanjc@google.com>
- <20251017003244.186495-6-seanjc@google.com>
+ <20251017003244.186495-7-seanjc@google.com>
 Content-Language: en-US
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251017003244.186495-6-seanjc@google.com>
+In-Reply-To: <20251017003244.186495-7-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 10/17/2025 8:32 AM, Sean Christopherson wrote:
-> Remove the helper and exports that were added to allow TDX code to reuse
-> kvm_tdp_map_page() for its gmem post-populate flow now that a dedicated
-> TDP MMU API is provided to install a mapping given a gfn+pfn pair.
+> Rename kvm_tdp_map_page() to kvm_tdp_page_prefault() now that it's used
+> only by kvm_arch_vcpu_pre_fault_memory().
 >
-> This reverts commit 2608f105760115e94a03efd9f12f8fbfd1f9af4b.
+> No functional change intended.
 >
 > Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
