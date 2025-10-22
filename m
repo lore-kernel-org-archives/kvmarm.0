@@ -1,125 +1,206 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B2D2DC350
-	for <kvmarm@lists.linux.dev>; Wed, 22 Oct 2025 17:50:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C23E2EACF9
+	for <kvmarm@lists.linux.dev>; Wed, 22 Oct 2025 18:12:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761155441; cv=none; b=D2tOSt8hMx/MGw56CxEknbWylplCwH3rmJZypgyJ9sFyHat3kVi8JNqtyt/HI/ISvm/F1e+bJLfQzl/69Vn77tmUQgoslZcyEZPvAUee1cpMftmFChVxGNwQS97IGshgg9NvDkEgzHz1vA5cZbG8nPimeZvWW4BfbwnSkD19I4A=
+	t=1761156773; cv=none; b=SNxpMrAla/AXYcEfKUT7hgEWO1QfHmALFG79jHuMR4W6AZ1cDnlXGlxYzUsqxGy3BTXJtpvLkVauEZrrxmfEZU8alEXMUl15QS0ppVqHSrpK7tjYdDjK0X/OjQuG4e3pJ09KiORlv6FclQUEsXwSfeYUdM67PmcIPJ+dGBKB0EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761155441; c=relaxed/simple;
-	bh=6CHmjI3yZ69786GhD7BIGbIes8WfBr6aBYUrXcsCp5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LIhNLWTfnDYdNFd96y0cUHkVYC6O98m19KpWxqa1jFevgjprfPiMELlAUnqb3grS29gXhdhDRzy330IR8ctprd+3X2kM4XYD9HRUslkGJNL6F5C6xsDoxIw2ovgBzJiIma6AGaBSwHCnw7g02ynSbDXlIpCoZsV4HMwmn0WquKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mvlQTlpK; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1761156773; c=relaxed/simple;
+	bh=UmH1svExxe3696H3/lrjYo2eB/zUc0gH+XKx1eKRj0s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FGXOyzSMk5n61AN3KbgdP+bHFRSrl5rW5BtAuW154cWsnlBHwIbvwbqUv+i/88w+WOk14Re/a8zk5HQ9tOBqOpnhMTj4Svw5l6lWel4cT5EQymMuRCiSDXgSH+llsdrhLyxkRljyJMy3YEyGm9X3YyvpO6ol+2jaJkwnv6nLU74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e/cYskuW; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mvlQTlpK"
-Date: Wed, 22 Oct 2025 17:50:29 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761155436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4D4r+gnYc8QDeR2V7bg4SB1yLrqRV0hyazuL9oViJLw=;
-	b=mvlQTlpK1K/gSJ/CrpM95wBz0OcPMKAe10hj5bbAnI2h22U2ueWbOOqaWRaahCB3p35D3C
-	ub6/pMxiXOYh9tAEZjCimraNGjYD6/imHSSCqGtKhgFOHqYUco6q9bTGFQk5fKGqiiq6KA
-	Bj1/8lU7/AQJLCMComxxG3ztkzEBv9U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Itaru Kitayama <itaru.kitayama@linux.dev>, kvmarm@lists.linux.dev, Jim Mattson <jmattson@google.com>
-Subject: Re: RFC KVM: arm64: selftest: stage 2 mapping helpers
-Message-ID: <zqtfz6k3mud5rjmnfy45pdvqhmf33mkqvmtsvayf7pjz2buoiw@m5z5rqqhiqh6>
-References: <10A5745B-411F-4EB3-A168-0BC6CA99FF4D@linux.dev>
- <aPbL8NCPCfLHIB3w@linux.dev>
- <aPjdgqHlxFOyjSKT@google.com>
- <62kml5omikxsb3ppd4yewcvbuje4xojffi6nkcnpxddsy77hpb@plprg57waxnb>
- <aPkYox4XLwrYi9qJ@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e/cYskuW"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33428befc08so4004359a91.2
+        for <kvmarm@lists.linux.dev>; Wed, 22 Oct 2025 11:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761156771; x=1761761571; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5F7t24lC7jgleOK3FW+MwSMdfYKm48DJa8i0z/06to=;
+        b=e/cYskuWyIQpg3D27Z5FTQbBrRvwr7fyTOvcQy8QqegpR5QIDg1g96mnneYK9TJYTj
+         y0C4NZhEhxtxlaj2o2CqiEeyKP8+1O2FFwscf30fo3t+5O3CMVWEhQ7Bh67gQYoVu/kZ
+         RlUOV1IUpzBvHcoopGn8a2eJB8uFxZ29q85Tg4uJxaT2awEbycwD2BfQW3y73jlBTZj4
+         UXLbHLFhjKgwe3dZe3lqz/3XoubWSBlbHt4T24EvPLKi9ukFqJ8qJYhs7CEZL3ubz9Vu
+         QO3xYDhwIQM2IOtzjx4j9F6TvqJoqRjMLTWFf+noT3ILDj6RFtW2YW48k954QHfQtwwl
+         h5vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761156771; x=1761761571;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V5F7t24lC7jgleOK3FW+MwSMdfYKm48DJa8i0z/06to=;
+        b=asXcLvRTJl++U4Yg+gtBVkf+YKm/4DglJoy03Zum7MlDepwWnnnX1O1zGKXQgte3do
+         YSNdHOdM+qYBb7Dr06dsfbW+exjdFlXl/gKKWt1fzM8r6PXJ6qsJM3jFkbYcAgKCJTdX
+         ar+1sYBgDOXBNpTH6Z9YYcaZFj1akr9AJFjZipuciC4oyU40nlrEDIdADGT0p7xtrOb3
+         uUSOuxyKVnkemxqw13KLGiL8nKUph5E4rXjZCcbxxxYj2Tkj33/OkCR8pqXkWPcvFtzB
+         URVRt48izv92goAERrVHUv7dVQ4mgRQ8jOdfVU1Q6G+W/w5qwp07wxZWEicKHUomB/YZ
+         QVCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlNfQvk4nA/j7q5D3XusJ8JiaRZkg1+k1wAFWX60OExlUhxgl3b+Tiugz7oNQRD1OifiOnUOk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyqR+rxouBbDUnd2Qq7nB0r5nzMyZRn311JXh0VzdI/okSOB8nv
+	DJ0Rzp/WKmZ9Zz1er8mvxNm0g4DIjQZdJ+51Od+hOP7mNMW0bFDStELXEK+PNJNLqUsAM1GR1b5
+	OK+VDJA==
+X-Google-Smtp-Source: AGHT+IFAZr0wpbGx7b8wp6kFow05WwkzX+gl9q/tJGKoWGxIdF2WxHsL5OqcbuH+85tLuHrz8145UQS6wJM=
+X-Received: from pjbnm19.prod.google.com ([2002:a17:90b:19d3:b0:33d:cdb9:9adf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3f8d:b0:33b:be31:8193
+ with SMTP id 98e67ed59e1d1-33bcf85d59dmr30647063a91.6.1761156768896; Wed, 22
+ Oct 2025 11:12:48 -0700 (PDT)
+Date: Wed, 22 Oct 2025 11:12:47 -0700
+In-Reply-To: <aPiQYBoDlUmrQxEw@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aPkYox4XLwrYi9qJ@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-5-seanjc@google.com>
+ <aPcG3LMA0qX5H5YI@yzhao56-desk.sh.intel.com> <aPe2pDYSpVFxDRWv@google.com> <aPiQYBoDlUmrQxEw@yzhao56-desk.sh.intel.com>
+Message-ID: <aPken0s-0MfdSd5o@google.com>
+Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 22, 2025 at 10:47:15AM -0700, Oliver Upton wrote:
-> On Wed, Oct 22, 2025 at 04:57:16PM +0000, Yosry Ahmed wrote:
-> > On Wed, Oct 22, 2025 at 06:34:58AM -0700, Sean Christopherson wrote:
-> > > +Yosry and Jim
-> > > 
-> > > On Mon, Oct 20, 2025, Oliver Upton wrote:
-> > > > > +void virt_arch_s2_map(struct kvm_vm *vm, u64 ipa, u64 paddr);
-> > > > > +
-> > > > > +static inline void virt_s2_map(struct kvm_vm *vm, u64 ipa, u64 paddr)
-> > > > > +{
-> > > > > +	virt_arch_s2_map(vm, ipa, paddr);
-> > > > > +}
-> > > > 
-> > > > This is all going to be arm64-specific, no need for indirection through
-> > > > something pretending to be arch-generic.
-> > > 
-> > > I was going to ask about that.  Do we want to try and provide a generic interface?
-> 
-> The problem is it isn't just page tables. It's the whole nested CPU
-> context, hypervisor trap configuration, and means of entering/exiting
-> the guest (i.e. ERET & exception entry vs. VMRUN).
-> 
-> I'm not fundamentally opposed to trying to do nested in common tests,
-> but I'd like to have a rough idea of how all the necessary parts will
-> fit together.
-> 
-> > > Yosry (and Jim) are working on unifying as much of the AMD vs. Intel logic as
-> > > possible, and if my wishes come true, unifying stage-1 and stage-2 mapping code
-> > > as well.
+On Wed, Oct 22, 2025, Yan Zhao wrote:
+> On Tue, Oct 21, 2025 at 09:36:52AM -0700, Sean Christopherson wrote:
+> > On Tue, Oct 21, 2025, Yan Zhao wrote:
+> > > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index 18d69d48bc55..ba5cca825a7f 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -5014,6 +5014,65 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> > > >  	return min(range->size, end - range->gpa);
+> > > >  }
+> > > >  
+> > > > +int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> > > > +{
+> > > > +	struct kvm_page_fault fault = {
+> > > > +		.addr = gfn_to_gpa(gfn),
+> > > > +		.error_code = PFERR_GUEST_FINAL_MASK | PFERR_PRIVATE_ACCESS,
+> > > > +		.prefetch = true,
+> > > > +		.is_tdp = true,
+> > > > +		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(vcpu->kvm),
+> > > > +
+> > > > +		.max_level = PG_LEVEL_4K,
+> > > > +		.req_level = PG_LEVEL_4K,
+> > > > +		.goal_level = PG_LEVEL_4K,
+> > > > +		.is_private = true,
+> > > > +
+> > > > +		.gfn = gfn,
+> > > > +		.slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn),
+> > > > +		.pfn = pfn,
+> > > > +		.map_writable = true,
+> > > > +	};
+> > > > +	struct kvm *kvm = vcpu->kvm;
+> > > > +	int r;
+> > > > +
+> > > > +	lockdep_assert_held(&kvm->slots_lock);
+> > > Do we need to assert that filemap_invalidate_lock() is held as well?
 > > 
-> > Your wishes already came true:
-> > https://lore.kernel.org/kvm/20251021074736.1324328-1-yosry.ahmed@linux.dev/.
-> > 
-> > For x86, the patches reuse most of the stage-1 mapping code for stage-2,
-> > with the only exception being using a different sets of bitmaks.
-> > 
-> > We end up with a nested_map() API (and some friends) for creating
-> > stage-2 mappings for L1 (by L0). I imagine we can make that an
-> > arch-agnostic interface.
-> > 
-> > A cooler thing (but probably far-fetched) thing to do is to reuse
-> > virt_pg_map() in nested_map() in the arch-agnostic code. Example, each
-> > arch provides bitmasks and other stuff, and then the generic code calls
-> > virt_map() (and friends) directly.
-> > 
-> > The feasibility depends on how similar stage-2 page tables are between
-> > archs, and how much differences would need to be conveyed to virt_map().
-> 
-> One of the other things for arm64 right now is enabling the 'common'
-> tests seems less interesting than doing low level testing on our nested
-> MMU implementation. That probably means we're going to deviate quite a
-> bit from virt_map() (e.g. using a different translation granule than
-> vm->page_size)
+> > Hrm, a lockdep assertion would be nice to have, but it's obviously not strictly
+> > necessary, and I'm not sure it's worth the cost.  To safely assert, KVM would need
+> Not sure. Maybe just add a comment?
+> But even with kvm_assert_gmem_invalidate_lock_held() and
+> lockdep_assert_held(&kvm->slots_lock), it seems that
+> kvm_tdp_mmu_map_private_pfn() still can't guarantee that the pfn is not stale.
 
-Makes sense.
+At some point we have to assume correctness.  E.g. one could also argue that
+holding every locking in the universe still doesn't ensure the pfn is fresh,
+because theoretically guest_memfd could violate the locking scheme.
 
-> 
-> IOW, the starting point for us is fine-grained control over potentially
-> multiple stage-2 MMUs with modal descriptor fields that change meaning
-> based on the current MMU context.
-> 
-> > > I.e. if we envision any arch-agnositic tests that can do nested things,
-> > > now's the time.  E.g. running dirty logging tests in L2 maybe?
-> 
-> We can just as easily implement an agnostic wrapper after the fact;
-> enabling architectural validation of the arm64 nested implementation is
-> the highest priority at the moment for us.
+Aha!  And to further harden and document this code, this API can be gated on
+CONFIG_KVM_GUEST_MEMFD=y, as pointed out by the amazing-as-always test bot:
 
-Oh 100%, I was not suggesting that we need to do this now, not sure if
-Sean was.
+https://lore.kernel.org/all/202510221928.ikBXHGCf-lkp@intel.com
 
+We could go a step further and gate it on CONFIG_KVM_INTEL_TDX=y, but I don't
+like that idea as I think it'd would be a net negative in terms of documenation,
+compared to checking CONFIG_KVM_GUEST_MEMFD.  And in general I don't want to set
+a precedent of ifdef-ing common x86 based on what vendor code _currently_ needs
+an API.
+
+> e.g., if hypothetically those locks were released and re-acquired after getting
+> the pfn.
 > 
-> Thanks,
-> Oliver
+> > to first assert that the file refcount is elevated, e.g. to guard against
+> > guest_memfd _really_ screwing up and not grabbing a reference to the underlying
+> > file.
+> > 
+> > E.g. it'd have to be something like this:
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 94d7f32a03b6..5d46b2ac0292 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -5014,6 +5014,18 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> >         return min(range->size, end - range->gpa);
+> >  }
+> >  
+> > +static void kvm_assert_gmem_invalidate_lock_held(struct kvm_memory_slot *slot)
+> > +{
+> > +#ifdef CONFIG_PROVE_LOCKING
+> > +       if (WARN_ON_ONCE(!kvm_slot_has_gmem(slot)) ||
+> > +           WARN_ON_ONCE(!slot->gmem.file) ||
+> > +           WARN_ON_ONCE(!file_count(slot->gmem.file)))
+> > +               return;
+> > +
+> > +       lockdep_assert_held(file_inode(&slot->gmem.file)->i_mapping->invalidate_lock));
+> 	  lockdep_assert_held(&file_inode(slot->gmem.file)->i_mapping->invalidate_lock);
+> > +#endif
+> > +}
+> > +
+> >  int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> >  {
+> >         struct kvm_page_fault fault = {
+> > @@ -5038,6 +5050,8 @@ int kvm_tdp_mmu_map_private_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> >  
+> >         lockdep_assert_held(&kvm->slots_lock);
+> >  
+> > +       kvm_assert_gmem_invalidate_lock_held(fault.slot);
+> > +
+> >         if (KVM_BUG_ON(!tdp_mmu_enabled, kvm))
+> >                 return -EIO;
+> > --
+> > 
+> > Which I suppose isn't that terrible?
+> Is it good if we test is_page_fault_stale()? e.g.,
+
+No, because it can only get false positives, e.g. if an mmu_notifier invalidation
+on shared, non-guest_memfd memory.  Though a sanity check would be nice to have;
+I believe we can simply do:
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index c5734ca5c17d..440fd8f80397 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1273,6 +1273,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+        struct kvm_mmu_page *sp;
+        int ret = RET_PF_RETRY;
+ 
++       KVM_MMU_WARN_ON(!root || root->role.invalid);
++
+        kvm_mmu_hugepage_adjust(vcpu, fault);
+ 
+        trace_kvm_mmu_spte_requested(fault);
