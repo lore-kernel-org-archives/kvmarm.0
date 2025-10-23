@@ -1,133 +1,100 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00041345CDE
-	for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 17:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D89635B138;
+	Thu, 23 Oct 2025 21:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761240440; cv=none; b=YzATFTOVqSt/UWRD7RpeVMg2iWubP8D9Q0ItX9mqTgtjO/rO+0LnBvGx6FZ4xuheCtvnwdtwdjB0QxZXUtqL4xqjJNBVtGAcqJxked+KOBEsoMED+0tAxFLfC8n8Mjo15jLlAb/+8OfuoQQnzkkrFIIRUu1a/xN1Ax73MRqTKNA=
+	t=1761254431; cv=none; b=B4NZHXKOea9cp3f+yZt+2zMKK/1sB0PrsEYwBQO/Wzi0Wrb22CcyfnjIBikkXu2NuwBzU1faHxhEctq6tu4O32SIzBQBEVr5X3RoKrDvEqib9IGF31v0ScbFFBOyWE/MJWOWMF7AQV47/llRwckY4U1YqV0OlnGHvCLd+oKgLu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761240440; c=relaxed/simple;
-	bh=XVDzXI4Y1e4iRpQIyW9vAwBiWIuzXTa0TJZpBTTKBPM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PkTfcso34yaIeuYi+n4mPr+qIzX7+OFMqY9i/0e5NzlrKhfH/LDDifTjNAKss4le0gRDqGwRyaTkuIBCtGSqQAnyfFtsKg+HxfP8DIAg8yMH4xqaPX07+2GweEoKC87nvwRtdoWPfG+31cHX4NtKarCQay8M2XLZLT6VRBO/Trg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vm4K4HO7; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1761254431; c=relaxed/simple;
+	bh=CnOMQMjrqhKtD/EhlScExXFn3jDF3wbOMnBmzOuuz8s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sKbqg+4YxW1wz1vufHDvm/L1vlyYkjwV0093SvMTTSW+pkZtdXHhfno/g3Uqo2PfrrciA5ruLUqMRdjhjT1BM35nksMn+a74DhTQ4lvP1j3G6d2tSq2rdANCimca0gor2VFcQOL/IdwN6DiU/ot8i2wYs6OGiQTK+OvHuRzHSMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyfkBUm1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vm4K4HO7"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b6ceba8968dso788175a12.2
-        for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 10:27:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761240437; x=1761845237; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PMd4YohbYBDUY30TTRBHmO9DyPvx8MjhdR/tVFXtYYI=;
-        b=Vm4K4HO7DcQ0iNQGySj3ZZiyEVBaXX2tKHbXivZ9jVaAJZMqvv9j73XEu/45NghDI6
-         rPY3VKN9oOQrHmIq+niTWsrzS2rQUvRxX2KqFyG5mvnDrBHNJGAydOsvUb00B9c7jyL8
-         adlRs15lZu0LiCWzIgDWd57xwWVGPigJKsjwMey84eKc7m5ZrfcuDDghqq4BWRiRpWvb
-         JcttsTHbeUNQ9ah/l06HIsJEDohAI0mzknxNw1DNOgYPeFe6nkOtqg5q2I+tnVALFh9L
-         FD5hozTL4hO49Z0/9c7dhwbwPaqU2h5R4P7YXKj2tfa2kl3vmMeKpVlJdPFP8iOLGXWZ
-         ZXzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761240437; x=1761845237;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PMd4YohbYBDUY30TTRBHmO9DyPvx8MjhdR/tVFXtYYI=;
-        b=M6UaYxjosFux9yecNYxlW0GUlhinGchpQ/6D+3/X5GHqvMAILKszrBk8SQ+7nv6sOz
-         U3ikttc958LGZsq8+4uFqcCdT4ZHOPcaew+H8LJ5v92rifJ1ZB+c0qiMdCvpNrzSy04/
-         404F7VLYRhpDAlq5G4TFgNqBF6OqKArgKjs1EigQZSaaitJfFo59VjsYVyMYkM0tY5xD
-         HaXIS3mbUPMaXq7OgUkRivi+uqbtcnQQKQBe+EbwBxWaez9Ib73bFC7E/p3sUaygiBD9
-         dI/ivIazyDXmoYVua3fxfb1VyPHJZ/Xm2cPAi/RoMcgCwQysAmxvW6H3awgzV6ZwMiHf
-         w0Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCWzj/N/FYmWi0IVJtvwv0Z1cCi3sNpMnJs6zxHxK/TfL7TVARGXlopRuLpzXoaKDWb5hjxpu54=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxdNvVmsQ1zRPq8DWUJldmMYWB2RdGYdAiWuEGlrWgwgu+THpc6
-	EG/9dGAmNonp4BHGUuCM8BFBNALnqmJ5lxSy2bvzDLZH+CcQh2C4TXHSvP+3RL0nn51kIrUx7vF
-	m9/mpUg==
-X-Google-Smtp-Source: AGHT+IFjhG//1khxmFCKdE4+6wWu9+6PA/jOl4XyR0eCgR53v+ZECkEt8twGk0B4jVNQwQCsevpreYrKXxc=
-X-Received: from pjuj5.prod.google.com ([2002:a17:90a:d005:b0:33b:a35b:861])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:db11:b0:240:48f4:40f7
- with SMTP id d9443c01a7336-290cba4efc9mr387536115ad.39.1761240437319; Thu, 23
- Oct 2025 10:27:17 -0700 (PDT)
-Date: Thu, 23 Oct 2025 10:27:16 -0700
-In-Reply-To: <707a01ee36c28863bdc6a4444a5560e9a0b19597.camel@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyfkBUm1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE34FC4CEFB;
+	Thu, 23 Oct 2025 21:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761254431;
+	bh=CnOMQMjrqhKtD/EhlScExXFn3jDF3wbOMnBmzOuuz8s=;
+	h=From:Date:Subject:To:Cc:From;
+	b=PyfkBUm1aFy2wRFZV4lD8D0CNFOxRgPgft1bZRCvlbGHjiTDOEDRSHPeaxJ4hs8mL
+	 Q0jiKSY7lNBab/qIAnfhp5rZzKA3f/XjXM+lKbDCV2QcQZ0uzMRt+fSLULsluNrdvK
+	 agcvDqY7q5cJVJYUSF4Wh2HIyZS5qjcZFTr9r52jHnmnQ1IUKhkoNA6X8gExYpe82b
+	 7HrKWlXLgLsgYDSdZhu4tSjag0qtLicxp3osJDmoAZQhJl0qxWInHWojzf4CsZ7mdJ
+	 BVSszA1Ve/HeM+IWLqL8P4gUyQumpvN6PSIrfDlICimkA0AuhZIN17BmGV8vgSunAq
+	 Cm5E2RJPk7d1A==
+From: Mark Brown <broonie@kernel.org>
+Date: Thu, 23 Oct 2025 22:19:29 +0100
+Subject: [PATCH] KVM: arm64: selftests: Add SCTLR2_EL2 to get-reg-list
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-15-seanjc@google.com>
- <707a01ee36c28863bdc6a4444a5560e9a0b19597.camel@intel.com>
-Message-ID: <aPpldKdiQYYnl4uC@google.com>
-Subject: Re: [PATCH v3 14/25] KVM: TDX: Bug the VM if extended the initial
- measurement fails
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, 
-	"maz@kernel.org" <maz@kernel.org>, "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"kas@kernel.org" <kas@kernel.org>, "maobibo@loongson.cn" <maobibo@loongson.cn>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>, 
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>, 
-	"zhaotianrui@loongson.cn" <zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>, 
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Kai Huang <kai.huang@intel.com>, 
-	Yan Y Zhao <yan.y.zhao@intel.com>, "michael.roth@amd.com" <michael.roth@amd.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, 
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	Vishal Annapurve <vannapurve@google.com>, 
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251023-b4-kvm-arm64-get-reg-list-sctlr-el2-v1-1-088f88ff992a@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOGb+mgC/x3NQQrCQAxG4auUrP2hTcciXkVcjDUdg9MqyVAKp
+ Xd3cPlt3tvJxVScrs1OJqu6fpaK7tTQ+IpLEuizmrjlc9dyj0fAe50RbR4CkhSYJGT1Ah9LNkh
+ mMLOEoZdLjBPV0tdk0u1/ud2P4weLEUR6dQAAAA==
+X-Change-ID: 20251023-b4-kvm-arm64-get-reg-list-sctlr-el2-222e463e8aaf
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+ Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-88d78
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1429; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=CnOMQMjrqhKtD/EhlScExXFn3jDF3wbOMnBmzOuuz8s=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBo+pwbFbGYn/J+XnOrZGFvXgcvTyRkw0UD8ItGS
+ HcdNtUNIyuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaPqcGwAKCRAk1otyXVSH
+ 0KyIB/9Hifq35A9damYTTSqJ1l1r/u0aFiu0nLatsjdRqqy5ohdrChk54+ZgkggtTGEhEgfUmpR
+ c1KDMeSzsd0gkcrIH2V6OxPvd6q0uBkzZhdy/rfOakWyasCWU1jT1ecCVopPQvnSBMqAROgqOcK
+ /DADf3whJVgNl2m1Vbt9NWO5VDsygGuZKyXxm2dc+HoeWCB5HTh9tLNszdX1gUgDKn4YYFD+ty7
+ HMkuYLOKJiP6zCoAbwbW7/ZTZ4R3qqPxgvmIhkm01Stka/J+btGZ6SwvIPF9Crs+1N3O66Jyjig
+ IVjVSM2/9MCzdxXyL+rfw61UAeqmauigvno1wNf/XARiKQhb
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Tue, Oct 21, 2025, Rick P Edgecombe wrote:
-> On Thu, 2025-10-16 at 17:32 -0700, Sean Christopherson wrote:
-> > WARN and terminate the VM if TDH_MR_EXTEND fails, as extending the
-> > measurement should fail if and only if there is a KVM bug, or if the S-=
-EPT
-> > mapping is invalid, and it should be impossible for the S-EPT mappings =
-to
-> > be removed between kvm_tdp_mmu_map_private_pfn() and tdh_mr_extend().
-> >=20
-> > Holding slots_lock prevents zaps due to memslot updates,
-> > filemap_invalidate_lock() prevents zaps due to guest_memfd PUNCH_HOLE,
-> > and all usage of kvm_zap_gfn_range() is mutually exclusive with S-EPT
-> > entries that can be used for the initial image.=C2=A0 The call from sev=
-.c is
-> > obviously mutually exclusive, TDX disallows KVM_X86_QUIRK_IGNORE_GUEST_=
-PAT
-> > so same goes for kvm_noncoherent_dma_assignment_start_or_stop, and whil=
-e
-> > __kvm_set_or_clear_apicv_inhibit() can likely be tripped while building=
- the
-> > image, the APIC page has its own non-guest_memfd memslot and so can't b=
-e
-> > used for the initial image, which means that too is mutually exclusive.
-> >=20
-> > Opportunistically switch to "goto" to jump around the measurement code,
-> > partly to make it clear that KVM needs to bail entirely if extending th=
-e
-> > measurement fails, partly in anticipation of reworking how and when
-> > TDH_MEM_PAGE_ADD is done.
-> >=20
-> > Fixes: d789fa6efac9 ("KVM: TDX: Handle vCPU dissociation")
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
->=20
-> Per the discussion in v2, shouldn't it go after patch 24 'KVM: TDX: Guard=
- VM
-> state transitions with "all" the locks'? Otherwise it introduces a KVM_BU=
-G_ON()
-> that can be triggered from userspace. not a huge deal though.
+We recently added support for SCTLR2_EL2 to the kernel but did not add it
+to get-reg-list, resulting in it reporting the missing register when it
+is available. Add it.
 
-Oh, right.  And then the changelog needs to be updated too.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ tools/testing/selftests/kvm/arm64/get-reg-list.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/arm64/get-reg-list.c b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+index c9b84eeaab6b..2abef0a86d46 100644
+--- a/tools/testing/selftests/kvm/arm64/get-reg-list.c
++++ b/tools/testing/selftests/kvm/arm64/get-reg-list.c
+@@ -63,6 +63,7 @@ static struct feature_id_reg feat_id_regs[] = {
+ 	REG_FEAT(HDFGWTR2_EL2,	ID_AA64MMFR0_EL1, FGT, FGT2),
+ 	REG_FEAT(ZCR_EL2,	ID_AA64PFR0_EL1, SVE, IMP),
+ 	REG_FEAT(SCTLR2_EL1,	ID_AA64MMFR3_EL1, SCTLRX, IMP),
++	REG_FEAT(SCTLR2_EL2,	ID_AA64MMFR3_EL1, SCTLRX, IMP),
+ 	REG_FEAT(VDISR_EL2,	ID_AA64PFR0_EL1, RAS, IMP),
+ 	REG_FEAT(VSESR_EL2,	ID_AA64PFR0_EL1, RAS, IMP),
+ 	REG_FEAT(VNCR_EL2,	ID_AA64MMFR4_EL1, NV_frac, NV2_ONLY),
+@@ -718,6 +719,7 @@ static __u64 el2_regs[] = {
+ 	SYS_REG(VMPIDR_EL2),
+ 	SYS_REG(SCTLR_EL2),
+ 	SYS_REG(ACTLR_EL2),
++	SYS_REG(SCTLR2_EL2),
+ 	SYS_REG(HCR_EL2),
+ 	SYS_REG(MDCR_EL2),
+ 	SYS_REG(CPTR_EL2),
+
+---
+base-commit: 211ddde0823f1442e4ad052a2f30f050145ccada
+change-id: 20251023-b4-kvm-arm64-get-reg-list-sctlr-el2-222e463e8aaf
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
