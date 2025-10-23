@@ -1,234 +1,480 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11022124.outbound.protection.outlook.com [52.101.43.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1223093DE;
-	Thu, 23 Oct 2025 10:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBB530C63C
+	for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 11:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.124
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761216789; cv=fail; b=dsjMd6G1mYi2rZhta2H0i9bZ7H9sfvi0M4asn+9SBnpBeC00OhOo11kf+pdMl9hYTQFP04rnQJjLV2u3kKJ7zvsDGzXkd66Tlb9OJTlLbaJLbn+HBBXR6D2jfbKNxs8tpNX5o+Y8yRokoqC/UuWXTJiUFSdlifRS+nHS/5T/C4k=
+	t=1761217917; cv=fail; b=RHX7ELGWlgTT3DlQNmOZvM99QxeNYxG4QJZdbj4riAi2iF8U7gLsWzqp8A+JJP4dpaUf0eavdLCgSx7kpfIdFgG7iaNa4Es7V8xZWiyMmt2LVLoKsbpxATZJgi532cMxvHIe2vBYszfX7Ba+uw0SI7zCKKuymaQrC9cV0XGEUuo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761216789; c=relaxed/simple;
-	bh=AQsxNT8qjrrWtk5sdRZxCUwgf7MYZ8rS8s5HtL7mAq8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YUvhwfCYiYbaghotca+uxrJYlmORYA8hiZWIGqb2tiQmcFCtEyPTDB81VrVeOkVpNrPW3h3ZcIB/qEy0/RJzQJHOeoTJrzj8T7gLX/R31isk+irEwP8lWNBCoTyX4QFp4Y4Cu/WSrG5e8cQvZ9cdCRXVzolWFgSgBtIS7nKf9ag=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Dpu2T2DV; arc=fail smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1761217917; c=relaxed/simple;
+	bh=wGiQBkI4yAeHNQBa0NGnGi1d01b74c6boT4y04guIGE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=H94OPzjyvTxQjg/c2HBgP2VCNaLyCf12N+19iMFexPfkGWAdf7iOq76r+R7weRXvjXOwUN0/HIMBDlDwCcJ37U2VSA93iEzS3k6Y227jjWzVKfE/63xHBzbkPkbCCwxwbIRBXDUl2CxnLk9XIX0TTS2KzmTQ97FikxwMETEodzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=KjEwFBkU; arc=fail smtp.client-ip=52.101.43.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Dpu2T2DV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761216788; x=1792752788;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=AQsxNT8qjrrWtk5sdRZxCUwgf7MYZ8rS8s5HtL7mAq8=;
-  b=Dpu2T2DV0qi55yG7yN+98aHwEsPyFYedSDo+P520OjlBk8ONv4rGDqPC
-   2dXrXkO6CWcdiYBQZo554nZhL8u46moh2HB4PSrnM3PAk4yQIk0ICHOeB
-   9IQVWFeJMjVhJRmH689uQzFvvaHup6AbY2eFXfliNEFwblDQp0wp6YPLs
-   p47hfJyO4ri8AgxxR6JriVeA78p+bCj1mNwG2J7GG+NN9UPfqKiG7X+yN
-   +AFP8b5iEaqMSSHXrwrSMRc81A5ZLUcqzDm1FEbUttqDKmOLJtyC84bXJ
-   z9wYtTXK8rahPTCxzX+R0gY33fU/RhLkL9DcvAQDoJEFZmYV79K8ZgIHk
-   g==;
-X-CSE-ConnectionGUID: mtjWa+MmSJ6uVMhpghOWXQ==
-X-CSE-MsgGUID: /5+sspu1T4+5YGX5dXd6Fg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="74500307"
-X-IronPort-AV: E=Sophos;i="6.19,249,1754982000"; 
-   d="scan'208";a="74500307"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 03:53:07 -0700
-X-CSE-ConnectionGUID: 99QVwrZgQ56NBbJKrsff9Q==
-X-CSE-MsgGUID: kbU3PDkFSyOhuSM1XuB9Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,249,1754982000"; 
-   d="scan'208";a="183301182"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2025 03:53:07 -0700
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 23 Oct 2025 03:53:06 -0700
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 23 Oct 2025 03:53:06 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.70) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 23 Oct 2025 03:53:06 -0700
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="KjEwFBkU"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=b9HhMWoFqdtJ99kKBren0RrSnOmoWNsBlxMk+wjh1eISZzudaoF8rv33MIHVoyFO/NnFbuds9Iu59J3RB3rWnwX0+daX39Zvy4pQSQvhfFThmyF21zwOgo+w8jyTpj42OrCE/B8m4Gq3l6CZccsTi5Xl5nfeDzfWT8rpuhKV2jzVp0tE5GexdAR7laU2rH6Fwt4h314fi/uDbvFkBtQsN+edCe/3yrB+Y4NbTqZ/ZtcMcDFZj+3tSeKwFhusKFFYeh1kulms5tWfGSbil2P4VVwJJgjw974ySrfWvQ22mspKo5Dq2afFK0z/msc6tNu7B1aoQjFCoCo758Q1l/fbUQ==
+ b=f/l4nAdaELaMgCc5UavSVmXBecHRtWqj4EMopmlGGd+OX1lyUy2ulV/79dJKm2liWR/yKr3Y9rG+D3ltFWlH76SfxJO/E95cGHe8okAH+5qmORNzhclnUhvBJNfOfFFEyzyoS5GTyTKtWoWKDJ+Bmr+El3hqRWVISbK+68QfC6D5ZCJSkZXX8Pdex705aGLoVgop9KxncZUHBBHz5Sp/1r4qaLCOLPIZd0PWbzBf/Lx588i99P+I+PXn6a03EacB6SnTrfva6QnaaK3AUjBxty/4Zzxxyuo8mJdt2wxnzZ8zg5BTApft6aNaFrD6f/LJrH17Xk9cVZAtTqVsUOFYfQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AQsxNT8qjrrWtk5sdRZxCUwgf7MYZ8rS8s5HtL7mAq8=;
- b=no35cCiGHV/iRJRNBBSjxj6vf97Yloq77tjv9EwHENEQQ0UqBbpy0Zi2hIKbRzMY+KP8zfxx2KrvMP0czVsVY+gCSnWXgmCi3Ds2SlyMGyx+s3NMA7euDeKvZZEXSqDWKeQwy4gGOUx2maF9xRohoHPeVdaAUpQR+tNUuBd1kPSBgXvTvLOFgX35FepngoXQaXm6CEkR+SFKg67MWWkBd3uMTZh+3mdiWhOJRNElKUUeSPwlSdpqnZNq4yI5JIJSk83V2pbRBYVuf6avKR3PbLUM5VFio4UOkY+YwgxELi9bysf47KU8LdsvsLp3tGp3vIkNrKZaqN0HAMeKo59AyA==
+ bh=Xq8Od45bF7Ud3kqk78W/hrv2u2droGHah+paXYW4w/Y=;
+ b=PRRdbEAQgQcEnaDyid1uh6zv3sW9wRY9vTSokYDCTBmaWb1MOdtjm0TBq6ocxNF66J8enQoSakjzujP+l46zO88+tG4C40zAQljCRBSYPKDBaowwu5pimGGqf6lP5mGV14W+Px7a4k4Cqnw70/0S/Mmg4ZCGRXx941sPNUDVSKNnkb5b7boRlElKt909LkKxdcSnYeYlTZYUD/w4qQjToJaDB0GTi+HNalsXtoHbDJyU2JQSUbfCFtHo6Kz/h6hjrnuwOvvb+p/KpUx9cNj78wMzQdobh5CMLptq4BNk6ZQxGhxu7UFJaOyuBgUwA8ig4Amj+Svlr2JTCviIW0qPpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com (2603:10b6:208:31f::10)
- by SA2PR11MB5212.namprd11.prod.outlook.com (2603:10b6:806:114::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.13; Thu, 23 Oct
- 2025 10:53:03 +0000
-Received: from BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66]) by BL1PR11MB5525.namprd11.prod.outlook.com
- ([fe80::1a2f:c489:24a5:da66%6]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
- 10:53:03 +0000
-From: "Huang, Kai" <kai.huang@intel.com>
-To: "chenhuacai@kernel.org" <chenhuacai@kernel.org>, "frankja@linux.ibm.com"
-	<frankja@linux.ibm.com>, "maz@kernel.org" <maz@kernel.org>,
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "pjw@kernel.org"
-	<pjw@kernel.org>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
-	"kas@kernel.org" <kas@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"maobibo@loongson.cn" <maobibo@loongson.cn>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "maddy@linux.ibm.com" <maddy@linux.ibm.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "imbrenda@linux.ibm.com"
-	<imbrenda@linux.ibm.com>, "zhaotianrui@loongson.cn"
-	<zhaotianrui@loongson.cn>, "anup@brainfault.org" <anup@brainfault.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
-	<linux-coco@lists.linux.dev>, "Zhao, Yan Y" <yan.y.zhao@intel.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Weiny, Ira" <ira.weiny@intel.com>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm-riscv@lists.infradead.org"
-	<kvm-riscv@lists.infradead.org>, "Annapurve, Vishal" <vannapurve@google.com>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "Edgecombe,
- Rick P" <rick.p.edgecombe@intel.com>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "x86@kernel.org" <x86@kernel.org>
-Subject: Re: [PATCH v3 09/25] KVM: TDX: Fold tdx_sept_drop_private_spte() into
- tdx_sept_remove_private_spte()
-Thread-Topic: [PATCH v3 09/25] KVM: TDX: Fold tdx_sept_drop_private_spte()
- into tdx_sept_remove_private_spte()
-Thread-Index: AQHcPv2gLm0PphD5f0WVfdqHF7sfHrTPmGoA
-Date: Thu, 23 Oct 2025 10:53:03 +0000
-Message-ID: <28136b62074550826efa3f57b1f7be07f571abdc.camel@intel.com>
-References: <20251017003244.186495-1-seanjc@google.com>
-	 <20251017003244.186495-10-seanjc@google.com>
-In-Reply-To: <20251017003244.186495-10-seanjc@google.com>
-Accept-Language: en-US
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xq8Od45bF7Ud3kqk78W/hrv2u2droGHah+paXYW4w/Y=;
+ b=KjEwFBkUpMnoH43BaKot85KqTRpGQ8O4cMr0HOwIS0QedR5XAzqvNqAs8rYjSYgR77rwiNXIR+GvcqI6IQ0T2s7vtYvUIotKhkItfrj5QF5WDaqHtVvT7K91RxL/8NNBebh0CsgiCKuGpAh7C3MqtZHHlh/B9skjcweiuSL6C9Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ SA0PR01MB6492.prod.exchangelabs.com (2603:10b6:806:ee::24) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9228.17; Thu, 23 Oct 2025 11:11:50 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.9253.011; Thu, 23 Oct 2025
+ 11:11:50 +0000
+Message-ID: <0345c510-5db4-462f-95fb-591e71468aca@os.amperecomputing.com>
+Date: Thu, 23 Oct 2025 16:41:42 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: arm64: nv: Optimize unmapping of shadow S2-MMU
+ tables
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
+ catalin.marinas@arm.com, suzuki.poulose@arm.com, joey.gouly@arm.com,
+ yuzenghui@huawei.com, darren@os.amperecomputing.com, cl@gentwo.org,
+ scott@os.amperecomputing.com, gklkml16@gmail.com
+References: <20251013065125.767779-1-gankulkarni@os.amperecomputing.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.56.2 (3.56.2-2.fc42) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5525:EE_|SA2PR11MB5212:EE_
-x-ms-office365-filtering-correlation-id: edb0e119-d43e-468e-1542-08de12225744
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|38070700021;
-x-microsoft-antispam-message-info: =?utf-8?B?VEVlWk94dXk5Tm1kbjNmL0ZXcmY1cWJFQVlnWHZjVVhnb3hYUUhwZmtHcG42?=
- =?utf-8?B?cVRERDBKaXRSLzh5RU9qUHRnVXVlTHhySGhTV2JJRkN6MkhXYVYrSU9xS2gr?=
- =?utf-8?B?dWU0ZFlYQlFMdmVBWXdNd1BWK0RsUmt2YXdUUzJXWnFLRU9rY2tZM0FkR2Zk?=
- =?utf-8?B?K3RVZkV5R0p2QUR2YkF1MWsrSWZmZHZUSDdUZTFoVmd3anp0WHRCdVprQUN5?=
- =?utf-8?B?WjFGVG1ZZ3hIcUR3aDN6ekt4djUydXFUczhrTURtNHkrMm5IN0UxeTVVdzUy?=
- =?utf-8?B?ZWo5TEdKZ3NSODh4b0VHL3lOcCs0Y09TMHFOeWpYUzU4cUM3eWYwQkp0Wnk3?=
- =?utf-8?B?MG40KzJDemJ3dGQ1ME1PL2pLOFE4RVR6YWNwdW84aC9IbmE5dUJ3Wm5SSVl6?=
- =?utf-8?B?TWdWa0JRMWFTaVg2Nkk5SDdyVGtPSnFrc1VyYU14dWdSRHRCR0x4RlROZzRD?=
- =?utf-8?B?NmlOQnZOTFB4bEJRZklSbUxXVGVxdCtmWWpCWWl1UEhDOFRWcGtFNjNiTFhI?=
- =?utf-8?B?aXloVnp6dWpmRGd0c2c2M2Y1eDZkeVBRZGJKOURucXVsTVNEd3RQdVVSSWRH?=
- =?utf-8?B?ZWhwNXdrTEFJb29Kd1R4Vk5Fd2I4ZWk3azZFTnlBMzVleWIvQVNkVi9sL1ZO?=
- =?utf-8?B?eDRDL2FhSHdieURpeGdYczhtRFhVMnk3SlRFa3c2V0lITjd0RVF5cGNhSUtE?=
- =?utf-8?B?ei93dEVISWd2eldVYW1UVVRNdXRaWVU4amdTbmZQNTRBWXhTdUZJYW90MXE2?=
- =?utf-8?B?Qkh4alRmTW1RSDJWL011YnNOVEF5Wm9lbVlDUlZHMStTbnV5dldZaExOeGsv?=
- =?utf-8?B?MFVnemxSUTRKbnJGLzVnSS9NOVJGZTJTMjBvR2JSQ3RjTVZRYjFmODN2RGV3?=
- =?utf-8?B?b3p3UUFkSzN3cERtdW5SUmc4RCtHTTlON3A3bEFmN280VklyNzE4OVlnYXhy?=
- =?utf-8?B?QUR5TFdBcDJMV1dZWkppL0s5ejZsTVdILzRuQ0p3d0VpMGdHaUNaNkRla1ZS?=
- =?utf-8?B?S3JPMVpMa09haUlLZURCTzJlZ2Q5Z0tmeUEzWkwvd3NJM1BTcGFvTjlwUlBl?=
- =?utf-8?B?WXlxRjBkeTJzMWFqSTloeHdJWHB2eFFBd1cvZ0QzaERsdTB6Sno2amp3ZnM3?=
- =?utf-8?B?UFFtVkxQNGJBRSt5Y25PbGM3K2RtY0RuamI3VmFKV3ozV0FJNXE1K2tZQjBW?=
- =?utf-8?B?WXpTZHk3WUYzc0xndjJPcVF5MHZCaVAxMmF6azZSanQ0K2F1T2hLUWlRdkFi?=
- =?utf-8?B?eFFYcWtWREhHbDEwemhnNFhVaDBRTUJuTWdQTWliRzNqVktMdVprRm10aHpG?=
- =?utf-8?B?bzNxcEtLQnl4U21UNVFhUFphL1VialI1VVptRWxSUll6dEVPeTZxNmUwZkRy?=
- =?utf-8?B?cjRDTjBMWi9QQXVKZDVIbmhYZDBYdUlQVnYxMEpxMmNpRG1JdTFSb0xDRCtw?=
- =?utf-8?B?dkxrZWZ3a2x6VGFCTzVwcVMyck1CdW95NjVVQlRJZ0Z2YmVTOEhRbVRHN1hh?=
- =?utf-8?B?YkxYSms2VFJ6UTBGSTR1S2dXNDJ2cTdxczJYMndrTWRjZVRlaEdNLzNpK0k0?=
- =?utf-8?B?bFFycDlsZ0pOeTVxenJqb1Y3ZTd2WUk1RkpFYzY2L1AxOEcyb3hXeVZHWXY1?=
- =?utf-8?B?eFQwSG4vNzNwL3cveG1EZGFKeCtHN3R6c0N1RXkvc1F4bWdFQTdEYWpJZ3BB?=
- =?utf-8?B?bUwwZndiNHczemlPZzEwU081WGxqb3MweWpLeXgvTkhUdXVmYU1zWkViRmlV?=
- =?utf-8?B?KzM5NHBreTFzaWRkV2ptcGdtNWY2aTBKSDdUSkNMSmtUTDdOZkprdWFVSENL?=
- =?utf-8?B?U0hxbW1vdUhZUUZUTlhjeXBZSjdQMnVRbDU1ZTJkRDdKNUQ5VG1XcWdWOEFa?=
- =?utf-8?B?K0FTQkROYnZXQ0Q0aVdTcW5FbWJiVG4zekhYNUQzeS9vSUJJU0drWlFuMDlo?=
- =?utf-8?B?amxPaWVldi83aWNQY1cvS3BYQTV4ZU15cUZFdVZxRisvVUU5eDhGRjZkYmxk?=
- =?utf-8?B?Q096ckRjdVJmUUp0ZmhCaXM2WlFKdkRKYk1BSnVMenNTeXQ5dk0vS09BV0N3?=
- =?utf-8?B?U1JUVmpPTDZFcVpoMVdPeTNPZFZKRjcyU3FEUT09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5525.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?M2Q1UlpHRUlBaytsVGkzZmVScXRNdStPbFVkbU5INURzUDJyL2txS3ZUWUdZ?=
- =?utf-8?B?eGU4YUhxQ3RYT1JncTFRZFh4L3pQWWhHUDN6cDYyeWtBVzl0eFR5TlVIcVNM?=
- =?utf-8?B?TnlyemVsUFQxMmM0YUVOaUJYcU43b0IxM1Jpb2FYMEsyMVRZaTBnUHdNelho?=
- =?utf-8?B?N1lvV2EvWDlFbGlidEtxaXAzdGhWbWU1YUsrUGNuRm40WDdYVmx2VWxPWnJj?=
- =?utf-8?B?aDhpODF5Mlc5YXdDOTg1N2VBU2R6bU9jS1lRVXcvY0daTWJPalRpRkUvUFNw?=
- =?utf-8?B?dXJhWGJIbmJwdHZ2ZlYrNGZSNVlxMkFiVUZQNUo3ekV2UnFlSjdQczU4RXVP?=
- =?utf-8?B?K3UyZVNFeFJiVXNVNHAvcitZZ2dlS05KaUo4eXJIOHFGVTdkU3MxdWF4eCt1?=
- =?utf-8?B?R0YzWlNJaXJLYW9NUGdZOXI4WGx5aEFrN3lYeEFaY1B1VjhwekFkeEZvM1R3?=
- =?utf-8?B?TUd2Z3U0M3hCM3Azcm5JaUw1NlNtb3l6M0t2OEZmRllmSkpzTnNmZ1lBU0NP?=
- =?utf-8?B?RlFzbGlhUVMzM05MckZURG5IZmxHVGF1YVl1djhHR1BRUTNWRWhCQXczVnYr?=
- =?utf-8?B?YlZNNU5hZ1Q5N0NEcXBSaDlETTlocjZoSWRkQ25ocXhLbDNYNnVGYmR6S01C?=
- =?utf-8?B?T1dIV0w5cnRaV1dSNTcwV1Y3R2I3L1BRZDVRTkxmUWFRRFM4eU5UNWE4cFYw?=
- =?utf-8?B?aEs4VDB6b0JaVHcwczZSNW4wMStSeWpUVWcyM1dkV21IOGVNeUpZb2hIMDFm?=
- =?utf-8?B?ZkVWbmNSam4yT2JUY3orQVllNWdEM0JnSjNQcmJidVRmTFk2RS9UVSs1RzRD?=
- =?utf-8?B?ZldDWnc0VlNJWTBKSGNPeG12WHhwbUYxbmRRWWV4UFVJY2g1bDdRRzVWOUZr?=
- =?utf-8?B?V09DRDdLcFNhZkFaNkhOOXBYZTZDQ3ZabnJXUmE4ZFRhbzN2dGdhSFI0RUhy?=
- =?utf-8?B?My9iT1dRVzMwUkVtRzF4ckxaK1lycWFkcUlYZlpoUDVxeFZXclp1WldiSGhV?=
- =?utf-8?B?RmRVSThmbGtwZ0MwQWxUNmlmeVVLWFZPcXVsRTU3WlpQK1FraXVKZzdUT2NR?=
- =?utf-8?B?RUhFY3lpaitvbjIrNktEdEMvUDh1RUIvMUFGaUZORFNwczFoT3NVbkwwckZ1?=
- =?utf-8?B?L0ZFQ2h6Q2dJcG9qZWplbTJKVFpqbzNqOWJtSm4vS0x0WGJ3ckUxaTV5VVNC?=
- =?utf-8?B?L3FEemRRMkU4cWhyMWU2cTMxQjFpQ0ptRTl4bXMzbFY1VXFkZ0YvaDN6clNW?=
- =?utf-8?B?ZjlzRytHSWs2WGNOSmNHT2dxb3l3Wjlta0hGeU5CUFl3WDZrN1kvQno2Smhv?=
- =?utf-8?B?aVA1amtmVzBSVnJMb1hqTlpDc2I2VGxzOTlSSWJ1Z1FMWG5VVmljanpERWhq?=
- =?utf-8?B?VEVqamkySGhSb3Z6RmlsWW1jVGxSbHZlRXk4WWlSQzNydER6TEhMQ1lYcmNE?=
- =?utf-8?B?Q1hMZXZPK1gzNjdEdlo2b3NSVFp1SnNibkFKT2dmQmhsQWkzcXVJN20rMWZ2?=
- =?utf-8?B?aGZIYjFIRE5pS0V0TVhGSWFGSWlYSHIrR2ZlMG9zQmF2eHhZc2piV1hCUTRN?=
- =?utf-8?B?L2t1WHhMUURiVXcwZm5BTmZTMUJZU1FEN2RrM2E0NFBPQm9CaGJueWRUNGxQ?=
- =?utf-8?B?Q3hvbWNZT0hzanhmcEY5YmR0WDd5OUFOYXpVT000M05XWXF2SCtVU2VqTms0?=
- =?utf-8?B?eTlmd1pTa1hrMVVHbDJBa2hVSXdadHVDcit2cUtueDBpckVVVXpYNER5KzJE?=
- =?utf-8?B?dzNTZnVRbDlqbm9pazJCT1diV0t6QnB5R0xCSk1CcmQ3OGVOa3NVZzM5RW95?=
- =?utf-8?B?dDNENy9QTlZaNkRxV0RQVWhWc0FJN1VwdXhZbFl1TVhBdjE4QUhLU2xDdDB3?=
- =?utf-8?B?NDF5V0NzaWMvVjdMQVE5TFNjay9RVEJQZ2ZpMjJRS0piQ3VObW4yT3VidWZS?=
- =?utf-8?B?ZG1vUWdwUmxRWEYzcFVSTHJsVldrUjhucDM1em1RemQzazZxNFZwb1drb3Qv?=
- =?utf-8?B?UE1JenVsRzhCMEtKQS9leXhwVStvTDlPNDhMOGNmRSsrZUNNZWtzNUZsdy95?=
- =?utf-8?B?T0lyeUhSUUhFa1lYNDFFQVdjR2crVDFVbUVtaFdsZEZMZVdsM3NOTFNjTmNr?=
- =?utf-8?Q?DPTJFdKQF3SbNoccr7Liy9fHn?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6E15421E36ADD24CA5133917FFDA3995@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20251013065125.767779-1-gankulkarni@os.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA5P287CA0166.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1ba::9) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|SA0PR01MB6492:EE_
+X-MS-Office365-Filtering-Correlation-Id: ce931376-a73c-4c98-729d-08de1224f6ea
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SmhVeWd4TTJWTW1rOTNzSkNMTzlGN3lxZ3dZT1ZNcWM0N0tQTVpTQWhFc3U5?=
+ =?utf-8?B?Smo2b1Jyd2d6NytWN2kybGdHNHhYUVVLeklTejl0L2FxZXVCd1ovWEhKUTBk?=
+ =?utf-8?B?UVR3VEJXejVKMUZ2V1o5QVAreVZXZkpRalh3UHlmeGd3NFBaa012S1ZqWlIw?=
+ =?utf-8?B?WlJhMCszcHNQUlpjVHNDMlQxazVJTFhzRU05alpvVGovOVgrcjhMY2VnOXh2?=
+ =?utf-8?B?ZTQyZ2orWHd1T1M5dWF1ZFJEYVRRdnJDMTFxZnpCL0k1cnZCNmZ6cG95Wi9S?=
+ =?utf-8?B?cy9PV0RRUmhIcm5wUThrV0VzYnFDZjFKVVhoc2FVbUNmSGdrTFlMUFFYNEhr?=
+ =?utf-8?B?SjF1ZHpuV1ZvOEVpRFVYbEpIaDkxVVFJa2puOWJiZGw5Ukk3R1MrQ1lSTy94?=
+ =?utf-8?B?N0J4TzRIMjVWREVqMWl3RzZXSDlJSThsSVJQN0tzRzBFRkk3b3NFVEFIbHFs?=
+ =?utf-8?B?ajlTcGk3d1ptdFVwQk5sMnNRb2FBR09GUy90aGFscXpDOUpGK0o0cW4zVTQ3?=
+ =?utf-8?B?blVZZkVxUzI4OXY3ZHltNi83UGVtUVB5UUpTcXFnL280L0FKRFRPaTBOMTJh?=
+ =?utf-8?B?YzdjWjJ2b1BMckdlRUVQQzI3QTAwQWs0dEh2cUxzelpPd3JEYXEwOGU0TmRr?=
+ =?utf-8?B?K25DeUJYTm1QT1Z0K1RGNC8yMjJwYXJTbGpTL0dKdFUrTmJha25FUE5OWjVN?=
+ =?utf-8?B?elhOcGtXemJsOENySWFtV2pMTTFWcHV1dFVvSzVkWU9SaTZLQnVGb3pvSncw?=
+ =?utf-8?B?dXhXTGlxQkRvS1VuSXM2d1k4OHpycFhKZlhJcC9ydmo0QzZqblFFZU9Iajlq?=
+ =?utf-8?B?djI4aXdkQSt3ZDdIMGlzcVhVM21ZcWh3YjVPZzU3eUFLaWVYOElBc2FoSW5V?=
+ =?utf-8?B?SWNtVkNrdldTN3owTjNzMmFGc1JOeUFFVzVLWTZyelBlOGxqdE5RZklFNDZt?=
+ =?utf-8?B?NHV2Mys2SWR4cUl1R1hEQnhZZlVjODMzTlQ3dGNMNVhaa1lVb3lvbWZ4RUg3?=
+ =?utf-8?B?cEFCV3VJR3c1eXBBZXdCOVl6QXZEUnFKUmFzTmtRa1NrNzUvL2xQbitlZE1o?=
+ =?utf-8?B?ekZWR1NDWWxPdXJxSXRWWlJlR0lSVlhpYVpwV1lzVjlIMmNYcm5tOXdXdmZX?=
+ =?utf-8?B?OU5ja2M1RGx0Nlo2VVI5YWZJRWJSRld1ajZvQlpKU0padFFUY0lnSTlZN0po?=
+ =?utf-8?B?ZGlWS2JqbkhSNUZ6aEZhdmtibnVJdFhpZHIzczBmOGxEc0Q5b1psOWtqQlds?=
+ =?utf-8?B?c1RMdGp3UWFjd1ZTakZBLzhxT08zUDFZaTRSN0hXTE9ORC9zNXRnWXd6VHRR?=
+ =?utf-8?B?OHRBT1I4dDkzQllxTUM0ejlveXVGNVdYZUZEU1NWQnV2Q0JYbjh5VmFEU2hO?=
+ =?utf-8?B?T0JITGJvTld0Q1BNdDl3VGdlQkdjOUgyVXRWUWZHYWZVMDhYTURHeXo5WWxV?=
+ =?utf-8?B?Q044NTllSzBvSW0vWmw2UU5uM0tsYWt4MXJJdlQ0b3dnVkhucFc3MlZiM043?=
+ =?utf-8?B?aUdEUTBHSlN5K2diSzNoeDVWOEkwNENvYWxKRnYybW1uaHEvNlM3TmYrWDhm?=
+ =?utf-8?B?aG1pTTFzdUhRbE96RW1TUGwrc3Nyajg5R2Q1aEpzdC85S21mQ1N1QTNrS0RV?=
+ =?utf-8?B?TkM1VnM5dkd0cTVNcXM3L0VLUCt5c01yM09uazdBQldxN0pYMUs3OG0wcVJN?=
+ =?utf-8?B?Z0F5OUpNVjZsdmpuektSODc1NnhCUElyaGlscFRaMENzbUJtajJrdjA0cFY3?=
+ =?utf-8?B?Q0RlU2haUVYrOUJQV29JMGUxWTRkbXhob0RVNkF3WU1ndEdlRGtLRUcwUmNl?=
+ =?utf-8?B?S29CaTdUcG5aRlprOUMzdmJkS0EvcGdiY28xbkswRVg1OTBCbmJqR0ROYU54?=
+ =?utf-8?B?WE9qN0R4VG90Ty9TZ1ZBNk9ERVJBOUFqNElVMkVneXhQdmkxOElSSkJPSmw2?=
+ =?utf-8?B?VGhVRVA3ZHArci9zWWlXVU04WnNldzg4Q09xMmUxdlhsaDdvN0dON3RaOXpM?=
+ =?utf-8?B?aU92WkVMbCtRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SzZwSnFWdCtXSFNHZTJ0ZnJuQi9PRVpQOHE1STNBblFzYmNXZlE4aEVLNldW?=
+ =?utf-8?B?d251Y25OQ0h6ckVjTjhWYzV6Wlg1MUpJUi8xeHA2RWV5SEFDeVV5RVQ2cmJ6?=
+ =?utf-8?B?c3hGUFBwWmtLYU0rdTUzTWR2NDFmWU1iNGNmdzBQbUxPWkdJTDFZTER4TFht?=
+ =?utf-8?B?NUl6bDZuQ0txbG5ibndrVFpuaU9YclJKYi9yTWpNckhjTlJRQTYzcytlYjZ4?=
+ =?utf-8?B?c3NhMVBoVXZnVWZEVER4L1IycTVHU1dLeTdMSkVYY1dRemtYKzF4djJ1UDN4?=
+ =?utf-8?B?cFYyTGs4dE05UEF5alBBVytDQzBMaWtZMGtLYkFBVVNFRXhBNVJ0Y3BDL2gr?=
+ =?utf-8?B?NjhvaGtHdWczTjYxOCs2d08rKzhsMDdFN1JZZ25GVWsvMGJDMUsrMXB5UktB?=
+ =?utf-8?B?Yzh6NWdJaGVsdEp6ZFQ4K2NVTk1QK1lqallRMUY3NysxM0ppek1iaXFhMUZZ?=
+ =?utf-8?B?QkZyVXcxN2hoWGdlNlh3bWlaOUUxTk1BQVlFVkN4bms2dWVoME5Wbi8wMjlM?=
+ =?utf-8?B?RzJHYWFLR3pzTTZ2UVpkZm8xV3JHN3pGTVZjTnNtdVJ6alZUZzRZWTQvcGlw?=
+ =?utf-8?B?cS9zNVdnUTFCL0NzYmJDOFY1bUZjM0FvUXpVSnltVm5QUVBpZjY5V2JRT2dK?=
+ =?utf-8?B?MDFlajZtU1VEK0E4cUdvaVZFNkQwNnpRSU5VallwMGVacGpIeFJZRi9ma2NW?=
+ =?utf-8?B?dGU2Z2hHUnN1TXpzTjV3cGNlZFd5cFRWb1pnUi96ZjdZU25pVk53SDYwUmNJ?=
+ =?utf-8?B?a0tNUDBNVGo3RGpIcGQxVlpwbDhnOXlMZmJPaENBR2N6elJuMEFkOStuYVRC?=
+ =?utf-8?B?QldHSldMZTNWYTAxV3JTeVFXUWl2VzBRV3hnbXYxbXZLVVFEemt0WFpWRGhN?=
+ =?utf-8?B?cDZWVmt0RlNmWXBtcytKOVgwNUlVRjRuUXh6LzJQM3ZmWFU4VVpaTUxNSHRG?=
+ =?utf-8?B?L3B5ZjJid1dGZG1IYWduZ29IK1FwelhIUDUwWEJsTVVsc3BTdjI2UDF3cGVO?=
+ =?utf-8?B?Z01RYUFXaTNvTGcyRk1BM1c1bkl6Wjd3WHptOHY2VXNOT3ozQXJrdE9uWjZw?=
+ =?utf-8?B?NlRuYktSRHMwb0UxUEMrK3J2Z1pPNXZjNXFTY1I2a2d0V2xnbDR4TmZEM3h1?=
+ =?utf-8?B?cVlTOFROM01ULzlCU0FWSTVkWVBDVFBzT201bWZ2OTlpZmI0NElzYlJkbUpB?=
+ =?utf-8?B?WFdBS3Z6ZWlSdHNBT1RMV2M0cDJZcnF0RDA2SEtZeHB5TDFBb2NaL3FJRk5B?=
+ =?utf-8?B?c3UxLzdJK0FjLzZLbVg0eGpjSHl5VG50OU9zT3RPc29Ea09oN1VaR2JTaC92?=
+ =?utf-8?B?aUcrR1ZsR2ZhYjFYcUVNU0gvSDZqL0NaY21HbXdFZ25BMStTZU52QitlZHJR?=
+ =?utf-8?B?aDIwVi9OVlR2alQ5bEpJQzQwSWMvaElvOHFTMVhyWEdnNmJyUmwxS1dkc1RN?=
+ =?utf-8?B?eC9ocU5lQkozWHcvcDBHWjltU2MvNlplUnBYWjZXRUxuUTIzSENoZy9FSzU2?=
+ =?utf-8?B?VHBYNVZYRmcxQTVkR2x1MUp2OHRqRXlCYWsrWS83SU9zVC9IVkw5MVFZT253?=
+ =?utf-8?B?RXh5ZHh1VVlPTTVHclBKcU9sR3kzM1A1dEYyK2l0SUF6enVZWEF3LzNkbmlk?=
+ =?utf-8?B?aUR1dVpJckNHd00vSXB1YU1IRlhCdEMxdkxHamJPaDNLTlJIclRWYjVLcldx?=
+ =?utf-8?B?R2xCOHlqdDZwZFozeUw0YWFNdFQwUnJsb0ZXSjA1SjlQc0FTQndYaEVaSS9m?=
+ =?utf-8?B?ZnJXaWU3NHpHcUp0Ylk5ZEp2T0hLRHVFWVZDMXMzcXBVNzc0Z1o3MkdhekdJ?=
+ =?utf-8?B?ak9PQ3lqbDd0c3ZzM2s3MVhVUUl0L0UzM0JVNUgvbFVZWi80ZmhtVVkzTHNj?=
+ =?utf-8?B?QkdrSFhHemF1RGQzOXR4TktDZFZmL1k3QVZqaGNRa3J2SjhwK2NaUXhFcFhE?=
+ =?utf-8?B?K0o1aElGNW4zaWoyd1dzYjFaZzhJYXJxa0FFNFdNNzJtMkJyN05sT09WSm5m?=
+ =?utf-8?B?akZvZzU2MnpBc3dRTTk3Z0R3VmpZRHVhemNZeXFqT05ZR3dabFBFTStCTzZI?=
+ =?utf-8?B?bkhDMXVSeFN6NEtjT3Z2K1lidkZlVTQ1dm81K0xLU0VVOUIzOWJtNWdrZ2Ns?=
+ =?utf-8?B?c3grN243ZDBmVElHSEh3VTFueHpXTEdvQlcrZEtLM1RqanQ5R3FaZzNFMHlE?=
+ =?utf-8?Q?CNt5LrL4mITyhp4MH9WPcDA=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce931376-a73c-4c98-729d-08de1224f6ea
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5525.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: edb0e119-d43e-468e-1542-08de12225744
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2025 10:53:03.5123
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2025 11:11:50.7297
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ASmAs+OADeHcNJS295X4jOriD8HIAmZTnOMsg8OkDilaoFmEN7mCypeiB2Ns2JATGmq1BOQjSm8zVoY7how0/Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5212
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oDby0TTSnG0I7+N44BBZmCgMaGG23Xf7L1NNOIzXPShm+fJYOpHxPOWMh0Dia4Fzrisf/GeY5jHBKFDcyh0FCjJLkCSM4EDZkCNw7TsXvEV8EX5QYQNWUXRR7wKJgIIn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR01MB6492
 
-T24gVGh1LCAyMDI1LTEwLTE2IGF0IDE3OjMyIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOg0KPiBGb2xkIHRkeF9zZXB0X2Ryb3BfcHJpdmF0ZV9zcHRlKCkgaW50byB0ZHhfc2VwdF9y
-ZW1vdmVfcHJpdmF0ZV9zcHRlKCkgdG8NCj4gYXZvaWQgaGF2aW5nIHRvIGRpZmZlcm5hdGlhdGUg
-YmV0d2VlbiAiemFwIiwgImRyb3AiLCBhbmQgInJlbW92ZSIsIGFuZCB0bw0KCQkgIF4NCgkJICBk
-aWZmZXJlbnRpYXRlDQoNCk5pdDogaXQncyBhIHdlZSBiaXQgY29uZnVzaW5nIHRoYXQgeW91IG1l
-bnRpb25lZCAiemFwIiwgYmVjYXVzZSBhZnRlciB0aGlzDQpwYXRjaCB0ZHhfc2VwdF96YXBfcHJp
-dmF0ZV9zcHRlKCkgaXMgc3RpbGwgdGhlcmUuICBCdXQgaXQgbWF5IGJlIG9ubHkgbWUNCmZlZWxp
-bmcgdGhhdCB3YXkuDQoNCj4gZWxpbWluYXRlIGRlYWQgY29kZSBkdWUgdG8gcmVkdW5kYW50IGNo
-ZWNrcywgZS5nLiBvbiBhbiBIS0lEIGJlaW5nDQo+IGFzc2lnbmVkLg0KPiANCj4gTm8gZnVuY3Rp
-b25hbCBjaGFuZ2UgaW50ZW5kZWQuDQo+IA0KPiBSZXZpZXdlZC1ieTogQmluYmluIFd1IDxiaW5i
-aW4ud3VAbGludXguaW50ZWwuY29tPg0KPiBTaWduZWQtb2ZmLWJ5OiBTZWFuIENocmlzdG9waGVy
-c29uIDxzZWFuamNAZ29vZ2xlLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IEthaSBIdWFuZyA8a2FpLmh1
-YW5nQGludGVsLmNvbT4NCg==
+
+Hi Marc, Oliver,
+
+On 10/13/2025 12:21 PM, Ganapatrao Kulkarni wrote:
+> As of commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow
+> stage 2 page tables"), an unmap of a canonical IPA range mapped at L1
+> triggers invalidation in L1 S2-MMU and in all active shadow (L2) S2-MMU
+> tables. Because there is no direct mapping to locate the corresponding
+> shadow IPAs, the code falls back to a full S2-MMU page-table walk and
+> invalidation across the entire L1 address space.
+> 
+> For 4K pages this causes roughly 256K loop iterations (about 8M for
+> 64K pages) per unmap, which can severely impact performance on large
+> systems and even cause soft lockups during NV (L1/L2) boots with many
+> CPUs and large memory. It also causes long delays during L1 reboot.
+> 
+> This patch adds a maple-tree-based lookup that records canonical-IPA to
+> shadow-IPA mappings whenever a page is mapped into any shadow (L2)
+> table. On unmap, the lookup is used to target only those shadow IPAs
+> which are fully or partially mapped in shadow S2-MMU tables, avoiding
+> a full-address-space walk and unnecessary unmap/flush operations.
+> 
+> The lookup is updated on map/unmap operations so entries remain
+> consistent with shadow table state. Use it during unmap to invalidate
+> only affected shadow IPAs, avoiding unnecessary CPU work and reducing
+> latency when shadow mappings are sparse.
+> 
+> Reviewed-by: Christoph Lameter (Ampere) <cl@gentwo.org>
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+> 
+> Changes since v1:
+> 		Rebased to 6.18-rc1.
+> 		Fixed alignment issue while adding the shadow ipa range
+> 		to lookup.	
+> 
+> Changes since RFC v1:
+> 		Added maple tree based lookup and updated with review
+> 		comments from [1].
+> 
+> [1] https://lkml.indiana.edu/2403.0/03801.html
+> 
+>   arch/arm64/include/asm/kvm_host.h   |   3 +
+>   arch/arm64/include/asm/kvm_nested.h |   9 +++
+>   arch/arm64/kvm/mmu.c                |  17 ++--
+>   arch/arm64/kvm/nested.c             | 120 ++++++++++++++++++++++++++--
+>   4 files changed, 138 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b763293281c8..e774681c6ba4 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -227,6 +227,9 @@ struct kvm_s2_mmu {
+>   	 * >0: Somebody is actively using this.
+>   	 */
+>   	atomic_t refcnt;
+> +
+> +	/* For IPA to shadow IPA lookup */
+> +	struct maple_tree nested_mmu_mt;
+>   };
+>   
+>   struct kvm_arch_memory_slot {
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index f7c06a840963..5b7c4e7ed18f 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -69,6 +69,8 @@ extern void kvm_init_nested(struct kvm *kvm);
+>   extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>   extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+>   extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
+> +extern int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 shadow_ipa, u64 ipa,
+> +		u64 size);
+>   
+>   union tlbi_info;
+>   
+> @@ -95,6 +97,12 @@ struct kvm_s2_trans {
+>   	u64 desc;
+>   };
+>   
+> +struct shadow_ipa_map {
+> +	u64 shadow_ipa;
+> +	u64 ipa;
+> +	u64 size;
+> +};
+> +
+>   static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
+>   {
+>   	return trans->output;
+> @@ -132,6 +140,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>   extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+>   extern void kvm_nested_s2_wp(struct kvm *kvm);
+>   extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
+> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 size, bool may_block);
+>   extern void kvm_nested_s2_flush(struct kvm *kvm);
+>   
+>   unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7cc964af8d30..27c120556e1b 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1872,6 +1872,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, vma_pagesize,
+>   					     __pfn_to_phys(pfn), prot,
+>   					     memcache, flags);
+> +
+> +		/* Add to lookup, if canonical IPA range mapped to shadow mmu */
+> +		if (nested)
+> +			add_to_shadow_ipa_lookup(pgt, fault_ipa, ipa, vma_pagesize);
+>   	}
+>   
+>   out_unlock:
+> @@ -2094,14 +2098,15 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>   
+>   bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>   {
+> +	gpa_t start = range->start << PAGE_SHIFT;
+> +	gpa_t end = (range->end - range->start) << PAGE_SHIFT;
+> +	bool may_block = range->may_block;
+> +
+>   	if (!kvm->arch.mmu.pgt)
+>   		return false;
+>   
+> -	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+> -			     (range->end - range->start) << PAGE_SHIFT,
+> -			     range->may_block);
+> -
+> -	kvm_nested_s2_unmap(kvm, range->may_block);
+> +	__unmap_stage2_range(&kvm->arch.mmu, start, end, may_block);
+> +	kvm_nested_s2_unmap_range(kvm, start, end, may_block);
+>   	return false;
+>   }
+>   
+> @@ -2386,7 +2391,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>   
+>   	write_lock(&kvm->mmu_lock);
+>   	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+> -	kvm_nested_s2_unmap(kvm, true);
+> +	kvm_nested_s2_unmap_range(kvm, gpa, size, true);
+>   	write_unlock(&kvm->mmu_lock);
+>   }
+>   
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 7a045cad6bdf..3a7035e7526a 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -7,6 +7,7 @@
+>   #include <linux/bitfield.h>
+>   #include <linux/kvm.h>
+>   #include <linux/kvm_host.h>
+> +#include <linux/maple_tree.h>
+>   
+>   #include <asm/fixmap.h>
+>   #include <asm/kvm_arm.h>
+> @@ -725,6 +726,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+>   	mmu->tlb_vttbr = VTTBR_CNP_BIT;
+>   	mmu->nested_stage2_enabled = false;
+>   	atomic_set(&mmu->refcnt, 0);
+> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
+>   }
+>   
+>   void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+> @@ -1067,6 +1069,99 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+>   	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+>   }
+>   
+> +/*
+> + * Store range of canonical IPA mapped to a nested stage 2 mmu table.
+> + * Canonical IPA used as pivot in maple tree for the lookup later
+> + * while IPA unmap/flush.
+> + */
+> +int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 shadow_ipa,
+> +		u64 ipa, u64 size)
+> +{
+> +	struct kvm_s2_mmu *mmu;
+> +	struct shadow_ipa_map *entry;
+> +	unsigned long start, end;
+> +	int ret;
+> +
+> +	start = ALIGN_DOWN(ipa, size);
+> +	end = start + size;
+> +	mmu = pgt->mmu;
+> +
+> +	entry = kzalloc(sizeof(struct shadow_ipa_map), GFP_KERNEL_ACCOUNT);
+> +
+> +	if (!entry)
+> +		return -ENOMEM;
+> +
+> +	entry->ipa = start;
+> +	entry->shadow_ipa = ALIGN_DOWN(shadow_ipa, size);
+> +	entry->size = size;
+> +	ret = mtree_store_range(&mmu->nested_mmu_mt, start, end - 1, entry,
+> +			  GFP_KERNEL_ACCOUNT);
+> +	if (ret) {
+> +		kfree(entry);
+> +		WARN_ON(ret);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static void nested_mtree_erase(struct maple_tree *mt, unsigned long start,
+> +		unsigned long size)
+> +{
+> +	void *entry = NULL;
+> +
+> +	MA_STATE(mas, mt, start, start + size - 1);
+> +
+> +	mtree_lock(mt);
+> +	entry = mas_erase(&mas);
+> +	mtree_unlock(mt);
+> +	kfree(entry);
+> +}
+> +
+> +static void nested_mtree_erase_and_unmap_all(struct kvm_s2_mmu *mmu,
+> +		unsigned long start, unsigned long end, bool may_block)
+> +{
+> +	struct shadow_ipa_map *entry;
+> +
+> +	mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu)) {
+> +		kvm_stage2_unmap_range(mmu, entry->shadow_ipa, entry->size,
+> +				may_block);
+> +		kfree(entry);
+> +	}
+> +
+> +	mtree_destroy(&mmu->nested_mmu_mt);
+> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
+> +}
+> +
+> +void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 size,
+> +		bool may_block)
+> +{
+> +	int i;
+> +	struct shadow_ipa_map *entry;
+> +
+> +	lockdep_assert_held_write(&kvm->mmu_lock);
+> +
+> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		unsigned long start = ipa;
+> +		unsigned long end = ipa + size;
+> +
+> +		if (!kvm_s2_mmu_valid(mmu))
+> +			continue;
+> +
+> +		do {
+> +			entry = mt_find(&mmu->nested_mmu_mt, &start, end - 1);
+> +			if (!entry)
+> +				break;
+> +
+> +			kvm_stage2_unmap_range(mmu, entry->shadow_ipa,
+> +							entry->size, may_block);
+> +			start = entry->ipa + entry->size;
+> +			nested_mtree_erase(&mmu->nested_mmu_mt, entry->ipa,
+> +							entry->size);
+> +		} while (start < end);
+> +	}
+> +}
+> +
+>   void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>   {
+>   	int i;
+> @@ -1076,8 +1171,10 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>   	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>   		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>   
+> -		if (kvm_s2_mmu_valid(mmu))
+> -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+> +		if (!kvm_s2_mmu_valid(mmu))
+> +			continue;
+> +
+> +		nested_mtree_erase_and_unmap_all(mmu, 0, kvm_phys_size(mmu), may_block);
+>   	}
+>   
+>   	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+> @@ -1091,9 +1188,14 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+>   
+>   	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>   		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +		struct shadow_ipa_map *entry;
+> +		unsigned long start = 0;
+>   
+> -		if (kvm_s2_mmu_valid(mmu))
+> -			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(mmu));
+> +		if (!kvm_s2_mmu_valid(mmu))
+> +			continue;
+> +
+> +		mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
+> +			kvm_stage2_flush_range(mmu, entry->shadow_ipa, entry->size);
+>   	}
+>   }
+>   
+> @@ -1104,8 +1206,16 @@ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+>   	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>   		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>   
+> -		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+> +		if (!WARN_ON(atomic_read(&mmu->refcnt))) {
+> +			struct shadow_ipa_map *entry;
+> +			unsigned long start = 0;
+> +
+>   			kvm_free_stage2_pgd(mmu);
+> +
+> +			mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
+> +				kfree(entry);
+> +			mtree_destroy(&mmu->nested_mmu_mt);
+> +		}
+>   	}
+>   	kvfree(kvm->arch.nested_mmus);
+>   	kvm->arch.nested_mmus = NULL;
+
+Any review comments or suggestions for this patch?
+
+-- 
+Thanks,
+Gk
