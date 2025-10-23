@@ -1,95 +1,140 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE13B169AE6
-	for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 15:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF63347FC3
+	for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 17:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761234397; cv=none; b=JGpYt3NzXygpm6me67znBs5iGU1bjkfKxLx4ywdFHqcDIFFy/uzfPk6SbeXoNI6L38r6P5wjQsecrvAVmLDahi7Q7pgzukHtn730olPQ7K82jAmMlhiTy9MZVscRVsOZt19oadqt0UQkx+d6y243Tubyz1rTeVa9gl+Lh5JAChA=
+	t=1761239769; cv=none; b=spbOTMolkxWGAo4zUSrhZMxN9czNbEVSPhl8JBMr7ZQivxID99ATCGYzEXh//sDMCKq+5RDnCtFFqN/L7v16Yln8Wdc/9tKTD2Myy4W/K3WQCdam5mu0kZIB+A9k5Rl3/uf+9h4bX+blt+3WzUEL9UDUXjDx0d2BH8F0lNtr/SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761234397; c=relaxed/simple;
-	bh=6pTymwxV3JY+AUKKUttfqyjqfuzMSv+BI+TUzdzowfg=;
+	s=arc-20240116; t=1761239769; c=relaxed/simple;
+	bh=3vjklBZDK91NfPPKB/m+mZXiuBD949DF/IdVW5vVnss=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UQYBhLiYNm5t3tIfzMs6CnP9Cu9LcC6OBozI1xrejwkPl75+D/+8Kph0Q4CYgsDehp8q+rTa4OCNOPW+9FW+2JekfH9V9+qWzndJr9zshQoCon+1BUlzTpkks2y4elvaY7p5hn85a76wVxJ2YlVWFb1LFeiVF4kg66QA0Ipv6Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=k1fG2xz0; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=db66UEGvB0XZy8Vu5UyZYX/4AYdBV5RB7nVDB2bVDLXwcO8ChI9ub5+FcUIk/veOaNmvood4TCdLKogZaHeQRv4a4FPZZQh0DdDiM8Tv5fKgFPFoTFukpdzWOXljrn0lHe1iS64Yq4+Kbu6+N09fjL6sqH997XbzccEtQXSfXB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5KLS9kS; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="k1fG2xz0"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3324538ceb0so1575508a91.1
-        for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 08:46:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5KLS9kS"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-27c62320f16so10739045ad.1
+        for <kvmarm@lists.linux.dev>; Thu, 23 Oct 2025 10:16:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761234395; x=1761839195; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761239767; x=1761844567; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cA8f+nNEAJRY7EiGBsr+OimXBMbTdTa3L7KnOjbjNro=;
-        b=k1fG2xz0uiZouoaytOLGD4vrD/kJ59W+GDHYfKywgfVu3JNWoP4BKj/ZDpfKdUIF8Q
-         IwtaCi7aS2Y/iIB/3wKFOtsSV6UzayH2eDo74RzeIpDB5ErJByjR3uBDmVLNleNQGsBQ
-         Dyi3qt/To8/QyKGwo+TgH1OlmnHw0mgMswNtz1rrP6a9i7RkriPiBvaphRYlmwYZKmYt
-         /dbhoLUUEnkrPtr15bHpVim7Qn0ZaXRZmW1i8/I0a9seS0m3X49o5v7ntyys624CZFhw
-         hHrbMukxHlFgLML/7CViW3Q7b0cvUCAHWT1Gj5M7jDTpf4GhmYlegBe0VjsorgQdO13e
-         zttQ==
+        bh=/DTN4f9sYvKKbqzH4zMTtt+lW5xHHb7Uewe/2Me0Lwc=;
+        b=e5KLS9kSeEuY/o0KSHwnBTH/0lXlwylg4HqTDx/EBUrmtGPXnprh3zAO+P/BCyPK9h
+         Xf96ARlssF9sJtIGFGoiEfdWQMRzMXWV0DMdkhMDndA6a7NDnbdPfOWhd/DIvF36mftC
+         bKcPaPAcAvrwAGRx8cdvRP3OKIpHYUhw4tvEqhLhyGosPvMTVyyW9qAjwlZoXkrrdpK+
+         DUyszV5v8QOmavlFTG6rYG5Wc6Zm9DJN2YHpD2KLZoJhHg8+QXrpJeAPnVMTCU8wcC61
+         mr2HUbWqLy+2NOvFzRKVdZXp2JG2W34Yq1S7OijvMp70Y+OVAwPYlmzFvKb+6k/GxFoY
+         wV8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761234395; x=1761839195;
+        d=1e100.net; s=20230601; t=1761239767; x=1761844567;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cA8f+nNEAJRY7EiGBsr+OimXBMbTdTa3L7KnOjbjNro=;
-        b=GQgolC7eaBvv1SX+aL4wnVCN3+0gCnlLbvIlZiDN9mYFClu9WiffbilvUmFOgZQCQx
-         gYCKTIesjI6rs/4hYDsQ8wA68Xq2jeuIUdXnlF6dKAftnX4VaIB/rZWQH6lgLIAk+fnF
-         35Y+ApEn5dCqzF3ErhI/AOmPm8zSg4vauuyZQdQ/JRid32oyznFbxe3PCoYZwsz8ghPi
-         /lMFvzwSTMCcJSe/sHAg4r5jhtesTUr7RmbmJxbAfCjrSqWhPsDTCa0uhP5GTMb1BOjN
-         FVP2if9LdeO1ehPupmbaVI6a/U6PNajy0yNB3X/lGdJQJr4Q3waYV8p1SvJcZdBKjrhD
-         QSkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaNN7j1/yrqJs8FivgHhT5f30tBRdjGquySYf7Oqrq+vp2wy8mmjVGC2pTzfS5VVMFBLBObTg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy9jLJ+fwjLClH2zPpZktHHpC9kBZep1eNhZsDt7mZ9ZGvW5Zib
-	A8QPSEwhGQ0I1Wiy+br+Y/7Vpxw/P72xH0eRZHFv/wrhgwoibuipyDdLbiFyXPirOiNyrXFDldm
-	1BtHx/g==
-X-Google-Smtp-Source: AGHT+IH1AC48gpV9weuwwebG5qkhyKt/sOEZ87sVL1uSftHljNqtSkYW1d4gsE3nQlKslL7141ZzFVVxScM=
-X-Received: from pjzm22.prod.google.com ([2002:a17:90b:696:b0:339:ee20:f620])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3c0e:b0:330:a228:d32
- with SMTP id 98e67ed59e1d1-33bcf86b401mr34594579a91.10.1761234395178; Thu, 23
- Oct 2025 08:46:35 -0700 (PDT)
-Date: Thu, 23 Oct 2025 08:46:33 -0700
-In-Reply-To: <zqtfz6k3mud5rjmnfy45pdvqhmf33mkqvmtsvayf7pjz2buoiw@m5z5rqqhiqh6>
+        bh=/DTN4f9sYvKKbqzH4zMTtt+lW5xHHb7Uewe/2Me0Lwc=;
+        b=CfAGf2++6x7H5nKRDxGqRqSMXQWI/SInO9nhy2jxE43PAOSJKveISU0qLjsz3n89mp
+         6UJuwdIXc+SZQ3ls8LHIR1XprJSo/0Z0NPkgLscM3qBUMiK+nKUYLgXBGHZI3OpNa4R5
+         P3rXfvj7yue9moXwjWo0LEGKAw4R+BZzA+Bb8XSaKJq7zbOqoWOCkhqIh9WDcWOefXqg
+         IsdSFCX3742s8bquXQPVNVKusPU3NsVW1g9jhiyYbNtVAhORHyHZTPnGFD6pbtAYaaHW
+         WCbTuVdpTtr6Rt3RNqLgyVSXMkkIs8WqKvFjo6OUaUmCCEeUBjVM+P5IamP2EGIGfI2Z
+         KKwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXC6/GHwZrKDTfgyb+k7rj/C+2E8KhztNhcKnsWp6wkjb/NWOjlUj6b/98xykFeyv+sco7w2pY=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwYpk+z8tVp8CGdRNl5BbIvgfomcVOz/o57viCZTLYRTT6ANHcP
+	tq9ulJTO4q9bHM9J0Wt7+oFt1Jw3SJy7dwRhC1x27L69W4FHfDvZnFa4P/P72Ns2EI2BNQLXc1S
+	WYkKYig==
+X-Google-Smtp-Source: AGHT+IHWPgGmZKfo+3ImlZCUG7AewIscdCvWipQB1xDHXcjZQxceHYcdCY71wfIfELDOVuODkQ3p+Aq3kE8=
+X-Received: from pjkm11.prod.google.com ([2002:a17:90a:730b:b0:33b:e0b5:6112])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e88e:b0:267:da75:e0f
+ with SMTP id d9443c01a7336-290c9c897bbmr312407025ad.11.1761239766935; Thu, 23
+ Oct 2025 10:16:06 -0700 (PDT)
+Date: Thu, 23 Oct 2025 10:16:05 -0700
+In-Reply-To: <20251013151502.6679-3-jackabt.amazon@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <10A5745B-411F-4EB3-A168-0BC6CA99FF4D@linux.dev>
- <aPbL8NCPCfLHIB3w@linux.dev> <aPjdgqHlxFOyjSKT@google.com>
- <62kml5omikxsb3ppd4yewcvbuje4xojffi6nkcnpxddsy77hpb@plprg57waxnb>
- <aPkYox4XLwrYi9qJ@linux.dev> <zqtfz6k3mud5rjmnfy45pdvqhmf33mkqvmtsvayf7pjz2buoiw@m5z5rqqhiqh6>
-Message-ID: <aPpN2U7lq8ZDdHx9@google.com>
-Subject: Re: RFC KVM: arm64: selftest: stage 2 mapping helpers
+References: <20251013151502.6679-1-jackabt.amazon@gmail.com> <20251013151502.6679-3-jackabt.amazon@gmail.com>
+Message-ID: <aPpi1c-8EpWuo87B@google.com>
+Subject: Re: [PATCH v2 2/4] KVM: selftests: Fix unaligned mmap allocations
 From: Sean Christopherson <seanjc@google.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Itaru Kitayama <itaru.kitayama@linux.dev>, 
-	kvmarm@lists.linux.dev, Jim Mattson <jmattson@google.com>
+To: Jack Thomson <jackabt.amazon@gmail.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	isaku.yamahata@intel.com, roypat@amazon.co.uk, kalyazin@amazon.co.uk, 
+	jackabt@amazon.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 22, 2025, Yosry Ahmed wrote:
-> On Wed, Oct 22, 2025 at 10:47:15AM -0700, Oliver Upton wrote:
-> > On Wed, Oct 22, 2025 at 04:57:16PM +0000, Yosry Ahmed wrote:
-> > > On Wed, Oct 22, 2025 at 06:34:58AM -0700, Sean Christopherson wrote:
-> > IOW, the starting point for us is fine-grained control over potentially
-> > multiple stage-2 MMUs with modal descriptor fields that change meaning
-> > based on the current MMU context.
-> > 
-> > > > I.e. if we envision any arch-agnositic tests that can do nested things,
-> > > > now's the time.  E.g. running dirty logging tests in L2 maybe?
-> > 
-> > We can just as easily implement an agnostic wrapper after the fact;
-> > enabling architectural validation of the arm64 nested implementation is
-> > the highest priority at the moment for us.
+On Mon, Oct 13, 2025, Jack Thomson wrote:
+> From: Jack Thomson <jackabt@amazon.com>
 > 
-> Oh 100%, I was not suggesting that we need to do this now, not sure if
-> Sean was.
+> When creating a VM using mmap with huge pages, and the memory amount does
+> not align with the underlying page size. The stored mmap_size value does
+> not account for the fact that mmap will automatically align the length
+> to a multiple of the underlying page size. During the teardown of the
+> test, munmap is used. However, munmap requires the length to be a
+> multiple of the underlying page size.
 
-I was maybe 60% suggesting that? :-)
+What happens when selftests use the wrong map_size?  E.g. is munmap() silently
+failing?  If so, then I should probably take this particular patch through
+kvm-x86/gmem, otherwise it means we'll start getting asserts due to:
 
-But it sounds like the underlying x86 and arm64 details are going to be much more
-different than I was anticipating, so I'm a-ok punting for now.  E.g. I was thinking
-we'd want a common kvm_mmu_arch or kvm_stage2_arch, but trying to implement such
-structures without a concrete use case would likely be painful/ugly.
+  3223560c93eb ("KVM: selftests: Define wrappers for common syscalls to assert success")
+
+If munmap() isn't failing, then that begs the question of what this patch is
+actually doing :-)
+
+> Update the vm_mem_add method to ensure the mmap_size is aligned to the
+> underlying page size.
+> 
+> Signed-off-by: Jack Thomson <jackabt@amazon.com>
+> ---
+>  tools/testing/selftests/kvm/lib/kvm_util.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index c3f5142b0a54..b106fbed999c 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1051,7 +1051,6 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>  	/* Allocate and initialize new mem region structure. */
+>  	region = calloc(1, sizeof(*region));
+>  	TEST_ASSERT(region != NULL, "Insufficient Memory");
+> -	region->mmap_size = mem_size;
+>  
+>  #ifdef __s390x__
+>  	/* On s390x, the host address must be aligned to 1M (due to PGSTEs) */
+> @@ -1060,6 +1059,11 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>  	alignment = 1;
+>  #endif
+>  
+> +	alignment = max(backing_src_pagesz, alignment);
+> +	region->mmap_size = align_up(mem_size, alignment);
+> +
+> +	TEST_ASSERT_EQ(guest_paddr, align_up(guest_paddr, backing_src_pagesz));
+> +
+>  	/*
+>  	 * When using THP mmap is not guaranteed to returned a hugepage aligned
+>  	 * address so we have to pad the mmap. Padding is not needed for HugeTLB
+> @@ -1067,12 +1071,6 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>  	 * page size.
+>  	 */
+>  	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
+> -		alignment = max(backing_src_pagesz, alignment);
+> -
+> -	TEST_ASSERT_EQ(guest_paddr, align_up(guest_paddr, backing_src_pagesz));
+> -
+> -	/* Add enough memory to align up if necessary */
+> -	if (alignment > 1)
+>  		region->mmap_size += alignment;
+>  
+>  	region->fd = -1;
+> -- 
+> 2.43.0
+> 
