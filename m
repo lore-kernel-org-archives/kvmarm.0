@@ -1,42 +1,45 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FEF307AEA
-	for <kvmarm@lists.linux.dev>; Fri, 24 Oct 2025 09:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0783090E1
+	for <kvmarm@lists.linux.dev>; Fri, 24 Oct 2025 09:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761296924; cv=none; b=Dng6+NU7WGzZerPhcRL/IveOhhkQzhSq8HRHeQe5Yx21TiiIMiTU/8fe871NeG5Ehk3cSTrsnIe7gp6YXWaeXX22i/DIsxFAaTsvtDipr7rtS5A9fuLvesGH1AF7lexDhoT6aIBDaCRuEUPMMY0QufmXpaOzmCKWB6lgWhOzRTk=
+	t=1761296925; cv=none; b=JSCa2vPfCxJdGlGF/mxp8eXcTkdKh91z7g8S9r0gm9UFP9UiKhZtxCqNTVMB0rnTTWlVddoMsTSq9Nu82om6ezIxjEFSk3GlAJAqnW8DpEwc6iQd2P7LP8p+AwZuEH8MfEL8mHuZz+n+Ih1Sg5wRoaHNzHLljt1D9YaAdvoamJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761296924; c=relaxed/simple;
-	bh=LIies+kH+GvWP6NMIsxJjVEVDQtfpR++NjFedgOq6AQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u8HjfcqU9i3ghpaljFDdL0XlF09OxwxmtVWg++DGbMEUenLr0h4cU+JmYDc4j8QV9q9rADONvhyMKNYYOX9E1H64Ed+JndyXlFklhcdBvg5tIVLVMs6rp82unNCpjcDcV6FdlKUpR24QUe8CgLOUN6x9b59TW9srOF6F5CbBtQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.187
+	s=arc-20240116; t=1761296925; c=relaxed/simple;
+	bh=N4qg2RqOA8jgmKM4jHTrUxOudcwTIhrqL+cdfw/07Po=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IE6zBlzfMk04rb78uUumpkltqXFIrmkJl+wGVElGrdHe/Pjt9CJUV3XiImgu9D9Xr+6mVR2bBHrLo7Zq5ngv0qkDGZ6mxWTa0pBww5gN/mN03BOhmdcnWTFKy7oVdqY/VNfvXoyGYSXu9NqVrEH74TGOR6NVmSSF8Z4RDZdeP7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ctH4k6RNQzxXDV;
-	Fri, 24 Oct 2025 17:03:34 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 61EEE18048E;
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ctH4s3P0fzJsXN;
+	Fri, 24 Oct 2025 17:03:41 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id E4290180064;
 	Fri, 24 Oct 2025 17:08:33 +0800 (CST)
 Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.2.1544.11; Fri, 24 Oct 2025 17:08:33 +0800
 Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
  (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 24 Oct
- 2025 17:08:32 +0800
+ 2025 17:08:33 +0800
 From: Zhou Wang <wangzhou1@hisilicon.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
 	<yuzenghui@huawei.com>
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
-Subject: [PATCH v6 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
-Date: Fri, 24 Oct 2025 17:08:12 +0800
-Message-ID: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
+Subject: [PATCH v6 1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+Date: Fri, 24 Oct 2025 17:08:13 +0800
+Message-ID: <20251024090819.4097819-2-wangzhou1@hisilicon.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
+References: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,108 +51,106 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200004.china.huawei.com (7.202.195.237)
 
-Armv8.7 introduces single-copy atomic 64-byte loads and stores
-instructions and its variants named under FEAT_{LS64, LS64_V}.
-Add support for Armv8.7 FEAT_{LS64, LS64_V}:
-- Add identifying and enabling in the cpufeature list
-- Expose the support of these features to userspace through HWCAP3 and cpuinfo
-- Add related hwcap test
-- Handle the trap of unsupported memory (normal/uncacheable) access in a VM
+From: Marc Zyngier <maz@kernel.org>
 
-A real scenario for this feature is that the userspace driver can make use of
-this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
-directly into the hardware.
+The main use of {LD,ST}64B* is to talk to a device, which is hopefully
+directly assigned to the guest and requires no additional handling.
 
-Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
-MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
+However, this does not preclude a VMM from exposing a virtual device
+to the guest, and to allow 64 byte accesses as part of the programming
+interface. A direct consequence of this is that we need to be able
+to forward such access to userspace.
 
-As Yicong has left HiSilicon, I will help to continue to upstream this patchset.
+Given that such a contraption is very unlikely to ever exist, we choose
+to offer a limited service: userspace gets (as part of a new exit reason)
+the ESR, the IPA, and that's it. It is fully expected to handle the full
+semantics of the instructions, deal with ACCDATA, the return values and
+increment PC. Much fun.
 
-[1] https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
+A canonical implementation can also simply inject an abort and be done
+with it. Frankly, don't try to do anything else unless you have time
+to waste.
 
-Tested with updated hwcap test(host in VHE):
-[root@localhost tmp]# ./hwcap
-[...]
-# LS64 present
-ok 226 cpuinfo_match_LS64
-ok 227 sigill_LS64
-ok 228 # SKIP sigbus_LS64
-# LS64_V present
-ok 229 cpuinfo_match_LS64_V
-ok 230 sigill_LS64_V
-ok 231 # SKIP sigbus_LS64_V
-# 121 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:110 fail:0 xfail:0 xpass:0 skip:121 error:0
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+---
+ arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h |  3 ++-
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-Tested with updated hwcap test(guest in VHE):
-root@localhost:/mnt# ./hwcap
-[...]
-# LS64 present
-ok 226 cpuinfo_match_LS64
-ok 227 sigill_LS64
-ok 228 # SKIP sigbus_LS64
-# LS64_V present
-ok 229 cpuinfo_match_LS64_V
-ok 230 sigill_LS64_V
-ok 231 # SKIP sigbus_LS64_V
-# 121 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:110 fail:0 xfail:0 xpass:0 skip:121 error:0
-
-Tested nVHE case as well, same log as above.
-
-Change since v5:
-- Rebase on v6.18-rc2 and fix the conflicts
-- Add more description in elf_hwcaps.rst as suggested by Catalin Marinas
-Link: https://lore.kernel.org/all/20250818064806.25417-1-yangyicong@huawei.com/
-
-Change since v4:
-- Rebase on v6.17-rc2 and fix the conflicts
-Link: https://lore.kernel.org/linux-arm-kernel/20250715081356.12442-1-yangyicong@huawei.com/
-
-Change since v3:
-- Inject DABT fault for LS64 fault on unsupported memory but with valid memslot
-Link: https://lore.kernel.org/linux-arm-kernel/20250626080906.64230-1-yangyicong@huawei.com/
-
-Change since v2:
-- Handle the LS64 fault to userspace and allow userspace to inject LS64 fault
-- Reorder the patches to make KVM handling prior to feature support
-Link: https://lore.kernel.org/linux-arm-kernel/20250331094320.35226-1-yangyicong@huawei.com/
-
-Change since v1:
-- Drop the support for LS64_ACCDATA
-- handle the DABT of unsupported memory type after checking the memory attributes
-Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
-
-Marc Zyngier (2):
-  KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
-  KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-
-Yicong Yang (5):
-  KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
-    memory
-  arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
-  arm64: Add support for FEAT_{LS64, LS64_V}
-  KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
-  kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
-
- Documentation/arch/arm64/booting.rst      | 12 +++
- Documentation/arch/arm64/elf_hwcaps.rst   | 14 ++++
- Documentation/virt/kvm/api.rst            | 43 +++++++++--
- arch/arm64/include/asm/el2_setup.h        | 12 ++-
- arch/arm64/include/asm/esr.h              |  8 ++
- arch/arm64/include/asm/hwcap.h            |  2 +
- arch/arm64/include/asm/kvm_emulate.h      |  7 ++
- arch/arm64/include/uapi/asm/hwcap.h       |  2 +
- arch/arm64/kernel/cpufeature.c            | 51 +++++++++++++
- arch/arm64/kernel/cpuinfo.c               |  2 +
- arch/arm64/kvm/inject_fault.c             | 22 ++++++
- arch/arm64/kvm/mmio.c                     | 27 ++++++-
- arch/arm64/kvm/mmu.c                      | 14 +++-
- arch/arm64/tools/cpucaps                  |  2 +
- include/uapi/linux/kvm.h                  |  3 +-
- tools/testing/selftests/arm64/abi/hwcap.c | 90 +++++++++++++++++++++++
- 16 files changed, 300 insertions(+), 11 deletions(-)
-
+diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+index 54f9358c9e0e..2a6261abb647 100644
+--- a/arch/arm64/kvm/mmio.c
++++ b/arch/arm64/kvm/mmio.c
+@@ -159,6 +159,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	bool is_write;
+ 	int len;
+ 	u8 data_buf[8];
++	u64 esr;
++
++	esr = kvm_vcpu_get_esr(vcpu);
+ 
+ 	/*
+ 	 * No valid syndrome? Ask userspace for help if it has
+@@ -168,7 +171,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	 * though, so directly deliver an exception to the guest.
+ 	 */
+ 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
+-		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
++		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
+ 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 
+ 		if (vcpu_is_protected(vcpu))
+@@ -185,6 +188,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		return -ENOSYS;
+ 	}
+ 
++	/*
++	 * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
++	 * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
++	 * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
++	 * which will have to provide a full emulation of these 4
++	 * instructions.  No, we don't expect this do be fast.
++	 *
++	 * We rely on traps being set if the corresponding features are not
++	 * enabled, so if we get here, userspace has promised us to handle
++	 * it already.
++	 */
++	switch (kvm_vcpu_trap_get_fault(vcpu)) {
++	case 0b000100 ... 0b001111:
++	case 0b101010 ... 0b101011:
++		if (FIELD_GET(GENMASK(12, 11), esr)) {
++			run->exit_reason = KVM_EXIT_ARM_LDST64B;
++			run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
++			run->arm_nisv.fault_ipa = fault_ipa;
++			return 0;
++		}
++	}
++
+ 	/*
+ 	 * Prepare MMIO operation. First decode the syndrome data we get
+ 	 * from the CPU. Then try if some in-kernel emulation feels
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52f6000ab020..d219946b96be 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -179,6 +179,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
+ #define KVM_EXIT_TDX              40
++#define KVM_EXIT_ARM_LDST64B      41
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -401,7 +402,7 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
+-		/* KVM_EXIT_ARM_NISV */
++		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+ 		struct {
+ 			__u64 esr_iss;
+ 			__u64 fault_ipa;
 -- 
 2.33.0
 
