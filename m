@@ -1,78 +1,78 @@
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B1A1E9B37
-	for <kvmarm@lists.linux.dev>; Fri, 24 Oct 2025 16:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D180336ED9
+	for <kvmarm@lists.linux.dev>; Fri, 24 Oct 2025 16:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761322752; cv=none; b=R2W6RMfOhZlSRnEfqnCNujYgpeS9VdEGcMOkViJsXkL5h7JHH6ZxFvwdKsHCkmRK6S8Ldd4f+4tf6fZ6pdRg2vXONEBbchb0cat5DSY01QjmGXpW2bDMOWvowYfYhQChQ6j7IkcPrB+m1oTPgiKtXsr7h0gOvEzVfCm9YOifrmE=
+	t=1761322983; cv=none; b=FBlkkqxKRbCSL8iIeAwwY7PXzrpPXbn35HFynzdISnh0KyAYMp9RDTU7y5oPw7vunAOxyPUEOt8FDD310wV3RhzYaGdhLhGVYMLSAvhXhQkzAZcbBVJHl4xnviPrLJJBHDKMtza4j3so556vgNp+r6LZt14PaPmx0I1dPBigY3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761322752; c=relaxed/simple;
-	bh=Yg9+HfgxCP7OY3GdXZf7eHifJhdW6qKNd9sza6Oifww=;
+	s=arc-20240116; t=1761322983; c=relaxed/simple;
+	bh=jYxSqWsZlopjDrjqw0dqRCdRWwD6wNfb4WN6sgvrsu0=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=hzbFkayHMF587FQdayLaYaq4UOJihaAAtNURgrnOshGciXaJZNZXKxYJXooNNFPuwfSNCIumoK9GkbPQ9HRjcRW+fSdKlp14oSRu9ZqZqIPN6SGJMS4241BXEiqSF2bsGLnPyuT7QzLNLyyw1rHZ4kkaW6ANI74EN9XA2DTYbZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Daw8D9gA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ekTc0xt+; arc=none smtp.client-ip=202.12.124.155
+	 Subject:Content-Type; b=K1can8KFOBSrPkBAcxPkm0aLCfZeWSr+xUfthTrMPwa61jmggY1GvsRzEmjilrfOC/4RKLWOHz5UCBIAKRlA5A9aNXRe9KkxPuuPy6JDmBXQrSwt4tTB66r2spkV9tdwIxN+SzoM+0GsFj4cArUXgP4mzygV9RvODyNM4e0UfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=s4YJwyaZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=elmRRgnH; arc=none smtp.client-ip=202.12.124.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Daw8D9gA";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ekTc0xt+"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="s4YJwyaZ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="elmRRgnH"
 Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4DF217A01BC;
-	Fri, 24 Oct 2025 12:19:09 -0400 (EDT)
+	by mailfout.stl.internal (Postfix) with ESMTP id ED3491D00110;
+	Fri, 24 Oct 2025 12:22:59 -0400 (EDT)
 Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Fri, 24 Oct 2025 12:19:09 -0400
+  by phl-compute-05.internal (MEProxy); Fri, 24 Oct 2025 12:23:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761322749;
-	 x=1761409149; bh=/B9j9u5CYOzjuk3WgYBkiy0d65YUT+VZg4FbCq3cE+U=; b=
-	Daw8D9gAqV1dR2nEcCsSSatqEzcQKAbQ56KUfgCxojvcHFRRgpCLtAptogEsdNLc
-	G5f95sSs1CWJs7FGwt9a8Luox4N51C2QeqkGuWX43FBNx5MVgKvZiIBoDFsArJNn
-	Wm8aUU1hXzcqVOx/XOdWdnoB37BOrgVoBniV00ICtCci9Nwr7tY5VfrzQyTsAbHu
-	Kx6hPLE7w6BUybg4LW+GVWXjd3i5jd8E60FDatbN6kj2kHV9M3tCFM1DQCUBSJKB
-	Bz98OP8zQrolLzdfBaOrca5UzPQr1BTsZ2HRljAcY79SsAHgQB757p3UmeqTvT1U
-	6iZ+7yQSbRDNNzNMLkuaPA==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1761322979;
+	 x=1761409379; bh=DdhUPldP4zQaOwb8ou7nonQrk2OnNL7FtKo4nPpwiLY=; b=
+	s4YJwyaZoDeRAmz+4Zi93QOJIa7ho0+3jAz/zoTieCw51vCgx+6G1Kaf/AfUMRXQ
+	QcXSl3mIPUzCBO6GVhT0h38p/IQZmklkXEAOXlthy1BDLonDK6A6SRyGKfWKqVSf
+	vC8+p1qaEB1yOaJ+lkX1S5HaQGSRi+Q7wCk3grwNFIMq3ddnUEeXwcGLDioAqNnn
+	07j9YSk4ka2TexFoubqstTpm3XkLQKw9L+GGxJOIeKosnObuHSkq936UvQkVO2AP
+	5dyRMmB33TYXS2cVueqPqf7C9XwjP3HLxaK7700PYqeNXyxrkQnq7/OVXhCrjC85
+	dF6ZWNQpdTTREUdpwmhlHA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1761322749; x=
-	1761409149; bh=/B9j9u5CYOzjuk3WgYBkiy0d65YUT+VZg4FbCq3cE+U=; b=e
-	kTc0xt+yhX628LsWHGPyqqLITkkSDoZ4pbpWgy+1+h3ni6P+uCy8GNGrioZjAk3N
-	Q9G5f5/4hArGUtB3wg5CYcfafsXQOA/bSsAz3nFBNLh/JFiLZk4avX9UJX8fIXxp
-	XWYEXpkin8T4Jv5TrkukvVeanY0uFKAqP1HieuhKY45WBE5QswVk3zmPpFlwvcCv
-	KEjxzPMcymcle2NF6TdzmRDm4prkF7BhxZmvsb8M2ff8YTg57ef30VgxN044ekO3
-	ZLPAWaGsXUekr9SGrR5PCNetPK0Gs4JT0w5oYbueJ7EMA0PJpAiEXhTkr8vDuFNp
-	Ul7dajft6HmjtIydrwMiQ==
-X-ME-Sender: <xms:_Kb7aFuPJD4a19HluDNkTB-z1MSw7oOcSQeS3nMU5z6OGDnWQ8reFg>
-    <xme:_Kb7aJSfzzvpFvW9IKG8ndYKhLWYzjAXG8z_5d4MLS8_yRcReqC6nrNK6FC8Xb76Y
-    t7YLB4xovJvIRcMPDyBqEGa1TBevtf1_szfueT7L9yPqLPPffT-7A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeelkedtucetufdoteggodetrf
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1761322979; x=
+	1761409379; bh=DdhUPldP4zQaOwb8ou7nonQrk2OnNL7FtKo4nPpwiLY=; b=e
+	lmRRgnHHFPzjWe99eerQSD/j/swGMwry/iA41RoZy+dCD7OHjx+tdwvzX+DClO4E
+	J7P/BpTPOPUPN7Yk3AyZSEcRcSeZ9w8mu/h9rgEv61nHr9ccjkzoRFmuVJu0l+7a
+	4EEUgEYGdJ86TJ872HF1r/drm+XVyHlwGQlgkvumNxMw0FN3JvX0k51YUBxzMNaR
+	5RbNFyqBDned+EWR7Ikqs1f10hJ5w0uLajqxSauBqnQ9eFpF8h2737+PiM8C4Og9
+	/DHg8d7xYR9NK03bJuKeLUToQy+9omsNh+VCvW//TQ1wDyz9zhiQXtkTTgjJdd7m
+	QPBgnraZYEQg5vdizYJ+g==
+X-ME-Sender: <xms:46f7aOBboAbf66p0rTSEPQaRvd4MjDrOcEbUTyTJzk8_1hXZQUFWZQ>
+    <xme:46f7aDUy4bLeYlYlNWAuPB9GJwVsrdMTqoktxQSqnEU9Ka1iUPCNgpZroNX3C-Gh2
+    891WNvTI0tAYHGzV4KRGqZMuxm1TT1PymKGkHZE2iQ9ZlRQGX19sw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddugeelkeduucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
     uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
-    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
-    khhirdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttg
-    gtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhl
-    ihgtohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonh
-    drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
-    ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:_Kb7aNgfg33TYPPQEyJ0-ZH69Y3tbEngvsHIH6ujODsiDk14uhQa_w>
-    <xmx:_Kb7aOvqOvi05xG9lCJDIFmxiAtBtuYHnH8lAuyLDesJJQsRByKg6Q>
-    <xmx:_Kb7aA8Lt3Rwu4079IcGrTslskFUByRavFV9pGmSKVRGMlXSFkyuvA>
-    <xmx:_Kb7aMYiefd54-VoqF8RXDQq178ER7g49XrzMdG39UhdZraHxl6MEg>
-    <xmx:_ab7aO9P9blqNtpe3J54rkmS_gS89AmVEZp5HFM5eHqCLo5Azqqi6jro>
+    hrnhepfefhheetffduvdfgieeghfejtedvkeetkeejfeekkeelffejteevvdeghffhiefh
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgt
+    phhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheptggrthgrlhhinh
+    drmhgrrhhinhgrshesrghrmhdrtghomhdprhgtphhtthhopehjohgvhidrghhouhhlhies
+    rghrmhdrtghomhdprhgtphhtthhopehsuhiiuhhkihdrphhouhhlohhsvgesrghrmhdrtg
+    homhdprhgtphhtthhopeihrghnghihtggttggttgesghhmrghilhdrtghomhdprhgtphht
+    thhopehprhhimhgvrdiivghngheshhhishhilhhitghonhdrtghomhdprhgtphhtthhope
+    ifrghnghiihhhouhdusehhihhsihhlihgtohhnrdgtohhmpdhrtghpthhtohepgihufigv
+    ihehsehhuhgrfigvihdrtghomhdprhgtphhtthhopeihuhiivghnghhhuhhisehhuhgrfi
+    gvihdrtghomhdprhgtphhtthhopehmrgiisehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:46f7aO1LYhs6chjIcT3tTeRkGwiH3nJll92OUYMsvhEV50j3pKQcRQ>
+    <xmx:46f7aNyNN4tnrfuteXPQCyb94X9PA7aoXGA27BciNMiULxGQ5YOcJA>
+    <xmx:46f7aKzx2DgByTIMBui6oOsj9MoLF4w9JX4GgKxuKuSsGvJVfLz12w>
+    <xmx:46f7aJ9h1a2simyVgk_w-un_Sc2PfTu6NXZPYNTfEyyGuUO2XOsCkQ>
+    <xmx:46f7aH3qHWtpSaKipncW3TJmsbjw47tOukGH69NwGCOuPp1Xrh0DjBvU>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 5C20B700054; Fri, 24 Oct 2025 12:19:08 -0400 (EDT)
+	id 4ED56700054; Fri, 24 Oct 2025 12:22:59 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -80,8 +80,8 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: AmBleg0913uk
-Date: Fri, 24 Oct 2025 18:18:18 +0200
+X-ThreadId: A5O6iWOKQdXk
+Date: Fri, 24 Oct 2025 18:22:03 +0200
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: "Zhou Wang" <wangzhou1@hisilicon.com>,
  "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
@@ -91,79 +91,39 @@ To: "Zhou Wang" <wangzhou1@hisilicon.com>,
  "Zenghui Yu" <yuzenghui@huawei.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  yangyccccc@gmail.com, prime.zeng@hisilicon.com, xuwei5@huawei.com
-Message-Id: <e40ce220-e857-4ecf-985b-40407f99fcb3@app.fastmail.com>
-In-Reply-To: <20251024090819.4097819-8-wangzhou1@hisilicon.com>
+Message-Id: <2a880d79-9205-45d1-8f8d-9f028e0bbfb2@app.fastmail.com>
+In-Reply-To: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
 References: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
- <20251024090819.4097819-8-wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v6 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
+Subject: Re: [PATCH v6 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 On Fri, Oct 24, 2025, at 11:08, Zhou Wang wrote:
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+> - Add identifying and enabling in the cpufeature list
+> - Expose the support of these features to userspace through HWCAP3 and cpuinfo
+> - Add related hwcap test
+> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
+>
+> A real scenario for this feature is that the userspace driver can make use of
+> this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+> directly into the hardware.
+>
+> Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
+> MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
+>
+> As Yicong has left HiSilicon, I will help to continue to upstream this patchset.
+>
+> [1] 
+> https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
 
-> +static void ls64_sigill(void)
-> +{
-> +	struct sigaction ign, old;
-> +	char src[64] __aligned(64) = { 1 };
-> +
-> +	/*
-> +	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
-> +	 * FEAT_LS64WB not supported) and the completer supports these
-> +	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
-> +	 * testing the ABI here, so just ignore the SIGBUS and see if we can
-> +	 * execute the instructions without receiving a SIGILL. Restore the
-> +	 * handler of SIGBUS after this test.
-> +	 */
-> +	ign.sa_sigaction = ignore_signal;
-> +	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-> +	sigemptyset(&ign.sa_mask);
-> +	sigaction(SIGBUS, &ign, &old);
-> +
-> +	register void *xn asm ("x8") = src;
-> +	register u64 xt_1 asm ("x0");
-> +	register u64 __maybe_unused xt_2 asm ("x1");
-> +	register u64 __maybe_unused xt_3 asm ("x2");
-> +	register u64 __maybe_unused xt_4 asm ("x3");
-> +	register u64 __maybe_unused xt_5 asm ("x4");
-> +	register u64 __maybe_unused xt_6 asm ("x5");
-> +	register u64 __maybe_unused xt_7 asm ("x6");
-> +	register u64 __maybe_unused xt_8 asm ("x7");
-> +
-> +	/* LD64B x0, [x8] */
-> +	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn));
+The patches all look reasonable to me, but I notice that you forgot
+to add your signoff below Yicong's, so the Arm maintainers won't be
+able to merge the series.
 
-Relying on the __maybe_unused register declaration seems a little
-fragile, can you change this so that the inline asm specifies
-all of the registers correctly as input/output arguments?
-
-> +static void ls64_v_sigill(void)
-> +{
-> +	struct sigaction ign, old;
-> +	char dst[64] __aligned(64);
-> +
-> +	/* See comment in ls64_sigill() */
-> +	ign.sa_sigaction = ignore_signal;
-> +	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-> +	sigemptyset(&ign.sa_mask);
-> +	sigaction(SIGBUS, &ign, &old);
-> +
-> +	register void *xn asm ("x8") = dst;
-> +	register u64 xt_1 asm ("x0") = 1;
-> +	register u64 __maybe_unused xt_2 asm ("x1") = 2;
-> +	register u64 __maybe_unused xt_3 asm ("x2") = 3;
-> +	register u64 __maybe_unused xt_4 asm ("x3") = 4;
-> +	register u64 __maybe_unused xt_5 asm ("x4") = 5;
-> +	register u64 __maybe_unused xt_6 asm ("x5") = 6;
-> +	register u64 __maybe_unused xt_7 asm ("x6") = 7;
-> +	register u64 __maybe_unused xt_8 asm ("x7") = 8;
-> +	register u64 st   asm ("x9");
-> +
-> +	/* ST64BV x9, x0, [x8] */
-> +	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn));
-> +
-> +	sigaction(SIGBUS, &old, NULL);
-
-Is ST64BV expected to cause SIGBUS here, or should it return the
-0xffffffffffffffff output to indicate an unsupported memory area?
+If nobody else has any comments on this version, please resend in
+a couple of days with your signoff added to each patch.
 
      Arnd
