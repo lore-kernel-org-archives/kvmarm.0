@@ -1,234 +1,152 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513F02FB0A0
-	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65D2FBE15
+	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761563168; cv=none; b=OH+ACEBAmwkW8cx/UpOLf8Hg4hqtoDrobTwZ5i5Zgpo84UWQq2dWT507bQqWXM0UxWkWx7x6Ssbdko6y4sGnIxDsGPSwxVD4uMCbBEjgH+G1CSaG8ZIF73f8cJhLULdErudbjP2aa+E8bFXzungrsGZ3Mot5kB1S2zA+wgl+RVk=
+	t=1761565085; cv=none; b=gedcPYUQ9V+KRM1EiGEHkQOEwBlpfdhDa7YhgEosXSnu/SRUQi95aIaxCsRrWTjJb7EDBwJoYnG7COXZF6rDgiSx3w9XodxnuIMf4xmQcOkG6Rlz9Sv8HRCNZwFdu+RVsb7ozDpuaEu44+4tTJmrHne5vFq/zD504ZdvfBgg2Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761563168; c=relaxed/simple;
-	bh=HmMy1j55bicBe2rImreC/B7Xz0ZjVkwKVIYH0S0Q7ko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BP1/qwbwOPtCFgtzk85GfMuziwxAqTFFVLVosvfammly40LnWciysqzXv3oeMRS312uHx9J/tFYUhhQ1/iq0pK4palX5kbu1U1g9akp6EAxGQ+XmrW9mEshYWT+T4+HXPY0Kog3YQMvkKaeo3ax2Zvxtj1srEQrcmsx8+Sii9Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v2oCpbx6; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=om4M0Q92; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=v2oCpbx6; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=om4M0Q92; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1761565085; c=relaxed/simple;
+	bh=JtPobr8U8OyEtWz0+PGGaZRwq4swI0tEr8EEUNz/8Bo=;
+	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=dpBBjhkDnuQnCxkK7xc+rnSiXC1l5K8N/91y4dyyJ/SVo8hGEC9AzxhVar2iVm76Hb+DpvA49dopu6tPYv1nDRQPq0G52Sui9n5w8CSfJD3QMPmkJNsuf1b9DYQ0g36MI6ymhjFTpo2L6yTQjtY8SiKG3FyTeMkDzk//BsphN38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJ3dEIKA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v2oCpbx6";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="om4M0Q92";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="v2oCpbx6";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="om4M0Q92"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 48D59219F2;
-	Mon, 27 Oct 2025 11:06:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761563162; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9DJLMlvHCLwsZUrC2mOIMooIT90ctMEYLWPEuoznNh8=;
-	b=v2oCpbx6JIAephImZiiNSMJV8HKboO7M60wIkqKzD0s5VQwgfUeYtcu1K/KnnErup9vwKl
-	kY2Q30yW/eIpLWsJ8EKdmF9Ps67BrnBYrU8iMfzLREJYcjrLyPKrNhlkWDdvWPzEVyk6BO
-	5FLAfI4Qn7yF91LNhx7kYMb9sRB1ZLc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761563162;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9DJLMlvHCLwsZUrC2mOIMooIT90ctMEYLWPEuoznNh8=;
-	b=om4M0Q92zRxEJdUyiXusjwa7kEbrmY7e4AKYwwFESyiDAhEMLoqnFrRgobXi7RNEFpUZme
-	/rQmOvbw7HdCG1Ag==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=v2oCpbx6;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=om4M0Q92
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761563162; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9DJLMlvHCLwsZUrC2mOIMooIT90ctMEYLWPEuoznNh8=;
-	b=v2oCpbx6JIAephImZiiNSMJV8HKboO7M60wIkqKzD0s5VQwgfUeYtcu1K/KnnErup9vwKl
-	kY2Q30yW/eIpLWsJ8EKdmF9Ps67BrnBYrU8iMfzLREJYcjrLyPKrNhlkWDdvWPzEVyk6BO
-	5FLAfI4Qn7yF91LNhx7kYMb9sRB1ZLc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761563162;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=9DJLMlvHCLwsZUrC2mOIMooIT90ctMEYLWPEuoznNh8=;
-	b=om4M0Q92zRxEJdUyiXusjwa7kEbrmY7e4AKYwwFESyiDAhEMLoqnFrRgobXi7RNEFpUZme
-	/rQmOvbw7HdCG1Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2BE2F136CF;
-	Mon, 27 Oct 2025 11:06:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id QmBgChpS/2gAQQAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 27 Oct 2025 11:06:02 +0000
-Message-ID: <343bc9ae-17d7-4466-8788-adc68acccca4@suse.cz>
-Date: Mon, 27 Oct 2025 12:06:01 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJ3dEIKA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761565083;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=0IYenQhIa9PZj00vW7IIruD0UnAnXJ3V9tGf3ph9/f0=;
+	b=KJ3dEIKAHSFiz4goVblGUoKumA6UI50fLNVvCWXzO71iOkFMO17qg2U3eFpqplXUMIkz69
+	CrNKVfvgkgDkCOUHWnCjPZT0G1RmsH+FOx53BXv8btG29f5UZuW/8yp7XcrQhtrfWQMJlP
+	AnpUVV/0SKkxfs7AxX8sE1EnUNyQWwg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-176-BqyPbWcFM6OX82aD0l9LgQ-1; Mon, 27 Oct 2025 07:37:58 -0400
+X-MC-Unique: BqyPbWcFM6OX82aD0l9LgQ-1
+X-Mimecast-MFC-AGG-ID: BqyPbWcFM6OX82aD0l9LgQ_1761565077
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42700099ff5so4246106f8f.2
+        for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 04:37:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761565077; x=1762169877;
+        h=mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0IYenQhIa9PZj00vW7IIruD0UnAnXJ3V9tGf3ph9/f0=;
+        b=cyHJVf1u6dSO8B/pbpDYOHotYOY/WCHZjsGgT6SG/Rq+llDa1dFJtoXWBUrL40yl8Q
+         nuExeNKazM82JU+WcSWrjMKLZefAeZ6sUhoYMqHeRu7m+16K3uZL2QNC22NOI3GOQgE9
+         mqCPi2GXAva1Ynu4/d5zp8a90eVCeL6mZh/qwXwfDmt6PG8WoGbnPSrRWi+RY6ls/RvO
+         8qrhShJ+ljm4PqTa7nwt4SAMZuv7dslLWNGv9w0p+T3ZTf8OjmwoQoeRN0wxYhuB0MHe
+         NkbOPrTEIno+eYZaP4QqRd7n8mCTxdL5bl0tnswjPvBPi44ZDPv9guipsgFRw3uBXu+Q
+         DxBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQIqoH6KJGiF9fX0JuIpJt8wJIGO1mTPoEaPgjLbCAoJ/LvL/Xo/zPOmHEzltxnNl7MShEImM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy/C/nbI437lyKmaLIQwqscveslMtyBm7zmINXw03OcshxMSYFC
+	4bNQWZCjlVU+sZjvpVy3ASAQr2qCCSgmBYkegh9tTNmcFa2LZZHPNUFQkAzkil2bbmYGvKmnwT3
+	IALqrt397behgOc2jOSqBywCI+ijDjdiGYG78Gh/1zxDK1442ybo+F4UUuQ==
+X-Gm-Gg: ASbGncsmaGfdn0TuA+DUYFQLLviM7kzD49BJmdk59xpA2ULXp+hqvz7+GFfSWuq6eF9
+	yEMq69nxzNtlk0dFrm5UTqVVeT+41zcJTakUqUwzaEbM02QyiNB9+CMPggjM3pPkC0u9fRDIY+F
+	lvTXdpSI3qcPPNVKVvaySSj/ixwEweKJgeRd/Do7a2m/7Au8skmBFxTTDFpychA8PaZJgaVxHJg
+	LRYuwRHfiRdwR4UQhgMilTz61UjjEA9BYUbx+HFLINCm+pE9baLIgP5E3T+WttkGDfW3cicy7bt
+	g8m2JivRzVoyn4i8mSOH70WvJd5xTMtTxi98io4lD9nJdqqjO8clMyXtlOtPKeIp4YUGb7h8lBU
+	I4dVbMjmcaZMlOFW7mP4qnPHP2C4of59ksJ3//9xMzM5s7oOC
+X-Received: by 2002:a5d:5c89:0:b0:425:7406:d298 with SMTP id ffacd0b85a97d-42704d7e9ebmr30407490f8f.5.1761565076780;
+        Mon, 27 Oct 2025 04:37:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGx4uKgsYoM0fU52HYyWEvQMrYgypwVSrAUmI9lNjcwUX5i2uMZCdkDcF1SDu586SVN9WApQ==
+X-Received: by 2002:a5d:5c89:0:b0:425:7406:d298 with SMTP id ffacd0b85a97d-42704d7e9ebmr30407464f8f.5.1761565076305;
+        Mon, 27 Oct 2025 04:37:56 -0700 (PDT)
+Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952cb7e8sm14108931f8f.19.2025.10.27.04.37.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Oct 2025 04:37:55 -0700 (PDT)
+Date: Mon, 27 Oct 2025 12:37:54 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+    Sascha Bischoff <Sascha.Bischoff@arm.com>
+cc: Suzuki K Poulose <suzuki.poulose@arm.com>, 
+    Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>, 
+    Joey Gouly <joey.gouly@arm.com>, Will Deacon <will@kernel.org>, 
+    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+    linux-kernel@vger.kernel.org
+Subject: Failing no-vgic-v3 test
+Message-ID: <f9c7fffa-53ba-a506-b48b-07e3df2d1d5a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 04/12] KVM: guest_memfd: Add slab-allocated inode
- cache
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>, Miguel Ojeda <ojeda@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ackerley Tng <ackerleytng@google.com>, Shivank Garg <shivankg@amd.com>,
- David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
- Ashish Kalra <ashish.kalra@amd.com>
-References: <20251016172853.52451-1-seanjc@google.com>
- <20251016172853.52451-5-seanjc@google.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <20251016172853.52451-5-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 48D59219F2
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[14];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:email,suse.cz:mid,suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Action: no action
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: KQABKHCGjWZhJXl9D2ZKdIWiOgIAmuf6R4YDMA9Ce30_1761565077
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; format=flowed; charset=US-ASCII
 
-On 10/16/25 19:28, Sean Christopherson wrote:
-> From: Shivank Garg <shivankg@amd.com>
-> 
-> Add a dedicated gmem_inode structure and a slab-allocated inode cache for
-> guest memory backing, similar to how shmem handles inodes.
-> 
-> This adds the necessary allocation/destruction functions and prepares
-> for upcoming guest_memfd NUMA policy support changes.  Using a dedicated
-> structure will also allow for additional cleanups, e.g. to track flags in
-> gmem_inode instead of i_private.
-> 
-> Signed-off-by: Shivank Garg <shivankg@amd.com>
-> Tested-by: Ashish Kalra <ashish.kalra@amd.com>
-> [sean: s/kvm_gmem_inode_info/gmem_inode, name init_once()]
-> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
-> Tested-by: Ackerley Tng <ackerleytng@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+Hey,
 
-Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+on an ampere altra I've got a sad selftest:
 
-Some nits below, not critical unless there's resubmit for other reasons:
+[root@virtlab-arm11 kvm]# ./arm64/no-vgic-v3
+Random seed: 0x6b8b4567
+==== Test Assertion Failure ====
+   arm64/no-vgic-v3.c:66: handled
+   pid=3793 tid=3793 errno=4 - Interrupted system call
+      1  0x0000000000402feb: test_run_vcpu at no-vgic-v3.c:128
+      2  0x000000000040214f: test_guest_no_gicv3 at no-vgic-v3.c:155 (discriminator 17)
+      3   (inlined by) main at no-vgic-v3.c:174 (discriminator 17)
+      4  0x0000ffff873eb587: ?? ??:0
+      5  0x0000ffff873eb65f: ?? ??:0
+      6  0x00000000004022af: _start at ??:?
+   ICC_PMR_EL1 no read trap
 
-> @@ -860,13 +917,31 @@ static int kvm_gmem_init_mount(void)
->  
->  int kvm_gmem_init(struct module *module)
->  {
-> +	struct kmem_cache_args args = {
-> +		.align = 0,
+This is a guest without VGICv3 on GICv3 HW. The test expects UNDEF on reg
+access - which is not happening since:
 
-This seems unnecessary as it's implicit.
+3193287ddffb KVM: arm64: gic-v3: Only set ICH_HCR traps for v2-on-v3 or v3 guests
 
-> +		.ctor = kvm_gmem_init_inode_once,
-> +	};
-> +	int ret;
-> +
->  	kvm_gmem_fops.owner = module;
-> +	kvm_gmem_inode_cachep = kmem_cache_create("kvm_gmem_inode_cache",
-> +						  sizeof(struct gmem_inode),
-> +						  &args, SLAB_ACCOUNT);
-> +	if (!kvm_gmem_inode_cachep)
-> +		return -ENOMEM;
->  
-> -	return kvm_gmem_init_mount();
-> +	ret = kvm_gmem_init_mount();
-> +	if (ret) {
-> +		kmem_cache_destroy(kvm_gmem_inode_cachep);
-> +		return ret;
-> +	}
-> +	return 0;
->  }
->  
->  void kvm_gmem_exit(void)
->  {
->  	kern_unmount(kvm_gmem_mnt);
->  	kvm_gmem_mnt = NULL;
-> +	rcu_barrier();
+As a local fix I've done:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 6fbb4b099855..1fe53a021926 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -297,11 +297,15 @@ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
+  {
+  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
 
-Is it because VFS can do call_rcu() with something that ends up with
-kvm_gmem_free_inode()? Because nothing in this patch does that directly,
-maybe worth a comment?
+  	if (!vgic_is_v3(vcpu->kvm))
+  		return;
 
-> +	kmem_cache_destroy(kvm_gmem_inode_cachep);
->  }
+  	/* Hide GICv3 sysreg if necessary */
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
++	if (!kvm_has_gicv3(vcpu->kvm) ||
++	    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
+  		vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
+  				      ICH_HCR_EL2_TC);
+  		return;
+
+
+but following the intention of the patch above maybe we should do smth
+like:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 6fbb4b099855..1fe53a021926 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -297,11 +297,15 @@ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
+  {
+  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
+
+  	if (!vgic_is_v3(vcpu->kvm))
+  		return;
+
+  	/* Hide GICv3 sysreg if necessary */
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
++	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, GIC, NI) ||
++	    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
+  		vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
+  				      ICH_HCR_EL2_TC);
+  		return;
+
+Thoughts?
+Sebastian
 
