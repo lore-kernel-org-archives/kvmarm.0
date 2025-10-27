@@ -1,156 +1,161 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BC023BCF3
-	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 01:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5252857C6
+	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 02:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761529019; cv=none; b=TTUDyquP8UwCdF6O6GZ96LQwhzo0cWfSFq+n5g68LHyA/5bL4QMopzKPLHo1wBx5n3ZntirEPgJUdW1z+WTPHbhhwW6YGVubSAf6HSoHojYdrX5+l1x9rZUgk1ZNAg3CHDUg5EI4atGvPyeWvqHQuuM78u98yI1TF35+hCqAmCo=
+	t=1761533465; cv=none; b=QTEJE0t3QvWqeGsVfIkhu1j+izYPp0TGUdMcHbYjmvk+h1ZtAmbWiMnEB/5jVGDC0hIfoo+2EFHddT1DPL1OKbB/ufSTbtmT8sFnqCzj9UVVj4Edt24Bqy9K4jBHmPHsYL4XPu/G/wQN6q+O07Wtt+B3H+un5gi2zHYwfYXUh/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761529019; c=relaxed/simple;
-	bh=FkJ17JdOa8kqwodupoeKU/kTXkVHWDiswetLtJd7TJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d5uAJvsI1oqiCJMx2xinFNoOYfmulI/a3aJVxemF6lp3XPrMQYtSYP340mUE8eru4qTEgZgkqjfIob/AoAcA/NCaeAdQWEZosbbhWVyQdByYTBaePbysbHpTpPifYQcYocQTRkd6zWdQlTgdBJvMzXyqvn9vMbPn+1T6BUZa7jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC97F175D;
-	Sun, 26 Oct 2025 18:36:43 -0700 (PDT)
-Received: from [10.163.70.164] (unknown [10.163.70.164])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A48F3F673;
-	Sun, 26 Oct 2025 18:36:48 -0700 (PDT)
-Message-ID: <6e7d0bf3-ddf1-44a0-a0cb-7dc994101878@arm.com>
-Date: Mon, 27 Oct 2025 07:06:45 +0530
+	s=arc-20240116; t=1761533465; c=relaxed/simple;
+	bh=IIkrylqt/UKr3fF+RWuu20i989v8Z7n0jv3mvGvdfC0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lbgLvOjcKT8tu1Nz53QpDzFerUKNHfsLiTR1Aqoh6UmiYHsxUG89KPabk0NBT1GPxJHK1n9hjB1cgVc/5jToK2+rsBr0wiElp2CT9PPiwTbsHKyzti4QRsq871QN+wtnzqi/3tNChp9djHuV0y18oLZVMwUU2bixgSftxFWtcZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4cvyfZ09rDz12LDD;
+	Mon, 27 Oct 2025 10:50:14 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 87746180B63;
+	Mon, 27 Oct 2025 10:50:52 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 27 Oct 2025 10:50:52 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 27 Oct 2025 10:50:51 +0800
+Message-ID: <0cdb8919-012e-c556-1082-63d44c6c7d97@hisilicon.com>
+Date: Mon, 27 Oct 2025 10:50:50 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 2/2] arm64/mm: Add remaining TLBI_XXX_MASK macros
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org, ben.horgan@arm.com,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20251024040207.137480-1-anshuman.khandual@arm.com>
- <20251024040207.137480-3-anshuman.khandual@arm.com>
- <20251024120014.000020af@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v6 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64,
+ LS64_V}
 Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20251024120014.000020af@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+To: Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton
+	<oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+References: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
+ <20251024090819.4097819-8-wangzhou1@hisilicon.com>
+ <e40ce220-e857-4ecf-985b-40407f99fcb3@app.fastmail.com>
+ <752915f0-1085-b32e-f94c-c6c68dfa6cd4@hisilicon.com>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <752915f0-1085-b32e-f94c-c6c68dfa6cd4@hisilicon.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-
-
-On 24/10/25 4:30 PM, Jonathan Cameron wrote:
-> On Fri, 24 Oct 2025 05:02:07 +0100
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
->> Add remaining TLBI_XXX_MASK macros and replace current open encoded fields.
->> While here replace hard coded page size based shifts but with derived ones
->> via ilog2() thus adding some required context.
+On 2025/10/25 18:06, Zhou Wang wrote:
+> On 2025/10/25 0:18, Arnd Bergmann wrote:
+>> On Fri, Oct 24, 2025, at 11:08, Zhou Wang wrote:
 >>
->> TLBI_TTL_MASK has been split into separate TLBI_TTL_MASK and TLBI_TG_MASK
->> as appropriate because currently it simultaneously contains both page size
->> and translation table level information. KVM on arm64 has been updated to
->> accommodate these changes to TLBI_TTL_MASK.
+>>> +static void ls64_sigill(void)
+>>> +{
+>>> +	struct sigaction ign, old;
+>>> +	char src[64] __aligned(64) = { 1 };
+>>> +
+>>> +	/*
+>>> +	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
+>>> +	 * FEAT_LS64WB not supported) and the completer supports these
+>>> +	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
+>>> +	 * testing the ABI here, so just ignore the SIGBUS and see if we can
+>>> +	 * execute the instructions without receiving a SIGILL. Restore the
+>>> +	 * handler of SIGBUS after this test.
+>>> +	 */
+>>> +	ign.sa_sigaction = ignore_signal;
+>>> +	ign.sa_flags = SA_SIGINFO | SA_RESTART;
+>>> +	sigemptyset(&ign.sa_mask);
+>>> +	sigaction(SIGBUS, &ign, &old);
+>>> +
+>>> +	register void *xn asm ("x8") = src;
+>>> +	register u64 xt_1 asm ("x0");
+>>> +	register u64 __maybe_unused xt_2 asm ("x1");
+>>> +	register u64 __maybe_unused xt_3 asm ("x2");
+>>> +	register u64 __maybe_unused xt_4 asm ("x3");
+>>> +	register u64 __maybe_unused xt_5 asm ("x4");
+>>> +	register u64 __maybe_unused xt_6 asm ("x5");
+>>> +	register u64 __maybe_unused xt_7 asm ("x6");
+>>> +	register u64 __maybe_unused xt_8 asm ("x7");
+>>> +
+>>> +	/* LD64B x0, [x8] */
+>>> +	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn));
 >>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will@kernel.org>
->> Cc: Marc Zyngier <maz@kernel.org>
->> Cc: Oliver Upton <oliver.upton@linux.dev>
->> Cc: linux-arm-kernel@lists.infradead.org
->> Cc: linux-kernel@vger.kernel.org
->> Cc: kvmarm@lists.linux.dev
->> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
->> ---
->>  arch/arm64/include/asm/tlbflush.h | 26 ++++++++++++++++++--------
->>  arch/arm64/kvm/nested.c           |  8 +++++---
->>  2 files changed, 23 insertions(+), 11 deletions(-)
+>> Relying on the __maybe_unused register declaration seems a little
+>> fragile, can you change this so that the inline asm specifies
+>> all of the registers correctly as input/output arguments?
+> 
+> Seems we can remove xt_2 ... xt8, but add x1 ... x7 to asm clobber list,
+> something like:
+> 
+>     asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn)
+>                  : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
+> 
+>>> +static void ls64_v_sigill(void)
+>>> +{
+>>> +	struct sigaction ign, old;
+>>> +	char dst[64] __aligned(64);
+>>> +
+>>> +	/* See comment in ls64_sigill() */
+>>> +	ign.sa_sigaction = ignore_signal;
+>>> +	ign.sa_flags = SA_SIGINFO | SA_RESTART;
+>>> +	sigemptyset(&ign.sa_mask);
+>>> +	sigaction(SIGBUS, &ign, &old);
+>>> +
+>>> +	register void *xn asm ("x8") = dst;
+>>> +	register u64 xt_1 asm ("x0") = 1;
+>>> +	register u64 __maybe_unused xt_2 asm ("x1") = 2;
+>>> +	register u64 __maybe_unused xt_3 asm ("x2") = 3;
+>>> +	register u64 __maybe_unused xt_4 asm ("x3") = 4;
+>>> +	register u64 __maybe_unused xt_5 asm ("x4") = 5;
+>>> +	register u64 __maybe_unused xt_6 asm ("x5") = 6;
+>>> +	register u64 __maybe_unused xt_7 asm ("x6") = 7;
+>>> +	register u64 __maybe_unused xt_8 asm ("x7") = 8;
+>>> +	register u64 st   asm ("x9");
+>>> +
+>>> +	/* ST64BV x9, x0, [x8] */
+>>> +	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn));
+>>> +
+>>> +	sigaction(SIGBUS, &old, NULL);
 >>
->> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
->> index 131096094f5b..cf75fc2a06c3 100644
->> --- a/arch/arm64/include/asm/tlbflush.h
->> +++ b/arch/arm64/include/asm/tlbflush.h
->> @@ -57,9 +57,10 @@
->>  /* This macro creates a properly formatted VA operand for the TLBI */
->>  #define __TLBI_VADDR(addr, asid)				\
->>  	({							\
->> -		unsigned long __ta = (addr) >> 12;		\
->> -		__ta &= GENMASK_ULL(43, 0);			\
->> -		__ta |= (unsigned long)(asid) << 48;		\
->> +		unsigned long __ta = (addr) >> ilog2(SZ_4K);	\
->> +		__ta &= TLBI_BADDR_MASK;			\
->> +		__ta &= ~TLBI_ASID_MASK;			\
->> +		__ta |= FIELD_PREP(TLBI_ASID_MASK, asid);	\
-> I think you can replace the two lines above with
-> 		FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);
+>> Is ST64BV expected to cause SIGBUS here, or should it return the
+>> 0xffffffffffffffff output to indicate an unsupported memory area?
 > 
-> It's a small reduction in code but I don't mind much either way.
+> I think it should return 0xffffffffffffffff without an exception,
 
-Right. FIELD_MODIFY() might be appropriate in this scenario but
-there will be some additional code churn needed. I don't have a
-strong opinion either way.
+My understanding above is wrong.
 
---- a/arch/arm64/include/asm/tlbflush.h
-+++ b/arch/arm64/include/asm/tlbflush.h
-@@ -55,13 +55,12 @@
- } while (0)
+As mentioned in C3.2.6 of ARM spec L.b:
 
- /* This macro creates a properly formatted VA operand for the TLBI */
--#define __TLBI_VADDR(addr, asid)                               \
--       ({                                                      \
--               unsigned long __ta = (addr) >> ilog2(SZ_4K);    \
--               __ta &= TLBI_BADDR_MASK;                        \
--               __ta &= ~TLBI_ASID_MASK;                        \
--               __ta |= FIELD_PREP(TLBI_ASID_MASK, asid);       \
--               __ta;                                           \
-+#define __TLBI_VADDR(addr, asid)                                       \
-+       ({                                                              \
-+               unsigned long __ta = (addr) >> ilog2(SZ_4K);            \
-+               __ta &= TLBI_BADDR_MASK;                                \
-+               __ta |= FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);      \
-+               __ta;                                                   \
-        })
- > 
->>  		__ta;						\
->>  	})
->>  
->> @@ -100,8 +101,17 @@ static inline unsigned long get_trans_granule(void)
->>   *
->>   * For Stage-2 invalidation, use the level values provided to that effect
->>   * in asm/stage2_pgtable.h.
->> + *
->> + * +----------+------+-------+--------------------------------------+
->> + * |   ASID   |  TG  |  TTL  |                 BADDR                |
->> + * +-----------------+-------+--------------------------------------+
->> + * |63      48|47  46|45   44|43                                   0|
->> + * +----------+------+-------+--------------------------------------+
->>   */
->> -#define TLBI_TTL_MASK		GENMASK_ULL(47, 44)
->> +#define TLBI_ASID_MASK		GENMASK_ULL(63, 48)
->> +#define TLBI_TG_MASK		GENMASK_ULL(47, 46)
->> +#define TLBI_TTL_MASK		GENMASK_ULL(45, 44)
->> +#define TLBI_BADDR_MASK		GENMASK_ULL(43, 0)
->>  
->>  #define TLBI_TTL_UNKNOWN	INT_MAX
->>  
->> @@ -110,10 +120,10 @@ static inline unsigned long get_trans_granule(void)
->>  									\
->>  	if (alternative_has_cap_unlikely(ARM64_HAS_ARMv8_4_TTL) &&	\
->>  	    level >= 0 && level <= 3) {					\
->> -		u64 ttl = level;					\
->> -		ttl |= get_trans_granule() << 2;			\
->> +		arg &= ~TLBI_TG_MASK;					\
->> +		arg |= FIELD_PREP(TLBI_TG_MASK, get_trans_granule());	\
->>  		arg &= ~TLBI_TTL_MASK;					\
->> -		arg |= FIELD_PREP(TLBI_TTL_MASK, ttl);			\
->> +		arg |= FIELD_PREP(TLBI_TTL_MASK, level);		\
+1. "When the instructions access a memory type that is not one of the following,
+   a data abort for unsupported Exclusive or atomic access is generated"
+
+2. "If the target memory location does not support the ST64BV or ST64BV0
+   instructions, then the register specified by <Xs> is set to 0xFFFFFFFF_FFFFFFFF"
+
+Here the test code is the first case, so a fault should be triggered.
+
+Best,
+Zhou
+
+> will modify above test codes in next version.
 > 
-> Similar potential to use FIELD_MODIFY for these.
+> Best,
+> Zhou
 > 
-> Jonathan
-> 
-
+>>
+>>      Arnd
+>> .
+> .
