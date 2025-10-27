@@ -1,131 +1,123 @@
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64BB28682
-	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 06:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99542367B5;
+	Mon, 27 Oct 2025 09:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761548306; cv=none; b=OjJ8vt7oyzTTa3N+06069mCr1ZK6drvOe1lFUlGU7nPBm0PJcZ+xfjCVDkH+/4w+PlP2bFzemd8cAD+Cq1AckKQDgUgJ86mv/LLwDBYgSto1WPn8lQPQ8oKMZLwPTPPxQaKzv2THVWs4FCgLrx0gGx81wsF3LnWwuaCs9w9r514=
+	t=1761555721; cv=none; b=ToIYA1dHLJaKehb0kGImLcxOV1/lHII7/QUwVU9/2ZrwiKdbjKLX6wU5UmiSl7I9tcxdznS3CDf4xQm1PTzrZjR2/jtzpDRaAApZZU0CGneQbJ7rwMbl0FJKCGEvbK4q4NEX5Z1Nip6IqsSQVYQY1fbU/zsr26vIc6s+CnGTOvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761548306; c=relaxed/simple;
-	bh=hDSiGNUZRyTvrOqWPBkaDmW457Wcg3lROhJN6dWvEHA=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=AdH4SEcDoqE8ODJZvxdZXKT/lDVxkx4SDFwqCM/ku3TJfkavWKzH9JuWaEphPJsdvQJiaMkxLhq3SAAFLUbeUccJZ9SDM5Hxu5kgHMZUt5+b2Qted5h1aChgwcAWCmmTS+DANiyr3Rca5y9cXVgL1hUbaPtaCeAqKUkkSrs66zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=BA2jFPBp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MODKEAa0; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1761555721; c=relaxed/simple;
+	bh=275YkRCyZVfjEDUsCr12iYfs5/SgTlKkXm5iRoBP66c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JTkWiickBbDcYj9HVArT/uulGYaZ++47UmmfbjA2K8KotCu5VUZ+tplcnYm+9HNDq86GsOeUdWqQPWn1cT134EhT0fqEHl+mDPeSKZ9WYkJoBK8uHBOdBASn6J2W3isESOOpJF9rYAhD2Tjpj/2+31E/WN2HNt3QFJGpgiex7Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WJdInWqP; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="BA2jFPBp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MODKEAa0"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 420237A00CD;
-	Mon, 27 Oct 2025 02:58:22 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-05.internal (MEProxy); Mon, 27 Oct 2025 02:58:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1761548302;
-	 x=1761634702; bh=TmTyoUdAcbfsSgeatw+eIqzaDwggdz/+Vn7/9s4fE0w=; b=
-	BA2jFPBp+gNQm0l4WpqAu5wAebGyS3bVNHqBoMQREqH9WvBF2dVOiVR2j3/ZSFGS
-	Tc1O70rQI+XIMY2xFHvlBnoYXfRs1Jbs/cyi5fPtRqi0ABJeSo+MDX9KzF6ZAbKg
-	g+hg7eJAnkayySALz3lbleji0XV9GowVh74yh7oPo/8V5MFlD5BRqGNFL6Wz8uk1
-	4HgRxMzkTK8hy+qxRN7ZS33ET/HPlVu+737I/E2rnI9qZ6dqd4baFAigDjQO8bJF
-	5ihEm4naY5Pct7lOYoTQCIt4PG+cFeAyPPajN4Uv9AVXq9aUu3+DAhEF3VR8dO3P
-	zw8QtOE+vI5qh0kTd00gTw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1761548302; x=
-	1761634702; bh=TmTyoUdAcbfsSgeatw+eIqzaDwggdz/+Vn7/9s4fE0w=; b=M
-	ODKEAa072bS6j0c6+bHSScX4RxEVz4tgwYZIrDpv5E7kVIsG2Plyw5OFqvawewmE
-	4XVQRZVvmfY+GcEwadyyVzMFMZfY3wIwx9uf7//3W72j895x3Saph7v1kpa0EH1v
-	wrZWDXUCThJ83IT0dD0QjqL5PLgtdIGrgqIpNmKNUwXpTOLRU9s2KUPrb1L4xFUg
-	4KyF2JDUPyoIo9RaBatG5+SMG2osp7wQM8j1s32ZlKckQT4ArVT6ESNZ0rtA7znM
-	mFDxO/X50WwfEV8Bwhu0qPeBwQqDpHEIiRWNSYZYGbNOo+ACq8KdA4g3AWsUszXW
-	kfxTMMLymKt1QaYcjICCg==
-X-ME-Sender: <xms:DRj_aGuP5V2d4HYI-M89Zzot7TNitljCe5X2AMorox20krKLj5dH-A>
-    <xme:DRj_aGQGyxU97X9_04LcgPv5I5hFRE7FXJjTBnYX7LGlm9W8_Wu9CCtr3DrEc6gZ0
-    RC3rTxdfGK1lsKWenHXm0N-BRVUxmUXH3didFl1v5E6122_maq-RVE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduheejfeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
-    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
-    khhirdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttg
-    gtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhl
-    ihgtohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonh
-    drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
-    ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:DRj_aOgEvDebSyhu4vq3uQtubJuSE6HnsVv1KKq1_Wa5Bip2vyS6IA>
-    <xmx:DRj_aLvSAGse4tHVN73fA7zEKkj4p4W9jFLSG0TW-ALkzmJOFs3KYA>
-    <xmx:DRj_aJ-e_zSyLtPNZ0fvcrXZnyEyWUFWVYDERhSWcPTI4cMArvpX4Q>
-    <xmx:DRj_aBZXs_NHb8N7DYpMT20ES0Tml5uypOYuzkKxSZuKhY5feJOo0g>
-    <xmx:Dhj_aD_60EYjbJRj6S0X8ZFONRx8BxDT8kuu8id1WnT1PloT_ILQLk28>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 6C3A0700054; Mon, 27 Oct 2025 02:58:21 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WJdInWqP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761555719; x=1793091719;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=275YkRCyZVfjEDUsCr12iYfs5/SgTlKkXm5iRoBP66c=;
+  b=WJdInWqPl+KAkREVwMfyH9a958lpsrnBmyvCHhCsQXNjUJ+fj9KiOgCv
+   1kSNYue2GmE1d4mQdk7hfeZs5MatZ26nRWkvBerb4pjJiV9Inmn+3/34g
+   kXrUbKZS0mCfIqpXN/iIoAhkcuCJbtzgDWlo/JP19qedPSmiQXClLjrb7
+   zpmAM/e00e2LmyAsK+zzGwSgUb4KeYa+XjC1AlmHrkP6nIU4SEAlH0R4u
+   fkYKYiFG4tRVIbiwn3MZOGTGLHs0HyfXjZoEm9rvHa219qVkJDxTS78jE
+   1C6QqBsOpJUNSHM1XJNlW+Scp7TfkBqFGBKMTXDDHyxUOhNh6Oj1LSJ8Z
+   A==;
+X-CSE-ConnectionGUID: QupBOUrlRGCeefTEJjVJYA==
+X-CSE-MsgGUID: vSfZFS6YTxWp0E6m/QNcVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="51206713"
+X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
+   d="scan'208";a="51206713"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 02:01:59 -0700
+X-CSE-ConnectionGUID: iCVeVDcZSguedVPvO1GnIg==
+X-CSE-MsgGUID: rPVV21LWTqG3HlsE3kXlFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,258,1754982000"; 
+   d="scan'208";a="184892900"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 02:01:51 -0700
+Message-ID: <59ae9957-88a8-4777-9bd2-196e8b4eb8ac@linux.intel.com>
+Date: Mon, 27 Oct 2025 17:01:49 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: AmBleg0913uk
-Date: Mon, 27 Oct 2025 07:57:39 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zhou Wang" <wangzhou1@hisilicon.com>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
- "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
- "Joey Gouly" <joey.gouly@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- "Yicong Yang" <yangyccccc@gmail.com>, prime.zeng@hisilicon.com,
- xuwei5@huawei.com
-Message-Id: <69c11f29-4cfa-4ec8-a9c7-f47337ac4c24@app.fastmail.com>
-In-Reply-To: <0cdb8919-012e-c556-1082-63d44c6c7d97@hisilicon.com>
-References: <20251024090819.4097819-1-wangzhou1@hisilicon.com>
- <20251024090819.4097819-8-wangzhou1@hisilicon.com>
- <e40ce220-e857-4ecf-985b-40407f99fcb3@app.fastmail.com>
- <752915f0-1085-b32e-f94c-c6c68dfa6cd4@hisilicon.com>
- <0cdb8919-012e-c556-1082-63d44c6c7d97@hisilicon.com>
-Subject: Re: [PATCH v6 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 13/25] KVM: TDX: Fold tdx_mem_page_record_premap_cnt()
+ into its sole caller
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+ Kai Huang <kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Ackerley Tng <ackerleytng@google.com>
+References: <20251017003244.186495-1-seanjc@google.com>
+ <20251017003244.186495-14-seanjc@google.com>
+ <5dea4a3d-c7b7-48f0-b2d5-7597e0cd5f00@linux.intel.com>
+ <aPuqYz3ly5a3__mf@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <aPuqYz3ly5a3__mf@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 27, 2025, at 03:50, Zhou Wang wrote:
-> On 2025/10/25 18:06, Zhou Wang wrote:
->> On 2025/10/25 0:18, Arnd Bergmann wrote:
->>> On Fri, Oct 24, 2025, at 11:08, Zhou Wang wrote:
+
+
+On 10/25/2025 12:33 AM, Sean Christopherson wrote:
+> On Fri, Oct 24, 2025, Binbin Wu wrote:
+>>
+>> On 10/17/2025 8:32 AM, Sean Christopherson wrote:
+>>> Fold tdx_mem_page_record_premap_cnt() into tdx_sept_set_private_spte() as
+>>> providing a one-off helper for effectively three lines of code is at best a
+>>> wash, and splitting the code makes the comment for smp_rmb()  _extremely_
+>>> confusing as the comment talks about reading kvm->arch.pre_fault_allowed
+>>> before kvm_tdx->state, but the immediately visible code does the exact
+>>> opposite.
 >>>
->>> Is ST64BV expected to cause SIGBUS here, or should it return the
->>> 0xffffffffffffffff output to indicate an unsupported memory area?
->> 
->> I think it should return 0xffffffffffffffff without an exception,
->
-> My understanding above is wrong.
->
-> As mentioned in C3.2.6 of ARM spec L.b:
->
-> 1. "When the instructions access a memory type that is not one of the following,
->    a data abort for unsupported Exclusive or atomic access is generated"
->
-> 2. "If the target memory location does not support the ST64BV or ST64BV0
->    instructions, then the register specified by <Xs> is set to 
-> 0xFFFFFFFF_FFFFFFFF"
->
-> Here the test code is the first case, so a fault should be triggered.
+>>> Opportunistically rewrite the comments to more explicitly explain who is
+>>> checking what, as well as _why_ the ordering matters.
+>>>
+>>> No functional change intended.
+>>>
+>>> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+>>
+>> One nit below.
+>>
+>> [...]
+>>> +	/*
+>>> +	 * If the TD isn't finalized/runnable, then userspace is initializing
+>>> +	 * the VM image via KVM_TDX_INIT_MEM_REGION.  Increment the number of
+>>> +	 * pages that need to be mapped and initialized via TDH.MEM.PAGE.ADD.
+>>> +	 * KVM_TDX_FINALIZE_VM checks the counter to ensure all mapped pages
+>>                                                                     ^
+>>                                                  Nit: Is pre-mapped better?
+> Yeah, updated (and then it gets deleted a few commits later :-) ).
+Oh, right, nr_premapped will be dropped later.
 
-I see, my mistake.
-
-     Arnd
+Since the whole nr_premapped will be dropped, do we still need a cleanup patch
+like patch 12 which will be dropped finally?
