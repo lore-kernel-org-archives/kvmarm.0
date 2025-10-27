@@ -1,55 +1,55 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDC92FB975
-	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BCE23BF8F
+	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761565191; cv=none; b=PaLfLNVdFblU1A6NOhsGqIfRBR5HjJOqrPyWyDAvfRAdXJQdPO2Ye5blXTiashmOSBT5U5LAraRD4z8BpGJbgZyRcWM8GOGCgja28d75e3fLV12DOsiqlPijX2xbSOPSZXHf9I/gVWkCcvKQ7dyAjLnsC5W3zxn6Uvbp94kctR4=
+	t=1761565192; cv=none; b=orwsQ2zM+0DjOVBqmMd355G6FBVFZHq2KEAGl7ZxCRq9Q9x/WytPVXVPvvFDybK0tBtJVL7LCaJ5S8S3Jq488iPmtBYmTUZT3LAztv51fmaSN3pqDwBjsvKbTsmX8iuEdKXHYAjTwE7XWSsxq/UI9SJcnN0y0vG3W74WQI7lPcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761565191; c=relaxed/simple;
-	bh=QrgMpQfX0rEm+71yHpj1ZdDFSmCyUNlm47eNRQHjeTA=;
+	s=arc-20240116; t=1761565192; c=relaxed/simple;
+	bh=f18anSMvBSuenSnLb/Xbd8UFXKt6gIPnehc+WlYNjJw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eQkvsfgpWD7kYsvP9JmLPX3o/zu1QfpEWV9zHufEoM/wQ9lOIxTZ+QsUymbTNu+GrG548HHSVMlD96yqgu6/o6RhCaj6G5P5P92MXB0dU4FY/uvzhojBhktc/nUNVAYaW2f13WiyPGzIwEchhA9eJR479eM37svUbIJj9yP30tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O+T1ky2B; arc=none smtp.client-ip=209.85.218.73
+	 To:Cc:Content-Type; b=BPOeY2mDeF8QoUV4XPGhD2SOuglD74xJG2za7H85qe/7dTynhGa7YGvOHIGTlO5AQTYS8BNHqtgmDvrWuhdnFE11/piOIcVPB+BuBzRYiJTkHO6AxBK+6ofU3in1MvBCSpYxpd9m/RgZyVwalN2eRkqNt92LYkjDaKEbFdUhg2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QgkgxZDg; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O+T1ky2B"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b6d7ad47b58so234606266b.1
-        for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 04:39:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QgkgxZDg"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-475ddf7e925so1629215e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 04:39:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761565188; x=1762169988; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761565189; x=1762169989; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ap94pVeJZZkbo7tUJgzqZixZK35kctleCNA5GGl6HeE=;
-        b=O+T1ky2BwvPg9VDbbBWHOaRDIGMgY12GGyrEz/gUg2JTc/kOQF7XkThrf/R+3SCGgJ
-         CIoYLoq5Ek6TZi1MH7FPTvZXPLppbb2UPtb394almM9d69HnRG2GSgYupTsXzcW2qf26
-         t7WsNxQlSALBvmFLM61C+FvM7fHs62jFdwdZZ3NkekkjG8tY7gvhMJbu9JCEk5z++FYB
-         h2bGAj6edoQ+K7cgmfNoc/2mT8MdkuEOBpxAhnqlLPBqIO29nvW2KKKrEY56TLR7IsQq
-         Dwun8uw63qaGyfSq7NizPc4+kfscUhh/opaDVHZfJiNlALJ+EfAfwhnZ7FQuuH17/Dw2
-         yMZg==
+        bh=ddUaiwuC2mzRcZAvCLVUB0QFXxr0juQKTwC4zCGP1k4=;
+        b=QgkgxZDgah4WY619ZQpqLASGTSv9XhZTGbaoPKwA8YUjuedcEyF67SSWc41HNUYRFF
+         nh56he5Aah/JocWlM6Lei2okmWl3OV71icBxb1hSIVkwZ8Eyk7l1P/epqOoTAszo62RR
+         orLjM4nCOKyc0S7M2gqMMusedQvGRXAzXwm3Cyhi8WMqXOug99cq3MubqnRPeUFZsUH4
+         H077o59OQ+nM4fu5fozLFK94D5orCBGNIM1tbV4vv9Kh53sZbRx+jb7SFJ6VI9ole85W
+         lu/KJwIhd8+hqeFtJggje4V/EmDdFPZ1hCMnRAasuZfrcMe4dUZfCvWJZiWpvW1UnHJe
+         UCDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761565188; x=1762169988;
+        d=1e100.net; s=20230601; t=1761565189; x=1762169989;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ap94pVeJZZkbo7tUJgzqZixZK35kctleCNA5GGl6HeE=;
-        b=MLGCyyuf9KAkgL6u9THGgnjZk17fOpPRXRibiHwlLPnsr48mOOKRXjI+YszlDdqe50
-         9WVwEGGJcszRxgJxk+9DRKQFKtVidUzMW5g5QSwWVOaqIyTK7E+vypBZe4vDyTFEVhIu
-         OOT+b+J2mGpOgzfnSlBY2EiicsB3DOL9RwnRmRaY00zh4P9QK8/xICQlf4xmqFnWwe8i
-         I/ltgubPYyvjLMtZBWrZg/oK4/cqx+hgeTXDDg++d9lx4HrjSu1+46UrWyteH7HWGSgl
-         60BE1sQuAckURMB0uXa0XXkmxKHFR0igqdcbM/BBmVCTL8VLlYO9v5pfXBYzLjUI6d5r
-         IvwQ==
-X-Gm-Message-State: AOJu0YxWOB95rfmKvl3ZUN9XDYZ1f7jD8Nmg2q/Di9A2rsElxLcmyjfA
-	ckkPjfodCQVfz1P5Lzz/rLjvN3pSoGc+L4eIN6n0ts7z66DLyZPbO0dI6XJgN5yd8KEKuJPuvhp
-	JzYGYghTCkAuAXOeKopydfh/bywAXbaTfIAZWiVfS6SU34bZBMdjP+WWfKYd7zVcmYAVIe/r/0r
-	Rn5VyQeRmzoW9xyLnQIrzapni1cImxVxw=
-X-Google-Smtp-Source: AGHT+IEScGbQWgMIwv19VMFWWRVfMiY9MCUgqr470ew7BdFYncsGhLIeFlTXYgFnqeoynaMCqmdqQeqXTA==
-X-Received: from ejed21.prod.google.com ([2002:a17:906:1755:b0:b55:f065:b57a])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:6d0f:b0:b0c:b51b:81f6
- with SMTP id a640c23a62f3a-b647423c403mr4390703766b.43.1761565187382; Mon, 27
- Oct 2025 04:39:47 -0700 (PDT)
-Date: Mon, 27 Oct 2025 11:39:42 +0000
+        bh=ddUaiwuC2mzRcZAvCLVUB0QFXxr0juQKTwC4zCGP1k4=;
+        b=II88bsGVIZ/WNSkMDbFcNx+CcARUowJaxagkFt9qhd7a5jKPEkc6uFm70bLsi9LJ/B
+         mDUfzjFfbgCtXuqrk3gE6mtwZL3lE5Oy/I2wMEWGlnGpuq6dlU0T0qsh6Lwstymo+5k5
+         8kJrW7J7JZ/VOq0hxUVmiITYcjg6Tl3lTsaj7ncNS8w8qNaBxhXwp53PzNEM5kL0Cvfo
+         nasiia1K9C9R9tGb+o6LWISRtEvu+ZvdcoTI7Rz+mLV2cLLfl6C4wK+kXPiCHS04IWjL
+         1Cj3Ru3xk76kvCZS66fqSkXN4b6PQ3jI3sGjy/CeeKqQUb/BK33Y1sXOPr/V/XvEX+Nr
+         rCIA==
+X-Gm-Message-State: AOJu0YwzlrvBSoON4aS0HaP9VW2NEGqtXbIVFMRa0ZH+zStDeSoZzZXH
+	5xrkaVhJUtc5X4Rrui3k5XNgsx93UB8RwGLIRF4BsKfzzNqsukdZlOpmUG9fEoKwA5Duyw2a94P
+	xlwhNa0hYy811WTUnF2uOgk+LUNUAJiLnb+uyEPq71Vymipwmdx0PW5be7IbqkQpClKPA679E6z
+	yDH7PtaT8zga0Bjj8E7QmH6Yp30leARk0=
+X-Google-Smtp-Source: AGHT+IHxB/wvK7ZW88eLq2mPzfdrKraGlY3vUxwTIx9YmWHVo3e6D2tmb9cmbK2uH9d6WMiSxuo442zJjg==
+X-Received: from wmcv7.prod.google.com ([2002:a05:600c:4287:b0:475:d94e:4d5d])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:5403:b0:475:e007:baf1
+ with SMTP id 5b1f17b1804b1-475e007f163mr66110575e9.34.1761565188837; Mon, 27
+ Oct 2025 04:39:48 -0700 (PDT)
+Date: Mon, 27 Oct 2025 11:39:43 +0000
 In-Reply-To: <20251027113943.1282568-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251027113943.1282568-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.1.838.g19442a804e-goog
-Message-ID: <20251027113943.1282568-4-tabba@google.com>
-Subject: [PATCH v1 3/4] KVM: arm64: Add compile-time type check to vcpu_write_sys_reg()
+Message-ID: <20251027113943.1282568-5-tabba@google.com>
+Subject: [PATCH v1 4/4] KVM: arm64: Add compile-time type check for register
+ in __vcpu_rmw_sys_reg()
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,102 +69,52 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The vcpu_write_sys_reg() function, like __vcpu_assign_sys_reg(),
-is susceptible to parameter transposition bugs where the 'u64 val' is
-accidentally passed in the 'reg' slot.
+Although it is less likely that the 'r' (register) and 'val' (value)
+parameters in __vcpu_rmw_sys_reg() would be swapped, it is still
+possible. The register ID is an int/enum, whereas the value is a u64, as
+in other similar functions and macros. The cost of adding a compile-time
+check to prevent this is minimal.
 
-Even with the now-consistent parameter ordering, this remains a risk.
-
-To apply the same compile-time checks, vcpu_write_sys_reg() is converted
-into a macro. The original function implementation is converted into a
-helper as _vcpu_write_sys_reg(). The new macro wrapper performs the same
-type compatibility check as its `__vcpu_assign_sys_reg` counterpart,
-preventing the 'reg' parameter from being a 'u64'.
-
-This patch also includes related cleanups made necessary or apparent by
-this change:
-* The 'reg' parameters for __vcpu_read_sys_reg() and
-  __vcpu_write_sys_reg() are tightened from 'int' to 'enum vcpu_sysreg'.
-* The 'struct sys_reg_desc.reg' field is changed from 'int' to 'enum
-  vcpu_sysreg'.
+To prevent this class of bugs, add a compile-time type compatibility
+check to prevent the 'r' parameter from having a 'u64' type.
 
 No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 8 +++++++-
- arch/arm64/kvm/hyp/exception.c    | 4 ++--
- arch/arm64/kvm/sys_regs.c         | 2 +-
- arch/arm64/kvm/sys_regs.h         | 2 +-
- 4 files changed, 11 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 2c33ea5fdb1c..2b7c8ba8802d 100644
+index 2b7c8ba8802d..9758ba502ed5 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1168,7 +1168,13 @@ u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
- 	})
+@@ -1147,15 +1147,16 @@ u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *, enum vcpu_sysreg, u64);
+ 		ctxt_sys_reg(ctxt, (r)) = __v;					\
+ 	} while (0)
  
- u64 vcpu_read_sys_reg(const struct kvm_vcpu *, enum vcpu_sysreg);
--void vcpu_write_sys_reg(struct kvm_vcpu *, enum vcpu_sysreg, u64);
-+void _vcpu_write_sys_reg(struct kvm_vcpu *, enum vcpu_sysreg, u64);
-+
-+#define vcpu_write_sys_reg(v, r, val)						\
+-#define __vcpu_rmw_sys_reg(v, r, op, val)				\
+-	do {								\
+-		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;	\
+-		u64 __v = ctxt_sys_reg(ctxt, (r));			\
+-		__v op (val);						\
+-		if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__)	\
+-			__v = kvm_vcpu_apply_reg_masks((v), (r), __v);	\
+-									\
+-		ctxt_sys_reg(ctxt, (r)) = __v;				\
++#define __vcpu_rmw_sys_reg(v, r, op, val)					\
 +	do {									\
++		const struct kvm_cpu_context *ctxt = &(v)->arch.ctxt;		\
++		u64 __v = ctxt_sys_reg(ctxt, (r));				\
 +		BUILD_BUG_ON_ZERO(__builtin_types_compatible_p(typeof(r), u64));\
-+		_vcpu_write_sys_reg(v, r, val);					\
-+	} while (0)
++		__v op (val);							\
++		if (vcpu_has_nv((v)) && (r) >= __SANITISED_REG_START__)		\
++			__v = kvm_vcpu_apply_reg_masks((v), (r), __v);		\
++										\
++		ctxt_sys_reg(ctxt, (r)) = __v;					\
+ 	} while (0)
  
- struct kvm_vm_stat {
- 	struct kvm_vm_stat_generic generic;
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index a5e5eda7aba0..6f8b1b5f2cab 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -20,7 +20,7 @@
- #error Hypervisor code only!
- #endif
- 
--static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
-+static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
- {
- 	if (has_vhe())
- 		return vcpu_read_sys_reg(vcpu, reg);
-@@ -28,7 +28,7 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 	return __vcpu_sys_reg(vcpu, reg);
- }
- 
--static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, int reg, u64 val)
-+static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg, u64 val)
- {
- 	if (has_vhe())
- 		vcpu_write_sys_reg(vcpu, reg, val);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d0d696d0819a..8e323353383c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -338,7 +338,7 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, enum vcpu_sysreg reg)
- 	return __vcpu_sys_reg(vcpu, reg);
- }
- 
--void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg, u64 val)
-+void _vcpu_write_sys_reg(struct kvm_vcpu *vcpu, enum vcpu_sysreg reg, u64 val)
- {
- 	struct sr_loc loc = {};
- 
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index b3f904472fac..a98c3aadcdbd 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -78,7 +78,7 @@ struct sys_reg_desc {
- 	u64 (*reset)(struct kvm_vcpu *, const struct sys_reg_desc *);
- 
- 	/* Index into sys_reg[], or 0 if we don't need to save it. */
--	int reg;
-+	enum vcpu_sysreg reg;
- 
- 	/* Value (usually reset value), or write mask for idregs */
- 	u64 val;
+ #define __vcpu_sys_reg(v,r)						\
 -- 
 2.51.1.838.g19442a804e-goog
 
