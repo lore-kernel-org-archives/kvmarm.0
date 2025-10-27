@@ -1,152 +1,137 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A65D2FBE15
-	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6162FB98B
+	for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 11:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761565085; cv=none; b=gedcPYUQ9V+KRM1EiGEHkQOEwBlpfdhDa7YhgEosXSnu/SRUQi95aIaxCsRrWTjJb7EDBwJoYnG7COXZF6rDgiSx3w9XodxnuIMf4xmQcOkG6Rlz9Sv8HRCNZwFdu+RVsb7ozDpuaEu44+4tTJmrHne5vFq/zD504ZdvfBgg2Xs=
+	t=1761565188; cv=none; b=i3RWkPVbUyeRGoL+L5HOM/NEEp/V9NbkBs0/WNCyhYyrZLZlU7hSfPxEcNY6A38DaoweIop1PzDDr3Q7yp24KC2KoqfC1gg35SQzB/bqnwj0QxKqBeH4BrrOdVy3ylhJ9Kiq6vRS0nTYFie+thNc65XhcLuXijQ6gfFELiscbwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761565085; c=relaxed/simple;
-	bh=JtPobr8U8OyEtWz0+PGGaZRwq4swI0tEr8EEUNz/8Bo=;
-	h=Date:From:To:cc:Subject:Message-ID:MIME-Version:Content-Type; b=dpBBjhkDnuQnCxkK7xc+rnSiXC1l5K8N/91y4dyyJ/SVo8hGEC9AzxhVar2iVm76Hb+DpvA49dopu6tPYv1nDRQPq0G52Sui9n5w8CSfJD3QMPmkJNsuf1b9DYQ0g36MI6ymhjFTpo2L6yTQjtY8SiKG3FyTeMkDzk//BsphN38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJ3dEIKA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761565188; c=relaxed/simple;
+	bh=uyG88eoeNDcrOWdUXNcbGFhXSLdBDCgZmTPebSjOGmA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AEYH+8tzEjkJmofYKheUCWIiBdnC8P40XASffYEZWXuAAJVJWjAta2sRM4PHljBVV81SKgM5kdssqpXNHW7aaUhoEIfHVOG2PxkGFtbbX6RCQPOrFcQbs8g7i7QCJQM6hmHcHdGwicfThep5z2dTJYabg7bSOVsME4Wt4bIufhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oYc4hX+m; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJ3dEIKA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761565083;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=0IYenQhIa9PZj00vW7IIruD0UnAnXJ3V9tGf3ph9/f0=;
-	b=KJ3dEIKAHSFiz4goVblGUoKumA6UI50fLNVvCWXzO71iOkFMO17qg2U3eFpqplXUMIkz69
-	CrNKVfvgkgDkCOUHWnCjPZT0G1RmsH+FOx53BXv8btG29f5UZuW/8yp7XcrQhtrfWQMJlP
-	AnpUVV/0SKkxfs7AxX8sE1EnUNyQWwg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-176-BqyPbWcFM6OX82aD0l9LgQ-1; Mon, 27 Oct 2025 07:37:58 -0400
-X-MC-Unique: BqyPbWcFM6OX82aD0l9LgQ-1
-X-Mimecast-MFC-AGG-ID: BqyPbWcFM6OX82aD0l9LgQ_1761565077
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42700099ff5so4246106f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 04:37:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oYc4hX+m"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477113a50fcso10351865e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 27 Oct 2025 04:39:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761565185; x=1762169985; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=W3zZy85oW98LmzlLLVlNLP/kxDk+jUE3Sk+1kWzQBq8=;
+        b=oYc4hX+mGPhrxJdkBxiryBbGz/SJ4LIVWfpz1tXgzGkZiV9oWRyIoQ+92RXw9N0uQz
+         46qJKTSQ6CNzLCwuhSO6kKgePiv8ugpTwaaDwfuo1LST0CjqGaURNyGVZjO3r/dpTViG
+         GA23ofiUWUgHSCF1bo3OBS7dICA5YcsMcvwjB+eKX5wvoBU+Q3ZyLmdwesyeShmp0Fia
+         ymc0w9SGGlUA/+eEhEAOINirUL6lOqooIXs3W2835mdzVQ7tFxKpYi4Gij3ZcOUy8Kqc
+         0bnN/bcC6SNObckin+reGboLcb40FKGMm8jy9DitdTB8nCO9GHJWWVvVJ6qFADha2cs/
+         4UYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761565077; x=1762169877;
-        h=mime-version:message-id:subject:cc:to:from:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1761565185; x=1762169985;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0IYenQhIa9PZj00vW7IIruD0UnAnXJ3V9tGf3ph9/f0=;
-        b=cyHJVf1u6dSO8B/pbpDYOHotYOY/WCHZjsGgT6SG/Rq+llDa1dFJtoXWBUrL40yl8Q
-         nuExeNKazM82JU+WcSWrjMKLZefAeZ6sUhoYMqHeRu7m+16K3uZL2QNC22NOI3GOQgE9
-         mqCPi2GXAva1Ynu4/d5zp8a90eVCeL6mZh/qwXwfDmt6PG8WoGbnPSrRWi+RY6ls/RvO
-         8qrhShJ+ljm4PqTa7nwt4SAMZuv7dslLWNGv9w0p+T3ZTf8OjmwoQoeRN0wxYhuB0MHe
-         NkbOPrTEIno+eYZaP4QqRd7n8mCTxdL5bl0tnswjPvBPi44ZDPv9guipsgFRw3uBXu+Q
-         DxBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQIqoH6KJGiF9fX0JuIpJt8wJIGO1mTPoEaPgjLbCAoJ/LvL/Xo/zPOmHEzltxnNl7MShEImM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy/C/nbI437lyKmaLIQwqscveslMtyBm7zmINXw03OcshxMSYFC
-	4bNQWZCjlVU+sZjvpVy3ASAQr2qCCSgmBYkegh9tTNmcFa2LZZHPNUFQkAzkil2bbmYGvKmnwT3
-	IALqrt397behgOc2jOSqBywCI+ijDjdiGYG78Gh/1zxDK1442ybo+F4UUuQ==
-X-Gm-Gg: ASbGncsmaGfdn0TuA+DUYFQLLviM7kzD49BJmdk59xpA2ULXp+hqvz7+GFfSWuq6eF9
-	yEMq69nxzNtlk0dFrm5UTqVVeT+41zcJTakUqUwzaEbM02QyiNB9+CMPggjM3pPkC0u9fRDIY+F
-	lvTXdpSI3qcPPNVKVvaySSj/ixwEweKJgeRd/Do7a2m/7Au8skmBFxTTDFpychA8PaZJgaVxHJg
-	LRYuwRHfiRdwR4UQhgMilTz61UjjEA9BYUbx+HFLINCm+pE9baLIgP5E3T+WttkGDfW3cicy7bt
-	g8m2JivRzVoyn4i8mSOH70WvJd5xTMtTxi98io4lD9nJdqqjO8clMyXtlOtPKeIp4YUGb7h8lBU
-	I4dVbMjmcaZMlOFW7mP4qnPHP2C4of59ksJ3//9xMzM5s7oOC
-X-Received: by 2002:a5d:5c89:0:b0:425:7406:d298 with SMTP id ffacd0b85a97d-42704d7e9ebmr30407490f8f.5.1761565076780;
-        Mon, 27 Oct 2025 04:37:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGx4uKgsYoM0fU52HYyWEvQMrYgypwVSrAUmI9lNjcwUX5i2uMZCdkDcF1SDu586SVN9WApQ==
-X-Received: by 2002:a5d:5c89:0:b0:425:7406:d298 with SMTP id ffacd0b85a97d-42704d7e9ebmr30407464f8f.5.1761565076305;
-        Mon, 27 Oct 2025 04:37:56 -0700 (PDT)
-Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952cb7e8sm14108931f8f.19.2025.10.27.04.37.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Oct 2025 04:37:55 -0700 (PDT)
-Date: Mon, 27 Oct 2025 12:37:54 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-    Sascha Bischoff <Sascha.Bischoff@arm.com>
-cc: Suzuki K Poulose <suzuki.poulose@arm.com>, 
-    Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>, 
-    Joey Gouly <joey.gouly@arm.com>, Will Deacon <will@kernel.org>, 
-    linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-    linux-kernel@vger.kernel.org
-Subject: Failing no-vgic-v3 test
-Message-ID: <f9c7fffa-53ba-a506-b48b-07e3df2d1d5a@redhat.com>
+        bh=W3zZy85oW98LmzlLLVlNLP/kxDk+jUE3Sk+1kWzQBq8=;
+        b=kg43qo/vx5tg/n1yLim3GHHcsV93hf4Uc/ZrJqDh1TAlmH1KH8kH7TZRgpZ6ri4aub
+         RmEswo9u6Dz1eldeHS65P82Rp5nh5zyWJ+j5RdXQMwFnda7Qk9PcHci3vAhyz06pdbOY
+         2jxONnAgTSMD29v/STNlbLbvupnwJwruAmbCWYaV31uEj+3JDhkhh8XhxDM6u7XtTl+1
+         srx9Ik95nP2DZKbP5ezwoyLd/bNYEVeofajHV472r3kc2pG2gxtV+qv/44l3E+rZHkSK
+         0R54Fa6rLppwOYWYuCRuiCFC0pxID7zwiEOkCBcaVJZJTWettz3uvwF2/K78QgmEMAEu
+         Dkig==
+X-Gm-Message-State: AOJu0YwPbce2GkPjJfdTOV+EtC0NB2jA2MxJ97ZBBiiN95ebbjCrbGKz
+	Q25B0kygZQA+jGEPNJt0Iz58LNK399NX2b0zYqnV3SSIRSFqC4vqeA9SdFCdvQwZtc+32gCQVVu
+	eummjZMgUEufr9qvgh5LjYqvxEX22YrxddOLx3xJeGQwWou+tYoBzbaDC1H4K/YOYGRTpUjXWcd
+	JLAyPj7sZOOQDhT+BjCoxl42pP9Qq3sAM=
+X-Google-Smtp-Source: AGHT+IGfIk/DDRBImLoLQrIA8NfRPRuJ6G5SFEtQg8ZEUOxNLLwzjWpF+jFxftbCRBMSKvrx+1GVUBgyOw==
+X-Received: from wmwo28.prod.google.com ([2002:a05:600d:439c:b0:471:6089:1622])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3e07:b0:46e:450d:e037
+ with SMTP id 5b1f17b1804b1-4711786c560mr290520485e9.5.1761565184474; Mon, 27
+ Oct 2025 04:39:44 -0700 (PDT)
+Date: Mon, 27 Oct 2025 11:39:39 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: KQABKHCGjWZhJXl9D2ZKdIWiOgIAmuf6R4YDMA9Ce30_1761565077
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.838.g19442a804e-goog
+Message-ID: <20251027113943.1282568-1-tabba@google.com>
+Subject: [PATCH v1 0/4] KVM: arm64: Prevent sysreg helper parameter transposition
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hey,
+Some of the KVM/arm64 sysreg helper functions and macros, such as
+vcpu_write_sys_reg() and __vcpu_assign_sys_reg(), are prone to parameter
+transposition bugs. The 'reg'/'r' (enum vcpu_sysreg) and 'val'/'v' (u64)
+can be easily swapped, as the types are not distinct enough to be caught
+by the compiler.
 
-on an ampere altra I've got a sad selftest:
+There are a few functions and macros that have similar parameters and
+behavior, e.g., vcpu_write_sys_reg(), __vcpu_assign_sys_reg(), and
+__vcpu_rmw_sys_reg(). However, the ordering of the reg and value
+parameters is not consitent across them [*].
 
-[root@virtlab-arm11 kvm]# ./arm64/no-vgic-v3
-Random seed: 0x6b8b4567
-==== Test Assertion Failure ====
-   arm64/no-vgic-v3.c:66: handled
-   pid=3793 tid=3793 errno=4 - Interrupted system call
-      1  0x0000000000402feb: test_run_vcpu at no-vgic-v3.c:128
-      2  0x000000000040214f: test_guest_no_gicv3 at no-vgic-v3.c:155 (discriminator 17)
-      3   (inlined by) main at no-vgic-v3.c:174 (discriminator 17)
-      4  0x0000ffff873eb587: ?? ??:0
-      5  0x0000ffff873eb65f: ?? ??:0
-      6  0x00000000004022af: _start at ??:?
-   ICC_PMR_EL1 no read trap
+Moreover, there is neither a compile time nor a runtime check that
+catches these errors. This has caused at least one bug that made it
+upsteam: commit 798eb5978700 ("KVM: arm64: Sync protected guest VBAR_EL1
+on injecting an undef exception"), and other kernel developers have also
+run into similar issues from speaking to them.
 
-This is a guest without VGICv3 on GICv3 HW. The test expects UNDEF on reg
-access - which is not happening since:
+This series addresses this in two ways:
 
-3193287ddffb KVM: arm64: gic-v3: Only set ICH_HCR traps for v2-on-v3 or v3 guests
+* The parameter order of vcpu_write_sys_reg() is changed from (vcpu,
+  val, reg) to (vcpu, reg, val), making it consistent with similar
+  functions and macros.
+* Compile-time checks are added to prevent the 'reg' parameter from
+  having a 'u64' type, which directly catches the transposition bug.
 
-As a local fix I've done:
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 6fbb4b099855..1fe53a021926 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -297,11 +297,15 @@ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
-  {
-  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
+No functional change is intended in this series.
 
-  	if (!vgic_is_v3(vcpu->kvm))
-  		return;
+Based on Linux 6.18-rc3.
 
-  	/* Hide GICv3 sysreg if necessary */
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-+	if (!kvm_has_gicv3(vcpu->kvm) ||
-+	    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-  		vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
-  				      ICH_HCR_EL2_TC);
-  		return;
+Cheers,
+/fuad
+
+[*] Just take look at __vcpu_write_sys_reg() in
+  arch/arm64/kvm/hyp/exception.c for example:
+
+static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+{
+	if (has_vhe())
+		vcpu_write_sys_reg(vcpu, val, reg);
+	else
+		__vcpu_assign_sys_reg(vcpu, reg, val);
+}
+
+Fuad Tabba (4):
+  KVM: arm64: Switch reg and val parameter ordering in
+    vcpu_write_sys_reg()
+  KVM: arm64: Add compile-time type check for register in
+    __vcpu_assign_sys_reg()
+  KVM: arm64: Add compile-time type check to vcpu_write_sys_reg()
+  KVM: arm64: Add compile-time type check for register in
+    __vcpu_rmw_sys_reg()
+
+ arch/arm64/include/asm/kvm_emulate.h |  2 +-
+ arch/arm64/include/asm/kvm_host.h    | 44 ++++++++++++++++------------
+ arch/arm64/kvm/at.c                  |  6 ++--
+ arch/arm64/kvm/emulate-nested.c      |  4 +--
+ arch/arm64/kvm/hyp/exception.c       | 14 ++++-----
+ arch/arm64/kvm/hyp/vhe/switch.c      |  2 +-
+ arch/arm64/kvm/inject_fault.c        | 16 +++++-----
+ arch/arm64/kvm/nested.c              |  4 +--
+ arch/arm64/kvm/pmu-emul.c            |  7 +++--
+ arch/arm64/kvm/sys_regs.c            | 16 +++++-----
+ arch/arm64/kvm/sys_regs.h            |  2 +-
+ 11 files changed, 63 insertions(+), 54 deletions(-)
 
 
-but following the intention of the patch above maybe we should do smth
-like:
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 6fbb4b099855..1fe53a021926 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -297,11 +297,15 @@ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
-  {
-  	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
-
-  	if (!vgic_is_v3(vcpu->kvm))
-  		return;
-
-  	/* Hide GICv3 sysreg if necessary */
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64PFR0_EL1, GIC, NI) ||
-+	    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-  		vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
-  				      ICH_HCR_EL2_TC);
-  		return;
-
-Thoughts?
-Sebastian
+base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
+-- 
+2.51.1.838.g19442a804e-goog
 
