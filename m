@@ -1,55 +1,55 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A93236B961
-	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 22:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47C536B98A
+	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 22:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761692339; cv=none; b=HY5tZYRl2+k6mE8epO3hBkgqcgNXMabXvT9XBH2yZDBzyWGg2oSkk5T8oP15Q12CRv4fSv5nqJ/K6Dl/0QNXcKpGkad/K4Ragyb2BBRqwXZ1PuRwQHTft56D8YPqtvoZtz+zkbiRjJKesLIIHrD8DD1pmTZPj7bODWQuAmHytfY=
+	t=1761692341; cv=none; b=Hjuzm6jYuGLhSymgyjhO8yR4PSOFoEPPNrXHFLInVzbWyLiR4tuSIoaloD956aiM0J/R1X27pyWW4Ux1mt9eRV5ZL0930ypSEzISy+S0ZocsqVfNM758Ban7Md0oo54M2zJ4OTebZr1m2sXQF35TmA+ecaot7HawKSiLU4aNcoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761692339; c=relaxed/simple;
-	bh=6S5tzR8kzOK7LjG9F9GQo6jk0uAJ9VKQm3dBNs63myU=;
+	s=arc-20240116; t=1761692341; c=relaxed/simple;
+	bh=93vaNyyTFMuDYRMt2Na8Hg8PCoyUTl7Q8NM8sIET3Q0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=TiZh/oYDgOtiAn7jM0FpNPsxm2NiGUXLRaGhxaA4671Qkr+sIf3+vDLlsFBmIGk+ZRQAPxUYqOfDp0Ya8wq1vGl8AEyGhn5gP1xU5SUAHw8kFVsV/2zpswY2XdYV6GuS3OyKkd+gefkAoQWTDeARa5IbgFB2YA+wDgn0ezYbDBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z5nfevA8; arc=none smtp.client-ip=209.85.216.74
+	 To:Content-Type; b=DYclpUBP935W2I9B5jF5DyVdKYRkrMtByoiIzASflZA/w4xBGEXLjn3/RJmkS2LD7RaydUgE0d8FGYMVh1u4LLj7QLm6Z3sclI2wD4qXoCAzAohl3NKDaoGqQtaXboD4L+6AJkVYZNVMuXWhe/zBWKbygJfgKUk8uBuJiNnGbSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2X1KZY6; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z5nfevA8"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33bdd0479a9so6655356a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 15:58:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2X1KZY6"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bb4d11f5eso6272019a91.3
+        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 15:58:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761692336; x=1762297136; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761692338; x=1762297138; darn=lists.linux.dev;
         h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ip0GSPcOf73baSNEbw06pVGhZdDHrjVOI7is0zaeU+I=;
-        b=z5nfevA875hAtDUp9E15tsSOAfFcnG9fPBlxqLtK7eoLjYM3TO7V/r2rAd+Nff9VTL
-         oOmWBullz3ivdxCeqeENhTEQaVbWv5GpIEBPz7pZYqma5gfQ9TvajSdtN4+ZK+Z6btIf
-         odoe3bkBqh2sz9H/Dw8YNH0X0Mg+DHT/16OEXIL2bVlqyWpX+S9oi3wvdm4ibrkR+L1S
-         L2rPC/SA6d8CalCWG1Z+mXSu0k5kgT3eUwoXsacR8itjHtAuUqgzYDvVA/88foTOXEB/
-         U2x4vJVxc4gxEW6xYNIzMa1x6zeDu7tYjZxjcdoLIon0cZYc3MyACzssbFeTcAJ3yaaZ
-         GwhA==
+        bh=CXlFQqVkeSJSGq4nf4h9sY1cU7UxsK+01O4a1p4Iox8=;
+        b=U2X1KZY6UicK04/TWeFL8Xgi4P163YiJ7DYRSL2AQMq96zplOoHS93kgH+e8JQAMTw
+         egl9yk+tbI1Zcfdalq706qUytVynMkBPSSUjzqfhu95BXk5UVS3BbBmsxJX/rkAgeI7Q
+         klw3xUf5U8xK1gm8c7vpvi/xn0qjxE5xqCs3yH/OxqkztIHcqv7xd9W4h4Ir1aZtIVWD
+         ECnMcon+boFbP9Nb9isInSoLieW3069Emwu8HsaVQNTftKzbDVSk5/sZeLj+9R2ipYrY
+         KCulPib6UN2XeHKEyeqFV6IszCzcKbRJ3pV0VymXMDPFCioQQXauLHMh1jr9UJkm6x7e
+         EeEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761692336; x=1762297136;
+        d=1e100.net; s=20230601; t=1761692338; x=1762297138;
         h=to:from:subject:message-id:references:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ip0GSPcOf73baSNEbw06pVGhZdDHrjVOI7is0zaeU+I=;
-        b=w2fPw8LTnLUvLK4++uBwlnpSgs8ZWNuXDk23PZgP2UgVaFCeYd10d6nbVT165g/V2h
-         YJdRWA4dS1r4TOBsPiqvVAWVmYsvQ/B/NjZUhJagvL1Pkzs7d/EiFxPDepyVaxyNmwGM
-         ITgruJ7o83U+jZT8cRCr1+F0JrzRJD+Jzf8FBK3U6a8n4bNpzFzhk1cK9G5B+/EttK5Z
-         lPUoQxNJvwFkSokfW7kAavk14fF+gUMKwrxSPKASb9eAbvi9YiyOVDlBhlW/T5EVpMH6
-         ZM+jTfyChcY9mCpoHckjw2nu4s8jtfUTi0Ujobp5xUmlReAvL73HYVV7974mCjM+11gR
-         t60g==
-X-Forwarded-Encrypted: i=1; AJvYcCUu7dKcFGAiBbCrRkrox2DkzJMA/gaCD2OTfgK0Trv+QxZIKtS05BlSFAHD6q+pYziS8gKJGgg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxhJoXCQ4BlvIIhb9rBZ1G+10Pg10nFOrllzLKYyubCZl1TU+BQ
-	kW1GysDQFCLJltng8DZjypOzwN+7oLOAk112fK2Dc1iBJunMC8gUYx26gJ9P7GvO58lb/VUJK3I
-	tK8QbcDrNPPVJYA==
-X-Google-Smtp-Source: AGHT+IEocRZ/8v9VtAgKKGORzHoS2iGayjZS+sqTWSEnk3iM6JDQKTWbdjJDm+53lGtYfikxVTGa+6PFwz1akg==
-X-Received: from pjtf19.prod.google.com ([2002:a17:90a:c293:b0:33b:da89:9788])
+        bh=CXlFQqVkeSJSGq4nf4h9sY1cU7UxsK+01O4a1p4Iox8=;
+        b=d/7r59Xqo7MlfE+UfKnPJx2Yy7brB+Yss1qOlxy9OftSpJESpqrla/ZSaKi16sfNxi
+         GfnNwuoGKOTm0XYSQ6xPnF0GpZ5wi80tsLbnXq4Sj+fuUxxOAsHmVGdgJ4kARuB+t3dH
+         PlT9Ljf5TeCkQXtL4crXkUZSJO/LYGwO6c3J6GsZJTA/4VNxGKcLVp7rw9cnxCw7+iyA
+         cW/T87sjn0/vGxqUdkPudzQukBajU06/nAUW96vXrXTPspQrkLf/LlFmnM0X+ogVp7GC
+         h5wLYeEFCe3Xc4G+qIAiQwlWuzrb9XfE340awriq6G21HWKMi4gRQ4C715CYlrEO8TO7
+         n8cA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXysxlZWbmHCxASCmAMQ+G6GMAopxXWj7fPO+7zv7FDryDtxAO28uiupExqdI+FZ96jLqMUwg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyYY2IMtWBB8pv5Nf7y+ZquWYwrhxMyTQ9O/eCeqz9ICVqQpQnk
+	kYUr0W8OKXdCpRAf9lCd4ChgVaCQ4Va/v2KsGpax2GZu523tbqw8x8hr/Jr4vW0vtnRS0tDUFOA
+	cljObjlXOh1PcjA==
+X-Google-Smtp-Source: AGHT+IHe+dJhfOO9m6uEQXw3DM1SrUYb2gIMsEhaThpkWaKsrk/O7HUYRRmxDYScsO608Odc0oikNMx/xTBT8Q==
+X-Received: from pjbsw13.prod.google.com ([2002:a17:90b:2c8d:b0:33f:e888:4aad])
  (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:1d4c:b0:340:29cf:221f with SMTP id 98e67ed59e1d1-3403a2a3952mr713832a91.33.1761692336600;
- Tue, 28 Oct 2025 15:58:56 -0700 (PDT)
-Date: Tue, 28 Oct 2025 15:30:41 -0700
+ 2002:a17:90b:586e:b0:340:299f:e244 with SMTP id 98e67ed59e1d1-3403a26906cmr820669a91.12.1761692337855;
+ Tue, 28 Oct 2025 15:58:57 -0700 (PDT)
+Date: Tue, 28 Oct 2025 15:30:42 -0700
 In-Reply-To: <20251028225827.2269128-1-jmattson@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251028225827.2269128-1-jmattson@google.com>
 X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251028225827.2269128-4-jmattson@google.com>
-Subject: [PATCH v2 3/4] KVM: selftests: Change VM_MODE_PXXV48_4K to VM_MODE_PXXVYY_4K
+Message-ID: <20251028225827.2269128-5-jmattson@google.com>
+Subject: [PATCH v2 4/4] KVM: selftests: Add a VMX test for LA57 nested state
 From: Jim Mattson <jmattson@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
 	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
@@ -73,233 +73,170 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Use 57-bit addresses with 5-level paging on hardware that supports
-LA57. Continue to use 48-bit addresses with 4-level paging on hardware
-that doesn't support LA57.
+Add a selftest that verifies KVM's ability to save and restore
+nested state when the L1 guest is using 5-level paging and the L2
+guest is using 4-level paging. Specifically, canonicality tests of
+the VMCS12 host-state fields should accept 57-bit virtual addresses.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- .../testing/selftests/kvm/include/kvm_util.h  |  4 +--
- .../selftests/kvm/include/x86/processor.h     |  2 +-
- .../selftests/kvm/lib/arm64/processor.c       |  2 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 30 ++++++++++---------
- .../testing/selftests/kvm/lib/x86/processor.c | 30 +++++++++++--------
- tools/testing/selftests/kvm/lib/x86/vmx.c     |  6 ++--
- 6 files changed, 40 insertions(+), 34 deletions(-)
+ tools/testing/selftests/kvm/Makefile.kvm      |   1 +
+ .../kvm/x86/vmx_la57_nested_state_test.c      | 134 ++++++++++++++++++
+ 2 files changed, 135 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index d3f3e455c031..8a54a1279d44 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -177,7 +177,7 @@ enum vm_guest_mode {
- 	VM_MODE_P40V48_4K,
- 	VM_MODE_P40V48_16K,
- 	VM_MODE_P40V48_64K,
--	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
-+	VM_MODE_PXXVYY_4K,	/* For 48-bit or 57-bit VA, depending on host support */
- 	VM_MODE_P47V64_4K,
- 	VM_MODE_P44V64_4K,
- 	VM_MODE_P36V48_4K,
-@@ -219,7 +219,7 @@ extern enum vm_guest_mode vm_mode_default;
- 
- #elif defined(__x86_64__)
- 
--#define VM_MODE_DEFAULT			VM_MODE_PXXV48_4K
-+#define VM_MODE_DEFAULT			VM_MODE_PXXVYY_4K
- #define MIN_PAGE_SHIFT			12U
- #define ptes_per_page(page_size)	((page_size) / 8)
- 
-diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-index 51cd84b9ca66..57d62a425109 100644
---- a/tools/testing/selftests/kvm/include/x86/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86/processor.h
-@@ -1441,7 +1441,7 @@ enum pg_level {
- 	PG_LEVEL_2M,
- 	PG_LEVEL_1G,
- 	PG_LEVEL_512G,
--	PG_LEVEL_NUM
-+	PG_LEVEL_256T
- };
- 
- #define PG_LEVEL_SHIFT(_level) ((_level - 1) * 9 + 12)
-diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
-index 54f6d17c78f7..d46e4b13b92c 100644
---- a/tools/testing/selftests/kvm/lib/arm64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
-@@ -324,7 +324,7 @@ void aarch64_vcpu_setup(struct kvm_vcpu *vcpu, struct kvm_vcpu_init *init)
- 
- 	/* Configure base granule size */
- 	switch (vm->mode) {
--	case VM_MODE_PXXV48_4K:
-+	case VM_MODE_PXXVYY_4K:
- 		TEST_FAIL("AArch64 does not support 4K sized pages "
- 			  "with ANY-bit physical address ranges");
- 	case VM_MODE_P52V48_64K:
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1a93d6361671..364efd02ad4a 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -201,7 +201,7 @@ const char *vm_guest_mode_string(uint32_t i)
- 		[VM_MODE_P40V48_4K]	= "PA-bits:40,  VA-bits:48,  4K pages",
- 		[VM_MODE_P40V48_16K]	= "PA-bits:40,  VA-bits:48, 16K pages",
- 		[VM_MODE_P40V48_64K]	= "PA-bits:40,  VA-bits:48, 64K pages",
--		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
-+		[VM_MODE_PXXVYY_4K]	= "PA-bits:ANY, VA-bits:48 or 57, 4K pages",
- 		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
- 		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
- 		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
-@@ -228,7 +228,7 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_P40V48_4K]	= { 40, 48,  0x1000, 12 },
- 	[VM_MODE_P40V48_16K]	= { 40, 48,  0x4000, 14 },
- 	[VM_MODE_P40V48_64K]	= { 40, 48, 0x10000, 16 },
--	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
-+	[VM_MODE_PXXVYY_4K]	= {  0,  0,  0x1000, 12 },
- 	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
- 	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
- 	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
-@@ -310,24 +310,26 @@ struct kvm_vm *____vm_create(struct vm_shape shape)
- 	case VM_MODE_P36V47_16K:
- 		vm->pgtable_levels = 3;
- 		break;
--	case VM_MODE_PXXV48_4K:
-+	case VM_MODE_PXXVYY_4K:
- #ifdef __x86_64__
- 		kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
- 		kvm_init_vm_address_properties(vm);
--		/*
--		 * Ignore KVM support for 5-level paging (vm->va_bits == 57),
--		 * it doesn't take effect unless a CR4.LA57 is set, which it
--		 * isn't for this mode (48-bit virtual address space).
--		 */
--		TEST_ASSERT(vm->va_bits == 48 || vm->va_bits == 57,
--			    "Linear address width (%d bits) not supported",
--			    vm->va_bits);
+diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
+index 148d427ff24b..b9279ce4eaab 100644
+--- a/tools/testing/selftests/kvm/Makefile.kvm
++++ b/tools/testing/selftests/kvm/Makefile.kvm
+@@ -117,6 +117,7 @@ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
+ TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
+ TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
+ TEST_GEN_PROGS_x86 += x86/vmx_set_nested_state_test
++TEST_GEN_PROGS_x86 += x86/vmx_la57_nested_state_test
+ TEST_GEN_PROGS_x86 += x86/vmx_tsc_adjust_test
+ TEST_GEN_PROGS_x86 += x86/vmx_nested_tsc_scaling_test
+ TEST_GEN_PROGS_x86 += x86/apic_bus_clock_test
+diff --git a/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
+new file mode 100644
+index 000000000000..00c6327d5621
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
+@@ -0,0 +1,134 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * vmx_la57_nested_state_test
++ *
++ * Copyright (C) 2025, Google LLC.
++ *
++ * Test KVM's ability to save and restore nested state when the L1 guest
++ * is using 5-level paging and the L2 guest is using 4-level paging.
++ *
++ * This test would have failed prior to commit 9245fd6b8531 ("KVM: x86:
++ * model canonical checks more precisely").
++ */
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++#include "vmx.h"
 +
- 		pr_debug("Guest physical address width detected: %d\n",
- 			 vm->pa_bits);
--		vm->pgtable_levels = 4;
--		vm->va_bits = 48;
-+		pr_debug("Guest virtual address width detected: %d\n",
-+			 vm->va_bits);
++#define LA57_GS_BASE 0xff2bc0311fb00000ull
 +
-+		if (vm->va_bits == 57) {
-+			vm->pgtable_levels = 5;
-+		} else {
-+			TEST_ASSERT(vm->va_bits == 48,
-+				    "Unexpected guest virtual address width: %d",
-+				    vm->va_bits);
-+			vm->pgtable_levels = 4;
++static void l2_guest_code(void)
++{
++	/*
++	 * Sync with L0 to trigger save/restore.  After
++	 * resuming, execute VMCALL to exit back to L1.
++	 */
++	GUEST_SYNC(1);
++	vmcall();
++}
++
++static void l1_guest_code(struct vmx_pages *vmx_pages)
++{
++#define L2_GUEST_STACK_SIZE 64
++	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
++	u64 guest_cr4;
++	vm_paddr_t pml5_pa, pml4_pa;
++	u64 *pml5;
++	u64 exit_reason;
++
++	/* Set GS_BASE to a value that is only canonical with LA57. */
++	wrmsr(MSR_GS_BASE, LA57_GS_BASE);
++	GUEST_ASSERT(rdmsr(MSR_GS_BASE) == LA57_GS_BASE);
++
++	GUEST_ASSERT(vmx_pages->vmcs_gpa);
++	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
++	GUEST_ASSERT(load_vmcs(vmx_pages));
++
++	prepare_vmcs(vmx_pages, l2_guest_code,
++		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
++
++	/*
++	 * Set up L2 with a 4-level page table by pointing its CR3 to
++	 * L1's first PML4 table and clearing CR4.LA57. This creates
++	 * the CR4.LA57 mismatch that exercises the bug.
++	 */
++	pml5_pa = get_cr3() & PHYSICAL_PAGE_MASK;
++	pml5 = (u64 *)pml5_pa;
++	pml4_pa = pml5[0] & PHYSICAL_PAGE_MASK;
++	vmwrite(GUEST_CR3, pml4_pa);
++
++	guest_cr4 = vmreadz(GUEST_CR4);
++	guest_cr4 &= ~X86_CR4_LA57;
++	vmwrite(GUEST_CR4, guest_cr4);
++
++	GUEST_ASSERT(!vmlaunch());
++
++	exit_reason = vmreadz(VM_EXIT_REASON);
++	GUEST_ASSERT(exit_reason == EXIT_REASON_VMCALL);
++}
++
++void guest_code(struct vmx_pages *vmx_pages)
++{
++	l1_guest_code(vmx_pages);
++	GUEST_DONE();
++}
++
++int main(int argc, char *argv[])
++{
++	vm_vaddr_t vmx_pages_gva = 0;
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	struct kvm_x86_state *state;
++	struct ucall uc;
++	int stage;
++
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57));
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
++
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++
++	/*
++	 * L1 needs to read its own PML5 table to set up L2. Identity map
++	 * the PML5 table to facilitate this.
++	 */
++	virt_map(vm, vm->pgd, vm->pgd, 1);
++
++	vcpu_alloc_vmx(vm, &vmx_pages_gva);
++	vcpu_args_set(vcpu, 1, vmx_pages_gva);
++
++	for (stage = 1;; stage++) {
++		vcpu_run(vcpu);
++		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			/* NOT REACHED */
++		case UCALL_SYNC:
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
 +		}
- #else
--		TEST_FAIL("VM_MODE_PXXV48_4K not supported on non-x86 platforms");
-+		TEST_FAIL("VM_MODE_PXXVYY_4K not supported on non-x86 platforms");
- #endif
- 		break;
- 	case VM_MODE_P47V64_4K:
-diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-index 720c678187b5..40bd69b265ef 100644
---- a/tools/testing/selftests/kvm/lib/x86/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-@@ -158,10 +158,10 @@ bool kvm_is_tdp_enabled(void)
- 
- void virt_arch_pgd_alloc(struct kvm_vm *vm)
- {
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
--		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
-+		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
- 
--	/* If needed, create page map l4 table. */
-+	/* If needed, create the top-level page table. */
- 	if (!vm->pgd_created) {
- 		vm->pgd = vm_alloc_page_table(vm);
- 		vm->pgd_created = true;
-@@ -221,8 +221,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
- 	uint64_t *pte = &vm->pgd;
- 	int current_level;
- 
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K,
--		    "Unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
-+		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
- 
- 	TEST_ASSERT((vaddr % pg_size) == 0,
- 		    "Virtual address not aligned,\n"
-@@ -307,27 +307,28 @@ static bool vm_is_target_pte(uint64_t *pte, int *level, int current_level)
- uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
- 				    int *level)
- {
-+	int va_width = 12 + (vm->pgtable_levels) * 9;
- 	uint64_t *pte = &vm->pgd;
- 	int current_level;
- 
- 	TEST_ASSERT(!vm->arch.is_pt_protected,
- 		    "Walking page tables of protected guests is impossible");
- 
--	TEST_ASSERT(*level >= PG_LEVEL_NONE && *level < PG_LEVEL_NUM,
-+	TEST_ASSERT(*level >= PG_LEVEL_NONE && *level <= vm->pgtable_levels,
- 		    "Invalid PG_LEVEL_* '%d'", *level);
- 
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
--		"unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
-+		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
- 	TEST_ASSERT(sparsebit_is_set(vm->vpages_valid,
- 		(vaddr >> vm->page_shift)),
- 		"Invalid virtual address, vaddr: 0x%lx",
- 		vaddr);
- 	/*
--	 * Based on the mode check above there are 48 bits in the vaddr, so
--	 * shift 16 to sign extend the last bit (bit-47),
-+	 * Check that the vaddr is a sign-extended va_width value.
- 	 */
--	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
--		"Canonical check failed.  The virtual address is invalid.");
-+	TEST_ASSERT(vaddr ==
-+		    (((int64_t)vaddr << (64 - va_width) >> (64 - va_width))),
-+		    "Canonical check failed.  The virtual address is invalid.");
- 
- 	for (current_level = vm->pgtable_levels;
- 	     current_level > PG_LEVEL_4K;
-@@ -520,7 +521,8 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- {
- 	struct kvm_sregs sregs;
- 
--	TEST_ASSERT_EQ(vm->mode, VM_MODE_PXXV48_4K);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
-+		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
- 
- 	/* Set mode specific system register values. */
- 	vcpu_sregs_get(vcpu, &sregs);
-@@ -534,6 +536,8 @@ static void vcpu_init_sregs(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 	sregs.cr4 |= X86_CR4_PAE | X86_CR4_OSFXSR;
- 	if (kvm_cpu_has(X86_FEATURE_XSAVE))
- 		sregs.cr4 |= X86_CR4_OSXSAVE;
-+	if (vm->pgtable_levels == 5)
-+		sregs.cr4 |= X86_CR4_LA57;
- 	sregs.efer |= (EFER_LME | EFER_LMA | EFER_NX);
- 
- 	kvm_seg_set_unusable(&sregs.ldt);
-diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-index d4d1208dd023..3bb529e8720f 100644
---- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-+++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-@@ -401,11 +401,11 @@ void __nested_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
- 	struct eptPageTableEntry *pt = vmx->eptp_hva, *pte;
- 	uint16_t index;
- 
--	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
--		    "unknown or unsupported guest mode, mode: 0x%x", vm->mode);
-+	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
-+		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
- 
- 	TEST_ASSERT((nested_paddr >> 48) == 0,
--		    "Nested physical address 0x%lx requires 5-level paging",
-+		    "Nested physical address 0x%lx is > 48-bits and requires 5-level EPT",
- 		    nested_paddr);
- 	TEST_ASSERT((nested_paddr % page_size) == 0,
- 		    "Nested physical address not on page boundary,\n"
++
++		TEST_ASSERT(uc.args[1] == stage,
++			    "Expected stage %d, got stage %lu", stage, (ulong)uc.args[1]);
++		if (stage == 1) {
++			pr_info("L2 is active; performing save/restore.\n");
++			state = vcpu_save_state(vcpu);
++
++			kvm_vm_release(vm);
++
++			/* Restore state in a new VM. */
++			vcpu = vm_recreate_with_one_vcpu(vm);
++			vcpu_load_state(vcpu, state);
++			kvm_x86_state_cleanup(state);
++		}
++	}
++
++done:
++	kvm_vm_free(vm);
++	return 0;
++}
 -- 
 2.51.1.851.g4ebd6896fd-goog
 
