@@ -1,107 +1,69 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022073.outbound.protection.outlook.com [52.101.48.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF6A1F75A6;
-	Tue, 28 Oct 2025 05:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B0922339
+	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 06:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761629960; cv=fail; b=ggJORS8nK8IMPzeTKeydK07Q/M69dEgheDmG1TgXArFKLmgtMShdRwwO5n3DHZ+E3QBXTQTNDnmBJkpjfhFVvCO36r1PNo3e3CeRe5xEi+j2cMUow1VnHIwHVlVl47oE4Y+7MosHvCLh4a7eHj+B/ZRH9uLKrNYFe66buTi+nsY=
+	t=1761631347; cv=fail; b=iWQ6nRJv/pFJtvqGPcPGvdQWYLWPKif6nV41Bwaq5oMClIWi4oYVOKuWwF9biWsdnzIVmGnb2aTDMXklG2H5FCyYCGx/DC2YppMvJJiYpAmw12Rs3D400j33LPVgkYXBMKWhYowhxfu5yUhKlyZTkPY23p7/bUC/wlr7vq9TvV8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761629960; c=relaxed/simple;
-	bh=TX3QK2a4KxJiOLoyJON9pbkXOOjZQpC0j8rV/ox9yQg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=atjdf6D+oxngEZYzHoVH3eUoX1f+/FsR3iCBM2KBFUYMv+EAs35z/nnUpWkCmamcXcPFthMsdTviLObc1XEYNExXZcvqBxFRQ+JXlboRtzP3OW3vfjPD3+0t2femk1mA/OQiWiX6X0HhE3x7K8H37jFWBiyimPRe0dW50x5a6y8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNWmCBQX; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1761631347; c=relaxed/simple;
+	bh=HJLP+gR8QIxZ/NSK/ZAsISyBhfqV2Z3kl6EIxd5gNZU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ONKjDnotUaOMv2It8EUrYnv+w3wOV4/F9Yq6moKqKobzrvIqsiko1VLu9jYyZCP5nkByGJkoSMgir5axkJkg7T/fWCV/AOzIYCzVAnraP1UrWtW/zG7IX5kvnSuuwC8tjnwvWAR2vGRU8JzL1jR3ySFut8lQVwTmXWPCTDBKSN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=ZAbOiItd; arc=fail smtp.client-ip=52.101.48.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNWmCBQX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761629958; x=1793165958;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=TX3QK2a4KxJiOLoyJON9pbkXOOjZQpC0j8rV/ox9yQg=;
-  b=gNWmCBQXoyvVYtlXsGCyBKSgPSO9m6BJuuGP4jAlJtpJWtL3pVLhgNeO
-   qVy19/30qchtpGNR56ZDoy2UBitfHPqRA1p2SoIT12TCeRuxfqhvre4kT
-   jxp5nK+i9HY9yJPfNlEgcXI0pNpDp3C6QS+TpIF2avMURx+BrxtpW5+Ec
-   9TIcLaaTYIqLfRWVixwdhZPrZn0zHtMAYkUNsseIQPj9G0ruMFxKDEWVA
-   gFLk7Yenm377zVIW/56DRH5v518yufjnPju0eWWEAkunxeKgBzvKUvSSz
-   TqB7zxnPxhajyAqfc5cI8hVt2fEMfWxWafp7e8iRaEz8jahTKzART2UyY
-   Q==;
-X-CSE-ConnectionGUID: 5hCmBBX5RgKmc54ewpEolg==
-X-CSE-MsgGUID: cGywF55uTSKJpiMFepRyPw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="81352230"
-X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
-   d="scan'208";a="81352230"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 22:39:17 -0700
-X-CSE-ConnectionGUID: cwtsJ5AdQUe6zIJiqiC+Rg==
-X-CSE-MsgGUID: F/fE7unJS42gMzKo41M/gA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
-   d="scan'208";a="208849223"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2025 22:39:14 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 22:39:13 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 27 Oct 2025 22:39:13 -0700
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.34) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 27 Oct 2025 22:39:13 -0700
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="ZAbOiItd"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZKHSJHYVQPzPtiYZYijelR9CKjR2FZJGwtTccJzesHwoLk21YcgQx57TxCWPhky0nec4X+eHo9pWSbDSqAizGYZ/Fx+I7dqQcfqFaHFdzjIrZ80+WkUtFnOUIx5VsZ/X/3qV/NjsDpL8FcxrSVZxmdiYmbyCXXrMSYDEmGM1khv1vATrXxL/9w6KxJWUaOpFCva+isPFRjmcJpJ+Zj1rqvvyDcqz1rkYzrP1iFX2IxOj2RHD4tMUisqH/4Kh5tPnwYQN70jDFiVzc2MClqLS9nnkAamQm/UY8zAkFvDdceKPDyxwF2YKdCtidvIo7Sm6WVC95TYClVLNww8F+v7bqQ==
+ b=I4b1TomGAfLRcgQcKNpJGc35cdpeFVcD989nKnzr+Jyt4f3jVMax/vOqEz2Y+jiXCkMWXTpso1gkZMM9+NVSpfbQCHiLZx9roOyF1CQqFtw2qQ8yxD0Z13sNeQ4dZ7cr4YSatKCcFaO35EIEZ751Ef+7mAJOpWYQV4L4Us+fk7XEu+DX/dM3SpyODNRKCASJ4aZNceBJfAAcqLq572Tw+BpAJfM0XlAfHlaAs/Ds6MCEVeucFHEnBmP29EJL7vrP/sQ+RAjOeTD9ZsfpvhIzyhACa4I4C7H1shnme15wj165hgTlGrRGCBtylvp2YJyjXXQpWo9Z9uDWADmcywIQIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h8k4brh66KBVcQ4GqmzGfZSKzMa7On53kGYgaWRMQgc=;
- b=Qpmn/MqlPcgz55QblR8Hz+yXrKCqQAkGi5ORCyH/iIk39Zh0TB2fE1uuclTB3tLBEpis4zJ+EqwWK/yOiADOO4eXgzXk0XS7bpMQMU2JLZoGSbiwJ7d8hfFrY6OgOy7cfSxbSfL9+L0290Yfe1GuBX4eXW71dkPlShU25CQVXR2XJeJRHj0yMj9CHZvrvd6Aarc37MukZ17M7RHWgIt0TdI+KnMx0XLreb3PTtFEvcJK2kkrxivlFNAcQpsGl0cTAUQRbYcd04gFhWc8+Z4SWr8o3a4obKwTEBAN6ae9ZOCZ/FJ1V+Dpey2hpTYEnw0ZU8NyxTLURQJ+QVVZ3i4stQ==
+ bh=ers8kR9eRPCvZsN30kgyxdxdh3V0IJ72AtdW7sjKxTQ=;
+ b=ahh4IScS/cp29WNNH5udwW/It3LsHeaIHC3LW+RTOc014kUKh0rFXFBscIDQP3n/KW6+E0Q1/uoPHO779UUtkEJXiBu8wCz0rVHLPVk/Xyi5WfCeNOjh9dQ3t4ZdTo1D0dNqkfmNkQhAR+Qhza8vkWQnYUz41ZfZ02566MuBTp9hVyxE1PZGcDeXmfKvXV/AmjWXvvWK8WYl4jcQWvMNMRWj5Ag9dUjHYgTqkca30ItL2oNxySdja6s1ViLVAJxyqJEIO0oqNWDFAsLSh8VG7v+eIcakWPlAl8LA9vTuNsmri2hM03rVSm3F931TVMUR/STi83JLGdRBmYl6fkOLbQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ers8kR9eRPCvZsN30kgyxdxdh3V0IJ72AtdW7sjKxTQ=;
+ b=ZAbOiItdgIu/BBVxno4cIWJ+ZC3Od7IInODgeaCEsxLPgwl2V4M4g+5SnnBFetYVKGUw0UEf2ZWih1KG8Qqer6jwu0+oa6VEZ6vXsGLX4uRRNEuP9e6mo5lMJfCuWIg4bT1tFVL9f8lsZg+fhAZKsFUtn+f3SX2f1p4hdySo8jQ=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DM3PPF0644BB20C.namprd11.prod.outlook.com (2603:10b6:f:fc00::f06) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.12; Tue, 28 Oct
- 2025 05:39:11 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9253.017; Tue, 28 Oct 2025
- 05:39:11 +0000
-Date: Tue, 28 Oct 2025 13:37:11 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-CC: <seanjc@google.com>, <ackerleytng@google.com>, <anup@brainfault.org>,
-	<aou@eecs.berkeley.edu>, <binbin.wu@linux.intel.com>,
-	<borntraeger@linux.ibm.com>, <chenhuacai@kernel.org>,
-	<frankja@linux.ibm.com>, <imbrenda@linux.ibm.com>, <ira.weiny@intel.com>,
-	<kai.huang@intel.com>, <kas@kernel.org>, <kvm-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-coco@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-mips@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<loongarch@lists.linux.dev>, <maddy@linux.ibm.com>, <maobibo@loongson.cn>,
-	<maz@kernel.org>, <michael.roth@amd.com>, <oliver.upton@linux.dev>,
-	<palmer@dabbelt.com>, <pbonzini@redhat.com>, <pjw@kernel.org>,
-	<vannapurve@google.com>, <x86@kernel.org>, <zhaotianrui@loongson.cn>
-Subject: Re: [PATCH] KVM: TDX: Take MMU lock around tdh_vp_init()
-Message-ID: <aQBWh/eG0BcC1boo@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <aP-1qlTkmFUgTld-@google.com>
- <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
-X-ClientProxiedBy: SI2P153CA0022.APCP153.PROD.OUTLOOK.COM (2603:1096:4:190::8)
- To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SJ2PR01MB8101.prod.exchangelabs.com (2603:10b6:a03:4f6::10) by
+ BY3PR01MB6722.prod.exchangelabs.com (2603:10b6:a03:367::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9253.18; Tue, 28 Oct 2025 06:02:21 +0000
+Received: from SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9]) by SJ2PR01MB8101.prod.exchangelabs.com
+ ([fe80::292:6d9c:eb9a:95c9%4]) with mapi id 15.20.9275.011; Tue, 28 Oct 2025
+ 06:02:21 +0000
+Message-ID: <060fe820-85b8-4476-be95-a0d37e53fa12@os.amperecomputing.com>
+Date: Tue, 28 Oct 2025 11:32:03 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: arm64: nv: Optimize unmapping of shadow S2-MMU
+ tables
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, oliver.upton@linux.dev, will@kernel.org,
+ catalin.marinas@arm.com, suzuki.poulose@arm.com, joey.gouly@arm.com,
+ yuzenghui@huawei.com, darren@os.amperecomputing.com, cl@gentwo.org,
+ scott@os.amperecomputing.com, gklkml16@gmail.com
+References: <20251013065125.767779-1-gankulkarni@os.amperecomputing.com>
+ <0345c510-5db4-462f-95fb-591e71468aca@os.amperecomputing.com>
+ <87v7k53cud.wl-maz@kernel.org>
+Content-Language: en-US
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <87v7k53cud.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA5P287CA0174.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1af::8) To SJ2PR01MB8101.prod.exchangelabs.com
+ (2603:10b6:a03:4f6::10)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -109,157 +71,416 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM3PPF0644BB20C:EE_
-X-MS-Office365-Filtering-Correlation-Id: 672f7153-663e-45d3-a8c3-08de15e45266
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SJ2PR01MB8101:EE_|BY3PR01MB6722:EE_
+X-MS-Office365-Filtering-Correlation-Id: 02c66939-2482-4a29-4da7-08de15e78ee3
+X-MS-Exchange-AtpMessageProperties: SA
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?ESl9wnng1ee3WkuCxFdde7fAJTm0lzLL+oZMrNgtdJF1zOGpQiDyB5b627+B?=
- =?us-ascii?Q?L6bqYyGGztCSQsjtb6Rwc9kGLpcPRUntzDozrXv04Cq5nCSQweBJshL7N7u5?=
- =?us-ascii?Q?Wy3JRGcy9NRtFWzxVk4E+OJtSyUuBhABWt3wcoqX8qnbk/d6dgCm8dAtdWkY?=
- =?us-ascii?Q?X48wU7Qae6AZ8XbxHGMSnNCP5rqo+fPSUXdwec15PmRXwG2bFRpm8iLQh2Ce?=
- =?us-ascii?Q?sD0VsMh2ofvlmrHG5WeF8Pux/59K6HXFlTqDP2pnAQR5lJFB3I8watpG+xf9?=
- =?us-ascii?Q?RF0rsVJyOEWu53Qw/lx0R0YsG8eMlf2ZiTl/sZK6FJyhoJiQOFLnuCtJ/cxl?=
- =?us-ascii?Q?sRzQ1bJnPTXssHFZpteQcRsBkLO2hYHfPOVwrZ5s0BA8X0XktYmSNLbnsj65?=
- =?us-ascii?Q?U8ejtPLLZEy8sT2yUfbJundeYgfuPw5iCMmLzdC4VGVCTYlDz/aMai7BOyEJ?=
- =?us-ascii?Q?QYFd8Omv/3997KpP9ELMPE22205aeobuRjUlIbs4cetA5TAo54npFBKfdNSu?=
- =?us-ascii?Q?uqXLgu0axO/amjmFt48lr68Fsm23GafdVj9W/vj586NiiyVA9D2U68PweTf3?=
- =?us-ascii?Q?P8SvEn8d51DCnx2ZvytWhzykQryRY1JafUpP2V7fBgG7W5oQuSVqJayrB85i?=
- =?us-ascii?Q?QhqKVEFs7myOWaofzMEpRXkPiDG/0hn5xt+RIRxXgasGbTwj6cQVe/G7KwkQ?=
- =?us-ascii?Q?vs+vnG4HyshYntdD6lTWFXRhqF+vz+9VrcOgtfAsIq/jZwKb6P8nmeoJTPof?=
- =?us-ascii?Q?LVFPa2kTfeQusnMyd3fvjnUnJojYgcPepRgS0pAjx/RrH5zRNR8MUgV8t8tp?=
- =?us-ascii?Q?wAhs8Xdv/LGl2vAZB5/roEVCfMa/oZqGzCOlg0Wie15hRqZaqXNtHjrtULwe?=
- =?us-ascii?Q?cvxdRHq3SX6eo6n3sMZ3rS7PNxYRNhiBH5ciH2WWGdVAzBeF5m/sXHmpdUMg?=
- =?us-ascii?Q?Vykb9DjzTdJT+lSFYM19R7dnamiJf4JrNqzS/lVVNmTkH927U43l7xn3yaXO?=
- =?us-ascii?Q?jFScQaANFjyCUzTrwDCWcuNAlaoDTFuqgGU4FJiR9l6zkPq7FQBVeiK8xiCv?=
- =?us-ascii?Q?dn6vJ0dbton928sFhoQgrpUj0xIwPfhIhsxsikn4JoYOcEnbiHtAJKmy/a5B?=
- =?us-ascii?Q?wfqni7wrgJYaM7xntJL33ouv8Bf/QpRg2URorz3F7vNg4EFR9BVKaJbv2yr6?=
- =?us-ascii?Q?sh8WMi2Gqsv3yW6knXAzr74cQEFaqiOJY8dq2WL/M83nnN3bPJcLXbwyg60y?=
- =?us-ascii?Q?uA+J5DAW332BrPlieS+4EjPvNfG/JuYGhvV0k4APIfcxkhgFp1nYxcfCtck3?=
- =?us-ascii?Q?//G8egmqUudSa9oO8qWxT1+yW2m2ieCSNfiUKWWEQX8yZJ7HDKO31uLcJ3Q4?=
- =?us-ascii?Q?Ihc2248ZfZG/Un8eWUI72+ZZXnIEk/y6snPnnAbdTWSINHXLdfhNVXQonJ+E?=
- =?us-ascii?Q?LDOQEJc0dtk21TpoxKC/cYbraXlnTt3s?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YXJZRnpGT3VreDEzWXlGY2xZVCtPQjJHZ01ZTHM3NTYxdzhQRWhwUjZQdUt3?=
+ =?utf-8?B?SjA5YlV6a3loZnJJTlFrYzZINXM3TVFDQTVWdGc4YVpISm80ZnhPeVcxbDQ5?=
+ =?utf-8?B?Mkh0Z3pNUE13S0dGVHlXbEZnTGR2QmRaTHduMlc2cXV2K09VR0w1V0ttS1Rv?=
+ =?utf-8?B?b1g4OHIvSnhLVm1ObExSK0Q4czdZdVJQdS9BcFoyZVFQeWduMitXRXdOWjBC?=
+ =?utf-8?B?ckFzUlJvb254VTBxYkhXT2gwcWxadldXdWN0KzBWOHZJNFpiTzZLWWxyRDZ4?=
+ =?utf-8?B?eVh1UmhjY21RRlk1VFkxV21kNjNld2FCdXE0ZzJBRWV0dmhkalJjRVkvTVFB?=
+ =?utf-8?B?V05VdXVMNFFHWUtuNGZ6S05taVJKUmpmR1E1blhoU2x6T01FZTkvWmFxRUJr?=
+ =?utf-8?B?d3BOcWpFeVBmOGFIVWV1VnJyRmNZaTQvdmpzSVFXa3NnM0VwQlc4c25BNm9u?=
+ =?utf-8?B?ajhiWWU5VHBCNjJhVll2VFFZN0lQNHptN0NJTkJuZTdJRHNVbERva1NDWjR2?=
+ =?utf-8?B?UTFKOWZPZG9jdngyMDl4amd4ZmUvRWFrTXRHNUhCYURDQlVWNjdvTmVxZFNH?=
+ =?utf-8?B?VXJlajRXMG5DVmF0ZjMvMUQzWWNyNm9NZFN6ZXBiTThhVkVqVUNIK3NOUnU0?=
+ =?utf-8?B?ZVVvcXBtcER1Z2wwTzVvVGE0M2NhR2FSWkkyY1NhUUVRQzVNMDJTeTR3a2tZ?=
+ =?utf-8?B?dHljS1NwSmhJeGp2OHY3ZnhCNG50WFpxa0x3dU9GeTZGb2FIbFdoUzRrelNx?=
+ =?utf-8?B?cXNERk1sSVY4M3hOdTI5RWhGVmFmZWpPaGt6UEpmNmlmK0l0TEtKOTNYY0Zo?=
+ =?utf-8?B?VFhaa1c5Q3RTN2k5UXRpRkt2MC92czA1VU4zUlg0TktMb2w3cHFkUE9HN3Ir?=
+ =?utf-8?B?QTFWM1RSOW93c3VQcit1aWNYcnJjbzdscEFSWXFrWVY5RUduNEVLYTVwNjJY?=
+ =?utf-8?B?dEVIdFpLNDB3UlpsMWgweWEwSmRINXNxUXo3WGZVUFlCcktUZzZiWVk1Vnly?=
+ =?utf-8?B?Z29xb1ZWUWwveDlrbFRJcml0MjVmRzdWRE5UZ245Ry9SWm1xSU43SkkxRm10?=
+ =?utf-8?B?MHozV3A5R1Rkb3ArcFJGeCtwTEcvRWtHVmZKWW90cG1naUtQcjF5T2VUQzVh?=
+ =?utf-8?B?M1JVcDJ0NlZ6YWNsSjlDeHdZYi9tZVJUWUliSzBnNzA3QVZ2L0d2anpWek5o?=
+ =?utf-8?B?M2pkQTdyenNHWGFSUkUySDcvOHBtall3YkMyOHZWMmdwYlVNYnJEd0JuR2hI?=
+ =?utf-8?B?MVVjTnNwaVN0aVRRU2xsN1RiVmNSbHFwMmZDaWptNXJHQkZpbFpTdGJUbjgy?=
+ =?utf-8?B?MHRVbHpCaU85M0s3akRoY2M5d1FabVhIdFA4cm9xTjZuRy9KM2xPWkY4bE8v?=
+ =?utf-8?B?NGltY2FTWTU1b05CZ3NheEppdkdITjJOOE9uLzF4ZFNySW9SQmprZndlY1lY?=
+ =?utf-8?B?RG9pdk5mMm9haU5qTldCd1ErbUl3V2NycGhiQXZvcmxUemtLMTlNYWhvSStq?=
+ =?utf-8?B?YWJtMnZaSXBDMXUzT0Zsakh3YUhJYjRtYWpwT2J6S0MxeGVtZ2xSRFFzYlZ6?=
+ =?utf-8?B?OU96bDFFRTVGN0F6MGE4RGUxVGNGalc0V1dOSkdJaFZvR0NUbmYzV3NWR0xo?=
+ =?utf-8?B?L3ZxdndJVmNmamFzdEJGRnBiSS9vWjNLM0U5alp3VnIvVkZoQXVPT05LRTV6?=
+ =?utf-8?B?bGhhWmQvOGp4Sk9NRVBPejl4UnduLzREeW5DcFMvMkVzOXRsVmRKRUZvMGlT?=
+ =?utf-8?B?VDBhWHJHZUtjUU00UVliOVZEMnBVTTNQNVNyT0pXczAwYmJSY2l6aFFsN3lM?=
+ =?utf-8?B?dXpXcFkxMS9ZaTlkWnhMS2JsbmUxdzE4VlJORWd2cU00eTdtR1JlV3ZaSjhw?=
+ =?utf-8?B?OHd4ZjBQOVZBYVlibnpSSEFrUWV5SGJ6Uklyb2Uwamc4MHc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR01MB8101.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GQP9ks88jnsRer/ownZiyqRKgCyQLCd0FFqoJouUqDtcYye9d+DuZUHw/6Ur?=
- =?us-ascii?Q?gU3Er+zRE69VG/yLjoXelA7slKxlx9KEPMndnNMtXffYQ7+Gy+WAQ7guJ8H4?=
- =?us-ascii?Q?apqRHpLfJYLtpU1KILhufxBDPUzMW8GCOS+Zq+hdB1HphtJapWSEahZHTLdu?=
- =?us-ascii?Q?6a/J8Qd+32Cd6zwPpIlmUQFD0jpRYhgHrZakwV8cITusse/7rU1Ot7j9bCGR?=
- =?us-ascii?Q?iJdEQpH9z3bPbeLB16AFQqXaEIAZCYBoGjDiHkp8uz0vQiP43iEoo2b2TMfu?=
- =?us-ascii?Q?dbRRFQT8coUJZLf6Xig5aWzl4e/1z6eIUbwBfz8nExWRXlksqVVXvZ5EC98H?=
- =?us-ascii?Q?T7Cr84kJvR3kY9sEcuIPwYZE0yqz168UaN1rbm6OGTwOk/igtuK9lVVh4Cdu?=
- =?us-ascii?Q?ihxsqc9v54rA5vMmT0/MhT5G2Ro+tTslseMjjp01/PARYbpU8+cQsJLHEFpk?=
- =?us-ascii?Q?QSv3wPc4QXuJybsIDcubW1cuPeR9zy4kVcp78xLBkbg7wpOBzGNAuMR3GQun?=
- =?us-ascii?Q?CiAYlmLgdOoVwrQqY5Z+dSGd9ib59+0mGcMpJMb2LEhDNWlG8pgPlENoGK0L?=
- =?us-ascii?Q?QkfC+oiMCYSTfNaZmYSaVST373mLQY3ldc7YNhKm4BWAgRA6td6vjDKYIMH4?=
- =?us-ascii?Q?L/JVt0jRwbdnPg4tz1Oc/Y/lwS9U7iGv/CXIW0w/Y9at6cGrmxV00xCcFFHO?=
- =?us-ascii?Q?CdfbxoSL7Eietre8WmcfwjrT8wStsGcSCpo+J5R4oWqNL6lzbp+v9amKBw3P?=
- =?us-ascii?Q?cT2FgQniQIIyYZqybJNnJvkgQd1NDZsuMkFYDWksnyUnKRG0C70dVhcvbBet?=
- =?us-ascii?Q?BpuoRzz7TKl5FgkPZ4SlGljtmYB4YnGzK/5tQNcvMdYpr2xF7GrrL7cnnf66?=
- =?us-ascii?Q?WeDPjxgyGQfJzDsQu2yWcNX5wBizSJzWJOSnot6bB9tv+MwiiU2cotWC7ai8?=
- =?us-ascii?Q?jMP9aSMC6t7J0CB9bRh70N67ZhUFT00sgcasVQp4FyTA7GtuWjZvWf6ZWuMW?=
- =?us-ascii?Q?PY+PXVDzRtlweABdvdMS6SZJ9mWLdjMNObpbPkVpEzQ6YzWOKCKaixvXptaj?=
- =?us-ascii?Q?nzSMec+1vJt1HuwT7k4x//qUihJVbognu1y/D7x78UiI7oyPs8D/WyFd53I4?=
- =?us-ascii?Q?Bv0XHtlWfaB2IdE7osm1ZwPMegxffLvgTA+NT0x3dDu9pCmDycgTvnDZPBj1?=
- =?us-ascii?Q?4ZpZTPJAOH1ztQ/LMVOLtszI2SkVssfPGO3CzXh7twQRvhO/KoBJoyVBR5+z?=
- =?us-ascii?Q?/vc1GHBDh32c1NipblRGgNAg5R/yrQODDxEOhjwJHZODYv2QIdBoGi56I6o9?=
- =?us-ascii?Q?tCkqrinSoOHLq4SimSRsqvPs+bFnAMhxH+YcKSVYUrrr+puTPpxPth2mMat+?=
- =?us-ascii?Q?8V0VYk0cSPcR5iRoRbbXTrgrIHkRxZKGKVqzoNjSBsNN41QLIlniEKi8rm4t?=
- =?us-ascii?Q?T1TKjAgV00TDjKO6jxZwpKXO3AZDi80z47qODwIjsnVlEVFwAugQ6X9phT/a?=
- =?us-ascii?Q?FAITi7eF9QeFtS1NXnjD/D6kg6KrDxEUdnUEyBwEJfdL8FwWfOrSRBpprSXs?=
- =?us-ascii?Q?8ASv09E3Bdnw2ymFZe4QIHFBw2kYH492OK/a/n+j?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 672f7153-663e-45d3-a8c3-08de15e45266
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MDJMSEpnNEVBLys5NEZrQmltSW5hTGdvNkt2UU9JL2duN1BxVmhEY0tQLzhw?=
+ =?utf-8?B?VXo5UEI5VjlkODdtcGt5RnRXRVhHSHZnSStQSGVJY1ZBL29xYTc4aFhVNkFj?=
+ =?utf-8?B?UXlYd0FPKy8xYVRuZ2lnN29qVW5SMWYwN0RkbDRhWnZEekNrTTdzQW5uL0NZ?=
+ =?utf-8?B?TllxVEk5dE5nb1c5VkJDZk5VVHRUYnBoaHNRV1A3RHRudmJUZ2N6VVMxTVl6?=
+ =?utf-8?B?T0IrU0tKV0hMaUVVSDZnQVpESm1nYmN5R0VjRk1HZ2RJWG5xdXpLL0hPRjd1?=
+ =?utf-8?B?Z0Vlb1NDZkFzM2N4SE1MZXg0OFEwNlQwMENINytSTFVwODBRWklTZ1MzdHBJ?=
+ =?utf-8?B?OUZWcEEzYVhlckJGU1lZV2k0N3FTVFI0OGlyWlMxcmlkZzFCRlZZZGJOTU03?=
+ =?utf-8?B?OU5sQ0FZSFhkdm1XT2dmbVVpYnFpWEtPWHFTQ2NkRGFFbHVHejJWU1R2cmJp?=
+ =?utf-8?B?cXQvdThoMjc3V2JjT3ZxdHNSd2p5TW5OKzA0NUREK1NEazBUTmh6bDBOenZ1?=
+ =?utf-8?B?TUdoME04cFowSW5jbnl4ajBCVlJ0bG9nS2FWY2VLMGJjZFlPN2krcWtKVjhW?=
+ =?utf-8?B?bG5NUm02Znh2NFBtejF5RUlCN0pmQUlCd2ZPNG01VmZEWkxLUFcrTkhhdktC?=
+ =?utf-8?B?dzY1VDUvdWJ2VVBJaG9mYkdjT2JLNmNVR1F1K1QwRStZalFpekVITDVFUHZH?=
+ =?utf-8?B?NnZtajFBeDVYMGRyeEJNTXo4angwTkdySC9sY2tCUEJCOHY1bWtOZERaUWM5?=
+ =?utf-8?B?WW5jc09vTWNNOW56cHk4M3lIK0VZTlFhUUgvakw0S2N3aHNLUy9YTWtaWm01?=
+ =?utf-8?B?cGJwbWR6MWxiVWtKQ1pMRDdTQm9IcFZNQUNBaHZtUGJnN2Y5WGxXNGxZUXBq?=
+ =?utf-8?B?Nkd5WHJWWjltRGJESStuSFhYV1FKdlZDcVdUcXArV05wL2UwMDhlMlhSVVYz?=
+ =?utf-8?B?VWp2UlBVbGtZbVA1MUhEemNOaXE4eUZTd0Fxb1FQdHplZzZReTZ3cExQeHFV?=
+ =?utf-8?B?Ym9vdURzbmtTUjNkZ2IwbkhoZFF2QUMzcllMTkNTdmJwR3RSNnNNSXkrUGpr?=
+ =?utf-8?B?Z21CVjV0blZ1RHJLRGhDUFdCTXViRFZaOWVmcTQ2bm45RFYyWUNkelFCSnhw?=
+ =?utf-8?B?K2VldjJtWDdtNm1GSmhudTh4VFdzYjZYWEVMUXdOR2hmUWRYTXRQU0JEMUZC?=
+ =?utf-8?B?Mkt1aDNaSkU1RkYyZXlzTXRXM2JONkVJaDJZTWFKbWd1TlRLeW93OEd0ZlRv?=
+ =?utf-8?B?VG9yODkyWEt1M0Nja3UxTnk1R1JJdWxjejljL2puQnhVdG1qcXJGNDA3RVlI?=
+ =?utf-8?B?V3N0RU9LWWpvRmhHc1NYVTl5SUZqeWZjaS9KY09jS3d1Ui9yWGVEVFRlbGVj?=
+ =?utf-8?B?eUkvelY4ek0yZXJxazJDaW9MaTlYWTJWSlFLQkR0VFkzTlJtUEltdTBZU2Qw?=
+ =?utf-8?B?bDBSdmVBOUpkZWFraDZLTHZhM0pxd3V0L20yMU5SK0VsWHVnQ1JuVVFVc0Fn?=
+ =?utf-8?B?bmpxZzBWTkh1Nm5OaXpJTlhLNTlJSDR1dFEwMG5PRkNDVGpLbWlkWXk2L1Rv?=
+ =?utf-8?B?dUJ0UDk0WXBDNHBpelZBdjgzb2hTRFlHQ091NGVIQjRlSUxLb2RaVmEwT1dF?=
+ =?utf-8?B?Wm1FSUl0dm5uODJYaW9qVVFuc01lUWV1QkJQRXZUL1lvY3NmNkZDQnZQVDZa?=
+ =?utf-8?B?VWx0bkJjSVBKZXhaSmNyU2w1QkVFMkxZMlROSmdlNUVHKzBJSktrUFcrNkFy?=
+ =?utf-8?B?NzY2Sk9ocGRsQkoyOHM1dlpRUHc4WG1iMTg3N0tOaVJZRmZwRVVJVGl4UkRK?=
+ =?utf-8?B?WDR6dlVFa2c3bCtIUFBaTmRIVEFGZ1JuWVVmZVcrd0lRdmpSUUN5UzNtSGhu?=
+ =?utf-8?B?dTVkQnpvUXZaUkF5SHd2Vjd1Um5BZUtkMHloajZybGFQTG1vY3BjRHhvMHQr?=
+ =?utf-8?B?WGlPVklRVzRQRGg5NWxvMkNacmxPc1kwWFhPSExwcnYxdEdPRFFZVng0V1lG?=
+ =?utf-8?B?NDY3V09QZFI1aXQyV3p3NHFlVHdFQlBoZHpkdldjQmZrd0RyUWhZaVBiVWFL?=
+ =?utf-8?B?M21JelE0ckU1WEZkNkowUGg3bTUvWTF2eEZzUHdKaVlBVEx3YVp4dUFCWVZ6?=
+ =?utf-8?B?N0k2aHhwZjBBZHV6WGt2QUZMbzFsdHBmTm94WkZ6bjh4NVNqYUZsRThVN245?=
+ =?utf-8?Q?2Gp1ae33nHces7maUeib5JU=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02c66939-2482-4a29-4da7-08de15e78ee3
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR01MB8101.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 05:39:11.4779
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 06:02:21.3454
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sgODYJ8S03JEGl+Tm7dfz1AGSzecmX92cYRQnZm0iNerHT2TJa/y6Nc83dv01fGw5dXoMd1ymfTOlcMYXaSF7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PPF0644BB20C
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: vgKU8hydRv2/MVTwfzEs69CCLpCo1znIO7XE+lghHFL14fvUaO2KZK1aPcAhvZqV+7xdOzDXqEYmLBsWITC0AsgeCj2/9Vj/SLdt1cFyxBIurxJBmoAoYQPE6gnCYv2B
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR01MB6722
 
-On Mon, Oct 27, 2025 at 05:28:24PM -0700, Rick Edgecombe wrote:
-> Take MMU lock around tdh_vp_init() in KVM_TDX_INIT_VCPU to prevent
-> meeting contention during retries in some no-fail MMU paths.
+On 10/23/2025 8:05 PM, Marc Zyngier wrote:
+> On Thu, 23 Oct 2025 12:11:42 +0100,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>
+>>
+>> Hi Marc, Oliver,
+>>
+>> On 10/13/2025 12:21 PM, Ganapatrao Kulkarni wrote:
+>>> As of commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow
+>>> stage 2 page tables"), an unmap of a canonical IPA range mapped at L1
+>>> triggers invalidation in L1 S2-MMU and in all active shadow (L2) S2-MMU
+>>> tables. Because there is no direct mapping to locate the corresponding
+>>> shadow IPAs, the code falls back to a full S2-MMU page-table walk and
+>>> invalidation across the entire L1 address space.
+>>>
+>>> For 4K pages this causes roughly 256K loop iterations (about 8M for
+>>> 64K pages) per unmap, which can severely impact performance on large
+>>> systems and even cause soft lockups during NV (L1/L2) boots with many
+>>> CPUs and large memory. It also causes long delays during L1 reboot.
+>>>
+>>> This patch adds a maple-tree-based lookup that records canonical-IPA to
+>>> shadow-IPA mappings whenever a page is mapped into any shadow (L2)
+>>> table. On unmap, the lookup is used to target only those shadow IPAs
+>>> which are fully or partially mapped in shadow S2-MMU tables, avoiding
+>>> a full-address-space walk and unnecessary unmap/flush operations.
+>>>
+>>> The lookup is updated on map/unmap operations so entries remain
+>>> consistent with shadow table state. Use it during unmap to invalidate
+>>> only affected shadow IPAs, avoiding unnecessary CPU work and reducing
+>>> latency when shadow mappings are sparse.
+>>>
+>>> Reviewed-by: Christoph Lameter (Ampere) <cl@gentwo.org>
+>>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+>>> ---
+>>>
+>>> Changes since v1:
+>>> 		Rebased to 6.18-rc1.
+>>> 		Fixed alignment issue while adding the shadow ipa range
+>>> 		to lookup.	
+>>>
+>>> Changes since RFC v1:
+>>> 		Added maple tree based lookup and updated with review
+>>> 		comments from [1].
+>>>
+>>> [1] https://lkml.indiana.edu/2403.0/03801.html
+>>>
+>>>    arch/arm64/include/asm/kvm_host.h   |   3 +
+>>>    arch/arm64/include/asm/kvm_nested.h |   9 +++
+>>>    arch/arm64/kvm/mmu.c                |  17 ++--
+>>>    arch/arm64/kvm/nested.c             | 120 ++++++++++++++++++++++++++--
+>>>    4 files changed, 138 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index b763293281c8..e774681c6ba4 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -227,6 +227,9 @@ struct kvm_s2_mmu {
+>>>    	 * >0: Somebody is actively using this.
+>>>    	 */
+>>>    	atomic_t refcnt;
+>>> +
+>>> +	/* For IPA to shadow IPA lookup */
+>>> +	struct maple_tree nested_mmu_mt;
+>>>    };
+>>>      struct kvm_arch_memory_slot {
+>>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+>>> index f7c06a840963..5b7c4e7ed18f 100644
+>>> --- a/arch/arm64/include/asm/kvm_nested.h
+>>> +++ b/arch/arm64/include/asm/kvm_nested.h
+>>> @@ -69,6 +69,8 @@ extern void kvm_init_nested(struct kvm *kvm);
+>>>    extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
+>>>    extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
+>>>    extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
+>>> +extern int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 shadow_ipa, u64 ipa,
+>>> +		u64 size);
+>>>      union tlbi_info;
+>>>    @@ -95,6 +97,12 @@ struct kvm_s2_trans {
+>>>    	u64 desc;
+>>>    };
+>>>    +struct shadow_ipa_map {
+>>> +	u64 shadow_ipa;
+>>> +	u64 ipa;
+>>> +	u64 size;
+>>> +};
+>>> +
+>>>    static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
+>>>    {
+>>>    	return trans->output;
+>>> @@ -132,6 +140,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+>>>    extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
+>>>    extern void kvm_nested_s2_wp(struct kvm *kvm);
+>>>    extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
+>>> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 size, bool may_block);
+>>>    extern void kvm_nested_s2_flush(struct kvm *kvm);
+>>>      unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu,
+>>> u64 val);
+>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>>> index 7cc964af8d30..27c120556e1b 100644
+>>> --- a/arch/arm64/kvm/mmu.c
+>>> +++ b/arch/arm64/kvm/mmu.c
+>>> @@ -1872,6 +1872,10 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>>    		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, vma_pagesize,
+>>>    					     __pfn_to_phys(pfn), prot,
+>>>    					     memcache, flags);
+>>> +
+>>> +		/* Add to lookup, if canonical IPA range mapped to shadow mmu */
+>>> +		if (nested)
+>>> +			add_to_shadow_ipa_lookup(pgt, fault_ipa, ipa, vma_pagesize);
+>>>    	}
+>>>      out_unlock:
+>>> @@ -2094,14 +2098,15 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>>      bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range
+>>> *range)
+>>>    {
+>>> +	gpa_t start = range->start << PAGE_SHIFT;
+>>> +	gpa_t end = (range->end - range->start) << PAGE_SHIFT;
+>>> +	bool may_block = range->may_block;
+>>> +
+>>>    	if (!kvm->arch.mmu.pgt)
+>>>    		return false;
+>>>    -	__unmap_stage2_range(&kvm->arch.mmu, range->start <<
+>>> PAGE_SHIFT,
+>>> -			     (range->end - range->start) << PAGE_SHIFT,
+>>> -			     range->may_block);
+>>> -
+>>> -	kvm_nested_s2_unmap(kvm, range->may_block);
+>>> +	__unmap_stage2_range(&kvm->arch.mmu, start, end, may_block);
+>>> +	kvm_nested_s2_unmap_range(kvm, start, end, may_block);
+>>>    	return false;
+>>>    }
+>>>    @@ -2386,7 +2391,7 @@ void kvm_arch_flush_shadow_memslot(struct
+>>> kvm *kvm,
+>>>      	write_lock(&kvm->mmu_lock);
+>>>    	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
+>>> -	kvm_nested_s2_unmap(kvm, true);
+>>> +	kvm_nested_s2_unmap_range(kvm, gpa, size, true);
+>>>    	write_unlock(&kvm->mmu_lock);
+>>>    }
+>>>    diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+>>> index 7a045cad6bdf..3a7035e7526a 100644
+>>> --- a/arch/arm64/kvm/nested.c
+>>> +++ b/arch/arm64/kvm/nested.c
+>>> @@ -7,6 +7,7 @@
+>>>    #include <linux/bitfield.h>
+>>>    #include <linux/kvm.h>
+>>>    #include <linux/kvm_host.h>
+>>> +#include <linux/maple_tree.h>
+>>>      #include <asm/fixmap.h>
+>>>    #include <asm/kvm_arm.h>
+>>> @@ -725,6 +726,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
+>>>    	mmu->tlb_vttbr = VTTBR_CNP_BIT;
+>>>    	mmu->nested_stage2_enabled = false;
+>>>    	atomic_set(&mmu->refcnt, 0);
+>>> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
+>>>    }
+>>>      void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
+>>> @@ -1067,6 +1069,99 @@ void kvm_nested_s2_wp(struct kvm *kvm)
+>>>    	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
+>>>    }
+>>>    +/*
+>>> + * Store range of canonical IPA mapped to a nested stage 2 mmu table.
+>>> + * Canonical IPA used as pivot in maple tree for the lookup later
+>>> + * while IPA unmap/flush.
+>>> + */
+>>> +int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 shadow_ipa,
+>>> +		u64 ipa, u64 size)
+>>> +{
+>>> +	struct kvm_s2_mmu *mmu;
+>>> +	struct shadow_ipa_map *entry;
+>>> +	unsigned long start, end;
+>>> +	int ret;
+>>> +
+>>> +	start = ALIGN_DOWN(ipa, size);
+>>> +	end = start + size;
+>>> +	mmu = pgt->mmu;
+>>> +
+>>> +	entry = kzalloc(sizeof(struct shadow_ipa_map), GFP_KERNEL_ACCOUNT);
+>>> +
+>>> +	if (!entry)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	entry->ipa = start;
+>>> +	entry->shadow_ipa = ALIGN_DOWN(shadow_ipa, size);
+>>> +	entry->size = size;
+>>> +	ret = mtree_store_range(&mmu->nested_mmu_mt, start, end - 1, entry,
+>>> +			  GFP_KERNEL_ACCOUNT);
+>>> +	if (ret) {
+>>> +		kfree(entry);
+>>> +		WARN_ON(ret);
+>>> +	}
+>>> +
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static void nested_mtree_erase(struct maple_tree *mt, unsigned long start,
+>>> +		unsigned long size)
+>>> +{
+>>> +	void *entry = NULL;
+>>> +
+>>> +	MA_STATE(mas, mt, start, start + size - 1);
+>>> +
+>>> +	mtree_lock(mt);
+>>> +	entry = mas_erase(&mas);
+>>> +	mtree_unlock(mt);
+>>> +	kfree(entry);
+>>> +}
+>>> +
+>>> +static void nested_mtree_erase_and_unmap_all(struct kvm_s2_mmu *mmu,
+>>> +		unsigned long start, unsigned long end, bool may_block)
+>>> +{
+>>> +	struct shadow_ipa_map *entry;
+>>> +
+>>> +	mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu)) {
+>>> +		kvm_stage2_unmap_range(mmu, entry->shadow_ipa, entry->size,
+>>> +				may_block);
+>>> +		kfree(entry);
+>>> +	}
+>>> +
+>>> +	mtree_destroy(&mmu->nested_mmu_mt);
+>>> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
+>>> +}
+>>> +
+>>> +void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 size,
+>>> +		bool may_block)
+>>> +{
+>>> +	int i;
+>>> +	struct shadow_ipa_map *entry;
+>>> +
+>>> +	lockdep_assert_held_write(&kvm->mmu_lock);
+>>> +
+>>> +	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>>> +		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>>> +		unsigned long start = ipa;
+>>> +		unsigned long end = ipa + size;
+>>> +
+>>> +		if (!kvm_s2_mmu_valid(mmu))
+>>> +			continue;
+>>> +
+>>> +		do {
+>>> +			entry = mt_find(&mmu->nested_mmu_mt, &start, end - 1);
+>>> +			if (!entry)
+>>> +				break;
+>>> +
+>>> +			kvm_stage2_unmap_range(mmu, entry->shadow_ipa,
+>>> +							entry->size, may_block);
+>>> +			start = entry->ipa + entry->size;
+>>> +			nested_mtree_erase(&mmu->nested_mmu_mt, entry->ipa,
+>>> +							entry->size);
+>>> +		} while (start < end);
+>>> +	}
+>>> +}
+>>> +
+>>>    void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>>>    {
+>>>    	int i;
+>>> @@ -1076,8 +1171,10 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
+>>>    	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>>>    		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>>>    -		if (kvm_s2_mmu_valid(mmu))
+>>> -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
+>>> +		if (!kvm_s2_mmu_valid(mmu))
+>>> +			continue;
+>>> +
+>>> +		nested_mtree_erase_and_unmap_all(mmu, 0, kvm_phys_size(mmu), may_block);
+>>>    	}
+>>>      	kvm_invalidate_vncr_ipa(kvm, 0,
+>>> BIT(kvm->arch.mmu.pgt->ia_bits));
+>>> @@ -1091,9 +1188,14 @@ void kvm_nested_s2_flush(struct kvm *kvm)
+>>>      	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>>>    		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>>> +		struct shadow_ipa_map *entry;
+>>> +		unsigned long start = 0;
+>>>    -		if (kvm_s2_mmu_valid(mmu))
+>>> -			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(mmu));
+>>> +		if (!kvm_s2_mmu_valid(mmu))
+>>> +			continue;
+>>> +
+>>> +		mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
+>>> +			kvm_stage2_flush_range(mmu, entry->shadow_ipa, entry->size);
+>>>    	}
+>>>    }
+>>>    @@ -1104,8 +1206,16 @@ void kvm_arch_flush_shadow_all(struct kvm
+>>> *kvm)
+>>>    	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+>>>    		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+>>>    -		if (!WARN_ON(atomic_read(&mmu->refcnt)))
+>>> +		if (!WARN_ON(atomic_read(&mmu->refcnt))) {
+>>> +			struct shadow_ipa_map *entry;
+>>> +			unsigned long start = 0;
+>>> +
+>>>    			kvm_free_stage2_pgd(mmu);
+>>> +
+>>> +			mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
+>>> +				kfree(entry);
+>>> +			mtree_destroy(&mmu->nested_mmu_mt);
+>>> +		}
+>>>    	}
+>>>    	kvfree(kvm->arch.nested_mmus);
+>>>    	kvm->arch.nested_mmus = NULL;
+>>
+>> Any review comments or suggestions for this patch?
 > 
-> The TDX module takes various try-locks internally, which can cause
-> SEAMCALLs to return an error code when contention is met. Dealing with
-> an error in some of the MMU paths that make SEAMCALLs is not straight
-> forward, so KVM takes steps to ensure that these will meet no contention
-> during a single BUSY error retry. The whole scheme relies on KVM to take
-> appropriate steps to avoid making any SEAMCALLs that could contend while
-> the retry is happening.
+> None. This patch is obviously lacking the basic requirements that such
+> an "optimisation" should handle, such as dealing with multiple
+> mappings to the same IPA in the shadow S2, hence will happily fail to
+> correctly unmap stuff. There is no documentation, and no test.
 > 
-> Unfortunately, there is a case where contention could be met if userspace
-> does something unusual. Specifically, hole punching a gmem fd while
-> initializing the TD vCPU. The impact would be triggering a KVM_BUG_ON().
-> 
-> The resource being contended is called the "TDR resource" in TDX docs 
-> parlance. The tdh_vp_init() can take this resource as exclusive if the 
-> 'version' passed is 1, which happens to be version the kernel passes. The 
-> various MMU operations (tdh_mem_range_block(), tdh_mem_track() and 
-> tdh_mem_page_remove()) take it as shared.
-> 
-> There isn't a KVM lock that maps conceptually and in a lock order friendly 
-> way to the TDR lock. So to minimize infrastructure, just take MMU lock 
-> around tdh_vp_init(). This makes the operations we care about mutually 
-> exclusive. Since the other operations are under a write mmu_lock, the code 
-> could just take the lock for read, however this is weirdly inverted from 
-> the actual underlying resource being contended. Since this is covering an 
-> edge case that shouldn't be hit in normal usage, be a little less weird 
-> and take the mmu_lock for write around the call.
-> 
-> Fixes: 02ab57707bdb ("KVM: TDX: Implement hooks to propagate changes of TDP MMU mirror page table")
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> Hi,
-> 
-> It was indeed awkward, as Sean must have sniffed. But seems ok enough to
-> close the issue.
-> 
-> Yan, can you give it a look?
-It passed my local tests. LGTM. Thanks!
+Thanks for the comment.
+How about adding list of multiple mappings ranges to the maple tree entry/node while adding to the lookup and later unmapping every range present in that list?
 
-> Posted here, but applies on top of this series.
-> 
-> Thanks,
-> 
-> Rick
-> ---
->  arch/x86/kvm/vmx/tdx.c | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index daec88d4b88d..8bf5d2624152 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2938,9 +2938,18 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
->  		}
->  	}
->  
-> -	err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
-> -	if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
-> -		return -EIO;
-> +	/*
-> +	 * tdh_vp_init() can take a exclusive lock of the TDR resource inside
-> +	 * the TDX module. This resource is also taken as shared in several
-> +	 * no-fail MMU paths, which could return TDX_OPERAND_BUSY on contention.
-> +	 * A read lock here would be enough to exclude the contention, but take
-> +	 * a write lock to avoid the weird inversion.
-> +	 */
-> +	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
-> +		err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
-> +		if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
-> +			return -EIO;
-> +	}
->  
->  	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->  
-> -- 
-> 2.51.1
-> 
+I tested this patch on an AmpereOne system (2 NUMA nodes, 96 CPUs per node, numa balance enabled) with large vCPU counts and large memory to L1 and L2.
+The current full-address-space walk caused very large unmap/flush work and significant delays (exacerbated by NUMA balancing / page migration activity).
+The targeted unmap using the list per node removes only the affected mappings and reduces the unmap latency substantially in our workloads.
+
+I booted multiple L1s, each hosting several L2s, and observed no panics or failures related to missing support for multiple‑IPA mappings.
+If you have any test cases or scenarios that would validate support for multiple IPA mappings, could you please share them?
+
+
+-- 
+Thanks,
+Gk
