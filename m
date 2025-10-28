@@ -1,440 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74D132E6B9;
-	Tue, 28 Oct 2025 12:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3CD2D94A3
+	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 13:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761654556; cv=none; b=nQ6Av0ltngZ89/ZiHmTrbKqiqCxGL5Jc4Z7304KwEifXCly1lIteIAnvSsVbItb/9E1hc6vAS+UUxWp001NiAKPpNs+INSsrumIa/2yVn4OMgCmIlwLtvittb+bW9HEfwVwaJE3ZHdF7Uh8qqZV08Hu4FBhfgwedNLFeS8NAzIo=
+	t=1761656512; cv=none; b=tSvV6u1Gc78kmrPQJ2uT/tUQ7G3eSqPHRsHnyeP5yO2oozLLE34sQJdsjhCdDpldna8Ry14w2ZQmiU2eW3TW32+8uw+85EynK0Cf4q+EyMXWITvQzibSi2dESL5g9yYiob3cwjzLC3J3cCc7LV7jn9XqrggD7wREVoqIYZYUfRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761654556; c=relaxed/simple;
-	bh=M0gT9Ho8hRq1U8nIIK24mbn8lo7wtYWBXsxfZh4dd9M=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HNYWiy6mb17xVuboQvp5FWhYNZ3754qkiigy9Sm9nl0KVpUMpe2mink0Bl3DHcQ+y2M3O1uqYzQcZUY33cgjNZrC7AvZDpJTbYQHZdM0o0ltcAnXTHGlOvIjOTHU7PmCs5re+i26I9DeM0odZZsUVZf2PJ9r5NrOTMzzBChF8pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9dCcoQL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761656512; c=relaxed/simple;
+	bh=G+je3gq6SyPr4mpic59RxkXyND0BDnxnTAB1RME3Z7k=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PoIf4WmGpCWpw/t7wgdOBfeh6NtWsSk9yNgvMSbVKRmIY9L+NB+DQ6AaxGiIrwxHGvKQVDLjXwvh3z/SQHmghPflNc8xeIc5up/xT/w4WHKXKR8xsEU4gX4Rj4QmuTd877h1oBH7U98jt271f7gZy6/nTuXPXCqCADhQ7Gykb4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=0q6CIKqS; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9dCcoQL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C691BC4CEFD;
-	Tue, 28 Oct 2025 12:29:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761654556;
-	bh=M0gT9Ho8hRq1U8nIIK24mbn8lo7wtYWBXsxfZh4dd9M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l9dCcoQLnZApXVoP15S/r745QnMwDQqHKkSFhCa4/3LJ83ad4LUnQJJtTP8U2DRrW
-	 tQl1kws46mlsJzZ4oazDyhKR/F2g3ue0GBdnrdTSXRicetX0BmmP6yljSX+F0WdIuo
-	 WROxlW/140jgmyDfNrk/qdrfhTKDf5TAq7F4TfH5Fo0ykc7NAzLxyRkp1+RLerA05x
-	 tUzV+sGVF4rjbkltLT0a6Gods+jdcCq2hSpAlqJlLqRTFvwr7dRulglhv6C634Zmrk
-	 o5q4GbTa7TDMp/73NflEKyY+ThB/SflXkNL3CENMOw94BQv6H5PX9eK0bHVVeHS38w
-	 cEypoQZlmojEg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vDip7-00000000Fpa-1Gaa;
-	Tue, 28 Oct 2025 12:29:13 +0000
-Date: Tue, 28 Oct 2025 12:29:12 +0000
-Message-ID: <86wm4fus4n.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	suzuki.poulose@arm.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	darren@os.amperecomputing.com,
-	cl@gentwo.org,
-	scott@os.amperecomputing.com,
-	gklkml16@gmail.com
-Subject: Re: [PATCH v2] KVM: arm64: nv: Optimize unmapping of shadow S2-MMU tables
-In-Reply-To: <060fe820-85b8-4476-be95-a0d37e53fa12@os.amperecomputing.com>
-References: <20251013065125.767779-1-gankulkarni@os.amperecomputing.com>
-	<0345c510-5db4-462f-95fb-591e71468aca@os.amperecomputing.com>
-	<87v7k53cud.wl-maz@kernel.org>
-	<060fe820-85b8-4476-be95-a0d37e53fa12@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="0q6CIKqS"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=XlmmVyLrW9dxB5D/jeLU9wLivg2YAqzJk0hijCQf38Q=;
+	b=0q6CIKqS9pZHjGnA2xxGdlLBxvFNFIVWVvYNODcuuM/VMf5yr54r4KZon8S/johgIzA5tpn1o
+	l0wTWlUL5iHLwzGeLo+GE1WjLt9uN+SIMTXs2QV/zpBtyWHoKLIVn4ePf8mf3ZyQVqO1guwdc/l
+	cZ0iIUoPEvpZcqha7wC4dD8=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cwqlx2wmcz1vnJV;
+	Tue, 28 Oct 2025 20:42:53 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cwqhk2vR4z6HJcZ;
+	Tue, 28 Oct 2025 20:40:06 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 35F071402F8;
+	Tue, 28 Oct 2025 20:43:36 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 28 Oct
+ 2025 12:43:35 +0000
+Date: Tue, 28 Oct 2025 12:43:34 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <ben.horgan@arm.com>, "Catalin
+ Marinas" <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, "Marc
+ Zyngier" <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	<linux-kernel@vger.kernel.org>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH V2 2/2] arm64/mm: Add remaining TLBI_XXX_MASK macros
+Message-ID: <20251028124334.00001e77@huawei.com>
+In-Reply-To: <6e7d0bf3-ddf1-44a0-a0cb-7dc994101878@arm.com>
+References: <20251024040207.137480-1-anshuman.khandual@arm.com>
+	<20251024040207.137480-3-anshuman.khandual@arm.com>
+	<20251024120014.000020af@huawei.com>
+	<6e7d0bf3-ddf1-44a0-a0cb-7dc994101878@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, will@kernel.org, catalin.marinas@arm.com, suzuki.poulose@arm.com, joey.gouly@arm.com, yuzenghui@huawei.com, darren@os.amperecomputing.com, cl@gentwo.org, scott@os.amperecomputing.com, gklkml16@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Tue, 28 Oct 2025 06:02:03 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->=20
-> On 10/23/2025 8:05 PM, Marc Zyngier wrote:
-> > On Thu, 23 Oct 2025 12:11:42 +0100,
-> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> >>=20
-> >>=20
-> >> Hi Marc, Oliver,
-> >>=20
-> >> On 10/13/2025 12:21 PM, Ganapatrao Kulkarni wrote:
-> >>> As of commit ec14c272408a ("KVM: arm64: nv: Unmap/flush shadow
-> >>> stage 2 page tables"), an unmap of a canonical IPA range mapped at L1
-> >>> triggers invalidation in L1 S2-MMU and in all active shadow (L2) S2-M=
-MU
-> >>> tables. Because there is no direct mapping to locate the corresponding
-> >>> shadow IPAs, the code falls back to a full S2-MMU page-table walk and
-> >>> invalidation across the entire L1 address space.
-> >>>=20
-> >>> For 4K pages this causes roughly 256K loop iterations (about 8M for
-> >>> 64K pages) per unmap, which can severely impact performance on large
-> >>> systems and even cause soft lockups during NV (L1/L2) boots with many
-> >>> CPUs and large memory. It also causes long delays during L1 reboot.
-> >>>=20
-> >>> This patch adds a maple-tree-based lookup that records canonical-IPA =
-to
-> >>> shadow-IPA mappings whenever a page is mapped into any shadow (L2)
-> >>> table. On unmap, the lookup is used to target only those shadow IPAs
-> >>> which are fully or partially mapped in shadow S2-MMU tables, avoiding
-> >>> a full-address-space walk and unnecessary unmap/flush operations.
-> >>>=20
-> >>> The lookup is updated on map/unmap operations so entries remain
-> >>> consistent with shadow table state. Use it during unmap to invalidate
-> >>> only affected shadow IPAs, avoiding unnecessary CPU work and reducing
-> >>> latency when shadow mappings are sparse.
-> >>>=20
-> >>> Reviewed-by: Christoph Lameter (Ampere) <cl@gentwo.org>
-> >>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.co=
-m>
-> >>> ---
-> >>>=20
-> >>> Changes since v1:
-> >>> 		Rebased to 6.18-rc1.
-> >>> 		Fixed alignment issue while adding the shadow ipa range
-> >>> 		to lookup.=09
-> >>>=20
-> >>> Changes since RFC v1:
-> >>> 		Added maple tree based lookup and updated with review
-> >>> 		comments from [1].
-> >>>=20
-> >>> [1] https://lkml.indiana.edu/2403.0/03801.html
-> >>>=20
-> >>>    arch/arm64/include/asm/kvm_host.h   |   3 +
-> >>>    arch/arm64/include/asm/kvm_nested.h |   9 +++
-> >>>    arch/arm64/kvm/mmu.c                |  17 ++--
-> >>>    arch/arm64/kvm/nested.c             | 120 ++++++++++++++++++++++++=
-++--
-> >>>    4 files changed, 138 insertions(+), 11 deletions(-)
-> >>>=20
-> >>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> >>> index b763293281c8..e774681c6ba4 100644
-> >>> --- a/arch/arm64/include/asm/kvm_host.h
-> >>> +++ b/arch/arm64/include/asm/kvm_host.h
-> >>> @@ -227,6 +227,9 @@ struct kvm_s2_mmu {
-> >>>    	 * >0: Somebody is actively using this.
-> >>>    	 */
-> >>>    	atomic_t refcnt;
-> >>> +
-> >>> +	/* For IPA to shadow IPA lookup */
-> >>> +	struct maple_tree nested_mmu_mt;
-> >>>    };
-> >>>      struct kvm_arch_memory_slot {
-> >>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include=
-/asm/kvm_nested.h
-> >>> index f7c06a840963..5b7c4e7ed18f 100644
-> >>> --- a/arch/arm64/include/asm/kvm_nested.h
-> >>> +++ b/arch/arm64/include/asm/kvm_nested.h
-> >>> @@ -69,6 +69,8 @@ extern void kvm_init_nested(struct kvm *kvm);
-> >>>    extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
-> >>>    extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
-> >>>    extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu);
-> >>> +extern int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 sha=
-dow_ipa, u64 ipa,
-> >>> +		u64 size);
-> >>>      union tlbi_info;
-> >>>    @@ -95,6 +97,12 @@ struct kvm_s2_trans {
-> >>>    	u64 desc;
-> >>>    };
-> >>>    +struct shadow_ipa_map {
-> >>> +	u64 shadow_ipa;
-> >>> +	u64 ipa;
-> >>> +	u64 size;
-> >>> +};
-> >>> +
-> >>>    static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans =
-*trans)
-> >>>    {
-> >>>    	return trans->output;
-> >>> @@ -132,6 +140,7 @@ extern int kvm_s2_handle_perm_fault(struct kvm_vc=
-pu *vcpu,
-> >>>    extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
-> >>>    extern void kvm_nested_s2_wp(struct kvm *kvm);
-> >>>    extern void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block);
-> >>> +extern void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 =
-size, bool may_block);
-> >>>    extern void kvm_nested_s2_flush(struct kvm *kvm);
-> >>>      unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu,
-> >>> u64 val);
-> >>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> >>> index 7cc964af8d30..27c120556e1b 100644
-> >>> --- a/arch/arm64/kvm/mmu.c
-> >>> +++ b/arch/arm64/kvm/mmu.c
-> >>> @@ -1872,6 +1872,10 @@ static int user_mem_abort(struct kvm_vcpu *vcp=
-u, phys_addr_t fault_ipa,
-> >>>    		ret =3D KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault_ipa, vma_p=
-agesize,
-> >>>    					     __pfn_to_phys(pfn), prot,
-> >>>    					     memcache, flags);
-> >>> +
-> >>> +		/* Add to lookup, if canonical IPA range mapped to shadow mmu */
-> >>> +		if (nested)
-> >>> +			add_to_shadow_ipa_lookup(pgt, fault_ipa, ipa, vma_pagesize);
-> >>>    	}
-> >>>      out_unlock:
-> >>> @@ -2094,14 +2098,15 @@ int kvm_handle_guest_abort(struct kvm_vcpu *v=
-cpu)
-> >>>      bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range
-> >>> *range)
-> >>>    {
-> >>> +	gpa_t start =3D range->start << PAGE_SHIFT;
-> >>> +	gpa_t end =3D (range->end - range->start) << PAGE_SHIFT;
-> >>> +	bool may_block =3D range->may_block;
-> >>> +
-> >>>    	if (!kvm->arch.mmu.pgt)
-> >>>    		return false;
-> >>>    -	__unmap_stage2_range(&kvm->arch.mmu, range->start <<
-> >>> PAGE_SHIFT,
-> >>> -			     (range->end - range->start) << PAGE_SHIFT,
-> >>> -			     range->may_block);
-> >>> -
-> >>> -	kvm_nested_s2_unmap(kvm, range->may_block);
-> >>> +	__unmap_stage2_range(&kvm->arch.mmu, start, end, may_block);
-> >>> +	kvm_nested_s2_unmap_range(kvm, start, end, may_block);
-> >>>    	return false;
-> >>>    }
-> >>>    @@ -2386,7 +2391,7 @@ void kvm_arch_flush_shadow_memslot(struct
-> >>> kvm *kvm,
-> >>>      	write_lock(&kvm->mmu_lock);
-> >>>    	kvm_stage2_unmap_range(&kvm->arch.mmu, gpa, size, true);
-> >>> -	kvm_nested_s2_unmap(kvm, true);
-> >>> +	kvm_nested_s2_unmap_range(kvm, gpa, size, true);
-> >>>    	write_unlock(&kvm->mmu_lock);
-> >>>    }
-> >>>    diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> >>> index 7a045cad6bdf..3a7035e7526a 100644
-> >>> --- a/arch/arm64/kvm/nested.c
-> >>> +++ b/arch/arm64/kvm/nested.c
-> >>> @@ -7,6 +7,7 @@
-> >>>    #include <linux/bitfield.h>
-> >>>    #include <linux/kvm.h>
-> >>>    #include <linux/kvm_host.h>
-> >>> +#include <linux/maple_tree.h>
-> >>>      #include <asm/fixmap.h>
-> >>>    #include <asm/kvm_arm.h>
-> >>> @@ -725,6 +726,7 @@ void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mm=
-u)
-> >>>    	mmu->tlb_vttbr =3D VTTBR_CNP_BIT;
-> >>>    	mmu->nested_stage2_enabled =3D false;
-> >>>    	atomic_set(&mmu->refcnt, 0);
-> >>> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
-> >>>    }
-> >>>      void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-> >>> @@ -1067,6 +1069,99 @@ void kvm_nested_s2_wp(struct kvm *kvm)
-> >>>    	kvm_invalidate_vncr_ipa(kvm, 0, BIT(kvm->arch.mmu.pgt->ia_bits));
-> >>>    }
-> >>>    +/*
-> >>> + * Store range of canonical IPA mapped to a nested stage 2 mmu table.
-> >>> + * Canonical IPA used as pivot in maple tree for the lookup later
-> >>> + * while IPA unmap/flush.
-> >>> + */
-> >>> +int add_to_shadow_ipa_lookup(struct kvm_pgtable *pgt, u64 shadow_ipa,
-> >>> +		u64 ipa, u64 size)
-> >>> +{
-> >>> +	struct kvm_s2_mmu *mmu;
-> >>> +	struct shadow_ipa_map *entry;
-> >>> +	unsigned long start, end;
-> >>> +	int ret;
-> >>> +
-> >>> +	start =3D ALIGN_DOWN(ipa, size);
-> >>> +	end =3D start + size;
-> >>> +	mmu =3D pgt->mmu;
-> >>> +
-> >>> +	entry =3D kzalloc(sizeof(struct shadow_ipa_map), GFP_KERNEL_ACCOUNT=
-);
-> >>> +
-> >>> +	if (!entry)
-> >>> +		return -ENOMEM;
-> >>> +
-> >>> +	entry->ipa =3D start;
-> >>> +	entry->shadow_ipa =3D ALIGN_DOWN(shadow_ipa, size);
-> >>> +	entry->size =3D size;
-> >>> +	ret =3D mtree_store_range(&mmu->nested_mmu_mt, start, end - 1, entr=
-y,
-> >>> +			  GFP_KERNEL_ACCOUNT);
-> >>> +	if (ret) {
-> >>> +		kfree(entry);
-> >>> +		WARN_ON(ret);
-> >>> +	}
-> >>> +
-> >>> +	return ret;
-> >>> +}
-> >>> +
-> >>> +static void nested_mtree_erase(struct maple_tree *mt, unsigned long =
-start,
-> >>> +		unsigned long size)
-> >>> +{
-> >>> +	void *entry =3D NULL;
-> >>> +
-> >>> +	MA_STATE(mas, mt, start, start + size - 1);
-> >>> +
-> >>> +	mtree_lock(mt);
-> >>> +	entry =3D mas_erase(&mas);
-> >>> +	mtree_unlock(mt);
-> >>> +	kfree(entry);
-> >>> +}
-> >>> +
-> >>> +static void nested_mtree_erase_and_unmap_all(struct kvm_s2_mmu *mmu,
-> >>> +		unsigned long start, unsigned long end, bool may_block)
-> >>> +{
-> >>> +	struct shadow_ipa_map *entry;
-> >>> +
-> >>> +	mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu)) {
-> >>> +		kvm_stage2_unmap_range(mmu, entry->shadow_ipa, entry->size,
-> >>> +				may_block);
-> >>> +		kfree(entry);
-> >>> +	}
-> >>> +
-> >>> +	mtree_destroy(&mmu->nested_mmu_mt);
-> >>> +	mt_init_flags(&mmu->nested_mmu_mt, MM_MT_FLAGS);
-> >>> +}
-> >>> +
-> >>> +void kvm_nested_s2_unmap_range(struct kvm *kvm, u64 ipa, u64 size,
-> >>> +		bool may_block)
-> >>> +{
-> >>> +	int i;
-> >>> +	struct shadow_ipa_map *entry;
-> >>> +
-> >>> +	lockdep_assert_held_write(&kvm->mmu_lock);
-> >>> +
-> >>> +	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
-> >>> +		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-> >>> +		unsigned long start =3D ipa;
-> >>> +		unsigned long end =3D ipa + size;
-> >>> +
-> >>> +		if (!kvm_s2_mmu_valid(mmu))
-> >>> +			continue;
-> >>> +
-> >>> +		do {
-> >>> +			entry =3D mt_find(&mmu->nested_mmu_mt, &start, end - 1);
-> >>> +			if (!entry)
-> >>> +				break;
-> >>> +
-> >>> +			kvm_stage2_unmap_range(mmu, entry->shadow_ipa,
-> >>> +							entry->size, may_block);
-> >>> +			start =3D entry->ipa + entry->size;
-> >>> +			nested_mtree_erase(&mmu->nested_mmu_mt, entry->ipa,
-> >>> +							entry->size);
-> >>> +		} while (start < end);
-> >>> +	}
-> >>> +}
-> >>> +
-> >>>    void kvm_nested_s2_unmap(struct kvm *kvm, bool may_block)
-> >>>    {
-> >>>    	int i;
-> >>> @@ -1076,8 +1171,10 @@ void kvm_nested_s2_unmap(struct kvm *kvm, bool=
- may_block)
-> >>>    	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
-> >>>    		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-> >>>    -		if (kvm_s2_mmu_valid(mmu))
-> >>> -			kvm_stage2_unmap_range(mmu, 0, kvm_phys_size(mmu), may_block);
-> >>> +		if (!kvm_s2_mmu_valid(mmu))
-> >>> +			continue;
-> >>> +
-> >>> +		nested_mtree_erase_and_unmap_all(mmu, 0, kvm_phys_size(mmu), may_b=
-lock);
-> >>>    	}
-> >>>      	kvm_invalidate_vncr_ipa(kvm, 0,
-> >>> BIT(kvm->arch.mmu.pgt->ia_bits));
-> >>> @@ -1091,9 +1188,14 @@ void kvm_nested_s2_flush(struct kvm *kvm)
-> >>>      	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
-> >>>    		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-> >>> +		struct shadow_ipa_map *entry;
-> >>> +		unsigned long start =3D 0;
-> >>>    -		if (kvm_s2_mmu_valid(mmu))
-> >>> -			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(mmu));
-> >>> +		if (!kvm_s2_mmu_valid(mmu))
-> >>> +			continue;
-> >>> +
-> >>> +		mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
-> >>> +			kvm_stage2_flush_range(mmu, entry->shadow_ipa, entry->size);
-> >>>    	}
-> >>>    }
-> >>>    @@ -1104,8 +1206,16 @@ void kvm_arch_flush_shadow_all(struct kvm
-> >>> *kvm)
-> >>>    	for (i =3D 0; i < kvm->arch.nested_mmus_size; i++) {
-> >>>    		struct kvm_s2_mmu *mmu =3D &kvm->arch.nested_mmus[i];
-> >>>    -		if (!WARN_ON(atomic_read(&mmu->refcnt)))
-> >>> +		if (!WARN_ON(atomic_read(&mmu->refcnt))) {
-> >>> +			struct shadow_ipa_map *entry;
-> >>> +			unsigned long start =3D 0;
-> >>> +
-> >>>    			kvm_free_stage2_pgd(mmu);
-> >>> +
-> >>> +			mt_for_each(&mmu->nested_mmu_mt, entry, start, kvm_phys_size(mmu))
-> >>> +				kfree(entry);
-> >>> +			mtree_destroy(&mmu->nested_mmu_mt);
-> >>> +		}
-> >>>    	}
-> >>>    	kvfree(kvm->arch.nested_mmus);
-> >>>    	kvm->arch.nested_mmus =3D NULL;
-> >>=20
-> >> Any review comments or suggestions for this patch?
-> >=20
-> > None. This patch is obviously lacking the basic requirements that such
-> > an "optimisation" should handle, such as dealing with multiple
-> > mappings to the same IPA in the shadow S2, hence will happily fail to
-> > correctly unmap stuff. There is no documentation, and no test.
-> >=20
-> Thanks for the comment.
-> How about adding list of multiple mappings ranges to the maple tree
-> entry/node while adding to the lookup and later unmapping every
-> range present in that list?
+On Mon, 27 Oct 2025 07:06:45 +0530
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 
-How will that work when the various mappings don't have the same size?
+> On 24/10/25 4:30 PM, Jonathan Cameron wrote:
+> > On Fri, 24 Oct 2025 05:02:07 +0100
+> > Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+> >   
+> >> Add remaining TLBI_XXX_MASK macros and replace current open encoded fields.
+> >> While here replace hard coded page size based shifts but with derived ones
+> >> via ilog2() thus adding some required context.
+> >>
+> >> TLBI_TTL_MASK has been split into separate TLBI_TTL_MASK and TLBI_TG_MASK
+> >> as appropriate because currently it simultaneously contains both page size
+> >> and translation table level information. KVM on arm64 has been updated to
+> >> accommodate these changes to TLBI_TTL_MASK.
+> >>
+> >> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >> Cc: Will Deacon <will@kernel.org>
+> >> Cc: Marc Zyngier <maz@kernel.org>
+> >> Cc: Oliver Upton <oliver.upton@linux.dev>
+> >> Cc: linux-arm-kernel@lists.infradead.org
+> >> Cc: linux-kernel@vger.kernel.org
+> >> Cc: kvmarm@lists.linux.dev
+> >> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> >> ---
+> >>  arch/arm64/include/asm/tlbflush.h | 26 ++++++++++++++++++--------
+> >>  arch/arm64/kvm/nested.c           |  8 +++++---
+> >>  2 files changed, 23 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> >> index 131096094f5b..cf75fc2a06c3 100644
+> >> --- a/arch/arm64/include/asm/tlbflush.h
+> >> +++ b/arch/arm64/include/asm/tlbflush.h
+> >> @@ -57,9 +57,10 @@
+> >>  /* This macro creates a properly formatted VA operand for the TLBI */
+> >>  #define __TLBI_VADDR(addr, asid)				\
+> >>  	({							\
+> >> -		unsigned long __ta = (addr) >> 12;		\
+> >> -		__ta &= GENMASK_ULL(43, 0);			\
+> >> -		__ta |= (unsigned long)(asid) << 48;		\
+> >> +		unsigned long __ta = (addr) >> ilog2(SZ_4K);	\
+> >> +		__ta &= TLBI_BADDR_MASK;			\
+> >> +		__ta &= ~TLBI_ASID_MASK;			\
+> >> +		__ta |= FIELD_PREP(TLBI_ASID_MASK, asid);	\  
+> > I think you can replace the two lines above with
+> > 		FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);
+> > 
+> > It's a small reduction in code but I don't mind much either way.  
+> 
+> Right. FIELD_MODIFY() might be appropriate in this scenario but
+> there will be some additional code churn needed. I don't have a
+> strong opinion either way.
+> 
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -55,13 +55,12 @@
+>  } while (0)
+> 
+>  /* This macro creates a properly formatted VA operand for the TLBI */
+> -#define __TLBI_VADDR(addr, asid)                               \
+> -       ({                                                      \
+> -               unsigned long __ta = (addr) >> ilog2(SZ_4K);    \
+> -               __ta &= TLBI_BADDR_MASK;                        \
+> -               __ta &= ~TLBI_ASID_MASK;                        \
+> -               __ta |= FIELD_PREP(TLBI_ASID_MASK, asid);       \
+> -               __ta;                                           \
+> +#define __TLBI_VADDR(addr, asid)                                       \
+> +       ({                                                              \
+> +               unsigned long __ta = (addr) >> ilog2(SZ_4K);            \
+> +               __ta &= TLBI_BADDR_MASK;                                \
+> +               __ta |= FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);      \
+		  FIELD_MODIFY(TLBI_ASID_MASK, &__tab, asid);
 
-> I tested this patch on an AmpereOne system (2 NUMA nodes, 96 CPUs
-> per node, numa balance enabled) with large vCPU counts and large
-> memory to L1 and L2.  The current full-address-space walk caused
-> very large unmap/flush work and significant delays (exacerbated by
-> NUMA balancing / page migration activity).  The targeted unmap using
-> the list per node removes only the affected mappings and reduces the
-> unmap latency substantially in our workloads.
+as it's done in place in the second parameter.
+ 
 
-I really don't care how badly things perform. The important thing is
-that this is architecturally correct, while your approach isn't.
 
-> I booted multiple L1s, each hosting several L2s, and observed no
-> panics or failures related to missing support for multiple=E2=80=91IPA
-> mappings.
-
-I'm sorry, but Linux isn't a validation tool for the architecture. You
-have clearly designed something around Linux's own behaviour, not the
-architectural requirements.
-
-> If you have any test cases or scenarios that would validate support
-> for multiple IPA mappings, could you please share them?
-
-The onus is on *you* to provide them, not me.
-
-I've repeatedly said that I didn't care about performance when we have
-so little to validate the existing code. This still stands.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
