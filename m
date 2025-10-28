@@ -1,110 +1,120 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474713081C2
-	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 10:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1DC2F691A
+	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 10:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761648085; cv=none; b=S1UeBFtJqUCuEGuEeXhpLa63usFwcwOjmfPOdomUCMuVvdOxmN1HzgshmhC2fDcXTsB3RSyGJBfwy8HRh1HLJVXSKyUpjZX85+8lyL+xCWolSfIH5pX94AM2zt61vwyxLmHKeIEr3+5wkdzBs6aK0W/9LM0Z0l+9wR6pdOcrZc8=
+	t=1761648702; cv=none; b=lniyfmkwumjUffPvkzUyHJeAiWBsBrC0Ip4jmF9/snFsWh0ouYiprvpJ311/ifXMYOsRrvWgx3csZZyGuqGT/62sYj3R3JZtY/bqMYeTt+thUirR0FTF0UEv6/YRRCkihzNxX1OUAoVtOiz4FYN991NFPAVMP1Ef3muzT0h+pik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761648085; c=relaxed/simple;
-	bh=/Tw7YIdbXuV+Py6bpAG4b/reVIEI2qovtF58gW1FAC0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MsRgpR/iTm+I17i6z2TBF2Xd3HIH7aorYKh5NY+xVzXPYxsuFERgHTW/V5a9NWFsi31D+LVWntPGWgQMVcbPDvGKq9ABAufUM2moFU2Y4dg/51aIFi306SHFlMzrZKUEdcG2k99bJx6D7STrja1feHStf7OSEQOWtgCxnDxl/3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KKcNPYXh; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1761648702; c=relaxed/simple;
+	bh=Pbgo/x92Vlpm9S0u6S/Gtfa49I9rN6zl/RUeL2NGYyA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F6NuCB6t0+LkACDjQ6Ks28b7OzTU/1rbyBRjqkC+fIVPV8jbO0jqrP+RlS5SzlFzP/G1wLUgPZnN2O9grMHViMYJNCXwdFMuaq+Oo/UVQ899w6hK0RFO26jgcSIeP2XxsmcpRwG4XvtZpBAMoF8nDwmetRx6xzJILnUR2FBd8ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ltQpxj9A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KKcNPYXh"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso125691cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 03:41:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761648082; x=1762252882; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xyYFRQojunl/tRzwlh+ac2kk1NsYLl4yZPYrY+iaVBw=;
-        b=KKcNPYXhbYGoUPLmoJ3jtxBfg8r/TatqmhAEn0IXBBskrf1dRk2aCl2ZBcjxwRfRZW
-         ypnossMy9yj1nbpBkKZ2/YGosKMqsRAj/quRMuQy4P/3RSlRiMtdj7QCOzPc0v1ZDCf/
-         6WPdKmqu4F1Q8c9E46qGhWnU/cWpxYcbeL3/J005zq6Tfa+8e/QFeDy8zCUuqgrix/oa
-         +a0eyp/96aq9QjYi7HbrMf/RIpcdkSOMPC4h1W3sVR8B4Y3pEiJhDC8vnKYzDgb/V64c
-         N/sIehd1hz9iNNUxpMEQ9evrFnHe/SeKl8eNtk2rGkGKK0ILuyqrSN886IXdbu79fKMJ
-         DKGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761648082; x=1762252882;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xyYFRQojunl/tRzwlh+ac2kk1NsYLl4yZPYrY+iaVBw=;
-        b=gLov9aXVmgdVt/Ef0iIT5obeXbuVWMbPmqF4PCPyVGcmdHZ7LD9n4o0LLdu83xqrQo
-         B4JHwJE3SkwRJvX7SGuzQrgEXAje58ClTWe3ejGeBlFyS/+jAm2bS9QefqG6xmkpsDX4
-         ErNZBRUsAw9WV6E0VjdX/1ByXp1jkmRfUTvGeWR3yy0ItRXGkpMRhGKZ2iLEJ1F6iR4Q
-         gBZERfI4dE7TEP8A+iSucZcGQUXcnPlVe0PrwO4Fj6zKiAqAhk57U4y41MDawmHiQLt9
-         SwZzvXsv8QDwGrv5SUfLuz0z/rvq3LCOK4U5JIsNF51dlBPCITl+tq4yinrlGSVthP81
-         t+eA==
-X-Gm-Message-State: AOJu0YygqBszrsC9q63CCsm/rNTKa0nu2SWjwOEHBN+UlK7XHe1lVl6L
-	7do2BqR3EFOTkOmYzDPqaHhxLQTw2Pz2q+KrDDnyZAQF418rXj972YZlEAloGBGPy9UAeQh6Ors
-	mIDdD2F/4JQN5nrzgGV556ak1irBaGvkOLXf4Fx5j
-X-Gm-Gg: ASbGncsL3xO1GK+5zXexT8iW7FT4CunIYsHIkPh3S2rgFozEV8wC9ZxQp440rBfnUX7
-	6TslE4rv25j98d0UBnKF7S9gbqMPgvGicINesuGO5knXyseNZyn/3PQZ00iYLpvgWJ77Iydcbyw
-	d+cPsed8zEz31J01K0PR+XANVteEhbEBqfmjE76Esuo88vl7UvbI4yNwgpwLFpENh0zSxgayThU
-	aEYx6fCW16FS8AklAY1StMeQ5Sq9xnkkIJXO5ew8vz/MoQGiVx0Cepcgn0mFL7TnDLPWBsxAh7u
-	GZ/wU0hKQdDnFhZ6zyx9sILB
-X-Google-Smtp-Source: AGHT+IFFXfImVcBC1aHOTYgWrMceC2H6PeDXVpaOsr5+gplZ8eX17JiVPPiMcYOXVyoXKBIZ0HHBi2NKdR1/MprdqkM=
-X-Received: by 2002:a05:622a:5a98:b0:4b7:9c77:6ba5 with SMTP id
- d75a77b69052e-4ed09f7cbd8mr4751271cf.15.1761648081564; Tue, 28 Oct 2025
- 03:41:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ltQpxj9A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C010C4CEE7;
+	Tue, 28 Oct 2025 10:51:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761648702;
+	bh=Pbgo/x92Vlpm9S0u6S/Gtfa49I9rN6zl/RUeL2NGYyA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ltQpxj9AqC0KGjK0nTSEsd+12Y/yu6tZKpgx6ueqTXbPDqyGkfWse3qeykciOhtxu
+	 I2+kbicPfJkH6Ke+SK1vVQVxfqmhwAZebgPjZtITXbFPurD4QB5O3AKDl8wrEVwcrX
+	 FEMx3BrKXz8f5IUFbPdhQWSOWwszMconCjlJ47jpcc2D3Dn7LPTpeh6KApwZjVQo3A
+	 xvl3JpliD5qVIkDK/qYCoCVbljGpChS7ga3OXpxV7aG8YJVieFq/mBchffBs81BVrb
+	 4xtl3/zSzkhnqU+WKlc70EG2IP3VgispGyXeOVEjkDGC8QFzuMUWI/6W7Vhoc56cl4
+	 K9FkGbaMU4BOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vDhIh-00000000E7N-46gY;
+	Tue, 28 Oct 2025 10:51:40 +0000
+Date: Tue, 28 Oct 2025 10:51:39 +0000
+Message-ID: <86y0ovuwn8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com
+Subject: Re: [PATCH v1 2/4] KVM: arm64: Add compile-time type check for register in __vcpu_assign_sys_reg()
+In-Reply-To: <20251027113943.1282568-3-tabba@google.com>
+References: <20251027113943.1282568-1-tabba@google.com>
+	<20251027113943.1282568-3-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251027113943.1282568-1-tabba@google.com> <20251027113943.1282568-2-tabba@google.com>
- <86zf9bux8m.wl-maz@kernel.org>
-In-Reply-To: <86zf9bux8m.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 28 Oct 2025 10:40:44 +0000
-X-Gm-Features: AWmQ_bkrWFTx10BG9y6-HIb1BAzsBhsUUbx3Qvf6bdqolNIIlbJkOOCnpYFIwQ8
-Message-ID: <CA+EHjTyBSmKCpiBQPRV4joY6Qxrjywi4zseNzqdXejr+KmPG+g@mail.gmail.com>
-Subject: Re: [PATCH v1 1/4] KVM: arm64: Switch reg and val parameter ordering
- in vcpu_write_sys_reg()
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
+On Mon, 27 Oct 2025 11:39:41 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> The 'r' (register) and 'val' (value) parameters in
+> __vcpu_assign_sys_reg() can be easily transposed. The register ID is an
+> enum, whereas the value is a u64. This has led to bugs in the past, and
+> the risk was increased by the historically inconsistent parameter
+> ordering of the vcpu_write_sys_reg() function.
+> 
+> To prevent this class of bugs, add a compile-time type compatibility check
+> to prevent the 'r' parameter from having a 'u64' type.
+> 
+> This directly catches the erroneous transposition (passing the 'u64'
+> value as 'r') while remaining flexible, as it does not force 'r' to
+> be a specific enum type.
 
-On Tue, 28 Oct 2025 at 10:38, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 27 Oct 2025 11:39:40 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > The vcpu_write_sys_reg() function previously used the signature:
-> > void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, enum vcpu_sysreg reg);
-> >
-> > This was inconsistent with related functions and macros such as
-> > __vcpu_assign_sys_reg() and __vcpu_rmw_sys_reg(), both of which
-> > have the register parameter before the value.
-> > '(vcpu, reg, ...)' ordering.
->
-> On the other hand, write_sys_reg() is exactly in the same order as
-> vcpu_write_sys_reg(). I think that's the model to follow.
->
-> The __vcpu_*_sys_reg() helpers are internal things, really, and if
-> something has to change, I'd rather change those.
+I don't think that's enough. It is too easy to pass a u32 and
+accidentally bypass this check. I really think we should redefine the
+register identifiers to be a fixed value structure, something like
+this:
 
-Sure. I'll wait a bit for additional comments on the remaining
-patches, and respin changing the order for the __vcpu_*_sys_reg()
-helpers.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7501a2ee4dd44..18f65dbff2379 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -624,6 +624,12 @@ enum vcpu_sysreg {
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
+ 
++struct vcpu_sys_reg {
++	enum vcpu_sysreg reg;
++};
++
++static const struct vcpu_sys_reg vcpu_sys_reg_SCTLR_EL1 = { SCTLR_EL1 };
++
+ struct kvm_sysreg_masks {
+ 	struct {
+ 		u64	res0;
 
-Thanks,
-/fuad
+and then enforce that whatever is interpreted as a system register is
+actually one of these structures (with some creative cpp wrapping to
+make it less awkward).
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+In a way, this is similar to what we are doing for page table
+manipulation, where pte_t is a structure wrapping a u64.
+
+If we move to such construct, it becomes impossible to swap value and
+register, and we can stop worrying about that.
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
