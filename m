@@ -1,199 +1,168 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517B825486D
-	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 11:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94AA309F13
+	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 11:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761649261; cv=none; b=Tq+lw8AOk2R9/pgcZVhkFm9WFgFeb9nps27GtSfE1ZbJfMiUkNy7PTcLEwyXHMNgmHQLWFLBO72DP63bnwJlKV1Zl85SNv7yjxBRWBUob3glCC6hGMaK0KK5itGsRWPEUjSroPLEsZjoBSIj5TtNZmJp5+CIB286pGg2MC30HS0=
+	t=1761651852; cv=none; b=LfFMvIuP9P796VSpc52ApC8+NT10nRoAlKvKlFLNayxYN3GBeJ4VPHqmNrJDl3vvX05VrFHxsm7qFO6sOcj7H89R4n5dCBNkDQ6+PhR38Otm6DXG9yWb8cfGhL13CsMknUjcyPVoL8AHdAs/IYqfFarkn/Sc1Kpq67xpDmRImHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761649261; c=relaxed/simple;
-	bh=TBcCwBBiRefOxaueoN9Psch/bKtJhqoQamxX5KSEkKc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=rycqheDQ6rHyMKMC0mdSCRosP4qHCP1vxSj316iam64TXAC19u779oFdblHJWaXceigmhP488C8wlR36vLYtYBM5mcu0tA2CeplcrSdF0z0fILgZssgKwSjk4D2ZsbOQgv8bAuNIkIGbMLkZpMzes6WgQ59QnUTVhs1D99N5AME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6q9WV3+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761651852; c=relaxed/simple;
+	bh=poij8wlwwOv2xQkmm5yAYpdmtg97F2oQvtny01XIVT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=spQ5YI6as9wQJ/j2JhubcWpxBpSvGL1yHV/ihgEat/zvhjjBjlmt4dj2EQXsxSxVVysH7C1HbFujTTMYkuaueXO8gFp5bBNY4Tknin8JQB4AcDuhK+orz29WNLWfupY1ol4iiuVahJP63b0AgBUJJOrotQvhaIK2IJuIsTUpTKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F/tJquwi; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6q9WV3+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761649259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nxmOHwHxmZMLpzf1uqdrSlEJ/+f2PvodAb00eauIdqA=;
-	b=d6q9WV3+KdAkJcCjHcSyEAt1iybIs/nSuGocH8TX4DrMDH5L0TrtALJFPJNZJirzlisZeT
-	yUH1SwjryOqpvCqQXdLbksx2O09iPFWT8oCykpfC1E9ivIXaJ/PUo2y/7ZMnU8rKc9ObpU
-	sIZagfyqi8Pw7pNmDN8ovsmZpy2DhBg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-462-ayo0arKzMgaavKqlV8VdlQ-1; Tue, 28 Oct 2025 07:00:57 -0400
-X-MC-Unique: ayo0arKzMgaavKqlV8VdlQ-1
-X-Mimecast-MFC-AGG-ID: ayo0arKzMgaavKqlV8VdlQ_1761649256
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-471001b980eso36573835e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 04:00:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/tJquwi"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3ee130237a8so3826142f8f.0
+        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 04:44:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761651848; x=1762256648; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PWcMpUbr5EvoYwg6OCCvCq3zKJMQIWwwgnasyRi2T/U=;
+        b=F/tJquwi1Y3FoXPpq57UAI4Q5E8K+5lAxtzNXLibRTVdhS9ud4WwnjUAfxWhoiq4gz
+         bOqSVpLHOeBOZUYEK3pLroq4/S7juSD2SUEeKes8b38ZTHFRzB0FgTR2NBVRFcssWdWk
+         LY0QooL1XQvnr3Fr+HczZFYeB37zlJSwlh0EeCJX4rTrsXfks5fANoq4IncnpnWulxOS
+         xxNGPiuFva3S/uYCVT+nZWx2A64QvmA2tDsnmYziQX6+vzL2fMug13PFtrKSJEwV39TC
+         GN5MDnzNUOKfOvXfDUjsmeDq1KMDZrgTph5ZUNgJC15KARDR7JBjLPGwya7wR68rSHoW
+         QSCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761649255; x=1762254055;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nxmOHwHxmZMLpzf1uqdrSlEJ/+f2PvodAb00eauIdqA=;
-        b=nu7RR2c9hS9x0B0KCjIwzH/yTcwK519rpRJfWngX+Es0sjkJx2scPqYbYtHotpRk+a
-         n+e4u9MpF/XIPod6MNFgKPqreRisSMSS0OqsoJH0Sq5heN5COZGnw9nJTZm5TkAbOMQU
-         naBT/up1vQ+v7T/q0srTRldutTk4zMtrKmdaFyuoqUDUA/YI0T90aoIjqYUMqDxIhzt5
-         XuVrROgfc++Qfwix7CdOwOotqcM8Mj+2IA+iM1ThgFserfHmndgt0TAjZZBkbB3FDIbV
-         nkzs8h5ldKU1Z8sS7OihMjpZP07vse4/2p6LnhcudWC+QWFBTQ1yQJ/pXbzjAQ+Yp/j6
-         s1gw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6j5V7/cXk2KolIZSiN0oWcY2jrTc3AsZ9leMhTZupdEZ7q4o4+r/PcPh1VsKGEeKaDVhxpMI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzlZwondLpxTYyGA01//N9vR7M11HWAQahhJuqjIiThT/r7lRI2
-	7TSH1GT3Oj1DtXQ8ycgDYWl1duyCQ2hnXK7xBdwf1ROgoSC/jCEYw7oepKU0h22We/ZL34MVjEH
-	zKOsNJhqF1n9KjDcpxtB4jzZGuUGjNIWUIhV6F8HQA1e13vUwXfajQn+qsw==
-X-Gm-Gg: ASbGnctJp5Ke2DpxNVqL4PqsxSY5+ImXE4dFiqeOW90qp62AMBkvuqG4csX+3M7cEG9
-	LSb0t7xe/arENaEcyrkmQb5p/aRfe86uhsnCecv3Kez5KWcJmsYOmJe5XapUtOqugMrd/bfCOh2
-	sOsZtSfZvpafQxdYtwcz5hrhIEB2MZnqR5A5Waz3BYpV+iZOJ4KPHRUFZr7IerLRfmlPFoB/ztD
-	qoUSKyRhc7Pv8CCTQvio2Z5pp14xp0K1qfSWI30yhOR7mgS+27XFwKSR6LoJMsFBYzJ+NRgL6FN
-	jM4KdXROMS0ifCqfLsNRNs+YoNlEoHdQOT8GUzwIyMsaUp6a3xQMVQWhzb3vVX+ZPEclIgv4TlS
-	QjW0Vwop3b3Wov8ahRuhS3GMYZNLeGaqgDtVe2+7VFKIieIFn
-X-Received: by 2002:a05:600c:3493:b0:46f:b42e:edce with SMTP id 5b1f17b1804b1-47717e67cd3mr23266985e9.39.1761649255552;
-        Tue, 28 Oct 2025 04:00:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFVAEQZBrj6XxR1esAB3vvNknSrAGxc5wuX0loLWB2sKQiYoi+ajmuIkxNcYXcTJ8iSZx7ug==
-X-Received: by 2002:a05:600c:3493:b0:46f:b42e:edce with SMTP id 5b1f17b1804b1-47717e67cd3mr23266575e9.39.1761649255026;
-        Tue, 28 Oct 2025 04:00:55 -0700 (PDT)
-Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd48942dsm192647185e9.4.2025.10.28.04.00.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 04:00:54 -0700 (PDT)
-Date: Tue, 28 Oct 2025 12:00:53 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, 
-    qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-In-Reply-To: <CAFEAcA-urFX=V7kuRA3cRik7PifFQER5eoXC_CZ2jKg7OZz9iA@mail.gmail.com>
-Message-ID: <ba03c952-e567-eb2b-f4c8-b1818ee127d6@redhat.com>
-References: <20250911144923.24259-1-sebott@redhat.com> <20250911144923.24259-3-sebott@redhat.com> <CAFEAcA-urFX=V7kuRA3cRik7PifFQER5eoXC_CZ2jKg7OZz9iA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1761651848; x=1762256648;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PWcMpUbr5EvoYwg6OCCvCq3zKJMQIWwwgnasyRi2T/U=;
+        b=bqbfUGYO8pxJS+MXIwXLVndbm46EcL+GmN1PosGNtwPArsyQuhj2fT7wqoGqk6N6SX
+         Un2IAT/zu3ERz2YHImgTHZOuHuT2p6KnFdLplsAWy1KYQCmJ4JuGrKt09xD5TU6P2kJO
+         c4ySLsDsk0EjWWE/lIhR5KxiM9+CsBuSPjz4Xhtzuiq1BR6sglAmz5A0t0qLkHXtI9b/
+         r0XDG5DqnGb3Yb2CxlVejFGQrigEO2SS2stTO1RjZ6iEe31cC1Rcpq5VTx/l/4Vhbp7g
+         WIxRTAmjexddXCC2y/zpDBVCoHRjWnNhwTo6okguq8JCu/i/J0vPUaCD0dwNNIDvf/ul
+         YTyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDFaayAW3CdwMr3y4W/3195zOOiMdUvSrmcr9qKfUjwrIzZMeXKaYGYxp2EeymjfrTtd1PqEc=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwXgzJodH1gp9g3XHZRxxoP5uvCIQkHBIY0dBeo1F8J7SfOg3c3
+	0qKnr1FO8iJxa3ON2rO0yi0Dy6NmBapGymH/n6tZrIcVXXsPUnjGXZnJ
+X-Gm-Gg: ASbGncsMdlCv86wbjr2Ha3ZzAYiQYj/Md8TaRtWXZmixAFN9wd0+Bo65RAaOo9KCqYF
+	ITZXxyMZHwRQ92fX1oJG9JVNyqief3X/drMgwdp14pE+BfE55BNyhYdRh9G7FCZmzyUeow26f4z
+	1/eW5c/y3juz3/aQyctIZfEXQkGICbp5/mvQNdbn65895Y5T9UmquEkvd2mKyo39+AjxNYxey2C
+	Gz2XocX90QdTGclIbhFRrMyU5gNpCJsz6W50Scxf19KEMKPtkp3LyRofU38tqSTSOxgfB/7kDln
+	qPJxPsjGktDz+pwd/lViAbUXYDNzjgluBHtd7FvvAwaCI1n9dGEajY1lXhkFTMMfAFx83Zs3X1B
+	zcZUS7SNUxFRqzWo0tpBRUv29afWlgl3ZtOfJvPfMeIMSoL11Y9zWgZs2DaOwdlx9NG2dDp7COP
+	v/RAe4JcEpL4qgkJjlyUeX
+X-Google-Smtp-Source: AGHT+IGWKlgpP2z1QhsSUQHXl7C4b+OW6D0eUSaDQiNKqIYxyLK5t9gJfLBx15l4AM6BkXPesoBDGw==
+X-Received: by 2002:a05:6000:3103:b0:429:8cda:dd4e with SMTP id ffacd0b85a97d-429a7e732bdmr2556153f8f.32.1761651847905;
+        Tue, 28 Oct 2025 04:44:07 -0700 (PDT)
+Received: from [10.24.67.204] ([15.248.3.88])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952b7b43sm20301815f8f.6.2025.10.28.04.44.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 04:44:07 -0700 (PDT)
+Message-ID: <c52db7bf-494f-49a8-9829-3805db6dda7c@gmail.com>
+Date: Tue, 28 Oct 2025 11:44:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: X4xJUEkPG1fY1-V65l97WbtLGRZEaa21pXTJnVlFjCE_1761649256
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] KVM: selftests: Fix unaligned mmap allocations
+Content-Language: en-GB
+To: Sean Christopherson <seanjc@google.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, pbonzini@redhat.com,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ isaku.yamahata@intel.com, roypat@amazon.co.uk, kalyazin@amazon.co.uk,
+ jackabt@amazon.com
+References: <20251013151502.6679-1-jackabt.amazon@gmail.com>
+ <20251013151502.6679-3-jackabt.amazon@gmail.com>
+ <aPpi1c-8EpWuo87B@google.com>
+From: "Thomson, Jack" <jackabt.amazon@gmail.com>
+In-Reply-To: <aPpi1c-8EpWuo87B@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 27 Oct 2025, Peter Maydell wrote:
-> On Thu, 11 Sept 2025 at 15:49, Sebastian Ott <sebott@redhat.com> wrote:
+
+
+On 23/10/2025 6:16 pm, Sean Christopherson wrote:
+> On Mon, Oct 13, 2025, Jack Thomson wrote:
+>> From: Jack Thomson <jackabt@amazon.com>
 >>
->> Provide a kvm specific vcpu property to override the default
->> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>> When creating a VM using mmap with huge pages, and the memory amount does
+>> not align with the underlying page size. The stored mmap_size value does
+>> not account for the fact that mmap will automatically align the length
+>> to a multiple of the underlying page size. During the teardown of the
+>> test, munmap is used. However, munmap requires the length to be a
+>> multiple of the underlying page size.
+> 
+> What happens when selftests use the wrong map_size?  E.g. is munmap() silently
+> failing?  If so, then I should probably take this particular patch through
+> kvm-x86/gmem, otherwise it means we'll start getting asserts due to:
+> 
+>    3223560c93eb ("KVM: selftests: Define wrappers for common syscalls to assert success")
+> 
+> If munmap() isn't failing, then that begs the question of what this patch is
+> actually doing :-)
+> 
+
+Hi Sean, sorry I completely missed your reply.
+
+Yeah currently with a misaligned map_size it causes munmap() to fail, I
+noticed when tested with different backings.
+
+>> Update the vm_mem_add method to ensure the mmap_size is aligned to the
+>> underlying page size.
 >>
->> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>> Signed-off-by: Jack Thomson <jackabt@amazon.com>
 >> ---
->>  docs/system/arm/cpu-features.rst |  5 +++
->>  target/arm/cpu.h                 |  6 +++
->>  target/arm/kvm.c                 | 70 +++++++++++++++++++++++++++++++-
->>  3 files changed, 80 insertions(+), 1 deletion(-)
+>>   tools/testing/selftests/kvm/lib/kvm_util.c | 12 +++++-------
+>>   1 file changed, 5 insertions(+), 7 deletions(-)
 >>
->> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
->> index 37d5dfd15b..1d32ce0fee 100644
->> --- a/docs/system/arm/cpu-features.rst
->> +++ b/docs/system/arm/cpu-features.rst
->> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
->>    the guest scheduler behavior and/or be exposed to the guest
->>    userspace.
->>
->> +``kvm-psci-version``
->> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
->> +  PSCI version emulated by the kernel. Current valid values are:
->> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> index c3f5142b0a54..b106fbed999c 100644
+>> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+>> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+>> @@ -1051,7 +1051,6 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>>   	/* Allocate and initialize new mem region structure. */
+>>   	region = calloc(1, sizeof(*region));
+>>   	TEST_ASSERT(region != NULL, "Insufficient Memory");
+>> -	region->mmap_size = mem_size;
+>>   
+>>   #ifdef __s390x__
+>>   	/* On s390x, the host address must be aligned to 1M (due to PGSTEs) */
+>> @@ -1060,6 +1059,11 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>>   	alignment = 1;
+>>   #endif
+>>   
+>> +	alignment = max(backing_src_pagesz, alignment);
+>> +	region->mmap_size = align_up(mem_size, alignment);
 >> +
->>  TCG VCPU Features
->>  =================
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index c15d79a106..44292aab32 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -974,6 +974,12 @@ struct ArchCPU {
->>       */
->>      uint32_t psci_version;
->>
->> +    /*
->> +     * Intermediate value used during property parsing.
->> +     * Once finalized, the value should be read from psci_version.
->> +     */
->> +    uint32_t prop_psci_version;
+>> +	TEST_ASSERT_EQ(guest_paddr, align_up(guest_paddr, backing_src_pagesz));
 >> +
->>      /* Current power state, access guarded by BQL */
->>      ARMPSCIState power_state;
+>>   	/*
+>>   	 * When using THP mmap is not guaranteed to returned a hugepage aligned
+>>   	 * address so we have to pad the mmap. Padding is not needed for HugeTLB
+>> @@ -1067,12 +1071,6 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>>   	 * page size.
+>>   	 */
+>>   	if (src_type == VM_MEM_SRC_ANONYMOUS_THP)
+>> -		alignment = max(backing_src_pagesz, alignment);
+>> -
+>> -	TEST_ASSERT_EQ(guest_paddr, align_up(guest_paddr, backing_src_pagesz));
+>> -
+>> -	/* Add enough memory to align up if necessary */
+>> -	if (alignment > 1)
+>>   		region->mmap_size += alignment;
+>>   
+>>   	region->fd = -1;
+>> -- 
+>> 2.43.0
 >>
->> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->> index 6672344855..bc6073f395 100644
->> --- a/target/arm/kvm.c
->> +++ b/target/arm/kvm.c
->> @@ -483,6 +483,59 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
->>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->>  }
->>
->> +static char *kvm_get_psci_version(Object *obj, Error **errp)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(obj);
->> +    const char *val;
->> +
->> +    switch (cpu->prop_psci_version) {
->> +    case QEMU_PSCI_VERSION_0_1:
->> +        val = "0.1";
->> +        break;
->> +    case QEMU_PSCI_VERSION_0_2:
->> +        val = "0.2";
->> +        break;
->> +    case QEMU_PSCI_VERSION_1_0:
->> +        val = "1.0";
->> +        break;
->> +    case QEMU_PSCI_VERSION_1_1:
->> +        val = "1.1";
->> +        break;
->> +    case QEMU_PSCI_VERSION_1_2:
->> +        val = "1.2";
->> +        break;
->> +    case QEMU_PSCI_VERSION_1_3:
->> +        val = "1.3";
->> +        break;
->> +    default:
->> +        val = "0.2";
->> +        break;
->> +    }
->> +    return g_strdup(val);
->> +}
->> +
->> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(obj);
->> +
->> +    if (!strcmp(value, "0.1")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_1;
->> +    } else if (!strcmp(value, "0.2")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_0_2;
->> +    } else if (!strcmp(value, "1.0")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_0;
->> +    } else if (!strcmp(value, "1.1")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_1;
->> +    } else if (!strcmp(value, "1.2")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_2;
->> +    } else if (!strcmp(value, "1.3")) {
->> +        cpu->prop_psci_version = QEMU_PSCI_VERSION_1_3;
->
-> We already have six values here and it's not implausible
-> we might end up with more in future; maybe we should make the
-> mapping between string and constant data-driven rather
-> than having code written out longhand in the get and set
-> functions?
 
-Yes, sure. I'll send out a V2.
-
-Thanks!
-Sebastian
-
+-- 
+Thanks,
+Jack
