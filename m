@@ -1,336 +1,101 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7250B1531E8;
-	Wed, 29 Oct 2025 17:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793AE34CFB9
+	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 17:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761758293; cv=none; b=OFg/cX2SLcVrDeSkKHrZtCrbNSQHs7DpdGHSaPQtvn93Jp98xeve31i4naRWGVCprlyoIUs6svzlMKon4gTgg73T5aDVSXgFUv/XNGBMwHuYVaDaJtXpcy0pm8dHm6shElJVAkH/mS2MB8a3T1d2cvIfTXgZVmacbJ8azWfuoqs=
+	t=1761758381; cv=none; b=k7bemVdVYMdflVJnYgAmFeI4T2aRCmIRYpJSQhwsVtQ6BsgdUt2QqrGJIdMm9sbjKunrR5+jEGK07iJQDkv57lpl+B8EDe4xc3W6RLps/JL0aKDerXC6+MplZAbNmU2TkzgZbNOd3VIuZg2vohsM3AxAqpZT+hwU4KQ7r7TKhlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761758293; c=relaxed/simple;
-	bh=l2c/vDBsG7K5TJewweXBMQRy7NKiKxNhEUsAr3NwYb8=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OK8Zsc/C8lnWES7EJj5YgbossTN3xU3Tk6uVMnwykx+NjkcqK1yRpbtnU29Vz4zPT+1K09I+HSMmq5PQ65HqGW9v+OGz64mgG3ZmnOD0kl9ogmk80UkQWZJIRX0eIG6hw+Uq9+SGxLLDKhpB+Rv7KgH4p4FkRn4HWYebuD7st/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=qt5ly6lR; arc=none smtp.client-ip=119.8.177.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1761758381; c=relaxed/simple;
+	bh=bSNd3wWUQQy2YBLmw8YBigmBKjZAe88REZ3E0Gos148=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJFkacIIxlICQOFowsX5Sx90wnddrCoep79pidWkhraewkvvTYMdxXw5lfqpS+YYlJIdeDlgEyYhqzYzGOmOAiKyLCuwZ7pdd+Js33ndF+J1Kiry0S4eWTaJWP2pkcF+bVfaJ2dS8xN6ba+XUxlZ6wKhbRyiRRTlelJzEgFs1es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hib+IaEm; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="qt5ly6lR"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=etNzivr8SvV+X6gAGuBQlMeUCTE9dixbeFJI6Lx0ikE=;
-	b=qt5ly6lR1cPZKVCjmHc2Sdf5ORiXrp0WssJ4oNEyMNjC6flDKGCD+Lv3V8APtzynoRCNWhTgO
-	29gugGJVmB3ILo+B0nR0CQEEZp6Ff99zyItuLc7lLhKmlqz/roabuIGKSBdnqsFz7GbwoMAy/A1
-	Z/OAuvyn/LN6EpgN5Jf3SjU=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cxYps69f2z1P7Js;
-	Thu, 30 Oct 2025 01:17:57 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cxYks4MX7z6GD6J;
-	Thu, 30 Oct 2025 01:14:29 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id BFEBD140427;
-	Thu, 30 Oct 2025 01:18:02 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 29 Oct
- 2025 17:18:01 +0000
-Date: Wed, 29 Oct 2025 17:18:00 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hib+IaEm"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-89e93741814so7637785a.0
+        for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 10:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1761758378; x=1762363178; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bSNd3wWUQQy2YBLmw8YBigmBKjZAe88REZ3E0Gos148=;
+        b=hib+IaEmI0n8nxZWdWACo30UWvmBDEOHshVqHVH2zczE4BObOXLFtiu29Bp8GjIqur
+         xj6Plh/xeAay2qEgH2OLAhB8S5f19gqH9iN1I9ywtjpa6/PUtvKqr4+bvHqZNY2aWIkj
+         jvpmU/+ac5P7xMrPw4q2XHZ6ADLYeQcWQIA1McxOJefyZZlFTaCJWWZqFEXNi9LFyL12
+         mcbWysJbxHv+8PGK3vBhiYY0+C3dHeC6SOfdGugxNtZJcHKrKov2HREaHdpYlgCuEt5C
+         A4odrkM8ae0AWQ+69N17nApt4PBX7kdC3Yy56+gil0QJbC4gFlWU7C50imP0Sd4BRPKg
+         z4lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761758378; x=1762363178;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bSNd3wWUQQy2YBLmw8YBigmBKjZAe88REZ3E0Gos148=;
+        b=XMYJ6mkq6ySgOH66001v2G73/i0FMAvOEvajWeCG3n/HtXzQ1mCsjmDkXZ7ucLhP2r
+         lzkryLlOwx/v/GyM6FpskeO7EnJqAdP+5tivDxBMIfdB5JbU6PEgEijQlrSCS44FYqts
+         272MuhFG2zuRJWWaoJKNSKNclBAdoexqg9ueCqhXxO+ZWskw/O+kjMpNurzG6TqtsH2U
+         SkCZF5+k3rkFA+cJn08t5FSRckFZo7XjyN2E7Yk77UO3QCAn0TLc56M4XK+uAsnnvRKR
+         XSOflkAVX6fGS8ni1XS3chKoz9DTUgRcbqupk2oS8enhlgp7KCbtofSCgdsJEZjN5YlR
+         Wi1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWqmpVUl3N4/b3W75NpgD1US/c+E7GIy3eUQ4gRp6junq+wDLtsU+Ltli7W5ZNJaiQ5MFQ62aw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzAiryjZ0Z4GxGhN49mwQ66XuwBjTuDzCdC4oY2F36mBMlnQW3g
+	kjwbeGejOW86J5oSen8aoq1UNVRMDxBJB3HNPDLvJjZWFsGEh9rpDpjeKPcFstbKaXU=
+X-Gm-Gg: ASbGncuOlwhbp43WdPkUG8ecxVU/X5TWr20DSdHOb2iSX5uxFPRXr6iGOJv+dQXhxir
+	Il9zcHzRdagi4c3hRaCMAHTm8ZnMh8on7WmShg/4hy6qsWSnmnVkZV9pX8szHIrNUEfRtyQu32k
+	f4/8CyGOifCGu3zLM7cJw1cXfNoIK0gXsOTihRFgYTlvkzeXEaee4uv6IQvQokVJyjkTQqdvMQ2
+	RIgODfYyN26fXHlmFVMJQQRhX0WTq/DPE8Et5cWSW+22aosI+MzRP+gf5lQcvgWm6AI2dZo3zw3
+	XC4H/TqWx4sWmpiHQvND+8I0THJOWl7o31jbk4WR/cV2Lu+jbOrgWoiFl/U37hmue+cjXryYIsu
+	cENM9ORTJR4dzI+9skzMPje06yDpSc1pZdyS/W7bhpFlocABFhanmOYN6ZnHELWlSUa87AnYnZV
+	a+C7aAyu1C+Gb2fcADioUFt5P0Bl/al8V3mevv8hDJcQcuqAg5ajgnN5XX
+X-Google-Smtp-Source: AGHT+IEE6XGe0cEoiRKL4NLOLkjviUWVkKq1s/Sgdt6ffSSTAqyCXCbcME2UvP5qWSwdJ9Al+rYJjg==
+X-Received: by 2002:a05:620a:bcc:b0:8a4:6ac1:ae9 with SMTP id af79cd13be357-8a8e436110dmr482308385a.3.1761758378351;
+        Wed, 29 Oct 2025 10:19:38 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f247fe594sm1089845885a.16.2025.10.29.10.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 10:19:37 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vE9pg-000000050Jg-2H4f;
+	Wed, 29 Oct 2025 14:19:36 -0300
+Date: Wed, 29 Oct 2025 14:19:36 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
 To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 04/12] coco: host: arm64: Add host TSM
- callback and IDE stream allocation support
-Message-ID: <20251029171800.0000688b@huawei.com>
-In-Reply-To: <20251027095602.1154418-5-aneesh.kumar@kernel.org>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH RESEND v2 12/12] coco: host: arm64: Register device
+ public key with RMM
+Message-ID: <20251029171936.GR760669@ziepe.ca>
 References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
-	<20251027095602.1154418-5-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+ <20251027095602.1154418-13-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251027095602.1154418-13-aneesh.kumar@kernel.org>
 
-On Mon, 27 Oct 2025 15:25:54 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+On Mon, Oct 27, 2025 at 03:26:02PM +0530, Aneesh Kumar K.V (Arm) wrote:
 
-> Register the TSM callback when the DA feature is supported by KVM.
-> 
-> This driver handles IDE stream setup for both the root port and PCIe
-> endpoints. Root port IDE stream enablement itself is managed by RMM.
-> 
-> In addition, the driver registers `pci_tsm_ops` with the TSM subsystem.
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-Minor stuff inline.
+> +DEFINE_FREE(free_page, unsigned long, if (_T) free_page(_T))
 
-> diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
-> index 3dbf0d067cc5..9cabe750533c 100644
-> --- a/drivers/firmware/smccc/smccc.c
-> +++ b/drivers/firmware/smccc/smccc.c
-> @@ -15,6 +15,7 @@
->  #include <asm/archrandom.h>
->  #ifdef CONFIG_ARM64
->  #include <asm/rsi_cmds.h>
-> +#include <asm/rmi_smc.h>
->  #endif
->  
->  static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
-> @@ -99,10 +100,27 @@ static void __init register_rsi_device(struct platform_device *pdev)
->  					"arm_cca_guest", RSI_DEV_NAME, NULL, 0);
->  
->  }
-> +
-> +static void __init register_rmi_device(struct platform_device *pdev)
-> +{
-> +	struct arm_smccc_res res;
-> +	unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
-> +						     RMI_ABI_MINOR_VERSION);
-> +
-> +	arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
-> +	if (res.a0 == RMI_SUCCESS)
-> +		__devm_auxiliary_device_create(&pdev->dev,
-> +					"arm_cca_host", RMI_DEV_NAME, NULL, 0);
-> +}
->  #else
->  static void __init register_rsi_device(struct platform_device *pdev)
->  {
->  
-> +}
-> +
-> +static void __init register_rmi_device(struct platform_device *pdev)
-> +{
-> +
->  }
->  #endif
+Please put these sorts of things in their proper headers
 
-Same comment as before applies. I'd split this to a separate c file and stub
-in a header.
-
-> diff --git a/drivers/virt/coco/arm-cca-host/arm-cca.c b/drivers/virt/coco/arm-cca-host/arm-cca.c
-> new file mode 100644
-> index 000000000000..18e5bf6adea4
-> --- /dev/null
-> +++ b/drivers/virt/coco/arm-cca-host/arm-cca.c
-> @@ -0,0 +1,192 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2025 ARM Ltd.
-> + */
-> +
-> +#include <linux/auxiliary_bus.h>
-> +#include <linux/pci-tsm.h>
-> +#include <linux/pci-ide.h>
-> +#include <linux/module.h>
-> +#include <linux/pci.h>
-> +#include <linux/tsm.h>
-> +#include <linux/vmalloc.h>
-> +#include <linux/cleanup.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#include "rmi-da.h"
-> +
-> +/* Total number of stream id supported at root port level */
-> +#define MAX_STREAM_ID	256
-> +
-> +
-> +static struct pci_tsm *cca_tsm_pci_probe(struct tsm_dev *tsm_dev, struct pci_dev *pdev)
-> +{
-> +	int rc;
-> +
-> +	if (!is_pci_tsm_pf0(pdev)) {
-> +		struct cca_host_fn_dsc *fn_dsc __free(kfree) =
-> +			kzalloc(sizeof(*fn_dsc), GFP_KERNEL);
-> +
-> +		if (!fn_dsc)
-> +			return NULL;
-> +
-> +		rc = pci_tsm_link_constructor(pdev, &fn_dsc->pci, tsm_dev);
-> +		if (rc)
-> +			return NULL;
-> +
-> +		return &no_free_ptr(fn_dsc)->pci;
-> +	}
-> +
-> +	if (!pdev->ide_cap)
-> +		return NULL;
-> +
-> +	struct cca_host_pf0_dsc *pf0_dsc __free(kfree) =
-> +					kzalloc(sizeof(*pf0_dsc), GFP_KERNEL);
-
-Not sure why this indent. I'd go with more consistent choice of just one tab.
-
-	struct cca_host_pf0_dsc *pf0_dsc __free(kfree) =
-		kzalloc(sizeof(*pf0_dsc), GFP_KERNEL);
-
-> +	if (!pf0_dsc)
-> +		return NULL;
-> +
-> +	rc = pci_tsm_pf0_constructor(pdev, &pf0_dsc->pci, tsm_dev);
-> +	if (rc)
-> +		return NULL;
-> +
-> +	pci_dbg(pdev, "tsm enabled\n");
-> +	return &no_free_ptr(pf0_dsc)->pci.base_tsm;
-> +}
-> +
-> +static void cca_tsm_pci_remove(struct pci_tsm *tsm)
-> +{
-> +	struct pci_dev *pdev = tsm->pdev;
-> +
-> +	if (is_pci_tsm_pf0(pdev)) {
-> +		struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(pdev);
-> +
-> +		pci_tsm_pf0_destructor(&pf0_dsc->pci);
-> +		kfree(pf0_dsc);
-> +	} else {
-> +		struct cca_host_fn_dsc *fn_dsc = to_cca_fn_dsc(pdev);
-> +
-> +		kfree(fn_dsc);
-> +		return;
-Maybe something else come in in later patches, but for now this return
-is unnecessary.
-		kfree(to_cca_fn_dsc(pdev));
-doesn't loose much if anything wrt to readability.
-
-> +	}
-> +}
-> +
-> +/* For now global for simplicity. Protected by pci_tsm_rwsem */
-> +static DECLARE_BITMAP(cca_stream_ids, MAX_STREAM_ID);
-> +
-> +static int cca_tsm_connect(struct pci_dev *pdev)
-> +{
-> +	struct pci_dev *rp = pcie_find_root_port(pdev);
-> +	struct cca_host_pf0_dsc *pf0_dsc;
-> +	struct pci_ide *ide;
-> +	int rc, stream_id;
-> +
-> +	/* Only function 0 supports connect in host */
-> +	if (WARN_ON(!is_pci_tsm_pf0(pdev)))
-> +		return -EIO;
-> +
-> +	pf0_dsc = to_cca_pf0_dsc(pdev);
-> +	/* Allocate stream id */
-> +	stream_id = find_first_zero_bit(cca_stream_ids, MAX_STREAM_ID);
-> +	if (stream_id == MAX_STREAM_ID)
-> +		return -EBUSY;
-> +	set_bit(stream_id, cca_stream_ids);
-> +
-> +	ide = pci_ide_stream_alloc(pdev);
-> +	if (!ide) {
-> +		rc = -ENOMEM;
-> +		goto err_stream_alloc;
-> +	}
-> +
-> +	pf0_dsc->sel_stream = ide;
-> +	ide->stream_id = stream_id;
-> +	rc = pci_ide_stream_register(ide);
-> +	if (rc)
-> +		goto err_stream;
-> +
-> +	pci_ide_stream_setup(pdev, ide);
-> +	pci_ide_stream_setup(rp, ide);
-> +
-> +	rc = tsm_ide_stream_register(ide);
-> +	if (rc)
-> +		goto err_tsm;
-> +
-> +	/*
-> +	 * Once ide is setup, enable the stream at the endpoint
-> +	 * Root port will be done by RMM
-> +	 */
-> +	pci_ide_stream_enable(pdev, ide);
-> +	return 0;
-> +
-> +err_tsm:
-> +	pci_ide_stream_teardown(rp, ide);
-> +	pci_ide_stream_teardown(pdev, ide);
-> +	pci_ide_stream_unregister(ide);
-> +err_stream:
-as below, I'd have
-	pf0_dsc->sel_stream = NULL;
-here
-
-> +	pci_ide_stream_free(ide);
-> +err_stream_alloc:
-> +	clear_bit(stream_id, cca_stream_ids);
-> +
-> +	return rc;
-> +}
-> +
-> +static void cca_tsm_disconnect(struct pci_dev *pdev)
-> +{
-> +	int stream_id;
-> +	struct pci_ide *ide;
-> +	struct cca_host_pf0_dsc *pf0_dsc;
-> +
-> +	pf0_dsc = to_cca_pf0_dsc(pdev);
-> +	if (!pf0_dsc)
-> +		return;
-> +
-> +	ide = pf0_dsc->sel_stream;
-> +	stream_id = ide->stream_id;
-> +	pf0_dsc->sel_stream = NULL;
-You go through this dance to unset these in disconnect but
-not if we get a failure in connect.  Whilst it might be fine
-it looks a little odd so I'd clear pf0_dsc->sel_stream in the
-error path of connect.
-
-> +
-> +	pci_ide_stream_release(ide);
-This helper is a bit irritating as the clearly of pf0_dsc->sel_stream,
-if it were in precise opposite of the connect path would occur mid way
-through that function.  Ah well, looks safe enough to be out of order
-just trickier to review.
-
-> +	clear_bit(stream_id, cca_stream_ids);
-> +}
-
-> +static int cca_link_tsm_probe(struct auxiliary_device *adev,
-> +			      const struct auxiliary_device_id *id)
-> +{
-> +	if (kvm_has_da_feature()) {
-Unless you expect to see something else after this, I'd flip logic
-
-	struct tsm_dev *tsm_dev;
-
-	if (!kvm_has_da_feature())
-		return -ENODEV;
-
-	tsm_dev = tsm_register(&adev->dev, &cca_link_pci_ops);
-	if (IS_ERR(tsm_dev))
-		return PTR_ERR(tsm_dev);
-
-	return devm_add_action_or_reset(&adev->dev, cca_link_tsm_remove,
-					tsm_dev);
-
-Here reduces indent and keeps that 'error path' out of line property
-that really helps me at least visually parse code.
-
-> +		struct tsm_dev *tsm_dev;
-> +
-> +		tsm_dev = tsm_register(&adev->dev, &cca_link_pci_ops);
-> +		if (IS_ERR(tsm_dev))
-> +			return PTR_ERR(tsm_dev);
-> +
-> +		return devm_add_action_or_reset(&adev->dev,
-> +					cca_link_tsm_remove, tsm_dev);
-> +	}
-> +	return -ENODEV;
-> +}
-
+Jason
