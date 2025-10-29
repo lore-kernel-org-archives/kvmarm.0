@@ -1,42 +1,42 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4FD3546FA;
-	Wed, 29 Oct 2025 17:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260493009E3;
+	Wed, 29 Oct 2025 18:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761759477; cv=none; b=WzEIvqxczpZHY4h+4aPG5HLlEi9+mif/qCqr67U2SdGGO/VlUa0qBYBSQ4JkJPj7srG1XzdOaLhV12qetshB4PYGrG03X/TeZNIByOb/ASue4lrI1DtMLmGaHn7fkwiDqiBzxKEiXt69XcT+ASHACO432YMQkJrznjreSlPsDm4=
+	t=1761762800; cv=none; b=ss3N7HkwIjNi+ymo+aTJ1k3KAd91CkqdDvg3xvBg2sF/AdY/HaFlB8JW5ddYsazfpxQo8KFr0FSiXPf3bjBYs6+cPprpiO5yqTUy3YGSffJtnUEvXtycnpo1mfn7MD/RVmFA+/STSXM9JHllrhbMbwosCq3aH7GamXoRAW+8l58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761759477; c=relaxed/simple;
-	bh=NDstYw8pmrIPwYWWztjigB9+DQjboyOOhXRFXLhKw1g=;
+	s=arc-20240116; t=1761762800; c=relaxed/simple;
+	bh=fUaexWlB3Ksus94u95hU4ZFOJ3a7Nb/LfAuUH4Y6FsE=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fiGkxeb72Vz4Bo1TvLW/MEsg9EYhwqffONL/1VdKjBU/SIN+JS7GOKiNOBNj0wTgUpe8k/KjI+L+ZEffyf3CvMj9xr2VFjh/V58qjA7PQnNZC6gmG+FOnIUJ52nk73Q+Mrh3DGcE64FDRQjWhMMVc746YPGsENEqnHWWW7FZHFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=pyRwohml; arc=none smtp.client-ip=119.8.177.37
+	 MIME-Version:Content-Type; b=I2temGiyTlbKWxrGp7mCVZDqXJGj60wSDbZeYYvsVpPv3GdsnxExe5B/KeHY8kmFrszUgrAb3vPF5o92H+ApZa9spGdGe8HoxlodP8HR6D/MkznEXZCnDbTV5/WTUY1XZdxEpmIDkWVXLbnFCdLPwvphbcTRf6yAK4lImK07PPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a6kVryDA; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="pyRwohml"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a6kVryDA"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=fNgZ48n/OH2NXMzx1CeBANaBiQhOc0HGHvkiCNq+ooA=;
-	b=pyRwohmlcL4tyq9QovmR5tmukJHr52XlLp/nAXgnvIOg5SFn9x5WwHn8OCpr+4YJrd9hCEjUF
-	HR9feaFgsTUTFMqDn0jNht/aBxtW0G2ymZDTaxR6rBJHB2u/c+Xl1E+ve1csMCknIZxKQDFYzQY
-	LKspvzhTnACK/jdCRltXHeI=
+	bh=pmZxCHXh+OmQRNRHVZ9cZOG3zdy3xehwGzAMDhrG0IE=;
+	b=a6kVryDAnrAIgupI5ZF5dW1FV4QpZOZkeYQEiESCw9N3RF0mboPy9zsEp4r/SCFPGfbwukHJf
+	owFlwPsVa2rsI9TwazyNnK608Mnfo+7G032745fh0j75JlNmXHFW6kXIRSS1+dvRG0tYcteVipo
+	HY8CQQ6BKvyEHU5OADrvyBs=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cxZDt1Fhxz1vnLJ;
-	Thu, 30 Oct 2025 01:37:02 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cxbTX4D3yz1P7HW;
+	Thu, 30 Oct 2025 02:33:04 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4cxZFX1ZSDzJ468T;
-	Thu, 30 Oct 2025 01:37:36 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4cxbTR1hrkzJ469B;
+	Thu, 30 Oct 2025 02:32:59 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 545ED1402EF;
-	Thu, 30 Oct 2025 01:37:46 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 67FA41402EF;
+	Thu, 30 Oct 2025 02:33:09 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 29 Oct
- 2025 17:37:45 +0000
-Date: Wed, 29 Oct 2025 17:37:43 +0000
+ 2025 18:33:08 +0000
+Date: Wed, 29 Oct 2025 18:33:06 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
@@ -47,12 +47,12 @@ CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
 	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
 	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
 	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 05/12] coco: host: arm64: Build and register
- RMM pdev descriptors
-Message-ID: <20251029173743.00006d48@huawei.com>
-In-Reply-To: <20251027095602.1154418-6-aneesh.kumar@kernel.org>
+Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
+ communication helpers
+Message-ID: <20251029183306.0000485c@huawei.com>
+In-Reply-To: <20251027095602.1154418-7-aneesh.kumar@kernel.org>
 References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
-	<20251027095602.1154418-6-aneesh.kumar@kernel.org>
+	<20251027095602.1154418-7-aneesh.kumar@kernel.org>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -62,165 +62,354 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Mon, 27 Oct 2025 15:25:55 +0530
+On Mon, 27 Oct 2025 15:25:56 +0530
 "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
 
-> Add the SMCCC plumbing for RMI_PDEV_AUX_COUNT, RMI_PDEV_CREATE, and
-> RMI_PDEV_GET_STATE, describe the pdev state enum/flags in rmi_smc.h,
-> and extend the PF0 descriptor so we can hold the RMM-side pdev handle
-> plus its auxiliary granules.
-> 
-> Implement pdev_create() to delegate backing pages, populate the pdev
-> parameters from the device's RID, ECAM window, IDE stream, and
-> non-coherent address ranges, and invoke RMI_PDEV_CREATE. The helper
-> keeps track of the allocated/assigned granules and unwinds them on
-> failure, so the host driver can reliably establish the pdev channel
-> before kicking off further IDE/TSM setup.
+> - add SMCCC IDs/wrappers for RMI_PDEV_COMMUNICATE/RMI_PDEV_ABORT
+> - describe the RMM device-communication ABI (struct rmi_dev_comm_*,
+>   cache flags, protocol/object IDs, busy error code)
+> - track per-PF0 communication state (buffers, workqueue, cache metadata) and
+>   serialize access behind object_lock
+> - plumb a DOE/SPDM worker (pdev_communicate_work) plus shared helpers that
+>   submit the SMCCC call, cache multi-part responses, and handle retries/abort
+> - hook the new helpers into the physical function connect path so IDE
+>   setup can drive the device to the expected state
 > 
 > Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-Hi Aneesh
 
-A few things inline.
+Hi Aneesh,
 
-J
-> ---
->  arch/arm64/include/asm/rmi_cmds.h       |  31 ++++++
->  arch/arm64/include/asm/rmi_smc.h        |  94 +++++++++++++++-
->  drivers/virt/coco/arm-cca-host/Makefile |   2 +-
->  drivers/virt/coco/arm-cca-host/rmi-da.c | 141 ++++++++++++++++++++++++
->  drivers/virt/coco/arm-cca-host/rmi-da.h |   5 +
->  5 files changed, 271 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/virt/coco/arm-cca-host/rmi-da.c
-> 
-
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> index fe1c91ffc0ab..10f87a18f09a 100644
-> --- a/arch/arm64/include/asm/rmi_smc.h
-> +++ b/arch/arm64/include/asm/rmi_smc.h
-> @@ -26,7 +26,7 @@
->  #define SMC_RMI_DATA_CREATE		SMC_RMI_CALL(0x0153)
->  #define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RMI_CALL(0x0154)
->  #define SMC_RMI_DATA_DESTROY		SMC_RMI_CALL(0x0155)
-> -
-
-I'd avoid the white space change. If it makes sense push it to the KVM series
-that I guess this was introduced in.
-
-> +#define SMC_RMI_PDEV_AUX_COUNT		SMC_RMI_CALL(0x0156)
-
->  #define RMI_ABI_MAJOR_VERSION	1
->  #define RMI_ABI_MINOR_VERSION	0
->  
-> @@ -269,4 +272,93 @@ struct rec_run {
->  	struct rec_exit exit;
->  };
-
-> +
-> +#define MAX_PDEV_AUX_GRANULES	32
-> +#define MAX_IOCOH_ADDR_RANGE	16
-> +#define MAX_FCOH_ADDR_RANGE	4
-> +
-> +#define RMI_PDEV_FLAGS_SPDM		BIT(0)
-> +#define RMI_PDEV_FLAGS_NCOH_IDE		BIT(1)
-> +#define RMI_PDEV_FLAGS_NCOH_ADDR	BIT(2)
-> +#define RMI_PDEV_FLAGS_COH_IDE		BIT(3)
-> +#define RMI_PDEV_FLAGS_COH_ADDR		BIT(4)
-> +#define RMI_PDEV_FLAGS_P2P		BIT(5)
-> +#define RMI_PDEV_FLAGS_COMP_TRUST	BIT(6)
-> +#define RMI_PDEV_FLAGS_CATEGORY		GENMASK(8, 7)
-> +
-> +#define RMI_PDEV_CMEM_CXL_CATEGORY	BIT(7)
-
-This smells like it's the value 1 in the RMI_PDEV_FLAGS_CATEGORY field?
-If so don't use a bit definition like this. Instead a suitably named field value definition.
-e.g. #define RMI_PDEV_FLAGS_CATEGORY_CXL 1
-
+Comments inline.
 
 > diff --git a/drivers/virt/coco/arm-cca-host/rmi-da.c b/drivers/virt/coco/arm-cca-host/rmi-da.c
-> new file mode 100644
-> index 000000000000..390b8f05c7cf
-> --- /dev/null
+> index 390b8f05c7cf..592abe0dd252 100644
+> --- a/drivers/virt/coco/arm-cca-host/rmi-da.c
 > +++ b/drivers/virt/coco/arm-cca-host/rmi-da.c
 
 > +
-> +static int init_pdev_params(struct pci_dev *pdev, struct rmi_pdev_params *params)
+> +static int doe_send_req_resp(struct pci_tsm *tsm)
 > +{
-> +	int rid, ret, i;
-> +	phys_addr_t aux_phys;
-> +	struct pci_config_window *cfg = pdev->bus->sysdata;
-> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(pdev);
-> +	struct pci_ide *ide = pf0_dsc->sel_stream;
+> +	int ret, data_obj_type;
+> +	struct cca_host_comm_data *comm_data = to_cca_comm_data(tsm->pdev);
+> +	struct rmi_dev_comm_exit *io_exit = &comm_data->io_params->exit;
+> +	u8 protocol = io_exit->protocol;
 > +
-> +	/* assign the ep device with RMM */
-> +	rid = pci_dev_id(pdev);
-> +	params->pdev_id = rid;
-> +	/* slot number for certificate chain */
-> +	params->cert_id = 0;
-> +	/* io coherent spdm/ide and non p2p */
-> +	params->flags = RMI_PDEV_FLAGS_SPDM | RMI_PDEV_FLAGS_NCOH_IDE |
-> +			RMI_PDEV_FLAGS_NCOH_ADDR;
-> +	params->ncoh_ide_sid = ide->stream_id;
-> +	params->hash_algo = RMI_HASH_SHA_256;
-> +	/* use the rid and MMIO resources of the end point pdev */
-> +	params->rid_base = rid;
-> +	params->rid_top = params->rid_base + 1;
-> +	params->ecam_addr = cfg->res.start;
-> +	params->root_id = pci_dev_id(pcie_find_root_port(pdev));
+> +	if (protocol == RMI_PROTOCOL_SPDM)
+> +		data_obj_type = PCI_DOE_FEATURE_CMA;
+> +	else if (protocol == RMI_PROTOCOL_SECURE_SPDM)
+> +		data_obj_type = PCI_DOE_FEATURE_SSESSION;
+> +	else
+> +		return -EINVAL;
 > +
-> +	params->ncoh_num_addr_range = pci_ide_aassoc_register_to_pdev_addr(params->ncoh_addr_range,
-> +								ARRAY_SIZE(params->ncoh_addr_range),
-> +								&ide->partner[PCI_IDE_RP]);
-I'd format as:
-	params->ncoh_num_addr_range =
-		pci_ide_aassoc_register_to_pdev_addr(params->ncoh_addr_range,
-						     ARRAY_SIZE(params->ncoh_addr_range),
-						     &ide->partner[PCI_IDE_RP]);
-
+> +	/* delay the send */
+> +	if (io_exit->req_delay)
+> +		fsleep(io_exit->req_delay);
 > +
-> +	rmi_pdev_aux_count(params->flags, &params->num_aux);
-> +	pf0_dsc->num_aux = params->num_aux;
-> +	for (i = 0; i < params->num_aux; i++) {
-> +		void *aux =  (void *)__get_free_page(GFP_KERNEL);
-One space only before cast.
-
-> +
-> +		if (!aux) {
-> +			ret = -ENOMEM;
-> +			goto err_free_aux;
-> +		}
-> +
-> +		aux_phys = virt_to_phys(aux);
-> +		if (rmi_granule_delegate(aux_phys)) {
-> +			ret = -ENXIO;
-> +			free_page((unsigned long)aux);
-> +			goto err_free_aux;
-> +		}
-> +		params->aux_granule[i] = aux_phys;
-> +		pf0_dsc->aux[i] = aux;
-> +	}
-> +	return 0;
-> +
-> +err_free_aux:
-> +	free_aux_pages(i, pf0_dsc->aux);
+> +	ret = pci_tsm_doe_transfer(tsm->dsm_dev, data_obj_type,
+> +				   comm_data->req_buff, io_exit->req_len,
+> +				   comm_data->rsp_buff, PAGE_SIZE);
 > +	return ret;
+
+	return pci_tsm_doe_transfer()
+
+> +}
+> +
+> +static inline bool pending_dev_communicate(struct rmi_dev_comm_exit *io_exit)
+> +{
+> +	bool pending = io_exit->flags & (RMI_DEV_COMM_EXIT_CACHE_REQ |
+> +					 RMI_DEV_COMM_EXIT_CACHE_RSP |
+> +					 RMI_DEV_COMM_EXIT_SEND |
+> +					 RMI_DEV_COMM_EXIT_WAIT |
+> +					 RMI_DEV_COMM_EXIT_MULTI);
+> +	return pending;
+> +}
+> +
+> +static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+> +{
+> +	int ret, nbytes, cp_len;
+> +	struct cache_object **cache_objp, *cache_obj;
+> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+> +	struct cca_host_comm_data *comm_data = to_cca_comm_data(tsm->pdev);
+> +	struct rmi_dev_comm_enter *io_enter = &comm_data->io_params->enter;
+> +	struct rmi_dev_comm_exit *io_exit = &comm_data->io_params->exit;
+> +
+> +redo_communicate:
+> +
+> +	if (type == PDEV_COMMUNICATE)
+> +		ret = rmi_pdev_communicate(virt_to_phys(pf0_dsc->rmm_pdev),
+> +					   virt_to_phys(comm_data->io_params));
+> +	else
+> +		ret = RMI_ERROR_INPUT;
+
+Treat this separately for simpler code (assuming you don't have other code that
+makes this more complex in later patches).
+
+	if (type != PDEV_COMMUNICATE)
+		return -ENXIO;
+
+	ret = rmi_pdev_communicate(virt_to_phys(pf0_dsc->rmm_pdev),
+				   virt_to_phys(comm_data->io_params));
+	if (ret != RMI...
+
+> +	if (ret != RMI_SUCCESS) {
+> +		if (ret == RMI_BUSY)
+> +			return -EBUSY;
+> +		return -ENXIO;
+> +	}
+> +
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_REQ ||
+> +	    io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_RSP) {
+> +
+> +		switch (io_exit->cache_obj_id) {
+> +		case RMI_DEV_VCA:
+> +			cache_objp = &pf0_dsc->vca;
+> +			break;
+> +		case RMI_DEV_CERTIFICATE:
+> +			cache_objp = &pf0_dsc->cert_chain.cache;
+> +			break;
+> +		default:
+> +			return -EINVAL;
+> +		}
+> +		cache_obj = *cache_objp;
+> +	}
+> +
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_REQ)
+> +		cp_len = io_exit->req_cache_len;
+> +	else
+> +		cp_len = io_exit->rsp_cache_len;
+> +
+> +	/* response and request len should be <= SZ_4k */
+> +	if (cp_len > CACHE_CHUNK_SIZE)
+> +		return -EINVAL;
+> +
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_REQ ||
+> +	    io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_RSP) {
+> +		int cache_remaining;
+> +		struct cache_object *new_obj;
+> +
+> +		/* new allocation */
+> +		if (!cache_obj) {
+> +			cache_obj = kvmalloc(struct_size(cache_obj, buf, CACHE_CHUNK_SIZE),
+> +					     GFP_KERNEL);
+> +			if (!cache_obj)
+> +				return -ENOMEM;
+> +
+> +			cache_obj->size = CACHE_CHUNK_SIZE;
+> +			cache_obj->offset = 0;
+> +			*cache_objp = cache_obj;
+> +		}
+> +
+> +		cache_remaining = cache_obj->size - cache_obj->offset;
+> +		if (cp_len > cache_remaining) {
+> +
+> +			if (cache_obj->size + CACHE_CHUNK_SIZE > MAX_CACHE_OBJ_SIZE)
+> +				return -EINVAL;
+> +
+> +			new_obj = kvmalloc(struct_size(cache_obj, buf,
+> +						       cache_obj->size + CACHE_CHUNK_SIZE),
+> +					   GFP_KERNEL);
+
+Is kvrealloc()? Would avoid need for explicit memcpy / freeing of old object.
+
+> +			if (!new_obj)
+> +				return -ENOMEM;
+> +			memcpy(new_obj, cache_obj, struct_size(cache_obj, buf, cache_obj->size));
+> +			new_obj->size = cache_obj->size + CACHE_CHUNK_SIZE;
+> +			*cache_objp = new_obj;
+> +			kvfree(cache_obj);
+> +		}
+> +
+> +		/* cache object can change above. */
+> +		cache_obj = *cache_objp;
+> +	}
+> +
+> +
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_REQ) {
+> +		memcpy(cache_obj->buf + cache_obj->offset,
+> +		       (comm_data->req_buff + io_exit->req_cache_offset), io_exit->req_cache_len);
+> +		cache_obj->offset += io_exit->req_cache_len;
+> +	}
+> +
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_CACHE_RSP) {
+> +		memcpy(cache_obj->buf + cache_obj->offset,
+> +		       (comm_data->rsp_buff + io_exit->rsp_cache_offset), io_exit->rsp_cache_len);
+> +		cache_obj->offset += io_exit->rsp_cache_len;
+> +	}
+> +
+> +	/*
+> +	 * wait for last packet request from RMM.
+> +	 * We should not find this because our device communication is synchronous
+> +	 */
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_WAIT)
+> +		return -ENXIO;
+> +
+> +	/* next packet to send */
+> +	if (io_exit->flags & RMI_DEV_COMM_EXIT_SEND) {
+> +		nbytes = doe_send_req_resp(tsm);
+> +		if (nbytes < 0) {
+> +			/* report error back to RMM */
+> +			io_enter->status = RMI_DEV_COMM_ERROR;
+> +		} else {
+> +			/* send response back to RMM */
+> +			io_enter->resp_len = nbytes;
+> +			io_enter->status = RMI_DEV_COMM_RESPONSE;
+> +		}
+> +	} else {
+> +		/* no data transmitted => no data received */
+> +		io_enter->resp_len = 0;
+> +		io_enter->status = RMI_DEV_COMM_NONE;
+> +	}
+> +
+> +	if (pending_dev_communicate(io_exit))
+> +		goto redo_communicate;
+> +
+> +	return 0;
+> +}
+> +
+> +static int __do_dev_communicate(enum dev_comm_type type,
+> +				struct pci_tsm *tsm, unsigned long error_state)
+> +{
+> +	int ret;
+> +	int state;
+> +	struct rmi_dev_comm_enter *io_enter;
+> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+> +
+> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
+> +	io_enter->resp_len = 0;
+> +	io_enter->status = RMI_DEV_COMM_NONE;
+> +
+> +	ret = ___do_dev_communicate(type, tsm);
+
+Think up a more meaningful name.  Counting _ doesn't make for readable code.
+
+> +	if (ret) {
+> +		if (type == PDEV_COMMUNICATE)
+> +			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+> +
+> +		state = error_state;
+> +	} else {
+> +		/*
+> +		 * Some device communication error will transition the
+> +		 * device to error state. Report that.
+> +		 */
+> +		if (type == PDEV_COMMUNICATE)
+> +			ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
+> +						 (enum rmi_pdev_state *)&state);
+> +		if (ret)
+> +			state = error_state;
+Whilst not strictly needed I'd do this as:
+
+		if (type == PDEV_COMMUNICATE) {
+			ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
+						 (enum rmi_pdev_state *)&state);
+			if (ret)
+				state = error_state;
+		}
+
+Just to make it clear that reg check is just on the output of the call above.
+If we didn't make that call it is definitely zero but nice not to have
+to reason about it.
+
+
+> +	}
+> +
+> +	if (state == error_state)
+> +		pci_err(tsm->pdev, "device communication error\n");
+> +
+> +	return state;
+> +}
+> +
+> +static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+> +			      unsigned long target_state,
+> +			      unsigned long error_state)
+> +{
+> +	int state;
+> +
+> +	do {
+> +		state = __do_dev_communicate(type, tsm, error_state);
+> +
+> +		if (state == target_state || state == error_state)
+> +			break;
+
+Might as well return rather than break;
+
+> +	} while (1);
+> +
+> +	return state;
 > +}
 
+> +void pdev_communicate_work(struct work_struct *work)
+> +{
+> +	unsigned long state;
+> +	struct pci_tsm *tsm;
+> +	struct dev_comm_work *setup_work;
+> +	struct cca_host_pf0_dsc *pf0_dsc;
+> +
+> +	setup_work = container_of(work, struct dev_comm_work, work);
+> +	tsm = setup_work->tsm;
+> +	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+Could combine these 3 with declarations for shorter code without much
+change to readability.
+
+> +
+> +	guard(mutex)(&pf0_dsc->object_lock);
+> +	state = do_pdev_communicate(tsm, setup_work->target_state);
+> +	WARN_ON(state != setup_work->target_state);
+> +
+> +	complete(&setup_work->complete);
+> +}
+
+
 > diff --git a/drivers/virt/coco/arm-cca-host/rmi-da.h b/drivers/virt/coco/arm-cca-host/rmi-da.h
-> index 01dfb42cd39e..6764bf8d98ce 100644
+> index 6764bf8d98ce..1d513e0b74d9 100644
 > --- a/drivers/virt/coco/arm-cca-host/rmi-da.h
 > +++ b/drivers/virt/coco/arm-cca-host/rmi-da.h
 
->  struct cca_host_fn_dsc {
-> @@ -38,4 +42,5 @@ static inline struct cca_host_fn_dsc *to_cca_fn_dsc(struct pci_dev *pdev)
->  	return container_of(tsm, struct cca_host_fn_dsc, pci);
->  }
->  
-> +int pdev_create(struct pci_dev *pdev);
-That is a very generic name to find in a header, even one buried deep in drivers.
-I'd prefix it with somethin more specific rmi_pdev_create() or something like that.
+> +struct cca_host_comm_data {
+> +	void *rsp_buff;
+> +	void *req_buff;
+> +	struct rmi_dev_comm_data *io_params;
+> +	/*
+> +	 * Only one device communication request can be active at
 
->  #endif
+wrap comments to 80 chars. This is around 70ish
+
+> +	 * a time. This limitation comes from using the DOE mailbox
+> +	 * at the pdev level. Requests such as get_measurements may
+> +	 * span multiple mailbox messages, which must not be
+> +	 * interleaved with other SPDM requests.
+> +	 */
+> +	struct workqueue_struct *work_queue;
+> +};
+> +
+>  /* dsc = device security context */
+>  struct cca_host_pf0_dsc {
+> +	struct cca_host_comm_data comm_data;
+>  	struct pci_tsm_pf0 pci;
+>  	struct pci_ide *sel_stream;
+>  
+>  	void *rmm_pdev;
+>  	int num_aux;
+>  	void *aux[MAX_PDEV_AUX_GRANULES];
+> +
+> +	struct mutex object_lock;
+> +	struct {
+> +		struct cache_object *cache;
+> +
+> +		void *public_key;
+> +		size_t public_key_size;
+> +
+> +		bool valid;
+> +	} cert_chain;
+> +	struct cache_object *vca;
+
+There are a enough slightly non obvious things in here like
+this vca that I think this structure would benefit from full kernel-doc.
+
+>  };
+
+
 
