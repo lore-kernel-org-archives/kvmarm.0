@@ -1,164 +1,110 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BAA2DF150;
-	Wed, 29 Oct 2025 06:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D645930F944
+	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 07:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761719891; cv=none; b=C9YRAD6Hz1PJ5n9pMWqZLvOndRex3eXA+o9f+bCy8CI1m90hmVHTmcpwYEbdTN8jsufDwQzOlYYEzX/L2HXcw9oRhuP9Pq2t/wC/6F5JvT1WxC8Ff3cZ/jkDA25Of/xJFl0hoeu2ydpgUpFHexM+ZCXcsJEjQVKARv0RYn2KFJQ=
+	t=1761722277; cv=none; b=D7RZ5jgIyNYo/JQvj9xHOoDNeFFR5415/z64TW1DUlPyIqWeo+9F7O9I8sdd6mOm04czQ4v2rLxticeGJNrG+1Q0an/qpipmXzD42FY5PMt9qLJKRG6xgfCib3YYH5n89iS/fnrQ69Disy91Ma70E4HZNnxKFeEMbg2tO3qTI7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761719891; c=relaxed/simple;
-	bh=GQBcTt3q3jYhlQdBtZfxngxuplRCCGIsPQTXwR3o7QE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mRhgF1BjDPiwkkCNDWcYgW4y1/d2mnHmCBkVb6Vup2x95B9xzqaJbgcJDZp+0HcLhWxeIqUUpRIG3BxUcFXVMAw+C5l2Tu7iRgNnUNZbdVY4dDBHumuRDZUXCcia/hEaky2uf9Pw2x14yp022zzOr2aINlVE5Acb5RYNQhFjBwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LE5DIOnD; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LE5DIOnD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761719887; x=1793255887;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GQBcTt3q3jYhlQdBtZfxngxuplRCCGIsPQTXwR3o7QE=;
-  b=LE5DIOnDHPPMwBZ6V+EXCZXh4DxsQVD4bMaNQ61jgeMPH98N1S0gBbzF
-   yJNFIspJPqDQQblEh7R7ooyk+DItra1O2NatQvbYOuc1ZVvecq8W2rGox
-   QPM8itT532kpJnK5slcYc91kz4kO6HYzjbX5yJLzld1KTuylIg006fov1
-   AvC5Zh2JSUfd1kx8XFkCjEuYMLFRJRr2dC1l287cB1BghdS5mM5zgCX/g
-   QoN5TL8XnAQDRU47jkjPmuWHGym4rOdJFngCXNYMzOV+8WQIavzUszRkO
-   KUTgnF2vC6d86m76o3/Z1phRsnn1k0+a83HfUmYjkRwViUw09zHaih2Bi
-   g==;
-X-CSE-ConnectionGUID: LZ3P2BrwQNGVOiKhWbOX0w==
-X-CSE-MsgGUID: xKU5U/z9Th+9Z9tgDvc9lA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63927782"
-X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="63927782"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:38:05 -0700
-X-CSE-ConnectionGUID: 8nQPxS3sQHujSGq7kBId9A==
-X-CSE-MsgGUID: W9e750ZQTU6M5dFb3BxcwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
-   d="scan'208";a="190701774"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:37:57 -0700
-Message-ID: <71006f78-7afa-4821-8bd1-9cd5b8d62a33@linux.intel.com>
-Date: Wed, 29 Oct 2025 14:37:55 +0800
+	s=arc-20240116; t=1761722277; c=relaxed/simple;
+	bh=nHrYKnq0A3RI6YrxImuLci6NbNAExaip2UClgnU6Hng=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fCo4fDV3pje1t0LtD9/ssp6ZSwTM5WV+80631xwS1dhAMbH1uS1cMHhKsHYS56uJ8AIrbvqxTO5XDQsImUSgIe45ebfCnJP097JHX6aVy++3jf/iq55X43Z8YRENcXlbHdtO1S9Nn0zcg6Vhfa3U2+X5HXAoSZdSqa2p4GACdz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from jtjnmail201620.home.langchao.com
+        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id 202510291517433647;
+        Wed, 29 Oct 2025 15:17:43 +0800
+Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
+ jtjnmail201620.home.langchao.com (10.100.2.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Wed, 29 Oct 2025 15:17:44 +0800
+Received: from inspur.com (10.100.2.113) by jtjnmailAR01.home.langchao.com
+ (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Wed, 29 Oct 2025 15:17:44 +0800
+Received: from localhost.localdomain.com (unknown [10.94.19.60])
+	by app9 (Coremail) with SMTP id cQJkCsDwSHmXvwFpdDgHAA--.5676S2;
+	Wed, 29 Oct 2025 15:17:44 +0800 (CST)
+From: Bo Liu <liubo03@inspur.com>
+To: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, Bo Liu
+	<liubo03@inspur.com>
+Subject: [PATCH] arm64: Fix double word in comments
+Date: Wed, 29 Oct 2025 15:17:42 +0800
+Message-ID: <20251029071742.17732-1-liubo03@inspur.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: TDX: Take MMU lock around tdh_vp_init()
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, ackerleytng@google.com, anup@brainfault.org,
- aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, chenhuacai@kernel.org,
- frankja@linux.ibm.com, imbrenda@linux.ibm.com, ira.weiny@intel.com,
- kai.huang@intel.com, kas@kernel.org, kvm-riscv@lists.infradead.org,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, maddy@linux.ibm.com, maobibo@loongson.cn,
- maz@kernel.org, michael.roth@amd.com, oliver.upton@linux.dev,
- palmer@dabbelt.com, pbonzini@redhat.com, pjw@kernel.org,
- vannapurve@google.com, x86@kernel.org, yan.y.zhao@intel.com,
- zhaotianrui@loongson.cn
-References: <aP-1qlTkmFUgTld-@google.com>
- <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cQJkCsDwSHmXvwFpdDgHAA--.5676S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF4DGFyfAw47Zr1ftryDAwb_yoW8Grykp3
+	4DurykAw4kC3WYka4DCwsxXFs8A395trWUGw1UZrWrtr90k348Wrn2vr1Y9rWrXrWrXayf
+	uFyqyr15W3WkArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
+	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
+	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
+	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
+	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU122NtUUUUU==
+X-CM-SenderInfo: xolxu0iqt6x0hvsx2hhfrp/
+X-CM-DELIVERINFO: =?B?073cd2LVRuiwy3Lqe5bb/wL3YD0Z3+qys2oM3YyJaJDj+48qHwuUARU7xYOAI0q1Re
+	KIpW5E45D/ppzVTEP3m+j7VajTAnWQJGywx+S+ZzlAJpWdDBKU+9ND03LjUKXr5WWebhqV
+	UxgGA21U09ARJ3pXvdw=
+Content-Type: text/plain
+tUid: 2025102915174356467725e5a955cb26b5d87bf08cd158
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
+Remove the repeated word "the" in comments.
 
+Signed-off-by: Bo Liu <liubo03@inspur.com>
+---
+ arch/arm64/kernel/entry-ftrace.S | 2 +-
+ arch/arm64/kvm/arm.c             | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On 10/28/2025 8:28 AM, Rick Edgecombe wrote:
-> Take MMU lock around tdh_vp_init() in KVM_TDX_INIT_VCPU to prevent
-> meeting contention during retries in some no-fail MMU paths.
->
-> The TDX module takes various try-locks internally, which can cause
-> SEAMCALLs to return an error code when contention is met. Dealing with
-> an error in some of the MMU paths that make SEAMCALLs is not straight
-> forward, so KVM takes steps to ensure that these will meet no contention
-> during a single BUSY error retry. The whole scheme relies on KVM to take
-> appropriate steps to avoid making any SEAMCALLs that could contend while
-> the retry is happening.
->
-> Unfortunately, there is a case where contention could be met if userspace
-> does something unusual. Specifically, hole punching a gmem fd while
-> initializing the TD vCPU. The impact would be triggering a KVM_BUG_ON().
->
-> The resource being contended is called the "TDR resource" in TDX docs
-> parlance. The tdh_vp_init() can take this resource as exclusive if the
-> 'version' passed is 1, which happens to be version the kernel passes. The
-> various MMU operations (tdh_mem_range_block(), tdh_mem_track() and
-> tdh_mem_page_remove()) take it as shared.
->
-> There isn't a KVM lock that maps conceptually and in a lock order friendly
-> way to the TDR lock. So to minimize infrastructure, just take MMU lock
-> around tdh_vp_init(). This makes the operations we care about mutually
-> exclusive. Since the other operations are under a write mmu_lock, the code
-> could just take the lock for read, however this is weirdly inverted from
-> the actual underlying resource being contended. Since this is covering an
-> edge case that shouldn't be hit in normal usage, be a little less weird
-> and take the mmu_lock for write around the call.
->
-> Fixes: 02ab57707bdb ("KVM: TDX: Implement hooks to propagate changes of TDP MMU mirror page table")
-> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
-> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> Hi,
->
-> It was indeed awkward, as Sean must have sniffed. But seems ok enough to
-> close the issue.
->
-> Yan, can you give it a look?
->
-> Posted here, but applies on top of this series.
->
-> Thanks,
->
-> Rick
-> ---
->   arch/x86/kvm/vmx/tdx.c | 15 ++++++++++++---
->   1 file changed, 12 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index daec88d4b88d..8bf5d2624152 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -2938,9 +2938,18 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
->   		}
->   	}
->   
-> -	err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
-> -	if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
-> -		return -EIO;
-> +	/*
-> +	 * tdh_vp_init() can take a exclusive lock of the TDR resource inside
-                                   ^
-                                   an
-
-> +	 * the TDX module. This resource is also taken as shared in several
-> +	 * no-fail MMU paths, which could return TDX_OPERAND_BUSY on contention.
-> +	 * A read lock here would be enough to exclude the contention, but take
-> +	 * a write lock to avoid the weird inversion.
-Can we also add the description that the lock is trying to prevent an edge case
-as in the change log if not too wordy?
-
-> +	 */
-> +	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
-> +		err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
-> +		if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
-> +			return -EIO;
-> +	}
->   
->   	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
->   
+diff --git a/arch/arm64/kernel/entry-ftrace.S b/arch/arm64/kernel/entry-ftrace.S
+index 169ccf600066..025140caafe7 100644
+--- a/arch/arm64/kernel/entry-ftrace.S
++++ b/arch/arm64/kernel/entry-ftrace.S
+@@ -94,7 +94,7 @@ SYM_CODE_START(ftrace_caller)
+ 	stp	x29, x30, [sp, #FREGS_SIZE]
+ 	add	x29, sp, #FREGS_SIZE
+ 
+-	/* Prepare arguments for the the tracer func */
++	/* Prepare arguments for the tracer func */
+ 	sub	x0, x30, #AARCH64_INSN_SIZE		// ip (callsite's BL insn)
+ 	mov	x1, x9					// parent_ip (callsite's LR)
+ 	mov	x3, sp					// regs
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 870953b4a8a7..9886bebc7263 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2448,7 +2448,7 @@ static void kvm_hyp_init_symbols(void)
+ 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
+ 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
+ 
+-	/* Propagate the FGT state to the the nVHE side */
++	/* Propagate the FGT state to the nVHE side */
+ 	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
+ 	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
+ 	kvm_nvhe_sym(hfgitr_masks)  = hfgitr_masks;
+-- 
+2.31.1
 
