@@ -1,110 +1,166 @@
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D645930F944
-	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 07:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.146
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A2B311975
+	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 09:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761722277; cv=none; b=D7RZ5jgIyNYo/JQvj9xHOoDNeFFR5415/z64TW1DUlPyIqWeo+9F7O9I8sdd6mOm04czQ4v2rLxticeGJNrG+1Q0an/qpipmXzD42FY5PMt9qLJKRG6xgfCib3YYH5n89iS/fnrQ69Disy91Ma70E4HZNnxKFeEMbg2tO3qTI7k=
+	t=1761731352; cv=none; b=JmQXzCP3ROJMLQj0oSy+ACMsKmgbdaQeQYOKpW10odbsMic9PbzHLZ+pEyY8CPqWysaYEah3vqckXA7Q4EO2fiv0RHuz1wrTc024WNAVwTgBJgRa+OjM5HEtiK2MsJ0+IMSRKWhDAj9AqvkiEdkTJIDuuJdEH7l/rf8LWTBhGY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761722277; c=relaxed/simple;
-	bh=nHrYKnq0A3RI6YrxImuLci6NbNAExaip2UClgnU6Hng=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fCo4fDV3pje1t0LtD9/ssp6ZSwTM5WV+80631xwS1dhAMbH1uS1cMHhKsHYS56uJ8AIrbvqxTO5XDQsImUSgIe45ebfCnJP097JHX6aVy++3jf/iq55X43Z8YRENcXlbHdtO1S9Nn0zcg6Vhfa3U2+X5HXAoSZdSqa2p4GACdz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from jtjnmail201620.home.langchao.com
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id 202510291517433647;
-        Wed, 29 Oct 2025 15:17:43 +0800
-Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
- jtjnmail201620.home.langchao.com (10.100.2.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Wed, 29 Oct 2025 15:17:44 +0800
-Received: from inspur.com (10.100.2.113) by jtjnmailAR01.home.langchao.com
- (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Wed, 29 Oct 2025 15:17:44 +0800
-Received: from localhost.localdomain.com (unknown [10.94.19.60])
-	by app9 (Coremail) with SMTP id cQJkCsDwSHmXvwFpdDgHAA--.5676S2;
-	Wed, 29 Oct 2025 15:17:44 +0800 (CST)
-From: Bo Liu <liubo03@inspur.com>
-To: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <catalin.marinas@arm.com>,
-	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>
-CC: <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, Bo Liu
-	<liubo03@inspur.com>
-Subject: [PATCH] arm64: Fix double word in comments
-Date: Wed, 29 Oct 2025 15:17:42 +0800
-Message-ID: <20251029071742.17732-1-liubo03@inspur.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1761731352; c=relaxed/simple;
+	bh=Rx6T/2ZiVqtM8p1WOZ5s4RFLxTBoy7M4bJuEZ03wm2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DbEh4EIuObhs2lNSjkwHmd4euNHc9Ykpm2ihNjW8fvpqpcu5XdJRmwjEj64IJk/PQUu+9VKKfwOpt1TNaioAs9wonz/rjq+m9KNPNmEgE4xvsCg5E5Eu1KaCmYign7/NCisp0JrM5EBBZuBEbuHKI7nX74rFoQRIEih8BtQbGcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 20F561AC1;
+	Wed, 29 Oct 2025 02:49:00 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E22E53F673;
+	Wed, 29 Oct 2025 02:49:05 -0700 (PDT)
+Message-ID: <61e923d6-388b-4cc6-8c26-5581a1e1cc10@arm.com>
+Date: Wed, 29 Oct 2025 09:49:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cQJkCsDwSHmXvwFpdDgHAA--.5676S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AF4DGFyfAw47Zr1ftryDAwb_yoW8Grykp3
-	4DurykAw4kC3WYka4DCwsxXFs8A395trWUGw1UZrWrtr90k348Wrn2vr1Y9rWrXrWrXayf
-	uFyqyr15W3WkArDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI
-	64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8Jw
-	Am72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAG
-	YxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7V
-	AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU122NtUUUUU==
-X-CM-SenderInfo: xolxu0iqt6x0hvsx2hhfrp/
-X-CM-DELIVERINFO: =?B?073cd2LVRuiwy3Lqe5bb/wL3YD0Z3+qys2oM3YyJaJDj+48qHwuUARU7xYOAI0q1Re
-	KIpW5E45D/ppzVTEP3m+j7VajTAnWQJGywx+S+ZzlAJpWdDBKU+9ND03LjUKXr5WWebhqV
-	UxgGA21U09ARJ3pXvdw=
-Content-Type: text/plain
-tUid: 2025102915174356467725e5a955cb26b5d87bf08cd158
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] KVM: arm64: support optional calls of FF-A v1.2
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, perlarsen@google.com, ayrton@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20251027191729.1704744-1-yeoreum.yun@arm.com>
+ <20251027191729.1704744-3-yeoreum.yun@arm.com>
+ <f5aa3c19-fdea-4f62-9541-530e59b20a87@arm.com>
+ <aQEwVe8+okm/Nmso@e129823.arm.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <aQEwVe8+okm/Nmso@e129823.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Remove the repeated word "the" in comments.
+Hi Levi,
 
-Signed-off-by: Bo Liu <liubo03@inspur.com>
----
- arch/arm64/kernel/entry-ftrace.S | 2 +-
- arch/arm64/kvm/arm.c             | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On 10/28/25 21:06, Yeoreum Yun wrote:
+> Hi Ben,
+> 
+>>> To use TPM drvier which uses CRB over FF-A with FFA_DIRECT_REQ2,
+>>> support the FF-A v1.2's optinal calls by querying whether
+>>> SPMC supports those.
+>>>
+>>> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+>>> ---
+>>>  arch/arm64/kvm/hyp/nvhe/ffa.c | 19 ++++++++++++++++++-
+>>>  1 file changed, 18 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+>>> index 0ae87ff61758..9ded1c6369b9 100644
+>>> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+>>> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+>>> @@ -646,6 +646,22 @@ static void do_ffa_mem_reclaim(struct arm_smccc_1_2_regs *res,
+>>>  		ffa_to_smccc_res(res, ret);
+>>>  }
+>>>
+>>> +static bool ffa_1_2_optional_calls_supported(u64 func_id)
+>>> +{
+>>> +	struct arm_smccc_1_2_regs res;
+>>> +
+>>> +	if (!smp_load_acquire(&has_version_negotiated) ||
+>>> +		(FFA_MINOR_VERSION(FFA_VERSION_1_2) < 2))
+>>> +		return false;
+>>> +
+>>> +	arm_smccc_1_2_smc(&(struct arm_smccc_1_2_regs) {
+>>> +		.a0 = FFA_FEATURES,
+>>> +		.a1 = func_id,
+>>> +	}, &res);
+>>> +
+>>> +	return res.a0 == FFA_SUCCESS;
+>>> +}
+>>> +
+>>>  /*
+>>>   * Is a given FFA function supported, either by forwarding on directly
+>>>   * or by handling at EL2?
+>>> @@ -678,12 +694,13 @@ static bool ffa_call_supported(u64 func_id)
+>>>  	case FFA_NOTIFICATION_SET:
+>>>  	case FFA_NOTIFICATION_GET:
+>>>  	case FFA_NOTIFICATION_INFO_GET:
+>>> +		return false;
+>>>  	/* Optional interfaces added in FF-A 1.2 */
+>>>  	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
+>>>  	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
+>>>  	case FFA_CONSOLE_LOG:			/* Optional per 13.1: not in Table 13.1 */
+>>
+>> Looking at table 13.54 in the FF-A 1.2 spec FFA_CONSOLE_LOG is only supported in secure FF-A
+>> instances and not from the normal world.
+> 
+> Thanks. in that case, we can return false for FFA_CONSOLE_LOG
+> unconditionally.
+> 
+>>
+>>>  	case FFA_PARTITION_INFO_GET_REGS:	/* Optional for virtual instances per 13.1 */
+>>> -		return false;
+>>> +		return ffa_1_2_optional_calls_supported(func_id);
+>>>  	}
+>>
+>> I don't think that an smc call here is the right thing to do. This changes this from a light
+>> weight deny list to an extra smc call for each ffa_msg_send_direct_req2 from the driver.
+>>
+>> Instead, I would expect this patch just to remove FFA_MSG_SEND_DIRECT_REQ2 from the deny list
+>> and rely on the TPM driver to use FFA_FEATURES to check whether it's supported.
+>>
+>> So, just this change:
+>>
+>> @@ -679,7 +679,6 @@ static bool ffa_call_supported(u64 func_id)
+>>         case FFA_NOTIFICATION_GET:
+>>         case FFA_NOTIFICATION_INFO_GET:
+>>         /* Optional interfaces added in FF-A 1.2 */
+>> -       case FFA_MSG_SEND_DIRECT_REQ2:          /* Optional per 7.5.1 */
+>>         case FFA_MSG_SEND_DIRECT_RESP2:         /* Optional per 7.5.1 */
+>>         case FFA_CONSOLE_LOG:                   /* Optional per 13.1: not in Table 13.1 */
+>>         case FFA_PARTITION_INFO_GET_REGS:       /* Optional for virtual instances per 13.1 */
+>>
+>> Am I missing something?
+> 
+> Nope. I think you don't think you miss anything and
+> I also think about it.
+> 
+> But, I'm not sure about "support" means in the pkvm about FF-A.
+> Anyway unless the SPMC doesn't support the specific FF-A ABI,
+> I don't know that's meaningful to return "TRUE" in here.
+> IOW, suppose pkvm returns supports of  FFA_MSG_SEND_DIRECT_REQ2
+> but user receive when it calls FFA_MSG_SEND_DIRECT_REQ2 with NOT SUPPORTED.
 
-diff --git a/arch/arm64/kernel/entry-ftrace.S b/arch/arm64/kernel/entry-ftrace.S
-index 169ccf600066..025140caafe7 100644
---- a/arch/arm64/kernel/entry-ftrace.S
-+++ b/arch/arm64/kernel/entry-ftrace.S
-@@ -94,7 +94,7 @@ SYM_CODE_START(ftrace_caller)
- 	stp	x29, x30, [sp, #FREGS_SIZE]
- 	add	x29, sp, #FREGS_SIZE
- 
--	/* Prepare arguments for the the tracer func */
-+	/* Prepare arguments for the tracer func */
- 	sub	x0, x30, #AARCH64_INSN_SIZE		// ip (callsite's BL insn)
- 	mov	x1, x9					// parent_ip (callsite's LR)
- 	mov	x3, sp					// regs
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 870953b4a8a7..9886bebc7263 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2448,7 +2448,7 @@ static void kvm_hyp_init_symbols(void)
- 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
- 	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
- 
--	/* Propagate the FGT state to the the nVHE side */
-+	/* Propagate the FGT state to the nVHE side */
- 	kvm_nvhe_sym(hfgrtr_masks)  = hfgrtr_masks;
- 	kvm_nvhe_sym(hfgwtr_masks)  = hfgwtr_masks;
- 	kvm_nvhe_sym(hfgitr_masks)  = hfgitr_masks;
+As I understand it, the ffa_call_supported() is used in two places:
+1. To return NOT SUPPORTED to an FFA_FEATURE call for ffa calls that are
+on the deny list.
+2. To block ffa calls if they are on the deny list.
+
+For both your patch and just removing FFA_MSG_SEND_DIRECT_REQ2 from the
+denylist I think the behaviour is the same.
+
+If FFA_MSG_SEND_DIRECT_REQ2 is not supported at the spmc then:
+a) an FFA_FEATURE call will return not supported
+b) an FFA_MSG_SEND_DIRECT_REQ2 will return not supported
+
+> 
+> I'm not sure this inconsistency is allowed or not so as a defensive
+> perspective.
+> 
+> If that allows, I don't have a any special comment for this.
+> 
+> Thanks!
+> 
+> --
+> Sincerely,
+> Yeoreum Yun
+
 -- 
-2.31.1
+Thanks,
+
+Ben
 
