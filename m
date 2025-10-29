@@ -1,91 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D487C337699;
-	Wed, 29 Oct 2025 16:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1967E2BE7CD;
+	Wed, 29 Oct 2025 16:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761755008; cv=none; b=Lb0LCWHjnE00EB9KxSGdmCMrEpYksg3HgleEyaaWoNz6WJXi05WGdRt3JLPRoEe63MZpjyW7Sy/oR8TypBfJ99OAciABGg25mlinnN0JKtITg5x+CuEncXeYXN7QZz1VXTTFg1nriNjicEaeObF9jN3q8GA0139qyllpRfZmfEc=
+	t=1761755967; cv=none; b=n4ZaC3+YaEPYXUQGLemZSEyhWt5QSz3gMm/tuzkRNX9p9okct7FjP6i06rlquxjS+VT9cVQIx4mIIM7eRhmWATOVvoJk1NR9YkF5eVOR6jBLP/3LuS37CQ5LSwFIrLwdP9kVfL5C+oyBMb2ITQ1/vQbmZzcgT42sh/siidumDfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761755008; c=relaxed/simple;
-	bh=jOD78Mx518TeQRICu+lIQf1/IpxzBTgMrkOiFkYx+R0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=heLADRhjtTXGZ+98d7IQpJyyWct+G4eeM7gpYa3np6Baxjon+QN/lz/pZ9olXjYSyx/cjrA79hd5mRpPcRNDIcC4rjFnw/0dqjg7edb0QQxn1iXJNLePzwb5CLrtziUyXzwEwgdGWoh5OU0LuIw1crYq3h5xIpgbaS7kvmFA4wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0vhav7C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761755967; c=relaxed/simple;
+	bh=R/XBmN72AWlHH+5TUzfXRncpX7TfMzhwtGlEAzMthFM=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H1ZGfe01GL+ij6mM7pETzXhdXu3/8stmhQwJe4zeo2+6qfOWIb/VYgmwN5z52h3aC1k5smc1hoVOXCtoNlvYusMjjT6r3o7Ve37pZ9ZtxtIMxOJU99ORw5NPz+HrqIFb9EtLw8vzz/35yT0gFjIoEFxeF/bIQ9/95CsatwplkBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=SXRlpokc; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0vhav7C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A05D1C4CEF7;
-	Wed, 29 Oct 2025 16:23:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761755008;
-	bh=jOD78Mx518TeQRICu+lIQf1/IpxzBTgMrkOiFkYx+R0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=G0vhav7C2VPL1gKf2u+3Ur40CdOmOqdjOrKKrWG7AHr4Nm8plDumh6C4wMMJ4QRVR
-	 53buwYqhXJHzccuJnVEjFyYHGS65dX7iL3dNE58Ar4bqqNPTKk/2g72cRS3jQP0UjC
-	 YOe/LxCAj458t8pPGcHGjxFqiJPgKjFVRbS8SoEclzTcE9bommQ6J11raqL0tFGqsI
-	 p+2LcKfHys9c4i4ETeRvEaEL9/RB6IGqh1iPMXqQrZ/4nQHv9u5F9XjhNN8OnkQjuY
-	 lrxQhA9nnBX9j+Tjv/dl4tqnlkLAjMR2hFbe8DqbBLKnKBgDNGwNvLHCETQttgFII/
-	 MBPsIuD9TrMxA==
-Date: Wed, 29 Oct 2025 16:23:22 +0000
-From: Will Deacon <will@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>, maz@kernel.org,
-	oliver.upton@linux.dev, catalin.marinas@arm.com,
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	joey.gouly@arm.com, ayrton@google.com, yuzenghui@huawei.com,
-	qperret@google.com, kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Check the untrusted offset in FF-A memory
- share
-Message-ID: <aQI_essk_agEZTTR@willie-the-truck>
-References: <20251017075710.2605118-1-sebastianene@google.com>
- <aPj2hTXbGUseUqhE@google.com>
- <aQHsD0MnZYSTDOf8@google.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="SXRlpokc"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=gDpScrLfjAz7w+zkzftTI0/uhsgvu01n2ST4dvnPHU8=;
+	b=SXRlpokc2MEHJiX0Rtds4jw/vMLytQ6GUp3bv0CSgY2ffj7vjFrxeD2BA6gMXiBHY+hqdikFO
+	U/dxGGlQrxQffWcY8kCK4IK6NWsYFhptAC9zTfmftGLvwFXSbM9OXD9ZJy3UaxeM6pKmwagH144
+	oG/gDSdIwlvCCCrP0HS53+g=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.36])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cxXy03dZXz1P6jy;
+	Thu, 30 Oct 2025 00:39:04 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cxXw24PPRz6L4sK;
+	Thu, 30 Oct 2025 00:37:22 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4FABB1401DC;
+	Thu, 30 Oct 2025 00:39:09 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 29 Oct
+ 2025 16:39:08 +0000
+Date: Wed, 29 Oct 2025 16:39:06 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
+	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
+	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH RESEND v2 01/12] KVM: arm64: RMI: Export
+ kvm_has_da_feature
+Message-ID: <20251029163906.000041e2@huawei.com>
+In-Reply-To: <20251027095602.1154418-2-aneesh.kumar@kernel.org>
+References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
+	<20251027095602.1154418-2-aneesh.kumar@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQHsD0MnZYSTDOf8@google.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Wed, Oct 29, 2025 at 10:27:27AM +0000, Sebastian Ene wrote:
-> On Wed, Oct 22, 2025 at 04:21:41PM +0100, Vincent Donnefort wrote:
-> > On Fri, Oct 17, 2025 at 07:57:10AM +0000, Sebastian Ene wrote:
-> > > Verify the offset to prevent OOB access in the hypervisor
-> > 
-> > I believe that would be just a read, so probably it would be difficult to use
-> > this to compromise anything, except crashing the system?
-> 
-> The simplest way is to crash the system but a more advanced one might
-> lead to a confused deputy attack:
-> 
-> 1. Use the original bug to trigger the overflow of the offset variable
-> which bypasses this check:
-> https://elixir.bootlin.com/linux/v6.18-rc2/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L519
-> 
-> 2. Use the host_share_hyp from the host to create a mapping in the hyp
-> address space so that : reg from reg = (void *)buf + offset; points to
-> memory mapped in the hyp address space & controlled from the host.
-> 
-> 3. Make the __ffa_host_share_ranges fail (since we control the content of
-> the reg) to trigger the recovery mechanism for __ffa_host_unshare_ranges
-> (https://elixir.bootlin.com/linux/v6.18-rc2/source/arch/arm64/kvm/hyp/nvhe/ffa.c#L392)
-> and replace the content of the reg with pages that we want to remove the
-> host stage-2 FF-A annotation from.
-> 
-> With step(3) we can remove the host stage-2 FF-A annotation from pages
-> without having to invoke the FF-A reclaim mechanism. This allows a
-> confused deputy attack because the pages can be given to another entity
-> after the annotation is removed (eg. given to a protected VM).
+On Mon, 27 Oct 2025 15:25:51 +0530
+"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
 
-Crikey, it's convoluted but I think your reasoning is correct and I also
-think that the patch fixes the issue:
+Hi Aneesh,
 
-Acked-by: Will Deacon <will@kernel.org>
+Great to see this support - this review might be a little superficial as
+I think it's first time I've looked at this and I'll be getting my head around
+it whilst reviewing.
 
-Cheers,
+Small process thing:
+Always include a stand alone description in here.  Some git clients
+don't put the patch title near the commit text. Add something like
 
-Will
+Export kvm_has_da_feature() for use in later patches.
+
+> This will be used in later patches
+Patch title made me think this was exporting something that already existed.
+Probably better to say  Add kvm_has_da_feature() helper for use in later patches
+or something like that.
+
+> 
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_rmi.h | 1 +
+>  arch/arm64/include/asm/rmi_smc.h | 1 +
+>  arch/arm64/kvm/rmi.c             | 6 ++++++
+>  3 files changed, 8 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 1b2cdaac6c50..a967061af6ed 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -90,6 +90,7 @@ u32 kvm_realm_ipa_limit(void);
+>  u32 kvm_realm_vgic_nr_lr(void);
+>  u8 kvm_realm_max_pmu_counters(void);
+>  unsigned int kvm_realm_sve_max_vl(void);
+> +bool kvm_has_da_feature(void);
+>  
+>  u64 kvm_realm_reset_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> index 1000368f1bca..2ea657a87402 100644
+> --- a/arch/arm64/include/asm/rmi_smc.h
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+> @@ -87,6 +87,7 @@ enum rmi_ripas {
+>  #define RMI_FEATURE_REGISTER_0_GICV3_NUM_LRS	GENMASK(37, 34)
+>  #define RMI_FEATURE_REGISTER_0_MAX_RECS_ORDER	GENMASK(41, 38)
+>  #define RMI_FEATURE_REGISTER_0_Reserved		GENMASK(63, 42)
+> +#define RMI_FEATURE_REGISTER_0_DA		BIT(42)
+
+Guess you want to be updating Reserved as seems bit 42 isn't any more.
+
+>  
+>  #define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
+>  #define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 478a73e0b35a..08f3d2362dfd 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -1738,6 +1738,12 @@ int kvm_init_realm_vm(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> +bool kvm_has_da_feature(void)
+> +{
+> +	return rmi_has_feature(RMI_FEATURE_REGISTER_0_DA);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_has_da_feature);
+> +
+>  void kvm_init_rmi(void)
+>  {
+>  	/* Only 4k page size on the host is supported */
+
