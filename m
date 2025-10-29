@@ -1,43 +1,43 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E8235BDBC
-	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 20:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F6618A6DB
+	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 20:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761769667; cv=none; b=PUcMJojS5LPGN0AZisfxVXwjgeQclLxzUYTF2mCBgQClidCiVuVOootbD9yL09i3YMfPdChD5IV74/gn0Tn2hThlgGizB27W+Xlu/Ww/egUF676wknR9u2E24iF2F9Yq5lyEW9CQ/uUPEDyYELQtaB+cDj2vUCmMigxlPfKs6sg=
+	t=1761770724; cv=none; b=pnMteN2h4lSYE+IAoxEbPuLfs3fU4yNfKr+iQtqdgjGF7pzUbEmbrRcv1Htbh7cydyw20mGOykM6/ePEObWpRnoIlHqrE3ptxAIbSVbzYj9n7WAwLhxoMeA4EHdTAD20n8NDGxkENuBG+//Zhq3Ojb6fzRVhe2DXTu0T4h2eU1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761769667; c=relaxed/simple;
-	bh=V3XWUmSqag986veKI80eSIb6m7nPk9CLKVIRbAGcJuQ=;
+	s=arc-20240116; t=1761770724; c=relaxed/simple;
+	bh=ulLgOXrempxnhkc8QBuR1SScFtqimPNsNISkAaKWKoU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cGlLc3ZJ5ZzgbS67V1I462y9F2WiKwjpXjeVfCC8R81Pv6vE+ELqOtt1rzA3UxVCQV61xKhkAbsOkLFjstI29hn/j1Ce0mCpt8SgbkRb60BRc95KZP66BoySPaiZBGFePC+6HJcG5ITwI/RBJVjKaldYmcQQn8Fh/OggQB5Lmy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SvOSZpMZ; arc=none smtp.client-ip=91.218.175.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=SjtnLm7hHltwMUS25so9ZzpkGA4m/kX1LjqXuPtGxJ0pLsZrlnZcNw+/2/wOv4Cq2avdBYEJoUFG+ZzXMmyWAcQTpyw8oy/D6vyvrPbZ4LaXgQcsuyR1CNpf0K3CYUln76jkYNZMgPTloXSguECKzkL5lCmABJhY3N1JnQTfqNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cDUZ9O0J; arc=none smtp.client-ip=95.215.58.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SvOSZpMZ"
-Date: Wed, 29 Oct 2025 13:27:33 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cDUZ9O0J"
+Date: Wed, 29 Oct 2025 13:45:10 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761769663;
+	t=1761770720;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UTcYzXZPrniWZCkwHLSm2V6Hq8R2XKza/pCFwi3PJs0=;
-	b=SvOSZpMZW3/p9h7JBDkzya4FoDoQEO9J+Px2YZf5sVJIhqCyP98bAFnuLqMr0hrcj4PUw1
-	qkoyJaEFkwISobw8SIX80cnkrsphzxEfEb6YMSZKL0aTCp/jZZchjpNzYL46QSL/9dyIhn
-	wOuyeVhVz2OK3K1f5wkDbsFQ9D0sxx8=
+	bh=hjWyo6uOfN+xF80KKFI5BtoiaYMueiNClbqh3PY0wpI=;
+	b=cDUZ9O0J21zXqhP2dHUhcwFujSNAC6y/8SVTyl1TJZ+/KF/5mr+B4mG8uv5x1qwaJyCM8Q
+	AqzfI26kFG4jEcgCi+yIaqJVIJZjHHRAxoIQdNPj2Thm/A/q1ZKihK9SVthLU7FvjEhSLD
+	ZPooe3pbRgDNnhWhlmRquAimlOyMl9k=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: syzbot <syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com>
-Cc: catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	maz@kernel.org, suzuki.poulose@arm.com,
-	syzkaller-bugs@googlegroups.com, will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [syzbot] [kvmarm?] kernel BUG in kvm_s2_put_page
-Message-ID: <aQJ4tQJPiGF6M9Wb@linux.dev>
-References: <68cd66b0.050a0220.139b6.000f.GAE@google.com>
- <6902734b.050a0220.3344a1.0430.GAE@google.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	shuah@kernel.org
+Subject: Re: [PATCH 2/3] KVM: arm64: selftests: Remove
+ ARM64_FEATURE_FIELD_BITS and its last user
+Message-ID: <aQJ8so_oAXfeyxn_@linux.dev>
+References: <20251014102108.2442391-1-ben.horgan@arm.com>
+ <20251014102108.2442391-3-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,33 +46,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6902734b.050a0220.3344a1.0430.GAE@google.com>
+In-Reply-To: <20251014102108.2442391-3-ben.horgan@arm.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 29, 2025 at 01:04:27PM -0700, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    10fd0285305d Merge branch kvm-arm64/selftests-6.18 into kv..
-> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=173e4fe2580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=a4522b3a704e0394
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c41f3ddb8299a30a98b5
-> compiler:       Debian clang version 20.1.8 (++20250708123704+0de59a293f7a-1~exp1~20250708003721.134), Debian LLD 20.1.8
-> userspace arch: arm64
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13559c92580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12963fe2580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-10fd0285.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/65e2ebd050e3/vmlinux-10fd0285.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/9d47fc3df12e/Image-10fd0285.gz.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+c41f3ddb8299a30a98b5@syzkaller.appspotmail.com
+Hi Ben,
 
-#syz fix: Revert "KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables"
+On Tue, Oct 14, 2025 at 11:21:07AM +0100, Ben Horgan wrote:
+> ARM64_FEATURE_FIELD_BITS is set to 4 but not all ID register fields are 4
+> bits. See for instance ID_AA64SMFR0_EL1. The last user of this define,
+> ARM64_FEATURE_FIELD_BITS, is the set_id_regs selftest. Its logic assumes
+> the fields aren't a single bits; assert that's the case and stop using the
+> define. As there are no more users, ARM64_FEATURE_FIELD_BITS is removed.
+> 
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h                 | 2 --
+>  tools/testing/selftests/kvm/arm64/set_id_regs.c | 8 ++++++--
+>  2 files changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 6455db1b54fd..d9aa76d08e13 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1129,8 +1129,6 @@
+>  #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+>  #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+>  
+> -#define ARM64_FEATURE_FIELD_BITS	4
+> -
+>  #ifdef __ASSEMBLY__
+>  
+>  	.macro	mrs_s, rt, sreg
 
-Just fast-forwarded kvmarm/next to 6.18-rc3 which has the fix.
+You can send this diff as a separate patch. Selftests actually uses the
+definition from tools/arch/arm64/include/asm/sysreg.h, so you'll want to
+drop that definition along with the change to set_id_regs.
 
 Thanks,
 Oliver
