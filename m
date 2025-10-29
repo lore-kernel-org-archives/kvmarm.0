@@ -1,242 +1,164 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47C536B98A
-	for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 22:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BAA2DF150;
+	Wed, 29 Oct 2025 06:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761692341; cv=none; b=Hjuzm6jYuGLhSymgyjhO8yR4PSOFoEPPNrXHFLInVzbWyLiR4tuSIoaloD956aiM0J/R1X27pyWW4Ux1mt9eRV5ZL0930ypSEzISy+S0ZocsqVfNM758Ban7Md0oo54M2zJ4OTebZr1m2sXQF35TmA+ecaot7HawKSiLU4aNcoc=
+	t=1761719891; cv=none; b=C9YRAD6Hz1PJ5n9pMWqZLvOndRex3eXA+o9f+bCy8CI1m90hmVHTmcpwYEbdTN8jsufDwQzOlYYEzX/L2HXcw9oRhuP9Pq2t/wC/6F5JvT1WxC8Ff3cZ/jkDA25Of/xJFl0hoeu2ydpgUpFHexM+ZCXcsJEjQVKARv0RYn2KFJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761692341; c=relaxed/simple;
-	bh=93vaNyyTFMuDYRMt2Na8Hg8PCoyUTl7Q8NM8sIET3Q0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=DYclpUBP935W2I9B5jF5DyVdKYRkrMtByoiIzASflZA/w4xBGEXLjn3/RJmkS2LD7RaydUgE0d8FGYMVh1u4LLj7QLm6Z3sclI2wD4qXoCAzAohl3NKDaoGqQtaXboD4L+6AJkVYZNVMuXWhe/zBWKbygJfgKUk8uBuJiNnGbSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2X1KZY6; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+	s=arc-20240116; t=1761719891; c=relaxed/simple;
+	bh=GQBcTt3q3jYhlQdBtZfxngxuplRCCGIsPQTXwR3o7QE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mRhgF1BjDPiwkkCNDWcYgW4y1/d2mnHmCBkVb6Vup2x95B9xzqaJbgcJDZp+0HcLhWxeIqUUpRIG3BxUcFXVMAw+C5l2Tu7iRgNnUNZbdVY4dDBHumuRDZUXCcia/hEaky2uf9Pw2x14yp022zzOr2aINlVE5Acb5RYNQhFjBwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LE5DIOnD; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2X1KZY6"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33bb4d11f5eso6272019a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 28 Oct 2025 15:58:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761692338; x=1762297138; darn=lists.linux.dev;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CXlFQqVkeSJSGq4nf4h9sY1cU7UxsK+01O4a1p4Iox8=;
-        b=U2X1KZY6UicK04/TWeFL8Xgi4P163YiJ7DYRSL2AQMq96zplOoHS93kgH+e8JQAMTw
-         egl9yk+tbI1Zcfdalq706qUytVynMkBPSSUjzqfhu95BXk5UVS3BbBmsxJX/rkAgeI7Q
-         klw3xUf5U8xK1gm8c7vpvi/xn0qjxE5xqCs3yH/OxqkztIHcqv7xd9W4h4Ir1aZtIVWD
-         ECnMcon+boFbP9Nb9isInSoLieW3069Emwu8HsaVQNTftKzbDVSk5/sZeLj+9R2ipYrY
-         KCulPib6UN2XeHKEyeqFV6IszCzcKbRJ3pV0VymXMDPFCioQQXauLHMh1jr9UJkm6x7e
-         EeEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761692338; x=1762297138;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXlFQqVkeSJSGq4nf4h9sY1cU7UxsK+01O4a1p4Iox8=;
-        b=d/7r59Xqo7MlfE+UfKnPJx2Yy7brB+Yss1qOlxy9OftSpJESpqrla/ZSaKi16sfNxi
-         GfnNwuoGKOTm0XYSQ6xPnF0GpZ5wi80tsLbnXq4Sj+fuUxxOAsHmVGdgJ4kARuB+t3dH
-         PlT9Ljf5TeCkQXtL4crXkUZSJO/LYGwO6c3J6GsZJTA/4VNxGKcLVp7rw9cnxCw7+iyA
-         cW/T87sjn0/vGxqUdkPudzQukBajU06/nAUW96vXrXTPspQrkLf/LlFmnM0X+ogVp7GC
-         h5wLYeEFCe3Xc4G+qIAiQwlWuzrb9XfE340awriq6G21HWKMi4gRQ4C715CYlrEO8TO7
-         n8cA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXysxlZWbmHCxASCmAMQ+G6GMAopxXWj7fPO+7zv7FDryDtxAO28uiupExqdI+FZ96jLqMUwg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYY2IMtWBB8pv5Nf7y+ZquWYwrhxMyTQ9O/eCeqz9ICVqQpQnk
-	kYUr0W8OKXdCpRAf9lCd4ChgVaCQ4Va/v2KsGpax2GZu523tbqw8x8hr/Jr4vW0vtnRS0tDUFOA
-	cljObjlXOh1PcjA==
-X-Google-Smtp-Source: AGHT+IHe+dJhfOO9m6uEQXw3DM1SrUYb2gIMsEhaThpkWaKsrk/O7HUYRRmxDYScsO608Odc0oikNMx/xTBT8Q==
-X-Received: from pjbsw13.prod.google.com ([2002:a17:90b:2c8d:b0:33f:e888:4aad])
- (user=jmattson job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:586e:b0:340:299f:e244 with SMTP id 98e67ed59e1d1-3403a26906cmr820669a91.12.1761692337855;
- Tue, 28 Oct 2025 15:58:57 -0700 (PDT)
-Date: Tue, 28 Oct 2025 15:30:42 -0700
-In-Reply-To: <20251028225827.2269128-1-jmattson@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LE5DIOnD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761719887; x=1793255887;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GQBcTt3q3jYhlQdBtZfxngxuplRCCGIsPQTXwR3o7QE=;
+  b=LE5DIOnDHPPMwBZ6V+EXCZXh4DxsQVD4bMaNQ61jgeMPH98N1S0gBbzF
+   yJNFIspJPqDQQblEh7R7ooyk+DItra1O2NatQvbYOuc1ZVvecq8W2rGox
+   QPM8itT532kpJnK5slcYc91kz4kO6HYzjbX5yJLzld1KTuylIg006fov1
+   AvC5Zh2JSUfd1kx8XFkCjEuYMLFRJRr2dC1l287cB1BghdS5mM5zgCX/g
+   QoN5TL8XnAQDRU47jkjPmuWHGym4rOdJFngCXNYMzOV+8WQIavzUszRkO
+   KUTgnF2vC6d86m76o3/Z1phRsnn1k0+a83HfUmYjkRwViUw09zHaih2Bi
+   g==;
+X-CSE-ConnectionGUID: LZ3P2BrwQNGVOiKhWbOX0w==
+X-CSE-MsgGUID: xKU5U/z9Th+9Z9tgDvc9lA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11586"; a="63927782"
+X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
+   d="scan'208";a="63927782"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:38:05 -0700
+X-CSE-ConnectionGUID: 8nQPxS3sQHujSGq7kBId9A==
+X-CSE-MsgGUID: W9e750ZQTU6M5dFb3BxcwQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,263,1754982000"; 
+   d="scan'208";a="190701774"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2025 23:37:57 -0700
+Message-ID: <71006f78-7afa-4821-8bd1-9cd5b8d62a33@linux.intel.com>
+Date: Wed, 29 Oct 2025 14:37:55 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251028225827.2269128-1-jmattson@google.com>
-X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251028225827.2269128-5-jmattson@google.com>
-Subject: [PATCH v2 4/4] KVM: selftests: Add a VMX test for LA57 nested state
-From: Jim Mattson <jmattson@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Andrew Jones <ajones@ventanamicro.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Bibo Mao <maobibo@loongson.cn>, Jim Mattson <jmattson@google.com>, 
-	"Pratik R. Sampat" <prsampat@amd.com>, James Houghton <jthoughton@google.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: TDX: Take MMU lock around tdh_vp_init()
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, ackerleytng@google.com, anup@brainfault.org,
+ aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, chenhuacai@kernel.org,
+ frankja@linux.ibm.com, imbrenda@linux.ibm.com, ira.weiny@intel.com,
+ kai.huang@intel.com, kas@kernel.org, kvm-riscv@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+ loongarch@lists.linux.dev, maddy@linux.ibm.com, maobibo@loongson.cn,
+ maz@kernel.org, michael.roth@amd.com, oliver.upton@linux.dev,
+ palmer@dabbelt.com, pbonzini@redhat.com, pjw@kernel.org,
+ vannapurve@google.com, x86@kernel.org, yan.y.zhao@intel.com,
+ zhaotianrui@loongson.cn
+References: <aP-1qlTkmFUgTld-@google.com>
+ <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251028002824.1470939-1-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Add a selftest that verifies KVM's ability to save and restore
-nested state when the L1 guest is using 5-level paging and the L2
-guest is using 4-level paging. Specifically, canonicality tests of
-the VMCS12 host-state fields should accept 57-bit virtual addresses.
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- .../kvm/x86/vmx_la57_nested_state_test.c      | 134 ++++++++++++++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24b..b9279ce4eaab 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -117,6 +117,7 @@ TEST_GEN_PROGS_x86 += x86/vmx_exception_with_invalid_guest_state
- TEST_GEN_PROGS_x86 += x86/vmx_msrs_test
- TEST_GEN_PROGS_x86 += x86/vmx_invalid_nested_guest_state
- TEST_GEN_PROGS_x86 += x86/vmx_set_nested_state_test
-+TEST_GEN_PROGS_x86 += x86/vmx_la57_nested_state_test
- TEST_GEN_PROGS_x86 += x86/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86 += x86/vmx_nested_tsc_scaling_test
- TEST_GEN_PROGS_x86 += x86/apic_bus_clock_test
-diff --git a/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-new file mode 100644
-index 000000000000..00c6327d5621
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86/vmx_la57_nested_state_test.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * vmx_la57_nested_state_test
-+ *
-+ * Copyright (C) 2025, Google LLC.
-+ *
-+ * Test KVM's ability to save and restore nested state when the L1 guest
-+ * is using 5-level paging and the L2 guest is using 4-level paging.
-+ *
-+ * This test would have failed prior to commit 9245fd6b8531 ("KVM: x86:
-+ * model canonical checks more precisely").
-+ */
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vmx.h"
-+
-+#define LA57_GS_BASE 0xff2bc0311fb00000ull
-+
-+static void l2_guest_code(void)
-+{
-+	/*
-+	 * Sync with L0 to trigger save/restore.  After
-+	 * resuming, execute VMCALL to exit back to L1.
-+	 */
-+	GUEST_SYNC(1);
-+	vmcall();
-+}
-+
-+static void l1_guest_code(struct vmx_pages *vmx_pages)
-+{
-+#define L2_GUEST_STACK_SIZE 64
-+	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
-+	u64 guest_cr4;
-+	vm_paddr_t pml5_pa, pml4_pa;
-+	u64 *pml5;
-+	u64 exit_reason;
-+
-+	/* Set GS_BASE to a value that is only canonical with LA57. */
-+	wrmsr(MSR_GS_BASE, LA57_GS_BASE);
-+	GUEST_ASSERT(rdmsr(MSR_GS_BASE) == LA57_GS_BASE);
-+
-+	GUEST_ASSERT(vmx_pages->vmcs_gpa);
-+	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
-+	GUEST_ASSERT(load_vmcs(vmx_pages));
-+
-+	prepare_vmcs(vmx_pages, l2_guest_code,
-+		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
-+
-+	/*
-+	 * Set up L2 with a 4-level page table by pointing its CR3 to
-+	 * L1's first PML4 table and clearing CR4.LA57. This creates
-+	 * the CR4.LA57 mismatch that exercises the bug.
-+	 */
-+	pml5_pa = get_cr3() & PHYSICAL_PAGE_MASK;
-+	pml5 = (u64 *)pml5_pa;
-+	pml4_pa = pml5[0] & PHYSICAL_PAGE_MASK;
-+	vmwrite(GUEST_CR3, pml4_pa);
-+
-+	guest_cr4 = vmreadz(GUEST_CR4);
-+	guest_cr4 &= ~X86_CR4_LA57;
-+	vmwrite(GUEST_CR4, guest_cr4);
-+
-+	GUEST_ASSERT(!vmlaunch());
-+
-+	exit_reason = vmreadz(VM_EXIT_REASON);
-+	GUEST_ASSERT(exit_reason == EXIT_REASON_VMCALL);
-+}
-+
-+void guest_code(struct vmx_pages *vmx_pages)
-+{
-+	l1_guest_code(vmx_pages);
-+	GUEST_DONE();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	vm_vaddr_t vmx_pages_gva = 0;
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_x86_state *state;
-+	struct ucall uc;
-+	int stage;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_LA57));
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+
-+	/*
-+	 * L1 needs to read its own PML5 table to set up L2. Identity map
-+	 * the PML5 table to facilitate this.
-+	 */
-+	virt_map(vm, vm->pgd, vm->pgd, 1);
-+
-+	vcpu_alloc_vmx(vm, &vmx_pages_gva);
-+	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-+
-+	for (stage = 1;; stage++) {
-+		vcpu_run(vcpu);
-+		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_IO);
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			/* NOT REACHED */
-+		case UCALL_SYNC:
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+
-+		TEST_ASSERT(uc.args[1] == stage,
-+			    "Expected stage %d, got stage %lu", stage, (ulong)uc.args[1]);
-+		if (stage == 1) {
-+			pr_info("L2 is active; performing save/restore.\n");
-+			state = vcpu_save_state(vcpu);
-+
-+			kvm_vm_release(vm);
-+
-+			/* Restore state in a new VM. */
-+			vcpu = vm_recreate_with_one_vcpu(vm);
-+			vcpu_load_state(vcpu, state);
-+			kvm_x86_state_cleanup(state);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.51.1.851.g4ebd6896fd-goog
+On 10/28/2025 8:28 AM, Rick Edgecombe wrote:
+> Take MMU lock around tdh_vp_init() in KVM_TDX_INIT_VCPU to prevent
+> meeting contention during retries in some no-fail MMU paths.
+>
+> The TDX module takes various try-locks internally, which can cause
+> SEAMCALLs to return an error code when contention is met. Dealing with
+> an error in some of the MMU paths that make SEAMCALLs is not straight
+> forward, so KVM takes steps to ensure that these will meet no contention
+> during a single BUSY error retry. The whole scheme relies on KVM to take
+> appropriate steps to avoid making any SEAMCALLs that could contend while
+> the retry is happening.
+>
+> Unfortunately, there is a case where contention could be met if userspace
+> does something unusual. Specifically, hole punching a gmem fd while
+> initializing the TD vCPU. The impact would be triggering a KVM_BUG_ON().
+>
+> The resource being contended is called the "TDR resource" in TDX docs
+> parlance. The tdh_vp_init() can take this resource as exclusive if the
+> 'version' passed is 1, which happens to be version the kernel passes. The
+> various MMU operations (tdh_mem_range_block(), tdh_mem_track() and
+> tdh_mem_page_remove()) take it as shared.
+>
+> There isn't a KVM lock that maps conceptually and in a lock order friendly
+> way to the TDR lock. So to minimize infrastructure, just take MMU lock
+> around tdh_vp_init(). This makes the operations we care about mutually
+> exclusive. Since the other operations are under a write mmu_lock, the code
+> could just take the lock for read, however this is weirdly inverted from
+> the actual underlying resource being contended. Since this is covering an
+> edge case that shouldn't be hit in normal usage, be a little less weird
+> and take the mmu_lock for write around the call.
+>
+> Fixes: 02ab57707bdb ("KVM: TDX: Implement hooks to propagate changes of TDP MMU mirror page table")
+> Reported-by: Yan Zhao <yan.y.zhao@intel.com>
+> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> Hi,
+>
+> It was indeed awkward, as Sean must have sniffed. But seems ok enough to
+> close the issue.
+>
+> Yan, can you give it a look?
+>
+> Posted here, but applies on top of this series.
+>
+> Thanks,
+>
+> Rick
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 15 ++++++++++++---
+>   1 file changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index daec88d4b88d..8bf5d2624152 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -2938,9 +2938,18 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+>   		}
+>   	}
+>   
+> -	err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
+> -	if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
+> -		return -EIO;
+> +	/*
+> +	 * tdh_vp_init() can take a exclusive lock of the TDR resource inside
+                                   ^
+                                   an
+
+> +	 * the TDX module. This resource is also taken as shared in several
+> +	 * no-fail MMU paths, which could return TDX_OPERAND_BUSY on contention.
+> +	 * A read lock here would be enough to exclude the contention, but take
+> +	 * a write lock to avoid the weird inversion.
+Can we also add the description that the lock is trying to prevent an edge case
+as in the change log if not too wordy?
+
+> +	 */
+> +	scoped_guard(write_lock, &vcpu->kvm->mmu_lock) {
+> +		err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
+> +		if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
+> +			return -EIO;
+> +	}
+>   
+>   	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+>   
 
