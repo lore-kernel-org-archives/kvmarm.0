@@ -1,86 +1,125 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15FE2D9ED8
-	for <kvmarm@lists.linux.dev>; Wed, 29 Oct 2025 20:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 346632EB859
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 02:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761770917; cv=none; b=sQudsm7IK3wTItlwsxBI8CGCtaQ+c/3WNPuLBrG05bpWG4q7GnzJPbmI5Kv5VngTxA7IVbTauCSvudqTlpYGJ/0jLLIxN+0fbYNpzhtcsxwdHkH68II5T0y68luD/7m1ugFprFiEJkz92sNyQ5oFepvl78wYyP5OxUB5Ozqn+b4=
+	t=1761792086; cv=none; b=hDHdnG9TXrJtVjqgj6Bo7qZ0HA2GE81gnbIumpOt5lcGoXLCxmBaSfQtYuah0G3lR2zlbRPnIZT+FGiuB7dVQ/iRnNpbeC+v52paMgu6dk7aCPrYM+MExgkXjw608x+57ZIln21Wko6zHNT/4/3G5PH+GdofpIdWZRSt09bx79c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761770917; c=relaxed/simple;
-	bh=CpqxIQaOXMxDs/03sklra3KXKiZ5+GcRhtAMgLboz7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cg8OpyQypFZRTL2mt6kgoAmoMpxNrlq4CEg18aXg0ALcSErdhWlYjULqIIw4ODsD3Mbmee/yaU5c7Gv1jpNGIuKb6dHeoM0H/AykrOKGUmPsDDNYR2LCtI2wNSPz+5NjbV7VK56nQ4IdXY/a62JzYGMfqSGe8SZ6/qg0lcfTWKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mMtMSGoz; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mMtMSGoz"
-Date: Wed, 29 Oct 2025 13:48:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761770909;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JYMU26G80HSBFv2mfmxmI1ldCw66DlxUZPOrNSRANLA=;
-	b=mMtMSGoznU8oiC3CKM6I+dZhCTlWmvw1ubRpmyM4nMyhNicLPb4oETsm6a/gY/kM3R7A2l
-	uMgoibMrNKqc42fs6rPaWAvbqqk6ib+dkdFcS2rDB6TbbvE9MZFY1tZHKxSlsaF1oejGB3
-	2up1KEUWUmjPt8uzMnMoLhUpcai+VD4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	shuah@kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm64: selftests: Count test_guest_reg_read()
- as a test
-Message-ID: <aQJ9mC5_j6HQ_jbg@linux.dev>
-References: <20251014102108.2442391-1-ben.horgan@arm.com>
- <20251014102108.2442391-2-ben.horgan@arm.com>
+	s=arc-20240116; t=1761792086; c=relaxed/simple;
+	bh=35O68B3yYenhF/csDe9xTVqzRsbi7wfuR8H72IjF2fY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AmIEHiXNWccKqQR0hejhvCAj6KZhWXEXc323FtsAyCM45aWRXsSSxeCLVAsvlT4koPIWvyiShYk5npptkCbX5uzOrsYvJyCuEZwq6K2KGvweutDQm6oncRQ3Xbpjk6ss55ieF7pDsXyye4k8JqX0J982mcvbZx+w8LJrAOVkCaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4DE12C42;
+	Wed, 29 Oct 2025 19:41:13 -0700 (PDT)
+Received: from [10.164.18.45] (unknown [10.164.18.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD7E33F66E;
+	Wed, 29 Oct 2025 19:41:18 -0700 (PDT)
+Message-ID: <434eebff-069d-424f-a2b8-d9dae4e2202f@arm.com>
+Date: Thu, 30 Oct 2025 08:11:15 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251014102108.2442391-2-ben.horgan@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/2] arm64/mm: Add remaining TLBI_XXX_MASK macros
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, ben.horgan@arm.com,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20251024040207.137480-1-anshuman.khandual@arm.com>
+ <20251024040207.137480-3-anshuman.khandual@arm.com>
+ <20251024120014.000020af@huawei.com>
+ <6e7d0bf3-ddf1-44a0-a0cb-7dc994101878@arm.com>
+ <20251028124334.00001e77@huawei.com>
+Content-Language: en-US
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+In-Reply-To: <20251028124334.00001e77@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 14, 2025 at 11:21:06AM +0100, Ben Horgan wrote:
-> The test test_guest_reg_read() is run without announcing its presence or
-> contributing to the test count. Rectify this.
+
+
+On 28/10/25 6:13 PM, Jonathan Cameron wrote:
+> On Mon, 27 Oct 2025 07:06:45 +0530
+> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
->  tools/testing/selftests/kvm/arm64/set_id_regs.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>> On 24/10/25 4:30 PM, Jonathan Cameron wrote:
+>>> On Fri, 24 Oct 2025 05:02:07 +0100
+>>> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
+>>>   
+>>>> Add remaining TLBI_XXX_MASK macros and replace current open encoded fields.
+>>>> While here replace hard coded page size based shifts but with derived ones
+>>>> via ilog2() thus adding some required context.
+>>>>
+>>>> TLBI_TTL_MASK has been split into separate TLBI_TTL_MASK and TLBI_TG_MASK
+>>>> as appropriate because currently it simultaneously contains both page size
+>>>> and translation table level information. KVM on arm64 has been updated to
+>>>> accommodate these changes to TLBI_TTL_MASK.
+>>>>
+>>>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>>>> Cc: Will Deacon <will@kernel.org>
+>>>> Cc: Marc Zyngier <maz@kernel.org>
+>>>> Cc: Oliver Upton <oliver.upton@linux.dev>
+>>>> Cc: linux-arm-kernel@lists.infradead.org
+>>>> Cc: linux-kernel@vger.kernel.org
+>>>> Cc: kvmarm@lists.linux.dev
+>>>> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/tlbflush.h | 26 ++++++++++++++++++--------
+>>>>  arch/arm64/kvm/nested.c           |  8 +++++---
+>>>>  2 files changed, 23 insertions(+), 11 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+>>>> index 131096094f5b..cf75fc2a06c3 100644
+>>>> --- a/arch/arm64/include/asm/tlbflush.h
+>>>> +++ b/arch/arm64/include/asm/tlbflush.h
+>>>> @@ -57,9 +57,10 @@
+>>>>  /* This macro creates a properly formatted VA operand for the TLBI */
+>>>>  #define __TLBI_VADDR(addr, asid)				\
+>>>>  	({							\
+>>>> -		unsigned long __ta = (addr) >> 12;		\
+>>>> -		__ta &= GENMASK_ULL(43, 0);			\
+>>>> -		__ta |= (unsigned long)(asid) << 48;		\
+>>>> +		unsigned long __ta = (addr) >> ilog2(SZ_4K);	\
+>>>> +		__ta &= TLBI_BADDR_MASK;			\
+>>>> +		__ta &= ~TLBI_ASID_MASK;			\
+>>>> +		__ta |= FIELD_PREP(TLBI_ASID_MASK, asid);	\  
+>>> I think you can replace the two lines above with
+>>> 		FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);
+>>>
+>>> It's a small reduction in code but I don't mind much either way.  
+>>
+>> Right. FIELD_MODIFY() might be appropriate in this scenario but
+>> there will be some additional code churn needed. I don't have a
+>> strong opinion either way.
+>>
+>> --- a/arch/arm64/include/asm/tlbflush.h
+>> +++ b/arch/arm64/include/asm/tlbflush.h
+>> @@ -55,13 +55,12 @@
+>>  } while (0)
+>>
+>>  /* This macro creates a properly formatted VA operand for the TLBI */
+>> -#define __TLBI_VADDR(addr, asid)                               \
+>> -       ({                                                      \
+>> -               unsigned long __ta = (addr) >> ilog2(SZ_4K);    \
+>> -               __ta &= TLBI_BADDR_MASK;                        \
+>> -               __ta &= ~TLBI_ASID_MASK;                        \
+>> -               __ta |= FIELD_PREP(TLBI_ASID_MASK, asid);       \
+>> -               __ta;                                           \
+>> +#define __TLBI_VADDR(addr, asid)                                       \
+>> +       ({                                                              \
+>> +               unsigned long __ta = (addr) >> ilog2(SZ_4K);            \
+>> +               __ta &= TLBI_BADDR_MASK;                                \
+>> +               __ta |= FIELD_MODIFY(TLBI_ASID_MASK, &__ta, asid);      \
+> 		  FIELD_MODIFY(TLBI_ASID_MASK, &__tab, asid);
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index 5e24f77868b5..6878ee23310e 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -655,6 +655,8 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
->  			TEST_FAIL("Unexpected ucall: %lu", uc.cmd);
->  		}
->  	}
-> +
-> +	ksft_test_result_pass("%s\n", __func__);
->  }
->  
->  /* Politely lifted from arch/arm64/include/asm/cache.h */
-> @@ -786,7 +788,7 @@ int main(void)
->  
->  	ksft_print_header();
->  
-> -	test_cnt = 3 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
-> +	test_cnt = 4 + MPAM_IDREG_TEST + MTE_IDREG_TEST;
+> as it's done in place in the second parameter.
 
-TBH, I'd actually be in favor of a patch that removes usage of the
-ksft_* harness from this test altogether. I don't think it adds much and
-we use the KVM-specific test assertions anyway.
-
-Thanks,
-Oliver
+Sorry but could not understand your point above.
