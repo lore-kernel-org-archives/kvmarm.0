@@ -1,130 +1,84 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE72340DA0;
-	Thu, 30 Oct 2025 10:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B282426B2C8
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 10:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761818464; cv=none; b=d10pNxRh2TfMoNO9A20WXvX8Fdob+TXIPS4IPypeh/HfqgYRrFCK8s9XtpAOd84DF+hQj83UhTBzIXpPaoD36ikMZJus4Mmkf5+wHeHBiUm6kbOV+8dVtI74ifMZaxKBCnNFcvZ/L+/QPSw/32D9oo4hzPI6Vxbo0iidN8kMuVw=
+	t=1761819772; cv=none; b=kbB11UvSw8Qcxx0ue0wFCd5k02Cdva3AhB0eqeWUBfjqQwUMqjszAEqvmB2KCex88ZMfORAlZ0VrKnfU9uI9lUX+JeuCfXeTuvTu2EkAwH1NkWf9FdlMMoPNBxVAeOHZpuyqe3Ze389LNBVIOBRKoTbRRy/H+/lKgVKTRYsatkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761818464; c=relaxed/simple;
-	bh=8z2DPsxRfU7/x/3wxyDVReRDq9qq0yZeP1k+PdqwnXg=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=URonLUTnUjYPKhYfWOq2r6648DYaILB7h+QbUdg55SAkzqbRLFxDCshVKW50mGNiB3869dQ2mxJcyZ0O/Dgil1imvOH/ByxM1ZTMNcHbobzGyIblr+B6ZlBJ+I/9wUkhOUE8ejmfaNG8j4fZVwSA51PI0VSEbTYguXJNL9FnqLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=D7faxU3P; arc=none smtp.client-ip=119.8.177.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="D7faxU3P"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=juOtsw+XKXPdwDGMXWQfaBt8GPcPrObp5r2IzcEKJAs=;
-	b=D7faxU3P5QktFdurjwp3E0G4X2lKyA6nan83uV2enABhH3xdLSRVWKnyiEsUmyjSpxDPi/gAu
-	5US+NpL5CPAQopObhEVmxCjSHAjeLBl0mq7xwHJQWGEClmUDZXVC9pDBe7TfgMllEvJ1ff1XJSt
-	pS2MUj+RAS3uwLidb0hpONk=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.35])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cy0414f4cz1P6gW;
-	Thu, 30 Oct 2025 18:00:49 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cxzzf4KlBz6M4p0;
-	Thu, 30 Oct 2025 17:57:02 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6BEC14038F;
-	Thu, 30 Oct 2025 18:00:54 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
- 2025 10:00:53 +0000
-Date: Thu, 30 Oct 2025 10:00:52 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
- communication helpers
-Message-ID: <20251030100052.00005c65@huawei.com>
-In-Reply-To: <yq5ay0osd9yb.fsf@kernel.org>
-References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
-	<20251027095602.1154418-7-aneesh.kumar@kernel.org>
-	<20251029183306.0000485c@huawei.com>
-	<yq5ay0osd9yb.fsf@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1761819772; c=relaxed/simple;
+	bh=cSMRPy2Ejt7AcgWwS4Xg6W8YSTMAtS2YoEnEg5OvBbM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=B/szoVmkUjsVFZFcOsai/yV9PyXcW2wlCbAa+EqUYaPXRqPVpQIW/iYHGyf5e+2LCelyHbn5qKmMHnuqEt/FP4yhNLTMcLP1nKwhaAZuFcTUyjIBt7v8NAp5Ph2agzvz27eAyxN79PjOh4N8t+4mPy4BZWzWHs15btZWHJ/RROo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AA5B2C42;
+	Thu, 30 Oct 2025 03:22:42 -0700 (PDT)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D679F3F66E;
+	Thu, 30 Oct 2025 03:22:47 -0700 (PDT)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	perlarsen@google.com,
+	ayrton@google.com,
+	ben.horgan@arm.com,
+	sudeep.holla@arm.com,
+	stuart.yoder@arm.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v2 0/2] use TPM device with CRB over FF-A when kernel boot with pkvm
+Date: Thu, 30 Oct 2025 10:22:43 +0000
+Message-Id: <20251030102245.2313898-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 30 Oct 2025 14:48:20 +0530
-Aneesh Kumar K.V <aneesh.kumar@kernel.org> wrote:
+To use TPM device iwth CRB over FF-A, it would be good to be compiled:
+  - CONFIG_ARM_FFA_TRANSPORT as bulit-in
+  - CONFIG_TCG_ARM_CRB_FFA as built-in
 
-> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
-> ...
-> 
-> >> +		/*
-> >> +		 * Some device communication error will transition the
-> >> +		 * device to error state. Report that.
-> >> +		 */
-> >> +		if (type == PDEV_COMMUNICATE)
-> >> +			ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
-> >> +						 (enum rmi_pdev_state *)&state);
-> >> +		if (ret)
-> >> +			state = error_state;  
-> > Whilst not strictly needed I'd do this as:
-> >
-> > 		if (type == PDEV_COMMUNICATE) {
-> > 			ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
-> > 						 (enum rmi_pdev_state *)&state);
-> > 			if (ret)
-> > 				state = error_state;
-> > 		}
-> >
-> > Just to make it clear that reg check is just on the output of the call above.
-> > If we didn't make that call it is definitely zero but nice not to have
-> > to reason about it.
-> >  
-> 
-> Some of this is because follow up patch adds more details there. In this case.
-> 
-> 		/*
-> 		 * Some device communication error will transition the
-> 		 * device to error state. Report that.
-> 		 */
-> 		if (type == PDEV_COMMUNICATE)
-> 			ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
-> 						 (enum rmi_pdev_state *)&state);
-> 		else
-> 			ret = rmi_vdev_get_state(virt_to_phys(host_tdi->rmm_vdev),
-> 						 (enum rmi_vdev_state *)&state);
-> 		if (ret)
-> 			state = error_state;
-> 
-Ah fair enough I missed that.
+to integrate with IMA subsystem otherwise, it couldn't generate the
+boot_aggreate log with the PCR value.
 
-J
-> 
-> 
-> >  
-> >> +	}
-> >> +
-> >> +	if (state == error_state)
-> >> +		pci_err(tsm->pdev, "device communication error\n");
-> >> +
-> >> +	return state;
-> >> +}
-> >> +  
-> 
-> -aneesh
+Unfortuately, kernel fails to probe the TPM device
+when it boots with kvm-arm.mode=protected since the FF-A calls
+(FFA_SEND_DIRECT_MSG/MSG2) are failed when CONFIG_ARM_FFA_TRANSPORT=y.
+
+This patch series resolves failure of the TPM device when
+kernel boots with kvm-arm.mode=protected and based on v6.18-rc3.
+
+Patch History
+==============
+
+from v1 to v2:
+  - remove unnecessary ffa_feature smc-call in ffa_call_supported()
+    (Ben Horgan's comment).
+  - https://lore.kernel.org/all/20251027191729.1704744-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (2):
+  KVM: arm64: fix FF-A call failure when ff-a driver is built-in
+  KVM: arm64: support some optional calls of FF-A v1.2
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+
+base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
