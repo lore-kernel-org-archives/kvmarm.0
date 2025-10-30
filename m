@@ -1,89 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1A533F365;
-	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE2231691D;
+	Thu, 30 Oct 2025 12:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761823520; cv=none; b=KA34WsAmpkb0qpJ0u6WPtE+WbAl5fOc8K3IV8abNws3tvBwt9+f0r9iGbuhUC6XTWINeGuv2rOXnG23jdGHxsJ3TBpPM9msLSemMKqLIB4aSIDs1Yb/IpjtY63wBsyVWLatRZiKQGVVV8hyqpN6MIJC8P5YkCeiXJwxd0Evahkc=
+	t=1761827232; cv=none; b=mWgDPu00w51dtHi9HoaL+SH7oIHkf0HqIQWIgKUcpFgd1gT8jnXisdh5PgJ9CODRZ9BSbwrwEWRhfHT1knZFmZOVuK92DO65X2EiL33H3Chs+mIfCqL97fJtnVEFAy3K/UHQqtEKbI3n9wTjjAdt2NFnUBEOCfpyHtJGbHZA6VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761823520; c=relaxed/simple;
-	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OPSBqlKPZZ8xF01HgIIFprk/jLJ2NnD/hWenzUwRNuFl/r82dq21hgdE3xL8HmCDEefwtSQDg5eMi63MRSfkUFe4gH9c233SECWF/EyAJBLkHWe5YzelLwPwiGuZDM/0soCMW3YBDyNHCfYz8WxSa+fPKdpxaWk32i56t+i4Mno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OK/iWfsG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761827232; c=relaxed/simple;
+	bh=jo/0EMLbTp/Ctoi6txojoXXpfGK/dAchax3ckErLqx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=neQMk5xalSwFc0pPGH/D4ie/6e0IGUGX85TqeTKF1ZoO4SWsr0bPlm64qgM52yn1wVOtJlyVInnNP155BXxkyz48bbcDVdY6ZhFDGMkob9eKeD5joH50psIUl/rxoR73h+r/Mux9cb1aLqacBULuXi6OAxh3qn8uWRZmSL6p2Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khJDio1f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OK/iWfsG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4D9C4CEF8;
-	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khJDio1f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 156E7C4CEF1;
+	Thu, 30 Oct 2025 12:27:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761823520;
-	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OK/iWfsGKPH76eTFnRmfEgmrgWV+XlSP07CDbXrbXrT5kabli0le+L3nLFvZyLmg3
-	 uDtdKVLtBAJQDlhIdZDjbKkD+O9erGphWHpSUwXCKM9IwBRGDUms4h4NQfFswyZmhP
-	 SqGFIHJ4BGbAUAQk2Z81nCkGtGd4wFoTkbcJFbzPuKQsO/WxoOgtIpcMQXqDTdZaiY
-	 4UZtYM1KAgwl5L56fuUCkhFk5NWPCLZG3YAWpaT1zfVqau8wKZc6t66BbWzNC6k/Gz
-	 mf2OQrEKHAjd0eTObb7YTHD981blAirH/sop1L0IU1eDwAfY0FwExedoSdbDeCk1oE
-	 m62/WGvW+HHUg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1761827232;
+	bh=jo/0EMLbTp/Ctoi6txojoXXpfGK/dAchax3ckErLqx0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=khJDio1fuT04VjpQ8He+rtGT5FbjQ8PpZVphdEJOu13J9L8viFj4PPeeI0iofiiWq
+	 wmKDfdBeh3IPfEgzc0aFMoAiELoo+gTpekm+4iUrFxmRl6X1uIz4oAPCFsTUzBk4vF
+	 6piVM+F8G1vywkXSxBfVcJaR7IWLSBrEp8D1sxLCHvYn7ZRDAcVFTaSW8Zvk8QxF4g
+	 ks9H4/AoM+4efSqGttfTGiJzR3MVcqIvBoDMQ5IHiWdaX9gBqzh5sN1YKRoKvldrKr
+	 w/NqOsix/qiSchx9VI3DqvvsX5nA/m9t/FSojSNRhUFV8rcCXx1k5hHlJDZUIZrNg1
+	 c7KhalLn1z1Hw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vEQmM-00000000xUk-0abm;
-	Thu, 30 Oct 2025 11:25:18 +0000
-Date: Thu, 30 Oct 2025 11:25:17 +0000
-Message-ID: <86tszgvdgi.wl-maz@kernel.org>
+	id 1vERkE-00000000yNP-0Lxl;
+	Thu, 30 Oct 2025 12:27:10 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: arm64: Make ID_PFR1_EL1.GIC writable
-In-Reply-To: <aPiBH1_WZicoE7Od@linux.dev>
-References: <20251013083207.518998-1-maz@kernel.org>
-	<20251013083207.518998-2-maz@kernel.org>
-	<aPiBH1_WZicoE7Od@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH v2 0/3] KVM: arm64: Fix handling of ID_PFR1_EL1.GIC
+Date: Thu, 30 Oct 2025 12:27:04 +0000
+Message-ID: <20251030122707.2033690-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, stable@vger.kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 22 Oct 2025 08:00:47 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hey,
-> 
-> On Mon, Oct 13, 2025 at 09:32:05AM +0100, Marc Zyngier wrote:
-> > Similarly to ID_AA64PFR0_EL1.GIC, relax ID_PFR1_EL1.GIC to be writable.
-> 
-> This looks fine to me, although I do wonder if we should just allow
-> userspace to write whatever value it wants to the 32-bit ID registers
-> and be done with it.
+Peter reported[0] that restoring a GICv2 VM fails badly, and correctly
+points out that ID_PFR1_EL1.GIC isn't writable, while its 64bit
+equivalent is. I broke that in 6.12.
 
-That's a good point. Nobody really cares about 32bit anyway, and I'd
-be happy to just let the VMM write whatever it wants. Might be a bit
-harder to backport, but whoever is interested in AArch32 will be able
-to do it.
+The other thing is that fixing the ID regs at runtime isn't great.
+specially when we could adjust them at the point where the GIC gets
+created.
 
-Thanks,
+This small series aims at fixing these issues. I've only tagged the
+first one as a stable candidate. With these fixes, I can happily
+save/restore a GICv2 VM (both 32 and 64bit) on my trusty Synquacer.
 
-	M.
+* From v1 [1]:
+
+  - Make all 32bit ID regs writable
+
+  - Use official accessors to manipulate ID regs
+
+  - Rebased on 6.18-rc3
+
+[0] https://lore.kernel.org/r/CAFEAcA8TpQduexT=8rdRYC=yxm_073COjzgWJAvc26_T+-F5vA@mail.gmail.com
+[3] https://lore.kernel.org/r/20251013083207.518998-1-maz@kernel.org
+
+Marc Zyngier (3):
+  KVM: arm64: Make all 32bit ID registers fully writable
+  KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when GICv3 is configured
+  KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace
+    irqchip
+
+ arch/arm64/kvm/sys_regs.c       | 71 ++++++++++++++++++---------------
+ arch/arm64/kvm/vgic/vgic-init.c | 14 ++++++-
+ 2 files changed, 50 insertions(+), 35 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
