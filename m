@@ -1,172 +1,183 @@
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C2C2BE057
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 17:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4202773D4
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 17:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761844309; cv=none; b=d6F6x+UxDhXmVxbHhLh11qNh49oJC3aHdxmBABpI9YnaI3MU/FAdps9Z0xsYSJXh0esdOvucti38AYfUM3uYzD8HLR5ScQQJBGwMzBscRUC1pswtHj8cAdm5PwV2DzRK/vua12c2G24R9UqLgygel9fuXqId9leTH2TIerkEpKE=
+	t=1761844717; cv=none; b=lY/Xdh3sKIqGkf5Sl5bE/E2+X4rpeKbYvX/uT1UebmVh8IjgE5W/om//KcY+92XKeYc26vsSm/OIpiNJ/TWn9/Sn956BTCm0vP34RDTqFW6ECzw328f8oit0vlqLHjpMBUdlk+bh/WpH9LhKNigPKYyzdJVIPMPs3BMq+hb+W18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761844309; c=relaxed/simple;
-	bh=w3xQ/IFC4bRYuvUl5HQvrpbvb4x1Naq0qy6bYNOooQM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Vby58u9Wzi0g/0iSAjpUr0NmFC65gPH+zJVvjFizFLp08ehCzbnQ4UnV01cFJ04nmvRw9NQqKo0BftAbNur+ZlyJgU+CngCWeiTTJIxMWDjJILOgzVQg5PYG3AsOYyoxI7ehRmlC4+We2kKFdUzTL1AopVcb5e/KN92TAauxpKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ikzeDLtH; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1761844717; c=relaxed/simple;
+	bh=VJLcmOospl0NvxJ/WTOkbujLbTnBJibWwvHUpjZ0/1w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VY451rGsPM9RMgsCls3Wck88sJHUwPQ1ZWC2HvG54n5CTg9FMomv8DMLHpCIJ4yjnqsZppWdtJwdIgoJqD4dkhvz7qsGxcyPuKzmYHm/k1p2mFHqVhp3m2KeHqDF7EJjMKbwxd/JKlZ4gUQULCrngPgk16YSgw8VjtUb1EEZAOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CrHzVV/X; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ikzeDLtH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1761844266; x=1762449066; i=markus.elfring@web.de;
-	bh=qX9jT0WVKNVZVkQFVvnvBU4twJtmXIXrEgsmm350dtE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ikzeDLtH8pSRBCH0hWG+C1Le3omfx0clVgdtTO203jLvQlx+eAfwBYu8Bc1oVS34
-	 0hktkE5p86DAfbQ2V/5+Jo5Z3pD2jXssGBOVJQwL+l9NPERT6J1RZK8hmi40dj9dm
-	 4GzL12PZUB/5GInBxbX9lWDALe2cnyzyCT2G6IwF++vTu8vz4eGjmE+KnscJuoKQz
-	 3auugnlKUC/7Siy+3dS3N2s5F9psYvbRCPFPjS2E8nvHJpdxj0odfLnB3CUzphIiR
-	 9rDDA6DD0GM4lRV7LROIwTOJ1Zjmsyz1fRLUKA1jsUeAyn42EVVTKMgNF/STh4JFK
-	 zNdzXfLYo2PcavIICg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.69.248]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mcpqq-1vn1yt3hKM-00jfVS; Thu, 30
- Oct 2025 18:11:05 +0100
-Message-ID: <6e962260-5069-490a-89fb-908a4342ccd9@web.de>
-Date: Thu, 30 Oct 2025 18:11:03 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CrHzVV/X"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4710d174c31so11061515e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 10:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761844713; x=1762449513; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0zIsYr/NZ5vBEDYePNHV7frUHCwl+Wvsd8lZxHFgSTA=;
+        b=CrHzVV/Xd1JmNgG8XcgFxCzXBGYnrHbpH/Hq5VzCavsS8Llt1zFnHuGH5HgcwQ4tEA
+         XqwYr4UVBv9RHhJpmN+eDYtzavxQyI4IAlGSTSRNwdX3rOdKDEgUQNEy77zBne9CtY4s
+         XVUeARZZRzSD16TjYJnvZ2TmKmhjOqtLEFjzzEOSyNNHEwIcuVCeUKlkhvB2tXPJZQ9d
+         a8Yw6n2fm6WnmCcJzulD0iQ6j/Lj8UJqoCzlzM/LC9Z1PlMr/t0Otmm65yNTFZawNBKi
+         LuBOUNeKU+DACyXwzJ618XWpaBE5Ojo8nSn4b0A8KhTJD3duIZb8tLC46ox9UuUSzi8H
+         j5TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761844713; x=1762449513;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0zIsYr/NZ5vBEDYePNHV7frUHCwl+Wvsd8lZxHFgSTA=;
+        b=HYCstDRUKtd+DIiFhHij5/wm5gHpwz2RSDX75MG+PGG6kAPhH20wqLJvscxdt4eS9d
+         xS9QwSLTr4tfPXusAys91+0ssukocxjN2f3063YJSo/M3AZKK14RKLmKk8+eLv+zgHKN
+         Gt3pMV3S9SSMnU/ggXx+rUFZSmSS44KrvC2ou7FpruWvtL8WTUB/dRxTWI9qLQ6uIPU9
+         pasB2lUWjuGnTnJTA6sr3tY1ssojIfde54e0RrBBocyp+zUPXWhcq7Xb8qKZhH48Acen
+         e//HlNA1aAA0QK800/pTFytMwqFyZsBua/bp99RWQX8iz8OWcHdZ55Oe9azBbuoEdy15
+         rkLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUF8bMLOqZUtcSyN46p5GciD303Q3elpt206S3zE/GY04ZaBFGFOkFZqc8w14xcGrq9GwQ6jyg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwOCReQcDfmBKN1qAjEXyOurOhMTCsQFvG571MNr4UFnbxpf+jt
+	6zZRwrYnco/dnKvb8e2EIl6Dmy8vjK3ZCCYy9+cUUXYgUlzcLOjvCYGXuMlp0VSvZu/ECfgCaB5
+	JiRe1oYSt+sAVRw==
+X-Google-Smtp-Source: AGHT+IFXk6DKJ2LvWY2ZBOreY5EWyiD1FLIIWcEezkT9L8CiZAonL3OXc94rN18lwM8G/At6waViWG4yx0JY7g==
+X-Received: from wmbka6.prod.google.com ([2002:a05:600c:5846:b0:470:ffaa:ae5e])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:3b8b:b0:471:989:9d7b with SMTP id 5b1f17b1804b1-4773086d53amr4625785e9.21.1761844712453;
+ Thu, 30 Oct 2025 10:18:32 -0700 (PDT)
+Date: Thu, 30 Oct 2025 17:18:31 +0000
+In-Reply-To: <20250924152214.7292-9-roypat@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- David Brazdil <dbrazdil@google.com>, Joey Gouly <joey.gouly@arm.com>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki Poulouse <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>
-Content-Language: en-GB, de-DE
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- Miaoqian Lin <linmq006@gmail.com>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] KVM: arm64: Use pointer from memcpy() call for assignment in
- init_hyp_mode()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:rK4JBHFEyHfa/6DyQX45RUvGECOdzSihIRe+9DLkEhLkLcTSO9E
- 4ZhRHSVas5MJjtsEsmpa8myg+USRJayiWVGBntVwPbXEg9XHbzfOdQMehiM8tJCmNe/VBBu
- fwaOrY2d8hOzMztUtFxy5wInOeyd+TS8CgBDoQ9PwIgRjLbBAaWWtjcV83owIOQ7mPjvuRb
- vFVv+nP5M/RAtuCTj1JyQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Tk+C6iJsU0c=;tAwdVkpjT2CkaeumDL0GzshrToX
- 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
+Mime-Version: 1.0
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-9-roypat@amazon.co.uk>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDVTTQZBJXAK.1OC7BTWCVCP9U@google.com>
+Subject: Re: [PATCH v7 12/12] KVM: selftests: Test guest execution from direct
+ map removed gmem
+From: Brendan Jackman <jackmanb@google.com>
+To: "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
+	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 30 Oct 2025 18:01:41 +0100
+On Wed Sep 24, 2025 at 3:22 PM UTC, Patrick Roy wrote:
+> Add a selftest that loads itself into guest_memfd (via
+> GUEST_MEMFD_FLAG_MMAP) and triggers an MMIO exit when executed. This
+> exercises x86 MMIO emulation code inside KVM for guest_memfd-backed
+> memslots where the guest_memfd folios are direct map removed.
+> Particularly, it validates that x86 MMIO emulation code (guest page
+> table walks + instruction fetch) correctly accesses gmem through the VMA
+> that's been reflected into the memslot's userspace_addr field (instead
+> of trying to do direct map accesses).
+>
+> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> ---
+>  .../selftests/kvm/set_memory_region_test.c    | 50 +++++++++++++++++--
+>  1 file changed, 46 insertions(+), 4 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+> index ce3ac0fd6dfb..cb3bc642d376 100644
+> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
+> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+> @@ -603,6 +603,41 @@ static void test_mmio_during_vectoring(void)
+>  
+>  	kvm_vm_free(vm);
+>  }
+> +
+> +static void guest_code_trigger_mmio(void)
+> +{
+> +	/*
+> +	 * Read some GPA that is not backed by a memslot. KVM consider this
+> +	 * as MMIO and tell userspace to emulate the read.
+> +	 */
+> +	READ_ONCE(*((uint64_t *)MEM_REGION_GPA));
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void test_guest_memfd_mmio(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	struct kvm_vcpu *vcpu;
+> +	struct vm_shape shape = {
+> +		.mode = VM_MODE_DEFAULT,
+> +		.src_type = VM_MEM_SRC_GUEST_MEMFD_NO_DIRECT_MAP,
+> +	};
+> +	pthread_t vcpu_thread;
+> +
+> +	pr_info("Testing MMIO emulation for instructions in gmem\n");
+> +
+> +	vm = __vm_create_shape_with_one_vcpu(shape, &vcpu, 0, guest_code_trigger_mmio);
 
-A pointer was assigned to a variable. The same pointer was used for
-the destination parameter of a memcpy() call.
-This function is documented in the way that the same value is returned.
-Thus convert two separate statements into a direct variable assignment for
-the return value from a memory copy action.
+When I run this test on my minimal config in a nested VM I get:
 
-The source code was transformed by using the Coccinelle software.
+[root@testvm:~]# /nix/store/xlxd60n7v1qfr6s5zxda410zrzdd0xc2-kselftests/bin/run_kselftest.sh -t kvm:set_memory_region_test
+TAP version 13
+1..1
+# timeout set to 120
+# selftests: kvm: set_memory_region_test
+# Random seed: 0x6b8b4567
+# Testing KVM_RUN with zero added memory regions
+# Testing MMIO during vectoring error handling
+# Allowed number of memory slots: 32764
+# Adding slots 0..32763, each memory region with 2048K size
+# Testing MMIO emulation for instructions in gmem
+# ==== Test Assertion Failure ====
+#   lib/kvm_util.c:1118: region->mmap_start != MAP_FAILED
+#   pid=614 tid=614 errno=19 - No such device
+#      1	0x0000000000407b02: vm_mem_add at ??:?
+#      2	0x000000000040a924: __vm_create at ??:?
+#      3	0x000000000040ab16: __vm_create_shape_with_one_vcpu at ??:?
+#      4	0x00000000004042cf: main at ??:?
+#      5	0x00007faa6b08a47d: ?? ??:0
+#      6	0x00007faa6b08a538: ?? ??:0
+#      7	0x0000000000404384: _start at ??:?
+#   mmap() failed, rc: -1 errno: 19 (No such device)
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- arch/arm64/kvm/arm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Here's the kconfig I'm using (basically defconfig+KVM): 
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 870953b4a8a7..feab88c31703 100644
-=2D-- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2600,8 +2600,8 @@ static int __init init_hyp_mode(void)
- 			goto out_err;
- 		}
-=20
--		page_addr =3D page_address(page);
--		memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size())=
-;
-+		page_addr =3D memcpy(page_address(page), CHOOSE_NVHE_SYM(__per_cpu_star=
-t),
-+				   nvhe_percpu_size());
- 		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] =3D (unsigned long)page_addr=
-;
- 	}
-=20
-=2D-=20
-2.51.1
+https://gist.githubusercontent.com/bjackman/4ea941ef5072606769211f3b000c8ed7/raw/73808882ddae6ff2ae8a0be85ac977b2980f7292/kconfig.txt
+
+Sorry I'm too ignorant about KVM to know what I'm missing here but I
+guess it's a missing TEST_REQUIRE()?
 
