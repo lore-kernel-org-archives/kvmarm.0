@@ -1,211 +1,147 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360852638BC
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 15:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330AE1F4CBB
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 16:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761839669; cv=none; b=DFtenmGRquPGzjPMbm4RL7Pauw5GNcK8scUPmYjhVX/tpSVL9uhDMDHag59rSNK2abNLisSPJcFIcXU2NOpz7R9bmKQVOhxIILVxDkic/5DiVdU7JgRDW7vn9B1Fy2qrLV1WbPW/Zyk1r9/13moRcYJ0jH2dNhjNySJjb6SQBY0=
+	t=1761840310; cv=none; b=gbXemeyJDPOashk06jZ0RTYLZ5OeECVYNeP6uLvM8qvKpJDUUDx669BKE3b+kdF143b5TE7bVVTJ5UFSmR8a4VZP87hOu6N8GIm6aT1sxMZ7M14SXj51q2xi8v+G1lORz1b6FjkSYySiu/OCzzXg+/KbSSNwEywsAuVCmpvniS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761839669; c=relaxed/simple;
-	bh=gvQ8rMV/nb8TfMKY/OICnkCcrY8IEDx2ni4D9u6xW5E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ivBsIEk/BGdWF4p7XJwXQ2MiTC/xh3iSEb7SDKTfnmEEEIK5U/VxRyJzDkVhvazWhIfvhCPQ5ufJ4rXb5FKug8hbUoNGvnKwuDqOw41nP7AcRvDiQ9pkjXGt0hlATfQiqvvNdI57R5XdHTLP3SkJ0QmP7uge/+eDiue2//imgNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LBr1PAtn; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1761840310; c=relaxed/simple;
+	bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uxMbpZZaaqA1thAVxH2D2CSYq8xw/QOcZWn951gr318A6lmpJHhVHcw5v7WbdojSXo5UpenSvtxcYkxJBHjtSQNtWqtbGXDwe6ZzdrWgrstEL5A8VQzOBTGUtdqzAWgi0GaGYuSL/sMTHrqyvlhLdWXN4AqD9NMbL5Euiiu3xoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X+ugbdcY; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LBr1PAtn"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-429bccca1e8so85563f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 08:54:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X+ugbdcY"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-426d4f59cbcso1356316f8f.1
+        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 09:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761839665; x=1762444465; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7c6+XrmoyFowwhGbEiLq66X/torWpHDQ+1RsFmcHlWE=;
-        b=LBr1PAtnp4PdH3qPXJdDqhuLhGmeOsSZ2OKm+2CcTIpRaEKTdSMtxMnLZ6gvtxBWLL
-         77u5ao61HkVlEIfhs7y8e7wpj+yW9S8WHWMAktLEtPBDld1PAiOJ3pcJW6hmWChxg1MA
-         ORLhKLcVQgyL/eCdqldOPqsNDQq7MAdc29/jy4HGadpYCp6aoDegON53XpUBuSmeyQ//
-         4C4TO3Nk6qTgPT/oH9naEmJmbxVw7+5RzPhIQtMw1j1vMNjwHckJn/MLLQJj5lDugLIa
-         Y3DcBPyNPmNEjWChl9g7PeWHUm2n3iUOjJqi/+Hj86jxAWD2/27muOxKg+Vplit9it+Y
-         mEMA==
+        d=google.com; s=20230601; t=1761840307; x=1762445107; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+        b=X+ugbdcY1/1tJHtbexd2XO+Zkjb8pKfhorRpZN7XxvSXHruLNWdOdnpdAB0z3XfIxF
+         eGUXSFpBtutQV5gF+J28sMt/0f/XmkDiVTtPD4mB8rl55xfPo8fmPdX8VsO1Q7WTKpHb
+         0YI2KMTlCBumQl3iVjQVKPRMXlqWP+eqTZ/OsAX5+Vk/M+0U0XxCFLMMw7ber4cKD9ey
+         wr5hdikZ74aJd++IyovhTvqplbTXDAHF+18JoNRy4dbL98pog+j9X/U3Zn5Am+oBtqUH
+         ZZA0uMdVGdSPhrVRgY7Fgtrwd30HwT3heNl9Z8xs5PTxnsuBo/z+l4947e3IkhGcj9XL
+         PTWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761839665; x=1762444465;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7c6+XrmoyFowwhGbEiLq66X/torWpHDQ+1RsFmcHlWE=;
-        b=ICzDLbt/MAHbfYrT5o4hYAEVc0Tjxub9wABhh0Z9XFX//H0c8E9yUnx7GXtF0Umha4
-         tenCx6LYjyIPlOzuGH8tuUKeJp9ZYjzQgdyrfCp5ifdxJTjHzCkVR3bT8bB6l2UlwAab
-         tyM/YF6Nk65OoeEbco2p0ZGIXSFlHt/ABA1zIPh57ND9Qf8BzH8dGo5l4mzEWwqcl+iF
-         OC47Pfz9lr3vgNYkdRogI25AduXPd4EVAWTs1fhlXEGiSYG+b2O5tH2yzpniIHv5SLVs
-         LhMHSfaBwAfzP2lC8vMmjjpk1HF2iSIIsRoKd5pNIG3dm+10kDOa5FKowVXSn9TCcaAB
-         6vOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWP+E9dD8A86KCUBgthqsOG/FyxPDNb1dErR7mLAMbVtChN6y63kMNx0Ol/KN857y6BNMPlzC0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz6NOAWl1C9rqtE6qxr97FqwXjQGlCbfXCwytXKj1mMdXZr+HdL
-	UtKZXvo49BoP03j4E/kX/JdriEjADYmQ8VrazGR9xp+RESx30JBCoIYur5nwZC6xpA==
-X-Gm-Gg: ASbGncvTBJccrxVg0nkSmaBMxJ4mimVqsvZPP+oLK1UnyVgztby7WRp4d0BsvkS11pg
-	aMGRch2rENsaFvtN3u4eVGcjfTnvhZ1DWxcsFG5oJhhj08FD8BaFPwdii1GL0r6G57dOHV96t7f
-	s6Uql4AVTtePfhwpfyKL+NhRkjeAOwxgw0mMWBdDtDmEd/4e3Z8F+/tusSZZMjGVaxft0Vz6sav
-	SbZ91hJJTfu9Ldf1BKL3qIzXa6+0rFQo3ihnTmk1bPU33dz2WOvic66ATM1MLeoWTgD/QbQ9L3d
-	OS24/AvOTzt96sWsZbKajwFOfzudjIs1ywjkj9Eygh3Kfsc3dDOmdOr/DDD/QQ/0oR43HrRhqbU
-	CFqq29MNBHOwLVWNfscRSFVCVTzumDK1bI0MmInmE7Oyd700xNB2D6EtW8lYhx7IdI9UWawt9MR
-	xbzOyMMiBwRodasq49R5/Xt0ezpyPx60OnRI6soUWFtcX2dyLh+aE=
-X-Google-Smtp-Source: AGHT+IFcl4Bo2iRnn9SQ4R5pthHC8V2HygnH866pn1+ULEALSY6EUZm9nBo5CT91dKPigulLVZJWlg==
-X-Received: by 2002:a05:6000:2485:b0:426:d82f:889e with SMTP id ffacd0b85a97d-429bd67c45dmr79155f8f.14.1761839665373;
-        Thu, 30 Oct 2025 08:54:25 -0700 (PDT)
-Received: from google.com (218.131.22.34.bc.googleusercontent.com. [34.22.131.218])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952db9c6sm33378016f8f.36.2025.10.30.08.54.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 08:54:24 -0700 (PDT)
-Date: Thu, 30 Oct 2025 15:54:21 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org, qperret@google.com,
-	keirf@google.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kernel-team@android.com
-Subject: Re: [PATCH v3] KVM: arm64: Check range args for pKVM mem transitions
-Message-ID: <aQOKLaCKUDcqIZeM@google.com>
-References: <20251016164541.3771235-1-vdonnefort@google.com>
- <aQMBG0SUlNWuQQFZ@google.com>
+        d=1e100.net; s=20230601; t=1761840307; x=1762445107;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c9b8XC/fH65U9UHUGq3SmXgvpJYhZ/Lo5B2qlcSERQ0=;
+        b=Eb7wNkKVzUiHLjdH/u5kanWiFZxpnn5czNT8C0HG2NZ3SpFq9J8plRym+KdJ7ZADei
+         GnbQIC+qCDdkBPRlYjhc6Ca9e0vU1Z+X9fZ9V0Qu7RPWjl6+YlUHe6Sdi8mkykthmI6U
+         hE5ckLqYC5Sj0ffdzf4xRTk9TuB3TAOvaGWUVSQG0zHmy+TYkpnfZhpFhzsYvOR9zWL2
+         0cGUhdjgv7CNUKOcObHb8hY67o2grhPUFasG5BGHEPQBdDsfdpXVN1FUte31JYYhUBlg
+         6Qr5Zhjj8g8TaxqnmthPwTQiRVWKSAPk++ugd5igzhsOeibb0eKcvD2ziaJDnf5fPA09
+         iXrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUnzbiHW1+tPvzAJw+M6pKDjp+vST8FgEnYkkfkLf2lVEDZIRAVBbt8hygtKvJlO3zmEADYPA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz4CXMynWu/3v1F06158UqFCD8UiM0NhtlyrOJAjXQuyPlDkrDh
+	JfNi2UVY9RxMDO27WSyP1wDYPnfrfvMUlvAZkyAH4JJuJuctSMjtkXGIQz9o01sG0Pykqfg6fD/
+	AdM/okP0O8eh+VQ==
+X-Google-Smtp-Source: AGHT+IHjMaURNuY5ADspjcwjcl/WRoZFYO9bioemMflpQGaxNDVvaG4JDdR/nXAPdbz/Yfz+Utvfc7Y4KaunSA==
+X-Received: from wmbz6.prod.google.com ([2002:a05:600c:c086:b0:471:6089:1622])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6000:2408:b0:429:8b8a:c32b with SMTP id ffacd0b85a97d-429b4c83176mr3266075f8f.22.1761840306279;
+ Thu, 30 Oct 2025 09:05:06 -0700 (PDT)
+Date: Thu, 30 Oct 2025 16:05:05 +0000
+In-Reply-To: <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQMBG0SUlNWuQQFZ@google.com>
+Mime-Version: 1.0
+References: <20250924151101.2225820-4-patrick.roy@campus.lmu.de>
+ <20250924152214.7292-1-roypat@amazon.co.uk> <20250924152214.7292-3-roypat@amazon.co.uk>
+ <e25867b6-ffc0-4c7c-9635-9b3f47b186ca@intel.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DDVS9ITBCE2Z.RSTLCU79EX8G@google.com>
+Subject: Re: [PATCH v7 06/12] KVM: guest_memfd: add module param for disabling
+ TLB flushing
+From: Brendan Jackman <jackmanb@google.com>
+To: Dave Hansen <dave.hansen@intel.com>, "Roy, Patrick" <roypat@amazon.co.uk>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	"will@kernel.org" <will@kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@redhat.com" <david@redhat.com>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
+	"song@kernel.org" <song@kernel.org>, "jolsa@kernel.org" <jolsa@kernel.org>, "ast@kernel.org" <ast@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Cali, Marco" <xmarcalx@amazon.co.uk>, 
+	"Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "Thomson, Jack" <jackabt@amazon.co.uk>, 
+	"derekmn@amazon.co.uk" <derekmn@amazon.co.uk>, "tabba@google.com" <tabba@google.com>, 
+	"ackerleytng@google.com" <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 30, 2025 at 06:09:31AM +0000, Sebastian Ene wrote:
-> On Thu, Oct 16, 2025 at 05:45:41PM +0100, Vincent Donnefort wrote:
-> > There's currently no verification for host issued ranges in most of the
-> > pKVM memory transitions. The end boundary might therefore be subject to
-> > overflow and later checks could be evaded.
-> > 
-> > Close this loophole with an additional pfn_range_is_valid() check on a
-> > per public function basis. Once this check has passed, it is safe to
-> > convert pfn and nr_pages into a phys_addr_t and a size.
-> > 
-> > host_unshare_guest transition is already protected via
-> > __check_host_shared_guest(), while assert_host_shared_guest() callers
-> > are already ignoring host checks.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > ---
-> > 
-> > v2 -> v3: 
-> >    * Test range against PA-range and make the func phys specific.
-> > 
-> > v1 -> v2:
-> >    * Also check for (nr_pages * PAGE_SIZE) overflow. (Quentin)
-> >    * Rename to check_range_args().
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index ddc8beb55eee..49db32f3ddf7 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -367,6 +367,19 @@ static int host_stage2_unmap_dev_all(void)
-> >  	return kvm_pgtable_stage2_unmap(pgt, addr, BIT(pgt->ia_bits) - addr);
-> >  }
-> 
-> Hello Vincent,
-> 
-> >  
-> > +/*
-> > + * Ensure the PFN range is contained within PA-range.
-> > + *
-> > + * This check is also robust to overflows and is therefore a requirement before
-> > + * using a pfn/nr_pages pair from an untrusted source.
-> > + */
-> > +static bool pfn_range_is_valid(u64 pfn, u64 nr_pages)
-> > +{
-> > +	u64 limit = BIT(kvm_phys_shift(&host_mmu.arch.mmu) - PAGE_SHIFT);
-> > +
-> > +	return pfn < limit && ((limit - pfn) >= nr_pages);
-> > +}
-> > +
-> 
-> This newly introduced function is probably fine to be called without the host lock held as long
-> as no one modifies the vtcr field from the host.mmu structure. While
-> searching I couldn't find a place where this is directly modified so
-> this is probably fine. 
-> 
-> >  struct kvm_mem_range {
-> >  	u64 start;
-> >  	u64 end;
-> > @@ -776,6 +789,9 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
-> >  	void *virt = __hyp_va(phys);
-> >  	int ret;
-> >  
-> > +	if (!pfn_range_is_valid(pfn, nr_pages))
-> > +		return -EINVAL;
-> > +
-> >  	host_lock_component();
-> >  	hyp_lock_component();
-> >  
-> > @@ -804,6 +820,9 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
-> >  	u64 virt = (u64)__hyp_va(phys);
-> >  	int ret;
-> >  
-> > +	if (!pfn_range_is_valid(pfn, nr_pages))
-> > +		return -EINVAL;
-> > +
-> >  	host_lock_component();
-> >  	hyp_lock_component();
-> >  
-> > @@ -887,6 +906,9 @@ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages)
-> >  	u64 size = PAGE_SIZE * nr_pages;
-> >  	int ret;
-> >  
-> > +	if (!pfn_range_is_valid(pfn, nr_pages))
-> > +		return -EINVAL;
-> > +
-> >  	host_lock_component();
-> >  	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_OWNED);
-> >  	if (!ret)
-> > @@ -902,6 +924,9 @@ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages)
-> >  	u64 size = PAGE_SIZE * nr_pages;
-> >  	int ret;
-> >  
-> > +	if (!pfn_range_is_valid(pfn, nr_pages))
-> > +		return -EINVAL;
-> > +
-> >  	host_lock_component();
-> >  	ret = __host_check_page_state_range(phys, size, PKVM_PAGE_SHARED_OWNED);
-> >  	if (!ret)
-> > @@ -945,6 +970,9 @@ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu
-> >  	if (prot & ~KVM_PGTABLE_PROT_RWX)
-> >  		return -EINVAL;
-> >  
-> > +	if (!pfn_range_is_valid(pfn, nr_pages))
-> > +		return -EINVAL;
-> > +
-> 
-> I think we don't need it here because __pkvm_host_share_guest has the
-> __guest_check_transition_size verification in place which limits
-> nr_pages.  
+On Thu Sep 25, 2025 at 6:27 PM UTC, Dave Hansen wrote:
+> On 9/24/25 08:22, Roy, Patrick wrote:
+>> Add an option to not perform TLB flushes after direct map manipulations.
+>
+> I'd really prefer this be left out for now. It's a massive can of worms.
+> Let's agree on something that works and has well-defined behavior before
+> we go breaking it on purpose.
 
-__guest_check_transition size will only limit to PMD_SIZE, which can be quite a
-big number if you consider > 4KiB pages systems. So I believe this is still a loophole
-worth fixing.
+As David pointed out in the MM Alignment Session yesterday, I might be
+able to help here. In [0] I've proposed a way to break up the direct map
+by ASI's "sensitivity" concept, which is weaker than the "totally absent
+from the direct map" being proposed here, but it has kinda similar
+implementation challenges.
 
-> 
-> >  	ret = __guest_check_transition_size(phys, ipa, nr_pages, &size);
-> >  	if (ret)
-> >  		return ret;
-> > 
-> > base-commit: 7ea30958b3054f5e488fa0b33c352723f7ab3a2a
-> > -- 
-> > 2.51.0.869.ge66316f041-goog
-> >
-> 
-> Other than that this looks good, thanks
-> Sebastian
+Basically it introduces a thing called a "freetype" that extends the
+idea of migratetype. Like the existing idea of migratetype, it's used to
+physically group pages when allocating, and you can index free pages by
+it, i.e. each freetype gets its own freelist. But it can also encode
+other information than mobility (and the other stuff that's encoded in
+migratetype...).
 
-Thanks for having a look at the patch.
+Could it make sense to use that logic to just have entire pageblocks
+that are absent from the direct map? Then when allocating memory for the
+guest_memfd we get it from one of those pageblocks. Then we only have to
+flush the TLB if there's no memory left in pageblocks of this freetype
+(so the allocator has to flip another pageblock over to the "no direct
+map" freetype, after removing it from the direct map).
+
+I haven't yet investigated this properly, I'll start doing that now.
+But I thought I'd immediately drop this note in case anyone can
+immediately see a reason why this doesn't work.
+
+[0] https://lore.kernel.org/all/20250924-b4-asi-page-alloc-v1-0-2d861768041f@google.com/T/#t
+
+BTW, I think if the skip-flush flag is the only thing blocking this
+patchset, it would be great to merge it without it. Even if that means
+it's no use for Firecracker usecases that doesn't mean the underlying
+feature isn't valuable for _someone_. Then we can figure out how to make
+it work for Firecracker afterwards, one way or another.
+
+(Just to be transparent: my nefarious ulterior motive is that it would
+give me an angle to start merging code that will eventually support ASI.
+But, I'm serious that there are probably users who would like this
+feature even if it's slow!)
