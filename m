@@ -1,80 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B765351FD7
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 10:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1A533F365;
+	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761819777; cv=none; b=cPMRoSpLOCYtSkW+3bfVdM4n/By2nWTIFTCnTXMLOxD76d1guc+MuPGQlFR+B7WqNb79WQSaUw1FwAwRS1hFFDa1uvOvcR/Dwq6UF/1WFaaO/xbj+hdAx1t/8qVMdrK02Gh49h0YCEhRv3vBs95CbsrxU+wm6S4ECejQnhudmtg=
+	t=1761823520; cv=none; b=KA34WsAmpkb0qpJ0u6WPtE+WbAl5fOc8K3IV8abNws3tvBwt9+f0r9iGbuhUC6XTWINeGuv2rOXnG23jdGHxsJ3TBpPM9msLSemMKqLIB4aSIDs1Yb/IpjtY63wBsyVWLatRZiKQGVVV8hyqpN6MIJC8P5YkCeiXJwxd0Evahkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761819777; c=relaxed/simple;
-	bh=DcnX957JuOPks+rDX8maDPbDJIJHIws9n5FXx0tfNS0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fo3rhF24ELMHA1+1OnXb/8pLoU4YvHHZ0FmM28Jfx71QaGDvlJrqp8r4micuSftGviqu6v2puGu4oOQzJ2Oz/qduB4MAUybJ8mJLfTG2VMd5sgQkFdN5WnxfqMQiKeh3UrsSLFVc3McHcYJMO+xpwuC0S7kGBBajTam9WnvxqmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A50F2C42;
-	Thu, 30 Oct 2025 03:22:47 -0700 (PDT)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 01BEE3F66E;
-	Thu, 30 Oct 2025 03:22:52 -0700 (PDT)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	perlarsen@google.com,
-	ayrton@google.com,
-	ben.horgan@arm.com,
-	sudeep.holla@arm.com,
-	stuart.yoder@arm.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v2 2/2] KVM: arm64: support some optional calls of FF-A v1.2
-Date: Thu, 30 Oct 2025 10:22:45 +0000
-Message-Id: <20251030102245.2313898-3-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251030102245.2313898-1-yeoreum.yun@arm.com>
-References: <20251030102245.2313898-1-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1761823520; c=relaxed/simple;
+	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OPSBqlKPZZ8xF01HgIIFprk/jLJ2NnD/hWenzUwRNuFl/r82dq21hgdE3xL8HmCDEefwtSQDg5eMi63MRSfkUFe4gH9c233SECWF/EyAJBLkHWe5YzelLwPwiGuZDM/0soCMW3YBDyNHCfYz8WxSa+fPKdpxaWk32i56t+i4Mno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OK/iWfsG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OK/iWfsG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F4D9C4CEF8;
+	Thu, 30 Oct 2025 11:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761823520;
+	bh=6pRLhXQTg48LccghaYa5grB/ldAS7xutWQXqYeaONAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OK/iWfsGKPH76eTFnRmfEgmrgWV+XlSP07CDbXrbXrT5kabli0le+L3nLFvZyLmg3
+	 uDtdKVLtBAJQDlhIdZDjbKkD+O9erGphWHpSUwXCKM9IwBRGDUms4h4NQfFswyZmhP
+	 SqGFIHJ4BGbAUAQk2Z81nCkGtGd4wFoTkbcJFbzPuKQsO/WxoOgtIpcMQXqDTdZaiY
+	 4UZtYM1KAgwl5L56fuUCkhFk5NWPCLZG3YAWpaT1zfVqau8wKZc6t66BbWzNC6k/Gz
+	 mf2OQrEKHAjd0eTObb7YTHD981blAirH/sop1L0IU1eDwAfY0FwExedoSdbDeCk1oE
+	 m62/WGvW+HHUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vEQmM-00000000xUk-0abm;
+	Thu, 30 Oct 2025 11:25:18 +0000
+Date: Thu, 30 Oct 2025 11:25:17 +0000
+Message-ID: <86tszgvdgi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Make ID_PFR1_EL1.GIC writable
+In-Reply-To: <aPiBH1_WZicoE7Od@linux.dev>
+References: <20251013083207.518998-1-maz@kernel.org>
+	<20251013083207.518998-2-maz@kernel.org>
+	<aPiBH1_WZicoE7Od@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-To support drivers or components that implement their services using
-FFA_DIRECT_REQ2/FFA_DIRECT_RESP2 (e.g., the TPM driver using CRB over FF-A)
-and obtain related partition information via FFA_PARTITION_INFO_GET_REG,
-enable pKVM to support both FFA_DIRECT_REQ2/FFA_DIRECT_RESP2
-and FFA_PARTITION_INFO_GET_REG.
+On Wed, 22 Oct 2025 08:00:47 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Hey,
+> 
+> On Mon, Oct 13, 2025 at 09:32:05AM +0100, Marc Zyngier wrote:
+> > Similarly to ID_AA64PFR0_EL1.GIC, relax ID_PFR1_EL1.GIC to be writable.
+> 
+> This looks fine to me, although I do wonder if we should just allow
+> userspace to write whatever value it wants to the 32-bit ID registers
+> and be done with it.
 
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 3 ---
- 1 file changed, 3 deletions(-)
+That's a good point. Nobody really cares about 32bit anyway, and I'd
+be happy to just let the VMM write whatever it wants. Might be a bit
+harder to backport, but whoever is interested in AArch32 will be able
+to do it.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 0ae87ff61758..81e8b33bbdd3 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -679,10 +679,7 @@ static bool ffa_call_supported(u64 func_id)
- 	case FFA_NOTIFICATION_GET:
- 	case FFA_NOTIFICATION_INFO_GET:
- 	/* Optional interfaces added in FF-A 1.2 */
--	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
--	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
- 	case FFA_CONSOLE_LOG:			/* Optional per 13.1: not in Table 13.1 */
--	case FFA_PARTITION_INFO_GET_REGS:	/* Optional for virtual instances per 13.1 */
- 		return false;
- 	}
- 
+Thanks,
+
+	M.
+
 -- 
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
-
+Without deviation from the norm, progress is not possible.
