@@ -1,57 +1,57 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBF638558F
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52649393DC9
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855045; cv=none; b=CiiGhhDbIThoOp+R9JwJ9sHOsm3mdLjGv208jwQPMGjUGi7hsqhgKvAKGWL/o1Ndr/piGVKAB0uI+5B9wBUyU/YPkztjNE+yb2JqED9aQ9bL4ILFFAsl5bYTadiM1QE22l4SFC6LaXBqLZM64vNcJU02Axc/cGOI+qdO7gl8hn4=
+	t=1761855048; cv=none; b=peVwhRVLAHMsbVrYgVj8Mr9yzlutqYXwv9aAWCQftjxGQGVQAOSwA5fvmFFdy7YHkVq8KrIjVeq5YGtszJ+6gWLZrqlc+VfIBtoZLam5D3KEJSowZaa/y5lEqXGGWJcKa9dbrnL8sfcfzAe5FMXGOnEAvnaTQG3asjY2edqyM0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855045; c=relaxed/simple;
-	bh=chQz73w4sDaVm3u9kl7kGYcKIA2cugXbhH5x61ROvUY=;
+	s=arc-20240116; t=1761855048; c=relaxed/simple;
+	bh=YzrAcOy4kMGvZnv8LvvV5Xf4Ed5dS9yiBLT7BTZP694=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BA8bmB637VhVIAG98Q/ZkiTQy03qbrDi0Y6uTtbk2eMLD3A7hdk4hcU6euQEMyfR5YOEn7n8GSzCThTEhMrTFrQQgDthVRXRSSbseE8yHIstpUYT5Rq/U9bb6GUQNngPonuX8+YMc6Y/cxLpeL/vZbOf8T9/rmRlPnCKEkFhD2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cTrswdSe; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=WMDXuP3ThHKDQZ7kRdDXBRYqScpFl00E1ySpTAs2ksSmqzAkT/B0wW6dJvFzfCBDZi7iOIuOl6NCGW22r7wexVHuMwoZXO2AHovaKtEDTF2StCjTXMeQEpYr70NUtqjsXe2Eo84BvIyb/NEilrYtXxlIYPBa2fPStyHuWdethg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4VMf5lN; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cTrswdSe"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6cf50cbd2cso1630755a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4VMf5lN"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2930e2e8e7fso12232865ad.2
+        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855043; x=1762459843; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761855046; x=1762459846; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXaPi3MoPrN4063cnb5uQMVDinJuo4gq6tPJoc7Otx0=;
-        b=cTrswdSettzgvD3HkJrl+kJ+yGaDWfIosd6JGohnGmDSjGoMZmfR8VfssVfiZEaMgI
-         6Emms3V/sM2qId+HR/IQ2lXdrDXayKlchoAwv33pMA8AjMS93aH/INBADclZ9HNkwNGe
-         S+VX3IhWVwXiakIwxYnRVFp+MgDs3tLFwHr2BHl/F/udHo02qSmV34YSZTnBHvJbGSSk
-         2ILcBVOj0lvyA9JBKjtFCjmYwAwljrE2bamxmOvKQyGNn8/AMI7VzZg+LpgnchVa/LFe
-         WcYMbpgp98OkEXmnpVN5eH7aYPKWtVMnmUWVbI6SKXlesDyJ3SlEKaIIikifBFNAf//x
-         sv4A==
+        bh=HvkYP5K0H7bzidqYh2GUowDdUiZwtqWzbaGK7ATegJ0=;
+        b=O4VMf5lNh0c6pLk04HWOt3bjK6VK0sew4eRQHERL5+8D3fTdKryRz7cRkXS8T/G47e
+         VdX/V0KJ44uJV1TcckdqMQ2UXuNy2KpVt/osrfYyhuZoq/cMLi176wxAMhRDsEGPDdMG
+         rcdqDYv4UGYv3KjBQnStb0V9jOEHA3UA6WulQ5zs3GEZhq6Z8CbCrU65ZumFVO+wMwyO
+         ekv6gpWyhyBEXQgzKYh8Z9L1bWocmJDrMZhYVUCBQMZAO+HXXNZ1KCAdO+qMzq6PslJr
+         2hGhqPqYsl0xOYbt1O25aXAGVIwdrFcgn0GCvMbJ08im7J1zV1U8JTmJkLMHnAcamElY
+         gCXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855043; x=1762459843;
+        d=1e100.net; s=20230601; t=1761855046; x=1762459846;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NXaPi3MoPrN4063cnb5uQMVDinJuo4gq6tPJoc7Otx0=;
-        b=d5Q8+CgIaAxDUFEqXpRkg8fZ17Z8/mV9826ZFkYdFky0TytirdkhJeK+Eo2j7zCeOM
-         JNCfHXEZmS8pML/HYIAAYXPjFt320Mjllj9p1lYgM28Xg1Vpk/WUsJpM2D8iECzUWInz
-         /ZIEq0/jDeJkMWJ/nojilibiNUT/jUXpcyEtQ5gECYZE5h8Suc0INBGN1umGQqt/rL2f
-         dinnj8g07O2EmUUHolgm+eziMr65ekt8PL5itFdxMGauMd9eY75wJ5bqpc3w6ZV+ra7g
-         oNAiXfO1N8gZhRmneu8AA0k8PVog83wMI0tYYQU+M+MU6N8ihln+712zWIVHKnH+PSVm
-         Nv+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWnqrEMxpffUfLmMYc+piUBPzdlVK2odWzrOzGfD2nJGXa2rrp1OXz1OLV9rm3sybcVUGJsdR0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxCNtKx1i8ORNWBLpmDsjOvEE2ZOJkpg4asuX/ouXcGJLy3q22a
-	LAQl9rgWJ+kOq49AewmXFzWKpii3Goz85OZsj9rMm3KQAUB7qvckcAig0yTlcUpOEPSBOkwDA8N
-	mZv7FXw==
-X-Google-Smtp-Source: AGHT+IEb/219Cf+wyRyoeh6pXELuzrJXroky0oVjoU6kkNSExiZe/MRoYQlDKXB9iGMeGWIkzSQ16EMgROI=
-X-Received: from plrs24.prod.google.com ([2002:a17:902:b198:b0:269:b6ad:8899])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e5cf:b0:293:b97:c30b
- with SMTP id d9443c01a7336-2951a3a6519mr12248475ad.9.1761855043356; Thu, 30
- Oct 2025 13:10:43 -0700 (PDT)
+        bh=HvkYP5K0H7bzidqYh2GUowDdUiZwtqWzbaGK7ATegJ0=;
+        b=rTpu4ZhMbK5iRrHFVCZsdNmKaA1/FLUIshkk0XNFDZJUFap8lJ/jQZPh5R9UuztH9I
+         BGJY3Q3hgiAw0P9O6bEoPsz6Gz34/Dy6XS7bSNN98RdkOazkFGBYqo6zDH6o0iH2Yc2e
+         7BHwmCDkhogISIIIWY9b6V09ke7GEp12kAowcUYw9e8kO4WhLHyCQhy4gxs1TlxW3JEd
+         S4D6fAkGD5jeSVllDwTL5RJKjtQ84K6QzU6UZI8unXDrB6UfZQXoby8uNE9V+koib8Gy
+         6w4+BuNJDDeTsBIE6V+9guAvaOxrEks2ejro7J7MVu2QFmuo9TNhkKVIt+wm2OxHv5m8
+         zlIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDDiOaUyetrjD4d68mbw7g8SUvwT/X8Gnn4HHVBoG1LgAUdyWK06YoSLWaFbz/AUeKbDkPs50=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzDgRbkfclRjDNCPJnopqdmw737x/W1W8/KlytPlmzy3IpUFyx+
+	dGzNfdorIKo47qGWb0Gx/aHvbdDRdAn8gys5nb6JQ062dHdk620CSZgvsldwDpJVZxAjBykVoHR
+	qtXIx5Q==
+X-Google-Smtp-Source: AGHT+IHb++2Z/KelxH0n+uChReZvIH66SFbrsagpgu5Hbz52plhdUUxmf4i41V+1yu1qPk273gNABB2ooWc=
+X-Received: from plmm17.prod.google.com ([2002:a17:902:c451:b0:294:fdb9:5c0a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc85:b0:24c:ed95:2725
+ with SMTP id d9443c01a7336-2951a3712f9mr11351465ad.4.1761855045661; Thu, 30
+ Oct 2025 13:10:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:40 -0700
+Date: Thu, 30 Oct 2025 13:09:41 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-18-seanjc@google.com>
-Subject: [PATCH v4 17/28] KVM: TDX: Fold tdx_sept_zap_private_spte() into tdx_sept_remove_private_spte()
+Message-ID: <20251030200951.3402865-19-seanjc@google.com>
+Subject: [PATCH v4 18/28] KVM: TDX: Combine KVM_BUG_ON + pr_tdx_error() into TDX_BUG_ON()
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -83,88 +83,298 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Do TDH_MEM_RANGE_BLOCK directly in tdx_sept_remove_private_spte() instead
-of using a one-off helper now that the nr_premapped tracking is gone.
+Add TDX_BUG_ON() macros (with varying numbers of arguments) to deduplicate
+the myriad flows that do KVM_BUG_ON()/WARN_ON_ONCE() followed by a call to
+pr_tdx_error().  In addition to reducing boilerplate copy+paste code, this
+also helps ensure that KVM provides consistent handling of SEAMCALL errors.
 
-Opportunistically drop the WARN on hugepages, which was dead code (see the
-KVM_BUG_ON() in tdx_sept_remove_private_spte()).
-
-No functional change intended.
+Opportunistically convert a handful of bare WARN_ON_ONCE() paths to the
+equivalent of KVM_BUG_ON(), i.e. have them terminate the VM.  If a SEAMCALL
+error is fatal enough to WARN on, it's fatal enough to terminate the TD.
 
 Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Reviewed-by: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 41 +++++++++++------------------------------
- 1 file changed, 11 insertions(+), 30 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 110 +++++++++++++++++------------------------
+ 1 file changed, 46 insertions(+), 64 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index cfdf8d262756..260b569309cf 100644
+index 260b569309cf..5e6f2d8b6014 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1683,33 +1683,6 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
+@@ -24,20 +24,32 @@
+ #undef pr_fmt
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+ 
+-#define pr_tdx_error(__fn, __err)	\
+-	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx\n", #__fn, __err)
++#define __TDX_BUG_ON(__err, __f, __kvm, __fmt, __args...)			\
++({										\
++	struct kvm *_kvm = (__kvm);						\
++	bool __ret = !!(__err);							\
++										\
++	if (WARN_ON_ONCE(__ret && (!_kvm || !_kvm->vm_bugged))) {		\
++		if (_kvm)							\
++			kvm_vm_bugged(_kvm);					\
++		pr_err_ratelimited("SEAMCALL " __f " failed: 0x%llx" __fmt "\n",\
++				   __err,  __args);				\
++	}									\
++	unlikely(__ret);							\
++})
+ 
+-#define __pr_tdx_error_N(__fn_str, __err, __fmt, ...)		\
+-	pr_err_ratelimited("SEAMCALL " __fn_str " failed: 0x%llx, " __fmt,  __err,  __VA_ARGS__)
++#define TDX_BUG_ON(__err, __fn, __kvm)				\
++	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
+ 
+-#define pr_tdx_error_1(__fn, __err, __rcx)		\
+-	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx\n", __rcx)
++#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
+ 
+-#define pr_tdx_error_2(__fn, __err, __rcx, __rdx)	\
+-	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx\n", __rcx, __rdx)
++#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, __rdx)
++
++#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%llx", __rcx, __rdx, __r8)
+ 
+-#define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
+-	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n", __rcx, __rdx, __r8)
+ 
+ bool enable_tdx __ro_after_init;
+ module_param_named(tdx, enable_tdx, bool, 0444);
+@@ -313,10 +325,9 @@ static int __tdx_reclaim_page(struct page *page)
+ 	 * before the HKID is released and control pages have also been
+ 	 * released at this point, so there is no possibility of contention.
+ 	 */
+-	if (WARN_ON_ONCE(err)) {
+-		pr_tdx_error_3(TDH_PHYMEM_PAGE_RECLAIM, err, rcx, rdx, r8);
++	if (TDX_BUG_ON_3(err, TDH_PHYMEM_PAGE_RECLAIM, rcx, rdx, r8, NULL))
+ 		return -EIO;
+-	}
++
  	return 0;
  }
  
--static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
--				     enum pg_level level, struct page *page)
--{
--	int tdx_level = pg_level_to_tdx_sept_level(level);
--	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
--	gpa_t gpa = gfn_to_gpa(gfn) & KVM_HPAGE_MASK(level);
--	u64 err, entry, level_state;
--
--	/* For now large page isn't supported yet. */
--	WARN_ON_ONCE(level != PG_LEVEL_4K);
--
--	err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
--
--	if (unlikely(tdx_operand_busy(err))) {
--		/* After no vCPUs enter, the second retry is expected to succeed */
--		tdx_no_vcpus_enter_start(kvm);
--		err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
--		tdx_no_vcpus_enter_stop(kvm);
+@@ -404,8 +415,8 @@ static void tdx_flush_vp_on_cpu(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	smp_call_function_single(cpu, tdx_flush_vp, &arg, 1);
+-	if (KVM_BUG_ON(arg.err, vcpu->kvm))
+-		pr_tdx_error(TDH_VP_FLUSH, arg.err);
++
++	TDX_BUG_ON(arg.err, TDH_VP_FLUSH, vcpu->kvm);
+ }
+ 
+ void tdx_disable_virtualization_cpu(void)
+@@ -464,8 +475,7 @@ static void smp_func_do_phymem_cache_wb(void *unused)
+ 	}
+ 
+ out:
+-	if (WARN_ON_ONCE(err))
+-		pr_tdx_error(TDH_PHYMEM_CACHE_WB, err);
++	TDX_BUG_ON(err, TDH_PHYMEM_CACHE_WB, NULL);
+ }
+ 
+ void tdx_mmu_release_hkid(struct kvm *kvm)
+@@ -504,8 +514,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+ 	err = tdh_mng_vpflushdone(&kvm_tdx->td);
+ 	if (err == TDX_FLUSHVP_NOT_DONE)
+ 		goto out;
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_MNG_VPFLUSHDONE, err);
++	if (TDX_BUG_ON(err, TDH_MNG_VPFLUSHDONE, kvm)) {
+ 		pr_err("tdh_mng_vpflushdone() failed. HKID %d is leaked.\n",
+ 		       kvm_tdx->hkid);
+ 		goto out;
+@@ -528,8 +537,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
+ 	 * tdh_mng_key_freeid() will fail.
+ 	 */
+ 	err = tdh_mng_key_freeid(&kvm_tdx->td);
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_MNG_KEY_FREEID, err);
++	if (TDX_BUG_ON(err, TDH_MNG_KEY_FREEID, kvm)) {
+ 		pr_err("tdh_mng_key_freeid() failed. HKID %d is leaked.\n",
+ 		       kvm_tdx->hkid);
+ 	} else {
+@@ -580,10 +588,9 @@ static void tdx_reclaim_td_control_pages(struct kvm *kvm)
+ 	 * when it is reclaiming TDCS).
+ 	 */
+ 	err = tdh_phymem_page_wbinvd_tdr(&kvm_tdx->td);
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
++	if (TDX_BUG_ON(err, TDH_PHYMEM_PAGE_WBINVD, kvm))
+ 		return;
 -	}
++
+ 	tdx_quirk_reset_page(kvm_tdx->td.tdr_page);
+ 
+ 	__free_page(kvm_tdx->td.tdr_page);
+@@ -606,11 +613,8 @@ static int tdx_do_tdh_mng_key_config(void *param)
+ 
+ 	/* TDX_RND_NO_ENTROPY related retries are handled by sc_retry() */
+ 	err = tdh_mng_key_config(&kvm_tdx->td);
 -
+-	if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
+-		pr_tdx_error(TDH_MNG_KEY_CONFIG, err);
++	if (TDX_BUG_ON(err, TDH_MNG_KEY_CONFIG, &kvm_tdx->kvm))
+ 		return -EIO;
+-	}
+ 
+ 	return 0;
+ }
+@@ -1601,10 +1605,8 @@ static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+ 	if (unlikely(tdx_operand_busy(err)))
+ 		return -EBUSY;
+ 
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error_2(TDH_MEM_PAGE_ADD, err, entry, level_state);
++	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_ADD, entry, level_state, kvm))
+ 		return -EIO;
+-	}
+ 
+ 	return 0;
+ }
+@@ -1623,10 +1625,8 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
+ 	if (unlikely(tdx_operand_busy(err)))
+ 		return -EBUSY;
+ 
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error_2(TDH_MEM_PAGE_AUG, err, entry, level_state);
++	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_AUG, entry, level_state, kvm))
+ 		return -EIO;
+-	}
+ 
+ 	return 0;
+ }
+@@ -1675,10 +1675,8 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
+ 	if (unlikely(tdx_operand_busy(err)))
+ 		return -EBUSY;
+ 
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error_2(TDH_MEM_SEPT_ADD, err, entry, level_state);
++	if (TDX_BUG_ON_2(err, TDH_MEM_SEPT_ADD, entry, level_state, kvm))
+ 		return -EIO;
+-	}
+ 
+ 	return 0;
+ }
+@@ -1726,8 +1724,7 @@ static void tdx_track(struct kvm *kvm)
+ 		tdx_no_vcpus_enter_stop(kvm);
+ 	}
+ 
+-	if (KVM_BUG_ON(err, kvm))
+-		pr_tdx_error(TDH_MEM_TRACK, err);
++	TDX_BUG_ON(err, TDH_MEM_TRACK, kvm);
+ 
+ 	kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
+ }
+@@ -1784,10 +1781,8 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 		tdx_no_vcpus_enter_stop(kvm);
+ 	}
+ 
 -	if (KVM_BUG_ON(err, kvm)) {
 -		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
--		return -EIO;
++	if (TDX_BUG_ON_2(err, TDH_MEM_RANGE_BLOCK, entry, level_state, kvm))
+ 		return;
 -	}
--	return 1;
--}
--
- /*
-  * Ensure shared and private EPTs to be flushed on all vCPUs.
-  * tdh_mem_track() is the only caller that increases TD epoch. An increase in
-@@ -1790,7 +1763,6 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
- 	gpa_t gpa = gfn_to_gpa(gfn);
- 	u64 err, entry, level_state;
--	int ret;
- 
- 	/*
- 	 * HKID is released after all private pages have been removed, and set
-@@ -1804,9 +1776,18 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
- 		return;
- 
--	ret = tdx_sept_zap_private_spte(kvm, gfn, level, page);
--	if (ret <= 0)
-+	err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
-+	if (unlikely(tdx_operand_busy(err))) {
-+		/* After no vCPUs enter, the second retry is expected to succeed */
-+		tdx_no_vcpus_enter_start(kvm);
-+		err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
-+		tdx_no_vcpus_enter_stop(kvm);
-+	}
-+
-+	if (KVM_BUG_ON(err, kvm)) {
-+		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
- 		return;
-+	}
  
  	/*
  	 * TDX requires TLB tracking before dropping private page.  Do
+@@ -1814,16 +1809,12 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 		tdx_no_vcpus_enter_stop(kvm);
+ 	}
+ 
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
++	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_REMOVE, entry, level_state, kvm))
+ 		return;
+-	}
+ 
+ 	err = tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page);
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
++	if (TDX_BUG_ON(err, TDH_PHYMEM_PAGE_WBINVD, kvm))
+ 		return;
+-	}
+ 
+ 	tdx_quirk_reset_page(page);
+ }
+@@ -2463,8 +2454,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 		goto free_packages;
+ 	}
+ 
+-	if (WARN_ON_ONCE(err)) {
+-		pr_tdx_error(TDH_MNG_CREATE, err);
++	if (TDX_BUG_ON(err, TDH_MNG_CREATE, kvm)) {
+ 		ret = -EIO;
+ 		goto free_packages;
+ 	}
+@@ -2505,8 +2495,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 			ret = -EAGAIN;
+ 			goto teardown;
+ 		}
+-		if (WARN_ON_ONCE(err)) {
+-			pr_tdx_error(TDH_MNG_ADDCX, err);
++		if (TDX_BUG_ON(err, TDH_MNG_ADDCX, kvm)) {
+ 			ret = -EIO;
+ 			goto teardown;
+ 		}
+@@ -2523,8 +2512,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
+ 		*seamcall_err = err;
+ 		ret = -EINVAL;
+ 		goto teardown;
+-	} else if (WARN_ON_ONCE(err)) {
+-		pr_tdx_error_1(TDH_MNG_INIT, err, rcx);
++	} else if (TDX_BUG_ON_1(err, TDH_MNG_INIT, rcx, kvm)) {
+ 		ret = -EIO;
+ 		goto teardown;
+ 	}
+@@ -2792,10 +2780,8 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 	cmd->hw_error = tdh_mr_finalize(&kvm_tdx->td);
+ 	if (tdx_operand_busy(cmd->hw_error))
+ 		return -EBUSY;
+-	if (KVM_BUG_ON(cmd->hw_error, kvm)) {
+-		pr_tdx_error(TDH_MR_FINALIZE, cmd->hw_error);
++	if (TDX_BUG_ON(cmd->hw_error, TDH_MR_FINALIZE, kvm))
+ 		return -EIO;
+-	}
+ 
+ 	kvm_tdx->state = TD_STATE_RUNNABLE;
+ 	/* TD_STATE_RUNNABLE must be set before 'pre_fault_allowed' */
+@@ -2882,16 +2868,14 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 	}
+ 
+ 	err = tdh_vp_create(&kvm_tdx->td, &tdx->vp);
+-	if (KVM_BUG_ON(err, vcpu->kvm)) {
++	if (TDX_BUG_ON(err, TDH_VP_CREATE, vcpu->kvm)) {
+ 		ret = -EIO;
+-		pr_tdx_error(TDH_VP_CREATE, err);
+ 		goto free_tdcx;
+ 	}
+ 
+ 	for (i = 0; i < kvm_tdx->td.tdcx_nr_pages; i++) {
+ 		err = tdh_vp_addcx(&tdx->vp, tdx->vp.tdcx_pages[i]);
+-		if (KVM_BUG_ON(err, vcpu->kvm)) {
+-			pr_tdx_error(TDH_VP_ADDCX, err);
++		if (TDX_BUG_ON(err, TDH_VP_ADDCX, vcpu->kvm)) {
+ 			/*
+ 			 * Pages already added are reclaimed by the vcpu_free
+ 			 * method, but the rest are freed here.
+@@ -2905,10 +2889,8 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 	}
+ 
+ 	err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
+-	if (KVM_BUG_ON(err, vcpu->kvm)) {
+-		pr_tdx_error(TDH_VP_INIT, err);
++	if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
+ 		return -EIO;
+-	}
+ 
+ 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+ 
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
