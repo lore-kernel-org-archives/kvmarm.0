@@ -1,57 +1,57 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B32B393DE6
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4439329E53
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855050; cv=none; b=VLSOssAGJ2nTTh3tixNUMF61haadd1G2alo5q9a2wEfe5gOzYvGljagyZ5o18nuHzSNWmllCLSwneXnVeuXiCY9YgK7mUvdCa5IM6xumlzAP6Wi3pKR9eAldbRKGOOpdBHDRDWNEKTJYrN/kOm/nAjLGeKuRXLTeUY4xuWefJl0=
+	t=1761855052; cv=none; b=Bj/rLHnhdBu4wCvFzbC+ybF/sjIa/DJfBTzGFJcQ9tyroJ5BIM8mrBWCHEgNjGpAgCfUMJReyaibyixgTCvNS0+qwXicH4MONSQcQoNpCehvn69/QMmddQouIzQpx+vkha5FmeishAtz1OOIWJksRmt7o6z2mtV0Zrh2j0a6OUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855050; c=relaxed/simple;
-	bh=4WxHGoE93VOocFQ5wN0AUJ/80sFNRiS2hdmgOFi4y/A=;
+	s=arc-20240116; t=1761855052; c=relaxed/simple;
+	bh=gvzcFRbzaqGBcuZ+f2VoTMDHPgCQZ6omIrzB4Q9yffU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ftg/wYif5ZkjWZ9vAQuHjy/4rNV4681LeCXef3eZJgn9efDiZ9i9FYR5H/0r5Um5s9cNc5xiVdAXNCkt9IZtOhuRfkE1I8rwq2rGJ59sMRvWmChH/o0ig275sx6PNfPafleiT07bAGKZgVj0/AsWWfaN65/xleiRzqh55RqBl9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nuwEaa+q; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=rgKF5ucuNgal39BbVND8j95oRvUrkE6l1VteuEhj1wQLIYlxAj+GY5j9GmXApGqjO4YoHnShMwT9BUL57Xu9XsoqrbHi3glSpH0kPXf/3PY1zkEdmGhtxLJ3VhCFlaEdc6NNAjNVaSmcnbOfkCq6/kaBYlPgR2z8eFDU3sRjMUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sUxMihlt; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nuwEaa+q"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6ce15aaa99so1086943a12.0
-        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sUxMihlt"
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-277f0ea6ee6so13471435ad.0
+        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855048; x=1762459848; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761855050; x=1762459850; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=q3vUMZT0yYe1EXEiRgC8c4U03xvX09k6brWY3B4yx5I=;
-        b=nuwEaa+qH18RZiQpT3TD29LLnHgFBGAhu6HW4ruRXl0tlvPS/ilGPXMJXOPGKCSlSu
-         cwqsk6RWe3ayC3b4dTMeEvzjDmIfrdknYTN9glRZ+g7Vc4NIrla3zWo9xlfFhLbs4963
-         Tu97VPlSeaxag0kI99VKnEefuDgHhorUIT1Xgnx8YwT8ujCR/b3iWpHj8C0Sr2NPLaG4
-         0t7LWdkUNUyN6R+HN3RtP/67DXgbPGxTswHzqJlVOb3zx9XEY0OiJUakgymECXdc7YCA
-         FTswyhUo6wk9H23FxArnUR97aKJo8gjm2NDU3RGw5YzjLRWpMpAe1fh4BwbKutLcvY6s
-         lUpw==
+        bh=JvdyzKJX9NuDfCF42GsCtwlMI06iCRR0AAdHR5FNyUo=;
+        b=sUxMihltabXLFjrt3ajAvtxvRIG+TW5RdYH67QW8ddRvmWRG2vIBhUyGYE6HnjkNwi
+         IQv9mMe2JS5ctk6/QQHFBNn5UTM9261joPJWx17GkrwY5NWWIa6XUYsYJYJF7ATM35/K
+         pd5PHsTLG234GUP9DbuNIqc6MeI6TV6DQARbP29xRTPyrtsXzogFFqStUkBfu4FwwFXV
+         KPmbGMHRu1ezbC9w6Tb1VByE6IzpUE9kMMqIqeAPnt/RIrDvw8+dEgI1b6by8Vavng3P
+         SZbv3IDHFrvIQlCW7PYbYS48vJrlGCCrhW9h9CHD++yeGqrzLfMj6xDI6XwCtHMx6m0k
+         vKww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855048; x=1762459848;
+        d=1e100.net; s=20230601; t=1761855050; x=1762459850;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=q3vUMZT0yYe1EXEiRgC8c4U03xvX09k6brWY3B4yx5I=;
-        b=bLSewPqMZt8Um/1UMb1dn3aZZYDDocdPSSPKSu5dL1bk+Mpf8LWn0qg++OnVa8ZaYC
-         uShA6ahIqyrhiZuLCYrGkWIEsPoRrIFnoR+BTyfee50SmT7mVuty5CLVs57KF/Y+BsSL
-         /hSGr/Sd0DdWEvFpwFO7I7/Xl8YAb1hKYb/gIelDTgkH+8+fctdpLRKwykypbbtbvWJu
-         EqzyUVQ0vgXYxTXeW+O2S420ejPjz2dMaeImktOBGj0YST0akymBds58eprCnbQBRHuU
-         8gogr0dJo6+cbuMPiNqnKPV+Jq+OF8Uhy1oT5ju3m1eK6pIBo7T95og7XSUs4kO0BMqu
-         HeSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/Jn7esvDFm+k/5OdH74gEoWL8bIi1zwRe1Z6Y6t7vXlomN6i/78kLzMiKg/5EAVZSLyuoBqY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy2Q/W2fkOpkKiAPXr0fXz1xV65plYmcEZ8OHUd3J3eNiRr4z2a
-	5Oio+EbZq4m4y2MITF4a53pz3JvI9Kz7mp+H28NcRSTPyIYwRaLqc0W1ZDRvpv1FbAoyrGdWHFb
-	yNUvvVg==
-X-Google-Smtp-Source: AGHT+IGMIUiQfnFXRwKgU4xakuBoSsZwl0KV10BIrj34ojpFyNKXcMvJLG+bxMBFJqWMl0yCEf0bmf3P3I0=
-X-Received: from pltj3.prod.google.com ([2002:a17:902:76c3:b0:294:8e58:7348])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2348:b0:295:1a63:57b0
- with SMTP id d9443c01a7336-2951a635c07mr12598385ad.23.1761855047670; Thu, 30
- Oct 2025 13:10:47 -0700 (PDT)
+        bh=JvdyzKJX9NuDfCF42GsCtwlMI06iCRR0AAdHR5FNyUo=;
+        b=cGcioyRAb/ftdcwSI6sto4KPa70vVrfzMljtKxjWavonZtYxePuDajaTat87sS5lsp
+         znCWYtaOPkVRKtg05eP3pBGl2JDL4VF4OuXlbzcb28YedYHY5/VycaCPxoD5kW6e+tWw
+         pIBo0lDggXLdvWyJNQqirn7D13e3fF8R4WixRDht7GWwyIkigkFaZXM7Nyt71yNv732Q
+         gy3Gv7yB67cp7SzmYh9e89T3AVpvrvUUbMHhmPJUBI97fuapub6WMpNXQU4pVxEyXOTG
+         wdgxEr366SVmDOcD9TspVxAESpVl5NNA9WCN0g1bWHJPkC6MYFyTpl7dmkOuPHFzCJXi
+         574A==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ7MtZVzll8G9rLDGq8YUk6jHcaMFzV5CulV3kX7tbe1AZwq1uCBahZH+zbUHZ/lEEdB3LQMk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxNunGKd7+2NIiI5fDA66Fk+vJY8yeGkYmBxXBmdm1uEj1QLxIF
+	0AKs53A/FCJ5yrYB86/ZZkalwicci9ODKm9TowhQXOaRsO15GhAYG4r3ckFlKVRWVWp93y4Jht3
+	Adk4rAA==
+X-Google-Smtp-Source: AGHT+IHEVTdCFV7pO4/z6pVQDy8N1YwVBneIfEZO+ruu2Aqfbau+04/y/mG+hlEqHWjdepdrmBSAOEyDdTs=
+X-Received: from plge18.prod.google.com ([2002:a17:902:cf52:b0:290:d7ff:80f8])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:38c8:b0:294:fda6:4723
+ with SMTP id d9443c01a7336-2951a6007f3mr12024995ad.60.1761855049987; Thu, 30
+ Oct 2025 13:10:49 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:42 -0700
+Date: Thu, 30 Oct 2025 13:09:43 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,9 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-20-seanjc@google.com>
-Subject: [PATCH v4 19/28] KVM: TDX: Derive error argument names from the local
- variable names
+Message-ID: <20251030200951.3402865-21-seanjc@google.com>
+Subject: [PATCH v4 20/28] KVM: TDX: Assert that mmu_lock is held for write
+ when removing S-EPT entries
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -84,43 +84,53 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When printing SEAMCALL errors, use the name of the variable holding an
-error parameter instead of the register from whence it came, so that flows
-which use descriptive variable names will similarly print descriptive
-error messages.
+Unconditionally assert that mmu_lock is held for write when removing S-EPT
+entries, not just when removing S-EPT entries triggers certain conditions,
+e.g. needs to do TDH_MEM_TRACK or kick vCPUs out of the guest.
+Conditionally asserting implies that it's safe to hold mmu_lock for read
+when those paths aren't hit, which is simply not true, as KVM doesn't
+support removing S-EPT entries under read-lock.
 
-Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Only two paths lead to remove_external_spte(), and both paths asserts that
+mmu_lock is held for write (tdp_mmu_set_spte() via lockdep, and
+handle_removed_pt() via KVM_BUG_ON()).
+
+Deliberately leave lockdep assertions in the "no vCPUs" helpers to document
+that wait_for_sept_zap is guarded by holding mmu_lock for write, and keep
+the conditional assert in tdx_track() as well, but with a comment to help
+explain why holding mmu_lock for write matters (above and beyond why
+tdx_sept_remove_private_spte()'s requirements).
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 5e6f2d8b6014..63d4609cc3bc 100644
+index 63d4609cc3bc..999b519494e9 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -41,14 +41,15 @@
- #define TDX_BUG_ON(__err, __fn, __kvm)				\
- 	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
+@@ -1715,6 +1715,11 @@ static void tdx_track(struct kvm *kvm)
+ 	if (unlikely(kvm_tdx->state != TD_STATE_RUNNABLE))
+ 		return;
  
--#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
--	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
-+#define TDX_BUG_ON_1(__err, __fn, a1, __kvm)			\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx", a1)
++	/*
++	 * The full sequence of TDH.MEM.TRACK and forcing vCPUs out of guest
++	 * mode must be serialized, as TDH.MEM.TRACK will fail if the previous
++	 * tracking epoch hasn't completed.
++	 */
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
  
--#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
--	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, __rdx)
-+#define TDX_BUG_ON_2(__err, __fn, a1, a2, __kvm)	\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx, " #a2 " 0x%llx", a1, a2)
+ 	err = tdh_mem_track(&kvm_tdx->td);
+@@ -1762,6 +1767,8 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	gpa_t gpa = gfn_to_gpa(gfn);
+ 	u64 err, entry, level_state;
  
--#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
--	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%llx", __rcx, __rdx, __r8)
-+#define TDX_BUG_ON_3(__err, __fn, a1, a2, a3, __kvm)	\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx, " #a2 ", 0x%llx, " #a3 " 0x%llx", \
-+		     a1, a2, a3)
- 
- 
- bool enable_tdx __ro_after_init;
++	lockdep_assert_held_write(&kvm->mmu_lock);
++
+ 	/*
+ 	 * HKID is released after all private pages have been removed, and set
+ 	 * before any might be populated. Warn if zapping is attempted when
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
