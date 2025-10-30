@@ -1,233 +1,172 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1DD2E091B
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 16:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C2C2BE057
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 17:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761843558; cv=none; b=DuNZ7dON+Rf5sXqVQsgB7IVhNUfqs1tto2LieeqI97Oz8bXy0G5aTJCpwUz4YU2eqUz2+IGV1+f5QuZZ5gq3+RhHCVxX70K78r4KqSyBy3yN7aoZ6Q3pSd/PO50jezLtzENKvsYwZ71vGgKQjjoKj61FmMNDyeIh4aFLFU4nGd0=
+	t=1761844309; cv=none; b=d6F6x+UxDhXmVxbHhLh11qNh49oJC3aHdxmBABpI9YnaI3MU/FAdps9Z0xsYSJXh0esdOvucti38AYfUM3uYzD8HLR5ScQQJBGwMzBscRUC1pswtHj8cAdm5PwV2DzRK/vua12c2G24R9UqLgygel9fuXqId9leTH2TIerkEpKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761843558; c=relaxed/simple;
-	bh=yxg5JtWcJU3AQI+LcX9lc7Atq1+nQtMZD0d/LAMglMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=qh3UXkUPdURlXi9tsd+np54wN1McsW8yuuh7nVMLjAevd3SGOKeSiPBF/tWUtzphpFslu8BdEwCUZl3iSfdh+P2uLicLqc0HlvqG0P/k4AH8NbkMoE4i4W1n6WyjIM7df/OsaeVguDUHW05eeQgNiABCxz8Uqi94gQUlNGSht1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WSU+HVtZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1761844309; c=relaxed/simple;
+	bh=w3xQ/IFC4bRYuvUl5HQvrpbvb4x1Naq0qy6bYNOooQM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Vby58u9Wzi0g/0iSAjpUr0NmFC65gPH+zJVvjFizFLp08ehCzbnQ4UnV01cFJ04nmvRw9NQqKo0BftAbNur+ZlyJgU+CngCWeiTTJIxMWDjJILOgzVQg5PYG3AsOYyoxI7ehRmlC4+We2kKFdUzTL1AopVcb5e/KN92TAauxpKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ikzeDLtH; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WSU+HVtZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761843555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y4ko4KBU7aEgwSx+DTL8x/7Jpcfxyw8R2e/RIc9ttX4=;
-	b=WSU+HVtZRQp1yMNfNFq0Xgak33SPf2CiUUEt/H1mQLHETu1PKlW51CSdS3q3NxRaWnJw0q
-	c/UBRZ9UBftG/H1uGsz01TGeEd2nZef7Q3zt5NtJfTpXDxdEaJJvfgwkE1o53SF6m9XFI6
-	/Z2QxEIk5biRX6dz1mjjNqTZRMEEmCQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-UCuIfX8vNjSaBe-3F9PUAw-1; Thu, 30 Oct 2025 12:59:14 -0400
-X-MC-Unique: UCuIfX8vNjSaBe-3F9PUAw-1
-X-Mimecast-MFC-AGG-ID: UCuIfX8vNjSaBe-3F9PUAw_1761843553
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-4298da9effcso1271704f8f.2
-        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 09:59:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761843553; x=1762448353;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y4ko4KBU7aEgwSx+DTL8x/7Jpcfxyw8R2e/RIc9ttX4=;
-        b=WFtUj7bEzM/tJ6eEXevCv3XjCreWOgs8vCSsTKgGeNAMtAqqr4KkOWaNn2yem2nAZh
-         NtkKa/A3qNcaBRytTxun73RKeOtyXH6TzwIarEna6kjkU0UWOHSt/7N1//lHr/qXBMVW
-         ns/zvDeTCL2R8ERgUOoe723mbSpXBm1gknoi2UCY+4WdcDZbto6EDJLDaB4vD7UxL5RY
-         Bdpd4yR3UMILnQ4OUykgbKm88LFvW705aoXmGTF61sv+B10vsLAic3pKt5DA4OD5AqZ0
-         JUmo+yJOgaMVHIzuN4aNzmMmqp/eTCIPKdeqTyeZ+G3gyO+Lu0oVt1Wgfv8UZOpeJwiz
-         /cLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXU2fzUw8LIf+BRnBrFkIy5KoPp/lcMy2Oj2miLJ3MZxnD4fTpa8/ixu9P5Z7FzGS0PGY3JdAU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwlSGKpX4yeY3C5FpAX0fQDVP/BGX5RZY98M+mj1gn8vCT3nP9I
-	VqoAfLgGCeBxQkeD6fbWenoUczraK4DfabQfKHeSkRZ5SJLhZouqyevVAugJyi4bwu0AOAgg37R
-	Zz5+9iY8CRsXU8V+8J78ai20oJx2opu3QFGWkkn4S3ZyPITgFmuxQJeNLtA==
-X-Gm-Gg: ASbGnctV0WwaRIAy7VNXGVJZVRAlg/HgH9tSx03Pv65l+ScMuiUcaTCHQBf4NA2Iumv
-	Z9FEvz0Uy2mVo5qqBCgUEApQjtAWjDlpxOKsuyjI7jamvW7RrQqKj7PySCmK6PV9e9ZCLbkgr7g
-	YPliF5HUJR/6JfvRUHXqKFowFsyXtjPRSatlMwGH8Oj829oFvZ1JxaFiwXzDlmeJRwnXGE0ELo9
-	VSKAUx3Pn3bpCrNzMv5PjyghmhAcggNVDEzG18/hsiHgYDIweryJxz3EIZ1Fv0yyQRXYg9Oo+WA
-	EfUg39BtRGql1w9qf855lOJ0diRMGIprBxghYlDYqX15r6ZsiyhSphCvFTMqNUC8y/5ofYm+aeE
-	DL1ZVVgB75Qm/u6yEI5rtPG1Lw9HLcapyNO/+uK2TbASIwqMA+KBZOmWMepb6krg=
-X-Received: by 2002:a05:600c:871a:b0:476:a25f:6a4d with SMTP id 5b1f17b1804b1-477305a6daamr3525415e9.1.1761843552949;
-        Thu, 30 Oct 2025 09:59:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGtxStmlfeeaS5Y8HP2+7UT81SENobqh4RvvVYY+Oiqs7Zmi4aE+qYv9gWYq8tm8LCZq3ZUGA==
-X-Received: by 2002:a05:600c:871a:b0:476:a25f:6a4d with SMTP id 5b1f17b1804b1-477305a6daamr3525165e9.1.1761843552439;
-        Thu, 30 Oct 2025 09:59:12 -0700 (PDT)
-Received: from rh.redhat.com (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477289e7cf5sm51104085e9.14.2025.10.30.09.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 09:59:12 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>
-Cc: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH v2 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-Date: Thu, 30 Oct 2025 17:59:05 +0100
-Message-ID: <20251030165905.73295-3-sebott@redhat.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251030165905.73295-1-sebott@redhat.com>
-References: <20251030165905.73295-1-sebott@redhat.com>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ikzeDLtH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1761844266; x=1762449066; i=markus.elfring@web.de;
+	bh=qX9jT0WVKNVZVkQFVvnvBU4twJtmXIXrEgsmm350dtE=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=ikzeDLtH8pSRBCH0hWG+C1Le3omfx0clVgdtTO203jLvQlx+eAfwBYu8Bc1oVS34
+	 0hktkE5p86DAfbQ2V/5+Jo5Z3pD2jXssGBOVJQwL+l9NPERT6J1RZK8hmi40dj9dm
+	 4GzL12PZUB/5GInBxbX9lWDALe2cnyzyCT2G6IwF++vTu8vz4eGjmE+KnscJuoKQz
+	 3auugnlKUC/7Siy+3dS3N2s5F9psYvbRCPFPjS2E8nvHJpdxj0odfLnB3CUzphIiR
+	 9rDDA6DD0GM4lRV7LROIwTOJ1Zjmsyz1fRLUKA1jsUeAyn42EVVTKMgNF/STh4JFK
+	 zNdzXfLYo2PcavIICg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.69.248]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mcpqq-1vn1yt3hKM-00jfVS; Thu, 30
+ Oct 2025 18:11:05 +0100
+Message-ID: <6e962260-5069-490a-89fb-908a4342ccd9@web.de>
+Date: Thu, 30 Oct 2025 18:11:03 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 6aMExzL1RnLhCl2sxUfTmBMHmM_CwL7PIPpBdeN8CDc_1761843553
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+User-Agent: Mozilla Thunderbird
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ David Brazdil <dbrazdil@google.com>, Joey Gouly <joey.gouly@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki Poulouse <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>
+Content-Language: en-GB, de-DE
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
+ Miaoqian Lin <linmq006@gmail.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] KVM: arm64: Use pointer from memcpy() call for assignment in
+ init_hyp_mode()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:rK4JBHFEyHfa/6DyQX45RUvGECOdzSihIRe+9DLkEhLkLcTSO9E
+ 4ZhRHSVas5MJjtsEsmpa8myg+USRJayiWVGBntVwPbXEg9XHbzfOdQMehiM8tJCmNe/VBBu
+ fwaOrY2d8hOzMztUtFxy5wInOeyd+TS8CgBDoQ9PwIgRjLbBAaWWtjcV83owIOQ7mPjvuRb
+ vFVv+nP5M/RAtuCTj1JyQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Tk+C6iJsU0c=;tAwdVkpjT2CkaeumDL0GzshrToX
+ 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
 
-Provide a kvm specific vcpu property to override the default
-(as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 30 Oct 2025 18:01:41 +0100
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- docs/system/arm/cpu-features.rst |  5 +++
- target/arm/cpu.h                 |  6 ++++
- target/arm/kvm.c                 | 60 +++++++++++++++++++++++++++++++-
- 3 files changed, 70 insertions(+), 1 deletion(-)
+A pointer was assigned to a variable. The same pointer was used for
+the destination parameter of a memcpy() call.
+This function is documented in the way that the same value is returned.
+Thus convert two separate statements into a direct variable assignment for
+the return value from a memory copy action.
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 37d5dfd15b..1d32ce0fee 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
-   the guest scheduler behavior and/or be exposed to the guest
-   userspace.
- 
-+``kvm-psci-version``
-+  Override the default (as of kernel v6.13 that would be PSCI v1.3)
-+  PSCI version emulated by the kernel. Current valid values are:
-+  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
-+
- TCG VCPU Features
- =================
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 39f2b2e54d..c2032070b7 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -981,6 +981,12 @@ struct ArchCPU {
-      */
-     uint32_t psci_version;
- 
-+    /*
-+     * Intermediate value used during property parsing.
-+     * Once finalized, the value should be read from psci_version.
-+     */
-+    uint32_t prop_psci_version;
-+
-     /* Current power state, access guarded by BQL */
-     ARMPSCIState power_state;
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 0d57081e69..c53b307b76 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
- }
- 
-+struct psci_version {
-+    uint32_t number;
-+    const char *str;
-+};
-+
-+static const struct psci_version psci_versions[] = {
-+    { QEMU_PSCI_VERSION_0_1, "0.1" },
-+    { QEMU_PSCI_VERSION_0_2, "0.2" },
-+    { QEMU_PSCI_VERSION_1_0, "1.0" },
-+    { QEMU_PSCI_VERSION_1_1, "1.1" },
-+    { QEMU_PSCI_VERSION_1_2, "1.2" },
-+    { QEMU_PSCI_VERSION_1_3, "1.3" },
-+    { -1, NULL },
-+};
-+
-+static char *kvm_get_psci_version(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    const struct psci_version *ver;
-+
-+    for (ver = psci_versions; ver->number != -1; ver++) {
-+        if (ver->number == cpu->prop_psci_version)
-+            return g_strdup(ver->str);
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
-+static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    const struct psci_version *ver;
-+
-+    for (ver = psci_versions; ver->number != -1; ver++) {
-+        if (!strcmp(value, ver->str)) {
-+            cpu->prop_psci_version = ver->number;
-+            return;
-+        }
-+    }
-+
-+    error_setg(errp, "Invalid PSCI-version value");
-+}
-+
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-@@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
-                              kvm_steal_time_set);
-     object_property_set_description(obj, "kvm-steal-time",
-                                     "Set off to disable KVM steal time.");
-+
-+    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
-+                            kvm_set_psci_version);
-+    object_property_set_description(obj, "kvm-psci-version",
-+                                    "Set PSCI version. "
-+                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
- }
- 
- bool kvm_arm_pmu_supported(void)
-@@ -1959,7 +2008,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
--    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-+    if (cpu->prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
-+        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-         cpu->psci_version = QEMU_PSCI_VERSION_0_2;
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
-     }
-@@ -1998,6 +2048,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
-+    if (cpu->prop_psci_version) {
-+        psciver = cpu->prop_psci_version;
-+        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
-+        if (ret) {
-+            error_report("PSCI version %"PRIx64" is not supported by KVM", psciver);
-+            return ret;
-+        }
-+    }
-     /*
-      * KVM reports the exact PSCI version it is implementing via a
-      * special sysreg. If it is present, use its contents to determine
--- 
-2.42.0
+The source code was transformed by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ arch/arm64/kvm/arm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 870953b4a8a7..feab88c31703 100644
+=2D-- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2600,8 +2600,8 @@ static int __init init_hyp_mode(void)
+ 			goto out_err;
+ 		}
+=20
+-		page_addr =3D page_address(page);
+-		memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size())=
+;
++		page_addr =3D memcpy(page_address(page), CHOOSE_NVHE_SYM(__per_cpu_star=
+t),
++				   nvhe_percpu_size());
+ 		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] =3D (unsigned long)page_addr=
+;
+ 	}
+=20
+=2D-=20
+2.51.1
 
