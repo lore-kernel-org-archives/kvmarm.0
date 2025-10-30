@@ -1,147 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A01227472;
-	Thu, 30 Oct 2025 16:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28166366FC8;
+	Thu, 30 Oct 2025 16:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761841231; cv=none; b=OLK/uZmYIjCJenjOFSXHNalLVCOXEgEOIKtfs9RQeqp1LsWDm1956bgbq93DP2P7IdPLJ6w3f9pq5MC2ZugC+BdxYM5OIxJxPS1d/CoHSD1d+kGjlRm8/VuOAeQWZBRL1BMaFD1UFGUUQvY3SwLNxWRdOn2mWKDF4ZFe6kHsBtw=
+	t=1761841396; cv=none; b=q0xQxi7ESVBfKngK4nPQR1V9tXY9OlJGrMyy+T+Q4Ur/e7MbTQMmBmu+dXwk0Sk/yrKyl3Ab5WPh6AzcpTCtBC5G4MLaD3UuTuv28dxIvMO/FJzZcWsUwshe4rJ772U1dA7UzamXc0UAcPT8udkBx6ZHrks5kTmF6EbjD5HEBYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761841231; c=relaxed/simple;
-	bh=JB1C63FfVtQnE2hu7z/BCXKPNzQrnk3QttrYxG2KxQw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XoCVIVMrF6/3OP7YP/HgfOo9hbYZl0IOCLreGahQ5KVlyMSDy9xKhTJQhg/RfPI+3I4moUcoE17i+qI53ezdGqwLLqPhPFXhpP4Nrll3j7Ie8w8yEEe6qwGQOynKuICpjP0aUsw0H+8xk95Dd5hlmFAQ/t1mZoCmUDs+g3UPUJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7CalIiK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761841396; c=relaxed/simple;
+	bh=4GBRLaudHRcBoz01Z4IeWd9bqYB0qBWnK2IVkXPjuoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rtZwK1Nob3qgjMIhdh52qFQDC+MWQWSAKd/S4cPqLlTCw8RezlxCRBFMDeCJvNBv5i0s+8406lsosX0vkRHfmOFdOCZe/ueshzCep+y4xqp5sqVl1H+ZqaabE9Xz2T29cuHTOH1wxH8HM0hZYCYvHSyh0upJoT86OgBDdyOzfOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+JX+u1A; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7CalIiK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7425C4CEF8;
-	Thu, 30 Oct 2025 16:20:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+JX+u1A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00425C4CEF1;
+	Thu, 30 Oct 2025 16:23:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761841230;
-	bh=JB1C63FfVtQnE2hu7z/BCXKPNzQrnk3QttrYxG2KxQw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=c7CalIiK2A8c6CCtJsIt63iRMFSFGxtTIFe7BMY8X6h4vR0W8S92AlK5KRl4C05cW
-	 uDCjy1VZUT0kn/80Z1z18NIwNWvcO7vZoOE/IzhuzoUqjKiOzLkwVseOB3/ZrAHzH2
-	 mHwSyAMbCexrImiDlbLApzwhSm+Gkxf1/qDGXGwWEJ0hCT2pmc4u6f/hekzJ8liXsi
-	 37ifxBRdU7wpW06lm4avhbtAdjL3WTTWylSIgFME5fCrRouNHpNe+A154w8pQuR/dr
-	 E50BqYnYyemZbWvTZYjNJEguoQJv0DNc8i8nfM8NU1yqwf4pn1DfyvLCctNMju1rCe
-	 xgA12toZ1QtfA==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
- communication helpers
-In-Reply-To: <20251029183306.0000485c@huawei.com>
-References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
- <20251027095602.1154418-7-aneesh.kumar@kernel.org>
- <20251029183306.0000485c@huawei.com>
-Date: Thu, 30 Oct 2025 21:50:22 +0530
-Message-ID: <yq5apla4cqex.fsf@kernel.org>
+	s=k20201202; t=1761841396;
+	bh=4GBRLaudHRcBoz01Z4IeWd9bqYB0qBWnK2IVkXPjuoE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=C+JX+u1AHdIdZKw4SyNVX0vtYYqnUKc0r1DZLb6pJ0joB9sWk/f5VrR5I/HS2HOM6
+	 ANZuNZEUkf+kqIi0ByD9yjuRgnWYZRjArzFYtRkHWM4L9ax/rBg3qRxJkOgR11X0yN
+	 Wpc5V88Gj76jEGU+0RZC1asYaoJOq0rbzpOe8/gx4ikTAuLlnjsT8QAm7z3hQf4p3j
+	 eoiw0TuwkHa8FbMbwFDzNMKXvFn2wZQ8ijgZbMnaeIJecVTeAwfYeGZHeuUeQD+tIf
+	 QnpUIrYZwDe9Z4a0k25LGe8onC99z5iNxqdv9iG95R+20Jdy7VByJq5twDzySRiI0x
+	 lYAJ1Bmjs+4qA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vEVQf-0000000139S-3rhC;
+	Thu, 30 Oct 2025 16:23:14 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: nd <nd@arm.com>,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
+Date: Thu, 30 Oct 2025 16:23:07 +0000
+Message-ID: <176184138741.2037570.6590517133486615638.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251021094358.1963807-1-sascha.bischoff@arm.com>
+References: <20251021094358.1963807-1-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, Sascha.Bischoff@arm.com, nd@arm.com, broonie@kernel.org, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+On Tue, 21 Oct 2025 09:44:09 +0000, Sascha Bischoff wrote:
+> If there is no in-kernel irqchip for a GICv3 host set all of the trap
+> bits to block all accesses. This fixes the no-vgic-v3 selftest again.
+> 
+> 
 
-> On Mon, 27 Oct 2025 15:25:56 +0530
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->
+Applied to fixes, thanks!
 
-...
+[1/1] KVM: arm64: vgic-v3: Trap all if no in-kernel irqchip
+      commit: da888524c393b4a14727e1a821bdd51313d0a2d3
 
->> +static int __do_dev_communicate(enum dev_comm_type type,
->> +				struct pci_tsm *tsm, unsigned long error_state)
->> +{
->> +	int ret;
->> +	int state;
->> +	struct rmi_dev_comm_enter *io_enter;
->> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
->> +
->> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
->> +	io_enter->resp_len = 0;
->> +	io_enter->status = RMI_DEV_COMM_NONE;
->> +
->> +	ret = ___do_dev_communicate(type, tsm);
->
-> Think up a more meaningful name.  Counting _ doesn't make for readable code.
->
+Cheers,
 
-I am not sure about this. What do you think?
-
-modified   drivers/virt/coco/arm-cca-host/rmi-da.c
-@@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
- 	return GFP_KERNEL_ACCOUNT;
- }
- 
--static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
-+static int __do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
- {
- 	gfp_t cache_alloc_flags;
- 	int ret, nbytes, cp_len;
-@@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
- 	return 0;
- }
- 
--static int __do_dev_communicate(enum dev_comm_type type,
-+static int do_dev_communicate(enum dev_comm_type type,
- 				struct pci_tsm *tsm, unsigned long error_state)
- {
- 	int ret;
-@@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
- 	io_enter->resp_len = 0;
- 	io_enter->status = RMI_DEV_COMM_NONE;
- 
--	ret = ___do_dev_communicate(type, tsm);
-+	ret = __do_dev_communicate(type, tsm);
- 	if (ret) {
- 		if (type == PDEV_COMMUNICATE)
- 			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
-@@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
- 	return state;
- }
- 
--static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
--			      unsigned long target_state,
--			      unsigned long error_state)
-+static int move_dev_to_state(enum dev_comm_type type, struct pci_tsm *tsm,
-+			     unsigned long target_state,
-+			     unsigned long error_state)
- {
- 	int state;
- 
- 	do {
--		state = __do_dev_communicate(type, tsm, error_state);
-+		state = do_dev_communicate(type, tsm, error_state);
- 
- 		if (state == target_state || state == error_state)
- 			return state;
-@@ -374,7 +374,7 @@ static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
- 
- static int do_pdev_communicate(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
- {
--	return do_dev_communicate(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
-+	return move_dev_to_state(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
- }
- 
- static int parse_certificate_chain(struct pci_tsm *tsm)
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
-
-
--aneesh
