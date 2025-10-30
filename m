@@ -1,57 +1,57 @@
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52649393DC9
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B32B393DE6
+	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 20:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855048; cv=none; b=peVwhRVLAHMsbVrYgVj8Mr9yzlutqYXwv9aAWCQftjxGQGVQAOSwA5fvmFFdy7YHkVq8KrIjVeq5YGtszJ+6gWLZrqlc+VfIBtoZLam5D3KEJSowZaa/y5lEqXGGWJcKa9dbrnL8sfcfzAe5FMXGOnEAvnaTQG3asjY2edqyM0E=
+	t=1761855050; cv=none; b=VLSOssAGJ2nTTh3tixNUMF61haadd1G2alo5q9a2wEfe5gOzYvGljagyZ5o18nuHzSNWmllCLSwneXnVeuXiCY9YgK7mUvdCa5IM6xumlzAP6Wi3pKR9eAldbRKGOOpdBHDRDWNEKTJYrN/kOm/nAjLGeKuRXLTeUY4xuWefJl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855048; c=relaxed/simple;
-	bh=YzrAcOy4kMGvZnv8LvvV5Xf4Ed5dS9yiBLT7BTZP694=;
+	s=arc-20240116; t=1761855050; c=relaxed/simple;
+	bh=4WxHGoE93VOocFQ5wN0AUJ/80sFNRiS2hdmgOFi4y/A=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WMDXuP3ThHKDQZ7kRdDXBRYqScpFl00E1ySpTAs2ksSmqzAkT/B0wW6dJvFzfCBDZi7iOIuOl6NCGW22r7wexVHuMwoZXO2AHovaKtEDTF2StCjTXMeQEpYr70NUtqjsXe2Eo84BvIyb/NEilrYtXxlIYPBa2fPStyHuWdethg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O4VMf5lN; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=ftg/wYif5ZkjWZ9vAQuHjy/4rNV4681LeCXef3eZJgn9efDiZ9i9FYR5H/0r5Um5s9cNc5xiVdAXNCkt9IZtOhuRfkE1I8rwq2rGJ59sMRvWmChH/o0ig275sx6PNfPafleiT07bAGKZgVj0/AsWWfaN65/xleiRzqh55RqBl9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nuwEaa+q; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O4VMf5lN"
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2930e2e8e7fso12232865ad.2
-        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nuwEaa+q"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b6ce15aaa99so1086943a12.0
+        for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 13:10:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761855046; x=1762459846; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1761855048; x=1762459848; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=HvkYP5K0H7bzidqYh2GUowDdUiZwtqWzbaGK7ATegJ0=;
-        b=O4VMf5lNh0c6pLk04HWOt3bjK6VK0sew4eRQHERL5+8D3fTdKryRz7cRkXS8T/G47e
-         VdX/V0KJ44uJV1TcckdqMQ2UXuNy2KpVt/osrfYyhuZoq/cMLi176wxAMhRDsEGPDdMG
-         rcdqDYv4UGYv3KjBQnStb0V9jOEHA3UA6WulQ5zs3GEZhq6Z8CbCrU65ZumFVO+wMwyO
-         ekv6gpWyhyBEXQgzKYh8Z9L1bWocmJDrMZhYVUCBQMZAO+HXXNZ1KCAdO+qMzq6PslJr
-         2hGhqPqYsl0xOYbt1O25aXAGVIwdrFcgn0GCvMbJ08im7J1zV1U8JTmJkLMHnAcamElY
-         gCXg==
+        bh=q3vUMZT0yYe1EXEiRgC8c4U03xvX09k6brWY3B4yx5I=;
+        b=nuwEaa+qH18RZiQpT3TD29LLnHgFBGAhu6HW4ruRXl0tlvPS/ilGPXMJXOPGKCSlSu
+         cwqsk6RWe3ayC3b4dTMeEvzjDmIfrdknYTN9glRZ+g7Vc4NIrla3zWo9xlfFhLbs4963
+         Tu97VPlSeaxag0kI99VKnEefuDgHhorUIT1Xgnx8YwT8ujCR/b3iWpHj8C0Sr2NPLaG4
+         0t7LWdkUNUyN6R+HN3RtP/67DXgbPGxTswHzqJlVOb3zx9XEY0OiJUakgymECXdc7YCA
+         FTswyhUo6wk9H23FxArnUR97aKJo8gjm2NDU3RGw5YzjLRWpMpAe1fh4BwbKutLcvY6s
+         lUpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761855046; x=1762459846;
+        d=1e100.net; s=20230601; t=1761855048; x=1762459848;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HvkYP5K0H7bzidqYh2GUowDdUiZwtqWzbaGK7ATegJ0=;
-        b=rTpu4ZhMbK5iRrHFVCZsdNmKaA1/FLUIshkk0XNFDZJUFap8lJ/jQZPh5R9UuztH9I
-         BGJY3Q3hgiAw0P9O6bEoPsz6Gz34/Dy6XS7bSNN98RdkOazkFGBYqo6zDH6o0iH2Yc2e
-         7BHwmCDkhogISIIIWY9b6V09ke7GEp12kAowcUYw9e8kO4WhLHyCQhy4gxs1TlxW3JEd
-         S4D6fAkGD5jeSVllDwTL5RJKjtQ84K6QzU6UZI8unXDrB6UfZQXoby8uNE9V+koib8Gy
-         6w4+BuNJDDeTsBIE6V+9guAvaOxrEks2ejro7J7MVu2QFmuo9TNhkKVIt+wm2OxHv5m8
-         zlIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDDiOaUyetrjD4d68mbw7g8SUvwT/X8Gnn4HHVBoG1LgAUdyWK06YoSLWaFbz/AUeKbDkPs50=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzDgRbkfclRjDNCPJnopqdmw737x/W1W8/KlytPlmzy3IpUFyx+
-	dGzNfdorIKo47qGWb0Gx/aHvbdDRdAn8gys5nb6JQ062dHdk620CSZgvsldwDpJVZxAjBykVoHR
-	qtXIx5Q==
-X-Google-Smtp-Source: AGHT+IHb++2Z/KelxH0n+uChReZvIH66SFbrsagpgu5Hbz52plhdUUxmf4i41V+1yu1qPk273gNABB2ooWc=
-X-Received: from plmm17.prod.google.com ([2002:a17:902:c451:b0:294:fdb9:5c0a])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:fc85:b0:24c:ed95:2725
- with SMTP id d9443c01a7336-2951a3712f9mr11351465ad.4.1761855045661; Thu, 30
- Oct 2025 13:10:45 -0700 (PDT)
+        bh=q3vUMZT0yYe1EXEiRgC8c4U03xvX09k6brWY3B4yx5I=;
+        b=bLSewPqMZt8Um/1UMb1dn3aZZYDDocdPSSPKSu5dL1bk+Mpf8LWn0qg++OnVa8ZaYC
+         uShA6ahIqyrhiZuLCYrGkWIEsPoRrIFnoR+BTyfee50SmT7mVuty5CLVs57KF/Y+BsSL
+         /hSGr/Sd0DdWEvFpwFO7I7/Xl8YAb1hKYb/gIelDTgkH+8+fctdpLRKwykypbbtbvWJu
+         EqzyUVQ0vgXYxTXeW+O2S420ejPjz2dMaeImktOBGj0YST0akymBds58eprCnbQBRHuU
+         8gogr0dJo6+cbuMPiNqnKPV+Jq+OF8Uhy1oT5ju3m1eK6pIBo7T95og7XSUs4kO0BMqu
+         HeSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/Jn7esvDFm+k/5OdH74gEoWL8bIi1zwRe1Z6Y6t7vXlomN6i/78kLzMiKg/5EAVZSLyuoBqY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy2Q/W2fkOpkKiAPXr0fXz1xV65plYmcEZ8OHUd3J3eNiRr4z2a
+	5Oio+EbZq4m4y2MITF4a53pz3JvI9Kz7mp+H28NcRSTPyIYwRaLqc0W1ZDRvpv1FbAoyrGdWHFb
+	yNUvvVg==
+X-Google-Smtp-Source: AGHT+IGMIUiQfnFXRwKgU4xakuBoSsZwl0KV10BIrj34ojpFyNKXcMvJLG+bxMBFJqWMl0yCEf0bmf3P3I0=
+X-Received: from pltj3.prod.google.com ([2002:a17:902:76c3:b0:294:8e58:7348])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:2348:b0:295:1a63:57b0
+ with SMTP id d9443c01a7336-2951a635c07mr12598385ad.23.1761855047670; Thu, 30
+ Oct 2025 13:10:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 30 Oct 2025 13:09:41 -0700
+Date: Thu, 30 Oct 2025 13:09:42 -0700
 In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251030200951.3402865-1-seanjc@google.com>
 X-Mailer: git-send-email 2.51.1.930.gacf6e81ea2-goog
-Message-ID: <20251030200951.3402865-19-seanjc@google.com>
-Subject: [PATCH v4 18/28] KVM: TDX: Combine KVM_BUG_ON + pr_tdx_error() into TDX_BUG_ON()
+Message-ID: <20251030200951.3402865-20-seanjc@google.com>
+Subject: [PATCH v4 19/28] KVM: TDX: Derive error argument names from the local
+ variable names
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -83,298 +84,43 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add TDX_BUG_ON() macros (with varying numbers of arguments) to deduplicate
-the myriad flows that do KVM_BUG_ON()/WARN_ON_ONCE() followed by a call to
-pr_tdx_error().  In addition to reducing boilerplate copy+paste code, this
-also helps ensure that KVM provides consistent handling of SEAMCALL errors.
+When printing SEAMCALL errors, use the name of the variable holding an
+error parameter instead of the register from whence it came, so that flows
+which use descriptive variable names will similarly print descriptive
+error messages.
 
-Opportunistically convert a handful of bare WARN_ON_ONCE() paths to the
-equivalent of KVM_BUG_ON(), i.e. have them terminate the VM.  If a SEAMCALL
-error is fatal enough to WARN on, it's fatal enough to terminate the TD.
-
-Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Suggested-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 110 +++++++++++++++++------------------------
- 1 file changed, 46 insertions(+), 64 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 260b569309cf..5e6f2d8b6014 100644
+index 5e6f2d8b6014..63d4609cc3bc 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -24,20 +24,32 @@
- #undef pr_fmt
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+@@ -41,14 +41,15 @@
+ #define TDX_BUG_ON(__err, __fn, __kvm)				\
+ 	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
  
--#define pr_tdx_error(__fn, __err)	\
--	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx\n", #__fn, __err)
-+#define __TDX_BUG_ON(__err, __f, __kvm, __fmt, __args...)			\
-+({										\
-+	struct kvm *_kvm = (__kvm);						\
-+	bool __ret = !!(__err);							\
-+										\
-+	if (WARN_ON_ONCE(__ret && (!_kvm || !_kvm->vm_bugged))) {		\
-+		if (_kvm)							\
-+			kvm_vm_bugged(_kvm);					\
-+		pr_err_ratelimited("SEAMCALL " __f " failed: 0x%llx" __fmt "\n",\
-+				   __err,  __args);				\
-+	}									\
-+	unlikely(__ret);							\
-+})
+-#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
+-	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
++#define TDX_BUG_ON_1(__err, __fn, a1, __kvm)			\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx", a1)
  
--#define __pr_tdx_error_N(__fn_str, __err, __fmt, ...)		\
--	pr_err_ratelimited("SEAMCALL " __fn_str " failed: 0x%llx, " __fmt,  __err,  __VA_ARGS__)
-+#define TDX_BUG_ON(__err, __fn, __kvm)				\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, "%s", "")
+-#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
+-	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, __rdx)
++#define TDX_BUG_ON_2(__err, __fn, a1, a2, __kvm)	\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx, " #a2 " 0x%llx", a1, a2)
  
--#define pr_tdx_error_1(__fn, __err, __rcx)		\
--	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx\n", __rcx)
-+#define TDX_BUG_ON_1(__err, __fn, __rcx, __kvm)			\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx", __rcx)
+-#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
+-	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%llx", __rcx, __rdx, __r8)
++#define TDX_BUG_ON_3(__err, __fn, a1, a2, a3, __kvm)	\
++	__TDX_BUG_ON(__err, #__fn, __kvm, ", " #a1 " 0x%llx, " #a2 ", 0x%llx, " #a3 " 0x%llx", \
++		     a1, a2, a3)
  
--#define pr_tdx_error_2(__fn, __err, __rcx, __rdx)	\
--	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx\n", __rcx, __rdx)
-+#define TDX_BUG_ON_2(__err, __fn, __rcx, __rdx, __kvm)		\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx", __rcx, __rdx)
-+
-+#define TDX_BUG_ON_3(__err, __fn, __rcx, __rdx, __r8, __kvm)	\
-+	__TDX_BUG_ON(__err, #__fn, __kvm, ", rcx 0x%llx, rdx 0x%llx, r8 0x%llx", __rcx, __rdx, __r8)
- 
--#define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
--	__pr_tdx_error_N(#__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n", __rcx, __rdx, __r8)
  
  bool enable_tdx __ro_after_init;
- module_param_named(tdx, enable_tdx, bool, 0444);
-@@ -313,10 +325,9 @@ static int __tdx_reclaim_page(struct page *page)
- 	 * before the HKID is released and control pages have also been
- 	 * released at this point, so there is no possibility of contention.
- 	 */
--	if (WARN_ON_ONCE(err)) {
--		pr_tdx_error_3(TDH_PHYMEM_PAGE_RECLAIM, err, rcx, rdx, r8);
-+	if (TDX_BUG_ON_3(err, TDH_PHYMEM_PAGE_RECLAIM, rcx, rdx, r8, NULL))
- 		return -EIO;
--	}
-+
- 	return 0;
- }
- 
-@@ -404,8 +415,8 @@ static void tdx_flush_vp_on_cpu(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	smp_call_function_single(cpu, tdx_flush_vp, &arg, 1);
--	if (KVM_BUG_ON(arg.err, vcpu->kvm))
--		pr_tdx_error(TDH_VP_FLUSH, arg.err);
-+
-+	TDX_BUG_ON(arg.err, TDH_VP_FLUSH, vcpu->kvm);
- }
- 
- void tdx_disable_virtualization_cpu(void)
-@@ -464,8 +475,7 @@ static void smp_func_do_phymem_cache_wb(void *unused)
- 	}
- 
- out:
--	if (WARN_ON_ONCE(err))
--		pr_tdx_error(TDH_PHYMEM_CACHE_WB, err);
-+	TDX_BUG_ON(err, TDH_PHYMEM_CACHE_WB, NULL);
- }
- 
- void tdx_mmu_release_hkid(struct kvm *kvm)
-@@ -504,8 +514,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 	err = tdh_mng_vpflushdone(&kvm_tdx->td);
- 	if (err == TDX_FLUSHVP_NOT_DONE)
- 		goto out;
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error(TDH_MNG_VPFLUSHDONE, err);
-+	if (TDX_BUG_ON(err, TDH_MNG_VPFLUSHDONE, kvm)) {
- 		pr_err("tdh_mng_vpflushdone() failed. HKID %d is leaked.\n",
- 		       kvm_tdx->hkid);
- 		goto out;
-@@ -528,8 +537,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
- 	 * tdh_mng_key_freeid() will fail.
- 	 */
- 	err = tdh_mng_key_freeid(&kvm_tdx->td);
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error(TDH_MNG_KEY_FREEID, err);
-+	if (TDX_BUG_ON(err, TDH_MNG_KEY_FREEID, kvm)) {
- 		pr_err("tdh_mng_key_freeid() failed. HKID %d is leaked.\n",
- 		       kvm_tdx->hkid);
- 	} else {
-@@ -580,10 +588,9 @@ static void tdx_reclaim_td_control_pages(struct kvm *kvm)
- 	 * when it is reclaiming TDCS).
- 	 */
- 	err = tdh_phymem_page_wbinvd_tdr(&kvm_tdx->td);
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
-+	if (TDX_BUG_ON(err, TDH_PHYMEM_PAGE_WBINVD, kvm))
- 		return;
--	}
-+
- 	tdx_quirk_reset_page(kvm_tdx->td.tdr_page);
- 
- 	__free_page(kvm_tdx->td.tdr_page);
-@@ -606,11 +613,8 @@ static int tdx_do_tdh_mng_key_config(void *param)
- 
- 	/* TDX_RND_NO_ENTROPY related retries are handled by sc_retry() */
- 	err = tdh_mng_key_config(&kvm_tdx->td);
--
--	if (KVM_BUG_ON(err, &kvm_tdx->kvm)) {
--		pr_tdx_error(TDH_MNG_KEY_CONFIG, err);
-+	if (TDX_BUG_ON(err, TDH_MNG_KEY_CONFIG, &kvm_tdx->kvm))
- 		return -EIO;
--	}
- 
- 	return 0;
- }
-@@ -1601,10 +1605,8 @@ static int tdx_mem_page_add(struct kvm *kvm, gfn_t gfn, enum pg_level level,
- 	if (unlikely(tdx_operand_busy(err)))
- 		return -EBUSY;
- 
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error_2(TDH_MEM_PAGE_ADD, err, entry, level_state);
-+	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_ADD, entry, level_state, kvm))
- 		return -EIO;
--	}
- 
- 	return 0;
- }
-@@ -1623,10 +1625,8 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
- 	if (unlikely(tdx_operand_busy(err)))
- 		return -EBUSY;
- 
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error_2(TDH_MEM_PAGE_AUG, err, entry, level_state);
-+	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_AUG, entry, level_state, kvm))
- 		return -EIO;
--	}
- 
- 	return 0;
- }
-@@ -1675,10 +1675,8 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
- 	if (unlikely(tdx_operand_busy(err)))
- 		return -EBUSY;
- 
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error_2(TDH_MEM_SEPT_ADD, err, entry, level_state);
-+	if (TDX_BUG_ON_2(err, TDH_MEM_SEPT_ADD, entry, level_state, kvm))
- 		return -EIO;
--	}
- 
- 	return 0;
- }
-@@ -1726,8 +1724,7 @@ static void tdx_track(struct kvm *kvm)
- 		tdx_no_vcpus_enter_stop(kvm);
- 	}
- 
--	if (KVM_BUG_ON(err, kvm))
--		pr_tdx_error(TDH_MEM_TRACK, err);
-+	TDX_BUG_ON(err, TDH_MEM_TRACK, kvm);
- 
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_OUTSIDE_GUEST_MODE);
- }
-@@ -1784,10 +1781,8 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 		tdx_no_vcpus_enter_stop(kvm);
- 	}
- 
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error_2(TDH_MEM_RANGE_BLOCK, err, entry, level_state);
-+	if (TDX_BUG_ON_2(err, TDH_MEM_RANGE_BLOCK, entry, level_state, kvm))
- 		return;
--	}
- 
- 	/*
- 	 * TDX requires TLB tracking before dropping private page.  Do
-@@ -1814,16 +1809,12 @@ static void tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
- 		tdx_no_vcpus_enter_stop(kvm);
- 	}
- 
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error_2(TDH_MEM_PAGE_REMOVE, err, entry, level_state);
-+	if (TDX_BUG_ON_2(err, TDH_MEM_PAGE_REMOVE, entry, level_state, kvm))
- 		return;
--	}
- 
- 	err = tdh_phymem_page_wbinvd_hkid((u16)kvm_tdx->hkid, page);
--	if (KVM_BUG_ON(err, kvm)) {
--		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
-+	if (TDX_BUG_ON(err, TDH_PHYMEM_PAGE_WBINVD, kvm))
- 		return;
--	}
- 
- 	tdx_quirk_reset_page(page);
- }
-@@ -2463,8 +2454,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 		goto free_packages;
- 	}
- 
--	if (WARN_ON_ONCE(err)) {
--		pr_tdx_error(TDH_MNG_CREATE, err);
-+	if (TDX_BUG_ON(err, TDH_MNG_CREATE, kvm)) {
- 		ret = -EIO;
- 		goto free_packages;
- 	}
-@@ -2505,8 +2495,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 			ret = -EAGAIN;
- 			goto teardown;
- 		}
--		if (WARN_ON_ONCE(err)) {
--			pr_tdx_error(TDH_MNG_ADDCX, err);
-+		if (TDX_BUG_ON(err, TDH_MNG_ADDCX, kvm)) {
- 			ret = -EIO;
- 			goto teardown;
- 		}
-@@ -2523,8 +2512,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
- 		*seamcall_err = err;
- 		ret = -EINVAL;
- 		goto teardown;
--	} else if (WARN_ON_ONCE(err)) {
--		pr_tdx_error_1(TDH_MNG_INIT, err, rcx);
-+	} else if (TDX_BUG_ON_1(err, TDH_MNG_INIT, rcx, kvm)) {
- 		ret = -EIO;
- 		goto teardown;
- 	}
-@@ -2792,10 +2780,8 @@ static int tdx_td_finalize(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
- 	cmd->hw_error = tdh_mr_finalize(&kvm_tdx->td);
- 	if (tdx_operand_busy(cmd->hw_error))
- 		return -EBUSY;
--	if (KVM_BUG_ON(cmd->hw_error, kvm)) {
--		pr_tdx_error(TDH_MR_FINALIZE, cmd->hw_error);
-+	if (TDX_BUG_ON(cmd->hw_error, TDH_MR_FINALIZE, kvm))
- 		return -EIO;
--	}
- 
- 	kvm_tdx->state = TD_STATE_RUNNABLE;
- 	/* TD_STATE_RUNNABLE must be set before 'pre_fault_allowed' */
-@@ -2882,16 +2868,14 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	}
- 
- 	err = tdh_vp_create(&kvm_tdx->td, &tdx->vp);
--	if (KVM_BUG_ON(err, vcpu->kvm)) {
-+	if (TDX_BUG_ON(err, TDH_VP_CREATE, vcpu->kvm)) {
- 		ret = -EIO;
--		pr_tdx_error(TDH_VP_CREATE, err);
- 		goto free_tdcx;
- 	}
- 
- 	for (i = 0; i < kvm_tdx->td.tdcx_nr_pages; i++) {
- 		err = tdh_vp_addcx(&tdx->vp, tdx->vp.tdcx_pages[i]);
--		if (KVM_BUG_ON(err, vcpu->kvm)) {
--			pr_tdx_error(TDH_VP_ADDCX, err);
-+		if (TDX_BUG_ON(err, TDH_VP_ADDCX, vcpu->kvm)) {
- 			/*
- 			 * Pages already added are reclaimed by the vcpu_free
- 			 * method, but the rest are freed here.
-@@ -2905,10 +2889,8 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
- 	}
- 
- 	err = tdh_vp_init(&tdx->vp, vcpu_rcx, vcpu->vcpu_id);
--	if (KVM_BUG_ON(err, vcpu->kvm)) {
--		pr_tdx_error(TDH_VP_INIT, err);
-+	if (TDX_BUG_ON(err, TDH_VP_INIT, vcpu->kvm))
- 		return -EIO;
--	}
- 
- 	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 
 -- 
 2.51.1.930.gacf6e81ea2-goog
 
