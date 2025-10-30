@@ -1,87 +1,123 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DE3277C96
-	for <kvmarm@lists.linux.dev>; Thu, 30 Oct 2025 17:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76401F4CB7;
+	Thu, 30 Oct 2025 18:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761846602; cv=none; b=EJzYUEHsw6Ifhde54pHRToZCNG6UXIydC6IjhvyTdAa9E1Jzs9CByyU5rbYCMo9Hgkk9HlIhn9JKMV4HCT+mnTnjyRmQ34GaozG5IvIevIM9ZfH4rnDNAlk/NkbfWBqsazx5azKW0gCkOr0nlfEda2llGjOW1+ouR9CfVTtm2B0=
+	t=1761847381; cv=none; b=NiRpbleb9Pvm2tZEM1FYb/3t+ZS0EQSGIho1qKbJzxRVO1y0sRMFf/wZPgpopAYxIKwZxkNIIaZwnXCs+gWDm1kxkhJ0uGmn58RCrTa1tTFt5ZbGD5uXXdOOhhqaySjp0VSjnVxoJSJ40qSg22X1YkR8WRoMvCAUUDVtyLBz5Rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761846602; c=relaxed/simple;
-	bh=PmlVtuLRMUGlPaXNotA+Y+vL38gowXndZOXkWJxEguk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFMsH76KWwkAPPtRg/86U+CzU1E8toFq788xKl0Q+ItoVMrVRSZPvVL+HkGnVTa7sYs9RgG4fbTM5ASR7P6mhS57Ep0p+guEYpbMoqfBN2yvPBpkooLUtjoWYSdWQjuMtLFTXxltk5JWCeVYgz8ute12iUMoUJR39azlJ5dBRQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 37EDC2C40;
-	Thu, 30 Oct 2025 10:49:51 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 01E493F673;
-	Thu, 30 Oct 2025 10:49:56 -0700 (PDT)
-Date: Thu, 30 Oct 2025 17:49:51 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Brazdil <dbrazdil@google.com>,
-	Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki Poulouse <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org, Miaoqian Lin <linmq006@gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Use pointer from memcpy() call for
- assignment in init_hyp_mode()
-Message-ID: <aQOlPy7W6xljdkJW@J2N7QTR9R3>
-References: <6e962260-5069-490a-89fb-908a4342ccd9@web.de>
+	s=arc-20240116; t=1761847381; c=relaxed/simple;
+	bh=vDwlv2wIxuifa4WMIkW8aM4STmw9u47pct+PmwEZY+4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qInwuOr9Cq66g96GkDwwZej5MC4jEjh3gyPsRFAZ84549h4GDhVY948tRhk2DG6Csm0c2otrvN6Bcm8XpvFtu+nV+ZKGjRgLjV/YESrR0pHP6EyV8cinObLWydUOtrWOcu404WCSS/LDrgqzvMrwr4SXnI4g9wv8+MDrFhh2gq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=nmfm7qtR; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="nmfm7qtR"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=iVJW4ud2NJIGSMWzm7QTw7Epgh70TDeonMG9NVC7r2Y=;
+	b=nmfm7qtRgkgqZWSA0nyj2JrIW6MH4mgXSef0YuL7xH+InTFo8F5qFOnOM9rYTyDebXqOspdIg
+	t5lhsgFIsuR7azpzwNEUy4uDutjC3BQDhk1w4SBx2akG1GyGKu+Uiu8ZAdaulCoc3hy3q7gSpqm
+	RAVZxmP8SFzDA7PTqRVU0yU=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.35])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cyBlD2WbQz1vnvZ;
+	Fri, 31 Oct 2025 02:02:00 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cyBgd1kHkz6M4qd;
+	Fri, 31 Oct 2025 01:58:53 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id C9E841402F5;
+	Fri, 31 Oct 2025 02:02:45 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
+ 2025 18:02:44 +0000
+Date: Thu, 30 Oct 2025 18:02:43 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
+	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
+	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
+ communication helpers
+Message-ID: <20251030180243.0000751b@huawei.com>
+In-Reply-To: <yq5asef0cwos.fsf@kernel.org>
+References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
+	<20251027095602.1154418-7-aneesh.kumar@kernel.org>
+	<20251029183306.0000485c@huawei.com>
+	<yq5asef0cwos.fsf@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e962260-5069-490a-89fb-908a4342ccd9@web.de>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Thu, Oct 30, 2025 at 06:11:03PM +0100, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Thu, 30 Oct 2025 18:01:41 +0100
+On Thu, 30 Oct 2025 19:34:51 +0530
+"Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+
+> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
 > 
-> A pointer was assigned to a variable. The same pointer was used for
-> the destination parameter of a memcpy() call.
-> This function is documented in the way that the same value is returned.
-> Thus convert two separate statements into a direct variable assignment for
-> the return value from a memory copy action.
+> > On Mon, 27 Oct 2025 15:25:56 +0530
+> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> >  
 > 
-> The source code was transformed by using the Coccinelle software.
+> ...
 > 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->  arch/arm64/kvm/arm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> >> +void pdev_communicate_work(struct work_struct *work)
+> >> +{
+> >> +	unsigned long state;
+> >> +	struct pci_tsm *tsm;
+> >> +	struct dev_comm_work *setup_work;
+> >> +	struct cca_host_pf0_dsc *pf0_dsc;
+> >> +
+> >> +	setup_work = container_of(work, struct dev_comm_work, work);
+> >> +	tsm = setup_work->tsm;
+> >> +	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);  
+> > Could combine these 3 with declarations for shorter code without much
+> > change to readability.
+> >  
 > 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 870953b4a8a7..feab88c31703 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2600,8 +2600,8 @@ static int __init init_hyp_mode(void)
->  			goto out_err;
->  		}
->  
-> -		page_addr = page_address(page);
-> -		memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size());
-> +		page_addr = memcpy(page_address(page), CHOOSE_NVHE_SYM(__per_cpu_start),
-> +				   nvhe_percpu_size());
+> Not sure about this.
+> 
+>  static void pdev_communicate_work(struct work_struct *work)
+>  {
+>  	unsigned long state;
+> -	struct pci_tsm *tsm;
+> -	struct dev_comm_work *setup_work;
+> -	struct cca_host_pf0_dsc *pf0_dsc;
+> -
+> -	setup_work = container_of(work, struct dev_comm_work, work);
+> -	tsm = setup_work->tsm;
+> -	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+> +	struct dev_comm_work *setup_work = container_of(work,
+> +							struct dev_comm_work,
+> +							work);
+> +	struct pci_tsm *tsm = setup_work->tsm;
+> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+I'd wrap it a bit differently.  
 
-This change makes the code harder to read, and harder to modify. It
-saves no space.
+	struct dev_comm_work *setup_work =
+		container_of(work, struct dev_comm_work, work);
+	struct pci_tsm *tsm = setup_work->tsm;
+	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
 
-As Dan said [1]:
+Entirely up to you. Hence the could part of the comment.
 
-| No one will thank you for making these changes...  :(  Please don't do
-| it.
+Jonathan
 
-[1] https://lore.kernel.org/lkml/aQNsecHJSO2U68Fc@stanley.mountain/
 
-Mark.
