@@ -1,114 +1,216 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD372868B0;
-	Thu, 30 Oct 2025 18:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4D124111D;
+	Thu, 30 Oct 2025 18:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761847649; cv=none; b=YBuaQxQHEZAVoAbx7pR31LC+/dj9PjkOfofteMju48vMuh++mLDBqSumVp14SRmnyO1BN9YKqmk+LujCAFquFocWAmvYbHMUWc1EYxpvOf9hUlbGjx/xnVH4kJsSbDKwduf4BYnuBzy20NbZar2CqMO3tM9OCXDcKFCewq8hjAk=
+	t=1761847985; cv=none; b=CEUjnPpq7s17EeIo1MjLU6u+E9hAokOHu97IWUGSPaN3h0fWHLbzNFZpoWud/S41ljwdCprbbunhDj0wEfVoRrVVKdY7lQ7WwtmpghcALFDx6TVTbh84bbLAqGFokfAFscmOoKMoyUq/TSl7AuMD09hXTW9IEWwI5EnXmSNXCXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761847649; c=relaxed/simple;
-	bh=sRQqD17ahn+kzZRYxFkDmApRJ9iKc38vVieFyY53S8Y=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rtI/Ro6uWBmWReMD/5OoX2FahqU9KMI00Lq2HABHdd5tjKLTjV4VbJM6YdZ2WUGZBjSJdrbJW2yWw2Y+lOk2SMJnfSXwPXWbH8b3J0bmp8sHGvdDwRq2ozk2n95PHBOuPKQEFXT7uIkJAHFI7LXHBnZQY6p3yIo2MLDjhZePLWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CpCNCqbA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761847985; c=relaxed/simple;
+	bh=pIzWpuUD6jTHhXtQ9pix8ZTiK8iGIjhuGEfFdWbZ4A0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TX0bv70K8vIhEAeGqbLVXjACFSWqmlC+OS6mxZS8SDXLQOSmAPEFKgeCN9eStP+YvSZeQUvKXHN0kMoKpB0ZxKUV7e8bx9xgzEihfGmZC4IZ1hoWBkZRbciC46/9Gfh/jbhFynZnVjqb8Zyc51AkDd58ewjUfWLyKxazONK9wg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=PBft4wRw; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CpCNCqbA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962C0C19423;
-	Thu, 30 Oct 2025 18:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761847648;
-	bh=sRQqD17ahn+kzZRYxFkDmApRJ9iKc38vVieFyY53S8Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CpCNCqbA4a4j8mKlyZlwnNktYacA2ZxPIrdQ2Q/UZ/+gorskwm1G8Jx0KYF46y3pK
-	 Rrp/vwuXr2oI/aGvKyK8JicqSrMnvy9NOuEUnDvNPQuW6VEoh5QCT9FUdSYY4VrpkA
-	 3tO5zrlyJ/90umHZ0iyyjZ+CmaR64giYcJePFLAD9+g0FLXCu+dIhI0u7Kv+drIB29
-	 nwLDUcWCsDb2RNZO5oRiy4En8Unpx23XjNmHIzs3YkbRMfo+8JhOnz/3v3mAYycpTe
-	 2+DeBR7V1j2HpAVet/vPrMPhZCy/NdwCsDq0E+QtMU+ZL4Zmld+EZ3DMCo26H8/KnG
-	 Fp6Ghcb9+dkzA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vEX3W-000000015F6-0bSG;
-	Thu, 30 Oct 2025 18:07:26 +0000
-Date: Thu, 30 Oct 2025 18:07:25 +0000
-Message-ID: <86o6pouuua.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Andrew Walbran <qwandor@google.com>,
-	Ayrton Munoz <ayrton@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Per Larsen <perlarsen@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Suzuki Poulouse <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	Miaoqian Lin <linmq006@gmail.com>
-Subject: Re: [PATCH] KVM: arm64: FFA: Use pointers from memcpy() calls for assignments in three functions
-In-Reply-To: <cb3bd42f-4fec-4300-8875-b6861716f274@web.de>
-References: <cb3bd42f-4fec-4300-8875-b6861716f274@web.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="PBft4wRw"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=KoPfinDgMh/viJR1rwPHmW2T7nZ+bfwoT7P3YyntFzk=;
+	b=PBft4wRwLg39bBAgVSj36UOzPPe/O9EoGyhJslgGOi40Y3vNYLCFC9GgokD8mTMA/Ge1XOGV4
+	5PnOWvAM4j1feyI1HeQb7oLZiWhOGbgSFBXi84/HE1rqV/h9oeJC1EYWXM9ecjRhEdqdom+sOal
+	EM8Kdw6B0ludsjPU4Zl5jbc=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.37])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4cyBzc0tz2z1P6n1;
+	Fri, 31 Oct 2025 02:12:43 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4cyBvY0qvDz6L57Q;
+	Fri, 31 Oct 2025 02:09:13 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 37ABF1402F5;
+	Fri, 31 Oct 2025 02:12:49 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
+ 2025 18:12:48 +0000
+Date: Thu, 30 Oct 2025 18:12:46 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
+	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
+	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
+ communication helpers
+Message-ID: <20251030181246.00006328@huawei.com>
+In-Reply-To: <yq5apla4cqex.fsf@kernel.org>
+References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
+	<20251027095602.1154418-7-aneesh.kumar@kernel.org>
+	<20251029183306.0000485c@huawei.com>
+	<yq5apla4cqex.fsf@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Markus.Elfring@web.de, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, qwandor@google.com, ayrton@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, oliver.upton@linux.dev, perlarsen@google.com, qperret@google.com, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, linmq006@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Thu, 30 Oct 2025 17:40:39 +0000,
-Markus Elfring <Markus.Elfring@web.de> wrote:
+On Thu, 30 Oct 2025 21:50:22 +0530
+"Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
+
+> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
 > 
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Thu, 30 Oct 2025 18:25:55 +0100
+> > On Mon, 27 Oct 2025 15:25:56 +0530
+> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+> >  
 > 
-> A pointer was assigned to a variable in three function implementations.
-> The same pointer was used for the destination parameter of a memcpy() call.
-> This function is documented in the way that the same value is returned.
-> Thus convert separate statements into direct variable assignments for
-> the return values from memory copy actions.
+> ...
 > 
-> The source code was transformed by using the Coccinelle software.
+> >> +static int __do_dev_communicate(enum dev_comm_type type,
+> >> +				struct pci_tsm *tsm, unsigned long error_state)
+> >> +{
+> >> +	int ret;
+> >> +	int state;
+> >> +	struct rmi_dev_comm_enter *io_enter;
+> >> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+> >> +
+> >> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
+> >> +	io_enter->resp_len = 0;
+> >> +	io_enter->status = RMI_DEV_COMM_NONE;
+> >> +
+> >> +	ret = ___do_dev_communicate(type, tsm);  
+> >
+> > Think up a more meaningful name.  Counting _ doesn't make for readable code.
+> >  
 > 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+> I am not sure about this. What do you think?
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 4e16f9b96f63..4820a9e96f80 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -431,8 +431,7 @@ static void do_ffa_mem_frag_tx(struct arm_smccc_1_2_regs *res,
->  	if (!host_buffers.tx)
->  		goto out_unlock;
+> modified   drivers/virt/coco/arm-cca-host/rmi-da.c
+> @@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
+>  	return GFP_KERNEL_ACCOUNT;
+>  }
 >  
-> -	buf = hyp_buffers.tx;
-> -	memcpy(buf, host_buffers.tx, fraglen);
-> +	buf = memcpy(hyp_buffers.tx, host_buffers.tx, fraglen);
->  	nr_ranges = fraglen / sizeof(*buf);
+> -static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+> +static int __do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+>  {
+>  	gfp_t cache_alloc_flags;
+>  	int ret, nbytes, cp_len;
+> @@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+>  	return 0;
+>  }
+>  
+> -static int __do_dev_communicate(enum dev_comm_type type,
+> +static int do_dev_communicate(enum dev_comm_type type,
+>  				struct pci_tsm *tsm, unsigned long error_state)
+>  {
+>  	int ret;
+> @@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
+>  	io_enter->resp_len = 0;
+>  	io_enter->status = RMI_DEV_COMM_NONE;
+>  
+> -	ret = ___do_dev_communicate(type, tsm);
+> +	ret = __do_dev_communicate(type, tsm);
+>  	if (ret) {
+>  		if (type == PDEV_COMMUNICATE)
+>  			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+> @@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
+>  	return state;
+>  }
+>  
+> -static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+> -			      unsigned long target_state,
+> -			      unsigned long error_state)
+> +static int move_dev_to_state(enum dev_comm_type type, struct pci_tsm *tsm,
 
-This is unreadable. And even if memcpy() behaves has you describe, you
-are breaking a pattern that people are relying on.
+Naming is always tricky.  Not sure why this name is appropriate given it's definitely
+still related to dev_communicate.
 
-I'm not planning to take anything of the sort.
+Maybe just squash do_dev_communicate and __do_dev_coummnicate.
+Slightly long lines will be the result but not too bad.
+I haven't checked what it ends up as after the whole series though
+so maybe it doesn't work out.
 
-Thanks,
+static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+			      unsigned long target_state,
+			      unsigned long error_state)
+{
+	
 
-	M.
+	do {
+		int state, ret;
+		struct rmi_dev_comm_enter *io_enter;
+		struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
 
--- 
-Without deviation from the norm, progress is not possible.
+		io_enter = &pf0_dsc->comm_data.io_params->enter;
+		io_enter->resp_len = 0;
+		io_enter->status = RMI_DEV_COMM_NONE;
+
+		ret = ___do_dev_communicate(type, tsm);
+//renamed
+
+		if (ret) {
+			if (type == PDEV_COMMUNICATE)
+				rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+
+			state = error_state;
+		} else {
+			/*
+			 * Some device communication error will transition the
+			 * device to error state. Report that.
+			 */
+			if (type == PDEV_COMMUNICATE)
+				ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
+							 (enum rmi_pdev_state *)&state);
+			if (ret)
+				state = error_state;
+		}
+	
+		if (state == error_state) {
+			pci_err(tsm->pdev, "device communication error\n");
+			return state;
+		}
+		if (state == target_state)
+			return state;
+	} while (1);
+}
+Jonathan
+
+> +			     unsigned long target_state,
+> +			     unsigned long error_state)
+>  {
+>  	int state;
+>  
+>  	do {
+> -		state = __do_dev_communicate(type, tsm, error_state);
+> +		state = do_dev_communicate(type, tsm, error_state);
+>  
+>  		if (state == target_state || state == error_state)
+>  			return state;
+> @@ -374,7 +374,7 @@ static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+>  
+>  static int do_pdev_communicate(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
+>  {
+> -	return do_dev_communicate(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
+> +	return move_dev_to_state(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
+>  }
+>  
+>  static int parse_certificate_chain(struct pci_tsm *tsm)
+> 
+> 
+> 
+> 
+> -aneesh
+> 
+
