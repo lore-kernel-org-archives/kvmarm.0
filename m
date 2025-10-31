@@ -1,235 +1,94 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3948834846E;
-	Fri, 31 Oct 2025 12:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C532FD7D6
+	for <kvmarm@lists.linux.dev>; Fri, 31 Oct 2025 17:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761912463; cv=none; b=q3r+YnosfoCkQ6UGgwoAkeRUQatlCTkjEZW3k2COj9C4g8Fv683JG1QxRqHlimoILlQNjeS778Y6zO+SRABCESiI8lOLBg+NmVsMH5TTkUCk+v6N8M2olc8vIW3UgFZVveTQjJd+tplar2/tV28d8jwVdqB55s6ZkXfLwg0r9HY=
+	t=1761930725; cv=none; b=VzWtV0N1h5jvgJF5ZkMuOrThU13sJ2Z+4KCqiCdVMzTxdF3X32JhYk5z4CcvIECbp+vAYtP7QClxyWbX6CLC7qJIozFyjXQXSJaxYR2407iM9NMDK41zZ5ol2rGcEEOMJYZPgbk4vWT+xAZ23ChDFg5UcSaGDDw/JURZU2CP+Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761912463; c=relaxed/simple;
-	bh=axhskxiBo2zPW17sTIBm+Goy9FupOra+dPrV5xh2Rh8=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uI4wqx2NIQ+KpWg3Z4fNULN6kQ8ojSQtj5R7xjkzhCzwxRg7flDXAY6GTFYbvUUaojI+09ebwnzZjzDe+tLF0hH5bWAaaopn2QIWaG9D21udUrKxhaP2Lx+/hBb5Cky9MzDJpHZ0wLZMOetMsewdPgJxZ9VzbKiI7l9fIcHdVSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=N6Zj/egf; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1761930725; c=relaxed/simple;
+	bh=2Py81n9yIbaq9LVne2Z6xEysNPQOVrfItEqxp5YA7aE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QB21nf9sCsfPBnz3boc+yupoG2ZrqaeRCG5jVZ1XA6Gm3DLz1WhhG3kl/vqlYcH7Qcy78g3YDAvdFcJIVZYDeOI5pA2ua58cC8gu5niYmWtYlBk/VNdUlA6wgWeY1aTanFjvuTc/8KsKllIGzpSQWR53iC0RVbdmHeDe2rVoSL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sHDU/8JR; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="N6Zj/egf"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=9TolKU4YCUfsB69h9PmW4OYgivzsAp8onhB9iwqpHl4=;
-	b=N6Zj/egfxBgO1FKnSEx/io0wWg+UUnAHCKtrPJVhD/6OGp0sXP5jRPQkmReGL76/jRUaq/GZD
-	xDZdkYV817aO4vELHUBJKtikjIHGG6ThsXVno/85oMnEnMRk6Iwsl2G1KWTzYSTjO+zB+I/6Atb
-	EKwZ8rfTCG4sqVH96LpOU3I=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4cyfpt1qxFz1vnNV;
-	Fri, 31 Oct 2025 20:06:46 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4cyfph13qYzHnGcf;
-	Fri, 31 Oct 2025 12:06:36 +0000 (UTC)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 875C01402E9;
-	Fri, 31 Oct 2025 20:07:32 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 31 Oct
- 2025 12:07:31 +0000
-Date: Fri, 31 Oct 2025 12:07:30 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
- communication helpers
-Message-ID: <20251031120730.00003758@huawei.com>
-In-Reply-To: <yq5ams57cx9q.fsf@kernel.org>
-References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
-	<20251027095602.1154418-7-aneesh.kumar@kernel.org>
-	<20251029183306.0000485c@huawei.com>
-	<yq5apla4cqex.fsf@kernel.org>
-	<20251030181246.00006328@huawei.com>
-	<yq5ams57cx9q.fsf@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sHDU/8JR"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34082c48b2bso1541850a91.1
+        for <kvmarm@lists.linux.dev>; Fri, 31 Oct 2025 10:12:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761930723; x=1762535523; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HjXjY8ls4xQvqV6pquPYuHe7QqNVj5FW0YEflavTuCM=;
+        b=sHDU/8JRRjU8crK8EZBgCp/Purmdputee6iKZSKOEkPaJlVQVksZYRnrOgjX1P/3VZ
+         u9ACChdjQXdDMHGdFD/E/91Wcpf74VTdffhc8VpXAS7McjCGIHDbAw0mM43g7ILmhXXD
+         RuZ5iFHy0HUX6NCXHoJMcre2MCpzPX7cVTR3XLx1Hx0Kje6Ir8/3VoafpfO9edYgCqyF
+         pl8NcFUF8ZHw8FhuI55tOAH1mnzyIUpfq11ccUQ8SMn9r1az73JEEbLYRvMXec6ocbhd
+         RO7tIAMhM5zTLPZ5u+bf47qAPlzBokZQVUmWpL3aKMhMwAYWru8ALgfYQa5gXFDTXYHc
+         Cw+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761930723; x=1762535523;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HjXjY8ls4xQvqV6pquPYuHe7QqNVj5FW0YEflavTuCM=;
+        b=NL671f0lLl8MMnTESo8yhl93MUgt5Whg/H7iQObMb5yu305JD6smFfcV1YNYTAnmXK
+         1tcMN9dUseDnzaSYtYfK2Dlm+oKc4dBbYdI/A1/03gtErEvqh98IoEEteEQyHd8/RvLR
+         AJ9fFMGCjBex8M4/A57ismPS+jU2Z6+Mt2/E4QSNJzCqTelhR2343AgzgoPwzg7YPWww
+         /IicGvqdkLrljdpoAOGikRZtfkqJfMMUzMsQa/594Yy+3pjRFqV0jugpvMBG9ezV7yjX
+         M8TsQB2AYbQVUYn97fx1q/0laqoorrfpRmSmenorm4oh4VpEcl3SQ9Clqf4o7cLR92vU
+         6B3g==
+X-Forwarded-Encrypted: i=1; AJvYcCWZpQY46d/jhZVNOlngzDYzWnZ/70FHWVga0U+8Vixr4DBxiXAovRYjYnUJmhs8WgeCN20Wymo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyDN6yb5bH5vQqizRXBu1eQ82qllaP5JMIap0UsaZvj7yvxxhg1
+	iCYZPmgfQS9ltOImlBZGZ+gd21zG325F3r3knNNaCJvUvWJ0t8yYMX8Pd6nEKYujGCDs2kkikHB
+	jBoR00Q==
+X-Google-Smtp-Source: AGHT+IGfSgMUQo+5u2P6PetuRGaKK3ywl60OSkXvDDKeMxjcSsBTGVvS+p3TiopL8XWw5d9McqxPGzj/wX4=
+X-Received: from pjbsr13.prod.google.com ([2002:a17:90b:4e8d:b0:340:b55d:7a07])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:388d:b0:32e:d599:1f66
+ with SMTP id 98e67ed59e1d1-34083089300mr5226937a91.30.1761930723259; Fri, 31
+ Oct 2025 10:12:03 -0700 (PDT)
+Date: Fri, 31 Oct 2025 10:12:01 -0700
+In-Reply-To: <aQRzWb3Fu6ywdE9t@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Mime-Version: 1.0
+References: <20251030200951.3402865-1-seanjc@google.com> <20251030200951.3402865-9-seanjc@google.com>
+ <aQRzWb3Fu6ywdE9t@yzhao56-desk.sh.intel.com>
+Message-ID: <aQTt4R4CflSuVnCX@google.com>
+Subject: Re: [PATCH v4 08/28] KVM: TDX: Drop superfluous page pinning in S-EPT management
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 31 Oct 2025 13:34:33 +0530
-"Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
-
-> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+On Fri, Oct 31, 2025, Yan Zhao wrote:
+> >   - Increasing the folio reference count only upon S-EPT zapping failure[5].
+> Nit: There's a warning:
 > 
-> > On Thu, 30 Oct 2025 21:50:22 +0530
-> > "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
-> >  
-> >> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
-> >>   
-> >> > On Mon, 27 Oct 2025 15:25:56 +0530
-> >> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-> >> >    
-> >> 
-> >> ...
-> >>   
-> >> >> +static int __do_dev_communicate(enum dev_comm_type type,
-> >> >> +				struct pci_tsm *tsm, unsigned long error_state)
-> >> >> +{
-> >> >> +	int ret;
-> >> >> +	int state;
-> >> >> +	struct rmi_dev_comm_enter *io_enter;
-> >> >> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
-> >> >> +
-> >> >> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
-> >> >> +	io_enter->resp_len = 0;
-> >> >> +	io_enter->status = RMI_DEV_COMM_NONE;
-> >> >> +
-> >> >> +	ret = ___do_dev_communicate(type, tsm);    
-> >> >
-> >> > Think up a more meaningful name.  Counting _ doesn't make for readable code.
-> >> >    
-> >> 
-> >> I am not sure about this. What do you think?
-> >> 
-> >> modified   drivers/virt/coco/arm-cca-host/rmi-da.c
-> >> @@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
-> >>  	return GFP_KERNEL_ACCOUNT;
-> >>  }
-> >>  
-> >> -static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
-> >> +static int __do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
-> >>  {
-> >>  	gfp_t cache_alloc_flags;
-> >>  	int ret, nbytes, cp_len;
-> >> @@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
-> >>  	return 0;
-> >>  }
-> >>  
-> >> -static int __do_dev_communicate(enum dev_comm_type type,
-> >> +static int do_dev_communicate(enum dev_comm_type type,
-> >>  				struct pci_tsm *tsm, unsigned long error_state)
-> >>  {
-> >>  	int ret;
-> >> @@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
-> >>  	io_enter->resp_len = 0;
-> >>  	io_enter->status = RMI_DEV_COMM_NONE;
-> >>  
-> >> -	ret = ___do_dev_communicate(type, tsm);
-> >> +	ret = __do_dev_communicate(type, tsm);
-> >>  	if (ret) {
-> >>  		if (type == PDEV_COMMUNICATE)
-> >>  			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
-> >> @@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
-> >>  	return state;
-> >>  }
-> >>  
-> >> -static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
-> >> -			      unsigned long target_state,
-> >> -			      unsigned long error_state)
-> >> +static int move_dev_to_state(enum dev_comm_type type, struct pci_tsm *tsm,  
-> >
-> > Naming is always tricky.  Not sure why this name is appropriate given it's definitely
-> > still related to dev_communicate.
-> >
-> > Maybe just squash do_dev_communicate and __do_dev_coummnicate.
-> > Slightly long lines will be the result but not too bad.
-> > I haven't checked what it ends up as after the whole series though
-> > so maybe it doesn't work out.
-> >
-> > static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
-> > 			      unsigned long target_state,
-> > 			      unsigned long error_state)
-> > {
-> > 	
-> >
-> > 	do {
-> > 		int state, ret;
-> > 		struct rmi_dev_comm_enter *io_enter;
-> > 		struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
-> >
-> > 		io_enter = &pf0_dsc->comm_data.io_params->enter;
-> > 		io_enter->resp_len = 0;
-> > 		io_enter->status = RMI_DEV_COMM_NONE;
-> >
-> > 		ret = ___do_dev_communicate(type, tsm);
-> > //renamed
-> >
-> > 		if (ret) {
-> > 			if (type == PDEV_COMMUNICATE)
-> > 				rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
-> >
-> > 			state = error_state;
-> > 		} else {
-> > 			/*
-> > 			 * Some device communication error will transition the
-> > 			 * device to error state. Report that.
-> > 			 */
-> > 			if (type == PDEV_COMMUNICATE)
-> > 				ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
-> > 							 (enum rmi_pdev_state *)&state);
-> > 			if (ret)
-> > 				state = error_state;
-> > 		}
-> > 	
-> > 		if (state == error_state) {
-> > 			pci_err(tsm->pdev, "device communication error\n");
-> > 			return state;
-> > 		}
-> > 		if (state == target_state)
-> > 			return state;
-> > 	} while (1);
-> > }
-> > Jonathan
-> >  
-> 
-> I need the existing __do_dev_communicate for a followup patch where the
-> device communication won't loop till state transition.
+> WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
 
-Ah. I'd missed that. Fair enough.
-
-
-> -static int __do_dev_communicate(enum dev_comm_type type,
-> +static int do_dev_communicate(enum dev_comm_type type,
->  				struct pci_tsm *tsm, unsigned long error_state)
->  {
->  	int ret;
-> @@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
->  	io_enter->resp_len = 0;
->  	io_enter->status = RMI_DEV_COMM_NONE;
->  
-> -	ret = ___do_dev_communicate(type, tsm);
-> +	ret = _do_dev_communicate(type, tsm);
->  	if (ret) {
->  		if (type == PDEV_COMMUNICATE)
->  			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
-> @@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
->  	return state;
->  }
->  
-> -static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
-> +static int wait_for_dev_state(enum dev_comm_type type, struct pci_tsm *tsm,
-This name conveys what the wrapper adds to the inner call but neglects that inner bit.
-
-do_dev_communicate_and_wait_for_xxx or
-do_dev_communicate_synchronous()  // maybe - it's approximately a synchronous wrapper of async operation.
-Or something along those lines perhaps?
-
-
->  			      unsigned long target_state,
->  			      unsigned long error_state)
->  {
-
-
+Checkpatch is a (very helpful) tool, but it is not authoritative in any way.
+Similar to the how "wrap at 80 chars" is a soft rule that can and should be
+broken depending on context, checkpatch should also be ignored for things like
+this.  If someone says that the period making the line "too long" actually makes
+this unreadable for them, then they're just trolling at that point :-)
