@@ -1,119 +1,342 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F93F329C67;
-	Fri, 31 Oct 2025 07:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8434F285C8C;
+	Fri, 31 Oct 2025 08:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761897514; cv=none; b=hSfJiOhicDr+YqRYFv6MXeO1C7dhvrO3We73qq1tTXkSM0UWdtq8z+IMQc8BtooIPsThluCBfKZSVzyMXCqBmH7Xe1TnOrSwxzfNMmbIkHcdMFdZ2SeZm952Ru4bIZY2VuVQLNR+iGNTQCquYJZtPnYyuqxkatuhUawQ5gEYIHA=
+	t=1761897881; cv=none; b=hOZpawTYE83P/R4JCvvrK9KMiX6uYtxqqiTSlo9JJO63c37MNeNrvqk/a/Q9OO/nu59Wi3OvbrFtBHUaQUeXb/6x62GvAk15fy915TiS68tMGBvaB/39czDCWNAk/qTq2JlJ1mxiN0omNhqs9pDtcgTec++kFLTcJRXocKQitNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761897514; c=relaxed/simple;
-	bh=rzM0b8qPEYkMq5nIoO4tMjMsIEGrMoYlxde7BXZgKfY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HIogGFfNUKplNjSoFbbOA0M7H97Uv+ex7ea+WK3xNdb8q7hp4Iuwp6CdLoK2Zsq75FU0a6DETz7PnnFBzCyeal7+LzI8jlGhCh12m7P/asHDtMU3UARIqfgTOuleiaV4MQ1++hBGgI4hUOKtceNC/U4FVPRMtMhouOJ8Yb8GUaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=goZspn5d; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1761897881; c=relaxed/simple;
+	bh=546etZjxB2dCRx5TRDsxExeuWWF+d4Iy+TeI2nSmrmE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XJ+oRnOpRUM1ohh2uNZvg2qHnpyEVyoqiI4MMxnXEeRGMpdV3ZWgU/f0++gH3HYf6hqUPEmA4xY7PzCmDhwEn/WocIiR8nyhWB8oValmQqJ4OKheb8DJAtNpPMMY4kL3p3yas5Jv8yl0lqTPyv7C4rkCyP8JMCp0yDw5/GJ32xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhqHqbmY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="goZspn5d"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761897513; x=1793433513;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rzM0b8qPEYkMq5nIoO4tMjMsIEGrMoYlxde7BXZgKfY=;
-  b=goZspn5dnwSdx0wnGIBedLEsVmCijQR8zOYDAJ9DYziwKsyIJyYBEysK
-   9rmBTMXeIkJW8t94ZLfZGI/bH6NQh1aXyOtVQQF5K268be1bEl972jb1W
-   DTTNvLO7voXC/gPxSFH4D9OEtIQb7Yby5JgOWBuJlsoKb0EIDZP3salof
-   /EOu764ODGwOAYplkyRe5aUZuD4mrJZxspR9m5M70YBsCtdSyLayEWecp
-   S13125gqwWd10Np1sqThsaEDwQPA8514P/Wfx4s8Bx9WoLObGJ67+jZ07
-   jBp1f1sPtcuTqRWTYw6RCQrXTdE4Uk/m03NCvMApNYRK38lNbqpxKkeZa
-   w==;
-X-CSE-ConnectionGUID: BpmLtxwJSjyg38zjuMdL1Q==
-X-CSE-MsgGUID: TiAoZZ8IS++rr3hxauHiYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="89517654"
-X-IronPort-AV: E=Sophos;i="6.19,268,1754982000"; 
-   d="scan'208";a="89517654"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 00:58:32 -0700
-X-CSE-ConnectionGUID: aelFfb7/T7+TXvXFUL/t7w==
-X-CSE-MsgGUID: o2Ju4geKSZSKLBD3vX8YRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,268,1754982000"; 
-   d="scan'208";a="186108753"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.240.28]) ([10.124.240.28])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 00:58:25 -0700
-Message-ID: <7e43061a-b901-4e8f-8ee9-57d67aaf4f38@linux.intel.com>
-Date: Fri, 31 Oct 2025 15:58:22 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhqHqbmY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A395C4CEE7;
+	Fri, 31 Oct 2025 08:04:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761897881;
+	bh=546etZjxB2dCRx5TRDsxExeuWWF+d4Iy+TeI2nSmrmE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=uhqHqbmYcivsUxPX+RYdkwTde0PdlS+BT4GwY03ZtYB6riJazTikkvm5aX4pSarBU
+	 wAuqdHWnKvawwrxzZdETZGZae4jI0OH/pYfKuXov5flO+BDrT5TJ/fIgnOGG+DjNb+
+	 Q3tRH03HTvOlKVMWq1zoJ+SW/zey19MHlYVrjJAGOeGhVBaBNjvk54IRE9ZzqUMIEF
+	 ygLoKs3nIDMxoUyMOsv1RCuUmc4ZSUTCrzrj4ojO03VWLHXARlwyYRHKYPI0o3fphN
+	 sbYbDbg6h811Kq7TnCU/W/D6QXc0yqwFAcT2pS41eyPC59CSWoqbnyIxVeTXBth6dT
+	 i7tLeQoucVpyw==
+X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
+From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
+	Samuel Ortiz <sameo@rivosinc.com>,
+	Xu Yilun <yilun.xu@linux.intel.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
+ communication helpers
+In-Reply-To: <20251030181246.00006328@huawei.com>
+References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
+ <20251027095602.1154418-7-aneesh.kumar@kernel.org>
+ <20251029183306.0000485c@huawei.com> <yq5apla4cqex.fsf@kernel.org>
+ <20251030181246.00006328@huawei.com>
+Date: Fri, 31 Oct 2025 13:34:33 +0530
+Message-ID: <yq5ams57cx9q.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/28] KVM: x86/mmu: Add dedicated API to map
- guest_memfd pfn into TDP MMU
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
- Kai Huang <kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Ackerley Tng <ackerleytng@google.com>
-References: <20251030200951.3402865-1-seanjc@google.com>
- <20251030200951.3402865-5-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251030200951.3402865-5-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+Jonathan Cameron <jonathan.cameron@huawei.com> writes:
 
-
-On 10/31/2025 4:09 AM, Sean Christopherson wrote:
-> Add and use a new API for mapping a private pfn from guest_memfd into the
-> TDP MMU from TDX's post-populate hook instead of partially open-coding the
-> functionality into the TDX code.  Sharing code with the pre-fault path
-> sounded good on paper, but it's fatally flawed as simulating a fault loses
-> the pfn, and calling back into gmem to re-retrieve the pfn creates locking
-> problems, e.g. kvm_gmem_populate() already holds the gmem invalidation
-> lock.
+> On Thu, 30 Oct 2025 21:50:22 +0530
+> "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
 >
-> Providing a dedicated API will also removing several MMU exports that
-> ideally would not be exposed outside of the MMU, let alone to vendor code.
-> On that topic, opportunistically drop the kvm_mmu_load() export.  Leave
-> kvm_tdp_mmu_gpa_is_mapped() alone for now; the entire commit that added
-> kvm_tdp_mmu_gpa_is_mapped() will be removed in the near future.
+>> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+>> 
+>> > On Mon, 27 Oct 2025 15:25:56 +0530
+>> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+>> >  
+>> 
+>> ...
+>> 
+>> >> +static int __do_dev_communicate(enum dev_comm_type type,
+>> >> +				struct pci_tsm *tsm, unsigned long error_state)
+>> >> +{
+>> >> +	int ret;
+>> >> +	int state;
+>> >> +	struct rmi_dev_comm_enter *io_enter;
+>> >> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+>> >> +
+>> >> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
+>> >> +	io_enter->resp_len = 0;
+>> >> +	io_enter->status = RMI_DEV_COMM_NONE;
+>> >> +
+>> >> +	ret = ___do_dev_communicate(type, tsm);  
+>> >
+>> > Think up a more meaningful name.  Counting _ doesn't make for readable code.
+>> >  
+>> 
+>> I am not sure about this. What do you think?
+>> 
+>> modified   drivers/virt/coco/arm-cca-host/rmi-da.c
+>> @@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
+>>  	return GFP_KERNEL_ACCOUNT;
+>>  }
+>>  
+>> -static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+>> +static int __do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+>>  {
+>>  	gfp_t cache_alloc_flags;
+>>  	int ret, nbytes, cp_len;
+>> @@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+>>  	return 0;
+>>  }
+>>  
+>> -static int __do_dev_communicate(enum dev_comm_type type,
+>> +static int do_dev_communicate(enum dev_comm_type type,
+>>  				struct pci_tsm *tsm, unsigned long error_state)
+>>  {
+>>  	int ret;
+>> @@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
+>>  	io_enter->resp_len = 0;
+>>  	io_enter->status = RMI_DEV_COMM_NONE;
+>>  
+>> -	ret = ___do_dev_communicate(type, tsm);
+>> +	ret = __do_dev_communicate(type, tsm);
+>>  	if (ret) {
+>>  		if (type == PDEV_COMMUNICATE)
+>>  			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+>> @@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
+>>  	return state;
+>>  }
+>>  
+>> -static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+>> -			      unsigned long target_state,
+>> -			      unsigned long error_state)
+>> +static int move_dev_to_state(enum dev_comm_type type, struct pci_tsm *tsm,
 >
-> Gate the API on CONFIG_KVM_GUEST_MEMFD=y as private memory _must_ be backed
-> by guest_memfd.  Add a lockdep-only assert to that the incoming pfn is
-> indeed backed by guest_memfd, and that the gmem instance's invalidate lock
-> is held (which, combined with slots_lock being held, obviates the need to
-> check for a stale "fault").
+> Naming is always tricky.  Not sure why this name is appropriate given it's definitely
+> still related to dev_communicate.
 >
-> Cc: Michael Roth <michael.roth@amd.com>
-> Cc: Yan Zhao <yan.y.zhao@intel.com>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Cc: Vishal Annapurve <vannapurve@google.com>
-> Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Reviewed-by: Kai Huang <kai.huang@intel.com>
-> Link: https://lore.kernel.org/all/20250709232103.zwmufocd3l7sqk7y@amd.com
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Maybe just squash do_dev_communicate and __do_dev_coummnicate.
+> Slightly long lines will be the result but not too bad.
+> I haven't checked what it ends up as after the whole series though
+> so maybe it doesn't work out.
+>
+> static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+> 			      unsigned long target_state,
+> 			      unsigned long error_state)
+> {
+> 	
+>
+> 	do {
+> 		int state, ret;
+> 		struct rmi_dev_comm_enter *io_enter;
+> 		struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+>
+> 		io_enter = &pf0_dsc->comm_data.io_params->enter;
+> 		io_enter->resp_len = 0;
+> 		io_enter->status = RMI_DEV_COMM_NONE;
+>
+> 		ret = ___do_dev_communicate(type, tsm);
+> //renamed
+>
+> 		if (ret) {
+> 			if (type == PDEV_COMMUNICATE)
+> 				rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+>
+> 			state = error_state;
+> 		} else {
+> 			/*
+> 			 * Some device communication error will transition the
+> 			 * device to error state. Report that.
+> 			 */
+> 			if (type == PDEV_COMMUNICATE)
+> 				ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
+> 							 (enum rmi_pdev_state *)&state);
+> 			if (ret)
+> 				state = error_state;
+> 		}
+> 	
+> 		if (state == error_state) {
+> 			pci_err(tsm->pdev, "device communication error\n");
+> 			return state;
+> 		}
+> 		if (state == target_state)
+> 			return state;
+> 	} while (1);
+> }
+> Jonathan
+>
 
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+I need the existing __do_dev_communicate for a followup patch where the
+device communication won't loop till state transition.
 
+Something like 
+
+void vdev_fetch_object_work(struct work_struct *work)
+{
+	int state;
+	struct pci_tsm *tsm;
+	struct cca_host_pf0_dsc *pf0_dsc;
+	struct dev_comm_work *setup_work;
+	struct rmi_dev_comm_enter *io_enter;
+
+	setup_work = container_of(work, struct dev_comm_work, work);
+	tsm = setup_work->tsm;
+	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+
+	io_enter = &pf0_dsc->comm_data.io_params->enter;
+	io_enter->resp_len = 0;
+	io_enter->status = RMI_DEV_COMM_NONE;
+
+	guard(mutex)(&pf0_dsc->object_lock);
+
+	*setup_work->cache_offset = 0;
+	memset(setup_work->cache_buf, 0, setup_work->cache_size);
+	state = __do_dev_communicate(VDEV_COMMUNICATE, tsm, RMI_VDEV_ERROR);
+	/* return status through dev_comm_work.cache_cache */
+	if (state == RMI_VDEV_ERROR)
+		setup_work->cache_size = 0;
+
+	complete(&setup_work->complete);
+}
+
+Considering current usage is loop till we reach a specific target state,
+how abou the below?
+
+modified   drivers/virt/coco/arm-cca-host/rmi-da.c
+@@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
+ 	return GFP_KERNEL_ACCOUNT;
+ }
+ 
+-static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
++static int _do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+ {
+ 	gfp_t cache_alloc_flags;
+ 	int ret, nbytes, cp_len;
+@@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
+ 	return 0;
+ }
+ 
+-static int __do_dev_communicate(enum dev_comm_type type,
++static int do_dev_communicate(enum dev_comm_type type,
+ 				struct pci_tsm *tsm, unsigned long error_state)
+ {
+ 	int ret;
+@@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
+ 	io_enter->resp_len = 0;
+ 	io_enter->status = RMI_DEV_COMM_NONE;
+ 
+-	ret = ___do_dev_communicate(type, tsm);
++	ret = _do_dev_communicate(type, tsm);
+ 	if (ret) {
+ 		if (type == PDEV_COMMUNICATE)
+ 			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
+@@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
+ 	return state;
+ }
+ 
+-static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
++static int wait_for_dev_state(enum dev_comm_type type, struct pci_tsm *tsm,
+ 			      unsigned long target_state,
+ 			      unsigned long error_state)
+ {
+ 	int state;
+ 
+ 	do {
+-		state = __do_dev_communicate(type, tsm, error_state);
++		state = do_dev_communicate(type, tsm, error_state);
+ 
+ 		if (state == target_state || state == error_state)
+ 			return state;
+@@ -372,9 +372,9 @@ static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
+ 	return error_state;
+ }
+ 
+-static int do_pdev_communicate(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
++static int wait_for_pdev_state(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
+ {
+-	return do_dev_communicate(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
++	return wait_for_dev_state(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
+ }
+ 
+ static int parse_certificate_chain(struct pci_tsm *tsm)
+@@ -497,7 +497,7 @@ static int pdev_set_public_key(struct pci_tsm *tsm)
+ 				   virt_to_phys(key_params));
+ }
+ 
+-static void pdev_communicate_work(struct work_struct *work)
++static void pdev_state_transition_workfn(struct work_struct *work)
+ {
+ 	unsigned long state;
+ 	struct pci_tsm *tsm;
+@@ -509,13 +509,13 @@ static void pdev_communicate_work(struct work_struct *work)
+ 	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+ 
+ 	guard(mutex)(&pf0_dsc->object_lock);
+-	state = do_pdev_communicate(tsm, setup_work->target_state);
++	state = wait_for_pdev_state(tsm, setup_work->target_state);
+ 	WARN_ON(state != setup_work->target_state);
+ 
+ 	complete(&setup_work->complete);
+ }
+ 
+-static int submit_pdev_comm_work(struct pci_dev *pdev, int target_state)
++static int submit_pdev_state_transition_work(struct pci_dev *pdev, int target_state)
+ {
+ 	int ret;
+ 	enum rmi_pdev_state state;
+@@ -523,7 +523,7 @@ static int submit_pdev_comm_work(struct pci_dev *pdev, int target_state)
+ 	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(pdev);
+ 	struct cca_host_comm_data *comm_data = to_cca_comm_data(pdev);
+ 
+-	INIT_WORK_ONSTACK(&comm_work.work, pdev_communicate_work);
++	INIT_WORK_ONSTACK(&comm_work.work, pdev_state_transition_workfn);
+ 	init_completion(&comm_work.complete);
+ 	comm_work.tsm = pdev->tsm;
+ 	comm_work.target_state = target_state;
+@@ -548,7 +548,7 @@ int cca_pdev_ide_setup(struct pci_dev *pdev)
+ {
+ 	int ret;
+ 
+-	ret = submit_pdev_comm_work(pdev, RMI_PDEV_NEEDS_KEY);
++	ret = submit_pdev_state_transition_work(pdev, RMI_PDEV_NEEDS_KEY);
+ 	if (ret)
+ 		return ret;
+ 	/*
+@@ -563,7 +563,7 @@ int cca_pdev_ide_setup(struct pci_dev *pdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	return submit_pdev_comm_work(pdev, RMI_PDEV_READY);
++	return submit_pdev_state_transition_work(pdev, RMI_PDEV_READY);
+ }
+ 
+ void cca_pdev_stop_and_destroy(struct pci_dev *pdev)
+@@ -576,7 +576,7 @@ void cca_pdev_stop_and_destroy(struct pci_dev *pdev)
+ 	if (WARN_ON(ret != RMI_SUCCESS))
+ 		return;
+ 
+-	submit_pdev_comm_work(pdev, RMI_PDEV_STOPPED);
++	submit_pdev_state_transition_work(pdev, RMI_PDEV_STOPPED);
+ 
+ 	ret = rmi_pdev_destroy(rmm_pdev_phys);
+ 	if (WARN_ON(ret != RMI_SUCCESS))
+
+
+
+
+-aneesh
