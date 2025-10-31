@@ -1,342 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8434F285C8C;
-	Fri, 31 Oct 2025 08:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6781132ABD0
+	for <kvmarm@lists.linux.dev>; Fri, 31 Oct 2025 08:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761897881; cv=none; b=hOZpawTYE83P/R4JCvvrK9KMiX6uYtxqqiTSlo9JJO63c37MNeNrvqk/a/Q9OO/nu59Wi3OvbrFtBHUaQUeXb/6x62GvAk15fy915TiS68tMGBvaB/39czDCWNAk/qTq2JlJ1mxiN0omNhqs9pDtcgTec++kFLTcJRXocKQitNU=
+	t=1761898182; cv=none; b=P3Ioxv9/73E9CSAlQtrfC7LorywQPPRe/gju6Sz6l9wa2Y+Y/NmriNqAvj/Pg59OBx0hj4VlPu0gmfH5oZGbmgcEjgTof8RqyCYCGWcXrE2cGUAH9JQgULiS4oYotUdxCk4+OGgeBmzmzS/JMMiK9wS3WrdcuNL4/H1vYK0YoNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761897881; c=relaxed/simple;
-	bh=546etZjxB2dCRx5TRDsxExeuWWF+d4Iy+TeI2nSmrmE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XJ+oRnOpRUM1ohh2uNZvg2qHnpyEVyoqiI4MMxnXEeRGMpdV3ZWgU/f0++gH3HYf6hqUPEmA4xY7PzCmDhwEn/WocIiR8nyhWB8oValmQqJ4OKheb8DJAtNpPMMY4kL3p3yas5Jv8yl0lqTPyv7C4rkCyP8JMCp0yDw5/GJ32xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhqHqbmY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1761898182; c=relaxed/simple;
+	bh=kf8HyOsYwdOePIqwVTCWV7fE1+Z/HvbEoskwb19+yBY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NFgXVHxItAR0SLYMhFvxeOd6kiSArTlxFgEAkh0XYVENccEof/Od4uDEbOE28oM1v/LxRQ2GGwcU7Kk8H6dPKjoviOiWFpdTHmQtmd+2f9WLwIZkXR+v4Pjo8xxL6AW7Q9XMxahrA1C01DU6xGv9BtN90URNmB6NBtbaTCv4ZIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L89v0xFo; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhqHqbmY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A395C4CEE7;
-	Fri, 31 Oct 2025 08:04:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761897881;
-	bh=546etZjxB2dCRx5TRDsxExeuWWF+d4Iy+TeI2nSmrmE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=uhqHqbmYcivsUxPX+RYdkwTde0PdlS+BT4GwY03ZtYB6riJazTikkvm5aX4pSarBU
-	 wAuqdHWnKvawwrxzZdETZGZae4jI0OH/pYfKuXov5flO+BDrT5TJ/fIgnOGG+DjNb+
-	 Q3tRH03HTvOlKVMWq1zoJ+SW/zey19MHlYVrjJAGOeGhVBaBNjvk54IRE9ZzqUMIEF
-	 ygLoKs3nIDMxoUyMOsv1RCuUmc4ZSUTCrzrj4ojO03VWLHXARlwyYRHKYPI0o3fphN
-	 sbYbDbg6h811Kq7TnCU/W/D6QXc0yqwFAcT2pS41eyPC59CSWoqbnyIxVeTXBth6dT
-	 i7tLeQoucVpyw==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH RESEND v2 06/12] coco: host: arm64: Add RMM device
- communication helpers
-In-Reply-To: <20251030181246.00006328@huawei.com>
-References: <20251027095602.1154418-1-aneesh.kumar@kernel.org>
- <20251027095602.1154418-7-aneesh.kumar@kernel.org>
- <20251029183306.0000485c@huawei.com> <yq5apla4cqex.fsf@kernel.org>
- <20251030181246.00006328@huawei.com>
-Date: Fri, 31 Oct 2025 13:34:33 +0530
-Message-ID: <yq5ams57cx9q.fsf@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L89v0xFo"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4770d4df4deso32765e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 31 Oct 2025 01:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761898179; x=1762502979; darn=lists.linux.dev;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VvPD2QlzwFWzsFKSo3tRWtjQG+OHFkXfXTJssyHMdKI=;
+        b=L89v0xFom4/Z/c/4yFdFSfOlYwC/uem8J6kddZmU1PM94QLXXrgK/MerxjcSgkocnC
+         WQt3m1TWaByBozznfvT2JiG2Eyj+Oqg63iyofJAK3iSDiefsYE4mWvPmn9Fx5IDTy1YR
+         6HWomeb+30o8Ur9pBA/cC65OjZGxMycwSs6Wb0VD7AsfIuhMBYUDos7Dw2HeJOscerGy
+         uUcU3iiEhcIHU9dKZiyL+7cx/7VBEDvi1jNSNIaRFfyBKaqNDS/gfxn/sX56KPTS06z6
+         cNfr3SvzffBuApBef4aTXnDHDnz2ETe0gaLAp5/NfoyhTE+KZUDUKzTfHA7eRaUBBvin
+         Ndmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761898179; x=1762502979;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VvPD2QlzwFWzsFKSo3tRWtjQG+OHFkXfXTJssyHMdKI=;
+        b=kNirGcumPywMz1qp7Go+lhYduVt7HCkkKiTvjPRYIuvAscPOnhMvKYOHce2WZGRV3a
+         5x0C0cqHA47sGw0xGMCWamrZhGg/5puvy1WkTMWeJ9+ybch6FudAi0j013qBdN6RfOWS
+         LzNaf8etkjIPeqzSkUnnOlUovQNasAZgp3U9JKYdAyqMc1r204QUYjZA6270A7aTq+wc
+         cTQVvs1Rdz37XYeU+C9NeaF2eERE+nLBt9mFAa8celoyzWksaqOjNLq6o39BYMuUKWUD
+         1o+NGoI3lOIa//W+gKapEhvaSLRaMM8VY+XRhWYmOPPwe4kLEYpjSm5PQ7eh1MhcVOJg
+         CvYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXyWjafkIxGvevGt/1JENHBG6A5W26VYIa02p2I+ibGmpVYwchJUgDAO2/Bf0/l3HLC0sEiR6Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxXxqTFJxwIvh4ENinr2FtZDa1DtuSyKY39W1PgoYMmYToSX7cO
+	km0f/1QSb+YpHD8s79U9CnnCPzb+9Qpc1mnsQJuCH3ohrd9lJJO8CMPD+ommBufXjg==
+X-Gm-Gg: ASbGncsyZi6GzPtKeFmhKBstRgzalrCZVbBRGW4rjvooGeWfwGKnOvZ6pgY+lIpDLm0
+	ikaSP+77PE57DAjIdDlCQOK6guiVaCop6QRF/Er2K003wgkvfERY5sJvgeWdOQL0XLGn+9OUEta
+	1ZJNqcAAaDY1nZlU1++NXXV0WX8AT7KxQCRLcxG9EmfJwji+gkGF1qda7emvCHNLukVfQZbj6+7
+	RJ05wUsDFHrKBtklSqcG+yAMW9aFtvGjC7RL7SlgLIJkGIXRzJHev1rJsDjVBp+t2nFj013NJdq
+	AjZDuPgp+RCi+zpHl0s3dVf4d7+xJl0oXMHaNbJb+d5m7jEQfwncYlmteFQdta+SjvJVNN9VLPe
+	1y2ga9TnXToVmqQzpxSq0wSuR/d7j3AWrJV2bkDbtExJwXFYmdiBQHoaYKmVb6JVbQ+ayngg1ox
+	OdgO6CTH+CZj1BFvjYdvgtbFnJu/spvuB3CoDr/Aq8mUSl2WoJUfou1xIF0g==
+X-Google-Smtp-Source: AGHT+IEowXI+Xa7Cev+Atw93C9B+sivtK/myXmK5E4UjFwYC2UVYflMXTzX7icRn1YESBGhfSybnGw==
+X-Received: by 2002:a05:600c:3ba8:b0:477:1afe:b962 with SMTP id 5b1f17b1804b1-477324afbe5mr1342845e9.1.1761898178470;
+        Fri, 31 Oct 2025 01:09:38 -0700 (PDT)
+Received: from google.com (177.112.205.35.bc.googleusercontent.com. [35.205.112.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47733023256sm19735575e9.17.2025.10.31.01.09.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Oct 2025 01:09:37 -0700 (PDT)
+Date: Fri, 31 Oct 2025 08:09:34 +0000
+From: Sebastian Ene <sebastianene@google.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, will@kernel.org, perlarsen@google.com,
+	ayrton@google.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: arm64: fix FF-A call failure when ff-a driver
+ is built-in
+Message-ID: <aQRuvu8V3woqnqCV@google.com>
+References: <20251027191729.1704744-1-yeoreum.yun@arm.com>
+ <20251027191729.1704744-2-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251027191729.1704744-2-yeoreum.yun@arm.com>
 
-Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+On Mon, Oct 27, 2025 at 07:17:28PM +0000, Yeoreum Yun wrote:
 
-> On Thu, 30 Oct 2025 21:50:22 +0530
-> "Aneesh Kumar K.V" <aneesh.kumar@kernel.org> wrote:
->
->> Jonathan Cameron <jonathan.cameron@huawei.com> writes:
->> 
->> > On Mon, 27 Oct 2025 15:25:56 +0530
->> > "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->> >  
->> 
->> ...
->> 
->> >> +static int __do_dev_communicate(enum dev_comm_type type,
->> >> +				struct pci_tsm *tsm, unsigned long error_state)
->> >> +{
->> >> +	int ret;
->> >> +	int state;
->> >> +	struct rmi_dev_comm_enter *io_enter;
->> >> +	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
->> >> +
->> >> +	io_enter = &pf0_dsc->comm_data.io_params->enter;
->> >> +	io_enter->resp_len = 0;
->> >> +	io_enter->status = RMI_DEV_COMM_NONE;
->> >> +
->> >> +	ret = ___do_dev_communicate(type, tsm);  
->> >
->> > Think up a more meaningful name.  Counting _ doesn't make for readable code.
->> >  
->> 
->> I am not sure about this. What do you think?
->> 
->> modified   drivers/virt/coco/arm-cca-host/rmi-da.c
->> @@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
->>  	return GFP_KERNEL_ACCOUNT;
->>  }
->>  
->> -static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
->> +static int __do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
->>  {
->>  	gfp_t cache_alloc_flags;
->>  	int ret, nbytes, cp_len;
->> @@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
->>  	return 0;
->>  }
->>  
->> -static int __do_dev_communicate(enum dev_comm_type type,
->> +static int do_dev_communicate(enum dev_comm_type type,
->>  				struct pci_tsm *tsm, unsigned long error_state)
->>  {
->>  	int ret;
->> @@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
->>  	io_enter->resp_len = 0;
->>  	io_enter->status = RMI_DEV_COMM_NONE;
->>  
->> -	ret = ___do_dev_communicate(type, tsm);
->> +	ret = __do_dev_communicate(type, tsm);
->>  	if (ret) {
->>  		if (type == PDEV_COMMUNICATE)
->>  			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
->> @@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
->>  	return state;
->>  }
->>  
->> -static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
->> -			      unsigned long target_state,
->> -			      unsigned long error_state)
->> +static int move_dev_to_state(enum dev_comm_type type, struct pci_tsm *tsm,
->
-> Naming is always tricky.  Not sure why this name is appropriate given it's definitely
-> still related to dev_communicate.
->
-> Maybe just squash do_dev_communicate and __do_dev_coummnicate.
-> Slightly long lines will be the result but not too bad.
-> I haven't checked what it ends up as after the whole series though
-> so maybe it doesn't work out.
->
-> static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
-> 			      unsigned long target_state,
-> 			      unsigned long error_state)
-> {
-> 	
->
-> 	do {
-> 		int state, ret;
-> 		struct rmi_dev_comm_enter *io_enter;
-> 		struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
->
-> 		io_enter = &pf0_dsc->comm_data.io_params->enter;
-> 		io_enter->resp_len = 0;
-> 		io_enter->status = RMI_DEV_COMM_NONE;
->
-> 		ret = ___do_dev_communicate(type, tsm);
-> //renamed
->
-> 		if (ret) {
-> 			if (type == PDEV_COMMUNICATE)
-> 				rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
->
-> 			state = error_state;
-> 		} else {
-> 			/*
-> 			 * Some device communication error will transition the
-> 			 * device to error state. Report that.
-> 			 */
-> 			if (type == PDEV_COMMUNICATE)
-> 				ret = rmi_pdev_get_state(virt_to_phys(pf0_dsc->rmm_pdev),
-> 							 (enum rmi_pdev_state *)&state);
-> 			if (ret)
-> 				state = error_state;
-> 		}
-> 	
-> 		if (state == error_state) {
-> 			pci_err(tsm->pdev, "device communication error\n");
-> 			return state;
-> 		}
-> 		if (state == target_state)
-> 			return state;
-> 	} while (1);
-> }
-> Jonathan
->
+Hi Yeoreum,
 
-I need the existing __do_dev_communicate for a followup patch where the
-device communication won't loop till state transition.
+> Until has_version_negotiated is set to true,
+> all FF-A function calls fail except FFA_VERSION.
+> The has_version_negotiated flag is set to true when
+> the first FFA_VERSION call is made after init_hyp_mode().
+> 
+> This works fine when the FF-A driver is built as a module,
+> since ffa_init() is invoked after kvm_arm_init(), allowing do_ffa_version()
+> to set has_version_negotiated to true.
+> 
+> However, when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y),
+> all FF-A calls fail. This happens because ffa_init() runs before
+> kvm_arm_init() — the init level of ffa_init() is rootfs_initcall.
+> As a result, the hypervisor cannot set has_version_negotiated,
+> since the FFA_VERSION call made in ffa_init() does not trap to the hypervisor
+> (HCR_EL2.TSC is cleared before kvm_arm_init()).
+> 
 
-Something like 
+I understand the reason behind the patch but this is problematic to have
+the builtin driver load before pKVM because the hypervisor would be
+un-aware of the host mapped buffers. (eg. the call from ffa_rxtx_map is
+not trapped because it is too early). Essentially, you will end up
+bypassing the hyp FF-A proxy which I think you will want to avoid.
 
-void vdev_fetch_object_work(struct work_struct *work)
-{
-	int state;
-	struct pci_tsm *tsm;
-	struct cca_host_pf0_dsc *pf0_dsc;
-	struct dev_comm_work *setup_work;
-	struct rmi_dev_comm_enter *io_enter;
+> Consequently, this causes failures when using EFI variable services
+> with secure partitions that rely on FFA_SEND_DIRECT_MSG.
+> 
+> To fix this, call hyp_ffa_post_init() and set has_version_negotiated
+> during hyp_ffa_init() when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y).
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 4e16f9b96f63..0ae87ff61758 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -984,5 +984,17 @@ int hyp_ffa_init(void *pages)
+>  	};
+>  
+>  	version_lock = __HYP_SPIN_LOCK_UNLOCKED;
+> +
+> +	if (IS_BUILTIN(CONFIG_ARM_FFA_TRANSPORT)) {
+> +		hyp_spin_lock(&version_lock);
+> +		if (hyp_ffa_post_init()) {
+> +			hyp_spin_unlock(&version_lock);
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +		smp_store_release(&has_version_negotiated, true);
+> +		hyp_spin_unlock(&version_lock);
+> +	}
+> +
+>  	return 0;
+>  }
 
-	setup_work = container_of(work, struct dev_comm_work, work);
-	tsm = setup_work->tsm;
-	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
+Thanks,
+Sebastian
 
-	io_enter = &pf0_dsc->comm_data.io_params->enter;
-	io_enter->resp_len = 0;
-	io_enter->status = RMI_DEV_COMM_NONE;
-
-	guard(mutex)(&pf0_dsc->object_lock);
-
-	*setup_work->cache_offset = 0;
-	memset(setup_work->cache_buf, 0, setup_work->cache_size);
-	state = __do_dev_communicate(VDEV_COMMUNICATE, tsm, RMI_VDEV_ERROR);
-	/* return status through dev_comm_work.cache_cache */
-	if (state == RMI_VDEV_ERROR)
-		setup_work->cache_size = 0;
-
-	complete(&setup_work->complete);
-}
-
-Considering current usage is loop till we reach a specific target state,
-how abou the below?
-
-modified   drivers/virt/coco/arm-cca-host/rmi-da.c
-@@ -188,7 +188,7 @@ static inline gfp_t cache_obj_id_to_gfp_flags(u8 cache_obj_id)
- 	return GFP_KERNEL_ACCOUNT;
- }
- 
--static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
-+static int _do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
- {
- 	gfp_t cache_alloc_flags;
- 	int ret, nbytes, cp_len;
-@@ -319,7 +319,7 @@ static int ___do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm)
- 	return 0;
- }
- 
--static int __do_dev_communicate(enum dev_comm_type type,
-+static int do_dev_communicate(enum dev_comm_type type,
- 				struct pci_tsm *tsm, unsigned long error_state)
- {
- 	int ret;
-@@ -331,7 +331,7 @@ static int __do_dev_communicate(enum dev_comm_type type,
- 	io_enter->resp_len = 0;
- 	io_enter->status = RMI_DEV_COMM_NONE;
- 
--	ret = ___do_dev_communicate(type, tsm);
-+	ret = _do_dev_communicate(type, tsm);
- 	if (ret) {
- 		if (type == PDEV_COMMUNICATE)
- 			rmi_pdev_abort(virt_to_phys(pf0_dsc->rmm_pdev));
-@@ -355,14 +355,14 @@ static int __do_dev_communicate(enum dev_comm_type type,
- 	return state;
- }
- 
--static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
-+static int wait_for_dev_state(enum dev_comm_type type, struct pci_tsm *tsm,
- 			      unsigned long target_state,
- 			      unsigned long error_state)
- {
- 	int state;
- 
- 	do {
--		state = __do_dev_communicate(type, tsm, error_state);
-+		state = do_dev_communicate(type, tsm, error_state);
- 
- 		if (state == target_state || state == error_state)
- 			return state;
-@@ -372,9 +372,9 @@ static int do_dev_communicate(enum dev_comm_type type, struct pci_tsm *tsm,
- 	return error_state;
- }
- 
--static int do_pdev_communicate(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
-+static int wait_for_pdev_state(struct pci_tsm *tsm, enum rmi_pdev_state target_state)
- {
--	return do_dev_communicate(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
-+	return wait_for_dev_state(PDEV_COMMUNICATE, tsm, target_state, RMI_PDEV_ERROR);
- }
- 
- static int parse_certificate_chain(struct pci_tsm *tsm)
-@@ -497,7 +497,7 @@ static int pdev_set_public_key(struct pci_tsm *tsm)
- 				   virt_to_phys(key_params));
- }
- 
--static void pdev_communicate_work(struct work_struct *work)
-+static void pdev_state_transition_workfn(struct work_struct *work)
- {
- 	unsigned long state;
- 	struct pci_tsm *tsm;
-@@ -509,13 +509,13 @@ static void pdev_communicate_work(struct work_struct *work)
- 	pf0_dsc = to_cca_pf0_dsc(tsm->dsm_dev);
- 
- 	guard(mutex)(&pf0_dsc->object_lock);
--	state = do_pdev_communicate(tsm, setup_work->target_state);
-+	state = wait_for_pdev_state(tsm, setup_work->target_state);
- 	WARN_ON(state != setup_work->target_state);
- 
- 	complete(&setup_work->complete);
- }
- 
--static int submit_pdev_comm_work(struct pci_dev *pdev, int target_state)
-+static int submit_pdev_state_transition_work(struct pci_dev *pdev, int target_state)
- {
- 	int ret;
- 	enum rmi_pdev_state state;
-@@ -523,7 +523,7 @@ static int submit_pdev_comm_work(struct pci_dev *pdev, int target_state)
- 	struct cca_host_pf0_dsc *pf0_dsc = to_cca_pf0_dsc(pdev);
- 	struct cca_host_comm_data *comm_data = to_cca_comm_data(pdev);
- 
--	INIT_WORK_ONSTACK(&comm_work.work, pdev_communicate_work);
-+	INIT_WORK_ONSTACK(&comm_work.work, pdev_state_transition_workfn);
- 	init_completion(&comm_work.complete);
- 	comm_work.tsm = pdev->tsm;
- 	comm_work.target_state = target_state;
-@@ -548,7 +548,7 @@ int cca_pdev_ide_setup(struct pci_dev *pdev)
- {
- 	int ret;
- 
--	ret = submit_pdev_comm_work(pdev, RMI_PDEV_NEEDS_KEY);
-+	ret = submit_pdev_state_transition_work(pdev, RMI_PDEV_NEEDS_KEY);
- 	if (ret)
- 		return ret;
- 	/*
-@@ -563,7 +563,7 @@ int cca_pdev_ide_setup(struct pci_dev *pdev)
- 	if (ret)
- 		return ret;
- 
--	return submit_pdev_comm_work(pdev, RMI_PDEV_READY);
-+	return submit_pdev_state_transition_work(pdev, RMI_PDEV_READY);
- }
- 
- void cca_pdev_stop_and_destroy(struct pci_dev *pdev)
-@@ -576,7 +576,7 @@ void cca_pdev_stop_and_destroy(struct pci_dev *pdev)
- 	if (WARN_ON(ret != RMI_SUCCESS))
- 		return;
- 
--	submit_pdev_comm_work(pdev, RMI_PDEV_STOPPED);
-+	submit_pdev_state_transition_work(pdev, RMI_PDEV_STOPPED);
- 
- 	ret = rmi_pdev_destroy(rmm_pdev_phys);
- 	if (WARN_ON(ret != RMI_SUCCESS))
-
-
-
-
--aneesh
+> -- 
+> LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+> 
