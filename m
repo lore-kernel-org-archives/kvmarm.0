@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C189324B23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA072325486;
 	Mon,  3 Nov 2025 16:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188932; cv=none; b=hLDcdVSsQSYf9Jj3Q/g4yEPnrrzQdproU87M3cb333Lw00Fi4xtepU/3YSvJsqUVeUzAn4jx3INZpyWPgssTx+KvX08zEwK3hV6v4CjR+l7DjLgo8LiGex0j/bwiGMbd+EY1fbVXgcOcPDfG1zq1fPkxaXW88pi0Gm1KM2y9LM0=
+	t=1762188933; cv=none; b=rcXZnq68dE2KsLjGcwB0i1Y6/QF4CNmpvB3XBAd/v5pCCAC1nRz8OoLaeS8cwT2gf9SLCGgKbvK/ILAznCwNeLJ3x0XG/lxwyQCI/NKO68usZd0E78g4BMPCS2l8DIj8DmDauPFD4mvn6reuyhsYFs7fDJGHaroj31f17azLtB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188932; c=relaxed/simple;
-	bh=Ksllf4QLmgdsUpwCGY9LSpYWYzEnFPQKXe3yy4PN5mU=;
+	s=arc-20240116; t=1762188933; c=relaxed/simple;
+	bh=iqZcVcEEAlkxkd+PUiY5mjGb5FYWhKWCcmecb4qtFAw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oYxni98lvvE2VraCkkJXklgj45cQdusTNOP2UlpPL3w18fzTAWvp7FTC/iEr2B8bHcsmFc8W/Df/KYqEMlEXkVPNJFN4Xy53ToGMpA3zeBjvld48G6uxqCyHlY6iTH6X6boJnyDSaSvFkt5pZrMEK7IJttg1PA1Ce8+jCs38bkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jj0mzUeN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=jnpai2BkXYxS0Mycqb8doLvw7AvjneY7ekYvcxpKd32BGfqmmvKTO9TznqY+CKytKambCBaUbd8bX84dCH+B8gi0jg7jS5LwYhVb7f5YHnxlwIFN/dVoVkoZYXUGK38Sy2K7xJfvadpVXcK0DSB2ZIbsJbX1bZHQy2/XHVVylTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RjIb8ziA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jj0mzUeN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD02C4CEE7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RjIb8ziA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A71F7C116D0;
 	Mon,  3 Nov 2025 16:55:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762188932;
-	bh=Ksllf4QLmgdsUpwCGY9LSpYWYzEnFPQKXe3yy4PN5mU=;
+	bh=iqZcVcEEAlkxkd+PUiY5mjGb5FYWhKWCcmecb4qtFAw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jj0mzUeNpCVIvienrf7new8E1injENLKMeUShmwFWj73Dz3uQwlQ2Fil62y8qWxjs
-	 eDfmahHLzJGsHUrWab1xIeiihtKlKrOtWQEW9fBuImQNwyUO6T4UeYbj0b/Gp9T6eU
-	 5MvPGbvs/7A7ssM6CJ7xgx8MvYN4Nam5m3dxy63q1QRAY7dGfKZvVRfQCVaH1hv0ml
-	 kstpCFSewKYVeUYDuihhtmV/UQrcNtPwTjH3jO4lsdgx2/Lq1UNdhc9FSlGNuiBKb2
-	 YaWns2EapYiMHHsPGzGBKNlJaJGn2gX7rvYqJZVgXvc2foETsy771L5LM+vW+rq/hW
-	 lnBR1cwide1iA==
+	b=RjIb8ziAti490KyjyrE0X6LDN3hVg2jlPjgzrl+gC4GyYQbNyuNn21HFQaycOnQuE
+	 RKDWuaIiFPQdkNJhVD/9PnYrUU/elhQ+VCb66Rp9u7kbl3exIULpxy55VIYvvCMr5W
+	 33IuxAQgtC3QjuSZlfuOlMidIc3mXNBd2ke5GkWYcbjee8U3FUvYZiozaoi2mP9AE2
+	 0Sazw8BG4JkPM9pE7qU0ydUzz/gp+xV3f7BFZ5I8Uo45I6XKOn1Mhh22FBbyXUrA3y
+	 dlLgGE57PZxw/u4ZfeIuNeL/mPqXGWCDtO5TZszHFLcp2kDUfm9ykQr1SnLSsvIM6Z
+	 qMh3cW8ueFSqQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vFxq6-000000021VN-1cXg;
-	Mon, 03 Nov 2025 16:55:30 +0000
+	id 1vFxq6-000000021VN-3ph0;
+	Mon, 03 Nov 2025 16:55:31 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: [PATCH 24/33] KVM: arm64: Use MI to detect groups being enabled/disabled
-Date: Mon,  3 Nov 2025 16:55:08 +0000
-Message-ID: <20251103165517.2960148-25-maz@kernel.org>
+Subject: [PATCH 26/33] KVM: arm64: GICv3: Handle LR overflow when EOImode==0
+Date: Mon,  3 Nov 2025 16:55:10 +0000
+Message-ID: <20251103165517.2960148-27-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
 References: <20251103165517.2960148-1-maz@kernel.org>
@@ -60,48 +60,85 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add the maintenance interrupt to force an exit when the guest
-enables/disables individual groups, so that we can resort the
-ap_list accordingly.
+Now that we can identify interrupts that have not made it into the LRs,
+it becomes relatively easy to use EOIcount to walk the overflow list.
+
+What is a bit odd is that we compute a fake LR for the original
+state of the interrupt, clear the active bit, and feed into the existing
+logic for processing. In a way, this is what would have happened if
+the interrupt was in an LR.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v2.c | 5 +++++
- arch/arm64/kvm/vgic/vgic-v3.c | 5 +++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/kvm/vgic/vgic-v3.c | 45 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index f53bc55288978..9d4702aec454b 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -39,6 +39,11 @@ void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu,
- 		cpuif->vgic_hcr |= GICH_HCR_LRENPIE;
- 	if (irqs_outside_lrs(als))
- 		cpuif->vgic_hcr |= GICH_HCR_UIE;
-+
-+	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & GICH_VMCR_ENABLE_GRP0_MASK) ?
-+		GICH_HCR_VGrp0DIE : GICH_HCR_VGrp0EIE;
-+	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & GICH_VMCR_ENABLE_GRP1_MASK) ?
-+		GICH_HCR_VGrp1DIE : GICH_HCR_VGrp1EIE;
- }
- 
- static bool lr_signals_eoi_mi(u32 lr_val)
 diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 79fa16c5344fb..e18b13b240492 100644
+index e18b13b240492..14b35a62e2981 100644
 --- a/arch/arm64/kvm/vgic/vgic-v3.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -36,6 +36,11 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
- 
- 	if (!als->nr_sgi)
- 		cpuif->vgic_hcr |= ICH_HCR_EL2_vSGIEOICount;
-+
-+	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG0_MASK) ?
-+		ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
-+	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
-+		ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
+@@ -109,16 +109,61 @@ static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
+ 	vgic_put_irq(vcpu->kvm, irq);
  }
  
- static bool lr_signals_eoi_mi(u64 lr_val)
++static u64 vgic_v3_compute_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq);
++
++static void vgic_v3_deactivate_phys(u32 intid)
++{
++	if (cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY))
++		gic_insn(intid | FIELD_PREP(GICV5_GIC_CDDI_TYPE_MASK, 1), CDDI);
++	else
++		gic_write_dir(intid);
++}
++
+ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
++	u32 eoicount = FIELD_GET(ICH_HCR_EL2_EOIcount, cpuif->vgic_hcr);
++	struct vgic_irq *irq;
+ 
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+ 	for (int lr = 0; lr < cpuif->used_lrs; lr++)
+ 		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+ 
++	/*
++	 * EOIMode=0: use EOIcount to emulate deactivation. We are
++	 * guaranteed to deactivate in reverse order of the activation, so
++	 * just pick one interrupt after the other in the overflow list, and
++	 * replay the deactivation as if the CPU was doing it. We also rely
++	 * on priority drop to have taken place.
++	 */
++	list_for_each_entry(irq, &vgic_cpu->overflow_ap_list_head, ap_list) {
++		u64 lr;
++
++		/*
++		 * I would have loved to write this using a scoped_guard(),
++		 * but using 'continue' here is a total train wreck.
++		 */
++		if (!eoicount) {
++			break;
++		} else {
++			guard(raw_spinlock)(&irq->irq_lock);
++
++			if (!(likely(vgic_target_oracle(irq) == vcpu) &&
++			      irq->active))
++				continue;
++
++			lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
++		}
++
++		if (lr & ICH_LR_HW)
++			vgic_v3_deactivate_phys(FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
++
++		vgic_v3_fold_lr(vcpu, lr);
++		eoicount--;
++	}
++
+ 	cpuif->used_lrs = 0;
+ }
+ 
 -- 
 2.47.3
 
