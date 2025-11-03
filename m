@@ -1,100 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74167274B39;
-	Mon,  3 Nov 2025 14:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D97264614
+	for <kvmarm@lists.linux.dev>; Mon,  3 Nov 2025 16:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762180410; cv=none; b=vD7b827Allh9jAot84mFtTXzktpRasnV4R+jZKPy1DQwCDq/xW1Y29cIQHh5DjVYOGPrRcR/ATloNeKNGCm6QDqQa+Th6D8tYfeUcIyccKiTJGn0nl19AKHkCutXIYboj5ydFhJcYVQdRigKpaG7LfbTKNUeeN9C993H1CgeyrU=
+	t=1762187553; cv=none; b=sSOrd+wycnS5IZjU9/u0zkM5f2ctvRp5BKwlPIDo5648P0+0AIsj/+QodiR/VfJhOCDkf1kSFpeExhWRIb2sxAfl6fr1Nj315Sm5+M+7oXl0TkSBUMmOMOPqvXjLLfdN2YVnizLYnlytwObCWXAyPAjIfprW1xZTy9cMbvgNe88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762180410; c=relaxed/simple;
-	bh=ADIEP2R4Ye3a32o5urTgbZq2x2MIrVSu4eY4ppawa+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kT5m0tuGkWv62YFytd8yrK4j5IWm4FBCjJdFJS9LbpErjsh0pOM9Jck71iezkvsCg3Z4Z1TuB6ah/+vkf0vDCyB1BtS1FlRV4ek617xvJEpkSQSfsYej9B8Ic+GpZrcdxYoTQd8kqDOo4q/R1kRz9lIxsAytsiKE1UOAo6fXBno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pu0EgPfz; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pu0EgPfz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05AD8C4CEE7;
-	Mon,  3 Nov 2025 14:33:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762180410;
-	bh=ADIEP2R4Ye3a32o5urTgbZq2x2MIrVSu4eY4ppawa+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pu0EgPfzvjxNzAIsMUXSORw/6lYc9GfU4GaBq2sILlsDpGtjsrmRc+YdwDv3m6ake
-	 JHxJ2Yay279m0qKorZ3WYC67v1gF4ln6k4IMb6+HwrSwsVQeFUbzJzigRn5MHI9OeY
-	 qjVx5buHc9KVTKW/R1cvEsti/x+qNEUhwlk0a9XjuQEbOoV9QnImX50GUpNci/qCxz
-	 vql1rTt+ETn/+hUSJH3lr6oIYzPVgxk82JOo7j5i+UALRm5az5Ofga8DTAx6ACk3f9
-	 rlAw2wYpEkHIcl89YFRv2J0vO2tS295cEnBqrcyv1DbPNunAfRoPNJeAmmKBbkbkzT
-	 q/NtfE39BpBVA==
-Date: Mon, 3 Nov 2025 14:33:22 +0000
-From: Will Deacon <will@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v9 1/5] perf: Add perf_event_attr::config4
-Message-ID: <aQi9MstZTsloKmeo@willie-the-truck>
-References: <20251029-james-perf-feat_spe_eft-v9-0-d22536b9cf94@linaro.org>
- <20251029-james-perf-feat_spe_eft-v9-1-d22536b9cf94@linaro.org>
+	s=arc-20240116; t=1762187553; c=relaxed/simple;
+	bh=VQ0WiX1TW6oTI7NKhfbFYkDH+GwDeBBWv2ibDv8P4hM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uoLxOfhtUTW5nwegCWfNz98TP6seJEAmzB60S47uA2zLYtNVzbYjb8KB7ydSyrzzc0U1YFtopTop+nIbmmPwyJE2RHNHXI9qYmC+lWiamye93P0vvh1HyepztKWyXmbF1t6wdo1EvkXyr0H4l3G0QnRC3EtVrGRIFCtRbEcP6YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0BE2B1D14;
+	Mon,  3 Nov 2025 08:32:22 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A43833F694;
+	Mon,  3 Nov 2025 08:32:26 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	mark.rutland@arm.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v10 0/9] support FEAT_LSUI
+Date: Mon,  3 Nov 2025 16:32:15 +0000
+Message-Id: <20251103163224.818353-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251029-james-perf-feat_spe_eft-v9-1-d22536b9cf94@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 29, 2025 at 03:46:01PM +0000, James Clark wrote:
-> Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
-> packet using another 64-bits of event filtering control. As the existing
-> perf_event_attr::configN fields are all used up for SPE PMU, an
-> additional field is needed. Add a new 'config4' field.
-> 
-> Reviewed-by: Leo Yan <leo.yan@arm.com>
-> Tested-by: Leo Yan <leo.yan@arm.com>
-> Reviewed-by: Ian Rogers <irogers@google.com>
-> Signed-off-by: James Clark <james.clark@linaro.org>
-> ---
->  include/uapi/linux/perf_event.h | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
-> index 78a362b80027..0d0ed85ad8cb 100644
-> --- a/include/uapi/linux/perf_event.h
-> +++ b/include/uapi/linux/perf_event.h
-> @@ -382,6 +382,7 @@ enum perf_event_read_format {
->  #define PERF_ATTR_SIZE_VER6			120	/* Add: aux_sample_size */
->  #define PERF_ATTR_SIZE_VER7			128	/* Add: sig_data */
->  #define PERF_ATTR_SIZE_VER8			136	/* Add: config3 */
-> +#define PERF_ATTR_SIZE_VER9			144	/* add: config4 */
->  
->  /*
->   * 'struct perf_event_attr' contains various attributes that define
-> @@ -543,6 +544,7 @@ struct perf_event_attr {
->  	__u64	sig_data;
->  
->  	__u64	config3; /* extension of config2 */
-> +	__u64	config4; /* extension of config3 */
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
 
-Please can one of the core perf maintainers ack/nak this extension?
+This patchset support FEAT_LSUI and applies in futex atomic operation
+and user_swpX emulation where can replace from ldxr/st{l}xr
+pair implmentation with clearing PSTATE.PAN bit to correspondant
+load/store unprevileged atomic operation without clearing PSTATE.PAN bit.
 
-Cheers,
 
-Will
+Patch Sequences
+================
+
+Patch #1 adds cpufeature for FEAT_LSUI
+
+Patch #2-#3 expose FEAT_LSUI to guest
+
+Patch #4 adds Kconfig for FEAT_LSUI
+
+Patch #5-#6 support futex atomic-op with FEAT_LSUI
+
+Patch #7-#9 support user_swpX emulation with FEAT_LSUI
+
+
+Patch History
+==============
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LUSI to guest
+  - add help section for LUSI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LUSI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (9):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: Kconfig: Detect toolchain support for LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: separate common LSUI definitions into lsui.h
+  arm64: armv8_deprecated: convert user_swpX to inline function
+  arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
+
+ arch/arm64/Kconfig                            |   5 +
+ arch/arm64/include/asm/futex.h                | 291 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  25 ++
+ arch/arm64/kernel/armv8_deprecated.c          |  86 +++++-
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 8 files changed, 360 insertions(+), 62 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+
+base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+
