@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA72532255D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F5F322774;
 	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762188931; cv=none; b=TbmeuiNjrhVOemanJ4x01RN/z7FiKY7nXU//8Ve70TrmQCR58nGcXV6GbjgQGUk2VZ9I8BWB+AVou4ovjoXzT5QN+1NRQT5Nbh3z9k4YsvzvDZfcOJnJkDLrZMk0sEIx3+4DnnUcbtHqd6V+yObFJ+JpgQj2mvWq0MKwWFoAKgM=
+	t=1762188932; cv=none; b=Wf34JRm8HJjcbertw/sH5NjRcbWRAKqvTv1XOZipbPY+5SnQHsNjvjmnUUfdVjTL+5qVO5atC1g7gsyC4fX2gv+YNqoLUL5Tp3dNG+c4Lpy4ghY1Mm8qHnmnTwLdo7zwVXhcZtj7nbi1T0mYM5D1iFo5tEURPElS9Tsougae0bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762188931; c=relaxed/simple;
-	bh=ExB1yEjtLfP3X2YfSpZ/UdxJUO+P0+U9gqTpdL+W5z4=;
+	s=arc-20240116; t=1762188932; c=relaxed/simple;
+	bh=eMdKgJvpXR9g6dp42ZCCeiki15cZjNTkDMh6Rl2Yf+I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QmE/LwTLqcNF8ZaLNrmd2r4Nu73FndbS1HbtqmnnzhQX9o/eF57vpGJbUPOIQ3W6j4d0Xs1Cpx8X+1uMJgHFzmHwWPPewHC8aaZsxEDUEnC/pu+eSnlyoGiAdMAAO6/8QlTKKuTMSE3VrxlGyPkFPi6k93tFwiPGpwSd8jfBwV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZA7rPNkt; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZBuxLh2HPxBDJXSQ6GMZtwJF+JBXX7gWRn50cMUyvQNevV24LhouMblDsjnEC0+17UJ3TU7odv7f2hSvKKhj7ktENXxlRb27dNhhk3S3Jc47w1see+659zhHR4+Dd/JZONofoGFNWcnwo5JLFprWAaYfiXaMBFLYAh6qjlXtOtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=II+MAjDY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZA7rPNkt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF21EC4CEE7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="II+MAjDY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 723B8C19425;
 	Mon,  3 Nov 2025 16:55:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762188931;
-	bh=ExB1yEjtLfP3X2YfSpZ/UdxJUO+P0+U9gqTpdL+W5z4=;
+	bh=eMdKgJvpXR9g6dp42ZCCeiki15cZjNTkDMh6Rl2Yf+I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZA7rPNktnp2D41azPYIxMIdARtDouu2LmD8SwX+uXDVUJ8W/dBzLxVKJrTP4K2pFZ
-	 Fo1MvfChmyZDvFwYD4yv3KpSBFnOuvI7cpyxfvW1JeEsKbFryf16G5ov0BQvq56eOj
-	 YUV8lz+zFZd7DmmrlKAZPUMctAcWYWhi1vrlLbFoEc7TO/Rnp3ngw997rzBWH1hG6M
-	 pPhNUdj7PVl1Vwm7A+ZY2Vg4gBsVjxbMzXy0EexMGPKH6pvWYL3y0qeoArtQWMykOq
-	 fCxNa9KJABKLU1Ru+u7snPUjzm3AEODhwbtcpQOkcRpjx6klNVnVL0ECI1xNw8fRc1
-	 wAyNTm/Bxg3Xg==
+	b=II+MAjDYqpAz1+2r2lnG0q+TPs1pPnfM/1YQGHah8NWXf+MRhriors07R+vBxUkXN
+	 rf9t4wigWLKp3LxBO3N25kcm/6Vemio3zK9TSS2D3xUxCGo2qubpMHRoDXfJA91K17
+	 2RkezM5Y3k4Rab26H9Av66oRbM6MlxcNf8PKD95tyCkJ3OeVO/HYc2fiMt8knYzQji
+	 0DUigJZujrX3zZMioITICclEfS66Fi8DgIkPMglcOwcU3+si50vOjy1dJF1cWp7Nhq
+	 dB4rkaoxvYJpNZoayYHQ5Lnnp3BFzW5qpym0dKfa9PkqJ76KE8mjl6ht6yyYFHeV0w
+	 ldxcoc+6uf4BA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vFxq5-000000021VN-3lmH;
+	id 1vFxq5-000000021VN-2qmJ;
 	Mon, 03 Nov 2025 16:55:29 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: [PATCH 22/33] KVM: arm64: Invert ap_list sorting to push active interrupts out
-Date: Mon,  3 Nov 2025 16:55:06 +0000
-Message-ID: <20251103165517.2960148-23-maz@kernel.org>
+Subject: [PATCH 21/33] KVM: arm64: Make vgic_target_oracle() globally available
+Date: Mon,  3 Nov 2025 16:55:05 +0000
+Message-ID: <20251103165517.2960148-22-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251103165517.2960148-1-maz@kernel.org>
 References: <20251103165517.2960148-1-maz@kernel.org>
@@ -60,64 +60,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Having established that pending interrupts should have priority
-to be moved into the LRs over the active interrupts, implement this
-in the ap_list sorting.
+Make the internal crystal ball global, so that implementation-specific
+code can use it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 2 +-
+ arch/arm64/kvm/vgic/vgic.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 570cc8fe42b87..56c61e17e1e88 100644
+index c420f8262e4c1..570cc8fe42b87 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -270,10 +270,7 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
-  * well, the first items in the list being the first things populated in the
-  * LRs.
+@@ -237,7 +237,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
   *
-- * A hard rule is that active interrupts can never be pushed out of the LRs
-- * (and therefore take priority) since we cannot reliably trap on deactivation
-- * of IRQs and therefore they have to be present in the LRs.
-- *
-+ * Pending, non-active interrupts must be placed at the head of the list.
-  * Otherwise things should be sorted by the priority field and the GIC
-  * hardware support will take care of preemption of priority groups etc.
-  *
-@@ -298,21 +295,21 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
- 	raw_spin_lock(&irqa->irq_lock);
- 	raw_spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
+  * Requires the IRQ lock to be held.
+  */
+-static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
++struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+ {
+ 	lockdep_assert_held(&irq->irq_lock);
  
--	if (irqa->active || irqb->active) {
--		ret = (int)irqb->active - (int)irqa->active;
--		goto out;
--	}
-+	penda = irqa->enabled && irq_is_pending(irqa) && !irqa->active;
-+	pendb = irqb->enabled && irq_is_pending(irqb) && !irqb->active;
- 
--	penda = irqa->enabled && irq_is_pending(irqa);
--	pendb = irqb->enabled && irq_is_pending(irqb);
-+	ret = (int)pendb - (int)penda;
-+	if (ret)
-+		goto out;
- 
--	if (!penda || !pendb) {
--		ret = (int)pendb - (int)penda;
-+	/* Both pending and enabled, sort by priority (lower number first) */
-+	ret = (int)irqa->priority - (int)irqb->priority;
-+	if (ret)
- 		goto out;
--	}
- 
--	/* Both pending and enabled, sort by priority */
--	ret = irqa->priority - irqb->priority;
-+	/* Finally, HW bit active interrupts have priority over non-HW ones */
-+	ret = (int)irqb->hw - (int)irqa->hw;
-+
- out:
- 	raw_spin_unlock(&irqb->irq_lock);
- 	raw_spin_unlock(&irqa->irq_lock);
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index f35410de1457b..7a44484acf93c 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -245,6 +245,7 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid);
+ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid);
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
++struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq);
+ bool vgic_get_phys_line_level(struct vgic_irq *irq);
+ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
 -- 
 2.47.3
 
