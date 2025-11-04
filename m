@@ -1,85 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FE833374A
-	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 17:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E552F691B
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 17:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762278621; cv=none; b=cdnQ+v89DaNxmKRkE7FmAVHK/sXhvJ6PgwqbE59ceiNDus1sRxA7GItCtMZUkqiS1sLborrvhW2DqCctgJUaL09GGQ+WAIE4mZQ0Logrp5fI6HVmfAot7z9ES4PonoXjG5Tbxm1dxtCKmofg8y2OUGOOWEOOTS7XPyPgZrx7pqw=
+	t=1762279050; cv=none; b=n8Z3SJF9IatlV6rxnNUKsrCx31303ppuhI2qeGah8VqMscO6I9rQ7b8cHSxmrYleNBR5M/4QS5npm4ShJIV8IPUK3aNnLtfyeNCTt3945n98k1cD88KR4mayONarZS2txvCkOYb8xptAMxVbcSMhB+FE+rH69fN0l6ZsOerY7BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762278621; c=relaxed/simple;
-	bh=uap4ZNNf4KCRh72JT+8YyzrSp1+Duu0+i2bQB0KuFO8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bRIr3+R6tVvoPiY3ifPdisRVC4n5hqioJJKFrAlBbOuKK43a/vuPHUu3nwxLIeCJ2wFP2hgfieOw2iZhF59n/D+NPDYZe2np530I9I7pUXlh0efPtXLCpjCoMA9EqqF9+bopmP1V7j7OPJBPKdbUOQjm5PN6Op4xJupAPD9wGEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C99971CE0;
-	Tue,  4 Nov 2025 09:50:09 -0800 (PST)
-Received: from [10.57.71.89] (unknown [10.57.71.89])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CB1F33F66E;
-	Tue,  4 Nov 2025 09:50:15 -0800 (PST)
-Message-ID: <a0b19558-dbcb-4231-b0c4-302cc10652db@arm.com>
-Date: Tue, 4 Nov 2025 17:50:13 +0000
+	s=arc-20240116; t=1762279050; c=relaxed/simple;
+	bh=EKtg11I2y89dxK71syiNOTNg3HE8V+Mj31tEd40SOxE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uiPhxV0OAICrVBpNL+wRJfDoDO/sWiLUs5ehAioyMF9DLlqIOH2SK93GDiGeE7VdWi7VuBZbQXNOpAXo2JuAGerFLxQjg3Z9ZzyllSiMyPJiVQGiBX5t2g+3eKwTUPCn1r/rz+HVjxCDQEmE3sTWooQ9Fr916hxHMD/w9lN834c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPiqO0G0; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPiqO0G0"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b9d73d57328so2152898a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 09:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762279048; x=1762883848; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kxFvD6gKxB44i1bxk1sbjy38espILrC0yFM/UcBrpew=;
+        b=HPiqO0G0CclvjWePPkqamwPsUnzl+mcpYndGD+XKIGT/g2Sq20JwIfEAKkJVcoGhOo
+         YHODfjj7Tob7296nrz3GE6vazURwFYTMKl9gSP/9sQEEPZgi8F5A9dCCiGV8YsV3M3P6
+         y6WfuL6uRrm85yrl4j8YVJh4b9czEnN44lWdhN4FfT7TfuEEP9p13GZLYgUrJ8JkYSSv
+         wSZYdv47B4xDhx+HbM6UNiangXo4PAB7xut8dzZ4BmU6Dtbx3N6S5SAxUGcmo6JZrsSW
+         5M240r4t+LMMUKWG0SkkndfcMcI/8NLvd0oOSgPwF6WApR5q/yFYuqkD1nhuELTWfXx/
+         nFzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762279048; x=1762883848;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kxFvD6gKxB44i1bxk1sbjy38espILrC0yFM/UcBrpew=;
+        b=WAO09akgIh/innWaJcf1zgFyOSWh4SS2UKWyKImShSt2i0rlDbUMgVHlFHI2jwhABC
+         wnQ0mdxjuUtq7cAadSD4FQPezbGgNk9plg6seRey7oQePqBZe8EfYSOcNbvhxUlZf/SE
+         5L/8bCtm/z/1uvftmR2C44D31Tjchpspcv+ePdo5beHCeZyXssmFZYfnERBcVp7ACr+/
+         0IJRizIMiHcTVqjNbQ17GDFCsTOHL4YjVtYkY76nKz/kX1PJ+/svOEY2O/rCxvJAdB8i
+         a+OgnWPDYil3uX05Uep+BIEax2RLqD1/poZ1mfRh8ioql5DYOMI63QzRUsyVhB/PeYgM
+         ecFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNCenHK5S5zBjOH39KbUSku8V+D+OJUeX2hNrLI3cKvPw7BIT7eQ7qUeHPXhRZs3CX0psMEBs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxF2OrXZ06Pl5dzeeG+EC0aDB5isHOjnhQSiDgrpQomEoubsh8M
+	VE9KrLVB9G39lbc9cx3Dnx18i4HSZMmfy18GAnvZ+sM5KXXXoscEvSjMY7OPH9OeR6SWNKyfm61
+	x0v6FxQ==
+X-Google-Smtp-Source: AGHT+IFJG/V0EfaymcoM6cPfayQ+DGikxVc9kN5RoO6CmqYed2gXkivkS54tuPy9BQi+XScmFB78yDVh2jQ=
+X-Received: from plblv11.prod.google.com ([2002:a17:903:2a8b:b0:290:28e2:ce5d])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ffcf:b0:295:2c8e:8e56
+ with SMTP id d9443c01a7336-2962ae715edmr5562415ad.44.1762279047867; Tue, 04
+ Nov 2025 09:57:27 -0800 (PST)
+Date: Tue, 4 Nov 2025 09:57:26 -0800
+In-Reply-To: <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 5/8] KVM: arm64: Fix Trace Buffer trap polarity for
- protected VMs
-Content-Language: en-GB
-To: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
- joey.gouly@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- vladimir.murzin@arm.com
-References: <20251104125906.1919426-1-tabba@google.com>
- <20251104125906.1919426-6-tabba@google.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20251104125906.1919426-6-tabba@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-5-seanjc@google.com>
+ <aPhjYcOFjL1Z8m2s@yzhao56-desk.sh.intel.com> <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
+Message-ID: <aQo-hus99rE7WBgb@google.com>
+Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 04/11/2025 12:59, Fuad Tabba wrote:
-> The E2TB bits in MDCR_EL2 control trapping of Trace Buffer system
-> register accesses. These accesses are trapped to EL2 when the bits are
-> clear.
-> 
-> The trap initialization logic for protected VMs in pvm_init_traps_mdcr()
-> had the polarity inverted. When a guest did not support the ExtTrcBuff
-> feature, the code was setting E2TB. This incorrectly disabled the trap,
-> potentially allowing a protected guest to access registers for a feature
-> it was not given.
-> 
-> Fix this by inverting the operation.
-> 
-> Fixes: f50758260bff ("KVM: arm64: Group setting traps for protected VMs by control register")
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->   arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 43bde061b65d..df0c59a29b35 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -118,7 +118,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
->   		val |= MDCR_EL2_TTRF;
->   
->   	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, ExtTrcBuff, IMP))
+On Thu, Oct 30, 2025, Yan Zhao wrote:
+> On Wed, Oct 22, 2025 at 12:53:53PM +0800, Yan Zhao wrote:
+> > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
+> > > Link: https://lore.kernel.org/all/20250709232103.zwmufocd3l7sqk7y@amd.com
+> > 
+> > Hi Sean,                                                                         
+> > 
+> > Will you post [1] to fix the AB-BA deadlock issue for huge page in-place
+> > conversion as well?
 
-Why are we checkin ExtTrcBuff ? Shouldn't that be TraceBuffer ?
-
-> -		val |= MDCR_EL2_E2TB_MASK;
-> +		val &= ~MDCR_EL2_E2TB_MASK;
-This looks correct to me.
-
-Suzuki
-
->   
->   	/* Trap Debug Communications Channel registers */
->   	if (!kvm_has_feat(kvm, ID_AA64MMFR0_EL1, FGT, IMP))
-
-
+If you (or anyone) has the bandwidth, please pick it up.  I won't have cycles to
+look at that for many weeks (potentially not even this calendar year).
