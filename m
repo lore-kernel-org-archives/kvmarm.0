@@ -1,109 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA2819A288;
-	Mon,  3 Nov 2025 22:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473021465B4;
+	Tue,  4 Nov 2025 06:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762208528; cv=none; b=pvf7cFpclCyUteNT5JBfqjCcZhWhnzFawmLetsdKZ4tAMMxGSQPMvrtH5fAiE0VFCO2Bc4rOSUU5p6m7jjkRVdEKaCfKAEi0afDYfhYD3lPT75hf+tLQz6fRMjrjoZxUmpXgksyP3bb5riG2BxAEzc2UlGy/ssXGt08+6evipaQ=
+	t=1762237025; cv=none; b=eidcBpSC3Gps5N/S2S/JTmTx0XsZ+Siau1FX47DyOFYXx7SgW8U+mW+jb9CnO6VID7E55yr7bokWtZ8fQxJZh0G/lQeCyZmzbCPWYVwv/pI+cM7TfrzS++oZUGBDxtAyoN9qTDRnbRlQ9KcWw5Tc7twJpOeXWY5w6YJa7NLMzqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762208528; c=relaxed/simple;
-	bh=4+HwZyxB60cLLkwbbtQeqRTkzlhrRDxKz+l5ARqBSFw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h/zNyUsOf1tDkfG6L78/xG9Lqsk6pAleR48U6xo2dm2stvgA7XtQXjRJ+Dn2acZGT0hJHECReTGaif8mR9WWx6YytkkW2QW2ee/NIAjMyN1r3DF4FnyAD6qEiaA6aJ5dsmJvxODJ4McEtHSMQuHx2WE9LXm2Aga+FDRhcDOU3gQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/Lp31yo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762237025; c=relaxed/simple;
+	bh=mSKoZmGkcXW407B8mNGjY9EejInAopsSE39gAyEUn9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KxyLXMJDWe4f36kzyEg87UBSz78LaRsWAtTEPNCIXeAXBLeZrWNY7QSnHrSrW0eZl7ZlvDMi8UdWS8PpB+l+lGrYORRklXhmbr5nVLR26YzoKdDB+0vmtV0HKCFm80pcKhBYPouGs/qZtmwzAgWFA0lsZtRw1cDsMgiv3grxxsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OXrazto3; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/Lp31yo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D9AFC4CEE7;
-	Mon,  3 Nov 2025 22:22:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762208527;
-	bh=4+HwZyxB60cLLkwbbtQeqRTkzlhrRDxKz+l5ARqBSFw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I/Lp31yoA+tIy3PALY99JfXTZS6tYX9J8PxGDjCegfDjzss4rKJoVJotvrVl6IZEw
-	 O+NjEs21yS9zEJjDSzc860V/hp6+VR11aam88MLXsVw0u2lWvLVVhPey2L4qqKKvza
-	 iABcTKLO4pKOM2S/pyT49b6YhJXNcJIQjp6vTSJRXsSTqyxi5WqSFByIxyotsB8CLV
-	 Etkqg60Rlmw7SV/CDP6sLHmqaHNBwZDYFtPSCfALy2BjB+QoFoLmaIJbI1YnnwMHc4
-	 FbE/1qyhWBcNv/c8EsZTKoaphJW0KdeOV25G5lW47zOpNAHdXSDlXDQFYkxvzRrsSU
-	 tnrDl1SQNkFMQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vG2w8-000000026Nh-3s7P;
-	Mon, 03 Nov 2025 22:22:05 +0000
-Date: Mon, 03 Nov 2025 22:22:04 +0000
-Message-ID: <86jz06vjsj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jose Marinho <jose.marinho@arm.com>
-Cc: Jiaqi Yan <jiaqiyan@google.com>,
-	oliver.upton@linux.dev,
-	duenwen@google.com,
-	rananta@google.com,
-	jthoughton@google.com,
-	vsethi@nvidia.com,
-	jgg@nvidia.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	pbonzini@redhat.com,
-	corbet@lwn.net,
-	shuah@kernel.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] KVM: arm64: VM exit to userspace to handle SEA
-In-Reply-To: <7a61bcf9-a57d-a8e9-a9b8-4eacef80acd3@arm.com>
-References: <20251013185903.1372553-1-jiaqiyan@google.com>
-	<20251013185903.1372553-2-jiaqiyan@google.com>
-	<7a61bcf9-a57d-a8e9-a9b8-4eacef80acd3@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OXrazto3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762237023; x=1793773023;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=mSKoZmGkcXW407B8mNGjY9EejInAopsSE39gAyEUn9k=;
+  b=OXrazto3bos6ZouLXm81qGUGmuUm3OZdCGxCNDmP4C2W+ykyqxLdNpHM
+   1DxyyS4eKg+f2UC8Kt2DT1ZQ1E34vbMtAEaD2xfzDXma1x2Sr01Q4K+0I
+   aF6SWWtCUu656YkV3TFUFRJN7V4ruPrFIYWNM78ZsGUX5oDCZo057lhKH
+   oGGMjooTh6E1C3Pi0yfsGM4DHcneO6QWuKHfwNwXSgurXHKDEBhDMEfqa
+   fFi5YiitRnTOAaF0VUY+gCJG52aM0x/NnUOEg/B33v6ZZnAMHrb19rw9x
+   Om3sIeQ4LUHVoj0/B1xwvM9Kfz/8Sra1hjkH8hLcR/ILGEc8Cq+pj8vUV
+   w==;
+X-CSE-ConnectionGUID: X85PB/eDRtq7BN2jAHCDug==
+X-CSE-MsgGUID: MEBed1xfQCmkE+WN7qFzPA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="63528093"
+X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
+   d="scan'208";a="63528093"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 22:17:02 -0800
+X-CSE-ConnectionGUID: IL8VAT68RkmI5IbPyY1fNw==
+X-CSE-MsgGUID: u8bxLoPYS/KxoreV4M7Dmg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
+   d="scan'208";a="210576877"
+Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 22:16:56 -0800
+Message-ID: <31da959f-d004-4ae0-a6a7-d5d31b646b70@linux.intel.com>
+Date: Tue, 4 Nov 2025 14:16:53 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jose.marinho@arm.com, jiaqiyan@google.com, oliver.upton@linux.dev, duenwen@google.com, rananta@google.com, jthoughton@google.com, vsethi@nvidia.com, jgg@nvidia.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 27/28] KVM: TDX: Bug the VM if extending the initial
+ measurement fails
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+ Kai Huang <kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Ackerley Tng <ackerleytng@google.com>
+References: <20251030200951.3402865-1-seanjc@google.com>
+ <20251030200951.3402865-28-seanjc@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20251030200951.3402865-28-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 03 Nov 2025 18:17:00 +0000,
-Jose Marinho <jose.marinho@arm.com> wrote:
-> 
-> > +	/*
-> > +	 * Exit to userspace, and provide faulting guest virtual and physical
-> > +	 * addresses in case userspace wants to emulate SEA to guest by
-> > +	 * writing to FAR_ELx and HPFAR_ELx registers.
-> > +	 */
-> > +	memset(&run->arm_sea, 0, sizeof(run->arm_sea));
-> > +	run->exit_reason = KVM_EXIT_ARM_SEA;
-> > +	run->arm_sea.esr = esr & esr_mask;
-> > +
-> > +	if (!(esr & ESR_ELx_FnV))
-> > +		run->arm_sea.gva = kvm_vcpu_get_hfar(vcpu) > +
-> > +	ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> > +	if (ipa != INVALID_GPA) {
-> > +		run->arm_sea.flags |= KVM_EXIT_ARM_SEA_FLAG_GPA_VALID;
-> > +		run->arm_sea.gpa = ipa;
-> 
-> Are we interested in the value of PFAR_EL2 (if FEAT_PFAR implemented)?
 
-We don't have any support for PFAR, and I don't think we have any plan
-to support it in the near future. If anything, the rest of the kernel
-should start by growing support for it before we start dragging it
-into KVM.
 
-	M.
+On 10/31/2025 4:09 AM, Sean Christopherson wrote:
+> WARN and terminate the VM if TDH_MR_EXTEND fails, as extending the
+> measurement should fail if and only if there is a KVM bug, or if the S-EPT
+> mapping is invalid.  Now that KVM makes all state transitions mutually
+> exclusive via tdx_vm_state_guard, it should be impossible for S-EPT
+> mappings to be removed between kvm_tdp_mmu_map_private_pfn() and
+> tdh_mr_extend().
+>
+> Holding slots_lock prevents zaps due to memslot updates,
+> filemap_invalidate_lock() prevents zaps due to guest_memfd PUNCH_HOLE,
+> vcpu->mutex locks prevents updates from other vCPUs, kvm->lock prevents
+> VM-scoped ioctls from creating havoc (e.g. by creating new vCPUs), and all
+> usage of kvm_zap_gfn_range() is mutually exclusive with S-EPT entries that
+> can be used for the initial image.
+>
+> For kvm_zap_gfn_range(), the call from sev.c is obviously mutually
+> exclusive, TDX disallows KVM_X86_QUIRK_IGNORE_GUEST_PAT so the same goes
+> for kvm_noncoherent_dma_assignment_start_or_stop(), and
+> __kvm_set_or_clear_apicv_inhibit() is blocked by virtue of holding all
+> VM and vCPU mutexes (and the APIC page has its own non-guest_memfd memslot
 
--- 
-Without deviation from the norm, progress is not possible.
+Nit:
+It sounds like TDX is using the memslot for the APIC page, but for a TD, the
+memslot for the APIC page is never initialized or used?
+
+> and so can't be used for the initial image, which means that too is
+> mutually exclusive irrespective of locking).
+>
+> Opportunistically return early if the region doesn't need to be measured
+> in order to reduce line lengths and avoid wraps.  Similarly, immediately
+> and explicitly return if TDH_MR_EXTEND fails to make it clear that KVM
+> needs to bail entirely if extending the measurement fails.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+
+> ---
+>   arch/x86/kvm/vmx/tdx.c | 24 +++++++++++++-----------
+>   1 file changed, 13 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 8bcdec049ac6..762f2896547f 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -3123,21 +3123,23 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
+>   
+>   	put_page(src_page);
+>   
+> -	if (ret)
+> +	if (ret || !(arg->flags & KVM_TDX_MEASURE_MEMORY_REGION))
+>   		return ret;
+>   
+> -	if (arg->flags & KVM_TDX_MEASURE_MEMORY_REGION) {
+> -		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+> -			err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry,
+> -					    &level_state);
+> -			if (err) {
+> -				ret = -EIO;
+> -				break;
+> -			}
+> -		}
+> +	/*
+> +	 * Note, MR.EXTEND can fail if the S-EPT mapping is somehow removed
+> +	 * between mapping the pfn and now, but slots_lock prevents memslot
+> +	 * updates, filemap_invalidate_lock() prevents guest_memfd updates,
+> +	 * mmu_notifier events can't reach S-EPT entries, and KVM's internal
+> +	 * zapping flows are mutually exclusive with S-EPT mappings.
+> +	 */
+> +	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
+> +		err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry, &level_state);
+> +		if (TDX_BUG_ON_2(err, TDH_MR_EXTEND, entry, level_state, kvm))
+> +			return -EIO;
+>   	}
+>   
+> -	return ret;
+> +	return 0;
+>   }
+>   
+>   static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+
