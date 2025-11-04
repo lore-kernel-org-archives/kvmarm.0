@@ -1,96 +1,125 @@
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E552F691B
-	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 17:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC4A262FC0
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 17:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279050; cv=none; b=n8Z3SJF9IatlV6rxnNUKsrCx31303ppuhI2qeGah8VqMscO6I9rQ7b8cHSxmrYleNBR5M/4QS5npm4ShJIV8IPUK3aNnLtfyeNCTt3945n98k1cD88KR4mayONarZS2txvCkOYb8xptAMxVbcSMhB+FE+rH69fN0l6ZsOerY7BA=
+	t=1762279058; cv=none; b=q2B81B+vxTuvZ8hGabFMtW3jvhLUTRK3rYL1LGmATGKGe8e1PeEXnMCNy7/LrK7mWjg0covqg37/skYrGeVVoEd1DAaszXyRdGQcasJ+2dvzxVK1YvXQXSeF5UXUIETCP3eUHVIGUDwvfiD8tajYUKlJaCFod0U0Q5R2tSmRGos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279050; c=relaxed/simple;
-	bh=EKtg11I2y89dxK71syiNOTNg3HE8V+Mj31tEd40SOxE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uiPhxV0OAICrVBpNL+wRJfDoDO/sWiLUs5ehAioyMF9DLlqIOH2SK93GDiGeE7VdWi7VuBZbQXNOpAXo2JuAGerFLxQjg3Z9ZzyllSiMyPJiVQGiBX5t2g+3eKwTUPCn1r/rz+HVjxCDQEmE3sTWooQ9Fr916hxHMD/w9lN834c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPiqO0G0; arc=none smtp.client-ip=209.85.215.202
+	s=arc-20240116; t=1762279058; c=relaxed/simple;
+	bh=2jPSWKegOMg7faVyLaQnSgZp5kDRxl6Borpiag/vnLM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y15pKMUavCbbyUZz/oYkL0Ad4ETC9C+ykmuvj+9VoU2sIY/oUmP2+46HoD8my4R+LNT18tcq38FHCJ/cDhO788i9JHgohmJyaJBfH/5oUi/q93O+sATUOF7FkDBSvTOj/CrY4Rq3AzCrh7FZ0UUVcQK4M77UrpC8qMqsEmCDxLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F7uE7uE3; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPiqO0G0"
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b9d73d57328so2152898a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 09:57:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F7uE7uE3"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ed6ca52a0bso11851cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 09:57:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762279048; x=1762883848; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kxFvD6gKxB44i1bxk1sbjy38espILrC0yFM/UcBrpew=;
-        b=HPiqO0G0CclvjWePPkqamwPsUnzl+mcpYndGD+XKIGT/g2Sq20JwIfEAKkJVcoGhOo
-         YHODfjj7Tob7296nrz3GE6vazURwFYTMKl9gSP/9sQEEPZgi8F5A9dCCiGV8YsV3M3P6
-         y6WfuL6uRrm85yrl4j8YVJh4b9czEnN44lWdhN4FfT7TfuEEP9p13GZLYgUrJ8JkYSSv
-         wSZYdv47B4xDhx+HbM6UNiangXo4PAB7xut8dzZ4BmU6Dtbx3N6S5SAxUGcmo6JZrsSW
-         5M240r4t+LMMUKWG0SkkndfcMcI/8NLvd0oOSgPwF6WApR5q/yFYuqkD1nhuELTWfXx/
-         nFzQ==
+        d=google.com; s=20230601; t=1762279056; x=1762883856; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jb4EiG1cKlRDr3ZrWg4hV76AaJf8Zy383HOlZZBw2Lk=;
+        b=F7uE7uE3BZyfTol+iDoVVXxhkWDKYPxEiRfsh4SiPb8IuhRdrFOp/+Sk8erTYKr/9H
+         zQXaqrgiKNFWpYnkuvf1D3g6f2NZHYKfqpHEq+TjlgY2dSECCW4q8p9uSH0Ta3GYH+Nv
+         6rcl7FkrcRpJr2Zxlis/C7NAqzn52/ORJp4O/X73bhttnZDBFIWGH7TWWX7SD8Y/1LDB
+         aRI/h9pRfH0MevJzdOnzfA5VD1fCShwgVHCkCgtYQuKIMPmY5Bbpl/MWLgLBfTlnLQay
+         ma2XtRqwrzbQgMBfUd/RoSd8Eb9ddoIYmFjk9Ar3agMeAURASZ6KKsYGY2FnzhhQ6I1j
+         JKCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762279048; x=1762883848;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kxFvD6gKxB44i1bxk1sbjy38espILrC0yFM/UcBrpew=;
-        b=WAO09akgIh/innWaJcf1zgFyOSWh4SS2UKWyKImShSt2i0rlDbUMgVHlFHI2jwhABC
-         wnQ0mdxjuUtq7cAadSD4FQPezbGgNk9plg6seRey7oQePqBZe8EfYSOcNbvhxUlZf/SE
-         5L/8bCtm/z/1uvftmR2C44D31Tjchpspcv+ePdo5beHCeZyXssmFZYfnERBcVp7ACr+/
-         0IJRizIMiHcTVqjNbQ17GDFCsTOHL4YjVtYkY76nKz/kX1PJ+/svOEY2O/rCxvJAdB8i
-         a+OgnWPDYil3uX05Uep+BIEax2RLqD1/poZ1mfRh8ioql5DYOMI63QzRUsyVhB/PeYgM
-         ecFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNCenHK5S5zBjOH39KbUSku8V+D+OJUeX2hNrLI3cKvPw7BIT7eQ7qUeHPXhRZs3CX0psMEBs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxF2OrXZ06Pl5dzeeG+EC0aDB5isHOjnhQSiDgrpQomEoubsh8M
-	VE9KrLVB9G39lbc9cx3Dnx18i4HSZMmfy18GAnvZ+sM5KXXXoscEvSjMY7OPH9OeR6SWNKyfm61
-	x0v6FxQ==
-X-Google-Smtp-Source: AGHT+IFJG/V0EfaymcoM6cPfayQ+DGikxVc9kN5RoO6CmqYed2gXkivkS54tuPy9BQi+XScmFB78yDVh2jQ=
-X-Received: from plblv11.prod.google.com ([2002:a17:903:2a8b:b0:290:28e2:ce5d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ffcf:b0:295:2c8e:8e56
- with SMTP id d9443c01a7336-2962ae715edmr5562415ad.44.1762279047867; Tue, 04
- Nov 2025 09:57:27 -0800 (PST)
-Date: Tue, 4 Nov 2025 09:57:26 -0800
-In-Reply-To: <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
+        d=1e100.net; s=20230601; t=1762279056; x=1762883856;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jb4EiG1cKlRDr3ZrWg4hV76AaJf8Zy383HOlZZBw2Lk=;
+        b=TxL4Z6C4wNnoWqQImd+iVPHDjrIrRKjrPFCX/YU+pnlZpre0BxsLUBWFiGXYdd+r0g
+         FtGeH21X30rQWV5ou+WmoBniNfecE7LzAM1AObotvlJijlgEKUbezyyP6wh/39HGk24K
+         CKeZRMEjKVvF7nSshTXIuu8lW/WHCaHI/Pjllbp9vXHrHW+oThCUvxBVUOt6/cxVFpYb
+         EGn/SZTtHMgcOJfKk61YtHnYJFor1+shvyglytrQMBX4eyrY2ZQ2hPdLljmXimB9//ll
+         jEzw1frnEsmpz3gqQ3nq+GiX7WeZZjkAvP8hqBD4ORtqs6c+9a+MJd/Y1l9r20IlCwVq
+         zf2Q==
+X-Gm-Message-State: AOJu0YwTfkTdpdPZQz/y4IuHdl9lHKC8OquWe4GKZ8TR42amRzztqw5R
+	v0iSYRx+Z4gqFfZBLoGN+e8y4lbDaNixH0P8tTyTggn+7FoZE/YHJgSvradvo807H0g8toPdMxM
+	NZQhzjdwMmvN6FtUn7F71aky1Y3dXx2bCkgfijPKH
+X-Gm-Gg: ASbGncslI2td39uAaFFWw35uRMX1slYujlMchTirDFTLpGUqaexwsjGxzVO377WCQst
+	rYTcb3ap+KtoHMTIF5VxiENCUnIu2P6UDk253qWgdoUnJrfJD0rCrmF1N0UeZHWZsH+7mADX8WP
+	aQuLBT54iadbIFOX55HR/o9R2cPJSdFAM1WM6mzUEDRs0CIqhhkl+Baezw/r94dn/y7XgmYsIw4
+	IyRanWfPK89urh5CRc9VT5DY8P095bmrgVyAwvyJqZAOcp8MMe9HucxUpb0zQ==
+X-Google-Smtp-Source: AGHT+IG0VJh2q9I6lpulhETeYqGjsEZHYw4x4EcIq2IDc3ASKPP8Z/KUgikANjcaHrTbKg5xgVZq38OQMSkaxmAXg7k=
+X-Received: by 2002:ac8:5e51:0:b0:4e8:b04a:82e3 with SMTP id
+ d75a77b69052e-4ed61bf9464mr7281931cf.10.1762279055815; Tue, 04 Nov 2025
+ 09:57:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-5-seanjc@google.com>
- <aPhjYcOFjL1Z8m2s@yzhao56-desk.sh.intel.com> <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
-Message-ID: <aQo-hus99rE7WBgb@google.com>
-Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
- guest_memfd pfn into TDP MMU
-From: Sean Christopherson <seanjc@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Binbin Wu <binbin.wu@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20251104125906.1919426-1-tabba@google.com> <20251104125906.1919426-6-tabba@google.com>
+ <a0b19558-dbcb-4231-b0c4-302cc10652db@arm.com>
+In-Reply-To: <a0b19558-dbcb-4231-b0c4-302cc10652db@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 4 Nov 2025 17:56:59 +0000
+X-Gm-Features: AWmQ_bnag7lXsJ9mn0GfG63SyUcw-QZVD7to_jR_Go2OWvRrYrrbE7F4qdFrXGA
+Message-ID: <CA+EHjTwPqm5wkmdGK60sn+S9BizK6LG5bSqWQLigsZVgXoJmUw@mail.gmail.com>
+Subject: Re: [PATCH v1 5/8] KVM: arm64: Fix Trace Buffer trap polarity for
+ protected VMs
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 30, 2025, Yan Zhao wrote:
-> On Wed, Oct 22, 2025 at 12:53:53PM +0800, Yan Zhao wrote:
-> > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
-> > > Link: https://lore.kernel.org/all/20250709232103.zwmufocd3l7sqk7y@amd.com
-> > 
-> > Hi Sean,                                                                         
-> > 
-> > Will you post [1] to fix the AB-BA deadlock issue for huge page in-place
-> > conversion as well?
+Hi Suzuki,
 
-If you (or anyone) has the bandwidth, please pick it up.  I won't have cycles to
-look at that for many weeks (potentially not even this calendar year).
+On Tue, 4 Nov 2025 at 17:50, Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>
+> On 04/11/2025 12:59, Fuad Tabba wrote:
+> > The E2TB bits in MDCR_EL2 control trapping of Trace Buffer system
+> > register accesses. These accesses are trapped to EL2 when the bits are
+> > clear.
+> >
+> > The trap initialization logic for protected VMs in pvm_init_traps_mdcr()
+> > had the polarity inverted. When a guest did not support the ExtTrcBuff
+> > feature, the code was setting E2TB. This incorrectly disabled the trap,
+> > potentially allowing a protected guest to access registers for a feature
+> > it was not given.
+> >
+> > Fix this by inverting the operation.
+> >
+> > Fixes: f50758260bff ("KVM: arm64: Group setting traps for protected VMs by control register")
+> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >   arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > index 43bde061b65d..df0c59a29b35 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > @@ -118,7 +118,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
+> >               val |= MDCR_EL2_TTRF;
+> >
+> >       if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, ExtTrcBuff, IMP))
+>
+> Why are we checkin ExtTrcBuff ? Shouldn't that be TraceBuffer ?
+
+This is an existing bug that needs to be fixed. Thank for spotting it.
+
+> > -             val |= MDCR_EL2_E2TB_MASK;
+> > +             val &= ~MDCR_EL2_E2TB_MASK;
+> This looks correct to me.
+
+I don't thin it's correct. E2TB traps when clear, not set:
+https://developer.arm.com/documentation/ddi0601/2025-09/AArch64-Registers/MDCR-EL2--Monitor-Debug-Configuration-Register--EL2-
+
+> Suzuki
+>
+> >
+> >       /* Trap Debug Communications Channel registers */
+> >       if (!kvm_has_feat(kvm, ID_AA64MMFR0_EL1, FGT, IMP))
+>
+>
