@@ -1,167 +1,192 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473021465B4;
-	Tue,  4 Nov 2025 06:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2949124290D
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 08:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762237025; cv=none; b=eidcBpSC3Gps5N/S2S/JTmTx0XsZ+Siau1FX47DyOFYXx7SgW8U+mW+jb9CnO6VID7E55yr7bokWtZ8fQxJZh0G/lQeCyZmzbCPWYVwv/pI+cM7TfrzS++oZUGBDxtAyoN9qTDRnbRlQ9KcWw5Tc7twJpOeXWY5w6YJa7NLMzqA=
+	t=1762246238; cv=none; b=eBqWmPvsQ5jbMo6hW4tuglHkBmh02pAm8vCL/Ey1+51N4N2rWEmR3z638OdeBr7ic6h/bFxVZVJvAb3LmYf00bhwVixLD4buNC4SNhkUxXJcen0fCawGYJ5uCwwZ+m/3HM7mRGlYcgS+Jar2xo9mpywoNAXCoSHXO4NUeBuLDRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762237025; c=relaxed/simple;
-	bh=mSKoZmGkcXW407B8mNGjY9EejInAopsSE39gAyEUn9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KxyLXMJDWe4f36kzyEg87UBSz78LaRsWAtTEPNCIXeAXBLeZrWNY7QSnHrSrW0eZl7ZlvDMi8UdWS8PpB+l+lGrYORRklXhmbr5nVLR26YzoKdDB+0vmtV0HKCFm80pcKhBYPouGs/qZtmwzAgWFA0lsZtRw1cDsMgiv3grxxsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OXrazto3; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1762246238; c=relaxed/simple;
+	bh=soGesaofbZljclF8W2Zm3bonsPZqu5WbEtAViCwuPsw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iJQuPbR+1lSbabPLkHsyUU/ro52Uqn9e1xX1xHhoIubg5oWk+Gvooikm9Ehmx5KAqMxZKWGfDGoIP9U9cE84sX7xD/lKKUmwKWxfQE9y5qM7Pp4TXinPsrwkrfUxYyHI+uORKnWrpOch3Y+QKLOmDxubOv4tqSAzbTJcwDiAktI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NBb/BZVT; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OXrazto3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762237023; x=1793773023;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=mSKoZmGkcXW407B8mNGjY9EejInAopsSE39gAyEUn9k=;
-  b=OXrazto3bos6ZouLXm81qGUGmuUm3OZdCGxCNDmP4C2W+ykyqxLdNpHM
-   1DxyyS4eKg+f2UC8Kt2DT1ZQ1E34vbMtAEaD2xfzDXma1x2Sr01Q4K+0I
-   aF6SWWtCUu656YkV3TFUFRJN7V4ruPrFIYWNM78ZsGUX5oDCZo057lhKH
-   oGGMjooTh6E1C3Pi0yfsGM4DHcneO6QWuKHfwNwXSgurXHKDEBhDMEfqa
-   fFi5YiitRnTOAaF0VUY+gCJG52aM0x/NnUOEg/B33v6ZZnAMHrb19rw9x
-   Om3sIeQ4LUHVoj0/B1xwvM9Kfz/8Sra1hjkH8hLcR/ILGEc8Cq+pj8vUV
-   w==;
-X-CSE-ConnectionGUID: X85PB/eDRtq7BN2jAHCDug==
-X-CSE-MsgGUID: MEBed1xfQCmkE+WN7qFzPA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="63528093"
-X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="63528093"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 22:17:02 -0800
-X-CSE-ConnectionGUID: IL8VAT68RkmI5IbPyY1fNw==
-X-CSE-MsgGUID: u8bxLoPYS/KxoreV4M7Dmg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="210576877"
-Received: from yinghaoj-desk.ccr.corp.intel.com (HELO [10.238.1.225]) ([10.238.1.225])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 22:16:56 -0800
-Message-ID: <31da959f-d004-4ae0-a6a7-d5d31b646b70@linux.intel.com>
-Date: Tue, 4 Nov 2025 14:16:53 +0800
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NBb/BZVT"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762246228; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=a6gOAz78r5vvYxw3j29DNoIm+CngnMkAn2hvO8B4UoM=;
+	b=NBb/BZVTivofn7dwRNQmdMFPs2bop4MZ88YXLsAYD5nfbMV1R/6ieyRD7A1iDTr5IK+4cmhttCQTzWDYds2j/ndnD4KJjBrMFKNRJBPreAdQid0TMACglZt5bXOX9o8WoSZJLynV7ZHEjA2igGlSrbTK/8EA32ji1yxDlaq8Kb8=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0Wrgcs7Z_1762246227 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 04 Nov 2025 16:50:27 +0800
+Date: Tue, 4 Nov 2025 16:50:26 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: Re: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack
+ of ICV_DIR_EL1 trapping
+Message-ID: <eossoxorxj5knjyx2xglsrzhrbi6rry3rcr2xryfmft3q7up4b@tr5yrg6lljzq>
+References: <20251103165517.2960148-1-maz@kernel.org>
+ <20251103165517.2960148-6-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 27/28] KVM: TDX: Bug the VM if extending the initial
- measurement fails
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
- Kai Huang <kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Vishal Annapurve <vannapurve@google.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Ackerley Tng <ackerleytng@google.com>
-References: <20251030200951.3402865-1-seanjc@google.com>
- <20251030200951.3402865-28-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20251030200951.3402865-28-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103165517.2960148-6-maz@kernel.org>
 
-
-
-On 10/31/2025 4:09 AM, Sean Christopherson wrote:
-> WARN and terminate the VM if TDH_MR_EXTEND fails, as extending the
-> measurement should fail if and only if there is a KVM bug, or if the S-EPT
-> mapping is invalid.  Now that KVM makes all state transitions mutually
-> exclusive via tdx_vm_state_guard, it should be impossible for S-EPT
-> mappings to be removed between kvm_tdp_mmu_map_private_pfn() and
-> tdh_mr_extend().
+On Mon, Nov 03, 2025 at 04:54:49PM +0800, Marc Zyngier wrote:
+> A long time ago, an unsuspecting architect forgot to add a trap
+> bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
+> what's a bit of spec between friends? Thankfully, this was fixed
+> in a later revision, and ARM "deprecates" the lack of trapping
+> ability.
 >
-> Holding slots_lock prevents zaps due to memslot updates,
-> filemap_invalidate_lock() prevents zaps due to guest_memfd PUNCH_HOLE,
-> vcpu->mutex locks prevents updates from other vCPUs, kvm->lock prevents
-> VM-scoped ioctls from creating havoc (e.g. by creating new vCPUs), and all
-> usage of kvm_zap_gfn_range() is mutually exclusive with S-EPT entries that
-> can be used for the initial image.
+> Unfortuantely, a few (billion) CPUs went out with that defect,
+> anything ARMv8.0 from ARM, give or take. And on these CPUs,
+> you can't trap DIR on its own, full stop.
 >
-> For kvm_zap_gfn_range(), the call from sev.c is obviously mutually
-> exclusive, TDX disallows KVM_X86_QUIRK_IGNORE_GUEST_PAT so the same goes
-> for kvm_noncoherent_dma_assignment_start_or_stop(), and
-> __kvm_set_or_clear_apicv_inhibit() is blocked by virtue of holding all
-> VM and vCPU mutexes (and the APIC page has its own non-guest_memfd memslot
-
-Nit:
-It sounds like TDX is using the memslot for the APIC page, but for a TD, the
-memslot for the APIC page is never initialized or used?
-
-> and so can't be used for the initial image, which means that too is
-> mutually exclusive irrespective of locking).
+> As the next best thing, we can trap everything in the common group,
+> which is a tad expensive, but hey ho, that's what you get. You can
+> otherwise recycle the HW in the neaby bin.
 >
-> Opportunistically return early if the region doesn't need to be measured
-> in order to reduce line lengths and avoid wraps.  Similarly, immediately
-> and explicitly return if TDH_MR_EXTEND fails to make it clear that KVM
-> needs to bail entirely if extending the measurement fails.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   arch/x86/kvm/vmx/tdx.c | 24 +++++++++++++-----------
->   1 file changed, 13 insertions(+), 11 deletions(-)
+>  arch/arm64/include/asm/virt.h  |  7 ++++++-
+>  arch/arm64/kernel/cpufeature.c | 34 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kernel/hyp-stub.S   |  5 +++++
+>  arch/arm64/kvm/vgic/vgic-v3.c  |  3 +++
+>  arch/arm64/tools/cpucaps       |  1 +
+>  5 files changed, 49 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 8bcdec049ac6..762f2896547f 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -3123,21 +3123,23 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
->   
->   	put_page(src_page);
->   
-> -	if (ret)
-> +	if (ret || !(arg->flags & KVM_TDX_MEASURE_MEMORY_REGION))
->   		return ret;
->   
-> -	if (arg->flags & KVM_TDX_MEASURE_MEMORY_REGION) {
-> -		for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
-> -			err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry,
-> -					    &level_state);
-> -			if (err) {
-> -				ret = -EIO;
-> -				break;
-> -			}
-> -		}
-> +	/*
-> +	 * Note, MR.EXTEND can fail if the S-EPT mapping is somehow removed
-> +	 * between mapping the pfn and now, but slots_lock prevents memslot
-> +	 * updates, filemap_invalidate_lock() prevents guest_memfd updates,
-> +	 * mmu_notifier events can't reach S-EPT entries, and KVM's internal
-> +	 * zapping flows are mutually exclusive with S-EPT mappings.
-> +	 */
-> +	for (i = 0; i < PAGE_SIZE; i += TDX_EXTENDMR_CHUNKSIZE) {
-> +		err = tdh_mr_extend(&kvm_tdx->td, gpa + i, &entry, &level_state);
-> +		if (TDX_BUG_ON_2(err, TDH_MR_EXTEND, entry, level_state, kvm))
-> +			return -EIO;
->   	}
->   
-> -	return ret;
-> +	return 0;
->   }
->   
->   static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index aa280f356b96a..8eb63d3294974 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -40,8 +40,13 @@
+>   */
+>  #define HVC_FINALISE_EL2	3
+>
+> +/*
+> + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
+> + */
+> +#define HVC_GET_ICH_VTR_EL2	4
+> +
+>  /* Max number of HYP stub hypercalls */
+> -#define HVC_STUB_HCALL_NR 4
+> +#define HVC_STUB_HCALL_NR 5
+>
+>  /* Error returned when an invalid stub number is passed into x0 */
+>  #define HVC_STUB_ERR	0xbadca11
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 5ed401ff79e3e..44103ad98805d 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2303,6 +2303,31 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
+>  }
+>  #endif
+>
+> +static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
+> +				 int scope)
+> +{
+> +	struct arm_smccc_res res = {};
+> +
+> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV3_CPUIF);
+> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDS <= ARM64_HAS_GICV5_LEGACY);
+> +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) ||
+> +	    !cpus_have_cap(ARM64_HAS_GICV3_CPUIF))
 
+Duplicated checking ?
+
+> +		return false;
+> +
+> +	if (!is_hyp_mode_available())
+> +		return false;
+> +
+> +	if (is_kernel_in_hyp_mode())
+> +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
+> +	else
+> +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
+> +
+> +	if (res.a0 == HVC_STUB_ERR)
+> +		return false;
+> +
+> +	return res.a1 & ICH_VTR_EL2_TDS;
+> +}
+> +
+>  #ifdef CONFIG_ARM64_BTI
+>  static void bti_enable(const struct arm64_cpu_capabilities *__unused)
+>  {
+> @@ -2814,6 +2839,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.matches = has_gic_prio_relaxed_sync,
+>  	},
+>  #endif
+> +	{
+> +		/*
+> +		 * Depends on having GICv3
+> +		 */
+> +		.desc = "ICV_DIR_EL1 trapping",
+> +		.capability = ARM64_HAS_ICH_HCR_EL2_TDS,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = can_trap_icv_dir_el1,
+> +	},
+>  #ifdef CONFIG_ARM64_E0PD
+>  	{
+>  		.desc = "E0PD",
+> diff --git a/arch/arm64/kernel/hyp-stub.S b/arch/arm64/kernel/hyp-stub.S
+> index 36e2d26b54f5c..ab60fa685f6d8 100644
+> --- a/arch/arm64/kernel/hyp-stub.S
+> +++ b/arch/arm64/kernel/hyp-stub.S
+> @@ -54,6 +54,11 @@ SYM_CODE_START_LOCAL(elx_sync)
+>  1:	cmp	x0, #HVC_FINALISE_EL2
+>  	b.eq	__finalise_el2
+>
+> +	cmp	x0, #HVC_GET_ICH_VTR_EL2
+> +	b.ne	2f
+> +	mrs	x1, ich_vtr_el2
+> +	b	9f
+> +
+>  2:	cmp	x0, #HVC_SOFT_RESTART
+>  	b.ne	3f
+>  	mov	x0, x2
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 236d0beef561d..e0c6e03bf9411 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -648,6 +648,9 @@ void noinstr kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
+>  		dir_trap = true;
+>  	}
+>
+> +	if (!cpus_have_cap(ARM64_HAS_ICH_HCR_EL2_TDS))
+> +		common_trap = true;
+> +
+>  	if (group0_trap)
+>  		hcr |= ICH_HCR_EL2_TALL0;
+>  	if (group1_trap)
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 1b32c1232d28d..77f1bd230722d 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -40,6 +40,7 @@ HAS_GICV5_CPUIF
+>  HAS_GICV5_LEGACY
+>  HAS_GIC_PRIO_MASKING
+>  HAS_GIC_PRIO_RELAXED_SYNC
+> +HAS_ICH_HCR_EL2_TDS
+>  HAS_HCR_NV1
+>  HAS_HCX
+>  HAS_LDAPR
+> --
+> 2.47.3
+>
