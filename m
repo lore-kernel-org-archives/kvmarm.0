@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9563713B293
-	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 15:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0101E215F42
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 15:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762269354; cv=none; b=DfD+Ordzqd72hXtSvqUmTYlzctsoYWmGurIl3KLwDrHaI97k92l3w8TejljZfNG2NA2ULHea2ZvB+wQKnamTXzVb5B3xzqPRpR3q2gsS0Rdbg/3uk14z0vJCPK7oRN9AmbnGUsHCESrFWpI5Jr1a8r9Ysvi/kCObrimgVioTZHY=
+	t=1762269973; cv=none; b=PPJNdQ1t8OX8/V3uS/Cwrgcs17dkThAMM2BRfY8Hz2lYvjg0zwe48vpPPpFNf95egOmvHEAIepU4nBK/FA0Ax+DupocMzzzyAa5lea6J+YHtNamrHxGO1kjx3xs/vQJchOdeej7mIXvl22yWRdRoKZOtJOuEUdWoIki5+RVaYVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762269354; c=relaxed/simple;
-	bh=z4gLYdJzEW4GjlUvstMoQfV2hJ358bwR0e9XXreUMe4=;
+	s=arc-20240116; t=1762269973; c=relaxed/simple;
+	bh=ufkzVDQGpPkSO8Os+Cl/eseLg3hDFTXk0IeH26ebQdo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qttrm2yHfnA+vuMY7JhcpgwbNnPBX55MCIBkizvRpDPPO2Gt2qO2sDNf+KLzDnAiDVrkUf2Aj0db063siU3T9rVG2YnLTU402MpMXo47cs4UgJ/bjiIZ++iEQCZA4QlxH4cduv1G+KoKn/PwCSIxBhPHmn77n8Xt5rEgSw8dk3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cKjai/u3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=f+Pe8qLWUp/IQpGjZq4gxGhPgE4glKU+AEMgB1sUccrHdhHDJhA51CjcK8d8ttFqiNOOjhgH2V1dh6quVbzu1Mv0G/7gQmVIIrVwHCZaUVOciXXo7JCmZ4ef53JiQJMOgvKx16dRAVMUxZdGS9rCHqyfxHWdJbWXSdpfdHIv/W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H52LslPc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cKjai/u3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BC1BC116B1;
-	Tue,  4 Nov 2025 15:15:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H52LslPc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F0DAC4CEF7;
+	Tue,  4 Nov 2025 15:26:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762269354;
-	bh=z4gLYdJzEW4GjlUvstMoQfV2hJ358bwR0e9XXreUMe4=;
+	s=k20201202; t=1762269972;
+	bh=ufkzVDQGpPkSO8Os+Cl/eseLg3hDFTXk0IeH26ebQdo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cKjai/u3WEmrF0qoL4fCe1Nngh5Pl1Zg0wiQ/QT3YTLDo7X1BDgt35Qk/a+lQ56yD
-	 KdHUFLOcQ5XfiCjQbvbZq2nDWGj3ihi2Wuy9Z/0QqTxed700UwZMrC97/1X0+1ltzf
-	 Jk5qOzId4J/PSH83A/xNrIZb8R9UjVyq/ojtmvTX2mW02jQk3AJfiRr1JV/lYGu2UK
-	 CTmW5kZwt+6ar2i8A9baqopAW7zsFrAKbl6iGKAfMFMTI/Te3fGnGAmCmOsjx4/zkg
-	 SWnmj8eMagfm0cvmJlkgTHkCd8P9iKVvjGIvOZatIuOdwO2YbBxgFcaI/XKDHIR0ef
-	 OHZ0dcgZWn2uw==
+	b=H52LslPcO2hTqEixOFdfNeDNtilT+VxG966alxulMa9XNn1XeU7un4PJK37i/PvNE
+	 fmiN7iv29QOmbAnoVLZJwEl0ch4X5Jx1TKWHpvNcN+uil/FqqgR5e/Mi6YsjwQStKW
+	 ubIzumPimcM4dXYiOM8HYoCcpUZaeekdnI7l3WaacrvR9e2muOM8m3M1mSFjomJcnj
+	 C7+8KsM38fHGnYl+kTE5OsqgsnWwfgnqdtFhGcsd+u2s7nKulw/Kq898zMTPzBzFIp
+	 FON2/Q5dTW32nmtmZutiOyw9QqjtUwI1sLSFl3pDZXupEoT3icHrgfC+lE0tpFkkGX
+	 NNjBIY8DXQt4g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vGIlD-00000002Kft-2rtZ;
-	Tue, 04 Nov 2025 15:15:51 +0000
-Date: Tue, 04 Nov 2025 15:15:51 +0000
-Message-ID: <86h5v9vnfc.wl-maz@kernel.org>
+	id 1vGIvC-00000002KvX-1BnK;
+	Tue, 04 Nov 2025 15:26:10 +0000
+Date: Tue, 04 Nov 2025 15:26:09 +0000
+Message-ID: <86fratvmy6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -45,10 +45,10 @@ Cc: kvmarm@lists.linux.dev,
 	yuzenghui@huawei.com,
 	catalin.marinas@arm.com,
 	vladimir.murzin@arm.com
-Subject: Re: [PATCH v1 2/8] KVM: arm64: Trap access to ALLINT if FEAT_NMI not supported by the guest
-In-Reply-To: <20251104125906.1919426-3-tabba@google.com>
+Subject: Re: [PATCH v1 3/8] KVM: arm64: Enable LS64 instructions when supported by guest
+In-Reply-To: <20251104125906.1919426-4-tabba@google.com>
 References: <20251104125906.1919426-1-tabba@google.com>
-	<20251104125906.1919426-3-tabba@google.com>
+	<20251104125906.1919426-4-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,43 +64,32 @@ X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@li
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 04 Nov 2025 12:59:00 +0000,
+On Tue, 04 Nov 2025 12:59:01 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Access to ALLINT is part of FEAT_NMI. If a guest does not support this
-> feature, any access to this register must be trapped to the hypervisor
-> (EL2).
+> The FEAT_LS64* family (FEAT_LS64, FEAT_LS64_V, FEAT_LS64_ACCDATA)
+> enables support for LD64B, ST64B, and their variants. If a guest is
+> advertised these features, KVM should not trap accesses to these
+> instructions to EL2.
 > 
-> KVM didn't configure this trap, potentially allowing a guest to toggle
-> all interrupt mask when it doesn't support FEAT_NMI. Fix this by
-> checking if the guest has FEAT_NMI support.
+> This is controlled by the HCRX_EL2_EnASR, HCRX_EL2_EnALS, and
+> HCRX_EL2_EnAS0 bits. When clear, these bits trap the corresponding
+> instructions. KVM did not set them, which would cause guest-supported
+> instructions to trap.
+> 
+> This also created a state mismatch for nested virtualization, which
+> validates its own HCRX_EL2 value against the features advertised in the
+> guest's ID_AA64ISAR1_EL1 (in handle_other()).
+> 
+> Fix this by checking for each FEAT_LS64* variant in
+> vcpu_set_hcrx() and setting the corresponding HCRX_EL2 enable
+> bit if the guest supports the feature.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 0f8311263edf..3fc62808c548 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -688,6 +688,9 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  		else
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_MCE2;
->  
-> +		if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, NMI, IMP))
-> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_TALLINT;
-> +
->  		if (kvm_has_tcr2(kvm))
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
->  
 
-I think this is moving in the wrong direction. We have for quite some
-time now tried to automatically derive these behaviours from the guest
-config, as we do for FGUs.
-
-I would like to see a similar behaviour being introduced for non-FGT
-bits so that we don't have to worry about these things anymore.
+Please see 20240815125959.2097734-1-maz@kernel.org, which has a large
+portion of what is required for this to work. Just flipping the bits
+isn't quite enough.
 
 Thanks,
 
