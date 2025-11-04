@@ -1,115 +1,127 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D186320DD52
-	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 15:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB5F3346A6
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 17:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762270301; cv=none; b=l3b6PlCo/LA/xwAw5AnP6FEtLfjXaadeyvxpH1QCulTXl/XY248SRFV5No3hWqYt633YABkPcTd2jbXo7eT7CLdGeKG3VowdsXLw2INWLQzT+GYWwwWs9U9zb1p8BUzxtStt/+dfazsgRirBLA9WBPk/mctendjorha9khuPmv4=
+	t=1762276957; cv=none; b=PccwfJCs/9uNWlpvldW0ygCjZUZXaV03+Laq7ZrjhLx5wp0Hau0JPEuQIUEOz+3hU8vhUi5D9vOgaFxi7BMwitT1xfidAhgverBCcUadrUA6KlpiSxCorYTwZ6GmCKYuTNzZkpQvUq5TbCULygcs5blJ9X3uB2odiM5LCU199qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762270301; c=relaxed/simple;
-	bh=cw9zaNJDOKWLXdz9grydVSG9cp15N8CBG56gvwobMfI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n76PRuRBBfsGYpq1W48Dj/4/TxQWio+sz+4ZV8QJ8iW0+M8VAgrRBEQx/c+h2Hb65s6PGZkqxDtKQIRB+x4gBS7sW/W81ZBObqbjMio7o66a4MeLTV9bT/y+gLprLNkNjFbkNFTdQr4NWrEoyV7C2zVcLbtH66JDomw5kiPK1og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lcw3MSxW; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1762276957; c=relaxed/simple;
+	bh=iUZ3N3RHvseLx+CotbOn+5bZMf+u+c4VO9Kg+qOLrVA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iKkc6//GPqHvdks4dWSKzCfXiTwe5gXXZ7qob7z0bF3A+n9sGsrmz9kzi4A25idF2XKYZz/s4I+qZr9TKZdTEKcJcfCzQNsNbTVzvL/S2InpL+zHl5Q/1/ab54WuKwFJLBTJPebpZZts2Bs4CUcIZiU8SIAXKid2W8NbBnZQ4EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SfOW3hyL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lcw3MSxW"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso377151cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 07:31:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762270299; x=1762875099; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=21lGBZHN6RDH3gDJV/VR93+uRMqtY4vgBTT2MKuRSr8=;
-        b=lcw3MSxWbQz7mvMhR3HNoqN+prx1TVHSKslbtmJMe18CINWo5ES1q5bjB0P7/yNpTL
-         Mg8/gJb2nNS9QRBl/B7YxoRAAPiH7gE5Xdjn0BB/8xPECpYd+X03Z+YPT3xrmWJfYjx+
-         A6eb/Ay1UhdFFPUVAqZzzchcBulwwSW8uWCH9QeClitq7tirRQNJ9VJV7CpYN6XLv/FA
-         5DHz60JJe1jrp2cepU4t3Ly9ffQQ9kn1KT7D7Vk5ws7B0HAXD8tiyNe68gHbIkiIrA6w
-         P2zf1ZCbcNd3lgGEkj5DWWY7BJk5o54o95dntmK1LID5kcheVB1U58HrbWQMiDF07BMW
-         Fx9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762270299; x=1762875099;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=21lGBZHN6RDH3gDJV/VR93+uRMqtY4vgBTT2MKuRSr8=;
-        b=G5MvM9YbxL2W4lMzd27HVddLYpe3jf9+rw2enjceau2nR9byYbt4lvimZOUN8bojST
-         yMQ4h5SDL4v+WLAVU+lDRR6OzsJZwfcWRO1k2qghQM+B3nzv8qFH/ABsdXCgYkvCZpED
-         y/VK52mOiGvekf4DPNd9OMrmUtwRzig6tYvB5NIHaqBAWU4NFxwcLLKTJhUwV0a5gTTN
-         kowXtHDWngqL/EJe7e3o/JrNooieKLhvuzY7699mv5EI6ZXn+zNQyXU/Z+jZ40xuMjXO
-         qeVyoUJgkF6Ezzqvl1FLXVHSnJj1VGRxOXgD0UC/bwaZpRW/rcgOriKa1yXzXEpT3lia
-         +LMQ==
-X-Gm-Message-State: AOJu0YxfkHW18/sEkv9IyldIHlcCP/eqz5LoTaFLL0tlwIpknLsZs6Dy
-	RSn81IdIV8YJWumP/BzrretLqRUws8P/QWL5Rf1fDNm5uQL9Bli/aduQD8nsXGzQWrn2zdAMBmL
-	fvO4uSIoKuJZnRHf/5B9FT2Hhzgok+bPhs0OgBBhLKlttq8NLH/PlagRt
-X-Gm-Gg: ASbGnct6q4UbKldOblcRB5OhxD4tO1/bKwUBbyT3waEpOapHeJTiiexXyEFyceahFvQ
-	Tobl7rxR9ORJFFj5vmVRs+ZHLbYxzhfqjAE1VN0DzgM2pWf04DWcJgcJ9Z39Foti+u2MFFd5MgO
-	PzNLSCyAo3LDq8j/leptcWk/fcdx7tsHLOW+hhQg74i2EdhZUNAVJFAtAk1Ctw8KlSU7ekX0AmQ
-	xHyKWeYmTHwb+oop7VK5lYET2srhCgtwpIegO7dXvST+aKbi06qQ8+PwmjIhDYIbe/0YhfJQN2a
-	pxar299bcoEvlD4qdvpjOx1V
-X-Google-Smtp-Source: AGHT+IGKUuRG3ZTQJQjA7fDbzPjiK8c0XLTuIcGAohK8BXI9QMN8hTTl8zf+znwMZHD4+Rf7gf9pYImYFgIOVtGiADE=
-X-Received: by 2002:a05:622a:1794:b0:4b7:9a9e:833f with SMTP id
- d75a77b69052e-4ed6384651fmr5720961cf.7.1762270298370; Tue, 04 Nov 2025
- 07:31:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SfOW3hyL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F99C4CEF7;
+	Tue,  4 Nov 2025 17:22:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762276957;
+	bh=iUZ3N3RHvseLx+CotbOn+5bZMf+u+c4VO9Kg+qOLrVA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SfOW3hyLAuC+DmP6QnLsMcVsa4W8zvFii49QP6kZ6T0IW37/W0a9tr2yBoC/olCl+
+	 fQvpdKsn5uA9bn4zeTkCXV1nrgx5VofgcGP0dY69jimF+hjKRvvDjMSvbnlHcMJv0Z
+	 mYQGUSZ7xvN+skE97lNcaFO9TS1ZoxGHR4fv7foWceAytGmfYzSL3Mc9FVBpatsbZQ
+	 5EyYa2AwW9N6SoYq27syR1LwqMXCZWvSfraihWjibmbRWdoxLruqjnQKw7JF6AEydQ
+	 mzr8vdyeAwRxzijaddtW91G4mKwqBwYRRHxNBFrCuTsSmksKV1Pl0Du1ZmsiQ9mMMJ
+	 h6Gf9f7KT5pSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vGKjr-00000002MrK-0GNT;
+	Tue, 04 Nov 2025 17:22:35 +0000
+Date: Tue, 04 Nov 2025 17:22:34 +0000
+Message-ID: <86ecqdvhk5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vladimir.murzin@arm.com
+Subject: Re: [PATCH v1 2/8] KVM: arm64: Trap access to ALLINT if FEAT_NMI not supported by the guest
+In-Reply-To: <CA+EHjTw7KnXVKeyxd4kNysAOMZrJniuBdCNGV=NoWodc3H-rMw@mail.gmail.com>
+References: <20251104125906.1919426-1-tabba@google.com>
+	<20251104125906.1919426-3-tabba@google.com>
+	<86h5v9vnfc.wl-maz@kernel.org>
+	<CA+EHjTw7KnXVKeyxd4kNysAOMZrJniuBdCNGV=NoWodc3H-rMw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251104125906.1919426-1-tabba@google.com> <20251104125906.1919426-4-tabba@google.com>
- <86fratvmy6.wl-maz@kernel.org>
-In-Reply-To: <86fratvmy6.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 4 Nov 2025 15:31:02 +0000
-X-Gm-Features: AWmQ_bmmcY2AsnQ7Tf1DOOd59RP8aCPwMHtrKQbQXLvPulNWGjrihLSXD_qNPF8
-Message-ID: <CA+EHjTxTBxR6VN_JtA-ga6QrZ-FL=AKyLTDr9vWSqfkdwjz9-Q@mail.gmail.com>
-Subject: Re: [PATCH v1 3/8] KVM: arm64: Enable LS64 instructions when
- supported by guest
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 4 Nov 2025 at 15:26, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 04 Nov 2025 12:59:01 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
+On Tue, 04 Nov 2025 15:30:34 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, 4 Nov 2025 at 15:15, Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > The FEAT_LS64* family (FEAT_LS64, FEAT_LS64_V, FEAT_LS64_ACCDATA)
-> > enables support for LD64B, ST64B, and their variants. If a guest is
-> > advertised these features, KVM should not trap accesses to these
-> > instructions to EL2.
+> > On Tue, 04 Nov 2025 12:59:00 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > Access to ALLINT is part of FEAT_NMI. If a guest does not support this
+> > > feature, any access to this register must be trapped to the hypervisor
+> > > (EL2).
+> > >
+> > > KVM didn't configure this trap, potentially allowing a guest to toggle
+> > > all interrupt mask when it doesn't support FEAT_NMI. Fix this by
+> > > checking if the guest has FEAT_NMI support.
+> > >
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_emulate.h | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > index 0f8311263edf..3fc62808c548 100644
+> > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > @@ -688,6 +688,9 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
+> > >               else
+> > >                       vcpu->arch.hcrx_el2 |= HCRX_EL2_MCE2;
+> > >
+> > > +             if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, NMI, IMP))
+> > > +                     vcpu->arch.hcrx_el2 |= HCRX_EL2_TALLINT;
+> > > +
+> > >               if (kvm_has_tcr2(kvm))
+> > >                       vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
+> > >
 > >
-> > This is controlled by the HCRX_EL2_EnASR, HCRX_EL2_EnALS, and
-> > HCRX_EL2_EnAS0 bits. When clear, these bits trap the corresponding
-> > instructions. KVM did not set them, which would cause guest-supported
-> > instructions to trap.
+> > I think this is moving in the wrong direction. We have for quite some
+> > time now tried to automatically derive these behaviours from the guest
+> > config, as we do for FGUs.
 > >
-> > This also created a state mismatch for nested virtualization, which
-> > validates its own HCRX_EL2 value against the features advertised in the
-> > guest's ID_AA64ISAR1_EL1 (in handle_other()).
-> >
-> > Fix this by checking for each FEAT_LS64* variant in
-> > vcpu_set_hcrx() and setting the corresponding HCRX_EL2 enable
-> > bit if the guest supports the feature.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
->
-> Please see 20240815125959.2097734-1-maz@kernel.org, which has a large
-> portion of what is required for this to work. Just flipping the bits
-> isn't quite enough.
+> > I would like to see a similar behaviour being introduced for non-FGT
+> > bits so that we don't have to worry about these things anymore.
+> 
+> I agree that we should make this more like FGT, but since that will
+> likely require a bit more time (and probably a couple of respins),
+> should we fix the HCRX traps as they are now?
 
-I see that now. Thanks.
-/fuad
+I don't think this is fixing anything. Where does the trap go? There
+is no triaging, no handling. At the very least, this needs to be
+defined.
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
