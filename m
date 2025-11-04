@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1B02ECEAC
-	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 12:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8001A2EC57B
+	for <kvmarm@lists.linux.dev>; Tue,  4 Nov 2025 12:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762261157; cv=none; b=mENWc8Zcpr04JEENv+sq+l59u+Vb2ZK+CT2WB3g1BZ+JNTLqM+HSAzH0Bnx3oBXGKVuRfoYn6e+3U6fzXs21B5rGFSeirvaCevGBhDhm5B/iIiWonpL2f6s0syRnLwOX3IgaRZRh08z7l87vEF+fnLAQpo6epBuU2450O8edUU4=
+	t=1762261158; cv=none; b=oi9U35HNEM7JwbbGdKRA00m2ZdhPN2vI+/D4M2a9WRZSyYgCzarX0boBLBLjCERpza1hjhFbgLGEZvCUItH9gpmfm4IX7iRPdLOLig0ovC1spev6/cFCnWZBsCe5FpOhDf88yYBsFWsVuSqRp1Dh5W+VSplwwdEG+lWe3FlrHHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762261157; c=relaxed/simple;
-	bh=eGLQyLWK5yhJv32b2I7Q4XrUgLWRfbQk6DCXGzy2uZc=;
+	s=arc-20240116; t=1762261158; c=relaxed/simple;
+	bh=weHZWsgI6gE723gtYQPU+G+nUSfn7eU9j54RBYV+r+U=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Jcxxml3S5Dd2dmm++RIvqN0b3NIN1WN11niOsT+HfMrIi458cQHODRD7Vt0FrQxnGLlkF3oxkeaYhtYQz3JAQSp9h+eAoZYqC/7A5q762DBrHKGLX3Q1WnK03gcisi24s4yJcwDY1/jBFqxrDzqliuHQ2yD4Ij+C6NNWaGeilR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4hDi8MPa; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=dCvOuly/J7M7rm89JA1ysT+0AbzyVR+/waOeaxAxhHexWwrF4EegINVB2IbCi8XVr1roOVS7cAbmEU8Pw72u7OWwoVcox6+pdlnaj1z5R78ldB6RG6wnHz7sdNhJ7XInz8f1jN5/bUXeT6rT/sgEMgEkcnerf7flsbPKMYuylT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gpBJ8AS6; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4hDi8MPa"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477563e531cso6227665e9.1
-        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 04:59:15 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gpBJ8AS6"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-429cd08586cso1372965f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 04 Nov 2025 04:59:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762261154; x=1762865954; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1762261155; x=1762865955; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Xik15WmAoHNbrZxUtrbj+k4Ee3EdsKPCteYm+EiLok=;
-        b=4hDi8MPaT/PHLPavdRpDBYiP25Bu4vBKttqJHpGTdZABQ26YQex1DX0mdp+NdcZMM1
-         0cyQjR89OOo8J5wsSmWQooHmBvHNuI9XJFtgGO92lKiPnAlmY6ox7azeJg4Ur+xlRT+d
-         OMs7lHot5D/SC0WLrKpfvC6kW0ygMXCp4xLpjLrl8/WYY+sdG8WcOquN5wH/hJ0jU3Tz
-         eEAzPKyYnAtkg87N0iDKG2O7bmQeGo4C9gzvXpWXqEQVGOekXH1zBcGjpmHeAufctUn4
-         WeCsIZFSQe6g4zOUQGQKtb/fU0tzMnATp3S7ZIn4+lJBRJ2Z2ueAHEGjCV7DBEaqoyhO
-         KNTQ==
+        bh=MzfKs1meZcxc8aIEgTcF+NFofqdV4KwxCeiYS7QeFos=;
+        b=gpBJ8AS63H7Inq/mV+k+D7YFfmWy8M1aY+TVB8WNPpbaV+L8xgDvRWR/Kd9JgAfCRO
+         jgWDZnA2b6zMDra79l04XeH8ivdfy4NDDyodtg0aMpi+ml4+mXf10l+zdS6GsCquu/Jc
+         jzAX7nKIORsehYJWTmnoJZ13z1yw3JvGtyUSx66Fk9XxhQzZnxF9a67+7yKixlTCzu1Z
+         VD3dgZZbBn6LWVt3Vss0ikdqoK2jS9HJMef/f7aTG6Va/2AOgGQQsYcfCrRb5/ZZai6X
+         HtEyVFF0FXEiZd7djcf6mAXTLHVKLsER3zY77e3qIK5zXmzrKtGQ1IRupF8ATvn1Aiav
+         g1fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762261154; x=1762865954;
+        d=1e100.net; s=20230601; t=1762261155; x=1762865955;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Xik15WmAoHNbrZxUtrbj+k4Ee3EdsKPCteYm+EiLok=;
-        b=NXIe5uEjH5M1q6JCdpErvVTw4rRxkGsThNd8xfwiHDFQavtBj4bNDVkah2cBqeBJuw
-         kdY2vVgE3InDMzR9t0fN5VyvZ/n67zyw1sF4rpwRjpNdezh3MN23C7xyRDZ+cpOxl/V/
-         haVXwPgxHbbF2ibI7kbF3VjwiCUxiYcAW1AS9mIMH7/67AM612hpWBV3UOUsq5IZ2gMu
-         HvpBykFDKjzoqM9Bv88d6lQTAVNBuY3esmsomziNqBgXs58CKcsYDiWGdnXewzVtASL4
-         BAnGqBImjoIAWF8zYdSdc+i6iVFjg+Hs0DaPUTcL2oLFEQAf6AT3jyUHQUqR5sW5tYTl
-         41Cg==
-X-Gm-Message-State: AOJu0Yzsf3cvw3CA2bTK/JrRXfGAxU+An5NEcu7PHh3Ucqb2xywSQPaE
-	509NrR9G+rdsGRAlTWwOnT5XWCTSJGUZDS0AX1e2yv2h6MPFLKcNX5iqE0rxmCMty3YG454u2Pn
-	rsH3POIsKBmoA8P06pNZPl9JSPQSFuur3Ssx5Elego/iLmNhVie17ZaHxi1qHKjjvhSm0CwHZ0J
-	W3kXYqOZZ9amWgEGa5qBnrx8MHn3BwUoo=
-X-Google-Smtp-Source: AGHT+IHlL/KyIyvJlAW6DKZbZabOz+McTPMSW0dgQJQD446yDCbFkkDQ67a8de15zsGEFor4k3yG3Qs0NA==
-X-Received: from wmco10.prod.google.com ([2002:a05:600c:a30a:b0:477:cf9:f4a3])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8b67:b0:45d:f81d:eae7
- with SMTP id 5b1f17b1804b1-4773089c98cmr166646825e9.28.1762261153921; Tue, 04
- Nov 2025 04:59:13 -0800 (PST)
-Date: Tue,  4 Nov 2025 12:59:05 +0000
+        bh=MzfKs1meZcxc8aIEgTcF+NFofqdV4KwxCeiYS7QeFos=;
+        b=U/Fi798uWHQwEWJyytEH1lSh97lD0JX6txdVAN99108SSdNlkz4FCE26K18iqW95mE
+         Ghar//IZbGxWgxxfPvT46mA60epmCGIGWgVBD86IWpcGfuSS0p888iHRYbJzyQr/6wEq
+         FvgG90uIjRD2HqAg7dtt0BhfOTzIdW3cF63UFYFja27emO9Fsikol6HKYanVqrcFidjH
+         lQvG4h1ty+BYzaOKRQ/dfPuMlMzXKaT+lHIZTsYbwQmTVvf4mEuRu8a9xLsiVKurXwsS
+         lXxk6focXdwe6a5vv+Mz4hIqUrW17uH2KLpZe4zFFHNapmjr4UIGAuUhi6if1s8WdeGR
+         GD7Q==
+X-Gm-Message-State: AOJu0Yz/+2RGU4QJqB+K1nRxAHI3nVAWYyl7NlvR8sMp5pyV8b1Jo82t
+	OMAcIonCNS5kJaQm4ce/jfOUXl+R9Kz/Lidv9rj75VJjblbStKaFXAWpXC4ADG4r5CHzJGi7QqC
+	axXCiKMtVlG8G7zvdrwdsAeCt035+pz2rmZxXNGM9jH3g0Ysb/YDCWRrxjkCNDzNdFRvqku8adD
+	ip+8NVncvbPwsV0xBDtdaSt7iy8IvTFBk=
+X-Google-Smtp-Source: AGHT+IHRYkO1/tIR1WAYAGStfsC6IBdc1crqUFMXQPt0Cl2jnlOTPv06xz5lhIxv8lUeuZzRrMw74GcB9g==
+X-Received: from wmbg22.prod.google.com ([2002:a05:600c:a416:b0:477:14b8:19f6])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4e52:b0:471:734:53c3
+ with SMTP id 5b1f17b1804b1-477308a0e33mr131579625e9.24.1762261154822; Tue, 04
+ Nov 2025 04:59:14 -0800 (PST)
+Date: Tue,  4 Nov 2025 12:59:06 +0000
 In-Reply-To: <20251104125906.1919426-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,9 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251104125906.1919426-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.2.997.g839fc31de9-goog
-Message-ID: <20251104125906.1919426-8-tabba@google.com>
-Subject: [PATCH v1 7/8] KVM: arm64: Prevent host from managing timer offsets
- for protected VMs
+Message-ID: <20251104125906.1919426-9-tabba@google.com>
+Subject: [PATCH v1 8/8] KVM: arm64: Define FAR_MASK for faulting IPA offset
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -69,84 +68,82 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-For protected VMs, the guest's timer offset state is private and must
-not be controlled by the host. Protected VMs must always run with a
-virtual counter offset of 0.
+This 12-bit FAR mask is hard-coded as 'GENMASK(11, 0)' in several places
+to reconstruct the full faulting IPA.
 
-The existing timer logic allowed the host to set and manage the timer
-counter offsets (voffset and poffset) for protected VMs.
+Define FAR_MASK for this value in the shared header and replace all
+open-coded instances to improve readability.
 
-This patch disables all host-side management of timer offsets for
-protected VMs by adding checks in the relevant code paths.
+No functional change intended.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arch_timer.c | 18 +++++++++++++-----
- arch/arm64/kvm/sys_regs.c   |  6 ++++--
- 2 files changed, 17 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h         | 2 ++
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 2 +-
+ arch/arm64/kvm/inject_fault.c            | 2 +-
+ arch/arm64/kvm/mmu.c                     | 4 ++--
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3f675875abea..69f5631ebf84 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1056,10 +1056,14 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1da290aeedce..e995e9b3a0c4 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -343,6 +343,8 @@
+ #define PAR_TO_HPFAR(par)		\
+ 	(((par) & GENMASK_ULL(52 - 1, 12)) >> 8)
  
- 	ctxt->timer_id = timerid;
- 
--	if (timerid == TIMER_VTIMER)
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
--	else
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	if (!kvm_vm_is_protected(vcpu->kvm)) {
-+		if (timerid == TIMER_VTIMER)
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+		else
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	} else {
-+		ctxt->offset.vm_offset = NULL;
-+	}
- 
- 	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 
-@@ -1083,7 +1087,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
--	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+	if (!vcpu_is_protected(vcpu) &&
-+	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
- 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
- 		timer_set_offset(vcpu_ptimer(vcpu), 0);
- 	}
-@@ -1687,6 +1692,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 	if (offset->reserved)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EBUSY;
++#define FAR_MASK GENMASK_ULL(11, 0)
 +
- 	mutex_lock(&kvm->lock);
+ #define ECN(x) { ESR_ELx_EC_##x, #x }
  
- 	if (!kvm_trylock_all_vcpus(kvm)) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e67eb39ddc11..3329a8f03436 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1606,11 +1606,13 @@ static int arch_timer_set_user(struct kvm_vcpu *vcpu,
- 		val &= ~ARCH_TIMER_CTRL_IT_STAT;
- 		break;
- 	case SYS_CNTVCT_EL0:
--		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags))
-+		if (!vcpu_is_protected(vcpu) &&
-+		    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags))
- 			timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read() - val);
- 		return 0;
- 	case SYS_CNTPCT_EL0:
--		if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags))
-+		if (!vcpu_is_protected(vcpu) &&
-+		    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags))
- 			timer_set_offset(vcpu_ptimer(vcpu), kvm_phys_timer_read() - val);
- 		return 0;
+ #define kvm_arm_exception_class \
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+index 78579b31a420..22898ed4dd6f 100644
+--- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+@@ -44,7 +44,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 
+ 	/* Build the full address */
+ 	fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
+-	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
+ 
+ 	/* If not for GICV, move on */
+ 	if (fault_ipa <  vgic->vgic_cpu_base ||
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index dfcd66c65517..8ef3453696a2 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -258,7 +258,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+ 	unsigned long addr, esr;
+ 
+ 	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+-	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	addr |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
+ 
+ 	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7cc964af8d30..21a9442f9b1e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1959,7 +1959,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 		/* Falls between the IPA range and the PARange? */
+ 		if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
+-			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
+ 
+ 			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
+ 		}
+@@ -2059,7 +2059,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * faulting VA. This is always 12 bits, irrespective
+ 		 * of the page size.
+ 		 */
+-		ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++		ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
+ 		ret = io_mem_abort(vcpu, ipa);
+ 		goto out_unlock;
  	}
 -- 
 2.51.2.997.g839fc31de9-goog
