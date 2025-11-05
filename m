@@ -1,236 +1,184 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C992C1780;
-	Wed,  5 Nov 2025 07:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762329002; cv=fail; b=Ku6eqHH7l/eTMkbGgcqnwYirSGyZELwVdU+ajO1VL/pGEd9hXDAN7wxUOGUKIGDouK23/KGeYbUbld6n45jol81QujIqb2s4RZEs+tS93zlSbkYIAYA3seu3BrK0OGI+MtdQhZXjOq0owbHNr9ZnXtZSARTLbLso1XMy9/jmv10=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762329002; c=relaxed/simple;
-	bh=xSVZXDY0znLHAquPH9GWLVC3lLn4OHkxYQHQ6IfV7so=;
-	h=Date:From:To:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=l+/Rd52Ykv5YTFqWY4VZ2O4KXalNvjPYyhaMIRX8VSkFs28rDDK/DBgWecMmMFUMOqJeO5FpnTmpWQiOM44uFG0I5UAHBQw3ku+wisDJ1vz2EGnfxciL81SRE3DllU9HUJ1k0VrvjxppQHoEgbOMGsLwVPu+hPFmgLr8eSoZQIs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AUcsypUT; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4510D1E572F
+	for <kvmarm@lists.linux.dev>; Wed,  5 Nov 2025 09:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762335436; cv=none; b=QVAYZ1CIvfDivNFHmjNcL5d79D0F3MYKPEtpD0YL+Vm0SLhRzlSDFTNdhP69Ekvn77E1blLi7uWchmXhCKnL5BgP63Wi49qaKUW6pu8AzPduflrpnF9j8hJByVPlzg0K+1Z77Yly97scKLUjoiRMu3MlxdZDLb1gptHIIzGimyQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762335436; c=relaxed/simple;
+	bh=GgAYd8m09eAkiFvYHfWthaUQ1qqw4sQEEnpEmXaxa5I=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BsjblBCfKG5g/jMvERXkfwfz21jg/6TzaNx9zA4+wSCG8WvYFXlySDNEej+VeaS24D0OCbwwny7ypvwetmB+PU082UYBQRvjaZtt7WUkbhtbUR/OEzWLQ3P/BtFamBXy0Mw5OwHU6CNdCmvHurJColellrcFpxeX/625+IECM8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=a+4+iU/J; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AUcsypUT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762329000; x=1793865000;
-  h=date:from:to:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=xSVZXDY0znLHAquPH9GWLVC3lLn4OHkxYQHQ6IfV7so=;
-  b=AUcsypUTBrIdk951IYPeoHnQGxRb9rsZL1ecLEi3W5lOlpXd9vIsoJTC
-   J1y4pgTcUR6pIJHokckesatJyL1jEM00FrxcEmJelxUmjvVSt1aJgx0Gf
-   z4J3g7lJwqP6wqM3XyEB0qlwCaSld069STj1+hNQ2GVwBJS6pt58SnMGE
-   NB1Z+zb/U4TSnix3mFvWAEyD0WbhjN8R067x9ivUbodPwahUuoM8f/j3m
-   Xizi6iWglMCfOTDRSbea3KLfKL7tBm7bQh2bkv0pRKtAWNxamWN4Y+lBF
-   YcCBxHu/71zNzhz+o43N98vu4oALv5Hocib4f9nR9BSFjkAsOVL4W+zKL
-   Q==;
-X-CSE-ConnectionGUID: tsow3gFBT0a0i1+aTqXd3Q==
-X-CSE-MsgGUID: 8sx6CXrvQq6C5gVEmADasA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="64131763"
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="64131763"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 23:50:00 -0800
-X-CSE-ConnectionGUID: /URWdqlmQhirABx2oJ5+wA==
-X-CSE-MsgGUID: HFnd7MhQS/ypmFv2FAX2bQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="192460516"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 23:50:00 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="a+4+iU/J"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=DZut6UUlhMErLbvp+0SGWnWDqtR3mrE8M0cra01Munc=;
+	b=a+4+iU/JM4Y+ta/pNg5p6q1UU1/k6pFpKrzpPlmOjMMv2aaD9Pah0kOGeGF99WrxPCDjcjUxs
+	n2QYSXMBhUdCSGpNtzlzcp3GhnDMhJWu9hjzvGENWXfAzFGkXfhXDqPKUSM5QbLJQD7ipMq8BEs
+	oSxrX5bt1eg5J3AT2nUQFnc=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4d1gD82LpxzmV6n;
+	Wed,  5 Nov 2025 17:35:36 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id ACA9D140156;
+	Wed,  5 Nov 2025 17:37:11 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 23:49:59 -0800
-Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 23:49:59 -0800
-Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.3) by
- edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 23:49:59 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Nw/WOF9nmqsvM36EY2tDKBWT4PbkMwVYmNJicwtVfzkcF1Elqfbi3IRxMoD0UFYkPk7+Z04YgGcFwRk/J5JbtrkKtic3QVygNn0IdQiI45q1DaIQVYKAhWoSuvdzyU4enK4rbZEgb3sS4oyz9vr5oRKQFM6z7kuXGmSto3EsIO6TdG9AOswk5ugXxysisXFAGsxJPlZBpGkXeY9u8FuXZBQAJy2OZl8GibG7tbgFnrYJnuqikPyNYj2c2S+yDk3EutKM5gFThD62i6MAlcPwzABVFbRFu8c8aG2/5RDnXszYwWGd3GDUm9Z4oLS/YrU6vKLzuerQ+2QPgto2uPNCTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H763XweLnSfFOo+PRrBmFAIVPvUbd9MxqaCXgLJ6h9M=;
- b=Cc0TzMgeb4vDP+clogZGst4NQaObKyZYnXje4g/o0fbdJ6FexwiaM8qC6Nxj3w/W1oI26LdMQ+zDOQC5K1aTMzThyM38ZG63St8usGD+6GjIz0r2oZdGWGDt+la9qtFK0erT0yotAbNkOwY/zZCm+Xk30GBuYJ4yNAypfRKOuUcST/OULRU8xmW3GpULuBHY3TeAazqcdHm9uOPfTZo/A0dPNVK1IYFTxiPtrDpSOYFJQLS3saN0vQz7j+dWA9NkR6QXsHjM/CBFK8zYPZDfQ8WAucbTSmhPXhGcb9BtZrv3s0z6h7jSZNbKtzkqs0kKNuGSCvOmXJfAFL6PsOQqwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- DS4PPF7CFF9C87C.namprd11.prod.outlook.com (2603:10b6:f:fc02::35) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Wed, 5 Nov
- 2025 07:49:56 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.9275.015; Wed, 5 Nov 2025
- 07:49:56 +0000
-Date: Wed, 5 Nov 2025 15:47:47 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
-	<zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, Huacai Chen
-	<chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, "Anup
- Patel" <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, "Christian
- Borntraeger" <borntraeger@linux.ibm.com>, Janosch Frank
-	<frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, "Paolo
- Bonzini" <pbonzini@redhat.com>, "Kirill A. Shutemov" <kas@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <loongarch@lists.linux.dev>,
-	<linux-mips@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
-	<x86@kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, Ira Weiny <ira.weiny@intel.com>, Kai Huang
-	<kai.huang@intel.com>, Michael Roth <michael.roth@amd.com>, Vishal Annapurve
-	<vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Ackerley Tng <ackerleytng@google.com>, Binbin Wu <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
- guest_memfd pfn into TDP MMU
-Message-ID: <aQsBI1/SIXGbf9nA@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20251017003244.186495-1-seanjc@google.com>
- <20251017003244.186495-5-seanjc@google.com>
- <aPhjYcOFjL1Z8m2s@yzhao56-desk.sh.intel.com>
- <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
- <aQo-hus99rE7WBgb@google.com>
- <aQr9jW/7zwWJaDFf@yzhao56-desk.sh.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aQr9jW/7zwWJaDFf@yzhao56-desk.sh.intel.com>
-X-ClientProxiedBy: SI1PR02CA0040.apcprd02.prod.outlook.com
- (2603:1096:4:1f6::7) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+ 15.2.1544.11; Wed, 5 Nov 2025 17:37:10 +0800
+Subject: Re: [PATCH v2 6/6] KVM: arm64: vgic-v3: Indicate vgic_put_irq() may
+ take LPI xarray lock
+To: Oliver Upton <oliver.upton@linux.dev>
+CC: <kvmarm@lists.linux.dev>, Marc Zyngier <maz@kernel.org>, Joey Gouly
+	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Ben Horgan
+	<ben.horgan@arm.com>
+References: <20250905100531.282980-1-oliver.upton@linux.dev>
+ <20250905100531.282980-7-oliver.upton@linux.dev>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <b4d7cb0f-f007-0b81-46d1-998b15cc14bc@huawei.com>
+Date: Wed, 5 Nov 2025 17:37:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DS4PPF7CFF9C87C:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e9ec11a-c06f-45a9-dfed-08de1c3fe994
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?WpyqhYkY92dZiBd/By/e2x2WbRfUnlxQUdWzaglJEI0AQvS2ZqmVY9Cdy8J6?=
- =?us-ascii?Q?xfX1XwaQnOyFn9qWvF5ijQT4RsJ59pq8tkGbewAYwUp1AVhrvBE1F2/Wc+gl?=
- =?us-ascii?Q?++EZEkXfP200IM2iHFuiellqD7ueVOpAPeVGqk78XA8HVlDR+G/TB2r7+Ioj?=
- =?us-ascii?Q?ji+bdWHI1DqprhfrGbB8WhhnUynbOMmZ6/hdn9190Ri/w20VoWS9BEhMHtGr?=
- =?us-ascii?Q?OhTOXV4Cb4ktQzOrNHNVLN3050FLJDswWjTHAzPqYGWysFBwmY97f/64RpuC?=
- =?us-ascii?Q?qJ4UP8CBSeevUA4l9fk0cTBcZgdIl13dQr8zGQZYo8/NaM6A2zo12rmNzjtU?=
- =?us-ascii?Q?wkhn661vjSs+Tgi6cv+HcrzWidq8aE1SN7jLW3aSqTx0vL/w8zb+dgRdfvrn?=
- =?us-ascii?Q?VtiJjs23qJTxG6/0QHe2ss9ozYWpdk5hc01jbHVSWTij1Ik8oREhvCMLENGL?=
- =?us-ascii?Q?qioGrVsKpoJ39KzeeRyM4HOhNZNG+i6uFMYj1Ul1Vl0bH13OJWI00Japp5M8?=
- =?us-ascii?Q?f+/qp5zw8vLrnbnAX1EkFNatc+3wwSny3VmWpErKY6Sh544SBQGA9NA1mQ9p?=
- =?us-ascii?Q?eJ4jJ3zSstOFA41YuX7Mwr+wewt1H8RIiPXDWlodB4juF0r8lsQBxZ5w38dw?=
- =?us-ascii?Q?MSne+PqvfxegtOfTA1vC579to1K/AcvODDjSUu0P7LUSXDm+EkE4QENck96M?=
- =?us-ascii?Q?RJ8XVPUa3oFJh6Jgfr070qt+SczJo8dGr0T8pOVpnie5IkDK/qsBfG+h6tFS?=
- =?us-ascii?Q?CkUtdNn0QYi4n+jKDzn/SMJOyj7a9TT8sn08x1RkCoUJWf99tBMmH6rzsoC1?=
- =?us-ascii?Q?pxirZfmCFXGWb6U00T5S9UAMSCXqWX6z3ZdzfjwssYgPkdcWJSNAs7tr2oDn?=
- =?us-ascii?Q?1shuDBpoUbM1P5OE6BEy/1JEKUee96rLsGa+/rS92GPlf1jPH1ApR3yPrTES?=
- =?us-ascii?Q?TPOrKrGkAnGkAPtNAxNj6GW25smNOqOl1uvg/TyNDG5Pza7xDoHSjmPpCoHA?=
- =?us-ascii?Q?fyNtUWGfd7yUitmtkBRVexPGeCfbU7lBZOWpV5MUmZxzT/XIwoeQFoOHDXEZ?=
- =?us-ascii?Q?NcNOxvODKVuFDOWPbbC2MoTamSFIFZ7SaVb8nc19GpzlY/f4XQ3K+uVV00Au?=
- =?us-ascii?Q?3fbssyD9iMq7WxDQeJxxuxyYfD1sr4eAPdVrp1NiuGJs1ABYZq8BYnB6U8Xg?=
- =?us-ascii?Q?YnXovBHktMWqf3gXjstMRBL7lrQAGa6W91KaDuwRCK2EeB41OqkGALHJO6Xd?=
- =?us-ascii?Q?VfqcXgw+n9ABLr9C1joeRPB6mTkNsTRLYLqwoqK4U2Foq5Zbr7W2sedgbeJ3?=
- =?us-ascii?Q?NT7yhAEy9PG7CualDXqy51OB1+b9fSou4IYjwbem+eTzcOKoEEjWdA4G9efu?=
- =?us-ascii?Q?we0eROc8wfFVVzLYr8NxXfZyPcVRmiI2kvUa7WNxE0PEF4QRrakbxPh3q532?=
- =?us-ascii?Q?ayXFeXdqxaZQlkOQOEQ5fh6qwv1EbBXpl/pyNUeLR6vNBCw3UmaaRwvHrAqj?=
- =?us-ascii?Q?xnb3eJ6r8LazX0+l1g7OqLjYUWkaknDUlaOc?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NRCu/xLEz4q4DmC2WXRmCl9LoYnU1QHZNjtQqW05KjQKGFxuVw+96E3ui5Z7?=
- =?us-ascii?Q?xQ6gXdlnMnpFaF9q0mrY6qZ4SuWtQSsed3exWRJLioPS+4Jm3JW7RMZDZOrn?=
- =?us-ascii?Q?ooypGL8CfWVmFAHQ+tqW2UKsLWcVaKDKWp6j+purCH4zU3mN8GxHHshvzujt?=
- =?us-ascii?Q?Yb1pzTBlS5yJvshM+Dj9oo7xAbZ/VgWty5KTu5+l8EAkceYVyUXASopZv7CP?=
- =?us-ascii?Q?dQFcMI/J0mcFzYxW7pLBoSkZ/MB6k5985pgvq/rzD6UxNHW6Bd+LH7oXQwKt?=
- =?us-ascii?Q?J/wY+21y8qKf4ZKWSqPD1UUL+TsAL/SsdlXehyCIdakcpmxptVZlYPzu2LhY?=
- =?us-ascii?Q?flvfLNl1zExSc8CZGbCcXWsiRnzAdE9++TbPVgMr/2kGja5D5uwAWwePhyze?=
- =?us-ascii?Q?/tXCT8TvXRvugAT/aPn80AcTEQxZu0RQk3h5IIaFb4LzeSNL+Hf5DJiL7wNt?=
- =?us-ascii?Q?bkax67ZWv7pnflq6C9ECxLyxa8CaaBy7lnTGR+/LAVoi81qTiGRcZrxmex5g?=
- =?us-ascii?Q?F53N7dZXeP9AC6gj+i9ScLak/8Mt1PKFyEsbZy2GWXc+zq8nmDXGQRMvGHwF?=
- =?us-ascii?Q?SHrCwZAU2prkN5kRHfxkJe8AndnIT//S+G65Pm4Yxiv/+djm4zmWI07Ee7aV?=
- =?us-ascii?Q?T8u620XWZzVZbafLQpl6UmMUKTEgOEu7lPKEKJKp92hwlOo9edoI/P+Kt8i1?=
- =?us-ascii?Q?CjrEy/largU0SU7rbZTdK3lsW904d6oFv6bFtMTQHb92xGcuSwN8pqZ68CY8?=
- =?us-ascii?Q?pSDhXa7my301v+DZ2psnHqXZSFtyH+b6gduB295a2Ao71rLEmomfnVHbxuXR?=
- =?us-ascii?Q?LotqeayxdHpcmnW9SahU3sp6mnfS70OkvywZeJLvtJ9qRe9f/UNH16tkOhre?=
- =?us-ascii?Q?vlwWYQDczAwjElxhc/uLuyqJmpok6jPEmo4jEYKZAYrv9zcPt018/e7dNYJD?=
- =?us-ascii?Q?srdv39blv6drI5Cwi7bEAFDtoNTZf/+AhibYj9gz6kdEi3Dku1wxF+OUKjte?=
- =?us-ascii?Q?bqT1V1qVUJTRb5Uk1tvD+x8rfpkrczdsuCBSKpOdd84MTD+KWyegz5WPqzAp?=
- =?us-ascii?Q?46jnsAZ/Grt0rZ2V89SYHtsdOZj75Zl/R4xa1BmC7h7Od1vNkQfiYiPTPMrz?=
- =?us-ascii?Q?3Oyf44hYLcxHxd/F57g4Y0BJ6HAbRO59UwtereSc2r4TgOgYmcBb8WNYExqA?=
- =?us-ascii?Q?TLiQEySJhgyX4LA5WCTwWAE2tN3oC3p69xcHNfi72RxJ++NE8gyz4xxwGWvI?=
- =?us-ascii?Q?YOpeqEFgMja+tgPzPUWf3vF5OBCjtA1/lgEovCMs5rHp65JQtZTNubxbS7jq?=
- =?us-ascii?Q?LRxyT6MoW6eVHOu674i4nIIvnhvJIZoSSBclOdCFNJGUbsl/Za5OWv3gUx/b?=
- =?us-ascii?Q?jwk6AKcu2iVhmYkfSL7FJHEt4qL6tkdmDlJqNb7G7b26mvKom0/YdyPlUE9v?=
- =?us-ascii?Q?6l0+fVtMXntUbqYhhszSA1p7Q+gqj9UJFxH1treAOiwoC7nZFUTIiFaMXy74?=
- =?us-ascii?Q?QCawUe+E2K7hLgvIp7DhU9o83t0h/rilKqO4BnxLkShxXfTZ1jaJDYfYcNsF?=
- =?us-ascii?Q?rdZMZw61tPq/97C81eEqEoW1Ru02kZ8Ebiz+3kNx?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e9ec11a-c06f-45a9-dfed-08de1c3fe994
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 07:49:56.1939
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p6Z2ENmN56C9ZqeMpITc9tPGXcDncpDGiwAevvvPsclreA+aq7aImB3W3ccb8Isi1QgAbzFSVvdjJ0SRs/VvLw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PPF7CFF9C87C
-X-OriginatorOrg: intel.com
+In-Reply-To: <20250905100531.282980-7-oliver.upton@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Wed, Nov 05, 2025 at 03:32:29PM +0800, Yan Zhao wrote:
-> On Tue, Nov 04, 2025 at 09:57:26AM -0800, Sean Christopherson wrote:
-> > On Thu, Oct 30, 2025, Yan Zhao wrote:
-> > > On Wed, Oct 22, 2025 at 12:53:53PM +0800, Yan Zhao wrote:
-> > > > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
-> > > > > Link: https://lore.kernel.org/all/20250709232103.zwmufocd3l7sqk7y@amd.com
-> > > > 
-> > > > Hi Sean,                                                                         
-> > > > 
-> > > > Will you post [1] to fix the AB-BA deadlock issue for huge page in-place
-> > > > conversion as well?
-> > 
-> > If you (or anyone) has the bandwidth, please pick it up.  I won't have cycles to
-> > look at that for many weeks (potentially not even this calendar year).
-> Got it!
-> On the other hand, do you think we can address the warning as below?
-> The code is based on [2].
-Hmm, updated the diff.
+Hi Oliver,
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 7b4a4474d468..543e1eb9db65 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -853,6 +853,9 @@ static int kvm_gmem_init_inode(struct inode *inode, loff_t size, u64 flags)
-        inode->i_size = size;
-        mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-        mapping_set_inaccessible(inode->i_mapping);
-+       if (flags &GUEST_MEMFD_FLAG_MMAP)
-+               lockdep_set_subclass(&inode->i_mapping->invalidate_lock, 1);
-+
-        /* Unmovable mappings are supposed to be marked unevictable as well. */
-        WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
-
- 
-> As noted in [3], the only scenario can trigger the warning after [2] is when a
-> process creates a TDX VM with non-in-place-conversion guest_memfd and a normal
-> VM with in-place-conversion guest_memfd. The two invalidate_lock's don't contend
-> with each other theoretically.
+On 2025/9/5 18:05, Oliver Upton wrote:
+> The release path on LPIs is quite rare, meaning it can be difficult to
+> find lock ordering bugs on the LPI xarray's spinlock. Tell lockdep that
+> vgic_put_irq() might acquire the xa_lock to make unsafe patterns more
+> obvious.
 > 
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/vgic/vgic.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> [2] https://lore.kernel.org/all/cover.1760731772.git.ackerleytng@google.com/
-> [3] https://lore.kernel.org/all/aQMi%2Fn9DVyeaWsVH@yzhao56-desk.sh.intel.com/
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index a21b482844ce..3b247041a130 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -142,6 +142,9 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+> +	if (irq->intid >= VGIC_MIN_LPI)
+> +		might_lock(&dist->lpi_xa.xa_lock);
+
+I got the following splat on a lockdep kernel. The reproducing step can
+be easily inferred from the backtrace (i.e., starting a guest with an
+assigned device).
+
+ ================================
+ WARNING: inconsistent lock state
+ 6.18.0-rc4-00019-g284922f4c563-dirty #2390 Not tainted
+ --------------------------------
+ inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
+ swapper/10/0 [HC1[1]:SC0[0]:HE0:SE1] takes:
+ ffff8000a504de18 (&xa->xa_lock#19){?.+.}-{3:3}, at: vgic_put_irq+0x28/0x110
+ {HARDIRQ-ON-W} state was registered at:
+   lock_acquire+0x1c8/0x354
+   _raw_spin_lock+0x48/0x60
+   vgic_add_lpi.part.0+0x70/0x2f8
+   vgic_its_cmd_handle_mapi.isra.0+0x398/0x418
+   vgic_its_process_commands.part.0+0x4d4/0xfa0
+   vgic_mmio_write_its_cwriter+0x80/0xa4
+   dispatch_mmio_write+0xd0/0x128
+   __kvm_io_bus_write+0xb4/0xe8
+   kvm_io_bus_write+0x58/0x98
+   io_mem_abort+0xe8/0x3f0
+   kvm_handle_guest_abort+0x4d0/0x1414
+   handle_exit+0x6c/0x1c4
+   kvm_arch_vcpu_ioctl_run+0x678/0xbfc
+   kvm_vcpu_ioctl+0x1ac/0xb24
+   __arm64_sys_ioctl+0xac/0x104
+   invoke_syscall+0x48/0x10c
+   el0_svc_common.constprop.0+0x40/0xe0
+   do_el0_svc+0x1c/0x28
+   el0_svc+0x50/0x2c0
+   el0t_64_sync_handler+0xa0/0xe4
+   el0t_64_sync+0x198/0x19c
+ irq event stamp: 5415534
+ hardirqs last  enabled at (5415533): [<ffff8000813e291c>]
+default_idle_call+0x7c/0x138
+ hardirqs last disabled at (5415534): [<ffff8000813dabf4>]
+enter_from_kernel_mode+0x10/0x3c
+ softirqs last  enabled at (5415516): [<ffff8000800c7b54>]
+handle_softirqs+0x4ac/0x4c4
+ softirqs last disabled at (5415511): [<ffff800080010748>]
+__do_softirq+0x14/0x20
+
+ other info that might help us debug this:
+  Possible unsafe locking scenario:
+
+        CPU0
+        ----
+   lock(&xa->xa_lock#19);
+   <Interrupt>
+     lock(&xa->xa_lock#19);
+
+  *** DEADLOCK ***
+
+ 2 locks held by swapper/10/0:
+  #0: ffff00280db646a0 (&ctx->wqh#2){-...}-{3:3}, at:
+eventfd_signal_mask+0x38/0xc0
+  #1: ffff8000a504e480 (&kvm->irq_srcu){.?.+}-{0:0}, at:
+irqfd_wakeup+0x88/0x2ac
+
+ stack backtrace:
+ CPU: 10 UID: 0 PID: 0 Comm: swapper/10 Kdump: loaded Not tainted
+6.18.0-rc4-00019-g284922f4c563-dirty #2390 PREEMPT
+ Call trace:
+  show_stack+0x18/0x24 (C)
+  dump_stack_lvl+0x90/0xd0
+  dump_stack+0x18/0x24
+  print_usage_bug.part.0+0x29c/0x358
+  mark_lock+0x6c0/0x960
+  __lock_acquire+0xd4c/0x20fc
+  lock_acquire+0x1c8/0x354
+  vgic_put_irq+0x54/0x110
+  vgic_its_inject_cached_translation+0x178/0x25c
+  kvm_arch_set_irq_inatomic+0xac/0x124
+  irqfd_wakeup+0x1a0/0x2ac
+  __wake_up_common+0x94/0x10c
+  __wake_up_locked_key+0x1c/0x28
+  eventfd_signal_mask+0x78/0xc0
+  vfio_msihandler+0x18/0x28
+  __handle_irq_event_percpu+0x8c/0x374
+  handle_irq_event+0x4c/0xa8
+  handle_fasteoi_irq+0x108/0x198
+  handle_irq_desc+0x40/0x58
+  generic_handle_domain_irq+0x1c/0x28
+  gic_handle_irq+0x4c/0x120
+  call_on_irq_stack+0x30/0x48
+  do_interrupt_handler+0x80/0x84
+  el1_interrupt+0x3c/0x60
+  el1h_64_irq_handler+0x18/0x24
+  el1h_64_irq+0x6c/0x70
+  default_idle_call+0x80/0x138 (P)
+  do_idle+0x21c/0x27c
+  cpu_startup_entry+0x34/0x3c
+  secondary_start_kernel+0x144/0x164
+  __secondary_switched+0xc0/0xc4
+
+Thanks,
+Zenghui
