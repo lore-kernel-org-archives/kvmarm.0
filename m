@@ -1,68 +1,71 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8F332549C
-	for <kvmarm@lists.linux.dev>; Wed,  5 Nov 2025 16:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6C9334C13
+	for <kvmarm@lists.linux.dev>; Wed,  5 Nov 2025 17:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762360834; cv=none; b=D0rE7giirG3kwPxjfybcinjcOKg2D590Fqmulg+duPShj/kLiDoFZoZiJekjbaJLYjY8BGRf7TvOjWHgrMmLbS9VWI98IoI+uTHu76kdGBadsMoXKEqSoFN43+uadvlw+8Db+yC4WWp0Vaf39gNxca7KLZTQ/GFyJPMEKIRu4t4=
+	t=1762362733; cv=none; b=nuT7wa5vxpXEuIoXhWE7DKbH/xWt0tLGLTqKYrK1JeDefV7wZJ13bZdukH1Wpkeu5kQRtyeFYqp+7878SArOVHDLqEz0fpDxUj55gqdo5CpKu+RmkpADCWNp+DVQYV4rPCEbJNSQrUtUyL791Psm6vN2CzU7DkKZn29DeIBSNoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762360834; c=relaxed/simple;
-	bh=atIZzAToir8eRpbQcVVHtDtwnLdnBANcxYeOYHDiA2g=;
+	s=arc-20240116; t=1762362733; c=relaxed/simple;
+	bh=RxBxFvM3oAmYwj+WD7NzxAgbGcX4OOVwNkYZi+Tgv38=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AeZ+KFU7oKva211pZmd5RyLXmL+Ia8Bx3h8hiwKk+7pRj+qBXx89XiFN1ylcKZSw+ECjCwZVl2hYz8rmaeTfC5Cu6dG11c6ksD6aDgUnQwLpQGt3ny65sD4nS+JipSEYYrRlF+lUPCCJM0nlYmWlwCo7DVNNFYRg3hmWGP8SrWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dPFAwrcU; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJpPRz7XuvUa/jEhzwu+512au6aWZm8h81eceSZ1O7rfrvUC3NUswStEDjxpLpm4jrwWD3k6WEON5dp0QTV53Rw/C6tFWw0TI+aso31c8SbMrxOYfTf9uG4BbmCNGwjfsdC9aTWJV5Y41+SG77FoF8peKBVwAg+FzGrGBh+2JWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=eAesbtpG; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dPFAwrcU"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4770d4df4deso30375e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 05 Nov 2025 08:40:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="eAesbtpG"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8b144ec3aa8so3703885a.2
+        for <kvmarm@lists.linux.dev>; Wed, 05 Nov 2025 09:12:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762360832; x=1762965632; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1762362730; x=1762967530; darn=lists.linux.dev;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=0eEl5tuPcKQIbbiQU4HmtriawKnG+Y/aITWPg2eK/vk=;
-        b=dPFAwrcUZ8t0Kn9OCOm4bsOAv4iqUtZ4IjUshi7gUn18Ug/0hkKn7d+l19u8kbakPd
-         WStkeLUBYljlna/IyAGTlzDwym/KW672Dhx97P75otL+wT5bQo6GIEtRiYOE2ddFKfky
-         mm4EFlywgfuUu9TwJaE/VLINIK2rwZJLGbrazPQ1omu9v+g6voBbZOrbsScPf+P3HHli
-         ofQrVzrgrB8roLwKsUhkN4lFFk7IFOmEeJ6JAL291WADSNx07xvSo2s63c7EODrW5PT2
-         whbPO4uRa0ZA/Vz9SbhVK/K+JDYG93OAyoRef6MoMEmcFCNW4V7fW7lLURG+r5TsrwJH
-         Te9g==
+        bh=wkO/YIgxaPM/wEK82kFqjfst+ouG4RuvuAOrJV+EoBw=;
+        b=eAesbtpGTAwnPJBKNk1mNnYIIW5cAuVcZCJXemIHNUFegKvI3t59nXH56uaPq3A76j
+         7BL91lypdZ9/otK/EtDjcA2stzhQE77eBatdK/zG7byA0iLlrEttUShLEGItp7VrTivH
+         cRxsboVUleJjSjE1/0+5GrjN2fsJbIA0vHEeSkP7d3TXW6cc1dH7szEnqeHIqBV7skot
+         NJq3W46iR7lb3E29JQ0vJQJqRyUro6e+hwIajaZp+FXbpE6X5K0prq/6yaWw4bKEDAgZ
+         OZr7BPnxwI03CT1VJMg691JUzSug8WGesqLUK7pSCRBUe7rG7XYjzrQNcvYCQ9qFw5pK
+         6vow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762360832; x=1762965632;
+        d=1e100.net; s=20230601; t=1762362730; x=1762967530;
         h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0eEl5tuPcKQIbbiQU4HmtriawKnG+Y/aITWPg2eK/vk=;
-        b=pH7NBh79Z60J47M2x6X02CMwIhRW0mK1ZNOmWcD67AKf657FLMq909cGLthKqZDQNG
-         hLUuauW405gHneLR9EBn1JNNFcvqzWaYtvZ+W6+t7S9hM9sqrDdrzC9vFN++O4Ka2nnW
-         wp4Q9CQfB3xFIFyA8HZa/4bWzbRTO8FtrnfVwzl1EHUKMkV7nmtmGg213kTgnR7EI3fW
-         Atzup7eTdixlj6YVd8uIuFWsv/4GL6xSIYYQKCsqsNuGaA3Y5nn7KaEiCzIMd/z2juun
-         8PK/JQY/kBuZj3yhKJe6mGECa1XhfN6mP9DeXu0hN3VLnpQGShFohBTG+3w0UGeYiDnQ
-         F2FA==
-X-Forwarded-Encrypted: i=1; AJvYcCXi7Atfl2JsQMMVDkjhVEc2NttUzLX1dedmwt0LbyCDe4Y8P6jxEkuMQw956f1cJPnZrEaKusw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzY7AJPmCvw6pRVWfYb3bzg+cSApIVNOTfP4iAfDCZVY6NCMbau
-	aJu1oOBXrjTDO1jUuuhazbG3K6fowIl2wvYVJa+2Hnhd375qhtV9RjOzTdLUVHernNNGgRUlqQv
-	Yedgh5A==
-X-Gm-Gg: ASbGnctOdwqNUL4eVnZTQexjpJg8VWdeZUHo2iu6kUR8Nqk8gcnJrvlY4+53dFHuooq
-	S1ZOv/UrKlq5/D6I5Irgrm6qhV2SC87w+D6gQ5ce+q265CK+UtZ2Z22Ubd0R3qwN6z6z4JMC724
-	qlBxW8bKsooER52vSlkpvvIZGGVdb/Zf+ogZr+LTYeW5/8vDHXmQaFr9kxLf0d8OYonOsohsg2R
-	WbtY16h/rERqzIfwAvmXfj4FOERTn3wh3TC8ofamZz0rrxEQMoB9CHxgszZlk0YP2+ase8XD4xT
-	nslt3AQX61+wMtby0vnwGC8ZiekXXf3gdLA+FCwZzHzvpP2cokWP3UAbIndWtGZsDq8w0Z5quXb
-	jBFr9Jq5whYbbXrN6i5q+wjXEpWfUxikBtieyCB9tk2f84HyWN+6BAEreF9VRuoOGm12zBXCajR
-	DDpk90yswkldnnpfeLFrWTzmUF9UNeCAeZx2VkMnljbbY0CgtSJjh871aUD+2e
-X-Google-Smtp-Source: AGHT+IEy+8V+O2C0Flc9TdN/DCHlTtarKl1lxRtJWgoMhvht/+272KjjM3JvTIZWVNcKN9O18oV/xA==
-X-Received: by 2002:a05:600c:3ba3:b0:477:1afe:b962 with SMTP id 5b1f17b1804b1-4775dae9364mr3187645e9.1.1762360831358;
-        Wed, 05 Nov 2025 08:40:31 -0800 (PST)
-Received: from google.com (54.140.140.34.bc.googleusercontent.com. [34.140.140.54])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc200878sm11360022f8f.45.2025.11.05.08.40.30
+        bh=wkO/YIgxaPM/wEK82kFqjfst+ouG4RuvuAOrJV+EoBw=;
+        b=NsyqUoid0uTcN+DwvJVov6ul3qVtdennhoKiReV9GHn5g8rZgJiLFwucXIeRwvYmsU
+         sNc2uylt5DWo5PYDYXMjJVdUBoYGfOny0w5LjKxx7D4Sq5+XTdg/e/gaYsXKS9WzLCSw
+         GK+V/pt8TxB+2jKYJzL8lZQUAr19XaNhOoFHdOCFZZ9OxpOUctDebdVDC7l4A9b2bTOv
+         vkSqaDNloEYcneJio9WbED1zd5jRuJ+IlKyDTZcGiEBeFu90DSt60Z26Usi9yzPQL+SF
+         7/EYQfWju2jhV/J/sG7DxgN3/5ypszUZpWF9yy1QVEnnwp3oG4XnpehR9koZD0+00/y1
+         QEAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUhu6fd6ekjWRL0HPo5zc1OfBm2/Cq8dktu8srC8oV6S7jpzwnNnY2NO1597XBojlTc2mv1HGQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxDA2jXvnVhvhNzyr54xjCc8r1WCnsM4hi7Pv5MdwByALCxFx1J
+	QfbHKov6IoaRvNZPrbCl3J5wvo6YKcAICqwxbvlZpj6bx8/4l7Qx3yCvhq3XH3esqcE=
+X-Gm-Gg: ASbGncsdIX84c76bJ1ViXVZbrsoHsEEeR46A3xEj3YYBmpOo/iCmivapfkSMJnx6KRy
+	mTGztxMiBlJuEOHapXOk0hH1pi/qsfjF67SNjGl2t57nXqxdk4YcZWZNI4MzBS4jg2olMtZ3WnT
+	NzIqG4QztJef+lZ/yf4Zz0V3kN7Huybo4LZD2xVko1paPAaCYmK3krx2iL9RizVqJZtjyjB8BIO
+	3vTsHZEHPJJo1OdqAGjXTvpe81L6PG2s4sdjmQP5qrDKUmfsWyiCOlGAREl54pUnxnRfbSE8J7y
+	HA8ddw194KOF+O0nKeU7DvEbrBe5uUOd0DOrxH8vpbO/CXmWQOvDLWjVgxpiokfhituPCKorR1B
+	LXRLfeap2gD2Bmpiidae8ZW6ffvQKhZh3iHRUJCYw3RW0BJAUypHGC03mkXWy4Rw8bWWAfz1FMK
+	dm2qS4GLA2+orrg0QBehMnbqILRgRZM0LN0FBk3H/4NGa1vQ==
+X-Google-Smtp-Source: AGHT+IE+H5A+GWBd94mKAScAzkbN/plh8wCL54OtyUq33k2cpyVKMqW/YnW1kIG+WLt6H619/vMFBw==
+X-Received: by 2002:ac8:7e93:0:b0:4ed:2140:7a96 with SMTP id d75a77b69052e-4ed7262fff1mr49444101cf.58.1762362729905;
+        Wed, 05 Nov 2025 09:12:09 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed5fabbbc9sm40585631cf.6.2025.11.05.09.12.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 08:40:30 -0800 (PST)
-Date: Wed, 5 Nov 2025 16:40:26 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+        Wed, 05 Nov 2025 09:12:09 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vGh3I-00000007Bqn-3NXB;
+	Wed, 05 Nov 2025 13:12:08 -0400
+Date: Wed, 5 Nov 2025 13:12:08 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
 Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
@@ -72,7 +75,7 @@ Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
 	mark.rutland@arm.com, praan@google.com
 Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
  mode
-Message-ID: <aQt9-kTCe8TpuyVq@google.com>
+Message-ID: <20251105171208.GN1204670@ziepe.ca>
 References: <20250819215156.2494305-1-smostafa@google.com>
  <20250819215156.2494305-16-smostafa@google.com>
  <aMQmA9cLaeYWG5_C@willie-the-truck>
@@ -80,6 +83,7 @@ References: <20250819215156.2494305-1-smostafa@google.com>
  <20250923173806.GF2547959@ziepe.ca>
  <aNppE9A3PDiDg_1W@google.com>
  <20251002151308.GG3195829@ziepe.ca>
+ <aQt9-kTCe8TpuyVq@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -89,90 +93,60 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251002151308.GG3195829@ziepe.ca>
+In-Reply-To: <aQt9-kTCe8TpuyVq@google.com>
 
-On Thu, Oct 02, 2025 at 12:13:08PM -0300, Jason Gunthorpe wrote:
-> On Mon, Sep 29, 2025 at 11:10:11AM +0000, Mostafa Saleh wrote:
-> > Another possible solution, to keep a device bound to the KVM driver,
-> > is to probe the SMMUs from the KVM driver, then to create child devices;
-> > possibly use something as device_set_of_node_from_dev to bind those to
-> > the main SMMUv3 or find another way to probe the main SMMUv3 without
-> > changes.
-> 
-> I do prefer something more like this one, I think it is nice that the
-> kvm specific driver will remain bound and visible so there is some
-> breadcrumbs about what happened to the system for debugging/etc.
-> 
-> Not sure how to do it, but I think it should be achievable..
-> 
-> Maybe even a simple faux/aux device and just pick up the of_node from
-> the parent..
+On Wed, Nov 05, 2025 at 04:40:26PM +0000, Mostafa Saleh wrote:
+> However, that didn’t work because, as from Linux perspective the
+> nested driver was bound to all the SMMUs which means that any
+> device that is connected to an SMMUv3 has its dependencies met, which
+> caused those drivers to start probing without IOMMU ops.
 
-I spent some time looking into this
+??
 
-With the approach of creating new devices as:
+What code is doing this?
 
-	pdev = platform_device_alloc(dev_name(dev), PLATFORM_DEVID_AUTO);
-	pdev->dev.parent = dev;
-	device_set_node(&pdev->dev, dev->fwnode);
-	platform_device_add_resources(pdev, cur_pdev->resource,
-				      cur_pdev->num_resources);
-	platform_device_add(pdev);
+If a struct device gets a fwspec attached to it then it should not
+permit any driver to probe until iommu_init_device() has
+succeeded. This broadly needs to work to support iommu drivers as
+modules that are loaded by the initrd.
 
-That is done from an init call after KVM init, where the KVM driver
-probes the SMMUs, which then does
-	bus_rescan_devices(&platform_bus_type);
+So the general principal of causing devices to not progress should
+already be there and work, if it doesn't then maybe it needs some
+fixing.
 
-In the KVM driver probe, it had:
-	if (pdev->dev.parent->driver == &smmuv3_nesting_driver.driver)
-		return -ENODEV;
+I expect iommu_init_device() to fail on devices up until the actual
+iommu driver is loaded. iommu_fwspec_ops() should fail because
+iommu_from_fwnode() will not find fwnode in the iommu_device_list
+until the iommu subsystem driver is bound, the kvm driver cannot
+supply this.
 
-Which causes the main SMMU driver to probe the new devices.
+So where do things go wrong for you?
 
-However, that didn’t work because, as from Linux perspective the
-nested driver was bound to all the SMMUs which means that any
-device that is connected to an SMMUv3 has its dependencies met, which
-caused those drivers to start probing without IOMMU ops.
+> It seems device links are not the write tool to use.
 
-Also, the approach with bind/unbind seemed to not work reliably
-because of the same reason.
+Yes
+ 
+> So far, the requirements we need to satisfy are:
+> 1- No driver should bind to the SMMUs before KVM initialises.
 
-Looking into the probe path, it roughly does.
-1) Device / Driver matching driver_match_device
-2) Check suppliers before probe (device_links_check_suppliers)
-3) Actual probe
+Using the above I'd expect a sequence where the KVM SMMU driver loads
+first, it does it's bit, then once KVM is happy it creates the actual
+SMMU driver which registers in iommu_device_list and triggers driver
+binding.
 
-I can’t see a way of adding dependencies in #1
+This is basically an identical sequence to loading an iommu driver
+from the initrd - just the trigger for the delayed load is the kvm
+creating the device, not udev runnign.
 
-For #2, there 2 problems,
-i) It’s not clear how to create links, something as fwnode_link_add()
-   won’t work as one of the devices won’t have fwnode and device_link_add()
-   will need the device to be already created (and not sure how
-   to guarantee it won’t probe)
-ii) Assuming we were able to create the link, it will be set to
-    DL_STATE_AVAILABLE once the nested driver probes, which won’t prevent
-    the main driver from probing till KVM initialises.
+> 2- Check if KVM is initialised from the SMMUv3 driver,
+>    if not -EPROBE_DEFER (as Will suggested), that will guarded by the
+>    KVM driver macro and cmdline to enable protected mode.
 
-It seems device links are not the write tool to use.
+SMMUv3 driver shouldn't even be bound until KVM is ready and it is an
+actual working driver? Do this by not creating the struct device until
+it is ready.
 
-So far, the requirements we need to satisfy are:
-1- No driver should bind to the SMMUs before KVM initialises.
-2- Back the nested driver with devices and possibly link them
+Also Greg will not like if you use platform devices here, use an aux
+device..
 
-The only possible solutions I see:
-1- Keep patch as is
-2- Check if KVM is initialised from the SMMUv3 driver,
-   if not -EPROBE_DEFER (as Will suggested), that will guarded by the
-   KVM driver macro and cmdline to enable protected mode.
-
-Then if needed, we can create devices from the nested driver and link
-them to the main ones in same initcall after the devices are created.
-
-I can to look into more suggestions, otherwise, I will try with #2
-with the -EPROBE_DEFER.
-
-Thanks,
-Mostafa
-
-> 
-> Jason
+Jason
