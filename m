@@ -1,53 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00C630149E
-	for <kvmarm@lists.linux.dev>; Wed,  5 Nov 2025 10:28:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F2D2D7DE8;
+	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762338487; cv=none; b=a6JtIVBBhpw77JBNLC0TcFzSHH7rEysDCT8op8w4vUgf9lbjWdVX75EU/OfaiVYbHaz2znoVOpTfei34wKHGcaQt5mIlq7+z4HVnOA5Q2eijhM0rcGVVYvM9Sa4A8XYPlg6bcUjbq7TEJO7WQvRiaRdVoSzubus4Y3vi+55wYsE=
+	t=1762342313; cv=none; b=eBli6VTfbtyHW7KrGkA3vpQIRKyHWkgzRPpPSDwCONI9SgJdAK8/Uq8sC8FfRE2bvoILIAHR+olXPy9XwxVHaqOZkdoP+4HLqzaarg96hOsowcLWwQL+wVMY9/VOcVQjUZ1rvESrFcUP1fNk23UOdhzY/Vx0L0Tfei4pAVqX8uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762338487; c=relaxed/simple;
-	bh=C45/cuTSmD46uS37xO2m8wTaJvEVZMK1MdEsT9dCOR4=;
+	s=arc-20240116; t=1762342313; c=relaxed/simple;
+	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LdRwAY8KZD320FJEvSKsQxiYvWvJIcX8jTIB5scMKNC5CeLndJb5msHI8iNEyez5twB412yZPCfps6gQ1jYgdMLVbJ4uMXXYkVyH0U7E8h7PU8BjzAoDzUH5N1Nxu5/uxUsWFAwxToEdJS5ZoRvCtdbGLI4fZj2L+J+9A3aNS8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Am1Dheis; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mWJuq4e+waVXoHamaePchSNSKzlAKUWyo8fbE5R7Y0+Gb5vKgbO3bt09dWtZF2kF5tYrfzsKqOZdWWieiDGQP9/0HQVoXOBk6E9WsMsUeLF1t3qF9T6FJTZBr1PkqitKHXgk6X0H2J6hL1e1pVQTsERvNJkjiq7jQeunVZUsB6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ragxC15H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Am1Dheis"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8639AC116D0;
-	Wed,  5 Nov 2025 10:28:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ragxC15H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24291C4CEF8;
+	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762338487;
-	bh=C45/cuTSmD46uS37xO2m8wTaJvEVZMK1MdEsT9dCOR4=;
+	s=k20201202; t=1762342312;
+	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Am1DheisxzMZNpkiyktmApCvZFsg2BfS02Jb8wbvkyJ/VfpWqh7aiLpDYivsK1TGB
-	 qkmXSsK1mzPNcga9kT9InCVW/nQGTkHh6KIxGyv+gYE81KNatueOBOhF2MIo0LrZGa
-	 Wx6EWEod0oCA+52lBh6wZ++o59UcFzGPHhaPJ/SvwVlgdH/kwZ5OJnx3t1JrRgqkpE
-	 bgW7bsH99rvXl56oqjoYoLf4GtzuZyZ8cfeX+P7ILcDCiUo7TQ8xfzcyRgkEaiGmIJ
-	 zs8NLCvRpCAqZ0cgmtMWqQM59d9VVQa2LycUvXpXlVtF7Tt6Iw0m7Q6oqhnFrlRl0H
-	 btRwceglc8oPg==
+	b=ragxC15Ht/seLaHZR7ulK+vdLU+DtRY2viILGtE8Zf4JihbWC9/iRZ5LH5zTASPg8
+	 ksS2TnwHb5P+G0uTXLPLzQ/EElYIQisOKOqV5DbfbNBwpuCyEaKZWdTJPXaWMBN+m2
+	 XnDaeG/OhBSmwFVq0gNfv2LtSNRJA7Sc1cQ92TOq+H1N0NdfnLN2s8Y+8O8VLEJgiD
+	 LSCpk9+GJXVVCsKhFpqsx4+UjqKsD4Ucl8FvuiPVw9pALgq8Xu6RF0gJMiQF1srgkI
+	 P3NMhuFOf1XAAyjPJxxhDxOD0px2P4w8Lvjv2vrRVy7LnbVczEHMyV1NXpCwaftSwG
+	 dS/l8XCzLMRoQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vGakH-00000002Yp1-0smb;
-	Wed, 05 Nov 2025 10:28:05 +0000
-Date: Wed, 05 Nov 2025 10:28:04 +0000
-Message-ID: <86cy5wvknf.wl-maz@kernel.org>
+	id 1vGbjx-00000002Zmi-31vj;
+	Wed, 05 Nov 2025 11:31:49 +0000
+Date: Wed, 05 Nov 2025 11:31:49 +0000
+Message-ID: <86bjlgvhp6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	<kvmarm@lists.linux.dev>,
-	Joey Gouly
-	<joey.gouly@arm.com>,
+To: kernel test robot <lkp@intel.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Ben Horgan
-	<ben.horgan@arm.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: vgic-v3: Indicate vgic_put_irq() may take LPI xarray lock
-In-Reply-To: <b4d7cb0f-f007-0b81-46d1-998b15cc14bc@huawei.com>
-References: <20250905100531.282980-1-oliver.upton@linux.dev>
-	<20250905100531.282980-7-oliver.upton@linux.dev>
-	<b4d7cb0f-f007-0b81-46d1-998b15cc14bc@huawei.com>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: Re: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+In-Reply-To: <202511050925.kQxVnIUB-lkp@intel.com>
+References: <20251103165517.2960148-6-maz@kernel.org>
+	<202511050925.kQxVnIUB-lkp@intel.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,120 +61,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, ben.horgan@arm.com
+X-SA-Exim-Rcpt-To: lkp@intel.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, oe-kbuild-all@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 05 Nov 2025 09:37:10 +0000,
-Zenghui Yu <yuzenghui@huawei.com> wrote:
+On Wed, 05 Nov 2025 02:01:36 +0000,
+kernel test robot <lkp@intel.com> wrote:
 > 
-> Hi Oliver,
+> Hi Marc,
 > 
-> On 2025/9/5 18:05, Oliver Upton wrote:
-> > The release path on LPIs is quite rare, meaning it can be difficult to
-> > find lock ordering bugs on the LPI xarray's spinlock. Tell lockdep that
-> > vgic_put_irq() might acquire the xa_lock to make unsafe patterns more
-> > obvious.
-> > 
-> > Reviewed-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/kvm/vgic/vgic.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> > index a21b482844ce..3b247041a130 100644
-> > --- a/arch/arm64/kvm/vgic/vgic.c
-> > +++ b/arch/arm64/kvm/vgic/vgic.c
-> > @@ -142,6 +142,9 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
-> >  {
-> >  	struct vgic_dist *dist = &kvm->arch.vgic;
-> >  
-> > +	if (irq->intid >= VGIC_MIN_LPI)
-> > +		might_lock(&dist->lpi_xa.xa_lock);
+> kernel test robot noticed the following build errors:
 > 
-> I got the following splat on a lockdep kernel. The reproducing step can
-> be easily inferred from the backtrace (i.e., starting a guest with an
-> assigned device).
+> [auto build test ERROR on kvmarm/next]
+> [also build test ERROR on linus/master v6.18-rc4 next-20251104]
+> [cannot apply to arm64/for-next/core tip/irq/core]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
 > 
->  ================================
->  WARNING: inconsistent lock state
->  6.18.0-rc4-00019-g284922f4c563-dirty #2390 Not tainted
->  --------------------------------
->  inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage.
->  swapper/10/0 [HC1[1]:SC0[0]:HE0:SE1] takes:
->  ffff8000a504de18 (&xa->xa_lock#19){?.+.}-{3:3}, at: vgic_put_irq+0x28/0x110
->  {HARDIRQ-ON-W} state was registered at:
->    lock_acquire+0x1c8/0x354
->    _raw_spin_lock+0x48/0x60
->    vgic_add_lpi.part.0+0x70/0x2f8
->    vgic_its_cmd_handle_mapi.isra.0+0x398/0x418
->    vgic_its_process_commands.part.0+0x4d4/0xfa0
->    vgic_mmio_write_its_cwriter+0x80/0xa4
->    dispatch_mmio_write+0xd0/0x128
->    __kvm_io_bus_write+0xb4/0xe8
->    kvm_io_bus_write+0x58/0x98
->    io_mem_abort+0xe8/0x3f0
->    kvm_handle_guest_abort+0x4d0/0x1414
->    handle_exit+0x6c/0x1c4
->    kvm_arch_vcpu_ioctl_run+0x678/0xbfc
->    kvm_vcpu_ioctl+0x1ac/0xb24
->    __arm64_sys_ioctl+0xac/0x104
->    invoke_syscall+0x48/0x10c
->    el0_svc_common.constprop.0+0x40/0xe0
->    do_el0_svc+0x1c/0x28
->    el0_svc+0x50/0x2c0
->    el0t_64_sync_handler+0xa0/0xe4
->    el0t_64_sync+0x198/0x19c
->  irq event stamp: 5415534
->  hardirqs last  enabled at (5415533): [<ffff8000813e291c>]
-> default_idle_call+0x7c/0x138
->  hardirqs last disabled at (5415534): [<ffff8000813dabf4>]
-> enter_from_kernel_mode+0x10/0x3c
->  softirqs last  enabled at (5415516): [<ffff8000800c7b54>]
-> handle_softirqs+0x4ac/0x4c4
->  softirqs last disabled at (5415511): [<ffff800080010748>]
-> __do_softirq+0x14/0x20
+> url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/irqchip-gic-Add-missing-GICH_HCR-control-bits/20251104-011133
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+> patch link:    https://lore.kernel.org/r/20251103165517.2960148-6-maz%40kernel.org
+> patch subject: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
+> config: arm64-randconfig-003-20251105 (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/config)
+> compiler: aarch64-linux-gcc (GCC) 8.5.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/reproduce)
 > 
->  other info that might help us debug this:
->   Possible unsafe locking scenario:
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202511050925.kQxVnIUB-lkp@intel.com/
 > 
->         CPU0
->         ----
->    lock(&xa->xa_lock#19);
->    <Interrupt>
->      lock(&xa->xa_lock#19);
+> All errors (new ones prefixed by >>):
 > 
->   *** DEADLOCK ***
+>    arch/arm64/kernel/hyp-stub.S: Assembler messages:
+> >> arch/arm64/kernel/hyp-stub.S:59: Error: unknown or missing system register name at operand 2 -- `mrs x1,ich_vtr_el2'
 > 
->  2 locks held by swapper/10/0:
->   #0: ffff00280db646a0 (&ctx->wqh#2){-...}-{3:3}, at:
-> eventfd_signal_mask+0x38/0xc0
->   #1: ffff8000a504e480 (&kvm->irq_srcu){.?.+}-{0:0}, at:
-> irqfd_wakeup+0x88/0x2ac
 > 
->  stack backtrace:
->  CPU: 10 UID: 0 PID: 0 Comm: swapper/10 Kdump: loaded Not tainted
-> 6.18.0-rc4-00019-g284922f4c563-dirty #2390 PREEMPT
->  Call trace:
->   show_stack+0x18/0x24 (C)
->   dump_stack_lvl+0x90/0xd0
->   dump_stack+0x18/0x24
->   print_usage_bug.part.0+0x29c/0x358
->   mark_lock+0x6c0/0x960
->   __lock_acquire+0xd4c/0x20fc
->   lock_acquire+0x1c8/0x354
->   vgic_put_irq+0x54/0x110
->   vgic_its_inject_cached_translation+0x178/0x25c
->   kvm_arch_set_irq_inatomic+0xac/0x124
+> vim +59 arch/arm64/kernel/hyp-stub.S
+> 
+>     45	
+>     46		.align 11
+>     47	
+>     48	SYM_CODE_START_LOCAL(elx_sync)
+>     49		cmp	x0, #HVC_SET_VECTORS
+>     50		b.ne	1f
+>     51		msr	vbar_el2, x1
+>     52		b	9f
+>     53	
+>     54	1:	cmp	x0, #HVC_FINALISE_EL2
+>     55		b.eq	__finalise_el2
+>     56	
+>     57		cmp	x0, #HVC_GET_ICH_VTR_EL2
+>     58		b.ne	2f
+>   > 59		mrs	x1, ich_vtr_el2
 
-Right. This might_lock() is gross, and clearly doesn't do the right
-thing outside of direct injection of LPIs.
-
-I think we should drop it, but we should ensure that lpi_xa.xa_lock is
-never taken in interrupt context.
-
-Oliver, what do you think?
+Ah, ancient assembler that doesn't understand the GICv3 registers...
+Oh well, I'll give it the generated encoding instead.
 
 	M.
 
