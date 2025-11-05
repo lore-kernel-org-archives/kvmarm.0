@@ -1,125 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F2D2D7DE8;
-	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD31338937
+	for <kvmarm@lists.linux.dev>; Wed,  5 Nov 2025 15:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762342313; cv=none; b=eBli6VTfbtyHW7KrGkA3vpQIRKyHWkgzRPpPSDwCONI9SgJdAK8/Uq8sC8FfRE2bvoILIAHR+olXPy9XwxVHaqOZkdoP+4HLqzaarg96hOsowcLWwQL+wVMY9/VOcVQjUZ1rvESrFcUP1fNk23UOdhzY/Vx0L0Tfei4pAVqX8uw=
+	t=1762356397; cv=none; b=YT8vvL6CrAqsnERzWaqGf0TlG1Txqa6j8eCcyl2hT+I5deBo8SSS2WQBN0UzGUePP5OxQgMRjNgP3eyu4x2+jFuZuPbjJGdJlCbMnPKSWYEpNnt9CQOYAmQO5LnQOJ7BaR1YVKM/og5Rce9Jx4IHWgANKqku71dlDq1YXyUMCnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762342313; c=relaxed/simple;
-	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mWJuq4e+waVXoHamaePchSNSKzlAKUWyo8fbE5R7Y0+Gb5vKgbO3bt09dWtZF2kF5tYrfzsKqOZdWWieiDGQP9/0HQVoXOBk6E9WsMsUeLF1t3qF9T6FJTZBr1PkqitKHXgk6X0H2J6hL1e1pVQTsERvNJkjiq7jQeunVZUsB6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ragxC15H; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762356397; c=relaxed/simple;
+	bh=d8JWxeRGmjq8jXPHzr0bSzSADeEyMQIUeCD2xQhaO6I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=F0XSCCFgeiRDKFyA+7WCfYTUm/kMnBoaOdtG3Gs4LGHY5+nFihQxSnKHEFG1QqSPdP20gr/2kLmjteJXGVYE8zWJdE88JMBDkRyVfEpZK9zBv5ATSeUC5YFEJzFpvSnobSlc/0QZawdr4RSC+QDJag+P7eNLeDbcb5HPSR5+xoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vHLDgpud; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ragxC15H"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24291C4CEF8;
-	Wed,  5 Nov 2025 11:31:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762342312;
-	bh=U57loPexlLZP5HdBIPeios3Zx2jNddLmBLVcIU228JY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ragxC15Ht/seLaHZR7ulK+vdLU+DtRY2viILGtE8Zf4JihbWC9/iRZ5LH5zTASPg8
-	 ksS2TnwHb5P+G0uTXLPLzQ/EElYIQisOKOqV5DbfbNBwpuCyEaKZWdTJPXaWMBN+m2
-	 XnDaeG/OhBSmwFVq0gNfv2LtSNRJA7Sc1cQ92TOq+H1N0NdfnLN2s8Y+8O8VLEJgiD
-	 LSCpk9+GJXVVCsKhFpqsx4+UjqKsD4Ucl8FvuiPVw9pALgq8Xu6RF0gJMiQF1srgkI
-	 P3NMhuFOf1XAAyjPJxxhDxOD0px2P4w8Lvjv2vrRVy7LnbVczEHMyV1NXpCwaftSwG
-	 dS/l8XCzLMRoQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vGbjx-00000002Zmi-31vj;
-	Wed, 05 Nov 2025 11:31:49 +0000
-Date: Wed, 05 Nov 2025 11:31:49 +0000
-Message-ID: <86bjlgvhp6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: kernel test robot <lkp@intel.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
-Subject: Re: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-In-Reply-To: <202511050925.kQxVnIUB-lkp@intel.com>
-References: <20251103165517.2960148-6-maz@kernel.org>
-	<202511050925.kQxVnIUB-lkp@intel.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vHLDgpud"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3418ada9e6cso1978171a91.1
+        for <kvmarm@lists.linux.dev>; Wed, 05 Nov 2025 07:26:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762356395; x=1762961195; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmjmfo22QwufKip+RFN2GwcKXDk7+fDMohFzNqFh1wo=;
+        b=vHLDgpud1UqaRvz1DNy0hmhbLnUZUDv/QSD4xhUkQemkpsUlpvR6D3TsXorLbazEz/
+         TaWYfbWJR3PrqtvZ2DvbXE5fEl+4rSsPVYAE46jbe52CzHaFPGis9wBUk+rrVqc8CTWW
+         mA141lGYy8Kl1zhxJlrz+MDW6QgHl9f3rV9cpTyA/bT55d7IZXKnefmcyHBOZCmSbHpR
+         wnWu79nUEN7vZw2rRQNqlr2e/vA7Lk9QZIUctlpS0yZekYwzGlj4lieONBvINwTXCwrF
+         7wVfceD9j+ozbnsaZAkFx36MkEeQN5IGOwYVXFdOwjqNJ+MslhPrGEsvFY8OCEooxiQG
+         hCfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762356395; x=1762961195;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmjmfo22QwufKip+RFN2GwcKXDk7+fDMohFzNqFh1wo=;
+        b=dqj9LB0X2ddcMeq8NRkcxp5HjU88VdU8iIHImhjnnzg8SNz9MWB/H0aMNtZ2Am569N
+         Byr6qXf4f8FvR+rXVzpGHLNDyNtr+aIqHdzXGUzizFIQRkxTeax7QEoZElsZYX1V26Is
+         E27dhHTJSciFJ0giIoxcl/eFLdCCMcXK8WrtfmOtkp9TrIvtcdtOdRwJRTTsilrK/OlH
+         S+O5VyqFnBTEhHT+d3kNys3tmRWfSXRI4clKWzpw4E1lgoPbh8owv7+W39L33IQ4c08f
+         nRoh1z5WJl3SsY1zvLUtfxtTd74dEd42AOxzhCUd+FhTxbQf/xyJIFqRUZmiQVyDvwrU
+         hFgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhDla0f3xfwZsPmBadtQiyfqD1QTI64I9WvIXGAp1+DFAHHyrElGJK75W5jAcWWziLE9E8aPc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw2iN0lipWwETSiOsTjVQl9YQjXzUDVYPZoaEdWVqJpeN/I50xk
+	F4+NG/zv5rh7aRRZYBGqiRN7thVvxAbm6Y2iApFgwT9sOqgPeKvi5mYGD1MZ/LYgoSmAZGmAuKm
+	PCCo0lA==
+X-Google-Smtp-Source: AGHT+IEksiko2nLkYHDcuQoizh41Xk4dhEPlLcSxUswEaWhydqjlp9gNPv6q5VYl/pXem0FsGEVxprPZGIk=
+X-Received: from pjbtc7.prod.google.com ([2002:a17:90b:5407:b0:340:b503:505f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:384d:b0:340:9cf1:54d0
+ with SMTP id 98e67ed59e1d1-341a6c08e65mr4623520a91.1.1762356395074; Wed, 05
+ Nov 2025 07:26:35 -0800 (PST)
+Date: Wed, 5 Nov 2025 07:26:33 -0800
+In-Reply-To: <aQsBI1/SIXGbf9nA@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: lkp@intel.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, oe-kbuild-all@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20251017003244.186495-1-seanjc@google.com> <20251017003244.186495-5-seanjc@google.com>
+ <aPhjYcOFjL1Z8m2s@yzhao56-desk.sh.intel.com> <aQMi/n9DVyeaWsVH@yzhao56-desk.sh.intel.com>
+ <aQo-hus99rE7WBgb@google.com> <aQr9jW/7zwWJaDFf@yzhao56-desk.sh.intel.com> <aQsBI1/SIXGbf9nA@yzhao56-desk.sh.intel.com>
+Message-ID: <aQtsqXPaZo2SMdJU@google.com>
+Subject: Re: [PATCH v3 04/25] KVM: x86/mmu: Add dedicated API to map
+ guest_memfd pfn into TDP MMU
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	"Kirill A. Shutemov" <kas@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	x86@kernel.org, linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Ira Weiny <ira.weiny@intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 05 Nov 2025 02:01:36 +0000,
-kernel test robot <lkp@intel.com> wrote:
+On Wed, Nov 05, 2025, Yan Zhao wrote:
+> On Wed, Nov 05, 2025 at 03:32:29PM +0800, Yan Zhao wrote:
+> > On Tue, Nov 04, 2025 at 09:57:26AM -0800, Sean Christopherson wrote:
+> > > On Thu, Oct 30, 2025, Yan Zhao wrote:
+> > > > On Wed, Oct 22, 2025 at 12:53:53PM +0800, Yan Zhao wrote:
+> > > > > On Thu, Oct 16, 2025 at 05:32:22PM -0700, Sean Christopherson wrote:
+> > > > > > Link: https://lore.kernel.org/all/20250709232103.zwmufocd3l7sqk7y@amd.com
+> > > > > 
+> > > > > Hi Sean,                                                                         
+> > > > > 
+> > > > > Will you post [1] to fix the AB-BA deadlock issue for huge page in-place
+> > > > > conversion as well?
+> > > 
+> > > If you (or anyone) has the bandwidth, please pick it up.  I won't have cycles to
+> > > look at that for many weeks (potentially not even this calendar year).
+> > Got it!
+> > On the other hand, do you think we can address the warning as below?
+> > The code is based on [2].
+> Hmm, updated the diff.
 > 
-> Hi Marc,
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 7b4a4474d468..543e1eb9db65 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -853,6 +853,9 @@ static int kvm_gmem_init_inode(struct inode *inode, loff_t size, u64 flags)
+>         inode->i_size = size;
+>         mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+>         mapping_set_inaccessible(inode->i_mapping);
+> +       if (flags &GUEST_MEMFD_FLAG_MMAP)
+> +               lockdep_set_subclass(&inode->i_mapping->invalidate_lock, 1);
+> +
+>         /* Unmovable mappings are supposed to be marked unevictable as well. */
+>         WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
 > 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on kvmarm/next]
-> [also build test ERROR on linus/master v6.18-rc4 next-20251104]
-> [cannot apply to arm64/for-next/core tip/irq/core]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Zyngier/irqchip-gic-Add-missing-GICH_HCR-control-bits/20251104-011133
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-> patch link:    https://lore.kernel.org/r/20251103165517.2960148-6-maz%40kernel.org
-> patch subject: [PATCH 05/33] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-> config: arm64-randconfig-003-20251105 (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 8.5.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251105/202511050925.kQxVnIUB-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202511050925.kQxVnIUB-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    arch/arm64/kernel/hyp-stub.S: Assembler messages:
-> >> arch/arm64/kernel/hyp-stub.S:59: Error: unknown or missing system register name at operand 2 -- `mrs x1,ich_vtr_el2'
-> 
-> 
-> vim +59 arch/arm64/kernel/hyp-stub.S
-> 
->     45	
->     46		.align 11
->     47	
->     48	SYM_CODE_START_LOCAL(elx_sync)
->     49		cmp	x0, #HVC_SET_VECTORS
->     50		b.ne	1f
->     51		msr	vbar_el2, x1
->     52		b	9f
->     53	
->     54	1:	cmp	x0, #HVC_FINALISE_EL2
->     55		b.eq	__finalise_el2
->     56	
->     57		cmp	x0, #HVC_GET_ICH_VTR_EL2
->     58		b.ne	2f
->   > 59		mrs	x1, ich_vtr_el2
+>  
+> > As noted in [3], the only scenario can trigger the warning after [2] is when a
+> > process creates a TDX VM with non-in-place-conversion guest_memfd and a normal
+> > VM with in-place-conversion guest_memfd. The two invalidate_lock's don't contend
+> > with each other theoretically.
 
-Ah, ancient assembler that doesn't understand the GICv3 registers...
-Oh well, I'll give it the generated encoding instead.
+Hmm, no, I think we need to hoist gup() call outside of filemap_invalidate_lock(),
+because I don't think this is strictly limited to TDX VMs without in-place
+conversion.  Even with in-place conversion, I think KVM should allow the source
+page to be shared memory, at which point I believe this becomes a legimate AB-BA
+issue.
 
-	M.
+In general, playing lockdep games with so many subsystems involved terrifies me.
 
--- 
-Without deviation from the norm, progress is not possible.
+> > [2] https://lore.kernel.org/all/cover.1760731772.git.ackerleytng@google.com/
+> > [3] https://lore.kernel.org/all/aQMi%2Fn9DVyeaWsVH@yzhao56-desk.sh.intel.com/
