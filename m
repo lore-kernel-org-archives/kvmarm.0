@@ -1,55 +1,55 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9F13321CF
-	for <kvmarm@lists.linux.dev>; Thu,  6 Nov 2025 14:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405503191D3
+	for <kvmarm@lists.linux.dev>; Thu,  6 Nov 2025 14:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762440262; cv=none; b=iYSvGfrBZYRqACdz5VJnItCxgmBIeK48f3sgMtRzVdqcvXzHUQKU+vvpi7uwq0erGi+aUWq2KQ2a9172Eh3rdmF17F3gkc4jJqFbEksMiPc5xtUpv2Ktf/acFTadAk3l1F8L3rz5pi6U2EjKRFsYlqoU7Hl50gK3A7B7TbMfz6M=
+	t=1762440264; cv=none; b=VX2wGe4mMInM2YQ3R/eB1VJjPRSkXe6l+JLbNDeFyErlDhW0uqPtinkw417vmVAf2TuSf5u7EaIr3FMbSb38MfdFj0L1RzxdZRdl/+q23frxM5b98Q2iku55qbquA/dxDoadmVkDI8yxBaAWJVedhrU03sXfeVZmalRWbmSLNVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762440262; c=relaxed/simple;
-	bh=fPGy+Qo6hQ4O1ne5b3sAZEf0TK6EzklkWv4OjN0CfJU=;
+	s=arc-20240116; t=1762440264; c=relaxed/simple;
+	bh=ZEqN0UPvK3HCK09MSfR+qkub5GZsyBTz/VhtlYBy2S4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dXo3r4G/yj3myMQwxk1ydcKASGj5cHZrVG4R/3Nj9Pq02vz9pSoUFlzvWYP8meWA2NRfLq3pJIaaJDtNAV9YiUihhMFJ5dFeEKy/DCIIVqAKtY6b4hXBX0jFXl7ghxqJ27pnSVtsrRwAVGStNzNpttzHLxij/+IyDqC3VUbgo0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ophk9TES; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=saYhjrWea7W6G/SjS5JSMSShicACFiwDO5QaXk38H6pNNoCEjVbXLal640UTCFQOSD1wolAGLOktEWpFR9S6z45/4laFVuZA+LnBR5gfnHAn0b7+XVmwjGSYeG6Sj+2pJ2guS9Nhm6CpKlpIdW4bG/uAIiHsP7iBdyo9G4GBlBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OzT2nXNo; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ophk9TES"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-470fd92ad57so11180325e9.3
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OzT2nXNo"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-471001b980eso8138845e9.1
         for <kvmarm@lists.linux.dev>; Thu, 06 Nov 2025 06:44:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20230601; t=1762440260; x=1763045060; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZxATvlfrAs6kPTkjH086Q4K5vdnLQEYuZzyZbmCochI=;
-        b=Ophk9TESwu7TFF28j0ORo+/IPfe/htA7+Hq3dUxyBxRRJaWY5bz272q5F6nBEkzNRy
-         P2cL8IZ24kxObzGRbithwIWCAeTAN4xmdmAi7xBB6WOnn0j5/XrCcheSt+ZajgXyi7pr
-         81+9uWQ0eVBUv93kxO2BrN6l4VD7ydGTH2BpEdKMTKI71s+KZBWpG9OChfjGXCz9X3FN
-         hy8CLx/eZnWg52rAXZAT9hQZt+OO3J37R02lSsOIgp7xIhUKTeJD7GJYRjyIeYIkB03O
-         BtdxP1bdOe6sbsuB7+Kg5mnDCnR7M28VfTloRyauXIqMkv8AFodxvsgCmWQYk2DJyUpc
-         zxtw==
+        bh=hQotLZ7bYQhnw+F+e2EgZGDV56Lv1I3QeSzBHAS6ry4=;
+        b=OzT2nXNoiczHLv3Hja5+2tkDEw9aakJ7ngnyb/0LREobCmG4cl0laQ5RHVhzfvbpaH
+         VrIrVc4Tb/cgoFGfGkm+pSGeOn7EVj71JuUihriRKC107T1ExpOhfCSzAiNJ94t1W7Cz
+         +bMRW+UguoWoD5NOcLiuER1BLaw5X6ORsRO8iIOvz4E2/hTCSkMcmnL5cZZ3hOVzB1fk
+         KMjIDDLFNJN7PusZDk1zG+rYsvRue0YK1ahJ4b5B6VIaiw/dNV/sCNiaMuCK3PeE5g7U
+         7/urGaJNS6YFtm9E+MTqvImSEYao4tCTXWZuTugv6XgyX4KQ8q11WNrp1v8OWWxUo8rQ
+         fcHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1762440260; x=1763045060;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZxATvlfrAs6kPTkjH086Q4K5vdnLQEYuZzyZbmCochI=;
-        b=jEW5IZlk733Uf8gB694PsQI2ziDmSuKTaEyhW8RHWBXFmrqSJHiBnthqIX/nP/WoUg
-         0Z85/A+4/gbf7XvH6CdezY6aL7y3a4XxQvsMo1S44zSmmayJFcmp7u/s4AKjMpCv9aiA
-         qPHoJA2mxWYYYiTpz1vuplypnV5remIVsXU2ZhX94LM9gqVDlI5oL+M70v1mKxeEzPMX
-         y3Q3SDn9jmhLGuFKOHJPbgC9BJD3j92BupRLhhC+JDW1LzoQrRkifCgc969YlNfZ4xX1
-         7XdA3PihXO06Yx1EAXWqM4oArfeXBcBKMK/eotnIrtTM3Xsfzx8bX9dTQ5kkwKqx1JP6
-         GOHw==
-X-Gm-Message-State: AOJu0YzQsJw5tDJCdn2imm+mm2bt93OXeGL0prED2275VQljLzEolY6D
-	sSptiNognPhUewr/Q9sWKN4U1Q+EddmCOEsmCwzgeRFWnzN9Gded5fG6xJcTN3ZQCcS/oN+PoQi
-	Gn6A7DJw1MBFXTEcxWtRlQr0aYgRwQQqjgiqZyL1wWVKZTrPUvoi5awB9UKUOvl255mdNiydP3B
-	iosmAXDuUy02mbR4vxccfKQKt3zQrJQKA=
-X-Google-Smtp-Source: AGHT+IEVyaIwoMfP0yfMDIthHFjuU2aK5E0vvak4krGXtReD/5DU8J3wL4/vur4Zr92jt89ZLLm5pAOlSQ==
-X-Received: from wmbz16.prod.google.com ([2002:a05:600c:c090:b0:477:1208:651d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3551:b0:475:dd59:d8da
- with SMTP id 5b1f17b1804b1-4775ce2b673mr73956545e9.40.1762440259695; Thu, 06
- Nov 2025 06:44:19 -0800 (PST)
-Date: Thu,  6 Nov 2025 14:44:13 +0000
+        bh=hQotLZ7bYQhnw+F+e2EgZGDV56Lv1I3QeSzBHAS6ry4=;
+        b=CYGHQTCetfSRNb6End3eW6bnHAbWCE6wk9pqwr90pzc+HmtKQ+finvF9G1fqjzDz9D
+         mm9BLYFcYpOw1IrKvykypA3cWOCe1suT6urh7fVhhPR0y6w/NLsgFkspxRdH2yyCCk0b
+         dFTeMFsRK94/vdMx6SPTSW2PunfTvPd/8NzLO0+wvGZ1+p/ZOZQ1ecI0jNfzGNyuI5Pr
+         3z1smgP7IKOnxeLAUInEvjxRAc8zLWPORz64/twHOrKzaOL9bnuGQxswLbxNELfj4pq4
+         bca89akwcmRn6j30KdRIBLC7Ie0aYcHJJC+Rgs85CY1zJmRFzsTDtcE6giDvzDKBdv3p
+         Z3LA==
+X-Gm-Message-State: AOJu0Yy7aeUD3WW2OnId2WyJM/8qlS+Ilw6ENjp34ZvfhHIqgVa/TYRz
+	lmvldIrcOMWjtL7Rm1E0Wh0RqPy2IP/YO4gnGnD7skRQx19YcKb/hXtF1IcTXc5EsaPG2lA0S1j
+	QQxNtFeAnqGKkwXpJLda20LORddN1tziScMFOWz74dWJbMUT683UP8NKiQ50iEmIaDg64ukJTPY
+	gfunaqRrKDrHp/JbXLgSgfPPrrWh8OXfg=
+X-Google-Smtp-Source: AGHT+IG54VtmRITeyRodrpFjnkmMn9aKcd2SfV26fNYyANDC22/WKNUNo00I7Z8tR3a3z6jTuMfxSnvpDw==
+X-Received: from wmfu16.prod.google.com ([2002:a05:600c:1390:b0:46f:aa50:d716])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:5291:b0:471:9da:5232
+ with SMTP id 5b1f17b1804b1-4775cdc8eb1mr74506725e9.15.1762440260497; Thu, 06
+ Nov 2025 06:44:20 -0800 (PST)
+Date: Thu,  6 Nov 2025 14:44:14 +0000
 In-Reply-To: <20251106144418.2847443-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251106144418.2847443-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106144418.2847443-2-tabba@google.com>
-Subject: [PATCH v2 1/5] KVM: arm64: Fix Trace Buffer trapping for protected VMs
+Message-ID: <20251106144418.2847443-3-tabba@google.com>
+Subject: [PATCH v2 2/5] KVM: arm64: Fix Trace Buffer trap polarity for
+ protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,34 +69,37 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-For protected VMs in pKVM, the hypervisor should trap accesses to trace
-buffer system registers if Trace Buffer isn't supported by the VM.
-However, the current code only traps if Trace Buffer External Mode isn't
-supported.
+The E2TB bits in MDCR_EL2 control trapping of Trace Buffer system
+register accesses. These accesses are trapped to EL2 when the bits are
+clear.
 
-Fix this by checking for FEAT_TRBE (Trace Buffer) rather than
-FEAT_TRBE_EXT.
+The trap initialization logic for protected VMs in pvm_init_traps_mdcr()
+had the polarity inverted. When a guest did not support the Trace Buffer
+feature, the code was setting E2TB. This incorrectly disabled the trap,
+potentially allowing a protected guest to access registers for a feature
+it was not given.
 
-Fixes: 9d5261269098 ("KVM: arm64: Trap external trace for protected VMs")
-Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Fix this by inverting the operation.
+
+Fixes: f50758260bff ("KVM: arm64: Group setting traps for protected VMs by control register")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
  arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 43bde061b65d..8d06a246dfd1 100644
+index 8d06a246dfd1..f6f8996c4f97 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -117,7 +117,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
- 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
+@@ -118,7 +118,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
  		val |= MDCR_EL2_TTRF;
  
--	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, ExtTrcBuff, IMP))
-+	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
- 		val |= MDCR_EL2_E2TB_MASK;
+ 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
+-		val |= MDCR_EL2_E2TB_MASK;
++		val &= ~MDCR_EL2_E2TB_MASK;
  
  	/* Trap Debug Communications Channel registers */
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR0_EL1, FGT, IMP))
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
