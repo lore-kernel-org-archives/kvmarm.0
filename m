@@ -1,112 +1,160 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3A21DF254
-	for <kvmarm@lists.linux.dev>; Thu,  6 Nov 2025 03:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B7430C639
+	for <kvmarm@lists.linux.dev>; Thu,  6 Nov 2025 09:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762400083; cv=none; b=PcQOffo+TI5UnI+RmtvrvBCDtebnvQTeCwBaJoqx3/x6F203kuT9zBLV2Xqcy/cnXTkGYBIPBIBcJxyDVSAsGAHmQ8M2nCno+O21MYQdxxA3z3lTfSg0+b+WcBMmook1DHrv+sEQuhboBvCHhUotrhFf3obH01P04IHZVTLeWSY=
+	t=1762422032; cv=none; b=KHiX0TK3mrcI7M/TpaoY/sTx75MXxA9i+9qb3EYgcHLfdJoKw5yVhJRaTAtgWRdalruiOXlmW8z52wik9W55TdrcWH4Qba/K4EtYwiBZFjB+Ef81L9+mJEosvO2E3g9vqRSV1neAAAZYX/Vi/AXL/NAc6FgnurRQeDEpKgrsAog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762400083; c=relaxed/simple;
-	bh=bAZRPhU1iXTa3lQwGSUSUkrCFaF3/7v43wHmWO9Vq9Y=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ZFUBVm2rvyA24NvWsTELYA/wCgb57qjj2VzH6x4aFVdWUiLPsViY1QQPagFkZbcaNakWt+SfRDNr5y23JdEuc8Muqj0CDg6NIf+wzSoRhnoYJQqsaxpvF7IlXB11kFNk5mzGSwFo7Jsawz44hpeAGks89U0nkrT/tEiO1NT+Aq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jgA67hQg; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jgA67hQg"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=MYcjEvRxn22VC5rAvQRDvynCUtq7/E1hpeiG4EFyNfQ=;
-	b=jgA67hQgiqIuINqhW2/NaicWZBtvlokfKG0ajEs0Yurc8hcot9tvQ3/quulNcIilw/v4JhzSN
-	d0w26zztMyNctfPPNdvpy6HKmJ2Fh3iKDICTUA/tuSxAZO3sH53tiLzBge/5oDMF9eTq5TPk0jc
-	uDPgeP2wqr1dOG3+KXy25ZU=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4d277M1bCgz12LDR;
-	Thu,  6 Nov 2025 11:33:03 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4CC0E140258;
-	Thu,  6 Nov 2025 11:34:38 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 6 Nov 2025 11:34:37 +0800
-Subject: Re: [PATCH v2 6/6] KVM: arm64: vgic-v3: Indicate vgic_put_irq() may
- take LPI xarray lock
-To: Oliver Upton <oliver.upton@linux.dev>
-CC: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>, Joey Gouly
-	<joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Ben Horgan
-	<ben.horgan@arm.com>
-References: <20250905100531.282980-1-oliver.upton@linux.dev>
- <20250905100531.282980-7-oliver.upton@linux.dev>
- <b4d7cb0f-f007-0b81-46d1-998b15cc14bc@huawei.com>
- <86cy5wvknf.wl-maz@kernel.org> <aQvwA68yqbUV5Iiw@linux.dev>
- <aQvyuB4bJq-ulP8s@linux.dev>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <6d77fe7f-48bd-fb44-9573-ff2e44790dfd@huawei.com>
-Date: Thu, 6 Nov 2025 11:34:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	s=arc-20240116; t=1762422032; c=relaxed/simple;
+	bh=vrkroYmYNXYCJ55dzk4Mp/6Rn8rgOpPCHKw9X6pxPKQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTmsPF4AT9JDu4oJgVf6kZ+ba+EEWGfAsnhxjq7kH7RYb/xe1sDgBnvrCt9MXf8zdZQG5/P8PTKBN/MRrzBwZrNP0Q1DqmCN48DaS09dP6n/ZupBp7Ln2H+9yhl2aWROQ8fuBqG3VtHQfaLgRaVNEbsTM2lAiazKDmwubaSuEbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BE7E31596;
+	Thu,  6 Nov 2025 01:40:21 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 613BB3F63F;
+	Thu,  6 Nov 2025 01:40:26 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	mark.rutland@arm.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v11 0/9] support FEAT_LSUI
+Date: Thu,  6 Nov 2025 09:40:14 +0000
+Message-Id: <20251106094023.1371246-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-In-Reply-To: <aQvyuB4bJq-ulP8s@linux.dev>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+Content-Transfer-Encoding: 8bit
 
-On 2025/11/6 8:58, Oliver Upton wrote:
-> On Wed, Nov 05, 2025 at 04:46:59PM -0800, Oliver Upton wrote:
-> > Hey,
-> >
-> > On Wed, Nov 05, 2025 at 10:28:04AM +0000, Marc Zyngier wrote:
-> > > On Wed, 05 Nov 2025 09:37:10 +0000,
-> > > Zenghui Yu <yuzenghui@huawei.com> wrote:
-> > > >  Call trace:
-> > > >   show_stack+0x18/0x24 (C)
-> > > >   dump_stack_lvl+0x90/0xd0
-> > > >   dump_stack+0x18/0x24
-> > > >   print_usage_bug.part.0+0x29c/0x358
-> > > >   mark_lock+0x6c0/0x960
-> > > >   __lock_acquire+0xd4c/0x20fc
-> > > >   lock_acquire+0x1c8/0x354
-> > > >   vgic_put_irq+0x54/0x110
-> > > >   vgic_its_inject_cached_translation+0x178/0x25c
-> > > >   kvm_arch_set_irq_inatomic+0xac/0x124
-> > >
-> > > Right. This might_lock() is gross, and clearly doesn't do the right
-> > > thing outside of direct injection of LPIs.
-> > >
-> > > I think we should drop it, but we should ensure that lpi_xa.xa_lock is
-> > > never taken in interrupt context.
-> > >
-> > > Oliver, what do you think?
-> >
-> > It is possible (albeit improbable) that the last reference to an LPI gets
-> > dropped here after injecting a cached translation. When that is the
-> > case, vgic_put_irq() will take the xa_lock from an irq context.
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
 
-IMO this is possible (with a really small possibility though) to happen.
+This patchset support FEAT_LSUI and applies in futex atomic operation
+and user_swpX emulation where can replace from ldxr/st{l}xr
+pair implmentation with clearing PSTATE.PAN bit to correspondant
+load/store unprevileged atomic operation without clearing PSTATE.PAN bit.
 
-> > So
-> > I'd say the might_lock() here is valid.
-> >
-> > Zenghui, does reverting 982f31bbb5b0 ("KVM: arm64: vgic-v3: Don't require
-> > IRQs be disabled for LPI xarray lock") make this go away?
-> 
-> Well, a bit more than that. Revert and add the diff below. Like I said
-> in the original changelog, finding bugs for rare release paths is
-> annoying and having a reliable way of causing an explosion when the
-> calling context isn't right is a property I'd like to preserve.
 
-The warning disappears with that.
+Patch Sequences
+================
 
-Thanks,
-Zenghui
+Patch #1 adds cpufeature for FEAT_LSUI
+
+Patch #2-#3 expose FEAT_LSUI to guest
+
+Patch #4 adds Kconfig for FEAT_LSUI
+
+Patch #5-#6 support futex atomic-op with FEAT_LSUI
+
+Patch #7-#9 support user_swpX emulation with FEAT_LSUI
+
+
+Patch History
+==============
+from v10 to v11:
+  - use cast instruction to emulate deprecated swpb instruction
+  - https://lore.kernel.org/all/20251103163224.818353-1-yeoreum.yun@arm.com/
+
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LUSI to guest
+  - add help section for LUSI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LUSI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+Yeoreum Yun (9):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: Kconfig: Detect toolchain support for LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: separate common LSUI definitions into lsui.h
+  arm64: armv8_deprecated: convert user_swpX to inline function
+  arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
+
+ arch/arm64/Kconfig                            |   5 +
+ arch/arm64/include/asm/futex.h                | 291 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  25 ++
+ arch/arm64/kernel/armv8_deprecated.c          | 111 +++++--
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 8 files changed, 381 insertions(+), 66 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+
+base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+
