@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F1C2405F8
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 18:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D61602D9EC7
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 18:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762541633; cv=none; b=pek1T9XTzoEGLRqPfUBvP2H4jqNeBApkqd5hlOC3dVhsPG/dX5VS8N5Fg/CUVSxPwWnXQ6eOBrkpmgqx0JNke9EGdAg79HEJiFJPF4XSR0SavhOWtP2drkJYnhXgocu7jQg1IPHcjSQxmihmJ8nEbtOr5ywBExFIvTrohMhyAIM=
+	t=1762541876; cv=none; b=SiDd+CEeb5sqLX7ojnMn5V55MNXNJwTA5CFF5AcYIkaR5UJTQXfZIpQPqkLMtUI9s1Mc1NNMzTmJwZjz1QGtyHXq+F/UCx6k0vOSmlib5OcGZu3MdN8lZQKXOE9pOkbXmPIyrt2JQPoE6ECgf0YZ2LZR+ekhTGwrvbKgBYz95tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762541633; c=relaxed/simple;
-	bh=RIXw7Xojbsu8fNwBlN6lueulv3Ht7IrJjqveZA3dqNw=;
+	s=arc-20240116; t=1762541876; c=relaxed/simple;
+	bh=awyUGs0rpGKlK7qoN/xReG7QUF+ghsD5p1upAxbLLfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EteR05/O0xXGreaib6NIm6S1oNQlYudkqJl0HluIOPQ/aoOdHg7wSL0Er5BVDCvk+C6W5j51k/Vquqw9wc8J0jn7yZfIZ4dN8T8srw1Le+bOSjaubAri3Nsy6EJtp9t0o+jvvjZTOvM4HL5PQZK4L1DuEXEuovyvThc+qhMmF5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBHo2vDv; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxVHFE69tK9WhXxueCnN7AIgO2dIeuKLjrcHnwlauYMdnFVh6OEDGy1/gEg3NVsE99qrME1AvTOMPbADq4BGd+3q8/L4/gMf9HF5miJu+F8d7lHPWKLU5F4gJvaogmC0Qz3ftHOAtc3FgJh9gK2i964lb9JUHes2GVLFGqXuNRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niFj0L83; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBHo2vDv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F137EC116C6;
-	Fri,  7 Nov 2025 18:53:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niFj0L83"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F21C4CEF7;
+	Fri,  7 Nov 2025 18:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762541632;
-	bh=RIXw7Xojbsu8fNwBlN6lueulv3Ht7IrJjqveZA3dqNw=;
+	s=k20201202; t=1762541876;
+	bh=awyUGs0rpGKlK7qoN/xReG7QUF+ghsD5p1upAxbLLfk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SBHo2vDvH4Ug3Szqt6A3FavNSuCOZhtpLXYvwGvZHgJczlRDIv1z54KWDtLFpuNRX
-	 34kFzDIOOT1RLXivNfvn1S8lTiiMR5kPRBlTumU7ayO7tFUP9DfUZGvcQgY2A79CRv
-	 oGWnH0fLyQdU3s4CPQ6cZv0l7HAyueYMsxdRKxM8+I7x7MxP9+5SiuilTYUd1v5E7z
-	 ju4H+mZAvigE19A8s2087AgWOC7xd9wDFq8WGUr3S8BIT7l0HDwWZK3vlPhLp3fREC
-	 lDUM7y2h3xb8MZEE09Aejtiy6o1xJ74UV5/oV/ALYK9UBjcuiTYHgIyyG0Sld35lqB
-	 uE1lEYc+ANadg==
-Date: Fri, 7 Nov 2025 10:53:50 -0800
+	b=niFj0L834blAvhm55fQPakks8soCRt7CHIzJIc542uN43IJeRL454mVe5C+CZJepI
+	 7tAN/u4arc4YprsEUil1ybJGs99xRtr/syqXiAzuw/0l34OTTHWOATCNtQghR2djAN
+	 CDZNx/ByneMMyxPcAN1s2vKIn+A1x0ToQ6DlGmP8PYJnlQ/TjSvGJ6MWkQTqAME3eS
+	 LvJqFIHS4aDvw79At5RlkbtzdnXBBIVjzz2wYtro3LSSTADp/084X4ys+0cJFjds5u
+	 t7DwcSBllmJ4tLjrav9C5vU8iyx+Yw9lE0N5FTTeIf4C8sgnWu0pKWRhAtwD8joFLW
+	 tdQowzW7c58Tg==
+Date: Fri, 7 Nov 2025 10:57:54 -0800
 From: Oliver Upton <oupton@kernel.org>
 To: Zhou Wang <wangzhou1@hisilicon.com>
 Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
@@ -34,11 +34,10 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	yuzenghui@huawei.com, arnd@arndb.de,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	yangyccccc@gmail.com, prime.zeng@hisilicon.com, xuwei5@huawei.com
-Subject: Re: [PATCH v7 6/7] KVM: arm64: Enable FEAT_{LS64, LS64_V} in the
- supported guest
-Message-ID: <aQ5APpLg0Elv4YoH@kernel.org>
+Subject: Re: [PATCH v7 0/7] Add support for FEAT_{LS64, LS64_V} and related
+ tests
+Message-ID: <aQ5BMo8FuQQGEM43@kernel.org>
 References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-7-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,48 +46,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251107072127.448953-7-wangzhou1@hisilicon.com>
+In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 
-Hi Zhou,
-
-On Fri, Nov 07, 2025 at 03:21:26PM +0800, Zhou Wang wrote:
-> From: Yicong Yang <yangyicong@hisilicon.com>
+On Fri, Nov 07, 2025 at 03:21:20PM +0800, Zhou Wang wrote:
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+> - Add identifying and enabling in the cpufeature list
+> - Expose the support of these features to userspace through HWCAP3 and cpuinfo
+> - Add related hwcap test
+> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
 > 
-> Using FEAT_{LS64, LS64_V} instructions in a guest is also controlled
-> by HCRX_EL2.{EnALS, EnASR}. Enable it if guest has related feature.
+> A real scenario for this feature is that the userspace driver can make use of
+> this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+> directly into the hardware.
 > 
-> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
+> MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
 
-The ordering of this patch is incorrect as patch #5 has the side-effect
-of exposing ID_AA64ISAR1_EL1.LS64 to KVM guests. This one should come
-first instead.
+Besides the ordering issue the KVM bits of this look fine to me. If
+these patches go through the kvmarm tree then I'd be happy to fix that
+up when applying.
+
+Will / Catalin, any preferences on which tree this goes in? If you guys
+take it:
+
+Acked-by: Oliver Upton <oupton@kernel.org>
 
 Thanks,
-Oliver
-
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index bab967d65715..29291e25ecfd 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -695,6 +695,12 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->  
->  		if (kvm_has_sctlr2(kvm))
->  			vcpu->arch.hcrx_el2 |= HCRX_EL2_SCTLR2En;
-> +
-> +		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64))
-> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnALS;
-> +
-> +		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
-> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
->  	}
->  }
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> -- 
-> 2.33.0
-> 
-> 
+Oliver 
