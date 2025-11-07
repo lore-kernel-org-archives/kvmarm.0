@@ -1,173 +1,138 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21C5324B2D
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 11:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF9A2D3A60
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 11:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762516158; cv=none; b=Tk9+850Zutcw3ZGLpKXdgBXm1xeJ/v1vn3ry2EyB1Q9YSlub60dyZBUz5aOGO9wAbqNU/TLLyCcEYzsrS+auYQeads53PNBRB7mVOxmBrW+PZbNUg+niFuYGJote0uoMilab5O7tqpXbuNdqqfuAcQB9PNMVb0xAIVXUOFbM/Fg=
+	t=1762516403; cv=none; b=byEIV1LV7G7tiQV4uoO0xDL81i3wt6SHBY2hzj726zNQ2zmkWoJibF1EeBMqZqGNq2X05UJt6/gioHuhPcuDESzqhj+SiopHSucKzG5SYgzL2hdv7kw62EfPlyucPlTDwtamBvRfsdBvqHBpwhemegRiOh8ThaRi+JA3Wuv+Ymg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762516158; c=relaxed/simple;
-	bh=QXmE58jWqTz+6fmUh4wbkTa0+b86LH+h73ZPYnF6l/4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EELpvt3G3DRP3y13IMP5yK7rAVkeBLittucMDkqprSskaspx5WdUzTazu6j9ft4rWjqVpsDswlaP50f9ip4HcFBHkWohrGyykfcONye7tJk3lIjUGnBoWadbB/4Q40coR+zXuKuAfs00d6laOE8zcMcRd8MRlonNJ039RXfHXds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55A9C1007;
-	Fri,  7 Nov 2025 03:49:07 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C8D33F63F;
-	Fri,  7 Nov 2025 03:49:13 -0800 (PST)
-Message-ID: <75c46cdc-1843-4716-8f45-92c6c0b89248@arm.com>
-Date: Fri, 7 Nov 2025 11:49:11 +0000
+	s=arc-20240116; t=1762516403; c=relaxed/simple;
+	bh=yQd1wP4dtJY3qwd3ZbTPi9Q/RA+YpkYHvKkoR396j6Q=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=WfhZaJUQx2WQyXvJSfnNHoq1RxbaLZ6+ZjVnZX5YBwnwnYjmEOKE8FMMGvBoxAZkKwF5XZow5ubjg4nIcQoRMSSgQ33SyqoMNcpYxqYX+f+bqaun+8pIZ7rzLQkfDRWK79urj/ixtk5rhY3qosads+XgxSzGCGfhuladNHjyiac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=nZYPXGpB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=3EZfkgsH; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="nZYPXGpB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="3EZfkgsH"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id C72A91D0014F;
+	Fri,  7 Nov 2025 06:53:20 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 06:53:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762516400;
+	 x=1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=
+	nZYPXGpBqzTG8KfhVvOQDNoZLtc3+Vkdh228V8+pj56i/Qm2peUDrvCMygNC5KbD
+	JQ/uZ81AmSWUFzCcblz0vmfZSw/7BBT2RPJzzmUfLyYJll5SWnFxnjCphPEHh96w
+	8kMu0BSc+o0f2bkkxuvO03zeXRZcanoFzt4q1+pljkveIh+Wk0fC1x28Z6ZRG+pa
+	sb1zfC7EMu2wnDrC0J09vliAAwMC2bsc5E+9zE+OhA+whjz+BPe53f7zXfm/KRTJ
+	caQ3I+k6uh9GCnHcOWYy+sVxUdu326xn8UzCgmueWeeQwq89GcQB/USiNYN58tFm
+	T3iRh2Eskdm1UlbZY1nWgA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762516400; x=
+	1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=3
+	EZfkgsHEaT84CaUc+anzrmrs9QeECQIR5p2OM9fGvHT0fDs7/KV0zn3cAj3UZrXA
+	WbPpAoH7zv4+M46Ay0zcSAonKvQggGaqOfQm2REyqgKHpox4MRaJduvZoj6hQpoO
+	BSPz4Ou3eVBPo/glrhOU13Ac17xegnClsxl18KWBntOZSsDL8Eus2FVuvLfR3nGV
+	U6YdzRvqcfKN+c81TkF5lxy27ya6zva+5tawKd+Gc+jBuyZ8OcJegYxKE6AwqiPk
+	wBBVJMPn1toPs9XcG7OlAvBViVy7wac9P5a/oAtaHgT6ZSCVBCYX8r3QOHYQe9xe
+	1ZmHuZLgfSmvme1oYx19g==
+X-ME-Sender: <xms:r90NaabeM2LyeI1AQ57PK2DWvphAmwIpxUQJ9Q-iesNws4vF3sr9ug>
+    <xme:r90NaYPEtXoRPMsXCPgGKOcmSq54PKVMVfwmG3MdxA1wpNp3LhY_CjjmcXLxzmJrs
+    nxvK7buXeLbyz40hjEwrpUogYbe7Y-JGyrkdfUURAUJ1u1NohlUK9M>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelheelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdefpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
+    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepkhgvvhhi
+    nhdrsghrohgushhkhiesrghrmhdrtghomhdprhgtphhtthhopehmrghrkhdrrhhuthhlrg
+    hnugesrghrmhdrtghomhdprhgtphhtthhopehmihhkohdrlhgvnhgtiigvfihskhhisegr
+    rhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhirdhpohhulhhoshgvsegrrhhmrdgtoh
+    hmpdhrtghpthhtohephigvohhrvghumhdrhihunhesrghrmhdrtghomhdprhgtphhtthho
+    peihrghnghihihgtohhngheshhhishhilhhitghonhdrtghomhdprhgtphhtthhopeihuh
+    iivghnghhhuhhisehhuhgrfigvihdrtghomh
+X-ME-Proxy: <xmx:r90Naa08TY73QAwQ15r2x0tWjcVK6iZ1U2jLiQ7uTwmZg-I_ucnftQ>
+    <xmx:r90NaYFUvmKHKTbn2nih1V_hWSqX6ycF5ywAeCuxVGwNx4PaMDJP4w>
+    <xmx:r90NaZgzqp4uVDE1DBQqjb7wUkxkHU0lvUlcFwlUStCzeGKZG0IMTA>
+    <xmx:r90NaZeZO9h15HpmRuk8i_fm0tmCxIyyKoQJmtTN_XzDMsUkCPmSww>
+    <xmx:sN0NaXNoJ3py5k8GLIR5-D3o_QeFRMYc_o86Zo7ZZ5QpcIsnJ76i-TNA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A92BF700063; Fri,  7 Nov 2025 06:53:19 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B*
- outside of memslots
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: Zhou Wang <wangzhou1@hisilicon.com>, catalin.marinas@arm.com,
- will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
- yuzenghui@huawei.com, arnd@arndb.de
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- yangyccccc@gmail.com, prime.zeng@hisilicon.com, xuwei5@huawei.com
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-2-wangzhou1@hisilicon.com>
- <1f0d24ae-c20c-4067-aa0c-b5bbeba367db@arm.com>
-Content-Language: en-US
-In-Reply-To: <1f0d24ae-c20c-4067-aa0c-b5bbeba367db@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-ThreadId: AGYZwPnl2csF
+Date: Fri, 07 Nov 2025 12:52:38 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Yeoreum Yun" <yeoreum.yun@arm.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Marc Zyngier" <maz@kernel.org>, "Mark Brown" <broonie@kernel.org>,
+ "Oliver Upton" <oliver.upton@linux.dev>, miko.lenczewski@arm.com,
+ "Kevin Brodsky" <kevin.brodsky@arm.com>, "Ard Biesheuvel" <ardb@kernel.org>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Lorenzo Pieralisi" <lpieralisi@kernel.org>, yangyicong@hisilicon.com,
+ scott@os.amperecomputing.com, "Joey Gouly" <joey.gouly@arm.com>,
+ "Zenghui Yu" <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
+ shuah <shuah@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Message-Id: <9fffb30d-fc9c-4e2e-94d2-c724e81ae3ac@app.fastmail.com>
+In-Reply-To: <20251106094023.1371246-10-yeoreum.yun@arm.com>
+References: <20251106094023.1371246-1-yeoreum.yun@arm.com>
+ <20251106094023.1371246-10-yeoreum.yun@arm.com>
+Subject: Re: [PATCH v11 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX
+ emulation.
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On 07/11/2025 11:48, Suzuki K Poulose wrote:
-> On 07/11/2025 07:21, Zhou Wang wrote:
->> From: Marc Zyngier <maz@kernel.org>
->>
->> The main use of {LD,ST}64B* is to talk to a device, which is hopefully
->> directly assigned to the guest and requires no additional handling.
->>
->> However, this does not preclude a VMM from exposing a virtual device
->> to the guest, and to allow 64 byte accesses as part of the programming
->> interface. A direct consequence of this is that we need to be able
->> to forward such access to userspace.
->>
->> Given that such a contraption is very unlikely to ever exist, we choose
->> to offer a limited service: userspace gets (as part of a new exit reason)
->> the ESR, the IPA, and that's it. It is fully expected to handle the full
->> semantics of the instructions, deal with ACCDATA, the return values and
->> increment PC. Much fun.
->>
->> A canonical implementation can also simply inject an abort and be done
->> with it. Frankly, don't try to do anything else unless you have time
->> to waste.
->>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> 
-> We also need to document this new EXIT reason here :
-> 
-> Documentation/virt/kvm/api.rst
+On Thu, Nov 6, 2025, at 10:40, Yeoreum Yun wrote:
+> apply FEAT_LSUI instruction to emulate deprecated swpX instruction.
 
-Well, spoke too soon. Please ignore this part ;-)
+Can you explain in the changrelog why you do this?
 
-> 
-> 
->> ---
->>   arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
->>   include/uapi/linux/kvm.h |  3 ++-
->>   2 files changed, 28 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
->> index 54f9358c9e0e..2a6261abb647 100644
->> --- a/arch/arm64/kvm/mmio.c
->> +++ b/arch/arm64/kvm/mmio.c
->> @@ -159,6 +159,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, 
->> phys_addr_t fault_ipa)
->>       bool is_write;
->>       int len;
->>       u8 data_buf[8];
->> +    u64 esr;
->> +
->> +    esr = kvm_vcpu_get_esr(vcpu);
->>       /*
->>        * No valid syndrome? Ask userspace for help if it has
->> @@ -168,7 +171,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, 
->> phys_addr_t fault_ipa)
->>        * though, so directly deliver an exception to the guest.
->>        */
->>       if (!kvm_vcpu_dabt_isvalid(vcpu)) {
->> -        trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
->> +        trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
->>                       kvm_vcpu_get_hfar(vcpu), fault_ipa);
->>           if (vcpu_is_protected(vcpu))
->> @@ -185,6 +188,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, 
->> phys_addr_t fault_ipa)
->>           return -ENOSYS;
->>       }
->> +    /*
->> +     * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
->> +     * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
->> +     * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
-> 
-> minor nit: typo: s/luserspace/userspace/                       ^^^
-> 
->> +     * which will have to provide a full emulation of these 4
->> +     * instructions.  No, we don't expect this do be fast.
->> +     *
->> +     * We rely on traps being set if the corresponding features are not
->> +     * enabled, so if we get here, userspace has promised us to handle
->> +     * it already.
->> +     */
->> +    switch (kvm_vcpu_trap_get_fault(vcpu)) {
->> +    case 0b000100 ... 0b001111:
->> +    case 0b101010 ... 0b101011:
-> 
-> Matches Arm ARM.
-> 
->> +        if (FIELD_GET(GENMASK(12, 11), esr)) {
->> +            run->exit_reason = KVM_EXIT_ARM_LDST64B;
->> +            run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
-> 
-> Any particular reason why we diverge from the NISV case, where the FSC 
-> is provided, but not here ? May be this needs to be documented too.
-> 
-> Suzuki
-> 
-> 
->> +            run->arm_nisv.fault_ipa = fault_ipa;
->> +            return 0;
->> +        }
->> +    }
->> +
->>       /*
->>        * Prepare MMIO operation. First decode the syndrome data we get
->>        * from the CPU. Then try if some in-kernel emulation feels
->> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index 52f6000ab020..d219946b96be 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -179,6 +179,7 @@ struct kvm_xen_exit {
->>   #define KVM_EXIT_LOONGARCH_IOCSR  38
->>   #define KVM_EXIT_MEMORY_FAULT     39
->>   #define KVM_EXIT_TDX              40
->> +#define KVM_EXIT_ARM_LDST64B      41
->>   /* For KVM_EXIT_INTERNAL_ERROR */
->>   /* Emulate instruction failed. */
->> @@ -401,7 +402,7 @@ struct kvm_run {
->>           } eoi;
->>           /* KVM_EXIT_HYPERV */
->>           struct kvm_hyperv_exit hyperv;
->> -        /* KVM_EXIT_ARM_NISV */
->> +        /* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
->>           struct {
->>               __u64 esr_iss;
->>               __u64 fault_ipa;
-> 
-> 
-> 
+In particular, is this a performance optimization or is this required
+for correctness in some scenario?
 
+I would have expected that there is very little benefit in
+changing the swp/swpb emulation here if the existing code
+has to remain compiled into the kernel and the overhead of
+the trap is so much larger than the uaccess_enable_privileged()
+overhead.
+
+> +		curval.var = newval.var = oldval;
+> +		newval.raw[idx] = *data;
+> +
+> +		asm volatile("// __lsui_user_swpb_asm\n"
+> +		__LSUI_PREAMBLE
+> +		"1: cast	%x2, %x3, %1\n"
+> +		"2:\n"
+> +		_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
+> +		: "+r" (err), "+Q" (*addr_al), "+r" (curval.var)
+> +		: "r" (newval.var)
+> +		: "memory");
+
+I see that you fixed the race now. I had written an email about
+it earlier when I saw the same mistake you found as well, but
+it got stuck in my drafts folder. The new version looks correct
+to me, I'm just not sure we need the added complexity.
+
+     Arnd
