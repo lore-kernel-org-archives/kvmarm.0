@@ -1,67 +1,158 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBDC1D61BC;
-	Fri,  7 Nov 2025 01:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F6D3081B7
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762479304; cv=none; b=AYfeM771aEX3OKA2K57WxIAHXuH1IAP/d3Qzl0j7IV0kTgO7tCopiurcJPHlc3t+Jnw9PInIGuUaiBQiL1b31UQKBTUEN3FbUrmdiOlUFdf+BLjQr7gPsTjr8UQ6tIxM/d1L1US+2wtv2Y98QXFQpiKtyGwaCS9MUai+fAGgLQI=
+	t=1762500143; cv=none; b=JgpLCgUae0vSwrN7mSZc4v0GK7tVNHLdpyN10Fv8Z47gtnGv3mUSC1LltyWbYhEOqpk++oqh4s85o+pZmip1mA1hU46M648UJIj3M0+54nvEcd2kwrGGqwXTqIyq7A0PnELIph5UIbVpZcb93E+3Bo2iJYD0ci3A4roNzIIHgYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762479304; c=relaxed/simple;
-	bh=RhgYGJJVIlLV+16NDohuEfj0KiMHJzVZLFlNY7wo5fc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cb9paKIeSvAhzeMao0DyiFtfK7r1zl5KYqChxepvvbF5AgF0n2BgL8CZ6Z0R+FOUITmrYYZszNqytEz3U+1HCYaKL4fBAncqymzvKS00qJx+GQcsVwcuAw3iVtm+QtD/BJxjrwijqKS7Fu1YsnPJBSbA/+uDxSEcWTYeEdBf8NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gi5srRG6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gi5srRG6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DACEC116C6;
-	Fri,  7 Nov 2025 01:35:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762479300;
-	bh=RhgYGJJVIlLV+16NDohuEfj0KiMHJzVZLFlNY7wo5fc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gi5srRG6NAm/xmowx3UzYgAKwRzlNNeYH3VC1F54sacFcNA6ZBwf3WlTC6Dnr+JgX
-	 rnKb0LawA9+d/53TLRRfHmf7SlJvZ+4lFppGlBsauI3AOnpK6fjpX44DwNotLNUINC
-	 0ND4UneIcQnZUgzO7Rc8MtTBnNkoI7wMCbaSlfM3NJXnaSU4FII/8AmTpyapKJer6+
-	 L0+U4p8/Je6J5AH8ktKlfz62c+oNRpbjdo3tcCW4yU+IstiKkT1aSAm5f6lbT063Pd
-	 afCaPLn+ZpuSKSHEX/h/aX5MUvER0N3J5tBlO9kXeQfMZPGsCwBNs2QBrPG0onen/M
-	 7bN8YthuG0ZSg==
-Date: Thu, 6 Nov 2025 17:34:59 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fix handling of ID_PFR1_EL1.GIC
-Message-ID: <aQ1Mw-DRgBwutLG1@kernel.org>
-References: <20251030122707.2033690-1-maz@kernel.org>
+	s=arc-20240116; t=1762500143; c=relaxed/simple;
+	bh=RYp0DG4CHJJInH7j31xP24BuAObnQzry1LquoapxGNc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r1la86v3JUzAN8623JMGPHpoOePKgKByEccKjGbHZV916ZRcvmJVnV4XAhDsviWQQW9RjGBPCR2/y91YpQcv06b+vh4OmWbLFqiSA2klLB6afxDP0qeqGZeG8VRtRUitR8mAIhfQIYPcUzYGznckziVmnRu0fX121PUa64zvErk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7X6gPtzmV7X;
+	Fri,  7 Nov 2025 15:20:40 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 792551A016C;
+	Fri,  7 Nov 2025 15:22:17 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 7 Nov 2025 15:22:17 +0800
+Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
+ (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 7 Nov
+ 2025 15:22:16 +0800
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<yuzenghui@huawei.com>, <arnd@arndb.de>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: [PATCH v7 1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+Date: Fri, 7 Nov 2025 15:21:21 +0800
+Message-ID: <20251107072127.448953-2-wangzhou1@hisilicon.com>
+X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030122707.2033690-1-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-On Thu, Oct 30, 2025 at 12:27:04PM +0000, Marc Zyngier wrote:
-> Peter reported[0] that restoring a GICv2 VM fails badly, and correctly
-> points out that ID_PFR1_EL1.GIC isn't writable, while its 64bit
-> equivalent is. I broke that in 6.12.
-> 
-> The other thing is that fixing the ID regs at runtime isn't great.
-> specially when we could adjust them at the point where the GIC gets
-> created.
-> 
-> This small series aims at fixing these issues. I've only tagged the
-> first one as a stable candidate. With these fixes, I can happily
-> save/restore a GICv2 VM (both 32 and 64bit) on my trusty Synquacer.
+From: Marc Zyngier <maz@kernel.org>
 
-Reviewed-by: Oliver Upton <oupton@kernel.org>
+The main use of {LD,ST}64B* is to talk to a device, which is hopefully
+directly assigned to the guest and requires no additional handling.
 
-Thanks,
-Oliver
+However, this does not preclude a VMM from exposing a virtual device
+to the guest, and to allow 64 byte accesses as part of the programming
+interface. A direct consequence of this is that we need to be able
+to forward such access to userspace.
+
+Given that such a contraption is very unlikely to ever exist, we choose
+to offer a limited service: userspace gets (as part of a new exit reason)
+the ESR, the IPA, and that's it. It is fully expected to handle the full
+semantics of the instructions, deal with ACCDATA, the return values and
+increment PC. Much fun.
+
+A canonical implementation can also simply inject an abort and be done
+with it. Frankly, don't try to do anything else unless you have time
+to waste.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h |  3 ++-
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+index 54f9358c9e0e..2a6261abb647 100644
+--- a/arch/arm64/kvm/mmio.c
++++ b/arch/arm64/kvm/mmio.c
+@@ -159,6 +159,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	bool is_write;
+ 	int len;
+ 	u8 data_buf[8];
++	u64 esr;
++
++	esr = kvm_vcpu_get_esr(vcpu);
+ 
+ 	/*
+ 	 * No valid syndrome? Ask userspace for help if it has
+@@ -168,7 +171,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 	 * though, so directly deliver an exception to the guest.
+ 	 */
+ 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
+-		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
++		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
+ 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
+ 
+ 		if (vcpu_is_protected(vcpu))
+@@ -185,6 +188,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+ 		return -ENOSYS;
+ 	}
+ 
++	/*
++	 * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
++	 * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
++	 * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
++	 * which will have to provide a full emulation of these 4
++	 * instructions.  No, we don't expect this do be fast.
++	 *
++	 * We rely on traps being set if the corresponding features are not
++	 * enabled, so if we get here, userspace has promised us to handle
++	 * it already.
++	 */
++	switch (kvm_vcpu_trap_get_fault(vcpu)) {
++	case 0b000100 ... 0b001111:
++	case 0b101010 ... 0b101011:
++		if (FIELD_GET(GENMASK(12, 11), esr)) {
++			run->exit_reason = KVM_EXIT_ARM_LDST64B;
++			run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
++			run->arm_nisv.fault_ipa = fault_ipa;
++			return 0;
++		}
++	}
++
+ 	/*
+ 	 * Prepare MMIO operation. First decode the syndrome data we get
+ 	 * from the CPU. Then try if some in-kernel emulation feels
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 52f6000ab020..d219946b96be 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -179,6 +179,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
+ #define KVM_EXIT_TDX              40
++#define KVM_EXIT_ARM_LDST64B      41
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -401,7 +402,7 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
+-		/* KVM_EXIT_ARM_NISV */
++		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+ 		struct {
+ 			__u64 esr_iss;
+ 			__u64 fault_ipa;
+-- 
+2.33.0
+
