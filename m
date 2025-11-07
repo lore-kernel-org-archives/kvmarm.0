@@ -1,33 +1,32 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C12308F14
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8953081C0
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762500144; cv=none; b=Zf3UySVD/p/FT3q3mbPWg8ypIZ9GTh/PAiVSSp7fNc+dJxXBeh4qyWO3b+ECuyXBileN5A4RhqCm0fIlc8wEM1cR0ND/EkPPpQA1RalmjnHzmBLilrXualVMNb83Tp/IYRWrG4BVxc3oIPTh3HLgDK223E8TUrdLDvlbIDBuEwc=
+	t=1762500144; cv=none; b=lZIlPqj4+kB8A3+Sm1JKnqbxWGeJ4Af0bCkkKm5Q+Svw0xl9gC3sxi77IgbH3yqfm596R+zd0n2IqYN5MIXDPY0BGdxP+yB/P6/ChxTTiyM/2O7B06kvYGHOMqQLhd7LOJsD4YmWne7AGq35ej13O0JUi6JKqL0dqTbKiE0KQR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762500144; c=relaxed/simple;
-	bh=5o3XUo6Ezb+trWaej0mil2wqYFEvwbs4zDjESVEhzQo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l8+E/ksqEV1HtWxYl5vJko7wWngodhRW4TV5vr52iYkuKsdDUleVl+wW+0pbozsOc+qbpYv6V0XQZdPAATpHlrikP057rIdDsLEYwxmpkivPrWeorPYjNaAOeSp2R8Ss6W8niTNLcapfipXpSOcy3eOtM4rOWOTQcYwYKg5sHAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.221
+	bh=GHiyzaxnwmP1STRJXAQc4RLwzUMPaWYusONylhSaqXM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KEFICUtkEkccg8CnFLYLQ/ad3qI+p4lFHQ8HKD309TadsTEHjKH/+TvefyOHa8vQSBapDCdu2U3wxdqwoTRdB6d1GrjXMgUPXe2JRD0USIsxPUF3wKyjG3pxfNP55CpUUVPT4Hud+kTw3xG6LuzlVPEz8sAHsf6Bx5fubDWbzBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7c184mzRhS1;
-	Fri,  7 Nov 2025 15:20:44 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1544618048E;
-	Fri,  7 Nov 2025 15:22:20 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7V01Vwzcb2f;
+	Fri,  7 Nov 2025 15:20:38 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2B7A31402ED;
+	Fri,  7 Nov 2025 15:22:18 +0800 (CST)
 Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Nov 2025 15:22:19 +0800
+ 15.2.1544.11; Fri, 7 Nov 2025 15:22:16 +0800
 Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
  (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 7 Nov
- 2025 15:22:19 +0800
+ 2025 15:22:16 +0800
 From: Zhou Wang <wangzhou1@hisilicon.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
@@ -35,12 +34,10 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
 	<wangzhou1@hisilicon.com>
-Subject: [PATCH v7 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
-Date: Fri, 7 Nov 2025 15:21:27 +0800
-Message-ID: <20251107072127.448953-8-wangzhou1@hisilicon.com>
+Subject: [PATCH v7 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
+Date: Fri, 7 Nov 2025 15:21:20 +0800
+Message-ID: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,126 +49,113 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200004.china.huawei.com (7.202.195.237)
 
-From: Yicong Yang <yangyicong@hisilicon.com>
+Armv8.7 introduces single-copy atomic 64-byte loads and stores
+instructions and its variants named under FEAT_{LS64, LS64_V}.
+Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+- Add identifying and enabling in the cpufeature list
+- Expose the support of these features to userspace through HWCAP3 and cpuinfo
+- Add related hwcap test
+- Handle the trap of unsupported memory (normal/uncacheable) access in a VM
 
-Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
-if feature presents, no SIGILL should be received. When such
-instructions operate on Device memory or non-cacheable memory,
-we may received a SIGBUS during the test (w/o FEAT_LS64WB).
-Just ignore it since we only tested whether the instruction
-itself can be issued as expected on platforms declaring the
-support of such features.
+A real scenario for this feature is that the userspace driver can make use of
+this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+directly into the hardware.
 
-Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
+Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
+MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
+
+[1] https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
+
+Tested with updated hwcap test(host in VHE):
+[root@localhost tmp]# ./hwcap
+[...]
+# LS64 present
+ok 226 cpuinfo_match_LS64
+ok 227 sigill_LS64
+ok 228 # SKIP sigbus_LS64
+# LS64_V present
+ok 229 cpuinfo_match_LS64_V
+ok 230 sigill_LS64_V
+ok 231 # SKIP sigbus_LS64_V
+# 121 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
+# Totals: pass:110 fail:0 xfail:0 xpass:0 skip:121 error:0
+
+Tested with updated hwcap test(guest in VHE):
+root@localhost:/mnt# ./hwcap
+[...]
+# LS64 present
+ok 226 cpuinfo_match_LS64
+ok 227 sigill_LS64
+ok 228 # SKIP sigbus_LS64
+# LS64_V present
+ok 229 cpuinfo_match_LS64_V
+ok 230 sigill_LS64_V
+ok 231 # SKIP sigbus_LS64_V
+# 121 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
+# Totals: pass:110 fail:0 xfail:0 xpass:0 skip:121 error:0
+
+Tested nVHE case as well, same log as above.
+
+Change since v6:
+- Add exception inject about nested VM in 3/7
+- Remove __maybe_unused related codes in 7/7, replace to use asm clobber
+- Add my signoff in each patch
+- Rebase on v6.18-rc4
+Link: https://lore.kernel.org/all/20251024090819.4097819-1-wangzhou1@hisilicon.com/
+
+Change since v5:
+- Rebase on v6.18-rc2 and fix the conflicts
+- Add more description in elf_hwcaps.rst as suggested by Catalin Marinas
+Link: https://lore.kernel.org/all/20250818064806.25417-1-yangyicong@huawei.com/
+
+Change since v4:
+- Rebase on v6.17-rc2 and fix the conflicts
+Link: https://lore.kernel.org/linux-arm-kernel/20250715081356.12442-1-yangyicong@huawei.com/
+
+Change since v3:
+- Inject DABT fault for LS64 fault on unsupported memory but with valid memslot
+Link: https://lore.kernel.org/linux-arm-kernel/20250626080906.64230-1-yangyicong@huawei.com/
+
+Change since v2:
+- Handle the LS64 fault to userspace and allow userspace to inject LS64 fault
+- Reorder the patches to make KVM handling prior to feature support
+Link: https://lore.kernel.org/linux-arm-kernel/20250331094320.35226-1-yangyicong@huawei.com/
+
+Change since v1:
+- Drop the support for LS64_ACCDATA
+- handle the DABT of unsupported memory type after checking the memory attributes
+Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
+
+Marc Zyngier (2):
+  KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+  KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
+
+Yicong Yang (5):
+  KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
+    memory
+  arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
+  arm64: Add support for FEAT_{LS64, LS64_V}
+  KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
+  kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
+
+ Documentation/arch/arm64/booting.rst      | 12 ++++
+ Documentation/arch/arm64/elf_hwcaps.rst   | 14 ++++
+ Documentation/virt/kvm/api.rst            | 43 ++++++++++--
+ arch/arm64/include/asm/el2_setup.h        | 12 +++-
+ arch/arm64/include/asm/esr.h              |  8 +++
+ arch/arm64/include/asm/hwcap.h            |  2 +
+ arch/arm64/include/asm/kvm_emulate.h      |  7 ++
+ arch/arm64/include/uapi/asm/hwcap.h       |  2 +
+ arch/arm64/kernel/cpufeature.c            | 51 +++++++++++++++
+ arch/arm64/kernel/cpuinfo.c               |  2 +
+ arch/arm64/kvm/inject_fault.c             | 34 ++++++++++
+ arch/arm64/kvm/mmio.c                     | 27 +++++++-
+ arch/arm64/kvm/mmu.c                      | 14 +++-
+ arch/arm64/tools/cpucaps                  |  2 +
+ include/uapi/linux/kvm.h                  |  3 +-
  tools/testing/selftests/arm64/abi/hwcap.c | 79 +++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ 16 files changed, 301 insertions(+), 11 deletions(-)
 
-diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
-index 3b96d090c5eb..4d41ab10988f 100644
---- a/tools/testing/selftests/arm64/abi/hwcap.c
-+++ b/tools/testing/selftests/arm64/abi/hwcap.c
-@@ -11,6 +11,8 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <linux/auxvec.h>
-+#include <linux/compiler.h>
- #include <sys/auxv.h>
- #include <sys/prctl.h>
- #include <asm/hwcap.h>
-@@ -595,6 +597,67 @@ static void lrcpc3_sigill(void)
- 	              : "=r" (data0), "=r" (data1) : "r" (src) :);
- }
- 
-+static void ignore_signal(int sig, siginfo_t *info, void *context)
-+{
-+	ucontext_t *uc = context;
-+
-+	uc->uc_mcontext.pc += 4;
-+}
-+
-+static void ls64_sigill(void)
-+{
-+	struct sigaction ign, old;
-+	char src[64] __aligned(64) = { 1 };
-+
-+	/*
-+	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
-+	 * FEAT_LS64WB not supported) and the completer supports these
-+	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
-+	 * testing the ABI here, so just ignore the SIGBUS and see if we can
-+	 * execute the instructions without receiving a SIGILL. Restore the
-+	 * handler of SIGBUS after this test.
-+	 */
-+	ign.sa_sigaction = ignore_signal;
-+	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-+	sigemptyset(&ign.sa_mask);
-+	sigaction(SIGBUS, &ign, &old);
-+
-+	register void *xn asm ("x8") = src;
-+	register u64 xt_1 asm ("x0");
-+
-+	/* LD64B x0, [x8] */
-+	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn)
-+		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
-+
-+	/* ST64B x0, [x8] */
-+	asm volatile(".inst 0xf83f9100" : : "r" (xt_1), "r" (xn)
-+		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
-+
-+	sigaction(SIGBUS, &old, NULL);
-+}
-+
-+static void ls64_v_sigill(void)
-+{
-+	struct sigaction ign, old;
-+	char dst[64] __aligned(64);
-+
-+	/* See comment in ls64_sigill() */
-+	ign.sa_sigaction = ignore_signal;
-+	ign.sa_flags = SA_SIGINFO | SA_RESTART;
-+	sigemptyset(&ign.sa_mask);
-+	sigaction(SIGBUS, &ign, &old);
-+
-+	register void *xn asm ("x8") = dst;
-+	register u64 xt_1 asm ("x0") = 1;
-+	register u64 st   asm ("x9");
-+
-+	/* ST64BV x9, x0, [x8] */
-+	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn)
-+		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
-+
-+	sigaction(SIGBUS, &old, NULL);
-+}
-+
- static const struct hwcap_data {
- 	const char *name;
- 	unsigned long at_hwcap;
-@@ -1134,6 +1197,22 @@ static const struct hwcap_data {
- 		.hwcap_bit = HWCAP3_MTE_STORE_ONLY,
- 		.cpuinfo = "mtestoreonly",
- 	},
-+	{
-+		.name = "LS64",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LS64,
-+		.cpuinfo = "ls64",
-+		.sigill_fn = ls64_sigill,
-+		.sigill_reliable = true,
-+	},
-+	{
-+		.name = "LS64_V",
-+		.at_hwcap = AT_HWCAP3,
-+		.hwcap_bit = HWCAP3_LS64_V,
-+		.cpuinfo = "ls64_v",
-+		.sigill_fn = ls64_v_sigill,
-+		.sigill_reliable = true,
-+	},
- };
- 
- typedef void (*sighandler_fn)(int, siginfo_t *, void *);
 -- 
 2.33.0
 
