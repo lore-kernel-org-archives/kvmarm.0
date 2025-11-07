@@ -1,138 +1,223 @@
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF9A2D3A60
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 11:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34434269B1C
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 12:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762516403; cv=none; b=byEIV1LV7G7tiQV4uoO0xDL81i3wt6SHBY2hzj726zNQ2zmkWoJibF1EeBMqZqGNq2X05UJt6/gioHuhPcuDESzqhj+SiopHSucKzG5SYgzL2hdv7kw62EfPlyucPlTDwtamBvRfsdBvqHBpwhemegRiOh8ThaRi+JA3Wuv+Ymg=
+	t=1762517124; cv=none; b=GsUTbIXCgGveX3IA8nl9XNZtcKQUuZB8u7lOJrdNGfjfwVkhE63CJBPdB3Vh4ZLrZzDTJyzEV8NjCx5vcuC3+d5NMiv3sRVyQbVdydbMwrKtAliOKUIOJrZOyFKLmlS36pqQFvA241gL3+hx+hb0DsSvXxlKP9qcCWTPLI6eo0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762516403; c=relaxed/simple;
-	bh=yQd1wP4dtJY3qwd3ZbTPi9Q/RA+YpkYHvKkoR396j6Q=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=WfhZaJUQx2WQyXvJSfnNHoq1RxbaLZ6+ZjVnZX5YBwnwnYjmEOKE8FMMGvBoxAZkKwF5XZow5ubjg4nIcQoRMSSgQ33SyqoMNcpYxqYX+f+bqaun+8pIZ7rzLQkfDRWK79urj/ixtk5rhY3qosads+XgxSzGCGfhuladNHjyiac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=nZYPXGpB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=3EZfkgsH; arc=none smtp.client-ip=202.12.124.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="nZYPXGpB";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="3EZfkgsH"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id C72A91D0014F;
-	Fri,  7 Nov 2025 06:53:20 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 06:53:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762516400;
-	 x=1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=
-	nZYPXGpBqzTG8KfhVvOQDNoZLtc3+Vkdh228V8+pj56i/Qm2peUDrvCMygNC5KbD
-	JQ/uZ81AmSWUFzCcblz0vmfZSw/7BBT2RPJzzmUfLyYJll5SWnFxnjCphPEHh96w
-	8kMu0BSc+o0f2bkkxuvO03zeXRZcanoFzt4q1+pljkveIh+Wk0fC1x28Z6ZRG+pa
-	sb1zfC7EMu2wnDrC0J09vliAAwMC2bsc5E+9zE+OhA+whjz+BPe53f7zXfm/KRTJ
-	caQ3I+k6uh9GCnHcOWYy+sVxUdu326xn8UzCgmueWeeQwq89GcQB/USiNYN58tFm
-	T3iRh2Eskdm1UlbZY1nWgA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762516400; x=
-	1762602800; bh=gsS27V0zYbo8yJ9T1sSydfxjZObboVuI8REAIsMuIYA=; b=3
-	EZfkgsHEaT84CaUc+anzrmrs9QeECQIR5p2OM9fGvHT0fDs7/KV0zn3cAj3UZrXA
-	WbPpAoH7zv4+M46Ay0zcSAonKvQggGaqOfQm2REyqgKHpox4MRaJduvZoj6hQpoO
-	BSPz4Ou3eVBPo/glrhOU13Ac17xegnClsxl18KWBntOZSsDL8Eus2FVuvLfR3nGV
-	U6YdzRvqcfKN+c81TkF5lxy27ya6zva+5tawKd+Gc+jBuyZ8OcJegYxKE6AwqiPk
-	wBBVJMPn1toPs9XcG7OlAvBViVy7wac9P5a/oAtaHgT6ZSCVBCYX8r3QOHYQe9xe
-	1ZmHuZLgfSmvme1oYx19g==
-X-ME-Sender: <xms:r90NaabeM2LyeI1AQ57PK2DWvphAmwIpxUQJ9Q-iesNws4vF3sr9ug>
-    <xme:r90NaYPEtXoRPMsXCPgGKOcmSq54PKVMVfwmG3MdxA1wpNp3LhY_CjjmcXLxzmJrs
-    nxvK7buXeLbyz40hjEwrpUogYbe7Y-JGyrkdfUURAUJ1u1NohlUK9M>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepvdefpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
-    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepkhgvvhhi
-    nhdrsghrohgushhkhiesrghrmhdrtghomhdprhgtphhtthhopehmrghrkhdrrhhuthhlrg
-    hnugesrghrmhdrtghomhdprhgtphhtthhopehmihhkohdrlhgvnhgtiigvfihskhhisegr
-    rhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhirdhpohhulhhoshgvsegrrhhmrdgtoh
-    hmpdhrtghpthhtohephigvohhrvghumhdrhihunhesrghrmhdrtghomhdprhgtphhtthho
-    peihrghnghihihgtohhngheshhhishhilhhitghonhdrtghomhdprhgtphhtthhopeihuh
-    iivghnghhhuhhisehhuhgrfigvihdrtghomh
-X-ME-Proxy: <xmx:r90Naa08TY73QAwQ15r2x0tWjcVK6iZ1U2jLiQ7uTwmZg-I_ucnftQ>
-    <xmx:r90NaYFUvmKHKTbn2nih1V_hWSqX6ycF5ywAeCuxVGwNx4PaMDJP4w>
-    <xmx:r90NaZgzqp4uVDE1DBQqjb7wUkxkHU0lvUlcFwlUStCzeGKZG0IMTA>
-    <xmx:r90NaZeZO9h15HpmRuk8i_fm0tmCxIyyKoQJmtTN_XzDMsUkCPmSww>
-    <xmx:sN0NaXNoJ3py5k8GLIR5-D3o_QeFRMYc_o86Zo7ZZ5QpcIsnJ76i-TNA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id A92BF700063; Fri,  7 Nov 2025 06:53:19 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1762517124; c=relaxed/simple;
+	bh=YFC3mVqOFCay/5oIYl8buTymdC3JBQDEHRzU74OzWKc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DAjxNZjnQaexZrjqvV7hrDO01vzmkc5XLiqW+jQEjJMS6OzckWOttAM/ek+KPXsdLI58lJHm8/rAMo+skuYrhYCXhJndhhNrmlKiqF5TucofGrc9ag44YPrbwPMrNb45UOXBnj4Vlt+6EdyxvBAXffRKI9gdn/R6XeM5sNRxkz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DB731515;
+	Fri,  7 Nov 2025 04:05:13 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9F20E3F66E;
+	Fri,  7 Nov 2025 04:05:19 -0800 (PST)
+Message-ID: <cb087e63-3dae-4d7d-ac8a-a8982e560be6@arm.com>
+Date: Fri, 7 Nov 2025 12:05:18 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: AGYZwPnl2csF
-Date: Fri, 07 Nov 2025 12:52:38 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Yeoreum Yun" <yeoreum.yun@arm.com>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
- "Marc Zyngier" <maz@kernel.org>, "Mark Brown" <broonie@kernel.org>,
- "Oliver Upton" <oliver.upton@linux.dev>, miko.lenczewski@arm.com,
- "Kevin Brodsky" <kevin.brodsky@arm.com>, "Ard Biesheuvel" <ardb@kernel.org>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Lorenzo Pieralisi" <lpieralisi@kernel.org>, yangyicong@hisilicon.com,
- scott@os.amperecomputing.com, "Joey Gouly" <joey.gouly@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>,
- shuah <shuah@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Message-Id: <9fffb30d-fc9c-4e2e-94d2-c724e81ae3ac@app.fastmail.com>
-In-Reply-To: <20251106094023.1371246-10-yeoreum.yun@arm.com>
-References: <20251106094023.1371246-1-yeoreum.yun@arm.com>
- <20251106094023.1371246-10-yeoreum.yun@arm.com>
-Subject: Re: [PATCH v11 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX
- emulation.
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
+To: Zhou Wang <wangzhou1@hisilicon.com>, catalin.marinas@arm.com,
+ will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+ yuzenghui@huawei.com, arnd@arndb.de
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ yangyccccc@gmail.com, prime.zeng@hisilicon.com, xuwei5@huawei.com
+References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+ <20251107072127.448953-6-wangzhou1@hisilicon.com>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20251107072127.448953-6-wangzhou1@hisilicon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 6, 2025, at 10:40, Yeoreum Yun wrote:
-> apply FEAT_LSUI instruction to emulate deprecated swpX instruction.
-
-Can you explain in the changrelog why you do this?
-
-In particular, is this a performance optimization or is this required
-for correctness in some scenario?
-
-I would have expected that there is very little benefit in
-changing the swp/swpb emulation here if the existing code
-has to remain compiled into the kernel and the overhead of
-the trap is so much larger than the uaccess_enable_privileged()
-overhead.
-
-> +		curval.var = newval.var = oldval;
-> +		newval.raw[idx] = *data;
+On 07/11/2025 07:21, Zhou Wang wrote:
+> From: Yicong Yang <yangyicong@hisilicon.com>
+> 
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> These features are identified by ID_AA64ISAR1_EL1.LS64 and the
+> use of such instructions in userspace (EL0) can be trapped. In
+> order to support the use of corresponding instructions in userspace:
+> - Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
+> - Add identifying and enabling in the cpufeature list
+> - Expose these support of these features to userspace through HWCAP3
+>    and cpuinfo
+> 
+> ld64b/st64b (FEAT_LS64) and st64bv (FEAT_LS64_V) is intended for
+> special memory (device memory) so requires support by the CPU, system
+> and target memory location (device that support these instructions).
+> The HWCAP3_{LS64, LS64_V} implies the support of CPU and system (since
+> no identification method from system, so SoC vendors should advertise
+> support in the CPU if system also support them).
+> 
+> Otherwise for ld64b/st64b the atomicity may not be guaranteed or a
+> DABT will be generated, so users (probably userspace driver developer)
+> should make sure the target memory (device) also have the support.
+> For st64bv 0xffffffffffffffff will be returned as status result for
+> unsupported memory so user should check it.
+> 
+> Document the restrictions along with HWCAP3_{LS64, LS64_V}.
+> 
+> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> ---
+>   Documentation/arch/arm64/booting.rst    | 12 ++++++
+>   Documentation/arch/arm64/elf_hwcaps.rst | 14 +++++++
+>   arch/arm64/include/asm/hwcap.h          |  2 +
+>   arch/arm64/include/uapi/asm/hwcap.h     |  2 +
+>   arch/arm64/kernel/cpufeature.c          | 51 +++++++++++++++++++++++++
+>   arch/arm64/kernel/cpuinfo.c             |  2 +
+>   arch/arm64/tools/cpucaps                |  2 +
+>   7 files changed, 85 insertions(+)
+> 
+> diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
+> index e4f953839f71..2c56d76ecafb 100644
+> --- a/Documentation/arch/arm64/booting.rst
+> +++ b/Documentation/arch/arm64/booting.rst
+> @@ -556,6 +556,18 @@ Before jumping into the kernel, the following conditions must be met:
+>   
+>      - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
+>   
+> +  For CPUs with support for 64-byte loads and stores without status (FEAT_LS64):
 > +
-> +		asm volatile("// __lsui_user_swpb_asm\n"
-> +		__LSUI_PREAMBLE
-> +		"1: cast	%x2, %x3, %1\n"
-> +		"2:\n"
-> +		_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-> +		: "+r" (err), "+Q" (*addr_al), "+r" (curval.var)
-> +		: "r" (newval.var)
-> +		: "memory");
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
+> +
+> +  For CPUs with support for 64-byte stores with status (FEAT_LS64_V):
+> +
+> +  - If the kernel is entered at EL1 and EL2 is present:
+> +
+> +    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
+> +
+>   The requirements described above for CPU mode, caches, MMUs, architected
+>   timers, coherency and system registers apply to all CPUs.  All CPUs must
+>   enter the kernel in the same exception level.  Where the values documented
+> diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
+> index a15df4956849..b86059bc288b 100644
+> --- a/Documentation/arch/arm64/elf_hwcaps.rst
+> +++ b/Documentation/arch/arm64/elf_hwcaps.rst
+> @@ -444,6 +444,20 @@ HWCAP3_MTE_STORE_ONLY
+>   HWCAP3_LSFE
+>       Functionality implied by ID_AA64ISAR3_EL1.LSFE == 0b0001
+>   
+> +HWCAP3_LS64
+> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001. Note that
+> +    the function of instruction ld64b/st64b requires support by CPU, system
+> +    and target (device) memory location and HWCAP3_LS64 implies the support
+> +    of CPU. User should only use ld64b/st64b on supported target (device)
+> +    memory location, otherwise fallback to the non-atomic alternatives.
+> +
+> +HWCAP3_LS64_V
+> +    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010. Same to
+> +    HWCAP3_LS64 that HWCAP3_LS64_V implies CPU's support of instruction
+> +    st64bv but also requires the support from the system and target (device)
+> +    memory location. st64bv supports return status result and 0xFFFFFFFFFFFFFFFF
+> +    will be returned for unsupported memory location.
+> +
+>   
+>   4. Unused AT_HWCAP bits
+>   -----------------------
+> diff --git a/arch/arm64/include/asm/hwcap.h b/arch/arm64/include/asm/hwcap.h
+> index 6d567265467c..3c0804fb3435 100644
+> --- a/arch/arm64/include/asm/hwcap.h
+> +++ b/arch/arm64/include/asm/hwcap.h
+> @@ -179,6 +179,8 @@
+>   #define KERNEL_HWCAP_MTE_FAR		__khwcap3_feature(MTE_FAR)
+>   #define KERNEL_HWCAP_MTE_STORE_ONLY	__khwcap3_feature(MTE_STORE_ONLY)
+>   #define KERNEL_HWCAP_LSFE		__khwcap3_feature(LSFE)
+> +#define KERNEL_HWCAP_LS64		__khwcap3_feature(LS64)
+> +#define KERNEL_HWCAP_LS64_V		__khwcap3_feature(LS64_V)
+>   
+>   /*
+>    * This yields a mask that user programs can use to figure out what
+> diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
+> index 575564ecdb0b..79bc77425b82 100644
+> --- a/arch/arm64/include/uapi/asm/hwcap.h
+> +++ b/arch/arm64/include/uapi/asm/hwcap.h
+> @@ -146,5 +146,7 @@
+>   #define HWCAP3_MTE_FAR		(1UL << 0)
+>   #define HWCAP3_MTE_STORE_ONLY		(1UL << 1)
+>   #define HWCAP3_LSFE		(1UL << 2)
+> +#define HWCAP3_LS64		(1UL << 3)
+> +#define HWCAP3_LS64_V		(1UL << 4)
+>   
+>   #endif /* _UAPI__ASM_HWCAP_H */
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 5ed401ff79e3..dcc5ba620a7e 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -239,6 +239,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
+>   };
+>   
+>   static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+> +	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LS64_SHIFT, 4, 0),
+>   	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_XS_SHIFT, 4, 0),
+>   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, 0),
+>   	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, 0),
+> @@ -2259,6 +2260,38 @@ static void cpu_enable_e0pd(struct arm64_cpu_capabilities const *cap)
+>   }
+>   #endif /* CONFIG_ARM64_E0PD */
+>   
+> +static bool has_ls64(const struct arm64_cpu_capabilities *entry, int __unused)
+> +{
+> +	u64 ls64;
+> +
+> +	ls64 = cpuid_feature_extract_field(__read_sysreg_by_encoding(entry->sys_reg),
+> +					   entry->field_pos, entry->sign);
 
-I see that you fixed the race now. I had written an email about
-it earlier when I saw the same mistake you found as well, but
-it got stuck in my drafts folder. The new version looks correct
-to me, I'm just not sure we need the added complexity.
+Why are we always reading from the "local" CPU ? Shouldn't this be based 
+on the SCOPE ?
 
-     Arnd
+i.e., read from the sanitised feature state for SCOPE_SYSTEM (given that 
+is the SCOPE for the capability)
+
+and read from the local CPU for SCOPE_LOCAL (for checks in late CPUs).
+
+
+> +
+> +	if (ls64 == ID_AA64ISAR1_EL1_LS64_NI ||
+> +	    ls64 > ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA)
+
+Given this is FTR_LOWER_SAFE, why do we skip anything that is HIGHER 
+than a particular value ? You must be able to fall back to the 
+has_cpuid_feature() check for both these CAPs.
+
+
+> +		return false;
+> +
+
+
+
+---8>---
+
+> +	if (entry->capability == ARM64_HAS_LS64 &&
+> +	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64)
+> +		return true;
+> +
+> +	if (entry->capability == ARM64_HAS_LS64_V &&
+> +	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64_V)
+> +		return true;
+> +
+> +	return false;
+
+--<8---
+
+
+minor nit: You could simplify this to:
+
+	return (ls64 >= entry->min_field_value)
+
+
+Suzuki
