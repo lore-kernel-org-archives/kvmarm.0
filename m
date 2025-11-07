@@ -1,61 +1,61 @@
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8855629DB99
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C6C29DB99
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762507305; cv=none; b=gFDjKL5byKwNhXRr4sZbhBOzyxyvPus3dk5z55r+OE/xPLBRtPohN1N26gzcDRYMu1kS68N1tp8hIjoIUR2qqMxbGTOoA6+wUxsF/7YGLRRkOs4t4ZFDLH0ErhC+qicFmWHQpgY0qRR8rId+47ucggiIkhJzNrwKfB12tsCNo6s=
+	t=1762507460; cv=none; b=tP69q8S4k6X2tXJK23xJPPFJFxgyrkEeBBg6cyps3v+s7pesJ1vMEB4H/k1q5lGbLRQdLOcOoWPF+HDhbbRQ12TYMrPJSjJ/wDdOzoU18gHAfNzsmbqxXtr20c5bacXR/VK3kn62p3LlJFcA8Ef8y6UeGyVbFqP8vGq2FPwdNuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762507305; c=relaxed/simple;
-	bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=;
+	s=arc-20240116; t=1762507460; c=relaxed/simple;
+	bh=WXLYZjdNIAc53cyvhoLCqBoT3xBsNGuA3UcfR+WehSA=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=opISWMDXCeZhtPjExahjaW0IcKtEnOsDmEOos9VtB7KXGQtcFRB6sLkTV61lxrrugdn+Gm5guMHEX12uUjf7rMRiuuDQqMzT7m7in27JVC7q6Tal4E8AlkQI/tModFBFxUAlnPfzY+WDes8RvtfMy5Rd26fmd8jDWDsXcN/Yjrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=C3jdLXC/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vpXaUf+/; arc=none smtp.client-ip=202.12.124.147
+	 Subject:Content-Type; b=AOj1/WGWv0k8h3Adh0tbpRdg07el56w5bGoOzPDPy5FBN3zuMNjK36QwjLF3RwLnzF5pA5yfpWVdIc3HM9At053O4uDbK5jZT7yWOCOAo54+PZsl2FxBmlZqTJ71LqQjDHn7PTLFq5WKMpHtN/TUY7pNyhtk89/EruDzI4si2Go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=o7GqnUda; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P6aW9IrO; arc=none smtp.client-ip=202.12.124.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="C3jdLXC/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vpXaUf+/"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="o7GqnUda";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P6aW9IrO"
 Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 2883B1D000F8;
-	Fri,  7 Nov 2025 04:21:41 -0500 (EST)
+	by mailfhigh.stl.internal (Postfix) with ESMTP id AD5B47A013D;
+	Fri,  7 Nov 2025 04:24:17 -0500 (EST)
 Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 04:21:41 -0500
+  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 04:24:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762507301;
-	 x=1762593701; bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=; b=
-	C3jdLXC/Tsizyb1vb++Rlc1wLjYnba7mP8NFlmYxL4ww9yjvdkKoNU1tvC3Z3yjF
-	DkMA8ifW4ClivToJfFhk+A7zIjuDmm9QMS4Ly6fLYhkvHALq1lGE5VEoEh/xIe5m
-	nPs/cTX0VLxNXpnU91spQCR2LAG3sxVZpeIT2aW6mzqa9hFjFBbt79r3ghuzzzPx
-	MUC6SkkxcKjj5GqNH2swGPa9ssEXfxuKKxw65AIUzSl2L5pQ897faEvBLh36uRzo
-	C8ABhRs3w+u2tmbRf+JE6CA8ycuJwt/eftOdI8paWmZxqHeMvE3iQYX4zXpPhtWN
-	YDCYtNbinxOMRkH1OXXuqg==
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762507457;
+	 x=1762593857; bh=WXLYZjdNIAc53cyvhoLCqBoT3xBsNGuA3UcfR+WehSA=; b=
+	o7GqnUda6vT7iuHPMYl8EPY6mkA+YFnte+d0RWsIcvgDBpucHJR7b+PZB0tmDP4q
+	RNN0MWn6+IR+SZfO4T5XWwkSM77zue6T0pvfYJtxJskPLOK2d15afuGuHsf7rous
+	FFAq9PSzFwMZnurhboZei4M0Zcv/bfUCqXtkubVPDXxR+yGNvhdlLNqvFnOkNZ0g
+	3+GKR50TfkEGwVRrVZkiOeu4TJMySxnnrLCl8+g0vnI3Yp3xfv9FF6HixbCtJxl7
+	ANAN1Y0sUWwz8ibd6yIFAjgEh3FxhtMgCdkdOWb5/Tj4b3D/eqRzJhQjGvx3nWBG
+	AbAQeYfSB4bGVetK2mKxqA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762507301; x=
-	1762593701; bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=; b=v
-	pXaUf+/9D1v0yWUm4t6enuolfwQK37TZSBKfy6CjzEATR76rbRs4gCYdadP7W22I
-	N1/rl9mTdWYGXSa5cqFuc2VG0LopYF3FGZp9I5K1nNlxYE3bVkCN+pQHDa+JDIwN
-	XoH3Gyv/enItVhxzE3tUIyplkGk3ZZtcMMmHA51xelqSKFMRPmfXQbVtPFkzC7UB
-	BJklCgrjZd+Sq904ePaic70Z/rmnxd7nEkMcG9f/hKq9Iqd0cX0yGp5JwxcYIKil
-	LCUE4DF1pQcfbOmA2z7QkIMk0++PYbWor3EppworgiT8o7gNr2UGkKV6fPObvgGv
-	w27LkOP9UuDvbwFWK+zFw==
-X-ME-Sender: <xms:I7oNaRd9Lm1AVOBtRqRzlxUJaWEojcAL233D8R675Wtf1ekk36hOxQ>
-    <xme:I7oNaaDA8F9zhOGR1tslq6JIEWLoPnDmNx_Hvr3Qfyhlkmp1Wdn0WU-f0zHZYbred
-    w813rm2BSROOCUYIVRkh5qLclz5rJbkYfiak9_woguoMZYJ--UXww>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762507457; x=
+	1762593857; bh=WXLYZjdNIAc53cyvhoLCqBoT3xBsNGuA3UcfR+WehSA=; b=P
+	6aW9IrOqvsFoFFL6lRZdeN4+DIUNr2lRpDW1gck+LH8W6hCkREykM1narI5ZFvB3
+	hKXhb6ETNvw9DvQ88btJOcm2R+z3ULk5k95GgjAu/8+v0e4stYYVNs9maRRMWn5k
+	OL7FzHdsJUObCvDwGno4cz0cobb7rw9z7GgtjKTwge0bW+thWWMmt3Xm7SkTbSLr
+	t+McB4wRs4a8pHwkxiDYJukxP/BWkMvDOZE1ZiJ2tZ21Fx2T2rWhny80Eyy7xL6m
+	e27UkkahD6FGI1Q946ZfRmgg22cEtd1PdZwtcq0PNghTA9fBf3NlVzVAQIeDnShU
+	Wet75uUjlwIi1Ljfy1kFQ==
+X-ME-Sender: <xms:wboNaTzlwxBdy25KrbgmilwYo9DpIGlP6Nhy7MZ499CoTRQPSeiQ5Q>
+    <xme:wboNaWFWO1oS95K5fLtecKum3gxOA2HhC715ncZopGvIwvCFHjnJKlJiVIrueb4FN
+    -dtIx0RbxXF2fruZLWnx4vt1YIWfsyz8tRsyGOta-tGTh3_fqF5SA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelvdelucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
     uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
     hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    necuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
     gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
     thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
     hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
@@ -65,14 +65,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelvdelucetufdote
     drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
     ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
     gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:I7oNaVTgIXKz7BmbT0aSRAsCx8hbsswWFfQUYcM3259OvbNxTDxWkQ>
-    <xmx:I7oNabdHEru5fn9Ue_PlmlaX3x4eW1HM_zpUKxCLbnf1iWGRQsYdjA>
-    <xmx:I7oNaevV2Ft3T0MEW76UT40yX4u6Ma3mYD8C_8Cxhh7ts1PLqczJiA>
-    <xmx:I7oNaXIq7odSdSjkeeYUUcsFuvwY4hPlEzUnJuK0S7YwwjAquyQPZQ>
-    <xmx:JLoNadzGFAutaWLdAzneKsvMe4x0fxomLo89oZ8O8fFh3GaWwCZP7xOy>
+X-ME-Proxy: <xmx:wboNaQkK9BRr8iZsczj8x9KX8NboyLz8JDP29VSIW5fNZOxWm29FoQ>
+    <xmx:wboNacin4kg4K_Hn1Rtcg3X3cHbcHzjS2rFQvGtxytYg2_0SeItpLw>
+    <xmx:wboNaSgDjUEYGUsg6Jl7BEZ_VbAPo0IC5qnsZR-WH1NYJwia2Hm0ZQ>
+    <xmx:wboNaWs7htAePw6k09arZlR3KG5kPP8-DAtQ4yLNj90U8c4dX0DHWw>
+    <xmx:wboNaXnMXSdQRWJnW6gFNjexcT7L5e1CuEHktQQUv2fdDd_iDs2IqLoB>
 Feedback-ID: i56a14606:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 97816700063; Fri,  7 Nov 2025 04:21:39 -0500 (EST)
+	id 22D0F700054; Fri,  7 Nov 2025 04:24:17 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -80,8 +80,8 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: A2_nuZaCxefk
-Date: Fri, 07 Nov 2025 10:21:18 +0100
+X-ThreadId: A5KJubIeX4vZ
+Date: Fri, 07 Nov 2025 10:23:56 +0100
 From: "Arnd Bergmann" <arnd@arndb.de>
 To: "Zhou Wang" <wangzhou1@hisilicon.com>,
  "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
@@ -92,28 +92,32 @@ To: "Zhou Wang" <wangzhou1@hisilicon.com>,
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  "Yicong Yang" <yangyccccc@gmail.com>, prime.zeng@hisilicon.com,
  xuwei5@huawei.com
-Message-Id: <146df4ad-c8a9-4e56-bc1e-7aae53ab8b85@app.fastmail.com>
-In-Reply-To: <20251107072127.448953-8-wangzhou1@hisilicon.com>
+Message-Id: <084ff83c-8bb7-45ea-9ae3-1d17be913c09@app.fastmail.com>
+In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-8-wangzhou1@hisilicon.com>
-Subject: Re: [PATCH v7 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
+Subject: Re: [PATCH v7 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 On Fri, Nov 7, 2025, at 08:21, Zhou Wang wrote:
-> From: Yicong Yang <yangyicong@hisilicon.com>
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+> - Add identifying and enabling in the cpufeature list
+> - Expose the support of these features to userspace through HWCAP3 and cpuinfo
+> - Add related hwcap test
+> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
 >
-> Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
-> if feature presents, no SIGILL should be received. When such
-> instructions operate on Device memory or non-cacheable memory,
-> we may received a SIGBUS during the test (w/o FEAT_LS64WB).
-> Just ignore it since we only tested whether the instruction
-> itself can be issued as expected on platforms declaring the
-> support of such features.
+> A real scenario for this feature is that the userspace driver can make use of
+> this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+> directly into the hardware.
 >
-> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
+> MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
 
-Thanks for the changes,
+This all looks good to me now, no further comments from my side,
+and I hope we can get this into the next kernel.
+
+Thanks a lot for taking care of this!
 
 Acked-by: Arnd Bergmann <arnd@arndb.de>
