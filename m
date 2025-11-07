@@ -1,33 +1,33 @@
-Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63842D063C
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C12308F14
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762500143; cv=none; b=VO197ciut59XYFHonFoA7GVqpU0jVGr+kQGOxkby/gyGkIHsKcbPHO0uttsI3/MC/HCXhYuy/4iBJddjsZe9qMlb/do/iHBDp70FZzzmWSnk3Lyj7xuVPxbbMyoK7TzEaH/Tifg2NXKKhYHO/iFuDtYH5U9cWTKu/KszycSosHM=
+	t=1762500144; cv=none; b=Zf3UySVD/p/FT3q3mbPWg8ypIZ9GTh/PAiVSSp7fNc+dJxXBeh4qyWO3b+ECuyXBileN5A4RhqCm0fIlc8wEM1cR0ND/EkPPpQA1RalmjnHzmBLilrXualVMNb83Tp/IYRWrG4BVxc3oIPTh3HLgDK223E8TUrdLDvlbIDBuEwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762500143; c=relaxed/simple;
-	bh=6QAL45stscntyDT6JyNYGWlYrlf5C5Ukgt+gZUX6bDQ=;
+	s=arc-20240116; t=1762500144; c=relaxed/simple;
+	bh=5o3XUo6Ezb+trWaej0mil2wqYFEvwbs4zDjESVEhzQo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g73/Tn4U5kHOJKazgXacBvm2N4NPhETiBaF64QWKKxTrp+foot6iL/0OxTph3QlfCXTSaDVdLxc15qxWBlrPJlV1v9jPA3i//7ocrruwSRzq4FjEawhADQcbhHfgzlMqis9r6vje7recmPcg7OOUyIuRbV8k+8Vj7brzWHDWbks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.223
+	 MIME-Version:Content-Type; b=l8+E/ksqEV1HtWxYl5vJko7wWngodhRW4TV5vr52iYkuKsdDUleVl+wW+0pbozsOc+qbpYv6V0XQZdPAATpHlrikP057rIdDsLEYwxmpkivPrWeorPYjNaAOeSp2R8Ss6W8niTNLcapfipXpSOcy3eOtM4rOWOTQcYwYKg5sHAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.221
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7Y2MhBzmV7X;
-	Fri,  7 Nov 2025 15:20:41 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id D916F140295;
-	Fri,  7 Nov 2025 15:22:17 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7c184mzRhS1;
+	Fri,  7 Nov 2025 15:20:44 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 1544618048E;
+	Fri,  7 Nov 2025 15:22:20 +0800 (CST)
 Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Nov 2025 15:22:17 +0800
+ 15.2.1544.11; Fri, 7 Nov 2025 15:22:19 +0800
 Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
  (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 7 Nov
- 2025 15:22:17 +0800
+ 2025 15:22:19 +0800
 From: Zhou Wang <wangzhou1@hisilicon.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
@@ -35,9 +35,9 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
 	<wangzhou1@hisilicon.com>
-Subject: [PATCH v7 2/7] KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-Date: Fri, 7 Nov 2025 15:21:22 +0800
-Message-ID: <20251107072127.448953-3-wangzhou1@hisilicon.com>
+Subject: [PATCH v7 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
+Date: Fri, 7 Nov 2025 15:21:27 +0800
+Message-ID: <20251107072127.448953-8-wangzhou1@hisilicon.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
 References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
@@ -52,91 +52,126 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
  kwepemq200004.china.huawei.com (7.202.195.237)
 
-From: Marc Zyngier <maz@kernel.org>
+From: Yicong Yang <yangyicong@hisilicon.com>
 
-Add a bit of documentation for KVM_EXIT_ARM_LDST64B so that userspace
-knows what to expect.
+Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
+if feature presents, no SIGILL should be received. When such
+instructions operate on Device memory or non-cacheable memory,
+we may received a SIGBUS during the test (w/o FEAT_LS64WB).
+Just ignore it since we only tested whether the instruction
+itself can be issued as expected on platforms declaring the
+support of such features.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
 Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- Documentation/virt/kvm/api.rst | 43 ++++++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 7 deletions(-)
+ tools/testing/selftests/arm64/abi/hwcap.c | 79 +++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 57061fa29e6a..b4af2a04b51a 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1303,12 +1303,13 @@ userspace, for example because of missing instruction syndrome decode
- information or because there is no device mapped at the accessed IPA, then
- userspace can ask the kernel to inject an external abort using the address
- from the exiting fault on the VCPU. It is a programming error to set
--ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO or
--KVM_EXIT_ARM_NISV. This feature is only available if the system supports
--KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which provides commonality in
--how userspace reports accesses for the above cases to guests, across different
--userspace implementations. Nevertheless, userspace can still emulate all Arm
--exceptions by manipulating individual registers using the KVM_SET_ONE_REG API.
-+ext_dabt_pending after an exit which was not either KVM_EXIT_MMIO,
-+KVM_EXIT_ARM_NISV, or KVM_EXIT_ARM_LDST64B. This feature is only available if
-+the system supports KVM_CAP_ARM_INJECT_EXT_DABT. This is a helper which
-+provides commonality in how userspace reports accesses for the above cases to
-+guests, across different userspace implementations. Nevertheless, userspace
-+can still emulate all Arm exceptions by manipulating individual registers
-+using the KVM_SET_ONE_REG API.
+diff --git a/tools/testing/selftests/arm64/abi/hwcap.c b/tools/testing/selftests/arm64/abi/hwcap.c
+index 3b96d090c5eb..4d41ab10988f 100644
+--- a/tools/testing/selftests/arm64/abi/hwcap.c
++++ b/tools/testing/selftests/arm64/abi/hwcap.c
+@@ -11,6 +11,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <linux/auxvec.h>
++#include <linux/compiler.h>
+ #include <sys/auxv.h>
+ #include <sys/prctl.h>
+ #include <asm/hwcap.h>
+@@ -595,6 +597,67 @@ static void lrcpc3_sigill(void)
+ 	              : "=r" (data0), "=r" (data1) : "r" (src) :);
+ }
  
- See KVM_GET_VCPU_EVENTS for the data structure.
++static void ignore_signal(int sig, siginfo_t *info, void *context)
++{
++	ucontext_t *uc = context;
++
++	uc->uc_mcontext.pc += 4;
++}
++
++static void ls64_sigill(void)
++{
++	struct sigaction ign, old;
++	char src[64] __aligned(64) = { 1 };
++
++	/*
++	 * LS64, LS64_V require target memory to be Device/Non-cacheable (if
++	 * FEAT_LS64WB not supported) and the completer supports these
++	 * instructions, otherwise we'll receive a SIGBUS. Since we are only
++	 * testing the ABI here, so just ignore the SIGBUS and see if we can
++	 * execute the instructions without receiving a SIGILL. Restore the
++	 * handler of SIGBUS after this test.
++	 */
++	ign.sa_sigaction = ignore_signal;
++	ign.sa_flags = SA_SIGINFO | SA_RESTART;
++	sigemptyset(&ign.sa_mask);
++	sigaction(SIGBUS, &ign, &old);
++
++	register void *xn asm ("x8") = src;
++	register u64 xt_1 asm ("x0");
++
++	/* LD64B x0, [x8] */
++	asm volatile(".inst 0xf83fd100" : "=r" (xt_1) : "r" (xn)
++		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
++
++	/* ST64B x0, [x8] */
++	asm volatile(".inst 0xf83f9100" : : "r" (xt_1), "r" (xn)
++		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
++
++	sigaction(SIGBUS, &old, NULL);
++}
++
++static void ls64_v_sigill(void)
++{
++	struct sigaction ign, old;
++	char dst[64] __aligned(64);
++
++	/* See comment in ls64_sigill() */
++	ign.sa_sigaction = ignore_signal;
++	ign.sa_flags = SA_SIGINFO | SA_RESTART;
++	sigemptyset(&ign.sa_mask);
++	sigaction(SIGBUS, &ign, &old);
++
++	register void *xn asm ("x8") = dst;
++	register u64 xt_1 asm ("x0") = 1;
++	register u64 st   asm ("x9");
++
++	/* ST64BV x9, x0, [x8] */
++	asm volatile(".inst 0xf829b100" : "=r" (st) : "r" (xt_1), "r" (xn)
++		     : "x1", "x2", "x3", "x4", "x5", "x6", "x7");
++
++	sigaction(SIGBUS, &old, NULL);
++}
++
+ static const struct hwcap_data {
+ 	const char *name;
+ 	unsigned long at_hwcap;
+@@ -1134,6 +1197,22 @@ static const struct hwcap_data {
+ 		.hwcap_bit = HWCAP3_MTE_STORE_ONLY,
+ 		.cpuinfo = "mtestoreonly",
+ 	},
++	{
++		.name = "LS64",
++		.at_hwcap = AT_HWCAP3,
++		.hwcap_bit = HWCAP3_LS64,
++		.cpuinfo = "ls64",
++		.sigill_fn = ls64_sigill,
++		.sigill_reliable = true,
++	},
++	{
++		.name = "LS64_V",
++		.at_hwcap = AT_HWCAP3,
++		.hwcap_bit = HWCAP3_LS64_V,
++		.cpuinfo = "ls64_v",
++		.sigill_fn = ls64_v_sigill,
++		.sigill_reliable = true,
++	},
+ };
  
-@@ -7050,12 +7051,14 @@ in send_page or recv a buffer to recv_page).
- 
- ::
- 
--		/* KVM_EXIT_ARM_NISV */
-+		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
- 		struct {
- 			__u64 esr_iss;
- 			__u64 fault_ipa;
- 		} arm_nisv;
- 
-+- KVM_EXIT_ARM_NISV:
-+
- Used on arm64 systems. If a guest accesses memory not in a memslot,
- KVM will typically return to userspace and ask it to do MMIO emulation on its
- behalf. However, for certain classes of instructions, no instruction decode
-@@ -7089,6 +7092,32 @@ Note that although KVM_CAP_ARM_NISV_TO_USER will be reported if
- queried outside of a protected VM context, the feature will not be
- exposed if queried on a protected VM file descriptor.
- 
-+- KVM_EXIT_ARM_LDST64B:
-+
-+Used on arm64 systems. When a guest using a LD64B, ST64B, ST64BV, ST64BV0,
-+outside of a memslot, KVM will return to userspace with KVM_EXIT_ARM_LDST64B,
-+exposing the relevant ESR_EL2 information and faulting IPA, similarly to
-+KVM_EXIT_ARM_NISV.
-+
-+Userspace is supposed to fully emulate the instructions, which includes:
-+
-+	- fetch of the operands for a store, including ACCDATA_EL1 in the case
-+	  of a ST64BV0 instruction
-+	- deal with the endianness if the guest is big-endian
-+	- emulate the access, including the delivery of an exception if the
-+	  access didn't succeed
-+	- provide a return value in the case of ST64BV/ST64BV0
-+	- return the data in the case of a load
-+	- increment PC if the instruction was successfully executed
-+
-+Note that there is no expectation of performance for this emulation, as it
-+involves a large number of interaction with the guest state. It is, however,
-+expected that the instruction's semantics are preserved, specially the
-+single-copy atomicity property of the 64 byte access.
-+
-+This exit reason must be handled if userspace sets ID_AA64ISAR1_EL1.LS64 to a
-+non-zero value, indicating that FEAT_LS64* is enabled.
-+
- ::
- 
- 		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
+ typedef void (*sighandler_fn)(int, siginfo_t *, void *);
 -- 
 2.33.0
 
