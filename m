@@ -1,278 +1,119 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0C126ED59
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 07:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8855629DB99
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762500149; cv=none; b=X+eqpog8kgOA5k4Tz9wzuwV4ZeHt9dTYZWuy9YIjLVX0HPyMwpviZJuMFvBG992Vx3ppTOMf2g9SrOQZLsWI6YulNZIPdB9kTSPvmVVxrq3C2Dt8pXXml55BwAfcMbdStP2uyhgMRQWo4tUZOZEpEIdqE9gFnn07epHUPLexSR8=
+	t=1762507305; cv=none; b=gFDjKL5byKwNhXRr4sZbhBOzyxyvPus3dk5z55r+OE/xPLBRtPohN1N26gzcDRYMu1kS68N1tp8hIjoIUR2qqMxbGTOoA6+wUxsF/7YGLRRkOs4t4ZFDLH0ErhC+qicFmWHQpgY0qRR8rId+47ucggiIkhJzNrwKfB12tsCNo6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762500149; c=relaxed/simple;
-	bh=ul3pLz8QsGv4AsC0n62Eu6+rCytT+aubiPu38HVnEMM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iMOaqiEgG7lFe780koKdHvHmMvJMlllWIDF8VoZFFdF7GE2tZwgBMpmYxtkbv+hUgpOD5LPv0NJPwgs74kFE+v4Bm6bqFIOFfJoXoqYrmDjyY7bCA9NEmOi7YclHQn18vKvB1JvevJiSGzwlbn/T5o0fRRgXalCXD+lwrF6AJ3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d2r7c6BryznTVj;
-	Fri,  7 Nov 2025 15:20:44 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3941F1800CF;
-	Fri,  7 Nov 2025 15:22:19 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Nov 2025 15:22:19 +0800
-Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
- (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 7 Nov
- 2025 15:22:18 +0800
-From: Zhou Wang <wangzhou1@hisilicon.com>
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <arnd@arndb.de>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
-	<wangzhou1@hisilicon.com>
-Subject: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-Date: Fri, 7 Nov 2025 15:21:25 +0800
-Message-ID: <20251107072127.448953-6-wangzhou1@hisilicon.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20251107072127.448953-1-wangzhou1@hisilicon.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+	s=arc-20240116; t=1762507305; c=relaxed/simple;
+	bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=opISWMDXCeZhtPjExahjaW0IcKtEnOsDmEOos9VtB7KXGQtcFRB6sLkTV61lxrrugdn+Gm5guMHEX12uUjf7rMRiuuDQqMzT7m7in27JVC7q6Tal4E8AlkQI/tModFBFxUAlnPfzY+WDes8RvtfMy5Rd26fmd8jDWDsXcN/Yjrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=C3jdLXC/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=vpXaUf+/; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="C3jdLXC/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="vpXaUf+/"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 2883B1D000F8;
+	Fri,  7 Nov 2025 04:21:41 -0500 (EST)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Fri, 07 Nov 2025 04:21:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1762507301;
+	 x=1762593701; bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=; b=
+	C3jdLXC/Tsizyb1vb++Rlc1wLjYnba7mP8NFlmYxL4ww9yjvdkKoNU1tvC3Z3yjF
+	DkMA8ifW4ClivToJfFhk+A7zIjuDmm9QMS4Ly6fLYhkvHALq1lGE5VEoEh/xIe5m
+	nPs/cTX0VLxNXpnU91spQCR2LAG3sxVZpeIT2aW6mzqa9hFjFBbt79r3ghuzzzPx
+	MUC6SkkxcKjj5GqNH2swGPa9ssEXfxuKKxw65AIUzSl2L5pQ897faEvBLh36uRzo
+	C8ABhRs3w+u2tmbRf+JE6CA8ycuJwt/eftOdI8paWmZxqHeMvE3iQYX4zXpPhtWN
+	YDCYtNbinxOMRkH1OXXuqg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762507301; x=
+	1762593701; bh=16fzktKxUy6Xh35FbsFWwaYt1pE18auc4mAIyTScTFI=; b=v
+	pXaUf+/9D1v0yWUm4t6enuolfwQK37TZSBKfy6CjzEATR76rbRs4gCYdadP7W22I
+	N1/rl9mTdWYGXSa5cqFuc2VG0LopYF3FGZp9I5K1nNlxYE3bVkCN+pQHDa+JDIwN
+	XoH3Gyv/enItVhxzE3tUIyplkGk3ZZtcMMmHA51xelqSKFMRPmfXQbVtPFkzC7UB
+	BJklCgrjZd+Sq904ePaic70Z/rmnxd7nEkMcG9f/hKq9Iqd0cX0yGp5JwxcYIKil
+	LCUE4DF1pQcfbOmA2z7QkIMk0++PYbWor3EppworgiT8o7gNr2UGkKV6fPObvgGv
+	w27LkOP9UuDvbwFWK+zFw==
+X-ME-Sender: <xms:I7oNaRd9Lm1AVOBtRqRzlxUJaWEojcAL233D8R675Wtf1ekk36hOxQ>
+    <xme:I7oNaaDA8F9zhOGR1tslq6JIEWLoPnDmNx_Hvr3Qfyhlkmp1Wdn0WU-f0zHZYbred
+    w813rm2BSROOCUYIVRkh5qLclz5rJbkYfiak9_woguoMZYJ--UXww>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelvdelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
+    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
+    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
+    khhirdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttg
+    gtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhl
+    ihgtohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonh
+    drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
+    ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
+    gvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:I7oNaVTgIXKz7BmbT0aSRAsCx8hbsswWFfQUYcM3259OvbNxTDxWkQ>
+    <xmx:I7oNabdHEru5fn9Ue_PlmlaX3x4eW1HM_zpUKxCLbnf1iWGRQsYdjA>
+    <xmx:I7oNaevV2Ft3T0MEW76UT40yX4u6Ma3mYD8C_8Cxhh7ts1PLqczJiA>
+    <xmx:I7oNaXIq7odSdSjkeeYUUcsFuvwY4hPlEzUnJuK0S7YwwjAquyQPZQ>
+    <xmx:JLoNadzGFAutaWLdAzneKsvMe4x0fxomLo89oZ8O8fFh3GaWwCZP7xOy>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 97816700063; Fri,  7 Nov 2025 04:21:39 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: A2_nuZaCxefk
+Date: Fri, 07 Nov 2025 10:21:18 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Zhou Wang" <wangzhou1@hisilicon.com>,
+ "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon" <will@kernel.org>,
+ "Marc Zyngier" <maz@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
+ "Joey Gouly" <joey.gouly@arm.com>,
+ "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+ "Zenghui Yu" <yuzenghui@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ "Yicong Yang" <yangyccccc@gmail.com>, prime.zeng@hisilicon.com,
+ xuwei5@huawei.com
+Message-Id: <146df4ad-c8a9-4e56-bc1e-7aae53ab8b85@app.fastmail.com>
+In-Reply-To: <20251107072127.448953-8-wangzhou1@hisilicon.com>
+References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+ <20251107072127.448953-8-wangzhou1@hisilicon.com>
+Subject: Re: [PATCH v7 7/7] kselftest/arm64: Add HWCAP test for FEAT_{LS64, LS64_V}
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+Content-Transfer-Encoding: 7bit
 
-From: Yicong Yang <yangyicong@hisilicon.com>
+On Fri, Nov 7, 2025, at 08:21, Zhou Wang wrote:
+> From: Yicong Yang <yangyicong@hisilicon.com>
+>
+> Add tests for FEAT_{LS64, LS64_V}. Issue related instructions
+> if feature presents, no SIGILL should be received. When such
+> instructions operate on Device memory or non-cacheable memory,
+> we may received a SIGBUS during the test (w/o FEAT_LS64WB).
+> Just ignore it since we only tested whether the instruction
+> itself can be issued as expected on platforms declaring the
+> support of such features.
+>
+> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
 
-Armv8.7 introduces single-copy atomic 64-byte loads and stores
-instructions and its variants named under FEAT_{LS64, LS64_V}.
-These features are identified by ID_AA64ISAR1_EL1.LS64 and the
-use of such instructions in userspace (EL0) can be trapped. In
-order to support the use of corresponding instructions in userspace:
-- Make ID_AA64ISAR1_EL1.LS64 visbile to userspace
-- Add identifying and enabling in the cpufeature list
-- Expose these support of these features to userspace through HWCAP3
-  and cpuinfo
+Thanks for the changes,
 
-ld64b/st64b (FEAT_LS64) and st64bv (FEAT_LS64_V) is intended for
-special memory (device memory) so requires support by the CPU, system
-and target memory location (device that support these instructions).
-The HWCAP3_{LS64, LS64_V} implies the support of CPU and system (since
-no identification method from system, so SoC vendors should advertise
-support in the CPU if system also support them).
-
-Otherwise for ld64b/st64b the atomicity may not be guaranteed or a
-DABT will be generated, so users (probably userspace driver developer)
-should make sure the target memory (device) also have the support.
-For st64bv 0xffffffffffffffff will be returned as status result for
-unsupported memory so user should check it.
-
-Document the restrictions along with HWCAP3_{LS64, LS64_V}.
-
-Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- Documentation/arch/arm64/booting.rst    | 12 ++++++
- Documentation/arch/arm64/elf_hwcaps.rst | 14 +++++++
- arch/arm64/include/asm/hwcap.h          |  2 +
- arch/arm64/include/uapi/asm/hwcap.h     |  2 +
- arch/arm64/kernel/cpufeature.c          | 51 +++++++++++++++++++++++++
- arch/arm64/kernel/cpuinfo.c             |  2 +
- arch/arm64/tools/cpucaps                |  2 +
- 7 files changed, 85 insertions(+)
-
-diff --git a/Documentation/arch/arm64/booting.rst b/Documentation/arch/arm64/booting.rst
-index e4f953839f71..2c56d76ecafb 100644
---- a/Documentation/arch/arm64/booting.rst
-+++ b/Documentation/arch/arm64/booting.rst
-@@ -556,6 +556,18 @@ Before jumping into the kernel, the following conditions must be met:
- 
-    - MDCR_EL3.TPM (bit 6) must be initialized to 0b0
- 
-+  For CPUs with support for 64-byte loads and stores without status (FEAT_LS64):
-+
-+  - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HCRX_EL2.EnALS (bit 1) must be initialised to 0b1.
-+
-+  For CPUs with support for 64-byte stores with status (FEAT_LS64_V):
-+
-+  - If the kernel is entered at EL1 and EL2 is present:
-+
-+    - HCRX_EL2.EnASR (bit 2) must be initialised to 0b1.
-+
- The requirements described above for CPU mode, caches, MMUs, architected
- timers, coherency and system registers apply to all CPUs.  All CPUs must
- enter the kernel in the same exception level.  Where the values documented
-diff --git a/Documentation/arch/arm64/elf_hwcaps.rst b/Documentation/arch/arm64/elf_hwcaps.rst
-index a15df4956849..b86059bc288b 100644
---- a/Documentation/arch/arm64/elf_hwcaps.rst
-+++ b/Documentation/arch/arm64/elf_hwcaps.rst
-@@ -444,6 +444,20 @@ HWCAP3_MTE_STORE_ONLY
- HWCAP3_LSFE
-     Functionality implied by ID_AA64ISAR3_EL1.LSFE == 0b0001
- 
-+HWCAP3_LS64
-+    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0001. Note that
-+    the function of instruction ld64b/st64b requires support by CPU, system
-+    and target (device) memory location and HWCAP3_LS64 implies the support
-+    of CPU. User should only use ld64b/st64b on supported target (device)
-+    memory location, otherwise fallback to the non-atomic alternatives.
-+
-+HWCAP3_LS64_V
-+    Functionality implied by ID_AA64ISAR1_EL1.LS64 == 0b0010. Same to
-+    HWCAP3_LS64 that HWCAP3_LS64_V implies CPU's support of instruction
-+    st64bv but also requires the support from the system and target (device)
-+    memory location. st64bv supports return status result and 0xFFFFFFFFFFFFFFFF
-+    will be returned for unsupported memory location.
-+
- 
- 4. Unused AT_HWCAP bits
- -----------------------
-diff --git a/arch/arm64/include/asm/hwcap.h b/arch/arm64/include/asm/hwcap.h
-index 6d567265467c..3c0804fb3435 100644
---- a/arch/arm64/include/asm/hwcap.h
-+++ b/arch/arm64/include/asm/hwcap.h
-@@ -179,6 +179,8 @@
- #define KERNEL_HWCAP_MTE_FAR		__khwcap3_feature(MTE_FAR)
- #define KERNEL_HWCAP_MTE_STORE_ONLY	__khwcap3_feature(MTE_STORE_ONLY)
- #define KERNEL_HWCAP_LSFE		__khwcap3_feature(LSFE)
-+#define KERNEL_HWCAP_LS64		__khwcap3_feature(LS64)
-+#define KERNEL_HWCAP_LS64_V		__khwcap3_feature(LS64_V)
- 
- /*
-  * This yields a mask that user programs can use to figure out what
-diff --git a/arch/arm64/include/uapi/asm/hwcap.h b/arch/arm64/include/uapi/asm/hwcap.h
-index 575564ecdb0b..79bc77425b82 100644
---- a/arch/arm64/include/uapi/asm/hwcap.h
-+++ b/arch/arm64/include/uapi/asm/hwcap.h
-@@ -146,5 +146,7 @@
- #define HWCAP3_MTE_FAR		(1UL << 0)
- #define HWCAP3_MTE_STORE_ONLY		(1UL << 1)
- #define HWCAP3_LSFE		(1UL << 2)
-+#define HWCAP3_LS64		(1UL << 3)
-+#define HWCAP3_LS64_V		(1UL << 4)
- 
- #endif /* _UAPI__ASM_HWCAP_H */
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 5ed401ff79e3..dcc5ba620a7e 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -239,6 +239,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
- };
- 
- static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
-+	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LS64_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_XS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, 0),
-@@ -2259,6 +2260,38 @@ static void cpu_enable_e0pd(struct arm64_cpu_capabilities const *cap)
- }
- #endif /* CONFIG_ARM64_E0PD */
- 
-+static bool has_ls64(const struct arm64_cpu_capabilities *entry, int __unused)
-+{
-+	u64 ls64;
-+
-+	ls64 = cpuid_feature_extract_field(__read_sysreg_by_encoding(entry->sys_reg),
-+					   entry->field_pos, entry->sign);
-+
-+	if (ls64 == ID_AA64ISAR1_EL1_LS64_NI ||
-+	    ls64 > ID_AA64ISAR1_EL1_LS64_LS64_ACCDATA)
-+		return false;
-+
-+	if (entry->capability == ARM64_HAS_LS64 &&
-+	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64)
-+		return true;
-+
-+	if (entry->capability == ARM64_HAS_LS64_V &&
-+	    ls64 >= ID_AA64ISAR1_EL1_LS64_LS64_V)
-+		return true;
-+
-+	return false;
-+}
-+
-+static void cpu_enable_ls64(struct arm64_cpu_capabilities const *cap)
-+{
-+	sysreg_clear_set(sctlr_el1, SCTLR_EL1_EnALS, SCTLR_EL1_EnALS);
-+}
-+
-+static void cpu_enable_ls64_v(struct arm64_cpu_capabilities const *cap)
-+{
-+	sysreg_clear_set(sctlr_el1, SCTLR_EL1_EnASR, SCTLR_EL1_EnASR);
-+}
-+
- #ifdef CONFIG_ARM64_PSEUDO_NMI
- static bool can_use_gic_priorities(const struct arm64_cpu_capabilities *entry,
- 				   int scope)
-@@ -3088,6 +3121,22 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.capability = ARM64_HAS_GICV5_LEGACY,
- 		.matches = test_has_gicv5_legacy,
- 	},
-+	{
-+		.desc = "LS64",
-+		.capability = ARM64_HAS_LS64,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_ls64,
-+		.cpu_enable = cpu_enable_ls64,
-+		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64)
-+	},
-+	{
-+		.desc = "LS64_V",
-+		.capability = ARM64_HAS_LS64_V,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_ls64,
-+		.cpu_enable = cpu_enable_ls64_v,
-+		ARM64_CPUID_FIELDS(ID_AA64ISAR1_EL1, LS64, LS64_V)
-+	},
- 	{},
- };
- 
-@@ -3207,6 +3256,8 @@ static const struct arm64_cpu_capabilities arm64_elf_hwcaps[] = {
- 	HWCAP_CAP(ID_AA64ISAR1_EL1, BF16, EBF16, CAP_HWCAP, KERNEL_HWCAP_EBF16),
- 	HWCAP_CAP(ID_AA64ISAR1_EL1, DGH, IMP, CAP_HWCAP, KERNEL_HWCAP_DGH),
- 	HWCAP_CAP(ID_AA64ISAR1_EL1, I8MM, IMP, CAP_HWCAP, KERNEL_HWCAP_I8MM),
-+	HWCAP_CAP(ID_AA64ISAR1_EL1, LS64, LS64, CAP_HWCAP, KERNEL_HWCAP_LS64),
-+	HWCAP_CAP(ID_AA64ISAR1_EL1, LS64, LS64_V, CAP_HWCAP, KERNEL_HWCAP_LS64_V),
- 	HWCAP_CAP(ID_AA64ISAR2_EL1, LUT, IMP, CAP_HWCAP, KERNEL_HWCAP_LUT),
- 	HWCAP_CAP(ID_AA64ISAR3_EL1, FAMINMAX, IMP, CAP_HWCAP, KERNEL_HWCAP_FAMINMAX),
- 	HWCAP_CAP(ID_AA64ISAR3_EL1, LSFE, IMP, CAP_HWCAP, KERNEL_HWCAP_LSFE),
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index c44e6d94f5de..e8ae0a1885e0 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -81,6 +81,8 @@ static const char *const hwcap_str[] = {
- 	[KERNEL_HWCAP_PACA]		= "paca",
- 	[KERNEL_HWCAP_PACG]		= "pacg",
- 	[KERNEL_HWCAP_GCS]		= "gcs",
-+	[KERNEL_HWCAP_LS64]		= "ls64",
-+	[KERNEL_HWCAP_LS64_V]		= "ls64_v",
- 	[KERNEL_HWCAP_DCPODP]		= "dcpodp",
- 	[KERNEL_HWCAP_SVE2]		= "sve2",
- 	[KERNEL_HWCAP_SVEAES]		= "sveaes",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 1b32c1232d28..9aae80ac2280 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -45,6 +45,8 @@ HAS_HCX
- HAS_LDAPR
- HAS_LPA2
- HAS_LSE_ATOMICS
-+HAS_LS64
-+HAS_LS64_V
- HAS_MOPS
- HAS_NESTED_VIRT
- HAS_BBML2_NOABORT
--- 
-2.33.0
-
+Acked-by: Arnd Bergmann <arnd@arndb.de>
