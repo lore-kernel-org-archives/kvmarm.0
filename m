@@ -1,54 +1,54 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E9D302143
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761C4302CC0
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762508335; cv=none; b=PKauypCaB9f6VZFJeM7N7QjlvWbroNJYKxsd0+ys8+1RrVskaQarjPFpHIcfU6AGSlPaT1K/ZY+BhK1xaprsFbD1b1pOPaUSSM93D3b9zf4h2gJsAph1IJ/U3JI24dnUn35CKwdxeeRn4Q5ceDk3psPMsFYhBUy8rHpJNDZqUAE=
+	t=1762508337; cv=none; b=n8hNvMobpTdkR7qbHPmnK3CS53w8kjsWJuxzPYz8r/xm/DsgkLSc702X4ogc9gObBEe/orvjK2O5yqKmnt3SS9Zv8qqVXNguqwz80MKJbjUhfGQvmOrimVpqgLUrp9yUeZK3pUls/3pcf9Fr0cMGmNM9tfECqfNdKRKJ260ygxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762508335; c=relaxed/simple;
-	bh=1WHmcQZ+TEgkiwwnjfRneGhCfqlOJBiAqdvzrgfqRfE=;
+	s=arc-20240116; t=1762508337; c=relaxed/simple;
+	bh=jEEXGy35HUpQAP9zQUnxHJyKz/LFgG7vcsNpQLwnFy0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EzpShFIc0f8j5VBzJakvwoc64z9I0+Um4K41xJyZgr6gayaSAGZzcYQU1QnIppch2wknASuoEeFwJOoRBGRvh4SMk+wWM+NAWruK/W51y9HkWKr1IaLBzd0YDuJ1pIAjioxYxTluiW0MWHVn3SfqY+xrov8xV4DrOfJjSYx4qis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uvsFKc1M; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=chPH0zr4ptVnI8l63yLkwy4BhUBeFx/XemP8nHTisO1IRHmTrlCK1/3cBAG7T4UkDLfYqiSNmzq4pV+4wPTsxqRwI8KVBWDNffbll+qe/upDiONp76CwbBuRfd6PccJkVSdd2Kp74l8kX/pOVi02lz5l3S4Ov27Yykas1a+lsJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lhToP7Cr; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uvsFKc1M"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-47769a0a13bso5373465e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:38:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lhToP7Cr"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b726760acb7so83243766b.0
+        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:38:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762508332; x=1763113132; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1762508334; x=1763113134; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C27VVD3vAqywTmo/NjVnuVPbtNW3I4H1LRWKbq+VenU=;
-        b=uvsFKc1MUy8RJjz0KLLIrR8SVUB0Txat8H80hpR2vnpl3pnJIAXVdh9gjo8qNeyG4y
-         ouaWhb3qf4wVAbmEK0dARmCIEvvazOxg6TPYtjibPQ2N4obKvFzLeVYs+MzbeL9bhPPJ
-         vTCNYyeCcNhlg969zDjkISLqkZgpPRzipCmvJTNtvng7czl10BMFEhet4qaid58IguFO
-         4/0Bj3Wq/ysY5ZXoTdLApi9lYSovM+Pac1J303yEVSSTxlqd35L2If07sCnUlelTqvNB
-         KCJK6wliZ/LJXCsEyRz1viixPGAhQO3Ud7KlnrssVMkGNjO3YqbX8uijv9ChDtsnGcbB
-         dvnA==
+        bh=7u3zBILwoXGQwoYC0Xq9BW4AZq6+iJ2od8CaDzzVgvE=;
+        b=lhToP7CrR0KiUtbANORir+pIP6iWAB3C958MzrLzelBCRn0rTOXBGx4imv7zj8nJQb
+         Z5QSaYI0d4tLwLSEU+iEsOFLObLlwgmkNh2ObX4w3sSsGCG6tjbkoi8ObMCY/qNYA1Sg
+         JcmmVI99ubqxEjhh6ZVV1ciWiOyv7QCwZ3nR/Q+lX27mClqoOHCRW/RgpZjMtNJpOBt6
+         +aPIXUpwmxLqPOeL64c/H7njeDt0Ah1Qg6qT8JPk1VPTv822K0AFkDskEUf9xINSr//A
+         LvYm1h2sczC7GohPJtILAheO7cC29xDL1oB7PlltMCOH29mc6J6N4byNa9STXjHWHHH6
+         6Izg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762508332; x=1763113132;
+        d=1e100.net; s=20230601; t=1762508334; x=1763113134;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C27VVD3vAqywTmo/NjVnuVPbtNW3I4H1LRWKbq+VenU=;
-        b=fn4623nWJ/YqTGKihiqt1f1tozPFbWOH6vCOe+H63O+mbJ9t/EtrHekO7byogyntgO
-         /gcDOtPZvUIeVuB4TGSgUjxk5eSkMukB9CM5kzUkVxSjr47FyYl3jXRJO4rNaMVh9qf6
-         WhoKalnmIdouFtG2ugmy/soqC07tB5PDyw6PQ7tyeV3wzd0XbL5qv0LEmmZRJetbO6F5
-         eLR/OMmflk/bjIdV/rpAuhaff8vlxXrmymdsim7N9LqAXMJ9DjqncRyhxruXxE6ECXq7
-         tZRMzKWuvOe0kyc9mW2ZnJcQ2daTPVtOLhOGXp046IjyuXi7UWpLLvK8zAs4CXJ3eiDS
-         ut5A==
-X-Gm-Message-State: AOJu0Yx5s3d3YSte/4MGyCxQCn5ZbvE0xW+2KEGi35JmzAM3cVKAMx5Q
-	ETHD90wXB6lpyNr8vu+j+HvvGILGRxEJRmiXb16vtkR4TTu+gpjl4mVjBth1a0kzpyidiCH/jS/
-	8FEOnYHawduPbVojg7g/9BQ==
-X-Google-Smtp-Source: AGHT+IGiQlhEUR6uXQZBOgfev2nnadl/wwtET3p/vSwvp4472FXmHSv/qhH8vVord0fI+bybrIdYpQbMBbA3Mg27
-X-Received: from wmbg24.prod.google.com ([2002:a05:600c:a418:b0:46e:5603:f679])
+        bh=7u3zBILwoXGQwoYC0Xq9BW4AZq6+iJ2od8CaDzzVgvE=;
+        b=SFtQ7nSL0S9Vmg6YtujSsVUyvjDfAi0F6GfodzV8/64oScuLAWIousYuWUDNz3oYzk
+         ppLU2ilLpGeesLIXYjAxedwQnfeD1Yq6C9vlVq9CvcVxkM9XBCyTVrMEmMbXqcSiWb8L
+         J+3fs/ECJcW9CsuFEKkLAf1NShvwVylhMRy2RDevH7ZjX1mzph399PxmLRrvlHSFePZL
+         0z+gCW92oT51ttzVWMQ9jczvT39g8Vpqiqg+GEz1IlwQagqDJObue6yljxhZOdOiv5QI
+         A+xFHy/og8vjltr7B/y8Pc+h9bOTwNLIf6Orz0/WX66qXXPJslBSM5S37jQEl/S33qkV
+         Oiwg==
+X-Gm-Message-State: AOJu0YzwFFT7JfPu+RGOID1uC7vwAXaX5KZFB0zpQxC/9kUKYc3uQx5j
+	DBjcWldH3bd0ptbLZuNyYe2LOxU7WBNBLvEBXwu19W05ObuaQXbBTYhWcU505wUDcHqsMGijvVN
+	vYReY/jUxdaxFL60o9wmj8Q==
+X-Google-Smtp-Source: AGHT+IHgDkuNncZlaLiNpLMu3aTitmPuR0CM9YTcGFIKOu+7HlV3Qva/fuAcZvKIOdIctQ4yRTHRz1pClFG3h2kI
+X-Received: from ejcqo8.prod.google.com ([2002:a17:907:8748:b0:b72:41e4:751a])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1f08:b0:46e:46c7:b79a with SMTP id 5b1f17b1804b1-4776bc871e1mr20848605e9.2.1762508332036;
- Fri, 07 Nov 2025 01:38:52 -0800 (PST)
-Date: Fri,  7 Nov 2025 09:38:16 +0000
+ 2002:a17:907:3e28:b0:b72:b495:828c with SMTP id a640c23a62f3a-b72c090e60amr266298966b.30.1762508333943;
+ Fri, 07 Nov 2025 01:38:53 -0800 (PST)
+Date: Fri,  7 Nov 2025 09:38:18 +0000
 In-Reply-To: <20251107093840.3779150-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251107093840.3779150-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251107093840.3779150-5-vdonnefort@google.com>
-Subject: [PATCH v8 04/28] ring-buffer: Add non-consuming read for ring-buffer remotes
+Message-ID: <20251107093840.3779150-7-vdonnefort@google.com>
+Subject: [PATCH v8 06/28] tracing: Add reset to trace remotes
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,124 +70,115 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hopefully, the remote will only swap pages on the kernel instruction (via
-the swap_reader_page() callback). This means we know at what point the
-ring-buffer geometry has changed. It is therefore possible to rearrange
-the kernel view of that ring-buffer to allow non-consuming read.
+Allow to reset the trace remote buffer by writing to the Tracefs "trace"
+file. This is similar to the regular Tracefs interface.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
-index 1d300189f261..4cc5da5cdc87 100644
---- a/kernel/trace/ring_buffer.c
-+++ b/kernel/trace/ring_buffer.c
-@@ -5347,10 +5347,51 @@ static bool rb_read_remote_meta_page(struct ring_buffer_per_cpu *cpu_buffer)
- 	return rb_num_of_entries(cpu_buffer);
+diff --git a/include/linux/trace_remote.h b/include/linux/trace_remote.h
+index feb3433c2128..55754ef78104 100644
+--- a/include/linux/trace_remote.h
++++ b/include/linux/trace_remote.h
+@@ -18,6 +18,8 @@
+  *			remote to allow writing.
+  * @swap_reader_page:	Called when Tracefs consumes a new page from a
+  *			ring-buffer. It is expected from the remote to isolate a
++ * @reset:		Called on `echo 0 > trace`. It is expected from the
++ *			remote to reset all ring-buffer pages.
+  *			new reader-page from the @cpu ring-buffer.
+  */
+ struct trace_remote_callbacks {
+@@ -25,6 +27,7 @@ struct trace_remote_callbacks {
+ 	void	(*unload_trace_buffer)(struct trace_buffer_desc *desc, void *priv);
+ 	int	(*enable_tracing)(bool enable, void *priv);
+ 	int	(*swap_reader_page)(unsigned int cpu, void *priv);
++	int	(*reset)(unsigned int cpu, void *priv);
+ };
+ 
+ /**
+diff --git a/kernel/trace/trace_remote.c b/kernel/trace/trace_remote.c
+index 3d80ff98fd90..49c4ae127533 100644
+--- a/kernel/trace/trace_remote.c
++++ b/kernel/trace/trace_remote.c
+@@ -63,6 +63,7 @@ static int trace_remote_load(struct trace_remote *remote)
+ 	rb_remote->desc = remote->trace_buffer_desc;
+ 	rb_remote->swap_reader_page = remote->cbs->swap_reader_page;
+ 	rb_remote->priv = remote->priv;
++	rb_remote->reset = remote->cbs->reset;
+ 	remote->trace_buffer = ring_buffer_alloc_remote(rb_remote);
+ 	if (!remote->trace_buffer) {
+ 		remote->cbs->unload_trace_buffer(remote->trace_buffer_desc, remote->priv);
+@@ -136,6 +137,21 @@ static int trace_remote_disable_tracing(struct trace_remote *remote)
+ 	return 0;
  }
  
-+static void rb_update_remote_head(struct ring_buffer_per_cpu *cpu_buffer)
++static void trace_remote_reset(struct trace_remote *remote, int cpu)
 +{
-+	struct buffer_page *next, *orig;
-+	int retry = 3;
++	lockdep_assert_held(&remote->lock);
 +
-+	orig = next = cpu_buffer->head_page;
-+	rb_inc_page(&next);
++	if (!trace_remote_loaded(remote))
++		return;
 +
-+	/* Run after the writer */
-+	while (cpu_buffer->head_page->page->time_stamp > next->page->time_stamp) {
-+		rb_inc_page(&next);
++	if (cpu == RING_BUFFER_ALL_CPUS)
++		ring_buffer_reset(remote->trace_buffer);
++	else
++		ring_buffer_reset_cpu(remote->trace_buffer, cpu);
 +
-+		rb_list_head_clear(cpu_buffer->head_page->list.prev);
-+		rb_inc_page(&cpu_buffer->head_page);
-+		rb_set_list_to_head(cpu_buffer->head_page->list.prev);
-+
-+		if (cpu_buffer->head_page == orig) {
-+			if (WARN_ON_ONCE(!(--retry)))
-+				return;
-+		}
-+	}
-+
-+	orig = cpu_buffer->commit_page = cpu_buffer->head_page;
-+	retry = 3;
-+
-+	while (cpu_buffer->commit_page->page->time_stamp < next->page->time_stamp) {
-+		rb_inc_page(&next);
-+		rb_inc_page(&cpu_buffer->commit_page);
-+
-+		if (cpu_buffer->commit_page == orig) {
-+			if (WARN_ON_ONCE(!(--retry)))
-+				return;
-+		}
-+	}
++	trace_remote_try_unload(remote);
 +}
 +
- static void rb_iter_reset(struct ring_buffer_iter *iter)
+ static ssize_t
+ tracing_on_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *ppos)
  {
- 	struct ring_buffer_per_cpu *cpu_buffer = iter->cpu_buffer;
+@@ -410,6 +426,26 @@ static const struct file_operations trace_pipe_fops = {
+ 	.release	= trace_pipe_release,
+ };
  
-+	if (cpu_buffer->remote) {
-+		rb_read_remote_meta_page(cpu_buffer);
-+		rb_update_remote_head(cpu_buffer);
-+	}
++static ssize_t trace_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *ppos)
++{
++	struct inode *inode = file_inode(filp);
++	struct trace_remote *remote = inode->i_private;
++	int cpu = RING_BUFFER_ALL_CPUS;
 +
- 	/* Iterator usage is expected to have record disabled */
- 	iter->head_page = cpu_buffer->reader_page;
- 	iter->head = cpu_buffer->reader_page->read;
-@@ -5503,7 +5544,7 @@ rb_update_iter_read_stamp(struct ring_buffer_iter *iter,
- static struct buffer_page *
- __rb_get_reader_page_from_remote(struct ring_buffer_per_cpu *cpu_buffer)
++	if (inode->i_cdev)
++		cpu = (long)inode->i_cdev - 1;
++
++	guard(mutex)(&remote->lock);
++
++	trace_remote_reset(remote, cpu);
++
++	return cnt;
++}
++
++static const struct file_operations trace_fops = {
++	.write		= trace_write,
++};
++
+ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remote)
  {
--	struct buffer_page *new_reader, *prev_reader;
-+	struct buffer_page *new_reader, *prev_reader, *prev_head, *new_head, *last;
+ 	struct dentry *remote_d, *percpu_d;
+@@ -440,7 +476,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
+ 	    !trace_create_file("buffer_size_kb", TRACEFS_MODE_WRITE, remote_d, remote,
+ 			       &buffer_size_kb_fops) ||
+ 	    !trace_create_file("trace_pipe", TRACEFS_MODE_READ, remote_d, remote,
+-			       &trace_pipe_fops))
++			       &trace_pipe_fops) ||
++	    !trace_create_file("trace", TRACEFS_MODE_WRITE, remote_d, remote,
++			       &trace_fops))
+ 		goto err;
  
- 	if (!rb_read_remote_meta_page(cpu_buffer))
- 		return NULL;
-@@ -5527,10 +5568,32 @@ __rb_get_reader_page_from_remote(struct ring_buffer_per_cpu *cpu_buffer)
+ 	percpu_d = tracefs_create_dir("per_cpu", remote_d);
+@@ -462,7 +500,9 @@ static int trace_remote_init_tracefs(const char *name, struct trace_remote *remo
+ 		}
  
- 	WARN_ON_ONCE(prev_reader == new_reader);
+ 		if (!trace_create_cpu_file("trace_pipe", TRACEFS_MODE_READ, cpu_d, remote, cpu,
+-					   &trace_pipe_fops))
++					   &trace_pipe_fops) ||
++		    !trace_create_cpu_file("trace", TRACEFS_MODE_WRITE, cpu_d, remote, cpu,
++					   &trace_fops))
+ 			goto err;
+ 	}
  
--	cpu_buffer->reader_page->page = new_reader->page;
--	cpu_buffer->reader_page->id = new_reader->id;
--	cpu_buffer->reader_page->read = 0;
--	cpu_buffer->read_stamp = cpu_buffer->reader_page->page->time_stamp;
-+	prev_head = new_reader;  /* New reader was also the previous head */
-+	new_head = prev_head;
-+	rb_inc_page(&new_head);
-+	last = prev_head;
-+	rb_dec_page(&last);
-+
-+	/* Clear the old HEAD flag */
-+	rb_list_head_clear(cpu_buffer->head_page->list.prev);
-+
-+	prev_reader->list.next = prev_head->list.next;
-+	prev_reader->list.prev = prev_head->list.prev;
-+
-+	/* Swap prev_reader with new_reader */
-+	last->list.next = &prev_reader->list;
-+	new_head->list.prev = &prev_reader->list;
-+
-+	new_reader->list.prev = &new_reader->list;
-+	new_reader->list.next = &new_head->list;
-+
-+	/* Reactivate the HEAD flag */
-+	rb_set_list_to_head(&last->list);
-+
-+	cpu_buffer->head_page = new_head;
-+	cpu_buffer->reader_page = new_reader;
-+	cpu_buffer->pages = &new_head->list;
-+	cpu_buffer->read_stamp = new_reader->page->time_stamp;
- 	cpu_buffer->lost_events = cpu_buffer->meta_page->reader.lost_events;
- 
- 	return rb_page_size(cpu_buffer->reader_page) ? cpu_buffer->reader_page : NULL;
-@@ -6114,7 +6177,7 @@ ring_buffer_read_start(struct trace_buffer *buffer, int cpu, gfp_t flags)
- 	struct ring_buffer_per_cpu *cpu_buffer;
- 	struct ring_buffer_iter *iter;
- 
--	if (!cpumask_test_cpu(cpu, buffer->cpumask) || buffer->remote)
-+	if (!cpumask_test_cpu(cpu, buffer->cpumask))
- 		return NULL;
- 
- 	iter = kzalloc(sizeof(*iter), flags);
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
