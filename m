@@ -1,148 +1,89 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D432D8766
-	for <kvmarm@lists.linux.dev>; Thu,  6 Nov 2025 17:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16BD62F5A09
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 01:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762449419; cv=none; b=hS8SSA1dhPLOfU+/ZnB3JfWIjU4pCi8yO7MMUcrADpVi9X2cEvq8dbBQ/yNhRxVHgY6wyUqfxpCUGcmrWuzkUAzEdN8otFudpgVKNerbVw2tCrGu06lcKvaKHfIyLIQzUsmNcQ/nzknPQg/P3ggpB3jpbxGagh1phNpMfQzTMww=
+	t=1762478934; cv=none; b=sDIluVujKibVEntYirP/zEWPDXYFv2FqtXTa90O0OMLEfTFdKTJ6fngcewfrfhrV6x6ASJJ3X+HqrvcNw682MHZWacjjD5XBvqG4/RddhCLqmde1x1aGBvJ9IhR3I/YSI0byV3BZc07RgHSGm91pA4kTt0bOwOoTrcR+CEMQENc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762449419; c=relaxed/simple;
-	bh=dIwybaZojCu29+P9gEfB8CIvmj6Bl08p1VgiPhwpKTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOSl3c466tLcJKZt4jX/f3LzjRieS/DtQubOfNB4FzpbheK6p1yWMr6iS0Y7WA2S6+6bVh1xZxgtpr6cDjGT0EQp2IQ9CJdJDIk/qsRyq9ui/TpjlrkZgADeYSwZk6lBjaUMwBzw7BrQnFg75O2C9JICZ2iUu/+kz09DYE0WO+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=fEmZskmt; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1762478934; c=relaxed/simple;
+	bh=c2e47lympQD3wVjQGVdtG8qTNTMhJePixA7Ed6yK78M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JaICTvbJRxurSoMPp+JGrW8q/5b8TbAcSP1LDyHvk/MwlDRX/Ia33h815Fv98/N4EUUxg9qTflOdm/l4A/sHk/9GS4Q+gUgsxTmHlvZMJpQoNlY5urr57sR2V2JF4cuFXgFMk/a72y2XFbOOKEgY0v7zJ1njMfngWYeXaKg8jiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgUUBmr0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="fEmZskmt"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ecfc3f4a13so6515741cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 06 Nov 2025 09:16:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1762449416; x=1763054216; darn=lists.linux.dev;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XyqXd6ge5y2aj27CRXRh3J8Q1q4rd+TcymckOxNEG8A=;
-        b=fEmZskmtaptejch4msph1FdQkdP/R8M9OyiBrYBY5+0s8wjOoLMT1qg7wQk42FNbP0
-         oAzW0rNsuy8yowrg1wZh1EAo4zNOSxhUviusHmHfQhE+xMRH6DC5a018eWDEtni+32kU
-         zoSnaSO1Kkee9suZwzfGum/mKFaQXD3PkFJfI5pmkOm/uyD0DOjJmQjGJlM3Dn0PVP7g
-         H217JKTo+71bC5hbjuzh+nFwDxePqy0XjfQZ5mmtkItpvv/GEeYCM0d7qjNXo0od1tIu
-         FeZiiHPeghao2aQ6b+78dGAJO3UDJ4NSFsDxJ3nEalLe+2JBXZqYpE5fFMSAgqkkjsnl
-         qLRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762449416; x=1763054216;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XyqXd6ge5y2aj27CRXRh3J8Q1q4rd+TcymckOxNEG8A=;
-        b=SovyDW8kE7KeL77hw6Ye7G/m9boXDhUwl+ucqGi+QsqoXa9L4WvsToHZsc0MHbt2r3
-         9HhNR/zetnumYVO7cJlcemtRdjuCzP1RBBT6rDJKQuInwDyj8JqfmQJRpOYMkmI/n6uc
-         gRUZQ5uKtq9XuneOSyC6n/gg9s5GrObPPb8NvLeyy/a6b/SuJsLZtY19lLg1LcqgE7ws
-         ywtUFNY0nnLSH5M1RJlCqsiCHmoSIt0XxQ0mbRGJzFllMj4DZ1jCSFt04pykwnuQU5wv
-         dTlURrF8n4Fp5vIzGzyndBwMvGLvDJJpuz7wEZx/zysqR26GGZLU4r/C1luSX1SecK/g
-         xQCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWI8PSBtzTUFbfnAZg1M09kqHepM6XgOCioui5AHrc4YObpQoOwT8if8tjg3KNZKDMLAh/KnZs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz4qFV2gmv9ISnDGEo4Y/pt1u0XG+41RamjC+aNmhLvkQ0gN3fo
-	ypmiEeONYZd5AKFO3S+4iF3kgJbwYfyhClBlpdX6Z1cNdbAf3Nh5kTg+owZgeRqM3F0=
-X-Gm-Gg: ASbGncvTW96lHOAqa/q3kL2QIllgryhJNh7PFemPfO6N0T/c3OAZla5iEgwxfptT14X
-	ZUL6e/nPH3UAi8QqqVJWHIGMsQvBFrL7s0SkwCjaS4qbfdVA7kMRXqL8DDuLbgrKs0ca2sxletM
-	MURNBdVpbSlDcEjVV9QkhHRoWGpE08CevtgGYdWaIsG1rrxBVFZtWiYOWKKr1Nwe3W9XzBVor9t
-	lHRFg5U1+CGiwQlUnz9Oje/2laFS4N0XaAjheXLPA0dU8UD7PL0nQtoSmvjmB2jcbv9NyOiXuQD
-	N5z2BpxwEy/Rmbrve2d0SXHVbFS1FPEIRi/ik0dMzZzMvOoppOc/2BUim80xxZ5ocA7n+u0lWeG
-	w5lTU9tMeQN3N26oboKSYyCDPxCsMq8+dEjMQjBHbF11ATSWCpyfrX6EchPfCH9CpOt5EUL5XhS
-	i8Hzaz2bfb7TZahHmrtfryC8zTYQx4aGtlZxFiqang8AyX8g==
-X-Google-Smtp-Source: AGHT+IGm7rjI4btGT0uAp5U2+RTOpSSDx/JneJwxU99rel9EmV7Mer/iD0OJK3RWNsxIkY3fdHP+mA==
-X-Received: by 2002:a05:622a:410d:b0:4e8:ac66:ee44 with SMTP id d75a77b69052e-4ed725e06eemr111576881cf.39.1762449415840;
-        Thu, 06 Nov 2025 09:16:55 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed813b7ce2sm21908131cf.24.2025.11.06.09.16.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 09:16:55 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1vH3bS-00000007OJk-2iYD;
-	Thu, 06 Nov 2025 13:16:54 -0400
-Date: Thu, 6 Nov 2025 13:16:54 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	iommu@lists.linux.dev, maz@kernel.org, oliver.upton@linux.dev,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, robin.murphy@arm.com,
-	jean-philippe@linaro.org, qperret@google.com, tabba@google.com,
-	mark.rutland@arm.com, praan@google.com
-Subject: Re: [PATCH v4 15/28] iommu/arm-smmu-v3: Load the driver later in KVM
- mode
-Message-ID: <20251106171654.GV1204670@ziepe.ca>
-References: <aMQmA9cLaeYWG5_C@willie-the-truck>
- <aNKwROPzDCWgJBGQ@google.com>
- <20250923173806.GF2547959@ziepe.ca>
- <aNppE9A3PDiDg_1W@google.com>
- <20251002151308.GG3195829@ziepe.ca>
- <aQt9-kTCe8TpuyVq@google.com>
- <20251105171208.GN1204670@ziepe.ca>
- <aQyBIohAuxNHV-XI@google.com>
- <20251106132331.GU1204670@ziepe.ca>
- <aQzSzhcndQ3Ry0a2@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgUUBmr0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75059C116C6;
+	Fri,  7 Nov 2025 01:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762478933;
+	bh=c2e47lympQD3wVjQGVdtG8qTNTMhJePixA7Ed6yK78M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RgUUBmr0ag6+Oa/O18qIGCpV6TnRiE0y52UIbGiH7MPSzizvv+Drg1dATYeUjOMTS
+	 0LH3BcxGIK9NS54JDZb95OF6jH95BcOQvbY2Cdl7h6sc+4r19KCwWxDkRl0EpmUdin
+	 F+/B/Wdh3MnUjlxDiIpFjiSnycuDBKgSAMsQyqCYXjQwi1it1wX2S+EpHLy3ANgm82
+	 ODc39CW+i7MXHHuJLva/rtYGfZxFDdUpqs6is+IW29fZEQxSGph6tFYFbqCQ1oKWCZ
+	 c0f52cb18agVzRd3CasZC0ywd6KfG9/P2z6zbKcGzipk2GIM2h0e1+ErMI895Cg1Rx
+	 qxaWNCIStOfuw==
+From: Oliver Upton <oupton@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oupton@kernel.org>
+Subject: [PATCH] MAINTAINERS: Switch myself to using kernel.org address
+Date: Thu,  6 Nov 2025 17:28:25 -0800
+Message-ID: <20251107012830.1708225-1-oupton@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aQzSzhcndQ3Ry0a2@google.com>
 
-On Thu, Nov 06, 2025 at 04:54:38PM +0000, Mostafa Saleh wrote:
-> Maybe I am misunderstanding this, but that looks really intrusive to me,
-> at the moment arm-smmuv-3.c is a platform driver, and rely on the
-> platform bus to understand the device (platform_get_resource...)
->
-> You are suggesting to change that so it can also bind to AUX devices, then
-> change the “arm_smmu_device_probe” function to understand that and possibly
-> parse info from the parent device?
+I've been running into issues with the linux.dev email
+semi-periodically, switching to my kernel.org address while I go figure
+out a better home for my inbox.
 
-Yes, it is probably only a couple lines I think. You still have a
-platform device, it just comes from a different spot.
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+---
+ .mailmap    | 3 ++-
+ MAINTAINERS | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-I didn't it audit it closely, but basically it starts like this:
-
--static int arm_smmu_device_probe(struct platform_device *pdev)
-+/*
-+ * dev is the device that the driver is bound to
-+ * pdev is the device that has the physical resources describing the smmu
-+ */
-+static int arm_smmu_device_probe_impl(struct device *dev,
-+                                     struct platform_device *pdev)
- {
-        int irq, ret;
-        struct resource *res;
-        resource_size_t ioaddr;
-        struct arm_smmu_device *smmu;
--       struct device *dev = &pdev->dev;
+diff --git a/.mailmap b/.mailmap
+index 369cfe467932..c8f5f36993ae 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -605,7 +605,8 @@ Oleksij Rempel <o.rempel@pengutronix.de>
+ Oleksij Rempel <o.rempel@pengutronix.de> <ore@pengutronix.de>
+ Oliver Hartkopp <socketcan@hartkopp.net> <oliver.hartkopp@volkswagen.de>
+ Oliver Hartkopp <socketcan@hartkopp.net> <oliver@hartkopp.net>
+-Oliver Upton <oliver.upton@linux.dev> <oupton@google.com>
++Oliver Upton <oupton@kernel.org> <oupton@google.com>
++Oliver Upton <oupton@kernel.org> <oliver.upton@linux.dev>
+ Ondřej Jirman <megi@xff.cz> <megous@megous.com>
+ Oza Pawandeep <quic_poza@quicinc.com> <poza@codeaurora.org>
+ Pali Rohár <pali@kernel.org> <pali.rohar@gmail.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 46bd8e033042..5481e24e84cf 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13656,7 +13656,7 @@ F:	virt/kvm/*
  
-        smmu = devm_kzalloc(dev, sizeof(*smmu), GFP_KERNEL);
-        if (!smmu)
+ KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
+ M:	Marc Zyngier <maz@kernel.org>
+-M:	Oliver Upton <oliver.upton@linux.dev>
++M:	Oliver Upton <oupton@kernel.org>
+ R:	Joey Gouly <joey.gouly@arm.com>
+ R:	Suzuki K Poulose <suzuki.poulose@arm.com>
+ R:	Zenghui Yu <yuzenghui@huawei.com>
 
-Probably needs some adjustments to switch places between pdev/dev, but
-the ones I looked at were all OK already..
+base-commit: 6146a0f1dfae5d37442a9ddcba012add260bceb0
+-- 
+2.47.3
 
-In the aux case dev is the aux dev, otherwise dev and pdev are the
-same thing. devm related stuff has to dev.
-
-> One of the main benefits from choosing trap and emulate was that it
-> looks transparent from the kernel of point view, so doing such radical
-> changes to adapt to KVM doesn't look right to me, I think the driver
-> should remain as is (a platform driver that thinks it's directly
-> talking to the HW).
-
-I'm not so fixed on this idea, this kvm stuff makes enough meaningful
-changes I don't think we need to sweep it all under the rug completely
-fully transparently. If you need a couple of edits to the probe
-function that's fine in my book.
-
-Jason
