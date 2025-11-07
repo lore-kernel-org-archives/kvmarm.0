@@ -1,54 +1,54 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0962FD691
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED4B3019BB
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762508332; cv=none; b=fZfCEmI6JWyNv2fF7534Fkq8C3WAAUwWSAKmLXYpySodZijr3YGRQjca9eJqpYvBvTK1eXq2pSjKIIk4JGDqoL94aD85N4MzDm8m3fbwkZzDsn+nTQXP6wAx2y5t7lwE76SrCkGVStJWy+J0rE48iOCAIc7eVX0ytH6MmCg/SW8=
+	t=1762508333; cv=none; b=XmAogLAveRR24Rfcp/kc4oIsdk9TSh7DzsyXrlRkIYbzSd6cw6e8q1sdQ744zYtRbovSExlWDhRL29GnY0XCvT7oru4WUKu4Dp/wNyfI+aUhqv9nPQ1ebdW3Mumuwq9VNVoLx4XCVs0DWDdV7H24uoJAMCUHZG674WKEPNcTjH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762508332; c=relaxed/simple;
-	bh=bbIu4OLAzPu9BN2qUYAt/wKwBQ34W6Iiz5uSvl5YDWc=;
+	s=arc-20240116; t=1762508333; c=relaxed/simple;
+	bh=sj8G0CUoartcPxXFAdQJrVtMlCMU5/QlpoX3U8XHqGw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z9gcOrtPt9iqhw5RyL5ia6+oqGBDkgPCV7BBhliT+F9l4K4wb8acfgWN6hI44+cWnodNrXUYigWVDXU6vb0NJy6EcjUlYGLpzR6wT9E5kzAzLTjSJoUYNRLBZ3anLSYhgKWhgrvOUBu6UYqleyU6xSn3kgNbX1pcvc8XcunKA1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J9jEnBMh; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=iOi5KTONBBstJKJUMKG/00Qa3P1atoOB0FLQq6MiPwAnVoFmHpf/CPDqLDc9/5WCiacoNb0SB28eHxvlY5dGIBfvIe8MsCvgZ40iHaMVlButgJDBfHzbMPu4T8sZcLk+fMUyWP24KxiZdzKY8tJrMMD3COhFklYrvuPpwt1p078=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C+S88PTN; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J9jEnBMh"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-46e39567579so2271615e9.0
-        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:38:50 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C+S88PTN"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-471001b980eso4099855e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:38:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762508329; x=1763113129; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1762508330; x=1763113130; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8oUgbBX1ulXE/9DMN2n7zAGqIrRVP1Mxd8sp0hGAu+o=;
-        b=J9jEnBMhWJO5Fy34BemTF6fWjVaAIiGqEVmZxI7nAHTQqHu/clnXxEB0YMrkpcVdyC
-         9gv+v1pmyzv8MRNIDr2xBwzHcY4R1cAewZMmqI9WHu7el6o/mImLp3l2uXNQuKLCw46J
-         QRCOpmme8qnZyqVyDUwzURlqo56m3diVn0llAfCU2ksaFy2nDJmq0wz3X/mmWxcIN41X
-         4Hu/ejEtS1QtdmGlemi5dmmAo5RK8Ejk7QvrDiRaoB/o+L5jWo0GFbhnqDhEIPvrcp8m
-         sxRv0XMcvMn3Bi9NK4oNL5SQ+wdSnVbj9q7NlVmoFwG7vMfG6gErghhm9A0sHd9/7kIX
-         VKPw==
+        bh=dE9bbheCp9V2aFuRlDh4WDEP/Ei7sW5/5LGgdkpufdc=;
+        b=C+S88PTN0f/6SSS2NUVi6o0c86cb7DQSxJMtbcERB3y8XYg5Td+pZyrlCRcdsSMEeR
+         2RZrkE972mbjmBQxmC91mi2JcG0dE6GAX7ogHKLx2qKZWP1lmgUJj4q0Tj0O0NlQzNTC
+         F8lgW/fltvrxzqT3He7PzLSQcQ2oRDupRYYllgpjR/B2t765oeqgKrC+d8DdQdWduS5V
+         IvGyaRGvXhr+rSyYjisshvoPf/MC6BtUpSDwVnlSgbwSjrEHYAHG1uGpj01bw5u0Iooq
+         UQ+RAEdnQpEsF/j8AmuLFjJeQv3ZLoFO6BOji7fhsLb91vMaR75nKhDcv19sbfQCTgh8
+         S+2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762508329; x=1763113129;
+        d=1e100.net; s=20230601; t=1762508330; x=1763113130;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8oUgbBX1ulXE/9DMN2n7zAGqIrRVP1Mxd8sp0hGAu+o=;
-        b=OFlm6XMN+LYHYA6nR4+AbZE5XUShLdD2knP1SNjyvGrUS9M5qfkXjsSuS/mr0MGrcN
-         d+Hml6H7oKRwkTR+P2fTsjHpHEZTewNRFpe95HOfCwjRwlnB9WHFFKU77Iu9GJhfIRZj
-         dxXJUUF45F77lIfgmT1Cf+3QwxweMBB1uXTjJtPw2l8RM6rwfF0Xu0szCaMtp2Lf4MCS
-         YWhAlzdYZfZHEJM6RcR0Apitavm5BuOvfutPZ6rsT5QhBrYH86CsKthc/aQGPWw4Z5nW
-         XpDSwrup/pSklUSg+1bCIn19pp7NbFfdNYU5JKD98eOrGcS2wl7TLAszR7i2BVj4AGYp
-         JqNw==
-X-Gm-Message-State: AOJu0Yy7fqr0twIEpOTSgmZ4xtLXc4PDLhao55TM6K3ts7TLDMR0AUXp
-	85J0Hj5APpRLTqFDZLQEmqaa1kxTTZbdPvVZBOggfoxmvGGtzWKAnhxOJI6X0Zs9W2Zov//ProW
-	A9njCwH/NgYx/H2F32H/8uA==
-X-Google-Smtp-Source: AGHT+IE23rPEzYSe4I0moWqEMyLx5Nz/SDjuSLTsgRUDjXKubF44UKXd0LSGwV/bDB8OhzSN4YVGVIEmz4/I2dF8
-X-Received: from wmot14.prod.google.com ([2002:a05:600c:450e:b0:477:bdc:7343])
+        bh=dE9bbheCp9V2aFuRlDh4WDEP/Ei7sW5/5LGgdkpufdc=;
+        b=KyX08ilGyc+MIYfMacyjDN2sMkUCxrYe/DqUAVnAkon2XA+fbVf6ONUyhroWnWSy6g
+         SJQiusiOpYZOQ16VTDOs+SK8c6gDosbFA18f1zuCILIUL/LmQ9QIeK784nslj8zcjkEg
+         Tu6+C1R8lsgRzrN4mZZdZeAu2xdSB5kggdvftZMO2UJNRMHgwyEA7IGT4pfz9hKx/S4d
+         Dv6gcRsPIHb9xZDjS+ollZR+hcAHTEPmma1zHlZlOTgAWnsGIZVfhae2pziKxrafNZmS
+         IQZ7LBxpUor6fcuWHN50ACQk4NiIvZcO8d8EHLmeNTxEqKAqnrBTRmeBXbWmhVAaetdq
+         L0uA==
+X-Gm-Message-State: AOJu0YwSTpEVcR5Tt1W/9O2DKcs01l6SCnnZs5ibXoifWW/rAzVXvjPY
+	KGl89fk3b97sNnj6j/pEfWZ7tWpTltLchZdRNTZVjrt3v1oSkmeEimdah+VUx2XjhuiNfwi5+6c
+	s4mUdb5ptJ4fqRDdGWrD8+w==
+X-Google-Smtp-Source: AGHT+IHJKQcuTuHVy5lW9/pddPtXEWrJkUHRKDzcCdWDYQlwal5t/VwhJiu80ev0kYlXjbKdm3HJXTGh6pg8IuqO
+X-Received: from wmim9.prod.google.com ([2002:a7b:cb89:0:b0:46e:1f26:9212])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:548a:b0:475:de14:db1f with SMTP id 5b1f17b1804b1-4776bcc2b13mr22237325e9.30.1762508329480;
- Fri, 07 Nov 2025 01:38:49 -0800 (PST)
-Date: Fri,  7 Nov 2025 09:38:13 +0000
+ 2002:a05:600c:4512:b0:471:114e:5894 with SMTP id 5b1f17b1804b1-4776bce1ae8mr18497205e9.25.1762508330429;
+ Fri, 07 Nov 2025 01:38:50 -0800 (PST)
+Date: Fri,  7 Nov 2025 09:38:14 +0000
 In-Reply-To: <20251107093840.3779150-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251107093840.3779150-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251107093840.3779150-2-vdonnefort@google.com>
-Subject: [PATCH v8 01/28] ring-buffer: Add page statistics to the meta-page
+Message-ID: <20251107093840.3779150-3-vdonnefort@google.com>
+Subject: [PATCH v8 02/28] ring-buffer: Store bpage pointers into subbuf_ids
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,51 +70,98 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add two fields pages_touched and pages_lost to the ring-buffer
-meta-page. Those fields are useful to get the number of used pages in
-the ring-buffer.
+The subbuf_ids field allows to point to a specific page from the
+ring-buffer based on its ID. As a preparation or the upcoming
+ring-buffer remote support, point this array to the buffer_page instead
+of the buffer_data_page.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/include/uapi/linux/trace_mmap.h b/include/uapi/linux/trace_mmap.h
-index c102ef35d11e..e8185889a1c8 100644
---- a/include/uapi/linux/trace_mmap.h
-+++ b/include/uapi/linux/trace_mmap.h
-@@ -17,8 +17,8 @@
-  * @entries:		Number of entries in the ring-buffer.
-  * @overrun:		Number of entries lost in the ring-buffer.
-  * @read:		Number of entries that have been read.
-- * @Reserved1:		Internal use only.
-- * @Reserved2:		Internal use only.
-+ * @pages_lost:		Number of pages overwritten by the writer.
-+ * @pages_touched:	Number of pages written by the writer.
-  */
- struct trace_buffer_meta {
- 	__u32		meta_page_size;
-@@ -39,8 +39,8 @@ struct trace_buffer_meta {
- 	__u64	overrun;
- 	__u64	read;
- 
--	__u64	Reserved1;
--	__u64	Reserved2;
-+	__u64	pages_lost;
-+	__u64	pages_touched;
- };
- 
- #define TRACE_MMAP_IOCTL_GET_READER		_IO('R', 0x20)
 diff --git a/kernel/trace/ring_buffer.c b/kernel/trace/ring_buffer.c
-index 1244d2c5c384..6e912527e44f 100644
+index 6e912527e44f..80099a8b2495 100644
 --- a/kernel/trace/ring_buffer.c
 +++ b/kernel/trace/ring_buffer.c
-@@ -6113,6 +6113,8 @@ static void rb_update_meta_page(struct ring_buffer_per_cpu *cpu_buffer)
- 	meta->entries = local_read(&cpu_buffer->entries);
- 	meta->overrun = local_read(&cpu_buffer->overrun);
- 	meta->read = cpu_buffer->read;
-+	meta->pages_lost = local_read(&cpu_buffer->pages_lost);
-+	meta->pages_touched = local_read(&cpu_buffer->pages_touched);
+@@ -519,7 +519,7 @@ struct ring_buffer_per_cpu {
+ 	unsigned int			mapped;
+ 	unsigned int			user_mapped;	/* user space mapping */
+ 	struct mutex			mapping_lock;
+-	unsigned long			*subbuf_ids;	/* ID to subbuf VA */
++	struct buffer_page		**subbuf_ids;	/* ID to subbuf VA */
+ 	struct trace_buffer_meta	*meta_page;
+ 	struct ring_buffer_cpu_meta	*ring_meta;
  
- 	/* Some archs do not have data cache coherency between kernel and user-space */
- 	flush_kernel_vmap_range(cpu_buffer->meta_page, PAGE_SIZE);
+@@ -7002,7 +7002,7 @@ static void rb_free_meta_page(struct ring_buffer_per_cpu *cpu_buffer)
+ }
+ 
+ static void rb_setup_ids_meta_page(struct ring_buffer_per_cpu *cpu_buffer,
+-				   unsigned long *subbuf_ids)
++				   struct buffer_page **subbuf_ids)
+ {
+ 	struct trace_buffer_meta *meta = cpu_buffer->meta_page;
+ 	unsigned int nr_subbufs = cpu_buffer->nr_pages + 1;
+@@ -7011,7 +7011,7 @@ static void rb_setup_ids_meta_page(struct ring_buffer_per_cpu *cpu_buffer,
+ 	int id = 0;
+ 
+ 	id = rb_page_id(cpu_buffer, cpu_buffer->reader_page, id);
+-	subbuf_ids[id++] = (unsigned long)cpu_buffer->reader_page->page;
++	subbuf_ids[id++] = cpu_buffer->reader_page;
+ 	cnt++;
+ 
+ 	first_subbuf = subbuf = rb_set_head_page(cpu_buffer);
+@@ -7021,7 +7021,7 @@ static void rb_setup_ids_meta_page(struct ring_buffer_per_cpu *cpu_buffer,
+ 		if (WARN_ON(id >= nr_subbufs))
+ 			break;
+ 
+-		subbuf_ids[id] = (unsigned long)subbuf->page;
++		subbuf_ids[id] = subbuf;
+ 
+ 		rb_inc_page(&subbuf);
+ 		id++;
+@@ -7030,7 +7030,7 @@ static void rb_setup_ids_meta_page(struct ring_buffer_per_cpu *cpu_buffer,
+ 
+ 	WARN_ON(cnt != nr_subbufs);
+ 
+-	/* install subbuf ID to kern VA translation */
++	/* install subbuf ID to bpage translation */
+ 	cpu_buffer->subbuf_ids = subbuf_ids;
+ 
+ 	meta->meta_struct_len = sizeof(*meta);
+@@ -7186,13 +7186,15 @@ static int __rb_map_vma(struct ring_buffer_per_cpu *cpu_buffer,
+ 	}
+ 
+ 	while (p < nr_pages) {
++		struct buffer_page *subbuf;
+ 		struct page *page;
+ 		int off = 0;
+ 
+ 		if (WARN_ON_ONCE(s >= nr_subbufs))
+ 			return -EINVAL;
+ 
+-		page = virt_to_page((void *)cpu_buffer->subbuf_ids[s]);
++		subbuf = cpu_buffer->subbuf_ids[s];
++		page = virt_to_page((void *)subbuf->page);
+ 
+ 		for (; off < (1 << (subbuf_order)); off++, page++) {
+ 			if (p >= nr_pages)
+@@ -7219,7 +7221,8 @@ int ring_buffer_map(struct trace_buffer *buffer, int cpu,
+ 		    struct vm_area_struct *vma)
+ {
+ 	struct ring_buffer_per_cpu *cpu_buffer;
+-	unsigned long flags, *subbuf_ids;
++	struct buffer_page **subbuf_ids;
++	unsigned long flags;
+ 	int err;
+ 
+ 	if (!cpumask_test_cpu(cpu, buffer->cpumask))
+@@ -7243,7 +7246,7 @@ int ring_buffer_map(struct trace_buffer *buffer, int cpu,
+ 	if (err)
+ 		return err;
+ 
+-	/* subbuf_ids include the reader while nr_pages does not */
++	/* subbuf_ids includes the reader while nr_pages does not */
+ 	subbuf_ids = kcalloc(cpu_buffer->nr_pages + 1, sizeof(*subbuf_ids), GFP_KERNEL);
+ 	if (!subbuf_ids) {
+ 		rb_free_meta_page(cpu_buffer);
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
