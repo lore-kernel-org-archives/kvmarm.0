@@ -1,54 +1,54 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67D431AF1E
-	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2564731B81B
+	for <kvmarm@lists.linux.dev>; Fri,  7 Nov 2025 09:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762508350; cv=none; b=An8lNDOUfgJs4liGbKIi2F0yBPROWzRVEaKaXuCPzLjxvCLOwvnvzV+9MRG+8Etrb2xhuDo/FVu/8e98xZPnmO1Ko2kaA6P8/1mOP7kf41hyxxlKHM3NzcByn/l+8OT6rsMK8weCbk5BNTQ5+CDCA8Z+quQy3755+jGL7nrU2vY=
+	t=1762508352; cv=none; b=jYDKKDVHIhyEPXSyOj8h67Nv20jnN1w1jHgm4wEwtgYaH0qShH1ptF/Lc+qG0Qj2+mNzxHPu3SwYP+/VpFj0BG7+hKZqIreKC8Idh9HiTIcefFKy9EbRl3jIQQ1jGzEaaQ966DjLYiN4eu0KYPypAZNpID9y303/Qa7Ma8jgvmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762508350; c=relaxed/simple;
-	bh=dY7C453YZMX6SBLG8P500Szez+LU0ktEnpERcQvizoA=;
+	s=arc-20240116; t=1762508352; c=relaxed/simple;
+	bh=lGiiTh0OxHYfMPwWWByZmpNfww+xM4wQ1NhzqyQ8ka4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bwr6Ebvd9E5cNMU5xZ/+biX9zIDj0Qe1Y9WHeQhksv8w3eWaohJyXKCIU83w4pzDvXdOOmMy0hnFFYXOo9lkgzxpXz8jWEImndJzBTciCQcPMUcnyZdhHWP9ZiUHSm/5WyqN3rgphKwQGGIAaxDY36IMwDDoyEPSOF/vKWUWaCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vIDt7jOS; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=lUwvC13TlRVW8qocqUgnk/WN3D+sNlVRqVGRXr+m64yQFZB1sXtk6tPmC0ReHCcygwChQmmhyTgSzLX5WWJmFH8/aVQ3GRp1dkf6RyEUMqnGfzmmdudt08IiTSlhBPIxqe/oB2HwRZvSGZJ0ZAkvf8H+G0d6m5k0m3Mwq1Dq7Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VVUgekZq; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vIDt7jOS"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477594aad41so3048215e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:39:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VVUgekZq"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b4635c413a7so42971266b.1
+        for <kvmarm@lists.linux.dev>; Fri, 07 Nov 2025 01:39:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762508345; x=1763113145; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1762508347; x=1763113147; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ce/zCDzb2G2ckswnrXnLfB3O70YfrWa+rKSIYEMNvwM=;
-        b=vIDt7jOSK7x9YXJeNSzahB70sFJANwA9mC23oz9lr+zw2DuSZ0lclF+xNU2BnQYewx
-         kAtcGkXapiLTmlTXvJ6CJ6bVWa/LUKk6ziO9zsKCteWMsj03KlRXmaHrizYia54kOfuN
-         42hHqA3MeYZSnhKzLiuNpbueyUA48B0/Po5YFJ5e1rCfRY76TO7nzUwp2UIxKRY0PvcK
-         /6aUwuLjVTaH1Q9izS3ANcwKSKxLSQgWd3wVfjQlQQe44QWC9YufTeEiS4FTS3l9W+0S
-         frJ3i3EoEFT3nk1141sq3HiEJSeamZ9+seH3BevR66sw+5nbwySEN03xcnfe08/u/WLH
-         Rt8w==
+        bh=xlb+Kpako7K/ZFQ9pzs/izhh1i5WG8pq3BDkIYjd07Y=;
+        b=VVUgekZqFJftI9Rs5e0iM6SSC1kFuJ1eCRqIq6zRP+lDU4WlhZ4p+t0vNnPUZ/jkEK
+         0NeAQgFYDSHF3u85tUwDzxMsMQcP7Yr8AIuj948LV3ib61Fdwb4zDMgeL/nzJhGkVdis
+         bV6PDOTSmAurswNHziJrNZE4ozz9r1hS0cDp49yfvQ7W+uy95/uvFgoD2lyY+R8j8z7M
+         h5U2X4BQt0Got56F6i1p089zDul1N0RwgwQbVXtEDZ4x0i93WePbg2bafWiGB6tLHADn
+         py8t7aEEI3xSW9r2w7yi51HaMDHzf11G4ekCahZihSQogMn5lF2OmdHwz122ifW/heW9
+         8xcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762508345; x=1763113145;
+        d=1e100.net; s=20230601; t=1762508347; x=1763113147;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ce/zCDzb2G2ckswnrXnLfB3O70YfrWa+rKSIYEMNvwM=;
-        b=vB47+//IIcDvgdiP+sPh7RY4lwfpjZTOPV6vNQcWns6JssuCwCDDO0icGNm81iOAKD
-         raWIfrgqqtREjx0qpkURXznYFJ1ebABJJZ7kzAIKSJHKJh8+7zRygW4cS3zJNd8QyDAR
-         dPLPJesAvltf7rAHh9lpupikBP9Q9zbW0f1yPTnaxT/IcFMahobc8BS99p6uWLg9T7OC
-         pz3vFCMRmTVFJG5tKDbKpGg2uYXv5IJoXW9BHBii62rlzaGNWAE8xc6v4KzC/WC+FcOy
-         4nN+F7Gda+tWHcKQoB2cR83LRKc8r3w7ccunvb6TuWnWnqQ89eUUineVaoSaFgKYlicj
-         qWqw==
-X-Gm-Message-State: AOJu0Yydo2owTFn3ERgWslA+NJ7mElZ4HYVgAyOf/Sxb7I5ne4rYWlJz
-	xibLMXllO7ktEOEM8rfZFVlWTGjrheyom6Hw0WLXmWw3zhsG7C/0xegJyPetPGXTMPiIbPqUYAn
-	czhJl63Eq1EGvDE6DQTIxjw==
-X-Google-Smtp-Source: AGHT+IHH6KySUg+bVxUdc2Vx4JCZPm6fDNIkH+y4qKSJ90mdCNMhcU8xm4yct+fqYgyGXkQZSGI0QTJtlUIwPdd8
-X-Received: from wmof18.prod.google.com ([2002:a05:600c:44d2:b0:46e:2eb4:38d])
+        bh=xlb+Kpako7K/ZFQ9pzs/izhh1i5WG8pq3BDkIYjd07Y=;
+        b=aj1v8HhnnYNMKLzP0e7Tv3ZQvhQPW3RbyUOujKcseND2ud4B+wuamP8TLpIKTcSI2L
+         iRP29RenK9uwipLhOSw0bKNVlUYJx+T+qRiM2w+3tQK2QOJtajY3nHLrhmDJejFObqPc
+         +kDTchgVw2Gv3fsUEj7IAL7wqdlzRxYbIkl9IiX51SwDs2gcNnns6foYGuIPwq0gHQy+
+         eiJfYR5wIUvUMTSCaVjWb8gpdJzYcVKNmfWlStdFV4Dr9KqL5tf3zvaWqh7gv4Su9v0O
+         Qk7D/jSnXYo7p+gBlAoMM1jheJc6N3tM8n6l1VWsi+6D0EblXPZ5jrQabyt1qX+AaUz1
+         57AA==
+X-Gm-Message-State: AOJu0YzD/oqRng7HnBfCLG+yiV9r2Q2A9ZmkJ3uP+uAb4o52ByLTKxAP
+	6ELQ58v9v+ylu5YJDXLeeVFVRXROWRi0ja+S6358zBIhUijGH9ak74o/bvMuxz+wcyWpiOVaAV7
+	9vGyU1+Qlbdn59HW/5gsdaw==
+X-Google-Smtp-Source: AGHT+IEPUDfqI4f4pqaRXkiNLHF/RceZQGy7tc5T8KjH7dmMEaQgNtTWnGWGyW4qmBIMMTOEr9LUfZoX341KfPIY
+X-Received: from ejcvx5.prod.google.com ([2002:a17:907:a785:b0:b6d:529d:6eb3])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1381:b0:477:fad:acd9 with SMTP id 5b1f17b1804b1-4776bcc5191mr24288135e9.34.1762508344724;
- Fri, 07 Nov 2025 01:39:04 -0800 (PST)
-Date: Fri,  7 Nov 2025 09:38:29 +0000
+ 2002:a17:907:3d89:b0:b04:67f3:890f with SMTP id a640c23a62f3a-b72c0cec57cmr250144766b.33.1762508347314;
+ Fri, 07 Nov 2025 01:39:07 -0800 (PST)
+Date: Fri,  7 Nov 2025 09:38:32 +0000
 In-Reply-To: <20251107093840.3779150-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251107093840.3779150-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251107093840.3779150-18-vdonnefort@google.com>
-Subject: [PATCH v8 17/28] tracing: load/unload page callbacks for simple_ring_buffer
+Message-ID: <20251107093840.3779150-21-vdonnefort@google.com>
+Subject: [PATCH v8 20/28] KVM: arm64: Add clock support for the pKVM hyp
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -70,165 +70,140 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add load/unload callback used for each admitted page in the ring-buffer.
-This will be later useful for the pKVM hypervisor which uses a different
-VA space and need to dynamically map/unmap the ring-buffer pages.
+By default, the arm64 host kernel is using the arch timer as a source
+for sched_clock. Conveniently, EL2 has access to that same counter,
+allowing to generate clock values that are synchronized.
+
+The clock needs nonetheless to be setup with the same slope values as
+the kernel. Introducing at the same time trace_clock() which is expected
+to be later configured by the hypervisor tracing.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/include/linux/simple_ring_buffer.h b/include/linux/simple_ring_buffer.h
-index f324df2f875b..ecd0e988c699 100644
---- a/include/linux/simple_ring_buffer.h
-+++ b/include/linux/simple_ring_buffer.h
-@@ -110,4 +110,11 @@ int simple_ring_buffer_reset(struct simple_rb_per_cpu *cpu_buffer);
-  */
- int simple_ring_buffer_swap_reader_page(struct simple_rb_per_cpu *cpu_buffer);
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index e6be1f5d0967..d46621d936e3 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -146,5 +146,4 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+ extern unsigned long kvm_nvhe_sym(__icache_flags);
+ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+ extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+-
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/clock.h b/arch/arm64/kvm/hyp/include/nvhe/clock.h
+new file mode 100644
+index 000000000000..9e152521f345
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/include/nvhe/clock.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __ARM64_KVM_HYP_NVHE_CLOCK_H
++#define __ARM64_KVM_HYP_NVHE_CLOCK_H
++#include <linux/types.h>
++
++#include <asm/kvm_hyp.h>
++
++#ifdef CONFIG_PKVM_TRACING
++void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
++u64 trace_clock(void);
++#else
++static inline void
++trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
++static inline u64 trace_clock(void) { return 0; }
++#endif
++#endif
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index a244ec25f8c5..f55a9a17d38f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
+ hostprogs := gen-hyprel
+ HOST_EXTRACFLAGS += -I$(objtree)/include
  
-+int __simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer,
-+			      struct simple_buffer_page *bpages,
-+			      const struct ring_buffer_desc *desc,
-+			      void *(*load_page)(unsigned long va),
-+			      void (*unload_page)(void *va));
-+void __simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer,
-+				 void (*unload_page)(void *));
- #endif
-diff --git a/kernel/trace/simple_ring_buffer.c b/kernel/trace/simple_ring_buffer.c
-index 1d1f40c8c6d8..f01386975266 100644
---- a/kernel/trace/simple_ring_buffer.c
-+++ b/kernel/trace/simple_ring_buffer.c
-@@ -71,7 +71,7 @@ static void simple_bpage_reset(struct simple_buffer_page *bpage)
- 	local_set(&bpage->page->commit, 0);
- }
+-lib-objs := clear_page.o copy_page.o memcpy.o memset.o
++lib-objs := clear_page.o copy_page.o memcpy.o memset.o tishift.o
+ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
  
--static void simple_bpage_init(struct simple_buffer_page *bpage, unsigned long page)
-+static void simple_bpage_init(struct simple_buffer_page *bpage, void *page)
- {
- 	INIT_LIST_HEAD(&bpage->link);
- 	bpage->page = (struct buffer_data_page *)page;
-@@ -342,10 +342,15 @@ int simple_ring_buffer_reset(struct simple_rb_per_cpu *cpu_buffer)
- }
- EXPORT_SYMBOL_GPL(simple_ring_buffer_reset);
+ CFLAGS_switch.nvhe.o += -Wno-override-init
+@@ -29,6 +29,7 @@ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+ 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+ hyp-obj-y += ../../../kernel/smccc-call.o
+ hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
++hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o
+ hyp-obj-y += $(lib-objs)
  
--int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_buffer_page *bpages,
--			    const struct ring_buffer_desc *desc)
-+int __simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer,
-+			      struct simple_buffer_page *bpages,
-+			      const struct ring_buffer_desc *desc,
-+			      void *(*load_page)(unsigned long va),
-+			      void (*unload_page)(void *va))
- {
- 	struct simple_buffer_page *bpage = bpages;
-+	int ret = 0;
-+	void *page;
- 	int i;
- 
- 	/* At least 1 reader page and two pages in the ring-buffer */
-@@ -354,15 +359,22 @@ int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_
- 
- 	memset(cpu_buffer, 0, sizeof(*cpu_buffer));
- 
--	cpu_buffer->bpages = bpages;
-+	cpu_buffer->meta = load_page(desc->meta_va);
-+	if (!cpu_buffer->meta)
-+		return -EINVAL;
- 
--	cpu_buffer->meta = (void *)desc->meta_va;
- 	memset(cpu_buffer->meta, 0, sizeof(*cpu_buffer->meta));
- 	cpu_buffer->meta->meta_page_size = PAGE_SIZE;
- 	cpu_buffer->meta->nr_subbufs = cpu_buffer->nr_pages;
- 
- 	/* The reader page is not part of the ring initially */
--	simple_bpage_init(bpage, desc->page_va[0]);
-+	page = load_page(desc->page_va[0]);
-+	if (!page) {
-+		unload_page(cpu_buffer->meta);
-+		return -EINVAL;
+ ##
+diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+new file mode 100644
+index 000000000000..600a300bece7
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+@@ -0,0 +1,65 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2025 Google LLC
++ * Author: Vincent Donnefort <vdonnefort@google.com>
++ */
++
++#include <nvhe/clock.h>
++
++#include <asm/arch_timer.h>
++#include <asm/div64.h>
++
++static struct clock_data {
++	struct {
++		u32 mult;
++		u32 shift;
++		u64 epoch_ns;
++		u64 epoch_cyc;
++		u64 cyc_overflow64;
++	} data[2];
++	u64 cur;
++} trace_clock_data;
++
++static u64 __clock_mult_uint128(u64 cyc, u32 mult, u32 shift)
++{
++	__uint128_t ns = (__uint128_t)cyc * mult;
++
++	ns >>= shift;
++
++	return (u64)ns;
++}
++
++/* Does not guarantee no reader on the modified bank. */
++void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
++{
++	struct clock_data *clock = &trace_clock_data;
++	u64 bank = clock->cur ^ 1;
++
++	clock->data[bank].mult			= mult;
++	clock->data[bank].shift			= shift;
++	clock->data[bank].epoch_ns		= epoch_ns;
++	clock->data[bank].epoch_cyc		= epoch_cyc;
++	clock->data[bank].cyc_overflow64	= ULONG_MAX / mult;
++
++	smp_store_release(&clock->cur, bank);
++}
++
++/* Using host provided data. Do not use for anything else than debugging. */
++u64 trace_clock(void)
++{
++	struct clock_data *clock = &trace_clock_data;
++	u64 bank = smp_load_acquire(&clock->cur);
++	u64 cyc, ns;
++
++	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
++
++	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
++		ns = cyc * clock->data[bank].mult;
++		ns >>= clock->data[bank].shift;
++	} else {
++		ns = __clock_mult_uint128(cyc, clock->data[bank].mult,
++					  clock->data[bank].shift);
 +	}
 +
-+	simple_bpage_init(bpage, page);
- 	bpage->id = 0;
- 
- 	cpu_buffer->nr_pages = 1;
-@@ -372,7 +384,13 @@ int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_
- 	cpu_buffer->head_page = bpage + 1;
- 
- 	for (i = 1; i < desc->nr_page_va; i++) {
--		simple_bpage_init(++bpage, desc->page_va[i]);
-+		page = load_page(desc->page_va[i]);
-+		if (!page) {
-+			ret = -EINVAL;
-+			break;
-+		}
-+
-+		simple_bpage_init(++bpage, page);
- 
- 		bpage->link.next = &(bpage + 1)->link;
- 		bpage->link.prev = &(bpage - 1)->link;
-@@ -381,6 +399,14 @@ int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_
- 		cpu_buffer->nr_pages = i + 1;
- 	}
- 
-+	if (ret) {
-+		for (i--; i >= 0; i--)
-+			unload_page((void *)desc->page_va[i]);
-+		unload_page(cpu_buffer->meta);
-+
-+		return ret;
-+	}
-+
- 	/* Close the ring */
- 	bpage->link.next = &cpu_buffer->tail_page->link;
- 	cpu_buffer->tail_page->link.prev = &bpage->link;
-@@ -388,21 +414,48 @@ int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_
- 	/* The last init'ed page points to the head page */
- 	simple_bpage_set_head_link(bpage);
- 
-+	cpu_buffer->bpages = bpages;
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(simple_ring_buffer_init);
- 
--void simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer)
-+static void *__load_page(unsigned long page)
- {
-+	return (void *)page;
++	return (u64)ns + clock->data[bank].epoch_ns;
 +}
-+
-+static void __unload_page(void *page) { }
-+
-+int simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer, struct simple_buffer_page *bpages,
-+			    const struct ring_buffer_desc *desc)
-+{
-+	return __simple_ring_buffer_init(cpu_buffer, bpages, desc, __load_page, __unload_page);
-+}
-+
-+void __simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer,
-+				 void (*unload_page)(void *))
-+{
-+	int p;
-+
- 	if (!simple_rb_loaded(cpu_buffer))
- 		return;
- 
- 	simple_rb_enable_tracing(cpu_buffer, false);
- 
-+	unload_page(cpu_buffer->meta);
-+	for (p = 0; p < cpu_buffer->nr_pages; p++)
-+		unload_page(cpu_buffer->bpages[p].page);
-+
- 	cpu_buffer->bpages = NULL;
- }
- EXPORT_SYMBOL_GPL(simple_ring_buffer_unload);
- 
-+void simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer)
-+{
-+	return __simple_ring_buffer_unload(cpu_buffer, __unload_page);
-+}
-+
- int simple_ring_buffer_enable_tracing(struct simple_rb_per_cpu *cpu_buffer, bool enable)
- {
- 	if (!simple_rb_loaded(cpu_buffer))
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
