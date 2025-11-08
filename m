@@ -1,53 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF5F134AB;
-	Sat,  8 Nov 2025 11:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC86134AB
+	for <kvmarm@lists.linux.dev>; Sat,  8 Nov 2025 11:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762603137; cv=none; b=jbfoupBn+P33JBioIzhZBUK0mmm9mxDnc4dFqp3eTA/7TxFILD6xKdje83ADNXnWG3EI+RirYz3a7olcNrHr/4rwAUNbg3ZI7Y/UEXHwyPYeSw0wiLFWgt+lEs+MMx8PJ5abIXuwnMNFfYbAdx6IbkiO/vdRBR7BUEDW13saXlU=
+	t=1762603144; cv=none; b=C0GNqL90lroHUuL1Lg2r7v8yvphsKu7VsKGnHZ0+KNpP/C6XLHpud7JAZGFhJduxk5RwyU0BxeCLjliAl/MRmFFyxmfuXPB9fpCyV7+Q1W7Vq3PiWKlvgMt3rlM6CnyZEcYWRjWfX8HUL8TmFj29kzH0JFBBgEj07HPxFdlcN28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762603137; c=relaxed/simple;
-	bh=71r+OcXQB1X7Xbdn1EcsiniewMLKe/3Ylt4UqFQfgeo=;
+	s=arc-20240116; t=1762603144; c=relaxed/simple;
+	bh=qEtlxgV/JD8Coq7HBGJK1HzPkeq6prIPvSIFTb3O24g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gZ5N4oH7nEgebeEiJzTxhk4gDt0iv6Gu0Hma1pHkIGw1ODdBc2eCs1CQgjgpSrbdO4aYo1vxOYcDS8rm7G3bDuLvy+Xr1r3grqocx7QjQFDBOLVpdvQzDF+j17tPlRDZTaXQVuHGr8vP4VNGBWAJ62nKt9Oma1WukDVXe/h0UXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfKQI63V; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BOYgLmktTtC6ms6lcAmeRxmGofTlahMP4lIH293K2QQLPPcBz/SbplSdaN8ZIT28fNTQs9mMlEx6RIIoJvEL0s4VKkDvbpDds0n6YW7RZliDONuLu60Ao3+s+bBzQHLuc8LGLU04v2vZUF3l9yre0J2Ig0jHwh9X/SZhDNy4vBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lplG2b0H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfKQI63V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 821EEC116C6;
-	Sat,  8 Nov 2025 11:58:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lplG2b0H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30BD4C19421;
+	Sat,  8 Nov 2025 11:59:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762603137;
-	bh=71r+OcXQB1X7Xbdn1EcsiniewMLKe/3Ylt4UqFQfgeo=;
+	s=k20201202; t=1762603144;
+	bh=qEtlxgV/JD8Coq7HBGJK1HzPkeq6prIPvSIFTb3O24g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MfKQI63Vbjwp935xilRzB7++lSedhoFohgzR9zEsNcklEA+133G3o1yz+5cQBQSz4
-	 qOjcCgCMZWbtkP3MeT3Im8efloiXfyW9hR4mknFZmtGCUNmhtVXDFZzQW3EJ79+d1V
-	 bpTm0dfzJbc/v+NS/gVSxP2wHanU/SzneKSBSki6QJEdO/P1AFRBAHGPR1IgbKxesz
-	 qIScoFBBbgybCkwSxmkuKD+BMAj7NMzGcclNsHR9mG350P4ZS4NNaXy7udK4Bj685T
-	 txsytUteQy8HlC3jwTeWjgrLxrMKMYGnjYN/fGxuo/IeqNqy4PfNM8IkzLaA9Qq/Q7
-	 wl1kk+qsB6dhw==
+	b=lplG2b0HaDMKDbumaUNTvnwFUTv3TDI9r/iaIzgmO+epweTuS3xdWNt/Zte0Y8gPs
+	 j8xUn59R9yEhRZjPejheSlg4PjYh+EGfLi6pP07BfYqykpriK94ElT4iF43KQBA2NN
+	 nBYTLSdupZjKQCpfU4ePLnqfTdHTI+lOntegAuYVruJyqaDof9elR+sCET4xdlnM0a
+	 Zw7ZujXHYbRGCNeAp1p/5V5xUtcjFV/sl0aRwglxVvOcO7uUyns0J0eyV1YM/bQRK4
+	 dEvSNv2Hj3AOY44qRaNVnASfETA16J6yhBqCu+r6siuI81g50Nc+4+GnoGtGs3Fe8S
+	 c3obwdMQTxvfg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vHhap-00000003Ten-0jtr;
-	Sat, 08 Nov 2025 11:58:55 +0000
+	id 1vHhaw-00000003Tet-1PsZ;
+	Sat, 08 Nov 2025 11:59:02 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
+	Oliver Upton <oupton@kernel.org>
 Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fix handling of ID_PFR1_EL1.GIC
-Date: Sat,  8 Nov 2025 11:58:47 +0000
-Message-ID: <176260312692.1201099.17567101607721197970.b4-ty@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: vgic-v3: Even more locking fun
+Date: Sat,  8 Nov 2025 11:58:57 +0000
+Message-ID: <176260313760.1201150.12533834837218904173.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251030122707.2033690-1-maz@kernel.org>
-References: <20251030122707.2033690-1-maz@kernel.org>
+In-Reply-To: <20251107184847.1784820-1-oupton@kernel.org>
+References: <20251107184847.1784820-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -57,29 +53,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, oupton@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 30 Oct 2025 12:27:04 +0000, Marc Zyngier wrote:
-> Peter reported[0] that restoring a GICv2 VM fails badly, and correctly
-> points out that ID_PFR1_EL1.GIC isn't writable, while its 64bit
-> equivalent is. I broke that in 6.12.
+On Fri, 07 Nov 2025 10:48:45 -0800, Oliver Upton wrote:
+> v1 => v2:
+>  - Make iter_(un)mark_lpis() use of the LPI xarray also disable IRQs
+>    (Zenghui)
+>  - Fix failure path to drop xa_lock before calling xa_release() in
+>    vgic_add_lpi() (Zenghui)
 > 
-> The other thing is that fixing the ID regs at runtime isn't great.
-> specially when we could adjust them at the point where the GIC gets
-> created.
+> Oliver Upton (2):
+>   KVM: arm64: vgic-v3: Reinstate IRQ lock ordering for LPI xarray
+>   KVM: arm64: vgic-v3: Release reserved slot outside of lpi_xa's lock
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/3] KVM: arm64: Make all 32bit ID registers fully writable
-      commit: 3f9eacf4f0705876a5d6526d7d320ca91d7d7a16
-[2/3] KVM: arm64: Set ID_{AA64PFR0,PFR1}_EL1.GIC when GICv3 is configured
-      commit: 8a9866ff860052efc5f9766f3f87fae30c983156
-[3/3] KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-      commit: 50e7cce81b9b2fbd6f0104c1698959d45ce3cf58
+[1/2] KVM: arm64: vgic-v3: Reinstate IRQ lock ordering for LPI xarray
+      commit: 75360a9a338580990c1ee188d40a838c025bbd30
+[2/2] KVM: arm64: vgic-v3: Release reserved slot outside of lpi_xa's lock
+      commit: 66768669f27d98b45b20ed401cca913c387a9934
 
 Cheers,
 
