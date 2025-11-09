@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8D230BB97;
-	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4990730BF52;
+	Sun,  9 Nov 2025 17:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708596; cv=none; b=M7mLwg9Y5lEQZ1Oxl4C4NmV30enhvlgoQtdlpC4Zskf99Ke34PdpBhpWslgS0RAAT54C0Fzf0nZ4Zb2U/NdRs4FQM6AjPxRlJSf3Gd7f2kU/CB3/WC1KVXXZ6OUjjeuDINXPTUu5Y8GIZZXFFilZhRGpQ2ainAyuIql96ABK030=
+	t=1762708596; cv=none; b=IdzQWZb8PFmVnSrblZZtGxx3IUK9tdIedUg4Wx69o2jv7qrRpinehR+XyNbkKL5sljtvP1uxIah+jwLbLjugLu0qF9xIFzVI3LO9Ns+NNQlXP0bRcfjS+ofXC3zRonhHXhCBqkE1ltqZB0QyjiLT1CnYN3AEx0eOmlxCkhoWQVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708596; c=relaxed/simple;
-	bh=MbdtwSik8XmKu9gMYviJLErwRbd5OqFthOk0PFdkfWs=;
+	bh=CYzmDh+aILcVXNDBixgJ9TUitMasGg2mcGGqo+VCx+w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MjG/V9u0nWILRORdeg0uk1/OQ3Ds61xvSNTJ4qTLLBrCvSg+uTBlFSeWkQ9LtHV9QPzMKV3H9tmXQwTsW4w/4kNvHXQMW02/HX41gp6XQkhIXQc8Y2dDMhbU/Aurtv22njyFkiJQhTFRd3qsk0htPIu2oGjxZhT9oH8/LqJ07Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXzU+rng; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=oWBaZzCLiIqzOHmfVH8rniG1NOwQF4IE4i8RySTDaV3CKH3Pz0veHtwoCWm5hCcmVUJ02pkvjfVS5e1vMBuWcigt5xZUmvhcgtmlhHga2vKuODQvjfF+G5bYLsB3chXklGd3n5meVwx4XGqPKIm1c2lJOMzi4Eogt9bbn50sPwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PjU+4+rZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXzU+rng"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69441C19423;
-	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PjU+4+rZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A901C116B1;
+	Sun,  9 Nov 2025 17:16:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762708595;
-	bh=MbdtwSik8XmKu9gMYviJLErwRbd5OqFthOk0PFdkfWs=;
+	s=k20201202; t=1762708596;
+	bh=CYzmDh+aILcVXNDBixgJ9TUitMasGg2mcGGqo+VCx+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BXzU+rngqH92GeXd8SLrjUv9/o0wYB7wZLuijkUG9cjMWSvBr83HMxpK384hfAXOm
-	 2A67HZoZNodlDTMoS/7Mca9nDxWEk7mLGRx0SEBrY0xdHAWq7CyQ9Ccre3WlczKeRW
-	 UEu6vyRxbVW2450yvrUyZH4AtMe4vjymHTMYAKRouBARwD0jA0MhYAeMTua3NFdvcE
-	 xuD78xiHXzTPNFYAY6Wn7M+ZbOGZqUPJv8L8q3wUdcYXACItyVJaUrcAN5l4PJkBDK
-	 NSPaC1wNNWnhRHb518JOrtXXq8Jm0FXpEuLRnbdBQu/1S+tEwgH5RCJGxvrioMmVS6
-	 3q/MEQxXyoeEA==
+	b=PjU+4+rZj6Tep2SKHZL1gVMNKyqmb5KTVV02at3ZuKPVQCSUhQZPyMa+9mQjR4wKr
+	 JpDiv/cmaQLhktlFwWM97yGHLIiI9V++dBQWrFeeB0UQrCAqChp+V/oHjjA/mAzCWm
+	 q0tHXEj8OQ52GWIhdrmoeP9uavp5WxYFF0dpbrp/eRsMCwWi85v8IvbxsASQWk+bM3
+	 z3LDCqyAiNfUr3OBMCChsy9ldd03UopASCTtOaEkRysAe9j7GTQ+Rj9EXxqk7PFJqn
+	 xfjb4HUyLBI12K2u/8/XQ4wxbKo5HRmUNB2Ta5B01sWqbFFGHmiB6QdPwlTD9NI3Pd
+	 gPATqS+KgdpbA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91l-00000003exw-2EFw;
-	Sun, 09 Nov 2025 17:16:33 +0000
+	id 1vI91m-00000003exw-0mUb;
+	Sun, 09 Nov 2025 17:16:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 22/45] KVM: arm64: Make vgic_target_oracle() globally available
-Date: Sun,  9 Nov 2025 17:15:56 +0000
-Message-ID: <20251109171619.1507205-23-maz@kernel.org>
+Subject: [PATCH v2 25/45] KVM: arm64: Use MI to detect groups being enabled/disabled
+Date: Sun,  9 Nov 2025 17:15:59 +0000
+Message-ID: <20251109171619.1507205-26-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -61,40 +61,48 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Make the internal crystal ball global, so that implementation-specific
-code can use it.
+Add the maintenance interrupt to force an exit when the guest
+enables/disables individual groups, so that we can resort the
+ap_list accordingly.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic.c | 2 +-
- arch/arm64/kvm/vgic/vgic.h | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-v2.c | 5 +++++
+ arch/arm64/kvm/vgic/vgic-v3.c | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index c420f8262e4c1..570cc8fe42b87 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -237,7 +237,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
-  *
-  * Requires the IRQ lock to be held.
-  */
--static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
-+struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
- {
- 	lockdep_assert_held(&irq->irq_lock);
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 18856186be7be..9a2de03f74c30 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -39,6 +39,11 @@ void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu,
+ 		cpuif->vgic_hcr |= GICH_HCR_LRENPIE;
+ 	if (irqs_outside_lrs(als))
+ 		cpuif->vgic_hcr |= GICH_HCR_UIE;
++
++	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & GICH_VMCR_ENABLE_GRP0_MASK) ?
++		GICH_HCR_VGrp0DIE : GICH_HCR_VGrp0EIE;
++	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & GICH_VMCR_ENABLE_GRP1_MASK) ?
++		GICH_HCR_VGrp1DIE : GICH_HCR_VGrp1EIE;
+ }
  
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index e48294521541e..037efb6200823 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -261,6 +261,7 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid);
- struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid);
- void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
-+struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq);
- bool vgic_get_phys_line_level(struct vgic_irq *irq);
- void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
- void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
+ static bool lr_signals_eoi_mi(u32 lr_val)
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 5a57f3c299b56..b5cf68bc1ea9f 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -36,6 +36,11 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
+ 
+ 	if (!als->nr_sgi)
+ 		cpuif->vgic_hcr |= ICH_HCR_EL2_vSGIEOICount;
++
++	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG0_MASK) ?
++		ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
++	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
++		ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
+ }
+ 
+ static bool lr_signals_eoi_mi(u64 lr_val)
 -- 
 2.47.3
 
