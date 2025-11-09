@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A3730FC0F;
-	Sun,  9 Nov 2025 17:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3DE30FF03;
+	Sun,  9 Nov 2025 17:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708599; cv=none; b=IPlBMfGyiphGlbExFypdvNhMa/mucZccRJPMZSCmi8sslxfzMRIZy+0slvXzfFaczLuh+fcxb0Jk5xSFcqbh7kyF9dwl3eCIpstoep8VGepMy9CkGzMBtzUMM/qauniCB1z/v7ga2qre09PC/TAi2T0+QGPcgY7tmXcChQuoMEY=
+	t=1762708599; cv=none; b=o7AJw8bL+GVCoGSIaVTCmTjNmmKwJubhKqBKeqym4uy99alpWBKhGyXfoaoAOdb3955YsGDxrG2YvcRXCzSjV69x+qI4RxT2rNUZdb1U45gGdqLHzfuLI6sPHwvPOJMstcXBzTD1WidqlZ8/dL+fOpy1VEXiT2gDZkR2DRsK5u0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708599; c=relaxed/simple;
-	bh=uWaIZt7QL7AACVK5FkurBms+yakL81yrNHL11N09IJ0=;
+	bh=Y2YjeqWLlbOpUJdMaswzmZChqewck/ZmHDILc7SWEwA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ATYxEZGgz3BQO6fa4YaFZATaMv+oVDEFjXXtT4CGEGIUYvVR6xBwn1QjHsD/BB4QkUIbrnspT4a+oqPCFD+EBYonmCk9oEUJ0Bn4lpx+eNwhklJeH04kgYFgbMaYYG47S3bM2sjilRm334FaZy81Jj3SHbeeA/+vKhmQuWii72w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MhL+Hu91; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=qm/AD9LZirsayEb4sgM5EW6MGhX86Zaq8qL3HN5emipV6VOyoyvgrBYPtelqplXkpMK0mEZfrujsVtBduIRvqFoDTK/FxCaZvYgkkUa/Yg5684HlGgsytwV88B2DJSFPgtdnLIm87k8+Fps4p3nwQzTl+UwoUb0hYAVW5RHu5to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=on/FfC/5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MhL+Hu91"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76E96C4CEF8;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="on/FfC/5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFD62C4CEFB;
 	Sun,  9 Nov 2025 17:16:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762708598;
-	bh=uWaIZt7QL7AACVK5FkurBms+yakL81yrNHL11N09IJ0=;
+	s=k20201202; t=1762708599;
+	bh=Y2YjeqWLlbOpUJdMaswzmZChqewck/ZmHDILc7SWEwA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MhL+Hu91qCoYiuqLDWpGrQXRUUSpufSblByDc/MI3yA42qwh97H74j6lkVGghmMef
-	 OyImshEx4aaWOKVDSq+7w5oboo5CUjCdmJ++ik1QKofYBZPFHllIV89Ga8x2040rll
-	 RP4v68BSamaleQDOB55tIGC531lhY6Us0hUWYayBvxR1KInwbKs52KvWpz1xxUIpcl
-	 0p+IfFAd3BHKdGvSnzsYaYQvTMZFJhyqb2fHksWvtfaF/5f7AtDGHpNBVirEi0Ym3m
-	 hzGLJW00R1PTs08bDNJBXRASUjx01LnKAhJFshhNGiZV08KbrPQcr0nkaol6PF4/+L
-	 hPhZpfDEyvqRw==
+	b=on/FfC/5iuinafoBjgBCmiGRg73s4UnnwGG6EG8FaovQnlhs0lLL4OgXHjvMVCqwS
+	 sPidGoIXvhz4NHpcCWULw6uPBezDdhOv/lmYvCVAyRwNgeKrDVdF7rsNnB8WWrT78w
+	 ehpdn/iEn7bQ6I1Wp1LkzJ9NtintNXixkAZ86YtJIAczpUHzeTQYIneeJ5M6LWNPr9
+	 MqxVf9eVCJe1tzhBPLVcQR5JKfeLwI7maIdC0m5wYcID2QKG7JrelE6crlmOki4rFO
+	 f8b8qQx4xYq/pPnJUSm7YUgwG/FMIycZaiJnxQLbNCrh/gVB1iR4x9BlqJ40vkkWqf
+	 Nd9Tj/sYbsNTA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91o-00000003exw-2iQC;
-	Sun, 09 Nov 2025 17:16:36 +0000
+	id 1vI91p-00000003exw-0O4D;
+	Sun, 09 Nov 2025 17:16:37 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 35/45] KVM: arm64: GICv2: Always trap GICV_DIR register
-Date: Sun,  9 Nov 2025 17:16:09 +0000
-Message-ID: <20251109171619.1507205-36-maz@kernel.org>
+Subject: [PATCH v2 37/45] KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
+Date: Sun,  9 Nov 2025 17:16:11 +0000
+Message-ID: <20251109171619.1507205-38-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -61,45 +61,26 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Since we can't decide to trap the DIR register on a per-vcpu basis,
-always trap the second page of the GIC CPU interface. Yes, this is
-costly. On the bright side, no sane SW should use EOImode==1 on
-GICv2...
+Make sure G0 is disabled at the point of initialising the GIC.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 4 ++++
- arch/arm64/kvm/vgic/vgic-v2.c            | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kvm/lib/arm64/gic_v3.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-index 78579b31a4205..5fd99763b54de 100644
---- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-+++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-@@ -63,6 +63,10 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
- 		return -1;
- 	}
+diff --git a/tools/testing/selftests/kvm/lib/arm64/gic_v3.c b/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
+index 3e4e1a6a4f7c3..5b0fd95c6b48a 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
++++ b/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
+@@ -342,6 +342,8 @@ static void gicv3_cpu_init(unsigned int cpu)
+ 	/* Set a default priority threshold */
+ 	write_sysreg_s(ICC_PMR_DEF_PRIO, SYS_ICC_PMR_EL1);
  
-+	/* Handle deactivation as a normal exit */
-+	if ((fault_ipa - vgic->vgic_cpu_base) >= GIC_CPU_DEACTIVATE)
-+		return 0;
-+
- 	rd = kvm_vcpu_dabt_get_rd(vcpu);
- 	addr  = kvm_vgic_global_state.vcpu_hyp_va;
- 	addr += fault_ipa - vgic->vgic_cpu_base;
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index bc52d44a573d5..585491fbda807 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -457,7 +457,7 @@ int vgic_v2_map_resources(struct kvm *kvm)
- 	if (!static_branch_unlikely(&vgic_v2_cpuif_trap)) {
- 		ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
- 					    kvm_vgic_global_state.vcpu_base,
--					    KVM_VGIC_V2_CPU_SIZE, true);
-+					    KVM_VGIC_V2_CPU_SIZE - SZ_4K, true);
- 		if (ret) {
- 			kvm_err("Unable to remap VGIC CPU to VCPU\n");
- 			return ret;
++	/* Disable Group-0 interrupts */
++	write_sysreg_s(ICC_IGRPEN0_EL1_MASK, SYS_ICC_IGRPEN1_EL1);
+ 	/* Enable non-secure Group-1 interrupts */
+ 	write_sysreg_s(ICC_IGRPEN1_EL1_MASK, SYS_ICC_IGRPEN1_EL1);
+ }
 -- 
 2.47.3
 
