@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170A130BB96;
-	Sun,  9 Nov 2025 17:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8D230BB97;
+	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708596; cv=none; b=hbdXS8ayIZp4psQ/SP+20ii2nJCOoMuQiMIe5QIrdIv2wK2ETwS4IJPSng8/NANJx4GE8bpdCe0B4A84dDDA1pyURdDCGKAo0ScGMHS0iTu0sCG6zARHyiJe+HWqCkGi9Pe9NsakRiSW0hjXaGQZ94Py6114tFdoSBS6OoxXZxU=
+	t=1762708596; cv=none; b=M7mLwg9Y5lEQZ1Oxl4C4NmV30enhvlgoQtdlpC4Zskf99Ke34PdpBhpWslgS0RAAT54C0Fzf0nZ4Zb2U/NdRs4FQM6AjPxRlJSf3Gd7f2kU/CB3/WC1KVXXZ6OUjjeuDINXPTUu5Y8GIZZXFFilZhRGpQ2ainAyuIql96ABK030=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708596; c=relaxed/simple;
-	bh=PnttpW5k/sZbVwWIADxCl8IZlSHBNDSq8thM0EUpP/0=;
+	bh=MbdtwSik8XmKu9gMYviJLErwRbd5OqFthOk0PFdkfWs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gf0AaKXGpI9zO6K1sbZRslZFmFMGYNyx+DLpIz5IpAERvZLS4KySCdRzp+zKfvhr8QHI2lPMOhNuhhO4QOPa8x50mVk3OBRAivpOFc1NTaCRG7Te00eka8A5Lg2rJpRHDtgMIkUgNguNVP1HsWMHtj8fw1qb/A5GBEZ04opm6Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YQQlKAs9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MjG/V9u0nWILRORdeg0uk1/OQ3Ds61xvSNTJ4qTLLBrCvSg+uTBlFSeWkQ9LtHV9QPzMKV3H9tmXQwTsW4w/4kNvHXQMW02/HX41gp6XQkhIXQc8Y2dDMhbU/Aurtv22njyFkiJQhTFRd3qsk0htPIu2oGjxZhT9oH8/LqJ07Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BXzU+rng; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YQQlKAs9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA7EDC19422;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BXzU+rng"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69441C19423;
 	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762708595;
-	bh=PnttpW5k/sZbVwWIADxCl8IZlSHBNDSq8thM0EUpP/0=;
+	bh=MbdtwSik8XmKu9gMYviJLErwRbd5OqFthOk0PFdkfWs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YQQlKAs9Thcvam3IYJRrrrgfYk1OoTeYqF8h0llmXHruLkLDpSEfouh0UF7AZavVB
-	 Jg7h9gy/LguljwVGupjHC+yVT4t0dIsuMWnf1sEf2+gIETb3rg5k73NKgFTDGmrTao
-	 48cEIy5p4xRjQrkBWdwqAp9FUmEJkGFPlrS7EGFa4EjjlZJ/y1sdupfYzGk2MDGCGX
-	 kiqvBbN4EcncmfceVgSH3oJn7soMEiHEuYW5MnhPzwwB0Yin1Uw80RH46H3K7I+UZD
-	 ktevk+BOT7EDSHG7KumGoJ5suZK5wwrHuiBrA7GpxODrjVouiIkM4ihyX4zD1F0x9z
-	 wixqI0ufnklMw==
+	b=BXzU+rngqH92GeXd8SLrjUv9/o0wYB7wZLuijkUG9cjMWSvBr83HMxpK384hfAXOm
+	 2A67HZoZNodlDTMoS/7Mca9nDxWEk7mLGRx0SEBrY0xdHAWq7CyQ9Ccre3WlczKeRW
+	 UEu6vyRxbVW2450yvrUyZH4AtMe4vjymHTMYAKRouBARwD0jA0MhYAeMTua3NFdvcE
+	 xuD78xiHXzTPNFYAY6Wn7M+ZbOGZqUPJv8L8q3wUdcYXACItyVJaUrcAN5l4PJkBDK
+	 NSPaC1wNNWnhRHb518JOrtXXq8Jm0FXpEuLRnbdBQu/1S+tEwgH5RCJGxvrioMmVS6
+	 3q/MEQxXyoeEA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91l-00000003exw-437N;
-	Sun, 09 Nov 2025 17:16:34 +0000
+	id 1vI91l-00000003exw-2EFw;
+	Sun, 09 Nov 2025 17:16:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 24/45] KVM: arm64: Move undeliverable interrupts to the end of ap_list
-Date: Sun,  9 Nov 2025 17:15:58 +0000
-Message-ID: <20251109171619.1507205-25-maz@kernel.org>
+Subject: [PATCH v2 22/45] KVM: arm64: Make vgic_target_oracle() globally available
+Date: Sun,  9 Nov 2025 17:15:56 +0000
+Message-ID: <20251109171619.1507205-23-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -61,80 +61,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Interrupts in the ap_list that cannot be acted upon because they
-are not enabled, or that their group is not enabled, shouldn't
-make it into the LRs if we are space-constrained.
+Make the internal crystal ball global, so that implementation-specific
+code can use it.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic.c | 2 +-
+ arch/arm64/kvm/vgic/vgic.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 56c61e17e1e88..5c9204d18b27d 100644
+index c420f8262e4c1..570cc8fe42b87 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -265,6 +265,11 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
- 	return NULL;
- }
- 
-+struct vgic_sort_info {
-+	struct kvm_vcpu *vcpu;
-+	struct vgic_vmcr vmcr;
-+};
-+
- /*
-  * The order of items in the ap_lists defines how we'll pack things in LRs as
-  * well, the first items in the list being the first things populated in the
-@@ -273,6 +278,7 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
-  * Pending, non-active interrupts must be placed at the head of the list.
-  * Otherwise things should be sorted by the priority field and the GIC
-  * hardware support will take care of preemption of priority groups etc.
-+ * Interrupts that are not deliverable should be at the end of the list.
+@@ -237,7 +237,7 @@ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active)
   *
-  * Return negative if "a" sorts before "b", 0 to preserve order, and positive
-  * to sort "b" before "a".
-@@ -282,6 +288,8 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
+  * Requires the IRQ lock to be held.
+  */
+-static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
++struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
  {
- 	struct vgic_irq *irqa = container_of(a, struct vgic_irq, ap_list);
- 	struct vgic_irq *irqb = container_of(b, struct vgic_irq, ap_list);
-+	struct vgic_sort_info *info = priv;
-+	struct kvm_vcpu *vcpu = info->vcpu;
- 	bool penda, pendb;
- 	int ret;
+ 	lockdep_assert_held(&irq->irq_lock);
  
-@@ -295,6 +303,17 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
- 	raw_spin_lock(&irqa->irq_lock);
- 	raw_spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
- 
-+	/* Undeliverable interrupts should be last */
-+	ret = (int)(vgic_target_oracle(irqb) == vcpu) - (int)(vgic_target_oracle(irqa) == vcpu);
-+	if (ret)
-+		goto out;
-+
-+	/* Same thing for interrupts targeting a disabled group */
-+	ret =  (int)(irqb->group ? info->vmcr.grpen1 : info->vmcr.grpen0);
-+	ret -= (int)(irqa->group ? info->vmcr.grpen1 : info->vmcr.grpen0);
-+	if (ret)
-+		goto out;
-+
- 	penda = irqa->enabled && irq_is_pending(irqa) && !irqa->active;
- 	pendb = irqb->enabled && irq_is_pending(irqb) && !irqb->active;
- 
-@@ -320,10 +339,12 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
- static void vgic_sort_ap_list(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_sort_info info = { .vcpu = vcpu, };
- 
- 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
- 
--	list_sort(NULL, &vgic_cpu->ap_list_head, vgic_irq_cmp);
-+	vgic_get_vmcr(vcpu, &info.vmcr);
-+	list_sort(&info, &vgic_cpu->ap_list_head, vgic_irq_cmp);
- }
- 
- /*
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index e48294521541e..037efb6200823 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -261,6 +261,7 @@ vgic_get_mmio_region(struct kvm_vcpu *vcpu, struct vgic_io_device *iodev,
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid);
+ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid);
+ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq);
++struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq);
+ bool vgic_get_phys_line_level(struct vgic_irq *irq);
+ void vgic_irq_set_phys_pending(struct vgic_irq *irq, bool pending);
+ void vgic_irq_set_phys_active(struct vgic_irq *irq, bool active);
 -- 
 2.47.3
 
