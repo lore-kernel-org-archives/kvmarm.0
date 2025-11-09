@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C504430B50B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC0730B511;
 	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762708595; cv=none; b=WgswPMyEpCo4zHMIHWbrP0h7EKa0fzE4N04fybvp+yU9Fp6qPIMNClto2X51jjq3mjhumicK/TYQx/N4prKrgysPwkYOOkyR+484d4mIVfvnVsLM5dy0jKm0b+oZTljBhmGGCdxhT9taWDkTTtZUP8s1RuOl2TVt2ZD9kQ7RoZA=
+	t=1762708595; cv=none; b=Xn+YKs5lY0RYFXv0IfUHnCmrcWYck0zKlbygWf7DcIoooSuXZDbLgy5cPtDk0AebyiXwXiqKfiKSXvW8cCsbDCoj88MFifswZxFObnvt8oHuVq/pBCWBp8ifNK8TeqRVrFva3UBl4kSfsB+HqsuRliifrWq5YLLfJj/XqWIM2WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762708595; c=relaxed/simple;
-	bh=udSMpIJFiQmBGXb8vj/fubWH9LddhuZiyRy4rd9M6Xw=;
+	bh=ExB1yEjtLfP3X2YfSpZ/UdxJUO+P0+U9gqTpdL+W5z4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZfxihOMs85gMPDFUBz9Covknj3EwPY8WQS0v2AgLalfYDUn+/7RgBdmOrWWy25v3OPgnppzJVidlGwbMYG15/C2QlVe1VrsCIF732BVtns7UAx2gU/H7vg+fChclRyxrGhaJxiWSMU2lwtWK2UBDMhRcTbWF/EClOjtTbmqEGIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVBOtnFg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZwPKYqjRiIewvBl4DxOtPWrg4t7mgyWLYanXItt5jR+2FsQ6s9UQDhcfFhkNaBduM2EmZXXsv1IHHyHLscPcNTIEpMvgKKz0jHNULlal4cG+imR1VDsok9fnbMs3OdtdfA+bbCVXK/NWVcV4AkoA3bcycLVRdm8/KRetta6krss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FPJx8+V7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVBOtnFg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04464C19421;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FPJx8+V7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADEF9C4CEF7;
 	Sun,  9 Nov 2025 17:16:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762708595;
-	bh=udSMpIJFiQmBGXb8vj/fubWH9LddhuZiyRy4rd9M6Xw=;
+	bh=ExB1yEjtLfP3X2YfSpZ/UdxJUO+P0+U9gqTpdL+W5z4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KVBOtnFgXlL2rExTw7GpfvugbARqfn2l8cBKaaI+7mw5TJxCSYLKWpABMMz1+wrb8
-	 EiZ7R1rtHi8KG8wqnKBA0PZHrhFxjl1ZhMaRn8zcpaIeymK/FSZlp5UDeTIa9gdjCG
-	 6fGC88h8dySxZfOcciAQo1C4QcwhFQ3MrzRJVU0kLWdT2/eCz/wlzqlc/tj5B/Gzbt
-	 8pOWo4Y3xeNSdIEakwYIXWTXNXhAP9ZnbuSEMKf6UC2CA8p0DTY7KOqUlNl6+zE6OG
-	 HeANt7PyVK19wXxe6kvIgKfy1j4e0efuy3+1GIedF2jw4SWwmTa9V5AB3e5EER/diL
-	 7r5G3uTpoyWoQ==
+	b=FPJx8+V7s7fWwj4j9lE2LEIJ6pk8nJh8b7unc0M/0sqtRy2y6Se/3KnIY46FXiLl8
+	 1GkVtgQV+sWfRnlweL0I60aZPdXao3/i6cLm06g3hXX0Avo7IAoEosh3c7hjuWF+xu
+	 8rvU7A0nF/VKNsJI1F6XwmrQ33AMXMNSeye1UKGoXsIRm50Ur/xTejQdk1dgTODIjE
+	 0oTiboDPEp/sSelP550aRGl4NeeD5KM97p+mUVxLaW6yAOL8rlf0NQhNjCl69bRn6E
+	 BbbvqwfmQ6HP7Yt1YYQaAEDUgq1v1c2gZI8qDHoSM4iPNZ77VC62Xd2SRI5/0/4r3P
+	 KGky1Xhb2Bzmg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vI91l-00000003exw-0Ddm;
+	id 1vI91l-00000003exw-34Hh;
 	Sun, 09 Nov 2025 17:16:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
-Date: Sun,  9 Nov 2025 17:15:54 +0000
-Message-ID: <20251109171619.1507205-21-maz@kernel.org>
+Subject: [PATCH v2 23/45] KVM: arm64: Invert ap_list sorting to push active interrupts out
+Date: Sun,  9 Nov 2025 17:15:57 +0000
+Message-ID: <20251109171619.1507205-24-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251109171619.1507205-1-maz@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
@@ -61,261 +61,64 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-We currently don't use the maintenance interrupt very much, apart
-from EOI on level interrupts, and for LR underflow in limited cases.
-
-However, as we are moving toward a setup where active interrupts
-can live outside of the LRs, we need to use the MIs in a more
-diverse set of cases.
-
-Add a new helper that produces a digest of the ap_list, and use
-that summary to set the various control bits as required.
-
-This slightly changes the way v2 SGIs are handled, as they used to
-count for more than one interrupt, but not anymore.
+Having established that pending interrupts should have priority
+to be moved into the LRs over the active interrupts, implement this
+in the ap_list sorting.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v2.c | 12 ++++-
- arch/arm64/kvm/vgic/vgic-v3.c | 15 +++++-
- arch/arm64/kvm/vgic/vgic.c    | 91 ++++++++++++-----------------------
- arch/arm64/kvm/vgic/vgic.h    | 19 +++++++-
- 4 files changed, 71 insertions(+), 66 deletions(-)
+ arch/arm64/kvm/vgic/vgic.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 07e93acafd04d..f53bc55288978 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -26,11 +26,19 @@ void vgic_v2_init_lrs(void)
- 		vgic_v2_write_lr(i, 0);
- }
- 
--void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
-+void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu,
-+			   struct ap_list_summary *als)
- {
- 	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
- 
--	cpuif->vgic_hcr |= GICH_HCR_UIE;
-+	cpuif->vgic_hcr = GICH_HCR_EN;
-+
-+	if (irqs_pending_outside_lrs(als))
-+		cpuif->vgic_hcr |= GICH_HCR_NPIE;
-+	if (irqs_active_outside_lrs(als))
-+		cpuif->vgic_hcr |= GICH_HCR_LRENPIE;
-+	if (irqs_outside_lrs(als))
-+		cpuif->vgic_hcr |= GICH_HCR_UIE;
- }
- 
- static bool lr_signals_eoi_mi(u32 lr_val)
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 2619e120484c5..d23db8f7b450a 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -20,11 +20,22 @@ static bool common_trap;
- static bool dir_trap;
- static bool gicv4_enable;
- 
--void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
-+void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
-+			   struct ap_list_summary *als)
- {
- 	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
- 
--	cpuif->vgic_hcr |= ICH_HCR_EL2_UIE;
-+	cpuif->vgic_hcr = ICH_HCR_EL2_En;
-+
-+	if (irqs_pending_outside_lrs(als))
-+		cpuif->vgic_hcr |= ICH_HCR_EL2_NPIE;
-+	if (irqs_active_outside_lrs(als))
-+		cpuif->vgic_hcr |= ICH_HCR_EL2_LRENPIE;
-+	if (irqs_outside_lrs(als))
-+		cpuif->vgic_hcr |= ICH_HCR_EL2_UIE;
-+
-+	if (!als->nr_sgi)
-+		cpuif->vgic_hcr |= ICH_HCR_EL2_vSGIEOICount;
- }
- 
- static bool lr_signals_eoi_mi(u64 lr_val)
 diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 46b31cd365466..c420f8262e4c1 100644
+index 570cc8fe42b87..56c61e17e1e88 100644
 --- a/arch/arm64/kvm/vgic/vgic.c
 +++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -791,38 +791,30 @@ static inline void vgic_clear_lr(struct kvm_vcpu *vcpu, int lr)
- 		vgic_v3_clear_lr(vcpu, lr);
- }
+@@ -270,10 +270,7 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+  * well, the first items in the list being the first things populated in the
+  * LRs.
+  *
+- * A hard rule is that active interrupts can never be pushed out of the LRs
+- * (and therefore take priority) since we cannot reliably trap on deactivation
+- * of IRQs and therefore they have to be present in the LRs.
+- *
++ * Pending, non-active interrupts must be placed at the head of the list.
+  * Otherwise things should be sorted by the priority field and the GIC
+  * hardware support will take care of preemption of priority groups etc.
+  *
+@@ -298,21 +295,21 @@ static int vgic_irq_cmp(void *priv, const struct list_head *a,
+ 	raw_spin_lock(&irqa->irq_lock);
+ 	raw_spin_lock_nested(&irqb->irq_lock, SINGLE_DEPTH_NESTING);
  
--static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
--{
--	if (kvm_vgic_global_state.type == VGIC_V2)
--		vgic_v2_set_underflow(vcpu);
--	else
--		vgic_v3_set_underflow(vcpu);
--}
--
--/* Requires the ap_list_lock to be held. */
--static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
--				 bool *multi_sgi)
-+static void summarize_ap_list(struct kvm_vcpu *vcpu,
-+			      struct ap_list_summary *als)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_irq *irq;
--	int count = 0;
--
--	*multi_sgi = false;
+-	if (irqa->active || irqb->active) {
+-		ret = (int)irqb->active - (int)irqa->active;
+-		goto out;
+-	}
++	penda = irqa->enabled && irq_is_pending(irqa) && !irqa->active;
++	pendb = irqb->enabled && irq_is_pending(irqb) && !irqb->active;
  
- 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+-	penda = irqa->enabled && irq_is_pending(irqa);
+-	pendb = irqb->enabled && irq_is_pending(irqb);
++	ret = (int)pendb - (int)penda;
++	if (ret)
++		goto out;
  
--	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
--		int w;
-+	*als = (typeof(*als)){};
+-	if (!penda || !pendb) {
+-		ret = (int)pendb - (int)penda;
++	/* Both pending and enabled, sort by priority (lower number first) */
++	ret = (int)irqa->priority - (int)irqb->priority;
++	if (ret)
+ 		goto out;
+-	}
  
--		raw_spin_lock(&irq->irq_lock);
--		/* GICv2 SGIs can count for more than one... */
--		w = vgic_irq_get_lr_count(irq);
--		raw_spin_unlock(&irq->irq_lock);
-+	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-+		scoped_guard(raw_spinlock, &irq->irq_lock) {
-+			if (vgic_target_oracle(irq) != vcpu)
-+				continue;
+-	/* Both pending and enabled, sort by priority */
+-	ret = irqa->priority - irqb->priority;
++	/* Finally, HW bit active interrupts have priority over non-HW ones */
++	ret = (int)irqb->hw - (int)irqa->hw;
 +
-+			if (!irq->active)
-+				als->nr_pend++;
-+			else
-+				als->nr_act++;
-+		}
- 
--		count += w;
--		*multi_sgi |= (w > 1);
-+		if (irq->intid < VGIC_NR_SGIS)
-+			als->nr_sgi++;
- 	}
--	return count;
- }
- 
- /*
-@@ -908,60 +900,39 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu,
- static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct ap_list_summary als;
- 	struct vgic_irq *irq;
--	int count;
--	bool multi_sgi;
--	u8 prio = 0xff;
--	int i = 0;
-+	int count = 0;
- 
- 	lockdep_assert_held(&vgic_cpu->ap_list_lock);
- 
--	count = compute_ap_list_depth(vcpu, &multi_sgi);
--	if (count > kvm_vgic_global_state.nr_lr || multi_sgi)
--		vgic_sort_ap_list(vcpu);
-+	summarize_ap_list(vcpu, &als);
- 
--	count = 0;
-+	if (irqs_outside_lrs(&als))
-+		vgic_sort_ap_list(vcpu);
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
--		raw_spin_lock(&irq->irq_lock);
--
--		/*
--		 * If we have multi-SGIs in the pipeline, we need to
--		 * guarantee that they are all seen before any IRQ of
--		 * lower priority. In that case, we need to filter out
--		 * these interrupts by exiting early. This is easy as
--		 * the AP list has been sorted already.
--		 */
--		if (multi_sgi && irq->priority > prio) {
--			raw_spin_unlock(&irq->irq_lock);
--			break;
-+		scoped_guard(raw_spinlock,  &irq->irq_lock) {
-+			if (likely(vgic_target_oracle(irq) == vcpu)) {
-+				vgic_populate_lr(vcpu, irq, count++);
-+			}
- 		}
- 
--		if (likely(vgic_target_oracle(irq) == vcpu)) {
--			vgic_populate_lr(vcpu, irq, count++);
--
--			if (irq->source)
--				prio = irq->priority;
--		}
--
--		raw_spin_unlock(&irq->irq_lock);
--
--		if (count == kvm_vgic_global_state.nr_lr) {
--			if (!list_is_last(&irq->ap_list,
--					  &vgic_cpu->ap_list_head))
--				vgic_set_underflow(vcpu);
-+		if (count == kvm_vgic_global_state.nr_lr)
- 			break;
--		}
- 	}
- 
- 	/* Nuke remaining LRs */
--	for (i = count ; i < kvm_vgic_global_state.nr_lr; i++)
-+	for (int i = count ; i < kvm_vgic_global_state.nr_lr; i++)
- 		vgic_clear_lr(vcpu, i);
- 
--	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-+	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
- 		vcpu->arch.vgic_cpu.vgic_v2.used_lrs = count;
--	else
-+		vgic_v2_configure_hcr(vcpu, &als);
-+	} else {
- 		vcpu->arch.vgic_cpu.vgic_v3.used_lrs = count;
-+		vgic_v3_configure_hcr(vcpu, &als);
-+	}
- }
- 
- static inline bool can_access_vgic_from_kernel(void)
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 0ecadfa00397d..4a0733869cb5f 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -236,6 +236,21 @@ struct its_ite {
- 	u32 event_id;
- };
- 
-+struct ap_list_summary {
-+	unsigned int	nr_pend;	/* purely pending, not active */
-+	unsigned int	nr_act;		/* active, or active+pending */
-+	unsigned int	nr_sgi;		/* any SGI */
-+};
-+
-+#define irqs_outside_lrs(s)						\
-+	 (((s)->nr_pend + (s)->nr_act) > kvm_vgic_global_state.nr_lr)
-+
-+#define irqs_pending_outside_lrs(s)			\
-+	((s)->nr_pend > kvm_vgic_global_state.nr_lr)
-+
-+#define irqs_active_outside_lrs(s)		\
-+	((s)->nr_act &&	irqs_outside_lrs(s))
-+
- int vgic_v3_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
- 		       struct vgic_reg_attr *reg_attr);
- int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
-@@ -262,7 +277,7 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
- void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
--void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v2_configure_hcr(struct kvm_vcpu *vcpu, struct ap_list_summary *als);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-@@ -302,7 +317,7 @@ static inline void vgic_get_irq_ref(struct vgic_irq *irq)
- void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
--void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu, struct ap_list_summary *als);
- void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ out:
+ 	raw_spin_unlock(&irqb->irq_lock);
+ 	raw_spin_unlock(&irqa->irq_lock);
 -- 
 2.47.3
 
