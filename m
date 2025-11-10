@@ -1,162 +1,105 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B009921E098
-	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 15:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074FE153BD9;
+	Mon, 10 Nov 2025 15:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762789394; cv=none; b=D1h2d/tOUO4g3JfLgUekanjjR2vdgUfgy300gRo3GHRRkwP5CrvkU3ydKKzGyQetM+yr6o/xevFTD5oO8ZixgkbT3a2higOEWBZ5ugPkxuJL5QqAsGed0UQn4z62tO+4TNNNqzBGdXIfe8z3Oo0HrC4oT1kyL1ZEXYMeOApgK7Q=
+	t=1762789725; cv=none; b=bTBS+UfuaejFlKhV7g79QT05b4rT6QsK93LCYkSgADfSkdKsaVDDbFxBW59staLNVuixFjBpj43mywOrbepdTwvV0SCXnyDftnzTHhVhE4opezR1iR3Ta8lVyJK9GiHN2orsvVkxNvYeCPRBxYyatA5tT2VkxyxrKiyXoaGWLkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762789394; c=relaxed/simple;
-	bh=Z6QBCawmA0V88I7dtIc6ikzQytNDqs3gMMcaJjnYR/s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NELnuwqPBi/WODUAIhKmfiCPmhhdZfFYRXiIgzslt3sZWkOQB5hr63cNOHvL+Atn0yyk/vYqlDDihE3l2KFpq1YX9oddzp8r1KAC2Uz/POIrq+yHVt7vDUFHmndJMG8sLOf94Pz8RTLfh3RrH+vG9JqQQX98c+OXtzoe0wMW6qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gf+BmCKf; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1762789725; c=relaxed/simple;
+	bh=Bn2Zyt+aIDLf4tjfg1cxJuUuA6zwIk1XsFG7lBgkeHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KniyQYUvpAE53kH/LMEGdSgTy6u/Tl4ocaocxe5zDhezh8bRg3MalilQjgXDpsY2kuCzwFKPWh0WDXyyLqsvSqxuhIxKcUPQ9scS8WFhzwyG1F5q85+F8soKNaRuDray/eifc6MA17r6Mgfm0F226duMrQk3AK/h9hJT7fHyC8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wJ0M+0La; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gf+BmCKf"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340bc4ef67fso3669419a91.3
-        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 07:43:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762789392; x=1763394192; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=87FfliXTeIYU4Ti4q0mlK1AlR2N3oXTPIRkcYWMY8TY=;
-        b=Gf+BmCKfmAIBCtqgl8CWC2KVDJZAvbomroByBQC5cr1Zp/X763KCNZ2J/v8m1pMSC3
-         x0VXBddqEzzRHGHEaCzZypmq5jIXJIBXZH56vextlwdj68mCm6VroxnLwrG1Ctdm/F5e
-         rrl8OjolbddSAcA3KwEcWxGB6jQpcHgRFash3YAX7lkdBJJZ9Wj7xhhmXxl9a5eh+eop
-         foiKf3XvvAFdVyMrxgHEDPamjl64lLHJGoo2i+5GPMam6WyG/SCqiVqrLnsxX9U+Zs6H
-         5aYHTW7LC/HxGheUxKHQTxZboT19gwHwEl3vrDwxwm7FL+bb2iqcrur4upT4t3JXgkhG
-         ltdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762789392; x=1763394192;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=87FfliXTeIYU4Ti4q0mlK1AlR2N3oXTPIRkcYWMY8TY=;
-        b=UQg0jroOeBlfCr3MEbhFPt1s2+tCE+c4M1EM15yJmRTpyiGqJ7A+lOw9qQPjXrQULv
-         cGdszt0GpcA9UzVRVLNv3tXhnop08Cyazsa1loW9A9OLnZZgtAPsuyM33IZhLxejdQzX
-         +wLJ34ZVDjDADGbcg3ml4vSp992DDOIb/9o1FfRl+7HHIcxYAQnkI29v4s0eyOpJSJKj
-         6RGLbcrFx48nKnwf+OpFuKvM/1IN7SOECnqbrQgH+7ICR5FNEZgAOl12xWWfC0fuTtXq
-         +1j715DpHwghCxdClvdV/r/kW/OixVGd9U5X/XORf9cC0GLIi4LcAoFQuzVizn+NJN2I
-         fZkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUidtmUEWPmGj2LCeP8GvswPrXu3f5ZjnDcEaXLUAI8LLGcrM1v3vPh7KZlh/+0BTEPUoiqpjU=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz1+1/jfHRqDkviKJw92DJvvkbgAsxDygOiB6p/UdXnGjHGpQ/o
-	VU9tKvBNjfER3tSxBuNGbc+Y0tiS16tLZl+K2C2mVkvBQIMMc0xeLY1XFjTdJcBeMFR1GN6TnYw
-	TiabAsA==
-X-Google-Smtp-Source: AGHT+IGU2QqcHJOpKVyUh8wnC6DXg/rmfR5MmGRMoX3raYINDU0h+4Ytj4+FRCcbgxWr/CiKwQo1uRnxIsY=
-X-Received: from pjbdw16.prod.google.com ([2002:a17:90b:950:b0:343:6849:31ae])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4a10:b0:341:124f:474f
- with SMTP id 98e67ed59e1d1-3436cd0c3e9mr10428985a91.32.1762789392114; Mon, 10
- Nov 2025 07:43:12 -0800 (PST)
-Date: Mon, 10 Nov 2025 07:37:29 -0800
-In-Reply-To: <20251030200951.3402865-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wJ0M+0La"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=C67O4LVeg8WMDJ8KU9F1/iW0QK6epKrLMnUjULyR+wE=; b=wJ0M+0LacOP1OLv0g4ScRMqglS
+	LJK9h7xh6K4qf0modj5inMpydmTdGbcMa7u9oY50NBpmiUWjjm5opruYL1W72Y/GSXDF7DHO25qvl
+	586Dr6AONOKccWRf436bm2xB571dWjwNdOivv0ZI/CfrO4M/nk0JrLuNmgUUCwJIjsx7OGodPSPQe
+	phSKMDJo6WAUVBX4EMKgDFu58GhCxYg0ZomDpAcyLYAzI8slSTAwij3VIviu89UTMFO0YE+gtPFnF
+	WqwJJegK0lW/mea8+L2aG91IiywF2Z/9h726ZmklZ5XudGqzHMoitlRUo7gWB+t5NQNkaMGgzzgTU
+	eyvGuy2Q==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vIU85-000000016gd-0EKo;
+	Mon, 10 Nov 2025 15:48:29 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id DE6E330029E; Mon, 10 Nov 2025 16:48:27 +0100 (CET)
+Date: Mon, 10 Nov 2025 16:48:27 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v9 2/5] perf: arm_spe: Add support for filtering on data
+ source
+Message-ID: <20251110154827.GA278048@noisy.programming.kicks-ass.net>
+References: <20251029-james-perf-feat_spe_eft-v9-0-d22536b9cf94@linaro.org>
+ <20251029-james-perf-feat_spe_eft-v9-2-d22536b9cf94@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251030200951.3402865-1-seanjc@google.com>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <176278827443.918905.17609380057567446021.b4-ty@google.com>
-Subject: Re: [PATCH v4 00/28] KVM: x86/mmu: TDX post-populate cleanups
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Madhavan Srinivasan <maddy@linux.ibm.com>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	"Kirill A. Shutemov" <kas@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, x86@kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>, 
-	Kai Huang <kai.huang@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>, 
-	Michael Roth <michael.roth@amd.com>, Yan Zhao <yan.y.zhao@intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Ackerley Tng <ackerleytng@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251029-james-perf-feat_spe_eft-v9-2-d22536b9cf94@linaro.org>
 
-On Thu, 30 Oct 2025 13:09:23 -0700, Sean Christopherson wrote:
-> Non-x86 folks, as with v3, patches 1 and 2 are likely the only thing of
-> interest here.  They make kvm_arch_vcpu_async_ioctl() mandatory and then
-> rename it to kvm_arch_vcpu_unlocked_ioctl().
+On Wed, Oct 29, 2025 at 03:46:02PM +0000, James Clark wrote:
+> SPE_FEAT_FDS adds the ability to filter on the data source of packets.
+> Like the other existing filters, enable filtering with PMSFCR_EL1.FDS
+> when any of the filter bits are set.
 > 
-> As for the x86 side...
+> Each bit maps to data sources 0-63 described by bits[0:5] in the data
+> source packet (although the full range of data source is 16 bits so
+> higher value data sources can't be filtered on). The filter is an OR of
+> all the bits, so for example clearing bits 0 and 3 only includes packets
+> from data sources 0 OR 3.
 > 
-> Clean up the TDX post-populate paths (and many tangentially related paths) to
-> address locking issues between gmem and TDX's post-populate hook[*], and
-> within KVM itself (KVM doesn't ensure full mutual exclusivity between paths
-> that for all intents and purposes the TDX-Module requires to be serialized).
-> 
-> [...]
+> Invert the filter given by userspace so that the default value of 0 is
+> equivalent to including all values (no filtering). This allows us to
+> skip adding a new format bit to enable filtering and still support
+> excluding all data sources which would have been a filter value of 0 if
+> not for the inversion.
 
-Applied to kvm-x86 tdx, with fixups for the various typos.  Thanks for all the
-reviews and testing!
+So from that I'm reading the config4 field will only have like 16 bits,
+but here:
 
-Other KVM arch maintainers, please holler if you want a stable tag for the
-kvm_arch_vcpu_async_ioctl() changes (they're based directly on v6.18-rc4).
+> +#define ATTR_CFG_FLD_inv_data_src_filter_CFG	config4	/* inverse of PMSDSFR_EL1 */
+> +#define ATTR_CFG_FLD_inv_data_src_filter_LO	0
+> +#define ATTR_CFG_FLD_inv_data_src_filter_HI	63
 
-[01/28] KVM: Make support for kvm_arch_vcpu_async_ioctl() mandatory
-        https://github.com/kvm-x86/linux/commit/0a0da3f92118
-[02/28] KVM: Rename kvm_arch_vcpu_async_ioctl() to kvm_arch_vcpu_unlocked_ioctl()
-        https://github.com/kvm-x86/linux/commit/50efc2340a59
-[03/28] KVM: TDX: Drop PROVE_MMU=y sanity check on to-be-populated mappings
-        https://github.com/kvm-x86/linux/commit/5294a4b93e07
-[04/28] KVM: x86/mmu: Add dedicated API to map guest_memfd pfn into TDP MMU
-        https://github.com/kvm-x86/linux/commit/3ab3283dbb2c
-[05/28] KVM: x86/mmu: WARN if KVM attempts to map into an invalid TDP MMU root
-        https://github.com/kvm-x86/linux/commit/c1f173fb3389
-[06/28] Revert "KVM: x86/tdp_mmu: Add a helper function to walk down the TDP MMU"
-        https://github.com/kvm-x86/linux/commit/fe7413e39810
-[07/28] KVM: x86/mmu: Rename kvm_tdp_map_page() to kvm_tdp_page_prefault()
-        https://github.com/kvm-x86/linux/commit/6de2fb089bb2
-[08/28] KVM: TDX: Drop superfluous page pinning in S-EPT management
-        https://github.com/kvm-x86/linux/commit/ce7b5695397b
-[09/28] KVM: TDX: Return -EIO, not -EINVAL, on a KVM_BUG_ON() condition
-        https://github.com/kvm-x86/linux/commit/e6348c90dda9
-[10/28] KVM: TDX: Fold tdx_sept_drop_private_spte() into tdx_sept_remove_private_spte()
-        https://github.com/kvm-x86/linux/commit/b836503300dc
-[11/28] KVM: x86/mmu: Drop the return code from kvm_x86_ops.remove_external_spte()
-        https://github.com/kvm-x86/linux/commit/7139c8606505
-[12/28] KVM: TDX: WARN if mirror SPTE doesn't have full RWX when creating S-EPT mapping
-        https://github.com/kvm-x86/linux/commit/b9d5cf6de0b6
-[13/28] KVM: TDX: Avoid a double-KVM_BUG_ON() in tdx_sept_zap_private_spte()
-        https://github.com/kvm-x86/linux/commit/24adff397052
-[14/28] KVM: TDX: Use atomic64_dec_return() instead of a poor equivalent
-        https://github.com/kvm-x86/linux/commit/af96d5452e5e
-[15/28] KVM: TDX: Fold tdx_mem_page_record_premap_cnt() into its sole caller
-        https://github.com/kvm-x86/linux/commit/b4b2b6eda5af
-[16/28] KVM: TDX: ADD pages to the TD image while populating mirror EPT entries
-        https://github.com/kvm-x86/linux/commit/6b5b71ffabf9
-[17/28] KVM: TDX: Fold tdx_sept_zap_private_spte() into tdx_sept_remove_private_spte()
-        https://github.com/kvm-x86/linux/commit/14c9938619be
-[18/28] KVM: TDX: Combine KVM_BUG_ON + pr_tdx_error() into TDX_BUG_ON()
-        https://github.com/kvm-x86/linux/commit/597d7068702f
-[19/28] KVM: TDX: Derive error argument names from the local variable names
-        https://github.com/kvm-x86/linux/commit/55560b6be5bc
-[20/28] KVM: TDX: Assert that mmu_lock is held for write when removing S-EPT entries
-        https://github.com/kvm-x86/linux/commit/2ff14116982c
-[21/28] KVM: TDX: Add macro to retry SEAMCALLs when forcing vCPUs out of guest
-        https://github.com/kvm-x86/linux/commit/3d626ce5a8cc
-[22/28] KVM: TDX: Add tdx_get_cmd() helper to get and validate sub-ioctl command
-        https://github.com/kvm-x86/linux/commit/59d5c1ed6df2
-[23/28] KVM: TDX: Convert INIT_MEM_REGION and INIT_VCPU to "unlocked" vCPU ioctl
-        https://github.com/kvm-x86/linux/commit/94428e3ba325
-[24/28] KVM: TDX: Use guard() to acquire kvm->lock in tdx_vm_ioctl()
-        https://github.com/kvm-x86/linux/commit/0b76e827b29d
-[25/28] KVM: TDX: Don't copy "cmd" back to userspace for KVM_TDX_CAPABILITIES
-        https://github.com/kvm-x86/linux/commit/f26061fe2c25
-[26/28] KVM: TDX: Guard VM state transitions with "all" the locks
-        https://github.com/kvm-x86/linux/commit/15945e9ec195
-[27/28] KVM: TDX: Bug the VM if extending the initial measurement fails
-        https://github.com/kvm-x86/linux/commit/ad44aa4c5d3f
-[28/28] KVM: TDX: Fix list_add corruption during vcpu_load()
-        https://github.com/kvm-x86/linux/commit/1e3a825c9ec9
+you claim all 64 bits.
 
---
-https://github.com/kvm-x86/linux/tree/next
+Also, afaict:
+
+  #define ATTR_CFG_FLD_min_latency_CFG            config2 /* PMSLATFR_EL1.MINLAT */
+  #define ATTR_CFG_FLD_min_latency_LO             0
+  #define ATTR_CFG_FLD_min_latency_HI             11
+
+Still has more than 16 bits left.
+
+
+So why exactly are we needing config4? Can we please get a more solid
+argument?
