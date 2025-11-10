@@ -1,113 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965E8305968;
-	Mon, 10 Nov 2025 13:11:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EB015A86D
+	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 13:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762780269; cv=none; b=RXHQN0PlzOID1z39JI3B8ivbcNGJMWFd+XsaZfR/ZvsrK5V5vQRTf4Fny2fEeY6kNkBm0UNsOhAUw7MhtTLysER3qk52CYo8xriAhPRQGnnKRz2vrEyG6E+0JeG0QZGwpaOnX29GsbNVtKNg3jt2TCmruckt+XP6lgN9DdJXI1c=
+	t=1762782329; cv=none; b=DJL9Gua8BUwDkrjGQ6TBXoxeQKUAz6ZIFWPeVqn325kxZJtkynUVYh+0EV8UepH7QMzcR5idXaIqUXWPAyv7EUG5CD+5gHVp5w+nZ5YLDc3ocCjJHC+ZvyPlIrlNUvN1yFxIgEt9gaOzzFv0BIhF9JSh7/BLGU9hM0zE6raauw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762780269; c=relaxed/simple;
-	bh=qw9MX581WnhmMom2rBbLrZv+6wBNDSv1qI3/Z5yj/+o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tgGQjrLjwqdOEkNdLt1lJRDF6gkfZvueIqpJpW8VJqa28pWgyap01O+/g+ZHRYLo2wn0xA+S0ASavWKsfB6Oe3vK99LmyLwuAOMckPZsRfuxu+zhKxk3Zw9yslMBjHa0fCYnSkfEV2Tj8fnt1e8H+LcbROvOSaeXYSdo5HMN3co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HA45JRSK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762782329; c=relaxed/simple;
+	bh=jY9fc5A0aQeKcNk1/F2uwB5+3AuvzlfVSp6toxcyNOw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=l9P8GGSRnR1xWtwQuD6JVCiE8Z1p9OSa0SWu2FsEoK5DTTILK9J/U4l34nJVocJ5nr+Tw+zYYADjOWtm+rY0e3A95ENlgNMe312c0J0fumAQfVYnM/Ek8GWc1D1a2sTzgIzRGRXqFwMZxA24ToQd3hPfh8Q/UDyw5hdMlEpmL0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DuZTogeL; arc=none smtp.client-ip=209.85.218.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HA45JRSK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B286C4CEFB;
-	Mon, 10 Nov 2025 13:11:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762780268;
-	bh=qw9MX581WnhmMom2rBbLrZv+6wBNDSv1qI3/Z5yj/+o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HA45JRSKa4wThdCDie0yZqfLA4s9jpUixk6E3qNfr6PA7T/x+/8MEFdfr2lnZ68jX
-	 qK6HK62GmjvooK8R+So9EvafCE0HvNOH4FdMN1OQDWrRhMU/MJj7lzJTfogOvpoeZw
-	 gPiCe6UAjKV610ugCm0jJBxFJNsfSFeFHTjkyU+6b79i3G4UTF02Jg5arwj5o39rLs
-	 k9fDx3OnljxROzv/NVGNaNVM/Y/3uTDFhMtEVGDbFIua1EyS4KpcD1ChSqtQazJRPh
-	 XBisFHRw+2UDVEuz80lEHQ2QI5F3zDKJkPwaaM8iuNEGO8k43g04Nyx0aRPR0U/NhU
-	 qCVrGtNelWGaQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vIRfl-00000003rvi-2p3d;
-	Mon, 10 Nov 2025 13:11:05 +0000
-Date: Mon, 10 Nov 2025 13:11:05 +0000
-Message-ID: <865xbiuj6e.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Aishwarya.TCV@arm.com
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Limit clearing of ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
-In-Reply-To: <aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
-References: <20251030122707.2033690-1-maz@kernel.org>
-	<20251030122707.2033690-4-maz@kernel.org>
-	<aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DuZTogeL"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b70be4f20e0so208802466b.0
+        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 05:45:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762782327; x=1763387127; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IHvbo6SnYwSsQd+ne/bFLjjWVF4qCjyFEL/r++b9u/M=;
+        b=DuZTogeLN9RDoVLDmgaE9EdUxJHs7Tt3xjhZqpieRKYFS/iYd8Gn4sPnp/yPQUQJep
+         /QiNxk5/DcL7GbJUm4w0YlmTznj9aTsZwpMJ3ZdireDBZyN/Kc22wSVZHwY0dy97E+2P
+         150gJfJKyYgj6/V1FuvmmfsvZhAS0hleezQOQDLyt+Obpt886TVFjtC3Vxehdy8afJ70
+         raqU628bxT6SgEufmoEhFR3vL19vz+EXJ/8Ph43086Zn+MlJLZ6djdHdNLFgtYzX2syq
+         g7k6GOCoi0P7qL2jur1NB8vNZRCcWmdC38KbSJNW5DmX5GCdMMjkNGc5q9X/y67x+7zf
+         sZNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762782327; x=1763387127;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IHvbo6SnYwSsQd+ne/bFLjjWVF4qCjyFEL/r++b9u/M=;
+        b=Cr+1JgjWn0SjGyzBLPR2mte2M7sKrqStbYy9Kp5e2vE0VUbZiTchIFg53RnKvbNCjF
+         +wDa4gl4Gg/3BVePFwdl7rL19e22vqrLclZxixGl+FEOGF55JIXnEWHylKjlj9RQcA77
+         DzgphbyWWrrRkKs5xRAAcUzeLVN026Ovh/7mXGDtf4kQ6+4XoKWYPnz2+K2DqCDaP+N5
+         l48i5jfDAbxUrmGnd8+5MXZ0WViDBu9Zqf+C0yXe5AZqCox1Fe1gyzDdztKo0y8/XFEO
+         l0KSrL+h3KF10+OBSsZv2d+4f4WLavW9hTI1GYiOSFlkewHnpq7A4NlJaMXzWKRsC35c
+         fG4Q==
+X-Gm-Message-State: AOJu0YyxqkPYwolzwI7QEsnPcjOhkRJ7xLVFlnyqZ3jlzBzsflrQLUYG
+	3+1IA595KxNf9S6XRhab+zmxtXfXakCZ9sRoNvYrpDhuX7sWtDEjUgfMbsBJIx2RdqG4qwfE/oC
+	au6L+MmsmoQmn6egZFyfvXqsMZkOFYg/ph8O0Ia/q1ruQ0/53rmtFB2FYKl+cotppRF71PNSdGW
+	ewxxblAGNPeLtqDZAMXBDvJk/bTorUg/M=
+X-Google-Smtp-Source: AGHT+IFvfbA62aZamyfGa4Rdc51rYmcB6jnaOM59MZ66aybSKMWuythr1PeqI/zas+fnnP1SNWeNo+j6zg==
+X-Received: from ejcuv8.prod.google.com ([2002:a17:907:cf48:b0:b71:4b98:8fe3])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:7b96:b0:b40:fba8:4491
+ with SMTP id a640c23a62f3a-b72e0310d6fmr936142966b.17.1762782326602; Mon, 10
+ Nov 2025 05:45:26 -0800 (PST)
+Date: Mon, 10 Nov 2025 13:45:17 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, peter.maydell@linaro.org, pbonzini@redhat.com, Aishwarya.TCV@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251110134525.3768197-1-tabba@google.com>
+Subject: [PATCH v3 0/8] KVM: arm64: Fixes for guest CPU feature trapping and enabling
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 10 Nov 2025 12:51:55 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Thu, Oct 30, 2025 at 12:27:07PM +0000, Marc Zyngier wrote:
-> > Now that the idreg's GIC field is in sync with the irqchip, limit
-> > the runtime clearing of these fields to the pathological case where
-> > we do not have an in-kernel GIC.
-> > 
-> > While we're at it, use the existing API instead of open-coded
-> > accessors to access the ID regs.
-> 
-> Today's next/pending-fixes is showing regressions on a range of physical
-> arm64 platforms (including at least a bunch of A53 systems, an A55 one
-> and an A72 one) in the steal_time selftest which bisect to this patch.
-> We get asserts in the kernel on ID register sets:
-> 
-> [  150.872407] WARNING: CPU: 0 PID: 2865 at arch/arm64/kvm/sys_regs.c:2353 kvm_set_vm_id_reg+0x9c/0xf4
-> 
-> ...
-> 
-> [  151.045312] Call trace:
-> [  151.047780]  kvm_set_vm_id_reg+0x9c/0xf4 (P)
-> [  151.052098]  kvm_finalize_sys_regs+0x88/0x240
-> [  151.056504]  kvm_arch_vcpu_run_pid_change+0xb4/0x438
-> [  151.061527]  kvm_vcpu_ioctl+0x92c/0x9d0
+Hi,
 
-Please name the platforms this fails on. Here, on a sample of one A72
-box, I don't see the issue:
+This series contains several fixes for guest feature trapping and
+enabling, as well as a bit of tidying up.
 
-	maz@sy-borg:~$ ./steal_time
-	Random seed: 0x6b8b4567
-	TAP version 13
-	1..4
-	ok 1 vcpu0
-	ok 2 vcpu1
-	ok 3 vcpu2
-	ok 4 vcpu3
-	# Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+Changes from v2 [1]:
+- Instead of a FAR_MASK, introduce a helper FAR_TO_FIPA_OFFSET() to
+  extract the offset (Oliver)
+- Expanded capability check in pKVM to include the VM type, since
+  certain capabilities are restricted for all VM types in pKVM, whereas
+  others are restricted for only protected VMs.
+- Do not allow KVM_CAP_ARM_MTE for any VM type in pKVM
+- Restrict which VM IOCTLs are allowed in pKVM based on the allowed
+  capabilities for that VM (Oliver)
+- Remove unnecessary checks for VM type when setting/getting arch timer
+  state (Oliver)
+- Based on Linux 6.18-rc5.
 
-Thanks,
+Cheers,
+/fuad
 
-	M.
+[1] https://lore.kernel.org/all/20251106144418.2847443-1-tabba@google.com/
 
+Fuad Tabba (8):
+  KVM: arm64: Fix Trace Buffer trapping for protected VMs
+  KVM: arm64: Fix Trace Buffer trap polarity for protected VMs
+  KVM: arm64: Fix MTE flag initialization for protected VMs
+  KVM: arm64: Introduce helper to calculate fault IPA offset
+  KVM: arm64: Include VM type when checking VM capabilities in pKVM
+  KVM: arm64: Do not allow KVM_CAP_ARM_MTE for any guest in pKVM
+  KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+  KVM: arm64: Prevent host from managing timer offsets for protected VMs
+
+ arch/arm64/include/asm/kvm_arm.h         |  2 ++
+ arch/arm64/include/asm/kvm_pkvm.h        | 33 +++++++++++++++++++++---
+ arch/arm64/kvm/arch_timer.c              | 18 +++++++++----
+ arch/arm64/kvm/arm.c                     |  7 +++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           | 20 +++++++-------
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
+ arch/arm64/kvm/inject_fault.c            |  2 +-
+ arch/arm64/kvm/mmu.c                     |  4 +--
+ 8 files changed, 64 insertions(+), 24 deletions(-)
+
+
+base-commit: e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c
 -- 
-Without deviation from the norm, progress is not possible.
+2.51.2.1041.gc1ab5b90ca-goog
+
