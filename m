@@ -1,156 +1,251 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2EE30506A
-	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 15:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D6C24DD15
+	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 15:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762787075; cv=none; b=RGRiFDmT7mdmwClukpllGzA7AFUsK/zW3LaJzQKZWZbJoPjV0deNPucsLaDMSIMj2vDzpHlh9YL4roWD3EjicU+qYJB/IikkfuiEBHjaW/hQZ7u4u6X0u2Cpcmls/g+p+SFTe1Sm3qigmmcLE0s/yZ77F1Z1cPZJ1gIecHaqi8Q=
+	t=1762788982; cv=none; b=f2UuxygIOs2x5+l3ZmQznAdc1gMqJHUgGV8y5KgvctLBd39BI4NjGuonyWE0VmraB4uiXBlOS0Ro2pXlZIcd/Ks4yNJ+PIDX2O3h5pNLMkF3X4F1JXQpo1VBpNPDW6Sjq+M35rqzxJgvEFnP/ySPa4rNMUljwS1tl+foJblAokk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762787075; c=relaxed/simple;
-	bh=hlp92FoWkCvhMy/WOgj245t8m5LSGL8kjyjvRN8gA3c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=afa3ElnMBfuuV+oUb2BFUp5b2VKAgOTeQgkmWhZc76UDs02nTZdWrDriN43Fee+7st4wBtUIQZ2bWmPUfHtYJEbLWt79NIEQ1Jw1NuYN50pDuvo7we7jml9OEuV5PNjpzvWr13XrF3C0Sme4tRtJkbViNZZkYQvwz3OZ1Rz6nBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sUQxoH4U; arc=none smtp.client-ip=209.85.160.178
+	s=arc-20240116; t=1762788982; c=relaxed/simple;
+	bh=6dsX1nap/ClvsXK7KrTRSd4Tz0PaTzKIHfmrOcuYTvQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uw3JC7f05qlqo13DafirDMuIRjmGZI6Slr17mWH6SHOwM8HEO/3urcaeymPg4ReVBZu9ksiY1fj3nJHPWa5DufcxztsCrnSvSEgniV12VLo6CubztgWF7k9ClHxH7f0waySFlMynyf8YCAV8Y082RM4JroRVoleASbvK3NP8Q1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fw4Zn0If; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sUQxoH4U"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4edb59dfda5so324761cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 07:04:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fw4Zn0If"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b72a8546d73so445247466b.2
+        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 07:36:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762787072; x=1763391872; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xbx1jZ5ZtDZQNw/mTpWHRsEOAMqWoM+Ba2UTcs6fjM0=;
-        b=sUQxoH4UD0wde4hzbn9jzrFvQLQSxIPeM4BlCQZU1QQ5vJnPl/0577Wb+7wJICMZcQ
-         nmgQeGGWmW/+BUpBtzYg3lUMLZX6TVXLA5QbyaY1oa7GPP/RtQIbDV9W2iuzGuLzzsxc
-         C26rPsT2D2uQaLj8CcMjaAyE2QBKKUqrdMgwfKz5ObnVFYuae81OyLQPPCrY2vbyfAyz
-         oCFRQEqZ0/t9zwhqLpz6RhlKN8hb1ABGezMZYNWlzAz5PRfpcZzTMpXYCVQbvPp2pThm
-         YDXkMKSvN6VpuExaYP5Lo7FDAw4LLvy753ItRX5lPBuDHjCzGnvCFweKKXZcrI+i+ocV
-         7b2A==
+        d=google.com; s=20230601; t=1762788978; x=1763393778; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaWutXseEM49NYYHvmu1piLSnNhRd63IQT+QthHzxAo=;
+        b=fw4Zn0IfoJEUy+MeKL4HxCXjgZJzObaeW2WX2D4eUANqCVE+lbklyQmK1zJ0PaUV5Q
+         C9Hm1AypheTQOGQXoNrH0mTtIhmcQRPH2ECf9lLnEL6aaisla9Zg6uj6c+yguM5rb+Ie
+         pdWkoRyUSXoTOQdBhosWS/+5EBrM/uexrthkQgIoBCV6O9oXAViDLlCg8jUtRCgAORIU
+         wUuOPDpw5WEDTITCNd+8cKSH0OufM3iNKRFr5pOGZdInG8/vfXDkcoT7uqY6xKkXvVa3
+         KflFlsLZ6rs8/VRHAG2HKKZ69Jw3//0R0J0NjL6MzGC78EPXFTtSrMq4c9OAjhjRgDq/
+         2crA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762787072; x=1763391872;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xbx1jZ5ZtDZQNw/mTpWHRsEOAMqWoM+Ba2UTcs6fjM0=;
-        b=Hvvxlpz/369/ax/aPtm/uAZj2T5vYY6TRnZfYsZUgEYBZFfbvnz1bq/WGG7UkQ8MNI
-         hLjKVSmiaa0bEW1jroSLjs09vmHweQqhoRSeJJMYangKU5NE/Fs3Hukk6mW1iLqAQ3rV
-         8qg6dWDuvZ6LfMIwhmkLkXseDwGGHU+q8XY8/zWHUIG/CF9N6NRMTmp+/9MiVDDQYLll
-         0Q0mEpJBdID8l3eE3EfXmD+SED92O/T2DkAJr1mTW/eyPUNhiksETrBPLVLlp1RuFYwN
-         iWhL8uOhw6mgFW7Ve5gwRXDArFlkTeIP0nTDLc/wohQaZBfLc7QqAwLD99qMZBGqa+dg
-         TiaQ==
-X-Gm-Message-State: AOJu0YwiiyJxQikgDUzlW0mByKCkiWbyTw+m34auu1mjX3zFnrAUb39c
-	yG+7QVaCWg4Pc4VzxTG9jyBxk8Z6OlU9NVDYy5RHT5pp++cBBPb94cYjsnyqxR4kWKfQ2Amp6Iq
-	VvhIxAU9Cf01WVNb0eLG3+u0MPo5h5Vk3LLuH9CWe
-X-Gm-Gg: ASbGncuchCwuTz4glFm3iU1TSIK1BwGJgX++1rf+BlttIMLpcgZRd8sZdPTkvikPkAJ
-	iAR9Uli6NELxpOCbEKXB1zOt+fyH+QhYPneoT5WqrW9zJb3K6x4zSbsG5Gjt3RjEEw1B1F9r9s0
-	Rzzy0Bw78FwRNSdHus6WKHOG0VLaK0KhJEYJflLYEf1TtY27PJ5B/ZxIH8IGQioUb+a5AkwO6Y5
-	b5SdpXsGBlbvrhECILwWP7EUwk/M+6Mn1PZT5MndBSFeQWE11dEKajhjtf/
-X-Google-Smtp-Source: AGHT+IEhj4deaDzdMbqhfKu1Xfh8nGslbXskec6lqQWbXZ4RiM6ounrrTFI5pFrD/dIUOXGWVk8xRUBXDzBAL5EHkw4=
-X-Received: by 2002:ac8:5808:0:b0:4ed:b4e3:cfa9 with SMTP id
- d75a77b69052e-4edb4f31b23mr8209791cf.5.1762787071367; Mon, 10 Nov 2025
- 07:04:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762788978; x=1763393778;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GaWutXseEM49NYYHvmu1piLSnNhRd63IQT+QthHzxAo=;
+        b=JXklcsYzo0AzLLVWrCTsLD8kE/1wUrRLy/gaAlMLGaOrbySPpIRiKr+DEjzEYOB1gg
+         ctG5SmHWw5ODngr3mvN/L3JaSRxl5ipS5UdPaxKjd056oalymcDo5Mcosez6gphNn8tF
+         7zhB3Kob9/4v3FSdWMzr1zyIukbUOipdbynb9BDlB5HYKoarlmEzfDlRMLDMeOdG65D0
+         kQjt4/q6U7kkNPCy4wQKNHoAPBQc+0S7julZ5sUVD5FdlORCeYxrvplTNXpxeKWLnwDr
+         7573j1+y3PQLZ5ahdOZ0YbMtP79csjIztL3lVyJuAXkoW0oPfNm+Zk5M9BcQxMo8xO/w
+         dYHw==
+X-Forwarded-Encrypted: i=1; AJvYcCXxB8Q54KnDDTsdHP3P3lDjxTOQZPoWrH3E6H8Aj5Uof6i+mRGXziGxcTZJ5u1QLWNlj70DFMA=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxK2LgX3K8asD39DhckJBkEzn48eD0vR/27bj2We4P5uZvPJy/M
+	VzRusD/+fO95Zp2mqsONuzjcr7PC0whhYea4BbYV2p1tsNOHsxfY04INRbm3EkCkjEhQ13VC4Ky
+	XjkGjuB7WXGk2TQ==
+X-Google-Smtp-Source: AGHT+IHTU5FXzUFeb1nI9cPK796M7PgT3DwXYMV5kcA8PjpI6OADg2Z/FZfwu9WOGlr1GmkIIQ0Qzc++hauFnA==
+X-Received: from ejcsq16.prod.google.com ([2002:a17:907:3890:b0:b72:b433:246f])
+ (user=jackmanb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:907:72c5:b0:b70:be84:5183 with SMTP id a640c23a62f3a-b72e0591830mr875999666b.60.1762788978060;
+ Mon, 10 Nov 2025 07:36:18 -0800 (PST)
+Date: Mon, 10 Nov 2025 15:36:17 +0000
+In-Reply-To: <a940044f-3ae4-451f-b9ba-946ec6df5082@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251110134525.3768197-1-tabba@google.com> <20251110134525.3768197-4-tabba@google.com>
- <bc25a11a-d5b7-45de-bb99-c78100e5055d@arm.com>
-In-Reply-To: <bc25a11a-d5b7-45de-bb99-c78100e5055d@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 10 Nov 2025 15:03:54 +0000
-X-Gm-Features: AWmQ_bnuzcmegBE5AU2g4oiIJKzzJSl7fV2EZbDb74iGF0ObJPvV6Janjbuy0xU
-Message-ID: <CA+EHjTzW1Mj6yCY8_L83s5B_LvuzbbVs=0p83t1W7zahEs_PaQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/8] KVM: arm64: Fix MTE flag initialization for
- protected VMs
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
+Mime-Version: 1.0
+References: <20250924151101.2225820-1-patrick.roy@campus.lmu.de>
+ <DE2L1SAOC55E.E4JY62WJQ2A8@google.com> <add94932-290c-4037-b4e6-c3c760240819@amazon.com>
+ <DE2NTMZXQ1MT.2TH9VAKM6WP6I@google.com> <a940044f-3ae4-451f-b9ba-946ec6df5082@amazon.com>
+X-Mailer: aerc 0.21.0
+Message-ID: <DE54JGHVJ4QH.KW6CD73R58AU@google.com>
+Subject: Re: [PATCH v7 00/12] Direct Map Removal Support for guest_memfd
+From: Brendan Jackman <jackmanb@google.com>
+To: <kalyazin@amazon.com>, Brendan Jackman <jackmanb@google.com>
+Cc: <pbonzini@redhat.com>, <corbet@lwn.net>, <maz@kernel.org>, 
+	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>, 
+	<yuzenghui@huawei.com>, <catalin.marinas@arm.com>, <will@kernel.org>, 
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>, 
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>, 
+	<luto@kernel.org>, <peterz@infradead.org>, <willy@infradead.org>, 
+	<akpm@linux-foundation.org>, <david@redhat.com>, <lorenzo.stoakes@oracle.com>, 
+	<Liam.Howlett@oracle.com>, <vbabka@suse.cz>, <rppt@kernel.org>, 
+	<surenb@google.com>, <mhocko@suse.com>, <song@kernel.org>, <jolsa@kernel.org>, 
+	<ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>, 
+	<martin.lau@linux.dev>, <eddyz87@gmail.com>, <yonghong.song@linux.dev>, 
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@fomichev.me>, 
+	<haoluo@google.com>, <jgg@ziepe.ca>, <jhubbard@nvidia.com>, 
+	<peterx@redhat.com>, <jannh@google.com>, <pfalcato@suse.de>, 
+	<shuah@kernel.org>, <seanjc@google.com>, <kvm@vger.kernel.org>, 
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, 
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, 
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>, <bpf@vger.kernel.org>, 
+	<linux-kselftest@vger.kernel.org>, <xmarcalx@amazon.co.uk>, 
+	<kalyazin@amazon.co.uk>, <jackabt@amazon.co.uk>, <derekmn@amazon.co.uk>, 
+	<tabba@google.com>, <ackerleytng@google.com>, 
+	Patrick Roy <patrick.roy@campus.lmu.de>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Ben,
+On Fri Nov 7, 2025 at 6:11 PM UTC, Nikita Kalyazin wrote:
+>
+>
+> On 07/11/2025 18:04, Brendan Jackman wrote:
+>> On Fri Nov 7, 2025 at 5:23 PM UTC, Nikita Kalyazin wrote:
+>>>
+>>>
+>>> On 07/11/2025 15:54, Brendan Jackman wrote:
+>>>> On Wed Sep 24, 2025 at 3:10 PM UTC, Patrick Roy wrote:
+>>>>> From: Patrick Roy <roypat@amazon.co.uk>
+>>>>>
+>>>>> [ based on kvm/next ]
+>>>>>
+>>>>> Unmapping virtual machine guest memory from the host kernel's direct map is a
+>>>>> successful mitigation against Spectre-style transient execution issues: If the
+>>>>> kernel page tables do not contain entries pointing to guest memory, then any
+>>>>> attempted speculative read through the direct map will necessarily be blocked
+>>>>> by the MMU before any observable microarchitectural side-effects happen. This
+>>>>> means that Spectre-gadgets and similar cannot be used to target virtual machine
+>>>>> memory. Roughly 60% of speculative execution issues fall into this category [1,
+>>>>> Table 1].
+>>>>>
+>>>>> This patch series extends guest_memfd with the ability to remove its memory
+>>>>> from the host kernel's direct map, to be able to attain the above protection
+>>>>> for KVM guests running inside guest_memfd.
+>>>>>
+>>>>> Additionally, a Firecracker branch with support for these VMs can be found on
+>>>>> GitHub [2].
+>>>>>
+>>>>> For more details, please refer to the v5 cover letter [v5]. No
+>>>>> substantial changes in design have taken place since.
+>>>>>
+>>>>> === Changes Since v6 ===
+>>>>>
+>>>>> - Drop patch for passing struct address_space to ->free_folio(), due to
+>>>>>     possible races with freeing of the address_space. (Hugh)
+>>>>> - Stop using PG_uptodate / gmem preparedness tracking to keep track of
+>>>>>     direct map state.  Instead, use the lowest bit of folio->private. (Mike, David)
+>>>>> - Do direct map removal when establishing mapping of gmem folio instead
+>>>>>     of at allocation time, due to impossibility of handling direct map
+>>>>>     removal errors in kvm_gmem_populate(). (Patrick)
+>>>>> - Do TLB flushes after direct map removal, and provide a module
+>>>>>     parameter to opt out from them, and a new patch to export
+>>>>>     flush_tlb_kernel_range() to KVM. (Will)
+>>>>>
+>>>>> [1]: https://download.vusec.net/papers/quarantine_raid23.pdf
+>>>>> [2]: https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding
+>>>>
+>>>> I just got around to trying this out, I checked out this patchset using
+>>>> its base-commit and grabbed the Firecracker branch. Things seem OK until
+>>>> I set the secrets_free flag in the Firecracker config which IIUC makes
+>>>> it set GUEST_MEMFD_FLAG_NO_DIRECT_MAP.
+>>>>
+>>>> If I set it, I find the guest doesn't show anything on the console.
+>>>> Running it in a VM and attaching GDB suggests that it's entering the
+>>>> guest repeatedly, it doesn't seem like the vCPU thread is stuck or
+>>>> anything. I'm a bit clueless about how to debug that (so far, whenever
+>>>> I've broken KVM, things always exploded very dramatically).
+>>>>
+>>>> Anyway, if I then kill the firecracker process, the host sometimes
+>>>> crashes, I think this is the most suggestive splat I've seen:
+>>>>
+>>>> [   99.673420][    T2] BUG: unable to handle page fault for address: ffff888012804000
+>>>> [   99.676216][    T2] #PF: supervisor write access in kernel mode
+>>>> [   99.678381][    T2] #PF: error_code(0x0002) - not-present page
+>>>> [   99.680499][    T2] PGD 2e01067 P4D 2e01067 PUD 2e02067 PMD 12801063 PTE 800fffffed7fb020
+>>>> [   99.683374][    T2] Oops: Oops: 0002 [#1] SMP
+>>>> [   99.685004][    T2] CPU: 0 UID: 0 PID: 2 Comm: kthreadd Not tainted 6.17.0-rc7-00366-g473c46a3cb2a #106 NONE
+>>>> [   99.688514][    T2] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 0.1 11/11/2019
+>>>> [   99.691547][    T2] RIP: 0010:clear_page_erms+0x7/0x10
+>>>> [   99.693440][    T2] Code: 48 89 47 18 48 89 47 20 48 89 47 28 48 89 47 30 48 89 47 38 48 8d 7f 40 75 d9 90 c3 0f 1f 80 00 00 00 00 b9 00 10 00 00 31 c0 <f3> aa c3 66 0f 1f 44 00 00 48 83 f9 40 73 2a 83 f9 08 73 0f 85 c9
+>>>> [   99.700188][    T2] RSP: 0018:ffff88800318fc10 EFLAGS: 00010246
+>>>> [   99.702321][    T2] RAX: 0000000000000000 RBX: 0000000000400dc0 RCX: 0000000000001000
+>>>> [   99.705100][    T2] RDX: ffffea00004a0100 RSI: ffffea00004a0200 RDI: ffff888012804000
+>>>> [   99.707861][    T2] RBP: 0000000000000801 R08: 0000000000000000 R09: 0000000000000000
+>>>> [   99.710648][    T2] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+>>>> [   99.713412][    T2] R13: 0000000000000801 R14: ffffea00004a0100 R15: ffffffff81f4df80
+>>>> [   99.716191][    T2] FS:  0000000000000000(0000) GS:ffff8880bbf28000(0000) knlGS:0000000000000000
+>>>> [   99.719316][    T2] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [   99.721648][    T2] CR2: ffff888012804000 CR3: 0000000007583001 CR4: 0000000000372eb0
+>>>> [   99.724421][    T2] Call Trace:
+>>>> [   99.725608][    T2]  <TASK>
+>>>> [   99.726646][    T2]  get_page_from_freelist+0x6fe/0x14b0
+>>>> [   99.728583][    T2]  ? fs_reclaim_acquire+0x43/0xe0
+>>>> [   99.730325][    T2]  ? find_held_lock+0x2b/0x80
+>>>> [   99.731965][    T2]  __alloc_frozen_pages_noprof+0x147/0x2d0
+>>>> [   99.734003][    T2]  __alloc_pages_noprof+0x5/0x50
+>>>> [   99.735766][    T2]  copy_process+0x1b1/0x1b30
+>>>> [   99.737398][    T2]  ? lock_is_held_type+0x89/0x100
+>>>> [   99.739157][    T2]  ? kthreadd+0x25/0x190
+>>>> [   99.740664][    T2]  kernel_clone+0x59/0x390
+>>>> [   99.742213][    T2]  ? kthreadd+0x25/0x190
+>>>> [   99.743728][    T2]  kernel_thread+0x55/0x70
+>>>> [   99.745310][    T2]  ? kthread_complete_and_exit+0x20/0x20
+>>>> [   99.747265][    T2]  kthreadd+0x117/0x190
+>>>> [   99.748748][    T2]  ? kthread_is_per_cpu+0x30/0x30
+>>>> [   99.750509][    T2]  ret_from_fork+0x16b/0x1e0
+>>>> [   99.752193][    T2]  ? kthread_is_per_cpu+0x30/0x30
+>>>> [   99.753992][    T2]  ret_from_fork_asm+0x11/0x20
+>>>> [   99.755717][    T2]  </TASK>
+>>>> [   99.756861][    T2] CR2: ffff888012804000
+>>>> [   99.758353][    T2] ---[ end trace 0000000000000000 ]---
+>>>> [   99.760319][    T2] RIP: 0010:clear_page_erms+0x7/0x10
+>>>> [   99.762209][    T2] Code: 48 89 47 18 48 89 47 20 48 89 47 28 48 89 47 30 48 89 47 38 48 8d 7f 40 75 d9 90 c3 0f 1f 80 00 00 00 00 b9 00 10 00 00 31 c0 <f3> aa c3 66 0f 1f 44 00 00 48 83 f9 40 73 2a 83 f9 08 73 0f 85 c9
+>>>> [   99.769129][    T2] RSP: 0018:ffff88800318fc10 EFLAGS: 00010246
+>>>> [   99.771297][    T2] RAX: 0000000000000000 RBX: 0000000000400dc0 RCX: 0000000000001000
+>>>> [   99.774126][    T2] RDX: ffffea00004a0100 RSI: ffffea00004a0200 RDI: ffff888012804000
+>>>> [   99.777013][    T2] RBP: 0000000000000801 R08: 0000000000000000 R09: 0000000000000000
+>>>> [   99.779827][    T2] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+>>>> [   99.782641][    T2] R13: 0000000000000801 R14: ffffea00004a0100 R15: ffffffff81f4df80
+>>>> [   99.785487][    T2] FS:  0000000000000000(0000) GS:ffff8880bbf28000(0000) knlGS:0000000000000000
+>>>> [   99.788671][    T2] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [   99.791012][    T2] CR2: ffff888012804000 CR3: 0000000007583001 CR4: 0000000000372eb0
+>>>> [   99.793863][    T2] Kernel panic - not syncing: Fatal exception
+>>>> [   99.796760][    T2] Kernel Offset: disabled
+>>>> [   99.798296][    T2] ---[ end Kernel panic - not syncing: Fatal exception ]---
+>>>>
+>>>> This makes me suspect the kvm_gmem_folio_restore_direct_map() path isn't
+>>>> working or isn't getting called.
+>>>>
+>>>> If anyone wants help trying to reproduce this let me know.
+>>>
+>>> Hi Brendan,
+>>>
+>>> Thanks for trying to run it!
+>>>
+>>> Just as a sanity check, the way it is known for us to work is we apply
+>>> all patches from [1].  For booted VMs (as opposed to restored from
+>>> snapshot), apart from the v6 of the direct map removal series, the only
+>>> additional patch is a fix for kvmclock on x86 [2].  Please let me know
+>>> if you see the same issue with that patch applied too.
+>>>
+>>> Nikita
+>>>
+>>> [1]
+>>> https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding/resources/hiding_ci/linux_patches
+>>> [2]
+>>> https://github.com/firecracker-microvm/firecracker/tree/feature/secret-hiding/resources/hiding_ci/linux_patches/11-kvm-clock
+>> 
+>> Ah, thanks! Seems I should have checked my inbox before sending my other
+>> mail. With the kvmclock fix applied to my host kernel, I start setting
+>> the other crash immediately when the VM boots. If I comment out the
+>> actual unmapping of memory, it boots (before, it wouldn't boot even with
+>> that commented out).
+>> 
+>> For the other linux_patches, I couldn't apply them on top of this
+>> series, do you have a branch I can use as a reference?
+>
+> Instead of having an explicit branch, we apply all the patches on top of 
+> [1].  There is a script that performs fetch/build/install end-to-end: [2].
+>
+> [1] 
+> https://github.com/firecracker-microvm/firecracker/blob/feature/secret-hiding/resources/hiding_ci/kernel_commit_hash
+> [2] 
+> https://github.com/firecracker-microvm/firecracker/blob/feature/secret-hiding/resources/hiding_ci/build_and_install_kernel.sh
 
-On Mon, 10 Nov 2025 at 14:51, Ben Horgan <ben.horgan@arm.com> wrote:
->
-> Hi Fuad,
->
-> On 11/10/25 13:45, Fuad Tabba wrote:
-> > The function pkvm_init_features_from_host() initializes guest
-> > features, propagating them from the host. The logic to propagate
-> > KVM_ARCH_FLAG_MTE_ENABLED (Memory Tagging Extension)
-> > has a couple of issues.
-> >
-> > First, the check was in the common path, before the divergence for
-> > protected and non-protected VMs. For non-protected VMs, this was
-> > unnecessary, as 'kvm->arch.flags' is completely overwritten by
-> > host_arch_flags immediately after, which already contains the MTE flag.
-> > For protected VMs, this was setting the flag even if the feature is not
-> > allowed.
-> >
-> > Second, the check was reading 'host_kvm->arch.flags' instead of using
-> > the local 'host_arch_flags', which is read once from the host flags.
-> >
-> > Fix these by moving the MTE flag check inside the protected-VM-only
-> > path, checking if the feature is allowed, and changing it to use the
-> > correct host_arch_flags local variable. This ensures non-protected VMs
-> > get the flag via the bulk copy, and protected VMs get it via an explicit
-> > check.
-> >
-> > Fixes: b7f345fbc32a ("KVM: arm64: Fix FEAT_MTE in pKVM")
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/pkvm.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > index f6f8996c4f97..7e370e31260d 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> > @@ -337,9 +337,6 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
-> >       /* CTR_EL0 is always under host control, even for protected VMs. */
-> >       hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
-> >
-> > -     if (test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &host_kvm->arch.flags))
-> > -             set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
-> > -
-> >       /* No restrictions for non-protected VMs. */
-> >       if (!kvm_vm_is_protected(kvm)) {
-> >               hyp_vm->kvm.arch.flags = host_arch_flags;
-> > @@ -372,6 +369,11 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
-> >               kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_GUEST_HAS_SVE);
-> >       }
-> >
-> > +     if (kvm_pvm_ext_allowed(KVM_CAP_ARM_MTE)) {
-> > +             set_bit(KVM_CAP_ARM_MTE, allowed_features);
->
-> Isn't allowed_features a bitmap for the KVM_ARCH_VCPU_ defines? I think
-> MTE is treated as a property of the VM.
-
-Right! This line should go. The check should only be to propagate the
-flag to kvm->arch.flags, i.e.,
-
-+       if (kvm_pvm_ext_allowed(KVM_CAP_ARM_MTE))
-+               kvm->arch.flags |= host_arch_flags &
-BIT(KVM_ARCH_FLAG_MTE_ENABLED);
-
-Thanks for pointing this out,
-/fuad
-
-> > +             kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_MTE_ENABLED);
-> > +     }
-> > +
-> >       bitmap_and(kvm->arch.vcpu_features, host_kvm->arch.vcpu_features,
-> >                  allowed_features, KVM_VCPU_MAX_FEATURES);
-> >  }
->
->
-> Thanks,
->
-> Ben
->
+Thanks, I was able to construct a branch and confirm the crashes go
+away. I guess this should block merging the feature though, right? Do
+you know which particular of the patches are the likely relevant ones
+here?
