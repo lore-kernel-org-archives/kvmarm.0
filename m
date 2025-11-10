@@ -1,97 +1,139 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D572F25F1
-	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 10:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3319221282;
+	Mon, 10 Nov 2025 11:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762771227; cv=none; b=Cev+eajv5T/06C6a0MNKgfgTkIQARafr6GSnsmrAbLUQRVFW9pF7o7NiO0u19PktFzmLAwsRrptLN9043NMFDFHb7yDZu/vQ2KuaWaQoDuRvSiqRZHVBt8zXq8a2GtifNTMwJlshrAR1m3Y3Y+6KT+coz193n7SLwzbfGfTWps0=
+	t=1762775264; cv=none; b=VjDzOhGhsjUYEyhs+VDNNBSXAcyOwdAve94qQZq36/3p4ovrrj3iFc/ghNTgXj3/kOrc2cpk1QbN8eoXds2xOr0BH3yuKibmf8uYUcl9uhE7TYZKIJdkS/ZPrqYcMO8S3mzGzMuA/e04MAXIaDaWvpHYCF/SpFcCXkgbuGixwAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762771227; c=relaxed/simple;
-	bh=8i2zPMoje5Db5aepFhq7c7rk3UWvoR7p+9rsDJZmqGM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B3Laj6DfAajrzfGsK+H1dqi/8edSL5hizmIZCcDqLL63kOszfwBVasTXL+oDVVtn1LsiRjgjyEe/hFhWjPPDi92fhN2ujF/Ib98nP54XeZaGygVB5hxVw+cj+7/ecAGklegTXFvVTLu+fVqd3TZeWJaknZxjV+Vdy1c5L1F/1lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 78DC8497;
-	Mon, 10 Nov 2025 02:40:16 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 03D223F66E;
-	Mon, 10 Nov 2025 02:40:22 -0800 (PST)
-Message-ID: <a914297b-753b-4fa0-8ffc-3a64b006316c@arm.com>
-Date: Mon, 10 Nov 2025 10:40:21 +0000
+	s=arc-20240116; t=1762775264; c=relaxed/simple;
+	bh=99WN30ryzWzH5hzRtlGC+kQjBRsdpDks1HmAmYRDMKA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CvYE6vtLwIZ2RD304VmKvyNeS3zW8D/iVaCRtE011PD0UrwxqA4QZVzWRT38ovRb20AZdPSStiVKKGoLO0PsFdnciKvnh2Yj5FKrh80zNh0R3Z8IHlfhMjEJ6jf1fS9/KvfAKYKLBvgLgSy4uThusWWANHW4oJZms1QBcOg5xZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rcCMBG+V; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rcCMBG+V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1FEDC19422;
+	Mon, 10 Nov 2025 11:47:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762775263;
+	bh=99WN30ryzWzH5hzRtlGC+kQjBRsdpDks1HmAmYRDMKA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rcCMBG+VU5HREdfNJgNish0MFJIZMNJB0GFmidQV69QhAQqOZ4lqKFwAPDLb9mAiY
+	 Ew6Wn4RUdcGoM6WtLDUdtGNBZVwQJ4fy9PQaj7U3bL6z5JKWqComWBXRmt9533il7O
+	 NlfPBLPdzDkucsF6uUXYm50ZpOp80hJdn2Z6RE5CfVob9Ghq5Cb2G6jTDxgI90eV+9
+	 cJdhJa2nmvpOC6BDo1EX75IUo5j+fq1FVuFW71MCaEsNEg508A98DhglHfhOVBq95h
+	 sQg5vNRU1fHyAWybkezEUX5uZtVUlYsRjH1m+wrU7eYrk6r4duvg1ZhKvbgERHVzga
+	 H4qvzB+ZK9BEw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vIQN3-00000003qIk-1Cd1;
+	Mon, 10 Nov 2025 11:47:41 +0000
+Date: Mon, 10 Nov 2025 11:47:40 +0000
+Message-ID: <867bvyun1f.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+In-Reply-To: <a914297b-753b-4fa0-8ffc-3a64b006316c@arm.com>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-5-maz@kernel.org>
+	<a914297b-753b-4fa0-8ffc-3a64b006316c@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a
- patched-in constant
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oupton@kernel.org>,
- Zenghui Yu <yuzenghui@huawei.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
- Yao Yuan <yaoyuan@linux.alibaba.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
- <20251109171619.1507205-5-maz@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20251109171619.1507205-5-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-On 09/11/2025 17:15, Marc Zyngier wrote:
-> The trap bits are currently only set to manage CPU errata. However,
-> we are about to make use of them for purposes beyond beating broken
-> CPUs into submission.
+On Mon, 10 Nov 2025 10:40:21 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> For this purpose, turn these errata-driven bits into a patched-in
-> constant that is merged with the KVM-driven value at the point of
-> programming the ICH_HCR_EL2 register, rather than being directly
-> stored with with the shadow value..
+> Hi Marc,
 > 
-> This allows the KVM code to distinguish between a trap being handled
-> for the purpose of an erratum workaround, or for KVM's own need.
+> On 09/11/2025 17:15, Marc Zyngier wrote:
+> > The trap bits are currently only set to manage CPU errata. However,
+> > we are about to make use of them for purposes beyond beating broken
+> > CPUs into submission.
+> > 
+> > For this purpose, turn these errata-driven bits into a patched-in
+> > constant that is merged with the KVM-driven value at the point of
+> > programming the ICH_HCR_EL2 register, rather than being directly
+> > stored with with the shadow value..
+> > 
+> > This allows the KVM code to distinguish between a trap being handled
+> > for the purpose of an erratum workaround, or for KVM's own need.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
+> ...
+> 
+> > diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> > index ac5f9c5d2b980..0ecadfa00397d 100644
+> > --- a/arch/arm64/kvm/vgic/vgic.h
+> > +++ b/arch/arm64/kvm/vgic/vgic.h
+> > @@ -164,6 +164,22 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+> >   	return ret;
+> >   }
+> >   +void kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
+> > +				   __le32 *origptr, __le32 *updptr, int nr_inst);
+> > +
+> > +static inline u64 vgic_ich_hcr_trap_bits(void)
+> > +{
+> > +	u64 hcr;
+> 
+> minor nit: Do we need a guard to make sure this isn't called before
+> the capabilities are finalized (given we may use it outside VM
+> context, e.g. VGIC probe). perhaps :
+> 
+> WARN_ON(!system_capabilities_finalized());
 
-...
+We already have a BUG_ON() for that at the point of setting up the
+vectors for pKVM. It wouldn't hurt to move this up as a general check
+for KVM, but I don't think placing these checks in random leaf
+functions is very appealing.
 
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index ac5f9c5d2b980..0ecadfa00397d 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -164,6 +164,22 @@ static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
->   	return ret;
->   }
->   
-> +void kvm_compute_ich_hcr_trap_bits(struct alt_instr *alt,
-> +				   __le32 *origptr, __le32 *updptr, int nr_inst);
-> +
-> +static inline u64 vgic_ich_hcr_trap_bits(void)
-> +{
-> +	u64 hcr;
+And if we do, it should be gated to not emit code in the hot path,
+with something like this (which I find awful):
 
-minor nit: Do we need a guard to make sure this isn't called before the 
-capabilities are finalized (given we may use it outside VM context, e.g. 
-VGIC probe). perhaps :
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index ec3a61e8e6b30..43f202cb83b48 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -171,6 +171,9 @@ static inline u64 vgic_ich_hcr_trap_bits(void)
+ {
+ 	u64 hcr;
+ 
++#if !defined(__KVM_VHE_HYPERVISOR__) && !defined(__KVM_NVHE_HYPERVISOR__)
++	WARN_ON(!system_capabilities_finalized());
++#endif
+ 	/* All the traps are in the bottom 16bits */
+ 	asm volatile(ALTERNATIVE_CB("movz %0, #0\n",
+ 				    ARM64_ALWAYS_SYSTEM,
 
-WARN_ON(!system_capabilities_finalized());
+Thanks,
 
+	M.
 
-> +
-> +	/* All the traps are in the bottom 16bits */
-> +	asm volatile(ALTERNATIVE_CB("movz %0, #0\n",
-> +				    ARM64_ALWAYS_SYSTEM,
-> +				    kvm_compute_ich_hcr_trap_bits)
-> +		     : "=r" (hcr));
-
-
-Suzuki
+-- 
+Without deviation from the norm, progress is not possible.
