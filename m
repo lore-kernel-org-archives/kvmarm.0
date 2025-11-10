@@ -1,173 +1,194 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F96720A5E5
-	for <kvmarm@lists.linux.dev>; Sun,  9 Nov 2025 19:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE1E2FC89F
+	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 09:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762717950; cv=none; b=A3LXG93DCUcPi/hlkoeR7jN3uAwGynFBn5CDkNtafldsm2lV48u6uptQB880CDqLzCM/z3uX3KTb0BoPVuq2TXFz5ftWou89jh4EMuIL11HMGpaoUKcTafbdapz8MRlNmn7dwxJmzOqDKiuFzVTSNy1FP0ZjXw+5ZEcghaRWXW8=
+	t=1762765604; cv=none; b=hwovPuiNdjTzPbJADJKPrUV2QKIcV63EH1VCDYBB2UtSjkHnKGAMP0JAYcriUOeDtnvQWHLnrucLscZa8lwdMsbI26tQ1KguYwRXiKuF9sRd4MNdjrRSKnfaNw9vMnEF2ZFlGAMufoncmIbc4OhFleJ162d9uBhyqAEXwvK39qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762717950; c=relaxed/simple;
-	bh=CGzhRtRTj/6mpi/QLfNxFwycc9UdPhBSdpXLE8Fd/II=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DfLsQqN+c17bB1Jqsu47kLD2urHOS8DEWVUNN2EjDBz/ia/IEyKoDXKSyCeI1iY1VkIPf+3gIcqjdWzjU+Z+Jg9m4PK0X0AcSuh/WHC+xQgorP7q5ic2LEgVCogoq9aNlPEvL+DKOM7Guddprcd5s7RGr/dFiS7opqSgvc8FOI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IHLGDeHw; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1762765604; c=relaxed/simple;
+	bh=gPcDGKwEsVJRvSCUHSJdrdgSd4eu3X4NeLWy+T2fUg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EqvuLxhuVJXpHxjV5zvQlY0KpbLvhRDj1OSTCOzGZdo2tcJSdbv3jaygHcd44KxcTPF0c/rCZte2S+bQUl0s/H1hkIswQMk2GS6v7bIdDAt0zYiL3Yoo5YpHHp49qwNdkeFSL48NCVCCXEzXhZQbkQGdOQMYbZOtSkxB1xr395M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tl8FVMW9; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IHLGDeHw"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed6ca52a0bso317601cf.1
-        for <kvmarm@lists.linux.dev>; Sun, 09 Nov 2025 11:52:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762717947; x=1763322747; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xxR6AO2B/jl6sBl+TPdH+gIFub+ESvkBEdXOIWya/Nk=;
-        b=IHLGDeHwRJhjJ8oJj6Mpn3nPNWqYroEDRGqj2Dsinv234XP6kkZr3NsADlwfRZsYae
-         yhz1j2ev2PIbv0f+pk+pCyCZLAgku4kXGdt3TZchV54hNof5QJ3+RV3WDkoMVuyOn/O+
-         mOFJnH5o+IsEtHBh5loUN4iisb6U1zGvBjjuvPbGlC/j3kD5zrWNYZx/uRZ8zCfXyEJu
-         FV+/ILwUTf6kJLvqagz5LzQZdX11WXEwCNDscyqDHwc//U2fW8FK5zw+k4sJcWQp1ji3
-         2/0h7lOEi1oPBmV1q3nFUoMxYytph6zTnze6KMm8wuwDi4IwI4TDJMLrHonSffWbnqMA
-         JlFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762717947; x=1763322747;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xxR6AO2B/jl6sBl+TPdH+gIFub+ESvkBEdXOIWya/Nk=;
-        b=PvNhZknJW4NQko9lAu1UcZD2wxHKz+tOfT+W2m8MbxcvCYODDQUjFK75UABo6D692k
-         Pyea0nmA9GESvXBc1IcJS7ujPhSWwcqYFrpFh4GW7IuoTtZ2nFYZb0702GNsCFb7Vkdl
-         jFMBa9DfXmvF24PrT0h7h9u8Do+5mfKkeeE6qct5HkC2xMHb7PG4Ob09BpG8JZQzD4tX
-         HkLU6d/5xsy5yQJA4qP7yhWBzdL3PkV0IFTG2ixOQtrAAGFm3LUjXupuI0MIoXQxSmfL
-         if6oVigYlqX6iDzEGz8biesUahUn8AFDdlE9+G6uSyGucpH35g5QOOjWi9JqXbdhQHu0
-         GptQ==
-X-Gm-Message-State: AOJu0YwKpHPRldSdZd+1Y53nfrs9N4LnGP2I95PqY5LxHcVWE21oXkRl
-	ct/65bJBF8qTYBTtCbJyqB/nAsdUUf3G/sJx+RHwL4I6/uFf62H07nJyWYzf0cTczPZoRhKJ9HB
-	q3aRWRaeFQ5YE5/bXi4PYZiFh/I5SfcDMjHv/HpCH
-X-Gm-Gg: ASbGncvsOHp0AeF1RqsguMYQl3OHV4AfavEM2Yu36O7sUUuWCVXKa6HalEh7GVv8BRe
-	nXrjdYrcr+jm2fpfY4usyfnm2bW+fyBAhaxFWlc225yPo7JmcNuZMaMzpsRbwg/XsCWKe50cT19
-	9jLbcWlnxpdaHJGvRAoSb5RRNzCcE25z1xotUxXSTNkMuHy+Jb1KORlYwIG+uqzY6iu0pETLSnQ
-	D5+03aJwLxHY9KHVJLhm0I89bvmyiqQMYpuglzsuz2CXX6pmy4vlmrsOQ2T
-X-Google-Smtp-Source: AGHT+IHJSNuyAe+Uxnb5byLMLhBxTCB9wY6uFCm/p+xazecRp4xYXv0GsvkhIaq1bmYoMG8A6aq02n8SHCv+pR7YX+Y=
-X-Received: by 2002:a05:622a:2cc:b0:4ed:8103:8c37 with SMTP id
- d75a77b69052e-4eda4e2c1abmr10604291cf.12.1762717947186; Sun, 09 Nov 2025
- 11:52:27 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tl8FVMW9"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762765598; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=vxV0Bv9e0M/3aXxevVPMy47RYEU13Dm8RyI5inKduGU=;
+	b=tl8FVMW9d8LbZZp/Vi9pvAVYG6DU1N9mfq1B3vZC81gcjXp7zbjXKQ8oxZZcsYcYuom7RBxKB8XMIv92dKC6KM0onVPd74nPH93OMIdWT1l9m5u+Ek7RptMCyUw1tpAwv4b48mZ5QcdOO6tieFvNxbYLbvMTlcK3YREzUUZs8ag=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0Ws1SfV-_1762765281 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 10 Nov 2025 17:01:21 +0800
+Date: Mon, 10 Nov 2025 17:01:21 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>
+Subject: Re: [PATCH v2 12/45] KVM: arm64: GICv3: Extract LR folding primitive
+Message-ID: <3tb7ekdzl5f4rs24bla63vw22awejhbn7ngvttid7v7bzaer2m@62bxshf7uj34>
+References: <20251109171619.1507205-1-maz@kernel.org>
+ <20251109171619.1507205-13-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251106144418.2847443-1-tabba@google.com> <20251106144418.2847443-6-tabba@google.com>
- <aQ580W6SU1lGbd_D@kernel.org>
-In-Reply-To: <aQ580W6SU1lGbd_D@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Sun, 9 Nov 2025 19:51:50 +0000
-X-Gm-Features: AWmQ_bkltSpteSq6mNSrRDyI0IRhsoYujO6S4KSBeDrZfrq3926fOivxRsnvq9c
-Message-ID: <CA+EHjTxwGEb0vPWNT7C8Gg6zhETk1C_dGhJ2+a9E+eJ84hvshA@mail.gmail.com>
-Subject: Re: [PATCH v2 5/5] KVM: arm64: Define FAR_MASK for fault IPA offset
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251109171619.1507205-13-maz@kernel.org>
 
-On Fri, 7 Nov 2025 at 23:12, Oliver Upton <oupton@kernel.org> wrote:
+On Sun, Nov 09, 2025 at 05:15:46PM +0800, Marc Zyngier wrote:
+> As we are going to need to handle deactivation for interrupts that
+> are not in the LRs, split vgic_v3_fold_lr_state() into a helper
+> that deals with a single interrupt, and the function that loops
+> over the used LRs.
 >
-> On Thu, Nov 06, 2025 at 02:44:17PM +0000, Fuad Tabba wrote:
-> > This 12-bit FAR mask is hard-coded as 'GENMASK(11, 0)' in several places
-> > to reconstruct the full fault IPA.
-> >
-> > Define FAR_MASK for this value in the shared header and replace all
-> > open-coded instances to improve readability.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h         | 2 ++
-> >  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 2 +-
-> >  arch/arm64/kvm/inject_fault.c            | 2 +-
-> >  arch/arm64/kvm/mmu.c                     | 4 ++--
-> >  4 files changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index 1da290aeedce..e995e9b3a0c4 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -343,6 +343,8 @@
-> >  #define PAR_TO_HPFAR(par)            \
-> >       (((par) & GENMASK_ULL(52 - 1, 12)) >> 8)
-> >
-> > +#define FAR_MASK GENMASK_ULL(11, 0)
-> > +
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v3.c | 88 +++++++++++++++++------------------
+>  1 file changed, 43 insertions(+), 45 deletions(-)
 >
-> This seems really confusing to me, since FAR_MASK sounds like it
-> represents the meaningful bits of FAR_ELx. Perhaps something like the
-> following would better represent intent:
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 3ede79e381513..0fccfe9e3e8dd 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -33,78 +33,76 @@ static bool lr_signals_eoi_mi(u64 lr_val)
+>  	       !(lr_val & ICH_LR_HW);
+>  }
 >
-> #define FAR_TO_FIPA_OFFSET(far) ((far) & GENMASK_ULL(11, 0))
+> -void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> +static void vgic_v3_fold_lr(struct kvm_vcpu *vcpu, u64 val)
+>  {
+> -	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> -	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+> -	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+> -	int lr;
+> -
+> -	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+> -
+> -	cpuif->vgic_hcr &= ~ICH_HCR_EL2_UIE;
+> -
+> -	for (lr = 0; lr < cpuif->used_lrs; lr++) {
+> -		u64 val = cpuif->vgic_lr[lr];
+> -		u32 intid, cpuid;
+> -		struct vgic_irq *irq;
+> -		bool is_v2_sgi = false;
+> -		bool deactivated;
+> -
+> -		cpuid = val & GICH_LR_PHYSID_CPUID;
+> -		cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+> -
+> -		if (model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> -			intid = val & ICH_LR_VIRTUAL_ID_MASK;
+> -		} else {
+> -			intid = val & GICH_LR_VIRTUALID;
+> -			is_v2_sgi = vgic_irq_is_sgi(intid);
+> -		}
+> +	struct vgic_irq *irq;
+> +	bool is_v2_sgi = false;
+> +	bool deactivated;
+> +	u32 intid;
+>
+> -		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> -		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> -			kvm_notify_acked_irq(vcpu->kvm, 0,
+> -					     intid - VGIC_NR_PRIVATE_IRQS);
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +		intid = val & ICH_LR_VIRTUAL_ID_MASK;
+> +	} else {
+> +		intid = val & GICH_LR_VIRTUALID;
+> +		is_v2_sgi = vgic_irq_is_sgi(intid);
+> +	}
+>
+> -		irq = vgic_get_vcpu_irq(vcpu, intid);
+> -		if (!irq)	/* An LPI could have been unmapped. */
+> -			continue;
+> +	irq = vgic_get_vcpu_irq(vcpu, intid);
+> +	if (!irq)	/* An LPI could have been unmapped. */
+> +		return;
+>
+> -		raw_spin_lock(&irq->irq_lock);
+> +	/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+> +	if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
+> +		kvm_notify_acked_irq(vcpu->kvm, 0,
+> +				     intid - VGIC_NR_PRIVATE_IRQS);
 
-Sounds better. I'll change it.
+The fds notifiy happens before checking irq's mapping before
+this patch, and now in reversal order w/ above change. It's
+fine for vLPI, and for vSPI no necessary call
+kvm_notify_acked_irq() if the it has been remapped, no
+gsi<->pin mapping there. Is above understanding correct ?
 
-Cheers,
-/fuad
-
-> Thanks,
-> Oliver
 >
-> >  #define ECN(x) { ESR_ELx_EC_##x, #x }
-> >
-> >  #define kvm_arm_exception_class \
-> > diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> > index 78579b31a420..22898ed4dd6f 100644
-> > --- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> > +++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
-> > @@ -44,7 +44,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
-> >
-> >       /* Build the full address */
-> >       fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
-> > -     fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > +     fault_ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
-> >
-> >       /* If not for GICV, move on */
-> >       if (fault_ipa <  vgic->vgic_cpu_base ||
-> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > index dfcd66c65517..8ef3453696a2 100644
-> > --- a/arch/arm64/kvm/inject_fault.c
-> > +++ b/arch/arm64/kvm/inject_fault.c
-> > @@ -258,7 +258,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> >       unsigned long addr, esr;
-> >
-> >       addr  = kvm_vcpu_get_fault_ipa(vcpu);
-> > -     addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > +     addr |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
-> >
-> >       __kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 7cc964af8d30..21a9442f9b1e 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1959,7 +1959,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >
-> >               /* Falls between the IPA range and the PARange? */
-> >               if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
-> > -                     fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > +                     fault_ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
-> >
-> >                       return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
-> >               }
-> > @@ -2059,7 +2059,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> >                * faulting VA. This is always 12 bits, irrespective
-> >                * of the page size.
-> >                */
-> > -             ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > +             ipa |= kvm_vcpu_get_hfar(vcpu) & FAR_MASK;
-> >               ret = io_mem_abort(vcpu, ipa);
-> >               goto out_unlock;
-> >       }
-> > --
-> > 2.51.2.1041.gc1ab5b90ca-goog
-> >
+> +	scoped_guard(raw_spinlock, &irq->irq_lock) {
+>  		/* Always preserve the active bit for !LPIs, note deactivation */
+>  		if (irq->intid >= VGIC_MIN_LPI)
+>  			val &= ~ICH_LR_ACTIVE_BIT;
+>  		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
+>  		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+>
+> -		if (irq->active && is_v2_sgi)
+> -			irq->active_source = cpuid;
+> -
+>  		/* Edge is the only case where we preserve the pending bit */
+>  		if (irq->config == VGIC_CONFIG_EDGE &&
+> -		    (val & ICH_LR_PENDING_BIT)) {
+> +		    (val & ICH_LR_PENDING_BIT))
+>  			irq->pending_latch = true;
+>
+> -			if (is_v2_sgi)
+> -				irq->source |= (1 << cpuid);
+> -		}
+> -
+>  		/*
+>  		 * Clear soft pending state when level irqs have been acked.
+>  		 */
+>  		if (irq->config == VGIC_CONFIG_LEVEL && !(val & ICH_LR_STATE))
+>  			irq->pending_latch = false;
+>
+> +		if (is_v2_sgi) {
+> +			u8 cpuid = FIELD_GET(GICH_LR_PHYSID_CPUID, val);
+> +
+> +			if (irq->active)
+> +				irq->active_source = cpuid;
+> +
+> +			if (val & ICH_LR_PENDING_BIT)
+> +				irq->source |= BIT(cpuid);
+> +		}
+> +
+>  		/* Handle resampling for mapped interrupts if required */
+>  		vgic_irq_handle_resampling(irq, deactivated, val & ICH_LR_PENDING_BIT);
+>
+>  		irq->on_lr = false;
+> -
+> -		raw_spin_unlock(&irq->irq_lock);
+> -		vgic_put_irq(vcpu->kvm, irq);
+>  	}
+>
+> +	vgic_put_irq(vcpu->kvm, irq);
+> +}
+> +
+> +void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+> +
+> +	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+> +
+> +	for (int lr = 0; lr < cpuif->used_lrs; lr++)
+> +		vgic_v3_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+> +
+>  	cpuif->used_lrs = 0;
+>  }
+>
+> --
+> 2.47.3
