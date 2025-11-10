@@ -1,130 +1,94 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36611448E3
-	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 13:45:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBB6722FDEC;
+	Mon, 10 Nov 2025 14:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762782337; cv=none; b=lEziiA7O4feNxN+Hpy4VI+GPmENh3m9+RbHYTxCLKdQ0sVtz6Qgg93PACdB+DjAjtLEWLfwAOOoQi2t1Twnaz/h70oCjS2c7QLIYzA07I+PIYfX6+ZFJ4Dtj5griZRk+9cVgXO2l8/AKYdTRQQxK630PkgUqZl3Pbyh1sEShf7U=
+	t=1762784131; cv=none; b=a7Q/GEuiXUVaFU1Kr2ckRV6t35rHIitYxijE/FfT0XQODFryVi3ZrMh8NfPE3NYKyetdsXTN+ZOXFBXwsG/5GW/rexpDpXNIX4ThYXxASNPXd5mygfxlu3oEUIWZ5NnXSZZCC1JSnHErLuB5dzAOk8BoEwJBRrKP9YQ8uXHHs1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762782337; c=relaxed/simple;
-	bh=etcwb9wYCbUJ8VuvJlSiYJOfdn5DYspnlP9RdmZ2sWM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gE/3AB1ObURtRIE3xmTFNy2uQBNH2kEZ+dH1SzY6WGlfPGqO5/TB4WwTj3YxO0kHILebrPeQoeCfLcH3fI0sp3ODZyB3XDWeZDD+qtfWVULOJetmtfp03jNCW+tdrtd0OAg9W0qRaXhIk5fboy8Sq7VaQs9w7B+LHR3pYvCmxLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gh4k0c56; arc=none smtp.client-ip=209.85.221.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1762784131; c=relaxed/simple;
+	bh=Zjtpe0PcMapcWqqZkDdW+4o/kiPNnUphphvNHXelxIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=elQnFZfrTGbF9OAhZHzkeqL8nYfHRhC61UhXQL/LTI9eGB/dfr5ZcKNbwCobBT5+uVWiyBGhnwRdH1RTL2UXTBTtsNFje8ZBso33M88YVdUq7Hb8B+8BYhTwIvpjTwFeiotNG7JFxlls6MkXIVYQEimf50GAaSmo9EnhtB7p/AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GA42ph7s; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gh4k0c56"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-429c93a28ebso2311743f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 05:45:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762782334; x=1763387134; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qzpqv5ajxbqxabD1jydfXotwMWgcKwPTq7CgnH0DZ4Q=;
-        b=gh4k0c56ySUYzspB3I9UJlKb+PnfH19Csn6SNofaXAd/JNMKC1ONAlgGgvr2f/zvTh
-         XZW3O8stryIqiz748DIvSoVlEqhre7locucy+jEgd8tsu4HbaLYNvf5eXck5F1cIU5aw
-         kMNVhMFp4uhdNVstOgz1fnPgj2CnGKSy3shMpL/SiysO3OCmqhTEkuv9S9XSffCanysg
-         wdZ4KBVC01UR5QqoZRAq2smkK50ogpPETPyFL2/3648amg+S9bMAmfeu+23Kox8wcCsl
-         CnVqd9TjuF/gscU1/MkJnQuhuG6l+uRV1v+AAgNFqIYiN6gBEFt53L305n2MOckU3eGt
-         bNtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762782334; x=1763387134;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qzpqv5ajxbqxabD1jydfXotwMWgcKwPTq7CgnH0DZ4Q=;
-        b=TsSZSKHBfxUHqQcIVJ/1btPWuw+Jbm9UXgnFbfT1Vo2ETQCKw3vgxeL2ANUCFijLo7
-         HOxeAUbMbvfKKr4yxNYwRjRw/BRpVYv+e78RZGt69LAtQfpKfc3yaypJhBzqtNn1hz13
-         KIJr6ZhOpKdpujcsyuSiEsCG1CqwUM3csA90jF/7gXuGbzmBV8HxyG5lLTn/Rc6iLfcd
-         iaLItJY76IXc65VAr74f0fUIbIcclb1OVSbf5zee61xubNy7omSCjS/OR6oCsEck13Pd
-         ykO/Lg/IaazxAVMpi2c1SXQ3DlDFw4boSRgaR7jJRUoQJx3V+QS+mYM9vVuQP6mqPOz6
-         8yaA==
-X-Gm-Message-State: AOJu0YwZZUAmwqIviMoKkywM31XaI3TtnxjlOQMv47cGxL7YKYQmwvgh
-	G91O9fU5styXN1cCerKRwqb/dJhWUeGN9aTM6OA7XBjzJP6x39ZQxvixD3iVEu1YTlsm0j/wOEl
-	6PKodV9zsDTyq+bDBQNsbClzud8lJ0vi4damEYTQOOlR6tYHZ3MJ8xts5k/Zj+ssyVOTfe6Hx/I
-	7nGcQm4aqqRiMKMgHsFnjORoLWRu5qA7I=
-X-Google-Smtp-Source: AGHT+IFXypgY1V9bfoxm4HDW9/b5rxBK9APolSwH/TBkmLsNgB/D1VFW8wsaUqSkXIyZxf2Xvb+MQ1m1cg==
-X-Received: from wrnu4.prod.google.com ([2002:adf:eb44:0:b0:429:cab7:2300])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2910:b0:429:dde3:6576
- with SMTP id ffacd0b85a97d-42b2dc2fca4mr6437305f8f.16.1762782333846; Mon, 10
- Nov 2025 05:45:33 -0800 (PST)
-Date: Mon, 10 Nov 2025 13:45:25 +0000
-In-Reply-To: <20251110134525.3768197-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GA42ph7s"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A5AC16AAE;
+	Mon, 10 Nov 2025 14:15:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762784130;
+	bh=Zjtpe0PcMapcWqqZkDdW+4o/kiPNnUphphvNHXelxIQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GA42ph7s2s7+Yl7kwe6WfC59VTGLEboLESGwJyU1V1aigA81vgr0GaSEHqSq7Vzou
+	 aOjGL/skU+9gr0wuCZMkj+dYY/k99CGv8IbvjRMfgDJMAQcpafQ4rwxR0DskeKbd3c
+	 k/bly5tjvA0+25B5Klj3vQzAF4hK2DyU+2f8gFGIOiQSJa4fbeNo8UKuG4+32R8DA5
+	 iSkb4zzDc1K0xysjIYCXJNR1NgLDu7br3jUdOPz2AKgTblQFRc9GFLk5pVh9C81U4K
+	 6AgVr8+MQWs+dUxApCQXJAdol1IPGOCqnjX1DZb1UwVGbi1l6ib1pncC4w5c1ntAiz
+	 4kwn8cI0TPScQ==
+Date: Mon, 10 Nov 2025 14:15:27 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Limit clearing of
+ ID_{AA64PFR0,PFR1}_EL1.GIC to userspace irqchip
+Message-ID: <aRHzf5wgJg5vSoKo@finisterre.sirena.org.uk>
+References: <20251030122707.2033690-1-maz@kernel.org>
+ <20251030122707.2033690-4-maz@kernel.org>
+ <aRHf6x5umkTYhYJ3@finisterre.sirena.org.uk>
+ <865xbiuj6e.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251110134525.3768197-1-tabba@google.com>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251110134525.3768197-9-tabba@google.com>
-Subject: [PATCH v3 8/8] KVM: arm64: Prevent host from managing timer offsets
- for protected VMs
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nmuVcHVoFc1KSfwu"
+Content-Disposition: inline
+In-Reply-To: <865xbiuj6e.wl-maz@kernel.org>
+X-Cookie: You dialed 5483.
 
-For protected VMs, the guest's timer offset state must not be controlled
-by the host and must always run with a virtual counter offset of 0. The
-existing timer logic allowed the host to set and manage the timer
-counter offsets for protected VMs in certain cases.
 
-Disable all host-side management of timer offsets for protected VMs by
-adding checks in the relevant code paths.
+--nmuVcHVoFc1KSfwu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/arch_timer.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+On Mon, Nov 10, 2025 at 01:11:05PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3f675875abea..f5407301c8f9 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1056,10 +1056,14 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
- 
- 	ctxt->timer_id = timerid;
- 
--	if (timerid == TIMER_VTIMER)
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
--	else
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	if (!kvm_vm_is_protected(vcpu->kvm)) {
-+		if (timerid == TIMER_VTIMER)
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+		else
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	} else {
-+		ctxt->offset.vm_offset = NULL;
-+	}
- 
- 	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 
-@@ -1083,7 +1087,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
--	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+	if (!vcpu_is_protected(vcpu) &&
-+	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
- 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
- 		timer_set_offset(vcpu_ptimer(vcpu), 0);
- 	}
-@@ -1687,6 +1692,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 	if (offset->reserved)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EINVAL;
-+
- 	mutex_lock(&kvm->lock);
- 
- 	if (!kvm_trylock_all_vcpus(kvm)) {
--- 
-2.51.2.1041.gc1ab5b90ca-goog
+> > Today's next/pending-fixes is showing regressions on a range of physical
+> > arm64 platforms (including at least a bunch of A53 systems, an A55 one
+> > and an A72 one) in the steal_time selftest which bisect to this patch.
+> > We get asserts in the kernel on ID register sets:
 
+> Please name the platforms this fails on. Here, on a sample of one A72
+> box, I don't see the issue:
+
+It looks like it's GICv2 that's affected - I'm seeing this on at least
+Raspberry Pi 3B+ and 4, Pine 64 Plus and Libretech Potato, Solitude and
+Tritum.  The platforms with GICv3 that I have results for (eg, the
+Toradex Verdin i.MX8MP and Mallow AM625) all seem fine.
+
+--nmuVcHVoFc1KSfwu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkR834ACgkQJNaLcl1U
+h9BOeQf9F0JppM6Dk5c7+DhSmGwO4/k/K/NN2DSDzXyrzdW9KWlMWhKIfk0uvhLD
+7Ne8pxY4YiamvsR/BgueeBbMum8BTfEZdT8nIkMdksIEDXrTTNz59bsDyqSw836z
+vvrIGpN1rtR8w61ptev/8jF9EDH3QQF+GkoRF6RFOW0rMMNMIN7EHciTVHcE2xBW
+T0Cf2fVgdYQAGNIs4j1dO3mmttXmQwNPeUAbasMw2qo8mw4kSqCGBhKO4mqvLBy4
+UQcK5zFxuf4S4gQCHTkBUHbiBReMvtgJJOV9wOA9+mK3KOwKC2+cuhVUfNl1s3zd
+Fs1H3D7kNPzDwNJl47kxXxHRqeQjHA==
+=/URp
+-----END PGP SIGNATURE-----
+
+--nmuVcHVoFc1KSfwu--
