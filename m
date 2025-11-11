@@ -1,112 +1,98 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71926346FB9
-	for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 03:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A58326A0DD;
+	Tue, 11 Nov 2025 09:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762832606; cv=none; b=AC6WAiqzY8xdBGCdj9ixHy9OveUJ2aAOnCR659wbUkI7PVHTxy0hgdKJ80opAE0K92DdoZ7plDssWVuokV6J10oSXmTqmbkEqxBLzAzBq6117A049LPklflcOwOB9r7jY5Cu1zTSFqaAwPr/igRVUxHD21DDeM1mOwBaDKSWKRc=
+	t=1762854546; cv=none; b=rofJN24vak5EWi4zVn71gqX2KrP+JMibSwyojFAbxROLeCUcKWxiYdGqAluyd924PhoHuoVrL8X1u8wjOkfCsAALGPPY0xcO2p4Os1yVcpQz7uYmi0PXzXbu5aBhhC/nzNLpxrLrQQm+0vWuZre+vEDucYj+M710Di14wkH0cSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762832606; c=relaxed/simple;
-	bh=MMwzfR5H1pUi2uy+y+0jbPsBuQQ+6oF24mA9QDCKNfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FHOHJlF4RSjw8/1AA3AEubjs7oLpTed5lpDZ4jitnPqQ/YRDY+FTkq1Wg20nho2teEzXUFxeq6zp/QuMTaBGdnn7w11DobkmNwcN1dnz3dq3OwmDuS31YJgBeLuhFaFKiXkH7rv5rWNUC9HarNOhoPY1nwUDZzL0+vuoFsloYNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4d5C534bS2z12LDN;
-	Tue, 11 Nov 2025 11:41:43 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id DBDE41401F0;
-	Tue, 11 Nov 2025 11:43:15 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 11 Nov 2025 11:43:15 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 11 Nov 2025 11:43:14 +0800
-Message-ID: <43558551-5ebc-0987-efdd-880021e7f906@hisilicon.com>
-Date: Tue, 11 Nov 2025 11:43:14 +0800
+	s=arc-20240116; t=1762854546; c=relaxed/simple;
+	bh=n/kM1AzkAh+XotAdnnKzHeaD66yI0/no2z219kdImyI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XOYTEH2oqGZFc4noenf5d2TSqSZVbayKtkdRKHn8i3VmhYQ7jYYJ19zT3dC4Z4oO+kgdJ/b7Ob7N2tlGEUHQ7iimiFeImhRS5i/Fp9u815xBXbBtFcVu5+Q5vMJ9Qkfb3mjFRc4GhcFo/ZYB6fGK1WNgJGjgjDjhTkIuFEpKzYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOeJ3RVZ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOeJ3RVZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB372C19421;
+	Tue, 11 Nov 2025 09:49:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762854546;
+	bh=n/kM1AzkAh+XotAdnnKzHeaD66yI0/no2z219kdImyI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HOeJ3RVZZB/4oSIYEvD8eHEipzvZOFaJqnkE42dmMFp+tB9OuzjLWz04+YM3z7R4U
+	 lcaEalhowL1o71cerk5eX47EHL+ajre+fi2UEyJi1xInplcb7+DTXcolqUX2R5nGjK
+	 6MBMS9grqKVToRjoS/YeVP7uQixVgsoLfttes1N01Nh3coRsXQHPgvQXU4w4kWOnxq
+	 iTV9Sv5znQ/WVyipDX6Eh5zMTxj++G97cXGP2KglHW5b3TIN+Akg5PHoftE2jnkGiu
+	 Nq4Ktn6Go9uKbNUmiwWIpZYgET9XI++vRz/VbZK/uBooblkYrgAlMYga9XRb72DXVa
+	 aZdMFVmKrv7Fg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vIkzn-00000004Alt-2bIR;
+	Tue, 11 Nov 2025 09:49:03 +0000
+Date: Tue, 11 Nov 2025 09:49:03 +0000
+Message-ID: <86346kvr00.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Osama Abdelkader <osama.abdelkader@gmail.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: add missing newline to sysreg init log
+In-Reply-To: <20251110211051.814728-1-osama.abdelkader@gmail.com>
+References: <20251110211051.814728-1-osama.abdelkader@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v7 6/7] KVM: arm64: Enable FEAT_{LS64, LS64_V} in the
- supported guest
-Content-Language: en-US
-To: Oliver Upton <oupton@kernel.org>
-CC: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<yuzenghui@huawei.com>, <arnd@arndb.de>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-7-wangzhou1@hisilicon.com>
- <aQ5APpLg0Elv4YoH@kernel.org>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <aQ5APpLg0Elv4YoH@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: osama.abdelkader@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/11/8 2:53, Oliver Upton wrote:
-> Hi Zhou,
+On Mon, 10 Nov 2025 21:10:51 +0000,
+Osama Abdelkader <osama.abdelkader@gmail.com> wrote:
 > 
-> On Fri, Nov 07, 2025 at 03:21:26PM +0800, Zhou Wang wrote:
->> From: Yicong Yang <yangyicong@hisilicon.com>
->>
->> Using FEAT_{LS64, LS64_V} instructions in a guest is also controlled
->> by HCRX_EL2.{EnALS, EnASR}. Enable it if guest has related feature.
->>
->> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> missing newline so the  message is merged with follow-on logs
+> the change only affects console output formatting, no behavioral impact.
 > 
-> The ordering of this patch is incorrect as patch #5 has the side-effect
-> of exposing ID_AA64ISAR1_EL1.LS64 to KVM guests. This one should come
-> first instead.
-Hi Oliver,
+> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
+> ---
+>  arch/arm64/kvm/arm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 870953b4a8a7..156cd1a6106e 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2845,7 +2845,7 @@ static __init int kvm_arm_init(void)
+>  
+>  	err = kvm_sys_reg_table_init();
+>  	if (err) {
+> -		kvm_info("Error initializing system register tables");
+> +		kvm_info("Error initializing system register tables\n");
+>  		return err;
+>  	}
+>  
 
-I got this point, will change the order in next version.
+Given that everything in kvm_sys_reg_table_init() already screams
+badly when it fails, I don't see the point of an additional message,
+and I'd rather remove it.
 
 Thanks,
-Zhou
 
-> 
-> Thanks,
-> Oliver
-> 
->> ---
->>  arch/arm64/include/asm/kvm_emulate.h | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index bab967d65715..29291e25ecfd 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -695,6 +695,12 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu *vcpu)
->>  
->>  		if (kvm_has_sctlr2(kvm))
->>  			vcpu->arch.hcrx_el2 |= HCRX_EL2_SCTLR2En;
->> +
->> +		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64))
->> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnALS;
->> +
->> +		if (kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V))
->> +			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
->>  	}
->>  }
->>  #endif /* __ARM64_KVM_EMULATE_H__ */
->> -- 
->> 2.33.0
->>
->>
-> 
-> .
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
