@@ -1,42 +1,43 @@
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767AC34EEE8;
-	Tue, 11 Nov 2025 10:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426CE357A20;
+	Tue, 11 Nov 2025 10:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762858543; cv=none; b=srf1J2eiJs95LuKRvHO5VNxngfG+Dj0Oo97sgeI/fv7aXQDQO+lUfzY2qGBUyPUuQEIajdd3CaEoV/AN6YDDQApry6r/oS9+/wC5BMiKrphrTHA9ZE4HvEl0iuYKp/+REqaDJFVV3umvLwBGKkdMkYWbL/MNTrNAUUnUty0228k=
+	t=1762858555; cv=none; b=bCLHW2n24dGUtRs8EGpSH626M2IfVx1Iaol8Rjt2A0Mq+iGJEIiAe6d5NI/NwcwXXWCgw7bWLAJDlkR/9ryLUAEpDgn7Tps2OvYD/6kNoaARXLxMSK0VcK9Ie4knwv0qzemXHFg9HEuyNJxQqCezfz8fK1X7qNMCE5oS/tV/3WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762858543; c=relaxed/simple;
-	bh=JIiXBQ+HfWnHPFXLFi4PNYjKN8uoAMBbRfj6haUpS3Q=;
+	s=arc-20240116; t=1762858555; c=relaxed/simple;
+	bh=SQNuPyry54rGiwTAF83uw3tVzcTs/6Rhfs7Wtk9sekY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mtLNH6EbuwJqERnNMzxdgExVRjSqNbgbnDI49NYcNVqCBth7cTMyrYhumFJ2B8hbxNoYamwh4aewjXK6+EzhB7s4cKmsERGaR65eMUJSfh6lMZxRa1NYA+aVeotOqFniT2K8Edx1UtwOKF5uQEqChBwEa4h2dCUSxSS2FvnHeng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=C5eRZQTa; arc=none smtp.client-ip=90.155.92.199
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFfwnUW8eLHZBjXlau0uyc54Q3LyFQkuc1BipQJ/Z+3hKmDJ765vMCpk4bT4/AleD+nx4BVg+RRAxht3u3+KKO3fsWVIA0G5cU41ffbEUPHPpdKsO1b+CgVZ4Jm+QKtpcGFiToQvUFkM+KIPu1PQfhEJyGMm9MQQVQcN5/1ET0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=haezqG7D; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C5eRZQTa"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="haezqG7D"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xnRd3UIwh+9qZhSCRQpcmxah3gyiZrVdc2k35mDPlXQ=; b=C5eRZQTaySI5US1pSO5wDw2NYR
-	32s1bpXC8pyo8HHTfDBR/mteI4rLGoP6FrtIJK+Dw8jnhwFgyVC9oyVrEFE1yMIVClqRGeN+3nizJ
-	WLKEsvrvkrg6C+M63UXfcMO8zQXCcwap4v2IJN3v5WGTrNZE1Qpwbqv5Yv+lJEjszB2z3VdctDVP0
-	hxRTPDmSyWwfXATdKCZf8dz1qVOGdWa0Sck3qJAU2QvcUMMU9Zl/KjKCNK3Ew3aZos7B9IgHSdibz
-	5wULk7flcbk98o+9ZkgyvojJOLvB3K1q7tv4NxVPXm1NHcxvv+zQux2aRr0Nk/PMVQbidIRHiduKy
-	7qOTS3nA==;
+	bh=6e7yn7s1XQtiRBa03S5N6GS6xIer9ZSlKTyvpE7kXHI=; b=haezqG7DjCoy/XwUDm/4CRUj0D
+	GU73y9BGJ+J06CCZYEAV18NSFvK2+1iGFIiL/EywksGvZSXsOWRT56UfygWcyZdAGVUQaRDygq3fi
+	5UdtXdRTaTjDec1HPK1hOQDqYq3iN92Mo37Yt4cl72XaGjQzR6U8FtV9PSZCJDpjKW5nfVoJqDZdv
+	/+rbcj2vFPXqZkMQG7l21MB3ps0aAmGRP32UT7wbZbkaYrpnrTaVxJUxOxJrs8ok/5JhocgP+EuF1
+	4FujX3EDXvOfOmpK5JxM0pYpWwOoQpsVeYLBhYaLzA0Ej269G6KQWwR/jyiK9sQxVnHL6JfSE/gD/
+	rJWAyfeg==;
 Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vIlAN-0000000CyGv-3VTa;
-	Tue, 11 Nov 2025 10:00:00 +0000
+	id 1vIlAg-0000000CyKB-0fBo;
+	Tue, 11 Nov 2025 10:00:18 +0000
 Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 6527A300328; Tue, 11 Nov 2025 11:55:26 +0100 (CET)
-Date: Tue, 11 Nov 2025 11:55:26 +0100
+	id 4AEE6300328; Tue, 11 Nov 2025 11:55:45 +0100 (CET)
+Date: Tue, 11 Nov 2025 11:55:45 +0100
 From: Peter Zijlstra <peterz@infradead.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+To: Will Deacon <will@kernel.org>
+Cc: James Clark <james.clark@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
 	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
@@ -51,13 +52,11 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v9 2/5] perf: arm_spe: Add support for filtering on data
- source
-Message-ID: <20251111105526.GI278048@noisy.programming.kicks-ass.net>
+Subject: Re: [PATCH v9 1/5] perf: Add perf_event_attr::config4
+Message-ID: <20251111105545.GJ278048@noisy.programming.kicks-ass.net>
 References: <20251029-james-perf-feat_spe_eft-v9-0-d22536b9cf94@linaro.org>
- <20251029-james-perf-feat_spe_eft-v9-2-d22536b9cf94@linaro.org>
- <20251110154827.GA278048@noisy.programming.kicks-ass.net>
- <8078e440-e97c-425c-b046-987b642640f7@linaro.org>
+ <20251029-james-perf-feat_spe_eft-v9-1-d22536b9cf94@linaro.org>
+ <aQi9MstZTsloKmeo@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -66,42 +65,41 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8078e440-e97c-425c-b046-987b642640f7@linaro.org>
+In-Reply-To: <aQi9MstZTsloKmeo@willie-the-truck>
 
-On Tue, Nov 11, 2025 at 10:51:56AM +0000, James Clark wrote:
-> 
-> 
-> On 10/11/2025 3:48 pm, Peter Zijlstra wrote:
-> > On Wed, Oct 29, 2025 at 03:46:02PM +0000, James Clark wrote:
-> > > SPE_FEAT_FDS adds the ability to filter on the data source of packets.
-> > > Like the other existing filters, enable filtering with PMSFCR_EL1.FDS
-> > > when any of the filter bits are set.
-> > > 
-> > > Each bit maps to data sources 0-63 described by bits[0:5] in the data
-> > > source packet (although the full range of data source is 16 bits so
-> > > higher value data sources can't be filtered on). The filter is an OR of
-> > > all the bits, so for example clearing bits 0 and 3 only includes packets
-> > > from data sources 0 OR 3.
-> > > 
-> > > Invert the filter given by userspace so that the default value of 0 is
-> > > equivalent to including all values (no filtering). This allows us to
-> > > skip adding a new format bit to enable filtering and still support
-> > > excluding all data sources which would have been a filter value of 0 if
-> > > not for the inversion.
+On Mon, Nov 03, 2025 at 02:33:22PM +0000, Will Deacon wrote:
+> On Wed, Oct 29, 2025 at 03:46:01PM +0000, James Clark wrote:
+> > Arm FEAT_SPE_FDS adds the ability to filter on the data source of a
+> > packet using another 64-bits of event filtering control. As the existing
+> > perf_event_attr::configN fields are all used up for SPE PMU, an
+> > additional field is needed. Add a new 'config4' field.
 > > 
-> > So from that I'm reading the config4 field will only have like 16 bits,
+> > Reviewed-by: Leo Yan <leo.yan@arm.com>
+> > Tested-by: Leo Yan <leo.yan@arm.com>
+> > Reviewed-by: Ian Rogers <irogers@google.com>
+> > Signed-off-by: James Clark <james.clark@linaro.org>
+> > ---
+> >  include/uapi/linux/perf_event.h | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/include/uapi/linux/perf_event.h b/include/uapi/linux/perf_event.h
+> > index 78a362b80027..0d0ed85ad8cb 100644
+> > --- a/include/uapi/linux/perf_event.h
+> > +++ b/include/uapi/linux/perf_event.h
+> > @@ -382,6 +382,7 @@ enum perf_event_read_format {
+> >  #define PERF_ATTR_SIZE_VER6			120	/* Add: aux_sample_size */
+> >  #define PERF_ATTR_SIZE_VER7			128	/* Add: sig_data */
+> >  #define PERF_ATTR_SIZE_VER8			136	/* Add: config3 */
+> > +#define PERF_ATTR_SIZE_VER9			144	/* add: config4 */
+> >  
+> >  /*
+> >   * 'struct perf_event_attr' contains various attributes that define
+> > @@ -543,6 +544,7 @@ struct perf_event_attr {
+> >  	__u64	sig_data;
+> >  
+> >  	__u64	config3; /* extension of config2 */
+> > +	__u64	config4; /* extension of config3 */
 > 
-> The _data source_ is 16 bits, but the _data source filter_ is 64 bits.
+> Please can one of the core perf maintainers ack/nak this extension?
 
-Ah!
-
-> It might be clearer if I add a few more words to differentiate "data source"
-> and "filter":
-> 
->   Each bit of the 64 bit filter maps to data sources 0-63 described by
->   bits[0:5] in the data source packet (although the full range of data
->   source is 16 bits so higher value data sources can't be filtered on).
->   The filter is an OR of all the filter bits, so for example clearing
->   filter bits 0 and 3 only includes packets from data sources 0 OR 3.
-
-Yeah, that might've helped :-)
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
