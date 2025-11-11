@@ -1,105 +1,195 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDC828000B
-	for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 21:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FE82FE568
+	for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 02:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762809061; cv=none; b=fRMpyW5hJR0ZIdU+/UnrFCf3Hv07bxngjfc/MgILEM6mkOaa6dsJ+zRwV5UdkwJPsNGOTD+KxJhNRoFxchi4Q3HFio9fcHXr/fdGkahdLmiXBZREjfrxlBKN6geZTVaqJqPtXvL2Vu9xUGZalHUWQ3G4KHXDE1gX8B0OC7pJXH0=
+	t=1762827158; cv=none; b=bBa0OqCbqO09ze5FtX0MEuLv+du0B/WRlSeYKMVhU1LysksEzhdhL0IhDLOiCYCctWbWZ63ZAMDjYDBnxIl43uWCrYD6j3+6AKjwSHaCOHmYoRzr9t73Qr3phctL5Kf0bywYbYPA3GdhXKKDhu5yozwOOocHHRBYh0keHe9DuIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762809061; c=relaxed/simple;
-	bh=5A2x3M04AnvOkfewgoNI3cPsxt1f+pgjuFoeucr4xmU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LShFtIynBKD0/e02NRuOiQdHOJOSIa9Mu2fS2Jz/sacGu+pPq3Jz/zMy1TgSZdmBjnvD3QdbcK8Aci6zMzXHaB8xofU44p2jYBDTcGV8O6V2kBP+H6MySTgOq1UsITbu/W2yFdeNIh7WPN/iZMap2he+26arqy3jvpkSRMuyId8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cNy4vuPp; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cNy4vuPp"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4710a1f9e4cso26898345e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 10 Nov 2025 13:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762809058; x=1763413858; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s6pHR7F03/pIPTipT8rH7/Q5PrxczVrwgluDM2gAtnY=;
-        b=cNy4vuPp+dDITzJatApX1tb3unF1vTaW7yC2FIvnEKYi23dqkyjwN5HSQRLUUwsLe8
-         PaIFGmo4YCICH2f2DiPPQRwroE/modayOLXSTPkrH7nRTCnSFALKvfF/td1dUc7Slbe3
-         VHPcUwZSr8Li6OxbPgRYGt3OjRYvShbVwxTB6s/tgnEd6Y5IM6NdQ8n37vwHsQMkY5O0
-         IXksj4PeD3QOVmfHMxOGSiUO3XFJxcZxqYg9rp5GUB1Ulaar1MRiYESq2vRdzw+Ib5h3
-         kGE9xktNM8jMrF2w5hTUcz/+Oyn/F6D6lgMYvM6nAhAEvC3qOkHgkp3r4uBgQ3oUwTtv
-         IjkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762809058; x=1763413858;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s6pHR7F03/pIPTipT8rH7/Q5PrxczVrwgluDM2gAtnY=;
-        b=CxotEhLj/qIe58I1s5XlZhIpmiTbAWvr36bL59GNijxUWOc8LPjI7JQXeTp7C6fk2E
-         QSDik2DyQwvlo5iaBfJ6NTio9GdPUNjVcTgXmqIPLk3qYooBcem6oneMrEzMHrRFYW7p
-         ESD/bUCX+qO3fSBWotfKGkcpqmSo2PYie/01YVij3azBs6bIn+jlwobyWGd4Ozef8Zmf
-         fGHu+z1c0RZpnonyEwVy5T9FGCkfK/6ISpxpSB6zzkJYDHVo0I1VxQMwx+S5mCwafM1B
-         YWcEtduz3hhuIpoiKfTQC6+/n5rHzr3CNh6MQuU78c39IL6rUAjmnyJ+gHftj7+pnIoY
-         g3HQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn2QJ8xwU/1kWyCOu9DOPwhnalOguW44ld+8W0fgB6ltVcbEvzUsspAZRo6uNIEv/VKAj8cM8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwxxrLpCIRCl1mW5JuDBjuBhmPkGwLJdqAauZS4K2ti7KztcSx7
-	dBelV4hW3O8T/AbJEQRgyEn1knT7RHW/XpwOgRs5qciBkdhL71eTssIO
-X-Gm-Gg: ASbGnctbrAZJ3jehnv07oz4vSAuJyreLyujSpLlsIhaHkzhiNRXGSfQh4cXetFPqu5t
-	K2iYNK0/wDhSPCJwkkHxbGXbPw8ds5RAUZDPyzSlwAlRLp+Or3ISx+pIgCL1hYUu2GPUVIJs+rc
-	bSntR6YOrBlIJJed+93hg20O3KbL5/8E7J1Dr2EHu9SV4qDxiPRPMKUcZV7eFOJMDxzLpmiC6gc
-	p4rfo0azmKfiI6raJ4VE7Dm1SOracMZl2KFgltzylSqJ5y76e2MUeoBurERIgKt1sERU+t0OpWu
-	g6etIZ7SL7Eyge0pSRu95383lysrsnp1m28oEyNyO9Hi/HirqfN2YzhN/C2mC0v+1fofGCxxQom
-	wTvrZGiEfxTnUEUdsbBSkxwOfPsqUoUXbR8OBOkiCUktL+/O4BJFa6y4Wbm6xAiH1rLq5ioFLKk
-	qTPhLp
-X-Google-Smtp-Source: AGHT+IGoIT5w+QUViZBORjTwCO0tphc5Rsw+ZwM/XoSTGH0I5syp92nB5jyHfqFFdSWjwPM/eSjHXw==
-X-Received: by 2002:a05:600c:4c98:b0:477:755b:5587 with SMTP id 5b1f17b1804b1-477755b5694mr45928235e9.8.1762809057974;
-        Mon, 10 Nov 2025 13:10:57 -0800 (PST)
-Received: from osama.. ([156.223.120.220])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47781d68e3bsm1181165e9.7.2025.11.10.13.10.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 13:10:57 -0800 (PST)
-From: Osama Abdelkader <osama.abdelkader@gmail.com>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Osama Abdelkader <osama.abdelkader@gmail.com>
-Subject: [PATCH] KVM: arm64: add missing newline to sysreg init log
-Date: Mon, 10 Nov 2025 23:10:51 +0200
-Message-ID: <20251110211051.814728-1-osama.abdelkader@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1762827158; c=relaxed/simple;
+	bh=hYTA4N3OynG6J0xbCv+fr6rP7Ws9A8YbiHTuM/yMTas=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rUU9Ay2EZrGbBj0oQMhPtEhwkLHlXBXgEJttg/YgMn70VJxS3cck+XDN3H/7zfO6ORez1SA0Nwplm8JRmwmU6B37ld2twVBkpTnS9Tbd/oxcWTf4/ejdxQurMt+3TbzL3X5pVys7wm4zhW222vXAwsofyiEyMJZyJ8/HwoeWlUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d594L64VBznTvV;
+	Tue, 11 Nov 2025 10:10:58 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0FDE81A016C;
+	Tue, 11 Nov 2025 10:12:31 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 11 Nov 2025 10:12:30 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 11 Nov 2025 10:12:30 +0800
+Message-ID: <b9c8bb91-cd0f-c732-6b21-d8eb2ccc880e@hisilicon.com>
+Date: Tue, 11 Nov 2025 10:12:07 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v7 1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B*
+ outside of memslots
+Content-Language: en-US
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, <catalin.marinas@arm.com>,
+	<will@kernel.org>, <maz@kernel.org>, <oliver.upton@linux.dev>,
+	<joey.gouly@arm.com>, <yuzenghui@huawei.com>, <arnd@arndb.de>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+ <20251107072127.448953-2-wangzhou1@hisilicon.com>
+ <1f0d24ae-c20c-4067-aa0c-b5bbeba367db@arm.com>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <1f0d24ae-c20c-4067-aa0c-b5bbeba367db@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-missing newline so the  message is merged with follow-on logs
-the change only affects console output formatting, no behavioral impact.
+On 2025/11/7 19:48, Suzuki K Poulose wrote:
+> On 07/11/2025 07:21, Zhou Wang wrote:
+>> From: Marc Zyngier <maz@kernel.org>
+>>
+>> The main use of {LD,ST}64B* is to talk to a device, which is hopefully
+>> directly assigned to the guest and requires no additional handling.
+>>
+>> However, this does not preclude a VMM from exposing a virtual device
+>> to the guest, and to allow 64 byte accesses as part of the programming
+>> interface. A direct consequence of this is that we need to be able
+>> to forward such access to userspace.
+>>
+>> Given that such a contraption is very unlikely to ever exist, we choose
+>> to offer a limited service: userspace gets (as part of a new exit reason)
+>> the ESR, the IPA, and that's it. It is fully expected to handle the full
+>> semantics of the instructions, deal with ACCDATA, the return values and
+>> increment PC. Much fun.
+>>
+>> A canonical implementation can also simply inject an abort and be done
+>> with it. Frankly, don't try to do anything else unless you have time
+>> to waste.
+>>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+>> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> 
+> We also need to document this new EXIT reason here :
+> 
+> Documentation/virt/kvm/api.rst
+> 
+> 
+>> ---
+>>   arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
+>>   include/uapi/linux/kvm.h |  3 ++-
+>>   2 files changed, 28 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
+>> index 54f9358c9e0e..2a6261abb647 100644
+>> --- a/arch/arm64/kvm/mmio.c
+>> +++ b/arch/arm64/kvm/mmio.c
+>> @@ -159,6 +159,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>>       bool is_write;
+>>       int len;
+>>       u8 data_buf[8];
+>> +    u64 esr;
+>> +
+>> +    esr = kvm_vcpu_get_esr(vcpu);
+>>         /*
+>>        * No valid syndrome? Ask userspace for help if it has
+>> @@ -168,7 +171,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>>        * though, so directly deliver an exception to the guest.
+>>        */
+>>       if (!kvm_vcpu_dabt_isvalid(vcpu)) {
+>> -        trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
+>> +        trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
+>>                       kvm_vcpu_get_hfar(vcpu), fault_ipa);
+>>             if (vcpu_is_protected(vcpu))
+>> @@ -185,6 +188,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>>           return -ENOSYS;
+>>       }
+>>   +    /*
+>> +     * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
+>> +     * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
+>> +     * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
+> 
+> minor nit: typo: s/luserspace/userspace/ 
 
-Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
----
- arch/arm64/kvm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Will fix this in next version.
+> 
+>> +     * which will have to provide a full emulation of these 4
+>> +     * instructions.  No, we don't expect this do be fast.
+>> +     *
+>> +     * We rely on traps being set if the corresponding features are not
+>> +     * enabled, so if we get here, userspace has promised us to handle
+>> +     * it already.
+>> +     */
+>> +    switch (kvm_vcpu_trap_get_fault(vcpu)) {
+>> +    case 0b000100 ... 0b001111:
+>> +    case 0b101010 ... 0b101011:
+> 
+> Matches Arm ARM.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 870953b4a8a7..156cd1a6106e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2845,7 +2845,7 @@ static __init int kvm_arm_init(void)
- 
- 	err = kvm_sys_reg_table_init();
- 	if (err) {
--		kvm_info("Error initializing system register tables");
-+		kvm_info("Error initializing system register tables\n");
- 		return err;
- 	}
- 
--- 
-2.43.0
+Here is mentioned in L.b D24.2.40(page 7526). It does not include 0b0000xx,
+so first case in above code is "case 0b000100 ... 0b001111", just skip 0b0000xx.
 
+> 
+>> +        if (FIELD_GET(GENMASK(12, 11), esr)) {
+>> +            run->exit_reason = KVM_EXIT_ARM_LDST64B;
+>> +            run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
+> 
+> Any particular reason why we diverge from the NISV case, where the FSC is provided,> but not here ? May be this needs to be documented too.
+
+NISV case and this case is different. NISV indicates whether the syndrome information
+in ISS[23:14] is valid, bits[12:11](LST) indicates which LS64 instruction generated
+the data abort. Not sure why did we mask FSC, seems that LST already offers related
+information.
+
+Best,
+Zhou
+
+> 
+> Suzuki
+> 
+> 
+>> +            run->arm_nisv.fault_ipa = fault_ipa;
+>> +            return 0;
+>> +        }
+>> +    }
+>> +
+>>       /*
+>>        * Prepare MMIO operation. First decode the syndrome data we get
+>>        * from the CPU. Then try if some in-kernel emulation feels
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 52f6000ab020..d219946b96be 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -179,6 +179,7 @@ struct kvm_xen_exit {
+>>   #define KVM_EXIT_LOONGARCH_IOCSR  38
+>>   #define KVM_EXIT_MEMORY_FAULT     39
+>>   #define KVM_EXIT_TDX              40
+>> +#define KVM_EXIT_ARM_LDST64B      41
+>>     /* For KVM_EXIT_INTERNAL_ERROR */
+>>   /* Emulate instruction failed. */
+>> @@ -401,7 +402,7 @@ struct kvm_run {
+>>           } eoi;
+>>           /* KVM_EXIT_HYPERV */
+>>           struct kvm_hyperv_exit hyperv;
+>> -        /* KVM_EXIT_ARM_NISV */
+>> +        /* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
+>>           struct {
+>>               __u64 esr_iss;
+>>               __u64 fault_ipa;
+> 
+> 
+> 
+> 
+> .
