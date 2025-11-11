@@ -1,247 +1,109 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB143A1D06
-	for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 17:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7552853F7
+	for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 18:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762883879; cv=none; b=ddWyv5U9//qG+h4LgLWtEG9VH8IG5I1z+6YTNJWTvHCcI0VTgePK1oqQ5l6nn3UfAA643taDnHMuGAzjBAqKwibk09nzzMomSlj+O/76UL52ZIKBAOyBtFvmmvj4jaFdm/1SwaM4kjJSHSTVo15mE1nvWr6JVSY3Lej4OUFaV48=
+	t=1762887013; cv=none; b=X41BQ0+L4jePlhMhJLPv52GAIjGQuzv8d9mze0lORMMy1lV2GLMsFJt3j+/PD5hbgMGNF7J9KxwvJRbbLpcn5VuJI4Z3/9xHg12bBj+s5tVavYKk98PHGkg77LqsB2wRtKpipb1eGh0R4QkwM+p3jOAqk0v/HG22LxnY7USGofk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762883879; c=relaxed/simple;
-	bh=Ua18poE0n61krzU4ifKvt7+6Dr5IAwrjucPZPapN7G8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b+Qu8RyqqXsSVv3JjYEapyPJgVLyrXZMVXWzErZ9blLemLNCZJvtI5WbY0rebB+0RxVoD7uKp3Y1dNtNS1DTX+VHT9dPljxhftO0fqQe3E9e98zxuOUZN7rj33dvh+3fPltSuv4plXWMPFuJ9fEaXA/32h1h5oiUEwUrAnCPAEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HWl9CdVM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1762887013; c=relaxed/simple;
+	bh=zh5qlv2jzu5zwpymlV61eYkKmky2VbNHJ19tw5WJCzU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gC4GeBvh5KZ5uKJoySvJ0Hlr9EtxrmAcojLSdv8Lg0vSNFxCWGqaYh988J3Rjd/s7RHMQy8tQK2WWlAgYKraH54WXhtTJ89KbDwKGtvPDFKtMO5lyyQBCNLN0n65siE1h9Mh+aQ9NRCmzQiETKzR08jNzRsJLiJNqyOncGn0kf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V/XhNXbU; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HWl9CdVM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762883874;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lgu0Ck5YyznAWG1i65dblATGVHtQNlg1aO/WGnU5EJc=;
-	b=HWl9CdVM8O7fOQhQDhumldLFDD/dl3Px1ymvUDUyI8StkZ47u5R93CPIpU71Wdl5tnbIVQ
-	JCZD46AJCGj3gyzowRUTlXK5vxt1FR6X9gs24vHtFQvgwmUCjUjS80Hs0vfgkqWwgtNFkq
-	YS4dhtrxpd5zbRaID6wXDzBmvNfpAmA=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-245-IRBd4MLaP0uk2bEbuYflLg-1; Tue, 11 Nov 2025 12:57:51 -0500
-X-MC-Unique: IRBd4MLaP0uk2bEbuYflLg-1
-X-Mimecast-MFC-AGG-ID: IRBd4MLaP0uk2bEbuYflLg_1762883871
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed6855557aso26000831cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 09:57:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V/XhNXbU"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b2dc17965so2744909f8f.3
+        for <kvmarm@lists.linux.dev>; Tue, 11 Nov 2025 10:50:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762887010; x=1763491810; darn=lists.linux.dev;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hecw6SGTcbrCqUAbSZzj/G3btrpHikJf1SssivaJbCA=;
+        b=V/XhNXbUnXAprPP1DOf3pBMv+8oLSNQ8dhRDjZY7qeFdKqaS3XVBJgE1DZ7bXHcI4N
+         ChOEhLQiiHDBi1jgljbpo8fPl8KzDz5iSBs3NguFzM2iqHb3nprBakSm5U8fo4d/cXSF
+         0ngjJvd7oR+Xu0v9xQTF/5IvFSbsTm0ihJnMO96hVgnCPNfgZrcRTC18AfbnwPrt8iRr
+         6PHx5VhX6MrD9nt+N6XCZKxlUsDeGzf9aKI8bKu6swp3X3qFBwdaV5nrHyxgHsN3oXum
+         GcCKc4CK+mTEUxblwbZn9EE0avYYJD8mIMjqDpSbpFDeZ0Dh037MdNQ5MFH8HJuujqBj
+         phJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762883871; x=1763488671;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1762887010; x=1763491810;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lgu0Ck5YyznAWG1i65dblATGVHtQNlg1aO/WGnU5EJc=;
-        b=EjoDis4XtM4vmjX4M2ephnBHa0xskUXZV4MN+v8fH47L5L6KwBIePDalAGLc/xialy
-         KsPP8+TppO2lXmSuH6nwzaMEV6wICWzqY3qGzFPrr9moWYjU21Fjobpgb8VfY/fN5AJA
-         MP9GHjLt11gZx2N9oLThDRkRxBaArB3ngaDmQMhKrsEBX1AEh/3WSIEvAMiFckVPxCQN
-         sup8MUTQOTEz9XUuUSv5f6pCv9ksPUGwERMeEeMjOAlyZ0sJM43XM8UH+w+4OOZKbTlU
-         1L2+wrj6ftaNnoRYl+xvmPEGWQmc2FZe/93yhIwVXOWBx2EiCzsZIiNYfThH6aIMQDCM
-         7WXw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhTSxE9ZrHHCTQl9ZQfrWGFffOZGd9wCiIeSil5kqhVlVZBDDQ6NOkiL/CAzTZCNkOCSUxAR0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz4dMTBwyKT+P5c3I7AHBvE2QK1qzabaULDWx5i6oostuuEwXtS
-	nskrk1SNrAf07uxkVetgDM/MiX1S7uuFfRCrdV4gt5/mkns+clYdHWzDkEvmnxaxv9XE8U1b/0b
-	cdr/LaCuZUhNZ4Qk+2AmSEj0hxM62RaPJWDU9w0tIu5tfywa7VUObThIjDg==
-X-Gm-Gg: ASbGncskp/P+886U/qSimVbE86ury9DuF9gb69KbBn4QkmmnlSN7t3evsfhNGwrVP2z
-	qNJWdPr6AViMUCfoWVSaMCpobGFJiwHYBRtXPkHoCC1mMBdxGCOt2VgiXXHrjZ//whltfoaDvAo
-	rYmv8zF+7oDXwnsNInObWh66JPZZE+N7VqGah5LN1Yx1EFkvXbLkb6UZly75dJBZ81Fk1ppD6rl
-	gknFW59d0wb6qwXS7Kp+po2OJjUnKN6LljqU7Vsg+qVZGItrnPkT+wxYQzO2LL4uO02s5wHOQ/p
-	qDH02VWF2WH+w36fUXib/cmxhktWwfjjcfAUB+ItApMpyObH5g16t/BaLt0JPuPve+6kl6HSNDL
-	nrnraEeexiQqT2WZhrx6NuMb9qcbEuIulDb+oxuDtAiIA6ZAMK9JZgZwr
-X-Received: by 2002:a05:622a:188d:b0:4ed:1ccb:e604 with SMTP id d75a77b69052e-4eddb82b388mr2963221cf.11.1762883870999;
-        Tue, 11 Nov 2025 09:57:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgy8Y2ETN6jhMS8VG62OyFcw269nFSuIGAcybI6nZ8cge2kSlujkUzY+J9XzGPpFYAEfeCTQ==
-X-Received: by 2002:a05:622a:188d:b0:4ed:1ccb:e604 with SMTP id d75a77b69052e-4eddb82b388mr2962891cf.11.1762883870608;
-        Tue, 11 Nov 2025 09:57:50 -0800 (PST)
-Received: from [10.188.251.182] (cust-east-par-46-193-65-163.cust.wifirst.net. [46.193.65.163])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4eda5956968sm71729391cf.6.2025.11.11.09.57.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 09:57:50 -0800 (PST)
-Message-ID: <0795ff4a-50d1-4b2d-84bf-e1bc9da11ba6@redhat.com>
-Date: Tue, 11 Nov 2025 18:57:48 +0100
+        bh=hecw6SGTcbrCqUAbSZzj/G3btrpHikJf1SssivaJbCA=;
+        b=MMSkDtbJGzvha/8LAUUnAuPBRSly75ocSm3hSPwygpXfFZTFbQM9HQCog9UswoPSuW
+         FC1rEgh/RbnIyeBlN3kg/tyMAY36c1SUVnW2OfaEu6tMYV4pSQn/5umUMMCCpiAAzazE
+         /kcs8exE7gkQ2O/LIQ10xQo5erFNVuVthiHVKQC+2kC72bQEvL2qYOngFFJ/k+P1XtG/
+         2E5dnUqO8DmRZnDVbslkxpufUP/uLVcx9LUl5kzyumMQgtfySCX3XD1yeKIn9xJJNwB2
+         tZLsNJeOoucutDlf/iCkFMeDUX1FE84JMCzt0L0FjgS8s1hzZB6UP5gyW9YnMyCSLfIa
+         NNLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRQxbdC76S5kUfWwKO2bCmPs5IvzHzoQsoU5Pe88krDZNvHPc5UhvmRMk7/3pyYL/iCGd8a1g=@lists.linux.dev
+X-Gm-Message-State: AOJu0YztdOaRbLgQYrzrUvZGk1rn4mS70wAjXucatfwUVMdedRQrZdNM
+	+EoiLkYgIydBQt2s+NOY80yDWX7qUXgydYSOlp2U6Ns5KnkaD3acn50z
+X-Gm-Gg: ASbGnctaJCWjXJyob4HWCRPEmTJXa0KsvXRplfRq1CQbRohAji0TuxwS2TJrxTsH2h1
+	FQp2P5Sdpw8NvB3T//oHioOWnKM64z0gzJDxQ2H1Wz9YCmh+BoXQcYBvjGzddfUrAbE2CNSsdoR
+	BmBojQFabDlRi0IMNAiLTXBl8FPnM9pBAZh4S4ZW7G8YLOgQ7iqqRKpvk0fRvM8GAhBW4Y6IwSx
+	+CJKDlYLacjTZytj+enjuezYtTFs9JT3SwsdJL6whgmi3/QuDbVjohe3s5jOyGky5azv9+pJH19
+	e/xK6VnrxQYyeETw76pxN5RPxleWtjg++nvGh9jnSEzr9bA4lumethiYkQAMFAGAo8MLPZfx9YQ
+	Uhv8PbitTGrot0OZ0U65CmWuxOIF80lBYLorIOCryL40dI0/TD4HxqluecqkCn1jsWhGPx4QvN5
+	Z7lxa1bBdxd/AS
+X-Google-Smtp-Source: AGHT+IFSvM2CsB+t9jolqji5xVyqJeQrmqnCERVjosfYiifdGVyx1RnjwV0p/nlqbwxmejN0WMpo8w==
+X-Received: by 2002:a05:6000:26d2:b0:42b:396e:2817 with SMTP id ffacd0b85a97d-42b4bd9b823mr211802f8f.40.1762887009974;
+        Tue, 11 Nov 2025 10:50:09 -0800 (PST)
+Received: from osama.. ([41.236.140.69])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b322d533dsm18787142f8f.0.2025.11.11.10.50.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 10:50:09 -0800 (PST)
+From: Osama Abdelkader <osama.abdelkader@gmail.com>
+To: maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Osama Abdelkader <osama.abdelkader@gmail.com>
+Subject: [PATCH] KVM: arm64:  drop sysreg init error log
+Date: Tue, 11 Nov 2025 20:50:05 +0200
+Message-ID: <20251111185005.12842-1-osama.abdelkader@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-To: Sebastian Ott <sebott@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20251030165905.73295-1-sebott@redhat.com>
- <20251030165905.73295-3-sebott@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20251030165905.73295-3-sebott@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: nz-N3NuUpP0Or0zAt7QfbvrX6RNRByq37MXUn74oYdo_1762883871
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The failure paths inside kvm_sys_reg_table_init() already emit
+excessive error messages. The additional kvm_info() in the caller
+is therefore redundant, so remove it.
 
+Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
+---
+ arch/arm64/kvm/arm.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-On 10/30/25 5:59 PM, Sebastian Ott wrote:
-> Provide a kvm specific vcpu property to override the default
-> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->  docs/system/arm/cpu-features.rst |  5 +++
->  target/arm/cpu.h                 |  6 ++++
->  target/arm/kvm.c                 | 60 +++++++++++++++++++++++++++++++-
->  3 files changed, 70 insertions(+), 1 deletion(-)
->
-> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-> index 37d5dfd15b..1d32ce0fee 100644
-> --- a/docs/system/arm/cpu-features.rst
-> +++ b/docs/system/arm/cpu-features.rst
-> @@ -204,6 +204,11 @@ the list of KVM VCPU features and their descriptions.
->    the guest scheduler behavior and/or be exposed to the guest
->    userspace.
->  
-> +``kvm-psci-version``
-> +  Override the default (as of kernel v6.13 that would be PSCI v1.3)
-> +  PSCI version emulated by the kernel. Current valid values are:
-> +  0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
-> +
->  TCG VCPU Features
->  =================
->  
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 39f2b2e54d..c2032070b7 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -981,6 +981,12 @@ struct ArchCPU {
->       */
->      uint32_t psci_version;
->  
-> +    /*
-> +     * Intermediate value used during property parsing.
-> +     * Once finalized, the value should be read from psci_version.
-> +     */
-> +    uint32_t prop_psci_version;
-> +
->      /* Current power state, access guarded by BQL */
->      ARMPSCIState power_state;
->  
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 0d57081e69..c53b307b76 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
->      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->  }
->  
-> +struct psci_version {
-> +    uint32_t number;
-> +    const char *str;
-> +};
-> +
-> +static const struct psci_version psci_versions[] = {
-> +    { QEMU_PSCI_VERSION_0_1, "0.1" },
-> +    { QEMU_PSCI_VERSION_0_2, "0.2" },
-> +    { QEMU_PSCI_VERSION_1_0, "1.0" },
-> +    { QEMU_PSCI_VERSION_1_1, "1.1" },
-> +    { QEMU_PSCI_VERSION_1_2, "1.2" },
-> +    { QEMU_PSCI_VERSION_1_3, "1.3" },
-> +    { -1, NULL },
-> +};
-> +
-> +static char *kvm_get_psci_version(Object *obj, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    const struct psci_version *ver;
-> +
-> +    for (ver = psci_versions; ver->number != -1; ver++) {
-> +        if (ver->number == cpu->prop_psci_version)
-I still have the same question/comment as on v1. In case the end user
-does not override the psci version I think you want to return the
-default value, retrieved from KVM through KVM_REG_ARM_PSCI_VERSION and
-which populates cpu->psci_version. So to me you should use
-cpu->psci_version instead
-
-> +            return g_strdup(ver->str);
-> +    }
-> +
-> +    g_assert_not_reached();
-> +}
-> +
-> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    const struct psci_version *ver;
-> +
-> +    for (ver = psci_versions; ver->number != -1; ver++) {
-> +        if (!strcmp(value, ver->str)) {
-> +            cpu->prop_psci_version = ver->number;
-> +            return;
-> +        }
-> +    }
-> +
-> +    error_setg(errp, "Invalid PSCI-version value");
-> +}
-> +
->  /* KVM VCPU properties should be prefixed with "kvm-". */
->  void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->  {
-> @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->                               kvm_steal_time_set);
->      object_property_set_description(obj, "kvm-steal-time",
->                                      "Set off to disable KVM steal time.");
-> +
-> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
-> +                            kvm_set_psci_version);
-> +    object_property_set_description(obj, "kvm-psci-version",
-> +                                    "Set PSCI version. "
-> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
->  }
->  
->  bool kvm_arm_pmu_supported(void)
-> @@ -1959,7 +2008,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->      if (cs->start_powered_off) {
->          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
->      }
-> -    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-> +    if (cpu->prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
-I don't understand what this change stands for. Please document it
-through both a comment and a commit msg explanation
-
-Thanks
-
-Eric
-> +        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
->          cpu->psci_version = QEMU_PSCI_VERSION_0_2;
->          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
->      }
-> @@ -1998,6 +2048,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          }
->      }
->  
-> +    if (cpu->prop_psci_version) {
-> +        psciver = cpu->prop_psci_version;
-> +        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
-> +        if (ret) {
-> +            error_report("PSCI version %"PRIx64" is not supported by KVM", psciver);
-> +            return ret;
-> +        }
-> +    }
->      /*
->       * KVM reports the exact PSCI version it is implementing via a
->       * special sysreg. If it is present, use its contents to determine
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 870953b4a8a7..af2fe3cb3356 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2844,10 +2844,8 @@ static __init int kvm_arm_init(void)
+ 	}
+ 
+ 	err = kvm_sys_reg_table_init();
+-	if (err) {
+-		kvm_info("Error initializing system register tables");
++	if (err)
+ 		return err;
+-	}
+ 
+ 	in_hyp_mode = is_kernel_in_hyp_mode();
+ 
+-- 
+2.43.0
 
