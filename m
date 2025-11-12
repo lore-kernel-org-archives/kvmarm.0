@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750C935388A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C8D2D2394
 	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 18:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972451; cv=none; b=ChYrqVFFNJdXsHjZ8oDTlfF7xgajjDYeAXO61jPBK341L/5suI3wxM+YgeQJIjKaymEM90kGluNmoTw1w64gmCnhsIYtRC2qKH2zIW7kMdUKd+cIj1UGwHyEidBHExdQbXESmN47wCY9+HS4A9wOaZ7M3SEdZx8B98V21X1eWxY=
+	t=1762972451; cv=none; b=l9+IdctTE1atj4Zjq+NyJJNXNLIdqqdxrQ6krWtPJyHEnhmv3GaRrtSC86J+Qo5KQq+aXYiX6PL2G6670+OBcJPP85fD3XmNT71EYXaktxXL7rZ8G1QoFOhYieUCH1QssCBO4mvwxhRsbMHTddzgcZTiIvsCcbTs5tQEh+qvj+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762972451; c=relaxed/simple;
-	bh=c+7ijd3XehpA5TcOC9WUGtH4UCbxLXxr9wnUGamEeV0=;
+	bh=jcQ49p7+7TtUyheqo4nLS8YmIoNFvSLGQOcaPlQH4rc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RhVIeVbKIsNb2KwveLAdDUn9pBNQzifWGxlFgXiBoCSwrXOKqzAJMEBemRcmamkK5xhZnkXzNR7nNauHhtwB4QVjkcBEvawv7Adi2ICUiVy9Ws50Lj9zblJHXBaV+7i+8flqb8cKym/8Su85itoAxInkAfkh4CHQHypwK7GSmMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNULLzPA; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MLgFtphi4BLTCJ4pSpy0ukwRWKuHxnDcHeuf77UUphLFoPi42KmDcFQli+RGIODV6H2gEEvP/mzyo2zr5hSgnlKAMxLeaLUpYOqP6vPLoO9ZuureGY+Q9FZdhpJzyZsBSUta2X9nPIP4Fn1ghTlQGIk1Qypz95IwpfsS8vrv+lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lu8zhRXZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNULLzPA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5642C4CEF1;
-	Wed, 12 Nov 2025 18:34:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lu8zhRXZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B47C19422;
+	Wed, 12 Nov 2025 18:34:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762972450;
-	bh=c+7ijd3XehpA5TcOC9WUGtH4UCbxLXxr9wnUGamEeV0=;
+	s=k20201202; t=1762972451;
+	bh=jcQ49p7+7TtUyheqo4nLS8YmIoNFvSLGQOcaPlQH4rc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fNULLzPAPcr+AxsZJZg8CzLmt+ClkTLbPV9TZv7g9uXxj7iqEbXsDVtK7AMDXeuFP
-	 V2ghUNnnySjiSNm21VLnHbYzkqxqMGKkEN7VaaodJHwpP8zAnay/Cx41LRwcJVZaSu
-	 OqBdEDE/pEvOITWVtase5Xvo4UE6S5sgt/7urag8TRQ59EDjAkm8Nhc5/sGYzx6FSm
-	 8Q4k8VNaqBbbhb3vZZvZJ7Tzfja1w6g7d42Dk7cdV3L70NvLfae+e1I+vSexlab27r
-	 ARIt+WCzcXc7K5QuzS/eNWj1lysUdXIoLkIpOLdFFemNSw+Z6mml6IP5BaaO/h40MY
-	 sZNFx0UWWu0zw==
+	b=Lu8zhRXZQyYP77QeXGj5jYv8gADok6YMXHrl4jMAAD9ZG8do6U7yUCPVT6oe6FRHj
+	 UDZjxu8lexx+t6w6eMfZO1LZpuLYvAzAgBs0uty29vgORgwJcALNzNEyUzHZl/+kY8
+	 0ue9BtFZUOQZAy6JCoebGjgyt/IG/2LlTnTxg8FJIPoU9QkrQBxo8h28k/MxHcaJhH
+	 Rz1W4EiGHgBNKAqqrSSyvMxFtFN18qzgJn6Hc/aQqY7L2gFumzPEph5lWhzZmDFa0M
+	 zazRyPJ6bDp07jNFWMYLmw/iSmU9/dCeUCFVigzO+viwTj18/yqRKdhRkXmbv/UD0R
+	 fN9/Ku2mrnTew==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,9 +33,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH 02/12] KVM: arm64: Add support for FEAT_XNX stage-2 permissions
-Date: Wed, 12 Nov 2025 10:33:56 -0800
-Message-ID: <20251112183406.2118981-3-oupton@kernel.org>
+Subject: [PATCH 03/12] KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2
+Date: Wed, 12 Nov 2025 10:33:57 -0800
+Message-ID: <20251112183406.2118981-4-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251112183406.2118981-1-oupton@kernel.org>
 References: <20251112183406.2118981-1-oupton@kernel.org>
@@ -47,150 +47,136 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-FEAT_XNX adds support for encoding separate execute permissions for EL0
-and EL1 at stage-2. Add support for this to the page table library,
-hiding the unintuitive encoding scheme behind generic pX and uX
-permission flags.
+Add support for FEAT_XNX to shadow stage-2 MMUs, being careful to only
+evaluate XN[0] when the feature is actually exposed to the VM.
+Restructure the layering of permissions in the fault handler to assume
+pX and uX then restricting based on the guest's stage-2 afterwards.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 17 +++++----
- arch/arm64/kvm/hyp/pgtable.c         | 54 ++++++++++++++++++++++++----
- 2 files changed, 58 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h | 37 +++++++++++++++++++++++++++--
+ arch/arm64/kvm/mmu.c                | 23 ++++++++++++++----
+ arch/arm64/kvm/nested.c             |  5 +++-
+ 3 files changed, 57 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 2888b5d03757..c72149a607d6 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -89,7 +89,7 @@ typedef u64 kvm_pte_t;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index f7c06a840963..5d967b60414c 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -120,9 +120,42 @@ static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
+ 	return trans->writable;
+ }
  
- #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
- 
--#define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
- 
-@@ -251,12 +251,15 @@ enum kvm_pgtable_stage2_flags {
-  * @KVM_PGTABLE_PROT_SW3:	Software bit 3.
-  */
- enum kvm_pgtable_prot {
--	KVM_PGTABLE_PROT_X			= BIT(0),
--	KVM_PGTABLE_PROT_W			= BIT(1),
--	KVM_PGTABLE_PROT_R			= BIT(2),
--
--	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
--	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-+	KVM_PGTABLE_PROT_PX			= BIT(0),
-+	KVM_PGTABLE_PROT_UX			= BIT(1),
-+	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
-+						  KVM_PGTABLE_PROT_UX,
-+	KVM_PGTABLE_PROT_W			= BIT(2),
-+	KVM_PGTABLE_PROT_R			= BIT(3),
-+
-+	KVM_PGTABLE_PROT_DEVICE			= BIT(4),
-+	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(5),
- 
- 	KVM_PGTABLE_PROT_SW0			= BIT(55),
- 	KVM_PGTABLE_PROT_SW1			= BIT(56),
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c351b4abd5db..8c813bf70b38 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -661,11 +661,36 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 
- #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
- 
-+static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
-+{
-+	bool px, ux;
-+	u8 xn;
-+
-+	px = prot & KVM_PGTABLE_PROT_PX;
-+	ux = prot & KVM_PGTABLE_PROT_UX;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_XNX) && px != ux)
-+		return -EINVAL;
-+
-+	if (px && ux)
-+		xn = 0b00;
-+	else if (!px && ux)
-+		xn = 0b01;
-+	else if (!px && !ux)
-+		xn = 0b10;
-+	else
-+		xn = 0b11;
-+
-+	*attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, xn);
-+	return 0;
+-static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
++static inline bool kvm_has_xnx(struct kvm *kvm)
+ {
+-	return !(trans->desc & BIT(54));
++	return cpus_have_final_cap(ARM64_HAS_XNX) &&
++		kvm_has_feat(kvm, ID_AA64MMFR1_EL1, XNX, IMP);
 +}
 +
- static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
- 				kvm_pte_t *ptep)
- {
- 	kvm_pte_t attr;
- 	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
-+	int r;
++static inline bool kvm_s2_trans_exec_el0(struct kvm *kvm, struct kvm_s2_trans *trans)
++{
++	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
++
++	if (!kvm_has_xnx(kvm))
++		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
++
++	switch (xn) {
++	case 0b00:
++	case 0b01:
++		return true;
++	default:
++		return false;
++	}
++}
++
++static inline bool kvm_s2_trans_exec_el1(struct kvm *kvm, struct kvm_s2_trans *trans)
++{
++	u8 xn = FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, trans->desc);
++
++	if (!kvm_has_xnx(kvm))
++		xn &= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10);
++
++	switch (xn) {
++	case 0b00:
++	case 0b11:
++		return true;
++	default:
++		return false;
++	}
+ }
  
- 	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
- 			KVM_PGTABLE_PROT_NORMAL_NC)) {
-@@ -685,8 +710,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7cc964af8d30..96f1786c72fe 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1521,6 +1521,16 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
+ 	*prot |= kvm_encode_nested_level(nested);
+ }
+ 
++static void adjust_nested_exec_perms(struct kvm *kvm,
++				     struct kvm_s2_trans *nested,
++				     enum kvm_pgtable_prot *prot)
++{
++	if (!kvm_s2_trans_exec_el0(kvm, nested))
++		*prot &= ~KVM_PGTABLE_PROT_UX;
++	if (!kvm_s2_trans_exec_el1(kvm, nested))
++		*prot &= ~KVM_PGTABLE_PROT_PX;
++}
++
+ #define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
+ 
+ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+@@ -1572,11 +1582,12 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (writable)
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 
+-	if (exec_fault ||
+-	    (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
+-	     (!nested || kvm_s2_trans_executable(nested))))
++	if (exec_fault || cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+ 		prot |= KVM_PGTABLE_PROT_X;
+ 
++	if (nested)
++		adjust_nested_exec_perms(kvm, nested, &prot);
++
+ 	kvm_fault_lock(kvm);
+ 	if (mmu_invalidate_retry(kvm, mmu_seq)) {
+ 		ret = -EAGAIN;
+@@ -1851,11 +1862,13 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+ 		else
+ 			prot |= KVM_PGTABLE_PROT_DEVICE;
+-	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC) &&
+-		   (!nested || kvm_s2_trans_executable(nested))) {
++	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
+ 		prot |= KVM_PGTABLE_PROT_X;
  	}
  
--	if (!(prot & KVM_PGTABLE_PROT_X))
--		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	r = stage2_set_xn_attr(prot, &attr);
-+	if (r)
-+		return r;
- 
- 	if (prot & KVM_PGTABLE_PROT_R)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-@@ -715,8 +741,19 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
- 		prot |= KVM_PGTABLE_PROT_R;
- 	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
- 		prot |= KVM_PGTABLE_PROT_W;
--	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN))
--		prot |= KVM_PGTABLE_PROT_X;
++	if (nested)
++		adjust_nested_exec_perms(kvm, nested, &prot);
 +
-+	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
-+	case 0b00:
-+		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
-+		break;
-+	case 0b01:
-+		prot |= KVM_PGTABLE_PROT_UX;
-+		break;
-+	case 0b11:
-+		prot |= KVM_PGTABLE_PROT_PX;
-+		break;
-+	default:
-+	}
+ 	/*
+ 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
+ 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index f04cda40545b..92b2a69f0b89 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -788,7 +788,10 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
+ 		return 0;
  
- 	return prot;
- }
-@@ -1293,6 +1330,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	int ret;
- 	s8 level;
- 	kvm_pte_t set = 0, clr = 0;
-+	kvm_pte_t xn;
+ 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
+-		forward_fault = !kvm_s2_trans_executable(trans);
++		if (vcpu_mode_priv(vcpu))
++			forward_fault = !kvm_s2_trans_exec_el1(vcpu->kvm, trans);
++		else
++			forward_fault = !kvm_s2_trans_exec_el0(vcpu->kvm, trans);
+ 	} else {
+ 		bool write_fault = kvm_is_write_fault(vcpu);
  
- 	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
- 		return -EINVAL;
-@@ -1303,8 +1341,12 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
--	if (prot & KVM_PGTABLE_PROT_X)
--		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	ret = stage2_set_xn_attr(prot, &xn);
-+	if (ret)
-+		return ret;
-+
-+	set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
- 
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level, flags);
- 	if (!ret || ret == -EAGAIN)
 -- 
 2.47.3
 
