@@ -1,92 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140522FE06F
-	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 10:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAFD313542
+	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 10:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762942052; cv=none; b=kAgLCfhEEY54TQHHvUf+c6KU+mtl3sv7xqxBVit7SthZjueyqi63jEfHWw2+dineKqfZPSFzZpOfACG6eVMgbmLlheJnsom4tkGHuIC7aFTCz9gbqgeOtzzfzw1AbtMgBDlWX4nxLyaubPmcImT1ntvIerx+v8iz7/kT7sLt3Uk=
+	t=1762943375; cv=none; b=u16KrNb3lT0klgmbt+S8JD6JnxMb1BbFgWRZlhZn0DNHXfCq/7cWFv95ovOSqLfrNKHJGmQwUVyImnCa2qDacZmGdbpYpjpIqFcZ52Hn6DItiB0u1BzO9KhdE/figT+hsJD86AEALBMo44yDDLP8Zlxu0S6rLdQgpUJxqKTh/c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762942052; c=relaxed/simple;
-	bh=qv0rkaW2D6V9ujLxu5wOdIydA/9+KagOl+U71EexFE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XWyESadAgBbIWStXX6ux7Vn+pjebOSVcAk4K+YdNyeSL2WDpSipNKyDcHjnVQvS0W0+igAPQd9QSV9F5c83UQWQJrKBiEYj5EN5tUbTVUzXCPXECs2vpOGzSZXLpWwtc65u2+Gaim0dDR3HgMQkrL2+SYW8W3eUdKsf3A9YVrto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1rY93bG; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1rY93bG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FA2C19423;
-	Wed, 12 Nov 2025 10:07:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762942051;
-	bh=qv0rkaW2D6V9ujLxu5wOdIydA/9+KagOl+U71EexFE0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j1rY93bGfF6KQBMEuguUMHxXmPbykSVli0bFRJZXzqDxNf56tK/QJW7OZvEny9K9A
-	 mECJ/EsU11mobGrrYDAUQB7lP26PGcqvA3saTFaf/tvpR58N2wXlhJT1xvtJFCFM8G
-	 rui532D3tvKMHRlpXlROMTmhwrY+wNQe7jIy+zJjRcztZgEnqfMWBK4fVbXwLNzblO
-	 Ynb1yH13ENfWZM6fGRUUXwvlQ1vjv6YpDumnH5jOPeZwwy7YjBzY4KpPj7zgDu/Hqf
-	 PSLCieSmJ1JGgDZXDvXig3+E/sVH6X5DPUV+bd9nSpDk6bdbPDfH87qdqiWDrmuV5i
-	 1U1sRp+r6luTw==
-Date: Wed, 12 Nov 2025 02:07:30 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, vladimir.murzin@arm.com
-Subject: Re: [PATCH v4 7/8] KVM: arm64: Check whether a VM IOCTL is allowed
- in pKVM
-Message-ID: <aRRcYltFUrBlcbfX@kernel.org>
-References: <20251112092051.1376245-1-tabba@google.com>
- <20251112092051.1376245-8-tabba@google.com>
+	s=arc-20240116; t=1762943375; c=relaxed/simple;
+	bh=NelOy/iaPfnwH4A8Hrxn5iUTCKwvGdLVBrLxLzTnviw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=kFnDhl4Nzymc5U16UIB7mMk9MKxPwF+YiN+wDXPr/3bnNbSRrMDOUxey0+4mWOmKLKgjSqhwo299SxV8So7hEmBXOlYZWrQ1QQinLBC1oQBiOTtQaqXlXPBvwSjSvnNC+neRVce5vJvKCLZZ0AfOh7nEMwwd1KkrZ7pz5SHCZPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DF93C1515;
+	Wed, 12 Nov 2025 02:29:23 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6A1DD3F5A1;
+	Wed, 12 Nov 2025 02:29:30 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: maz@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: [PATCH] KVM: arm64: VHE: Compute fgt traps before activating them
+Date: Wed, 12 Nov 2025 10:28:53 +0000
+Message-ID: <20251112102853.47759-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112092051.1376245-8-tabba@google.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Fuad,
+On VHE, the Fine Grain Traps registers are written to hardware in
+kvm_arch_vcpu_load()->..->__activate_traps_hfgxtr(), but the fgt array is
+computed later, in kvm_vcpu_load_fgt(). This can lead to zero being written
+to the FGT registers the first time a VCPU is loaded. Also, any changes to
+the fgt array will be visible only after the VCPU is scheduled out, and
+then back in, which is not the intended behaviour.
 
-On Wed, Nov 12, 2025 at 09:20:50AM +0000, Fuad Tabba wrote:
-> +/*
-> + * Check whether the KVM VM IOCTL is allowed in pKVM.
-> + *
-> + * Certain features are allowed only for non-protected VMs in pKVM, which is why
-> + * this takes the VM (kvm) as a parameter.
-> + */
-> +static inline bool kvm_pkvm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
-> +{
-> +	switch (ioctl) {
-> +	case KVM_CREATE_IRQCHIP:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_IRQCHIP);
-> +	case KVM_ARM_SET_DEVICE_ADDR:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SET_DEVICE_ADDR);
-> +	case KVM_ARM_MTE_COPY_TAGS:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_MTE);
-> +	case KVM_ARM_SET_COUNTER_OFFSET:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_COUNTER_OFFSET);
-> +	case KVM_HAS_DEVICE_ATTR:
-> +	case KVM_SET_DEVICE_ATTR:
-> +	case KVM_GET_DEVICE_ATTR:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_DEVICE_CTRL) ||
-> +		       kvm_pkvm_ext_allowed(kvm, KVM_CAP_VM_ATTRIBUTES);
-> +	case KVM_ARM_GET_REG_WRITABLE_MASKS:
-> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES);
-> +	default:
-> +		return true;
-> +	}
-> +}
-> +
+Fix it by computing the fgt array just before the fgt traps are written
+to hardware.
 
-I was thinking of something a bit more tabular since CCA will impose its
-own restrictions + pKVM could share the ioctl <=> KVM_CAP association.
+Fixes: fb10ddf35c1c ("KVM: arm64: Compute per-vCPU FGTs at vcpu_load()")
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
 
-Anyway, ioctl filtering should be an allowlist (default to false) just
-like kvm_pkvm_ext_allowed(). The default assumption is that new UAPI is not
-supported for pVMs unless explicitly stated otherwise.
+Stumbled upon this when running a Linux guest on FVP with FEAT_S1PIE
+enabled.  Linux touches PIRE0_EL1 very early during boot, in __cpu_setup().
+HFGWTR_EL2 was 0 the first time the VCPU was run, KVM would then trap
+the access to PIR0_EL1 (PIRE0_EL1 is an inverted trap) and trigger the
+BUG_ON(!r->access) from perform_access().
 
-Thanks,
-Oliver
+I hacked __activate_traps_hfgxtr() to print the register value for
+HFGWTR_EL2. Before this patch, during the first vcpu_load(),
+HFGWTR_EL2 is 0, then it has the correct value. After this patch, it
+always has the correct value.
+
+If I were to venture a shot in the dark, it might be that the name is a bit
+misleading - it's kvm_vpcu_load_fgt(), but it doesn't load anything onto
+hardware, it just computes values. Might be worth renaming to avoid
+similar ordering issues in the future.
+
+ arch/arm64/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 870953b4a8a7..052bf0d4d0b0 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -624,6 +624,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	kvm_timer_vcpu_load(vcpu);
+ 	kvm_vgic_load(vcpu);
+ 	kvm_vcpu_load_debug(vcpu);
++	kvm_vcpu_load_fgt(vcpu);
+ 	if (has_vhe())
+ 		kvm_vcpu_load_vhe(vcpu);
+ 	kvm_arch_vcpu_load_fp(vcpu);
+@@ -642,7 +643,6 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 		vcpu->arch.hcr_el2 |= HCR_TWI;
+ 
+ 	vcpu_set_pauth_traps(vcpu);
+-	kvm_vcpu_load_fgt(vcpu);
+ 
+ 	if (is_protected_kvm_enabled()) {
+ 		kvm_call_hyp_nvhe(__pkvm_vcpu_load,
+
+base-commit: e9a6fb0bcdd7609be6969112f3fbfcce3b1d4a7c
+-- 
+2.51.2
+
