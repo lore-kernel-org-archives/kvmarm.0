@@ -1,87 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24FC12B93;
-	Wed, 12 Nov 2025 00:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6BA2D1F4E;
+	Wed, 12 Nov 2025 08:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762906119; cv=none; b=QTNlANSC0zOl5VoJ4YW/6gcH0+qYGHMOq+MQS7gu9D12lptjyGqR8CCpHHBr+TRfOhYGnfI1/Iylp/cGT2QAp0Xm1Xi8pLYOMuM6iPKHgiIGQtS6sdsGBhY34xpC4CM+VbpI3axjAFWtYaf5wi9jO3C5haMSjrxloWLQz1Y1Os8=
+	t=1762936437; cv=none; b=BXyBEutgACUjyZggJeQe3vop22WKaTr7fM5+CoBsv8boB6Cf+1yD6rHCZZUO64G7YpgzFDcEupxg7SQUiHZXZLx4mXOc6fuxXRTqC4p/DeHeIrHJRGLPctW4NJ01XTUxpOePWFXkoYT5n0AvUeNsQWyzX7k/AvZRPkx0kv4mubI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762906119; c=relaxed/simple;
-	bh=x2q3/YmBP7+xUvA10uWwMegTPDYA5rCthXeXB7vi3nk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vq5qAxpV+lmQ6T4t5AAusUxgrsNTxLpWJDIJiQHYpRr5ILKIT3vNMftMckH4O6ucObPKgX2EOHZixgaU0NwjyBlPQWbmQLX2knhPvJj2Z6ZBjla4KcRNeSSPv0a3rSJhhIKhDzUvIK4usLpNARTilPjYpcz2aJraXdQJmRRVc+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fz3Bxz7+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762936437; c=relaxed/simple;
+	bh=81f0ESLSrnetgKGzemcxP8SfAbjzKr+GfwSLMaWOTFw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jztCJwlk8Tm1Hx88UWUrUqFnusLTzJtKc2OgXgsez1yHI0MXTOXyPm+i/j8qjbsp8RFAQ2II2fphbAjLsSoknFa/py4LqqrTsoBvzJ6SxozbbRSqerHYPmabtCP+KUmLaA5J36/Zz2uvkL4QjrQHOv0koEXseSD5vdDfTmD/kNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qr7kV1C7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fz3Bxz7+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE0BC4CEFB;
-	Wed, 12 Nov 2025 00:08:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qr7kV1C7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23938C116B1;
+	Wed, 12 Nov 2025 08:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762906119;
-	bh=x2q3/YmBP7+xUvA10uWwMegTPDYA5rCthXeXB7vi3nk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fz3Bxz7+XSxc+KAFCkBAmJ2wjFOBYwh4qNy5j4kmuZf1aSEkIp14TOXMKs2X31cSj
-	 VyS691SEYvi+9eU7J7hRPcd86VVMci8puqDKKh6UEfyl1mgPXFCIFQiR465L5W9vKH
-	 hw9+Yl8jKzZAuz/Qb1HG9iCFfsYp8tt2zCcQfi+QoBXp68+L08gyr5S4x4vUsqW3Sn
-	 JFuq1ylEOVbm1GRB7GEPaRNqcBsIMr49W8wGAQzqlzo7In5aGMUybaLqdi2kSiFBUp
-	 AcKEZsZjF4CQF8N3Kc+1OGhmj/U3nSeRimD8JDZCFqYyYjnBomwooybDfGmLIsq67v
-	 8azQGBxmu+TbA==
-Date: Tue, 11 Nov 2025 16:08:37 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1762936437;
+	bh=81f0ESLSrnetgKGzemcxP8SfAbjzKr+GfwSLMaWOTFw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qr7kV1C7PkAAiV0WEdvnFAjNELGLD9nOqg1HaEzXLXtHkYdeBiKlVu5/nz0F8WvDs
+	 ATYkqKkjN/63MXvgCFzwpl7EGVe/X0jBZvmE613OI2ZwWBPdJzp2egaPpHcJFZ5u5q
+	 uv/VPbmPGRueN//p9s1KpM7TRPjoLmKpB/mh0rc9ncnsXD9JPxxPEJApOShu5upu3x
+	 CicYGiDKmCLVwOzS+5NPs6p+ZWC32uAlXhVQCohBnYdlHSVuHiiD32LYoE/usiE0Ks
+	 zdaq9TqJIm8Sulxc5+wNiwDr1Ual/8n1zc69LEeU2Zv3SM74XQ9S4Xok+8P/Y17ptk
+	 Aqm54UmE05bKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJ6Ic-00000004Su3-2m1u;
+	Wed, 12 Nov 2025 08:33:54 +0000
+Date: Wed, 12 Nov 2025 08:33:54 +0000
+Message-ID: <86y0obtzt9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt
- configuration
-Message-ID: <aRPQBQVPLVXGOxU-@kernel.org>
+Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
+In-Reply-To: <aRPQBQVPLVXGOxU-@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
- <20251109171619.1507205-21-maz@kernel.org>
+	<20251109171619.1507205-21-maz@kernel.org>
+	<aRPQBQVPLVXGOxU-@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251109171619.1507205-21-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
-> +static void summarize_ap_list(struct kvm_vcpu *vcpu,
-> +			      struct ap_list_summary *als)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_irq *irq;
-> -	int count = 0;
-> -
-> -	*multi_sgi = false;
->  
->  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
->  
-> -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> -		int w;
-> +	*als = (typeof(*als)){};
->  
-> -		raw_spin_lock(&irq->irq_lock);
-> -		/* GICv2 SGIs can count for more than one... */
-> -		w = vgic_irq_get_lr_count(irq);
-> -		raw_spin_unlock(&irq->irq_lock);
-> +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> +		scoped_guard(raw_spinlock, &irq->irq_lock) {
-> +			if (vgic_target_oracle(irq) != vcpu)
-> +				continue;
+On Wed, 12 Nov 2025 00:08:37 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
+> > +static void summarize_ap_list(struct kvm_vcpu *vcpu,
+> > +			      struct ap_list_summary *als)
+> >  {
+> >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >  	struct vgic_irq *irq;
+> > -	int count = 0;
+> > -
+> > -	*multi_sgi = false;
+> >  
+> >  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+> >  
+> > -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> > -		int w;
+> > +	*als = (typeof(*als)){};
+> >  
+> > -		raw_spin_lock(&irq->irq_lock);
+> > -		/* GICv2 SGIs can count for more than one... */
+> > -		w = vgic_irq_get_lr_count(irq);
+> > -		raw_spin_unlock(&irq->irq_lock);
+> > +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> > +		scoped_guard(raw_spinlock, &irq->irq_lock) {
+> > +			if (vgic_target_oracle(irq) != vcpu)
+> > +				continue;
+> 
+> From our conversation about this sort of thing a few weeks ago, wont
+> this 'continue' interact pooly with the for loop that scoped_guard()
+> expands to?
 
-From our conversation about this sort of thing a few weeks ago, wont
-this 'continue' interact pooly with the for loop that scoped_guard()
-expands to?
+Gahhh... I was sure I had killed that everywhere, but obviously failed
+to. I wish there was a coccinelle script to detect this sort of broken
+constructs (where are the script kiddies when you really need them?).
 
-Consistent with the other checks against the destination oracle you'll
-probably want a branch hint too.
+Thanks for spotting it!
 
-Thanks,
-Oliver
+> Consistent with the other checks against the destination oracle you'll
+> probably want a branch hint too.
+
+Yup, I'll add that.
+
+Thanks again,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
