@@ -1,168 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2CA2FF15A;
-	Wed, 12 Nov 2025 09:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140522FE06F
+	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 10:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762941392; cv=none; b=a53xJ89JXqCUv0HKLmChgs/0OmCQtGGNSgRspKTevIUOeEt7M1Zb2016pMZd7F6pVazVduQe+AfF3nkZdw31vG53A1awrAjnGE6/TFl7NintxWXhjDHyGCbE7tV4EYEQ6gHwX/H25/HGvh6BJgEZMg3yLsWoL2US1jqMa9TNBM0=
+	t=1762942052; cv=none; b=kAgLCfhEEY54TQHHvUf+c6KU+mtl3sv7xqxBVit7SthZjueyqi63jEfHWw2+dineKqfZPSFzZpOfACG6eVMgbmLlheJnsom4tkGHuIC7aFTCz9gbqgeOtzzfzw1AbtMgBDlWX4nxLyaubPmcImT1ntvIerx+v8iz7/kT7sLt3Uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762941392; c=relaxed/simple;
-	bh=gRCZf9Ayfo1qLWyDTVQsRixm5fKxDCpVixnU+WvPMQY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NWfEE8IivenXuIAkzCCC4oakKJ1RQ/mmUfG/j3PEfyqenzhh8bTlIKmMcUo3pXtmjf9Jh7Cw0T05Gsskc7+Kp7EPhw086eejIpwISbUSG0ZbiC0s8n1eS0mwwMzOkNb0X+Vg5d7atKTJYV1co+ki7qsrL/A/86d96zD/iKKCNQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MGuvBuka; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762942052; c=relaxed/simple;
+	bh=qv0rkaW2D6V9ujLxu5wOdIydA/9+KagOl+U71EexFE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XWyESadAgBbIWStXX6ux7Vn+pjebOSVcAk4K+YdNyeSL2WDpSipNKyDcHjnVQvS0W0+igAPQd9QSV9F5c83UQWQJrKBiEYj5EN5tUbTVUzXCPXECs2vpOGzSZXLpWwtc65u2+Gaim0dDR3HgMQkrL2+SYW8W3eUdKsf3A9YVrto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1rY93bG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MGuvBuka"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89091C4CEF8;
-	Wed, 12 Nov 2025 09:56:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1rY93bG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FA2C19423;
+	Wed, 12 Nov 2025 10:07:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762941391;
-	bh=gRCZf9Ayfo1qLWyDTVQsRixm5fKxDCpVixnU+WvPMQY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MGuvBukaozndXY9PPPIcpdwaZghXipBbs2p/7qKye1qXFeh4Ra1K2Nwak5Pzu5rHr
-	 ZQMiJbpAQF6L1ydSe6Bq4gE7Rc1CgXSh81/tBq1eV1h0W6uORAaDetyoq90G/VgagA
-	 1VCKAcaELm7O3cmUZ0cDuxeIEH/M87q+2yqvejLNSQeHoNEU3KgW8aTb0zjHuCp5Tp
-	 WY7HtvoRjbVhdzsDM4y087TGX4E6Zo9GvkE+6ruDUdzZTgaegSp2w3I1BglFBei0as
-	 WTsemcZLKJhx30CAH5AJ3SnRuu+ho9yG6y/OQmzL0fLWVxzK1ODe8dZd1wM2z43bYY
-	 zXyeMNwo+DWJg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJ7aX-00000004UXd-0dxm;
-	Wed, 12 Nov 2025 09:56:29 +0000
-Date: Wed, 12 Nov 2025 09:56:28 +0000
-Message-ID: <86wm3vtvzn.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
-In-Reply-To: <aRRJOSNnvD1B0ZfJ@kernel.org>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-21-maz@kernel.org>
-	<aRPQBQVPLVXGOxU-@kernel.org>
-	<86y0obtzt9.wl-maz@kernel.org>
-	<aRRJOSNnvD1B0ZfJ@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1762942051;
+	bh=qv0rkaW2D6V9ujLxu5wOdIydA/9+KagOl+U71EexFE0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j1rY93bGfF6KQBMEuguUMHxXmPbykSVli0bFRJZXzqDxNf56tK/QJW7OZvEny9K9A
+	 mECJ/EsU11mobGrrYDAUQB7lP26PGcqvA3saTFaf/tvpR58N2wXlhJT1xvtJFCFM8G
+	 rui532D3tvKMHRlpXlROMTmhwrY+wNQe7jIy+zJjRcztZgEnqfMWBK4fVbXwLNzblO
+	 Ynb1yH13ENfWZM6fGRUUXwvlQ1vjv6YpDumnH5jOPeZwwy7YjBzY4KpPj7zgDu/Hqf
+	 PSLCieSmJ1JGgDZXDvXig3+E/sVH6X5DPUV+bd9nSpDk6bdbPDfH87qdqiWDrmuV5i
+	 1U1sRp+r6luTw==
+Date: Wed, 12 Nov 2025 02:07:30 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, vladimir.murzin@arm.com
+Subject: Re: [PATCH v4 7/8] KVM: arm64: Check whether a VM IOCTL is allowed
+ in pKVM
+Message-ID: <aRRcYltFUrBlcbfX@kernel.org>
+References: <20251112092051.1376245-1-tabba@google.com>
+ <20251112092051.1376245-8-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251112092051.1376245-8-tabba@google.com>
 
-On Wed, 12 Nov 2025 08:45:45 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> On Wed, Nov 12, 2025 at 08:33:54AM +0000, Marc Zyngier wrote:
-> > On Wed, 12 Nov 2025 00:08:37 +0000,
-> > Oliver Upton <oupton@kernel.org> wrote:
-> > > 
-> > > On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
-> > > > +static void summarize_ap_list(struct kvm_vcpu *vcpu,
-> > > > +			      struct ap_list_summary *als)
-> > > >  {
-> > > >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> > > >  	struct vgic_irq *irq;
-> > > > -	int count = 0;
-> > > > -
-> > > > -	*multi_sgi = false;
-> > > >  
-> > > >  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> > > >  
-> > > > -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > > > -		int w;
-> > > > +	*als = (typeof(*als)){};
-> > > >  
-> > > > -		raw_spin_lock(&irq->irq_lock);
-> > > > -		/* GICv2 SGIs can count for more than one... */
-> > > > -		w = vgic_irq_get_lr_count(irq);
-> > > > -		raw_spin_unlock(&irq->irq_lock);
-> > > > +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > > > +		scoped_guard(raw_spinlock, &irq->irq_lock) {
-> > > > +			if (vgic_target_oracle(irq) != vcpu)
-> > > > +				continue;
-> > > 
-> > > From our conversation about this sort of thing a few weeks ago, wont
-> > > this 'continue' interact pooly with the for loop that scoped_guard()
-> > > expands to?
-> > 
-> > Gahhh... I was sure I had killed that everywhere, but obviously failed
-> > to. I wish there was a coccinelle script to detect this sort of broken
-> > constructs (where are the script kiddies when you really need them?).
-> > 
-> > Thanks for spotting it!
-> > 
-> > > Consistent with the other checks against the destination oracle you'll
-> > > probably want a branch hint too.
-> > 
-> > Yup, I'll add that.
-> 
-> I can take care of it when applying. These patches need to bake :)
+Hi Fuad,
 
-Yes, they do. Here's the current state of additional changes I have
-(compile tested only).
+On Wed, Nov 12, 2025 at 09:20:50AM +0000, Fuad Tabba wrote:
+> +/*
+> + * Check whether the KVM VM IOCTL is allowed in pKVM.
+> + *
+> + * Certain features are allowed only for non-protected VMs in pKVM, which is why
+> + * this takes the VM (kvm) as a parameter.
+> + */
+> +static inline bool kvm_pkvm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
+> +{
+> +	switch (ioctl) {
+> +	case KVM_CREATE_IRQCHIP:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_IRQCHIP);
+> +	case KVM_ARM_SET_DEVICE_ADDR:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SET_DEVICE_ADDR);
+> +	case KVM_ARM_MTE_COPY_TAGS:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_MTE);
+> +	case KVM_ARM_SET_COUNTER_OFFSET:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_COUNTER_OFFSET);
+> +	case KVM_HAS_DEVICE_ATTR:
+> +	case KVM_SET_DEVICE_ATTR:
+> +	case KVM_GET_DEVICE_ATTR:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_DEVICE_CTRL) ||
+> +		       kvm_pkvm_ext_allowed(kvm, KVM_CAP_VM_ATTRIBUTES);
+> +	case KVM_ARM_GET_REG_WRITABLE_MASKS:
+> +		return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES);
+> +	default:
+> +		return true;
+> +	}
+> +}
+> +
+
+I was thinking of something a bit more tabular since CCA will impose its
+own restrictions + pKVM could share the ioctl <=> KVM_CAP association.
+
+Anyway, ioctl filtering should be an allowlist (default to false) just
+like kvm_pkvm_ext_allowed(). The default assumption is that new UAPI is not
+supported for pVMs unless explicitly stated otherwise.
 
 Thanks,
-
-	M.
-
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index bd67ad1fcad5e..28184582f23d3 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -851,15 +851,15 @@ static void summarize_ap_list(struct kvm_vcpu *vcpu,
- 	*als = (typeof(*als)){};
- 
- 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
--		scoped_guard(raw_spinlock, &irq->irq_lock) {
--			if (vgic_target_oracle(irq) != vcpu)
--				continue;
--
--			if (!irq->active)
--				als->nr_pend++;
--			else
--				als->nr_act++;
--		}
-+		guard(raw_spinlock)(&irq->irq_lock);
-+
-+		if (unlikely(vgic_target_oracle(irq) != vcpu))
-+			continue;
-+
-+		if (!irq->active)
-+			als->nr_pend++;
-+		else
-+			als->nr_act++;
- 
- 		if (irq->intid < VGIC_NR_SGIS)
- 			als->nr_sgi++;
-@@ -915,8 +915,8 @@ static void summarize_ap_list(struct kvm_vcpu *vcpu,
-  *
-  *      - deactivation can happen in any order, and we cannot rely on
-  *	  EOImode=0's coupling of priority-drop and deactivation which
-- *	  imposes strict reverse Ack order. This means that DIR must be set
-- *	  if we have active interrupts outside of the LRs.
-+ *	  imposes strict reverse Ack order. This means that DIR must
-+ *	  trap if we have active interrupts outside of the LRs.
-  *
-  *      - deactivation of SPIs can occur on any CPU, while the SPI is only
-  *	  present in the ap_list of the CPU that actually ack-ed it. In that
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
