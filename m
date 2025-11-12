@@ -1,169 +1,83 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC9F2FFDF8
-	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 10:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F05C30B507
+	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 10:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762944757; cv=none; b=dVlsKA0kExo8CnZcyKjEUxG/xKrCH9+YyGMQb/DTXd/1Dh+XM0jKmbCCIfhQSVi+pecdv7bGTqJ2QjerRib+iEQGuuHyh716vT/SbMAJsVl6DfWcQQGJiz2j3TQsmjRNkBnAPZs2LHhtBeXU3qKHF5EciGIyTDGD8bzW5qRhrEU=
+	t=1762944899; cv=none; b=dpPBvSnlTpSZ1m7QF/YvUMiRKVuxSvNsjvHi+fCh86zINb53IggZCG4jnAi4T3eD1MFVtHbh64xpcndrt4L81/7OKheWctcpWvDf0+tjYpDpaibxBTCZYP7HD3Kp7bwJpKtD7FJME4oSmkjr2WLLu+2TThi1KT7fFeCbakC8ix0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762944757; c=relaxed/simple;
-	bh=6AGPldyrHuBJ/qzLf0A20ECVa3RXsc+6ZS1F7vCuAT0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XcsmBPCe54m4N6Nn5z+jbfh0ykTGXZaCBVbsypPUg0R5HM/rKTZmn1dZR7VhGim1ZHkOh440PlXjizWoHCSerhxorQrjjL32CjDzsMui62WImKSwqZrYDq2Vmqehi1IXLuyJ0fVuaMhVb3VyMyIihzqtfCWIMBVGbg8ZoAr2/tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=blewlyUn; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1762944899; c=relaxed/simple;
+	bh=W51dKg5AAstr6djaoD8uG/T3R+JrK/bE16/j24kPxSc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=InKSqb3VaFu4mT52bg9bZyuK168dKyKDlBt8Lx5HS+5fJsOMit/WN7rn3lU2Pw5uwrejBxYtNQKwOvMC7NHK5DM6KKXA0lSOtQkWc8x0ZgVHRh4+QAP5TiYSutI82etOY1GhvbR5uvPCifc81WP+fs6OZkh4w8U3aklmkRKeGg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qu9C9cIX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="blewlyUn"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ed67a143c5so253631cf.0
-        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 02:52:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762944755; x=1763549555; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNEmHsCQ3cI11oAI1u83nSxC6LWPxu8t+VCOL7GAmx4=;
-        b=blewlyUnrWTeMVpWbDVmhLVYjTAEXDXkFixwQ6FpOaYTWpvTMuKn4RVyLLAEGXo4Ry
-         SNrTFqL3C6c4bJM/RoQ8SOItMShQiO0M8fWkGt1dx1GddEtwn63H6r1f3HjJy9+aGd8m
-         KwdkqRYbd168iD6u5j/E1xbk87wvNlh1f6cXRd41bREyVlBEoZ1B7j+Tx8B3lq6OSB22
-         ZOwrP6zjq/oS0VWwyaqH768ZutY5TJ4KZ3CB3qstSsVaXLnXitNMw8Fe1Jq2jj+sX0mR
-         KxiiFAQ8AnFbn4AZxUSb9ai5cQI5YGAkS7/rdWsq/nEoGSir70RrogbcqVEBfO+w3Rjp
-         JCOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762944755; x=1763549555;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WNEmHsCQ3cI11oAI1u83nSxC6LWPxu8t+VCOL7GAmx4=;
-        b=EHPXeoQojS/Gugy1Spmyk94StY2aIPzypQT3PrN1/LVurVmUJwaPx3SwAxZOVJohlJ
-         GLFsEH4W3wBxUpcp3Tv/V09C/zclDyaS/Jpk5NqbccAU3BIPMx/m3c29CEFRhwYP+7fK
-         dNVKgAN03D+tuaaMcKFkOugqqeFxWIW+fqf2Og4OY+MqyGmjiJRyXuNUUT3eHjvi6CJ/
-         esVEH5f0O5OMAn0D3B0F8LH6/BXhhaN4RTvKoAsqKOmQ3eGstoa6x13nmstRqcTPjrHI
-         yyQ85ADtcroBz1Dx8b8m+Gjqc5Vy/5iZQYwK76HL1t0IJZS883CxXiZYivMPBSDioaKj
-         77vA==
-X-Gm-Message-State: AOJu0YyjlI6NIfa1PmDUxQQNRNXIephBb1KpImnreiKaTjaNMCltR5F0
-	fcG86ty6jW1OTgF5PMWTCKy+Ayu/pVboqLQHg1Vnpp5TlJ1VPnSBv0t9XFHQ+OCHpxXDrYXQUNu
-	HutZhApgksTVfGjuPu6lNSOpnP9nevoE1RNE6H0I0
-X-Gm-Gg: ASbGncvM/kqqx47r9epicF+3cSEf8v9j52YlX+vkDtfZyGAo7zZqzbAk6JnDuMUUj4o
-	uHpRpuA5rBKNzTpUfb9e97gGUDzo5mDDQGaXvHN9Pb3UoGZ3F+geLbT1B2IQR09aC+Zz/Ar+lxy
-	s43t67X7vJQSZFIJImTy37jW4GwlvMxZU45ujVtOIGIHKRz+/7GQuKQ5XF3Urh/gLhl4QYgYGBA
-	vMFnFR2JvvfrsnBO3jbzi11Hju9l0C2aRT4Xc4e7qJ1K+8D1wJLQInjxJMqd4y/6ilzNk2d3lKg
-	7Q4cJ292FeDy+jw6dAs3XHXqmi+/DvthIzw=
-X-Google-Smtp-Source: AGHT+IH2kbrp2wOONl68BTyAziYAcWVjit+MdfPXbN9/MBL9IDmErGLT+GrOxTm+S9zHBlZfWlLxLVKM03Url96aZNE=
-X-Received: by 2002:a05:622a:246:b0:4e5:7827:f4b9 with SMTP id
- d75a77b69052e-4eddcf51ffdmr5007411cf.3.1762944754666; Wed, 12 Nov 2025
- 02:52:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qu9C9cIX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0D6CC116B1;
+	Wed, 12 Nov 2025 10:54:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762944898;
+	bh=W51dKg5AAstr6djaoD8uG/T3R+JrK/bE16/j24kPxSc=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=qu9C9cIXLuXFWuyGDg1uBYoRwByiVd1c5b2SUc0CWhywiOcSJ92iu7cn7IbmsJ+NV
+	 Wva7Om/yNmnG2qu2qLiCZjed3u8uY2nHLWHmnJXQ/ZWFNnXXlAxaAFsBVMeAGB6oQD
+	 Evxo0hSlLGBjcGiWBKYdlQzfWD7AhMNXdec5XuG88Aq1VckKBoDaGKgnZ8+TBi784P
+	 NyR5qevJIIWdEqGBdsq9NZumjHNQrUHV9gHta5If/u21whj9HSm+DfOIl7PfBDKCUW
+	 93z3iFlzl59Qyz7TrdCIHmPCOAv0AoFPjOCHPxJmXLmKqv9SLTy1F2Er3uAD25ij8F
+	 8oaJHWzC4qk9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJ8V6-00000004VdI-2xmh;
+	Wed, 12 Nov 2025 10:54:56 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm64: VHE: Compute fgt traps before activating them
+Date: Wed, 12 Nov 2025 10:54:53 +0000
+Message-ID: <176294489353.2146675.1598964023376256637.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251112102853.47759-1-alexandru.elisei@arm.com>
+References: <20251112102853.47759-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251112092051.1376245-1-tabba@google.com> <20251112092051.1376245-8-tabba@google.com>
- <aRRcYltFUrBlcbfX@kernel.org>
-In-Reply-To: <aRRcYltFUrBlcbfX@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 12 Nov 2025 10:51:58 +0000
-X-Gm-Features: AWmQ_blDGZmge2Sw8Vj1BBhA5Hq-sY9Tzxc1CXj4hBJ5LlqC72ETgAVnLelWlpE
-Message-ID: <CA+EHjTwyu5PZnPeEuD6VRV2zfAnP=KSMq+VVcGeq-zGRSUjaSA@mail.gmail.com>
-Subject: Re: [PATCH v4 7/8] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, oupton@kernel.org, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Oliver,
+On Wed, 12 Nov 2025 10:28:53 +0000, Alexandru Elisei wrote:
+> On VHE, the Fine Grain Traps registers are written to hardware in
+> kvm_arch_vcpu_load()->..->__activate_traps_hfgxtr(), but the fgt array is
+> computed later, in kvm_vcpu_load_fgt(). This can lead to zero being written
+> to the FGT registers the first time a VCPU is loaded. Also, any changes to
+> the fgt array will be visible only after the VCPU is scheduled out, and
+> then back in, which is not the intended behaviour.
+> 
+> [...]
 
-On Wed, 12 Nov 2025 at 10:07, Oliver Upton <oupton@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Wed, Nov 12, 2025 at 09:20:50AM +0000, Fuad Tabba wrote:
-> > +/*
-> > + * Check whether the KVM VM IOCTL is allowed in pKVM.
-> > + *
-> > + * Certain features are allowed only for non-protected VMs in pKVM, which is why
-> > + * this takes the VM (kvm) as a parameter.
-> > + */
-> > +static inline bool kvm_pkvm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
-> > +{
-> > +     switch (ioctl) {
-> > +     case KVM_CREATE_IRQCHIP:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_IRQCHIP);
-> > +     case KVM_ARM_SET_DEVICE_ADDR:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SET_DEVICE_ADDR);
-> > +     case KVM_ARM_MTE_COPY_TAGS:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_MTE);
-> > +     case KVM_ARM_SET_COUNTER_OFFSET:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_COUNTER_OFFSET);
-> > +     case KVM_HAS_DEVICE_ATTR:
-> > +     case KVM_SET_DEVICE_ATTR:
-> > +     case KVM_GET_DEVICE_ATTR:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_DEVICE_CTRL) ||
-> > +                    kvm_pkvm_ext_allowed(kvm, KVM_CAP_VM_ATTRIBUTES);
-> > +     case KVM_ARM_GET_REG_WRITABLE_MASKS:
-> > +             return kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES);
-> > +     default:
-> > +             return true;
-> > +     }
-> > +}
-> > +
->
-> I was thinking of something a bit more tabular since CCA will impose its
-> own restrictions + pKVM could share the ioctl <=> KVM_CAP association.
+Applied to fixes, thanks!
 
-Sure. Before I respin, how about something along these lines:
+[1/1] KVM: arm64: VHE: Compute fgt traps before activating them
+      commit: 85592114ffda568b507bc2b04f5e9afbe7c13b62
 
-struct kvm_ioctl_cap_map {
-    unsigned int ioctl;
-    long ext;
-};
+Cheers,
 
-/*
- * Sorted by ioctl to allow for potential binary search,
- * though linear scan is sufficient for this size.
- * (Note to Oliver: If you like, I can add a runtime check if we want
-to support binary search.)
- */
-static const struct kvm_ioctl_cap_map vm_ioctl_caps[] = {
-    { KVM_CREATE_IRQCHIP, KVM_CAP_IRQCHIP },
-    { KVM_ARM_SET_DEVICE_ADDR, KVM_CAP_ARM_SET_DEVICE_ADDR },
-    { KVM_ARM_MTE_COPY_TAGS, KVM_CAP_ARM_MTE },
-    { KVM_SET_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-    { KVM_GET_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-    { KVM_HAS_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-    { KVM_ARM_SET_COUNTER_OFFSET, KVM_CAP_COUNTER_OFFSET },
-    { KVM_ARM_GET_REG_WRITABLE_MASKS, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES },
-    { KVM_ARM_PREFERRED_TARGET, -1 }, /* Basic IOCTLs, no gating capability */
-};
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
-/*
- * Set *ext to the capability, which is -1 for basic capabilities.
- * Return 0 if found, or -EINVAL if no IOCTL matches.
- */
-long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext)
-{
-    int i;
 
-    for (i = 0; i < ARRAY_SIZE(vm_ioctl_caps); i++) {
-        if (vm_ioctl_caps[i]. ioctl == ioctl)
-            *ext = vm_ioctl_caps[i].ext;
-            return 0;
-   }
-
-    return -EINVAL;
-}
-
-> Anyway, ioctl filtering should be an allowlist (default to false) just
-> like kvm_pkvm_ext_allowed(). The default assumption is that new UAPI is not
-> supported for pVMs unless explicitly stated otherwise.
-
-Of course, that's what we do with capability checks.
-
-Thanks,
-/fuad
-
-> Thanks,
-> Oliver
