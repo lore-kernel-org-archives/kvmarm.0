@@ -1,55 +1,55 @@
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC6E283FEE
-	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 09:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681FF2C0296
+	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 09:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762939257; cv=none; b=iagtrvWJq43qxh80iaYSipbu5YfM6abbQAl74OFekIukktoqEGGeyyS1RNiK05kId1ZEueMqgO0cTuyzJMlNyP8JEOCMhIH/s+LSdlQgVY16fcTdQWzT/ymxL+4KYH+qEbOzIeF7A/OSK8RRHFpz4v2ydaQgcJAikYVw4xswTUk=
+	t=1762939259; cv=none; b=iDMoNcJNI612SP5th0UAXMIRSpaxf8rN54r73/Okw8j/WULsWSlIWAVJFeZafQ4J8zO/tC4YOY5Uzh8hVkSJfDzA0Uq9+ITl1degUdI9I2xGemikFGIhgc9jGczeKR3UTVJEiddidpdMAMGZcp4woBajsVlxVR2q91nJGrmrEmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762939257; c=relaxed/simple;
-	bh=K6DQitLxBRpwlpj7f8fJ0uLFWIa4XB5w2rT+x3cat9g=;
+	s=arc-20240116; t=1762939259; c=relaxed/simple;
+	bh=175eMniaoZH9OwYm9KXAc5H9VVXTaJRCSTXfCs6BIJ8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dv4BULG4SBA5o0Bkqg/UhEDDz9SOjgP9WP+Vx3yBtyLCGFr6A8omVXJopgXW23S9kxqiKXp+sBZEc6/vMqk9Ylsx1MxXAJVNF0yZLu/qgRr2PgN6ja7ULet8ZyxWxzxj2m6FwGRU8jJgkjlCBSP49EJjATLPWvqP8+UpCwcUgFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Nk12Rs8; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=dzGQ2x96C3LotdX0O1V742fLeFsKaWTOmvXPzlyaQTt+B5BhKdGA5wGxCUTcFmrXzUnhYPwR0/PVjiqkojgaIlUxtQpA09SWE+47tdI+8PAZDs3fPDS/kQzV6c2y1obHBV6oUv9w4QNvQbJD5SjII0HAnZaYGKoqpVMwLC8ZMEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L47EybJF; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Nk12Rs8"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4710d174c31so5254775e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 01:20:56 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L47EybJF"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-47777158a85so6006045e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 01:20:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762939255; x=1763544055; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1762939256; x=1763544056; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7h9UV3nYWC6hYsHPBAX2lZPJFbMaZGkJN8sutubEAEQ=;
-        b=4Nk12Rs8QwDOLsm+Zsl3+REmsUHRitmlA/d4GTML8Aufjj438EiD5gRVaa4iS8F9sU
-         VKHLWTVtUEU/tRdkPad0xq627iTZdje/pEzuiIE9pZwbqPm79blShbkV1bgnrC5/z6nh
-         RoHFDvD3hvMh8LcJY9kE87tpW5zxAE9poHYpuzcqihF9VrISXRwHUa88oWTFgqX+FL38
-         tMLy8+v8FjfG4L3jJciq0R7AQMo/x/1o+QHxi+dskdwQf+AI4QbkBScEukIwZ/ZiJiYq
-         MyDcA718nyQGGNlr21ilX01AfbWqG+dPqtuGpqmPWtAZul4LElzNFnJXg53Z7EcVPpub
-         Rd4w==
+        bh=JB5qwwMZxO407X97+Vf/KcwBIUQMngdzvKz1itKcTdc=;
+        b=L47EybJFFPkJROzqClRtNbSFZxRNzBv2b1CHZlunxJlGbOFxYYgA10AjqQltO1t7cg
+         Vop0bevg8d1WcElj5Esmq+YoqX7EwEhpXKed796iG5/I/PJUTPv3Wie5i1XtAgUKHC3+
+         Sq+S6Yd1hwG3ZRJWDRqLt7HLBdQe65I/3n3oggDs8/Qf78OYPkDIgenpcTmaRH5GWEbS
+         8FiC+OzDlGGMgAXT05LazfJQOtdVYXg6wUo821gUlyZhw6wCxmMOq2eBvB2vW1DVNYks
+         Pn1lhiJF9z6WIuQTTwUMdlVypo1fvErH8edshF6u9d9qUcMc8if/zq04G4o4jxm540h5
+         nmIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762939255; x=1763544055;
+        d=1e100.net; s=20230601; t=1762939256; x=1763544056;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7h9UV3nYWC6hYsHPBAX2lZPJFbMaZGkJN8sutubEAEQ=;
-        b=BCNFi6M3EC7U0TKRXTgaobzu/xAHAXm3bCqmY6xbv5KyFz0MLSVziy6BjBPsfTku4d
-         G4sErTJjmyCvi9Do9+JYmn8e1yxj0Abw53ILPeLbXwvjPoyr41UsBdtISIjQoHxhFHg8
-         cteOPmNCBGLsABir9H/GZ7tGtEsugryzGrzpXhcbETJayBTipkjidt2rbNKUtTnQNvMq
-         sSqPYEb1EXa6eP/UgsThdBiWWJx3/hEUqTE0ysh12zhFSXsOa2uW235aF0ciAkGSCvcc
-         RUzYvsVzuyfanXcWHbNkZs1L9rpYnSQETfSIcGzVeQ7Xe+4Thm+NbUtW4EYV1h30ii2e
-         iKDw==
-X-Gm-Message-State: AOJu0YyOcrWo5BJfDoX3ckcToGa9iefjlQMzwmLHIm3XSgDO/RR/Jpj7
-	Enz3eJ3lrLn+cX/8W5bEE24YgQlFjnD3YinqUWlu66JOHwSslqwuMDtk9mKrbLR9Klz1HSYky97
-	9cdVLi24UnZNkGHAbsWyXXq3NvRoZU1K7tTkS0+MJsv4TccdWMlFmW/9vIqu1iyQfOFOG14z82F
-	EWpJnn8fVOyNpyiGm3I0Fkj14unMAl9k0=
-X-Google-Smtp-Source: AGHT+IF+dsx1c4LF0aiVAUBfRYuGGbYQKD+wAzOKX8ydw/hwxgLYI8Qn1guhrPUGrrVE73xmb603B6Usqg==
-X-Received: from wmhf7.prod.google.com ([2002:a7b:cc07:0:b0:475:dc01:3dbb])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3145:b0:477:76c2:49c9
- with SMTP id 5b1f17b1804b1-477870718cdmr21988195e9.2.1762939254762; Wed, 12
- Nov 2025 01:20:54 -0800 (PST)
-Date: Wed, 12 Nov 2025 09:20:46 +0000
+        bh=JB5qwwMZxO407X97+Vf/KcwBIUQMngdzvKz1itKcTdc=;
+        b=turFFotlCszRFSXBIxsNhxHok7AVQlUR+Kia8XQy9mIkfvoKg63/DIRFl0afT4+4NO
+         TR/IwKxQIjUHpDWP0t43/HIlvAe1iG6ypHi0AWiVQALLwTEoZzxkeViVKW32BHsv5xEg
+         T6Vs7QFy0LGw2XwKhR4McIC2R4z7n0byhV+SPgox7ivLtCJioAIsDmRoquBMD6ppMae8
+         r5RPsERMvVXcKNG2BueXShdDsmcqGgcKBQygZBfFq7FaF3R583kiKy5A372NYjbwD7GT
+         9pplL44vf7bG5QRQt0Fu85HYYkFWXUGeCFg4a/r2k/UKcQ9p2CBB/WC3hhBQ2yKiLNgY
+         DmnQ==
+X-Gm-Message-State: AOJu0YzaN+btrYiZ/x9qhRHZkiuw8LefQN2QuZJJrLbpQpl94ZnGzIMe
+	4BkzgE9X0Jn0Li2GHvag77zLucWjiqNBG2y6LQP/YGUE5scuTKpyWW1h/m8aifnyhFZUXvBSK5l
+	pITBgRHgjpOS8CB1fw5vuGw1SAYJhM32YAMKvaKczf1QEGuCNFPbiFTkhHAu8sma7vMD438vGJE
+	S3EIrMd3rCIYBP8hSQXMvx4IZ4Z5USuwk=
+X-Google-Smtp-Source: AGHT+IGSzKv9Qpoz2yI1N6uU2pBwYKoPNwxfrgPxGJ57M4rsQcHsKYhNgr+gdljJbqvoaektBGzCN8Huow==
+X-Received: from wmcq24.prod.google.com ([2002:a05:600c:c118:b0:477:74f4:31c])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1f0d:b0:45d:f83b:96aa
+ with SMTP id 5b1f17b1804b1-47787045016mr18090705e9.7.1762939255548; Wed, 12
+ Nov 2025 01:20:55 -0800 (PST)
+Date: Wed, 12 Nov 2025 09:20:47 +0000
 In-Reply-To: <20251112092051.1376245-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251112092051.1376245-1-tabba@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251112092051.1376245-4-tabba@google.com>
-Subject: [PATCH v4 3/8] KVM: arm64: Fix MTE flag initialization for protected VMs
+Message-ID: <20251112092051.1376245-5-tabba@google.com>
+Subject: [PATCH v4 4/8] KVM: arm64: Introduce helper to calculate fault IPA offset
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,57 +68,83 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-The function pkvm_init_features_from_host() initializes guest
-features, propagating them from the host. The logic to propagate
-KVM_ARCH_FLAG_MTE_ENABLED (Memory Tagging Extension)
-has a couple of issues.
+This 12-bit FAR fault IPA offset mask is hard-coded as 'GENMASK(11, 0)'
+in several places to reconstruct the full fault IPA.
 
-First, the check was in the common path, before the divergence for
-protected and non-protected VMs. For non-protected VMs, this was
-unnecessary, as 'kvm->arch.flags' is completely overwritten by
-host_arch_flags immediately after, which already contains the MTE flag.
-For protected VMs, this was setting the flag even if the feature is not
-allowed.
+Introduce FAR_TO_FIPA_OFFSET() to calculate this value in a shared
+header and replace all open-coded instances to improve readability.
 
-Second, the check was reading 'host_kvm->arch.flags' instead of using
-the local 'host_arch_flags', which is read once from the host flags.
+No functional change intended.
 
-Fix these by moving the MTE flag check inside the protected-VM-only
-path, checking if the feature is allowed, and changing it to use the
-correct host_arch_flags local variable. This ensures non-protected VMs
-get the flag via the bulk copy, and protected VMs get it via an explicit
-check.
-
-Fixes: b7f345fbc32a ("KVM: arm64: Fix FEAT_MTE in pKVM")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h         | 2 ++
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 2 +-
+ arch/arm64/kvm/inject_fault.c            | 2 +-
+ arch/arm64/kvm/mmu.c                     | 4 ++--
+ 4 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index f6f8996c4f97..16d7bf493c18 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -337,9 +337,6 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 	/* CTR_EL0 is always under host control, even for protected VMs. */
- 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1da290aeedce..73abe697bc2d 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -343,6 +343,8 @@
+ #define PAR_TO_HPFAR(par)		\
+ 	(((par) & GENMASK_ULL(52 - 1, 12)) >> 8)
  
--	if (test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &host_kvm->arch.flags))
--		set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
--
- 	/* No restrictions for non-protected VMs. */
- 	if (!kvm_vm_is_protected(kvm)) {
- 		hyp_vm->kvm.arch.flags = host_arch_flags;
-@@ -354,6 +351,9 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 		return;
- 	}
- 
-+	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_MTE))
-+		kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_MTE_ENABLED);
++#define FAR_TO_FIPA_OFFSET(far) ((far) & GENMASK_ULL(11, 0))
 +
- 	bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
+ #define ECN(x) { ESR_ELx_EC_##x, #x }
  
- 	set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
+ #define kvm_arm_exception_class \
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+index 78579b31a420..43d7dfa2c517 100644
+--- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+@@ -44,7 +44,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 
+ 	/* Build the full address */
+ 	fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
+-	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	fault_ipa |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+ 
+ 	/* If not for GICV, move on */
+ 	if (fault_ipa <  vgic->vgic_cpu_base ||
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index dfcd66c65517..c9bbce017dee 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -258,7 +258,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+ 	unsigned long addr, esr;
+ 
+ 	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+-	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	addr |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+ 
+ 	__kvm_inject_sea(vcpu, kvm_vcpu_trap_is_iabt(vcpu), addr);
+ 
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7cc964af8d30..5b159cf0d203 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1959,7 +1959,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ 		/* Falls between the IPA range and the PARange? */
+ 		if (fault_ipa >= BIT_ULL(VTCR_EL2_IPA(vcpu->arch.hw_mmu->vtcr))) {
+-			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++			fault_ipa |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+ 
+ 			return kvm_inject_sea(vcpu, is_iabt, fault_ipa);
+ 		}
+@@ -2059,7 +2059,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 		 * faulting VA. This is always 12 bits, irrespective
+ 		 * of the page size.
+ 		 */
+-		ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++		ipa |= FAR_TO_FIPA_OFFSET(kvm_vcpu_get_hfar(vcpu));
+ 		ret = io_mem_abort(vcpu, ipa);
+ 		goto out_unlock;
+ 	}
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
