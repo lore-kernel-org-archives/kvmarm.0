@@ -1,116 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A6BA2D1F4E;
-	Wed, 12 Nov 2025 08:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2592E2FC873;
+	Wed, 12 Nov 2025 08:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762936437; cv=none; b=BXyBEutgACUjyZggJeQe3vop22WKaTr7fM5+CoBsv8boB6Cf+1yD6rHCZZUO64G7YpgzFDcEupxg7SQUiHZXZLx4mXOc6fuxXRTqC4p/DeHeIrHJRGLPctW4NJ01XTUxpOePWFXkoYT5n0AvUeNsQWyzX7k/AvZRPkx0kv4mubI=
+	t=1762937150; cv=none; b=fYgkNN2/4POiSR5QSyWY1UBcqQGEZSmM7tvbdKNP5oiDGO1yBcLAfc/SSNtACahd1tlt6xBYFctYyOkctgFj43xstvuCAhGYat5/rg7wEKpXLu0dTTdjimeewy93gnD0pS3kCm2QF8AVLFpXEOpNL4/8PorY75jwKovv5Nsji2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762936437; c=relaxed/simple;
-	bh=81f0ESLSrnetgKGzemcxP8SfAbjzKr+GfwSLMaWOTFw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jztCJwlk8Tm1Hx88UWUrUqFnusLTzJtKc2OgXgsez1yHI0MXTOXyPm+i/j8qjbsp8RFAQ2II2fphbAjLsSoknFa/py4LqqrTsoBvzJ6SxozbbRSqerHYPmabtCP+KUmLaA5J36/Zz2uvkL4QjrQHOv0koEXseSD5vdDfTmD/kNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qr7kV1C7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1762937150; c=relaxed/simple;
+	bh=3PpC23lXWHMZc/xqZ8AI6v/rV2TDMJJUIRhSuy6tr+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nj8+9ZpdUaypFtyT41jw9Fco2VwdOgHbZNRY7BOMA66TcLewQ03+lyfR5rsOx2aThks+fmJFSm2Gj+r5lWBUeEGOQJfW0N0Lfv14ce9aHWARYVLvuf6RNK3+glkTgwvqun8bMMET9WR8QtuKycm0xxNgWfWC1gEi+CVZWsAasfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eyMxGT/H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qr7kV1C7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23938C116B1;
-	Wed, 12 Nov 2025 08:33:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eyMxGT/H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8BEC4CEF7;
+	Wed, 12 Nov 2025 08:45:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762936437;
-	bh=81f0ESLSrnetgKGzemcxP8SfAbjzKr+GfwSLMaWOTFw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qr7kV1C7PkAAiV0WEdvnFAjNELGLD9nOqg1HaEzXLXtHkYdeBiKlVu5/nz0F8WvDs
-	 ATYkqKkjN/63MXvgCFzwpl7EGVe/X0jBZvmE613OI2ZwWBPdJzp2egaPpHcJFZ5u5q
-	 uv/VPbmPGRueN//p9s1KpM7TRPjoLmKpB/mh0rc9ncnsXD9JPxxPEJApOShu5upu3x
-	 CicYGiDKmCLVwOzS+5NPs6p+ZWC32uAlXhVQCohBnYdlHSVuHiiD32LYoE/usiE0Ks
-	 zdaq9TqJIm8Sulxc5+wNiwDr1Ual/8n1zc69LEeU2Zv3SM74XQ9S4Xok+8P/Y17ptk
-	 Aqm54UmE05bKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJ6Ic-00000004Su3-2m1u;
-	Wed, 12 Nov 2025 08:33:54 +0000
-Date: Wed, 12 Nov 2025 08:33:54 +0000
-Message-ID: <86y0obtzt9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1762937146;
+	bh=3PpC23lXWHMZc/xqZ8AI6v/rV2TDMJJUIRhSuy6tr+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eyMxGT/HHav6pdcoZJe2w68jZ+BllzlUulSSnAFhC6j02cdmGIa6ljPeDogIuN6XR
+	 xhLX/yJwi6pJBkqwM83lBtGiHUOPiA30EJ0qwUtS7Nyqr93Fcai3jYJ0ka23jKxlb+
+	 MQJfYJlUGv+r9aild/gH4M3IRHMzB5OSH+31GPo7UPMwXoEkNZc1Gdlsyh00FmBWHl
+	 I5dNhWL6hsS1AhaZ9ZJn2Xi10rtsUVD3qvUIjO30+IJgK81FQ2FCtDDPd5LKdOGPed
+	 CkqIr6cMqr9rr30BORWUr9CFJA3YIl4HsbxqOT31AOgWiysacpegcIy+Bgrq9fcF6v
+	 2TS3igp6FMojg==
+Date: Wed, 12 Nov 2025 00:45:45 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
 	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt configuration
-In-Reply-To: <aRPQBQVPLVXGOxU-@kernel.org>
+Subject: Re: [PATCH v2 20/45] KVM: arm64: Revamp vgic maintenance interrupt
+ configuration
+Message-ID: <aRRJOSNnvD1B0ZfJ@kernel.org>
 References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-21-maz@kernel.org>
-	<aRPQBQVPLVXGOxU-@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20251109171619.1507205-21-maz@kernel.org>
+ <aRPQBQVPLVXGOxU-@kernel.org>
+ <86y0obtzt9.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86y0obtzt9.wl-maz@kernel.org>
 
-On Wed, 12 Nov 2025 00:08:37 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
+On Wed, Nov 12, 2025 at 08:33:54AM +0000, Marc Zyngier wrote:
+> On Wed, 12 Nov 2025 00:08:37 +0000,
+> Oliver Upton <oupton@kernel.org> wrote:
+> > 
+> > On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
+> > > +static void summarize_ap_list(struct kvm_vcpu *vcpu,
+> > > +			      struct ap_list_summary *als)
+> > >  {
+> > >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> > >  	struct vgic_irq *irq;
+> > > -	int count = 0;
+> > > -
+> > > -	*multi_sgi = false;
+> > >  
+> > >  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
+> > >  
+> > > -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> > > -		int w;
+> > > +	*als = (typeof(*als)){};
+> > >  
+> > > -		raw_spin_lock(&irq->irq_lock);
+> > > -		/* GICv2 SGIs can count for more than one... */
+> > > -		w = vgic_irq_get_lr_count(irq);
+> > > -		raw_spin_unlock(&irq->irq_lock);
+> > > +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> > > +		scoped_guard(raw_spinlock, &irq->irq_lock) {
+> > > +			if (vgic_target_oracle(irq) != vcpu)
+> > > +				continue;
+> > 
+> > From our conversation about this sort of thing a few weeks ago, wont
+> > this 'continue' interact pooly with the for loop that scoped_guard()
+> > expands to?
 > 
-> On Sun, Nov 09, 2025 at 05:15:54PM +0000, Marc Zyngier wrote:
-> > +static void summarize_ap_list(struct kvm_vcpu *vcpu,
-> > +			      struct ap_list_summary *als)
-> >  {
-> >  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> >  	struct vgic_irq *irq;
-> > -	int count = 0;
-> > -
-> > -	*multi_sgi = false;
-> >  
-> >  	lockdep_assert_held(&vgic_cpu->ap_list_lock);
-> >  
-> > -	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > -		int w;
-> > +	*als = (typeof(*als)){};
-> >  
-> > -		raw_spin_lock(&irq->irq_lock);
-> > -		/* GICv2 SGIs can count for more than one... */
-> > -		w = vgic_irq_get_lr_count(irq);
-> > -		raw_spin_unlock(&irq->irq_lock);
-> > +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-> > +		scoped_guard(raw_spinlock, &irq->irq_lock) {
-> > +			if (vgic_target_oracle(irq) != vcpu)
-> > +				continue;
+> Gahhh... I was sure I had killed that everywhere, but obviously failed
+> to. I wish there was a coccinelle script to detect this sort of broken
+> constructs (where are the script kiddies when you really need them?).
 > 
-> From our conversation about this sort of thing a few weeks ago, wont
-> this 'continue' interact pooly with the for loop that scoped_guard()
-> expands to?
+> Thanks for spotting it!
+> 
+> > Consistent with the other checks against the destination oracle you'll
+> > probably want a branch hint too.
+> 
+> Yup, I'll add that.
 
-Gahhh... I was sure I had killed that everywhere, but obviously failed
-to. I wish there was a coccinelle script to detect this sort of broken
-constructs (where are the script kiddies when you really need them?).
+I can take care of it when applying. These patches need to bake :)
 
-Thanks for spotting it!
-
-> Consistent with the other checks against the destination oracle you'll
-> probably want a branch hint too.
-
-Yup, I'll add that.
-
-Thanks again,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
