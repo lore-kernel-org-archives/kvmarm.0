@@ -1,55 +1,55 @@
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C993093D1
-	for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 05:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A35C30BB96
+	for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 05:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763011514; cv=none; b=iDEj5NjxnmzzEU9x2yKb+5KmEMSPFeV4msrDn+slenIKT022uSpyuhMKhh4LQFecCyalnJFi0R629BhJLM7Sqk11CiBYfPF8vmeIbuAARzDNIH+FUjl4nfGGj9GTTAJN4AF3Y9wiGX+2Q7BkGlhp457dUJwJm1R7+w0I+DF3DMg=
+	t=1763011516; cv=none; b=h6kCcH8H24pLdC7w9IXRIftFrL1hwx7T9v7UAJIe47lgciE4gq9aTJ2IdWUiiNhUsBC/Qsb47GhqTl2mTYT+kf8GrJtiFHWl1Cz0l/6TkG9+aJ7dCUxJDrA8QGWAEfSV7BBoCd8/st0ebuezGAy2YODtE15NW3PImJzT4Nc+cDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763011514; c=relaxed/simple;
-	bh=3MvUjAEITw8JSRCxSPotHQttoes8WfavPfN/6AC4l2A=;
+	s=arc-20240116; t=1763011516; c=relaxed/simple;
+	bh=P9X8/pKAhvG/wWkSjOkEiXdGNBedfO9mFofKaMhghnc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nIWKX7o7UzmwzBw/PiX3xbSjmi/WKFMbueYMeeIKKAOR7wDLUvhou08e3wCvvv+VLWnVLwOATQWQxBSCegYrRupyfnDzNZndvsvz7gtqYHwIcP6qCxLBESq0ktghs3INipXPOmpwXUHrhKu8ZJfdXr7/EYD7og17Hr2qDb/szfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sbXFafkt; arc=none smtp.client-ip=209.85.166.73
+	 To:Cc:Content-Type; b=ucUBBMGJtcBmiymK1oL6+u8iOfujtNlGTy6vz3qeypflKwQPRESp5YnyuMuTJ5pkllyyU6c6GvB66qCGqbPFYjoRKTiVQ072STAipMayAReXRk9q4O3TGqyWf8dVuQ3/fKdWBpWuTgBql8JXbcg0ICmN3mYOeFB+lVwKkrub1Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kiSW8TkR; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sbXFafkt"
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-948bf83a707so51343439f.1
-        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 21:25:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kiSW8TkR"
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-43373c85296so6804625ab.2
+        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 21:25:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763011512; x=1763616312; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763011514; x=1763616314; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ta7sr0PTTEzvgb7b4GWZ1P6Da8DksAgzSXe7OlGF+gA=;
-        b=sbXFafkthakTzIqCPUHqdw5OZCOJ4jJzTWoDGEp4yQWtfi19Wcc0kXAKHUgAerMjUK
-         r1+Ewsa1jcLB2XP8j2914grd5gVdM1zo0nhw5ZltPq4X/GsD4SkmxEHbiQ/7kYq/1Wyn
-         4csEgKUl3AghfTh2gUjU/C9Qkc9+abKZ1gPxnKpyC5i0jifXAlM490VHk3Wudg9ei/of
-         IDuwuB9anxAWH05pRHfDsDADKbgLyOQYUObchaSy4KbnUp7o2SqQyfyLu+hPT7AV/7cI
-         4kXEX98+Az6qqqM4E8zHB7E7BkHr71OnGFP1sWe3kOLOj16JvK7iZ9M4OdznXOMbBB/J
-         sS5A==
+        bh=YR4PqSCoKUZHQwNLH+ibXY+eaMViVtVOUHNqTtgOoNw=;
+        b=kiSW8TkRPhD5xSkKomaWoWYxtK4vsB8K6uL3lQsZgqA0ad1DtW77rkFT29jnTIUM47
+         QnX/lAVjICOIhpdEFFeMzkw3jFOn7cj+Lw/o64Brw+sM70YYxe7OQpZo+X9A7WfcpEiI
+         K0D0JTDqzAXF00Onndjg+C3CuqN+Y1DYX8yWfyOwzrW5uXw64osfLhfDqpMPxfajQqho
+         MLiDuZhi4w3or9j82Cg6hY5/URF2XRq9x1dJu0lN+92H1wRmv17qjv81iXEKnCJN9fNX
+         S6P7DfWf9qSPrbNsoKHQ//V6TiHu2chB7uzuvOAULBhKiaWmmzDUCtEJwim5bEYAIYWG
+         p74Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763011512; x=1763616312;
+        d=1e100.net; s=20230601; t=1763011514; x=1763616314;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ta7sr0PTTEzvgb7b4GWZ1P6Da8DksAgzSXe7OlGF+gA=;
-        b=mL7EAStqs/1gcoH7PPoTgptYZkGY1OxH6XVF8zZEWYTn2H9Znxll1e4A5XM2kiqIEO
-         yVqFrvrCaNVc1mFk7M3TS5IYxPhuVLcM7mE+ic6ySY55SdMg8h+k9GsAdy3OOl1wg0o0
-         phbmMRl5JsfUS7XIhRwaRtVvD8Tc2MG7jmJu5Dk66t+9Gxz9j2BztirIEXeTSLRZUnKu
-         yvhS1fmGUo626X36E/XBfPMb41zja6l43Gm1sAtjnhF4ueAU84XqTjRVr7RkEhX1wFb5
-         MU/OSedXoyJXs9bFrBGR+C/XT+h3fAXQ3uIB0IJ5F4wYa7n/e5uLpT43K4Mcl1mv0Fv0
-         CrAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrcNjqeHODL1Hu4mtJtJz2dtDkoReBYc1Df0VTdvK/IvmrchP+93iK0kQSgvTHFnveqyJ43WA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz582mzN8oNxRNCHr+7EgkyqrIKiSxoOzHpUUjnEkkEkxYR3r4e
-	zeFhwrDf3m7yOdsiplA1P0fHENfC45czIo2wyOYijgYtrazZ4jkdGxMbha+S/4P5NZasU5p17QJ
-	jeS4ICv//9A==
-X-Google-Smtp-Source: AGHT+IHMvk9ultN6RL8YYeEEQa9a2SgSGY279SAAWTq2ofAb1uDKUH6fYPApAnPv5ZmcPZ+gZVtFlIs2gOZI
-X-Received: from iopt1.prod.google.com ([2002:a5e:dd01:0:b0:945:af6f:682e])
- (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6602:8312:b0:948:9ff9:4189
- with SMTP id ca18e2360f4ac-948c46a06f5mr586614639f.19.1763011511803; Wed, 12
- Nov 2025 21:25:11 -0800 (PST)
-Date: Thu, 13 Nov 2025 05:24:51 +0000
+        bh=YR4PqSCoKUZHQwNLH+ibXY+eaMViVtVOUHNqTtgOoNw=;
+        b=Fabg9cVfyjA6tTgigRcPFUYO45NgkLbMeV9Y+1d13kpNfDFdYnwM6hUAE9IQG+M0uh
+         kC+8TmaohXWbEMChezh/3+qns7lHdKjuPIJixNEZxrAytGCK1+rSHAtsrNfrglMYZKjO
+         b5FEU14/Wt82nHT/27JTxVQQtbvWAQu27TReoFJx9+M3stZ4mBbRRK80cuV29mXj13e5
+         C8XngdnEkaPCnbHEc3ls0/BVJFNMiV8XS7PwwUZu9ca0n9c1cEyZf49TqOSCt7SSwong
+         s5E/xKMqY5jmCq5LBYO5JM/Wvd1xvRZU9FyOKVSN0ebCyWJmJS+yhytxNkjhBerAEqq2
+         ACiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGkjeu8N+r35h8YMBww3GGPOXOi9B8nA1qBKP7SyF/VnO/b2l5tTtAfVVddpNGy6yqc/E77UU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzIe/QszSsghv6BtU4m93/i1X+a7UGoEj4Z1D6JKOYrHdt4srCJ
+	EtFYwk6M4cHx4G+1Qyg0ZTIGh345UCad22A7XnkBPugSjRKiuViquz3uAsrz+fE7tOTSCMhkjJa
+	mYINANE0oEw==
+X-Google-Smtp-Source: AGHT+IFRYF4zNyv9Ly6pBzYTZfMV1gbB624Cl5TmoplavbzHX+2MSvXvATj641ux/60yeM2/PvFgItVBduUS
+X-Received: from ilbbm14.prod.google.com ([2002:a05:6e02:330e:b0:433:2091:8e7e])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6e02:1a83:b0:433:2072:9d2c
+ with SMTP id e9e14a558f8ab-43473d2a3a5mr86726965ab.10.1763011514189; Wed, 12
+ Nov 2025 21:25:14 -0800 (PST)
+Date: Thu, 13 Nov 2025 05:24:52 +0000
 In-Reply-To: <20251113052452.975081-1-rananta@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251113052452.975081-1-rananta@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251113052452.975081-3-rananta@google.com>
-Subject: [PATCH 2/3] KVM: arm64: Split kvm_pgtable_stage2_destroy()
+Message-ID: <20251113052452.975081-4-rananta@google.com>
+Subject: [PATCH 3/3] KVM: arm64: Reschedule as needed when destroying the
+ stage-2 page-tables
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
 Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
@@ -69,207 +70,114 @@ Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.co
 	Oliver Upton <oliver.upton@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Split kvm_pgtable_stage2_destroy() into two:
-  - kvm_pgtable_stage2_destroy_range(), that performs the
-    page-table walk and free the entries over a range of addresses.
-  - kvm_pgtable_stage2_destroy_pgd(), that frees the PGD.
+When a large VM, specifically one that holds a significant number of PTEs,
+gets abruptly destroyed, the following warning is seen during the
+page-table walk:
 
-This refactoring enables subsequent patches to free large page-tables
-in chunks, calling cond_resched() between each chunk, to yield the
-CPU as necessary.
+ sched: CPU 0 need_resched set for > 100018840 ns (100 ticks) without schedule
+ CPU: 0 UID: 0 PID: 9617 Comm: kvm_page_table_ Tainted: G O 6.16.0-smp-DEV #3 NONE
+ Tainted: [O]=OOT_MODULE
+ Call trace:
+  show_stack+0x20/0x38 (C)
+  dump_stack_lvl+0x3c/0xb8
+  dump_stack+0x18/0x30
+  resched_latency_warn+0x7c/0x88
+  sched_tick+0x1c4/0x268
+  update_process_times+0xa8/0xd8
+  tick_nohz_handler+0xc8/0x168
+  __hrtimer_run_queues+0x11c/0x338
+  hrtimer_interrupt+0x104/0x308
+  arch_timer_handler_phys+0x40/0x58
+  handle_percpu_devid_irq+0x8c/0x1b0
+  generic_handle_domain_irq+0x48/0x78
+  gic_handle_irq+0x1b8/0x408
+  call_on_irq_stack+0x24/0x30
+  do_interrupt_handler+0x54/0x78
+  el1_interrupt+0x44/0x88
+  el1h_64_irq_handler+0x18/0x28
+  el1h_64_irq+0x84/0x88
+  stage2_free_walker+0x30/0xa0 (P)
+  __kvm_pgtable_walk+0x11c/0x258
+  __kvm_pgtable_walk+0x180/0x258
+  __kvm_pgtable_walk+0x180/0x258
+  __kvm_pgtable_walk+0x180/0x258
+  kvm_pgtable_walk+0xc4/0x140
+  kvm_pgtable_stage2_destroy+0x5c/0xf0
+  kvm_free_stage2_pgd+0x6c/0xe8
+  kvm_uninit_stage2_mmu+0x24/0x48
+  kvm_arch_flush_shadow_all+0x80/0xa0
+  kvm_mmu_notifier_release+0x38/0x78
+  __mmu_notifier_release+0x15c/0x250
+  exit_mmap+0x68/0x400
+  __mmput+0x38/0x1c8
+  mmput+0x30/0x68
+  exit_mm+0xd4/0x198
+  do_exit+0x1a4/0xb00
+  do_group_exit+0x8c/0x120
+  get_signal+0x6d4/0x778
+  do_signal+0x90/0x718
+  do_notify_resume+0x70/0x170
+  el0_svc+0x74/0xd8
+  el0t_64_sync_handler+0x60/0xc8
+  el0t_64_sync+0x1b0/0x1b8
 
-Existing callers of kvm_pgtable_stage2_destroy(), that probably cannot
-take advantage of this (such as nVMHE), will continue to function as is.
+The warning is seen majorly on the host kernels that are configured
+not to force-preempt, such as CONFIG_PREEMPT_NONE=y. To avoid this,
+instead of walking the entire page-table in one go, split it into
+smaller ranges, by checking for cond_resched() between each range.
+Since the path is executed during VM destruction, after the
+page-table structure is unlinked from the KVM MMU, relying on
+cond_resched_rwlock_write() isn't necessary.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 Suggested-by: Oliver Upton <oliver.upton@linux.dev>
-Link: https://lore.kernel.org/r/20250820162242.2624752-2-rananta@google.com
+Link: https://lore.kernel.org/r/20250820162242.2624752-3-rananta@google.com
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 30 ++++++++++++++++++++++++++++
- arch/arm64/include/asm/kvm_pkvm.h    |  4 +++-
- arch/arm64/kvm/hyp/pgtable.c         | 25 +++++++++++++++++++----
- arch/arm64/kvm/mmu.c                 | 12 +++++++++--
- arch/arm64/kvm/pkvm.c                | 11 ++++++++--
- 5 files changed, 73 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/mmu.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 2888b5d037573..1246216616b51 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -355,6 +355,11 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
- 	return pteref;
- }
- 
-+static inline kvm_pte_t *kvm_dereference_pteref_raw(kvm_pteref_t pteref)
-+{
-+	return pteref;
-+}
-+
- static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
- {
- 	/*
-@@ -384,6 +389,11 @@ static inline kvm_pte_t *kvm_dereference_pteref(struct kvm_pgtable_walker *walke
- 	return rcu_dereference_check(pteref, !(walker->flags & KVM_PGTABLE_WALK_SHARED));
- }
- 
-+static inline kvm_pte_t *kvm_dereference_pteref_raw(kvm_pteref_t pteref)
-+{
-+	return rcu_dereference_raw(pteref);
-+}
-+
- static inline int kvm_pgtable_walk_begin(struct kvm_pgtable_walker *walker)
- {
- 	if (walker->flags & KVM_PGTABLE_WALK_SHARED)
-@@ -551,6 +561,26 @@ static inline int kvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2
-  */
- void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
- 
-+/**
-+ * kvm_pgtable_stage2_destroy_range() - Destroy the unlinked range of addresses.
-+ * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-+ * @addr:      Intermediate physical address at which to place the mapping.
-+ * @size:      Size of the mapping.
-+ *
-+ * The page-table is assumed to be unreachable by any hardware walkers prior
-+ * to freeing and therefore no TLB invalidation is performed.
-+ */
-+void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+					u64 addr, u64 size);
-+
-+/**
-+ * kvm_pgtable_stage2_destroy_pgd() - Destroy the PGD of guest stage-2 page-table.
-+ * @pgt:       Page-table structure initialised by kvm_pgtable_stage2_init*().
-+ *
-+ * It is assumed that the rest of the page-table is freed before this operation.
-+ */
-+void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
-+
- /**
-  * kvm_pgtable_stage2_free_unlinked() - Free an unlinked stage-2 paging structure.
-  * @mm_ops:	Memory management callbacks.
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 08be89c95466e..0aecd4ac5f45d 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -180,7 +180,9 @@ struct pkvm_mapping {
- 
- int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
- 			     struct kvm_pgtable_mm_ops *mm_ops);
--void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt);
-+void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+					u64 addr, u64 size);
-+void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt);
- int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
- 			    enum kvm_pgtable_prot prot, void *mc,
- 			    enum kvm_pgtable_walk_flags flags);
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 6d6a23f7dedb6..0882896dbf8f2 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1577,21 +1577,38 @@ static int stage2_free_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 	}
- }
- 
--void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-+void kvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+				       u64 addr, u64 size)
- {
--	size_t pgd_sz;
- 	struct kvm_pgtable_walker walker = {
- 		.cb	= stage2_free_walker,
- 		.flags	= KVM_PGTABLE_WALK_LEAF |
- 			  KVM_PGTABLE_WALK_TABLE_POST,
- 	};
- 
--	WARN_ON(kvm_pgtable_walk(pgt, 0, BIT(pgt->ia_bits), &walker));
-+	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
-+}
-+
-+void kvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-+{
-+	size_t pgd_sz;
-+
- 	pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
--	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref(&walker, pgt->pgd), pgd_sz);
-+
-+	/*
-+	 * Since the pgtable is unlinked at this point, and not shared with
-+	 * other walkers, safely deference pgd with kvm_dereference_pteref_raw()
-+	 */
-+	pgt->mm_ops->free_pages_exact(kvm_dereference_pteref_raw(pgt->pgd), pgd_sz);
- 	pgt->pgd = NULL;
- }
- 
-+void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-+{
-+	kvm_pgtable_stage2_destroy_range(pgt, 0, BIT(pgt->ia_bits));
-+	kvm_pgtable_stage2_destroy_pgd(pgt);
-+}
-+
- void kvm_pgtable_stage2_free_unlinked(struct kvm_pgtable_mm_ops *mm_ops, void *pgtable, s8 level)
- {
- 	kvm_pteref_t ptep = (kvm_pteref_t)pgtable;
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7cc964af8d305..c2bc1eba032cd 100644
+index c2bc1eba032cd..f86d17ad50a7f 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -904,6 +904,14 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+@@ -904,11 +904,35 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
  	return 0;
  }
  
-+static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
++/*
++ * Assume that @pgt is valid and unlinked from the KVM MMU to free the
++ * page-table without taking the kvm_mmu_lock and without performing any
++ * TLB invalidations.
++ *
++ * Also, the range of addresses can be large enough to cause need_resched
++ * warnings, for instance on CONFIG_PREEMPT_NONE kernels. Hence, invoke
++ * cond_resched() periodically to prevent hogging the CPU for a long time
++ * and schedule something else, if required.
++ */
++static void stage2_destroy_range(struct kvm_pgtable *pgt, phys_addr_t addr,
++				   phys_addr_t end)
 +{
-+	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
++	u64 next;
 +
-+	KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, 0, BIT(ia_bits));
-+	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
++	do {
++		next = stage2_range_addr_end(addr, end);
++		KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, addr,
++							     next - addr);
++		if (next != end)
++			cond_resched();
++	} while (addr = next, addr != end);
 +}
 +
- /**
-  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
-  * @kvm:	The pointer to the KVM structure
-@@ -980,7 +988,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 	return 0;
- 
- out_destroy_pgtable:
--	KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
-+	kvm_stage2_destroy(pgt);
- out_free_pgtable:
- 	kfree(pgt);
- 	return err;
-@@ -1081,7 +1089,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
--		KVM_PGT_FN(kvm_pgtable_stage2_destroy)(pgt);
-+		kvm_stage2_destroy(pgt);
- 		kfree(pgt);
- 	}
- }
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 24f0f8a8c943c..d7a0f69a99821 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -344,9 +344,16 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
- 	return 0;
- }
- 
--void pkvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
-+void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
-+					u64 addr, u64 size)
+ static void kvm_stage2_destroy(struct kvm_pgtable *pgt)
  {
--	__pkvm_pgtable_stage2_unmap(pgt, 0, ~(0ULL));
-+	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
-+}
-+
-+void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-+{
-+	/* Expected to be called after all pKVM mappings have been released. */
-+	WARN_ON_ONCE(!RB_EMPTY_ROOT(&pgt->pkvm_mappings.rb_root));
+ 	unsigned int ia_bits = VTCR_EL2_IPA(pgt->mmu->vtcr);
+ 
+-	KVM_PGT_FN(kvm_pgtable_stage2_destroy_range)(pgt, 0, BIT(ia_bits));
++	stage2_destroy_range(pgt, 0, BIT(ia_bits));
+ 	KVM_PGT_FN(kvm_pgtable_stage2_destroy_pgd)(pgt);
  }
  
- int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
