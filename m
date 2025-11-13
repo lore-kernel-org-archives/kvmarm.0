@@ -1,144 +1,166 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12932DA76A
-	for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 21:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3468248C
+	for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 05:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762981649; cv=none; b=Cmc47pJgVvUdzznHrB7yYw1jxg3yRHX8PpMS9HzoxDWmaEctQm57wHuepZQkqhcn1mHJMqDtkntoE/AHmPuVpyTfiJZmdma5c0gj2OmHUSEN6/RiAwbd2eT7I1eulep2N2jZYeHH8xs3DXRofU3ygMdDL1DT6Lnr791N+NrlqqY=
+	t=1763011502; cv=none; b=SI33sI1YpMW5e+vRgsix0JNYJf2VzfIw8MpSmwJc4GR/TgAOYpAa5l/qbhU+u3J2hxPGJUo3zxcuh1FbK5Lm1CE9Eu8uwI6VfZeK+rc4vXebwLIJD6p0XkXhu+DHzjxlPXQuDZ6E3nvDkDqYI8OnbN8Nmp2jv54wOuNQ+8aYmTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762981649; c=relaxed/simple;
-	bh=Z2e8DoPZSUlsjdl9QhSqNgJm8pSP3JCCSTrBSJ21Zyw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TSxEOC3IR0Am2/K46Ni19ZIOwWVp/ReHiQ7Yqzqu7p8YQKCsOIPGQWSh7I1WUO7xfLOaL2i4kPLzH7dxZJG57CtIRATLAsGIVrseeH0+2poV9bIYrzPwZcKXKKdoHjbAoI8QfsPr+Eael3YKRUqx8v9eskNb4QfFSTcEPRkovC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Fur7pORo; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1763011502; c=relaxed/simple;
+	bh=JRpVSsu65muOPw+ZR6pM7QRh8sMT33lr34qzVyXY/os=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NZf7TAcQVr269cnHylMzCnh9Ggq5H9cU3Yl+4ZYe1IvXUgjz4p8WgQzj3/d/8pLjxwWw7cSz3elpD2Jwg5KRhIOp9F4y3RayUJR2AYovKaH5VdNJhLptqFCgAdY4lXKWhG9hJ7Hyu0iDtRIGb57JcPBH9qjwxg8b0EFk3P7lBgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i9khdZN5; arc=none smtp.client-ip=209.85.166.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--rananta.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fur7pORo"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-42b2e9ac45aso79634f8f.0
-        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 13:07:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i9khdZN5"
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-432f8352633so15419405ab.0
+        for <kvmarm@lists.linux.dev>; Wed, 12 Nov 2025 21:25:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762981644; x=1763586444; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ndvKFCJtXmZXWNjsWlnfM9pmpLT2hMmXPRvFvrdoK9k=;
-        b=Fur7pORo769pA4pc5TIUThdKRk5X4YZ1Q/wiB1uR1FtmwWd5nvbBLIzN2AON4e1g2w
-         M7/lyne+abQFlJYlxUXo1iRCpEbxqOWq6H5BxYF2EW4znJjiTZUmx6vvYL8hr2GbvPjW
-         z0X77ceHU4j2hGxS7bGFEXeFSv1ExwZgprVTNgefTc9uJKsPNwt7FnKR7iXIE68WB1Er
-         xFf8zGEI3jqaKyzqPdA5tSWADlLI8T/S+PDQuFUcapuQyPF31SfW/ST2urb7ZLaoWDte
-         4Ko4YUw8Wzn/MLlz4DFd4Aw9Ic2+tRG/OQ/bzmGBOE2T5WRwHZRAPh0UTxrkad5sZJbH
-         531w==
+        d=google.com; s=20230601; t=1763011500; x=1763616300; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ITLN6DrW4j9W1gRe4G0SjKiXKIkSq/9JXCq9e/dhlsU=;
+        b=i9khdZN5cXZ/bwFjLQCyzEuKR0++aGm/l3Qpf3XKP3OxMWU8n1PqkT5ni/BoFQZ7It
+         iixWjZYBCtTp1+1LVQdgrLfWQ64Pmz3mP2XnG/OPBnz05mcxnmked96XAjIrsSlcgDBy
+         BO2de7PVk0t0gJLxfvOWyLOO25dOLuxbOtOjMnkiFpmShvO99GCWLAqRV8nvZ2YD90t3
+         FnEc+FMaJ4aMEhLAwdKxkO5bHnI2gMDrRxxvJAUvmyOygrvxhH9QqkIop0gwHzGPDHB+
+         wv8msPfGY7iHAdaC16gAEqgotCKjl5/0x5PadwraaQpy1wNmUvFmQDYEzID4Bc0ceuWe
+         Q35w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762981644; x=1763586444;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ndvKFCJtXmZXWNjsWlnfM9pmpLT2hMmXPRvFvrdoK9k=;
-        b=lDthPuklOCgtElpM106GqPU/krrMG/NLhQD9r0v6ZTM6IoYH+2+UU71Wvjw5iUYwMq
-         Y7qDrOgHE4NS2esUZsJdGvik1oQWqOY984KBYb6SPYrOgsMMUrNDLIfAA9mADJ49wJqu
-         6xXl6xxF7ob6G9MIuYAWwPsefODZ4wW0czxO6iLoNf2hVF4mHbDN80eJ4AmVjkvo6n6q
-         YwmEkn99tshCiCx3OXr/aHKiYHfncZm5rHmhgd49amtEwO3YU5nc6iihz9V79c2C+V9j
-         wlCgHsnFuoZMW5Z5LOzjSydsPGMLLh/tqDZKetDvwyqrnt7SoYeMpxSLCbm4NSsUahR7
-         aA5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVvoenIJE1u0P5lKkDcnQUT1eTkH784KzYc5t/rOjHKEHJWx+yYXp3DzdM+/G11EwOD8sCl5n8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy+vKvzjeoBeDegsp2iAE/R8hDlDY6wP2AVhfsiS/rTE/qSU+sZ
-	NT5vXH9aiuqGmR3imf5mUtG1HaIEcAD2LcrghOg+37opXtgP4KOoQfAeMLK9AX4WlJA=
-X-Gm-Gg: ASbGncuqMTU368LoOD/rLfCvHxnVGb+cDdlxjyC9FUZa+Oe8x2cstXLO6sd1tnRjI/q
-	HY6v1/SP+NeEPTGjgs0z/sNCFGSjIGqVUWBwhADvmG6/VujFIyip0jOgBQFuQHDC6eektjsEvcB
-	1x/VwoT2/UMWSD8Xk7yIGL4MH3ZIFlJGED3IW5au3kB8G3gFp42ADudXGEKbu0m0MoD/lQehPIC
-	GA/x12TOfb/50rwXAUOl8wbA2OyVfCgLVTlYiubz61Xm/6Vu/1yJlBLsrJm6v0MMktHDMhz4X3e
-	uDLFVldcQlNKvvqesWZAMhhK+9V1QJftzgJu7c/uqQOymMy8lgnisKWPpx0p7vLM/JDiWdnhE51
-	zsasbtykNxLZamXQYLlBBCsfOCcYFkPgf3oow0cQqRg2T2Hw0gKDwYoyfXWZODuvJ16iqnEo8Qf
-	fKseG/L23lfCImhy6tnxMEB4xDkvIRIW602ek4BNqsmaI=
-X-Google-Smtp-Source: AGHT+IGtaSx6QtlDHy/EycHh0/ZhW1Mmm/5WCyQeOiw9mC05LvLWss/kOLCaCs1PZ52vi6bPz95ITQ==
-X-Received: by 2002:a05:6000:310b:b0:42b:3b4c:f411 with SMTP id ffacd0b85a97d-42b4bdb06f1mr4248875f8f.36.1762981643683;
-        Wed, 12 Nov 2025 13:07:23 -0800 (PST)
-Received: from [192.168.69.210] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b2e96441dsm28506596f8f.23.2025.11.12.13.07.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Nov 2025 13:07:23 -0800 (PST)
-Message-ID: <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
-Date: Wed, 12 Nov 2025 22:07:07 +0100
+        d=1e100.net; s=20230601; t=1763011500; x=1763616300;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ITLN6DrW4j9W1gRe4G0SjKiXKIkSq/9JXCq9e/dhlsU=;
+        b=S8253A1gbE7R8rrYtV5JCQ0sIQ/x7Nakf37JIHVIF9MqPA7TiqSvlgXcZNQNDwiB4Q
+         d3c4AF3TNXpqZeO5c4GVjPLA6jf2LeV8k45Ae5w3EbzcqxZ6WYugLD/Gb5TLha7nh0Es
+         CEX1g4XETxz2jgt8UDfZRrNcl5p2QnCoZM1wi3STF2ZeBQzOtFMKM0DRSXi6PHl4PeVv
+         Fr1OA2r+KH1hDbIDeIi9CmPk7M/J9iR31KPoedDxtflMWdXUGS7A4U1brkkoePhmnF1Q
+         +H8ExrOwQ0DoPyW7DOhHTp5MT9fuBBiXeSAsBCdk39kjaepw/7eYud5+6kEnqTv5qaGx
+         a8mg==
+X-Forwarded-Encrypted: i=1; AJvYcCUOI+xEt4DqffqPc4jCznjbbHuxF2jf8Oeh6SUmYMdnKPDOZ0AI0lWJDDP5Atavl+yp2Asc+bk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzoOAejgbctKNiBJtIlCrOpn//7qIxVxmHM8usa1HKvt0xLJlhS
+	09o0HDCAV6yZdybYLfgDLBKodXXgIrjiPdB8az1sPGIkERyFiuPSMt+t7JcyOf2rLe4b+hHCf8I
+	hG4XlrqqAUA==
+X-Google-Smtp-Source: AGHT+IFL6UP4YmlKx250LyiOtTQeJ7J1ke7xQcOZuRjsBn2ACx0ONuYF1IJLK61YzRE922HtvlvNEGnRGSBI
+X-Received: from jaa26.prod.google.com ([2002:a05:6638:ae1a:b0:5ad:7f49:aa05])
+ (user=rananta job=prod-delivery.src-stubby-dispatcher) by 2002:a92:c245:0:b0:433:78b8:943a
+ with SMTP id e9e14a558f8ab-43473d15984mr90010315ab.10.1763011500033; Wed, 12
+ Nov 2025 21:25:00 -0800 (PST)
+Date: Thu, 13 Nov 2025 05:24:49 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-Content-Language: en-US
-To: Sebastian Ott <sebott@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini
- <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20251112181357.38999-1-sebott@redhat.com>
- <20251112181357.38999-3-sebott@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20251112181357.38999-3-sebott@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251113052452.975081-1-rananta@google.com>
+Subject: [PATCH 0/3] KVM: arm64: Reschedule as needed when destroying the
+ stage-2 page-tables
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>
+Cc: Raghavendra Rao Anata <rananta@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Sebastian,
+Hello,
 
-On 12/11/25 19:13, Sebastian Ott wrote:
-> Provide a kvm specific vcpu property to override the default
-> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
-> 
-> Note: in order to support PSCI v0.1 we need to drop vcpu
-> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
-> 
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->   docs/system/arm/cpu-features.rst |  5 +++
->   target/arm/cpu.h                 |  6 +++
->   target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
->   3 files changed, 74 insertions(+), 1 deletion(-)
+When destroying a fully-mapped 128G VM abruptly, the following scheduler
+warning is observed:
+
+  sched: CPU 0 need_resched set for > 100018840 ns (100 ticks) without schedule
+  CPU: 0 UID: 0 PID: 9617 Comm: kvm_page_table_ Tainted: G O 6.16.0-smp-DEV #3 NONE
+  Tainted: [O]=OOT_MODULE
+  Call trace:
+      show_stack+0x20/0x38 (C)
+      dump_stack_lvl+0x3c/0xb8
+      dump_stack+0x18/0x30
+      resched_latency_warn+0x7c/0x88
+      sched_tick+0x1c4/0x268
+      update_process_times+0xa8/0xd8
+      tick_nohz_handler+0xc8/0x168
+      __hrtimer_run_queues+0x11c/0x338
+      hrtimer_interrupt+0x104/0x308
+      arch_timer_handler_phys+0x40/0x58
+      handle_percpu_devid_irq+0x8c/0x1b0
+      generic_handle_domain_irq+0x48/0x78
+      gic_handle_irq+0x1b8/0x408
+      call_on_irq_stack+0x24/0x30
+      do_interrupt_handler+0x54/0x78
+      el1_interrupt+0x44/0x88
+      el1h_64_irq_handler+0x18/0x28
+      el1h_64_irq+0x84/0x88
+      stage2_free_walker+0x30/0xa0 (P)
+      __kvm_pgtable_walk+0x11c/0x258
+      __kvm_pgtable_walk+0x180/0x258
+      __kvm_pgtable_walk+0x180/0x258
+      __kvm_pgtable_walk+0x180/0x258
+      kvm_pgtable_walk+0xc4/0x140
+      kvm_pgtable_stage2_destroy+0x5c/0xf0
+      kvm_free_stage2_pgd+0x6c/0xe8
+      kvm_uninit_stage2_mmu+0x24/0x48
+      kvm_arch_flush_shadow_all+0x80/0xa0
+      kvm_mmu_notifier_release+0x38/0x78
+      __mmu_notifier_release+0x15c/0x250
+      exit_mmap+0x68/0x400
+      __mmput+0x38/0x1c8
+      mmput+0x30/0x68
+      exit_mm+0xd4/0x198
+      do_exit+0x1a4/0xb00
+      do_group_exit+0x8c/0x120
+      get_signal+0x6d4/0x778
+      do_signal+0x90/0x718
+      do_notify_resume+0x70/0x170
+      el0_svc+0x74/0xd8
+      el0t_64_sync_handler+0x60/0xc8
+      el0t_64_sync+0x1b0/0x1b8
+
+The host kernel was running with CONFIG_PREEMPT_NONE=y, and since the
+page-table walk operation takes considerable amount of time for a VM
+with such a large number of PTEs mapped, the warning is seen.
+
+To mitigate this, split the walk into smaller ranges, by checking for
+cond_resched() between each range. Since the path is executed during
+VM destruction, after the page-table structure is unlinked from the
+KVM MMU, relying on cond_resched_rwlock_write() isn't necessary.
+
+Patch-1 kills the assumption that the page-table hierarchy under the
+table is free (in stage2_free_walker()). Instead, drop and clear the
+references only on empty tables.
+
+Patch-2 splits the kvm_pgtable_stage2_destroy() function into separate
+'walk' and 'free PGD' parts.
+
+Patch-3 leverages the split and performs the walk periodically over
+smaller ranges and calls cond_resched() between them.
+
+The series was originally posted and merged [1], but was later reverted
+due to syzkaller catching a UAF bug [2]. This series fixes the issue, and
+the original need_resched warning is addressed.
+
+[1]: https://lore.kernel.org/all/175582091313.1266576.4329884314263043118.b4-ty@linux.dev/
+[2]: https://lore.kernel.org/all/20250910180930.3679473-1-oliver.upton@linux.dev/ 
+
+Oliver Upton (1):
+  KVM: arm64: Only drop references on empty tables in stage2_free_walker
+
+Raghavendra Rao Ananta (2):
+  KVM: arm64: Split kvm_pgtable_stage2_destroy()
+  KVM: arm64: Reschedule as needed when destroying the stage-2
+    page-tables
+
+ arch/arm64/include/asm/kvm_pgtable.h | 30 +++++++++++++
+ arch/arm64/include/asm/kvm_pkvm.h    |  4 +-
+ arch/arm64/kvm/hyp/pgtable.c         | 63 +++++++++++++++++++++++-----
+ arch/arm64/kvm/mmu.c                 | 36 +++++++++++++++-
+ arch/arm64/kvm/pkvm.c                | 11 ++++-
+ 5 files changed, 129 insertions(+), 15 deletions(-)
 
 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 0d57081e69..e91b1abfb8 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
->       ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->   }
->   
-> +struct psci_version {
-> +    uint32_t number;
-> +    const char *str;
-> +};
-> +
-> +static const struct psci_version psci_versions[] = {
-> +    { QEMU_PSCI_VERSION_0_1, "0.1" },
-> +    { QEMU_PSCI_VERSION_0_2, "0.2" },
-> +    { QEMU_PSCI_VERSION_1_0, "1.0" },
-> +    { QEMU_PSCI_VERSION_1_1, "1.1" },
-> +    { QEMU_PSCI_VERSION_1_2, "1.2" },
-> +    { QEMU_PSCI_VERSION_1_3, "1.3" },
-> +    { -1, NULL },
-> +};
+base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
 
-
-> @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->                                kvm_steal_time_set);
->       object_property_set_description(obj, "kvm-steal-time",
->                                       "Set off to disable KVM steal time.");
-> +
-> +    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
-> +                            kvm_set_psci_version);
-> +    object_property_set_description(obj, "kvm-psci-version",
-> +                                    "Set PSCI version. "
-> +                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
-
-Could we enumerate from psci_versions[] here?
-
->   }
-Thanks,
-
-Phil.
