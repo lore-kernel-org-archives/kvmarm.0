@@ -1,141 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE29E218AD4;
-	Thu, 13 Nov 2025 20:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15B828506C;
+	Thu, 13 Nov 2025 21:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763064622; cv=none; b=mWBaLn95MgsbTBvdqBJghK/H3hIjf+N8DhqxOc5+uMIdpRKBxSV6cwQ61V1iEpoasjD7Lb4Uo2A5fgQEKR3UGowcQZZT2uk20tQW5CaKHs5/XPaiiixGbteCRFMcG5jUfeZvLWPDxTEn1SfaTBMis4Cphk5SeW1PZPNaQYrg3Zw=
+	t=1763068006; cv=none; b=NjZPY+yeaFI8KJs1epqmvCCiWfDwnHK6T2XYq0aU7hCoL1tjolpJ8oAfugMd8f30XUahBwP7EpspXIjraglAtSTnU2FxMsPde2i0zTwdwvUeIuyt1Ah5Fs7Fente6V0ZRRf8LlcCdSRX7MYbgjk2WIXxtv7499DCL/Pk8nHvxhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763064622; c=relaxed/simple;
-	bh=XhW7cUeN8WBhvszpm+5UwRt9sdZlZPSmEzfCXizuFPU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JW7rMr0g+lIaB5YHQjqS2PHDu9eNK6I2ETKMKE/+/hparM6oxHw2WTyMzt0R5+A2iHyK20t4N/OWrn9IM3wNuxKtTXWhR3AaNfJyahAuaslt6GaeMtAJJcTitEnar37nq1x+eZrHM7U9b5R3X0E0+H9xa7p24CSs5kIvM6CmSkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFR0yht4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763068006; c=relaxed/simple;
+	bh=IC4VpM6ZN4n39UtKfc2C/9ZDlOpdPQkYd/6hCrS82gc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E+WLzgQM5vexxe72Mipddn1snRlk9JloMXiCX4vekh6K4KmAZuAizBWff9JABY07VUHOzCyzF/Drj/O02Dvioqpqx79TstOuQ3bHFL6yd8OalQz7UD/HGH2jTaw6K1qy3Xy/LyyTccuM7FdYDl+TIHAOugcconl/9hEbVjx12d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OjYnTKJ/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFR0yht4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 884A4C4CEFB;
-	Thu, 13 Nov 2025 20:10:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OjYnTKJ/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D99C16AAE;
+	Thu, 13 Nov 2025 21:06:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763064621;
-	bh=XhW7cUeN8WBhvszpm+5UwRt9sdZlZPSmEzfCXizuFPU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uFR0yht4IbiXsgAESdOfYzJ4m/HcgROH6oLpQ+yKbpqYYNFSZn2HxN26zEJT4NQgD
-	 rqqc9gif+X6AN/mSMbaJ8vtL28nHq3gG/BxuP1qZHOIZu5PPsRuzEqHa9IMOGJI18o
-	 3KinGzRd3xvz+XQI9txqamOo6ErdJKo58oItGiFTjIjDPcXR8P+dplgaPfYC/ytQh9
-	 rvUm3zOhrTxJ+6NnQp5PF+PeRrdVuiD3LTu7EH+N1Y4A/B+y0zm9Tl1EPPt8bcdABd
-	 9Q+haHBl06AraG5BsT99BI4Vdqz73hQ6QFuKePG1Ghx4oWVW3pBd4QrePubi7F6+kN
-	 2993WUen4SDPQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJde7-0000000503W-11X2;
-	Thu, 13 Nov 2025 20:10:19 +0000
-Date: Thu, 13 Nov 2025 20:10:18 +0000
-Message-ID: <86frahu21h.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+	s=k20201202; t=1763068006;
+	bh=IC4VpM6ZN4n39UtKfc2C/9ZDlOpdPQkYd/6hCrS82gc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=OjYnTKJ/stoU+JDIoC3n2v+tPgNx/vKxfRWf/HLoAlV5nbyLzTu3Ft8Fvny0t11N6
+	 QMA8MUkfHE+tj4p6jJ7b633oqS+hKmhvAFLG3eeT++DIUO73t7L8dCzgIitVFGXwPx
+	 vKgeQKWtb+KRhIFIRnPtm2OSNHPsq6HhaSnbDz9d921vntsZAJo/H+LncPIkgF2weV
+	 uy73KnJRVrKK02jSnG8GQYTr7ugY8LNqcFVOCrzY0BCSN3QTF9vi2wTgxEYMl/Fx8z
+	 jMbYJcK3VZ/574J8jMi1QZrcEHBIeMWLfcLIVztc/DQqN83+i6/LjyEV2cR5bm6/E0
+	 e9Xsi8eezp0qw==
+From: Oliver Upton <oupton@kernel.org>
+To: maz@kernel.org,
+	oliver.upton@linux.dev,
+	Jiaqi Yan <jiaqiyan@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	duenwen@google.com,
+	rananta@google.com,
+	jthoughton@google.com,
+	vsethi@nvidia.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	pbonzini@redhat.com,
+	corbet@lwn.net,
+	shuah@kernel.org,
 	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>,
-	Aishwarya.TCV@arm.com, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-In-Reply-To: <7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-6-maz@kernel.org>
-	<7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
-	<86ikfdu7cu.wl-maz@kernel.org>
-	<7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v4 0/3] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+Date: Thu, 13 Nov 2025 13:06:42 -0800
+Message-ID: <176305834766.2137300.8747261213603076982.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251013185903.1372553-1-jiaqiyan@google.com>
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Aishwarya.TCV@arm.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-+Fuad
-
-On Thu, 13 Nov 2025 19:06:31 +0000,
-Mark Brown <broonie@kernel.org> wrote:
+On Mon, 13 Oct 2025 18:59:00 +0000, Jiaqi Yan wrote:
+> Problem
+> =======
 > 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Thu, Nov 13, 2025 at 06:15:29PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
+> When host APEI is unable to claim a synchronous external abort (SEA)
+> during guest abort, today KVM directly injects an asynchronous SError
+> into the VCPU then resumes it. The injected SError usually results in
+> unpleasant guest kernel panic.
 > 
-> > > The arch_timer case bisects to this patch in -next, regular nVHE mode
-> > > runs this test happily.
-> 
-> > My hunch is that we're missing something like the hack below, but I
-> > haven't tried it yet.
-> 
-> > I'll probably get to it tomorrow.
-> 
-> That still fails FWIW.
+> [...]
 
-Yup, this has uncovered yet another pKVM bug, which doesn't preserve
-the vgic_model in its private kvm structure. I'm able to make it work
-with this:
+I've gone ahead and done some cleanups, especially around documentation.
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 43bde061b65de..8911338961c5b 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -337,6 +337,9 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
- 	/* CTR_EL0 is always under host control, even for protected VMs. */
- 	hyp_vm->kvm.arch.ctr_el0 = host_kvm->arch.ctr_el0;
- 
-+	/* Preserve the vgic model so that GICv3 emulation works */
-+	hyp_vm->kvm.arch.vgic.vgic_model = host_kvm->arch.vgic.vgic_model;
-+
- 	if (test_bit(KVM_ARCH_FLAG_MTE_ENABLED, &host_kvm->arch.flags))
- 		set_bit(KVM_ARCH_FLAG_MTE_ENABLED, &kvm->arch.flags);
- 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 82da9b03692d4..3108b5185c204 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -444,6 +444,8 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Scalable Vector Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_PMR_EL1),
-+
- 	RAZ_WI(SYS_ERRIDR_EL1),
- 	RAZ_WI(SYS_ERRSELR_EL1),
- 	RAZ_WI(SYS_ERXFR_EL1),
-@@ -457,9 +459,12 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 
- 	/* Limited Ordering Regions Registers are restricted. */
- 
-+	HOST_HANDLED(SYS_ICC_DIR_EL1),
-+	HOST_HANDLED(SYS_ICC_RPR_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_ASGI1R_EL1),
- 	HOST_HANDLED(SYS_ICC_SGI0R_EL1),
-+	HOST_HANDLED(SYS_ICC_CTLR_EL1),
- 	{ SYS_DESC(SYS_ICC_SRE_EL1), .access = pvm_gic_read_sre, },
- 
- 	HOST_HANDLED(SYS_CCSIDR_EL1),
+Applied to next, thanks!
 
-Thanks,
+[1/3] KVM: arm64: VM exit to userspace to handle SEA
+      https://git.kernel.org/kvmarm/kvmarm/c/ad9c62bd8946
+[2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+      https://git.kernel.org/kvmarm/kvmarm/c/feee9ef7ac16
+[3/3] Documentation: kvm: new UAPI for handling SEA
+      https://git.kernel.org/kvmarm/kvmarm/c/4debb5e8952e
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+--
+Best,
+Oliver
