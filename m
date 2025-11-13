@@ -1,89 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF463324B3C;
-	Thu, 13 Nov 2025 21:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C20D30DD18
+	for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 22:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763071177; cv=none; b=ZLiNTMMwdw03Gza5LtngwXv3t5n3ICZCW6bK9dREYxqmiRYvhGYqGCfurxah6f/04CiRvJxxZ0Bk789ciJE5p7mwnuUPYcp1cIda9FeEDvbJdzTu6U50cwzO6rl6fzLrTzOtafhClKJGi8gpVNJbq9Ika48/U1bGYUM+jMRD5Og=
+	t=1763072065; cv=none; b=VuSl2J+yFpXkz1h+n6Syew5efnDOxWGymqbvxaW1hPwDobbx3ySifWJfRglkGKLZzQLT9QheOjKN6WwJmCS8D+sw00eFaP5THbdi1vuiXfmmX+CCJ0D9jX+H3bDJGnFjfiCE9ytVIxL+sm6UsstwZGbUbQ+N7wvXKJmBQpI34tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763071177; c=relaxed/simple;
-	bh=UnZOEY9cSyoxchmU4I4ZbyI1+seIbFOun8eX8HryMlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=phq/41zF3MkQw7TVnOPfDax7YbbCAcqLWTrBKyhxZ8Y77jYf0gw1Uk9Uu9LvwibFyU81SkdYnH3OAdSkLVnZ2qxGAdI/oe4pJLbPaeRaP0X5YPS/IHMyh3NARFGOn3RhqEYWnzY83P/mUL9mtda2LnQDJMfBvY/0siypvK/EanM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bt1HFehq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763072065; c=relaxed/simple;
+	bh=vg2n9jgyf6Un8yroS0eZ9RJEclmxHEAIxafM2FtYloU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VFaLUVlRO++jxPx38MuagzGuPWPbEQPsCE5ByUGNVGmD9Q2/3yffX9kS5LdayKaQxe1VBjf3wua6qJFfILazjOZeDi10snM2rbL7jLAIqZ8JhglThrmMYvX8GbwMaSgyxm8dzL7jjAsxopE64Zr+yTba1/ORePjDgNKjQY6YJlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QNVe2/FW; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bt1HFehq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA6AC4CEF8;
-	Thu, 13 Nov 2025 21:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763071177;
-	bh=UnZOEY9cSyoxchmU4I4ZbyI1+seIbFOun8eX8HryMlQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bt1HFehqN+Es/5TQWa0IXHbiptw4nRqIqt1PyD4C47kF5v281LoeHwiC2xMoJ12eY
-	 06DSzN8q/p0QvuBNE3kPhjI7C4lppN71hEQLXNyP35bt575ilt3trvdavSArqM1gVf
-	 uXRM73grYNc+ws/jr0I51YEbl2+3jqEfqbsOWcBow6c1Zz61FGe1GTfVQ6U5aQbidc
-	 xOgA7tPNdFcyjIhdXFhhQ66vmJ/c8DLpAJHVeLvjiiiQ5H1EwpxOaBEoAPw2nFWL3Y
-	 YfitVFLlTu3eggDBs/TuK3BomDp86SiyQq8XpmGz3rL80g8T2jTfB3TokcFXRmcsCl
-	 4T4iotV2r/+hw==
-Date: Thu, 13 Nov 2025 13:59:35 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>, Aishwarya.TCV@arm.com,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 05/45] KVM: arm64: GICv3: Detect and work around the
- lack of ICV_DIR_EL1 trapping
-Message-ID: <aRZUx1WkyKdFQgYy@kernel.org>
-References: <20251109171619.1507205-1-maz@kernel.org>
- <20251109171619.1507205-6-maz@kernel.org>
- <7ae5874e-366f-4abd-9142-ffbe21fed3a8@sirena.org.uk>
- <86ikfdu7cu.wl-maz@kernel.org>
- <7ea5c49d-b093-475e-9f27-ad92dcc4b560@sirena.org.uk>
- <86frahu21h.wl-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QNVe2/FW"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-477741542bcso18935e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 14:14:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763072060; x=1763676860; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f7JRornaiplk0uZKMqz9STwhUMyLeMRJwxelXDphyMs=;
+        b=QNVe2/FWvCPKO2Tu7BclkO0avPgRHa9AQtkXmCfzD4e3Z2wT1x7NYwvs2ja1NGC6Hw
+         hsHQNz4WP33y0PaJPfdcT/iJcvazISltmnxu+DNuBIA6tswkunqF9Y+C/zSlPUsky3bV
+         H6NrGu8rEMDoY8xa5oYgiY0iRr33WFptn73Q4Fjo4WXIHMJItKLaRpvvcpDrmCysqd06
+         GVtDouATzVBciO+h3rLGQ9SyjgBq/oq7XfhEKcOMz/+puk9IvRP/LrEmr9/aCmxTVLOy
+         ZKP/7irPea2+Zkwb2y9RFrZIYZ/hueJh1iLCM75Y2wVnrWEuQW3f+m7KbmT/E+YJdKKC
+         kL1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763072060; x=1763676860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f7JRornaiplk0uZKMqz9STwhUMyLeMRJwxelXDphyMs=;
+        b=pv38teJjCFqCUNzeSaU9cLtdfz06Crx3g9hnh+HAFCTKWCbMzqGYfwqR81G46HOSKp
+         r3iHciTUtd74o0eOSvQsASScqgJqo+/DLFijnK/Dh8KbzQwK/SkDWD5ZqHR6bOoEk8Ex
+         yGt7VRCreAg2DFyiyTR3c4nPnoHn5p7UB62dz9ccNtGrdLsbPfst9uWde12E+sB4BmfG
+         vOVP9hoERX/Y73dbb2TYglK+Q3TY6DR8HRZNME/Kz2g9PzuKSibAD7/w5mZZOyX2tB/M
+         o2hutronS6JKwQ1OyUfxbspeNHptjyyFJwXGTAfBO1/93S5wWjaTDqaqse5/ji++QWj4
+         hBew==
+X-Forwarded-Encrypted: i=1; AJvYcCUQAke/nIHd+TW7POw7o+DFbqnYxV9DNm9EbIf5WSjsujSj8ZGHiip+FECUC5Lb7syVQ3wR14o=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwI9b2unGaafAsyRQUQUJk1UPG/CdPHbtduNCwfzbDHs4cOZXtQ
+	shvDjVvJfyaJClyiicjnVxwmXcx5nBKlcQXm69BFOWm6k5oaOfFbnO4B+qZeT3+P01f3osLNHV6
+	H0RuOldjZ+43au75Uq42a9sGq2oCDYWz42qysp6AK
+X-Gm-Gg: ASbGncvMGTSfmRkTb37SFemg3aoWi2ghkN7RZpXsdi8ukfCoTnUmi0RDCC+bghtXs2M
+	8ur4TdeJK37/0Xvyts+Zu5hbXUMJrbFJSuLpbLBs4H3Z3eHCagJrk/zuuYBpzXE0QKLkcHUKsrY
+	4/gDrqnel3l9vAYqmIBk987xwBmTlGx/hugyAXG658a7UfRc6XD7bQ9hKWA3Bo57G8KjhqmIz0f
+	l+V8WqeyIrvd/+BI3coi2Oo27I1MeSQ8veEUTMi5wLjZRUkh5g1A7tU8u5gSIwHTfgt2vdN+SnU
+	/OvFyFKcEDuzXijjrbJ6BpVIzw==
+X-Google-Smtp-Source: AGHT+IH1dTN9h9lNDnRTlh4UyFd6aH1+EDMlfhkx9gNk7p2AjcKqv19bBUUeTsmBJjRKqPU2Xh2SmzFkyX1KkJheFqs=
+X-Received: by 2002:a7b:cc99:0:b0:477:772e:9b76 with SMTP id
+ 5b1f17b1804b1-47790b11bbdmr102735e9.7.1763072060296; Thu, 13 Nov 2025
+ 14:14:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86frahu21h.wl-maz@kernel.org>
+References: <20251013185903.1372553-1-jiaqiyan@google.com> <176305834766.2137300.8747261213603076982.b4-ty@kernel.org>
+In-Reply-To: <176305834766.2137300.8747261213603076982.b4-ty@kernel.org>
+From: Jiaqi Yan <jiaqiyan@google.com>
+Date: Thu, 13 Nov 2025 14:14:08 -0800
+X-Gm-Features: AWmQ_bk6n8j-0ORtQ1jAf-pM3nvvAf6VB8V4V3Ju58iczpjKI42PYMXub9cNtfk
+Message-ID: <CACw3F51cxSgd-=D46A6X6GptEZS8-JZ_MnB_yK_ZR1wktunYRA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] VMM can handle guest SEA via KVM_EXIT_ARM_SEA
+To: Oliver Upton <oupton@kernel.org>, oliver.upton@linux.dev
+Cc: maz@kernel.org, duenwen@google.com, rananta@google.com, 
+	jthoughton@google.com, vsethi@nvidia.com, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, pbonzini@redhat.com, corbet@lwn.net, shuah@kernel.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Jason Gunthorpe <jgg@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 13, 2025 at 08:10:18PM +0000, Marc Zyngier wrote:
-> +Fuad
-> 
-> On Thu, 13 Nov 2025 19:06:31 +0000,
-> Mark Brown <broonie@kernel.org> wrote:
-> > 
-> > [1  <text/plain; us-ascii (7bit)>]
-> > On Thu, Nov 13, 2025 at 06:15:29PM +0000, Marc Zyngier wrote:
-> > > Mark Brown <broonie@kernel.org> wrote:
-> > 
-> > > > The arch_timer case bisects to this patch in -next, regular nVHE mode
-> > > > runs this test happily.
-> > 
-> > > My hunch is that we're missing something like the hack below, but I
-> > > haven't tried it yet.
-> > 
-> > > I'll probably get to it tomorrow.
-> > 
-> > That still fails FWIW.
-> 
-> Yup, this has uncovered yet another pKVM bug, which doesn't preserve
-> the vgic_model in its private kvm structure. I'm able to make it work
-> with this:
+On Thu, Nov 13, 2025 at 1:06=E2=80=AFPM Oliver Upton <oupton@kernel.org> wr=
+ote:
+>
+> On Mon, 13 Oct 2025 18:59:00 +0000, Jiaqi Yan wrote:
+> > Problem
+> > =3D=3D=3D=3D=3D=3D=3D
+> >
+> > When host APEI is unable to claim a synchronous external abort (SEA)
+> > during guest abort, today KVM directly injects an asynchronous SError
+> > into the VCPU then resumes it. The injected SError usually results in
+> > unpleasant guest kernel panic.
+> >
+> > [...]
+>
+> I've gone ahead and done some cleanups, especially around documentation.
+>
+> Applied to next, thanks!
 
-Thanks for debugging this Marc. I've added a patch on top of kvmarm/next
-with this. I don't have any A53 machines around but I was able to repro
-using kvm-arm.vgic_v3_common_trap=1 on QEMU.
+Many thanks, Oliver!
 
-Thanks,
-Oliver
+I assume I still need to send out v5 with typo fixed, comments
+addressed, and your cleanups applied? If so, what specific tag/release
+you want me to rebase v5 onto?
+
+>
+> [1/3] KVM: arm64: VM exit to userspace to handle SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/ad9c62bd8946
+> [2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/feee9ef7ac16
+> [3/3] Documentation: kvm: new UAPI for handling SEA
+>       https://git.kernel.org/kvmarm/kvmarm/c/4debb5e8952e
+>
+> --
+> Best,
+> Oliver
