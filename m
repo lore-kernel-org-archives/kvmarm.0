@@ -1,93 +1,177 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE5427B34E;
-	Thu, 13 Nov 2025 11:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFE921348
+	for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 12:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763034127; cv=none; b=f4Z1AThmy4gqVwNC8gfUTjzhHN6M58F3lp2ZV5+SsI50Vk1YdMrPXma3YHdrj+vZGj9JQdq2cAmvwib60QzKwFt1U8qaGc/PYpop0lVbb6rG/fT578WtZYI3e8p0vuPGwgdXnlV1un3GqMRxNtdygdDmkh3USLGMTmVBtyiqWfg=
+	t=1763035546; cv=none; b=cJdz/5dQnOm3YlBsaWicMD0IfPrR8MLR34ufCSCabwWJkFOqV+PXjwwhU3JqZVwbO3V4JIJSbs0tlPXxSSOwKaqJDILWPvVNTAUbiwMEwm1HWX/CXAo2EC0UjFsV4/tVXGIysKX7ezy/NrDtZzDz5LNRLYa86VNE5WDv6eBOfrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763034127; c=relaxed/simple;
-	bh=QgHFt6FHIW10WhXSanDVm43md4tZOo1qLvXd9ZzB3AE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sa2mrmxXEPGrkZT062xHtoSxa0DukBVgslZzKYwl18teXtOWhth27vo2GK/jZeBj/Ko12mg/celVXZ8GVHj1LGV3YKk+1NBWlZUa8NctEAlcnRUXCWHaNfa+5v04+VxN+DVjna8wnOivlQK+twoMzScsgLwf5j2FFOBw1Q6Y+u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ytsd/mir; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763035546; c=relaxed/simple;
+	bh=1DOX3pdOF+OPXzuS2flwxPO8UkmLiGftFIO4KEG+Lt4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=XpVXliwC40IV9P+TRk4RYVdmgTigEK+Zj+lOt5qpXl3qrTQQ6/rBNqD7iwLK0YCVXDl49Gdo0Ie41rFs+odYqsrlC22W/LIs076gEwHQPDUz/xKDhSETe45pCpSCAmMcrGD+mnDqHNH0pWHCIVact1JqNaVBkW8TCKm2ABAt6vw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OfKJxU6L; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ytsd/mir"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C21CC4CEF8;
-	Thu, 13 Nov 2025 11:42:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763034127;
-	bh=QgHFt6FHIW10WhXSanDVm43md4tZOo1qLvXd9ZzB3AE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ytsd/mir0Lv9XI9rvJ+l8/nj1mIvaqoya/2pOSw1uoH+DeioGBHDiC66Tx+ZT2lBX
-	 hCndMN2VVpgy8VqruA5HYa8MOr4XUrEsVIzC8/k1jdVMM5wWOlFXGl0/k0DsOy7w2b
-	 DmNG9Lc24s3U4XgJVRCszq4tNHsW6NPaA5zH3a87YDVZZq/ctX5czwITd7PmZsqdT+
-	 mo9QfdJBIiZjqtOVvP2RCVLi/IZJOlx1osW+6bBJ4KA8JTlA4GUfjRtG162K29Mbt6
-	 pCnUKWKXigCKBNb2ZaL1k9LneO5gfbrTre2pYjf8UbV36kV1ECEt0YzNOI2W08SE5A
-	 mj+Q9F+5yZf/Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vJViG-00000004rK3-3hWQ;
-	Thu, 13 Nov 2025 11:42:04 +0000
-Date: Thu, 13 Nov 2025 11:42:04 +0000
-Message-ID: <86pl9mtb03.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-In-Reply-To: <20251113112333.GA1434041@e124191.cambridge.arm.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-5-maz@kernel.org>
-	<CGME20251113095225eucas1p261508e40d5b802f6e5be58600bb4a02c@eucas1p2.samsung.com>
-	<b618732b-fd26-49e0-84c5-bfd54be09cd2@samsung.com>
-	<86seeitd3f.wl-maz@kernel.org>
-	<5a0aac14-6d1f-4941-b0d1-bb60572e7a6e@samsung.com>
-	<20251113112333.GA1434041@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OfKJxU6L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763035543;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XXe30AvAgod46okaWpXEOT8NCg0lGaJYsjemG6fav+k=;
+	b=OfKJxU6LumD9ER5gP2q9KKvqrhyzEEP18SHTIPns4cSkM9UfnDZYgob99IJmhWSw+pXlre
+	RwBsp+MA8C+lWhoGHbR+4v9BiddM/SmsjzgBy1jrZxpwDxVFxJJgvPX3rai6KGLnALgYgD
+	ti/z4gbwIVRJAp/sjdnMyFX7lgW/E2Y=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-UE7xjv4iM0CQSejIq7vxgg-1; Thu, 13 Nov 2025 07:05:42 -0500
+X-MC-Unique: UE7xjv4iM0CQSejIq7vxgg-1
+X-Mimecast-MFC-AGG-ID: UE7xjv4iM0CQSejIq7vxgg_1763035541
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429c76c8a1bso557158f8f.0
+        for <kvmarm@lists.linux.dev>; Thu, 13 Nov 2025 04:05:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763035541; x=1763640341;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tI2/OYtW6mgwxijeu2yFHVnaEg8ys2MTvM8mvkzh7dM=;
+        b=uRBiiiaoLCAH1FtCTHvI5e4glf8mTQPU6fHtiJiiDKuX31wfrSqEr6LulSpNtVNBBD
+         MvsYzmIBdcetD45RhfiUMJpEgGbsZP7TXX2FjDMy0KDzpZYiU8uox+/Lbysmp7lv+jVo
+         uu184KSGNV7a8gFLrz/1SHP17X5z5LbGqqNNVlCn7qN5zDMfMORij1W1TCjB55XXEn/a
+         NTZlztyk31TZSw0LjrHC6k8bdrVE83Civ0/IRp3i3ifGRe0EDCRaKP/4XeTvUpA+lmBt
+         E84CD9gKPPw6g8NHFghlPwvE7PHlocvuysshsH7W472byFQwH/JSGj/iEdFepzigoawL
+         wkVA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6U0wdY/iFuMasDlxait2zoaZDDuLl91Mt/wgzpAk2sIXNObUGlJZUzsoi/DgKAmA66Hmfif0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwlUE2k01/S+eKpEvRchp6WId4vti5O0ZZFv3XxIH1KlM936wDH
+	CK/Sn0PRvJgRzZhKb9PuRnzMM31mepLfE63pbLwdMjXPTvA/bV0KpjM2PZbIzbM0r9uajQ4hb9M
+	pr27BtIPLy0B8Qcw98BsKM/9I2MkD+OAW+O6sm0wTL1EGip1TAvZMo2fSog==
+X-Gm-Gg: ASbGncuzHYX7S9MKEccw/LF/uNFaYmLxzjgV3o2hyj/vvxHSXEiRtfwsSkpErqp4JUJ
+	sRVn0QO21e+H7AX5X/EcWEDyniLIsGSEyCgvFz6oTO2fL4qjyOKU2auUs6TBKC6X95P6gOTtdvo
+	0yc6SU0DtFaCs0ncQ1i20NylluhX5jhTR2mqJ6dkK/MtSihtj14ao+hLYBhg8KGkoGQ6nI6NJ53
+	wO7bPLBD8sMA7LHJZYblTuHP59cecyvRXQ0KvdhQjRSs0PW1ragamYnMj7Rjo/hEIB1rkBeayxO
+	GR+zgf9rWpsRUE7/mcuQoyItY9wbuxQWa4/5gkeI8mg5k3I9qJSQdTvuIuQnhNpB4v0+WxhxI+0
+	Nv4dKfg9HxmvhZPWlI4S1zz0cDSL7ONEbq5OQZQgMi3Y3txZ+
+X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895241f8f.18.1763035541153;
+        Thu, 13 Nov 2025 04:05:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3IIBIBt8q03GbcoIy980NO1o7f47Eyz3eGrQw/lEHfvAJ2mJpS0tJ8SI1nFL6EYhPZo1J9g==
+X-Received: by 2002:a05:6000:1885:b0:42b:3680:3567 with SMTP id ffacd0b85a97d-42b4bb91b2cmr5895217f8f.18.1763035540713;
+        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
+Received: from rh (p200300f6af131a0027bd20bfc18c447d.dip0.t-ipconnect.de. [2003:f6:af13:1a00:27bd:20bf:c18c:447d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b53f23a1asm3522001f8f.45.2025.11.13.04.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Nov 2025 04:05:40 -0800 (PST)
+Date: Thu, 13 Nov 2025 13:05:39 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@linaro.org>
+cc: Peter Maydell <peter.maydell@linaro.org>, 
+    Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+    qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
+    kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu
+ property
+In-Reply-To: <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
+Message-ID: <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
+References: <20251112181357.38999-1-sebott@redhat.com> <20251112181357.38999-3-sebott@redhat.com> <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, m.szyprowski@samsung.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: ffxXuG4PzMdyCXssvb0M_wWmq4xP-yAvfsFRZqJPJLs_1763035541
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed; boundary="-1463806286-853068444-1763035540=:13840"
 
-On Thu, 13 Nov 2025 11:23:33 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463806286-853068444-1763035540=:13840
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-> I suppose the issue is that the alternatives in vgic_ich_hcr_trap_bits() are
-> always calculated, even if that function is only used from the gic-v3 code.
-> Calculating the trap bits reads ICH_VTR_EL2, which needs FEAT_GICv3.
+Hi Philippe,
 
-Except that we have a bunch of rotten fruits that only have half a
-GICv3, so relying on FEAT_GICv3 isn't useful if we want to continue
-supporting these machines in the foreseeable future.
+On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
+> On 12/11/25 19:13, Sebastian Ott wrote:
+>>  Provide a kvm specific vcpu property to override the default
+>>  (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+>>  by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>>
+>>  Note: in order to support PSCI v0.1 we need to drop vcpu
+>>  initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+>>
+>>  Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>>  ---
+>>    docs/system/arm/cpu-features.rst |  5 +++
+>>    target/arm/cpu.h                 |  6 +++
+>>    target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>>    3 files changed, 74 insertions(+), 1 deletion(-)
+>
+>
+>>  diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>>  index 0d57081e69..e91b1abfb8 100644
+>>  --- a/target/arm/kvm.c
+>>  +++ b/target/arm/kvm.c
+>>  @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
+>>  value, Error **errp)
+>>        ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
+>>    ON_OFF_AUTO_OFF;
+>>    }
+>>
+>>  +struct psci_version {
+>>  +    uint32_t number;
+>>  +    const char *str;
+>>  +};
+>>  +
+>>  +static const struct psci_version psci_versions[] = {
+>>  +    { QEMU_PSCI_VERSION_0_1, "0.1" },
+>>  +    { QEMU_PSCI_VERSION_0_2, "0.2" },
+>>  +    { QEMU_PSCI_VERSION_1_0, "1.0" },
+>>  +    { QEMU_PSCI_VERSION_1_1, "1.1" },
+>>  +    { QEMU_PSCI_VERSION_1_2, "1.2" },
+>>  +    { QEMU_PSCI_VERSION_1_3, "1.3" },
+>>  +    { -1, NULL },
+>>  +};
+>
+>
+>>  @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
+>>                                 kvm_steal_time_set);
+>>        object_property_set_description(obj, "kvm-steal-time",
+>>                                        "Set off to disable KVM steal
+>>  time.");
+>>  +
+>>  +    object_property_add_str(obj, "kvm-psci-version",
+>>  kvm_get_psci_version,
+>>  +                            kvm_set_psci_version);
+>>  +    object_property_set_description(obj, "kvm-psci-version",
+>>  +                                    "Set PSCI version. "
+>>  +                                    "Valid values are 0.1, 0.2, 1.0, 1.1,
+>>  1.2, 1.3");
+>
+> Could we enumerate from psci_versions[] here?
+>
 
-The fix for this is, I expect, what I posted at [1].
+Hm, we'd need to concatenate these. Either manually:
+"Valid values are " psci_versions[0].str ", " psci_versions[1].str ", " ... 
+which is not pretty and still needs to be touched for a new version.
 
-Thanks,
+Or by a helper function that puts these in a new array and uses smth like
+g_strjoinv(", ", array);
+But that's quite a bit of extra code that needs to be maintained without
+much gain.
 
-	M.
+Or we shy away from the issue and rephrase that to:
+"Valid values include 1.0, 1.1, 1.2, 1.3"
 
-[1] https://lore.kernel.org/r/86seeitd3f.wl-maz@kernel.org
+Since the intended use case is via machine types and I don't expect a
+lot of users setting the psci version manually - I vote for option 3.
 
--- 
-Without deviation from the norm, progress is not possible.
+Opinions?
+
+Sebastian
+---1463806286-853068444-1763035540=:13840--
+
