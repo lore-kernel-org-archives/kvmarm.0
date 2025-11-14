@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02377283151
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A88315777
+	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763136481; cv=none; b=TCMbBszp7r6INwnEyx2juayWwu5sisDBsmdo4Efb0xHEoRS9C7SYCHNrULLzXI+mvQcSmPKReqL7fjiqlCFDC7i/OUwc/W5lWhia5tfQefyBegpY7xAeW+dE6vVt3cR9R5z5IXbY3YYwmizgamsjBC1b7TSX+8LF+l2MZb/f24U=
+	t=1763136484; cv=none; b=fSVzxP8asCYWmvjjV7I5uj0nMQnZqS0+cL+9Uacukc1gru1o43sZ5uUkuvb7JMVXi4ZUaXwPtdPdMT5BR5p8ho96X7zKwo14CCJ0CivjBDG1ISgBvm7GENlHvdBvGMM19vM8uFO6GGO6ckYKzWQZ60g5Yp6G8ozZVL6Usvxsofk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763136481; c=relaxed/simple;
-	bh=UTM4N9FjSClcVgR/6oeSO4XnZPoY6lByp8Fyb6blvGo=;
+	s=arc-20240116; t=1763136484; c=relaxed/simple;
+	bh=zNJuH9zQLB1r80m/vO0hS2Y09tnBqpOrNMUI0tcu6vU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mMPurufODGlkGUGO2ysPi167FvTVtPANqr+bkMn+ZZ/n6ieH3VwAEDJn/TZ5N7tqWrsNvGju76GZthp4zXAcqBPurmI4U7lJtUuoGRqE0cwi4jFW8ERW9Wv9JTUAmoRdYR1ZRyHvbAoN2BqgjNuRC5L7M/K4khrlT6tx8Zu0CjE=
+	 MIME-Version; b=VvgRuAoaB6BVwpVfO27TsoyiivQ+yTTsasKochwamDZJ1sE2k4fkh0i+rsGSxW9K+/ff3/quxm6NHw/eWN5B+8zPx28VdqiqYbr0qMbuK3fZXhwaPMvtjTLR4m2Oppop8uGtMtOdfZ0ug/RfyVmKiskJIiKgf6K8/vZsxfQomuA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E72DB1BC0;
-	Fri, 14 Nov 2025 08:07:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8FDE71AC1;
+	Fri, 14 Nov 2025 08:07:54 -0800 (PST)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4272A3F73B;
-	Fri, 14 Nov 2025 08:07:57 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1F733F5A1;
+	Fri, 14 Nov 2025 08:07:59 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oliver.upton@linux.dev,
@@ -32,9 +32,9 @@ Cc: james.clark@linaro.org,
 	mark.rutland@arm.com,
 	james.morse@arm.com,
 	Sudeep Holla <sudeep.holla@arm.com>
-Subject: [RFC PATCH v6 10/35] KVM: arm64: Add a new VCPU device control group for SPE
-Date: Fri, 14 Nov 2025 16:06:51 +0000
-Message-ID: <20251114160717.163230-11-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v6 11/35] KVM: arm64: Add SPE VCPU device attribute to set the interrupt number
+Date: Fri, 14 Nov 2025 16:06:52 +0000
+Message-ID: <20251114160717.163230-12-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251114160717.163230-1-alexandru.elisei@arm.com>
 References: <20251114160717.163230-1-alexandru.elisei@arm.com>
@@ -48,142 +48,232 @@ Content-Transfer-Encoding: 8bit
 
 From: Sudeep Holla <sudeep.holla@arm.com>
 
-Add a new VCPU device control group to control various aspects of KVM's SPE
-emulation. Functionality will be added in later patches.
+Add KVM_ARM_VCPU_SPE_CTRL(KVM_ARM_VCPU_SPE_IRQ) to allow the user to set
+the interrupt number for the buffer management interrupt.
 
-[ Alexandru E: Major rework ]
+[ Alexandru E: Split from "KVM: arm64: Add a new VCPU device control group
+               for SPE" ]
 
 Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Documentation/virt/kvm/devices/vcpu.rst |  5 +++++
- arch/arm64/include/asm/kvm_spe.h        | 17 +++++++++++++++++
+ Documentation/virt/kvm/devices/vcpu.rst | 22 +++++++
+ arch/arm64/include/asm/kvm_host.h       |  2 +
+ arch/arm64/include/asm/kvm_spe.h        | 10 +++
  arch/arm64/include/uapi/asm/kvm.h       |  1 +
- arch/arm64/kvm/guest.c                  | 10 ++++++++++
- arch/arm64/kvm/spe.c                    | 15 +++++++++++++++
- 5 files changed, 48 insertions(+)
+ arch/arm64/kvm/guest.c                  |  2 +
+ arch/arm64/kvm/spe.c                    | 82 +++++++++++++++++++++++++
+ 6 files changed, 119 insertions(+)
 
 diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index 60bf205cb373..8c5208ccd107 100644
+index 8c5208ccd107..9a26252d0a34 100644
 --- a/Documentation/virt/kvm/devices/vcpu.rst
 +++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -291,3 +291,8 @@ From the destination VMM process:
+@@ -296,3 +296,25 @@ From the destination VMM process:
+ ===============================
  
- 7. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
-    respective value derived in the previous step.
+ :Architectures: ARM64
 +
-+5. GROUP: KVM_ARM_VCPU_SPE_CTRL
-+===============================
++5.1 ATTRIBUTE: KVM_ARM_VCPU_SPE_IRQ
++-----------------------------------
 +
-+:Architectures: ARM64
++:Parameters: in kvm_device_attr.addr the address for the Profiling Buffer
++             management interrupt number as a pointer to an int
++
++Returns:
++
++	 =======  ==========================================================
++	 -EFAULT  Error accessing the buffer management interrupt number
++	 -EINVAL  Invalid interrupt number or not using an in-kernel irqchip
++	 -ENODEV  KVM_ARM_VCPU_HAS_SPE VCPU feature not set
++	 -ENXIO   SPE not supported or not properly configured
++	 =======  ==========================================================
++
++Required.
++
++Specifies the Profiling Buffer management interrupt number. The interrupt number
++must be a PPI and the interrupt number must be the same for each VCPU. Arm
++recommends 21 as the interrupt number. SPE virtualization requires an in-kernel
++vGIC implementation.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 64302c438355..bc7aeae39fb9 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -27,6 +27,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/kvm_spe.h>
+ #include <asm/vncr_mapping.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -865,6 +866,7 @@ struct kvm_vcpu_arch {
+ 	struct vgic_cpu vgic_cpu;
+ 	struct arch_timer_cpu timer_cpu;
+ 	struct kvm_pmu pmu;
++	struct kvm_vcpu_spe vcpu_spe;
+ 
+ 	/* vcpu power state */
+ 	struct kvm_mp_state mp_state;
 diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-index 8e8a5c6f7971..7c8268f6f507 100644
+index 7c8268f6f507..6855976b4c72 100644
 --- a/arch/arm64/include/asm/kvm_spe.h
 +++ b/arch/arm64/include/asm/kvm_spe.h
-@@ -16,9 +16,26 @@ static __always_inline bool kvm_supports_spe(void)
+@@ -6,7 +6,14 @@
+ #ifndef __ARM64_KVM_SPE_H__
+ #define __ARM64_KVM_SPE_H__
  
- #define vcpu_has_spe(vcpu)					\
- 	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_SPE))
++#include <linux/kvm.h>
 +
-+int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-+int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-+int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ #ifdef CONFIG_KVM_ARM_SPE
++
++struct kvm_vcpu_spe {
++	int irq_num;		/* Buffer management interrupt number */
++};
++
+ DECLARE_STATIC_KEY_FALSE(kvm_spe_available);
+ 
+ static __always_inline bool kvm_supports_spe(void)
+@@ -21,6 +28,9 @@ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
  #else
++struct kvm_vcpu_spe {
++};
++
  #define kvm_supports_spe()	false
  #define vcpu_has_spe(vcpu)	false
-+
-+static inline int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
- #endif /* CONFIG_KVM_ARM_SPE */
  
- #endif /* __ARM64_KVM_SPE_H__ */
 diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 5bdfe1f6d565..5e2d47572136 100644
+index 5e2d47572136..578a0f6c3f8f 100644
 --- a/arch/arm64/include/uapi/asm/kvm.h
 +++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -444,6 +444,7 @@ enum {
- #define   KVM_ARM_VCPU_TIMER_IRQ_HPTIMER	3
+@@ -445,6 +445,7 @@ enum {
  #define KVM_ARM_VCPU_PVTIME_CTRL	2
  #define   KVM_ARM_VCPU_PVTIME_IPA	0
-+#define KVM_ARM_VCPU_SPE_CTRL		3
+ #define KVM_ARM_VCPU_SPE_CTRL		3
++#define   KVM_ARM_VCPU_SPE_IRQ		0
  
  /* KVM_IRQ_LINE irq field index values */
  #define KVM_ARM_IRQ_VCPU2_SHIFT		28
 diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 1c87699fd886..d1bf8b154a31 100644
+index d1bf8b154a31..fbc17a71edc3 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -25,6 +25,7 @@
- #include <asm/kvm.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_nested.h>
-+#include <asm/kvm_spe.h>
- #include <asm/sigcontext.h>
- 
- #include "trace.h"
-@@ -918,6 +919,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PVTIME_CTRL:
+@@ -920,7 +920,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
  		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
  		break;
-+	case KVM_ARM_VCPU_SPE_CTRL:
-+		ret = kvm_spe_set_attr(vcpu, attr);
-+		break;
+ 	case KVM_ARM_VCPU_SPE_CTRL:
++		mutex_lock(&vcpu->kvm->arch.config_lock);
+ 		ret = kvm_spe_set_attr(vcpu, attr);
++		mutex_unlock(&vcpu->kvm->arch.config_lock);
+ 		break;
  	default:
  		ret = -ENXIO;
- 		break;
-@@ -941,6 +945,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PVTIME_CTRL:
- 		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_SPE_CTRL:
-+		ret = kvm_spe_get_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
-@@ -964,6 +971,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
- 	case KVM_ARM_VCPU_PVTIME_CTRL:
- 		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
- 		break;
-+	case KVM_ARM_VCPU_SPE_CTRL:
-+		ret = kvm_spe_has_attr(vcpu, attr);
-+		break;
- 	default:
- 		ret = -ENXIO;
- 		break;
 diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-index 101258b55053..4d635e881620 100644
+index 4d635e881620..c6b81a2ef71f 100644
 --- a/arch/arm64/kvm/spe.c
 +++ b/arch/arm64/kvm/spe.c
-@@ -40,3 +40,18 @@ void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
- 	if (list_is_singular(&arm_spus))
+@@ -41,17 +41,99 @@ void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
  		static_branch_enable(&kvm_spe_available);
  }
-+
-+int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 
++static bool kvm_spe_irq_is_valid(struct kvm *kvm, int irq)
 +{
-+	return -ENXIO;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vcpu_spe *vcpu_spe;
++	unsigned long i;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		vcpu_spe = &vcpu->arch.vcpu_spe;
++
++		if (!vcpu_spe->irq_num)
++			continue;
++
++		if (vcpu_spe->irq_num != irq)
++			return false;
++	}
++
++	return true;
 +}
 +
-+int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
+ int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
++	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
++	struct kvm *kvm = vcpu->kvm;
 +
-+int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
++	lockdep_assert_held(&kvm->arch.config_lock);
++
++	if (!vcpu_has_spe(vcpu))
++		return -ENODEV;
++
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_SPE_IRQ: {
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		int irq;
++
++		if (!irqchip_in_kernel(kvm))
++			return -EINVAL;
++
++		if (get_user(irq, uaddr))
++			return -EFAULT;
++
++		if (!irq_is_ppi(irq))
++			return -EINVAL;
++
++		if (!kvm_spe_irq_is_valid(kvm, irq))
++			return -EINVAL;
++
++		vcpu_spe->irq_num = irq;
++		return 0;
++	}
++	}
++
+ 	return -ENXIO;
+ }
+ 
+ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
++	struct kvm_vcpu_spe *vcpu_spe = &vcpu->arch.vcpu_spe;
++	struct kvm *kvm = vcpu->kvm;
++
++	if (!vcpu_has_spe(vcpu))
++		return -ENODEV;
++
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_SPE_IRQ: {
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		int irq;
++
++		if (!irqchip_in_kernel(kvm))
++			return -EINVAL;
++
++		if (!vcpu_spe->irq_num)
++			return -ENXIO;
++
++		irq = vcpu_spe->irq_num;
++		if (put_user(irq, uaddr))
++			return -EFAULT;
++
++		return 0;
++	}
++	}
++
+ 	return -ENXIO;
+ }
+ 
+ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
++	if (!vcpu_has_spe(vcpu))
++		return -ENODEV;
++
++	switch(attr->attr) {
++	case KVM_ARM_VCPU_SPE_IRQ:
++		return 0;
++	}
++
+ 	return -ENXIO;
+ }
 -- 
 2.51.2
 
