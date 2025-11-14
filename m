@@ -1,126 +1,104 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F0B3054F5
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 11:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7905B281356;
+	Fri, 14 Nov 2025 11:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763118718; cv=none; b=femtFxxgi3MW8/GA+VB7FB2ZVaBJhSWdZuX8h7hTRnVYaO7OkFjfofQQ+ooIg2YU2KFSQRA2r/6X82qnsPhGqG3tvKdNs1aRGWTtTxtKnA44coVej+uN9FNiDEZvZkBf+JqWUg3KodMUEqFgbdJyzrPCrjTduvjhlwc+n4MLmQ4=
+	t=1763120083; cv=none; b=q/LqyBF3stDnF2O/mIcpglnb6cHXWfogary65cjbWH2PiYhxXAtg3MQLXRM1pXDMmuH3JLvQmbJ+C+w0LCbJLjqMIDXqkOx8MdetA0VCSopTmpCSYNpu1QpBSMXAJ0lM3w6UNqu00UZRMw6S2yHkLyC/mjZ8EnSRE3y+/fe8ekY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763118718; c=relaxed/simple;
-	bh=qqY/9nEU8JfC3zBaFynTGqR9lQHhYb0zLTrGgkhqxM4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TT0+uzweX4eFs4B37Vl79+icn13phBOVaOvq3gB5RCy451MlYsqS+PXutKLr6xkRLXEhxD9b2LqAaQGD8mpsIpzZi4ZXT9MGYDhYw5t90cxMBYPZU1f/vt6iswszjHvf8xzD6AIYYVo0+ywZUdanDQjYHsYuNGl30tU5wb9o78M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--korneld.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EI1OZDGx; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--korneld.bounces.google.com
+	s=arc-20240116; t=1763120083; c=relaxed/simple;
+	bh=KV4hhmCrF50yCsv4HaclQvyKMdrM81Xxcq4YVAQQSdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J/5/9SrhSXB3LXCXpythr6lR5Q8/kK+IDU8Xnt1BaF5w4K1gvbqukqCsZ54nbGgXmKO3cjHZr5wXUfY6q0vSuk89bdxwt+q9We5VfBcS70O8MocfzCd3SxxKudRVPaCxhnygDGLFjmiI5MYPzPNB3eFbTVP/JAX8V9GY15qCxPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2rRQ37z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EI1OZDGx"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b70b3297664so158156966b.1
-        for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 03:11:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763118715; x=1763723515; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tQcSzEpSwA6ZBpPi/rTINYX4HBb66yNmYZWYgUBx7xg=;
-        b=EI1OZDGxOvdLpWJsZyx8HpKRrbKS/IiT2Doi8sPyLNe1xzvOHGFkkX/g3r+Qg45efD
-         7COQIIz5oEdyTVPi9JpTyMIfkm0nBp+AwGccdQwyAMdCiCRwEHZ2yvyLraVzFqpPQLpj
-         Jpb1AeSU/KT8r0ypqDTLGPhZGETyTHMEn82cH0PUh+X1g589NwMo/bYIjY8d4CNHsKVs
-         MsXjqyekXHi80M8oReQHCREi6Z0Mx7ULGz+1btXKVxNtzef/ANZjRnzmCvZ1Wd0+w5jw
-         uNZu7jDMKdhCFa0jGbm268fgiIb4wTqeXyvqDSqCWKN48b0oEy4zIjynUt/qmrQDmkfD
-         3/PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763118715; x=1763723515;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tQcSzEpSwA6ZBpPi/rTINYX4HBb66yNmYZWYgUBx7xg=;
-        b=sE2EA/aOXtAzx5IHrSr5KgyQpb93PxF4Z2d61Q78MYzq9ofG4X+duET5NBeOoBUnYl
-         bbElnXumHJ77u0kpk49Etp9WbVDgj55TZ9Ihl3Ac1QvM56YZLUza55cOYUtbbkvuXB7O
-         vzvVSeufQQm7wtLZqZ5f6JfamfGSqUF7BqUYrjJUcciwGZVQ+/Jh/KpHS58CPq8/uG3f
-         QsPHgC3AmhhXwJXboIP8LGonLzd07ujA/LCfPNxhFLX7KcjXEXiXH3rQLwhCOa4ugJhb
-         VlKl+5JZ7XVS01fmUEqdSDugbIXjC4UsENxia+mpwg6PwHPt08m6vZqwf+UIC0q+5FOt
-         KJpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVb/ZF1UOI6021cgWrp9MxUVA44s6+iU1fAecH1HlbO4MRZfy3Kig/6LQzLRiCzGJEjABtrhzM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyt/nsjZ5KdnUgZu53bOFjka8Q0UT9uB+BFguQfUtvB8a49cuOH
-	3FOKhVW5CyMaXXMywBCg32pWWwQ2XnGXYtcEfmRsqiYbrGvPAnPt2dGTbQAhow+1x4tlLpKab7S
-	8NZOdG4sBag==
-X-Google-Smtp-Source: AGHT+IGnWVB505G2W650/nXNH2n0iR9oY27m/GdXw2nME7uc6d5UvqI4cEORymAa2S62GvJ0zkxb/mKrP/Ib
-X-Received: from ejcvi2.prod.google.com ([2002:a17:907:d402:b0:b73:7326:8548])
- (user=korneld job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:6d20:b0:b45:66f6:6a0a
- with SMTP id a640c23a62f3a-b736793d74dmr217106466b.44.1763118714892; Fri, 14
- Nov 2025 03:11:54 -0800 (PST)
-Date: Fri, 14 Nov 2025 11:11:53 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2rRQ37z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF769C19421;
+	Fri, 14 Nov 2025 11:34:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763120083;
+	bh=KV4hhmCrF50yCsv4HaclQvyKMdrM81Xxcq4YVAQQSdM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=L2rRQ37z0sVAN0FA5ANL2E37QwZJvRNyI7QuUHhc6R5hz7YYRZyW2i43z80bvLIai
+	 lemBuJC5vC6ZWyC7DMhcJREmerTrvldjmsTWXQKjiT1kEIJCj7MB1wwVAOlc9VqNHB
+	 sawVRJauQ+m9txr8vDvkkT5mJNA2nak1hPwmDFUSIsOdWgnrCMsQubgSHO3rBdy1II
+	 pT4JfFlMz1sNI99vz5LD8SV8J8INeZwGv9Ph2Tq/aYvP/gzMTRlBkZWNhddh1/RkI9
+	 FmzuvdszNNBLiEo/kwgm884A0Zxla311ddGhbwKNFuhXrSjSyZFCDREGDnvBo4feeX
+	 zTdaWfno+fEbw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJs4e-00000005Brg-38Js;
+	Fri, 14 Nov 2025 11:34:40 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 fix for 6.18, take #3
+Date: Fri, 14 Nov 2025 11:34:15 +0000
+Message-ID: <20251114113415.3217950-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAHgOF2kC/x3MQQqAIBBA0avIrBNSDKWrRIjUWEOkohGBdPek5
- Vv8X6FgJiwwsgoZbyoUQ4PoGCy7CxtyWptB9nIQQiiejvu0FOiyIXrvuFuM6QelUUsNrUoZPT3 /cZrf9wNy+DuXYQAAAA==
-X-Change-Id: 20251114-pkvm_init_noffa-ac880547e727
-X-Mailer: b4 0.14.2
-Message-ID: <20251114-pkvm_init_noffa-v1-1-87a82e87c345@google.com>
-Subject: [PATCH] KVM: arm64: Fix error checking for FFA_VERSION
-From: "=?utf-8?q?Kornel_Dul=C4=99ba?=" <korneld@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: Bartlomiej Grzesik <bgrzesik@google.com>, Tomasz Nowicki <tnowicki@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	"=?utf-8?q?Kornel_Dul=C4=99ba?=" <korneld@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, broonie@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-According to section 13.2 of the DEN0077 FF-A specification, when
-firmware does not support the requested version, it should reply with
-FFA_RET_NOT_SUPPORTED(-1). Table 13.6 specifies the type of the error
-code as int32.
-Currently, the error checking logic compares the unsigned long return
-value it got from the SMC layer, against a "-1" literal. This fails due
-to a type mismatch: the literal is extended to 64 bits, whereas the
-register contains only 32 bits of ones(0x00000000ffffffff).
-Consequently, hyp_ffa_init misinterprets the "-1" return value as an
-invalid FF-A version. This prevents pKVM initialization on devices where
-FF-A is not supported in firmware.
-Fix this by explicitly casting res.a0 to s32.
+Paolo,
 
-Signed-off-by: Kornel Dul=C4=99ba <korneld@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I'm back with my weekly routine of collecting patches, plugging
+another couple of regressions (the FGT one is particularly annoying).
+I hope this is the last one for this cycle, but my gut feeling is that
+we're not quite finished with it yet...
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 58b7d0c477d7fce235fc70d089d175c7879861b5..ab1e53bd4ceeea431fc30a87548=
-2ed1523b01ab5 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -792,7 +792,7 @@ static void do_ffa_version(struct arm_smccc_1_2_regs *r=
-es,
- 			.a0 =3D FFA_VERSION,
- 			.a1 =3D ffa_req_version,
- 		}, res);
--		if (res->a0 =3D=3D FFA_RET_NOT_SUPPORTED)
-+		if ((s32)res->a0 =3D=3D FFA_RET_NOT_SUPPORTED)
- 			goto unlock;
-=20
- 		hyp_ffa_version =3D ffa_req_version;
-@@ -943,7 +943,7 @@ int hyp_ffa_init(void *pages)
- 		.a0 =3D FFA_VERSION,
- 		.a1 =3D FFA_VERSION_1_2,
- 	}, &res);
--	if (res.a0 =3D=3D FFA_RET_NOT_SUPPORTED)
-+	if ((s32)res.a0 =3D=3D FFA_RET_NOT_SUPPORTED)
- 		return 0;
-=20
- 	/*
+Please pull,
 
----
-base-commit: 6fa9041b7177f6771817b95e83f6df17b147c8c6
-change-id: 20251114-pkvm_init_noffa-ac880547e727
+	M.
 
-Best regards,
---=20
-Kornel Dul=C4=99ba <korneld@google.com>
+The following changes since commit 4af235bf645516481a82227d82d1352b9788903a:
 
+  MAINTAINERS: Switch myself to using kernel.org address (2025-11-08 11:21:20 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.18-3
+
+for you to fetch changes up to 85592114ffda568b507bc2b04f5e9afbe7c13b62:
+
+  KVM: arm64: VHE: Compute fgt traps before activating them (2025-11-12 10:52:58 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.18, take #3
+
+- Only adjust the ID registers when no irqchip has been created once
+  per VM run, instead of doing it once per vcpu, as this otherwise
+  triggers a pretty bad conbsistency check failure in the sysreg code.
+
+- Make sure the per-vcpu Fine Grain Traps are computed before we load
+  the system registers on the HW, as we otherwise start running without
+  anything set until the first preemption of the vcpu.
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM: arm64: VHE: Compute fgt traps before activating them
+
+Marc Zyngier (1):
+      KVM: arm64: Finalize ID registers only once per VM
+
+ arch/arm64/kvm/arm.c      | 2 +-
+ arch/arm64/kvm/sys_regs.c | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
