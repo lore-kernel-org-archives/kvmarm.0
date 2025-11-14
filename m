@@ -1,113 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A0822F772;
-	Fri, 14 Nov 2025 16:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DC7328242
+	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763137500; cv=none; b=bWgNGM3MVVAPtG39wOJURbGQN/dXBbY27imKkQ2MU6GXycy7j5APucarmnu1lbbx4SQwudazy0zeGqZ9ZmupBYeChdAnfICJh9JwLseRh93Orb6l3YMIAOt4nQk4BAdTFxChANjIKFIl6ZJCYjs9THhO+CZFSB8MDVJ22MhITPY=
+	t=1763138381; cv=none; b=q+9swTzfScHdrOLBz4sAVcVdMVciGEWtqHC2H2eAnG8jOjcsdxWhlMyc8SUQWblNOvMzqubttqmfPpBddARxxXuTQUrP7QApOeidzd9ygg6JeIi/n0ozaXLlho5BQfsYCLnc/c2OtSuBXLMbTxKXJ6dFcPwpMVngA326PTInuW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763137500; c=relaxed/simple;
-	bh=9ADDlwiObOzy6aRdDxf35MgMRl6YQt/8mloSpSA44HY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pjyG08q7cHcGDRPpmiTLIoEMLCF/XZs/jyfxJuISAVaaCABMbK/QpQlG773oJy9YLA1+hgANjyQjHx9xVBA/P/f+2vJCu7XduJjMl122hWu1KxsjBJPOHFy9m6FlBuarPMOrHRiwYtX+V5HXy+kYfeHqBnGv5t9Fgj8BYwzdXuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l5mJIe1D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763138381; c=relaxed/simple;
+	bh=0ZCVUMLgfmd6DiDcctwRiIjcoGRN52H8jYjLBR1MlwI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WWA3uNaQdBZzqV1c4SFrtKe5udSFziqyaO+j7X8PLOKnprf3wSPPsOTl2OLi8dIv99bYv7s39tk/FCCAyy3kLE21/LRVdIlBB3mD01ZMUQPwrVxeLHnVMvr/1eHc+NlTL7n36ggRT0BI6AYXNKUmDfLVDsx7tubC/2lCv4IXTGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eTL8cv4y; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5mJIe1D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA69C4CEF5;
-	Fri, 14 Nov 2025 16:24:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763137499;
-	bh=9ADDlwiObOzy6aRdDxf35MgMRl6YQt/8mloSpSA44HY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l5mJIe1DWlBXSMgELsnOTYDVlb5JEtqKs3y0KjBE5zQgrbn7GM0bSKHJ7mXten+WS
-	 ZZthJR6fmmcDceL3yMb1Yc0iMdf6N2HCQvJZPK75slYDXD2spgYkkCTnWNc7cbClDS
-	 VKM2/2f0Ji8KcB/cce0d65t0G0A8IG35ced5I3aq5WvU0vwdU17xrxJffNdAYaYlzm
-	 HEQkSM+EdT9qumGnQLZxmCeotn8GAltCR31E3I0TOpJs31J1hyksakve3zuoAACkl1
-	 SPwLSaNbORtMZu2+IDPWja5nvV+RrrthXZBBM2TKomzmEJeEMBFSy1SJrFBOCoxYIV
-	 F0yUmTwUjMfgw==
-Date: Fri, 14 Nov 2025 16:24:53 +0000
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, perlarsen@google.com, ayrton@google.com,
-	ben.horgan@arm.com, sudeep.holla@arm.com, stuart.yoder@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] KVM: arm64: fix FF-A call failure when ff-a
- driver is built-in
-Message-ID: <aRdX1YM0Y8WMP05w@willie-the-truck>
-References: <20251030102245.2313898-1-yeoreum.yun@arm.com>
- <20251030102245.2313898-2-yeoreum.yun@arm.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eTL8cv4y"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2956a694b47so27176835ad.1
+        for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 08:39:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763138379; x=1763743179; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvKuuE+PjYCzOAb47tSaH9inRUN7g6VhaZRxkzeJxLY=;
+        b=eTL8cv4yLIK3YcHB91Vt0Hm2zS5bvd9u9sQSvCLihT2GZRib/OO2vfQEaDaOfMPcnL
+         WyFIrQ16KvzuQe52htzyLj9Zu9yDAsdxfwoRSmKdGyUFOslS3ICENMLPXOsqZIbMLS1z
+         j58Xbw3grj5TtdfJJV27V7FCvjg4shI9Eb7cfvoqLJ07t3857yyM7FoVnsPVlKDEMUhV
+         pKCvewEiMMCCnMVDB1Wfnv+FLYhHGe/MoHzkExIVl+fB3TkCAD2E4JGmqvDUMY3mQzwe
+         bRjo5AqavBOAPlwY8IyMJ2AJ6NeYPpi++H+f+8AnBVOwIymAAuLY9B4S8uo9mt1wK3Rt
+         KeFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763138379; x=1763743179;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vvKuuE+PjYCzOAb47tSaH9inRUN7g6VhaZRxkzeJxLY=;
+        b=rRgRytgBUxZF8immf2WsVJI+dAEvUiAEKMsSbPEqk+cfa5UR6yyFI3qqIff39vp9uZ
+         yHZy4KAcOYUREFNlcqTY1oo8F1O/k67BnCpbu5eK+4TjaYi9ytyHTgulHR49azjxYOHR
+         ramrofjkeXW9F5qFHozJrFGb5THLznKb50FNlbfnJ/HPZz0lI5f+IN5aieo9sq8urnLC
+         YPiHhs70NRkfiKqm7EIbr/zVeeYAYrF/Mt9YpeOjDhq9mzTrR4eyGHxn5ejQdX5s/a9Z
+         uDarNQWfKLt8wwbhcThBezw76cSuxaeYsvRkAoX7aLav73c2eyT5uR09gZXEJXoPMatk
+         scVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmGaEE3Pdfk7heE05IPRrJnI3KDcyEiWn10jN+efTDM/kZCxWLDcuJe3sfjT3FPL72u0XeWR4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxhivE/dAOstek12LCd3o0U7tXu21mJaIFYezOwkkSKBL2o85U4
+	J8pHuQpa9p73tuhxsHLNx3KrTsQTN6jEsXVouzCYU5fQ1eOupckuQq/6/i28jdnAEj0NDFxK5rd
+	lQcz1Ag==
+X-Google-Smtp-Source: AGHT+IHWarhq/WnVBj+1YjmYIbOlKqVYywIAwj5fgd2lO10HbZm9MsXu/DDihp156NA7glJkGLvQ6yfhWGs=
+X-Received: from pge4.prod.google.com ([2002:a05:6a02:2d04:b0:bc3:1d96:1f54])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:4b07:b0:295:9627:8cbd
+ with SMTP id d9443c01a7336-2986a73b6bamr37888775ad.33.1763138378950; Fri, 14
+ Nov 2025 08:39:38 -0800 (PST)
+Date: Fri, 14 Nov 2025 08:39:37 -0800
+In-Reply-To: <9b2d7e48-a847-4c84-89cc-b8d3962f4498@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251030102245.2313898-2-yeoreum.yun@arm.com>
+Mime-Version: 1.0
+References: <20250915215432.362444-1-minipli@grsecurity.net> <9b2d7e48-a847-4c84-89cc-b8d3962f4498@grsecurity.net>
+Message-ID: <aRdbSYrkSOpUJKAT@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Eric Auger <eric.auger@redhat.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Oct 30, 2025 at 10:22:44AM +0000, Yeoreum Yun wrote:
-> Until has_version_negotiated is set to true,
-> all FF-A function calls fail except FFA_VERSION.
-> The has_version_negotiated flag is set to true when
-> the first FFA_VERSION call is made after init_hyp_mode().
+On Fri, Nov 14, 2025, Mathias Krause wrote:
+> +Sean
 > 
-> This works fine when the FF-A driver is built as a module,
-> since ffa_init() is invoked after kvm_arm_init(), allowing do_ffa_version()
-> to set has_version_negotiated to true.
-> 
-> However, when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y),
-> all FF-A calls fail. This happens because ffa_init() runs before
-> kvm_arm_init() — the init level of ffa_init() is rootfs_initcall.
-> As a result, the hypervisor cannot set has_version_negotiated,
-> since the FFA_VERSION call made in ffa_init() does not trap to the hypervisor
-> (HCR_EL2.TSC is cleared before kvm_arm_init()).
-> 
-> Consequently, this causes failures when using EFI variable services
-> with secure partitions that rely on FFA_SEND_DIRECT_MSG.
-> 
-> To fix this, call hyp_ffa_post_init() and set has_version_negotiated
-> during hyp_ffa_init() when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y).
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index 4e16f9b96f63..0ae87ff61758 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -984,5 +984,17 @@ int hyp_ffa_init(void *pages)
->  	};
->  
->  	version_lock = __HYP_SPIN_LOCK_UNLOCKED;
-> +
-> +	if (IS_BUILTIN(CONFIG_ARM_FFA_TRANSPORT)) {
-> +		hyp_spin_lock(&version_lock);
-> +		if (hyp_ffa_post_init()) {
-> +			hyp_spin_unlock(&version_lock);
-> +			return -EOPNOTSUPP;
-> +		}
-> +
-> +		smp_store_release(&has_version_negotiated, true);
-> +		hyp_spin_unlock(&version_lock);
-> +	}
-> +
+> Sean, while you're currently in KUT maintainer mode, can you please take
+> a look at this? The ARM bits have already been ack'ed by Andrew and
+> Paolo, apparently, has little time for KUT as well. But as you currently
+> seem to be looking through the pending KUT patches, maybe this one can
+> get some attention as well?
 
-I don't think this is the right approach.
-
-If the host starts using FF-A before pKVM has initialised, then we've
-got bigger problems than the version because we have no way of knowing
-which pages have been shared with TZ before we initialised.
-
-Why can't FFA defer initialisation until after the proxy has initialised
-when pKVM is enabled? The fact that the driver is modular indicates that
-this should be do-able.
-
-Will
+Got 'em.  Thanks for the heads up, this wasn't on my radar (I saw that Drew had
+responded to v1 and assumed he had taken them).
