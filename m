@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7087281503
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C6826ED48
+	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763136471; cv=none; b=sObHfdCeHurOtnAD3wAOueB13BBHB1tLqKALg6W8TlZp4uL2DjYzvhYuxKGZQGr09lDpJy37R3TgW14mNOhmF6cZsswcDtdeZ1qw55vEw3xdEjOeQ9dWcYHuPUq500Vp1Vh8JTUujq0S6WUoP5yHLyMDLySzHjYaUpdMDcsnems=
+	t=1763136473; cv=none; b=q8q/S4BTmUsso1rRldeOQ6MY+FsB5Q9VkfTsYTbvXv1kr1FxAgqtweRtD9Hbkaeu2I5zltZnKO45S4xvxkPF+zFNeK7/Q6IFDW45lho/drBvVxevpv2MZ3Uel8CqvnJdNJjiPti71z4Yvh36WRtwZd6NHdlsGI41tMpfvOJFEsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763136471; c=relaxed/simple;
-	bh=0lkgCcZ13b/4UkRfU+NKdz4vsVOhpvQipM/+2TbX9Xg=;
+	s=arc-20240116; t=1763136473; c=relaxed/simple;
+	bh=KB5Qx5rJNl9cq9xVgYeGggng4pcB6xcwDGSOUWXSns8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hLJMYiB/QQKJgNSf1r7H8uO52Tmt26KYCKMgYk2rdaTMrWmw2M6aHYfzVjn6j4f4ddJJQXVhuGIYgGIa7bxp/ARnMSWqsA7LgmhklgAenmmibagpxCtO7tCkbBz7FS1RRpSaoIoLFWBgyfU6ItrU2bKfFdSc/VvLmOI+JA2aTY8=
+	 MIME-Version; b=sqAqhXiJx+5UxByPLOsIvXafzoDQJ7+JS/GD7la6RTbbcM/F0+OdZ4PtowlLVsk7T9SfO+Z1spc0yP8NF9RUbn17g50PgCUnqTVaJEYXEfkvDSYwwnzUh00FRxDD4J7xl95Vm/XNAPxjmZaafBrWCjHf1VFdGOiEX95xzY+04PI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5514106F;
-	Fri, 14 Nov 2025 08:07:41 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A0E61BC0;
+	Fri, 14 Nov 2025 08:07:44 -0800 (PST)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 332F13F5A1;
-	Fri, 14 Nov 2025 08:07:47 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B02873F5A1;
+	Fri, 14 Nov 2025 08:07:49 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oliver.upton@linux.dev,
@@ -31,9 +31,9 @@ To: maz@kernel.org,
 Cc: james.clark@linaro.org,
 	mark.rutland@arm.com,
 	james.morse@arm.com
-Subject: [RFC PATCH v6 06/35] KVM: arm64: Add KVM_ARM_VCPU_SPE VCPU feature
-Date: Fri, 14 Nov 2025 16:06:47 +0000
-Message-ID: <20251114160717.163230-7-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v6 07/35] HACK! KVM: arm64: Disable SPE virtualization if protected KVM is enabled
+Date: Fri, 14 Nov 2025 16:06:48 +0000
+Message-ID: <20251114160717.163230-8-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251114160717.163230-1-alexandru.elisei@arm.com>
 References: <20251114160717.163230-1-alexandru.elisei@arm.com>
@@ -45,70 +45,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a new VCPU feature that enables SPE virtualization when set by
-userspace.
+For RFC only.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_spe.h  | 4 ++++
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- arch/arm64/kvm/arm.c              | 7 +++++++
- 3 files changed, 12 insertions(+)
+ arch/arm64/kvm/spe.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-index 6572384531e2..8e8a5c6f7971 100644
---- a/arch/arm64/include/asm/kvm_spe.h
-+++ b/arch/arm64/include/asm/kvm_spe.h
-@@ -13,8 +13,12 @@ static __always_inline bool kvm_supports_spe(void)
+diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+index cf902853750f..7e38f7d9075b 100644
+--- a/arch/arm64/kvm/spe.c
++++ b/arch/arm64/kvm/spe.c
+@@ -24,6 +24,10 @@ void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
  {
- 	return static_branch_likely(&kvm_spe_available);
- }
+ 	struct arm_spu_entry *entry;
+ 
++	/* TODO: pKVM support */
++	if (is_protected_kvm_enabled())
++		return;
 +
-+#define vcpu_has_spe(vcpu)					\
-+	(vcpu_has_feature(vcpu, KVM_ARM_VCPU_SPE))
- #else
- #define kvm_supports_spe()	false
-+#define vcpu_has_spe(vcpu)	false
- #endif /* CONFIG_KVM_ARM_SPE */
+ 	guard(mutex)(&arm_spus_lock);
  
- #endif /* __ARM64_KVM_SPE_H__ */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ed5f3892674c..5bdfe1f6d565 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
- #define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
- #define KVM_ARM_VCPU_HAS_EL2_E2H0	8 /* Limit NV support to E2H RES0 */
-+#define KVM_ARM_VCPU_SPE		9 /* Support SPE in guest */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ee230cb34215..1e4449d96d62 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1459,6 +1459,9 @@ static unsigned long system_supported_vcpu_features(void)
- 	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
- 		clear_bit(KVM_ARM_VCPU_HAS_EL2, &features);
- 
-+	if (!kvm_supports_spe())
-+		clear_bit(KVM_ARM_VCPU_SPE, &features);
-+
- 	return features;
- }
- 
-@@ -1498,6 +1501,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
- 		return -EINVAL;
- 
-+	/* SPE is incompatible with AArch32 */
-+	if (test_bit(KVM_ARM_VCPU_SPE, &features))
-+		return -EINVAL;
-+
- 	return 0;
- }
- 
+ 	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
 -- 
 2.51.2
 
