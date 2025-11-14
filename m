@@ -1,129 +1,116 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B7C307AD2
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 09:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0173090C6;
+	Fri, 14 Nov 2025 09:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763113055; cv=none; b=n7EGjNQUgSz/lFmSXxbnRA3mss7nlNwFZqxGwHXJqPCUw2RwgVvEdFpy5x74rRyoavozrfs5ccpPBMmmmuwJ7Pn46HeTeDyp2UWP5hqKO0XA9Z7SorgJY0Q+9GxzvyjNwAK6Vk/IijGRAFQX5I7uRRiEOZYjINJoEzdR3fF9wBc=
+	t=1763113061; cv=none; b=nEGSFNdQH9csDK627dNPPjCJqJDYwTxX+xxtq4452+2Nlk5F+ZbcwatEGlUIfMRNgR5YzphVypAF1qnf5/2RN3w/zqjlmgGRrUmKjkLy7i+GyZQW2qeEaXatdF5or5x8c0qj50n+9KA0H8aZwxh+OZZyFf/ZgjbTuAUSzhg7wxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763113055; c=relaxed/simple;
-	bh=jMayAiuXr4uJLVBXrajZ8ItHjuEufMqH59fcxhtrMU4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=V+QToyy7e6X6kT5SHPYg+i2Kvzv73IwQ7BoRGcF8SWZlcaTR+Mms9ERWP63kt7ULVloo8vTWODWlud7XQOD3NZK6GGDP8Yv3lkakymnKHSmvlT3Dc+1ztN+lZE/JiW0qlLHpO40bvT7ZmpWkXJ6xafe8bJV52o4PUZXjR5BneWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=XZaYKkvn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RhKSvZ/z; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1763113061; c=relaxed/simple;
+	bh=3N2qHHebaLsgIZzS0J6BkkzTUjzTAKRxRZhlf8ATkdM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tSqickdApl9AG80DJ9ksqDnH78g/Gx21ZWAqeJm3a1k4EsqfMGifMYmAwQjPNeJm58JjzIHo47fzbkiXV1aqs8EfCD6pgIBzV+k2Qv0f3cK/qb1Koa04LQ8u7YIImrmvntFcu5TtyYWMyeB4UdBvTA7xnFs2XMHt1RCQI47FQew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iDw/z3R4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="XZaYKkvn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RhKSvZ/z"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 33A0F1D00119;
-	Fri, 14 Nov 2025 04:37:32 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Fri, 14 Nov 2025 04:37:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1763113052;
-	 x=1763199452; bh=soPqXnxmlCvPRKXbyW72z7/eSR3RnvsIJJJeiu3WxNI=; b=
-	XZaYKkvnzXbl+K616mu3KywYGRPFf4lemWsF4R6HAj8GIJXRAMWsxEUjtvIy7o6X
-	Qqw1H0Zyk1lMMOLouRKxzPgIodZveBiRz+eYgbLk+YQhxza/T7LWVi0XeIm1fL6y
-	SEdwGvgN6oqNPdYo1mMPFjbzkywXx+AG9mKUPzV5o83TRpTLhFGKaVZGvEX/9a54
-	upWXaz2zgI1z1oJau42wsiArYBpjSN+mLjmXsDkZQLOxRnJWEOc8kTyMxX9yuZIb
-	cYKEwjaXGncAQdVsHB5KaKJLPEJI6zmG2mzHs6QysckO+OXssvWe80uGeXc040Ez
-	fv1ivh0tuCDj8ngv62NJ5g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763113052; x=
-	1763199452; bh=soPqXnxmlCvPRKXbyW72z7/eSR3RnvsIJJJeiu3WxNI=; b=R
-	hKSvZ/zjEOh3Gt5F3mIGsQK9FjZkibMCIJv13HZA0pGL9XRW6tve0qc3WWieqz9/
-	98S5RCruS/b9/Gt8DYV15lhRhR+nwmmd9Fg+tqapS92KGfvN8ziP6PRkL06IqSMZ
-	QGOku4MgtYAZVM4c4D8ve9OARJ/6Ya5cQBJcwQLSaiHw7ClE7DUhzbVrmS6Xz/Ar
-	qCib+zlR2BOBht2AY5GvrVwdS5lK2AoSCB4j8RlgspLu2OklSV9TkSezkhWDNzns
-	wSIhKizUmx7kCzGIBLMGyaJkFyGZ66gD2QfXPW5TbToXolnNLczWqRML6rJkSUGu
-	Gkh7SNVph063qMcbvVH6Q==
-X-ME-Sender: <xms:W_gWaXI0OiQ5UHBmOuB_fmLcBbLec-667X8vC3MJeXu2irRUyL5pUQ>
-    <xme:W_gWaV-Ujci0l8P_upBBWVrrMs_tlM8eFo4FMvMjGaN629lBC0D8WwAzdCgzRR49c
-    3cmwhR6rYbSSMKg2dGvqAtCoLXp3tyv2PGqsPXCSo0diT0MyU0qNA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvtdelgeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
-    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
-    khhirdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttg
-    gtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhl
-    ihgtohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonh
-    drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
-    ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:W_gWaR-uy4htPZa4nGV_xz5fseSLAzF46ULPH1m4ZfAjg0Yzd_5KiQ>
-    <xmx:W_gWaSZJZ7Emsz9uKR8Ys1YNxZm9rPGkK7o8Sst9beXjN6l-VO1I3w>
-    <xmx:W_gWaS4sqDFW7YG3PICuSWFwNuMZItT-ZNYVMJBlE-kp1j6sS1yzFg>
-    <xmx:W_gWafkWengLWJvoL__alMwekK3AdQ1wIzo8FFq5ARJ0MflOuEZl_Q>
-    <xmx:XPgWaUWsuGJX-agTr_QIxB4AEOh8WSVjdKSSTC5vcPOviAKIIcUChm_4>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 0EE85700054; Fri, 14 Nov 2025 04:37:31 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iDw/z3R4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF62C2BC87;
+	Fri, 14 Nov 2025 09:37:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763113060;
+	bh=3N2qHHebaLsgIZzS0J6BkkzTUjzTAKRxRZhlf8ATkdM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iDw/z3R4erxFbJeQbSJ4uRNPlm751QKbaX9se6e/Fz+n1PfHRHkqL2VltD4nw+Gua
+	 bWSyF3IJyTNN26VB1RCQRfYuWPJiueheKVkUSHt/4Yf0GjblMVtCclIg+8zDuIfiDA
+	 7HrtlBolMF9Glva2+hCtQcWV+JpFs9aGDdHMhBMAj4OWcv2H2XbrBKctH0ZCOcWJla
+	 jvQN3BWwV5ncQjFOK6rZm6/bPuSb0BPlq8YqpMeifSV/pU+sxQL701brSRoNPFb1O3
+	 WLaEe2MJUZI/0x8lOg6HRhJLum+cy7kKh/4c5/4aubrkdoGAK/tyvH8Uv/46CuRItE
+	 JD+Dm3gOyINAg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vJqFN-000000059uW-3oqS;
+	Fri, 14 Nov 2025 09:37:38 +0000
+Date: Fri, 14 Nov 2025 09:37:37 +0000
+Message-ID: <86ecq1t0ny.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Aishwarya.TCV@arm.com
+Subject: Re: [PATCH v2 04/45] KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
+In-Reply-To: <72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-5-maz@kernel.org>
+	<72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ThreadId: ALjut8WcExBk
-Date: Fri, 14 Nov 2025 10:37:09 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zhou Wang" <wangzhou1@hisilicon.com>, "Marc Zyngier" <maz@kernel.org>
-Cc: "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
- "Joey Gouly" <joey.gouly@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, "Yicong Yang" <yangyccccc@gmail.com>,
- prime.zeng@hisilicon.com, xuwei5@huawei.com
-Message-Id: <113db0fb-d879-49d7-a5f2-7755558f29dd@app.fastmail.com>
-In-Reply-To: <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-6-wangzhou1@hisilicon.com>
- <861pm4vn02.wl-maz@kernel.org>
- <b1407660-9b69-7e21-328a-0f969fffa554@hisilicon.com>
- <c72411f9-a77e-4a72-a401-5110b919a2df@app.fastmail.com>
- <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
-Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com, Sascha.Bischoff@arm.com, sfr@canb.auug.org.au, Aishwarya.TCV@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 14, 2025, at 10:25, Zhou Wang wrote:
-> On 2025/11/14 0:26, Arnd Bergmann wrote:
->> 
->> Are you using a particular device, or are you trying to enable
->> the support in general? If you have a specific device you are
->> working on, does it use the PASID data or not?
->
-> Many thanks for your careful explanation! I got the pointer here.
->
-> We have a real device in our SoC, which supports LS64B/ST64B/ST64BV.
-> For ST64BV, Our device just receives 64B data atomically, not interpret
-> it with PASID data.
+On Thu, 13 Nov 2025 18:01:57 +0000,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Sun, Nov 09, 2025 at 05:15:38PM +0000, Marc Zyngier wrote:
+> > The trap bits are currently only set to manage CPU errata. However,
+> > we are about to make use of them for purposes beyond beating broken
+> > CPUs into submission.
+> > 
+> > For this purpose, turn these errata-driven bits into a patched-in
+> > constant that is merged with the KVM-driven value at the point of
+> > programming the ICH_HCR_EL2 register, rather than being directly
+> > stored with with the shadow value..
+> 
+> We're seeing the no-vgic-v3 failures in -next with slightly different
+> symptoms to those that were seen in mainline and fixed with Sacha's
+> change da888524c393 ("KVM: arm64: vgic-v3: Trap all if no in-kernel
+> irqchip").  That change generated a conflict with this patch which
+> Stephen resolved in what looks like a reasonable fashion tactically but
+> I suspect needs some wider changes.  The test now fails with:
+> 
+> # selftests: kvm: no-vgic-v3
+> # Random seed: 0x6b8b4567
+> # ==== Test Assertion Failure ====
+> #   lib/arm64/processor.c:487: false
+> #   pid=2080 tid=2080 errno=4 - Interrupted system call
+> #      1	0x0000000000413d27: assert_on_unhandled_exception at processor.c:487
+> #      2	0x0000000000406c1f: _vcpu_run at kvm_util.c:1699
+> #      3	 (inlined by) vcpu_run at kvm_util.c:1710
+> #      4	0x000000000040308b: test_run_vcpu at no-vgic-v3.c:124
+> #      5	0x0000000000402253: test_guest_no_gicv3 at no-vgic-v3.c:155
+> #      6	 (inlined by) main at no-vgic-v3.c:174
+> #      7	0x0000ffff9dc17543: ?? ??:0
+> #      8	0x0000ffff9dc17617: ?? ??:0
+> #      9	0x000000000040242f: _start at ??:?
+> #   Unexpected exception (vector:0x4, ec:0x18)
+> not ok 25 selftests: kvm: no-vgic-v3 # exit=254
 
-Ok, I see. So I assume this is either a kind of dedicated work queue
-where the IOMMU PASID is set up in advance for the user MMIO area,
-or it is a device that does not do any DMA at all, correct?
+Fix at 20251114093541.3216162-1-maz@kernel.org based on kvmarm/next. I
+haven't tried -next.
 
-In this case, would the device also work correctly with ST64BV0 if
-the ACCDATA register is fixed to a value of zero and you can only
-use the upper 480 bits? Would it also work if there is an
-unpredictable value in ACCDATA that may match the PASID of another
-device used by the same process?
+	M.
 
-         Arnd
+-- 
+Without deviation from the norm, progress is not possible.
