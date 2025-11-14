@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C9B26F28A
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561692B9A4
+	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763136524; cv=none; b=qSqLhciw4fANp20+gbxmkc53Bwu/2dC0IOqOOtNO3CKhrzGk5de+YtILY0iwpwfUN5rLDPLdjA47UaRLFqJ02gnGcVMB0oUYSJD0799NuL4kTHH2dEsOnfBzwqz4eAyN26cbJ7ReRlJXMEdYrzvANLEYxrw3xFpvY704CGcVYaI=
+	t=1763136526; cv=none; b=HkkjWJHswgCbOs6SUc1KgKlCu1WJU09jmCgVS+mk/way4yhrYPjK3KQxbqeivVKJqZypaamF/jA0ZyniqXxs1BvoKb11tC0y7fec9h0jS6svt+vzKy8VWBoieZRsg2kAlq5z4FV9hjbYq9Bf/cHOw/AKgpcVABc6n9rL1Mb7Z1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763136524; c=relaxed/simple;
-	bh=LmVBJI0b/J7GXGXX+m/JKpng/ZuYNuhZrQv02eDoluk=;
+	s=arc-20240116; t=1763136526; c=relaxed/simple;
+	bh=g4lHCTwMAU4ndGnY00xoomb/+GMYCVf/W+odcOmhlYo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BrlSzps0Qo+/P4+j1th3jmJxjQEJxXzhgolDMBYnHuwkrAC5PV1KZjUjcOELIQa/ja44k8pdHdDgG+90O1fB0gBF9sPi4UC4zzSXvAwkmbFybh1HdwQV1pOJs5h+sYLIT1lF3iVaukZGclsD4OrAqSRRA2l4ukKfEsOesIX6P6U=
+	 MIME-Version; b=kzaALvWXqjOmTKEoea07A2l2zksQPi5suPpu2JMsx/6a+AR01FSVMnb+JNh2d4wOpyHQvelSDdD/ESAE04s4A4XlVICmiDt6vWBZOvV1KWmL0AJ6tfXXRrF11tevhjBnrKtKPwK3lXruBey64hVzD2xEuxSIt70t/LouXIMjLAU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4CD01BCB;
-	Fri, 14 Nov 2025 08:08:34 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4837919F6;
+	Fri, 14 Nov 2025 08:08:37 -0800 (PST)
 Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46E483F5A1;
-	Fri, 14 Nov 2025 08:08:40 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF63A3F5A1;
+	Fri, 14 Nov 2025 08:08:42 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org,
 	oliver.upton@linux.dev,
@@ -31,9 +31,9 @@ To: maz@kernel.org,
 Cc: james.clark@linaro.org,
 	mark.rutland@arm.com,
 	james.morse@arm.com
-Subject: [RFC PATCH v6 27/35] KVM: arm64: Make MTE functions public
-Date: Fri, 14 Nov 2025 16:07:08 +0000
-Message-ID: <20251114160717.163230-28-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v6 28/35] KVM: arm64: at: Use callback for reading descriptor
+Date: Fri, 14 Nov 2025 16:07:09 +0000
+Message-ID: <20251114160717.163230-29-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20251114160717.163230-1-alexandru.elisei@arm.com>
 References: <20251114160717.163230-1-alexandru.elisei@arm.com>
@@ -45,68 +45,109 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make sanitise_mte_tags() (renamed to kvm_sanitise_mte_tags()) and
-kvm_vma_mte_allowed() public, to be used by the SPE virtualization code.
+Allow callers of __kvm_translate_va() to use a custom defined function for
+reading the translation table descriptor from guest memory. This will be
+useful for SPE virtualization, where the translation tables must also be
+mapped at stage 2 for the entire duration of the guest profiling session.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h | 3 +++
- arch/arm64/kvm/mmu.c             | 9 +++++----
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  6 ++++++
+ arch/arm64/kvm/at.c                 | 17 +++++++++++++----
+ arch/arm64/kvm/nested.c             |  7 ++++---
+ 3 files changed, 23 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e4069f2ce642..37b84e9d4337 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -183,6 +183,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
- 
-+bool kvm_vma_mte_allowed(struct vm_area_struct *vma);
-+void kvm_sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn, unsigned long size);
-+
- phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
- int __init kvm_mmu_init(u32 *hyp_va_bits);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7cc964af8d30..8abba9619c58 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1434,13 +1434,14 @@ static int get_vma_page_shift(struct vm_area_struct *vma, unsigned long hva)
-  * Must be called with kvm->mmu_lock held to ensure the memory remains mapped
-  * while the tags are zeroed.
-  */
--static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
--			      unsigned long size)
-+void kvm_sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn, unsigned long size)
- {
- 	unsigned long i, nr_pages = size >> PAGE_SHIFT;
- 	struct page *page = pfn_to_page(pfn);
- 	struct folio *folio = page_folio(page);
- 
-+	lockdep_assert_held(&kvm->mmu_lock);
-+
- 	if (!kvm_has_mte(kvm))
- 		return;
- 
-@@ -1462,7 +1463,7 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index f7c06a840963..e9a73ea74f24 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -284,6 +284,11 @@ static inline unsigned int ps_to_output_size(unsigned int ps, bool pa52bit)
  	}
  }
  
--static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
-+bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
- {
- 	return vma->vm_flags & VM_MTE_ALLOWED;
++typedef int (*read_desc_fn)(struct kvm_vcpu *, gpa_t, void *, unsigned long);
++
++int kvm_vcpu_read_desc(struct kvm_vcpu *vcpu, gpa_t gpa, void *desc,
++		       unsigned long len);
++
+ enum trans_regime {
+ 	TR_EL10,
+ 	TR_EL20,
+@@ -305,6 +310,7 @@ struct s1_walk_filter {
+ 
+ struct s1_walk_info {
+ 	struct s1_walk_filter	*filter;
++	read_desc_fn		read_desc;
+ 	u64	     		baddr;
+ 	enum trans_regime	regime;
+ 	unsigned int		max_oa_bits;
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index be26d5aa668c..e1df4278d5d5 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -110,6 +110,12 @@ static u64 effective_tcr2(struct kvm_vcpu *vcpu, enum trans_regime regime)
+ 	return vcpu_read_sys_reg(vcpu, TCR2_EL2);
  }
-@@ -1833,7 +1834,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (!fault_is_perm && !s2_force_noncacheable && kvm_has_mte(kvm)) {
- 		/* Check the VMM hasn't introduced a new disallowed VMA */
- 		if (mte_allowed) {
--			sanitise_mte_tags(kvm, pfn, vma_pagesize);
-+			kvm_sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		} else {
- 			ret = -EFAULT;
- 			goto out_unlock;
+ 
++int kvm_vcpu_read_desc(struct kvm_vcpu *vcpu, gpa_t gpa, void *desc,
++		       unsigned long len)
++{
++	return kvm_read_guest(vcpu->kvm, gpa, desc, len);
++}
++
+ static bool s1pie_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
+ {
+ 	if (!kvm_has_s1pie(vcpu->kvm))
+@@ -142,6 +148,9 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 	unsigned int stride, x;
+ 	bool va55, tbi, lva;
+ 
++	if (!wi->read_desc)
++		return -EINVAL;
++
+ 	va55 = va & BIT(55);
+ 
+ 	if (vcpu_has_nv(vcpu)) {
+@@ -414,7 +423,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 				return ret;
+ 		}
+ 
+-		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
++		ret = wi->read_desc(vcpu, ipa, &desc, sizeof(desc));
+ 		if (ret) {
+ 			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
+ 			return ret;
+@@ -1542,9 +1551,9 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ }
+ 
+ /*
+- * Translate a VA for a given EL in a given translation regime, with
+- * or without PAN. This requires wi->{regime, as_el0, pan} to be
+- * set. The rest of the wi and wr should be 0-initialised.
++ * Translate a VA for a given EL in a given translation regime, with or without
++ * PAN. This requires wi->{read_desc, regime, as_el0, pan} to be set. The rest
++ * of the wi and wr should be 0-initialised.
+  */
+ int __kvm_translate_va(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		       struct s1_walk_result *wr, u64 va)
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index f04cda40545b..92e94bb96bcc 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1196,9 +1196,10 @@ static int kvm_translate_vncr(struct kvm_vcpu *vcpu, bool *is_gmem)
+ 		invalidate_vncr(vt);
+ 
+ 		vt->wi = (struct s1_walk_info) {
+-			.regime	= TR_EL20,
+-			.as_el0	= false,
+-			.pan	= false,
++			.read_desc	= kvm_vcpu_read_desc,
++			.regime		= TR_EL20,
++			.as_el0		= false,
++			.pan		= false,
+ 		};
+ 		vt->wr = (struct s1_walk_result){};
+ 	}
 -- 
 2.51.2
 
