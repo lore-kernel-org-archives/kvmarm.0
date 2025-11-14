@@ -1,88 +1,113 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E849628314C
-	for <kvmarm@lists.linux.dev>; Fri, 14 Nov 2025 16:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A0822F772;
+	Fri, 14 Nov 2025 16:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763136544; cv=none; b=dKSuV3xoqrBHqcv+xN2rzhIS1CCx75u9gnv0U/IAN+3s3w152jDYaefVVAxCkvw2X1SsFrYloFpwydGqQ0wihgPJYq8cUknjZrPNalT8eT/7tAtUtJUQPrtSBy5KN97nYy6tk/eRc+WOI88JMgTlJDWJp1F9X6X4CO2hEkC4sBM=
+	t=1763137500; cv=none; b=bWgNGM3MVVAPtG39wOJURbGQN/dXBbY27imKkQ2MU6GXycy7j5APucarmnu1lbbx4SQwudazy0zeGqZ9ZmupBYeChdAnfICJh9JwLseRh93Orb6l3YMIAOt4nQk4BAdTFxChANjIKFIl6ZJCYjs9THhO+CZFSB8MDVJ22MhITPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763136544; c=relaxed/simple;
-	bh=RmB4j4oqzdbJPAwLvZwU4vW/9oqI+knA/4vk8u1u/Bo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hzGsY/tewde8xNlWf4xTmvVPBd3DTi43CA9nQk6MlavRt6P8ZdYH+YMSx7GNZiyWlAf8S0hLEGh0CKKr2C3gqk9dGcdPl9BOqu/W4+/EHrgzxyEY4j9fVogrT6gjV19CQ2c7fTxv/cFWFO7TZWj4/Ji1l4MjOYBvHsV94zNMpAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3CDF1BF7;
-	Fri, 14 Nov 2025 08:08:54 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 640933F5A1;
-	Fri, 14 Nov 2025 08:09:00 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	will@kernel.org,
-	catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: james.clark@linaro.org,
-	mark.rutland@arm.com,
-	james.morse@arm.com
-Subject: [RFC PATCH v6 35/35] KVM: arm64: Allow the creation of a SPE enabled VM
-Date: Fri, 14 Nov 2025 16:07:16 +0000
-Message-ID: <20251114160717.163230-36-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <20251114160717.163230-1-alexandru.elisei@arm.com>
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1763137500; c=relaxed/simple;
+	bh=9ADDlwiObOzy6aRdDxf35MgMRl6YQt/8mloSpSA44HY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pjyG08q7cHcGDRPpmiTLIoEMLCF/XZs/jyfxJuISAVaaCABMbK/QpQlG773oJy9YLA1+hgANjyQjHx9xVBA/P/f+2vJCu7XduJjMl122hWu1KxsjBJPOHFy9m6FlBuarPMOrHRiwYtX+V5HXy+kYfeHqBnGv5t9Fgj8BYwzdXuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l5mJIe1D; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l5mJIe1D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AA69C4CEF5;
+	Fri, 14 Nov 2025 16:24:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763137499;
+	bh=9ADDlwiObOzy6aRdDxf35MgMRl6YQt/8mloSpSA44HY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l5mJIe1DWlBXSMgELsnOTYDVlb5JEtqKs3y0KjBE5zQgrbn7GM0bSKHJ7mXten+WS
+	 ZZthJR6fmmcDceL3yMb1Yc0iMdf6N2HCQvJZPK75slYDXD2spgYkkCTnWNc7cbClDS
+	 VKM2/2f0Ji8KcB/cce0d65t0G0A8IG35ced5I3aq5WvU0vwdU17xrxJffNdAYaYlzm
+	 HEQkSM+EdT9qumGnQLZxmCeotn8GAltCR31E3I0TOpJs31J1hyksakve3zuoAACkl1
+	 SPwLSaNbORtMZu2+IDPWja5nvV+RrrthXZBBM2TKomzmEJeEMBFSy1SJrFBOCoxYIV
+	 F0yUmTwUjMfgw==
+Date: Fri, 14 Nov 2025 16:24:53 +0000
+From: Will Deacon <will@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	catalin.marinas@arm.com, perlarsen@google.com, ayrton@google.com,
+	ben.horgan@arm.com, sudeep.holla@arm.com, stuart.yoder@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] KVM: arm64: fix FF-A call failure when ff-a
+ driver is built-in
+Message-ID: <aRdX1YM0Y8WMP05w@willie-the-truck>
+References: <20251030102245.2313898-1-yeoreum.yun@arm.com>
+ <20251030102245.2313898-2-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251030102245.2313898-2-yeoreum.yun@arm.com>
 
-Everything is in place, allow userspace to enable SPE for a virtual
-machine.
+On Thu, Oct 30, 2025 at 10:22:44AM +0000, Yeoreum Yun wrote:
+> Until has_version_negotiated is set to true,
+> all FF-A function calls fail except FFA_VERSION.
+> The has_version_negotiated flag is set to true when
+> the first FFA_VERSION call is made after init_hyp_mode().
+> 
+> This works fine when the FF-A driver is built as a module,
+> since ffa_init() is invoked after kvm_arm_init(), allowing do_ffa_version()
+> to set has_version_negotiated to true.
+> 
+> However, when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y),
+> all FF-A calls fail. This happens because ffa_init() runs before
+> kvm_arm_init() — the init level of ffa_init() is rootfs_initcall.
+> As a result, the hypervisor cannot set has_version_negotiated,
+> since the FFA_VERSION call made in ffa_init() does not trap to the hypervisor
+> (HCR_EL2.TSC is cleared before kvm_arm_init()).
+> 
+> Consequently, this causes failures when using EFI variable services
+> with secure partitions that rely on FFA_SEND_DIRECT_MSG.
+> 
+> To fix this, call hyp_ffa_post_init() and set has_version_negotiated
+> during hyp_ffa_init() when the FF-A driver is built-in (CONFIG_ARM_FFA_TRANSPORT=y).
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 4e16f9b96f63..0ae87ff61758 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -984,5 +984,17 @@ int hyp_ffa_init(void *pages)
+>  	};
+>  
+>  	version_lock = __HYP_SPIN_LOCK_UNLOCKED;
+> +
+> +	if (IS_BUILTIN(CONFIG_ARM_FFA_TRANSPORT)) {
+> +		hyp_spin_lock(&version_lock);
+> +		if (hyp_ffa_post_init()) {
+> +			hyp_spin_unlock(&version_lock);
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +		smp_store_release(&has_version_negotiated, true);
+> +		hyp_spin_unlock(&version_lock);
+> +	}
+> +
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/Kconfig            | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+I don't think this is the right approach.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b730401717b5..1c987274556e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -40,7 +40,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 9
-+#define KVM_VCPU_MAX_FEATURES 10
- #define KVM_VCPU_VALID_FEATURES	(BIT(KVM_VCPU_MAX_FEATURES) - 1)
- 
- #define KVM_REQ_SLEEP \
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 31388b5b2655..f746df3c2c28 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -84,9 +84,9 @@ config PTDUMP_STAGE2_DEBUGFS
- 	  If in doubt, say N.
- 
- config KVM_ARM_SPE
--	bool
-+	bool "Support SPE in guest"
- 	depends on KVM && ARM_SPE_PMU=y
--	default n
-+	default y
- 	help
- 	  Adds support for Statistical Profiling Extension (SPE) in virtual
- 	  machines.
--- 
-2.51.2
+If the host starts using FF-A before pKVM has initialised, then we've
+got bigger problems than the version because we have no way of knowing
+which pages have been shared with TZ before we initialised.
 
+Why can't FFA defer initialisation until after the proxy has initialised
+when pKVM is enabled? The fact that the driver is modular indicates that
+this should be do-able.
+
+Will
