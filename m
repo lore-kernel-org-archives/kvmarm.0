@@ -1,135 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B301B4223;
-	Sun, 16 Nov 2025 08:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F142225779
+	for <kvmarm@lists.linux.dev>; Sun, 16 Nov 2025 11:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763282814; cv=none; b=HQ3YYyB7JcXw/Yt0sQCrS/jcX42RvGokzIplmiEJD46q/DmrVZpJFQpemkuxXjBWDQuqOOBWtWFFBcb9slyBIn+yGl/O7XxYQlRy0LLpcQ7pVx1yembBNozwt6zsOopU3sLMMVttef6V2FEHHP+YjUkJ2nbIrpKMzJu1TXnbQZU=
+	t=1763290872; cv=none; b=cxQJisz7wxQg1J7GL5AU5Ni++JxjPE2ofFOCNDf58yizTeDoV0oEyhG5Ax2rBoNJIlLBslOPNsMDWOBQJGUu47WtM2GMDd3Rd0ZabHGQA2KeikgFIOZWyRdtHbIBV+wwW4bs78cLTGxjHpr+oEULBjtIVzGG/eJw4RV8zlefR7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763282814; c=relaxed/simple;
-	bh=ABVp4p3rYz5wfGmvWsCJ14bgZY4IShGgmpX2v0OpT+w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iftUu9VttAG95nzrhHP6EkoXHmdO7rU9yA7kxyoC1+c/YMcc/f7+QiCySJcKsoJRtIiaLlY4oH2bCV2UG8M7d7ZJfTsQnZ+y5mqDNwqTVgTHzrAzRt+1XJrKVVezeqM/Fd3dlxQA04prRL7u6JUoyWmNwmjKfrVBi0A70g0ouSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eg7CnYJS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763290872; c=relaxed/simple;
+	bh=9dtn3zhF4pNp0HRjuahTXbNpgIfE2IdQgne03qczeWI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=oGUqD3/dj2qZfPufviZul2zN7tb8UvQ19ALde/UjZ6JO8g5lwWeQXcDg5qBBi5iPAV5dieeVK+28KihxXiDZF7nFrH05zsE8SHfCdB2azRjmZwOtJMtWgEAGOtogmjg1tWd8J5j/ap3+RijzpMYbAef4QrrrGxwf9CwofJ7sbL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MsBW3ler; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eg7CnYJS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C7D1C4CEF1;
-	Sun, 16 Nov 2025 08:46:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763282814;
-	bh=ABVp4p3rYz5wfGmvWsCJ14bgZY4IShGgmpX2v0OpT+w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Eg7CnYJS4yA5MCLl3AtbieOcFU1LoTCYOLeIwfC/MO+TOXcSMf58h73v+9Y0+P12d
-	 Ohg7htC3Oqt/RCm17Ie3fIgHZrL0vbPfd5+1x4I5u4uNINUVAXunukM7sf/hLKCGfw
-	 F4gff8lllz1bKRpIml1mtBU0WTAq2xHLCCVJjjj95rtl7gZIPT9rgf62UT7sG36Svd
-	 eap4k0sWjqosaJrp5CeqkqEZzEYMzP3q9Kt8vAyRqDtwc+Qp4XoSsHe5H8kNwHZ/Xk
-	 lwIb6Nu0LhWbAF3lKqHZtbxx49FZSN/8YhddXlnDvgHDWZQLxPimw9PnV0diVZtNLc
-	 w07FBvktjO5Ug==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vKYPL-00000005ZPB-2jP9;
-	Sun, 16 Nov 2025 08:46:51 +0000
-Date: Sun, 16 Nov 2025 08:46:51 +0000
-Message-ID: <868qg6tldw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: syzbot <syzbot+c4aef6558d0cd90fe378@syzkaller.appspotmail.com>
-Cc: catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	oupton@kernel.org,
-	suzuki.poulose@arm.com,
-	syzkaller-bugs@googlegroups.com,
-	will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [syzbot] [kvmarm?] WARNING in kvm_set_vm_id_reg
-In-Reply-To: <6918cd88.050a0220.1c914e.0044.GAE@google.com>
-References: <6918cd88.050a0220.1c914e.0044.GAE@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MsBW3ler"
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2984dfae043so30426645ad.0
+        for <kvmarm@lists.linux.dev>; Sun, 16 Nov 2025 03:01:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763290871; x=1763895671; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uRv0x/mbD31ezymVtnCbBZQgh6UPxXX7neGyCw/P4/k=;
+        b=MsBW3lerCMWV0nROr6dWgsoxzkzBndKhJUxbB1uDmlYxbldGYAYsf0LrzJvidp9VeK
+         ut6jpYyySuiEgVMibdWJQ66rf6O2LHPvowK1ocIQW/XeDwf07VWR+9vvDtayvbHzPSe5
+         9l3xo5VVsNkyv9vVBuVrDkVLv7SJ5rZidiHourAvvRLWDlyQI8jZbph79Ne1R2pWt92f
+         OhpbqbAah0/76GEj/Pb/8+umkGpJr4J4KeosSig4RiN0DnQCcJknFG1kPp3XiF8LT9Vm
+         9jDONO+lLYLwhaKmOscGjM7NDMO3fh6wEvUTytwGejGw7gTkzKe9p6nDV2twIPPWBD8G
+         ZyoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763290871; x=1763895671;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uRv0x/mbD31ezymVtnCbBZQgh6UPxXX7neGyCw/P4/k=;
+        b=X6PlAlGDu05cP1iZeFJFC3dl0XGwUCUyRy+cZQbA0emGVU9GPz29si3d7BJShv2P/+
+         bCFpBaIzTYZpyoYi5BERs9yLGRUjlHCqL06w7nlUcNrjtIBTr5bu++Hg1jTRmEbm05D0
+         OscZXeiDKtlwUfcYJbt01Xa3nBfmNiDY8RyPHrZidqhK1P7SgGqWRWVEMjbU7z+fSwU+
+         aIqFUy8YKrZlWO6gNUrexdFSYvFpWYqOSHkt/sNnMOKov/EcmplG+XSHUebwVGh42sLw
+         sfF69ESkXhyVRigQahPe2CKfDUm1Ij9QYQThFKrBpvwYoQBpL8o0LRha2a3WC6cdH00B
+         0ayQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkoBSljhPOZpvDmUF7PKRBuTY8rf+DE1qwNmTgsFVuIFlEU/2ILQdi2rtf1C2/1z3BnTG9O8w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwN8TxVZ7lsmDlC+obDGaFkg7SIZGOs7kDhl+mSY3FDL7fdoUyN
+	X14G157qaVsKHhh0tcmMLshz1LMSfNkYqyyjhVBfTarDadLsEYnEJTIL
+X-Gm-Gg: ASbGnctVobl7Z3dCjCXOD8zQ4S5BrwaLtMilSiyfr1ymv6ScRs3C0B5i4AsKOyrWIbq
+	1kFmkvnhpLn0IkhMghrxql29yrVQk6z7mzH16NImK3CxGY/znxGCZdbNPyhodCNc4vVW5ICy5dI
+	xKJ0h0IVqwnAp3tc5JgkoBNVHeeDhNosugFZW5vqJClkV/fBzpxKSMBNil91a9iFnF1EmzWErzx
+	K2QIRPAiUgkk9fKNikADqjfHwCGE0lFFqDLYEXk+KPBgDissrtcVThzbV57W7+ZzrKDjSxWaavA
+	zYspp7xhKD4CFinJByVmh9ec+GGnRMz7wp2pjQt/ntIa3rR7vmjjsU3SgKgihcGtT96pc6W/0UZ
+	l88bezrx9LIQCHnWPAhCK2kUNRg40WSHVL/VAut2e71GeLaI7z2mKdv2VEoWmNtRZztRX9+x89O
+	EfjW+FRTtBDpSjs9ZZpes/r6DOkq0lxwQ=
+X-Google-Smtp-Source: AGHT+IGwXKVh3JoXqwDVnEA8t27M4iTiBciJSt6uHCX3HWuQiqFLuOCSzc0jDkXVTsETAHbo8/8pyQ==
+X-Received: by 2002:a17:902:c945:b0:295:5da6:6014 with SMTP id d9443c01a7336-2986a6d07f2mr112271255ad.22.1763290870736;
+        Sun, 16 Nov 2025 03:01:10 -0800 (PST)
+Received: from [192.168.1.2] ([122.171.252.231])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bc375081023sm9414287a12.21.2025.11.16.03.01.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Nov 2025 03:01:10 -0800 (PST)
+Message-ID: <456bba04-07b7-4c27-96fc-9bf226b12fd9@gmail.com>
+Date: Sun, 16 Nov 2025 16:31:04 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: syzbot+c4aef6558d0cd90fe378@syzkaller.appspotmail.com, catalin.marinas@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, oliver.upton@linux.dev, oupton@kernel.org, suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum
+ AC04_CPU_23
+Content-Language: en-US
+To: D Scott Phillips <scott@os.amperecomputing.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ James Clark <james.clark@linaro.org>, James Morse <james.morse@arm.com>,
+ Joey Gouly <joey.gouly@arm.com>, Kevin Brodsky <kevin.brodsky@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Rob Herring (Arm)" <robh@kernel.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Shiqi Liu <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>,
+ Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
+From: Jaikiran Pai <jai.forums2013@gmail.com>
+In-Reply-To: <20250513184514.2678288-1-scott@os.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, 15 Nov 2025 18:59:20 +0000,
-syzbot <syzbot+c4aef6558d0cd90fe378@syzkaller.appspotmail.com> wrote:
-> 
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    7a0892d2836e Merge tag 'pci-v6.18-fixes-5' of git://git.ke..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=12c56884580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=bbf220ce32df0361
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c4aef6558d0cd90fe378
-> compiler:       aarch64-linux-gnu-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: arm64
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=139c77cd980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11d6a914580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-7a0892d2.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/e83411b74df6/vmlinux-7a0892d2.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/135caed64c95/Image-7a0892d2.gz.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+c4aef6558d0cd90fe378@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 3583 at arch/arm64/kvm/sys_regs.c:2353 kvm_set_vm_id_reg+0x60/0xf4 arch/arm64/kvm/sys_regs.c:2348
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 3583 Comm: syz.2.17 Not tainted syzkaller #0 PREEMPT 
-> Hardware name: linux,dummy-virt (DT)
-> pstate: a1402009 (NzCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
-> pc : kvm_set_vm_id_reg+0x60/0xf4 arch/arm64/kvm/sys_regs.c:2353
-> lr : kvm_finalize_sys_regs+0x88/0x244 arch/arm64/kvm/sys_regs.c:5616
-> sp : ffff800089543ab0
-> x29: ffff800089543ab0 x28: f6f00000121c12c0 x27: 0000000000000000
-> x26: 0000000000000000 x25: f1f00000085d8000 x24: 0000000000000000
-> x23: f1f00000085d8048 x22: 0000000000000000 x21: f9ff800083e0dbd0
-> x20: f9ff800083e0d000 x19: f1f00000085d8000 x18: 00000000ffffffff
-> x17: 0000000000000000 x16: 0000000000000000 x15: ffff800089543a90
-> x14: ffff800089543d98 x13: ffff800089543d5a x12: 0000000000000000
-> x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000078
-> x8 : ffff800089543da8 x7 : f0f0000004469ffc x6 : 0000000000000077
-> x5 : f6f00000121c12c0 x4 : 0000000000000001 x3 : f9ff800083e0dd18
-> x2 : 1101001020110222 x1 : 0000000000000000 x0 : f9ff800083e0d000
-> Call trace:
->  kvm_set_vm_id_reg+0x60/0xf4 arch/arm64/kvm/sys_regs.c:2348 (P)
->  kvm_finalize_sys_regs+0x88/0x244 arch/arm64/kvm/sys_regs.c:5616
->  kvm_arch_vcpu_run_pid_change+0x8c/0x36c arch/arm64/kvm/arm.c:857
->  kvm_vcpu_ioctl+0x7f8/0x878 virt/kvm/kvm_main.c:4464
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:597 [inline]
->  __se_sys_ioctl fs/ioctl.c:583 [inline]
->  __arm64_sys_ioctl+0xac/0x104 fs/ioctl.c:583
->  __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->  invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
->  el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
->  do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
->  el0_svc+0x34/0x10c arch/arm64/kernel/entry-common.c:746
->  el0t_64_sync_handler+0xa0/0xe4 arch/arm64/kernel/entry-common.c:765
->  el0t_64_sync+0x1a4/0x1a8 arch/arm64/kernel/entry.S:596
-> ---[ end trace 0000000000000000 ]---
+Hello Scott,
 
-#syz fix KVM: arm64: Finalize ID registers only once per VM
+On 14/05/25 12:15 am, D Scott Phillips wrote:
+> On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
+> translations for data addresses initiated by load/store instructions.
+> Only instruction initiated translations are vulnerable, not translations
+> from prefetches for example. A DSB before the store to HCR_EL2 is
+> sufficient to prevent older instructions from hitting the window for
+> corruption, and an ISB after is sufficient to prevent younger
+> instructions from hitting the window for corruption.
 
-	M.
+I see that this patch enables the workaround only for AmpereOne AC04 
+systems. Do you happen to know if the underlying issue for which this 
+patch was introduced, impacts (or can impact) AmpereOne AC03 systems too:
 
--- 
-Without deviation from the norm, progress is not possible.
+CPU implementer    : 0xc0
+CPU architecture: 8
+CPU variant    : 0x0
+CPU part    : 0xac3
+CPU revision    : 1
+
+-Jaikiran
+
