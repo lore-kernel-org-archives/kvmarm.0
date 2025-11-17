@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE4628504F
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 22:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB4C28504F
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 22:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763419409; cv=none; b=HywfXC24ts4EXUTSRyZq98qBIW6/bERGZrMZn9XCv5yxM5IOds4f8cNkJ3Jr0D7ECn255jMXb+whWBtBbllTDbYIqpzL0Z4vIb0vP6W9sB38mTW4O8ZhWhpdfnnh6jvEj/KKQ4XsAKFr2yxncLP+wVvNMQCXAG1psIxUVJoFZX0=
+	t=1763419409; cv=none; b=N7nJqwBB12nE84fUKK7qVwQ6pkqZb67cotlNecaOKDodRBjNCcu4Y5OmNPJyh0RkKsKJo6HJdrqreLkp2lKd12JWn1B0aRt0gpZIAXwnMRQB/30KOUFNav237X5L+frLrfUkEcM1vHs2lsq331swHk2qARN+xNAXm0yO3QTRSEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763419409; c=relaxed/simple;
-	bh=c+7ijd3XehpA5TcOC9WUGtH4UCbxLXxr9wnUGamEeV0=;
+	bh=knW1PUsbyJ6Yx+zrY5Ax4H+LAVQSSI+Qh6CyS1LpRe8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gT8n/RlddFw/Y4mqPGw37HUN8ivc2yfUOR/q8xoSnaurp16+bMBSLDk+4qLm74Pp943KJVBLC3F+jcyxkNXpGiawK0U7pnhAnoxWrHxIgU6BOxAL+F56JNdkh5nwZrFuLZ7GYtrJMJw+n2CpR3erjo7p2qMjsUlkFrTJgoFKdrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VTsIDPtT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=O2rJwyeBdyIgSKJLWsPXV7pG5kC370MaNZPXZ8+0X19EpFrfSEwPVhbJYa30Kp1x1GaYoBKQT9qkGD/ETMLGylrFj3VfJ/v+ZRSqQOx3GwR6GFWMgKQ+y4a5wFiGnmbLCjhnUKWV9nvq6aec0W0YCWobsWJ2juYd4+PP9TrGKIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGH95pQK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VTsIDPtT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D0FAC2BCB0;
-	Mon, 17 Nov 2025 22:43:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGH95pQK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29163C2BCB1;
+	Mon, 17 Nov 2025 22:43:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763419408;
-	bh=c+7ijd3XehpA5TcOC9WUGtH4UCbxLXxr9wnUGamEeV0=;
+	s=k20201202; t=1763419409;
+	bh=knW1PUsbyJ6Yx+zrY5Ax4H+LAVQSSI+Qh6CyS1LpRe8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VTsIDPtTzRl9MaSrngtGwhxDSqoFqOdzZvK5Qoaq3PJ1h+Mngj5x6vJ3KL2Tb8pLT
-	 DJC/o86h7P4GKUjei528cdhAJMAihBSud8PcYbJHkzm4zVNtjqj1BOq/MJVZnlAIot
-	 XDQraIpcBv544aAJI+2sDqKX74b8a4UJCX9aa4570ANRGm/qCuMLg8Km0bzPguLEWC
-	 P2r3D8mZj7yG0l1p0T2n+06YABRL1PYJtDLbRoYiuPJDPmgByb3URia1e07CnCzq+y
-	 i2ZrGu4nir9AFRxyZrtZ/B50sEc8ecUKH/2BsCnAVcIMygY65a4nIrDVOs0m4ZpxrY
-	 m1raSMMbUVxDg==
+	b=PGH95pQKWX1ejKbND09XgiHnJGttzeqD02/ld7K4Gn88iCoQi6isIVRfS28ieB45v
+	 jIljyxNtNwTe1/lUo9+7Bh0OWV6esE47D3xvJMWii6jiRVsLGQjvAeD20gfy/mvC9X
+	 lzqW2uZUpa7HV6XNi4DCLFeYTxZIpOVXV7saRIdYZULY0al5Fhf+yYAcRedBSVlSDM
+	 EFljS6kI5hUSVcZbkpwYLNEvcOFG+bfTKJEHVQM5oUu05XvkrBeIQW2Fk/lIT6KqLn
+	 cJckDszNRIdUZaISbOoEVaYpw14cBh8lBIgIkMxpbaY7ANbNXtschOKclrWwpJ3NA/
+	 xbrOlYZKZB/4w==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,9 +33,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 02/14] KVM: arm64: Add support for FEAT_XNX stage-2 permissions
-Date: Mon, 17 Nov 2025 14:43:13 -0800
-Message-ID: <20251117224325.2431848-3-oupton@kernel.org>
+Subject: [PATCH v2 04/14] KVM: arm64: Teach ptdump about FEAT_XNX permissions
+Date: Mon, 17 Nov 2025 14:43:15 -0800
+Message-ID: <20251117224325.2431848-5-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251117224325.2431848-1-oupton@kernel.org>
 References: <20251117224325.2431848-1-oupton@kernel.org>
@@ -47,150 +47,75 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-FEAT_XNX adds support for encoding separate execute permissions for EL0
-and EL1 at stage-2. Add support for this to the page table library,
-hiding the unintuitive encoding scheme behind generic pX and uX
-permission flags.
+Although KVM doesn't make direct use of the feature, guest hypervisors
+can use FEAT_XNX which influences the permissions of the shadow stage-2.
+Update ptdump to separately print the privileged and unprivileged
+execute permissions.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 17 +++++----
- arch/arm64/kvm/hyp/pgtable.c         | 54 ++++++++++++++++++++++++----
- 2 files changed, 58 insertions(+), 13 deletions(-)
+ arch/arm64/kvm/ptdump.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 2888b5d03757..c72149a607d6 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -89,7 +89,7 @@ typedef u64 kvm_pte_t;
- 
- #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
- 
--#define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
- 
-@@ -251,12 +251,15 @@ enum kvm_pgtable_stage2_flags {
-  * @KVM_PGTABLE_PROT_SW3:	Software bit 3.
-  */
- enum kvm_pgtable_prot {
--	KVM_PGTABLE_PROT_X			= BIT(0),
--	KVM_PGTABLE_PROT_W			= BIT(1),
--	KVM_PGTABLE_PROT_R			= BIT(2),
--
--	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
--	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-+	KVM_PGTABLE_PROT_PX			= BIT(0),
-+	KVM_PGTABLE_PROT_UX			= BIT(1),
-+	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
-+						  KVM_PGTABLE_PROT_UX,
-+	KVM_PGTABLE_PROT_W			= BIT(2),
-+	KVM_PGTABLE_PROT_R			= BIT(3),
-+
-+	KVM_PGTABLE_PROT_DEVICE			= BIT(4),
-+	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(5),
- 
- 	KVM_PGTABLE_PROT_SW0			= BIT(55),
- 	KVM_PGTABLE_PROT_SW1			= BIT(56),
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c351b4abd5db..8c813bf70b38 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -661,11 +661,36 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 
- #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
- 
-+static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
-+{
-+	bool px, ux;
-+	u8 xn;
-+
-+	px = prot & KVM_PGTABLE_PROT_PX;
-+	ux = prot & KVM_PGTABLE_PROT_UX;
-+
-+	if (!cpus_have_final_cap(ARM64_HAS_XNX) && px != ux)
-+		return -EINVAL;
-+
-+	if (px && ux)
-+		xn = 0b00;
-+	else if (!px && ux)
-+		xn = 0b01;
-+	else if (!px && !ux)
-+		xn = 0b10;
-+	else
-+		xn = 0b11;
-+
-+	*attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, xn);
-+	return 0;
-+}
-+
- static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
- 				kvm_pte_t *ptep)
- {
- 	kvm_pte_t attr;
- 	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
-+	int r;
- 
- 	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
- 			KVM_PGTABLE_PROT_NORMAL_NC)) {
-@@ -685,8 +710,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
- 		attr = KVM_S2_MEMATTR(pgt, NORMAL);
- 	}
- 
--	if (!(prot & KVM_PGTABLE_PROT_X))
--		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	r = stage2_set_xn_attr(prot, &attr);
-+	if (r)
-+		return r;
- 
- 	if (prot & KVM_PGTABLE_PROT_R)
- 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
-@@ -715,8 +741,19 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
- 		prot |= KVM_PGTABLE_PROT_R;
- 	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
- 		prot |= KVM_PGTABLE_PROT_W;
--	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN))
--		prot |= KVM_PGTABLE_PROT_X;
-+
-+	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
-+	case 0b00:
-+		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
-+		break;
-+	case 0b01:
-+		prot |= KVM_PGTABLE_PROT_UX;
-+		break;
-+	case 0b11:
-+		prot |= KVM_PGTABLE_PROT_PX;
-+		break;
-+	default:
-+	}
- 
- 	return prot;
- }
-@@ -1293,6 +1330,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	int ret;
- 	s8 level;
- 	kvm_pte_t set = 0, clr = 0;
-+	kvm_pte_t xn;
- 
- 	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
- 		return -EINVAL;
-@@ -1303,8 +1341,12 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	if (prot & KVM_PGTABLE_PROT_W)
- 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
- 
--	if (prot & KVM_PGTABLE_PROT_X)
--		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	ret = stage2_set_xn_attr(prot, &xn);
-+	if (ret)
-+		return ret;
-+
-+	set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
-+	clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
- 
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level, flags);
- 	if (!ret || ret == -EAGAIN)
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index dc5acfb00af9..bd722383d0e3 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -31,27 +31,46 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+ 		.val	= PTE_VALID,
+ 		.set	= " ",
+ 		.clear	= "F",
+-	}, {
++	},
++	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+ 		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+ 		.set	= "R",
+ 		.clear	= " ",
+-	}, {
++	},
++	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+ 		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+ 		.set	= "W",
+ 		.clear	= " ",
+-	}, {
++	},
++	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.set	= "NX",
+-		.clear	= "x ",
+-	}, {
++		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b00),
++		.set	= "px ux ",
++	},
++	{
++		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
++		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b01),
++		.set	= "PXNux ",
++	},
++	{
++		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
++		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10),
++		.set	= "PXNUXN",
++	},
++	{
++		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
++		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b11),
++		.set	= "px UXN",
++	},
++	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+ 		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+ 		.set	= "AF",
+ 		.clear	= "  ",
+-	}, {
++	},
++	{
+ 		.mask	= PMD_TYPE_MASK,
+ 		.val	= PMD_TYPE_SECT,
+ 		.set	= "BLK",
 -- 
 2.47.3
 
