@@ -1,177 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA92126C02;
-	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52F9019CD0A
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 12:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763380614; cv=none; b=L/lmC7thTpY5s9NPdb1dlpiLIMUfjT4w9d3SL7XY2l2gctjLCNNPsbzGRiOWoJP4/x99UQqNFPFcGbNDIkf4uDisbMTktwOpYjKtmplDvhHEvxoo5EcBWDc2rTVHlORuOfuM3h9x6NfZB8rpG98ZXLRBuMqbh7PpkxdoNlHq2T8=
+	t=1763384083; cv=none; b=cZTqCC/Q+ys2PDdLOB3/zNJWs9WBoyynPzi1YIvFWaiy71WFiTZmr0NlCLGmX/j+xNWsgHyvSepSSz/OvbG0Nlc4tzY0jrmeA7NP8y9TQa9SI1TslFyWJvvXJYAt4aos6D2n4/ZqgIgDLi5JmCRAHwXlSpJEZfc+wlLKkF4A2lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763380614; c=relaxed/simple;
-	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BHWPJ5vwQa67aQ3XOQDiquBAWFkM/9ZHeYm3NVDNxg0vEGPIDGhRIKCW72BlK/5DsGdH+/3D8tuMZV+vrvF5lvkTgjQLcoLo7X84X+oEsVfyWAyNABaC+AHIFOorM+4VwGaqR+lcj4b2d+1AM8UjmbkcjwgSDcoT0Uu4lKpSYQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSN0iYkk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763384083; c=relaxed/simple;
+	bh=nl0HsCOCplgzTdFedqXiVjLN/5t+82gffsxQe1egsWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a/WjvLX7gl6VBwBrGCgO6WbvqFD8eavT6UhtuQKmftUcBNiqYf6+v2pMApjmjSt9nTFE4vD99NA6VH1/cr9CxJ8I1MXqbYpg65rMRdb/NArVSF3yid+wRH8D6rkdrPSmX5pZHNFfLyHnnr5Fa5490ZyEJBBzeVi4dsBFAjUETCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xzL+vXYT; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSN0iYkk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF00C4CEF1;
-	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763380614;
-	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aSN0iYkknKkvL0mij60oWERa1I1nFDaXLZGicletaKLuv+pgGNmTLofH7Xf409+u2
-	 0SGzgm1GEyLD3Sn/ZtmvWY/mSdJ94pmrBc5Y0NmFUosSrN6kuTZjDd8HFDK056E5xe
-	 rRSubGAb3LKV1vwS/S4rbVoG4QGoTSQRTBrldmLUwfG7Bm6wHZNepJiO1emO/1/Ohn
-	 AS6ykqNckSmvEwmPREXaC3xg/QTrxhdi4fOJ1s9IBRhoQpB23WVGvY8zQTibIRJstd
-	 pIELReB4DkVkdcwBN+17uFx2D0/QEPLfCaOaog1rh2nooNzKLpiwQvbTQgLLRqweh6
-	 RVj+Pp0Q9Anlw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vKxql-00000005oR5-4B8h;
-	Mon, 17 Nov 2025 11:56:52 +0000
-Date: Mon, 17 Nov 2025 11:56:51 +0000
-Message-ID: <861plwub24.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-In-Reply-To: <CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
-References: <20251109171619.1507205-1-maz@kernel.org>
-	<20251109171619.1507205-30-maz@kernel.org>
-	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
-	<86cy5ku06v.wl-maz@kernel.org>
-	<CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
-	<86a50otsuh.wl-maz@kernel.org>
-	<CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xzL+vXYT"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4edb8d6e98aso694521cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 04:54:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763384081; x=1763988881; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=j0PeYkxx4r+5jJsF9hbC2hTxYP/y6FVcRV15IQ6oSzc=;
+        b=xzL+vXYTrpbK+DTW0+t/Km6sfRKC0hQnW/6eCX1IMbyfUZL7vmwBAcX8VYqG5I4Jd8
+         hs/jdx+/438xn8c95qZFPZVhky++BHAcCh6ODeP6zUsg+1jioMkfxfH8Fk+kO69HX9p4
+         7kj6W29mGUqksPxfhlsHtgHfVjnyNmKyV1s+6nTr8s7vyosq7vmC8OVVRCs+xWw/oX5C
+         IIjNDuHU3+ZLkGTV9wA38zKuIB1LLp6JHBmLebBy5VlGSkBk3yuhbf0RLYzNUCN4Irk2
+         P+lDzMzRjtRLFu4lXcOGcv6QZZpGg4qNTlFalymjm33uGEh1HM5dNZZhckxBMcK7CG92
+         0nWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763384081; x=1763988881;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j0PeYkxx4r+5jJsF9hbC2hTxYP/y6FVcRV15IQ6oSzc=;
+        b=NSKAVwqzHt25knu1MBWPdwYW48YvU/de30bLmiwB3jaOU2usRgM8gnUman7rQcDOpy
+         coTE5r1Emhi8q/3sUuOARt66F2TkS5KosEMYOTm/rfyJebhSGz34S8Bv6zYA8CUkKuMz
+         fA59qxC3OmTMPx7yDh8fVAFq6fV8fhE5zK86YCdiWHiCT4wHC70BmH9dLLJtFfo929rG
+         WXgQJkjd2AyXm0XdrbsL+yQT58SycTMXa0RH5fovMvYqh2PuEE62+iVuLYcr88jORSs0
+         CKliyFjWcN91VGF2rIGJf+02eb3pubth5qACS6acUlFIOURJCICZMmCw/KLN4pEJC8sl
+         0J/A==
+X-Gm-Message-State: AOJu0YxOg//utkH+ZLR7MLRXYMZ6NdAdcDARsuMbngRPMLVXltBu++X0
+	p+/bjpwe/EclAyjg0S3z3tG0SCC2i5Wef/f+Z0RRod8Anvp6ZJCa19cHikB/AyAgP9oegKyXrHX
+	hVLAL3SWOIveAxg1cOVSGsdqk3Ga+gdFEsg8o9v1IDq60DwQ/O6ASbznCYUs=
+X-Gm-Gg: ASbGnctvP/3e7as4vOrzlqd59RncaM1iMDUFzAh2w0Vd+O2xVsJU0rVBHf+Ffst4PI0
+	7yYr58ovJEVzjyw4rM0Q3nZVJAkIjOya56hRg3enUbIQGOJksysXCjsiq5eV4L2/IMBb2ROx42I
+	UT4vvhUCXsOXpZXEog5ysehfY8DPKRBQbddP488Og2XV+K+TzFpGILaJ1baOsRv5zvbkjmqPGsT
+	wBeMmiqABUtaKV6HPvcDntaeoOWSyFVS5pqlme89rYsuxh17DGNEZO9FTbwipC2Rsx5h7mRrwby
+	vllOBA==
+X-Google-Smtp-Source: AGHT+IGyUPT3wn6gNyvpaQ2io1rn1H6hCVd0hgtsdhKIadTArqZSFCNMUbFtSog8erGv//K0RpdAaxu0Wib8dQEX/+I=
+X-Received: by 2002:a05:622a:1a23:b0:4e6:eaea:af3f with SMTP id
+ d75a77b69052e-4ee029e00ddmr10626351cf.3.1763384080849; Mon, 17 Nov 2025
+ 04:54:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251117091527.1119213-1-maz@kernel.org> <CA+EHjTzudrep2hEno4RPwh8H88txiVYFoU7AyJYVWG9SFSk87Q@mail.gmail.com>
+ <867bvpt25u.wl-maz@kernel.org> <CA+EHjTyLGFUDbyr_B1uj5ZpxQA9ypCBy0ZUNRQ8M8VdLmXimnw@mail.gmail.com>
+In-Reply-To: <CA+EHjTyLGFUDbyr_B1uj5ZpxQA9ypCBy0ZUNRQ8M8VdLmXimnw@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 17 Nov 2025 12:54:04 +0000
+X-Gm-Features: AWmQ_bmjMm1Pn-peAzaMdg9UHlblAmHGoqWm7U5eN4zTrXFoNWlFVMWvJb4f2Ww
+Message-ID: <CA+EHjTx=sqkOfvoXO-gtAP9oZ+HJnfqFWzeughu+sTv9uJx7zw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the
+ dregs, the bad and the ugly)
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
+	Mark Brown <broonie@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 17 Nov 2025 08:22:05 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
+Hi Marc,
+
+On Mon, 17 Nov 2025 at 10:18, Fuad Tabba <tabba@google.com> wrote:
+>
 > Hi Marc,
-> 
-> On Fri, 14 Nov 2025 at 17:41, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Mon, 17 Nov 2025 at 09:54, Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > On Fri, 14 Nov 2025 15:53:33 +0000,
+> > Hi Fuad,
+> >
+> > On Mon, 17 Nov 2025 09:40:47 +0000,
 > > Fuad Tabba <tabba@google.com> wrote:
 > > >
 > > > Hi Marc,
 > > >
-> > > On Fri, 14 Nov 2025 at 15:02, Marc Zyngier <maz@kernel.org> wrote:
+> > > On Mon, 17 Nov 2025 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
 > > > >
-> > > > On Fri, 14 Nov 2025 14:20:46 +0000,
-> > > > Fuad Tabba <tabba@google.com> wrote:
-> > > > >
-> > > > > Hi Marc,
-> > > > >
-> > > > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
-> > > > > >
-> > > > > > Now that we are ready to handle deactivation through ICV_DIR_EL1,
-> > > > > > set the trap bit if we have active interrupts outside of the LRs.
-> > > > > >
-> > > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > > ---
-> > > > > >  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
-> > > > > >  1 file changed, 7 insertions(+)
-> > > > > >
-> > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > index 1026031f22ff9..26e17ed057f00 100644
-> > > > > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> > > > > > @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
-> > > > > >                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
-> > > > > >         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
-> > > > > >                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-> > > > > > +
-> > > > > > +       /*
-> > > > > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > > > > +        * can change behind our back without any warning...
-> > > > > > +        */
-> > > > > > +       if (irqs_active_outside_lrs(als))
-> > > > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
-> > > > > >  }
-> > > > >
-> > > > > I just tested these patches as they are on kvmarm/next
-> > > > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > > > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > > > > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > > > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > > > > when booting a non-protected guest, which triggers a bug in
-> > > > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
-> > > > >
-> > > > > This trap is happening because of setting this particular trap (TDIR).
-> > > > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > > > > kvmarm/next boots fine.
-> > > >
-> > > > This is surprising, as I'm not hitting this on actual HW. Are you
-> > > > getting a 0x18 trap? If so, is it coming from the host? Can you
-> > > > correlate the PC with what the host is doing?
+> > > > This is a follow-up to the original series [1] (and fixes [2][3])
+> > > > with a bunch of bug-fixes and improvements. At least one patch has
+> > > > already been posted, but I thought I might repost it as part of a
+> > > > series, since I accumulated more stuff:
 > > >
-> > > I should have given you that earlier, sorry.
-> > >
-> > > Yes, it's an 0x18 trap from the host (although it happens when I boot
-> > > a guest). Here is the relevant part of the backtrace addr2lined and
-> > > the full one below.
-> > >
-> > > handle_percpu_devid_irq+0x90/0x120 (kernel/irq/chip.c:930)
-> > > generic_handle_domain_irq+0x40/0x64 (include/linux/irqdesc.h:?)
-> > > gic_handle_irq+0x4c/0x110 (include/linux/irqdesc.h:?)
-> > > call_on_irq_stack+0x30/0x48 (arch/arm64/kernel/entry.S:893)
-> > >
-> > > [   28.454804] Code: d65f03c0 92800008 f9000008 17fffffa (d4210000)
-> > > [   28.454873] kvm [266]: Hyp Offset: 0xfff1205c3fe00000
-> > > [   28.455157] Kernel panic - not syncing: HYP panic:
-> > > [   28.455157] PS:204023c9 PC:000e5fa4413e39bc ESR:00000000f2000800
-> > > [   28.455157] FAR:ffff800082733d3c HPFAR:0000000000500000 PAR:0000000000000000
+> > > I'd like to test this series as well. Do you have it applied in one of
+> > > your branches at
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git
+> > > , or which commit is it based on?
 > >
-> > I expect you have a write to ICC_DIR_EL1 at this address?
-> 
-> It almost surely must be, but tracking it down hasn't been that easy.
-> That said, I think it's ending up in gic_eoimode1_eoi_irq(), which
-> calls gic_write_dir() if !gic_arm64_erratum_2941627_needed(d).
-> 
-> I wonder if your hardware needs that erratum.
+> > I just pushed a new branch
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow-fixes
+> >
+> > that is based on -rc5, kvmarm/next, kvmarm-fixes-6.18-rc3 plus these
+> > patches. Let me know how this fares for you.
+>
+> Great! I've applied the pKVM patches on top of it. So far so good.
+> I'll test this series more thoroughly and review it as well. Stay tuned...
 
-No, it doesn't. And this erratum only kicks in if the deactivated
-interrupt is an SPI that has been moved to another CPU while being
-handled (i.e. never).
+For this series, and the series that it sits on top of (i.e.,
+https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow-fixes):
 
-It really isn't related to the GIC itself (which the erratum above is
-about), but to the CPU interface, and whether TDIR applies to
-ICC_DIR_EL1 on top of the virtual variant.
+Tested-by: Fuad Tabba <tabba@google.com>
 
-The architecture "deprecates" not trapping, and QEMU abides by this
-deprecation. HW that predates the deprecation didn't get the message,
-oddly enough... Neither did I, until you reported the crash!
+On QEMU, nVHE, hVHE protected mode, and protected VMs (with the latest
+Android pKVM patches applied on top).
 
 Thanks,
+/fuad
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Cheers,
+> /fuad
+>
+> >
+> > Thanks,
+> >
+> >         M.
+> >
+> > --
+> > Without deviation from the norm, progress is not possible.
