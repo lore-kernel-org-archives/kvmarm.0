@@ -1,55 +1,55 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC53E33769F
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 18:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9419C335BCC
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 18:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763405323; cv=none; b=PG6KAq5m00JSUc+en949gpiYzQQAL0mhWqiT0azS5f+txKSZIFhvuGvtoFOT6KKQTCblKlIRdu/xQk0cjtDy2ueuzjIub00e/uYUuxOpVYiSvBCf/W6BYeJ1S5Xnhbf47rPZvg9shZ68aD/K64LivOwc685ODBWbhwQiPR988tg=
+	t=1763405323; cv=none; b=OPvExtwS5+5X17+Nl8vR6YFoJz0tiOMTyNLOppcUDFZl+ioK7ETYOTVETJRhNzdjSBs5bRWfTRabCJZhcYOzXKTvjGKVbXv2uumB6L/l+vlO28AoGJuUjbeLYQ+8gLMKCIHhii6RtW2JDe1zw9YaqiC26hOvmWpanG+lqFzpmI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763405323; c=relaxed/simple;
-	bh=X1SB8xBsyDP9CObrHvadpvuvmKMLHDjQeJHpDgXwBrU=;
+	bh=INcTJzS700s05ZGwDrQtXEsdidTABqC6bRW5Y2ydOoI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KGFUK31UTMvvC755GEWQV55kLcoiVyfwxdSB+DGj6k86fCJD39OUJ4quBDWd9bhVCugJeZhhyUN0C46SwSKHsRDxm9Q32hoKQMOj5eM4EYbhIy6GwdJL6NB0eL7REsmtYNNplC5VC8betb0ot5T5SP4TyrJ77TJ5X89Um/gYL4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HUPlv6hb; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=sdLF40tqBEtF5TZsIv+p7jQ0e49faAI1kXdaT76Tzv2BmEBewgg1ZuHjqsc8LaSXkSXplcpF7fNXkVEKzr2URpmXlx0U65J0zfmNmJ67EerJY64kxU5/8MkVRaztPYRmioaKru4WXwF5ayJEvDWN+IhoSQhUiDSAJSjkM2XPKeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bQS3szry; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HUPlv6hb"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-42b2e448bd9so2994378f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 10:48:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bQS3szry"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b735efd650fso515445366b.0
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 10:48:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763405318; x=1764010118; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763405319; x=1764010119; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VXBWv8Dw5hE8mlU4Sm4VTohDwotOri7T9rWgww1xmos=;
-        b=HUPlv6hbdLEasy1TJDwPw/g3D/wY3JxLgf75UAi6l1pFIvXig9/dC6Oyf6CRftGmHO
-         QA/6pXcqXv7mFG0jBZKDgA7W2T98T2CuXMR6b/2GwCwNwkPNCLjuvEzwmhcdu7E7r26b
-         gWK76FRWCzG4KtcFl+wTSsbk4S+amj5xjoqbr9p3g8IeCb8ZmcfeBciIU1szoJouGEE4
-         lKksCdEJzD3qtRFx06qpf7GZXYDWYBOhl/ssJzweLaJxAzsSo/s6tWbW0SqWR76AEz1w
-         SIkoiyix6M4f++aOckTRKvQDWZDORVU7dStVDa+fdGxCHxRv1ABjgFt/DTVDDxCZP7Lm
-         +RIA==
+        bh=6trFz58Gu4UJEu1ThwWz2XtrxsLtl476+uXL3Pe7jcQ=;
+        b=bQS3szryJjnDjLnE+uKWlItSvV3U3MHLtx7F89xQ+p3h6wm3NhQiVtAf0kwkiTnxRd
+         C7ZuuZhxLZ/ZGO9CH5XH56h6L6cmm6XYPPW8q0q66s9ny37QcNVyMcoN/rKPBI6bwIO4
+         Td7+pYpTy3dNyntSXKnoziyQ3sP3HJke6TeBN0KQIf8bIYtTgc8VkZD0TzFY2rLwB23r
+         /Xk2VcS8xgtMzAeY32qp2Hg4XSaHd9B6XkiOm5u6ggyIATywy/cps4T6bAl55bz62SZb
+         K6+6KIvC7gNhUj5CdXg7RrJ/GzPjmu/jIdOl9/T5lPFa4OZMhDQeAOLEJjW3Zq3rZycF
+         f+1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763405318; x=1764010118;
+        d=1e100.net; s=20230601; t=1763405319; x=1764010119;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VXBWv8Dw5hE8mlU4Sm4VTohDwotOri7T9rWgww1xmos=;
-        b=YC85eHEu52Kr+N7QUDqa89i6DVUInQEzJgxJ5AAd6VqyaS0CZtIUXQotkp5C5j+MrE
-         pgeK98+Wm4r6ZXyGFH54+W+lUbVeA8tDNltXgLKgVkHRqcE0LluMpjpmkXZXhKZiCUh8
-         HxbDWQhOTcnu2xvX1AQvXPaxogddK5+cM4i077JO8d9kqNwdU2yy2eg5W4KGY43NAcwG
-         gnTrKk9lPs7VEJn7zhj2s5mCg+APy5SrVmm5QJzylRLEtLH5do4K8sVg9kJwtHnTRbSA
-         34bIVCVKdzgoZMBKREjWBWfsDlW1roAfE+6XOR1S56sYWDYgsqIg0xl1LDjUXHYwbvZp
-         1fqg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsyBZ0M+mY+2Sa0eHeecG4KfC0HrD3jURGWch6SScIxmOEHSOu2YYjkUgwiUv7gNludAM8VqA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YylBoTew8OALj9EZ+TFEe7Ig1OvUB8VrO5HZ8FsF8vzAyoc0lA3
-	5XjXzNLL4eXGABDdcO2hxrlDk2fj9Ti8Wu+l3a8nZ/YWBglS1JBy0He7xwkocvqAlXyt2ZGRg72
-	5TP/KVcJX8y7IUw==
-X-Google-Smtp-Source: AGHT+IHQBDWwjO/s1zZNuEFY1oL5kAjhY98F1o68vfkU7yeDw2zqyTvhCAFTbYHvFaunhrv4os5cxfn9oBJJZA==
-X-Received: from wrxe9.prod.google.com ([2002:a05:6000:1209:b0:428:563f:ce93])
+        bh=6trFz58Gu4UJEu1ThwWz2XtrxsLtl476+uXL3Pe7jcQ=;
+        b=o3NKSgCLsInCgPLHta2/kQGeXVrqNK/Cw1RjYCrC32Y/Y+oDadkBYsRnSIAjF32+JE
+         qzqDr2tirkkh//6IVwIwySvU/iboK2QVAbP0zATm5xXxcZfiMi0eGMeHpEfOMwWQ9+K0
+         XDZPMFDcx8213Aso4bs8orpve0ppSp9RKvdQ5WBWXPyxsAft7IMMxnCWxorC2iB6ltiw
+         rJNqf2W2ODucYDk9IoOiaNvOGbZp+L3CWOSGh6g50bPq+cmbYMOrWQjB9Ka20t1Qyfez
+         3Fwx8e6GD1T89/bu5cQHiVbXv1YghfWzWwiMr/pwB2Lj2UMjAwkKqwJxmr7jRFw91a8e
+         m6VA==
+X-Forwarded-Encrypted: i=1; AJvYcCWf64R5u9I3zkBVN3Vj9OYcmkXmi+eS6dnos5GxU8bGzulsd/saobD7dd1EX8c6JhiF5LhTK0o=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw5i4zT+D8gOgBC3t6XoypwMj2ElTLOi/3AwtXMlWK4qDlRD/JD
+	L2sLXgpM2MVGSWmT0/zywU2nuX/zQSGhfDpvA+VD0Mn9595c/IznhM5lBoM+ZPsfYk1RNuQRhQo
+	jk75PXizeoiMEUw==
+X-Google-Smtp-Source: AGHT+IE3+viO3srJHAcHB3c5RRKlLg8klxOmp1l9jNQ0CtxcTZZi09dcfnPoyGFkFEx9s/uAX82FyaMdOVjXZg==
+X-Received: from ejsr3.prod.google.com ([2002:a17:906:7fc3:b0:b6d:5546:e475])
  (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6000:615:b0:42b:3a1b:f71a with SMTP id ffacd0b85a97d-42b5934e2b6mr13388046f8f.23.1763405318003;
+ 2002:a17:907:3c90:b0:b70:b077:b94b with SMTP id a640c23a62f3a-b7367b99c79mr1398956966b.43.1763405318837;
  Mon, 17 Nov 2025 10:48:38 -0800 (PST)
-Date: Mon, 17 Nov 2025 18:47:59 +0000
+Date: Mon, 17 Nov 2025 18:48:00 +0000
 In-Reply-To: <20251117184815.1027271-1-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251117184815.1027271-1-smostafa@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251117184815.1027271-13-smostafa@google.com>
-Subject: [PATCH v5 12/27] iommu/arm-smmu-v3-kvm: Add SMMUv3 driver
+Message-ID: <20251117184815.1027271-14-smostafa@google.com>
+Subject: [PATCH v5 13/27] iommu/arm-smmu-v3-kvm: Add the kernel driver
 From: Mostafa Saleh <smostafa@google.com>
 To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
 	kvmarm@lists.linux.dev, iommu@lists.linux.dev
@@ -71,111 +71,128 @@ Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
 	qperret@google.com, tabba@google.com, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+A platform driver is created to probe the SMMUs, which then creates
+aux devices for the emulated SMMUs.
 
-Add the skeleton for an Arm SMMUv3 driver at EL2.
+Then the driver registers with KVM.
 
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Next, the SMMUv3 driver will probed the aux devices.
+
 Signed-off-by: Mostafa Saleh <smostafa@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/Makefile              |  5 ++++
- drivers/iommu/arm/Kconfig                     |  9 ++++++
- .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 29 +++++++++++++++++++
- .../iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h  | 16 ++++++++++
- 4 files changed, 59 insertions(+)
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
- create mode 100644 drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
+ drivers/iommu/arm/arm-smmu-v3/Makefile        |  1 +
+ .../iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c   | 91 +++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 8210788d6f88..197685817546 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -32,6 +32,11 @@ hyp-obj-y += ../../../kernel/smccc-call.o
- hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
- hyp-obj-y += $(lib-objs)
+diff --git a/drivers/iommu/arm/arm-smmu-v3/Makefile b/drivers/iommu/arm/arm-smmu-v3/Makefile
+index c9ce392e6d31..c3fc5c4a4a1e 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/Makefile
++++ b/drivers/iommu/arm/arm-smmu-v3/Makefile
+@@ -4,5 +4,6 @@ arm_smmu_v3-y := arm-smmu-v3.o arm-smmu-v3-common-lib.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_IOMMUFD) += arm-smmu-v3-iommufd.o
+ arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_SVA) += arm-smmu-v3-sva.o
+ arm_smmu_v3-$(CONFIG_TEGRA241_CMDQV) += tegra241-cmdqv.o
++arm_smmu_v3-$(CONFIG_ARM_SMMU_V3_PKVM) += arm-smmu-v3-kvm.o
  
-+HYP_SMMU_V3_DRV_PATH = ../../../../../drivers/iommu/arm/arm-smmu-v3
-+
-+hyp-obj-$(CONFIG_ARM_SMMU_V3_PKVM) += $(HYP_SMMU_V3_DRV_PATH)/pkvm/arm-smmu-v3.o \
-+	$(HYP_SMMU_V3_DRV_PATH)/arm-smmu-v3-common-lib.o
-+
- ##
- ## Build rules for compiling nVHE hyp code
- ## Output of this folder is `kvm_nvhe.o`, a partially linked object
-diff --git a/drivers/iommu/arm/Kconfig b/drivers/iommu/arm/Kconfig
-index ef42bbe07dbe..7eeb94d2499d 100644
---- a/drivers/iommu/arm/Kconfig
-+++ b/drivers/iommu/arm/Kconfig
-@@ -142,3 +142,12 @@ config QCOM_IOMMU
- 	select ARM_DMA_USE_IOMMU
- 	help
- 	  Support for IOMMU on certain Qualcomm SoCs.
-+
-+config ARM_SMMU_V3_PKVM
-+	bool "ARM SMMUv3 support for protected Virtual Machines"
-+	depends on KVM && ARM64 && ARM_SMMU_V3=y
-+	help
-+	  Enable a SMMUv3 driver in the KVM hypervisor, to protect VMs against
-+	  memory accesses from devices owned by the host.
-+
-+	  Say Y here if you intend to enable KVM in protected mode.
-diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
+ obj-$(CONFIG_ARM_SMMU_V3_KUNIT_TEST) += arm-smmu-v3-test.o
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
 new file mode 100644
-index 000000000000..fa8b71152560
+index 000000000000..ca12560639c5
 --- /dev/null
-+++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-@@ -0,0 +1,29 @@
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3-kvm.c
+@@ -0,0 +1,91 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * pKVM hyp driver for the Arm SMMUv3
++ * pKVM host driver for the Arm SMMUv3
 + *
 + * Copyright (C) 2022 Linaro Ltd.
 + */
-+#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
++#include <asm/kvm_pkvm.h>
 +
-+#include <nvhe/iommu.h>
++#include <linux/auxiliary_bus.h>
++#include <linux/of_platform.h>
++#include <linux/platform_device.h>
 +
-+#include "arm_smmu_v3.h"
++#include "arm-smmu-v3.h"
++#include "pkvm/arm_smmu_v3.h"
 +
-+size_t __ro_after_init kvm_hyp_arm_smmu_v3_count;
-+struct hyp_arm_smmu_v3_device *kvm_hyp_arm_smmu_v3_smmus;
++extern struct kvm_iommu_ops kvm_nvhe_sym(smmu_ops);
 +
-+static int smmu_init(void)
++static size_t smmu_hyp_pgt_pages(void)
 +{
-+	return -ENOSYS;
++	/*
++	 * SMMUv3 uses the same format as stage-2 and hence have the same memory
++	 * requirements, we add extra 500 pages for L2 ste.
++	 */
++	if (of_find_compatible_node(NULL, NULL, "arm,smmu-v3"))
++		return host_s2_pgtable_pages() + 500;
++	return 0;
 +}
 +
-+static void smmu_host_stage2_idmap(phys_addr_t start, phys_addr_t end, int prot)
++static struct platform_driver smmuv3_nesting_driver;
++static int smmuv3_nesting_probe(struct platform_device *pdev)
 +{
++	return 0;
 +}
 +
-+/* Shared with the kernel driver in EL1 */
-+struct kvm_iommu_ops smmu_ops = {
-+	.init				= smmu_init,
-+	.host_stage2_idmap		= smmu_host_stage2_idmap,
-+};
-diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
-new file mode 100644
-index 000000000000..f6ad91d3fb85
---- /dev/null
-+++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm_smmu_v3.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __KVM_ARM_SMMU_V3_H
-+#define __KVM_ARM_SMMU_V3_H
++static int kvm_arm_smmu_v3_register(void)
++{
++	size_t nr_pages = smmu_hyp_pgt_pages();
++	int ret;
 +
-+#include <asm/kvm_asm.h>
++	if (!is_protected_kvm_enabled() || !nr_pages)
++		return 0;
 +
-+struct hyp_arm_smmu_v3_device {
++	ret = platform_driver_probe(&smmuv3_nesting_driver, smmuv3_nesting_probe);
++	if (ret)
++		return ret;
++
++	return kvm_iommu_register_driver(kern_hyp_va(lm_alias(&kvm_nvhe_sym(smmu_ops))),
++					 nr_pages);
 +};
 +
-+extern size_t kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count);
-+#define kvm_hyp_arm_smmu_v3_count kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_count)
++static int smmu_create_aux_device(struct device *dev, void *data)
++{
++	static int dev_id;
++	struct auxiliary_device *auxdev;
 +
-+extern struct hyp_arm_smmu_v3_device *kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_smmus);
-+#define kvm_hyp_arm_smmu_v3_smmus kvm_nvhe_sym(kvm_hyp_arm_smmu_v3_smmus)
++	auxdev = __devm_auxiliary_device_create(dev, "protected_kvm",
++						"smmu_v3_emu", NULL, dev_id++);
++	if (!auxdev)
++		return -ENODEV;
 +
-+#endif /* __KVM_ARM_SMMU_V3_H */
++	auxdev->dev.parent = dev;
++
++	return 0;
++}
++
++static struct platform_driver smmuv3_nesting_driver;
++static int kvm_arm_smmu_v3_post_init(void)
++{
++	if (!is_protected_kvm_enabled())
++		return 0;
++
++	WARN_ON(driver_for_each_device(&smmuv3_nesting_driver.driver, NULL,
++				       NULL, smmu_create_aux_device));
++
++	return 0;
++}
++
++static const struct of_device_id smmuv3_nested_of_match[] = {
++	{ .compatible = "arm,smmu-v3", },
++	{ },
++};
++
++static struct platform_driver smmuv3_nesting_driver = {
++	.driver = {
++		.name = "smmuv3-nesting",
++		.of_match_table = smmuv3_nested_of_match,
++	},
++};
++late_initcall(kvm_arm_smmu_v3_post_init);
++subsys_initcall(kvm_arm_smmu_v3_register);
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
