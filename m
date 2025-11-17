@@ -1,148 +1,177 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B15329373
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 11:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA92126C02;
+	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763380132; cv=none; b=cbH90LCqbgVOnAslACV6Dc9aRl3za2QxK/5i/ZojiDr5LTb2/Oqi7IHBUuEvEPR8ZuJJ+2OhgEc2pyAEvXVvLpWAysjxeuh+B6c3PDtDmhCXv2FWHFXjer3/6P2bscaDww2Mq6+3XK0f+URhkc2GHie0wL+oQPydovnziehxpNQ=
+	t=1763380614; cv=none; b=L/lmC7thTpY5s9NPdb1dlpiLIMUfjT4w9d3SL7XY2l2gctjLCNNPsbzGRiOWoJP4/x99UQqNFPFcGbNDIkf4uDisbMTktwOpYjKtmplDvhHEvxoo5EcBWDc2rTVHlORuOfuM3h9x6NfZB8rpG98ZXLRBuMqbh7PpkxdoNlHq2T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763380132; c=relaxed/simple;
-	bh=sRlq8ZsHJ8wENkGdYQx+aafifaQb0Y8TbYSZjuDARps=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OhDYzM4gL7dEKnP/2YMcCL57Bux6leb60qWtLYt4FhGupyE1BtvSrWhq4BYXspT3gjXVpf7p2aCE6HeqCcjCTZr6UB/cJIOeZHMFQs9zUlLkHwre2L3lmHsUwi49IRT1C0FOorvuK++NYykXDciHxEx2e2ucgTIIU9+4JRov8ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1jkt4Sj+; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1763380614; c=relaxed/simple;
+	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BHWPJ5vwQa67aQ3XOQDiquBAWFkM/9ZHeYm3NVDNxg0vEGPIDGhRIKCW72BlK/5DsGdH+/3D8tuMZV+vrvF5lvkTgjQLcoLo7X84X+oEsVfyWAyNABaC+AHIFOorM+4VwGaqR+lcj4b2d+1AM8UjmbkcjwgSDcoT0Uu4lKpSYQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aSN0iYkk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1jkt4Sj+"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee243b98caso191311cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 03:48:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763380130; x=1763984930; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wtFMwliyeURMAMFY1byC+UBdCK6dtQy078PTE9BuABk=;
-        b=1jkt4Sj+THzaUhxLkOBrjKViPCXffvl3Z83dMrVT9vICh4KUcTKrjxS1vntVBX6d4y
-         VcLmmWbFwVHHbvrAEwP47YFhfglxXanLwHjJhetaLbHD4Jvtd4Qkyz9BxO9pxIhID2c+
-         cB0T1IIdwvrxq4u7yWAlwlnM92sicjf6JlyDB3F0N948qRuiUTakTIVGwt7Edoo7czVl
-         OqM9BUc23ZSSvs0hIB2xxGEWK1bhPPGcdQacRQl/6Wz+4Hdu9C1FebwHES05FYrp1LyG
-         UZ3PmpTH0LM2ue/3AQXvfUtq7mwET9tS5WcFmgHFmleUVd4ULvZPGc6Tn8OcTokA4skH
-         01Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763380130; x=1763984930;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wtFMwliyeURMAMFY1byC+UBdCK6dtQy078PTE9BuABk=;
-        b=faIz7UCz+g+RAsetETU9oN5l50wtx3nENaIR3MkCWPC7wqYGCAuShVqFeXL3BcJnEF
-         daVG0JGVWmsEMyLY3FkhdP7bUHlcMF2AbtgDycRmGelEE+QQllRxs5XoE5n1Xoo5qHfx
-         7eQP2VMVF+JUv08GlFnn4O0/k/LL1A0Hj7G5eKjw726ffMYannRa0l0irTE2D+EoefL6
-         xhO/QBen4UBw0FMfboudhhu/iyiJvaiyqc/Ho942sK8EyrvEQScII6CeE59GJZyDb4Y8
-         7lZPAiqEgrttL9p/hqTlj0rSlyPa1ormYmKkz+9apNCgcwdUqcBDEp4hNKiiEakLx6Fp
-         WHVA==
-X-Gm-Message-State: AOJu0YxzKDRNbF1JFkRW9YKasVv3UaG1R/m+jFaPmpLeY5IgE6XbB/dn
-	iMYrVA0ASv27vqvT+mVnOd2NaSu762bRVb7SJdTzWhE9V+sKBBrJRT5mxhIE5HJIbZB7MmDfmKy
-	TBtj/bB16wLVjScy12hOLC1kmpynqTlzhLHnLj2pq
-X-Gm-Gg: ASbGncvnZ+cdmJHW61MJYjvdCdMuZDjzpVcmZMWb1EYHUdE5kSt+QXScK4xAGxN/nSp
-	pBh/aI0xyGt+lGB+YDn87Y4nQu8tlAilowXB0WoxrnydinXPFipn0l6yz3+N5gG0fHgzJKmX/Zr
-	EBpLfFfUHox0woh0Irl1nM+SmeFYOQBVIbVfI8EnMYGTBgByL+RE62RK+lNtA+u25mJo+YCsf63
-	4itJKildS6SXlcYdx2LiNf26gSAiW87C3hzHDLu8y7tfmD12boPeSXFCQ6Km91P8omU/Hs=
-X-Google-Smtp-Source: AGHT+IEHIBrDsl1tNBXJlZjvy3Cf3bvvIt0plNzv8yp90Dy54B0sd0uogGQ1BYNz1nQ2J5pl3F6LJlVNsJl1l4fGJHA=
-X-Received: by 2002:a05:622a:4f13:b0:4ed:ff77:1a87 with SMTP id
- d75a77b69052e-4ee02a994a9mr8359641cf.19.1763380129366; Mon, 17 Nov 2025
- 03:48:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aSN0iYkk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF00C4CEF1;
+	Mon, 17 Nov 2025 11:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763380614;
+	bh=kB9ZXKohVrn5IEX6S+MiFF63aw8Py7ecNIx3DP7Yi+E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aSN0iYkknKkvL0mij60oWERa1I1nFDaXLZGicletaKLuv+pgGNmTLofH7Xf409+u2
+	 0SGzgm1GEyLD3Sn/ZtmvWY/mSdJ94pmrBc5Y0NmFUosSrN6kuTZjDd8HFDK056E5xe
+	 rRSubGAb3LKV1vwS/S4rbVoG4QGoTSQRTBrldmLUwfG7Bm6wHZNepJiO1emO/1/Ohn
+	 AS6ykqNckSmvEwmPREXaC3xg/QTrxhdi4fOJ1s9IBRhoQpB23WVGvY8zQTibIRJstd
+	 pIELReB4DkVkdcwBN+17uFx2D0/QEPLfCaOaog1rh2nooNzKLpiwQvbTQgLLRqweh6
+	 RVj+Pp0Q9Anlw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vKxql-00000005oR5-4B8h;
+	Mon, 17 Nov 2025 11:56:52 +0000
+Date: Mon, 17 Nov 2025 11:56:51 +0000
+Message-ID: <861plwub24.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
+In-Reply-To: <CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-30-maz@kernel.org>
+	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
+	<86cy5ku06v.wl-maz@kernel.org>
+	<CA+EHjTzi9Q9hqAu1Xk51hO3uz0FdUGjdPSViN4RAD6tuXJkvYQ@mail.gmail.com>
+	<86a50otsuh.wl-maz@kernel.org>
+	<CA+EHjTwcf7HXypmt-1gS2G8GK5iBt3VQrpmRiHysr571J96VvA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-6-maz@kernel.org>
- <CA+EHjTxVr7uk8Ofhb2VHjDw+LfC4ZSz4dDun5+xLcnRQy5AKaQ@mail.gmail.com> <86346cubqo.wl-maz@kernel.org>
-In-Reply-To: <86346cubqo.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 17 Nov 2025 11:48:11 +0000
-X-Gm-Features: AWmQ_bnWedPYEhHQPg2C4X-v3VYqSp4JpRxkKgnh4axAij7gQDfBobnagYWNTiE
-Message-ID: <CA+EHjTxB6qf80zLYQJnpr=beJWg2CiqcbTwPhodgtBceEGLVUw@mail.gmail.com>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Mark Brown <broonie@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 at 11:42, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 17 Nov 2025 11:35:18 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
+On Mon, 17 Nov 2025 08:22:05 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, 14 Nov 2025 at 17:41, Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > Hi Marc,
+> > On Fri, 14 Nov 2025 15:53:33 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Fri, 14 Nov 2025 at 15:02, Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > On Fri, 14 Nov 2025 14:20:46 +0000,
+> > > > Fuad Tabba <tabba@google.com> wrote:
+> > > > >
+> > > > > Hi Marc,
+> > > > >
+> > > > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
+> > > > > >
+> > > > > > Now that we are ready to handle deactivation through ICV_DIR_EL1,
+> > > > > > set the trap bit if we have active interrupts outside of the LRs.
+> > > > > >
+> > > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > > > ---
+> > > > > >  arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
+> > > > > >  1 file changed, 7 insertions(+)
+> > > > > >
+> > > > > > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> > > > > > index 1026031f22ff9..26e17ed057f00 100644
+> > > > > > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > > > > > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > > > > > @@ -42,6 +42,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
+> > > > > >                 ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
+> > > > > >         cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
+> > > > > >                 ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
+> > > > > > +
+> > > > > > +       /*
+> > > > > > +        * Note that we set the trap irrespective of EOIMode, as that
+> > > > > > +        * can change behind our back without any warning...
+> > > > > > +        */
+> > > > > > +       if (irqs_active_outside_lrs(als))
+> > > > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
+> > > > > >  }
+> > > > >
+> > > > > I just tested these patches as they are on kvmarm/next
+> > > > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
+> > > > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
+> > > > > additional pKVM patches. I tried running it with pKVM (non-protected)
+> > > > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
+> > > > > when booting a non-protected guest, which triggers a bug in
+> > > > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
+> > > > >
+> > > > > This trap is happening because of setting this particular trap (TDIR).
+> > > > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
+> > > > > kvmarm/next boots fine.
+> > > >
+> > > > This is surprising, as I'm not hitting this on actual HW. Are you
+> > > > getting a 0x18 trap? If so, is it coming from the host? Can you
+> > > > correlate the PC with what the host is doing?
+> > >
+> > > I should have given you that earlier, sorry.
+> > >
+> > > Yes, it's an 0x18 trap from the host (although it happens when I boot
+> > > a guest). Here is the relevant part of the backtrace addr2lined and
+> > > the full one below.
+> > >
+> > > handle_percpu_devid_irq+0x90/0x120 (kernel/irq/chip.c:930)
+> > > generic_handle_domain_irq+0x40/0x64 (include/linux/irqdesc.h:?)
+> > > gic_handle_irq+0x4c/0x110 (include/linux/irqdesc.h:?)
+> > > call_on_irq_stack+0x30/0x48 (arch/arm64/kernel/entry.S:893)
+> > >
+> > > [   28.454804] Code: d65f03c0 92800008 f9000008 17fffffa (d4210000)
+> > > [   28.454873] kvm [266]: Hyp Offset: 0xfff1205c3fe00000
+> > > [   28.455157] Kernel panic - not syncing: HYP panic:
+> > > [   28.455157] PS:204023c9 PC:000e5fa4413e39bc ESR:00000000f2000800
+> > > [   28.455157] FAR:ffff800082733d3c HPFAR:0000000000500000 PAR:0000000000000000
 > >
-> > On Mon, 17 Nov 2025 at 09:22, Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
-> > > effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
-> > > interrupt is vain. This only hits memory, and the guest hasn't cleared
-> > > anything -- the MI will fire.
-> > >
-> > > For example, running the vgic_irq test under NV results in about 800
-> > > maintenance interrupts being actually handled by the L1 guest,
-> > > when none were expected.
-> > >
-> > > As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
-> > > ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
-> > > the host in NV, giving it the opportunity to retire the pending
-> > > MI. With this, the above test tuns to completion without any MI
-> > > being actually handled.
-> >
-> > nit: tuns->runs
-> >
-> >
-> > >
-> > > Yes, this is really poor...
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
-> > >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
-> > >  2 files changed, 11 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > > index 99342c13e1794..f503cf01ac82c 100644
-> > > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > > @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
-> > >         }
-> > >
-> > >         write_gicreg(0, ICH_HCR_EL2);
-> > > +
-> > > +       /*
-> > > +        * Hack alert: On NV, this results in a trap so that the above
-> > > +        * write actually takes effect...
-> > > +        */
-> > > +       isb();
-> > > +       read_gicreg(ICH_MISR_EL2);
-> > >  }
-> >
-> > nit: is it worth gating this with "ARM64_HAS_NESTED_VIRT"?
->
-> This is in a *guest*, which knows nothing about being virtualised!
+> > I expect you have a write to ICC_DIR_EL1 at this address?
+> 
+> It almost surely must be, but tracking it down hasn't been that easy.
+> That said, I think it's ending up in gic_eoimode1_eoi_irq(), which
+> calls gic_write_dir() if !gic_arm64_erratum_2941627_needed(d).
+> 
+> I wonder if your hardware needs that erratum.
 
-Nested makes my head hurt :D
+No, it doesn't. And this erratum only kicks in if the deactivated
+interrupt is an SPI that has been moved to another CPU while being
+handled (i.e. never).
 
-Cheers,
-/fuad
+It really isn't related to the GIC itself (which the erratum above is
+about), but to the CPU interface, and whether TDIR applies to
+ICC_DIR_EL1 on top of the virtual variant.
 
->
-> > Otherwise,
-> > Reviewed-by: Fuad Tabba <tabba@google.com>
->
-> Thanks!
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+The architecture "deprecates" not trapping, and QEMU abides by this
+deprecation. HW that predates the deprecation didn't get the message,
+oddly enough... Neither did I, until you reported the crash!
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
