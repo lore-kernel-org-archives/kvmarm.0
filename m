@@ -1,186 +1,149 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B354342517
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 18:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E3030103D
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 22:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763405338; cv=none; b=VLVMiJKIfrBaDRZ9PZzqdXjwisaVeuVUamIf5IncYMD1FlW0oVEBlQV0MLy77ciu1tlfo491Z63+/RWVxHoleBMhNwIqil83JNwbYoOz/mQRoLdOdvLz/qKfTATTsNMW9WtS5sCMs8rQ7i2Fwh3Owg55jxPONGXwIxvmbQH+BUA=
+	t=1763417946; cv=none; b=oUcGMnKpLYjehctEw47EOHXjQqmoB++VXun9fVryGfRkwFqVwPtwFazuDVpgOL2lrZCZ/qObMlyWIG/x1VNc+kYjKer7pLMkMvtrUdhB7qDFQ562AEZPGOnRJS2ngTE2gl0QQ+Ro8aOX75/5DitAgVztVs9bYZDS6PP1ee16rFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763405338; c=relaxed/simple;
-	bh=U01zuPmHBR4NpjwfbFt/lTc1f2okLAeIr+T5ztn4mi4=;
+	s=arc-20240116; t=1763417946; c=relaxed/simple;
+	bh=m+SUNOSsRGNg6e4fertlZE3XZICpzyYhXKuDwT0ifo4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rFFzxHzkPksYze0xNMSbhZ7hoz0lBxPVEmpzSOERlFp6h6iu6YZDxrCyCmZ6GxLeI1ur/NK3GME6dd3YQ7VpwU+X0RiOnRLvG0MW3A1AZ50CgH1biFJv8y/oCYEu0KFg4A4Y4fiyS/c55rmKB16GfXJls3cMUtgxE5JRRxiN4RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rzcwYY5p; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=KD2Ib4oWEWD3QUH1WLVIX1io2OJ9gj130pAPr0OCWza4K8w0CzqwTF/blBeOhX1uy3pT/Lupyj40/BqpF6eQs+WYOrgd2w94aMI+zO06JvK/9E4Z9HSHQhh6hr+r8fOTk8/eRIX8pYbiX2/qRL8zhFRoZEr/46MCKtWvK1WQ5Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0EHtZivr; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--smostafa.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rzcwYY5p"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477a0ddd1d4so12504755e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 10:48:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0EHtZivr"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-297e66542afso159805245ad.3
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 14:19:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763405333; x=1764010133; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763417945; x=1764022745; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yqv9vt6rYdUcUmbSADKPrtDVgWOjgzH7G7qmk1O24d8=;
-        b=rzcwYY5pHRshkvIXAlSGrPjV+hyD6CzPxuUHw9NvB9+WKYiVX5ceO+2zAAu3/WraIY
-         LpZAQe1C+Erf/oCWYApSRriwJR/AfsDHFSOodH4+oDNFhLSu89aLW1jyIbnm1d0IolR6
-         tIiPg04WFspOqwJlDn5T1/jYskGOsziXPxrwqtcFvUY9R+x6iuaGkV+rl47j3C6QN5oE
-         Q86oF6vfR+G1ZHvV7X6ZlH2p7YyG8FEN3OjGrhN2f+8U58jbBwRF93MH++ZrH4dRmTPG
-         VRBz978FPbp5N2QlIVZU71UWyEevujIFw2ipj+FoYDwka/o2lB99eqAYylPcBYszT6T8
-         ac/g==
+        bh=jketl0ykgqH6CHwpfbMW0pLhEMzOqTEcodUiqzB4Vy0=;
+        b=0EHtZivr5lEkBYPxSfEoMlt8cClCaaOAPfaI/8Acq284d4AdFfIwHF8itjprPqwzmy
+         L0ZzIUIz5ffR73L3aNBVb/UlcVwiPF2+DPZLTKMz7p49hAcRt6YRThpvXLwdWka+M5XF
+         boDTRHta6YrX/IvC/zD/ss+zEUbJns2vV9AdH0b+woC0tblcCFbm4+Rx8YbqWqreDdPL
+         k/JaMF6XoGyG05SSoxeT0to6McaIraWfye35QpHR3PqDxa3/xdGRakXMg60jUm6EwCNr
+         7ju7caoo+/rS/QRPgjed7OX48KoXpdbMIbd3K71FLSHWn44QH91Mpgw5I3CbUDHSuuYg
+         NW4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763405333; x=1764010133;
+        d=1e100.net; s=20230601; t=1763417945; x=1764022745;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yqv9vt6rYdUcUmbSADKPrtDVgWOjgzH7G7qmk1O24d8=;
-        b=NyPO7EOkCgMUSuYUU1b0UQ4Cf021HyPIZP5IIYgCyK11AX/QLyQAUesJCWp7QlFnss
-         OUSXskP0jaEfi0QIvnBv4PeksohavHimzoXFd0ZcJaT94S58sU9AriJ5lwbBt5cX4rY5
-         LttB0Qf1a5TDXKasRvntNPdMLV/+HrDa+qI0ZTys5bgsLPUG0OQz+supE6rfqeLpUFPt
-         nPtVcwiXwPd0HzNMCJZtWBTbM96Q3IAOLUA018e/Qt9OtP8i4aeY4w90ZptJ1UPMtS1z
-         +IRpQgVV5wHo+gLWB6hNqweXK8y3YjwGl6FlVAg7SEWLwEoW0CP93lfJw7nkZiAfqghY
-         PfOg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsNDWTamaP7mz3Uuf6DQwn6ctr7v+XFOmq7H9xMwiiG6disF1y209aJOYoVlD+yhgaN+7Nn50=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVmeMuR+gHFhhQzkMYoHGsSxbYCCmj/z7FE50X/89lbv845Trj
-	brC2+MBFMN+MWytLwFXuV/6Jah5SAeVyNUcDSVUkZgvyu8W22wRdjbVDmZ8qa3hhTB8zPyVW+T4
-	qe6Osc3AxvHrX1A==
-X-Google-Smtp-Source: AGHT+IFKuKQmQwETqVMo5V4rZDWAjfD2WAPxG29C33FYX0labdGr2WvGuWsAPiA9DtRuNjEGIDoqy8Foar2wTg==
-X-Received: from wmqy12.prod.google.com ([2002:a05:600c:364c:b0:477:9aa2:7d50])
- (user=smostafa job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:1d15:b0:477:9bfc:dcb6 with SMTP id 5b1f17b1804b1-4779bfcde09mr72288665e9.14.1763405333101;
- Mon, 17 Nov 2025 10:48:53 -0800 (PST)
-Date: Mon, 17 Nov 2025 18:48:14 +0000
-In-Reply-To: <20251117184815.1027271-1-smostafa@google.com>
+        bh=jketl0ykgqH6CHwpfbMW0pLhEMzOqTEcodUiqzB4Vy0=;
+        b=GcaHg8wBv6RqVBqxmbPF8/bxV5R3J5AwP3iQRR7dJBtGmxL/5KKsXACgpd7xzTZwXP
+         kzqYz+dsvLFnQqvQi801xpRMPxc27DqPfmfNbWDu8SuyCuxVi4s8dwzPj3y340EU3nKO
+         iCLSwa81zOK5KzCLu2s7c1IbnBioEuHc5V1KUq/6P141zcvl2dbhrt28kG1dX/ja1/Kh
+         Jvfr24mim/OIY2HNh+TaTM2ZuYXeQlEejGOn8R+h+JPqItn+cLeVlsk3MbrB1s8/qcA1
+         hJdAxQvo9GEYfMUxiduv3UI5MR4epxiBOvQbpKK/gX44rc+RkzkaQmoVi+3MDeeJ7xzP
+         A1mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhvH8EzkaDIMuTNYI7r2UWcBKgivuHvfVJdWmwRVKqkh98m36yg2mzhbmAwNxlTVVjHLKwpfc=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz4ibVmsvR10sLwcbu+OB07yFNgFyn4YJSuJUfVXx1yHO5WFAUU
+	ENnXXP80zNDVi/Aq5g03/kymTmXEBdZ4Eo5mgbkuhChj11QTzy15A53lHsjU09VV79CfZtKxuVe
+	AhcHIOg==
+X-Google-Smtp-Source: AGHT+IHcdd0ArWlATEcfj8BU5F82GWD1Li5aCx6PmaH0PInTm//H/NUZ3GqyQdoRB02rIu9vl/OLgCgIy78=
+X-Received: from plgn12.prod.google.com ([2002:a17:902:f60c:b0:297:e1db:fee5])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e951:b0:298:46a9:df1f
+ with SMTP id d9443c01a7336-2986a6b88fbmr168676665ad.12.1763417944666; Mon, 17
+ Nov 2025 14:19:04 -0800 (PST)
+Date: Mon, 17 Nov 2025 14:19:03 -0800
+In-Reply-To: <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20251117184815.1027271-1-smostafa@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251117184815.1027271-28-smostafa@google.com>
-Subject: [PATCH v5 27/27] iommu/arm-smmu-v3-kvm: Enable nesting
-From: Mostafa Saleh <smostafa@google.com>
-To: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev
-Cc: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org, jgg@ziepe.ca, 
-	praan@google.com, danielmentz@google.com, mark.rutland@arm.com, 
-	qperret@google.com, tabba@google.com, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20250915215432.362444-1-minipli@grsecurity.net>
+ <176314469132.1828515.1099412303366772472.b4-ty@google.com> <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
+Message-ID: <aRufV8mPlW3uKMo4@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Now, as the hypervisor controls the command queue, stream table,
-and shadows the stage-2 page table.
-Enable stage-2 in case the host puts an STE in bypass or stage-1.
+On Sat, Nov 15, 2025, Mathias Krause wrote:
+> On 14.11.25 19:25, Sean Christopherson wrote:
+> > On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
+> >> This is v2 of [1], trying to enhance backtraces involving leaf
+> >> functions.
+> >>
+> >> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
+> >> fails hard for leaf functions lacking a proper stack frame setup, making
+> >> it dereference invalid pointers. ARM64 just skips frames, much like x86
+> >> does.
+> >>
+> >> [...]
+> > 
+> > Applied to kvm-x86 next, thanks!
+> 
+> Thanks a lot, Sean!
+> 
+> > P.S. This also prompted me to get pretty_print_stacks.py working in my
+> >      environment, so double thanks!
+> 
+> Haha, you're welcome! :D
+> 
+> > 
+> > [1/4] Makefile: Provide a concept of late CFLAGS
+> >       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
+> > [2/4] x86: Better backtraces for leaf functions
+> >       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
 
-Signed-off-by: Mostafa Saleh <smostafa@google.com>
----
- .../iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c  | 75 ++++++++++++++++++-
- 1 file changed, 74 insertions(+), 1 deletion(-)
+Spoke too soon :-(
 
-diff --git a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-index f0075f9a0947..3e451cef937c 100644
---- a/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-+++ b/drivers/iommu/arm/arm-smmu-v3/pkvm/arm-smmu-v3.c
-@@ -371,6 +371,46 @@ static int smmu_init_cmdq(struct hyp_arm_smmu_v3_device *smmu)
- 	return 0;
- }
- 
-+static void smmu_attach_stage_2(struct arm_smmu_ste *ste)
-+{
-+	unsigned long vttbr;
-+	unsigned long ts, sl, ic, oc, sh, tg, ps;
-+	unsigned long cfg;
-+	struct io_pgtable_cfg *pgt_cfg =  &idmap_pgtable->cfg;
-+
-+	cfg = FIELD_GET(STRTAB_STE_0_CFG, ste->data[0]);
-+	if (!FIELD_GET(STRTAB_STE_0_V, ste->data[0]) ||
-+	    (cfg == STRTAB_STE_0_CFG_ABORT))
-+		return;
-+	/* S2 is not advertised, that should never be attempted. */
-+	if (WARN_ON(cfg == STRTAB_STE_0_CFG_NESTED))
-+		return;
-+	vttbr = pgt_cfg->arm_lpae_s2_cfg.vttbr;
-+	ps = pgt_cfg->arm_lpae_s2_cfg.vtcr.ps;
-+	tg = pgt_cfg->arm_lpae_s2_cfg.vtcr.tg;
-+	sh = pgt_cfg->arm_lpae_s2_cfg.vtcr.sh;
-+	oc = pgt_cfg->arm_lpae_s2_cfg.vtcr.orgn;
-+	ic = pgt_cfg->arm_lpae_s2_cfg.vtcr.irgn;
-+	sl = pgt_cfg->arm_lpae_s2_cfg.vtcr.sl;
-+	ts = pgt_cfg->arm_lpae_s2_cfg.vtcr.tsz;
-+
-+	ste->data[1] |= FIELD_PREP(STRTAB_STE_1_SHCFG, STRTAB_STE_1_SHCFG_INCOMING);
-+	/* The host shouldn't write dwords 2 and 3, overwrite them. */
-+	ste->data[2] = FIELD_PREP(STRTAB_STE_2_VTCR,
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2PS, ps) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2TG, tg) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2SH0, sh) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2OR0, oc) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2IR0, ic) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2SL0, sl) |
-+				  FIELD_PREP(STRTAB_STE_2_VTCR_S2T0SZ, ts)) |
-+		 FIELD_PREP(STRTAB_STE_2_S2VMID, 0) |
-+		 STRTAB_STE_2_S2AA64 | STRTAB_STE_2_S2R;
-+	ste->data[3] = vttbr & STRTAB_STE_3_S2TTB_MASK;
-+	/* Convert S1 => nested and bypass => S2 */
-+	ste->data[0] |= FIELD_PREP(STRTAB_STE_0_CFG, cfg | BIT(1));
-+}
-+
- /* Get an STE for a stream table base. */
- static struct arm_smmu_ste *smmu_get_ste_ptr(struct hyp_arm_smmu_v3_device *smmu,
- 					     u32 sid, u64 *strtab)
-@@ -426,6 +466,15 @@ static void smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid, bool
- 	u64 *hyp_ste_base = strtab_hyp_base(smmu);
- 	struct arm_smmu_ste *host_ste_ptr = smmu_get_ste_ptr(smmu, sid, host_ste_base);
- 	struct arm_smmu_ste *hyp_ste_ptr = smmu_get_ste_ptr(smmu, sid, hyp_ste_base);
-+	struct arm_smmu_ste target = {};
-+	struct arm_smmu_cmdq_ent cfgi_cmd = {
-+		.opcode	= CMDQ_OP_CFGI_STE,
-+		.cfgi	= {
-+			.sid	= sid,
-+			.leaf	= true,
-+		},
-+	};
-+	int i;
- 
- 	/*
- 	 * Linux only uses leaf = 1, when leaf is 0, we need to verify that this
-@@ -441,8 +490,32 @@ static void smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid, bool
- 		hyp_ste_ptr = smmu_get_ste_ptr(smmu, sid, hyp_ste_base);
- 	}
- 
--	smmu_copy_from_host(smmu, hyp_ste_ptr->data, host_ste_ptr->data,
-+	smmu_copy_from_host(smmu, target.data, host_ste_ptr->data,
- 			    STRTAB_STE_DWORDS << 3);
-+	/*
-+	 * Typically, STE update is done as the following
-+	 * 1- Write last 7 dwords, while STE is invalid
-+	 * 2- CFGI
-+	 * 3- Write first dword, making STE valid
-+	 * 4- CFGI
-+	 * As the SMMU MUST at least load 64 bits atomically
-+	 * that gurantees that there is no race between writing
-+	 * the STE and the CFGI where the SMMU observes parts
-+	 * of the STE.
-+	 * In the shadow we update the STE to enable nested translation,
-+	 * which requires updating first 4 dwords.
-+	 * That is only done if the STE is valid and not in abort.
-+	 * Which means it happens at step 4)
-+	 * So we need to also write the last 7 dwords and send CFGI
-+	 * before writing the first dword.
-+	 * There is no need for last CFGI as it's done next.
-+	 */
-+	smmu_attach_stage_2(&target);
-+	for (i = 1; i < STRTAB_STE_DWORDS; i++)
-+		WRITE_ONCE(hyp_ste_ptr->data[i], target.data[i]);
-+
-+	WARN_ON(smmu_send_cmd(smmu, &cfgi_cmd));
-+	WRITE_ONCE(hyp_ste_ptr->data[0], target.data[0]);
- }
- 
- static int smmu_init_strtab(struct hyp_arm_smmu_v3_device *smmu)
--- 
-2.52.0.rc1.455.g30608eb744-goog
+The x86 change breaks the realmode test.  I didn't try hard to debug, as that
+test is brittle, e.g. see https://lore.kernel.org/all/20240604143507.1041901-1-pbonzini@redhat.com.
 
+I can't for the life of me figure out how to get Makefile variables to do what I
+want, so for now I'm going to drop the x86 change so as not to block the rest of
+the stuff I've got applied.
+
+I'll keep the rest applied, so just resubmit the x86 patch against kvm-x86/next.
+
+FWIW, conceptually I think we want something like this:
+
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index be18a77a..65e41578 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -44,6 +44,7 @@ COMMON_CFLAGS += -O1
+ KEEP_FRAME_POINTER := y
+ 
+ ifneq ($(KEEP_FRAME_POINTER),)
++ifneq ($(no_profiling),y)
+ # Fake profiling to force the compiler to emit a frame pointer setup also in
+ # leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
+ #
+@@ -53,6 +54,7 @@ ifneq ($(KEEP_FRAME_POINTER),)
+ # during compilation makes this do "The Right Thing."
+ LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
+ endif
++endif
+ 
+ FLATLIBS = lib/libcflat.a
+ 
+@@ -120,6 +122,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o $(SRCDIR)/$(TEST_DIR)/realmode.
+        $(LD) -m elf_i386 -nostdlib -o $@ \
+              -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $(filter %.o, $^)
+ 
++$(TEST_DIR)/realmode.o: no_profiling = y
+ $(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+ 
+ $(TEST_DIR)/access_test.$(bin): $(TEST_DIR)/access.o
+
+> > [3/4] arm64: Better backtraces for leaf functions
+> >       https://github.com/kvm-x86/kvm-unit-tests/commit/da1804215c8e
+> > [4/4] arm: Fix backtraces involving leaf functions
+> >       https://github.com/kvm-x86/kvm-unit-tests/commit/c885c94f523e
+> > 
+> > --
+> > https://github.com/kvm-x86/kvm-unit-tests/tree/next
+> 
