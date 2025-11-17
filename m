@@ -1,71 +1,72 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B86A30C639
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 10:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F659328619
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 10:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763375717; cv=none; b=aYDocf4+PS1qKE1XykqGkoRRfLiWNOQPj601DX/VtTAmFgWMS+ogdF0LFei6tzKXGqGT/VEPjUrgtbTiz87o9PMghzRYTH8R7/Uda3SiCvftwFDbv2PrHeyzXtMavUNIcQIyzRsxVOGIwWNomI+Ggh1iw61HiHYyoVrc52JPvho=
+	t=1763375844; cv=none; b=bgGPK8IsV6ZffJCLRXVFPJZBbDW85Qbxi6iD8ecswgz/1lDkZZH0EqFhZoj2tC5pFHlgrpU9Sw0wMk1wYaE+5eJaQ7YlAuu3ODd5b21pPUrzn4KIWjqv4fjjUuoSuj6XKqOVkIw9js6QGpWOjDzCVTmha3haQzpFqslfm/NYLQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763375717; c=relaxed/simple;
-	bh=1amoj1sKKYr1XLj2M/noyNE2YeQgsGaERFXZC4W3TJ0=;
+	s=arc-20240116; t=1763375844; c=relaxed/simple;
+	bh=jU6y13VHOFy3Pi7WNXNgmgLs1immGWngiyX609zJHLw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uZRF3mIA2snK1b1gT7w/jMFluz/73oMrX/PifAbDYvok2Iul/gqBLQFFxLLQ+MmLvPRLAYbceT83DLZ1M4pqSiiCdlmT+ZeZWWZV54iXgSQ3QRWPldTePPzbkAAizDZnsx1+9ft1LdvRmglz1RaaJWsY4+cGNyT420DifsJAS9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hePDOCfQ; arc=none smtp.client-ip=209.85.160.170
+	 To:Cc:Content-Type; b=CPPHkVU6/yvwiNtfWrmEF5cxpLqZWzL89xHaXjB+G9t0RQgDXZOZG8SW6iEElajznOZmuF2NX+7WzXsWXsoMDrQxmI1FaV+k2+iYAUUlSqsrIBx1qnjA1i8ABoLQu/IntVXeSdGLmOk3XwBAlvDVfh+CcxxOEe0efkR3npFdmfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cZ/TA4dM; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hePDOCfQ"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ee147baf7bso403021cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 02:35:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cZ/TA4dM"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ee147baf7bso403521cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 02:37:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763375713; x=1763980513; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763375841; x=1763980641; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6UMb76mn8fRdulKyLx/a7XYom3+koOQ6PHrThZtOCmE=;
-        b=hePDOCfQogyBs1f4yIdjOh/MFVzP6CokkYTpH4xNqeEJWYln4e6FaQ+9Lf6JwfyTq0
-         8cgywuTCPhGHnwL8MIWR9Gy6Z33tcpctnoQvzguWquFY3nIRAelCKK/Rwp6jprDPyhB6
-         azBOKAb64JGO5IxmILv+Z5Eo3Xv0J5u1p+PQRoP+ZP+tTdBSOfgBq+uQxeEhs28ZVyV8
-         4OFE1VpxRTwUSwha6GUf2v+qQUdCvsd0r+uv9+F5cJXOqemjXheiyN8iyPxlyjp+kORr
-         aT+V/i5qBN5Hg1qup0ZPip8aD2I2p+6nWS3PaMUJpNFYpnx7eEr8AFILzv/+OA12zQjW
-         IBog==
+        bh=cSCczuntyrjypJFmPl75f311GtN50oo2b0NuRkLWiBY=;
+        b=cZ/TA4dMxq8FuLINfvfpKJyJTwFB5NFIrBBlH+xeDzh4Ivh5cklXyEuoKcv4382Vqn
+         GHmnukX4TDACJJtUWL6xsqbPalS9FUKgGcJOvdQYrtvL+sOD2Mlts9jz4sOcj6f0Nbv8
+         51ygTAOkCLiMd/uLYV6V4bKEaOn/vFNZLeZeRAyzClq4KD/5e58YySHoS+8F8Dnc98ds
+         GrNC8y5koRDIRQRIsodnk+XfooOg+ZLkPQoW6aLRQn2hxFOcdbi+3nyaP7jJFoXkpptL
+         m9aOKwdGNz4MpueblumgqqMg8hT0t/bGyn/dTmzYW8eihiXX0BZZm8U4XBQTnYkG0f89
+         VwIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763375713; x=1763980513;
+        d=1e100.net; s=20230601; t=1763375841; x=1763980641;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6UMb76mn8fRdulKyLx/a7XYom3+koOQ6PHrThZtOCmE=;
-        b=nd/ih3E/PE3cuK6pQqW5subBOQKIEhjXB4w9zyBXGfAGTc9o1rFFG7mGYLQ+fCM/tU
-         p7FBsQpNEK+qooM2WKscmaDg5opiHzGcscu87MHykNTpo9aYknmZRtDV0ZnocACAQGAs
-         LqsqOL8y71kKysxtB8A+pvo9tpYKI14ZrTgHHou1icR1g6+K748iHNf0LfJVt8A37QcM
-         8N1M1kIyEkC8Sya8tW+R84m2dVNcBtxDsWrDj+IY18F3uoWAl0MpgCVcXNg2+4QuJ5Es
-         CFdG8qo5L0rpju5m5ONxq/qRqsYXZ7HdmjFEmL4TcfntaL7ufErDGFXYj/yY1ZBpdG04
-         km2w==
-X-Gm-Message-State: AOJu0Yzn4KnYYw1f8QKiBNJhVjZyROQiUIE28EeGobNfpb6OWgFh9UIt
-	uVd0CHjHSJiy5PgU/EfbAJL6OqbDbEXtT5ZrAo8jiCc+Ai1qkYCSb6YeoZKaW4RBMekg2FPi1x7
-	Wilc8SsfqtQ+Njm35NqM0S6Ok6PBBpvgqbGbPjUvW
-X-Gm-Gg: ASbGncu/vPF+f2Na32g9zUGs9u69wpuJoa4yrCKSOfrgFDDwWIoRtsds6ETITrWyw9S
-	0JYP30MDtxmMehSfzpvW6mzWFKrIjF4txjwOK0NV0ratV4mwjBNkIufI8wsEzgPeUYMIkLuifu/
-	S/DUBrFNZ9X0FLGSQUTSh94oam4E2N7X/nAbrPvkzZm477AaB177l94+9RemCNrNubi5cLA8KZN
-	FK7uDD1gckMWEvp9SkOIlmHOpZMDhqGLR5GOzcQDccdI9C4yr9oE8Jn20g+wk+u0vKp47s=
-X-Google-Smtp-Source: AGHT+IEeDf8TqrvbNoWWGhOaSKTbd2JM8FcWY8tyPNdC251IWOGGbR4OQunLQUmX2T6cgbU3MIvYtVGTrvUN+xb9V7A=
-X-Received: by 2002:a05:622a:647:b0:4e6:eaee:a944 with SMTP id
- d75a77b69052e-4ee02febe71mr10646641cf.4.1763375713065; Mon, 17 Nov 2025
- 02:35:13 -0800 (PST)
+        bh=cSCczuntyrjypJFmPl75f311GtN50oo2b0NuRkLWiBY=;
+        b=WceQZYc5tHOAn64bby2xUTUKrbBJDCD/iI5wECNEZhALJkd9nr1kZfxW0R4RfncV+x
+         lMGDB5lUawZ6VAJiV5yRcXZuEiwS9RsOE6mifP7E2A9MlB+aJs9ZSN2EtzD3o3hwBd/h
+         23iH7d75gZP/7q8332JA0yeHPk6jTaMgt2KHGgL0mb9Qy0L/35KHaFdRDOk3wQaWnZfY
+         6GoLhH6ows/P3qXhfO1MRE1yDLAcGxuATS20a5EcM2AcMIR8EvFmouanhOpd+zSHxqG0
+         ol1WXLYa3Ofy+Zv3jdrX1bHTzaAvOZ8Od/JykRVW7yebFi35IVveDSsc4JTSm60DNY4q
+         2oCw==
+X-Gm-Message-State: AOJu0YyvgrKNSR4fa6zoljFOgjmYZEudGX9b40zxfEA/u/ZGAdNWg51N
+	tt+J6I8fnyZSdL4OUBcuo0DGlyvdxiuQQAp49txm6IJCNMYikgCUPTZZKSYBpULovHmfch47Ye/
+	VgYPQwpGzyJC5me9/NuKX35cBbtdjAwZCQ1D1Zo0J
+X-Gm-Gg: ASbGncvGvQsKRGVas4w5KPuoKgAw9h0DwaJC3kjrcyoQmFT5NBUcog82+1d/m1K5gQQ
+	KCxSxR/ZNcJm4yUoAaUXNaBzPfGIMmI0Uhw62WMZ6iLzoWguH/vjQF4TxDVAich7TH0B03EGCoQ
+	RQstNEMB4KTdDkRKg3gk+2CrubchwshCN22R5BsGGEDIXGq6wMiRsuUZ3KiayD0WBVUCKH9et9H
+	J9cjyk8S7o9olpvlb7nweELg3YybGKDDtSjaSnFobsWiQLUH13j875u4uaM8k5ee8e6i8teuhTs
+	e7k6yA==
+X-Google-Smtp-Source: AGHT+IFFM24GESKuymha8lz4kxmnQKTDe1ajE7ALZIAlCW3kwiBwOHxbJvkmtglaccu5bdOdgggOwWj6OAOtjgUpEJU=
+X-Received: by 2002:a05:622a:1196:b0:4ed:7c45:9908 with SMTP id
+ d75a77b69052e-4ee02abc1c8mr11423671cf.10.1763375841094; Mon, 17 Nov 2025
+ 02:37:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-2-maz@kernel.org>
-In-Reply-To: <20251117091527.1119213-2-maz@kernel.org>
+References: <20251117091527.1119213-1-maz@kernel.org> <20251117091527.1119213-3-maz@kernel.org>
+In-Reply-To: <20251117091527.1119213-3-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 17 Nov 2025 10:34:36 +0000
-X-Gm-Features: AWmQ_blgezKjAAmHyIWXBoJZICk6tQG5D6YP6HkWhKHbDls8Zob-nCh13_5IZ4w
-Message-ID: <CA+EHjTy93dmoTysS91+jFmey8ei55VWNUf-FsqVz9Ho4W1NWBQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/5] KVM: arm64: GICv3: Don't advertise
- ICH_HCR_EL2.En==1 when no vgic is configured
+Date: Mon, 17 Nov 2025 10:36:44 +0000
+X-Gm-Features: AWmQ_bkOHIvxxrAN0Ta8I3LCFjnIE-AQuTMgHtHd82ZTpr8YLnfGv1xtAWeYWMw
+Message-ID: <CA+EHjTy-vmMrOR_-BAd4q2JG99afzd3cisvf-VP6uM+M9Pg2=g@mail.gmail.com>
+Subject: Re: [PATCH v3 2/5] KVM: arm64: GICv3: Completely disable trapping on
+ vcpu exit
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -76,46 +77,46 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hi Marc,
 
-On Mon, 17 Nov 2025 at 09:15, Marc Zyngier <maz@kernel.org> wrote:
+On Mon, 17 Nov 2025 at 09:20, Marc Zyngier <maz@kernel.org> wrote:
 >
-> Configuring GICv3 to deal with the lack of GIC in the guest relies
-> on not setting ICH_HCR_EL2.En in the shadow register, as this is
-> an indication of the fact that we want to trap all system registers
-> to report an UNDEF in the guest.
+> Fuad reports that on QEMU, the DIR trapping is still effective after
+> a vcpu exit and that the host is running nVHE, resulting in a BUG()
+> (we only expect DIR to be trapped for the guest, and never the host).
 >
-> Make sure we leave vgic_hcr untouched in this case.
+> As it turns out, this is an implementation-dependent behaviour, which
+> the architecture allows, but that seem to be relatively uncommon across
+> implementations.
 >
-> Reported-by: Mark Brown <broonie@kernel.org>
-> Tested-by: Mark Brown <broonie@kernel.org>
-> Closes: https://lore.kernel.org/r/72e1e8b5-e397-4dc5-9cd6-a32b6af3d739@sirena.org.uk
-> Fixes: 877324a1b5415 ("KVM: arm64: Revamp vgic maintenance interrupt configuration")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/vgic/vgic-v3.c | 3 +++
->  1 file changed, 3 insertions(+)
+> Fix this by completely zeroing the ICH_HCR_EL2 register when the
+> vcpu exits.
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 598621b14a30d..1d6dd1b545bdd 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -26,6 +26,9 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
->  {
->         struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
->
-> +       if (!irqchip_in_kernel(vcpu->kvm))
-> +               return;
-> +
+> Reported-by: Fuad Tabba <tabba@google.com>
 
-Bear with me, since I'm not too familiar with this code. This is the
-only function that initializes cpuif->vgic_hcr. Should we be
-explicitly setting it to 0, or warn if ICH_HCR_EL2_En is set?
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
->         cpuif->vgic_hcr = ICH_HCR_EL2_En;
+> Fixes: ca30799f7c2d0 ("KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant")
+> Closes: https://lore.kernel.org/r/CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
->         if (irqs_pending_outside_lrs(als))
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index e950efa225478..71199e1a92940 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -243,7 +243,7 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
+>                 cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
+>         }
+>
+> -       write_gicreg(compute_ich_hcr(cpu_if) & ~ICH_HCR_EL2_En, ICH_HCR_EL2);
+> +       write_gicreg(0, ICH_HCR_EL2);
+>  }
+>
+>  void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
 > --
 > 2.47.3
 >
