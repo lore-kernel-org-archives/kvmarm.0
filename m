@@ -1,49 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E734021A459
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 14:51:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBC3332EB3
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 15:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763391098; cv=none; b=gvxAgf/HgBXK7CyEI9NlbXsejYRwurtLq0UU6fVFkeG2148YdAbszYAFHhn+g6K1i+oufuBVHNA7S4GRed35o4ZatWbPt1OANSum6PlSqKVl6+hT3nog5BMsG2OsPPpaIpsQ9Iq9I8NCJCIjplA+MteFN1ehTg2dhQGvuGZBJ84=
+	t=1763392892; cv=none; b=kJtdCsKEE07MdPpIEgWmzSMaH8hSMZaa29ykHBPygGDEo/M1IV3Q/PyCrp+Ayu3ffvX05NoA8GQpwK1syl6QDFNMri33W0mMIngLrHTUJh8Mztg3zx4Zbd8Abd6nNNxuMqspdFtnhzkVdf7tUmRdiZkmoBzoIVtmB+hWP7AHupc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763391098; c=relaxed/simple;
-	bh=nbF1HEzvfSz3SCnqr0Q+zmVU7pXK5Y9v6nkTCEUQhPo=;
+	s=arc-20240116; t=1763392892; c=relaxed/simple;
+	bh=PVRxfGg1cEYxc9jw6OsJ9TgbyI7cJl91/PMDRKr5bL4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=koCOxELTd1MDOZ0tnDgVGynKLhEaKgpyVL2RjidlS/5hZFWsn1ENWJcM06//ptVeYmP9fbJFmP8Op3OzByszv90BP5Z3QaV5yEjFgfXVk652gfOz3K+lbk8LM+cA7H2COyXvHv6KIQnz8eaL0ugSk9wN4mUbDFmJm1zyEXz1x48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HujHPshe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Nr584BVs+H5FIm6SIR8IYI1sdnpHNbDqBug/3HlCUj3h+r2a+/dcldYdxteRDXK9g/Sae4C0vzaVSm6FpVkpqCFvERV+cSqV41FfttA86orpITU7C3EX8ZAE5E3fGsmtL86n9Bdzz/IljRpcjc+cw6CotA2S3VmUMkfg/kpap8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k/d37biJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HujHPshe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6ED8DC4CEF1;
-	Mon, 17 Nov 2025 14:51:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k/d37biJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA372C19424;
+	Mon, 17 Nov 2025 15:21:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763391097;
-	bh=nbF1HEzvfSz3SCnqr0Q+zmVU7pXK5Y9v6nkTCEUQhPo=;
+	s=k20201202; t=1763392891;
+	bh=PVRxfGg1cEYxc9jw6OsJ9TgbyI7cJl91/PMDRKr5bL4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HujHPsheyBVBFvZqe9bRkBOl3O7WgZTXnqmPQzCSLIM0A1BUK9sFv0oDp45U1YQNQ
-	 Hppjf/kUmIo3gk0zjJvPR/7kkgrwWxnbTLwLrwht9LkvflZ8JtW5uxg5wnwhc48lgZ
-	 OK2UoG+O5IY26zptxcF6eWH94cgqMS2F/auFLWKO6mT6UqDNBMd6U7kgV+CjwG389l
-	 4tCWAr/OO6xnegeE8wXuWKnRmckfVT9KCRpzS4QpTnh4BBsFhDKESDL4hQF2NIEo5W
-	 vyeShpjPa15u4nnr6c/NP6PluPswlufuHQCDCiFQP/Z2NX5LtIsjjZpuGsLwQdNwYX
-	 QeDyg/4b2O3tw==
+	b=k/d37biJuARdKvYFnJYNN3pU9q56EaKjcn4q1OcewnuMICC4tZA+z/Ih/wxIjwsCf
+	 j3iKOpksYuMuQkkuupixaUKifbev4Bp/JPoKvFqaOIoXIkmY1UIRd3uGG06pJkFtFd
+	 Lc949A8jXGlQhAgHXyApg4cwK94iyJcVTwg6DQQAuXdrR0CzmFpNrz09KIGNHfmrI4
+	 Yy9dT3pPPbAb3keVPJ7h4fCfIUgpOCJqt2gXXwaS+9v2G93kGX8n4I3YuBM5NLsAxa
+	 74+mjJoRVv4nTfQd8PalbQ6GSSp7M+1cgFJN58/hfngq4xfui18qtF1tkKcrreBwYn
+	 nTslVAI22wiVg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vL0Zr-00000005rXC-1TZA;
-	Mon, 17 Nov 2025 14:51:35 +0000
-Date: Mon, 17 Nov 2025 14:51:35 +0000
-Message-ID: <86wm3osoeg.wl-maz@kernel.org>
+	id 1vL12n-00000005s2C-29ij;
+	Mon, 17 Nov 2025 15:21:29 +0000
+Date: Mon, 17 Nov 2025 15:21:29 +0000
+Message-ID: <86v7j8sn0m.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 11/12] KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW
-In-Reply-To: <20251112183406.2118981-12-oupton@kernel.org>
+Subject: Re: [PATCH 00/12] KVM: arm64: nv: Implement FEAT_XNX and FEAT_HAF
+In-Reply-To: <20251112183406.2118981-1-oupton@kernel.org>
 References: <20251112183406.2118981-1-oupton@kernel.org>
-	<20251112183406.2118981-12-oupton@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,98 +58,37 @@ X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 12 Nov 2025 18:34:05 +0000,
+On Wed, 12 Nov 2025 18:33:54 +0000,
 Oliver Upton <oupton@kernel.org> wrote:
 > 
-> Give the stage-2 walk similar treatment to stage-1: update the access
-> flag during the table walk and do so for any walk context.
+> This series closes a couple of gaps between our shadow stage-2
+> implementation and the architecture:
 > 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c    |  3 +++
->  arch/arm64/kvm/nested.c | 46 ++++++++++++++++++++++++++++++++++-------
->  2 files changed, 41 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 96f1786c72fe..b23d3dc8865e 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2012,6 +2012,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		u32 esr;
->  
->  		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
-> +		if (ret == -EAGAIN)
-> +			return 1;
-> +
->  		if (ret) {
->  			esr = kvm_s2_trans_esr(&nested_trans);
->  			kvm_inject_s2_fault(vcpu, esr);
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index b2fb3d7c9c19..7293769dacf5 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -124,13 +124,14 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->  }
->  
->  struct s2_walk_info {
-> -	void	     *data;
-> -	u64	     baddr;
-> -	unsigned int max_oa_bits;
-> -	unsigned int pgshift;
-> -	unsigned int sl;
-> -	unsigned int t0sz;
-> -	bool	     be;
-> +	void		*data;
-> +	u64		baddr;
-> +	unsigned int	max_oa_bits;
-> +	unsigned int	pgshift;
-> +	unsigned int	sl;
-> +	unsigned int	t0sz;
-> +	bool		be;
-> +	bool		ha;
->  };
->  
->  static u32 compute_fsc(int level, u32 fsc)
-> @@ -220,6 +221,22 @@ static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, struct s2_walk_info *wi
->  	return 0;
->  }
->  
-> +static int swap_guest_s2_desc(phys_addr_t pa, u64 old, u64 new,
-> +			      struct s2_walk_info *wi)
-> +{
-> +	struct kvm_vcpu *vcpu = wi->data;
-> +
-> +	if (wi->be) {
-> +		old = cpu_to_be64(old);
-> +		new = cpu_to_be64(new);
-> +	} else {
-> +		old = cpu_to_be64(old);
-> +		new = cpu_to_be64(new);
-> +	}
-> +
-> +	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
-> +}
-> +
->  /*
->   * This is essentially a C-version of the pseudo code from the ARM ARM
->   * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
-> @@ -233,7 +250,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
->  	int first_block_level, level, stride, input_size, base_lower_bound;
->  	phys_addr_t base_addr;
->  	unsigned int addr_top, addr_bottom;
-> -	u64 desc;  /* page table entry */
-> +	u64 desc, new_desc;  /* page table entry */
->  	int ret;
->  	phys_addr_t paddr;
->  
-> @@ -326,6 +343,17 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
->  		return 1;
->  	}
->  
-> +	if (wi->ha)
-> +		new_desc |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
+> FEAT_XNX - KVM doesn't make use of the feature for itself but this is
+> a rather low hanging fruit which entails expressing privileged and
+> unprivileged execute permissions in our pseudo-TLB
 
-Same issue here (new_desc not initialised).
+I think this part looks good, no objection from my end.
+
+> 
+> FEAT_HAF - This one is a bit more involved, requiring the PTW
+> implementations to atomically update descriptors in user memory to set
+> the Access Flag. I've made the implementation choice that AT
+> instructions also update the AF which was done to avoid evaluating the
+> access type in the PTW.
+
+This one needs a bit more work. There is a couple of amusing bugs that
+need addressing. Hopefully you can respin it shortly so that we can
+have this series in 6.19.
+
+> There's more work to be done for FEAT_HAFDBS (dirty state updates),
+> since updates to DBM are conditional based on the walk context. Lastly,
+> this is all horribly untested since I don't have an NV-capable machine
+> with FEAT_HAF that is easy to hack on. Although I do plan on adding some
+> selftests coverage soon.
+
+Yup, it looks like systems accessible to the common mortals don't have
+any of it (my QC box doesn't either). Oh well...
 
 Thanks,
 
