@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570CA2C08BC
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 17:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A4023C512
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 18:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763401987; cv=none; b=UU5mzhOKPEe5dqdv5lTkcOdKaNu1Wx47hMpVkYRXRho7jd4cLdFnG9qOSCVekClS0+ZgO32RDMn9zkVIg1p/cTn1sZ3U1A4NPAneU64pzs8RobvIqKFQOnGcD6yr8tfelpImNZVfFAg6TIaP6rsA6ukRtGbe998dckIj1sLoOzg=
+	t=1763403199; cv=none; b=UIMifQITq0bzoJKLD0XKnN940GW/5xwjrXFI/X9G99IMikly2qFz1C5RnWm6hdS8YKtTLqR6FQxFdDn+a7Uo3oWWxwVpr2xKkaC+2VX85A4M0cxvoDRW17+bGjyw7XK1g3Q1GRncJvslWNaiA3c6r4SK5MpQ7avP95JnYdAY+YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763401987; c=relaxed/simple;
-	bh=KdETyFgS3BdIRZidpLd8kGMG8VhwCntOYpxvZRPQVZ4=;
+	s=arc-20240116; t=1763403199; c=relaxed/simple;
+	bh=L+r8tMHNl4AZkUtOJbtkVeGRmYSN+YUhDRJuFJK1a3c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TwHDTq4ARaGsYE51swwtSwCd4tHWaobupe/4O0swy+eoU5OZBAWJx7piSdnqv88G9HWbHxIBIMr+KCqIPGMkq8FSWqBFHTlZEU8uuU70DPrIE1u2XXJ2kSLndQdD1uNFx0JuGme5RL5rw/4d8Fg/MJAk0WYQciggwHfNCSODugY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pmfjjv/1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=j0V3qRuAvLS0qm82LdjDctetFXO3SXdZlYmqzbngarAzPeoR18MFpy6r5WJZCipPMhN2FD4cifGdZJfv3GV1ZT1VHmA5A2n1C4xd/YaNetehkAM03zltr8kYyknQqPsHYYThSwWzS0CG1nMRz6xXT/JO8621pzsLaFjbkIbKGxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JipRzz+j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pmfjjv/1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46CD7C19422;
-	Mon, 17 Nov 2025 17:53:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JipRzz+j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93690C19422;
+	Mon, 17 Nov 2025 18:13:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763401982;
-	bh=KdETyFgS3BdIRZidpLd8kGMG8VhwCntOYpxvZRPQVZ4=;
+	s=k20201202; t=1763403198;
+	bh=L+r8tMHNl4AZkUtOJbtkVeGRmYSN+YUhDRJuFJK1a3c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pmfjjv/1jsz21Zfe8SJfIezsUTtEoRq82aH73p1zl/wWcN0VLHuSzIi2PN2vYKX+Q
-	 95ud+5zHn256vuiYY9QcMAGPCHHta97++FwhtOfbaTLo1SgzbPpfG72ghKREF4FGt8
-	 FljF/k/JIqdCzVB29htscYbS8BSxx4RXnhJKbfupGBDZnNQz6u/kXj2i7Besh6XRH7
-	 t7qQuAseFwcKn+ifycDI7SgYdo4/U52RfhDXP7OgrQQgA/bcks8Uks57Mp8UCohI/C
-	 cO/muhHGcqMgrQ+8rYLsV1LWyaScwjwA2k9dMmmLSxyUVbfdvxR0bp4UEsoq/K+1TF
-	 P19aU6Fvsufaw==
-Date: Mon, 17 Nov 2025 09:53:00 -0800
+	b=JipRzz+juWRZKQZtrtsq3lvLrD+MBnmFUjuSSptmnaXO80OsHFuCidz7Qy4h+Ejb6
+	 jOtXLlinEDg5/WBjlcp3OsChAO2+HAt2VvpiC2kUQoP8wXChHdE2bWSIg7q44ylLY7
+	 MwQDY9DpnI2gew38Ds/aZtLpR5Lo3pd86xOOyWrDqUATdDZhnEvf9HePLqk+6HylX9
+	 Elj6i1+BBREhtLw/TtOFjTxtbJxhbwRl8V3aIfsyobpURkQoZ39vf1ClsfdWVRmYUb
+	 eUGwVVCBeopfrL3k4ktCHrXahUMEo/VDoQ+8VGK2RWZvajEQlAtPEh0rjYHf8tATPo
+	 jk3ncJFi6eqxg==
+Date: Mon, 17 Nov 2025 10:13:16 -0800
 From: Oliver Upton <oupton@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: Implement HW access flag management in
- stage-1 SW PTW
-Message-ID: <aRtg_GiK_rvpQpgO@kernel.org>
+Subject: Re: [PATCH 09/12] KVM: arm64: Add helper for swapping guest
+ descriptor
+Message-ID: <aRtlvNj9yMZoVb9g@kernel.org>
 References: <20251112183406.2118981-1-oupton@kernel.org>
- <20251112183406.2118981-11-oupton@kernel.org>
- <86y0o4sohe.wl-maz@kernel.org>
+ <20251112183406.2118981-10-oupton@kernel.org>
+ <86zf8ksq53.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,48 +46,54 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86y0o4sohe.wl-maz@kernel.org>
+In-Reply-To: <86zf8ksq53.wl-maz@kernel.org>
 
-Hey,
-
-On Mon, Nov 17, 2025 at 02:49:49PM +0000, Marc Zyngier wrote:
-> On Wed, 12 Nov 2025 18:34:04 +0000,
-> > @@ -490,6 +506,17 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> >  	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
-> >  		goto addrsz;
-> >  
-> > +	if (wi->ha)
-> > +		new_desc |= PTE_AF;
+On Mon, Nov 17, 2025 at 02:14:00PM +0000, Marc Zyngier wrote:
+> On Wed, 12 Nov 2025 18:34:03 +0000,
+> Oliver Upton <oupton@kernel.org> wrote:
+> > +static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> > +{
+> > +	unsigned int loops = 128;
+> > +	u64 tmp;
+> > +	int ret;
+> > +
+> > +	uaccess_enable_privileged();
+> > +
+> > +	asm volatile("prfm	pstl1strm, %[addr]\n"
+> > +		     "1: ldxr	%[tmp], %[addr]\n"
+> > +		     "sub	%[tmp], %[tmp], %[old]\n"
+> > +		     "cbnz	%[tmp], 3f\n"
+> > +		     "2: stlxr	%w[ret], %[new], %[addr]\n"
+> > +		     "cbz	%w[ret], 4f\n"
+> > +		     "sub	%w[loops], %w[loops], #1\n"
+> > +		     "cbnz	%w[loops], 1b\n"
+> > +		     "3: mov	%w[ret], %w[eagain]\n"
+> > +		     "4:\n"
+> > +		     : [ret] "=r" (ret), [addr] "+Q" (*ptep), [tmp] "=&r" (tmp),
+> > +		       [loops] "+r" (loops)
+> > +		     : [old] "r" (old), [new] "r" (new), [eagain] "Ir" (-EAGAIN)
+> > +		     : "memory");
 > 
-> What initialised new_desc the first place? Shouldn't there be a
-> 'new_desc = desc;' somewhere before that?
+> Why doesn't this need an exception table as well? I'd expect it to
+> fault just as much as the LSE version (and ret cannot report -EFAULT,
+> for example).
 
-Lol, I had this right after the read succeeds but threw out that part of
-the diff.
+I just threw in ${something} to satisfy the LL/SC case, so yes, this
+needs exception fixup as well.
 
-> > @@ -1489,13 +1528,17 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-> >  	}
-> >  
-> >  	/* We failed the translation, let's replay it in slow motion */
-> > -	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
-> > -		par = handle_at_slow(vcpu, op, vaddr);
-> > +	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par)) {
-> > +		ret = handle_at_slow(vcpu, op, vaddr, &par);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
-> >  
-> >  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
-> > +	return 0;
-> >  }
-> 
-> There is a quite a bit of churn in this patch changing the signature
-> of the __kvm_at_s*() functions (and whatever calls them to propagate
-> the errors). It'd be worth pulling this refactor as a preliminary
-> patch, and then focus on the functional change.
+> I'm also on the fence about the bounded loop. Yes, forward progress is
+> a problem, but it should only affect large systems which can readily
+> use the atomic instructions. I'd rather we get rid of it until proven
+> that we really need something like it.
 
-Fine by me, thanks for reviewing!
+From a letter of the architecture POV I'm not sure we even need the
+LL/SC implementation. As of now the only non-nested use case is the SEA
+TTW walker which doesn't set the access flag (nor should it) and any
+implementation that has FEAT_NV must also have FEAT_LSE.
 
--- 
+I guess that just leaves the recursive NV case where a VMM explicitly
+de-features FEAT_LSE. So I guess having a trivial, non-looping
+implementation would be enough to cover this pointless issue.
+
 Thanks,
 Oliver
