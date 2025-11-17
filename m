@@ -1,144 +1,162 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E9A2AEF5;
-	Mon, 17 Nov 2025 14:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061E4286A7
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 14:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763388096; cv=none; b=cEMvGco7m8+OYNiE+ZS77Kc2G7eLSGqr2HKjF4qoENgFBIOkUj2UvQKRa4+P4iDO7YbU1KgspxKkQ/CBB+7yeU2AvalMvhmKh+7RRSG8y0jW3bfRL2ybcz/pWwdC3jR42ZjR6hBEqrdStNWokx4gBG7vlNxf2tC7bWr8DWrXMvA=
+	t=1763388843; cv=none; b=aU1pkkEqo1hmTH5m4lPwNtDDfNXZLXlzre63z06V9RLriKQG3rW+qcEleBCnmlcHC2TCiiXkFi+wy5XvGGEilaSz+AoeMo9IPrs33UoUuMAC7Cn4OZrIGvUFEp59D1LCHe9AYP2Ve4ORGuwcbmLukGLm3R56+lOrF3ymGMmQz3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763388096; c=relaxed/simple;
-	bh=jzqp5L6i6oSJSOFQ7k80/LJ+BF1WQ9a6s4hanokXhI0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CzvaGju2QWka8tReaZcUi2n5SWITCOK3XZzPg/PI3/AuhpJOFGeb6OSQVl44ZDWmHdcxgQQCdssUNpxCOadnau9+NsNZy+2q9QUH5iZpp2uGiC0woJLZ3eKVpAACtaeEWb35/ldztR4dfrwKzx/iVgh0OZZMEqadxxqtGMtqzPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dC03GAh6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763388843; c=relaxed/simple;
+	bh=3jGSNpC+RFuosSSwTgsUJIaw5/p2K5A41jkysEQg2vk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DaPJaoJ9Xri25yRqDm7i38G79LX6dDXMteFryGKuHhh/+oUT3nZeCdtPHBjUjd9riB0wBtcBksb3hEbWkdlrYDuOD9QAMt1ealbrLrrv9BtaZ4/XRxr62i5b6PdN5pBBa9VkW3iblWs653MJmJmZobNPXh6JuklgqhuEU4JC7C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uw54X+bn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dC03GAh6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87D1DC19424;
-	Mon, 17 Nov 2025 14:01:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uw54X+bn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8665AC113D0;
+	Mon, 17 Nov 2025 14:14:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763388096;
-	bh=jzqp5L6i6oSJSOFQ7k80/LJ+BF1WQ9a6s4hanokXhI0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dC03GAh6W5C1RFPMo5liMfGzVU17Ta6KatQ/l0ICX5l64Ettk36M76oY0HA5QxrXV
-	 PAhRg2PAOLDueI96eBHlOYnXNBQWTSrCxI9vVotB/iFfTAb9QheLVGEsK4+GHqAViB
-	 Np3Qld9FiUA+mmkcYhfk9nl3pIzDenFzZXc83uQigO22G3d6Gjlj0U2fuy8V/FF8cQ
-	 RdswForiQ2KDRZjfYzzyRzG9JQRYkJTjwhCo4UKJ99RmDH5jDTzsvHnvzjunBhMobs
-	 uuPMMUzG2I6sNZgeYp/oea/A3BLZhQQsWYaIgvnu31tzdOqI51iY4g13G01jx47XnJ
-	 MCIG3ZI4KUNbA==
-From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-To: linux-coco@lists.linux.dev,
-	kvmarm@lists.linux.dev
-Cc: linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dan.j.williams@intel.com,
-	aik@amd.com,
-	lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-Subject: [PATCH v2 11/11] coco: guest: arm64: Enable vdev DMA after attestation
-Date: Mon, 17 Nov 2025 19:30:07 +0530
-Message-ID: <20251117140007.122062-12-aneesh.kumar@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251117140007.122062-1-aneesh.kumar@kernel.org>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
+	s=k20201202; t=1763388842;
+	bh=3jGSNpC+RFuosSSwTgsUJIaw5/p2K5A41jkysEQg2vk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uw54X+bni+oe6AiRl2/mPu19moxq8UVnxztvJe7wogGz7/YdeetTSPyyxYYIWx+TC
+	 d99XpRdSt68nfVhI8pLnU9KKOM94gdEaH74K3TwKsspk4cf8HrmHb2a9QMq6+p6+zx
+	 P2cELBf+7lfc8ZG3hSSCZj8BZUTw6gGuPYcduc6yhXscsDppAGH5QW3LWJg7+Q+zcJ
+	 Qq3HBa+F0DVXPawjSx5XKQQ5i8AOa5GZXkh8J0N4FRQA+tRfwa5imhuy3+S0ykd9x5
+	 6XeZR3kRDiP9HdqOJHp1OReSZFlm4nXQaEcsuG71GU7WHHWYagKkdXpMJ0yP7/fA7D
+	 aIv1UZtTGHHTA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vKzzU-00000005r3X-1dPu;
+	Mon, 17 Nov 2025 14:14:00 +0000
+Date: Mon, 17 Nov 2025 14:14:00 +0000
+Message-ID: <86zf8ksq53.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 09/12] KVM: arm64: Add helper for swapping guest descriptor
+In-Reply-To: <20251112183406.2118981-10-oupton@kernel.org>
+References: <20251112183406.2118981-1-oupton@kernel.org>
+	<20251112183406.2118981-10-oupton@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-- define SMC_RSI_VDEV_DMA_ENABLE and add wrapper in rsi_cmds.h
-- invoke the new helper from the guest accept path once the device
-  passes attestation, rolling back to TDI_LOCKED on failure
+On Wed, 12 Nov 2025 18:34:03 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> Implementing FEAT_HAFDBS in KVM's software PTWs requires the ability to
+> CAS a descriptor to update the in-memory value. Add an accessor to do
+> exactly that, coping with the fact that guest descriptors are in user
+> memory (duh).
+> 
+> While FEAT_LSE required on any system that implements NV, KVM now uses
+> the stage-1 PTW for non-nested use cases meaning an LL/SC implementation
+> is necessary as well.
+> 
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h |  2 +
+>  arch/arm64/kvm/at.c                 | 86 +++++++++++++++++++++++++++++
+>  2 files changed, 88 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5d967b60414c..6dbc2908aed9 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -403,4 +403,6 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val);
+>  		(FIX_VNCR - __c);				\
+>  	})
+>  
+> +int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new);
+> +
+>  #endif /* __ARM64_KVM_NESTED_H */
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index a295a37dd3b1..74f3be46fa66 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -1650,3 +1650,89 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  		return ret;
+>  	}
+>  }
+> +
+> +static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp = old;
+> +	int ret = 0;
+> +
+> +	uaccess_enable_privileged();
+> +
+> +	asm volatile(__LSE_PREAMBLE
+> +		     "1: cas	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_disable_privileged();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+> +}
+> +
+> +static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	unsigned int loops = 128;
+> +	u64 tmp;
+> +	int ret;
+> +
+> +	uaccess_enable_privileged();
+> +
+> +	asm volatile("prfm	pstl1strm, %[addr]\n"
+> +		     "1: ldxr	%[tmp], %[addr]\n"
+> +		     "sub	%[tmp], %[tmp], %[old]\n"
+> +		     "cbnz	%[tmp], 3f\n"
+> +		     "2: stlxr	%w[ret], %[new], %[addr]\n"
+> +		     "cbz	%w[ret], 4f\n"
+> +		     "sub	%w[loops], %w[loops], #1\n"
+> +		     "cbnz	%w[loops], 1b\n"
+> +		     "3: mov	%w[ret], %w[eagain]\n"
+> +		     "4:\n"
+> +		     : [ret] "=r" (ret), [addr] "+Q" (*ptep), [tmp] "=&r" (tmp),
+> +		       [loops] "+r" (loops)
+> +		     : [old] "r" (old), [new] "r" (new), [eagain] "Ir" (-EAGAIN)
+> +		     : "memory");
 
-Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
----
- arch/arm64/include/asm/rsi_cmds.h        | 15 +++++++++++++++
- arch/arm64/include/asm/rsi_smc.h         |  2 ++
- drivers/virt/coco/arm-cca-guest/rsi-da.c | 14 ++++++++++++++
- 3 files changed, 31 insertions(+)
+Why doesn't this need an exception table as well? I'd expect it to
+fault just as much as the LSE version (and ret cannot report -EFAULT,
+for example).
 
-diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
-index e6d68760a729..bce08778c799 100644
---- a/arch/arm64/include/asm/rsi_cmds.h
-+++ b/arch/arm64/include/asm/rsi_cmds.h
-@@ -225,4 +225,19 @@ static inline unsigned long rsi_vdev_get_info(unsigned long vdev_id,
- 	return res.a0;
- }
- 
-+static inline unsigned long __rsi_vdev_dma_enable(unsigned long vdev_id,
-+						  unsigned long non_ats_plane,
-+						  unsigned long lock_nonce,
-+						  unsigned long meas_nonce,
-+						  unsigned long report_nonce)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RSI_VDEV_DMA_ENABLE, vdev_id,
-+			     non_ats_plane, lock_nonce,
-+			     meas_nonce, report_nonce, &res);
-+
-+	return res.a0;
-+}
-+
- #endif /* __ASM_RSI_CMDS_H */
-diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm/rsi_smc.h
-index 49334d07dd55..7bfc8bc5c2ff 100644
---- a/arch/arm64/include/asm/rsi_smc.h
-+++ b/arch/arm64/include/asm/rsi_smc.h
-@@ -186,6 +186,8 @@ struct realm_config {
-  */
- #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
- 
-+#define SMC_RSI_VDEV_DMA_ENABLE			SMC_RSI_FID(0x19C)
-+
- struct rsi_vdevice_info {
- 	union {
- 		struct {
-diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-index 4852a03dd17d..0b98f6271da6 100644
---- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
-+++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-@@ -264,6 +264,13 @@ static int verify_digests(struct cca_guest_dsc *dsc)
- 	return 0;
- }
- 
-+static inline int rsi_vdev_enable_dma(int vdev_id, struct dsm_device_info *dev_info)
-+{
-+	return __rsi_vdev_dma_enable(vdev_id, 0, dev_info->lock_nonce,
-+				     dev_info->meas_nonce, dev_info->report_nonce);
-+
-+}
-+
- int cca_device_verify_and_accept(struct pci_dev *pdev)
- {
- 	int ret;
-@@ -336,5 +343,12 @@ int cca_device_verify_and_accept(struct pci_dev *pdev)
- 		pci_err(pdev, "failed to switch the device (%u) to RUN state\n", ret);
- 		return -EIO;
- 	}
-+
-+	if (rsi_vdev_enable_dma(vdev_id, &dsc->dev_info)) {
-+		rhi_vdev_set_tdi_state(pdev, RHI_DA_TDI_CONFIG_LOCKED);
-+		pci_err(pdev, "failed to enable DMA from the device %d\n", ret);
-+		return -EIO;
-+	}
-+
- 	return 0;
- }
+I'm also on the fence about the bounded loop. Yes, forward progress is
+a problem, but it should only affect large systems which can readily
+use the atomic instructions. I'd rather we get rid of it until proven
+that we really need something like it.
+
+Thanks,
+
+	M.
+
 -- 
-2.43.0
-
+Without deviation from the norm, progress is not possible.
