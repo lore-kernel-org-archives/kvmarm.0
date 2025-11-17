@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061E4286A7
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 14:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C9033556F
+	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 14:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763388843; cv=none; b=aU1pkkEqo1hmTH5m4lPwNtDDfNXZLXlzre63z06V9RLriKQG3rW+qcEleBCnmlcHC2TCiiXkFi+wy5XvGGEilaSz+AoeMo9IPrs33UoUuMAC7Cn4OZrIGvUFEp59D1LCHe9AYP2Ve4ORGuwcbmLukGLm3R56+lOrF3ymGMmQz3U=
+	t=1763390993; cv=none; b=pumWVEkVtDDfrpWQSNiyLL7zA6Yl0Qg9VWfV+wroQIde5s0ebpj8X2sIAVSVUUioa1R6hXjvt0h/ZczCc7RIqxyDJNiIDs4EMYHR8m5+I64BTYupeh+IITv1vlsYY74U4c3X5oIqtLOZ522bLcsQXSDPs5U8w0UetFknh1196CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763388843; c=relaxed/simple;
-	bh=3jGSNpC+RFuosSSwTgsUJIaw5/p2K5A41jkysEQg2vk=;
+	s=arc-20240116; t=1763390993; c=relaxed/simple;
+	bh=eKcYHSjU+AaPevagF9nac5HnZveUtt8Cy3drmGczfVg=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DaPJaoJ9Xri25yRqDm7i38G79LX6dDXMteFryGKuHhh/+oUT3nZeCdtPHBjUjd9riB0wBtcBksb3hEbWkdlrYDuOD9QAMt1ealbrLrrv9BtaZ4/XRxr62i5b6PdN5pBBa9VkW3iblWs653MJmJmZobNPXh6JuklgqhuEU4JC7C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uw54X+bn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OQPVWTwa+qVZYEEwJmRbnWJ2t/YZeQTm5vJnBJ3+jzob7KZxTnjiq71nABqFYfq3FY+/oTaPYrAN/fuQ+bHYshxOcoKAA7Rl+oCEcO6LDExiNQH9zbUVfclJYgK0vqGpqtrSaJtw93MssMGikLIXUP7MrWIVdu8QQlVuDH+UsIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avIT7oJC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uw54X+bn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8665AC113D0;
-	Mon, 17 Nov 2025 14:14:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avIT7oJC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64FE4C4CEF1;
+	Mon, 17 Nov 2025 14:49:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763388842;
-	bh=3jGSNpC+RFuosSSwTgsUJIaw5/p2K5A41jkysEQg2vk=;
+	s=k20201202; t=1763390992;
+	bh=eKcYHSjU+AaPevagF9nac5HnZveUtt8Cy3drmGczfVg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uw54X+bni+oe6AiRl2/mPu19moxq8UVnxztvJe7wogGz7/YdeetTSPyyxYYIWx+TC
-	 d99XpRdSt68nfVhI8pLnU9KKOM94gdEaH74K3TwKsspk4cf8HrmHb2a9QMq6+p6+zx
-	 P2cELBf+7lfc8ZG3hSSCZj8BZUTw6gGuPYcduc6yhXscsDppAGH5QW3LWJg7+Q+zcJ
-	 Qq3HBa+F0DVXPawjSx5XKQQ5i8AOa5GZXkh8J0N4FRQA+tRfwa5imhuy3+S0ykd9x5
-	 6XeZR3kRDiP9HdqOJHp1OReSZFlm4nXQaEcsuG71GU7WHHWYagKkdXpMJ0yP7/fA7D
-	 aIv1UZtTGHHTA==
+	b=avIT7oJCO4TYdu4sX+QL+usxzq7Q2PmICjKYiMdLjzTjraMDfXor0PSRxTLmr2JIe
+	 Ucc1PrO0UM5K3+RWY6cw8d7GkEDhW//APx1io5xOAbBUmJooKXaPBCCt/0THP5GTjd
+	 x/rheUgP+9Onkqf3ooZPr+5aLBlOGT3KSaF/IJTKeY5FZJatLHwU66+r4ueCaRePkv
+	 B9WmD+bm3AF24Ocu3hD9rnsBf4tOwkbL07wvKiXuRpFpIi8wniE6C0+HySdZNv/oW6
+	 CI8q2eE1LtichdmN9++znGJHJU6JuTQOS2GHmmAzxyFrvLxSEKec/HYlOmR1M3eVuz
+	 IWxGfW8lmSXJQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vKzzU-00000005r3X-1dPu;
-	Mon, 17 Nov 2025 14:14:00 +0000
-Date: Mon, 17 Nov 2025 14:14:00 +0000
-Message-ID: <86zf8ksq53.wl-maz@kernel.org>
+	id 1vL0YA-00000005rVP-1yMe;
+	Mon, 17 Nov 2025 14:49:50 +0000
+Date: Mon, 17 Nov 2025 14:49:49 +0000
+Message-ID: <86y0o4sohe.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 09/12] KVM: arm64: Add helper for swapping guest descriptor
-In-Reply-To: <20251112183406.2118981-10-oupton@kernel.org>
+Subject: Re: [PATCH 10/12] KVM: arm64: Implement HW access flag management in stage-1 SW PTW
+In-Reply-To: <20251112183406.2118981-11-oupton@kernel.org>
 References: <20251112183406.2118981-1-oupton@kernel.org>
-	<20251112183406.2118981-10-oupton@kernel.org>
+	<20251112183406.2118981-11-oupton@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,100 +59,211 @@ X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 12 Nov 2025 18:34:03 +0000,
+On Wed, 12 Nov 2025 18:34:04 +0000,
 Oliver Upton <oupton@kernel.org> wrote:
 > 
-> Implementing FEAT_HAFDBS in KVM's software PTWs requires the ability to
-> CAS a descriptor to update the in-memory value. Add an accessor to do
-> exactly that, coping with the fact that guest descriptors are in user
-> memory (duh).
+> Atomically update the Access flag at stage-1 when the guest has
+> configured the MMU to do so. Make the implementation choice (and liberal
+> interpretation of speculation) that any access type updates the Access
+> flag, including AT and CMO instructions.
 > 
-> While FEAT_LSE required on any system that implements NV, KVM now uses
-> the stage-1 PTW for non-nested use cases meaning an LL/SC implementation
-> is necessary as well.
+> Restart the entire walk by returning to the exception-generating
+> instruction in the case of a failed Access flag update.
 > 
 > Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_nested.h |  2 +
->  arch/arm64/kvm/at.c                 | 86 +++++++++++++++++++++++++++++
->  2 files changed, 88 insertions(+)
+>  arch/arm64/include/asm/kvm_asm.h    |  6 +--
+>  arch/arm64/include/asm/kvm_nested.h |  1 +
+>  arch/arm64/kvm/at.c                 | 74 +++++++++++++++++++++++------
+>  arch/arm64/kvm/sys_regs.c           |  9 ++--
+>  4 files changed, 69 insertions(+), 21 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 9da54d4ee49e..090f7b740bdc 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -246,9 +246,9 @@ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
+>  extern int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
+>  
+>  extern void __kvm_timer_set_cntvoff(u64 cntvoff);
+> -extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> -extern void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> -extern void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> +extern int __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> +extern int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+> +extern int __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
 > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 5d967b60414c..6dbc2908aed9 100644
+> index 6dbc2908aed9..905c658057a4 100644
 > --- a/arch/arm64/include/asm/kvm_nested.h
 > +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -403,4 +403,6 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val);
->  		(FIX_VNCR - __c);				\
->  	})
+> @@ -353,6 +353,7 @@ struct s1_walk_info {
+>  	bool	     		be;
+>  	bool	     		s2;
+>  	bool			pa52bit;
+> +	bool			ha;
+>  };
 >  
-> +int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new);
-> +
->  #endif /* __ARM64_KVM_NESTED_H */
+>  struct s1_walk_result {
 > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index a295a37dd3b1..74f3be46fa66 100644
+> index 74f3be46fa66..9778a4241c19 100644
 > --- a/arch/arm64/kvm/at.c
 > +++ b/arch/arm64/kvm/at.c
-> @@ -1650,3 +1650,89 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
->  		return ret;
->  	}
+> @@ -346,6 +346,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  
+>  	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
+>  
+> +	wi->ha = tcr & TCR_HA;
+> +
+>  	return 0;
+>  
+>  addrsz:
+> @@ -380,10 +382,24 @@ static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
+>  	return 0;
 >  }
-> +
-> +static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>  
+> +static int kvm_swap_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 old, u64 new,
+> +			    struct s1_walk_info *wi)
 > +{
-> +	u64 tmp = old;
-> +	int ret = 0;
+> +	if (wi->be) {
+> +		old = cpu_to_be64(old);
+> +		new = cpu_to_be64(new);
+> +	} else {
+> +		old = cpu_to_be64(old);
+> +		new = cpu_to_be64(new);
+> +	}
 > +
-> +	uaccess_enable_privileged();
-> +
-> +	asm volatile(__LSE_PREAMBLE
-> +		     "1: cas	%[old], %[new], %[addr]\n"
-> +		     "2:\n"
-> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
-> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
-> +		     : [new] "r" (new)
-> +		     : "memory");
-> +
-> +	uaccess_disable_privileged();
-> +
-> +	if (ret)
-> +		return ret;
-> +	if (tmp != old)
-> +		return -EAGAIN;
-> +
-> +	return ret;
+> +	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
 > +}
 > +
-> +static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
-> +{
-> +	unsigned int loops = 128;
-> +	u64 tmp;
+>  static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  		   struct s1_walk_result *wr, u64 va)
+>  {
+> -	u64 va_top, va_bottom, baddr, desc;
+> +	u64 va_top, va_bottom, baddr, desc, new_desc, ipa;
+>  	int level, stride, ret;
+>  
+>  	level = wi->sl;
+> @@ -393,7 +409,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  	va_top = get_ia_size(wi) - 1;
+>  
+>  	while (1) {
+> -		u64 index, ipa;
+> +		u64 index;
+>  
+>  		va_bottom = (3 - level) * stride + wi->pgshift;
+>  		index = (va & GENMASK_ULL(va_top, va_bottom)) >> (va_bottom - 3);
+> @@ -490,6 +506,17 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+>  	if (check_output_size(baddr & GENMASK(52, va_bottom), wi))
+>  		goto addrsz;
+>  
+> +	if (wi->ha)
+> +		new_desc |= PTE_AF;
+
+What initialised new_desc the first place? Shouldn't there be a
+'new_desc = desc;' somewhere before that?
+
+> +
+> +	if (new_desc != desc) {
+> +		ret = kvm_swap_s1_desc(vcpu, ipa, desc, new_desc, wi);
+> +		if (ret)
+> +			return ret;
+> +
+> +		desc = new_desc;
+> +	}
+> +
+>  	if (!(desc & PTE_AF)) {
+>  		fail_s1_walk(wr, ESR_ELx_FSC_ACCESS_L(level), false);
+>  		return -EACCES;
+> @@ -1234,7 +1261,7 @@ static void compute_s1_permissions(struct kvm_vcpu *vcpu,
+>  	wr->pr &= !pan;
+>  }
+>  
+> -static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +static int handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr, u64 *par)
+>  {
+>  	struct s1_walk_result wr = {};
+>  	struct s1_walk_info wi = {};
+> @@ -1259,6 +1286,11 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  
+>  	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>  
+> +	/*
+> +	 * Race to update a descriptor -- restart the walk.
+> +	 */
+> +	if (ret == -EAGAIN)
+> +		return ret;
+>  	if (ret)
+>  		goto compute_par;
+>  
+> @@ -1292,7 +1324,8 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  		fail_s1_walk(&wr, ESR_ELx_FSC_PERM_L(wr.level), false);
+>  
+>  compute_par:
+> -	return compute_par_s1(vcpu, &wi, &wr);
+> +	*par = compute_par_s1(vcpu, &wi, &wr);
+> +	return 0;
+>  }
+>  
+>  /*
+> @@ -1420,9 +1453,10 @@ static bool par_check_s1_access_fault(u64 par)
+>  		 !(par & SYS_PAR_EL1_S));
+>  }
+>  
+> -void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +int __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  {
+>  	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
 > +	int ret;
-> +
-> +	uaccess_enable_privileged();
-> +
-> +	asm volatile("prfm	pstl1strm, %[addr]\n"
-> +		     "1: ldxr	%[tmp], %[addr]\n"
-> +		     "sub	%[tmp], %[tmp], %[old]\n"
-> +		     "cbnz	%[tmp], 3f\n"
-> +		     "2: stlxr	%w[ret], %[new], %[addr]\n"
-> +		     "cbz	%w[ret], 4f\n"
-> +		     "sub	%w[loops], %w[loops], #1\n"
-> +		     "cbnz	%w[loops], 1b\n"
-> +		     "3: mov	%w[ret], %w[eagain]\n"
-> +		     "4:\n"
-> +		     : [ret] "=r" (ret), [addr] "+Q" (*ptep), [tmp] "=&r" (tmp),
-> +		       [loops] "+r" (loops)
-> +		     : [old] "r" (old), [new] "r" (new), [eagain] "Ir" (-EAGAIN)
-> +		     : "memory");
+>  
+>  	/*
+>  	 * If PAR_EL1 reports that AT failed on a S1 permission or access
+> @@ -1434,15 +1468,20 @@ void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  	 */
+>  	if ((par & SYS_PAR_EL1_F) &&
+>  	    !par_check_s1_perm_fault(par) &&
+> -	    !par_check_s1_access_fault(par))
+> -		par = handle_at_slow(vcpu, op, vaddr);
+> +	    !par_check_s1_access_fault(par)) {
+> +		ret = handle_at_slow(vcpu, op, vaddr, &par);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+> +	return 0;
+>  }
+>  
+> -void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> +int __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  {
+>  	u64 par;
+> +	int ret;
+>  
+>  	/*
+>  	 * We've trapped, so everything is live on the CPU. As we will be
+> @@ -1489,13 +1528,17 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  	}
+>  
+>  	/* We failed the translation, let's replay it in slow motion */
+> -	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
+> -		par = handle_at_slow(vcpu, op, vaddr);
+> +	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par)) {
+> +		ret = handle_at_slow(vcpu, op, vaddr, &par);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+> +	return 0;
+>  }
 
-Why doesn't this need an exception table as well? I'd expect it to
-fault just as much as the LSE version (and ret cannot report -EFAULT,
-for example).
-
-I'm also on the fence about the bounded loop. Yes, forward progress is
-a problem, but it should only affect large systems which can readily
-use the atomic instructions. I'd rather we get rid of it until proven
-that we really need something like it.
+There is a quite a bit of churn in this patch changing the signature
+of the __kvm_at_s*() functions (and whatever calls them to propagate
+the errors). It'd be worth pulling this refactor as a preliminary
+patch, and then focus on the functional change.
 
 Thanks,
 
