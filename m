@@ -1,55 +1,55 @@
 Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E482D4B66
-	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A13330B3D
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763462297; cv=none; b=fw/F01QRo9a09W2IQrOm/zy4I1YaN7jdCmW53BEZxlijoUfWt6t4Gk0QOttyFgt9LKaKCZhM/1TaciIoIevJmEWfR4TDpTp0f0+57cnFADOeCki5EDXBxVxoJfkwN7K1obSGX7b52tuULiyIV/aDZrRYdu0OzPxDZ5K0JQUAw8o=
+	t=1763462298; cv=none; b=Vh87oRmcqM2gg7NoLlq4SdLUjBR7RNn2i6hT7KBYJEy4cDSYSxY4KmUZxgxAICff63+wvkS68hGCENkcP9ZjunZhySRnrjqKvYr8C2cKH/i9yLVuRxBSvZqLZxJAV0nE3d5l42OtkMILjgP6fw+juDsFRvjadvk1fP93BrXx8FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763462297; c=relaxed/simple;
-	bh=kgJd1xA0i1mby4L8vq6WdQZ6MiQdSsX0GOy588gokjQ=;
+	s=arc-20240116; t=1763462298; c=relaxed/simple;
+	bh=+T9pWVPxkhIqZEeKHCDUYC6bVKUN5yOXgXVN0FrZNrQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HgnBaOCldIxrabaoknwKJX89aHvvDMkCes1ONHgibICBCLi+N8bE4bQxaNuCcZXQ6kNpxAy6iP/S+3rcrnfAV7/Ev9u3KGkjzlBO+dYTioQY84WEY58SkplPHZIppXcbH1RB1k/agB8KkwrvXpxNckiuITbPPQifo4NsFMEtxQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s6ewk3O7; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=lBp/N5wVidtQWVlC+lBi/+QVEYdkvX4Ie6dg6lELQw2auReGpSBfqUc/Il2yKWU0g5cMMHlHVNGs+GpdwJIf6jHH6w7v0w39pbbRO5drv0eVnSMO3doRqr9aR4/YtODZjAtpFhb0LiCbPZ9DNza3UqqRGWlI2jaHHBcr+D8O7OM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3lD2AFug; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s6ewk3O7"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-42b352355a1so3034845f8f.1
-        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3lD2AFug"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-42b2b642287so3034600f8f.2
+        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763462295; x=1764067095; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763462293; x=1764067093; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1KpAk/X+mJeWWI/FqOB+Io4kN5HIqeKrqVApCd567Q=;
-        b=s6ewk3O73hBEn+C4DptfG/VBavc7HSOZjQv8Rr7HK2U8UZFCqjj7x2WUbv4vLD14bm
-         mTqwX9Ph9Un0xnp3fJmY6pI5+oMNwpJ4+iYVp+nf+4wGFZXlcfwU9qU+y5swLsLOyj9S
-         ZDTf0vqjbaU7e8e4v3O10e9gner0sKKwg5OUBZfdrMpK8kET3YROwqr15bvIGTMkJoTo
-         NChiB+0JTJ4/ytb5Hr273VBkMl9ZkCwIHWv5W+ETkmvKXyvHgdp0XGOmJ+x38B4YPkkv
-         +rqGsElK47otciNyi12rlnMR/JPZgksUkRuaZwU5RiBup2Obv0IFVufTwokJCK6sOKgb
-         I56g==
+        bh=V3DY/r7vs4MdPYVHCLsSRZJ7Jsv5MwDNd3VXG3UBq7M=;
+        b=3lD2AFugrNsBCh7na7DY4NgNzxbBUTE5wBTDdDfZIISOsDLJUalh7jsAg3mYB131gi
+         vRXojsrq0PfDDTlesD3drdKb8YoIqlpZv2HCMUln9u9bFxz2HaQHJn06m2oWjkvipaBV
+         fUZFM/hJlhUKJ2uiNigMJjF6DB8GYqGKlg7uZMsyaxKVBH76WTGGUMrns8qnfbFJZq4Y
+         dVLMUOs3IisvLWvVvc7GbD2VtWTQKR1sKD/XFgTcGsbTy6ZALYnPpG8Ux3yFimNtDttT
+         fVkspPUr1WcA/rpWNmguZD3IYAQTNhIOzJA5foAkdurVodXSaHefdks8GkFJgjgjSZdA
+         xMLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763462295; x=1764067095;
+        d=1e100.net; s=20230601; t=1763462293; x=1764067093;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1KpAk/X+mJeWWI/FqOB+Io4kN5HIqeKrqVApCd567Q=;
-        b=EfS08retfj92pxbtMmjp06HjIB9h3z409kPsv0d7R3LuwcUWGsUh9NJRdevTUV7y69
-         5hgUvBO/iuVo1pNGHV1jDxXsZNlr/mw9xzNkwdkVYxKPhPWS68G3TLVljMH+fUuXqvlP
-         AXOnGwVAOQi3/ZIoxgESjQWAvskfBqkOog/HbhwnwJLaqU4Tl9DdJRnzmtsRX9SSIBGU
-         NaGsM4X7qAIlIBFfGhciSEB+wqIJ1DSI3j6pNrbFkcpWb0tGYbNy2ZZX8FkkpmGE7q2i
-         gblodgv3nIxATWt7evHyVp6l0Fj9iXXFB9zf6YGRcOky/8zdhssrnllic8I0Ojp+IvHN
-         T9Ag==
-X-Gm-Message-State: AOJu0YxKwMOQ+kK+MBCp4bWONWirV3sGpx9ssjndxQQxEl+QtJ29IXOr
-	bQ0h7AY4aoQcwJsuMCdtch34Q8gn6D9LgRdtE2bLtLbXH4aSkkSPrphpoV8+pWbg8IrF11fbct8
-	nfsz4l3+1MugRw40/8MPRvZJd5kWHTc93s2XuqVjxWR2KTdsIJf1KAvwJxat39nkN+KWchMeVGS
-	E6V26BevKCkMewbaznK+mTir8akQNz1Lo=
-X-Google-Smtp-Source: AGHT+IEAYj+W/utL/Dvs1aiYdmCy2z5+TKwIEDcEUnNtXsvha71Ab0BwsvmfljNEPRzfgpl8tCmySeuxRA==
-X-Received: from wrbei2.prod.google.com ([2002:a05:6000:4182:b0:42b:b28a:673a])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:615:b0:42b:3dbe:3a37
- with SMTP id ffacd0b85a97d-42ca86971acmr2477705f8f.10.1763462294513; Tue, 18
- Nov 2025 02:38:14 -0800 (PST)
-Date: Tue, 18 Nov 2025 10:38:04 +0000
+        bh=V3DY/r7vs4MdPYVHCLsSRZJ7Jsv5MwDNd3VXG3UBq7M=;
+        b=liQEZ9JeE1q/WgXoOtnb5RHJn8KXRmg2SMg7FeEraDgNvyVShei2xm8G0y5wrlARYC
+         +bjKZWHs9xswUbAgf4vlcNZyJN0r9pNgXMuHXd+i+2v2eIheLhc2/5qXZQyS2UtcZjiE
+         MaIoT4wZFwBt+ix0NR0giFV+n6R4rXjT9l/My7kG03LoDr9O6MHncxhpee9uXQidi4jJ
+         iUChKHwUwHGf7PnHmmbGIJ5puCekuIW8V2lRmcA/Af6xzvrfljozYQiEOJmj9nbvcSOY
+         DGYVjnv4/UXK5xOlB5QgCzbQ22PUBgnMxhzFMHny/DPx+gH9ZEy2RrU4+200GXIvKZjm
+         QOJg==
+X-Gm-Message-State: AOJu0Yzfeu494yop5yolp7YGBu+1Q+FQC+sO5CFnzbWuBqyweBOw59mM
+	XZzUUsQd6tX+VN1r6ygv7QD1szrb7xoFPcglZcY+KmJCngoqAcc2y1lYujT4zvIsOEbnGaTnSlZ
+	+3+rUx+C+ckfEsIc+M53Mmu65hK2L8IA5wVRc+2DYDG4T2Q4PqNJcR+Wjn3Rqyjs7PYOqBfEp5/
+	afnixnPgiG21AE4QeWwgYW34JnWlOF3NU=
+X-Google-Smtp-Source: AGHT+IEM0HDE+lvs9ScNzQ8shtoujqBquagXe3II1XZ7PNdFFLvsEYqm1nNc2hPRwGYPRVWpbIx2645UEQ==
+X-Received: from wrxb9.prod.google.com ([2002:a05:6000:10c9:b0:42b:36e8:75b4])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:2910:b0:42b:2b07:8630
+ with SMTP id ffacd0b85a97d-42b59374207mr13697323f8f.31.1763462292547; Tue, 18
+ Nov 2025 02:38:12 -0800 (PST)
+Date: Tue, 18 Nov 2025 10:38:02 +0000
 In-Reply-To: <20251118103807.707500-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251118103807.707500-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251118103807.707500-8-tabba@google.com>
-Subject: [PATCH v5 7/9] KVM: arm64: Track KVM IOCTLs and their associated KVM caps
+Message-ID: <20251118103807.707500-6-tabba@google.com>
+Subject: [PATCH v5 5/9] KVM: arm64: Include VM type when checking VM
+ capabilities in pKVM
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,82 +69,105 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Track KVM IOCTLs (VM IOCTLs for now), and the associated KVM capability
-that enables that IOCTL. Add a function that performs the lookup.
+Certian features and capabilities are restricted in protected mode. Most
+of these features are restricted only for protected VMs, but some
+are restricted for ALL VMs in protected mode.
 
-This will be used by CoCo VM Hypervisors (e.g., pKVM) to determine
-whether a particular KVM IOCTL is allowed for its VMs.
+Extend the pKVM capability check to pass the VM (kvm), and use that when
+determining supported features. Moreover, extend the check to disallow
+MTE for all VM types in protected mode.
 
-Suggested-by: Oliver Upton <oupton@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 42 +++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          |  1 +
- 2 files changed, 43 insertions(+)
+ arch/arm64/include/asm/kvm_pkvm.h | 10 ++++++----
+ arch/arm64/kvm/arm.c              |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    | 10 +++++-----
+ 3 files changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 64302c438355..3ec2d4edd3b4 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1652,4 +1652,46 @@ static __always_inline enum fgt_group_id __fgt_reg_to_group_id(enum vcpu_sysreg
- 		p;							\
- 	})
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 08be89c95466..7195be508d99 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -23,10 +23,12 @@ void pkvm_destroy_hyp_vm(struct kvm *kvm);
+ int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
  
-+/*
-+ * Tracks KVM IOCTLs and their associated KVM capabilities.
-+ */
-+struct kvm_ioctl_cap_map {
-+	unsigned int ioctl;
-+	long ext;
-+};
-+
-+/*
-+ * Sorted by ioctl to allow for potential binary search,
-+ * though linear scan is sufficient for this size.
-+ */
-+static const struct kvm_ioctl_cap_map vm_ioctl_caps[] = {
-+	{ KVM_CREATE_IRQCHIP, KVM_CAP_IRQCHIP },
-+	{ KVM_ARM_SET_DEVICE_ADDR, KVM_CAP_ARM_SET_DEVICE_ADDR },
-+	{ KVM_ARM_MTE_COPY_TAGS, KVM_CAP_ARM_MTE },
-+	{ KVM_SET_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-+	{ KVM_GET_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-+	{ KVM_HAS_DEVICE_ATTR, KVM_CAP_DEVICE_CTRL },
-+	{ KVM_ARM_SET_COUNTER_OFFSET, KVM_CAP_COUNTER_OFFSET },
-+	{ KVM_ARM_GET_REG_WRITABLE_MASKS, KVM_CAP_ARM_SUPPORTED_REG_MASK_RANGES },
-+	{ KVM_ARM_PREFERRED_TARGET, KVM_CAP_CORE },
-+};
-+
-+/*
-+ * Set *ext to the capability.
-+ * Return 0 if found, or -EINVAL if no IOCTL matches.
-+ */
-+static inline long kvm_get_cap_for_kvm_ioctl(unsigned int ioctl, long *ext)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(vm_ioctl_caps); i++) {
-+		if (vm_ioctl_caps[i].ioctl == ioctl) {
-+			*ext = vm_ioctl_caps[i].ext;
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52f6000ab020..1f6e51234157 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -704,6 +704,7 @@ struct kvm_enable_cap {
  /*
-  * Extension capability list.
+- * This functions as an allow-list of protected VM capabilities.
+- * Features not explicitly allowed by this function are denied.
++ * Check whether the specific capability is allowed in pKVM.
++ *
++ * Certain features are allowed only for non-protected VMs in pKVM, which is why
++ * this takes the VM (kvm) as a parameter.
   */
-+#define KVM_CAP_CORE -1	/* represents core KVM capabilities */
- #define KVM_CAP_IRQCHIP	  0
- #define KVM_CAP_HLT	  1
- #define KVM_CAP_MMU_SHADOW_CACHE_CONTROL 2
+-static inline bool kvm_pvm_ext_allowed(long ext)
++static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+ {
+ 	switch (ext) {
+ 	case KVM_CAP_IRQCHIP:
+@@ -43,7 +45,7 @@ static inline bool kvm_pvm_ext_allowed(long ext)
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+ 		return true;
+ 	default:
+-		return false;
++		return !kvm || !kvm_vm_is_protected(kvm);
+ 	}
+ }
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 870953b4a8a7..10d853f2722e 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -87,7 +87,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	if (cap->flags)
+ 		return -EINVAL;
+ 
+-	if (kvm_vm_is_protected(kvm) && !kvm_pvm_ext_allowed(cap->cap))
++	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, cap->cap))
+ 		return -EINVAL;
+ 
+ 	switch (cap->cap) {
+@@ -299,7 +299,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+ 
+-	if (kvm && kvm_vm_is_protected(kvm) && !kvm_pvm_ext_allowed(ext))
++	if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, ext))
+ 		return 0;
+ 
+ 	switch (ext) {
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 16d7bf493c18..581dec4b8271 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -351,23 +351,23 @@ static void pkvm_init_features_from_host(struct pkvm_hyp_vm *hyp_vm, const struc
+ 		return;
+ 	}
+ 
+-	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_MTE))
++	if (kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_MTE))
+ 		kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_MTE_ENABLED);
+ 
+ 	bitmap_zero(allowed_features, KVM_VCPU_MAX_FEATURES);
+ 
+ 	set_bit(KVM_ARM_VCPU_PSCI_0_2, allowed_features);
+ 
+-	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PMU_V3))
++	if (kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_PMU_V3))
+ 		set_bit(KVM_ARM_VCPU_PMU_V3, allowed_features);
+ 
+-	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PTRAUTH_ADDRESS))
++	if (kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_PTRAUTH_ADDRESS))
+ 		set_bit(KVM_ARM_VCPU_PTRAUTH_ADDRESS, allowed_features);
+ 
+-	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_PTRAUTH_GENERIC))
++	if (kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_PTRAUTH_GENERIC))
+ 		set_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, allowed_features);
+ 
+-	if (kvm_pvm_ext_allowed(KVM_CAP_ARM_SVE)) {
++	if (kvm_pkvm_ext_allowed(kvm, KVM_CAP_ARM_SVE)) {
+ 		set_bit(KVM_ARM_VCPU_SVE, allowed_features);
+ 		kvm->arch.flags |= host_arch_flags & BIT(KVM_ARCH_FLAG_GUEST_HAS_SVE);
+ 	}
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
