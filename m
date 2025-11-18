@@ -1,55 +1,55 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA72311954
-	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DDC1C5D6A
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763462298; cv=none; b=fXlKDaT+laXOuDM/ZYm8msnK8k2BtyAV8gFFCErLIjfWxYNVoWzNuC1AJcTgpyyYWrKhJegEnuVm87Jba8AKZAqgYRMAL2e9Y66AzJx1rmqtHaKPcY/g6rcKsNVHrFPFdZNq6RMbXX4pq/0mjYHXY03JFmZxR7utAicOEsHp+4U=
+	t=1763462299; cv=none; b=UJ3+ycCC65DNVzl9Kqc2HOmJL5NNuXiXlLeWYj2x4aj9n8wefOkJj2uUMtas30Eh2zeCJcjkLTKQijwPS5WHjpfndoj45ZKejNr7cZPWL1fTxocyIdwJ8KC89C/GebpSuhSYACLBGd57u9d+Srukcfun1RbC71mb2ZI25byNbtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763462298; c=relaxed/simple;
-	bh=v6HnMXIRJVHYjHBHmKGwtj+/Dn+/S4HxeSywIevMMH4=;
+	s=arc-20240116; t=1763462299; c=relaxed/simple;
+	bh=HS3A6nZ/C1SGV1BCJYeGF/yP+AMKPP+weyYCOkSvWPg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hU1c7CsScSQO+VA4wp0yYe3txvRg1roh335MfER52WH85wg7h5N7h49Qfu4HBd9WpSNnsAukpC6d7eh2wZWZbH/un7Hcq+2IzsuQuMLt0BaxqHRWh9P7o5qiEKRj3co38X6xpVgKR+CIJlcYVAyYOtF69kAGd1C9eJcZ5i+vzcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OQysbq8G; arc=none smtp.client-ip=209.85.128.73
+	 To:Cc:Content-Type; b=GIOhrdGJNP1R0uNboEhbgJJie5XZrgpBb7u/npvhCcxGofM6y/IegrMtuCYgdwBjYvaiISEQXRQyfyimNVj7C2polHAnH5PRNGRxtAN9WlgJ7nQoNaQ5tjsb7Ll9FZHGMyTDFfYA0VOx3vUATEgIrSwoUCkii4Oqhd0mvrFzpxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OfBYi4Nj; arc=none smtp.client-ip=209.85.208.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OQysbq8G"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477a11d9f89so3878795e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:16 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OfBYi4Nj"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-6417677bf55so6934555a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763462295; x=1764067095; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1763462296; x=1764067096; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f7Ix1gvDoedoa2VySziNtSICAiph6cR2zcFJA1VxEgw=;
-        b=OQysbq8GEJxUQDrn4jKiKAdRtG3Ld4IXRv+D2c/MT15YBDmwiH0TJdFTlzuWU/xL50
-         t54x6C/pzbCtEfewb0hN8khCicIfKHy1pSrwreFvMIEj+uKes0i9J+V07OSX3+ogsYUZ
-         3PH0pWMDzsTBp0OXgoqAQQx47UAQJ1TdjI9PI2MEbYkVnDUXPcD7YgLWZx6bCFK8Wkc4
-         MfTn+Vq09MARHF0U4RBeOCE8fO1aDCgJTOs3IkwOEFO5RM8uF7+HhSlDNLQ1dCHlnFUn
-         W5OQdeb0Cjeai9RWwZq7hss5PGs/xPmxI+vDemUQrn2LKVm6IA7lwPLevvG3VbjJbXu2
-         VbAA==
+        bh=MdD3HvYe/LmQgWb1ELzMtTfkz5l2xc5jclOfmsq7xGc=;
+        b=OfBYi4Njcv+xtknkcgp6lOxWUxY+5UjKapHiHzm8JyQE1ItLINH386BUY+gR2yDMwR
+         tt7jj60LZavtGCV1h6OmYOhm7tnO0thNbJ7ieac5V1gN1HCnD/xRb09ZQauumFW98vqq
+         1usIvjLEij6AFChltneuBvYVUZaEuSG8sL9Qn2BXS1i0+Glss1WxzXzraZd7iojnm6eL
+         xPVvgmX0O2jYkSHkvsnaW4AWpOdv92kkQP7icvRqHIDLEl6qouf9ArlqbkipDEBJMIxN
+         2bKDJe3ZoOlxZ0WGLTiOF9A22Bo2vNy/76jT1EImLrfTPlWTjg2i3neuBs0qeRQTsVCv
+         juYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763462295; x=1764067095;
+        d=1e100.net; s=20230601; t=1763462296; x=1764067096;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f7Ix1gvDoedoa2VySziNtSICAiph6cR2zcFJA1VxEgw=;
-        b=ofF3+hCGSUOkvXFBPjqYFguD3hqEZ59T+i9x6y3ISDX8OuYiPmhM1Q721ISAdXo2bJ
-         uxkmg37lSvAdTsenw/k8WVar7Vdli/fpFfgq9dOv0p1yryPFr88E0suIuKiMB/Ws5UBw
-         z5C62OAYaeqKO26qOfrgGv4IIgX58k/Xvu+Sd/urbnnvCv00jWmPuu2J0gkkQZv/ejii
-         a4jNYGLrvWscR+6a1G7/JTTIPLustuE/S0mjAvRofvKhIeroYuL0SL4dcGXe3rjYumew
-         LzDX60sel8uKa+zCEsASbw1tEAktZyz3u6Jpl8m+jJ6EatIKMSet2ErOW/9h0dn1GcyV
-         TQBA==
-X-Gm-Message-State: AOJu0YyTiqz19AMH84MdBm6sn/VRLpwzUXHotqmhvk5ErVh2vTcOwgah
-	IUeP57qH4/HUlCvS67kB8nndfKVYvrKEGHbK1lLQ6Qbcf6mOwCObZVks7skRC54VihrR1WM4h+r
-	RqrmcVZRITo7ZdF442zAfcZEKVLIPpBBmT0glDctr1uZcnowz7sKZ0mf8rN1JEpI7hZAYda12AY
-	nxVwavNmnSWUnpOkqrPUHZTGyqAd+Ui5s=
-X-Google-Smtp-Source: AGHT+IHHaFRT48dnQv9XnnqkCXxSMygY1YzNHot8cTmVJYtqnUnJm6Bhep5tmphH8wELHWrZN7tKJjb/Cg==
-X-Received: from wmla8.prod.google.com ([2002:a05:600d:2388:b0:477:9945:466d])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8b23:b0:477:7bd2:693f
- with SMTP id 5b1f17b1804b1-4778fe60615mr147591815e9.6.1763462295255; Tue, 18
- Nov 2025 02:38:15 -0800 (PST)
-Date: Tue, 18 Nov 2025 10:38:05 +0000
+        bh=MdD3HvYe/LmQgWb1ELzMtTfkz5l2xc5jclOfmsq7xGc=;
+        b=Aw9H7NHht8IFtTpaUWvu8VgJ0AigFVsxr08JWqsRAHoAL/o7E75d/FMG97iaxhSv8x
+         iGEOFdLuyBXW7AhPP2DFz9JThyJqfbwKYwZtqMgATTesC/GHEwYIwq6Qy7A1k5qhYVT1
+         6Le58xDLyX86t1xt3E3tdL0LVHyyOar6Pb2Q2YRIjRyUCx7eQbuIuv9DvWQVyQLxOCYR
+         wFBmpC4N4x698tqY2b3pNc1qTKXGOSGUx4l4944SgCZOCNTX4AQBY4mNChuUiVZWId4L
+         ODRkQhgdvMbZcf7YEI/qdLvllrURtW4S+WchTU/q8pbeOF4QeCro2OjJnbCp95TOzQCS
+         +cxw==
+X-Gm-Message-State: AOJu0YzdKfBWrc3dRCLY4e30QnY0LBETUBZHTSsE1Z2PpaVYpdAdJuGL
+	HuhqYS2e1dmIiLIS1/TZFEeDjq8Fjmz61WYVjZ56quB4CZ1yuNKrEV+0kQ3oY1ffnjl3zU4HAK8
+	vIV+COLL/jZfWVSY4+PypyTNQapIp/nhmF7cStA1hlj2lSQRxeYf0u3LLyv815FoJuaehF94qHN
+	LJPc8ee1XVlcGh95SZVriOGFTEJ/q65Lo=
+X-Google-Smtp-Source: AGHT+IEJA/93zlApirgJ20FxZ4HFh69ol4ZkNO3y+csZUeciJUQyIEUxS2YM11xAwc6simPGysMnBpLtPg==
+X-Received: from eda13.prod.google.com ([2002:a05:6402:a00d:b0:643:38d8:ea2a])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:51cf:b0:640:9bb0:a059
+ with SMTP id 4fb4d7f45d1cf-644fe9b27demr2655048a12.10.1763462296292; Tue, 18
+ Nov 2025 02:38:16 -0800 (PST)
+Date: Tue, 18 Nov 2025 10:38:06 +0000
 In-Reply-To: <20251118103807.707500-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251118103807.707500-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251118103807.707500-9-tabba@google.com>
-Subject: [PATCH v5 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+Message-ID: <20251118103807.707500-10-tabba@google.com>
+Subject: [PATCH v5 9/9] KVM: arm64: Prevent host from managing timer offsets
+ for protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -68,81 +69,62 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
-support all features, restrict which IOCTLs are allowed depending on
-whether the associated feature is supported.
+For protected VMs, the guest's timer offset state should not be
+controlled by the host and must always run with a virtual counter offset
+of 0. The existing timer logic allowed the host to set and manage the
+timer counter offsets for protected VMs in certain cases.
 
-Use the existing VM capability check as the source of truth to whether
-an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
-associated capabilities.
+Disable all host-side management of timer offsets for protected VMs by
+adding checks in the relevant code paths.
 
-Suggested-by: Oliver Upton <oupton@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
- arch/arm64/kvm/arm.c              |  3 +++
- 2 files changed, 24 insertions(+)
+ arch/arm64/kvm/arch_timer.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 5b564576160d..dcba7f99b88c 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -9,6 +9,7 @@
- #include <linux/arm_ffa.h>
- #include <linux/memblock.h>
- #include <linux/scatterlist.h>
-+#include <asm/kvm_host.h>
- #include <asm/kvm_pgtable.h>
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 3f675875abea..f5407301c8f9 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1056,10 +1056,14 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
  
- /* Maximum number of VMs that can co-exist under pKVM. */
-@@ -31,6 +32,7 @@ int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
- static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
- {
- 	switch (ext) {
-+	case KVM_CAP_CORE:
- 	case KVM_CAP_IRQCHIP:
- 	case KVM_CAP_ARM_PSCI:
- 	case KVM_CAP_ARM_PSCI_0_2:
-@@ -51,6 +53,25 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+ 	ctxt->timer_id = timerid;
+ 
+-	if (timerid == TIMER_VTIMER)
+-		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+-	else
+-		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
++	if (!kvm_vm_is_protected(vcpu->kvm)) {
++		if (timerid == TIMER_VTIMER)
++			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
++		else
++			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
++	} else {
++		ctxt->offset.vm_offset = NULL;
++	}
+ 
+ 	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
+ 
+@@ -1083,7 +1087,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 		timer_context_init(vcpu, i);
+ 
+ 	/* Synchronize offsets across timers of a VM if not already provided */
+-	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
++	if (!vcpu_is_protected(vcpu) &&
++	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+ 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+ 		timer_set_offset(vcpu_ptimer(vcpu), 0);
  	}
- }
+@@ -1687,6 +1692,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+ 	if (offset->reserved)
+ 		return -EINVAL;
  
-+/*
-+ * Check whether the KVM VM IOCTL is allowed in pKVM.
-+ *
-+ * Certain features are allowed only for non-protected VMs in pKVM, which is why
-+ * this takes the VM (kvm) as a parameter.
-+ */
-+static inline bool kvm_pkvm_ioctl_allowed(struct kvm *kvm, unsigned int ioctl)
-+{
-+	long ext;
-+	int r;
-+
-+	r = kvm_get_cap_for_kvm_ioctl(ioctl, &ext);
-+
-+	if (WARN_ON_ONCE(r < 0))
-+		return false;
-+
-+	return kvm_pkvm_ext_allowed(kvm, ext);
-+}
-+
- extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
- extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 10d853f2722e..020cadd811a3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1879,6 +1879,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 	void __user *argp = (void __user *)arg;
- 	struct kvm_device_attr attr;
- 
-+	if (is_protected_kvm_enabled() && !kvm_pkvm_ioctl_allowed(kvm, ioctl))
++	if (kvm_vm_is_protected(kvm))
 +		return -EINVAL;
 +
- 	switch (ioctl) {
- 	case KVM_CREATE_IRQCHIP: {
- 		int ret;
+ 	mutex_lock(&kvm->lock);
+ 
+ 	if (!kvm_trylock_all_vcpus(kvm)) {
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
