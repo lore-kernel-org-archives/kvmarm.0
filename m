@@ -1,137 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE58E2E62C6;
-	Tue, 18 Nov 2025 19:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139542BEC42;
+	Tue, 18 Nov 2025 22:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763492804; cv=none; b=rXWDE8YEO7eRYXT1csmC014dH70eajcKQZiPbvdKOinUr1Vbk7S5LaZY8X7kYeCIxc8pd6g+KT/XBwcqqoEh9Q5CTzkfwf0BIoHX1PJJL8iAK51b1PaFbjXB+xc4rf3VfQ2J6/8ghU9GSaaTN3LF3hMFfOBOPSuQgpluMYzQgM0=
+	t=1763505896; cv=none; b=S4OeXW2DtrCGfdX76Mxrpk9sFgCri0rgYumcRWN5hnsPqtY35a5Bbct0oJ5+cLuiWX/pckBKj9qJogTLrpiZZnrRHeen71fW74Z6zNUtQ893yosRFMutk1rqiKeLGbqiYFhpTYpN+ePVnMT1Ajhl3Ib9Z2kvEjc9rvJtlBkg80U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763492804; c=relaxed/simple;
-	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MpdLms5S/iF7H50K1h3Nsxlpzpid26CG86/JZMfJA38f4iOt/Gy8NWjzFjVj6HFF3WKOD69PZVIvlxAi0cjLWag05faW9RWPvkz9AzWZ6F/RhZLkBWtxrKbeQEaFX52BBD94euq94HorADVifu4khw6jLKxprncoBvNaw7c4ghU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtPxeFps; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763505896; c=relaxed/simple;
+	bh=KvM4sw5d11P00xzno+X5e9UaJIpcGEJfE9v6laupK1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kr4gs+Nwbga7KMjl5kSEtuf6J5iIJiK5SW6sIAXawBmrhdGuTU00N8dvlJnsbfOGsxa/M5EWa7iFpMhfAsv4ks3BsNz6IhOhw4GmjR3V01EEuJia8HsE4pUlzZUqmaMtHMtSnPDKycbTEBAS0JxGAHm+etN5eRdfS/1vb24FOmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLTGDx4j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtPxeFps"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6BB3C19421;
-	Tue, 18 Nov 2025 19:06:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLTGDx4j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F3A7C2BCAF;
+	Tue, 18 Nov 2025 22:44:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763492804;
-	bh=7Uej8vFQyBecna9Eft7O2XmvApuSK/EcttFDPNfpMfs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PtPxeFpsTCUMy3B0/s9eZJtRfBN3Woqf70pKAph9EK0jd7Puhx2BUzOL+w4mV9IJb
-	 p/zsH5NWOhE3LPrQ1BkdpfvVuRG2BQDcR2aseYYXSAtheJnJa2Xcs7eyrwOWfqDzfF
-	 Tz/pCtMOkFC8LkHZMM8WFzaoBq7iEYvu5tbyb7VeEEH5gcgiBibU250YiQwgZXvpn6
-	 NnG5Ht4yrgzDOFHp9hjw9qZ+RYcrFflJfIVnK5QHkz2CUeWSMKr5cr3QKTes64/8Qm
-	 Y4TQte2J0EUMApdinQOenZwP0oE1IWuYVoTLYrPsZSn1Qpf9jfMBaq7GMscAivG8Ej
-	 YVkWR8TGwxseA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vLR2G-00000006Im4-42i7;
-	Tue, 18 Nov 2025 19:06:41 +0000
-Date: Tue, 18 Nov 2025 19:06:40 +0000
-Message-ID: <86ms4jrwhr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the dregs, the bad and the ugly)
-In-Reply-To: <CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
-References: <20251117091527.1119213-1-maz@kernel.org>
-	<aRweUM4O71ecPvVr@kernel.org>
-	<CA+EHjTzJQOTTSUoXVKpGdWO8vz9Vc-2AL3zRyzG4DkUPz+wBBQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1763505894;
+	bh=KvM4sw5d11P00xzno+X5e9UaJIpcGEJfE9v6laupK1E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JLTGDx4jkYO6rCsLPTkfwcGiYcDeLR7/nVDsghDGniU+c6haoY7REaiN1wy3sBlq9
+	 S1Nx/SQUNHYJzFYW4DRllsixtoyyp/z5EwPSAfaxytqjmLjM5Dyz9qZOt9GuNlhP9S
+	 CEDQmNM5EHH2448doM3f0Cx8X+uz/iUSnP+Ojva/p3O6299cR8zioP7BcoYWpmAUo2
+	 8TrFbVfbFfqiy5367kLCW+wwOTigWd0zQxJceJ5lXZ+N1IwOPma7GgW0fQskrRVRo2
+	 PPso+aj/XoqEE0emE98JGMwkcULoKFxl0uhcw0ahNwqCoY4uoeT7hW5MCZUSasVRxk
+	 Uc9tZlxit/BCg==
+Date: Tue, 18 Nov 2025 15:44:48 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, bpf@vger.kernel.org,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 1/4] mm/vmalloc: warn on invalid vmalloc gfp flags
+Message-ID: <20251118224448.GA998046@ax162>
+References: <20251117173530.43293-1-vishal.moola@gmail.com>
+ <20251117173530.43293-2-vishal.moola@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251117173530.43293-2-vishal.moola@gmail.com>
 
-Hi Fuad,
+Hi Vishal,
 
-On Tue, 18 Nov 2025 13:59:14 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Mon, Nov 17, 2025 at 09:35:27AM -0800, Vishal Moola (Oracle) wrote:
+> Vmalloc explicitly supports a list of flags, but we never enforce them.
+> vmalloc has been trying to handle unsupported flags by clearing and
+> setting flags wherever necessary. This is messy and makes the code
+> harder to understand, when we could simply check for a supported input
+> immediately instead.
 > 
-> On Tue, 18 Nov 2025 at 07:20, Oliver Upton <oupton@kernel.org> wrote:
-> >
-> > On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
-> > > This is a follow-up to the original series [1] (and fixes [2][3])
-> > > with a bunch of bug-fixes and improvements. At least one patch has
-> > > already been posted, but I thought I might repost it as part of a
-> > > series, since I accumulated more stuff:
-> > >
-> > > - The first patch addresses Mark's observation that the no-vgic-v3
-> > >   test has been broken once more. At some point, we'll have to retire
-> > >   that functionality, because even if we keep fixing the SR handling,
-> > >   nobody tests the actual interrupt state exposure to userspace, which
-> > >   I'm pretty sure has badly been broken for at least 5 years.
-> > >
-> > > - The second one addresses a report from Fuad that on QEMU,
-> > >   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
-> > >   the host exploding on deactivating an interrupt. This behaviour is
-> > >   allowed by the spec, so make sure we clear all trap bits
-> > >
-> > > - Running vgic_irq in an L1 guest (the test being an L2) results in a
-> > >   MI storm on the host, as the state synchronisation is done at the
-> > >   wrong place, much like it was on the non-NV path before it was
-> > >   reworked. Apply the same methods to the NV code, and enjoy much
-> > >   better MI emulation, now tested all the way into an L3.
-> > >
-> > > - Nuke a small leftover from previous rework.
-> > >
-> > > - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
-> > >   the trap prevents too many spurious MIs in an L1 guest, as the write
-> > >   to ICH_HCR_EL2 does exactly nothing on its own when running under
-> > >   FEAT_NV2.
-> > >
-> > > Oliver: this is starting to be a large series of fixes on top of the
-> > > existing series, plus the two patches you have already added. I'd be
-> > > happy to respin a full v4 with the fixes squashed into their original
-> > > patches. On the other hand, if you want to see the history in its full
-> > > glory, that also works for me.
-> >
-> > I'll pick up these patches in a moment but at this point I'd prefer a
-> > clean history. Plan is to send out the 6.19 pull sometime next week so
-> > any time before then would be great for v4.
+> Define a helper mask and function telling callers they have passed in
+> invalid flags, and clear those unsupported vmalloc flags.
 > 
-> I'm happy to take that for another spin Marc before you send it, if
-> it's different from the ToT I tested. In that case, just send me a
-> pointer to the branch.
+> Suggested-by: Christoph Hellwig <hch@infradead.org>
+> Signed-off-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  mm/vmalloc.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+> index 0832f944544c..5dc467c6cab4 100644
+> --- a/mm/vmalloc.c
+> +++ b/mm/vmalloc.c
+> @@ -3911,6 +3911,28 @@ static void *__vmalloc_area_node(struct vm_struct *area, gfp_t gfp_mask,
+>  	return NULL;
+>  }
+>  
+> +/*
+> + * See __vmalloc_node_range() for a clear list of supported vmalloc flags.
+> + * This gfp lists all flags currently passed through vmalloc. Currently,
+> + * __GFP_ZERO is used by BPF and __GFP_NORETRY is used by percpu. Both drm
+> + * and BPF also use GFP_USER. Additionally, various users pass
+> + * GFP_KERNEL_ACCOUNT.
+> + */
+> +#define GFP_VMALLOC_SUPPORTED (GFP_KERNEL | GFP_ATOMIC | GFP_NOWAIT |\
+> +				__GFP_NOFAIL |  __GFP_ZERO | __GFP_NORETRY |\
+> +				GFP_NOFS | GFP_NOIO | GFP_KERNEL_ACCOUNT |\
+> +				GFP_USER)
+> +
+> +static gfp_t vmalloc_fix_flags(gfp_t flags)
+> +{
+> +	gfp_t invalid_mask = flags & ~GFP_VMALLOC_SUPPORTED;
+> +
+> +	flags &= GFP_VMALLOC_SUPPORTED;
+> +	WARN(1, "Unexpected gfp: %#x (%pGg). Fixing up to gfp: %#x (%pGg). Fix your code!\n",
+> +			invalid_mask, &invalid_mask, flags, &flags);
+> +	return flags;
+> +}
 
-I've just pushed out a full branch at [1]. Please make sure to merge
-kvmarm-fixes-6.18-3 in, as it fixes a couple of nasties (small
-conflict expected, but the resolution should be obvious).
+I am seeing this warning trigger when starting a VM on one of my arm64
+boxes.
 
-For my own testing, I added -rc6 on top.
+  [ 6345.145795] ------------[ cut here ]------------
+  [ 6345.145803] Unexpected gfp: 0x2 (__GFP_HIGHMEM). Fixing up to gfp: 0x400dc0 (GFP_KERNEL_ACCOUNT|__GFP_ZERO). Fix your code!
+  [ 6345.145819] WARNING: mm/vmalloc.c:3940 at vmalloc_fix_flags+0x60/0x90, CPU#32: qemu-system-aar/4325
+  [ 6345.176990] Modules linked in: ...
+  [ 6345.254421] CPU: 32 UID: 1000 PID: 4325 Comm: qemu-system-aar Not tainted 6.18.0-rc6-next-20251118-00002-g2331e73a4769 #1 PREEMPT(voluntary)
+  [ 6345.267101] Hardware name: To be filled by O.E.M Ampere Altra Developer Platform/Ampere Altra Developer Platform, BIOS TianoCore 2.10.100.02 (SYS: 2.10.20
+  [ 6345.280907] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  [ 6345.287856] pc : vmalloc_fix_flags+0x60/0x90
+  [ 6345.292115] lr : vmalloc_fix_flags+0x58/0x90
+  [ 6345.296374] sp : ffff80008d5b3a10
+  [ 6345.299676] x29: ffff80008d5b3a20 x28: ffff07ff8a148000 x27: 0000000000000000
+  [ 6345.306800] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+  [ 6345.313923] x23: 000000000000000b x22: 000000000000ae01 x21: 0000000000000028
+  [ 6345.321047] x20: ffffc682ea643fbc x19: 0000000000001040 x18: ffff800083465050
+  [ 6345.328170] x17: 00000000d949c370 x16: 00000000d949c370 x15: 0000000000000004
+  [ 6345.335294] x14: 0000000000000002 x13: 0000000000000002 x12: 0000000000000000
+  [ 6345.342417] x11: 0000000000000001 x10: ffffc682ec577744 x9 : bf6a46a6bf3b7900
+  [ 6345.349541] x8 : bf6a46a6bf3b7900 x7 : 65646f632072756f x6 : 7920786946202e29
+  [ 6345.356664] x5 : ffff081f6fcdc678 x4 : 0000000000000000 x3 : ffff80008d5b3688
+  [ 6345.363788] x2 : 0000000000000021 x1 : 0000000000000000 x0 : 000000000000006f
+  [ 6345.370911] Call trace:
+  [ 6345.373346]  vmalloc_fix_flags+0x60/0x90 (P)
+  [ 6345.377606]  __vmalloc_noprof+0xa0/0xb0
+  [ 6345.381431]  kvm_arch_alloc_vm+0x64/0x70
+  [ 6345.385344]  kvm_dev_ioctl+0x9c/0x58c
+  [ 6345.388997]  __arm64_sys_ioctl+0xb0/0x100
+  [ 6345.392995]  invoke_syscall+0x84/0xf4
+  [ 6345.396648]  el0_svc_common.llvm.4390888008543260363+0x90/0xf4
+  [ 6345.402469]  do_el0_svc+0x2c/0x3c
+  [ 6345.405773]  el0_svc+0x54/0x2a8
+  [ 6345.408905]  el0t_64_sync_handler+0x88/0x134
+  [ 6345.413164]  el0t_64_sync+0x1b8/0x1bc
+  [ 6345.416815] ---[ end trace 0000000000000000 ]---
 
-Note that I didn't take your Tested-by: tags, as you are about to
-retest the whole thing anyway. If all goes well (fingers crossed),
-Oliver will be able to apply any further tag once I post these
-patches.
+where kvm_arch_alloc_vm() from arch/arm64/kvm/arm.c is
 
-Thanks,
+  struct kvm *kvm_arch_alloc_vm(void)
+  {
+      size_t sz = sizeof(struct kvm);
 
-	M.
+      if (!has_vhe())
+          return kzalloc(sz, GFP_KERNEL_ACCOUNT);
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vgic-lr-overflow
+      return __vmalloc(sz, GFP_KERNEL_ACCOUNT | __GFP_HIGHMEM | __GFP_ZERO);
+  }
 
--- 
-Without deviation from the norm, progress is not possible.
+Should __GFP_HIGHMEM be dropped from the call to __vmalloc? It looks
+like it was added by commit 115bae923ac8 ("KVM: arm64: Add memcg
+accounting to KVM allocations") back in 5.16.
+
+Cheers,
+Nathan
