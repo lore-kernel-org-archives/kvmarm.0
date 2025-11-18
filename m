@@ -1,69 +1,67 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADED62F1FDE
-	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 01:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BA716D9C2
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 01:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763429603; cv=none; b=pLYI/z+pHPZr2Mr8PJUFZW18xoIgJXbQRbc3r8zgbgd7dfSNWw018keH9ly7N3cigkw+WN66VAQ4WW7/5Kr/PXSVFBeKg1eN06Z3HXj9Vq814iyWJc83ouI+MKU/tN9SCpit8eEyruKWWA9MdpfFSkQUIM8jU4NclKgARAdg3fY=
+	t=1763430359; cv=none; b=NLD0JVoKnntQW1FK7jJbahHiTDmt96307baerU2pgQh9awtmi9M0Si0uneq6QcJmTX3IzsYC0vbhMNVCSb07ayJ1kEPXjVwMFU0jcctehDcR+l8X0Shg1sSiThY/irHDJMETXNPvh5zy8pbyDGbzAZcRGaQclo3SCMVkV6e6LF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763429603; c=relaxed/simple;
-	bh=nnVJBDrqwwIhWPtEpmmZic7FnfDmoGokXzSNORyOUJo=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=ZfcWqcVxMcaHnkh2jUg0mCvq75QNI6oiiP4nM7qGBHd4ne4pU3ndW+Z/+nVK/aA83lEHico9I8O+wV40JQnbvj4YMF0gPhyepHJepuHzRH45r25b/gUyeyU037Q3IZztJ/o4FXCNYzmEayiJrVXsDx3ng2Tbw0C559118qyecbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=rHzA47Gr; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+	s=arc-20240116; t=1763430359; c=relaxed/simple;
+	bh=rATIvjZWl17/yzOZ5j8ONKzwEletAb128KFIym5/z2k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ExMNALyUmwb/aS7DssCDTgT3lIZDkTH/6jyzZyIvZiDcszMCFAHHlEz1xKgvYeR+gUh0R8Y+WH6Ki3n1irsDxPEZWBtK967i/sZx22AQ7k7JP5l5/UezchSI0SQmXRXVgsEoqAOa4vlMErYvrkXZjiFg+1eAjD9Yszy6pdUc3Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eurWVBCU; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="rHzA47Gr"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b2f2c5ec36so152185385a.1
-        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 17:33:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eurWVBCU"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7aab7623f42so5857891b3a.2
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 17:45:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1763429600; x=1764034400; darn=lists.linux.dev;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C4hoiXRAaj1tbhxDzJlVdMfo7upvGHdC39KJuih16Vw=;
-        b=rHzA47Gr0qAwaXhqA2wpQIOM/4XXwif5aQnyBsDAm+NU9ggF/QUvLSte2eBbiqSDGQ
-         5O1aQPVD/I6t/rBXqNOPFiHNILXPwC+rUxXEakcmSqVrLoBL0diJfXRFLH+vJkIS4B4C
-         y0HbRZMT0LO8Z5X9HvLaj++9W2JB+K2yr36CQQNX4Qy/FAP5zM3OBTAmn4QyMb2nx0p7
-         0G+Xm1d2jxFXQng2o2oAUf2f7gOFS+WQEr4h3r9BGrRMch1q03jCmV+sbQh/CIs8S6Nk
-         mEuxMN1fJlP5FpmJh+DnuI3y4Y4FL4OX4cgyV1JSB6IYPnMxyMdqvii60RnOHB5uU4Sp
-         +C4A==
+        d=gmail.com; s=20230601; t=1763430357; x=1764035157; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9LVu1ftHSweMGGMS0wtdGEkaqFzhCbvStNQPyLLvshM=;
+        b=eurWVBCUpu4mZDD3HXGwJ132gez4xfyRkBPAOqgN7KRBBSX9Q6gzhkCziJekBeQTV3
+         K0+fUN2WBrPxuezZyDvE/eZv1hDYRaek0QAlc7QGpKvZPopjP+HmhGijo1hg34EwgmUV
+         R1q4lGMUcwXremx/eg4qrhU+l3BEd+2soS5DlSDYOw3fGFRYSuCs6FRTaubvnYobxzyP
+         gAKyMGmXaPdHURnF1GnvreYN6kjVkntwsRhdAXEa64fgdYrCQ8DSEYT5VGzpnBs/utW2
+         SQFnRCUVT8YYDL/WuArcGfsl5X4y2XKG0HsYq5kJlqjZZN6oIfu3ujY3t4tR8CD8qctY
+         G+Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763429600; x=1764034400;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4hoiXRAaj1tbhxDzJlVdMfo7upvGHdC39KJuih16Vw=;
-        b=bKaU2y/pPJJCYqJHhTSPWPK53VawWG84HpTFbS7Cp8pTmPkYwduVHByxp5GcOcZeHi
-         y1lKy12JKoEgJo00M6GIGC8oCqPoIPQeUOPz7ORCCkETYiaHTSF4dlJY9/nqtBUThYwF
-         HNzUtWc19QaGPE08I2PtP7x7APQIllukfiSEqJvDDOyGiaMX347sCxDtBDzQB9AsULId
-         H3vEMr4Hj1yt+Ji+JSqKeBGPQ53ZXONOZ8pShY/DFnNM3dDFadcp1aFtrjYcYqo5m4yc
-         7c7dWtKYGFIcY2Djz8tFYfLIO4C5sZ4aNondRt6fCOeaVUswRYbf075Mwohyss2DLyhD
-         SI+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVuuS+QG7DnN4ghI43lcUB+Oz4pW36liL16aBqVVx20TXNAmJBV/dCCwMhQunOSa1S3XJSatPg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx9fWTqN4x0TSRViltiOOYDwN0FfIFnHz4fKjBdpiLTc/s1X58M
-	AfoF5x7QZGldaRZyuiYtsVoyuplSvsvXTKH6BSKvxnb3hOCJMmJ49jIplCZghoazb38NM+YE/Ha
-	eo7iC
-X-Gm-Gg: ASbGnct9y/7E3VuLgfWldVIvVQIFwaNUWhtixKHvcj3Bt33nIUze4QtqRks9+2eumfs
-	2RfNyVjxXEb2wxUfEoGrp8bxPlx7aN7+eI8QAsiGK7hj7tYqoPx48xizZZ9hAfR0z9Bmca0fts1
-	Y6VDF1xuKG28/OvCEbGpW6qjZJC5kBgfzhs0wjINT3mrnfgzK166CleU6VhDUI/NiDpbHALDSSx
-	DRB7ll11eoP10wVLyn9X0glZCAGt2nuo1IAL/GSRYHuoaTg6aZpnumUtKg7KMaDXuqLx7oFmLOd
-	5cIkNpywEGXPeYBxNoOCeI1gTk9FqpTHx37iBTVLYUvm+7RmOIQTe7NKxs7mlxVgCGJEGR3nuYJ
-	pJhxow+5vsKiSuit0kBu7oLFwssOCFmC2ZYNEOjWGjw2CyCtbVDROh6gwERwE0E1XQnAKClTvKG
-	r6HQoE1/9fptJORvn/2v/RFMi0KI4Gk4Lc+rpE9WkDEHHFgyASD9/9deahsQ+4i85V63Xuz+9qm
-	yDY1ilwVVWFrDmt9NFjrCdNUpEMPwk/rzSJJ1x2cZwPjcs8JdjuiSmW
-X-Google-Smtp-Source: AGHT+IH3jZaF+8AMXYP9SIuqmgqhQ/1/L9nHNB8dUkfbV4+F9NYJk6SL9OfbdMigKEqTCtc9kQ2kdg==
-X-Received: by 2002:a05:620a:3945:b0:8b2:7679:4d2d with SMTP id af79cd13be357-8b2c31d3f09mr1994630685a.63.1763429600193;
-        Mon, 17 Nov 2025 17:33:20 -0800 (PST)
-Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2aee9e519sm1116530885a.5.2025.11.17.17.33.17
+        d=1e100.net; s=20230601; t=1763430357; x=1764035157;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9LVu1ftHSweMGGMS0wtdGEkaqFzhCbvStNQPyLLvshM=;
+        b=BNA6DjPImt8co3+Hlu8dgoTA6xPQfT11yKiw2lPGJ4bw5KwElJ6Ofa5zAMB56rEZ9U
+         CXWg7m9wo5qgFnkpk9sIQw6hIZK+Rcn4yC3CQyY0zCgzHUwGNGy3zWm3fSacTr86KVC9
+         dNDwZkRCkjDko5d1UdHl+gFdTagwTEjL8gdoc3C9hD3rZOgLY//jkLDZnGqfoo1obckb
+         WE9tXi84QXKUJlyVeOI7B/HONCiVlaOh03TBDs/9OCmxTmGySZWi7103Ok1xATfmgl8q
+         1HSTb4jK5XfQ2CPaWfq0N5G2Fb1UqnbcBZvUR5TUQLgjoXYfhxYEbO2EAOl8wezonivT
+         mG9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXD2MShP21zSBcWX90Pdc2CJovOIkX1xg/7CPHJTVr8dRA6nQD7jfEck/b2kI0RPehBmG0/D9Y=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzm45Kh4EX2T0Bq8ExiuQAc+Yke64mFsEP/HGf+cSK7zroNKDzT
+	oKefjjMBJlsjTE/jiegfQc+4T6/uUvWg6U1KryOhzzTEt/zDEy9VIK3i
+X-Gm-Gg: ASbGncsm7DC3XTnliX0SyEzZxqojg1Nj6wKZ3arQ7CQDb+2d8shHEVPDQo8puccCRNA
+	hUxCWQfDpVUpIKGNx+Tt/ZdnxAus93SIGoJLTFNermTB/uY5vYABkpnk55C8RZVHXzD7K6KOhfR
+	fZLAc5jgUKSzOwP94aIixWy5GmDeXDf+u/k7lPj5zcv562ZW4bVmAr8MBUElVGeubEiu01+veQ4
+	aFBaExhKFyR/aoLJ4WS2vVNfDrKf5oCJfmLh944By+acjjrVbgFi++Pjtu1+EvnYRa5nNS3OV0s
+	sLJrMPIbW2NBBZJgYKPsh4QAuzrtRix6Cs771vFkoPq5SAfgNipkihFGWRfAyWezLYfj71NXa7q
+	en+jkMSHWOWP8FbO8UbYqTyfHOPEdO005b8D1F5f/GegBamwYVBx0vzmDRC89KyllABs9f50Gq4
+	F0TQcqhFbUOj74TN6KWhhJ
+X-Google-Smtp-Source: AGHT+IG/PNQV7yS4/dOlu2YCel/annKvAJBo90V1Nz+6LPzZU6gOPlYVZPEcln+UbOpMuRAShHAXFA==
+X-Received: by 2002:a05:6a21:3397:b0:35d:cc9a:8bbb with SMTP id adf61e73a8af0-35dcc9a8d3emr9776085637.47.1763430357500;
+        Mon, 17 Nov 2025 17:45:57 -0800 (PST)
+Received: from [192.168.1.2] ([122.177.125.110])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bc3761d0109sm13385461a12.27.2025.11.17.17.45.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Nov 2025 17:33:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------v5UEWd1lmK7xbVKuWRNVQR30"
-Message-ID: <083276ef-ff1b-4ac3-af19-3f73b1581d39@grsecurity.net>
-Date: Tue, 18 Nov 2025 02:33:16 +0100
+        Mon, 17 Nov 2025 17:45:57 -0800 (PST)
+Message-ID: <0f6fe0c6-7c11-4f16-bed4-db4de675b002@gmail.com>
+Date: Tue, 18 Nov 2025 07:15:50 +0530
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -71,230 +69,76 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
- functions
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Andrew Jones <andrew.jones@linux.dev>, Eric Auger <eric.auger@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20250915215432.362444-1-minipli@grsecurity.net>
- <176314469132.1828515.1099412303366772472.b4-ty@google.com>
- <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
- <aRufV8mPlW3uKMo4@google.com>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <aRufV8mPlW3uKMo4@google.com>
-
-This is a multi-part message in MIME format.
---------------v5UEWd1lmK7xbVKuWRNVQR30
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v4] arm64: errata: Work around AmpereOne's erratum
+ AC04_CPU_23
+To: D Scott Phillips <scott@os.amperecomputing.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ James Clark <james.clark@linaro.org>, James Morse <james.morse@arm.com>,
+ Joey Gouly <joey.gouly@arm.com>, Kevin Brodsky <kevin.brodsky@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ "Rob Herring (Arm)" <robh@kernel.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Shiqi Liu <shiqiliu@hust.edu.cn>, Will Deacon <will@kernel.org>,
+ Yicong Yang <yangyicong@hisilicon.com>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250513184514.2678288-1-scott@os.amperecomputing.com>
+ <456bba04-07b7-4c27-96fc-9bf226b12fd9@gmail.com>
+ <86bjl0o9yd.fsf@scott-ph-mail.amperecomputing.com>
+Content-Language: en-US
+From: Jaikiran Pai <jai.forums2013@gmail.com>
+In-Reply-To: <86bjl0o9yd.fsf@scott-ph-mail.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 17.11.25 23:19, Sean Christopherson wrote:
-> On Sat, Nov 15, 2025, Mathias Krause wrote:
->> On 14.11.25 19:25, Sean Christopherson wrote:
->>> On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
->>>> This is v2 of [1], trying to enhance backtraces involving leaf
->>>> functions.
->>>>
->>>> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
->>>> fails hard for leaf functions lacking a proper stack frame setup, making
->>>> it dereference invalid pointers. ARM64 just skips frames, much like x86
->>>> does.
->>>>
->>>> [...]
->>>
->>> Applied to kvm-x86 next, thanks!
+
+On 17/11/25 10:47 pm, D Scott Phillips wrote:
+> Jaikiran Pai <jai.forums2013@gmail.com> writes:
+>
+>> Hello Scott,
 >>
->> Thanks a lot, Sean!
->>
->>> P.S. This also prompted me to get pretty_print_stacks.py working in my
->>>      environment, so double thanks!
->>
->> Haha, you're welcome! :D
->>
->>>
->>> [1/4] Makefile: Provide a concept of late CFLAGS
->>>       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
->>> [2/4] x86: Better backtraces for leaf functions
->>>       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
-> 
-> Spoke too soon :-(
-> 
-> The x86 change breaks the realmode test.  I didn't try hard to debug, as that
-> test is brittle, e.g. see https://lore.kernel.org/all/20240604143507.1041901-1-pbonzini@redhat.com.
-
-Gee! 16bit code at its finest.
-
-So I looked at it and this seems to be a bug in gcc because it emits a
-5-byte NOP to make room for a 3-byte call. Actually, it doesn't even
-emit a NOP, it just spits out some bytes:
-
-minipli@bell:~$ diff -u pg.s nop_mcount.s
---- pg.s	2025-11-18 01:34:34.884472417 +0100
-+++ nop_mcount.s	2025-11-18 01:34:05.716096290 +0100
-@@ -11,7 +11,7 @@
- 	.cfi_offset 5, -8
- 	movl	%esp, %ebp
- 	.cfi_def_cfa_register 5
--1:	call	mcount
-+1:	.byte	0x0f, 0x1f, 0x44, 0x00, 0x00
- 	movl	8(%ebp), %eax
- 	addl	%eax, %eax
- 	popl	%ebp
-
-The issue is, while that is a perfectly fine NOPL for 32-bit and 64-bit,
-it's not for 16-bit. The 16-bit version gets treated as a 4-byte NOPW
-with a left-over zero byte which messes with all the following opcodes
-and causes issues like you observed.
-
-However, gcc is probably not fully to blame, as it cannot know that it's
-generating 16-bit code. That piece is hidden in a asm(".code16gcc")
-statement.
-
-> 
-> I can't for the life of me figure out how to get Makefile variables to do what I
-> want, so for now I'm going to drop the x86 change so as not to block the rest of
-> the stuff I've got applied.
-> 
-> I'll keep the rest applied, so just resubmit the x86 patch against kvm-x86/next.
-> 
+>> On 14/05/25 12:15 am, D Scott Phillips wrote:
+>>> On AmpereOne AC04, updates to HCR_EL2 can rarely corrupt simultaneous
+>>> translations for data addresses initiated by load/store instructions.
+>>> Only instruction initiated translations are vulnerable, not translations
+>>> from prefetches for example. A DSB before the store to HCR_EL2 is
+>>> sufficient to prevent older instructions from hitting the window for
+>>> corruption, and an ISB after is sufficient to prevent younger
+>>> instructions from hitting the window for corruption.
+>> I see that this patch enables the workaround only for AmpereOne AC04
+>> systems. Do you happen to know if the underlying issue for which this
+>> patch was introduced, impacts (or can impact) AmpereOne AC03 systems too:
+> Hi Jaikiran, this issue impacts ac04 only, it is not present on ac03.
 
 
-> FWIW, conceptually I think we want something like this:
-> 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index be18a77a..65e41578 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -44,6 +44,7 @@ COMMON_CFLAGS += -O1
->  KEEP_FRAME_POINTER := y
->  
->  ifneq ($(KEEP_FRAME_POINTER),)
-> +ifneq ($(no_profiling),y)
->  # Fake profiling to force the compiler to emit a frame pointer setup also in
->  # leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
->  #
-> @@ -53,6 +54,7 @@ ifneq ($(KEEP_FRAME_POINTER),)
->  # during compilation makes this do "The Right Thing."
->  LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
->  endif
-> +endif
->  
->  FLATLIBS = lib/libcflat.a
->  
-> @@ -120,6 +122,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o $(SRCDIR)/$(TEST_DIR)/realmode.
->         $(LD) -m elf_i386 -nostdlib -o $@ \
->               -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $(filter %.o, $^)
->  
-> +$(TEST_DIR)/realmode.o: no_profiling = y
->  $(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+Thank you Scott for the quick confirmation.
 
-Kind of, yes. Just with the $(no_profiling) part embedded into
-LATE_CFLAGS. However, as that gets forcibly evaluated early (on
-purpose!), that can't work.
+We have been investigating an issue on AC03 (running Oracle Linux as a 
+VM) where some memory writes (stores) are lost especially when the OS 
+appears to have accumulated high buf/cache usage (monitored through free 
+-h). That investigation, backed by a trivial C reproducer, is still 
+ongoing and we are trying to understand what could be causing it. The 
+issue description here made us curious whether it's the same issue we 
+are running into and since this patch wasn't applied on AC03, we decided 
+to check once.
 
-I tried to play with $(filter-out ...,$(CFLAGS)) but that didn't work
-out either. What does work, however, is to disable -mnop-mcount and make
-it a call again. This just needs a stub mcount() and the realmode test
-is working again.
+While at it, if you have any inputs (tools/commands) that you typically 
+use to narrow down such issues, I would be happy to experiment with if 
+feasible. Right now we are focusing on the kernel itself and checking 
+which specific kernel versions can reproduce it. We have been able to 
+reproduce it consistently on 5.15.x and 5.16.x and we plan to try it 
+with other kernel versions all the way upto 6.12. That should tell us if 
+the issue we are encountering has already been addressed in any specific 
+kernel version.
 
-I see that kvm-x86/next as of now (e403d30a8210 ("x86/emulator: Treat
-DR6_BUS_LOCK as writable if CPU has BUS_LOCK_DETECT")) still has
-f01ea38a385a ("x86: Better backtraces for leaf functions"), so I just
-created a fixup commit (attached). Feel free to squash it into
-f01ea38a385a or yell at if you want something else.
+Given that you noted this patch isn't relevant for AC03, I don't plan to 
+further reply-all to this PATCH discussion, but if you would like me to 
+keep you updated with this investigation (I would love to get some 
+inputs and provide updates as we go along) then please let me know and I 
+will communicate with you over your email (or any other relevant forum 
+you suggest).
 
-Thanks,
-Mathias
+Thank you again for the quick response.
 
---------------v5UEWd1lmK7xbVKuWRNVQR30
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-x86-Prevent-realmode-test-code-instrumentation-with-.patch"
-Content-Disposition: attachment;
- filename*0="0001-x86-Prevent-realmode-test-code-instrumentation-with-.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
+-Jaikiran
 
-RnJvbSBkMmFjMTU4ODFiNzk0YTRlMzkzMmM0OWE5NzI3OGQwNDI2ZjBhYTY3IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBNYXRoaWFzIEtyYXVzZSA8bWluaXBsaUBncnNlY3Vy
-aXR5Lm5ldD4KRGF0ZTogVHVlLCAxOCBOb3YgMjAyNSAwMjoxNDoyNyArMDEwMApTdWJqZWN0
-OiBba3ZtLXVuaXQtdGVzdHMgUEFUQ0hdIHg4NjogUHJldmVudCByZWFsbW9kZSB0ZXN0IGNv
-ZGUKIGluc3RydW1lbnRhdGlvbiB3aXRoIG5vcC1tY291bnQKCkNvbW1pdCBmMDFlYTM4YTM4
-NWEgKCJ4ODY6IEJldHRlciBiYWNrdHJhY2VzIGZvciBsZWFmIGZ1bmN0aW9ucyIpIG1hZGUK
-dXNlIG9mICctcGcgLW1ub3AtbWNvdW50JyB0byBwcm92aWRlIGEgbGlnaHR3ZWlnaHQgd2F5
-IHRvIGZvcmNlIGxlYWYKZnVuY3Rpb25zIHRvIGVtaXQgYSBwcm9wZXIgcHJvbG9ndWUgZm9y
-IHRoZSBiYWNrdHJhY2luZyBjb2RlLiBIb3dldmVyLAotbW5vcC1tY291bnQgZG9lc24ndCBw
-bGF5IHdlbGwgd2l0aCAxNi1iaXQgY29kZSBnZW5lcmF0aW9uIGZvciBDIGNvZGUuCmdjYyBo
-YXBwaWx5IGVtaXRzIGEgNS1ieXRlIE5PUCB0aGF0IHRyYW5zbXV0ZXMgdG8gYSA0LWJ5dGUg
-Tk9QIGZvbGxvd2VkCmJ5IGEgemVybyBieXRlIHdoZW4gZXhlY3V0ZWQgaW4gcmVhbCBtb2Rl
-LCB3cmVja2luZyBhbGwgY29kZSB0aGF0CmZvbGxvd3MuCgpGaXggdGhhdCBieSBzZWxlY3Rp
-dmVseSBkaXNhYmxpbmcgJy1tbm9wLW1jb3VudCcgZm9yIHJlYWxtb2RlLmMsIG1ha2luZwpp
-dCBjYWxsIG1jb3VudCgpLCB3aGljaCBpcyBwcm92aWRlZCBhcyBhIHN0dWIgZnVuY3Rpb24u
-CgpSZXBvcnRlZC1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+
-CkZpeGVzOiBmMDFlYTM4YTM4NWEgKCJ4ODY6IEJldHRlciBiYWNrdHJhY2VzIGZvciBsZWFm
-IGZ1bmN0aW9ucyIpClNpZ25lZC1vZmYtYnk6IE1hdGhpYXMgS3JhdXNlIDxtaW5pcGxpQGdy
-c2VjdXJpdHkubmV0PgotLS0KIHg4Ni9NYWtlZmlsZS5jb21tb24gfCA1ICsrKystCiB4ODYv
-cmVhbG1vZGUuYyAgICAgIHwgMyArKysKIDIgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25z
-KCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEveDg2L01ha2VmaWxlLmNvbW1vbiBi
-L3g4Ni9NYWtlZmlsZS5jb21tb24KaW5kZXggYmUxOGE3N2E3NzllLi42YjU5ZjI2YTNkMmMg
-MTAwNjQ0Ci0tLSBhL3g4Ni9NYWtlZmlsZS5jb21tb24KKysrIGIveDg2L01ha2VmaWxlLmNv
-bW1vbgpAQCAtNTEsNyArNTEsOSBAQCBpZm5lcSAoJChLRUVQX0ZSQU1FX1BPSU5URVIpLCkK
-ICMgV2UgbmVlZCB0byBkZWZlciB0aGUgY2Mtb3B0aW9uIHRlc3QgdW50aWwgLWZuby1waWMg
-b3IgLW5vLXBpZSBoYXZlIGJlZW4KICMgYWRkZWQgdG8gQ0ZMQUdTIGFzIC1tbm9wLW1jb3Vu
-dCBuZWVkcyBpdC4gVGhlIGxhenkgZXZhbHVhdGlvbiBvZiBDRkxBR1MKICMgZHVyaW5nIGNv
-bXBpbGF0aW9uIG1ha2VzIHRoaXMgZG8gIlRoZSBSaWdodCBUaGluZy4iCi1MQVRFX0NGTEFH
-UyArPSAkKGNhbGwgY2Mtb3B0aW9uLCAtcGcgLW1ub3AtbWNvdW50LCAiIikKK05PUF9QR0ZM
-QUdTIDo9IC1wZyAtbW5vcC1tY291bnQKK0xBVEVfQ0ZMQUdTICs9ICQoY2FsbCBjYy1vcHRp
-b24sICQoTk9QX1BHRkxBR1MpLCAiIikKK05PX05PUF9NQ09VTlQgPSAkKGlmICQoZmlsdGVy
-ICQoTk9QX1BHRkxBR1MpLCQoTEFURV9DRkxBR1MpKSwtbW5vLW5vcC1tY291bnQpCiBlbmRp
-ZgogCiBGTEFUTElCUyA9IGxpYi9saWJjZmxhdC5hCkBAIC0xMjEsNiArMTIzLDcgQEAgJChU
-RVNUX0RJUikvcmVhbG1vZGUuZWxmOiAkKFRFU1RfRElSKS9yZWFsbW9kZS5vICQoU1JDRElS
-KS8kKFRFU1RfRElSKS9yZWFsbW9kZS4KIAkgICAgICAtVCAkKFNSQ0RJUikvJChURVNUX0RJ
-UikvcmVhbG1vZGUubGRzICQoZmlsdGVyICUubywgJF4pCiAKICQoVEVTVF9ESVIpL3JlYWxt
-b2RlLm86IGJpdHMgPSAkKHJlYWxtb2RlX2JpdHMpCiskKFRFU1RfRElSKS9yZWFsbW9kZS5v
-OiBDRkxBR1MgKz0gJChOT19OT1BfTUNPVU5UKQogCiAkKFRFU1RfRElSKS9hY2Nlc3NfdGVz
-dC4kKGJpbik6ICQoVEVTVF9ESVIpL2FjY2Vzcy5vCiAKZGlmZiAtLWdpdCBhL3g4Ni9yZWFs
-bW9kZS5jIGIveDg2L3JlYWxtb2RlLmMKaW5kZXggN2E0NDIzZWM2MDk4Li4wYTcxMDRkNGNm
-ZjQgMTAwNjQ0Ci0tLSBhL3g4Ni9yZWFsbW9kZS5jCisrKyBiL3g4Ni9yZWFsbW9kZS5jCkBA
-IC0yMyw2ICsyMyw5IEBAIHZvaWQgdGVzdF9mdW5jdGlvbih2b2lkKTsKIGFzbSgKIAkidGVz
-dF9mdW5jdGlvbjogXG5cdCIKIAkibW92ICQweDEyMzQsICVlYXggXG5cdCIKKwkicmV0XG5c
-dCIKKwkvKiBtY291bnQoKSBzdHViICovCisJIm1jb3VudDpcblx0IgogCSJyZXQiCiAgICAp
-OwogCi0tIAoyLjQ3LjMKCg==
-
---------------v5UEWd1lmK7xbVKuWRNVQR30--
