@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A68B2FB967;
-	Tue, 18 Nov 2025 07:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7CC25A633;
+	Tue, 18 Nov 2025 07:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763450211; cv=none; b=PaQWhSOOS78Fz0K/XRAiC7yKqaRUZ0f9qdXHfXrzDbtThmJkNUtla/1EhMCWrSHp8njeVxANd8ANp1ZPYXN9Pn5AG50xkGtGVuqA69u6UnAn481EiHsLLGlKzcqoUp7PcBhQRbNuhzyIFOC4tSMf8vSZkvejzZBnrxqk43ogRrw=
+	t=1763450450; cv=none; b=hXpbmQepoxLMdnnbvHAdKs7F6a4cWqXlys4K/ymC7DMa6SMgI9Ahjm1x/s8cXqJBzEnS8g+AXMLlelnw13FWrnVmR03oIc6HKTaiUajji60ak6KO0A+oQYoIdOUmiylcN87E0GxNs4ulGVQbKUpIgAurHuTqSYBf+34Lnwmseck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763450211; c=relaxed/simple;
-	bh=o/KD4CFjTa5b+jI1V4WECs+Cr2gk3wDlEmLAaFnD4Ao=;
+	s=arc-20240116; t=1763450450; c=relaxed/simple;
+	bh=j+MYg21RyAED4d0T7A8bQOMTtInQi6sOoDxd6eR1Muk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=au4Idh8Vfdq4pCBbBeTTV24uxMi+NQOcwIp6lGugQzmGxbyKV9lBJrCEY6/b2JjKppbVhabWmRweW6mEfd75Ee80jrGahhJmtmEpsK4WYyZ2gg4CGDE7IyIYCxnZqTvtJAqDvBX6NCIrAWvnqZS6013pFejwi/sz1rIpUC5e1g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvQmVK3n; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Irjdqtgqi8wQwbEcqK1cWAkfIGCNOaHivN1e8GYMCt28/gmMk9fqG3qe/QxtDcJlf/v4dju3dyhHnbklY9DGBmj1ZfQL1NrVO36vnJ/iY3OvFeb6nLmAZV16O7uxMfaRCUGT+rhs91DW3IKFgUu1YUb+kg2nH9dsnAiTrMwB0xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auyuCTfQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UvQmVK3n"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E3A8C4CEFB;
-	Tue, 18 Nov 2025 07:16:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auyuCTfQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CC7C4CEF1;
+	Tue, 18 Nov 2025 07:20:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763450210;
-	bh=o/KD4CFjTa5b+jI1V4WECs+Cr2gk3wDlEmLAaFnD4Ao=;
+	s=k20201202; t=1763450450;
+	bh=j+MYg21RyAED4d0T7A8bQOMTtInQi6sOoDxd6eR1Muk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UvQmVK3nMgoYR91ZphsqYWV0kU9oHzB14ClmsFfmVBjTSOEJMREcoW+bExW/4lYNB
-	 qsBVlJgxcMYg3Q6lk3XVcGP7KbJvkswko9cpTr4M2DV1loH/L1yfLhyFkvL2CpQP0H
-	 O8RO5eTZwqtyQ6b/SzifEjPeADuyZ/9PEIbXs7zU1910PfRnM55l2wRPm0S6yZiPAY
-	 PRO4ACHkktfiw9ALsPokgf4lZBKVNJw8FGgiMWfIwG/nbEWC/kSOeIQisvvG2YXel/
-	 CZP8j6YcWyD+pZC2j/JJwGyMBGJnaSr4vWwGfRl8Re9dqRN0zqOpLc85WI0GEDsYBe
-	 nFQI6w5AU2jcg==
-Date: Mon, 17 Nov 2025 23:16:49 -0800
+	b=auyuCTfQWiotWzkuYWbY3kpLpU1Rx9vv6Ce6mePeTlvdStH2Mlq/MJ0L17XFdeYHr
+	 rPw5mvZiWtV57Bti6p32Ki0iGz8l0N289niGMqWyULzI2S67/OF2J2ClZ30l1NVMZT
+	 SwqYRKAUWiAAv2xwzyJNP8fdeAyHQlfcYj0oCMYZ6booge8jwliQKyLdy4KrO1P5qs
+	 Ri00Ujz2q199Go/WiONfVpbVz5whlik+KM4Hc9EY07glIlJ4A2oZ8lkJOL7X6yscjb
+	 O0ztnAYtRpuGe0AkCAO6a1vh3BIgj40zKn07NAprKsSCqHXxqe6/UW5CI5k5V7CaWr
+	 UfncsehknxHEw==
+Date: Mon, 17 Nov 2025 23:20:48 -0800
 From: Oliver Upton <oupton@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -35,11 +35,10 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync
- ICH_HCR_EL2.En
-Message-ID: <aRwdYZ98cwIeg-P3@kernel.org>
+Subject: Re: [PATCH v3 0/5] KVM: arm64: Add LR overflow infrastructure (the
+ dregs, the bad and the ugly)
+Message-ID: <aRweUM4O71ecPvVr@kernel.org>
 References: <20251117091527.1119213-1-maz@kernel.org>
- <20251117091527.1119213-6-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,61 +47,49 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251117091527.1119213-6-maz@kernel.org>
+In-Reply-To: <20251117091527.1119213-1-maz@kernel.org>
 
-Hey Marc,
-
-On Mon, Nov 17, 2025 at 09:15:27AM +0000, Marc Zyngier wrote:
-> FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
-> effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
-> interrupt is vain. This only hits memory, and the guest hasn't cleared
-> anything -- the MI will fire.
+On Mon, Nov 17, 2025 at 09:15:22AM +0000, Marc Zyngier wrote:
+> This is a follow-up to the original series [1] (and fixes [2][3])
+> with a bunch of bug-fixes and improvements. At least one patch has
+> already been posted, but I thought I might repost it as part of a
+> series, since I accumulated more stuff:
 > 
-> For example, running the vgic_irq test under NV results in about 800
-> maintenance interrupts being actually handled by the L1 guest,
-> when none were expected.
+> - The first patch addresses Mark's observation that the no-vgic-v3
+>   test has been broken once more. At some point, we'll have to retire
+>   that functionality, because even if we keep fixing the SR handling,
+>   nobody tests the actual interrupt state exposure to userspace, which
+>   I'm pretty sure has badly been broken for at least 5 years.
 > 
-> As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
-> ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
-> the host in NV, giving it the opportunity to retire the pending
-> MI. With this, the above test tuns to completion without any MI
-> being actually handled.
-
-Just to make sure I'm following, the scenario you're talking about is
-we've already put the vgic into a non-nested state, populated an LR with
-the pending MI at the time of that switch and L0 has no signal for when
-it can drop the LR / pending state.
-
-> Yes, this is really poor...
-
-+1 :-/
-
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
->  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
->  2 files changed, 11 insertions(+), 2 deletions(-)
+> - The second one addresses a report from Fuad that on QEMU,
+>   ICH_HCR_EL2.TDIR traps ICC_DIR_EL1 on top of ICV_DIR_EL1, leading to
+>   the host exploding on deactivating an interrupt. This behaviour is
+>   allowed by the spec, so make sure we clear all trap bits
 > 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 99342c13e1794..f503cf01ac82c 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
->  	}
->  
->  	write_gicreg(0, ICH_HCR_EL2);
-> +
-> +	/*
-> +	 * Hack alert: On NV, this results in a trap so that the above
-> +	 * write actually takes effect...
-> +	 */
-> +	isb();
-> +	read_gicreg(ICH_MISR_EL2);
+> - Running vgic_irq in an L1 guest (the test being an L2) results in a
+>   MI storm on the host, as the state synchronisation is done at the
+>   wrong place, much like it was on the non-NV path before it was
+>   reworked. Apply the same methods to the NV code, and enjoy much
+>   better MI emulation, now tested all the way into an L3.
+> 
+> - Nuke a small leftover from previous rework.
+> 
+> - Force a read-back of ICH_MISR_EL2 when disabling the vgic, so that
+>   the trap prevents too many spurious MIs in an L1 guest, as the write
+>   to ICH_HCR_EL2 does exactly nothing on its own when running under
+>   FEAT_NV2.
+> 
+> Oliver: this is starting to be a large series of fixes on top of the
+> existing series, plus the two patches you have already added. I'd be
+> happy to respin a full v4 with the fixes squashed into their original
+> patches. On the other hand, if you want to see the history in its full
+> glory, that also works for me.
 
-I'm all for writing correct code but since we don't actually care about
-the value of MISR_EL2 do we need the ISB? There's no need for a CSE for
-non-NV and you'd get it 'for free' by way of exception entry in the NV
-case.
+I'll pick up these patches in a moment but at this point I'd prefer a
+clean history. Plan is to send out the 6.19 pull sometime next week so
+any time before then would be great for v4.
 
-Thanks,
+Thanks for ironing out all the quirks :)
+
+Best,
 Oliver
