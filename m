@@ -1,173 +1,138 @@
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5770A302167
-	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 07:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5806330F533;
+	Tue, 18 Nov 2025 08:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763451452; cv=none; b=rx7dMIOte6rflHmpB4Bf5S9LnR2mNMTWAKXsOvy8gL2EqQU2nmxrU331ih+z8/JKgH1EOJ/P59y0flLW+aE9mpfWZgmci8eMTfmXob77DxZ81ml/tWYO0TuolQJmEs4z83RPET+s3ubA6x8A0b3CbQsY5QfStSLpWOXuWDBLKfs=
+	t=1763456080; cv=none; b=NoByTmxL5VoEg5g0K5Mn6Plyiwtkn7OuaegqhqzcbWNIrzan79UT0RCCbHfipLRyNz3LotIH0ihXY+o2r0rmB/UkWOgX4pcoWyuIVvW92mWduWCDGf9di2WhYUeYgAzRLqW4zcEU6+Dx7ZvvfakARGllRpU1g2TqcPm8ayoB50U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763451452; c=relaxed/simple;
-	bh=TgjY5H4ZBxHrbzJ2bkYkhPqwYpjQ/oQZAih2ce8s0bw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=QG4zs7kHUDl229SdqP368hOX9pOXgW3JBlf06dq9n700gx8SWSiorA6xw1DrRHAb3ka+m2nfuvz1yBQZBPg3HqDMCk1HuyLOl3cc82INbbUfH3CyUWFszr3z2/DmBfLRu5rr5EqwSteaCDSuug7PzGtNX+gRwm0/3EPeDZp5NR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=XSg4GWDY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wAOhs6fX; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1763456080; c=relaxed/simple;
+	bh=qREI2xZBKFk1AaWq3n7qoCSnNHV94Pp8p3hmarr/YqQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d05LlAkcr55EGB1fZUg9YGV58IOYxdLtSFX/rtV3cWmeaZwIDv69PRkryPsxloVMZq33j7A+RUb6NoccADgoZkppX6FarnqPLC8NjsVHpMIM56dNKUL+lVipo6m299SvIHkcG91Ts97ib3CxqlFBT2I35I7iblXCdubc901u8wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXGOjKpT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="XSg4GWDY";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wAOhs6fX"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0E00F7A014E;
-	Tue, 18 Nov 2025 02:37:28 -0500 (EST)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Tue, 18 Nov 2025 02:37:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1763451447;
-	 x=1763537847; bh=4QiRiDhSqT4fLCQcU+UjOzbWSkk4b4aDS7SspI0AxSc=; b=
-	XSg4GWDYB9Qc+u3oG85yZVloU4ekvHAIszyIEGREWA9NJLV543yh51rMlIN4eeYr
-	ODZP0w80+qPQqtXv1dJdictPjMMXsLpmtD7Hy013qaY5xK/k0Xb/ZBC7okEBGiy3
-	IwQrltZZ5picL5oe6HmlLTYcMpXJ0VmxEmRkStkqiyxO4EM87KVKoWKmnp/Q/RGI
-	JQTVa23WxrALPM7XcYxG+4f7ANtzULfG/Ps2O6Uz316F54reXtrUgUrt2InHdmV7
-	yZg4x6QzXmrWT2xg3KE5+Hc1ZkdnejkoRnrls2dpV03iPkrpOwJujkH/ZGela2Q0
-	sKL3xFxVy4U1r4xF05w1fw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1763451447; x=
-	1763537847; bh=4QiRiDhSqT4fLCQcU+UjOzbWSkk4b4aDS7SspI0AxSc=; b=w
-	AOhs6fXp32kzvOJeVWTEwCUEZiDWRgq89k6AX6VszCxGkoAbunAAPK3Gx13K6Y9a
-	oCvUBIS/0m8EApXiPVi4A+YhJLivudy7dKl2LYR9DMUIUjGY93KwRCjE8TxUzCOW
-	7gL2VaTEmNLKU8pOdpjHUqT+dwcj3QUd2oT8S5tGSwlFR88MC9sVyvvuKcRn/dh1
-	+ucX1OExpS0sJyay4r1G2emxGRuMR5pAM5UFEyFLP6b2Lzy8pxhaY9kU0Tcfl8na
-	sxoAgthuSsij6jkOUU6fYUZg5TtSQh7O8pUstQwAWr/5PvdinoDOBmPcm36c17ED
-	BzsadMqFNjxZDK7yt8zhw==
-X-ME-Sender: <xms:NyIcafPkiVxBWIcFP8mNGDVcSmwiKdY3gZVUC0i1Nm1XaSxJOWVRKA>
-    <xme:NyIcaUyh---jACwC8JUwEE3Z0E5RW-4aCSOl0XUhZEzSH_1rVZ49ZzUk-LYUeiduW
-    2xDb5rNk8PVP60re3uEsnn03l8CJoZKFyqwEdXUyR0E9lx03KHs9A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvvddtjeeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhu
-    thdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtg
-    hpthhtohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihu
-    khhirdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttg
-    gtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhl
-    ihgtohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonh
-    drtghomhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthht
-    ohephihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:NyIcafAE5K7piy_7UkKxsRmEjUfhifMC-QFmcZRL6tgiwTqew32kAA>
-    <xmx:NyIcaSMGcA57DGzU4LL7i4SwQPEL7IqsTR6yaz4sTIYDBknLL2oCSg>
-    <xmx:NyIcaefxZ0f0R3TYY_SP5CKdrtrOpjoLx7_7WJDQIWZxPFgDVk3fDw>
-    <xmx:NyIcab58UbuA_BO8MqQFM9tEdVFDyLGqf_EuKblPqofMFrlM7_Fr-Q>
-    <xmx:NyIcaVhjDqK7MTDlEnhSrpcM3onA7hiYDDY1g48yS6oDOIA3ZghxIPJH>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 09734700054; Tue, 18 Nov 2025 02:37:27 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXGOjKpT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DE5EC2BD01;
+	Tue, 18 Nov 2025 08:54:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763456078;
+	bh=qREI2xZBKFk1AaWq3n7qoCSnNHV94Pp8p3hmarr/YqQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cXGOjKpTgtfc3OdAYfQEuU4xeHg2KPYFPO96LoPVEvnIoWn4zX3+iIUrW6VL5Hhzz
+	 CCIr9/iq1B/mDuGrO2ZjIVmIX+byjuMw6D3DRl0tTpHEvNj81IyZgP9yNgf6K3DejQ
+	 2br9SEEaqk9NRGvTFcGEGzFbtaZo0c63VfBA76zk8uc7eQLFwIwULHBaZ7hppYpmBv
+	 tcTRuI/vfpXv7JcQvg3Jy4BCQ+5QLfClHjFZLdIy7WsySl4pq/aU5PKd4Mof99Rkag
+	 5DbYym86K6BwfO72enHkFqi8PLLpdPW6+sPYaNnxsBJvWSaEBs4zuClhOx1lu+KCzX
+	 fcjhun9OG/3rw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vLHTq-000000067I6-0f34;
+	Tue, 18 Nov 2025 08:54:30 +0000
+Date: Tue, 18 Nov 2025 08:54:29 +0000
+Message-ID: <86qztvsou2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
+In-Reply-To: <aRwdYZ98cwIeg-P3@kernel.org>
+References: <20251117091527.1119213-1-maz@kernel.org>
+	<20251117091527.1119213-6-maz@kernel.org>
+	<aRwdYZ98cwIeg-P3@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ThreadId: ALjut8WcExBk
-Date: Tue, 18 Nov 2025 08:36:56 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zhou Wang" <wangzhou1@hisilicon.com>, "Marc Zyngier" <maz@kernel.org>
-Cc: "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
- "Joey Gouly" <joey.gouly@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, "Yicong Yang" <yangyccccc@gmail.com>,
- prime.zeng@hisilicon.com, xuwei5@huawei.com
-Message-Id: <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
-In-Reply-To: <6d6fad8d-e4e4-b973-6431-34a37003d363@hisilicon.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-6-wangzhou1@hisilicon.com>
- <861pm4vn02.wl-maz@kernel.org>
- <b1407660-9b69-7e21-328a-0f969fffa554@hisilicon.com>
- <c72411f9-a77e-4a72-a401-5110b919a2df@app.fastmail.com>
- <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
- <113db0fb-d879-49d7-a5f2-7755558f29dd@app.fastmail.com>
- <6d6fad8d-e4e4-b973-6431-34a37003d363@hisilicon.com>
-Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 18, 2025, at 03:31, Zhou Wang wrote:
-> On 2025/11/14 17:37, Arnd Bergmann wrote:
->> On Fri, Nov 14, 2025, at 10:25, Zhou Wang wrote:
->>> On 2025/11/14 0:26, Arnd Bergmann wrote:
->>>>
->>>> Are you using a particular device, or are you trying to enable
->>>> the support in general? If you have a specific device you are
->>>> working on, does it use the PASID data or not?
->>>
->>> Many thanks for your careful explanation! I got the pointer here.
->>>
->>> We have a real device in our SoC, which supports LS64B/ST64B/ST64BV.
->>> For ST64BV, Our device just receives 64B data atomically, not interpret
->>> it with PASID data.
->> 
->> Ok, I see. So I assume this is either a kind of dedicated work queue
->> where the IOMMU PASID is set up in advance for the user MMIO area,
->
-> Yeah, it is something like you mentioned above. MMIO area is binded with
-> a work queue, a PASID is set up in advance for this work queue.
+On Tue, 18 Nov 2025 07:16:49 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
+> 
+> Hey Marc,
+> 
+> On Mon, Nov 17, 2025 at 09:15:27AM +0000, Marc Zyngier wrote:
+> > FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
+> > effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
+> > interrupt is vain. This only hits memory, and the guest hasn't cleared
+> > anything -- the MI will fire.
+> > 
+> > For example, running the vgic_irq test under NV results in about 800
+> > maintenance interrupts being actually handled by the L1 guest,
+> > when none were expected.
+> > 
+> > As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
+> > ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
+> > the host in NV, giving it the opportunity to retire the pending
+> > MI. With this, the above test tuns to completion without any MI
+> > being actually handled.
+> 
+> Just to make sure I'm following, the scenario you're talking about is
+> we've already put the vgic into a non-nested state, populated an LR with
+> the pending MI at the time of that switch and L0 has no signal for when
+> it can drop the LR / pending state.
 
-Ok, thanks for confirming.
+Exactly. Only an exit can cause it to reevaluate the state and retire
+the pending MI.
 
->> or it is a device that does not do any DMA at all, correct?
->> 
->> In this case, would the device also work correctly with ST64BV0 if
->> the ACCDATA register is fixed to a value of zero and you can only
->> use the upper 480 bits? Would it also work if there is an
->> unpredictable value in ACCDATA that may match the PASID of another
->> device used by the same process?
->
-> We do not support ST64BV0, so above case will not happen. I think ST64BV0
-> will trigger a illegal instruction exception in our system.
+> 
+> > Yes, this is really poor...
+> 
+> +1 :-/
+> 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
+> >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
+> >  2 files changed, 11 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > index 99342c13e1794..f503cf01ac82c 100644
+> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> > @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
+> >  	}
+> >  
+> >  	write_gicreg(0, ICH_HCR_EL2);
+> > +
+> > +	/*
+> > +	 * Hack alert: On NV, this results in a trap so that the above
+> > +	 * write actually takes effect...
+> > +	 */
+> > +	isb();
+> > +	read_gicreg(ICH_MISR_EL2);
+> 
+> I'm all for writing correct code but since we don't actually care about
+> the value of MISR_EL2 do we need the ISB? There's no need for a CSE for
+> non-NV and you'd get it 'for free' by way of exception entry in the NV
+> case.
 
-At least this does make it easier because on your system you would
-never run into a situation where you want to support both your
-internal device with st64bv and another device with st64bv0.
+Yup, that's a good point. And exceptions are of course guaranteed to
+be in program order anyway, so the ISB can go. I'll add comment to
+that effect.
 
-The easiest setup I can think of that still supports your machine
-would look something like:
+Thanks,
 
-- have the kernel choose between st64bv and st64bv0 at early boot,
-  based on platform configuration, use st64bv0 by default if
-  available in hardware and not disabled in EL3, EL2 or kernel
-  command line.
-- Change pasid handling in iommu_sva_bind_device() so drivers
-  have to explicitly request one of the modes before establishing
-  a pasid, refuse this on incompatible systems, update the
-  three existing callers (idxd, amdxdna, uacce) accordingly.
-- on systems with st64bv but no st64bv0, enable st64bv for
-  all CPUs at boot time to avoid context switch overhead, but
-  forbid mapping shared hardware workqueues into userspace.
-- postpone full support for st64bv0 until we have a device that
-  actually uses this and can be tested. I think most of it is
-  already there in the iommu code, but the ACCDATA setup needs
-  to be integrated into the switch_mm()/__switch_to() code
-  and possibly a trap handler like on x86.
+	M.
 
-In the current architecture, both FEAT_LS64_V and
-FEAT_LS64_ACCDATA are optional, so you can continue to
-produce CPUs that have the former but not the latter, and
-the logic above will keep that working. However this breaks
-if you ever want to support FEAT_LS64_ACCDATA in a later
-CPU but keep the existing driver working with st64bv.
-
-       Arnd
+-- 
+Without deviation from the norm, progress is not possible.
