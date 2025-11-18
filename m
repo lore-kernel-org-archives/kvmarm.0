@@ -1,130 +1,127 @@
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DDC1C5D6A
-	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BF32F1FC8
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763462299; cv=none; b=UJ3+ycCC65DNVzl9Kqc2HOmJL5NNuXiXlLeWYj2x4aj9n8wefOkJj2uUMtas30Eh2zeCJcjkLTKQijwPS5WHjpfndoj45ZKejNr7cZPWL1fTxocyIdwJ8KC89C/GebpSuhSYACLBGd57u9d+Srukcfun1RbC71mb2ZI25byNbtI=
+	t=1763462385; cv=none; b=UumI14Iucemse3VTS47Jqwt8/Q4hB7qSkJGdjNpHfWZGfLFnFIcKdS9ydq7/bQGAPjjYjxI/ibC6SBSLPf1CMoLPka9Cg3shg5rCf3e+UDLtq+G/ZdpQ+Zq1WMYdJUB9PckWnfupXslbIxdq/RGbJVuTjNpJVLvYZBYWRNJ036Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763462299; c=relaxed/simple;
-	bh=HS3A6nZ/C1SGV1BCJYeGF/yP+AMKPP+weyYCOkSvWPg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GIOhrdGJNP1R0uNboEhbgJJie5XZrgpBb7u/npvhCcxGofM6y/IegrMtuCYgdwBjYvaiISEQXRQyfyimNVj7C2polHAnH5PRNGRxtAN9WlgJ7nQoNaQ5tjsb7Ll9FZHGMyTDFfYA0VOx3vUATEgIrSwoUCkii4Oqhd0mvrFzpxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OfBYi4Nj; arc=none smtp.client-ip=209.85.208.74
+	s=arc-20240116; t=1763462385; c=relaxed/simple;
+	bh=2eGJfH9Fvrs9Q2j26nj1pJcG/v5qQ2e3DafswTVyPwM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HT3we2KtD232doc154L4vRPRs8DNEDgYHq2wQJ9cV1l18y3c29/Rg4ssaZM49eiup+/6g/mKS2I6AjDjO90dXkWX/xi2JCSRxtoljXwzG0xe2LOw0gA5jCG15DRRRkFy9ETSWfSiHjT92BOyKJia/Fn38d8RAcuCXjO9E6OZdEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jnvkUw1X; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OfBYi4Nj"
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-6417677bf55so6934555a12.1
-        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jnvkUw1X"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4ee243b98caso193521cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:39:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1763462296; x=1764067096; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdD3HvYe/LmQgWb1ELzMtTfkz5l2xc5jclOfmsq7xGc=;
-        b=OfBYi4Njcv+xtknkcgp6lOxWUxY+5UjKapHiHzm8JyQE1ItLINH386BUY+gR2yDMwR
-         tt7jj60LZavtGCV1h6OmYOhm7tnO0thNbJ7ieac5V1gN1HCnD/xRb09ZQauumFW98vqq
-         1usIvjLEij6AFChltneuBvYVUZaEuSG8sL9Qn2BXS1i0+Glss1WxzXzraZd7iojnm6eL
-         xPVvgmX0O2jYkSHkvsnaW4AWpOdv92kkQP7icvRqHIDLEl6qouf9ArlqbkipDEBJMIxN
-         2bKDJe3ZoOlxZ0WGLTiOF9A22Bo2vNy/76jT1EImLrfTPlWTjg2i3neuBs0qeRQTsVCv
-         juYw==
+        d=google.com; s=20230601; t=1763462382; x=1764067182; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=A3fuFPmq7u+4TfWmna4IMO/rExqShukKvoJZ1nxd6fI=;
+        b=jnvkUw1XxSkzQGYiWibY8uCXxM7yzp5HvvuO92gHmsOEMQ1iJNm4kBbtKG66/L7f3f
+         Ajp8bOfW+yP0NnUDt2gwR9qPPPbfdOYvTT9xY7QXOlZqVjgb1EiEYpj5E/If4oillQkl
+         dN9/qsDoykI/UFMtLPlMtnLqW2FWpW01TCE+aRQyIBOvlrN/a55y5sbJaoiGJ5OKR19N
+         TboXYth02lfVWn1kyRTCKblTVDhkv0/fIFFRyaI1jiHXZp7Jlk3pLQgQpDH8B/fqeG69
+         jOsTpbEsrWZaYOpDhbjimi2xn9OyeffmQ/ij6AIyXY7XI6WrIEqQsewlGjjsNAqbIzU/
+         JDAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763462296; x=1764067096;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdD3HvYe/LmQgWb1ELzMtTfkz5l2xc5jclOfmsq7xGc=;
-        b=Aw9H7NHht8IFtTpaUWvu8VgJ0AigFVsxr08JWqsRAHoAL/o7E75d/FMG97iaxhSv8x
-         iGEOFdLuyBXW7AhPP2DFz9JThyJqfbwKYwZtqMgATTesC/GHEwYIwq6Qy7A1k5qhYVT1
-         6Le58xDLyX86t1xt3E3tdL0LVHyyOar6Pb2Q2YRIjRyUCx7eQbuIuv9DvWQVyQLxOCYR
-         wFBmpC4N4x698tqY2b3pNc1qTKXGOSGUx4l4944SgCZOCNTX4AQBY4mNChuUiVZWId4L
-         ODRkQhgdvMbZcf7YEI/qdLvllrURtW4S+WchTU/q8pbeOF4QeCro2OjJnbCp95TOzQCS
-         +cxw==
-X-Gm-Message-State: AOJu0YzdKfBWrc3dRCLY4e30QnY0LBETUBZHTSsE1Z2PpaVYpdAdJuGL
-	HuhqYS2e1dmIiLIS1/TZFEeDjq8Fjmz61WYVjZ56quB4CZ1yuNKrEV+0kQ3oY1ffnjl3zU4HAK8
-	vIV+COLL/jZfWVSY4+PypyTNQapIp/nhmF7cStA1hlj2lSQRxeYf0u3LLyv815FoJuaehF94qHN
-	LJPc8ee1XVlcGh95SZVriOGFTEJ/q65Lo=
-X-Google-Smtp-Source: AGHT+IEJA/93zlApirgJ20FxZ4HFh69ol4ZkNO3y+csZUeciJUQyIEUxS2YM11xAwc6simPGysMnBpLtPg==
-X-Received: from eda13.prod.google.com ([2002:a05:6402:a00d:b0:643:38d8:ea2a])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:51cf:b0:640:9bb0:a059
- with SMTP id 4fb4d7f45d1cf-644fe9b27demr2655048a12.10.1763462296292; Tue, 18
- Nov 2025 02:38:16 -0800 (PST)
-Date: Tue, 18 Nov 2025 10:38:06 +0000
-In-Reply-To: <20251118103807.707500-1-tabba@google.com>
+        d=1e100.net; s=20230601; t=1763462382; x=1764067182;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A3fuFPmq7u+4TfWmna4IMO/rExqShukKvoJZ1nxd6fI=;
+        b=Cjf+U5u/bzQqzjdbzVCrwo99FSGb9OxOOD9pwQVR+IYIyTzg8Zk44Tu5UUAtb6/hu5
+         QuO0KpHrUJsF7sR73R9oLYEKWRDpV8JAODd6ienex9YJ1khIhG9wwBgoddie8JXjSpeE
+         4818H1mOm0p8TXzli7xV6DJJxMD3RUIxGAOjo9na2XBo+XrPbJ9qzx2W6G00DyXlaARD
+         rzr2RvVPvlavOp9H2CAuLhOMmzatVxu+S5OK0VC47cfkJRF+reOsOCV7Vpw3WWscYsiT
+         ATrricdMLh+S+SkFtHu5H1IjmnUG9FHcw62WqHHjQ9UjDlozoaxCvtGySLRfCFOb7LkZ
+         5EpA==
+X-Gm-Message-State: AOJu0YwAyedcKEmqb/wjroO31oLNsOgULHSbAcyGTHkDCByeY/zGnhAL
+	6NN1Q0MBczEJMPZUl8uGWAHdzuHuWylR95k0nv4LbRgvkOfq3ZS6N6tNg9lDTSXGaeOOa8beEVI
+	t9KntcG7fl0RQaHZ2vlwoE36nuyWy+29rEv1TtM6OEFl8/xU6jywR/aoCygU=
+X-Gm-Gg: ASbGncvmy2aGOKLiIvi4Dksyp1eVaJciJyjSspKNqZOle6OeJ5OhzFxese//xxezqwb
+	zO3SJceeaaxrF4sLaJedHPSyCC4hrvbhshtGtUAPvhe8n7eDVcgxNpXrdoS3TJ/5sVOgP3vhFEs
+	/FlphvHAcXf5iXFBBjV2plHTnxkPzI2tD644unRI3BhEUeITpiFL3PLYAzP62Jdtx2eOLAsJ1sY
+	shfdumlkXLUCOaLnsNwMkH6dM5IDXPk4oo20Tk9T2KNXklxaZ/RlQahidn0nfHO5P+YEjaY7W0N
+	q37ZdQFXN6OzI7a/ZrB6saCr/8GZJc4/qHc=
+X-Google-Smtp-Source: AGHT+IF7R3581QqoxLfrWmpw9+FLNMOBldbaqa1DkyFXRRv3ZqD8SWk+0oLgf3+nvFRitSGahBgPq/81NnTTID7GzXw=
+X-Received: by 2002:ac8:7254:0:b0:4b3:7533:c1dd with SMTP id
+ d75a77b69052e-4ee3a8f3a62mr327971cf.1.1763462381839; Tue, 18 Nov 2025
+ 02:39:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20251118103807.707500-1-tabba@google.com>
-X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251118103807.707500-10-tabba@google.com>
-Subject: [PATCH v5 9/9] KVM: arm64: Prevent host from managing timer offsets
- for protected VMs
+In-Reply-To: <20251118103807.707500-1-tabba@google.com>
 From: Fuad Tabba <tabba@google.com>
+Date: Tue, 18 Nov 2025 10:39:05 +0000
+X-Gm-Features: AWmQ_bkg3Pxo8Nt-K_kohdqRusQj83AOJuZTIGZVKLHFt3_L0-eui3763G3uKAs
+Message-ID: <CA+EHjTz0tUL9Q0d2tS9D_w=csuz+7t5KVfvfr-4WRjmeTf+3=A@mail.gmail.com>
+Subject: Re: [PATCH v5 0/9] KVM: arm64: Fixes for guest CPU feature trapping
+ and enabling
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
 	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
+	catalin.marinas@arm.com, vladimir.murzin@arm.com
 Content-Type: text/plain; charset="UTF-8"
 
-For protected VMs, the guest's timer offset state should not be
-controlled by the host and must always run with a virtual counter offset
-of 0. The existing timer logic allowed the host to set and manage the
-timer counter offsets for protected VMs in certain cases.
+On Tue, 18 Nov 2025 at 10:38, Fuad Tabba <tabba@google.com> wrote:
+>
+> Hi,
+>
+> This series contains several fixes for guest feature trapping and
+> enabling, as well as a bit of tidying up.
+>
+> Changes from v3 [1]:
 
-Disable all host-side management of timer offsets for protected VMs by
-adding checks in the relevant code paths.
+This should be
+Changes from v4 [1]:
+[1] https://lore.kernel.org/all/20251112092051.1376245-1-tabba@google.com/
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/arch_timer.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+Cheers,
+/fuad
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3f675875abea..f5407301c8f9 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1056,10 +1056,14 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
- 
- 	ctxt->timer_id = timerid;
- 
--	if (timerid == TIMER_VTIMER)
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
--	else
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	if (!kvm_vm_is_protected(vcpu->kvm)) {
-+		if (timerid == TIMER_VTIMER)
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+		else
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	} else {
-+		ctxt->offset.vm_offset = NULL;
-+	}
- 
- 	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 
-@@ -1083,7 +1087,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
--	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+	if (!vcpu_is_protected(vcpu) &&
-+	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
- 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
- 		timer_set_offset(vcpu_ptimer(vcpu), 0);
- 	}
-@@ -1687,6 +1692,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 	if (offset->reserved)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EINVAL;
-+
- 	mutex_lock(&kvm->lock);
- 
- 	if (!kvm_trylock_all_vcpus(kvm)) {
--- 
-2.52.0.rc1.455.g30608eb744-goog
-
+> - Add a map of KVM capabilities to IOCTLs (Oliver)
+> - Based on Linux 6.18-rc6
+>
+> Cheers,
+> /fuad
+>
+> [1] https://lore.kernel.org/all/20251110134525.3768197-1-tabba@google.com/
+>
+> Fuad Tabba (9):
+>   KVM: arm64: Fix Trace Buffer trapping for protected VMs
+>   KVM: arm64: Fix Trace Buffer trap polarity for protected VMs
+>   KVM: arm64: Fix MTE flag initialization for protected VMs
+>   KVM: arm64: Introduce helper to calculate fault IPA offset
+>   KVM: arm64: Include VM type when checking VM capabilities in pKVM
+>   KVM: arm64: Do not allow KVM_CAP_ARM_MTE for any guest in pKVM
+>   KVM: arm64: Track KVM IOCTLs and their associated KVM caps
+>   KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+>   KVM: arm64: Prevent host from managing timer offsets for protected VMs
+>
+>  arch/arm64/include/asm/kvm_arm.h         |  2 ++
+>  arch/arm64/include/asm/kvm_host.h        | 42 ++++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_pkvm.h        | 33 ++++++++++++++++---
+>  arch/arm64/kvm/arch_timer.c              | 18 +++++++---
+>  arch/arm64/kvm/arm.c                     |  7 ++--
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c           | 18 +++++-----
+>  arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
+>  arch/arm64/kvm/inject_fault.c            |  2 +-
+>  arch/arm64/kvm/mmu.c                     |  4 +--
+>  include/uapi/linux/kvm.h                 |  1 +
+>  10 files changed, 105 insertions(+), 24 deletions(-)
+>
+>
+> base-commit: 6a23ae0a96a600d1d12557add110e0bb6e32730c
+> --
+> 2.52.0.rc1.455.g30608eb744-goog
+>
