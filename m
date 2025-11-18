@@ -1,138 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5806330F533;
-	Tue, 18 Nov 2025 08:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D2F2D4B66
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 10:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763456080; cv=none; b=NoByTmxL5VoEg5g0K5Mn6Plyiwtkn7OuaegqhqzcbWNIrzan79UT0RCCbHfipLRyNz3LotIH0ihXY+o2r0rmB/UkWOgX4pcoWyuIVvW92mWduWCDGf9di2WhYUeYgAzRLqW4zcEU6+Dx7ZvvfakARGllRpU1g2TqcPm8ayoB50U=
+	t=1763462291; cv=none; b=mugccQ7LdoVtSNCAbac6DJTwSe4OzqV7fapBipmDpHrXmlE9iO1PvMD4v5Ylp4NWYAXwt9vKW27dt+5IUbL9urbEcxgD/R6UGoUqU8RtVUqLAzGC9Wb+Y87z+FOIQYHClIzwLHa93e/QB/x55mKDQLK+113XpVvr8/0Mhm/mEFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763456080; c=relaxed/simple;
-	bh=qREI2xZBKFk1AaWq3n7qoCSnNHV94Pp8p3hmarr/YqQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d05LlAkcr55EGB1fZUg9YGV58IOYxdLtSFX/rtV3cWmeaZwIDv69PRkryPsxloVMZq33j7A+RUb6NoccADgoZkppX6FarnqPLC8NjsVHpMIM56dNKUL+lVipo6m299SvIHkcG91Ts97ib3CxqlFBT2I35I7iblXCdubc901u8wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXGOjKpT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763462291; c=relaxed/simple;
+	bh=pE3jJd7UHpJXmJt/9kmFtYwEQTumWVI/eaeO0kVtYgk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kfkrxNcaNS+8Qi4KsAhe8WlqjuOP7xSK1lNuanGFMkeoUsVo4atGNdPEgP+oraC2NHkPI0wZvXvCAVM9lWTRpRXZf7MR0W7zmoh13Hf2Ot7sdHLkLMhWUWGcvRFUK5Rwv0CEIRvBvubN64JjHHmc8IKBUDrzm9BBrD3VOAuaDm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1wOztKvL; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXGOjKpT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DE5EC2BD01;
-	Tue, 18 Nov 2025 08:54:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763456078;
-	bh=qREI2xZBKFk1AaWq3n7qoCSnNHV94Pp8p3hmarr/YqQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cXGOjKpTgtfc3OdAYfQEuU4xeHg2KPYFPO96LoPVEvnIoWn4zX3+iIUrW6VL5Hhzz
-	 CCIr9/iq1B/mDuGrO2ZjIVmIX+byjuMw6D3DRl0tTpHEvNj81IyZgP9yNgf6K3DejQ
-	 2br9SEEaqk9NRGvTFcGEGzFbtaZo0c63VfBA76zk8uc7eQLFwIwULHBaZ7hppYpmBv
-	 tcTRuI/vfpXv7JcQvg3Jy4BCQ+5QLfClHjFZLdIy7WsySl4pq/aU5PKd4Mof99Rkag
-	 5DbYym86K6BwfO72enHkFqi8PLLpdPW6+sPYaNnxsBJvWSaEBs4zuClhOx1lu+KCzX
-	 fcjhun9OG/3rw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vLHTq-000000067I6-0f34;
-	Tue, 18 Nov 2025 08:54:30 +0000
-Date: Tue, 18 Nov 2025 08:54:29 +0000
-Message-ID: <86qztvsou2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 5/5] KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-In-Reply-To: <aRwdYZ98cwIeg-P3@kernel.org>
-References: <20251117091527.1119213-1-maz@kernel.org>
-	<20251117091527.1119213-6-maz@kernel.org>
-	<aRwdYZ98cwIeg-P3@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1wOztKvL"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b7270cab7eeso464924666b.1
+        for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 02:38:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1763462288; x=1764067088; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=opTLkJ9rWZdOh6NllMm8SZ1k9obnWdX+EkDUkDwUBBE=;
+        b=1wOztKvLbgbPRThvRTyL6ggH/6JF5XjhFspniyR/PyZ1VPvyRiutezgV9O+1mBM7B1
+         C9wVDgE/ZRcsYb8+ba/5GDNNZyLeFJZ0KLBzKVFk38M2BygqC1PrCsjwQcJHh9pa9AI8
+         tPtDzgZYEawaq+oT4shAWcBFAoCS5Mnwk66UthL3zHtE6ZrEibw0o3GAxRiGMRAxF39d
+         Fot7gffow/J9y432kSRfOb4iKOFzR+dvDFgr8BCnxKiKprb3MDDFVKrKoG1XyHugtJFA
+         eBBcPaVM2QGQ3PkFXEon8lOXjRQVcU/uG37lXeFQZ5OUVgLgeXcXaC81Cn3ANuf446We
+         Kf6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763462288; x=1764067088;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=opTLkJ9rWZdOh6NllMm8SZ1k9obnWdX+EkDUkDwUBBE=;
+        b=DC1Lk2CuyIWUEynjcvnq9Sct5Ajywr+vP0XhT8zAQh1l0GxdNALbfjPLX2Jglu4jaW
+         yfO40Z3gOmhab++fiiBaHW9CWNkHDB+C7r0G/idE/3o5iROQSDOzf4B6qMT16fPmlcFg
+         v3Snps0eKjvYqWu44K3lF0ljPn4LUeaVtqEq6DFweQpRpmvfZmz+mM1lfCC0tpc/79UC
+         oGJLg6IQJcX1I5l9oaH7MMGIXNtj7ZwNnrKK6RDaUPtskzyYsAeC2NIoqha1DRmMG7te
+         eRNFni/Ts4rCWBNGsLeckpEzvH/Tt9dhC6LSp3wEjrTh3KGFN9rUtVGdvbdwUokwPvVl
+         6+Fw==
+X-Gm-Message-State: AOJu0YxYNQErtI82ODzhn2DCbO6lOlM+RomPw2me4X1FMg9ND0t6Q8Aw
+	bNnEIlD2wAqRajRUR+RiXmy1mopJAGZh+vuM3CAYLOh9yohWraaerOyeRdwaCZCmm1YsnQpoZa4
+	SfFWYNoaWgc4aXUe6xjTd6kfZIvAmaYzYRVnX1j20qdLrimiWb+P8UNarwNdUaXSVs8YJE1ZqOv
+	G9b0kpcgcFny5eR85Wyc5YhIeHLkABTco=
+X-Google-Smtp-Source: AGHT+IHa7FWLOGKg8Thm7QDDUPlVzXaAEWqWomimgzOkWsb0FL5ju0E2rB0g4YLHEY/ASv5Z648Auwd6KA==
+X-Received: from ejchw14.prod.google.com ([2002:a17:907:a0ce:b0:b72:41e4:751c])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:1c9c:b0:b6d:7b77:ff33
+ with SMTP id a640c23a62f3a-b736782c351mr1442681866b.19.1763462287893; Tue, 18
+ Nov 2025 02:38:07 -0800 (PST)
+Date: Tue, 18 Nov 2025 10:37:57 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251118103807.707500-1-tabba@google.com>
+Subject: [PATCH v5 0/9] KVM: arm64: Fixes for guest CPU feature trapping and enabling
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 18 Nov 2025 07:16:49 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> Hey Marc,
-> 
-> On Mon, Nov 17, 2025 at 09:15:27AM +0000, Marc Zyngier wrote:
-> > FEAT_NV2 is pretty terrible for anything that tries to enforce immediate
-> > effects, and writing to ICH_HCR_EL2 in the hope to disable a maintenance
-> > interrupt is vain. This only hits memory, and the guest hasn't cleared
-> > anything -- the MI will fire.
-> > 
-> > For example, running the vgic_irq test under NV results in about 800
-> > maintenance interrupts being actually handled by the L1 guest,
-> > when none were expected.
-> > 
-> > As a cheap workaround, read back ICH_MISR_EL2 after writing 0 to
-> > ICH_HCR_EL2. This is very cheap on real HW, and causes a trap to
-> > the host in NV, giving it the opportunity to retire the pending
-> > MI. With this, the above test tuns to completion without any MI
-> > being actually handled.
-> 
-> Just to make sure I'm following, the scenario you're talking about is
-> we've already put the vgic into a non-nested state, populated an LR with
-> the pending MI at the time of that switch and L0 has no signal for when
-> it can drop the LR / pending state.
+Hi,
 
-Exactly. Only an exit can cause it to reevaluate the state and retire
-the pending MI.
+This series contains several fixes for guest feature trapping and
+enabling, as well as a bit of tidying up.
 
-> 
-> > Yes, this is really poor...
-> 
-> +1 :-/
-> 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 7 +++++++
-> >  arch/arm64/kvm/vgic/vgic-v3-nested.c | 6 ++++--
-> >  2 files changed, 11 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > index 99342c13e1794..f503cf01ac82c 100644
-> > --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> > @@ -244,6 +244,13 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
-> >  	}
-> >  
-> >  	write_gicreg(0, ICH_HCR_EL2);
-> > +
-> > +	/*
-> > +	 * Hack alert: On NV, this results in a trap so that the above
-> > +	 * write actually takes effect...
-> > +	 */
-> > +	isb();
-> > +	read_gicreg(ICH_MISR_EL2);
-> 
-> I'm all for writing correct code but since we don't actually care about
-> the value of MISR_EL2 do we need the ISB? There's no need for a CSE for
-> non-NV and you'd get it 'for free' by way of exception entry in the NV
-> case.
+Changes from v3 [1]:
+- Add a map of KVM capabilities to IOCTLs (Oliver)
+- Based on Linux 6.18-rc6
 
-Yup, that's a good point. And exceptions are of course guaranteed to
-be in program order anyway, so the ISB can go. I'll add comment to
-that effect.
+Cheers,
+/fuad
 
-Thanks,
+[1] https://lore.kernel.org/all/20251110134525.3768197-1-tabba@google.com/
 
-	M.
+Fuad Tabba (9):
+  KVM: arm64: Fix Trace Buffer trapping for protected VMs
+  KVM: arm64: Fix Trace Buffer trap polarity for protected VMs
+  KVM: arm64: Fix MTE flag initialization for protected VMs
+  KVM: arm64: Introduce helper to calculate fault IPA offset
+  KVM: arm64: Include VM type when checking VM capabilities in pKVM
+  KVM: arm64: Do not allow KVM_CAP_ARM_MTE for any guest in pKVM
+  KVM: arm64: Track KVM IOCTLs and their associated KVM caps
+  KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+  KVM: arm64: Prevent host from managing timer offsets for protected VMs
 
+ arch/arm64/include/asm/kvm_arm.h         |  2 ++
+ arch/arm64/include/asm/kvm_host.h        | 42 ++++++++++++++++++++++++
+ arch/arm64/include/asm/kvm_pkvm.h        | 33 ++++++++++++++++---
+ arch/arm64/kvm/arch_timer.c              | 18 +++++++---
+ arch/arm64/kvm/arm.c                     |  7 ++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c           | 18 +++++-----
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
+ arch/arm64/kvm/inject_fault.c            |  2 +-
+ arch/arm64/kvm/mmu.c                     |  4 +--
+ include/uapi/linux/kvm.h                 |  1 +
+ 10 files changed, 105 insertions(+), 24 deletions(-)
+
+
+base-commit: 6a23ae0a96a600d1d12557add110e0bb6e32730c
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0.rc1.455.g30608eb744-goog
+
