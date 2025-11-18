@@ -1,281 +1,300 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AD1324B22
-	for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 22:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADED62F1FDE
+	for <kvmarm@lists.linux.dev>; Tue, 18 Nov 2025 01:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763419415; cv=none; b=tkAnUTvpc1iaEXTFPhPzoHCO3eRGBqbQe4MmReM1E4ZaI0V+7UODNgGDvKHZmcvJcStTmuyPluTU2He6HL4v+u+y4CDNQ5QJWJyn09DD/TM/jkAoIa8kZXg8G25ptNN3OdTI9MYB1jmtyDhzGCc/dqwpkaCuZlWuPK0EvIb+q1U=
+	t=1763429603; cv=none; b=pLYI/z+pHPZr2Mr8PJUFZW18xoIgJXbQRbc3r8zgbgd7dfSNWw018keH9ly7N3cigkw+WN66VAQ4WW7/5Kr/PXSVFBeKg1eN06Z3HXj9Vq814iyWJc83ouI+MKU/tN9SCpit8eEyruKWWA9MdpfFSkQUIM8jU4NclKgARAdg3fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763419415; c=relaxed/simple;
-	bh=qlNCPFPZ5sK3tkOJkWN2mmTRvbJFKCInbVuD79GxMtY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HM5K9BDSVp9jgcg2CuprFEHVwXxZeUcfvOj2LtgT0Gq5t21xmKZxTjFwaV3y5M+za8uxYhgvMqkC7PM8w7bZ2DADmeJMdtrwvW/iFRmA/oh0SJSjbfZUHZeSUaGzcCYAW+Owx0JYI+gZ/9qMluvGsm3BFJWi6sowSbdmqzl7II0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6oJqJoE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763429603; c=relaxed/simple;
+	bh=nnVJBDrqwwIhWPtEpmmZic7FnfDmoGokXzSNORyOUJo=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To; b=ZfcWqcVxMcaHnkh2jUg0mCvq75QNI6oiiP4nM7qGBHd4ne4pU3ndW+Z/+nVK/aA83lEHico9I8O+wV40JQnbvj4YMF0gPhyepHJepuHzRH45r25b/gUyeyU037Q3IZztJ/o4FXCNYzmEayiJrVXsDx3ng2Tbw0C559118qyecbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=rHzA47Gr; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6oJqJoE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2FC7C4AF0E;
-	Mon, 17 Nov 2025 22:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763419415;
-	bh=qlNCPFPZ5sK3tkOJkWN2mmTRvbJFKCInbVuD79GxMtY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f6oJqJoE7SSzpZ8Uq8HxFbNRJ7XgCnbNgvl/f4ye2XKQA33jvuNHN5iLDqBB6mYlN
-	 +tn64fSYHrSa4sLFkg6AqcQ3zYGh22RikuPw6XFVvZHBJA25VPbX8wo6LJL6S6DAbc
-	 CNnoUDPdiuij0m/QeIHQTyyq4EL+U5i6iXtG5EHMGzjcXr77oQQBgf3WlGbY55wy+R
-	 AQslH0W2PbdaCuxgZF9dS1mdx9eJTOANGlpJpMN/qyHYUtv59NxQlBiW7OyA/SktyP
-	 404RiagjTaO9u9QIQuTxrx+/5GtWZXezAJ7WUzhX9afSAZp5pvME15bIWP97QQwbdc
-	 Jiu4hJlxcqW8Q==
-From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v2 14/14] KVM: arm64: selftests: Add test for AT emulation
-Date: Mon, 17 Nov 2025 14:43:25 -0800
-Message-ID: <20251117224325.2431848-15-oupton@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251117224325.2431848-1-oupton@kernel.org>
-References: <20251117224325.2431848-1-oupton@kernel.org>
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="rHzA47Gr"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-8b2f2c5ec36so152185385a.1
+        for <kvmarm@lists.linux.dev>; Mon, 17 Nov 2025 17:33:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1763429600; x=1764034400; darn=lists.linux.dev;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C4hoiXRAaj1tbhxDzJlVdMfo7upvGHdC39KJuih16Vw=;
+        b=rHzA47Gr0qAwaXhqA2wpQIOM/4XXwif5aQnyBsDAm+NU9ggF/QUvLSte2eBbiqSDGQ
+         5O1aQPVD/I6t/rBXqNOPFiHNILXPwC+rUxXEakcmSqVrLoBL0diJfXRFLH+vJkIS4B4C
+         y0HbRZMT0LO8Z5X9HvLaj++9W2JB+K2yr36CQQNX4Qy/FAP5zM3OBTAmn4QyMb2nx0p7
+         0G+Xm1d2jxFXQng2o2oAUf2f7gOFS+WQEr4h3r9BGrRMch1q03jCmV+sbQh/CIs8S6Nk
+         mEuxMN1fJlP5FpmJh+DnuI3y4Y4FL4OX4cgyV1JSB6IYPnMxyMdqvii60RnOHB5uU4Sp
+         +C4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763429600; x=1764034400;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C4hoiXRAaj1tbhxDzJlVdMfo7upvGHdC39KJuih16Vw=;
+        b=bKaU2y/pPJJCYqJHhTSPWPK53VawWG84HpTFbS7Cp8pTmPkYwduVHByxp5GcOcZeHi
+         y1lKy12JKoEgJo00M6GIGC8oCqPoIPQeUOPz7ORCCkETYiaHTSF4dlJY9/nqtBUThYwF
+         HNzUtWc19QaGPE08I2PtP7x7APQIllukfiSEqJvDDOyGiaMX347sCxDtBDzQB9AsULId
+         H3vEMr4Hj1yt+Ji+JSqKeBGPQ53ZXONOZ8pShY/DFnNM3dDFadcp1aFtrjYcYqo5m4yc
+         7c7dWtKYGFIcY2Djz8tFYfLIO4C5sZ4aNondRt6fCOeaVUswRYbf075Mwohyss2DLyhD
+         SI+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVuuS+QG7DnN4ghI43lcUB+Oz4pW36liL16aBqVVx20TXNAmJBV/dCCwMhQunOSa1S3XJSatPg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx9fWTqN4x0TSRViltiOOYDwN0FfIFnHz4fKjBdpiLTc/s1X58M
+	AfoF5x7QZGldaRZyuiYtsVoyuplSvsvXTKH6BSKvxnb3hOCJMmJ49jIplCZghoazb38NM+YE/Ha
+	eo7iC
+X-Gm-Gg: ASbGnct9y/7E3VuLgfWldVIvVQIFwaNUWhtixKHvcj3Bt33nIUze4QtqRks9+2eumfs
+	2RfNyVjxXEb2wxUfEoGrp8bxPlx7aN7+eI8QAsiGK7hj7tYqoPx48xizZZ9hAfR0z9Bmca0fts1
+	Y6VDF1xuKG28/OvCEbGpW6qjZJC5kBgfzhs0wjINT3mrnfgzK166CleU6VhDUI/NiDpbHALDSSx
+	DRB7ll11eoP10wVLyn9X0glZCAGt2nuo1IAL/GSRYHuoaTg6aZpnumUtKg7KMaDXuqLx7oFmLOd
+	5cIkNpywEGXPeYBxNoOCeI1gTk9FqpTHx37iBTVLYUvm+7RmOIQTe7NKxs7mlxVgCGJEGR3nuYJ
+	pJhxow+5vsKiSuit0kBu7oLFwssOCFmC2ZYNEOjWGjw2CyCtbVDROh6gwERwE0E1XQnAKClTvKG
+	r6HQoE1/9fptJORvn/2v/RFMi0KI4Gk4Lc+rpE9WkDEHHFgyASD9/9deahsQ+4i85V63Xuz+9qm
+	yDY1ilwVVWFrDmt9NFjrCdNUpEMPwk/rzSJJ1x2cZwPjcs8JdjuiSmW
+X-Google-Smtp-Source: AGHT+IH3jZaF+8AMXYP9SIuqmgqhQ/1/L9nHNB8dUkfbV4+F9NYJk6SL9OfbdMigKEqTCtc9kQ2kdg==
+X-Received: by 2002:a05:620a:3945:b0:8b2:7679:4d2d with SMTP id af79cd13be357-8b2c31d3f09mr1994630685a.63.1763429600193;
+        Mon, 17 Nov 2025 17:33:20 -0800 (PST)
+Received: from ?IPV6:2003:fa:af29:b100:e8b2:7dbf:b11:65fc? (p200300faaf29b100e8b27dbf0b1165fc.dip0.t-ipconnect.de. [2003:fa:af29:b100:e8b2:7dbf:b11:65fc])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2aee9e519sm1116530885a.5.2025.11.17.17.33.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Nov 2025 17:33:19 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------v5UEWd1lmK7xbVKuWRNVQR30"
+Message-ID: <083276ef-ff1b-4ac3-af19-3f73b1581d39@grsecurity.net>
+Date: Tue, 18 Nov 2025 02:33:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf
+ functions
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Andrew Jones <andrew.jones@linux.dev>, Eric Auger <eric.auger@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20250915215432.362444-1-minipli@grsecurity.net>
+ <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+ <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net>
+ <aRufV8mPlW3uKMo4@google.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <aRufV8mPlW3uKMo4@google.com>
 
-Add a basic test for AT emulation in the EL2&0 and EL1&0 translation
-regimes.
+This is a multi-part message in MIME format.
+--------------v5UEWd1lmK7xbVKuWRNVQR30
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/arm64/at.c        | 166 ++++++++++++++++++
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  10 ++
- 4 files changed, 178 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/at.c
+On 17.11.25 23:19, Sean Christopherson wrote:
+> On Sat, Nov 15, 2025, Mathias Krause wrote:
+>> On 14.11.25 19:25, Sean Christopherson wrote:
+>>> On Mon, 15 Sep 2025 23:54:28 +0200, Mathias Krause wrote:
+>>>> This is v2 of [1], trying to enhance backtraces involving leaf
+>>>> functions.
+>>>>
+>>>> This version fixes backtraces on ARM and ARM64 as well, as ARM currently
+>>>> fails hard for leaf functions lacking a proper stack frame setup, making
+>>>> it dereference invalid pointers. ARM64 just skips frames, much like x86
+>>>> does.
+>>>>
+>>>> [...]
+>>>
+>>> Applied to kvm-x86 next, thanks!
+>>
+>> Thanks a lot, Sean!
+>>
+>>> P.S. This also prompted me to get pretty_print_stacks.py working in my
+>>>      environment, so double thanks!
+>>
+>> Haha, you're welcome! :D
+>>
+>>>
+>>> [1/4] Makefile: Provide a concept of late CFLAGS
+>>>       https://github.com/kvm-x86/kvm-unit-tests/commit/816fe2d45aed
+>>> [2/4] x86: Better backtraces for leaf functions
+>>>       https://github.com/kvm-x86/kvm-unit-tests/commit/f01ea38a385a
+> 
+> Spoke too soon :-(
+> 
+> The x86 change breaks the realmode test.  I didn't try hard to debug, as that
+> test is brittle, e.g. see https://lore.kernel.org/all/20240604143507.1041901-1-pbonzini@redhat.com.
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24b..81b3aa54678a 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -156,6 +156,7 @@ TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
- TEST_GEN_PROGS_arm64 = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_arm64 += arm64/aarch32_id_regs
- TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
-+TEST_GEN_PROGS_arm64 += arm64/at
- TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
- TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
-diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
-new file mode 100644
-index 000000000000..acecb6ab5071
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/at.c
-@@ -0,0 +1,166 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * at - Test for KVM's AT emulation in the EL2&0 and EL1&0 translation regimes.
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "ucall.h"
-+
-+#include <asm/sysreg.h>
-+
-+#define TEST_ADDR	0x80000000
-+
-+enum {
-+	CLEAR_ACCESS_FLAG,
-+	TEST_ACCESS_FLAG,
-+};
-+
-+static u64 *ptep_hva;
-+
-+#define copy_el2_to_el1(reg)						\
-+	write_sysreg_s(read_sysreg_s(SYS_##reg##_EL1), SYS_##reg##_EL12)
-+
-+/* Yes, this is an ugly hack */
-+#define __at(op, addr)	write_sysreg_s(addr, op)
-+
-+#define test_at_insn(op, expect_fault)							\
-+do {											\
-+	u64 par, fsc;									\
-+	bool fault;									\
-+											\
-+	GUEST_SYNC(CLEAR_ACCESS_FLAG);							\
-+											\
-+	__at(OP_AT_##op, TEST_ADDR);							\
-+	isb();										\
-+	par = read_sysreg(par_el1);							\
-+											\
-+	fault = par & SYS_PAR_EL1_F;							\
-+	fsc = FIELD_GET(SYS_PAR_EL1_FST, par);						\
-+											\
-+	__GUEST_ASSERT((expect_fault) == fault,						\
-+		       "AT "#op": %sexpected fault (par: %lx)1",			\
-+		       (expect_fault) ? "" : "un", par);				\
-+	if ((expect_fault)) {								\
-+		__GUEST_ASSERT(fsc == ESR_ELx_FSC_ACCESS_L(3),				\
-+			       "AT "#op": expected access flag fault (par: %lx)",	\
-+			       par);							\
-+	} else {									\
-+		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
-+		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
-+		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
-+		GUEST_SYNC(TEST_ACCESS_FLAG);						\
-+	}										\
-+} while (0)
-+
-+static void test_at(bool expect_fault)
-+{
-+	test_at_insn(S1E2R, expect_fault);
-+	test_at_insn(S1E2W, expect_fault);
-+
-+	/* Reuse the stage-1 MMU context from EL2 at EL1 */
-+	copy_el2_to_el1(SCTLR);
-+	copy_el2_to_el1(MAIR);
-+	copy_el2_to_el1(TCR);
-+	copy_el2_to_el1(TTBR0);
-+	copy_el2_to_el1(TTBR1);
-+
-+	/* Disable stage-2 translation and enter a non-host context */
-+	write_sysreg(0, vtcr_el2);
-+	write_sysreg(0, vttbr_el2);
-+	sysreg_clear_set(hcr_el2, HCR_EL2_TGE | HCR_EL2_VM, 0);
-+	isb();
-+
-+	test_at_insn(S1E1R, expect_fault);
-+	test_at_insn(S1E1W, expect_fault);
-+}
-+
-+static void guest_code(void)
-+{
-+	sysreg_clear_set(tcr_el1, TCR_HA, 0);
-+	isb();
-+
-+	test_at(true);
-+
-+	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
-+		GUEST_DONE();
-+
-+	/*
-+	 * KVM's software PTW makes the implementation choice that the AT
-+	 * instruction sets the access flag.
-+	 */
-+	sysreg_clear_set(tcr_el1, 0, TCR_HA);
-+	isb();
-+	test_at(false);
-+
-+	GUEST_DONE();
-+}
-+
-+static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	switch (uc->args[1]) {
-+	case CLEAR_ACCESS_FLAG:
-+		/*
-+		 * Delete + reinstall the memslot to invalidate stage-2
-+		 * mappings of the stage-1 page tables, forcing KVM to
-+		 * use the 'slow' AT emulation path.
-+		 *
-+		 * This and clearing the access flag from host userspace
-+		 * ensures that the access flag cannot be set speculatively
-+		 * and is reliably cleared at the time of the AT instruction.
-+		 */
-+		clear_bit(__ffs(PTE_AF), ptep_hva);
-+		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
-+		break;
-+	case TEST_ACCESS_FLAG:
-+		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
-+			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected SYNC arg: %lu", uc->args[1]);
-+	}
-+}
-+
-+static void run_test(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	while (true) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			return;
-+		case UCALL_SYNC:
-+			handle_sync(vcpu, &uc);
-+			continue;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			return;
-+		default:
-+			TEST_FAIL("Unexpeced ucall: %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-+
-+	vm = vm_create(1);
-+
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	virt_map(vm, TEST_ADDR, TEST_ADDR, 1);
-+	ptep_hva = virt_get_pte_hva_at_level(vm, TEST_ADDR, 3);
-+	run_test(vcpu);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index d3f3e455c031..41467dad9178 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -715,6 +715,7 @@ static inline bool vm_arch_has_protected_memory(struct kvm_vm *vm)
- #endif
- 
- void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-+void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot);
- void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1a93d6361671..d6538bb17740 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1201,6 +1201,16 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
- 		ret, errno, slot, flags);
- }
- 
-+void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot)
-+{
-+	struct userspace_mem_region *region = memslot2region(vm, slot);
-+	struct kvm_userspace_memory_region2 tmp = region->region;
-+
-+	tmp.memory_size = 0;
-+	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &tmp);
-+	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
-+}
-+
- /*
-  * VM Memory Region Move
-  *
--- 
-2.47.3
+Gee! 16bit code at its finest.
 
+So I looked at it and this seems to be a bug in gcc because it emits a
+5-byte NOP to make room for a 3-byte call. Actually, it doesn't even
+emit a NOP, it just spits out some bytes:
+
+minipli@bell:~$ diff -u pg.s nop_mcount.s
+--- pg.s	2025-11-18 01:34:34.884472417 +0100
++++ nop_mcount.s	2025-11-18 01:34:05.716096290 +0100
+@@ -11,7 +11,7 @@
+ 	.cfi_offset 5, -8
+ 	movl	%esp, %ebp
+ 	.cfi_def_cfa_register 5
+-1:	call	mcount
++1:	.byte	0x0f, 0x1f, 0x44, 0x00, 0x00
+ 	movl	8(%ebp), %eax
+ 	addl	%eax, %eax
+ 	popl	%ebp
+
+The issue is, while that is a perfectly fine NOPL for 32-bit and 64-bit,
+it's not for 16-bit. The 16-bit version gets treated as a 4-byte NOPW
+with a left-over zero byte which messes with all the following opcodes
+and causes issues like you observed.
+
+However, gcc is probably not fully to blame, as it cannot know that it's
+generating 16-bit code. That piece is hidden in a asm(".code16gcc")
+statement.
+
+> 
+> I can't for the life of me figure out how to get Makefile variables to do what I
+> want, so for now I'm going to drop the x86 change so as not to block the rest of
+> the stuff I've got applied.
+> 
+> I'll keep the rest applied, so just resubmit the x86 patch against kvm-x86/next.
+> 
+
+
+> FWIW, conceptually I think we want something like this:
+> 
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index be18a77a..65e41578 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -44,6 +44,7 @@ COMMON_CFLAGS += -O1
+>  KEEP_FRAME_POINTER := y
+>  
+>  ifneq ($(KEEP_FRAME_POINTER),)
+> +ifneq ($(no_profiling),y)
+>  # Fake profiling to force the compiler to emit a frame pointer setup also in
+>  # leaf function (-mno-omit-leaf-frame-pointer doesn't work, unfortunately).
+>  #
+> @@ -53,6 +54,7 @@ ifneq ($(KEEP_FRAME_POINTER),)
+>  # during compilation makes this do "The Right Thing."
+>  LATE_CFLAGS += $(call cc-option, -pg -mnop-mcount, "")
+>  endif
+> +endif
+>  
+>  FLATLIBS = lib/libcflat.a
+>  
+> @@ -120,6 +122,7 @@ $(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o $(SRCDIR)/$(TEST_DIR)/realmode.
+>         $(LD) -m elf_i386 -nostdlib -o $@ \
+>               -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $(filter %.o, $^)
+>  
+> +$(TEST_DIR)/realmode.o: no_profiling = y
+>  $(TEST_DIR)/realmode.o: bits = $(realmode_bits)
+
+Kind of, yes. Just with the $(no_profiling) part embedded into
+LATE_CFLAGS. However, as that gets forcibly evaluated early (on
+purpose!), that can't work.
+
+I tried to play with $(filter-out ...,$(CFLAGS)) but that didn't work
+out either. What does work, however, is to disable -mnop-mcount and make
+it a call again. This just needs a stub mcount() and the realmode test
+is working again.
+
+I see that kvm-x86/next as of now (e403d30a8210 ("x86/emulator: Treat
+DR6_BUS_LOCK as writable if CPU has BUS_LOCK_DETECT")) still has
+f01ea38a385a ("x86: Better backtraces for leaf functions"), so I just
+created a fixup commit (attached). Feel free to squash it into
+f01ea38a385a or yell at if you want something else.
+
+Thanks,
+Mathias
+
+--------------v5UEWd1lmK7xbVKuWRNVQR30
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-x86-Prevent-realmode-test-code-instrumentation-with-.patch"
+Content-Disposition: attachment;
+ filename*0="0001-x86-Prevent-realmode-test-code-instrumentation-with-.pa";
+ filename*1="tch"
+Content-Transfer-Encoding: base64
+
+RnJvbSBkMmFjMTU4ODFiNzk0YTRlMzkzMmM0OWE5NzI3OGQwNDI2ZjBhYTY3IE1vbiBTZXAg
+MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBNYXRoaWFzIEtyYXVzZSA8bWluaXBsaUBncnNlY3Vy
+aXR5Lm5ldD4KRGF0ZTogVHVlLCAxOCBOb3YgMjAyNSAwMjoxNDoyNyArMDEwMApTdWJqZWN0
+OiBba3ZtLXVuaXQtdGVzdHMgUEFUQ0hdIHg4NjogUHJldmVudCByZWFsbW9kZSB0ZXN0IGNv
+ZGUKIGluc3RydW1lbnRhdGlvbiB3aXRoIG5vcC1tY291bnQKCkNvbW1pdCBmMDFlYTM4YTM4
+NWEgKCJ4ODY6IEJldHRlciBiYWNrdHJhY2VzIGZvciBsZWFmIGZ1bmN0aW9ucyIpIG1hZGUK
+dXNlIG9mICctcGcgLW1ub3AtbWNvdW50JyB0byBwcm92aWRlIGEgbGlnaHR3ZWlnaHQgd2F5
+IHRvIGZvcmNlIGxlYWYKZnVuY3Rpb25zIHRvIGVtaXQgYSBwcm9wZXIgcHJvbG9ndWUgZm9y
+IHRoZSBiYWNrdHJhY2luZyBjb2RlLiBIb3dldmVyLAotbW5vcC1tY291bnQgZG9lc24ndCBw
+bGF5IHdlbGwgd2l0aCAxNi1iaXQgY29kZSBnZW5lcmF0aW9uIGZvciBDIGNvZGUuCmdjYyBo
+YXBwaWx5IGVtaXRzIGEgNS1ieXRlIE5PUCB0aGF0IHRyYW5zbXV0ZXMgdG8gYSA0LWJ5dGUg
+Tk9QIGZvbGxvd2VkCmJ5IGEgemVybyBieXRlIHdoZW4gZXhlY3V0ZWQgaW4gcmVhbCBtb2Rl
+LCB3cmVja2luZyBhbGwgY29kZSB0aGF0CmZvbGxvd3MuCgpGaXggdGhhdCBieSBzZWxlY3Rp
+dmVseSBkaXNhYmxpbmcgJy1tbm9wLW1jb3VudCcgZm9yIHJlYWxtb2RlLmMsIG1ha2luZwpp
+dCBjYWxsIG1jb3VudCgpLCB3aGljaCBpcyBwcm92aWRlZCBhcyBhIHN0dWIgZnVuY3Rpb24u
+CgpSZXBvcnRlZC1ieTogU2VhbiBDaHJpc3RvcGhlcnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+
+CkZpeGVzOiBmMDFlYTM4YTM4NWEgKCJ4ODY6IEJldHRlciBiYWNrdHJhY2VzIGZvciBsZWFm
+IGZ1bmN0aW9ucyIpClNpZ25lZC1vZmYtYnk6IE1hdGhpYXMgS3JhdXNlIDxtaW5pcGxpQGdy
+c2VjdXJpdHkubmV0PgotLS0KIHg4Ni9NYWtlZmlsZS5jb21tb24gfCA1ICsrKystCiB4ODYv
+cmVhbG1vZGUuYyAgICAgIHwgMyArKysKIDIgZmlsZXMgY2hhbmdlZCwgNyBpbnNlcnRpb25z
+KCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEveDg2L01ha2VmaWxlLmNvbW1vbiBi
+L3g4Ni9NYWtlZmlsZS5jb21tb24KaW5kZXggYmUxOGE3N2E3NzllLi42YjU5ZjI2YTNkMmMg
+MTAwNjQ0Ci0tLSBhL3g4Ni9NYWtlZmlsZS5jb21tb24KKysrIGIveDg2L01ha2VmaWxlLmNv
+bW1vbgpAQCAtNTEsNyArNTEsOSBAQCBpZm5lcSAoJChLRUVQX0ZSQU1FX1BPSU5URVIpLCkK
+ICMgV2UgbmVlZCB0byBkZWZlciB0aGUgY2Mtb3B0aW9uIHRlc3QgdW50aWwgLWZuby1waWMg
+b3IgLW5vLXBpZSBoYXZlIGJlZW4KICMgYWRkZWQgdG8gQ0ZMQUdTIGFzIC1tbm9wLW1jb3Vu
+dCBuZWVkcyBpdC4gVGhlIGxhenkgZXZhbHVhdGlvbiBvZiBDRkxBR1MKICMgZHVyaW5nIGNv
+bXBpbGF0aW9uIG1ha2VzIHRoaXMgZG8gIlRoZSBSaWdodCBUaGluZy4iCi1MQVRFX0NGTEFH
+UyArPSAkKGNhbGwgY2Mtb3B0aW9uLCAtcGcgLW1ub3AtbWNvdW50LCAiIikKK05PUF9QR0ZM
+QUdTIDo9IC1wZyAtbW5vcC1tY291bnQKK0xBVEVfQ0ZMQUdTICs9ICQoY2FsbCBjYy1vcHRp
+b24sICQoTk9QX1BHRkxBR1MpLCAiIikKK05PX05PUF9NQ09VTlQgPSAkKGlmICQoZmlsdGVy
+ICQoTk9QX1BHRkxBR1MpLCQoTEFURV9DRkxBR1MpKSwtbW5vLW5vcC1tY291bnQpCiBlbmRp
+ZgogCiBGTEFUTElCUyA9IGxpYi9saWJjZmxhdC5hCkBAIC0xMjEsNiArMTIzLDcgQEAgJChU
+RVNUX0RJUikvcmVhbG1vZGUuZWxmOiAkKFRFU1RfRElSKS9yZWFsbW9kZS5vICQoU1JDRElS
+KS8kKFRFU1RfRElSKS9yZWFsbW9kZS4KIAkgICAgICAtVCAkKFNSQ0RJUikvJChURVNUX0RJ
+UikvcmVhbG1vZGUubGRzICQoZmlsdGVyICUubywgJF4pCiAKICQoVEVTVF9ESVIpL3JlYWxt
+b2RlLm86IGJpdHMgPSAkKHJlYWxtb2RlX2JpdHMpCiskKFRFU1RfRElSKS9yZWFsbW9kZS5v
+OiBDRkxBR1MgKz0gJChOT19OT1BfTUNPVU5UKQogCiAkKFRFU1RfRElSKS9hY2Nlc3NfdGVz
+dC4kKGJpbik6ICQoVEVTVF9ESVIpL2FjY2Vzcy5vCiAKZGlmZiAtLWdpdCBhL3g4Ni9yZWFs
+bW9kZS5jIGIveDg2L3JlYWxtb2RlLmMKaW5kZXggN2E0NDIzZWM2MDk4Li4wYTcxMDRkNGNm
+ZjQgMTAwNjQ0Ci0tLSBhL3g4Ni9yZWFsbW9kZS5jCisrKyBiL3g4Ni9yZWFsbW9kZS5jCkBA
+IC0yMyw2ICsyMyw5IEBAIHZvaWQgdGVzdF9mdW5jdGlvbih2b2lkKTsKIGFzbSgKIAkidGVz
+dF9mdW5jdGlvbjogXG5cdCIKIAkibW92ICQweDEyMzQsICVlYXggXG5cdCIKKwkicmV0XG5c
+dCIKKwkvKiBtY291bnQoKSBzdHViICovCisJIm1jb3VudDpcblx0IgogCSJyZXQiCiAgICAp
+OwogCi0tIAoyLjQ3LjMKCg==
+
+--------------v5UEWd1lmK7xbVKuWRNVQR30--
