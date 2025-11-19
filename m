@@ -1,50 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD60B2DE6FF;
-	Wed, 19 Nov 2025 22:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2676F30E0F2
+	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 22:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763591731; cv=none; b=HqpTaUBAdBEqS2B1ceE0d404lL7sfOzkjda1G4MuwCMCdHbkHAIzt8e4S9B+UegNuiS57zThIGc3VlaT2d63oOBlcPStfa6BHU/iz5Myi1Ged15w2atYmm7gI3Uj8tZDeeH7goZ2hFouzEJThDP0zfvVImW5FMLLjeJVfZ8oR+4=
+	t=1763591732; cv=none; b=WAJCJV5U14U3+qlNwmRNAnPC5cFtyVd1OeT2iZJ9yFva9U25yBiFP00M3kxEKc714M0ewzcYGn4m9Ih619Hm9hk1zaWJEKVSl2NJwBrbazzplhjpZWn/det3raINDNTFz45qMyy9vDqgujolI9Icap9D1LNaGfvJvB6sNB2tur4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763591731; c=relaxed/simple;
-	bh=gtkw5I6XWLCtMEVkd6b/QRRhgxON/maxlA2T6Gp457E=;
+	s=arc-20240116; t=1763591732; c=relaxed/simple;
+	bh=DJy6fnE5dbdhKjrUNfky4jJT0ghtNhfTiQzLKtcXCDQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MqWGiSTInG2ZevjbD4bl227MxFbTah6LtBBCIKr7DzAo9j2WTrN3lLh35KjiHhnMOCzwcdOiF3cgiNbJg/6KyoQaf0cnKB7mnUHkTGjRpjUriAhW6dWZpK6X11dI8xAsGAXOXoCup+6Fmgo04pltv56jX3YJ4BeFJT4+f1mpjy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAR4JFIl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=vF3XCi5VkPCi/ggY0W9jYIs6A2HuZ7zmuHF6tgf84+xGrw+6b+wzLlJ2VeBMns1f2t7iNhCvf4ooA9gk3O9fvmmHJDuibwsNczu0tWQqjBGvhSpTMxXsyPUIHzU8bAT1XTNhwTXuLUljRJl0s1ZGkzx5ustlLgmkwxZuQKkH6xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C70E3GFW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAR4JFIl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37B44C4CEF5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C70E3GFW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75CE6C16AAE;
 	Wed, 19 Nov 2025 22:35:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1763591731;
-	bh=gtkw5I6XWLCtMEVkd6b/QRRhgxON/maxlA2T6Gp457E=;
+	bh=DJy6fnE5dbdhKjrUNfky4jJT0ghtNhfTiQzLKtcXCDQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FAR4JFIl4a1/kGUdxiL57yHPZIlzEkEW8XgXreuOVre+Bs/lhVWxAHSBMjdK/yA6y
-	 gnOLQ7W+OQ+/gDOLooBlbD7Ms9P0L4GBSrPLeDt9MgAIIYnleNa/UcWbY8daNMXw4R
-	 dCwJLdjN7mpKmGRNQJTzI8rEM2sHtZ6mr2T4XciJCCJR9L0Jo01gVBnKqlMp+QW1YP
-	 uFZK6cYd5kkWjLc6gdKbZD86YAbXVwH3yE32bPpXZp2gnlyIMNUry/o6K3bKbRBgsK
-	 XyhoZDI/n1NU971WytVE1rbKaDuXkKIXinT0SlmO0g+eYS/1mUQxrJBc08e0EKoP03
-	 lsdNz8uIFNiIg==
+	b=C70E3GFWeWSEXXDjZ++W5CncR+JbntusCdMVgQHKP8pMpMnuofojOXQevuguqmy4d
+	 VrzBNDaCbsbYBmPcN5GOtoQUr475VDscFzgRvSWoAO+ZSElC7Su/vmqi9x6DpoG4MO
+	 1Pgo2AcNgsaZtswR22kIijIIwi7JEOr4rzTMU29fk907gaOoMn8e8Htd5OzeBlpGCj
+	 Vg8Ku88gFzRnf3Mtpn3hTlqxNqXDt+UQqHAO1WGNdGVDQgDL2+c3L4u5rRYJfRxMEd
+	 VZGqI2tqPiJGlzrH2S14QZtftguY4RK+ReX3pEo3F/9P+yWAYa1pjxfq6f2XWbxhRR
+	 JMKqij1Hc8i+Q==
 From: Oliver Upton <oupton@kernel.org>
-To: maz@kernel.org,
-	oliver.upton@linux.dev,
-	Maximilian Dittgen <mdittgen@amazon.de>
-Cc: Oliver Upton <oupton@kernel.org>,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kselftest@vger.kernel.org,
-	kvm@vger.kernel.org,
-	lilitj@amazon.de,
-	nh-open-source@amazon.com
-Subject: Re: [PATCH v2 1/2] KVM: selftests: Assert GICR_TYPER.Processor_Number matches selftest CPU number
-Date: Wed, 19 Nov 2025 14:35:26 -0800
-Message-ID: <176359161122.183996.2358688818272311431.b4-ty@kernel.org>
+To: kvmarm@lists.linux.dev,
+	Oliver Upton <oupton@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fixes to KVM struct allocation
+Date: Wed, 19 Nov 2025 14:35:27 -0800
+Message-ID: <176359161116.183996.3170816859732930577.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251119135744.68552-1-mdittgen@amazon.de>
-References: <20251114143902.30435-1-mdittgen@amazon.de> <20251119135744.68552-1-mdittgen@amazon.de>
+In-Reply-To: <20251119093822.2513142-1-oupton@kernel.org>
+References: <20251119093822.2513142-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,28 +48,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Nov 2025 14:57:43 +0100, Maximilian Dittgen wrote:
-> The selftests GIC library and tests assume that the
-> GICR_TYPER.Processor_number associated with a given CPU is the same as
-> the CPU's selftest index.
+On Wed, 19 Nov 2025 01:38:20 -0800, Oliver Upton wrote:
+> Small fix to drop __GFP_HIGHMEM from KVM struct allocation GFP flags,
+> which was always completely pointless and now trips a WARN for passing
+> such an unsupported flag to vmalloc().
 > 
-> Since this assumption is not guaranteed by specification, add an assert
-> in gicv3_cpu_init() that validates this is true.
+> Oliver Upton (2):
+>   KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
+>   KVM: arm64: Use kvzalloc() for kvm struct allocation
 > 
 > [...]
 
-I did a small cleanup to patch #1 to get rid of open-coded shifts / masks.
-
-Please new versions of a series as a separate thread, using a cover letter
-for anything more than a single patch. This is helpful for tracking patches
-on my end.
-
 Applied to next, thanks!
 
-[1/2] KVM: selftests: Assert GICR_TYPER.Processor_Number matches selftest CPU number
-      https://git.kernel.org/kvmarm/kvmarm/c/31df012da496
-[2/2] KVM: selftests: SYNC after guest ITS setup in vgic_lpi_stress
-      https://git.kernel.org/kvmarm/kvmarm/c/85f329df2931
+[1/2] KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
+      https://git.kernel.org/kvmarm/kvmarm/c/297877069bc2
+[2/2] KVM: arm64: Use kvzalloc() for kvm struct allocation
+      https://git.kernel.org/kvmarm/kvmarm/c/cb17d79ff51d
 
 --
 Best,
