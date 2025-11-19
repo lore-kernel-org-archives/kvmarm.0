@@ -1,148 +1,535 @@
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C24327BF6;
-	Wed, 19 Nov 2025 16:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2CE302164;
+	Wed, 19 Nov 2025 17:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763568719; cv=none; b=dLsLsZ/uITMEprl3JNEMB7COEjMxONa5QVgAAPUQdeqAuKhg0H8hQut/MipoS7JoLSwe17iCoAzXvvTVaY2YRz1QMbcCuKJ0pf5wMRTJCFugc3nxeyhnk5VnnbsPZOkK1DSOxKm7pSxAGL1TxPDRSykPUaLC7O5VtvRqGV+KSnI=
+	t=1763572002; cv=none; b=XtJKWAe12CgR/55pxuFKzzuzaqCJ9b4F5ijBvzlMyDUnnmrf1/Yxqjm6UZxg6SHuUA75am1TVgWnsXVWFKMHvAvNL1WoEn2WpX3RQ7QwBRz8akvNsDdqIl7EXk7w9cOJ/OxDnNoKx4qhYLlZ0/wpn14sk+x6g5W2VnT4gPj2wZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763568719; c=relaxed/simple;
-	bh=VKtIi9EYMzDKzvT85LA50F6VBpmoAORqCYOXVXARLsg=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T4mrk3J4hX1oGsNOqeNxjd5mC6thWBcnso+xHf4kJP55uUylJUE00Vma23W93KeiKFyMXN1YozalvP1OQy3b6OL7za1Z5XgPTE1fBYlw0G5e/2btnFmP5svssDan9pukiFOdwGLuU8VWRtha9uzlrphwuPMOrZNdjf3QUTSJrgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=N3AamHaH; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763572002; c=relaxed/simple;
+	bh=woNh5JEEMkAdN+vfrrrsu6WoTN/klukjySz4Ay7pPwA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OHojqDowXUsRVMDgmkvvN7RK4VXEzvhTsGeZjBeu7Z79RmqzcbIlOlbt68TbKg41jh1E24DUMoUcCbZ+ICnOQ6RwG1h7axiLiyMGzzfTZtBfsj1+ajc9YVo9iZSIgCkTmvQVs+YmWsxllKVH/Ya6i+LwZUU1Df0gZnoInZomJnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSQ1gRVt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="N3AamHaH"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=uPer+0zUouYQflZKOjIi8F+VvjFsXukWzLta7c51w5Y=;
-	b=N3AamHaHSG59kZl8zhI/w7eV5iJkjtLu2WLkCRedFEni5oK+iJnpiqwEBCrVT+JqdWxuHjkmg
-	yn0Af0G0tylxhQGSHAypKjtU2fu4rmN/JfxuwemxSxrxfRUHzgaDP005Rtui2hBUoK0Y0Z2PCUb
-	5m8M2rSa0sm/ojZhFMOeZgk=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dBQxv18WwzMtYq;
-	Wed, 19 Nov 2025 23:53:38 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dBQyZ2n6TzHnGhy;
-	Wed, 19 Nov 2025 23:54:14 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6AD1E14033C;
-	Wed, 19 Nov 2025 23:54:47 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 19 Nov
- 2025 15:54:46 +0000
-Date: Wed, 19 Nov 2025 15:54:44 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 04/11] coco: guest: arm64: Add support for updating
- interface reports from device
-Message-ID: <20251119155444.00002925@huawei.com>
-In-Reply-To: <20251117140007.122062-5-aneesh.kumar@kernel.org>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
-	<20251117140007.122062-5-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSQ1gRVt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FE7FC113D0;
+	Wed, 19 Nov 2025 17:06:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763572001;
+	bh=woNh5JEEMkAdN+vfrrrsu6WoTN/klukjySz4Ay7pPwA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WSQ1gRVtxv6UXCd31HIq6Eh1eEv1fYJrOHMjVCdVGZImTqa4M0QWku4WgOHaI6t9J
+	 bemN7fXO9y3W7EQh5ZDxi7qJa3D+s0w+OaOsiUCpGQoXUVfk5KlPAxFQg+bJ4l31u5
+	 AylhoizcT7sOvO0q4FufbMqCFvYievKVGrstRab7wo81UqefvhlNPM4Jljp9CEBjgU
+	 FNlVrq1O+vo7vxhL1PgD+WQ6rrqk+HTQDrDKeWA47I3yulXrhUQMVgvGKYl6znGr92
+	 DD9LygtLLeS36eZzBmVbSDfR14VTj8b7he52RnqUU+wM7Qs1kiwnbdAi3plDuP1Uvs
+	 x9vrDJdLLnpKw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vLlde-00000006dSZ-3ZPO;
+	Wed, 19 Nov 2025 17:06:38 +0000
+Date: Wed, 19 Nov 2025 17:06:38 +0000
+Message-ID: <86bjkyrly9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 21/28] KVM: arm64: Add tracing capability for the pKVM hyp
+In-Reply-To: <20251107093840.3779150-22-vdonnefort@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+	<20251107093840.3779150-22-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 19:30:00 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-
-> Support collecting interface reports using RSI calls. The fetched
-> interface report will be cached in the host.
+On Fri, 07 Nov 2025 09:38:33 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-
-> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> index f4c9e529c43e..7988ff6d4b2e 100644
-> --- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> @@ -212,6 +212,12 @@ static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pde
->  	if (ret)
->  		return ERR_PTR(-EIO);
+> When running with protected mode, the host has very little knowledge
+> about what is happening in the hypervisor. Of course this is an
+> essential feature for security but nonetheless, that piece of code
+> growing with more responsibilities, we need now a way to debug and
+> profile it. Tracefs by its reliability, versatility and support for
+> user-space is the perfect tool.
+> 
+> There's no way the hypervisor could log events directly into the host
+> tracefs ring-buffers. So instead let's use our own, where the hypervisor
+> is the writer and the host the reader.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 9da54d4ee49e..ad02dee140d3 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_load_tracing,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_unload_tracing,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_enable_tracing,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_swap_reader_tracing,
+>  };
 >  
-> +	ret = cca_update_device_object_cache(pdev, cca_dsc);
-> +	if (ret) {
-> +		cca_device_unlock(pdev);
-> +		return ERR_PTR(-EIO);
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> diff --git a/arch/arm64/include/asm/kvm_hyptrace.h b/arch/arm64/include/asm/kvm_hyptrace.h
+> new file mode 100644
+> index 000000000000..9c30a479bc36
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_hyptrace.h
+> @@ -0,0 +1,13 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef __ARM64_KVM_HYPTRACE_H_
+> +#define __ARM64_KVM_HYPTRACE_H_
+> +
+> +#include <linux/ring_buffer.h>
+> +
+> +struct hyp_trace_desc {
+> +	unsigned long			bpages_backing_start;
 
-Why not return ERR_PTR(ret);
+Why is this an integer type? You keep casting it all over the place,
+which tells me that's not the ideal type.
 
+> +	size_t				bpages_backing_size;
+> +	struct trace_buffer_desc	trace_buffer_desc;
+> +
+> +};
+> +#endif
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 4f803fd1c99a..580426cdbe77 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -83,4 +83,11 @@ config PTDUMP_STAGE2_DEBUGFS
+>  
+>  	  If in doubt, say N.
+>  
+> +config PKVM_TRACING
+> +	bool
+> +	depends on KVM
+> +	depends on TRACING
+> +	select SIMPLE_RING_BUFFER
+> +	default y
+
+I'd rather this is made to depend on NVHE_EL2_DEBUG, just like the
+other debug options.
+
+> +
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> new file mode 100644
+> index 000000000000..996e90c0974f
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> @@ -0,0 +1,23 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef __ARM64_KVM_HYP_NVHE_TRACE_H
+> +#define __ARM64_KVM_HYP_NVHE_TRACE_H
+> +#include <asm/kvm_hyptrace.h>
+> +
+> +#ifdef CONFIG_PKVM_TRACING
+> +void *tracing_reserve_entry(unsigned long length);
+> +void tracing_commit_entry(void);
+> +
+> +int __pkvm_load_tracing(unsigned long desc_va, size_t desc_size);
+> +void __pkvm_unload_tracing(void);
+> +int __pkvm_enable_tracing(bool enable);
+> +int __pkvm_swap_reader_tracing(unsigned int cpu);
+> +#else
+> +static inline void *tracing_reserve_entry(unsigned long length) { return NULL; }
+> +static inline void tracing_commit_entry(void) { }
+> +
+> +static inline int __pkvm_load_tracing(unsigned long desc_va, size_t desc_size) { return -ENODEV; }
+> +static inline void __pkvm_unload_tracing(void) { }
+> +static inline int __pkvm_enable_tracing(bool enable) { return -ENODEV; }
+> +static inline int __pkvm_swap_reader_tracing(unsigned int cpu) { return -ENODEV; }
+> +#endif
+> +#endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index f55a9a17d38f..504c3b9caef8 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -29,7 +29,7 @@ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+>  hyp-obj-y += ../../../kernel/smccc-call.o
+>  hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+> -hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o
+> +hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o trace.o ../../../../../kernel/trace/simple_ring_buffer.o
+
+Can we get something less awful here? Surely there is a way to get an
+absolute path from the kbuild infrastructure? $(objtree) springs to
+mind...
+
+>  hyp-obj-y += $(lib-objs)
+>  
+>  ##
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 29430c031095..6381e50ff531 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -18,6 +18,7 @@
+>  #include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+>  #include <nvhe/pkvm.h>
+> +#include <nvhe/trace.h>
+>  #include <nvhe/trap_handler.h>
+>  
+>  DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+> @@ -585,6 +586,35 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
+>  	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+>  }
+>  
+> +static void handle___pkvm_load_tracing(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	 DECLARE_REG(unsigned long, desc_hva, host_ctxt, 1);
+> +	 DECLARE_REG(size_t, desc_size, host_ctxt, 2);
+> +
+> +	 cpu_reg(host_ctxt, 1) = __pkvm_load_tracing(desc_hva, desc_size);
+> +}
+> +
+> +static void handle___pkvm_unload_tracing(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	__pkvm_unload_tracing();
+> +
+> +	cpu_reg(host_ctxt, 1) = 0;
+> +}
+> +
+> +static void handle___pkvm_enable_tracing(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(bool, enable, host_ctxt, 1);
+> +
+> +	cpu_reg(host_ctxt, 1) = __pkvm_enable_tracing(enable);
+> +}
+> +
+> +static void handle___pkvm_swap_reader_tracing(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(unsigned int, cpu, host_ctxt, 1);
+> +
+> +	cpu_reg(host_ctxt, 1) = __pkvm_swap_reader_tracing(cpu);
+> +}
+> +
+>  typedef void (*hcall_t)(struct kvm_cpu_context *);
+>  
+>  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+> @@ -626,6 +656,10 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__pkvm_vcpu_load),
+>  	HANDLE_FUNC(__pkvm_vcpu_put),
+>  	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
+> +	HANDLE_FUNC(__pkvm_load_tracing),
+> +	HANDLE_FUNC(__pkvm_unload_tracing),
+> +	HANDLE_FUNC(__pkvm_enable_tracing),
+> +	HANDLE_FUNC(__pkvm_swap_reader_tracing),
+>  };
+>  
+>  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
+> new file mode 100644
+> index 000000000000..def5cbc75722
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
+> @@ -0,0 +1,257 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2025 Google LLC
+> + * Author: Vincent Donnefort <vdonnefort@google.com>
+> + */
+> +
+> +#include <nvhe/clock.h>
+> +#include <nvhe/mem_protect.h>
+> +#include <nvhe/mm.h>
+> +#include <nvhe/trace.h>
+> +
+> +#include <asm/percpu.h>
+> +#include <asm/kvm_mmu.h>
+> +#include <asm/local.h>
+> +
+> +#include <linux/simple_ring_buffer.h>
+> +
+> +static DEFINE_PER_CPU(struct simple_rb_per_cpu, __simple_rbs);
+> +
+> +static struct hyp_trace_buffer {
+> +	struct simple_rb_per_cpu __percpu	*simple_rbs;
+> +	unsigned long				bpages_backing_start;
+> +	size_t					bpages_backing_size;
+> +	hyp_spinlock_t				lock;
+> +} trace_buffer = {
+> +	.simple_rbs = &__simple_rbs,
+> +	.lock = __HYP_SPIN_LOCK_UNLOCKED,
+> +};
+> +
+> +static bool hyp_trace_buffer_loaded(struct hyp_trace_buffer *trace_buffer)
+> +{
+> +	return trace_buffer->bpages_backing_size > 0;
+> +}
+> +
+> +void *tracing_reserve_entry(unsigned long length)
+> +{
+> +	return simple_ring_buffer_reserve(this_cpu_ptr(trace_buffer.simple_rbs), length,
+> +					  trace_clock());
+> +}
+> +
+> +void tracing_commit_entry(void)
+> +{
+> +	simple_ring_buffer_commit(this_cpu_ptr(trace_buffer.simple_rbs));
+> +}
+> +
+> +static int hyp_trace_buffer_load_bpage_backing(struct hyp_trace_buffer *trace_buffer,
+> +					       struct hyp_trace_desc *desc)
+> +{
+> +	unsigned long start = kern_hyp_va(desc->bpages_backing_start);
+> +	size_t size = desc->bpages_backing_size;
+> +	int ret;
+> +
+> +	if (!PAGE_ALIGNED(start) || !PAGE_ALIGNED(size))
+> +		return -EINVAL;
+> +
+> +	ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn((void *)start), size >> PAGE_SHIFT);
+> +	if (ret)
+> +		return ret;
+> +
+> +	memset((void *)start, 0, size);
+> +
+> +	trace_buffer->bpages_backing_start = start;
+> +	trace_buffer->bpages_backing_size = size;
+> +
+> +	return 0;
+> +}
+> +
+> +static void hyp_trace_buffer_unload_bpage_backing(struct hyp_trace_buffer *trace_buffer)
+> +{
+> +	unsigned long start = trace_buffer->bpages_backing_start;
+> +	size_t size = trace_buffer->bpages_backing_size;
+> +
+> +	if (!size)
+> +		return;
+> +
+> +	memset((void *)start, 0, size);
+> +
+> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(start), size >> PAGE_SHIFT));
+> +
+> +	trace_buffer->bpages_backing_start = 0;
+> +	trace_buffer->bpages_backing_size = 0;
+> +}
+> +
+> +static void *__pin_shared_page(unsigned long kern_va)
+> +{
+> +	void *va = kern_hyp_va((void *)kern_va);
+> +
+> +	return hyp_pin_shared_mem(va, va + PAGE_SIZE) ? NULL : va;
+> +}
+> +
+> +static void __unpin_shared_page(void *va)
+> +{
+> +	hyp_unpin_shared_mem(va, va + PAGE_SIZE);
+> +}
+> +
+> +static void hyp_trace_buffer_unload(struct hyp_trace_buffer *trace_buffer)
+> +{
+> +	int cpu;
+> +
+> +	hyp_assert_lock_held(&trace_buffer->lock);
+> +
+> +	if (!hyp_trace_buffer_loaded(trace_buffer))
+> +		return;
+> +
+> +	for (cpu = 0; cpu < hyp_nr_cpus; cpu++)
+> +		__simple_ring_buffer_unload(per_cpu_ptr(trace_buffer->simple_rbs, cpu),
+> +					    __unpin_shared_page);
+> +
+> +	hyp_trace_buffer_unload_bpage_backing(trace_buffer);
+> +}
+> +
+> +static int hyp_trace_buffer_load(struct hyp_trace_buffer *trace_buffer,
+> +				 struct hyp_trace_desc *desc)
+> +{
+> +	struct simple_buffer_page *bpages;
+> +	struct ring_buffer_desc *rb_desc;
+> +	int ret, cpu;
+> +
+> +	hyp_assert_lock_held(&trace_buffer->lock);
+> +
+> +	if (hyp_trace_buffer_loaded(trace_buffer))
+> +		return -EINVAL;
+> +
+> +	ret = hyp_trace_buffer_load_bpage_backing(trace_buffer, desc);
+> +	if (ret)
+> +		return ret;
+> +
+> +	bpages = (struct simple_buffer_page *)trace_buffer->bpages_backing_start;
+> +	for_each_ring_buffer_desc(rb_desc, cpu, &desc->trace_buffer_desc) {
+> +		ret = __simple_ring_buffer_init(per_cpu_ptr(trace_buffer->simple_rbs, cpu),
+> +						bpages, rb_desc, __pin_shared_page,
+> +						__unpin_shared_page);
+> +		if (ret)
+> +			break;
+> +
+> +		bpages += rb_desc->nr_page_va;
 > +	}
 > +
->  	return &no_free_ptr(cca_dsc)->pci.base_tsm;
->  }
->  
-> diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> index 3430d8df4424..f4fb8577e1b5 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> @@ -156,3 +156,47 @@ int rhi_vdev_set_tdi_state(struct pci_dev *pdev, unsigned long target_state)
->  
->  	return ret;
->  }
+> +	if (ret)
+> +		hyp_trace_buffer_unload(trace_buffer);
 > +
-> +static inline int rhi_vdev_get_interface_report(unsigned long vdev_id,
-> +						unsigned long *cookie)
-> +{
-> +	unsigned long ret;
-> +
-> +	struct rsi_host_call *rhi_call __free(kfree) =
-> +		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
-> +	if (!rhi_call)
-> +		return -ENOMEM;
-> +
-> +	rhi_call->imm = 0;
-> +	rhi_call->gprs[0] = RHI_DA_VDEV_GET_INTERFACE_REPORT;
-> +	rhi_call->gprs[1] = vdev_id;
-> +
-> +	ret = rsi_host_call(virt_to_phys(rhi_call));
-
-Given every rsi_host_call I've seen in here is passed
-output of virt_to_phys() maybe a wrapper that does that is worthwhile?
-
-rsi_host_call_va() or something like that.
-
-> +	if (ret != RSI_SUCCESS)
-> +		return -EIO;
-> +
-> +	*cookie = rhi_call->gprs[1];
-> +	return map_rhi_da_error(rhi_call->gprs[0]);
+> +	return ret;
 > +}
-
-
-> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> index d1f4641a0fa1..fd4792a50daf 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> @@ -31,4 +31,6 @@ static inline int rsi_vdev_id(struct pci_dev *pdev)
->  
->  int cca_device_lock(struct pci_dev *pdev);
->  int cca_device_unlock(struct pci_dev *pdev);
-> +int cca_update_device_object_cache(struct pci_dev *pdev, struct cca_guest_dsc *dsc);
 > +
+> +static bool hyp_trace_desc_validate(struct hyp_trace_desc *desc, size_t desc_size)
+> +{
+> +	struct simple_buffer_page *bpages = (struct simple_buffer_page *)desc->bpages_backing_start;
+> +	struct ring_buffer_desc *rb_desc;
+> +	void *bpages_end, *desc_end;
+> +	unsigned int cpu;
+> +
+> +	desc_end = (void *)desc + desc_size; /* __pkvm_host_donate_hyp validates desc_size */
+> +
+> +	bpages_end = (void *)desc->bpages_backing_start + desc->bpages_backing_size;
+> +	if (bpages_end < (void *)desc->bpages_backing_start)
+> +		return false;
+> +
+> +	for_each_ring_buffer_desc(rb_desc, cpu, &desc->trace_buffer_desc) {
+> +		/* Can we read nr_page_va? */
+> +		if ((void *)rb_desc + struct_size(rb_desc, page_va, 0) > desc_end)
+> +			return false;
+> +
+> +		/* Overflow desc? */
+> +		if ((void *)rb_desc + struct_size(rb_desc, page_va, rb_desc->nr_page_va) > desc_end)
+> +			return false;
+> +
+> +		/* Overflow bpages backing memory? */
+> +		if ((void *)(bpages + rb_desc->nr_page_va) > bpages_end)
+> +			return false;
+> +
+> +		if (cpu >= hyp_nr_cpus)
+> +			return false;
+> +
+> +		if (cpu != rb_desc->cpu)
+> +			return false;
+> +
+> +		bpages += rb_desc->nr_page_va;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +int __pkvm_load_tracing(unsigned long desc_hva, size_t desc_size)
+> +{
+> +	struct hyp_trace_desc *desc = (struct hyp_trace_desc *)kern_hyp_va(desc_hva);
+> +	int ret;
+> +
+> +	if (!desc_size || !PAGE_ALIGNED(desc_hva) || !PAGE_ALIGNED(desc_size))
+> +		return -EINVAL;
+> +
+> +	ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn((void *)desc),
+> +				     desc_size >> PAGE_SHIFT);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (!hyp_trace_desc_validate(desc, desc_size))
+> +		goto err_donate_desc;
+> +
+> +	hyp_spin_lock(&trace_buffer.lock);
+> +
+> +	ret = hyp_trace_buffer_load(&trace_buffer, desc);
+> +
+> +	hyp_spin_unlock(&trace_buffer.lock);
+> +
+> +err_donate_desc:
+> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn((void *)desc),
+> +				       desc_size >> PAGE_SHIFT));
 
-If the blank line makes sense, should have been in previous patch.
+That's basically a guaranteed panic if anything goes wrong. Are you
+sure you want to do that?
 
->  #endif
+> +	return ret;
+> +}
+> +
+> +void __pkvm_unload_tracing(void)
+> +{
+> +	hyp_spin_lock(&trace_buffer.lock);
+> +	hyp_trace_buffer_unload(&trace_buffer);
+> +	hyp_spin_unlock(&trace_buffer.lock);
+> +}
+> +
+> +int __pkvm_enable_tracing(bool enable)
+> +{
+> +	int cpu, ret = enable ? -EINVAL : 0;
+> +
+> +	hyp_spin_lock(&trace_buffer.lock);
+> +
+> +	if (!hyp_trace_buffer_loaded(&trace_buffer))
+> +		goto unlock;
+> +
+> +	for (cpu = 0; cpu < hyp_nr_cpus; cpu++)
+> +		simple_ring_buffer_enable_tracing(per_cpu_ptr(trace_buffer.simple_rbs, cpu),
+> +						  enable);
+> +
+> +	ret = 0;
+> +
+> +unlock:
+> +	hyp_spin_unlock(&trace_buffer.lock);
+> +
+> +	return ret;
+> +}
+> +
+> +int __pkvm_swap_reader_tracing(unsigned int cpu)
+> +{
+> +	int ret;
+> +
+> +	if (cpu >= hyp_nr_cpus)
+> +		return -EINVAL;
+> +
+> +	hyp_spin_lock(&trace_buffer.lock);
+> +
+> +	if (hyp_trace_buffer_loaded(&trace_buffer))
+> +		ret = simple_ring_buffer_swap_reader_page(
+> +				per_cpu_ptr(trace_buffer.simple_rbs, cpu));
 
+Please keep these things on a single line. I don't care what people
+(of checkpatch) say.
+
+> +	else
+> +		ret = -ENODEV;
+> +
+> +	hyp_spin_unlock(&trace_buffer.lock);
+> +
+> +	return ret;
+> +}
+> -- 
+> 2.51.2.1041.gc1ab5b90ca-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
