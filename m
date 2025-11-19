@@ -1,274 +1,215 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1B32E9729;
-	Wed, 19 Nov 2025 15:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D9C2DCBFA;
+	Wed, 19 Nov 2025 15:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763566975; cv=none; b=SMTQRzwFdNr5pErZE+M3fkF2NgVb0OMV7ADH1dbGT7Xz7HFVAPe/ltZtpFtQYNsEfvD30Le01h3V5wyg8blUN186uS5xtS+3OfwAEk7EelsCYUTng4k5ammSZYt+SFObHDbHCRjDEbEbfg0NaJkEZpt25oZ1IviL0eepIIy6YHs=
+	t=1763567068; cv=none; b=soJxyhmnpRER442dXz7dNKOVWLEmsLZLWZhvoVWAFFR2n+wn53N1pQjy8x9Y9ez/H7/Tuw9F6pfE4lRUF6+Eub4dV5L5U6AIVF5UT+0HoVpKbm4k71KcZc7VQXYqh3drJUesd79K/H9pz04gyEVn+r7ySTnKIbZRN9LI6S7P4gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763566975; c=relaxed/simple;
-	bh=35vOJPyrgKb+9cfdez7P0ePWSzUKBrJup9U4Y+XzUhU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K8ugphzLd/9R/oHa5ijz8lNROcErroNK2fvBoKMujnY1otc6aOhiNmjBeS8RYYh05o4Zm/68YZbNuxJGd0oaHpD85doVu/k20VCjOsf1GhUOlNMsfN8ZLQ9mNzHSJFP3btkoGSF1og5L9onSKhO1VNfVEsLSD06oZayAMAaCutM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Q6XYebHb; arc=none smtp.client-ip=119.8.177.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763567068; c=relaxed/simple;
+	bh=QGmtI/N5Qrm3baU32/IWSmS0i0iTNplBH0bTCMUaMN8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DNkiyBm7xLMLwgSvoUtueMaXq1mh3Cdbq3wVNaq3mfNO8AuJ9gBTiX6CaWwbAVpTrpCXZzNVg3CkZNM23pbhuBKBlcJ0XNNHCjTrFuDipCySUV/ETPtcKKrtUC2QmoPy1lzgCFEDSMtQ1JSzOAstFZMBsWI1wY4SpRhf1yXO5/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ilfjC4nT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Q6XYebHb"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=4KQ60AZkRR436n3z62l8wSAm4xK4aGrP18HCQEaGmFI=;
-	b=Q6XYebHbPap5JMYIPqzRsnJ0QvPVtJvZHbN2hIehZnC6wg1n94G2W6lCweazDWEVFr+nUIDUR
-	jaMCNXyMHIVgELx9VoVzTuCPm1H/aAfEp8lPKvKw+4Sod7xAadtW/ESkE3Nbjby+7qmrqUH5/to
-	GKTFGP5Mr5INoRWoVKDwG9c=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dBQD415Jjz1P7G1;
-	Wed, 19 Nov 2025 23:20:51 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dBQDq3W4VzHnH4l;
-	Wed, 19 Nov 2025 23:21:31 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7B0B81402ED;
-	Wed, 19 Nov 2025 23:22:04 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 19 Nov
- 2025 15:22:03 +0000
-Date: Wed, 19 Nov 2025 15:22:01 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 01/11] coco: guest: arm64: Guest TSM callback and
- realm device lock support
-Message-ID: <20251119152201.00000876@huawei.com>
-In-Reply-To: <20251117140007.122062-2-aneesh.kumar@kernel.org>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
-	<20251117140007.122062-2-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ilfjC4nT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 146BBC4AF0B;
+	Wed, 19 Nov 2025 15:44:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763567067;
+	bh=QGmtI/N5Qrm3baU32/IWSmS0i0iTNplBH0bTCMUaMN8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ilfjC4nTMZAZmo+Dgc4Sa/r7hErsQvNOBLUE25mtapxZK3kk3VCMPcstd6/ULn9qF
+	 Wzlz3eybCTjqbBLT4SZqqDY0XQpQ+jfJF4Poe94d7HaG/ftsuJKgrupYiO15O0SU2k
+	 NrHeCsJJKSMq1YdFlGuiFiWZ5qLTdZUcQEXtnl2AKFUbgcovbdq6xm7BMljBaLPlj0
+	 ZIISPpG9TFdvmdsh24+W4vL1k9MQgQM5li3Rf3vjtP+/4L7NmoKUuZEoHQ4Ah8VKnu
+	 pHvAD42wFhDNbOeydXe+W9yn9J0Qrd3TfInV5sjjYaRvZix3A6jAgwn2Y/CYLkemPf
+	 9Eu5kT1iHjsDA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vLkM3-00000006bKb-36CG;
+	Wed, 19 Nov 2025 15:44:23 +0000
+Date: Wed, 19 Nov 2025 15:44:23 +0000
+Message-ID: <86cy5erprc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 20/28] KVM: arm64: Add clock support for the pKVM hyp
+In-Reply-To: <20251107093840.3779150-21-vdonnefort@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+	<20251107093840.3779150-21-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 19:29:57 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-
-> Register the TSM callback when the DA feature is supported by RSI. The
-> build order is also adjusted so that the TSM class is created before the
-> arm-cca-guest driver is initialized.
+On Fri, 07 Nov 2025 09:38:32 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> In addition, add support for the TDISP lock sequence. Writing a TSM
-> (TEE Security Manager) device name from `/sys/class/tsm` into `tsm/lock`
-> triggers the realm device lock operation.
+> By default, the arm64 host kernel is using the arch timer as a source
+> for sched_clock. Conveniently, EL2 has access to that same counter,
+> allowing to generate clock values that are synchronized.
 > 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-Hi Aneesh,
+> The clock needs nonetheless to be setup with the same slope values as
+> the kernel. Introducing at the same time trace_clock() which is expected
+> to be later configured by the hypervisor tracing.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index e6be1f5d0967..d46621d936e3 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -146,5 +146,4 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+>  extern unsigned long kvm_nvhe_sym(__icache_flags);
+>  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+>  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+> -
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/clock.h b/arch/arm64/kvm/hyp/include/nvhe/clock.h
+> new file mode 100644
+> index 000000000000..9e152521f345
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/clock.h
+> @@ -0,0 +1,16 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ARM64_KVM_HYP_NVHE_CLOCK_H
+> +#define __ARM64_KVM_HYP_NVHE_CLOCK_H
+> +#include <linux/types.h>
+> +
+> +#include <asm/kvm_hyp.h>
+> +
+> +#ifdef CONFIG_PKVM_TRACING
+> +void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
+> +u64 trace_clock(void);
+> +#else
+> +static inline void
+> +trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
+> +static inline u64 trace_clock(void) { return 0; }
+> +#endif
+> +#endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+> index a244ec25f8c5..f55a9a17d38f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
+> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+> @@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
+>  hostprogs := gen-hyprel
+>  HOST_EXTRACFLAGS += -I$(objtree)/include
+>  
+> -lib-objs := clear_page.o copy_page.o memcpy.o memset.o
+> +lib-objs := clear_page.o copy_page.o memcpy.o memset.o tishift.o
+>  lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+>  
+>  CFLAGS_switch.nvhe.o += -Wno-override-init
+> @@ -29,6 +29,7 @@ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
+>  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
+>  hyp-obj-y += ../../../kernel/smccc-call.o
+>  hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
+> +hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o
+>  hyp-obj-y += $(lib-objs)
+>  
+>  ##
+> diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
+> new file mode 100644
+> index 000000000000..600a300bece7
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/nvhe/clock.c
+> @@ -0,0 +1,65 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2025 Google LLC
+> + * Author: Vincent Donnefort <vdonnefort@google.com>
+> + */
+> +
+> +#include <nvhe/clock.h>
+> +
+> +#include <asm/arch_timer.h>
+> +#include <asm/div64.h>
+> +
+> +static struct clock_data {
+> +	struct {
+> +		u32 mult;
+> +		u32 shift;
+> +		u64 epoch_ns;
+> +		u64 epoch_cyc;
+> +		u64 cyc_overflow64;
+> +	} data[2];
+> +	u64 cur;
+> +} trace_clock_data;
+> +
+> +static u64 __clock_mult_uint128(u64 cyc, u32 mult, u32 shift)
+> +{
+> +	__uint128_t ns = (__uint128_t)cyc * mult;
+> +
+> +	ns >>= shift;
+> +
+> +	return (u64)ns;
+> +}
+> +
+> +/* Does not guarantee no reader on the modified bank. */
+> +void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
+> +{
+> +	struct clock_data *clock = &trace_clock_data;
+> +	u64 bank = clock->cur ^ 1;
+> +
+> +	clock->data[bank].mult			= mult;
+> +	clock->data[bank].shift			= shift;
+> +	clock->data[bank].epoch_ns		= epoch_ns;
+> +	clock->data[bank].epoch_cyc		= epoch_cyc;
+> +	clock->data[bank].cyc_overflow64	= ULONG_MAX / mult;
+> +
+> +	smp_store_release(&clock->cur, bank);
+> +}
+> +
+> +/* Using host provided data. Do not use for anything else than debugging. */
+> +u64 trace_clock(void)
+> +{
+> +	struct clock_data *clock = &trace_clock_data;
+> +	u64 bank = smp_load_acquire(&clock->cur);
+> +	u64 cyc, ns;
+> +
+> +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
 
-Some minor stuff in here.   One general comment is that there
-are some fixlets for the CCA code surrounding what this patch
-should focus on. Break those out as separate cleanup or base
-this on top of the fixed up version of that code.
+I can only imagine that you don't care about the broken systems that
+do not have a monotonic counter, and that will happily have their
+counter swing back and forth?
+
+Also, you may want to document why you are using the physical counter
+instead of the virtual one. I guess that you don't want CNTVOFF_EL2 to
+apply when HCR_EL2.E2H==0, but given that you never allow anything
+else for pKVM, this is slightly odd.
 
 Thanks,
 
-Jonathan
+	M.
 
-> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-> index 1b716d18b80e..2ec0f5dff02e 100644
-> --- a/arch/arm64/kernel/rsi.c
-> +++ b/arch/arm64/kernel/rsi.c
-> @@ -15,6 +15,7 @@
->  #include <asm/rsi.h>
->  
->  static struct realm_config config;
-> +static unsigned long rsi_feat_reg0;
->  
->  unsigned long prot_ns_shared;
->  EXPORT_SYMBOL(prot_ns_shared);
-> @@ -22,6 +23,12 @@ EXPORT_SYMBOL(prot_ns_shared);
->  DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->  EXPORT_SYMBOL(rsi_present);
->  
-> +bool rsi_has_da_feature(void)
-> +{
-> +	return u64_get_bits(rsi_feat_reg0, RSI_FEATURE_REGISTER_0_DA);
-
-I'm not keen on mixing explicit size of a u64 with the implicit
-fact an unsigned long is effectively a u64.  Can we tidy up the types
-to match?
- 
-> +}
-> +EXPORT_SYMBOL_GPL(rsi_has_da_feature);
-
-> diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
-> index cb52021912b3..57556d7c1cec 100644
-> --- a/drivers/virt/coco/Makefile
-> +++ b/drivers/virt/coco/Makefile
-> @@ -6,6 +6,6 @@ obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
->  obj-$(CONFIG_ARM_PKVM_GUEST)	+= pkvm-guest/
->  obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
->  obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
-> -obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
->  obj-$(CONFIG_TSM) 		+= tsm-core.o
->  obj-$(CONFIG_TSM_GUEST)		+= guest/
-> +obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
-
-Check all patches for noise like this.  It may be a valid change but in this series
-it's just adding confusion.
-
-> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
-> index a42359a90558..66b2d9202b66 100644
-> --- a/drivers/virt/coco/arm-cca-guest/Kconfig
-> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
-> @@ -1,11 +1,17 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +#
-> +
->  config ARM_CCA_GUEST
->  	tristate "Arm CCA Guest driver"
->  	depends on ARM64
-> +	depends on PCI_TSM
->  	select TSM_REPORTS
->  	select AUXILIARY_BUS
-> +	select TSM
->  	help
-> -	  The driver provides userspace interface to request and
-> +	  The driver provides userspace interface to request an
-
-Push this fixlet to the series adding this or a follow up if that isn't being respun.
-Definitely shouldn't be in here.
-
->  	  attestation report from the Realm Management Monitor(RMM).
-> +	  If the DA feature is supported, it also register with TSM framework.
->  
->  	  If you choose 'M' here, this module will be called
->  	  arm-cca-guest.
-> diff --git a/drivers/virt/coco/arm-cca-guest/Makefile b/drivers/virt/coco/arm-cca-guest/Makefile
-> index 75a120e24fda..bc3b2be4019f 100644
-> --- a/drivers/virt/coco/arm-cca-guest/Makefile
-> +++ b/drivers/virt/coco/arm-cca-guest/Makefile
-> @@ -1,4 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> +#
-
-Stray change.
-
->  obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
->  
->  arm-cca-guest-y +=  arm-cca.o
-> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> index dc96171791db..288fa53ad0af 100644
-> --- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
-> @@ -1,6 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  /*
-> - * Copyright (C) 2023 ARM Ltd.
-> + * Copyright (C) 2025 ARM Ltd.
-Usually we just extend the date span rather than claiming everything is
-2025. e.g.
- * Copyright (C) 2023-2025 ARM Ltd.
-
->   */
-
-> @@ -192,6 +194,57 @@ static void unregister_cca_tsm_report(void *data)
->  	tsm_report_unregister(&arm_cca_tsm_report_ops);
->  }
->  
-> +static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pdev)
-> +{
-> +	int ret;
-> +
-> +	struct cca_guest_dsc *cca_dsc __free(kfree) =
-> +		kzalloc(sizeof(*cca_dsc), GFP_KERNEL);
-> +	if (!cca_dsc)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	ret = pci_tsm_devsec_constructor(pdev, &cca_dsc->pci, tsm_dev);
-> +	if (ret)
-> +		return ERR_PTR(ret);
-> +
-> +	return ERR_PTR(-EIO);
-
-Perhaps add a comment so you have something like
-
-	return ERR_PTR(-EIO); /* For now always return an error */
-
-Just makes it a tiny bit easier to review as no need to go check this
-is removed in a later patch.
-
-> +}
-> +
-> +static void cca_tsm_unlock(struct pci_tsm *tsm)
-> +{
-> +	struct cca_guest_dsc *cca_dsc = to_cca_guest_dsc(tsm->pdev);
-> +
-> +	kfree(cca_dsc);
-> +}
-> +
-> +static struct pci_tsm_ops cca_devsec_pci_ops = {
-> +	.lock = cca_tsm_lock,
-> +	.unlock = cca_tsm_unlock,
-> +};
-> +
-> +static void cca_devsec_tsm_remove(void *tsm_dev)
-> +{
-> +	tsm_unregister(tsm_dev);
-> +}
-> +
-> +static int cca_devsec_tsm_register(struct auxiliary_device *adev)
-> +{
-> +	struct tsm_dev *tsm_dev;
-> +	int rc;
-> +
-> +	tsm_dev = tsm_register(&adev->dev, &cca_devsec_pci_ops);
-> +	if (IS_ERR(tsm_dev))
-> +		return PTR_ERR(tsm_dev);
-> +
-> +	rc = devm_add_action_or_reset(&adev->dev, cca_devsec_tsm_remove, tsm_dev);
-> +	if (rc) {
-> +		cca_devsec_tsm_remove(tsm_dev);
-
-Take a look at what the _or_reset() does in the devm_add_action_or_reset().
-Short story, you should not need this call if the devm machinery has returned
-an error.
-
-> +		return rc;
-> +	}
-> +
-> +	return 0;
-> +}
-
-> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-> new file mode 100644
-> index 000000000000..5ad3b740710e
-> --- /dev/null
-> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
-
-> +static inline int rsi_vdev_id(struct pci_dev *pdev)
-> +{
-> +	return (pci_domain_nr(pdev->bus) << 16) |
-> +	       PCI_DEVID(pdev->bus->number, pdev->devfn);
-
-I'm struggling to find where this is actually defined in the various specs
-so good to have a reference in a comment here.
-
-> +}
-> +
-> +#endif
-
+-- 
+Without deviation from the norm, progress is not possible.
