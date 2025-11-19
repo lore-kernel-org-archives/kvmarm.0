@@ -1,82 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DCA35CB98
-	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 13:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5B42DFA25
+	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 13:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763557743; cv=none; b=Bc9NuYwFzG0F6HHfbbvxMJKVniHes98IBn+aNOXGXfNTnKJxYHJ6Go1M78tTFZTr5uxvjiuGLs56nVK+c2fe8g0DmGdfjiDIIKrxcPtntwtnxSMI1Z2fK5QfZ6kTOZufCFS0+pSQDU5nTQhHE0QgNpLqrtrvCdWrv30TSFF1sSU=
+	t=1763558316; cv=none; b=Nmcej/EcrjpIKEv6ny7tqRiCe8VRJikxBUqRXeOS7rLGBHPPUtqaQ+4fdVLqYP9hrYqdAV8OhvTsccJdQ8nKv4daPvJtKzGUbuu8rL3/QJVrsBFrbwABgzPSGeZAoyUBoxejbZfxigKptAhN6wUL0/838NVGo3plbpxCNw/lxYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763557743; c=relaxed/simple;
-	bh=SF5bUmLdJVDFmGC7+UoVBgVyA11BD/B78JzuawAG8zs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=egIAgYdWUbhcQk6ijPq14tqHryVAyWkdBYJwI9Cta4K0IWq+nhdcfnnvoSBtuZRs2vV3pKCSfvpF931mwMDIkCHoUCEDW9wQkzd9TNpaAvu4wMLAty4POZYDvy2D1m7L0ukPj9RIq4BvyIN9Cz2mv2rdyUfbbNy/Ek1nwUeJmqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWJcLLmw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWJcLLmw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4890C2BC87;
-	Wed, 19 Nov 2025 13:09:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763557742;
-	bh=SF5bUmLdJVDFmGC7+UoVBgVyA11BD/B78JzuawAG8zs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CWJcLLmwobPT2Y96emCdxXltc2bcGZhsIK2EH/30IgGxfSgiv/eouABgScHzudNKj
-	 pZnBJ8nsbR7mh9Y2WsEJgnOLGw2/MBx7F9hIDhNa3aQVFmm7M4gDST2gYnyo0x0Qlg
-	 Wgy5ox/zkRPpHQOulLZmoR2WkA9WprnXNI5+fmm4mYNHbsHIsfYN51/IVtzmCdSyuK
-	 0JDK/hwOS8LnY9TgkdquzcL9/ZLT/DLbLnz1+GveUDXtXQD21R5M4kqOh4efurbKAr
-	 4ZjnUNBOlsIPoI2RcDRFb+kGhQW0PCxZiZdTfYe48J02meDpQ1IIVGkmbjNcfXRgnS
-	 nj7D08p1yfPFA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vLhvf-00000006Xl9-3a7J;
-	Wed, 19 Nov 2025 13:08:59 +0000
-Date: Wed, 19 Nov 2025 13:08:59 +0000
-Message-ID: <86ikf6rwyc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Fixes to KVM struct allocation
-In-Reply-To: <20251119093822.2513142-1-oupton@kernel.org>
-References: <20251119093822.2513142-1-oupton@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1763558316; c=relaxed/simple;
+	bh=/90S5s8jyey4VwZIkypzcuJWPsahhBY1HGVUTboMpLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iElI0pfHpIW9Q70hCy+agIX3+TpZ/i3M6hdpK6Ro/HqlCe3F25Bi6v8x6uTLRrdk+De1xW5XX5OHWlAX4UIM+w0Hw3ZDgUPeW+P4FVs6KdiZLLDzB826bunxSfXVJ/LMj18/SdQj1AQlaqBKsZly2s0CJHp1HZikZktUP0kfN80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C53AFFEC;
+	Wed, 19 Nov 2025 05:18:25 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 43DE73F66E;
+	Wed, 19 Nov 2025 05:18:32 -0800 (PST)
+Date: Wed, 19 Nov 2025 13:18:27 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: kvm@vger.kernel.org
+Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
+Message-ID: <20251119131827.GA2206028@e124191.cambridge.arm.com>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250925141958.468311-1-joey.gouly@arm.com>
 
-On Wed, 19 Nov 2025 09:38:20 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
+On Thu, Sep 25, 2025 at 03:19:48PM +0100, Joey Gouly wrote:
+> Hi all,
 > 
-> Small fix to drop __GFP_HIGHMEM from KVM struct allocation GFP flags,
-> which was always completely pointless and now trips a WARN for passing
-> such an unsupported flag to vmalloc().
+> This series is for adding support to running the kvm-unit-tests at EL2. These
+> have been tested with Linux 6.17-rc6 KVM nested virt.
 > 
-> Oliver Upton (2):
->   KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
->   KVM: arm64: Use kvzalloc() for kvm struct allocation
+> This latest round I also tested using the run_tests.sh script with QEMU TCG,
+> running at EL2.
 > 
->  arch/arm64/kvm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The goal is to later extend and add new tests for Nested Virtualisation,
+> however they should also work with bare metal as well.
 
-Seems sensible. FWIW:
+Any comments on this series, would be nice to get it merged.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Thanks,
+Joey
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> Changes since v2[1]:
+> 	- Move the sctlr setup in EFI to a function.
+> 	- Decided to not re-use el2_setup.h from Linux, looked more
+> 	  complicated to use than needed for KUT.
+> 	- Add EL2 env variable for testing, open to feedback for that.
+> 	  This was untested with kvmtool as my testing setup only has
+> 	  busybox ash currently, and the run_tests.sh script needs bash.
+> 
+> Issues (that I think are fine to investigate/fix later):
+> 	- Some of the debug tests fail with QEMU at EL2 and kvmtool.
+> 	- The gic ipi test times out with QEMU at EL2, but works with kvmtool.
+> 
+> Thanks,
+> Joey
+> 
+> [1] https://lore.kernel.org/kvmarm/20250529135557.2439500-1-joey.gouly@arm.com/
+> 
+> Alexandru Elisei (2):
+>   arm64: micro-bench: use smc when at EL2
+>   arm64: selftest: update test for running at EL2
+> 
+> Joey Gouly (8):
+>   arm64: drop to EL1 if booted at EL2
+>   arm64: efi: initialise SCTLR_ELx fully
+>   arm64: efi: initialise the EL
+>   arm64: timer: use hypervisor timers when at EL2
+>   arm64: micro-bench: fix timer IRQ
+>   arm64: pmu: count EL2 cycles
+>   arm64: run at EL2 if supported
+>   arm64: add EL2 environment variable
+> 
+>  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
+>  arm/efi/crt0-efi-aarch64.S |  5 ++++
+>  arm/micro-bench.c          | 26 ++++++++++++++++--
+>  arm/pmu.c                  | 13 ++++++---
+>  arm/run                    |  7 +++++
+>  arm/selftest.c             | 18 ++++++++----
+>  arm/timer.c                | 10 +++++--
+>  lib/acpi.h                 |  2 ++
+>  lib/arm/asm/setup.h        |  8 ++++++
+>  lib/arm/asm/timer.h        | 11 ++++++++
+>  lib/arm/setup.c            |  4 +++
+>  lib/arm/timer.c            | 19 +++++++++++--
+>  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
+>  lib/arm64/processor.c      | 12 ++++++++
+>  14 files changed, 191 insertions(+), 19 deletions(-)
+> 
+> -- 
+> 2.25.1
+> 
