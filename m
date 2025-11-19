@@ -1,116 +1,112 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9C23612F0
-	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 13:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AD5342C8E
+	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 13:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763560110; cv=none; b=ePHK8zBp03Nd4TuzkKv6UONbuVF5fwhhHWNPs5Vb85KyymcG1JhOlE58uqd0C4WY0QR9F/oIGzXO3OlxYUi9rpt4q8JSEVBp3nbq9msZIxUfm1PoDxZB4Du/X8BcxmXOUxhKqT1v4heEHQWnWRgRZc1+acaXC88s/uqvJYL3vKY=
+	t=1763560679; cv=none; b=QiRabCaFocLIQMjNKMKWCGfWy0ef+7j2ZVY/z9Bf2KEMR/+q2G+RN3o2YTUe7v9nHK54EdaIVPwgZrhvGDj8DokoeiKgHY6UP2KEcJy0dYQIvOVK+EvT7pymNqYNZSPFNigPnN2Prj1s/5kguyNEOSfTeKPw6SiHZWNvpAQU6Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763560110; c=relaxed/simple;
-	bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=lR+DBv6N2Y2U9/It8+FjUjoZacnT9+avh+qFJ51p+G9uWAtfe6UL6hxTV3d8X5hSWC+haXAPCaQ9hRikUbsMqImdmE4wnYLLkUyUZhU+KwcVbsfD5Sk717e9VeqsI3plKPpAO89FnQ+ab7K/p4xgaGhOTEgvw1GA/n/7lIveWZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlxjQZSK; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1763560679; c=relaxed/simple;
+	bh=ByCe5Wk1WZHnITWxGLTBZHA4ULg8negffLBSEe5L7Qo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p0x19pQ4PGCnC9StT+onALAXoFFhWyyI4W2ch9IVpAN/Ei2n5e7AiAHJu5SpoMSiXX9/mDs7hZfFydG+ziH8A4JNhd3bBmn8aAEDOFcZtQEv+nYU9NWHDPE29bt3lkiqBFpotrt79STU/xI+TDWBqyzDiPGyMbJJo2nlyktnRFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=GHxF/N3f; arc=none smtp.client-ip=35.155.198.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlxjQZSK"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477a219db05so24736495e9.2
-        for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 05:48:28 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="GHxF/N3f"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763560107; x=1764164907; darn=lists.linux.dev;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-        b=YlxjQZSKiZEXID99iOzFbwgzm4aCTfx8zXrO9oTbc3SIadI+y4po0FY6f8wZ9YlYy8
-         d002J/jJlEjcZsLgTzR5cB29E3Lrs7p6M16BbGJ52oHA6MVjXAxRFO+3IBtNB5/N3SXS
-         YpPGOFaECSpbmK/LWRUr7VKD9RYx/FnoJQuY+fXC2Rt37Ag7ISUj+WJjIy/Bpr22WlQR
-         aFl97FyeF72OYxzpCeMSO0LbQfLRQfaQRBviJDK0JfPSTVC20iyHB1ytG/pE0w6IJqYJ
-         HaWSnb9QYbwJ1fJXfkaC01bqbH8dkOwzNavdWmuuUUaIzYapAZXGuphZg+HOnfc5TAxr
-         dIsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763560107; x=1764164907;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dUZz/EGTXNyXTJb3zRKoJd5YmLpYLOqdOWG1Mal/clY=;
-        b=mBHStO6PIzvKmoXzEtpDczQdSCDNi/dmwM9Xew6hXXb7C6OsWdW3NNIkVYclBUgGGk
-         0qIAuu2vJzdX8k0ih8jphnXhZ6r0ZuaImdTGms+maO8lIao/XnQZUaICS3xHlTVLbtCe
-         NXViiS1X1zwSwM95fW5VcJxui0jiWn70+/g7veH82Mki8wmjeBHSlMLvOx8z0h0jcChI
-         8K5cz2RSmRz2xGRfP2V2nJr3qf+nMymxI9PpLyb3sV0Ksw4Z2CrNGR+WcCSAv0ZwdCjy
-         eeOIfi2kv6s8/yARaBZ/iGzxvRHApcn7owBf5hMAhFAU3q2A7hvO262gvti6t+9tvFnP
-         /X5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRYmm0jxBtlyFzfGwrxtBdJqf1riOvPzBHnziKcwJoqSlx07CaSOJzIseku5S3/6eCS3YaD7U=@lists.linux.dev
-X-Gm-Message-State: AOJu0YycfeAjUEI7KD/jxXT3XBaKBaj9yMw83KpNPkS4y7h59NEQkl7T
-	adfi/fWiRWdGDYBOiUVsoda/bfAZ2IvR1MVGzWlZaw3e82PHbuKSBc4J
-X-Gm-Gg: ASbGncvVKMEJnuPAE2ITNNBNvALYI8P38a34nsIoLIwbpxybqyTS2UAlil6Ms2RPKIL
-	gPWqlYWIvjX+rOIb0AA/caq+P5Q61RpB2xoe/yd7sJ2tJzToJIIpI2K42ZOgLEst7IA3GcPAIc+
-	wlOodZTNskQEnc/d2cCbgukaCzGnduBtEJCx7L+xjFbsTRUdJB78thH3Y+xauaPKSsykdp+G8xs
-	Bf/qGdT2BucT114QRFzq2L+zlGDUk+OHOSimozAxmiI6lnh2M8/VtYsRJrhH8QLyojVFD/DX2t2
-	mPauk+D1uhy4JNvhB1mxOM4Im/pb3kFOK09VmFgt/L1AHqNMt3aDIQ3ocom6+/3i1BE6n4SijO+
-	76HELhRG3P36wxeOu4Yes5eHYLl06cIPxzqYi7UyjzbEoW1VFSiyNolQF89AynihNjbb5vSsBUT
-	7hvuiR/3LDwrdG1PX/NBa8aSKsoOI5MWI=
-X-Google-Smtp-Source: AGHT+IEO/r2yjXRo1vsrIYmRAWR3LX5xjMNvgtEI6xtFpDqm0QsABV6tIyV/TEUGoCBLoYPW7a2THw==
-X-Received: by 2002:a05:600c:3b19:b0:475:daba:d03c with SMTP id 5b1f17b1804b1-4778fe62088mr166989585e9.13.1763560107125;
-        Wed, 19 Nov 2025 05:48:27 -0800 (PST)
-Received: from smtpclient.apple ([132.68.46.63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b106b03bsm50714925e9.9.2025.11.19.05.48.25
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Nov 2025 05:48:25 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1763560677; x=1795096677;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AD/fl1UNdfZTs54F3wc7D+0CkLxzucfjuLtGwXGbOso=;
+  b=GHxF/N3fGax5eaVyAVN9PaljpyBKXPRShbGb+FbBPnHh4lRFiWkpKoaO
+   dbWOJAXmKfh8VOWIJMdEo/lGDeACt4hmqgiLCYAef889PIA+JKlwU8dW0
+   zwBorECwM6BRot8spTz4azOkn+KCvnJX6kxt2kN0/C+Z8PmFIJh39oa8G
+   /OG09BH+0Wyc0ND52dnlzlvCBxKqPYbpdvGs6np1V8BTLoDwmoowRi3MS
+   rhyDI1sY1n/GYTgA+GC7sc0nGEbltQX3cuQwp0sPvpgHUIB9LsNI788CL
+   kjLDMcNdOLJ172+C8Vzd54BH3bGukhKovq8XgdY6wHXRCzka/rQc6v6j5
+   Q==;
+X-CSE-ConnectionGUID: JkfJsYlnQre4cKlhFs4gng==
+X-CSE-MsgGUID: VCWMbrieREe6jc83VLzlfg==
+X-IronPort-AV: E=Sophos;i="6.19,315,1754956800"; 
+   d="scan'208";a="7255520"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2025 13:57:55 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:6832]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.161:2525] with esmtp (Farcaster)
+ id d5cebf11-5ff8-4133-9c24-8c5a2ae6742a; Wed, 19 Nov 2025 13:57:54 +0000 (UTC)
+X-Farcaster-Flow-ID: d5cebf11-5ff8-4133-9c24-8c5a2ae6742a
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Wed, 19 Nov 2025 13:57:54 +0000
+Received: from amazon.com (10.1.212.27) by EX19D001UWA001.ant.amazon.com
+ (10.13.138.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29; Wed, 19 Nov 2025
+ 13:57:52 +0000
+From: Maximilian Dittgen <mdittgen@amazon.de>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>
+CC: <pbonzini@redhat.com>, <shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<mdittgen@amazon.de>, <lilitj@amazon.de>, <nh-open-source@amazon.com>
+Subject: [PATCH v2 1/2] KVM: selftests: Assert GICR_TYPER.Processor_Number matches selftest CPU number
+Date: Wed, 19 Nov 2025 14:57:43 +0100
+Message-ID: <20251119135744.68552-1-mdittgen@amazon.de>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20251114143902.30435-1-mdittgen@amazon.de>
+References: <20251114143902.30435-1-mdittgen@amazon.de>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.200.81.1.6\))
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
-From: Nadav Amit <nadav.amit@gmail.com>
-In-Reply-To: <20251119131827.GA2206028@e124191.cambridge.arm.com>
-Date: Wed, 19 Nov 2025 15:48:13 +0200
-Cc: kvm@vger.kernel.org,
- alexandru.elisei@arm.com,
- andrew.jones@linux.dev,
- kvmarm@lists.linux.dev,
- Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D63D4CE9-431B-4F76-B769-C4FFB37B76AF@gmail.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20251119131827.GA2206028@e124191.cambridge.arm.com>
-To: Joey Gouly <joey.gouly@arm.com>
-X-Mailer: Apple Mail (2.3864.200.81.1.6)
+MIME-Version: 1.0
+X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+The selftests GIC library and tests assume that the
+GICR_TYPER.Processor_number associated with a given CPU is the same as
+the CPU's selftest index.
+
+Since this assumption is not guaranteed by specification, add an assert
+in gicv3_cpu_init() that validates this is true.
+
+Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
+---
+ tools/testing/selftests/kvm/lib/arm64/gic_v3.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/lib/arm64/gic_v3.c b/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
+index 66d05506f78b..50158d08117b 100644
+--- a/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
++++ b/tools/testing/selftests/kvm/lib/arm64/gic_v3.c
+@@ -304,6 +304,9 @@ static void gicv3_cpu_init(unsigned int cpu)
+ 	redist_base_cpu = gicr_base_cpu(cpu);
+ 	sgi_base = sgi_base_from_redist(redist_base_cpu);
+ 
++	/* Verify assumption that GICR_TYPER.Processor_number == cpu */
++	GUEST_ASSERT(((readq_relaxed(redist_base_cpu + GICR_TYPER) >> 8) & 0xffff) == cpu);
++
+ 	gicv3_enable_redist(redist_base_cpu);
+ 
+ 	/*
+-- 
+2.50.1 (Apple Git-155)
 
 
 
-> On 19 Nov 2025, at 15:18, Joey Gouly <joey.gouly@arm.com> wrote:
->=20
-> On Thu, Sep 25, 2025 at 03:19:48PM +0100, Joey Gouly wrote:
->> Hi all,
->>=20
->> This series is for adding support to running the kvm-unit-tests at =
-EL2. These
->> have been tested with Linux 6.17-rc6 KVM nested virt.
->>=20
->> This latest round I also tested using the run_tests.sh script with =
-QEMU TCG,
->> running at EL2.
->>=20
->> The goal is to later extend and add new tests for Nested =
-Virtualisation,
->> however they should also work with bare metal as well.
->=20
-> Any comments on this series, would be nice to get it merged.
 
-I wonder, does kvm-unit-tests run on bare-metal arm64 these days?
-
-I ran it in-house some time ago (fixing several issues on the way),
-but IIRC this issue was never fixed upstream:
-
-=
-https://lore.kernel.org/all/C812A718-DCD6-4485-BB5A-B24DE73A0FD3@gmail.com=
-/
+Amazon Web Services Development Center Germany GmbH
+Tamara-Danz-Str. 13
+10243 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Christof Hellmis
+Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
+Sitz: Berlin
+Ust-ID: DE 365 538 597
 
