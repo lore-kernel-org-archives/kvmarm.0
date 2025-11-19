@@ -1,201 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E4230FF24;
-	Wed, 19 Nov 2025 17:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C8C327C01
+	for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 19:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763573494; cv=none; b=LxhjyAhbXkdAeJTjb7qZ34hlTRT/+Rc4xrM1FSDGPReBxIkiDNW6H3AASdMog/UhAskeG6xY/hYLzrECQ2H9nPvSYGnz6/rvmu245IfOSMHqaaqGLLyN53EDmXjrz8fTZo7Myb5uzaQXcZkDKlpmhr4ZfzuYfGu0upSjie1p77A=
+	t=1763579539; cv=none; b=BHM0/4mZ+B+RPq2bPTcOJX2eCXwawnFVGCicjtcAyLjIv1Cs3yCuZFn4u3Wbn85vFP1LkUG64wTUTVlJMNuMw2Z/SpW30iwfNb8kJmnCTdx3GsR/ZXnWFEGQCnSf0ac1NhL72gurKDxMJvMK4zPrrHvwVdVUbhUiOvi4IbyLAmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763573494; c=relaxed/simple;
-	bh=oO3Fmz7mebynD3LKHMlj/1T1aV6n0QwikQ+DyWiqIJU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MaPNaeXjpFrIgDViGGoIqpgtmdfk6J+Ogaoh7ZxY5PGsiKD9C/6va+ynzrkUjjFR5lJEvBQyTRA/s76J3Yn73sJi/n4xnaa7O20mRaqJ24eo+GLPYUbtfIRltHFL8cfCE0QoB7XDNH381sZA9vj+p09UMgxZF1tzJ+R16iiM+UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=puEEiqN9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763579539; c=relaxed/simple;
+	bh=YFYWHJim5jvnsNE5kctSr58nUHH8C6Iq4/D+0cJ/Qe4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ItVuEZAFksLMvbQV5vxbPZEXshpDTq1G03YxleiWiLDTKryHVr5VS7tiUpESq7tVanBHTqZjHTKZLcpqUCY/oNWMQs4bh9wc/jnrcjcvZzec1+c/YyDpoUc/oW6eJhbUjsaXr3mPCqBb5ToIgb6ZIgFmv9t6XzgoGEAlkF+mh6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Buwc6nLn; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="puEEiqN9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB4B7C4CEF5;
-	Wed, 19 Nov 2025 17:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763573492;
-	bh=oO3Fmz7mebynD3LKHMlj/1T1aV6n0QwikQ+DyWiqIJU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=puEEiqN93N+Hlswozk6W04RyGHmpQg0q2FzCTJ6oWDdFSS7FGIzcx1V6DAgB6ZfSf
-	 kw+SXuaa57VZkaFdecTUYE1RtonNEo+5IYHslbgZYybCpRbPJjR0RmwSvAdfixz9hS
-	 H6xfSftrVJBCwYFaJncm80cenJXa/rt/GJ4kSzGbO7+7ZsEacmhQOEich3IDFyyaGg
-	 cHhrdjzxjviTCGhkjSsybFIBu0aaKpzekKbpPgp5XR0B9Fr9NhKVb0w/Em/qU7TCjp
-	 dwur8MCjfAvlvLlS8YloszC7lWFkdBE8JZX/1GEyN668Ncu9aSbHMW/CFWmMhyuMv3
-	 EMFYqgpTv3w5Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vLm1i-00000006e48-2Yc2;
-	Wed, 19 Nov 2025 17:31:30 +0000
-Date: Wed, 19 Nov 2025 17:31:30 +0000
-Message-ID: <86a50irkst.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	jstultz@google.com,
-	qperret@google.com,
-	will@kernel.org,
-	aneesh.kumar@kernel.org,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 22/28] KVM: arm64: Add trace remote for the pKVM hyp
-In-Reply-To: <20251107093840.3779150-23-vdonnefort@google.com>
-References: <20251107093840.3779150-1-vdonnefort@google.com>
-	<20251107093840.3779150-23-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Buwc6nLn"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b6ceb3b68eeso24683a12.2
+        for <kvmarm@lists.linux.dev>; Wed, 19 Nov 2025 11:12:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1763579534; x=1764184334; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tGpjcoQG0e7rkN9MYV2/Te01/UoG0xUfXMTePukkKCU=;
+        b=Buwc6nLnSA7Xh/0RzaS8vfEQN3e7gHfabGPNnlhvrDz2jkjUoq7Nf5O2UurQI4K3PV
+         oD27ef0oKr5XanakfxSiHKYsmmZOcN8w4mFj3SGFP0hBYUwYSIXpHhRReC4x8+eYwJqq
+         drhRMbpAzOP575MJf8oxF0HuiuycyUPe6a7aDkDRgtov0vr5f7f/Y9MRfCMKZn7KtxRE
+         TWqi61a1byZ5k0qeJ4ebZYkxkilhbemiETYj7/PtqTJ45wCBaJc9F+TgL4BAGTb/fY8e
+         YQ53HLlGBHfT3tuKNDU1AMy+6AX/kleuFg/4ko4k2JeggQSDgLK6tT37hQPrcGwlyVkk
+         at3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763579534; x=1764184334;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tGpjcoQG0e7rkN9MYV2/Te01/UoG0xUfXMTePukkKCU=;
+        b=ID7MKjh5UZS4E21/amNDS3IW2ajeUPPLxA8OGsaKyzQu660N9FEJWq3mu7LZEG86Nu
+         QYpyzigfhVBRgvz4RjQh0MVzUszHNZKccUKXWU9UGXi/Efnadu3rWDwmxIdsv0xGVRgj
+         DgKAFjXdlJ/BaKcZen+aUjRzhr1yOhamD7sQG2r3AKK0uh5POZkUf/5YfdnhhQSvdZER
+         ndetIVDWT9t2AYDjMaALVIaLJovw63Hx3ztHTL4phyaDBp9FkNBw3IWpGWluFe/ogrhz
+         ADMfzwVr+AXYtU1LIO0UafPdu/2NYuEEOe+qNDEM6y6jzWWXuKzbLXsbJCi/8Qv8I8P2
+         SXZA==
+X-Gm-Message-State: AOJu0YxKE4gr4hWZZl+I10oM1uxKu0Ud6jB4WNpK/EccTbeZXLDJlBrL
+	k8RSHB4DSU1Pzw6EykvNtrfGuO+8eWm1A+UJNoRUnXtm/kd7AxbOGn3r
+X-Gm-Gg: ASbGncsalUuBJpNsyLk3viv+Qbtc+uTm5HyHhQhFNHVkJn8mzrUG5GnEKFmBY8ux4hm
+	MiAtQvQbDSSA5YoyLbU53HP1T/RA3YN205SooY7cN09LrONo0OVt6pi1zIuAfK9Cwy9Ddsk/UfJ
+	/Xcz3JdnPPqSlgbfb3oTrJnb8Rkxr6EAeK8e2jriffX51y5pB2AaTWsPxOAgItDM+WsuGb4lin0
+	OMuA0OVgFPuKcFb/iz93dZUYGGYxeEOv/9jlJy+fYrTWNPK3RtX3GjN1LE/Ei6QOj+YPnchjvoD
+	gcOdXpCFCSGpT8xF2PF5kz+mJ2Pw83RYKBIjQc2OtYqS7BTlXs1uKTKKhrd5fG6YCxmXIRBO6bm
+	NPKOR440ZDm09g1Z7Q3pbyw0aXuAf9+JCGzF97U9jws4mc6CsyloYc5DyAhNkKoIAtfthSkr15A
+	nwh09ex3ZPezPguRd/ZQdY+ns1RFDtEShkyCvRXoD0yGIqc+TTZjORbw==
+X-Google-Smtp-Source: AGHT+IE2LGJD/7c4DA3p6/9s6dAr0K6Ncy9jizQyd9jeLiMsAlG9mSVSRDL/rbnn7zDZI0B/YAvt2w==
+X-Received: by 2002:a05:7300:880c:b0:2a4:75f1:fb27 with SMTP id 5a478bee46e88-2a6fd1215f4mr104587eec.25.1763579533584;
+        Wed, 19 Nov 2025 11:12:13 -0800 (PST)
+Received: from fedora (c-67-164-59-41.hsd1.ca.comcast.net. [67.164.59.41])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a6fc38a66bsm1125718eec.1.2025.11.19.11.12.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Nov 2025 11:12:13 -0800 (PST)
+Date: Wed, 19 Nov 2025 11:12:10 -0800
+From: "Vishal Moola (Oracle)" <vishal.moola@gmail.com>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Fixes to KVM struct allocation
+Message-ID: <aR4WiqooLbKfshKw@fedora>
+References: <20251119093822.2513142-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119093822.2513142-1-oupton@kernel.org>
 
-On Fri, 07 Nov 2025 09:38:34 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Wed, Nov 19, 2025 at 01:38:20AM -0800, Oliver Upton wrote:
+> Small fix to drop __GFP_HIGHMEM from KVM struct allocation GFP flags,
+> which was always completely pointless and now trips a WARN for passing
+> such an unsupported flag to vmalloc().
 > 
-> When running with KVM protected mode, the hypervisor is able to generate
-> events into tracefs compatible ring-buffers. Create a trace remote so
-> the kernel can read those buffers.
+> Oliver Upton (2):
+>   KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
+>   KVM: arm64: Use kvzalloc() for kvm struct allocation
 > 
-> This currently doesn't provide any event support which will come later.
-> 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 580426cdbe77..64db254f0448 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -87,6 +87,7 @@ config PKVM_TRACING
->  	bool
->  	depends on KVM
->  	depends on TRACING
-> +	select TRACE_REMOTE
->  	select SIMPLE_RING_BUFFER
->  	default y
->  
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 3ebc0570345c..2c184e3abd8e 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -30,6 +30,8 @@ kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->  kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->  kvm-$(CONFIG_PTDUMP_STAGE2_DEBUGFS) += ptdump.o
->  
-> +kvm-$(CONFIG_PKVM_TRACING) += hyp_trace.o
-> +
->  always-y := hyp_constants.h hyp-constants.s
->  
->  define rule_gen_hyp_constants
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 870953b4a8a7..c485e54417e2 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -24,6 +24,7 @@
->  
->  #define CREATE_TRACE_POINTS
->  #include "trace_arm.h"
-> +#include "hyp_trace.h"
->  
->  #include <linux/uaccess.h>
->  #include <asm/ptrace.h>
-> @@ -2345,6 +2346,9 @@ static int __init init_subsystems(void)
->  
->  	kvm_register_perf_callbacks(NULL);
->  
-> +	err = hyp_trace_init();
-> +	if (err)
-> +		kvm_err("Failed to initialize Hyp tracing\n");
->  out:
->  	if (err)
->  		hyp_cpu_pm_exit();
-> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
-> new file mode 100644
-> index 000000000000..98051c3fb0c2
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp_trace.c
-> @@ -0,0 +1,210 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2025 Google LLC
-> + * Author: Vincent Donnefort <vdonnefort@google.com>
-> + */
-> +
-> +#include <linux/trace_remote.h>
-> +#include <linux/simple_ring_buffer.h>
-> +
-> +#include <asm/kvm_host.h>
-> +#include <asm/kvm_hyptrace.h>
-> +
-> +#include "hyp_trace.h"
-> +
-> +/* Access to this struct within the trace_remote_callbacks are protected by the trace_remote lock */
-> +static struct hyp_trace_buffer {
-> +	struct hyp_trace_desc	*desc;
-> +	size_t			desc_size;
-> +} trace_buffer;
-> +
-> +static int hyp_trace_buffer_alloc_bpages_backing(struct hyp_trace_buffer *trace_buffer, size_t size)
-> +{
-> +	int nr_bpages = (PAGE_ALIGN(size) / PAGE_SIZE) + 1;
-> +	size_t backing_size;
-> +	void *start;
-> +
-> +	backing_size = PAGE_ALIGN(sizeof(struct simple_buffer_page) * nr_bpages *
-> +				  num_possible_cpus());
-> +
-> +	start = alloc_pages_exact(backing_size, GFP_KERNEL_ACCOUNT);
-> +	if (!start)
-> +		return -ENOMEM;
-> +
-> +	trace_buffer->desc->bpages_backing_start = (unsigned long)start;
-> +	trace_buffer->desc->bpages_backing_size = backing_size;
-> +
-> +	return 0;
-> +}
-> +
-> +static void hyp_trace_buffer_free_bpages_backing(struct hyp_trace_buffer *trace_buffer)
-> +{
-> +	free_pages_exact((void *)trace_buffer->desc->bpages_backing_start,
-> +			 trace_buffer->desc->bpages_backing_size);
-> +}
-> +
-> +static int __load_page(unsigned long va)
-> +{
-> +	return kvm_call_hyp_nvhe(__pkvm_host_share_hyp, virt_to_pfn((void *)va), 1);
-> +}
+>  arch/arm64/kvm/arm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I struggle a bit with the nomenclature here. Why is that called
-"load"? Surely this is a "map" operation, right? Is that because this
-is called at "vcpu load" time? Something else?
+For the series:
 
-Also, how is this working without pKVM, in a normal nVHE environment?
-Being able to trace in nVHE is a basic requirement, and I don't see
-how this works here.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Acked-by: Vishal Moola (Oracle) <vishal.moola@gmail.com>
