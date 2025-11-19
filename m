@@ -1,49 +1,61 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC09E2DCBFA;
-	Wed, 19 Nov 2025 15:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19CF2D97BA;
+	Wed, 19 Nov 2025 15:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763566500; cv=none; b=kP4AdYfDjxPhTGpLUnPHXS0UetwBUUW7bAUbY+Yoqdj9pojOi3pwkOxT9/bFLJZDqioKto+DTLUm4fYiJzebgzo8nW21hqtwfWYYfyepz/oGGcluSQF0tIopOlc1G4PL3tu0X++pIY911nv7GCUs+HnsU1YCEdJbPRqcLpK2tN4=
+	t=1763566716; cv=none; b=J6oTVAnTFfN0RvlnKS984rcKAB+b06VFCvHnS/nKO34ViiE5FNzg4p4MeWy3xEVYftdbBD/JcM5VI3G5IIpad/K+yjSYoEnFw2o7HnBpxoxlozEmi5co1jRM4IkGzd7YCIMRDMhQY+xwEtePbpWmUfmzmD5menioXfW/9TrLV7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763566500; c=relaxed/simple;
-	bh=zok7QAvBsMjETv8uh/twrnWp3KqATJ7tiWS1BI6gMAI=;
+	s=arc-20240116; t=1763566716; c=relaxed/simple;
+	bh=tDvM/osjxXgqZcn8Pbd6iKpnBr1NSfDmq5IFWml4eu8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wj/43MVv/+zd1levZ3jUvn+HYjC1qPYuXTMJVaCGSIzWbXSqp1qGm1Kn2UH3RId4uBv7JLdOkLl5EX+8kjo+Dip8wzzayx5QEmY1F+XsJUVeo6FZv2pKhi+0n33utDN5DIkaYnu2yyM/+1kWr2X0vtBdImEwO0iEHnkd35VQhg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IYhWi3JN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=nzVX2f8xZNiWD4POFdqH2q8tC2vowXaVLq9PK0IJbSYDeJlDb8sZUKgij7KsNZczjo4XK0gMD04Ik1177iSgqQD4GzzjpC5+6joW7Kq8/8eg8MlHmorDicwrOaR1tEBiPqRji2HkcesNo0jJ8onISIt+WHXPqMwcGUGraIOSL9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxa1MaKh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IYhWi3JN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5A1C2BCB1;
-	Wed, 19 Nov 2025 15:34:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxa1MaKh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E2B7C4CEF5;
+	Wed, 19 Nov 2025 15:38:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763566499;
-	bh=zok7QAvBsMjETv8uh/twrnWp3KqATJ7tiWS1BI6gMAI=;
+	s=k20201202; t=1763566716;
+	bh=tDvM/osjxXgqZcn8Pbd6iKpnBr1NSfDmq5IFWml4eu8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IYhWi3JN1qRmyhdWHxY6VTqoa5KzLxWACqlURACPmeOMvzYnzlXeV3aEqJZ6zRVdQ
-	 PQ31Y3FtuMGQQ7gytJx2x/sRyd/Tj2EXP0eLPRXKiDFHbgilfwH0GWNaAn4PmoH2HL
-	 V0bRXzNIGlRoA/gNboMeXLPLEs8eyFuc+s4ajUwb4XAVabzPmsjqCW5C1Q9xUUpsCs
-	 haCBNZUCuAOg8ZZppemQwVZk4G5QAovH/lVPoSj9Mre5JoxS6gipq/E6XvxJbzPClU
-	 dMZF/SWJyRgaehhY6VmHrKHNP+uWboerjg3/qr9F3nxDdkcCWyc81FjWqdHUS3+9M2
-	 xRau4sJfdXAWQ==
+	b=nxa1MaKh4sUUB9UX5NANcxpHz6HSRQqS7RrVdzU+feZF/oC1h03b+p/RyzYsTo+V5
+	 EnoDPlb13ySEJ/5+kl0ldw+VG/5ok+J/Pzze7M44TiZXMhdNJPAe1lBvIIDhf/ZpDS
+	 v7UZ4bvTH3xuG3FIm4E6EQg7ORh3U6rZKZE1sCOZypFNrWQDxVilbGXANXKNjmtNDM
+	 8CkLY2eFzzotijauxl+aFgr14BZKO0N7zva43QxLeCssZSX+5NAfOWMPTte+O8BBRD
+	 odbdzEoRGADd2BTwTYQLJYo/y4IkxewQAu6QBxMM2y5pctxzGfJPw8uz+vdtDJ/PiU
+	 dvyXeOa8SAgbQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vLkCu-00000006b4f-3xfO;
-	Wed, 19 Nov 2025 15:34:57 +0000
-Date: Wed, 19 Nov 2025 15:34:56 +0000
-Message-ID: <86fraarq73.wl-maz@kernel.org>
+	id 1vLkGO-00000006b9m-3Xsy;
+	Wed, 19 Nov 2025 15:38:32 +0000
+Date: Wed, 19 Nov 2025 15:38:32 +0000
+Message-ID: <86ecpurq13.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org,
-	alexandru.elisei@arm.com,
-	andrew.jones@linux.dev,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
 	kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
-In-Reply-To: <20250925141958.468311-1-joey.gouly@arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 19/28] KVM: arm64: Support unaligned fixmap in the pKVM hyp
+In-Reply-To: <20251107093840.3779150-20-vdonnefort@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+	<20251107093840.3779150-20-vdonnefort@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,29 +67,37 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev, oliver.upton@linux.dev
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 25 Sep 2025 15:19:48 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Fri, 07 Nov 2025 09:38:31 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Hi all,
+> Return the fixmap VA with the page offset, instead of the page base
+> address. This allows to use hyp_fixmap_map() seamlessly regardless of
+> the address alignment.
 > 
-> This series is for adding support to running the kvm-unit-tests at EL2. These
-> have been tested with Linux 6.17-rc6 KVM nested virt.
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> This latest round I also tested using the run_tests.sh script with QEMU TCG,
-> running at EL2.
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index ae8391baebc3..75014dc7d82e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -239,7 +239,7 @@ static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
+>  	WRITE_ONCE(*ptep, pte);
+>  	dsb(ishst);
+>  
+> -	return (void *)slot->addr;
+> +	return (void *)slot->addr + offset_in_page(phys);
+>  }
+>  
+>  void *hyp_fixmap_map(phys_addr_t phys)
 
-I've eyeballed it superficially, and didn't spot anything unexpected.
+This looks slightly odd. fixmap_map_slot() should return *a slot*, not
+something in it. Can't hyp_fixmap_map() do that instead?
 
-Given that upstream KVM now supports NV, not having anything in KUT is
-becoming a problem, and this is a first step towards proper testing.
-
-FWIW:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
+Thanks,
 
 	M.
 
