@@ -1,168 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF462357A25;
-	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FF13751B8;
+	Thu, 20 Nov 2025 17:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763655520; cv=none; b=IDYYt/XveXVtJKcgNWAIzruUfdITSPlKYjj12ViuLKTZrcTMuSTk+xfK3dDOaOd3cWIY49Kmh4UuLvx2Br8ErRey56+1UcFXkwuD1P4Q2q/Qqqx42R3uCDdEpU14RCsAnvg2Yf7ftQ+j9CDDER9C+E+ElebQJ7lFdHyEiIpTER8=
+	t=1763659556; cv=none; b=DzkGZr/Wtk8yzoGsz3qM6qgdP8m1LEP3ViDCPJPazaVlZ7CjUnPC8TzX2a6crBX716Z4o1XDdwz2dkAsF4lrCNrBUmVzPso+GLwpmep9BZ3TZQp8b1AZrhguDzplLOPwsGwgFahJEjoiyk4c2RRizuihmcm/fTyAF3SjWTvU2XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763655520; c=relaxed/simple;
-	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=np0ChZucCjk5bW3x4mKajAwtKKFCmB2cMSAqCN5cyuAjn9aSUNtq/G+3/oNO2JomY6Qr/moA8XpODZZ3+bkl6nCJhamCSj5hBD8Yeotn8mETUrlo+3ZrHW3YpMPhqkg6rWDnPSCmGm5bXQM5/A/21WEV16XKNGMmCZnFpKtbIJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCG19c7v; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763659556; c=relaxed/simple;
+	bh=k4X+SvMugMHhrjX6NQq/vIrlSTaNkooCR283WJN59gs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=qEYmOT/YZzRtbRYuFHQLw0lBKMSwDkbXPHLJhUnH3jq3CfM/I7scT0a4/1JhZWADeI/ObeMdoMY6KCxLk+Cu51NHAixlm3RA6r1eqBsGZtkxNPQFiE4PiPD0yYtZmk/tJyNY+VESmuqqAHc+iO/L+q69pkitLOo4VL5oz+NTLjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFe5qtmI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCG19c7v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3344DC4CEF1;
-	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFe5qtmI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB448C116C6;
+	Thu, 20 Nov 2025 17:25:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763655520;
-	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MCG19c7vrB14C6fJ+JhzzKXYDKpEsqcAEaaJONS7bVM706UHdAmzQmi6Cb3od5awI
-	 WRw4jQH663YReAPOCN1shTzYGWuEan0maY0zVHg6X/AOE2k2rsI+HfYDQPXjzSeRiF
-	 Fk/rAuUySTn8H38h+yJEmVTMzrTXBnsd87zsW6g9B3TH1wnn6ArRc/6IMorry3cgcE
-	 huPOZdYkq4T25oR8OUMHtrj2mYVkT4mkiajE72ylz7TjVCyaj0NIGpT8qytz4rbiVp
-	 yh/jzx84pAzuxwooUxaP6B8h3FuX8fzsJfj8SGgtCE8VkS5brlkFCuk/TjKVlsewCt
-	 X0FVYGbc88fzw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1763659555;
+	bh=k4X+SvMugMHhrjX6NQq/vIrlSTaNkooCR283WJN59gs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WFe5qtmIB6iZmy4rPe4CmVG9smUvAoshAWBEt8t4AIFgy5FTsoMtt0EqAZmFem/2k
+	 lzq7Z/FeMvyIoq86S1Fn26vumBuu6gz21xiy/+JrGwQ5sfxvVwVnIU3B0V5UTLh6ke
+	 +39wUxLyGi6nWiPcp4z2aM3/CxGsU879FV4dgq+K3FQBQTDiQBVYrISKozBcLbPbtZ
+	 PPVKABStkkWB+lqtB8WImLou/fTKpmqVQh5QMiC1PRFwvDZqhMJjBA5HFDn7fDPXcB
+	 kXTVIv8WT4jP58s+U+Vgm4ccIOwGcRgtvjICzppHOpE/X+X5XOi3xZcWD4nbUMlR3Y
+	 MMUpd6Qxm3lGA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM7Mj-00000006wt3-47F0;
-	Thu, 20 Nov 2025 16:18:38 +0000
-Date: Thu, 20 Nov 2025 16:18:37 +0000
-Message-ID: <864iqosmn6.wl-maz@kernel.org>
+	id 1vM8Pq-00000006y6g-02qS;
+	Thu, 20 Nov 2025 17:25:54 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Maximilian Dittgen <mdittgen@amazon.de>
-Cc: <oliver.upton@linux.dev>,
-	<pbonzini@redhat.com>,
-	<shuah@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kselftest@vger.kernel.org>,
-	<kvm@vger.kernel.org>,
-	<lilitj@amazon.de>,
-	<sauravsc@amazon.de>,
-	<nh-open-source@amazon.com>
-Subject: Re: [RFC PATCH 01/13] KVM: Introduce config option for per-vCPU vLPI enablement
-In-Reply-To: <20251120140305.63515-2-mdittgen@amazon.de>
-References: <20251120140305.63515-1-mdittgen@amazon.de>
-	<20251120140305.63515-2-mdittgen@amazon.de>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 01/49] irqchip/gic: Add missing GICH_HCR control bits
+Date: Thu, 20 Nov 2025 17:24:51 +0000
+Message-ID: <20251120172540.2267180-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
+References: <20251120172540.2267180-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, lilitj@amazon.de, sauravsc@amazon.de, nh-open-source@amazon.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 20 Nov 2025 14:02:50 +0000,
-Maximilian Dittgen <mdittgen@amazon.de> wrote:
->=20
-> Add CONFIG_ARM_GIC_V3_PER_VCPU_VLPI to control whether vLPI direct
-> injection is to be enabled on a system-wide or a per-vCPU basis.
->=20
-> When enabled, vPEs can be allocated/deallocated to vCPUs on an ad-hoc,
-> per-vCPU basis in runtime. When disabled, keep current vgic_v4_init
-> behavior of automatic vCPU vPE allocation upon VM initialization.
->=20
-> We declare three ioctls numbers to manage per-vCPU vLPI enablement:
-> - KVM_ENABLE_VCPU_VLPI, which given a vCPU ID, allocates a vPE and
-> initializes the vCPU for receiving direct vLPI interrupts.
-> - KVM_DISABLE_VCPU_VLPI, which given a vCPU ID, disables the vCPU=E2=80=
-=99s
-> ability to receive direct vLPI interrupts and frees its underlying vPE
-> structure.
-> - KVM_QUERY_VCPU_VLPI, which given a vCPU ID, returns a boolean
-> describing whether the vCPU is configured to receive direct vLPI
-> interrupts.
->=20
-> This commit declares the kconfig, ioctl numbers, and documentation.
-> Implementation will come throughout this patch set.
->=20
-> Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
-> ---
->  Documentation/virt/kvm/api.rst | 56 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/arm.c           | 15 +++++++++
->  arch/arm64/kvm/vgic/vgic-v4.c  |  9 ++++++
->  arch/arm64/kvm/vgic/vgic.h     |  2 ++
->  drivers/irqchip/Kconfig        | 13 ++++++++
->  include/uapi/linux/kvm.h       |  6 ++++
->  6 files changed, 101 insertions(+)
->=20
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
-rst
-> index 27f726ff8fe0..dcfb326dff10 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6517,6 +6517,62 @@ the capability to be present.
-> =20
->  `flags` must currently be zero.
-> =20
-> +4.XXX KVM_ENABLE_VCPU_VLPI
-> +--------------------------
-> +
-> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: int vcpu_id (in)
-> +:Returns: 0 on success, negative value on error
-> +
-> +This ioctl enables GICv4 direct vLPI injection for the specified vCPU.
-> +Allocates vPE structures (doorbell IRQ, vPE table entry, virtual pending
-> +table, vPEID) and upgrades existing software-forwarded LPIs targeting
-> +this vCPU to hardware-forwarded vLPIs.
-> +
-> +If GICv4.1 is supported and vSGIs are disabled on the specified vCPU,
-> +this ioctl enables vCPU vSGI support.
-> +
-> +Requires CONFIG_ARM_GIC_V3_PER_VCPU_VLPI and GICv4 hardware support.
-> +
-> +Returns -EINVAL if vGICv4 is not initialized or if the passed vcpu_id
-> +does not map to a vCPU.
-> +
-> +4.XXX KVM_DISABLE_VCPU_VLPI
-> +---------------------------
-> +
-> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
-> +:Architectures: arm64
-> +:Type: vm ioctl
-> +:Parameters: int vcpu_id (in)
-> +:Returns: 0 on success, negative value on error
-> +
-> +This ioctl disables GICv4 direct vLPI injection for the specified vCPU.
-> +Downgrades hardware-forwarded vLPIs to software-forwarded LPIs and frees
-> +vPE structures. Pending interrupts in the virtual pending table may be
-> +lost.
+The GICH_HCR description is missing a bunch of control bits that
+control the maintenance interrupt. Add them.
 
-I'm going to put my foot down on that immediately.
+Tested-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ include/linux/irqchip/arm-gic.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-There is no conceivable case where losing interrupts in acceptable.
-Ever. If that's what you want, please write your own hypervisor. I
-wish you luck!
+diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+index 2223f95079ce8..d45fa19f9e470 100644
+--- a/include/linux/irqchip/arm-gic.h
++++ b/include/linux/irqchip/arm-gic.h
+@@ -86,7 +86,13 @@
+ 
+ #define GICH_HCR_EN			(1 << 0)
+ #define GICH_HCR_UIE			(1 << 1)
++#define GICH_HCR_LRENPIE		(1 << 2)
+ #define GICH_HCR_NPIE			(1 << 3)
++#define GICH_HCR_VGrp0EIE		(1 << 4)
++#define GICH_HCR_VGrp0DIE		(1 << 5)
++#define GICH_HCR_VGrp1EIE		(1 << 6)
++#define GICH_HCR_VGrp1DIE		(1 << 7)
++#define GICH_HCR_EOICOUNT		GENMASK(31, 27)
+ 
+ #define GICH_LR_VIRTUALID		(0x3ff << 0)
+ #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+-- 
+2.47.3
 
-> +
-> +If vSGIs are enabled on the specified vCPU, this ioctl disables them.
-
-So what? Something that didn't have an active state now has one that
-the guest doesn't know about? There is exactly *one* bit that defines
-that, and it doesn't exist in some quantum superposition.
-
-This whole thing is completely insane, has not been thought out at
-all, is ignoring the basis of the architecture, and I'm really sorry
-that you wasted your time on that.
-
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
