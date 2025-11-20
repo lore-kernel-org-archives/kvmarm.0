@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A5537414D;
-	Thu, 20 Nov 2025 17:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A99637415B;
+	Thu, 20 Nov 2025 17:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659560; cv=none; b=JyEQbh3rs5EB5gCzAK00kVsRP66fD/QBe+Tn0IPNAIOZRK6szltWPoQ8XbSP4lwzdBR9w//iJHzVtfBOb/+Lh94mV3HxPUBbLsqpwteDt04m+i1x+lMT5NDcFVWogKyi0Nf5SferveTTL+4X+OPzznBWMJyd+x89E/TM+ytsGsk=
+	t=1763659561; cv=none; b=tHsCd4GJgu2jwHXRKsYvMMGDmc4F/AP9t8dLhMG+QLEM94kpkPA9EffsbFdKa0O5XWMJkRt1hNEo9RAU9g5bKwSQJtl807XUfIuEpOHdNXZkU9kSnWMVrykYKOF82gsum0Kw8nxMD+rFCs/PAUd5nIWuxrxjkRmAWtqdaYGfqro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659560; c=relaxed/simple;
-	bh=bms1Md7sGkq4HJkFfPkaPFYDm0tudSYohGQAkv2vdk8=;
+	s=arc-20240116; t=1763659561; c=relaxed/simple;
+	bh=Wne+A8EYEvVAkzxyqVearpf9rf8Dhb8b8xWDhsiAlHo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dgwDeBdohKAd2G/8SBlx9SUc+HKWd55WBwVRwAc4iAl1jUzE8gi/qhkHk5N99RoLbcca71rZf7XN9XFe9OrxPYuorSMhMCO+W3SBWCwy2kzaerx2i1agviq99pXPZ436GKERs0CkLXkwFotjLpJv3TZYK9O7FhHDdmRgheFwlM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gWYDsp9+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=V7WWkQGeH+mMySW0MUQIMXvEiLhZp7u4Owrq1+7Y0YTe9JCmj6r3SY79TOdWZc5Rqava6ncZ+FFhhbirmoUM+8bSCiNS/et5YWH/ZbEQ3Fwb9YwcKyupOMmdFKh0wSGiMz1X0GIDvhjuDjaDFQ+6j2zfANB7FISqJID+8ZvWDkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ib/KQUfr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gWYDsp9+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A8F7C116C6;
-	Thu, 20 Nov 2025 17:26:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ib/KQUfr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BFBC16AAE;
+	Thu, 20 Nov 2025 17:26:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763659560;
-	bh=bms1Md7sGkq4HJkFfPkaPFYDm0tudSYohGQAkv2vdk8=;
+	s=k20201202; t=1763659561;
+	bh=Wne+A8EYEvVAkzxyqVearpf9rf8Dhb8b8xWDhsiAlHo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gWYDsp9+ctsMCg5mXoqk6JlWQe7SMrPK30l/mgZ46FpE6zuVB/e99TPV8N6KP4x3i
-	 RiwZ/xDpu2ui596Em9IICWMW2NuiLDf2xxJ45paGkH8DNjtrXqrc86uvvesHwtNaZB
-	 jwT5tevg8Al1in1Ppi/fVpp9YEtoLLUj7pjJVh04EM60TGIYrDgkXbEgZV55J1MdLN
-	 XfXbLdhm+AIyQqJr8sGhFrKu0Rea1yAQ9op+dtCt68IUR2tBtydg2A1gw3A4ph9WqY
-	 q1YvkQeN0L5oiD3zrnRLGiZ+MLRXhRXruDtyi+nqPFC1uZV3yjGkSgT9f0bygzxG74
-	 QLp8EpvwqDxuw==
+	b=ib/KQUfr+I/dKWLtDhG4jMPbPOdn+OKJMfqcWAvMOXGUp/4ZXYHhXJ5OEqZSvMlR7
+	 y2qGjr6x9ZX/3qtjrYfxI5JAwIXUgroaRtCK5xAR9LVeABxSet4QBbwW551kmG06Vk
+	 N0Mif7sbmGu0g590U0bBdL2zNOdidBOmmGipM9CToDJhuiZcSFnjQh1wuBcW/O8SUO
+	 GLvUkEGuWYJhDaxActxGOlXlzzMzVEH5ad40enQ2eyNkov7+rGi+KEutqK1X5M31H+
+	 MLguqUIJcTd9pk4E0LH2Sosx0X20WPUP6n/BhedgDnPBlcbBYLpmzwmPi0DeThUYTm
+	 N0AAKhYvEzTDQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM8Pu-00000006y6g-1r1N;
-	Thu, 20 Nov 2025 17:25:58 +0000
+	id 1vM8Pv-00000006y6g-0uU3;
+	Thu, 20 Nov 2025 17:25:59 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 19/49] KVM: arm64: Compute vgic state irrespective of the number of interrupts
-Date: Thu, 20 Nov 2025 17:25:09 +0000
-Message-ID: <20251120172540.2267180-20-maz@kernel.org>
+Subject: [PATCH v4 22/49] KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
+Date: Thu, 20 Nov 2025 17:25:12 +0000
+Message-ID: <20251120172540.2267180-23-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
 References: <20251120172540.2267180-1-maz@kernel.org>
@@ -61,83 +61,119 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As we are going to rely on the [G]ICH_HCR{,_EL2} register to be
-programmed with MI information at all times, slightly de-optimise
-the flush/sync code to always be called. This is rather lightweight
-when no interrupts are in flight.
+Now that we always reconfigure the vgic HCR register on entry,
+the "enable" part of kvm_vgic_vcpu_enable() is pretty useless.
+
+Removing the enable bits from these functions makes it plain that
+they are just about computing the reset state. Just rename the
+functions accordingly.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic.c | 35 ++---------------------------------
- 1 file changed, 2 insertions(+), 33 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c | 8 ++++----
+ arch/arm64/kvm/vgic/vgic-v2.c   | 5 +----
+ arch/arm64/kvm/vgic/vgic-v3.c   | 5 +----
+ arch/arm64/kvm/vgic/vgic.h      | 4 ++--
+ 4 files changed, 8 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 7ee253a9fb77e..39346baa2677c 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -985,8 +985,6 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
- /* Sync back the hardware VGIC state into our emulation after a guest's run. */
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	int used_lrs;
--
- 	/* If nesting, emulate the HW effect from L0 to L1 */
- 	if (vgic_state_is_nested(vcpu)) {
- 		vgic_v3_sync_nested(vcpu);
-@@ -996,20 +994,10 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	if (vcpu_has_nv(vcpu))
- 		vgic_v3_nested_update_mi(vcpu);
- 
--	/* An empty ap_list_head implies used_lrs == 0 */
--	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
--		return;
--
- 	if (can_access_vgic_from_kernel())
- 		vgic_save_state(vcpu);
- 
--	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
--		used_lrs = vcpu->arch.vgic_cpu.vgic_v2.used_lrs;
--	else
--		used_lrs = vcpu->arch.vgic_cpu.vgic_v3.used_lrs;
--
--	if (used_lrs)
--		vgic_fold_lr_state(vcpu);
-+	vgic_fold_lr_state(vcpu);
- 	vgic_prune_ap_list(vcpu);
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 1796b1a22a72a..6d5e5d708f23a 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -353,12 +353,12 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	return ret;
  }
  
-@@ -1053,29 +1041,10 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	if (vcpu_has_nv(vcpu))
- 		vgic_v3_nested_update_mi(vcpu);
+-static void kvm_vgic_vcpu_enable(struct kvm_vcpu *vcpu)
++static void kvm_vgic_vcpu_reset(struct kvm_vcpu *vcpu)
+ {
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+-		vgic_v2_enable(vcpu);
++		vgic_v2_reset(vcpu);
+ 	else
+-		vgic_v3_enable(vcpu);
++		vgic_v3_reset(vcpu);
+ }
  
--	/*
--	 * If there are no virtual interrupts active or pending for this
--	 * VCPU, then there is no work to do and we can bail out without
--	 * taking any lock.  There is a potential race with someone injecting
--	 * interrupts to the VCPU, but it is a benign race as the VCPU will
--	 * either observe the new interrupt before or after doing this check,
--	 * and introducing additional synchronization mechanism doesn't change
--	 * this.
--	 *
--	 * Note that we still need to go through the whole thing if anything
--	 * can be directly injected (GICv4).
--	 */
--	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head) &&
--	    !vgic_supports_direct_irqs(vcpu->kvm))
--		return;
+ /*
+@@ -405,7 +405,7 @@ int vgic_init(struct kvm *kvm)
+ 	}
+ 
+ 	kvm_for_each_vcpu(idx, vcpu, kvm)
+-		kvm_vgic_vcpu_enable(vcpu);
++		kvm_vgic_vcpu_reset(vcpu);
+ 
+ 	ret = kvm_vgic_setup_default_irq_routing(kvm);
+ 	if (ret)
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index f53bc55288978..18856186be7be 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -285,7 +285,7 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 			GICH_VMCR_PRIMASK_SHIFT) << GICV_PMR_PRIORITY_SHIFT;
+ }
+ 
+-void vgic_v2_enable(struct kvm_vcpu *vcpu)
++void vgic_v2_reset(struct kvm_vcpu *vcpu)
+ {
+ 	/*
+ 	 * By forcing VMCR to zero, the GIC will restore the binary
+@@ -293,9 +293,6 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
 -
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+-	/* Get the show on the road... */
+-	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+ }
  
--	if (!list_empty(&vcpu->arch.vgic_cpu.ap_list_head)) {
--		raw_spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-+	scoped_guard(raw_spinlock, &vcpu->arch.vgic_cpu.ap_list_lock)
- 		vgic_flush_lr_state(vcpu);
--		raw_spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
--	}
+ /* check for overlapping regions and for regions crossing the end of memory */
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 81f1de9e3897b..780cc92c79e04 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -293,7 +293,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, SameAsInner)	| \
+ 	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable))
  
- 	if (can_access_vgic_from_kernel())
- 		vgic_restore_state(vcpu);
+-void vgic_v3_enable(struct kvm_vcpu *vcpu)
++void vgic_v3_reset(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
+ 
+@@ -323,9 +323,6 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 						    kvm_vgic_global_state.ich_vtr_el2);
+ 	vcpu->arch.vgic_cpu.num_pri_bits = FIELD_GET(ICH_VTR_EL2_PRIbits,
+ 						     kvm_vgic_global_state.ich_vtr_el2) + 1;
+-
+-	/* Get the show on the road... */
+-	vgic_v3->vgic_hcr = ICH_HCR_EL2_En;
+ }
+ 
+ void vcpu_set_ich_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 4a0733869cb5f..e48294521541e 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -285,7 +285,7 @@ int vgic_v2_cpuif_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			  int offset, u32 *val);
+ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+-void vgic_v2_enable(struct kvm_vcpu *vcpu);
++void vgic_v2_reset(struct kvm_vcpu *vcpu);
+ int vgic_v2_probe(const struct gic_kvm_info *info);
+ int vgic_v2_map_resources(struct kvm *kvm);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+@@ -320,7 +320,7 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu, struct ap_list_summary *als);
+ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+-void vgic_v3_enable(struct kvm_vcpu *vcpu);
++void vgic_v3_reset(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(const struct gic_kvm_info *info);
+ int vgic_v3_map_resources(struct kvm *kvm);
+ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq);
 -- 
 2.47.3
 
