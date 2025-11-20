@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A59936C5B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A41436CE09;
 	Thu, 20 Nov 2025 17:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659558; cv=none; b=YbJ+LQFYpA7d9gBuyCF76cWYL9GMXWuxphlcKGaHE3k/JCSAsNDhEHBCWAp7pStfM384myT+pVwUweX5yENY9+5fs1M5gvtr6WN2F6PKVt9ToxTdBn/CUGA8r8eeUcMmo+VZqEN1FNegXqVzffnSr7iWTgdKPwdWYYSQoXEO5x8=
+	t=1763659558; cv=none; b=RZgZoPDrWA/FsPTO90/qswfr2ulJMeLMun0n8uxMCvvW8eGdgD7w/3v866mFr6oFwHJaP/tzA8AKvCNE2IDpHsKdcjaVtJoKjiGN96ZmP8A/gCEtJwBAhNsMLfYQXPUTCPltzeLjQkY8m3I4Y8qp+RjLI08qa/q2Kcrsg9nTbE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763659558; c=relaxed/simple;
-	bh=Phnjr10/3FSU814EfoeZq4CTVio4OIfPI7Xamjqjd9Q=;
+	bh=yYpe3ZiXdu0kQ382PoQuTzOmEcqd+Y4/E7xAIiyvr0g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oBhfCZ795ofo6dyqt6crGVrjBKLKZqt90USMIWq3iQeeaJBklgNF/e2H47SwMx4FlUUMLzdUg6plB6IM0sX4N9ryzE5VJOIPiGtONO2TKmtXAQMfIZ+FQ6dQVx5kjjbiHqY63VWOcyf6ktz+pHg6Q6oJiWh5Lsx/ph89OC/b6HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6md+j+N; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=psQ+W+5KmUedV+2nFAQeolM6NCfbFv1LuIaronPDNtwBiy4wf+7r+swwBsqkBYwuNRCgD9YkNSRoQ+deCCEtP/EXYjVedV7a3qqRZTn0vYdIAEUogaSoloZOlAkyJPZkThzs91HSxGNTXipSf8G1HgUHjz+KjUPVB8Ggs6XFlfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/yz4Tv/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6md+j+N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3052C19421;
-	Thu, 20 Nov 2025 17:25:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/yz4Tv/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CCE5C116C6;
+	Thu, 20 Nov 2025 17:25:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1763659558;
-	bh=Phnjr10/3FSU814EfoeZq4CTVio4OIfPI7Xamjqjd9Q=;
+	bh=yYpe3ZiXdu0kQ382PoQuTzOmEcqd+Y4/E7xAIiyvr0g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m6md+j+NSq+asIjrap5hOKsHaUMm1LXwNUJk2deeiAQ9aTWLbFOD49vyusxWHU03B
-	 +jvvGtDcZKGLR0Zf8MSOoQd4jpWOiaOAM3tsGl3nX27/AkLm7l3fsto5PW28avaY1F
-	 7FxU9jN8r0CLblbxga+HNp0LMZpdbn6P2Li5AJInZAEn2Q3F4Q8WnEWrWFRqTi141A
-	 MmcKZ6ZCnragJlZIa1l+I1v3yDuAEKsZOoxGsYiJ/73vUJ1tTJ9vmmcOiHGQZLI7zV
-	 6UqhYMGbuxpCtjwCvVYJkWMxR081OQWtVwZgUmCQCVjF+8+5QsOoicjpLmx+GwD0RT
-	 U8URsKlZrL+dw==
+	b=r/yz4Tv/3FTYweByKSMq3BQxadKiZ7enrNxDz8jMyBdoJf5NUNCpg8+Okrf1Cfnrj
+	 l83DYxc836/AfAd0Ep12VbkhfTGHPhOrDa3EipNWSXvrhBN/o/ifoEc49SPUziXnGE
+	 /Q9H1tAvgmmvuTjXO62BHo0Caj/KaVNK/eQa9EdiQuOCVNke/Jqyxc0KjzV1GEuiTi
+	 jpwHSKaJeoj2L4Sn+KWYkMqhcssJ7pHKdXaBd8Fjz5f+vdpL6v4DuvNhv/EtUpVrfc
+	 GZUSZGFma4xTyS0mk5AKE0MCaH9Hhc1KC7iKbaJdCRX5Gi1EwwY9wtfKQtNZ9TP1IW
+	 dLh2Eh/YLWe6Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM8Ps-00000006y6g-12j3;
+	id 1vM8Ps-00000006y6g-319A;
 	Thu, 20 Nov 2025 17:25:56 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 10/49] KVM: arm64: GICv3: Drop LPI active state when folding LRs
-Date: Thu, 20 Nov 2025 17:25:00 +0000
-Message-ID: <20251120172540.2267180-11-maz@kernel.org>
+Subject: [PATCH v4 12/49] KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
+Date: Thu, 20 Nov 2025 17:25:02 +0000
+Message-ID: <20251120172540.2267180-13-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
 References: <20251120172540.2267180-1-maz@kernel.org>
@@ -61,39 +61,76 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Despite LPIs not having an active state, *virtual* LPIs do have
-one, which gets cleared on EOI. So far, so good.
+Not programming ICH_HCR_EL2 while no LRs are populated is a bit
+of an issue, as we otherwise don't see any maintenance interrupt
+when the guest interacts with the LRs.
 
-However, this leads to a small problem: when an active LPI is not
-in the LRs, that EOImode==0 and that the guest EOIs it, EOIcount
-doesn't get bumped up. Which means that in these condition, the
-LPI would stay active forever.
-
-Clearly, we can't have that. So if we spot an active LPI, we drop
-that state. It's pretty pointless anyway, and only serves as a way
-to trip SW over.
+Decouple the two and always program the control register, even when
+we don't have to touch the LRs.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index e3f4b27e0225f..81d22f615fa66 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -72,7 +72,9 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 9bfcbfd91118a..2509b52bbd629 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -219,20 +219,12 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
+ 		}
+ 	}
  
- 		raw_spin_lock(&irq->irq_lock);
+-	if (used_lrs || cpu_if->its_vpe.its_vm) {
++	if (used_lrs) {
+ 		int i;
+ 		u32 elrsr;
  
--		/* Always preserve the active bit, note deactivation */
-+		/* Always preserve the active bit for !LPIs, note deactivation */
-+		if (irq->intid >= VGIC_MIN_LPI)
-+			val &= ~ICH_LR_ACTIVE_BIT;
- 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
- 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
+ 		elrsr = read_gicreg(ICH_ELRSR_EL2);
  
+-		if (cpu_if->vgic_hcr & ICH_HCR_EL2_LRENPIE) {
+-			u64 val = read_gicreg(ICH_HCR_EL2);
+-			cpu_if->vgic_hcr &= ~ICH_HCR_EL2_EOIcount;
+-			cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
+-		}
+-
+-		write_gicreg(0, ICH_HCR_EL2);
+-
+ 		for (i = 0; i < used_lrs; i++) {
+ 			if (elrsr & (1 << i))
+ 				cpu_if->vgic_lr[i] &= ~ICH_LR_STATE;
+@@ -242,6 +234,14 @@ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if)
+ 			__gic_v3_set_lr(0, i);
+ 		}
+ 	}
++
++	if (cpu_if->vgic_hcr & ICH_HCR_EL2_LRENPIE) {
++		u64 val = read_gicreg(ICH_HCR_EL2);
++		cpu_if->vgic_hcr &= ~ICH_HCR_EL2_EOIcount;
++		cpu_if->vgic_hcr |= val & ICH_HCR_EL2_EOIcount;
++	}
++
++	write_gicreg(0, ICH_HCR_EL2);
+ }
+ 
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
+@@ -249,12 +249,10 @@ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if)
+ 	u64 used_lrs = cpu_if->used_lrs;
+ 	int i;
+ 
+-	if (used_lrs || cpu_if->its_vpe.its_vm) {
+-		write_gicreg(compute_ich_hcr(cpu_if), ICH_HCR_EL2);
++	write_gicreg(compute_ich_hcr(cpu_if), ICH_HCR_EL2);
+ 
+-		for (i = 0; i < used_lrs; i++)
+-			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+-	}
++	for (i = 0; i < used_lrs; i++)
++		__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+ 
+ 	/*
+ 	 * Ensure that writes to the LRs, and on non-VHE systems ensure that
 -- 
 2.47.3
 
