@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E4F368296;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBEA3A79A6;
 	Thu, 20 Nov 2025 17:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659563; cv=none; b=gcXBBK+jQwDZXnAO4FQ2fIv/1zzb8OUnexA//KkQ7ULMZpkWXt1KhHDhlge7+Ab5gUwqzwhbT3vC3SSVwPuIHUSQ2iD0aH9sAbCIz/L4ApdXG6zw/5eLmPlQSeC3+iszLeZcPh4ipy6ZhFT6b/6jh+9BDui0pKo1pUpm7lBfj3I=
+	t=1763659563; cv=none; b=jHiQeBrszBrcWu7sB0robt0T/b2UmzijcVSlMzwSXHgEwfl5m6roYSB0sCu1eESQc0oUzOOLh46mYiJdVdah1ScvklWxKAFyZIMVO/JC7Asb5suwKGiJsHXZzrEuo/0G+TEJKGjs2GvCLL9p0zvknp536sDVxFkqELtk0RWKIac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763659563; c=relaxed/simple;
-	bh=dWDeyae6N77yEGNAKHiIA8aFG+UfJsUWjTDlzOcR5Z4=;
+	bh=2M4MvgwXEugIL3oc9eCJTpv22xhUFFpaQt+5YS+onvM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y4nZAwRXprbCYVBqlshULyiPV6vRdjeTBjCG92Ah68gskZnTFewQvfcmLq1ywJE1/2c9WUhQLpaXrrOPYf2pxGhMobxTHQdVIrD5EaPoVSfJ+eu4f2JKrmO2g0hvZlVyjoEqckKcaj0uPbvkfs3gkGbv10XbUW2xiu4ffNFr+fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dkjMSsRk; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=mKImGVwvqVEcXSUzDx9nvSHNN+HDANkyhgy6DTxSjNHn+mjPmjZAogdys58W8fUAttxdKthWl9lvH6GhLgNxbcrM7WJsfyZMCnjtEMniQGREm4N0cvW6Uklvj+G3rozNu8qZDTeFcJXz/4yM66klnpPCsFGeJirk8teE2zcz9e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVzdvSF6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dkjMSsRk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9C40C116D0;
-	Thu, 20 Nov 2025 17:26:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVzdvSF6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82599C116D0;
+	Thu, 20 Nov 2025 17:26:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1763659563;
-	bh=dWDeyae6N77yEGNAKHiIA8aFG+UfJsUWjTDlzOcR5Z4=;
+	bh=2M4MvgwXEugIL3oc9eCJTpv22xhUFFpaQt+5YS+onvM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dkjMSsRk3fJw+aKn4gvxuLDa68dhzMojiTFGq7Z19Y+gDLq9Of1FPK+gHarTXf2I8
-	 fn9D8v5pj1/vdpHZc8X2T3GCU9es/8SLVg4GchurG/kkxp9rpOAf5zxIkH5pyCWcCh
-	 VRs7/H7bwjv0f5c0kbNudHBLc5gbb6/gXErHGFYtMqnzyYAM9KVdTKktBKpxqm+i/c
-	 hxrC3wzi9Kah5fYmGT+FEaZJEp8jnWTmrem6M5LNHQxttWFeOFDdQs8sbd76Y4S7Gu
-	 ZkWEIwSdyTLrCgj8i3TFgLiUD1JD303HdJuVFQXcy+KnrVLfTnaFYrCduTdtyHM06V
-	 R8NkRWYrnvbGg==
+	b=EVzdvSF6VGpIZtYXPv6LJuKjlM21JV/05/5SjEULzrDDidGNXnI3TZ2dqWXazwbT2
+	 W0ai4cgD4n5OLbpYCldBbu0BJJAqdvUa+Qnz9eoSXa6yvHhNew1r7C+Zl8gqe/61Yd
+	 4s9lnqsbaePP2MgBZdRm+LqtHFdppjEYM72KSUt6uI/l8x34nf5LUPjMjzVod+2KYo
+	 EB47DZGijmfnWlxypeHVI4QjTPyTLNALb4420MK7OY4GfIk+4DY22yF4HYiSf9Wm8e
+	 gEX6VsENiuwgAQ8VAwT9efqWDP/+w3Pjn01aOP0A9gkauGpsOhd+6ZSnPtFJfzXjs8
+	 5hpGQoATC5oIQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM8Px-00000006y6g-0reG;
+	id 1vM8Px-00000006y6g-2vqD;
 	Thu, 20 Nov 2025 17:26:01 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 30/49] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-Date: Thu, 20 Nov 2025 17:25:20 +0000
-Message-ID: <20251120172540.2267180-31-maz@kernel.org>
+Subject: [PATCH v4 32/49] KVM: arm64: GICv3: Handle in-LR deactivation when possible
+Date: Thu, 20 Nov 2025 17:25:22 +0000
+Message-ID: <20251120172540.2267180-33-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
 References: <20251120172540.2267180-1-maz@kernel.org>
@@ -61,33 +61,90 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Now that we are ready to handle deactivation through ICV_DIR_EL1,
-set the trap bit if we have active interrupts outside of the LRs.
+Even when we have either an LR overflow or SPIs in flight, it is
+extremely likely that the interrupt being deactivated is still in
+the LRs, and that going all the way back to the the generic trap
+handling code is a waste of time.
+
+Instead, try and deactivate in place when possible, and only if
+this fails, perform a full exit.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 38 ++++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 9fcee5121fe5e..09f86bf6fe7b8 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -45,6 +45,13 @@ void vgic_v3_configure_hcr(struct kvm_vcpu *vcpu,
- 		ICH_HCR_EL2_VGrp0DIE : ICH_HCR_EL2_VGrp0EIE;
- 	cpuif->vgic_hcr |= (cpuif->vgic_vmcr & ICH_VMCR_ENG1_MASK) ?
- 		ICH_HCR_EL2_VGrp1DIE : ICH_HCR_EL2_VGrp1EIE;
-+
-+	/*
-+	 * Note that we set the trap irrespective of EOIMode, as that
-+	 * can change behind our back without any warning...
-+	 */
-+	if (irqs_active_outside_lrs(als))
-+		cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index f2f5854551449..71199e1a92940 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -792,7 +792,7 @@ static void __vgic_v3_bump_eoicount(void)
+ 	write_gicreg(hcr, ICH_HCR_EL2);
  }
  
- static bool lr_signals_eoi_mi(u64 lr_val)
+-static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
++static int ___vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ {
+ 	u32 vid = vcpu_get_reg(vcpu, rt);
+ 	u64 lr_val;
+@@ -800,19 +800,25 @@ static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+ 
+ 	/* EOImode == 0, nothing to be done here */
+ 	if (!(vmcr & ICH_VMCR_EOIM_MASK))
+-		return;
++		return 1;
+ 
+ 	/* No deactivate to be performed on an LPI */
+ 	if (vid >= VGIC_MIN_LPI)
+-		return;
++		return 1;
+ 
+ 	lr = __vgic_v3_find_active_lr(vcpu, vid, &lr_val);
+-	if (lr == -1) {
+-		__vgic_v3_bump_eoicount();
+-		return;
++	if (lr != -1) {
++		__vgic_v3_clear_active_lr(lr, lr_val);
++		return 1;
+ 	}
+ 
+-	__vgic_v3_clear_active_lr(lr, lr_val);
++	return 0;
++}
++
++static void __vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
++{
++	if (!___vgic_v3_write_dir(vcpu, vmcr, rt))
++		__vgic_v3_bump_eoicount();
+ }
+ 
+ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+@@ -1247,9 +1253,21 @@ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 	case SYS_ICC_DIR_EL1:
+ 		if (unlikely(is_read))
+ 			return 0;
+-		/* Full exit if required to handle overflow deactivation... */
+-		if (vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr & ICH_HCR_EL2_TDIR)
+-			return 0;
++		/*
++		 * Full exit if required to handle overflow deactivation,
++		 * unless we can emulate it in the LRs (likely the majority
++		 * of the cases).
++		 */
++		if (vcpu->arch.vgic_cpu.vgic_v3.vgic_hcr & ICH_HCR_EL2_TDIR) {
++			int ret;
++
++			ret = ___vgic_v3_write_dir(vcpu, __vgic_v3_read_vmcr(),
++						   kvm_vcpu_sys_get_rt(vcpu));
++			if (ret)
++				__kvm_skip_instr(vcpu);
++
++			return ret;
++		}
+ 		fn = __vgic_v3_write_dir;
+ 		break;
+ 	case SYS_ICC_RPR_EL1:
 -- 
 2.47.3
 
