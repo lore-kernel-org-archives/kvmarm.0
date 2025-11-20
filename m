@@ -1,184 +1,119 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B7B372AC1
-	for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 10:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FA01531E8
+	for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 11:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763635430; cv=none; b=TaPDVVyGVa3dtKTFBLhpNHIp0MdwKzt1dBiFST+aDDPNLskrJR7+Ygw09mbsmaMuh/vctiuq9y8xgl/MoRyZI4L1aKiX0pFbSz3Mbv+5kkS1HOOAg0QL9EdaIH6JKPgtULc7slF7bhuzWAyFgkMmQAyMF89WwjUMY9XxSgP02kM=
+	t=1763638583; cv=none; b=eRzNUhvxDCzHfOhh7wR66T+saZUkXUuxLHMQJgwEjsNF1JQO0s6LbTaca6vOaq41tgHybwtvRpKSfVkEPkoG5DlPWfvUvgISuyFgmoH0bDxXTkAV2ujZX96Xs/IaGc/8JAKQ/fvbbB8cYdlGivqd8tIEvii4FOKzKLZnMuAVDdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763635430; c=relaxed/simple;
-	bh=MbA9H+RwW5ZqdWuv+HONXve++UBdBrFLTUyzU+kGvVk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VAeJYTcIMbARVg/AwuYi2/z8Hc2FZLer8qJUegjE8XEOy0ATgPZSy6EnLfBWAWUFQeZeihkDccfg8JXyMhdm0UkSMv2IX489sZwX7BOOlStSXPMEu40Y2XREDFK2mABv4/SNIYGxKdaqbXjcTT1SMh9Q0KRzwEqvTcktIuuw3nI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=a43OTxh/; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1763638583; c=relaxed/simple;
+	bh=F+0N4wMzGmWADzwl/vFuA6k8UEcvJMDKp1Ep/I+CU2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GwowaKah6WQN0NoJ7VGWR2r0EglqtpP3NcwSjJ0G69TccERwoX1qdxbZVYWHg6FwyywkGzYa4LxJ9rO866rsxNRrZ22GmxDwYpXRQKGm5DeaU8mUyMMD+viHnqQSlDYhJI9wKd8CgwRjt3YXy4QhPlkYSHvpvY7xiEUC79IwT80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lq8en3f6; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a43OTxh/"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-477632d9326so4579385e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 02:43:45 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lq8en3f6"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-477b5e0323bso9757625e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 03:36:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1763635424; x=1764240224; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7oHOv6TarlQbLUVDxxSIUN/NgK6M7FvSaHEHJevpMjw=;
-        b=a43OTxh/aFSc7QfiiLnkfRXSjeO8iKJHzjpxGBswo8RMCk1CO3VTpkLY6cnXgavKxk
-         +5N/h/DekBALgDrEueIV883iEZaC60sp4i+6t54ZcSjBSJGLvEKmlrwE2GYWlNFa0c6z
-         oO9f+eYxwcFT0vwlbX7dkJIRwIG5k5fIAT329/zDBZwoE3NEnb0VhFbMuMeYC2XgFtK0
-         3tetCOdS2ZVWCklRCrO+rk/Y3BF+5jxSsg3PuiughTJ7yumJbhiT/6aa72OX6rX+Sbkc
-         yrsZvL8OV2F6Hv63FrojJchwJE866ZcBNmJxKSBgmAIy2Kr7XmOKu7gyAvKWb9Ou29ha
-         qVXQ==
+        d=google.com; s=20230601; t=1763638580; x=1764243380; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TPlzmXt4DNVBdqLVvxiBIWu8Rl4FZ4bDuiyypGx7MuQ=;
+        b=Lq8en3f67tz+ZrCxmAx5vKzyeQYWRib827qf/94cXV5pjsg7SgMv1Czs5ZZGAZM7rF
+         /reavl4KO14f3q0bqut/z0Dn24g3nof+T8ELbs3VBlTSfKrZn5a9rJipAIVpPHf4R5ms
+         geRuGOCDMRXA0VJpuVJP4LBuB2wKOR8t0pMK0ydjL/noad79Ln9rd9gR4K09Yigp8OiL
+         DdKbo3+N6Zugd2OsYQ1v1U274qIwZ9X5/qXrdS+Q0YJkuR6in4VKCP748LKocaOT+JcK
+         l0fe75i56AZN7d7fGh0Qn2Euhs8/39+Z3WI8wMXJaegPaoil0xYyf6Or69OVdzYrYMmP
+         Kmig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763635424; x=1764240224;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7oHOv6TarlQbLUVDxxSIUN/NgK6M7FvSaHEHJevpMjw=;
-        b=kD7Qgj3yqFNdfqEpdsCF+sOzwf9HSqtz+9xsTjGIASQoXjGupn629uLsLSBUmvDAyp
-         IoYEJSDWKHVCBuVm+S0Kh82gq8iZAvi2+EExvk1TFUxmPR9H3cGujHEEARIC8jKV+X5z
-         AJLyrM0cuUT3IMnrSJrSJlefvLzM3G/6m+vlkxc9NAcWjHq+U2jVpwDOVQaFICgNGhSN
-         xn6rqEioYQukZCfLg9Nk4VVg9w1l/G9hXC+oSfgbxnhBUT3WvH0mOIZSLDr/Dv5K0dwe
-         uxuFYgFGqJkq4hIkR82MwjHeHAx2VIVnClBTn76uYKATki6wGWU4RjyCpKV92qp1gZKe
-         L29A==
-X-Forwarded-Encrypted: i=1; AJvYcCXieLcjEWBFN1Gn3Cl+IN9CK55aMbgo5+Lo4++Ms43r3iUTgHUY/DWx/Or8yUTlPE/BRb18rJk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxo5yYckh2wrCkDkNZblpjS/qay4Wc2FqhCfthNSHKYM+5INHX4
-	bdhEX1u81lOLQd5dVM8bxtJoy4aJkWN8YmCU02zH3OyDoD+owRT8eoY52cuEFChJPts=
-X-Gm-Gg: ASbGncv0nE6UoV0P+yTLownubeWNy9KXqrk0HaOIedfAKbYe6x0cTyrdbWk+whKOxfX
-	uhk8dcaInFvv7WEd+F4eGZ5/JW1rtw1ihiPwHrXYoHvCKRpGr5B48OeUkuVeg+6Zjj+xK8HdGNK
-	aC3GZVwt2UE3D/3YtG9ptjhxTjE6uMs5bF68AVrC8R2XHX5pY/CjvQKOXvXjMNWCH2898S/1k4c
-	P1i5ZFA8ia9EX5HqTEOYEq1LPskIy1qQIH/bXyyZLGAQpeUtWOsSbcpitOo/hcpD/tCmmMBvPD5
-	Wa/lPS68RTMxMkGGgo7FFPUrkVxg+W33jr6M3c6uOrtDnLx8QV+60USXWGHJdT9giFQndbofvJr
-	roZxAI1ptBvbMeQeqH5OTVV7rSQ0RgFCTp/Wi2w4a6fY9x+YmzHDHqGErIa4JI4k10gCc206tvi
-	05jLXWhu1l9Oy0O1joWty+YDEtYpo4wJmtSI2c2kaLPsvqfyulVYBNGA==
-X-Google-Smtp-Source: AGHT+IEMgQ5A/ngM4oB7aYVi/VQg/3amHDLzSn7jIdobyyplBkmG3dA8rWbfZr7EIB9azrG7yf2qjA==
-X-Received: by 2002:a05:600c:1550:b0:477:a54a:acba with SMTP id 5b1f17b1804b1-477b9e1cbe5mr23604595e9.17.1763635424278;
-        Thu, 20 Nov 2025 02:43:44 -0800 (PST)
-Received: from [192.168.69.210] (88-187-86-199.subs.proxad.net. [88.187.86.199])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b831421fsm40121035e9.10.2025.11.20.02.43.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 02:43:43 -0800 (PST)
-Message-ID: <43427fac-db73-43af-bbf6-93bc3d978706@linaro.org>
-Date: Thu, 20 Nov 2025 11:43:42 +0100
+        d=1e100.net; s=20230601; t=1763638580; x=1764243380;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TPlzmXt4DNVBdqLVvxiBIWu8Rl4FZ4bDuiyypGx7MuQ=;
+        b=JhxFRvQ9c+jpHrm7ki01JLHO5ezoCBBmTPK5p0uDmBCzUO6U+sKK3JPkFh17F1Agj3
+         CZLY7Ly5FjpMi4F5qU/gquDVLpbcfJeozUN2gs728LJMfbvqyMvBVNommpzDPHX9sp87
+         RnuRd/DWyNyLCZh+P9aNtkSubgBZkBTU0KAQdl2Oza6s4XSeqldhw2eunUvEqiDvNUZL
+         e0RnpCrsBFJwD0K2FUMfJ/50f4b5H2hDT9nIhwkRemgQppSPMMHaymz62fCsdsmu6d+S
+         6mMPwuz4PQqYFovJKND52z03Zuax26yDmQmWUYiRnMge6rx172lzPvO8/WuFl+Pn36TZ
+         SU7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXXBy42T/qZAcRii5yHuG+JxMUJwUZO3v4X0qBjcRTTSYQD+X91MbLlqtj8k0vV0zlx0cVOmE4=@lists.linux.dev
+X-Gm-Message-State: AOJu0Ywmo7+e265PfCdSU9x9WlTX6WxFmoy6kmbtc2Mommvm2sVIjB1o
+	AQvhZz/FMtTLU9n1lSpe6yAnLLXvEBM5G+UgVfvDfC94i+0tbuvMOxvqZQTcroemGg==
+X-Gm-Gg: ASbGnctsvLKJwIYMySYeTPrmlk7CyXDVN6s8eLpwlhle22oNcCmVtL+JUAPNheyN/0T
+	6d+rduKDCmJz5698DhGnz54XrBn4bCaueAuvLMvzqgSwWAHriUSqKxi61uYpiGwlphnNAowq73Y
+	V03CljnupP+ZKxMaWtbZ3Kulsg0e6f61PF3JdQ03JvUgcCqtX6GiiIq+gmLuof3yTAdD3OdGJrb
+	IZqdtv0cbdO9/lMBMEZiFxfXcqnaJli7FkBNxdsh+GBRjYTpi4MrAlo2ScN2uIVOJ6HU9cJ/qxb
+	tT9huHAVQ0nmnTBxEv+vRwJa6jJSBUAA2nFAwSK72orkjV4j9Wu56UjvCRYj06G5tgN2AaDiapM
+	Rk861EA0BL2psS1kdGAXL04+P+C4jbKlWtXmY0P0RhWH+acHrAikfCEzkDAlYhoRNgOaqLVIeYP
+	fXTZH1H7tNIWyASKOA38Cf0iWx3qxSiJywtRRIbTupOeMhiiE83A==
+X-Google-Smtp-Source: AGHT+IGcOCRDUWPkVUZ7ncQTNFf+q64GbtuEHTlJs5oKc83ztKfhHnrQKRpzLVqerrPSrM7dBJtv3A==
+X-Received: by 2002:a05:600c:2e4c:b0:477:9890:4528 with SMTP id 5b1f17b1804b1-477b9ea31e9mr14670485e9.2.1763638580134;
+        Thu, 20 Nov 2025 03:36:20 -0800 (PST)
+Received: from google.com (120.54.38.34.bc.googleusercontent.com. [34.38.54.120])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477a9e1b657sm60238005e9.17.2025.11.20.03.36.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 03:36:19 -0800 (PST)
+Date: Thu, 20 Nov 2025 11:36:16 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>, g@google.com
+Cc: rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
+	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
+	kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 20/28] KVM: arm64: Add clock support for the pKVM hyp
+Message-ID: <aR79MCNlAKP1H-PQ@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+ <20251107093840.3779150-21-vdonnefort@google.com>
+ <86cy5erprc.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-Content-Language: en-US
-To: eric.auger@redhat.com, Sebastian Ott <sebott@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-References: <20251112181357.38999-1-sebott@redhat.com>
- <20251112181357.38999-3-sebott@redhat.com>
- <d4f17034-94d9-4fdb-9d9d-c027dbc1e9b3@linaro.org>
- <c082340f-31b1-e690-8c29-c8d39edf8d35@redhat.com>
- <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <a2d0ddf1-f00c-42dd-851d-53f2ec789986@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86cy5erprc.wl-maz@kernel.org>
 
-On 20/11/25 11:10, Eric Auger wrote:
-> 
-> 
-> On 11/13/25 1:05 PM, Sebastian Ott wrote:
->> Hi Philippe,
->>
->> On Wed, 12 Nov 2025, Philippe Mathieu-Daudé wrote:
->>> On 12/11/25 19:13, Sebastian Ott wrote:
->>>>   Provide a kvm specific vcpu property to override the default
->>>>   (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
->>>>   by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->>>>
->>>>   Note: in order to support PSCI v0.1 we need to drop vcpu
->>>>   initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->>>>
->>>>   Signed-off-by: Sebastian Ott <sebott@redhat.com>
->>>>   ---
->>>>     docs/system/arm/cpu-features.rst |  5 +++
->>>>     target/arm/cpu.h                 |  6 +++
->>>>     target/arm/kvm.c                 | 64
->>>> +++++++++++++++++++++++++++++++-
->>>>     3 files changed, 74 insertions(+), 1 deletion(-)
->>>
->>>
->>>>   diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>>>   index 0d57081e69..e91b1abfb8 100644
->>>>   --- a/target/arm/kvm.c
->>>>   +++ b/target/arm/kvm.c
->>>>   @@ -484,6 +484,49 @@ static void kvm_steal_time_set(Object *obj, bool
->>>>   value, Error **errp)
->>>>         ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON :
->>>>     ON_OFF_AUTO_OFF;
->>>>     }
->>>>
->>>>   +struct psci_version {
->>>>   +    uint32_t number;
->>>>   +    const char *str;
->>>>   +};
->>>>   +
->>>>   +static const struct psci_version psci_versions[] = {
->>>>   +    { QEMU_PSCI_VERSION_0_1, "0.1" },
->>>>   +    { QEMU_PSCI_VERSION_0_2, "0.2" },
->>>>   +    { QEMU_PSCI_VERSION_1_0, "1.0" },
->>>>   +    { QEMU_PSCI_VERSION_1_1, "1.1" },
->>>>   +    { QEMU_PSCI_VERSION_1_2, "1.2" },
->>>>   +    { QEMU_PSCI_VERSION_1_3, "1.3" },
->>>>   +    { -1, NULL },
->>>>   +};
->>>
->>>
->>>>   @@ -505,6 +548,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
->>>>                                  kvm_steal_time_set);
->>>>         object_property_set_description(obj, "kvm-steal-time",
->>>>                                         "Set off to disable KVM steal
->>>>   time.");
->>>>   +
->>>>   +    object_property_add_str(obj, "kvm-psci-version",
->>>>   kvm_get_psci_version,
->>>>   +                            kvm_set_psci_version);
->>>>   +    object_property_set_description(obj, "kvm-psci-version",
->>>>   +                                    "Set PSCI version. "
->>>>   +                                    "Valid values are 0.1, 0.2,
->>>> 1.0, 1.1,
->>>>   1.2, 1.3");
->>>
->>> Could we enumerate from psci_versions[] here?
->>>
->>
->> Hm, we'd need to concatenate these. Either manually:
->> "Valid values are " psci_versions[0].str ", " psci_versions[1].str ",
->> " ... which is not pretty and still needs to be touched for a new
->> version.
->>
->> Or by a helper function that puts these in a new array and uses smth like
->> g_strjoinv(", ", array);
->> But that's quite a bit of extra code that needs to be maintained without
->> much gain.
->>
->> Or we shy away from the issue and rephrase that to:
->> "Valid values include 1.0, 1.1, 1.2, 1.3"
-> Personally I would vote for keeping it as is
+[...]
 
-OK.
-
-> (by the way why did you
-> moit 0.1 and 0.2 above?)
+> > +/* Using host provided data. Do not use for anything else than debugging. */
+> > +u64 trace_clock(void)
+> > +{
+> > +	struct clock_data *clock = &trace_clock_data;
+> > +	u64 bank = smp_load_acquire(&clock->cur);
+> > +	u64 cyc, ns;
+> > +
+> > +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
 > 
-> Eric
->>
->> Since the intended use case is via machine types and I don't expect a
->> lot of users setting the psci version manually - I vote for option 3.
->>
->> Opinions?
->>
->> Sebastian
-> 
+> I can only imagine that you don't care about the broken systems that
+> do not have a monotonic counter, and that will happily have their
+> counter swing back and forth?
 
+I haven't used the _stable() variant for the affected devices... Hum this will
+not be trivial from the hypervisor. I'll see what I can do.
+
+> 
+> Also, you may want to document why you are using the physical counter
+> instead of the virtual one. I guess that you don't want CNTVOFF_EL2 to
+> apply when HCR_EL2.E2H==0, but given that you never allow anything
+> else for pKVM, this is slightly odd.
+
+You mean I might as well use __arch_counter_get_cntvct() as CNTVOFF_EL2 will
+always be ignored in the pKVM case?
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
