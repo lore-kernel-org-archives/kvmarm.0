@@ -1,159 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C613A8D5E;
-	Thu, 20 Nov 2025 17:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3A524A05D;
+	Thu, 20 Nov 2025 17:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659568; cv=none; b=DfPL+cgkKka98L5tbAeaZQRrvccP6MJ6YdjvU/5s5rnUuXFM6zrJOOTeL6KcvWNweAsM7eG5b4agixsTSrtlokPyjD0UcmBg7mL7IRC84uj80WgrSiA5RHCE/sTMx4PDNNOvbtSLBClHaiXo4bds3thito2jlYBVInZhnlAOveU=
+	t=1763659938; cv=none; b=NHAzwSH1r134DaB5xZcZihSmd5h6iqKRVQGj8Mu+AMoVIai8o/BJ5I3egmv83nHtM1B3FR0rRJhj5W4BNx7lBzys9HhigVoHsNSpMlS9zwsXFX3IG9UJVFTWp93AUtwvXXYdrcidyY3mQN0/vnCO1uowM5VmTGR5vU4XOFapPTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659568; c=relaxed/simple;
-	bh=aut+4Oafn6tB11/ooAwwuBkrUn/fot5spF2GxBcIs7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z3E4N8ITt0oUfYkhSmsMzteJMKOA/9UQSxUKR2AqOwABHHCzMv4zMk9PXOYb1Y1aVXr5/9EOsPByFFRksxpdOMQRDQ/V+WCiHg5ghE1W5+61AFF733sIquQh/dUvqylOOPrLCfvzPDuF80NAFdtpotANaQSXoI+nR428RTTeXdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbJbToWR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763659938; c=relaxed/simple;
+	bh=9/c+ELr1/fHues8ZWflDDWYNjH0kSYLiJWym/CrYVZw=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=frirblrSWPWetjmA3M53yFTkrJ1ZwYe4iGPA6UuDNxvncmLC6tOgO7xe7bjw7orLBp63Xsj/3BhdN6IolDorWXy1m3KTZGzDm5FDzpGV7lH0goPT+OJWXY7MXhYX7xH+RY9LNMS/5CGyDXAWqP4IHi+rpmKO0CXZsmFfyOs7Z1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=KPst2i0q; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbJbToWR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43BA0C4CEF1;
-	Thu, 20 Nov 2025 17:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763659568;
-	bh=aut+4Oafn6tB11/ooAwwuBkrUn/fot5spF2GxBcIs7Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NbJbToWRNgRwkvzsygqIiz0PcursXGfjNIDNxHKHIj5VRa+uRbwlf5HXzvqYs313Y
-	 ojkw1aej+bdTAg0Gy60WiGIGglkaPV0cEJ1LkXnq/kM1tyTS4WATYWTs3phGKXAg58
-	 RnxkZWY8amhU7oFnykOVV//SkNBEV1nh8kpymTQlDeToyNQE8xLKurv7UpeSElJIef
-	 EmIDsqkTMbJJPhPyyVqjIkNQlclRduyL5WFHzZf3Pyf4fLa+siojOyKHtAGc/22OJs
-	 tw/+wxxeyMdNl23FHTG9oRZatmySKH+kbPn/aL7p7Sz1xujJ+DMP0Deyt4TeoVFoHn
-	 A2kAGjgRttuCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vM8Q2-00000006y6g-1wYF;
-	Thu, 20 Nov 2025 17:26:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 49/49] KVM: arm64: selftests: vgic_irq: Add timer deactivation test
-Date: Thu, 20 Nov 2025 17:25:39 +0000
-Message-ID: <20251120172540.2267180-50-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="KPst2i0q"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=mXOkmgMomugKQo+k2FQLzUzQiiA115Atzcu83W/SPKg=;
+	b=KPst2i0qTU8MfV5I+OsuoeDxcG3Lkz28HjMKVG1+Rx8qvyV36gvjwjpYVza1wH324V/YkwW3J
+	yIuZNER1Un3TacpmCIV28Xh342p2DRNybKmBqoxha/V/Ny447FpfM3s0+RoV7OujF2BmHLnBn1M
+	YWx1ppycWMExhelFp8mPR4U=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dC53X51J1z1P7SP;
+	Fri, 21 Nov 2025 01:30:48 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC5432vNFzJ46CH;
+	Fri, 21 Nov 2025 01:31:15 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 384A71402FD;
+	Fri, 21 Nov 2025 01:32:01 +0800 (CST)
+Received: from localhost (10.48.159.58) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 20 Nov
+ 2025 17:32:00 +0000
+Date: Thu, 20 Nov 2025 17:31:57 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
+	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
+	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
+	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
+	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 06/11] coco: guest: arm64: Add support for reading
+ cached objects from host
+Message-ID: <20251120173157.00007fc4@huawei.com>
+In-Reply-To: <20251117140007.122062-7-aneesh.kumar@kernel.org>
+References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
+	<20251117140007.122062-7-aneesh.kumar@kernel.org>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, tabba@google.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Add a new test case that triggers the HW deactivation emulation path
-when trapping ICV_DIR_EL1. This is obviously tied to the way KVM
-works now, but the test follows the expected architectural behaviour.
+On Mon, 17 Nov 2025 19:30:02 +0530
+"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
 
-Tested-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- tools/testing/selftests/kvm/arm64/vgic_irq.c | 65 ++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+> Teach rsi_device_start() to pull the interface report and device
+> certificate from the host by querying size, sharing a decrypted buffer
+> for the read, copying the payload to private memory. Also track the
+> fetched blobs in struct cca_guest_dsc so later stages can hand them to
+> the attestation flow.
+> 
+> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
+> ---
+>  arch/arm64/include/asm/rhi.h             |  7 +++
+>  drivers/virt/coco/arm-cca-guest/rhi-da.c | 80 ++++++++++++++++++++++++
+>  drivers/virt/coco/arm-cca-guest/rhi-da.h |  1 +
+>  drivers/virt/coco/arm-cca-guest/rsi-da.h |  8 +++
+>  4 files changed, 96 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
+> index ce2ed8a440c3..738470dfb869 100644
+> --- a/arch/arm64/include/asm/rhi.h
+> +++ b/arch/arm64/include/asm/rhi.h
+> @@ -39,6 +39,13 @@
+>  				 RHI_DA_FEATURE_VDEV_SET_TDI_STATE)
+>  #define RHI_DA_FEATURES			SMC_RHI_CALL(0x004B)
+>  
+> +#define RHI_DA_OBJECT_CERTIFICATE		0x1
+> +#define RHI_DA_OBJECT_MEASUREMENT		0x2
+> +#define RHI_DA_OBJECT_INTERFACE_REPORT		0x3
+> +#define RHI_DA_OBJECT_VCA			0x4
+> +#define RHI_DA_OBJECT_SIZE		SMC_RHI_CALL(0x004C)
+> +#define RHI_DA_OBJECT_READ		SMC_RHI_CALL(0x004D)
+> +
+>  #define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
+>  #define RHI_DA_VDEV_GET_INTERFACE_REPORT SMC_RHI_CALL(0x0052)
+>  
+> diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
+> index aa17bb3ee562..d29aee0fca58 100644
+> --- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
+> +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
+> @@ -248,3 +248,83 @@ int rhi_update_vdev_measurements_cache(struct pci_dev *pdev,
+>  
+>  	return ret;
+>  }
+> +
+> +int rhi_read_cached_object(int vdev_id, int da_object_type, void **object, int *object_size)
+> +{
+> +	int ret;
+> +	int max_data_len;
+> +	struct page *shared_pages;
+> +	void *data_buf_shared, *data_buf_private;
+> +	struct rsi_host_call *rhicall;
+> +
+> +	rhicall = kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
+> +	if (!rhicall)
+> +		return -ENOMEM;
+> +
+> +	rhicall->imm = 0;
+> +	rhicall->gprs[0] = RHI_DA_OBJECT_SIZE;
+> +	rhicall->gprs[1] = vdev_id;
+> +	rhicall->gprs[2] = da_object_type;
+> +
+> +	ret = rsi_host_call(virt_to_phys(rhicall));
+> +	if (ret != RSI_SUCCESS) {
+> +		ret = -EIO;
+> +		goto err_return;
+> +	}
+> +
+> +	if (rhicall->gprs[0] != RHI_DA_SUCCESS) {
+> +		ret = -EIO;
+> +		goto err_return;
+> +	}
+> +
+> +	/* validate against the max cache object size used on host. */
+> +	max_data_len = rhicall->gprs[1];
+> +	if (max_data_len > MAX_CACHE_OBJ_SIZE || max_data_len == 0) {
+> +		ret = -EIO;
+> +		goto err_return;
+> +	}
+> +	*object_size = max_data_len;
 
-diff --git a/tools/testing/selftests/kvm/arm64/vgic_irq.c b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-index ff2c75749f5c5..9858187c7b6ea 100644
---- a/tools/testing/selftests/kvm/arm64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/arm64/vgic_irq.c
-@@ -894,6 +894,70 @@ static void guest_code_group_en(struct test_args *args, int cpuid)
- 	GUEST_DONE();
- }
- 
-+static void guest_code_timer_spi(struct test_args *args, int cpuid)
-+{
-+	uint32_t intid;
-+	u64 val;
-+
-+	gic_init(GIC_V3, 2);
-+
-+	gic_set_eoi_split(1);
-+	gic_set_priority_mask(CPU_PRIO_MASK);
-+
-+	/* Add a pending SPI so that KVM starts trapping DIR */
-+	gic_set_priority(MIN_SPI + cpuid, IRQ_DEFAULT_PRIO);
-+	gic_irq_set_pending(MIN_SPI + cpuid);
-+
-+	/* Configure the timer with a higher priority, make it pending */
-+	gic_set_priority(27, IRQ_DEFAULT_PRIO - 8);
-+
-+	isb();
-+	val = read_sysreg(cntvct_el0);
-+	write_sysreg(val, cntv_cval_el0);
-+	write_sysreg(1, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(gic_irq_get_pending(27));
-+
-+	/* Enable both interrupts */
-+	gic_irq_enable(MIN_SPI + cpuid);
-+	gic_irq_enable(27);
-+
-+	/* The timer must fire */
-+	intid = wait_for_and_activate_irq();
-+	GUEST_ASSERT(intid == 27);
-+
-+	/* Check that we can deassert it */
-+	write_sysreg(0, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(!gic_irq_get_pending(27));
-+
-+	/*
-+	 * Priority drop, deactivation -- we expect that the host
-+	 * deactivation will have been effective
-+	 */
-+	gic_set_eoi(27);
-+	gic_set_dir(27);
-+
-+	GUEST_ASSERT(!gic_irq_get_active(27));
-+
-+	/* Do it one more time */
-+	isb();
-+	val = read_sysreg(cntvct_el0);
-+	write_sysreg(val, cntv_cval_el0);
-+	write_sysreg(1, cntv_ctl_el0);
-+	isb();
-+
-+	GUEST_ASSERT(gic_irq_get_pending(27));
-+
-+	/* The timer must fire again */
-+	intid = wait_for_and_activate_irq();
-+	GUEST_ASSERT(intid == 27);
-+
-+	GUEST_DONE();
-+}
-+
- static void *test_vcpu_run(void *arg)
- {
- 	struct kvm_vcpu *vcpu = arg;
-@@ -1011,6 +1075,7 @@ int main(int argc, char **argv)
- 		test_vgic(nr_irqs, true /* level */, true /* eoi_split */);
- 		test_vgic_two_cpus(guest_code_asym_dir);
- 		test_vgic_two_cpus(guest_code_group_en);
-+		test_vgic_two_cpus(guest_code_timer_spi);
- 	} else {
- 		test_vgic(nr_irqs, level_sensitive, eoi_split);
- 	}
--- 
-2.47.3
+I raise this below, but not sure why this is set way before setting
+*object.  Can set it later and use max_data_len which I think is
+clearer naming anyway.
+
+> +
+> +	data_buf_private = kmalloc(*object_size, GFP_KERNEL);
+> +	if (!data_buf_private) {
+> +		ret = -ENOMEM;
+> +		goto err_return;
+> +	}
+> +
+> +	shared_pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL, max_data_len);
+> +	if (!shared_pages) {
+> +		ret = -ENOMEM;
+> +		goto err_shared_alloc;
+> +	}
+> +	data_buf_shared = page_address(shared_pages);
+> +
+> +	rhicall->imm = 0;
+> +	rhicall->gprs[0] = RHI_DA_OBJECT_READ;
+> +	rhicall->gprs[1] = vdev_id;
+> +	rhicall->gprs[2] = da_object_type;
+> +	rhicall->gprs[3] = 0; /* offset within the data buffer */
+> +	rhicall->gprs[4] = max_data_len;
+> +	rhicall->gprs[5] = virt_to_phys(data_buf_shared);
+> +	ret = rsi_host_call(virt_to_phys(rhicall));
+> +	if (ret != RSI_SUCCESS || rhicall->gprs[0] != RHI_DA_SUCCESS) {
+> +		ret = -EIO;
+> +		goto err_rhi_call;
+> +	}
+> +
+> +	memcpy(data_buf_private, data_buf_shared, *object_size);
+
+Given data_buf_private() only seems useful if we aren't in an error
+condition, why not move allocation to here and use kmemdup() ?
+
+> +	free_shared_pages(shared_pages, max_data_len);
+> +
+> +	*object = data_buf_private;
+> +	kfree(rhicall);
+> +	return 0;
+> +
+> +err_rhi_call:
+> +	free_shared_pages(shared_pages, max_data_len);
+> +err_shared_alloc:
+> +	kfree(data_buf_private);
+> +err_return:
+> +	*object = NULL;
+
+Is it necessary to zero the passed in variable given this function never
+touched it and is returning an error. If it is, can you do that unconditionally
+at start of function and override only on success?
+
+> +	*object_size = 0;
+
+Likewise for the size - I'm not sure why you set that much earlier
+than *object.
+
+With those two gone, this feels like it would be well suited for
+some __free magic to handle everything here.
+You will need to deal with the free_shared_pages() though which will
+require an extra structure definition and helpers to wrap up what
+is allocated - similar to what tdx_page_array_alloc does (though without
+the bulk aspects of that)
+
+http://lore.kernel.org/all/20251117022311.2443900-7-yilun.xu@linux.intel.com/
+
+Or given the shared page stuff is the inner most aspect anyway you could
+just do a helper function from alloc_shared_pages to free_shared_pages
+calls so that you can call that free_shared_pages unconditionally before
+checking return value.
+
+Note that if you do go with DEFINE_FREE() you 'could' pass in the storage.
+I objected to that elsewhere but there is precedence.  So have a
+struct shared_pages {
+	struct page *page;
+	size_t order;
+}
+define one on the stack and pass it in so that you avoid an extra allocation.
+Not a pattern I particularly like though and this isn't expected to be
+a particularly fast path so I'd just dynamically allocate a struct shared_pages
+inside alloc_shared_pages.
+
+
+> +	kfree(rhicall);
+> +	return ret;
+> +}
+
 
