@@ -1,277 +1,168 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B9036C5B4;
-	Thu, 20 Nov 2025 15:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF462357A25;
+	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763652136; cv=none; b=GUoLHEQOLGDsjrW0bhfUqW/XumYU4Ijx3PMtJTA8tablYf3+AH4jfXw3FyX1TdlrwltpmYDl77fmqlVG5ST/FcCICwfNHeOryHklnYipEClGwXYn3c/Mp/kkp7CN+qXMqqIgZ0y3M0KpMOzBtTliHZ19N2t9bG7d7/m+uRcf77A=
+	t=1763655520; cv=none; b=IDYYt/XveXVtJKcgNWAIzruUfdITSPlKYjj12ViuLKTZrcTMuSTk+xfK3dDOaOd3cWIY49Kmh4UuLvx2Br8ErRey56+1UcFXkwuD1P4Q2q/Qqqx42R3uCDdEpU14RCsAnvg2Yf7ftQ+j9CDDER9C+E+ElebQJ7lFdHyEiIpTER8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763652136; c=relaxed/simple;
-	bh=HTP7ZG0JLrR72YEpCQPOqmegXIQklqpfc1T/tjAQ2gk=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KlAuiMe5vaaDGB6EuuSSObIbcttg5clvovEGCFXtKpmwArRsiT0mG0LIKWQL4M/vWbCtPde6SWWl4qMLMUVuK+Oefx4CmgeZAe6hERy+DBK8yoaELdz+h2MalNPwDsC5B/sykFPwJtbT09/5CO4KmeVPUpocW3qoqpg5tyuzo7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=P8suQuB5; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763655520; c=relaxed/simple;
+	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=np0ChZucCjk5bW3x4mKajAwtKKFCmB2cMSAqCN5cyuAjn9aSUNtq/G+3/oNO2JomY6Qr/moA8XpODZZ3+bkl6nCJhamCSj5hBD8Yeotn8mETUrlo+3ZrHW3YpMPhqkg6rWDnPSCmGm5bXQM5/A/21WEV16XKNGMmCZnFpKtbIJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCG19c7v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="P8suQuB5"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=tvyyaDNHmQ2x14W2WTsi4Y3M6d5AXJBaR91q3uubHa8=;
-	b=P8suQuB5PwqZjD42T1LpU9x6a8G94VQmb+EdDJjHp0fTt7YXE26W7pr8ZZrt97isNy5JuW9Rz
-	ocf1+lQIxqsN3ZKHxy8a8YaH1AUNkjARqjJP5a5D92bNNF0QuEppUN9AcB2CxojIm8BRpYUIz9E
-	aBYU43M1xRf+aQpZAtfvHCo=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dC29f6KB8z1vpBc;
-	Thu, 20 Nov 2025 23:20:54 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC2B73cfPzJ46Yf;
-	Thu, 20 Nov 2025 23:21:19 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2CD101402F1;
-	Thu, 20 Nov 2025 23:22:05 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 20 Nov
- 2025 15:22:04 +0000
-Date: Thu, 20 Nov 2025 15:22:02 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 05/11] coco: guest: arm64: Add support for updating
- measurements from device
-Message-ID: <20251120152202.00001efb@huawei.com>
-In-Reply-To: <20251117140007.122062-6-aneesh.kumar@kernel.org>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
-	<20251117140007.122062-6-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCG19c7v"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3344DC4CEF1;
+	Thu, 20 Nov 2025 16:18:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763655520;
+	bh=KwZ0JhnSDCNZyZyVN2OkoVg0lxuvRbqfuZ3B6h7NGRg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MCG19c7vrB14C6fJ+JhzzKXYDKpEsqcAEaaJONS7bVM706UHdAmzQmi6Cb3od5awI
+	 WRw4jQH663YReAPOCN1shTzYGWuEan0maY0zVHg6X/AOE2k2rsI+HfYDQPXjzSeRiF
+	 Fk/rAuUySTn8H38h+yJEmVTMzrTXBnsd87zsW6g9B3TH1wnn6ArRc/6IMorry3cgcE
+	 huPOZdYkq4T25oR8OUMHtrj2mYVkT4mkiajE72ylz7TjVCyaj0NIGpT8qytz4rbiVp
+	 yh/jzx84pAzuxwooUxaP6B8h3FuX8fzsJfj8SGgtCE8VkS5brlkFCuk/TjKVlsewCt
+	 X0FVYGbc88fzw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vM7Mj-00000006wt3-47F0;
+	Thu, 20 Nov 2025 16:18:38 +0000
+Date: Thu, 20 Nov 2025 16:18:37 +0000
+Message-ID: <864iqosmn6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Maximilian Dittgen <mdittgen@amazon.de>
+Cc: <oliver.upton@linux.dev>,
+	<pbonzini@redhat.com>,
+	<shuah@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>,
+	<linux-kselftest@vger.kernel.org>,
+	<kvm@vger.kernel.org>,
+	<lilitj@amazon.de>,
+	<sauravsc@amazon.de>,
+	<nh-open-source@amazon.com>
+Subject: Re: [RFC PATCH 01/13] KVM: Introduce config option for per-vCPU vLPI enablement
+In-Reply-To: <20251120140305.63515-2-mdittgen@amazon.de>
+References: <20251120140305.63515-1-mdittgen@amazon.de>
+	<20251120140305.63515-2-mdittgen@amazon.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mdittgen@amazon.de, oliver.upton@linux.dev, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, lilitj@amazon.de, sauravsc@amazon.de, nh-open-source@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 19:30:01 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
-
-> Fetch device measurements using RSI_RDEV_GET_MEASUREMENTS. The fetched
-> device measurements will be cached in the host.
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-Hi Aneesh
-
-Minor stuff inline.
-
-thanks
-
-Jonathan
-
+On Thu, 20 Nov 2025 14:02:50 +0000,
+Maximilian Dittgen <mdittgen@amazon.de> wrote:
+>=20
+> Add CONFIG_ARM_GIC_V3_PER_VCPU_VLPI to control whether vLPI direct
+> injection is to be enabled on a system-wide or a per-vCPU basis.
+>=20
+> When enabled, vPEs can be allocated/deallocated to vCPUs on an ad-hoc,
+> per-vCPU basis in runtime. When disabled, keep current vgic_v4_init
+> behavior of automatic vCPU vPE allocation upon VM initialization.
+>=20
+> We declare three ioctls numbers to manage per-vCPU vLPI enablement:
+> - KVM_ENABLE_VCPU_VLPI, which given a vCPU ID, allocates a vPE and
+> initializes the vCPU for receiving direct vLPI interrupts.
+> - KVM_DISABLE_VCPU_VLPI, which given a vCPU ID, disables the vCPU=E2=80=
+=99s
+> ability to receive direct vLPI interrupts and frees its underlying vPE
+> structure.
+> - KVM_QUERY_VCPU_VLPI, which given a vCPU ID, returns a boolean
+> describing whether the vCPU is configured to receive direct vLPI
+> interrupts.
+>=20
+> This commit declares the kconfig, ioctl numbers, and documentation.
+> Implementation will come throughout this patch set.
+>=20
+> Signed-off-by: Maximilian Dittgen <mdittgen@amazon.de>
 > ---
->  arch/arm64/include/asm/rhi.h             | 19 ++++++++
->  drivers/virt/coco/arm-cca-guest/rhi-da.c | 48 ++++++++++++++++++++
->  drivers/virt/coco/arm-cca-guest/rhi-da.h |  2 +
->  drivers/virt/coco/arm-cca-guest/rsi-da.c | 58 ++++++++++++++++++++++++
->  drivers/virt/coco/arm-cca-guest/rsi-da.h |  2 +
->  5 files changed, 129 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/rhi.h b/arch/arm64/include/asm/rhi.h
-> index 5f140015afc3..ce2ed8a440c3 100644
-> --- a/arch/arm64/include/asm/rhi.h
-> +++ b/arch/arm64/include/asm/rhi.h
-> @@ -42,6 +42,25 @@
->  #define RHI_DA_VDEV_CONTINUE		SMC_RHI_CALL(0x0051)
->  #define RHI_DA_VDEV_GET_INTERFACE_REPORT SMC_RHI_CALL(0x0052)
->  
-> +#define RHI_VDEV_MEASURE_SIGNED		BIT(0)
-> +#define RHI_VDEV_MEASURE_RAW		BIT(1)
-> +#define RHI_VDEV_MEASURE_EXCHANGE	BIT(2)
-Whilst I appreciate the specs are still subject to minor changes, 
-it would be very helpful if definitions like the ones above were
-all accompanied by a spec reference.
-
-Which is another way of saying I can't find these ones ;)
-
-> +struct rhi_vdev_measurement_params {
-> +	union {
-> +		u64 flags;
-> +		u8 padding0[256];
-> +	};
-> +	union {
-> +		u8 indices[32];
-> +		u8 padding1[256];
-> +	};
-> +	union {
-> +		u8 nonce[32];
-> +		u8 padding2[256];
-> +	};
-> +};
-> +#define RHI_DA_VDEV_GET_MEASUREMENTS	SMC_RHI_CALL(0x0053)
+>  Documentation/virt/kvm/api.rst | 56 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/arm.c           | 15 +++++++++
+>  arch/arm64/kvm/vgic/vgic-v4.c  |  9 ++++++
+>  arch/arm64/kvm/vgic/vgic.h     |  2 ++
+>  drivers/irqchip/Kconfig        | 13 ++++++++
+>  include/uapi/linux/kvm.h       |  6 ++++
+>  6 files changed, 101 insertions(+)
+>=20
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 27f726ff8fe0..dcfb326dff10 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6517,6 +6517,62 @@ the capability to be present.
+> =20
+>  `flags` must currently be zero.
+> =20
+> +4.XXX KVM_ENABLE_VCPU_VLPI
+> +--------------------------
 > +
->  #define RHI_DA_TDI_CONFIG_UNLOCKED		0x0
->  #define RHI_DA_TDI_CONFIG_LOCKED		0x1
->  #define RHI_DA_TDI_CONFIG_RUN			0x2
-> diff --git a/drivers/virt/coco/arm-cca-guest/rhi-da.c b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> index f4fb8577e1b5..aa17bb3ee562 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> +++ b/drivers/virt/coco/arm-cca-guest/rhi-da.c
-> @@ -200,3 +200,51 @@ int rhi_update_vdev_interface_report_cache(struct pci_dev *pdev)
->  
->  	return ret;
->  }
+> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: int vcpu_id (in)
+> +:Returns: 0 on success, negative value on error
 > +
-> +static inline int rhi_vdev_get_measurements(unsigned long vdev_id,
-> +					    phys_addr_t vdev_meas_phys,
-> +					    unsigned long *cookie)
-> +{
-> +	unsigned long ret;
+> +This ioctl enables GICv4 direct vLPI injection for the specified vCPU.
+> +Allocates vPE structures (doorbell IRQ, vPE table entry, virtual pending
+> +table, vPEID) and upgrades existing software-forwarded LPIs targeting
+> +this vCPU to hardware-forwarded vLPIs.
 > +
-> +	struct rsi_host_call *rhi_call __free(kfree) =
-> +		kmalloc(sizeof(struct rsi_host_call), GFP_KERNEL);
-
-sizeof(*rhi_call) slightly preferred.
-
-> +	if (!rhi_call)
-> +		return -ENOMEM;
+> +If GICv4.1 is supported and vSGIs are disabled on the specified vCPU,
+> +this ioctl enables vCPU vSGI support.
 > +
-> +	rhi_call->imm = 0;
-> +	rhi_call->gprs[0] = RHI_DA_VDEV_GET_MEASUREMENTS;
-> +	rhi_call->gprs[1] = vdev_id;
-> +	rhi_call->gprs[2] = vdev_meas_phys;
+> +Requires CONFIG_ARM_GIC_V3_PER_VCPU_VLPI and GICv4 hardware support.
 > +
-> +	ret = rsi_host_call(virt_to_phys(rhi_call));
-> +	if (ret != RSI_SUCCESS)
-> +		return -EIO;
+> +Returns -EINVAL if vGICv4 is not initialized or if the passed vcpu_id
+> +does not map to a vCPU.
 > +
-> +	*cookie = rhi_call->gprs[1];
-> +	return map_rhi_da_error(rhi_call->gprs[0]);
-> +}
+> +4.XXX KVM_DISABLE_VCPU_VLPI
+> +---------------------------
 > +
-
-
-> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-> index c8ba72e4be3e..aa6e13e4c0ea 100644
-> --- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
-> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-> @@ -4,6 +4,7 @@
->   */
->  
->  #include <linux/pci.h>
-> +#include <linux/mem_encrypt.h>
->  #include <asm/rsi_cmds.h>
->  
->  #include "rsi-da.h"
-> @@ -35,9 +36,50 @@ int cca_device_unlock(struct pci_dev *pdev)
->  	return 0;
->  }
->  
-> +struct page *alloc_shared_pages(int nid, gfp_t gfp_mask, unsigned long min_size)
-> +{
-> +	int ret;
-> +	struct page *page;
-> +	/* We should normalize the size based on hypervisor page size */
-> +	int page_order = get_order(min_size);
+> +:Capability: KVM_CAP_ARM_PER_VCPU_VLPI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: int vcpu_id (in)
+> +:Returns: 0 on success, negative value on error
 > +
-> +	/* Always request for zero filled pages */
+> +This ioctl disables GICv4 direct vLPI injection for the specified vCPU.
+> +Downgrades hardware-forwarded vLPIs to software-forwarded LPIs and frees
+> +vPE structures. Pending interrupts in the virtual pending table may be
+> +lost.
 
-Not sure the comment is necessary given the visible flag.
-If you were saying 'why' then a comment would be fine, but this is just
-repeating what we can see in the code.
+I'm going to put my foot down on that immediately.
 
-> +	page = alloc_pages_node(nid, gfp_mask | __GFP_ZERO, page_order);
+There is no conceivable case where losing interrupts in acceptable.
+Ever. If that's what you want, please write your own hypervisor. I
+wish you luck!
+
 > +
-> +	if (!page)
-> +		return NULL;
-> +
-> +	ret = set_memory_decrypted((unsigned long)page_address(page),
-> +				   1 << page_order);
-> +	/*
-> +	 * If set_memory_decrypted() fails then we don't know what state the
-> +	 * page is in, so we can't free it. Instead we leak it.
-> +	 * set_memory_decrypted() will already have WARNed.
-> +	 */
-> +	if (ret)
-> +		return NULL;
-> +
-> +	return page;
-> +}
-> +
-> +int free_shared_pages(struct page *page, unsigned long min_size)
-> +{
-> +	int ret;
-> +	/* We should normalize the size based on hypervisor page size */
-> +	int page_order = get_order(min_size);
-> +
-> +	ret = set_memory_encrypted((unsigned long)page_address(page), 1 << page_order);
-> +	/* If we fail to mark it encrypted don't free it back */
-> +	if (!ret)
-> +		__free_pages(page, page_order);
-> +	return ret;
-If failing to mark it encrypted is an error I'd find it easier to read this if it were
-out of line.
+> +If vSGIs are enabled on the specified vCPU, this ioctl disables them.
 
-	ret = set_memory...
-	if (ret)
-		return ret;
+So what? Something that didn't have an active state now has one that
+the guest doesn't know about? There is exactly *one* bit that defines
+that, and it doesn't exist in some quantum superposition.
 
-	__free_pages();
+This whole thing is completely insane, has not been thought out at
+all, is ignoring the basis of the architecture, and I'm really sorry
+that you wasted your time on that.
 
-	return 0;
+	M.
 
-This is just a preference as someone who reads a lot of code.  Having error handling
-as the out of line path is more common and so what my brain (and other reviewers)
-has long been trained to expect.
-
-> +}
-> +
->  int cca_update_device_object_cache(struct pci_dev *pdev, struct cca_guest_dsc *dsc)
->  {
->  	int ret;
-> +	struct page *shared_pages;
-> +	struct rhi_vdev_measurement_params *dev_meas;
->  
->  	ret = rhi_update_vdev_interface_report_cache(pdev);
->  	if (ret) {
-> @@ -45,5 +87,21 @@ int cca_update_device_object_cache(struct pci_dev *pdev, struct cca_guest_dsc *d
->  		return ret;
->  	}
->  
-> +	shared_pages = alloc_shared_pages(NUMA_NO_NODE, GFP_KERNEL, sizeof(struct rhi_vdev_measurement_params));
-
-Perhaps sizeof(*dev_meas) would be both shorter and clearer.
-
-> +	if (!shared_pages)
-> +		return -ENOMEM;
-> +
-> +	dev_meas = (struct rhi_vdev_measurement_params *)page_address(shared_pages);
-> +	/* request for signed full transcript */
-> +	dev_meas->flags = RHI_VDEV_MEASURE_SIGNED | RHI_VDEV_MEASURE_EXCHANGE;
-> +	/* request all measurement block. Set bit 254 */
-> +	dev_meas->indices[31] = 0x40;
-> +	ret = rhi_update_vdev_measurements_cache(pdev, dev_meas);
-> +
-> +	free_shared_pages(shared_pages, sizeof(struct rhi_vdev_measurement_params));
-
-It might be worth appropriate DEFINE_FREE() magic to to stash the size away
-and simplify this a tiny bit. Kind of depends on whether this is a one off
-or those helpers are going to get a reasonable amount of use.
-
-> +	if (ret) {
-> +		pci_err(pdev, "failed to get device measurement (%d)\n", ret);
-> +		return ret;
-> +	}
->  	return 0;
->  }
+--=20
+Without deviation from the norm, progress is not possible.
