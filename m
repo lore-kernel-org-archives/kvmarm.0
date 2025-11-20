@@ -1,200 +1,128 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BF22E88A1
-	for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 09:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE1E2DE711
+	for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 09:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763630372; cv=none; b=DoJ7Y1Z7Id4YnPnnBqo2QBXCR7iuBItiv67JMXaHE5aZWSOIiePd2I6Ehb62xeLJj/CkLzapbPM10iZMjiG7AMQv6W63JtLZgDy+ggH85dxJt0+A8n8mTXQCUs45eaU1V+q1AYuBU+EwBBNtUbgupLPRt32tKv6OX2aMDmxzwdc=
+	t=1763632521; cv=none; b=aBRSweV0YTRsqkXl402qqAuDghFHdQHL4laB/xBtbBjZ4ew16XEf/o3pL6FSnPZFuMpCyLN/oewUIdAtbxYX5XJ32ZmWhP6pyVZ1xf61mgMEQTKH/tJaur459A6+6BBtmUSGctX64WoLOu8vY4aWSPjL9SFbPwY9Z7Ry91S6I8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763630372; c=relaxed/simple;
-	bh=y5wMycaqef501Ldy2X5EI+znPj+titPOSLVRy2EdgVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NgG+hCMbzhZXqo6kysndObUF/hQ8wIDavDbXSgDPKIYF9VKx9RtfA22UoUvodXl7Yu9EQeZDJLZ1M7miH3/dJw7wahnvdtJIKGQ9/iFT8s0eGgpbQ9+T3CLf35bBWW9iL2s1s0rdCXW1p5sbr6yrB28R8ckLmfx0ex8RTddTxsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dyHlJx9H; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1763632521; c=relaxed/simple;
+	bh=ArxGOMiOJjMc3O/3BTttrN1R0+lQiHUEPUxEsA7xDDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZX1gWnQW0hvQowAAJuxX7BxY9w+FKKCNtJW9E0EKiFFn1Gb1kmer55LzJYyL/SwHna+tE1S3i6eVEA3tDaN8d7097nWAnooV06/AI1aERDvyLmJq7rJCNYPzllbk8rABy5GLaFswP8VQBWMmP1TKfZlO9oK4eAG4pwY1SI/tll8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mumKMI8G; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dyHlJx9H"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so6869195e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 01:19:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mumKMI8G"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477a219db05so4318945e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 20 Nov 2025 01:55:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1763630368; x=1764235168; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=20kuTsLD7mzN21Mbsnm6zJe9RI36sxYDFDB3fVbVRPA=;
-        b=dyHlJx9HzveUshPJ/4tfRq7r8nA12p5JbJbi1uclyciweRAwG5gJiuQyxOMe3aL9H+
-         DSvsZptulN3xov7Ezrp6G2h/EWnSGx8GiDXouAWILgVF3fJzjL4iswzWX9R4XgNTmEZZ
-         KOACWx+bqOar7KR61jErO76+G15KC6j9gpFAC/D1FW9Nx0mk4Tsg26F2t2XEdD4bcpMA
-         QeJAE9Hm9oTWREIuu9wDlgWBIJBz+tfFSO6SFrU2DI3nv9VmlXxVd2jCe3UmmJmiXlPX
-         CZlfi2rippu60afN0mXsNckWypJxPMBt997AF997qit5ca+Fsmlvq0xnTZa6d6Q2GF8M
-         m19w==
+        d=google.com; s=20230601; t=1763632518; x=1764237318; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJ1a6GXdAz13/z+frt7ZsPUiHK+rVmDTT+AWenA3aKw=;
+        b=mumKMI8G41H8H9Vx4jR8ykTyHhYfDChbtHeJNZbPAoIYzE+Fdxk4jbpxQeutevlELd
+         sWTOgIM8bKCiJ3k0ilEEU5gPPAIcsYw7MHTGxUghEhTL1VyeU/3Nc87Ioex+anTf+7I8
+         oeS9/ZzwbwPbZSQYRV2Y9BbZc/uBor6WXJgfHlD+DLYXcpOY4Z3Ic+FoG8k1DBXEV+MQ
+         KbPoBQ1Ej6/LXAt9xrqz7X27REqyTB9waslmojUsKJ2o3xBtQcaWdyP2ENl2+14XFLIc
+         Ir49+QM3W+a+xFD5+AzVezZmAXOWDJd44qfErMxXfTm9HSjnq3vEqnzaEhCbySkL7UoQ
+         QwUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763630368; x=1764235168;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=20kuTsLD7mzN21Mbsnm6zJe9RI36sxYDFDB3fVbVRPA=;
-        b=RzX7wHPhNa0m5IC3fJzJJdotM6xqV1RY5wv4MYs/VFrc3luz1Gcbt8j2x7EGsZe2EV
-         19gq1rxaVecTWNo9uPKp2OjyNEX/4/snSy5uWXLEQmOEjBKGRxX4PgO1SKDGSRXv4hnB
-         Llm8lzPRAVh3lFz8L9zEQGFtbmmKMlFSsucXxq1ZnWdxwPpb4FbrRc15GgsPYzf70Q3s
-         BjhX61ZB/X4biOJM3U2DJPB5GUsHnxXRr3kX/XRnWbyVxdlTmI6H/CR9bP1++UPhXuXl
-         7I41vhCmIHwDZ158NPI80pPZfCG1leNrs+rNvEyPs3e08Xf0Sgn0/zQWq/3rXcnalIMu
-         1Q9g==
-X-Forwarded-Encrypted: i=1; AJvYcCXrCYmhWPHHHeC0fNwJSdAXI79MNB2qx9e+HJzmXLaW8bv61fCP3ubPMnf2vGzeVBi4QyxkyWg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yxn9tNFnzwkVhub8QA28AMDgbGAA3pvQKiAHKVdF9Rh4BxFhvZK
-	pTh8OUs0vukMj/xpxyJtRRYCrJDzaqikZL0HzIOQL9K0deYb5Fm+BA1DxQQAkwDbKWs=
-X-Gm-Gg: ASbGnctkrHRHxt5iQl4W8K3LOKi+oePNmoOz9kijvXGxwHaG7St9D4KfOd++m8Lrgr0
-	tRSGDXhJfTwxUp7Kd+5j0K4ywev8ABfEvgWncWb0rSielz9wI+Z1tBnhM0oiTFuD1MRvlg9eY5j
-	4s3oE7UnQhlZ3dtqkx+aZyyUUGe76qACntiTEDTRL9hQlzYtWSR3kXGxFmTgY6+kNGWMVX+8DvB
-	37EymmWeBqa0nzETbKove179gtCz1j4foW8k2f5HzkPx3SJ9QHDo7khtwDqRDqR+SoztJ+SnEdz
-	8p1llCwC6K1y6Mi9Rh1+UV20FqgCwzovp84KxUIRHBDEsNO4REwrqvTZUZ21eHhpHZZ5jv9YBtb
-	ruTPXhb+vx+nZ2gkFZaTCh5sM2VDYz8v957tr6qSbBmVprkTL8JXDa22nF9dzz/nnx38PnFl/Wg
-	bKi5/9QEWFYMvy0sBe
-X-Google-Smtp-Source: AGHT+IG5tl/whbs/s+74YcG+m53Ghp9OLB4xBZ6tsdMgU8rY+wexmvaqdkIZY2ULXyjStCQ5oVkWfQ==
-X-Received: by 2002:a05:600c:358f:b0:477:9650:3175 with SMTP id 5b1f17b1804b1-477b835c667mr30933245e9.0.1763630367552;
-        Thu, 20 Nov 2025 01:19:27 -0800 (PST)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b831ad3fsm36561245e9.12.2025.11.20.01.19.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Nov 2025 01:19:27 -0800 (PST)
-Message-ID: <d3dca311-5f2b-406f-a91b-0c5bf4dcb7ce@linaro.org>
-Date: Thu, 20 Nov 2025 09:19:25 +0000
+        d=1e100.net; s=20230601; t=1763632518; x=1764237318;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XJ1a6GXdAz13/z+frt7ZsPUiHK+rVmDTT+AWenA3aKw=;
+        b=Yt+GIEwqBh98332oT3f7vAHo43Qve3EEUpga/1ZZ+djytLyNdcVgPypU9OKfqf5ou7
+         8GfAPPmjTMEfw3g5YzzrO3gkfmbMh/7enXG6HyH3TMUzYvZqLQl9CWg0YSx5VFV4zDX+
+         r+HUR/PhuYGvmYdE6EGaruSer4If99bhJZxJNM98odO5MAN4zrCQGvEAMZB3knL25Mib
+         yNVJRpZqLFF3LQIocLrDT/gejajUIXDOrSFo0HrbERQ0YXM4Yv+SPEDqCoVAOqkLNCAX
+         /bMewlJ4tMJ5fW4ktIUuyJnPFhzssJgSR2vQyxhADRE1uvWSD4y2bniTb/vaGV+slpzg
+         qCXg==
+X-Forwarded-Encrypted: i=1; AJvYcCW4t3Wy8cYt3GIBrRD9iS+hi9RCeeyFNdnjISQFIlxXY6LEm/p1wzpPy1tu0Ui/RTgnH7T0C/k=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx47SWqTiZjtY6A6ACu1cOgJBCJcUpMngPp8rud3l9FnoAGNn3E
+	/qDR3XEnrhuPq7ytuDi2wIak6d/oBCfUrwPPDnPW2/8mRqMmGpH2B8DUFcB+KW9yCw==
+X-Gm-Gg: ASbGncu90BHsaxXo3AWvA1koJi+rR8rIkup8uDuYoqBUZPoZCW+01YBA6RXjy9yo79K
+	jXvhw93SjqGEbZu0iUc3m2ypCJHelE2LFR6zPxz1qFyHUcufBKOUbw1SUK2m9cT8IXO8LWyCfCf
+	/oBEIsNaej9vek2bdSTuy1yvRG9p2RsIJkI62N+fs3FFpgFIuMHVZo1+jd3NcgDrywPbMhFydIe
+	cetHjm+GzeGtjUPOBBtVDTYxIlX6kM9UdXfNDQfcYUP23ZniFELCad3xaQ2IZdIP4qS3/q97YXs
+	07Fw87c7OO2J3z32kgFituh4i7kRAzhcCFWXaLvoDKnDUT80qQ9Ee3Ux/Hxt29/SBkVLH+Qcez2
+	xq/+aeltJNA2JDJWIlpKAVoLzEXf0Km2/7yEHLZkwEwJcxB5Fr9fa0/mxk+wxCRv2s7KWOTF3Mw
+	sd5kcKjHddx84wRgXuM9RszrYebGRJ//yVLCV2WawoklKuZvtsIQ==
+X-Google-Smtp-Source: AGHT+IFJRNp2sRsVEs1GlQW6MJTcF2zwsPsEOfrLSK/NN3A774PXikUBAOOjBZgY44x25hx3cSpDQg==
+X-Received: by 2002:a05:600c:4ecd:b0:471:114e:5894 with SMTP id 5b1f17b1804b1-477b8a9b267mr18043455e9.25.1763632517489;
+        Thu, 20 Nov 2025 01:55:17 -0800 (PST)
+Received: from google.com (120.54.38.34.bc.googleusercontent.com. [34.38.54.120])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477b831421fsm37963635e9.10.2025.11.20.01.55.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Nov 2025 01:55:17 -0800 (PST)
+Date: Thu, 20 Nov 2025 09:55:14 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
+	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
+	kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 19/28] KVM: arm64: Support unaligned fixmap in the
+ pKVM hyp
+Message-ID: <aR7lggObvo-2Yrg5@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+ <20251107093840.3779150-20-vdonnefort@google.com>
+ <86ecpurq13.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 0/5] perf: arm_spe: Armv8.8 SPE features
-To: Namhyung Kim <namhyung@kernel.org>, Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
- kvmarm@lists.linux.dev
-References: <20251111-james-perf-feat_spe_eft-v10-0-1e1b5bf2cd05@linaro.org>
- <aR503-f-ZrnWzZh2@google.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <aR503-f-ZrnWzZh2@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ecpurq13.wl-maz@kernel.org>
+
+Hi Marc,
+
+Thanks for having a look at the series.
 
 
-
-On 20/11/2025 1:54 am, Namhyung Kim wrote:
-> Hello,
+On Wed, Nov 19, 2025 at 03:38:32PM +0000, Marc Zyngier wrote:
+> On Fri, 07 Nov 2025 09:38:31 +0000,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
+> > Return the fixmap VA with the page offset, instead of the page base
+> > address. This allows to use hyp_fixmap_map() seamlessly regardless of
+> > the address alignment.
+> > 
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > index ae8391baebc3..75014dc7d82e 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > @@ -239,7 +239,7 @@ static void *fixmap_map_slot(struct hyp_fixmap_slot *slot, phys_addr_t phys)
+> >  	WRITE_ONCE(*ptep, pte);
+> >  	dsb(ishst);
+> >  
+> > -	return (void *)slot->addr;
+> > +	return (void *)slot->addr + offset_in_page(phys);
+> >  }
+> >  
+> >  void *hyp_fixmap_map(phys_addr_t phys)
 > 
-> On Tue, Nov 11, 2025 at 11:37:54AM +0000, James Clark wrote:
->> Support SPE_FEAT_FDS data source filtering.
-> 
-> What's the state of this series?  I can merge the tools part (3, 4, 5)
-> once the kernel part lands somewhere.
+> This looks slightly odd. fixmap_map_slot() should return *a slot*, not
+> something in it. Can't hyp_fixmap_map() do that instead?
+
+That was fixing hyp_fixblock_map() at the same time. I will move the
+offset_in_page() in both callers.
+
 > 
 > Thanks,
-> Namhyung
 > 
-
-The SPE driver part was blocked on Peter's ack for the config4 change. 
-He's given it now so Will should be able to take the driver.
-
-Thanks
-James
-
->>
->> ---
->> Changes in v10:
->> - Pick up Peter's ack
->> - Slightly clarify commit message regarding the difference between the
->>    data source filter and the data source
->> - Link to v9: https://lore.kernel.org/r/20251029-james-perf-feat_spe_eft-v9-0-d22536b9cf94@linaro.org
->>
->> Changes in v9:
->> - Fix another typo in docs: s/data_src_filter/inv_data_src_filter/g
->> - Drop already applied patches for other features. Only the data source
->>    filtering patches remain.
->> - Rebase on latest perf-tools-next
->> - Link to v8: https://lore.kernel.org/r/20250901-james-perf-feat_spe_eft-v8-0-2e2738f24559@linaro.org
->>
->> Changes in v8:
->> - Define __spe_vers_imp before it's used
->> - "disable traps to PMSDSFR" -> "disable traps of PMSDSFR to EL2"
->> - Link to v7: https://lore.kernel.org/r/20250814-james-perf-feat_spe_eft-v7-0-6a743f7fa259@linaro.org
->>
->> Changes in v7:
->> - Fix typo in docs: s/data_src_filter/inv_data_src_filter/g
->> - Pickup trailers
->> - Link to v6: https://lore.kernel.org/r/20250808-james-perf-feat_spe_eft-v6-0-6daf498578c8@linaro.org
->>
->> Changes in v6:
->> - Rebase to resolve conflict with BRBE changes in el2_setup.h
->> - Link to v5: https://lore.kernel.org/r/20250721-james-perf-feat_spe_eft-v5-0-a7bc533485a1@linaro.org
->>
->> Changes in v5:
->> - Forgot to pickup tags from v4
->> - Forgot to drop test and review tags on v4 patches that were
->>    significantly modified
->> - Update commit message for data source filtering to mention inversion
->> - Link to v4: https://lore.kernel.org/r/20250721-james-perf-feat_spe_eft-v4-0-0a527410f8fd@linaro.org
->>
->> Changes in v4:
->> - Rewrite "const u64 feat_spe_eft_bits" inline
->> - Invert data source filter so that it's possible to exclude all data
->>    sources without adding an additional 'enable filter' flag
->> - Add a macro in el2_setup.h to check for an SPE version
->> - Probe valid filter bits instead of hardcoding them
->> - Take in Leo's commit to expose the filter bits as it depends on the
->>    new filter probing
->> - Link to v3: https://lore.kernel.org/r/20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org
->>
->> Changes in v3:
->> - Use PMSIDR_EL1_FDS instead of 1 << PMSIDR_EL1_FDS_SHIFT
->> - Add VNCR offsets
->> - Link to v2: https://lore.kernel.org/r/20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org
->>
->> Changes in v2:
->> - Fix detection of FEAT_SPE_FDS in el2_setup.h
->> - Pickup Marc Z's sysreg change instead which matches the json
->> - Restructure and expand docs changes
->> - Link to v1: https://lore.kernel.org/r/20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org
->>
->> ---
->> James Clark (5):
->>        perf: Add perf_event_attr::config4
->>        perf: arm_spe: Add support for filtering on data source
->>        tools headers UAPI: Sync linux/perf_event.h with the kernel sources
->>        perf tools: Add support for perf_event_attr::config4
->>        perf docs: arm-spe: Document new SPE filtering features
->>
->>   drivers/perf/arm_spe_pmu.c                |  37 +++++++++++
->>   include/uapi/linux/perf_event.h           |   2 +
->>   tools/include/uapi/linux/perf_event.h     |   2 +
->>   tools/perf/Documentation/perf-arm-spe.txt | 104 +++++++++++++++++++++++++++---
->>   tools/perf/tests/parse-events.c           |  13 +++-
->>   tools/perf/util/parse-events.c            |  11 ++++
->>   tools/perf/util/parse-events.h            |   1 +
->>   tools/perf/util/parse-events.l            |   1 +
->>   tools/perf/util/pmu.c                     |   8 +++
->>   tools/perf/util/pmu.h                     |   1 +
->>   10 files changed, 170 insertions(+), 10 deletions(-)
->> ---
->> base-commit: 081006b7c8e19406dc6674c6b6d086764d415b5c
->> change-id: 20250312-james-perf-feat_spe_eft-66cdf4d8fe99
->>
->> Best regards,
->> -- 
->> James Clark <james.clark@linaro.org>
->>
-
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
