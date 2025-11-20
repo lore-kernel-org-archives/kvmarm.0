@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C0E3A79DD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0E33A8D40;
 	Thu, 20 Nov 2025 17:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763659564; cv=none; b=M+LQ0Y8vtDwGgudtVFEe1kVCv7ebFgmzF5Ai1eUMPXnKVmdIlX4QZfCUtONNGt1vOuXesmR24fftU60k+Mo5trsABez8OOFfhbJi6CLlhEWE0h1WbHJVfXkFQIzHjfdow2BnpOWThzpqpTpe2R5/U33HQEM2bgjhW+c+Pwd5Km8=
+	t=1763659565; cv=none; b=fkQDQlHnQWvIUNmmN7o1O/IOUVRCSg4EQUZazbEijGeCKw64+FjlUCBVnOgOcHEXSJvJns9sRGM5ePgUhWbwGkr2kZHYq0T3evqB1g7tlZHqN9U5SGkhd/bJ8cNClvznUKzf9vKdoTw5QAMJVcmNyA1ZxUyeEZ1JEHvl0RwDfo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763659564; c=relaxed/simple;
-	bh=5oclhuOKF2j0jLu4azurZ3vXLPt1EEMSdWiGQPsFMNY=;
+	s=arc-20240116; t=1763659565; c=relaxed/simple;
+	bh=wdtlW7oExSxObQ4jKYqfqHWLDRMqqpy/Zk8W2VvDjQQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Nl6vooSQp+Mdq6y+8ifKx2jXvVsZZO8frHJSbsccBBq2xmkLBZy0xCtGmx2ZyKPKep5zqAjG8TJfCYC1vUfRVG+OeznF4+pbjObR+TFT4HKIdYF2k4rQAKHxJTOygx8OneYd71IcUE40yEWNrbG6943CP0oIz9bF3CFhpimuS6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DFGhjNdM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Po1g20HSQ/p6RYZ+f+ebIAuePGDaaTtCvDchjG6FiXL0Bw14eCNgga9z37JmLkp6j0xvl43aBPH4/QLZZkcDexuxhfSvD9pXSUdNq9OEcwd/Dp1Cbe/zDr+s5I9XonQpjF4yX9KPsk4445XQoR4Zmh17hYnDSMlXqLgR7gIQG7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9ltta9n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DFGhjNdM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8131C2BC86;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9ltta9n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35494C19423;
 	Thu, 20 Nov 2025 17:26:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1763659564;
-	bh=5oclhuOKF2j0jLu4azurZ3vXLPt1EEMSdWiGQPsFMNY=;
+	bh=wdtlW7oExSxObQ4jKYqfqHWLDRMqqpy/Zk8W2VvDjQQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DFGhjNdMYu8T09FUClS+mVHZk46IFFq1Umw8vuI8VvS79SAdJk7PtLlBzeNYEzIRj
-	 +LLPpC0V8OV5tSeHAPZtfPVJ2eBjTJLrr4+SWH1fKbKuA+xhS2HetaQxjfyVG/OVfH
-	 q5ncr7kB7joE1Jyycl/iA35Scp7fYhAJ86nhF8Ion8Hue+A56I0yV89hYPLXwAZSqz
-	 PvNrYFNaXc/2iqq+xgz1QQYIRHh17vRrEC28EI8oIXGbzMF6VkFm/aWfnqaW12C/tF
-	 fBqs6suboaUe62cF+gHo0irQEOANkgWol5kMT+j9Zqw8LRIQ0hhHWPfOJ/v0CQpd6E
-	 0dnDhyrw+fedQ==
+	b=W9ltta9nazT3SQ2ZamyMQlAZ+yuH6hyU5zlXNJ07C7fm45he3Q/Xv1bSNq0GVlbzy
+	 X2af6GKESAGI7dhS+cj0/+wkk/wUA5Q6XvhABLqIIM0pTwyqLnbBzvIWtRnIq3uqpm
+	 C6TACMU+Z7K1tAJP5l7qVb05FN4CmQLDd7tcrJoScrUKFbu05u5egwM6D9Id/e4Uo1
+	 +zH8vxJF/LaBOWEbnH82oMGkciCUGV8CNn1w92trWhE0mJOyLF3mcnvrULmXBSOTC4
+	 3ffwG1KsFpDBXIB6IkA5vZVF1evq3dTH8xbOA2NZyuUegeeiVqulPjL6hB8Di5bVwi
+	 ZBNx2qB0kEQcQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vM8Py-00000006y6g-3ygt;
-	Thu, 20 Nov 2025 17:26:03 +0000
+	id 1vM8Py-00000006y6g-1qDX;
+	Thu, 20 Nov 2025 17:26:02 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v4 37/49] KVM: arm64: GICv2: Handle LR overflow when EOImode==0
-Date: Thu, 20 Nov 2025 17:25:27 +0000
-Message-ID: <20251120172540.2267180-38-maz@kernel.org>
+Subject: [PATCH v4 35/49] KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
+Date: Thu, 20 Nov 2025 17:25:25 +0000
+Message-ID: <20251120172540.2267180-36-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251120172540.2267180-1-maz@kernel.org>
 References: <20251120172540.2267180-1-maz@kernel.org>
@@ -61,66 +61,65 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Similarly to the GICv3 version, handle the EOIcount-driven deactivation
-by walking the overflow list.
+Pretty much like the rest of the LR handling, deactivation of an
+L2 interrupt gets reflected in the L1 LRs, and therefore must be
+propagated into the L1 shadow state if the interrupt is HW-bound.
+
+Instead of directly handling the active state (which looks a bit
+off as it ignores locking and L1->L0 HW propagation), use the new
+deactivation primitive to perform the deactivation and deal with
+the required maintenance.
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v2.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 9a2de03f74c30..bbd4d003fde86 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -100,6 +100,8 @@ static void vgic_v2_fold_lr(struct kvm_vcpu *vcpu, u32 val)
- 	vgic_put_irq(vcpu->kvm, irq);
- }
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index 40f7a37e0685c..15e7033a7937e 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -280,7 +280,6 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
  
-+static u32 vgic_v2_compute_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq);
-+
- /*
-  * transfer the content of the LRs back into the corresponding ap_list:
-  * - active bit is transferred as is
-@@ -111,12 +113,37 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
- 	struct vgic_v2_cpu_if *cpuif = &vgic_cpu->vgic_v2;
-+	u32 eoicount = FIELD_GET(GICH_HCR_EOICOUNT, cpuif->vgic_hcr);
-+	struct vgic_irq *irq;
+ 	for_each_set_bit(i, &shadow_if->lr_map, kvm_vgic_global_state.nr_lr) {
+ 		u64 val, host_lr, lr;
+-		struct vgic_irq *irq;
  
- 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 		host_lr = __gic_v3_get_lr(lr_map_idx_to_shadow_idx(shadow_if, i));
  
- 	for (int lr = 0; lr < vgic_cpu->vgic_v2.used_lrs; lr++)
- 		vgic_v2_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+@@ -290,7 +289,14 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 		val |= host_lr & ICH_LR_STATE;
+ 		__vcpu_assign_sys_reg(vcpu, ICH_LRN(i), val);
  
-+	/* See the GICv3 equivalent for the EOIcount handling rationale */
-+	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-+		u32 lr;
-+
-+		if (!eoicount) {
-+			break;
-+		} else {
-+			guard(raw_spinlock)(&irq->irq_lock);
-+
-+			if (!(likely(vgic_target_oracle(irq) == vcpu) &&
-+			      irq->active))
-+				continue;
-+
-+			lr = vgic_v2_compute_lr(vcpu, irq) & ~GICH_LR_ACTIVE_BIT;
-+		}
-+
-+		if (lr & GICH_LR_HW)
-+			writel_relaxed(FIELD_GET(GICH_LR_PHYSID_CPUID, lr),
-+				       kvm_vgic_global_state.gicc_base + GIC_CPU_DEACTIVATE);
-+		vgic_v2_fold_lr(vcpu, lr);
-+		eoicount--;
-+	}
-+
- 	cpuif->used_lrs = 0;
- }
+-		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++		/*
++		 * Deactivation of a HW interrupt: the LR must have the HW
++		 * bit set, have been in a non-invalid state before the run,
++		 * and now be in an invalid state. If any of that doesn't
++		 * hold, we're done with this LR.
++		 */
++		if (!((lr & ICH_LR_HW) && (lr & ICH_LR_STATE) &&
++		      !(host_lr & ICH_LR_STATE)))
+ 			continue;
  
+ 		/*
+@@ -298,14 +304,7 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ 		 * need to emulate the HW effect between the guest hypervisor
+ 		 * and the nested guest.
+ 		 */
+-		irq = vgic_get_vcpu_irq(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+-		if (WARN_ON(!irq)) /* Shouldn't happen as we check on load */
+-			continue;
+-
+-		if (!(host_lr & ICH_LR_STATE))
+-			irq->active = false;
+-
+-		vgic_put_irq(vcpu->kvm, irq);
++		vgic_v3_deactivate(vcpu, FIELD_GET(ICH_LR_PHYS_ID_MASK, lr));
+ 	}
+ 
+ 	/* We need these to be synchronised to generate the MI */
 -- 
 2.47.3
 
