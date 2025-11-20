@@ -1,117 +1,156 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266EE30DEDE;
-	Wed, 19 Nov 2025 22:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC55257842;
+	Thu, 20 Nov 2025 01:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763591732; cv=none; b=D3hA5THzKN8ZiCh0goe1KAZIUDGJo3NjRyCXLIygm5XWUXM+9JVyHz5sSHYHQI2nRcP7Gvg7x8DyTZBwyJ6qh7AMS6FiH8q4KgfkP8w4yEF7f9cj7ZDcDoRwobeOnq0w2+COhcz5dQjlPchKTwjxckAV/w71CpnCkSA9JMuvaow=
+	t=1763603684; cv=none; b=gfeyMPDkwqweIdGcwkNgJL3QmeO2g4ATyfz+F42iS032aQ1IHyBcdTwyqLPNmltxvvmnktmV9P25fQf620LBY0u0uOtyQqhVBYrvxf9rgpV0x5IEPtLcNuR2ogh9wgTfRiBk84opgUapy1cO5Hsb6bakNhKJNbajY+KkDFurCl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763591732; c=relaxed/simple;
-	bh=sDyW89qPXT3xdQtj10GxlHLo6uAfus5uHKYULC7hRl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ntZ0xjekzDtv4jllJ/dH069Y9gSVqJgLGdIQnkFmXKkNmlG09dnWIA34cUMt2LgtmjKHhytyITicEFhKyDnD2EOtUHS4kYO44zc5j/vCF7laSxfiGftBaPAa1VZ9VV0VrnBZJA896C8EWP7THVUp0sMYePrxcRx+MQnTrP+uYwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rt0Vg+lz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763603684; c=relaxed/simple;
+	bh=/bYl3PfE31ZepLHyLYI1pggKbRkiLRQgnDFKccns06Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vsae9GoB+srRqbI4UpqbZeFdzhtw84h5RVNxI19n3fZM/UnEYJ/VGO27bp1SDWKZ4DfpFHY//Uc/onl/gJU2AF3fBMnpejn1GhdBhRmnyFce+Pm1jQoglvqTYCeMZ2B5JkL3AjNYEk0bdZu6GklMNEcIt+IUJNh6v1p6c/R17i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JohDXqXE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rt0Vg+lz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8992C19421;
-	Wed, 19 Nov 2025 22:35:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JohDXqXE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94ED9C4CEF5;
+	Thu, 20 Nov 2025 01:54:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763591731;
-	bh=sDyW89qPXT3xdQtj10GxlHLo6uAfus5uHKYULC7hRl4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rt0Vg+lzXkk7T3RVTZNY/ZGYbm7HWy7YYAeYDktDAgzB4DG+fqhFxJ5KVxgemCpAx
-	 uLpKJ9LFrcVGvOxsgPcurh4KAT+/qHiy1K/4LKT2Dm9uDQ/ighMwPkz/pGOPsnspTh
-	 4lYlwLHJ7xsi4KdUReKoML5WaUtgAWxtxo3zO80+zHLqltFeUAimDZrIpa/z9GStJv
-	 xk1CUYTjSbP1YqQm5+RTWnvx4hDWT0j1wtZ4JRAv82Pm3mMtdzPbapGNA62yOdODBb
-	 sxqkZ05AoP+HlPlYAsYdtCMW7wcf32HmiJcY36JRkjy0tHFD9w+MpEg5fiSC4AxWL+
-	 L4S0oZ1e+P/FA==
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Mingwei Zhang <mizhang@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 0/3] KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
-Date: Wed, 19 Nov 2025 14:35:28 -0800
-Message-ID: <176359161125.183996.17801262311162275177.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251113052452.975081-1-rananta@google.com>
-References: <20251113052452.975081-1-rananta@google.com>
+	s=k20201202; t=1763603684;
+	bh=/bYl3PfE31ZepLHyLYI1pggKbRkiLRQgnDFKccns06Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JohDXqXE59Z8ijFqQfx9apJXrtQaIpyff899jEd9yeCinqsEssuZZOSlffP3mnX1M
+	 k5cOOzyw3RMnuadAF4/LSHar0tA+MOijnrEhaguqi6CoL8E/faNQj4NgpUM6kVYe2J
+	 XHCuIQMr+zy/IkEt7NPmKohBfMtQcogn0vl3wgmwQMWq66GiyFTyDYYYQ4EGWpIO6A
+	 +XnSlk07tIOqnHSoQH87pFTjiU6pCxkH3lXtDgkSX8rSZq/m0YRnBV/8NDgEOAHSmO
+	 7nvFTaiNnS9Z2+c2pKgBTs7iayTLfyyeL+sawnlz8ZnLK5voFDbbjzZkcOoceWGW3P
+	 jr46nBMBIOZoQ==
+Date: Wed, 19 Nov 2025 17:54:39 -0800
+From: Namhyung Kim <namhyung@kernel.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>, Leo Yan <leo.yan@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v10 0/5] perf: arm_spe: Armv8.8 SPE features
+Message-ID: <aR503-f-ZrnWzZh2@google.com>
+References: <20251111-james-perf-feat_spe_eft-v10-0-1e1b5bf2cd05@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251111-james-perf-feat_spe_eft-v10-0-1e1b5bf2cd05@linaro.org>
 
-On Thu, 13 Nov 2025 05:24:49 +0000, Raghavendra Rao Ananta wrote:
-> When destroying a fully-mapped 128G VM abruptly, the following scheduler
-> warning is observed:
+Hello,
+
+On Tue, Nov 11, 2025 at 11:37:54AM +0000, James Clark wrote:
+> Support SPE_FEAT_FDS data source filtering.
+
+What's the state of this series?  I can merge the tools part (3, 4, 5)
+once the kernel part lands somewhere.
+
+Thanks,
+Namhyung
+
 > 
->   sched: CPU 0 need_resched set for > 100018840 ns (100 ticks) without schedule
->   CPU: 0 UID: 0 PID: 9617 Comm: kvm_page_table_ Tainted: G O 6.16.0-smp-DEV #3 NONE
->   Tainted: [O]=OOT_MODULE
->   Call trace:
->       show_stack+0x20/0x38 (C)
->       dump_stack_lvl+0x3c/0xb8
->       dump_stack+0x18/0x30
->       resched_latency_warn+0x7c/0x88
->       sched_tick+0x1c4/0x268
->       update_process_times+0xa8/0xd8
->       tick_nohz_handler+0xc8/0x168
->       __hrtimer_run_queues+0x11c/0x338
->       hrtimer_interrupt+0x104/0x308
->       arch_timer_handler_phys+0x40/0x58
->       handle_percpu_devid_irq+0x8c/0x1b0
->       generic_handle_domain_irq+0x48/0x78
->       gic_handle_irq+0x1b8/0x408
->       call_on_irq_stack+0x24/0x30
->       do_interrupt_handler+0x54/0x78
->       el1_interrupt+0x44/0x88
->       el1h_64_irq_handler+0x18/0x28
->       el1h_64_irq+0x84/0x88
->       stage2_free_walker+0x30/0xa0 (P)
->       __kvm_pgtable_walk+0x11c/0x258
->       __kvm_pgtable_walk+0x180/0x258
->       __kvm_pgtable_walk+0x180/0x258
->       __kvm_pgtable_walk+0x180/0x258
->       kvm_pgtable_walk+0xc4/0x140
->       kvm_pgtable_stage2_destroy+0x5c/0xf0
->       kvm_free_stage2_pgd+0x6c/0xe8
->       kvm_uninit_stage2_mmu+0x24/0x48
->       kvm_arch_flush_shadow_all+0x80/0xa0
->       kvm_mmu_notifier_release+0x38/0x78
->       __mmu_notifier_release+0x15c/0x250
->       exit_mmap+0x68/0x400
->       __mmput+0x38/0x1c8
->       mmput+0x30/0x68
->       exit_mm+0xd4/0x198
->       do_exit+0x1a4/0xb00
->       do_group_exit+0x8c/0x120
->       get_signal+0x6d4/0x778
->       do_signal+0x90/0x718
->       do_notify_resume+0x70/0x170
->       el0_svc+0x74/0xd8
->       el0t_64_sync_handler+0x60/0xc8
->       el0t_64_sync+0x1b0/0x1b8
+> ---
+> Changes in v10:
+> - Pick up Peter's ack
+> - Slightly clarify commit message regarding the difference between the
+>   data source filter and the data source
+> - Link to v9: https://lore.kernel.org/r/20251029-james-perf-feat_spe_eft-v9-0-d22536b9cf94@linaro.org
 > 
-> [...]
-
-Applied to next, thanks!
-
-[1/3] KVM: arm64: Only drop references on empty tables in stage2_free_walker
-      https://git.kernel.org/kvmarm/kvmarm/c/156f70afcfec
-[2/3] KVM: arm64: Split kvm_pgtable_stage2_destroy()
-      https://git.kernel.org/kvmarm/kvmarm/c/d68d66e57e2b
-[3/3] KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
-      https://git.kernel.org/kvmarm/kvmarm/c/4ddfab5436b6
-
---
-Best,
-Oliver
+> Changes in v9:
+> - Fix another typo in docs: s/data_src_filter/inv_data_src_filter/g
+> - Drop already applied patches for other features. Only the data source
+>   filtering patches remain.
+> - Rebase on latest perf-tools-next
+> - Link to v8: https://lore.kernel.org/r/20250901-james-perf-feat_spe_eft-v8-0-2e2738f24559@linaro.org
+> 
+> Changes in v8:
+> - Define __spe_vers_imp before it's used
+> - "disable traps to PMSDSFR" -> "disable traps of PMSDSFR to EL2"
+> - Link to v7: https://lore.kernel.org/r/20250814-james-perf-feat_spe_eft-v7-0-6a743f7fa259@linaro.org
+> 
+> Changes in v7:
+> - Fix typo in docs: s/data_src_filter/inv_data_src_filter/g
+> - Pickup trailers
+> - Link to v6: https://lore.kernel.org/r/20250808-james-perf-feat_spe_eft-v6-0-6daf498578c8@linaro.org
+> 
+> Changes in v6:
+> - Rebase to resolve conflict with BRBE changes in el2_setup.h
+> - Link to v5: https://lore.kernel.org/r/20250721-james-perf-feat_spe_eft-v5-0-a7bc533485a1@linaro.org
+> 
+> Changes in v5:
+> - Forgot to pickup tags from v4
+> - Forgot to drop test and review tags on v4 patches that were
+>   significantly modified
+> - Update commit message for data source filtering to mention inversion
+> - Link to v4: https://lore.kernel.org/r/20250721-james-perf-feat_spe_eft-v4-0-0a527410f8fd@linaro.org
+> 
+> Changes in v4:
+> - Rewrite "const u64 feat_spe_eft_bits" inline
+> - Invert data source filter so that it's possible to exclude all data
+>   sources without adding an additional 'enable filter' flag
+> - Add a macro in el2_setup.h to check for an SPE version
+> - Probe valid filter bits instead of hardcoding them
+> - Take in Leo's commit to expose the filter bits as it depends on the
+>   new filter probing
+> - Link to v3: https://lore.kernel.org/r/20250605-james-perf-feat_spe_eft-v3-0-71b0c9f98093@linaro.org
+> 
+> Changes in v3:
+> - Use PMSIDR_EL1_FDS instead of 1 << PMSIDR_EL1_FDS_SHIFT
+> - Add VNCR offsets
+> - Link to v2: https://lore.kernel.org/r/20250529-james-perf-feat_spe_eft-v2-0-a01a9baad06a@linaro.org
+> 
+> Changes in v2:
+> - Fix detection of FEAT_SPE_FDS in el2_setup.h
+> - Pickup Marc Z's sysreg change instead which matches the json
+> - Restructure and expand docs changes
+> - Link to v1: https://lore.kernel.org/r/20250506-james-perf-feat_spe_eft-v1-0-dd480e8e4851@linaro.org
+> 
+> ---
+> James Clark (5):
+>       perf: Add perf_event_attr::config4
+>       perf: arm_spe: Add support for filtering on data source
+>       tools headers UAPI: Sync linux/perf_event.h with the kernel sources
+>       perf tools: Add support for perf_event_attr::config4
+>       perf docs: arm-spe: Document new SPE filtering features
+> 
+>  drivers/perf/arm_spe_pmu.c                |  37 +++++++++++
+>  include/uapi/linux/perf_event.h           |   2 +
+>  tools/include/uapi/linux/perf_event.h     |   2 +
+>  tools/perf/Documentation/perf-arm-spe.txt | 104 +++++++++++++++++++++++++++---
+>  tools/perf/tests/parse-events.c           |  13 +++-
+>  tools/perf/util/parse-events.c            |  11 ++++
+>  tools/perf/util/parse-events.h            |   1 +
+>  tools/perf/util/parse-events.l            |   1 +
+>  tools/perf/util/pmu.c                     |   8 +++
+>  tools/perf/util/pmu.h                     |   1 +
+>  10 files changed, 170 insertions(+), 10 deletions(-)
+> ---
+> base-commit: 081006b7c8e19406dc6674c6b6d086764d415b5c
+> change-id: 20250312-james-perf-feat_spe_eft-66cdf4d8fe99
+> 
+> Best regards,
+> -- 
+> James Clark <james.clark@linaro.org>
+> 
