@@ -1,49 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AAC2727ED
-	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 18:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B292F532F
+	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 18:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763750265; cv=none; b=Zd+XD7inofsK+1XNg9f/ghkcGtIx+VdSiLpeC6LcKlN2tMpsysnqLOP9x/4gkZwfoLkwXjkHdi0vP/gU0VOygplTYemmh+ZsppcotzVQtuAaydvpixeCGE6cyaLyBII4jcaaeXrTaCWCaBMw4gNEdxTTBF+X6rbJRbUpClFxmx8=
+	t=1763750632; cv=none; b=D+3t3MamKE7XDe+mobD51DvPxpT5JrhZ0FpmwroOBmHZJQmeyK1sknXnTjnNQHY+qOY9QCyKS0d6NJyTsEEB5aA+51vluhvdz4mVWahFpY1+DpiK19T5S8Wllziy0aQX0U+ivYb7WFC8tmsS4EkVpK4SvzyuhTq13htKHKPWuJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763750265; c=relaxed/simple;
-	bh=O8dcaRRhhV8xxE2nTTleeKw72OMmJd3eaP5A4pspAbc=;
+	s=arc-20240116; t=1763750632; c=relaxed/simple;
+	bh=EMV/5s6gcshi4NdnsHZ6AoVwnbcrkPdyZL2FDXA6MYs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FGdj783xJFSckUfpROOCcCTkKgQjwuZPn3OTzyEdTKLT0hw8O/km7z3c9UCAoIz7qyfhEtMk/c8t5pjmoopQv3wu8yYjdgSqRvoyo4wlzc8whM5UAZAuh7cUZ6gIH5hJ6D2yLgrYXyGahGDODaMEHgIIzY117FVCH0Gt+CCEZKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jvB2/fON; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=IhLVfxsrgAfiMeN4BGZv5vvSUi3dmwyCJ88n6EwdTDs9P91UI2VWDRBISvYdpQXnTgtji4iPmaF1rqEMqGL/VT0cvlWpJqUKegKc7GVZiupVnI1TV6fnvbgQ860CoxLNTAJLcHi+9DgJoqEx4SWoDxawu/8+qFgCX2Gdlvjr7hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBLG3+sP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jvB2/fON"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2CA4C4CEF1;
-	Fri, 21 Nov 2025 18:37:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBLG3+sP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20A04C4CEF1;
+	Fri, 21 Nov 2025 18:43:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763750264;
-	bh=O8dcaRRhhV8xxE2nTTleeKw72OMmJd3eaP5A4pspAbc=;
+	s=k20201202; t=1763750632;
+	bh=EMV/5s6gcshi4NdnsHZ6AoVwnbcrkPdyZL2FDXA6MYs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jvB2/fONGMA2POGCurOl+KycUY0RBmh7SHYUvRbtGE0UR98d4epc8RYK3wXbUGomB
-	 r/J08Rv9gcIRVQmmLyVfbHqjw3be9vFGImwn9gdPh/5kIrAUHgCRY266g0492bFxKM
-	 j3Bk9r4aeMtFNNd/Gob6cKe/aiydZy1+BtM5c3FR2GP2we+ybk8KkuJEnFR9ByDI2K
-	 F9b/OlBqw3/NmQZLjlpUs+hTQ43AoDScHr+M2B9R6WpmK9piBA5XvbUYasdxoknijS
-	 AVRBeS4yHplplfMko2jC1T7dIXUgJaD4+ogbAdfMMcKUfy9gm8YczedzAC0zEPGhi9
-	 GNmzkSPJqr7DQ==
+	b=BBLG3+sPvhzwwgbtIYYp2zBCVfJ44Y3HJNgiEUNn9hxOitnT1raBJonc3dMoIbtI5
+	 YXXKvuPfjzy5yAtgTToga60CpiXxQ6tVz0Vq/KbXQM9aJ61hYF/ujmzMktwiBc3KVe
+	 g7uFCOwTKyIaGLEwa7p+vyL+d7A9LqipBQPqb32wmXhE1pZ6YC1J1Em19PAqSsh3B4
+	 7yFB8ZPbTMN41IPvDCC0VtOpL6Dy2AbGlVv1gz3WbmrXHUNxyB7Vj65++UpfFiHm2Q
+	 qBYKMDF17LlHR+wVNJnyaJJEtYBgI/8AG36uVCT1bFjGG1AT80uC4/hmHeffTZkxaj
+	 tObU6dlCkM3OA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vMW0s-00000007KKY-0YHl;
-	Fri, 21 Nov 2025 18:37:42 +0000
-Date: Fri, 21 Nov 2025 18:37:41 +0000
-Message-ID: <87pl9bfczu.wl-maz@kernel.org>
+	id 1vMW6n-00000007KQe-3TFN;
+	Fri, 21 Nov 2025 18:43:49 +0000
+Date: Fri, 21 Nov 2025 18:43:49 +0000
+Message-ID: <87o6ovfcpm.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 12/14] KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW
-In-Reply-To: <20251117224325.2431848-13-oupton@kernel.org>
+Subject: Re: [PATCH v2 00/14] KVM: arm64: nv: Implement FEAT_XNX and FEAT_HAF
+In-Reply-To: <20251117224325.2431848-1-oupton@kernel.org>
 References: <20251117224325.2431848-1-oupton@kernel.org>
-	<20251117224325.2431848-13-oupton@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,34 +58,20 @@ X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 22:43:23 +0000,
+On Mon, 17 Nov 2025 22:43:11 +0000,
 Oliver Upton <oupton@kernel.org> wrote:
 > 
-> Give the stage-2 walk similar treatment to stage-1: update the access
-> flag during the table walk and do so for any walk context.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c    |  3 +++
->  arch/arm64/kvm/nested.c | 48 ++++++++++++++++++++++++++++++++++-------
->  2 files changed, 43 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 96f1786c72fe..b23d3dc8865e 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2012,6 +2012,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		u32 esr;
->  
->  		ret = kvm_walk_nested_s2(vcpu, fault_ipa, &nested_trans);
-> +		if (ret == -EAGAIN)
-> +			return 1;
+> Good news, v2 appears to actually work! With the included selftest, I've
+> tried out M2 (FEAT_HAF not implemented) and QEMU-TCG (FEAT_HAF && FEAT_LSE,
+> FEAT_HAF && !FEAT_LSE).
 
-Err. This is returning with the srcu lock held. Can't be a good idea.
+I went through the most interesting patches. I think there are a few
+annoying bugs that need addressing (I've suggested changes in most
+cases), and a some cleanups wouldn't hurt (but that aren't strictly
+required).
 
-Also maybe an opportunity to turn the srcu_read_lock() call into a
-guard, which would avoid future similar issue (and probably clean the
-code a bit.
+Otherwise, I like the overall shape of the series, and it'd be great
+if you could respin it quickly so that it simmers a bit in -next.
 
 Thanks,
 
