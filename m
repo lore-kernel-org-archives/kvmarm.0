@@ -1,125 +1,250 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6363298987
-	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 10:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87E82D47F5
+	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 12:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763720484; cv=none; b=uvQV4i0y4JnYMo50pDzfYrYDGLK3jEn57fZ9VOYVMvfS0PCifs9wfDHYaoZDo99MxGEJLwHhBrxKC4KmPh7YXeM/g9RyLTpTZURCmDCIH3CZeLL0AvkmuDqnC9FEOJQ+uPg3vlqq2N2lfUYTI38uD+qNsymYD1aOiah690WyRYo=
+	t=1763727854; cv=none; b=KoKV8T0k6gAuBq5jSAOFP9p05iiDx21P3C+jG8rnDIim+rXKzqRdNgTpftEKzCn8kWYQ34L+/4+npamLYQWL/lW2Fu8lnTo5Z06teeNbMgVwq6hSJQmgSm90TVfpAjbhqOaMTO40CBBTD2piTy32FbtI9bMcMv/KqMk2kKUVsyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763720484; c=relaxed/simple;
-	bh=IXGQCEmd056QTCHBVaE7XkvLClggp4N8EpoSVsmdUn8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OiiWJb6YLJFS+f6IrNWvqafQJnkj1KKni60tR+LbVtWqKwSKd6YGFAh1/8HqL1cKECuh0AvrzS7vuV9ao/0CdLKgSFDQ10bNXFt8BpSGBEX0/ERcCIyX6wANQUFKP/plp24mAMvDa2k3xIUULBrTkiDO8lltQd/uT9vmtqpvKtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=0z8pR8Wf; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1763727854; c=relaxed/simple;
+	bh=vQNDtJOkmvGOIUmhalVKFko77jzNkNGwnbw7N2H2+rk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Usz5JsjS1Ur8skCqB3eycb2/aetj0x3dIyfyoQRdghV1Gq+oPlAxsJd8guonf98zrh7MYdecfN+zOiT3VHVqSYBlnmF+WaU988m4bChxKqoFTKrWWSP6YrEk+3DsODGqSyBx3o7vcDz64GlFloO2QLlWhE7RvEKbn/LYku/Xs1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SE/Pddhy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="0z8pR8Wf"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=DmfI//jDc+SutvcPkcAsQW6M+QXS7fQhKaN+xJdDWXk=;
-	b=0z8pR8WfT775x726EkNdOncOLgPPCb5HrQ0rtwDUHKC76QJ0JTEvF9cfpXwh8NE8NYNECs/yT
-	nBCVTI+GJ1cTaSID3fbVSGbjA8tVOPpXV79m7RZbaLRpAzrwQTAzlPArIx22ZI3vu+k+p5dmX8q
-	nKwQCXkMUYU0+vzIba4YMYE=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dCWRT05kXz1cyP6;
-	Fri, 21 Nov 2025 18:19:33 +0800 (CST)
-Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5509A14010D;
-	Fri, 21 Nov 2025 18:21:18 +0800 (CST)
-Received: from [10.67.120.103] (10.67.120.103) by
- kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 21 Nov 2025 18:21:17 +0800
-Message-ID: <90180222-5399-442c-b7a3-e65b7d0e1378@huawei.com>
-Date: Fri, 21 Nov 2025 18:21:16 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SE/Pddhy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A57C4CEF1;
+	Fri, 21 Nov 2025 12:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1763727853;
+	bh=vQNDtJOkmvGOIUmhalVKFko77jzNkNGwnbw7N2H2+rk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SE/PddhyA0H3riwZj6+vTfIbFlA260/Yyz78JLi1uAbhE9Grk8ldwzjtfc/Tbnj1q
+	 kSCyzNrpGLtxHBZ8WkgMzjNQ1B2X34bZBy0cXtLCSYyaJd9Riu+0RVVmDI/6SLKgdH
+	 4OnCR02+5kTCPUF8/n49VF/zYFNHY73QwyEu+/BMfPPJSOwNlRr7VWuEzDfwpncJbu
+	 fKkRifU7/jCyk6INzCdIZ8dmPSNMArC74xWUZdZD9EbKvOs3FWOk7Gnut1AqfTiPM8
+	 3kldddECELZ/WlRyi5W1DRjvo1mVG2SRibkmjQL1XmGjnruSkAus3KQU/vhoWlfwoR
+	 RrdSTAIe6pDeQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vMQBP-00000007E5l-1EAB;
+	Fri, 21 Nov 2025 12:24:11 +0000
+Date: Fri, 21 Nov 2025 12:24:04 +0000
+Message-ID: <87v7j3fuaj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 02/14] KVM: arm64: Add support for FEAT_XNX stage-2 permissions
+In-Reply-To: <20251117224325.2431848-3-oupton@kernel.org>
+References: <20251117224325.2431848-1-oupton@kernel.org>
+	<20251117224325.2431848-3-oupton@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/5] Support the FEAT_HDBSS introduced in Armv9.5
-To: Marc Zyngier <maz@kernel.org>, Tian Zheng <zhengtian10@huawei.com>
-CC: <oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
-	<pbonzini@redhat.com>, <will@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
-	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <joey.gouly@arm.com>,
-	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
-	<suzuki.poulose@arm.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <86zf8fr9r2.wl-maz@kernel.org>
-From: z00939249 <zhengtian10@huawei.com>
-In-Reply-To: <86zf8fr9r2.wl-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemr100010.china.huawei.com (7.202.195.125)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/11/21 17:54, Marc Zyngier wrote:
-> On Fri, 21 Nov 2025 09:23:37 +0000,
-> Tian Zheng <zhengtian10@huawei.com> wrote:
->>
->> This series of patches add support to the Hardware Dirty state tracking
->> Structure(HDBSS) feature, which is introduced by the ARM architecture
->> in the DDI0601(ID121123) version.
->>
->> The HDBSS feature is an extension to the architecture that enhances
->> tracking translation table descriptors' dirty state, identified as
->> FEAT_HDBSS. The goal of this feature is to reduce the cost of surveying
->> for dirtied granules, with minimal effect on recording when a granule
->> has been dirtied.
->>
->> The purpose of this feature is to make the execution overhead of live
->> migration lower to both the guest and the host, compared to existing
->> approaches (write-protect or search stage 2 tables).
->>
->> After these patches, users(such as qemu) can use the
->> KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl to enable or disable the HDBSS
->> feature before and after the live migration.
->>
->> This feature is similar to Intel's Page Modification Logging (PML),
->> offering hardware-assisted dirty tracking to reduce live migration
->> overhead. With PML support expanding beyond Intel, HDBSS introduces a
->> comparable mechanism for ARM.
+On Mon, 17 Nov 2025 22:43:13 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
 > 
-> Where is the change log describing what was changed compared to the
-> previous version?
+> FEAT_XNX adds support for encoding separate execute permissions for EL0
+> and EL1 at stage-2. Add support for this to the page table library,
+> hiding the unintuitive encoding scheme behind generic pX and uX
+> permission flags.
+
+This patch consistently breaks running VMs on my M2, see below for a
+possible fix.
+
 > 
-> We gave you extensive comments back in March. You never replied to the
-> feedback. And you now dump a whole set of patches, 6 months later,
-> without the slightest indication of what has changed?
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h | 17 +++++----
+>  arch/arm64/kvm/hyp/pgtable.c         | 54 ++++++++++++++++++++++++----
+>  2 files changed, 58 insertions(+), 13 deletions(-)
 > 
-> Why should we make the effort to review this again?
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 2888b5d03757..c72149a607d6 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -89,7 +89,7 @@ typedef u64 kvm_pte_t;
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+>  
+> -#define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
+> +#define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+>  
+> @@ -251,12 +251,15 @@ enum kvm_pgtable_stage2_flags {
+>   * @KVM_PGTABLE_PROT_SW3:	Software bit 3.
+>   */
+>  enum kvm_pgtable_prot {
+> -	KVM_PGTABLE_PROT_X			= BIT(0),
+> -	KVM_PGTABLE_PROT_W			= BIT(1),
+> -	KVM_PGTABLE_PROT_R			= BIT(2),
+> -
+> -	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+> -	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
+> +	KVM_PGTABLE_PROT_PX			= BIT(0),
+> +	KVM_PGTABLE_PROT_UX			= BIT(1),
+> +	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
+> +						  KVM_PGTABLE_PROT_UX,
+> +	KVM_PGTABLE_PROT_W			= BIT(2),
+> +	KVM_PGTABLE_PROT_R			= BIT(3),
+> +
+> +	KVM_PGTABLE_PROT_DEVICE			= BIT(4),
+> +	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(5),
+>  
+>  	KVM_PGTABLE_PROT_SW0			= BIT(55),
+>  	KVM_PGTABLE_PROT_SW1			= BIT(56),
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index c351b4abd5db..8c813bf70b38 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -661,11 +661,36 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  
+>  #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
+>  
+> +static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
+> +{
+> +	bool px, ux;
+> +	u8 xn;
+> +
+> +	px = prot & KVM_PGTABLE_PROT_PX;
+> +	ux = prot & KVM_PGTABLE_PROT_UX;
+> +
+> +	if (!cpus_have_final_cap(ARM64_HAS_XNX) && px != ux)
+> +		return -EINVAL;
+> +
+> +	if (px && ux)
+> +		xn = 0b00;
+> +	else if (!px && ux)
+> +		xn = 0b01;
+> +	else if (!px && !ux)
+> +		xn = 0b10;
+> +	else
+> +		xn = 0b11;
+> +
+> +	*attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, xn);
 
-Apologies for the lack of proper changelog and the delayed follow-up on 
-the feedback provided in March. This was an oversight on our part during 
-the transition of maintainership for the HDBSS patch series. We 
-sincerely appreciate the thorough comments you shared earlier and regret 
-not responding in a timely manner.
+Notice how this is orr'ing bits into an existing descriptor, and...
 
-Below is a summary of the changes made from v1 to v2.
+> +	return 0;
+> +}
+> +
+>  static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot prot,
+>  				kvm_pte_t *ptep)
+>  {
+>  	kvm_pte_t attr;
+>  	u32 sh = KVM_PTE_LEAF_ATTR_LO_S2_SH_IS;
+> +	int r;
+>  
+>  	switch (prot & (KVM_PGTABLE_PROT_DEVICE |
+>  			KVM_PGTABLE_PROT_NORMAL_NC)) {
+> @@ -685,8 +710,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+>  		attr = KVM_S2_MEMATTR(pgt, NORMAL);
+>  	}
+>  
+> -	if (!(prot & KVM_PGTABLE_PROT_X))
+> -		attr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> +	r = stage2_set_xn_attr(prot, &attr);
+> +	if (r)
+> +		return r;
+>  
+>  	if (prot & KVM_PGTABLE_PROT_R)
+>  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> @@ -715,8 +741,19 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte)
+>  		prot |= KVM_PGTABLE_PROT_R;
+>  	if (pte & KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W)
+>  		prot |= KVM_PGTABLE_PROT_W;
+> -	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN))
+> -		prot |= KVM_PGTABLE_PROT_X;
+> +
+> +	switch (FIELD_GET(KVM_PTE_LEAF_ATTR_HI_S2_XN, pte)) {
+> +	case 0b00:
+> +		prot |= KVM_PGTABLE_PROT_PX | KVM_PGTABLE_PROT_UX;
+> +		break;
+> +	case 0b01:
+> +		prot |= KVM_PGTABLE_PROT_UX;
+> +		break;
+> +	case 0b11:
+> +		prot |= KVM_PGTABLE_PROT_PX;
+> +		break;
+> +	default:
+> +	}
+>  
+>  	return prot;
+>  }
+> @@ -1293,6 +1330,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	int ret;
+>  	s8 level;
+>  	kvm_pte_t set = 0, clr = 0;
+> +	kvm_pte_t xn;
 
-v1:
-https://lore.kernel.org/kvm/20250311040321.1460-1-yezhenyu2@huawei.com/
+... how this variable is left uninitialised...
 
-v1->v2 changes:
-- Removed redundant macro definitions and switched to tool-generated.
-- Split HDBSS interface and implementation into separate patches.
-- Integrate system_supports_hdbss() into ARM feature initialization.
-- Refactored HDBSS data structure to store meaningful values instead
-of raw register contents.
-- Fixed permission checks when applying DBM bits in page tables to
-prevent potential memory corruption.
-- Removed unnecessary dsb instructions.
-- Drop the debugging printks.
-- Merged the two patches "using ioctl to enable/disable the HDBSS
-feature" and "support to handle the HDBSSF event" into one.
+>  
+>  	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+>  		return -EINVAL;
+> @@ -1303,8 +1341,12 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+>  	if (prot & KVM_PGTABLE_PROT_W)
+>  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+>  
+> -	if (prot & KVM_PGTABLE_PROT_X)
+> -		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> +	ret = stage2_set_xn_attr(prot, &xn);
+> +	if (ret)
+> +		return ret;
+> +
+> +	set |= xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> +	clr |= ~xn & KVM_PTE_LEAF_ATTR_HI_S2_XN;
 
-We apologize again for the delay and the missing changelog, and we 
-greatly appreciate your time in reviewing this updated version.
+... and finally consumed here. Depending on how the stack variable is
+allocated, you may get interesting surprises. I fixed it with this
+(belt and braces):
 
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 8c813bf70b385..d57134d69ea82 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -681,6 +681,7 @@ static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
+ 	else
+ 		xn = 0b11;
+ 
++	*attr &= ~KVM_PTE_LEAF_ATTR_HI_S2_XN;
+ 	*attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, xn);
+ 	return 0;
+ }
+@@ -1329,8 +1330,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ {
+ 	int ret;
+ 	s8 level;
+-	kvm_pte_t set = 0, clr = 0;
+-	kvm_pte_t xn;
++	kvm_pte_t xn = 0, set = 0, clr = 0;
+ 
+ 	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+ 		return -EINVAL;
+
+
+Thanks,
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
