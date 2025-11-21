@@ -1,37 +1,38 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B1733F380
-	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 09:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CB4305946
+	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 09:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763717028; cv=none; b=mqfaZMED7TrT0YJFO5GtF9cgpBrrVyi1V7lfpc18oQhJeW/8NLajUmNQ/Buox6s3MsK2L22q8S+mxciqmVFa+JRSXV5se6qROR5niSDZRu3wQkbVHs4Z5lYrYlFVkkn5TXKVnnXl6v8FYCKoDyQqYT0M5w/hzvbzxnnIQ2M2ko4=
+	t=1763717029; cv=none; b=cQf+v4g32h+UW7yHz6ZQJ/Phdc8BGJUOKWRyBokgLZlEFpMcAeT2fE+2V8V0Qf9vCJcB1ewensvlCb0WUTmx9fcCgQpjRsg3jJ33lMTUI++hjOguSZyzdgMiSdCM4xLFiCGjJhDN/Nt/aPfGKOQoyqw1sft8eeGN9qu9/AS1LHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763717028; c=relaxed/simple;
-	bh=LjrNVB/VDqUyL8RfflBobn4bMQWyFHvx8GB+ANFej34=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L490ou2Ez4v/XhCEaNpknrz7S4HOIiuKKux7yNHDpmoewTZnpQ3stgt3YAEAPhJfVTob5GyoVCYGueDz1LzDu/vLhggp75HMmJIzcUWGsY9jJi/JQNWkUlW1d5HSuH+ysKuuOHv75tnSHvCdtRYROeQiXj3MW+3b9M8mrf59PyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ozJXLhj6; arc=none smtp.client-ip=113.46.200.219
+	s=arc-20240116; t=1763717029; c=relaxed/simple;
+	bh=QOaPSddJrhEQyce/cPvajTpXzTn+tjI4fHw3Qv/pDlM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jp7j6dCQm5XqQ1anuhKrVmITweXpSqZ3W/qel87WFMfcuWBKvA8yQTwgvhwkVzjWm3ttM1TSudyjIzhpKcrgaTttnc5F09HCS/w0vRO3Rmoh8o02nL9oz547fcxtCcA4GcK2UrhmUq9MUtCK4UA91qH9c5IcI2+P+fTMN1359ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=W0qaa46x; arc=none smtp.client-ip=113.46.200.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ozJXLhj6"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="W0qaa46x"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=2FNmGdRA6WNkSW3gQDN3+WluFUlUMpgBNvvjHe+ozws=;
-	b=ozJXLhj6qKROoOq+Bbf5eCE0ySKbEVe0eFVDWD/2NDiAYI7utwPDBHlEEAzurSA2GkdIXdVXT
-	zKejclK2pnorcdLX5muQcRwK9J4d/+pnoQfVEP6sPTiIopiImF0IP81WLWpiUwUujyavJZPrWwU
-	mTG2AV+Dhxw8dUbY0bLSFqk=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dCV912sbxz1prkV;
-	Fri, 21 Nov 2025 17:21:57 +0800 (CST)
+	bh=aSmhSjVlXXSAOTMnlq2uU/cOCynmcE9Ef92ugEWwAf4=;
+	b=W0qaa46xvizHT9Gu7lDEABADS4vTuORq1FbRVkx9UBjt3wRJTwB7YIe8+fmWixZM0YLuBSyD+
+	2iqtZMjwWbSzIs4fPSmvFQvnMFFSTZht9yHIGLUayMzi50RK7dQe9/iVmnGZlczZIUOk5MHtJSK
+	q5TOR0asMTh1EsGFZseqa3M=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dCV924VvSzKmXQ;
+	Fri, 21 Nov 2025 17:21:58 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id 369DA180BCF;
-	Fri, 21 Nov 2025 17:23:43 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 32376140295;
+	Fri, 21 Nov 2025 17:23:44 +0800 (CST)
 Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
  (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
- 2025 17:23:42 +0800
+ 2025 17:23:43 +0800
 From: Tian Zheng <zhengtian10@huawei.com>
 To: <maz@kernel.org>, <oliver.upton@linux.dev>, <catalin.marinas@arm.com>,
 	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>
@@ -41,10 +42,12 @@ CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
 	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: [PATCH v2 0/5] Support the FEAT_HDBSS introduced in Armv9.5
-Date: Fri, 21 Nov 2025 17:23:37 +0800
-Message-ID: <20251121092342.3393318-1-zhengtian10@huawei.com>
+Subject: [PATCH v2 2/5] KVM: arm64: Support set the DBM attr during memory abort
+Date: Fri, 21 Nov 2025 17:23:39 +0800
+Message-ID: <20251121092342.3393318-3-zhengtian10@huawei.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20251121092342.3393318-1-zhengtian10@huawei.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,61 +59,76 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
-This series of patches add support to the Hardware Dirty state tracking
-Structure(HDBSS) feature, which is introduced by the ARM architecture
-in the DDI0601(ID121123) version.
+From: eillon <yezhenyu2@huawei.com>
 
-The HDBSS feature is an extension to the architecture that enhances
-tracking translation table descriptors' dirty state, identified as
-FEAT_HDBSS. The goal of this feature is to reduce the cost of surveying
-for dirtied granules, with minimal effect on recording when a granule
-has been dirtied.
+Add DBM support to automatically promote write-clean pages to
+write-dirty, preventing users from being trapped in EL2 due to
+missing write permissions.
 
-The purpose of this feature is to make the execution overhead of live
-migration lower to both the guest and the host, compared to existing
-approaches (write-protect or search stage 2 tables).
+Since the DBM attribute was introduced in ARMv8.1 and remains
+optional in later architecture revisions, including ARMv9.5.
 
-After these patches, users(such as qemu) can use the
-KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl to enable or disable the HDBSS
-feature before and after the live migration.
+Support set the DBM attr during user_mem_abort().
 
-This feature is similar to Intel's Page Modification Logging (PML),
-offering hardware-assisted dirty tracking to reduce live migration
-overhead. With PML support expanding beyond Intel, HDBSS introduces a
-comparable mechanism for ARM.
+Signed-off-by: eillon <yezhenyu2@huawei.com>
+Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+---
+ arch/arm64/include/asm/kvm_pgtable.h | 4 ++++
+ arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
+ 2 files changed, 10 insertions(+)
 
-eillon (4):
-  arm64/sysreg: Add HDBSS related register information
-  KVM: arm64: Support set the DBM attr during memory abort
-  KVM: arm64: Add support for FEAT_HDBSS
-  KVM: arm64: Enable HDBSS support and handle HDBSSF events
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index 2888b5d03757..2fa24953d1a6 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -91,6 +91,8 @@ typedef u64 kvm_pte_t;
 
-Tian Zheng (1):
-  KVM: arm64: Document HDBSS ioctl
+ #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
 
- Documentation/virt/kvm/api.rst       |  15 ++++
- arch/arm64/Kconfig                   |  14 ++++
- arch/arm64/include/asm/cpucaps.h     |   2 +
- arch/arm64/include/asm/cpufeature.h  |   5 ++
- arch/arm64/include/asm/esr.h         |   2 +
- arch/arm64/include/asm/kvm_arm.h     |   1 +
- arch/arm64/include/asm/kvm_host.h    |  14 ++++
- arch/arm64/include/asm/kvm_mmu.h     |  17 +++++
- arch/arm64/include/asm/kvm_pgtable.h |   4 +
- arch/arm64/include/asm/sysreg.h      |  12 +++
- arch/arm64/kernel/cpufeature.c       |   9 +++
- arch/arm64/kvm/arm.c                 | 107 +++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c         |  45 +++++++++++
- arch/arm64/kvm/hyp/pgtable.c         |   6 ++
- arch/arm64/kvm/hyp/vhe/switch.c      |   1 +
- arch/arm64/kvm/mmu.c                 |  10 +++
- arch/arm64/kvm/reset.c               |   3 +
- arch/arm64/tools/cpucaps             |   1 +
- arch/arm64/tools/sysreg              |  28 +++++++
- include/linux/kvm_host.h             |   1 +
- include/uapi/linux/kvm.h             |   1 +
- tools/include/uapi/linux/kvm.h       |   1 +
- 22 files changed, 299 insertions(+)
++#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
++
+ #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
+
+ #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
+@@ -245,6 +247,7 @@ enum kvm_pgtable_stage2_flags {
+  * @KVM_PGTABLE_PROT_R:		Read permission.
+  * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
+  * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
++ * @KVM_PGTABLE_PROT_DBM:	Dirty bit management attribute.
+  * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
+  * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
+  * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
+@@ -257,6 +260,7 @@ enum kvm_pgtable_prot {
+
+ 	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
+ 	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
++	KVM_PGTABLE_PROT_DBM			= BIT(5),
+
+ 	KVM_PGTABLE_PROT_SW0			= BIT(55),
+ 	KVM_PGTABLE_PROT_SW1			= BIT(56),
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index c351b4abd5db..ce41c6924ebe 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -694,6 +694,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
+ 	if (prot & KVM_PGTABLE_PROT_W)
+ 		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+
++	if (prot & KVM_PGTABLE_PROT_DBM)
++		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++
+ 	if (!kvm_lpa2_is_enabled())
+ 		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
+
+@@ -1303,6 +1306,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 	if (prot & KVM_PGTABLE_PROT_W)
+ 		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
+
++	if (prot & KVM_PGTABLE_PROT_DBM)
++		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
++
+ 	if (prot & KVM_PGTABLE_PROT_X)
+ 		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
 
 --
 2.33.0
