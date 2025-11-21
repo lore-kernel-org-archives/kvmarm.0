@@ -1,34 +1,34 @@
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B47C340A62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79F2340D9D
 	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 09:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763717030; cv=none; b=DAoCPhPg7687d+GCSzBAJDKbeUqu/qPSj/lM4Jr76SXaeU84zfwb29Op5h2CubYxnIjNs4O1xkuR0eS18Y4igEQI1T3yc/vs9N2q8nSFoZFG0Y/mP2xIsDhOsOQM3ITm091fgdDpAImpe3Zi0HJlBHimuIXpQRoH7m6f/Mc6xkw=
+	t=1763717031; cv=none; b=S4KG2ZYq0J9g/Sabwv5aZ3VaoNcjKo/z54HE31feQ6yC+Qua9aMpLLPm6q1atuMdp6foM/pFZABMtTT97Y0FdsOLxzm5zk4oytpRQIrRitWWboutNvUAXQqKV87rRmyzSAGDEybRBL/V9EloJSEmAzUaxpNMD4eaH0WbNBUJGE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763717030; c=relaxed/simple;
-	bh=Q2DGYkufsk2x9Tu77BjVKMwT+QPioocOFWU53UddrwA=;
+	s=arc-20240116; t=1763717031; c=relaxed/simple;
+	bh=UrY+pCES8Lr8ar4CYQXHO9RG4hQV+PjFmGgWq4oPIAA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYEG+ei2Gwv00Tvy5k6FH9+JQcNMDIaCSAs4iu6B54j2TwBhr0sNb1cN2TeavkqVd2rt0hZyT70uxL7ybjaaUG42dHbmFUyWqGLaS2mu8M5q2pTbuSQZ75NgqcwisEHgdYNRyl/odiEPv+/h1CaUWQ4Jjto0RU7ovqhNZrM5KCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=NHtZg8eu; arc=none smtp.client-ip=113.46.200.222
+	 MIME-Version:Content-Type; b=u4FiUeC4z1UqP/kTMUfRtqmKUKCM6Maoo7lXnBQbXmbgyIgCfLXqmRzlmEszJOaAjIOYZungKYPgzYHXFCVIvAOvMYqez56WOovBfVqe0XpGTUhQRM4FcTd9yGKUCIQcFG9ix4RcD6RoSpLVtIZx/DI4UDZ0AceUtqOW7sp9ZDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JEy7kf+6; arc=none smtp.client-ip=113.46.200.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="NHtZg8eu"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JEy7kf+6"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=XSG5z7NezWuc0avnwC5SfAzocygjZiNaU3gOAAGSw08=;
-	b=NHtZg8euW9umBzAFbKKuTno6mueSgWMgcjgqSAsN4SNFgEVkFhh4PxkGHnIKfJeAg7qbhyoF9
-	mdq2Vr/FDTfM3qWwOvHcfhj+KrtHIaoYNlT15NFg4wTOtz/UYcn3urnXMWOt2qcjXEUhzu7ww7M
-	a46AtZbRptp5H2obWVOpDDI=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dCV941023zLlSZ;
+	bh=UrY+pCES8Lr8ar4CYQXHO9RG4hQV+PjFmGgWq4oPIAA=;
+	b=JEy7kf+6F/tBqxGKMOknAV8OX/p+URTD23jg7dHml3kKmPLxmWb7Q3OnpmdoOkZ+jXnAhxHe4
+	r6wP+AJNXuTiYE+3it6noIqKNu2gqN2hHYsgSlhxPqOMlYYyxdC7exPJXl7wm94Yp2vdfhHoeKv
+	MqwohDLKTjAXmoxMMMhW5Ao=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dCV9418fTzKmWx;
 	Fri, 21 Nov 2025 17:22:00 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id B76CB140295;
-	Fri, 21 Nov 2025 17:23:44 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id B206614022D;
+	Fri, 21 Nov 2025 17:23:45 +0800 (CST)
 Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
  (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
@@ -42,9 +42,9 @@ CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
 	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: [PATCH v2 3/5] KVM: arm64: Add support for FEAT_HDBSS
-Date: Fri, 21 Nov 2025 17:23:40 +0800
-Message-ID: <20251121092342.3393318-4-zhengtian10@huawei.com>
+Subject: [PATCH v2 5/5] KVM: arm64: Document HDBSS ioctl
+Date: Fri, 21 Nov 2025 17:23:42 +0800
+Message-ID: <20251121092342.3393318-6-zhengtian10@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20251121092342.3393318-1-zhengtian10@huawei.com>
 References: <20251121092342.3393318-1-zhengtian10@huawei.com>
@@ -59,184 +59,42 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
-From: eillon <yezhenyu2@huawei.com>
-
-Armv9.5 introduces the Hardware Dirty Bit State Structure (HDBSS) feature,
-indicated by ID_AA64MMFR1_EL1.HAFDBS == 0b0100.
-
-Add the Kconfig for FEAT_HDBSS and support detecting and enabling the
-feature. A CPU capability is added to notify the user of the feature.
-
-Add KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl and basic framework for
-ARM64 HDBSS support. Since the HDBSS buffer size is configurable and
-cannot be determined at KVM initialization, an IOCTL interface is
-required.
-
-Actually exposing the new capability to user space happens in a later
-patch.
+A new ioctl (KVM_CAP_ARM_HW_DIRTY_STATE_TRACK) provides a mechanism for
+userspace to configure the HDBSS buffer size during live migration,
+enabling hardware-assisted dirty page tracking.
 
 Signed-off-by: eillon <yezhenyu2@huawei.com>
 Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
 ---
- arch/arm64/Kconfig                  | 14 ++++++++++++++
- arch/arm64/include/asm/cpucaps.h    |  2 ++
- arch/arm64/include/asm/cpufeature.h |  5 +++++
- arch/arm64/include/asm/kvm_host.h   |  4 ++++
- arch/arm64/include/asm/sysreg.h     | 12 ++++++++++++
- arch/arm64/kernel/cpufeature.c      |  9 +++++++++
- arch/arm64/tools/cpucaps            |  1 +
- include/uapi/linux/kvm.h            |  1 +
- tools/include/uapi/linux/kvm.h      |  1 +
- 9 files changed, 49 insertions(+)
+ Documentation/virt/kvm/api.rst | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 6663ffd23f25..1edf75888a09 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2201,6 +2201,20 @@ config ARM64_GCS
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 57061fa29e6a..25d60ff136e9 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8703,6 +8703,21 @@ This capability indicate to the userspace whether a PFNMAP memory region
+ can be safely mapped as cacheable. This relies on the presence of
+ force write back (FWB) feature support on the hardware.
 
- endmenu # "ARMv9.4 architectural features"
-
-+menu "ARMv9.5 architectural features"
++7.44 KVM_CAP_ARM_HW_DIRTY_STATE_TRACK
++:Architectures: arm64
++:Type: VM
++:Parameters: args[0] is the allocation order determining HDBSS buffer size
++:Returns: 0 on success, negative value on failure
 +
-+config ARM64_HDBSS
-+	bool "Enable support for Hardware Dirty state tracking Structure (HDBSS)"
-+	help
-+	  Hardware Dirty state tracking Structure(HDBSS) enhances tracking
-+	  translation table descriptors' dirty state to reduce the cost of
-+	  surveying for dirtied granules.
++Enables hardware-assisted dirty page tracking via the Hardware Dirty State
++Tracking Structure (HDBSS).
 +
-+	  The feature introduces new assembly registers (HDBSSBR_EL2 and
-+	  HDBSSPROD_EL2), which are accessed via generated register accessors.
++When live migration is initiated, userspace can enable this feature by
++setting KVM_CAP_ARM_HW_DIRTY_STATE_TRACK through IOCTL. KVM will allocate
++per-vCPU HDBSS buffers.
 +
-+endmenu # "ARMv9.5 architectural features"
++The feature is disabled by invoking the ioctl again.
 +
- config ARM64_SVE
- 	bool "ARM Scalable Vector Extension support"
- 	default y
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 9d769291a306..5e5a26f28dec 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -48,6 +48,8 @@ cpucap_is_possible(const unsigned int cap)
- 		return IS_ENABLED(CONFIG_ARM64_GCS);
- 	case ARM64_HAFT:
- 		return IS_ENABLED(CONFIG_ARM64_HAFT);
-+	case ARM64_HAS_HDBSS:
-+		return IS_ENABLED(CONFIG_ARM64_HDBSS);
- 	case ARM64_UNMAP_KERNEL_AT_EL0:
- 		return IS_ENABLED(CONFIG_UNMAP_KERNEL_AT_EL0);
- 	case ARM64_WORKAROUND_843419:
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index e223cbf350e4..b231415a2b76 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -856,6 +856,11 @@ static inline bool system_supports_haft(void)
- 	return cpus_have_final_cap(ARM64_HAFT);
- }
+ 8. Other capabilities.
+ ======================
 
-+static inline bool system_supports_hdbss(void)
-+{
-+	return cpus_have_final_cap(ARM64_HAS_HDBSS);
-+}
-+
- static __always_inline bool system_supports_mpam(void)
- {
- 	return alternative_has_cap_unlikely(ARM64_MPAM);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 64302c438355..d962932f0e5f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -60,6 +60,10 @@
-
- #define KVM_HAVE_MMU_RWLOCK
-
-+/* HDBSS entry field definitions */
-+#define HDBSS_ENTRY_VALID BIT(0)
-+#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
-+
- /*
-  * Mode of operation configurable with kvm-arm.mode early param.
-  * See Documentation/admin-guide/kernel-parameters.txt for more information.
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index c231d2a3e515..3511edea1fbc 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1129,6 +1129,18 @@
- #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
- #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
-
-+/*
-+ * Definitions for the HDBSS feature
-+ */
-+#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
-+
-+#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
-+				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
-+#define HDBSSBR_BADDR(br)	((br) & GENMASK(55, (12 + HDBSSBR_SZ(br))))
-+#define HDBSSBR_SZ(br)		FIELD_GET(HDBSSBR_EL2_SZ_MASK, br)
-+
-+#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
-+
- #define ARM64_FEATURE_FIELD_BITS	4
-
- #ifdef __ASSEMBLY__
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index e25b0f84a22d..f39973b68bdb 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2710,6 +2710,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HAFT)
- 	},
-+#endif
-+#ifdef CONFIG_ARM64_HDBSS
-+	{
-+		.desc = "Hardware Dirty state tracking structure (HDBSS)",
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.capability = ARM64_HAS_HDBSS,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, HAFDBS, HDBSS)
-+	},
- #endif
- 	{
- 		.desc = "CRC32 instructions",
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 1b32c1232d28..4be19bb4543e 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -64,6 +64,7 @@ HAS_TLB_RANGE
- HAS_VA52
- HAS_VIRT_HOST_EXTN
- HAS_WFXT
-+HAS_HDBSS
- HAFT
- HW_DBM
- KVM_HVHE
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 52f6000ab020..59340189afac 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -963,6 +963,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_RISCV_MP_STATE_RESET 242
- #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
- #define KVM_CAP_GUEST_MEMFD_FLAGS 244
-+#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 245
-
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 52f6000ab020..59340189afac 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -963,6 +963,7 @@ struct kvm_enable_cap {
- #define KVM_CAP_RISCV_MP_STATE_RESET 242
- #define KVM_CAP_ARM_CACHEABLE_PFNMAP_SUPPORTED 243
- #define KVM_CAP_GUEST_MEMFD_FLAGS 244
-+#define KVM_CAP_ARM_HW_DIRTY_STATE_TRACK 245
-
- struct kvm_irq_routing_irqchip {
- 	__u32 irqchip;
 --
 2.33.0
 
