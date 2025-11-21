@@ -1,79 +1,142 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BED72FD1B9;
-	Thu, 20 Nov 2025 17:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A9333C519
+	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 09:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763661559; cv=none; b=lkkw2jk//Lp0MDTZ2+Wp/T/t0p1cFwbTx+DVUOWlFpEpr+gdbrGqh3n/bpjmKHDik5SJzX4VO3F9iWgf3bu4DdmBco5PKsofPxmjeTcUMwShhCEAgz+F+NllMgLEAGCWvzJAyuKYp4POO9/TWzPKTnosTigInROc3OGJH+2pZK0=
+	t=1763717028; cv=none; b=nVD8bgnpMdO+H+UQYcCyNudFQZSQwZn30fdhq2jfOY0eOtb3/OaRIykJ2VdD4gWrpx6CqFEC5PlriS+gYBc7PGZ+tefRqNprI9Fhqbyujlk5Nnb6bofyS+3MFhYXciqiKgUXXLnjqZ2V+JcUSzYZcr05wrmSOE8XyRbI1aSwqOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763661559; c=relaxed/simple;
-	bh=j8iVfNQHbGBFw5o1AQhqQ85i0Fy/SaPvvDyzmWQ/hhQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lcRLKLAVJAuTdGvnRY7wiJAsjqTaJv1kEdBsuYWEYghWRFDq1JyEfxVu0DgXybQJpv5d3bYafZYdDHh3CCuZyr9cUJZQD8NJVaaqHku4Q0GzzPUihyKpzSFMxjV9l5dKOA8ZMcxBeogPNbyamUNL3vkPtFAYIyvPoHb3njCATZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=FKV4R0de; arc=none smtp.client-ip=119.8.177.37
+	s=arc-20240116; t=1763717028; c=relaxed/simple;
+	bh=Bt2Hwt9sCR5WG2aRUAwBi8UUiftFYTbEFxblcAUpPr0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ROKPpd4SK5C6ALm91d1KrZq4xP6wzpejB22uXbfFwpmcFRGwxitm6zLx8Wopgi39eU0ZFph1ytca1WaYl3vjX0hw2FN2zNIL7PTe967tzeEH24/xf8QduFe73GYjIuTgId6w4UkuiY4q+0ZPbHEtWeFK3gUD0tZgU8aYDa4FfM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=5adxCFnY; arc=none smtp.client-ip=113.46.200.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="FKV4R0de"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="5adxCFnY"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=pg8bpfAqZHinwFuZ1N2NkS2NwoQDtiQ4C8zkIv+wGLQ=;
-	b=FKV4R0defO4YvLpmPxFdMH0HxV0e16/O0eAGg20uJ6rt+RJx+jQQbTx1IaQ02KiNOthzY7gUh
-	GPW7ootpwaWCENWv1jG0yUXX5gTsJ73UrkM7A4XRaa+rckbMyrm59mqlFPGYYA+Uxql4vdHHgpt
-	yrf5Jnd9GUuvNUhp2dz714U=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dC5ft4YbZz1vnNw;
-	Fri, 21 Nov 2025 01:57:58 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dC5gY6hBdzHnGhb;
-	Fri, 21 Nov 2025 01:58:33 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1FA4714038F;
-	Fri, 21 Nov 2025 01:59:09 +0800 (CST)
-Received: from localhost (10.48.159.58) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 20 Nov
- 2025 17:59:08 +0000
-Date: Thu, 20 Nov 2025 17:59:06 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
-CC: <linux-coco@lists.linux.dev>, <kvmarm@lists.linux.dev>,
-	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <aik@amd.com>, <lukas@wunner.de>, Samuel Ortiz
-	<sameo@rivosinc.com>, Xu Yilun <yilun.xu@linux.intel.com>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Suzuki K Poulose <Suzuki.Poulose@arm.com>, Steven Price
-	<steven.price@arm.com>, Bjorn Helgaas <helgaas@kernel.org>, Catalin Marinas
-	<catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon
-	<will@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 11/11] coco: guest: arm64: Enable vdev DMA after
- attestation
-Message-ID: <20251120175906.00003560@huawei.com>
-In-Reply-To: <20251117140007.122062-12-aneesh.kumar@kernel.org>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
-	<20251117140007.122062-12-aneesh.kumar@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	bh=HP4T9Ux78gNIlOGmGsvDsFgk5odPVemp6LKwfalw7UY=;
+	b=5adxCFnYtZP2WE1LbfvuKRRXT1JiztDVoW03rbWUI/v5H9cGRx+kWCpAgaUfizgE9Y6O2HdUE
+	TpGdLfyM9yjlcDiwechxX0z6rWUmBv/yUFhVPOQh75CmwUzlgaQTVHp3gSmbuKwQkJ1SVDidL9w
+	y23dAw0NO6DZhA4Gwb18TsU=
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dCV916Swqz1prkV;
+	Fri, 21 Nov 2025 17:21:57 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id B0F5018048D;
+	Fri, 21 Nov 2025 17:23:43 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
+ (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
+ 2025 17:23:43 +0800
+From: Tian Zheng <zhengtian10@huawei.com>
+To: <maz@kernel.org>, <oliver.upton@linux.dev>, <catalin.marinas@arm.com>,
+	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <linuxarm@huawei.com>,
+	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+Subject: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
+Date: Fri, 21 Nov 2025 17:23:38 +0800
+Message-ID: <20251121092342.3393318-2-zhengtian10@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20251121092342.3393318-1-zhengtian10@huawei.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On Mon, 17 Nov 2025 19:30:07 +0530
-"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
+From: eillon <yezhenyu2@huawei.com>
 
-> - define SMC_RSI_VDEV_DMA_ENABLE and add wrapper in rsi_cmds.h
-> - invoke the new helper from the guest accept path once the device
->   passes attestation, rolling back to TDI_LOCKED on failure
-> 
-> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-LGTM
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+The ARM architecture added the HDBSS feature and descriptions of
+related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+add them to Linux.
 
+Signed-off-by: eillon <yezhenyu2@huawei.com>
+Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+---
+ arch/arm64/include/asm/esr.h     |  2 ++
+ arch/arm64/include/asm/kvm_arm.h |  1 +
+ arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+)
+
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index e1deed824464..a6f3cf0b9b86 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -159,6 +159,8 @@
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+
+ /* ISS2 field definitions for Data Aborts */
++#define ESR_ELx_HDBSSF_SHIFT	(11)
++#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+ #define ESR_ELx_TnD_SHIFT	(10)
+ #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+ #define ESR_ELx_TagAccess_SHIFT	(9)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1da290aeedce..b71122680a03 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -124,6 +124,7 @@
+ 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+
+ /* VTCR_EL2 Registers bits */
++#define VTCR_EL2_HDBSS		(1UL << 45)
+ #define VTCR_EL2_DS		TCR_EL2_DS
+ #define VTCR_EL2_RES1		(1U << 31)
+ #define VTCR_EL2_HD		(1 << 22)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 1c6cdf9d54bb..f489703338b5 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -4408,6 +4408,34 @@ Sysreg	GCSPR_EL2	3	4	2	5	1
+ Fields	GCSPR_ELx
+ EndSysreg
+
++Sysreg	HDBSSBR_EL2	3	4	2	3	2
++Res0	63:56
++Field	55:12	BADDR
++Res0	11:4
++Enum	3:0	SZ
++	0b0001	8KB
++	0b0010	16KB
++	0b0011	32KB
++	0b0100	64KB
++	0b0101	128KB
++	0b0110	256KB
++	0b0111	512KB
++	0b1000	1MB
++	0b1001	2MB
++EndEnum
++EndSysreg
++
++Sysreg	HDBSSPROD_EL2	3	4	2	3	3
++Res0	63:32
++Enum	31:26	FSC
++	0b000000	OK
++	0b010000	ExternalAbort
++	0b101000	GPF
++EndEnum
++Res0	25:19
++Field	18:0	INDEX
++EndSysreg
++
+ Sysreg	DACR32_EL2	3	4	3	0	0
+ Res0	63:32
+ Field	31:30	D15
+--
+2.33.0
 
