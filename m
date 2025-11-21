@@ -1,38 +1,37 @@
 Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A9333C519
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B1733F380
 	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 09:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763717028; cv=none; b=nVD8bgnpMdO+H+UQYcCyNudFQZSQwZn30fdhq2jfOY0eOtb3/OaRIykJ2VdD4gWrpx6CqFEC5PlriS+gYBc7PGZ+tefRqNprI9Fhqbyujlk5Nnb6bofyS+3MFhYXciqiKgUXXLnjqZ2V+JcUSzYZcr05wrmSOE8XyRbI1aSwqOs=
+	t=1763717028; cv=none; b=mqfaZMED7TrT0YJFO5GtF9cgpBrrVyi1V7lfpc18oQhJeW/8NLajUmNQ/Buox6s3MsK2L22q8S+mxciqmVFa+JRSXV5se6qROR5niSDZRu3wQkbVHs4Z5lYrYlFVkkn5TXKVnnXl6v8FYCKoDyQqYT0M5w/hzvbzxnnIQ2M2ko4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1763717028; c=relaxed/simple;
-	bh=Bt2Hwt9sCR5WG2aRUAwBi8UUiftFYTbEFxblcAUpPr0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ROKPpd4SK5C6ALm91d1KrZq4xP6wzpejB22uXbfFwpmcFRGwxitm6zLx8Wopgi39eU0ZFph1ytca1WaYl3vjX0hw2FN2zNIL7PTe967tzeEH24/xf8QduFe73GYjIuTgId6w4UkuiY4q+0ZPbHEtWeFK3gUD0tZgU8aYDa4FfM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=5adxCFnY; arc=none smtp.client-ip=113.46.200.219
+	bh=LjrNVB/VDqUyL8RfflBobn4bMQWyFHvx8GB+ANFej34=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L490ou2Ez4v/XhCEaNpknrz7S4HOIiuKKux7yNHDpmoewTZnpQ3stgt3YAEAPhJfVTob5GyoVCYGueDz1LzDu/vLhggp75HMmJIzcUWGsY9jJi/JQNWkUlW1d5HSuH+ysKuuOHv75tnSHvCdtRYROeQiXj3MW+3b9M8mrf59PyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ozJXLhj6; arc=none smtp.client-ip=113.46.200.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="5adxCFnY"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ozJXLhj6"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=HP4T9Ux78gNIlOGmGsvDsFgk5odPVemp6LKwfalw7UY=;
-	b=5adxCFnYtZP2WE1LbfvuKRRXT1JiztDVoW03rbWUI/v5H9cGRx+kWCpAgaUfizgE9Y6O2HdUE
-	TpGdLfyM9yjlcDiwechxX0z6rWUmBv/yUFhVPOQh75CmwUzlgaQTVHp3gSmbuKwQkJ1SVDidL9w
-	y23dAw0NO6DZhA4Gwb18TsU=
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dCV916Swqz1prkV;
+	bh=2FNmGdRA6WNkSW3gQDN3+WluFUlUMpgBNvvjHe+ozws=;
+	b=ozJXLhj6qKROoOq+Bbf5eCE0ySKbEVe0eFVDWD/2NDiAYI7utwPDBHlEEAzurSA2GkdIXdVXT
+	zKejclK2pnorcdLX5muQcRwK9J4d/+pnoQfVEP6sPTiIopiImF0IP81WLWpiUwUujyavJZPrWwU
+	mTG2AV+Dhxw8dUbY0bLSFqk=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4dCV912sbxz1prkV;
 	Fri, 21 Nov 2025 17:21:57 +0800 (CST)
 Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
-	by mail.maildlp.com (Postfix) with ESMTPS id B0F5018048D;
+	by mail.maildlp.com (Postfix) with ESMTPS id 369DA180BCF;
 	Fri, 21 Nov 2025 17:23:43 +0800 (CST)
 Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
  (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 21 Nov
- 2025 17:23:43 +0800
+ 2025 17:23:42 +0800
 From: Tian Zheng <zhengtian10@huawei.com>
 To: <maz@kernel.org>, <oliver.upton@linux.dev>, <catalin.marinas@arm.com>,
 	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>
@@ -42,12 +41,10 @@ CC: <linux-kernel@vger.kernel.org>, <zhengtian10@huawei.com>,
 	<joey.gouly@arm.com>, <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
 	<suzuki.poulose@arm.com>
-Subject: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
-Date: Fri, 21 Nov 2025 17:23:38 +0800
-Message-ID: <20251121092342.3393318-2-zhengtian10@huawei.com>
+Subject: [PATCH v2 0/5] Support the FEAT_HDBSS introduced in Armv9.5
+Date: Fri, 21 Nov 2025 17:23:37 +0800
+Message-ID: <20251121092342.3393318-1-zhengtian10@huawei.com>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251121092342.3393318-1-zhengtian10@huawei.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,84 +56,62 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
  kwepemr100010.china.huawei.com (7.202.195.125)
 
-From: eillon <yezhenyu2@huawei.com>
+This series of patches add support to the Hardware Dirty state tracking
+Structure(HDBSS) feature, which is introduced by the ARM architecture
+in the DDI0601(ID121123) version.
 
-The ARM architecture added the HDBSS feature and descriptions of
-related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
-add them to Linux.
+The HDBSS feature is an extension to the architecture that enhances
+tracking translation table descriptors' dirty state, identified as
+FEAT_HDBSS. The goal of this feature is to reduce the cost of surveying
+for dirtied granules, with minimal effect on recording when a granule
+has been dirtied.
 
-Signed-off-by: eillon <yezhenyu2@huawei.com>
-Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
----
- arch/arm64/include/asm/esr.h     |  2 ++
- arch/arm64/include/asm/kvm_arm.h |  1 +
- arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
- 3 files changed, 31 insertions(+)
+The purpose of this feature is to make the execution overhead of live
+migration lower to both the guest and the host, compared to existing
+approaches (write-protect or search stage 2 tables).
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index e1deed824464..a6f3cf0b9b86 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -159,6 +159,8 @@
- #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+After these patches, users(such as qemu) can use the
+KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl to enable or disable the HDBSS
+feature before and after the live migration.
 
- /* ISS2 field definitions for Data Aborts */
-+#define ESR_ELx_HDBSSF_SHIFT	(11)
-+#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
- #define ESR_ELx_TnD_SHIFT	(10)
- #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
- #define ESR_ELx_TagAccess_SHIFT	(9)
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 1da290aeedce..b71122680a03 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -124,6 +124,7 @@
- 			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+This feature is similar to Intel's Page Modification Logging (PML),
+offering hardware-assisted dirty tracking to reduce live migration
+overhead. With PML support expanding beyond Intel, HDBSS introduces a
+comparable mechanism for ARM.
 
- /* VTCR_EL2 Registers bits */
-+#define VTCR_EL2_HDBSS		(1UL << 45)
- #define VTCR_EL2_DS		TCR_EL2_DS
- #define VTCR_EL2_RES1		(1U << 31)
- #define VTCR_EL2_HD		(1 << 22)
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 1c6cdf9d54bb..f489703338b5 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -4408,6 +4408,34 @@ Sysreg	GCSPR_EL2	3	4	2	5	1
- Fields	GCSPR_ELx
- EndSysreg
+eillon (4):
+  arm64/sysreg: Add HDBSS related register information
+  KVM: arm64: Support set the DBM attr during memory abort
+  KVM: arm64: Add support for FEAT_HDBSS
+  KVM: arm64: Enable HDBSS support and handle HDBSSF events
 
-+Sysreg	HDBSSBR_EL2	3	4	2	3	2
-+Res0	63:56
-+Field	55:12	BADDR
-+Res0	11:4
-+Enum	3:0	SZ
-+	0b0001	8KB
-+	0b0010	16KB
-+	0b0011	32KB
-+	0b0100	64KB
-+	0b0101	128KB
-+	0b0110	256KB
-+	0b0111	512KB
-+	0b1000	1MB
-+	0b1001	2MB
-+EndEnum
-+EndSysreg
-+
-+Sysreg	HDBSSPROD_EL2	3	4	2	3	3
-+Res0	63:32
-+Enum	31:26	FSC
-+	0b000000	OK
-+	0b010000	ExternalAbort
-+	0b101000	GPF
-+EndEnum
-+Res0	25:19
-+Field	18:0	INDEX
-+EndSysreg
-+
- Sysreg	DACR32_EL2	3	4	3	0	0
- Res0	63:32
- Field	31:30	D15
+Tian Zheng (1):
+  KVM: arm64: Document HDBSS ioctl
+
+ Documentation/virt/kvm/api.rst       |  15 ++++
+ arch/arm64/Kconfig                   |  14 ++++
+ arch/arm64/include/asm/cpucaps.h     |   2 +
+ arch/arm64/include/asm/cpufeature.h  |   5 ++
+ arch/arm64/include/asm/esr.h         |   2 +
+ arch/arm64/include/asm/kvm_arm.h     |   1 +
+ arch/arm64/include/asm/kvm_host.h    |  14 ++++
+ arch/arm64/include/asm/kvm_mmu.h     |  17 +++++
+ arch/arm64/include/asm/kvm_pgtable.h |   4 +
+ arch/arm64/include/asm/sysreg.h      |  12 +++
+ arch/arm64/kernel/cpufeature.c       |   9 +++
+ arch/arm64/kvm/arm.c                 | 107 +++++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c         |  45 +++++++++++
+ arch/arm64/kvm/hyp/pgtable.c         |   6 ++
+ arch/arm64/kvm/hyp/vhe/switch.c      |   1 +
+ arch/arm64/kvm/mmu.c                 |  10 +++
+ arch/arm64/kvm/reset.c               |   3 +
+ arch/arm64/tools/cpucaps             |   1 +
+ arch/arm64/tools/sysreg              |  28 +++++++
+ include/linux/kvm_host.h             |   1 +
+ include/uapi/linux/kvm.h             |   1 +
+ tools/include/uapi/linux/kvm.h       |   1 +
+ 22 files changed, 299 insertions(+)
+
 --
 2.33.0
 
