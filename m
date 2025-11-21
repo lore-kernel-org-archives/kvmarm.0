@@ -1,49 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B413826B760
-	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 17:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ADF336D4EE
+	for <kvmarm@lists.linux.dev>; Fri, 21 Nov 2025 18:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763746839; cv=none; b=rp98wIfolcnlKiGaVPYWRZC804VZ/WPELZRqY6njSPqLTTLjOhqnoaf17LCZdquuQ2P2wywZ3kyXOwzyMbBc1iZ+w53BJDroMT4ktlCzvSo0J+WsHPNu2bwefFh3n9+X7i4+giiTkKTT98WkR0z8+c7Vd82mnJ6XbqPjlwK1B74=
+	t=1763749549; cv=none; b=XABADFnP1aZmUrGjUE3mZhM9E68TZTUBREFZZoi0OeimnDhRs1I3t8yEOzYfUku6Cb8nUs8Zg2scPK9lJY+TKtZNAVxMEM5Zrc6LmmpU8OrdcyBHY32RkndZM86cLTTGKsrCK2xuKb0ivzv9VX7juSxerbG4wv7kO4gf6RZ/ceI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763746839; c=relaxed/simple;
-	bh=8nKZJhx3dG0Hpsj0XeH0juJ30gs8T8Bx7T+zCDpXYrI=;
+	s=arc-20240116; t=1763749549; c=relaxed/simple;
+	bh=6L0hHi9chnHutRMdkh1eDwRCuLFHnUHoJDc33A6MOpE=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OBaUPwluPLH9ZCQLANIRRfkdCwhQlNW7o0xEU1y/ZYJXxZ3Ao4vEqKYDFVOm8oG/P0tP4fmE93qHsh+maUaa7wHqXQ7b5dGO1xMxH+Z5EGt585WDGRcJZLYAUrlWfNFxklRlvIaGpZaeArIhncl69jDC8T6sqJWKgnXvIH18XgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ueiJs/M/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=KLdOxM1QfmSFgxnqCESSJhsvFZPLn0c7PBsOiMyPxJVJ/YU/o9f3PvN4SXx/X0NXjLt4DVsUNO2MZ8YCHGKTug26mxrNaEJzaWImRzgFFe9C6DF4u1xD76ptW0c3lfq2A6JGIsWFrl6utpLaSybexIYop7rcK810YM8vLc2/7Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qb0Fhely; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ueiJs/M/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48187C4CEF1;
-	Fri, 21 Nov 2025 17:40:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qb0Fhely"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8BB0C4CEF1;
+	Fri, 21 Nov 2025 18:25:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763746839;
-	bh=8nKZJhx3dG0Hpsj0XeH0juJ30gs8T8Bx7T+zCDpXYrI=;
+	s=k20201202; t=1763749547;
+	bh=6L0hHi9chnHutRMdkh1eDwRCuLFHnUHoJDc33A6MOpE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ueiJs/M/Bfx20wpKI8HTyGkcEsphy7IlMjsBzHLeWFmIriuTAZQh2SVUuEYrZOYia
-	 5GARj3h9RjEjMXL6fCy8CF9vqxqc9aMryVhbThbyc6GEuWHVQVxjv0Ia9HIJoa26nd
-	 EI7QqVfWa1SY/quoJ1Q69eJYiJhOnJsR2ZdRXyLbGR1MgZjqWPzvxFcvG2XsSeHF+Q
-	 EqpJOy7lXqw/BlraHIbejRkZ9iXqIKR6t68cEfQ8j9lj91lOZxNEy/tDVjKhxzxqmg
-	 Y3t8C9+RoHDQcy1GVmcQqmbWYh81LhZIhIxJ/U9xOvkoX6BYACoiniDGgCifBDQaXC
-	 yVWPWkrJirYCQ==
+	b=qb0FhelyJdVe1Av/lf0PwvtqOJ0S3sHgyOI1HGsxMrRsaDowaHzcrLtYsS5B+jTux
+	 b5ZMP7OE2bCVN6La3j3XCe3mgZQ9w8uCut5hueafciRhFJGme1DMjMnP2qCGtTiOu9
+	 ijKmRC+Kzt8gjmOUjaLFpn5FCvq4FrSwze94+h40DCUiHFpMcOBpi1TdaN+ZFedy4n
+	 uyoKd0KJv0+tMerX3gy+8fYJ4JBYmHZERaNv2mq2XgWdqRvrsEFoXxvSeN/kmf7x6a
+	 qJtr/p4ipMtkjEmln3Yedh0FC4uU9boLxG7+OHIgiFp7oduB+2EiL9rI4E6tpuIOA6
+	 IdeaDzhT+G2PQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vMV7d-00000007JK2-0ol1;
-	Fri, 21 Nov 2025 17:40:37 +0000
-Date: Fri, 21 Nov 2025 17:40:36 +0000
-Message-ID: <87see7ffmz.wl-maz@kernel.org>
+	id 1vMVpJ-00000007KAE-1wph;
+	Fri, 21 Nov 2025 18:25:45 +0000
+Date: Fri, 21 Nov 2025 18:25:45 +0000
+Message-ID: <87qztrfdjq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvmarm@lists.linux.dev,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 07/14] KVM: arm64: Handle endianness in read helper for emulated PTW
-In-Reply-To: <20251117224325.2431848-8-oupton@kernel.org>
+Subject: Re: [PATCH v2 09/14] KVM: arm64: Add helper for swapping guest descriptor
+In-Reply-To: <20251117224325.2431848-10-oupton@kernel.org>
 References: <20251117224325.2431848-1-oupton@kernel.org>
-	<20251117224325.2431848-8-oupton@kernel.org>
+	<20251117224325.2431848-10-oupton@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,172 +59,183 @@ X-SA-Exim-Rcpt-To: oupton@kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 17 Nov 2025 22:43:18 +0000,
+On Mon, 17 Nov 2025 22:43:20 +0000,
 Oliver Upton <oupton@kernel.org> wrote:
 > 
-> Implementing FEAT_HAFDBS means adding another descriptor accessor that
-> needs to deal with the guest-configured endianness. Prepare by moving
-> the endianness handling into the read accessor and out of the main body
-> of the S1/S2 PTWs.
+> Implementing FEAT_HAFDBS in KVM's software PTWs requires the ability to
+> CAS a descriptor to update the in-memory value. Add an accessor to do
+> exactly that, coping with the fact that guest descriptors are in user
+> memory (duh).
+> 
+> While FEAT_LSE required on any system that implements NV, KVM now uses
+> the stage-1 PTW for non-nested use cases meaning an LL/SC implementation
+> is necessary as well.
 > 
 > Signed-off-by: Oliver Upton <oupton@kernel.org>
 > ---
->  arch/arm64/kvm/at.c     | 25 +++++++++++++++++++------
->  arch/arm64/kvm/nested.c | 30 +++++++++++++++++-------------
->  2 files changed, 36 insertions(+), 19 deletions(-)
+>  arch/arm64/include/asm/kvm_nested.h |  2 +
+>  arch/arm64/kvm/at.c                 | 87 +++++++++++++++++++++++++++++
+>  2 files changed, 89 insertions(+)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5d967b60414c..6dbc2908aed9 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -403,4 +403,6 @@ void kvm_handle_s1e2_tlbi(struct kvm_vcpu *vcpu, u32 inst, u64 val);
+>  		(FIX_VNCR - __c);				\
+>  	})
+>  
+> +int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new);
+> +
+>  #endif /* __ARM64_KVM_NESTED_H */
 > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index be26d5aa668c..a295a37dd3b1 100644
+> index a295a37dd3b1..22e2ee4e182e 100644
 > --- a/arch/arm64/kvm/at.c
 > +++ b/arch/arm64/kvm/at.c
-> @@ -362,6 +362,24 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  	return -EFAULT;
+> @@ -1650,3 +1650,90 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  		return ret;
+>  	}
 >  }
->  
-> +static int kvm_read_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 *desc,
-> +			    struct s1_walk_info *wi)
+> +
+> +static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
 > +{
-> +	u64 val;
-> +	int r;
+> +	u64 tmp = old;
+> +	int ret = 0;
 > +
-> +	r = kvm_read_guest(vcpu->kvm, pa, &val, sizeof(val));
-> +	if (r)
-> +		return r;
+> +	uaccess_enable_privileged();
 > +
-> +	if (wi->be)
-> +		*desc = be64_to_cpu((__force __be64)val);
-> +	else
-> +		*desc = le64_to_cpu((__force __le64)val);
+> +	asm volatile(__LSE_PREAMBLE
+> +		     "1: cas	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
 > +
-> +	return 0;
+> +	uaccess_disable_privileged();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
 > +}
 > +
->  static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  		   struct s1_walk_result *wr, u64 va)
->  {
-> @@ -414,17 +432,12 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
->  				return ret;
->  		}
->  
-> -		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
-> +		ret = kvm_read_s1_desc(vcpu, ipa, &desc, wi);
->  		if (ret) {
->  			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level), false);
->  			return ret;
->  		}
->  
-> -		if (wi->be)
-> -			desc = be64_to_cpu((__force __be64)desc);
-> -		else
-> -			desc = le64_to_cpu((__force __le64)desc);
-> -
->  		/* Invalid descriptor */
->  		if (!(desc & BIT(0)))
->  			goto transfault;
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index cf4b24e04a1a..10e68aab3d2a 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -198,13 +198,26 @@ static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
->  	return 0;
->  }
->  
-> -static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
-> +static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, struct s2_walk_info *wi)
->  {
-> -	struct kvm_vcpu *vcpu = data;
-> +	struct kvm_vcpu *vcpu = wi->data;
+> +static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp;
+> +	int ret;
+> +
+> +	uaccess_enable_privileged();
+> +
+> +	asm volatile("prfm	pstl1strm, %[addr]\n"
+> +		     "1: ldxr	%[tmp], %[addr]\n"
+> +		     "sub	%[tmp], %[tmp], %[old]\n"
+> +		     "cbnz	%[tmp], 3f\n"
+> +		     "2: stlxr	%w[ret], %[new], %[addr]\n"
 
-How about getting rid of this nonsense wi->data business? With the
-reader abstraction removed, this really serves no purpose. And
-aligning the read_guest_s[12]_desc() prototype. See below for an
-untested suggestion.
+So if we don't find the correct value, we skip the store, which means
+that ret is not updated.
+
+> +		     "3:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w[ret])
+> +		     _ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w[ret])
+> +		     : [ret] "=r" (ret), [addr] "+Q" (*ptep), [tmp] "=&r" (tmp)
+> +		     : [old] "r" (old), [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_disable_privileged();
+> +
+> +	/* STLXR didn't update the descriptor */
+> +	if (ret == 1)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+
+But then ret has an undefined value, and bad things will happen. I
+reckon you need to initialise ret to 0, and evaluate tmp, much like
+you do in the CAS case. Something like this:
+
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 7c13e69a7d9a1..67a93c7954c7d 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1724,8 +1724,8 @@ static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+ 
+ static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
+ {
++	int ret = 0;
+ 	u64 tmp;
+-	int ret;
+ 
+ 	uaccess_enable_privileged();
+ 
+@@ -1743,8 +1743,11 @@ static int __llsc_swap_desc(u64 __user *ptep, u64 old, u64 new)
+ 
+ 	uaccess_disable_privileged();
+ 
+-	/* STLXR didn't update the descriptor */
+-	if (ret == 1)
++	if (ret < 0)
++		return ret;
++
++	/* STLXR didn't update the descriptor, or the compare failed */
++	if (tmp || ret == 1)
+ 		return -EAGAIN;
+ 
+ 	return ret;
+
+> +}
+> +
+> +int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	unsigned long hva;
+> +	u64 __user *ptep;
+> +	bool writable;
+> +	int offset;
+> +	gfn_t gfn;
+> +	int r;
+> +
+> +	gfn = ipa >> PAGE_SHIFT;
+> +	offset = offset_in_page(ipa);
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
+
+There is a very strong assumption that we hold the srcu read lock
+here. Can we add a
+
+      lockdep_assert(srcu_read_lock_held(&kvm->srcu));
+
+at the beginning of this function?
+
+> +	if (kvm_is_error_hva(hva))
+> +		return -EINVAL;
+> +	if (!writable)
+> +		return -EPERM;
+> +
+> +	ptep = (u64 __user *)hva + offset;
+> +	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+> +		r = __lse_swap_desc(ptep, old, new);
+> +	else
+> +		r = __llsc_swap_desc(ptep, old, new);
+> +
+> +	if (r < 0)
+> +		return r;
+> +	if (r)
+> +		return -EAGAIN;
+
+Isn't that case always caught by the first check?
+
+> +
+> +	mark_page_dirty_in_slot(kvm, slot, gfn);
+> +	return 0;
+> +}
 
 Thanks,
 
 	M.
-
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index dbd3900e8bff6..e063061f21aad 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -124,7 +124,6 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- }
- 
- struct s2_walk_info {
--	void		*data;
- 	u64		baddr;
- 	unsigned int	max_oa_bits;
- 	unsigned int	pgshift;
-@@ -199,9 +198,9 @@ static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
- 	return 0;
- }
- 
--static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, struct s2_walk_info *wi)
-+static int read_guest_s2_desc(struct kvm_vcpu *vcpu,
-+			      phys_addr_t pa, u64 *desc, struct s2_walk_info *wi)
- {
--	struct kvm_vcpu *vcpu = wi->data;
- 	u64 val;
- 	int r;
- 
-@@ -221,11 +220,10 @@ static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, struct s2_walk_info *wi
- 	return 0;
- }
- 
--static int swap_guest_s2_desc(phys_addr_t pa, u64 old, u64 new,
-+static int swap_guest_s2_desc(struct kvm_vcpu *vcpu,
-+			      phys_addr_t pa, u64 old, u64 new,
- 			      struct s2_walk_info *wi)
- {
--	struct kvm_vcpu *vcpu = wi->data;
--
- 	if (wi->be) {
- 		old = cpu_to_be64(old);
- 		new = cpu_to_be64(new);
-@@ -244,7 +242,7 @@ static int swap_guest_s2_desc(phys_addr_t pa, u64 old, u64 new,
-  *
-  * Must be called with the kvm->srcu read lock held
-  */
--static int walk_nested_s2_pgd(phys_addr_t ipa,
-+static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
- 			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
- {
- 	int first_block_level, level, stride, input_size, base_lower_bound;
-@@ -295,7 +293,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 			>> (addr_bottom - 3);
- 
- 		paddr = base_addr | index;
--		ret = read_guest_s2_desc(paddr, &desc, wi);
-+		ret = read_guest_s2_desc(vcpu, paddr, &desc, wi);
- 		if (ret < 0)
- 			return ret;
- 
-@@ -349,7 +347,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 		new_desc |= KVM_PTE_LEAF_ATTR_LO_S2_AF;
- 
- 	if (new_desc != desc) {
--		ret = swap_guest_s2_desc(paddr, desc, new_desc, wi);
-+		ret = swap_guest_s2_desc(vcpu, paddr, desc, new_desc, wi);
- 		if (ret)
- 			return ret;
- 
-@@ -410,14 +408,13 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 	if (!vcpu_has_nv(vcpu))
- 		return 0;
- 
--	wi.data = vcpu;
- 	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
- 
- 	vtcr_to_walk_info(vtcr, &wi);
- 
- 	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
- 
--	ret = walk_nested_s2_pgd(gipa, &wi, result);
-+	ret = walk_nested_s2_pgd(vcpu, gipa, &wi, result);
- 	if (ret)
- 		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
- 
 
 -- 
 Jazz isn't dead. It just smells funny.
