@@ -1,56 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AAE11F37A1;
-	Sat, 22 Nov 2025 11:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE06207A3A;
+	Sat, 22 Nov 2025 12:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763811378; cv=none; b=oaEKtM6PZD5hFtZsQneMoq+VOmMTp2z5h6+DNPnH3ALSQJa7JkCmMZO/2K4oi3BfuuCcu2NNTHy2HFVlkkHmB++lper+d/YvPExbmOVNnqQeqt6cCcvrGqoHK4RTnnm8q2Aq8GE4zlUymS4HfJuHHZYFCsuMSq6KJfox47p9Y4k=
+	t=1763815230; cv=none; b=E98CogdVFqeiUS2dJvaDcdJtfIlEGvwlkHe47Wr7ObMJPY4aIBSCzRMmrpiMmCQzD/kcVseP6CXF1wXVlQ1ay6esd5vX7HSRmXnZvsjQiBi8UgOE83QZr4u4NSpQeLYaZE0/qKMacuWxc1r8bMuqaL9WTXMRoun0Y0CEuMoJBN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763811378; c=relaxed/simple;
-	bh=N8UVOM97bpuzdMThEtEW9EoLnzHdhFQiiRsevvt0RN4=;
+	s=arc-20240116; t=1763815230; c=relaxed/simple;
+	bh=BdnKYTAKaORHGO2Q/Ihj95imsb6E3FqedhQAygwOtME=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PLxsqbx7paJ0DYeNypbpEaY4FyPXw+AXNGsSYKbXIAT/GdH2ZTRyEs1L6ngvNuglvkphh4V92yHsh6dUTMJPbld8RX/eBtuBkIoxoSjTB6kOpRYVnyzqiKmF3u/cLAAgBPfhGEjn2k0D2NemHIFuEC3lm+gUhfz/zaHTwmer8xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuya2A4S; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=NvCAX4SuBlYbjU+KsyxMpI20wIl3hwr50amYeTFJEQnQAbFVfs8D57+ZOUavp3sd+/KnWHm/skdiZ8cYKyKoKbvwvsv1HrWLvmiHGfQCceD88aoj2z0JblGAFKp1bHt1tUGffymrXCj6XSesFGr3KO2Lsw/fSGcJJLZCLuo9Jpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agJf8a7L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuya2A4S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922AEC4CEF5;
-	Sat, 22 Nov 2025 11:36:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agJf8a7L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1386EC4CEF5;
+	Sat, 22 Nov 2025 12:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763811377;
-	bh=N8UVOM97bpuzdMThEtEW9EoLnzHdhFQiiRsevvt0RN4=;
+	s=k20201202; t=1763815230;
+	bh=BdnKYTAKaORHGO2Q/Ihj95imsb6E3FqedhQAygwOtME=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fuya2A4SJO/hHRzoRnE7wHp5qyLAc+XRIhpr4gR0jPmWncNhkPPiCHUqKS5a8Q9tD
-	 Cp4K2fQNqtprBEymcDctSjB1LC6k5VRIzdZiyTZyanbUWcV4lUBMNVtS+AzsR9xHr2
-	 mmr5cvecYKEh2s46aiYgcaHOyFq4itwV3nZhAUxrJrrKMBQGQkOGI0cIQuMBhSTD4m
-	 CqEc1pJ816h+6GHK2f7RGzOV18XFnoXPjEcnSJMFOT8xmyTF1hICFJSLnmKWHue6IU
-	 ZQVQH8yE4pRAViUm+sdP74GQ//JKqro70124HWT++luv6Av5DwN4COEqXcjytw9UET
-	 AkfXySze6Ve4A==
+	b=agJf8a7LyH/iIOyJQTWgVeUmnxNhDQOOQVYulw37B5bbbtdEDM/eyEMHAwCPpEmr2
+	 BNi/CTDYPjU8zu768mBfk8h3mncoDFkUX0vbxoflPmFj+DKw2Yaq1tWYyDktArgl3V
+	 8UL7Dl+nMSEnpTHVtgjNWsbXP7huorjOVkZLn8GU3ywsIewGcdpGF5gzwsloFdrQCV
+	 3JTm3wiV7cPAP+SHF+5abJijTyW1SVbvYuCvWyuLo+fsUIwDCJZGVeJKPK/R2jgEy5
+	 Qm1qe8852o3PGDa7xmR+LRQn13R/rezvVHJDZ2BOG5+kPAOAvV0nVwBbqDQySQb3aL
+	 tlkjsqwx00p9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vMluZ-00000007TZy-0hdz;
-	Sat, 22 Nov 2025 11:36:15 +0000
-Date: Sat, 22 Nov 2025 11:36:14 +0000
-Message-ID: <86y0nyqoy9.wl-maz@kernel.org>
+	id 1vMmuh-00000007U9L-2jRe;
+	Sat, 22 Nov 2025 12:40:27 +0000
+Date: Sat, 22 Nov 2025 12:40:27 +0000
+Message-ID: <86wm3iqlz8.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "=?utf-8?q?Kornel_Dul=C4=99ba?=" <korneld@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Bartlomiej Grzesik <bgrzesik@google.com>,
-	Tomasz Nowicki <tnowicki@google.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: Fix error checking for FFA_VERSION
-In-Reply-To: <20251114-pkvm_init_noffa-v1-1-87a82e87c345@google.com>
-References: <20251114-pkvm_init_noffa-v1-1-87a82e87c345@google.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: <oliver.upton@linux.dev>,
+	<catalin.marinas@arm.com>,
+	<corbet@lwn.net>,
+	<pbonzini@redhat.com>,
+	<will@kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<yuzenghui@huawei.com>,
+	<wangzhou1@hisilicon.com>,
+	<yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>,
+	<zhengchuan@huawei.com>,
+	<linuxarm@huawei.com>,
+	<joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>,
+	<kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
+In-Reply-To: <20251121092342.3393318-2-zhengtian10@huawei.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
+	<20251121092342.3393318-2-zhengtian10@huawei.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,33 +69,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: korneld@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, bgrzesik@google.com, tnowicki@google.com, sebastianene@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, linux-kernel@vger.kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 14 Nov 2025 11:11:53 +0000,
-"=?utf-8?q?Kornel_Dul=C4=99ba?=" <korneld@google.com> wrote:
+On Fri, 21 Nov 2025 09:23:38 +0000,
+Tian Zheng <zhengtian10@huawei.com> wrote:
 > 
-> According to section 13.2 of the DEN0077 FF-A specification, when
-> firmware does not support the requested version, it should reply with
-> FFA_RET_NOT_SUPPORTED(-1). Table 13.6 specifies the type of the error
-> code as int32.
-> Currently, the error checking logic compares the unsigned long return
-> value it got from the SMC layer, against a "-1" literal. This fails due
-> to a type mismatch: the literal is extended to 64 bits, whereas the
-> register contains only 32 bits of ones(0x00000000ffffffff).
-> Consequently, hyp_ffa_init misinterprets the "-1" return value as an
-> invalid FF-A version. This prevents pKVM initialization on devices where
-> FF-A is not supported in firmware.
+> From: eillon <yezhenyu2@huawei.com>
+> 
+> The ARM architecture added the HDBSS feature and descriptions of
+> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+> add them to Linux.
+> 
+> Signed-off-by: eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/include/asm/esr.h     |  2 ++
+>  arch/arm64/include/asm/kvm_arm.h |  1 +
+>  arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index e1deed824464..a6f3cf0b9b86 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -159,6 +159,8 @@
+>  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+> 
+>  /* ISS2 field definitions for Data Aborts */
+> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>  #define ESR_ELx_TnD_SHIFT	(10)
+>  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>  #define ESR_ELx_TagAccess_SHIFT	(9)
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 1da290aeedce..b71122680a03 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -124,6 +124,7 @@
+>  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+> 
+>  /* VTCR_EL2 Registers bits */
+> +#define VTCR_EL2_HDBSS		(1UL << 45)
 
-Is this statement accurate? I regularly boot KVM in protected mode in
-environments that really cannot be suspected of implementing FF-A
-(there is no EL3 to start with). And yet I don't see any failure of
-the sort.
-
-Please clarify the circumstances this is triggered.
-
-Thanks,
+I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+instead of adding extra bits here.
 
 	M.
 
