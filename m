@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0349A2D481F
-	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 19:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BF214AD20
+	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 19:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764010921; cv=none; b=gnNdv1qdo383zbkfF7Lk8WxYXBJ3+DUOJUiLGoP0l+jG/nXU1yTQL8Q5OSn/F5v+6O9TS3nk2Kc9SyBC3auIVduFZ9HRPZWVcqrVsE6DEgWe40mcqH0Y349Xts0+t3cz+MvhYHPeKJnR8T6VWbbpL+Mi+CLAlROw9JQe2rxPupg=
+	t=1764010921; cv=none; b=qDHEs9jeBl3IKkvrQuPMxiXcM/MaioGEpdF6uK9yyBTkRX+U8WEfuO2sFtQaDDy2iT8qVQwL7MgChYbZIwuIW+qlOqxX0jzWfr2Hvqcl8RFail3LwZC+nsp3dI1nfc2mHF+PypBU7b5DFya7XsCldfURS2VusUfr6eWPs/8oV2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764010921; c=relaxed/simple;
-	bh=+gAD+IaTwpG1gRteVAgWRs/7VtXVdKOClN/MoBBXTFE=;
+	bh=ePrVL7ImOMdiM270PdDY9pXUIsY/eSJ644Bc65UfvwI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rtCPILzm7Ojgwccpder0ogbDyy03rXYxeUhZ53wT//5BbxQS5oiG8Yb6ZdwQRRhcgtNOhwf/g1uknO26mcFHUG2JTHR6WBzS6MjWw5YRJR9lDCNbjphAPOWZX+E30vMQOhUxY9fgIa1EV0hSDWM5NJj31P36LU31mY2Qfo8i1Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Am2XH0W4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=J0TVvitLOa3Ub5NeNZHZ2RCRbYUjRqEqxTd1RQKeRrC7J9bjY9nv0KDqYVxjgh7tityxDrrc8zcRBgW9sMbvybavaTJ3YW5QWaHPbVpDrsrocWlxfS1NKXHP4MBdABDvZ/Wct7DM2MzL8hI9Q2tQFTBTYw2FxutRyhl1rbiUMWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6QHJSoR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Am2XH0W4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6173C2BC87;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6QHJSoR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 029E1C16AAE;
 	Mon, 24 Nov 2025 19:02:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764010920;
-	bh=+gAD+IaTwpG1gRteVAgWRs/7VtXVdKOClN/MoBBXTFE=;
+	s=k20201202; t=1764010921;
+	bh=ePrVL7ImOMdiM270PdDY9pXUIsY/eSJ644Bc65UfvwI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Am2XH0W4xksStCkGEf1y/gdMimx+zFKxUikzQBZnAWQwE996FlCo72z9hElkeX1Oa
-	 wtPyez0i2t2ZI6V22p/18CYD7soNA13c/P1oCF1I9+ZoPVT+63b6jbFO2ppkLleKjU
-	 nwCBkB1nXqwfuCRdBWyMUbChbLvsidq5dent9yTwr+i8w+394QeehKsOlaNmieqj5C
-	 +1BGNL9fgbpuqmZIeik0/w5ZR6vE8596nnip/HIIdKXtiSfhmP2eEWX0zQCAu//qsO
-	 0e8Ki7Y8CIAQExrolfRF3RVDOpMf1g2SiBxbL4Wd1pj3/fCXAs+M1vvxU1J12JRflF
-	 /e7406F7IpoYA==
+	b=W6QHJSoRR5ASodvWjXVxhGE1Ev12QQH3eOKT+YqFlxeK77QQTAQIEqJ2cLfkIxdLB
+	 ommbK+aDz5ub0f8eEFXoJSF+PKAgot+uBucEaCI7q2+XyrKW0k2adUf4MnMR6/iyM5
+	 UaZpvrnh6PKf6GyXeSqkxQVGroBSXAC7ArRdEx832Dbic2cPxjAkwWdQjMIUhvvHfP
+	 q7Hxb67PMxaBM5slZzUsDHLocJA8Az5AsHXeJxHhAe6jkmRdz50z0C61nYQGC3DjJp
+	 s8ylOxD/ZNmQmAGQw0RCnpDoxRigABrvWqtlmYAtBZytJtefha3nETtucFI3zvZpJa
+	 FMlVBpbIm+u+g==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,9 +33,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v3 06/15] KVM: arm64: Call helper for reading descriptors directly
-Date: Mon, 24 Nov 2025 11:01:48 -0800
-Message-ID: <20251124190158.177318-7-oupton@kernel.org>
+Subject: [PATCH v3 07/15] KVM: arm64: nv: Stop passing vCPU through void ptr in S2 PTW
+Date: Mon, 24 Nov 2025 11:01:49 -0800
+Message-ID: <20251124190158.177318-8-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251124190158.177318-1-oupton@kernel.org>
 References: <20251124190158.177318-1-oupton@kernel.org>
@@ -47,70 +47,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Going through a function pointer doesn't serve much purpose when there's
-only one implementation.
+The stage-2 table walker passes down the vCPU as a void pointer. That
+might've made sense if the walker was generic although at this point it
+is clear this will only ever be used in the context of a vCPU.
 
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- arch/arm64/kvm/nested.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/nested.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 08839a320a45..e4928a6a3672 100644
+index e4928a6a3672..94eff8307aad 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
 @@ -124,7 +124,6 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
  }
  
  struct s2_walk_info {
--	int	     (*read_desc)(phys_addr_t pa, u64 *desc, void *data);
- 	void	     *data;
+-	void	     *data;
  	u64	     baddr;
  	unsigned int max_oa_bits;
-@@ -199,6 +198,13 @@ static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
- 	return 0;
- }
- 
-+static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
-+{
-+	struct kvm_vcpu *vcpu = data;
-+
-+	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
-+}
-+
- /*
-  * This is essentially a C-version of the pseudo code from the ARM ARM
-  * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
-@@ -257,7 +263,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 			>> (addr_bottom - 3);
- 
- 		paddr = base_addr | index;
--		ret = wi->read_desc(paddr, &desc, wi->data);
-+		ret = read_guest_s2_desc(paddr, &desc, wi->data);
- 		if (ret < 0)
- 			return ret;
- 
-@@ -325,13 +331,6 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 	unsigned int pgshift;
+@@ -198,10 +197,8 @@ static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
  	return 0;
  }
  
 -static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
--{
++static int read_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 *desc)
+ {
 -	struct kvm_vcpu *vcpu = data;
 -
--	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
--}
--
- static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
+ 	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
+ }
+ 
+@@ -212,7 +209,7 @@ static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
+  *
+  * Must be called with the kvm->srcu read lock held
+  */
+-static int walk_nested_s2_pgd(phys_addr_t ipa,
++static int walk_nested_s2_pgd(struct kvm_vcpu *vcpu, phys_addr_t ipa,
+ 			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
  {
- 	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
-@@ -364,7 +363,6 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	int first_block_level, level, stride, input_size, base_lower_bound;
+@@ -263,7 +260,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
+ 			>> (addr_bottom - 3);
+ 
+ 		paddr = base_addr | index;
+-		ret = read_guest_s2_desc(paddr, &desc, wi->data);
++		ret = read_guest_s2_desc(vcpu, paddr, &desc);
+ 		if (ret < 0)
+ 			return ret;
+ 
+@@ -363,14 +360,13 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
  	if (!vcpu_has_nv(vcpu))
  		return 0;
  
--	wi.read_desc = read_guest_s2_desc;
- 	wi.data = vcpu;
+-	wi.data = vcpu;
  	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+ 
+ 	vtcr_to_walk_info(vtcr, &wi);
+ 
+ 	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_ELx_EE;
+ 
+-	ret = walk_nested_s2_pgd(gipa, &wi, result);
++	ret = walk_nested_s2_pgd(vcpu, gipa, &wi, result);
+ 	if (ret)
+ 		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
  
 -- 
 2.47.3
