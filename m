@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2602D2493
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2E62D2498
 	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 19:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764010920; cv=none; b=n/OjoPBXZGjAoPwZqwmDAyMcSpsyHwevf94LVYZrv53OPWMr1mNVmJ8RZzZuXFJRWfDxO6BrN64L50iYi5UQx9fMw6dTToX/BgmvlS1PJUcojgxtN4mOo3ZF+UWJpaXxSLCCZDWNV/6sI79YRUvjXVAyYkaIdk1j3EXgo8s+0O8=
+	t=1764010920; cv=none; b=U/TlKcN3p53XvTXwN14CXrF/cuNCvFBkuNSoIkVff+g/F8V4GgXM2ljTUaHG2vQ3mtLZwO4tIv1Wmch43HuLVUZ8w8WLmWJVW7aYJWQ0KEgpdV5RYH2A6Iw0EUDVG/BD5NJfE71oKNNvzAN6md7YrKkj4NYfQBNbZ1EXp9RHl4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764010920; c=relaxed/simple;
-	bh=1PsgmgxT6voP8H02wCGF5eReTQNWRovqHjEeValMF+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZJbbnIq/8TQth0+PL2SvDCRbE/EOiu2/P4fMdqdV83O3Zq6vJffwYw1IT+tyIDcBqiCpvktsxvRC/Cp/WdeJYnvQX3uwF0UfIwoF0G5aDLIky7YQfLv6pCBzRr9DwiONRwrre/m5pwM4r4ejQgfk1Q1JaMIn1qLxG7FGsKIRcFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oYqiuxVt; arc=none smtp.client-ip=10.30.226.201
+	bh=pDFAQEgrrb6MNUq0QHvvefg81WhPMe2QqlhgC9ChIHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DIt53LFpKoTfA+zUNzRqA5EQg3prMTE4TMIummBsEnYtXrxiQgmvIWwvrOap7ZAN7sIGByPLL48sJ+EtWMlUcv3+ooVsbN/qRVs6lfI4g9dkBFMELRBi+j/vIwFrf6xeyYOtTaNre2VESGzYfzP8imPXgoCuOQyaLOIZjfTfhCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TiXlk6PW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oYqiuxVt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 759D5C4CEF1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TiXlk6PW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAEA0C4AF09;
 	Mon, 24 Nov 2025 19:01:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764010919;
-	bh=1PsgmgxT6voP8H02wCGF5eReTQNWRovqHjEeValMF+k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oYqiuxVto2+eooF2x6M6Wq8Y/pwLEDbQOlyBbntNbJlwPs122qgmkoNbYGcjN71/G
-	 7cpAAfE5w4Y9qeY5eM7ceZ01O09ZNbu8+P/i0UD46scj9rrw/VjDXt5/baGRZ0tHWy
-	 0zrXIWtfC6LECw3Zao0ysiA6GvMh94Me1T4UFckN9Ig23+mqKy4SAIVy4BBZlNefhF
-	 dTWWX5QeAedmSMJ1isaTbROuQs+SsDE7k9YwALhYe26UT4Umz+EuQxfrAolISLUY+V
-	 YxT+VJMv/FqT+4MuzVBqSHE2eogpXfjJnNvQBi3bQ7YsrQauJnI14b+pOkSLtEe6/W
-	 7Be2rvlZVQEvg==
+	bh=pDFAQEgrrb6MNUq0QHvvefg81WhPMe2QqlhgC9ChIHE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TiXlk6PWIIzxsr1W1g61UEuN8OjUdZbwE12sgUBLke1DvOJ8ysAatt1Ir+hajZoeG
+	 mE6p4rDgZNa6+Duc7xnD/aiuXj8Hwdl2XVwF4JjbyTUbYk3dJq8TUsJ3V2AEGr59+8
+	 wEkDmMTd/wVDDn/PA/b4+FTG1lnpDg/w3eMv5xHdpv7lSLTRHmeEW1AdI/xuS/b9Gl
+	 ZxPBUzd/CSJ0sy2FxKa8ampIlLyxawPINH0/Mc5kuhl1uB9+h5LMtzYEyCYuuiuv91
+	 XdfIrS24IxUTsndow99Otr4+6cXLdofitMJInmnTV/3OYJWYA4xOBa5ZuvB9x0CJ/C
+	 DVzUGG9CEaP7Q==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -32,10 +33,12 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v3 00/15] KVM: arm64: nv: Implement FEAT_XNX and FEAT_HAF
-Date: Mon, 24 Nov 2025 11:01:42 -0800
-Message-ID: <20251124190158.177318-1-oupton@kernel.org>
+Subject: [PATCH v3 01/15] arm64: Detect FEAT_XNX
+Date: Mon, 24 Nov 2025 11:01:43 -0800
+Message-ID: <20251124190158.177318-2-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251124190158.177318-1-oupton@kernel.org>
+References: <20251124190158.177318-1-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,53 +47,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fixes all the issues Marc found in v2:
+Detect the feature in anticipation of using it in KVM.
 
-v2: https://lore.kernel.org/kvmarm/20251117224325.2431848-1-oupton@kernel.org/
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+---
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ arch/arm64/tools/cpucaps       | 1 +
+ 2 files changed, 8 insertions(+)
 
-v2 -> v3:
- - Don't use uninitialized XN value in kvm_pgtable_stage2_relax_perms()
- - Pass vcpu pointer directly in the stage-2 PTW
- - Ensure LL/SC swap implementation correctly handles compare failures
- - Fix SRCU imbalance
-
-Oliver Upton (15):
-  arm64: Detect FEAT_XNX
-  KVM: arm64: Add support for FEAT_XNX stage-2 permissions
-  KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2
-  KVM: arm64: Teach ptdump about FEAT_XNX permissions
-  KVM: arm64: nv: Advertise support for FEAT_XNX
-  KVM: arm64: Call helper for reading descriptors directly
-  KVM: arm64: nv: Stop passing vCPU through void ptr in S2 PTW
-  KVM: arm64: Handle endianness in read helper for emulated PTW
-  KVM: arm64: nv: Use pgtable definitions in stage-2 walk
-  KVM: arm64: Add helper for swapping guest descriptor
-  KVM: arm64: Propagate PTW errors up to AT emulation
-  KVM: arm64: Implement HW access flag management in stage-1 SW PTW
-  KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW
-  KVM: arm64: nv: Expose hardware access flag management to NV guests
-  KVM: arm64: selftests: Add test for AT emulation
-
- arch/arm64/include/asm/kvm_asm.h              |   6 +-
- arch/arm64/include/asm/kvm_nested.h           |  40 +++-
- arch/arm64/include/asm/kvm_pgtable.h          |  17 +-
- arch/arm64/kernel/cpufeature.c                |   7 +
- arch/arm64/kvm/at.c                           | 186 ++++++++++++++++--
- arch/arm64/kvm/hyp/pgtable.c                  |  58 +++++-
- arch/arm64/kvm/mmu.c                          |  28 ++-
- arch/arm64/kvm/nested.c                       | 126 ++++++++----
- arch/arm64/kvm/ptdump.c                       |  35 +++-
- arch/arm64/kvm/sys_regs.c                     |   9 +-
- arch/arm64/tools/cpucaps                      |   1 +
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/arm64/at.c        | 172 ++++++++++++++++
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  10 +
- 15 files changed, 602 insertions(+), 95 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/arm64/at.c
-
-
-base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 5ed401ff79e3..aa3ecae252d3 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -3088,6 +3088,13 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.capability = ARM64_HAS_GICV5_LEGACY,
+ 		.matches = test_has_gicv5_legacy,
+ 	},
++	{
++		.desc = "XNX",
++		.capability = ARM64_HAS_XNX,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_cpuid_feature,
++		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, XNX, IMP)
++	},
+ 	{},
+ };
+ 
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index 1b32c1232d28..ee74199107d3 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -64,6 +64,7 @@ HAS_TLB_RANGE
+ HAS_VA52
+ HAS_VIRT_HOST_EXTN
+ HAS_WFXT
++HAS_XNX
+ HAFT
+ HW_DBM
+ KVM_HVHE
 -- 
 2.47.3
 
