@@ -1,61 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7704626C3A2;
-	Mon, 24 Nov 2025 11:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145E02FC891;
+	Mon, 24 Nov 2025 11:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763984082; cv=none; b=MC+bPcOkC1WFINGY5jmTwb90wMKRS+f8a4syZuSgkG3yRFgqZOaTZdE7dZHBi2stczgDrzASCrLXALmW6fSw1deAn6HM58Y24leWfR87WOa6zqSnGFiIlZX1iAoqmljHI/bOumnIHsB4I07KZKCh0wZdlSIUnHmpRSIdmy/Fwc0=
+	t=1763984904; cv=none; b=WjyocGtajJFqv2G3Fm+yZAk264yPE+loALk1V4rTJQ9xOoO0vfOeXptYYIxNsQZ5LkHvGz6f1grWlSPGewARoBBrjLrrIdzNvzwHMpd9/9nf5bskadO9Gvwd+lpz0glukAMRx38C0JajHLnrHCTeAu35wtZVFYBdkon11+bqghk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763984082; c=relaxed/simple;
-	bh=d2Pha4UQ+iv223CySHm3Sd8FeEwJji6XUeaUkkW/NLw=;
+	s=arc-20240116; t=1763984904; c=relaxed/simple;
+	bh=fm8eKcgU59Lqj/73CT15p83zfcOtM57iiz6YiPB9l3g=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kSXP13rHSWme3LBNTM4L4wMqz9q2Uc3b98H4nzjcxB/A2QodE3NGnf7y36z8/dMkFx+YUrGV/wP/oLoWgb0BHuE03b1lRyTIBtXR1crMys29wOw7Rwu/PGJiJcLKO2JiEkEDsZzE01ZKmo8ghWk5t1Jc8mbRQsWjbMeUSXKpVvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0dFp+6E; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=TqUlKLlsoIsIFF5owiF1+7gnsFudkNjB/eCChGMwXNcbDjY+9BNyrtD6UJzxP8iPgc0qrY/JuUjlX/+NINNoDXVtSrYpyzURsL4tugMPkpjGM6EJToHA8VNngmfuWkBj58JI8vbahVUQ/SVxiouxXoz8IQRL5nywXMVOCMIzTo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I2kdqteT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0dFp+6E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D409BC116D0;
-	Mon, 24 Nov 2025 11:34:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2kdqteT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B471C4CEF1;
+	Mon, 24 Nov 2025 11:48:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763984082;
-	bh=d2Pha4UQ+iv223CySHm3Sd8FeEwJji6XUeaUkkW/NLw=;
+	s=k20201202; t=1763984903;
+	bh=fm8eKcgU59Lqj/73CT15p83zfcOtM57iiz6YiPB9l3g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i0dFp+6E4Is+fWWge0UEvkYpQayOdSHJUgb7SEGt0uTr4JoW5nZSpbKPalYsSC1MU
-	 l8ORVowokyEHWSd7P/LWgix/3kyyBwWNEWtOPmVZOaaSJJvpDMzqE3mwHbsz9MJ+rx
-	 utAyn+nZTbA+jlfhuWZkhHlp+ar4zDTKIw1S9TNOX12m+dzY/Pzbq9Icju2i//xSnc
-	 rThftJF63B5VsJX8sLYD2UfW6b6XTZSr0hXnyyZlkXVO+xMsdCbX+nbHi7XuMA2ZxK
-	 zSQpKo/ZGtPX8Piy4kXKIax50h/KeafTjfvkcCDwQkBpfuxFiPcsSNPQZE0fSoSRQn
-	 css3xZ78TXGng==
+	b=I2kdqteTk4749mFp5UOJjmN3KrINfddNofXHl1o88aBhT1iHeZFlwXclcAwhXUPOO
+	 GJzl+y3kD/CRi9Ccp8rozqJYrh5sEU+H8QpNb81A+yltN/nuAFL67655CVQ14zDfos
+	 o0+2PLCq6j066A376ueX29+vS7DsLGb5la3AUNkDjkZXcfbJv10CluTNAuB7NyKO8z
+	 kGi3iNm1Nrd45iHzYeTRWEaSv9UNJjL+aLqA69SuuvG3DrVnu7k27/Saa3v9Ma52Ye
+	 qGto4i76I/GzdHXq+x7aQiFNIvl/SXhPy0KB82tRHdFgc8owKGLzfzJtUf9xIwdGlK
+	 XnvjFZBMNFJfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNUq7-00000007pHS-1gK1;
-	Mon, 24 Nov 2025 11:34:39 +0000
-Date: Mon, 24 Nov 2025 11:34:38 +0000
-Message-ID: <86see3r7e9.wl-maz@kernel.org>
+	id 1vNV3N-00000007pTs-186o;
+	Mon, 24 Nov 2025 11:48:21 +0000
+Date: Mon, 24 Nov 2025 11:48:20 +0000
+Message-ID: <86qztnr6rf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jack Thomson <jackabt.amazon@gmail.com>
-Cc: oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	shuah@kernel.org,
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	isaku.yamahata@intel.com,
-	xmarcalx@amazon.co.uk,
-	kalyazin@amazon.co.uk,
-	jackabt@amazon.com
-Subject: Re: [PATCH v3 1/3] KVM: arm64: Add pre_fault_memory implementation
-In-Reply-To: <20251119154910.97716-2-jackabt.amazon@gmail.com>
-References: <20251119154910.97716-1-jackabt.amazon@gmail.com>
-	<20251119154910.97716-2-jackabt.amazon@gmail.com>
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose
+ <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: Report optional ID register traps with a 0x18 syndrome
+In-Reply-To: <576d088c-0176-41e5-a66c-8713f5cb09b7@arm.com>
+References: <20251120133202.2037803-1-maz@kernel.org>
+	<20251120133202.2037803-5-maz@kernel.org>
+	<576d088c-0176-41e5-a66c-8713f5cb09b7@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,203 +60,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jackabt.amazon@gmail.com, oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com, xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 19 Nov 2025 15:49:08 +0000,
-Jack Thomson <jackabt.amazon@gmail.com> wrote:
+On Mon, 24 Nov 2025 10:41:56 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> From: Jack Thomson <jackabt@amazon.com>
+> Hi Marc,
 > 
-> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
-> off the stage-2 faulting logic to either gmem_abort() or
-> user_mem_abort().
+> On 11/20/25 13:32, Marc Zyngier wrote:
+> > With FEAT_IDST, unimplemented system registers must be reported using
+> > EC=0x18 at the closest handling EL, rather than with an UNDEF.
 > 
-> Add an optional page_size output parameter to user_mem_abort() to
-> return the VMA page size, which is needed when pre-faulting.
+> I think this needs 'in the feature ID space' adding. Something like:
 > 
-> Update the documentation to clarify x86 specific behaviour.
-> 
-> Signed-off-by: Jack Thomson <jackabt@amazon.com>
-> ---
->  Documentation/virt/kvm/api.rst |  3 +-
->  arch/arm64/kvm/Kconfig         |  1 +
->  arch/arm64/kvm/arm.c           |  1 +
->  arch/arm64/kvm/mmu.c           | 73 ++++++++++++++++++++++++++++++++--
->  4 files changed, 73 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 57061fa29e6a..30872d080511 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6493,7 +6493,8 @@ Errors:
->  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
->  for the current vCPU state.  KVM maps memory as if the vCPU generated a
->  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
-> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
-> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
-> +Accessed.
->  
->  In the case of confidential VM types where there is an initial set up of
->  private guest memory before the guest is 'finalized'/measured, this ioctl
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 4f803fd1c99a..6872aaabe16c 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -25,6 +25,7 @@ menuconfig KVM
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> +	select KVM_GENERIC_PRE_FAULT_MEMORY
->  	select VIRT_XFER_TO_GUEST_WORK
->  	select KVM_VFIO
->  	select HAVE_KVM_DIRTY_RING_ACQ_REL
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 870953b4a8a7..88c5dc2b4ee8 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -327,6 +327,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_IRQFD_RESAMPLE:
->  	case KVM_CAP_COUNTER_OFFSET:
->  	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
-> +	case KVM_CAP_PRE_FAULT_MEMORY:
->  		r = 1;
+> With FEAT_IDST, unimplemented system registers in the feature ID space
+> must be reported using EC=0x18 at the closest handling EL, rather than
+> with an UNDEF.
 
-How does with pKVM, where the host is not in charge of dealing with
-stage-2?
+Ah, good point. I got (slightly) carried away!
 
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7cc964af8d30..cba09168fc6d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1599,8 +1599,8 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  			  struct kvm_s2_trans *nested,
-> -			  struct kvm_memory_slot *memslot, unsigned long hva,
-> -			  bool fault_is_perm)
-> +			  struct kvm_memory_slot *memslot, long *page_size,
-
-Why is page_size a signed type? A page size is never negative.
-
-> +			  unsigned long hva, bool fault_is_perm)
-
-I really wish we'd stop adding parameters to this function, as it has
-long stopped being readable. It would make a lot more sense if we
-passed a descriptor for the fault, containing the ipa, hva, memslot
-and fault type.
-
->  {
->  	int ret = 0;
->  	bool topup_memcache;
-> @@ -1878,6 +1878,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	kvm_release_faultin_page(kvm, page, !!ret, writable);
->  	kvm_fault_unlock(kvm);
->  
-> +	if (page_size)
-> +		*page_size = vma_pagesize;
-> +
->  	/* Mark the page dirty only if the fault is handled successfully */
->  	if (writable && !ret)
->  		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> @@ -2080,8 +2083,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
->  				 esr_fsc_is_permission_fault(esr));
->  	else
-> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
-> -				     esr_fsc_is_permission_fault(esr));
-> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
-> +				     hva, esr_fsc_is_permission_fault(esr));
->  	if (ret == 0)
->  		ret = 1;
->  out:
-> @@ -2457,3 +2460,65 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->  
->  	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
->  }
-> +
-> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> +				    struct kvm_pre_fault_memory *range)
-> +{
-> +	int ret, idx;
-> +	hva_t hva;
-> +	phys_addr_t end;
-> +	struct kvm_memory_slot *memslot;
-> +	struct kvm_vcpu_fault_info stored_fault, *fault_info;
-> +
-> +	long page_size = PAGE_SIZE;
-> +	phys_addr_t ipa = range->gpa;
-> +	gfn_t gfn = gpa_to_gfn(range->gpa);
-
-nit: Please order this in a more readable way, preferably with long
-line first.
-
-> +
-> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
-
-??? Aren't we already guaranteed to be under the SRCU read lock?
-
-> +
-> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> +	if (!memslot) {
-> +		ret = -ENOENT;
-> +		goto out_unlock;
-> +	}
-> +
-> +	fault_info = &vcpu->arch.fault;
-> +	stored_fault = *fault_info;
-
-If this is a vcpu ioctl, can the fault information be actually valid
-while userspace is issuing an ioctl? Wouldn't that mean that we are
-exiting to userspace in the middle of handling an exception?
-
-> +
-> +	/* Generate a synthetic abort for the pre-fault address */
-> +	fault_info->esr_el2 = ESR_ELx_EC_DABT_LOW;
-> +	fault_info->esr_el2 &= ~ESR_ELx_ISV;
-
-You are constructing this from scratch. How can ISV be set?
-
-> +	fault_info->esr_el2 |= ESR_ELx_FSC_FAULT_L(KVM_PGTABLE_LAST_LEVEL);
-> +
-> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
-> +		FIELD_PREP(HPFAR_EL2_FIPA, ipa >> 12);
-> +
-> +	if (kvm_slot_has_gmem(memslot)) {
-> +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
-> +	} else {
-> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> +		if (kvm_is_error_hva(hva)) {
-> +			ret = -EFAULT;
-> +			goto out;
-> +		}
-> +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
-> +				     false);
-> +	}
-> +
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	end = (range->gpa & ~(page_size - 1)) + page_size;
-
-This suspiciously looks like one of the __ALIGN_KERNEL* macros.
-
-> +	ret = min(range->size, end - range->gpa);
-> +
-> +out:
-> +	*fault_info = stored_fault;
-> +out_unlock:
-> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-> +	return ret;
-> +}
+I'll fold these updates in.
 
 Thanks,
 
