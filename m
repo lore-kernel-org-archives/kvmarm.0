@@ -1,117 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B63E2FE598;
-	Mon, 24 Nov 2025 11:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6D2381C4;
+	Mon, 24 Nov 2025 12:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763985133; cv=none; b=qDSZGDGexUIAg86AGJyGPmzZ9hMQf69XXs9gqiYs6V6bVPXed76vMp3aqYNxEqTJUcvgW4F9RimCbYlpOjRaWJ5vkGlv7rdKW14mZwMIig9j2ql4NXIeVjjhispsacksjydtRRiZa5M0sma4q41RjpzqhQmP+6VVJK0OnNx76v8=
+	t=1763988882; cv=none; b=pKn7Vj8BcQexiAbQ+j498nN/wg51RaHEvlNNQ9/uOfPSVOi13mDM4i+tS6K6PKic2LLQlfjYdKAfU2iRdCXKy9vPYQ5U+Xn7h74tieiXE7ApWYmjIh7bfgUd1A+KjbokeljVElZvMTY6fEtwE9SVvP0vTcdTc47cKQN+d1Gdnlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763985133; c=relaxed/simple;
-	bh=+A0RZRVEBIVa97yRu+iGJ3OLNh6XAPvgUo5bkd4evxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gUeSckCB/Qb0j/r+qjJODrdvS6FEwUJho2Md5gw1xMwdv0tu4OiRT89Q6P4uyOjJXqm3e3QVr7u06VrzTGa4ZPbuxERoVY4FyuLM9SNQlMc05sRD7YFFRTjZenEitbt4imqM1Yxfr2OGS20RFeFdOwiXX22tqMB5IlxCGS3a9Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MeFPtxm8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763988882; c=relaxed/simple;
+	bh=BVX+0lqg+9IsvmNv+Eftv4V7s42mUPCpJ0PE8synrpU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X8K+GLchNlW0yQ+UryeI8fnYUr7CbHwJ8gPoZ567tyAX/CU5AIPoQhiHI7iYSD+l8D30wYZ644n0YEu+PVOYqDTpbcOg1I1ERgHXRjYgPEb1FUJiRwnL7Ed1+A+Xub92AMwgBUugy2g8V0pNEv8QDSX54ogan97cW4UuwZsd9yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIiXq+m6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MeFPtxm8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D59C4CEF1;
-	Mon, 24 Nov 2025 11:52:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIiXq+m6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9747C4CEF1;
+	Mon, 24 Nov 2025 12:54:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763985132;
-	bh=+A0RZRVEBIVa97yRu+iGJ3OLNh6XAPvgUo5bkd4evxE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MeFPtxm8ba1BCOfiVIPu4YL4MMPX/jRMyYFXWRaJlCoAkTJRQkgB0Ft8RTKvu9Qqi
-	 C/qZ3h9LzrZrHcrmfmaGIP+bQvmZdUDkMtR4/VVXWJLoDOtkymHbTUDW4vBDN1bqkR
-	 oiKdcR69YqIWg78G+3cuNjoBsZTWGB3+DVV5UN8w9bvweinTbBimnncrn5MWQUtogE
-	 ZTB3xUlwWtiRLNIt+38dP1f/u8RuMiXO9Ok5EpApoTzbw9JRMCgD8tP6AufgovpfpI
-	 bptfQO2t5TZrzzRefmUFV4aa9UyWbvKG9+NnBg0dvFWtEazmQEYi6l/gv1NfWD+L/i
-	 8HMTTCO5/odVg==
-Date: Mon, 24 Nov 2025 11:52:07 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Fuad Tabba <tabba@google.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when
- interrupts overflow LR capacity
-Message-ID: <51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
-References: <20251109171619.1507205-1-maz@kernel.org>
- <20251109171619.1507205-30-maz@kernel.org>
- <CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
- <86cy5ku06v.wl-maz@kernel.org>
+	s=k20201202; t=1763988881;
+	bh=BVX+0lqg+9IsvmNv+Eftv4V7s42mUPCpJ0PE8synrpU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gIiXq+m6h5hQqpxycXFOLH9UJvEqHMIiF84Y+h0dZUz+elmZLgFZlzGb2U/22BcqX
+	 n7R5gni5H5oSANu8/QCrCtqj07B0IwpE++nv3pVNFlRbpH/mh72ZmQfUBcgoopysM8
+	 sVDC32YKo4ovKJRBlKrYThowIdRiVhh/HeQn4evvfHdeZZssYTtYyuZPu32z7LdNQX
+	 CsVXEQmXHg5iMmjUyfFiAu9CZrYyLh+070cFSEKttBLoktF3PlE9rkvybYLohk2z+9
+	 209X+976hmSi1ukMgLTYv76jobon7dXqgRbKv4xisviSjl3ty1tmS9SK9SBMKiJs8q
+	 gGhuNjfMt/Etw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vNW5X-00000007qqJ-1bmx;
+	Mon, 24 Nov 2025 12:54:39 +0000
+Date: Mon, 24 Nov 2025 12:54:38 +0000
+Message-ID: <86pl97r3ox.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jack Thomson <jackabt.amazon@gmail.com>
+Cc: oliver.upton@linux.dev,
+	pbonzini@redhat.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	isaku.yamahata@intel.com,
+	xmarcalx@amazon.co.uk,
+	kalyazin@amazon.co.uk,
+	jackabt@amazon.com
+Subject: Re: [PATCH v3 1/3] KVM: arm64: Add pre_fault_memory implementation
+In-Reply-To: <86see3r7e9.wl-maz@kernel.org>
+References: <20251119154910.97716-1-jackabt.amazon@gmail.com>
+	<20251119154910.97716-2-jackabt.amazon@gmail.com>
+	<86see3r7e9.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GQXf/xg20mFSxdaQ"
-Content-Disposition: inline
-In-Reply-To: <86cy5ku06v.wl-maz@kernel.org>
-X-Cookie: Are we running light with overbyte?
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jackabt.amazon@gmail.com, oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com, xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Mon, 24 Nov 2025 11:34:38 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Wed, 19 Nov 2025 15:49:08 +0000,
+> Jack Thomson <jackabt.amazon@gmail.com> wrote:
+> >
 
---GQXf/xg20mFSxdaQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[...]
 
-On Fri, Nov 14, 2025 at 03:02:32PM +0000, Marc Zyngier wrote:
-> Fuad Tabba <tabba@google.com> wrote:
-> > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
+> > +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
+> > +		FIELD_PREP(HPFAR_EL2_FIPA, ipa >> 12);
+> > +
+> > +	if (kvm_slot_has_gmem(memslot)) {
+> > +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
+> > +	} else {
+> > +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+> > +		if (kvm_is_error_hva(hva)) {
+> > +			ret = -EFAULT;
+> > +			goto out;
+> > +		}
+> > +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
+> > +				     false);
+> > +	}
 
-> > > +       /*
-> > > +        * Note that we set the trap irrespective of EOIMode, as that
-> > > +        * can change behind our back without any warning...
-> > > +        */
-> > > +       if (irqs_active_outside_lrs(als))
-> > > +               cpuif->vgic_hcr |=3D ICH_HCR_EL2_TDIR;
-> > >  }
+And thinking of it a bit more, this is completely broken. What happens
+if the vcpu is in a nested context? You just populate random pages in
+an IPA space that is not relevant at all, corrupting the guest state.
 
-> > I just tested these patches as they are on kvmarm/next
-> > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
-> > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
-> > additional pKVM patches. I tried running it with pKVM (non-protected)
-> > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
-> > when booting a non-protected guest, which triggers a bug in
-> > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
+You must correctly handle the context the vcpu is in, instead of
+assuming that this is the canonical context. This means going via the
+*guest's* S2 translation, just like handle_mem_abort() does.
 
-> > This trap is happening because of setting this particular trap (TDIR).
-> > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
-> > kvmarm/next boots fine.
+	M.
 
-> This is surprising, as I'm not hitting this on actual HW. Are you
-> getting a 0x18 trap? If so, is it coming from the host? Can you
-> correlate the PC with what the host is doing?
-
-FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
-
-  https://lava.sirena.org.uk/scheduler/job/2118713#L1044
-=20
-I'm also seeing boot failures on AM625 in pKVM mode but much earlier,
-before any console output, so there's some confounding issue in that
-case (non-pKVM boots on the platform seemed fine, I'll investigate if
-it's still a problem in today's -next).
-
---GQXf/xg20mFSxdaQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmkkRucACgkQJNaLcl1U
-h9Ctwwf/UjCM5goRKvuE8EnGB6VSLcY7irSfXLjXDneE5T4Zooihr4CpVDT0cfhR
-qKXjvRw5wtUrm6X5KEcicUo6bm2AJK4EfEY+d0X+QYW6cN4BHCDzGnb15uBtdwrA
-lv/ncF2ZwZcgwxl3GyQInmZARS4jjSYTLpCGMid0MF68cZ3d0M2WalchkopHRBl7
-piZqsQOU18T0NR2p8Vq5RYjztxSKpumbctKAF+CFOjOxjAFUU5ys6h12PfI0UnHI
-QQgrQ8UpD+Z5d5aZnZnOVj1k0ehaPojN1Agnl+ThGdS1m0YxVIYhfyUUB+irJikj
-vYGcRfxjfZYci+1+860etlcUDyiqiA==
-=KDCh
------END PGP SIGNATURE-----
-
---GQXf/xg20mFSxdaQ--
+-- 
+Without deviation from the norm, progress is not possible.
