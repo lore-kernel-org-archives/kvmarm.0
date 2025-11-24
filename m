@@ -1,112 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015A025EF87;
-	Mon, 24 Nov 2025 08:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D761D555
+	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 10:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763972927; cv=none; b=lGItb1JXkpQQ/H2pv7yOMMRdKe/Zy5gFKzG6quC2tUpCyhvLxo8lIGD++siYk2X9vXvO5YKKuzMWbnPXHuQeXkaln4/EueFboELVPU38cuWPxfYir4yLDMfgCw8LsE+Zur9mKrkTqNYNBqWl2fYzLqZ+glMaRl02kSCb9JXeKYE=
+	t=1763980762; cv=none; b=kAU+EeVwoYDeAV3kMyb/hHBv19UGMteBP96qcJTT9QRfKFbkl5sp2QxhTvY/k/PZsmFbTZ4snDfAQGV4ySk272jy+WsJqkM9a1tcH4LlBzM57m7zx+bJPUZU5hyHs4MIczOAQ+1pndOCGdlAEQAA6s6x+rfco9fiBicXGHLx9uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763972927; c=relaxed/simple;
-	bh=T+MPGyJriR1QBClsWWwkOpi+qR0ocPEU1Z7hsuWSSiA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FcC41yG5MeegTgvMxHhkPRRXImTxDl9+Go/qDR6p8xR0IpeaG+u0FTD67lJV3Kf6Di3kNF1c4zjY3OHc6ChK8+zvkQbwX5sdnclgzmIe6zPmN06dpCulc3IVYoM60tyQGXMSoZTaZtwtv9oP4yX6to8U/Jx3VG4QhgJ8Dsau8s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMXCiXOu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMXCiXOu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE2BDC4CEF1;
-	Mon, 24 Nov 2025 08:28:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763972926;
-	bh=T+MPGyJriR1QBClsWWwkOpi+qR0ocPEU1Z7hsuWSSiA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=UMXCiXOunP9qrY+cJl3V2GxBKEcQ5LWV6YoWhqw3NnG4I8HkHc2YhDwNjSxWpv2vr
-	 5YU7olXypGz9sXJkztfarx5lTI9NMaXFE3j6svmbZxEAkAH7o5KyIawMQFamFKEU7C
-	 N0rk4Nyv+/CK7KduzjmTOMQMimuYRCH9QIoI0ooMeEj7E/e25EwVAKxEutCLB9GU/u
-	 wwFktzNVz21GhHtCV0K/I/8WiH3cfmz9gHacUg6AatcdM08nszOsTq5J85cc3s/oYH
-	 Fn59NNJhA/UE0s0yuxpeD/xFQzQ7VFVADS58DkmjLsRMuyhc+SrpqNp4MJcSp3R2O7
-	 RtQ9Mct5vq/0w==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 08/11] coco: guest: arm64: Add support for fetching
- and verifying device info
-In-Reply-To: <20251120175432.00004af8@huawei.com>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
- <20251117140007.122062-9-aneesh.kumar@kernel.org>
- <20251120175432.00004af8@huawei.com>
-Date: Mon, 24 Nov 2025 13:58:38 +0530
-Message-ID: <yq5ay0nvltqh.fsf@kernel.org>
+	s=arc-20240116; t=1763980762; c=relaxed/simple;
+	bh=sKzSYKgfcLzAIYddODcCTT28lZBov8xUXigByO0kSKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tfwXqNugZFhRtOT4fkHMLAT7FIMpUQMbTwg/Jxi2ROK2uDaTzksr5PpywsSQICSOqH0sV92OGLOWgrKBIgJr4nPDpVRcE9l434r3uZRjEgJ5utq7PI5e4epavlz5Y+ZnKJMqKzz7wADkmdEcaikVw/5XpAp6YdQ9+apLWWMqObk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 923C0497;
+	Mon, 24 Nov 2025 02:39:11 -0800 (PST)
+Received: from [10.1.39.148] (e121487-lin.cambridge.arm.com [10.1.39.148])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C6B8C3F6A8;
+	Mon, 24 Nov 2025 02:39:15 -0800 (PST)
+Message-ID: <ff581325-199a-4bcb-bf5b-43a6f5ec64be@arm.com>
+Date: Mon, 24 Nov 2025 10:38:49 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] KVM: arm64: Add pre_fault_memory implementation
+To: Jack Thomson <jackabt.amazon@gmail.com>, maz@kernel.org,
+ oliver.upton@linux.dev, pbonzini@redhat.com
+Cc: joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ isaku.yamahata@intel.com, xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk,
+ jackabt@amazon.com
+References: <20251119154910.97716-1-jackabt.amazon@gmail.com>
+ <20251119154910.97716-2-jackabt.amazon@gmail.com>
+Content-Language: en-GB
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+In-Reply-To: <20251119154910.97716-2-jackabt.amazon@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+Hi Jack,
 
-> On Mon, 17 Nov 2025 19:30:04 +0530
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->
+On 11/19/25 15:49, Jack Thomson wrote:
+> From: Jack Thomson <jackabt@amazon.com>
+> 
+> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
+> off the stage-2 faulting logic to either gmem_abort() or
+> user_mem_abort().
+> 
+> Add an optional page_size output parameter to user_mem_abort() to
+> return the VMA page size, which is needed when pre-faulting.
+> 
+> Update the documentation to clarify x86 specific behaviour.
+> 
+> Signed-off-by: Jack Thomson <jackabt@amazon.com>
 
-...
+It works quite well for a few cases I have, so FWIW
 
->
->> +		return -EIO;
->> +	}
->> +
->> +	dsc->dev_info.cert_id       =3D dev_info->cert_id;
->> +	dsc->dev_info.hash_algo     =3D dev_info->hash_algo;
->> +	dsc->dev_info.lock_nonce    =3D dev_info->lock_nonce;
->> +	dsc->dev_info.meas_nonce    =3D dev_info->meas_nonce;
->> +	dsc->dev_info.report_nonce  =3D dev_info->report_nonce;
->> +	memcpy(dsc->dev_info.cert_digest, dev_info->cert_digest, SHA512_DIGEST=
-_SIZE);
->> +	memcpy(dsc->dev_info.meas_digest, dev_info->meas_digest, SHA512_DIGEST=
-_SIZE);
->> +	memcpy(dsc->dev_info.report_digest, dev_info->report_digest, SHA512_DI=
-GEST_SIZE);
->
-> So copy everything other than flags.  Any reason why not flags?
->
+Tested-by: Vladimir Murzin <vladimir.murzin@arm.com>
 
-The flags field currently carries p2p_enabled and p2p_bound, but these
-aren=E2=80=99t used yet. I=E2=80=99ll drop flags from dsc->dev_info for now=
- and
-reintroduce it once there=E2=80=99s an actual user.
-
->> +
->> +	kfree(dev_info);
->> +	/*
->> +	 * Verify that the digests of the provided reports match with the
->> +	 * digests from RMM
->> +	 */
->> +	ret =3D verify_digests(dsc);
->> +	if (ret) {
->> +		pci_err(pdev, "device digest validation failed (%d)\n", ret);
->> +		return ret;
->> +	}
->> +
->> +	ret =3D cca_apply_interface_report_mappings(pdev, true);
->> +	if (ret) {
->> +		pci_err(pdev, "failed to validate the interface report\n");
->> +		return -EIO;
->> +	}
->> +
->> +	return 0;
->> +}
+Cheers
+Vladimir
