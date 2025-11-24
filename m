@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C910A2D3750
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A3D27FD76
 	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 19:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764010922; cv=none; b=FbX0+ccQUrUgylmXZdZDxE28BheGAP9yUG1m9zDQlFiRM464kv3FAgvBdzvCvySusrUgyxV9LGVUKegVHV/UKqX2FnFT1agu3fmpTQcPj5lPuhch05G6wLNUEbn2tC+ZIiZUI5apIUYBVLLsuLu7FDv9oESU4KG7D4qTcmiP5p4=
+	t=1764010923; cv=none; b=p6I43D668tgF5DNAxwP3z3Mpy43SkZh3lgHrI3Z0OumrpnMAXI9c24C8ZAc5Yp/CzdN9nAlX3V2dZhZYvTNVp6R/+glC7Mpp7G7pnwJHDj4mZ/NSp3TiDbaWwrP2HEze4hgBGLkHEOpBdJ+SnXMPJ/O9zZV4kjTDCygv1AReKz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764010922; c=relaxed/simple;
-	bh=qlNCPFPZ5sK3tkOJkWN2mmTRvbJFKCInbVuD79GxMtY=;
+	s=arc-20240116; t=1764010923; c=relaxed/simple;
+	bh=Ne1nWoAtvGja0yTRw6Jt+6foMsIzRmryzzpbl9RZQ50=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hGwTK4PAHnVzcYGygO9/3HOCSjE8CpPieMn/Tbf698gx4u5TfwxHOEfhWrgvIjhAk7BnHoej+Gfa8IAyFoJpbSDtTVIGse3+xvIRxS6VgyfaYuk4A0TCuZW3FFaAh4zLCwVcIt3nhlkX4hXA2Xyc7pMhFUT/O3niou7SwpOxQlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=az8TGlUU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=E5SpkPhW59dcU3lgelUITkupAduKfcqSPXXcC4TJk9pqcK2ghRobJ+1yLlb2d7fD2+bkiNHJXBACt+YEB3dki4SqW1lZJ5l0+yyTlI3mMhvLxf5E8v8fNEReUEXKlqYuaN4pOmcHARehL6yTKuZFJhEt/I05zr+uImuFfk9q1m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ReJcIq4x; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="az8TGlUU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A0DAC4AF09;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ReJcIq4x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DCFC19421;
 	Mon, 24 Nov 2025 19:02:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764010922;
-	bh=qlNCPFPZ5sK3tkOJkWN2mmTRvbJFKCInbVuD79GxMtY=;
+	bh=Ne1nWoAtvGja0yTRw6Jt+6foMsIzRmryzzpbl9RZQ50=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=az8TGlUUzNeAchqi9PBRUKrSqdqT/I8/5pDilNmVN/Cw+67Lj44g+MAL4HblyvrB5
-	 bkqGIJUVDCzBy92dDmRxj49pVEQRCOGbWhuJKp8TlNv/lm68wUZffjkQl54jg0EhoT
-	 Ds43NEUMXPXv+RKSFbIjP4CtWTyJZfRevZ9B7zxZljKw13Q/s9EBp37QqGSSpHefyf
-	 NUyB/aZTY3GdhtFrU0/ElZ2xPdpQH5sBD79plgvDoEjaZ9fD5De5YVITxkdAOuLGsC
-	 4pVKZtsPaIiR+7UKgeJ1i+4HGmzvxgW8gdwrlDO0oJI/i6Pw7CndheRFs3ih623o3z
-	 o4Ei+jWbKSQwA==
+	b=ReJcIq4xhkcoBd7T5xr48VUYx2e6VSCfLXSkDlpLTHEB9jG/aPEm7Fxs3r2ezIGbQ
+	 O4+IPHAEfrIFbZpJfiYKwI+/wK5N93lyTzsy4sdHGSEZO5C8t9bdeBhQd4WGNNNp+k
+	 xb/rB4r76P+aGMxpUZWm9teHZtmknnvKQzPTSv4ZG9I0SeKLkwPNKyOqR5NUkgmjRe
+	 iPllvZGAz62OkfJT33jqnbmTwGPpRvdHwhU/nyuh58jOP2fsbixhn2HlKy1gbtBb9X
+	 iV75lkOHpwGQBP+pLK1Mn5HtdfZZyEWOuchJoEmDTgiR9IU5esbAMfPMm9PlVrHYX2
+	 7pMiiZHdFMk7g==
 From: Oliver Upton <oupton@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -33,9 +33,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v3 15/15] KVM: arm64: selftests: Add test for AT emulation
-Date: Mon, 24 Nov 2025 11:01:57 -0800
-Message-ID: <20251124190158.177318-16-oupton@kernel.org>
+Subject: [PATCH v3 14/15] KVM: arm64: nv: Expose hardware access flag management to NV guests
+Date: Mon, 24 Nov 2025 11:01:56 -0800
+Message-ID: <20251124190158.177318-15-oupton@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251124190158.177318-1-oupton@kernel.org>
 References: <20251124190158.177318-1-oupton@kernel.org>
@@ -47,235 +47,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a basic test for AT emulation in the EL2&0 and EL1&0 translation
-regimes.
+Everything is in place to update the access flag at S1 and S2. Expose
+support for the access flag flavor of FEAT_HAFDBS to NV guests.
 
 Signed-off-by: Oliver Upton <oupton@kernel.org>
 ---
- tools/testing/selftests/kvm/Makefile.kvm      |   1 +
- tools/testing/selftests/kvm/arm64/at.c        | 166 ++++++++++++++++++
- .../testing/selftests/kvm/include/kvm_util.h  |   1 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  10 ++
- 4 files changed, 178 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/arm64/at.c
+ arch/arm64/kvm/nested.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index 148d427ff24b..81b3aa54678a 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -156,6 +156,7 @@ TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
- TEST_GEN_PROGS_arm64 = $(TEST_GEN_PROGS_COMMON)
- TEST_GEN_PROGS_arm64 += arm64/aarch32_id_regs
- TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
-+TEST_GEN_PROGS_arm64 += arm64/at
- TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
- TEST_GEN_PROGS_arm64 += arm64/hello_el2
- TEST_GEN_PROGS_arm64 += arm64/host_sve
-diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
-new file mode 100644
-index 000000000000..acecb6ab5071
---- /dev/null
-+++ b/tools/testing/selftests/kvm/arm64/at.c
-@@ -0,0 +1,166 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * at - Test for KVM's AT emulation in the EL2&0 and EL1&0 translation regimes.
-+ */
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+#include "ucall.h"
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 6495442f400a..88d7dfb44410 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -1599,11 +1599,13 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
+ 	case SYS_ID_AA64MMFR1_EL1:
+ 		val &= ~(ID_AA64MMFR1_EL1_CMOW		|
+ 			 ID_AA64MMFR1_EL1_nTLBPA	|
+-			 ID_AA64MMFR1_EL1_ETS		|
+-			 ID_AA64MMFR1_EL1_HAFDBS);
++			 ID_AA64MMFR1_EL1_ETS);
 +
-+#include <asm/sysreg.h>
+ 		/* FEAT_E2H0 implies no VHE */
+ 		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
+ 			val &= ~ID_AA64MMFR1_EL1_VH;
 +
-+#define TEST_ADDR	0x80000000
-+
-+enum {
-+	CLEAR_ACCESS_FLAG,
-+	TEST_ACCESS_FLAG,
-+};
-+
-+static u64 *ptep_hva;
-+
-+#define copy_el2_to_el1(reg)						\
-+	write_sysreg_s(read_sysreg_s(SYS_##reg##_EL1), SYS_##reg##_EL12)
-+
-+/* Yes, this is an ugly hack */
-+#define __at(op, addr)	write_sysreg_s(addr, op)
-+
-+#define test_at_insn(op, expect_fault)							\
-+do {											\
-+	u64 par, fsc;									\
-+	bool fault;									\
-+											\
-+	GUEST_SYNC(CLEAR_ACCESS_FLAG);							\
-+											\
-+	__at(OP_AT_##op, TEST_ADDR);							\
-+	isb();										\
-+	par = read_sysreg(par_el1);							\
-+											\
-+	fault = par & SYS_PAR_EL1_F;							\
-+	fsc = FIELD_GET(SYS_PAR_EL1_FST, par);						\
-+											\
-+	__GUEST_ASSERT((expect_fault) == fault,						\
-+		       "AT "#op": %sexpected fault (par: %lx)1",			\
-+		       (expect_fault) ? "" : "un", par);				\
-+	if ((expect_fault)) {								\
-+		__GUEST_ASSERT(fsc == ESR_ELx_FSC_ACCESS_L(3),				\
-+			       "AT "#op": expected access flag fault (par: %lx)",	\
-+			       par);							\
-+	} else {									\
-+		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
-+		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
-+		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
-+		GUEST_SYNC(TEST_ACCESS_FLAG);						\
-+	}										\
-+} while (0)
-+
-+static void test_at(bool expect_fault)
-+{
-+	test_at_insn(S1E2R, expect_fault);
-+	test_at_insn(S1E2W, expect_fault);
-+
-+	/* Reuse the stage-1 MMU context from EL2 at EL1 */
-+	copy_el2_to_el1(SCTLR);
-+	copy_el2_to_el1(MAIR);
-+	copy_el2_to_el1(TCR);
-+	copy_el2_to_el1(TTBR0);
-+	copy_el2_to_el1(TTBR1);
-+
-+	/* Disable stage-2 translation and enter a non-host context */
-+	write_sysreg(0, vtcr_el2);
-+	write_sysreg(0, vttbr_el2);
-+	sysreg_clear_set(hcr_el2, HCR_EL2_TGE | HCR_EL2_VM, 0);
-+	isb();
-+
-+	test_at_insn(S1E1R, expect_fault);
-+	test_at_insn(S1E1W, expect_fault);
-+}
-+
-+static void guest_code(void)
-+{
-+	sysreg_clear_set(tcr_el1, TCR_HA, 0);
-+	isb();
-+
-+	test_at(true);
-+
-+	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
-+		GUEST_DONE();
-+
-+	/*
-+	 * KVM's software PTW makes the implementation choice that the AT
-+	 * instruction sets the access flag.
-+	 */
-+	sysreg_clear_set(tcr_el1, 0, TCR_HA);
-+	isb();
-+	test_at(false);
-+
-+	GUEST_DONE();
-+}
-+
-+static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-+{
-+	switch (uc->args[1]) {
-+	case CLEAR_ACCESS_FLAG:
-+		/*
-+		 * Delete + reinstall the memslot to invalidate stage-2
-+		 * mappings of the stage-1 page tables, forcing KVM to
-+		 * use the 'slow' AT emulation path.
-+		 *
-+		 * This and clearing the access flag from host userspace
-+		 * ensures that the access flag cannot be set speculatively
-+		 * and is reliably cleared at the time of the AT instruction.
-+		 */
-+		clear_bit(__ffs(PTE_AF), ptep_hva);
-+		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
-+		break;
-+	case TEST_ACCESS_FLAG:
-+		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
-+			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected SYNC arg: %lu", uc->args[1]);
-+	}
-+}
-+
-+static void run_test(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+
-+	while (true) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_DONE:
-+			return;
-+		case UCALL_SYNC:
-+			handle_sync(vcpu, &uc);
-+			continue;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			return;
-+		default:
-+			TEST_FAIL("Unexpeced ucall: %lu", uc.cmd);
-+		}
-+	}
-+}
-+
-+int main(void)
-+{
-+	struct kvm_vcpu_init init;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
-+
-+	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-+
-+	vm = vm_create(1);
-+
-+	kvm_get_default_vcpu_target(vm, &init);
-+	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-+	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	kvm_arch_vm_finalize_vcpus(vm);
-+
-+	virt_map(vm, TEST_ADDR, TEST_ADDR, 1);
-+	ptep_hva = virt_get_pte_hva_at_level(vm, TEST_ADDR, 3);
-+	run_test(vcpu);
-+
-+	kvm_vm_free(vm);
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index d3f3e455c031..41467dad9178 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -715,6 +715,7 @@ static inline bool vm_arch_has_protected_memory(struct kvm_vm *vm)
- #endif
++		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
+ 		break;
  
- void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-+void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot);
- void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1a93d6361671..d6538bb17740 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1201,6 +1201,16 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
- 		ret, errno, slot, flags);
- }
- 
-+void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot)
-+{
-+	struct userspace_mem_region *region = memslot2region(vm, slot);
-+	struct kvm_userspace_memory_region2 tmp = region->region;
-+
-+	tmp.memory_size = 0;
-+	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &tmp);
-+	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
-+}
-+
- /*
-  * VM Memory Region Move
-  *
+ 	case SYS_ID_AA64MMFR2_EL1:
 -- 
 2.47.3
 
