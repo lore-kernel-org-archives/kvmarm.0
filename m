@@ -1,62 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6D2381C4;
-	Mon, 24 Nov 2025 12:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A22E8E10;
+	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763988882; cv=none; b=pKn7Vj8BcQexiAbQ+j498nN/wg51RaHEvlNNQ9/uOfPSVOi13mDM4i+tS6K6PKic2LLQlfjYdKAfU2iRdCXKy9vPYQ5U+Xn7h74tieiXE7ApWYmjIh7bfgUd1A+KjbokeljVElZvMTY6fEtwE9SVvP0vTcdTc47cKQN+d1Gdnlc=
+	t=1763989592; cv=none; b=cE1mI3L60jHuAEjQfboXDsLUqWyYUmk//cnFUCYNdNFkXZoAagpo5uKJfv1XdrlE+a4pzqR5UG4v5XvIN+Cw2FXMfq2okpUZ7bJlyZAOjB8U+OHJpfM6OdYnKpYXcqH6tPiGPw/f2R7//9rSUdovXMMVNYa8i2ysMe/bCpJ4xpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763988882; c=relaxed/simple;
-	bh=BVX+0lqg+9IsvmNv+Eftv4V7s42mUPCpJ0PE8synrpU=;
+	s=arc-20240116; t=1763989592; c=relaxed/simple;
+	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X8K+GLchNlW0yQ+UryeI8fnYUr7CbHwJ8gPoZ567tyAX/CU5AIPoQhiHI7iYSD+l8D30wYZ644n0YEu+PVOYqDTpbcOg1I1ERgHXRjYgPEb1FUJiRwnL7Ed1+A+Xub92AMwgBUugy2g8V0pNEv8QDSX54ogan97cW4UuwZsd9yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gIiXq+m6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=BA2/4palBcQfTAv3K787EhhyBguwUlvf5V+WMRT5uRjqRp5Zi4VligdWSspQOmztWOkpP1DJMZe0IFXLKY2bl9uEawkHbxpK3mRPCT5a5FfaG9isQj5i0stpOMCemTT4og44StwqeCFtn9q0lu/IiKzaTJO6IZyzK4/u3bA41Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3V8BGSg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gIiXq+m6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9747C4CEF1;
-	Mon, 24 Nov 2025 12:54:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3V8BGSg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ACEFC116D0;
+	Mon, 24 Nov 2025 13:06:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763988881;
-	bh=BVX+0lqg+9IsvmNv+Eftv4V7s42mUPCpJ0PE8synrpU=;
+	s=k20201202; t=1763989592;
+	bh=5j0CLSvOJClj10Gzqp4SzaePQkmDOy6Vdp6NVHuro04=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gIiXq+m6h5hQqpxycXFOLH9UJvEqHMIiF84Y+h0dZUz+elmZLgFZlzGb2U/22BcqX
-	 n7R5gni5H5oSANu8/QCrCtqj07B0IwpE++nv3pVNFlRbpH/mh72ZmQfUBcgoopysM8
-	 sVDC32YKo4ovKJRBlKrYThowIdRiVhh/HeQn4evvfHdeZZssYTtYyuZPu32z7LdNQX
-	 CsVXEQmXHg5iMmjUyfFiAu9CZrYyLh+070cFSEKttBLoktF3PlE9rkvybYLohk2z+9
-	 209X+976hmSi1ukMgLTYv76jobon7dXqgRbKv4xisviSjl3ty1tmS9SK9SBMKiJs8q
-	 gGhuNjfMt/Etw==
+	b=m3V8BGSgC33MuYL+7IJxdicRfHPtObuQIPuR9g/U+fAPn2+3zga2WCZU5KBrGOnGi
+	 1YOgzNXdk2lGlaOLjwjepa0O0YgY204eUo8mcryVjAr6UZF+svSCtGc2MzavsDbviD
+	 US4QliUeH2ZmLsYmYqxJEtM+hMShI0bQIy77+4rCQ0CuNornjXAOtj+77027bYnTFD
+	 mvuL8QA89qMzREMKm/yejISFrfxDViL13NmuDg7D6Q+c3BvUVVr7WezqVDvoltZzCa
+	 KBOPueLvBIgAB/Va8rftGGomNarbKr8cXhIW1xJ2/QiEZyVCJIq8Q0L8H+2RSzy7vp
+	 nx09yKENSacwQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNW5X-00000007qqJ-1bmx;
-	Mon, 24 Nov 2025 12:54:39 +0000
-Date: Mon, 24 Nov 2025 12:54:38 +0000
-Message-ID: <86pl97r3ox.wl-maz@kernel.org>
+	id 1vNWGz-00000007r1G-3j9E;
+	Mon, 24 Nov 2025 13:06:29 +0000
+Date: Mon, 24 Nov 2025 13:06:29 +0000
+Message-ID: <86o6orr356.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jack Thomson <jackabt.amazon@gmail.com>
-Cc: oliver.upton@linux.dev,
-	pbonzini@redhat.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+To: Mark Brown <broonie@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>,
 	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	isaku.yamahata@intel.com,
-	xmarcalx@amazon.co.uk,
-	kalyazin@amazon.co.uk,
-	jackabt@amazon.com
-Subject: Re: [PATCH v3 1/3] KVM: arm64: Add pre_fault_memory implementation
-In-Reply-To: <86see3r7e9.wl-maz@kernel.org>
-References: <20251119154910.97716-1-jackabt.amazon@gmail.com>
-	<20251119154910.97716-2-jackabt.amazon@gmail.com>
-	<86see3r7e9.wl-maz@kernel.org>
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Volodymyr Babchuk <Volodymyr_Babchuk@epam.com>,
+	Yao Yuan <yaoyuan@linux.alibaba.com>
+Subject: Re: [PATCH v2 29/45] KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
+In-Reply-To: <51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
+References: <20251109171619.1507205-1-maz@kernel.org>
+	<20251109171619.1507205-30-maz@kernel.org>
+	<CA+EHjTzRwswNq+hZQDD5tXj+-0nr04OmR201mHmi82FJ0VHuJA@mail.gmail.com>
+	<86cy5ku06v.wl-maz@kernel.org>
+	<51f5b5d7-9e98-40b8-8f8b-f50254573f3d@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,41 +65,50 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jackabt.amazon@gmail.com, oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com, xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, christoffer.dall@arm.com, Volodymyr_Babchuk@epam.com, yaoyuan@linux.alibaba.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 24 Nov 2025 11:34:38 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Mon, 24 Nov 2025 11:52:07 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> On Wed, 19 Nov 2025 15:49:08 +0000,
-> Jack Thomson <jackabt.amazon@gmail.com> wrote:
-> >
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Fri, Nov 14, 2025 at 03:02:32PM +0000, Marc Zyngier wrote:
+> > Fuad Tabba <tabba@google.com> wrote:
+> > > On Sun, 9 Nov 2025 at 17:17, Marc Zyngier <maz@kernel.org> wrote:
+> 
+> > > > +       /*
+> > > > +        * Note that we set the trap irrespective of EOIMode, as that
+> > > > +        * can change behind our back without any warning...
+> > > > +        */
+> > > > +       if (irqs_active_outside_lrs(als))
+> > > > +               cpuif->vgic_hcr |= ICH_HCR_EL2_TDIR;
+> > > >  }
+> 
+> > > I just tested these patches as they are on kvmarm/next
+> > > 2ea7215187c5759fc5d277280e3095b350ca6a50 ("Merge branch
+> > > 'kvm-arm64/vgic-lr-overflow' into kvmarm/next"), without any
+> > > additional pKVM patches. I tried running it with pKVM (non-protected)
+> > > and with just plain nVHE. In both cases, I get a trap to EL2 (0x18)
+> > > when booting a non-protected guest, which triggers a bug in
+> > > handle_trap() arch/arm64/kvm/hyp/nvhe/hyp-main.c:706
+> 
+> > > This trap is happening because of setting this particular trap (TDIR).
+> > > Just removing this trap from vgic_v3_configure_hcr() from the ToT on
+> > > kvmarm/next boots fine.
+> 
+> > This is surprising, as I'm not hitting this on actual HW. Are you
+> > getting a 0x18 trap? If so, is it coming from the host? Can you
+> > correlate the PC with what the host is doing?
+> 
+> FWIW I am seeing this on i.MX8MP (4xA53+GICv3):
+> 
+>   https://lava.sirena.org.uk/scheduler/job/2118713#L1044
 
-[...]
-
-> > +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
-> > +		FIELD_PREP(HPFAR_EL2_FIPA, ipa >> 12);
-> > +
-> > +	if (kvm_slot_has_gmem(memslot)) {
-> > +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
-> > +	} else {
-> > +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
-> > +		if (kvm_is_error_hva(hva)) {
-> > +			ret = -EFAULT;
-> > +			goto out;
-> > +		}
-> > +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
-> > +				     false);
-> > +	}
-
-And thinking of it a bit more, this is completely broken. What happens
-if the vcpu is in a nested context? You just populate random pages in
-an IPA space that is not relevant at all, corrupting the guest state.
-
-You must correctly handle the context the vcpu is in, instead of
-assuming that this is the canonical context. This means going via the
-*guest's* S2 translation, just like handle_mem_abort() does.
+There are worrying errors way before that, in the VMID allocator init,
+and I can't see what the GIC has to do with it. The issue Fuad
+reported was at run time, not boot time. so this really doesn't align
+with what you are seeing.
 
 	M.
 
