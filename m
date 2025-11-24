@@ -1,80 +1,88 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A3D27FD76
-	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 19:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965192D7805;
+	Mon, 24 Nov 2025 19:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764010923; cv=none; b=p6I43D668tgF5DNAxwP3z3Mpy43SkZh3lgHrI3Z0OumrpnMAXI9c24C8ZAc5Yp/CzdN9nAlX3V2dZhZYvTNVp6R/+glC7Mpp7G7pnwJHDj4mZ/NSp3TiDbaWwrP2HEze4hgBGLkHEOpBdJ+SnXMPJ/O9zZV4kjTDCygv1AReKz4=
+	t=1764011928; cv=none; b=mmK++MCMRQoeFvQn0LnpdckRDVbbQcdCeXjdJzUgzkpBO0lNZIRftgrzJbBlJ54tsSuD1/cK3VSpH7C3zXl2iwq2gHCzPX1xVWTJ+WDfmdICAOoiKxdmOc/bDzl7+BVhkwhKMERANTfBcXvz70Vv4/0+Mm5LLSMel8G7eKMxqXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764010923; c=relaxed/simple;
-	bh=Ne1nWoAtvGja0yTRw6Jt+6foMsIzRmryzzpbl9RZQ50=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E5SpkPhW59dcU3lgelUITkupAduKfcqSPXXcC4TJk9pqcK2ghRobJ+1yLlb2d7fD2+bkiNHJXBACt+YEB3dki4SqW1lZJ5l0+yyTlI3mMhvLxf5E8v8fNEReUEXKlqYuaN4pOmcHARehL6yTKuZFJhEt/I05zr+uImuFfk9q1m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ReJcIq4x; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764011928; c=relaxed/simple;
+	bh=rDkSwbW4xoasbdAG1a25incEAfgJNunRzcR8e9Kx9qo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jmvAX3wMEwR/GwQK2fwuvJq6bBMWeR5/zfDNRLJFXSRmRru7J8ChS6VPb8C2XbJuGeM35USsvpuWul2EH30736uuSKaYnjHcLk12IfB5bF3X1HAvOKXL3eTVmYo/dPDK30gEmiurHlM2YMRD8OShj5JfUwdf4VEIX99giGXIFmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k7Vox0ti; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ReJcIq4x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69DCFC19421;
-	Mon, 24 Nov 2025 19:02:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k7Vox0ti"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD7AC4CEF1;
+	Mon, 24 Nov 2025 19:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764010922;
-	bh=Ne1nWoAtvGja0yTRw6Jt+6foMsIzRmryzzpbl9RZQ50=;
+	s=k20201202; t=1764011928;
+	bh=rDkSwbW4xoasbdAG1a25incEAfgJNunRzcR8e9Kx9qo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ReJcIq4xhkcoBd7T5xr48VUYx2e6VSCfLXSkDlpLTHEB9jG/aPEm7Fxs3r2ezIGbQ
-	 O4+IPHAEfrIFbZpJfiYKwI+/wK5N93lyTzsy4sdHGSEZO5C8t9bdeBhQd4WGNNNp+k
-	 xb/rB4r76P+aGMxpUZWm9teHZtmknnvKQzPTSv4ZG9I0SeKLkwPNKyOqR5NUkgmjRe
-	 iPllvZGAz62OkfJT33jqnbmTwGPpRvdHwhU/nyuh58jOP2fsbixhn2HlKy1gbtBb9X
-	 iV75lkOHpwGQBP+pLK1Mn5HtdfZZyEWOuchJoEmDTgiR9IU5esbAMfPMm9PlVrHYX2
-	 7pMiiZHdFMk7g==
-From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	b=k7Vox0tiC6aEBy+NvJaadSN3/y2+MnSeI16LLh4WWU7Wt1gcm7dngn98Eidpbh+Zi
+	 uiiuASO0fqEp+TXKWvf0/zEp9FV1oGU+xaNcZpFi7aTPesnk81dS6cBEoRFZz6gotJ
+	 0XG1DpTk1Y9N1fjuK1rCaYdIxKvwLfw2bNAkA/22FbzwPXFISHtAO5ky794Fp8f5Pn
+	 ikwAnf3fH6xzB/d29obYib/CuWsaz3JJpw8MhGpEHoPo8LXM48dX5S3uFQkfMeuUVV
+	 pXHjDz2toelygeC/7FhZnqgn/omotVps3GjsGPCkppJ+Z3SDoDzdpgv02dQxBQwaWh
+	 S7uz3yF4CeFmQ==
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH v3 14/15] KVM: arm64: nv: Expose hardware access flag management to NV guests
-Date: Mon, 24 Nov 2025 11:01:56 -0800
-Message-ID: <20251124190158.177318-15-oupton@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251124190158.177318-1-oupton@kernel.org>
-References: <20251124190158.177318-1-oupton@kernel.org>
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	Leo Yan <leo.yan@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	James Clark <james.clark@linaro.org>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v10 0/5] perf: arm_spe: Armv8.8 SPE features
+Date: Mon, 24 Nov 2025 19:18:31 +0000
+Message-Id: <176399995950.525942.8372760882667197136.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20251111-james-perf-feat_spe_eft-v10-0-1e1b5bf2cd05@linaro.org>
+References: <20251111-james-perf-feat_spe_eft-v10-0-1e1b5bf2cd05@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Everything is in place to update the access flag at S1 and S2. Expose
-support for the access flag flavor of FEAT_HAFDBS to NV guests.
+On Tue, 11 Nov 2025 11:37:54 +0000, James Clark wrote:
+> Support SPE_FEAT_FDS data source filtering.
+> 
 
-Signed-off-by: Oliver Upton <oupton@kernel.org>
----
- arch/arm64/kvm/nested.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Applied kernel changes to will (for-next/perf), thanks!
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 6495442f400a..88d7dfb44410 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1599,11 +1599,13 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- 	case SYS_ID_AA64MMFR1_EL1:
- 		val &= ~(ID_AA64MMFR1_EL1_CMOW		|
- 			 ID_AA64MMFR1_EL1_nTLBPA	|
--			 ID_AA64MMFR1_EL1_ETS		|
--			 ID_AA64MMFR1_EL1_HAFDBS);
-+			 ID_AA64MMFR1_EL1_ETS);
-+
- 		/* FEAT_E2H0 implies no VHE */
- 		if (test_bit(KVM_ARM_VCPU_HAS_EL2_E2H0, kvm->arch.vcpu_features))
- 			val &= ~ID_AA64MMFR1_EL1_VH;
-+
-+		val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64MMFR1_EL1, HAFDBS, AF);
- 		break;
- 
- 	case SYS_ID_AA64MMFR2_EL1:
+[1/5] perf: Add perf_event_attr::config4
+      https://git.kernel.org/will/c/cbbfba4847b8
+[2/5] perf: arm_spe: Add support for filtering on data source
+      https://git.kernel.org/will/c/e6a27290d800
+
+Cheers,
 -- 
-2.47.3
+Will
 
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
