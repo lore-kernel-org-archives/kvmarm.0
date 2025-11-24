@@ -1,294 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AD91FF7BC;
-	Mon, 24 Nov 2025 04:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6A829A309
+	for <kvmarm@lists.linux.dev>; Mon, 24 Nov 2025 05:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763959261; cv=none; b=n2zNpdWcIcmYJ4zbHOsTJIYq0lbzu7Kb3g0y3AG+Cuq9IV+e0td2MVgtabrBgr20DyutuIThNLEUzmHaOACbizY24jUN1W9gCOuXnUXWOaECzFH/Qzgfk/te9FffJkQqeOsBc+pMpZpsYG1EJD/Ncw3IHhyarO2UPap1p1Rgi5c=
+	t=1763960703; cv=none; b=eOwoyXjU3q5uaCBd/Iznr/SWbhATYQZ6HgsJjnN9k1JcZSUM5vvLSsiDdORo+YqxBeag8i3I2r6HlT25zAr932S7RAMVRWpmxtgME8UtpTVqjfXd624bjsKlh37uaSGv6H9ihnkRzGNg2h2NUJhk5YxnSTbNHmu+QFkiOccrJ1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763959261; c=relaxed/simple;
-	bh=q9L+mFCqqi7OtLGPXEUseU0UCKPzyxnW6nIpa0CKEWw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nTF6arRAB5m49j6ZMpghNHcFZCj1AZXLzc3mQUOb/8VYyGthRaNKVaV8lxJvNamGNiGlWU255b8lkLJB91+QpDM7Vzk63Z3I+/Y57bOEmiVFmlOYBOWYkxSJdoTtI1Mqyd+1c9qraGthdfUQfgJWsPYbEL2viOEOIivT36h5ehs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODMg/sye; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1763960703; c=relaxed/simple;
+	bh=jgunH0PsWpK/zSQyPSuaVv0R9gIIlbDMFDceS4blm88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QXhO6+tuA26L9X81byocOsWp1zBkg4oo6tLrt5iErOuQJ9KbD//fDPQVwwG4CHxCaAJy6cB00vxB6JJvfiuc1dZLlXXqDu3E8OGYoCo24aFfsJ+iBlEFUha1gRcepS9m2BVcvqwWP37MON5V5ou/08xtn4YFVaPu7lA7Ezh4VLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uc00vuIT; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODMg/sye"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9491CC4CEFB;
-	Mon, 24 Nov 2025 04:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1763959259;
-	bh=q9L+mFCqqi7OtLGPXEUseU0UCKPzyxnW6nIpa0CKEWw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=ODMg/syevllHhEnzaKfGzjSEJpEOc/Ue7UpzAHQ+v0IzF4+tStxbRm9BzaGdm2o3g
-	 N0R9Zonj4rD6G1zKO6eaStxv0d64aHrcw4YJg+pkU+2a9SelEH0geeg06LDSDwy8uM
-	 nTvhxRLzwDgWnj2etz0mRVJK7NhyByRJjy81tbw1MeejXIubSX9Z2+xjvOaLzgzn9G
-	 woRvybjg8h3VxWowQzUX/OwClH8WFEuTGnle5/r8UBp9y6uuWFpdBUpckZ9qG8YjTF
-	 ipUOb+D7nZ68A0WtOrjDPu7M2/qUv2tqCiobffTzSaHdtoMzpBjZ4Loh9+kfwAgIpp
-	 Jsg/hrkzl0KVQ==
-X-Mailer: emacs 30.2 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: linux-coco@lists.linux.dev, kvmarm@lists.linux.dev,
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dan.j.williams@intel.com, aik@amd.com, lukas@wunner.de,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 01/11] coco: guest: arm64: Guest TSM callback and
- realm device lock support
-In-Reply-To: <20251119152201.00000876@huawei.com>
-References: <20251117140007.122062-1-aneesh.kumar@kernel.org>
- <20251117140007.122062-2-aneesh.kumar@kernel.org>
- <20251119152201.00000876@huawei.com>
-Date: Mon, 24 Nov 2025 10:10:50 +0530
-Message-ID: <yq5acy58m4a5.fsf@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uc00vuIT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1763960700;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZARig0mkAfhyVpxziKpIN9dzSGezkpNssMMdRVlHTnA=;
+	b=Uc00vuITLiiQvbyp/Egkpybeu5j4SBBAGnMAETPt14MNQEZhRjGI9aFUnWcKJTAJeEj+Np
+	jjhJpqz5mlS/L4tGw9g7Mc2ZrIqi8lJq81PAJSGV5hh/AU4VS9Edm+Br0I5lXKxZhEfFzt
+	bSg6oLqtNIeLXJiI9Vyqob+AKxd7qLw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-212-yT4DBRBiPsS6WRYmBD1DXg-1; Mon,
+ 24 Nov 2025 00:04:55 -0500
+X-MC-Unique: yT4DBRBiPsS6WRYmBD1DXg-1
+X-Mimecast-MFC-AGG-ID: yT4DBRBiPsS6WRYmBD1DXg_1763960694
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E0F55195609F;
+	Mon, 24 Nov 2025 05:04:53 +0000 (UTC)
+Received: from gshan-thinkpadx1nanogen2.rmtau.csb (unknown [10.64.136.67])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EC4D619560A7;
+	Mon, 24 Nov 2025 05:04:49 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: kvmarm@lists.linux.dev
+Cc: kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	seanjc@google.com,
+	shan.gavin@gmail.com
+Subject: [PATCH] KVM: selftests: Fix core dump in rseq_test
+Date: Mon, 24 Nov 2025 15:04:27 +1000
+Message-ID: <20251124050427.1924591-1-gshan@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Jonathan Cameron <jonathan.cameron@huawei.com> writes:
+In commit 0297cdc12a87 ("KVM: selftests: Add option to rseq test to
+override /dev/cpu_dma_latency"), a 'break' is missed before the option
+'l' in the argument parsing loop, which leads to an unexpected core
+dump in atoi_paranoid(). It tries to get the latency from non-existent
+argument.
 
-> On Mon, 17 Nov 2025 19:29:57 +0530
-> "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org> wrote:
->
->> Register the TSM callback when the DA feature is supported by RSI. The
->> build order is also adjusted so that the TSM class is created before the
->> arm-cca-guest driver is initialized.
->> 
->> In addition, add support for the TDISP lock sequence. Writing a TSM
->> (TEE Security Manager) device name from `/sys/class/tsm` into `tsm/lock`
->> triggers the realm device lock operation.
->> 
->> Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
-> Hi Aneesh,
->
-> Some minor stuff in here.   One general comment is that there
-> are some fixlets for the CCA code surrounding what this patch
-> should focus on. Break those out as separate cleanup or base
-> this on top of the fixed up version of that code.
->
-> Thanks,
->
-> Jonathan
->
->> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
->> index 1b716d18b80e..2ec0f5dff02e 100644
->> --- a/arch/arm64/kernel/rsi.c
->> +++ b/arch/arm64/kernel/rsi.c
->> @@ -15,6 +15,7 @@
->>  #include <asm/rsi.h>
->>  
->>  static struct realm_config config;
->> +static unsigned long rsi_feat_reg0;
->>  
->>  unsigned long prot_ns_shared;
->>  EXPORT_SYMBOL(prot_ns_shared);
->> @@ -22,6 +23,12 @@ EXPORT_SYMBOL(prot_ns_shared);
->>  DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->>  EXPORT_SYMBOL(rsi_present);
->>  
->> +bool rsi_has_da_feature(void)
->> +{
->> +	return u64_get_bits(rsi_feat_reg0, RSI_FEATURE_REGISTER_0_DA);
->
-> I'm not keen on mixing explicit size of a u64 with the implicit
-> fact an unsigned long is effectively a u64.  Can we tidy up the types
-> to match?
->
+  host$ ./rseq_test -u
+  Random seed: 0x6b8b4567
+  Segmentation fault (core dumped)
 
-will switch rsi_feat_reg0 to static u64
+Add a 'break' before the option 'l' in the argument parsing loop to avoid
+the unexpected core dump.
 
->> +}
->> +EXPORT_SYMBOL_GPL(rsi_has_da_feature);
->
->> diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
->> index cb52021912b3..57556d7c1cec 100644
->> --- a/drivers/virt/coco/Makefile
->> +++ b/drivers/virt/coco/Makefile
->> @@ -6,6 +6,6 @@ obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
->>  obj-$(CONFIG_ARM_PKVM_GUEST)	+= pkvm-guest/
->>  obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
->>  obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
->> -obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
->>  obj-$(CONFIG_TSM) 		+= tsm-core.o
->>  obj-$(CONFIG_TSM_GUEST)		+= guest/
->> +obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
->
-> Check all patches for noise like this.  It may be a valid change but in this series
-> it's just adding confusion.
->
+Fixes: 0297cdc12a87 ("KVM: selftests: Add option to rseq test to override /dev/cpu_dma_latency")
+Cc: stable@vger.kernel.org # v6.15+
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ tools/testing/selftests/kvm/rseq_test.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-This is required for the patch to work as intended. This patch adds
-registration with TSM, which depends on the TSM class being created
-before the arm_cca_guest driver is initialized. The commit message
-provides further details.
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 1375fca80bcdb..f80ad6b47d16b 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
+ 		switch (opt) {
+ 		case 'u':
+ 			skip_sanity_check = true;
++			break;
+ 		case 'l':
+ 			latency = atoi_paranoid(optarg);
+ 			break;
+-- 
+2.51.1
 
-"Register the TSM callback when the DA feature is supported by RSI. The
-build order is also adjusted so that the TSM class is created before the
-arm-cca-guest driver is initialized.""
-
-
->
->> diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
->> index a42359a90558..66b2d9202b66 100644
->> --- a/drivers/virt/coco/arm-cca-guest/Kconfig
->> +++ b/drivers/virt/coco/arm-cca-guest/Kconfig
->> @@ -1,11 +1,17 @@
->> +# SPDX-License-Identifier: GPL-2.0-only
->> +#
->> +
->>  config ARM_CCA_GUEST
->>  	tristate "Arm CCA Guest driver"
->>  	depends on ARM64
->> +	depends on PCI_TSM
->>  	select TSM_REPORTS
->>  	select AUXILIARY_BUS
->> +	select TSM
->>  	help
->> -	  The driver provides userspace interface to request and
->> +	  The driver provides userspace interface to request an
->
-> Push this fixlet to the series adding this or a follow up if that isn't being respun.
-> Definitely shouldn't be in here.
->
->
->>  	  attestation report from the Realm Management Monitor(RMM).
->> +	  If the DA feature is supported, it also register with TSM framework.
->>  
->>  	  If you choose 'M' here, this module will be called
->>  	  arm-cca-guest.
->> diff --git a/drivers/virt/coco/arm-cca-guest/Makefile b/drivers/virt/coco/arm-cca-guest/Makefile
->> index 75a120e24fda..bc3b2be4019f 100644
->> --- a/drivers/virt/coco/arm-cca-guest/Makefile
->> +++ b/drivers/virt/coco/arm-cca-guest/Makefile
->> @@ -1,4 +1,5 @@
->>  # SPDX-License-Identifier: GPL-2.0-only
->> +#
->
-> Stray change.
->
->>  obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
->>  
->>  arm-cca-guest-y +=  arm-cca.o
->> diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca.c b/drivers/virt/coco/arm-cca-guest/arm-cca.c
->> index dc96171791db..288fa53ad0af 100644
->> --- a/drivers/virt/coco/arm-cca-guest/arm-cca.c
->> +++ b/drivers/virt/coco/arm-cca-guest/arm-cca.c
->> @@ -1,6 +1,6 @@
->>  // SPDX-License-Identifier: GPL-2.0-only
->>  /*
->> - * Copyright (C) 2023 ARM Ltd.
->> + * Copyright (C) 2025 ARM Ltd.
-> Usually we just extend the date span rather than claiming everything is
-> 2025. e.g.
->  * Copyright (C) 2023-2025 ARM Ltd.
->
->>   */
->
->> @@ -192,6 +194,57 @@ static void unregister_cca_tsm_report(void *data)
->>  	tsm_report_unregister(&arm_cca_tsm_report_ops);
->>  }
->>  
->> +static struct pci_tsm *cca_tsm_lock(struct tsm_dev *tsm_dev, struct pci_dev *pdev)
->> +{
->> +	int ret;
->> +
->> +	struct cca_guest_dsc *cca_dsc __free(kfree) =
->> +		kzalloc(sizeof(*cca_dsc), GFP_KERNEL);
->> +	if (!cca_dsc)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	ret = pci_tsm_devsec_constructor(pdev, &cca_dsc->pci, tsm_dev);
->> +	if (ret)
->> +		return ERR_PTR(ret);
->> +
->> +	return ERR_PTR(-EIO);
->
-> Perhaps add a comment so you have something like
->
-> 	return ERR_PTR(-EIO); /* For now always return an error */
->
-> Just makes it a tiny bit easier to review as no need to go check this
-> is removed in a later patch.
->
->
->> +}
->> +
->> +static void cca_tsm_unlock(struct pci_tsm *tsm)
->> +{
->> +	struct cca_guest_dsc *cca_dsc = to_cca_guest_dsc(tsm->pdev);
->> +
->> +	kfree(cca_dsc);
->> +}
->> +
->> +static struct pci_tsm_ops cca_devsec_pci_ops = {
->> +	.lock = cca_tsm_lock,
->> +	.unlock = cca_tsm_unlock,
->> +};
->> +
->> +static void cca_devsec_tsm_remove(void *tsm_dev)
->> +{
->> +	tsm_unregister(tsm_dev);
->> +}
->> +
->> +static int cca_devsec_tsm_register(struct auxiliary_device *adev)
->> +{
->> +	struct tsm_dev *tsm_dev;
->> +	int rc;
->> +
->> +	tsm_dev = tsm_register(&adev->dev, &cca_devsec_pci_ops);
->> +	if (IS_ERR(tsm_dev))
->> +		return PTR_ERR(tsm_dev);
->> +
->> +	rc = devm_add_action_or_reset(&adev->dev, cca_devsec_tsm_remove, tsm_dev);
->> +	if (rc) {
->> +		cca_devsec_tsm_remove(tsm_dev);
->
-> Take a look at what the _or_reset() does in the devm_add_action_or_reset().
-> Short story, you should not need this call if the devm machinery has returned
-> an error.
->
->> +		return rc;
->> +	}
->> +
->> +	return 0;
->> +}
->
->> diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.h b/drivers/virt/coco/arm-cca-guest/rsi-da.h
->> new file mode 100644
->> index 000000000000..5ad3b740710e
->> --- /dev/null
->> +++ b/drivers/virt/coco/arm-cca-guest/rsi-da.h
->
->> +static inline int rsi_vdev_id(struct pci_dev *pdev)
->> +{
->> +	return (pci_domain_nr(pdev->bus) << 16) |
->> +	       PCI_DEVID(pdev->bus->number, pdev->devfn);
->
-> I'm struggling to find where this is actually defined in the various specs
-> so good to have a reference in a comment here.
->
-
-The vdev_id is provided by the host during the rmi_vdev_create
-operation. In the Linux implementation, we use the guest_rid as the
-vdev_id.
-
-https://git.gitlab.arm.com/linux-arm/linux-cca/-/commit/3c55fc14480183f18c694e3d6054578830719d00#152a2139b6b88b07ff1e0f53e408a1d4158076a4_643_715
-
-
->> +}
->> +
->> +#endif
-
--aneesh
