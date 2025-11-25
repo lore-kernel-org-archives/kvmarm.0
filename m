@@ -1,120 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C19E2629D;
-	Tue, 25 Nov 2025 20:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D310D2264A9;
+	Tue, 25 Nov 2025 21:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764103734; cv=none; b=gO5PUfBecJA+o+1D1DMRK67QjJFlj/Ivgdl/Ew0akyYNs5ZOYfk1GPRbjuu46d9yMol8sGGZUPTPirsE8GcTROjyen1hCiAmhSUTP3Xd2d9Cr+uIxaB1agiscyAq0PIwUlhLaadwF/jdM0HGAR+a8edkVGzKjphcpfV9M65VEGw=
+	t=1764105921; cv=none; b=Vm/iaQyZpjmf8MEC8MrJ5bFltya8dMbmurdmXpGQTJ1KyASl9CzTdAVDijH7Bc93k2z12WBBad8rXqob6gPTzdOOI7keMKlsU8fbVnfXja14THRNZktmFDWVj5l7jcdlcXRMizI0D79K3+iGtvNFzgjJTZYJu24cAsfcc63GHPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764103734; c=relaxed/simple;
-	bh=JK/jjvYSwgAGtXn2/4YtYuj6bvcT8tHZpTXPO//omWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dw8JipLO5i2n1qpN0TV0JdvfbtFXwTuzJ5hnGAZ+CvvukRFOgrWwux6hzVknxyeoHtPM2Wb8nImdsKtLgpRQUYo3ic4jTAAc0RhvEdW3rUR5vEavkeuiUQ4WLnSJCD2IKzLHCtktmdux1F+FXLeznzKpknHDxLgNDC9vQwlwB5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9mZv298; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764105921; c=relaxed/simple;
+	bh=/5/8CnucXexqxcmHU/UtJRHL8WYNxyE9z/az71jfwjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GYqXJFPdQmSxHFcKG29Z/gKOq+dZFvVaOSn03Thr2DihexzPGHCn6/ME+sTF3VoZ9i4wLPV49p5HVDJILqrMqYY+QK6ODSG5Zb/mwmToV3WBjCYDzwXXC+NBf+D4w8QdMCTmf9+dPengGONSXvY/mAJVnTZ4uJWaP2GpZ7fwebY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pVvzVe4H; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9mZv298"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF0FCC4CEF1;
-	Tue, 25 Nov 2025 20:48:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pVvzVe4H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 392A0C4CEF1;
+	Tue, 25 Nov 2025 21:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764103733;
-	bh=JK/jjvYSwgAGtXn2/4YtYuj6bvcT8tHZpTXPO//omWg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=t9mZv298Wpa5eTpRc/cfeMLeKRD7X1tEKMrtXLVf/QISI3Crlp6vonCAvSPxWQsZY
-	 ro+iytmds2t16rpz2mdFFyA4Q4PJOfadM9IcZEdnyiWmGJQC3Q0oLaGlUCjVHbzq8d
-	 NLxScvnNk6R8dlh9BJIpPLBiknpId/E1OGH4rpB9lKs+E9wgvABFin1JjAiASSzh6W
-	 i0r+a3+6yKpu4ABehDmL8J273pok8USYQHeZc4emMz5Z+u+/r/8jub4O0qifFJjHNl
-	 QZR22SlP707NVF3dA6Ghczg1rDcfZf07sz+CbJAF6zHeKqhLtE+ZkABDzVdYzowhmi
-	 75GJtcxBvhz+A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vNzxz-00000008HI3-3DX2;
-	Tue, 25 Nov 2025 20:48:51 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1764105921;
+	bh=/5/8CnucXexqxcmHU/UtJRHL8WYNxyE9z/az71jfwjE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pVvzVe4HPqXuvwssOnpPmVG0irI/Jdi1mn5r2geRo5gtQEjRqzhW3TLBTQfOH6paK
+	 oZ+qjn2P84b03j1GMfiFz4EOqVcxA/zGHIA06BBPnMm72ZX1pmiDbjDn5HV8IHmsbx
+	 kAW5nInjZZFQfcGCA2o1ZiAvZpKT0F1lVj/MBVO3MSTi2rBnAv8mGnKWe9XFfvmKxx
+	 ybHh0EE3f2zM1/r4GXCnGbzt2LkbRnHch1Z1JS7zR+9+lALudMAUOAUX7XGiSJ8dEp
+	 zQpnB562Lj3o1muXZd/v3SRxOBToVjmC6oUAsqnmvc9+Jt9ldX67/kl7rR8vbuWB5O
+	 mrWviyyOjZwjw==
+Date: Tue, 25 Nov 2025 13:25:19 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH v2] KVM: arm64: Add endian casting to kvm_swap_s[12]_desc()
-Date: Tue, 25 Nov 2025 20:48:48 +0000
-Message-ID: <20251125204848.1136383-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	llvm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Add break to default case in
+ kvm_pgtable_stage2_pte_prot()
+Message-ID: <aSYev0IqSATKAEau@kernel.org>
+References: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
+ <87ecplgapz.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, lkp@intel.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ecplgapz.wl-maz@kernel.org>
 
-Keep sparse quiet by explicitly casting endianness conversion
-when swapping S1 and S2 descriptors.
+On Tue, Nov 25, 2025 at 07:42:48PM +0000, Marc Zyngier wrote:
+> On Tue, 25 Nov 2025 17:59:15 +0000,
+> Nathan Chancellor <nathan@kernel.org> wrote:
+> > 
+> > Clang warns (or errors with CONFIG_WERROR=y / W=e):
+> > 
+> >   arch/arm64/kvm/hyp/pgtable.c:757:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+> >     757 |         }
+> >         |         ^
+> > 
+> > With older versions of clang (15 and older) and GCC (at least the minimum
+> > supported, 8.1), this is an unconditional hard error:
+> > 
+> >   arch/arm64/kvm/hyp/pgtable.c: In function 'kvm_pgtable_stage2_pte_prot':
+> >   arch/arm64/kvm/hyp/pgtable.c:756:2: error: label at end of compound statement
+> >     default:
+> >     ^~~~~~~
+> > 
+> >   arch/arm64/kvm/hyp/pgtable.c:756:10: error: label at end of compound statement: expected statement
+> >           default:
+> >                   ^
+> >                    ;
+> > 
+> > Add a break statement to this default case to clear up the error/warning.
+> > 
+> > Fixes: 2608563b466b ("KVM: arm64: Add support for FEAT_XNX stage-2 permissions")
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> 
+> Acked-by: Marc Zyngier <maz@kernel.org>
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202511260246.JQDGsQKa-lkp@intel.com/
-Closes: https://lore.kernel.org/oe-kbuild-all/202511260344.9XehvH5Q-lkp@intel.com/
-Fixes: c59ca4b5b0c3f ("KVM: arm64: Implement HW access flag management in stage-1 SW PTW")
-Fixes: 39db933ba67f8 ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
+Thank you both for addressing the pile-up of issues I managed to
+introduce :) Online now, will apply in just a moment.
 
-Notes:
-    Missed the S2 issue the first time, and only caught up with
-    the robot's email.
-
- arch/arm64/kvm/at.c     | 8 ++++----
- arch/arm64/kvm/nested.c | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index f774a02d9393b..d25fef0f66e21 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -386,11 +386,11 @@ static int kvm_swap_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 old, u64 new,
- 			    struct s1_walk_info *wi)
- {
- 	if (wi->be) {
--		old = cpu_to_be64(old);
--		new = cpu_to_be64(new);
-+		old = (__force u64)cpu_to_be64(old);
-+		new = (__force u64)cpu_to_be64(new);
- 	} else {
--		old = cpu_to_le64(old);
--		new = cpu_to_le64(new);
-+		old = (__force u64)cpu_to_le64(old);
-+		new = (__force u64)cpu_to_le64(new);
- 	}
- 
- 	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c3033d1fe718c..cdeeb8f09e722 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -224,11 +224,11 @@ static int swap_guest_s2_desc(struct kvm_vcpu *vcpu, phys_addr_t pa, u64 old, u6
- 			      struct s2_walk_info *wi)
- {
- 	if (wi->be) {
--		old = cpu_to_be64(old);
--		new = cpu_to_be64(new);
-+		old = (__force u64)cpu_to_be64(old);
-+		new = (__force u64)cpu_to_be64(new);
- 	} else {
--		old = cpu_to_le64(old);
--		new = cpu_to_le64(new);
-+		old = (__force u64)cpu_to_le64(old);
-+		new = (__force u64)cpu_to_le64(new);
- 	}
- 
- 	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
--- 
-2.47.3
-
+Thanks,
+Oliver
