@@ -1,64 +1,92 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B8532E73D
-	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 18:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07F9274B59;
+	Tue, 25 Nov 2025 19:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764095510; cv=none; b=keiKir7KJcAX7bwz+Y2+fnUKH2zCifTrGT6bLFtow/5fk1R9FQ4V11BwpIuWl+PDOGUOarRNYnjkzKNtP4cnCakKh36j+02J0R2g3gowycItH1RYqKWQTn4RFXXOZ8LhZ36GIxXSGN0NwgkWstDN+3JsX2QpZtDG0vQMvWa1qsw=
+	t=1764099705; cv=none; b=Dk9lKaUZhuQPr2R9EYzilVRTiGAayZFOqb6iGpQjgqA2bSmOpBdQp7rujM+ZsCFhdlkOHaK5oq7Ib72mkvxFjh9lHDiPBAiHuaGWo9XO7WVOwLFLOwA30UR4XYNB8Rc8wT3W0e3bxwBM2lOvg30Jkc6uV+t2EWlg/wfixeDEw4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764095510; c=relaxed/simple;
-	bh=MSWaX9NjuLJ6vSRA7GHqTQ8KVuL7BdPXBD15aiBv8rA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k68+iBsah+6cQtBfeEfDAQNTi0SneVWIYGx5ohhspQm5VCOa3EBoErpWMIUDFp7lV55pOwpENl/F0PtOqT87yHsA9QERjQRAoJo7iU8SS6LqSNpRdn3wGvGf0TnTP7XPE/A86wI5BLVW3gNu0xQOooZys3YXJmyeHY1oe//yEPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4229A1570;
-	Tue, 25 Nov 2025 10:31:34 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 294003F6A8;
-	Tue, 25 Nov 2025 10:31:40 -0800 (PST)
-Date: Tue, 25 Nov 2025 18:31:37 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Ben Horgan <ben.horgan@arm.com>, will@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, shuah@kernel.org
-Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
-Message-ID: <aSX2CSJEwUYkn5GQ@arm.com>
-References: <20251125101207.1492580-1-ben.horgan@arm.com>
- <86cy56qgi3.wl-maz@kernel.org>
+	s=arc-20240116; t=1764099705; c=relaxed/simple;
+	bh=q1XrjBDBdd+NI+CU1uTxO0pJaAQ+bVffaYJhhaFxauQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OhzxDl+v9DlkgJzWkI0l8/4cKMRXP0CKPtalSQhAwQ+hl3metmIOKSQR6P5ZBzAD23YBHzWI+Krw14HDApCWmHZVOaPAuoA0llK8wx++UG8IL1QFcIMowk82PEIztKjCAXAv1yaXCHNkJwVsjEJMrjRpNO5DA1TAWO40JcFQSf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ri//HlS/; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ri//HlS/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD6CC4CEF1;
+	Tue, 25 Nov 2025 19:41:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764099705;
+	bh=q1XrjBDBdd+NI+CU1uTxO0pJaAQ+bVffaYJhhaFxauQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ri//HlS/rWxwFVTtjDva4j/if+FF9A0+ocX/LBtvCM1iUVyYF+HV7lFyslkhQLj5h
+	 bYmGkQEuFQyH7NZTbZJTCofjUJBy5wmF19PWxLnAImrsJbu6g2PaX0CB7ilcMy9oG1
+	 JDnUbneEs1ePLz7svQVGE3P0hifg3R8nONn/mErdSv3z+NosCPnkaFpmZRZNYBwaW5
+	 fFY+8KF/TeoZNsAb9jb+nSKTxSpQh+/dwzv/ShfUQ7VnAa9S78msCP8dzSbzVSiajv
+	 IEodzobJg/S+/cdEOz8UeJUd9RbcdZ4lOsjNDROgKhs5LjOIz/51y9ymkhMvYRTIP9
+	 CZsFdPcwp+4LQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vNyv0-00000008GGi-3P2p;
+	Tue, 25 Nov 2025 19:41:42 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] KVM: arm64: Add endian casting to kvm_swap_s1_desc()
+Date: Tue, 25 Nov 2025 19:41:37 +0000
+Message-ID: <20251125194138.1097971-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86cy56qgi3.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, lkp@intel.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Nov 25, 2025 at 03:27:48PM +0000, Marc Zyngier wrote:
-> On Tue, 25 Nov 2025 10:12:05 +0000,
-> Ben Horgan <ben.horgan@arm.com> wrote:
-> > 
-> > For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
-> > more extensive changes [1] and looks to be a user of the set_id_regs
-> > test rather than someone just doing some cleanup. The other change in
-> > this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
-> > sysreg.h header rather than the kernel version. I'll send a separate
-> > patch to remove the kernel version.
-> > 
-> > Tidies up a few small things in set_id_regs. The removal of
-> > ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
-> > the define but set_id_regs.c is the only place its used.
-> 
-> Acked-by: Marc Zyngier <maz@kernel.org>
+Keep sparse quiet by explicitly casting endianness conversion
+when swapping S1 descriptors.
 
-Thanks Marc. Shall I take these through the arm64 tree, together with
-the removal of the macro? They should have probably been a single
-series.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202511260246.JQDGsQKa-lkp@intel.com/
+Fixes: c59ca4b5b0c3f ("KVM: arm64: Implement HW access flag management in stage-1 SW PTW")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/at.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index f774a02d9393b..d25fef0f66e21 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -386,11 +386,11 @@ static int kvm_swap_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 old, u64 new,
+ 			    struct s1_walk_info *wi)
+ {
+ 	if (wi->be) {
+-		old = cpu_to_be64(old);
+-		new = cpu_to_be64(new);
++		old = (__force u64)cpu_to_be64(old);
++		new = (__force u64)cpu_to_be64(new);
+ 	} else {
+-		old = cpu_to_le64(old);
+-		new = cpu_to_le64(new);
++		old = (__force u64)cpu_to_le64(old);
++		new = (__force u64)cpu_to_le64(new);
+ 	}
+ 
+ 	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
 -- 
-Catalin
+2.47.3
+
