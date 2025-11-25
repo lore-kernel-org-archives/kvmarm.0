@@ -1,92 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07F9274B59;
-	Tue, 25 Nov 2025 19:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C74C3148B4;
+	Tue, 25 Nov 2025 19:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764099705; cv=none; b=Dk9lKaUZhuQPr2R9EYzilVRTiGAayZFOqb6iGpQjgqA2bSmOpBdQp7rujM+ZsCFhdlkOHaK5oq7Ib72mkvxFjh9lHDiPBAiHuaGWo9XO7WVOwLFLOwA30UR4XYNB8Rc8wT3W0e3bxwBM2lOvg30Jkc6uV+t2EWlg/wfixeDEw4g=
+	t=1764099771; cv=none; b=Wwto/tYa7AR1k9nZZ5B/KETcs0xTAyPc3F7ZU3MFslEJYDH1NF9p3Ip4LsPIWvFHEly6vR03ghHWWXBWJrTRyOuaz8KFLMKI4nuJeCYWcp4BxjnQS1h3CdZSqThYT1X4RlrEkRx/zbbXe/9crDSYd4ylCiBEgej3SC2k8sr2XRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764099705; c=relaxed/simple;
-	bh=q1XrjBDBdd+NI+CU1uTxO0pJaAQ+bVffaYJhhaFxauQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OhzxDl+v9DlkgJzWkI0l8/4cKMRXP0CKPtalSQhAwQ+hl3metmIOKSQR6P5ZBzAD23YBHzWI+Krw14HDApCWmHZVOaPAuoA0llK8wx++UG8IL1QFcIMowk82PEIztKjCAXAv1yaXCHNkJwVsjEJMrjRpNO5DA1TAWO40JcFQSf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ri//HlS/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764099771; c=relaxed/simple;
+	bh=EH5HQVZ4pVflbpU68pvKHubZ0K2IYSrdTVT51BYzWEo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tQAx3j94PeNDPIkfd5ZKrwuT2ZZ9W7NlJkwaj+sOkv9IgKAT5juDmsJRXFEnqUkuiSshfvfLdEIJGHzxjVG7aonKfctw53mYu+Pe0Gz4lRsPh+w55TdMnn5ElkyDN0eH5Tx+KlLqxHFe65qmF8vtbIDBHC4/B8aqQSCnpKqAb74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsUY5hRY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ri//HlS/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD6CC4CEF1;
-	Tue, 25 Nov 2025 19:41:45 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsUY5hRY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79ADC4CEF1;
+	Tue, 25 Nov 2025 19:42:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764099705;
-	bh=q1XrjBDBdd+NI+CU1uTxO0pJaAQ+bVffaYJhhaFxauQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ri//HlS/rWxwFVTtjDva4j/if+FF9A0+ocX/LBtvCM1iUVyYF+HV7lFyslkhQLj5h
-	 bYmGkQEuFQyH7NZTbZJTCofjUJBy5wmF19PWxLnAImrsJbu6g2PaX0CB7ilcMy9oG1
-	 JDnUbneEs1ePLz7svQVGE3P0hifg3R8nONn/mErdSv3z+NosCPnkaFpmZRZNYBwaW5
-	 fFY+8KF/TeoZNsAb9jb+nSKTxSpQh+/dwzv/ShfUQ7VnAa9S78msCP8dzSbzVSiajv
-	 IEodzobJg/S+/cdEOz8UeJUd9RbcdZ4lOsjNDROgKhs5LjOIz/51y9ymkhMvYRTIP9
-	 CZsFdPcwp+4LQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1764099770;
+	bh=EH5HQVZ4pVflbpU68pvKHubZ0K2IYSrdTVT51BYzWEo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DsUY5hRYzfqkGz84KqeI8ykvjkXvHFogdOuTZISZ1HlQ3iWfar5088nRWuAbxCBZC
+	 ukjMV4DN9o4vTQ/aC6z63GOvNjJj3Yn+theY4+NI6hgat6JiFDYUq8GTVmZi8Av+ZU
+	 ODPDmyRqsSdNTIos2LyZKTNgplyfFYC6WeR5XJrTMPkHBun+WJf0IfHCAhmg8RDhTK
+	 bHX7HlbORW6yiJ0i2SI159BRkioCcSgt+UUuuL+UZzpYMwJuf5ggXt9IucyJhTa76y
+	 bckSyrokrdh5xBjk3r6PSizr7rk5mHZoZjc+QCYU3Bk8auyr+rurVx6r7WhoQP8IYi
+	 AEm8L4vFk38NA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNyv0-00000008GGi-3P2p;
-	Tue, 25 Nov 2025 19:41:42 +0000
+	id 1vNyw4-00000008GHt-235b;
+	Tue, 25 Nov 2025 19:42:48 +0000
+Date: Tue, 25 Nov 2025 19:42:48 +0000
+Message-ID: <87ecplgapz.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH] KVM: arm64: Add endian casting to kvm_swap_s1_desc()
-Date: Tue, 25 Nov 2025 19:41:37 +0000
-Message-ID: <20251125194138.1097971-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	llvm@lists.linux.dev,
+	patches@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
+In-Reply-To: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
+References: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, lkp@intel.com
+X-SA-Exim-Rcpt-To: nathan@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, llvm@lists.linux.dev, patches@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Keep sparse quiet by explicitly casting endianness conversion
-when swapping S1 descriptors.
+On Tue, 25 Nov 2025 17:59:15 +0000,
+Nathan Chancellor <nathan@kernel.org> wrote:
+> 
+> Clang warns (or errors with CONFIG_WERROR=y / W=e):
+> 
+>   arch/arm64/kvm/hyp/pgtable.c:757:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+>     757 |         }
+>         |         ^
+> 
+> With older versions of clang (15 and older) and GCC (at least the minimum
+> supported, 8.1), this is an unconditional hard error:
+> 
+>   arch/arm64/kvm/hyp/pgtable.c: In function 'kvm_pgtable_stage2_pte_prot':
+>   arch/arm64/kvm/hyp/pgtable.c:756:2: error: label at end of compound statement
+>     default:
+>     ^~~~~~~
+> 
+>   arch/arm64/kvm/hyp/pgtable.c:756:10: error: label at end of compound statement: expected statement
+>           default:
+>                   ^
+>                    ;
+> 
+> Add a break statement to this default case to clear up the error/warning.
+> 
+> Fixes: 2608563b466b ("KVM: arm64: Add support for FEAT_XNX stage-2 permissions")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202511260246.JQDGsQKa-lkp@intel.com/
-Fixes: c59ca4b5b0c3f ("KVM: arm64: Implement HW access flag management in stage-1 SW PTW")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/at.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index f774a02d9393b..d25fef0f66e21 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -386,11 +386,11 @@ static int kvm_swap_s1_desc(struct kvm_vcpu *vcpu, u64 pa, u64 old, u64 new,
- 			    struct s1_walk_info *wi)
- {
- 	if (wi->be) {
--		old = cpu_to_be64(old);
--		new = cpu_to_be64(new);
-+		old = (__force u64)cpu_to_be64(old);
-+		new = (__force u64)cpu_to_be64(new);
- 	} else {
--		old = cpu_to_le64(old);
--		new = cpu_to_le64(new);
-+		old = (__force u64)cpu_to_le64(old);
-+		new = (__force u64)cpu_to_le64(new);
- 	}
- 
- 	return __kvm_at_swap_desc(vcpu->kvm, pa, old, new);
+	M.
+
 -- 
-2.47.3
-
+Jazz isn't dead. It just smells funny.
