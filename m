@@ -1,100 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556431FBC8C
-	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 19:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A52633B6E0;
+	Tue, 25 Nov 2025 20:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764099925; cv=none; b=ESeHvkV3pGjhwy8xYVCAqPohwbpuHd7xvGXuZt3/ND3BDQJmVvxyrS8o6XERsC5WbAqX8VneJv1dVbs8X7D4Qg7E0PihnXzUeXWonMXQWB3V70rog+S/re9bdgfwhEduV43x0/WIRgER5lF9n+8nHc7dIHPxu/SUDxCFkYICxio=
+	t=1764101841; cv=none; b=Ep990GY6fWqdN5UZK84yNFJa4ZOWh9H2/JsIiDU+GbAEM+/jkbTz6jwhtAomnccbfdxI3Bre8VpYpjJAWAyEttB8XoSQIaHVSFrDAcXkNdjkJxme1hju4Ggkd8VuMaQiATEasTtwLPBVyxZ+QDU2K0ANq5HazxPA21AZdL18YJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764099925; c=relaxed/simple;
-	bh=xQLKTEy0U4Tn7LI1F1hhw+E72j8eKGa3XENdEMY7PR0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FRn1oCwmV3ic3FNAsudhGC2ecePLeZtarLnGfySy/ShY3U/ZDgJDyYorDnAgZYDy6H9jJC9lbF1P3AOkWvwZsfjAHlOD02Ri/ZjlC7uuDK+XwGg/vDt7zVCLCdB4W8BkSXkdnWZcrDxDX3fSiEENqbsnktL6+5b+B03Zru6+pDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wkiicn6S; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764101841; c=relaxed/simple;
+	bh=hzbR14ZISIMAgrKscEtE9O4AxjI+YtVWZFwOy9uJXg8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pvcrIQfO3Niw8dYt5yYzwO5dvDVVh7/8J1nMBym39xBSaHFo/ruCdcdhhlBvKMNUW82ZXdseH+V7tucB+OurPMbfXFDYPTvqDYHRoG9qZgLK8IHet69y1Jvid4zWEOk0tFbIRXNyPdVfSAIW365HADvP3Qpr1QJa07OHUur8cfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S9eQXmzQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wkiicn6S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC05C4CEF1;
-	Tue, 25 Nov 2025 19:45:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S9eQXmzQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8301C4CEF1;
+	Tue, 25 Nov 2025 20:17:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764099925;
-	bh=xQLKTEy0U4Tn7LI1F1hhw+E72j8eKGa3XENdEMY7PR0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Wkiicn6SSdjowI/ygyBTWt93AYs7efRcVIa7wMWX3M2qSD7QcBx2XlVa3SDHXKJ0+
-	 EBERH4AdgSQCeaOugMPxFj20SuOXqXw7MxIa+SZIRaase1cdGuPvpWMGOZVz5lwt8T
-	 XgfwmF/4/ZJcVmMT5kf1eOyjii8WUM9l9e3pED8bTq87ICKMyK/Jeq0GPh9NsxS2Fi
-	 2vdxsZS4gMl4ifjzMrHzAddmnf+A1p/jfWRDQe3igzJIzf3udVK5Mvi9+N4QjdGUoI
-	 C6MLM14iQDpDzFV1tAYaLANYw3slMMigPk+8xP/Pt3JhYsMqU4FrfEnulKHNUzutI0
-	 gxSEqVL7zgysw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	s=k20201202; t=1764101840;
+	bh=hzbR14ZISIMAgrKscEtE9O4AxjI+YtVWZFwOy9uJXg8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=S9eQXmzQ0b9CochquTo+PVGfqqmazZyHHt6+I/eoi1j9d1AE5pyPqxnPQ3mUHJhbM
+	 ncrdnVuaVfDsKuevkOzRYWPefitMvYU7uYBMkofOMoLe+842CXzM1+DDPJVdI3FjLd
+	 Bo2gH/+eLkV96ygSzq3Oa8VnTbzna2v8ZRwN6Zr93KQBIcdZoEGkCDVBP2C48xCoJZ
+	 rXtBOsnFAk+dMVTh4Rg0XP/t0OqcOwTDMs84a9pBGeMtyJXgHvl9ZPzxxKhcHarkT2
+	 eOfioK9DFUpUiDwgPBRGpKI004+yT3I5FzqDc0cJw0l01665bdcaGcXnT5/CWVYSYy
+	 983m5Hpdwl0mw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNyyY-00000008GJS-3QqH;
-	Tue, 25 Nov 2025 19:45:22 +0000
-Date: Tue, 25 Nov 2025 19:45:22 +0000
-Message-ID: <87cy55galp.wl-maz@kernel.org>
+	id 1vNzTS-00000008Gpd-3C63;
+	Tue, 25 Nov 2025 20:17:18 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>,
-    Oliver Upton <oupton@kernel.org>
-Cc: Ben Horgan <ben.horgan@arm.com>,
-	will@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	shuah@kernel.org
-Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
-In-Reply-To: <aSX2CSJEwUYkn5GQ@arm.com>
-References: <20251125101207.1492580-1-ben.horgan@arm.com>
-	<86cy56qgi3.wl-maz@kernel.org>
-	<aSX2CSJEwUYkn5GQ@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH] KVM: arm64: Don't use FIELD_PREP() in initialisers
+Date: Tue, 25 Nov 2025 20:17:15 +0000
+Message-ID: <20251125201715.1133405-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, oupton@kernel.org, ben.horgan@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, shuah@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, nathan@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 25 Nov 2025 18:31:37 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
-> 
-> On Tue, Nov 25, 2025 at 03:27:48PM +0000, Marc Zyngier wrote:
-> > On Tue, 25 Nov 2025 10:12:05 +0000,
-> > Ben Horgan <ben.horgan@arm.com> wrote:
-> > > 
-> > > For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
-> > > more extensive changes [1] and looks to be a user of the set_id_regs
-> > > test rather than someone just doing some cleanup. The other change in
-> > > this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
-> > > sysreg.h header rather than the kernel version. I'll send a separate
-> > > patch to remove the kernel version.
-> > > 
-> > > Tidies up a few small things in set_id_regs. The removal of
-> > > ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
-> > > the define but set_id_regs.c is the only place its used.
-> > 
-> > Acked-by: Marc Zyngier <maz@kernel.org>
-> 
-> Thanks Marc. Shall I take these through the arm64 tree, together with
-> the removal of the macro? They should have probably been a single
-> series.
+Nathan reports that compiling with CONFIG_PTDUMP_STAGE2_DEBUGFS
+results in a compilation failure, with the compiler moaning about
+"braced-group within expression allowed only inside a function"...
 
-Oliver is in charge of the merge window this time around, so I'll
-defer to him, but that's absolutely fine from my PoV.
+Replace FIELD_PREP() with its shifting primitive, which does the
+trick here.
 
-Thanks,
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Fixes: 81e9fe5c6f25d ("KVM: arm64: Teach ptdump about FEAT_XNX permissions")
+Closes: https://lore.kernel.org/r/20251125173929.GA3256322@ax162
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/ptdump.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+index bd722383d0e3f..6cbe018fd6fda 100644
+--- a/arch/arm64/kvm/ptdump.c
++++ b/arch/arm64/kvm/ptdump.c
+@@ -46,22 +46,22 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+ 	},
+ 	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b00),
++		.val	= 0b00UL << __bf_shf(KVM_PTE_LEAF_ATTR_HI_S2_XN),
+ 		.set	= "px ux ",
+ 	},
+ 	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b01),
++		.val	= 0b01UL << __bf_shf(KVM_PTE_LEAF_ATTR_HI_S2_XN),
+ 		.set	= "PXNux ",
+ 	},
+ 	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10),
++		.val	= 0b10UL << __bf_shf(KVM_PTE_LEAF_ATTR_HI_S2_XN),
+ 		.set	= "PXNUXN",
+ 	},
+ 	{
+ 		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+-		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b11),
++		.val	= 0b11UL << __bf_shf(KVM_PTE_LEAF_ATTR_HI_S2_XN),
+ 		.set	= "px UXN",
+ 	},
+ 	{
 -- 
-Jazz isn't dead. It just smells funny.
+2.47.3
+
