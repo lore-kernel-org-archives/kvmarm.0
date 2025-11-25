@@ -1,243 +1,85 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9528032549B
-	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 15:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C241328259
+	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 15:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764082999; cv=none; b=CYmY0xO3n23uZMHQXTPGy5/O8XZcNin9YkYQle8xbY73/lTS/9wTzCbiwakt7WnR5KQHvn/L459aCSHbShBpn7VgxTC02b7TTyP7Uw8+lmhE6XWHb79q7Zr/7zBSoM+897BF+bJmyfUjh8LUYw8IEh2kYKGVDZH4WDJrfofgnew=
+	t=1764084471; cv=none; b=aKyDtk1McqgSvqHSQ25qvEY3K8dhIyHapAEITyDZsB8cQq1OJgB9+4Rcn/lI4syON2aKMkfrFLolEo7i858idT7F4/+FFo5CSXDt4UwBOhJsFRSweSgL/54HivZhdAUAV2i7Ta0MTiwfb/W0LzgTuRQVpSCwH/csk1IEmNA55YE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764082999; c=relaxed/simple;
-	bh=q8r5T2Pan94gsN2Ar3/GzYNtJhKq9Qu08gx1Reof65Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AL/X6oFZ/rQw0CBiGCLpuO9nFTrjjITiAV3z+/kcOwtWZTyzu2mJZaUnDJFLvZTDQhWR+w17TOPiZBT7OvsjrvLPgWMryj7171qz8+2eQ2DN7NjqS3xl3NuoS3ebM4F8/ktNrTrqGAos4BmmYIQ/fGqF7lXDUNRPg/t84UfzreE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7A912168F;
-	Tue, 25 Nov 2025 07:03:08 -0800 (PST)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2DC63F73B;
-	Tue, 25 Nov 2025 07:03:14 -0800 (PST)
-Message-ID: <d6277c87-d20c-459e-8314-d5fd99cf9b00@arm.com>
-Date: Tue, 25 Nov 2025 15:03:13 +0000
+	s=arc-20240116; t=1764084471; c=relaxed/simple;
+	bh=Ti8iGiUtcqBKkkPG21ATi5ytvoW0QZ6kgRhmCLoSnoU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lfoh68aWYaXgEwOVBRaWeJ5OcLnlb1lXz+Tp44fLw+G0Pji9kJ3D7Kc869LM+spdFBOB0eEnOh2GoJxmAa3JskbwJIX9C4ucpA4AE4KLbk21HdNyjwYMv/O7lKFhoPW85Nh9C8vIlKXKjU/gA0kzVnoapYyRNgLGJ6pDAnT7+aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C6Tzz3x3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C6Tzz3x3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1152C4CEF1;
+	Tue, 25 Nov 2025 15:27:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764084470;
+	bh=Ti8iGiUtcqBKkkPG21ATi5ytvoW0QZ6kgRhmCLoSnoU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C6Tzz3x3v5M7Pinh31uHfDG59eIaqyxBZ337pHbFgR/6YPDeapEST0FA3U2PMNq/E
+	 AgzRW+TRekf7iBAX21La/zSO28UNV5wfNeqSmclpFn+DWGuYxct4AkNgZGWaY6LtU3
+	 ZdfijJRDdnBmBZ6bMBeaiVaacxIKqiCqbaRzDS7NgO0MqsCfuI8iuE6nXMqnnwZKaU
+	 BuYjghFEuQcG4V2n9L6fYWeBXDh5LE2YrOL/BSIt5x9sfJ/NW3yHXNcGhaUzey+wXY
+	 0mN/995bHUzoANunMD7fw5DKvYrinP+LlATUqF1T5puZpHoXUr5LVIy0Oo+rOtTknf
+	 5b9SVXc/TnoeA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vNuxI-00000008CIc-2ogP;
+	Tue, 25 Nov 2025 15:27:48 +0000
+Date: Tue, 25 Nov 2025 15:27:48 +0000
+Message-ID: <86cy56qgi3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	shuah@kernel.org
+Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
+In-Reply-To: <20251125101207.1492580-1-ben.horgan@arm.com>
+References: <20251125101207.1492580-1-ben.horgan@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/49] KVM: arm64: GICv3: Detect and work around the
- lack of ICV_DIR_EL1 trapping
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- Mark Brown <broonie@kernel.org>
-References: <20251120172540.2267180-1-maz@kernel.org>
- <20251120172540.2267180-7-maz@kernel.org>
- <5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com> <86h5uiql4b.wl-maz@kernel.org>
- <e67decb6-20a5-4659-8401-8534049f9229@arm.com> <86fra2qhq9.wl-maz@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86fra2qhq9.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, shuah@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 25/11/2025 15:01, Marc Zyngier wrote:
-> On Tue, 25 Nov 2025 14:14:25 +0000,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>
->> On 25/11/2025 13:48, Marc Zyngier wrote:
->>> On Tue, 25 Nov 2025 11:26:10 +0000,
->>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>>
->>>> On 20/11/2025 17:24, Marc Zyngier wrote:
->>>>> A long time ago, an unsuspecting architect forgot to add a trap
->>>>> bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
->>>>> what's a bit of spec between friends? Thankfully, this was fixed
->>>>> in a later revision, and ARM "deprecates" the lack of trapping
->>>>> ability.
->>>>>
->>>>> Unfortuantely, a few (billion) CPUs went out with that defect,
->>>>> anything ARMv8.0 from ARM, give or take. And on these CPUs,
->>>>> you can't trap DIR on its own, full stop.
->>>>>
->>>>> As the next best thing, we can trap everything in the common group,
->>>>> which is a tad expensive, but hey ho, that's what you get. You can
->>>>> otherwise recycle the HW in the neaby bin.
->>>>>
->>>>> Tested-by: Fuad Tabba <tabba@google.com>
->>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>>> ---
->>>>>     arch/arm64/include/asm/virt.h  |  7 ++++-
->>>>>     arch/arm64/kernel/cpufeature.c | 52 ++++++++++++++++++++++++++++++++++
->>>>>     arch/arm64/kernel/hyp-stub.S   |  5 ++++
->>>>>     arch/arm64/kvm/vgic/vgic-v3.c  |  3 ++
->>>>>     arch/arm64/tools/cpucaps       |  1 +
->>>>>     5 files changed, 67 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
->>>>> index aa280f356b96a..8eb63d3294974 100644
->>>>> --- a/arch/arm64/include/asm/virt.h
->>>>> +++ b/arch/arm64/include/asm/virt.h
->>>>> @@ -40,8 +40,13 @@
->>>>>      */
->>>>>     #define HVC_FINALISE_EL2	3
->>>>>     +/*
->>>>> + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
->>>>> + */
->>>>> +#define HVC_GET_ICH_VTR_EL2	4
->>>>> +
->>>>>     /* Max number of HYP stub hypercalls */
->>>>> -#define HVC_STUB_HCALL_NR 4
->>>>> +#define HVC_STUB_HCALL_NR 5
->>>>>       /* Error returned when an invalid stub number is passed into x0
->>>>> */
->>>>>     #define HVC_STUB_ERR	0xbadca11
->>>>> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->>>>> index 5ed401ff79e3e..5de51cb1b8fe2 100644
->>>>> --- a/arch/arm64/kernel/cpufeature.c
->>>>> +++ b/arch/arm64/kernel/cpufeature.c
->>>>> @@ -2303,6 +2303,49 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
->>>>>     }
->>>>>     #endif
->>>>>     +static bool can_trap_icv_dir_el1(const struct
->>>>> arm64_cpu_capabilities *entry,
->>>>> +				 int scope)
->>>>> +{
->>>>> +	static const struct midr_range has_vgic_v3[] = {
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
->>>>> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
->>>>> +		{},
->>>>> +	};
->>>>> +	struct arm_smccc_res res = {};
->>>>> +
->>>>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
->>>>> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
->>>>> +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
->>>>> +	    !is_midr_in_range_list(has_vgic_v3))
->>>>> +		return false;
->>>>> +
->>>>> +	if (!is_hyp_mode_available())
->>>>> +		return false;
->>>>> +
->>>>> +	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
->>>>> +		return true;
->>>>> +
->>>>> +	if (is_kernel_in_hyp_mode())
->>>>> +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
->>>>> +	else
->>>>> +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
->>>>
->>>> We are reading the register on the current CPU and this capability,
->>>> being a SYSTEM_FEATURE, relies on the "probing CPU". If there CPUs
->>>> with differing values (which I don't think is practical, but hey,
->>>> never say..). This is would better be a
->>>> ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which would run through all
->>>> boot CPUs and would set the capability when it matches.
->>>
->>> While I agree that SYSTEM_FEATURE is most probably the wrong thing, I
->>> can't help but notice that
->>>
->>> - ARM64_HAS_GICV3_CPUIF,
->>> - ARM64_HAS_GIC_PRIO_MASKING
->>> - ARM64_HAS_GIC_PRIO_RELAXED_SYNC
->>>
->>> are all ARM64_CPUCAP_STRICT_BOOT_CPU_FEATURE.
->>
->> Which means, if GICV3_CPUIF is set any booting CPU must have them.
->>
->>>
->>> On the other ARM64_HAS_GICV5_LEGACY is ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE.
->>>
->>> Given that ARM64_HAS_ICH_HCR_EL2_TDIR is dependent on both
->>> ARM64_HAS_GICV3_CPUIF and ARM64_HAS_GICV5_LEGACY, shouldn't these two
->>> (and their dependencies) be aligned to have the same behaviour?
->>
->> Yes, but it also depends on how you are detecting the feature.
->>
->> BOOT_CPU_FEATURES are finalized with BOOT CPU and thusanything that
->> boots up later must have it. So it is fine, as long
->> as a SYSTEM cap depends on it and can do its own additional checks
->> in a system wide safe manner.
+On Tue, 25 Nov 2025 10:12:05 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> I had a quick go at it, and things are a bit murky. As it turns out,
-> the GICv3 stuff is STRICT_BOOT_CPU_FEATURE because we need the GIC
-> super early, before secondary CPUs can be brought up.
+> For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
+> more extensive changes [1] and looks to be a user of the set_id_regs
+> test rather than someone just doing some cleanup. The other change in
+> this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
+> sysreg.h header rather than the kernel version. I'll send a separate
+> patch to remove the kernel version.
 > 
-> However, virtualisation-specific features only get used way down the
-> line, so both ICH_HCR_EL2_TDIR and GICV5_LEGACY can be delayed until
-> all CPUs have booted.
-> 
->> But in your case, we a have SYSTEM cap, which only performs the check
->> on the "running CPU" and not considering a system wide safe value for
->> ICH_VTR_EL2_TDS. In order to do this, we need to switch to something
->> like the GICV5_LEGACY cap, which chooses to perform the check on all
->> booting CPUs (as we don't keep the system wide safe value for the
->> bit it is looking for).
->>
->> e.g., your cap may be incorrectly SET, when the BOOT cpu (which
->> mostly runs the SYSTEM scope), but another CPU didn't have the
->> ICH_VTR_EL2_TDS.
-> 
-> Yup, that's the conclusion I also came to.
-> 
->> Does that help ?
-> 
-> It does. I came up with the fix below, which I'll spin as a patch shortly.
-> 
-> Thanks,
+> Tidies up a few small things in set_id_regs. The removal of
+> ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
+> the define but set_id_regs.c is the only place its used.
 
-Thanks, the below looks good to me.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
+	M.
 
-Cheers
-Suzuki
-
-> 
-> 	M.
-> 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index ff2b05f7226a9..c840a93b9ef95 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2326,14 +2326,14 @@ static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
->   
->   	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
->   	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
-> -	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
-> +	if (!this_cpu_has_cap(ARM64_HAS_GICV3_CPUIF) &&
->   	    !is_midr_in_range_list(has_vgic_v3))
->   		return false;
->   
->   	if (!is_hyp_mode_available())
->   		return false;
->   
-> -	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
-> +	if (this_cpu_has_cap(ARM64_HAS_GICV5_LEGACY))
->   		return true;
->   
->   	if (is_kernel_in_hyp_mode())
-> @@ -2864,7 +2864,7 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->   		 */
->   		.desc = "ICV_DIR_EL1 trapping",
->   		.capability = ARM64_HAS_ICH_HCR_EL2_TDIR,
-> -		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.type = ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE,
->   		.matches = can_trap_icv_dir_el1,
->   	},
->   #ifdef CONFIG_ARM64_E0PD
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
