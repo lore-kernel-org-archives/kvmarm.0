@@ -1,160 +1,197 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B114329C68
-	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 17:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E28A218596
+	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 17:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764090500; cv=none; b=ePVITcneRhi9+eI0PgIA4EB1T7Vld+sw55KbYZ0Q2PkvZQAt7IZzsRpeVMimABb8wNWqs9xmGSaXURBOj0SitxQ6FkOm3g6RuGnKUPZpB3DAL0JmaAEbz6G3UFapdZCejf4DEyyNXQgaG97M21ZzMupE7C2uu62u8/FiwpdDgVQ=
+	t=1764092374; cv=none; b=hFbWeQkdm55H/4VZoYCAN6CQhrWVwfSEw5LFPraaIWKJg/pQbB2XF4O+XcFCWJ3+hhy7P1CFOhjAZfcNhxqIf2q1TGvyBc/TV0d3RDoLSXUtj7JLrojFDnAWuJDFqh9F04Ncv8Ljm/rWOBw5e2gCBo3dIj8dcWmDKHFHqq7D/RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764090500; c=relaxed/simple;
-	bh=Ws/YNKakph/oNkC8T2Z0oK5lQ8Qe0+L4yEIQYy1pOV8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R3TjgTs1eihXV4LbaYFXTwwM/kylU4GpsxSiQ+g2I1KKq+IWmbNJcH4ucMBC6mk8RabWxdxHlCec61LssMFn+cr9RvfJZC3UTlJqhMO0JZ9+FVnSEz/lclex8GE1iqDze4x+KS+hI5eO+d9HW/vaKbkRUpS+EaZSSLjM+EeVNk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sXDkyVmM; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1764092374; c=relaxed/simple;
+	bh=Qbox7/Q69vV2ZqoPXL7NY02Ztiyfhv/0qmeL08HQFyw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TWU5K1ZVVkr7h8fdaaIqLjQXCjNl1ngJoUkbqYk1ABbRWMRd7ZPDAZsvuW6cJRahhWg1+TsUL6eaLIBOsRaKsRhwYJA4xWSIoPID/9JM1CaSSGpczWbjLt6yod65KsabZ2HSh+R5AxVbDVcXiDwSpzJlaYVQQlYraP6X/Htm5vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXL/LD02; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sXDkyVmM"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343806688cbso13898934a91.3
-        for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 09:08:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764090498; x=1764695298; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4ndUQJXblyMVIEo31GQ2aPBJsTj4kLS2trQiSNmxdk=;
-        b=sXDkyVmMU8r0kFFns6m95FHmKeidG/MDhOQfEKZ9CnEBka1vPyAO1G3GGSd1XEgFQ3
-         U0XxiU5TMQn4B4c06HCzEbbQnyeDU/bFwOpRANVPjUv2E1npXV3mgvEfNZ+ss9zVAvmY
-         nT8E8cPP3pI2am+ztS9OiMNYYc4TxQHCa1sWyW4AEiUN1SaEkw+5R6Joa4SFUllVbai+
-         i5FyR9b0PLRUCKcLzsM18Zmbh9RhjXyru7wnj+HmvatXCbN04C3X7Gheba9l8aIN1bQe
-         8g7jfyEmDff99mFbybsh01sYRv1M18cBYLDjnnzWQspcudSZ4rhcxyu5jmCmDZYe6tEq
-         +PIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764090498; x=1764695298;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4ndUQJXblyMVIEo31GQ2aPBJsTj4kLS2trQiSNmxdk=;
-        b=NjzMz5LczJJM7T0E8UCJ2YvG4wpH8vUT+B1rLySx18Hw4b1TQWaUG4Kw/AsTETR+a7
-         JNfEPStnPQ1dD8wK/+XY5Upo1FIuudSuNmHA1/4fXGkOQuF43/FEhdhnZjbcZPT8JoKv
-         MEoJIfWiR3IrTVQT1lFM5TmILI0TN3OKur0sfJcI2UWcvGuG2nyvG8HOtFhZuYJFQg9c
-         dKzvSKaZStLPZjmGZOHygf6WKfA28NpxKAWu1tT2ZqxUTLxIo8/Dz+Jvp+3LSgInK+q5
-         2YciyZOkVVi1ZzCm0QnZZAKymC2yz/MZmDm3zKHcdNXtFafUxJJTcOELTfYyoF8F78U8
-         HPZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXxt3Fdce6ZcthX4Nu204BsRW2L9kaePmSczsg97k4xCQESvrZEByX3rJgowgqZ5sPhumIodLw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyEGQDIlv+UhZuX4sLNfEjGe6uvUkD+FjvvGeAvTEDX1AfoBZ8I
-	5yQLJsidvfg0BcKQt2+oKbnxjDvCqU7PGm0d+fwp2k59qM49TxBqMCvFMG2P1nFuEEZTQuOjIiv
-	usUcG0Q==
-X-Google-Smtp-Source: AGHT+IFzDAUOZTDNFOssfEjC4490DRPTOVZZ7CJwR5gD19Yg3yMCKcUxEwLwt1d5WA+HAajf5nh9jS9CJiQ=
-X-Received: from pjbpw1.prod.google.com ([2002:a17:90b:2781:b0:33b:c211:1fa9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:384f:b0:341:8c8e:38b5
- with SMTP id 98e67ed59e1d1-34733f3e483mr14061440a91.25.1764090498218; Tue, 25
- Nov 2025 09:08:18 -0800 (PST)
-Date: Tue, 25 Nov 2025 09:08:16 -0800
-In-Reply-To: <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXL/LD02"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA078C16AAE;
+	Tue, 25 Nov 2025 17:39:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764092374;
+	bh=Qbox7/Q69vV2ZqoPXL7NY02Ztiyfhv/0qmeL08HQFyw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kXL/LD02xa/VB0hwKyhXVPW0jQ54Pjn3k1T3x/+AN5ZPEWW14AzO2rQBGgXzs1Ufe
+	 yt803w7eyjr7vHPOHLwmEQgG+DANTm7ACcF3IPORKFgWmnmP6oZQcTC0PmO7Z3NG75
+	 dl4z3kQ8ALFOn1YnYCA6XpwqTFZJM1v5gh2Cj595OLRxBRljuJbnUMe7oWUfcmpCKb
+	 PJwRLa+hsrFkH0vQd9aGG9FsdxFk1wOz1sTccv2x03e++J1UQe4E5Z1Jp0YA6sXPT/
+	 m+quhtz/gpdBqYtGUcon6+//RBAyN9Wo1kr8iXcNFFf4uz6bWwdHJn6et4FhEJfH55
+	 FDBnd8MGjd6ig==
+Date: Tue, 25 Nov 2025 10:39:29 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v3 04/15] KVM: arm64: Teach ptdump about FEAT_XNX
+ permissions
+Message-ID: <20251125173929.GA3256322@ax162>
+References: <20251124190158.177318-1-oupton@kernel.org>
+ <20251124190158.177318-5-oupton@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250806195706.1650976-1-seanjc@google.com> <20250806195706.1650976-29-seanjc@google.com>
- <aSUK8FuWT4lpMP3F@google.com> <83067602-325a-4655-a1b7-e6bd6a31eed4@linux.intel.com>
-Message-ID: <aSXigAQznhuxZmy7@google.com>
-Subject: Re: [PATCH v5 28/44] KVM: x86/pmu: Load/save GLOBAL_CTRL via
- entry/exit fields for mediated PMU
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, 
-	Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	Kan Liang <kan.liang@linux.intel.com>, Yongwei Ma <yongwei.ma@intel.com>, 
-	Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Sandipan Das <sandipan.das@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251124190158.177318-5-oupton@kernel.org>
 
-On Tue, Nov 25, 2025, Dapeng Mi wrote:
-> On 11/25/2025 9:48 AM, Sean Christopherson wrote:
-> >> +	if (host_pmu->version < 4 || !(host_perf_cap & PERF_CAP_FW_WRITES))
-> >> +		return false;
-> >> +
-> >> +	/*
-> >> +	 * All CPUs that support a mediated PMU are expected to support loading
-> >> +	 * and saving PERF_GLOBAL_CTRL via dedicated VMCS fields.
-> >> +	 */
-> >> +	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl() ||
-> >> +			 !cpu_has_save_perf_global_ctrl()))
-> >> +		return false;
-> > And so this WARN fires due to cpu_has_save_perf_global_ctrl() being false.  The
-> > bad changelog is mine, but the code isn't entirely my fault.  I did suggest the
-> > WARN in v3[1], probably because I forgot when PMU v4 was introduced and no one
-> > corrected me.
-> >
-> > v4 of the series[2] then made cpu_has_save_perf_global_ctrl() a hard requirement,
-> > based on my miguided feedback.
-> >
-> >    * Only support GLOBAL_CTRL save/restore with VMCS exec_ctrl, drop the MSR
-> >      save/retore list support for GLOBAL_CTRL, thus the support of mediated
-> >      vPMU is constrained to SapphireRapids and later CPUs on Intel side.
-> >
-> > Doubly frustrating is that this was discussed in the original RFC, where Jim
-> > pointed out[3] that requiring VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL would prevent
-> > enabling the mediated PMU on Skylake+, and I completely forgot that conversation
-> > by the time v3 of the series rolled around :-(
+Hi Oliver,
+
+On Mon, Nov 24, 2025 at 11:01:46AM -0800, Oliver Upton wrote:
+> Although KVM doesn't make direct use of the feature, guest hypervisors
+> can use FEAT_XNX which influences the permissions of the shadow stage-2.
+> Update ptdump to separately print the privileged and unprivileged
+> execute permissions.
 > 
-> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL is introduced from SPR and later. I
-> remember the original requirements includes to support Skylake and Icelake,
-> but I ever thought there were some offline sync and the requirement changed...
-
-Two things:
-
- 1) Upstream's "requirements" are not the same as Google's requirements (or those
-    of any company/individual).  Upstream most definitely is influenced by the
-    needs and desires of end users, but ultimately the decision to do something
-    (or not) is one that needs to be made by the upstream community.
-
- 2) Decisions made off-list need to be summarized and communicated on-list,
-    especially in cases like this where it's a relatively minor detail in a
-    large series/feature, and thus easy to overlook.
-
-I'll follow-up internally to make sure these points are well-understood by Google
-folks as well (at least, those working on KVM).
-
-> My bad,
-
-Eh, this was a group "effort".  I'm as much to blame as anyone else.
-
-> I should double confirm this at then.
-
-No need, as above, Google's requirements (assuming the requirements you're referring
-to are coming from Google people) are effectively just one data point.  At this
-point, I want to drive the decision to support Sylake+ (or not) purely through
-discussion of upstream patches.
-
-> > As mentioned in the discussion with Jim, _if_ PMU v4 was introduced with ICX (or
-> > later), then I'd be in favor of making VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL a hard
-> > requirement.  But losing supporting Skylake+ is a bit much.
-> >
-> > There are a few warts with nVMX's use of the auto-store list that need to be
-> > cleaned up, but on the plus side it's also a good excuse to clean up
-> > {add,clear}_atomic_switch_msr(), which have accumulated some cruft and quite a
-> > bit of duplicate code.  And while I still dislike using the auto-store list, the
-> > code isn't as ugly as it was back in v3 because we _can_ make the "load" VMCS
-> > controls mandatory without losing support for any CPUs (they predate PMU v4).
+> Signed-off-by: Oliver Upton <oupton@kernel.org>
+> ---
+>  arch/arm64/kvm/ptdump.c | 35 +++++++++++++++++++++++++++--------
+>  1 file changed, 27 insertions(+), 8 deletions(-)
 > 
-> Yes, xxx_atomic_switch_msr() helpers need to be cleaned up and optimized. I
-> suppose we can have an independent patch-set to clean up and support
-> global_ctrl with auto-store list for Skylake and Icelake.
+> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> index dc5acfb00af9..bd722383d0e3 100644
+> --- a/arch/arm64/kvm/ptdump.c
+> +++ b/arch/arm64/kvm/ptdump.c
+> @@ -31,27 +31,46 @@ static const struct ptdump_prot_bits stage2_pte_bits[] = {
+>  		.val	= PTE_VALID,
+>  		.set	= " ",
+>  		.clear	= "F",
+> -	}, {
+> +	},
+> +	{
+>  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+>  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R,
+>  		.set	= "R",
+>  		.clear	= " ",
+> -	}, {
+> +	},
+> +	{
+>  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+>  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+>  		.set	= "W",
+>  		.clear	= " ",
+> -	}, {
+> +	},
+> +	{
+>  		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> -		.val	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> -		.set	= "NX",
+> -		.clear	= "x ",
+> -	}, {
+> +		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b00),
+> +		.set	= "px ux ",
+> +	},
+> +	{
+> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> +		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b01),
+> +		.set	= "PXNux ",
+> +	},
+> +	{
+> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> +		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10),
+> +		.set	= "PXNUXN",
+> +	},
+> +	{
+> +		.mask	= KVM_PTE_LEAF_ATTR_HI_S2_XN,
+> +		.val	= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b11),
+> +		.set	= "px UXN",
+> +	},
+> +	{
+>  		.mask	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+>  		.val	= KVM_PTE_LEAF_ATTR_LO_S2_AF,
+>  		.set	= "AF",
+>  		.clear	= "  ",
+> -	}, {
+> +	},
+> +	{
+>  		.mask	= PMD_TYPE_MASK,
+>  		.val	= PMD_TYPE_SECT,
+>  		.set	= "BLK",
+> -- 
+> 2.47.3
+> 
 
-I have the code written (I wanted to see how much complexity it would add before
-re-opening this discussion).  My plan is to put the Skylake+ support at the end
-of the series, not a separate series, so that it can be reviewed in one shot.
-E.g. if we can make a change in the "main" series that would simplify Skylake+
-support, then I'd prefer to find and implement any such change right away.
+This change as commit 81e9fe5c6f25 ("KVM: arm64: Teach ptdump about
+FEAT_XNX permissions") in -next does not build for me.
+
+GCC 15.2.0
+
+  In file included from arch/arm64/include/asm/sysreg.h:1155,
+                   from arch/arm64/include/asm/memory.h:219,
+                   from arch/arm64/include/asm/thread_info.h:17,
+                   from include/linux/thread_info.h:60,
+                   from arch/arm64/include/asm/preempt.h:5,
+                   from include/linux/preempt.h:79,
+                   from include/linux/spinlock.h:56,
+                   from include/linux/wait.h:9,
+                   from include/linux/wait_bit.h:8,
+                   from include/linux/fs.h:7,
+                   from include/linux/debugfs.h:15,
+                   from arch/arm64/kvm/ptdump.c:9:
+  include/linux/bitfield.h:114:9: error: braced-group within expression allowed only inside a function
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:49:27: note: in expansion of macro 'FIELD_PREP'
+     49 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b00),
+        |                           ^~~~~~~~~~
+  include/linux/bitfield.h:114:9: error: braced-group within expression allowed only inside a function
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:54:27: note: in expansion of macro 'FIELD_PREP'
+     54 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b01),
+        |                           ^~~~~~~~~~
+  include/linux/bitfield.h:114:9: error: braced-group within expression allowed only inside a function
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:59:27: note: in expansion of macro 'FIELD_PREP'
+     59 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10),
+        |                           ^~~~~~~~~~
+  include/linux/bitfield.h:114:9: error: braced-group within expression allowed only inside a function
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:64:27: note: in expansion of macro 'FIELD_PREP'
+     64 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b11),
+        |                           ^~~~~~~~~~
+
+clang 21.1.6:
+
+  arch/arm64/kvm/ptdump.c:49:10: error: statement expression not allowed at file scope
+     49 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b00),
+        |                           ^
+  include/linux/bitfield.h:114:2: note: expanded from macro 'FIELD_PREP'
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:54:10: error: statement expression not allowed at file scope
+     54 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b01),
+        |                           ^
+  include/linux/bitfield.h:114:2: note: expanded from macro 'FIELD_PREP'
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:59:10: error: statement expression not allowed at file scope
+     59 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b10),
+        |                           ^
+  include/linux/bitfield.h:114:2: note: expanded from macro 'FIELD_PREP'
+    114 |         ({                                                              \
+        |         ^
+  arch/arm64/kvm/ptdump.c:64:10: error: statement expression not allowed at file scope
+     64 |                 .val    = FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_S2_XN, 0b11),
+        |                           ^
+  include/linux/bitfield.h:114:2: note: expanded from macro 'FIELD_PREP'
+    114 |         ({                                                              \
+        |         ^
+
+Cheers,
+Nathan
