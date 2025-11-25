@@ -1,47 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC0A2264A9;
-	Tue, 25 Nov 2025 21:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FA92FB0BC;
+	Tue, 25 Nov 2025 21:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764105959; cv=none; b=DiLcef9Bw09EHH7zrVI8qGVwv+u56egpPhBjHzGdfG1CaJBunLHaQQl2qxSfkKiGGgXBhNZHM7sItIJbU7loq1IBu5n2vw36X3/6V2TJUaxJ81AExeSS29ZaUElg/GksKfK115Yuq8TR+P/KkNJ9ARrE/PI7VMt0DWfCJRx25Hg=
+	t=1764105960; cv=none; b=vA3zEuRqqMVJ9L+9x4zgWCbWh2ANLC0wZmwdgA/to+YNRKrJf/G5NAgUmb6LbK1IcpSsFbWpq+hVwHEZtijW9uroGswawb1vc4rdteAD7PUVVEXsQSLyMMhPGEPgH0KRyuCEGlet01tvWIw/EEa8M06fdUg01oMrAxTl301N5Sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764105959; c=relaxed/simple;
-	bh=n5CbeK8jDmfr7XozFAqeBAw9k9v7rJ8GAcFjignIIHw=;
+	s=arc-20240116; t=1764105960; c=relaxed/simple;
+	bh=bef6yMABPv/hypevyI4Lq+80S7ARj2nTb5O5egnjE/g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vcqy9P406mqQjALnp+fnU/GMDHs/4GvJcq0m0OlEkLcTKW+MGiarCt8ATYkIlB0aFP5AdaXdAqTWG56HdpaGQJk0IbUZ9gPzqTLeKIwKLlXy7v3oT/0pVZN73O69S5VTeYQh6rriCcDasvFRoCRdWE7GKNbpXpLyZAsWOm9JPuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiYzwwbW; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LxWtQwy1vDPLsnaR3jofj77Bn80YLKhXUIXYA1YPOrrYEI7XakfqAxbW/XyCFpu3KrfVZUbMLt0/J3yUNBk3/D5WjzdYrW28er0PXbjK8upXH7vv886/BDDYQb49D1QaODLu3a0F+e0xSOnGfUwEpQElP+41P+Cbi3HVpuemARk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=orbMk4MH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiYzwwbW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 750B4C4CEF1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="orbMk4MH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCF28C116D0;
 	Tue, 25 Nov 2025 21:25:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1764105959;
-	bh=n5CbeK8jDmfr7XozFAqeBAw9k9v7rJ8GAcFjignIIHw=;
+	bh=bef6yMABPv/hypevyI4Lq+80S7ARj2nTb5O5egnjE/g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JiYzwwbWs6GsJDcQLfpHkUixgu90gQAntbPAxoHz5R+QD8CRJqTFAbv3zGTEh+SkI
-	 xYyYACNja+jj4qWS08YDpbDHVGabTtd4wjwBCdANYSqMm3ziTIwmSQR0R/AS2AqCRJ
-	 r3yE6Jd+kTygj9Xp5I5l2kvNsMG7ol573cjWnaRksbNAsf2rTKZLlXDghRs3jN+ZOD
-	 35umsDShvWtxHLc1Avpz9/i1nX8gy6FQew7Os888cLjyjC6xFpMeQHMT1EpJSxa9Qx
-	 l+OZA+CdDgEbgj3czy8YU3LuDzE+8Yoh+92UPFnNLZx9w7J/umCup9RrToXzAkWbBa
-	 3cNlZCpPSopEA==
+	b=orbMk4MHqTKNugXgoAHwkxwN3XU1m9vyqO25ZroD7/chhRdCoAixusAKJHXt1CQI4
+	 iDRCKXxf8XHRXEmk2/T8LmPWC0VXrzD0nRZCo5Fkz3anm87X7TEpZywCTxkD4GU1X6
+	 3FO200hJe+YWv4MgASwhXtZlg/w23j7mXDTlu67yqJRhZR11i+pgfJeaglMF7Zt4zW
+	 QahubkEAGVCT5NzmMjCPyVAItov8Hdnrxix6STvkVO8iQMG7z0Zrx9JofTGOQHacIy
+	 SmLGL5ZulvEVEyKMryM6T15hJjt03jsNJXcOQAtrNCc/pxaDTQVDTBpOQiVBZkvzAd
+	 PkDClAS1OCsNQ==
 From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
+To: Marc Zyngier <maz@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Don't use FIELD_PREP() in initialisers
-Date: Tue, 25 Nov 2025 13:25:55 -0800
-Message-ID: <176410594555.1756747.17127905148287939848.b4-ty@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	llvm@lists.linux.dev,
+	patches@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
+Date: Tue, 25 Nov 2025 13:25:56 -0800
+Message-ID: <176410594557.1756747.6202745594251816164.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251125201715.1133405-1-maz@kernel.org>
-References: <20251125201715.1133405-1-maz@kernel.org>
+In-Reply-To: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
+References: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,20 +52,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Tue, 25 Nov 2025 20:17:15 +0000, Marc Zyngier wrote:
-> Nathan reports that compiling with CONFIG_PTDUMP_STAGE2_DEBUGFS
-> results in a compilation failure, with the compiler moaning about
-> "braced-group within expression allowed only inside a function"...
+On Tue, 25 Nov 2025 10:59:15 -0700, Nathan Chancellor wrote:
+> Clang warns (or errors with CONFIG_WERROR=y / W=e):
 > 
-> Replace FIELD_PREP() with its shifting primitive, which does the
-> trick here.
+>   arch/arm64/kvm/hyp/pgtable.c:757:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+>     757 |         }
+>         |         ^
+> 
+> With older versions of clang (15 and older) and GCC (at least the minimum
+> supported, 8.1), this is an unconditional hard error:
 > 
 > [...]
 
 Applied to next, thanks!
 
-[1/1] KVM: arm64: Don't use FIELD_PREP() in initialisers
-      https://git.kernel.org/kvmarm/kvmarm/c/5742f3650013
+[1/1] KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
+      https://git.kernel.org/kvmarm/kvmarm/c/621e0a641f64
 
 --
 Best,
