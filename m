@@ -1,129 +1,174 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F98D283FF5
-	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 11:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB91726C39E
+	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 11:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764069757; cv=none; b=LjsKTAXJgfjLR+ur70ItTg4zIazb9Wh8LjCccFseHZpOGmMNbqBWF7EZnQmSnSp/4fgz0VEG3Ep7cFmrMY5HZMaqx5g0pjDVfXksEdZd6vJOX5ifH1cmGjh6B/9hCs/+Y8L6PL+hdZAzHZl/j766IcSmm/9U/FA4XNNo2gWOnEc=
+	t=1764069975; cv=none; b=Kl+LSQQkMmz4pcquQ7yy/JuCs8lo6w3ok9J2e55O2EVUXOWY0qAcTWFGZF3K923DIa7Hf02VfvPNAV0A4CFI5ZupV5zw0DjvhCq8NTAypjtXNbjI/pYJiYdb0+ASPbJWdrbwPB7TnNPicFPMZnYOg+bL+g9cqg4TYZiBWtOXEcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764069757; c=relaxed/simple;
-	bh=8A0ajViliK3Xk9CxMhdKP1RnM72/06YSeBi3L9O9P/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=STSEWpi8nLkzDbOOCa2CAEUvo/SMGedKurtkz790Wj53WMS43aLFKsEf4Ryz7kEi63JywhTSnCQYfk5ypV+CoRxjo6uLuEtETJoiwW2JiRx7GgHpqyRCGqBty1SIzez5jTbtNDq+ij5c60wk+cdR4V23d2gdJiIiGH+/QUEAfzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iJAassO0; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iJAassO0"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b3c5defb2so3550526f8f.2
-        for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 03:22:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764069753; x=1764674553; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/GHs616mr7dTyieWIVUhqR8ZeVc35qwPIJKCi+VXq9s=;
-        b=iJAassO0raC0bQARTEa3Tbj4Kd7SiyATbZGpihnLUsKJkMpVSvi9TuaA9pQq7vy4YF
-         Pz6aBVIzYXmjLhawTk7D7ekq6bKdm+oNEUNCrUit/51eNnODFmNahopbMBtGXbV9w7DI
-         S+1myp5KOFwfPC+bL7Kxahxfl+bemRIedzuVAMqJXkRlXrFlbK8yKUIpRjo9hLxittmv
-         bNxW4ApAF3/jGWn519LziDSKSw4Yqp2gArLoZ7bWacu4wOHu8x1eU/JSyS3Z5b69EN0E
-         VKSgQtBlBjGy/kD4Cvo8wHeJBjX+K1ra0D/hm04dOw+UTtiYDiQyJimJguA8tozab2Ne
-         tVyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764069753; x=1764674553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/GHs616mr7dTyieWIVUhqR8ZeVc35qwPIJKCi+VXq9s=;
-        b=s65T3PtN5AaYzFRFT4QXM2OhNuxnjiCbQQww200hkxSrb82ikyK9KWUs6a1ku5ITxN
-         E01zKSZ89EgIqUdU94HfPcY9GpiLgUzv1pBNDcgeZXOz2pVXgpWnB1c08cOumh5bpszB
-         k8VDyvhb4l7LPzWtAPQy87HBhvDMO33Cvk0vlYcPM7/vgjDLGKiVwAzPxvmSFseT/wAF
-         pq6dWAvCZxnffM+omX9GfdbmbEwKTulJx5h+b/5HDD63TDcX3YhwglQP/GBNEtZyGMEL
-         5EHMU4DCirIMb3Eb9VctYjfbRO8Fd5PuWHCfTaCoYdLtSz76+t8SgDFtaGaYHO4UUo6i
-         VVsA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpblHe1Ci3T6PcG7FKfRVUl+7yNiiNiOEvtR53B4W2FgpBvhWRCIIMCV0Ees36AKrSM2Tfngc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwUYQTvi/pFdLVLX422q95eT2nB/JisjnKcUJVlHWVLpDIAD6Pm
-	zrtdHlBnCJbvxaa4mpzfuncGDb+z+xFERBEaWNyXt4o8pVcLVMYg1fIbG+93nXctWw==
-X-Gm-Gg: ASbGncvhXf9o5TOAKMdGQpN/qbvynBSNpvUVGXZeNPGzk5L3AIojk2EEU3nxW1Iel+R
-	MHD0hIpLmBwWAPOXHiRr2k5wWRMftRVQ5TLSvcTrqT/MMMxR2bw6Bks2puiTZGcD7tX+wjNIYpd
-	r4rWhpYZ1TPOUZDICqz7EQrfys9X0xWHi7O78ADJBk+k38qUti3Jecu5j43GjmIPQO8aPt87zWP
-	c+K4/S627wdcBB4v/54CDFAwCOPL4CrUFkqiC4mUddKJLp3+YcEPQLXpiHBfOXOBf3E1jxIGfSo
-	LGrOyFhi/Gwavqx4rBA91nvmbGP0aDp7i71P01TGF9YWqc0yHxdHC3nk83wJb1US3eptkYxiIne
-	zLvvp+zuWC++TW92e4Pw4y7T/KyvEuuq0pdoYlQWN1+jl3zKC7VwDqQP49N6Rrvw/5VpkJuH4gt
-	yyXOg35PQaDr86TmLm2RBwMk1pzXuJSMRYZCA3LTcl/r5Su7uhug==
-X-Google-Smtp-Source: AGHT+IGTMkYeA9p+ckKB04IyPeZJ4YUR/HSDsAZGnoL2ifU24s5TxikwdtgZkZDiTjUCKMsk8yADHg==
-X-Received: by 2002:a5d:5f94:0:b0:42b:3b55:8917 with SMTP id ffacd0b85a97d-42cc1d0cd7dmr15814872f8f.36.1764069752552;
-        Tue, 25 Nov 2025 03:22:32 -0800 (PST)
-Received: from google.com (120.54.38.34.bc.googleusercontent.com. [34.38.54.120])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42cb7f2e598sm33172639f8f.4.2025.11.25.03.22.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Nov 2025 03:22:32 -0800 (PST)
-Date: Tue, 25 Nov 2025 11:22:29 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: rostedt@goodmis.org, mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
-	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
-	kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 21/28] KVM: arm64: Add tracing capability for the pKVM
- hyp
-Message-ID: <aSWRdSELuYpAXCM8@google.com>
-References: <20251107093840.3779150-1-vdonnefort@google.com>
- <20251107093840.3779150-22-vdonnefort@google.com>
- <86bjkyrly9.wl-maz@kernel.org>
+	s=arc-20240116; t=1764069975; c=relaxed/simple;
+	bh=xAUKBqaEigAmMTjdPx8ZU5kXaumG6AEkkV5SBBq1l/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KKn9EHpJM/B0JG18LgfDDhQfcDiRFmrycJYbyUD/MOpDl0ot78fX/vZeqHCJU2LJU6U8J1+E/wHCH6B3h8xfmC1ZOuSs/EAtwBKXPSDuY4qMp+DjM2akZdnPoy0YBkT1pMgHgLQin6wglpgU9sbjbm9Iy442fctfnEhjIYghFj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BBE7714BF;
+	Tue, 25 Nov 2025 03:26:05 -0800 (PST)
+Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id ED6153F73B;
+	Tue, 25 Nov 2025 03:26:11 -0800 (PST)
+Message-ID: <5df713d4-8b79-4456-8fd1-707ca89a61b6@arm.com>
+Date: Tue, 25 Nov 2025 11:26:10 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bjkyrly9.wl-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 06/49] KVM: arm64: GICv3: Detect and work around the
+ lack of ICV_DIR_EL1 trapping
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ Mark Brown <broonie@kernel.org>
+References: <20251120172540.2267180-1-maz@kernel.org>
+ <20251120172540.2267180-7-maz@kernel.org>
+Content-Language: en-US
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20251120172540.2267180-7-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-[...]
-
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > index f55a9a17d38f..504c3b9caef8 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> > +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> > @@ -29,7 +29,7 @@ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-> >  	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
-> >  hyp-obj-y += ../../../kernel/smccc-call.o
-> >  hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
-> > -hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o
-> > +hyp-obj-$(CONFIG_PKVM_TRACING) += clock.o trace.o ../../../../../kernel/trace/simple_ring_buffer.o
+On 20/11/2025 17:24, Marc Zyngier wrote:
+> A long time ago, an unsuspecting architect forgot to add a trap
+> bit for ICV_DIR_EL1 in ICH_HCR_EL2. Which was unfortunate, but
+> what's a bit of spec between friends? Thankfully, this was fixed
+> in a later revision, and ARM "deprecates" the lack of trapping
+> ability.
 > 
-> Can we get something less awful here? Surely there is a way to get an
-> absolute path from the kbuild infrastructure? $(objtree) springs to
-> mind...
-
-Because of the path substitution below, I can't simply use $(objtree) here. I
-suppose that's why all other paths above are relative.
-
-However, I could probably simplify by including simple_ring_buffer.c into trace.c:
-
-  diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-  -hyp-obj-$(CONFIG_TRACING) += clock.o trace.o ../../../../../kernel/trace/simple_ring_buffer.o
-  +hyp-obj-$(CONFIG_TRACING) += clock.o trace.o
-   hyp-obj-y += $(lib-objs)
-   
-  +# Path to simple_ring_buffer.c
-  +CFLAGS_trace.nvhe.o += -I$(objtree)/kernel/trace/
-  +
-  
-  
-  diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
-  -#include <linux/simple_ring_buffer.h>
-  +#include "simple_ring_buffer.c"
-
+> Unfortuantely, a few (billion) CPUs went out with that defect,
+> anything ARMv8.0 from ARM, give or take. And on these CPUs,
+> you can't trap DIR on its own, full stop.
 > 
-> >  hyp-obj-y += $(lib-objs)
-> >  
-> >  ##
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> As the next best thing, we can trap everything in the common group,
+> which is a tad expensive, but hey ho, that's what you get. You can
+> otherwise recycle the HW in the neaby bin.
+> 
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/virt.h  |  7 ++++-
+>   arch/arm64/kernel/cpufeature.c | 52 ++++++++++++++++++++++++++++++++++
+>   arch/arm64/kernel/hyp-stub.S   |  5 ++++
+>   arch/arm64/kvm/vgic/vgic-v3.c  |  3 ++
+>   arch/arm64/tools/cpucaps       |  1 +
+>   5 files changed, 67 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+> index aa280f356b96a..8eb63d3294974 100644
+> --- a/arch/arm64/include/asm/virt.h
+> +++ b/arch/arm64/include/asm/virt.h
+> @@ -40,8 +40,13 @@
+>    */
+>   #define HVC_FINALISE_EL2	3
+>   
+> +/*
+> + * HVC_GET_ICH_VTR_EL2 - Retrieve the ICH_VTR_EL2 value
+> + */
+> +#define HVC_GET_ICH_VTR_EL2	4
+> +
+>   /* Max number of HYP stub hypercalls */
+> -#define HVC_STUB_HCALL_NR 4
+> +#define HVC_STUB_HCALL_NR 5
+>   
+>   /* Error returned when an invalid stub number is passed into x0 */
+>   #define HVC_STUB_ERR	0xbadca11
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 5ed401ff79e3e..5de51cb1b8fe2 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -2303,6 +2303,49 @@ static bool has_gic_prio_relaxed_sync(const struct arm64_cpu_capabilities *entry
+>   }
+>   #endif
+>   
+> +static bool can_trap_icv_dir_el1(const struct arm64_cpu_capabilities *entry,
+> +				 int scope)
+> +{
+> +	static const struct midr_range has_vgic_v3[] = {
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_PRO),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_PRO),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_ICESTORM_MAX),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M1_FIRESTORM_MAX),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_PRO),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_PRO),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_BLIZZARD_MAX),
+> +		MIDR_ALL_VERSIONS(MIDR_APPLE_M2_AVALANCHE_MAX),
+> +		{},
+> +	};
+> +	struct arm_smccc_res res = {};
+> +
+> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV3_CPUIF);
+> +	BUILD_BUG_ON(ARM64_HAS_ICH_HCR_EL2_TDIR <= ARM64_HAS_GICV5_LEGACY);
+> +	if (!cpus_have_cap(ARM64_HAS_GICV3_CPUIF) &&
+> +	    !is_midr_in_range_list(has_vgic_v3))
+> +		return false;
+> +
+> +	if (!is_hyp_mode_available())
+> +		return false;
+> +
+> +	if (cpus_have_cap(ARM64_HAS_GICV5_LEGACY))
+> +		return true;
+> +
+> +	if (is_kernel_in_hyp_mode())
+> +		res.a1 = read_sysreg_s(SYS_ICH_VTR_EL2);
+> +	else
+> +		arm_smccc_1_1_hvc(HVC_GET_ICH_VTR_EL2, &res);
 
-[...]
+We are reading the register on the current CPU and this capability,
+being a SYSTEM_FEATURE, relies on the "probing CPU". If there CPUs
+with differing values (which I don't think is practical, but hey,
+never say..). This is would better be a 
+ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE, which would run through all
+boot CPUs and would set the capability when it matches.
+
+That means, you may need to replace cpus_have_cap() with
+this_cpu_has_cap() for both GICV3_CPUIF and GICV5_LEGACY.
+
+
+
+> +
+> +	if (res.a0 == HVC_STUB_ERR)
+> +		return false;
+> +
+> +	return res.a1 & ICH_VTR_EL2_TDS;
+> +}
+> +
+>   #ifdef CONFIG_ARM64_BTI
+>   static void bti_enable(const struct arm64_cpu_capabilities *__unused)
+>   {
+> @@ -2814,6 +2857,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>   		.matches = has_gic_prio_relaxed_sync,
+>   	},
+>   #endif
+> +	{
+> +		/*
+> +		 * Depends on having GICv3
+> +		 */
+> +		.desc = "ICV_DIR_EL1 trapping",
+> +		.capability = ARM64_HAS_ICH_HCR_EL2_TDIR,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+
+As mentioned above, this needs to be a 
+ARM64_CPUCAP_EARLY_LOCAL_CPU_FEATURE.
+
+Suzuki
+
+
