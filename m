@@ -1,52 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C74C3148B4;
-	Tue, 25 Nov 2025 19:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556431FBC8C
+	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 19:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764099771; cv=none; b=Wwto/tYa7AR1k9nZZ5B/KETcs0xTAyPc3F7ZU3MFslEJYDH1NF9p3Ip4LsPIWvFHEly6vR03ghHWWXBWJrTRyOuaz8KFLMKI4nuJeCYWcp4BxjnQS1h3CdZSqThYT1X4RlrEkRx/zbbXe/9crDSYd4ylCiBEgej3SC2k8sr2XRU=
+	t=1764099925; cv=none; b=ESeHvkV3pGjhwy8xYVCAqPohwbpuHd7xvGXuZt3/ND3BDQJmVvxyrS8o6XERsC5WbAqX8VneJv1dVbs8X7D4Qg7E0PihnXzUeXWonMXQWB3V70rog+S/re9bdgfwhEduV43x0/WIRgER5lF9n+8nHc7dIHPxu/SUDxCFkYICxio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764099771; c=relaxed/simple;
-	bh=EH5HQVZ4pVflbpU68pvKHubZ0K2IYSrdTVT51BYzWEo=;
+	s=arc-20240116; t=1764099925; c=relaxed/simple;
+	bh=xQLKTEy0U4Tn7LI1F1hhw+E72j8eKGa3XENdEMY7PR0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tQAx3j94PeNDPIkfd5ZKrwuT2ZZ9W7NlJkwaj+sOkv9IgKAT5juDmsJRXFEnqUkuiSshfvfLdEIJGHzxjVG7aonKfctw53mYu+Pe0Gz4lRsPh+w55TdMnn5ElkyDN0eH5Tx+KlLqxHFe65qmF8vtbIDBHC4/B8aqQSCnpKqAb74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DsUY5hRY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FRn1oCwmV3ic3FNAsudhGC2ecePLeZtarLnGfySy/ShY3U/ZDgJDyYorDnAgZYDy6H9jJC9lbF1P3AOkWvwZsfjAHlOD02Ri/ZjlC7uuDK+XwGg/vDt7zVCLCdB4W8BkSXkdnWZcrDxDX3fSiEENqbsnktL6+5b+B03Zru6+pDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wkiicn6S; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsUY5hRY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79ADC4CEF1;
-	Tue, 25 Nov 2025 19:42:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wkiicn6S"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC05C4CEF1;
+	Tue, 25 Nov 2025 19:45:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764099770;
-	bh=EH5HQVZ4pVflbpU68pvKHubZ0K2IYSrdTVT51BYzWEo=;
+	s=k20201202; t=1764099925;
+	bh=xQLKTEy0U4Tn7LI1F1hhw+E72j8eKGa3XENdEMY7PR0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DsUY5hRYzfqkGz84KqeI8ykvjkXvHFogdOuTZISZ1HlQ3iWfar5088nRWuAbxCBZC
-	 ukjMV4DN9o4vTQ/aC6z63GOvNjJj3Yn+theY4+NI6hgat6JiFDYUq8GTVmZi8Av+ZU
-	 ODPDmyRqsSdNTIos2LyZKTNgplyfFYC6WeR5XJrTMPkHBun+WJf0IfHCAhmg8RDhTK
-	 bHX7HlbORW6yiJ0i2SI159BRkioCcSgt+UUuuL+UZzpYMwJuf5ggXt9IucyJhTa76y
-	 bckSyrokrdh5xBjk3r6PSizr7rk5mHZoZjc+QCYU3Bk8auyr+rurVx6r7WhoQP8IYi
-	 AEm8L4vFk38NA==
+	b=Wkiicn6SSdjowI/ygyBTWt93AYs7efRcVIa7wMWX3M2qSD7QcBx2XlVa3SDHXKJ0+
+	 EBERH4AdgSQCeaOugMPxFj20SuOXqXw7MxIa+SZIRaase1cdGuPvpWMGOZVz5lwt8T
+	 XgfwmF/4/ZJcVmMT5kf1eOyjii8WUM9l9e3pED8bTq87ICKMyK/Jeq0GPh9NsxS2Fi
+	 2vdxsZS4gMl4ifjzMrHzAddmnf+A1p/jfWRDQe3igzJIzf3udVK5Mvi9+N4QjdGUoI
+	 C6MLM14iQDpDzFV1tAYaLANYw3slMMigPk+8xP/Pt3JhYsMqU4FrfEnulKHNUzutI0
+	 gxSEqVL7zgysw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vNyw4-00000008GHt-235b;
-	Tue, 25 Nov 2025 19:42:48 +0000
-Date: Tue, 25 Nov 2025 19:42:48 +0000
-Message-ID: <87ecplgapz.wl-maz@kernel.org>
+	id 1vNyyY-00000008GJS-3QqH;
+	Tue, 25 Nov 2025 19:45:22 +0000
+Date: Tue, 25 Nov 2025 19:45:22 +0000
+Message-ID: <87cy55galp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+To: Catalin Marinas <catalin.marinas@arm.com>,
+    Oliver Upton <oupton@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	llvm@lists.linux.dev,
-	patches@lists.linux.dev
-Subject: Re: [PATCH] KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
-In-Reply-To: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
-References: <20251125-arm64-kvm-hyp-pgtable-fix-c23-ext-warn-v1-1-98b506ddefbf@kernel.org>
+	shuah@kernel.org
+Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
+In-Reply-To: <aSX2CSJEwUYkn5GQ@arm.com>
+References: <20251125101207.1492580-1-ben.horgan@arm.com>
+	<86cy56qgi3.wl-maz@kernel.org>
+	<aSX2CSJEwUYkn5GQ@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,38 +61,38 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: nathan@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, llvm@lists.linux.dev, patches@lists.linux.dev
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, oupton@kernel.org, ben.horgan@arm.com, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, shuah@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 25 Nov 2025 17:59:15 +0000,
-Nathan Chancellor <nathan@kernel.org> wrote:
+On Tue, 25 Nov 2025 18:31:37 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> Clang warns (or errors with CONFIG_WERROR=y / W=e):
+> On Tue, Nov 25, 2025 at 03:27:48PM +0000, Marc Zyngier wrote:
+> > On Tue, 25 Nov 2025 10:12:05 +0000,
+> > Ben Horgan <ben.horgan@arm.com> wrote:
+> > > 
+> > > For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
+> > > more extensive changes [1] and looks to be a user of the set_id_regs
+> > > test rather than someone just doing some cleanup. The other change in
+> > > this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
+> > > sysreg.h header rather than the kernel version. I'll send a separate
+> > > patch to remove the kernel version.
+> > > 
+> > > Tidies up a few small things in set_id_regs. The removal of
+> > > ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
+> > > the define but set_id_regs.c is the only place its used.
+> > 
+> > Acked-by: Marc Zyngier <maz@kernel.org>
 > 
->   arch/arm64/kvm/hyp/pgtable.c:757:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
->     757 |         }
->         |         ^
-> 
-> With older versions of clang (15 and older) and GCC (at least the minimum
-> supported, 8.1), this is an unconditional hard error:
-> 
->   arch/arm64/kvm/hyp/pgtable.c: In function 'kvm_pgtable_stage2_pte_prot':
->   arch/arm64/kvm/hyp/pgtable.c:756:2: error: label at end of compound statement
->     default:
->     ^~~~~~~
-> 
->   arch/arm64/kvm/hyp/pgtable.c:756:10: error: label at end of compound statement: expected statement
->           default:
->                   ^
->                    ;
-> 
-> Add a break statement to this default case to clear up the error/warning.
-> 
-> Fixes: 2608563b466b ("KVM: arm64: Add support for FEAT_XNX stage-2 permissions")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> Thanks Marc. Shall I take these through the arm64 tree, together with
+> the removal of the macro? They should have probably been a single
+> series.
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+Oliver is in charge of the merge window this time around, so I'll
+defer to him, but that's absolutely fine from my PoV.
+
+Thanks,
 
 	M.
 
