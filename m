@@ -1,67 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB0C2264A9;
-	Tue, 25 Nov 2025 21:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7987C231858
+	for <kvmarm@lists.linux.dev>; Tue, 25 Nov 2025 21:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764106000; cv=none; b=R8UdXW3Sl0+PJFP5jQXBEmD4x7FpDS8r4TVWloQzMmzea0Ltcgx7iyzcNejhHnkrNdGByP4zLXFJHOtbRsij/SL4qbQ8cV7AvEdTDREEHKxyV/+mEnR1HjNJwIN7wtFPtZGUVG2eYJxMcdRykceSNf7v0rSy1nGMWHOKUPei4H4=
+	t=1764106082; cv=none; b=GJAPYFu9unbtOg2oeHmjh9EBidjZST/FeJ3zEivCau+3Hsj88/WEQaf5LNYdih+GzJ+vNe6TBJhLX7B24QBYst58ZMwf+UslvxSCy9tT/JsPhGlx09hmHjceDDhxlN5pFyjld8vgghG6hM2cc7iUHjc2A72rZWxYYqljqHUQH4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764106000; c=relaxed/simple;
-	bh=j3PFuvojslHLNYmdmCoF9SEmIH4R95D0u/HjVyTT8uw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e8LSI/4jA1G1SrHRRvHToCHKZcLJbgp9NmJ9J8MaryvQzns4skuVPydd3ojuVa6pj1qlLJXeTpWQTZwBvhnuD3H31eVEROmLvW5UGU0C0N2iDb6MuaiBNEwbE/6oqVi9OHvPyU6uO7z+dcUboYVXBvN6YuDYyK6wWsx8N4h6u9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScWFMkJ1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764106082; c=relaxed/simple;
+	bh=Lthp2oIt0CjSTyCBl6DdHeK3C8f8yjc6ypdos1FTR5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fx46SdjSloAciw+NADdQaFGXu+n1Xrw5yQ/D+KNc6216jf2whE4WJ6ujbUoXwI0RDAn/VqvhK9rA9jturD6V9RknzhHNXyHDxzwljC7s0xkz0oyc6ng8u2LPAA+gNsCcTdJ+kdlyO4iij6Q8NJwXeLqmi1/6B8RD0ckcDtTYspo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CgIVQwWU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScWFMkJ1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25AD0C4CEF1;
-	Tue, 25 Nov 2025 21:26:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CgIVQwWU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7399C4CEF1;
+	Tue, 25 Nov 2025 21:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764106000;
-	bh=j3PFuvojslHLNYmdmCoF9SEmIH4R95D0u/HjVyTT8uw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ScWFMkJ1QIkfkGpwHoZvxJn8uc6QJ2SBxnfKVzjoHJzbaAoMYPFDWH6e5hre/DrVs
-	 kT0yl90HJc90N+9huQqq9fb/dK5KXOTehydvzJ+fS/lMsytXH8pphr4KpxIsw6ukUf
-	 70yYrpktNvn8Z1QuVtrdFTP4jRihoqC1HfsgkZzeOoxHV5XlQ4E2gUmC7KwSOF1Eq5
-	 Mt8jg6J6NSD48NhaCXWLRRIgUBQNCT6UnAvRKqnLGeUWmpGZpuSLclz1rGad0Jz2tr
-	 H3ujKq2PDX2yTyCKFPM+NmsNpqulbkQRSTmPoktP95+SrSUyrts0kvV28bYxMnoORw
-	 VbUDZaZj3gfEA==
+	s=k20201202; t=1764106082;
+	bh=Lthp2oIt0CjSTyCBl6DdHeK3C8f8yjc6ypdos1FTR5E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CgIVQwWURIbdEZ3ocsensRhZKL7wV1xvWkKKDVbNit1OCAkrfIeYyvEjdmnrc/WnJ
+	 0ZQtSoKlCgewMZ4UKWi61o3MsHQ+eY96LzKigyGHVcQSj9BDvAhwMgJqJuZfYDPkMx
+	 fhK0jT5wwgXCvV+tYevIKTXpj0YudgyN21qUXMtAbPlNDE+jdNt2CHLfbaC+8OBotj
+	 Q9l0MqTSDTXyg9bMiJP9qmT6BTqs2wKAz03bgDfb2PPIr+JBauloeEB36jvAG1Wqhh
+	 TVzKkVFvkKsK0taA215mB//BuTcCRSzNP0I7Li/RBDqMJXsWLFU92GMvMt0FJ4febN
+	 LaBG86xAkv65g==
+Date: Tue, 25 Nov 2025 13:28:00 -0800
 From: Oliver Upton <oupton@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v2] KVM: arm64: Add endian casting to kvm_swap_s[12]_desc()
-Date: Tue, 25 Nov 2025 13:26:37 -0800
-Message-ID: <176410599244.1757287.4209231567146876775.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251125204848.1136383-1-maz@kernel.org>
-References: <20251125204848.1136383-1-maz@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>, will@kernel.org,
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	shuah@kernel.org
+Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
+Message-ID: <aSYfYC4UE3H9SDs7@kernel.org>
+References: <20251125101207.1492580-1-ben.horgan@arm.com>
+ <86cy56qgi3.wl-maz@kernel.org>
+ <aSX2CSJEwUYkn5GQ@arm.com>
+ <87cy55galp.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87cy55galp.wl-maz@kernel.org>
 
-On Tue, 25 Nov 2025 20:48:48 +0000, Marc Zyngier wrote:
-> Keep sparse quiet by explicitly casting endianness conversion
-> when swapping S1 and S2 descriptors.
+On Tue, Nov 25, 2025 at 07:45:22PM +0000, Marc Zyngier wrote:
+> On Tue, 25 Nov 2025 18:31:37 +0000,
+> Catalin Marinas <catalin.marinas@arm.com> wrote:
+> > 
+> > On Tue, Nov 25, 2025 at 03:27:48PM +0000, Marc Zyngier wrote:
+> > > On Tue, 25 Nov 2025 10:12:05 +0000,
+> > > Ben Horgan <ben.horgan@arm.com> wrote:
+> > > > 
+> > > > For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
+> > > > more extensive changes [1] and looks to be a user of the set_id_regs
+> > > > test rather than someone just doing some cleanup. The other change in
+> > > > this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
+> > > > sysreg.h header rather than the kernel version. I'll send a separate
+> > > > patch to remove the kernel version.
+> > > > 
+> > > > Tidies up a few small things in set_id_regs. The removal of
+> > > > ARM64_FEATURE_FIELD_BITS touches other code only so much as it removes
+> > > > the define but set_id_regs.c is the only place its used.
+> > > 
+> > > Acked-by: Marc Zyngier <maz@kernel.org>
+> > 
+> > Thanks Marc. Shall I take these through the arm64 tree, together with
+> > the removal of the macro? They should have probably been a single
+> > series.
 > 
-> 
+> Oliver is in charge of the merge window this time around, so I'll
+> defer to him, but that's absolutely fine from my PoV.
 
-Applied to next, thanks!
+Catalin, please go ahead and apply. I don't believe I have anything that
+will conflict.
 
-[1/1] KVM: arm64: Add endian casting to kvm_swap_s[12]_desc()
-      https://git.kernel.org/kvmarm/kvmarm/c/1625e20fc198
+Acked-by: Oliver Upton <oupton@kernel.org>
 
---
-Best,
+Thanks,
 Oliver
