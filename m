@@ -1,59 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E876EED8;
-	Wed, 26 Nov 2025 11:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA7533970F
+	for <kvmarm@lists.linux.dev>; Wed, 26 Nov 2025 15:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764158298; cv=none; b=SuKVkd52ZNxIzA6HMkqmaP6CQwmhvYfL+GGtICqOwzfWBMXhFuTukATYnoPm00Lzpl4msi81Px2ZsCXU/vVBGc/XDCdMoKvcOSYW+H7j9AJAK/YGxEm9aYP/DVFXoYUHFFpCWeSoC4FiPsegKP4jExtlpkSWaiRO0adStfG36ho=
+	t=1764171410; cv=none; b=qnsBCTaoWfNi9T4X9enfYoD8ND/fulqx55D0jmMmj7ucUZnK2eJ+jotjWbhGKEhyREPQw+2+ex97mmbGHqtLo5jRTbgatXdhWYx5ImWID1g+do9OfwhMzlL8lfFDFydTw/za5XQ7kk41uammhRA2AzvsAmn2vrJdGlgZ3bdrGuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764158298; c=relaxed/simple;
-	bh=rmV+i/bxGZPpVilUeplxqHoBEtEaVJTKCPj9TMnykC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pf3hQe/xVb3intlMzJ5p/LSENRQ6zfC4BXp45+GjenRc96wNKys5zL0+F3GaeiW4UpfiILlNVMobK2iLbQj8up7+MtsNeTORaoT6dVjEd0LqIHotlvAZ/Xl4eLDTzCQmqW9JtHEtMMyyryczkJpj0EEnFUmc4egEI5/eMktsRAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nwxd9t5R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764171410; c=relaxed/simple;
+	bh=/8FCdi6x7TLlipr8hT2p3sBnfBjielKdgUHYCnvkaz8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QjyxVhS4pl4/KyJg833XuIi2XyyyfkTqip7cgWvEVzz6OeXu+F8eQsNZsMZAhJ1hZPhRfrfD8yNc0SDkNctn6NYnPyu7QsSZFkvw5inJRkGhMM0N2iV0odtcLWGZirIZXHqZ7X0hzq8w2WcNX1xQzgITxpsNWKEsA8TQe6WPFMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMxyN/yd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nwxd9t5R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73152C113D0;
-	Wed, 26 Nov 2025 11:58:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMxyN/yd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B62AC4CEF7;
+	Wed, 26 Nov 2025 15:36:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764158296;
-	bh=rmV+i/bxGZPpVilUeplxqHoBEtEaVJTKCPj9TMnykC0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Nwxd9t5R5bIys1gPue6FOsKItnzoP/0qgGNdZ2v4fRnl0sjw3K85BBLvodEkOGRnI
-	 pl9YPwTDC4bvfsbQCvbfZlBbMHHAJ2gTMjNu0hs39OmQEQGLV1n8zui4lwspyleDug
-	 DR/rxRIPwldmxw6LoADHlzwxTcK4oY/4uZ9693NEcWZk0fWVE/eHXUePmg29s8AU7y
-	 VMJ2pCP6F8ROXzIOLwN7h5jEybsZw92p9WmaG1sESESLA8aVlrC85D/Ecn1y2TbtxF
-	 0JRmE8AmpkgHWUz5nKJGzyZ8dRk3Tkuu9dfPWnYUcrqlTwoS9wwYnYnNfDBJ/To8wg
-	 tPUJbLLYtjoTw==
-From: Sasha Levin <sashal@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	s=k20201202; t=1764171409;
+	bh=/8FCdi6x7TLlipr8hT2p3sBnfBjielKdgUHYCnvkaz8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dMxyN/yd84PF0UFsoBD7f/uvgZOCAUi4bi2Fr5AsEBGL5JKS1GVDnm+gAiHYm0y8Y
+	 oAXMFqfLjI0cDIrtgj1GdWXqUdugXrr1PU8DbXSFC3iPbTXfwlSp2EQuswAdPA+tzK
+	 U7f/GWpqjquUkgotOswxehle/8uSfek68hlUMcm0uL2TSUicGQdDurVALA3xoHlW2u
+	 0mU4otPW+NMBOZgHBA0BIoETN7jCiGC5tjYxUtRvSHr5dGX9B8+Kv1hnjpD1IaPbs2
+	 3JhtF0cjRci3stnOp2FBoe5ls9eE0/Va0tDuKBCcf7SdiIcn140Hlnbu29884iQCCO
+	 ZqFwm41AxSM9Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vOHZX-00000008WTd-19m0;
+	Wed, 26 Nov 2025 15:36:47 +0000
+Date: Wed, 26 Nov 2025 15:36:46 +0000
+Message-ID: <864iqgrek1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 6.12.y] KVM: arm64: Make all 32bit ID registers fully writable
-Date: Wed, 26 Nov 2025 06:58:14 -0500
-Message-ID: <20251126115814.1354988-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251123103909.3518993-1-maz@kernel.org>
-References: <20251123103909.3518993-1-maz@kernel.org>
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vladimir.murzin@arm.com
+Subject: Re: [PATCH v5 5/9] KVM: arm64: Include VM type when checking VM capabilities in pKVM
+In-Reply-To: <CA+EHjTxPxscVZryCoVAZYebgD82waEKiv0Z-CFG6H+CW3dAbXQ@mail.gmail.com>
+References: <20251118103807.707500-1-tabba@google.com>
+	<20251118103807.707500-6-tabba@google.com>
+	<867bvdqd4m.wl-maz@kernel.org>
+	<CA+EHjTxPxscVZryCoVAZYebgD82waEKiv0Z-CFG6H+CW3dAbXQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This patch has been queued up for the 6.12 stable tree.
+On Wed, 26 Nov 2025 11:00:47 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> I agree, but I don't think this patch changes this behavior. Later on
+> in this series we expand the check to apply to non-protected VMs to
+> also restrict features that are not allowed in protected mode in
+> general -- something that until this series we didn't have.
 
-Subject: KVM: arm64: Make all 32bit ID registers fully writable
-Queue: 6.12
+Ah, you are correct. Apologies for being so thick.
 
-Thanks for the backport!
+Still, I think we need to do something here -- the whole extension
+check without context is just broken.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
