@@ -1,200 +1,126 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6020C2701B6
-	for <kvmarm@lists.linux.dev>; Wed, 26 Nov 2025 11:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60367320A0D
+	for <kvmarm@lists.linux.dev>; Wed, 26 Nov 2025 11:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764154887; cv=none; b=HbY77203JH1v08LvtvIzlnlzJzB6bh20pz4Ly9XILwZL212mcTiM7iY39L8RowzEFlGQt+pk2KAAeMnGVOGd0TNxc+P/R0MjNML8lTmX0R7fq43E/nUW3tGXh/m2g2+d3HYYNmi3ZAoTyX106q8hlzow0RmzOyagkhtWF6P5kOA=
+	t=1764157676; cv=none; b=C+AdZKnKAHuQqDogvgEHQ0m1tEzH+cJu7c/31KQy6TYfhHDU+cEImpGQ0Ri9T4vyhymKsCsnOm/pBK1JPi71TqZ+ePASg+VCasotbfLCEbPCpqYydpB8kTlkLmwtoXGSpCGQl0oWZ2K/iumWqpxf6mRMAlyqEpIne46FJA+PyA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764154887; c=relaxed/simple;
-	bh=uY9owOb2xofGtrtx5SQr6m/Fe0Au+tMZ4uy08qe82jk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AYqYDUl19iGJhF4/AbaEwIxcneZd0bEzsqXApuRCRfh5GehGw6e0uh3N18F8PQFOAD89xb74mDjXvF8PJQPWqujfOcaZ5EZYmx/j8cE9kpwyFwlD9jfh7SZsyPzr/Yk3DKOXUCsqLWdQDPVbSC8YegM1EjEUEL+J54y5HOYsRKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4MXH2K/p; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1764157676; c=relaxed/simple;
+	bh=fIQjbi23zkTo/MW8Q5cZnkSIzHfjgtmhtZr1pnvAnlE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iJFMFJLZOcGNW+Ve4Uh4u19/22OD3zzZR3w8To+LiTFe5MtMzURoPk1ITFs29uE7YFbpYomN9INmzifP00rszeLRRAWmyMJMHWpTn08b9wkUz6wN+aD4cYJMIsVfch8JwUlGSHVOqFiL/EzApO1IM9Op3ODMcxUDNTuNJw+TYJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6MDnKKC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4MXH2K/p"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4edb8d6e98aso326081cf.0
-        for <kvmarm@lists.linux.dev>; Wed, 26 Nov 2025 03:01:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764154884; x=1764759684; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=J+3L7npYoMe72LZAqOf/QcGS609azhf8MHMKeVgv2t0=;
-        b=4MXH2K/pyzA2RhWNl/o9B2OkEcelJkK6Z2hqzSiojjjLw+9K//Uq9iRlIgzsQgQo41
-         EsMv3OfN7+DoRgtGU8s0TwFc5gF0ip8Y8orLgGKg0XuulCAqfaQo9+yPCb4+O4IANthO
-         iaR8hwUzH3d7GsaBlhfI9EDeF9Qy7oJ8P0W/I7PVNwflIyjD7Zs5OpPFn0RKzobbTIj+
-         ElefTjepQzrMexaxvCKTwNb8XXyuFEfZfLsxfmvp9oX3HTQydde9eevqFMxvXzBDAyDD
-         /v30bMZ/kD3JsLRMtlFjYEob+D3gI8fV/EtDKxNbNltDR6sYm2LJ5XAHeRr1P2D/dxMm
-         1CBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764154884; x=1764759684;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J+3L7npYoMe72LZAqOf/QcGS609azhf8MHMKeVgv2t0=;
-        b=cdo9TdNGlxsrwXvV6MSb7Ubt5ttyw+UuP5rl85JEn+s5i0sMmcmF32jBjFfiuy/ytO
-         FRej1OA8W69nr/7jmGO/GT7LHRpDVIgGO+dnSoEu5HWUH6U7Rh1s38askXGptR49OvWM
-         ZFq2/TI6+4+0ZwiUhPNSW/hG5MX+jAXDmt13aDHTowD8IJdSmNshwEycBwmFFE4lwRG4
-         MKGa9fwdjG1srdEaCAoXn3u7ZV03oO/Mni3ap43Ph6IUQg9aJ1pSqjQUE2ERQYTC9oQY
-         r8Qiic6dhdWTkcMaHsKFHSbsdU1ccMcqK0YvxuTnD5M85DSJ1spsoBAaeBvNH2jXW3y8
-         jw/A==
-X-Gm-Message-State: AOJu0YxlDvX1u+GmKnSuwt6gHPeBGDyxoYXPvHMTmzb/Kn8R5SrqvR9u
-	GxN+W9xI1GeRhZkyUAOHs3TZaK9OStNl2fYrw27szkyKeAtnOQReKdVEELSRbEcSg9A0TUtn5+o
-	e0vmGY+1ZvuIEUnPRpdd2QY/nyFUzGRkeIL+GKnoL
-X-Gm-Gg: ASbGnct1xfCx0AXw4y0bCYGQpz/fvietJwSQZw26nZMAq6GgoJj/Y/nxIYrmHEf0uk8
-	9aXqbcnzNs1roI3RulLmPN/2wvh157uXfmjUiMtcvw5kNzWHHrmXYxMAjCfUXemdsoCsafUlLsz
-	WayS6w9nb4lboV8K+/W5tR+Z9u9K3hk6dgz30Bauk20EMgwHyduDu2T6Eet/+yxjkYpzUHJ1GmH
-	zWUy/EG9RiYCwIIRwr9y+zlrwlYmKcsLWmypIpbGwfSaNMPka8YJc6EGVlakXLvlzmGxCEegmQJ
-	745vt9LX8SuF5F45wrf/An4U
-X-Google-Smtp-Source: AGHT+IGg8KtTFQs3f5lkDPEQIA1agApY+VFbSfmaMCBg+p4yvM2Tz8ctiRXqArvH+h7g2HfrS6qrMI4+M4gDyc1CPvk=
-X-Received: by 2002:a05:622a:1496:b0:4ed:b665:3779 with SMTP id
- d75a77b69052e-4efc6c8b73bmr3738061cf.16.1764154883809; Wed, 26 Nov 2025
- 03:01:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6MDnKKC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01B99C113D0;
+	Wed, 26 Nov 2025 11:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764157676;
+	bh=fIQjbi23zkTo/MW8Q5cZnkSIzHfjgtmhtZr1pnvAnlE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b6MDnKKCd9V+WXMZU+Yrb7YqIUMeXEocsewD0ZufGLRArHEfdeEpJsQ3UjaY9v/Dw
+	 5oflgolSLJ32i0W/NZG17s0DCIwWoujydgUA3jsfZ0x0wCGY5mO27Q8GZbyy1/4ADl
+	 oyTYucb5CXYfjArLQLqaRon7+hBiJeq8INAE27qetRmqepnaSp/naZbFh5cTNDEmE1
+	 rCrL4R5pXkU+kcOA3PAbo+F6fD5EADRFCShAGm6HROxmdMb/Y7RA9bKQdW7bDa7T1G
+	 sYWj51ahr9vh1T66vk+3myUEGtY323xBgUHCaeELQrz1Sy8HwO6lcfcei3MfJPE3s9
+	 A3CRvNnKSAyJA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vOE02-00000008ScS-02yA;
+	Wed, 26 Nov 2025 11:47:54 +0000
+Date: Wed, 26 Nov 2025 11:47:53 +0000
+Message-ID: <865xaxqal2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vladimir.murzin@arm.com
+Subject: Re: [PATCH v5 2/9] KVM: arm64: Fix Trace Buffer trap polarity for protected VMs
+In-Reply-To: <CA+EHjTwHrLhdHrNSA8f-+bCZ1-QEuNocQQxeiaaost9oLwaG5A@mail.gmail.com>
+References: <20251118103807.707500-1-tabba@google.com>
+	<20251118103807.707500-3-tabba@google.com>
+	<868qftqehe.wl-maz@kernel.org>
+	<CA+EHjTwHrLhdHrNSA8f-+bCZ1-QEuNocQQxeiaaost9oLwaG5A@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251118103807.707500-1-tabba@google.com> <20251118103807.707500-6-tabba@google.com>
- <867bvdqd4m.wl-maz@kernel.org>
-In-Reply-To: <867bvdqd4m.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Wed, 26 Nov 2025 11:00:47 +0000
-X-Gm-Features: AWmQ_bnId5eaZtSND4q_YYjMzwsJNTvFSJeX_rFs9ffPKuakqZ-zcAPUa1IB4is
-Message-ID: <CA+EHjTxPxscVZryCoVAZYebgD82waEKiv0Z-CFG6H+CW3dAbXQ@mail.gmail.com>
-Subject: Re: [PATCH v5 5/9] KVM: arm64: Include VM type when checking VM
- capabilities in pKVM
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-On Wed, 26 Nov 2025 at 10:53, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 18 Nov 2025 10:38:02 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
+On Wed, 26 Nov 2025 10:37:57 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, 26 Nov 2025 at 10:23, Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > Certian features and capabilities are restricted in protected mode. Most
-> > of these features are restricted only for protected VMs, but some
-> > are restricted for ALL VMs in protected mode.
+> > On Tue, 18 Nov 2025 10:37:59 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > The E2TB bits in MDCR_EL2 control trapping of Trace Buffer system
+> > > register accesses. These accesses are trapped to EL2 when the bits are
+> > > clear.
+> > >
+> > > The trap initialization logic for protected VMs in pvm_init_traps_mdcr()
+> > > had the polarity inverted. When a guest did not support the Trace Buffer
+> > > feature, the code was setting E2TB. This incorrectly disabled the trap,
+> > > potentially allowing a protected guest to access registers for a feature
+> > > it was not given.
+> > >
+> > > Fix this by inverting the operation.
+> > >
+> > > Fixes: f50758260bff ("KVM: arm64: Group setting traps for protected VMs by control register")
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > index 8d06a246dfd1..f6f8996c4f97 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> > > @@ -118,7 +118,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
+> > >               val |= MDCR_EL2_TTRF;
+> > >
+> > >       if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
+> > > -             val |= MDCR_EL2_E2TB_MASK;
+> > > +             val &= ~MDCR_EL2_E2TB_MASK;
 > >
-> > Extend the pKVM capability check to pass the VM (kvm), and use that when
-> > determining supported features. Moreover, extend the check to disallow
-> > MTE for all VM types in protected mode.
+> > This does not only change the trapping logic (bit 24). It also change
+> > the ownership of the buffer (bit 25). I wonder whether you should do
+> > something for that, maybe by clearing TRBLIMITR_EL1.E, because
+> > otherwise, you keep tracing, but using an EL2 VA. What could possibly
+> > go wrong?
 > >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h | 10 ++++++----
-> >  arch/arm64/kvm/arm.c              |  4 ++--
-> >  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 10 +++++-----
-> >  3 files changed, 13 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index 08be89c95466..7195be508d99 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -23,10 +23,12 @@ void pkvm_destroy_hyp_vm(struct kvm *kvm);
-> >  int pkvm_create_hyp_vcpu(struct kvm_vcpu *vcpu);
-> >
-> >  /*
-> > - * This functions as an allow-list of protected VM capabilities.
-> > - * Features not explicitly allowed by this function are denied.
-> > + * Check whether the specific capability is allowed in pKVM.
-> > + *
-> > + * Certain features are allowed only for non-protected VMs in pKVM, which is why
-> > + * this takes the VM (kvm) as a parameter.
-> >   */
-> > -static inline bool kvm_pvm_ext_allowed(long ext)
-> > +static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
-> >  {
-> >       switch (ext) {
-> >       case KVM_CAP_IRQCHIP:
-> > @@ -43,7 +45,7 @@ static inline bool kvm_pvm_ext_allowed(long ext)
-> >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> >               return true;
-> >       default:
-> > -             return false;
-> > +             return !kvm || !kvm_vm_is_protected(kvm);
->
-> I find this expression a bit unreadable. IMO it would be better if
-> written as:
->
->                 return !(kvm && kvm_vm_is_protected(kvm));
+> > Overall, I'm very uneasy about TRBE in the context of pKVM.
+> 
+> So should we clear/restore TRBLIMITR_EL1.E on guest entry/exit in
+> protected mode?
 
-Will change.
+I think you need something of the sort, yes. Overall, SPE and TRBE
+should be aligned on what they are allowed to do, as they are two
+sides of the same ugly coin.
 
-> which makes it "clear" that you claim to support everything when
-> either kvm == NULL or described an unprotected VM.
->
-> But it then begs the question:
->
-> - in what circumstances is kvm == NULL? Is there any case outside of
->   kvm_vm_check_extension()?
+	M.
 
-kvm_vm_ioctl_check_extension() could be called without a VM. In which
-case, we don't know if the check is for non-protected or protected.
-This patch doesn't change the behavior of this part.
-
-> - do you really support everything?
-
-For non-protected, yes ... with the MTE caveat, which later patches fix.
-
-> >       }
-> >  }
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 870953b4a8a7..10d853f2722e 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -87,7 +87,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >       if (cap->flags)
-> >               return -EINVAL;
-> >
-> > -     if (kvm_vm_is_protected(kvm) && !kvm_pvm_ext_allowed(cap->cap))
-> > +     if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, cap->cap))
-> >               return -EINVAL;
-> >
-> >       switch (cap->cap) {
-> > @@ -299,7 +299,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >  {
-> >       int r;
-> >
-> > -     if (kvm && kvm_vm_is_protected(kvm) && !kvm_pvm_ext_allowed(ext))
-> > +     if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, ext))
-> >               return 0;
->
-> But that's a change in semantics here. Calling this function outside
-> of the context of a VM (kvm == NULL) will now report that *ALL*
-> extensions are valid, instead of limiting it to the allow-list.
->
-> With that, userspace can no longer detect what is available and what
-> isn't before creating a VM with the correct VM type.
-
-This patch doesn't change this semantic, since this patch moves the
-NULL check into kvm_pkvm_ext_allowed().
-
-> I don't think this is the right way to do this, unless you really want
-> to break the existing UAPI (rhetorical question).
-
-I agree, but I don't think this patch changes this behavior. Later on
-in this series we expand the check to apply to non-protected VMs to
-also restrict features that are not allowed in protected mode in
-general -- something that until this series we didn't have.
-
-Cheers,
-/fuad
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+-- 
+Without deviation from the norm, progress is not possible.
