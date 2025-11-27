@@ -1,145 +1,79 @@
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCE623D7CE
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 03:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780E127A45C
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 05:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764215509; cv=none; b=KXKEfY0I7SqVNqA4p+hdMu60JVjfJrfpy/MtXpMN8GAbWm44nX1OgTR07ZmbkPd0TVc/jssIBpKCMClW3hqxNVpBB08OZtfywrkPxNBdN+U9UJv6fJAOUVP4YVHBzP4/bdwCCKssVEti4OmUI0pRBoQ9u6PU7at8/0SFPcba0H0=
+	t=1764222777; cv=none; b=kHoB5Sd8x4PJ2GwizILMNF+SY1iFllSKiftcNQaTaMIdaH1Ozd7AgpkWVUXnZwgxlPDuy8glDFU+WOPNE/eptX8UHmkxkkrel5NsFjh0Ci6fP+NhNazKOsOPFjYOsC9Pkf0zvsHdDpUB+IAehod4uWgXSuEHuAECgDRumyX/JdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764215509; c=relaxed/simple;
-	bh=3PHFVtseHam8/Q0pAuowhNePsjgnGDP9mWLmZ4a2XLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=iRzxpfsDFZYbkMuzLzuLwGHon91St2zFF8lQw0ByKW4M/rlPB4/FzaY3YeTl2IIH9NquZAz1n6Xuox9T07I/ge0QVWLmN8Uye8z0DVanv8ZLukbGWthL5ej0SMOQLKIZ9urlT1wrszJAR+qc9twMHajOWsLDgqDejEHi2EJZsQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dH2Wc4g04znTW1;
-	Thu, 27 Nov 2025 11:50:20 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id D0B471A0188;
-	Thu, 27 Nov 2025 11:51:43 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 27 Nov 2025 11:51:43 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 27 Nov 2025 11:51:42 +0800
-Message-ID: <e6cffbce-7cd4-3fe3-a9bd-935efedaebd0@hisilicon.com>
-Date: Thu, 27 Nov 2025 11:51:37 +0800
+	s=arc-20240116; t=1764222777; c=relaxed/simple;
+	bh=ISAFkZ0HmitTgmmDConEYXzcz7D+u6fWEkB3O+gmCY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TguQh7cInCBYnqim1zL9ErfSLr5WxXOCyKKM7vGWaJ/zhq/aggOi0/h39u8YteKmOQBtsUmY9qsS7DdGthHrgxRzQl7Ho9lQomErny2XRHPisOuWvUxw3mTa8J+fMSVH1c0MK0mkwuakaslicVV3i71ZbHcQVd+yEB8cyhX9+Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HGkNCLD3; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HGkNCLD3"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1764222764; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=8n0RK31A+ec3zN8vE8zvo+3qlTZfSr6qORtM7xzltbs=;
+	b=HGkNCLD3LPQ5CZf0cKx3a5ucoQrgHAF4bgPZ1MCS5+Pt48TuPJML98cpgIsXFVZ8El+qbCW7dYkgeIwQ+NGDj7kehDmHBptCYRs8mxBM6HEdfOudS1cCLLyTk0abDWI0fNKe0NpnX5SoYj94bLg7yotEdIbtcMuMs8Q/lqMWmcc=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WtW0l1z_1764222762 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 27 Nov 2025 13:52:43 +0800
+Date: Thu, 27 Nov 2025 13:52:42 +0800
+From: Yao Yuan <yaoyuan@linux.alibaba.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Ben Horgan <ben.horgan@arm.com>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Force trap of GMID_EL1 when the guest
+ doesn't have MTE
+Message-ID: <itxexyotztmtvuvcbs4wjcdod3tfpufqe5t2gmz6vyky3vtihs@a3atxxjadgfq>
+References: <20251126155951.1146317-1-maz@kernel.org>
+ <20251126155951.1146317-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-Content-Language: en-US
-To: Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>
-CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, Yicong Yang
-	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-6-wangzhou1@hisilicon.com>
- <861pm4vn02.wl-maz@kernel.org>
- <b1407660-9b69-7e21-328a-0f969fffa554@hisilicon.com>
- <c72411f9-a77e-4a72-a401-5110b919a2df@app.fastmail.com>
- <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
- <113db0fb-d879-49d7-a5f2-7755558f29dd@app.fastmail.com>
- <6d6fad8d-e4e4-b973-6431-34a37003d363@hisilicon.com>
- <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126155951.1146317-3-maz@kernel.org>
 
-On 2025/11/18 15:36, Arnd Bergmann wrote:
-> On Tue, Nov 18, 2025, at 03:31, Zhou Wang wrote:
->> On 2025/11/14 17:37, Arnd Bergmann wrote:
->>> On Fri, Nov 14, 2025, at 10:25, Zhou Wang wrote:
->>>> On 2025/11/14 0:26, Arnd Bergmann wrote:
->>>>>
->>>>> Are you using a particular device, or are you trying to enable
->>>>> the support in general? If you have a specific device you are
->>>>> working on, does it use the PASID data or not?
->>>>
->>>> Many thanks for your careful explanation! I got the pointer here.
->>>>
->>>> We have a real device in our SoC, which supports LS64B/ST64B/ST64BV.
->>>> For ST64BV, Our device just receives 64B data atomically, not interpret
->>>> it with PASID data.
->>>
->>> Ok, I see. So I assume this is either a kind of dedicated work queue
->>> where the IOMMU PASID is set up in advance for the user MMIO area,
->>
->> Yeah, it is something like you mentioned above. MMIO area is binded with
->> a work queue, a PASID is set up in advance for this work queue.
-> 
-> Ok, thanks for confirming.
-> 
->>> or it is a device that does not do any DMA at all, correct?
->>>
->>> In this case, would the device also work correctly with ST64BV0 if
->>> the ACCDATA register is fixed to a value of zero and you can only
->>> use the upper 480 bits? Would it also work if there is an
->>> unpredictable value in ACCDATA that may match the PASID of another
->>> device used by the same process?
->>
->> We do not support ST64BV0, so above case will not happen. I think ST64BV0
->> will trigger a illegal instruction exception in our system.
-> 
-> At least this does make it easier because on your system you would
-> never run into a situation where you want to support both your
-> internal device with st64bv and another device with st64bv0.
-> 
-> The easiest setup I can think of that still supports your machine
-> would look something like:
-> 
-> - have the kernel choose between st64bv and st64bv0 at early boot,
->   based on platform configuration, use st64bv0 by default if
->   available in hardware and not disabled in EL3, EL2 or kernel
->   command line.
-> - Change pasid handling in iommu_sva_bind_device() so drivers
->   have to explicitly request one of the modes before establishing
->   a pasid, refuse this on incompatible systems, update the
->   three existing callers (idxd, amdxdna, uacce) accordingly.
-> - on systems with st64bv but no st64bv0, enable st64bv for
->   all CPUs at boot time to avoid context switch overhead, but
->   forbid mapping shared hardware workqueues into userspace.
-> - postpone full support for st64bv0 until we have a device that
->   actually uses this and can be tested. I think most of it is
->   already there in the iommu code, but the ACCDATA setup needs
->   to be integrated into the switch_mm()/__switch_to() code
->   and possibly a trap handler like on x86.
+Hi Marc,
 
-Hi Arnd,
+On Wed, Nov 26, 2025 at 03:59:48PM +0800, Marc Zyngier wrote:
+> If our host has MTE, but the guest doesn't, make sure we set HCR_EL2.TID5
+> to force GMID_EL1 being trapped.
+>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9e4c46fbfd802..2ca6862e935b5 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -5561,6 +5561,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
+>
+>  	if (kvm_has_mte(vcpu->kvm))
+>  		vcpu->arch.hcr_el2 |= HCR_ATA;
+> +	else if (id_aa64pfr1_mte(read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1)))
+> +		vcpu->arch.hcr_el2 |= HCR_TID5;
 
-Sorry for late to reply, I double checked with our SoC and device
-colleagues, currently only st64b has been used in our system.
+Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
-So I think we could upstream FEAT_LS64 firstly as it seems easy
-to be merged. After this, we continue to discuss FEAT_LS64V and
-FEAT_LS64_ACCDATA solution if there is a real system need them.
-
-Best,
-Zhou
-
-> 
-> In the current architecture, both FEAT_LS64_V and
-> FEAT_LS64_ACCDATA are optional, so you can continue to
-> produce CPUs that have the former but not the latter, and
-> the logic above will keep that working. However this breaks
-> if you ever want to support FEAT_LS64_ACCDATA in a later
-> CPU but keep the existing driver working with st64bv.
-> 
->        Arnd
-> .
+>
+>  	/*
+>  	 * In the absence of FGT, we cannot independently trap TLBI
+> --
+> 2.47.3
+>
