@@ -1,157 +1,126 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EE3296BD1
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 14:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53632AAC4
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 15:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764255136; cv=none; b=RRKuLA9ThiW+BIMlg5QADzTiKsICKLUgBV0RRU/mxKsssPywtZMpbvYTRSemA4B9wEwEmFHGLeaPjWkGPw+xVugAfuc+k5H/2A5QKgQNg9xqD4Z4qH1dTXtXK89ufv8Pw1KeQPOWPaNcR9fCTT/ir3AVbg803ZMBcuxVAyrnyCs=
+	t=1764256025; cv=none; b=n7LmDBBAGnvmwBPl/nQ8CsF75nbfExqYbJ5yS3gaFfFt6o51J8NDoTSTbmhvc9USgLowLcE9javLbgXeCS8YyWkIQ++s/dFG9n9NW+RwPtWzxRg9g2yaPpcnVqKmBdFUUiLzP9c2nPb3kvjcZQkG/82J9fLAgWX7j7g3JExPq70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764255136; c=relaxed/simple;
-	bh=AUUmYjlpz1+SSjEFdJCci6iQPPtM3JeZzyRpDsyrjUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j9QA6JlyUCwVQCalrRCSRpfheg7IbXnDgWaocLVmdCb0SACfHom4aAWrBK48KTQuxYywUSnVssvbWELRaPXb7CFSiyASgYWIn8jlP/5Dm+m2L0+xLJp7PC2xvu4BITclSXY2MbaZvabWvDthFR6SvXWRw6Eym4vlaAkYzeO9plc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B15B91063;
-	Thu, 27 Nov 2025 06:52:06 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D52693F66E;
-	Thu, 27 Nov 2025 06:52:12 -0800 (PST)
-Date: Thu, 27 Nov 2025 14:52:07 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
-Message-ID: <20251127145207.GA3265987@e124191.cambridge.arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
- <20251127110832.GA3240191@e124191.cambridge.arm.com>
- <3a39738e-ed33-49fa-9f1c-0bbba6979038@redhat.com>
+	s=arc-20240116; t=1764256025; c=relaxed/simple;
+	bh=O3Jl0TedBRVRfVhZgOJdrLKqQHfxK+5HmiN/P10lDXE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aFkJpw3HGDo1UJAygotll0ELG1syRrWC4endvA5l4l33W+sQc6idwaU0L91avvdv1hHi1vHPBkuF94UKLeOH0KnRNLdHEO4pXh3IRlHrxTcVzq0yO1VWBTRvqVM3Mjcs+oBSfscDI6ATsv/R2hP3A0c/d2OoMntDwsKIZAjYhyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WAd70L0o; arc=none smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WAd70L0o"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-6430834244aso725824d50.2
+        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 07:07:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1764256023; x=1764860823; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=o9j9JckZewB0T/evvAwAYflbY/oMjYUWYlwvg8R/JAM=;
+        b=WAd70L0oPj9dbUOPKJ2EoY4rYCNTSBmilcWc4c4fWP4F7rtUfkAi+doPHoQ/JxXtwW
+         toofWb2CaP9NB+GHYK2aiq0MB7CPvz9aMermWRykbuvCHdsL4WZRQxVawWm9wAy6pOqL
+         37oKGxbqWC4skmypI69m4b5dtcMBcrS8lyiskPdmUbXIFn/KDikspGjfeQTR1sQGHQwg
+         MCOF5r2H9mfvoP3zRbKd52YI1MM+ol21emDh3ppVUyQj6B5E6pBw/L5jkCYE0BDKS088
+         PrDMV3/95x1YceC5tn6X8X5i7pzz6O5wN0oc/nk/jjo8nlUoBtBjS8DBePx7r7BdJFhI
+         /6iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764256023; x=1764860823;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o9j9JckZewB0T/evvAwAYflbY/oMjYUWYlwvg8R/JAM=;
+        b=nExzI7mabLlj4ehzgNUzo85Uq41PH56dAUADn3ssZB47bfqwJ0W9pRyVI9KaSHoDQG
+         D2oZcFWyuaHYzVcwnYvA35DBGHeQNA5dQ4Qp4AZ5816w2+MEeIp+Cw18wCFyjEJg3XlF
+         ZhO8Vw9wDo3XGJTKzd/YnijcfcG3mkAyo1QC89AqmiQxrirgXmer2XVTonJj0glJSz9U
+         wN7sDCfv7vto7deMUWtTYyR6gr9/0+O0d6hBDX8RAGMlUlGIWYuQsxUVmVmST/7XzNtV
+         3Th6xngoEY6cUwehM8Va1XzdFcS4DwU/ILDwO91VHel1aObwbsKBXG2LKLIE6L6BaWDd
+         8I6g==
+X-Forwarded-Encrypted: i=1; AJvYcCVx+pUo20GJwZ1C6HDJpuHRux0uGl347Vt40+xDXhTapXK6LYQ27/g67eHh3VfYS30aJmlM2bo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxUC4Q6nxie2bQcOSyjWqxVBmSSKgW3ce9AaZ85qGWOseK1yNwQ
+	gJcUHDwUNIFcWiv6bi0umgnLEywR9w9OhHgRGsEu0fxgc8sCDXA8xjRBwexIsMEZaY9zldHqfaP
+	I0jwnkFYQXZIbKvGl66kmsQiM/I4Qs1YS5/fxjZSzfg==
+X-Gm-Gg: ASbGncuHp+cxe3NohPOF78PhC7jeZbvvNhx3ODubUv89Su0+PpHqW1oDO5KDMbl18zq
+	+LVWxizyW9S+43D5MXLzF8Jpv41RjCetxtrvQ4RBV1Q3z5EVBfhE+CHsh+5L5CsbBewZpGH58Im
+	xIC/Bc5MlpIZtmbmmWjTym1QQZAo74z4tvamlK/q2u8Qsj0roSAq7FP1QHa9VQCwCNVajyedLjb
+	4zq7ijPM1CEyayK5pKS0Oh8GtG2AQ3ymL3OnLjuPA4tcjDqbXA/xWe9RCB40RziCAVfMMFr
+X-Google-Smtp-Source: AGHT+IHOZv1XVUaCpJ1GafgJ+Q4ufaODDINZzVe7OUjEEvUjTH0ObsXn/Gn7AJqtRSZdFMpWXb50BEdfVotDE3qezIw=
+X-Received: by 2002:a05:690e:1581:10b0:641:f5bc:68d3 with SMTP id
+ 956f58d0204a3-6432940d24amr6552660d50.80.1764256022644; Thu, 27 Nov 2025
+ 07:07:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3a39738e-ed33-49fa-9f1c-0bbba6979038@redhat.com>
+References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
+ <20250902-kvm-arm64-sme-v8-11-2cb2199c656c@kernel.org> <CAFEAcA_GJ7gzn7aMCZYxHnJWvx4tHSHBKsOxtQ7NTb4gPjkMJQ@mail.gmail.com>
+ <df712591-397e-422b-b9c9-fbf080cad9aa@sirena.org.uk>
+In-Reply-To: <df712591-397e-422b-b9c9-fbf080cad9aa@sirena.org.uk>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Nov 2025 15:06:50 +0000
+X-Gm-Features: AWmQ_blQNCtlqrFl6oR-29ayIeVzxjSMrcpdxqL32ABrh38kpa7m6Xz9ardxRBI
+Message-ID: <CAFEAcA8LGwm-6JEhtKTq1E_da-T=H-aBX9-8LMJOAQpK5J+NfQ@mail.gmail.com>
+Subject: Re: [PATCH v8 11/29] KVM: arm64: Document the KVM ABI for SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
+	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
+	Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Nov 27, 2025 at 01:04:08PM +0100, Eric Auger wrote:
-> Hi Joey,
-> 
-> On 11/27/25 12:08 PM, Joey Gouly wrote:
-> > On Thu, Nov 27, 2025 at 11:04:43AM +0100, Eric Auger wrote:
-> >> Hi Joey,
-> >>
-> >> On 9/25/25 4:19 PM, Joey Gouly wrote:
-> >>> Hi all,
-> >>>
-> >>> This series is for adding support to running the kvm-unit-tests at EL2. These
-> >>> have been tested with Linux 6.17-rc6 KVM nested virt.
-> >>>
-> >>> This latest round I also tested using the run_tests.sh script with QEMU TCG,
-> >>> running at EL2.
-> >>>
-> >>> The goal is to later extend and add new tests for Nested Virtualisation,
-> >>> however they should also work with bare metal as well.
-> >>>
-> >>> Changes since v2[1]:
-> >>> 	- Move the sctlr setup in EFI to a function.
-> >>> 	- Decided to not re-use el2_setup.h from Linux, looked more
-> >>> 	  complicated to use than needed for KUT.
-> >>> 	- Add EL2 env variable for testing, open to feedback for that.
-> >>> 	  This was untested with kvmtool as my testing setup only has
-> >>> 	  busybox ash currently, and the run_tests.sh script needs bash.
-> >>>
-> >>> Issues (that I think are fine to investigate/fix later):
-> >>> 	- Some of the debug tests fail with QEMU at EL2 and kvmtool.
-> >>> 	- The gic ipi test times out with QEMU at EL2, but works with kvmtool.
-> >> Have you noticed any failure with migration tests. On my end, as soon as
-> >> I set EL2=1 migration tests do fail.
-> > Yes migration also fails here, forgot to mention that.
-> >
-> > Seems like migration completes, but then something bad happens on the first
-> > interrupt. I will investigate a bit now and see if it's an easy fix.
-> 
-> while you do that I will go through the series. My apologies for the delay
+On Mon, 24 Nov 2025 at 20:13, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Mon, Nov 24, 2025 at 03:48:06PM +0000, Peter Maydell wrote:
+> > On Tue, 2 Sept 2025 at 12:45, Mark Brown <broonie@kernel.org> wrote:
+>
+> > > SME, the Scalable Matrix Extension, is an arm64 extension which adds
+> > > support for matrix operations, with core concepts patterned after SVE.
+>
+> > I haven't actually tried writing any code that uses this proposed
+> > ABI, but mostly it looks OK to me. I have a few nits below, but
+> > my main concern is the bits of text that say (or seem to say --
+> > maybe I'm misinterpreting them) that various parts of how userspace
+> > accesses the guest state (e.g. the fp regs) depend on the current
+> > state of the vcpu, rather than being only a function of how the
+> > vcpu was configured. That seems to me like it's unnecessarily awkward.
+> > (More detail below.)
+>
+> That was deliberate and I agree it is awkward, it was introduced as a
+> result of earlier review comments.  I had originally implemented an ABI
+> where the VL for the vector registers was the maximum of the SVE and SME
+> VLs but the feedback was that the ABI should instead follow what the
+> architecture does with the vector length and potentially presence of the
+> vector registers depending on the current streaming mode configuration.
+> It sounds like you would prefer something more like what was there
+> originally?
 
-Thanks!
+Yes, that's what I would prefer. The "varies by current CPU state"
+approach seems to me to be not the way we do things right now,
+and to be awkward for the VMM side, so it ought to have a really
+strong justification for why we need it.
 
-I found the issue, and I thought it was one I had solved before, but maybe I lost the fix somehow:
+Generally the VMM doesn't care about the actual current state of the
+CPU, it just wants all the data (e.g. to send for migration). We don't
+make the current SVE accessors change based on what the current SVE
+vq length is or whether the guest has set the SVE enable bits -- we
+have "if the vcpu supports SVE at all, data is always accessed via
+the SVE accessors, and it's always the max_vq length, regardless of
+how the vcpu has set its current vq length".
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index af7c81c1..fd8b6690 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -235,6 +235,11 @@ get_mmu_off:
- .globl secondary_entry
- secondary_entry:
-        init_el x0
-+
-+       /* set SCTLR_EL1 to a known value */
-+       ldr     x4, =INIT_SCTLR_EL1_MMU_OFF
-+       msr     sctlr_el1, x4
-+       isb
-+
-        /* enable FP/ASIMD and SVE */
-        mov     x0, #(3 << 20)
-        orr     x0, x0, #(3 << 16)
+What's the benefit of making the way KVM exposes the data
+bounce around based on the current CPU state? Does that
+make things easier for the kernel internally?
 
-The secondary core code doesn't fully initialise SCTLR_ELx, which means that
-SCTLR_ELx.SPAN=0. That's why there was a data abort after the IRQ.
-
-This doesn't affect EL1 (only) because KVM has a different reset value for
-SCTLR_EL1 and SCTLR_EL2.
-
-I will send out a new version with this fix, missing sob/reviews/acks, after you've had a look!
-
-Thanks,
-Joey
-
-> 
-> Eric
-> >
-> > Thanks,
-> > Joey
-> >
-> >> Eric
-> >>> Thanks,
-> >>> Joey
-> >>>
-> >>> [1] https://lore.kernel.org/kvmarm/20250529135557.2439500-1-joey.gouly@arm.com/
-> >>>
-> >>> Alexandru Elisei (2):
-> >>>   arm64: micro-bench: use smc when at EL2
-> >>>   arm64: selftest: update test for running at EL2
-> >>>
-> >>> Joey Gouly (8):
-> >>>   arm64: drop to EL1 if booted at EL2
-> >>>   arm64: efi: initialise SCTLR_ELx fully
-> >>>   arm64: efi: initialise the EL
-> >>>   arm64: timer: use hypervisor timers when at EL2
-> >>>   arm64: micro-bench: fix timer IRQ
-> >>>   arm64: pmu: count EL2 cycles
-> >>>   arm64: run at EL2 if supported
-> >>>   arm64: add EL2 environment variable
-> >>>
-> >>>  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
-> >>>  arm/efi/crt0-efi-aarch64.S |  5 ++++
-> >>>  arm/micro-bench.c          | 26 ++++++++++++++++--
-> >>>  arm/pmu.c                  | 13 ++++++---
-> >>>  arm/run                    |  7 +++++
-> >>>  arm/selftest.c             | 18 ++++++++----
-> >>>  arm/timer.c                | 10 +++++--
-> >>>  lib/acpi.h                 |  2 ++
-> >>>  lib/arm/asm/setup.h        |  8 ++++++
-> >>>  lib/arm/asm/timer.h        | 11 ++++++++
-> >>>  lib/arm/setup.c            |  4 +++
-> >>>  lib/arm/timer.c            | 19 +++++++++++--
-> >>>  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
-> >>>  lib/arm64/processor.c      | 12 ++++++++
-> >>>  14 files changed, 191 insertions(+), 19 deletions(-)
-> >>>
-> 
+-- PMM
