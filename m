@@ -1,74 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46FE3385A3
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 16:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54092E0410
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 17:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764262193; cv=none; b=JnPcQb5cRbunZPa4Ga8jCDPpCJ2lyzAyHeIBOSmB5RgAH8Q7043OgVU6uZWDdTfObgWPQ32GyGjr1/NzHG9B9c1HFY9bAdpIGM83DnJBZ5bVwi5bkkGMNUWkVry5T3vORa2RoEj7l5W7jY+pW/9G8jgEn1vBztmTp6co4q7L5Lw=
+	t=1764263261; cv=none; b=EWnuDIqSb+PyqFlwk9ONqi75kWRMxxLxOSAMr/W+CfLBhdlhToFmXHyQTx5TM5vwmZBkzoqvzqMBPotANg+8yIrvjcy3ArLdb0745Umnz4kvURuNHn4m7HP92B2O3HzPQp20C+uPGusTXIZ2wMKXfe03NDyBDH8lhSkmXuWmtAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764262193; c=relaxed/simple;
-	bh=2GkoMiW1aOXux7Oy2sMmlIrHWqkBrcbNDpdWRYEyKO4=;
+	s=arc-20240116; t=1764263261; c=relaxed/simple;
+	bh=WNftygtxSL6IMWGCxSRkwNbV5nPIgoHk2RbEmkARluA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IUzF3KtSiwquy9Vw5E7mvaxXW0Hs6cjBSaRhPOzhPjPhQzNhbLgH0pujGZ/e4FLXXasR2a+ama/xmo02CIBjIr+y7XKfO5whZHNDpFFli/xnUIO7fWwNa/+Iw/4CvYJifWgp3gFmGVwDNWJsaBAU4pHPvM17Fs+P3ymorUWtTMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i6JvHI56; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=NqGKWv3ihcCWTqUm7gaCv+xvGOYa+JM1wVagQDWjXiGJ845tDx0DP59KHYteaepT3QMTU0+VZiQCNZABwBRlD/NxPFToce+X2byUc6q1/+nOkd9zMoD5qY4qf/0FdNZkA9p64BFqJmnoOtj3Zf2LFAKdIkqPVBoAWy8MTarZHHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WlUtFnZs; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i6JvHI56"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WlUtFnZs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764262190;
+	s=mimecast20190719; t=1764263258;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=k7Uz86MWYfQL+y6cfsCHemHYwZCFKIe5X+o1N7gMtLs=;
-	b=i6JvHI56yaVFxvBcBf/jv66Ez5ULlJBCjVHXK+TBJTsWo93OFBi9BOsBxgCUnnyu6Vnl5K
-	8IuzGdvv/R43fhReInHDPydNM8B7zbvqLz/dMLs36xmbZNY0i6Jt5//7Ij+vZdLMQuNx9B
-	sjZqo+bxn8+pQDEcPP/V7wV5RRXMJtc=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mV2UP49qvKkyyXIhJrLysCKXjPL5fKqw41mRBMGCnN8=;
+	b=WlUtFnZsltqoMfgwpceEo5aH5IUks4CfOgXXHe/i2zVUpEbYssU4QJ16bxIab8hp9HsnWn
+	9E4NG3mIG8W7HZJTM2alv2H8yMMHNbh1C/aDxd/s9MzFTmjT08GvQNLKA8YD3dPcD2Iz4x
+	3QXhs89Wfsex7k1xVDp0yDMyjeNUWJM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-4PivukzUPL2ga7UzA6fZ8A-1; Thu, 27 Nov 2025 11:49:49 -0500
-X-MC-Unique: 4PivukzUPL2ga7UzA6fZ8A-1
-X-Mimecast-MFC-AGG-ID: 4PivukzUPL2ga7UzA6fZ8A_1764262189
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8a1c15daa69so267864585a.1
-        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 08:49:49 -0800 (PST)
+ us-mta-86-wDNYkQzwMISUkaSlkuaPJw-1; Thu, 27 Nov 2025 12:07:31 -0500
+X-MC-Unique: wDNYkQzwMISUkaSlkuaPJw-1
+X-Mimecast-MFC-AGG-ID: wDNYkQzwMISUkaSlkuaPJw_1764263251
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8b2e4b78e35so182703385a.0
+        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 09:07:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764262188; x=1764866988;
+        d=1e100.net; s=20230601; t=1764263251; x=1764868051;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k7Uz86MWYfQL+y6cfsCHemHYwZCFKIe5X+o1N7gMtLs=;
-        b=FREbP7UJGMNrYFlpCWOBhKeoFKXe7KTNhuVlhsRTiCtvn3bflvfVZ5K3YXiupttVq8
-         QvChXLTNtTWs+DYDqaSirrBvnP1ep8gf64JXYBelifA6+vgaqlhj0Ta75syC5Of8GIkN
-         ffbRS3fZwhDas7rl+7I5JdYVCrVj7dsUrN5gHD6rZR7N1hHnZyIIYQQi4/CcMs/IkCwv
-         5n/lc73npahZSo208cvYWV0vUNzw8VGvMhUdErLa800Lmj0oagRvif3h7tnxj2E+m/a/
-         1IbM+xoXX3rdM4GBqSl9b1X38H3asXie4iqnYeFT/+BQL3xRz7JQGKcifQfsMh4jCyux
-         ugPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXm4PAevfq4ZkBTf0s96lk6h8bukn5t9dVCG+DBv0wMHh4F7KsqwAwd2GLv3Idi6/8NPr8WxXA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxxKjW/sfcBm7j3lK/HjHYSErYHT12SyW1LUib9Pp6nut8IgsMq
-	VwRzpk/eTS0d4F57G7zhAF1Mgbp/SYdDN0+FdxEALK8fgFTDGJyD+9wTk64WEGfyhGaoTzuHw3E
-	mXJ/vgYKP1FLo0cou4SP9HWZ9htqNM6Aj2sevZXUaPRO6Fv9UczxGW8CrjA==
-X-Gm-Gg: ASbGnctv5QSJXKpThVKU3ATxuJrejWrN62zPK+MRguOatdgEjHGxhKQvqay/6dk/VG2
-	ZQM2m9tREXrjYhGdvX++DvXmICFNP41PjmgP/5+oNkZYSJJNgr6ii0qcMk5LnakGJ5lvuaZbeSN
-	7/0pNZUIwxXLVC98lvWZ0hRbmdNrpPndfXJ4QtWB0dJdvzySdrLN83fNcvK3huzVJrNmSvnRx0X
-	Cb0c4DpDrF8Ej+lN6k1ayl4ZGXtbH2RwSjkkFzdrQps23ysWLJbtJc0pIS839J4OGGRsOTcDAcs
-	FIj5P4Sf+wyWs1gjsR/HTHnVt0YC/G32iA1ZT9rRPD6fJ//fS3m5wyVPZZPQrVyJMVIy3He+GTL
-	CNZqRmVlUu0FtmYV/iZgFFJ4okveoCKdodAzaaPibjyJHOSCOc5+PN4T16w==
-X-Received: by 2002:a05:620a:25c7:b0:89e:67a9:fcf1 with SMTP id af79cd13be357-8b4ebdaea90mr1500116685a.52.1764262188696;
-        Thu, 27 Nov 2025 08:49:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFaTomno2Tlgqds4NSGAWNKA9Sj7QFcdWKkY4vTpNLJn+xX+6DRbAf650DtgDJ/AfspXBsVxA==
-X-Received: by 2002:a05:620a:25c7:b0:89e:67a9:fcf1 with SMTP id af79cd13be357-8b4ebdaea90mr1500114285a.52.1764262188357;
-        Thu, 27 Nov 2025 08:49:48 -0800 (PST)
+        bh=mV2UP49qvKkyyXIhJrLysCKXjPL5fKqw41mRBMGCnN8=;
+        b=elUlLd7hio/7XI6V7+y/ZPFK9ZFbiY/MUcuhIp/jgjITPXARV96aC+aOvUq/Sp1b3C
+         21uOealcCMxuamzG1AGOSy0ioahdJkuT3OkB7Eyvu3nPpXNX9U6V9ntpRfdaaicE+qRl
+         O59BjCVBcodtrZsKIHsETE9WOMboLDhXbOLnrRUnno6LRm40VZN89nWFvrlE0hAtw6Hr
+         5vxm+KjjVLBsKXUOKZG0P9mXuykSxxt/WMIX0G5FPZ6x3VzhrClK1aCJhQxZ4TgGk1Wv
+         gRo5gQeOCEAYo+aPSR8WL+SPRr2eaiR/S7sQBuKVERnFVjWtr5IfqawLT0ZFbODU0pB5
+         9n6g==
+X-Forwarded-Encrypted: i=1; AJvYcCUBJsJzv2lTEe7pyFGA0WoNoa5Y8tqxvSopi2kAZQXwxwb+OjcDTNAaaVg2rmP4j6pXDZF3t1k=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzIV6BjTfS7hzxEac61JbWNCo5COZFimnnImPho8WlZE4eyFNQ6
+	kVycm0yqhxjhgmXyCm/rUm+ln2GZ8WZUxoL/1h4Jm/hz7tFy3obqc1KXJFZdHV2DY7omsl6VS2v
+	ykQ0BmWsjPjEvnda7lYfIU0MOW+KJPUsQH6qWbs5kFvOjNR7o7uR2PsVMUJiDT3faGQ==
+X-Gm-Gg: ASbGncu86edVlkYlHXd6zjCPUZipEXCbfskEEv5Kxb+TwE+d1kvMfpQAliXiVOP15bg
+	pvUaDPpt/wDWRr14PL2YQWkuZEVuczf+x9jZorHsS6JTaPTD/5U9OuPIov1tw0DNyCGFUqEph5e
+	5PFWD8ZNoXuzUK8UOmvMp9LvMkJYE6msjyyePDzV1iliQ4M7Kw+9O+AdhVtUqraZfW87Q9tMql+
+	PP5h7froF7kptbSaR6F3TriBU4W2GevB75oDVF6DS74Xh/2COmqnT8updh9t/8U4SdgRm/Rdbus
+	YR6CSxNLmBrTkuPixnajgtoi/ylycDeDxYkwp+izIUT4l6Ss0580ZaBw5FSNV5Q2F/Zn5oi4G7h
+	qlBgnfaPK3NhmfG0RG505sIDjNByI4kJ5w2GihWKbebEDw9RcVdLVQOLReQ==
+X-Received: by 2002:ac8:5f93:0:b0:4ee:12e0:f071 with SMTP id d75a77b69052e-4efbda335afmr149294901cf.20.1764263251185;
+        Thu, 27 Nov 2025 09:07:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6lyi76KYE/oBFzG9aDg5WUkrTUPkQ/7sKsHxhci6KoegKW5WMzobiAFfIQE8n+bHCDtPTPg==
+X-Received: by 2002:ac8:5f93:0:b0:4ee:12e0:f071 with SMTP id d75a77b69052e-4efbda335afmr149294261cf.20.1764263250688;
+        Thu, 27 Nov 2025 09:07:30 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1b759esm137332485a.31.2025.11.27.08.49.46
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b73542sm12559736d6.44.2025.11.27.09.07.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 08:49:47 -0800 (PST)
-Message-ID: <92f27f98-e4c9-41d9-badc-635e5ba40552@redhat.com>
-Date: Thu, 27 Nov 2025 17:49:45 +0100
+        Thu, 27 Nov 2025 09:07:30 -0800 (PST)
+Message-ID: <e4ffc74b-ae94-4304-9985-7e1f2df2767f@redhat.com>
+Date: Thu, 27 Nov 2025 18:07:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,17 +77,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 02/10] arm64: efi: initialise SCTLR_ELx
- fully
+Subject: Re: [kvm-unit-tests PATCH v3 01/10] arm64: drop to EL1 if booted at
+ EL2
 To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-3-joey.gouly@arm.com>
+ <20250925141958.468311-2-joey.gouly@arm.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250925141958.468311-3-joey.gouly@arm.com>
+In-Reply-To: <20250925141958.468311-2-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: erHl28DSETjYfv0wD634BW4yIBSwgOzfbI6gA4TAZUk_1764262189
+X-Mimecast-MFC-PROC-ID: kgMz-hv-CyDqU37L9X9c4eACDiKqiFc0NkuQApJ50xc_1764263251
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -96,76 +96,141 @@ Content-Transfer-Encoding: 7bit
 Hi Joey,
 
 On 9/25/25 4:19 PM, Joey Gouly wrote:
-> Don't rely on the value of SCTLR_ELx when booting via EFI.
+> EL2 is not currently supported, drop to EL1 to conitnue booting.
+continue
 >
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 > ---
->  lib/arm/asm/setup.h   |  6 ++++++
->  lib/arm/setup.c       |  3 +++
->  lib/arm64/processor.c | 12 ++++++++++++
->  3 files changed, 21 insertions(+)
+>  arm/cstart64.S         | 47 +++++++++++++++++++++++++++++++++++++++---
+>  lib/arm64/asm/sysreg.h | 14 +++++++++++++
+>  2 files changed, 58 insertions(+), 3 deletions(-)
 >
-> diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> index 9f8ef82e..4e60d552 100644
-> --- a/lib/arm/asm/setup.h
-> +++ b/lib/arm/asm/setup.h
-> @@ -28,6 +28,12 @@ void setup(const void *fdt, phys_addr_t freemem_start);
->  
->  #include <efi.h>
->  
-> +#ifdef __aarch64__
-> +void setup_efi_sctlr(void);
-> +#else
-> +static inline void setup_efi_sctlr(void) {}
-> +#endif
-> +
->  efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
->  
->  #endif
-> diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> index 67b5db07..0aaa1d3a 100644
-> --- a/lib/arm/setup.c
-> +++ b/lib/arm/setup.c
-> @@ -349,6 +349,9 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
->  {
->  	efi_status_t status;
->  
-> +
-spurious line
-> +	setup_efi_sctlr();
-> +
->  	exceptions_init();
->  
->  	memregions_init(arm_mem_regions, NR_MEM_REGIONS);
-> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> index eb93fd7c..edc0ad87 100644
-> --- a/lib/arm64/processor.c
-> +++ b/lib/arm64/processor.c
-> @@ -8,6 +8,7 @@
->  #include <libcflat.h>
->  #include <asm/ptrace.h>
->  #include <asm/processor.h>
-> +#include <asm/setup.h>
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 014c9c7b..79b93dd4 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -15,6 +15,46 @@
 >  #include <asm/thread_info.h>
+>  #include <asm/sysreg.h>
 >  
->  static const char *vector_names[] = {
-> @@ -271,3 +272,14 @@ bool __mmu_enabled(void)
->  {
->  	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
->  }
+> +.macro init_el, tmp
+
+init_el2? but also likely to fall back to EL1. At least add a doc comment to explain what the function does.
+
+> +	mrs	\tmp, CurrentEL
+> +	cmp	\tmp, CurrentEL_EL2
+> +	b.ne	1f
+> +	/* EL2 setup */
+> +	mrs	\tmp, mpidr_el1
+> +	msr	vmpidr_el2, \tmp
+> +	mrs	\tmp, midr_el1
+> +	msr	vpidr_el2, \tmp
+> +	/* clear trap registers */
+clear FGT registers if FGT feature supported
+> +	mrs	\tmp, id_aa64mmfr0_el1
+> +	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
+> +	cbz	\tmp, .Lskip_fgt_\@
+> +	mov	\tmp, #0
+> +	msr_s	SYS_HFGRTR_EL2, \tmp
+> +	msr_s	SYS_HFGWTR_EL2, \tmp
+> +	msr_s	SYS_HFGITR_EL2, \tmp
+> +	mrs	\tmp, id_aa64mmfr0_el1
+> +	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
+> +	cmp	\tmp, #ID_AA64MMFR0_EL1_FGT_FGT2
+> +	bne	.Lskip_fgt_\@
+> +	mov	\tmp, #0
+> +	msr_s	SYS_HFGRTR2_EL2, \tmp
+> +	msr_s	SYS_HFGWTR2_EL2, \tmp
+> +	msr_s	SYS_HFGITR2_EL2, \tmp
+> +.Lskip_fgt_\@:
+> +	mov	\tmp, #0
+> +	msr	cptr_el2, \tmp
+> +	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
+> +	msr	hcr_el2, \tmp
+> +	mov	\tmp, PSR_MODE_EL1t
+> +	msr	spsr_el2, \tmp
+> +	adrp	\tmp, 1f
+> +	add	\tmp, \tmp, :lo12:1f
+> +	msr	elr_el2, \tmp
+> +	eret
+> +1:
+> +.endm
+
+I read in the coverletter you chose to not reuse include/asm/el2_setup.h
+which indeed would look overkill given the reduced scope that we target
+here. However compared to init_el2_state we seem to do very few things
+in the EL2 setup before switching to EL1. I would give a bit more info
+in the commit msg about what you keep and what you dropped and why it is
+reasonable (stage2, timers, debug at least).
+
 > +
-> +#ifdef CONFIG_EFI
 > +
-> +void setup_efi_sctlr(void)
-> +{
-> +	// EFI exits boot services with SCTLR_ELx.M=1, so keep
-> +	// the MMU enabled.
-I don't really understand the comment, if MMU was enabled why are we
-mandated to set M bit again?
+>  #ifdef CONFIG_EFI
+>  #include "efi/crt0-efi-aarch64.S"
+>  #else
+> @@ -56,15 +96,15 @@ start:
+>  	add     x6, x6, :lo12:reloc_end
+>  1:
+>  	cmp	x5, x6
+> -	b.hs	1f
+> +	b.hs	reloc_done
+>  	ldr	x7, [x5]			// r_offset
+>  	ldr	x8, [x5, #16]			// r_addend
+>  	add	x8, x8, x4			// val = base + r_addend
+>  	str	x8, [x4, x7]			// base[r_offset] = val
+>  	add	x5, x5, #24
+>  	b	1b
+> -
+> -1:
+> +reloc_done:
+> +	init_el x4
+>  	/* zero BSS */
+>  	adrp	x4, bss
+>  	add	x4, x4, :lo12:bss
+> @@ -185,6 +225,7 @@ get_mmu_off:
+>  
+>  .globl secondary_entry
+>  secondary_entry:
+> +	init_el x0
+>  	/* enable FP/ASIMD and SVE */
+>  	mov	x0, #(3 << 20)
+>  	orr	x0, x0, #(3 << 16)
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index e537bb46..ed776716 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -77,6 +77,9 @@ asm(
+>  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+>  #define ID_AA64PFR1_EL1_MTE_SHIFT	8
+>  
+> +#define ID_AA64MMFR0_EL1_FGT_SHIFT	56
+> +#define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
+> +
+>  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+>  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+>  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> @@ -113,6 +116,17 @@ asm(
+>  #define SCTLR_EL1_TCF0_SHIFT	38
+>  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+>  
+> +#define HCR_EL2_RW		_BITULL(31)
+> +
+> +#define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
+
+I don't really understand the renaming
+
+> +
+> +#define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
+> +#define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
+> +#define SYS_HFGITR_EL2		sys_reg(3, 4, 1, 1, 6)
+> +#define SYS_HFGRTR2_EL2		sys_reg(3, 4, 3, 1, 2)
+> +#define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
+> +#define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
+> +
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+>  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+>  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+Thanks
 
 Eric
-> +	write_sysreg(INIT_SCTLR_EL1_MMU_OFF | SCTLR_EL1_M, sctlr_el1);
-> +}
-> +
-> +#endif
 
