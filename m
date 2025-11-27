@@ -1,63 +1,66 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB70131C58A
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 12:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DEC32C30D
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 12:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246134; cv=none; b=XC3yt4PpPGffLQ83AwQxhMK8VH7pi7Cr0hC1sEh8ixtaHROr+Fib4FcMMpSSlqroRzR58meFvBmFcBbrjiWQBNrp3VUt8QmH0gVTxJ1/n5AJvlCCN5TgniytOY/WCtSCkwN0xK9TZ0dx8379nPVUpeCr06OdP/5KNKQLkxCFlSk=
+	t=1764246135; cv=none; b=BDeQGlfqhzUrwHPlPrc0yBgGV+35Owm91Uj/6VzkdXCzvcC+AY4PR1qDblu344NeZefPeZ1sfcP3fsmsYZt2vQc24/Az7bSrg9VK1R1f+w3hroKTQfb74BEMo5nQsy2i5tyOfKWBtxP4kEcsxy3PLS80uoT4nHSqueVxaAqkaj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246134; c=relaxed/simple;
-	bh=I+XyZrDML5GYyRBQ+9H0cPwa/UYQ11eKVhIpq8ixLAI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ni221nOuYTBpnsJ5kyp6hcGppkfXEJrmdACIuJGS0w9HCWQYckSR+9l6n/E3GhDkoyNW8pCr04AGs25ER3doFxofvNoRlA5Tq8GsoXK6YJcfrtZgM5AgVK9qXLHWhQVSGRIfIEqJZumAB9OkfyoxxsjmkWi1SbrlQ3h0gXlLFfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uyRf9gS8; arc=none smtp.client-ip=209.85.221.73
+	s=arc-20240116; t=1764246135; c=relaxed/simple;
+	bh=itVBDoMNcgUwq55xeET6AAi7RpUmXVS9MJk8QhRvEEo=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=foWWpCO6/Tx5Y0Ep/X3l6i+tcrPfq33P8ps/BU/tJS9bxuNVgQ4QgR0RYlLUXOai315D5DtVp/QKvEVWF65o+LnciQPiK6brEKDtdhknoyBqscppZVDIBwlCJG+wK8fy7FrwexjGgi+UiQ/I/ang4CrcRjIG4UNm2Fc6gchzzok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rl/9TLmi; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uyRf9gS8"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-42b3339cab7so651871f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 04:22:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rl/9TLmi"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-477cabba65dso4564815e9.2
+        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 04:22:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764246131; x=1764850931; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GVwrAr1o2bOF3/BWCpSgvLRZ2BQlyKlslZCDEV//lbY=;
-        b=uyRf9gS8HTpSzKCuHKrB2fPbgXPx199oChwCnTL91qR7TUGLEOlm7ZjjltJPSTj4yo
-         20AfKe+I9i5czYC2aukHYc9/DvKs8aM6MrpUJp5Zg47SLwVCdIrFfFwZ8uXGRxfjUrOJ
-         y7uVMcsQsLc4HvhQm24l8k89iu8eEVawPVqCtKq5+xroOTxJjlX8cOEtAk/WWOCqcGU7
-         2ob4sCrIhlUDw5k3irqhNcfN03L3Ph2OVBDvd0Vhcb4ARSPLKGKcJ2wrZWywoftOP6mn
-         BlH+Z9g4idJjU7mcHd5oIUrhAqfnNqwmdoE9i37wdWsNZ71MmabbSaw2N+rwe05thdem
-         mJcA==
+        d=google.com; s=20230601; t=1764246132; x=1764850932; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0jYlXOcQHb39hyc/5eDnef2js3ze9FVOX5U4DjiM3A=;
+        b=Rl/9TLmi/nusvFSrOZKI3tLORVz6+Kb1g7cYkvFtAfqu8UnpbSqSpXMzSg7XmNE/gg
+         jlvBceTPGcGYxlzi5TqLbaIm6meUyDlmef3dYxZisove5tZNZsiZzWgkrLjgHCScyjlw
+         H6Qmys9bf9yTG3dN3jOVoznXay88EpPkWbC3I43nwGPZHxP4xSduGyhL/hHgAiOm5FRe
+         u+i2DWRPI5m7RHEQUtAV5wccW5OzgR6LPjh/gBQp/BxdZeJ5xQdOcLAhB0N9872EJyqu
+         fImnQlpfwSXrmLowODDIYLIiTzdFkSv16bs88FjhvqIh5C5D5tH2AJcmH3BT9k8VX9TJ
+         7keg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764246131; x=1764850931;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GVwrAr1o2bOF3/BWCpSgvLRZ2BQlyKlslZCDEV//lbY=;
-        b=Pzh7DqrJ1aC9asHDivGxjyDEdghOw5ro70Othenm60i4Q96g7gzVvnRjFZL/B2EDPS
-         KDrQwTL2NYAGmIwsa3yku3CEkJBKfLN9lLmpQuj05snrpd2xBsQNw5/oWkZPxcvLL5Ea
-         w0u/wQw+NOaIObJDBHboRDT6u8CBiodkEqAThCGXCbUROvsI0f+gg8hc3ebgVDzayXQG
-         Smeerj8E0spqN7PHpSiiz1o7eCDdF3KYStfI2O9s07u7NMkqHI0zdGf/7KJ8V/SvryZ3
-         YhDr2WxECBWONd9rlqTvwteCCQ3s4v+mjFn0LeUnVkhxf7IwWHlI013l0C5/mZ79Axaj
-         p3fQ==
-X-Gm-Message-State: AOJu0YxaRbPZhw6YFx+WHLaum/3tSBeyqpnFgq+9G8aH3b6vr2p5Z2fU
-	77rfVrZZqs/AZaQYvZ0IB68oHH8gi7fBz5ThcaXgNyrFsvQ8UAmqchRUiHr6Bl54cDSo14RljPt
-	cC40pb/rmuZRU6X8EJ2CF603RlgtcJumTzYAjloSNi2asXFl3QzhKgZji9MzOtGx5YoujgEtetp
-	t/LLwneX1oh/GsAdanWHs1h0ozleEUX6k=
-X-Google-Smtp-Source: AGHT+IGc06Ksqz3q4KmChSDnqiNh6zGUCebNu9RwNyylVq1cMFdJSKjWUp6H3EkpXI5zoXsi+pYNq3SHSQ==
-X-Received: from wmlm20.prod.google.com ([2002:a7b:ca54:0:b0:477:9aa2:7d50])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b96:b0:477:5c58:3d42
- with SMTP id 5b1f17b1804b1-47904ad907amr115795665e9.10.1764246131094; Thu, 27
- Nov 2025 04:22:11 -0800 (PST)
-Date: Thu, 27 Nov 2025 12:22:05 +0000
+        d=1e100.net; s=20230601; t=1764246132; x=1764850932;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q0jYlXOcQHb39hyc/5eDnef2js3ze9FVOX5U4DjiM3A=;
+        b=Jf/kRQcs9sPwoQA/shJovqWKpO6PR4PNw2E9KBBLOnxPCITikad+yvqGtU/ftwj3n5
+         CFUR6uGq9lfyjhAofSk4PVgcUU+qkipSAB7KA0vMQCUMsoH7eCqbYKbv7SzY1wko8LDu
+         zIxL7waui6xJjqxNCVa1SvjV8/R5PqJWafYYdmuWyW6sNHKGEYHp1Kp2mF3MtAlYNKGT
+         SibKY/aCbkXzjdMKzAhfSbPylnRjQNFL979qRZ6A9drUsJ+o7J23NuYTaB9yqXLCLsTG
+         zKkd6enaisnXGLfqPHDOFSanbFrLsr9lp46hQDIQguqj2o2Os3yJZDZ3OxPSu7LKZDzB
+         4oiA==
+X-Gm-Message-State: AOJu0Yzn985ItKwQW1sCzXR84wLf8OpMGHtE7y4hi5GaZEsJzlJzeaA5
+	M1lQYA8bWQJgabf4cweTiXvtowWIwnp0tFcv5n3IgXtBODJ/fk3wAOIWtXm+//CJZ4cpaGbLfhl
+	w6FQ2ih9bOYnZiQ90LkGgzQ0EmLzUXE50/TOQLbfGPDIpUciQk6qUh8ku4vLy8IuJkkfIGyO8/n
+	T2unLDm3sa+7lFkxTcJ8K6FtDxDoUIeNk=
+X-Google-Smtp-Source: AGHT+IG376eJWHhEDDHEut4Z6VQk8yE45YwYK/zkOvNfOcdPu+aYheXH5kexSijNSsoOI07uy/ilOytz6A==
+X-Received: from wmcn11.prod.google.com ([2002:a05:600c:c0cb:b0:477:7a96:c9e1])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:1ca0:b0:477:75eb:a643
+ with SMTP id 5b1f17b1804b1-477c0165b4emr275207485e9.4.1764246132246; Thu, 27
+ Nov 2025 04:22:12 -0800 (PST)
+Date: Thu, 27 Nov 2025 12:22:06 +0000
+In-Reply-To: <20251127122210.4111702-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20251127122210.4111702-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
-Message-ID: <20251127122210.4111702-1-tabba@google.com>
-Subject: [PATCH v1 0/5] KVM: arm64: Enforce MTE disablement at EL2
+Message-ID: <20251127122210.4111702-2-tabba@google.com>
+Subject: [PATCH v1 1/5] arm64: Remove dead code resetting HCR_EL2 for pKVM
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
@@ -65,62 +68,40 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-pKVM never exposes MTE to protected guests (pVM), but we must also
-ensure a malicious host cannot use MTE to attack the hypervisor or a
-pVM.
+The pKVM lifecycle does not support tearing down the hypervisor and
+returning to the hyp stub once initialized. The transition to protected
+mode is one-way.
 
-If MTE is supported by the hardware (and is enabled at EL3), it remains
-available to lower exception levels by default. Disabling it in the host
-kernel (e.g., via 'arm64.nomte') only stops the kernel from advertising
-the feature; it does not physically disable MTE in the hardware.
+Consequently, the code path in hyp-init.S responsible for resetting
+EL2 registers (triggered by kexec or hibernation) is unreachable in
+protected mode.
 
-In this scenario, a malicious host could still access tags in pages
-donated to a guest using MTE instructions (e.g., STG and LDG), bypassing
-the kernel's configuration.
+Remove the dead code handling HCR_EL2 reset for
+ARM64_KVM_PROTECTED_MODE.
 
-To prevent this, explicitly disable MTE at EL2 (by clearing HCR_EL2.ATA)
-when the host has MTE disabled. This causes any MTE instruction usage to
-generate a Data Abort (trap) to the hypervisor.
+No functional change intended.
 
-Additionally, to faithfully mimic hardware that does not support MTE,
-trap accesses to MTE system registers (e.g., GCR_EL1) and inject an
-Undefined Instruction exception back to the host.
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S | 5 -----
+ 1 file changed, 5 deletions(-)
 
-This logic is applied in all non-VHE modes. For non-protected modes,
-this remains beneficial as it prevents unpredictable behavior caused by
-accessing allocation tags when the system considers them disabled.
-
-Note that this ties into my other outgoing patch series [1], which also
-has some MTE-related fixes, but is not dependent on it.
-
-Based on Linux 6.18-rc7
-
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20251118103807.707500-1-tabba@google.com/
-
-Fuad Tabba (4):
-  arm64: Remove dead code resetting HCR_EL2 for pKVM
-  arm64: Clear HCR_EL2.ATA when MTE is not supported or disabled
-  arm64: Inject UNDEF when accessing MTE sysregs with MTE disabled
-  KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
-
-Quentin Perret (1):
-  KVM: arm64: Refactor enter_exception64()
-
- arch/arm64/include/asm/kvm_arm.h     |   2 +-
- arch/arm64/include/asm/kvm_emulate.h |   5 ++
- arch/arm64/kernel/head.S             |   2 +-
- arch/arm64/kvm/arm.c                 |   4 ++
- arch/arm64/kvm/hyp/exception.c       | 100 ++++++++++++++++-----------
- arch/arm64/kvm/hyp/nvhe/hyp-init.S   |   5 --
- arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  44 ++++++++++++
- arch/arm64/kvm/hyp/nvhe/pkvm.c       |   2 +-
- 8 files changed, 114 insertions(+), 50 deletions(-)
-
-
-base-commit: ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index aada42522e7b..0d42eedc7167 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -260,11 +260,6 @@ reset:
+ 	msr	sctlr_el2, x5
+ 	isb
+ 
+-alternative_if ARM64_KVM_PROTECTED_MODE
+-	mov_q	x5, HCR_HOST_NVHE_FLAGS
+-	msr_hcr_el2 x5
+-alternative_else_nop_endif
+-
+ 	/* Install stub vectors */
+ 	adr_l	x5, __hyp_stub_vectors
+ 	msr	vbar_el2, x5
 -- 
 2.52.0.487.g5c8c507ade-goog
 
