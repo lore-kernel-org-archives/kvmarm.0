@@ -1,41 +1,41 @@
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780E127A45C
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 05:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A84276050
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 05:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764222777; cv=none; b=kHoB5Sd8x4PJ2GwizILMNF+SY1iFllSKiftcNQaTaMIdaH1Ozd7AgpkWVUXnZwgxlPDuy8glDFU+WOPNE/eptX8UHmkxkkrel5NsFjh0Ci6fP+NhNazKOsOPFjYOsC9Pkf0zvsHdDpUB+IAehod4uWgXSuEHuAECgDRumyX/JdQ=
+	t=1764223058; cv=none; b=dZS7kPj28ObTUKuJWsu4zncBbNrfHiW0gDsh/w3Tt75HhK/0sZc7DZW+zsNGWgp+N4ARjD7XA+WuNXvrEBH2vwYUHptVIkKPnHTftDqnp8qlEa0i6bixLZ3OBGLU66pD7YJDHqxjjeljrDxEpU8LqOrCfIBsES6SQkcJaBO9WyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764222777; c=relaxed/simple;
-	bh=ISAFkZ0HmitTgmmDConEYXzcz7D+u6fWEkB3O+gmCY0=;
+	s=arc-20240116; t=1764223058; c=relaxed/simple;
+	bh=5r9eZwZ6KTr5agpykZihNFQhd97KIwo36+xrKGwxqpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TguQh7cInCBYnqim1zL9ErfSLr5WxXOCyKKM7vGWaJ/zhq/aggOi0/h39u8YteKmOQBtsUmY9qsS7DdGthHrgxRzQl7Ho9lQomErny2XRHPisOuWvUxw3mTa8J+fMSVH1c0MK0mkwuakaslicVV3i71ZbHcQVd+yEB8cyhX9+Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HGkNCLD3; arc=none smtp.client-ip=115.124.30.99
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hpz+O+pWsB4yTRDt5/CxVJGrZEGFaQwdCNTwcmGS5Xugpf55PBUATcDcxqzpSbJVtIN+Rzv+Hz4bRqFdT3dDkLIDcnmvZkrYyY7eGfSafzbjH5bELTr1dssbWCk/5CxkFDyVGSnLx/7DxrkaNg2ebn49+NaTJgo/oua/wRQgi2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=XgfgsGm0; arc=none smtp.client-ip=115.124.30.112
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HGkNCLD3"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="XgfgsGm0"
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1764222764; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=8n0RK31A+ec3zN8vE8zvo+3qlTZfSr6qORtM7xzltbs=;
-	b=HGkNCLD3LPQ5CZf0cKx3a5ucoQrgHAF4bgPZ1MCS5+Pt48TuPJML98cpgIsXFVZ8El+qbCW7dYkgeIwQ+NGDj7kehDmHBptCYRs8mxBM6HEdfOudS1cCLLyTk0abDWI0fNKe0NpnX5SoYj94bLg7yotEdIbtcMuMs8Q/lqMWmcc=
-Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WtW0l1z_1764222762 cluster:ay36)
+	t=1764223045; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=4QKv6ZOvX2SBICDdmwi+E+eWq1SX0cudMyw17vPaerg=;
+	b=XgfgsGm0CRSvGFqDKUjo/SPiX0SmdXhP2iZexrOJVSN3r8GJgZT7Td0cuy8QBHiH6OQlWp4o+8q7UIDWo0qh6rmDmUUulmGg7c65Bplebq2+8339+UsVNw+WoVPEIDSdrD4aXn0MDlIKYNlc77beukkpwEiNa7/7uHGGi7Lj+KM=
+Received: from localhost(mailfrom:yaoyuan@linux.alibaba.com fp:SMTPD_---0WtVwrDT_1764223044 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Thu, 27 Nov 2025 13:52:43 +0800
-Date: Thu, 27 Nov 2025 13:52:42 +0800
+          Thu, 27 Nov 2025 13:57:24 +0800
+Date: Thu, 27 Nov 2025 13:57:24 +0800
 From: Yao Yuan <yaoyuan@linux.alibaba.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
 	Zenghui Yu <yuzenghui@huawei.com>, Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Force trap of GMID_EL1 when the guest
- doesn't have MTE
-Message-ID: <itxexyotztmtvuvcbs4wjcdod3tfpufqe5t2gmz6vyky3vtihs@a3atxxjadgfq>
+Subject: Re: [PATCH v2 3/5] KVM: arm64: Add a generic synchronous exception
+ injection primitive
+Message-ID: <5f65l5sg5xxxzoh3uuqixwqrvkuwfvaqhkz2u4mme2jw2rcfzq@oq4lhswlquxt>
 References: <20251126155951.1146317-1-maz@kernel.org>
- <20251126155951.1146317-3-maz@kernel.org>
+ <20251126155951.1146317-4-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,36 +44,72 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251126155951.1146317-3-maz@kernel.org>
+In-Reply-To: <20251126155951.1146317-4-maz@kernel.org>
+
+On Wed, Nov 26, 2025 at 03:59:49PM +0800, Marc Zyngier wrote:
+> Maybe in a surprising way, we don't currently have a generic way
+> to inject a synchronous exception at the EL the vcpu is currently
+> running at.
 
 Hi Marc,
 
-On Wed, Nov 26, 2025 at 03:59:48PM +0800, Marc Zyngier wrote:
-> If our host has MTE, but the guest doesn't, make sure we set HCR_EL2.TID5
-> to force GMID_EL1 being trapped.
->
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9e4c46fbfd802..2ca6862e935b5 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -5561,6 +5561,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
->
->  	if (kvm_has_mte(vcpu->kvm))
->  		vcpu->arch.hcr_el2 |= HCR_ATA;
-> +	else if (id_aa64pfr1_mte(read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1)))
-> +		vcpu->arch.hcr_el2 |= HCR_TID5;
+Thanks for bring this in generic way.
 
 Reviewed-by: Yuan Yao <yaoyuan@linux.alibaba.com>
 
 >
+> Extract such primitive from the UNDEF injection code.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  1 +
+>  arch/arm64/kvm/inject_fault.c        | 10 +++++++---
+>  2 files changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c9eab316398e2..df20d47f0d256 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -45,6 +45,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+>  void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+>
+>  void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+> +void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr);
+>  int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+>  int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
+>  void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index dfcd66c655179..7102424a3fa5e 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -162,12 +162,16 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+>  	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+>  }
+>
+> +void kvm_inject_sync(struct kvm_vcpu *vcpu, u64 esr)
+> +{
+> +	pend_sync_exception(vcpu);
+> +	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> +}
+> +
+>  static void inject_undef64(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
+>
+> -	pend_sync_exception(vcpu);
+> -
 >  	/*
->  	 * In the absence of FGT, we cannot independently trap TLBI
+>  	 * Build an unknown exception, depending on the instruction
+>  	 * set.
+> @@ -175,7 +179,7 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+>  	if (kvm_vcpu_trap_il_is32bit(vcpu))
+>  		esr |= ESR_ELx_IL;
+>
+> -	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
+> +	kvm_inject_sync(vcpu, esr);
+>  }
+>
+>  #define DFSR_FSC_EXTABT_LPAE	0x10
 > --
 > 2.47.3
 >
