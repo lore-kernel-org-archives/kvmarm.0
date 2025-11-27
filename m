@@ -1,126 +1,170 @@
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF53632AAC4
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 15:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90247241679
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 15:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764256025; cv=none; b=n7LmDBBAGnvmwBPl/nQ8CsF75nbfExqYbJ5yS3gaFfFt6o51J8NDoTSTbmhvc9USgLowLcE9javLbgXeCS8YyWkIQ++s/dFG9n9NW+RwPtWzxRg9g2yaPpcnVqKmBdFUUiLzP9c2nPb3kvjcZQkG/82J9fLAgWX7j7g3JExPq70=
+	t=1764257196; cv=none; b=axTbMB4anElUKh/d7OlI8q1oBmXeTCdXDfjWnwXSKUxqxekBt95kanbMNzlX27yDPD7agrJEi7wUhs46s2uIaOPMeXG5h82HuK2Ai+xJAN+IW5S6L4aU7H3VJnTUYmeEnp+Udw7em/ouALlcv5j5qrBfOVMEIYEpgnd8f9oGlEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764256025; c=relaxed/simple;
-	bh=O3Jl0TedBRVRfVhZgOJdrLKqQHfxK+5HmiN/P10lDXE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aFkJpw3HGDo1UJAygotll0ELG1syRrWC4endvA5l4l33W+sQc6idwaU0L91avvdv1hHi1vHPBkuF94UKLeOH0KnRNLdHEO4pXh3IRlHrxTcVzq0yO1VWBTRvqVM3Mjcs+oBSfscDI6ATsv/R2hP3A0c/d2OoMntDwsKIZAjYhyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WAd70L0o; arc=none smtp.client-ip=74.125.224.49
+	s=arc-20240116; t=1764257196; c=relaxed/simple;
+	bh=q5MQgk6x2w8quyp4nLV8UziXwgEbHHC3uNAf2WnDGkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NSZKCUQfx4PnGf1DG1Md8dKb9bScyXNhKbaN8Wc+654cU85cKZC5OpDykhmRc3xeG97MfA9yDkc7TGOuhUogvRmXBj2lFBqJQlgi7pil8abEdW0nFLRxVNkAPnTOGbuaBizpq/vrUy95sgCn50CpCXmZw1VjBOwAQnMFQJUuDBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pXDCCVol; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WAd70L0o"
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-6430834244aso725824d50.2
-        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 07:07:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pXDCCVol"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so9235805e9.3
+        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 07:26:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1764256023; x=1764860823; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9j9JckZewB0T/evvAwAYflbY/oMjYUWYlwvg8R/JAM=;
-        b=WAd70L0oPj9dbUOPKJ2EoY4rYCNTSBmilcWc4c4fWP4F7rtUfkAi+doPHoQ/JxXtwW
-         toofWb2CaP9NB+GHYK2aiq0MB7CPvz9aMermWRykbuvCHdsL4WZRQxVawWm9wAy6pOqL
-         37oKGxbqWC4skmypI69m4b5dtcMBcrS8lyiskPdmUbXIFn/KDikspGjfeQTR1sQGHQwg
-         MCOF5r2H9mfvoP3zRbKd52YI1MM+ol21emDh3ppVUyQj6B5E6pBw/L5jkCYE0BDKS088
-         PrDMV3/95x1YceC5tn6X8X5i7pzz6O5wN0oc/nk/jjo8nlUoBtBjS8DBePx7r7BdJFhI
-         /6iQ==
+        d=linaro.org; s=google; t=1764257193; x=1764861993; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U9Sd2Vih8qCT8Sm8DHyp6voQA1fNVa6aZXqM7Jub6wE=;
+        b=pXDCCVol7aWQk8RT+ryT/aoKT/feGK+wddZjt1VelkCgqLQZC8cQD45zau4LoMUz4l
+         w+O6bkH/QZYjq/p/8TbUKFPoLJCpCfCeCydgRjfEqrCZEHN3xAhA7ngrr9VE7TL+pmn4
+         SFnIwtSZoTJ22ktGnN8JZUSUik7dahCybYZbk8MVucG9pT0fnqgcOjigsM8ZKAAY3VYw
+         5ash2lf0PSZaf41yPKcGm3gBn2A5GNO1croZzYy2pEpYotwnE/w8y0UxV1ZHCt/hzNFD
+         QpyIsX/70bghjrGNoWZK2t6nSWBr9am81SbYIentmKlDcCpy2EyXhisEpVMuauoNa87G
+         0uNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764256023; x=1764860823;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o9j9JckZewB0T/evvAwAYflbY/oMjYUWYlwvg8R/JAM=;
-        b=nExzI7mabLlj4ehzgNUzo85Uq41PH56dAUADn3ssZB47bfqwJ0W9pRyVI9KaSHoDQG
-         D2oZcFWyuaHYzVcwnYvA35DBGHeQNA5dQ4Qp4AZ5816w2+MEeIp+Cw18wCFyjEJg3XlF
-         ZhO8Vw9wDo3XGJTKzd/YnijcfcG3mkAyo1QC89AqmiQxrirgXmer2XVTonJj0glJSz9U
-         wN7sDCfv7vto7deMUWtTYyR6gr9/0+O0d6hBDX8RAGMlUlGIWYuQsxUVmVmST/7XzNtV
-         3Th6xngoEY6cUwehM8Va1XzdFcS4DwU/ILDwO91VHel1aObwbsKBXG2LKLIE6L6BaWDd
-         8I6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVx+pUo20GJwZ1C6HDJpuHRux0uGl347Vt40+xDXhTapXK6LYQ27/g67eHh3VfYS30aJmlM2bo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxUC4Q6nxie2bQcOSyjWqxVBmSSKgW3ce9AaZ85qGWOseK1yNwQ
-	gJcUHDwUNIFcWiv6bi0umgnLEywR9w9OhHgRGsEu0fxgc8sCDXA8xjRBwexIsMEZaY9zldHqfaP
-	I0jwnkFYQXZIbKvGl66kmsQiM/I4Qs1YS5/fxjZSzfg==
-X-Gm-Gg: ASbGncuHp+cxe3NohPOF78PhC7jeZbvvNhx3ODubUv89Su0+PpHqW1oDO5KDMbl18zq
-	+LVWxizyW9S+43D5MXLzF8Jpv41RjCetxtrvQ4RBV1Q3z5EVBfhE+CHsh+5L5CsbBewZpGH58Im
-	xIC/Bc5MlpIZtmbmmWjTym1QQZAo74z4tvamlK/q2u8Qsj0roSAq7FP1QHa9VQCwCNVajyedLjb
-	4zq7ijPM1CEyayK5pKS0Oh8GtG2AQ3ymL3OnLjuPA4tcjDqbXA/xWe9RCB40RziCAVfMMFr
-X-Google-Smtp-Source: AGHT+IHOZv1XVUaCpJ1GafgJ+Q4ufaODDINZzVe7OUjEEvUjTH0ObsXn/Gn7AJqtRSZdFMpWXb50BEdfVotDE3qezIw=
-X-Received: by 2002:a05:690e:1581:10b0:641:f5bc:68d3 with SMTP id
- 956f58d0204a3-6432940d24amr6552660d50.80.1764256022644; Thu, 27 Nov 2025
- 07:07:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764257193; x=1764861993;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U9Sd2Vih8qCT8Sm8DHyp6voQA1fNVa6aZXqM7Jub6wE=;
+        b=X1SLhF7IKQbIjmDRFO2srTdP+TRYlceE2z+EBO8h/NtSg7uwm6Qo5G6ySRfyhFVuks
+         /MolI4NM9CT27fbFETbDCvLKD76vptgO3pyeKembS4NkjrcC0POVD5RVo3oqly7s4HMd
+         3QZh+kSPFGIhWP7akb5AnlpD7GeJ9l8n1BjX5Lm1kX2fkEstPEnRqcXHoF7ffHtudU7P
+         viQA9HTrTa8UojmCtjlSgI8zVnNCagK0ZMi/ZmiifGXDXv3CV9xqNEIAkovDfK/fjx44
+         os94ixW+8dxrA99hsvv+pszZTOP7M4/fxIaVrtJVjMT/g7yTkKEpH75TtjvuhiL/TAzK
+         l11A==
+X-Gm-Message-State: AOJu0YynoKJDzMP7OYHF4LTR2McxKLsP0Ptv0TxxO4QAZ+NmjtsF0N9m
+	V7TVfdbtZk8Ya8NaC91LM80ocegjOAyC/16ONDhDEg86tYuuQqAb2fQzwbDRm6XNVIU=
+X-Gm-Gg: ASbGncsFp0Wj7zY6g27sVTpanRCibAbj4B5GzpCYB4E/8WDql8fFq2Optip0F9Y28ST
+	mDygACHt2JIVcuQuYX6aOutHgMwnpyE4WqNQJVVud2m83Ix4sojk9Af4OZqrICTJJwMzWH7PMfZ
+	LxecCTqTUn738bTt3+L/kT2Sh5iAon4XtheoBEeDzjgFTuz50FqBJkS9D1ygargoEegk7je617b
+	7kR0e1J/yXCkXwn33s523QOnDVvIChlpmeQ9KLhFyMZdJc59WonZAS+Jo8HlmZmjFskTI1+qMOU
+	VdXquBuyuQ4T3m5dFFMXliREmUWcxB2xUceDV7YpC1VxT22NN1Jfh9BqWvTlEKMZqYeYdXIzVdj
+	eNQjBfYuHSXLuYD8/r3k7a/E2mlzGaElSl6WeXVUWN4TATSe072F7k/kDwOAdE8dBUcKfEd9BAy
+	ZzFtRzY0BgUgYrX7bBXB3akTE6x9Q=
+X-Google-Smtp-Source: AGHT+IFE9u2XY1HoDD/zsyLLeGS8NDSHbZP5RWiZbNOjKUta7mf7Tb07oyyYOwPyJfOjFkNhODLj5g==
+X-Received: by 2002:a05:600c:35cf:b0:46e:4a13:e6c6 with SMTP id 5b1f17b1804b1-477c114476fmr266244525e9.19.1764257192799;
+        Thu, 27 Nov 2025 07:26:32 -0800 (PST)
+Received: from [192.168.1.3] ([185.48.77.170])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d607csm4470702f8f.15.2025.11.27.07.26.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Nov 2025 07:26:32 -0800 (PST)
+Message-ID: <7f1c187b-0f94-49c5-b4c9-2f414ab0ac8a@linaro.org>
+Date: Thu, 27 Nov 2025 15:26:31 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
- <20250902-kvm-arm64-sme-v8-11-2cb2199c656c@kernel.org> <CAFEAcA_GJ7gzn7aMCZYxHnJWvx4tHSHBKsOxtQ7NTb4gPjkMJQ@mail.gmail.com>
- <df712591-397e-422b-b9c9-fbf080cad9aa@sirena.org.uk>
-In-Reply-To: <df712591-397e-422b-b9c9-fbf080cad9aa@sirena.org.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Nov 2025 15:06:50 +0000
-X-Gm-Features: AWmQ_blQNCtlqrFl6oR-29ayIeVzxjSMrcpdxqL32ABrh38kpa7m6Xz9ardxRBI
-Message-ID: <CAFEAcA8LGwm-6JEhtKTq1E_da-T=H-aBX9-8LMJOAQpK5J+NfQ@mail.gmail.com>
-Subject: Re: [PATCH v8 11/29] KVM: arm64: Document the KVM ABI for SME
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, 
-	Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>, 
-	Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/9] KVM: arm64: Fix Trace Buffer trap polarity for
+ protected VMs
+To: Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ vladimir.murzin@arm.com
+References: <20251118103807.707500-1-tabba@google.com>
+ <20251118103807.707500-3-tabba@google.com> <868qftqehe.wl-maz@kernel.org>
+ <CA+EHjTwHrLhdHrNSA8f-+bCZ1-QEuNocQQxeiaaost9oLwaG5A@mail.gmail.com>
+ <865xaxqal2.wl-maz@kernel.org>
+ <CA+EHjTxhOvu-733Z-gJgc6f_EAs-tksA6u5KuQZeimP6T6M-fQ@mail.gmail.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <CA+EHjTxhOvu-733Z-gJgc6f_EAs-tksA6u5KuQZeimP6T6M-fQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Nov 2025 at 20:13, Mark Brown <broonie@kernel.org> wrote:
->
-> On Mon, Nov 24, 2025 at 03:48:06PM +0000, Peter Maydell wrote:
-> > On Tue, 2 Sept 2025 at 12:45, Mark Brown <broonie@kernel.org> wrote:
->
-> > > SME, the Scalable Matrix Extension, is an arm64 extension which adds
-> > > support for matrix operations, with core concepts patterned after SVE.
->
-> > I haven't actually tried writing any code that uses this proposed
-> > ABI, but mostly it looks OK to me. I have a few nits below, but
-> > my main concern is the bits of text that say (or seem to say --
-> > maybe I'm misinterpreting them) that various parts of how userspace
-> > accesses the guest state (e.g. the fp regs) depend on the current
-> > state of the vcpu, rather than being only a function of how the
-> > vcpu was configured. That seems to me like it's unnecessarily awkward.
-> > (More detail below.)
->
-> That was deliberate and I agree it is awkward, it was introduced as a
-> result of earlier review comments.  I had originally implemented an ABI
-> where the VL for the vector registers was the maximum of the SVE and SME
-> VLs but the feedback was that the ABI should instead follow what the
-> architecture does with the vector length and potentially presence of the
-> vector registers depending on the current streaming mode configuration.
-> It sounds like you would prefer something more like what was there
-> originally?
 
-Yes, that's what I would prefer. The "varies by current CPU state"
-approach seems to me to be not the way we do things right now,
-and to be awkward for the VMM side, so it ought to have a really
-strong justification for why we need it.
 
-Generally the VMM doesn't care about the actual current state of the
-CPU, it just wants all the data (e.g. to send for migration). We don't
-make the current SVE accessors change based on what the current SVE
-vq length is or whether the guest has set the SVE enable bits -- we
-have "if the vcpu supports SVE at all, data is always accessed via
-the SVE accessors, and it's always the max_vq length, regardless of
-how the vcpu has set its current vq length".
+On 26/11/2025 11:48 am, Fuad Tabba wrote:
+> On Wed, 26 Nov 2025 at 11:47, Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> On Wed, 26 Nov 2025 10:37:57 +0000,
+>> Fuad Tabba <tabba@google.com> wrote:
+>>>
+>>> Hi Marc,
+>>>
+>>> On Wed, 26 Nov 2025 at 10:23, Marc Zyngier <maz@kernel.org> wrote:
+>>>>
+>>>> On Tue, 18 Nov 2025 10:37:59 +0000,
+>>>> Fuad Tabba <tabba@google.com> wrote:
+>>>>>
+>>>>> The E2TB bits in MDCR_EL2 control trapping of Trace Buffer system
+>>>>> register accesses. These accesses are trapped to EL2 when the bits are
+>>>>> clear.
+>>>>>
+>>>>> The trap initialization logic for protected VMs in pvm_init_traps_mdcr()
+>>>>> had the polarity inverted. When a guest did not support the Trace Buffer
+>>>>> feature, the code was setting E2TB. This incorrectly disabled the trap,
+>>>>> potentially allowing a protected guest to access registers for a feature
+>>>>> it was not given.
+>>>>>
+>>>>> Fix this by inverting the operation.
+>>>>>
+>>>>> Fixes: f50758260bff ("KVM: arm64: Group setting traps for protected VMs by control register")
+>>>>> Signed-off-by: Fuad Tabba <tabba@google.com>
+>>>>> ---
+>>>>>   arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
+>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+>>>>> index 8d06a246dfd1..f6f8996c4f97 100644
+>>>>> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+>>>>> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+>>>>> @@ -118,7 +118,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
+>>>>>                val |= MDCR_EL2_TTRF;
+>>>>>
+>>>>>        if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
+>>>>> -             val |= MDCR_EL2_E2TB_MASK;
+>>>>> +             val &= ~MDCR_EL2_E2TB_MASK;
+>>>>
+>>>> This does not only change the trapping logic (bit 24). It also change
+>>>> the ownership of the buffer (bit 25). I wonder whether you should do
+>>>> something for that, maybe by clearing TRBLIMITR_EL1.E, because
+>>>> otherwise, you keep tracing, but using an EL2 VA. What could possibly
+>>>> go wrong?
+>>>>
+>>>> Overall, I'm very uneasy about TRBE in the context of pKVM.
+>>>
+>>> So should we clear/restore TRBLIMITR_EL1.E on guest entry/exit in
+>>> protected mode?
+>>
+>> I think you need something of the sort, yes. Overall, SPE and TRBE
+>> should be aligned on what they are allowed to do, as they are two
+>> sides of the same ugly coin.
+> 
+> I'll fix this (or add a patch to do this, depending on how it looks)
+> when I respin.
+> 
+> Cheers,
+> /fuad
+> 
 
-What's the benefit of making the way KVM exposes the data
-bounce around based on the current CPU state? Does that
-make things easier for the kernel internally?
+To understand this, is it just belt-and-braces because you don't trust 
+the current filter clearing in TRFCR_EL1? And to reduce the potential 
+for mistakes leading to trace leakages? I suppose even the hardware 
+itself could have some errata where it tries to access the buffer, even 
+if we've completely filtered out trace and flushed before going into the 
+guest.
 
--- PMM
+Thanks
+James
+
+>>          M.
+>>
+>> --
+>> Without deviation from the norm, progress is not possible.
+> 
+
