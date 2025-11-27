@@ -1,74 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39F92E9729
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 10:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5DF315D5B
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 10:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764237894; cv=none; b=erOTqdvzK5mzhgheg+sscjNHI80pHjoTcST34byHx6DxSmLdTLRzvr7yvFvhGJp1GtCKUHIIW6gCwxVBWgfkC3naBUHxnQSLpqoU7sJqSG66FndSHR6zncmah/h+HgFMwQxp+JPS/m2IOopQ0BgXBxR5W2OdwjUIBoVLYdNz7nI=
+	t=1764239705; cv=none; b=mhU+iP+DxRDcYNITRLoRcH5ugTwN4hdLfPKsWUfOKbZH10CuRo21FrCVb6bASgszTJ5X4piPsEE0KuiG1q0i0xAEo6hgyBKnPPw6sVDj2qO0vCldt/Zln1W113Vhp869KJEacWKiiyA4B3fWnnPzQpC6z5dpiM8z0iXw8XuuQ04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764237894; c=relaxed/simple;
-	bh=W7PJmEg+ySd6bSUClx93pUrJNIPJakZuzB+lUeIQ6+c=;
+	s=arc-20240116; t=1764239705; c=relaxed/simple;
+	bh=DpiI8GgMDHD1LVQiscwaq9jAgParWgWZMDwjFqItjQY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PL3nKlWqFWXqktAaB+OtTcBexC7DOTBMnH/2Z8ofnX0Ga55jbIMYrL8ngLhlnTvB5uTHnp8CF49AiK7ko120lFCV/feHYS2/ql2jhYZtWQgJBYbsZrvDlqD7A0LIlV17yCGGOoILqBCvixjwbGPvzmusYjqMPPB3W0pait9Y+FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G9yAPMkC; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=RYxjBKkw3aCMXCQHsa1ylQE5094BewMQFU8y0+QS8rQoXbiQn4c9n09Aa8m4wa1h2KRJmM0nwBu4nSXp2F8PccfQHZTzu5inRs5mDI+XaIB/pWo8xvKaTWJ5fp2qTQajiLv7LkpQzeMmEZmCNC1D9Z307Aoragts+rP9/atIQV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxGZefJg; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9yAPMkC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxGZefJg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764237891;
+	s=mimecast20190719; t=1764239702;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QHU1dfEDnDJW+SngUG/WWslLp6yHfhX1XyYXZAm53gw=;
-	b=G9yAPMkCqZkGtiOUFvmphn6UZWuDidVxB0pk7FhFkgT8fICSOEmSa0zo0CaB00Cwe8AucJ
-	ON64mbC20FCfPPLWi5TYqSBKd+dL/z5vTZl/YnWMM+v7zL2sqRDKAYsAq6XHHEKbtQ/LZf
-	EVMicTIPwVopWQ+WTmV6LCEMV9lsR/g=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=tiBBX2HMY2n/AxbltWad/ANX3RKH0tf+SEsscaE7SL0=;
+	b=TxGZefJg0l9wxcHwI+W7ioFed2CQXLvf6ReDSu3dflMQAlz87bETyDZ/uwJ9pbeOnarEdg
+	ZCrii1UeTNKno/Oqn/Wq6Fy8cOFozboup6CyR4YN1B1uFY10HJt1KOruQpP5/03JnhLGSe
+	L0Um/gc/dHlkBN7NMu0VPT9CE3lGh28=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-670-fhjbfSnrPT6s6UYqy6QEkw-1; Thu, 27 Nov 2025 05:04:47 -0500
-X-MC-Unique: fhjbfSnrPT6s6UYqy6QEkw-1
-X-Mimecast-MFC-AGG-ID: fhjbfSnrPT6s6UYqy6QEkw_1764237886
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-88236bcdfc4so14296886d6.1
-        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 02:04:47 -0800 (PST)
+ us-mta-17-eFWQ2w_YMuaaIc9R19-4Xg-1; Thu, 27 Nov 2025 05:35:00 -0500
+X-MC-Unique: eFWQ2w_YMuaaIc9R19-4Xg-1
+X-Mimecast-MFC-AGG-ID: eFWQ2w_YMuaaIc9R19-4Xg_1764239700
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-8823a371984so9853496d6.1
+        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 02:35:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764237886; x=1764842686;
+        d=1e100.net; s=20230601; t=1764239700; x=1764844500;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QHU1dfEDnDJW+SngUG/WWslLp6yHfhX1XyYXZAm53gw=;
-        b=rj2481LBjWX1pRpztvshFwk0uLEFz6+5QUl6lYkNsPD5h8VDuJvAULkppUi+N2hg/2
-         gYmFHSLA9den5jTEmPGGN4K2lOk+yZ66inyVDa46KJeoI1RPNdsN/aqOTYTuJ7MRjtJn
-         UuILNSqrCt7UZnYPqrrXzDE/nHWGfNEEcEmDNAHVrPKT3gYTSy2+a0/Z9RKmAh8DXtky
-         L378ipaQmkdunSyDG87ZBBQDUVey/CHrhfU+gk6zw/x7baGDtUuuTImqW/34QtKO1vJn
-         X5TC40SYQdptmM7OBeKF2SR8dF5pWkES/5/1C84Yf1baklLQnQRk+loxnmplLVcPInOK
-         zCCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVNZDZZIN6G9duEQMAZlKJkWe/DapvdTbFdjeDPhu3xBWrvyXEjDchFvfCx3bicapHQXT0f2AQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwflFuLw73ai51DwHihfQj/oZP5BSvv72++hIw68LaQCffTjF3E
-	5fFwEblKK5xoeTXQV+fuXjCHbtl1R5WmSmsz5lFzvwB7StT29305H/k/uy66WaYc73vtuVe1N6j
-	EU7ne/Pszlx8fmMjMjH1yemSYdbqPg7q2/+TCEZK6OfAyZbzajzahEtWceA==
-X-Gm-Gg: ASbGncuSSazNNg+FegMQWwL2xHbCpYl4pIwBY1PLR23MfiFZV0Mm4jQCOTQloD/qrlH
-	BD6AJdAtaNfnZ7V1SbExdmBT67BnWfmVXYWyLGdnUQoR7tAoYjOuPD8Y8CSro/YFneDVZAXw+yV
-	BoTNRIkEXhoFomICr7Mt6rjQw/YoAa8myM0iphYuZ+SC4vaTjqRjV6945KzwaCZet7ANiCYGyo1
-	I0kvExH+/EymUnaCSVZzkHV5W9gKRJuIHs2tiwf14BOEvPElhJCnGfaclVS5LhwRq4M6+tN1a+p
-	AQUZzgbAAEzW1g2TZ6hD7NvySbvFgL5K2x5ZuDqrx4U6JHasXYBFo6wW3WUQQzfxTMNrZuMl/P5
-	C1FkfOMprZXC/h5zerZaFJbPgR72njSAMQv88cYVU/egTzWjFt/Xb3G3kJQ==
-X-Received: by 2002:a05:622a:64d:b0:4ee:1f5b:73c3 with SMTP id d75a77b69052e-4efbdafae82mr136566691cf.60.1764237886576;
-        Thu, 27 Nov 2025 02:04:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEMNAI9vR0jwzy4e6ezn9h7hQWLE/WyRaFVqDnCXyvdwThkgiaIPE3CdjzdXtnP1MyZ3AN9LQ==
-X-Received: by 2002:a05:622a:64d:b0:4ee:1f5b:73c3 with SMTP id d75a77b69052e-4efbdafae82mr136566411cf.60.1764237886178;
-        Thu, 27 Nov 2025 02:04:46 -0800 (PST)
+        bh=tiBBX2HMY2n/AxbltWad/ANX3RKH0tf+SEsscaE7SL0=;
+        b=ZtfIwQF40z41HgJ/j1aGX7kYDs23qCKiaIlulp2ACAdTkx7u+ccLSuDZoFlQpZ7C2K
+         xnH5KLumv/zbw7WgWXpmBX4pNA0VECWV1HWh0osdFo4I8zWaql3QJWHN4y7rdnrxXL8N
+         r2WjhCliFscrOnUEB0u6U0CCyY/YdZ+B7gjZE4NUse16pvifoLBEL691E2jBS0DGKr9u
+         yYqr1TL68d8kM69YrtVafPr77dchJmb0F1R5csnGEZxMkS6x2Iaiwu7Q9F5e1clR4TPC
+         mYj9hGUxeD5qZ1KJadzE/0fw8vMOx2wQ40gi819mkymkLqC5ZIYqUrC4CN/8F4VU9f9X
+         kKeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUaPqgPZNXDffn2fc4r8TGyDHAkUyiqIfEq7EzxHr8R9paSpoNAu0AAaLTwLX8ahM+iGJIEE8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy3oJY2MO36xnklWlNSLE+BiV1q9nys5FV4Rkyn+JSqa2M5TPdV
+	BoTwBcdx6v4VBdlS9CiFSqBlj6fdtq7buHlhVoTe4dWXtPjpSGpAB3/2tMrJEXwXLhYZIEG+mk/
+	v0bFHar/wi9vGWem++jse6/uptTht68qiuvkdBCE66NaEZtcCk8L6DwKlTGMZHDdUhw==
+X-Gm-Gg: ASbGncv/uyIAKr6qZL2X9y6ZO0rlO2rbpa7rFHjNKLcvNeGsSj1Tz+lZZ8xTvj5Y8BU
+	9gDB/l8JyY5TId0B9CbQJrqeW5khwq0cEO2fYcef1Ap7utONFc684rytV54TXxJH67HoIGudZP9
+	OfzsuE3guSTShuGUSKWk7WJVzWea/8OH0LriYZfqXW42CczNxHtgADhnXSOYdfynIQOeA096qvF
+	8qJXVimssgyUOUkn9uUWLOpmqOJM5lAf2ziKUAtjFvBWk0aCRgypJjU6t/kTPv5+vGt7cm2gyRV
+	EH+BVNOomn+OgMzIXZt/3Rlc9fH0SSWuB31gLzWiEy9+uVqGcld34jm4Za+a+NXS+Djbwoo2p3S
+	j5lUzqyTh2hxk7XiRMWEgyRiP4flN8XAMXUxqDbtNQ2bf2yXVoS42fUrBYw==
+X-Received: by 2002:ad4:4eeb:0:b0:880:447d:407c with SMTP id 6a1803df08f44-8847c4d5850mr321245636d6.9.1764239699726;
+        Thu, 27 Nov 2025 02:34:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IENQI5eX5Oevifu0hA7wSdkD485RV3dcludhFKndd5LnRSAV5DrFbgSaQBSwuSBHJCvcKCXCg==
+X-Received: by 2002:ad4:4eeb:0:b0:880:447d:407c with SMTP id 6a1803df08f44-8847c4d5850mr321245286d6.9.1764239699383;
+        Thu, 27 Nov 2025 02:34:59 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd34224bdsm6316801cf.19.2025.11.27.02.04.44
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b4ac25sm6980896d6.28.2025.11.27.02.34.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 02:04:45 -0800 (PST)
-Message-ID: <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
-Date: Thu, 27 Nov 2025 11:04:43 +0100
+        Thu, 27 Nov 2025 02:34:58 -0800 (PST)
+Message-ID: <6e735f02-dbd6-4807-95b3-4043049d4557@redhat.com>
+Date: Thu, 27 Nov 2025 11:34:56 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,15 +77,17 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
+Subject: Re: [kvm-unit-tests PATCH v3 10/10] arm64: add EL2 environment
+ variable
 To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <20250925141958.468311-11-joey.gouly@arm.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250925141958.468311-1-joey.gouly@arm.com>
+In-Reply-To: <20250925141958.468311-11-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: r2cHyp9Y1NRHey9Q-OHB0QlFJslz23cjgU9cfqUYBqk_1764237886
+X-Mimecast-MFC-PROC-ID: bbutHuG-o690B0yBrgdPUKwfc94Lx2PruV28Cf5JSrk_1764239700
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -94,67 +96,41 @@ Content-Transfer-Encoding: 7bit
 Hi Joey,
 
 On 9/25/25 4:19 PM, Joey Gouly wrote:
-> Hi all,
->
-> This series is for adding support to running the kvm-unit-tests at EL2. These
-> have been tested with Linux 6.17-rc6 KVM nested virt.
->
-> This latest round I also tested using the run_tests.sh script with QEMU TCG,
-> running at EL2.
->
-> The goal is to later extend and add new tests for Nested Virtualisation,
-> however they should also work with bare metal as well.
->
-> Changes since v2[1]:
-> 	- Move the sctlr setup in EFI to a function.
-> 	- Decided to not re-use el2_setup.h from Linux, looked more
-> 	  complicated to use than needed for KUT.
-> 	- Add EL2 env variable for testing, open to feedback for that.
-> 	  This was untested with kvmtool as my testing setup only has
-> 	  busybox ash currently, and the run_tests.sh script needs bash.
->
-> Issues (that I think are fine to investigate/fix later):
-> 	- Some of the debug tests fail with QEMU at EL2 and kvmtool.
-> 	- The gic ipi test times out with QEMU at EL2, but works with kvmtool.
+> This variable when set to 1 will cause QEMU/kvmtool to start at EL2.
 
-Have you noticed any failure with migration tests. On my end, as soon as
-I set EL2=1 migration tests do fail.
+Misses the Sob.
+
+Besides Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
+
+> ---
+>  arm/run | 7 +++++++
+>  1 file changed, 7 insertions(+)
 >
-> Thanks,
-> Joey
->
-> [1] https://lore.kernel.org/kvmarm/20250529135557.2439500-1-joey.gouly@arm.com/
->
-> Alexandru Elisei (2):
->   arm64: micro-bench: use smc when at EL2
->   arm64: selftest: update test for running at EL2
->
-> Joey Gouly (8):
->   arm64: drop to EL1 if booted at EL2
->   arm64: efi: initialise SCTLR_ELx fully
->   arm64: efi: initialise the EL
->   arm64: timer: use hypervisor timers when at EL2
->   arm64: micro-bench: fix timer IRQ
->   arm64: pmu: count EL2 cycles
->   arm64: run at EL2 if supported
->   arm64: add EL2 environment variable
->
->  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
->  arm/efi/crt0-efi-aarch64.S |  5 ++++
->  arm/micro-bench.c          | 26 ++++++++++++++++--
->  arm/pmu.c                  | 13 ++++++---
->  arm/run                    |  7 +++++
->  arm/selftest.c             | 18 ++++++++----
->  arm/timer.c                | 10 +++++--
->  lib/acpi.h                 |  2 ++
->  lib/arm/asm/setup.h        |  8 ++++++
->  lib/arm/asm/timer.h        | 11 ++++++++
->  lib/arm/setup.c            |  4 +++
->  lib/arm/timer.c            | 19 +++++++++++--
->  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
->  lib/arm64/processor.c      | 12 ++++++++
->  14 files changed, 191 insertions(+), 19 deletions(-)
->
+> diff --git a/arm/run b/arm/run
+> index 858333fc..2a9c0de0 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -59,6 +59,10 @@ function arch_run_qemu()
+>  		M+=",highmem=off"
+>  	fi
+>  
+> +	if [ "$EL2" = "1" ]; then
+> +		M+=",virtualization=on"
+> +	fi
+> +
+>  	if ! $qemu $M -device '?' | grep -q virtconsole; then
+>  		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+>  		exit 2
+> @@ -116,6 +120,9 @@ function arch_run_kvmtool()
+>  	fi
+>  
+>  	command="$(timeout_cmd) $kvmtool run"
+> +	if [ "$EL2" = "1" ]; then
+> +		command+=" --nested"
+> +	fi
+>  	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
+>  		run_test_status $command --kernel "$@" --aarch32
+>  	else
 
