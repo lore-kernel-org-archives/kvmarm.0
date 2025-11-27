@@ -1,207 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D11D331237;
-	Wed, 26 Nov 2025 18:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCE623D7CE
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 03:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764182506; cv=none; b=L1MZzFhzSdDlClvec+pCoqWxHu+N/O0l/ChhMGzL7V4dYNE37PN228mHnhEAzWxTfY8l3k15pQ/Pb2nGC7fE26so/N9BDYmKqhxGh+TgQQ6X3dIxdJ79x8dMP8l8Cof/KYLoSA/UcGZS7pIFyZ7OgX9P8Mbna9fy/xfy+mj0oLU=
+	t=1764215509; cv=none; b=KXKEfY0I7SqVNqA4p+hdMu60JVjfJrfpy/MtXpMN8GAbWm44nX1OgTR07ZmbkPd0TVc/jssIBpKCMClW3hqxNVpBB08OZtfywrkPxNBdN+U9UJv6fJAOUVP4YVHBzP4/bdwCCKssVEti4OmUI0pRBoQ9u6PU7at8/0SFPcba0H0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764182506; c=relaxed/simple;
-	bh=OrhxCJrCTAVZNlhdhhsJnvnRtmy8sEmyPzUtcg6Xrw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GssvyNDWuK24o/KCEf5YniPvHcrGTr3nrffMss3CDur0wuic/pFh32+wbfCnDbxDxKTd6PEPeVAocniez1mA68DmMtnaGttGjFgnZVeU6pvktv5WFXdGMMivjTvjcplAEVfOHDGuJcuF2PcoL1U8rMffA/26SpYX6t1qwNBMyeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1zPS+LK; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1zPS+LK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C166C4CEF8;
-	Wed, 26 Nov 2025 18:41:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764182505;
-	bh=OrhxCJrCTAVZNlhdhhsJnvnRtmy8sEmyPzUtcg6Xrw4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u1zPS+LKUaXXpTefzHkDWvnRO47r2FZ8n+VfyP6uAEXavpdrJ98W4D0ey5rqVQL2b
-	 2kszPt8wjH6Ol4z2gl2D2DiQqTajn79gCa1MzviSWJxj5+/jQSZ60fxptQztxSz4ET
-	 0HLdIhBY0PA+USuTNyivVs32an/VfAP7QFm7y7VP8+dChFC+NeQeoG1P85OAM5DzTj
-	 In1e6YUqNJMlhUEt7m8V9Eoju6QjA8OsR/ejIs9jV/Ln7jBXGWFasGxxH3EO0NwkTG
-	 0ApqTvKMaPdShngMRvVSRoUfN7cZ1eJ/DaeAITctDy82/41WBm3INKD5BK9nHKMHjg
-	 PUS+LdeMvdfuQ==
-Date: Wed, 26 Nov 2025 18:41:39 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Fuad Tabba <tabba@google.com>, Mark Rutland <mark.rutland@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v8 11/29] KVM: arm64: Document the KVM ABI for SME
-Message-ID: <8d27e309-15d7-47de-b51a-9f0e0bfa4766@sirena.org.uk>
-References: <20250902-kvm-arm64-sme-v8-0-2cb2199c656c@kernel.org>
- <20250902-kvm-arm64-sme-v8-11-2cb2199c656c@kernel.org>
- <CAFEAcA_GJ7gzn7aMCZYxHnJWvx4tHSHBKsOxtQ7NTb4gPjkMJQ@mail.gmail.com>
- <df712591-397e-422b-b9c9-fbf080cad9aa@sirena.org.uk>
- <aScfSMZEKCeUq7Zn@e133380.arm.com>
+	s=arc-20240116; t=1764215509; c=relaxed/simple;
+	bh=3PHFVtseHam8/Q0pAuowhNePsjgnGDP9mWLmZ4a2XLM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iRzxpfsDFZYbkMuzLzuLwGHon91St2zFF8lQw0ByKW4M/rlPB4/FzaY3YeTl2IIH9NquZAz1n6Xuox9T07I/ge0QVWLmN8Uye8z0DVanv8ZLukbGWthL5ej0SMOQLKIZ9urlT1wrszJAR+qc9twMHajOWsLDgqDejEHi2EJZsQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dH2Wc4g04znTW1;
+	Thu, 27 Nov 2025 11:50:20 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id D0B471A0188;
+	Thu, 27 Nov 2025 11:51:43 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 27 Nov 2025 11:51:43 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 27 Nov 2025 11:51:42 +0800
+Message-ID: <e6cffbce-7cd4-3fe3-a9bd-935efedaebd0@hisilicon.com>
+Date: Thu, 27 Nov 2025 11:51:37 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qeptf6kasDv7BEH7"
-Content-Disposition: inline
-In-Reply-To: <aScfSMZEKCeUq7Zn@e133380.arm.com>
-X-Cookie: Murphy was an optimist.
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
+Content-Language: en-US
+To: Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <maz@kernel.org>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	<linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>, Yicong Yang
+	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
+ <20251107072127.448953-6-wangzhou1@hisilicon.com>
+ <861pm4vn02.wl-maz@kernel.org>
+ <b1407660-9b69-7e21-328a-0f969fffa554@hisilicon.com>
+ <c72411f9-a77e-4a72-a401-5110b919a2df@app.fastmail.com>
+ <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
+ <113db0fb-d879-49d7-a5f2-7755558f29dd@app.fastmail.com>
+ <6d6fad8d-e4e4-b973-6431-34a37003d363@hisilicon.com>
+ <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
+On 2025/11/18 15:36, Arnd Bergmann wrote:
+> On Tue, Nov 18, 2025, at 03:31, Zhou Wang wrote:
+>> On 2025/11/14 17:37, Arnd Bergmann wrote:
+>>> On Fri, Nov 14, 2025, at 10:25, Zhou Wang wrote:
+>>>> On 2025/11/14 0:26, Arnd Bergmann wrote:
+>>>>>
+>>>>> Are you using a particular device, or are you trying to enable
+>>>>> the support in general? If you have a specific device you are
+>>>>> working on, does it use the PASID data or not?
+>>>>
+>>>> Many thanks for your careful explanation! I got the pointer here.
+>>>>
+>>>> We have a real device in our SoC, which supports LS64B/ST64B/ST64BV.
+>>>> For ST64BV, Our device just receives 64B data atomically, not interpret
+>>>> it with PASID data.
+>>>
+>>> Ok, I see. So I assume this is either a kind of dedicated work queue
+>>> where the IOMMU PASID is set up in advance for the user MMIO area,
+>>
+>> Yeah, it is something like you mentioned above. MMIO area is binded with
+>> a work queue, a PASID is set up in advance for this work queue.
+> 
+> Ok, thanks for confirming.
+> 
+>>> or it is a device that does not do any DMA at all, correct?
+>>>
+>>> In this case, would the device also work correctly with ST64BV0 if
+>>> the ACCDATA register is fixed to a value of zero and you can only
+>>> use the upper 480 bits? Would it also work if there is an
+>>> unpredictable value in ACCDATA that may match the PASID of another
+>>> device used by the same process?
+>>
+>> We do not support ST64BV0, so above case will not happen. I think ST64BV0
+>> will trigger a illegal instruction exception in our system.
+> 
+> At least this does make it easier because on your system you would
+> never run into a situation where you want to support both your
+> internal device with st64bv and another device with st64bv0.
+> 
+> The easiest setup I can think of that still supports your machine
+> would look something like:
+> 
+> - have the kernel choose between st64bv and st64bv0 at early boot,
+>   based on platform configuration, use st64bv0 by default if
+>   available in hardware and not disabled in EL3, EL2 or kernel
+>   command line.
+> - Change pasid handling in iommu_sva_bind_device() so drivers
+>   have to explicitly request one of the modes before establishing
+>   a pasid, refuse this on incompatible systems, update the
+>   three existing callers (idxd, amdxdna, uacce) accordingly.
+> - on systems with st64bv but no st64bv0, enable st64bv for
+>   all CPUs at boot time to avoid context switch overhead, but
+>   forbid mapping shared hardware workqueues into userspace.
+> - postpone full support for st64bv0 until we have a device that
+>   actually uses this and can be tested. I think most of it is
+>   already there in the iommu code, but the ACCDATA setup needs
+>   to be integrated into the switch_mm()/__switch_to() code
+>   and possibly a trap handler like on x86.
 
---qeptf6kasDv7BEH7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Arnd,
 
-On Wed, Nov 26, 2025 at 05:23:47PM +0000, Dave Martin wrote:
-> On Mon, Nov 24, 2025 at 08:12:56PM +0000, Mark Brown wrote:
-> > On Mon, Nov 24, 2025 at 03:48:06PM +0000, Peter Maydell wrote:
+Sorry for late to reply, I double checked with our SoC and device
+colleagues, currently only st64b has been used in our system.
 
-> > > >  .. [1] These encodings are not accepted for SVE-enabled vcpus.  See
-> > > > -       :ref:`KVM_ARM_VCPU_INIT`.
-> > > > +       :ref:`KVM_ARM_VCPU_INIT`.  They are also not accepted when =
-SME is
-> > > > +       enabled without SVE and the vcpu is in streaming mode.
+So I think we could upstream FEAT_LS64 firstly as it seems easy
+to be merged. After this, we continue to discuss FEAT_LS64V and
+FEAT_LS64_ACCDATA solution if there is a real system need them.
 
-> > > Does this mean that on an SME-no-SVE VM the VMM needs to know
-> > > if the vcpu is currently in streaming mode or not to determine
-> > > whether to read the FP registers as fp_regs or sve regs? That
-> > > seems unpleasant -- I was expecting this to be strictly a
-> > > matter of how the VM was configured (as it is with SVE).
+Best,
+Zhou
 
-> > Yes, it does.
-
-> Is the above condition right re streaming mode?  The original reason
-> for this restriction was that the SVE Z-regs and FPSIMD V-regs are
-> aliases when SVE is present.  To avoid having to worry about how to
-> order register accesses and/or paste parts of them together, we went
-> down the road of banishing encodings that alias a subset of the
-> register state accessed by some other encoding.
-
-I queried the issue with requiring that writes to the registers be done
-in a specific order - we apparently have some other examples of this
-already (I would need to go and check which specifically) so that was
-seen as OK.
-
-> In line with this principle, with SME Vn and Zn are aliases when
-> *not* in streaming mode, so allowing access through the Vn view feels
-> problematic too?  (And when in streaming mode, the Vn regs don't exist
-> at all.)
-
-The ABI proposed here is that the V registers will only be available
-with a VM that lacks SVE, you'll never have them both simultaneously but
-rather which is available at any given moment will vary on a SME without
-SVE VM.  This obviously has complications, but aliasing is not one of
-them.
-
-Another option would be to represent the V registers as 128 bit Z
-registers, giving you something similar to how they'd appear on a VM
-with both SVE and SME for a SME only VM.
-
-> Whether the proposed ABI is considered awkward for VMMs or not is a
-> separate matter...)
-
-Indeed.
-
-> > > > +       max_vq.  This is the maximum vector length currently availa=
-ble to
-> > > > +       the guest on this vcpu, and determines which register slice=
-s are
-> > > > +       visible through this ioctl interface.
-> >=20
-> > > > +       If SME is supported then the max_vq used for the Z and P re=
-gisters
-> > > > +       while SVCR.SM is 1 this vector length will be the maximum S=
-ME
-> > > > +       vector length available for the guest, otherwise it will be=
- the
-> > > > +       maximum SVE vector length available.
-
-> The max_vq name here is not ABI; it's just linking concepts together in
-> the documentation text.
-
-> So, can we give explicitly different names to these two max_vq values?
-
-We could call them sve_max_vq and sme_max_vq?
-
-> Splitting the affected register descriptions into "SVCR.SM =3D=3D 0" and
-> "SVCR.SM =3D=3D 1" cases also be helpful to make this special-casing clea=
-r.
-
-Possibly I'm looking at the wrong thing here but the overall text for
-describing the vector registers is relatively long so I worry that it'd
-be harder for readers to play spot the difference if there was
-duplication.  I figured explicitly calling out the differences would be
-clearer and less error prone in terms of any future updates.
-
-> > This is attempting to say that the VL for the Z and P registers (and
-> > FFR) will vary depending on if the vCPU is in streaming mode or not if
-> > the maximum VL for SVE and SME differs, similarly to how the Z, P and
-> > FFR registers disappear when we are not in streaming mode in a SME only
-> > system.
-
-> May flipping SVCR.SM through KVM_SET_ONE_REG have the architectural
-> effect of zeroing the vector regs?  That feels like something that
-> should be stated explicitly.
-
-Yes, it should zero them - I'll find some place/way to add that.
-
-> I'd agree that this mutating interface feels odd, and does not follow
-> the original spirit of the design here.
-
-> But the SME architecture doesn't fit well with the spirit of the
-> original KVM ABI here either, so I guess there won't be a perfect
-> solution.
-
-Something's going to be awkward somewhere.
-
-> It seems that when SME is enabled in the vCPU features and the VMM is
-> planning to dump or set affected registers, there is a requirement to
-> dump / set SVCR.SM first, and then go down one of two code paths.  Can
-> this be called out explicitly?  This is a departure from the the
-> previous interaction model, so it probably deserves its own section,
-> which can then be cross-referenced from individual reg
-> descriptions.
-
-> SVCR.SM exhibits this modality w.r.t a specific set of affected
-> register encodings; it would be good to have that captured clearly in
-> one place.
-
-As I said above my understanding is that this is not actually a
-departure from the current stituation, this not being noticed probably
-highlights why it'd be good to improve the documentation here!  I think
-grouping all behaviours like this together would be good from a
-usability point of view.  I don't know how much of that that fits
-directly in the ABI document or in a separate "here's some gotchas" type
-document, things are already getting a bit difficult to manage.
-Possibly both.
-
---qeptf6kasDv7BEH7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmknSeIACgkQJNaLcl1U
-h9Docgf/cPhrqw0FDee6DcZOryTwO1VKQ+JqiWC1SI9SblwgQ/XgIeIYAQSjWrPM
-0pvT2htq6pm7QwQc0l0eX4Np6yo/OSjiCrjuCkJF1QHevk3sdguC+hCjaabkfDBm
-LbPLGdx3q7k6E4zza+kXg6inA0+D3T/fvLnFvvrDgnu7V3FmHlRCoIvinIpOeWZR
-7qZ+rZdUBKnljxQXBbbx3NPx5//xeYHlzxXLXwJU2CzCCSOSqKGIpuM0nLVaaoZS
-4sCzTBvU112uGizcjZGRruKfZ59Mp+xQKUrxnFb2HaO8udriyait0aMv7s08Xw/V
-z3/GvVCRxxcUSHXSYIwmWQPJeVqv4w==
-=dEOw
------END PGP SIGNATURE-----
-
---qeptf6kasDv7BEH7--
+> 
+> In the current architecture, both FEAT_LS64_V and
+> FEAT_LS64_ACCDATA are optional, so you can continue to
+> produce CPUs that have the former but not the latter, and
+> the logic above will keep that working. However this breaks
+> if you ever want to support FEAT_LS64_ACCDATA in a later
+> CPU but keep the existing driver working with st64bv.
+> 
+>        Arnd
+> .
