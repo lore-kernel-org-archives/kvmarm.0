@@ -1,166 +1,157 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B01033436A
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 14:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EE3296BD1
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 14:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764254524; cv=none; b=QJGYx7FZ89V8kXmud1YR0hghnxP/FLnlOD+Ew8iUiG4/8rg355O8j8fJyee83OZjsr6z3/KO9jYTRAqeTJV9qaQ7tL+/gsDJqISfHrdHcQ8Y3bKOJhn5UJhz+sM3w14FxXne6JOiMtMeBLOa5P0gBo9PxEFhi5PG2jwCqJfRbLo=
+	t=1764255136; cv=none; b=RRKuLA9ThiW+BIMlg5QADzTiKsICKLUgBV0RRU/mxKsssPywtZMpbvYTRSemA4B9wEwEmFHGLeaPjWkGPw+xVugAfuc+k5H/2A5QKgQNg9xqD4Z4qH1dTXtXK89ufv8Pw1KeQPOWPaNcR9fCTT/ir3AVbg803ZMBcuxVAyrnyCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764254524; c=relaxed/simple;
-	bh=1IlaOxFWU3rpeiIHBvRb1uHRvj5oCzpB41EXx0yBvF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rBXNHaPFUir50JGseNqY+x2SNy26Rz4sgVQiV5sZ6CiTIlJ6z7bRUtV81A4mKj0mg1gQLA+NxN5tHhTvuecx5g2eD3U+NYxHQ2jDid8J3C+2edES2B9aBmIkh6dKfHtnm0vFW0/5yw/JHcIDdgjp+hqpxPb/Lj0xZd5tFH9V5P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qng84tqf; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qng84tqf"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4edb8d6e98aso387501cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 06:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764254521; x=1764859321; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=CPCyrID5c/tHs4/7/55sixEXvWOHWzu46qNqSyPa2CE=;
-        b=qng84tqfJ2gtLsD59FWNQFLlXHIAERCKlY5CaBIw9MBKXgeHAatAy1PC83ZQbInzd8
-         6hPAun1z7pbJCbqdhK2hQ6z+1fQFk5LPtNzrsUqw67dFCjPZ8FcAhVSTL5XVtOIY6pGx
-         itf55iVTVS0FS0LWjk+zbYQEB+4gpgCqLrucF1XPsZBfkKX0ZhDbhime5XV6rQTPgZrn
-         isMRYQbVJWLvJIsi0AUUZe5ukbMkrofv9S0F0uPo8DfZUjWQU/XAwsHtdNrUzU0PuZxT
-         apAw2/zIBN4qupvlvQMynfgXznwo5Ym2jQjMPp8TZfBpW/ysCzj+pn87xv8OIzBuieNu
-         Jevg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764254521; x=1764859321;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CPCyrID5c/tHs4/7/55sixEXvWOHWzu46qNqSyPa2CE=;
-        b=WusKaWFGj3Vu+XcGQXm9mmuzW/FvSmyRGm07DzlWqfrEXp0LzdDfFbjeFGc5pvqCLG
-         xggKxPfvNZbApJNkRRBc+aGNWk5eyJC30lno46muBxvvmKzWVyrHqiOHP1FulLc6yDf6
-         7JuFl1Uf1I+CDmkrbrwkF/JQeA0yxFqpdg7VSkRK9iDardT20mjH2GOBlUlQm0672X4K
-         H4khUjH+6H7PV1i6+swtWcEiQDGKrdAY0dIKX0RbZHMcOshRUqWOuERM552VZhXU+qb8
-         wfR0zyoosfx0zQcLFra0e6yD6yQHDqIgmpoVipm6SreX+wbJNRJI/+qHm+o7HfFipqWo
-         f41g==
-X-Gm-Message-State: AOJu0YwQrhtj4uA+2BwsPkLK5ql5CRVs4T/8ABlCs+hSwjIE/F8NHtXE
-	jGkY99zPmJonyPbjA5cCKI+I6yEa5LxKBKsHS6Zn0WeYyvJuB6QrWELLhRunJCI7JxDaJZBLx8A
-	xLZLWNNyB6Kfkejgtd6y3jsDqoFVU54yyZkKslfWu
-X-Gm-Gg: ASbGncsy2HqWFZl8Y2ON8np9vvEXtY5RlUWGyLkWk6OGVJ3xJmx5CnDvTS7nOKxwrjx
-	9RuWHTIhJcev6CugBj+B0aULgRjRnd1fHRH8Aj9jkQB+n0oWIQ+sjO0MCdcNIIkH9+PFJjx02D+
-	Tc4f+w6NH1AskQETWcphGFFlU9iXAbtO1QG16A3XlgcAYiQzrz+KXIbXBQ80lb6qJ+mDcQPU3w/
-	Kiea899zRCMwOLW8zB8LCH2fHZqYCMxZ0bzHm0SBW5aa/R4N6Za4lJ5TCmG5tRoqgYwvME=
-X-Google-Smtp-Source: AGHT+IEvOReB+QeleLtSN0F2f5YKf6WqFvgp/w6xqbY/X02DfIQnSyuKWL8wM7Xf0Dv/gF9wW71/cQ4fRe46i351NDg=
-X-Received: by 2002:a05:622a:54b:b0:4ee:40fb:d2e7 with SMTP id
- d75a77b69052e-4efd0cc5434mr4659811cf.20.1764254521051; Thu, 27 Nov 2025
- 06:42:01 -0800 (PST)
+	s=arc-20240116; t=1764255136; c=relaxed/simple;
+	bh=AUUmYjlpz1+SSjEFdJCci6iQPPtM3JeZzyRpDsyrjUE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j9QA6JlyUCwVQCalrRCSRpfheg7IbXnDgWaocLVmdCb0SACfHom4aAWrBK48KTQuxYywUSnVssvbWELRaPXb7CFSiyASgYWIn8jlP/5Dm+m2L0+xLJp7PC2xvu4BITclSXY2MbaZvabWvDthFR6SvXWRw6Eym4vlaAkYzeO9plc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B15B91063;
+	Thu, 27 Nov 2025 06:52:06 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D52693F66E;
+	Thu, 27 Nov 2025 06:52:12 -0800 (PST)
+Date: Thu, 27 Nov 2025 14:52:07 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
+Message-ID: <20251127145207.GA3265987@e124191.cambridge.arm.com>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
+ <20251127110832.GA3240191@e124191.cambridge.arm.com>
+ <3a39738e-ed33-49fa-9f1c-0bbba6979038@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251127122210.4111702-1-tabba@google.com> <20251127122210.4111702-5-tabba@google.com>
- <86345zr24c.wl-maz@kernel.org>
-In-Reply-To: <86345zr24c.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 27 Nov 2025 14:41:24 +0000
-X-Gm-Features: AWmQ_bmXs4f0B9KhCjDSmGn5zPBptXNndJQXBS9Qk5J98RtBGlIoKV9rr83Hjg4
-Message-ID: <CA+EHjTz9fJ2892TNn-hy3aiQA6Cxj6xuFUBKQhpDOnsHkDtdwQ@mail.gmail.com>
-Subject: Re: [PATCH v1 4/5] arm64: Inject UNDEF when accessing MTE sysregs
- with MTE disabled
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a39738e-ed33-49fa-9f1c-0bbba6979038@redhat.com>
 
-Hi Marc,
-
-On Thu, 27 Nov 2025 at 14:17, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 27 Nov 2025 12:22:09 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
+On Thu, Nov 27, 2025 at 01:04:08PM +0100, Eric Auger wrote:
+> Hi Joey,
+> 
+> On 11/27/25 12:08 PM, Joey Gouly wrote:
+> > On Thu, Nov 27, 2025 at 11:04:43AM +0100, Eric Auger wrote:
+> >> Hi Joey,
+> >>
+> >> On 9/25/25 4:19 PM, Joey Gouly wrote:
+> >>> Hi all,
+> >>>
+> >>> This series is for adding support to running the kvm-unit-tests at EL2. These
+> >>> have been tested with Linux 6.17-rc6 KVM nested virt.
+> >>>
+> >>> This latest round I also tested using the run_tests.sh script with QEMU TCG,
+> >>> running at EL2.
+> >>>
+> >>> The goal is to later extend and add new tests for Nested Virtualisation,
+> >>> however they should also work with bare metal as well.
+> >>>
+> >>> Changes since v2[1]:
+> >>> 	- Move the sctlr setup in EFI to a function.
+> >>> 	- Decided to not re-use el2_setup.h from Linux, looked more
+> >>> 	  complicated to use than needed for KUT.
+> >>> 	- Add EL2 env variable for testing, open to feedback for that.
+> >>> 	  This was untested with kvmtool as my testing setup only has
+> >>> 	  busybox ash currently, and the run_tests.sh script needs bash.
+> >>>
+> >>> Issues (that I think are fine to investigate/fix later):
+> >>> 	- Some of the debug tests fail with QEMU at EL2 and kvmtool.
+> >>> 	- The gic ipi test times out with QEMU at EL2, but works with kvmtool.
+> >> Have you noticed any failure with migration tests. On my end, as soon as
+> >> I set EL2=1 migration tests do fail.
+> > Yes migration also fails here, forgot to mention that.
 > >
-> > When MTE hardware is present but disabled via software (arm64.nomte or
-> > CONFIG_ARM64_MTE=n), HCR_EL2.ATA is cleared to prevent use of MTE
-> > instructions. However, this alone doesn't fully emulate hardware that
-> > lacks MTE support.
+> > Seems like migration completes, but then something bad happens on the first
+> > interrupt. I will investigate a bit now and see if it's an easy fix.
+> 
+> while you do that I will go through the series. My apologies for the delay
+
+Thanks!
+
+I found the issue, and I thought it was one I had solved before, but maybe I lost the fix somehow:
+
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index af7c81c1..fd8b6690 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -235,6 +235,11 @@ get_mmu_off:
+ .globl secondary_entry
+ secondary_entry:
+        init_el x0
++
++       /* set SCTLR_EL1 to a known value */
++       ldr     x4, =INIT_SCTLR_EL1_MMU_OFF
++       msr     sctlr_el1, x4
++       isb
++
+        /* enable FP/ASIMD and SVE */
+        mov     x0, #(3 << 20)
+        orr     x0, x0, #(3 << 16)
+
+The secondary core code doesn't fully initialise SCTLR_ELx, which means that
+SCTLR_ELx.SPAN=0. That's why there was a data abort after the IRQ.
+
+This doesn't affect EL1 (only) because KVM has a different reset value for
+SCTLR_EL1 and SCTLR_EL2.
+
+I will send out a new version with this fix, missing sob/reviews/acks, after you've had a look!
+
+Thanks,
+Joey
+
+> 
+> Eric
 > >
-> > With HCR_EL2.ATA cleared, accesses to certain MTE system registers trap
-> > to EL2 with exception class ESR_ELx_EC_SYS64. To faithfully emulate
-> > hardware without MTE (where such accesses would cause an Undefined
-> > Instruction exception), inject UNDEF into the host.
+> > Thanks,
+> > Joey
 > >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 44 ++++++++++++++++++++++++++++++
-> >  1 file changed, 44 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index 29430c031095..f542e4c17156 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -686,6 +686,46 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
-> >       kvm_skip_host_instr();
-> >  }
-> >
-> > +static void inject_undef64(void)
-> > +{
-> > +     unsigned long sctlr, vbar, old, new;
-> > +     u64 offset, esr;
-> > +
-> > +     vbar = read_sysreg_el1(SYS_VBAR);
-> > +     sctlr = read_sysreg_el1(SYS_SCTLR);
-> > +     old = read_sysreg_el2(SYS_SPSR);
-> > +     new = get_except64_cpsr(old, system_supports_mte(), sctlr, PSR_MODE_EL1h);
-> > +     offset = get_except64_offset(old, PSR_MODE_EL1h, except_type_sync);
-> > +     esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
-> > +
-> > +     write_sysreg_el1(esr, SYS_ESR);
-> > +     write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> > +     write_sysreg_el1(old, SYS_SPSR);
-> > +     write_sysreg_el2(vbar + offset, SYS_ELR);
-> > +     write_sysreg_el2(new, SYS_SPSR);
-> > +}
-> > +
-> > +static bool handle_host_mte(u64 esr)
-> > +{
-> > +     /* If we're here for any reason other than MTE, then it's a bug. */
-> > +
-> > +     if (read_sysreg(HCR_EL2) & HCR_ATA)
-> > +             return false;
-> > +
-> > +     switch (esr_sys64_to_sysreg(esr)) {
-> > +     case SYS_RGSR_EL1:
-> > +     case SYS_GCR_EL1:
-> > +     case SYS_TFSR_EL1:
-> > +     case SYS_TFSRE0_EL1:
->
-> How about other things, such as DC GVA? Don't you need to trap and
-> UNDEF it (which has the side effect of also trapping DC ZVA)?
->
-> Same question for all the DC {C,I,CI}GVA{C,P} instructions.
-
-As far as I could tell, none of these are trapped by ATA. The spec
-says that in the absence of MTE, their behavior is undefined --- which
-is the same for the ones I'm actually handling here...
-
-The reasons I've only handled these is that, when booting a system
-with a misadvertised MTE, the kernel accesses these registers, and
-injecting an UNDEF resulted in a nicer failure mode.
-
-What do you suggest, drop this patch (and the one before it), since
-trying to access MTE is UNDEF, and the kernel that does it is just
-shooting itself in the foot (no security implications)? Or edit the
-commit message to make it clear that this is best effort, based on
-what ATA traps?
-
-Cheers,
-/fuad
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> >> Eric
+> >>> Thanks,
+> >>> Joey
+> >>>
+> >>> [1] https://lore.kernel.org/kvmarm/20250529135557.2439500-1-joey.gouly@arm.com/
+> >>>
+> >>> Alexandru Elisei (2):
+> >>>   arm64: micro-bench: use smc when at EL2
+> >>>   arm64: selftest: update test for running at EL2
+> >>>
+> >>> Joey Gouly (8):
+> >>>   arm64: drop to EL1 if booted at EL2
+> >>>   arm64: efi: initialise SCTLR_ELx fully
+> >>>   arm64: efi: initialise the EL
+> >>>   arm64: timer: use hypervisor timers when at EL2
+> >>>   arm64: micro-bench: fix timer IRQ
+> >>>   arm64: pmu: count EL2 cycles
+> >>>   arm64: run at EL2 if supported
+> >>>   arm64: add EL2 environment variable
+> >>>
+> >>>  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
+> >>>  arm/efi/crt0-efi-aarch64.S |  5 ++++
+> >>>  arm/micro-bench.c          | 26 ++++++++++++++++--
+> >>>  arm/pmu.c                  | 13 ++++++---
+> >>>  arm/run                    |  7 +++++
+> >>>  arm/selftest.c             | 18 ++++++++----
+> >>>  arm/timer.c                | 10 +++++--
+> >>>  lib/acpi.h                 |  2 ++
+> >>>  lib/arm/asm/setup.h        |  8 ++++++
+> >>>  lib/arm/asm/timer.h        | 11 ++++++++
+> >>>  lib/arm/setup.c            |  4 +++
+> >>>  lib/arm/timer.c            | 19 +++++++++++--
+> >>>  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
+> >>>  lib/arm64/processor.c      | 12 ++++++++
+> >>>  14 files changed, 191 insertions(+), 19 deletions(-)
+> >>>
+> 
