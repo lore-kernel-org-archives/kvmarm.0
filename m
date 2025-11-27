@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557311C84D7;
-	Thu, 27 Nov 2025 06:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CDE12B94;
+	Thu, 27 Nov 2025 06:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764225436; cv=none; b=imT/Dys9TLFkHIe3glLktdc+uMfmkgcYSd31QIDnHYNpRXLkc0BXUlEX8Hb8D1cXJxzTmajTnhbVbiNulJH5a4g367xAwcPx4UXyDJPI9Ge2WGdYwipx79syBAY5zOBitnrjNop76ocxR4rIC9gkKItiwxHma1lYNeBRSHGY2iQ=
+	t=1764225832; cv=none; b=JnmAYTjOYJW5kb73qRgZX7KKsDz6MlAqBiHguG53eGu5F589qwT6d+QifQvHcuS0QPMqPagCUwg8eqZLeZQK2a9KRzMDYDFwHfwX4DNMS0yhZsEPgm+/DIwh87W2nlLZzelcVZ3wOyinXjTRqYaH4XdyZ8Yci2gfkLgx+zBU9gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764225436; c=relaxed/simple;
-	bh=sxm/pZRxFK+AZN/1aSkLmnFO7vK7xwxEtuumkKqVWs4=;
+	s=arc-20240116; t=1764225832; c=relaxed/simple;
+	bh=nJ1AksxvkgzgI5yArHPx9UP569L+VBn2SNhrNoTyxVI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tRMqslOlbeo5UyfdSfIDVNyj15y4sQtd/gwQxvHm5tsf62m9rEEY3M9ABHvMCo5Olt+hz0NZbRNLDxG3vXt79q0y2GjXFrz3+13oME6oSVViXAL1Zo2JaOZ+kIAXzq412WLboa+t8NAgftOJT52I/Zvb/8RIA8qK0tFU9yyt9Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=secg8Oj4; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVtYjgc8Lkcr6f/sWWTT4VuvkYD+NsHCN3SoM0jO3blob0VMHPtDZbChdm0Usnwr6BhEzJ8QmvcsWP5OT4g61TQOvb68GPZcCiRAGCacMK2dLxkZOwCWETOLiIOUgoPla7DyQ7aDWzEgSuCFsiz9ZGZU/6+Gd9FcRKAosSyhz4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qySN6j7B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="secg8Oj4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAEB2C4CEF8;
-	Thu, 27 Nov 2025 06:37:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qySN6j7B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51061C4CEF8;
+	Thu, 27 Nov 2025 06:43:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764225434;
-	bh=sxm/pZRxFK+AZN/1aSkLmnFO7vK7xwxEtuumkKqVWs4=;
+	s=k20201202; t=1764225832;
+	bh=nJ1AksxvkgzgI5yArHPx9UP569L+VBn2SNhrNoTyxVI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=secg8Oj4iwk0hBvUbPFzz+j+hhH6cmpWPfG/YpGNTbMPOY3RnYZ5N4OjH7wwZS0Co
-	 qCvrNf0E9cD1di0gSesJU3RyjrhKOYZsd+otKZvo+lyVA5MUzLWzlDCuyXuyIDU+Um
-	 +XLT8oepfwvxr9eZ40IOFdemjnuEN/by4VV2XT+c1R1sQHrI4zgP+UHtbAiy+/RwiI
-	 TOeJdje3X5DO1cAwEc26uND4nbttPkuEo/u4p9KYUyMa0r8uCpua2rDGf9CM7BduHI
-	 FkETw4oXtXVDPhGx2crT5UJtTaqNYbmGsQs6eTReE4JJEEaWSSQQTIo6Gv2+lYbQCJ
-	 aTKPQFA/phqgA==
-Date: Wed, 26 Nov 2025 22:37:13 -0800
+	b=qySN6j7BCWXiirX2iH/LbdQY7BIP5AOhi3DKO0XaIffn/BuecmPdQ0LTgTFiENeFq
+	 9/JJxc9Jl7VZeJ63qj2hlNfnBm5PhhX/HHaRvyB0KdZy8os65NiC+CFYvCtCgsTKIY
+	 /+POJMGyTBi1RHY6gjObEjdi9euL37hb6FfgOpuMtQFY41tZ+0SSM4e3Hzrb9KPV9C
+	 of1CkzsjphU4N8MgwcJvIp9MSwdLZ7bw+f0D7Wh1EicNNTdrlmShRqOZcWwdRJG8w4
+	 pPE2jVZA2R+3bqktm0J+WtRqITdWnWaNfk3WJcZy1VsRI/Nv/43GLz11YavGKBAt/a
+	 7aKiQgm9c1kfA==
+Date: Wed, 26 Nov 2025 22:43:51 -0800
 From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+To: Yao Yuan <yaoyuan@linux.alibaba.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>, Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Force trap of GMID_EL1 when the guest
- doesn't have MTE
-Message-ID: <aSfxmQptJlCHhb0M@kernel.org>
+Subject: Re: [PATCH v2 4/5] KVM: arm64: Report optional ID register traps
+ with a 0x18 syndrome
+Message-ID: <aSfzJxBfdI17pyPD@kernel.org>
 References: <20251126155951.1146317-1-maz@kernel.org>
- <20251126155951.1146317-3-maz@kernel.org>
+ <20251126155951.1146317-5-maz@kernel.org>
+ <dk6bwi72nwfty6qpbh2eaeubznqt74gjffas2rclrrwjn5tr6j@mjitrla3p3d7>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,34 +48,48 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251126155951.1146317-3-maz@kernel.org>
+In-Reply-To: <dk6bwi72nwfty6qpbh2eaeubznqt74gjffas2rclrrwjn5tr6j@mjitrla3p3d7>
 
-On Wed, Nov 26, 2025 at 03:59:48PM +0000, Marc Zyngier wrote:
-> If our host has MTE, but the guest doesn't, make sure we set HCR_EL2.TID5
-> to force GMID_EL1 being trapped.
+On Thu, Nov 27, 2025 at 02:07:08PM +0800, Yao Yuan wrote:
+> On Wed, Nov 26, 2025 at 03:59:50PM +0800, Marc Zyngier wrote:
+> > With FEAT_IDST, unimplemented system registers in the feature ID space
+> > must be reported using EC=0x18 at the closest handling EL, rather than
+> > with an UNDEF.
+> >
+> > Most of these system registers are always implemented thanks to their
+> > dependency on FEAT_AA64, except for a set of (currently) three registers:
+> > GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
+> > and SMIDR_EL1 (depending on SME).
+> >
+> > For these three registers, report their trap as EC=0x18 if they
+> > end-up trapping into KVM and that FEAT_IDST is not implemented in the
+> > guest. Otherwise, just make them UNDEF.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++---
+> >  1 file changed, 13 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 2ca6862e935b5..7705f703e7c6d 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -82,6 +82,16 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+> >  			"sys_reg write to read-only register");
+> >  }
+> >
+> > +static bool idst_access(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> > +			const struct sys_reg_desc *r)
+> > +{
+> > +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, 0x0))
 > 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 2 ++
->  1 file changed, 2 insertions(+)
+> Hi Marc,
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 9e4c46fbfd802..2ca6862e935b5 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -5561,6 +5561,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
->  
->  	if (kvm_has_mte(vcpu->kvm))
->  		vcpu->arch.hcr_el2 |= HCR_ATA;
-> +	else if (id_aa64pfr1_mte(read_sanitised_ftr_reg(SYS_ID_AA64PFR1_EL1)))
+> Minor: maybe beter readability if use NI instead of 0x0, just like
+> things in feat_nv2() below, but depends on you.
 
-This helper is ugly!
-
-> +		vcpu->arch.hcr_el2 |= HCR_TID5;
-
-How about setting the trap unconditionally when !kvm_has_mte()? Even in
-the case of asymmetry we'd want GMID_EL1 to trap.
++1, using the ESR value as an identifier in the sysreg tables is just
+terrible. This reads like a literal.
 
 Thanks,
 Oliver
