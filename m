@@ -1,117 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FF832ABF7
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 11:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD26258EF3
+	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 11:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764241722; cv=none; b=VzKI6/lBBrSi6NLOKHp/nmr8O7GF0N6JkvCERczjsF5cOrCTUcTDtoK3EE3P1N3md4rbfcI5dKJolbP64iQtx4Tow7HACT8chLaz+NA7Y0CY0B8NjjDATytZxHxCJA/Ukv1uhxfe1ToVS7dmW1hyu8r8XbSO9KKYlo/3IrNQ3NU=
+	t=1764244131; cv=none; b=ZzBK2DLxU9bLnGdesSbwpMHbtxJlWWfw7qoipeZWbB6/hvTRP0bkA4gGq+6af3nrEd4R4wDLUsjl0IvRlDQGXDuDMLnHtIWGIbGd8HnFp5DhyleBWsL5ch4iVsMBhI+kPMJDMSFPhygILijb2ReIqIbe7ufwvdaKBbh3z36/Hzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764241722; c=relaxed/simple;
-	bh=sgv0ngZl3R0UBBCOfD0Wy5vgMgcm8qI+c3ByDO7gkVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y3wnhXdxwzQqr4z+GTZ7dPZvKEBsZ5j315lWrIEzTxxC0uj35zJ9KoYLMCa9wGT+LEuUoPJUqpi72kkb1xYCTBgN878JL1nhvE0BO5XM4b6rSDXnx6IXVrTC/vpPV7Xx2KsgJPS7c2HtVr4NUG9MD72sJOo5Bg1qDG4iZqOMauA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8BCB31477;
-	Thu, 27 Nov 2025 03:08:32 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B35F43F66E;
-	Thu, 27 Nov 2025 03:08:38 -0800 (PST)
-Date: Thu, 27 Nov 2025 11:08:32 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 00/10] arm64: EL2 support
-Message-ID: <20251127110832.GA3240191@e124191.cambridge.arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
+	s=arc-20240116; t=1764244131; c=relaxed/simple;
+	bh=Kmy6fbm4AVNE0igIM0FCeD2lcq4jABrCROTkwk52m3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=McUcO+k3Tyr6/P7dsSmw0kMSg5txb7mWWaL+sOsEk6lY+N1y0bdITR+N0xWNAz6OWCIPFp2nmm3IzOASN7U6HEa7dQGM6YlMKqRy6UbrRZy+NlIGx9bG2WQJVyvCgVXzZnz9cbFv5qUmRFZOvpEHoiHWG03X2qkWdrZdiPcBblE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XWTtN5L7; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XWTtN5L7"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Dw31ylgTw5lVkOHJ0GjXBHniTQtPSmoq+7esHDkGbVw=;
+	b=XWTtN5L7zPwfC0KqbuHtes1A/mmqYWRuONQsCEL6DCH3mFXhGME9j5wthhQnM0qC+Zl4U0HD2
+	A92Y/JUbpG8MX5P7KuhPOd6V4u9tYnk12FGAqW3P2OfgoM7gvrdlRUBIGm7kqBGCxxQ7KkmJrmL
+	Rp4BQuZcRuDEgxiHbEZ+R1c=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dHF5w4WDwznTY0;
+	Thu, 27 Nov 2025 19:47:16 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9687A140135;
+	Thu, 27 Nov 2025 19:48:39 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 27 Nov 2025 19:48:38 +0800
+Message-ID: <54558610-1062-4632-a44c-d06443bdc736@huawei.com>
+Date: Thu, 27 Nov 2025 19:48:38 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <44fac47f-1df1-4119-8bf0-1db96cda18ef@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register
+ information
+To: Marc Zyngier <maz@kernel.org>, Tian Zheng <zhengtian10@huawei.com>
+CC: <oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
+	<pbonzini@redhat.com>, <will@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
+ <20251121092342.3393318-2-zhengtian10@huawei.com>
+ <86wm3iqlz8.wl-maz@kernel.org>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <86wm3iqlz8.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On Thu, Nov 27, 2025 at 11:04:43AM +0100, Eric Auger wrote:
-> Hi Joey,
+
+
+On 2025/11/22 20:40, Marc Zyngier wrote:
+> On Fri, 21 Nov 2025 09:23:38 +0000,
+> Tian Zheng <zhengtian10@huawei.com> wrote:
+>>
+>> From: eillon <yezhenyu2@huawei.com>
+>>
+>> The ARM architecture added the HDBSS feature and descriptions of
+>> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+>> add them to Linux.
+>>
+>> Signed-off-by: eillon <yezhenyu2@huawei.com>
+>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/esr.h     |  2 ++
+>>   arch/arm64/include/asm/kvm_arm.h |  1 +
+>>   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+>>   3 files changed, 31 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index e1deed824464..a6f3cf0b9b86 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -159,6 +159,8 @@
+>>   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+>>
+>>   /* ISS2 field definitions for Data Aborts */
+>> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+>> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>>   #define ESR_ELx_TnD_SHIFT	(10)
+>>   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>>   #define ESR_ELx_TagAccess_SHIFT	(9)
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index 1da290aeedce..b71122680a03 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -124,6 +124,7 @@
+>>   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>>
+>>   /* VTCR_EL2 Registers bits */
+>> +#define VTCR_EL2_HDBSS		(1UL << 45)
 > 
-> On 9/25/25 4:19 PM, Joey Gouly wrote:
-> > Hi all,
-> >
-> > This series is for adding support to running the kvm-unit-tests at EL2. These
-> > have been tested with Linux 6.17-rc6 KVM nested virt.
-> >
-> > This latest round I also tested using the run_tests.sh script with QEMU TCG,
-> > running at EL2.
-> >
-> > The goal is to later extend and add new tests for Nested Virtualisation,
-> > however they should also work with bare metal as well.
-> >
-> > Changes since v2[1]:
-> > 	- Move the sctlr setup in EFI to a function.
-> > 	- Decided to not re-use el2_setup.h from Linux, looked more
-> > 	  complicated to use than needed for KUT.
-> > 	- Add EL2 env variable for testing, open to feedback for that.
-> > 	  This was untested with kvmtool as my testing setup only has
-> > 	  busybox ash currently, and the run_tests.sh script needs bash.
-> >
-> > Issues (that I think are fine to investigate/fix later):
-> > 	- Some of the debug tests fail with QEMU at EL2 and kvmtool.
-> > 	- The gic ipi test times out with QEMU at EL2, but works with kvmtool.
+> I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+> instead of adding extra bits here.
 > 
-> Have you noticed any failure with migration tests. On my end, as soon as
-> I set EL2=1 migration tests do fail.
+Sure, I will move VTCR_EL2_HDBSS into the sysreg description file
+alongside VTCR_EL2.
+> 	M.
 
-Yes migration also fails here, forgot to mention that.
 
-Seems like migration completes, but then something bad happens on the first
-interrupt. I will investigate a bit now and see if it's an easy fix.
-
-Thanks,
-Joey
-
-> 
-> Eric
-> >
-> > Thanks,
-> > Joey
-> >
-> > [1] https://lore.kernel.org/kvmarm/20250529135557.2439500-1-joey.gouly@arm.com/
-> >
-> > Alexandru Elisei (2):
-> >   arm64: micro-bench: use smc when at EL2
-> >   arm64: selftest: update test for running at EL2
-> >
-> > Joey Gouly (8):
-> >   arm64: drop to EL1 if booted at EL2
-> >   arm64: efi: initialise SCTLR_ELx fully
-> >   arm64: efi: initialise the EL
-> >   arm64: timer: use hypervisor timers when at EL2
-> >   arm64: micro-bench: fix timer IRQ
-> >   arm64: pmu: count EL2 cycles
-> >   arm64: run at EL2 if supported
-> >   arm64: add EL2 environment variable
-> >
-> >  arm/cstart64.S             | 56 ++++++++++++++++++++++++++++++++++++--
-> >  arm/efi/crt0-efi-aarch64.S |  5 ++++
-> >  arm/micro-bench.c          | 26 ++++++++++++++++--
-> >  arm/pmu.c                  | 13 ++++++---
-> >  arm/run                    |  7 +++++
-> >  arm/selftest.c             | 18 ++++++++----
-> >  arm/timer.c                | 10 +++++--
-> >  lib/acpi.h                 |  2 ++
-> >  lib/arm/asm/setup.h        |  8 ++++++
-> >  lib/arm/asm/timer.h        | 11 ++++++++
-> >  lib/arm/setup.c            |  4 +++
-> >  lib/arm/timer.c            | 19 +++++++++++--
-> >  lib/arm64/asm/sysreg.h     | 19 +++++++++++++
-> >  lib/arm64/processor.c      | 12 ++++++++
-> >  14 files changed, 191 insertions(+), 19 deletions(-)
-> >
-> 
