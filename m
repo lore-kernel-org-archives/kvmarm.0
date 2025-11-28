@@ -1,68 +1,68 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2846428DB52
-	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 16:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D2D285CA7
+	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 16:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764348345; cv=none; b=VGjXq7C4KnvyRo2341fPVbo2qfZyKpxKoEKesM6p8Kg9WKPvAHx5n0lfhyjSIJUQI3nDPfkviXBpaIJXgS0Zw5koHUVCpXv4XFDb8uvJ/86VFNHQcPhRnWo8kIeQpWwu+ULOC2CTdbznwZcVPru9jYNMqlDDaKNF/aefSaD/CRA=
+	t=1764348419; cv=none; b=unw6+0JOCk6mh2Mb810jX5hSXdCFEwAm+GcL7tGoMnd9CIYSDxx3M74v7FS2cRtI/ozcyuxZ2tu7nVqYIK8GkEGjeiW7ndhSrYb3DlPjgnvOnngIUFSUwIW6jjlnnaX5hU4kSlECFtdHE2buCcmgSHgt47/ZCEj6N80vq7s8lqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764348345; c=relaxed/simple;
-	bh=Cpzk7bcGRWcSKZ2pCJVSu0NktIw2AZpfODjcTJoI7zU=;
+	s=arc-20240116; t=1764348419; c=relaxed/simple;
+	bh=WX4pc9BQeZW3s5krELSMAl7NSmtfwDPPbwwaGWHKB0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0nj42awfFXa9CEm8kazuE7bXXYDmxib2wfsKsLwPLs6zUupgyi65/H1NvUL6SHHxSz63EIOr5vv22vnfcsIz5BmgElsegM6VNNNPirpEBE3VT+NI5Vt+dcwSuBZQOAFLplPNEzRyyvl5vXkmK9/UsFb01mkLNEHAwqXbMVir5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=HVuQ0GVZ; arc=none smtp.client-ip=209.85.219.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=LTnN7E7vKMUoRh7oMUFV844iBCeI6S3/KYWrNrgq2V93uKUK9D34KRDCGHTzIhNxEF7WCnaHsKaQEoYuaVebAu705/yYSQvPy6OznRl8IS0oAwjVsQ6QBifuUIjlMAF8cwu7uw0xWihLoe6oGHUNlJqoEWjYKwq8TdwLuI4ThbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=T/je1K8N; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="HVuQ0GVZ"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-880439c5704so19938586d6.1
-        for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 08:45:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="T/je1K8N"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-8b29ff9d18cso185366385a.3
+        for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 08:46:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1764348343; x=1764953143; darn=lists.linux.dev;
+        d=ziepe.ca; s=google; t=1764348416; x=1764953216; darn=lists.linux.dev;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cpzk7bcGRWcSKZ2pCJVSu0NktIw2AZpfODjcTJoI7zU=;
-        b=HVuQ0GVZIgymALTv3FCZt7+syL/n6iojjfjqw/QRiPpqrdElJJg2MMRcqskvr7a/YF
-         VbAeExN0RBFYn7JA/ltdstG+pdjlI9jGvENj61+ndd0rVtG2QtJbiw5gwbbbripl/dbR
-         eCFke1d05gYPt7wOfakBnWsXZHeI7AR2z9OBg6QTzX2gTeWlUSpB6jBEIPNRrhVwfTOF
-         xbwyh11YYxz1fa+sSEX485Umb1PNG5qgOYdVcCFKPG+EwdnuXtc7GjG1rHCiz3fsfaI9
-         UA3UTZYLP1R1Q8rfLgg2xXzrQChIPmxq7LRjCZl1eE3WtHBFmeOYo3YN8vo8hSPcc/Wp
-         Siew==
+        bh=WyDxOQ8Lw5prQGezJfzgyKDZ5+VnUcEleF9/ih+sij8=;
+        b=T/je1K8Ngl531nFzyaKxrO3Hx00Vo3CHjpJw0D+FDi4IrXcgRlSsO7rXSIvojrn9MP
+         JBrNQy43Q0w4IcLAUnanrzblCimGwmX/2M5+nciuGeDiFv9n4S0eQTkJr0D+/+N15+CH
+         RZYtyeIO6sZ7RXJqqYQQhg2Lb/x66sWDNapgfMZtPFUEzV5l2LfynasMYk1i4zoRJTJ4
+         MW770fWfwjQkahKDv19jlJexKLnESMKoquTxo6sMdhqleePTDUAgH/gxjZQvxEQkS1t5
+         1MME71P5NUk1kKpwL4AXvANDgPIpC9pA3ncDNcvvCIY2F0AAie+KFfiIr6Xvvb+XXfdW
+         QPJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764348343; x=1764953143;
+        d=1e100.net; s=20230601; t=1764348417; x=1764953217;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Cpzk7bcGRWcSKZ2pCJVSu0NktIw2AZpfODjcTJoI7zU=;
-        b=qYpjU5DGHOLin7Aqq6fEpGno7IO8EGy0fso98PdETdyyU5MmioLDi3Or19LpfvhSJs
-         tofbguSEIB124F9mXoSycqL0twjP7JKe/FKTH+WJb0wvHahiYGQ/PpmBn5vEvDeQ+1Jx
-         Oi2dQwQ8+CXBTAwFYYlBnsD76t1zOaJEsnJFSfkNXJTxbHghwx5T4m8zuVm/9LbjELjm
-         QJKM6ZMuT/L6I3x/5I6sFlb6Lby3XvTrWkywZ71ux1zMRcQlAtaO6Tdkm7pvSMWOeILB
-         sVYsIc0Xai5JUf6hucTNpJgH/iRZIfRiEgJpjXW/bsxCFmN60VxIfESgH0rHPafv6z9J
-         R0Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSHiys+OwxhMV7GrdJkVWYi7Hc5imgzaPtP5fk2w7dIYvl1tqLm7ZhBVUSOyWDDhbEBKEToHg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx8D0X0eVsvVjNxN95a5bkeGOA8Z2RvmtgVMFpbEXzmEZGp+sAv
-	RYvvNmEVTzF9jz7z2ZEr45OAwY0ANJHC7SnmdVQepaSVqMFAPsAtO6fWEWZ2YMFIAz0=
-X-Gm-Gg: ASbGncvbaOmcKm4SJunmpehSS1TQv6buCyqGboItyDZUQ9EtDgv+LALuX5vY3e+CZUH
-	rZaxnbFT/mu7uPsatDSvOqtvAfPvPRibfFt36IInw+hETY3MxduKyS5jF2+UeruAnV8Qm/G6tjk
-	hLTrzVN7/59E6NsW8kmNWoivzTSRtFUaxvkf6KRvkCGsX87octO09yAdrBDE6xrphCJk5oj3nYz
-	GUXJwJAicoiHMCGShpE71ef+tXsETib4ya11nULqbed6CZrE1575JJrU1qvdcEtL8K4aDqGQqU0
-	myyGtffQTveqMjv9cgtUmQ0ubox+qO4MEgPRpDgl0iMB71w9icpGv2OqdoO6X+wcs4x4nKoi0n2
-	Be9rwaP+sEe9X5jiqgdKEeUqGZTFYbctI6BYA3P10WQp4Bc8kRSfVwtr8OIF3UI/dc7vPOldjY2
-	XLd+j8PedX5udvhwZUig6enMrX81lbHyaGsYlIHStte5OID/U6ebEBlXX+
-X-Google-Smtp-Source: AGHT+IEQdKc+IcKw3qnpBrSVmQlkpj+jbCLM52rDH21kCOY0Js9AqiEVYv/dkHvCwjTpPv/UNBoquA==
-X-Received: by 2002:ad4:5be2:0:b0:880:53e3:3a2 with SMTP id 6a1803df08f44-8863ae61a58mr231831966d6.11.1764348342896;
-        Fri, 28 Nov 2025 08:45:42 -0800 (PST)
+        bh=WyDxOQ8Lw5prQGezJfzgyKDZ5+VnUcEleF9/ih+sij8=;
+        b=WrL0YnDTPfgKOvxSkhQRIhhnpxQKcjDsWQgFBXU61a9WIQBsZidrmhxd8W8HjszyWY
+         eYZdkI12M1UPYQXH6YvwDPA7ZtT3WqRfaLxa2/E6t70NtgsKmXX2cNH7osJrHEcIZi9a
+         xcShJ8CzV/2e4SrkRqrj5LjX0jVNy6jk982Q7fVjFLaTUmphR/kd9eNLwrmQQO7AVjgU
+         Vdb/NB86YAmob+NmB6V7aSvP9XofKOzMjiWTPEI3lUGP4dT4HkNEGM48MmptSTcd7Hre
+         FcP47UYqP3/uIM6C96VF9uHUyRUjcQZftANep+4sGTh7bPc1yoWSxBGvJ44zqcT4SOsV
+         WRmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXn/w3rRJ+meCNuss0WFQCwab7v3GgpVQkH6BDYRS1c3CPTd8L3LWIrmswaV6VlWUgtztyi57E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxeFlx8ip2TLXj7LFOtoIcwKNzJnXMqkUGx+2/yqbATGiZC9IKk
+	Xlz3U4bDFS/rve+TdCD/eAvGUTYrR3OtLbcDQmMCuELqgsc3729eg/PJXpGA9WBIUIo=
+X-Gm-Gg: ASbGncs+wQRawHz6qmuK/N/7G6oTR+eT3JOh2nlei/KnmGISK/U6XFWfLx4GX6znDT6
+	798ZnEKoWIeWA/WC6r0l6hf8OmE335DeQvFbJJuye/9QdJTrISEOYsxczoCSSAi1bDlLvLTzl1B
+	nvusZI9FyEP8/KxENkoE/uhU76V4ZPxxKPYHnRM4GJF44l7bITh4P2iPL/9M/KUHuu0rKZMYS+2
+	A56NJKaGhEKPncA4oiEdE/qljU3PXO/jcI1/2KwOfDVqItvj6Ub06X4jcD5OSKtWwrSf2Dom0V0
+	4gW/KN/jj0QuVYyx//o6cL5dIM9Y/C81Ta92MCyGj5AsCiZCZSBc3z0Rz424t56b7DCwKI19b38
+	o88pS6IQkbMYGTLAAKLbVa88GKVgQlduAKs/fbHmmDMoYWESAUo+GQ82LC78orQCeXv8taypyDD
+	5gxIhr0MYrhC9Lm6OxxcW+IWaq64QLcj2xGtKn6NMuhw8sxaBl8DnHdsk0Ojoxyj968wE=
+X-Google-Smtp-Source: AGHT+IEp5YYm0eW3jhapM8OVullA+b9CRrzLXKAGXQfH68FS3XEeNccrfEDUvP/XIE+WOdxNSzgv+g==
+X-Received: by 2002:a05:620a:4694:b0:8b2:e986:26ff with SMTP id af79cd13be357-8b33d469db8mr3847315685a.66.1764348416499;
+        Fri, 28 Nov 2025 08:46:56 -0800 (PST)
 Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b6851dsm31384526d6.42.2025.11.28.08.45.42
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1b6591sm338772785a.30.2025.11.28.08.46.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 08:45:42 -0800 (PST)
+        Fri, 28 Nov 2025 08:46:55 -0800 (PST)
 Received: from jgg by wakko with local (Exim 4.97)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1vP1bJ-00000003Puv-2JnU;
-	Fri, 28 Nov 2025 12:45:41 -0400
-Date: Fri, 28 Nov 2025 12:45:41 -0400
+	id 1vP1cV-00000003Pw0-0IzM;
+	Fri, 28 Nov 2025 12:46:55 -0400
+Date: Fri, 28 Nov 2025 12:46:55 -0400
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Mostafa Saleh <smostafa@google.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -72,11 +72,10 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
 	praan@google.com, danielmentz@google.com, mark.rutland@arm.com,
 	qperret@google.com, tabba@google.com
-Subject: Re: [PATCH v5 04/27] iommu/io-pgtable-arm: Factor kernel specific
- code out
-Message-ID: <20251128164541.GA812105@ziepe.ca>
+Subject: Re: [PATCH v5 05/27] iommu/arm-smmu-v3: Split code with hyp
+Message-ID: <20251128164655.GB812105@ziepe.ca>
 References: <20251117184815.1027271-1-smostafa@google.com>
- <20251117184815.1027271-5-smostafa@google.com>
+ <20251117184815.1027271-6-smostafa@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -85,26 +84,22 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251117184815.1027271-5-smostafa@google.com>
+In-Reply-To: <20251117184815.1027271-6-smostafa@google.com>
 
-On Mon, Nov 17, 2025 at 06:47:51PM +0000, Mostafa Saleh wrote:
-> Some of the used APIs are only part of the kernel and are not
-> available in the hypervisor, factor those out:
-> - alloc/free memory
+On Mon, Nov 17, 2025 at 06:47:52PM +0000, Mostafa Saleh wrote:
+> The KVM SMMUv3 driver would re-use some of the cmdq code inside
+> the hypervisor, move these functions to a new common c file that
+> is shared between the host kernel and the hypervisor.
+> 
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  drivers/iommu/arm/arm-smmu-v3/Makefile        |   2 +-
+>  .../arm/arm-smmu-v3/arm-smmu-v3-common-lib.c  | 114 +++++++++++++
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c   | 161 ------------------
+>  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h   |  61 +++++++
 
-Why not provide the iommu-pages API for the hypervisor environment?
-
-Same for virt_to_phys, that could be moved into an iommu-pages wrapper
-too..
-
-I want to change other parts of the driver to use iommu-pages in the
-long run as well, so putting the abstraction there is probably more
-valuable than this.
-
-Also the genericpt stuff is merged, should you (eventually?) be making
-a pKVM hypervisor specific set of page table functions? Eg if all you
-are doing is mirroring the host stage 2 I think you can build
-something much more efficient...
+I would think these inlines should go in some -common.h instead of
+arm-smmu-v3.h for better clarity, and ideally pkvm stuff does not
+include arm-smmu-v3.h at all?
 
 Jason
-
