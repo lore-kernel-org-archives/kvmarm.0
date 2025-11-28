@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECAE22652D
-	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 15:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462D779CD
+	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 15:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764344809; cv=none; b=HdiLGVuf1BXPwUFcfiLewJrxbRhKclDJfXXeW512/enaWtiBxT4cDTWwsh8UwXdpBcx4k7pL6W+acGVY51IeGstsp82VahkCSiwH+nS31z/jPcgdThgNQYPcyRAWtPZ53Fn2sBe6YmMLrrfXzGXHnazsi70QK/sPanb1k1SpAdw=
+	t=1764345095; cv=none; b=LhsTFFYB0Bk8/KwmZ1kLVLBbsRYaRJ28WyWdQeBwhcT8M7xPJIVSprgdmyMxy8z0nnyLJhND+zx1i5J1Ph6Ugi1Cs7arjjhByTyNpSNgcStRHXYDGNnRFSYZO0pp9Jd4YRuhRJisFLK4Ew3ah9F58MoBSoZd7CM/rI73LOLRkK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764344809; c=relaxed/simple;
-	bh=MNj5HtF+aSbUYKg2YiyCvOZvfVfh1yCk+bi5DQ2Unfg=;
+	s=arc-20240116; t=1764345095; c=relaxed/simple;
+	bh=aPLWofWdUipzpbGuIHYeHU8jUS57cqxPSIx0x6D8pto=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZvDhGtoC771tZTWAl8rIqgLid+hTiNhimWvD1AIcJANTy90lcotAa7IQyfEnMIwARlPBGRMpc8WDsi4kLZJThgCjPKidyv10gvAAvIl0deSQF98u/U3WmP9TVXPS8AoS2tu6D6kpZEc0uXEqrttxkvnIrEw0wk8Igyazh2BFqs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hl9WFIhM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LX7sW1Yh1JRR9qqtIMZt4M1+WgUEYnqmwIessJT87KyKqb0cJbdV457Zr9IG8GowMVtyyh6Vh4e805Pia6xg6jrRa+D/7wJZ8nkbhwf79xcv3QOfnj19J60kyo5L5O2y9/UbFgQ2+ceo4vR9jQLJkH3H5FA1CdY+vWJulH6Ywtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYmg2uDV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hl9WFIhM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C11C4CEF1;
-	Fri, 28 Nov 2025 15:46:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYmg2uDV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE878C4CEFB;
+	Fri, 28 Nov 2025 15:51:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764344807;
-	bh=MNj5HtF+aSbUYKg2YiyCvOZvfVfh1yCk+bi5DQ2Unfg=;
+	s=k20201202; t=1764345094;
+	bh=aPLWofWdUipzpbGuIHYeHU8jUS57cqxPSIx0x6D8pto=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Hl9WFIhM1och/MG27u+iJ3u32N3ggjIJxIoj1x6CJXgAW4hVgiiw1n3YWP7NzKbmY
-	 Ufhv3JbQZgo5zREwGe9UwcGZLcgfXt1Itm1thN3drPd8iAbozI538imvOKilvocXhs
-	 FR/KLRQRIsBFCX6hrKQ7KAzhEKuoCwDA5sB2ab7wK8jztsp7lm9aXrAyJ60hiuB3pZ
-	 FZfMOr69HHFwbaAlD0vlj0yF3SSVPkcOLvsQ6KIXlRt9lTfPNYlNtDt1QNmqKhsXH1
-	 YQfbhTDjCxWEE55AaTzhmOz5LDQEL8hhWf6y/ygZw9T0V1MARq61bVakNZ5Fgfd+Sv
-	 lfuifu1XlRCBA==
+	b=lYmg2uDVWyfjQSNLny1cLjM1VW7jsnTpJ4jPu+JkwIaBc0BqsEwCra07d+yDa9v0J
+	 ABgBqh9qO3MMC5amZ0IGnPsk53/ZRNufHBBRbEfnLGmLJ0EiFEBZ3A5PHE1ec8X8h8
+	 7LEP0i1LUcOuyexzzFHUN8twOyh4lZPu67NsVgk63RTJhNfEA5ZtsgQ9IDgNp/MoqH
+	 Ce/CmifNmBO4F9I5P5e5LCNvDi90VMJQ1+smgMGQk/BVwg3Sgky+Hwgad7D7KRTh67
+	 JkruvyNhp+xPhcRqH83Mk912YARDPRtHFgD+eh8uPFt0ILV4W9FccZn0Ggwb/XaPY/
+	 YIuxUsTvuMBOQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vP0gH-000000097pK-0tRU;
-	Fri, 28 Nov 2025 15:46:45 +0000
-Date: Fri, 28 Nov 2025 15:46:44 +0000
-Message-ID: <86v7iup3bv.wl-maz@kernel.org>
+	id 1vP0ku-000000097sK-1bwp;
+	Fri, 28 Nov 2025 15:51:32 +0000
+Date: Fri, 28 Nov 2025 15:51:31 +0000
+Message-ID: <86tsyep33w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: oliver.upton@linux.dev,
@@ -42,10 +42,10 @@ Cc: oliver.upton@linux.dev,
 	suzuki.poulose@arm.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/4] KVM: arm64: nv: Don't mask VTCR_EL2.HA if FEAT_HAFDBS is present
-In-Reply-To: <20251128100946.74210-4-alexandru.elisei@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: at: Update AF on software walk only if VM has FEAT_HAFDBS
+In-Reply-To: <20251128100946.74210-5-alexandru.elisei@arm.com>
 References: <20251128100946.74210-1-alexandru.elisei@arm.com>
-	<20251128100946.74210-4-alexandru.elisei@arm.com>
+	<20251128100946.74210-5-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -61,50 +61,44 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 28 Nov 2025 10:09:45 +0000,
+On Fri, 28 Nov 2025 10:09:46 +0000,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Commit 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management
-> in stage-2 SW PTW") added support for hardware updates to the access flag
-> to stage 2 if the feature is available to the virtual machine, but forgot
-> to remove the VTCR_EL2.HA bit from the res0 mask for the register. Remove
-> it from the mask to allow the VM to use the feature.
+> A guest can write 1 to TCR_ELx.HA, making the KVM software walker update
+> the access flag in a table descriptor even if FEAT_HAFDBS is not present.
+> Avoid this by making wi->ha depend on FEAT_HAFDBS being enabled in the VM,
+> similar to how the software walker treats FEAT_HPDS.
 > 
-> Fixes: 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
+> This is not needed for VTCR_EL2.HA, since a guest will always write to
+> the in-memory copy of the register, where the HA bit is masked (set to
+> 0) by KVM if the VM doesn't have FEAT_HAFDBS.
+> 
+> Fixes: c59ca4b5b0c3 ("KVM: arm64: Implement HW access flag management in stage-1 SW PTW")
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/nested.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/at.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 911fc99ed99d..7a34163f6c68 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1719,7 +1719,9 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
->  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 6d41a95f6c60..53bf70126f81 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -346,7 +346,8 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
 >  
->  	/* VTCR_EL2 */
-> -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-> +	res0 = GENMASK(63, 32) | GENMASK(30, 22) | BIT(20);
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, AF))
-> +		res0 |= VTCR_EL2_HA;
->  	res1 = BIT(31);
->  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+>  	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
 >  
+> -	wi->ha = (wi->regime == TR_EL2 ?
+> +	wi->ha  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HAFDBS, AF);
+> +	wi->ha &= (wi->regime == TR_EL2 ?
+>  		  FIELD_GET(TCR_EL2_HA, tcr) :
+>  		  FIELD_GET(TCR_HA, tcr));
 
-The fix is correct, but I really do not want to add more of these
-tedious checks, one after the other. We should fix this once and for
-all by converting VTCR_EL2 to the feature dependency infrastructure
-and be done with it.
-
-I've pushed a small series at [1] that does that (very lightly
-tested).
+This is yet another case where we should expand the sanitisation
+infrastructure to cover the TCR registers.
 
 Thanks,
 
 	M.
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vtcr
 
 -- 
 Without deviation from the norm, progress is not possible.
