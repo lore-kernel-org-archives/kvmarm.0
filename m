@@ -1,127 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71B8230BCC
-	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 15:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECAE22652D
+	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 15:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764343130; cv=none; b=YtkNuruP5lI2amXwDV9ePUyjcFVZc/1ivzKu3VXar+u18nc6ycNIoUuRfJa/UwjFrLjmQNtwCLC1cqjdELK5zT/SbiSS7NvV1HI3aQm7AcoHSwtOmDbyYdzx/8OpMTfeTC8+zZV3nyaAk6tdchiBL3CEQnbqGLLg2IsgzRQ77k0=
+	t=1764344809; cv=none; b=HdiLGVuf1BXPwUFcfiLewJrxbRhKclDJfXXeW512/enaWtiBxT4cDTWwsh8UwXdpBcx4k7pL6W+acGVY51IeGstsp82VahkCSiwH+nS31z/jPcgdThgNQYPcyRAWtPZ53Fn2sBe6YmMLrrfXzGXHnazsi70QK/sPanb1k1SpAdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764343130; c=relaxed/simple;
-	bh=cPIAl0MknH3Ubw5SLJY+k56ymudueQeGEETaisFABrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZlrZ0LVfp39GFEmzfNembzxHBk8UeSrvLbDapB/L984cBr1wi2ghr/2MnzmFYmuzD0gFDtgL1Sb2dpzROUPI1Jeezt1rfiAo+B2zP0KQFn0yMpjilQmV0vGX7+Az4ik8PRmFd5ie91On0fZiGCWpnufcfJUpvoUXwDKtTTFMq6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C031D176A;
-	Fri, 28 Nov 2025 07:18:39 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0BE83F66E;
-	Fri, 28 Nov 2025 07:18:45 -0800 (PST)
-Date: Fri, 28 Nov 2025 15:18:43 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 02/10] arm64: efi: initialise SCTLR_ELx
- fully
-Message-ID: <20251128151843.GB3391839@e124191.cambridge.arm.com>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-3-joey.gouly@arm.com>
- <92f27f98-e4c9-41d9-badc-635e5ba40552@redhat.com>
+	s=arc-20240116; t=1764344809; c=relaxed/simple;
+	bh=MNj5HtF+aSbUYKg2YiyCvOZvfVfh1yCk+bi5DQ2Unfg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZvDhGtoC771tZTWAl8rIqgLid+hTiNhimWvD1AIcJANTy90lcotAa7IQyfEnMIwARlPBGRMpc8WDsi4kLZJThgCjPKidyv10gvAAvIl0deSQF98u/U3WmP9TVXPS8AoS2tu6D6kpZEc0uXEqrttxkvnIrEw0wk8Igyazh2BFqs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hl9WFIhM; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hl9WFIhM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C11C4CEF1;
+	Fri, 28 Nov 2025 15:46:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764344807;
+	bh=MNj5HtF+aSbUYKg2YiyCvOZvfVfh1yCk+bi5DQ2Unfg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Hl9WFIhM1och/MG27u+iJ3u32N3ggjIJxIoj1x6CJXgAW4hVgiiw1n3YWP7NzKbmY
+	 Ufhv3JbQZgo5zREwGe9UwcGZLcgfXt1Itm1thN3drPd8iAbozI538imvOKilvocXhs
+	 FR/KLRQRIsBFCX6hrKQ7KAzhEKuoCwDA5sB2ab7wK8jztsp7lm9aXrAyJ60hiuB3pZ
+	 FZfMOr69HHFwbaAlD0vlj0yF3SSVPkcOLvsQ6KIXlRt9lTfPNYlNtDt1QNmqKhsXH1
+	 YQfbhTDjCxWEE55AaTzhmOz5LDQEL8hhWf6y/ygZw9T0V1MARq61bVakNZ5Fgfd+Sv
+	 lfuifu1XlRCBA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vP0gH-000000097pK-0tRU;
+	Fri, 28 Nov 2025 15:46:45 +0000
+Date: Fri, 28 Nov 2025 15:46:44 +0000
+Message-ID: <86v7iup3bv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/4] KVM: arm64: nv: Don't mask VTCR_EL2.HA if FEAT_HAFDBS is present
+In-Reply-To: <20251128100946.74210-4-alexandru.elisei@arm.com>
+References: <20251128100946.74210-1-alexandru.elisei@arm.com>
+	<20251128100946.74210-4-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92f27f98-e4c9-41d9-badc-635e5ba40552@redhat.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Nov 27, 2025 at 05:49:45PM +0100, Eric Auger wrote:
-> Hi Joey,
+On Fri, 28 Nov 2025 10:09:45 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> On 9/25/25 4:19 PM, Joey Gouly wrote:
-> > Don't rely on the value of SCTLR_ELx when booting via EFI.
-> >
-> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> > ---
-> >  lib/arm/asm/setup.h   |  6 ++++++
-> >  lib/arm/setup.c       |  3 +++
-> >  lib/arm64/processor.c | 12 ++++++++++++
-> >  3 files changed, 21 insertions(+)
-> >
-> > diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-> > index 9f8ef82e..4e60d552 100644
-> > --- a/lib/arm/asm/setup.h
-> > +++ b/lib/arm/asm/setup.h
-> > @@ -28,6 +28,12 @@ void setup(const void *fdt, phys_addr_t freemem_start);
-> >  
-> >  #include <efi.h>
-> >  
-> > +#ifdef __aarch64__
-> > +void setup_efi_sctlr(void);
-> > +#else
-> > +static inline void setup_efi_sctlr(void) {}
-> > +#endif
-> > +
-> >  efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
-> >  
-> >  #endif
-> > diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-> > index 67b5db07..0aaa1d3a 100644
-> > --- a/lib/arm/setup.c
-> > +++ b/lib/arm/setup.c
-> > @@ -349,6 +349,9 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
-> >  {
-> >  	efi_status_t status;
-> >  
-> > +
-> spurious line
-> > +	setup_efi_sctlr();
-> > +
-> >  	exceptions_init();
-> >  
-> >  	memregions_init(arm_mem_regions, NR_MEM_REGIONS);
-> > diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-> > index eb93fd7c..edc0ad87 100644
-> > --- a/lib/arm64/processor.c
-> > +++ b/lib/arm64/processor.c
-> > @@ -8,6 +8,7 @@
-> >  #include <libcflat.h>
-> >  #include <asm/ptrace.h>
-> >  #include <asm/processor.h>
-> > +#include <asm/setup.h>
-> >  #include <asm/thread_info.h>
-> >  
-> >  static const char *vector_names[] = {
-> > @@ -271,3 +272,14 @@ bool __mmu_enabled(void)
-> >  {
-> >  	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
-> >  }
-> > +
-> > +#ifdef CONFIG_EFI
-> > +
-> > +void setup_efi_sctlr(void)
-> > +{
-> > +	// EFI exits boot services with SCTLR_ELx.M=1, so keep
-> > +	// the MMU enabled.
-> I don't really understand the comment, if MMU was enabled why are we
-> mandated to set M bit again?
+> Commit 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management
+> in stage-2 SW PTW") added support for hardware updates to the access flag
+> to stage 2 if the feature is available to the virtual machine, but forgot
+> to remove the VTCR_EL2.HA bit from the res0 mask for the register. Remove
+> it from the mask to allow the VM to use the feature.
+> 
+> Fixes: 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/kvm/nested.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 911fc99ed99d..7a34163f6c68 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1719,7 +1719,9 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+>  
+>  	/* VTCR_EL2 */
+> -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
+> +	res0 = GENMASK(63, 32) | GENMASK(30, 22) | BIT(20);
+> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, AF))
+> +		res0 |= VTCR_EL2_HA;
+>  	res1 = BIT(31);
+>  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+>  
 
-I'm overwriting sctlr_el1 with a fully new value, rather than using a
-'read-modify-write' style. So the comment is justifying why I'm using the
-INIT_SCTLR_EL1_MMU_OFF define but also or-ing in the M bit.
+The fix is correct, but I really do not want to add more of these
+tedious checks, one after the other. We should fix this once and for
+all by converting VTCR_EL2 to the feature dependency infrastructure
+and be done with it.
 
-> 
-> Eric
-> > +	write_sysreg(INIT_SCTLR_EL1_MMU_OFF | SCTLR_EL1_M, sctlr_el1);
-> > +}
-> > +
-> > +#endif
-> 
+I've pushed a small series at [1] that does that (very lightly
+tested).
 
 Thanks,
-Joey
+
+	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vtcr
+
+-- 
+Without deviation from the norm, progress is not possible.
