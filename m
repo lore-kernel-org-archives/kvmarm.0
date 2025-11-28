@@ -1,179 +1,190 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A7B770FE
-	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 14:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF20309DC5
+	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 15:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764339438; cv=none; b=Sp5yv/h2OOaJb49o0+VD5rVW5AXabLRVT4J1EAsezurjj0Yw5DdbLPgMmk9Nhyg6B1hgosj4TtwnASIOOEz3Befk/y9RKnQcd+525xput186Z1mH9sYbhIoqnUHAilx/13C7IC3nSRSb89lilI/8SJB9y2U0r0LDOSPJ1qrXjT8=
+	t=1764342726; cv=none; b=XhyUkwOIJaN8FNAvByD/w0Y3F5mppDNyQ2f1hdc3HqDVcykjLgarmolX3ycWHReeIJJ9g2T4ywxP7DgVfsPrSEyR7eh8sx4oyA0t8nxCOkGJf1T9WODSXHvfmo3HuINMwlk6XF2tNOpk9UWSSJdyJ2wy1Dtsf/NHADbnyT/VqpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764339438; c=relaxed/simple;
-	bh=znVfCnkhwZOTtHLotYIU8+PsWT8Kzfud0OeYCNQfrvs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tEjMVc2Pafs2MxXZrjNZ4Ius247vML6AaDhSG0lF6dPKaEe3dMTDOqMPPWv4BJVwaiMg5Vwsq22F4wINjTCWWyZKnGjYYvK/e4QElRcve6hDDbopLluVF102fkSZRXBcErzCC0+Dr+zcuFTZLeVrd+bzIQaMRqcX2u84kQx5Avs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEl/7Xxe; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEl/7Xxe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65A2AC4CEF1;
-	Fri, 28 Nov 2025 14:17:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764339437;
-	bh=znVfCnkhwZOTtHLotYIU8+PsWT8Kzfud0OeYCNQfrvs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HEl/7XxesWwAfgOWhEYHKoTC4KlbzK9fAI/KwmXjwJUlRnFQTeoaDmEQLNT2Mjc+y
-	 BhFeUbyzRiOPPYPfWE6L988ZjMWeemCQYRfeMjxCe2Qxgw4d+unGJX1koBrNVic71T
-	 cIWCKI8fxwds3+chFJGpv8ZARX2o0dwpTErZK8fvUQrfNWBhassjsxx2spq8F/sz9b
-	 Eocje6FDYghx3FRAALpuLUKfz7tYmKzPthG8lx3+KYedPJJecUwu8LNThjnLIm1gYh
-	 ZM8fRRkZSpufsrnig0hAAtl3XCD5KwkZd8CBDeHd8brsGEZwnRTV6qEhxRaHsbk1pl
-	 hpwQCt3Hl/fxA==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>
-Subject: [PATCH] KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
-Date: Fri, 28 Nov 2025 14:17:10 +0000
-Message-Id: <20251128141710.19472-1-will@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1764342726; c=relaxed/simple;
+	bh=1vkMm7X0ag8wG1nlAVMaE/y+4Yp/YeEYLUVV56D4qGw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FUFvRFenDzflDLKm5bXNJN97diOPfrIIXdOgXwa6XpqSg7Y8f3q7O5srT6594kTfaP3BXGMLNu4Vnp+4IK+SvY2/uK4P+jFTaAJdI9EH5G95UIPpqAn2O8oe38wSHRVK/8chGM1k8TGkSu4ZWcS2CWocClwrdmZW8xyZhDKMwsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 16D59176A;
+	Fri, 28 Nov 2025 07:11:56 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 334A83F66E;
+	Fri, 28 Nov 2025 07:12:02 -0800 (PST)
+Date: Fri, 28 Nov 2025 15:11:16 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v3 01/10] arm64: drop to EL1 if booted at
+ EL2
+Message-ID: <20251128151116.GA3391839@e124191.cambridge.arm.com>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <20250925141958.468311-2-joey.gouly@arm.com>
+ <e4ffc74b-ae94-4304-9985-7e1f2df2767f@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e4ffc74b-ae94-4304-9985-7e1f2df2767f@redhat.com>
 
-Commit ddcadb297ce5 ("KVM: arm64: Ignore EAGAIN for walks outside of a
-fault") introduced a new walker flag ('KVM_PGTABLE_WALK_HANDLE_FAULT')
-to KVM's page-table code. When set, the walk logic maintains its
-previous behaviour of terminating a walk as soon as the visitor callback
-returns an error. However, when the flag is clear, the walk will
-continue if the visitor returns -EAGAIN and the error is then suppressed
-and returned as zero to the caller.
+On Thu, Nov 27, 2025 at 06:07:27PM +0100, Eric Auger wrote:
+> Hi Joey,
+> 
+> On 9/25/25 4:19 PM, Joey Gouly wrote:
+> > EL2 is not currently supported, drop to EL1 to conitnue booting.
+> continue
+> >
+> > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> > ---
+> >  arm/cstart64.S         | 47 +++++++++++++++++++++++++++++++++++++++---
+> >  lib/arm64/asm/sysreg.h | 14 +++++++++++++
+> >  2 files changed, 58 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arm/cstart64.S b/arm/cstart64.S
+> > index 014c9c7b..79b93dd4 100644
+> > --- a/arm/cstart64.S
+> > +++ b/arm/cstart64.S
+> > @@ -15,6 +15,46 @@
+> >  #include <asm/thread_info.h>
+> >  #include <asm/sysreg.h>
+> >  
+> > +.macro init_el, tmp
+> 
+> init_el2? but also likely to fall back to EL1. At least add a doc comment to explain what the function does.
+> 
+> > +	mrs	\tmp, CurrentEL
+> > +	cmp	\tmp, CurrentEL_EL2
+> > +	b.ne	1f
+> > +	/* EL2 setup */
+> > +	mrs	\tmp, mpidr_el1
+> > +	msr	vmpidr_el2, \tmp
+> > +	mrs	\tmp, midr_el1
+> > +	msr	vpidr_el2, \tmp
+> > +	/* clear trap registers */
+> clear FGT registers if FGT feature supported
+> > +	mrs	\tmp, id_aa64mmfr0_el1
+> > +	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
+> > +	cbz	\tmp, .Lskip_fgt_\@
+> > +	mov	\tmp, #0
+> > +	msr_s	SYS_HFGRTR_EL2, \tmp
+> > +	msr_s	SYS_HFGWTR_EL2, \tmp
+> > +	msr_s	SYS_HFGITR_EL2, \tmp
+> > +	mrs	\tmp, id_aa64mmfr0_el1
+> > +	ubfx	\tmp, \tmp, #ID_AA64MMFR0_EL1_FGT_SHIFT, #4
+> > +	cmp	\tmp, #ID_AA64MMFR0_EL1_FGT_FGT2
+> > +	bne	.Lskip_fgt_\@
+> > +	mov	\tmp, #0
+> > +	msr_s	SYS_HFGRTR2_EL2, \tmp
+> > +	msr_s	SYS_HFGWTR2_EL2, \tmp
+> > +	msr_s	SYS_HFGITR2_EL2, \tmp
+> > +.Lskip_fgt_\@:
+> > +	mov	\tmp, #0
+> > +	msr	cptr_el2, \tmp
+> > +	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
+> > +	msr	hcr_el2, \tmp
+> > +	mov	\tmp, PSR_MODE_EL1t
+> > +	msr	spsr_el2, \tmp
+> > +	adrp	\tmp, 1f
+> > +	add	\tmp, \tmp, :lo12:1f
+> > +	msr	elr_el2, \tmp
+> > +	eret
+> > +1:
+> > +.endm
+> 
+> I read in the coverletter you chose to not reuse include/asm/el2_setup.h
+> which indeed would look overkill given the reduced scope that we target
+> here. However compared to init_el2_state we seem to do very few things
+> in the EL2 setup before switching to EL1. I would give a bit more info
+> in the commit msg about what you keep and what you dropped and why it is
+> reasonable (stage2, timers, debug at least).
+> 
+> > +
+> > +
+> >  #ifdef CONFIG_EFI
+> >  #include "efi/crt0-efi-aarch64.S"
+> >  #else
+> > @@ -56,15 +96,15 @@ start:
+> >  	add     x6, x6, :lo12:reloc_end
+> >  1:
+> >  	cmp	x5, x6
+> > -	b.hs	1f
+> > +	b.hs	reloc_done
+> >  	ldr	x7, [x5]			// r_offset
+> >  	ldr	x8, [x5, #16]			// r_addend
+> >  	add	x8, x8, x4			// val = base + r_addend
+> >  	str	x8, [x4, x7]			// base[r_offset] = val
+> >  	add	x5, x5, #24
+> >  	b	1b
+> > -
+> > -1:
+> > +reloc_done:
+> > +	init_el x4
+> >  	/* zero BSS */
+> >  	adrp	x4, bss
+> >  	add	x4, x4, :lo12:bss
+> > @@ -185,6 +225,7 @@ get_mmu_off:
+> >  
+> >  .globl secondary_entry
+> >  secondary_entry:
+> > +	init_el x0
+> >  	/* enable FP/ASIMD and SVE */
+> >  	mov	x0, #(3 << 20)
+> >  	orr	x0, x0, #(3 << 16)
+> > diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> > index e537bb46..ed776716 100644
+> > --- a/lib/arm64/asm/sysreg.h
+> > +++ b/lib/arm64/asm/sysreg.h
+> > @@ -77,6 +77,9 @@ asm(
+> >  #define ID_AA64ISAR0_EL1_RNDR_SHIFT	60
+> >  #define ID_AA64PFR1_EL1_MTE_SHIFT	8
+> >  
+> > +#define ID_AA64MMFR0_EL1_FGT_SHIFT	56
+> > +#define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
+> > +
+> >  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+> >  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+> >  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> > @@ -113,6 +116,17 @@ asm(
+> >  #define SCTLR_EL1_TCF0_SHIFT	38
+> >  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+> >  
+> > +#define HCR_EL2_RW		_BITULL(31)
+> > +
+> > +#define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
+> 
+> I don't really understand the renaming
 
-Clearing the flag is beneficial when write-protecting a range of IPAs
-with kvm_pgtable_stage2_wrprotect() but is not useful in any other
-cases, either because we are operating on a single page (e.g.
-kvm_pgtable_stage2_mkyoung() or kvm_phys_addr_ioremap()) or because the
-early termination is desirable (e.g. when mapping pages from a fault in
-user_mem_abort()).
+It's just a define similar to INIT_HCR_EL2, that's added in patch 9.
 
-Subsequently, commit e912efed485a ("KVM: arm64: Introduce the EL1 pKVM
-MMU") hooked up pKVM's hypercall interface to the MMU code at EL1 but
-failed to propagate any of the walker flags. As a result, page-table
-walks at EL2 fail to set KVM_PGTABLE_WALK_HANDLE_FAULT even when the
-early termination semantics are desirable on the fault handling path.
+> 
+> > +
+> > +#define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
+> > +#define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
+> > +#define SYS_HFGITR_EL2		sys_reg(3, 4, 1, 1, 6)
+> > +#define SYS_HFGRTR2_EL2		sys_reg(3, 4, 3, 1, 2)
+> > +#define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
+> > +#define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
+> > +
+> >  #define INIT_SCTLR_EL1_MMU_OFF	\
+> >  			(SCTLR_EL1_ITD | SCTLR_EL1_SED | SCTLR_EL1_EOS | \
+> >  			 SCTLR_EL1_TSCXT | SCTLR_EL1_EIS | SCTLR_EL1_SPAN | \
+> Thanks
+> 
+> Eric
+> 
 
-Rather than complicate the pKVM hypercall interface, invert the flag so
-that the whole thing can be simplified and only pass the new flag
-('KVM_PGTABLE_WALK_IGNORE_EAGAIN') from the wrprotect code.
-
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
-Signed-off-by: Will Deacon <will@kernel.org>
----
-
-I found this by inspection and it's a bit fiddly to see what could
-actually go wrong in practice because the 'mappings' tree will return
--EAGAIN if it finds a pre-existing entry. The permission relaxing path
-looks more problematic, as we'll return 0 instead of -EAGAIN and I
-think we can mark the page dirty twice etc.
-
- arch/arm64/include/asm/kvm_pgtable.h | 6 +++---
- arch/arm64/kvm/hyp/pgtable.c         | 5 +++--
- arch/arm64/kvm/mmu.c                 | 8 +++-----
- 3 files changed, 9 insertions(+), 10 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 2888b5d03757..c69a9462fc79 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -288,8 +288,8 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-  *					children.
-  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-  *					with other software walkers.
-- * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
-- *					invoked from a fault handler.
-+ * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
-+ *					the walker returns -EAGAIN.
-  * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
-  *					without Break-before-make's
-  *					TLB invalidation.
-@@ -302,7 +302,7 @@ enum kvm_pgtable_walk_flags {
- 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
- 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
- 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
--	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
-+	KVM_PGTABLE_WALK_IGNORE_EAGAIN		= BIT(4),
- 	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
- 	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
- };
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index c351b4abd5db..3eca720ff8eb 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -144,7 +144,7 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
- 	 * page table walk.
- 	 */
- 	if (r == -EAGAIN)
--		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
-+		return walker->flags & KVM_PGTABLE_WALK_IGNORE_EAGAIN;
- 
- 	return !r;
- }
-@@ -1223,7 +1223,8 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	return stage2_update_leaf_attrs(pgt, addr, size, 0,
- 					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
--					NULL, NULL, 0);
-+					NULL, NULL,
-+					KVM_PGTABLE_WALK_IGNORE_EAGAIN);
- }
- 
- void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7cc964af8d30..c3cd6abfa06e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1521,14 +1521,12 @@ static void adjust_nested_fault_perms(struct kvm_s2_trans *nested,
- 	*prot |= kvm_encode_nested_level(nested);
- }
- 
--#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
--
- static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		      struct kvm_s2_trans *nested,
- 		      struct kvm_memory_slot *memslot, bool is_perm)
- {
- 	bool write_fault, exec_fault, writable;
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
- 	unsigned long mmu_seq;
-@@ -1622,7 +1620,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct kvm_pgtable *pgt;
- 	struct page *page;
- 	vm_flags_t vm_flags;
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 
- 	if (fault_is_perm)
- 		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-@@ -1888,7 +1886,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- /* Resolve the access fault by making the page young again. */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 	struct kvm_s2_mmu *mmu;
- 
- 	trace_kvm_access_fault(fault_ipa);
--- 
-2.52.0.487.g5c8c507ade-goog
-
+Thanks,
+Joey
