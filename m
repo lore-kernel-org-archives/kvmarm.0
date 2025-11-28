@@ -1,59 +1,169 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9FA23EAB6
-	for <kvmarm@lists.linux.dev>; Thu, 27 Nov 2025 19:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AFF2EC086
+	for <kvmarm@lists.linux.dev>; Fri, 28 Nov 2025 08:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764270983; cv=none; b=XjUfXt1opH/rlWFxePeoHyYF83ruJU1m88wNsnp8/JU9YpjRIoCAslJaPAaMHH4zeatknyg0PsFh1c6A4IWcQymutrM3UziuW2awaZqM+zV+OSfYVSYAtIbBcJ6B117S6UIG6ffJXZEw8APxbxwV6MCX8N5fuXfMBUUUiKRbQTQ=
+	t=1764319393; cv=none; b=aH7e16HkZRIG6g0FN68aEVFBIJSajzAFLMfunes6HElkbMSTKxVXdV6P2c31Kh2BEVDXIbEqFxdxoNUmQHywymms6e4hOaatGQUasxE1UvoLk8peiPZApeCRrHoXvMqE+UzKDdWT6Cjgin9LoJ2r3rR6acPrfkgCZoiXKBpOcGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764270983; c=relaxed/simple;
-	bh=k7VXPzSZVf1M/FYNsbVM5voQcU2yMODHM0qz1I4OCSI=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ibIdmF7N8I1pooXT3KQ6vjgU773G780q4uJhoFQj71lQ6joQ1XTRZgPsEOiblJ6eyZEZcBEMoRLqfRGsRPASI7QU5cJGuc3Vf+GzVzttCZgstEEXak5+eRucnq8eIC+oJfT+WW/ObFR3uFvaJSqk3jVq6m0ibFP5X9H8FnLNc5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 153E2176A;
-	Thu, 27 Nov 2025 11:16:14 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F12D3F66E;
-	Thu, 27 Nov 2025 11:16:20 -0800 (PST)
-Date: Thu, 27 Nov 2025 19:16:17 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: will@kernel.org, maz@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	shuah@kernel.org, Oliver Upton <oupton@kernel.org>,
-	Ben Horgan <ben.horgan@arm.com>
-Subject: Re: [PATCH v2 0/2] set_id_regs cleanup
-Message-ID: <176427094645.1018621.6342347190473898593.b4-ty@arm.com>
-References: <20251125101207.1492580-1-ben.horgan@arm.com>
+	s=arc-20240116; t=1764319393; c=relaxed/simple;
+	bh=HHFxMq+EVjNrn/S3W2wE1fNTsZjWCLaDDlrITqoPVC8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oZlXx1zPsefDPeSsP9Vzux/3pnQKoq8gkCxOlaZ7y95qm0zH4bIjd1HwEqiicY+c9hWIEWbdSZi9RYepiadv1fvgi0UBuTGTVWBaER5usgfMpiIJXbEVCcrfvbLwzqTj6b/vU6+FRn3nU66Th/eUjWZ1+bOihgrhmJCRmARNVYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4ksTJbX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4ksTJbX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45F97C4CEF1;
+	Fri, 28 Nov 2025 08:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764319393;
+	bh=HHFxMq+EVjNrn/S3W2wE1fNTsZjWCLaDDlrITqoPVC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=c4ksTJbXTPIECgzbRJrIWfptyv6HQes3skMGZcQbdnEnIDlRTxLUWhuv1PRffCGea
+	 DKcnphE5H1c/j+gh9N1gEoPvGwBvaOu7iBmen46oH9PgdRCM/Q3lGkcr4SG9heQmpL
+	 LFGb9rZOEBcx/gZEnb5egbylrOsFLUF0xMdzHTkhNIJfbUcWZgizYcuzWHp47MC0+F
+	 A9BhuaV6hn4+DuYbzwD6uKhSyFVN+U0YzwHXlaVyL+vCPobwllknPSaRxa1bahKQqi
+	 eFWxEXUykUVNZdvg0CdRNHOzQ/fL/XPRkiMMTp3wo8NUbIiG+bHfeu6+YeFXux955C
+	 s7I6l88BpIPjQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vOu4M-0000000903K-1FOy;
+	Fri, 28 Nov 2025 08:43:10 +0000
+Date: Fri, 28 Nov 2025 08:43:09 +0000
+Message-ID: <86wm3apmxu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [PATCH v1 4/5] arm64: Inject UNDEF when accessing MTE sysregs with MTE disabled
+In-Reply-To: <CA+EHjTz9fJ2892TNn-hy3aiQA6Cxj6xuFUBKQhpDOnsHkDtdwQ@mail.gmail.com>
+References: <20251127122210.4111702-1-tabba@google.com>
+	<20251127122210.4111702-5-tabba@google.com>
+	<86345zr24c.wl-maz@kernel.org>
+	<CA+EHjTz9fJ2892TNn-hy3aiQA6Cxj6xuFUBKQhpDOnsHkDtdwQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125101207.1492580-1-ben.horgan@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 25 Nov 2025 10:12:05 +0000, Ben Horgan wrote:
-> For this v2 I've dropped the ksft_test accounting fix. Mark Brown has
-> more extensive changes [1] and looks to be a user of the set_id_regs
-> test rather than someone just doing some cleanup. The other change in
-> this series is to remove ARM64_FEATURE_FIELD_BITS from the tools
-> sysreg.h header rather than the kernel version. I'll send a separate
-> patch to remove the kernel version.
+On Thu, 27 Nov 2025 14:41:24 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> [...]
+> Hi Marc,
+> 
+> On Thu, 27 Nov 2025 at 14:17, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 27 Nov 2025 12:22:09 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > When MTE hardware is present but disabled via software (arm64.nomte or
+> > > CONFIG_ARM64_MTE=n), HCR_EL2.ATA is cleared to prevent use of MTE
+> > > instructions. However, this alone doesn't fully emulate hardware that
+> > > lacks MTE support.
+> > >
+> > > With HCR_EL2.ATA cleared, accesses to certain MTE system registers trap
+> > > to EL2 with exception class ESR_ELx_EC_SYS64. To faithfully emulate
+> > > hardware without MTE (where such accesses would cause an Undefined
+> > > Instruction exception), inject UNDEF into the host.
+> > >
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 44 ++++++++++++++++++++++++++++++
+> > >  1 file changed, 44 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > index 29430c031095..f542e4c17156 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > @@ -686,6 +686,46 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+> > >       kvm_skip_host_instr();
+> > >  }
+> > >
+> > > +static void inject_undef64(void)
+> > > +{
+> > > +     unsigned long sctlr, vbar, old, new;
+> > > +     u64 offset, esr;
+> > > +
+> > > +     vbar = read_sysreg_el1(SYS_VBAR);
+> > > +     sctlr = read_sysreg_el1(SYS_SCTLR);
+> > > +     old = read_sysreg_el2(SYS_SPSR);
+> > > +     new = get_except64_cpsr(old, system_supports_mte(), sctlr, PSR_MODE_EL1h);
+> > > +     offset = get_except64_offset(old, PSR_MODE_EL1h, except_type_sync);
+> > > +     esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
+> > > +
+> > > +     write_sysreg_el1(esr, SYS_ESR);
+> > > +     write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
+> > > +     write_sysreg_el1(old, SYS_SPSR);
+> > > +     write_sysreg_el2(vbar + offset, SYS_ELR);
+> > > +     write_sysreg_el2(new, SYS_SPSR);
+> > > +}
+> > > +
+> > > +static bool handle_host_mte(u64 esr)
+> > > +{
+> > > +     /* If we're here for any reason other than MTE, then it's a bug. */
+> > > +
+> > > +     if (read_sysreg(HCR_EL2) & HCR_ATA)
+> > > +             return false;
+> > > +
+> > > +     switch (esr_sys64_to_sysreg(esr)) {
+> > > +     case SYS_RGSR_EL1:
+> > > +     case SYS_GCR_EL1:
+> > > +     case SYS_TFSR_EL1:
+> > > +     case SYS_TFSRE0_EL1:
+> >
+> > How about other things, such as DC GVA? Don't you need to trap and
+> > UNDEF it (which has the side effect of also trapping DC ZVA)?
+> >
+> > Same question for all the DC {C,I,CI}GVA{C,P} instructions.
+> 
+> As far as I could tell, none of these are trapped by ATA. The spec
+> says that in the absence of MTE, their behavior is undefined --- which
+> is the same for the ones I'm actually handling here...
+> 
+> The reasons I've only handled these is that, when booting a system
+> with a misadvertised MTE, the kernel accesses these registers, and
+> injecting an UNDEF resulted in a nicer failure mode.
 
-Applied to arm64 (for-next/sysreg), thanks!
+But it all comes down to *why* is MTE disabled. Is it because the user
+cannot be arsed with MTE's abysmal^Wstellar performance? Or because
+this is a memory corruption vector on a misconfigured platform?
 
-[1/2] KVM: arm64: selftests: Remove ARM64_FEATURE_FIELD_BITS and its last user
-      https://git.kernel.org/arm64/c/bf09ee918053
-[2/2] KVM: arm64: selftests: Consider all 7 possible levels of cache
-      https://git.kernel.org/arm64/c/4138cc63d3ef
+> What do you suggest, drop this patch (and the one before it), since
+> trying to access MTE is UNDEF, and the kernel that does it is just
+> shooting itself in the foot (no security implications)? Or edit the
+> commit message to make it clear that this is best effort, based on
+> what ATA traps?
+
+No, what I am simply pointing out that that there is more to MTE than
+what gets trapped by ATA, and my hunch is that when MTE is disabled on
+machine that actually has it, it is because something is deeply broken
+with tag management (I have one such machine).
+
+So depending which side of the problem you're on, this could be either
+perfectly valid, or just missing the point.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
