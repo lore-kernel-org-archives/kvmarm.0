@@ -1,128 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9760288A2
-	for <kvmarm@lists.linux.dev>; Sat, 29 Nov 2025 11:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0947079CF;
+	Sat, 29 Nov 2025 14:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764416120; cv=none; b=jPrQkzqV13+8E2BJSBncK7IE18IvZrz5seZ/OPeGIwZL0dBzidgJeVlYomKG/Vnmxkfuetnh6/RNpiqzP6+a17Tb0DBZQsplbt1rl1h64F+LkQE+FPiodx46q05hTWLqL7GzCjajutH1hkm1gyQWB8X2pU2tGqAVx6yIrkMZMEk=
+	t=1764427531; cv=none; b=s1FOGtw+xScTVEr/og7ILf656Mb3uUJAFVQGTja9jmFzctgI8RJYB3yVijNNiBy+2touxV0JAozsR+82QpPdyZk/X1hotXvinfZ0iJqwWMPSfJV6NDGuaev20YX0hLycuz8t+i62SZKFB3wppDw5Hlpwn89rVz+KYTRFto2TFxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764416120; c=relaxed/simple;
-	bh=JM98PJFfINVzJy2hg19um8addcWX+p6PWfjrRa9Rxq8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EA+Ct5jh8AKjy0uVH4IfNOva7Fibcbgz0AzQRml3Ge/ub//Ou9QVPKcSZsO3S/6GDhqbz9Y9VrSdX5qLmBBgz9vnNizNFeIBupvB1eKytWr4UOOVIxpT5NsBwwVI6Ny9cA0sjsrDjdk2/V8bZlT90MA7D0McSUbbxJEXTS7gmtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHuOadfQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764427531; c=relaxed/simple;
+	bh=J8YgpBDKoIkE30i8e29RJl8Adbc8Y+aT9MBBTzbD6IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JvwfFncFd6Eep3GUnNLXOa8+CxB+6HUTU2LBdAYZCtejR57AzW2yUx5o8zmMn5lq2MPNv7Rt3TDoZU4peeazD7znyKsv//C1tdaSsXuLLt1RQyp0c8HSdJmzMpOxk1uMhMW8A4klPUDLxTEWDuOhbVA/40JjpHN24SpTA5ugyNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5yIymrv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHuOadfQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42102C4CEF7;
-	Sat, 29 Nov 2025 11:35:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5yIymrv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C086C113D0;
+	Sat, 29 Nov 2025 14:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764416120;
-	bh=JM98PJFfINVzJy2hg19um8addcWX+p6PWfjrRa9Rxq8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QHuOadfQ9Mhe2iysqF3zIDtoJ1up90mrOFzwieqHyZj/++9/G+wSRx2ED1S3uUe5s
-	 7LqVGI/CUxNLSFisDG4+bZForKf9Q5SlvXRql6rfQf1d0/YOeMO8NiDG5inAJ4U1df
-	 z+tNewHbzHJhL7rWRffbQVltO34uBhVRl1zkp3CQGcZNEXR6GyR5aLuP06cRyhCJZN
-	 d8XTvrmDXv0+R4j1YBXlAgk0qf6PxWyAnnOX1V3kCd2PGzidYFdvfCuWsgeRuS4iv+
-	 WplN7D9v4ra4tTBs0J0KI/x0HxRLRezzVG01a1UjX0Oq5yr10xH7eqQlj4ay2MxSRm
-	 HLbiUpeZwKFng==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1764427530;
+	bh=J8YgpBDKoIkE30i8e29RJl8Adbc8Y+aT9MBBTzbD6IU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s5yIymrvlmrVZV10Kyo9oayMygRW0E5mnnRK13jq4+/1dlZaKWyhRghI6fcQF1AUh
+	 gIg70MuCIQXTFu48m61Iu4UQzzuklOVsdvjttpsHFr5h9+zACeGEKgr8EE3u35qsuV
+	 RwGhNeRVYqxXaXfZQJKelZyG4atkiLifG4OJToXb9dxMfux6OQPeuSnfK6hErz3LDx
+	 xF2eDDrL/oycQAR0Mpiu3IF9S8kQOAnjRUiyWi23d0Lgbhd8ifRMy9syzqEjtNqWv0
+	 ccDx0jUjvgjVGAR9B5+0bs5yBxVqyU+yOkIMujGSYIsdx6UseN7OHZCZjXrcTzDT5L
+	 aE8NNQfziCHng==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPJET-00000009GPJ-37Hi;
-	Sat, 29 Nov 2025 11:35:17 +0000
-Date: Sat, 29 Nov 2025 11:35:17 +0000
-Message-ID: <86sedxoyve.wl-maz@kernel.org>
+	id 1vPMCW-00000009HnQ-26an;
+	Sat, 29 Nov 2025 14:45:28 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	suzuki.poulose@arm.com,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/4] KVM: arm64: nv: Don't mask VTCR_EL2.HA if FEAT_HAFDBS is present
-In-Reply-To: <aSnuauBCe1Ru2q0T@kernel.org>
-References: <20251128100946.74210-1-alexandru.elisei@arm.com>
-	<20251128100946.74210-4-alexandru.elisei@arm.com>
-	<86v7iup3bv.wl-maz@kernel.org>
-	<aSnuauBCe1Ru2q0T@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH 1/4] arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
+Date: Sat, 29 Nov 2025 14:45:22 +0000
+Message-ID: <20251129144525.2609207-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251129144525.2609207-1-maz@kernel.org>
+References: <20251129144525.2609207-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 28 Nov 2025 18:48:10 +0000,
-Oliver Upton <oupton@kernel.org> wrote:
-> 
-> On Fri, Nov 28, 2025 at 03:46:44PM +0000, Marc Zyngier wrote:
-> > On Fri, 28 Nov 2025 10:09:45 +0000,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Commit 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management
-> > > in stage-2 SW PTW") added support for hardware updates to the access flag
-> > > to stage 2 if the feature is available to the virtual machine, but forgot
-> > > to remove the VTCR_EL2.HA bit from the res0 mask for the register. Remove
-> > > it from the mask to allow the VM to use the feature.
-> > > 
-> > > Fixes: 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/nested.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > > index 911fc99ed99d..7a34163f6c68 100644
-> > > --- a/arch/arm64/kvm/nested.c
-> > > +++ b/arch/arm64/kvm/nested.c
-> > > @@ -1719,7 +1719,9 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
-> > >  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
-> > >  
-> > >  	/* VTCR_EL2 */
-> > > -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
-> > > +	res0 = GENMASK(63, 32) | GENMASK(30, 22) | BIT(20);
-> > > +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, AF))
-> > > +		res0 |= VTCR_EL2_HA;
-> > >  	res1 = BIT(31);
-> > >  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
-> > >  
-> > 
-> > The fix is correct, but I really do not want to add more of these
-> > tedious checks, one after the other. We should fix this once and for
-> > all by converting VTCR_EL2 to the feature dependency infrastructure
-> > and be done with it.
-> > 
-> > I've pushed a small series at [1] that does that (very lightly
-> > tested).
-> 
-> This looks alright to me, do you want to post it?
+ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 are currently represented as unordered
+enumerations. However, the architecture treats them as Unsigned,
+as hinted to by the MRS data:
 
-Still fixing some of the fallout from the sysreg conversion -- a bunch
-of things that were shifted constants are now unshifted, and need to
-be FIELD_PREP()'d.
+(FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) &&
+		       FEAT_TGran4K) ||
+		     (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))))
 
-I *think* I got them all now, but this is all a bit fiddly. Should the
-last tests run smoothly,
+and similar descriptions exist for 16 and 64k.
 
-Note that the TCR conversion will be even more invasive, and probably
-not merge window material, so you may want to pick Alexandru's 4th
-patch as well.
+This is also confirmed by D24.1.3.3 ("Alternative ID scheme used for
+ID_AA64MMFR0_EL1 stage 2 granule sizes") in the L.b revision of
+the ARM ARM.
 
-Thanks,
+Turn these fields into UnsignedEnum so that we can use the above
+description more or less literally.
 
-	M.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/tools/sysreg | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 1c6cdf9d54bba..9d388f87d9a13 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2098,18 +2098,18 @@ UnsignedEnum	47:44	EXS
+ 	0b0000	NI
+ 	0b0001	IMP
+ EndEnum
+-Enum	43:40	TGRAN4_2
++UnsignedEnum	43:40	TGRAN4_2
+ 	0b0000	TGRAN4
+ 	0b0001	NI
+ 	0b0010	IMP
+ 	0b0011	52_BIT
+ EndEnum
+-Enum	39:36	TGRAN64_2
++UnsignedEnum	39:36	TGRAN64_2
+ 	0b0000	TGRAN64
+ 	0b0001	NI
+ 	0b0010	IMP
+ EndEnum
+-Enum	35:32	TGRAN16_2
++UnsignedEnum	35:32	TGRAN16_2
+ 	0b0000	TGRAN16
+ 	0b0001	NI
+ 	0b0010	IMP
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
