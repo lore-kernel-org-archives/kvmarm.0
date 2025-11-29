@@ -1,69 +1,128 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EB227FD43;
-	Fri, 28 Nov 2025 18:51:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9760288A2
+	for <kvmarm@lists.linux.dev>; Sat, 29 Nov 2025 11:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764355865; cv=none; b=nAAdmgVTwFRl/yeeoyEqeKIScQTxSapaRZJOY+Q0FDUhhnB3ui2FfQX5/HO50Lk8QqVqQQujZ/wg2nSUMo29xR9FWIM6D5BOVxufk6UWFugDL+YBNc9GXqK9bkJdlYXvnmlmm7uyDoNyAJLwaKzqSR3DHVVCgncYDUuk7q55hZ0=
+	t=1764416120; cv=none; b=jPrQkzqV13+8E2BJSBncK7IE18IvZrz5seZ/OPeGIwZL0dBzidgJeVlYomKG/Vnmxkfuetnh6/RNpiqzP6+a17Tb0DBZQsplbt1rl1h64F+LkQE+FPiodx46q05hTWLqL7GzCjajutH1hkm1gyQWB8X2pU2tGqAVx6yIrkMZMEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764355865; c=relaxed/simple;
-	bh=dhHIbvpCuulxKEAkqdhlFDieD4aHu6LWLRet+FMiD5I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rc3lgtGlhuTQ/8AlD/FsBsxIMShnDNSSYCy4lc1JZixAgulzTXwp/YOtR1IatVgRhzUATCUfvbDP9IrSIUBbeLvc8q2joJzrogVTsPBIYVyDSr0Zyr0ilqWvTZ8pRxTNMgnZtvUfrMdvNa/VGjdL7l8dUkfOtuwDb6cnetPnAAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mh5TT6nq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764416120; c=relaxed/simple;
+	bh=JM98PJFfINVzJy2hg19um8addcWX+p6PWfjrRa9Rxq8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EA+Ct5jh8AKjy0uVH4IfNOva7Fibcbgz0AzQRml3Ge/ub//Ou9QVPKcSZsO3S/6GDhqbz9Y9VrSdX5qLmBBgz9vnNizNFeIBupvB1eKytWr4UOOVIxpT5NsBwwVI6Ny9cA0sjsrDjdk2/V8bZlT90MA7D0McSUbbxJEXTS7gmtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHuOadfQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mh5TT6nq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8122C113D0;
-	Fri, 28 Nov 2025 18:51:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHuOadfQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42102C4CEF7;
+	Sat, 29 Nov 2025 11:35:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764355865;
-	bh=dhHIbvpCuulxKEAkqdhlFDieD4aHu6LWLRet+FMiD5I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mh5TT6nqG7GLwKm/V8ednxHY2PajJrlW7e1XAzHhABnJJ7XufHgJOx+vtzS6j1MZX
-	 BCoQfC9V4raW224VY6nU5sVwFM+B3KePmpxtWIXKQ6Lz+onuAb8Y1qhs0phPIlWcdg
-	 eEpcSzxwO+cgN/wZ4zsTh1Z7RwJ6aLyKB5KQmHNMkx89BEo19YFBI4BytJO9RL+61X
-	 0NkFHfNtN8xAW1Xqa8rpwo4jfSCbuJbroINDXPly7NaYJNwxs5UxVVO4+gH46sNA3j
-	 Sj/8V9F61pnEqq31jdj2+X3GTHmQHM/dkfygwI+Cywkl/LbrXInEkSppT+lDHP9QcB
-	 jDP+Wxg6QGeMQ==
-From: Oliver Upton <oupton@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
+	s=k20201202; t=1764416120;
+	bh=JM98PJFfINVzJy2hg19um8addcWX+p6PWfjrRa9Rxq8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QHuOadfQ9Mhe2iysqF3zIDtoJ1up90mrOFzwieqHyZj/++9/G+wSRx2ED1S3uUe5s
+	 7LqVGI/CUxNLSFisDG4+bZForKf9Q5SlvXRql6rfQf1d0/YOeMO8NiDG5inAJ4U1df
+	 z+tNewHbzHJhL7rWRffbQVltO34uBhVRl1zkp3CQGcZNEXR6GyR5aLuP06cRyhCJZN
+	 d8XTvrmDXv0+R4j1YBXlAgk0qf6PxWyAnnOX1V3kCd2PGzidYFdvfCuWsgeRuS4iv+
+	 WplN7D9v4ra4tTBs0J0KI/x0HxRLRezzVG01a1UjX0Oq5yr10xH7eqQlj4ay2MxSRm
+	 HLbiUpeZwKFng==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vPJET-00000009GPJ-37Hi;
+	Sat, 29 Nov 2025 11:35:17 +0000
+Date: Sat, 29 Nov 2025 11:35:17 +0000
+Message-ID: <86sedxoyve.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@kernel.org>
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Colin Ian King <colin.i.king@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] KVM: arm64: Fix spelling mistake "Unexpeced" -> "Unexpected"
-Date: Fri, 28 Nov 2025 10:51:01 -0800
-Message-ID: <176435583511.14290.101174161990641158.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251128175124.319094-1-colin.i.king@gmail.com>
-References: <20251128175124.319094-1-colin.i.king@gmail.com>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/4] KVM: arm64: nv: Don't mask VTCR_EL2.HA if FEAT_HAFDBS is present
+In-Reply-To: <aSnuauBCe1Ru2q0T@kernel.org>
+References: <20251128100946.74210-1-alexandru.elisei@arm.com>
+	<20251128100946.74210-4-alexandru.elisei@arm.com>
+	<86v7iup3bv.wl-maz@kernel.org>
+	<aSnuauBCe1Ru2q0T@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@kernel.org, alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 28 Nov 2025 17:51:24 +0000, Colin Ian King wrote:
-> There is a spelling mistake in a TEST_FAIL message. Fix it.
+On Fri, 28 Nov 2025 18:48:10 +0000,
+Oliver Upton <oupton@kernel.org> wrote:
 > 
+> On Fri, Nov 28, 2025 at 03:46:44PM +0000, Marc Zyngier wrote:
+> > On Fri, 28 Nov 2025 10:09:45 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Commit 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management
+> > > in stage-2 SW PTW") added support for hardware updates to the access flag
+> > > to stage 2 if the feature is available to the virtual machine, but forgot
+> > > to remove the VTCR_EL2.HA bit from the res0 mask for the register. Remove
+> > > it from the mask to allow the VM to use the feature.
+> > > 
+> > > Fixes: 39db933ba67f ("KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW")
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >  arch/arm64/kvm/nested.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > > index 911fc99ed99d..7a34163f6c68 100644
+> > > --- a/arch/arm64/kvm/nested.c
+> > > +++ b/arch/arm64/kvm/nested.c
+> > > @@ -1719,7 +1719,9 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+> > >  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+> > >  
+> > >  	/* VTCR_EL2 */
+> > > -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
+> > > +	res0 = GENMASK(63, 32) | GENMASK(30, 22) | BIT(20);
+> > > +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, HAFDBS, AF))
+> > > +		res0 |= VTCR_EL2_HA;
+> > >  	res1 = BIT(31);
+> > >  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+> > >  
+> > 
+> > The fix is correct, but I really do not want to add more of these
+> > tedious checks, one after the other. We should fix this once and for
+> > all by converting VTCR_EL2 to the feature dependency infrastructure
+> > and be done with it.
+> > 
+> > I've pushed a small series at [1] that does that (very lightly
+> > tested).
 > 
+> This looks alright to me, do you want to post it?
 
-Applied to next, thanks!
+Still fixing some of the fallout from the sysreg conversion -- a bunch
+of things that were shifted constants are now unshifted, and need to
+be FIELD_PREP()'d.
 
-[1/1] KVM: arm64: Fix spelling mistake "Unexpeced" -> "Unexpected"
-      https://git.kernel.org/kvmarm/kvmarm/c/f3ec2787803e
+I *think* I got them all now, but this is all a bit fiddly. Should the
+last tests run smoothly,
 
---
-Best,
-Oliver
+Note that the TCR conversion will be even more invasive, and probably
+not merge window material, so you may want to pick Alexandru's 4th
+patch as well.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
