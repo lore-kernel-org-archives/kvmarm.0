@@ -1,210 +1,176 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA63730FC39;
-	Sat, 29 Nov 2025 14:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CFB36D510
+	for <kvmarm@lists.linux.dev>; Sun, 30 Nov 2025 13:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764427532; cv=none; b=ULI4YdB7rJAbdl0B32yO7tQQ7uj3PVBNJuiIXtCksKGgJMW0gcZBdRZnQvQ9irWpZJ1PvJN0uFp9dEdpBfK64bzQOg+eWVcpZ2lHXqXOYDnFcXXiZnoWzp379KeKZFbFjd3BmslA1fM2cZT3L/YR/z+6/uuDrMljAS1YLEuR1CE=
+	t=1764508321; cv=none; b=XlOlOkKCxJWEzwIG316AbZUaCRXMjC+R/jzXr2O496UKFWz7pKLjdJcSy6vxC+cjAHp6KDpDxjNmnfsSdJM+WOGS/J7wwKlU9CxVgZNN8XLffXCA43tAUJt8VxM8DOEs4kgFvd9xOkn3sC8vPUH7Z3YBXsrD3JeFDRADGRrhqtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764427532; c=relaxed/simple;
-	bh=tDssoD1XS4XLgOWYd/9GLFKxn1aVZOn4j3yArgN+oAM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MYL1aXa5b1Chn3JK34nm7zKF50PhPaACMyDl2zba3wLOpzD8NuNzXo6xfOui/k7VpN/igyvwDt6+BAB4DmJkD2bbrKAiAgiuOOUg/qOYRilQMIgoa+UBlitK1yNzhuwPGuIZdROrQ+6j8rlYTW/Ub8Lq9GIIzQ/lhNRnOX99cww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AH7a8KV0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764508321; c=relaxed/simple;
+	bh=ZgigReiyWWOX6rMHBjUflJ+pjs/WLbBCc/fUEa2OSqo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MUigyDF5Vy2aFrdWZmwEHIz9gxyK57t01amgZ5ouQ1Tgw1I0uaTC72jmh+Tw4F4w+xcbHThzrpw3KePAtSgGHyUQWW3rg1fUFO6XMEmXq7nKeyxYhsbDPUJw1Gf5YSmIswQPdowLU0VrWhB96J5PRVtTSSOUL72/+6WX1BgSgdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/IIDObn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AH7a8KV0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94943C4CEF7;
-	Sat, 29 Nov 2025 14:45:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/IIDObn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB576C4CEF8;
+	Sun, 30 Nov 2025 13:12:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764427531;
-	bh=tDssoD1XS4XLgOWYd/9GLFKxn1aVZOn4j3yArgN+oAM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AH7a8KV0/rzRKtF/MhiqyVbb9ngK/N67arrYEqV3Vqx+6jWWERIg1kPwiugHoQKl8
-	 so12IQvbCRo8GlYywgsFCTJKAFkkxUvNcI7fW4VbjNAOIUfTRQBZGubdAuyo23a4qz
-	 vVoK0Z7lOjNzX4YW4lMLB48GVCHtvvKp/uTManS3NLVGhnWKsreu3lx97tYlGO++5s
-	 7+aXlXJ8L9+T6s0mN0TdatDjDvuunS4cmKN8QEJYSgGJgdjEeRGirR3wtYWx6+AQEm
-	 cWCFaS4rfC/lih0FkCgIj18aBYgGa3Wzcdy2rfFmI4+1dT82sxKRyKNj0bF9VFODDp
-	 ZwdDgps2jQtSw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1764508320;
+	bh=ZgigReiyWWOX6rMHBjUflJ+pjs/WLbBCc/fUEa2OSqo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u/IIDObnB/o6BIvA+3pZF1namXu63e4WWJGu55y/fK3RWVRsmkvXXQHnRL5N8W8T7
+	 vI0HZTp7p4WUSLAf9v932gw2wxRT7UOYh78J0l/AV6TdauFHRI5fpXYakf488Ro4eD
+	 ytVD5U1vO+DHglHe4U0hfp8nHE1uTnNxo8DiZAtTYQlkMibOE6Mg5Y4m3s6XwhVdxj
+	 RGi/4GiNCnKLqQ9idc+olF/x0L9s+ntolRC8EqjIqKiboA8c98gLzi4WfZCClX7x9C
+	 Ga90ZuAob1FhPaw8w5156zW/VI406WcnouFxGDw0SFZGbjbBvfO/LhlB+86qgYArGH
+	 HfWXesCw8+fMw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPMCX-00000009HnQ-0ilZ;
-	Sat, 29 Nov 2025 14:45:29 +0000
+	id 1vPhDa-00000009PcT-1OIK;
+	Sun, 30 Nov 2025 13:11:58 +0000
+Date: Sun, 30 Nov 2025 13:11:57 +0000
+Message-ID: <87a503fyw2.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
 	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
-Date: Sat, 29 Nov 2025 14:45:25 +0000
-Message-ID: <20251129144525.2609207-5-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251129144525.2609207-1-maz@kernel.org>
-References: <20251129144525.2609207-1-maz@kernel.org>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/4] KVM: arm64: nv: HAF fixes
+In-Reply-To: <20251128100946.74210-1-alexandru.elisei@arm.com>
+References: <20251128100946.74210-1-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Describe all the VTCR_EL2 fields and their respective configurations,
-making sure that we correctly ignore the bits that are not defined
-for a given guest configuration.
+On Fri, 28 Nov 2025 10:09:42 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Based on kvmarm's next branch.
+> 
+> HAF support for the software translation table walker was merged while I
+> was in the process of reading the patches, so instead of comments I have
+> these few fixes.
+> 
+> One thing I didn't touch is this sequence in hyp_set_prot_attr():
+> 
+> 	if (prot & KVM_PGTABLE_PROT_X) {
+> 		/* don't set the XN bit */
+> 	} else {
+> 		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
+> 	}
+> 
+> If the caller is executing in nVHE mode, the translation regime is EL2,
+> which has only PrivExecute permission. Since KVM_PGTABLE_PROT_X is now the
+> union of PrivExecute and UnprivExecute, if the caller requests only the
+> UnprivExecute permission, but no PrivExecute permission, the function does
+> not return an error code and sets the PrivExecute permission.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/nested.c |  3 +-
- 2 files changed, 70 insertions(+), 2 deletions(-)
+I don't think this is a huge problem *right now*, as long as we don't
+have anything that looks like "hvhe hypervisor userspace" (yes, I
+proposed that a while ago, and haven't completely dropped the
+idea). But at the same time, the page-table code should probably be
+built to the architecture and not to the use cases.
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index a02c28d6a61c9..c36e133c51912 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -141,6 +141,7 @@ struct reg_feat_map_desc {
- #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
- #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
- #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
-+#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
- #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
- #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
- #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
-@@ -202,6 +203,8 @@ struct reg_feat_map_desc {
- #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
- #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
- #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-+#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-+#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
- #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
- #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
- #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
-@@ -219,6 +222,7 @@ struct reg_feat_map_desc {
- #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
- #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
- #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
-+#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+But it also outlines a rather bad bug in the hVHE case, where we set
+the UXN bit instead of the PXN bit...
+
+What I have in mind is something like this, untested. Thoughts?
+
+	M.
+
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index d57c12f074a40..48305118ba3c5 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -88,6 +88,8 @@ typedef u64 kvm_pte_t;
+ #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
  
- static bool not_feat_aa64el3(struct kvm *kvm)
- {
-@@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
- 	return check_pmu_revision(kvm, V3P9);
- }
+ #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
++#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
++#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
  
-+#define has_feat_s2tgran(k, s)						\
-+  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
-+    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
-+   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
-+
-+static bool feat_lpa2(struct kvm *kvm)
+ #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+ 
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index e0bd6a0172729..cbf9b6b58e284 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -330,6 +330,11 @@ struct hyp_map_data {
+ 	kvm_pte_t			attr;
+ };
+ 
++static bool el2_nvhe(void)
 +{
-+	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
-+		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
-+		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
-+		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
-+		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
-+		 !has_feat_s2tgran(kvm, 4))				&&
-+		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
-+		 !has_feat_s2tgran(kvm, 16)));
++	return !has_vhe() && !cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
 +}
 +
-+static bool feat_vmid16(struct kvm *kvm)
-+{
-+	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
-+}
-+
- static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
+ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
  {
- 	/* This is purely academic: AArch32 and NV are mutually exclusive */
-@@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
- static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
- 			      mdcr_el2_feat_map, FEAT_AA64EL2);
+ 	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
+@@ -342,6 +347,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+ 	if (!(prot & KVM_PGTABLE_PROT_R))
+ 		return -EINVAL;
  
-+static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
-+	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
-+	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
-+	NEEDS_FEAT(VTCR_EL2_TL0		|
-+		   VTCR_EL2_TL1		|
-+		   VTCR_EL2_AssuredOnly	|
-+		   VTCR_EL2_GCSH,
-+		   FEAT_THE),
-+	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
-+	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
-+	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
-+	NEEDS_FEAT(VTCR_EL2_SL2		|
-+		   VTCR_EL2_DS,
-+		   feat_lpa2),
-+	NEEDS_FEAT(VTCR_EL2_NSA		|
-+		   VTCR_EL2_NSW,
-+		   FEAT_SEL2),
-+	NEEDS_FEAT(VTCR_EL2_HWU62	|
-+		   VTCR_EL2_HWU61	|
-+		   VTCR_EL2_HWU60	|
-+		   VTCR_EL2_HWU59,
-+		   FEAT_HPDS2),
-+	NEEDS_FEAT(VTCR_EL2_HD, ID_AA64MMFR1_EL1, HAFDBS, DBM),
-+	NEEDS_FEAT(VTCR_EL2_HA, ID_AA64MMFR1_EL1, HAFDBS, AF),
-+	NEEDS_FEAT(VTCR_EL2_VS, feat_vmid16),
-+	NEEDS_FEAT(VTCR_EL2_PS		|
-+		   VTCR_EL2_TG0		|
-+		   VTCR_EL2_SH0		|
-+		   VTCR_EL2_ORGN0	|
-+		   VTCR_EL2_IRGN0	|
-+		   VTCR_EL2_SL0		|
-+		   VTCR_EL2_T0SZ,
-+		   FEAT_AA64EL1),
-+};
++	if (el2_nvhe())
++		prot &= ~KVM_PGTABLE_PROT_UX;
 +
-+static const DECLARE_FEAT_MAP(vtcr_el2_desc, VTCR_EL2,
-+			      vtcr_el2_feat_map, FEAT_AA64EL2);
+ 	if (prot & KVM_PGTABLE_PROT_X) {
+ 		if (prot & KVM_PGTABLE_PROT_W)
+ 			return -EINVAL;
+@@ -351,8 +359,16 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
+ 
+ 		if (system_supports_bti_kernel())
+ 			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
++	}
 +
- static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
- 				  int map_size, u64 res0, const char *str)
- {
-@@ -1211,6 +1275,7 @@ void __init check_feature_map(void)
- 	check_reg_desc(&tcr2_el2_desc);
- 	check_reg_desc(&sctlr_el1_desc);
- 	check_reg_desc(&mdcr_el2_desc);
-+	check_reg_desc(&vtcr_el2_desc);
- }
++	if (el2_nvhe()) {
++		if (!(prot & KVM_PGTABLE_PROT_PX))
++			attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
+ 	} else {
+-		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
++		if (!(prot & KVM_PGTABLE_PROT_PX))
++			attr |= KVM_PTE_LEAF_ATTR_HI_S1_PXN;
++		if (!(prot & KVM_PGTABLE_PROT_UX))
++			attr |= KVM_PTE_LEAF_ATTR_HI_S1_UXN;
+ 	}
  
- static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
-@@ -1425,6 +1490,10 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
- 		*res0 = compute_reg_res0_bits(kvm, &mdcr_el2_desc, 0, 0);
- 		*res1 = MDCR_EL2_RES1;
- 		break;
-+	case VTCR_EL2:
-+		*res0 = compute_reg_res0_bits(kvm, &vtcr_el2_desc, 0, 0);
-+		*res1 = VTCR_EL2_RES1;
-+		break;
- 	default:
- 		WARN_ON_ONCE(1);
- 		*res0 = *res1 = 0;
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index e1ef8930c97b3..606cebcaa7c09 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1719,8 +1719,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
- 	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+ 	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
+@@ -373,8 +389,15 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
+ 	if (!kvm_pte_valid(pte))
+ 		return prot;
  
- 	/* VTCR_EL2 */
--	res0 = GENMASK(63, 32) | GENMASK(30, 20);
--	res1 = BIT(31);
-+	get_reg_fixed_bits(kvm, VTCR_EL2, &res0, &res1);
- 	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+-	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
+-		prot |= KVM_PGTABLE_PROT_X;
++	if (el2_nvhe()) {
++		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
++			prot |= KVM_PGTABLE_PROT_PX;
++	} else {
++		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_PXN))
++			prot |= KVM_PGTABLE_PROT_PX;
++		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_UXN))
++			prot |= KVM_PGTABLE_PROT_UX;
++	}
  
- 	/* VMPIDR_EL2 */
+ 	ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
+ 	if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
+
 -- 
-2.47.3
-
+Jazz isn't dead. It just smells funny.
