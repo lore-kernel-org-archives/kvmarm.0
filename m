@@ -1,61 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA44A36D510;
-	Sun, 30 Nov 2025 19:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614152BEC5A
+	for <kvmarm@lists.linux.dev>; Sun, 30 Nov 2025 19:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764529255; cv=none; b=K6u0eAgxxWvsRddGMlHfa68lN4FB+wAglHwEtWgGzhclCmI27ab/iNULtK25yIx8jVGXn7vmGPo1iZyfx3KdpKs4qjiZtXgzvwsqSTtTsV/H3Zg8o1Kj2Btv6qXFk6Bc5DxlQ6ePNKQ00uMdsYoRpF6mpFBdNI3k59LSaIfBnUk=
+	t=1764530763; cv=none; b=qBNzaysjkREzcOBFNKZgQ+2YtWMLIZgKX4FGHLzb3r1Si0jIt3i6UAh9KUBO3QrtlIQoRhtJ0pVY53lG3fs0dSVS1oNrOVx2HhOKKgzJsCJLjHX4f5/y5GKao/VbhHDUG484BGwSLSXkIyW5A8OZvc0z1X5GI5EYXVfWww2OOH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764529255; c=relaxed/simple;
-	bh=mPEVeRr6keddK7qH3YNSYex+8//0NX6k5IUxeUArYy0=;
+	s=arc-20240116; t=1764530763; c=relaxed/simple;
+	bh=GdPNc3PxxP9kLpHvuNn2P++e+FiMa66Ks5F/Mnz068c=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cAamAtZb8RJAc2yKA+Mp5SCgsFhRbn9z9EQaOZfMQHVIlHoZJqO6I1ICy53n1UjHRIVT5McP2J2/h/kELO4y+OXup+oV6FSGUndp+DZXlgF8hSkJ+zHjsoxgDkRFCh+BEVW8i0WCCQXoDhCAXLKGvg48idl+kBX7TNFcfB6UP0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=trw2mUaX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=hrTIKZI3WL7qD+lMzx74+yY4nF2I+t+Z6T6OTpx2inwI23pmmbHRoroCAFlVVMe/+n/oAzxAtDGQMliMtbDHmvHHSRI9rxKghS908VmZEdBGInCBC+6ooTaqYKpnouxFxbCWPb+D4IeGZ2JYfqQOzPKgbXjBCkitLJrlanXWlOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rENTJxXv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="trw2mUaX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F4C8C4CEF8;
-	Sun, 30 Nov 2025 19:00:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rENTJxXv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D49D9C116B1;
+	Sun, 30 Nov 2025 19:26:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764529255;
-	bh=mPEVeRr6keddK7qH3YNSYex+8//0NX6k5IUxeUArYy0=;
+	s=k20201202; t=1764530762;
+	bh=GdPNc3PxxP9kLpHvuNn2P++e+FiMa66Ks5F/Mnz068c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=trw2mUaXCjIGhq11DQgJd9k61el1RXH95SwTuS8VxyY7pF4qNs0EtArM5fz7SEbBa
-	 r83YIYYMYSanHaUNG8toB0gRJSyyoqaIAA+xs8R6PFM7TkkV3Q0B44qcFYJhqDINhx
-	 bGa1j8h+zwAm1+htzkWa+yGItNUhnMfQIRIN2uFxtS0iRfl1X3bH93SpV7Aw5kDWOK
-	 pmN3Q7zZ6JcUYdMlmWStZomiYNapzifwyaI6lK+lG1bxiB47ON4WameeYTr1m0Hgu8
-	 P8WHSG0rwJfG++BvcaqMG+/6axeqVjE5TZok8Iq0AupQNxb8Mcw4KFGi00diTQT9iw
-	 sjMjQvVZ+KjPw==
+	b=rENTJxXv3cbOf3BXmLNJ2psBgRg2OQ+vGLKQuQBnkiSN4yHXJiKGC6vCjJeTqH6+1
+	 IaHdDe1N7SrvZSv/TQoY2wNDrftXfFWeVxi0ImgAIX5us96OvU0+ULMfEHxHfF/3Yb
+	 xbU7hD6ejaBxwm3Uk7XCZuEOSXyvAyTRCKdy80YfouIRI6a1s+t6KPIvhKHRL0arDR
+	 fEq05T4sE7bJZ+vtd85K8jC4coxhuwsGPf31G290MOcOsheO0XrsYN+FrUTP7gS2Sm
+	 oJWl0qvsIO+/ZcNkjIlSVW1br94HX2EJraUozV41dwys4WVfdt7muS5rnR64Mwko0g
+	 arOysGb3IWOLQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPmfF-00000009Ray-0Ymp;
-	Sun, 30 Nov 2025 19:00:53 +0000
-Date: Sun, 30 Nov 2025 19:00:52 +0000
-Message-ID: <87345vfiqj.wl-maz@kernel.org>
+	id 1vPn3Y-00000009Rlh-29ew;
+	Sun, 30 Nov 2025 19:26:00 +0000
+Date: Sun, 30 Nov 2025 19:25:59 +0000
+Message-ID: <871plffhko.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	jstultz@google.com,
-	qperret@google.com,
-	will@kernel.org,
-	aneesh.kumar@kernel.org,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 26/28] KVM: arm64: Add hyp_enter/hyp_exit events to pKVM hyp
-In-Reply-To: <20251107093840.3779150-27-vdonnefort@google.com>
-References: <20251107093840.3779150-1-vdonnefort@google.com>
-	<20251107093840.3779150-27-vdonnefort@google.com>
+	Fuad Tabba <tabba@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
+In-Reply-To: <20251128141710.19472-1-will@kernel.org>
+References: <20251128141710.19472-1-will@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,76 +55,58 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, qperret@google.com, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 07 Nov 2025 09:38:38 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Fri, 28 Nov 2025 14:17:10 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> The hyp_enter and hyp_exit events are logged by the hypervisor any time
-> it is entered and exited.
+> Commit ddcadb297ce5 ("KVM: arm64: Ignore EAGAIN for walks outside of a
+> fault") introduced a new walker flag ('KVM_PGTABLE_WALK_HANDLE_FAULT')
+> to KVM's page-table code. When set, the walk logic maintains its
+> previous behaviour of terminating a walk as soon as the visitor callback
+> returns an error. However, when the flag is clear, the walk will
+> continue if the visitor returns -EAGAIN and the error is then suppressed
+> and returned as zero to the caller.
 > 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> Clearing the flag is beneficial when write-protecting a range of IPAs
+> with kvm_pgtable_stage2_wrprotect() but is not useful in any other
+> cases, either because we are operating on a single page (e.g.
+> kvm_pgtable_stage2_mkyoung() or kvm_phys_addr_ioremap()) or because the
+> early termination is desirable (e.g. when mapping pages from a fault in
+> user_mem_abort()).
 > 
-> diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-> index d6e033c96c52..ce3953bc884a 100644
-> --- a/arch/arm64/include/asm/kvm_hypevents.h
-> +++ b/arch/arm64/include/asm/kvm_hypevents.h
-> @@ -7,4 +7,21 @@
->  #include <nvhe/trace.h>
->  #endif
->  
-> +HYP_EVENT(hyp_enter,
-> +	HE_PROTO(void),
-> +	HE_STRUCT(
-> +	),
-> +	HE_ASSIGN(
-> +	),
-> +	HE_PRINTK()
-> +);
-> +
-> +HYP_EVENT(hyp_exit,
-> +	HE_PROTO(void),
-> +	HE_STRUCT(
-> +	),
-> +	HE_ASSIGN(
-> +	),
-> +	HE_PRINTK()
-> +);
->  #endif
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
-> new file mode 100644
-> index 000000000000..4b69d33e4f2d
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#include <asm/kvm_hypevents.h>
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#undef arm_smccc_1_1_smc
-> +#define arm_smccc_1_1_smc(...)					\
-> +	do {							\
-> +		trace_hyp_exit();				\
-> +		__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__);	\
-> +		trace_hyp_enter();				\
-> +	} while (0)
+> Subsequently, commit e912efed485a ("KVM: arm64: Introduce the EL1 pKVM
+> MMU") hooked up pKVM's hypercall interface to the MMU code at EL1 but
+> failed to propagate any of the walker flags. As a result, page-table
+> walks at EL2 fail to set KVM_PGTABLE_WALK_HANDLE_FAULT even when the
+> early termination semantics are desirable on the fault handling path.
+> 
+> Rather than complicate the pKVM hypercall interface, invert the flag so
+> that the whole thing can be simplified and only pass the new flag
+> ('KVM_PGTABLE_WALK_IGNORE_EAGAIN') from the wrprotect code.
+> 
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: Quentin Perret <qperret@google.com>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+> 
+> I found this by inspection and it's a bit fiddly to see what could
+> actually go wrong in practice because the 'mappings' tree will return
+> -EAGAIN if it finds a pre-existing entry. The permission relaxing path
+> looks more problematic, as we'll return 0 instead of -EAGAIN and I
+> think we can mark the page dirty twice etc.
 
-Huh. No, please. Don't override existing kernel constructs behind
-everybody's back. I know that tracing folks love to play that sort of
-game, but I really don't want any of that here.
+I don't really like the new name of the flag, but unsurprisingly, I
+also can't come up with anything better.
 
-Just define a wrapper that is KVM-specific, and use that.
+I otherwise quite like the fact that it becomes a buy-in behaviour.
 
-Then from a semantic perspective, an SMC call, an ERET back to EL1
-host, and an ERET back to EL1 guest are all very different events that
-you lump under the "exit" category. That's not right. Same thing for
-"enter".
-
-Thanks,
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
