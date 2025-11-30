@@ -1,50 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CFB36D510
-	for <kvmarm@lists.linux.dev>; Sun, 30 Nov 2025 13:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ACB19E97B;
+	Sun, 30 Nov 2025 18:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764508321; cv=none; b=XlOlOkKCxJWEzwIG316AbZUaCRXMjC+R/jzXr2O496UKFWz7pKLjdJcSy6vxC+cjAHp6KDpDxjNmnfsSdJM+WOGS/J7wwKlU9CxVgZNN8XLffXCA43tAUJt8VxM8DOEs4kgFvd9xOkn3sC8vPUH7Z3YBXsrD3JeFDRADGRrhqtM=
+	t=1764526526; cv=none; b=L3EoyaKbWi2YMGbwndMnF3G+bcfxIE8Ug3BE7MWR3e3QnVelqJdsOniwzj7kNlssztGv+yneSVkZcghu6mueBNL3dTTAF5dj9dE5/jLwPTzAMJ9CncpYVCD7YAmVwhyIRCi0salvVog1DfZN0TpJGwno7jyCx+cCfSMPOJM6JGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764508321; c=relaxed/simple;
-	bh=ZgigReiyWWOX6rMHBjUflJ+pjs/WLbBCc/fUEa2OSqo=;
+	s=arc-20240116; t=1764526526; c=relaxed/simple;
+	bh=QLjiei/aj1hM85e6RP3JXwOChsIkW+/RduS7s2r5j0Q=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MUigyDF5Vy2aFrdWZmwEHIz9gxyK57t01amgZ5ouQ1Tgw1I0uaTC72jmh+Tw4F4w+xcbHThzrpw3KePAtSgGHyUQWW3rg1fUFO6XMEmXq7nKeyxYhsbDPUJw1Gf5YSmIswQPdowLU0VrWhB96J5PRVtTSSOUL72/+6WX1BgSgdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/IIDObn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FwFvRRhF+pg2w/BOHTI/9RVF5dbedGBKE+dUHGuh1ABGb+uWFmg6S8/7IzPft7OAR9Dk34rJ2D0HtnxiYkxOFxpa5s7eBnMvL0y62YGLDesTC5XpYHxAJFOCEn1VcBeDB1l4yqIKcVsGc05hbX3Gd5e9Uia80ij+OMBuYQg+8G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WM4XF6kp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/IIDObn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB576C4CEF8;
-	Sun, 30 Nov 2025 13:12:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WM4XF6kp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028F4C4CEF8;
+	Sun, 30 Nov 2025 18:15:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764508320;
-	bh=ZgigReiyWWOX6rMHBjUflJ+pjs/WLbBCc/fUEa2OSqo=;
+	s=k20201202; t=1764526526;
+	bh=QLjiei/aj1hM85e6RP3JXwOChsIkW+/RduS7s2r5j0Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u/IIDObnB/o6BIvA+3pZF1namXu63e4WWJGu55y/fK3RWVRsmkvXXQHnRL5N8W8T7
-	 vI0HZTp7p4WUSLAf9v932gw2wxRT7UOYh78J0l/AV6TdauFHRI5fpXYakf488Ro4eD
-	 ytVD5U1vO+DHglHe4U0hfp8nHE1uTnNxo8DiZAtTYQlkMibOE6Mg5Y4m3s6XwhVdxj
-	 RGi/4GiNCnKLqQ9idc+olF/x0L9s+ntolRC8EqjIqKiboA8c98gLzi4WfZCClX7x9C
-	 Ga90ZuAob1FhPaw8w5156zW/VI406WcnouFxGDw0SFZGbjbBvfO/LhlB+86qgYArGH
-	 HfWXesCw8+fMw==
+	b=WM4XF6kp1mvCYskm2Xb1pdoQdN053QIK+wCY9Y+7gCxT54sUqxa1eUU5UGvE0MbuY
+	 PtrpPWMhqk9DdUUwe26ivALxlDzQscK3tbZrFRcmEip5zusPGg6/y9ikqhEnS8REq0
+	 aYGil/7YU+RYwMt+fiYw05HJ0g62p1ScC9lo12dRYWDew0G294k7FdduekmLiyJKIC
+	 fGKahG/RGps05ZLccKzq1d9vooRu4N1HKTiNmFqRF+FqoyVOQIS5dLFZ0ZXUS3gBTD
+	 wzYp9xoIwITtQzXd7/4HJRJBwtCMXGJRxtDnc1XG7KGP5FvbQMNWQgmV9GxsCYtHf+
+	 nI1tIuS82n+oQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPhDa-00000009PcT-1OIK;
-	Sun, 30 Nov 2025 13:11:58 +0000
-Date: Sun, 30 Nov 2025 13:11:57 +0000
-Message-ID: <87a503fyw2.wl-maz@kernel.org>
+	id 1vPlxD-00000009RHO-18JD;
+	Sun, 30 Nov 2025 18:15:23 +0000
+Date: Sun, 30 Nov 2025 18:15:22 +0000
+Message-ID: <878qfnfkud.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oliver.upton@linux.dev,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: g@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
 	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
 	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 0/4] KVM: arm64: nv: HAF fixes
-In-Reply-To: <20251128100946.74210-1-alexandru.elisei@arm.com>
-References: <20251128100946.74210-1-alexandru.elisei@arm.com>
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 20/28] KVM: arm64: Add clock support for the pKVM hyp
+In-Reply-To: <aR79MCNlAKP1H-PQ@google.com>
+References: <20251107093840.3779150-1-vdonnefort@google.com>
+	<20251107093840.3779150-21-vdonnefort@google.com>
+	<86cy5erprc.wl-maz@kernel.org>
+	<aR79MCNlAKP1H-PQ@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -56,121 +70,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, g@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 28 Nov 2025 10:09:42 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, 20 Nov 2025 11:36:16 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Based on kvmarm's next branch.
+> [...]
 > 
-> HAF support for the software translation table walker was merged while I
-> was in the process of reading the patches, so instead of comments I have
-> these few fixes.
+> > > +/* Using host provided data. Do not use for anything else than debugging. */
+> > > +u64 trace_clock(void)
+> > > +{
+> > > +	struct clock_data *clock = &trace_clock_data;
+> > > +	u64 bank = smp_load_acquire(&clock->cur);
+> > > +	u64 cyc, ns;
+> > > +
+> > > +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
+> > 
+> > I can only imagine that you don't care about the broken systems that
+> > do not have a monotonic counter, and that will happily have their
+> > counter swing back and forth?
 > 
-> One thing I didn't touch is this sequence in hyp_set_prot_attr():
-> 
-> 	if (prot & KVM_PGTABLE_PROT_X) {
-> 		/* don't set the XN bit */
-> 	} else {
-> 		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-> 	}
-> 
-> If the caller is executing in nVHE mode, the translation regime is EL2,
-> which has only PrivExecute permission. Since KVM_PGTABLE_PROT_X is now the
-> union of PrivExecute and UnprivExecute, if the caller requests only the
-> UnprivExecute permission, but no PrivExecute permission, the function does
-> not return an error code and sets the PrivExecute permission.
+> I haven't used the _stable() variant for the affected devices... Hum this will
+> not be trivial from the hypervisor. I'll see what I can do.
 
-I don't think this is a huge problem *right now*, as long as we don't
-have anything that looks like "hvhe hypervisor userspace" (yes, I
-proposed that a while ago, and haven't completely dropped the
-idea). But at the same time, the page-table code should probably be
-built to the architecture and not to the use cases.
+In all honestly, simply disabling tracing when you don't have a stable
+counter should be enough. I don't think there is much to be gained
+with supporting that on sub-standard HW (the bar is low enough).
 
-But it also outlines a rather bad bug in the hVHE case, where we set
-the UXN bit instead of the PXN bit...
+> > Also, you may want to document why you are using the physical counter
+> > instead of the virtual one. I guess that you don't want CNTVOFF_EL2 to
+> > apply when HCR_EL2.E2H==0, but given that you never allow anything
+> > else for pKVM, this is slightly odd.
+> 
+> You mean I might as well use __arch_counter_get_cntvct() as CNTVOFF_EL2 will
+> always be ignored in the pKVM case?
 
-What I have in mind is something like this, untested. Thoughts?
+That, plus the fact that CNTVOFF_EL2 is only evaluated at EL2 when
+E2H=0 (and that case is going to disappear over time).
 
 	M.
-
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index d57c12f074a40..48305118ba3c5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -88,6 +88,8 @@ typedef u64 kvm_pte_t;
- #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-+#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
- 
- #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
- 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index e0bd6a0172729..cbf9b6b58e284 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -330,6 +330,11 @@ struct hyp_map_data {
- 	kvm_pte_t			attr;
- };
- 
-+static bool el2_nvhe(void)
-+{
-+	return !has_vhe() && !cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
-+}
-+
- static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- {
- 	bool device = prot & KVM_PGTABLE_PROT_DEVICE;
-@@ -342,6 +347,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 	if (!(prot & KVM_PGTABLE_PROT_R))
- 		return -EINVAL;
- 
-+	if (el2_nvhe())
-+		prot &= ~KVM_PGTABLE_PROT_UX;
-+
- 	if (prot & KVM_PGTABLE_PROT_X) {
- 		if (prot & KVM_PGTABLE_PROT_W)
- 			return -EINVAL;
-@@ -351,8 +359,16 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
- 
- 		if (system_supports_bti_kernel())
- 			attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-+	}
-+
-+	if (el2_nvhe()) {
-+		if (!(prot & KVM_PGTABLE_PROT_PX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
- 	} else {
--		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-+		if (!(prot & KVM_PGTABLE_PROT_PX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_PXN;
-+		if (!(prot & KVM_PGTABLE_PROT_UX))
-+			attr |= KVM_PTE_LEAF_ATTR_HI_S1_UXN;
- 	}
- 
- 	attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-@@ -373,8 +389,15 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
- 	if (!kvm_pte_valid(pte))
- 		return prot;
- 
--	if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
--		prot |= KVM_PGTABLE_PROT_X;
-+	if (el2_nvhe()) {
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-+			prot |= KVM_PGTABLE_PROT_PX;
-+	} else {
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_PXN))
-+			prot |= KVM_PGTABLE_PROT_PX;
-+		if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_UXN))
-+			prot |= KVM_PGTABLE_PROT_UX;
-+	}
- 
- 	ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
- 	if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
 
 -- 
 Jazz isn't dead. It just smells funny.
