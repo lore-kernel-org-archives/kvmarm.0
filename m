@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ACB19E97B;
-	Sun, 30 Nov 2025 18:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DA91FBC8E;
+	Sun, 30 Nov 2025 18:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764526526; cv=none; b=L3EoyaKbWi2YMGbwndMnF3G+bcfxIE8Ug3BE7MWR3e3QnVelqJdsOniwzj7kNlssztGv+yneSVkZcghu6mueBNL3dTTAF5dj9dE5/jLwPTzAMJ9CncpYVCD7YAmVwhyIRCi0salvVog1DfZN0TpJGwno7jyCx+cCfSMPOJM6JGc=
+	t=1764527026; cv=none; b=V7YxndzbA0hvMoCS8iPXneHvbnT9czp2jarVJdm9B9FvA4DNvLAi6GLQP3bypW+8BeucH6898U3L57Icc4I/gfcQhRPI15MF5QJc+Z3Ud+NlNe/Ss3AThh5qKcG+I/wzL1nq7OMv8JJJtCU3j9tcKHdtfS2j4KhJLjz94p8rYt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764526526; c=relaxed/simple;
-	bh=QLjiei/aj1hM85e6RP3JXwOChsIkW+/RduS7s2r5j0Q=;
+	s=arc-20240116; t=1764527026; c=relaxed/simple;
+	bh=wxGi5KhMHefnyPeE18YbxxI9ChdRvOLT/D+zSDi6lC4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FwFvRRhF+pg2w/BOHTI/9RVF5dbedGBKE+dUHGuh1ABGb+uWFmg6S8/7IzPft7OAR9Dk34rJ2D0HtnxiYkxOFxpa5s7eBnMvL0y62YGLDesTC5XpYHxAJFOCEn1VcBeDB1l4yqIKcVsGc05hbX3Gd5e9Uia80ij+OMBuYQg+8G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WM4XF6kp; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=GUU/iUcV64jbAMVU0CyFsZKSyqNoVXmAUEMiwJuk9yvP8BREOMEDs7do8iFLdHmNkT8Ze4XNIby79J8XqqDqP/y30v4iHhdPgLTb1cRBKsuPTR4o5mhUuyoZqdLfMInSHCX4QgWen6JU1hItqXrixQB5vSUN9X/kBExqA/bFdcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rMc5gsdz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WM4XF6kp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028F4C4CEF8;
-	Sun, 30 Nov 2025 18:15:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMc5gsdz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE18C4CEF8;
+	Sun, 30 Nov 2025 18:23:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764526526;
-	bh=QLjiei/aj1hM85e6RP3JXwOChsIkW+/RduS7s2r5j0Q=;
+	s=k20201202; t=1764527026;
+	bh=wxGi5KhMHefnyPeE18YbxxI9ChdRvOLT/D+zSDi6lC4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WM4XF6kp1mvCYskm2Xb1pdoQdN053QIK+wCY9Y+7gCxT54sUqxa1eUU5UGvE0MbuY
-	 PtrpPWMhqk9DdUUwe26ivALxlDzQscK3tbZrFRcmEip5zusPGg6/y9ikqhEnS8REq0
-	 aYGil/7YU+RYwMt+fiYw05HJ0g62p1ScC9lo12dRYWDew0G294k7FdduekmLiyJKIC
-	 fGKahG/RGps05ZLccKzq1d9vooRu4N1HKTiNmFqRF+FqoyVOQIS5dLFZ0ZXUS3gBTD
-	 wzYp9xoIwITtQzXd7/4HJRJBwtCMXGJRxtDnc1XG7KGP5FvbQMNWQgmV9GxsCYtHf+
-	 nI1tIuS82n+oQ==
+	b=rMc5gsdz1DTW91gCfDgroykjDSBJlgb+ro4HJxAcAYJ77WzPYIS33ItzCPhZrGtyM
+	 tosPEK7WvHhn8b2KjVTVyinBH+YLyHLHqCb3fWNmwMRt8uqGe6fcXhDHNXvG5QKsGq
+	 17PwlClIVy615YgjlvX9R573ePTQK0xNDsMZURfdTK/TvH94VezUtECWCws4EuDTJC
+	 Gk2xPuiK+pgt1c0UlgGkP2WrwhXmnEqNGdU8ApHaT+PG7Mv+BANpJV6KSjD/uxnMlb
+	 RpYs7t4HNYF17PhaMh1sMuhRJsKCJSe98QiQs1YE3Y35VRST/kkzyJIeNQdvYBcfHx
+	 Ig/UnP6bxcRgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPlxD-00000009RHO-18JD;
-	Sun, 30 Nov 2025 18:15:23 +0000
-Date: Sun, 30 Nov 2025 18:15:22 +0000
-Message-ID: <878qfnfkud.wl-maz@kernel.org>
+	id 1vPm5H-00000009RLI-38t4;
+	Sun, 30 Nov 2025 18:23:43 +0000
+Date: Sun, 30 Nov 2025 18:23:43 +0000
+Message-ID: <877bv7fkgg.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>
-Cc: g@google.com,
-	rostedt@goodmis.org,
+Cc: rostedt@goodmis.org,
 	mhiramat@kernel.org,
 	mathieu.desnoyers@efficios.com,
 	linux-trace-kernel@vger.kernel.org,
@@ -53,12 +52,12 @@ Cc: g@google.com,
 	aneesh.kumar@kernel.org,
 	kernel-team@android.com,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 20/28] KVM: arm64: Add clock support for the pKVM hyp
-In-Reply-To: <aR79MCNlAKP1H-PQ@google.com>
+Subject: Re: [PATCH v8 21/28] KVM: arm64: Add tracing capability for the pKVM hyp
+In-Reply-To: <aR8DM6Xf8cmTGVR0@google.com>
 References: <20251107093840.3779150-1-vdonnefort@google.com>
-	<20251107093840.3779150-21-vdonnefort@google.com>
-	<86cy5erprc.wl-maz@kernel.org>
-	<aR79MCNlAKP1H-PQ@google.com>
+	<20251107093840.3779150-22-vdonnefort@google.com>
+	<86bjkyrly9.wl-maz@kernel.org>
+	<aR8DM6Xf8cmTGVR0@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,45 +69,122 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, g@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 20 Nov 2025 11:36:16 +0000,
+On Thu, 20 Nov 2025 12:01:55 +0000,
 Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> [...]
-> 
-> > > +/* Using host provided data. Do not use for anything else than debugging. */
-> > > +u64 trace_clock(void)
-> > > +{
-> > > +	struct clock_data *clock = &trace_clock_data;
-> > > +	u64 bank = smp_load_acquire(&clock->cur);
-> > > +	u64 cyc, ns;
+> On Wed, Nov 19, 2025 at 05:06:38PM +0000, Marc Zyngier wrote:
+> > On Fri, 07 Nov 2025 09:38:33 +0000,
+> > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > > 
+> > > When running with protected mode, the host has very little knowledge
+> > > about what is happening in the hypervisor. Of course this is an
+> > > essential feature for security but nonetheless, that piece of code
+> > > growing with more responsibilities, we need now a way to debug and
+> > > profile it. Tracefs by its reliability, versatility and support for
+> > > user-space is the perfect tool.
+> > > 
+> > > There's no way the hypervisor could log events directly into the host
+> > > tracefs ring-buffers. So instead let's use our own, where the hypervisor
+> > > is the writer and the host the reader.
+> > > 
+> > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > > 
+> > > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > > index 9da54d4ee49e..ad02dee140d3 100644
+> > > --- a/arch/arm64/include/asm/kvm_asm.h
+> > > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > > @@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
+> > >  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+> > >  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+> > >  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> > > +	__KVM_HOST_SMCCC_FUNC___pkvm_load_tracing,
+> > > +	__KVM_HOST_SMCCC_FUNC___pkvm_unload_tracing,
+> > > +	__KVM_HOST_SMCCC_FUNC___pkvm_enable_tracing,
+> > > +	__KVM_HOST_SMCCC_FUNC___pkvm_swap_reader_tracing,
+> > >  };
+> > >  
+> > >  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> > > diff --git a/arch/arm64/include/asm/kvm_hyptrace.h b/arch/arm64/include/asm/kvm_hyptrace.h
+> > > new file mode 100644
+> > > index 000000000000..9c30a479bc36
+> > > --- /dev/null
+> > > +++ b/arch/arm64/include/asm/kvm_hyptrace.h
+> > > @@ -0,0 +1,13 @@
+> > > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > > +#ifndef __ARM64_KVM_HYPTRACE_H_
+> > > +#define __ARM64_KVM_HYPTRACE_H_
 > > > +
-> > > +	cyc = __arch_counter_get_cntpct() - clock->data[bank].epoch_cyc;
+> > > +#include <linux/ring_buffer.h>
+> > > +
+> > > +struct hyp_trace_desc {
+> > > +	unsigned long			bpages_backing_start;
 > > 
-> > I can only imagine that you don't care about the broken systems that
-> > do not have a monotonic counter, and that will happily have their
-> > counter swing back and forth?
+> > Why is this an integer type? You keep casting it all over the place,
+> > which tells me that's not the ideal type.
 > 
-> I haven't used the _stable() variant for the affected devices... Hum this will
-> not be trivial from the hypervisor. I'll see what I can do.
-
-In all honestly, simply disabling tracing when you don't have a stable
-counter should be enough. I don't think there is much to be gained
-with supporting that on sub-standard HW (the bar is low enough).
-
-> > Also, you may want to document why you are using the physical counter
-> > instead of the virtual one. I guess that you don't want CNTVOFF_EL2 to
-> > apply when HCR_EL2.E2H==0, but given that you never allow anything
-> > else for pKVM, this is slightly odd.
+> That's because it is a kern VA the hyp needs to convert. However it would indeed
+> make my life easier to declare it as a struct simple_buffer_page * in the
+> struct hyp_trace_buffer below.
 > 
-> You mean I might as well use __arch_counter_get_cntvct() as CNTVOFF_EL2 will
-> always be ignored in the pKVM case?
+> > 
+> > > +	size_t				bpages_backing_size;
+> > > +	struct trace_buffer_desc	trace_buffer_desc;
+> > > +
+> > > +};
+> > > +#endif
+> > > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> > > index 4f803fd1c99a..580426cdbe77 100644
+> > > --- a/arch/arm64/kvm/Kconfig
+> > > +++ b/arch/arm64/kvm/Kconfig
+> > > @@ -83,4 +83,11 @@ config PTDUMP_STAGE2_DEBUGFS
+> > >  
+> > >  	  If in doubt, say N.
+> > >  
+> > > +config PKVM_TRACING
+> > > +	bool
+> > > +	depends on KVM
+> > > +	depends on TRACING
+> > > +	select SIMPLE_RING_BUFFER
+> > > +	default y
+> > 
+> > I'd rather this is made to depend on NVHE_EL2_DEBUG, just like the
+> > other debug options.
+> 
+> NVHE_EL2_DEBUG is unsafe for production because of the stage-2 relax on panic.
+> While this one is. So ideally this should be usable even without NVHE_EL2_DEBUG.
 
-That, plus the fact that CNTVOFF_EL2 is only evaluated at EL2 when
-E2H=0 (and that case is going to disappear over time).
+I don't see what makes tracing safer, as it potentially exposes
+information (timing, control flow) that the host use to infer what is
+happening at EL2. Which is, after all, the whole point of tracing.
+
+I really think this should be guarded by NVHE_EL2_DEBUG, and the
+stage-2 relaxation tied to the stacktrace infrastructure, so that you
+can select both independently.
+
+> I can remove this hidden PKVM_TRACING option and use everywhere
+> CONFIG_TRACING. But then I need something to select
+> SIMPLE_RING_BUFFER.
+> 
+> Perhaps with the following?
+> 
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 2ae6bf499236..c561bf9d4754 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -38,6 +38,7 @@ menuconfig KVM
+>         select SCHED_INFO
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+>         select KVM_GUEST_MEMFD
+> +       select SIMPLE_RING_BUFFER if CONFIG_TRACING
+
+That's better, but my ask about making this depending on DEBUG still
+stand.
+
+Thanks,
 
 	M.
 
