@@ -1,115 +1,121 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83AA333452
-	for <kvmarm@lists.linux.dev>; Mon,  1 Dec 2025 18:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0DA36D513;
+	Mon,  1 Dec 2025 18:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764613284; cv=none; b=M6/g4tgSEetm68hs9AMd1Dp+4E5sNzQZ8uJLRwUBS5asKUhfkB9yvw9Y3HfWXnZf/+CKdVbyETYixv7hpXFeSCb2er5wEfVkQ/8iHtDtfEhtkuxaveHkNY0ylInlJnRP0slbKEn/hU2k/UswsOndGbIhf+x5xC3fUDNF3mKNCGs=
+	t=1764614932; cv=none; b=c6I6HT/jPN3nYrNM2SUl+md0+ACzPUkniRGmthnC1Um5xF2v7jNRSPLU9gDJf10IaTfJhoXJ7FnMyqMhwKK5ZfbNcgItkvIx23i44gJyOG+BsYo2mMRdJunnqD5mZxYp0pP7PqdZ/VSgBx7MoLtDy6W0QyAcp/x9w7WP5gLAxuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764613284; c=relaxed/simple;
-	bh=7vOZlkn7KxLEHBeqTq+/468rlp4RUVKGCfWwdJqKCH0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TcdqywBZ0FpQjh4AmWpHiiLfGY7iwbGiHiG1WO8F7WdJzQXOXZOS0IxhnaeA6yQ4pkGhIt3dflqfbqKOSZCithFtTGsrK2hIvoA8Eu9mZTUVFH8EROmrEs/odsWZ4gTXn9muTlWxkxe/picCH4W5emCKsd09cdAMHTvqW2c+DaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JkB/4v1h; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
+	s=arc-20240116; t=1764614932; c=relaxed/simple;
+	bh=8mPq8nOkd7GYclNEqbPcyQdNSK5b0Ogy59muydnaThI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nG9J5mDVJqjm4MRsFbOhAWh36I4l3WlAgLTTH1VgjS/QvRaADe6sEU+koEz1iWyLnxEa/pVLmIlEd96H+l9mpfc4iidie3rimHJHmNSIsLIXC1PHR7WPdvU/BWltB7UupQcRc24LjVwHVuwmLzZV8ebOXRGDYXPuJSeupF9+bIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qonL8Ofb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JkB/4v1h"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b7689ad588fso458868866b.3
-        for <kvmarm@lists.linux.dev>; Mon, 01 Dec 2025 10:21:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764613281; x=1765218081; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=odX/ox3aZ6OfRTd6Iy2+oa0/EpTihBm90P4xNQBVkvs=;
-        b=JkB/4v1hTVElVaXWtFFx9BvpyIlN3YyHr3O4wPxoJRjQsrQOttoEBsT3LjH27bOBE/
-         qNXrWcr1FQUceBAFJUaIjW5vQ3i8+QCehZp/Xm1qDX+3ouKF3CXRf3JgT4qd9wd+nS1e
-         3LhkfCy40N3H7fKPLxzDQbmWl7HLTWdihC1BJaaVUdfybsBdYVnW7ywHYvFwGqiub6MK
-         4HaNqU3LNvl+NOmDCB0ybmUwv4sMqwg6nEkQE7zQqBZc49UXz5vLD9E9UPje3PyLhntk
-         beOu1Ahm7jAG9cnl3XhWr0S94kuYVqSeelbndIZf6pHqo94YleVVsqmgcECVuoSR/x36
-         FZ9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764613281; x=1765218081;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=odX/ox3aZ6OfRTd6Iy2+oa0/EpTihBm90P4xNQBVkvs=;
-        b=ITKF6dO0c2u4mnnEFYa+ly9AKtX0dO7udjWMLpidATP6JpcPSnYOw1i/JwyXU7hUlB
-         0ebxjTlZAkSP2bx0eis6zwj/c3kzpZZ1TZwvus4wp+qlsDxQUDXZZPDs2Q8Q1A0mC9wI
-         XRMlhk3ac6ufDVk1hl19NQfrWkd6hbKmrRnnxB0jLC/y4g1TQIRTPO2XJbey9la42Q/s
-         +HdX1hnSd51pBsGa/W521L6Wey++dz/EFIDALd7hfLOSoPD6OW61CM4h0Q8DrRw8Ss1J
-         MXweKtKjA/mEgg1j68rkxiKNQDjHnqsvCAFUgDqq3wu230HcwQEPLmQ1oJRhIhEncEx7
-         H5Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCX7ZRnSfc92rh33hxjxV4x+WRfgdyW1STU4B5zp75NPeH3DQgDQxWJn12mvBJfveFb74axDFm8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyWxwEAP2Oho3J+dHu9yt2DW7icUd0gibRSO/yNkJ0WeXSZ1O5z
-	h0AcapUXUq4kIoPj+Lt/IAg6Wb4uAkZP7x/fqFcvtkXTfw+w253Say2+Pg5nu1LFIc6qhH4Roi5
-	wGw==
-X-Google-Smtp-Source: AGHT+IHh8EB3gV32tWgbXZNPjCoJvYZ5NAK7xEFvEDfY8RzeyPbORY5fp6hyi+V7tHYcCNBQoIRQPJhBGw==
-X-Received: from ejclg11.prod.google.com ([2002:a17:907:180b:b0:b73:69d2:27b7])
- (user=ptosi job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:9610:b0:b73:870f:fa2b
- with SMTP id a640c23a62f3a-b7671596300mr4237213466b.27.1764613281291; Mon, 01
- Dec 2025 10:21:21 -0800 (PST)
-Date: Mon, 01 Dec 2025 18:21:09 +0000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qonL8Ofb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6045CC4CEF1;
+	Mon,  1 Dec 2025 18:48:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764614931;
+	bh=8mPq8nOkd7GYclNEqbPcyQdNSK5b0Ogy59muydnaThI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qonL8OfbUvIgnf+p/t9uJtgN1AGc6Xl4nvqXi+pQB70+la1/q/J2DoHgNwzPP0qZ6
+	 xpU/O2CUhzcGThb8zC3RHiy3dTIB/Y2+5NOSKlyfx2QIvY+OCHlxYNUnweXP43fwd/
+	 Cu0YXRibhJLEuuvX1HDSog7pYS/f5/BSBwBwaRXp8XX4dYRFdFwiSHdeKbAjMWftEM
+	 ehNFa/3T/V+n8F0IrfjPXuE8A9BRfJYYBcAg39iU529V7/v5nebMFnEgQmXasCTp8p
+	 r1GPbR6YKzONufYvcPWDcuhUIcWRPla8yzqbM08s0BZoCGFDp8iWMqhvoED7X0HliX
+	 7B3jkWm/9Exfg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vQ8x6-00000009hAi-48rX;
+	Mon, 01 Dec 2025 18:48:49 +0000
+Date: Mon, 01 Dec 2025 18:48:48 +0000
+Message-ID: <86ms42ox67.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+Cc: kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Prevent FWD_TO_USER of SMCCC to pKVM
+In-Reply-To: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
+References: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJTcLWkC/x3MMQqAMAxA0atIZgNtQEGvIg4lpjaDVVJQQby7x
- fEN/z9QxFQKjM0DJqcW3XOFbxvgFPIqqEs1kKPOk/MYbMOyMTPuVxar5oS8RBoiUXB9hJoeJlH vfzvN7/sBPmjymGYAAAA=
-X-Change-Id: 20251201-arm-smccc-owner-arch-cdf29f22a06f
-X-Mailer: b4 0.14.2
-Message-ID: <20251201-arm-smccc-owner-arch-v1-1-71f7d75f97a4@google.com>
-Subject: [PATCH] KVM: arm64: Use ARM_SMCCC_OWNER_ARCH in place of 0
-From: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ptosi@google.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Trivial change to use the appropriate self-documenting macro.
+On Mon, 01 Dec 2025 18:19:52 +0000,
+"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com> wrote:
+> 
+> With protected VMs, forwarding guest HVC/SMCs happens at two interfaces:
+> 
+>      pKVM [EL2] <--> KVM [EL1] <--> VMM [EL0]
+> 
+> so it might be possible for EL0 to successfully register with EL1 to
+> handle guest SMCCC calls but never see the KVM_EXIT_HYPERCALL, even if
+> the calls are properly issued by the guest, due to EL2 handling them so
+> that (host) EL1 never gets a chance to exit to EL0.
+> 
+> Instead, avoid that confusing situation and make userspace fail early by
+> disallowing KVM_ARM_VM_SMCCC_FILTER-ing calls from protected guests in
+> the KVM FID range (which pKVM re-uses).
+> 
+> DEN0028 defines 65536 "Vendor Specific Hypervisor Service Calls":
+> 
+> - the first ARM_SMCCC_KVM_NUM_FUNCS (128) can be custom-defined
+> - the following 3 are currently standardized
+> - the rest is "reserved for future expansion"
+> 
+> so reserve them all, like commit 821d935c87bc ("KVM: arm64: Introduce
+> support for userspace SMCCC filtering") with the Arm Architecture Calls.
 
-Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
----
- arch/arm64/kvm/hypercalls.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+I don't think preventing all hypercalls from reaching userspace is
+acceptable from an API perspective. For example, it is highly expected
+that the hypercall that exposes the various MIDR/REVIDR/AIDR that the
+guest can be expected to run on is handled in userspace.
 
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 58c5fe7d757274d9079606fcc378485980c6c0f8..3e7fdbcc6411f658f5cec818bfa=
-d2e97711d37a7 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -126,14 +126,17 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *v=
-cpu, u32 func_id)
- #define SMC32_ARCH_RANGE_BEGIN	ARM_SMCCC_VERSION_FUNC_ID
- #define SMC32_ARCH_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
- 						   ARM_SMCCC_SMC_32,		\
--						   0, ARM_SMCCC_FUNC_MASK)
-+						   ARM_SMCCC_OWNER_ARCH,	\
-+						   ARM_SMCCC_FUNC_MASK)
-=20
- #define SMC64_ARCH_RANGE_BEGIN	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
- 						   ARM_SMCCC_SMC_64,		\
--						   0, 0)
-+						   ARM_SMCCC_OWNER_ARCH,	\
-+						   0)
- #define SMC64_ARCH_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
- 						   ARM_SMCCC_SMC_64,		\
--						   0, ARM_SMCCC_FUNC_MASK)
-+						   ARM_SMCCC_OWNER_ARCH,	\
-+						   ARM_SMCCC_FUNC_MASK)
-=20
- static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
- {
+Given that this hypercall is critical to the correct behaviour of a
+guest in an asymmetric system, you can't really forbid it. If you
+don't want it, that's fine -- don't implement it in your VMM.
 
----
-base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
-change-id: 20251201-arm-smccc-owner-arch-cdf29f22a06f
+But I fully expect pKVM to inherit the existing APIs by virtue of
+being a KVM backend.
 
-Best regards,
---=20
-Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+> Alternatively, we could have only reserved the ARM_SMCCC_KVM_NUM_FUNCS
+> (or even a subset of it) and the "Call UID Query" but that would have
+> risked future conflicts between that uAPI and an extension of the SMCCC
+> or of the pKVM ABI.
 
+I disagree. The only ones you can legitimately block are the ones that
+are earmarked for pKVM itself (2-63), and only these. Everything else
+should make it to userspace if the guest and the VMM agree to do so.
+
+This is part of the KVM ABI, and pKVM should be fixed.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
