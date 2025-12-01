@@ -1,168 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D721FBEA6;
-	Mon,  1 Dec 2025 16:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AFC337BA1
+	for <kvmarm@lists.linux.dev>; Mon,  1 Dec 2025 18:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764606812; cv=none; b=sJzl/ThkJBUWeV0k1Iq8WgcFsGT/tKRhKwLRsGjn/yojjNtglYWo+z6SDZLXCoafGp8cWoILOb3GCX88r/i5xODrvzO45YPullEWdTMPIu5oxK5pptx2cqh+rI8zuIDqlsltpvw6w/2miIMI0HE4DOxnl9/Ty39cdrzWNtubnrU=
+	t=1764613200; cv=none; b=iD3+O2bAGokrsLWBBfuRykGqMiUFewYjXImgzecb4p3wxaXKgDDJmIdEkqCRen6nqcDgXQ1Fdg+QQkFRqsHNUrKcZL9zt1os5UQrsOhPnQYtUI0FUc7IwEuKHGcTBJsIiCAmjz0XNa+tAarJMxzwBtrYVIzaGsPsF6Y6sD164zM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764606812; c=relaxed/simple;
-	bh=mKAh6zoTfeyMrA3fhkg8tP6+y8PTWo7YVbnFxPAXZD8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n7mZ7LtX6+Cx5j6JMVHduEIgUOlU+QjQaJpGhZX/bS8SsAbHt02SfYRI01t9KETuiVGliXUbwRIUxvghFI+dpoYiNQnwObrZaOq/HaU5IcI5YzM/Ii2HNnzx8WwyOifLiibbNnAMol6R9zmpdAyO/FzjFEUUupnzayo7lKEYYCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FaaesL99; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764613200; c=relaxed/simple;
+	bh=R4zb8QVEWFPgzNvZ5CPpwj0EBVH9ubdWaSW2XoDwoY0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OHD5RLh3qhJgaFlYou6+B0iRKvIaQVJJ1yh8Ebp7ve1m7pCgxFSXhrK/h5pk/2kegt47lk1DJT3CORM1D8J4XKib0EnrNUDkhZ/PpraB/VTbFrqRyXPhjeDqQFxl+hZwS9skeYl5d5TR+Cc4QAmkzmOlavx0Ncd0HiFQJqsHP8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zpr88CvA; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FaaesL99"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E15E5C4CEF1;
-	Mon,  1 Dec 2025 16:33:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764606811;
-	bh=mKAh6zoTfeyMrA3fhkg8tP6+y8PTWo7YVbnFxPAXZD8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FaaesL99f3aylyjGWhobo5yy8gWh0sTHYUcDMseN5AN38SYx5q/uRK7ezEDTA2ZFk
-	 9SHs2TIVg5xk1N6nyIjKdsxBJbVx9ZO7KUubuzjy2y+T9sPJQt9eYIJDNXwM0C1sTU
-	 P8rTQhJPVN8xE1f8dRS878TyldV2uz509ZYKJ598qQJ5aWZSuhMc8JllWfktFlN1GW
-	 hITjUZO4RNzPqocvqcx3jAUJqJE12ylkA5plINUmvEem2ZRKadlK8RYSwniC4bitIg
-	 Q69xwNJfklZR6yL3D2mXiJmE22dQlFRe2+CHQM7DxssgQIP73xkUW15fBXT7QOTNhr
-	 nbyljAXgWizvg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vQ6q9-00000009f9x-203m;
-	Mon, 01 Dec 2025 16:33:29 +0000
-Date: Mon, 01 Dec 2025 16:33:28 +0000
-Message-ID: <86o6oip3fr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	jstultz@google.com,
-	qperret@google.com,
-	will@kernel.org,
-	aneesh.kumar@kernel.org,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 26/28] KVM: arm64: Add hyp_enter/hyp_exit events to pKVM hyp
-In-Reply-To: <aS28dyrKgZaOmMNr@google.com>
-References: <20251107093840.3779150-1-vdonnefort@google.com>
-	<20251107093840.3779150-27-vdonnefort@google.com>
-	<87345vfiqj.wl-maz@kernel.org>
-	<aS28dyrKgZaOmMNr@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zpr88CvA"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b70bca184ccso448034966b.2
+        for <kvmarm@lists.linux.dev>; Mon, 01 Dec 2025 10:19:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764613196; x=1765217996; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R2ky1g7vqxE0dSxSYlDayHPkG662KZ7f5gS2hZCCGuQ=;
+        b=Zpr88CvAsfj2ywbMPvWvH5VsozBrhWQJsGhz2QI7lcetukl3yr/i3jMUZZUin7skxv
+         9ALiY4EvGC4M8qPSgmmL6K8GabrwyDoZa1fa7GMwGHA1edEeR5HR9gDSBX4LLwm5mFHb
+         ew0x+tm/FNBkVcd1UideS2olAZjNBElgpSsXaWvSwuydmO3p3sMVUrdVW/uYXnVC3gRn
+         VdHGoEwlomrXSFE7SOPfWotyVbo/gQHpgMx4U1WKXxoc6YMF72FDd2e/WZd06ug2e7Pw
+         6Fa5vGpp/XPFQwJj6NQr+jgsPKiol5twgzhP0BqPJrehnf20+4hkzAzFmYL8fDpr3MtR
+         pamg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764613196; x=1765217996;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R2ky1g7vqxE0dSxSYlDayHPkG662KZ7f5gS2hZCCGuQ=;
+        b=Bw2fQ/7n3Usd29r3zVM5xBVWHPHijlDcxnk8PM29iUbs2M2jtjLgI8SBpQ6kMH3sDi
+         Lcac8Wm+aI9wFub2A3qZH0XH26JcuZSOcYhU4awOiFtxHGRgozcg+u6qZRLcgPXiwH27
+         VitlWYNZe2PqE91Nt0l/OS7+z4LawQAmk9uoCMVdj0AR+TXDlRD4slkk6e1cN8mr5Qyk
+         r3QqoGkjg9pPYmmOC8Bq3pOmhmk2DjuHg2p/osjOIQ+WTnQU9cJ7fyCSRvejfBW0rLta
+         62YBqgYkHcZDMkhkp7/XC4uiF0Wd7XB5sSiIYceyVQ5rHiV0iWuqqmjgqZF+xJDy2MuC
+         ZqrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUzGDY18j/i0RwegE06iAM0uGNBgWeYBPCEM1JiuFcBT8wBfNhE+rg7mlQ8hA8Il2A921PXbs0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwlAqWmnyQw+0Cz3teKAXDokxlWA5mjgOSmBIcGQwAM1iPAOV2c
+	7lruE+SITHyNUVU9eyHDBXvl5y+yf+X/nvTHYndEXUNflNzphElITvY93kcXk/wKODbc7gfQpKU
+	hlg==
+X-Google-Smtp-Source: AGHT+IG0rnfQOBcsGBc89nGQ7P5SqEhx394iLm0A9p+JH2UauaQ7PKGIBjoXKOQU6ONzPdt2vT+TuR01CA==
+X-Received: from ejdcu3.prod.google.com ([2002:a17:906:ba83:b0:b73:2695:dbc5])
+ (user=ptosi job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:6d13:b0:b77:18a0:3c8b
+ with SMTP id a640c23a62f3a-b7718a03cd2mr1308264966b.1.1764613196560; Mon, 01
+ Dec 2025 10:19:56 -0800 (PST)
+Date: Mon, 01 Dec 2025 18:19:52 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAEjcLWkC/x3MQQqAIBBA0avIrBN0QpCuEi1KxxooC40IxLsnL
+ d/i/wKZElOGQRRI9HDmMzboToDb5riSZN8MqNBoVFrmwzknA+83JWms9T5oXHpjoCVXosDvvxu nWj8ivT43XgAAAA==
+X-Change-Id: 20251201-smccc-filter-588ddf12b355
+X-Mailer: b4 0.14.2
+Message-ID: <20251201-smccc-filter-v1-1-b4831416f8a3@google.com>
+Subject: [PATCH] KVM: arm64: Prevent FWD_TO_USER of SMCCC to pKVM
+From: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 01 Dec 2025 16:04:07 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> On Sun, Nov 30, 2025 at 07:00:52PM +0000, Marc Zyngier wrote:
-> > On Fri, 07 Nov 2025 09:38:38 +0000,
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > 
-> > > The hyp_enter and hyp_exit events are logged by the hypervisor any time
-> > > it is entered and exited.
-> > > 
-> > > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
-> > > index d6e033c96c52..ce3953bc884a 100644
-> > > --- a/arch/arm64/include/asm/kvm_hypevents.h
-> > > +++ b/arch/arm64/include/asm/kvm_hypevents.h
-> > > @@ -7,4 +7,21 @@
-> > >  #include <nvhe/trace.h>
-> > >  #endif
-> > >  
-> > > +HYP_EVENT(hyp_enter,
-> > > +	HE_PROTO(void),
-> > > +	HE_STRUCT(
-> > > +	),
-> > > +	HE_ASSIGN(
-> > > +	),
-> > > +	HE_PRINTK()
-> > > +);
-> > > +
-> > > +HYP_EVENT(hyp_exit,
-> > > +	HE_PROTO(void),
-> > > +	HE_STRUCT(
-> > > +	),
-> > > +	HE_ASSIGN(
-> > > +	),
-> > > +	HE_PRINTK()
-> > > +);
-> > >  #endif
-> > > diff --git a/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
-> > > new file mode 100644
-> > > index 000000000000..4b69d33e4f2d
-> > > --- /dev/null
-> > > +++ b/arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
-> > > @@ -0,0 +1,13 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +
-> > > +#include <asm/kvm_hypevents.h>
-> > > +
-> > > +#include <linux/arm-smccc.h>
-> > > +
-> > > +#undef arm_smccc_1_1_smc
-> > > +#define arm_smccc_1_1_smc(...)					\
-> > > +	do {							\
-> > > +		trace_hyp_exit();				\
-> > > +		__arm_smccc_1_1(SMCCC_SMC_INST, __VA_ARGS__);	\
-> > > +		trace_hyp_enter();				\
-> > > +	} while (0)
-> > 
-> > Huh. No, please. Don't override existing kernel constructs behind
-> > everybody's back. I know that tracing folks love to play that sort of
-> > game, but I really don't want any of that here.
-> 
-> And you haven't seen what I had for arm_smccc_1_2_smc()
+With protected VMs, forwarding guest HVC/SMCs happens at two interfaces:
 
-I have the feeling that I don't want to see it at all!
+     pKVM [EL2] <--> KVM [EL1] <--> VMM [EL0]
 
-> > Just define a wrapper that is KVM-specific, and use that.
-> > 
-> > Then from a semantic perspective, an SMC call, an ERET back to EL1
-> > host, and an ERET back to EL1 guest are all very different events that
-> > you lump under the "exit" category. That's not right. Same thing for
-> > "enter".
-> 
-> The idea of those events is just to know when we enter and exit the hypervisor,
-> purely from a timing point of view. In ACK, we already have other separated
-> events that can give the "cause" for entering or exiting the hypervisor. I
-> haven't added them to that series because I thought it was big enough.
-> 
-> So happy to add now or do a follow-up, once we're done with that one?
+so it might be possible for EL0 to successfully register with EL1 to
+handle guest SMCCC calls but never see the KVM_EXIT_HYPERCALL, even if
+the calls are properly issued by the guest, due to EL2 handling them so
+that (host) EL1 never gets a chance to exit to EL0.
 
-Fixed trace points are ABI AFAIC, so I'd rather we make them useful
-from the very start. What you have here is not very interesting,
-because it makes all entry and exit points equal -- they very much
-aren't.
+Instead, avoid that confusing situation and make userspace fail early by
+disallowing KVM_ARM_VM_SMCCC_FILTER-ing calls from protected guests in
+the KVM FID range (which pKVM re-uses).
 
-So get rid of these and implement the real thing.
+DEN0028 defines 65536 "Vendor Specific Hypervisor Service Calls":
 
-Thanks,
+- the first ARM_SMCCC_KVM_NUM_FUNCS (128) can be custom-defined
+- the following 3 are currently standardized
+- the rest is "reserved for future expansion"
 
-	M.
+so reserve them all, like commit 821d935c87bc ("KVM: arm64: Introduce
+support for userspace SMCCC filtering") with the Arm Architecture Calls.
 
--- 
-Without deviation from the norm, progress is not possible.
+Alternatively, we could have only reserved the ARM_SMCCC_KVM_NUM_FUNCS
+(or even a subset of it) and the "Call UID Query" but that would have
+risked future conflicts between that uAPI and an extension of the SMCCC
+or of the pKVM ABI.
+
+Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+---
+ Documentation/virt/kvm/devices/vm.rst | 11 ++++++++++
+ arch/arm64/kvm/hypercalls.c           | 39 +++++++++++++++++++++++++++++++=
+++++
+ 2 files changed, 50 insertions(+)
+
+diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm=
+/devices/vm.rst
+index a4d39fa1b0834b090318250db3b670b0b3174259..9ed4b7afe022023346d4835d33a=
+901e557fc4765 100644
+--- a/Documentation/virt/kvm/devices/vm.rst
++++ b/Documentation/virt/kvm/devices/vm.rst
+@@ -400,3 +400,14 @@ will reject attempts to define a filter for any portio=
+n of these ranges:
+         0x8000_0000 0x8000_FFFF
+         0xC000_0000 0xC000_FFFF
+         =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++
++Protected KVM (pKVM) reserves the 'Vendor Specific Hypervisor Service Call=
+s'
++range of function IDs and will reject attempts to define a filter for any
++portion of these ranges for a protected VM (``KVM_VM_TYPE_ARM_PROTECTED``)=
+:
++
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        Start       End (inclusive)
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        0x8600_0000 0x8600_FFFF
++        0xC600_0000 0xC600_FFFF
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 58c5fe7d757274d9079606fcc378485980c6c0f8..5ddcdd70a6b280914048e7683da=
+fb778d0f24658 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -135,6 +135,21 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vc=
+pu, u32 func_id)
+ 						   ARM_SMCCC_SMC_64,		\
+ 						   0, ARM_SMCCC_FUNC_MASK)
+=20
++#define SMC32_VHYP_RANGE_BEGIN	ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
++#define SMC32_VHYP_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_32,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   ARM_SMCCC_FUNC_MASK)
++
++#define SMC64_VHYP_RANGE_BEGIN	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_64,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   0)
++#define SMC64_VHYP_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_64,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   ARM_SMCCC_FUNC_MASK)
++
+ static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
+ {
+ 	int r;
+@@ -158,6 +173,30 @@ static int kvm_smccc_filter_insert_reserved(struct kvm=
+ *kvm)
+ 	if (r)
+ 		goto out_destroy;
+=20
++	/*
++	 * Prevent userspace from registering to handle any SMCCC call in the
++	 * vendor hypervisor range for pVMs, avoiding the confusion of guest
++	 * calls seemingly not resulting in KVM_RUN exits because pKVM handles
++	 * them without ever returning to the host. This is NOT for security.
++	 */
++	if (kvm_vm_is_protected(kvm)) {
++		r =3D mtree_insert_range(&kvm->arch.smccc_filter,
++				       SMC32_VHYP_RANGE_BEGIN,
++				       SMC32_VHYP_RANGE_END,
++				       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				       GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++
++		r =3D mtree_insert_range(&kvm->arch.smccc_filter,
++				       SMC64_VHYP_RANGE_BEGIN,
++				       SMC64_VHYP_RANGE_END,
++				       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				       GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++	}
++
+ 	return 0;
+ out_destroy:
+ 	mtree_destroy(&kvm->arch.smccc_filter);
+
+---
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+change-id: 20251201-smccc-filter-588ddf12b355
+
+Best regards,
+--=20
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+
