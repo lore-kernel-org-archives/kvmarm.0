@@ -1,285 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31C9248F6A;
-	Mon,  1 Dec 2025 20:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED75248F77
+	for <kvmarm@lists.linux.dev>; Mon,  1 Dec 2025 21:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764619857; cv=none; b=qU6kILpmOjdsiOtfs9MScrQCaPeO1wg7pztYNjhY8pvVxOlHmgDe8PHYiyz0AoCb6yNMKvVsK89aTUTWQ9JtnoX8qGrTGSyWnVCqWazh+j6Owyv40BGz1ACep32+GEXwboqr2sFQVkmgwC2RrTBy3xPlXrSGfBmIHF9V+1RlyOE=
+	t=1764624421; cv=none; b=Ma782Yb8vyQqmITCrHwo6yq+k+SBHmcMVy2mYY5UF6mZ4cB6P6Df1dYrVOF1kt0FkKSYNz+QaeVaJ59NIdxtbmNbUdjxVHdToKxwYcJS8FAQJsQ+PnRPvJGWmj0o64csyTZcHy5sDmFOKXVELH4YgcgjN0NFj3XOa5WsedCdMNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764619857; c=relaxed/simple;
-	bh=rY4efxw1ZxhhV5xEW4DI/gzUAdUFghbdjtNe8WA+b1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SnQ5AxS3J3QI5aXsmoJGFk8H7SL0FVRdPtrbJfmdSwwpcNLD/QDmtI8QU0GNsTAOIu+AcoEKTvKbU96mswDSTi9vSVNs3j698u9MW6s27EvF5OKHWJyc2blPzPxDh83JCMksoLSJ0UyUwrzq705wHnC7oRSdjCpw6ECnDREJ+nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OpoGnI7p; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764624421; c=relaxed/simple;
+	bh=8mLxC795XDeXvk7AKRtIomjBDkWhyEQnDZ+CSuHWqxQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fV7YHogdkHg0lJtnP066SnR5WDzmVejY/qxvcQIIGINxl3Mvg7TUjednPXYWyPKjr1M/k8+p1613LnuMDGmmcBVtjZ5qbEhvo0iKi+vd+nuE/FzPO1HBB6ncLcNYLADxJ3gtuYPJVH74n0w4boTmBZOXBWsNkmpFLO+86p/xLXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pT4GGGs1; arc=none smtp.client-ip=209.85.208.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OpoGnI7p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 345AEC4CEF1;
-	Mon,  1 Dec 2025 20:10:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764619857;
-	bh=rY4efxw1ZxhhV5xEW4DI/gzUAdUFghbdjtNe8WA+b1U=;
-	h=Date:From:To:Cc:Subject:From;
-	b=OpoGnI7pZDVa02dbu+O/wuCGRNlTbliW1qjSbosj95dSGS8vsEBj6tNHFdRpvbTyg
-	 HI6P2K7CiaDWoLWvdiiXUcvwgbSJt8nsTP3suAFE9MaWWWAF6MIoFkm0YNUFbUA5TS
-	 Ga/MLoMsARWOURMgpfTOKL4CUlomdd2GyUla8CtcgIFnV92N3p4xF2uTBJwE5wOdph
-	 kakoBsp3Fi2K5V3keXV6i92UDsaaJgrGJE6F0cYvhLty71Sr4UEQ2cQlzI0cyXTE1A
-	 am1u0EYwLHrnHmxeae9SJQLIOm8YKkrK1IU2Pg5hLd9/dNxuaI7Xh9bVsuLP0yrYrC
-	 8KfRA4mxr9QCw==
-Date: Mon, 1 Dec 2025 12:10:55 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 updates for 6.19
-Message-ID: <aS32T_UxeEfbeJx6@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pT4GGGs1"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-64160e4d78eso4505479a12.0
+        for <kvmarm@lists.linux.dev>; Mon, 01 Dec 2025 13:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764624417; x=1765229217; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cfRTWtcIaathUA2mgL41QBVM+XL6VT6UBdp0QiNZHSY=;
+        b=pT4GGGs1WTOHEeLPUmoKzpIHZYZ7vNqGX8DITlzgZrGb6BtibxFyqbpf/YKoqo/jH1
+         pFDsCP/0FcUsddhm2HuFe4BySDMZqh6eYkH+gL8S44s2SQuUzO7tPLaNlj3HD3FS3E4I
+         4xjNch5MEX/l4CeqJHFQfRLPHyq9IxajEmUrwXDmOvKBW+R1rrwVklapWtZxkRsfJ9jW
+         jYCE0ltqrGOr28Uwx1NItaNS6+25gDPlgjFWi9FHOrTtQ6MJQehP/0qS+3iqZbGmkBMD
+         j0bMD+FWloH3xgKETcXl1p24yyR5p9iDNkYSqw9Q1mXpNjtjRdYgDvxyXXqOLpPWd2cE
+         2fWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764624417; x=1765229217;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cfRTWtcIaathUA2mgL41QBVM+XL6VT6UBdp0QiNZHSY=;
+        b=rZLwIXtmQ3g/6eZy8W6yQrOxXkrZprFXtQjRV1DdbG6bEcau8wPBuAXntnMNKXEwE7
+         K0DPqn5qmR0oI3f+xIwX1vNiInfg/wJeaGyLiZYsDL52E4W84UobE5FKMjoGF7VbXbvN
+         qzwK2Ud6b0A2NOHRVF2GM602ELkzNz1NDIwSuUeoVxyfl0hNO3bQ+fyNPEehtqr4CGdY
+         x3+nshyAgvuWJI/GiMofjTRJDAU040LFNapH2x6LD/pC1T3zOqROSjE72U7/0wX/jCsn
+         Tpp4UO71EJGCzuJsWmIeHG4T9GI77YUMccdvFasv1Qu37dz+h2jAG1f0vrm1i0LNtscf
+         9g6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVvb64ufKzUldrEoXrFkDMC/RAcb5bNxx+f8oEX7hBdVI+gFuFnlg5dPc7ci10YsCR83oniGOM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwB1kYu1W1C+RxOGOaJKeZF7w8egJtA1sQTFm30clbbJnor1k5g
+	JeARWZlRqIC75IzP/dd/CFqz8qJICXB+++g272T8p1xdoYEpQlbs15AyaureRLFtXNI4xVwtoPq
+	TCQ==
+X-Google-Smtp-Source: AGHT+IG6OTWqFbaWntwqBBvO6mL+v9FKNl0tgC0FGiL0/5Lod1u3ROGkbcUdu5tvSbLlEmMPZt/biMrlsA==
+X-Received: from eda15.prod.google.com ([2002:a05:6402:a00f:b0:647:7a4d:7406])
+ (user=ptosi job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:26c3:b0:643:6af2:2356
+ with SMTP id 4fb4d7f45d1cf-645eb2aade8mr24700068a12.26.1764624416786; Mon, 01
+ Dec 2025 13:26:56 -0800 (PST)
+Date: Mon, 01 Dec 2025 21:26:42 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIABEILmkC/3XMQQ6DIBCF4auYWZfGQWlIV71H40JhwElUGjCkj
+ eHupe67/F/yvgMSRaYE9+aASJkTh62GvDRg5nHzJNjWBtlKhbJFkVZjjHC87BSF0tpah3LqlIJ 6eUVy/D6551B75rSH+Dn1jL/1D5RRoJh63WGPN6fH7uFD8AtdTVhhKKV8ATlMx72pAAAA
+X-Change-Id: 20251201-smccc-filter-588ddf12b355
+X-Mailer: b4 0.14.2
+Message-ID: <20251201-smccc-filter-v2-1-03dab737a14d@google.com>
+Subject: [PATCH v2] KVM: arm64: Prevent FWD_TO_USER of SMCCC to pKVM
+From: "=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+To: kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev
+Cc: Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
+	"=?utf-8?q?Pierre-Cl=C3=A9ment_Tosi?=" <ptosi@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+With protected VMs, forwarding guest HVC/SMCs happens at two interfaces:
 
-Now that I'm back from the holiday, here's the bulk of the 6.19 content. The
-MMU changes look a little newer than they actually are (have been sitting in -next
-for more than a week) because I squashed a fixup to avoid introducing bisection
-issues.
+     pKVM [EL2] <--> KVM [EL1] <--> VMM [EL0]
 
-As always, details can be found in the tag. There's an extremely minor conflict with
-fixes that Marc queued in 6.18, my resolution is included at the end. Sorry about the
-wrinkle, will try to avoid next time.
+so it might be possible for EL0 to successfully register with EL1 to
+handle guest SMCCC calls but never see the KVM_EXIT_HYPERCALL, even if
+the calls are properly issued by the guest, due to EL2 handling them so
+that (host) EL1 never gets a chance to exit to EL0.
 
-Please pull.
+Instead, avoid that confusing situation and make userspace fail early by
+disallowing KVM_ARM_VM_SMCCC_FILTER-ing calls from protected guests in
+the pKVM FID range.
 
-Thanks,
-Oliver
+Similarly, reserve the "Call UID Query" to ensure that a malicious host
+can't mislead a protected guest into misusing the pKVM ABI, under the
+premise that it would be interacting with a different hypervisor ABI, as
+hypervisors share the same FID space.
 
-The following changes since commit dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa:
+Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+---
+Changes in v2:
+- Restricted the range to pKVM HVCs & the "Call UID Query"
+- Updated docs & removed mention of KVM_VM_TYPE_ARM_PROTECTED
+- Link to v1: https://lore.kernel.org/r/20251201-smccc-filter-v1-1-b4831416=
+f8a3@google.com
+---
+ Documentation/virt/kvm/devices/vm.rst | 10 ++++++++++
+ arch/arm64/kvm/hypercalls.c           | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
-  Linux 6.18-rc3 (2025-10-26 15:59:49 -0700)
+diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm=
+/devices/vm.rst
+index a4d39fa1b0834b090318250db3b670b0b3174259..28ab2629e7e8f166def6f9efd18=
+e8408ab4a8e63 100644
+--- a/Documentation/virt/kvm/devices/vm.rst
++++ b/Documentation/virt/kvm/devices/vm.rst
+@@ -400,3 +400,13 @@ will reject attempts to define a filter for any portio=
+n of these ranges:
+         0x8000_0000 0x8000_FFFF
+         0xC000_0000 0xC000_FFFF
+         =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++
++Protected KVM (pKVM) handles some calls directly and will reject attempts =
+to
++define a filter for a protected VM for any portion of these ranges:
++
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        Start       End (inclusive)
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
++        0x8600_FF01 0x8600_FF01
++        0xC600_0002 0xC600_003F
++        =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 58c5fe7d757274d9079606fcc378485980c6c0f8..5329772f228d356322863a7150f=
+fa40c25ea1ee2 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -135,6 +135,12 @@ static bool kvm_smccc_test_fw_bmap(struct kvm_vcpu *vc=
+pu, u32 func_id)
+ 						   ARM_SMCCC_SMC_64,		\
+ 						   0, ARM_SMCCC_FUNC_MASK)
+=20
++#define SMC64_PKVM_RANGE_BEGIN	ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_I=
+D
++#define SMC64_PKVM_RANGE_END	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
++						   ARM_SMCCC_SMC_64,		\
++						   ARM_SMCCC_OWNER_VENDOR_HYP,	\
++						   ARM_SMCCC_KVM_FUNC_PKVM_RESV_63)
++
+ static int kvm_smccc_filter_insert_reserved(struct kvm *kvm)
+ {
+ 	int r;
+@@ -158,6 +164,29 @@ static int kvm_smccc_filter_insert_reserved(struct kvm=
+ *kvm)
+ 	if (r)
+ 		goto out_destroy;
+=20
++	/*
++	 * Prevent userspace from registering to handle any SMCCC call in the
++	 * vendor hypervisor range for pVMs, avoiding the confusion of guest
++	 * calls seemingly not resulting in KVM_RUN exits because pKVM handles
++	 * them without ever returning to the host. This is NOT for security.
++	 */
++	if (kvm_vm_is_protected(kvm)) {
++		r =3D mtree_insert(&kvm->arch.smccc_filter,
++				ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
++				xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++
++		r =3D mtree_insert_range(&kvm->arch.smccc_filter,
++				       SMC64_PKVM_RANGE_BEGIN,
++				       SMC64_PKVM_RANGE_END,
++				       xa_mk_value(KVM_SMCCC_FILTER_HANDLE),
++				       GFP_KERNEL_ACCOUNT);
++		if (r)
++			goto out_destroy;
++	}
++
+ 	return 0;
+ out_destroy:
+ 	mtree_destroy(&kvm->arch.smccc_filter);
 
-are available in the Git repository at:
+---
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+change-id: 20251201-smccc-filter-588ddf12b355
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-6.19
+Best regards,
+--=20
+Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
 
-for you to fetch changes up to 3eef0c83c3f3e58933e98e678ddf4e95457d4d14:
-
-  Merge branch 'kvm-arm64/nv-xnx-haf' into kvmarm/next (2025-12-01 00:47:41 -0800)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 6.19
-
- - Support for userspace handling of synchronous external aborts (SEAs),
-   allowing the VMM to potentially handle the abort in a non-fatal
-   manner.
-
- - Large rework of the VGIC's list register handling with the goal of
-   supporting more active/pending IRQs than available list registers in
-   hardware. In addition, the VGIC now supports EOImode==1 style
-   deactivations for IRQs which may occur on a separate vCPU than the
-   one that acked the IRQ.
-
- - Support for FEAT_XNX (user / privileged execute permissions) and
-   FEAT_HAF (hardware update to the Access Flag) in the software page
-   table walkers and shadow MMU.
-
- - Allow page table destruction to reschedule, fixing long need_resched
-   latencies observed when destroying a large VM.
-
- - Minor fixes to KVM and selftests
-
-----------------------------------------------------------------
-Alexandru Elisei (3):
-      KVM: arm64: Document KVM_PGTABLE_PROT_{UX,PX}
-      KVM: arm64: at: Use correct HA bit in TCR_EL2 when regime is EL2
-      KVM: arm64: at: Update AF on software walk only if VM has FEAT_HAFDBS
-
-Colin Ian King (1):
-      KVM: arm64: Fix spelling mistake "Unexpeced" -> "Unexpected"
-
-Jiaqi Yan (3):
-      KVM: arm64: VM exit to userspace to handle SEA
-      KVM: selftests: Test for KVM_EXIT_ARM_SEA
-      Documentation: kvm: new UAPI for handling SEA
-
-Marc Zyngier (51):
-      irqchip/gic: Add missing GICH_HCR control bits
-      irqchip/gic: Expose CPU interface VA to KVM
-      irqchip/apple-aic: Spit out ICH_MISR_EL2 value on spurious vGIC MI
-      KVM: arm64: Turn vgic-v3 errata traps into a patched-in constant
-      KVM: arm64: vgic-v3: Fix GICv3 trapping in protected mode
-      KVM: arm64: GICv3: Detect and work around the lack of ICV_DIR_EL1 trapping
-      KVM: arm64: Repack struct vgic_irq fields
-      KVM: arm64: Add tracking of vgic_irq being present in a LR
-      KVM: arm64: Add LR overflow handling documentation
-      KVM: arm64: GICv3: Drop LPI active state when folding LRs
-      KVM: arm64: GICv3: Preserve EOIcount on exit
-      KVM: arm64: GICv3: Decouple ICH_HCR_EL2 programming from LRs
-      KVM: arm64: GICv3: Extract LR folding primitive
-      KVM: arm64: GICv3: Extract LR computing primitive
-      KVM: arm64: GICv2: Preserve EOIcount on exit
-      KVM: arm64: GICv2: Decouple GICH_HCR programming from LRs being loaded
-      KVM: arm64: GICv2: Extract LR folding primitive
-      KVM: arm64: GICv2: Extract LR computing primitive
-      KVM: arm64: Compute vgic state irrespective of the number of interrupts
-      KVM: arm64: Eagerly save VMCR on exit
-      KVM: arm64: Revamp vgic maintenance interrupt configuration
-      KVM: arm64: Turn kvm_vgic_vcpu_enable() into kvm_vgic_vcpu_reset()
-      KVM: arm64: Make vgic_target_oracle() globally available
-      KVM: arm64: Invert ap_list sorting to push active interrupts out
-      KVM: arm64: Move undeliverable interrupts to the end of ap_list
-      KVM: arm64: Use MI to detect groups being enabled/disabled
-      KVM: arm64: GICv3: Handle LR overflow when EOImode==0
-      KVM: arm64: GICv3: Handle deactivation via ICV_DIR_EL1 traps
-      KVM: arm64: GICv3: Add GICv2 SGI handling to deactivation primitive
-      KVM: arm64: GICv3: Set ICH_HCR_EL2.TDIR when interrupts overflow LR capacity
-      KVM: arm64: GICv3: Add SPI tracking to handle asymmetric deactivation
-      KVM: arm64: GICv3: Handle in-LR deactivation when possible
-      KVM: arm64: GICv3: Avoid broadcast kick on CPUs lacking TDIR
-      KVM: arm64: GICv3: nv: Resync LRs/VMCR/HCR early for better MI emulation
-      KVM: arm64: GICv3: nv: Plug L1 LR sync into deactivation primitive
-      KVM: arm64: GICv3: Force exit to sync ICH_HCR_EL2.En
-      KVM: arm64: GICv2: Handle LR overflow when EOImode==0
-      KVM: arm64: GICv2: Handle deactivation via GICV_DIR traps
-      KVM: arm64: GICv2: Always trap GICV_DIR register
-      KVM: arm64: selftests: gic_v3: Add irq group setting helper
-      KVM: arm64: selftests: gic_v3: Disable Group-0 interrupts by default
-      KVM: arm64: selftests: vgic_irq: Fix GUEST_ASSERT_IAR_EMPTY() helper
-      KVM: arm64: selftests: vgic_irq: Change configuration before enabling interrupt
-      KVM: arm64: selftests: vgic_irq: Exclude timer-controlled interrupts
-      KVM: arm64: selftests: vgic_irq: Remove LR-bound limitation
-      KVM: arm64: selftests: vgic_irq: Perform EOImode==1 deactivation in ack order
-      KVM: arm64: selftests: vgic_irq: Add asymmetric SPI deaectivation test
-      KVM: arm64: selftests: vgic_irq: Add Group-0 enable test
-      KVM: arm64: selftests: vgic_irq: Add timer deactivation test
-      KVM: arm64: Convert ICH_HCR_EL2_TDIR cap to EARLY_LOCAL_CPU_FEATURE
-      KVM: arm64: Add endian casting to kvm_swap_s[12]_desc()
-
-Maximilian Dittgen (2):
-      KVM: selftests: Assert GICR_TYPER.Processor_Number matches selftest CPU number
-      KVM: selftests: SYNC after guest ITS setup in vgic_lpi_stress
-
-Nathan Chancellor (1):
-      KVM: arm64: Add break to default case in kvm_pgtable_stage2_pte_prot()
-
-Oliver Upton (23):
-      KVM: arm64: Drop useless __GFP_HIGHMEM from kvm struct allocation
-      KVM: arm64: Use kvzalloc() for kvm struct allocation
-      KVM: arm64: Only drop references on empty tables in stage2_free_walker
-      arm64: Detect FEAT_XNX
-      KVM: arm64: Add support for FEAT_XNX stage-2 permissions
-      KVM: arm64: nv: Forward FEAT_XNX permissions to the shadow stage-2
-      KVM: arm64: Teach ptdump about FEAT_XNX permissions
-      KVM: arm64: nv: Advertise support for FEAT_XNX
-      KVM: arm64: Call helper for reading descriptors directly
-      KVM: arm64: nv: Stop passing vCPU through void ptr in S2 PTW
-      KVM: arm64: Handle endianness in read helper for emulated PTW
-      KVM: arm64: nv: Use pgtable definitions in stage-2 walk
-      KVM: arm64: Add helper for swapping guest descriptor
-      KVM: arm64: Propagate PTW errors up to AT emulation
-      KVM: arm64: Implement HW access flag management in stage-1 SW PTW
-      KVM: arm64: nv: Implement HW access flag management in stage-2 SW PTW
-      KVM: arm64: nv: Expose hardware access flag management to NV guests
-      KVM: arm64: selftests: Add test for AT emulation
-      KVM: arm64: Fix compilation when CONFIG_ARM64_USE_LSE_ATOMICS=n
-      Merge branch 'kvm-arm64/misc' into kvmarm/next
-      Merge branch 'kvm-arm64/sea-user' into kvmarm/next
-      Merge branch 'kvm-arm64/vgic-lr-overflow' into kvmarm/next
-      Merge branch 'kvm-arm64/nv-xnx-haf' into kvmarm/next
-
-Raghavendra Rao Ananta (2):
-      KVM: arm64: Split kvm_pgtable_stage2_destroy()
-      KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
-
- Documentation/virt/kvm/api.rst                     |  47 +++
- arch/arm64/include/asm/kvm_arm.h                   |   1 +
- arch/arm64/include/asm/kvm_asm.h                   |   8 +-
- arch/arm64/include/asm/kvm_host.h                  |   3 +
- arch/arm64/include/asm/kvm_hyp.h                   |   3 +-
- arch/arm64/include/asm/kvm_nested.h                |  40 +-
- arch/arm64/include/asm/kvm_pgtable.h               |  49 ++-
- arch/arm64/include/asm/kvm_pkvm.h                  |   4 +-
- arch/arm64/include/asm/virt.h                      |   7 +-
- arch/arm64/kernel/cpufeature.c                     |  59 +++
- arch/arm64/kernel/hyp-stub.S                       |   5 +
- arch/arm64/kernel/image-vars.h                     |   1 +
- arch/arm64/kvm/arm.c                               |  14 +-
- arch/arm64/kvm/at.c                                | 196 +++++++++-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   7 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                     |   3 +
- arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |   5 +
- arch/arm64/kvm/hyp/pgtable.c                       | 122 +++++-
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c           |   4 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c                    |  96 +++--
- arch/arm64/kvm/mmu.c                               | 132 ++++++-
- arch/arm64/kvm/nested.c                            | 123 ++++--
- arch/arm64/kvm/pkvm.c                              |  11 +-
- arch/arm64/kvm/ptdump.c                            |  35 +-
- arch/arm64/kvm/sys_regs.c                          |  28 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |   9 +-
- arch/arm64/kvm/vgic/vgic-mmio-v2.c                 |  24 ++
- arch/arm64/kvm/vgic/vgic-mmio.h                    |   1 +
- arch/arm64/kvm/vgic/vgic-v2.c                      | 291 ++++++++++----
- arch/arm64/kvm/vgic/vgic-v3-nested.c               | 104 ++---
- arch/arm64/kvm/vgic/vgic-v3.c                      | 426 ++++++++++++++++-----
- arch/arm64/kvm/vgic/vgic-v4.c                      |   5 +-
- arch/arm64/kvm/vgic/vgic.c                         | 298 ++++++++------
- arch/arm64/kvm/vgic/vgic.h                         |  43 ++-
- arch/arm64/tools/cpucaps                           |   2 +
- drivers/irqchip/irq-apple-aic.c                    |   7 +-
- drivers/irqchip/irq-gic.c                          |   3 +
- include/kvm/arm_vgic.h                             |  29 +-
- include/linux/irqchip/arm-gic.h                    |   6 +
- include/linux/irqchip/arm-vgic-info.h              |   2 +
- include/uapi/linux/kvm.h                           |  10 +
- tools/arch/arm64/include/asm/esr.h                 |   2 +
- tools/testing/selftests/kvm/Makefile.kvm           |   2 +
- tools/testing/selftests/kvm/arm64/at.c             | 166 ++++++++
- tools/testing/selftests/kvm/arm64/sea_to_user.c    | 331 ++++++++++++++++
- tools/testing/selftests/kvm/arm64/vgic_irq.c       | 285 ++++++++++++--
- .../testing/selftests/kvm/arm64/vgic_lpi_stress.c  |   4 +
- tools/testing/selftests/kvm/include/arm64/gic.h    |   1 +
- .../selftests/kvm/include/arm64/gic_v3_its.h       |   1 +
- tools/testing/selftests/kvm/include/kvm_util.h     |   1 +
- tools/testing/selftests/kvm/lib/arm64/gic.c        |   6 +
- .../testing/selftests/kvm/lib/arm64/gic_private.h  |   1 +
- tools/testing/selftests/kvm/lib/arm64/gic_v3.c     |  22 ++
- tools/testing/selftests/kvm/lib/arm64/gic_v3_its.c |  10 +
- tools/testing/selftests/kvm/lib/kvm_util.c         |  11 +
- 55 files changed, 2575 insertions(+), 531 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/arm64/at.c
- create mode 100644 tools/testing/selftests/kvm/arm64/sea_to_user.ca
-
--- 
-diff --cc arch/arm64/kvm/vgic/vgic-v3.c
-index 968aa9d89be6,2f75ef14d339..1d6dd1b545bd
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@@ -507,9 -301,21 +507,10 @@@ void vcpu_set_ich_hcr(struct kvm_vcpu *
-                return;
-  
-        /* Hide GICv3 sysreg if necessary */
--       if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
-+       if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 ||
- -          !irqchip_in_kernel(vcpu->kvm)) {
-++          !irqchip_in_kernel(vcpu->kvm))
-                vgic_v3->vgic_hcr |= (ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 |
-                                      ICH_HCR_EL2_TC);
- -              return;
- -      }
- -
- -      if (group0_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TALL0;
- -      if (group1_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TALL1;
- -      if (common_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TC;
- -      if (dir_trap)
- -              vgic_v3->vgic_hcr |= ICH_HCR_EL2_TDIR;
-  }
-  
-  int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
