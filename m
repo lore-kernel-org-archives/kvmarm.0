@@ -1,49 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614152BEC5A
-	for <kvmarm@lists.linux.dev>; Sun, 30 Nov 2025 19:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C631C5D72
+	for <kvmarm@lists.linux.dev>; Mon,  1 Dec 2025 09:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764530763; cv=none; b=qBNzaysjkREzcOBFNKZgQ+2YtWMLIZgKX4FGHLzb3r1Si0jIt3i6UAh9KUBO3QrtlIQoRhtJ0pVY53lG3fs0dSVS1oNrOVx2HhOKKgzJsCJLjHX4f5/y5GKao/VbhHDUG484BGwSLSXkIyW5A8OZvc0z1X5GI5EYXVfWww2OOH4=
+	t=1764580760; cv=none; b=aqEPVJvE5yACfhZETvE5zbkx6krrCDNV7ooXfGKcWkQQm8jAlthlvy5qKAAXnw4Zao67sATUOasgSZy5eIVj6KuWS7zfB54P+5LTChmIMXnaiyN9RcQDahIBm14yvBJmdvFVueIANZyCcPuviqYjLvgpcX4x4C9R4B+dgy0NDj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764530763; c=relaxed/simple;
-	bh=GdPNc3PxxP9kLpHvuNn2P++e+FiMa66Ks5F/Mnz068c=;
+	s=arc-20240116; t=1764580760; c=relaxed/simple;
+	bh=kiJoP+7/+HStSKRHTnqaa0QmmtBrTe1uce/EYrqIBBU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hrTIKZI3WL7qD+lMzx74+yY4nF2I+t+Z6T6OTpx2inwI23pmmbHRoroCAFlVVMe/+n/oAzxAtDGQMliMtbDHmvHHSRI9rxKghS908VmZEdBGInCBC+6ooTaqYKpnouxFxbCWPb+D4IeGZ2JYfqQOzPKgbXjBCkitLJrlanXWlOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rENTJxXv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=OhFtZ405cgNukcTHd/YYfQoR9WTU7blmabeUyuRBDgzZ5suMoMWq/KJkUcMuGGNSf2Qyif02pUOjG0TF+hqPe5IFX5HZV7P53v3V9oJPxXsiDSUo+JMqIwmtN84G9I3rP7vXRMBUrIq1HCDKJ+jVIQCpwVxwG1NEhCWRBh/9O8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQPzXm47; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rENTJxXv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D49D9C116B1;
-	Sun, 30 Nov 2025 19:26:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQPzXm47"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99489C4CEF1;
+	Mon,  1 Dec 2025 09:19:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764530762;
-	bh=GdPNc3PxxP9kLpHvuNn2P++e+FiMa66Ks5F/Mnz068c=;
+	s=k20201202; t=1764580759;
+	bh=kiJoP+7/+HStSKRHTnqaa0QmmtBrTe1uce/EYrqIBBU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rENTJxXv3cbOf3BXmLNJ2psBgRg2OQ+vGLKQuQBnkiSN4yHXJiKGC6vCjJeTqH6+1
-	 IaHdDe1N7SrvZSv/TQoY2wNDrftXfFWeVxi0ImgAIX5us96OvU0+ULMfEHxHfF/3Yb
-	 xbU7hD6ejaBxwm3Uk7XCZuEOSXyvAyTRCKdy80YfouIRI6a1s+t6KPIvhKHRL0arDR
-	 fEq05T4sE7bJZ+vtd85K8jC4coxhuwsGPf31G290MOcOsheO0XrsYN+FrUTP7gS2Sm
-	 oJWl0qvsIO+/ZcNkjIlSVW1br94HX2EJraUozV41dwys4WVfdt7muS5rnR64Mwko0g
-	 arOysGb3IWOLQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	b=RQPzXm47YVt1+uqOu70tE87pYuSb+h/CI7wVv0ShYS4qSuF/VYyVIHeO4UVcJLQyd
+	 t48IEQY+Lc9LF1o17hrX/GBj1IsmgYaGVAVfqKkcMQ/YmJRWrh/8SWiM62MehuhRll
+	 JdnVeDVDCYJIy0tYqzSGrYGQyAU0ps+7C+LcWA2h2+AYYpP2h+Fszh8ZenOZUDplXt
+	 tjLzUD6jIPxaxC1UWdhtcWqu4Ni3IAcGDKSwxTZWZGUwY+GIuDWk1qjnxRIU4kQuvF
+	 dtPQHZwmbiBBs8ae5zK/xwokYLZCogZ/HnpmIkj9nTQ/lBVoqlXXhdxFVkayjVYiIk
+	 EjU7l8cwU+0xQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vPn3Y-00000009Rlh-29ew;
-	Sun, 30 Nov 2025 19:26:00 +0000
-Date: Sun, 30 Nov 2025 19:25:59 +0000
-Message-ID: <871plffhko.wl-maz@kernel.org>
+	id 1vQ03x-00000009YAW-1aC6;
+	Mon, 01 Dec 2025 09:19:17 +0000
+Date: Mon, 01 Dec 2025 09:19:17 +0000
+Message-ID: <86qztepnje.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	suzuki.poulose@arm.com,
 	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>,
-	Quentin Perret <qperret@google.com>,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
-In-Reply-To: <20251128141710.19472-1-will@kernel.org>
-References: <20251128141710.19472-1-will@kernel.org>
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 0/4] KVM: arm64: nv: HAF fixes
+In-Reply-To: <87a503fyw2.wl-maz@kernel.org>
+References: <20251128100946.74210-1-alexandru.elisei@arm.com>
+	<87a503fyw2.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,60 +57,77 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, qperret@google.com, oupton@kernel.org
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 28 Nov 2025 14:17:10 +0000,
-Will Deacon <will@kernel.org> wrote:
+On Sun, 30 Nov 2025 13:11:57 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Commit ddcadb297ce5 ("KVM: arm64: Ignore EAGAIN for walks outside of a
-> fault") introduced a new walker flag ('KVM_PGTABLE_WALK_HANDLE_FAULT')
-> to KVM's page-table code. When set, the walk logic maintains its
-> previous behaviour of terminating a walk as soon as the visitor callback
-> returns an error. However, when the flag is clear, the walk will
-> continue if the visitor returns -EAGAIN and the error is then suppressed
-> and returned as zero to the caller.
+> On Fri, 28 Nov 2025 10:09:42 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Based on kvmarm's next branch.
+> > 
+> > HAF support for the software translation table walker was merged while I
+> > was in the process of reading the patches, so instead of comments I have
+> > these few fixes.
+> > 
+> > One thing I didn't touch is this sequence in hyp_set_prot_attr():
+> > 
+> > 	if (prot & KVM_PGTABLE_PROT_X) {
+> > 		/* don't set the XN bit */
+> > 	} else {
+> > 		attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
+> > 	}
+> > 
+> > If the caller is executing in nVHE mode, the translation regime is EL2,
+> > which has only PrivExecute permission. Since KVM_PGTABLE_PROT_X is now the
+> > union of PrivExecute and UnprivExecute, if the caller requests only the
+> > UnprivExecute permission, but no PrivExecute permission, the function does
+> > not return an error code and sets the PrivExecute permission.
 > 
-> Clearing the flag is beneficial when write-protecting a range of IPAs
-> with kvm_pgtable_stage2_wrprotect() but is not useful in any other
-> cases, either because we are operating on a single page (e.g.
-> kvm_pgtable_stage2_mkyoung() or kvm_phys_addr_ioremap()) or because the
-> early termination is desirable (e.g. when mapping pages from a fault in
-> user_mem_abort()).
+> I don't think this is a huge problem *right now*, as long as we don't
+> have anything that looks like "hvhe hypervisor userspace" (yes, I
+> proposed that a while ago, and haven't completely dropped the
+> idea). But at the same time, the page-table code should probably be
+> built to the architecture and not to the use cases.
 > 
-> Subsequently, commit e912efed485a ("KVM: arm64: Introduce the EL1 pKVM
-> MMU") hooked up pKVM's hypercall interface to the MMU code at EL1 but
-> failed to propagate any of the walker flags. As a result, page-table
-> walks at EL2 fail to set KVM_PGTABLE_WALK_HANDLE_FAULT even when the
-> early termination semantics are desirable on the fault handling path.
+> But it also outlines a rather bad bug in the hVHE case, where we set
+> the UXN bit instead of the PXN bit...
 > 
-> Rather than complicate the pKVM hypercall interface, invert the flag so
-> that the whole thing can be simplified and only pass the new flag
-> ('KVM_PGTABLE_WALK_IGNORE_EAGAIN') from the wrprotect code.
+> What I have in mind is something like this, untested. Thoughts?
 > 
-> Cc: Fuad Tabba <tabba@google.com>
-> Cc: Quentin Perret <qperret@google.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
+> 	M.
 > 
-> I found this by inspection and it's a bit fiddly to see what could
-> actually go wrong in practice because the 'mappings' tree will return
-> -EAGAIN if it finds a pre-existing entry. The permission relaxing path
-> looks more problematic, as we'll return 0 instead of -EAGAIN and I
-> think we can mark the page dirty twice etc.
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index d57c12f074a40..48305118ba3c5 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -88,6 +88,8 @@ typedef u64 kvm_pte_t;
+>  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
+> +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
+> +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
+>  
+>  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
+>  
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index e0bd6a0172729..cbf9b6b58e284 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -330,6 +330,11 @@ struct hyp_map_data {
+>  	kvm_pte_t			attr;
+>  };
+>  
+> +static bool el2_nvhe(void)
+> +{
+> +	return !has_vhe() && !cpus_have_final_cap(ARM64_KVM_PROTECTED_MODE);
 
-I don't really like the new name of the flag, but unsurprisingly, I
-also can't come up with anything better.
-
-I otherwise quite like the fact that it becomes a buy-in behaviour.
-
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Obviously, this should read ARM64_KVM_HVHE, not PROTECTED_MODE...
 
 	M.
 
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
