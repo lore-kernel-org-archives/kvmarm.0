@@ -1,196 +1,228 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6973074A2
-	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 08:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484FC22A7E9
+	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 08:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764664557; cv=none; b=Rg/fo7YSvh+YZHnMx1pzbwCOQelettr/kTFXp9FTi5OorOreUCqbk1GsGDziyyKZ13xLZL3wmcdnmNCkGajtUlMcyvyWRPdvkTV1L7SUEKcLf+1gj60sZdNV6it3j4Q7oL63zbwPkSLTnrtAq9jt9mqa7DYlPD+yd8nuhZiYcdo=
+	t=1764664595; cv=none; b=aN/ilVPu56amQoPFXtw3fxW6n9r7kNu3qutTZP2NI278bsjGrMuIxIK36Zla0pobO/sArh5kLAYMjKtJGC7Z3Q5IaiCTbVBtn9WOybVfZnMG8Dd3UsEK5n8mGjEEul3pIN1BD67QkHfUBtVnskIqouqzOYMkFXw98+PpNEOa81g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764664557; c=relaxed/simple;
-	bh=gHOM5bTm/siJ0+zuEDfJS5XT4JUYNOqWZnXLfLNBnw0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=r0zlUA0jMdcS/S4HljUR8YGelyj3QDVDT6gKtozVn7E5LmQRQE78J6jpKCQoSoV8IJp4HAdefMpdnCGCTfb0ctwTvfNn7pb+kDoa1pX4FW5g8LEcFCC5CnDa5ygDa8UCX6iBGPYh8NM3PJ7AW9pvvv35MquGebCkT6joAK+8fA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B67DB6gi; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--changyuanl.bounces.google.com
+	s=arc-20240116; t=1764664595; c=relaxed/simple;
+	bh=Gz7vApITgIqPY132Zxq49IpiscM7OmK0CHhCAthSdJg=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qFRvndh70VK19l9kzrwvFot7rD8x1UW4/S1GDXAtNM20bdBHgHuE87s5m++8x0WjkMPM/ODMvifvAhWJfzBTNRbR0RiTSfHTh3vwUnrCetJhIcVojwny9zmKUrDeCriIJ6IcH4o55YXfSpTl2uti5RwortvV3BwMVMtB1frgJhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CHCS5ORr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B67DB6gi"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-b99763210e5so8782071a12.3
-        for <kvmarm@lists.linux.dev>; Tue, 02 Dec 2025 00:35:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764664555; x=1765269355; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6B5OqMy67kr8q+11wZNONtDWMMpaPIwFbThvyADwmk=;
-        b=B67DB6giITW2574LnacvpJbzbDWnGQE9zMD33iQxpHvvzhCP9gF60GM0RLeI4KMqMx
-         zjA5VJsr2RoAmWTudZQ3s6CiD0fvXzVQibUt35jkdbmwR34I9ksnDn1Cx1mnkIv7p6v3
-         zt3QIvbThRkL+OIzb8ek8kGTiWI0CaFp1ntnLfXuXMn28u54wdxmZrWSnDbL6hngR+F4
-         4ilNbosWdutE3aOCISPTPr57nBDGAaR+z3IYTBpUhgh6FIZeLphIjZ0BAJ3b1p6F3464
-         lnejBiGREQuJefoW4VAqOrLeIZ6tvxMqxeB/VhtxuNAzlPb44AS9JT23qz7jHScsNuNn
-         XJrA==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CHCS5ORr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764664592;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GvfVo/tXrBwyrxovjX+VTgd/Lnc9aoy4HSw1ILNP5rA=;
+	b=CHCS5ORrF4h54Aj2rlORBiBg0Bw6rXLXm7mPiJT2467k2Lg3GlXJDvN+v/gJ0MJCdp2t/a
+	OMkTEgjrlBvi4HE+xYGZXNKtRNrVlLtb6I3vWBf2+dzrVG6mnIgyeCMqQh87ASUUAStkXX
+	b0IgHNt3bDrSQLrw1x2gpJuXviFmBS0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-Q10c6ZmVMR-2juJOT9I-Jg-1; Tue, 02 Dec 2025 03:36:31 -0500
+X-MC-Unique: Q10c6ZmVMR-2juJOT9I-Jg-1
+X-Mimecast-MFC-AGG-ID: Q10c6ZmVMR-2juJOT9I-Jg_1764664591
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-88238449415so173234536d6.2
+        for <kvmarm@lists.linux.dev>; Tue, 02 Dec 2025 00:36:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764664555; x=1765269355;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6B5OqMy67kr8q+11wZNONtDWMMpaPIwFbThvyADwmk=;
-        b=mrpdrO5/s2oWcEscd0gMSA4h3alsot0f7nhYJtFqyV3oy+7ZpcqElRoGQrKlODoWkJ
-         cqW5Bm3KizalvvV+YKA3hfNHqfTqLePEc6WjFXzmC7MV8ThLJQxKtta6P2eIjwG+bc0i
-         66r+LKlX2DWFNKiGB0FK4aBju5e04aaihoae1cEWrL42yRbtTdU98gDJpsNVpwqfexDm
-         hQR90C3bUMkdn9HHHSpBZuEDh8FzYvgMyaNENjvjDohXoqdbdf7VUFl7F/QpVdg1OOOC
-         IU6rDSHPGlr4fAoxWGe8f3j1lVgkGOBJzMWv0GqQQPLYkleWz5OaSOqzkdbYzg4xdrX4
-         F6Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCXUHxcaFkKiVwkLz9nRPetYLxKhyEK+97vlzbKI+8cH5qrmWBBuO1UZecLvhGvv7kOOXpfosv4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwosIZs+W09PlYqnu5RkbH99MlUUclyS9zMUEaqNO+oT5eNHmQa
-	DODAO4EO9SCvE15SDBE1QMsV7I5spcg7G5v+t0aWSw04BtAX6pbCm/VRmlvjFuLcLIQVYd97C29
-	2DoMhpBeB5oW9hJ9j88B7DQ==
-X-Google-Smtp-Source: AGHT+IGb5peSwTweL+kT4iMjAsZiwlPMM3x6CCn7fxcWmgYrU7ZMSeiv42KQvwk9tb1HT/dlWaP97KF+vN1SUw9m
-X-Received: from dybph18.prod.google.com ([2002:a05:7301:4192:b0:2a4:7453:cd4e])
- (user=changyuanl job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7300:6b18:b0:2a4:55ae:fbd8 with SMTP id 5a478bee46e88-2a7192f5ae0mr15983784eec.37.1764664554525;
- Tue, 02 Dec 2025 00:35:54 -0800 (PST)
-Date: Tue,  2 Dec 2025 00:35:50 -0800
-In-Reply-To: <20250212182558.2865232-3-maz@kernel.org>
+        d=1e100.net; s=20230601; t=1764664591; x=1765269391;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:reply-to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GvfVo/tXrBwyrxovjX+VTgd/Lnc9aoy4HSw1ILNP5rA=;
+        b=Wp4SzOzFx26ACCsjxqYjCxJbL76TqrYDhAjUHFkWV/sy9pViFbwRLaMsrNuWiFUNLW
+         NLSOaG+yG9dfxw/KBn7JACEVT71qS/DCT91MjAlK1NztH8mRf1g+qcmpvwZXG8BCJkrA
+         5PtzlpQWFy5XEP7FVuzZc003CisWsiYnEXJ+4yJczvJOhPrs2f1sXvsDFU8sV1ti2MYW
+         h8ZeV+NZ5cTMCX/DCtq0zDbFWnAFVGEt0LtdgP7IDtgE3Mwbid3Y4UFd2glFCeXeW0HP
+         aVD5tBRCbsyVDw6nmttYeow9Uo++LFbn/3nsWL6ePcOYfbdzQ8i33f1FKhr3OJ1CplWT
+         jonQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUM0Imbi6w8j+/OUfYE2duqR4AJOEymRm+FxPEAoZXza1w/jJyA744MckfRL8OxKJ0+XL3KqtQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw7jkIbZ1RlblKH5gaeeQPZy5nso+7zk4fD/uEZ0Cr+I8aGgjuJ
+	nN9E7izBwzZ4/crXHYQHy6+/I+crpAXqexCEEL5SwN5NqKyr6njLsYVlXPl9QN4uB1eL1r8pP9r
+	Z1+nRSh3MXfh1IBxVk0TQv11sBmzhFD8zis6sUZZ9bUTXY1ECWscl/M988A==
+X-Gm-Gg: ASbGnctQzZCQF8K4D3nqDwGIQ3kH120SPM+e2/OPr3iygtXuPSYi4N8lFrfb+qtSjn8
+	7VqRS0ai3rHC4v0wzZMwcY1YOQC9i8BM6l7fgX5bcMwlCmg8prgcVPL9682ENPzA1FnFWa6GIBv
+	aF4DjP2Agb81aIHu/gclkr1j3Tf77gJNZLwIHm24zq23dHiKU0uMWaVTYra5rheIPGp4AZrdD41
+	aoK9QYQrTYe9yO23NtYIOc6dCq0XVGpLVSwOph5N5utGAOfMjWX0FauBkH6PTEYfMAxcyV7kDrf
+	pMybjRQFMThZoKgvH5RaXzzYfZfyL7Yct5Y3yMeY9Rb9DHAZXDs2MArkcod5kuEovbGxkR072EZ
+	ksLSWSoJdgvZ4cFKm55HH3w5ayZ0tkpLhcpU2Al7ETWLbaWy76wnGo0iPiA==
+X-Received: by 2002:a05:622a:514:b0:4e8:a941:4b81 with SMTP id d75a77b69052e-4ee58a6c025mr625414171cf.32.1764664590776;
+        Tue, 02 Dec 2025 00:36:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHIAnpUoT7sntSpUQUvxEen/nsZKDfNbEIvOfP9YAHn3QHjRKe70K7BiDefDj8DHnqBjrSyDw==
+X-Received: by 2002:a05:622a:514:b0:4e8:a941:4b81 with SMTP id d75a77b69052e-4ee58a6c025mr625413971cf.32.1764664590357;
+        Tue, 02 Dec 2025 00:36:30 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e? ([2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd345c34fsm90330451cf.35.2025.12.02.00.36.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Dec 2025 00:36:29 -0800 (PST)
+Message-ID: <02742e7b-7f29-4960-b44c-51909a0e8c60@redhat.com>
+Date: Tue, 2 Dec 2025 09:36:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20250212182558.2865232-3-maz@kernel.org>
-X-Mailer: git-send-email 2.52.0.107.ga0afd4fd5b-goog
-Message-ID: <20251202083550.88668-1-changyuanl@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: vgic: Hoist SGI/PPI alloc from
- vgic_init() to kvm_create_vgic()
-From: Changyuan Lyu <changyuanl@google.com>
-To: maz@kernel.org
-Cc: glider@google.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 04/10] arm64: timer: use hypervisor
+ timers when at EL2
+Reply-To: eric.auger@redhat.com
+To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
+Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
+References: <20250925141958.468311-1-joey.gouly@arm.com>
+ <20250925141958.468311-5-joey.gouly@arm.com>
+In-Reply-To: <20250925141958.468311-5-joey.gouly@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: Y-eU_7GCAdDm4HukZej2tKbYrWstWkURGd5MT_wrjsg_1764664591
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Marc,
 
-On Wed, Feb 12, 2025 at 18:25:58 +0000, Marc Zyngier <maz@kernel.org> wrote:
-> If userspace creates vcpus, then a vgic, we end-up in a situation
-> where irqchip_in_kernel() will return true, but no private interrupt
-> has been allocated for these vcpus. This situation will continue
-> until userspace initialises the vgic, at which point we fix the
-> early vcpus. Should a vcpu run or be initialised in the interval,
-> bad things may happen.
+
+On 9/25/25 4:19 PM, Joey Gouly wrote:
+> At EL2, with VHE:
+>   CNT{P,V}_{TVAL,CTL}_EL0 is forwarded to CNTH{P,V}_{CVAL,TVAL,CTL}_EL0.
 >
-> An obvious solution is to move this fix-up phase to the point where
-> the vgic is created. This ensures that from that point onwards,
-> all vcpus have their private interrupts, as new vcpus will directly
-> allocate them.
-
-I have a concern that this patch might cause an issue if userspace creates
-VCPUs *after* a VGIC is created but *before* it has been initialized via
-`KVM_DEV_ARM_VGIC_CTRL_INIT`.
-
-For example, consider the following call sequence:
-
-1.  Create VGIC via `KVM_CREATE_DEVICE`.
-2.  Create all VCPUs.
-3.  Issue `KVM_ARM_VCPU_INIT` to all VCPUs.
-4.  Issue `KVM_DEV_ARM_VGIC_CTRL_INIT` to the VGIC.
-
-> With that, we have the invariant that when irqchip_in_kernel() is
-> true, all vcpus have their private interrupts.
+> Save the hypervisor physical and virtual timer IRQ numbers from the DT/ACPI.
 >
-> Reported-by: Alexander Potapenko <glider@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-init.c | 74 ++++++++++++++++-----------------
->  1 file changed, 37 insertions(+), 37 deletions(-)
+>  arm/timer.c         | 10 ++++++++--
+>  lib/acpi.h          |  2 ++
+>  lib/arm/asm/timer.h | 11 +++++++++++
+>  lib/arm/timer.c     | 19 +++++++++++++++++--
+>  4 files changed, 38 insertions(+), 4 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> index bc7e22ab5d812..775461cf2d2db 100644
-> --- a/arch/arm64/kvm/vgic/vgic-init.c
-> +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> [...]
->
-> -static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu)
-> +static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
+> diff --git a/arm/timer.c b/arm/timer.c
+> index 2cb80518..c6287ca7 100644
+> --- a/arm/timer.c
+> +++ b/arm/timer.c
+> @@ -347,8 +347,14 @@ static void test_ptimer(void)
+>  static void test_init(void)
 >  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	int i;
-> @@ -218,17 +236,28 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu)
->  			/* PPIs */
->  			irq->config = VGIC_CONFIG_LEVEL;
->  		}
+>  	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
+nit: move above assert to 
+
+if (current_level() == CurrentEL_EL1) block?
+
+> -	ptimer_info.irq = TIMER_PTIMER_IRQ;
+> -	vtimer_info.irq = TIMER_VTIMER_IRQ;
+> +	if (current_level() == CurrentEL_EL1) {
+> +		ptimer_info.irq = TIMER_PTIMER_IRQ;
+> +		vtimer_info.irq = TIMER_VTIMER_IRQ;
+> +	} else {
+> +		assert(TIMER_HPTIMER_IRQ != -1 && TIMER_HVTIMER_IRQ != -1);
+> +		ptimer_info.irq = TIMER_HPTIMER_IRQ;
+> +		vtimer_info.irq = TIMER_HVTIMER_IRQ;
+> +	}
+>  
+>  	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+>  	ptimer_info.read_ctl();
+> diff --git a/lib/acpi.h b/lib/acpi.h
+> index c330c877..66e3062d 100644
+> --- a/lib/acpi.h
+> +++ b/lib/acpi.h
+> @@ -290,6 +290,8 @@ struct acpi_table_gtdt {
+>  	u64 counter_read_block_address;
+>  	u32 platform_timer_count;
+>  	u32 platform_timer_offset;
+> +	u32 virtual_el2_timer_interrupt;
+> +	u32 virtual_el2_timer_flags;
+>  };
+>  
+>  /* Reset to default packing */
+> diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
+> index fd8f7796..0dcebc1c 100644
+> --- a/lib/arm/asm/timer.h
+> +++ b/lib/arm/asm/timer.h
+> @@ -21,12 +21,23 @@ struct timer_state {
+>  		u32 irq;
+>  		u32 irq_flags;
+>  	} vtimer;
+> +	struct {
+> +		u32 irq;
+> +		u32 irq_flags;
+> +	} hptimer;
+> +	struct {
+> +		u32 irq;
+> +		u32 irq_flags;
+> +	} hvtimer;
+>  };
+>  extern struct timer_state __timer_state;
+>  
+>  #define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
+>  #define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
+>  
+> +#define TIMER_HPTIMER_IRQ (__timer_state.hptimer.irq)
+> +#define TIMER_HVTIMER_IRQ (__timer_state.hvtimer.irq)
 > +
-> +		switch (type) {
-> +		case KVM_DEV_TYPE_ARM_VGIC_V3:
-> +			irq->group = 1;
-> +			irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
-> +			break;
-
-`vgic_allocate_private_irqs_locked()` appears to be called in two scenarios:
-
-a) When the VGIC is created, in `kvm_vgic_create()`.
-b) When a VCPU is created, in `kvm_vm_ioctl_create_vcpu()`.
-
-For scenario (b), the call path is:
-
-`kvm_vm_ioctl_create_vcpu()`
--> `kvm_arch_vcpu_create()`
-  -> `kvm_vgic_vcpu_init()`
-    -> `vgic_allocate_private_irqs()`
-      -> `vgic_allocate_private_irqs_locked()`
-
-However, since the VCPU has just been created, its `MPIDR_EL1` register
-value has not been assigned at this point. The VCPU's `MPIDR_EL1`
-register is populated later when `KVM_ARM_VCPU_INIT` is issued, via
-the following call path:
-
-`kvm_arch_vcpu_ioctl_vcpu_init()`
--> `kvm_vcpu_set_target()`
-  -> `__kvm_vcpu_set_target()`
-    -> `kvm_reset_vcpu()`
-      -> `kvm_reset_sys_regs()`
-        -> `reset_mpidr()`
-
-Therefore, with the call sequence I mentioned at the beginning,
-`irq->mpidr` would be assigned an uninitialized value. This suggests that
-for `irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu)` to work correctly, we
-must rely on the code path from scenario (a). This would imply that
-with this patch, all VCPUs must be created and initialized before the
-VGIC is created.
-
-> +		case KVM_DEV_TYPE_ARM_VGIC_V2:
-> +			irq->group = 0;
-> +			irq->targets = BIT(vcpu->vcpu_id);
-> +			break;
-> +		}
->  	}
->
->  	return 0;
+>  void timer_save_state(void);
+>  
+>  #endif /* !__ASSEMBLER__ */
+> diff --git a/lib/arm/timer.c b/lib/arm/timer.c
+> index ae702e41..57f504e2 100644
+> --- a/lib/arm/timer.c
+> +++ b/lib/arm/timer.c
+> @@ -38,10 +38,11 @@ static void timer_save_state_fdt(void)
+>  	 *      secure timer irq
+>  	 *      non-secure timer irq            (ptimer)
+>  	 *      virtual timer irq               (vtimer)
+> -	 *      hypervisor timer irq
+> +	 *      hypervisor timer irq            (hptimer)
+> +	 *      hypervisor virtual timer irq    (hvtimer)
+>  	 */
+>  	prop = fdt_get_property(fdt, node, "interrupts", &len);
+> -	assert(prop && len == (4 * 3 * sizeof(u32)));
+> +	assert(prop && len >= (4 * 3 * sizeof(u32)));
+>  
+>  	data = (u32 *) prop->data;
+>  	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */ );
+> @@ -50,6 +51,14 @@ static void timer_save_state_fdt(void)
+>  	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */ );
+>  	__timer_state.vtimer.irq = PPI(fdt32_to_cpu(data[7]));
+>  	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
+> +	if (len == (5 * 3 * sizeof(u32))) {
+> +		assert(fdt32_to_cpu(data[9]) == 1 /* PPI */ );
+> +		__timer_state.hptimer.irq = PPI(fdt32_to_cpu(data[10]));
+> +		__timer_state.hptimer.irq_flags = fdt32_to_cpu(data[11]);
+> +		assert(fdt32_to_cpu(data[12]) == 1 /* PPI */ );
+> +		__timer_state.hvtimer.irq = PPI(fdt32_to_cpu(data[13]));
+> +		__timer_state.hvtimer.irq_flags = fdt32_to_cpu(data[14]);
+> +	}
 >  }
->
-> -static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu)
-> +static int vgic_allocate_private_irqs(struct kvm_vcpu *vcpu, u32 type)
->  {
->  	int ret;
->
->  	mutex_lock(&vcpu->kvm->arch.config_lock);
-> -	ret = vgic_allocate_private_irqs_locked(vcpu);
-> +	ret = vgic_allocate_private_irqs_locked(vcpu, type);
->  	mutex_unlock(&vcpu->kvm->arch.config_lock);
->
->  	return ret;
-> @@ -258,7 +287,7 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
->  	if (!irqchip_in_kernel(vcpu->kvm))
->  		return 0;
->
-> -	ret = vgic_allocate_private_irqs(vcpu);
-> +	ret = vgic_allocate_private_irqs(vcpu, dist->vgic_model);
->  	if (ret)
->  		return ret;
->
-> [...]
+>  
+>  #ifdef CONFIG_EFI
+> @@ -72,6 +81,12 @@ static void timer_save_state_acpi(void)
+>  
+>  	__timer_state.vtimer.irq = gtdt->virtual_timer_interrupt;
+>  	__timer_state.vtimer.irq_flags = gtdt->virtual_timer_flags;
+> +
+> +	__timer_state.hptimer.irq = gtdt->non_secure_el2_interrupt;
+> +	__timer_state.hptimer.irq_flags = gtdt->non_secure_el2_flags;
+> +
+> +	__timer_state.hvtimer.irq = gtdt->virtual_el2_timer_interrupt;
+> +	__timer_state.hvtimer.irq_flags = gtdt->virtual_el2_timer_flags;
+>  }
+>  
+>  #else
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Please let me know if my understanding is incorrect. Thank you!
+Eric
 
-Best,
-Changyuan
