@@ -1,74 +1,74 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0037204583
-	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 10:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA5A301714
+	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 10:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764671504; cv=none; b=DNTaOpaQ8tqd3nCeNJ1mFXJEAqktw4BIgXtSSO3bKb1djlQHQRZmGXkn99LQU2pxHSF0VYFZo+quY5d3sGwbmdC84xTpVe8i6vQ/EcNqgAepsFnR04f2YFoI/GVnVILJxIBQ/uV485fOKK7aGiF7Ac0nyg+9Lqz/Jo8Llsw2h9k=
+	t=1764671733; cv=none; b=N5sXJf3IQJVSBeisPiXIV0P2jUzohon/iU4+EgRpETpIm2debidA5jjKckoeOeF7YtFfTRbpJH7TV3qMvqxtQZiRYDfL0jQgY+g5Vg6MaV6+zb+yQ57blJFGZ+o8z6ut8nyGpQY/oR3XNubUqhiS2+pDKPlypYauHusaihkZlcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764671504; c=relaxed/simple;
-	bh=fgMjYj4bIL6AZNPeX1R5CQmvPztTnQWt1WpxvYC3K1I=;
+	s=arc-20240116; t=1764671733; c=relaxed/simple;
+	bh=8ehwieRgME29YittKX3I6p8D8uoKGas4AaSH/vNw+ck=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eILI7xF1ZYiNRe060ms/KuRYqNwW5aV+2qYI7NzI1zHrY1+EUVrvNvSd9Zc1ZSnXTtr1W6S6EiJiXJ7ZI2L5blXkb8nrPOTmqDNVDxGKjojxMwc+8F0lDPzYhY8E814QPHO83kyX/krIo39+ZqPBA17QWjwaNoxlTyzKFfOd6Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d86P3cTp; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=ZW9P6G0IhkBZuLB/8go0M/dqCKYGK+M1ZvENIfdNN8IFTZKn2e86FS2QdBTKYi7RqtIDCQNnKhOu7JlGfuSKQa4RoMCNx9As5Ken1+oF/kIRnZDoCo1LiJLPLQEsIczw4nIXnD9arziS5C4BLR3XhIwSvBRQi+ixchO3jX11F0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=fail smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ifNqaXN7; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d86P3cTp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ifNqaXN7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764671501;
+	s=mimecast20190719; t=1764671730;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vQZ1yQVfkBFCjcNblwsqZZNx6M3xDYjpded8RdSmjTQ=;
-	b=d86P3cTpec6W43JAPcnMBhltuCbW+utw4OABzMAUri/J3/Oc/GZTNLi+yhsV+E12wxppc4
-	quUMniyBaZ3eSgiTW2imVLR6VsuE+hV1xrK+zRfq531GHC4ALQIaa/AQUgv20lUvdEIsx3
-	FWWGjII9BYtf0DsiQnXFnvHH6c8pimw=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nVckf801EzlHLt3eBGX4mHh0JO99LKIAjAwFPbJ7PrM=;
+	b=ifNqaXN71fNhg0EoZQSPTiGJgWiU8AqVC1PiwclVMrI7KD776GiQgklK5ki7wH6VhlytLP
+	oB64o22dwDGH89MOdsjlO+02X3Y+XSjJIswxWuZi7vkNYRoRNWBMNOKF+tMJlud0YuLEn+
+	LOIK4kBEWDEh/3kt1SgKE1Gzjb3rQTA=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-TzM7ahc9OAyh9JYNb13nuw-1; Tue, 02 Dec 2025 05:31:40 -0500
-X-MC-Unique: TzM7ahc9OAyh9JYNb13nuw-1
-X-Mimecast-MFC-AGG-ID: TzM7ahc9OAyh9JYNb13nuw_1764671500
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-8b2f0be2cf0so1545853585a.0
-        for <kvmarm@lists.linux.dev>; Tue, 02 Dec 2025 02:31:40 -0800 (PST)
+ us-mta-400-BR6BLUVCMz-g_PJNHEcDHA-1; Tue, 02 Dec 2025 05:35:29 -0500
+X-MC-Unique: BR6BLUVCMz-g_PJNHEcDHA-1
+X-Mimecast-MFC-AGG-ID: BR6BLUVCMz-g_PJNHEcDHA_1764671729
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-882376d91beso139811196d6.3
+        for <kvmarm@lists.linux.dev>; Tue, 02 Dec 2025 02:35:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764671500; x=1765276300;
+        d=1e100.net; s=20230601; t=1764671729; x=1765276529;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vQZ1yQVfkBFCjcNblwsqZZNx6M3xDYjpded8RdSmjTQ=;
-        b=JkQTQcSsKf5rqph6+/ckcF96lOL6n86Ktcpz9ustRsVrbqqY9OCvL3DL2dosh58CYe
-         0dxTzWMiZ98uQwcLzFluZtbYbCRKW9YUF5xrBhUd5FiRANywWNqdZCg8xgyCGfBt9HxV
-         rZ1rK01yicdve1d/eIDgFzzILq1gqdFTjt8WvaKX5k/D2RvIfjOBCco5x6ylV27rCmvd
-         DmAVSvQn2NVZ6dDewaESyVJ/CbHkYphbeMvv+j6ILvoL9QUro75d6xa9PXbeGyD21jyh
-         lmzwBSpWhN6IhBSuEFqeSPOrF/l9L0qtzaHgylDq6dgoSPzUuuQAPT8vEN3Mv70CwpcT
-         c1aA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYgm8bOI5Roa3yWQbnGDYRHv+S9U5NUrJQLgkS+obHK5baSi1kXmAHWra9KwSacqnKTcIbFGg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwpLbq6Tfuf7Gg99BxWOpXXi7L6ExkzU/iMQ0HtDzJDc5aYy76E
-	ldZhg3uRWLD6wkdlUVE2+1hOe4w8jbJywhVw5lg93xWeKD7FRhjoT851UxFldHbmSm5Y61mF9Ss
-	yg+2OcVTnfM0axYKEc9RQEYi8vWHMYP436KywqLx+3mEV04L8V2qG13TZMg==
-X-Gm-Gg: ASbGncuEzJRU9XOxxcB5XFGxL5WIr5nH/hF/z/kMoaP5uWi8jY0bLOQLVin9HxfT6oO
-	UIfXDmREuTEWi8tHJHjgh46wZV/fuySNCUoFU929EIUX5nWRVPdevJmkm9v110Ye5ZP1nB5xLQ/
-	ar0nvIalQgygmCY8LxkPfpeBszJYUtGOxh7O4gPE1hq78FBcpXl72qSDWmCYEZrvmV8WboJWPoN
-	Ov9wql0iV/e8aYPg2EqTVfBifjhEE1+sVr1Nc1gmIQ2qCkAY91vSW2S059z0Lec+v56OhPS/ppS
-	kOmS2ZSAzOH+Drm5zQDFwpoWBYrYz9zpzE5LnXeHQvXtKhDTj9HytHXE1caEtxraNuvlbs65mS8
-	Iii7WWpseAKEhSCrS4I0Pzk6sibdOtfwlH4icg/Tf5cF7z/yN1yNpZzoy3g==
-X-Received: by 2002:a05:620a:4687:b0:8a3:87ef:9245 with SMTP id af79cd13be357-8b33d4c71damr5820820085a.85.1764671499945;
-        Tue, 02 Dec 2025 02:31:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEkFzxmwelK7JWWOAoPq9zHQWlUTkFdQtGpxT5OnaUqoncZnDcZ0jY3Vwv2Xy+uzCGGTRumEg==
-X-Received: by 2002:a05:620a:4687:b0:8a3:87ef:9245 with SMTP id af79cd13be357-8b33d4c71damr5820816985a.85.1764671499514;
-        Tue, 02 Dec 2025 02:31:39 -0800 (PST)
+        bh=nVckf801EzlHLt3eBGX4mHh0JO99LKIAjAwFPbJ7PrM=;
+        b=TP4CxGt2svYCQrNQTCGB12xCD4AtFj9df0O4LIznr8n53MhIS0BM5HgcWqUyznsNaJ
+         vrhbp/iqkHqT0ZUXfsOrA9CfXtSmWWCZz/AhewOFxgf8TASp31Su3DwGyXxG6MCdruhN
+         L1O5D5ywsj4NoprJaSYsh4zO0XMI5vSlihmRDEnuducA73YldspTCavVZI3aI/6FohSY
+         kE39xfk9kTod1hd2ULTcV7Umbf5ojGeFpRyNc1E8Uvy1dLUZVC5552azr+vwd889T1+t
+         MKLdZVIU5K9tHb4reZJVGtqf9aK6xcD/SSXsyGsNu0qlyO27+Be237likLmuOXxRXOPI
+         rf9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWSyVRBlKvhGSgpei0wRgEYIfFt0oOKiEOEP52Y05SzSThVIbdOkfr/bTk17UR9JbVYFOE4MMg=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw5Eqa4pdN4sqw9Y9ybYpbnBV6BO8HOlRBdpqkwyUinvsZB/NFq
+	C6vFYMPSup9njGFPzUCY+Gri6RQmShyfEaQa4zuX65v98iunJoGCOmsLVNPfCh6+76j443zKSJF
+	/e0Hs6NYfQCMeNcBpKmxTCJabc5xdNjsSLYh1xkc4Qvb8DYn+YmCWGq6iKg==
+X-Gm-Gg: ASbGnctRTTF1HQKZNhFLuONrZ1R4Ij3yc5BL2JmQp1uTSvHvRTx1fS3uZqpt3kE3znL
+	y4WHhwkrWozZWMSxi48Kip1WoocNArsiXhz+Q3XHu8uapETegZUbAZ1gNYVM6J987cyjnCDdlel
+	zOKcxAyzcQaqr9A5kOPYXwgCWzb+TRF1Yr1XKZcmuMTYbalm2w8/L7F9B6wYyEqMh4t+rU5wQAD
+	PW6g7zHP1BXXeB58YbiKcp7+ICjLL3T8a2LNRVaB01LNpflKDrLNGcri1aJ7UBtpW5d8CBuU8WA
+	8S5TZxR/ev0KWOcRanW0WQ+oouTfJzVtjOmqiZotUcfiQdNQdfk+A+n/i+g2eFeU+mLjVBCnM9w
+	nLYCiK1GGNtCJFRhtEXLa/yWS9Z4hFV0CYk9Hql6OnyxgKmJUxtwnGlLmUw==
+X-Received: by 2002:a05:6214:212b:b0:7f7:777e:39c5 with SMTP id 6a1803df08f44-8863af15e51mr447369466d6.25.1764671728776;
+        Tue, 02 Dec 2025 02:35:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHGEbGb2r6oAFr49aUac0U3SAzN0PPLJROZTPCjIXcuNk6VSBXpQXplvBnfUNVbCdUK5fRCMw==
+X-Received: by 2002:a05:6214:212b:b0:7f7:777e:39c5 with SMTP id 6a1803df08f44-8863af15e51mr447369246d6.25.1764671728422;
+        Tue, 02 Dec 2025 02:35:28 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e? ([2a01:e0a:fa3:e4b0:95dc:ab11:92db:6f9e])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1c909asm1040500585a.40.2025.12.02.02.31.38
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88652b6851dsm100885856d6.42.2025.12.02.02.35.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Dec 2025 02:31:39 -0800 (PST)
-Message-ID: <a8951572-2d70-413e-90c7-9eb45a5d18a2@redhat.com>
-Date: Tue, 2 Dec 2025 11:31:36 +0100
+        Tue, 02 Dec 2025 02:35:27 -0800 (PST)
+Message-ID: <0ceb3518-6eb2-4d0d-95c5-f926cce313ca@redhat.com>
+Date: Tue, 2 Dec 2025 11:35:25 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,16 +77,16 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 08/10] arm64: pmu: count EL2 cycles
+Subject: Re: [kvm-unit-tests PATCH v3 09/10] arm64: run at EL2 if supported
 To: Joey Gouly <joey.gouly@arm.com>, kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com, andrew.jones@linux.dev, kvmarm@lists.linux.dev,
  Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
 References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-9-joey.gouly@arm.com>
+ <20250925141958.468311-10-joey.gouly@arm.com>
 From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20250925141958.468311-9-joey.gouly@arm.com>
+In-Reply-To: <20250925141958.468311-10-joey.gouly@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: JhzDZ4c8Yw4-j6msXCaWTR5uAlsy3VWayb3HfTXdeao_1764671500
+X-Mimecast-MFC-PROC-ID: TnP8UoK4SH-DeY9_a8OnL_jTB7xKbhbN7Q7GkEySpis_1764671729
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8
@@ -95,66 +95,85 @@ Content-Transfer-Encoding: 7bit
 
 
 On 9/25/25 4:19 PM, Joey Gouly wrote:
-> Count EL2 cycles if that's the EL kvm-unit-tests is running at!
+> If VHE is supported, continue booting at EL2, otherwise continue booting at
+> EL1.
 >
 > Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
 Eric
 > ---
->  arm/pmu.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+>  arm/cstart64.S         | 17 +++++++++++++----
+>  lib/arm64/asm/sysreg.h |  5 +++++
+>  2 files changed, 18 insertions(+), 4 deletions(-)
 >
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 2dc0822b..e6c0f05b 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -121,6 +121,8 @@ static struct pmu pmu;
->  #define PMINTENCLR   __ACCESS_CP15(c9, 0, c14, 2)
->  #define PMCCNTR64    __ACCESS_CP15_64(0, c9)
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index 79b93dd4..af7c81c1 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -18,7 +18,7 @@
+>  .macro init_el, tmp
+>  	mrs	\tmp, CurrentEL
+>  	cmp	\tmp, CurrentEL_EL2
+> -	b.ne	1f
+> +	b.ne	2f
+>  	/* EL2 setup */
+>  	mrs	\tmp, mpidr_el1
+>  	msr	vmpidr_el2, \tmp
+> @@ -41,17 +41,26 @@
+>  	msr_s	SYS_HFGWTR2_EL2, \tmp
+>  	msr_s	SYS_HFGITR2_EL2, \tmp
+>  .Lskip_fgt_\@:
+> +	/* check VHE is supported */
+> +	mrs	\tmp, ID_AA64MMFR1_EL1
+> +	ubfx	\tmp, \tmp, ID_AA64MMFR1_EL1_VH_SHIFT, #4
+> +	cbz	\tmp, 1f
+> +	ldr	\tmp, =(INIT_HCR_EL2)
+> +	msr	hcr_el2, \tmp
+> +	isb
+> +	b	2f
+> +1:
+>  	mov	\tmp, #0
+>  	msr	cptr_el2, \tmp
+>  	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
+>  	msr	hcr_el2, \tmp
+>  	mov	\tmp, PSR_MODE_EL1t
+>  	msr	spsr_el2, \tmp
+> -	adrp	\tmp, 1f
+> -	add	\tmp, \tmp, :lo12:1f
+> +	adrp	\tmp, 2f
+> +	add	\tmp, \tmp, :lo12:2f
+>  	msr	elr_el2, \tmp
+>  	eret
+> -1:
+> +2:
+>  .endm
 >  
-> +#define PMCCFILTR_EL0_DEFAULT	0
+>  
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index ed776716..f2d05018 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -80,6 +80,8 @@ asm(
+>  #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
+>  #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
+>  
+> +#define ID_AA64MMFR1_EL1_VH_SHIFT	8
 > +
->  static inline uint32_t get_id_dfr0(void) { return read_sysreg(ID_DFR0); }
->  static inline uint32_t get_pmcr(void) { return read_sysreg(PMCR); }
->  static inline void set_pmcr(uint32_t v) { write_sysreg(v, PMCR); }
-> @@ -206,6 +208,9 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
->  #define ID_DFR0_PMU_V3_8_5	0b0110
->  #define ID_DFR0_PMU_IMPDEF	0b1111
+>  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+>  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+>  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+> @@ -116,9 +118,12 @@ asm(
+>  #define SCTLR_EL1_TCF0_SHIFT	38
+>  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
 >  
-> +#define PMCCFILTR_EL0_NSH	BIT(27)
-> +#define PMCCFILTR_EL0_DEFAULT	(current_level() == CurrentEL_EL2 ? PMCCFILTR_EL0_NSH : 0)
-> +
->  static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
->  static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
->  static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
-> @@ -246,8 +251,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
->  #define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
->  #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+> +#define HCR_EL2_TGE		_BITULL(27)
+>  #define HCR_EL2_RW		_BITULL(31)
+> +#define HCR_EL2_E2H		_BITULL(34)
 >  
-> -#define PMEVTYPER_EXCLUDE_EL1 BIT(31)
-> -#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
-> +#define PMEVTYPER_EXCLUDE_EL0 BIT(30) | (current_level() == CurrentEL_EL2 ? BIT(27) : 0)
+>  #define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
+> +#define INIT_HCR_EL2		(HCR_EL2_TGE | HCR_EL2_E2H | HCR_EL2_RW)
 >  
->  static bool is_event_supported(uint32_t n, bool warn)
->  {
-> @@ -1063,7 +1067,8 @@ static bool check_cycles_increase(void)
->  	/* init before event access, this test only cares about cycle count */
->  	pmu_reset();
->  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> +
-> +	set_pmccfiltr(PMCCFILTR_EL0_DEFAULT);
->  
->  	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
->  	isb();
-> @@ -1118,7 +1123,7 @@ static bool check_cpi(int cpi)
->  	/* init before event access, this test only cares about cycle count */
->  	pmu_reset();
->  	set_pmcntenset(1 << PMU_CYCLE_IDX);
-> -	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
-> +	set_pmccfiltr(PMCCFILTR_EL0_DEFAULT);
->  
->  	if (cpi > 0)
->  		printf("Checking for CPI=%d.\n", cpi);
+>  #define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
+>  #define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
 
