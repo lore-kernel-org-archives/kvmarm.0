@@ -1,89 +1,121 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDA8192B75
-	for <kvmarm@lists.linux.dev>; Mon,  1 Dec 2025 23:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D650F245019
+	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 06:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764632112; cv=none; b=og6tL8T2GZSKg1TIVt6Z6GWMDBbJH2F/xWgCukGdDZOSENe2eQK8rs9BvhcyIYEZww1/kgrmn7I24IPaAVKqHJfBkDuNICMQsZj6nDt1xnFtJRq1xd+6Sv2gZsvHh7XOvGBIK1Op4p6yxlMqIyLBtI633QTTzyOuMXujDzq6gkk=
+	t=1764658314; cv=none; b=XRcB58bR1kIG1iFnqEotcxJAyZNfabyfXvSvPhkH/dObBiCuKlhPyjVJfJ/lW9X7DT+we9CWI805rMlwodXYQNiogWRTXtkiN7CQojxeoTFv5AT60weoOrUnB6R3C59lxIxgP+D4SeBaWok19PhGdDIRci4dSQ7aoTpn65bmuFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764632112; c=relaxed/simple;
-	bh=AuJGuGtsHdS3xk031eDwxs7JKAN6oFUvFUcxyqlE7tM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jaifGCssoPfChXHDGHwrt+OsEj6n5fgY2oxNK7l/I4y/BRY7xIdudRUgXTZRngzPVkZl335xKRTPPJya3BPuNf6ndFPaVyEkiDTwzGPp0lViXm9a4eb1DUoTJcp1nTOCaQ+sUEslbRU8bvE4E6kC/g1DG0jegw60wdCM0mMFmb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EZF+aHK2; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1764658314; c=relaxed/simple;
+	bh=1gWTQq98bOypJjboTaFYpJ4wa3iFoj+/sxC2R7JCTkU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=t900QcWewqoVHylaCGuiEs3bjUWkN4gypQmv0V5wdpx7RAMYx4ORaxMd13rdGRAvEEPQpk212vAiO4aKdUg7nSRBi7YJlxgXfIE6wOUQhEYulLA3sNbbSY7L+kdUnncKWQBdwtBbxtrYmxesOhHAb1H9JR/GQrL7lb4UBbIjdWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ZwWuYbG5; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EZF+aHK2"
-Date: Mon, 1 Dec 2025 17:34:57 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764632105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DmR3Mr3V3KyKYyAMw2wPTB//qSQSjvj0UFM0Ln0Rpj4=;
-	b=EZF+aHK2ZzhaIg8+8F7R0xsdgjVBtqOLFgamxmXhBMJOHN/FUg30MPZjmbWyEwZAAVGkv+
-	i9bKdAjCaI3zvuwbc44LeFjNpa0FAd+THdRbviH/+gP9vQojz3OjR4EMwkE2pKOkflKUOb
-	3HQzrOjMhZ4CaaJy0erxtdMnRtO0g9I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, kvmarm@lists.linux.dev, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v3 10/10] arm64: add EL2 environment
- variable
-Message-ID: <20251201-8bd3f30dc0e9b2378c27e6d9@orel>
-References: <20250925141958.468311-1-joey.gouly@arm.com>
- <20250925141958.468311-11-joey.gouly@arm.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ZwWuYbG5"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=cATUQiJc9npGbI4jT9r+I8H4PuqTS2f1GZLrT/FePi4=;
+	b=ZwWuYbG5Q4xPmpss4QVApiJLmjWp+n8LiM6hKr9n7ChT+CJ5bPOvx3acW7pqU4MdJPlyNGvOE
+	RAaXTbV5rP9YfYneFFiGuebJEYbII+gELeXeBLd/+g18aQDBLsWWn1iQq1/0slm4c3ka2XzXU+g
+	BKMoenxgpkm/nrnPz5JyzAM=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4dLBGS2cKRzRhVh;
+	Tue,  2 Dec 2025 14:49:52 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 080F3180BCE;
+	Tue,  2 Dec 2025 14:51:44 +0800 (CST)
+Received: from [10.67.120.103] (10.67.120.103) by
+ kwepemr100010.china.huawei.com (7.202.195.125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Tue, 2 Dec 2025 14:51:43 +0800
+Message-ID: <3b41d540-37d1-4b92-91a3-f4094f7ad792@huawei.com>
+Date: Tue, 2 Dec 2025 14:51:42 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250925141958.468311-11-joey.gouly@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register
+ information
+To: Marc Zyngier <maz@kernel.org>, Tian Zheng <zhengtian10@huawei.com>
+CC: <oliver.upton@linux.dev>, <catalin.marinas@arm.com>, <corbet@lwn.net>,
+	<pbonzini@redhat.com>, <will@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>, <yezhenyu2@huawei.com>,
+	<xiexiangyou@huawei.com>, <zhengchuan@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<suzuki.poulose@arm.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com>
+ <20251121092342.3393318-2-zhengtian10@huawei.com>
+ <86wm3iqlz8.wl-maz@kernel.org>
+From: Tian Zheng <zhengtian10@huawei.com>
+In-Reply-To: <86wm3iqlz8.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-On Thu, Sep 25, 2025 at 03:19:58PM +0100, Joey Gouly wrote:
-> This variable when set to 1 will cause QEMU/kvmtool to start at EL2.
-> ---
->  arm/run | 7 +++++++
->  1 file changed, 7 insertions(+)
+
+
+在 2025/11/22 20:40, Marc Zyngier 写道:
+> On Fri, 21 Nov 2025 09:23:38 +0000,
+> Tian Zheng <zhengtian10@huawei.com> wrote:
+>>
+>> From: eillon <yezhenyu2@huawei.com>
+>>
+>> The ARM architecture added the HDBSS feature and descriptions of
+>> related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+>> add them to Linux.
+>>
+>> Signed-off-by: eillon <yezhenyu2@huawei.com>
+>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+>> ---
+>>   arch/arm64/include/asm/esr.h     |  2 ++
+>>   arch/arm64/include/asm/kvm_arm.h |  1 +
+>>   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+>>   3 files changed, 31 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+>> index e1deed824464..a6f3cf0b9b86 100644
+>> --- a/arch/arm64/include/asm/esr.h
+>> +++ b/arch/arm64/include/asm/esr.h
+>> @@ -159,6 +159,8 @@
+>>   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+>>
+>>   /* ISS2 field definitions for Data Aborts */
+>> +#define ESR_ELx_HDBSSF_SHIFT	(11)
+>> +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+>>   #define ESR_ELx_TnD_SHIFT	(10)
+>>   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+>>   #define ESR_ELx_TagAccess_SHIFT	(9)
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index 1da290aeedce..b71122680a03 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -124,6 +124,7 @@
+>>   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>>
+>>   /* VTCR_EL2 Registers bits */
+>> +#define VTCR_EL2_HDBSS		(1UL << 45)
 > 
-> diff --git a/arm/run b/arm/run
-> index 858333fc..2a9c0de0 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -59,6 +59,10 @@ function arch_run_qemu()
->  		M+=",highmem=off"
->  	fi
->  
-> +	if [ "$EL2" = "1" ]; then
-
-Please also support 'y' and 'Y', e.g. 'EL2=y run_tests.sh -g ...'
-
-Thanks,
-drew
-
-> +		M+=",virtualization=on"
-> +	fi
-> +
->  	if ! $qemu $M -device '?' | grep -q virtconsole; then
->  		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
->  		exit 2
-> @@ -116,6 +120,9 @@ function arch_run_kvmtool()
->  	fi
->  
->  	command="$(timeout_cmd) $kvmtool run"
-> +	if [ "$EL2" = "1" ]; then
-> +		command+=" --nested"
-> +	fi
->  	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
->  		run_test_status $command --kernel "$@" --aarch32
->  	else
-> -- 
-> 2.25.1
+> I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+> instead of adding extra bits here.
 > 
+
+Hello Marc, I noticed you added VTCR_EL2 to the sysreg infrastructure in 
+this patch:
+
+https://lore.kernel.org/linux-arm-kernel/20251129144525.2609207-3-maz@kernel.org/
+
+Once this patch is merged upstream, I will remove my local definition.
+
+> 	M.
+> 
+
