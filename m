@@ -1,39 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F003381C4
-	for <kvmarm@lists.linux.dev>; Wed,  3 Dec 2025 15:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B9935502B
+	for <kvmarm@lists.linux.dev>; Wed,  3 Dec 2025 16:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764775223; cv=none; b=IhNgc9UAnaHViMCgUzvBHRE6ygD0QBLc+6Q5f9hcxlfQ5SGWFugpPLYIEUv8IxAwaSaaG74SiB2K28lmJXBJp9KdOr/y3kp+iOzg1d83Dft8zGQiBiJFuXZ9T67uvzxE4yE7P4opM60jjIc1ULH7yW7ilXGLz2XWCvEjd/Tk4gM=
+	t=1764778645; cv=none; b=shu4XGQ0M6uKBi2Fy8O2xQXIsem9XL94qD2ueLWNXQg4+RVlhQtk/Ojug/5Gqt1tTA5I3ShEnzCIzjbXO4CpeHxFfpADGeUZw6O/g50zgspJyqVBvDumdk3Gg+bvrTEKH7BiQwwyHpdqETppZ5CW7K5i4kBFyHq82Dz8JqQN2X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764775223; c=relaxed/simple;
-	bh=unslt5gGvxCkzQ3extZLzSTvy6lEfMNMpoA78YAUcrM=;
+	s=arc-20240116; t=1764778645; c=relaxed/simple;
+	bh=ZgDtOVPSWZyP+Yt2Ga3r9KRjbu/RrjqzEbQ1CwGz8Ew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Stuuh+M3kos5iz2VT8WzCTD5V8pqL7uvYTUcmdglWjPYjwqpRFzkbpyZyaCzAszqIFBzVSKKUF6MYhx1eqHk9z3yT3l6tLDtq+3kN5muaDao5BGcXLvhR9BVLVzObkK+BzOD0Z9qbeEKhOmxPy9TQG5n+JGczh/yw0ebW9eYIk4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=K3cn/ZMupwC6xAyCihEoBM3BAIy+NoBuiKTg6/jtChbygb34h6ptqzq/4FKM9WjaBQoXC4zY3fceX7uWtxlcl2Oxo4cSHDqKvQhlBjQ1UeLXwMimi5hxCrKf4Ji5lrtP6wLKkqqQNF09EOcmj0/32gtQCFJJDN6B7UTx04wkNps=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4147A339;
-	Wed,  3 Dec 2025 07:20:13 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1881E3F59E;
-	Wed,  3 Dec 2025 07:20:18 -0800 (PST)
-Date: Wed, 3 Dec 2025 15:20:16 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB3D9339;
+	Wed,  3 Dec 2025 08:17:14 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B99F93F66E;
+	Wed,  3 Dec 2025 08:17:20 -0800 (PST)
+Date: Wed, 3 Dec 2025 16:17:15 +0000
+From: Joey Gouly <joey.gouly@arm.com>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+	kvm@vger.kernel.org, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven
  sanitisation
-Message-ID: <aTBVMIxeVbiZq0ee@raptor>
+Message-ID: <20251203161715.GA4187196@e124191.cambridge.arm.com>
 References: <20251129144525.2609207-1-maz@kernel.org>
  <20251129144525.2609207-5-maz@kernel.org>
- <aTAijieCI8055FL0@raptor>
- <86ikenpvna.wl-maz@kernel.org>
- <aTBDRx1oeGDs2SFl@raptor>
- <86h5u7pq7u.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,156 +38,174 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86h5u7pq7u.wl-maz@kernel.org>
+In-Reply-To: <20251129144525.2609207-5-maz@kernel.org>
 
-Hi Marc,
+Hi!
 
-On Wed, Dec 03, 2025 at 02:58:13PM +0000, Marc Zyngier wrote:
-> On Wed, 03 Dec 2025 14:03:51 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Wed, Dec 03, 2025 at 01:00:57PM +0000, Marc Zyngier wrote:
-> > > On Wed, 03 Dec 2025 11:44:14 +0000,
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > > 
-> > > > Hi Marc,
-> > > > 
-> > > > On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
-> > > > > Describe all the VTCR_EL2 fields and their respective configurations,
-> > > > > making sure that we correctly ignore the bits that are not defined
-> > > > > for a given guest configuration.
-> > > > > 
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
-> > > > >  arch/arm64/kvm/nested.c |  3 +-
-> > > > >  2 files changed, 70 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > > > > index a02c28d6a61c9..c36e133c51912 100644
-> > > > > --- a/arch/arm64/kvm/config.c
-> > > > > +++ b/arch/arm64/kvm/config.c
-> > > > > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
-> > > > >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
-> > > > >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
-> > > > >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
-> > > > > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
-> > > > >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
-> > > > >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
-> > > > >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
-> > > > > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
-> > > > >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
-> > > > >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
-> > > > >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-> > > > > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-> > > > > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
-> > > > >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
-> > > > >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-> > > > >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
-> > > > > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
-> > > > >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
-> > > > >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
-> > > > >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
-> > > > > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
-> > > > >  
-> > > > >  static bool not_feat_aa64el3(struct kvm *kvm)
-> > > > >  {
-> > > > > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
-> > > > >  	return check_pmu_revision(kvm, V3P9);
-> > > > >  }
-> > > > >  
-> > > > > +#define has_feat_s2tgran(k, s)						\
-> > > > > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
-> > > > > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
-> > > > 
-> > > > Wouldn't that read better as kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s, IMP)?
-> > > > I think that would also be correct.
-> > > 
-> > > Sure, I don't mind either way,
-> > > 
-> > > > 
-> > > > > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
-> > > > 
-> > > > A bit unexpected to treat the same field first as an enum, then as an integer,
-> > > > but it saves one line.
-> > > 
-> > > It potentially saves more if the encoding grows over time. I don't
-> > > think it matters.
-> > 
-> > Doesn't, was just aestethics and saves someone having to check the values to
-> > make sure it wasn't an error.
-> > 
-> > > 
-> > > > 
-> > > > > +
-> > > > > +static bool feat_lpa2(struct kvm *kvm)
-> > > > > +{
-> > > > > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
-> > > > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
-> > > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
-> > > > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
-> > > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
-> > > > > +		 !has_feat_s2tgran(kvm, 4))				&&
-> > > > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
-> > > > > +		 !has_feat_s2tgran(kvm, 16)));
-> > > > > +}
-> > > > 
-> > > > That was a doozy, but looks correct to me if the intention was to have the check
-> > > > as relaxed as possible - i.e, a VM can advertise 52 bit support for one granule,
-> > > > but not the other (same for stage 1 and stage 2).
-> > > 
-> > > Not quite. The intent is that, for all the possible granules, at all
-> > > the possible stages, either the granule size isn't implemented at all,
-> > > or it supports 52 bits. I think this covers it, but as you said, this
-> > > is a bit of a bran fsck.
-> > 
-> > Hm... this sounds like something that should be sanitised in
-> > set_id_aa64mmfr0_el1(). Sorry, but I just can't tell if TGran{4,16,64} are
-> > writable by userspace.
+On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
+> Describe all the VTCR_EL2 fields and their respective configurations,
+> making sure that we correctly ignore the bits that are not defined
+> for a given guest configuration.
 > 
-> Everything in ID_AA64MMFR0_EL1 is writable, except for ASIDBITS.
-
-Aaah, ok so a bit set in the 'mask' argument to ID_FILTERED means the bit is
-writable (the comment for ID_FILTERED doesn't explain that).
-
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/nested.c |  3 +-
+>  2 files changed, 70 insertions(+), 2 deletions(-)
 > 
-> > 
-> > > 
-> > > This is essentially a transliteration of the MRS:
-> > > 
-> > > (FEAT_LPA2 && FEAT_S2TGran4K) <=> (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 3))
-> > > (FEAT_LPA2 && FEAT_S2TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 3))
-> > > (FEAT_LPA2 && FEAT_TGran4K) <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 1))
-> > > (FEAT_LPA2 && FEAT_TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 2))
-> > > FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) && FEAT_TGran4K) || (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))
-> > > FEAT_S2TGran16K <=> (((UInt(ID_AA64MMFR0_EL1.TGran16_2) == 0) && FEAT_TGran16K) || (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 2))
-> > > FEAT_TGran4K <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 0)
-> > > FEAT_TGran16K <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 1)
-> > 
-> > How about (untested):
-> > 
-> > static bool feat_lpas2(struct kvm *kvm)
-> > {
-> > 	if (kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP) ||
-> > 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP) ||
-> > 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, IMP) ||
-> > 	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, IMP))
-> > 		return false;
-> > 
-> > 	return true;
-> > }
-> 
-> The combination (TGRAN4=NI, TGRAN2_4=TGRAN4, TGRAN16=52_BIT,
-> TGRAN16_2=52_BIT) is a valid LPA2 configuration, which the test above
-> rejects.
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index a02c28d6a61c9..c36e133c51912 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
+>  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+>  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
+>  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+> +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
+>  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+>  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+>  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
+>  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+>  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+>  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+>  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+>  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+>  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
+> @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
+>  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
+>  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+>  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+> +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+>  
+>  static bool not_feat_aa64el3(struct kvm *kvm)
+>  {
+> @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
+>  	return check_pmu_revision(kvm, V3P9);
+>  }
+>  
+> +#define has_feat_s2tgran(k, s)						\
+> +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
+> +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> +
+> +static bool feat_lpa2(struct kvm *kvm)
+> +{
+> +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
+> +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
+> +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
+> +		 !has_feat_s2tgran(kvm, 4))				&&
+> +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
+> +		 !has_feat_s2tgran(kvm, 16)));
+> +}
+> +
+> +static bool feat_vmid16(struct kvm *kvm)
+> +{
+> +	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
+> +}
+> +
+>  static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
+>  {
+>  	/* This is purely academic: AArch32 and NV are mutually exclusive */
+> @@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
+>  static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
+>  			      mdcr_el2_feat_map, FEAT_AA64EL2);
+>  
+> +static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
+> +	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
+> +	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
+> +	NEEDS_FEAT(VTCR_EL2_TL0		|
+> +		   VTCR_EL2_TL1		|
+> +		   VTCR_EL2_AssuredOnly	|
+> +		   VTCR_EL2_GCSH,
+> +		   FEAT_THE),
 
-Thank you for taking the time to entertain my comments. It's not clear to me why
-the combination is rejected since there are no IMP values in your example, but I
-trust your judgement and I don't want to waste your time on nitpicking.
+The text for VTCR_EL2.AssuredOnly says:
 
-My Reviewed-by stands, by the way, in case that wasn't clear.
+	This field is RES0 when VTCR_EL2.D128 is 1.
+
+> +	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
+> +	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
+> +	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
+
+The text for VTCR_EL2.S2PIE says:
+
+	This field is RES1 when VTCR_EL2.D128 is set.
+
+
+Are these cases that need to be handled here somehow?
 
 Thanks,
-Alex
+Joey
+
+
+> +	NEEDS_FEAT(VTCR_EL2_SL2		|
+> +		   VTCR_EL2_DS,
+> +		   feat_lpa2),
+> +	NEEDS_FEAT(VTCR_EL2_NSA		|
+> +		   VTCR_EL2_NSW,
+> +		   FEAT_SEL2),
+> +	NEEDS_FEAT(VTCR_EL2_HWU62	|
+> +		   VTCR_EL2_HWU61	|
+> +		   VTCR_EL2_HWU60	|
+> +		   VTCR_EL2_HWU59,
+> +		   FEAT_HPDS2),
+> +	NEEDS_FEAT(VTCR_EL2_HD, ID_AA64MMFR1_EL1, HAFDBS, DBM),
+> +	NEEDS_FEAT(VTCR_EL2_HA, ID_AA64MMFR1_EL1, HAFDBS, AF),
+> +	NEEDS_FEAT(VTCR_EL2_VS, feat_vmid16),
+> +	NEEDS_FEAT(VTCR_EL2_PS		|
+> +		   VTCR_EL2_TG0		|
+> +		   VTCR_EL2_SH0		|
+> +		   VTCR_EL2_ORGN0	|
+> +		   VTCR_EL2_IRGN0	|
+> +		   VTCR_EL2_SL0		|
+> +		   VTCR_EL2_T0SZ,
+> +		   FEAT_AA64EL1),
+> +};
+> +
+> +static const DECLARE_FEAT_MAP(vtcr_el2_desc, VTCR_EL2,
+> +			      vtcr_el2_feat_map, FEAT_AA64EL2);
+> +
+>  static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+>  				  int map_size, u64 res0, const char *str)
+>  {
+> @@ -1211,6 +1275,7 @@ void __init check_feature_map(void)
+>  	check_reg_desc(&tcr2_el2_desc);
+>  	check_reg_desc(&sctlr_el1_desc);
+>  	check_reg_desc(&mdcr_el2_desc);
+> +	check_reg_desc(&vtcr_el2_desc);
+>  }
+>  
+>  static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_feat_map *map)
+> @@ -1425,6 +1490,10 @@ void get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg, u64 *res0, u64 *r
+>  		*res0 = compute_reg_res0_bits(kvm, &mdcr_el2_desc, 0, 0);
+>  		*res1 = MDCR_EL2_RES1;
+>  		break;
+> +	case VTCR_EL2:
+> +		*res0 = compute_reg_res0_bits(kvm, &vtcr_el2_desc, 0, 0);
+> +		*res1 = VTCR_EL2_RES1;
+> +		break;
+>  	default:
+>  		WARN_ON_ONCE(1);
+>  		*res0 = *res1 = 0;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index e1ef8930c97b3..606cebcaa7c09 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1719,8 +1719,7 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>  	set_sysreg_masks(kvm, VTTBR_EL2, res0, res1);
+>  
+>  	/* VTCR_EL2 */
+> -	res0 = GENMASK(63, 32) | GENMASK(30, 20);
+> -	res1 = BIT(31);
+> +	get_reg_fixed_bits(kvm, VTCR_EL2, &res0, &res1);
+>  	set_sysreg_masks(kvm, VTCR_EL2, res0, res1);
+>  
+>  	/* VMPIDR_EL2 */
+> -- 
+> 2.47.3
+> 
