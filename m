@@ -1,176 +1,181 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072B2145FE0;
-	Wed,  3 Dec 2025 13:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F2121B918
+	for <kvmarm@lists.linux.dev>; Wed,  3 Dec 2025 14:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764766861; cv=none; b=D6a/NxL8MRH2g2QnClyfaK7btKSXV7jHiq1puSfUa1YOlpVIRvIRHJQx6c6X+Ct0osyiHddivJoQ2D9I26VTCthpx5V/RSf5Lpp3gMX2bfq8TNQgjtKky7fwgoOGycX1tL2sBwvEBtpxkocGVdQPIBQtBsAXznom5+9Pi0wcu7A=
+	t=1764770638; cv=none; b=uWIdpWzrFWDfb3AJ7uZOIclhSxbpXX70FGwgWdaoRlBZ4+OwNfJ+2khFgopErxof9Wp2fqdFhEgWriccUk35yyuRkJ2WIRdybOYIWXXpc8rhkbp+nyeyAu2twlkatahmyoXvTmhACKnkNQiQW37E2uxKPHdpWHrt87hzHGKt89I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764766861; c=relaxed/simple;
-	bh=94NMNh/bjL/9IvXfEznPqaXJhPlPZ/AXgR/yH/tDbeg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tqeqcotgdcqcOiC4vxju0rea91rgFhpNGlGIaOIW8T/D9Ht/0kI/iJeaZZKd/6c+cPTXDjs/ontHkvVdQN6KmShtu4d9A5g6nbiBbUGVFhO6X8ol5lq36hRPf7cF7p6Uf0AsN9b674NpFf/EuAeBF1A6OSZxbi8jRZQgn5dZ8Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qoECoH7a; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qoECoH7a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B75FC4CEFB;
-	Wed,  3 Dec 2025 13:01:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764766860;
-	bh=94NMNh/bjL/9IvXfEznPqaXJhPlPZ/AXgR/yH/tDbeg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qoECoH7adV+Eew2kED6UQJrbbAyDfCHVND9/PRkXMYUbwlAkGq1XMtxj8jND6ehtj
-	 GjhBG5Ubi7lmlUzHkOs/YzOzvxMKnerM65N+Vrgr1nT69oCHTehX9956dH8shLmV/4
-	 vdjBGU5mejHUoR/goRSZ9Sxi3QzSic2kigDhhnAPv/xTP6YavyxYC+f458Rd5xghm6
-	 YgmSMgpM6H+vNU8p5/n1Wr9VjbmYgQFKWcTUnFUVk8YChzTDPQK3Xn8Mk2dIQcuKYY
-	 5y3o0YBpu94T9pmVusQ/JhBJ1zV20g6EzvX632dVkxvVRMbS909wCNxO0SaZz88xLw
-	 +b+0qvES9OnNw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vQmTZ-0000000ABPW-3tA8;
-	Wed, 03 Dec 2025 13:00:58 +0000
-Date: Wed, 03 Dec 2025 13:00:57 +0000
-Message-ID: <86ikenpvna.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	s=arc-20240116; t=1764770638; c=relaxed/simple;
+	bh=hS/XRd5u+8Aimo+zSQghJCBW+rCxKbMT0t4pX+O8qCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IPSkE28hAoSfPMS1mQ7Tj26YrtODSa/fB7Ne6ixkB8VL04ew1MFSacz+cdaUZ7/o/WhL68/WRUaK/HUBJGKQXzlf8uPAiDYFY9xoNbMduTxqrS4vMtaE7guZcTUO+nRuDN5jyV58FVgJ6uTiwlXZFZf/33C2l5kBxREtMjSD0RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79503339;
+	Wed,  3 Dec 2025 06:03:48 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4A3403F73B;
+	Wed,  3 Dec 2025 06:03:54 -0800 (PST)
+Date: Wed, 3 Dec 2025 14:03:51 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
-In-Reply-To: <aTAijieCI8055FL0@raptor>
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven
+ sanitisation
+Message-ID: <aTBDRx1oeGDs2SFl@raptor>
 References: <20251129144525.2609207-1-maz@kernel.org>
-	<20251129144525.2609207-5-maz@kernel.org>
-	<aTAijieCI8055FL0@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20251129144525.2609207-5-maz@kernel.org>
+ <aTAijieCI8055FL0@raptor>
+ <86ikenpvna.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ikenpvna.wl-maz@kernel.org>
 
-On Wed, 03 Dec 2025 11:44:14 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
-> > Describe all the VTCR_EL2 fields and their respective configurations,
-> > making sure that we correctly ignore the bits that are not defined
-> > for a given guest configuration.
+Hi Marc,
+
+On Wed, Dec 03, 2025 at 01:00:57PM +0000, Marc Zyngier wrote:
+> On Wed, 03 Dec 2025 11:44:14 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/nested.c |  3 +-
-> >  2 files changed, 70 insertions(+), 2 deletions(-)
+> > Hi Marc,
 > > 
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index a02c28d6a61c9..c36e133c51912 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
-> >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
-> >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
-> > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
-> >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
-> >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
-> >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
-> > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
-> >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
-> >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
-> >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-> > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-> > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
-> >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
-> >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-> >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
-> > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
-> >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
-> >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
-> > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
-> >  
-> >  static bool not_feat_aa64el3(struct kvm *kvm)
-> >  {
-> > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
-> >  	return check_pmu_revision(kvm, V3P9);
-> >  }
-> >  
-> > +#define has_feat_s2tgran(k, s)						\
-> > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
-> > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> > On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
+> > > Describe all the VTCR_EL2 fields and their respective configurations,
+> > > making sure that we correctly ignore the bits that are not defined
+> > > for a given guest configuration.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
+> > >  arch/arm64/kvm/nested.c |  3 +-
+> > >  2 files changed, 70 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > > index a02c28d6a61c9..c36e133c51912 100644
+> > > --- a/arch/arm64/kvm/config.c
+> > > +++ b/arch/arm64/kvm/config.c
+> > > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
+> > >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
+> > >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
+> > >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
+> > > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
+> > >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
+> > >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
+> > >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
+> > > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
+> > >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
+> > >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
+> > >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
+> > > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
+> > > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
+> > >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
+> > >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
+> > >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
+> > > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
+> > >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
+> > >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+> > >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+> > > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+> > >  
+> > >  static bool not_feat_aa64el3(struct kvm *kvm)
+> > >  {
+> > > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
+> > >  	return check_pmu_revision(kvm, V3P9);
+> > >  }
+> > >  
+> > > +#define has_feat_s2tgran(k, s)						\
+> > > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
+> > > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
+> > 
+> > Wouldn't that read better as kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s, IMP)?
+> > I think that would also be correct.
 > 
-> Wouldn't that read better as kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s, IMP)?
-> I think that would also be correct.
+> Sure, I don't mind either way,
+> 
+> > 
+> > > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> > 
+> > A bit unexpected to treat the same field first as an enum, then as an integer,
+> > but it saves one line.
+> 
+> It potentially saves more if the encoding grows over time. I don't
+> think it matters.
 
-Sure, I don't mind either way,
+Doesn't, was just aestethics and saves someone having to check the values to
+make sure it wasn't an error.
 
 > 
-> > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
+> > 
+> > > +
+> > > +static bool feat_lpa2(struct kvm *kvm)
+> > > +{
+> > > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
+> > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
+> > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
+> > > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
+> > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
+> > > +		 !has_feat_s2tgran(kvm, 4))				&&
+> > > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
+> > > +		 !has_feat_s2tgran(kvm, 16)));
+> > > +}
+> > 
+> > That was a doozy, but looks correct to me if the intention was to have the check
+> > as relaxed as possible - i.e, a VM can advertise 52 bit support for one granule,
+> > but not the other (same for stage 1 and stage 2).
 > 
-> A bit unexpected to treat the same field first as an enum, then as an integer,
-> but it saves one line.
+> Not quite. The intent is that, for all the possible granules, at all
+> the possible stages, either the granule size isn't implemented at all,
+> or it supports 52 bits. I think this covers it, but as you said, this
+> is a bit of a bran fsck.
 
-It potentially saves more if the encoding grows over time. I don't
-think it matters.
+Hm... this sounds like something that should be sanitised in
+set_id_aa64mmfr0_el1(). Sorry, but I just can't tell if TGran{4,16,64} are
+writable by userspace.
 
 > 
-> > +
-> > +static bool feat_lpa2(struct kvm *kvm)
-> > +{
-> > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
-> > +		 !has_feat_s2tgran(kvm, 4))				&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
-> > +		 !has_feat_s2tgran(kvm, 16)));
-> > +}
+> This is essentially a transliteration of the MRS:
 > 
-> That was a doozy, but looks correct to me if the intention was to have the check
-> as relaxed as possible - i.e, a VM can advertise 52 bit support for one granule,
-> but not the other (same for stage 1 and stage 2).
+> (FEAT_LPA2 && FEAT_S2TGran4K) <=> (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 3))
+> (FEAT_LPA2 && FEAT_S2TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 3))
+> (FEAT_LPA2 && FEAT_TGran4K) <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 1))
+> (FEAT_LPA2 && FEAT_TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 2))
+> FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) && FEAT_TGran4K) || (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))
+> FEAT_S2TGran16K <=> (((UInt(ID_AA64MMFR0_EL1.TGran16_2) == 0) && FEAT_TGran16K) || (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 2))
+> FEAT_TGran4K <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 0)
+> FEAT_TGran16K <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 1)
 
-Not quite. The intent is that, for all the possible granules, at all
-the possible stages, either the granule size isn't implemented at all,
-or it supports 52 bits. I think this covers it, but as you said, this
-is a bit of a bran fsck.
+How about (untested):
 
-This is essentially a transliteration of the MRS:
+static bool feat_lpas2(struct kvm *kvm)
+{
+	if (kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP) ||
+	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP) ||
+	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, IMP) ||
+	    kvm_has_feat_exact(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, IMP))
+		return false;
 
-(FEAT_LPA2 && FEAT_S2TGran4K) <=> (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 3))
-(FEAT_LPA2 && FEAT_S2TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 3))
-(FEAT_LPA2 && FEAT_TGran4K) <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 1))
-(FEAT_LPA2 && FEAT_TGran16K) <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 2))
-FEAT_S2TGran4K <=> (((UInt(ID_AA64MMFR0_EL1.TGran4_2) == 0) && FEAT_TGran4K) || (UInt(ID_AA64MMFR0_EL1.TGran4_2) >= 2))
-FEAT_S2TGran16K <=> (((UInt(ID_AA64MMFR0_EL1.TGran16_2) == 0) && FEAT_TGran16K) || (UInt(ID_AA64MMFR0_EL1.TGran16_2) >= 2))
-FEAT_TGran4K <=> (SInt(ID_AA64MMFR0_EL1.TGran4) >= 0)
-FEAT_TGran16K <=> (UInt(ID_AA64MMFR0_EL1.TGran16) >= 1)
+	return true;
+}
 
-> As far as I can tell, everything looks good to me:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+where, in case there's not something similar already and I just don't know about
+it:
+
+#define kvm_has_feat_exact(kvm, id, fld, val)			\
+	kvm_cmp_feat(kvm, id, fld, =, val)
+
+The idea being that if one of the granules does not support 52 bit, then it's
+not supported by any of the other granules.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Alex
