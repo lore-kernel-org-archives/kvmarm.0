@@ -1,41 +1,34 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A832F9DAB
-	for <kvmarm@lists.linux.dev>; Tue,  2 Dec 2025 22:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8AB2F1FEA
+	for <kvmarm@lists.linux.dev>; Wed,  3 Dec 2025 11:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764715417; cv=none; b=ukA2jOE+TQhfrFHHnBiv4zosnGZJTceblNxboQCAl6mei55lDkZORwNGKbOPGyAepxkxTOlPVdjFPBd6IIjRro2tyb1zNShmOUBjDMd1/i9WJq8uih2lfcB1vrAGr85wRzXc2XFzjAKQenZ3wTFaZyza+DzGTPaeBMB8mS/kSGo=
+	t=1764762200; cv=none; b=pFSplrgvFSA6HCyjGcUjGpvT4p6vtsPYrU+j9lWdkjd5dMFU0hYUq/Pu39IMNzCYE6mIgdOEasJjL8lqLhHboEUW+d9LmepMEvCk2eUqgOq4bP0yo9YpTT9y6aRN/ntg7rX9arJV2SXH3ZKDba1Sd1PfofvV7Jxxz1Q7lSo0Yro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764715417; c=relaxed/simple;
-	bh=GV4nmZlTqNhyK5x8C0GUeistp+nziFPdQUXBsboHFBc=;
+	s=arc-20240116; t=1764762200; c=relaxed/simple;
+	bh=pLOiebTBpnJHjLLx2A1HolSFHezPKLxQjcmSQfsmLS0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jeDB7ScclMq4uayxogIGU5lboUS9Du9y2862Ls5FyKNA5mvnFTdebR/inOI0G5D2fLQR4lPWjNnzlw+eLNjMeo836ULETVOsU9XtjBYo8G3nr1aurAvBHHogtqa3qAJLGqo6n9OPlgNEMYebYxK+Zsm7QufV3GGzqJKtZWomtxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N+OG7h2S; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N+OG7h2S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C840C4CEF1;
-	Tue,  2 Dec 2025 22:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764715417;
-	bh=GV4nmZlTqNhyK5x8C0GUeistp+nziFPdQUXBsboHFBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N+OG7h2StqSuMuBZhLDw0GRqK4uP5QDkjo1fRktjsnAKRVLG5XMuNPtDlpxgaWHsU
-	 mu5KqH8TL451/7uUURfqh/J0H8C3UGOdmxyfeCGLZKhogteBy+2dJxmibmWcVICnqd
-	 R45zpc7u6f2cIHrtMzCBXo+C20DcKk6kobttLeEbLYEF6I+EI6cWSGntc28wXu4PEl
-	 3MPsrnpC/mNtjA13FngjE5LWM/Grqg1NGqcMbJP4GTH9U1BRHzo2nLs0g4V19Fp8Hz
-	 RpM5yi2ZV6vCG/TEOJ4d5LZJoNG3mMu3WeG0vOPS64ql3UXqHi3gc3YC5K88azd3Ep
-	 WTggPVCMY+Ksw==
-Date: Tue, 2 Dec 2025 14:43:36 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Fuad Tabba <tabba@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDllUvhchOXCJGed02II33JsVyNRVRAgtawWZXmoQMt2kCyf6UOJbC3P6WmD9VqXhUlYYJ/S/ZJXxHTr5J+PfQhvSDcs+bXGcIHcCBFp4gvZrToW5SpRoZGyztzkSORB0t/D+UKbwcv7f8faN0SfHO6b/Iy98l3ipxPnUZjDMto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4203339;
+	Wed,  3 Dec 2025 03:43:10 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D44513F59E;
+	Wed,  3 Dec 2025 03:43:16 -0800 (PST)
+Date: Wed, 3 Dec 2025 11:43:14 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com,
-	catalin.marinas@arm.com, will@kernel.org
-Subject: Re: [PATCH v1 0/5] KVM: arm64: Enforce MTE disablement at EL2
-Message-ID: <aS9rmMgNna7I5g4F@kernel.org>
-References: <20251127122210.4111702-1-tabba@google.com>
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 2/4] arm64: Convert VTCR_EL2 to sysreg infratructure
+Message-ID: <aTAiUuc_aK5Bgce0@raptor>
+References: <20251129144525.2609207-1-maz@kernel.org>
+ <20251129144525.2609207-3-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,50 +37,281 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251127122210.4111702-1-tabba@google.com>
+In-Reply-To: <20251129144525.2609207-3-maz@kernel.org>
 
-Hi Fuad,
+Hi Marc,
 
-On Thu, Nov 27, 2025 at 12:22:05PM +0000, Fuad Tabba wrote:
-> pKVM never exposes MTE to protected guests (pVM), but we must also
-> ensure a malicious host cannot use MTE to attack the hypervisor or a
-> pVM.
+On Sat, Nov 29, 2025 at 02:45:23PM +0000, Marc Zyngier wrote:
+> Our definition of VTCR_EL2 is both partial (tons of fields are
+> missing) and totally inconsistent (some constants are shifted,
+> some are not). They are also expressed in terms of TCR, which is
+> rather inconvenient.
 > 
-> If MTE is supported by the hardware (and is enabled at EL3), it remains
-> available to lower exception levels by default. Disabling it in the host
-> kernel (e.g., via 'arm64.nomte') only stops the kernel from advertising
-> the feature; it does not physically disable MTE in the hardware.
+> Replace the ad-hoc definitions with the the generated version.
+> This results in a bunch of additional changes to make the code
+> with the unshifted nature of generated enumerations.
 > 
-> In this scenario, a malicious host could still access tags in pages
-> donated to a guest using MTE instructions (e.g., STG and LDG), bypassing
-> the kernel's configuration.
-> 
-> To prevent this, explicitly disable MTE at EL2 (by clearing HCR_EL2.ATA)
-> when the host has MTE disabled. This causes any MTE instruction usage to
-> generate a Data Abort (trap) to the hypervisor.
-> 
-> Additionally, to faithfully mimic hardware that does not support MTE,
-> trap accesses to MTE system registers (e.g., GCR_EL1) and inject an
-> Undefined Instruction exception back to the host.
-> 
-> This logic is applied in all non-VHE modes. For non-protected modes,
-> this remains beneficial as it prevents unpredictable behavior caused by
-> accessing allocation tags when the system considers them disabled.
-> 
-> Note that this ties into my other outgoing patch series [1], which also
-> has some MTE-related fixes, but is not dependent on it.
+> The register data was extracted from the BSD licenced AARCHMRS
+> (AARCHMRS_OPENSOURCE_A_profile_FAT-2025-09_ASL0).
 
-To be honest, I've actually been having a bit of a hard time
-rationalizing some of these targeted fixes for pKVM. It has been in a
-half working state upstream for O(years) and we haven't made forward
-progress on enabling pVMs.
+Looks correct to me:
 
-Fully aware that guest_memfd has been one of the long poles here, but
-I'm becoming less interested in fixes addressing "pKVM policy is XYZ"
-without having the full picture of the feature.
-
-What are the upstream plans on enabling some basic implementation of
-protected VMs?
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
-Oliver
+Alex
+
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h | 52 +++++++----------------------
+>  arch/arm64/include/asm/sysreg.h  |  1 -
+>  arch/arm64/kvm/hyp/pgtable.c     |  8 ++---
+>  arch/arm64/kvm/nested.c          |  8 ++---
+>  arch/arm64/tools/sysreg          | 57 ++++++++++++++++++++++++++++++++
+>  5 files changed, 76 insertions(+), 50 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 1da290aeedce7..cd2dc378baee6 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -123,37 +123,7 @@
+>  #define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
+>  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+>  
+> -/* VTCR_EL2 Registers bits */
+> -#define VTCR_EL2_DS		TCR_EL2_DS
+> -#define VTCR_EL2_RES1		(1U << 31)
+> -#define VTCR_EL2_HD		(1 << 22)
+> -#define VTCR_EL2_HA		(1 << 21)
+> -#define VTCR_EL2_PS_SHIFT	TCR_EL2_PS_SHIFT
+> -#define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
+> -#define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
+> -#define VTCR_EL2_TG0_4K		TCR_TG0_4K
+> -#define VTCR_EL2_TG0_16K	TCR_TG0_16K
+> -#define VTCR_EL2_TG0_64K	TCR_TG0_64K
+> -#define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
+> -#define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
+> -#define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
+> -#define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
+> -#define VTCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
+> -#define VTCR_EL2_IRGN0_WBWA	TCR_IRGN0_WBWA
+> -#define VTCR_EL2_SL0_SHIFT	6
+> -#define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
+> -#define VTCR_EL2_T0SZ_MASK	0x3f
+> -#define VTCR_EL2_VS_SHIFT	19
+> -#define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
+> -#define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
+> -
+> -#define VTCR_EL2_T0SZ(x)	TCR_T0SZ(x)
+> -
+>  /*
+> - * We configure the Stage-2 page tables to always restrict the IPA space to be
+> - * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
+> - * not known to exist and will break with this configuration.
+> - *
+>   * The VTCR_EL2 is configured per VM and is initialised in kvm_init_stage2_mmu.
+>   *
+>   * Note that when using 4K pages, we concatenate two first level page tables
+> @@ -161,9 +131,6 @@
+>   *
+>   */
+>  
+> -#define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
+> -				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
+> -
+>  /*
+>   * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
+>   * Interestingly, it depends on the page size.
+> @@ -195,30 +162,35 @@
+>   */
+>  #ifdef CONFIG_ARM64_64K_PAGES
+>  
+> -#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_64K
+> +#define VTCR_EL2_TGRAN			64K
+>  #define VTCR_EL2_TGRAN_SL0_BASE		3UL
+>  
+>  #elif defined(CONFIG_ARM64_16K_PAGES)
+>  
+> -#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_16K
+> +#define VTCR_EL2_TGRAN			16K
+>  #define VTCR_EL2_TGRAN_SL0_BASE		3UL
+>  
+>  #else	/* 4K */
+>  
+> -#define VTCR_EL2_TGRAN			VTCR_EL2_TG0_4K
+> +#define VTCR_EL2_TGRAN			4K
+>  #define VTCR_EL2_TGRAN_SL0_BASE		2UL
+>  
+>  #endif
+>  
+>  #define VTCR_EL2_LVLS_TO_SL0(levels)	\
+> -	((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
+> +	FIELD_PREP(VTCR_EL2_SL0, (VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))))
+>  #define VTCR_EL2_SL0_TO_LVLS(sl0)	\
+>  	((sl0) + 4 - VTCR_EL2_TGRAN_SL0_BASE)
+>  #define VTCR_EL2_LVLS(vtcr)		\
+> -	VTCR_EL2_SL0_TO_LVLS(((vtcr) & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT)
+> +	VTCR_EL2_SL0_TO_LVLS(FIELD_GET(VTCR_EL2_SL0, (vtcr)))
+> +
+> +#define VTCR_EL2_FLAGS	(SYS_FIELD_PREP_ENUM(VTCR_EL2, SH0, INNER)	    | \
+> +			 SYS_FIELD_PREP_ENUM(VTCR_EL2, ORGN0, WBWA)	    | \
+> +			 SYS_FIELD_PREP_ENUM(VTCR_EL2, IRGN0, WBWA)	    | \
+> +			 SYS_FIELD_PREP_ENUM(VTCR_EL2, TG0, VTCR_EL2_TGRAN) | \
+> +			 VTCR_EL2_RES1)
+>  
+> -#define VTCR_EL2_FLAGS			(VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
+> -#define VTCR_EL2_IPA(vtcr)		(64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
+> +#define VTCR_EL2_IPA(vtcr)		(64 - FIELD_GET(VTCR_EL2_T0SZ, (vtcr)))
+>  
+>  /*
+>   * ARM VMSAv8-64 defines an algorithm for finding the translation table
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index c231d2a3e5159..acad7a7621b9e 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -516,7 +516,6 @@
+>  #define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+>  #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+>  #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> -#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+>  
+>  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+>  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 947ac1a951a5b..e0bd6a0172729 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -583,8 +583,8 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  	u64 vtcr = VTCR_EL2_FLAGS;
+>  	s8 lvls;
+>  
+> -	vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
+> -	vtcr |= VTCR_EL2_T0SZ(phys_shift);
+> +	vtcr |= FIELD_PREP(VTCR_EL2_PS, kvm_get_parange(mmfr0));
+> +	vtcr |= FIELD_PREP(VTCR_EL2_T0SZ, (UL(64) - phys_shift));
+>  	/*
+>  	 * Use a minimum 2 level page table to prevent splitting
+>  	 * host PMD huge pages at stage2.
+> @@ -624,9 +624,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  		vtcr |= VTCR_EL2_DS;
+>  
+>  	/* Set the vmid bits */
+> -	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
+> -		VTCR_EL2_VS_16BIT :
+> -		VTCR_EL2_VS_8BIT;
+> +	vtcr |= (get_vmid_bits(mmfr1) == 16) ? VTCR_EL2_VS : 0;
+>  
+>  	return vtcr;
+>  }
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 911fc99ed99d9..e1ef8930c97b3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -377,7 +377,7 @@ static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
+>  {
+>  	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
+>  
+> -	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
+>  	case VTCR_EL2_TG0_4K:
+>  		wi->pgshift = 12;	 break;
+>  	case VTCR_EL2_TG0_16K:
+> @@ -513,7 +513,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+>  
+>  	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
+>  
+> -	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
+>  	case VTCR_EL2_TG0_4K:
+>  		ttl = (TLBI_TTL_TG_4K << 2);
+>  		break;
+> @@ -530,7 +530,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+>  
+>  again:
+>  	/* Iteratively compute the block sizes for a particular granule size */
+> -	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
+>  	case VTCR_EL2_TG0_4K:
+>  		if	(sz < SZ_4K)	sz = SZ_4K;
+>  		else if (sz < SZ_2M)	sz = SZ_2M;
+> @@ -593,7 +593,7 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+>  
+>  	if (!max_size) {
+>  		/* Compute the maximum extent of the invalidation */
+> -		switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
+> +		switch (FIELD_GET(VTCR_EL2_TG0_MASK, mmu->tlb_vtcr)) {
+>  		case VTCR_EL2_TG0_4K:
+>  			max_size = SZ_1G;
+>  			break;
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 9d388f87d9a13..6f43b2ae5993b 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -4400,6 +4400,63 @@ Field	56:12	BADDR
+>  Res0	11:0
+>  EndSysreg
+>  
+> +Sysreg	VTCR_EL2	3	4	2	1	2
+> +Res0	63:46	
+> +Field	45	HDBSS
+> +Field	44	HAFT
+> +Res0	43:42	
+> +Field	41	TL0
+> +Field	40	GCSH
+> +Res0	39
+> +Field	38	D128
+> +Field	37	S2POE
+> +Field	36	S2PIE
+> +Field	35	TL1
+> +Field	34	AssuredOnly
+> +Field	33	SL2
+> +Field	32	DS
+> +Res1	31
+> +Field	30	NSA
+> +Field	29	NSW
+> +Field	28	HWU62
+> +Field	27	HWU61
+> +Field	26	HWU60
+> +Field	25	HWU59
+> +Res0	24:23
+> +Field	22	HD
+> +Field	21	HA
+> +Res0	20
+> +Enum	19	VS
+> +	0b0	8BIT
+> +	0b1	16BIT
+> +EndEnum
+> +Field	18:16	PS
+> +Enum	15:14	TG0
+> +	0b00	4K
+> +	0b01	64K
+> +	0b10	16K
+> +EndEnum
+> +Enum	13:12	SH0
+> +	0b00	NONE
+> +	0b01	OUTER
+> +	0b11	INNER
+> +EndEnum
+> +Enum	11:10	ORGN0
+> +	0b00	NC
+> +	0b01	WBWA
+> +	0b10	WT
+> +	0b11	WBnWA
+> +EndEnum
+> +Enum	9:8	IRGN0
+> +	0b00	NC
+> +	0b01	WBWA
+> +	0b10	WT
+> +	0b11	WBnWA
+> +EndEnum
+> +Field	7:6	SL0
+> +Field	5:0	T0SZ
+> +EndSysreg
+> +
+>  Sysreg	GCSCR_EL2	3	4	2	5	0
+>  Fields	GCSCR_ELx
+>  EndSysreg
+> -- 
+> 2.47.3
+> 
