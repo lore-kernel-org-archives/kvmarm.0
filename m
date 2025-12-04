@@ -1,127 +1,93 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954242E7637;
-	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E5B2FD667
+	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 14:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764849967; cv=none; b=ast7rJtnDO1+UpoJ7s5sTMe80hZ+HB/Rid700Hr9xBQe21U/Azj93t8e61U8q97q9MYn6z2NK5TWB/AT9Ts8M3sZtgBq5ogq70yYWJJejS/ypR2zm1WEKct+GGStv+nW99DyXz4vhT9F1Or977IR0a6OrmWZJJg1SvKW1TjoyYU=
+	t=1764858228; cv=none; b=a+43AheD+ujgdRabeva9dRmzK9AUZZg3PTFBnu348AUxbfAY0j+N09IRkNClDXjjHEUNsVfUwmiov7vVOOWqbBrP2ydf42ALCy2qSMGj+ilonxpbeTDPzlVpDXXKjHWDs1sHWOkbwM6804Ged/Dr8Zwlf2EzLASp56AD8eehEcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764849967; c=relaxed/simple;
-	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EM3W9vUgGtACSRT6HITToS3PLCfdNu6FY460+eHJ8ndPnvT0v3sErQ5Y/VyhfVwbeAyp1WKvouOoS9RQytg8DJ9pyn1sN73IedVS4Usf2q1JYYxl2Rh5Qj9RX3mxY5N+ezP5jdGYkcPHJBhpaCu+YBFBHcaiixAXa/g9udfvdtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTw9PFvu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTw9PFvu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26991C4CEFB;
-	Thu,  4 Dec 2025 12:06:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764849967;
-	bh=KAwt9YmF0MdTkjuXPCwrEtTOnMnIeg8UKwNlBdD09n8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cTw9PFvuwgMzOOX7mPdw/vBRFALpKrgH9twL2OEnXhVu4Xn8XzaBM2RUad5E7kr1f
-	 dtaDqRucDcpvV98fiYSrOgjge8Y2BiTV50+xk8KkrvmOao4NTmg0tA2UmbyZ2t4UY7
-	 WKwzefQgC0RnZnxlg6yQpIUhitxJo38eT2VyO5b23nX1AjDrXUBEiH99h7yrU+NUY8
-	 bNyg6KjVNlm+p7wGhFz5W28xBkZ7h6sVOfnaKyYWJZc8wzomUx7f+nWav7X2cKl5fV
-	 6zy1KdXB7FtadE4oWQv+QB+0fUqD4bjD0PFch1bfEhxxNRiRxPn0+Z3SwdbpD2jIwT
-	 wpGWbsshwbgHg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vR861-0000000ARGn-0147;
-	Thu, 04 Dec 2025 12:06:05 +0000
-Date: Thu, 04 Dec 2025 12:06:04 +0000
-Message-ID: <86a4zypi37.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose
- <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v3 8/9] KVM: arm64: pkvm: Report optional ID register traps with a 0x18 syndrome
-In-Reply-To: <7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
-References: <20251204094806.3846619-1-maz@kernel.org>
-	<20251204094806.3846619-9-maz@kernel.org>
-	<7f853a85-f1da-4e6f-ab3f-63507731f8ee@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1764858228; c=relaxed/simple;
+	bh=m5GLaNwrwFBOJDR8QSiMFVr/SOD8N0Ngf95FjAD/KIc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UAGp9sqlEueuTwz638XklStvH3eXGQ7Zz5Ing6g0hb8hFiOMOAdEeTE3wfplkE3xBL8dF3OrAPg+YG46m/Oa88y3riVPhJDvlo7fOoLRG5ukJ8Wc7D6IOMkIZrNNJlAjp9EbEM9iSRmsZyLBFecvbzXh0qCOQgfRuJpt2UY+rsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43543339;
+	Thu,  4 Dec 2025 06:23:38 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27E663F73B;
+	Thu,  4 Dec 2025 06:23:44 -0800 (PST)
+From: Joey Gouly <joey.gouly@arm.com>
+To: kvm@vger.kernel.org
+Cc: alexandru.elisei@arm.com,
+	eric.auger@redhat.com,
+	joey.gouly@arm.com,
+	maz@kernel.org,
+	andrew.jones@linux.dev,
+	kvmarm@lists.linux.dev,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [kvm-unit-tests PATCH v4 00/11] arm64: EL2 support
+Date: Thu,  4 Dec 2025 14:23:27 +0000
+Message-Id: <20251204142338.132483-1-joey.gouly@arm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 04 Dec 2025 10:51:19 +0000,
-Ben Horgan <ben.horgan@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 12/4/25 09:48, Marc Zyngier wrote:
-> > With FEAT_IDST, unimplemented system registers in the feature ID space
-> > must be reported using EC=0x18 at the closest handling EL, rather than
-> > with an UNDEF.
-> > 
-> > Most of these system registers are always implemented thanks to their
-> > dependency on FEAT_AA64, except for a set of (currently) three registers:
-> > GMID_EL1 (depending on MTE2), CCSIDR2_EL1 (depending on FEAT_CCIDX),
-> > and SMIDR_EL1 (depending on SME).
-> > 
-> > For these three registers, report their trap as EC=0x18 if they
-> > end-up trapping into KVM and that FEAT_IDST is implemented in the guest.
-> > Otherwise, just make them UNDEF.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > index 876b36d3d4788..efc36645f4b5a 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> > @@ -347,6 +347,18 @@ static bool pvm_gic_read_sre(struct kvm_vcpu *vcpu,
-> >  	return true;
-> >  }
-> >  
-> > +static bool pvm_idst_access(struct kvm_vcpu *vcpu,
-> > +			    struct sys_reg_params *p,
-> > +			    const struct sys_reg_desc *r)
-> > +{
-> > +	if (kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, IDS, NI))
-> > +		inject_undef64(vcpu);
-> > +	else
-> > +		inject_sync64(vcpu, kvm_vcpu_get_esr(vcpu));
-> > +
-> > +	return false;
-> > +}
-> > +
-> 
-> Just wondering, why is the pkvm version register specific? You changed
-> the non-pkvm from register specific to generic.
+Hi all,
 
-Because pKVM relies on a full enumeration of the registers as a design
-principle, and refrains from having wide-casting nets as a catch-all.
+This series is for adding support to running the kvm-unit-tests at EL2.
 
-That's to ensure that there is a "surprise trap" always results in an
-UNDEF. Different model from the rest of KVM.
+Changes since v3[1]:
+	- Added rb/acks, thanks!
+	- Fixed checkpatch.pl issues
+	- Changed EL2=1 env var to EL2=y or EL2=Y
+	- Couldn't make the change as suggested in [2] since those tests are
+	  also run at EL0, where CurrentEL is UNDEFINED. So I have left the
+	  #ifdef.
+	- Fixed SCTLR_ELx initialisation on secondary cores.
 
 Thanks,
+Joey
 
-	M.
+[1] https://lore.kernel.org/kvmarm/20250925141958.468311-1-joey.gouly@arm.com/
+[2] https://lore.kernel.org/kvmarm/20251202122115.GA3921791@e124191.cambridge.arm.com/
+
+Alexandru Elisei (2):
+  arm64: micro-bench: use smc when at EL2
+  arm64: selftest: update test for running at EL2
+
+Joey Gouly (9):
+  arm64: set SCTLR_EL1 to a known value for secondary cores
+  arm64: drop to EL1 if booted at EL2
+  arm64: efi: initialise SCTLR_ELx fully
+  arm64: efi: initialise the EL
+  arm64: timer: use hypervisor timers when at EL2
+  arm64: micro-bench: fix timer IRQ
+  arm64: pmu: count EL2 cycles
+  arm64: run at EL2 if supported
+  arm64: add EL2 environment variable
+
+ arm/cstart64.S             | 66 ++++++++++++++++++++++++++++++++++++--
+ arm/efi/crt0-efi-aarch64.S |  5 +++
+ arm/micro-bench.c          | 26 +++++++++++++--
+ arm/pmu.c                  | 13 +++++---
+ arm/run                    |  7 ++++
+ arm/selftest.c             | 18 ++++++++---
+ arm/timer.c                | 12 +++++--
+ lib/acpi.h                 |  2 ++
+ lib/arm/asm/setup.h        |  8 +++++
+ lib/arm/asm/timer.h        | 11 +++++++
+ lib/arm/setup.c            |  4 +++
+ lib/arm/timer.c            | 19 +++++++++--
+ lib/arm64/asm/sysreg.h     | 19 +++++++++++
+ lib/arm64/processor.c      | 14 ++++++++
+ 14 files changed, 204 insertions(+), 20 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.25.1
+
