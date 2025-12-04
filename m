@@ -1,183 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38A135FF66;
-	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778F910FD
+	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 00:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764780214; cv=none; b=m7VCBCbf0IxNZUeOsak7W1oWXIobxpZkwkx2RLpe689dOqPpilLaG2qu9CiE4Kr/ED+z+e8SnjIKxVoff3C/Y8vw2IJ5knxAbCam3j6zI5+rbLj3asoOBQF8bdx8CVRCSBXSq0QubBRjUCTrS5BiQdeTyBMxfbq8O1yseeHHT98=
+	t=1764806719; cv=none; b=lNQyCi+KSUWoNpDlsnEsuOgqJponQHQ9trVMtjQF0HBRT7ii+AaoB7bOM78foMMngXSEo0qZjtkWx6sUtSkH9blLx57hZzJGSpGwItgufRN+PxKwnUjPO3TbQ7Z/rkv/G7hvryU1hc6Wa1hP1p8BeDGVrl8Q5R3aI8ESkufT9S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764780214; c=relaxed/simple;
-	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+tiaLudl1lwYLLeqEEivueA2L55gE3p688ZKED0dNWEI8F6F+qXDJ2b+Wz+ZAVlMEdDwxifh7idGazcOvaEYiwwZIOEuZHauenXIRbonb1IniZqmeigkuSGPHX190xiJnY+QYFaYABXIaxVuwcD0Omn7YOA8vDUJs4MW9FsFZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CA29AkXS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1764806719; c=relaxed/simple;
+	bh=x5mBtF42C9vuyDFwHE+YA3ZE08rnQOGA8Etyfdi9gMY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=My2ZTQra5mO+XJJX3Je1nJPKjYs8Y4NeOwr7bCLGjGIVC7u6uO5b4xAgRwqbKqg9lNqT99TgV/yZm3Sonk7Kv654SdVJ2Nv4SUTqXS+cpOSrJbY45bU47q/CzBCXvdEaP/fYAg3npb8H6UBI1wvYvamrJNM/yZyCI2z3ooBIYhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KlEfllmq; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CA29AkXS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 230B0C4CEF5;
-	Wed,  3 Dec 2025 16:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764780214;
-	bh=iyflUZchaw873FTzogwUNqRT8cclH8+Swqz8EPmoL5w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CA29AkXSlTUEp4TCKC8TjYGZYOKPd7DJierroBKco/xQli3ma3HoMF9l3c6PHRdya
-	 jn0FuRwOgU8vlGAA18fWSxmbb2JYp0V60Fo9NO6UZRgRDpPNnObaaSjXFUenWstB4d
-	 RX9+AEOh0SUG7hMiiXnCgLzluYqH8tFVr06KHaiSlQyA4UTxM6Ft85SKI7nY+rPW63
-	 wxzUaIGBLxg62Z3EMxd/SKSHs5niGm/vb/7o/fSh1hGblzPKepAHg1nijjeYC6oWbR
-	 vyi7w+lsxnnkZuvJ6eWUpI8PNTOuU+Y7kdL3QaREIITPtwOpY29PZE59u62LJOVeAv
-	 ooqXhHdtZoEXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vQpwx-0000000AEDg-38lh;
-	Wed, 03 Dec 2025 16:43:31 +0000
-Date: Wed, 03 Dec 2025 16:43:31 +0000
-Message-ID: <86fr9rplcc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
-In-Reply-To: <20251203161715.GA4187196@e124191.cambridge.arm.com>
-References: <20251129144525.2609207-1-maz@kernel.org>
-	<20251129144525.2609207-5-maz@kernel.org>
-	<20251203161715.GA4187196@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KlEfllmq"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5942a631c2dso492627e87.2
+        for <kvmarm@lists.linux.dev>; Wed, 03 Dec 2025 16:05:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764806716; x=1765411516; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zd9WoFQTvNfYXS0FutJkOHLRDDNZG45Z8fkn2eFEtfA=;
+        b=KlEfllmqT5owU3xyfA1GuiqwtMbA3G/EbT56dhSPyq4SGRGgfOMC9ARQ40bRks0BG+
+         X0hLK3X9QNS44OxylcxUfugZ7lYWmW6C2+GEtRe40+IxNP76U8AHL+Sx95fwYAAj3t1P
+         8rzFRD3aPgTCx2G2r/EYTuJeIQVMToNdEe2sXgkqIFd1y/vnJ41xTcZOyV9uvIYXUsCd
+         qgxk5CnqEaSxdZEGmB2wuQ9qWwmykokhRzWPpRcVazqBpQ/kuEt4goiSOdk7gOxxjNsE
+         b3It05pp7fRulTslusU2wO8AqzocYdjh1aThQ6tX2/+0QPaVLv5S1mTht9luHkJyuMsj
+         kiDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764806716; x=1765411516;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Zd9WoFQTvNfYXS0FutJkOHLRDDNZG45Z8fkn2eFEtfA=;
+        b=jlFB19drLxe8oX5ry63GJ3K0D0pMLmsGvHtVQwuH4rRgWXIhcECUpw4e4ZP0W6URZ4
+         762BkWoQUK24oyvAimMjkLG/MEc2kShfQoj2srY+RmHpBISlgqCeLfGb6or7WDqbRC68
+         Pdsp5OFQh1RcDax76Gr6I5pPb3U/HiWzKaJsEZbgfMcnIZD+HU+dh5rlmJzskC0atb/V
+         og7MVovnBs/LvmFZP4RRlLzAjVjJnDzFZsLwSEDBxC8LCVLQd61u9hF2kOCp8B5Ju0Xe
+         WSl+CuVYJ34MhL53RnDa3gItE/j+E5unw7WRyn7e/0rqgQuq4KrNbyJMx15utW4PCo8V
+         ABLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW02cfET/+t6Sh9bTZnjvxOT/6emmqObgwdBOSeOyguYxe23J3sQrfcFRFPxVXsOYjpGEanJNU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yynz0cQNXf/LQck24nTtAmH64ure7ikQdrCTX+zOwnftzpHdtnb
+	yAKdrw9A/LL1RRW9gyr0/tc8+1DglAwvEAqpU5v50C/T/xRW1fzDrtyo4Ldbm6mfwmLyahemrR0
+	Q0Woa8QIsyyyDrH7EBfSATse1t41vjmZmQwoVuWvT
+X-Gm-Gg: ASbGncuy6K+XsN1d/rf8XEicOm5vTE9tWwzktbnFS7RtPlfHrOO5AOLw77a1yXPiUpK
+	kEreSQAFmj5CZAyOqKoU/a6pKdyYTceQ7SX/I3s8FBRTN+orZ6KJoADA27CrmUPRU3HW7cSvIGp
+	dH8RkR57IH1dInOHJBtMTVOy/losP0UfaFlzC0yPeTTq5Exu35b/97RsxyrptE1Zc1IQkAsUjCZ
+	bThzBsL3DppuqAcpJGahHnJDTumZpblF6wCM9hcRSa8WGXnUSK37RimEln46YyVvY7m7qbB
+X-Google-Smtp-Source: AGHT+IF4CyNFKv3NT4Ky0XeOn1TQzX5YXD6kxpQuevTbiLqvfi0Z1H0r6mqBjI/VHgPS5RUsjZgaT368W08YU9UmgDU=
+X-Received: by 2002:a05:6512:12c4:b0:578:ed03:7b5f with SMTP id
+ 2adb3069b0e04-597d3f7b821mr1673675e87.26.1764806715139; Wed, 03 Dec 2025
+ 16:05:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20250501183304.2433192-1-dmatlack@google.com> <aBPhs39MJz-rt_Ob@google.com>
+ <CALzav=eqv0Fh9pzaBgjZ-fehwFbD4YscoLQz0=o0TKQT_zLTwQ@mail.gmail.com> <aRZ9SQ_G2lsmXtur@google.com>
+In-Reply-To: <aRZ9SQ_G2lsmXtur@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Wed, 3 Dec 2025 16:04:47 -0800
+X-Gm-Features: AWmQ_blvUOA-vJuP7PArgXkGtxVwcyZaljS6okCvAjRlV-VnKxXpsCQN-Lg9GyA
+Message-ID: <CALzav=fN4FpZsfzwbdLeNSj4nx4OpRkwHvKiZNVgP8S-zsUvJA@mail.gmail.com>
+Subject: Re: [PATCH 00/10] KVM: selftests: Convert to kernel-style types
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, Eric Auger <eric.auger@redhat.com>, 
+	James Houghton <jthoughton@google.com>, Colin Ian King <colin.i.king@gmail.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 03 Dec 2025 16:17:15 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi!
-> 
-> On Sat, Nov 29, 2025 at 02:45:25PM +0000, Marc Zyngier wrote:
-> > Describe all the VTCR_EL2 fields and their respective configurations,
-> > making sure that we correctly ignore the bits that are not defined
-> > for a given guest configuration.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 69 +++++++++++++++++++++++++++++++++++++++++
-> >  arch/arm64/kvm/nested.c |  3 +-
-> >  2 files changed, 70 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index a02c28d6a61c9..c36e133c51912 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -141,6 +141,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_AA64EL1		ID_AA64PFR0_EL1, EL1, IMP
-> >  #define FEAT_AA64EL2		ID_AA64PFR0_EL1, EL2, IMP
-> >  #define FEAT_AA64EL3		ID_AA64PFR0_EL1, EL3, IMP
-> > +#define FEAT_SEL2		ID_AA64PFR0_EL1, SEL2, IMP
-> >  #define FEAT_AIE		ID_AA64MMFR3_EL1, AIE, IMP
-> >  #define FEAT_S2POE		ID_AA64MMFR3_EL1, S2POE, IMP
-> >  #define FEAT_S1POE		ID_AA64MMFR3_EL1, S1POE, IMP
-> > @@ -202,6 +203,8 @@ struct reg_feat_map_desc {
-> >  #define FEAT_ASID2		ID_AA64MMFR4_EL1, ASID2, IMP
-> >  #define FEAT_MEC		ID_AA64MMFR3_EL1, MEC, IMP
-> >  #define FEAT_HAFT		ID_AA64MMFR1_EL1, HAFDBS, HAFT
-> > +#define FEAT_HDBSS		ID_AA64MMFR1_EL1, HAFDBS, HDBSS
-> > +#define FEAT_HPDS2		ID_AA64MMFR1_EL1, HPDS, HPDS2
-> >  #define FEAT_BTI		ID_AA64PFR1_EL1, BT, IMP
-> >  #define FEAT_ExS		ID_AA64MMFR0_EL1, EXS, IMP
-> >  #define FEAT_IESB		ID_AA64MMFR2_EL1, IESB, IMP
-> > @@ -219,6 +222,7 @@ struct reg_feat_map_desc {
-> >  #define FEAT_FGT2		ID_AA64MMFR0_EL1, FGT, FGT2
-> >  #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
-> >  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
-> > +#define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
-> >  
-> >  static bool not_feat_aa64el3(struct kvm *kvm)
-> >  {
-> > @@ -362,6 +366,28 @@ static bool feat_pmuv3p9(struct kvm *kvm)
-> >  	return check_pmu_revision(kvm, V3P9);
-> >  }
-> >  
-> > +#define has_feat_s2tgran(k, s)						\
-> > +  ((kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, TGRAN##s) && \
-> > +    !kvm_has_feat_enum(kvm, ID_AA64MMFR0_EL1, TGRAN##s, NI))	     ||	\
-> > +   kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN##s##_2, IMP))
-> > +
-> > +static bool feat_lpa2(struct kvm *kvm)
-> > +{
-> > +	return ((kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT)    ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT)   ||
-> > +		 !kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16, IMP))	&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN4_2, 52_BIT)  ||
-> > +		 !has_feat_s2tgran(kvm, 4))				&&
-> > +		(kvm_has_feat(kvm, ID_AA64MMFR0_EL1, TGRAN16_2, 52_BIT) ||
-> > +		 !has_feat_s2tgran(kvm, 16)));
-> > +}
-> > +
-> > +static bool feat_vmid16(struct kvm *kvm)
-> > +{
-> > +	return kvm_has_feat_enum(kvm, ID_AA64MMFR1_EL1, VMIDBits, 16);
-> > +}
-> > +
-> >  static bool compute_hcr_rw(struct kvm *kvm, u64 *bits)
-> >  {
-> >  	/* This is purely academic: AArch32 and NV are mutually exclusive */
-> > @@ -1168,6 +1194,44 @@ static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
-> >  static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
-> >  			      mdcr_el2_feat_map, FEAT_AA64EL2);
-> >  
-> > +static const struct reg_bits_to_feat_map vtcr_el2_feat_map[] = {
-> > +	NEEDS_FEAT(VTCR_EL2_HDBSS, FEAT_HDBSS),
-> > +	NEEDS_FEAT(VTCR_EL2_HAFT, FEAT_HAFT),
-> > +	NEEDS_FEAT(VTCR_EL2_TL0		|
-> > +		   VTCR_EL2_TL1		|
-> > +		   VTCR_EL2_AssuredOnly	|
-> > +		   VTCR_EL2_GCSH,
-> > +		   FEAT_THE),
-> 
-> The text for VTCR_EL2.AssuredOnly says:
-> 
-> 	This field is RES0 when VTCR_EL2.D128 is 1.
-> 
-> > +	NEEDS_FEAT(VTCR_EL2_D128, FEAT_D128),
-> > +	NEEDS_FEAT(VTCR_EL2_S2POE, FEAT_S2POE),
-> > +	NEEDS_FEAT(VTCR_EL2_S2PIE, FEAT_S2PIE),
-> 
-> The text for VTCR_EL2.S2PIE says:
-> 
-> 	This field is RES1 when VTCR_EL2.D128 is set.
-> 
-> 
-> Are these cases that need to be handled here somehow?
+On Thu, Nov 13, 2025 at 4:52=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, Oct 17, 2025, David Matlack wrote:
+> > On Thu, May 1, 2025 at 2:03=E2=80=AFPM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> > > On Thu, May 01, 2025, David Matlack wrote:
+> > > > This series renames types across all KVM selftests to more align wi=
+th
+> > > > types used in the kernel:
+> > > >
+> > > >   vm_vaddr_t -> gva_t
+> > > >   vm_paddr_t -> gpa_t
+> > >
+> > > 10000% on these.
+> > >
+> > > >   uint64_t -> u64
+> > > >   uint32_t -> u32
+> > > >   uint16_t -> u16
+> > > >   uint8_t  -> u8
+> > > >
+> > > >   int64_t -> s64
+> > > >   int32_t -> s32
+> > > >   int16_t -> s16
+> > > >   int8_t  -> s8
+> > >
+> > > I'm definitely in favor of these renames.  I thought I was the only o=
+ne that
+> > > tripped over the uintNN_t stuff; at this point, I've probably lost ho=
+urs of my
+> > > life trying to type those things out.
+> >
+> > What should the next step be here? I'd be happy to spin a new version
+> > whenever on whatever base commit you prefer.
+>
+> Sorry for the slow reply, I've had this window sitting open for something=
+ like
+> two weeks.
 
-These are not static configurations. They are dynamic behaviours
-depending on other control bits.
+No worries, thanks for taking a look :)
 
-D128 code, if it ever exists, will have to *interpret* these bits as
-RES0 (resp. RES1) when evaluating the page tables.
+>
+> My slowness is largely because I'm not sure how to land/approach this.  I=
+'m 100%
+> in favor of the renames, it's the timing and coordination I'm unsure of.
+>
+> In hindsight, it probably would have best to squeeze it into 6.18, so at =
+least
+> the most recent LTS wouldn't generate conflicts all over the place.  The =
+next
+> best option would probably be to spin a new version, bribe Paolo to apply=
+ it at
+> the end of the next merge window, and tag the whole thing for stable@ (ma=
+ybe
+> limited to 6.18+?) to minimize downstream pain.
 
-If you want a similar example in existing code, look at the way we
-handle TCR_EL1.HPDn in the S1 PTW. They are treated as RES1 if
-TCR2_EL1.PIE is set, as per R_JHSVW.
+With LPC coming up I won't have cycles to post a new version before
+the 6.19 merge window closes.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I'm tempted to say let's just wait for the next LTS release and merge
+it in then. This is low priorit, so I'm fine with waiting.
