@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F361F1932
-	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 14:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8E5336ED5
+	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 14:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764858246; cv=none; b=qXFQF9qvoAw/aFbk8LXHonib93vrmXnwZ3wuMl4mU5gXcnNYTWQyPuRmZVkPkMnXRTGLWRt3BeUcVoQASWdJqGTJazTU1rgUoc4JrUnVhL4dXT5/sZvNp17zwECv7icrbg8v7mSivO0YWuFcDkIrBJeQuURUg00D2i47gC3yOxo=
+	t=1764858247; cv=none; b=IoUQ5Fvt8Bb1eMlGtgy6G+pTz9vQfkwxeaHtIc5oidhM9GVUzhC2Afz597k0U4+Cb9oiCLgg0/0NF5r41z42QEMcjhEiHkfv/5cgoCdFAVdJ1fcTn6qWnqt2RnQ5AtU0bMf0ykmpUNkR8uaH1larPOJgWsd0Qnf+qFYignsFiq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764858246; c=relaxed/simple;
-	bh=s0M/sSyTqAkSyLV5sUqkTDP/QBn2D28VCgAkL5NG6Lg=;
+	s=arc-20240116; t=1764858247; c=relaxed/simple;
+	bh=TfJbhWoRlrKrWJhom61uk26xhvmwVHx5fZFC3v4Uhfo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oXhBdDV0YjB++E93b6G1HBWDriENEQ1d4BUMfQ1mR9W9bhmyh1Ax3OVo9FbHKKh4FSUFflnEPYJFlN7ZcDdjaHquwnpaJSeZoDHbdIOSTzhJ/r12+MTqHDx+PeUFtbxwOnkZS5ERBYgf/wEDPO1JX0KZR2MkQwCwR7/rjtfSX/I=
+	 MIME-Version; b=CPMxUzx4jofGpdXzWXx5fTHgGYCUEvdUwBh0Zzs2dqsKFN0jjJKmViQjFqsoBC6OI/GUIDA8qfHCGWAizTAjEvULfzkgCGIBMVQ9GWenmoAxKLhCHjHm5+qkXQl5wuWMGiNaQKczkciP1ifuPCHbCk4Ms3x7jXz469n/6pgplqY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5793E1764;
-	Thu,  4 Dec 2025 06:23:56 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22244339;
+	Thu,  4 Dec 2025 06:23:58 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4058C3F73B;
-	Thu,  4 Dec 2025 06:24:02 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A05D3F73B;
+	Thu,  4 Dec 2025 06:24:03 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com,
@@ -27,9 +27,9 @@ Cc: alexandru.elisei@arm.com,
 	andrew.jones@linux.dev,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v4 10/11] arm64: run at EL2 if supported
-Date: Thu,  4 Dec 2025 14:23:37 +0000
-Message-Id: <20251204142338.132483-11-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v4 11/11] arm64: add EL2 environment variable
+Date: Thu,  4 Dec 2025 14:23:38 +0000
+Message-Id: <20251204142338.132483-12-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251204142338.132483-1-joey.gouly@arm.com>
 References: <20251204142338.132483-1-joey.gouly@arm.com>
@@ -41,93 +41,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If VHE is supported, continue booting at EL2, otherwise continue booting at
-EL1.
+This variable when set to y/Y will cause QEMU/kvmtool to start at EL2.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Acked-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/cstart64.S         | 21 +++++++++++++++++----
- lib/arm64/asm/sysreg.h |  5 +++++
- 2 files changed, 22 insertions(+), 4 deletions(-)
+ arm/run | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 2b93f234..49cf8ed6 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -15,10 +15,14 @@
- #include <asm/thread_info.h>
- #include <asm/sysreg.h>
+diff --git a/arm/run b/arm/run
+index 858333fc..dd641772 100755
+--- a/arm/run
++++ b/arm/run
+@@ -59,6 +59,10 @@ function arch_run_qemu()
+ 		M+=",highmem=off"
+ 	fi
  
-+/*
-+ * Initialise the EL used for running the tests.
-+ * If started at EL2 and VHE is supported, EL2 is used, otherwise EL1 is used.
-+ */
- .macro init_el, tmp
- 	mrs	\tmp, CurrentEL
- 	cmp	\tmp, CurrentEL_EL2
--	b.ne	1f
-+	b.ne	2f
- 	/* EL2 setup */
- 	mrs	\tmp, mpidr_el1
- 	msr	vmpidr_el2, \tmp
-@@ -41,17 +45,26 @@
- 	msr_s	SYS_HFGWTR2_EL2, \tmp
- 	msr_s	SYS_HFGITR2_EL2, \tmp
- .Lskip_fgt_\@:
-+	/* check VHE is supported */
-+	mrs	\tmp, ID_AA64MMFR1_EL1
-+	ubfx	\tmp, \tmp, ID_AA64MMFR1_EL1_VH_SHIFT, #4
-+	cbz	\tmp, 1f
-+	ldr	\tmp, =(INIT_HCR_EL2)
-+	msr	hcr_el2, \tmp
-+	isb
-+	b	2f
-+1:
- 	mov	\tmp, #0
- 	msr	cptr_el2, \tmp
- 	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
- 	msr	hcr_el2, \tmp
- 	mov	\tmp, PSR_MODE_EL1t
- 	msr	spsr_el2, \tmp
--	adrp	\tmp, 1f
--	add	\tmp, \tmp, :lo12:1f
-+	adrp	\tmp, 2f
-+	add	\tmp, \tmp, :lo12:2f
- 	msr	elr_el2, \tmp
- 	eret
--1:
-+2:
- .endm
- 
- 
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index ed776716..f2d05018 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -80,6 +80,8 @@ asm(
- #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
- #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
- 
-+#define ID_AA64MMFR1_EL1_VH_SHIFT	8
++	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
++		M+=",virtualization=on"
++	fi
 +
- #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
- #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-@@ -116,9 +118,12 @@ asm(
- #define SCTLR_EL1_TCF0_SHIFT	38
- #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
+ 	if ! $qemu $M -device '?' | grep -q virtconsole; then
+ 		echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
+ 		exit 2
+@@ -116,6 +120,9 @@ function arch_run_kvmtool()
+ 	fi
  
-+#define HCR_EL2_TGE		_BITULL(27)
- #define HCR_EL2_RW		_BITULL(31)
-+#define HCR_EL2_E2H		_BITULL(34)
- 
- #define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
-+#define INIT_HCR_EL2		(HCR_EL2_TGE | HCR_EL2_E2H | HCR_EL2_RW)
- 
- #define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
- #define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
+ 	command="$(timeout_cmd) $kvmtool run"
++	if [ "$EL2" = "Y" ] || [ "$EL2" = "y" ]; then
++		command+=" --nested"
++	fi
+ 	if [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ]; then
+ 		run_test_status $command --kernel "$@" --aarch32
+ 	else
 -- 
 2.25.1
 
