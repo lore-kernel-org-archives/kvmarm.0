@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E5B2FD667
-	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 14:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFBF2231A32
+	for <kvmarm@lists.linux.dev>; Thu,  4 Dec 2025 14:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764858228; cv=none; b=a+43AheD+ujgdRabeva9dRmzK9AUZZg3PTFBnu348AUxbfAY0j+N09IRkNClDXjjHEUNsVfUwmiov7vVOOWqbBrP2ydf42ALCy2qSMGj+ilonxpbeTDPzlVpDXXKjHWDs1sHWOkbwM6804Ged/Dr8Zwlf2EzLASp56AD8eehEcA=
+	t=1764858230; cv=none; b=npyUPrQs6jzScRKYKqPTZJRKST/17zDR6xBh5Yx0xPceK2QVMUg132xl9XcqcK5HQdVHKJuas35UACpof4u8PFPWSInUh3f/r0P1g/vlU6jFisn/9IzKyt5FypEyuh2jvqz3KuDoqWaDrCU1KfJzRQi+PaONlKMMN7ik9v2CpUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764858228; c=relaxed/simple;
-	bh=m5GLaNwrwFBOJDR8QSiMFVr/SOD8N0Ngf95FjAD/KIc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UAGp9sqlEueuTwz638XklStvH3eXGQ7Zz5Ing6g0hb8hFiOMOAdEeTE3wfplkE3xBL8dF3OrAPg+YG46m/Oa88y3riVPhJDvlo7fOoLRG5ukJ8Wc7D6IOMkIZrNNJlAjp9EbEM9iSRmsZyLBFecvbzXh0qCOQgfRuJpt2UY+rsA=
+	s=arc-20240116; t=1764858230; c=relaxed/simple;
+	bh=AQ05VoVrya+r4oDU0jIKRSlGB+3aPZGgmGxytlximaw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=dXeusaNbGpQ9hp2rYAbbUURXI57Ct9y/JfBRWavyIojTdffNUFoBPBuB0MZJxiHN1cyuczCc2A1LwbGLqZWe5LOKae6Wl7hme3jiWuRb07UWsDD+BaSaU/dZO7xBrnCzrkVLCPpLnhCVS5Uf7FMNRLNpik81Wcr9leoLJJ6FVlk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43543339;
-	Thu,  4 Dec 2025 06:23:38 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 078501575;
+	Thu,  4 Dec 2025 06:23:40 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27E663F73B;
-	Thu,  4 Dec 2025 06:23:44 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E53863F73B;
+	Thu,  4 Dec 2025 06:23:45 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: kvm@vger.kernel.org
 Cc: alexandru.elisei@arm.com,
@@ -26,10 +27,12 @@ Cc: alexandru.elisei@arm.com,
 	andrew.jones@linux.dev,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v4 00/11] arm64: EL2 support
-Date: Thu,  4 Dec 2025 14:23:27 +0000
-Message-Id: <20251204142338.132483-1-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v4 01/11] arm64: set SCTLR_EL1 to a known value for secondary cores
+Date: Thu,  4 Dec 2025 14:23:28 +0000
+Message-Id: <20251204142338.132483-2-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20251204142338.132483-1-joey.gouly@arm.com>
+References: <20251204142338.132483-1-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,56 +41,30 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi all,
+This ensures that primary and secondary cores will have the same values for
+SCTLR_EL1.
 
-This series is for adding support to running the kvm-unit-tests at EL2.
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+---
+ arm/cstart64.S | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Changes since v3[1]:
-	- Added rb/acks, thanks!
-	- Fixed checkpatch.pl issues
-	- Changed EL2=1 env var to EL2=y or EL2=Y
-	- Couldn't make the change as suggested in [2] since those tests are
-	  also run at EL0, where CurrentEL is UNDEFINED. So I have left the
-	  #ifdef.
-	- Fixed SCTLR_ELx initialisation on secondary cores.
-
-Thanks,
-Joey
-
-[1] https://lore.kernel.org/kvmarm/20250925141958.468311-1-joey.gouly@arm.com/
-[2] https://lore.kernel.org/kvmarm/20251202122115.GA3921791@e124191.cambridge.arm.com/
-
-Alexandru Elisei (2):
-  arm64: micro-bench: use smc when at EL2
-  arm64: selftest: update test for running at EL2
-
-Joey Gouly (9):
-  arm64: set SCTLR_EL1 to a known value for secondary cores
-  arm64: drop to EL1 if booted at EL2
-  arm64: efi: initialise SCTLR_ELx fully
-  arm64: efi: initialise the EL
-  arm64: timer: use hypervisor timers when at EL2
-  arm64: micro-bench: fix timer IRQ
-  arm64: pmu: count EL2 cycles
-  arm64: run at EL2 if supported
-  arm64: add EL2 environment variable
-
- arm/cstart64.S             | 66 ++++++++++++++++++++++++++++++++++++--
- arm/efi/crt0-efi-aarch64.S |  5 +++
- arm/micro-bench.c          | 26 +++++++++++++--
- arm/pmu.c                  | 13 +++++---
- arm/run                    |  7 ++++
- arm/selftest.c             | 18 ++++++++---
- arm/timer.c                | 12 +++++--
- lib/acpi.h                 |  2 ++
- lib/arm/asm/setup.h        |  8 +++++
- lib/arm/asm/timer.h        | 11 +++++++
- lib/arm/setup.c            |  4 +++
- lib/arm/timer.c            | 19 +++++++++--
- lib/arm64/asm/sysreg.h     | 19 +++++++++++
- lib/arm64/processor.c      | 14 ++++++++
- 14 files changed, 204 insertions(+), 20 deletions(-)
-
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 014c9c7b..dcdd1516 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -185,6 +185,11 @@ get_mmu_off:
+ 
+ .globl secondary_entry
+ secondary_entry:
++	/* set SCTLR_EL1 to a known value */
++	ldr	x0, =INIT_SCTLR_EL1_MMU_OFF
++	msr	sctlr_el1, x0
++	isb
++
+ 	/* enable FP/ASIMD and SVE */
+ 	mov	x0, #(3 << 20)
+ 	orr	x0, x0, #(3 << 16)
 -- 
 2.25.1
 
