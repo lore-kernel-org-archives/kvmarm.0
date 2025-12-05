@@ -1,55 +1,55 @@
-Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
+Received: from fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.75.33.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681D1342513
-	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 16:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A972313E38
+	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 16:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.75.33.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764953977; cv=none; b=ZtiVDG5vnLuIpspGc0fT3eTGUESLo3XVPa+yODHP03J9awBXV9Czmi7jiT8GtxocSaBGWTNuuITQs3VzA9TUxMXO1tFzG8y0nlVG94Rr2cT4/VzS6DDkq7diO2L6Ht9yP88xTJh3i+PGYUk+cEstykvNvABGipgcJI1DUSvh5zo=
+	t=1764953985; cv=none; b=mNTZSQOlOeZnmgTik24yR8RJYVqgEF42vOis3zJ5vYhnymFL7jq6a5LbJ2JEaUx0rnRdu8u8pdZETpLBYsm5xVnmXjI4L0GsIPrnOFJs6TEwI1qPn26nPdJibrZEoVVMjIBnV9ckwC4Vo7Kl6i1FpwJyXW4cPv/o/iIqlQD9ATQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764953977; c=relaxed/simple;
-	bh=uscAv0ZOrJ7JzQOd3sbmaT4mGOxC0tA+wUUmeuMqHpg=;
+	s=arc-20240116; t=1764953985; c=relaxed/simple;
+	bh=dn3h+9x0Guls9b+4MTJSqmKY7y8139bpAHZnXTB1xhQ=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ja63Zpdo7Wuv69v3WYEWFgBFl6IvAXtLVAEeobbUqSHXw8pbvzteLaTJimqoyV5QRYPGlodDyj/wjDXNOXmcFs17/4mPwObiUah55pzCrYST8dRvuyoGvkyUFqxtSogJgle2cD3t+6BLG8Qz9HpBFpbfzeDkLIihL0vVfaGhx3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=lUUHB7P7; arc=none smtp.client-ip=52.28.197.132
+	 Content-Type:MIME-Version; b=gpWqm6W1/Q7T0eQxCAJ2fP+ythQWzFNPDdIJwb4hh2xPNiD69Jzt4aG+rjQtMvOWBuGUIrkmCgTShXt4dTPtFAxfOqtX+Av8jJWQeaWGxAnfHVSh4+TBYRMrTpGaIAqNDRY9/kIpkT42TvsAPRovuho0Zy3JbueltpLe2W79s7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ORYuJCCQ; arc=none smtp.client-ip=3.75.33.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="lUUHB7P7"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ORYuJCCQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1764953957; x=1796489957;
+  s=amazoncorp2; t=1764953979; x=1796489979;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=Qx10YQyM1n7Bzq/TmzHM+nwXVd+92kjURQXs15/Kk1I=;
-  b=lUUHB7P7VySG8KlXDL39+TcRFjQNXO3NdFu66Id3BTIomemGws/Z2BBB
-   LXYc+W48AFkk0Yj+722FzRj8IdoaxFww7KDFIl9FhtnFVWoO0eaEeduky
-   5I9EtGYE2dgjhvFjLAAkd2xJ3Y4S1NLBC1NzKrOQwdLv/XPKYaJJ5ksSl
-   T89WrqkgdCEC5lWbXuBNUdHrkw7vtCSE4nyhZTs3Zv/371KZZl54aCcAc
-   ZaMfMdwA55yPXzRr4VbB0XkmMMmlZ1gKAMoyaO25L+kvgxRgRcyLFTWZf
-   SV5dbNQf1rs9+0/75DxAgIef/HQtRf0f3t7aw62n5NfeNjAuI0GDHtiP3
+  bh=DAa+s0ltL2AWBGJLNkppOiWQM65ZNjJ1swchhaZKNTI=;
+  b=ORYuJCCQHDf8Uf6wMPKL93UPz0NY46y9BWC2o4EueM/YWGgsNDE7p4EI
+   nZ29YtjfpkHgR1D4pj9iSmeIOQCKJkOZCAZMZ/zTISvmj6sPW3R0Uraik
+   lFcpjD4kVM40ZqctnkNOUDoZ30yPEpXi4C9zFyjU2Qpm7GkjWXBKccpsx
+   /WEaI3LaqoDRx4olyVVtbowsumLwjtSN2nS7SOdMBylJCzXntzeOMh+hV
+   KtqarhmV9hCrgfa/EJQJIklk4gfMdbijtCl0QnMz+srrH+ZY4a9q3KeVD
+   MsIh/JbmpKKRFzbykEXpIcFsxXgydb+TfFkzoMEtZ9PTkcOw/6G8lLyyM
    w==;
-X-CSE-ConnectionGUID: 6oIRaqr8Rkuu7bomYo5Pgg==
-X-CSE-MsgGUID: Du9SD6hVSkaAOIpNm4V2fg==
+X-CSE-ConnectionGUID: q0GqOJJ7TEuIVrXmD2UySw==
+X-CSE-MsgGUID: W7Hjf9rtRji/ZjNjf2UQHw==
 X-IronPort-AV: E=Sophos;i="6.20,252,1758585600"; 
-   d="scan'208";a="6191211"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 16:58:56 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:29292]
+   d="scan'208";a="6301667"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 16:58:09 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:3739]
  by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.37.108:2525] with esmtp (Farcaster)
- id d6b08ff2-69cd-4ef4-91c7-3c44faa72354; Fri, 5 Dec 2025 16:58:56 +0000 (UTC)
-X-Farcaster-Flow-ID: d6b08ff2-69cd-4ef4-91c7-3c44faa72354
-Received: from EX19D005EUB001.ant.amazon.com (10.252.51.12) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ id 30a38f77-2a8d-47e1-ad78-b78782ea5839; Fri, 5 Dec 2025 16:58:09 +0000 (UTC)
+X-Farcaster-Flow-ID: 30a38f77-2a8d-47e1-ad78-b78782ea5839
+Received: from EX19D005EUB004.ant.amazon.com (10.252.51.126) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Fri, 5 Dec 2025 16:58:56 +0000
+ Fri, 5 Dec 2025 16:58:09 +0000
 Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19D005EUB001.ant.amazon.com (10.252.51.12) with Microsoft SMTP Server
+ EX19D005EUB004.ant.amazon.com (10.252.51.126) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Fri, 5 Dec 2025 16:58:55 +0000
+ Fri, 5 Dec 2025 16:58:08 +0000
 Received: from EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c]) by
  EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c%3]) with mapi id
- 15.02.2562.029; Fri, 5 Dec 2025 16:58:55 +0000
+ 15.02.2562.029; Fri, 5 Dec 2025 16:58:08 +0000
 From: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
 To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
 	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
@@ -104,13 +104,12 @@ CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
  Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
 	"Cali, Marco" <xmarcalx@amazon.co.uk>, "Kalyazin, Nikita"
 	<kalyazin@amazon.co.uk>
-Subject: [PATCH v8 06/13] KVM: x86: define
- kvm_arch_gmem_supports_no_direct_map()
-Thread-Topic: [PATCH v8 06/13] KVM: x86: define
- kvm_arch_gmem_supports_no_direct_map()
-Thread-Index: AQHcZghwpwkQ2L3MZ0qB0yKOOmzCSA==
-Date: Fri, 5 Dec 2025 16:58:55 +0000
-Message-ID: <20251205165743.9341-7-kalyazin@amazon.com>
+Subject: [PATCH v8 02/13] x86/tlb: export flush_tlb_kernel_range to KVM module
+Thread-Topic: [PATCH v8 02/13] x86/tlb: export flush_tlb_kernel_range to KVM
+ module
+Thread-Index: AQHcZghUt46N9MNDx0Sv0bdQIhD0sg==
+Date: Fri, 5 Dec 2025 16:58:08 +0000
+Message-ID: <20251205165743.9341-3-kalyazin@amazon.com>
 References: <20251205165743.9341-1-kalyazin@amazon.com>
 In-Reply-To: <20251205165743.9341-1-kalyazin@amazon.com>
 Accept-Language: en-GB, en-US
@@ -128,42 +127,62 @@ MIME-Version: 1.0
 
 From: Patrick Roy <patrick.roy@linux.dev>=0A=
 =0A=
-x86 supports GUEST_MEMFD_FLAG_NO_DIRECT_MAP whenever direct map=0A=
-modifications are possible (which is always the case).=0A=
+After direct map removal, a TLB flush must be done to ensure that the=0A=
+just-unmapped memory cannot be accessed through stale TLB entries.=0A=
 =0A=
+This export is only needed on x86, as arm64 (the only other architecture=0A=
+supporting guest_memfd currently) does not allow building KVM as a=0A=
+module.=0A=
+=0A=
+Cc: Thomas Gleixner <tglx@linutronix.de>=0A=
 Signed-off-by: Patrick Roy <patrick.roy@linux.dev>=0A=
 Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>=0A=
 ---=0A=
- arch/x86/include/asm/kvm_host.h | 9 +++++++++=0A=
- 1 file changed, 9 insertions(+)=0A=
+ arch/x86/include/asm/tlbflush.h | 3 ++-=0A=
+ arch/x86/mm/tlb.c               | 1 +=0A=
+ 2 files changed, 3 insertions(+), 1 deletion(-)=0A=
 =0A=
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
-t.h=0A=
-index 5a3bfa293e8b..68bd29a52f24 100644=0A=
---- a/arch/x86/include/asm/kvm_host.h=0A=
-+++ b/arch/x86/include/asm/kvm_host.h=0A=
-@@ -28,6 +28,7 @@=0A=
- #include <linux/sched/vhost_task.h>=0A=
- #include <linux/call_once.h>=0A=
- #include <linux/atomic.h>=0A=
-+#include <linux/set_memory.h>=0A=
+diff --git a/arch/x86/include/asm/tlbflush.h b/arch/x86/include/asm/tlbflus=
+h.h=0A=
+index 00daedfefc1b..6f57f7eb621b 100644=0A=
+--- a/arch/x86/include/asm/tlbflush.h=0A=
++++ b/arch/x86/include/asm/tlbflush.h=0A=
+@@ -317,7 +317,6 @@ extern void flush_tlb_all(void);=0A=
+ extern void flush_tlb_mm_range(struct mm_struct *mm, unsigned long start,=
+=0A=
+ 				unsigned long end, unsigned int stride_shift,=0A=
+ 				bool freed_tables);=0A=
+-extern void flush_tlb_kernel_range(unsigned long start, unsigned long end)=
+;=0A=
  =0A=
- #include <asm/apic.h>=0A=
- #include <asm/pvclock-abi.h>=0A=
-@@ -2481,4 +2482,12 @@ static inline bool kvm_arch_has_irq_bypass(void)=0A=
- 	return enable_device_posted_irqs;=0A=
- }=0A=
+ static inline void flush_tlb_page(struct vm_area_struct *vma, unsigned lon=
+g a)=0A=
+ {=0A=
+@@ -483,6 +482,8 @@ static inline void cpu_tlbstate_update_lam(unsigned lon=
+g lam, u64 untag_mask)=0A=
+ #endif=0A=
+ #endif /* !MODULE */=0A=
  =0A=
-+#ifdef CONFIG_KVM_GUEST_MEMFD=0A=
-+static inline bool kvm_arch_gmem_supports_no_direct_map(void)=0A=
-+{=0A=
-+	return can_set_direct_map();=0A=
-+}=0A=
-+#define kvm_arch_gmem_supports_no_direct_map kvm_arch_gmem_supports_no_dir=
-ect_map=0A=
-+#endif /* CONFIG_KVM_GUEST_MEMFD */=0A=
++extern void flush_tlb_kernel_range(unsigned long start, unsigned long end)=
+;=0A=
 +=0A=
- #endif /* _ASM_X86_KVM_HOST_H */=0A=
+ static inline void __native_tlb_flush_global(unsigned long cr4)=0A=
+ {=0A=
+ 	native_write_cr4(cr4 ^ X86_CR4_PGE);=0A=
+diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c=0A=
+index 5d221709353e..cce591d26e4c 100644=0A=
+--- a/arch/x86/mm/tlb.c=0A=
++++ b/arch/x86/mm/tlb.c=0A=
+@@ -1561,6 +1561,7 @@ void flush_tlb_kernel_range(unsigned long start, unsi=
+gned long end)=0A=
+ =0A=
+ 	put_flush_tlb_info();=0A=
+ }=0A=
++EXPORT_SYMBOL_FOR_MODULES(flush_tlb_kernel_range, "kvm");=0A=
+ =0A=
+ /*=0A=
+  * This can be used from process context to figure out what the value of=
+=0A=
 -- =0A=
 2.50.1=0A=
 =0A=
