@@ -1,55 +1,54 @@
-Received: from fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.197.217.180])
+Received: from fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.65.3.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0050F345CB9
-	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 16:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.197.217.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6478A346E67
+	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 16:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.65.3.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764953924; cv=none; b=Z+SA4SlbLdNfZC8XCMTAbZMxMjsDLMNNjdmcCSA2dXtbiCb7rkhd3pSC4blBZcjWI2LhQdQY4r+y5e5CHHKnX+k+8Vbk6SFQ61OeNPexpi8wGUZnKJrE6I0zR3eF3UcRuSRaFWlIABFkXM8A6BGICuyUUO35uEch8ICFRL+3LYs=
+	t=1764953963; cv=none; b=Hdc9jfuZwh0W5hZyxQzyU7FTN55Otnjh6WBmPHp70GXNj/XqROKXk3/3yiV8s3cqjLhgUkJlQJjCkB9tq525C7AMVsuB4eKjTMHqqUnBm9XrWEFKMc2WFbGI02c9uObNh1FBCV9el/+X3WKJkPOirdj5/PPTdrawK0iVF8SUclo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764953924; c=relaxed/simple;
-	bh=4bavK0iph9koAlnHX2Wy2xe770aVguNdisa0TR0XACY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TnQpzRJE6x1g2PoeQ02bUwLX8bf6myYXOAiShxMqL1XwI5EHa2ff+HAUUzznCNcRiWtEfE92FyYjK8l64749WZRakEAbM2b5jwV7XVYXsL3ElINQlphkruF7nomy1iCXH27SdaDpqqm7kMErMgJfmkLPbBJq9XpooQRtALcY9cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=WsYcXxVj; arc=none smtp.client-ip=18.197.217.180
+	s=arc-20240116; t=1764953963; c=relaxed/simple;
+	bh=g9f7k5eNWq+pvmYEnwpqBk6mpfJovYGI2BhirwjbTxI=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=utOS6jTGvROwbzSA2BEbO3nxK+dLgudWyrXCBHycxqyDqh+xBZtX7FSKooLPlvLgkASQEu1Pohb9p9rPbCp5lOPOYwYr6KgSSWS99fijZ5H0zr4em/O064Fmh/3QtUGscCWquj6o83zPgXJnZDP48wYq1ga6UPQ3NgS9kPGVupQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=NSu2LyjE; arc=none smtp.client-ip=3.65.3.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="WsYcXxVj"
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="NSu2LyjE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazoncorp2; t=1764953920; x=1796489920;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=XlbB/AHh0YQTX9rpyDTJlTKE99RJ4c4rYvfLyG5A7fY=;
-  b=WsYcXxVjJETm7QfCjvIt8bez8JfO3UPpFy9yYxSPI0E3yycA65udPvHN
-   Mqq3KCbeOzbUwKaPCaRUKA9De9kEa9eztNm00wZ2CvZ8ZZ+UsknuUJ4FX
-   HF4rR3E4R6d9/2ruI1mt908PjQ6977wfyYIwnxgNzgH+z/DPMoKI6eAfg
-   K8kgBM6HaWCe5RijLOwWPAWc6EUW9pCST8/6EnQLiXbmM5rW5TxvtvHQp
-   dr3Ieip1A1sZ+kll9J0RSD0m6g8ie3bAl8oPoWv3TtWuEVz9wq3I/SMv3
-   HbWUABFPEjcrUPYP04Rn+/j/lkgRNyPdlEjE4qTOxwDiFAxeo3/6o70Bj
-   w==;
-X-CSE-ConnectionGUID: tZu3dFNkQvqA1ZyZ7qwk7w==
-X-CSE-MsgGUID: cc5HHGcuQSOXn+liRVfvJw==
+  s=amazoncorp2; t=1764953955; x=1796489955;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=5xjYTj8X5HwetCCZmy/ho1YfHMjgHekQDOcmjzpSUS8=;
+  b=NSu2LyjEpetXuF0XvrtleFvhaOMF2ihZsW6nTNN1KVL4qO4bAz/c/eyv
+   xjrNqPQ28ifVN2b9G1oox49k4S/Y6QWZnb+9+B2Cd2TNhqXS30d9ZLhHV
+   YzZZ6atdm/o31919mzajIOBaixe2BPhMz8V6hHUCAy9PxA9Cl9Cn9eMRc
+   h6zTQQBwvFFPp2C8uo3GJkIMDb3IPW7xvoqJ6DA2ISdS+++bYv3S8vJ6u
+   ZlmML+ckcbRqbLCd1wvuI4m7Wn/UAWGBqPasH2a2ALYCvtoBLZQbDXJ1A
+   j4A70SW3SWlck13e0OamFd+ZRbt2Hf+44DvDzfRYlgbtWFyxY8aiRzmtz
+   A==;
+X-CSE-ConnectionGUID: PZ+vMz7dRbCMsLBLT8Gdaw==
+X-CSE-MsgGUID: w5Ol/ml1TDK9X+g8vPtOgw==
 X-IronPort-AV: E=Sophos;i="6.20,252,1758585600"; 
-   d="scan'208";a="6301792"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-006.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 16:58:21 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:7206]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.0.231:2525] with esmtp (Farcaster)
- id b66dbefc-1774-4ce5-8285-0803812e64ba; Fri, 5 Dec 2025 16:58:20 +0000 (UTC)
-X-Farcaster-Flow-ID: b66dbefc-1774-4ce5-8285-0803812e64ba
+   d="scan'208";a="6306224"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-002.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 16:57:47 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:8759]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.34.107:2525] with esmtp (Farcaster)
+ id 0c512124-b02e-40ba-accc-7940a3109b59; Fri, 5 Dec 2025 16:57:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 0c512124-b02e-40ba-accc-7940a3109b59
 Received: from EX19D005EUB001.ant.amazon.com (10.252.51.12) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Fri, 5 Dec 2025 16:58:20 +0000
+ Fri, 5 Dec 2025 16:57:46 +0000
 Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
  EX19D005EUB001.ant.amazon.com (10.252.51.12) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Fri, 5 Dec 2025 16:58:20 +0000
+ Fri, 5 Dec 2025 16:57:45 +0000
 Received: from EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c]) by
  EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c%3]) with mapi id
- 15.02.2562.029; Fri, 5 Dec 2025 16:58:20 +0000
+ 15.02.2562.029; Fri, 5 Dec 2025 16:57:45 +0000
 From: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
 To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
 	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
@@ -104,13 +103,11 @@ CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
  Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
 	"Cali, Marco" <xmarcalx@amazon.co.uk>, "Kalyazin, Nikita"
 	<kalyazin@amazon.co.uk>
-Subject: [PATCH v8 03/13] mm: introduce AS_NO_DIRECT_MAP
-Thread-Topic: [PATCH v8 03/13] mm: introduce AS_NO_DIRECT_MAP
-Thread-Index: AQHcZghb1bjlwJbbGEq/dQeHI0u86A==
-Date: Fri, 5 Dec 2025 16:58:19 +0000
-Message-ID: <20251205165743.9341-4-kalyazin@amazon.com>
-References: <20251205165743.9341-1-kalyazin@amazon.com>
-In-Reply-To: <20251205165743.9341-1-kalyazin@amazon.com>
+Subject: [PATCH v8 00/13] Direct Map Removal Support for guest_memfd
+Thread-Topic: [PATCH v8 00/13] Direct Map Removal Support for guest_memfd
+Thread-Index: AQHcZghHzqqX7URA4kyxe1tOPZcLlA==
+Date: Fri, 5 Dec 2025 16:57:45 +0000
+Message-ID: <20251205165743.9341-1-kalyazin@amazon.com>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -124,270 +121,103 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 
-From: Patrick Roy <patrick.roy@linux.dev>=0A=
+[ based on kvm/next ]=0A=
 =0A=
-Add AS_NO_DIRECT_MAP for mappings where direct map entries of folios are=0A=
-set to not present. Currently, mappings that match this description are=0A=
-secretmem mappings (memfd_secret()). Later, some guest_memfd=0A=
-configurations will also fall into this category.=0A=
+Unmapping virtual machine guest memory from the host kernel's direct map=0A=
+is a successful mitigation against Spectre-style transient execution=0A=
+issues: if the kernel page tables do not contain entries pointing to=0A=
+guest memory, then any attempted speculative read through the direct map=0A=
+will necessarily be blocked by the MMU before any observable=0A=
+microarchitectural side-effects happen.  This means that Spectre-gadgets=0A=
+and similar cannot be used to target virtual machine memory.  Roughly=0A=
+60% of speculative execution issues fall into this category [1, Table=0A=
+1].=0A=
 =0A=
-Reject this new type of mappings in all locations that currently reject=0A=
-secretmem mappings, on the assumption that if secretmem mappings are=0A=
-rejected somewhere, it is precisely because of an inability to deal with=0A=
-folios without direct map entries, and then make memfd_secret() use=0A=
-AS_NO_DIRECT_MAP on its address_space to drop its special=0A=
-vma_is_secretmem()/secretmem_mapping() checks.=0A=
+This patch series extends guest_memfd with the ability to remove its=0A=
+memory from the host kernel's direct map, to be able to attain the above=0A=
+protection for KVM guests running inside guest_memfd.=0A=
 =0A=
-This drops a optimization in gup_fast_folio_allowed() where=0A=
-secretmem_mapping() was only called if CONFIG_SECRETMEM=3Dy. secretmem is=
+Additionally, a Firecracker branch with support for these VMs can be=0A=
+found on GitHub [2].=0A=
 =0A=
-enabled by default since commit b758fe6df50d ("mm/secretmem: make it on=0A=
-by default"), so the secretmem check did not actually end up elided in=0A=
-most cases anymore anyway.=0A=
+For more details, please refer to the v5 cover letter.  No substantial=0A=
+changes in design have taken place since.=0A=
 =0A=
-Use a new flag instead of overloading AS_INACCESSIBLE (which is already=0A=
-set by guest_memfd) because not all guest_memfd mappings will end up=0A=
-being direct map removed (e.g. in pKVM setups, parts of guest_memfd that=0A=
-can be mapped to userspace should also be GUP-able, and generally not=0A=
-have restrictions on who can access it).=0A=
+See also related write() syscall support in guest_memfd [3] where=0A=
+the interoperation between the two features is described.=0A=
 =0A=
-Acked-by: Mike Rapoport (Microsoft) <rppt@kernel.org>=0A=
-Acked-by: David Hildenbrand (Red Hat)" <david@kernel.org>=0A=
-Signed-off-by: Patrick Roy <patrick.roy@linux.dev>=0A=
-Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>=0A=
----=0A=
- include/linux/pagemap.h   | 16 ++++++++++++++++=0A=
- include/linux/secretmem.h | 18 ------------------=0A=
- lib/buildid.c             |  4 ++--=0A=
- mm/gup.c                  | 19 +++++--------------=0A=
- mm/mlock.c                |  2 +-=0A=
- mm/secretmem.c            |  8 ++------=0A=
- 6 files changed, 26 insertions(+), 41 deletions(-)=0A=
+Changes since v7:=0A=
+ - David: separate patches for adding x86 and ARM support=0A=
+ - Dave/Will: drop support for disabling TLB flushes=0A=
 =0A=
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h=0A=
-index a17fabbc0269..d51e0c0404e2 100644=0A=
---- a/include/linux/pagemap.h=0A=
-+++ b/include/linux/pagemap.h=0A=
-@@ -213,6 +213,7 @@ enum mapping_flags {=0A=
- 	AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM =3D 9,=0A=
- 	AS_KERNEL_FILE =3D 10,	/* mapping for a fake kernel file that shouldn't=
+v7: https://lore.kernel.org/kvm/20250924151101.2225820-1-patrick.roy@campus=
+.lmu.de=0A=
+v6: https://lore.kernel.org/kvm/20250912091708.17502-1-roypat@amazon.co.uk=
 =0A=
- 				   account usage to user cgroups */=0A=
-+	AS_NO_DIRECT_MAP =3D 11,	/* Folios in the mapping are not in the direct m=
-ap */=0A=
- 	/* Bits 16-25 are used for FOLIO_ORDER */=0A=
- 	AS_FOLIO_ORDER_BITS =3D 5,=0A=
- 	AS_FOLIO_ORDER_MIN =3D 16,=0A=
-@@ -348,6 +349,21 @@ static inline bool mapping_writeback_may_deadlock_on_r=
-eclaim(const struct addres=0A=
- 	return test_bit(AS_WRITEBACK_MAY_DEADLOCK_ON_RECLAIM, &mapping->flags);=
+v5: https://lore.kernel.org/kvm/20250828093902.2719-1-roypat@amazon.co.uk=
 =0A=
- }=0A=
- =0A=
-+static inline void mapping_set_no_direct_map(struct address_space *mapping=
-)=0A=
-+{=0A=
-+	set_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
-+}=0A=
-+=0A=
-+static inline bool mapping_no_direct_map(const struct address_space *mappi=
-ng)=0A=
-+{=0A=
-+	return test_bit(AS_NO_DIRECT_MAP, &mapping->flags);=0A=
-+}=0A=
-+=0A=
-+static inline bool vma_has_no_direct_map(const struct vm_area_struct *vma)=
+v4: https://lore.kernel.org/kvm/20250221160728.1584559-1-roypat@amazon.co.u=
+k=0A=
+RFCv3: https://lore.kernel.org/kvm/20241030134912.515725-1-roypat@amazon.co=
+.uk=0A=
+RFCv2: https://lore.kernel.org/kvm/20240910163038.1298452-1-roypat@amazon.c=
+o.uk=0A=
+RFCv1: https://lore.kernel.org/kvm/20240709132041.3625501-1-roypat@amazon.c=
+o.uk=0A=
 =0A=
-+{=0A=
-+	return vma->vm_file && mapping_no_direct_map(vma->vm_file->f_mapping);=0A=
-+}=0A=
-+=0A=
- static inline gfp_t mapping_gfp_mask(const struct address_space *mapping)=
+[1] https://download.vusec.net/papers/quarantine_raid23.pdf=0A=
+[2] https://github.com/firecracker-microvm/firecracker/tree/feature/secret-=
+hiding=0A=
+[3] https://lore.kernel.org/kvm/20251114151828.98165-1-kalyazin@amazon.com=
 =0A=
- {=0A=
- 	return mapping->gfp_mask;=0A=
-diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h=0A=
-index e918f96881f5..0ae1fb057b3d 100644=0A=
---- a/include/linux/secretmem.h=0A=
-+++ b/include/linux/secretmem.h=0A=
-@@ -4,28 +4,10 @@=0A=
- =0A=
- #ifdef CONFIG_SECRETMEM=0A=
- =0A=
--extern const struct address_space_operations secretmem_aops;=0A=
--=0A=
--static inline bool secretmem_mapping(struct address_space *mapping)=0A=
--{=0A=
--	return mapping->a_ops =3D=3D &secretmem_aops;=0A=
--}=0A=
--=0A=
--bool vma_is_secretmem(struct vm_area_struct *vma);=0A=
- bool secretmem_active(void);=0A=
- =0A=
- #else=0A=
- =0A=
--static inline bool vma_is_secretmem(struct vm_area_struct *vma)=0A=
--{=0A=
--	return false;=0A=
--}=0A=
--=0A=
--static inline bool secretmem_mapping(struct address_space *mapping)=0A=
--{=0A=
--	return false;=0A=
--}=0A=
--=0A=
- static inline bool secretmem_active(void)=0A=
- {=0A=
- 	return false;=0A=
-diff --git a/lib/buildid.c b/lib/buildid.c=0A=
-index c4b0f376fb34..89e567954284 100644=0A=
---- a/lib/buildid.c=0A=
-+++ b/lib/buildid.c=0A=
-@@ -65,8 +65,8 @@ static int freader_get_folio(struct freader *r, loff_t fi=
-le_off)=0A=
- =0A=
- 	freader_put_folio(r);=0A=
- =0A=
--	/* reject secretmem folios created with memfd_secret() */=0A=
--	if (secretmem_mapping(r->file->f_mapping))=0A=
-+	/* reject folios without direct map entries (e.g. from memfd_secret() or =
-guest_memfd()) */=0A=
-+	if (mapping_no_direct_map(r->file->f_mapping))=0A=
- 		return -EFAULT;=0A=
- =0A=
- 	r->folio =3D filemap_get_folio(r->file->f_mapping, file_off >> PAGE_SHIFT=
-);=0A=
-diff --git a/mm/gup.c b/mm/gup.c=0A=
-index a8ba5112e4d0..719e4dbecc09 100644=0A=
---- a/mm/gup.c=0A=
-+++ b/mm/gup.c=0A=
-@@ -11,7 +11,6 @@=0A=
- #include <linux/rmap.h>=0A=
- #include <linux/swap.h>=0A=
- #include <linux/swapops.h>=0A=
--#include <linux/secretmem.h>=0A=
- =0A=
- #include <linux/sched/signal.h>=0A=
- #include <linux/rwsem.h>=0A=
-@@ -1216,7 +1215,7 @@ static int check_vma_flags(struct vm_area_struct *vma=
-, unsigned long gup_flags)=0A=
- 	if ((gup_flags & FOLL_SPLIT_PMD) && is_vm_hugetlb_page(vma))=0A=
- 		return -EOPNOTSUPP;=0A=
- =0A=
--	if (vma_is_secretmem(vma))=0A=
-+	if (vma_has_no_direct_map(vma))=0A=
- 		return -EFAULT;=0A=
- =0A=
- 	if (write) {=0A=
-@@ -2724,7 +2723,7 @@ EXPORT_SYMBOL(get_user_pages_unlocked);=0A=
-  * This call assumes the caller has pinned the folio, that the lowest page=
- table=0A=
-  * level still points to this folio, and that interrupts have been disable=
-d.=0A=
-  *=0A=
-- * GUP-fast must reject all secretmem folios.=0A=
-+ * GUP-fast must reject all folios without direct map entries (such as sec=
-retmem).=0A=
-  *=0A=
-  * Writing to pinned file-backed dirty tracked folios is inherently proble=
-matic=0A=
-  * (see comment describing the writable_file_mapping_allowed() function). =
-We=0A=
-@@ -2739,7 +2738,6 @@ static bool gup_fast_folio_allowed(struct folio *foli=
-o, unsigned int flags)=0A=
- {=0A=
- 	bool reject_file_backed =3D false;=0A=
- 	struct address_space *mapping;=0A=
--	bool check_secretmem =3D false;=0A=
- 	unsigned long mapping_flags;=0A=
- =0A=
- 	/*=0A=
-@@ -2751,18 +2749,10 @@ static bool gup_fast_folio_allowed(struct folio *fo=
-lio, unsigned int flags)=0A=
- 		reject_file_backed =3D true;=0A=
- =0A=
- 	/* We hold a folio reference, so we can safely access folio fields. */=0A=
--=0A=
--	/* secretmem folios are always order-0 folios. */=0A=
--	if (IS_ENABLED(CONFIG_SECRETMEM) && !folio_test_large(folio))=0A=
--		check_secretmem =3D true;=0A=
--=0A=
--	if (!reject_file_backed && !check_secretmem)=0A=
--		return true;=0A=
--=0A=
- 	if (WARN_ON_ONCE(folio_test_slab(folio)))=0A=
- 		return false;=0A=
- =0A=
--	/* hugetlb neither requires dirty-tracking nor can be secretmem. */=0A=
-+	/* hugetlb neither requires dirty-tracking nor can be without direct map.=
- */=0A=
- 	if (folio_test_hugetlb(folio))=0A=
- 		return true;=0A=
- =0A=
-@@ -2800,8 +2790,9 @@ static bool gup_fast_folio_allowed(struct folio *foli=
-o, unsigned int flags)=0A=
- 	 * At this point, we know the mapping is non-null and points to an=0A=
- 	 * address_space object.=0A=
- 	 */=0A=
--	if (check_secretmem && secretmem_mapping(mapping))=0A=
-+	if (mapping_no_direct_map(mapping))=0A=
- 		return false;=0A=
-+=0A=
- 	/* The only remaining allowed file system is shmem. */=0A=
- 	return !reject_file_backed || shmem_mapping(mapping);=0A=
- }=0A=
-diff --git a/mm/mlock.c b/mm/mlock.c=0A=
-index bb0776f5ef7c..506452ee8cad 100644=0A=
---- a/mm/mlock.c=0A=
-+++ b/mm/mlock.c=0A=
-@@ -474,7 +474,7 @@ static int mlock_fixup(struct vma_iterator *vmi, struct=
- vm_area_struct *vma,=0A=
- =0A=
- 	if (newflags =3D=3D oldflags || (oldflags & VM_SPECIAL) ||=0A=
- 	    is_vm_hugetlb_page(vma) || vma =3D=3D get_gate_vma(current->mm) ||=0A=
--	    vma_is_dax(vma) || vma_is_secretmem(vma) || (oldflags & VM_DROPPABLE)=
-)=0A=
-+	    vma_is_dax(vma) || vma_has_no_direct_map(vma) || (oldflags & VM_DROPP=
-ABLE))=0A=
- 		/* don't set VM_LOCKED or VM_LOCKONFAULT and don't count */=0A=
- 		goto out;=0A=
- =0A=
-diff --git a/mm/secretmem.c b/mm/secretmem.c=0A=
-index b59350daffe3..c1eafe29c3e8 100644=0A=
---- a/mm/secretmem.c=0A=
-+++ b/mm/secretmem.c=0A=
-@@ -134,11 +134,6 @@ static int secretmem_mmap_prepare(struct vm_area_desc =
-*desc)=0A=
- 	return 0;=0A=
- }=0A=
- =0A=
--bool vma_is_secretmem(struct vm_area_struct *vma)=0A=
--{=0A=
--	return vma->vm_ops =3D=3D &secretmem_vm_ops;=0A=
--}=0A=
--=0A=
- static const struct file_operations secretmem_fops =3D {=0A=
- 	.release	=3D secretmem_release,=0A=
- 	.mmap_prepare	=3D secretmem_mmap_prepare,=0A=
-@@ -156,7 +151,7 @@ static void secretmem_free_folio(struct folio *folio)=
 =0A=
- 	folio_zero_segment(folio, 0, folio_size(folio));=0A=
- }=0A=
- =0A=
--const struct address_space_operations secretmem_aops =3D {=0A=
-+static const struct address_space_operations secretmem_aops =3D {=0A=
- 	.dirty_folio	=3D noop_dirty_folio,=0A=
- 	.free_folio	=3D secretmem_free_folio,=0A=
- 	.migrate_folio	=3D secretmem_migrate_folio,=0A=
-@@ -205,6 +200,7 @@ static struct file *secretmem_file_create(unsigned long=
- flags)=0A=
- =0A=
- 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);=0A=
- 	mapping_set_unevictable(inode->i_mapping);=0A=
-+	mapping_set_no_direct_map(inode->i_mapping);=0A=
- =0A=
- 	inode->i_op =3D &secretmem_iops;=0A=
- 	inode->i_mapping->a_ops =3D &secretmem_aops;=0A=
+Patrick Roy (13):=0A=
+  x86: export set_direct_map_valid_noflush to KVM module=0A=
+  x86/tlb: export flush_tlb_kernel_range to KVM module=0A=
+  mm: introduce AS_NO_DIRECT_MAP=0A=
+  KVM: guest_memfd: Add stub for kvm_arch_gmem_invalidate=0A=
+  KVM: guest_memfd: Add flag to remove from direct map=0A=
+  KVM: x86: define kvm_arch_gmem_supports_no_direct_map()=0A=
+  KVM: arm64: define kvm_arch_gmem_supports_no_direct_map()=0A=
+  KVM: selftests: load elf via bounce buffer=0A=
+  KVM: selftests: set KVM_MEM_GUEST_MEMFD in vm_mem_add() if guest_memfd=0A=
+    !=3D -1=0A=
+  KVM: selftests: Add guest_memfd based vm_mem_backing_src_types=0A=
+  KVM: selftests: cover GUEST_MEMFD_FLAG_NO_DIRECT_MAP in existing=0A=
+    selftests=0A=
+  KVM: selftests: stuff vm_mem_backing_src_type into vm_shape=0A=
+  KVM: selftests: Test guest execution from direct map removed gmem=0A=
+=0A=
+ Documentation/virt/kvm/api.rst                | 22 ++++---=0A=
+ arch/arm64/include/asm/kvm_host.h             | 13 ++++=0A=
+ arch/x86/include/asm/kvm_host.h               |  9 +++=0A=
+ arch/x86/include/asm/tlbflush.h               |  3 +-=0A=
+ arch/x86/mm/pat/set_memory.c                  |  1 +=0A=
+ arch/x86/mm/tlb.c                             |  1 +=0A=
+ include/linux/kvm_host.h                      | 14 ++++=0A=
+ include/linux/pagemap.h                       | 16 +++++=0A=
+ include/linux/secretmem.h                     | 18 ------=0A=
+ include/uapi/linux/kvm.h                      |  1 +=0A=
+ lib/buildid.c                                 |  4 +-=0A=
+ mm/gup.c                                      | 19 ++----=0A=
+ mm/mlock.c                                    |  2 +-=0A=
+ mm/secretmem.c                                |  8 +--=0A=
+ .../testing/selftests/kvm/guest_memfd_test.c  | 17 ++++-=0A=
+ .../testing/selftests/kvm/include/kvm_util.h  | 37 ++++++++---=0A=
+ .../testing/selftests/kvm/include/test_util.h |  8 +++=0A=
+ tools/testing/selftests/kvm/lib/elf.c         |  8 +--=0A=
+ tools/testing/selftests/kvm/lib/io.c          | 23 +++++++=0A=
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 59 +++++++++--------=0A=
+ tools/testing/selftests/kvm/lib/test_util.c   |  8 +++=0A=
+ tools/testing/selftests/kvm/lib/x86/sev.c     |  1 +=0A=
+ .../selftests/kvm/pre_fault_memory_test.c     |  1 +=0A=
+ .../selftests/kvm/set_memory_region_test.c    | 52 +++++++++++++--=0A=
+ .../kvm/x86/private_mem_conversions_test.c    |  7 +-=0A=
+ virt/kvm/guest_memfd.c                        | 64 +++++++++++++++++--=0A=
+ 26 files changed, 314 insertions(+), 102 deletions(-)=0A=
+=0A=
+=0A=
+base-commit: e0c26d47def7382d7dbd9cad58bc653aed75737a=0A=
 -- =0A=
 2.50.1=0A=
 =0A=
