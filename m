@@ -1,149 +1,163 @@
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569D54D8CE
-	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 07:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BFA337BAA
+	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 16:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764918592; cv=none; b=FNWI0XP4qElCl5e3FCTfMKd3BrPUE9yJY91Y1wuK9VUDSfpQxCFPWTDBVFkYiO8BW930hgdws/aBhcF+8WZex/BzpASZYScVtmE3ONPL1hKX6vcKWKscdUSum2fP0qXdrVVLoslgAgQL20+qkg9olyzNKMkS896YuUNILTGfEyU=
+	t=1764953902; cv=none; b=PzvFKUPoLyZUUnyCIBPbRYuNtuti2qH+8RZoCvK6qjM196zvckpRD0EqxdQ6C7xRM7WSW/HQ2iKH/GDLUQZkUB+4b/725DPNkbxoajdVH5iN+mzrmjC+4F4iDmg2sSKWxd/t09xrsSd+NeADr/T1kITNdeMycSMJIjjkqV51fcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764918592; c=relaxed/simple;
-	bh=5rroxi3abUmGonf4pfj8UHKFzNzhHxxNOuDwgEGodAc=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=t8pWfFfURkB0dvnMz/+He1u+tTPlwj1uT4sWgnqTRsAU7dFBH+ltzqam2p/O50kCkKV3IKV/C0SQgpRvpd7amAXAkvnrG/mq+bOCmiPlDlb+DVWg+/wFPBcIL3jug6t86yWCwopYPsE/7C2tRRvXmJp1q5kpYtXtl3KmOShm9Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=pR+SopcO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QFIYUk4G; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1764953902; c=relaxed/simple;
+	bh=Vwbdvg++f2ttKWUxXJ9GmOhGjgSvNbfER95LUrDWy8o=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Hp6TjQLECOvn7N0u7IHZxN1sCx6vC2qCJVHVfC2oRjwHwupqqpvzNjPxSzGHKPsrLz5oiPeHZifafTMkQUcMeofwLDdnEI5nTYZCZhNYgXYTE11Yj7p89fFAujHWQ2+jp8YMU7BFyxae0tYE858Y0+S69IyTnOJTgABv3V1qu20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=ATMCqAOt; arc=none smtp.client-ip=63.178.132.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="pR+SopcO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QFIYUk4G"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 1948614000C5;
-	Fri,  5 Dec 2025 02:09:49 -0500 (EST)
-Received: from phl-imap-17 ([10.202.2.105])
-  by phl-compute-04.internal (MEProxy); Fri, 05 Dec 2025 02:09:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1764918589;
-	 x=1765004989; bh=QmdYGEfgv2myx16lov9/7CVEhKPUPcTa475udVNsp90=; b=
-	pR+SopcOddt96sZj22fCQRcQZGiXPMJc1zI+6OnmaEa/FNXOtRTQYVgghdkMnoT9
-	lGDOyhtVXbBHsg1c7sN061mgDTNsJDETDBCmTq5Z6Hi2E5UQS+hkf6SQ5oVYHAVX
-	mq2ntKif5N15TvU1il6RcD/0chXcNHV2IpvNoVhGDu8vmYQBUHZKynkiR6U8d+IU
-	ibP1S/u+Eol8BzTU12LLjO5o7eyXTiakzvSelRUhZN6ipAPDTuZQLUodJSMaG1hM
-	AZr2CiO6rjmzBmQI6gJv/h00UVoPc3T/6xcgvUwli+FEUIdMyR3YqzLOreOjCgeS
-	ySHOgyJKBFGIXbBF/jbTCA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1764918589; x=
-	1765004989; bh=QmdYGEfgv2myx16lov9/7CVEhKPUPcTa475udVNsp90=; b=Q
-	FIYUk4GKW6+hZsyUGKFBABL+SGjlfDwcCi2KK8CJcTd7pvD8izGkR1glwxBHTCT1
-	XiwesSTZKCtbcVF9r5GI6SvnoISz6U19eBVKHkFI/qe9WyjsLN6thQ9lfzUjadM9
-	AcnhQGpq8QukHm9miNWv+Vcc5UvRfnkNxdh6vTfeLmJw+lDHxKZMPMeqXHLsdOgv
-	rhjNnrRwNKxP71P/9CASdSt6fgWwKWOhRyknlzoImYk5jUoojqF/ODhrSZjiuMXw
-	iMK7T1RNc6uREuaNLNWGydIsxVEi0V2KknlFsY5ARq/WeVu2Usju25un3aD9msKz
-	8oCmktTXtW9YTsEOrnnuw==
-X-ME-Sender: <xms:O4UyaSzhdeTYAey0H6Uq4o1DYjrNzb4bkRpYygbI8vFjWq3BZV9xUA>
-    <xme:O4UyaZE7ncY2zhBDt3TgVkfDfvSzjHEOKtLEAUyYzVrgHm5PK2E21KjiLM41q9Moc
-    f5RLpQHfLLidnPE_NBbnl5SJmvHQDN00zJdeN2qogJOW-5iSkrTUjM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdejjeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhguuceu
-    vghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvghrnh
-    ephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdeinecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhguse
-    grrhhnuggsrdguvgdpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdp
-    rhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtghpth
-    htohepjhhovgihrdhgohhulhihsegrrhhmrdgtohhmpdhrtghpthhtohepshhuiihukhhi
-    rdhpohhulhhoshgvsegrrhhmrdgtohhmpdhrtghpthhtohephigrnhhghigttggttggtse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepphhrihhmvgdriigvnhhgsehhihhsihhlihgt
-    ohhnrdgtohhmpdhrtghpthhtohepfigrnhhgiihhohhuudeshhhishhilhhitghonhdrtg
-    homhdprhgtphhtthhopeiguhifvghiheeshhhurgifvghirdgtohhmpdhrtghpthhtohep
-    hihuiigvnhhghhhuiheshhhurgifvghirdgtohhmpdhrtghpthhtohepmhgriieskhgvrh
-    hnvghlrdhorhhg
-X-ME-Proxy: <xmx:O4UyafngJPLFs7fyEnjKKoQ5kwNQARDl2dUNCDymmjbbGVUZHTeZTQ>
-    <xmx:O4UyafjLCZ1lSQ9io6JMAgpThae_MzCOypWnRMo9pMWjH8H4KBjj4Q>
-    <xmx:O4UyaZiL-jzcbGxYsahzlDsEZcfszIjx37SbMhK2uCWV48E61Aarsw>
-    <xmx:O4UyaRvz_S024JAi1xJ1LN_4x9Qe8NtIVuKfk3qEhttj5JRCBZfCLg>
-    <xmx:PYUyaelGkuw6dr-5gJWBTcBd3cWpIT97vnNbKVAqbOu5yDoZtgM3Zonl>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 3DDDFC40054; Fri,  5 Dec 2025 02:09:47 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="ATMCqAOt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazoncorp2; t=1764953898; x=1796489898;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OTta7SWGM4sSlljWxtUnxsblM5lcOxRPzU4BqTYg0Qg=;
+  b=ATMCqAOtjIQCJE1L+/6j+H3uLocmSuoT7s9N0G53tXn2lZm1RErqnBAY
+   5r+bzVDbqoG7LL35YjX5Sn7KimfoNxnFSSS4nA1iojCc7LuEY+q/5whQc
+   SKqbf7XVwtg9E+GStYkCVrC6e5zcUJysSVHZtbasJu5N+a/2rrYGT/kjB
+   R1ISqudsR9UdnTE24cqCXY9EiRV/WOECrwOL6PGKo1jwuxq8qp5TuWT5o
+   mEx0zoepAbLMf6n6n5/8dR9LyzvoqeAm+vtRz1XFK7Dyew4Ceky7emWla
+   pynQPRY4ZvGlWqpRgPNHJT//hU2rDnbwX5h2or4B/4XuHDahOFSEUxjQX
+   w==;
+X-CSE-ConnectionGUID: tCSZJcjsRGW05HlXnAg+rw==
+X-CSE-MsgGUID: DdJLRKRZQbmfkk+SpQ0udg==
+X-IronPort-AV: E=Sophos;i="6.20,252,1758585600"; 
+   d="scan'208";a="6196568"
+Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
+  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 16:57:58 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:10986]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.26.175:2525] with esmtp (Farcaster)
+ id 2bf591aa-fe6a-4778-8f28-ccc43634a12b; Fri, 5 Dec 2025 16:57:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 2bf591aa-fe6a-4778-8f28-ccc43634a12b
+Received: from EX19D005EUB002.ant.amazon.com (10.252.51.103) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Fri, 5 Dec 2025 16:57:57 +0000
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19D005EUB002.ant.amazon.com (10.252.51.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Fri, 5 Dec 2025 16:57:57 +0000
+Received: from EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c]) by
+ EX19D005EUB003.ant.amazon.com ([fe80::b825:becb:4b38:da0c%3]) with mapi id
+ 15.02.2562.029; Fri, 5 Dec 2025 16:57:57 +0000
+From: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
+	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
+	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
+	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org"
+	<luto@kernel.org>, "peterz@infradead.org" <peterz@infradead.org>,
+	"willy@infradead.org" <willy@infradead.org>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
+	<surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org"
+	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
+	<yonghong.song@linux.dev>, "john.fastabend@gmail.com"
+	<john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com"
+	<peterx@redhat.com>, "jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>, "shuah@kernel.org" <shuah@kernel.org>,
+	"riel@surriel.com" <riel@surriel.com>, "baohua@kernel.org"
+	<baohua@kernel.org>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"jgross@suse.com" <jgross@suse.com>, "yu-cheng.yu@intel.com"
+	<yu-cheng.yu@intel.com>, "kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com"
+	<coxu@redhat.com>, "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>, "maobibo@loongson.cn"
+	<maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>,
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "isaku.yamahata@intel.com"
+	<isaku.yamahata@intel.com>, "jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "vannapurve@google.com"
+	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
+	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
+	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
+ Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>
+Subject: [PATCH v8 01/13] x86: export set_direct_map_valid_noflush to KVM
+ module
+Thread-Topic: [PATCH v8 01/13] x86: export set_direct_map_valid_noflush to KVM
+ module
+Thread-Index: AQHcZghOBziVXkJRtEWVlaaPn0Dq3Q==
+Date: Fri, 5 Dec 2025 16:57:57 +0000
+Message-ID: <20251205165743.9341-2-kalyazin@amazon.com>
+References: <20251205165743.9341-1-kalyazin@amazon.com>
+In-Reply-To: <20251205165743.9341-1-kalyazin@amazon.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-ThreadId: ALjut8WcExBk
-Date: Fri, 05 Dec 2025 08:09:18 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zhou Wang" <wangzhou1@hisilicon.com>, "Marc Zyngier" <maz@kernel.org>
-Cc: "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Oliver Upton" <oliver.upton@linux.dev>,
- "Joey Gouly" <joey.gouly@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>,
- "Zenghui Yu" <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, "Yicong Yang" <yangyccccc@gmail.com>,
- prime.zeng@hisilicon.com, xuwei5@huawei.com
-Message-Id: <007cc7c9-b466-4437-b113-cddd85599766@app.fastmail.com>
-In-Reply-To: <734163cd-3692-3be2-9f2a-5364d9f5980c@hisilicon.com>
-References: <20251107072127.448953-1-wangzhou1@hisilicon.com>
- <20251107072127.448953-6-wangzhou1@hisilicon.com>
- <861pm4vn02.wl-maz@kernel.org>
- <b1407660-9b69-7e21-328a-0f969fffa554@hisilicon.com>
- <c72411f9-a77e-4a72-a401-5110b919a2df@app.fastmail.com>
- <1ed610f5-3f0b-614d-5e7f-2c643238bec3@hisilicon.com>
- <113db0fb-d879-49d7-a5f2-7755558f29dd@app.fastmail.com>
- <6d6fad8d-e4e4-b973-6431-34a37003d363@hisilicon.com>
- <f641d3f2-dac9-4a9e-92a4-0805e6561418@app.fastmail.com>
- <e6cffbce-7cd4-3fe3-a9bd-935efedaebd0@hisilicon.com>
- <7d2ea8c6-e54f-4a57-843c-e0c6c33c02c5@app.fastmail.com>
- <734163cd-3692-3be2-9f2a-5364d9f5980c@hisilicon.com>
-Subject: Re: [PATCH v7 5/7] arm64: Add support for FEAT_{LS64, LS64_V}
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 5, 2025, at 07:47, Zhou Wang wrote:
-> On 2025/11/27 23:37, Arnd Bergmann wrote:
->> On Thu, Nov 27, 2025, at 04:51, Zhou Wang wrote:
->> 
->> As I understand it, using ST64B is usually more efficient than
->> ST64BV if you can use either, since it is a normal posted bus
->> transaction rather than a synchronous atomic. If that works for
->> you, I think what we should plan for is to let you use ST64B
->> on this particular hardware and never support ST64BV from
->> userspace, the same way we do it on Intel hardware with ENQCMD.
->
-> I missed the email as it has been filtered into other fold, my bad :(
-> I think it works fine in our system. I planned to remove whole ST64BV
-> support in next version, so what you suggested is not to export
-> ST64BV to userspace?
-
-Exactly: In line with how this works on x86, we'd always use
-ST64B for userspace access to dedicated workqueues, or ST64BV0
-for shared hardware workqueues, while ST64BV remains reserved
-for in-kernel users.
-
->> As there are already CPUs out there that do include ST64BV0,
->> I think we also want to support those soon. Not having to
->> support both ST64BV and ST64BV0 from userspace makes it a lot
->> easier, but I think we'd still want to only enable ST64BV0
->> on a per-task base when mapping a shared workqueued into the
->> user address space on a task that has an active mm->iommu_mm.
->> 
->> If that makes sense to you, I can try to come up with a
->> prototype based on your current patches to add the context
->> switching and enable logic.
->
-> I am OK with this, even though currently we do not have a real
-> hardware to test ST64BV0 related codes.
-
-Thanks for confirming!
-
-        Arnd
+From: Patrick Roy <patrick.roy@linux.dev>=0A=
+=0A=
+Use the per-module export functionality to allow KVM (and only KVM)=0A=
+access to set_direct_map_valid_noflush(). This allows guest_memfd to=0A=
+remove its memory from the direct map, even if KVM is built as a module.=0A=
+=0A=
+Only do this on x86, as only x86 and arm64 support guest_memfd, and=0A=
+arm64 does not support building KVM as a module.=0A=
+=0A=
+Direct map removal gives guest_memfd the same protection that=0A=
+memfd_secret enjoys, such as hardening against Spectre-like attacks=0A=
+through in-kernel gadgets.=0A=
+=0A=
+Signed-off-by: Patrick Roy <patrick.roy@linux.dev>=0A=
+Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>=0A=
+---=0A=
+ arch/x86/mm/pat/set_memory.c | 1 +=0A=
+ 1 file changed, 1 insertion(+)=0A=
+=0A=
+diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c=0A=
+index 970981893c9b..a7a88b598d99 100644=0A=
+--- a/arch/x86/mm/pat/set_memory.c=0A=
++++ b/arch/x86/mm/pat/set_memory.c=0A=
+@@ -2655,6 +2655,7 @@ int set_direct_map_valid_noflush(struct page *page, u=
+nsigned nr, bool valid)=0A=
+ =0A=
+ 	return __set_pages_np(page, nr);=0A=
+ }=0A=
++EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");=0A=
+ =0A=
+ #ifdef CONFIG_DEBUG_PAGEALLOC=0A=
+ void __kernel_map_pages(struct page *page, int numpages, int enable)=0A=
+-- =0A=
+2.50.1=0A=
+=0A=
