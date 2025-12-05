@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878D83563C2
-	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 17:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0135034AB13
+	for <kvmarm@lists.linux.dev>; Fri,  5 Dec 2025 17:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764955621; cv=none; b=AmR3elNVbyeV9zatEaGp47Wh1iCzCJHIXw7Y5pAqIVWQyBxKbkv2/yvC0qWrtUyWUEMrzoec9AxUczwcecsPzSHryFjnfETPjlngCvsDbATAY11dmx2/XeBcnJpEN93N4reRhLTm9CIf9yGn7c5isdOZhrs0y53eVRO1E30MXl4=
+	t=1764955816; cv=none; b=hzHrKIAFUc0iMuY5AeuG+5YHtnDyyOjkyw4S/UZNXyWwwOs6tTTYwZDwDpY6YqZnJ0Yn8d1l2GHaEICiBvRGjlERbDEEMh6u0Dp7nTGQglkW0qYRYOom+dGazE2hcL5RVqarDKB/uptlmggCzZBwZm2xUJGBHNS5k+T3bZQK/gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764955621; c=relaxed/simple;
-	bh=TmM8G4lNHaUxZQSRyqB2EBkn6Cn3E5Bi3cEB/xO+pjM=;
+	s=arc-20240116; t=1764955816; c=relaxed/simple;
+	bh=+ffseYP4FsqtlkEAydL2rHyJW7f5NEUUyD1ipfBMGZA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m7E/TjAQie2Xz8FVYJTh3RL3LiU/zrQjWRkARWVKJUeUYzQWl0JIFxkvRo4H/YpP3ho5BuImCZpz8hQTJ8tbz5deJ3Gy/fVI4TbZ6ygU2i/JFp8faLR5K00nTFORJCNeVimQQ3EiPkPsXg4r+IVrb6opnVQG5h5hIZeHTFo0vdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BxQh9VmO; arc=none smtp.client-ip=192.198.163.11
+	 In-Reply-To:Content-Type; b=K//qNdRWKno0HX3nL3NUtKf8ax0qrThqIRJHRJ5DFDeVQATkNHTxYvKkjXUzRLPxy+huwBbNt7H9Ooh2kAjKHRMYoY1lAbRSn/+Prs3zn4LZlx0/7312Tvw3RE2cbWq8C1xhyQMWcxC7qrYRVQAoZcyOJDyqqsnEz3B1Q2OzWTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ll6/rdkt; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BxQh9VmO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ll6/rdkt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764955620; x=1796491620;
+  t=1764955815; x=1796491815;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=TmM8G4lNHaUxZQSRyqB2EBkn6Cn3E5Bi3cEB/xO+pjM=;
-  b=BxQh9VmOMSFH+v447AoNk7cwu2vq0oQQOXiC/YGASkvpA61H+e0sAUs9
-   3er16w7oWUCALB86utszR4CKswKtY1hNl2iFtjb0MGCGAFD1ru3IIYFcM
-   LFTsEVq8+6iBEO/PRJAeboXTQ+WAwR+ID0OLpx+3umeexhQCkn2Gpk7P+
-   S3JgkXoNZOtB8HSec8xO5Ewnm4ftq031svQq4UDOdRtoHPFSkffu9i9wm
-   +WEpDik6QC/YKD/uk+9mrqqzteAH+yrOTZyT+60EoW6Yr9B0fuR/ldQVV
-   ykQE2LKqawC6aFZqwzQuPVhspPeQGToLLoEOD7rxVqaldW06SXqR32O5F
-   A==;
-X-CSE-ConnectionGUID: jNsgBL59TVaPRY6Of/lRog==
-X-CSE-MsgGUID: KYKHazs/T621MLFJQUWgNQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11633"; a="77612320"
+  bh=+ffseYP4FsqtlkEAydL2rHyJW7f5NEUUyD1ipfBMGZA=;
+  b=ll6/rdktwecXVuNB97lTY2f74lUKt4kmh2tHn2JACtZxSyS/IbCB8mOd
+   S6UWMNSP4na3FwQS+xtI7u8oDdQPspfNRcf5MSmyzvfAxyUMU5kYJfN+F
+   zY1nEEsdv/2UbpE5ufYw5YPdkRKOUUSnuFGj0rq09V3dThq0PmY6eOHjs
+   vU+GhebcLxJaGmj0mRjbesRj3E/GM4bETWc95t7D0jY5sCHauYiQhtc66
+   FOMvrD/IJ+lR3CK9udYW71ro6KdULTm9X0vGVnOGDjv4/p3Orka1GLSct
+   kCPKJFYeXHtY8C7h612gkL7DpraqieOCLDkRO85hm5cfiSulqjTYHY/IO
+   w==;
+X-CSE-ConnectionGUID: iaAMBNDHQaid0CChXHJInQ==
+X-CSE-MsgGUID: AgGoRVxLTcubuhgvyoRafA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11633"; a="92471069"
 X-IronPort-AV: E=Sophos;i="6.20,252,1758610800"; 
-   d="scan'208";a="77612320"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 09:26:58 -0800
-X-CSE-ConnectionGUID: F9P4sbSUS1agtmmb/ST5Xg==
-X-CSE-MsgGUID: RM8P4RCTRyq268Qov786Aw==
+   d="scan'208";a="92471069"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 09:30:13 -0800
+X-CSE-ConnectionGUID: 0zVgGn7kRryd4YRQDDxvpw==
+X-CSE-MsgGUID: JpgCbNWPR9SJGQ2HiyIx1Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,252,1758610800"; 
-   d="scan'208";a="194646785"
+   d="scan'208";a="232715651"
 Received: from vverma7-desk1.amr.corp.intel.com (HELO [10.125.108.173]) ([10.125.108.173])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 09:26:57 -0800
-Message-ID: <9409531b-589b-4a54-b122-06a3cf0846f3@intel.com>
-Date: Fri, 5 Dec 2025 09:26:56 -0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 09:30:11 -0800
+Message-ID: <51a059a1-f03a-4b43-8df6-d31fca09cce7@intel.com>
+Date: Fri, 5 Dec 2025 09:30:09 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 01/13] x86: export set_direct_map_valid_noflush to KVM
- module
+Subject: Re: [PATCH v8 05/13] KVM: guest_memfd: Add flag to remove from direct
+ map
 To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
@@ -122,7 +122,7 @@ Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
  "Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
  <xmarcalx@amazon.co.uk>
 References: <20251205165743.9341-1-kalyazin@amazon.com>
- <20251205165743.9341-2-kalyazin@amazon.com>
+ <20251205165743.9341-6-kalyazin@amazon.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -168,22 +168,29 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <20251205165743.9341-2-kalyazin@amazon.com>
+In-Reply-To: <20251205165743.9341-6-kalyazin@amazon.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/5/25 08:57, Kalyazin, Nikita wrote:
-...
-> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
+On 12/5/25 08:58, Kalyazin, Nikita wrote:
+> +static void kvm_gmem_folio_restore_direct_map(struct folio *folio)
+> +{
+> +	/*
+> +	 * Direct map restoration cannot fail, as the only error condition
+> +	 * for direct map manipulation is failure to allocate page tables
+> +	 * when splitting huge pages, but this split would have already
+> +	 * happened in set_direct_map_invalid_noflush() in kvm_gmem_folio_zap_direct_map().
+> +	 * Thus set_direct_map_valid_noflush() here only updates prot bits.
+> +	 */
+> +	if (kvm_gmem_folio_no_direct_map(folio))
+> +		set_direct_map_valid_noflush(folio_page(folio, 0), folio_nr_pages(folio),
+> +					 true);
+> +}
 
-I think this export is a bad idea. The interface is abhorrent enough,
-but exporting it just invites abuse and bugs.
+This is rather hopeful programming.
 
-I think what this really needs is a pair of helpers that are just:
+I can think of a number of ways that this assumption might become invalid.
+This at *least* check for set_direct_map_valid_noflush() failures (or
+whatever interface you end up using)?
 
-	folio_zap_direct_map()
-and
-	folio_restore_direct_map()
-
-that take a folio. *Those* can get exported to modules and those should
-internally flush the TLB and not expect callers to do it.
+A WARN_ON_ONCE() would be fine.
