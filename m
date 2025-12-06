@@ -1,57 +1,57 @@
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5AE25CC79
-	for <kvmarm@lists.linux.dev>; Sat,  6 Dec 2025 00:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CCC26D4F9
+	for <kvmarm@lists.linux.dev>; Sat,  6 Dec 2025 00:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764980270; cv=none; b=LIWQfFLwBeeKusxybkbYMNpoEWqnzX771pSBA6DC0vEXjTCZYNqK5qa1hsMJAVBd6sMn26CGiqgi/yEX4hJ01EZUKkbB1E2x9dsH5aBsx5myDXUOPFDSgIY+iF+XfQzQdsrecJUdloOaB3srni/c9EEZuUapiXPPcBMOiEGxuZU=
+	t=1764980272; cv=none; b=kA+TSGRfECnVAvGewIhSimh7RXamzykrGSs1bGqodorxzOJOjH9HwkaKQQNUbhoZ+kgwtfOjNK742eAlXHbh2mTntw5M/OxI2lF/HcHz0U+xIeCzXebfRj4Ep4VMfhsY2gsna+p5DN5qJAyZAc4SqpY3diyu39ntU6Q005pQJjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764980270; c=relaxed/simple;
-	bh=gw4FQTHE8SLlwJArBri42euAjtNSeNQ1byjalYji5b0=;
+	s=arc-20240116; t=1764980272; c=relaxed/simple;
+	bh=1cCrG4DCg3nVbAW9oH4QXbYa70u3YhFDXh9Xhmff200=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Os4LMI7I0qqLMkREj4d2qw8KgSWcU5g52ZGH7qV5QyPzWVrC1om6ecQMwstT7YZ8LJwZX+NoX1umiRqwSAF9ytIe3DeMDU6soDy2s4Sb+rZNjSSX+odD7FNsxS0XaPIaOWQzXO8aCQ+p5BW4GsG1vGA4fAC6qb2gIMOSQzFa4po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0sSCQEts; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Jpq5q/jS4Oz1zK7/u873qssmL2FPw2kMNMh/JE3gcWP+9pWJFPl0jjwOxjCi4SyVmUfnCL3uDo4gco/Ehon5ZacV96uZJfiLRY8dZEZ4yYAczo6dDWTv04LLtKjniqvGxxzvBG7/HTK9j1y4HIFXqdzdLqeWCwTsSkyuCGBFI0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ixXGh+W4; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0sSCQEts"
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-340c0604e3dso3051670a91.2
-        for <kvmarm@lists.linux.dev>; Fri, 05 Dec 2025 16:17:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ixXGh+W4"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7d5564057d0so7138143b3a.0
+        for <kvmarm@lists.linux.dev>; Fri, 05 Dec 2025 16:17:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764980266; x=1765585066; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1764980269; x=1765585069; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUuCYzCJ+7mOkcgENgUcVnWD5HNM+Ecxc29Wc5gu0a8=;
-        b=0sSCQEts4ZJgzRlGpWIBp/f8G6gBiPsh7LctroMJUj49PYgwvtHvNdzdA00yO2lwTi
-         6f4/FeRWf05vkFUT+6/4DXrVZ7x8aDHMtg9zgL2u2RYdowCQZNNVEzmV/Tkbgjmgeiok
-         ZfMyTRm+HI2XJJo+FPpk/BRC6ny4lCOlvXen0sgms7+VMO5iZaFtGOESPpQXI5AfEDx/
-         pw3yF85WYKLGA84Fcs3ZlmIEQ7kEbUaXCsTQEealDEVozqYhcegKJ49JC9qXHqb8RBdI
-         2TqSB1xOogxt6UpAT2zhAFgMWo/pijj5lt8EcqSomNQOfFn6w8JEbzgH96cCqGnJ/0Ns
-         UPDQ==
+        bh=OFskCraMCAt1o1jXv8Q2cmHJ2OyK2yl9CAVs1/Lc01w=;
+        b=ixXGh+W4mycQsBB6inR/uNZj6TNGJr5RqmC8ET5XhQWRGDyz+eCdvu+ca8xxakFZzl
+         a7Ceggzk/oOy8LRYWZqRcwGNcj539g5xrlZQXZFfpRBJ/uXbOfQ10x7OctW1Ft9BvxnG
+         euOanRjDadkzIi+wKh9bp/U0GmrKRLWPZyKkS2pjtFWybwzauOwj1XTq4BM7X/FS+iPe
+         7XHDGnA8P9IdGUhJKMJtGIfC/dUJVn0ba4Q3nYhxnwkDlhdBM8/zPuwWB8rSHX5tjipF
+         GWOANNTlcYiFAA4aNvZYcUnyJFIxR9vacCjCZRDxysUKPsb6EVaisPkayWU7VZ+981W8
+         7wJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764980266; x=1765585066;
+        d=1e100.net; s=20230601; t=1764980269; x=1765585069;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CUuCYzCJ+7mOkcgENgUcVnWD5HNM+Ecxc29Wc5gu0a8=;
-        b=gkDOGW2mM0JgmQGyRWUiwaA+tZAXdMq9kosyHe9TsMoVj8rzaKKK4FoJzII4/40VYg
-         NQbGXBJCmCSA6j6D7Fe/iqxhtwQlMCyeIEUpmSZcvBKdyGMaSpquRJqRVDOwST7xWrQv
-         m6o1uigukr9voqqCJg+S33aFn36p0GPKZUKM+dhDQgSm75nGj5inl8kBpGS1Ev/UHCCm
-         vMTtQl4sOgTMlxf46tGjoRMPB2D6P1sTyz9vpgjGQ2YISaQtJhjujXg2pDlKq1/P856u
-         VLlRY+PZU9YyPa3jN+cX6+4eBDnf+oTgu14olFAYxe/s5q2QWlV4MAWdhhe9obiyVP//
-         Wkbw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQpGzDFMUiuxBoG9lBmQgh+JgnDuzkLiirROgTumIBSkeiVO5qgMmRLjCPtBzsuLXgRjE8IWE=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy8KFRGzaYe+NfhjP7RkQKRd1okLL4c1uBmvb2B/wuurd5N7QhK
-	R+hKkIL82QgZIjxp02UDrxqvioXwLuxWBycR8hVHmQPhm2PDx05m+kkNd+aP2pKmBtmB0UHZQQI
-	iVasC1g==
-X-Google-Smtp-Source: AGHT+IEudAc+RtrsthgQd29i5TzWwClBzh0orawUsXJ6SsndAr08K8DVgHn3KuIiiMIFAwisOcz2YNtd49Q=
-X-Received: from pjqx1.prod.google.com ([2002:a17:90a:b001:b0:33b:5907:81cb])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d92:b0:340:b572:3b7d
- with SMTP id 98e67ed59e1d1-349a25fb840mr628818a91.19.1764980265902; Fri, 05
- Dec 2025 16:17:45 -0800 (PST)
+        bh=OFskCraMCAt1o1jXv8Q2cmHJ2OyK2yl9CAVs1/Lc01w=;
+        b=lJgUOjKZJt2VTi/JmmV48Jvp8GByqYAVYBCQuBIYpvxch+Ak0rlc4arqvc2YTuJm0q
+         rk11Laka0WESnwZndnwb1DpXa1i7Hq8+IrPgOZRsvCzYzZooYgptySXNfQy6HVwFWree
+         H0IyvNrvT6GCsJmnI8kH0h6lTPH2NVr0reBr4RFDGP7/FkGnxH9Q4Wn246pPY8RUdg4M
+         H/My8aarR8ppkRwEIEKwZNTa+50gHWtDPXzERD5pljb7x4e8ntsNkN5UT21zxjPk5PId
+         tW8Dha6icHzAvAExZ7WDCvwVveQbEVKsbW4aWz9Xt2T5nMkuBN0u+TA1qOVmuJ41rXCB
+         nAiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmwdfMbtdVXbH60urArLn0ULMDZbkK//WZzNuyM+x0HELGHTmrpNq8nWJL0dn5jQwsQTiDOV8=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxybbkp0dwkiH6aTmRaGfncnSE2vGUaxqP+/UFjvq6IwIq+2sJf
+	FoPwUl244rXsPvWf018XMCFHsMFwY0hi7KPozVCjnBgPGHaiGePxBWXgRiVI54mCZMgrcijN1JF
+	zbs1BwA==
+X-Google-Smtp-Source: AGHT+IFfI+s5eY5Nrz61icCfCwYv8IGUZBRQf6oh7KDogWUJprIuAF6nUR9g3xDsrE/LDxUvXG6Y79XK/ls=
+X-Received: from pfuf34.prod.google.com ([2002:a05:6a00:b22:b0:781:26f4:7855])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:234c:b0:7e8:450c:6195
+ with SMTP id d2e1a72fcca58-7e8c6dac143mr767576b3a.44.1764980268965; Fri, 05
+ Dec 2025 16:17:48 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  5 Dec 2025 16:16:46 -0800
+Date: Fri,  5 Dec 2025 16:16:47 -0800
 In-Reply-To: <20251206001720.468579-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251206001720.468579-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251206001720.468579-11-seanjc@google.com>
-Subject: [PATCH v6 10/44] perf/x86/core: Do not set bit width for unavailable counters
+Message-ID: <20251206001720.468579-12-seanjc@google.com>
+Subject: [PATCH v6 11/44] perf/x86/core: Plumb mediated PMU capability from
+ x86_pmu to x86_pmu_cap
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
 	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
@@ -81,39 +82,44 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sandipan Das <sandipan.das@amd.com>
+From: Mingwei Zhang <mizhang@google.com>
 
-Not all x86 processors have fixed counters. It may also be the case that
-a processor has only fixed counters and no general-purpose counters. Set
-the bit widths corresponding to each counter type only if such counters
-are available.
+Plumb mediated PMU capability to x86_pmu_cap in order to let any kernel
+entity such as KVM know that host PMU support mediated PMU mode and has
+the implementation.
 
-Fixes: b3d9468a8bd2 ("perf, x86: Expose perf capability to other modules")
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 Tested-by: Xudong Hao <xudong.hao@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/events/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/events/core.c            | 1 +
+ arch/x86/include/asm/perf_event.h | 1 +
+ 2 files changed, 2 insertions(+)
 
 diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index abe6a129a87f..bd9abe298469 100644
+index bd9abe298469..1b50f0117876 100644
 --- a/arch/x86/events/core.c
 +++ b/arch/x86/events/core.c
-@@ -3132,8 +3132,8 @@ void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- 	cap->version		= x86_pmu.version;
- 	cap->num_counters_gp	= x86_pmu_num_counters(NULL);
- 	cap->num_counters_fixed	= x86_pmu_num_counters_fixed(NULL);
--	cap->bit_width_gp	= x86_pmu.cntval_bits;
--	cap->bit_width_fixed	= x86_pmu.cntval_bits;
-+	cap->bit_width_gp	= cap->num_counters_gp ? x86_pmu.cntval_bits : 0;
-+	cap->bit_width_fixed	= cap->num_counters_fixed ? x86_pmu.cntval_bits : 0;
+@@ -3137,6 +3137,7 @@ void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
  	cap->events_mask	= (unsigned int)x86_pmu.events_maskl;
  	cap->events_mask_len	= x86_pmu.events_mask_len;
  	cap->pebs_ept		= x86_pmu.pebs_ept;
++	cap->mediated		= !!(pmu.capabilities & PERF_PMU_CAP_MEDIATED_VPMU);
+ }
+ EXPORT_SYMBOL_GPL(perf_get_x86_pmu_capability);
+ 
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 4cd38b9da0ba..4714bdee17b2 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -296,6 +296,7 @@ struct x86_pmu_capability {
+ 	unsigned int	events_mask;
+ 	int		events_mask_len;
+ 	unsigned int	pebs_ept	:1;
++	unsigned int	mediated	:1;
+ };
+ 
+ /*
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
