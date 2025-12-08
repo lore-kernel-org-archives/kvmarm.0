@@ -1,50 +1,67 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1983101BA;
-	Mon,  8 Dec 2025 09:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F09C2DF125;
+	Mon,  8 Dec 2025 10:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765186771; cv=none; b=DkAwoxo5DPMq9QpWBnUU6RmOPj0fFrKrVovC9HGSTuoh5vLIMskorXugQVR5QcELzBM31kmEPTY+VYbbnJqmLup0k66T8QCzvPEcdp7vFpiWStwsh+iEHq9Xop3PAeWdcvk/yxFI+3AtmXIjWhBEybuYDySIVWOfV8MLUL1vIyI=
+	t=1765189965; cv=none; b=GpYUrpTBqDy3AO6kQGqJmNFZ4+0oEmHsdc9nsDjxyJZujYzChFXVQ54f/lXbfVib/LlPWwhOPbxaw9g86V5Pw9iXrdAMrWKbs4Bn41U2WqLVyjZIoZ9zOA4qUXtrxjKl64TqOw6TOskBQYbaO/2Fhrh/njogIqgCfY57Zv/wNnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765186771; c=relaxed/simple;
-	bh=p82IBGZ4j1jkt4NBfcu7z7d/63zqeo9G4reT2I4uWDo=;
+	s=arc-20240116; t=1765189965; c=relaxed/simple;
+	bh=ce+U8SbYQ+yLKTxPHO/Gmpsx/eFQDoVFLjOVXAiEEao=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d9UFDUGtNIm0Yjj2ZQnR6iF7XvTmwo8Af6RqFfrn8ywFfWuy2lz1XnndoAOMS72JfdDFMp8m9SdHh/amwiYyoq7iP/TdOJCtH6R/+Nf2EUtC+a5nWpFAixBsQ/+F0ZRml+OtxEXEkeQdDgKPdgu4r+KkcLPqaTbZ625QP2wTjpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bG6XJnnX; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	 In-Reply-To:Content-Type; b=gaKAYdT/SU9x9M8pVad7IW4bg++kggeavUcOVNHLvMtQD7w5lA9JZ96ravyjtM1BRRkj2Usk9Ymwfa7sh/m/+yxscl06/ZRVPNQReN2LnbU91bdmaStlL6wGuqxJAZ2opmS3LqMdiTs1krFWgh6oJ9iuXW1uEYchog7hK58PpS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BfzC3Hxr; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bG6XJnnX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765186770; x=1796722770;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=p82IBGZ4j1jkt4NBfcu7z7d/63zqeo9G4reT2I4uWDo=;
-  b=bG6XJnnX+Nxb7n0oaV51zT1rfX+SYGcj9o2feEPxMCrKVgwOkuR/8cPU
-   NfHabVf6goXRAMKk6MB2uTA4wxWIdbifAomscOO50ZJhYEINweqd9q9YX
-   9TN+OsQQSsNp02Zbh3EOqnLp/liKYNljyVf3HmXeGN7zEzuPVtIq4Buok
-   N5x54PejBfAbkwU7FyyfQ2lCqm5Th+NgKXj5OvHWW7BR2nB0U0QhmRSoY
-   wAzLVtaU1HmmFTWbKa7qE/N+GfG3oVrnPcsmpypaLFjwMvCH4Jjtc/Y4g
-   4NCSjwoqMele5Cjb3Shexi6CQQuLQUsyiDfoj3qeRgw0ej3Y1DYptHm+C
-   g==;
-X-CSE-ConnectionGUID: nw7OW9guSMyKzxfUrKQbXw==
-X-CSE-MsgGUID: WOH51Xc/Qk2Sz+lvF/gJPg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="84532310"
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="84532310"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:39:29 -0800
-X-CSE-ConnectionGUID: RUNkPscvTKK1RrxIzPPi5w==
-X-CSE-MsgGUID: ZP9ZxvGjQRmDCWEnSrL+eg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="200807599"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:39:21 -0800
-Message-ID: <ee30ed9c-6377-4d14-b930-f0e2c809df7c@linux.intel.com>
-Date: Mon, 8 Dec 2025 17:39:18 +0800
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BfzC3Hxr"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B86b963010256;
+	Mon, 8 Dec 2025 10:32:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Je9IIy
+	qf3ckx1tk8Ni7hFzNEfi8CPmuUhAWbgT06pH4=; b=BfzC3HxrPobuhS53ACWdZB
+	PA9iEG/1aL4jT1TRuchKotrzCF9xodygooM1550WBnCL65pVF3xXiljw12UBVbLl
+	lT+rak8kiOOioJ9cqZfrJ/ccy+UBPtvzp/8HFNZqWKthsUB1XFwvk4QBgX+oR4l2
+	iEBYiqVoRUgRtZMs2uBsno0TintxSEi5vcwDUtb+JotU+Kwm1A/ocXKUSZWbktMh
+	g4tOQ0bTghEU6cY1PLDtxzsPSxo1B5+CtrYCtPidOz0X79/QvKd91QLKbspeRwQw
+	V9xQ4P1lQPcSB1CjW4dA4pcTwPESBW5+P72Bw0gAK7/ETwLMsX/bE32v4LqRlX8A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc536st5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:35 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B8ASQSK009105;
+	Mon, 8 Dec 2025 10:32:34 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4avc536ssv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:34 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B885xZo002034;
+	Mon, 8 Dec 2025 10:32:33 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aw11j4wwg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 08 Dec 2025 10:32:33 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B8AWU3o38535608
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 8 Dec 2025 10:32:30 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F3E72004B;
+	Mon,  8 Dec 2025 10:32:30 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 73E4420040;
+	Mon,  8 Dec 2025 10:32:28 +0000 (GMT)
+Received: from [9.111.22.193] (unknown [9.111.22.193])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  8 Dec 2025 10:32:28 +0000 (GMT)
+Message-ID: <8f1c1b9e-2743-4326-9a6f-754885ae90f4@linux.ibm.com>
+Date: Mon, 8 Dec 2025 11:32:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,195 +69,95 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 44/44] KVM: VMX: Add mediated PMU support for CPUs
- without "save perf global ctrl"
+Subject: Re: [PATCH] KVM: Remove subtle "struct kvm_stats_desc" pseudo-overlay
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+        Oliver Upton <oupton@kernel.org>,
+        Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
- Sandipan Das <sandipan.das@amd.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-45-seanjc@google.com>
+        kvm@vger.kernel.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A . R . Silva" <gustavoars@kernel.org>
+References: <20251205232655.445294-1-seanjc@google.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20251206001720.468579-45-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20251205232655.445294-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA2MDAyMCBTYWx0ZWRfX/ZkvryR9rikx
+ RRIhLIzEwTDFULt3caOu8S6wy6ncgQsyLzn5JBuqe/16x7rRK7DPdjVge5xAJA2z7rL/tT1lyFd
+ YMh3EQIfgG8q57vyiiYdkyOyNbLFDPTLaENaDyuoNnPQpGHKZMal2jpHafVG+bQkdZsWG8NW7UX
+ AlT3nARl8qerz3haG9zUXE0cGXVKSMt5DkrhWZpn/VgzlCYydbpaoEhPc+m7bnrKQcjwj0amtRB
+ p7RTydIUxj8YhOmJYvTpU5HYiUaYpnHgR9Ox+9r7ValcFQxCBW7NuzkHf4WykCwt+6kvFjjjGAe
+ 9Yp1mHPJC81eNRrbuDPcX0SwdooPdv90XQw8GuaCLPA48Ihvfn3NN+/xRxSX0h0xvHQNlMFWFsC
+ kUNylzqzl1bbNR0XFFbgeDqefkUM1w==
+X-Authority-Analysis: v=2.4 cv=S/DUAYsP c=1 sm=1 tr=0 ts=6936a943 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=1XWaLZrsAAAA:8 a=VnNF1IyMAAAA:8 a=W9euR_DFE7q28BTGJBMA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: QQLrcpyWW-8FcouxCOIdxqAKliO-gZxO
+X-Proofpoint-GUID: ADFjf-VsY2dJHYbJ59fyg02c4PSLuneX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-06_02,2025-12-04_04,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0 clxscore=1011 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512060020
 
-
-On 12/6/2025 8:17 AM, Sean Christopherson wrote:
-> Extend mediated PMU support for Intel CPUs without support for saving
-> PERF_GLOBAL_CONTROL into the guest VMCS field on VM-Exit, e.g. for Skylake
-> and its derivatives, as well as Icelake.  While supporting CPUs without
-> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL isn't completely trivial, it's not that
-> complex either.  And not supporting such CPUs would mean not supporting 7+
-> years of Intel CPUs released in the past 10 years.
->
-> On VM-Exit, immediately propagate the saved PERF_GLOBAL_CTRL to the VMCS
-> as well as KVM's software cache so that KVM doesn't need to add full EXREG
-> tracking of PERF_GLOBAL_CTRL.  In practice, the vast majority of VM-Exits
-> won't trigger software writes to guest PERF_GLOBAL_CTRL, so deferring the
-> VMWRITE to the next VM-Enter would only delay the inevitable without
-> batching/avoiding VMWRITEs.
->
-> Note!  Take care to refresh VM_EXIT_MSR_STORE_COUNT on nested VM-Exit, as
-> it's unfortunately possible that KVM could recalculate MSR intercepts
-> while L2 is active, e.g. if userspace loads nested state and _then_ sets
-> PERF_CAPABILITIES.  Eating the VMWRITE on every nested VM-Exit is
-> unfortunate, but that's a pre-existing problem and can/should be solved
-> separately, e.g. modifying the number of auto-load entries while L2 is
-> active is also uncommon on modern CPUs.
->
+Am 06.12.25 um 00:26 schrieb Sean Christopherson:
+> Remove KVM's internal pseudo-overlay of kvm_stats_desc, which subtly
+> aliases the flexible name[] in the uAPI definition with a fixed-size array
+> of the same name.  The unusual embedded structure results in compiler
+> warnings due to -Wflex-array-member-not-at-end, and also necessitates an
+> extra level of dereferencing in KVM.  To avoid the "overlay", define the
+> uAPI structure to have a fixed-size name when building for the kernel.
+> 
+> Opportunistically clean up the indentation for the stats macros, and
+> replace spaces with tabs.
+> 
+> No functional change intended.
+> 
+> Reported-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Closes: https://lore.kernel.org/all/aPfNKRpLfhmhYqfP@kspp
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/nested.c    |  6 ++++-
->  arch/x86/kvm/vmx/pmu_intel.c |  7 -----
->  arch/x86/kvm/vmx/vmx.c       | 52 ++++++++++++++++++++++++++++++++----
->  3 files changed, 52 insertions(+), 13 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 614b789ecf16..1ee1edc8419d 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -5142,7 +5142,11 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->  
->  	kvm_nested_vmexit_handle_ibrs(vcpu);
->  
-> -	/* Update any VMCS fields that might have changed while L2 ran */
-> +	/*
-> +	 * Update any VMCS fields that might have changed while vmcs02 was the
-> +	 * active VMCS.  The tracking is per-vCPU, not per-VMCS.
-> +	 */
-> +	vmcs_write32(VM_EXIT_MSR_STORE_COUNT, vmx->msr_autostore.nr);
->  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
->  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
->  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 55249fa4db95..27eb76e6b6a0 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -777,13 +777,6 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
->  	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl()))
->  		return false;
->  
-> -	/*
-> -	 * KVM doesn't yet support mediated PMU on CPUs without support for
-> -	 * saving PERF_GLOBAL_CTRL via a dedicated VMCS field.
-> -	 */
-> -	if (!cpu_has_save_perf_global_ctrl())
-> -		return false;
-> -
->  	return true;
->  }
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 6a17cb90eaf4..ba1262c3e3ff 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1204,6 +1204,17 @@ static bool update_transition_efer(struct vcpu_vmx *vmx)
->  	return true;
->  }
->  
-> +static void vmx_add_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
-> +{
-> +	vmx_add_auto_msr(&vmx->msr_autostore, msr, 0, VM_EXIT_MSR_STORE_COUNT,
-> +			 vmx->vcpu.kvm);
-> +}
-> +
-> +static void vmx_remove_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
-> +{
-> +	vmx_remove_auto_msr(&vmx->msr_autostore, msr, VM_EXIT_MSR_STORE_COUNT);
-> +}
-> +
->  #ifdef CONFIG_X86_32
->  /*
->   * On 32-bit kernels, VM exits still load the FS and GS bases from the
-> @@ -4225,6 +4236,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
->  
->  static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
->  {
-> +	u64 vm_exit_controls_bits = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +				    VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
->  	bool has_mediated_pmu = kvm_vcpu_has_mediated_pmu(vcpu);
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -4234,12 +4247,19 @@ static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
->  	if (!enable_mediated_pmu)
->  		return;
->  
-> +	if (!cpu_has_save_perf_global_ctrl()) {
-> +		vm_exit_controls_bits &= ~VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
-> +
-> +		if (has_mediated_pmu)
-> +			vmx_add_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
-> +		else
-> +			vmx_remove_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
-> +	}
-> +
->  	vm_entry_controls_changebit(vmx, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
->  				    has_mediated_pmu);
->  
-> -	vm_exit_controls_changebit(vmx, VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
-> -					VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
-> -				   has_mediated_pmu);
-> +	vm_exit_controls_changebit(vmx, vm_exit_controls_bits, has_mediated_pmu);
->  
->  	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
->  		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i,
-> @@ -7346,6 +7366,29 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->  					      msrs[i].host);
->  }
->  
-> +static void vmx_refresh_guest_perf_global_control(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> +
-> +	if (msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
-> +		return;
-> +
-> +	if (!cpu_has_save_perf_global_ctrl()) {
-> +		int slot = vmx_find_loadstore_msr_slot(&vmx->msr_autostore,
-> +						       MSR_CORE_PERF_GLOBAL_CTRL);
-> +
-> +		if (WARN_ON_ONCE(slot < 0))
-> +			return;
-> +
-> +		pmu->global_ctrl = vmx->msr_autostore.val[slot].value;
-> +		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, pmu->global_ctrl);
-> +		return;
-> +	}
-> +
-> +	pmu->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
-> +}
-> +
->  static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> @@ -7631,8 +7674,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
->  
->  	vmx->loaded_vmcs->launched = 1;
->  
-> -	if (!msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
-> -		vcpu_to_pmu(vcpu)->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
-> +	vmx_refresh_guest_perf_global_control(vcpu);
->  
->  	vmx_recover_nmi_blocking(vmx);
->  	vmx_complete_interrupts(vmx);
 
-The change looks good to me, but I still have no bandwidth to test the code
-on Ice lake, I would go back after I finish the tests. Thanks.
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+[..]
 
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -14,6 +14,10 @@
+>   #include <linux/ioctl.h>
+>   #include <asm/kvm.h>
+>   
+> +#ifdef __KERNEL__
+> +#include <linux/kvm_types.h>
+> +#endif
+> +
+>   #define KVM_API_VERSION 12
+>   
+>   /*
+> @@ -1579,7 +1583,11 @@ struct kvm_stats_desc {
+>   	__u16 size;
+>   	__u32 offset;
+>   	__u32 bucket_size;
+> +#ifdef __KERNEL__
+> +	char name[KVM_STATS_NAME_SIZE];
+> +#else
+>   	char name[];
+> +#endif
+>   };
 
+Not sure if we need a comment here or not. Maybe git blame is good enough.
