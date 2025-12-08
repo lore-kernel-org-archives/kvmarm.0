@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EE22DF3F2;
-	Mon,  8 Dec 2025 09:15:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AAF3148BD;
+	Mon,  8 Dec 2025 09:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765185313; cv=none; b=Yw0IvUy0c3xVsNI1oSzfoPKdIE8w1RWdCO+lmVu++oVNOsSdAwhaNos7l1A6v2C36dFg+eRUclCizbxh8ZVkYnZZo4TromRYClzqaefEuC7+bPWYl0ZBaon8Mc5atknhhZEtyK/8zzHqlW0MRoCyd+SD6z8FOghRlFQ0t7c625w=
+	t=1765186205; cv=none; b=LmSOZMa9o9WM0CzFwOKxxg4yAkKSnpaj6c+Bo4uzUNYNOkScZcQWpvd3NANdHlrTqXc3TYLufGmVG0DbweV5hLisaIOT1ejTTpTL4SJdipuVKoRo+rCNjvqZ2ib7EpCMgiGcy/nmTAGGDCN7IfleNjtfexfjrE7NpW1nqypkLMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765185313; c=relaxed/simple;
-	bh=Op2nVfSeshtd/97y1F620bAyJ5slemNLwyBYIxH82c8=;
+	s=arc-20240116; t=1765186205; c=relaxed/simple;
+	bh=JcvwqgFLZTsix0sYAKimzPeJUH3wC8yywdSyJTN0AOA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bvr0mDfLps6ueFG9EUmIS1wts16B9GSm9OqhAX9H40KrqfsQI23+12IVBq6YxVocZYzIUaDFQVy3RRrYhUEvfeR6Jps2UaVOyOXyYBYcCWm/XxWl+wwm25v08f7vWzw2rDJ3GZZL/m+3obJEU4siZn91EHd2Pn6mshldEx27Y8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QrhGnBPf; arc=none smtp.client-ip=192.198.163.19
+	 In-Reply-To:Content-Type; b=AhWBUZgp/oixKdv+JkEU0hdI4FrfkpeokcSFRXtm1UmVD3IxctGEiAW24GFF6aTR5naHp9uJO8Frl9Z2MieXlaBvWhShGKLKEdTSZlmmW6VX+rpRXopEE6UYhhxyZKuqTgIegFRyoiZs/Wuf4dghQ9ec2TnJG6DOrLc4p0P8nP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nXofIik1; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QrhGnBPf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nXofIik1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765185311; x=1796721311;
+  t=1765186205; x=1796722205;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Op2nVfSeshtd/97y1F620bAyJ5slemNLwyBYIxH82c8=;
-  b=QrhGnBPfG9KQgS3kIU+kwvMouIZ0LG9BY0XdCwOd2nj4U046KS3TpK+Y
-   P3bRZrD8xEseRiLyvQNDR4u57GkybSrBR1Tc3or69x8SV8NBaFtdaR8FL
-   ubwpj4MQOd28HJdq70hCLiQ+MVFBO8LCrmLtKco7HS7PuGzg+nkCCszrk
-   iebq8niuiV9/8w3h27jSSqKtNJCGNuX1mlcVvY7X/rBvIxIc3cx06tJGq
-   YDfN5FdDeoZoyEGBz1E+/d8N8ExrJ6DAOzc7n0Dt1+yhHGDYuliHccn1d
-   40BppSKMtDkJzLpAxqqcmYGRimLvEPUjWh6WlVdnA6RAudaZhPYUg+Ms2
+  bh=JcvwqgFLZTsix0sYAKimzPeJUH3wC8yywdSyJTN0AOA=;
+  b=nXofIik18CH0JQSzkCZXBhsdsW6oayriLxNss4v2cHQ2prAOIIt/QQB4
+   zpi2zaUEejwjuSPLwMjF8nuA8R7nq+XU9DRpwrJCmoDLFPaICSMJVzgyn
+   C6+cPy0uLjsJ3ozTF10vCLzfa/I6v8HuHtQwAeOU39IzDWTtHZmZ3uRVs
+   nAtXPnGvzucTC+O6tSR81ZzpFoI47cKbJ3mR4Qi81tkDZjkaUxoM3Vw9v
+   vlL1k3g8hv/zTATX7bizX3KpGyC+b+LxOtU+9cAjQ5KISHUiOTZSg+PZK
+   3QdYjBO5f5qGii8JcoDJYcJVbze9ajrIRTtIwyMTFPrafABBtmUnKXmSE
    g==;
-X-CSE-ConnectionGUID: SHZ8tbhCSIewJ4zwRdzXzw==
-X-CSE-MsgGUID: Qt62ahHSScqvO1+byIhynA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="66124378"
+X-CSE-ConnectionGUID: /au2yoG1QAOFUtudSN8oAQ==
+X-CSE-MsgGUID: Kj2bVwCYRteqPwBRllautg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="70979401"
 X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="66124378"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:15:10 -0800
-X-CSE-ConnectionGUID: 4H/pcwrXQVSjY8FUXqPV6w==
-X-CSE-MsgGUID: j7p+D3AjRFu5Wm3XzOa1YQ==
+   d="scan'208";a="70979401"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:30:04 -0800
+X-CSE-ConnectionGUID: hxoRms/XQeW3zbu9VYpNCQ==
+X-CSE-MsgGUID: qMxDtETuSwGp66ogCtei0A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="195945489"
+   d="scan'208";a="200067632"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:14:59 -0800
-Message-ID: <0237b3eb-87f5-4758-b704-9f8d525f1f15@linux.intel.com>
-Date: Mon, 8 Dec 2025 17:14:56 +0800
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 01:29:56 -0800
+Message-ID: <2440b9bf-a2a1-4f66-94b2-71f47d62f3db@linux.intel.com>
+Date: Mon, 8 Dec 2025 17:29:53 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 35/44] KVM: VMX: Drop intermediate "guest" field from
- msr_autostore
+Subject: Re: [PATCH v6 37/44] KVM: VMX: Dedup code for removing MSR from
+ VMCS's auto-load list
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
  Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
@@ -72,111 +72,90 @@ Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
  Xiong Zhang <xiong.y.zhang@linux.intel.com>,
  Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
 References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-36-seanjc@google.com>
+ <20251206001720.468579-38-seanjc@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20251206001720.468579-36-seanjc@google.com>
+In-Reply-To: <20251206001720.468579-38-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 On 12/6/2025 8:17 AM, Sean Christopherson wrote:
-> Drop the intermediate "guest" field from vcpu_vmx.msr_autostore as the
-> value saved on VM-Exit isn't guaranteed to be the guest's value, it's
-> purely whatever is in hardware at the time of VM-Exit.  E.g. KVM's only
-> use of the store list at the momemnt is to snapshot TSC at VM-Exit, and
-> the value saved is always the raw TSC even if TSC-offseting and/or
-> TSC-scaling is enabled for the guest.
->
-> And unlike msr_autoload, there is no need differentiate between "on-entry"
-> and "on-exit".
+> Add a helper to remove an MSR from an auto-{load,store} list to dedup the
+> msr_autoload code, and in anticipation of adding similar functionality for
+> msr_autostore.
 >
 > No functional change intended.
 >
-> Cc: Jim Mattson <jmattson@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/vmx/nested.c | 10 +++++-----
->  arch/x86/kvm/vmx/vmx.c    |  2 +-
->  arch/x86/kvm/vmx/vmx.h    |  4 +---
->  3 files changed, 7 insertions(+), 9 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
 >
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 729cc1f05ac8..486789dac515 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1076,11 +1076,11 @@ static bool nested_vmx_get_vmexit_msr_value(struct kvm_vcpu *vcpu,
->  	 * VM-exit in L0, use the more accurate value.
->  	 */
->  	if (msr_index == MSR_IA32_TSC) {
-> -		int i = vmx_find_loadstore_msr_slot(&vmx->msr_autostore.guest,
-> +		int i = vmx_find_loadstore_msr_slot(&vmx->msr_autostore,
->  						    MSR_IA32_TSC);
->  
->  		if (i >= 0) {
-> -			u64 val = vmx->msr_autostore.guest.val[i].value;
-> +			u64 val = vmx->msr_autostore.val[i].value;
->  
->  			*data = kvm_read_l1_tsc(vcpu, val);
->  			return true;
-> @@ -1167,7 +1167,7 @@ static void prepare_vmx_msr_autostore_list(struct kvm_vcpu *vcpu,
->  					   u32 msr_index)
->  {
->  	struct vcpu_vmx *vmx = to_vmx(vcpu);
-> -	struct vmx_msrs *autostore = &vmx->msr_autostore.guest;
-> +	struct vmx_msrs *autostore = &vmx->msr_autostore;
->  	bool in_vmcs12_store_list;
->  	int msr_autostore_slot;
->  	bool in_autostore_list;
-> @@ -2366,7 +2366,7 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
->  	 * addresses are constant (for vmcs02), the counts can change based
->  	 * on L2's behavior, e.g. switching to/from long mode.
->  	 */
-> -	vmcs_write64(VM_EXIT_MSR_STORE_ADDR, __pa(vmx->msr_autostore.guest.val));
-> +	vmcs_write64(VM_EXIT_MSR_STORE_ADDR, __pa(vmx->msr_autostore.val));
->  	vmcs_write64(VM_EXIT_MSR_LOAD_ADDR, __pa(vmx->msr_autoload.host.val));
->  	vmcs_write64(VM_ENTRY_MSR_LOAD_ADDR, __pa(vmx->msr_autoload.guest.val));
->  
-> @@ -2704,7 +2704,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
->  	 */
->  	prepare_vmx_msr_autostore_list(&vmx->vcpu, MSR_IA32_TSC);
->  
-> -	vmcs_write32(VM_EXIT_MSR_STORE_COUNT, vmx->msr_autostore.guest.nr);
-> +	vmcs_write32(VM_EXIT_MSR_STORE_COUNT, vmx->msr_autostore.nr);
->  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
->  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
->  
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 62ba2a2b9e98..23c92c41fd83 100644
+> index 52bcb817cc15..a51f66d1b201 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6567,7 +6567,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
->  	if (vmcs_read32(VM_ENTRY_MSR_LOAD_COUNT) > 0)
->  		vmx_dump_msrs("guest autoload", &vmx->msr_autoload.guest);
->  	if (vmcs_read32(VM_EXIT_MSR_STORE_COUNT) > 0)
-> -		vmx_dump_msrs("guest autostore", &vmx->msr_autostore.guest);
-> +		vmx_dump_msrs("autostore", &vmx->msr_autostore);
+> @@ -1040,9 +1040,22 @@ static int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr)
+>  	return -ENOENT;
+>  }
 >  
->  	if (vmentry_ctl & VM_ENTRY_LOAD_CET_STATE)
->  		pr_err("S_CET = 0x%016lx, SSP = 0x%016lx, SSP TABLE = 0x%016lx\n",
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index d7a96c84371f..4ce653d729ca 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -245,9 +245,7 @@ struct vcpu_vmx {
->  		struct vmx_msrs host;
->  	} msr_autoload;
+> +static void vmx_remove_auto_msr(struct vmx_msrs *m, u32 msr,
+> +				unsigned long vmcs_count_field)
+> +{
+> +	int i;
+> +
+> +	i = vmx_find_loadstore_msr_slot(m, msr);
+> +	if (i < 0)
+> +		return;
+> +
+> +	--m->nr;
+> +	m->val[i] = m->val[m->nr];
+
+Sometimes the order of MSR writing does matter, e.g., PERF_GLOBAL_CTRL MSR
+should be written at last after all PMU MSR writing. So directly moving the
+last MSR entry into cleared one could break the MSR writing sequence and
+may cause issue in theory.
+
+I know this won't really cause issue since currently vPMU won't use the MSR
+auto-load feature to save any PMU MSR, but it's still unsafe for future uses. 
+
+I'm not sure if it's worthy to do the strict MSR entry shift right now.
+Perhaps we could add a message to warn users at least.
+
+Thanks.
+
+
+> +	vmcs_write32(vmcs_count_field, m->nr);
+> +}
+> +
+>  static void clear_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr)
+>  {
+> -	int i;
+>  	struct msr_autoload *m = &vmx->msr_autoload;
 >  
-> -	struct msr_autostore {
-> -		struct vmx_msrs guest;
-> -	} msr_autostore;
-> +	struct vmx_msrs msr_autostore;
+>  	switch (msr) {
+> @@ -1063,21 +1076,9 @@ static void clear_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr)
+>  		}
+>  		break;
+>  	}
+> -	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
+> -	if (i < 0)
+> -		goto skip_guest;
+> -	--m->guest.nr;
+> -	m->guest.val[i] = m->guest.val[m->guest.nr];
+> -	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
 >  
->  	struct {
->  		int vm86_active;
-
-LGTM.
-
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-
-
+> -skip_guest:
+> -	i = vmx_find_loadstore_msr_slot(&m->host, msr);
+> -	if (i < 0)
+> -		return;
+> -
+> -	--m->host.nr;
+> -	m->host.val[i] = m->host.val[m->host.nr];
+> -	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, m->host.nr);
+> +	vmx_remove_auto_msr(&m->guest, msr, VM_ENTRY_MSR_LOAD_COUNT);
+> +	vmx_remove_auto_msr(&m->host, msr, VM_EXIT_MSR_LOAD_COUNT);
+>  }
+>  
+>  static __always_inline void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
