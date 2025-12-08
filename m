@@ -1,104 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5A5286891;
-	Mon,  8 Dec 2025 10:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5C22D877E;
+	Mon,  8 Dec 2025 11:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765190539; cv=none; b=t4nbCn4wLHVbxbR62MHDyWgFu3anmVDopwpyqFA91R79eNsHbBHgDi1njV4i68NLvwoEA/UhNfHi6dGzoUYXW4PRaF21w6SdAdi47iAxIs2B0pBcCgqK29xHRi4LkLnOywnY0Zlpi5qwHX0w/ktz/lgBBY/wOzJDGrLKV4ftbIE=
+	t=1765194727; cv=none; b=khswgB7HOKlFKhfZcSZdpphrEBmJQ4/Y1R0me+WxJsqHbxLsOLqo/qW/UXeGklDHbhllkDYnx+j9zfqDxQ7qoc+sxyacaLJsYMD48j5qagFZLFESVvRizMJWX/VSnLcy2jLK32w4q6T+3PcV0s06mTNRDlzKy/HShff3dzxF2bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765190539; c=relaxed/simple;
-	bh=TAnDl6sPhcy+IUlbX2x8cziKUCBVlmn2sw/09aCCSsI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B924UxaXOUjijxYwhnmdQaAFYc/Bnk+hUuky+Y+6CiDGUYkHlPxWP2c/1TwfepD+5vPoA2m91RR3AZdOZxp3uZybjdTfgojeKtj1xGccX5KpdLQvRM3hj4xprDRiuaAVTeyXu7/tuHrjCJseUIV1KgIpFJ3kFVCbvtpBHXLuuLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X39h8sTJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765194727; c=relaxed/simple;
+	bh=4FADccRZqPbzotcTGTpPdhOrIlxkICNwS3BZDu1/VH0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bv1y+ZU06+szdkaEiAIRdE3wYdjHbDuEy2+S0JjIf9EEn1IT5ejWzFon7e0CP7ZisgL9BlqoI0UMJ/hyqceWPq4xuPhn4VPf+gKTe/rA2xohQ6hqto2Qu0aPhhgYo6o5IDOOuD9HpiAmK4IHE/FeMPcjQJzNp+3rOfk7T4VtaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oZb0VXak; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X39h8sTJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDA12C4CEF1;
-	Mon,  8 Dec 2025 10:42:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765190538;
-	bh=TAnDl6sPhcy+IUlbX2x8cziKUCBVlmn2sw/09aCCSsI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X39h8sTJnWGPt8aAvzjUIiETMHFCA3RazvKyqIgwrxEc58CgplJjrACjAAoXNDu9v
-	 Mf4FaQLF71Mpzddiqh8kUrRua4Tc83Ql8bVBgkYb1NwV/s948y0TBK6H1F/bs9Ola/
-	 sZu+jSyI5iZIZdEKwdjRFL1iArddlpoE9LJVlY5w70w1lpY2RFr5VT3HWhCLjjqgO/
-	 7UHZkgAfe6RkxZmmdW+6fR624bPxRz7mmacB9JWaHHKj3qGDASLOxRB1uz0L/yo7E6
-	 bJOkeoaduri8FaD9L2jy/l1FCprmQ0KANGIOHDqKa2svuZK9Ni4EKDeVCuLiDQBGK1
-	 trQavZzLM6zlg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vSYh6-0000000BGKA-1nWA;
-	Mon, 08 Dec 2025 10:42:16 +0000
-Date: Mon, 08 Dec 2025 10:42:15 +0000
-Message-ID: <865xahp854.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oZb0VXak"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=iPXwGwvEAAx1QdhY0az6JjqaxPOleQ46LMOtvOvZTJE=; b=oZb0VXakegLWXQ5mbsFuowE7GM
+	DV34MR9DukwCZjUTx8pB/UtWn7yzdSsZgCfI8rfgihkL7mKaA5tuiBmo0kHZPfq/dZnSFY0+kEqUe
+	cAU+NExfBqZ3SLOaQJDsBd6kgaHEESbSKU0TPNvPiH3GDJohzU9/m0PDPAJNrujeN0rF4ZmLFAgL4
+	O0rhb5HB06eAuj11P/DfJQ9tH1k3SPKG9S6ZfQUHHo41QlumJOsPf6iWl1NCDUFvGfYVaQzogMQAM
+	q+J+KTnlnUaPGrJ0IJhvALjg9pQPoLk/z4TcES7CdMXs3ExRkhx9iI2dyI5Nj9+GcqpObncERbfnL
+	s8qIDapg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vSZmX-00000009jjc-1PBF;
+	Mon, 08 Dec 2025 11:51:57 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 6040D30301A; Mon, 08 Dec 2025 12:51:56 +0100 (CET)
+Date: Mon, 8 Dec 2025 12:51:56 +0100
+From: Peter Zijlstra <peterz@infradead.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
 	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <pjw@kernel.org>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
 	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A . R . Silva" <gustavoars@kernel.org>
-Subject: Re: [PATCH] KVM: Remove subtle "struct kvm_stats_desc" pseudo-overlay
-In-Reply-To: <20251205232655.445294-1-seanjc@google.com>
-References: <20251205232655.445294-1-seanjc@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, loongarch@lists.linux.dev,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	Mingwei Zhang <mizhang@google.com>,
+	Xudong Hao <xudong.hao@intel.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v6 04/44] perf: Add APIs to create/release mediated guest
+ vPMUs
+Message-ID: <20251208115156.GE3707891@noisy.programming.kicks-ass.net>
+References: <20251206001720.468579-1-seanjc@google.com>
+ <20251206001720.468579-5-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, oupton@kernel.org, zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org, maddy@linux.ibm.com, anup@brainfault.org, pjw@kernel.org, palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, gustavoars@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251206001720.468579-5-seanjc@google.com>
 
-On Fri, 05 Dec 2025 23:26:55 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> Remove KVM's internal pseudo-overlay of kvm_stats_desc, which subtly
-> aliases the flexible name[] in the uAPI definition with a fixed-size array
-> of the same name.  The unusual embedded structure results in compiler
-> warnings due to -Wflex-array-member-not-at-end, and also necessitates an
-> extra level of dereferencing in KVM.  To avoid the "overlay", define the
-> uAPI structure to have a fixed-size name when building for the kernel.
-> 
-> Opportunistically clean up the indentation for the stats macros, and
-> replace spaces with tabs.
-> 
-> No functional change intended.
-> 
-> Reported-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Closes: https://lore.kernel.org/all/aPfNKRpLfhmhYqfP@kspp
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Fri, Dec 05, 2025 at 04:16:40PM -0800, Sean Christopherson wrote:
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+> +static atomic_t nr_include_guest_events __read_mostly;
+> +
+> +static atomic_t nr_mediated_pmu_vms __read_mostly;
+> +static DEFINE_MUTEX(perf_mediated_pmu_mutex);
 
-	M.
+> +static int mediated_pmu_account_event(struct perf_event *event)
+> +{
+> +	if (!is_include_guest_event(event))
+> +		return 0;
+> +
+> +	guard(mutex)(&perf_mediated_pmu_mutex);
+> +
+> +	if (atomic_read(&nr_mediated_pmu_vms))
+> +		return -EOPNOTSUPP;
+> +
+> +	atomic_inc(&nr_include_guest_events);
+> +	return 0;
+> +}
+> +
+> +static void mediated_pmu_unaccount_event(struct perf_event *event)
+> +{
+> +	if (!is_include_guest_event(event))
+> +		return;
+> +
+> +	atomic_dec(&nr_include_guest_events);
+> +}
 
--- 
-Without deviation from the norm, progress is not possible.
+> +int perf_create_mediated_pmu(void)
+> +{
+> +	guard(mutex)(&perf_mediated_pmu_mutex);
+> +	if (atomic_inc_not_zero(&nr_mediated_pmu_vms))
+> +		return 0;
+> +
+> +	if (atomic_read(&nr_include_guest_events))
+> +		return -EBUSY;
+> +
+> +	atomic_inc(&nr_mediated_pmu_vms);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(perf_create_mediated_pmu);
+> +
+> +void perf_release_mediated_pmu(void)
+> +{
+> +	if (WARN_ON_ONCE(!atomic_read(&nr_mediated_pmu_vms)))
+> +		return;
+> +
+> +	atomic_dec(&nr_mediated_pmu_vms);
+> +}
+> +EXPORT_SYMBOL_GPL(perf_release_mediated_pmu);
+
+These two things are supposed to be symmetric, but are implemented
+differently; what gives?
+
+That is, should not both have the general shape:
+
+	if (atomic_inc_not_zero(&A))
+		return 0;
+
+	guard(mutex)(&lock);
+
+	if (atomic_read(&B))
+		return -EBUSY;
+
+	atomic_inc(&A);
+	return 0;
+
+Similarly, I would imagine both release variants to have the underflow
+warn on like:
+
+	if (WARN_ON_ONCE(!atomic_read(&A)))
+		return;
+
+	atomic_dec(&A);
+
+Hmm?
+
+Also, EXPORT_SYMBOL_FOR_KVM() ?
+
+I can make these edits when applying, if/when we get to applying. Let me
+continue reading.
+
