@@ -1,55 +1,55 @@
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B9B2FBE14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87D630B527
 	for <kvmarm@lists.linux.dev>; Tue,  9 Dec 2025 20:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765313565; cv=none; b=UmKaLi2ufCiN/8PL6avK8yUCgGcr3GmKJeRIA4mipd+iR0vApwRwYSJ0wG5D9HR+USCsGNuPgkXxmrYuuvUEkujP+EJGabSMph0aHZjeyTMAJ2K/N5TpnFkyHdjd0Oneqmaf+MEhyhc7kSIMoipbwRhLGnVnNRPNuX46QTzSjCk=
+	t=1765313564; cv=none; b=MiqDZZhQSp/c0FLucWMTK2gE4VlwUEe8mxwwXFpnSqqF7F3jiTWNSFoIGMB/DHpSzjGX6AsOJRcaQKazN5bmNSa/zXXYjSiJNRi5SYzisgKKfc0Yt0A2KfKzV0L14saOaUCkkpMgyVkvyu5r14oSABnnV+GBvyWNG9U4fjzs1OU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765313565; c=relaxed/simple;
-	bh=SQ6Z1MwvA88uzbzI+XtO/m3rZVQWhJdhjpiP6b/54yU=;
+	s=arc-20240116; t=1765313564; c=relaxed/simple;
+	bh=aCNuh2V9q56mw6LZjRPGjWZ7ahwIMSj/x17VFTK+/00=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EVWwc7I5sdW4A8aVMhn36rtck6cRcszMgaUGS6OcYht+zAYZeSjbjeov2XRxRqHc8Wrob89P2pA9gRUAU/FhRmjZFYLgC5RTAos921riVRqefJSlbmnsvg53p+DIrwHF0v0juINzMHCxDDvmoHUbmYMxRRjlKZ2WI7u04pzjR7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4pJmGuzK; arc=none smtp.client-ip=209.85.167.202
+	 To:Cc:Content-Type; b=aXCgp1OCiltswNdjANGo7vpH5zR1hwYhjnL+smcC7aQ3wuYD6aU+TYRSHY2bIz0/6CCcjxHnSVGKZhyGGDue/GMcYqREk4b9uPIdG92dWhuPFqp+1XO/Azz/Hxdw/hfG5PdXzFbayzxzj2ePWglF82p4fZtsCzneAtjwpU+G3TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sitj1gYo; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4pJmGuzK"
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-450fd003480so8460664b6e.2
-        for <kvmarm@lists.linux.dev>; Tue, 09 Dec 2025 12:52:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sitj1gYo"
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-657486eb435so7782190eaf.1
+        for <kvmarm@lists.linux.dev>; Tue, 09 Dec 2025 12:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765313559; x=1765918359; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1765313557; x=1765918357; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AJ1EthCH6ONdnoakqWvxYQ6ZZxvXCgKuA673W4BNIkM=;
-        b=4pJmGuzK9u288n9Y5Gi6LB7l36UTwWlw76kHgmPG1LgmTGJyHu8ByStT0pRuVKDpm7
-         13JL7K7mkUg8mWorUmAV0srYA9MLFVgtWXo65SaWcsPoX8UK+u1bJi7nDM2LHEMKKeBW
-         TT5oKKUJ1PdaPrRXFlmyx3p6XmqDMVVMgEsrP+vaIjmutmeOtA0ZvZJ5lVRCRtQRJjGO
-         n25eB2u8bFIybcKPyShp5DHzPZrbuOw3ek3HkA6MwGuFsy5ggZ8dgbnDrDtYZdbZ9r21
-         bSBMm8aKpZZPIolJMTr3E0zJAJzuZlGjIRPfJsn2uD8RCm7ljvFLiTU5SVjTGDPkeIqY
-         xDCg==
+        bh=tlzYgLY8Hya1ebzZsNsRPfgfqZdf/pfSg0Aip8i1MzM=;
+        b=sitj1gYoJnW39Jp5xovs/UbKRCz6/jpaNiWU0iYXhYU+oXlwwZsWQHhNU/LJDfxFBT
+         VKNwoM3OfZVIRM2/pM/JcRD8HRBp3FFqTrYp++ICdlbvO+gvKr+AZJYiQd0upkqhoG8Q
+         awlWrZKkFfB8PDCDpKNQJpGuNcpxf8OIhsF2GPCDefqSlNXy4notjXEA1Jb2z1ZGNErz
+         cJ/jPYrvSkNxsdRls/Xbf8QfyJEnCekA8FK5TMOgrKNsYMuVBj09Hh3jb02a5m063zvk
+         WbY3hpuD+73FovxMgofZt/NBhgvgIFaHPjeGHp89c9HJqan6Vt2xSO8MO8JqXCLmR2K3
+         gsVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765313559; x=1765918359;
+        d=1e100.net; s=20230601; t=1765313557; x=1765918357;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AJ1EthCH6ONdnoakqWvxYQ6ZZxvXCgKuA673W4BNIkM=;
-        b=h6j7Ldb4qsrZTFchsZuYU4N8mrl71EdqYgV3aNiHa4Q2izWVUvgOqHDkqLRk/rqUhs
-         3s+pVDATPDSnrLnIgQMxLq0moQ9rU2obn33+M0kexPsebryzcMITRy0ooIIteYedXbcE
-         96HsoeyKLrRvHXL+QTkc5VWkbXDQWHbAFTxARTFP3iSGFfraPdQ+RSnNcuHrqS7wBwJZ
-         VaO2HS5VdWhlkNcFc1fgYtd+vTtliP4y+43UO4796wiV8ra1wGQKMl7PYyuuodJw5CD6
-         +WvYCz1xIWHzReDCefAsuApueMkYIZ8owwndMXawWTRyI4E81TZZ8fuchoV5XywOe42U
-         q2Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/3lxns4pEHM8p9YlAycspE+f0WtXZq/ZLja5OO7FmzQyjULxwdceYIqImGqIZtDb3p2gmrXs=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzl+u6p8vzbppU2h57VeeS+b14EbXj2b7S98lb4P/Z9aDCXJn2/
-	99gEaXq01f0PfNHuY0K1Ij0DpvPwEZB60nmFbURxK5kdpne48kc+9jCUA/qSU2OEup5JPAVws77
-	axIWdtJ/MWY5ZhwITrOaQwEWtRA==
-X-Google-Smtp-Source: AGHT+IEXFAGDtIzcAMUsWr76V/QsGbzsYAGUdLx+/ZdxOcslRVX0AGiIPoGFGxMRz56nzOeGb3yai/VbNoKlqj0WOg==
-X-Received: from jabgz26.prod.google.com ([2002:a05:6638:6b1a:b0:5b7:27fd:4267])
+        bh=tlzYgLY8Hya1ebzZsNsRPfgfqZdf/pfSg0Aip8i1MzM=;
+        b=t96XXu1766Avq0LNfUsezNinGfuHJro1z5Cr2ewDC5VsZX4v5kK8LCfhF3oEkfhi/D
+         ZP5Dic3Irv1pbtlI0haHn1JKtVAU0jXLp9g3RMta2Z2xuWQUeIRNX+m0ueq+zJbkbkmr
+         7PqhJ58IzrN6oRrBZOlST7xU92rv2fsiOPuk2vnj3mtcXNJctpJ8pFa7MZI9ls6zyoer
+         +Qzt4KT6ZYwI0AlkvheRij4kc+IoydWdWgZsA8ppP44uj8CVXIIoAs3K4mXK6vAXMWSR
+         barnY6QJiH8wjCMG5tqK2BR3OhFKV8Jg6X/Cc8ErsGljcLWgx1i4LMTF11JHdvEfgR2w
+         tckQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVZIOyek8gD9thbaf0Ug/mzT80Kb0sjfi2Gbs3nZyHiDLp8g7/L+aiZ62B80CDoERQz/XjQvw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzxxTOaglc+aI/9C+q7S3IvibCssOJworA/D6E1VIE3ihOQg7FH
+	dGBixbJB6/P8PyETxNDerm1dZnoJJaNZht5XVwY4sKZwMTqRN4LNebSDuULGeLl6NbSCYQsZH68
+	hZX8D3Fri3lm7WQMdPUYMV9LoAg==
+X-Google-Smtp-Source: AGHT+IFjXkWMzT4yuAEaLB+dJ2qXq9BXOkkzzf3nS3SdXsepbg3bqK/U0WpaHKFNBgIw1WNvMEX2vLOAaq9kL+8k3A==
+X-Received: from jabhd27.prod.google.com ([2002:a05:6638:4e9b:b0:5b7:56fc:a47d])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a4a:ee05:0:b0:657:717a:8c8 with SMTP id 006d021491bc7-65b2abef8e5mr121600eaf.3.1765313559184;
- Tue, 09 Dec 2025 12:52:39 -0800 (PST)
-Date: Tue,  9 Dec 2025 20:51:10 +0000
+ 2002:a05:6820:6acf:b0:659:9a49:8f3d with SMTP id 006d021491bc7-65b2ad9f5eamr96621eaf.78.1765313557028;
+ Tue, 09 Dec 2025 12:52:37 -0800 (PST)
+Date: Tue,  9 Dec 2025 20:51:08 +0000
 In-Reply-To: <20251209205121.1871534-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -59,8 +59,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251209205121.1871534-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
-Message-ID: <20251209205121.1871534-14-coltonlewis@google.com>
-Subject: [PATCH v5 13/24] KVM: arm64: Writethrough trapped PMOVS register
+Message-ID: <20251209205121.1871534-12-coltonlewis@google.com>
+Subject: [PATCH v5 11/24] KVM: arm64: Writethrough trapped PMEVTYPER register
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
@@ -75,71 +75,76 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
 	linux-kselftest@vger.kernel.org, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Because PMOVS remains trapped, it needs to be written through when
-partitioned to affect PMU hardware when expected.
+With FGT in place, the remaining trapped registers need to be written
+through to the underlying physical registers as well as the virtual
+ones. Failing to do this means guest writes will not take effect when
+expected.
+
+For the PMEVTYPER register, take care to enforce KVM's PMU event
+filter. Do that by setting the bits to exclude EL1 and EL0 when an
+event is not present in the filter and clearing the bit to include EL2
+always.
+
+Note the virtual register is always assigned the value specified by
+the guest to hide the setting of those bits.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- arch/arm64/include/asm/arm_pmuv3.h | 10 ++++++++++
- arch/arm64/kvm/sys_regs.c          | 17 ++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/arm_pmuv3.h b/arch/arm64/include/asm/arm_pmuv3.h
-index 60600f04b5902..3e25c0313263c 100644
---- a/arch/arm64/include/asm/arm_pmuv3.h
-+++ b/arch/arm64/include/asm/arm_pmuv3.h
-@@ -140,6 +140,16 @@ static inline u64 read_pmicfiltr(void)
- 	return read_sysreg_s(SYS_PMICFILTR_EL0);
- }
- 
-+static inline void write_pmovsset(u64 val)
-+{
-+	write_sysreg(val, pmovsset_el0);
-+}
-+
-+static inline u64 read_pmovsset(void)
-+{
-+	return read_sysreg(pmovsset_el0);
-+}
-+
- static inline void write_pmovsclr(u64 val)
- {
- 	write_sysreg(val, pmovsclr_el0);
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e6d907fa8af2..bee892db9ca8b 100644
+index c636840b1f6f9..0c9596325519b 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1307,6 +1307,19 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+@@ -1166,6 +1166,36 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
  	return true;
  }
  
-+static void writethrough_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p, bool set)
++static bool writethrough_pmevtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++				   u64 reg, u64 idx)
 +{
-+	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
++	u64 eventsel;
++	u64 val = p->regval;
++	u64 evtyper_set = ARMV8_PMU_EXCLUDE_EL0 |
++		ARMV8_PMU_EXCLUDE_EL1;
++	u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
 +
-+	if (set) {
-+		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=, (p->regval & mask));
-+		write_pmovsset(p->regval & mask);
-+	} else {
-+		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, &=, ~(p->regval & mask));
-+		write_pmovsclr(p->regval & mask);
-+	}
++	__vcpu_assign_sys_reg(vcpu, reg, val);
++
++	if (idx == ARMV8_PMU_CYCLE_IDX)
++		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
++	else
++		eventsel = val & kvm_pmu_event_mask(vcpu->kvm);
++
++	if (vcpu->kvm->arch.pmu_filter &&
++	    !test_bit(eventsel, vcpu->kvm->arch.pmu_filter))
++		val |= evtyper_set;
++
++	val &= ~evtyper_clr;
++
++	if (idx == ARMV8_PMU_CYCLE_IDX)
++		write_pmccfiltr(val);
++	else
++		write_pmevtypern(idx, val);
++
++	return true;
 +}
 +
- static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
+ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			       const struct sys_reg_desc *r)
  {
-@@ -1315,7 +1328,9 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (pmu_access_el0_disabled(vcpu))
+@@ -1192,7 +1222,9 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (!pmu_counter_idx_valid(vcpu, idx))
  		return false;
  
 -	if (p->is_write) {
 +	if (kvm_vcpu_pmu_is_partitioned(vcpu) && p->is_write) {
-+		writethrough_pmovs(vcpu, p, r->CRm & 0x2);
++		writethrough_pmevtyper(vcpu, p, reg, idx);
 +	} else if (p->is_write) {
- 		if (r->CRm & 0x2)
- 			/* accessing PMOVSSET_EL0 */
- 			__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=, (p->regval & mask));
+ 		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
+ 		kvm_vcpu_pmu_restore_guest(vcpu);
+ 	} else {
 -- 
 2.52.0.239.gd5f0c6e74e-goog
 
