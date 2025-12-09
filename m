@@ -1,260 +1,180 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC14243376;
-	Tue,  9 Dec 2025 06:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAEB224B0D
+	for <kvmarm@lists.linux.dev>; Tue,  9 Dec 2025 17:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765261890; cv=none; b=PDfbu+5dSRrviu8QrlUD1Lcr5CFuEcQi6eOVGDtLa9BqhhQ+XFVgB4mRexTs2PUohNGhm7+KQDgxLDGDNmn1mFP/4YWxFWpWH4vbFDQHPUbJSOMEkX7CI/Zxb8Jp/yX6N411bNN0gMz4gKNm4nPAP3hugCCAWFWMoH5VH52a7ls=
+	t=1765301837; cv=none; b=mc4Y3ODYEQ3+rDgjpPQf71qzOJQ85fyeRcN7LbLbg+pd/dGMUgNh4AI53x835qETAi8yifhdmdpTerI+rc+SOhp+1JlhZD0TUkV0JfOwaBMQgca6H3gMfm0LVQtELT+X/xXuVHCitc2mI0aEYWRrRPkjdVUujVEST7+kcnbIn4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765261890; c=relaxed/simple;
-	bh=3I2+FsbZXr1WnlAwsLrRK4zLjlcjjzCN2ZRMQ8uYaWE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=nZJWAli0yckK8rDvmFEtoL+FCvEpzd/RpmA1dhwFK/0g98Uq+4w9rMOi5foedmYkgqAzCIkk04F0QiMAnFRDlyzJUoGCsXjwMsLnaIZ6y5Z/cg0PK+qdgqAwc3zRAHf0olD7jtIvODvyJVQ2c+zXo0ksDG8EJEmxcMfDbWm69tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qz5XTvzl; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1765301837; c=relaxed/simple;
+	bh=HizTlmZQbI6tmGG3q1gw6CHs59oQallkQuLPYHyLpHw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hKSQQD6PvAZtwYrG2u/Hj2RT+29n6VyaTAyfm8qenEZvKKcVIcpVygvCtheMgX3J7H1H774wByiSFqm02iJOVUQagc0bkbl3TU+38LuMRJWwALFbYBXvMkSonDLmTnZXVt5l5woDTes38PqyTOZxeFilVldEMWV7iqk1Rk01ZYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Pl6u2y27; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qz5XTvzl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765261888; x=1796797888;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=3I2+FsbZXr1WnlAwsLrRK4zLjlcjjzCN2ZRMQ8uYaWE=;
-  b=Qz5XTvzlod2viSVUR3nXbwVu2qtYZr4iJHqqpqMY9tQcwNx4j3Lrk15D
-   YAHn8ESHKTaPb+kj14UVcC4Q+SDNDw4UV8uGyKBYnebien9RXo9JIv4wL
-   BUpXTkPofdb8m0luAkkVnylyo4yjsybpLxPQnqU3HUKwHMVA1pei5kR9j
-   vRqJmZ2siX6/WOxOg9zqibLhFaCBP0/+LnRDc4E9Q60d2kVwmXv9vjKKW
-   xtRi+08G4ky0ohoebpY0N47P065msgJFGYRMEwTCDKEc2CpkZQh4rNS24
-   kUxAkmvck9n88QTMzphuRNGf31Fv09sjB4OBV4qgnydqU9lgXI7xtmjMb
-   g==;
-X-CSE-ConnectionGUID: Tr+qDR3dRbq2DRC9BQhtaA==
-X-CSE-MsgGUID: VnMqLRqfS5+yFSSElMpWmA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="84621509"
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="84621509"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 22:31:28 -0800
-X-CSE-ConnectionGUID: E0aTtjOiTQelMO5dDdd7mA==
-X-CSE-MsgGUID: 9WXsel9CRiO4rC94VpUqXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="scan'208";a="196601217"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 22:31:20 -0800
-Message-ID: <8365c5ca-637d-4bef-a404-eb2166d384f5@linux.intel.com>
-Date: Tue, 9 Dec 2025 14:31:17 +0800
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Pl6u2y27"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3437f0760daso11280204a91.1
+        for <kvmarm@lists.linux.dev>; Tue, 09 Dec 2025 09:37:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765301835; x=1765906635; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RSI8Pxf1Wt9ews+8G0JZ3VLNAwMte4kHmIud1VFkk60=;
+        b=Pl6u2y27+WkjJNXaGpLz8jvygoVd9Fj5Pjd1cSU7O3ntD3ZdVa0ULP18NvYsTd15By
+         E7OHYVcrjegbXbFoY5+2T/4ztqSBNhy1txK0UwECAhf9SCVGqVY1yfPTc85oyptpM1qJ
+         cTTP2Z/VMKKA+EtT7aLLg8Tz4GT1ltIDS7u4ErbdSxRiesSS8KYPfIImx9CpWcztO1wI
+         iWoSgQ37cau4vhFkTodQB6LBLm2jY0Q8He2PNwgaSUyZYFOyUCDfItF0N+r14YIN0Eff
+         nzP8I+3XPfdxlGCb1Cqdk419pRyCmjotE4chYELi+4Q0f63EQWkI1Aw9kLqFLGBs4RUH
+         UFlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765301835; x=1765906635;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RSI8Pxf1Wt9ews+8G0JZ3VLNAwMte4kHmIud1VFkk60=;
+        b=pVHdNhkiFwxFf0XTcTo1lL6vMOIDCDivdG3wstIz/4HluV/9Zrwzxjp1+DYAUBwxsh
+         RXmUnaQzJ721ZqnHP3+zIo00KnVc1QTDQP6fUgp9ZpBU08uOSYFtbZ7WxJA3EXTlzk9o
+         3QvCbNhCYOia9g7vhd++IxOl2exnB1zrbd2Zmp0vIOUrDicwNNSe34Jd4q+zhLnYQUS8
+         4+ME890CkIVYKSM2R8svZYKsnrTrAOCEnU0QomZV2ZzeT6IzCImBc+J6wXRIyQ+vvs/G
+         M+Ezo2/ttToEE5vhqHtiJnjq6GKiVvnJZaR1uUempjwI9s8B4g38e8Up7jAA9JO1hyBg
+         7rbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDTvqBPNcwREQcY0t2LngqwdRg26dFth03TacblWoyAKCDfoAZaEMekmXalTU+J3SpE0na0IM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx0EYi0yzg9F3AkYMjRf5d0fh5P0yBnPFaUIqPvzijgnuH/4NMV
+	V/9eV/RwqL9uMk1caOXeDpaLGxot/AtIgiq7nGbarbZF0FtwetLshgqOb2TNT12Ah6XacEsvACx
+	hQRRO+g==
+X-Google-Smtp-Source: AGHT+IFtEkvOBWBmPhAZp6fiQBmIeByIj1WwkTuM0S6f9ba1kbmIBgBTopqxljhwYNgNIix+N66SAv3Sd14=
+X-Received: from pjbnh9.prod.google.com ([2002:a17:90b:3649:b0:343:6cb7:a68e])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1a8b:b0:343:f509:aa4a
+ with SMTP id 98e67ed59e1d1-349a260a9d0mr9559247a91.36.1765301834531; Tue, 09
+ Dec 2025 09:37:14 -0800 (PST)
+Date: Tue, 9 Dec 2025 09:37:13 -0800
+In-Reply-To: <2440b9bf-a2a1-4f66-94b2-71f47d62f3db@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 44/44] KVM: VMX: Add mediated PMU support for CPUs
- without "save perf global ctrl"
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
- Sandipan Das <sandipan.das@amd.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-45-seanjc@google.com>
- <ee30ed9c-6377-4d14-b930-f0e2c809df7c@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <ee30ed9c-6377-4d14-b930-f0e2c809df7c@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20251206001720.468579-1-seanjc@google.com> <20251206001720.468579-38-seanjc@google.com>
+ <2440b9bf-a2a1-4f66-94b2-71f47d62f3db@linux.intel.com>
+Message-ID: <aTheSQb9fhXmZKw6@google.com>
+Subject: Re: [PATCH v6 37/44] KVM: VMX: Dedup code for removing MSR from
+ VMCS's auto-load list
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 12/8/2025 5:39 PM, Mi, Dapeng wrote:
+On Mon, Dec 08, 2025, Dapeng Mi wrote:
+>=20
 > On 12/6/2025 8:17 AM, Sean Christopherson wrote:
->> Extend mediated PMU support for Intel CPUs without support for saving
->> PERF_GLOBAL_CONTROL into the guest VMCS field on VM-Exit, e.g. for Skylake
->> and its derivatives, as well as Icelake.  While supporting CPUs without
->> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL isn't completely trivial, it's not that
->> complex either.  And not supporting such CPUs would mean not supporting 7+
->> years of Intel CPUs released in the past 10 years.
->>
->> On VM-Exit, immediately propagate the saved PERF_GLOBAL_CTRL to the VMCS
->> as well as KVM's software cache so that KVM doesn't need to add full EXREG
->> tracking of PERF_GLOBAL_CTRL.  In practice, the vast majority of VM-Exits
->> won't trigger software writes to guest PERF_GLOBAL_CTRL, so deferring the
->> VMWRITE to the next VM-Enter would only delay the inevitable without
->> batching/avoiding VMWRITEs.
->>
->> Note!  Take care to refresh VM_EXIT_MSR_STORE_COUNT on nested VM-Exit, as
->> it's unfortunately possible that KVM could recalculate MSR intercepts
->> while L2 is active, e.g. if userspace loads nested state and _then_ sets
->> PERF_CAPABILITIES.  Eating the VMWRITE on every nested VM-Exit is
->> unfortunate, but that's a pre-existing problem and can/should be solved
->> separately, e.g. modifying the number of auto-load entries while L2 is
->> active is also uncommon on modern CPUs.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> ---
->>  arch/x86/kvm/vmx/nested.c    |  6 ++++-
->>  arch/x86/kvm/vmx/pmu_intel.c |  7 -----
->>  arch/x86/kvm/vmx/vmx.c       | 52 ++++++++++++++++++++++++++++++++----
->>  3 files changed, 52 insertions(+), 13 deletions(-)
->>
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index 614b789ecf16..1ee1edc8419d 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -5142,7 +5142,11 @@ void __nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
->>  
->>  	kvm_nested_vmexit_handle_ibrs(vcpu);
->>  
->> -	/* Update any VMCS fields that might have changed while L2 ran */
->> +	/*
->> +	 * Update any VMCS fields that might have changed while vmcs02 was the
->> +	 * active VMCS.  The tracking is per-vCPU, not per-VMCS.
->> +	 */
->> +	vmcs_write32(VM_EXIT_MSR_STORE_COUNT, vmx->msr_autostore.nr);
->>  	vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, vmx->msr_autoload.host.nr);
->>  	vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, vmx->msr_autoload.guest.nr);
->>  	vmcs_write64(TSC_OFFSET, vcpu->arch.tsc_offset);
->> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
->> index 55249fa4db95..27eb76e6b6a0 100644
->> --- a/arch/x86/kvm/vmx/pmu_intel.c
->> +++ b/arch/x86/kvm/vmx/pmu_intel.c
->> @@ -777,13 +777,6 @@ static bool intel_pmu_is_mediated_pmu_supported(struct x86_pmu_capability *host_
->>  	if (WARN_ON_ONCE(!cpu_has_load_perf_global_ctrl()))
->>  		return false;
->>  
->> -	/*
->> -	 * KVM doesn't yet support mediated PMU on CPUs without support for
->> -	 * saving PERF_GLOBAL_CTRL via a dedicated VMCS field.
->> -	 */
->> -	if (!cpu_has_save_perf_global_ctrl())
->> -		return false;
->> -
->>  	return true;
->>  }
->>  
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 6a17cb90eaf4..ba1262c3e3ff 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -1204,6 +1204,17 @@ static bool update_transition_efer(struct vcpu_vmx *vmx)
->>  	return true;
->>  }
->>  
->> +static void vmx_add_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
->> +{
->> +	vmx_add_auto_msr(&vmx->msr_autostore, msr, 0, VM_EXIT_MSR_STORE_COUNT,
->> +			 vmx->vcpu.kvm);
->> +}
->> +
->> +static void vmx_remove_autostore_msr(struct vcpu_vmx *vmx, u32 msr)
->> +{
->> +	vmx_remove_auto_msr(&vmx->msr_autostore, msr, VM_EXIT_MSR_STORE_COUNT);
->> +}
->> +
->>  #ifdef CONFIG_X86_32
->>  /*
->>   * On 32-bit kernels, VM exits still load the FS and GS bases from the
->> @@ -4225,6 +4236,8 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
->>  
->>  static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
->>  {
->> +	u64 vm_exit_controls_bits = VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
->> +				    VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
->>  	bool has_mediated_pmu = kvm_vcpu_has_mediated_pmu(vcpu);
->>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> @@ -4234,12 +4247,19 @@ static void vmx_recalc_pmu_msr_intercepts(struct kvm_vcpu *vcpu)
->>  	if (!enable_mediated_pmu)
->>  		return;
->>  
->> +	if (!cpu_has_save_perf_global_ctrl()) {
->> +		vm_exit_controls_bits &= ~VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL;
->> +
->> +		if (has_mediated_pmu)
->> +			vmx_add_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
->> +		else
->> +			vmx_remove_autostore_msr(vmx, MSR_CORE_PERF_GLOBAL_CTRL);
->> +	}
->> +
->>  	vm_entry_controls_changebit(vmx, VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
->>  				    has_mediated_pmu);
->>  
->> -	vm_exit_controls_changebit(vmx, VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL |
->> -					VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL,
->> -				   has_mediated_pmu);
->> +	vm_exit_controls_changebit(vmx, vm_exit_controls_bits, has_mediated_pmu);
->>  
->>  	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
->>  		vmx_set_intercept_for_msr(vcpu, MSR_IA32_PERFCTR0 + i,
->> @@ -7346,6 +7366,29 @@ static void atomic_switch_perf_msrs(struct vcpu_vmx *vmx)
->>  					      msrs[i].host);
->>  }
->>  
->> +static void vmx_refresh_guest_perf_global_control(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> +
->> +	if (msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
->> +		return;
->> +
->> +	if (!cpu_has_save_perf_global_ctrl()) {
->> +		int slot = vmx_find_loadstore_msr_slot(&vmx->msr_autostore,
->> +						       MSR_CORE_PERF_GLOBAL_CTRL);
->> +
->> +		if (WARN_ON_ONCE(slot < 0))
->> +			return;
->> +
->> +		pmu->global_ctrl = vmx->msr_autostore.val[slot].value;
->> +		vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, pmu->global_ctrl);
->> +		return;
->> +	}
->> +
->> +	pmu->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
->> +}
->> +
->>  static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit)
->>  {
->>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
->> @@ -7631,8 +7674,7 @@ fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
->>  
->>  	vmx->loaded_vmcs->launched = 1;
->>  
->> -	if (!msr_write_intercepted(vmx, MSR_CORE_PERF_GLOBAL_CTRL))
->> -		vcpu_to_pmu(vcpu)->global_ctrl = vmcs_read64(GUEST_IA32_PERF_GLOBAL_CTRL);
->> +	vmx_refresh_guest_perf_global_control(vcpu);
->>  
->>  	vmx_recover_nmi_blocking(vmx);
->>  	vmx_complete_interrupts(vmx);
-> The change looks good to me, but I still have no bandwidth to test the code
-> on Ice lake, I would go back after I finish the tests. Thanks.
+> > Add a helper to remove an MSR from an auto-{load,store} list to dedup t=
+he
+> > msr_autoload code, and in anticipation of adding similar functionality =
+for
+> > msr_autostore.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++---------------
+> >  1 file changed, 16 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 52bcb817cc15..a51f66d1b201 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -1040,9 +1040,22 @@ static int vmx_find_loadstore_msr_slot(struct vm=
+x_msrs *m, u32 msr)
+> >  	return -ENOENT;
+> >  }
+> > =20
+> > +static void vmx_remove_auto_msr(struct vmx_msrs *m, u32 msr,
+> > +				unsigned long vmcs_count_field)
+> > +{
+> > +	int i;
+> > +
+> > +	i =3D vmx_find_loadstore_msr_slot(m, msr);
+> > +	if (i < 0)
+> > +		return;
+> > +
+> > +	--m->nr;
+> > +	m->val[i] =3D m->val[m->nr];
+>=20
+> Sometimes the order of MSR writing does matter, e.g., PERF_GLOBAL_CTRL MS=
+R
+> should be written at last after all PMU MSR writing.
 
-Tested below test cases on Skylake and Sapphire Rapids servers for both
-mediated vPMU and Perf based emulated vPMU, no issue is found. Thanks.
+Hmm, no.  _If_ KVM were writing event selectors using the auto-load lists, =
+then
+KVM would need to bookend the event selector MSRs with PERF_GLOBAL_CTRL=3D0=
+ and
+PERF_GLOBAL_CTRL=3D<new context (guest vs. host)>.  E.g. so that guest PMC =
+counts
+aren't polluted with host events, and vice versa.
 
-Kselftests: pmu_counters_test/pmu_event_filter_test/vmx_pmu_caps_test
+As things stand today, the only other MSRs are PEBS and the DS area configu=
+ration
+stuff, and kinda to my earlier point, KVM pre-zeroes MSR_IA32_PEBS_ENABLE a=
+s part
+of add_atomic_switch_msr() to ensure a quiescent period before VM-Enter.
 
-KVM-unit-tests: pmu/pmu_lbr/pmu_pebs
+Heh, and writing PERF_GLOBAL_CTRL last for that sequence might actually be
+problematic.  E.g. load host PEBS with guest PERF_GLOBAL_CTRL active.
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Anyways, I agree that this might be brittle, but this is all pre-existing b=
+ehavior
+so I don't want to tackle that here unless it's absolutely necessary.
 
-Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Or wait, by "writing" do you mean "writing MSRs to memory", as opposed to "=
+writing
+values to MSRs"?  Regardless, I think my answer is the same: this isn't a p=
+roblem
+today, so I'd prefer to not shuffle the ordering unless it's absolutely nec=
+essary.
 
-
+> So directly moving the last MSR entry into cleared one could break the MS=
+R
+> writing sequence and may cause issue in theory.
+>=20
+> I know this won't really cause issue since currently vPMU won't use the M=
+SR
+> auto-load feature to save any PMU MSR, but it's still unsafe for future u=
+ses.=C2=A0
+>=20
+> I'm not sure if it's worthy to do the strict MSR entry shift right now.
 >
->
+> Perhaps we could add a message to warn users at least.
+
+Hmm, yeah, but I'm not entirely sure where/how best to document this.  Beca=
+use
+it's not just that vmx_remove_auto_msr() arbitrarily maniuplates the order,=
+ e.g.
+multiple calls to vmx_add_auto_msr() aren't guaranteed to provide ordering =
+because
+one or more MSRs may already be in the list.  And the "special" MSRs that c=
+an be
+switched via dedicated VMCS fields further muddy the waters.
+
+So I'm tempted to not add a comment to the helpers, or even the struct fiel=
+ds,
+because unfortunately it's largely a "Here be dragons!" type warning. :-/
