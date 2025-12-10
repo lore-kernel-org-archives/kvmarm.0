@@ -1,39 +1,56 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348B02FE59B
-	for <kvmarm@lists.linux.dev>; Wed, 10 Dec 2025 13:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85C832936C;
+	Wed, 10 Dec 2025 17:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765372879; cv=none; b=qjfY2Tn/ipUrPJ6Z5y2SFTlBbwjQvzlmfCAwmpSBvGXFSOG0PezgcNN8lE5LYGnU1dVXe1zycsMbjaXRcYBM05rbS3wP0pFEVzG6XJ00q6uWXzA407h+SWXpqwabWGAYQuGkBux8eOvt7h+uUJQMFhIhsh6GFd6lqu8OZh+Q3jI=
+	t=1765387833; cv=none; b=BzoNblYRdI8c5BMzZVQEql+tOSy3HEK2043lqoGrBaslrQgDsF5CUxNN168v05wZoNRcPFvt9eTQBG2AT5ffkR5IfDnr9TV557+qonp/xgiEnyzZ9IY4bzKrZlbu9AnFu8gJHfo1dOsa2VNZZoCqkBqEcJxpYPC23MHMp8GaN7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765372879; c=relaxed/simple;
-	bh=Nh9fHJY5CALZZIofm510EihlGHO1B2GuNJy//F5H7QQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p87iw/ebSmdgXCQ/4K/L9IKxQmpCE9z9+Ywt9FcTVtY4XpSYEUe+zxhH4eqLkoSzj1v+DvEf6Bl1cRnpEqJOmcJkZnlyCUwuwMSBiaTTulIAc2hxjJKtUCBladtjhNqw9llGQfIN9bBwbomr1pj03eY98OKZJYMpwmX3TZdTzYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35CCC1762;
-	Wed, 10 Dec 2025 05:21:10 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF36D3F762;
-	Wed, 10 Dec 2025 05:21:15 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	will@kernel.org,
+	s=arc-20240116; t=1765387833; c=relaxed/simple;
+	bh=RsP+jKzQ4ppzzi0DdCDKDraJ6gU5DPtIntpZyn+upb4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QtN5iDhzrXS8EauIIm2/tPtHGGjaYtrGijMVygsINjPD7I27wVDW0rjg0X4cmRPM52gWQ1oXNXVuSkETIGzbDhR48zSpa8Aw8PCTnagOjGcLgGNhRfzv2UZw3IMjr+IkomJs4xEgpb+NOj5M9lVD/Lb6lkGNG1GV+GLF33u5Ljs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCy3VTgG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCy3VTgG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 886ABC4CEF1;
+	Wed, 10 Dec 2025 17:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765387832;
+	bh=RsP+jKzQ4ppzzi0DdCDKDraJ6gU5DPtIntpZyn+upb4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sCy3VTgGwt/xQ5FAGr2m7cteORdx7PJk2HfyylKEPjeYiFqZ9iKmPN9lchTNQSBVt
+	 qtsaXGOx3MhWNrkc3/h06/o22vp8CfjAEBEFRGuSOmamKnLfvGnO9/M+qABP/9Ei6h
+	 bCTQwmAvTswaDqu4Dxw23ClAGPdF/nDmlA5cVZ9efJkvcxCFxHtVqfQ833GXH87X1u
+	 qWKdpaSTt1P6H/0LbX5LSK/1KnsepLehc8XvCJdpnzbTL58wRMxh3oqDNMz5CMEGyO
+	 oPc2Cxr9823HbA0T9C1FmwMZ2Yoni0UKwC0c5IPnYBQCjmq5Ud1XF/v9NQAV8JMXEd
+	 8nY3CY2zuUCnw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vTO1G-0000000BnnB-21e6;
+	Wed, 10 Dec 2025 17:30:30 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH 2/2] KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
-Date: Wed, 10 Dec 2025 13:21:02 +0000
-Message-ID: <20251210132102.137631-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251210132102.137631-1-alexandru.elisei@arm.com>
-References: <20251210132102.137631-1-alexandru.elisei@arm.com>
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: [PATCH v2 1/6] KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
+Date: Wed, 10 Dec 2025 17:30:19 +0000
+Message-ID: <20251210173024.561160-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251210173024.561160-1-maz@kernel.org>
+References: <20251210173024.561160-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,30 +58,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-__pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
-parameter, the pfn, not two. Even though correctness isn't impacted because
-the SMCCC handlers pass the first argument and ignore the second one, let's
-call the functions with the proper number of arguments.
+The current XN implementation is tied to the EL2 translation regime,
+and fall flat on its face with the EL2&0 one that is used for hVHE,
+as the permission bit for privileged execution is a different one.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Fixes: 6537565fd9b7f ("KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_pgtable.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7cc964af8d30..6c6abcd8e89e 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
- 	this->count = 1;
- 	rb_link_node(&this->node, parent, node);
- 	rb_insert_color(&this->node, &hyp_shared_pfns);
--	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
-+	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
- unlock:
- 	mutex_unlock(&hyp_shared_pfns_lock);
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index fc02de43c68dd..be68b89692065 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -87,7 +87,15 @@ typedef u64 kvm_pte_t;
+ 
+ #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
+ 
+-#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
++#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
++#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
++#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
++
++#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
++	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
++			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
++			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
++			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
+ 
+ #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
  
 -- 
-2.52.0
+2.47.3
 
