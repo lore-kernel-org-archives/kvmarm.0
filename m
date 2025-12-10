@@ -1,80 +1,185 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3AC309EFB;
-	Tue,  9 Dec 2025 23:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A9221765B;
+	Wed, 10 Dec 2025 01:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765321262; cv=none; b=SDkssKiPqoHVidRY69G3QI2R/Lgn5rt/zbh2fDHzm4FCTBHnbVgTDfUzpdX4MI+ZuunuHYzCM/ZRa8OdMwRoCdqVpDV0tdQ1eUeMdotrmB6LfM/l5RRZDRtqlK3RHbh46hUlk02G61KwfPr6cQXsQ8WrQN3y4zvLvvvFqk3+9A4=
+	t=1765328945; cv=none; b=nlmKYQeKxXc5oKDRpGXic0LiOm11tqSpgw3qWFR16qAo+GHASQffiGKmTMxrgLTqCEU0WyFcnVxpe4Tkr3/7dF4kuH7gbtD+JTHq1tAEuo2fjekZTq+6iwODjJzg8CNTtpSHQn0WiSDpVwhfT3zXEYVoHpVfKHT2FwXOADe5jxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765321262; c=relaxed/simple;
-	bh=/ah7Zqz2nEXNAxPK4fIH6Lzc/09WmhDQtHjd6n9mOeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UB+PRSXq6143uOWLzdsoL7LgghzoOkAbxWRK7ZhOlkBaMzzzcGG0Z7KwEdQP01fqd5/niFHK5UduPLxnYGPLTcW0SMB+kItbXrNFcp59EnGh3RXFjdJ2uR2gHdM/+4sTWA1GEqA9yg3fRT5LOAzhTUVN0+GNpoigatxceen6K9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1Z2s9JW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765328945; c=relaxed/simple;
+	bh=7Sw6PITpzapkD99/tAnwNI3D6Ucw9JU8bsiOsehlJts=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pAN3drOj1/1rDrXTLRWa5X9nCpl1dic7/COmEmaIMHIbPDNlNK321uL6D9deIj3wSDAxiy3xMSoEVtufd1Pa2RHAX602T8e4W+U/91ee3jxiQt9cjQOu/JOvLWibIldkCQlwmQyQ2f1QfI1mJRQggrokq7mCcQHpHtj4AGembHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oevo+BJi; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1Z2s9JW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 360C2C4CEF5;
-	Tue,  9 Dec 2025 23:01:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765321261;
-	bh=/ah7Zqz2nEXNAxPK4fIH6Lzc/09WmhDQtHjd6n9mOeg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e1Z2s9JWfojscSVTnJwydD7UV4xdGcvwgbFKC8mdeuCUIQGwCGyf+uTghHKUBkIbu
-	 ZPRz8fO0uNalxMF/ozlxNYLd+Apyru/mijc2WT70RTagFeAOyjPcLQAU4zLBxFcMCl
-	 PcjmeDS2LWJ2KAibw5ZtxQdXj/FP62jnY69/yJ8KzjFOsqNxk3bj/WbI9aAMzQrnwo
-	 p3B3CkuN3cfv46RHfhNytOPrt5Qn9eFQrZr+py3CzHyMWVIX/dQb3/n5njtU3b0Ip0
-	 udpcHzXK1FdWrvrirQyGdPNfrzcAy3d5nEfHa6ssb2rKx+7J54erVlG5dJEepmb+EN
-	 HPka7oYuHd9og==
-Date: Tue, 9 Dec 2025 15:00:59 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 00/24] ARM64 PMU Partitioning
-Message-ID: <aTiqK7gKKKzGGwgW@kernel.org>
-References: <20251209205121.1871534-1-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oevo+BJi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765328943; x=1796864943;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7Sw6PITpzapkD99/tAnwNI3D6Ucw9JU8bsiOsehlJts=;
+  b=Oevo+BJiqpvQMUoRJM5hp4O2KdQgYEHYW90HTJ+FUTCqhV+OFrksovyi
+   lPTXxNJgOJI8ahA7H8sq2EnTl7dq6IuBjnY4iEXBRkYUMisgqdsEmqKpK
+   A/uSce8HsUC9I5sDv+3emnId7YMOdXr9HkQ3yrLtbw6cDIZvwpcaF+bJn
+   NkPzpWldT8011xQs7IfyMeD2Dp3SVnAJE1O5WlJttV90Dz5bv+AplzQz/
+   b6t++/7z5miGAz8yZvb2yTJocfB0A1wvfDpRyt/rf6yc2EMxJpFjxqgEB
+   +Pul5NNqydPqjGxWUZ0+t88pY4tvm9L+kcSdZ8w2d/aRRFDeSLbAj8OEP
+   g==;
+X-CSE-ConnectionGUID: nnN5PhDoQ4yeHAz2PK6GKQ==
+X-CSE-MsgGUID: zDGIV1SNQPmsQ0bzSiFGrQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="67190226"
+X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
+   d="scan'208";a="67190226"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 17:09:03 -0800
+X-CSE-ConnectionGUID: 21iGYDOORw+11NIMlPnpaw==
+X-CSE-MsgGUID: WFDJ3r6bSDGlQ9mRnDj7FQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
+   d="scan'208";a="200862410"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.12]) ([10.124.240.12])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 17:08:54 -0800
+Message-ID: <fad66209-6dc1-4067-87df-9aa1105e3017@linux.intel.com>
+Date: Wed, 10 Dec 2025 09:08:52 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209205121.1871534-1-coltonlewis@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 37/44] KVM: VMX: Dedup code for removing MSR from
+ VMCS's auto-load list
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
+ Sandipan Das <sandipan.das@amd.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+References: <20251206001720.468579-1-seanjc@google.com>
+ <20251206001720.468579-38-seanjc@google.com>
+ <2440b9bf-a2a1-4f66-94b2-71f47d62f3db@linux.intel.com>
+ <aTheSQb9fhXmZKw6@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aTheSQb9fhXmZKw6@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 09, 2025 at 08:50:57PM +0000, Colton Lewis wrote:
-> This series creates a new PMU scheme on ARM, a partitioned PMU that
-> allows reserving a subset of counters for more direct guest access,
-> significantly reducing overhead. More details, including performance
-> benchmarks, can be read in the v1 cover letter linked below.
-> 
-> An overview of what this series accomplishes was presented at KVM
-> Forum 2025. Slides [1] and video [2] are linked below.
-> 
-> The long duration between v4 and v5 is due to time spent on this
-> project being monopolized preparing this feature for internal
-> production. As a result, there are too many improvements to fully list
-> here, but I will cover the notable ones.
 
-Thanks for reposting. I think there's still quite a bit of ground to
-cover on the KVM side of this, but I would definitely appreciate it if
-someone with more context on the perf side of things could chime in.
+On 12/10/2025 1:37 AM, Sean Christopherson wrote:
+> On Mon, Dec 08, 2025, Dapeng Mi wrote:
+>> On 12/6/2025 8:17 AM, Sean Christopherson wrote:
+>>> Add a helper to remove an MSR from an auto-{load,store} list to dedup the
+>>> msr_autoload code, and in anticipation of adding similar functionality for
+>>> msr_autostore.
+>>>
+>>> No functional change intended.
+>>>
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>> ---
+>>>  arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++---------------
+>>>  1 file changed, 16 insertions(+), 15 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 52bcb817cc15..a51f66d1b201 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -1040,9 +1040,22 @@ static int vmx_find_loadstore_msr_slot(struct vmx_msrs *m, u32 msr)
+>>>  	return -ENOENT;
+>>>  }
+>>>  
+>>> +static void vmx_remove_auto_msr(struct vmx_msrs *m, u32 msr,
+>>> +				unsigned long vmcs_count_field)
+>>> +{
+>>> +	int i;
+>>> +
+>>> +	i = vmx_find_loadstore_msr_slot(m, msr);
+>>> +	if (i < 0)
+>>> +		return;
+>>> +
+>>> +	--m->nr;
+>>> +	m->val[i] = m->val[m->nr];
+>> Sometimes the order of MSR writing does matter, e.g., PERF_GLOBAL_CTRL MSR
+>> should be written at last after all PMU MSR writing.
+> Hmm, no.  _If_ KVM were writing event selectors using the auto-load lists, then
+> KVM would need to bookend the event selector MSRs with PERF_GLOBAL_CTRL=0 and
+> PERF_GLOBAL_CTRL=<new context (guest vs. host)>.  E.g. so that guest PMC counts
+> aren't polluted with host events, and vice versa.
+>
+> As things stand today, the only other MSRs are PEBS and the DS area configuration
+> stuff, and kinda to my earlier point, KVM pre-zeroes MSR_IA32_PEBS_ENABLE as part
+> of add_atomic_switch_msr() to ensure a quiescent period before VM-Enter.
+>
+> Heh, and writing PERF_GLOBAL_CTRL last for that sequence might actually be
+> problematic.  E.g. load host PEBS with guest PERF_GLOBAL_CTRL active.
+>
+> Anyways, I agree that this might be brittle, but this is all pre-existing behavior
+> so I don't want to tackle that here unless it's absolutely necessary.
 
-Will, IIRC you had some thoughts around counter allocation, right?
+Yeah, this won't cause any real issue for current code. 
 
-Best,
-Oliver
+
+>
+> Or wait, by "writing" do you mean "writing MSRs to memory", as opposed to "writing
+> values to MSRs"?  Regardless, I think my answer is the same: this isn't a problem
+> today, so I'd prefer to not shuffle the ordering unless it's absolutely necessary.
+
+Actually both. As SDM suggests, current any manipulation for PMU MSRs, the
+below order should be followed.
+
+- disable all PMU counters by writing PERF_GLOBAL_CTRL to 0.
+
+- manipulate PMU MSRs.
+
+- Enable the needed PMU counters by writing PERF_GLOBAL_CTRL.
+
+So there is a implicit order on the MSR writing in fact. 
+
+For KVM, if MSR auto-load list feature is used to automatically restore the
+host/guest MSRs, KVM needs to follow the above order to fill the MSR
+auto-load list and then expect these MSRs are written by VMX in the
+designed order.
+
+But since it won't cause any real issue now, it's fine for me to handle it
+until there is a real necessity.
+
+
+>
+>> So directly moving the last MSR entry into cleared one could break the MSR
+>> writing sequence and may cause issue in theory.
+>>
+>> I know this won't really cause issue since currently vPMU won't use the MSR
+>> auto-load feature to save any PMU MSR, but it's still unsafe for future uses. 
+>>
+>> I'm not sure if it's worthy to do the strict MSR entry shift right now.
+>>
+>> Perhaps we could add a message to warn users at least.
+> Hmm, yeah, but I'm not entirely sure where/how best to document this.  Because
+> it's not just that vmx_remove_auto_msr() arbitrarily maniuplates the order, e.g.
+> multiple calls to vmx_add_auto_msr() aren't guaranteed to provide ordering because
+> one or more MSRs may already be in the list.  And the "special" MSRs that can be
+> switched via dedicated VMCS fields further muddy the waters.
+>
+> So I'm tempted to not add a comment to the helpers, or even the struct fields,
+> because unfortunately it's largely a "Here be dragons!" type warning. :-/
+
+I see. Thanks.
+
+
