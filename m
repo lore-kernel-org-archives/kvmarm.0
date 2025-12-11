@@ -1,155 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952D0316905;
-	Thu, 11 Dec 2025 16:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53EC22068A
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 16:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765470083; cv=none; b=ohKHvj22dVn3u/MzDAhTFRTaawEhsf4R1L02dEet00A6JkQniZwERAtU2Zpgs4YvjhprfLZKQJ9gUR+LTywr1hP46R6D0Pa+CIYCNxXrrSPJ6ir7rKLu3EV0f+DbpZAdw3tJGyloOIivcWYVx1xlMhAtzh9858HkoWbFUwMgm+g=
+	t=1765470870; cv=none; b=nKNNas+CqtlrB3sQq5ASSMIJfJyzICwPNJElUrNsII9VKlflYqfHCwW6/3R7TmRk9JC/sKXjdjtjW173BD3TKmJ8xICTrRWC5qzBfFfKChHuW5p9U/oeXOgeKT0dUtqt4qmenRjJds6m7zaktFmQdENeOx/2Fxe38Xaon46FZrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765470083; c=relaxed/simple;
-	bh=y8xi0690kj7eN8efJPQZwJp2vdnwY7JF6oRnrBCl3Ok=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F2ddtNHPXKpUaxdCtS4FAP7B7la1lWj8stHyrKJfBwrhgeqlE1qQ0MtybtMbUXL5uO9mB5veTNB0tjx2H+cxCBF5J2wfS5utC7Ylfx4fFZvv1ROZvUmHDz0qQRONLTLQCeJvTczp1xo2O7a0OV2pkJq3FPR6QLyiZeoK6u4gf40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOsdhLFf; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOsdhLFf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CCEC4CEF7;
-	Thu, 11 Dec 2025 16:21:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765470083;
-	bh=y8xi0690kj7eN8efJPQZwJp2vdnwY7JF6oRnrBCl3Ok=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AOsdhLFfM0i6K1tw759EzzvDKigMReMknnQ51pDwJTgL8vBmFHWja9Q1+Uk9RIOPE
-	 5xl1eB1PtkjWQS2i0ypbyQBvnyN5ZPy8CnJzODJAbPji1lPskRWzs0PSHrTRyvTTle
-	 y+JFqp7GHHfJs4KigManI3RpjfVZfTkqpyf0DAW108oU+K9cVeItCMV8SkPJl0dTjl
-	 XEoHWVFE+9ShjGwm1Zj4TkFRsiBk/7Pew6oTh2objlQh20mf7G7c7BmnZH3gSMA4t/
-	 dfsBzcAbwoo58r94H3b8XDTfBBXg9/ouIFkoTEyt6oFc6ZYz6sEu2RpJfXovIrnUfl
-	 Ge32hZzbSNCxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTjPs-0000000C2ld-3FmR;
-	Thu, 11 Dec 2025 16:21:20 +0000
-Date: Thu, 11 Dec 2025 16:21:20 +0000
-Message-ID: <86tsxxng5b.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
-In-Reply-To: <20251211151810.GA867614@e124191.cambridge.arm.com>
-References: <20251210173024.561160-1-maz@kernel.org>
-	<20251210173024.561160-7-maz@kernel.org>
-	<20251211151810.GA867614@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765470870; c=relaxed/simple;
+	bh=gRMGTxk+E5OssCw7KLXY7ad4pHQi9rkNCPeKjCx/xSo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tJW0MhK4wZ+jbj4zRwmdnD7LxDtfpzkTanRjmCXLFvqDEUWnGxTbFCQKphSsOfATFQz+D4cQG3Ho0VQDbu5ZYBcQ46GFHJGBRx774MtVaB2HtAh25SYz63qvh2UslWos4ZTnLCOEZ4FeQZ8RrwQeOolklEDOnX+1xp6AX8QzWSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E2D31063;
+	Thu, 11 Dec 2025 08:34:20 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 72A213F73B;
+	Thu, 11 Dec 2025 08:34:27 -0800 (PST)
+Date: Thu, 11 Dec 2025 16:34:25 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
+	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, james.clark@linaro.org,
+	mark.rutland@arm.com, james.morse@arm.com
+Subject: Re: [RFC PATCH v6 00/35] KVM: arm64: Add Statistical Profiling
+ Extension (SPE) support
+Message-ID: <20251211163425.GA4113166@e132581.arm.com>
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114160717.163230-1-alexandru.elisei@arm.com>
 
-On Thu, 11 Dec 2025 15:18:51 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+Hi Alexandru,
+
+Just couples general questions for myself to easier understand the series
+(sorry if I asked duplicated questions).
+
+> I wanted the focus to be on pinning memory at stage 2 (that's patches #29, 'KVM:
+> arm64: Pin the SPE buffer in the host and map it at stage 2', to #3, 'KVM:
+> arm64: Add hugetlb support for SPE') and I would very much like to start a
+> discussion around that.
+
+I am confused for "pinning memory at stage 2" and then I read "Pin the
+SPE buffer in the host".  I read Chapter 2 Specification, ARM DEN 0154,
+my conclusion is:
+
+1) You set PMBLIMITR_EL1.nVM == 0 (virtual address mode) so that the
+   driver uses the same mode whether it is running in a host or in a
+   guest.
+
+2) The KVM hypervisor needs to parse the VA -> IPA -> PA with:
+
+   Guest stage-1 table (managed in guest OS);
+   Guest stage-2 table (managed in KVM hypervisor);
+
+3) In the end, the KVM hypervisor pins physical pages on the host
+   stage-1 page table for:
+
+   The physical pages are pinned for Guest stage-1 table;
+   The physical pages are pinned for Guest stage-2 table;
+   The physical pages are pinned for used for TRBE buffer in guest.
+
+Due the host might migrate or swap pages, so all the pin operations
+happen on the host's page table.  The pin operations never to be set up
+in guest's stage-2 table, right?
+
+> The problem
+> ===========
 > 
-> Question,
-> 
-> On Wed, Dec 10, 2025 at 05:30:24PM +0000, Marc Zyngier wrote:
-> > Now that we potentially have two bits to deal with when setting
-> > execution permissions, make sure we correctly handle them when both
-> > when building the page tables and when reading back from them.
-> > 
-> > Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
-> >  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
-> >  2 files changed, 24 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index be68b89692065..095e6b73740a6 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_SW		GENMASK(58, 55)
-> >  
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > -#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> > -
-> > -#define KVM_PTE_LEAF_ATTR_HI_S1_XN					\
-> > -	({ cpus_have_final_cap(ARM64_KVM_HVHE) ?			\
-> > -			(__KVM_PTE_LEAF_ATTR_HI_S1_UXN |		\
-> > -			 __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :		\
-> > -			__KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_XN	BIT(54)
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN	BIT(54)
-> > +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN	BIT(53)
-> >  
-> >  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	GENMASK(54, 53)
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index e0bd6a0172729..97c0835d25590 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
-> >  	if (!(prot & KVM_PGTABLE_PROT_R))
-> >  		return -EINVAL;
-> >  
-> > +	if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-> > +		prot &= ~KVM_PGTABLE_PROT_UX;
-> 
-> Trying to understand this part. We don't consider KVM_PGTABLE_PROT_UX below
-> when !HVHE, and we don't set it in kvm_pgtable_hyp_pte_prot() when !HVHE
-> either, so can it ever actually be set?
+> When the Statistical Profiling Unit (SPU from now on) encounter a fault when
+> it attempts to write a record to memory, two things happen: profiling is
+> stopped, and the fault is reported to the CPU via an interrupt, not an
+> exception. This creates a blackout window during which the CPU executes
+> instructions which aren't profiled. The SPE driver avoid this by keeping the
+> buffer mapped while ProfilingBufferEnabled() = true. But when running as a
+> guest under KVM, the SPU will trigger stage 2 faults, with the associated
+> blackout windows.
 
-Because KVM_PGTABLE_PROT_X, which is directly passed by the high-level
-code, is defined as such:
+My understanding is that there are two prominent challenges for SPE
+virtualization:
 
-	KVM_PGTABLE_PROT_X			= KVM_PGTABLE_PROT_PX	|
-						  KVM_PGTABLE_PROT_UX,
+1) Allocation: we need to allocate trace buffer with mapping both
+   guest's stage-1 and stage-2 before enabling SPU.  (For me, the free
+   buffer is never an issue as we always disable the SPU before
+   releasing the resource).
 
-We *could* make that value dependent on HVHE, but since that's in an
-enum, it is pretty ugly to do (not impossible though).
+2) Pin: the physical pages used by trace buffer and the relevant stage-1
+   and stage-2 tables must be pinned during the session.
 
-But it is in the following code that this becomes useful...
+I will read (and learn) the patches in next days.
 
->
-> Otherwise LGTM!
-> 
-> Thanks,
-> Joey
-> 
-> > +
-> >  	if (prot & KVM_PGTABLE_PROT_X) {
-> >  		if (prot & KVM_PGTABLE_PROT_W)
-> >  			return -EINVAL;
-
-... here. If you were passed UX (and only that), and that you're
-!HVHE, you won't have execution at all, and can allow writes.
-
-Does that make sense?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Leo
