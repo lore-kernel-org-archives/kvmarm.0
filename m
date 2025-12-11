@@ -1,105 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129C1298CC4
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 08:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD5B239567
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 09:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765440932; cv=none; b=NBNeJfxbUK+2QN5ZlVwyZ16J1jOCgdjm0KCcVA3he9f2To9LQfm9yRXkNE78ZBmGZe/alS9MKLnmqUsi6NAwxr4nSkMgVYRfsVtlZpXRr3Th/OhuBAQCpeawlo9hKEFw5lErlY7z5AL3JVtmc7WRv0jBfe/0YC28DTTxKO8Bvxc=
+	t=1765445628; cv=none; b=nIVCn1QytSyFo1yIeQr0DLnr19WHI1/hI/GVYBvpAZxU6ulDzjQ2i/4Pq4r9hV6vgRvb/i4e2T6soC6VDuXoKKVnl4JJKXIJhoH28ZbVPn8UJhz1qcZDqPgu8TGI8JnMpBdV6W7q4nnkLhWwcayHZYqTWmQg1u9j5IxVC1erVVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765440932; c=relaxed/simple;
-	bh=uisW3lsr1R5kreh20aN9ry1a7WqtATsZX41vyRxxghQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wm/mzn+8eZxC9nh0Ji1Y/rLpysw6ptsMUVvyrQ9qOcD04k43Vt47P5h1CX0QzLSvjXQhYSrN2ndfgG++7YNuix2pM73btJpMPRRy8cRXVKOPIcs5rmsfQhrSGlmdW7Rh35uYxdrgCEQVHja3Duc8ovhJBPNIT6uv9VaFfh/Cjs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXTY+io2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXTY+io2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149AFC4CEFB;
-	Thu, 11 Dec 2025 08:15:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765440931;
-	bh=uisW3lsr1R5kreh20aN9ry1a7WqtATsZX41vyRxxghQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FXTY+io2OtXnTyuHOadUOc7ReXqmtOFWxhlLQU4dltyAQ0v1yIvk+mcyJt6kEGvux
-	 QkWzpnG5piXbgTht5YNFuG0mQrRHYbiCDXTVMtzamKBrZGfGvWcZOJhdypvKOti9mT
-	 Cqt/8V8R0I55DBVXHsTS8q68AL2WgdwDZ9mv8aOae9mcl86JUyej+pAfDDYoonJBdY
-	 vKG2t0wMg32jjlWozq6wcVmNdMexE6m/D+/TfyzuTdR+3o1jFTzUnhKPSd6lRUpziQ
-	 atYinPEGfmVf5QmglpSqURT8KGQYLdfMPCMHy9f5EVTA2haL3n8aEDVVL41f5UUB4E
-	 liSp/aYWsD/yA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTbpg-0000000BwTn-2jnn;
-	Thu, 11 Dec 2025 08:15:28 +0000
-Date: Thu, 11 Dec 2025 08:15:28 +0000
-Message-ID: <86zf7po2n3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/2] KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
-In-Reply-To: <20251210132102.137631-3-alexandru.elisei@arm.com>
+	s=arc-20240116; t=1765445628; c=relaxed/simple;
+	bh=hmfsFF7nWW1MNifDGPOiey6zKLj8xrPrYNRWY8Bq9kg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TCE8+UR3xXDFCUkNuHrBqh5Idva4Cwh+FW0mm/2OaJu1Jtlag1foSOIHsdzi+52AVJ0WiuH3FfhYDkIzsJtLWHhK9U1ZBEyJMCpSnjZaXL6/XlB3phVzDxBCtC/m6U0IELKtasAuzZIEI+cjmtJ/NYsdr3FP4eI4nAOfCVNctik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0974F153B;
+	Thu, 11 Dec 2025 01:33:38 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C2B033F740;
+	Thu, 11 Dec 2025 01:33:43 -0800 (PST)
+Date: Thu, 11 Dec 2025 09:33:40 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, qperret@google.com, will@kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/2] KVM: arm64: Remove extra argument for
+ __pvkm_host_{share,unshare}_hyp()
+Message-ID: <aTqP9M_E7ROGpfbB@raptor>
 References: <20251210132102.137631-1-alexandru.elisei@arm.com>
-	<20251210132102.137631-3-alexandru.elisei@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20251210132102.137631-3-alexandru.elisei@arm.com>
+ <86zf7po2n3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86zf7po2n3.wl-maz@kernel.org>
 
-On Wed, 10 Dec 2025 13:21:02 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> __pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
-> parameter, the pfn, not two. Even though correctness isn't impacted because
-> the SMCCC handlers pass the first argument and ignore the second one, let's
-> call the functions with the proper number of arguments.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/kvm/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 7cc964af8d30..6c6abcd8e89e 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
->  	this->count = 1;
->  	rb_link_node(&this->node, parent, node);
->  	rb_insert_color(&this->node, &hyp_shared_pfns);
-> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
-> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
->  unlock:
->  	mutex_unlock(&hyp_shared_pfns_lock);
->  
+Hi Marc,
 
-Yeah, we lost all form of type-checking when everything was hastily
-converted to SMCCC to avoid function pointers. Somehow, I feel that
-the cure was worse than the disease.
+On Thu, Dec 11, 2025 at 08:15:28AM +0000, Marc Zyngier wrote:
+> On Wed, 10 Dec 2025 13:21:02 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > __pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
+> > parameter, the pfn, not two. Even though correctness isn't impacted because
+> > the SMCCC handlers pass the first argument and ignore the second one, let's
+> > call the functions with the proper number of arguments.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 7cc964af8d30..6c6abcd8e89e 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
+> >  	this->count = 1;
+> >  	rb_link_node(&this->node, parent, node);
+> >  	rb_insert_color(&this->node, &hyp_shared_pfns);
+> > -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
+> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+> >  unlock:
+> >  	mutex_unlock(&hyp_shared_pfns_lock);
+> >  
+> 
+> Yeah, we lost all form of type-checking when everything was hastily
+> converted to SMCCC to avoid function pointers. Somehow, I feel that
+> the cure was worse than the disease.
+> 
+> I wish we'd reintroduce some form of compile-time checks, maybe by
+> having generated stubs?
 
-I wish we'd reintroduce some form of compile-time checks, maybe by
-having generated stubs?
+I also think compile-time checks would be useful, do you have something
+particular in mind?
+
+If not, right now I can't think of a way to generate the stubs automagically,
+but I can give it a (probably bad) try and take it from there.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Alex
