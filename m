@@ -1,63 +1,66 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3876326CE2D
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 10:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AFE2F5A36
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 10:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765450033; cv=none; b=RMeEWKJTEGcDYdYeDimhkQqruZioXE1n6cockeEzOgWhPIL8o8H6ZfLmUvxK4T6jwq0oYlodVvnSDLa8MSnr2A5SBo0cO6TFUK3MGUo35HBWz2NKlaWALYPDctEx1Z4zF90D0TO+RNdQbL5DJwZCCgCcu3LPZlfjUTmAkCyKf/U=
+	t=1765450035; cv=none; b=U97l9nddkKcsNnHzYpqOm6iJBO6L9Fl0A57Pwcir5eb1uQCmn47YM89XPf9n85iZ59MiqFywOiFywytfhGzajegCtkyRAfdCz8zuZf2ivk5yIBp5HLMSpXc0L2cDt021m1R9gDqgJUoIvTPWpBKkl+oF75TRsDMP3wQUBwDRenE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765450033; c=relaxed/simple;
-	bh=RxwzWh3XxVuKEWEOsyVQrcZCvzLtNdThj6MPjs3X+5s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mq01AHGCeTES1RUa4NdWVpqb9UUgNQ1edImtvwbIMnXo8zCMDEkFLoG5wex+ttWY/VSi+ZIvzGhM2Cd7v+iGitZ1Tj3ub5h5FSVrJ7W89KNYUPeiQ8118Tcs/uPhv6Gzl8Pcia/phqIhf7OQe9eEilCDHfw0gZ/pjK44PGCFGV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qv9Vwzin; arc=none smtp.client-ip=209.85.128.73
+	s=arc-20240116; t=1765450035; c=relaxed/simple;
+	bh=DVsd37nCvE94CkkPU3ro//ptcGcxUZZpp+9ilN/9FT8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fnNXqxNW8LK+St1eXtmsNYOR/rA679eChLVCv0aH4ujGbNAPaTogmRwN+AF6WtlDy50QdKAGgAhypcWOhqHWng43g5olYIicx2TUftArGwyBgDPZt6YisyYQEhunRss3Y9DT1cqhjzAhwx68BrvyFyFW1ewPJd6dCNxqPqNz3YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gdblvgJN; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qv9Vwzin"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4792bd2c290so7287535e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 02:47:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gdblvgJN"
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b70b1778687so55262666b.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 02:47:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765450030; x=1766054830; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mu4tnUPCP3eMMJ7r4B7pF06/VroDz+dRR+cVn01z+uk=;
-        b=Qv9VwzinpcqgXxR2iEvnn7rZ2UzDB+IsqD+hiowOP+1sojuS32NkhsdwlIS5pF0kRv
-         y8fs3zZgtYlStPr6JLcmw1b7jRm0quf5uo6MhdgwKJgGyx0GiXWgfbMFMlnEmSoqrW7w
-         yMJ5AgS5yvW1Sj7vgK/zu+kwbKl9J+gEmQAjw2fjr60d5Kj7o6ZC5iAd9WWz19b0rgAq
-         wUqE96JntiTKui87LSSi7Dce9U352QVfIOHwEzCbp1GMC04rOO58OCkWvzCG9nbam6Tu
-         IhbJFKYQI1tgIyp2Jlzw8/y9xARIMvS0CTKoZkejxd6lmp9AexH7LSwswguVbhyUH3On
-         eyag==
+        d=google.com; s=20230601; t=1765450031; x=1766054831; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HqqmxcdVkzTCOajtcgiZXftpHXD5dGukksoxeGfTga0=;
+        b=gdblvgJN/fWtfho7qLHnvtYw3k0Bu12ZlJZ5IufZevUPY8uD9YKpvvBfQZxFaG8IH+
+         ycKf61q8iw6Y8YqSYUBbAURARjlhB7GHfUY7F2+ysOzOVAgYTjC49QUw1xFQnsDO+oTf
+         MiFIexO1+SeTzFfeD/GoPhxAlHNZQXgN6EKKH6g8jn3sesKHKCXdZu0YztEhjFXy1jhM
+         0dPGXVlWRaAQ8fUhH+cZGbXXkRiD1N8Y5LKXY/tHBqQ8kZldl4QgJK2ZQi5CHo7JF05B
+         qwadTHWPUib2WrJNp7nnNzZldjA9b9oR1lG5U3L/XWrP7emNN6din8B63cRCi/6gm5OC
+         Io3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765450030; x=1766054830;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mu4tnUPCP3eMMJ7r4B7pF06/VroDz+dRR+cVn01z+uk=;
-        b=ptUdK8NyVz4J11Kjzk7N+mQRThp8KxfOA09yqinH4NNv9lRbzmfHeDDysZx9VxwMe6
-         eFBJ6LEh0B98DGex4XtbTDvAjlD4AAqHxPx0G4QTZN0W1GHmjT5smzHt0pukQdA2PMsN
-         JuxLD0REICyix5/pvOfKsZ5u3o7eEatOFtdwnJEi3Z/Ri0eE1cEoX849QWuVvRCX/0eG
-         jTjU0xh6Mxge5ZSW5LRlnlf4bT153ELJSw+2W2gkXCgEEUNiKEumRRkHHyq5QEYfozvr
-         ScL6IPXIFw0dVfdeOC3VMgKqtH6l1lMFUdQOJPJ6m173vfuY07t0P424JK0bHMKG5I6O
-         jxWg==
-X-Gm-Message-State: AOJu0YzdnTvOBzzh3xMs9CSokgWwavb2Ge7JChCVHApBokbv7XmRjjXA
-	pwUAFucO8dxkDVeYpc1jq9tgVDndLwBdW/xeGMSO77992Ve7WYycadFhKRMLsH+rGmfb1VZHGYF
-	Z5poAP0t6q7nVYZa6ACYACsJtlWj9h9YyWf+s/TP4UVfEZtWAzhWisvcczP1sxG8UDD5hRS034G
-	bs5qhO3EqiR4sXydV2bi6Eo7BybBmDRtk=
-X-Google-Smtp-Source: AGHT+IHc1x4pEN8TyM6QeYpLvJgYc1keTk/0h7stJTpOa4NQXbSqrXLawJVqtiBF+zdbLMz7/t4wRg9Cpg==
-X-Received: from wmpc20.prod.google.com ([2002:a05:600c:4a14:b0:477:9dee:b5d5])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3512:b0:471:21:554a
- with SMTP id 5b1f17b1804b1-47a83814519mr52189595e9.13.1765450030559; Thu, 11
- Dec 2025 02:47:10 -0800 (PST)
-Date: Thu, 11 Dec 2025 10:47:00 +0000
+        d=1e100.net; s=20230601; t=1765450031; x=1766054831;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HqqmxcdVkzTCOajtcgiZXftpHXD5dGukksoxeGfTga0=;
+        b=v4aZYyzNJogIcmSI3G1qzbPs+I+P+nKnWbL+o1f4LRwH5j6dTDr3fiRum34ySyQkft
+         UhAh9lBx7IIFIywP1O/G/LBZgFhOGYeXqbcYLERg6wZh+Be+gkfFcw3LsZPxdFjEdqjM
+         7W7MNm573EmT+f571ZPUVHLyj8zWeFesENRzHGj/dVcypvn5698yNhGriDXqVmjQCHQk
+         s7kl+drw4mih9he4JC+zB2AjoxQGglhUb28nO3jt1oC+CdoLDSmApwWLFsdtstO2m1dV
+         z6qNtqDTDDRc7UMq81t2A0UmhvXb146Xu/DyzXghNTdcNjiKFLCNx4cOeGSuYpVlkDfL
+         PnSg==
+X-Gm-Message-State: AOJu0Ywq3P8mRzRj+6Awp/YykTnYyg0p/dzrQjcfCsZkzoLv3khh1XV3
+	K7CLsgcEKC3RZUnuGqMkUsV47PP2mRMiw3aqrBwtNsSHk7GvJY1zkCjmvfvGSilSsH5iXcZ/2OF
+	txgw1RuVp7doAqDP9s21sqofDMF/IfPZl3gJ9x9oHeWXv0nLCTUH/H3wkT6Ab4DMjK+lTkvBltX
+	dCXSGwthocbLao+BpBRt+5QkU/OA/CRv0=
+X-Google-Smtp-Source: AGHT+IF+0VU7+ANp0QfeE8zIM8Vmgpcs4f/A+ibyHzS59B8VrSVBA5mSFGH+wSJ/LBwQMJHzgebSqsDiDA==
+X-Received: from ejdcx5.prod.google.com ([2002:a17:907:1685:b0:b73:7b15:46])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:1c0a:b0:b73:758c:c96f
+ with SMTP id a640c23a62f3a-b7ce84853bamr566099966b.52.1765450031334; Thu, 11
+ Dec 2025 02:47:11 -0800 (PST)
+Date: Thu, 11 Dec 2025 10:47:01 +0000
+In-Reply-To: <20251211104710.151771-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20251211104710.151771-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251211104710.151771-1-tabba@google.com>
-Subject: [PATCH v6 0/9] KVM: arm64: Fixes for guest CPU feature trapping and enabling
+Message-ID: <20251211104710.151771-2-tabba@google.com>
+Subject: [PATCH v6 1/9] KVM: arm64: Fix Trace Buffer trapping for protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
@@ -65,49 +68,35 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org,
 	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+For protected VMs in pKVM, the hypervisor should trap accesses to trace
+buffer system registers if Trace Buffer isn't supported by the VM.
+However, the current code only traps if Trace Buffer External Mode isn't
+supported.
 
-This series contains several fixes for guest feature trapping and
-enabling in pKVM, as well as a bit of tidying up.
+Fix this by checking for FEAT_TRBE (Trace Buffer) rather than
+FEAT_TRBE_EXT.
 
-Changes from v6 [1]:
-- Fixes to the patch that tracks KVM IOCTLs and their associated KVM
-  caps. Move static header data and function definitions to arm.c.
-- Introduce a capability KVM_CAP_ARM_BASIC instead of KVM_CAP_CORE,
-  since it is ARM-specific and that it only checks basic ARM ioctls.
-- Tidying up code and commit messages.
-- Based on Linux 6.18
+Fixes: 9d5261269098 ("KVM: arm64: Trap external trace for protected VMs")
+Reported-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-/fuad
-
-[1] https://lore.kernel.org/all/20251118103807.707500-1-tabba@google.com/
-
-Fuad Tabba (9):
-  KVM: arm64: Fix Trace Buffer trapping for protected VMs
-  KVM: arm64: Fix Trace Buffer trap polarity for protected VMs
-  KVM: arm64: Fix MTE flag initialization for protected VMs
-  KVM: arm64: Introduce helper to calculate fault IPA offset
-  KVM: arm64: Include VM type when checking VM capabilities in pKVM
-  KVM: arm64: Do not allow KVM_CAP_ARM_MTE for any guest in pKVM
-  KVM: arm64: Track KVM IOCTLs and their associated KVM caps
-  KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
-  KVM: arm64: Prevent host from managing timer offsets for protected VMs
-
- arch/arm64/include/asm/kvm_arm.h         |  2 +
- arch/arm64/include/asm/kvm_host.h        |  2 +
- arch/arm64/include/asm/kvm_pkvm.h        | 33 ++++++++++++++--
- arch/arm64/kvm/arch_timer.c              | 18 ++++++---
- arch/arm64/kvm/arm.c                     | 49 +++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c           | 18 ++++-----
- arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c |  2 +-
- arch/arm64/kvm/inject_fault.c            |  2 +-
- arch/arm64/kvm/mmu.c                     |  4 +-
- include/uapi/linux/kvm.h                 |  1 +
- 10 files changed, 107 insertions(+), 24 deletions(-)
-
-
-base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 43bde061b65d..8d06a246dfd1 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -117,7 +117,7 @@ static void pvm_init_traps_mdcr(struct kvm_vcpu *vcpu)
+ 	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceFilt, IMP))
+ 		val |= MDCR_EL2_TTRF;
+ 
+-	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, ExtTrcBuff, IMP))
++	if (!kvm_has_feat(kvm, ID_AA64DFR0_EL1, TraceBuffer, IMP))
+ 		val |= MDCR_EL2_E2TB_MASK;
+ 
+ 	/* Trap Debug Communications Channel registers */
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
