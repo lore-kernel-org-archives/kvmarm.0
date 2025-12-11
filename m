@@ -1,101 +1,215 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1952F49FE
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 11:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0010E30DD1E
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 11:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765453116; cv=none; b=mbHxunilRAHf0lr0UHYk5HFzOyDm2y02BulcSKuA/1TAzof0FwSwHVqwghbI8WoyO9lJ7oY8y0hR1gIPOAeeicJRMqxKKo8TtZwKS0Y4VLMWCDf3VT2EglspLKI2rWW2a5HKQ1+e/oXhGcV3HEzhglrN3x2LwFXGp2EoMLr0EiQ=
+	t=1765454247; cv=none; b=LLVnKS+KPSNZmcuh5hcNxHL6PbyHO2rhw2KYtb7kCa2laFkZre38620/8S24dQk8Lv/jRHZ5h8UhVccEotJO/Ov1Qp05n/xVIy8JNQT2dJT984jnozdEbIC+EVyKLmjm0UnCRWaO5M68DBEY9uVOLnIY0Fq5JrTL4TK1hDcxNA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765453116; c=relaxed/simple;
-	bh=fgQOrToOs+VeD+943R9Ee+say+r4FYRNSjPsH/Ee+7A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QWHi9IREFqExPQMDDSDMCJ/4ruHpQAGsdpgbiBD9rvweOGaxx9zHx4i18mTsh1ZzIQYYBADlf8AT1f6no3WvlQ60Dr9LK+clG0xHt4TPpkkqWdJkrn8jl/vmVy/eaN87ibdEBioP/sqH//afYMxvtviZCPIJGL9anX8iae11llg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fmId6/it; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1765454247; c=relaxed/simple;
+	bh=myZp/nYUBwEbOWDlmVdLDQKg2988Fam3/cDwGtQWm6A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Od6ts9u/kniuxnxODVS43VC5hpSTEHL9ER8VaiA8/PYtTqIT3852RxWRZLepkYOP6C7TBIKHA3CGdd1zQ0mKEUF4I8ELNB0GYAU6Pmp46tcn0C5iYPQZwWt6CvhAPj3vievuxxkhoUR+gM2DGuHbhJyOcgYXY54HAs6+IglSt/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=makmDseR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fmId6/it"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4779da35d27so6430105e9.3
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 03:38:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765453113; x=1766057913; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TSfRNcqgdYRR94XeQNW+/XHpT2F5cVFLgBSNfHWFmoY=;
-        b=fmId6/itw1f+Y2CtT8j8YqG2ygFp/rA3qGJ7hqKQIrfONNdfiEzQq0vge0IXQgHS3o
-         sKgOy0b49EOky2HYDF6xFT1WWzKNojCQ4eh036YtSghVvrp9p1TDjtRIzJUoeA1s+W1C
-         DTZVOnJtSaQmNjRh+dG1oUJmNqDUlyd1Am8ic1PQADUUZNbwY7coUbPdQpnaMWUb9XQs
-         IR6ixvrFCdfjG8FbbThaLJK3eMBRmeQv+lb/Wkx+bhm7Pju6J8lKGyrpF+vTS4U+Oe1m
-         PWzuL24jw9v6MnA3JySfJHuqIciSNgokR+Xwpq/nbWZdxDuQAq8MIBw6zRJF5zfDfeYV
-         ap/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765453113; x=1766057913;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TSfRNcqgdYRR94XeQNW+/XHpT2F5cVFLgBSNfHWFmoY=;
-        b=GuhAsCIZDg6AoFfKdboE7C8Mcu/ImyA098Lcm8WaDvy9kNr31njbw+JF04FHQqCO2i
-         lAW3u5McWwtPq3RUYOs6n/SsQrqAD0s+tbA491hLtQrHDvs/JJTQI0zUkfwQwW+jWfz8
-         +55QoFPUccKzSfF1LWSECMd/DxeohiGSvXntAHZPs/HaGoAZggaoSf+J+C/l5hW5iacq
-         F4bTUYWohwjD1Un4MAgfllpd4zR7mG2guQRfRlBpckX4K8MnUGWXVfsHij1zPu2ho1uN
-         d3pVK9+/woKgl42KpLQ8aTMQ/xbLCcJ22/zQCklAI46fZutUeGvgcWO9TeQGnKQkA6Sj
-         3Llw==
-X-Gm-Message-State: AOJu0Yxlq9TEqRAUGdrJx7ZYmX1wm2EN4YGdounxvqFSki3sPzmvZX4L
-	w4LCzlegt+LZJmeS5pHTsv78qjv4VsrJRkw6WuFAEVe+vmna9H48phpSNNIxwLvpERdrKMIZJla
-	E9Cl8aBHL8SMLweKjFqB95skg9OWs7fZCzrj5erOtO2twhL7svFqnBpi9ExjqOzReBkiqR87gC3
-	dHm7kz9o8YFILGlBqxEaM9fc7n/hb2XoQ=
-X-Google-Smtp-Source: AGHT+IE3m9ReGHk5thHgnr5mene8nSTtvswTou0C94251E4SNHdCUfcxFkOSYWkF5uoeb8ochQ55sz6G2g==
-X-Received: from wmjy22.prod.google.com ([2002:a7b:cd96:0:b0:477:9976:8214])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3514:b0:477:28c1:26ce
- with SMTP id 5b1f17b1804b1-47a837fd255mr52324735e9.7.1765453113506; Thu, 11
- Dec 2025 03:38:33 -0800 (PST)
-Date: Thu, 11 Dec 2025 11:38:28 +0000
-In-Reply-To: <20251211113828.370370-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="makmDseR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C07C4CEF7;
+	Thu, 11 Dec 2025 11:57:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765454246;
+	bh=myZp/nYUBwEbOWDlmVdLDQKg2988Fam3/cDwGtQWm6A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=makmDseR2miy4/QKrR4GEVg/d9ppNRK+aLfj6C9uZivXzZbEfEaTKwFTUH9vIZKET
+	 9ggjUc9x1hfrNtsssbQeKdHFu5i678EDSrZdtzmi19hrmDZU3Ql2ncSgbfkQ57AeRD
+	 GE70KsRtRBj3+PfAgc9JzJGF/WlFQ5s+BJcIiz1cQmXvTvRJImfDAZogA6tUI38CaK
+	 V7dJ9fWwIzIbTO5vafrRpo5i3jWJ4248/B4mQ5EIpruAlN5METpkpOBCJVBkH9xOGJ
+	 Sefc+9hz/dDxrjxbNXjBjBy2DMrKZ5xDaY5O4XqRDyGTo2dUXrvOsFuEtIYaybn22H
+	 ImF7Ek3b4pXuA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vTfIR-0000000BzRt-4BII;
+	Thu, 11 Dec 2025 11:57:24 +0000
+Date: Thu, 11 Dec 2025 11:57:23 +0000
+Message-ID: <86wm2tnsd8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/2] KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
+In-Reply-To: <aTqP9M_E7ROGpfbB@raptor>
+References: <20251210132102.137631-1-alexandru.elisei@arm.com>
+	<20251210132102.137631-3-alexandru.elisei@arm.com>
+	<86zf7po2n3.wl-maz@kernel.org>
+	<aTqP9M_E7ROGpfbB@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251211113828.370370-1-tabba@google.com>
-X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251211113828.370370-6-tabba@google.com>
-Subject: [PATCH v2 5/5] KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When initializing HCR traps in protected mode, use kvm_has_mte() to
-check for MTE support rather than kvm_has_feat(kvm, ID_AA64PFR1_EL1,
-MTE, IMP).
+On Thu, 11 Dec 2025 09:33:40 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Dec 11, 2025 at 08:15:28AM +0000, Marc Zyngier wrote:
+> > On Wed, 10 Dec 2025 13:21:02 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > __pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
+> > > parameter, the pfn, not two. Even though correctness isn't impacted because
+> > > the SMCCC handlers pass the first argument and ignore the second one, let's
+> > > call the functions with the proper number of arguments.
+> > > 
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >  arch/arm64/kvm/mmu.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 7cc964af8d30..6c6abcd8e89e 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
+> > >  	this->count = 1;
+> > >  	rb_link_node(&this->node, parent, node);
+> > >  	rb_insert_color(&this->node, &hyp_shared_pfns);
+> > > -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
+> > > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+> > >  unlock:
+> > >  	mutex_unlock(&hyp_shared_pfns_lock);
+> > >  
+> > 
+> > Yeah, we lost all form of type-checking when everything was hastily
+> > converted to SMCCC to avoid function pointers. Somehow, I feel that
+> > the cure was worse than the disease.
+> > 
+> > I wish we'd reintroduce some form of compile-time checks, maybe by
+> > having generated stubs?
+> 
+> I also think compile-time checks would be useful, do you have something
+> particular in mind?
+> 
+> If not, right now I can't think of a way to generate the stubs automagically,
+> but I can give it a (probably bad) try and take it from there.
 
-kvm_has_mte() provides a more comprehensive check:
- - kvm_has_feat() only checks if MTE is in the guest's ID register view
-   (i.e., what we advertise to the guest)
- - kvm_has_mte() checks both system_supports_mte() AND whether
-   KVM_ARCH_FLAG_MTE_ENABLED is set for this VM instance
+On first approximation, all the hypercalls are implemented like this
+(taking __pkvm_init() as an example):
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 43bde061b65d..f2060ca66e5d 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -82,7 +82,7 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
- 		val &= ~(HCR_AMVOFFEN);
+We have the body of the function, with its forward declaration:
+
+int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+		unsigned long *per_cpu_base, u32 hyp_va_bits);
+
+int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+		unsigned long *per_cpu_base, u32 hyp_va_bits)
+{
+	[...]
+}
+
+We also have the callee stub that does the argument un-marshalling:
+
+static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
+{
+	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+	DECLARE_REG(unsigned long, size, host_ctxt, 2);
+	DECLARE_REG(unsigned long, nr_cpus, host_ctxt, 3);
+	DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 4);
+	DECLARE_REG(u32, hyp_va_bits, host_ctxt, 5);
+
+	/*
+	 * __pkvm_init() will return only if an error occurred, otherwise it
+	 * will tail-call in __pkvm_init_finalise() which will have to deal
+	 * with the host context directly.
+	 */
+	cpu_reg(host_ctxt, 1) = __pkvm_init(phys, size, nr_cpus, per_cpu_base,
+					    hyp_va_bits);
+}
+
+and then the call site:
+
+	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
+				num_possible_cpus(), kern_hyp_va(per_cpu_base),
+				hyp_va_bits);
+
+The problem is that kvm_call_hyp_nvhe() ignores the type conveyed by
+"__pkvm_init", as it is immediately tokenized as an SMCCC function
+number.
+
+One idea would be to add something like this:
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b552a1e03848c..fdf09beeae380 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1208,10 +1208,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+ #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
  
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, IMP)) {
-+	if (!kvm_has_mte(kvm)) {
- 		val |= HCR_TID5;
- 		val &= ~(HCR_DCT | HCR_ATA);
- 	}
--- 
-2.52.0.223.gf5cc29aaa4-goog
+ #ifndef __KVM_NVHE_HYPERVISOR__
+-#define kvm_call_hyp_nvhe(f, ...)						\
++#define kvm_call_hyp_nvhe(f, ...)					\
+ 	({								\
+ 		struct arm_smccc_res res;				\
+ 									\
++		(void)f(##__VA_ARGS__);					\
+ 		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
+ 				  ##__VA_ARGS__, &res);			\
+ 		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
 
+and generate stub functions that don't do anything, can be eliminated
+by the compiler, but not before type-checking.
+
+Another possible idea would be:
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b552a1e03848c..4f53a3240a511 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1208,12 +1208,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+ #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+-#define kvm_call_hyp_nvhe(f, ...)						\
++#define kvm_call_hyp_nvhe(f, ...)					\
+ 	({								\
+ 		struct arm_smccc_res res;				\
+ 									\
+-		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
+-				  ##__VA_ARGS__, &res);			\
++		nvhe_hvc_ ## f(##__VA_ARGS__, &res);			\
+ 		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
+ 									\
+ 		res.a1;							\
+
+where the stub function would actually do the type checking. I tend to
+prefer this.
+
+In any case, you would need have some form of declarative IDL, and get
+both the caller and callee stubs to be totally generated. It shouldn't
+be too complicated to do it in awk or some other stuff.
+
+Thoughts?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
