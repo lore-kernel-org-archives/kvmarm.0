@@ -1,215 +1,296 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0010E30DD1E
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 11:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834BD35966
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 13:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765454247; cv=none; b=LLVnKS+KPSNZmcuh5hcNxHL6PbyHO2rhw2KYtb7kCa2laFkZre38620/8S24dQk8Lv/jRHZ5h8UhVccEotJO/Ov1Qp05n/xVIy8JNQT2dJT984jnozdEbIC+EVyKLmjm0UnCRWaO5M68DBEY9uVOLnIY0Fq5JrTL4TK1hDcxNA0=
+	t=1765458168; cv=none; b=os4GwCWdaNepjhyIF+sgqBkxY+zdT/VIJY56mZ/IVB2Xwog2sC86nDpJhu5C6ms6aNB49FU6PZNrpSAiBSEZtGlK9HAv021u0Z9gfmi/I6WVLlabGR8uVsKvBHYgnygGs0QsFNzTI0QQ4qwAifDEhl7vSoSk78PhBm4gmDGjRaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765454247; c=relaxed/simple;
-	bh=myZp/nYUBwEbOWDlmVdLDQKg2988Fam3/cDwGtQWm6A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Od6ts9u/kniuxnxODVS43VC5hpSTEHL9ER8VaiA8/PYtTqIT3852RxWRZLepkYOP6C7TBIKHA3CGdd1zQ0mKEUF4I8ELNB0GYAU6Pmp46tcn0C5iYPQZwWt6CvhAPj3vievuxxkhoUR+gM2DGuHbhJyOcgYXY54HAs6+IglSt/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=makmDseR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765458168; c=relaxed/simple;
+	bh=wMqefMX8Mc38mruoomh45hwibeRJ0H2QBBT3xydpibQ=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=RUCudtwLz4aWJ3PTY8q25WswEi0V1BHGwrtiJDUpxtKBwfwJK9pUrGo3mWKxIQfZis5qJGHsOU02cueb2f7V8sibSNsQGNtyWoSmqfO5iLhEYlW7UZMx3HI8bazOXFdzyliXjhIakeib7kaqMo2CX9hZbhNfJY6CyOrHOuz33pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=xHbr3R2W; arc=none smtp.client-ip=113.46.200.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="makmDseR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C07C4CEF7;
-	Thu, 11 Dec 2025 11:57:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765454246;
-	bh=myZp/nYUBwEbOWDlmVdLDQKg2988Fam3/cDwGtQWm6A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=makmDseR2miy4/QKrR4GEVg/d9ppNRK+aLfj6C9uZivXzZbEfEaTKwFTUH9vIZKET
-	 9ggjUc9x1hfrNtsssbQeKdHFu5i678EDSrZdtzmi19hrmDZU3Ql2ncSgbfkQ57AeRD
-	 GE70KsRtRBj3+PfAgc9JzJGF/WlFQ5s+BJcIiz1cQmXvTvRJImfDAZogA6tUI38CaK
-	 V7dJ9fWwIzIbTO5vafrRpo5i3jWJ4248/B4mQ5EIpruAlN5METpkpOBCJVBkH9xOGJ
-	 Sefc+9hz/dDxrjxbNXjBjBy2DMrKZ5xDaY5O4XqRDyGTo2dUXrvOsFuEtIYaybn22H
-	 ImF7Ek3b4pXuA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTfIR-0000000BzRt-4BII;
-	Thu, 11 Dec 2025 11:57:24 +0000
-Date: Thu, 11 Dec 2025 11:57:23 +0000
-Message-ID: <86wm2tnsd8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	will@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 2/2] KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
-In-Reply-To: <aTqP9M_E7ROGpfbB@raptor>
-References: <20251210132102.137631-1-alexandru.elisei@arm.com>
-	<20251210132102.137631-3-alexandru.elisei@arm.com>
-	<86zf7po2n3.wl-maz@kernel.org>
-	<aTqP9M_E7ROGpfbB@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="xHbr3R2W"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yXjDj2LopgEdejBPveRLTL1bCofz4US84PT1q1wUrQg=;
+	b=xHbr3R2WIFp5oR9Nco7g8uQM7yu4h8Y+nnBWfQSXyrUxZxY18Qw54d2p1AsZz3jxGzQ4smao0
+	Zufh6YL+19aoxIC2d0F0j8hIcQYrDe0NKCEwe1hsGqQ+OwBnstutzZsIFz65/ezT/vDsDImfl1I
+	7irz7iJCvnjq1YPX3iwjrnI=
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dRt3k0kTVz12LCr;
+	Thu, 11 Dec 2025 21:00:18 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E13418047B;
+	Thu, 11 Dec 2025 21:02:35 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 11 Dec 2025 21:02:33 +0800
+Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+To: Jiaqi Yan <jiaqiyan@google.com>
+CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <duenwen@google.com>,
+	<rananta@google.com>, <jthoughton@google.com>, <vsethi@nvidia.com>,
+	<jgg@nvidia.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <pbonzini@redhat.com>,
+	<corbet@lwn.net>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
+ <20251013185903.1372553-3-jiaqiyan@google.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
+Date: Thu, 11 Dec 2025 21:02:27 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+In-Reply-To: <20251013185903.1372553-3-jiaqiyan@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-On Thu, 11 Dec 2025 09:33:40 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+Hi Jiaqi,
+
+I had run into several problems when testing it on different servers. I
+haven't figured them out yet but post it early for discussion.
+
+On 2025/10/14 2:59, Jiaqi Yan wrote:
+> Test how KVM handles guest SEA when APEI is unable to claim it, and
+> KVM_CAP_ARM_SEA_TO_USER is enabled.
 > 
-> Hi Marc,
+> The behavior is triggered by consuming recoverable memory error (UER)
+> injected via EINJ. The test asserts two major things:
+> 1. KVM returns to userspace with KVM_EXIT_ARM_SEA exit reason, and
+>    has provided expected fault information, e.g. esr, flags, gva, gpa.
+> 2. Userspace is able to handle KVM_EXIT_ARM_SEA by injecting SEA to
+>    guest and KVM injects expected SEA into the VCPU.
 > 
-> On Thu, Dec 11, 2025 at 08:15:28AM +0000, Marc Zyngier wrote:
-> > On Wed, 10 Dec 2025 13:21:02 +0000,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > __pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
-> > > parameter, the pfn, not two. Even though correctness isn't impacted because
-> > > the SMCCC handlers pass the first argument and ignore the second one, let's
-> > > call the functions with the proper number of arguments.
-> > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index 7cc964af8d30..6c6abcd8e89e 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
-> > >  	this->count = 1;
-> > >  	rb_link_node(&this->node, parent, node);
-> > >  	rb_insert_color(&this->node, &hyp_shared_pfns);
-> > > -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
-> > > +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
-> > >  unlock:
-> > >  	mutex_unlock(&hyp_shared_pfns_lock);
-> > >  
-> > 
-> > Yeah, we lost all form of type-checking when everything was hastily
-> > converted to SMCCC to avoid function pointers. Somehow, I feel that
-> > the cure was worse than the disease.
-> > 
-> > I wish we'd reintroduce some form of compile-time checks, maybe by
-> > having generated stubs?
+> Tested on a data center server running Siryn AmpereOne processor
+> that has RAS support.
 > 
-> I also think compile-time checks would be useful, do you have something
-> particular in mind?
+> Several things to notice before attempting to run this selftest:
+> - The test relies on EINJ support in both firmware and kernel to
+>   inject UER. Otherwise the test will be skipped.
+> - The under-test platform's APEI should be unable to claim the SEA.
+>   Otherwise the test will be skipped.
+> - Some platform doesn't support notrigger in EINJ, which may cause
+>   APEI and GHES to offline the memory before guest can consume
+>   injected UER, and making test unable to trigger SEA.
 > 
-> If not, right now I can't think of a way to generate the stubs automagically,
-> but I can give it a (probably bad) try and take it from there.
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
 
-On first approximation, all the hypercalls are implemented like this
-(taking __pkvm_init() as an example):
+[...]
 
+> +static void inject_uer(uint64_t paddr)
+> +{
+> +	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
+> +		ksft_test_result_skip("EINJ table no available in firmware");
 
-We have the body of the function, with its forward declaration:
+Missing '\n'.
 
-int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
-		unsigned long *per_cpu_base, u32 hyp_va_bits);
+We should return early (to actually skip the test) if the file can not
+be accessed, right?
 
-int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
-		unsigned long *per_cpu_base, u32 hyp_va_bits)
-{
-	[...]
-}
+> +
+> +	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
+> +		ksft_test_result_skip("EINJ module probably not loaded?");
+> +
+> +	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
+> +	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
+> +	write_einj_entry(EINJ_ADDR, paddr);
+> +	write_einj_entry(EINJ_MASK, ~0x0UL);
+> +	write_einj_entry(EINJ_NOTRIGGER, 1);
+> +	write_einj_entry(EINJ_DOIT, 1);
+> +}
+> +
+> +/*
+> + * When host APEI successfully claims the SEA caused by guest_code, kernel
+> + * will send SIGBUS signal with BUS_MCEERR_AR to test thread.
+> + *
+> + * We set up this SIGBUS handler to skip the test for that case.
+> + */
+> +static void sigbus_signal_handler(int sig, siginfo_t *si, void *v)
+> +{
+> +	ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig);
+> +	ksft_print_msg("si_signo=%d, si_errno=%d, si_code=%d, si_addr=%p\n",
+> +		       si->si_signo, si->si_errno, si->si_code, si->si_addr);
+> +	if (si->si_code == BUS_MCEERR_AR)
+> +		ksft_test_result_skip("SEA is claimed by host APEI\n");
+> +	else
+> +		ksft_test_result_fail("Exit with signal unhandled\n");
+> +
+> +	exit(0);
+> +}
+> +
+> +static void setup_sigbus_handler(void)
+> +{
+> +	struct sigaction act;
+> +
+> +	memset(&act, 0, sizeof(act));
+> +	sigemptyset(&act.sa_mask);
+> +	act.sa_sigaction = sigbus_signal_handler;
+> +	act.sa_flags = SA_SIGINFO;
+> +	TEST_ASSERT(sigaction(SIGBUS, &act, NULL) == 0,
+> +		    "Failed to setup SIGBUS handler");
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint64_t guest_data;
+> +
+> +	/* Consumes error will cause a SEA. */
+> +	guest_data = *(uint64_t *)EINJ_GVA;
+> +
+> +	GUEST_FAIL("Poison not protected by SEA: gva=%#lx, guest_data=%#lx\n",
+> +		   EINJ_GVA, guest_data);
+> +}
+> +
+> +static void expect_sea_handler(struct ex_regs *regs)
+> +{
+> +	u64 esr = read_sysreg(esr_el1);
+> +	u64 far = read_sysreg(far_el1);
+> +	bool expect_far_invalid = far_invalid;
+> +
+> +	GUEST_PRINTF("Handling Guest SEA\n");
+> +	GUEST_PRINTF("ESR_EL1=%#lx, FAR_EL1=%#lx\n", esr, far);
+> +
+> +	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
+> +	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+> +
+> +	if (expect_far_invalid) {
+> +		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
 
-We also have the callee stub that does the argument un-marshalling:
+I hit this ASSERT with:
 
-static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
-{
-	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-	DECLARE_REG(unsigned long, size, host_ctxt, 2);
-	DECLARE_REG(unsigned long, nr_cpus, host_ctxt, 3);
-	DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 4);
-	DECLARE_REG(u32, hyp_va_bits, host_ctxt, 5);
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
+einj_hpa=0x202841234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x202841234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+# Memory UER EINJected
+# Dump kvm_run info about KVM_EXIT_ARM_SEA
+# kvm_run.arm_sea: esr=0x92000610, flags=0
+# kvm_run.arm_sea: gva=0, gpa=0
+# From guest: Handling Guest SEA
+# From guest: ESR_EL1=0x96000010, FAR_EL1=0xaaaadf254828
+# Guest aborted!
+==== Test Assertion Failure ====
+  arm64/sea_to_user.c:172: esr & ESR_ELx_FnV == ESR_ELx_FnV
+  pid=38112 tid=38112 errno=4 - Interrupted system call
+     1	0x0000000000402f9b: run_vm at sea_to_user.c:246
+     2	0x0000000000402467: main at sea_to_user.c:330
+     3	0x0000ffff8e22b03f: ?? ??:0
+     4	0x0000ffff8e22b117: ?? ??:0
+     5	0x00000000004026ef: _start at ??:?
+  0x0 != 0x400 (esr & ESR_ELx_FnV != ESR_ELx_FnV)
 
-	/*
-	 * __pkvm_init() will return only if an error occurred, otherwise it
-	 * will tail-call in __pkvm_init_finalise() which will have to deal
-	 * with the host context directly.
-	 */
-	cpu_reg(host_ctxt, 1) = __pkvm_init(phys, size, nr_cpus, per_cpu_base,
-					    hyp_va_bits);
-}
+It seems that KVM doesn't emulate FnV when injecting an abort.
 
-and then the call site:
+> +		GUEST_PRINTF("Guest observed garbage value in FAR\n");
+> +	} else {
+> +		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, 0);
+> +		GUEST_ASSERT_EQ(far, EINJ_GVA);
+> +	}
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_vcpu_events events = {};
+> +
+> +	events.exception.ext_dabt_pending = true;
+> +	vcpu_events_set(vcpu, &events);
+> +}
+> +
+> +static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+> +{
+> +	struct ucall uc;
+> +	bool guest_done = false;
+> +	struct kvm_run *run = vcpu->run;
+> +	u64 esr;
+> +
+> +	/* Resume the vCPU after error injection to consume the error. */
+> +	vcpu_run(vcpu);
+> +
+> +	ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
+> +		       exit_reason_str(run->exit_reason));
+> +	ksft_print_msg("kvm_run.arm_sea: esr=%#llx, flags=%#llx\n",
+> +		       run->arm_sea.esr, run->arm_sea.flags);
+> +	ksft_print_msg("kvm_run.arm_sea: gva=%#llx, gpa=%#llx\n",
+> +		       run->arm_sea.gva, run->arm_sea.gpa);
+> +
+> +	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
 
-	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
-				num_possible_cpus(), kern_hyp_va(per_cpu_base),
-				hyp_va_bits);
+I can also hit this ASSERT with:
 
-The problem is that kvm_call_hyp_nvhe() ignores the type conveyed by
-"__pkvm_init", as it is immediately tokenized as an SMCCC function
-number.
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
+einj_hpa=0x2841234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+# Memory UER EINJected
+# Dump kvm_run info about KVM_EXIT_MMIO
+# kvm_run.arm_sea: esr=0xffff90ba0040, flags=0x691000
+# kvm_run.arm_sea: gva=0x100000008, gpa=0
+==== Test Assertion Failure ====
+  arm64/sea_to_user.c:207: exit_reason == (41)
+  pid=38023 tid=38023 errno=4 - Interrupted system call
+     1	0x0000000000402d1b: run_vm at sea_to_user.c:207
+     2	0x0000000000402467: main at sea_to_user.c:330
+     3	0x0000ffff9122b03f: ?? ??:0
+     4	0x0000ffff9122b117: ?? ??:0
+     5	0x00000000004026ef: _start at ??:?
+  Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
 
-One idea would be to add something like this:
+Not sure what's wrong it..
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b552a1e03848c..fdf09beeae380 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1208,10 +1208,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
--#define kvm_call_hyp_nvhe(f, ...)						\
-+#define kvm_call_hyp_nvhe(f, ...)					\
- 	({								\
- 		struct arm_smccc_res res;				\
- 									\
-+		(void)f(##__VA_ARGS__);					\
- 		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
- 				  ##__VA_ARGS__, &res);			\
- 		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
+> +
+> +	esr = run->arm_sea.esr;
+> +	TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
+> +	TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+> +	TEST_ASSERT_EQ(ESR_ELx_ISS2(esr), 0);
+> +	TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
+> +	TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
+> +
+> +	if (!(esr & ESR_ELx_FnV)) {
+> +		ksft_print_msg("Expect gva to match given FnV bit is 0\n");
+> +		TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
+> +	}
+> +
+> +	if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
+> +		ksft_print_msg("Expect gpa to match given KVM_EXIT_ARM_SEA_FLAG_GPA_VALID is set\n");
+> +		TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MASK);
+> +	}
+> +
+> +	far_invalid = esr & ESR_ELx_FnV;
 
-and generate stub functions that don't do anything, can be eliminated
-by the compiler, but not before type-checking.
+Missing sync_global_to_guest()?
 
-Another possible idea would be:
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index b552a1e03848c..4f53a3240a511 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -1208,12 +1208,11 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
--#define kvm_call_hyp_nvhe(f, ...)						\
-+#define kvm_call_hyp_nvhe(f, ...)					\
- 	({								\
- 		struct arm_smccc_res res;				\
- 									\
--		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
--				  ##__VA_ARGS__, &res);			\
-+		nvhe_hvc_ ## f(##__VA_ARGS__, &res);			\
- 		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
- 									\
- 		res.a1;							\
-
-where the stub function would actually do the type checking. I tend to
-prefer this.
-
-In any case, you would need have some form of declarative IDL, and get
-both the caller and callee stubs to be totally generated. It shouldn't
-be too complicated to do it in awk or some other stuff.
-
-Thoughts?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Zenghui
