@@ -1,130 +1,132 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2A230497C
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 10:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053202EBDE3
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 11:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765450042; cv=none; b=P1vcENoFMgbMSwe/3UmquvNI6l3/MxVFGXgEmLxNkhFT1A4uli6uFBHEUVccUe/yekXbLhGRHBg7YTo4w5E8Lml7Fngy4yDD48ONTRXIMaX0tyuQbMIeh6IdhAc6unzyS7skzkXds5QHmaBIH2lKRnk1KXi3bFn5ZwH7HX4Tbro=
+	t=1765453112; cv=none; b=SFS79RurIjX7dzLbx5D1yf9vFS3tPQY//n7kigH3R7VC0S2aZNtcqtHIEP3vRplULFcnvUkBW4B79xS/eDAQNoFmZbpVhS7wuweIEoXBv+peD+ndUGaIOIZ0fWXzXEzklCNsWKCHvKHirr4pnmdlorQTSAuA6cgZ5wj/Ft/8k2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765450042; c=relaxed/simple;
-	bh=a0bm5ypoL+ePWexa5r4NV2hTrNL9J6dicbZFBQV7ZO8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bmQg3uAx54uBHpjkUuruB0PlkwTj1SY4O9GOhGf58X4muGfD8IZFYAg06AAVUfLKBnf0HtRlrdUeuZB+bDJgEtlmEegZ/ChOOoN+lLaJphx4uxAWUBpo8G7QreDhL3LTFYrNwY/WAwq5LojJTjcraDArSfsmVPaDoGxmq9kaiek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eEqqAibF; arc=none smtp.client-ip=209.85.128.74
+	s=arc-20240116; t=1765453112; c=relaxed/simple;
+	bh=0NUGEdE2gGvvTSabZ4VjEwBUuxj4vNHbJ1kfrp5W+qM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bEV1GzDMdQ9QNE/jJRlLvPmNycWyvc+UCe6kxdKiGS0nqZTBeRtUX+fBG5MvteFUGyRiabufkiRo7NSLSVxQ4lI8BFzwfRyoVjJ/7aV/h5J8wWRe+R7Mjq/1qT08tPZwSrw4pEDgZo0Q0W/dlgchsRCshE8dgyM7LzuX25U7is8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4Vh8I9Zd; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eEqqAibF"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-477b8a667bcso9941535e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 02:47:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4Vh8I9Zd"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-42e2e50cfaeso587209f8f.3
+        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 03:38:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765450038; x=1766054838; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DPJFeWIsG1i6FowmtIAisiP3QqBxSUvcrKvafvSq4e8=;
-        b=eEqqAibFasFgOL7RJ4ZTRRafsMlP4bvABdVr96EB8vuq08ZfMTjz88ceKDoODtcLvP
-         oReQ5hutEiy6QowSYN/qsnvniIJsciUmzhbApRz/IaU2BrzmJVIYrayyCo3dY1TosB87
-         nJE7iX56imOyqv6ocg+5oCwZrS4IFvmyDNAXQuv90ncQkLw1MzehuX/wb8ACffMSUF4a
-         P2yMyC/ngUO7ycTiM0mPfzpzV1/Qk+rqAunz9Ap+p5DAud2eUUg80ieQlfsQgWb5o9wQ
-         G7q1FtYqcixT4wMuyJjgTtTLZru0+siQL84DtqjUYSWkU04tttmnCy9CZr4OcSxQPp4J
-         KCeQ==
+        d=google.com; s=20230601; t=1765453109; x=1766057909; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=CckZrUPb46HYjW9q/J8GG7tJwmYowZwvL5Toejifz2s=;
+        b=4Vh8I9ZdgofqvBkw8ZHPiPh3CS9BSeI+jPzCZqt62+oKFgjA/sTytV/wOcG92ywEHw
+         IzTIEo5pJ7X8sUl4SdqFyE1mqgOHTaxfRGnLBDyE4FRGDiOF2gm0tXmWhK69Tblx33Y3
+         /dmzz1FsalJT6dcLQIpAXD00TmFObBpLmpnm6VyRo74rp5wGZh9ebRSrlZ5tlWzDkp5p
+         CQBJT+nZHuMQmnXdKCI+ohD63A1l7vJAuioDJBboLQlWkW6ZQdZyLR9MPWHuakdJV1qq
+         BvqqNq4qo49pvJljHTQTJu+TW/dTkUK2jAZWM4JIFXZOrohf8TVmw7jKAuTMyxJTe7DM
+         NmGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765450038; x=1766054838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DPJFeWIsG1i6FowmtIAisiP3QqBxSUvcrKvafvSq4e8=;
-        b=S1XV43rcmQVOuJ16VKqLPUw4n9A6vcqjdCsgS3BAX54i01MHZlLpIbqXwg11NEuJLQ
-         m7HfCwtaMeAKOOx9dAZSGsqbaaLW5W71CykXtES393k8kJSfG8KrNy6z1DCIqLOWzMeS
-         EBLuft5yVTlw+PKDUPwx/AM4+aMX2qQM2p3LONoGdsOaZGOwVdKnsH7aK21BeOUy6tqv
-         LjfSxPy8W0l2LaM7g4suMidB1W3sUfycgkHRE1wFXHmTwqQKe5cLi3Fe3Ob3jIb7k1/d
-         5ckU/6nROkWEYr/IV+AzuKtuGOBCI/PvAYA/H/+HNYfk7Rvpgsnta3YRtQmi1mUB5ig3
-         1wSQ==
-X-Gm-Message-State: AOJu0YzpFM2VC9CuOoxOc/qCyzYSYWj2vE1pXN5MPjRZnOim/BhV3yVy
-	HyRqo6ex6aj11rn6zo+0aztan7T0SaWkrV/R2j1+Me/RUzYo+zLes32ZQpQpspTnD58PoHSGifW
-	T5ssMFDP2WBhHW0mqi5I5U0Ko8xROGZu6/W47q0FSLH+aG0rXJXKLvDq35PfWeGYIyQGNS3RZJI
-	cWSyrXXmXPyP1N0LqB0kLsmTfDN7xvyRI=
-X-Google-Smtp-Source: AGHT+IFxe3la08OatSiShthELwpIsMGdrPJNlN/I9MD19vMV+FsiKC4eR8k6s85XeMgwNaC6DyldV+5Jog==
-X-Received: from wmpg4.prod.google.com ([2002:a05:600c:4c84:b0:477:55d3:90d1])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4693:b0:471:989:9d7b
- with SMTP id 5b1f17b1804b1-47a8378cd86mr56456405e9.21.1765450038441; Thu, 11
- Dec 2025 02:47:18 -0800 (PST)
-Date: Thu, 11 Dec 2025 10:47:09 +0000
-In-Reply-To: <20251211104710.151771-1-tabba@google.com>
+        d=1e100.net; s=20230601; t=1765453109; x=1766057909;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CckZrUPb46HYjW9q/J8GG7tJwmYowZwvL5Toejifz2s=;
+        b=S72MwmWy0WHluxGMur/Wkc05HrlrAnQP2NeSKbrQDcpaJONt/K/ocH7Kl2UhlMHE2h
+         TKFJQTXWGvTky8kvFXZNkhiBpHRvfNvCygQDVFOlk28215vEov2aJGzyD0mj8aTU8Jex
+         HTYo+1ntGtTP0rtvQqyf7IcudO3NxflFRqrbqO2ELMVFWXI7sLKrPz6EWQNZsTe4PPRA
+         cGzsX1wJS381UgIXWHXDxZliqIyKKACRbY84YA2IPxa/mhiL3uSCJZugSgKm/bPYREsD
+         V7dHX0J5H5hqnwHVdY0p0Nbd5BusbLIp9mCY0LKEnKsRbghyYdhsyBvrU6zwDMO/aPYQ
+         tToQ==
+X-Gm-Message-State: AOJu0YwQPiFNqsRmwwDUfA1m/kHf/3zjcw1xwJm8WTjwn6dHRow4PmzJ
+	i8zbqA5VafO8tzs7FS0AdehUlZ3nNwEwKhnuKOgXMld87FJSgnn70NmkBrZVnCVYF/kkYsyPSkb
+	zFfXbEXIu+QTBFRLQRL8nOsRlrrER+6y3ySE3fJmGmi5KHicEgIkxNWL5Ae8lOLNAxgbCIGOQi9
+	/9ccsJC+IIMwEVb9RBCGSkc/bmy14cep0=
+X-Google-Smtp-Source: AGHT+IHGT/x5KyuVOljq6fzfjB0iRjK178XSlQN3GeksKcr8VmbWiVYNPeYgJhy+9wL3xLSwnbIaeT020w==
+X-Received: from wrbhg14.prod.google.com ([2002:a05:6000:1e4e:b0:42b:2c97:16d9])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:adf:9bca:0:b0:42f:a8bc:813
+ with SMTP id ffacd0b85a97d-42fa8bc08bemr2137499f8f.5.1765453109288; Thu, 11
+ Dec 2025 03:38:29 -0800 (PST)
+Date: Thu, 11 Dec 2025 11:38:23 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-References: <20251211104710.151771-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251211104710.151771-10-tabba@google.com>
-Subject: [PATCH v6 9/9] KVM: arm64: Prevent host from managing timer offsets
- for protected VMs
+Message-ID: <20251211113828.370370-1-tabba@google.com>
+Subject: [PATCH v2 0/5] KVM: arm64: Enforce MTE disablement at EL2
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, will@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, vladimir.murzin@arm.com, tabba@google.com
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-For protected VMs, the guest's timer offset state should not be
-controlled by the host and must always run with a virtual counter offset
-of 0. The existing timer logic allowed the host to set and manage the
-timer counter offsets for protected VMs in certain cases.
+pKVM never exposes MTE to protected guests (pVM), but we must also
+ensure a malicious host cannot use MTE to attack the hypervisor or a
+pVM.
 
-Disable all host-side management of timer offsets for protected VMs by
-adding checks in the relevant code paths.
+If MTE is supported by the hardware (and is enabled at EL3), it remains
+available to lower exception levels by default. Disabling it in the host
+kernel (e.g., via 'arm64.nomte') only stops the kernel from advertising
+the feature; it does not physically disable MTE in the hardware.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/arch_timer.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+The ability to disable MTE in the host kernel is used by some systems,
+such as Android, so that the physical memory otherwise used as tag
+storage can be used for other things (i.e. treated just like the rest of
+memory).
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 3f675875abea..f5407301c8f9 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -1056,10 +1056,14 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
- 
- 	ctxt->timer_id = timerid;
- 
--	if (timerid == TIMER_VTIMER)
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
--	else
--		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	if (!kvm_vm_is_protected(vcpu->kvm)) {
-+		if (timerid == TIMER_VTIMER)
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
-+		else
-+			ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
-+	} else {
-+		ctxt->offset.vm_offset = NULL;
-+	}
- 
- 	hrtimer_setup(&ctxt->hrtimer, kvm_hrtimer_expire, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 
-@@ -1083,7 +1087,8 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 		timer_context_init(vcpu, i);
- 
- 	/* Synchronize offsets across timers of a VM if not already provided */
--	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
-+	if (!vcpu_is_protected(vcpu) &&
-+	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
- 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
- 		timer_set_offset(vcpu_ptimer(vcpu), 0);
- 	}
-@@ -1687,6 +1692,9 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
- 	if (offset->reserved)
- 		return -EINVAL;
- 
-+	if (kvm_vm_is_protected(kvm))
-+		return -EINVAL;
-+
- 	mutex_lock(&kvm->lock);
- 
- 	if (!kvm_trylock_all_vcpus(kvm)) {
+In this scenario, a malicious host could still access tags in pages
+donated to a guest using MTE instructions (e.g., STG and LDG), bypassing
+the kernel's configuration.
+
+To prevent this, explicitly disable MTE at EL2 (by clearing HCR_EL2.ATA)
+when the host has MTE disabled. This causes any MTE instruction usage to
+generate a Data Abort (trap) to the hypervisor.
+
+Additionally, to faithfully mimic hardware that does not support MTE,
+trap accesses to MTE system registers (e.g., GCR_EL1) and inject an
+Undefined Instruction exception back to the host.
+
+This logic is applied in all non-VHE modes. For non-protected modes,
+this remains beneficial as it prevents unpredictable behavior caused by
+accessing allocation tags when the system considers them disabled.
+
+Note that this ties into my other outgoing patch series [1], which also
+has some MTE-related fixes, but is not dependent on it.
+
+Based on Linux 6.18
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20251211104710.151771-1-tabba@google.com/
+[2] https://lore.kernel.org/all/20251127122210.4111702-1-tabba@google.com/
+
+Fuad Tabba (4):
+  arm64: Remove dead code resetting HCR_EL2 for pKVM
+  arm64: Clear HCR_EL2.ATA when MTE is not supported or disabled
+  arm64: Inject UNDEF when accessing MTE sysregs with MTE disabled
+  KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
+
+Quentin Perret (1):
+  KVM: arm64: Refactor enter_exception64()
+
+ arch/arm64/include/asm/kvm_arm.h     |   2 +-
+ arch/arm64/include/asm/kvm_emulate.h |   5 ++
+ arch/arm64/kernel/head.S             |   2 +-
+ arch/arm64/kvm/arm.c                 |   4 ++
+ arch/arm64/kvm/hyp/exception.c       | 100 ++++++++++++++++-----------
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   |   5 --
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  44 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c       |   2 +-
+ 8 files changed, 114 insertions(+), 50 deletions(-)
+
+
+base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
