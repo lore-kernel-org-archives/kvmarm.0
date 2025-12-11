@@ -1,91 +1,92 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6C22D238D
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 14:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A99F315D23
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 14:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765462444; cv=pass; b=fykw8+RlySDGyp431hwcKmi5M5EflgFkPYPsG02/ACxE1/SYidlpI3HsvxPnXUvYo30/irTZ6ZDNTE+jz5ijjT5EgVWhOrfO14jH382D9D/A1LOzw21l+ou2kwSzJcQckn41OZUn7IoWQ0lGn+Rg+tWcGv1ZjBgI/p3RyThpwgg=
+	t=1765463445; cv=pass; b=KnS8mRhtfJF1CqVauE4uB0RIR1Mz/5w1CZKg7RhVqu8S9FDJCOqqCla3JwHP8xoWNVvYqt3prthOEj9dC/REOU2Pw6QTCbxoWVcaapps2wy6Je6FI3VO3gzJjHLSkZ6h99YslqIt1eNgJx02JyOUpAs70xZeFCOhBTISlU7cC3M=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765462444; c=relaxed/simple;
-	bh=HOmO7w9wX12Y3tO2vwswa40uELHQ7sGeubZv38Za8VA=;
+	s=arc-20240116; t=1765463445; c=relaxed/simple;
+	bh=JFjzYzXKwQSP6iSsNRz75EAq2acEDG9Cc+XM1pWcsDs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u+Je0GVDEbB7AkGm1xVbXCdKyVAiYERsNjb/BeUAKPGIqlI0I0xZ84AafuOrGH4QKK0QlMfopnVpUHDKWu0tR0Enry0HzCu5Gv3u4T08WDbxjMknHtgBWEp56/aLnfReEWpVuhoBnuvvaqhDynsuLmNaqwvhH53ymA7G5vHHPDQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LPkpy8si; arc=pass smtp.client-ip=209.85.160.180
+	 To:Cc:Content-Type; b=gutv8ekBiyMLqN938RrilajjvnMDlpJzmTuxFweNWB/epJiWCgv9heVEXrMonqeYDlyBtfzFeMKP+DqP+h6z10XK1hkbFl700szK44dtxFkHFv70OeQdD286InjcUuyEgbW3rTrE95VGZNaG2b+RDh5ODld+oLlMld7JSWK8cms=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HExrVj7w; arc=pass smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LPkpy8si"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ee147baf7bso424561cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 06:14:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765462439; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HExrVj7w"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4edb8d6e98aso628041cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 06:30:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765463441; cv=none;
         d=google.com; s=arc-20240605;
-        b=TNlxsRNkMSHVWjeEnt/xxNsQ3ngirmGffMqddDSdflVR3U7U4ndKejJz0uzWAbQrxy
-         UCGLPFhm4ZuMtRa7vU0ScjDOAzsvTaeMsy8et8/uwTVvbFM7UciJTxqfuN7UJK3yZFrU
-         Yq8EenwZ74utD7WVsECSa4pY5E2BABUvKbaZPVFYawfYLaS/ezOJoOO6ij8O087KaEFd
-         e+2RNSt5GzaQsJnApyX1IrWhPvI/1+EeumCIm47bIvOt/EQAbbAqK7/0XwRJS+s5Iwwq
-         bsVJ5mwvZOvRsr83JbzFNNJ4JbK0NAx2udh/fLJrRhXAoricFFjFeIvyL6bF4BbOlNkx
-         j/FA==
+        b=SzSZKTlcyVUQ0TEs20h9enEalc44kZQAbJkhqMwy9kD2em+iubL3EN9QmPPYCsqiQl
+         h8lh5F7/J2R3fbSalmIzeXOaWozNhAD8mO7/jBWCCLncJq6ZYYI/h4EMEIX7ATkwBKON
+         dJA/AVXwgXDYRIODyjYpfuOpHLayXIJ3x7Ip9ifd3fkiFSkd4oM++VQ38L1N9PFCvdTD
+         XyQFq0AgFKuEgqLIUcW7L2A8A+VAp/TdN2da88488a98s8Y8HmFf/vLKxLgM1maENq9M
+         b5aCHBVF1E3dh1bCTMoQxcy0yKfBCUGzFWYZhHjh4ONq8M4a4n8CirqZGj/CaNskDiwW
+         rSaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
+        bh=CXKK+XMOV+BG1j0Dmg65GZuKWhjmotSC6I9z/HN+0TE=;
         fh=NG/nEuPEgoaPuGimMFCytjJ02a7zmffXXGabTKRy8/o=;
-        b=Cxtc8YXbA2lEagTRMkkM7eT06cW7eQ0DePvfJ3hGfiqN5XJPpxiDA47CDp66KLKTvp
-         3+Yf3iB6MdW9/9r/gCM2L1Mb0/u++Zauw9qZv1x0s+37eZcQo3OjdG0tKSArL1k2IqPA
-         zZxnXg6FRLNxT5dUiQhJsBA57RG7WPARVOmaXcezqWjaksOGFnpG3twXBz1DLCQ/hnFd
-         boWj0Aozqwfg334N83HMwso4mU4DrNEVj9RqSrvtc/aZD+lFLiTKcyBuz3c+yyHWtrHT
-         3tLo686FoQZ1LxwjlOOnkYD5MFCzvZ2BT849ZFm5OeRjiKLzYZrjrCl0p+weF6ak/P2W
-         MDSw==;
+        b=A/U2SBXIR+ykUkBknnMIIQyDi6tbnUN85+ffH3//yAIDw4Raekgta7/u20S3ZSpNAw
+         Zl0Fl6gj0n1td+DiaM0Z1KdRSasQnL+EfKOePHmw8sL95/aiVvY4bIxSA8EuUYixy253
+         77LJOgh0zEEnCKFuwvVP0Z1hC5akpH9q1KFb5IACrHtj6RJ+PKT07pLOIohIUPTan7b7
+         Pihywiqw6QI1b/w9acwD/SVnVo/CEJpnCJwX7WD6Z10/dGwxT5ZJd13vrTwDi+anIPaj
+         MYlpx3P4ZJPAbBmYCCJxwElp7C5UhIpjqFru9mfj0l76Fb+HkHy2UXwlVIRF1s9iKAgw
+         6FLg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765462439; x=1766067239; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1765463441; x=1766068241; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
-        b=LPkpy8sivWxp51VhcSxdjTrRM/MwCfvP/7XGJYlEi8rRenXRYDfXxznVZFjPkpHVkm
-         GRqyQ1dUULAUqMB1/LhueT3yik+nTrFDTf/Lr3KYOBtd3o4HgcvG4AE0ltDvrvYf2uap
-         GHU0DzBp9sOf29t/XsmhM/LuIq7VxP+VpvxeqmZSi9Q901VJ/Rkc2f90tw21GZJwwsPm
-         B7SuA+OeObZTRS5sSUM8Ph0c6PnE7IDbt4Yw0c/qCSff/2cCdRO9+o9qWWzF7yhkOzP4
-         9+Nkha4vTbL/2uqL/TfqiYeolB9bLo0irPAmaja0tQK+auERmMKzH+xeYicDepfxncbE
-         d9mA==
+        bh=CXKK+XMOV+BG1j0Dmg65GZuKWhjmotSC6I9z/HN+0TE=;
+        b=HExrVj7wl54ROlDuoQo0HB87AHgOsAhpyybyb2peOgeYIwgpCtQtAdBOfNix5Zzf8b
+         peXXwwrai48YMtVUVttCduolSRoqNpUqE6uaTIXHKhF2jy18YvCRBVaXtkEEQFSH92SB
+         FQyUsyQfj0aMpl+XHbCHNmRKjhajr9e04f7f4YjF5r2xW34E070ExRLYXBhr64tAe5yJ
+         y5M63jqK0mVP2mp9z0pd+fsmGllnGswZFxe7NvwQ+WIZxLeksclykYFHxA8zc+6xVNIk
+         XgpxspOzHFDPGAAu0CbiWeEaN3qGMgH8d1PQ3lbQW28jHbAxL8ikgq9dNMPVBTADfYpb
+         VMTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765462439; x=1766067239;
+        d=1e100.net; s=20230601; t=1765463441; x=1766068241;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DbriQ0SkVMvNN6P53laWKo2APdvbpd18INbzHTP59Xc=;
-        b=XBLyJArIxrVHPJl6Ji7/HWBbrT5KkiLY7UhtM9ueLH1caGqpJe6cN2PLAz/C37oLAL
-         5HOUKT55olNy5PbH/RXaNB9UvXtAqDVV1RzXHrJnraYG1Cf/mYQeg+J83FQmk+xRZwL/
-         RTCQtjA9z3PTO5R5sgjedy9V7UAHcvxA15XsTJ2SyMoOq6AJ8/Qo4IM7BHG3iwVL6aBW
-         x1G72/NxdrtSl419eSX6mSpRjObGaQ8xBQ9L9VE7EhkitK3nHzoZhfZuTT/JMwWIgBcx
-         ROXYVSxyskGugOt2u365cRcL22WoiALiWfavlBPunCR6TJgP2J7/mbXd2Z3Cf+jfFzpU
-         Z9kw==
-X-Gm-Message-State: AOJu0YzsgXFQfsWCGIZ+kuVYgKDwRdO+IopVrFgdZ7xJanW3EfTxBLxh
-	sCI1hhiSG7lenbOtfuEhJjT2GyP6lfHFJI5kyz8m/PIar+SYK2VWE6U27GNelF0yJvYV/3AxAGT
-	OGpNNOnc8ERgz1AhtE4raZCTvB9YpbQGD7bOYTi/KTvIGBp6hAnMDRXaG
-X-Gm-Gg: AY/fxX6F0HV/w07xmeSJMtHtLN0co3+y06dMfQrdU5NtrNjqrnt22GodMNIVVFvBIZ1
-	pjjCxu3+6OXJRLTPN47WTlayTkidlmlusHkcsx0RO4UX0Fl1YpVFyoKUJump7e7A96fT3y1Nx1x
-	MTs3cXYoNgjpMwe/wHwbz9zsPEJS2wazSj2QFUdV0jd3ze/avUSPYJqsFNwb2dhaS8HFdKVlApV
-	N3glIhrhEnpeiugjd5Dapi7Lvs1xF1IMivnQkzg8sPBhu/J4Vf/qCNBqpHtH+vLAiZKePOk
-X-Google-Smtp-Source: AGHT+IHsR5PweMeVDYCfFKFjDQpdQaAflU2RyEDDm5BFseo6Sjuat6mmlH3xwySmJNO3hwq7ZAvO0aIfX0lj5pQvCmM=
-X-Received: by 2002:a05:622a:2a18:b0:4f1:bee9:f24a with SMTP id
- d75a77b69052e-4f1bee9f407mr9010731cf.0.1765462439165; Thu, 11 Dec 2025
- 06:13:59 -0800 (PST)
+        bh=CXKK+XMOV+BG1j0Dmg65GZuKWhjmotSC6I9z/HN+0TE=;
+        b=jUozwavOCXaZ5cK5rEm5OW9QL0ro9LsfwbJ0M72paxVIoagADHpDRdw6NqyBcKsvne
+         8V8g8wDNNHM9fVrQ7Ki33Ps0BvopGx81yf1RADaNVkWIQPwYs6b9npWKDfAkQUU08LTj
+         mf1apQODNZ82yfr8BgBsfP1ynUBGxydfsafgOhwuXJI9AB3EFkicXZSWyyigBydGNtIp
+         RKltJIEEoz0iBLUwKomCRJTC250zkINmQewOU/2BhQ1eJCnLY4rebSSOhti7iRxuZQyD
+         OMJmbyJ7GOpbYrVzwv+U8Km7Zgz/kRNV2UMInrSDKYpPBMVWJqfqRBvRtrQUYxhX0jDG
+         HjzA==
+X-Gm-Message-State: AOJu0Yxv19mKv/2ktjsADGotn5jffyBnWmsXyBxsxuvF4S7acTapaNpU
+	2yoiec+X7TvrhlXFNSFFizBWvHS7N2tFxQa7wk+OrUVCs+WADXuOUmS1hIB5i0S3EPqUS1MptaL
+	NKrgem2mWyuAnDvka6fCEh1G8s8rXEA4CnaV+yfw7LWWPuo3x/3GQ51NN
+X-Gm-Gg: AY/fxX4MM5F5ALwXt60vE2K2RWTxHqjnCrqJrmdzixsg3i3kJrcNFWdi6x4oI9K7W7P
+	q5CqrvymECc2Y9A7WHP9fcdwQx98HP094bJoJ02OO8JFFXZvmiOMVMezHRj0LdD6k4q6rWcvYRu
+	dSCCCEVw/1q76SCcAUSswL1Jvjr2VoTH+viSxEqAZmWq4Ww6RLue6X6sBGS1eYtpa2DaPjraIGP
+	xZ2d9XbCBFAthxbrS8dVDEE+dIfsGyeZ9HHJsMzJTddv9pugYAPrPTY/dlDStDU3ZFfUAkT
+X-Google-Smtp-Source: AGHT+IHOTRmzXfJZ1LxuUaQCR8PjN6XcJs7sQ/sZlzHzbcwman+GYjtDsYLbkyW9r2wgCAu14xGlJhBPAApNgAZIVaM=
+X-Received: by 2002:a05:622a:a:b0:4ed:ff77:1a87 with SMTP id
+ d75a77b69052e-4f1bee1ac37mr9103321cf.19.1765463440630; Thu, 11 Dec 2025
+ 06:30:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-4-maz@kernel.org>
-In-Reply-To: <20251210173024.561160-4-maz@kernel.org>
+References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-5-maz@kernel.org>
+In-Reply-To: <20251210173024.561160-5-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 11 Dec 2025 14:13:22 +0000
-X-Gm-Features: AQt7F2rr9PtjIIiHtnFsFtlWwu7AuIjaSq1NTTsgICgihl-4XDKmWFGJmdfGQpU
-Message-ID: <CA+EHjTyJFZttD4jTH=q_T28BwMR2CDdYSyH7G-WTQvULyjy-Tw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] arm64: Convert VTCR_EL2 to sysreg infratructure
+Date: Thu, 11 Dec 2025 14:30:03 +0000
+X-Gm-Features: AQt7F2pDHRhtoAmbiPDRAiv1SfNZGM-FeRtbrSAxL2i7eJPuZsyFVaRGyD0DPvo
+Message-ID: <CA+EHjTy2=NjAOwG32_Aj2akEDS8yo92nTMmd_rkUPABDAAcdAA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in
+ DECLARE_FEAT_MAP() and co
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -95,286 +96,230 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Sebastian Ene <sebastianene@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
-
-In subject: infratructure -> infrastructure
-
-
 On Wed, 10 Dec 2025 at 17:30, Marc Zyngier <maz@kernel.org> wrote:
 >
-> Our definition of VTCR_EL2 is both partial (tons of fields are
-> missing) and totally inconsistent (some constants are shifted,
-> some are not). They are also expressed in terms of TCR, which is
-> rather inconvenient.
+> None of the registers we manage in the feature dependency infrastructure
+> so far has any RES1 bit. This is about to change, as VTCR_EL2 has
+> its bit 31 being RES1.
 >
-> Replace the ad-hoc definitions with the the generated version.
-
-Duplicate "the"
-
-> This results in a bunch of additional changes to make the code
-> with the unshifted nature of generated enumerations.
+> In order to not fail the consistency checks by not describing a bit,
+> add RES1 bits to the set of immutable bits. This requires some extra
+> surgery for the FGT handling, as we now need to track RES1 bits there
+> as well.
 >
-> The register data was extracted from the BSD licenced AARCHMRS
-> (AARCHMRS_OPENSOURCE_A_profile_FAT-2025-09_ASL0).
+> There are no RES1 FGT bits *yet*. Watch this space.
 >
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-After checking the bits against the spec, and with the nits above:
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
 /fuad
 
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 52 +++++++----------------------
->  arch/arm64/include/asm/sysreg.h  |  1 -
->  arch/arm64/kvm/hyp/pgtable.c     |  8 ++---
->  arch/arm64/kvm/nested.c          |  8 ++---
->  arch/arm64/tools/sysreg          | 57 ++++++++++++++++++++++++++++++++
->  5 files changed, 76 insertions(+), 50 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/config.c           | 25 +++++++-------
+>  arch/arm64/kvm/emulate-nested.c   | 55 +++++++++++++++++--------------
+>  3 files changed, 45 insertions(+), 36 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index e500600e4b9b8..dfdbd2b65db9e 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -124,37 +124,7 @@
->  #define TCR_EL2_MASK   (TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
->                          TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac7f970c78830..b552a1e03848c 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -638,6 +638,7 @@ struct fgt_masks {
+>         u64             mask;
+>         u64             nmask;
+>         u64             res0;
+> +       u64             res1;
+>  };
 >
-> -/* VTCR_EL2 Registers bits */
-> -#define VTCR_EL2_DS            TCR_EL2_DS
-> -#define VTCR_EL2_RES1          (1U << 31)
-> -#define VTCR_EL2_HD            (1 << 22)
-> -#define VTCR_EL2_HA            (1 << 21)
-> -#define VTCR_EL2_PS_SHIFT      TCR_EL2_PS_SHIFT
-> -#define VTCR_EL2_PS_MASK       TCR_EL2_PS_MASK
-> -#define VTCR_EL2_TG0_MASK      TCR_TG0_MASK
-> -#define VTCR_EL2_TG0_4K                TCR_TG0_4K
-> -#define VTCR_EL2_TG0_16K       TCR_TG0_16K
-> -#define VTCR_EL2_TG0_64K       TCR_TG0_64K
-> -#define VTCR_EL2_SH0_MASK      TCR_SH0_MASK
-> -#define VTCR_EL2_SH0_INNER     TCR_SH0_INNER
-> -#define VTCR_EL2_ORGN0_MASK    TCR_ORGN0_MASK
-> -#define VTCR_EL2_ORGN0_WBWA    TCR_ORGN0_WBWA
-> -#define VTCR_EL2_IRGN0_MASK    TCR_IRGN0_MASK
-> -#define VTCR_EL2_IRGN0_WBWA    TCR_IRGN0_WBWA
-> -#define VTCR_EL2_SL0_SHIFT     6
-> -#define VTCR_EL2_SL0_MASK      (3 << VTCR_EL2_SL0_SHIFT)
-> -#define VTCR_EL2_T0SZ_MASK     0x3f
-> -#define VTCR_EL2_VS_SHIFT      19
-> -#define VTCR_EL2_VS_8BIT       (0 << VTCR_EL2_VS_SHIFT)
-> -#define VTCR_EL2_VS_16BIT      (1 << VTCR_EL2_VS_SHIFT)
-> -
-> -#define VTCR_EL2_T0SZ(x)       TCR_T0SZ(x)
-> -
->  /*
-> - * We configure the Stage-2 page tables to always restrict the IPA space to be
-> - * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
-> - * not known to exist and will break with this configuration.
-> - *
->   * The VTCR_EL2 is configured per VM and is initialised in kvm_init_stage2_mmu.
->   *
->   * Note that when using 4K pages, we concatenate two first level page tables
-> @@ -162,9 +132,6 @@
->   *
+>  extern struct fgt_masks hfgrtr_masks;
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 24bb3f36e9d59..3845b188551b6 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -16,14 +16,14 @@
 >   */
+>  struct reg_bits_to_feat_map {
+>         union {
+> -               u64     bits;
+> -               u64     *res0p;
+> +               u64              bits;
+> +               struct fgt_masks *masks;
+>         };
 >
-> -#define VTCR_EL2_COMMON_BITS   (VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
-> -                                VTCR_EL2_IRGN0_WBWA | VTCR_EL2_RES1)
-> -
+>  #define        NEVER_FGU       BIT(0)  /* Can trap, but never UNDEF */
+>  #define        CALL_FUNC       BIT(1)  /* Needs to evaluate tons of crap */
+>  #define        FIXED_VALUE     BIT(2)  /* RAZ/WI or RAO/WI in KVM */
+> -#define        RES0_POINTER    BIT(3)  /* Pointer to RES0 value instead of bits */
+> +#define        MASKS_POINTER   BIT(3)  /* Pointer to fgt_masks struct instead of bits */
+>
+>         unsigned long   flags;
+>
+> @@ -92,8 +92,8 @@ struct reg_feat_map_desc {
+>  #define NEEDS_FEAT_FIXED(m, ...)                       \
+>         __NEEDS_FEAT_FLAG(m, FIXED_VALUE, bits, __VA_ARGS__, 0)
+>
+> -#define NEEDS_FEAT_RES0(p, ...)                                \
+> -       __NEEDS_FEAT_FLAG(p, RES0_POINTER, res0p, __VA_ARGS__)
+> +#define NEEDS_FEAT_MASKS(p, ...)                               \
+> +       __NEEDS_FEAT_FLAG(p, MASKS_POINTER, masks, __VA_ARGS__)
+>
 >  /*
->   * VTCR_EL2:SL0 indicates the entry level for Stage2 translation.
->   * Interestingly, it depends on the page size.
-> @@ -196,30 +163,35 @@
+>   * Declare the dependency between a set of bits and a set of features,
+> @@ -109,19 +109,20 @@ struct reg_feat_map_desc {
+>  #define DECLARE_FEAT_MAP(n, r, m, f)                                   \
+>         struct reg_feat_map_desc n = {                                  \
+>                 .name                   = #r,                           \
+> -               .feat_map               = NEEDS_FEAT(~r##_RES0, f),     \
+> +               .feat_map               = NEEDS_FEAT(~(r##_RES0 |       \
+> +                                                      r##_RES1), f),   \
+>                 .bit_feat_map           = m,                            \
+>                 .bit_feat_map_sz        = ARRAY_SIZE(m),                \
+>         }
+>
+>  /*
+>   * Specialised version of the above for FGT registers that have their
+> - * RES0 masks described as struct fgt_masks.
+> + * RESx masks described as struct fgt_masks.
 >   */
->  #ifdef CONFIG_ARM64_64K_PAGES
+>  #define DECLARE_FEAT_MAP_FGT(n, msk, m, f)                             \
+>         struct reg_feat_map_desc n = {                                  \
+>                 .name                   = #msk,                         \
+> -               .feat_map               = NEEDS_FEAT_RES0(&msk.res0, f),\
+> +               .feat_map               = NEEDS_FEAT_MASKS(&msk, f),    \
+>                 .bit_feat_map           = m,                            \
+>                 .bit_feat_map_sz        = ARRAY_SIZE(m),                \
+>         }
+> @@ -1168,21 +1169,21 @@ static const DECLARE_FEAT_MAP(mdcr_el2_desc, MDCR_EL2,
+>                               mdcr_el2_feat_map, FEAT_AA64EL2);
 >
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_64K
-> +#define VTCR_EL2_TGRAN                 64K
->  #define VTCR_EL2_TGRAN_SL0_BASE                3UL
->
->  #elif defined(CONFIG_ARM64_16K_PAGES)
->
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_16K
-> +#define VTCR_EL2_TGRAN                 16K
->  #define VTCR_EL2_TGRAN_SL0_BASE                3UL
->
->  #else  /* 4K */
->
-> -#define VTCR_EL2_TGRAN                 VTCR_EL2_TG0_4K
-> +#define VTCR_EL2_TGRAN                 4K
->  #define VTCR_EL2_TGRAN_SL0_BASE                2UL
->
->  #endif
->
->  #define VTCR_EL2_LVLS_TO_SL0(levels)   \
-> -       ((VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))) << VTCR_EL2_SL0_SHIFT)
-> +       FIELD_PREP(VTCR_EL2_SL0, (VTCR_EL2_TGRAN_SL0_BASE - (4 - (levels))))
->  #define VTCR_EL2_SL0_TO_LVLS(sl0)      \
->         ((sl0) + 4 - VTCR_EL2_TGRAN_SL0_BASE)
->  #define VTCR_EL2_LVLS(vtcr)            \
-> -       VTCR_EL2_SL0_TO_LVLS(((vtcr) & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT)
-> +       VTCR_EL2_SL0_TO_LVLS(FIELD_GET(VTCR_EL2_SL0, (vtcr)))
-> +
-> +#define VTCR_EL2_FLAGS (SYS_FIELD_PREP_ENUM(VTCR_EL2, SH0, INNER)          | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, ORGN0, WBWA)         | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, IRGN0, WBWA)         | \
-> +                        SYS_FIELD_PREP_ENUM(VTCR_EL2, TG0, VTCR_EL2_TGRAN) | \
-> +                        VTCR_EL2_RES1)
->
-> -#define VTCR_EL2_FLAGS                 (VTCR_EL2_COMMON_BITS | VTCR_EL2_TGRAN)
-> -#define VTCR_EL2_IPA(vtcr)             (64 - ((vtcr) & VTCR_EL2_T0SZ_MASK))
-> +#define VTCR_EL2_IPA(vtcr)             (64 - FIELD_GET(VTCR_EL2_T0SZ, (vtcr)))
->
->  /*
->   * ARM VMSAv8-64 defines an algorithm for finding the translation table
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index c231d2a3e5159..acad7a7621b9e 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -516,7 +516,6 @@
->  #define SYS_TTBR1_EL2                  sys_reg(3, 4, 2, 0, 1)
->  #define SYS_TCR_EL2                    sys_reg(3, 4, 2, 0, 2)
->  #define SYS_VTTBR_EL2                  sys_reg(3, 4, 2, 1, 0)
-> -#define SYS_VTCR_EL2                   sys_reg(3, 4, 2, 1, 2)
->
->  #define SYS_HAFGRTR_EL2                        sys_reg(3, 4, 3, 1, 6)
->  #define SYS_SPSR_EL2                   sys_reg(3, 4, 4, 0, 0)
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 947ac1a951a5b..e0bd6a0172729 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -583,8 +583,8 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->         u64 vtcr = VTCR_EL2_FLAGS;
->         s8 lvls;
->
-> -       vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
-> -       vtcr |= VTCR_EL2_T0SZ(phys_shift);
-> +       vtcr |= FIELD_PREP(VTCR_EL2_PS, kvm_get_parange(mmfr0));
-> +       vtcr |= FIELD_PREP(VTCR_EL2_T0SZ, (UL(64) - phys_shift));
->         /*
->          * Use a minimum 2 level page table to prevent splitting
->          * host PMD huge pages at stage2.
-> @@ -624,9 +624,7 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->                 vtcr |= VTCR_EL2_DS;
->
->         /* Set the vmid bits */
-> -       vtcr |= (get_vmid_bits(mmfr1) == 16) ?
-> -               VTCR_EL2_VS_16BIT :
-> -               VTCR_EL2_VS_8BIT;
-> +       vtcr |= (get_vmid_bits(mmfr1) == 16) ? VTCR_EL2_VS : 0;
->
->         return vtcr;
->  }
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index 911fc99ed99d9..e1ef8930c97b3 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -377,7 +377,7 @@ static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
+>  static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+> -                                 int map_size, u64 res0, const char *str)
+> +                                 int map_size, u64 resx, const char *str)
 >  {
->         wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
+>         u64 mask = 0;
 >
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 wi->pgshift = 12;        break;
->         case VTCR_EL2_TG0_16K:
-> @@ -513,7 +513,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+>         for (int i = 0; i < map_size; i++)
+>                 mask |= map[i].bits;
 >
->         lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(mmu)->mmu_lock);
+> -       if (mask != ~res0)
+> +       if (mask != ~resx)
+>                 kvm_err("Undefined %s behaviour, bits %016llx\n",
+> -                       str, mask ^ ~res0);
+> +                       str, mask ^ ~resx);
+>  }
 >
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 ttl = (TLBI_TTL_TG_4K << 2);
->                 break;
-> @@ -530,7 +530,7 @@ static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
+>  static u64 reg_feat_map_bits(const struct reg_bits_to_feat_map *map)
+>  {
+> -       return map->flags & RES0_POINTER ? ~(*map->res0p) : map->bits;
+> +       return map->flags & MASKS_POINTER ? (map->masks->mask | map->masks->nmask) : map->bits;
+>  }
 >
->  again:
->         /* Iteratively compute the block sizes for a particular granule size */
-> -       switch (vtcr & VTCR_EL2_TG0_MASK) {
-> +       switch (FIELD_GET(VTCR_EL2_TG0_MASK, vtcr)) {
->         case VTCR_EL2_TG0_4K:
->                 if      (sz < SZ_4K)    sz = SZ_4K;
->                 else if (sz < SZ_2M)    sz = SZ_2M;
-> @@ -593,7 +593,7 @@ unsigned long compute_tlb_inval_range(struct kvm_s2_mmu *mmu, u64 val)
+>  static void __init check_reg_desc(const struct reg_feat_map_desc *r)
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 834f13fb1fb7d..75d49f83342a5 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2105,23 +2105,24 @@ static u32 encoding_next(u32 encoding)
+>  }
 >
->         if (!max_size) {
->                 /* Compute the maximum extent of the invalidation */
-> -               switch (mmu->tlb_vtcr & VTCR_EL2_TG0_MASK) {
-> +               switch (FIELD_GET(VTCR_EL2_TG0_MASK, mmu->tlb_vtcr)) {
->                 case VTCR_EL2_TG0_4K:
->                         max_size = SZ_1G;
->                         break;
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 9d388f87d9a13..6f43b2ae5993b 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4400,6 +4400,63 @@ Field    56:12   BADDR
->  Res0   11:0
->  EndSysreg
->
-> +Sysreg VTCR_EL2        3       4       2       1       2
-> +Res0   63:46
-> +Field  45      HDBSS
-> +Field  44      HAFT
-> +Res0   43:42
-> +Field  41      TL0
-> +Field  40      GCSH
-> +Res0   39
-> +Field  38      D128
-> +Field  37      S2POE
-> +Field  36      S2PIE
-> +Field  35      TL1
-> +Field  34      AssuredOnly
-> +Field  33      SL2
-> +Field  32      DS
-> +Res1   31
-> +Field  30      NSA
-> +Field  29      NSW
-> +Field  28      HWU62
-> +Field  27      HWU61
-> +Field  26      HWU60
-> +Field  25      HWU59
-> +Res0   24:23
-> +Field  22      HD
-> +Field  21      HA
-> +Res0   20
-> +Enum   19      VS
-> +       0b0     8BIT
-> +       0b1     16BIT
-> +EndEnum
-> +Field  18:16   PS
-> +Enum   15:14   TG0
-> +       0b00    4K
-> +       0b01    64K
-> +       0b10    16K
-> +EndEnum
-> +Enum   13:12   SH0
-> +       0b00    NONE
-> +       0b01    OUTER
-> +       0b11    INNER
-> +EndEnum
-> +Enum   11:10   ORGN0
-> +       0b00    NC
-> +       0b01    WBWA
-> +       0b10    WT
-> +       0b11    WBnWA
-> +EndEnum
-> +Enum   9:8     IRGN0
-> +       0b00    NC
-> +       0b01    WBWA
-> +       0b10    WT
-> +       0b11    WBnWA
-> +EndEnum
-> +Field  7:6     SL0
-> +Field  5:0     T0SZ
-> +EndSysreg
+>  #define FGT_MASKS(__n, __m)                                            \
+> -       struct fgt_masks __n = { .str = #__m, .res0 = __m, }
+> -
+> -FGT_MASKS(hfgrtr_masks, HFGRTR_EL2_RES0);
+> -FGT_MASKS(hfgwtr_masks, HFGWTR_EL2_RES0);
+> -FGT_MASKS(hfgitr_masks, HFGITR_EL2_RES0);
+> -FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2_RES0);
+> -FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2_RES0);
+> -FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2_RES0);
+> -FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2_RES0);
+> -FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2_RES0);
+> -FGT_MASKS(hfgitr2_masks, HFGITR2_EL2_RES0);
+> -FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2_RES0);
+> -FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2_RES0);
+> +       struct fgt_masks __n = { .str = #__m, .res0 = __m ## _RES0, .res1 = __m ## _RES1 }
 > +
->  Sysreg GCSCR_EL2       3       4       2       5       0
->  Fields GCSCR_ELx
->  EndSysreg
+> +FGT_MASKS(hfgrtr_masks, HFGRTR_EL2);
+> +FGT_MASKS(hfgwtr_masks, HFGWTR_EL2);
+> +FGT_MASKS(hfgitr_masks, HFGITR_EL2);
+> +FGT_MASKS(hdfgrtr_masks, HDFGRTR_EL2);
+> +FGT_MASKS(hdfgwtr_masks, HDFGWTR_EL2);
+> +FGT_MASKS(hafgrtr_masks, HAFGRTR_EL2);
+> +FGT_MASKS(hfgrtr2_masks, HFGRTR2_EL2);
+> +FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2);
+> +FGT_MASKS(hfgitr2_masks, HFGITR2_EL2);
+> +FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2);
+> +FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2);
+>
+>  static __init bool aggregate_fgt(union trap_config tc)
+>  {
+>         struct fgt_masks *rmasks, *wmasks;
+> +       u64 rresx, wresx;
+>
+>         switch (tc.fgt) {
+>         case HFGRTR_GROUP:
+> @@ -2154,24 +2155,27 @@ static __init bool aggregate_fgt(union trap_config tc)
+>                 break;
+>         }
+>
+> +       rresx = rmasks->res0 | rmasks->res1;
+> +       if (wmasks)
+> +               wresx = wmasks->res0 | wmasks->res1;
+> +
+>         /*
+>          * A bit can be reserved in either the R or W register, but
+>          * not both.
+>          */
+> -       if ((BIT(tc.bit) & rmasks->res0) &&
+> -           (!wmasks || (BIT(tc.bit) & wmasks->res0)))
+> +       if ((BIT(tc.bit) & rresx) && (!wmasks || (BIT(tc.bit) & wresx)))
+>                 return false;
+>
+>         if (tc.pol)
+> -               rmasks->mask |= BIT(tc.bit) & ~rmasks->res0;
+> +               rmasks->mask |= BIT(tc.bit) & ~rresx;
+>         else
+> -               rmasks->nmask |= BIT(tc.bit) & ~rmasks->res0;
+> +               rmasks->nmask |= BIT(tc.bit) & ~rresx;
+>
+>         if (wmasks) {
+>                 if (tc.pol)
+> -                       wmasks->mask |= BIT(tc.bit) & ~wmasks->res0;
+> +                       wmasks->mask |= BIT(tc.bit) & ~wresx;
+>                 else
+> -                       wmasks->nmask |= BIT(tc.bit) & ~wmasks->res0;
+> +                       wmasks->nmask |= BIT(tc.bit) & ~wresx;
+>         }
+>
+>         return true;
+> @@ -2180,7 +2184,6 @@ static __init bool aggregate_fgt(union trap_config tc)
+>  static __init int check_fgt_masks(struct fgt_masks *masks)
+>  {
+>         unsigned long duplicate = masks->mask & masks->nmask;
+> -       u64 res0 = masks->res0;
+>         int ret = 0;
+>
+>         if (duplicate) {
+> @@ -2194,10 +2197,14 @@ static __init int check_fgt_masks(struct fgt_masks *masks)
+>                 ret = -EINVAL;
+>         }
+>
+> -       masks->res0 = ~(masks->mask | masks->nmask);
+> -       if (masks->res0 != res0)
+> -               kvm_info("Implicit %s = %016llx, expecting %016llx\n",
+> -                        masks->str, masks->res0, res0);
+> +       if ((masks->res0 | masks->res1 | masks->mask | masks->nmask) != GENMASK(63, 0) ||
+> +           (masks->res0 & masks->res1)  || (masks->res0 & masks->mask) ||
+> +           (masks->res0 & masks->nmask) || (masks->res1 & masks->mask)  ||
+> +           (masks->res1 & masks->nmask) || (masks->mask & masks->nmask)) {
+> +               kvm_info("Inconsistent masks for %s (%016llx, %016llx, %016llx, %016llx)\n",
+> +                        masks->str, masks->res0, masks->res1, masks->mask, masks->nmask);
+> +               masks->res0 = ~(masks->res1 | masks->mask | masks->nmask);
+> +       }
+>
+>         return ret;
+>  }
 > --
 > 2.47.3
 >
