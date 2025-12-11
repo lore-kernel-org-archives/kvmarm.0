@@ -1,108 +1,105 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436F532AAC7;
-	Wed, 10 Dec 2025 20:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129C1298CC4
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 08:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765398179; cv=none; b=gWwzqXuYiPgg7p7nTcHFLiu7mwEqq98DljUAFng70gLf4KtSmRe5/J0cxKMaY/kiDlWaSMgcGfiovUEI5PWCcCOhR+UUgwSIBVsvaK4w6s/YeLrdsSzTVJlpCibGcdngDS4dw9B7A9+i2znHuTgwl+xV5IVN3i2Yn7Ige2HlC6I=
+	t=1765440932; cv=none; b=NBNeJfxbUK+2QN5ZlVwyZ16J1jOCgdjm0KCcVA3he9f2To9LQfm9yRXkNE78ZBmGZe/alS9MKLnmqUsi6NAwxr4nSkMgVYRfsVtlZpXRr3Th/OhuBAQCpeawlo9hKEFw5lErlY7z5AL3JVtmc7WRv0jBfe/0YC28DTTxKO8Bvxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765398179; c=relaxed/simple;
-	bh=RxEHatHQ0Qy/ChtgEVQnw0Bex/SyCFO2r36FHfM3As0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldLIOLLQFMdM8vB4cso6qZ6bjwnTonb4ySSJkTaAbh/lYS28F1AVtQraCE8rC/DaiAvRw2zV5P9AKOJrekDT8adJ6pGwVFjQ/s2RJNzi42qDKWf9KUZ3ibxcixAsGgScQknKg9g/I4ii7vgLvg2DyYPpeiYSgoYo00GT8KI/YQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k5eG4Aqg; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765440932; c=relaxed/simple;
+	bh=uisW3lsr1R5kreh20aN9ry1a7WqtATsZX41vyRxxghQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wm/mzn+8eZxC9nh0Ji1Y/rLpysw6ptsMUVvyrQ9qOcD04k43Vt47P5h1CX0QzLSvjXQhYSrN2ndfgG++7YNuix2pM73btJpMPRRy8cRXVKOPIcs5rmsfQhrSGlmdW7Rh35uYxdrgCEQVHja3Duc8ovhJBPNIT6uv9VaFfh/Cjs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXTY+io2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k5eG4Aqg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765398179; x=1796934179;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RxEHatHQ0Qy/ChtgEVQnw0Bex/SyCFO2r36FHfM3As0=;
-  b=k5eG4AqgJ2aBUrQBA7NkKCAPG3PyIxJmUotlw/JYwEvOpSqGyZ3jwkwK
-   0JoH/zhqlvbCOTWdYZEac85GdXR2XlZOqsTc1Bxf8tIY7RKNdoRK2d92A
-   Y1/6BNFq3wliuxQ+hzNGdibDFFlgqFhhq5E4RAkZy3/KlQZiTapmcDgrv
-   7+VlQYfJnB6Wfr483Flcf6bvCybIx67vicgQz0OegjdJiGaQtu4H1NTqM
-   j7/saeSy/mgdFD0V6RgTcxlOaITSV6Xzcukp59ZJ9tGWTKr8pxfYjBUCg
-   m+CKzpxr44sp9o9xHVQ8jDcqEatKWEIZFS+Ff1PxbXAG4CZephvllZo+3
-   Q==;
-X-CSE-ConnectionGUID: yJFGeze3QVyK2kKVxiUuuw==
-X-CSE-MsgGUID: 0HN5qBWDR9S2DI3wPjbLFA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="78846117"
-X-IronPort-AV: E=Sophos;i="6.20,264,1758610800"; 
-   d="scan'208";a="78846117"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 12:22:58 -0800
-X-CSE-ConnectionGUID: cQOMJWuWSbOlJRB/Ih9UEQ==
-X-CSE-MsgGUID: bTPfKaUBSC2wiNq3JOclMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,264,1758610800"; 
-   d="scan'208";a="195684982"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 10 Dec 2025 12:22:52 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vTQi1-000000003j7-3dyl;
-	Wed, 10 Dec 2025 20:22:49 +0000
-Date: Thu, 11 Dec 2025 04:21:58 +0800
-From: kernel test robot <lkp@intel.com>
-To: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Colton Lewis <coltonlewis@google.com>
-Subject: Re: [PATCH v5 09/24] perf: arm_pmuv3: Keep out of guest counter
- partition
-Message-ID: <202512110439.UXwb1Qh4-lkp@intel.com>
-References: <20251209205121.1871534-10-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXTY+io2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149AFC4CEFB;
+	Thu, 11 Dec 2025 08:15:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765440931;
+	bh=uisW3lsr1R5kreh20aN9ry1a7WqtATsZX41vyRxxghQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FXTY+io2OtXnTyuHOadUOc7ReXqmtOFWxhlLQU4dltyAQ0v1yIvk+mcyJt6kEGvux
+	 QkWzpnG5piXbgTht5YNFuG0mQrRHYbiCDXTVMtzamKBrZGfGvWcZOJhdypvKOti9mT
+	 Cqt/8V8R0I55DBVXHsTS8q68AL2WgdwDZ9mv8aOae9mcl86JUyej+pAfDDYoonJBdY
+	 vKG2t0wMg32jjlWozq6wcVmNdMexE6m/D+/TfyzuTdR+3o1jFTzUnhKPSd6lRUpziQ
+	 atYinPEGfmVf5QmglpSqURT8KGQYLdfMPCMHy9f5EVTA2haL3n8aEDVVL41f5UUB4E
+	 liSp/aYWsD/yA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vTbpg-0000000BwTn-2jnn;
+	Thu, 11 Dec 2025 08:15:28 +0000
+Date: Thu, 11 Dec 2025 08:15:28 +0000
+Message-ID: <86zf7po2n3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	will@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/2] KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
+In-Reply-To: <20251210132102.137631-3-alexandru.elisei@arm.com>
+References: <20251210132102.137631-1-alexandru.elisei@arm.com>
+	<20251210132102.137631-3-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209205121.1871534-10-coltonlewis@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Colton,
+On Wed, 10 Dec 2025 13:21:02 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> __pvkm_host_share_hyp() and __pkvm_host_unshare_hyp() both have one
+> parameter, the pfn, not two. Even though correctness isn't impacted because
+> the SMCCC handlers pass the first argument and ignore the second one, let's
+> call the functions with the proper number of arguments.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 7cc964af8d30..6c6abcd8e89e 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -497,7 +497,7 @@ static int share_pfn_hyp(u64 pfn)
+>  	this->count = 1;
+>  	rb_link_node(&this->node, parent, node);
+>  	rb_insert_color(&this->node, &hyp_shared_pfns);
+> -	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn, 1);
+> +	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+>  unlock:
+>  	mutex_unlock(&hyp_shared_pfns_lock);
+>  
 
-kernel test robot noticed the following build warnings:
+Yeah, we lost all form of type-checking when everything was hastily
+converted to SMCCC to avoid function pointers. Somehow, I feel that
+the cure was worse than the disease.
 
-[auto build test WARNING on ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d]
+I wish we'd reintroduce some form of compile-time checks, maybe by
+having generated stubs?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Colton-Lewis/arm64-cpufeature-Add-cpucap-for-HPMN0/20251210-055309
-base:   ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d
-patch link:    https://lore.kernel.org/r/20251209205121.1871534-10-coltonlewis%40google.com
-patch subject: [PATCH v5 09/24] perf: arm_pmuv3: Keep out of guest counter partition
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20251211/202512110439.UXwb1Qh4-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251211/202512110439.UXwb1Qh4-lkp@intel.com/reproduce)
+Thanks,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512110439.UXwb1Qh4-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: arch/arm64/kvm/pmu-direct.c:75 function parameter 'pmu' not described in 'kvm_pmu_guest_counter_mask'
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Without deviation from the norm, progress is not possible.
