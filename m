@@ -1,91 +1,92 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA6F29A9C3
-	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 14:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A848189F43
+	for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 14:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765464725; cv=pass; b=jwwvMsWt0yBWqhyCoimGxo1s1neI3yXjIEe/PO5+1SRxBmHrOM4Tiwtxgdd5EkEoG1FsEC26eblGyD5DU1TM2CM88ajw8/NYELnrKhj96pU8svdB8UuZhZkWSDq2B+lGlfH/JrqX6IrSuGnIcM7Bb3ILAzUEXfNsaz+CKXAoZlA=
+	t=1765464979; cv=pass; b=laxn1GdL18SPEFwWdXtX5A+54N01ujBiMRlVAm2oR2pqB/WkELJV12nG+kRDhFKiJwiIYeCunpnQLttiSKAf6C0NnzveAm/HEiBgLxlkF3TPOy8J+k1BshOHKSTj37nqC8EoiY4WcSwVCaLlN+l4/+zDCPaDdtdbr6FL7+uLq1w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765464725; c=relaxed/simple;
-	bh=wAMwNSRawWZ1QoE1+8GigGIznpCapxk6QfzLASpXrww=;
+	s=arc-20240116; t=1765464979; c=relaxed/simple;
+	bh=5k7G6/vHOZ/ZELJRWze07kLHkh4Upe+J24EgYvfN/uQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NY8GJlIyH15OTPXWQjVtfYnsyqpV7C8y0irTfPbmmPjfe28UFtvgg+ryfQqMVfdDx5h44Jgr2YYQ35ZHfKuoqE39RZaW7rkytiXf61phmHa2bsbstCX7i60bfgxIFtewkr9pvzjRKCUMbP5UPk1gX+nicTQMVSdqs7T517hIORw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=THAe+DzL; arc=pass smtp.client-ip=209.85.160.180
+	 To:Cc:Content-Type; b=tzQhuAbfKegOYchdLVpXZqCiH3cmpVd3ZPr8OrhM09yg1cicClQ7c1ZminVvT7iEpSMl/hefi7InkxiJF580SJ1K6tObhLGWpiX2V43HeRVVNS72hw+IrE5Tkl4Y181HCfgY7BGJwjxQevRN6LQIsRnsgCieNCkMcyE4n0LM7WE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yUrzDIbi; arc=pass smtp.client-ip=209.85.160.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="THAe+DzL"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ed67a143c5so557681cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 06:52:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765464722; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yUrzDIbi"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ed67a143c5so559961cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 06:56:17 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765464976; cv=none;
         d=google.com; s=arc-20240605;
-        b=J2bSyWyXXlZIsIMzopf9YMakba/KkrJq7pvGLbtPmUtsqNVX4vEoQxZZll9H+xhJKb
-         stomnV/21pliVRr0fF8/HfoQ9G90rs38lJ7BZV3mwTjJqEsWLWrwaWhUpXf+PQdbOgFM
-         TSsVCky7BfEezUTTmsFi1kmNSAHQ5DBMuC/mmAFeHeLH9ySQ4cfOyF8q9B3GClFwhISU
-         XD3rCNgd2Jj4kUTh9w8XqonnTG/AliV5MTtN5vpVvf+pPJUVUJZJo9CU6giJeqOgqDJU
-         ChxI/DtfaMUTwUuPXrj6tlwe82XFIADcbAbpTKLuqaijS4se/OyElSElGtlEyuxYhW9r
-         3Hbw==
+        b=FR7cI1jYJPLaSYoPsqdfnC9d9Al7aCpvP4DwRKNGXENcL6cnaSUXM1PiRAQVD0ICVx
+         zW73brSwuYwwSmemsalQr2GnwCQEcD7RE6LxS2FlQdohSquc9bd++g81l5wGfCh5NeI2
+         FKvK29IW/WU0qwtyYg5ufgFH7SgxkMZmfQlpelaMQ2ZfFchvvkwZHZ0fmlVhepx56bEk
+         tc3LNVBCZTdENhF4ojhoWwWKV4f1B6DP6x+3fUa/Y7pKJ1/roElbwoqSrZ1ifBl8Er4j
+         3JeKu/CndxtfP7RHo8ORcSZtbags365koowp4Pf368Mr9H1TxZUFfle9dNvekihFLsYV
+         wKgg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
+        bh=LSd8N+GnU3kOnAVY+f16uUov3Vq7sUiHBSfthzax8S4=;
         fh=NG/nEuPEgoaPuGimMFCytjJ02a7zmffXXGabTKRy8/o=;
-        b=GF6PJtp6msXBa/9vqMJQtgGl24Ov521AbuePvZ5LVVhD7o2+qtfvo/0U6lqpw4nWjF
-         +983YQY3a7F0lkYBuslS9XUOn6Gp+9qJUnYOrt2dn4sUEmCsyFzg5DZidoUvI7V2W4O6
-         kq8Prl3oRk2ajYaXgpKs0785kwCF5PLbDaeWiHqJpMkjWMQ1HPBFKcjXHiS+f6PlBTgG
-         ZgfYNuKJLj/FrJmFDo0m35FopF0nV2ignbR0/PrP2n/27ZhbANgtys+NL0klCLU0Waq8
-         lgCLxU66gjDCAoWhEYsQ//nTu/sJ7abe1CeVmvB38ZhVGumKs2IgU3UectsCGWLTwlFg
-         CKOA==;
+        b=FXz05OH8iIGMZRokz/EOctyt3lqcFPUN+hIHufkEwJkGVBEC9pgFWFLE0Mz9/Oamdw
+         sGdGkvu1TBRChmwwhiriuf1sJKJ2xHZwBIAGLYa/uNz2yzFxu8VajrG1FfRJUTXjWawa
+         P4iRT+r/r+8OyDWGUkq0Sj4DCDso33GuB/S00/GRWa7yPJ2bc+JSWhAtNcte1PAyKENq
+         bf5o6T26IK25p6eIxcCrGcifkoOaunBHgr63XpwdwXCWIjs5EdI9LJTEXuCzN0Qryw+Y
+         4blMO+Ohc0In973iorVt/vKfzwhv4RVPlpR/JC9cqc7Ek635HjeQcRcGMqiYKYnlrGGm
+         mm1g==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765464722; x=1766069522; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1765464976; x=1766069776; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
-        b=THAe+DzL8QFpKNukhuNZtEGhsrQmAP+lmPJU0QAyzotBmH3iHRgWfUJiIZn+eiH6M2
-         KarYibSkNILhoqXqWh+0OcjYyqa+80e2PjYcQtry7ALBXBfwcxeIhTfo/sINhWwq0hUp
-         BpPUKNPFwA0kRPLJckUvUrW27TfCWkIgkBfKWcMUvk4Hy9smQK4kokwx6PCNI4iUViPz
-         R8IbG3W2gnaR/GylTWms4HiARGpTJt5CAHcoDvhjaTlDPGpl7eNwYHswZw0mREsaecea
-         blrcNV+9N6NpfwE7blNGErVeHtCxh1KYN7NtF4F6pKU6/O7nYIBY1w2dekYhqwUH4ofg
-         YUEg==
+        bh=LSd8N+GnU3kOnAVY+f16uUov3Vq7sUiHBSfthzax8S4=;
+        b=yUrzDIbiJM+qy15O5RG2n/7Sdpc+2SOyfJHrvhuZBqdyOSszd2XRy1FmkdkiBqSTik
+         r+pS9BLGSGCgzgmcgyVBY4x/qS9cyt17S8Hi+dpHmoZbl9QUCgFE6jhe2DXrdxL15fbj
+         OjmGku4jPOA40dd1fYn/XOflE+TqKjvmNB4o4UDBtjjJ3QAT3LrMLUqyto3R1PgEyfkM
+         LSF6ACCWkyXjDLaOwpWETcDVyo6v4ceDR7iFwCJnG+8bJwStY4DvDpdHnH0CG0JibK8i
+         gpeGJ6Uk51gj0YIHvRp0IBsX97yj+3BeNMZGzB/IY+3ReI+e8dfxcF9N2I/kfg+eOdEE
+         H00Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765464722; x=1766069522;
+        d=1e100.net; s=20230601; t=1765464976; x=1766069776;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yWMX1jyjXeIgNw1WZzMJikLtB4FVJ9nrhVzaVMwg74Q=;
-        b=hcyos3kFbDkC1K8HR97n6pJSzptluxFLRuqFQvV9FmX4BHkPG9gyT27a5MzkmF6RjD
-         aTU+NNs5DqcUUqq3boYA7osJIrYyKQz5QoJdbbtwe+ZOLPbN5tQetWggQVsIklX9xEId
-         NLp3Fgxkx3W4Xx3CkFzfNiA8PWJRBfgRAMUrDwY+lLb81aB1wqPgubWoChRqefahu0Mx
-         SPoCST7XIIBCLatIqAzY1HXRDK9b+uZy6z16hoL0PdOOEcWdHGCLnBUiTl1UJ7obEUFS
-         jI5v5YDkRRQZI6E7c1ZcKcUy26/Y/AQZ8uHoBIACM+ysLuv6hEqKt9bs4sjI+mneMmF9
-         3bFg==
-X-Gm-Message-State: AOJu0Yx0Zu59AvQ81apKvDrT3On67WlS6BZj8WZwewcLCwUYIIDIC8zo
-	yBR5WMRZ27CZmmkXmvxGQy7SmFJiD/xTNPV4uUfX42arS3wGgho/CxrUyIf7q/LgTXM8ro52AQ1
-	g3607w09dBagLP+SpXlbu6Xf1jj5cC2rYuSjM0h0rBgZtRFaYRXWNfXmo
-X-Gm-Gg: AY/fxX4Ke9KNKnJp51+jnNqIozLUdoU8WkoQdhMYh7iAWH2Qg+amzvA5fqYg22BIp/8
-	hS/OPlnrzuKXFQOyrGo8U81xNfCBNApfHdCE0xCDCDp/kOHqhmW9CCve+GOp8CXbPo8P20cyWLm
-	s19rifsLlkSdvh5PFJy6KQwaCDLrzdZ+I5QlcaioxuePjTN46wZ9jshaOTOPnDNMK04Anbk8P9S
-	fxcSXntAtloG2b2kL3AAOHafC56ZuduGXzeqH57UjXaHi9HoO3xpR14rkDTQDGqlkJQ/ZgZ
-X-Google-Smtp-Source: AGHT+IFQKP5fapGPHx5ImO6c09xm7GohUJLdBZ1CUTPePaNGb2mNfszOTXSYC0I42sptlzmkcKe68l3xaix/F5ByaNg=
-X-Received: by 2002:a05:622a:1995:b0:4b2:ecb6:e6dd with SMTP id
- d75a77b69052e-4f1bed26845mr9697741cf.1.1765464722271; Thu, 11 Dec 2025
- 06:52:02 -0800 (PST)
+        bh=LSd8N+GnU3kOnAVY+f16uUov3Vq7sUiHBSfthzax8S4=;
+        b=g17+dnj3irIQzg26t+cuhSCA4h64wsJhaNbHIaYu2YIN6GRzOMx3PBMCYCyHW1LO8O
+         nM7eujd2S2rCeR0dqPmHFpEsQpiA5TfXSVMMn2gn56Rr1kQgAJ4/rBCiUl3TJIyVoFyI
+         X8Ky6c4KTzh2dv7hcA6IfY9ZEhYfubqEBK+ARhOkbmNV/VsN4A32IrCg+/h2v3TE+qSh
+         BgXHQQBXMZPvevNnd0rORjc4jFXIa/gQKa7fjlLtBVtw+PrDutI90NPU9iXEh4hRBdg9
+         60fa/qp8kDRYu6kdHP6kc7vNLsz+1ha3QXcql7JtpsAz9SF0JsAqe/atSGMw3KD87pkV
+         C9Gg==
+X-Gm-Message-State: AOJu0YxVjvyv+PtMddHyEvRYadva6dzzcD5P1zLVlunPb7mwsXdLrDCo
+	VBHmQb2MxTKOFNxwRDpghh8KJ4Rsur8dz+bjpPBj1xmau8ye7rU72DjFl1JDGnZ02s19UYEbyU3
+	iJOzqNnw/4R2vRp8V8z8XaPd07S8/oE9CXATheU2U
+X-Gm-Gg: AY/fxX7NAyaBRccNovn9oANbB5DRJcmqYQ5U1b1WuigPO6dY8mw5hNcsv7fMdRHqw+K
+	39vI8mjPRlQOOXV6z+e4WmAbZoV5GvW+fZiUDMnPiSHUsdOjavac+hhNNWSSY3jYa9cIaKvOCXi
+	yzxbEnaTyRoIxX08EqoF5bjlGWfhlp1Ip/T7eYfd8JPnYukYnw+4RhJDFzzHjhhMBtcJqMxStj5
+	A5eWRlRGACpeHccaFQlFbVv5o/RUlrg/ItgRQdlD0WM2pnQTeU4s6jPdeGKNCoKD6bj69Yz
+X-Google-Smtp-Source: AGHT+IFgjwqJGgZa7LZD4L5r7a6kWYEP7wTy3klGGOECrWDWiCBkWZLd3nH8UUUtuYTcOmHg8w6evp1g6WqoN0gf/WI=
+X-Received: by 2002:a05:622a:106:b0:4f1:b41a:a38a with SMTP id
+ d75a77b69052e-4f1bed269bdmr10288581cf.3.1765464976027; Thu, 11 Dec 2025
+ 06:56:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251210173024.561160-1-maz@kernel.org> <20251210173024.561160-7-maz@kernel.org>
-In-Reply-To: <20251210173024.561160-7-maz@kernel.org>
+References: <20251210173024.561160-1-maz@kernel.org>
+In-Reply-To: <20251210173024.561160-1-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 11 Dec 2025 14:51:25 +0000
-X-Gm-Features: AQt7F2o1Eo4xEzZ0xMgWpr24G9qnYMnYlv-SMNtZ7eV3yobp_YNt8tudLckw7Mw
-Message-ID: <CA+EHjTwi3S-BVYQWf6_TAyd4fi18Ng3G3HkxKh2MB8PrE_32Uw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
+Date: Thu, 11 Dec 2025 14:55:39 +0000
+X-Gm-Features: AQt7F2r2xUgOLmLbDl7ihpbE251_7xooz1URlan3WSuQuzZ8uzvAyHS3-gcFwgs
+Message-ID: <CA+EHjTx8LYCCY=W+ifaQ4Ny3mJ_+u0GL5T2FaKWvaX-oqVPT6A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: VTCR_EL2 conversion to feature
+ dependency framework
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -95,97 +96,57 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Sebastian Ene <sebastianene@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
+Hi Marc,
+
 On Wed, 10 Dec 2025 at 17:30, Marc Zyngier <maz@kernel.org> wrote:
 >
-> Now that we potentially have two bits to deal with when setting
-> execution permissions, make sure we correctly handle them when both
-> when building the page tables and when reading back from them.
+> This is a follow-up on my VTCR_EL2 sanitisation series, with extra
+> goodies, mostly as a consequence of Alexandru's patches and review.
 >
-> Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> * From [1]:
+>
+>   - Added two patches fixing some FEAT_XNX issues: one dating back
+>     from the hVHE introduction, and the other related to the newer
+>     stuff in 6.19.
+>
+>   - Expanded the scope of the RES1 handling in DECLARE_FEAT_MAP() to
+>     deal with FGTs, as we're about to get quality stuff thanks to
+>     GICv5.
+>
+>   - Simplified the S2TGRANx detection slightly.
+>
+>   - Collected RBs, with thanks
+>
+> [1] https://lore.kernel.org/r/20251129144525.2609207-1-maz@kernel.org
+>
+> Marc Zyngier (6):
+>   KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
+>   arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
+>   arm64: Convert VTCR_EL2 to sysreg infratructure
+>   KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+>   KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
+>   KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+For the series, on qemu, hVHE and protected hVHE:
+Tested-by: Fuad Tabba <tabba@google.com>
 
+
+Cheers,
 /fuad
 
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 12 +++---------
->  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++++++++++---
->  2 files changed, 24 insertions(+), 12 deletions(-)
+
+
+>  arch/arm64/include/asm/kvm_arm.h     | 52 ++++-----------
+>  arch/arm64/include/asm/kvm_host.h    |  1 +
+>  arch/arm64/include/asm/kvm_pgtable.h |  2 +
+>  arch/arm64/include/asm/sysreg.h      |  1 -
+>  arch/arm64/kvm/config.c              | 94 ++++++++++++++++++++++++----
+>  arch/arm64/kvm/emulate-nested.c      | 55 +++++++++-------
+>  arch/arm64/kvm/hyp/pgtable.c         | 32 +++++++---
+>  arch/arm64/kvm/nested.c              | 11 ++--
+>  arch/arm64/tools/sysreg              | 63 ++++++++++++++++++-
+>  9 files changed, 217 insertions(+), 94 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index be68b89692065..095e6b73740a6 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -87,15 +87,9 @@ typedef u64 kvm_pte_t;
->
->  #define KVM_PTE_LEAF_ATTR_HI_SW                GENMASK(58, 55)
->
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_XN   BIT(54)
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_UXN  BIT(54)
-> -#define __KVM_PTE_LEAF_ATTR_HI_S1_PXN  BIT(53)
-> -
-> -#define KVM_PTE_LEAF_ATTR_HI_S1_XN                                     \
-> -       ({ cpus_have_final_cap(ARM64_KVM_HVHE) ?                        \
-> -                       (__KVM_PTE_LEAF_ATTR_HI_S1_UXN |                \
-> -                        __KVM_PTE_LEAF_ATTR_HI_S1_PXN) :               \
-> -                       __KVM_PTE_LEAF_ATTR_HI_S1_XN; })
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_XN     BIT(54)
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_UXN    BIT(54)
-> +#define KVM_PTE_LEAF_ATTR_HI_S1_PXN    BIT(53)
->
->  #define KVM_PTE_LEAF_ATTR_HI_S2_XN     GENMASK(54, 53)
->
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index e0bd6a0172729..97c0835d25590 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -342,6 +342,9 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
->         if (!(prot & KVM_PGTABLE_PROT_R))
->                 return -EINVAL;
->
-> +       if (!cpus_have_final_cap(ARM64_KVM_HVHE))
-> +               prot &= ~KVM_PGTABLE_PROT_UX;
-> +
->         if (prot & KVM_PGTABLE_PROT_X) {
->                 if (prot & KVM_PGTABLE_PROT_W)
->                         return -EINVAL;
-> @@ -351,8 +354,16 @@ static int hyp_set_prot_attr(enum kvm_pgtable_prot prot, kvm_pte_t *ptep)
->
->                 if (system_supports_bti_kernel())
->                         attr |= KVM_PTE_LEAF_ATTR_HI_S1_GP;
-> +       }
-> +
-> +       if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-> +               if (!(prot & KVM_PGTABLE_PROT_PX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_PXN;
-> +               if (!(prot & KVM_PGTABLE_PROT_UX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_UXN;
->         } else {
-> -               attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
-> +               if (!(prot & KVM_PGTABLE_PROT_PX))
-> +                       attr |= KVM_PTE_LEAF_ATTR_HI_S1_XN;
->         }
->
->         attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S1_AP, ap);
-> @@ -373,8 +384,15 @@ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte)
->         if (!kvm_pte_valid(pte))
->                 return prot;
->
-> -       if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-> -               prot |= KVM_PGTABLE_PROT_X;
-> +       if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_PXN))
-> +                       prot |= KVM_PGTABLE_PROT_PX;
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_UXN))
-> +                       prot |= KVM_PGTABLE_PROT_UX;
-> +       } else {
-> +               if (!(pte & KVM_PTE_LEAF_ATTR_HI_S1_XN))
-> +                       prot |= KVM_PGTABLE_PROT_PX;
-> +       }
->
->         ap = FIELD_GET(KVM_PTE_LEAF_ATTR_LO_S1_AP, pte);
->         if (ap == KVM_PTE_LEAF_ATTR_LO_S1_AP_RO)
 > --
 > 2.47.3
 >
