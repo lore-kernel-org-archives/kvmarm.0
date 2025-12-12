@@ -1,133 +1,144 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9BE1C84B8
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 16:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF941288CA3;
+	Fri, 12 Dec 2025 16:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765556141; cv=none; b=MNlPkf5Lw4b9TDuAjjAoGpgTdfX6QVtyNT7BrGm96X4P2R8LUR8tG53XyyZnCTiHY5hS2UgQwNQw3Gg+w6TFxm3ogpiXm2oUKWOp3rQJceejkBJqyyIeJOPksf+9YnNobo0hBv/FqQDqxarLjC2+xJRJkDRu9EjV8ZDCSrmsUB4=
+	t=1765556649; cv=none; b=oN53ZfBnX03ZVZWo+Wqt7p1e9nIMQC/Ggv+qMS+no/6WoSfOe7vxbVUz/O1Wc3NHvX2UhnpXjNf67NYxhh0DPs09TO3hIbV1oi4O6xAXf6byKG3Ey10rs0yLZtb2vVvioEFN4wz4rWjJB+Ju/hbvxGIO3Me/SRoXlmapznNh/6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765556141; c=relaxed/simple;
-	bh=QpUarcAdLSnbqTnWNlECIfVH11gk7hWE6QE7JXi1JQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y/zTN9y1N2nRTkk4JFF8spApvew9qCkeGsvhBjIxY2uFnguyJgCG5JHox6+cjumIe7zKT0e5TfLfYyBXciJiaTwWRiYB1o6zP9sRcNTpf9qftomvTJgSmwK7K1aRBm+5d0TPN3vXNiwDZ+JlWERS+0lV/XIuf3Bil4rFPwzCB6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PlvjOTHt; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1765556649; c=relaxed/simple;
+	bh=GdsBH8+ZvQAlqwjeL41Ytv9iQZSSG1XeBSd8y2Nuj3g=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JB3sqwvanXoq8RvUF2IT6JZsVtyKQ9SS5p0uW3K1lAPY77h2Q3D1SKQgZbM34Z3LFWU8pwX1HD/kA0RBtDoOANOhAV5ZmhLxvaNViLTygun7zduqhmD4JwZu0UbQU6795/k0E5l8z2FcHfzYQN8BTKJJUed6XSFsawGxUyzJNSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tr/h20Kl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PlvjOTHt"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47a815c43baso134875e9.1
-        for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 08:15:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765556138; x=1766160938; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=frjawGCw0cne3ietsxce3al/KlU0ywLGbRoWqjDTmUo=;
-        b=PlvjOTHtaMBXArJLqTmJHiI+ujgGBKYEwkWDroji64H6/14a9eLxkGSBpbfV8knvIY
-         mvw9FDhjEwKJs2R7+iRH/SI8mk7JYTEH4IFRVqzLQ4gpspX87RYPrM03ji/mKjWfrxe6
-         g7wU819PLvTC46qMWiCOLT6P+275Mojgz1KEu4bLCXL5jNoHzylp2cNC+HYqLRKSpyby
-         GS+pKbOfNyGMpkA9EegAbkn2f7QB4MfE8z4MHGDCblO2jqnsNPgcePLhZoyk0kga9DNe
-         4cGWzkLksUpMlyKMnVzgrNIhmKVfq1q+9jSf+kba2kFhVDsA4V/wCleVp//genRfo8B7
-         Dl1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765556138; x=1766160938;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=frjawGCw0cne3ietsxce3al/KlU0ywLGbRoWqjDTmUo=;
-        b=JROUhkqVbVc1DY89pskr1+GBYMag9KZECJfoak7tEhhN2WxvXPrB9RdxqZHXB2RkRA
-         3BzYsTJ6ZtQbL857pAQa8F85zij9h0aj3W9Bt5uCOLqLWSqpX+Wt/Tk48TiqTSWk6Lxc
-         kfd7+xuGktmcoPSv5dIX7NEDTi7myTWkhWyxVaV1/BBvS+LzoHB6K9a3rPofkGEnYO5V
-         ikh40+Z+u3HQr+yr1NawFmh6YZHWVlmse/k7s18UnQDMBvUByQV8J9OkxbiDoWrh68jm
-         hPXF2lVULEHY9BwiJ0AuFilFs5tDJoEh/zlkYcwIwcAkvBePb5jRFtXqf87+OnR/Frzj
-         7taw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ4m/XZ+QiheFuj3DGqBEzMbWLcs/BgCcLSVwUDde5gTBqjjq400IvV1uY6T/SStHzflEd9Ts=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxNTN0Qa9JcZLd076AOdd36eIIO7Xjv4GjWP3r/wWoOlSC2TNEo
-	IIMfFNNmTWtdAp6/rFCtGB7WLxKLH+H3P0mezFS79p5/1IFZfS1bMqvzFapgFPFxmA==
-X-Gm-Gg: AY/fxX5+I8GuUWurYDCV+Adf8NXlmuMbkKOWGl0J2MjjzelT1wlxvCpI6cafRWiNXyS
-	5o0qRYKMjO7xfU+e/ALfSDRBSLCc7mt26KLEzltGn78vxtuSht/kbEK/n6h/JZQOT/mv39FLU9l
-	JUUZAOyJh/aaVFZl7GYdMnvLpN/PUbU3pd3I6nxO3jlNMNjuykaN1vc6U5JVFN/LSKjPH8WTooI
-	vCzPpU7Z3aJO5Gl0M5ZW4OooWUtJMy0C3aZ2cdxP9TgV0VRwaq9RdKREXZtWuke2/FCGQo3CkiT
-	fk27IlCb+KvJmggAWxWAkx7w2wQfBoflQUcofkvpnUKJkgYJqwoJRjiq/Jkd17XCJ4oQXqr4nhY
-	LV4kImHnjWgeGDNbErnzsWdxu8c14Xqr0L9SMyMtfWAbo1y5KxSbFZA5nZeWobhe/GIKO7nZo3R
-	XQrvwF04PeoBrLhxm8wpIHZnMQK7YsRjiPZbvj0cj+3GTlMZubgg==
-X-Google-Smtp-Source: AGHT+IFLv4OTi7EK70u2qvgXNHw6cjKhs3ugO63ipp+5tWwT+3KODquOARuyX6zUO1as6i35ut2QZg==
-X-Received: by 2002:a05:600c:4a2a:b0:477:95a8:3805 with SMTP id 5b1f17b1804b1-47a8982139emr984895e9.15.1765556137476;
-        Fri, 12 Dec 2025 08:15:37 -0800 (PST)
-Received: from google.com (54.140.140.34.bc.googleusercontent.com. [34.140.140.54])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f3352a0sm14417635e9.0.2025.12.12.08.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 08:15:36 -0800 (PST)
-Date: Fri, 12 Dec 2025 16:15:33 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
-	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
-	praan@google.com, danielmentz@google.com, mark.rutland@arm.com,
-	qperret@google.com, tabba@google.com
-Subject: Re: [PATCH v5 27/27] iommu/arm-smmu-v3-kvm: Enable nesting
-Message-ID: <aTw_pZ7ZyhwFW7-3@google.com>
-References: <20251117184815.1027271-1-smostafa@google.com>
- <20251117184815.1027271-28-smostafa@google.com>
- <20251128171252.GF812105@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tr/h20Kl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34B85C4CEF1;
+	Fri, 12 Dec 2025 16:24:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765556649;
+	bh=GdsBH8+ZvQAlqwjeL41Ytv9iQZSSG1XeBSd8y2Nuj3g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tr/h20KlJjOfsOsPHUZWjCGxLvpm0XkUydGWD13NXIvpZVvh1VKNgG8il008IHDS5
+	 K1qfySkQU3i+Uddgkxg40cVb9NwqsrJ7TxhdFgSAvXsuGfrHaQLv4q6YBvN6vpCtpr
+	 xUPSLOmbmKENf9kW+uFRAusmSwWSdHbS975PKI4WjPnK738jlpJ80Mu508ONLrwmeF
+	 sR8OIlxe4LK/RDAWNtwQG+mjckeylT5XBlWRNxUfFwEqg3IvWhKkLiD7VghtzrSlk8
+	 szzyTNRyjXr+11LRM5ZkXXh9EXTj+kdW2WFe4RH2we4OJ/RBd/1nTilzFx3CUudNP9
+	 BgCZDQ4rr1jvg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vU5w6-0000000CHKQ-3OvS;
+	Fri, 12 Dec 2025 16:24:06 +0000
+Date: Fri, 12 Dec 2025 16:24:06 +0000
+Message-ID: <86o6o3oehl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 09/32] KVM: arm64: gic-v5: Compute GICv5 FGTs on vcpu load
+In-Reply-To: <20251212152215.675767-10-sascha.bischoff@arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+	<20251212152215.675767-10-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251128171252.GF812105@ziepe.ca>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Nov 28, 2025 at 01:12:52PM -0400, Jason Gunthorpe wrote:
-> On Mon, Nov 17, 2025 at 06:48:14PM +0000, Mostafa Saleh wrote:
-> > @@ -441,8 +490,32 @@ static void smmu_reshadow_ste(struct hyp_arm_smmu_v3_device *smmu, u32 sid, bool
-> >  		hyp_ste_ptr = smmu_get_ste_ptr(smmu, sid, hyp_ste_base);
-> >  	}
-> >  
-> > -	smmu_copy_from_host(smmu, hyp_ste_ptr->data, host_ste_ptr->data,
-> > +	smmu_copy_from_host(smmu, target.data, host_ste_ptr->data,
-> >  			    STRTAB_STE_DWORDS << 3);
-> > +	/*
-> > +	 * Typically, STE update is done as the following
-> > +	 * 1- Write last 7 dwords, while STE is invalid
-> > +	 * 2- CFGI
-> > +	 * 3- Write first dword, making STE valid
-> > +	 * 4- CFGI
-> > +	 * As the SMMU MUST at least load 64 bits atomically
-> > +	 * that gurantees that there is no race between writing
-> > +	 * the STE and the CFGI where the SMMU observes parts
-> > +	 * of the STE.
-> > +	 * In the shadow we update the STE to enable nested translation,
-> > +	 * which requires updating first 4 dwords.
-> > +	 * That is only done if the STE is valid and not in abort.
-> > +	 * Which means it happens at step 4)
-> > +	 * So we need to also write the last 7 dwords and send CFGI
-> > +	 * before writing the first dword.
-> > +	 * There is no need for last CFGI as it's done next.
-> > +	 */
+On Fri, 12 Dec 2025 15:22:38 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> This really should share the main driver logic to do STE writes in the
-> right order and try to avoid making it non-valid if not necessary.
+> Extend the existing FGT infrastructure to calculate and activate any
+> required GICv5 traps (ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, ICH_HFGITR_EL2)
+> before entering the guest, and restore the original ICH_HFGxTR_EL2
+> contents on the return path. This ensures that the host and guest
+> behaviour remains independent.
 > 
-> This will not properly support all the real-world kernel flows around
-> PASID with such a simplistic implementation.
-> 
->
+> As of this change, none of the GICv5 instructions or register accesses
+> are being trapped, but this will change in subsequent commits as some
+> GICv5 system registers must always be trapped (ICC_IAFFIDR_EL1,
+> ICH_PPI_HMRx_EL1).
 
-I see, would it be OK to keep it as this simple now and add this later,
-as this is still early support? as I want to keep this series minimal.
+nit: 90% of this patch has nothing to do with computing the FGTs at
+load time. The gist of it is actually setting up the FGT
+infrastructure, and activate/deactivate aspect is actually very
+minor. You may want to reformulate the commit message to make that
+clearer (I don't think this needs splitting though).
 
-I plan to have another seires with some improvements and optimizations,
-mostly about page tables (using block mappings) and I can include such
-optimization, specially that the new hitless STE stuff is relatively
-recent in the main driver.
+[...]
+
+> @@ -1501,7 +1585,7 @@ static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+>  void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> -		return;
+> +		goto skip_feat_fgt;
+
+How can you have GICv5, but not FGTs? I don't think this is a valid
+construct as per the architecture:
+
+	(FEAT_GCIE ==> v9Ap3)
+	(FEAT_FGT ==> v8Ap5)
+	(v9Ap3 ==> (v9Ap2 && v8Ap8))
+
+>  
+>  	__compute_fgt(vcpu, HFGRTR_EL2);
+>  	__compute_hfgwtr(vcpu);
+> @@ -1511,11 +1595,19 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+>  	__compute_fgt(vcpu, HAFGRTR_EL2);
+>  
+>  	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+> -		return;
+> +		goto skip_feat_fgt;
+
+Even FGT2 is expected, since v9.3 is congruent to v8.8:
+
+	(FEAT_FGT2 ==> v8Ap8)
+
+>  
+>  	__compute_fgt(vcpu, HFGRTR2_EL2);
+>  	__compute_fgt(vcpu, HFGWTR2_EL2);
+>  	__compute_fgt(vcpu, HFGITR2_EL2);
+>  	__compute_fgt(vcpu, HDFGRTR2_EL2);
+>  	__compute_fgt(vcpu, HDFGWTR2_EL2);
+> +
+> +skip_feat_fgt:
+> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return;
+> +
+> +	__compute_fgt(vcpu, ICH_HFGRTR_EL2);
+> +	__compute_fgt(vcpu, ICH_HFGWTR_EL2);
+> +	__compute_fgt(vcpu, ICH_HFGITR_EL2);
+>  }
 
 Thanks,
-Mostafa
 
-> Json
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
