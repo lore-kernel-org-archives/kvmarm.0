@@ -1,29 +1,29 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012024.outbound.protection.outlook.com [52.101.66.24])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013018.outbound.protection.outlook.com [40.107.162.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0654F31A7F8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC5E31770F
 	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 15:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.24
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.18
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765553032; cv=fail; b=IEVDCXIY+bpe/DgIsF8/oo1v45JSeSguOnJTv0mkNhqh/45BD0xoBj/uqdQ4RVfS2efY0AoG9X4ezxQB9VHVwpAHjoboDmtCsHbOqaKw5nBxONrH6L1IGXm9IYb0uRk3qy/2aYt9U+UaK10l0GZWjvti26YNCOeIdyAOCz6CNQ4=
+	t=1765553033; cv=fail; b=nAmFdH7DzAxL0NIq6BCmX0O7e7w08ZHVN+44M+grwpw4KmS/5WImKLmBArcUVSMjN4TwQsh/gyn4mz945bLKal7Rt5nX3FzvZmBW5Rjo5mcYlXil8jhk2ux06UjMNva7stMwKB+oZC908MPC+673ZB7ihn9Gz5kzPYVOSKJT38M=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765553032; c=relaxed/simple;
-	bh=zM98x5+lKt6sSkRRNG7vldGiramZXUbM+pEXz/zSfao=;
+	s=arc-20240116; t=1765553033; c=relaxed/simple;
+	bh=l0mmhZwxkStOeF4rhhtK+P1gYLGx0GsyEyd3spfXhZk=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=BTuYOaQymn2Iakssx4GE2bcGLB50Izhc0A0RRGTIv9TgcmNeJweDIJo+cFG9pJg3i/2IHOvZZyfWNdhD6UrMuM54qOlFYBWEbrNWPvXug5ewQKBicAgwoVL9fu3dKa8Wu1c7/xDhiaSeFg9FSOV97PTORkFF3JrkpJAbntuahBQ=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QZaDqOv/; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=QZaDqOv/; arc=fail smtp.client-ip=52.101.66.24
+	 Content-Type:MIME-Version; b=YvBBGobTfl2IVEdPoubtYCOqpm4vlMYX3ZKgB01lQSSu19IAek+SudqbDiECZjzLkQRUGzZieh/KmMRkP9bpg5GyrsmZ0C7s0rLn8woe5AJsSd1aHNad3lbrcOj+WDjT7p8iJvGnuSOuxTy1Kh9C0lrLdbGQ3VVp3KFYCOIJeAw=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gu93kEW7; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=gu93kEW7; arc=fail smtp.client-ip=40.107.162.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QZaDqOv/";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="QZaDqOv/"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gu93kEW7";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="gu93kEW7"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=iDfLPEd4jg7u/6YI2cC18Zxkmvc35TwbLbWdF5m4WmsaBz1yAEYb4xlhJ2nriOWgxVQpw7a+mfkOlI20JU4X5SBCsMciNqo9h6V2QHSbqFRAVHI2cvENb1B3P4wHBwR0HGUEbO/p/WDPhuIACJsIuLi3ye8TNv8g+WcOL0jlbE1oUHbXQ9qmAnnffZaa+Fns0jzeXdeU2x0a5PNJYY9CCNdkFpuqr4aDpxZHDPlqOanuafr5DbpOE30/tdT6PduJONW+P9JRL9OFhKL+vRkv3WZmFM6EPUvVPSM3yTMcX/aTC2EMvlnriuqw9p/VoeH+9kASk0ht9QlAmPuwl4Fvbg==
+ b=kqsxatgiXzPMDNBgzvZ5BDIolsyyQgjqjA+9V8jPR/1nhl10KtMT9a8iEc5PH+pnrjl+qklvmRM57J/ikfLw+4DrbBuwem7g1Kj/lt3KmXWezslHxw3gG9s+nWxewsBCQyTxFbotNwGG9CZJKxt2K2WVlen7plTfOtSXPa9igyL2bcnch9ydLjz5TtWBg5fAlyNtHnFTSYBrYtzlCyB5kYugYCv8yvuuvyHWcKlnG4iepameKLG4lbuSocCbC6EgsAhrOShWOcP2ef1qSSLSLovIhJ33zGt+g58k9U2OGMt7/iSCXqaho9PD0wwYxjmYomz39NJMowESSuFc7IuBgg==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OwxyANOLvSzdvDCB1LM08Yj1dOd/6/t+JPTmbglgNqY=;
- b=KiK6HxTXgjb+tBAknH+LCr3Jqy7X+a165Fk+BYNArisVwFVT43HSTUpDY1xpAz53cmWZ5BOrDFc2v9xvnrl0mSXqQLxIvYsGgnYNdrQqbw8Iia6qtYTgH3kjPSLZinMxVts5QciC1M7Yqzd3jPhOQfj3yqJnqj9Y54ojW5h5iQhn/GUgK6ywqETEnhjTcK72g8Evbeqi8+KmaSjclZ3T6EdniUSKyZjQOFp81NBsIOTT31fugScwwGxRfLbhazjeNJoes3T+VbUEAuuxZK3Du9QfSPo0TheE/nfLkKew00+T/MJmMnYODwl1p+aPfLb9I/ALY2dfyqehWJ53XWcLlw==
+ bh=5vtp49JtJTAHWk0P5SeLhiqZ509MzHqqYRz0nfffv38=;
+ b=Od7RPDZsa5tX0cJC2npXu8ZR9AZWgYitG3wTDyfeZ1yQ25Pn9/ID7T3fAJI+fN/488G82bbvLqxMfDJGqOOqRnGbYyVAm2uvn2xXmqxhHaTPhU80t/IbjETfD8uQhpKtM5w2mYZCB1FG39aObNO1r1+bKi9PptKjA8DaTyQMwlTNJ/CIZJfClsa3nXE6JlhQU+kn8fvnbM9yVpp75wad8kfJp9iOH+5As4vTzWiklliUZarS+C5Jfs/vV1c1iHJXBnTZA1aH9oW2yv/iD5P2pb4NWwmx7WtuRnTDbrq9+bNjVIxwZVf6KfYNBBib+cKiIdQJQZYCi5rHDdPV5H1piQ==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,17 +32,17 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OwxyANOLvSzdvDCB1LM08Yj1dOd/6/t+JPTmbglgNqY=;
- b=QZaDqOv/XAWAqVGlNCYU20cQroSUvLM8Qwyzooleb2/+uRP5OUioSMIsj49qQDFesq183iEzye6ubzYMqnxfIMQZEv/lXnszLKRtlRDL6iuuXf1kyTrelJCurAPUazp1e+ovGpVO0etaTv7mzO87SBi23IzuzhdJ3HF0RHX1AaA=
-Received: from AS4P189CA0024.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5db::14)
- by DBBPR08MB10483.eurprd08.prod.outlook.com (2603:10a6:10:535::22) with
+ bh=5vtp49JtJTAHWk0P5SeLhiqZ509MzHqqYRz0nfffv38=;
+ b=gu93kEW7Lsu2Z+AguA1/bgQERODzwmWZLT0306mxJ98hIGUQBcf6at8fyP+eXfugPigSrjmseYw1pIm8QKUTe9QCu3EwGxUaa9TRKV9WHJVUZ8nvej5dEn7QJyyjnaNwAOdP5WyYlfCydSiOwjkOrL67B7419YtxAmGVyRjro1w=
+Received: from AS4P189CA0035.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5dd::14)
+ by AS8PR08MB9388.eurprd08.prod.outlook.com (2603:10a6:20b:5ab::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.9; Fri, 12 Dec
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.7; Fri, 12 Dec
  2025 15:23:42 +0000
-Received: from AM4PEPF00027A69.eurprd04.prod.outlook.com
- (2603:10a6:20b:5db:cafe::6b) by AS4P189CA0024.outlook.office365.com
- (2603:10a6:20b:5db::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.11 via Frontend Transport; Fri,
+Received: from AM2PEPF0001C70F.eurprd05.prod.outlook.com
+ (2603:10a6:20b:5dd:cafe::f4) by AS4P189CA0035.outlook.office365.com
+ (2603:10a6:20b:5dd::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.10 via Frontend Transport; Fri,
  12 Dec 2025 15:23:42 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
@@ -51,32 +51,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM4PEPF00027A69.mail.protection.outlook.com (10.167.16.87) with Microsoft
+ AM2PEPF0001C70F.mail.protection.outlook.com (10.167.16.203) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.4
  via Frontend Transport; Fri, 12 Dec 2025 15:23:42 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KkSkZQEkdzR09xLWE9x/eJXXLd0bSLBWT+R0lRtc6Yb577wIxWoBg/F1IumP18+J3lqATmCrSTlDuQbmOqeip3LkWN24zvb1a0pKqeBsEZjdBlgm3kMN6kUoRx/48uUXYVjltZFU4dzfiCB4UHFphYo9YxsX31iL/CXEN+mey4CBJzLbuZWgGYyRMrMFajHTSFiauTT1oNn5GdUG2nCs1olvtGmv8mzpr+b9ytSXAZtn7/J9U678P8gE1YPY3rVCCNXrlpQWEJd46iAByd90i5SdI61MGt0qpX2rHPQr9JFJqlvBv+xmFUL8JSs2d43BoZg4I/PwfQSw4ivAXNM9dA==
+ b=ih4yHeYCTDqI9GRYGCZLeYuZl2WAbOeimUmO12BBB0Q5OdQeyG8jxcXshSYrnAVc0pLCbuC0gva4lfIPpyTg34LRomGtzGxZR+XEfEdQcDUCgkeApHfhcM04REmJ52v6cXWRx3aq+lVyuoH31xE4D5L7EydRcPcOsff2+bZj5NEcb8PPHG1Vj9mxFjk2JeuYvGH/HpfkVOiqfHWPRObJ1kHdN2ZbSDyVUf6UEQO+h97YlftTvWHbZYJR1/cWdWB4uKzvEdF4uP6U7im0gY5XVeExTen6L/9D47qr3ChquKiBy5wNxsQ64Lvpy1E3HNaNSSNYmvaTLjnlJIClx45ULA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OwxyANOLvSzdvDCB1LM08Yj1dOd/6/t+JPTmbglgNqY=;
- b=I4zCIXzFEdqSPkBXNkNrULGzp/OIgRDNMk1AGJYXYKwzADNeGbUk7/CZO7eVAQiFm9m3+wz/6dGOpHWWnEj/VKC4k1p7EbqjgHB79L65gPT2O/Y3smFZxZCwVER/kUItGsenQlkh+LEDpCesQM5WGJX09jwhToltcw551G4b//REr+F6np+Dia6lZBIcCRoMCBtwQ+Qfp97Fx/ElHBJlaHjpV7xWpVizDcuOLW8FpYtun7+uaiXclZTbrfDwRFjwfLIGiRL6YuUhWYUVRoqmJnWr9d6xV5ldXDHgH8yiExhJuLAKE8h6mfIVnTwr3KBwqqjdBE2Kx/LTFfD3Wdybyw==
+ bh=5vtp49JtJTAHWk0P5SeLhiqZ509MzHqqYRz0nfffv38=;
+ b=kxc4CawqwZis2dWzOISEbAUXdC0SK3sx89w5pcIlHJNjaJ7VkVKB+HGLlj48kazIrcLCbl+YtTD5xhpKCVKAN93NIEmci+bhzc5lM1RgqDEmtr1iS2HRcKXK9EHDYm3xB35sti5JxQ/K08izjWWnftTyPjyIs7osMubowI7ew4S0m0ooOQYwHcwEbq1vNp4vjoIDRYe4kfAt5XwE7Fw7y3CUnukGnmkMDwpmLR8lF0EagUnHr1fW4Trzgh6+ZeJU/eKz1CiiPLVlL+8oWOf4Pfvybnhnopky7AegNKl4pajjsQCIbYN9FgKnK63oaUIzs9szSVLmN8zJy74P3g7vOg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OwxyANOLvSzdvDCB1LM08Yj1dOd/6/t+JPTmbglgNqY=;
- b=QZaDqOv/XAWAqVGlNCYU20cQroSUvLM8Qwyzooleb2/+uRP5OUioSMIsj49qQDFesq183iEzye6ubzYMqnxfIMQZEv/lXnszLKRtlRDL6iuuXf1kyTrelJCurAPUazp1e+ovGpVO0etaTv7mzO87SBi23IzuzhdJ3HF0RHX1AaA=
+ bh=5vtp49JtJTAHWk0P5SeLhiqZ509MzHqqYRz0nfffv38=;
+ b=gu93kEW7Lsu2Z+AguA1/bgQERODzwmWZLT0306mxJ98hIGUQBcf6at8fyP+eXfugPigSrjmseYw1pIm8QKUTe9QCu3EwGxUaa9TRKV9WHJVUZ8nvej5dEn7QJyyjnaNwAOdP5WyYlfCydSiOwjkOrL67B7419YtxAmGVyRjro1w=
 Received: from VI1PR08MB3871.eurprd08.prod.outlook.com (2603:10a6:803:b7::17)
- by DB9PR08MB9756.eurprd08.prod.outlook.com (2603:10a6:10:45f::5) with
+ by PA6PR08MB10565.eurprd08.prod.outlook.com (2603:10a6:102:3ca::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.9; Fri, 12 Dec
- 2025 15:22:36 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.10; Fri, 12 Dec
+ 2025 15:22:40 +0000
 Received: from VI1PR08MB3871.eurprd08.prod.outlook.com
  ([fe80::98c3:33df:8fd4:b704]) by VI1PR08MB3871.eurprd08.prod.outlook.com
  ([fe80::98c3:33df:8fd4:b704%4]) with mapi id 15.20.9412.005; Fri, 12 Dec 2025
- 15:22:36 +0000
+ 15:22:39 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -87,13 +87,13 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "peter.maydell@linaro.org"
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: [PATCH 04/32] arm64/sysreg: Add remaining GICv5 ICC_ & ICH_ sysregs
- for KVM support
-Thread-Topic: [PATCH 04/32] arm64/sysreg: Add remaining GICv5 ICC_ & ICH_
- sysregs for KVM support
-Thread-Index: AQHca3slo/iovGxqi0mLpe0GxZetVQ==
-Date: Fri, 12 Dec 2025 15:22:36 +0000
-Message-ID: <20251212152215.675767-5-sascha.bischoff@arm.com>
+Subject: [PATCH 13/32] KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp
+ interface
+Thread-Topic: [PATCH 13/32] KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp
+ interface
+Thread-Index: AQHca3snsrG+V/OS2UOhNLRdjlwFcQ==
+Date: Fri, 12 Dec 2025 15:22:39 +0000
+Message-ID: <20251212152215.675767-14-sascha.bischoff@arm.com>
 References: <20251212152215.675767-1-sascha.bischoff@arm.com>
 In-Reply-To: <20251212152215.675767-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -104,44 +104,44 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	VI1PR08MB3871:EE_|DB9PR08MB9756:EE_|AM4PEPF00027A69:EE_|DBBPR08MB10483:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2e754461-b0e4-4dba-ec30-08de39926f54
+	VI1PR08MB3871:EE_|PA6PR08MB10565:EE_|AM2PEPF0001C70F:EE_|AS8PR08MB9388:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ae60bfc-235b-42c4-6292-08de39926ee3
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|1800799024|376014|38070700021;
+ BCL:0;ARA:13230040|376014|366016|1800799024|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- =?iso-8859-1?Q?uKcklBoYv2gKraW/9XDc6XBMYtLGqDlhw1gDfnAXcpWP6oFsdcP6Jqr//g?=
- =?iso-8859-1?Q?73mYGHQNELZVPOmLv/ifVOwVo/MeNfbNr2sxwPAljHwkD8sEiI6K3mdA+6?=
- =?iso-8859-1?Q?jvh51Cg0xqxgmfj1mjvzL6pg+LENdHA3B4dcfp2o6xHcM2aSv5pGDilJIG?=
- =?iso-8859-1?Q?ibKXtTS9wiGuC7ziKSjyHDcbXBRL08sAClYBAAhgYgnW8msAJaN7kBvd0Z?=
- =?iso-8859-1?Q?Q2EJL9N1OXvmU43KtmbFRY4WDwy/r+/XNhNZYXJRWCoIfQdotHrfICII4N?=
- =?iso-8859-1?Q?5fmW0ICkWqwTZ1hSWqlJ1G6B3KAatYInRUU/FmOFC2bz0fgPrnqge1hyrf?=
- =?iso-8859-1?Q?Np3BLg3juhktZEYFAlINUr4xP378S1/9SD79cfBf/pnVMph4ji/tSsFvuu?=
- =?iso-8859-1?Q?52ch8YsRxZrZiCUAlaDc1Qg7ipvL7fxSYk9fgUAdCUlYMilZYri5D3mr2Y?=
- =?iso-8859-1?Q?MWC8/pi4oeW4zikSjuri/7DEOyJ5Hmg1W0R0BWRHAd7AkjBiyzel2FJF3S?=
- =?iso-8859-1?Q?kOuUWnHA0EZw1CnNQZXtZkEXJJGY1/YYSEmMjuvS2rvWDks0JnivhukhLy?=
- =?iso-8859-1?Q?A7z9WjAR9naLErzDBBReaaWPylInXbYOFEn52C0qOJVBmDBQ7qOnDfNcAZ?=
- =?iso-8859-1?Q?+b6f33M2jxe8zDYtTM9XpkOEfzE4YTtWsdofO7IKRkz/0/K6R6cnB0f1Yh?=
- =?iso-8859-1?Q?EWvEgU+NHmKSlaPdxYreQZIwXv0Y5VND+kut4WHoTrg0dPuQUyJKG53D6T?=
- =?iso-8859-1?Q?hC8mS9hqMtTNuiZ1qGFJ/WCZNKvhrwbl+9uRBKCfMs0+dfACZnWTSrXRIF?=
- =?iso-8859-1?Q?fcQMqh4momJCnl0YDP88XSUWbwR65Bk9NTffiyetG20TWy8OYS5STNMw3u?=
- =?iso-8859-1?Q?PMGs3WqB4rdcg4xHwJQesDKcbmYgBotzROUDI5ZlJvN4tRdP+0CmRkk5z5?=
- =?iso-8859-1?Q?ZYj/UnKcMCGQROqNyJ4pSlkSsTmbiAwUeCWgwq+tFimtkVnjk7wxQr1kUK?=
- =?iso-8859-1?Q?q4tvhhCPU65eUiQdi9HhlCDtzLgA+YRb+NcDwxO9LcGcXrwrK3xql6aw57?=
- =?iso-8859-1?Q?adQscjKfsJ2xfQJ9D5xXHACV0rzRuoO+vocuTPUMSm8DVrWHkQq9vGZ8US?=
- =?iso-8859-1?Q?eBCQZKBAkAFXVvBLNv77WApOojsgWY9g2+RcCzyPHIXn/VKhXHJP4J0GDf?=
- =?iso-8859-1?Q?CwgnPHeLhspAOaypkh097uJO85mAfuTkZPFF6zZ0YsEPe/CCJPrNvOBeGA?=
- =?iso-8859-1?Q?IZrM412iGjNzcNydlf3gIYGO+Tw04hJMotQTMbtQuG6m+ZpeislKg6NjQn?=
- =?iso-8859-1?Q?/344uq761GYecBAFUTpWRCFdrialqitCl1LDW6Uz8kAn2wrelVTM0lT/Ya?=
- =?iso-8859-1?Q?Y60Y2TTijblTtInvna7ca2iOEKrf6ecr2V8KsgscXUok1+ySlMBzpRzxhA?=
- =?iso-8859-1?Q?U1CWQ+y/xCS58aRmudUGjx4W16+xmqfiM8A+grOVn9eAGSrSL1WaYzIKlw?=
- =?iso-8859-1?Q?QxLAXCEL14W17nblUQAHpi5UFv/RlTN+eJHtBD4Zeqrv6ay06sDDiGnLaS?=
- =?iso-8859-1?Q?qfU3NsRUHdCOVv438VjHPii6bfSN?=
+ =?iso-8859-1?Q?bEvUFmp3GKFw3Y+jsSsj73dbfP78wGLP6xgeFNw9pyxvBom3u2VeI7+i1F?=
+ =?iso-8859-1?Q?5+qOrKK4KkicNzrUJx7s3zPtItuut9j+W4VIDTpiAAmfpeKJXvtAfqqniF?=
+ =?iso-8859-1?Q?cOOLDeUVClr3wgPws8PPvhFV3GDx9mOvXcf863N8I6LnipfkCeTj/HQEUf?=
+ =?iso-8859-1?Q?DLz1Ufs1RUtdwzo2vfo+zL8ISaBXH0WAF6Ig0aCWUThPVFaiU42vOsGYV9?=
+ =?iso-8859-1?Q?Flleg4bD0n/6JcTX1Kk9EJxIge8qPIICgMeuTNZVp1WmnyyHBPhvttZMJv?=
+ =?iso-8859-1?Q?DK1J+LTeU40lNxsNCBkn3n5vQx4hfjOp1i+EyDNNEka5JWPvjOP1k/bJeD?=
+ =?iso-8859-1?Q?t9jPQCW9IMfwnaRZ828IiYKirex6v8ob0Gb1jRw7QMSdbfKDWqKA9fiW4H?=
+ =?iso-8859-1?Q?m1CDW+KWUmjhVE1ogQ/Mhvx7zXJF8M0Qp9vpbpEO5lLrtb53WNeUwi+P7R?=
+ =?iso-8859-1?Q?GFDXBCnKSxdzplgIJse1W3KHaR3ZjuHTt0QGW76Ykm/TA2mfTfQ52g113J?=
+ =?iso-8859-1?Q?hEqhf06JZNOqfnBCrNKb7MemeJx5CJM1jJ9jHuwkNVp9tW2w7pGr6C6q34?=
+ =?iso-8859-1?Q?bbXevPqY+mVmkU7tbownTtLdrgMEOqRhaVWa9BLXJJwt2O8yNo8d1C8gAe?=
+ =?iso-8859-1?Q?3H0bHAQ344UD11nj4z1WWkvMDLApbO+DacVJE4Vg0sdGEG21BjJ3jr+o+4?=
+ =?iso-8859-1?Q?MF+v6avTjMUw4XYX0lrZLUjogfg6rk5ZyXrGHd1vwXHIMRL75B8eiGixIK?=
+ =?iso-8859-1?Q?ioBzFhJdnDzdqpkwkEFyLmQ2F8Cu4rG1eez654ea0VfoD7vwPwn/xPUbB9?=
+ =?iso-8859-1?Q?r0FRpTahz+tWgQkYNhiAiGEIEGZD8XzNzs266RxfQTb9EPfnY36qjIIzah?=
+ =?iso-8859-1?Q?2+M9cJ0g7RRE+gY1ebnUPnvumBDDFTJKpzM+pmNgcfRF0XTkAp/irufJvV?=
+ =?iso-8859-1?Q?mWIL3vqQWZ7fIRI3N4UKyDsVVCFzoeIHLV2218Cq3CNtjb9gAU9c2S/H8p?=
+ =?iso-8859-1?Q?B7r7bn07hXWqJ85qPM7NLw9IFm3y/VqhJC9BaAVzFtIPDnjHOd2YmSFenu?=
+ =?iso-8859-1?Q?tqr6tK2zck0Rbeds/kAmLsPTtbXewgbyf72Ztaqw4FNFBJ9amDjBB0jdtU?=
+ =?iso-8859-1?Q?MRp+0NLiNJRZ7AsjIenCBduayJA08JDrZb3Ts9CIFvt2zTeE7CSUAQ6P7C?=
+ =?iso-8859-1?Q?JtrfJoFTfTLvO1UOM1J3z3prscI/Uj9iHTLOPRC6vNmGlz8sQZnorzGAlK?=
+ =?iso-8859-1?Q?DOcXt15Xx4S0vi11xPfpVE2Fxa44PdbyVK1/hWDzV6sRIReWp+hxRxvKyY?=
+ =?iso-8859-1?Q?pS8D8CzvowlCGdgEJuQU7EozU2W5zZS8fLMAz7GaKvMsVDQ30EIWNn0h46?=
+ =?iso-8859-1?Q?pDWOXG714HxGVqGQvDJ7TKN5VJHVuF/ySbp2RbVyLw8De+vz+4syWsGEbl?=
+ =?iso-8859-1?Q?1D4KQJozR0HpGt6gz5HKuTxKvU/KU3luzgsLtC8ELsf4qNr6EfbshW8U6k?=
+ =?iso-8859-1?Q?8vAAerEjyFDnAQqgFg7cl2GnclrcyfjIwjTJ1lD77obTLk7yZehZ5KY8l0?=
+ =?iso-8859-1?Q?Z1X5oIkOKWWpdBEWUzSeNoX1QH6Z?=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3871.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700021);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3871.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -150,615 +150,419 @@ List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR08MB9756
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10565
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A69.eurprd04.prod.outlook.com
+ AM2PEPF0001C70F.eurprd05.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	462c10c2-9a12-45de-adbb-08de399247dd
+	5812ac5a-98df-4f01-f5b4-08de399249c6
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|35042699022|1800799024|14060799003;
+	BCL:0;ARA:13230040|376014|1800799024|35042699022|36860700013|82310400026|14060799003;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?/sApUb98xN40eGpB4K5br3pCdiliHtI+p05dgkUgNMBe71vPp3gLTK1UYX?=
- =?iso-8859-1?Q?ANDR+KiL2hFyDr92xL8nbyMHayzHffB6KDZ2ZaIiQvq7A0SRJaxT/YqLKk?=
- =?iso-8859-1?Q?Jv82e6f3+bahGk7MCZVT+MlifNlkWt5nT/3Vm9VYtrwye5KyU0cbgpvWQX?=
- =?iso-8859-1?Q?qRE7tloFTVa9SeuSEcLmHtp6jcrdXDBRWqs0SN8QcUIc6N75SfCWSBn9B0?=
- =?iso-8859-1?Q?qkuTuwQLE4engO32wfiyoLpxB8J9w+iPwb3nQBIeU3Jc7SFmbBeNGaqcUw?=
- =?iso-8859-1?Q?zxQGLZCK9rngKS9k+engEFQcPr1KLwnnokjH2Eo9OjWcGl2nadi66pUrFm?=
- =?iso-8859-1?Q?c6X1MEHqj3dxKNQAFnIqM3VAVzbaNIZ2EFMicjt3uIFEBrFwryWwuXKVH/?=
- =?iso-8859-1?Q?qKCz58CW+LftZOu71/HABAkMz7iVXw3yWSv0/C2lyR6YTXTMokjk0zWYAr?=
- =?iso-8859-1?Q?8X6oCKWJznILQARVaIfwWFwtlIY5PydimQl6MeYk2FcK9Q8UU+iLC7NMUY?=
- =?iso-8859-1?Q?stl3k1nhf4M8G027woEAEpTlaN8UNmBgT/3fu4XfX3vZIAgtYy1/a8Lh1U?=
- =?iso-8859-1?Q?q2bFmLU1GRd18xeRJ9W6N5icRl17OlfsX5RL4x4oEKE0y5DuIMvkc7E0V7?=
- =?iso-8859-1?Q?lZpQYbrDAGfDFvoAhltlpQ/d250oYZoGgegfgZDXVsW2OiubhsApihfYKd?=
- =?iso-8859-1?Q?TWiZdX+GQ+X52gEG5kzxeNJr2QQ0h+cy0iKYS5q8wgKff8p6D0El/pohjk?=
- =?iso-8859-1?Q?FXgukLGuldvJuecTZwX/fmg6tEfSGZwcQeJK+jBNOQoxn/4gYosRS9JOBf?=
- =?iso-8859-1?Q?ntCxiCnIlru/GMAPmTSYC1cRNfVk6XJJx4fuGptFB381n5MS9aOqbw9R3m?=
- =?iso-8859-1?Q?YntAubsZNIJ7RtGSUMsCoDn1XDmsGUKzonUJPOVNMqjomVuvd6AQH9jtDl?=
- =?iso-8859-1?Q?vCO8pSGD+oEgt//xmyUdk8NkwBXSXdgx34J7Wqpwo0H8XisY0lHWmCt/l0?=
- =?iso-8859-1?Q?e72QcD1bXzAS2EIqBVFX4qiVQtymi+FFEZUCkHqmYx32+8v96+32zaLeS6?=
- =?iso-8859-1?Q?SzK37W+71CwdZ431CzPkJm+1jBUUtflVhgmt1Kh9PwOdPGxWpNzUuohW5+?=
- =?iso-8859-1?Q?t5Xh19VMs/jYhVlLsGYADPTvNkimwvBklFJXDI4U8s1zGOnGTjzyh+7rPD?=
- =?iso-8859-1?Q?3IdgGPKVM9FJaTC6Ev5I4qmsur6tfX3zEvBeL7RJ21q8iTQzaLxbCm1OB8?=
- =?iso-8859-1?Q?/qLMiENRLZS+V19BRIm6YymhCyp9ZfQsfK2gaqHCmRsStMDEfAWjxGzTOn?=
- =?iso-8859-1?Q?FkZxN5Rdo9LRs3DQOYvjfprUfQD+uWySg3D5eaJNrijPtNHOPKIq4tdmli?=
- =?iso-8859-1?Q?VX4ZmriO0ZXX4wNCjijnN15zZYeR6V0xTCcb1TZlRzBn6OLMFgvQvLQBIK?=
- =?iso-8859-1?Q?nN3VpDK1rs4jOOJ1r9X8CZh7NBtIVuWjLNzt/3a+IZBlffg0CayjvLk9bQ?=
- =?iso-8859-1?Q?76ItzceewdIIbas2nlnRzpUVT6Mtau4w0Awvw9TGjJ9fUMG2wXrvTd2mlv?=
- =?iso-8859-1?Q?EB50x1fy9lJ+WTJrJtds4OuIfX2J2nnIhSWzSAKWPNVMPOYtjYgWEGcMsr?=
- =?iso-8859-1?Q?ZAzBCY6Hjrk9Y=3D?=
+	=?iso-8859-1?Q?dbqJyoTMb0A/6z2ibr6BxOYrIM208fO0bA7pnoZAzxuRWJj4XLiYiJvZAV?=
+ =?iso-8859-1?Q?Yu06QePBRK0VZXieiHPtmcIEucwXvBR3fhlqFSKAgIP9SfH/NVRbNf28P9?=
+ =?iso-8859-1?Q?mzeQyE+CT4xuNI01gzImBLWfNBnwZ9Dv6p3KJ+ojL1r1CYnvYpDtCpfLVa?=
+ =?iso-8859-1?Q?pCxmrqaxKEYUvGNxcnZrSwTH8iBYvrPQu7xe9gKOLeem+dMJcKP39I/ZpM?=
+ =?iso-8859-1?Q?eplTNcavE8EfvPcaN/mq6+SPfcPhYLQKOCxPWC9YehxAbYdtwrsy5/2uYH?=
+ =?iso-8859-1?Q?+HFFY2NSN/K0FAQ8pWs/kbixxXxlRouWk1icaqH2sUnm/76MqfnDOLF6+h?=
+ =?iso-8859-1?Q?2o5JtSBw831G+lkbE5G5Ki4HVAUsodR0gFf10Lq5qTQJtWSXf6FB0jz9vb?=
+ =?iso-8859-1?Q?16v7qzW8bHT3gBULdt8X558O3fsvjyAU0cmFUwjVCEbvrhu4mkTjQCBYFE?=
+ =?iso-8859-1?Q?7m67iHkQSOnEfosQ4HJ5C4QpOzjtR6gow4yJxPflbxN//yItz/5qQWJdmx?=
+ =?iso-8859-1?Q?zY4lXfu/7U5d12aeaO3TFt6Ghc3asZHwYdcdmdG690KLVP4GPZE6IAJxYb?=
+ =?iso-8859-1?Q?O6pySsAGjF/d3irsDqxYl2fDSjZPcdL3KKVwrRNS9LJeGXn4bKphQc7diB?=
+ =?iso-8859-1?Q?oXpGEEzHRx2+Px+yiQvxLc77+r5HjipUjCpv4ueIv/ys6QaCrUad+OyB8Z?=
+ =?iso-8859-1?Q?7H+QIQpkPWXJ2DUSO3gZdNOAk/O4L7rYaYb1/Nt0EFVuEEu1+Anu1ZCLEO?=
+ =?iso-8859-1?Q?w9mwtTN+Fi/x43heklHBpQlo2wu6gwRrhW74JyPsSAof6YpCR8W9/AFSFX?=
+ =?iso-8859-1?Q?OQccRHatPAKEYp3vQ8TLokhn+0yOn9fUTvoUf8LwrRtCGefbXNBVK91Hg3?=
+ =?iso-8859-1?Q?bPK1PBB95IGoPjMlUEtwt6dUzVPbxZzQTV8VJZ3UaqUjLDfpCXuKh/Mx2X?=
+ =?iso-8859-1?Q?3dWFIV4cdw/AkzO0zc1Bwjyhn3qv7wo8PFgBwrYph+hd1Z+1nHChE4xzDD?=
+ =?iso-8859-1?Q?NSjQrCwAILA0P0sivmUP4usSpB0QZe6HiWE8EhmhWwt2ahtECQJLaOGyGZ?=
+ =?iso-8859-1?Q?0X1/Ho2MItAU7zQ18MVOy8OD+ZgFoNg+NaXUbNzzEnSORX8Ny58NmsBSTS?=
+ =?iso-8859-1?Q?f+RK/xhE/MkRDW8ZhjHpXOp/c0L0KuOwxzCcBc57sPc80MOxi9E6f6FVo4?=
+ =?iso-8859-1?Q?XaGxmRUgUcACB3MrNHKysmMHlRFUD0xQl7K07Wt7kdDzxWiHNMPsBbnvym?=
+ =?iso-8859-1?Q?duX/aeNqAQSfn+8HOgYV4QqBoVx2s4L1iiNTy+wYy044/y5u89xC1ajO38?=
+ =?iso-8859-1?Q?ajgbtkVZ3Vxyjvo//BGq/pZqIV64v4VxbrypASxfoHSSSAX9OkUnlLqbwH?=
+ =?iso-8859-1?Q?Kyv2qFAPPEA9kYw2qAgt632fDSwcqflvWIqdz3KE7chXho6EaZl3lsgEvY?=
+ =?iso-8859-1?Q?BvDrHaHphxwlZ1ykRF4UwObHY6yJG1p96VovDPuyKmBo6Dsnd4wymDz42a?=
+ =?iso-8859-1?Q?/gTa0oaN6EkK99AjBJ81vEA7aK3MmHYakYVpICQfB+8XRplIjA1hkplv3I?=
+ =?iso-8859-1?Q?R9cdgbqVSIF5zCNnRwPGBcgJHhniCJsq0BAiTTTlvs93AAUhDsz5tZ7M1U?=
+ =?iso-8859-1?Q?2FRVzaPFnRFH4=3D?=
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(35042699022)(1800799024)(14060799003);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(35042699022)(36860700013)(82310400026)(14060799003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2025 15:23:42.7933
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2025 15:23:42.0621
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e754461-b0e4-4dba-ec30-08de39926f54
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ae60bfc-235b-42c4-6292-08de39926ee3
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A69.eurprd04.prod.outlook.com
+	AM2PEPF0001C70F.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB10483
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9388
 
-Add the GICv5 system registers required to support native GICv5 guests
-with KVM. Many of the GICv5 sysregs have already been added as part of
-the host GICv5 driver, keeping this set relatively small. The
-registers added in this change complete the set by adding those
-required by KVM either directly (ICH_) or indirectly (FGTs for the
-ICC_ sysregs).
+Introduce hyp functions to save/restore the following GICv5 state:
 
-The following system registers and their fields are added:
+* ICC_ICSR_EL1
+* ICH_APR_EL2
+* ICH_PPI_ACTIVERx_EL2
+* ICH_PPI_DVIRx_EL2
+* ICH_PPI_ENABLERx_EL2
+* ICH_PPI_PENDRRx_EL2
+* ICH_PPI_PRIORITYRx_EL2
+* ICH_VMCR_EL2
 
-	ICC_APR_EL1
-	ICC_HPPIR_EL1
-	ICC_IAFFIDR_EL1
-	ICH_APR_EL2
-	ICH_CONTEXTR_EL2
-	ICH_PPI_ACTIVER<n>_EL2
-	ICH_PPI_DVI<n>_EL2
-	ICH_PPI_ENABLER<n>_EL2
-	ICH_PPI_PENDR<n>_EL2
-	ICH_PPI_PRIORITYR<n>_EL2
+All of these are saved/restored to/from the KVM vgic_v5 CPUIF shadow
+state.
 
+The ICSR must be save/restored as this register is shared between host
+and guest. Therefore, to avoid leaking host state to the guest, this
+must be saved and restored. Moreover, as this can by used by the host
+at any time, it must be save/restored eagerly. Note: the host state is
+not preserved as the host should only use this register when
+preemption is disabled.
+
+As part of restoring the ICH_VMCR_EL2 and ICH_APR_EL2, GICv3-compat
+mode is also disabled by setting the ICH_VCTLR_EL2.V3 bit to 0. The
+correspoinding GICv3-compat mode enable is part of the VMCR & APR
+restore for a GICv3 guest as it only takes effect when actually
+running a guest.
+
+Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arch/arm64/tools/sysreg | 480 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 480 insertions(+)
+ arch/arm64/include/asm/kvm_asm.h   |   4 +
+ arch/arm64/include/asm/kvm_hyp.h   |   8 ++
+ arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c |  32 ++++++
+ arch/arm64/kvm/hyp/vgic-v5.c       | 155 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/Makefile    |   2 +-
+ include/kvm/arm_vgic.h             |  28 ++++++
+ 7 files changed, 229 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/vgic-v5.c
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index dab5bfe8c9686..2f44a568ebf4e 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -3248,6 +3248,14 @@ UnsignedEnum	3:0	ID_BITS
- EndEnum
- EndSysreg
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_=
+asm.h
+index a1ad12c72ebf1..5f669299fb956 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_vmcr_aprs,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_aprs,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_ppi_state,
++	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_ppi_state,
+ };
 =20
-+Sysreg	ICC_HPPIR_EL1	3	0	12	10	3
-+Res0	63:33
-+Field	32	HPPIV
-+Field	31:29	TYPE
-+Res0	28:24
-+Field	23:0	ID
-+EndSysreg
-+
- Sysreg	ICC_ICSR_EL1	3	0	12	10	4
- Res0	63:48
- Field	47:32	IAFFID
-@@ -3262,6 +3270,11 @@ Field	1	Enabled
- Field	0	F
- EndSysreg
+ #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_=
+hyp.h
+index 76ce2b94bd97e..f6cf59a719ac6 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -87,6 +87,14 @@ void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+ int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
 =20
-+Sysreg	ICC_IAFFIDR_EL1	3	0	12	10	5
-+Res0	63:16
-+Field	15:0	IAFFID
-+EndSysreg
++/* GICv5 */
++void __vgic_v5_save_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_restore_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_save_icsr(struct vgic_v5_cpu_if *cpu_if);
++void __vgic_v5_restore_icsr(struct vgic_v5_cpu_if *cpu_if);
 +
- SysregFields	ICC_PPI_ENABLERx_EL1
- Field	63	EN63
- Field	62	EN62
-@@ -3668,6 +3681,42 @@ Res0	14:12
- Field	11:0	AFFINITY
- EndSysreg
+ #ifdef __KVM_NVHE_HYPERVISOR__
+ void __timer_enable_traps(struct kvm_vcpu *vcpu);
+ void __timer_disable_traps(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Mak=
+efile
+index a244ec25f8c5b..d860fbe9bc476 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -26,7 +26,7 @@ hyp-obj-y :=3D timer-sr.o sysreg-sr.o debug-sr.o switch.o=
+ tlb.o hyp-init.o host.o
+ 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
+ 	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
+ hyp-obj-y +=3D ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../en=
+try.o \
+-	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
++	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5.o
+ hyp-obj-y +=3D ../../../kernel/smccc-call.o
+ hyp-obj-$(CONFIG_LIST_HARDENED) +=3D list_debug.o
+ hyp-obj-y +=3D $(lib-objs)
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/h=
+yp-main.c
+index a7c689152f686..6bc5a4f75fd01 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -586,6 +586,34 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_c=
+ontext *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) =3D __pkvm_teardown_vm(handle);
+ }
 =20
-+Sysreg	ICC_APR_EL1	3	1	12	0	0
-+Res0	63:32
-+Field	31	P31
-+Field	30	P30
-+Field	29	P29
-+Field	28	P28
-+Field	27	P27
-+Field	26	P26
-+Field	25	P25
-+Field	24	P24
-+Field	23	P23
-+Field	22	P22
-+Field	21	P21
-+Field	20	P20
-+Field	19	P19
-+Field	18	P18
-+Field	17	P17
-+Field	16	P16
-+Field	15	P15
-+Field	14	P14
-+Field	13	P13
-+Field	12	P12
-+Field	11	P11
-+Field	10	P10
-+Field	9	P9
-+Field	8	P8
-+Field	7	P7
-+Field	6	P6
-+Field	5	P5
-+Field	4	P4
-+Field	3	P3
-+Field	2	P2
-+Field	1	P1
-+Field	0	P0
-+EndSysreg
++static void handle___vgic_v5_save_vmcr_aprs(struct kvm_cpu_context *host_c=
+txt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
 +
- Sysreg	ICC_CR0_EL1	3	1	12	0	1
- Res0	63:39
- Field	38	PID
-@@ -4567,6 +4616,42 @@ Field	31:16	PhyPARTID29
- Field	15:0	PhyPARTID28
- EndSysreg
++	__vgic_v5_save_vmcr_aprs(kern_hyp_va(cpu_if));
++}
++
++static void handle___vgic_v5_restore_vmcr_aprs(struct kvm_cpu_context *hos=
+t_ctxt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
++
++	__vgic_v5_restore_vmcr_aprs(kern_hyp_va(cpu_if));
++}
++
++static void handle___vgic_v5_save_ppi_state(struct kvm_cpu_context *host_c=
+txt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
++
++	__vgic_v5_save_ppi_state(kern_hyp_va(cpu_if));
++}
++
++static void handle___vgic_v5_restore_ppi_state(struct kvm_cpu_context *hos=
+t_ctxt)
++{
++	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
++
++	__vgic_v5_restore_ppi_state(kern_hyp_va(cpu_if));
++}
++
+ typedef void (*hcall_t)(struct kvm_cpu_context *);
 =20
-+Sysreg	ICH_APR_EL2	3	4	12	8	4
-+Res0	63:32
-+Field	31	P31
-+Field	30	P30
-+Field	29	P29
-+Field	28	P28
-+Field	27	P27
-+Field	26	P26
-+Field	25	P25
-+Field	24	P24
-+Field	23	P23
-+Field	22	P22
-+Field	21	P21
-+Field	20	P20
-+Field	19	P19
-+Field	18	P18
-+Field	17	P17
-+Field	16	P16
-+Field	15	P15
-+Field	14	P14
-+Field	13	P13
-+Field	12	P12
-+Field	11	P11
-+Field	10	P10
-+Field	9	P9
-+Field	8	P8
-+Field	7	P7
-+Field	6	P6
-+Field	5	P5
-+Field	4	P4
-+Field	3	P3
-+Field	2	P2
-+Field	1	P1
-+Field	0	P0
-+EndSysreg
-+
- Sysreg	ICH_HFGRTR_EL2	3	4	12	9	4
- Res0	63:21
- Field	20	ICC_PPI_ACTIVERn_EL1
-@@ -4615,6 +4700,306 @@ Field	1	GICCDDIS
- Field	0	GICCDEN
- EndSysreg
+ #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] =3D (hcall_t)handle_##x
+@@ -627,6 +655,10 @@ static const hcall_t host_hcall[] =3D {
+ 	HANDLE_FUNC(__pkvm_vcpu_load),
+ 	HANDLE_FUNC(__pkvm_vcpu_put),
+ 	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
++	HANDLE_FUNC(__vgic_v5_save_vmcr_aprs),
++	HANDLE_FUNC(__vgic_v5_restore_vmcr_aprs),
++	HANDLE_FUNC(__vgic_v5_save_ppi_state),
++	HANDLE_FUNC(__vgic_v5_restore_ppi_state),
+ };
 =20
-+SysregFields	ICH_PPI_DVIRx_EL2
-+Field	63	DVI63
-+Field	62	DVI62
-+Field	61	DVI61
-+Field	60	DVI60
-+Field	59	DVI59
-+Field	58	DVI58
-+Field	57	DVI57
-+Field	56	DVI56
-+Field	55	DVI55
-+Field	54	DVI54
-+Field	53	DVI53
-+Field	52	DVI52
-+Field	51	DVI51
-+Field	50	DVI50
-+Field	49	DVI49
-+Field	48	DVI48
-+Field	47	DVI47
-+Field	46	DVI46
-+Field	45	DVI45
-+Field	44	DVI44
-+Field	43	DVI43
-+Field	42	DVI42
-+Field	41	DVI41
-+Field	40	DVI40
-+Field	39	DVI39
-+Field	38	DVI38
-+Field	37	DVI37
-+Field	36	DVI36
-+Field	35	DVI35
-+Field	34	DVI34
-+Field	33	DVI33
-+Field	32	DVI32
-+Field	31	DVI31
-+Field	30	DVI30
-+Field	29	DVI29
-+Field	28	DVI28
-+Field	27	DVI27
-+Field	26	DVI26
-+Field	25	DVI25
-+Field	24	DVI24
-+Field	23	DVI23
-+Field	22	DVI22
-+Field	21	DVI21
-+Field	20	DVI20
-+Field	19	DVI19
-+Field	18	DVI18
-+Field	17	DVI17
-+Field	16	DVI16
-+Field	15	DVI15
-+Field	14	DVI14
-+Field	13	DVI13
-+Field	12	DVI12
-+Field	11	DVI11
-+Field	10	DVI10
-+Field	9	DVI9
-+Field	8	DVI8
-+Field	7	DVI7
-+Field	6	DVI6
-+Field	5	DVI5
-+Field	4	DVI4
-+Field	3	DVI3
-+Field	2	DVI2
-+Field	1	DVI1
-+Field	0	DVI0
-+EndSysregFields
+ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/kvm/hyp/vgic-v5.c b/arch/arm64/kvm/hyp/vgic-v5.c
+new file mode 100644
+index 0000000000000..11b67ae09e326
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/vgic-v5.c
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2025 - ARM Ltd
++ */
 +
-+Sysreg	ICH_PPI_DVIR0_EL2	3	4	12	10	0
-+Fields ICH_PPI_DVIx_EL2
-+EndSysreg
++#include <hyp/adjust_pc.h>
 +
-+Sysreg	ICH_PPI_DVIR1_EL2	3	4	12	10	1
-+Fields ICH_PPI_DVIx_EL2
-+EndSysreg
++#include <linux/compiler.h>
++#include <linux/irqchip/arm-gic-v5.h>
++#include <linux/kvm_host.h>
 +
-+SysregFields	ICH_PPI_ENABLERx_EL2
-+Field	63	EN63
-+Field	62	EN62
-+Field	61	EN61
-+Field	60	EN60
-+Field	59	EN59
-+Field	58	EN58
-+Field	57	EN57
-+Field	56	EN56
-+Field	55	EN55
-+Field	54	EN54
-+Field	53	EN53
-+Field	52	EN52
-+Field	51	EN51
-+Field	50	EN50
-+Field	49	EN49
-+Field	48	EN48
-+Field	47	EN47
-+Field	46	EN46
-+Field	45	EN45
-+Field	44	EN44
-+Field	43	EN43
-+Field	42	EN42
-+Field	41	EN41
-+Field	40	EN40
-+Field	39	EN39
-+Field	38	EN38
-+Field	37	EN37
-+Field	36	EN36
-+Field	35	EN35
-+Field	34	EN34
-+Field	33	EN33
-+Field	32	EN32
-+Field	31	EN31
-+Field	30	EN30
-+Field	29	EN29
-+Field	28	EN28
-+Field	27	EN27
-+Field	26	EN26
-+Field	25	EN25
-+Field	24	EN24
-+Field	23	EN23
-+Field	22	EN22
-+Field	21	EN21
-+Field	20	EN20
-+Field	19	EN19
-+Field	18	EN18
-+Field	17	EN17
-+Field	16	EN16
-+Field	15	EN15
-+Field	14	EN14
-+Field	13	EN13
-+Field	12	EN12
-+Field	11	EN11
-+Field	10	EN10
-+Field	9	EN9
-+Field	8	EN8
-+Field	7	EN7
-+Field	6	EN6
-+Field	5	EN5
-+Field	4	EN4
-+Field	3	EN3
-+Field	2	EN2
-+Field	1	EN1
-+Field	0	EN0
-+EndSysregFields
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_hyp.h>
++#include <asm/kvm_mmu.h>
 +
-+Sysreg	ICH_PPI_ENABLER0_EL2	3	4	12	10	2
-+Fields ICH_PPI_ENABLERx_EL2
-+EndSysreg
++void __vgic_v5_save_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if)
++{
++	cpu_if->vgic_vmcr =3D read_sysreg_s(SYS_ICH_VMCR_EL2);
++	cpu_if->vgic_apr =3D read_sysreg_s(SYS_ICH_APR_EL2);
++}
 +
-+Sysreg	ICH_PPI_ENABLER1_EL2	3	4	12	10	3
-+Fields ICH_PPI_ENABLERx_EL2
-+EndSysreg
++static void  __vgic_v5_compat_mode_disable(void)
++{
++	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, ICH_VCTLR_EL2_V3, 0);
++	isb();
++}
 +
-+SysregFields	ICH_PPI_PENDRx_EL2
-+Field	63	PEND63
-+Field	62	PEND62
-+Field	61	PEND61
-+Field	60	PEND60
-+Field	59	PEND59
-+Field	58	PEND58
-+Field	57	PEND57
-+Field	56	PEND56
-+Field	55	PEND55
-+Field	54	PEND54
-+Field	53	PEND53
-+Field	52	PEND52
-+Field	51	PEND51
-+Field	50	PEND50
-+Field	49	PEND49
-+Field	48	PEND48
-+Field	47	PEND47
-+Field	46	PEND46
-+Field	45	PEND45
-+Field	44	PEND44
-+Field	43	PEND43
-+Field	42	PEND42
-+Field	41	PEND41
-+Field	40	PEND40
-+Field	39	PEND39
-+Field	38	PEND38
-+Field	37	PEND37
-+Field	36	PEND36
-+Field	35	PEND35
-+Field	34	PEND34
-+Field	33	PEND33
-+Field	32	PEND32
-+Field	31	PEND31
-+Field	30	PEND30
-+Field	29	PEND29
-+Field	28	PEND28
-+Field	27	PEND27
-+Field	26	PEND26
-+Field	25	PEND25
-+Field	24	PEND24
-+Field	23	PEND23
-+Field	22	PEND22
-+Field	21	PEND21
-+Field	20	PEND20
-+Field	19	PEND19
-+Field	18	PEND18
-+Field	17	PEND17
-+Field	16	PEND16
-+Field	15	PEND15
-+Field	14	PEND14
-+Field	13	PEND13
-+Field	12	PEND12
-+Field	11	PEND11
-+Field	10	PEND10
-+Field	9	PEND9
-+Field	8	PEND8
-+Field	7	PEND7
-+Field	6	PEND6
-+Field	5	PEND5
-+Field	4	PEND4
-+Field	3	PEND3
-+Field	2	PEND2
-+Field	1	PEND1
-+Field	0	PEND0
-+EndSysregFields
++void __vgic_v5_restore_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if)
++{
++	__vgic_v5_compat_mode_disable();
 +
-+Sysreg	ICH_PPI_PENDR0_EL2	3	4	12	10	4
-+Fields ICH_PPI_PENDRx_EL2
-+EndSysreg
++	write_sysreg_s(cpu_if->vgic_vmcr, SYS_ICH_VMCR_EL2);
++	write_sysreg_s(cpu_if->vgic_apr, SYS_ICH_APR_EL2);
++}
 +
-+Sysreg	ICH_PPI_PENDR1_EL2	3	4	12	10	5
-+Fields ICH_PPI_PENDRx_EL2
-+EndSysreg
++void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
++{
++	cpu_if->vgic_ppi_activer_exit[0] =3D
++		read_sysreg_s(SYS_ICH_PPI_ACTIVER0_EL2);
++	cpu_if->vgic_ppi_activer_exit[1] =3D
++		read_sysreg_s(SYS_ICH_PPI_ACTIVER1_EL2);
 +
-+SysregFields	ICH_PPI_ACTIVERx_EL2
-+Field	63	ACTIVE63
-+Field	62	ACTIVE62
-+Field	61	ACTIVE61
-+Field	60	ACTIVE60
-+Field	59	ACTIVE59
-+Field	58	ACTIVE58
-+Field	57	ACTIVE57
-+Field	56	ACTIVE56
-+Field	55	ACTIVE55
-+Field	54	ACTIVE54
-+Field	53	ACTIVE53
-+Field	52	ACTIVE52
-+Field	51	ACTIVE51
-+Field	50	ACTIVE50
-+Field	49	ACTIVE49
-+Field	48	ACTIVE48
-+Field	47	ACTIVE47
-+Field	46	ACTIVE46
-+Field	45	ACTIVE45
-+Field	44	ACTIVE44
-+Field	43	ACTIVE43
-+Field	42	ACTIVE42
-+Field	41	ACTIVE41
-+Field	40	ACTIVE40
-+Field	39	ACTIVE39
-+Field	38	ACTIVE38
-+Field	37	ACTIVE37
-+Field	36	ACTIVE36
-+Field	35	ACTIVE35
-+Field	34	ACTIVE34
-+Field	33	ACTIVE33
-+Field	32	ACTIVE32
-+Field	31	ACTIVE31
-+Field	30	ACTIVE30
-+Field	29	ACTIVE29
-+Field	28	ACTIVE28
-+Field	27	ACTIVE27
-+Field	26	ACTIVE26
-+Field	25	ACTIVE25
-+Field	24	ACTIVE24
-+Field	23	ACTIVE23
-+Field	22	ACTIVE22
-+Field	21	ACTIVE21
-+Field	20	ACTIVE20
-+Field	19	ACTIVE19
-+Field	18	ACTIVE18
-+Field	17	ACTIVE17
-+Field	16	ACTIVE16
-+Field	15	ACTIVE15
-+Field	14	ACTIVE14
-+Field	13	ACTIVE13
-+Field	12	ACTIVE12
-+Field	11	ACTIVE11
-+Field	10	ACTIVE10
-+Field	9	ACTIVE9
-+Field	8	ACTIVE8
-+Field	7	ACTIVE7
-+Field	6	ACTIVE6
-+Field	5	ACTIVE5
-+Field	4	ACTIVE4
-+Field	3	ACTIVE3
-+Field	2	ACTIVE2
-+Field	1	ACTIVE1
-+Field	0	ACTIVE0
-+EndSysregFields
++	cpu_if->vgic_ich_ppi_enabler_exit[0] =3D
++		read_sysreg_s(SYS_ICH_PPI_ENABLER0_EL2);
++	cpu_if->vgic_ich_ppi_enabler_exit[1] =3D
++		read_sysreg_s(SYS_ICH_PPI_ENABLER1_EL2);
 +
-+Sysreg	ICH_PPI_ACTIVER0_EL2	3	4	12	10	6
-+Fields ICH_PPI_ACTIVERx_EL2
-+EndSysreg
++	cpu_if->vgic_ppi_pendr_exit[0] =3D read_sysreg_s(SYS_ICH_PPI_PENDR0_EL2);
++	cpu_if->vgic_ppi_pendr_exit[1] =3D read_sysreg_s(SYS_ICH_PPI_PENDR1_EL2);
 +
-+Sysreg	ICH_PPI_ACTIVER1_EL2	3	4	12	10	7
-+Fields ICH_PPI_ACTIVERx_EL2
-+EndSysreg
++	cpu_if->vgic_ppi_priorityr[0] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR0_EL2);
++	cpu_if->vgic_ppi_priorityr[1] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR1_EL2);
++	cpu_if->vgic_ppi_priorityr[2] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR2_EL2);
++	cpu_if->vgic_ppi_priorityr[3] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR3_EL2);
++	cpu_if->vgic_ppi_priorityr[4] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR4_EL2);
++	cpu_if->vgic_ppi_priorityr[5] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR5_EL2);
++	cpu_if->vgic_ppi_priorityr[6] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR6_EL2);
++	cpu_if->vgic_ppi_priorityr[7] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR7_EL2);
++	cpu_if->vgic_ppi_priorityr[8] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR8_EL2);
++	cpu_if->vgic_ppi_priorityr[9] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR9_EL2);
++	cpu_if->vgic_ppi_priorityr[10] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR10_EL2);
++	cpu_if->vgic_ppi_priorityr[11] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR11_EL2);
++	cpu_if->vgic_ppi_priorityr[12] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR12_EL2);
++	cpu_if->vgic_ppi_priorityr[13] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR13_EL2);
++	cpu_if->vgic_ppi_priorityr[14] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR14_EL2);
++	cpu_if->vgic_ppi_priorityr[15] =3D
++		read_sysreg_s(SYS_ICH_PPI_PRIORITYR15_EL2);
 +
- Sysreg	ICH_HCR_EL2	3	4	12	11	0
- Res0	63:32
- Field	31:27	EOIcount
-@@ -4669,6 +5054,18 @@ Field	1	V3
- Field	0	En
- EndSysreg
++	/* Now that we are done, disable DVI */
++	write_sysreg_s(0, SYS_ICH_PPI_DVIR0_EL2);
++	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
++}
++
++void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
++{
++	 /* Now enable DVI so that the guest's interrupt config takes over */
++	 write_sysreg_s(cpu_if->vgic_ppi_dvir[0], SYS_ICH_PPI_DVIR0_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_dvir[1], SYS_ICH_PPI_DVIR1_EL2);
++
++	 write_sysreg_s(cpu_if->vgic_ppi_activer_entry[0],
++			SYS_ICH_PPI_ACTIVER0_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_activer_entry[1],
++			SYS_ICH_PPI_ACTIVER1_EL2);
++
++	 write_sysreg_s(cpu_if->vgic_ich_ppi_enabler_entry[0],
++			SYS_ICH_PPI_ENABLER0_EL2);
++	 write_sysreg_s(cpu_if->vgic_ich_ppi_enabler_entry[1],
++			SYS_ICH_PPI_ENABLER1_EL2);
++
++	 /* Update the pending state of the NON-DVI'd PPIs, only */
++	 write_sysreg_s(cpu_if->vgic_ppi_pendr_entry[0] &
++				~cpu_if->vgic_ppi_dvir[0],
++			SYS_ICH_PPI_PENDR0_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_pendr_entry[1] &
++				~cpu_if->vgic_ppi_dvir[1],
++			SYS_ICH_PPI_PENDR1_EL2);
++
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[0],
++			SYS_ICH_PPI_PRIORITYR0_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[1],
++			SYS_ICH_PPI_PRIORITYR1_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[2],
++			SYS_ICH_PPI_PRIORITYR2_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[3],
++			SYS_ICH_PPI_PRIORITYR3_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[4],
++			SYS_ICH_PPI_PRIORITYR4_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[5],
++			SYS_ICH_PPI_PRIORITYR5_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[6],
++			SYS_ICH_PPI_PRIORITYR6_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[7],
++			SYS_ICH_PPI_PRIORITYR7_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[8],
++			SYS_ICH_PPI_PRIORITYR8_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[9],
++			SYS_ICH_PPI_PRIORITYR9_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[10],
++			SYS_ICH_PPI_PRIORITYR10_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[11],
++			SYS_ICH_PPI_PRIORITYR11_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[12],
++			SYS_ICH_PPI_PRIORITYR12_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[13],
++			SYS_ICH_PPI_PRIORITYR13_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[14],
++			SYS_ICH_PPI_PRIORITYR14_EL2);
++	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[15],
++			SYS_ICH_PPI_PRIORITYR15_EL2);
++}
++
++void __vgic_v5_save_icsr(struct vgic_v5_cpu_if *cpu_if)
++{
++	cpu_if->vgic_icsr =3D read_sysreg_s(SYS_ICC_ICSR_EL1);
++}
++
++void __vgic_v5_restore_icsr(struct vgic_v5_cpu_if *cpu_if)
++{
++	write_sysreg_s(cpu_if->vgic_icsr, SYS_ICC_ICSR_EL1);
++}
+diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makef=
+ile
+index afc4aed9231ac..fcf5e68ab591c 100644
+--- a/arch/arm64/kvm/hyp/vhe/Makefile
++++ b/arch/arm64/kvm/hyp/vhe/Makefile
+@@ -10,4 +10,4 @@ CFLAGS_switch.o +=3D -Wno-override-init
 =20
-+Sysreg	ICH_CONTEXTR_EL2	3	4	12	11	6
-+Field	63	V
-+Field	62	F
-+Field	61	IRICHPPIDIS
-+Field	60	DB
-+Field	59:55	DBPM
-+Res0	54:48
-+Field	47:32	VPE
-+Res0	31:16
-+Field	15:0	VM
-+EndSysreg
-+
- Sysreg	ICH_VMCR_EL2	3	4	12	11	7
- Prefix	FEAT_GCIE
- Res0	63:32
-@@ -4690,6 +5087,89 @@ Field	1	VENG1
- Field	0	VENG0
- EndSysreg
+ obj-y :=3D timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o
+ obj-y +=3D ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.=
+o \
+-	 ../fpsimd.o ../hyp-entry.o ../exception.o
++	 ../fpsimd.o ../hyp-entry.o ../exception.o ../vgic-v5.o
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index fbbaef4ad2114..525c8b83e83c9 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -359,7 +359,35 @@ struct vgic_v3_cpu_if {
+ };
 =20
-+SysregFields	ICH_PPI_PRIORITYRx_EL2
-+Res0	63:61
-+Field	60:56	Priority7
-+Res0	55:53
-+Field	52:48	Priority6
-+Res0	47:45
-+Field	44:40	Priority5
-+Res0	39:37
-+Field	36:32	Priority4
-+Res0	31:29
-+Field	28:24	Priority3
-+Res0	23:21
-+Field	20:16	Priority2
-+Res0	15:13
-+Field	12:8	Priority1
-+Res0	7:5
-+Field	4:0	Priority0
-+EndSysregFields
+ struct vgic_v5_cpu_if {
++	u64	vgic_apr;
++	u64	vgic_vmcr;
 +
-+Sysreg	ICH_PPI_PRIORITYR0_EL2	3	4	12	14	0
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
++	/* PPI register state */
+ 	u64	vgic_ppi_hmr[2];
++	u64	vgic_ppi_dvir[2];
++	u64	vgic_ppi_priorityr[16];
 +
-+Sysreg	ICH_PPI_PRIORITYR1_EL2	3	4	12	14	1
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
++	/* The pending state of the guest. This is merged with the exit state */
++	u64	vgic_ppi_pendr[2];
 +
-+Sysreg	ICH_PPI_PRIORITYR2_EL2	3	4	12	14	2
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
++	/* The state flushed to the regs when entering the guest */
++	u64	vgic_ppi_activer_entry[2];
++	u64	vgic_ich_ppi_enabler_entry[2];
++	u64	vgic_ppi_pendr_entry[2];
 +
-+Sysreg	ICH_PPI_PRIORITYR3_EL2	3	4	12	14	3
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
++	/* The saved state of the regs when leaving the guest */
++	u64	vgic_ppi_activer_exit[2];
++	u64	vgic_ich_ppi_enabler_exit[2];
++	u64	vgic_ppi_pendr_exit[2];
 +
-+Sysreg	ICH_PPI_PRIORITYR4_EL2	3	4	12	14	4
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR5_EL2	3	4	12	14	5
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR6_EL2	3	4	12	14	6
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR7_EL2	3	4	12	14	7
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR8_EL2	3	4	12	15	0
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR9_EL2	3	4	12	15	1
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR10_EL2	3	4	12	15	2
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR11_EL2	3	4	12	15	3
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR12_EL2	3	4	12	15	4
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR13_EL2	3	4	12	15	5
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR14_EL2	3	4	12	15	6
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
-+Sysreg	ICH_PPI_PRIORITYR15_EL2	3	4	12	15	7
-+Fields	ICH_PPI_PRIORITYRx_EL2
-+EndSysreg
-+
- Sysreg	CONTEXTIDR_EL2	3	4	13	0	1
- Fields	CONTEXTIDR_ELx
- EndSysreg
++	/*
++	 * The ICSR is re-used across host and guest, and hence it needs to be
++	 * saved/restored. Only one copy is required as the host should block
++	 * preemption between executing GIC CDRCFG and acccessing the
++	 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
++	 * it is the hyp's responsibility to keep the state constistent.
++	 */
++	u64	vgic_icsr;
+ };
+=20
+ struct vgic_cpu {
 --=20
 2.34.1
