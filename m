@@ -1,111 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894003128D5;
-	Fri, 12 Dec 2025 09:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EDD312831
+	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 09:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765532125; cv=none; b=J1fX/bvrsG/JQ/ZogthMwQQ13HRs1jpMvQLLmsgAXQkm3fAN+P7PyH1XidVTdUqOYVG7q+5eiUqCqN6LMsUulcDEQGuvo+MSzNhI/QUGSLKTW9RbCHS8EyDKBrRdD3Vw8FsxzCGEn1/mUR+okqeLsiyk51ssutXJY5k4mcqMf20=
+	t=1765532391; cv=none; b=a+0navfGhHPMPTZEHp8nltfmS1TJXMA584UB5oANx/YQe8bQdjSj2e1VmQun35RughkKCaRxilvMCKsGhZhR3s3GE+dcr/RIsqzAcUkZ+23mgaTc8lhb8pMvAcsCKP8sjKOGIXDg8Qg259lMBE1v7bFSYO17ksxSun0sMv/gHXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765532125; c=relaxed/simple;
-	bh=+BSLacMfi0BHhMkyCl+CLC3JdH9HxLNCmhjKs+lJdRs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KeUomaoBltlbMmzlcr6uhoHWcJrl8VwK8WU9FX93pJxtNk/7rvQmAnQJPL7Kd+jJdUQVxswY1/ZG9S/p24R2gLr1fjrP9KdYODQA78HDXV7jVUIY7SFO3u4Z/RrkiQUs+1DF8iuKbzT/yd9WqFnp9DhPojrQiDvKUvyyobM6mMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R36EmrrV; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R36EmrrV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EC46C4CEF1;
-	Fri, 12 Dec 2025 09:35:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765532125;
-	bh=+BSLacMfi0BHhMkyCl+CLC3JdH9HxLNCmhjKs+lJdRs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=R36EmrrVbMMM4TfYdg7tUa46rj5Ka4V8ujjYINr/6Yjxk9eMzrwaFWtLa5PGHd27w
-	 CCvoBByxSAzeEQX2T+YXwahg5SFUcxKT6g2TS3xTsntYTnClIdixx5wMbzkxgDi7IZ
-	 4e93Z3xPBuefeRNUbuqtaDWENTKGMXGl5I43labSkqG7l77Gvx5Nr/8/RQIyJiI6if
-	 D13bq+Cq2hwzKQdwY+27i+rqa0D7zyy9TEkuGz8BEmbeSP08A3Rb0XzBmz2nJMgcJ+
-	 GrlzBasJxcEXbZXeGBh0GxdwYerxxivrdcslzHBIApWXVStrGtOJ+52hwd5bMj4WR7
-	 OEJ2fjGn+jX8g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vTzYY-0000000CCWV-3c5g;
-	Fri, 12 Dec 2025 09:35:22 +0000
-Date: Fri, 12 Dec 2025 09:35:22 +0000
-Message-ID: <86pl8kniud.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Osama Abdelkader <osama.abdelkader@gmail.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Timothy Hayes <timothy.hayes@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Jing Zhang <jingzhangos@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: simplify vgic_v3_redist_region_full()
-In-Reply-To: <20251211225114.20474-1-osama.abdelkader@gmail.com>
-References: <20251211225114.20474-1-osama.abdelkader@gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1765532391; c=relaxed/simple;
+	bh=e5QOsR0BNFelxy02wdhwDwZe2B8E7CbpolBFmlg6keM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rVDKiBeur6227RHQuPfDukjSQ//YrMt1Lz3nXzpoHrRCzzwlruwY51fPhHgYT0ALchAzdHq+ZiL+6otFlOU+Lcw/su2uxRCTXphDu3AC3H+iJU2Mf51R1chfGgTyfnYtO1WIERVxWKgNEl56I6PCphkCtOd4HJJg9P6SagMbDnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AB9C1063;
+	Fri, 12 Dec 2025 01:39:41 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 99A143F73B;
+	Fri, 12 Dec 2025 01:39:46 -0800 (PST)
+Date: Fri, 12 Dec 2025 09:39:43 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Leo Yan <leo.yan@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
+	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, james.clark@linaro.org,
+	mark.rutland@arm.com, james.morse@arm.com
+Subject: Re: [RFC PATCH v6 01/35] arm64/sysreg: Add new SPE fields
+Message-ID: <aTvi33vLZU5S9CoM@raptor>
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-2-alexandru.elisei@arm.com>
+ <20251210183827.GA3920451@e132581.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: osama.abdelkader@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, timothy.hayes@arm.com, Sascha.Bischoff@arm.com, rananta@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210183827.GA3920451@e132581.arm.com>
 
-On Thu, 11 Dec 2025 22:51:09 +0000,
-Osama Abdelkader <osama.abdelkader@gmail.com> wrote:
+Hi Leo,
+
+On Wed, Dec 10, 2025 at 06:38:27PM +0000, Leo Yan wrote:
+> On Fri, Nov 14, 2025 at 04:06:42PM +0000, Alexandru Elisei wrote:
 > 
-> Simplify the function by converting the if-return-false pattern to a
-> direct boolean expression return, making the code more concise and
-> readable.
+> [...]
 > 
-> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
-> ---
->  arch/arm64/kvm/vgic/vgic.h | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
+> >  Sysreg	PMBIDR_EL1	3	0	9	10	7
+> > -Res0	63:12
+> > +Res0	63:48
+> > +Field	47:32	MaxBuffSize
+> > +Res0	31:12
+> >  Enum	11:8	EA
+> >  	0b0000	NotDescribed
+> >  	0b0001	Ignored
+> >  	0b0010	SError
+> >  EndEnum
+> > -Res0	7:6
+> > +Enum	7:6	AddrMode
+> > +	0b00	VM_ONLY
+> > +	0b01	BOTH
+> > +	0b10	RESERVED
+> > +	0b11	nVM_ONLY
+> > +EndEnum
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 5f0fc96b4dc2..04dd2055e7df 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -382,10 +382,7 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
->  static inline bool
->  vgic_v3_redist_region_full(struct vgic_redist_region *region)
->  {
-> -	if (!region->count)
-> -		return false;
-> -
-> -	return (region->free_index >= region->count);
-> +	return region->count > 0 && region->free_index >= region->count;
->  }
->  
->  struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
+> Not sure how to select the enum names, but seems names above don't match
+> well to the definitions.  How about:
+> 
+>   Enum  7:6     AddrMode
+>         0b00    VA_ONLY         // Virtual address only
+>         0b01    VA_PA           // Virtual and physical address supported
+>         0b10    RESERVED
+>         0b11    VM_PA_ONLY      // Physical address only in VM
 
-This is not clearer. Checking for 0 is pretty important as it outlines
-a specific condition, which is why this is written as a separate
-statement.
+Why not, but I would name the last value PA_ONLY.
 
-Please stop sending patches that are only aligning things to your
-personal taste. There is no shortage of real problems to fix in the
-kernel, your time is better spent on that, and mine on reviewing
-useful patches.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Alex
