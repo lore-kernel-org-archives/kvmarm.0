@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5492D94AA;
-	Fri, 12 Dec 2025 09:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894003128D5;
+	Fri, 12 Dec 2025 09:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765531716; cv=none; b=HC1oMvd1u2zRHSa0XFS30GrIeeeVEIAXwF9jsHdjS0treMfoAYznzImCB5gldr+mwdfRDa3uFiWJ4UOuDlqRbPYFV6YQX4VfXMvuVHg8axO76iZADEWQx++xjVzlW4uzuC7dfNxCQFSOycVCNpBoJrbzRvUfV9J28Sq5/v18okQ=
+	t=1765532125; cv=none; b=J1fX/bvrsG/JQ/ZogthMwQQ13HRs1jpMvQLLmsgAXQkm3fAN+P7PyH1XidVTdUqOYVG7q+5eiUqCqN6LMsUulcDEQGuvo+MSzNhI/QUGSLKTW9RbCHS8EyDKBrRdD3Vw8FsxzCGEn1/mUR+okqeLsiyk51ssutXJY5k4mcqMf20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765531716; c=relaxed/simple;
-	bh=W0rU0ZoF6KH9m1aZIblf+y0H8Wfvx3C1oFibvVqu4v0=;
+	s=arc-20240116; t=1765532125; c=relaxed/simple;
+	bh=+BSLacMfi0BHhMkyCl+CLC3JdH9HxLNCmhjKs+lJdRs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hhc08gOVLB8Sjr+jYqI8t3BFPp4ZmZS6YTIElxlVJYT6Sb9hlZjYHfgnFFA+ok9XcDLQRbCajbXXjHLSye1HKIx9PcYH8wy4ndAc90DIfb9CZo58d9i+KYBvihwRJ0VphO7ZHgXXfz+XxiiyvRVgdtYsfU4wsRwQOD0H4xW9TZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RotuDtiU; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=KeUomaoBltlbMmzlcr6uhoHWcJrl8VwK8WU9FX93pJxtNk/7rvQmAnQJPL7Kd+jJdUQVxswY1/ZG9S/p24R2gLr1fjrP9KdYODQA78HDXV7jVUIY7SFO3u4Z/RrkiQUs+1DF8iuKbzT/yd9WqFnp9DhPojrQiDvKUvyyobM6mMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R36EmrrV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RotuDtiU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2462EC4CEF1;
-	Fri, 12 Dec 2025 09:28:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R36EmrrV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EC46C4CEF1;
+	Fri, 12 Dec 2025 09:35:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765531716;
-	bh=W0rU0ZoF6KH9m1aZIblf+y0H8Wfvx3C1oFibvVqu4v0=;
+	s=k20201202; t=1765532125;
+	bh=+BSLacMfi0BHhMkyCl+CLC3JdH9HxLNCmhjKs+lJdRs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RotuDtiUo6aJuiOF1avUBU/UsoYG9796vH4RbeE/SUGdNbZbbhSWiTOrxZeuTwUGu
-	 DtVTfUt4Ug8l0YjTmDpC5yUjq+lIlucwd79j1J8aGjGaOzsKyf8FCxRkiqKDYm2ztM
-	 PqH3GAExY5DahWOFRiStK2fAFJthLKY19zhvwYK4FXLVtv9JLrBW6J+5RZoqmDHKvd
-	 o4/ci8WUb5pH9m7aAkwEBAFK8viEYDVm8m1Af+JRu+9lC7DTa4l+zYCaAUKN5flf6y
-	 c060QJWRAUIOUTmebE9mEKoP+TZxTmtL277Z+8zsyV3Dr5cy8kR8HZbnW7VlAURTrw
-	 Nf3gWN2JRBi/g==
+	b=R36EmrrVbMMM4TfYdg7tUa46rj5Ka4V8ujjYINr/6Yjxk9eMzrwaFWtLa5PGHd27w
+	 CCvoBByxSAzeEQX2T+YXwahg5SFUcxKT6g2TS3xTsntYTnClIdixx5wMbzkxgDi7IZ
+	 4e93Z3xPBuefeRNUbuqtaDWENTKGMXGl5I43labSkqG7l77Gvx5Nr/8/RQIyJiI6if
+	 D13bq+Cq2hwzKQdwY+27i+rqa0D7zyy9TEkuGz8BEmbeSP08A3Rb0XzBmz2nJMgcJ+
+	 GrlzBasJxcEXbZXeGBh0GxdwYerxxivrdcslzHBIApWXVStrGtOJ+52hwd5bMj4WR7
+	 OEJ2fjGn+jX8g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vTzRx-0000000CCQb-3IyC;
-	Fri, 12 Dec 2025 09:28:33 +0000
-Date: Fri, 12 Dec 2025 09:28:33 +0000
-Message-ID: <86qzt0nj5q.wl-maz@kernel.org>
+	id 1vTzYY-0000000CCWV-3c5g;
+	Fri, 12 Dec 2025 09:35:22 +0000
+Date: Fri, 12 Dec 2025 09:35:22 +0000
+Message-ID: <86pl8kniud.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Osama Abdelkader <osama.abdelkader@gmail.com>
 Cc: Oliver Upton <oupton@kernel.org>,
@@ -42,12 +42,16 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
+	Timothy Hayes <timothy.hayes@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Jing Zhang <jingzhangos@google.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: vgic: add default case to switch statement
-In-Reply-To: <20251211224033.18079-1-osama.abdelkader@gmail.com>
-References: <20251211224033.18079-1-osama.abdelkader@gmail.com>
+Subject: Re: [PATCH] KVM: arm64: vgic: simplify vgic_v3_redist_region_full()
+In-Reply-To: <20251211225114.20474-1-osama.abdelkader@gmail.com>
+References: <20251211225114.20474-1-osama.abdelkader@gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,68 +63,47 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: osama.abdelkader@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: osama.abdelkader@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, timothy.hayes@arm.com, Sascha.Bischoff@arm.com, rananta@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 11 Dec 2025 22:40:28 +0000,
+On Thu, 11 Dec 2025 22:51:09 +0000,
 Osama Abdelkader <osama.abdelkader@gmail.com> wrote:
 > 
-> The switch statement in vgic_validate_injection() handles all enum
-> values for irq->config, but lacked a default case. Add one to match
-> the pattern used in other switch statements in the same file and make
+> Simplify the function by converting the if-return-false pattern to a
+> direct boolean expression return, making the code more concise and
+> readable.
+> 
+> Signed-off-by: Osama Abdelkader <osama.abdelkader@gmail.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic.h | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 5f0fc96b4dc2..04dd2055e7df 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -382,10 +382,7 @@ static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+>  static inline bool
+>  vgic_v3_redist_region_full(struct vgic_redist_region *region)
+>  {
+> -	if (!region->count)
+> -		return false;
+> -
+> -	return (region->free_index >= region->count);
+> +	return region->count > 0 && region->free_index >= region->count;
+>  }
+>  
+>  struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rdregs);
 
-News flash: there is no other switch statement in this file. This is
-the only one.
+This is not clearer. Checking for 0 is pretty important as it outlines
+a specific condition, which is why this is written as a separate
+statement.
 
-> the defensive return explicit.
-
-I'd suggest you read the code more carefully, and consider the
-following observations:
-
-enum vgic_irq_config {
-	VGIC_CONFIG_EDGE = 0,
-	VGIC_CONFIG_LEVEL
-};
-
-struct vgic_irq {
-	[...]
-	enum vgic_irq_config config:1;	/* Level or edge */
-	[...]
-};
-
-With these two definitions in mind, let's revisit the function you are
-patching:
-
-static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owner)
-{
-	[...]
-
-	switch (irq->config) {
-	case VGIC_CONFIG_LEVEL:
-		return irq->line_level != level;
-	case VGIC_CONFIG_EDGE:
-		return level;
-	}
-
-	return false;
-}
-
-Please explain how it is possible that the switch does not cover
-*exhaustively* all the possible values that are constraint to exactly
-One. Single. Bit? How adding a default case makes things better? The
-compiler already knows that we are covering all the possible values of
-the enum (yes, even a C compiler can achieve that), so it can *prove*
-that there is no need for a default.
-
-If anything, I'd have expected a patch dropping the last return, as it
-is remarkably pointless. But just moving it? What does it change?
-
-I'd suggest you think a bit more before posting random patches and
-wasting people's time. I spent a good 15 minutes writing this, which
-you could have used yourself to realise this change is pointless.
-
-Thanks,
+Please stop sending patches that are only aligning things to your
+personal taste. There is no shortage of real problems to fix in the
+kernel, your time is better spent on that, and mine on reviewing
+useful patches.
 
 	M.
 
