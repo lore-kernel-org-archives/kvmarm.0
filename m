@@ -1,66 +1,65 @@
-Received: from mail-oi1-f202.google.com (mail-oi1-f202.google.com [209.85.167.202])
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com [209.85.210.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725F030DD35
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 20:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3365E2F6577
+	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 21:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765572882; cv=none; b=neW1CS81G0vzgfj9iP63EOizqzPdAWzXdk88/WpB+Mzn2zMHPUxeXciQ+AfZusmME0T4RRL2aSw76lmOjNZ/dRB0N4LjgVbYlP5YoQgZXAHi3jbxlUy+YSWN7uketnru8M9XGlN8lwv2Mldtd1m5IJR3nZ/IEvghfjinhUOh9sQ=
+	t=1765573617; cv=none; b=fRnpkZCo0n7WPB/NH/2hAyb/fYjym2dD9JdRcVqB3iwpRfqqYituqwzKmvo4KqLkbWxwDaZCV0NVoJxQ/SryuRh94rPEc7yjIteoiUwqYQjTOlApsxQCNOvCq3N/iGWAWVL1Aibw4j73y3hJRIBJG+f8yHZvDwvyhaRPR6D20Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765572882; c=relaxed/simple;
-	bh=KRrYXDgotZ3hkrFWqT2Xxzs4T7VsdVUIUvNsM4Tt2CA=;
+	s=arc-20240116; t=1765573617; c=relaxed/simple;
+	bh=j4zmNXaHcAhBlyQ7iWB1i9Dwg1d4I/P9T1rUCk2IZys=;
 	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Y33X89pC7ZfsvT8b4yTHW5akIGT7w4ndEymYbccE9EKlivf5BlikQamTGKL+UkDptT9tWyF/A3BngkCfuqYKIWBMshnS9fumtRF1aqf7DDhLsWH+gLxddpXvVFkOvowcQboiGa/zJZUPr764aRqDn0xE00yndMzmDqRBEaSBOSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HDTnHavx; arc=none smtp.client-ip=209.85.167.202
+	 Content-Type; b=oigxpBehvCYb8VUzqySkX655ZSYDETbwj+kKVcWzUzVrZwiJE8tD1YgJL5Jipbg97PM0aG8ZmMYlZ0mWH8VFo1mrpWGQiMCs4Ft4XJ0L5STDElLS+VXsWRu2VFEkuPhWRpQZ439pzYNBzD80GF9qWT9JxsrGMgFUf3J4obVHaoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BaL7Zs5H; arc=none smtp.client-ip=209.85.210.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HDTnHavx"
-Received: by mail-oi1-f202.google.com with SMTP id 5614622812f47-45396d397e0so1335671b6e.3
-        for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 12:54:40 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BaL7Zs5H"
+Received: by mail-ot1-f74.google.com with SMTP id 46e09a7af769-7c7046514a2so1503893a34.0
+        for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 13:06:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765572879; x=1766177679; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1765573614; x=1766178414; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=3FXn5oKHBMgqIJsfuynoMoNzKyF0I0AGnsGa5FlNVAQ=;
-        b=HDTnHavxpnntVt2ADSohx0p4fYG9+wPk2TXk9vVh7m1CIq9Ujuu8VQXip2kd/Op4Kg
-         vPXtCOv9TJVXtBXUspGwsjQy57Yj0UHUwar92dOcyENB0igxE3/11Mpu7wLzSVfUty5h
-         BMe/wa0Ejw/3Cmb07GnpJGoxPbykTYdtmsH3WzNM213+iZN6MiTo7u4L8AJFz/PMNsvg
-         tw07Ci93ps8LbM2eLvQVrU3LSOURbt6zYDCzVGxZn3DaJhR3qCPP/cq3Xl1xHxIhMZX4
-         Uanx5lNPTqiTf8B9qd9JNsv+tq4t7B6HTELlYKwTWZjjDNULvJ4nmIhNyzc8e1L4F1FT
-         7n9g==
+        bh=NvEO8IWge7rjEvmTvBLfyyCkg8YrPNESaGlmNB9KmuA=;
+        b=BaL7Zs5Hd6ZSaspW8zp/ZVch1w61zbp+nIzoZ8YCU9dAlgNErTI4W3R78d4bFkn8lQ
+         Z3MR8SyqLL/zBh7Pp7LKQlJ9HqplWQozKsaySWO46+d4Km1jquCMBaM7zTm9CCwVA+NM
+         KPTDvA1peH0qenClKQfPKuWlSAajDbFNO8cZaDYwJK3aZI20YIHThHrjIJjxUMjEttEP
+         RiB2cWCM2P8yGyctFKPjH0EqBqjd/iYV5o7IUywnl64l0vl4bEYmRYE0EP3JCT2r88rZ
+         ZEh5IroJcqpXPeIRu7Bmn2L4VnSdw8+KWxuCgFqcfF11L1v6okgVdOJ4kXyQ4sxJbV1Z
+         1okg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765572879; x=1766177679;
+        d=1e100.net; s=20230601; t=1765573614; x=1766178414;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3FXn5oKHBMgqIJsfuynoMoNzKyF0I0AGnsGa5FlNVAQ=;
-        b=AT52FzdZrhESKnemnyvh3IMtUwtg0cw58XnTdtADKPGokSfdnZCL1CLeTjXwgazVNA
-         mFdBVY+PtSrvPipiGK336Dzd2jY2R0wFpeKHqYVqdYG+8bUl/uZ0BWLT/08vyvGiK9tH
-         sXh7utmPSBg/qGJxx0/cfQMeHFJYdJYfcrGwMKTONz0ymOyTTg2VT1pQpjxdR4Zxq9+W
-         1DLwPzBZImCPW+wEytguoMWdSzhGP1bgw+QiyNnXNNDmiiBqAQRDh+e8qxQyergh02k9
-         1k4WfHPoSUaoT8tP2uAhQsjtVNufEVHzQ9npEyBql8eIxhmXtp864wePMJMr6bU/Y5qu
-         eb8w==
-X-Forwarded-Encrypted: i=1; AJvYcCX09xwDAhwhUCcPWWLVzCrVfZahtwKL5enrkJjiBch3C/xsCMUBZ0zqLI7JveoPEdfkrhk9hkU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzPdvaAfDxwwWRIfe6B40mUEXp4w5b/Ml5tdMhrZYen+IkNIFpO
-	ozE2Adsw80lYn/tcwJyQ3jabStaFvZGaskiQYGsZ/d1Cag2ZF3UUB0B5KF9p2l3Zj+50HjFHdZW
-	iHRWdQ0exSQG34HL8/aYwq3UuTA==
-X-Google-Smtp-Source: AGHT+IH6fb4UumzYsfcjXdyetsttD/1JFDYI7F758xyq6M3c7XHveoyP9rAiScoRQhR1KR8axHNUmY6AiGo2XvKjTQ==
-X-Received: from oaeh14.prod.google.com ([2002:a05:6870:170e:b0:3f5:b0db:411a])
+        bh=NvEO8IWge7rjEvmTvBLfyyCkg8YrPNESaGlmNB9KmuA=;
+        b=EkNJ6KGbiK1pR5Fw/cCyyZc8j/0np02/FrwSlUD2+1maf9I3OTtPk+9bEKyzbrtXpD
+         54AAZhhv56jN2YUSqq98SdrGTYCu7MjLOtskzbxlPwLMio5aDSDCqmXgQF/yEsaSwKmC
+         Q7YTeYzQk2C27FVTXnJ4begWdBpBNcIDSd/b3gcBkLDyQpkWFmCiLn1FTK3G/1ybWnT9
+         aOgmMUctC7JOlZOmVhZtyxKU8OEWs/Nx5b0qEJYwb+tdJ23oL7n21NN+Gsw/XJVMQpPo
+         KUXfChOdUbUxy99THzmCiHMkKaWQoug1ZDS3Cp1v12Wb6tMsr/N0+FBh/lmIkSaXpQgM
+         pW5w==
+X-Forwarded-Encrypted: i=1; AJvYcCXk3GZZAnwFDrtuIHE6a77WFpcr+LKrvFH85IO3MIOTQMIlfHSQXnf7E+NsgAD3rR0ZYiJrGMQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx32K/GTdbyzBvGeuUyVSbH8/FIZeWpTQJzfvP40LuilfwSeZAr
+	kyUtTdFWlfeZz2SLD2yIXdjo1s1yGp4EwrB0wJC53cZR5xLlqw8nJ4qLa5b5OvrUQ0Soz3Eot30
+	UO+G3egx7eYgHwUpoBPEAAYNRVw==
+X-Google-Smtp-Source: AGHT+IGLtIUbFameZTVObRWcG+lq04RJyrGiyVy+qxibJohcLHDXgLx6kR5HPWzG4MF6bmkp/GMqRXiYMN5HlbpHeg==
+X-Received: from ilbcb7.prod.google.com ([2002:a05:6e02:3187:b0:430:c30d:ac37])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6808:1814:b0:450:d504:9295 with SMTP id 5614622812f47-455ac957f68mr1619808b6e.44.1765572879590;
- Fri, 12 Dec 2025 12:54:39 -0800 (PST)
-Date: Fri, 12 Dec 2025 20:54:38 +0000
-In-Reply-To: <aTiRG0I1FZzntHtH@kernel.org> (message from Oliver Upton on Tue,
- 9 Dec 2025 13:14:03 -0800)
+ 2002:a05:6820:1899:b0:659:9a49:8dde with SMTP id 006d021491bc7-65b45172277mr1612721eaf.32.1765573614348;
+ Fri, 12 Dec 2025 13:06:54 -0800 (PST)
+Date: Fri, 12 Dec 2025 21:06:53 +0000
+In-Reply-To: <aTiSTODjzaLzwAPN@kernel.org> (message from Oliver Upton on Tue,
+ 9 Dec 2025 13:19:08 -0800)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-Message-ID: <gsntv7ib2zg1.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 12/24] KVM: arm64: Use physical PMSELR for PMXEVTYPER
- if partitioned
+Message-ID: <gsntsedf2yvm.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 13/24] KVM: arm64: Writethrough trapped PMOVS register
 From: Colton Lewis <coltonlewis@google.com>
 To: Oliver Upton <oupton@kernel.org>
 Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
@@ -75,79 +74,76 @@ Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
 Oliver Upton <oupton@kernel.org> writes:
 
-> On Tue, Dec 09, 2025 at 08:51:09PM +0000, Colton Lewis wrote:
->> Because PMXEVTYPER is trapped and PMSELR is not, it is not appropriate
->> to use the virtual PMSELR register when it could be outdated and lead
->> to an invalid write. Use the physical register when partitioned.
+> On Tue, Dec 09, 2025 at 08:51:10PM +0000, Colton Lewis wrote:
+>> Because PMOVS remains trapped, it needs to be written through when
+>> partitioned to affect PMU hardware when expected.
 
 >> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 >> ---
->>   arch/arm64/include/asm/arm_pmuv3.h | 7 ++++++-
->>   arch/arm64/kvm/sys_regs.c          | 9 +++++++--
->>   2 files changed, 13 insertions(+), 3 deletions(-)
+>>   arch/arm64/include/asm/arm_pmuv3.h | 10 ++++++++++
+>>   arch/arm64/kvm/sys_regs.c          | 17 ++++++++++++++++-
+>>   2 files changed, 26 insertions(+), 1 deletion(-)
 
 >> diff --git a/arch/arm64/include/asm/arm_pmuv3.h  
 >> b/arch/arm64/include/asm/arm_pmuv3.h
->> index 27c4d6d47da31..60600f04b5902 100644
+>> index 60600f04b5902..3e25c0313263c 100644
 >> --- a/arch/arm64/include/asm/arm_pmuv3.h
 >> +++ b/arch/arm64/include/asm/arm_pmuv3.h
->> @@ -70,11 +70,16 @@ static inline u64 read_pmcr(void)
->>   	return read_sysreg(pmcr_el0);
+>> @@ -140,6 +140,16 @@ static inline u64 read_pmicfiltr(void)
+>>   	return read_sysreg_s(SYS_PMICFILTR_EL0);
 >>   }
 
->> -static inline void write_pmselr(u32 val)
->> +static inline void write_pmselr(u64 val)
->>   {
->>   	write_sysreg(val, pmselr_el0);
->>   }
-
->> +static inline u64 read_pmselr(void)
+>> +static inline void write_pmovsset(u64 val)
 >> +{
->> +	return read_sysreg(pmselr_el0);
+>> +	write_sysreg(val, pmovsset_el0);
 >> +}
 >> +
->>   static inline void write_pmccntr(u64 val)
+>> +static inline u64 read_pmovsset(void)
+>> +{
+>> +	return read_sysreg(pmovsset_el0);
+>> +}
+>> +
+>>   static inline void write_pmovsclr(u64 val)
 >>   {
->>   	write_sysreg(val, pmccntr_el0);
+>>   	write_sysreg(val, pmovsclr_el0);
 >> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index 0c9596325519b..2e6d907fa8af2 100644
+>> index 2e6d907fa8af2..bee892db9ca8b 100644
 >> --- a/arch/arm64/kvm/sys_regs.c
 >> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -1199,14 +1199,19 @@ static bool writethrough_pmevtyper(struct  
->> kvm_vcpu *vcpu, struct sys_reg_params
->>   static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct  
->> sys_reg_params *p,
->>   			       const struct sys_reg_desc *r)
->>   {
->> -	u64 idx, reg;
->> +	u64 idx, reg, pmselr;
+>> @@ -1307,6 +1307,19 @@ static bool access_pminten(struct kvm_vcpu *vcpu,  
+>> struct sys_reg_params *p,
+>>   	return true;
+>>   }
 
->>   	if (pmu_access_el0_disabled(vcpu))
->>   		return false;
+>> +static void writethrough_pmovs(struct kvm_vcpu *vcpu, struct  
+>> sys_reg_params *p, bool set)
+>> +{
+>> +	u64 mask = kvm_pmu_accessible_counter_mask(vcpu);
+>> +
+>> +	if (set) {
+>> +		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, |=, (p->regval & mask));
+>> +		write_pmovsset(p->regval & mask);
+>> +	} else {
+>> +		__vcpu_rmw_sys_reg(vcpu, PMOVSSET_EL0, &=, ~(p->regval & mask));
+>> +		write_pmovsclr(p->regval & mask);
+>> +	}
 
->>   	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
->>   		/* PMXEVTYPER_EL0 */
->> -		idx = SYS_FIELD_GET(PMSELR_EL0, SEL, __vcpu_sys_reg(vcpu,  
->> PMSELR_EL0));
->> +		if (kvm_vcpu_pmu_is_partitioned(vcpu))
->> +			pmselr = read_pmselr();
->> +		else
->> +			pmselr = __vcpu_sys_reg(vcpu, PMSELR_EL0);
+> There's only ever a single canonical guest view of a register. Either it  
+> has
+> been loaded onto the CPU or it is in memory, writing the value to two
+> different locations is odd. What guarantees the guest context is on the
+> CPU currently? And what about preemption?
 
-> This isn't preemption safe. Nor should the "if (partitioned) do X else do  
-> Y" get
-> open-coded throughout the shop.
+My thinking here was pmovs is trapped so the "canonical" view is in
+memory, but the guest still expects it to have an effect immediately.
 
-Okay. I had not known the register access stuff wasn't. I'll fix that.
+Otherwise we would have to wait until the next load before the value
+makes it to hardware. Are you okay with that latency? I'm not sure
+how well that's going to work. Consider PMEVTYPER as an example. If I
+don't write it to hardware immediately, a guest may expect a counter to
+start counting as soon as it is written, but if it's only in memory the
+counter won't start until the next load.
 
-
-> I would rather this be handled with a prepatory patch that provides
-> generic PMU register accessors to the rest of KVM (e.g.
-> vcpu_read_pmu_reg() / vcpu_write_pmu_reg()). Internally those helpers
-> can locate the vCPU's PMU registers (emulated, partitioned in-memory,
-> partitioned in-CPU).
-
-That seems like a good idea.
-
-> Thanks,
-> Oliver
+Echoing discussion on the previous patch, I wasn't aware preemption was
+possible while servicing these register writes. I'll figure out how to
+account for that.
