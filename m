@@ -1,110 +1,128 @@
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7292BDC0E
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 09:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5492D94AA;
+	Fri, 12 Dec 2025 09:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765531333; cv=none; b=YHSMmgiJ4vJC6BKNye0q/6BDItYsKeDeBh80zOl/1oygNn/lEJ34oYhkvxqN0NHpY9BnzDiu28gdPODBRgGHQwZNESvOX2bPN9foj66URH+brfMOGgWO3EFZmF3131W1rU/XclXoFa6+UmVniah0trYEhJPjH5UKCY1ioN5cry4=
+	t=1765531716; cv=none; b=HC1oMvd1u2zRHSa0XFS30GrIeeeVEIAXwF9jsHdjS0treMfoAYznzImCB5gldr+mwdfRDa3uFiWJ4UOuDlqRbPYFV6YQX4VfXMvuVHg8axO76iZADEWQx++xjVzlW4uzuC7dfNxCQFSOycVCNpBoJrbzRvUfV9J28Sq5/v18okQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765531333; c=relaxed/simple;
-	bh=04tB4MdBbE3k8czrCSAhdUggbwlMaR9/T03/le8K7gY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JK8+/FC6vM7OFK7vuJRYE8utO+t4TIob0u8cZiL+PEO0iha63JLDTpiWx5DN7z7ZFNLIQPZTx6Hlp4aRB8NNakCTfMC4CG89tTow7L8u3CgCxSu4Z4jWJ+VQfNyua1ZB28gpGsmk+QD4EX+7MWvaD1Lw+5+duJQflJaHDaDFmEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eBZ7zu2o; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1765531716; c=relaxed/simple;
+	bh=W0rU0ZoF6KH9m1aZIblf+y0H8Wfvx3C1oFibvVqu4v0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hhc08gOVLB8Sjr+jYqI8t3BFPp4ZmZS6YTIElxlVJYT6Sb9hlZjYHfgnFFA+ok9XcDLQRbCajbXXjHLSye1HKIx9PcYH8wy4ndAc90DIfb9CZo58d9i+KYBvihwRJ0VphO7ZHgXXfz+XxiiyvRVgdtYsfU4wsRwQOD0H4xW9TZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RotuDtiU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eBZ7zu2o"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=z4vPaiUk9n/GpIxutnAk0NTSeMO9iODdip7MeYu98yA=;
-	b=eBZ7zu2ox8ryH+r6AugMOCYGdskTgvt4HVyTB0sNWJZuu6AwqpHtUJ674NWi8oVHhZqLLb8Fe
-	9+6XJ13bHSi7juapcNkdSCOlj5bwH+XCJogKs9+MppIMgyb9nZajKcNlh/7ZzT71idEJ7zWb7e1
-	gwacD2hwUuyP493g1H7y+vg=
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dSP686k3Dzcb0J;
-	Fri, 12 Dec 2025 17:19:12 +0800 (CST)
-Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3634E180BD0;
-	Fri, 12 Dec 2025 17:21:57 +0800 (CST)
-Received: from [10.174.178.219] (10.174.178.219) by
- kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 12 Dec 2025 17:21:55 +0800
-Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
-To: Jiaqi Yan <jiaqiyan@google.com>
-CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <duenwen@google.com>,
-	<rananta@google.com>, <jthoughton@google.com>, <vsethi@nvidia.com>,
-	<jgg@nvidia.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <pbonzini@redhat.com>,
-	<corbet@lwn.net>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
-	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-References: <20251013185903.1372553-1-jiaqiyan@google.com>
- <20251013185903.1372553-3-jiaqiyan@google.com>
- <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
- <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <dbcfb853-5853-5967-1bf9-76c6b3839717@huawei.com>
-Date: Fri, 12 Dec 2025 17:21:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RotuDtiU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2462EC4CEF1;
+	Fri, 12 Dec 2025 09:28:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765531716;
+	bh=W0rU0ZoF6KH9m1aZIblf+y0H8Wfvx3C1oFibvVqu4v0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RotuDtiUo6aJuiOF1avUBU/UsoYG9796vH4RbeE/SUGdNbZbbhSWiTOrxZeuTwUGu
+	 DtVTfUt4Ug8l0YjTmDpC5yUjq+lIlucwd79j1J8aGjGaOzsKyf8FCxRkiqKDYm2ztM
+	 PqH3GAExY5DahWOFRiStK2fAFJthLKY19zhvwYK4FXLVtv9JLrBW6J+5RZoqmDHKvd
+	 o4/ci8WUb5pH9m7aAkwEBAFK8viEYDVm8m1Af+JRu+9lC7DTa4l+zYCaAUKN5flf6y
+	 c060QJWRAUIOUTmebE9mEKoP+TZxTmtL277Z+8zsyV3Dr5cy8kR8HZbnW7VlAURTrw
+	 Nf3gWN2JRBi/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vTzRx-0000000CCQb-3IyC;
+	Fri, 12 Dec 2025 09:28:33 +0000
+Date: Fri, 12 Dec 2025 09:28:33 +0000
+Message-ID: <86qzt0nj5q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Osama Abdelkader <osama.abdelkader@gmail.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: vgic: add default case to switch statement
+In-Reply-To: <20251211224033.18079-1-osama.abdelkader@gmail.com>
+References: <20251211224033.18079-1-osama.abdelkader@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-In-Reply-To: <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk200017.china.huawei.com (7.202.194.83)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: osama.abdelkader@gmail.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2025/12/12 9:53, Jiaqi Yan wrote:
-> On Thu, Dec 11, 2025 at 5:02 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
-> >
-> > I can also hit this ASSERT with:
-> >
-> > Random seed: 0x6b8b4567
-> > # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-> > # Before EINJect: data=0xbaadcafe
-> > # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
-> > einj_hpa=0x2841234bad
-> > # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-> > # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-> > # echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
-> > # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-> > # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-> > # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
-> > # Memory UER EINJected
-> > # Dump kvm_run info about KVM_EXIT_MMIO
-> > # kvm_run.arm_sea: esr=0xffff90ba0040, flags=0x691000
-> > # kvm_run.arm_sea: gva=0x100000008, gpa=0
-> > ==== Test Assertion Failure ====
-> >   arm64/sea_to_user.c:207: exit_reason == (41)
-> >   pid=38023 tid=38023 errno=4 - Interrupted system call
-> >      1  0x0000000000402d1b: run_vm at sea_to_user.c:207
-> >      2  0x0000000000402467: main at sea_to_user.c:330
-> >      3  0x0000ffff9122b03f: ?? ??:0
-> >      4  0x0000ffff9122b117: ?? ??:0
-> >      5  0x00000000004026ef: _start at ??:?
-> >   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
-> >
-> > Not sure what's wrong it..
+On Thu, 11 Dec 2025 22:40:28 +0000,
+Osama Abdelkader <osama.abdelkader@gmail.com> wrote:
 > 
-> Does your test machine have SDEI or SCI enabled for host APEI? Do you
-> see any kernel log from "Memory failure:" saying hugetlb page
-> recovered, and recovered significant earlier than the KVM exit here.
-> It maybe the kernel has already unmapped hugepage in response to SDEI
-> or SCI before this test actually consumes memory error, so no SEA is
-> actually triggered.
+> The switch statement in vgic_validate_injection() handles all enum
+> values for irq->config, but lacked a default case. Add one to match
+> the pattern used in other switch statements in the same file and make
 
-No kernel log was printed when I saw this failure.
+News flash: there is no other switch statement in this file. This is
+the only one.
+
+> the defensive return explicit.
+
+I'd suggest you read the code more carefully, and consider the
+following observations:
+
+enum vgic_irq_config {
+	VGIC_CONFIG_EDGE = 0,
+	VGIC_CONFIG_LEVEL
+};
+
+struct vgic_irq {
+	[...]
+	enum vgic_irq_config config:1;	/* Level or edge */
+	[...]
+};
+
+With these two definitions in mind, let's revisit the function you are
+patching:
+
+static bool vgic_validate_injection(struct vgic_irq *irq, bool level, void *owner)
+{
+	[...]
+
+	switch (irq->config) {
+	case VGIC_CONFIG_LEVEL:
+		return irq->line_level != level;
+	case VGIC_CONFIG_EDGE:
+		return level;
+	}
+
+	return false;
+}
+
+Please explain how it is possible that the switch does not cover
+*exhaustively* all the possible values that are constraint to exactly
+One. Single. Bit? How adding a default case makes things better? The
+compiler already knows that we are covering all the possible values of
+the enum (yes, even a C compiler can achieve that), so it can *prove*
+that there is no need for a default.
+
+If anything, I'd have expected a patch dropping the last return, as it
+is remarkably pointless. But just moving it? What does it change?
+
+I'd suggest you think a bit more before posting random patches and
+wasting people's time. I spent a good 15 minutes writing this, which
+you could have used yourself to realise this change is pointless.
 
 Thanks,
-Zenghui
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
