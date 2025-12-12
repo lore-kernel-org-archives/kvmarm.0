@@ -1,176 +1,110 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECC6288C30
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 08:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765526688; cv=pass; b=RXttIbzru/upG8/gG1wowqhEZO2ceRF4+QEI3cwsS+fOg89hD88JMtOiMK7mNjeZ/iG5IDPxJGiw/KpdOpPmOp17uuVsv4sIn5aUXtL5+MjPOSD7/EmP6LhO9mnlWOGZnJxiwdcSTW3Go6jEz2MO/ffQxyQDoi9rcl+cjHaujnM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765526688; c=relaxed/simple;
-	bh=fR2klWCppQaFHnTEKTEWn7Dx8bcRJpNJV4ZE2BoUbt4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ftqrHJbj04zJnZEq5UCIIAh7a6xQDb16jQrrYNuEqzJwFKbjkW8L6PTNTtgDxSN4V+CfYZyewWd6tfZcrBf7YCXYmU41Lhn1OfyqO2mvUXT+iwAcmFaxt0k+ezTeX99FLPzwZgxSU5HfXZcpb7DkPLf/6XBpwcEantcnD0w89N8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=upTR8oKX; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7292BDC0E
+	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 09:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765531333; cv=none; b=YHSMmgiJ4vJC6BKNye0q/6BDItYsKeDeBh80zOl/1oygNn/lEJ34oYhkvxqN0NHpY9BnzDiu28gdPODBRgGHQwZNESvOX2bPN9foj66URH+brfMOGgWO3EFZmF3131W1rU/XclXoFa6+UmVniah0trYEhJPjH5UKCY1ioN5cry4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765531333; c=relaxed/simple;
+	bh=04tB4MdBbE3k8czrCSAhdUggbwlMaR9/T03/le8K7gY=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=JK8+/FC6vM7OFK7vuJRYE8utO+t4TIob0u8cZiL+PEO0iha63JLDTpiWx5DN7z7ZFNLIQPZTx6Hlp4aRB8NNakCTfMC4CG89tTow7L8u3CgCxSu4Z4jWJ+VQfNyua1ZB28gpGsmk+QD4EX+7MWvaD1Lw+5+duJQflJaHDaDFmEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eBZ7zu2o; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="upTR8oKX"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4edb8d6e98aso1237511cf.0
-        for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 00:04:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765526684; cv=none;
-        d=google.com; s=arc-20240605;
-        b=QYQleOZJdklTlWQ8uK8EaDg1a2s9WDYQ/i/JmpJCrO3bwBktRqvEUo9gE+78WhE/r4
-         Jra1sbKLQVkYWuyCVdUxs3cAB+lJFzL9TYD3yc5UOCTg7cDRRbregw58g+o39v4Jauvq
-         O7FqFVIlCTGipIarIDywItjQRDIHR/919e+k0qyZ7CrfGcLNkB73TL+fT9pBEStRj60g
-         5KJj3M7yrK6GbmFpxiMmdBFefE45+RImGbkKFMdMgyMZh1Haxm7UpKDiy/GYf2J0kNNJ
-         qtpfN3MOdeZpOY/8dkdIFZXBc5SoQgeAe9El5zYm4gMy71DrgAbPur1IdDo4pFGjT2tc
-         JOEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=+U8+dNznpFslZOt3jZDGf7JqED9dm8pLESuGBInwRgU=;
-        fh=DVwc+tRCqe7ToMUGYt0SRI0SWsKK+Mu5y3pDhnw4hn4=;
-        b=fsRamQuumf8bD2PaToahaR57LG3wFLl2ka8432QxBl4zbxoOqghydD8OGk4Zz/iRZN
-         P5iZk/b0oBisAFdN0e5jcfzCfvuR4m0PJ0LvSeNidf+H30QcN1/L7nL8samwc+CBF5zK
-         UjoUpqqytGfoAIiY8ia1V8HMI/xeHKuazmo/QlraIF0kzSZ7+euoy0FoS/GO1iA2MKlG
-         KVbuwTmxS9f9CWWXa7vFIOqKEHzh2WuuasnL4ueF7EbyNfAKAlnYz6NedToVqyP626Hb
-         RFwqv8izGUSLpYC4J6LHheoORDky7U16kSxX9DoVJrY/C0Wb3glTVkYJzwcJWuiiW3aG
-         S9TA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765526684; x=1766131484; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+U8+dNznpFslZOt3jZDGf7JqED9dm8pLESuGBInwRgU=;
-        b=upTR8oKXJKVTM7A0wlc0XulTkUd16MlnC1kv6RD6lHT93qw+2SzkQdzCOqweSekaUa
-         BUW1VOYWKV38/aal7YNHNdRW7mKgF9M9PfTnfN1uaWRve/oLUi7uZCHlRZRnk2W7n4W+
-         y2lkYF7snCWWGtz2BlRR0DzomWon5EXrJ2pA0mEvOF+bQHNnxhCzVWGhSKeAZsnl5b+T
-         LWISAkFTM3+g9kc75rvwcUiW7kz9LVVht2t2W5I2YeYB7wqbubHyr5g4z/iacQ36WfvI
-         CbpoKfk/6w1Ur68TCmVYmm0qAkBCeYPXZmJrRrLydJ/hHIa4SwY231zsZR5zJgF1XA9s
-         M4PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765526684; x=1766131484;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+U8+dNznpFslZOt3jZDGf7JqED9dm8pLESuGBInwRgU=;
-        b=NJ/aWD86jT2N8B9nRU/khrDtK8rVeZajuNctM3iLhMvS8UszVg1/0AdaGR31ePlpN9
-         zzKZ9jG6GbCHM0D/tet/qL1yr0yubdDRwnCp0hU0pBMFtvfWG+dBsCtBOIw9hKC+YgO+
-         yEB6cVfAjJRAPYiKl+4aT/cFhShYL0A/lvppi5yrNMRLyN89pGQRlQQfUxxZcwIp/sT+
-         Uf8nx5rV0UD8DPy/2dZzSPfGEAGVvcWnPcprg6qpo9IWiDSJN3k8hLZxJ4/szD/BVZk/
-         8HyaCamkXzlvkZsPemv5BvOxGyykk3UVkmDtx3KHkiOwfscKqU1J8SajQgpT9OUDzCRF
-         xF8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ8VQ1Y0q5BypB9AORI6Ykw9k+IYLflbLFFB66FIMTLjxtdZxDLySpi7YmXQaWDH4AwBaFKII=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyD0siKP6ybs1mxRW/i8XdpmWOfENoAmm/3DzzDGV8SJPqmaU40
-	J62vxxKviwi2sNCtgj+X3lyxhp3dYPJIbi4guOM4ZM/wLWfFA8H//CMG7c8Jwgv4sF1I2iyzJey
-	g+otL2GcqoJQ1qBuydcpLZWj/chA0JhOFP6bRTK0B
-X-Gm-Gg: AY/fxX5KuAZkXoEjiRfaN45Zz6RD5SR2JuwMz4Dru3nqv7KUm5Ll+oTydpJqEglHxsD
-	ZatlhrMtS95+iwUpuo8J1aTkhnN7iR5cyK277GG1JE/x8cznMMHL3d2QcTyajIMEOGTKsIX363C
-	Ql97m4qr+eCD/9ke2bAflG+OSQw+uwcqj0ge+M3yY2BmrinH9PeoTlAMcKfIm4ihojUFAIk5iT+
-	+hZBpCT6u8F37tntePyMEWnl0/+M+sS0KN/SvqcYkqqJw+EcoJ0Hy/E6CVTxP3E9uQeCxe8
-X-Google-Smtp-Source: AGHT+IFVdi59OsP3fmwvGAVvHEYCwmSnxEeO5zTktWlzni97TuZa78q8LVRVlb3nurJBxIY+bjfeYS+tgZqGnE3/N9U=
-X-Received: by 2002:a05:622a:4d1:b0:4ed:b665:3779 with SMTP id
- d75a77b69052e-4f1bd956c90mr10154741cf.16.1765526683971; Fri, 12 Dec 2025
- 00:04:43 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eBZ7zu2o"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=z4vPaiUk9n/GpIxutnAk0NTSeMO9iODdip7MeYu98yA=;
+	b=eBZ7zu2ox8ryH+r6AugMOCYGdskTgvt4HVyTB0sNWJZuu6AwqpHtUJ674NWi8oVHhZqLLb8Fe
+	9+6XJ13bHSi7juapcNkdSCOlj5bwH+XCJogKs9+MppIMgyb9nZajKcNlh/7ZzT71idEJ7zWb7e1
+	gwacD2hwUuyP493g1H7y+vg=
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dSP686k3Dzcb0J;
+	Fri, 12 Dec 2025 17:19:12 +0800 (CST)
+Received: from kwepemk200017.china.huawei.com (unknown [7.202.194.83])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3634E180BD0;
+	Fri, 12 Dec 2025 17:21:57 +0800 (CST)
+Received: from [10.174.178.219] (10.174.178.219) by
+ kwepemk200017.china.huawei.com (7.202.194.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 12 Dec 2025 17:21:55 +0800
+Subject: Re: [PATCH v4 2/3] KVM: selftests: Test for KVM_EXIT_ARM_SEA
+To: Jiaqi Yan <jiaqiyan@google.com>
+CC: <maz@kernel.org>, <oliver.upton@linux.dev>, <duenwen@google.com>,
+	<rananta@google.com>, <jthoughton@google.com>, <vsethi@nvidia.com>,
+	<jgg@nvidia.com>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <pbonzini@redhat.com>,
+	<corbet@lwn.net>, <shuah@kernel.org>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20251013185903.1372553-1-jiaqiyan@google.com>
+ <20251013185903.1372553-3-jiaqiyan@google.com>
+ <3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei.com>
+ <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <dbcfb853-5853-5967-1bf9-76c6b3839717@huawei.com>
+Date: Fri, 12 Dec 2025 17:21:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251210132102.137631-1-alexandru.elisei@arm.com> <20251210132102.137631-2-alexandru.elisei@arm.com>
-In-Reply-To: <20251210132102.137631-2-alexandru.elisei@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 12 Dec 2025 08:04:07 +0000
-X-Gm-Features: AQt7F2qhTzwVzsydho6e40R4qIxakCmrjVFzoPGIgOsInIjz7_T83i-YOn6fwUU
-Message-ID: <CA+EHjTxMmNrJT5-biZJDiTE4E5RaKpr+SGuj_jnpAfsbxzaR3g@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Copy FGT traps to unprotected pKVM VCPU
- on VCPU load
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CACw3F51mRXCDz7Hd4Vve98NoskhB2cSc88zAGfd6Hwr4uCBxPA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk200017.china.huawei.com (7.202.194.83)
 
-Hi Alexandru,
+On 2025/12/12 9:53, Jiaqi Yan wrote:
+> On Thu, Dec 11, 2025 at 5:02 AM Zenghui Yu <yuzenghui@huawei.com> wrote:
+> >
+> > I can also hit this ASSERT with:
+> >
+> > Random seed: 0x6b8b4567
+> > # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+> > # Before EINJect: data=0xbaadcafe
+> > # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad,
+> > einj_hpa=0x2841234bad
+> > # echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+> > # echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+> > # echo 0x2841234bad > /sys/kernel/debug/apei/einj/param1 - done
+> > # echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+> > # echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+> > # echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+> > # Memory UER EINJected
+> > # Dump kvm_run info about KVM_EXIT_MMIO
+> > # kvm_run.arm_sea: esr=0xffff90ba0040, flags=0x691000
+> > # kvm_run.arm_sea: gva=0x100000008, gpa=0
+> > ==== Test Assertion Failure ====
+> >   arm64/sea_to_user.c:207: exit_reason == (41)
+> >   pid=38023 tid=38023 errno=4 - Interrupted system call
+> >      1  0x0000000000402d1b: run_vm at sea_to_user.c:207
+> >      2  0x0000000000402467: main at sea_to_user.c:330
+> >      3  0x0000ffff9122b03f: ?? ??:0
+> >      4  0x0000ffff9122b117: ?? ??:0
+> >      5  0x00000000004026ef: _start at ??:?
+> >   Wanted KVM exit reason: 41 (ARM_SEA), got: 6 (MMIO)
+> >
+> > Not sure what's wrong it..
+> 
+> Does your test machine have SDEI or SCI enabled for host APEI? Do you
+> see any kernel log from "Memory failure:" saying hugetlb page
+> recovered, and recovered significant earlier than the KVM exit here.
+> It maybe the kernel has already unmapped hugepage in response to SDEI
+> or SCI before this test actually consumes memory error, so no SEA is
+> actually triggered.
 
-On Wed, 10 Dec 2025 at 13:21, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->
-> Commit fb10ddf35c1c ("KVM: arm64: Compute per-vCPU FGTs at vcpu_load()")
-> introduced per-VCPU FGT traps. For an unprotected pKVM VCPU, the untrusted
-> host FGT configuration is copied in pkvm_vcpu_init_traps(), which is called
-> from __pkvm_init_vcpu(). __pkvm_init_vcpu() is called once per VCPU (when
-> the VCPU is first run) which means that the uninitialized, zero, values for
-> the FGT registers end up being used for the entire lifetime of the VCPU.
-> This causes both unwanted traps (for the inverse polarity trap bits) and
-> the guest being allowed to access registers it shouldn't.
->
-> Fix it by copying the FGT traps for unprotected pKVM VCPUs when the
-> untrusted host loads the VCPU.
->
-> Fixes: fb10ddf35c1c ("KVM: arm64: Compute per-vCPU FGTs at vcpu_load()")
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 12 ++++++++++--
->  arch/arm64/kvm/hyp/nvhe/pkvm.c     |  1 -
->  2 files changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 29430c031095..ee0f1343100c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -167,6 +167,7 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
->         DECLARE_REG(unsigned int, vcpu_idx, host_ctxt, 2);
->         DECLARE_REG(u64, hcr_el2, host_ctxt, 3);
->         struct pkvm_hyp_vcpu *hyp_vcpu;
-> +       struct kvm_vcpu *hyp_kvm_vcpu;
->
->         if (!is_protected_kvm_enabled())
->                 return;
-> @@ -175,10 +176,17 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
->         if (!hyp_vcpu)
->                 return;
->
-> +       hyp_kvm_vcpu = &hyp_vcpu->vcpu;
-> +
->         if (pkvm_hyp_vcpu_is_protected(hyp_vcpu)) {
->                 /* Propagate WFx trapping flags */
-> -               hyp_vcpu->vcpu.arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI);
-> -               hyp_vcpu->vcpu.arch.hcr_el2 |= hcr_el2 & (HCR_TWE | HCR_TWI);
-> +               hyp_kvm_vcpu->arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI);
-> +               hyp_kvm_vcpu->arch.hcr_el2 |= hcr_el2 & (HCR_TWE | HCR_TWI);
-> +       } else {
-> +               struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-> +
-> +               memcpy(&hyp_kvm_vcpu->arch.fgt, host_vcpu->arch.fgt,
-> +                      sizeof(hyp_kvm_vcpu->arch.fgt));
->         }
->  }
+No kernel log was printed when I saw this failure.
 
-With the fix Will mentioned (hyp-main.c never uses the variable name
-hyp_kvm_vcpu, it's vcpu for the hyp, or host_vcpu for the host's).
-
-Tested-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
-/fuad
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 43bde061b65d..05774aed09cb 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -172,7 +172,6 @@ static int pkvm_vcpu_init_traps(struct pkvm_hyp_vcpu *hyp_vcpu)
->
->                 /* Trust the host for non-protected vcpu features. */
->                 vcpu->arch.hcrx_el2 = host_vcpu->arch.hcrx_el2;
-> -               memcpy(vcpu->arch.fgt, host_vcpu->arch.fgt, sizeof(vcpu->arch.fgt));
->                 return 0;
->         }
->
-> --
-> 2.52.0
->
->
+Thanks,
+Zenghui
