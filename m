@@ -1,81 +1,81 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7F6279795
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 02:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA10A28DB46
+	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 02:11:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765505353; cv=pass; b=gB1cJn2MURvf+55KQc2BwCnTAI4lJlvmQtyeUpWWBcYSImscT1GPJYvG9UhF2H9DFJKNu8TYCl0aq7vF8vhnYZcGNYAW32Xz/5KT+Gu2Tt4cTI/e7hA8CYZ9gwK198oefTsSC66xjUv2g9VdMc2TSKGWXYdZYRI0HyIGr/yHOEw=
+	t=1765505503; cv=pass; b=JCmglrA/neUQ0QSBiq/8Onsa51SuSH3jTKRTHBVz+uetJG0YuuLd9Uak5b0Iikauh23e0+nQTwTriZUk3lbM3jcESFt2gI57aLIJ5I8s6G+A1xuQivlP2ZrPNcsF1QILH3uxwyOWhUAsRf0+742Q3YWwJISiPbXzZNX2bDhaLgc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765505353; c=relaxed/simple;
-	bh=84TfbL9BjJfn33I8UDW+Ory3GlE3i/ue11dFxydhcZo=;
+	s=arc-20240116; t=1765505503; c=relaxed/simple;
+	bh=Ao4814nx/MeyiCjtOPdPxV2RF0Pfv1gFdV6IO+0/tn8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J+u98HSUFVhdo2REvLVaeUlR/OLzVAvCPWKBQP6Vm77A6QMyAN8gwQ4lvpk6QOQf2pJAREj62eLMaWwzam9lPVIJffAvQp2LUHQRsATZmyiyusxn/YhbWdaHmPCfXgvQQjS3bToIbDFifreyiS4lwaGgltruHU1UGtolGQCHxMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B/Jz+v9D; arc=pass smtp.client-ip=209.85.128.46
+	 To:Cc:Content-Type; b=O5XrIY8lq0RXkn1VYQCJDaJH4IpgQ2YbbL1yjAwqyLG2kSqD/cDylf+LabNMLfGuDZuG49AgHvWqvhOisEX7PW8hCuSru+U51qxhMVg+IA1bjtbFZgjMOPOs+/DZ+6+UXa/eLoV55FmPgTCHFeLI4DtcfmDPXmiP/X84Zjg3qo4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QGzjqOHx; arc=pass smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B/Jz+v9D"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-477a1c8cc47so129375e9.0
-        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 18:09:11 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1765505350; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QGzjqOHx"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4779e2ac121so121755e9.1
+        for <kvmarm@lists.linux.dev>; Thu, 11 Dec 2025 18:11:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765505500; cv=none;
         d=google.com; s=arc-20240605;
-        b=Q0E8jALX7XS0VTiqzIursBv+IS87kvhI9YQXijBQfekNhoLD9zSsKg1hKDOly1dPzS
-         GcFrUJpcdYD/MuiRiYRJhZzBy/B/SfThgXidCW+TWvXOaoA2f29lbo+y9Xxy7RS/44pH
-         Wpd2LjfGO1hhyzor/f0jircZS0CLVgNsQd/z0qcjigOXzg6ZCij6sHZYadFlQgOhunp+
-         Ne806SKLei3S3i1ZmF4edK3HT0GRX7k3w6jqCsTUsoqp8FPrR9cx/b/LCa8SN95XvJsR
-         0RdQymZ1wTwAfvf4wkJQDXfsGwFJ9zbHA5g/bfRoUS3VreGjy8MpRi3ensGXCl1Tf2z0
-         FFYQ==
+        b=IDzKcBbbNq0/tYJ+j/a+hxkgO1hgDKl6YU6p5578r8dUWT6sseiqC3FXFQE/rmn5Md
+         u+JrRDGYLBQC83w1OK/qFvXYLtumleF9A6r+xVYxf/uvnHb/oqq8PGg9/DsSRJd4JHXH
+         DzN4S8CDNlQ/MSs22AbMOhEHiV+3dT6gCOEuftJPuxiVmKPsutvQAmsMdNqB9qwaBlL0
+         YWl2VMencaV4ZOvJhwErW7k9uo3GDqx+HXk71tAr4I9HUI9jCob22v4Z61Irrc1iGpxw
+         0ao6GhCtPDZvotE5zQmBNJM0IGjEeAk7whPZVkhlZR5RKVgtu1GRLERhI1wE8cbeAqBm
+         HDcw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=84TfbL9BjJfn33I8UDW+Ory3GlE3i/ue11dFxydhcZo=;
-        fh=02/JrjdXouS72MUzulxeCm6n4n+N+uGjgshFn8s2zC4=;
-        b=hGEw2y8NbV3x8L3U/ACjAe+u2TOT7THjxK9ZF8P7BnAdh4EnIoOGYnwvNqFyxjcOza
-         /QpgGQQXvuchozVp4cceSAIPpKjBn6Js5CH6IkWp2f4vqCHJ6MQnkTFHoznd2HWrRyM9
-         tcHoxCjeLVojvewG4ZSvdGAEpg75lzNbaJdEVGwypZpgasab0NPsfDweZnTQ1sJzUKTi
-         2ndaY/rVpMqfn9FBYFgRFBQxc4I0YJrB/AedAzS4/pX9rPuMrno/UOF8fT3vZlH00bnq
-         otQmOF66b4X8IdSGiUI0g92RDWopOF27Mxay8VJ7fIBms46TuAtsHylv5Dkrll8bWLAr
-         KuLw==;
+        bh=KKXbQJ7VyOdfJwU2Y+H1IueDoIplm0PygWT6mOen4rY=;
+        fh=BS4u/gXsygt1F7Xf4IqkkIxPyUtxynUv4og45lkn3io=;
+        b=G8HsKCvF0op+EZWsxcUDydu3Yrny9OVMCLzqD5qJV/UhWCLj7UFAVh4Gz+V6NCei8a
+         qaWlA3PpJ4v9/TiX8MMnq1gZztGp51CDsD4mEd/CbohX4PA7iVvyC2e3pmIX5QNifwPf
+         HrZg3GRAb6Gfx4dWbOvXIm0sErb44w7vmRGVJN9GHeWYBbP7nUbFKhAOO5nDeODv039A
+         giG8Q8xIlaccDh/Z9c9P6A9SYFRGo5R8VCKZ8Xjhpi5RtE/t7UJytgq4dZSRCqPJTkFy
+         RVXel58T62CS97fAf/Nl+7Zfg9p5OuHmR8NP6i34rR0rKn71ph9JzHSKnFqAoc/X+RA7
+         9+MA==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765505350; x=1766110150; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1765505500; x=1766110300; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=84TfbL9BjJfn33I8UDW+Ory3GlE3i/ue11dFxydhcZo=;
-        b=B/Jz+v9DSbYjWwLY64CrskSq1SXnhVHwDOD/OhIyrGIxYtL+zFNDmva3kkFnlFx2ST
-         1I8mQ8/8w1tabHpWZVy/43fnjiiKamhrYMvz78Aoo6FCxkVdDqnTPoXaeJLRGV6uNowX
-         W+AxTuIoWAXhouyKIrMV6kMlNnHz77DQ2dtjZepKqXOMch+Rf1NlpfBgXNaJvAUpLGAA
-         Ac3OguYN0QFfGBTcPGx7Z6VYYUogoKjDu5neZ9Q4RtFH3HHQU3kz3CVpZQXMRDd4IIez
-         aftpYoDou3mlgo1EZcEtq89Af+NXgdXqHHybbU6BYkgH0F1dlziO1sMIVM5MuKrGngm/
-         2P4w==
+        bh=KKXbQJ7VyOdfJwU2Y+H1IueDoIplm0PygWT6mOen4rY=;
+        b=QGzjqOHxkym5BLFgSOlSiBRmWFmDpTDDArgnPrz0Dx/feY03WkQKGRnwDpkbGYkmgY
+         oTOup4PQ54V1WwZzGNEUBYmgm6krmm8QboZBhcCU159dmLnvfLun/nYO/0i1qz2rxdJI
+         aEE0ZEcYkxv+Ab0bRLvk2LnXLPxbTWGtUBzimhB1lTrSHkV/QQXpuDIKcoY4oF943ss3
+         mjbqB6P4xk+O6PZ6dKWFzgkqcv0OSm2cQ132oyoSvQzx+A1pU+gn52DDAVJdQ7Pc8KuG
+         0dfcfWOciOEI4TTMBpZBulowKAisueYswLe9on9LL5m7uhn/LUXsl0SZ7kA/kFMHGFsI
+         9mgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765505350; x=1766110150;
+        d=1e100.net; s=20230601; t=1765505500; x=1766110300;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=84TfbL9BjJfn33I8UDW+Ory3GlE3i/ue11dFxydhcZo=;
-        b=OF3yFGQaZrlRScpEoGcEA4gHhfLS7zIPEpYtmtZn6l3cBJ7m/5/lMaDnjA/FoQ2lYk
-         V7g9iaUry+SirP5sCW+Q2uTA1o4LqCO+FR0GdG9QbqY668IYPBHH44MnyeHhGwL1joqN
-         yU0nfPgqXwQYJJVJrbBsvL/rWzjrClCRk9jPzoiwEU8zjz9ZNG5xi2jo19isjLgJ260r
-         BIE8AddN5mLxSwb1K6a9oaz/AGVBJp7A4EZTi0wHjL1IGVETlvJ1ZjqHjaPxSEEufh/2
-         WVsKPEZke56enrQbgwGA4b43TB46wMXd1hhX4hckC+5JFWZ37tqevDYiB6Y3KxY/Hvat
-         +i4A==
-X-Forwarded-Encrypted: i=1; AJvYcCV3XkbBek4k43e9C7L8CPk3a822K+slITbF3d4nQLhbUDcbaGnQVcBkHKPHrUOBKiU4O8svpHw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzER3brQtCEIQ6k94zsoxAKCyhsZfLRm9V1R9M5zmcEJnCtIv5k
-	grdp4FSDY8KBpUHZvOu72Widf8IrUjW2HB3lBdrcmDkZzXMaqQhLU+uIFo5uZ+iIaGflRLF0mYL
-	CvkOQFJIfCWZ4cExNcywhU3iLn2DPMtwRmqrMeWEO
-X-Gm-Gg: AY/fxX4S99AqJguSOTgYT+vUB4gYNwuBfmfFCwJITRlZwRZgcDvOv8o5kYunx0x4QHg
-	N1kr6wqsaAduQB0XcHcphikqOcxaZVwznlrnr2/+hl3kl4QmM0Fq1SzUot2Xj6uHyxTzwzpQnXY
-	DVMLy3zNrW3W+/PbboDc9K79gywA3CW/AYrxLGXmf4UE12YMHJM+pGQ4P5t+Enpq2YWcWdfObux
-	TzSu3EHCHiqsJPLOMx80UiquofLJHRlNUZfZFkeAKRPrZniCZ1MmXYHfD2YvMuvPKX7Ts2DT2NR
-	QMUuZ6azdXDpzWUeQao4QI5UHSH/
-X-Google-Smtp-Source: AGHT+IGoi5wVrkD2fWPEWoc/lIs5FT33tT8boqcMkmHzGIlAt4ukcQFeZJmytGledBHa8gl+3ojCpFp5RQ8KAJmzYtQ=
-X-Received: by 2002:a05:600c:68d7:b0:475:da0c:38a8 with SMTP id
- 5b1f17b1804b1-47a88d1fc5bmr854875e9.4.1765505349917; Thu, 11 Dec 2025
- 18:09:09 -0800 (PST)
+        bh=KKXbQJ7VyOdfJwU2Y+H1IueDoIplm0PygWT6mOen4rY=;
+        b=V7NbIF8nZfwS2w+e3aKTI2MhlYrgpi62+nPw01++ueoWI+kJMWKKV7KxcP99P9bvAg
+         D5HiF5czpnn/I0XZSyGLmTPE4CPmbynn+OxfwP15cezKJ7QRqwhOTlLG7osXXb2QwOhw
+         zmn6zcOgSGFOk8OAx+24A39mq+ZEzZEXsgFPzsqIgvyA6wvjGyQUjQiABj7YaGMsqDzW
+         tior60CDsyzEqG0zJLHWDMnEF6NY34cz/Myt0cn3/Im6PrY3MfvcmJzxK9lDnvnlTpnw
+         4vHirN/TTnTXyM7YuTzTBKH6vBjmvz0CXi8/aI8lPAncRI3U0e0aCEPeiRwDnZHfngq5
+         uXVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWMQbtN8tW9H3tfOoop1mJ5F8HFWvbZlJcANSI71b/+0dDtcv+lE5bV1invMIMzgoVLNxqVwI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzYAffNjJo+RYOguuCIm6BYoca7vR6gwbxqpvU5IiPpGfUvWBny
+	zU4OkZ9SGJKAeajsDTAAfA9qsflK+4rczAgjTYm1gMcQhr+48cGSb9EHuKhNtyE5upXgmEOoSbk
+	6bbx+JxT+6SQfRNUNpov0qoFr/yEKx5QGlyuVplea
+X-Gm-Gg: AY/fxX4Si5F1R1XXXYLxtf5lAZ5pViyXr4fXulBS2c8pDqpPF0Jm6pkKy/NS47sxbip
+	Werkkq+zFFvJfFP8aLyKbfzbL8XOd+oFbKQylVRIX6AbR3A/0of6ZDbjCkxIhs7cu5WLd8Dmzs1
+	xHKJsnCWl+A3p4wLdnBcEwt3HUJ0MHq6ZJsuZ2JbYCuZZSItccsgQ8nAt4vtoIW1Wz+9DP3LU7O
+	IUIxtETlBnv+bg2KAsVQBEcrwrGOobSekWusNnz1skD1oUNHvmXeThEiFU8iNwHNL+JjGYMEZ4A
+	tB6UVNO8WPNEqFxNGgMt6ZG69eFQ
+X-Google-Smtp-Source: AGHT+IFYskZ/bgUJL8oh+IWDpPaPCx1TyYrhdztCLLCAnfYuBrsXrdmOgn4LN5g44F9X73hGi18eDted1V3Fai8KP/w=
+X-Received: by 2002:a05:600c:c04d:b0:477:95a8:2563 with SMTP id
+ 5b1f17b1804b1-47a88c67cb0mr445965e9.14.1765505500063; Thu, 11 Dec 2025
+ 18:11:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -83,58 +83,48 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 References: <1478ac09-8134-5551-13b6-c7be096262af@redhat.com>
- <CACw3F52i_Yr+8Gd1=H=EMi7NnVJ8WCgMkaG1dSe8FD7PvOsW8w@mail.gmail.com> <c44b75bd-bf54-0aab-78a2-89f448cf126c@redhat.com>
-In-Reply-To: <c44b75bd-bf54-0aab-78a2-89f448cf126c@redhat.com>
+ <CACw3F52i_Yr+8Gd1=H=EMi7NnVJ8WCgMkaG1dSe8FD7PvOsW8w@mail.gmail.com> <86sedgop86.wl-maz@kernel.org>
+In-Reply-To: <86sedgop86.wl-maz@kernel.org>
 From: Jiaqi Yan <jiaqiyan@google.com>
-Date: Thu, 11 Dec 2025 18:08:58 -0800
-X-Gm-Features: AQt7F2rAtAMfq5kg2V3CkWpX1f5OFLeUqrS16Y_3ULq9rATVCLdx1UlpLQpqi04
-Message-ID: <CACw3F53ZGQxefk9E8c8-9UM2o3Rv+0SwSt=n_fatBOxwQE3FNw@mail.gmail.com>
+Date: Thu, 11 Dec 2025 18:11:28 -0800
+X-Gm-Features: AQt7F2ruwRGIX7zw26TKkYRQ458cNr4PLpCMeJupnhA1pZONZUfBkBxbqR-PLiM
+Message-ID: <CACw3F51usGLY+ZAqy3WEW+cBxCQysHDuM3ebvC-Adkwf_+zP8Q@mail.gmail.com>
 Subject: Re: sea_to_user sefltest failure
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sebastian Ott <sebott@redhat.com>, Oliver Upton <oupton@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	kvmarm@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Zenghui Yu <zenghui.yu@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 11, 2025 at 10:11=E2=80=AFAM Sebastian Ott <sebott@redhat.com> =
-wrote:
+On Thu, Dec 11, 2025 at 10:19=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
+e:
 >
-> On Thu, 11 Dec 2025, Jiaqi Yan wrote:
+> On Thu, 11 Dec 2025 18:04:48 +0000,
+> Jiaqi Yan <jiaqiyan@google.com> wrote:
+> >
+> > [1  <text/plain; UTF-8 (quoted-printable)>]
+> > Hi Sebastian,
+> >
 > > CONFIGs seem alright to me. Do you boot kernel with cmdline options lik=
-e "default_hugepagesz=3D1G hugepagesz=3D1G hugepages=3D64", or dynamically =
-set up
-> > huge pages via "echo 64 > /sys/kernel/mm/hugepages/hugepages-1048576kB/=
-nr_hugepages"?
+e
+> > "default_hugepagesz=3D1G hugepagesz=3D1G hugepages=3D64", or dynamicall=
+y set up
+> > huge pages via "echo 64 >
+> > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages"?
 >
-> Neither of these. When I do the test is skipped:
-> # echo 64 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
-> # ./arm64/sea_to_user
-> Random seed: 0x6b8b4567
-> # Mapped 0x40000 pages: gva=3D0x80000000 to gpa=3D0xff80000000
-> # Before EINJect: data=3D0xbaadcafe
-> # EINJ_GVA=3D0x81234bad, einj_gpa=3D0xff81234bad, einj_hva=3D0xffff41234b=
-ad,
-> einj_hpa=3D0x80241234bad
-> ok 1 # SKIP EINJ module probably not loaded?sh: line 1:
-> /sys/kernel/debug/apei/einj/error_type: No such file or directory
-> Bail out! Failed to write EINJ entry: No such file or directory (2)
+> I don't think this is irrelevant. The whole thing seems to have some
+> logic flaws, see the extensive report from Zenghui[1] as a reply to
+> your series.
 
-Looks like EINJ is not available on your test machine. You will need
-to check several things:
-1. does your firmware have EINJ support? kernel should log something
-like "ACPI: EINJ populated" at boot time, but it doesn't guarantee the
-EINJ support, just suggesting it may support.
-2. if you are sure about the firmware, did you build kernel with
-CONFIG_ACPI_APEI_EINJ=3Dm?
-3. if CONFIG_ACPI_APEI_EINJ=3Dm, please also "modprobe einj". If
-modprobe failed or /sys/kernel/debug/apei/einj/error_type still
-doesn't show up, firmware probably doesn't support EINJ at all.
+Perhaps my test is too coupled with my test environment. I will work
+with Zhenghui to improve the test for people.
 
-I will probably add more comments at the top of the file to clarify things.
-
-> # 1 skipped test(s) detected. Consider enabling relevant config options t=
-o
-> improve coverage.
-> # Planned tests !=3D run tests (0 !=3D 1)
-> # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
 >
+>         M.
+>
+> [1] https://lore.kernel.org/r/3061f5f8-cef0-b7b1-c4de-f2ceea29af9a@huawei=
+.com
+>
+> --
+> Without deviation from the norm, progress is not possible.
