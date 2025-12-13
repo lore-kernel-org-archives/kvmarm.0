@@ -1,59 +1,59 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4A271468;
-	Sat, 13 Dec 2025 06:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B147286D64;
+	Sat, 13 Dec 2025 08:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765605617; cv=none; b=FXudcUjJAQEEwe7HjySOR5fhNJwRL11+cuBL8Ii8m1lQhTF5HJpqE+EJEKmxU1bE+TUPf0zut6wuVOSwCem4jvkljQHKJHsWu8NA/cPrCzjLaIiLstiugLj52aXJzanIhVtWYAAZ7a2AIJq4ydnRBDdBhlHs+wFTbLXNh+Ki1x4=
+	t=1765613121; cv=none; b=aDCQb41XbwQuPqfgBDSKGjct6OpjLEQ/K7LSbckcS/sVEDsCJGebkggGGnfkpbfoYARS7wP1Beg5tX6DKqvnZj93Ln7sFNGgFoFzAbz8mlLyhYXirknC/ZcMsC6/E+Z/tMmsFhdbXjnhUDiFHV4ZaR9VrbUnyDs2bbA374uoqM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765605617; c=relaxed/simple;
-	bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
+	s=arc-20240116; t=1765613121; c=relaxed/simple;
+	bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CZLYcroQYarfZr42nUUCxDhWAWH3qFZrz3XOlq2bWcjY63BB1kJxMxhNwEz+XcrreuHLnCd1wrGwprdn89IwXj3i/frOAKk1ocWgfM8E5hWVE9oWYlnSFZQ3HmjyaKR+cTDhScLfoXX4KD00Ic0GUqWVQHkqwjDs2a6Mth3cc04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ywen3wFP; arc=none smtp.client-ip=198.175.65.19
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0Q5OrI+zWjgDkEJkTXzeNgu4OTQvzqUYOkAyFJEZqRuMipHFe7eXaFJjidwrA4oePxm8KGte83V0b1524xXZQTP8fC453mv9s7SfW6XbvdIJomcATeKukU9c/81Qq2cmRCIDIzodJfHihdn7fDfY6nhbvz3BHhlNpWKhzGzUnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kdUiwj0Q; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ywen3wFP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kdUiwj0Q"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765605614; x=1797141614;
+  t=1765613120; x=1797149120;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
-  b=Ywen3wFP/Rm/JKeFBL6CNWJBwEV3zC6BHslObUaT4fgTte7szylKwO76
-   UaX879oEh5hpbCsC/GH3ed4etoZdnHdJ+67m14eHBUG7+AoSo0HwqGhLB
-   ReYi3Fp8LqytjIS8RNvNSiawwTA3ZZDTPjIpeIdUbJ839iVk0IDau0+ao
-   Uywv4MPk0hliu7a0wFNvD55vTQSs6Lvxsntg1NRyR2Dx/0AUcf5yi+mRv
-   T3uWxFKtlBdgoBz84hiZeew9r9e6MrC/yTX4X9y1GWQ14292A3/kfvPqB
-   qaX2vIMzEs/PdP3IjaDC78v0fuBxG7dGpRuk69GoPghW1Pv5w/hnKEAUm
+  bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
+  b=kdUiwj0QDw1E1HD0iFoUYLWlWdr5p/lsEbPqDWXWO4eNcDKcxMdVNs57
+   GAzYQQLh+bKn9vSOVrmjsu09+15OMt0tVM8jQ1n+PjDJCUXGknEfsnNfh
+   VUAYE7//sefDXrlZftTZlhZytHpOfe27A46nFX25SvEgNhwxf0P88HUQU
+   Q1A7Y39EFnxuRu/IvJ1zA6+il8yE8xzaHWP3R1VheS2xmcsYTPmunSfZJ
+   I9O2ZGRmXYXC3a63l6klmGpAR5oOc/sL+YFEAVxEvx0Jyotv9R87aJyCP
+   XM+f3d1SN1jkfAvkf4+pVNQsJSm4p/d70SJBFmmyAXhRCz24rUyouxJou
    g==;
-X-CSE-ConnectionGUID: ZdwjyufvRmmInwFMRudYiA==
-X-CSE-MsgGUID: bTh9JTs9QQS/GBV7Oy+vsg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67479178"
+X-CSE-ConnectionGUID: safVptAuSiChwvY24VsK3Q==
+X-CSE-MsgGUID: OUEsTJGBSayRSUitQHmnjw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67675499"
 X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="67479178"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 22:00:09 -0800
-X-CSE-ConnectionGUID: 0dvZTn5IRXWGLU1cN3ZoGA==
-X-CSE-MsgGUID: S/O+NmewRDKE54hVKm53Sg==
+   d="scan'208";a="67675499"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2025 00:05:19 -0800
+X-CSE-ConnectionGUID: +REegi4BSZ6Pyhok8jMjiA==
+X-CSE-MsgGUID: EDrkqM7KRneDKww23KbinA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="201749910"
+   d="scan'208";a="227937216"
 Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 12 Dec 2025 22:00:06 -0800
+  by orviesa002.jf.intel.com with ESMTP; 13 Dec 2025 00:05:15 -0800
 Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
 	(envelope-from <lkp@intel.com>)
-	id 1vUIfj-0000000078T-1bmr;
-	Sat, 13 Dec 2025 06:00:03 +0000
-Date: Sat, 13 Dec 2025 13:59:37 +0800
+	id 1vUKcq-000000007H3-3MBs;
+	Sat, 13 Dec 2025 08:05:12 +0000
+Date: Sat, 13 Dec 2025 16:05:00 +0800
 From: kernel test robot <lkp@intel.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
 	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
 	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
 	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
 	"maz@kernel.org" <maz@kernel.org>,
 	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
 	Joey Gouly <Joey.Gouly@arm.com>,
@@ -64,7 +64,7 @@ Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
 Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
  save/restore
-Message-ID: <202512131338.pYhd9ptc-lkp@intel.com>
+Message-ID: <202512131539.zPrweF7e-lkp@intel.com>
 References: <20251212152215.675767-15-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -91,34 +91,44 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64
 base:   linus/master
 patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
 patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/reproduce)
+config: arm64-randconfig-002-20251213 (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 1335a05ab8bc8339ce24be3a9da89d8c3f4e0571)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512131338.pYhd9ptc-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512131539.zPrweF7e-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   In file included from arch/arm64/include/asm/kvm_host.h:36,
-                    from include/linux/kvm_host.h:45,
-                    from arch/arm64/kernel/asm-offsets.c:16:
->> include/kvm/arm_vgic.h:392:26: error: field 'gicv5_vpe' has incomplete type
+   In file included from arch/arm64/kernel/asm-offsets.c:16:
+   In file included from include/linux/kvm_host.h:45:
+   In file included from arch/arm64/include/asm/kvm_host.h:36:
+>> include/kvm/arm_vgic.h:392:19: error: field has incomplete type 'struct gicv5_vpe'
      392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^~~~~~~~~
-   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1
+         |                          ^
+   include/kvm/arm_vgic.h:392:9: note: forward declaration of 'struct gicv5_vpe'
+     392 |         struct gicv5_vpe gicv5_vpe;
+         |                ^
+   1 error generated.
+   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1 shuffle=1891526797
    make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1314: prepare0] Error 2
+   make[2]: *** [Makefile:1314: prepare0] Error 2 shuffle=1891526797
    make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:248: __sub-make] Error 2
+   make[1]: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
    make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2
+   make: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
    make: Target 'prepare' not remade because of errors.
 
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for CAN_DEV
+   Depends on [n]: NETDEVICES [=n] && CAN [=y]
+   Selected by [y]:
+   - CAN [=y] && NET [=y]
 
-vim +/gicv5_vpe +392 include/kvm/arm_vgic.h
+
+vim +392 include/kvm/arm_vgic.h
 
    360	
    361	struct vgic_v5_cpu_if {
