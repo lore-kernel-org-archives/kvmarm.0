@@ -1,129 +1,161 @@
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C412F3C3D
-	for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 22:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4A271468;
+	Sat, 13 Dec 2025 06:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765580346; cv=none; b=Dk1QZ12XBjm2/IDc/9QBfwMe7ED3zfH26jPgr2GW/y0weTK8iATHajL+RKLN/hhSZVZksYcmO2PqWo1nILF9c4l6wYirg4iXRvOMIN7eBUSHDtQ8vrcq6GlKQCqDGNVuDMSb6CxyIUk7aE2W++DPHyBu4sb04lxMjai56w84hFY=
+	t=1765605617; cv=none; b=FXudcUjJAQEEwe7HjySOR5fhNJwRL11+cuBL8Ii8m1lQhTF5HJpqE+EJEKmxU1bE+TUPf0zut6wuVOSwCem4jvkljQHKJHsWu8NA/cPrCzjLaIiLstiugLj52aXJzanIhVtWYAAZ7a2AIJq4ydnRBDdBhlHs+wFTbLXNh+Ki1x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765580346; c=relaxed/simple;
-	bh=7bslInIBLJIoLn/9TutWUpr69eWhQhXaLvHEGWAesY0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=KBGIxPM7pd0jrnp2FOgfqfYC0f97laLgaV6Gpx3Sjb87oSM8fMZFcyimaTzvHJtCbHVUdPZA4HAuBI0MUjEWdj+4ZZKgSA58dd6OCAScgZVrUCYoh1fdUzL1vo4zuZ2lCyc/7JXNcEuYzIjTZfw7DLELHRJ9+Yc2tqrBP0ZeRYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pFFj53E0; arc=none smtp.client-ip=209.85.210.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1765605617; c=relaxed/simple;
+	bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CZLYcroQYarfZr42nUUCxDhWAWH3qFZrz3XOlq2bWcjY63BB1kJxMxhNwEz+XcrreuHLnCd1wrGwprdn89IwXj3i/frOAKk1ocWgfM8E5hWVE9oWYlnSFZQ3HmjyaKR+cTDhScLfoXX4KD00Ic0GUqWVQHkqwjDs2a6Mth3cc04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ywen3wFP; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pFFj53E0"
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7c6d3685fadso1612550a34.1
-        for <kvmarm@lists.linux.dev>; Fri, 12 Dec 2025 14:59:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765580343; x=1766185143; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tBFcNzGChK01MBl7aRFxeqVQzmaQvoTyGJMrwZXP/1Q=;
-        b=pFFj53E0i1u0yxHWi83X/zqLsM4tVGW1otGJtkKeEs/6UWAG0qK0BiB9k9xUkomyom
-         oUVY2wwbld2QXLe7PNgFL3F3n52YIUe2/8ajtQzLoejTrkulZYHy3iIRO5rRPa3iLE4s
-         MZDGzW817B+DPKuDOJoTMNr9yw0zWT7R+9bh9oHjPIzOLk3g4a+PYwr5ULKP8smdqRs+
-         RVpqWgag5PZcSUdYb+aVHx6Zge6lmhaZKXo7XIAwxKgdk+P7Az/gWcrK7tceGtgh2j7a
-         wzrrWHIuzFtG+q++ZCJ5R3OXdrNhT2uC0TCM+llpmT8Iq4/pqxKoFUhe091nEv7Tzw9I
-         a/Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765580343; x=1766185143;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBFcNzGChK01MBl7aRFxeqVQzmaQvoTyGJMrwZXP/1Q=;
-        b=XDuJQl0Dv0XtI9ysdQ+4dmVFwAkmhFh6gnb/NXohglLeCrsFfTnOzjvKUyQ5UHMGY/
-         41CdQCbOYJNVMabGo8vwLkcfI8UNR6QQV6qaydvP4eVHEnlDjt0jYmrI4X9hGwu1wGqi
-         9oYUCQPJgNzpiXidzsvZHhGWWq3Tj+Q3pJOe1b/S4icVybr6WA3vni6Ji0ijHI1IV8F7
-         CZyYv5VzS3ISUNkbbYhaFNQ91K1i7rKuQXvgUf7HIB9nAC/CLBrUDNhM3mBJXCpgfjL0
-         qKhBtcAz9esArcre/bZlt45CQqeNq9cWNeiRvPmLndPwE5ajMbYuXByPrRGVrd5ppKfz
-         mKWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7QfrfhO+mVWK3P3xrYPiIB+jilOSCofI6s/g4D03Uy4eRlmg33YIHDRvvHOexneuLvbBUPR4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzNWKrYJg4QPogNp/j9CcWKdzAsDQaIl0+oDvO3puAvhNuWClFI
-	2/9TutxtsRJ2i/LiEWwI7EAXn0tnc5Lvvisj2mh7Z/P36N7TpEL9OT2kAKJZ7VLHnsjnC9F9oYo
-	GBbn+9eaGeMjTXitP3C7K2BFMNg==
-X-Google-Smtp-Source: AGHT+IErW9ttpylPAKTVb6sUEZwG4YGY35EKiSdiqsCWGntNWnLEEqDhx+071F1DfXt8IYeJCob+cCIIDVfcvHekjQ==
-X-Received: from ilbbc25.prod.google.com ([2002:a05:6e02:99:b0:434:972f:bf92])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:1886:b0:65b:35a2:7a8b with SMTP id 006d021491bc7-65b4523911emr1339446eaf.82.1765580342788;
- Fri, 12 Dec 2025 14:59:02 -0800 (PST)
-Date: Fri, 12 Dec 2025 22:59:01 +0000
-In-Reply-To: <aTipeb2fAmUtSzzX@kernel.org> (message from Oliver Upton on Tue,
- 9 Dec 2025 14:58:01 -0800)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ywen3wFP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765605614; x=1797141614;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WL4zqdjhP4eWIgWVfNrlgI8rU89YTQc1eFsnk2DTuu0=;
+  b=Ywen3wFP/Rm/JKeFBL6CNWJBwEV3zC6BHslObUaT4fgTte7szylKwO76
+   UaX879oEh5hpbCsC/GH3ed4etoZdnHdJ+67m14eHBUG7+AoSo0HwqGhLB
+   ReYi3Fp8LqytjIS8RNvNSiawwTA3ZZDTPjIpeIdUbJ839iVk0IDau0+ao
+   Uywv4MPk0hliu7a0wFNvD55vTQSs6Lvxsntg1NRyR2Dx/0AUcf5yi+mRv
+   T3uWxFKtlBdgoBz84hiZeew9r9e6MrC/yTX4X9y1GWQ14292A3/kfvPqB
+   qaX2vIMzEs/PdP3IjaDC78v0fuBxG7dGpRuk69GoPghW1Pv5w/hnKEAUm
+   g==;
+X-CSE-ConnectionGUID: ZdwjyufvRmmInwFMRudYiA==
+X-CSE-MsgGUID: bTh9JTs9QQS/GBV7Oy+vsg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67479178"
+X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
+   d="scan'208";a="67479178"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2025 22:00:09 -0800
+X-CSE-ConnectionGUID: 0dvZTn5IRXWGLU1cN3ZoGA==
+X-CSE-MsgGUID: S/O+NmewRDKE54hVKm53Sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
+   d="scan'208";a="201749910"
+Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 12 Dec 2025 22:00:06 -0800
+Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vUIfj-0000000078T-1bmr;
+	Sat, 13 Dec 2025 06:00:03 +0000
+Date: Sat, 13 Dec 2025 13:59:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
+ save/restore
+Message-ID: <202512131338.pYhd9ptc-lkp@intel.com>
+References: <20251212152215.675767-15-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnt5xab2toq.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 22/24] KVM: arm64: Add KVM_CAP to partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, 
-	linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
 
-Oliver Upton <oupton@kernel.org> writes:
+Hi Sascha,
 
-> On Tue, Dec 09, 2025 at 08:51:19PM +0000, Colton Lewis wrote:
->> +
->> +7.245 KVM_CAP_ARM_PARTITION_PMU
->> +-------------------------------------
->> +
+kernel test robot noticed the following build errors:
 
-> Why can't this be a vCPU attribute similar to the other vPMU controls?
-> Making the UAPI consistent will make it easier for userspace to reason
-> about it.
+[auto build test ERROR on linus/master]
+[also build test ERROR on next-20251212]
+[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next v6.18]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I'm confused by the inconsistency of using a vCPU attribute for
-something we want to affect the whole VM.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
+patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
+config: arm64-allnoconfig (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131338.pYhd9ptc-lkp@intel.com/reproduce)
 
-But I'll do a vCPU attribute if you want.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512131338.pYhd9ptc-lkp@intel.com/
 
-> Better yet, we could make the UAPI such that userspace selects a PMU
-> implementation and the partitioned-ness of the PMU at the same time.
+All errors (new ones prefixed by >>):
 
-Sounds good.
+   In file included from arch/arm64/include/asm/kvm_host.h:36,
+                    from include/linux/kvm_host.h:45,
+                    from arch/arm64/kernel/asm-offsets.c:16:
+>> include/kvm/arm_vgic.h:392:26: error: field 'gicv5_vpe' has incomplete type
+     392 |         struct gicv5_vpe gicv5_vpe;
+         |                          ^~~~~~~~~
+   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1
+   make[3]: Target 'prepare' not remade because of errors.
+   make[2]: *** [Makefile:1314: prepare0] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:248: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:248: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
 
->> @@ -132,6 +134,16 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->>   		}
->>   		mutex_unlock(&kvm->lock);
->>   		break;
->> +	case KVM_CAP_ARM_PARTITION_PMU:
->> +		if (kvm->created_vcpus) {
->> +			r = -EBUSY;
->> +		} else if (!kvm_pmu_partition_ready()) {
->> +			r = -EPERM;
->> +		} else {
->> +			r = 0;
->> +			kvm_pmu_partition_enable(kvm, cap->args[0]);
->> +		}
->> +		break;
->>   	default:
->>   		break;
->>   	}
->> @@ -388,6 +400,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,  
->> long ext)
->>   	case KVM_CAP_ARM_PMU_V3:
->>   		r = kvm_supports_guest_pmuv3();
->>   		break;
->> +	case KVM_CAP_ARM_PARTITION_PMU:
->> +		r = kvm_pmu_partition_ready();
 
-> "ready" is very confusing in this context, as KVM will never be ready to
-> support the feature on a system w/o the prerequisites.
+vim +/gicv5_vpe +392 include/kvm/arm_vgic.h
 
-That was a last minute addition. I'll change the name to something
-better.
+   360	
+   361	struct vgic_v5_cpu_if {
+   362		u64	vgic_apr;
+   363		u64	vgic_vmcr;
+   364	
+   365		/* PPI register state */
+   366		u64	vgic_ppi_hmr[2];
+   367		u64	vgic_ppi_dvir[2];
+   368		u64	vgic_ppi_priorityr[16];
+   369	
+   370		/* The pending state of the guest. This is merged with the exit state */
+   371		u64	vgic_ppi_pendr[2];
+   372	
+   373		/* The state flushed to the regs when entering the guest */
+   374		u64	vgic_ppi_activer_entry[2];
+   375		u64	vgic_ich_ppi_enabler_entry[2];
+   376		u64	vgic_ppi_pendr_entry[2];
+   377	
+   378		/* The saved state of the regs when leaving the guest */
+   379		u64	vgic_ppi_activer_exit[2];
+   380		u64	vgic_ich_ppi_enabler_exit[2];
+   381		u64	vgic_ppi_pendr_exit[2];
+   382	
+   383		/*
+   384		 * The ICSR is re-used across host and guest, and hence it needs to be
+   385		 * saved/restored. Only one copy is required as the host should block
+   386		 * preemption between executing GIC CDRCFG and acccessing the
+   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
+   388		 * it is the hyp's responsibility to keep the state constistent.
+   389		 */
+   390		u64	vgic_icsr;
+   391	
+ > 392		struct gicv5_vpe gicv5_vpe;
+   393	};
+   394	
 
-> Thanks,
-> Oliver
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
