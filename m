@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590A631328A
-	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 11:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C893231354A
+	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 11:23:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765711386; cv=none; b=FKh26RIG2f6ZS++ENQ5YY4YLtFhQCHCz9nPZhg/1sRlcBdkgQAwEZLhY6WTJBQ6fWYkHjYSQTyX6fUoOBfQSH/oXXRx3tzW7eBKCTG7zSGlLr4Rsm7uNct0Y/Yux33QasXX3ZF5KGUYL1UnmuQph9OfomJurX3O8TCsqyqNQGYg=
+	t=1765711388; cv=none; b=mNb1RWUa4786XWP2Lrf2CkVrVd+tmYRMO1VcE2Rr84piR84sbowg1mQ85bLBz/a947wmZWc5HJx4yaYQZPt46l1BJrjTZq4sw0zx3G70dN1bFlM0OMrYgNtai3V/nxJ0cHxRXWO2hgTTAOikY85DgxcMuihb+8dJ/mBuVOKixL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765711386; c=relaxed/simple;
-	bh=6btpuIDyiFXuqBnCNKDMWd6bba2VNM8GqJZU/fhQK/M=;
+	s=arc-20240116; t=1765711388; c=relaxed/simple;
+	bh=QejTyxFJMU9YKfgHH9Mgdm7NJQeYkCy4kJIgQcQtous=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hAXrGoVqiZUm7o/EoiMBRvi+wlsDghiqFJDfJDlBgLU5OAhMighLLDU9P0j/HTFyCRZDfTBb/X3qhOY7McsT9mfCyBYi7/ytF/KevwPX56J3t5a8NHj5vOvNiyyIOB1Kck7m/ZJJfC309plgiVGk5XOsLajmNk/ol550+NId8+8=
+	 MIME-Version; b=rMjzz0OBbmt/5LmrvWX4tT2KVVVbie0V7SdsIfcpkLxN9Epu3Ojb2ReNiV87Hu1Anc6w406sPV7SyaCqMK9nNzyWgNzjqHeyjstKRKy0uqo3zQ5y85isoHozgM7mOvTgIHUCQxgxGiZph30y9X+Pafct/s3rUHBhtGShbUZmQlM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 84C01FEC;
-	Sun, 14 Dec 2025 03:22:51 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BF204165C;
+	Sun, 14 Dec 2025 03:22:58 -0800 (PST)
 Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6F7B53F73B;
-	Sun, 14 Dec 2025 03:22:55 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9D5CB3F73B;
+	Sun, 14 Dec 2025 03:23:02 -0800 (PST)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: catalin.marinas@arm.com,
 	will@kernel.org,
@@ -43,9 +43,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v11 RESEND 1/9] arm64: cpufeature: add FEAT_LSUI
-Date: Sun, 14 Dec 2025 11:22:40 +0000
-Message-Id: <20251214112248.901769-2-yeoreum.yun@arm.com>
+Subject: [PATCH v11 RESEND 3/9] KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+Date: Sun, 14 Dec 2025 11:22:42 +0000
+Message-Id: <20251214112248.901769-4-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251214112248.901769-1-yeoreum.yun@arm.com>
 References: <20251214112248.901769-1-yeoreum.yun@arm.com>
@@ -57,59 +57,26 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since Armv9.6, FEAT_LSUI provides load/store instructions
-that allow privileged code to access user memory without
-clearing the PSTATE.PAN bit.
-
-Add CPU feature detection for FEAT_LSUI.
+Add test coverage for FEAT_LSUI.
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 10 ++++++++++
- arch/arm64/tools/cpucaps       |  1 +
- 2 files changed, 11 insertions(+)
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c840a93b9ef9..4c75220e53a1 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -280,6 +280,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
+diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+index c4815d365816..0b1714aa127c 100644
+--- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
++++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
+@@ -125,6 +125,7 @@ static const struct reg_ftr_bits ftr_id_aa64isar2_el1[] = {
 
- static const struct arm64_ftr_bits ftr_id_aa64isar3[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FPRCVT_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_LSUI_SHIFT, 4, ID_AA64ISAR3_EL1_LSUI_NI),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_LSFE_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR3_EL1_FAMINMAX_SHIFT, 4, 0),
- 	ARM64_FTR_END,
-@@ -3148,6 +3149,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, XNX, IMP)
- 	},
-+#ifdef CONFIG_AS_HAS_LSUI
-+	{
-+		.desc = "Unprivileged Load Store Instructions (LSUI)",
-+		.capability = ARM64_HAS_LSUI,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.matches = has_cpuid_feature,
-+		ARM64_CPUID_FIELDS(ID_AA64ISAR3_EL1, LSUI, IMP)
-+	},
-+#endif
- 	{},
- };
-
-diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-index 0fac75f01534..4b2f7f3f2b80 100644
---- a/arch/arm64/tools/cpucaps
-+++ b/arch/arm64/tools/cpucaps
-@@ -46,6 +46,7 @@ HAS_HCX
- HAS_LDAPR
- HAS_LPA2
- HAS_LSE_ATOMICS
-+HAS_LSUI
- HAS_MOPS
- HAS_NESTED_VIRT
- HAS_BBML2_NOABORT
+ static const struct reg_ftr_bits ftr_id_aa64isar3_el1[] = {
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FPRCVT, 0),
++	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSUI, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSFE, 0),
+ 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FAMINMAX, 0),
+ 	REG_FTR_END,
 --
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
