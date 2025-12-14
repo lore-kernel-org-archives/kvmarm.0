@@ -1,171 +1,165 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B147286D64;
-	Sat, 13 Dec 2025 08:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB4429ACFD
+	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 11:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765613121; cv=none; b=aDCQb41XbwQuPqfgBDSKGjct6OpjLEQ/K7LSbckcS/sVEDsCJGebkggGGnfkpbfoYARS7wP1Beg5tX6DKqvnZj93Ln7sFNGgFoFzAbz8mlLyhYXirknC/ZcMsC6/E+Z/tMmsFhdbXjnhUDiFHV4ZaR9VrbUnyDs2bbA374uoqM0=
+	t=1765711384; cv=none; b=QSS1h3l1XBFRZMPnMaHsyt6ALhI6xZcETQpALxbHm8e/qOeff8gWy5xlVNuLmlHQqds6O1JumVewwYa1NG4TNh9AJY629l0hJzNaQfveYPLNOC0QODnQQnj4UON53pqnP9V+UitbA/vdn5l1zTbqkrxN/lGf3iJBoJ3vd+vM8Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765613121; c=relaxed/simple;
-	bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R0Q5OrI+zWjgDkEJkTXzeNgu4OTQvzqUYOkAyFJEZqRuMipHFe7eXaFJjidwrA4oePxm8KGte83V0b1524xXZQTP8fC453mv9s7SfW6XbvdIJomcATeKukU9c/81Qq2cmRCIDIzodJfHihdn7fDfY6nhbvz3BHhlNpWKhzGzUnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kdUiwj0Q; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kdUiwj0Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765613120; x=1797149120;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wol9oS19c9bBdlTBpPH9ntNcDtf/6ZWS5Gp4NfQ0SYg=;
-  b=kdUiwj0QDw1E1HD0iFoUYLWlWdr5p/lsEbPqDWXWO4eNcDKcxMdVNs57
-   GAzYQQLh+bKn9vSOVrmjsu09+15OMt0tVM8jQ1n+PjDJCUXGknEfsnNfh
-   VUAYE7//sefDXrlZftTZlhZytHpOfe27A46nFX25SvEgNhwxf0P88HUQU
-   Q1A7Y39EFnxuRu/IvJ1zA6+il8yE8xzaHWP3R1VheS2xmcsYTPmunSfZJ
-   I9O2ZGRmXYXC3a63l6klmGpAR5oOc/sL+YFEAVxEvx0Jyotv9R87aJyCP
-   XM+f3d1SN1jkfAvkf4+pVNQsJSm4p/d70SJBFmmyAXhRCz24rUyouxJou
-   g==;
-X-CSE-ConnectionGUID: safVptAuSiChwvY24VsK3Q==
-X-CSE-MsgGUID: OUEsTJGBSayRSUitQHmnjw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11640"; a="67675499"
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="67675499"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2025 00:05:19 -0800
-X-CSE-ConnectionGUID: +REegi4BSZ6Pyhok8jMjiA==
-X-CSE-MsgGUID: EDrkqM7KRneDKww23KbinA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,145,1763452800"; 
-   d="scan'208";a="227937216"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 13 Dec 2025 00:05:15 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUKcq-000000007H3-3MBs;
-	Sat, 13 Dec 2025 08:05:12 +0000
-Date: Sat, 13 Dec 2025 16:05:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Message-ID: <202512131539.zPrweF7e-lkp@intel.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1765711384; c=relaxed/simple;
+	bh=XDSDi5h/fuwj32uTomF9VLHfGU2PnEDhrbwKBeZtl6c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d105ySmGmu+UOkAfBZlkwLrBKXlWY4KTDG6eimAsSUa0X7u48N+x0qW2VdkAuQpzHed0XQdwnQJ3uNCci2YEwan9UBGK7R7v7a9u8QPNQ6bw4WiPAufyhBXWGlD/ONmGZwA3Muimxya8RC5c6WuTN0LfjYFr96UBk0Gax26SYDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED840497;
+	Sun, 14 Dec 2025 03:22:47 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D4FD73F73B;
+	Sun, 14 Dec 2025 03:22:51 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: catalin.marinas@arm.com,
+	will@kernel.org,
+	maz@kernel.org,
+	broonie@kernel.org,
+	oliver.upton@linux.dev,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	mark.rutland@arm.com,
+	arnd@arndb.de
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH v11 RESEND 0/9] support FEAT_LSUI
+Date: Sun, 14 Dec 2025 11:22:39 +0000
+Message-Id: <20251214112248.901769-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Sascha,
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
 
-kernel test robot noticed the following build errors:
+This patchset support FEAT_LSUI and applies in futex atomic operation
+and user_swpX emulation where can replace from ldxr/st{l}xr
+pair implmentation with clearing PSTATE.PAN bit to correspondant
+load/store unprevileged atomic operation without clearing PSTATE.PAN bit.
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on next-20251212]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next v6.18]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
-patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-randconfig-002-20251213 (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 1335a05ab8bc8339ce24be3a9da89d8c3f4e0571)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251213/202512131539.zPrweF7e-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512131539.zPrweF7e-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from include/linux/kvm_host.h:45:
-   In file included from arch/arm64/include/asm/kvm_host.h:36:
->> include/kvm/arm_vgic.h:392:19: error: field has incomplete type 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^
-   include/kvm/arm_vgic.h:392:9: note: forward declaration of 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                ^
-   1 error generated.
-   make[3]: *** [scripts/Makefile.build:182: arch/arm64/kernel/asm-offsets.s] Error 1 shuffle=1891526797
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1314: prepare0] Error 2 shuffle=1891526797
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2 shuffle=1891526797
-   make: Target 'prepare' not remade because of errors.
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for CAN_DEV
-   Depends on [n]: NETDEVICES [=n] && CAN [=y]
-   Selected by [y]:
-   - CAN [=y] && NET [=y]
+This patch based on v6.19-rc1
 
 
-vim +392 include/kvm/arm_vgic.h
+Patch Sequences
+================
 
-   360	
-   361	struct vgic_v5_cpu_if {
-   362		u64	vgic_apr;
-   363		u64	vgic_vmcr;
-   364	
-   365		/* PPI register state */
-   366		u64	vgic_ppi_hmr[2];
-   367		u64	vgic_ppi_dvir[2];
-   368		u64	vgic_ppi_priorityr[16];
-   369	
-   370		/* The pending state of the guest. This is merged with the exit state */
-   371		u64	vgic_ppi_pendr[2];
-   372	
-   373		/* The state flushed to the regs when entering the guest */
-   374		u64	vgic_ppi_activer_entry[2];
-   375		u64	vgic_ich_ppi_enabler_entry[2];
-   376		u64	vgic_ppi_pendr_entry[2];
-   377	
-   378		/* The saved state of the regs when leaving the guest */
-   379		u64	vgic_ppi_activer_exit[2];
-   380		u64	vgic_ich_ppi_enabler_exit[2];
-   381		u64	vgic_ppi_pendr_exit[2];
-   382	
-   383		/*
-   384		 * The ICSR is re-used across host and guest, and hence it needs to be
-   385		 * saved/restored. Only one copy is required as the host should block
-   386		 * preemption between executing GIC CDRCFG and acccessing the
-   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-   388		 * it is the hyp's responsibility to keep the state constistent.
-   389		 */
-   390		u64	vgic_icsr;
-   391	
- > 392		struct gicv5_vpe gicv5_vpe;
-   393	};
-   394	
+Patch #1 adds cpufeature for FEAT_LSUI
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Patch #2-#3 expose FEAT_LSUI to guest
+
+Patch #4 adds Kconfig for FEAT_LSUI
+
+Patch #5-#6 support futex atomic-op with FEAT_LSUI
+
+Patch #7-#9 support user_swpX emulation with FEAT_LSUI
+
+
+Patch History
+==============
+from v10 to v11:
+  - rebase to v6.19-rc1
+  - use cast instruction to emulate deprecated swpb instruction
+  - https://lore.kernel.org/all/20251103163224.818353-1-yeoreum.yun@arm.com/
+
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LUSI to guest
+  - add help section for LUSI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LUSI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (9):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: Kconfig: Detect toolchain support for LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: separate common LSUI definitions into lsui.h
+  arm64: armv8_deprecated: convert user_swpX to inline function
+  arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
+
+ arch/arm64/Kconfig                            |   5 +
+ arch/arm64/include/asm/futex.h                | 291 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  25 ++
+ arch/arm64/kernel/armv8_deprecated.c          | 111 +++++--
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 8 files changed, 381 insertions(+), 66 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+
