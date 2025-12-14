@@ -1,185 +1,77 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E465131328A
-	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 11:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E031DDF3
+	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 12:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765711409; cv=none; b=lW28k9okXe0Gv7cGk1/iCoOPHrKK60Go3tef5t0GMOHTgJt2cYjJuVVMYt+po+CsZUAlPIazhQlMSI+Uvc1qQrtNpwZeAIcbf05n+beRvcrFoySA6jofEUPequ/PrCEWxs6MX0929jOlVzmEas8v9uxTdRphuKTVZZzvz4QLzk0=
+	t=1765714732; cv=none; b=GHO+iQpKi2HlOK7eU1/JRnVCg72qlCrjhtjCiBHq/oZthiKcwV7AUyT10dNOG7c5iO+SDVvFDCaDUcCQrAoSGkFEIxwuBXjE8jXKm2Z+coQ6B3pnnGTax5i8JwW/JdsOUstAMrK7wTriscn777PefqCBxVP50z6tpJF1egkCMvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765711409; c=relaxed/simple;
-	bh=lhB4tUhCCDLZA6yBYgCDqTgP+a9jFwXX5PcOcj+pjRA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A1vGmC877EQ6xs+AYM1EiY1oycpDW+8Ma03bWCunzXuBcuhxWMUmE51gtUjomb7WuKNvyun5u8NdIkzIZMYcWKGyI61mPUkMzoS1eEyZkqxa1fz7g4fXf54COp2+ELVFQkvN6IxKWr8YnP6OKoqScwmrqEpjPluZ1kiTOlY0viM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49B1B16F3;
-	Sun, 14 Dec 2025 03:23:20 -0800 (PST)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 31B933F73B;
-	Sun, 14 Dec 2025 03:23:24 -0800 (PST)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	broonie@kernel.org,
-	oliver.upton@linux.dev,
-	miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com,
-	ardb@kernel.org,
-	suzuki.poulose@arm.com,
-	lpieralisi@kernel.org,
-	yangyicong@hisilicon.com,
-	scott@os.amperecomputing.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	mark.rutland@arm.com,
-	arnd@arndb.de
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
-Date: Sun, 14 Dec 2025 11:22:48 +0000
-Message-Id: <20251214112248.901769-10-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251214112248.901769-1-yeoreum.yun@arm.com>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1765714732; c=relaxed/simple;
+	bh=Wca8yvalyxtSQH/XJSSaImT9Ra4CF5mpJ5QmuhAfhAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SUZJTOv3bMgWPc5LPkIC8wVyNwLpBwGI788RocUwOzaIlOFbQq++o7m//7xEBWopmw16JXA4lXEsqh5EgoZ5GRJugkJa0/qYtzxEGvYgJy9aljvmh6HN1QTu7OYlp76qsnh0SStg4GaALMjY0zDYGBaLe0oCu6TVKOR0Djb8m9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vTv9hKGM; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vTv9hKGM"
+Date: Sun, 14 Dec 2025 20:18:42 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765714727;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e0Rtq02u4ALdXbWLdQuFWEAwLztJaqUa3MxILk+qipg=;
+	b=vTv9hKGMVqpUCNXD7Kr50vG8fAIReJ542cYQqEEak4yI4RoUqGG6jT41ppiGt+T6TY+Siy
+	I29EoPf4ZlKjjCw9+0OIAIrXHOjTE2b34qjlqACRhKNVzB4k5V2LLkk5mfBVfWmyxChlq0
+	64w0lUqBVOVz9sOjOb+t7KVunN6jGIw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Leo Yan <leo.yan@linux.dev>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
+	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, james.clark@linaro.org,
+	mark.rutland@arm.com, james.morse@arm.com
+Subject: Re: [RFC PATCH v6 05/35] KVM: arm64: Add KVM_CAP_ARM_SPE capability
+Message-ID: <20251214121842.GA16796@debian-dev>
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-6-alexandru.elisei@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251114160717.163230-6-alexandru.elisei@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-instruction, so that toggling of the PSTATE.PAN bit can be removed when
-LSUI-related instructions are used.
+On Fri, Nov 14, 2025 at 04:06:46PM +0000, Alexandru Elisei wrote:
 
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
----
- arch/arm64/kernel/armv8_deprecated.c | 77 +++++++++++++++++++++++++---
- 1 file changed, 71 insertions(+), 6 deletions(-)
+[...]
 
-diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
-index d15e35f1075c..b8e6d71f766d 100644
---- a/arch/arm64/kernel/armv8_deprecated.c
-+++ b/arch/arm64/kernel/armv8_deprecated.c
-@@ -13,6 +13,7 @@
- #include <linux/uaccess.h>
+> +void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
+> +{
+> +	struct arm_spu_entry *entry;
+> +
+> +	guard(mutex)(&arm_spus_lock);
+> +
+> +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
+> +	if (!entry)
+> +		return;
+> +
+> +	entry->arm_spu = arm_spu;
+> +	list_add_tail(&entry->link, &arm_spus);
+> +
+> +	if (list_is_singular(&arm_spus))
+> +		static_branch_enable(&kvm_spe_available);
 
- #include <asm/cpufeature.h>
-+#include <asm/lsui.h>
- #include <asm/insn.h>
- #include <asm/sysreg.h>
- #include <asm/system_misc.h>
-@@ -86,13 +87,77 @@ static unsigned int __maybe_unused aarch32_check_condition(u32 opcode, u32 psr)
-  *	   Rn  = address
-  */
+We can simply check if list_empty(&arm_spus) in kvm_supports_spe(), thus
+the static key kvm_spe_available is not needed.  Another benefit is this
+is consistent with CPU PMU's virt implementation.
 
-+/* Arbitrary constant to ensure forward-progress of the loop */
-+#define __SWP_LOOPS	4
-+
-+#ifdef CONFIG_AS_HAS_LSUI
-+static __always_inline int
-+__lsui_user_swp_asm(unsigned int *data, unsigned int addr)
-+{
-+	int err = 0;
-+	unsigned int temp;
-+
-+	asm volatile("// __lsui_user_swp_asm\n"
-+	__LSUI_PREAMBLE
-+	"1:	swpt		%w1, %w2, [%3]\n"
-+	"	mov		%w1, %w2\n"
-+	"2:\n"
-+	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-+	: "+r" (err), "+r" (*data), "=&r" (temp)
-+	: "r" ((unsigned long)addr)
-+	: "memory");
-+
-+	return err;
-+}
-+
-+static __always_inline int
-+__lsui_user_swpb_asm(unsigned int *data, unsigned int addr)
-+{
-+	u8 i, idx;
-+	int err = -EAGAIN;
-+	u64 __user *addr_al;
-+	u64 oldval;
-+	union {
-+		u64 var;
-+		u8 raw[sizeof(u64)];
-+	} newval, curval;
-+
-+	idx = addr & (sizeof(u64) - 1);
-+	addr_al = (u64 __user *)ALIGN_DOWN(addr, sizeof(u64));
-+
-+	for (i = 0; i < __SWP_LOOPS; i++) {
-+		if (get_user(oldval, addr_al))
-+			return -EFAULT;
-+
-+		curval.var = newval.var = oldval;
-+		newval.raw[idx] = *data;
-+
-+		asm volatile("// __lsui_user_swpb_asm\n"
-+		__LSUI_PREAMBLE
-+		"1: cast	%x2, %x3, %1\n"
-+		"2:\n"
-+		_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-+		: "+r" (err), "+Q" (*addr_al), "+r" (curval.var)
-+		: "r" (newval.var)
-+		: "memory");
-+
-+		if (curval.var == oldval) {
-+			err = 0;
-+			break;
-+		}
-+	}
-+
-+	if (!err)
-+		*data = curval.raw[idx];
-+
-+	return err;
-+}
-+#endif /* CONFIG_AS_HAS_LSUI */
-+
- /*
-  * Error-checking SWP macros implemented using ldxr{b}/stxr{b}
-  */
-
--/* Arbitrary constant to ensure forward-progress of the LL/SC loop */
--#define __SWP_LL_SC_LOOPS	4
--
- #define LLSC_USER_SWPX(B)					\
- static __always_inline int					\
- __llsc_user_swp##B##_asm(unsigned int *data, unsigned int addr)	\
-@@ -117,7 +182,7 @@ __llsc_user_swp##B##_asm(unsigned int *data, unsigned int addr)	\
- 	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)			\
- 	: "=&r" (err), "+r" (*data), "=&r" (temp), "=&r" (temp2)\
- 	: "r" ((unsigned long)addr), "i" (-EAGAIN),		\
--	  "i" (__SWP_LL_SC_LOOPS)				\
-+	  "i" (__SWP_LOOPS)					\
- 	: "memory");						\
- 	uaccess_disable_privileged();				\
- 								\
-@@ -128,9 +193,9 @@ LLSC_USER_SWPX()
- LLSC_USER_SWPX(b)
-
- #define __user_swp_asm(data, addr) \
--	__llsc_user_swp_asm(data, addr)
-+	__lsui_llsc_body(user_swp_asm, data, addr)
- #define __user_swpb_asm(data, addr) \
--	__llsc_user_swpb_asm(data, addr)
-+	__lsui_llsc_body(user_swpb_asm, data, addr)
-
- /*
-  * Bit 22 of the instruction encoding distinguishes between
---
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
-
+Thanks,
+Leo
