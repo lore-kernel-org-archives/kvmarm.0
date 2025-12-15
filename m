@@ -1,331 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D21532AAB1;
-	Mon, 15 Dec 2025 16:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79BD341065
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 16:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765814707; cv=none; b=JeN4oD1kdEkZH7R3Sdc5YdKJXPLCOpqav6Tg4XTQNGX+N7UsAa+xwBtqqhkcl/QYQ7IrKIy5JlEqJ/dMpMzWDlM8nmNZGUv/dlJkserWuLgf1PAkOE3jLxGoYjzvvt04D0F1KIbwLXbI/m6YEX48VC9hBYQE7iY6Pl1LmN3gOd0=
+	t=1765817519; cv=none; b=tTLieAsVKwcWxFBe900FSGRSXhlL133ZVeEUfJL9dZsljgq9E5mEowIVD7AiW6z+UdnKmzWdUAxpfP7xuuOpxaQVHbrOqTGdqmn8rMJCPwoPgiraDi47+3XvmHLOfrSyyedKwgXeptSc2m7PwYciPYosqANYOg4XZTOKJUmeXlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765814707; c=relaxed/simple;
-	bh=bkRUkk2Yd28DymjzRKsJIcSdDn9vDEUyQ62VF2+dGLk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TYnf6pwkChcw3rIHzYDYnpfK6u4wYlfvx4lBZ+eG4y2upPSduLU1BzDG1m00QG1EeYy/Bq82rOSbXJPKewTumd1SbBW9EIuiXAFwqa9vfhLYHaJLOoHbY3AXFYpg7osol24oPmZoMKINZqIxy36jUhgqhFCdCwj8n9UA7HhmOKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNoWA50/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765817519; c=relaxed/simple;
+	bh=kU9NExtTi+tE1/KxnF4R8dBMbcDHnu2R/mzeJ9uVPQs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sdDtrKDHZnj2qbN3GuC0Lg18SViAFdwZWcYbfyLfp/v7WjgkjNvJu4L+kR05LXZ6B8gMj2PUNLDsxABr5727XHa9u/Cdh0IzJM81r5aIMm66Bo9Oee8gWY5SR5cj4xsdnfBF0Dri+J23LtGoTaZQYnx1lvtxBtJM0ijzPusHvvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v66sDfm6; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNoWA50/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE7ACC4CEF5;
-	Mon, 15 Dec 2025 16:05:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765814707;
-	bh=bkRUkk2Yd28DymjzRKsJIcSdDn9vDEUyQ62VF2+dGLk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XNoWA50/+Kj3ywDKjQhg1qz3I7wKxKoeemhIi7Iqi8febu/LP3D1fQP6UJ0NaQLt6
-	 q/5t1FZyfQ2bobMtnW5b3309NQFcKJvpO3cl6YBu16uRO4JvN7bNnjtGDw+EjPzV83
-	 OghlntbnhZN3oEXxZUwLUzLWckPngTI2ERfN6T8YfsrfbHGusrLmm7bvDE3N1InNRO
-	 hVFwEiGMNsJooc7sy6Y1yoYTahnyPAh2qPZrPc5fXfr5dke5n2AG/XHW9EfsIWU2q0
-	 y7+Oy1zP3brakqVbXoXFsrSfjvvz7pfBSsEM6iT9W8z3bfbQmX7AcX3gxm8weG4XjC
-	 MAaALmm/JYSKQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVB4K-0000000Cold-3DYt;
-	Mon, 15 Dec 2025 16:05:04 +0000
-Date: Mon, 15 Dec 2025 16:05:04 +0000
-Message-ID: <86ecovohn3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 07/32] KVM: arm64: gic: Introduce interrupt type helpers
-In-Reply-To: <86jyynooq3.wl-maz@kernel.org>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-8-sascha.bischoff@arm.com>
-	<86jyynooq3.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v66sDfm6"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4792bd2c290so42476915e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 08:51:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765817516; x=1766422316; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
+        b=v66sDfm6AWlP8boEbDCRAgU8l/bVZYjE68GwKNDl/YSM8GaWrio2+A8QdPhbJADZUG
+         pHPNbdT29P/hoj8bO4szMV8ZQ9QoMSi6SgvVJ8KfUyCVZ9gFtUsCfCw79IS6DFXl188C
+         QfjtexLHh/TvZhuCMA33IUsfdXy0dP6GBScVorthFwNb9lCCcPYv9HNvSU4Hi4Cm8boa
+         zn93N1Y7QxB++YGBAjls90opHmLODIQchuZ1CFjPUkrEGyLVMyMynBlSSPTuKWxUkdxp
+         yNynUkl8HNDykRfblTbC6QGVx8DSp9f6UhAUaGEVJPRkZLBlSsBJrpvxKrenRlX3+1ve
+         Ygvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765817516; x=1766422316;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k4K0A7tw0piWVnb/7q48qsAOBuaPwaaJnbI388C3EIk=;
+        b=bw4uumyehlnxAA1r8Lq26F7QdcSUUkmceKkdov+xIh4ZYX1RGwYwchvwy5ZWDbhNn+
+         XoR/4mWvH1SeX8DP4WNWH61oh0QwJHu+3j+zrx/hrOa9BidjS2mPFw8cf3vMf9Q+EgEU
+         tyqqbAXz7hhGE1q7Wn/lUrGMu74zUJ3hP9pt5JJ1W65XrA4qs2EjVFjVwhWAN+nAJy40
+         RGXJvwOnJicZFlpvLo4J0hIg11K2iZo1nH3SDjqKVFrS59iyRrjY2GO7q5gy6K7QyCgt
+         rs97Z28RRxtWJGCVlIRh50FCRtEAyxCrOLvocK4aoVFPpKt9bXtcplbtfwx5WaPgVmlS
+         Gylg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjWzc30Vl8YoIi4jeo9nWBcuylcEDi96tyowSiNHlAE2/eyJBxLNjIE7akU9C5nULz6Mt4gsE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyvyna9J0DfTZMXN4lO9rX4WbzPk5V96jKtDdsYDA0eL5kSHxKC
+	RAQnxNtsBgAGMKzR4OqfZgJN/5QhwyoUDcvjS6+R2CYGA53Gh6XdoVUaZxf69kY4moNioLDvUsD
+	lSg==
+X-Google-Smtp-Source: AGHT+IGNq+OOelN0gNt5/INxptKwNuOhXBeg9PpZV5h/y2ooLGgWvT+8nQuHYF+Ar/8EPep76SDOriq1fw==
+X-Received: from wmpo6.prod.google.com ([2002:a05:600c:3386:b0:475:d804:bfd2])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:840f:b0:479:1a09:1c4a
+ with SMTP id 5b1f17b1804b1-47a96378c50mr93572455e9.31.1765817516238; Mon, 15
+ Dec 2025 08:51:56 -0800 (PST)
+Date: Mon, 15 Dec 2025 16:51:50 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251215165155.3451819-1-tabba@google.com>
+Subject: [PATCH v2 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, 
+	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Dec 2025 13:32:04 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> I'd rather you have something that denotes the non-GICv5-ness of the
-> implementation. irq_is_nv5_ppi()?
+v2:
+- Resend to correct partial To/Cc lists. The previous versions were
+  inadvertently sent to disjoint subsets of the maintainers and lists
+  (kvmarm vs kvm-riscv). Apologies for the noise and the duplicate
+  threads.
+- No code changes.
 
-Actually, this is just as bad. I spent the past 30 minutes hacking on
-this, and came up with this hack (which compiles, but probably doesn't
-run). It is significantly more code, but I like that it treats all GIC
-implementations more or less the same way.
+This series tidies up a few things in the KVM selftests. It addresses an
+error in memory alignment, hardens the arm64 MMU configuration for
+selftests, and fixes minor documentation issues.
 
-It also clears the who [v]gic_is_v5() situation that made little
-sense.
+First, for arm64, the series explicitly disables translation table walks
+for the unused upper virtual address range (TTBR1). Since selftests run
+entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
+active could lead to unpredictable behavior if guest code accesses high
+addresses. We set EPD1 (and TBI1) to ensure such accesses
+deterministically generate translation faults.
 
-Let me know what you think.
+Second, the series fixes the `page_align()` implementation in both arm64
+and riscv. The previous version incorrectly rounded up already-aligned
+addresses to the *next* page, potentially wasting memory or causing
+unexpected gaps. After fixing the logic in the arch-specific files, the
+function is moved to the common `kvm_util.h` header to eliminate code
+duplication.
 
-	M.
+Finally, a few comments and argument descriptions in `kvm_util` are
+updated to match the actual code implementation.
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index b0a5a6c6bf8da..c908d5ac4d678 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -62,11 +62,6 @@ static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
- 	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
- };
- 
--static bool vgic_is_v5(struct kvm_vcpu *vcpu)
--{
--	return vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5;
--}
--
- static int nr_timers(struct kvm_vcpu *vcpu)
- {
- 	if (!vcpu_has_nv(vcpu))
-@@ -708,7 +703,7 @@ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
- 
- 	phys_active |= ctx->irq.level;
- 
--	if (!vgic_is_v5(vcpu))
-+	if (!vgic_is_v5(vcpu->kvm))
- 		set_timer_irq_phys_active(ctx, phys_active);
- 	else
- 		set_timer_irq_phys_masked(ctx, true);
-@@ -760,7 +755,7 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return;
- 
--	ops = vgic_is_v5(vcpu) ? &arch_timer_irq_ops_vgic_v5 :
-+	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
- 				 &arch_timer_irq_ops;
- 
- 	/*
-@@ -905,7 +900,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 
- 	if (static_branch_likely(&has_gic_active_state)) {
- 		/* We don't do NV on GICv5, yet */
--		if (vcpu_has_nv(vcpu) && !vgic_is_v5(vcpu))
-+		if (vcpu_has_nv(vcpu) && !vgic_is_v5(vcpu->kvm))
- 			kvm_timer_vcpu_load_nested_switch(vcpu, &map);
- 
- 		kvm_timer_vcpu_load_gic(map.direct_vtimer);
-@@ -977,7 +972,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 		kvm_timer_blocking(vcpu);
- 
- 	/* Unmask again on GICV5 */
--	if (vgic_is_v5(vcpu)) {
-+	if (vgic_is_v5(vcpu->kvm)) {
- 		set_timer_irq_phys_masked(map.direct_vtimer, false);
- 
- 		if (map.direct_ptimer)
-@@ -1623,7 +1618,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
- 		return -EINVAL;
- 	}
- 
--	ops = vgic_is_v5(vcpu) ? &arch_timer_irq_ops_vgic_v5 :
-+	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
- 				 &arch_timer_irq_ops;
- 
- 	get_timer_map(vcpu, &map);
-@@ -1700,7 +1695,7 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	 * The PPIs for the Arch Timers arch architecturally defined for
- 	 * GICv5. Reject anything that changes them from the specified value.
- 	 */
--	if (vgic_is_v5(vcpu) && vcpu->kvm->arch.timer_data.ppi[idx] != irq) {
-+	if (vgic_is_v5(vcpu->kvm) && vcpu->kvm->arch.timer_data.ppi[idx] != irq) {
- 		ret = -EINVAL;
- 		goto out;
- 	}
-diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-index d74cc3543b9a4..19d8bf90f8f6c 100644
---- a/arch/arm64/kvm/vgic/vgic-v5.c
-+++ b/arch/arm64/kvm/vgic/vgic-v5.c
-@@ -225,7 +225,7 @@ bool vgic_v5_ppi_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
- 
- 	lockdep_assert_held(&irq->irq_lock);
- 
--	if (WARN_ON_ONCE(!irq_is_ppi_v5(irq->intid)))
-+	if (WARN_ON_ONCE(!__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid)))
- 		return false;
- 
- 	vcpu = irq->target_vcpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 62d7d4c5650e4..6d8e4cd661734 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -109,10 +109,10 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
- 	if (WARN_ON(!vcpu))
- 		return NULL;
- 
--	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
-+	if (vgic_is_v5(vcpu->kvm)) {
- 		u32 int_num = FIELD_GET(GICV5_HWIRQ_ID, intid);
- 
--		if (irq_is_ppi_v5(intid)) {
-+		if (__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, intid)) {
- 			int_num = array_index_nospec(int_num, VGIC_V5_NR_PRIVATE_IRQS);
- 			return &vcpu->arch.vgic_cpu.private_irqs[int_num];
- 		}
-@@ -600,15 +600,13 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
- 	irq->hwintid = data->hwirq;
- 	irq->ops = ops;
- 
--	if (vgic_is_v5(vcpu->kvm)) {
--		/* Nothing for us to do */
--		if (!irq_is_ppi_v5(irq->intid))
--			return 0;
-+	if (vgic_is_v5(vcpu->kvm) &&
-+	    !__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
-+		return 0;
- 
--		if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
--			if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
--				irq->directly_injected = true;
--		}
-+	if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
-+		if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
-+			irq->directly_injected = true;
- 	}
- 
- 	return 0;
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 91969b3b80d04..d8a947a7eb941 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -500,11 +500,6 @@ static inline bool vgic_is_v3(struct kvm *kvm)
- 	return kvm_vgic_global_state.type == VGIC_V3 || vgic_is_v3_compat(kvm);
- }
- 
--static inline bool vgic_is_v5(struct kvm *kvm)
--{
--	return kvm_vgic_global_state.type == VGIC_V5 && !vgic_is_v3_compat(kvm);
--}
--
- bool system_supports_direct_sgis(void);
- bool vgic_supports_direct_msis(struct kvm *kvm);
- bool vgic_supports_direct_sgis(struct kvm *kvm);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 6863e19d6eeb7..ae2897c539af7 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -36,22 +36,78 @@
- /* GICv5 constants */
- #define VGIC_V5_NR_PRIVATE_IRQS	128
- 
--#define irq_is_ppi_legacy(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
--#define irq_is_spi_legacy(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
--					(irq) <= VGIC_MAX_SPI)
--#define irq_is_lpi_legacy(irq) ((irq) > VGIC_MAX_SPI)
--
--#define irq_is_ppi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_PPI)
--#define irq_is_spi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_SPI)
--#define irq_is_lpi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_LPI)
--
--#define gic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
--
--#define irq_is_ppi(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : irq_is_ppi_legacy(i))
--#define irq_is_spi(k, i) (gic_is_v5(k) ? irq_is_spi_v5(i) : irq_is_spi_legacy(i))
--#define irq_is_lpi(k, i) (gic_is_v5(k) ? irq_is_lpi_v5(i) : irq_is_lpi_legacy(i))
--
--#define irq_is_private(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : i < VGIC_NR_PRIVATE_IRQS)
-+#define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
-+
-+#define __irq_is_sgi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = false;					\
-+			break;						\
-+		default:						\
-+			__ret  = (i) < VGIC_NR_SGIS;			\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_ppi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_PPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) >= VGIC_NR_SGIS;			\
-+			__ret &= (i) < VGIC_NR_PRIVATE_IRQS;		\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_spi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_SPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) <= VGIC_MAX_SPI;			\
-+			__ret &= (i) >= VGIC_NR_PRIVATE_IRQS;		\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define __irq_is_lpi(t, i)						\
-+	({								\
-+		bool __ret;						\
-+									\
-+		switch (t) {						\
-+		case KVM_DEV_TYPE_ARM_VGIC_V5:				\
-+			__ret = is_v5_type(GICV5_HWIRQ_TYPE_LPI, (i));	\
-+			break;						\
-+		default:						\
-+			__ret  = (i) >= 8192;				\
-+		}							\
-+									\
-+		__ret;							\
-+	})
-+
-+#define irq_is_sgi(k, i) __irq_is_sgi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_ppi(k, i) __irq_is_ppi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_spi(k, i) __irq_is_spi((k)->arch.vgic.vgic_model, i)
-+#define irq_is_lpi(k, i) __irq_is_lpi((k)->arch.vgic.vgic_model, i)
-+
-+#define irq_is_private(k, i) (irq_is_ppi(k, i) || irq_is_sgi(k, i))
-+
-+#define vgic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
- 
- enum vgic_type {
- 	VGIC_V2,		/* Good ol' GICv2 */
+Based on Linux 6.19-rc1.
 
+Cheers,
+/fuad
+
+Fuad Tabba (5):
+  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+  KVM: arm64: selftests: Fix incorrect rounding in page_align()
+  KVM: riscv: selftests: Fix incorrect rounding in page_align()
+  KVM: selftests: Move page_align() to shared header
+  KVM: selftests: Fix typos and stale comments in kvm_util
+
+ tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
+ tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
+ 5 files changed, 14 insertions(+), 13 deletions(-)
+
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0.239.gd5f0c6e74e-goog
+
