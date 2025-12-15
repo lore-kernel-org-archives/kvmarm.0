@@ -1,97 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306802BEC2D;
-	Mon, 15 Dec 2025 09:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC53313525
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 09:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765791231; cv=none; b=L7LDWWIi7F7fPqUJo9gVxBBRZSKvijgQhyLoZlm1P94LJPLvGYhbZkM0hLM8Ldukmv65qzUlu6biY7rQQX8aCuXnjPT0u6AdbQNiabimgCb/X6tLxTpJyHKWRN5YaE6q9X4PC5Q4AAsy5/N7jpTlwcDPbCIj8xFGpvzHNVO5Htg=
+	t=1765792619; cv=none; b=LuB59729y9B5JVAzxNj9OKHSPQF1hNo1S4hqhRkqamd4Tw/jM9wI0NjjJadstvsEy/mp8ooKEFDOQbBVAd94jLL6PhuUH3e824EmVh0gp2HglsN0wGtgVrv3zUzv1hLr3hbE6PsDH08zDEqbsnvRJG1vlldhQRlSatNma6WTn6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765791231; c=relaxed/simple;
-	bh=SeF9YpW8ZZv1PqRsseJuqiCynezLQg+Dpkn6Gx/DWrM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c0K33baWTycM8/WUlIeAWyexrdtgD5imPzCsVNZ7HBzAober7B7Lg7BDh2S/paQ/Iwzm/UP6rVbhlEywYBDjF8rjHmPyYVgLnq5OzJd8aESJ+wLAST8Euff8Km/AyCSMysfWAYi6iSaawvYSWNgYAItjGe7rl+jZ7Je9cxaYM6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xt1v9Zy6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765792619; c=relaxed/simple;
+	bh=iuV++rBkrNA/kKc2HZDb0IcKwxQSZL9qjg+wv+qXbvA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dFVWvGugPcr7YGL1GXGufYDCXSB7aYevKhrqK1apoJnlcTKvqIgndeOYbpz6DINUvxVMa/MGwi1ZB+azj4ii6LGqBcfzpBCqi+yJYmOyg9d9XMgGYFXR0h69SCCzyYfGBlfXFWv+yvPpwNkvPkQaZtNsB9Dk5xTPJ0sHCsOSYY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=erMjdeBb; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xt1v9Zy6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2690C4CEF5;
-	Mon, 15 Dec 2025 09:33:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765791230;
-	bh=SeF9YpW8ZZv1PqRsseJuqiCynezLQg+Dpkn6Gx/DWrM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xt1v9Zy6vJn3XucSIhPiWS5DgEBL8MeL8S3hjUOZ92Pz+AF2MsIKRPE4X+WE23PXB
-	 8vZa/Foh1wS2BLniSCP/VRE6zIjzaao6VIZtWIaWvO8QpDz6XATn/HMt4pEPx7kJ6D
-	 CAr4/XhcmkEIMyuTaoSdxBgVfhKphIvDaO6xyHazeILXiuNsz2ZpcPkgDbmjI2sahs
-	 wtW/iYCyHIyVMkgcJBGgdA0Gx7tAHlClPmM5dyf0Vr0ohcy4zDqsu+6kuAH1rttPPM
-	 bJanP79mJIJ/YOa+hi6bvpvXE1/UuTjmxYUMGi6i+JICrwdMa/RVMXjoKFUYP3ukLo
-	 iW3VfwHc28bPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vV4xg-0000000Ciix-00EC;
-	Mon, 15 Dec 2025 09:33:48 +0000
-Date: Mon, 15 Dec 2025 09:33:47 +0000
-Message-ID: <86ms3knl6s.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	broonie@kernel.org,
-	oliver.upton@linux.dev,
-	miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com,
-	ardb@kernel.org,
-	suzuki.poulose@arm.com,
-	lpieralisi@kernel.org,
-	yangyicong@hisilicon.com,
-	scott@os.amperecomputing.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	mark.rutland@arm.com,
-	arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI for swpX emulation.
-In-Reply-To: <20251214112248.901769-10-yeoreum.yun@arm.com>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
-	<20251214112248.901769-10-yeoreum.yun@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="erMjdeBb"
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-6432842cafdso2930743d50.2
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 01:56:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1765792617; x=1766397417; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iuV++rBkrNA/kKc2HZDb0IcKwxQSZL9qjg+wv+qXbvA=;
+        b=erMjdeBbzzSMw+3rjEDQ5sWd15npukQACPcpHN0pWlIZ9rbxfXKVaUTMMeAICiZl1H
+         2BRUiyZvvkXoiEdkVRrOSH5A6DRWmlUGWoxViD2bMOYP0MbvDrYPmmAxRB4OrKX9Xegn
+         PZ3P3GAlDivL2DcxJ8mimgT5n4AfwobuPRTpk3Wb3SYbau6ED9nSj6GZ8J7VHdlznjLz
+         XDN5oQjlYYJaAEfS+Kcnqj2LYnRX7HJVMju41NoFQcsV9x96vLZowjKwkYpeTozf7T7V
+         o8gxg8+mdY0t8jGlw77Qz1CCPu394GxjtMt0X7SEPcDMMo2Fp6FhQPz5e7oSrCHXFx/X
+         iI/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765792617; x=1766397417;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iuV++rBkrNA/kKc2HZDb0IcKwxQSZL9qjg+wv+qXbvA=;
+        b=D0GKdu5wJ9KlTvzkf4vs6ddKe9ZqzoL6RsqmSMxIyChFcDPk5svkEzlw7597AmUU7H
+         1TRyFLecdrVqSIExgf/8bl3jV1Xg1mcXivz50fmlZadMXWqsfCp+jzZF6LerC/slVOYG
+         n6BQfSLOk5aIWLfMDZLuJ4wwuAEvy8DwrE64eoCe/NxrCARj17H4y733KxkxxJMkJkgI
+         g9T2mPpxptIjsqsd7NzwtEBDeOaSeAKrEw7N9w1/ajnYrJo4nqZyrTdmBf8rkiwspbtf
+         UGr/wzYadhZ7acW5Eu3khhE+4ijsMidg6XDpo1jSGWyE8n53LXM7eXKlrS5fb5GOMMFQ
+         d9xg==
+X-Forwarded-Encrypted: i=1; AJvYcCXX3Uw9yBsvm1hRn6Ex6NC4Ck4sip+GX6NQ+9d9/ftMS3TTUU8DfcqDosm0X2hLp8dSPwZEtOk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzaDs768QHmCJOQtf7Y3r2azUmpnsXTTEqpX1LbQUJix16ASrZc
+	suGReMJgfN6ag6ZUvtjOGtMzyz4TZA/yeGKp9f/lVZHdpHGgUhzuh8sdGOvvPgWb44UmyNNJ1g3
+	l4q6wV4cMiSh/GXpVIUTuVKS1PBbiQyaS833F6V145Q==
+X-Gm-Gg: AY/fxX75+k5kuTV1JIvCTLRp+DD4uhQLMgy6aver2ahMmaeW/uqu7Cp0hlQXVsYk2rS
+	B8VLmx4jD3zmZ5IAThTQna+aR9tp2XD5Hr4L66ZAS+fFdukuR/1vA+6oO85qAzNRpOboHhVYDw5
+	PziqTWZBcZol3vWdfa6sdoYMFa9kbKKRDgFUvWiosTt9x16i8Pd8vdoEWoz6cabXzxzgSkuVP7x
+	vMWXF2ARvxS0OKOoFioxu32Ygv0mF3wMck6JBrB8c2uf8lI412dtttmofaviELfi47q12fZ
+X-Google-Smtp-Source: AGHT+IGvRV+k5PpJ3mHqjVXWNH0ySYLSRmzIZa/3PhuG05Fhie+VpbBy/JBhrcR8TEOdgUG1Nhjy1u+B7Rb0r7A0s3U=
+X-Received: by 2002:a05:690e:118a:b0:641:f5bc:695c with SMTP id
+ 956f58d0204a3-64555661ec4mr9123217d50.72.1765792616925; Mon, 15 Dec 2025
+ 01:56:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, catalin.marinas@arm.com, will@kernel.org, broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com, kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com, lpieralisi@kernel.org, yangyicong@hisilicon.com, scott@os.amperecomputing.com, joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251212152215.675767-1-sascha.bischoff@arm.com> <20251212152215.675767-32-sascha.bischoff@arm.com>
+In-Reply-To: <20251212152215.675767-32-sascha.bischoff@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 15 Dec 2025 09:56:45 +0000
+X-Gm-Features: AQt7F2oZumKMouo4dd8tGmO8LzSkjWfV4-sM3jXbB_jFEwXZwbdvqQR53He-UZg
+Message-ID: <CAFEAcA-fgWOUu7yWfGNGyy0BwTPxH1ht+E5SQ4tjJf3U=w7e6w@mail.gmail.com>
+Subject: Re: [PATCH 31/32] Documentation: KVM: Introduce documentation for VGICv5
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>, 
+	"maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, 
+	Suzuki Poulose <Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 14 Dec 2025 11:22:48 +0000,
-Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> 
-> Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-> instruction, so that toggling of the PSTATE.PAN bit can be removed when
-> LSUI-related instructions are used.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+On Fri, 12 Dec 2025 at 15:24, Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>
+> Now that it is possible to create a VGICv5 device, provide initial
+> documentation for it. At this stage, there is little to document.
 
-It really begs the question: what are the odds of ever seeing a CPU
-that implements both LSUI and AArch32?
+Is userspace access to read/write the GICv5 register state also
+in the "will be added a in future patchseries" category ?
 
-This seems extremely unlikely to me.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+thanks
+-- PMM
