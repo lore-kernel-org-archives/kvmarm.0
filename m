@@ -1,300 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2522F2905;
-	Mon, 15 Dec 2025 13:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765805527; cv=none; b=Wndl1+O74x31echJeiwqEGoWDDk1qjwSIOi19IQJedQFSd2NRPQ1doEU8aOu/IUbiibAqNivMwXH0uSa74YoZ/iMUCuSwySwGao2FoDR65glXf+Lxad8LuedIDkGTKbEWes4pVCPJMEU78PF6Tx7j7PgJlXsvikasNj6BzMjKSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765805527; c=relaxed/simple;
-	bh=84Dzn8gAnsI6rfNIwAA64Hfmd016CVzpMPiihOVlWyg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MNHcJaFA6msTezNKBgsM1lXnvtKdSbndneCIA/IhFuVFmjNFkBmshAOIvKnZ9pLYMNXqqEukxpckGAjTb9NZ228/+vCkksUlyuyPLHFdMxqykiQIUYKPFWJ9e5AeOb08lfbAkYTVTwK/qiih4QVDVMn7WIEjazIxhvtZBTEdDs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ru0RAags; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1D427FB3E
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 13:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765806205; cv=pass; b=UdTPJyoETi78xDPZDbbiVadgfmh7BAIAZA5mb5/EEsrk/i+VM/oVrLFOhNbNhmefWPjPj7/KkP1bdQPaIeyrfIgyF5mTkSLPpKFxLpRhD6dv0qNzvL5dow4AXxdFiBA56D0myl55pewPYjejn5ZEQp9WF0zo+YBgXz91gQPVJs8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765806205; c=relaxed/simple;
+	bh=nsbFlHT7t91E43W7U8+Fsp77nyGuhWQL8pPq90Wth28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ghSathkD5qVq3SVGnd62KBB9D0LBiPCOSLSLPB2347sPxDUMqbk3Y5b3jSFLq2gqYumF0mqNdU+y+bfUX68vnLVBbcINQOR5yJYFUwNl4bH+C1pujDJTdr1Fiu9dEA1yLZ/Q8DumCNZCz4uSxLjzVLT122Raz5O3KAzRzYxR9Yc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r6SN+Txg; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ru0RAags"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACCE7C4CEF5;
-	Mon, 15 Dec 2025 13:32:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765805526;
-	bh=84Dzn8gAnsI6rfNIwAA64Hfmd016CVzpMPiihOVlWyg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ru0RAagsbL9KNqe1Me//gm6BO/+23CBjfd27AM2LTwLRN45kO//JZxSJgLcx7uuvM
-	 b9rFetWD40fsyaF+74q4WwpnlWRATjeb9oLRYzPlfcDRxnpOMV08pauoQnAiU8caVY
-	 vyJkFpirTGUOcDdd+r/wypoK1TmdEsKoF6k1FB70+cP4nK6G59ec1xvLx6Yjl3I7IE
-	 Gu4fK8yxigXmCKT79RDQyfA5QD3D0Q2EbvRLD/m9rfmJrJP9jR02tAJbuDry3eD5In
-	 f8VTq2peiRnW0rtQVG1/vz3d4J6Tu/sWsJhCsH9dscy3+brDXcgn2AHlDu6v13LIw4
-	 HMHRUe5wUzk/A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vV8gG-0000000Cm4r-2Oi3;
-	Mon, 15 Dec 2025 13:32:04 +0000
-Date: Mon, 15 Dec 2025 13:32:04 +0000
-Message-ID: <86jyynooq3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 07/32] KVM: arm64: gic: Introduce interrupt type helpers
-In-Reply-To: <20251212152215.675767-8-sascha.bischoff@arm.com>
-References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-8-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r6SN+Txg"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4edb8d6e98aso2574691cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 05:43:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1765806202; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ccslI/30y4qBj9ulFbazIAFyaFnojzipxIU6XaGu3PnNde1XtOMEAXKMXAqxzG75rJ
+         rf0cmIUD6eFygEKrhyAwgXLUTGbGeNpbbcn+jIaj0LOtoU8uqp/SojDWA/rRmunPa9YL
+         ZSS7fqibnIdiFg2zYMljC36DvuYPK4BCmm0DA3iBBwkuhaw0ALP1MxHKdEzgfd2UJJoT
+         zgwS350ugsBEhb2JDl1RVrDwcnIt8+BVXxflPJyrWjAsmCaxf6xsquu0bQE8moKhH9JE
+         bi1SoTIdIiPt6GSI9ScG3zglAzCWfJkaZwAIxiLg/XG0rRZybHR9hCs9y5dg6QiJPniI
+         lkDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=zf3hSW2fHb+vZcqGeYrEECUOHTRoafS8R6kEtlKr8/I=;
+        fh=clQBGQ3wfkgbXCNKKIDswnBTBjQw7wtFELtk881WE7w=;
+        b=fHqNn9YiANtwRt5hko2HCzXZ43wUmDkVLt0r/6eci2jlqeLKq7pTTPOTNEARHxAf/0
+         kJozmoGJAHQXN7vZ+Ovwww85uoOi0MPyWKuht+BnCz04hM1AdOERKWQ3N0Voz0T4h0eh
+         0TrmFk+CXPomIGBt+9yCVolS+KaMWAKy7QNL34OiRehTC1GGPgdLVjeLTwsflO5GALo7
+         PQw/zQKcUYWpiikUoa9tMRkMTt7YsmZW0+UMdjBFhI0VaDyzSY5RhxqIQuZZsfEa/H3y
+         JmRIyNQY+nVYlf75UYgGgQTj5mISBEjAY9zvYo6kgcaDcrO9NYL+Hv4XLLuGbvT6q2ar
+         0vHA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765806202; x=1766411002; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zf3hSW2fHb+vZcqGeYrEECUOHTRoafS8R6kEtlKr8/I=;
+        b=r6SN+TxgF9HDwyTL6n0YxTk8K7+hxsi9ZzeJOrB3DYdvYIAKHPpU7Q3REkIwMiw3l7
+         5v0rOoKKZO7/g4Q1yJTvPuosdP78E3KEqr6JtY6GDBeoj7tvFPxvj237GOKu9SjsKJET
+         Kpku8n40fko1YT/4oFpImd718YfSZtZdhfB5b4RdRwP5dD/K56gMg0T2BOs9qLxsvufE
+         ACS2L8OmZMTfGZEDZippllwcMnHSOD8+B56omOXWQzYE4I/28bH8KxvR/Z8+R8ErTOul
+         SthZwF3xIttG1T6adGpEMTYBJ4Ct1xWtaejZF3fbSN8EXlLAIyKv6RI1+yuTT/BZP6mZ
+         +7Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765806202; x=1766411002;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zf3hSW2fHb+vZcqGeYrEECUOHTRoafS8R6kEtlKr8/I=;
+        b=BQlDtoU0TRYFi/jOPY7Xy+63Lj3fUKwvdmCpQaYBaduEHdMkDX9Lcc+CGcP5DStL7o
+         LOdp2mB1oU+A3/UkaLe5q0yr7zvNLEnvnCAfF6HQwvllz8mis2Zq0SkHtXRh5NX7Eka9
+         A/NmTWvxB+MIcm8ssg9T9LggPxXHDciutBTrXxtbBe8nWykD4RjX4QgiRTYNXbIQ896x
+         nZjtCjF0TDlBIAW4788t1mDLSmTpTYpQNm0fTW7DDJjZn3KB5KyDmayKnOO2NRupmMHY
+         HksHoXOzLGb2puzjAxjPuoeaoFKFHw2vSo97M1c/8jwGGO+iXgtUltgD1YqdAyaz4xmh
+         pHgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWS9xTkqlDVd4kgMe9DqLe4ESckydXPAh7nObQSnHkir+jRSl0WP7W1KfClPJ3ja/80GA0h1mg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwLSCVY7BFO+rzclYrqHWFo2JCNEvKhcQBaubeZ/X9YfV0z7T0h
+	nmQarHF4rDLnT57HtUVO13xZrJb/vaBlPUnpZY7JbquqkNpUxUJWTsnDm3uzAkEB5YNrxFqDR9o
+	NjmsTrMc97vptjUkdaLfcM+fQRKRcGmsIjnbEgKfs
+X-Gm-Gg: AY/fxX5S8lMq4+87D/86RQ/MnD2qsbCoy4/k+kkZTfN4x9mQOw2chdNoId8LUUCE+ty
+	jF9ZbszbQIWKn1R7LW6KigF7G3JbMA/GxBEnZDSSpsqQbbN+7yVsgdgOlrMwhNKCtoEuUom24GH
+	BcfUBvNrDfppqFTocbDigR2ijDC92G5Ql3OZlFbMumkryXrKIB6p4xnpZR0rhpQxaB0O495aOcY
+	0O5UGQeTtuQVeKb+Bj91l7AzwUQhWPZXjvyIY9adxXs7EaQkDaXaC0vER98176pvwnwgnDi
+X-Google-Smtp-Source: AGHT+IFzDElWJwyr6+nuwAlH/P9H4uymOrx5buaTQt2l+b4Jh2LO43obqrs0YFrGsbjpoetfJAAeMF7Kmpc6x+crfXk=
+X-Received: by 2002:a05:622a:1313:b0:4ed:b665:3779 with SMTP id
+ d75a77b69052e-4f1dd58a1d2mr20890381cf.16.1765806201435; Mon, 15 Dec 2025
+ 05:43:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251215114409.212512-1-alexandru.elisei@arm.com> <20251215114409.212512-5-alexandru.elisei@arm.com>
+In-Reply-To: <20251215114409.212512-5-alexandru.elisei@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 15 Dec 2025 13:42:44 +0000
+X-Gm-Features: AQt7F2q1x7ATNnNzIPh308Tfm8dpOMHBrZ2T4CqyYv5-2vMJtxpKgN6HpQ3ZEqw
+Message-ID: <CA+EHjTyCTetJ+ieRNFG9QN6gQT_4b+G29i-w9AB745w4EtrwMA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Remove unused parameter in synchronize_vcpu_pstate()
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, 
+	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 12 Dec 2025 15:22:37 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> GICv5 has moved from using interrupt ranges for different interrupt
-> types to using some of the upper bits of the interrupt ID to denote
-> the interrupt type. This is not compatible with older GICs (which rely
-> on ranges of interrupts to determine the type), and hence a set of
-> helpers is introduced. These helpers take a struct kvm*, and use the
-> vgic model to determine how to interpret the interrupt ID.
-> 
-> Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
-> helper is introduced to determine if an interrupt is private - SGIs
-> and PPIs for older GICs, and PPIs only for GICv5.
-> 
-> The helpers are plumbed into the core vgic code, as well as the Arch
-> Timer and PMU code.
-> 
-> There should be no functional changes as part of this change.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
->  arch/arm64/kvm/arch_timer.c           |  2 +-
->  arch/arm64/kvm/pmu-emul.c             |  6 +++---
->  arch/arm64/kvm/vgic/vgic-kvm-device.c |  2 +-
->  arch/arm64/kvm/vgic/vgic.c            | 14 +++++++-------
->  include/kvm/arm_vgic.h                | 27 +++++++++++++++++++++++----
->  5 files changed, 35 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 99a07972068d1..6f033f6644219 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -1598,7 +1598,7 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  	if (get_user(irq, uaddr))
->  		return -EFAULT;
->  
-> -	if (!(irq_is_ppi(irq)))
-> +	if (!(irq_is_ppi(vcpu->kvm, irq)))
-
-nit: From a high-level perspective, I'd find it mentally more
-satisfying to pass a vcpu to the macro rather than a vm pointer when
-dealing with PPIs. It would also keep the dereference hidden away. But
-maybe i just need to go with the flow here.
-
->  		return -EINVAL;
->  
->  	mutex_lock(&vcpu->kvm->arch.config_lock);
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index b03dbda7f1ab9..0baf8e0fe23bd 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -939,7 +939,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  		 * number against the dimensions of the vgic and make sure
->  		 * it's valid.
->  		 */
-> -		if (!irq_is_ppi(irq) && !vgic_valid_spi(vcpu->kvm, irq))
-> +		if (!irq_is_ppi(vcpu->kvm, irq) && !vgic_valid_spi(vcpu->kvm, irq))
->  			return -EINVAL;
->  	} else if (kvm_arm_pmu_irq_initialized(vcpu)) {
->  		   return -EINVAL;
-> @@ -991,7 +991,7 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  		if (!kvm_arm_pmu_irq_initialized(vcpu))
->  			continue;
->  
-> -		if (irq_is_ppi(irq)) {
-> +		if (irq_is_ppi(kvm, irq)) {
->  			if (vcpu->arch.pmu.irq_num != irq)
->  				return false;
->  		} else {
-> @@ -1142,7 +1142,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  			return -EFAULT;
->  
->  		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
-> -		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
-> +		if (!(irq_is_ppi(vcpu->kvm, irq) || irq_is_spi(vcpu->kvm, irq)))
->  			return -EINVAL;
->  
->  		if (!pmu_irq_is_valid(kvm, irq))
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index 3d1a776b716d7..b12ba99a423e5 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -639,7 +639,7 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
->  		if (vgic_initialized(dev->kvm))
->  			return -EBUSY;
->  
-> -		if (!irq_is_ppi(val))
-> +		if (!irq_is_ppi(dev->kvm, val))
->  			return -EINVAL;
->  
->  		dev->kvm->arch.vgic.mi_intid = val;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 430aa98888fda..2c0e8803342e2 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -94,7 +94,7 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, u32 intid)
->  	}
->  
->  	/* LPIs */
-> -	if (intid >= VGIC_MIN_LPI)
-> +	if (irq_is_lpi(kvm, intid))
->  		return vgic_get_lpi(kvm, intid);
->  
->  	return NULL;
-> @@ -123,7 +123,7 @@ static void vgic_release_lpi_locked(struct vgic_dist *dist, struct vgic_irq *irq
->  
->  static __must_check bool __vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  {
-> -	if (irq->intid < VGIC_MIN_LPI)
-> +	if (!irq_is_lpi(kvm, irq->intid))
->  		return false;
->  
->  	return refcount_dec_and_test(&irq->refcount);
-> @@ -148,7 +148,7 @@ void vgic_put_irq(struct kvm *kvm, struct vgic_irq *irq)
->  	 * Acquire/release it early on lockdep kernels to make locking issues
->  	 * in rare release paths a bit more obvious.
->  	 */
-> -	if (IS_ENABLED(CONFIG_LOCKDEP) && irq->intid >= VGIC_MIN_LPI) {
-> +	if (IS_ENABLED(CONFIG_LOCKDEP) && irq_is_lpi(kvm, irq->intid)) {
->  		guard(spinlock_irqsave)(&dist->lpi_xa.xa_lock);
->  	}
->  
-> @@ -186,7 +186,7 @@ void vgic_flush_pending_lpis(struct kvm_vcpu *vcpu)
->  	raw_spin_lock_irqsave(&vgic_cpu->ap_list_lock, flags);
->  
->  	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
-> -		if (irq->intid >= VGIC_MIN_LPI) {
-> +		if (irq_is_lpi(vcpu->kvm, irq->intid)) {
->  			raw_spin_lock(&irq->irq_lock);
->  			list_del(&irq->ap_list);
->  			irq->vcpu = NULL;
-> @@ -521,12 +521,12 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  	if (ret)
->  		return ret;
->  
-> -	if (!vcpu && intid < VGIC_NR_PRIVATE_IRQS)
-> +	if (!vcpu && irq_is_private(kvm, intid))
->  		return -EINVAL;
->  
->  	trace_vgic_update_irq_pending(vcpu ? vcpu->vcpu_idx : 0, intid, level);
->  
-> -	if (intid < VGIC_NR_PRIVATE_IRQS)
-> +	if (irq_is_private(kvm, intid))
->  		irq = vgic_get_vcpu_irq(vcpu, intid);
->  	else
->  		irq = vgic_get_irq(kvm, intid);
-> @@ -685,7 +685,7 @@ int kvm_vgic_set_owner(struct kvm_vcpu *vcpu, unsigned int intid, void *owner)
->  		return -EAGAIN;
->  
->  	/* SGIs and LPIs cannot be wired up to any device */
-> -	if (!irq_is_ppi(intid) && !vgic_valid_spi(vcpu->kvm, intid))
-> +	if (!irq_is_ppi(vcpu->kvm, intid) && !vgic_valid_spi(vcpu->kvm, intid))
->  		return -EINVAL;
->  
->  	irq = vgic_get_vcpu_irq(vcpu, intid);
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index b261fb3968d03..be1f45a494f78 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -19,6 +19,7 @@
->  #include <linux/jump_label.h>
->  
->  #include <linux/irqchip/arm-gic-v4.h>
-> +#include <linux/irqchip/arm-gic-v5.h>
->  
->  #define VGIC_V3_MAX_CPUS	512
->  #define VGIC_V2_MAX_CPUS	8
-> @@ -31,9 +32,22 @@
->  #define VGIC_MIN_LPI		8192
->  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
->  
-> -#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
-> -#define irq_is_spi(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
-> -			 (irq) <= VGIC_MAX_SPI)
-> +#define irq_is_ppi_legacy(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
-> +#define irq_is_spi_legacy(irq) ((irq) >= VGIC_NR_PRIVATE_IRQS && \
-> +					(irq) <= VGIC_MAX_SPI)
-> +#define irq_is_lpi_legacy(irq) ((irq) > VGIC_MAX_SPI)
-
-This last line is wrong. v3 LPIs start at 8192, while VGIC_MAX_SPI is
-1019. Also, "legacy" is remarkably ambiguous. v2 is legacy for v3, v3
-for v4...  You see where this is going.
-
-I'd rather you have something that denotes the non-GICv5-ness of the
-implementation. irq_is_nv5_ppi()?
-
-> +
-> +#define irq_is_ppi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_PPI)
-> +#define irq_is_spi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_SPI)
-> +#define irq_is_lpi_v5(irq) (FIELD_GET(GICV5_HWIRQ_TYPE, irq) == GICV5_HWIRQ_TYPE_LPI)
-> +
-> +#define gic_is_v5(k) ((k)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
-> +
-> +#define irq_is_ppi(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : irq_is_ppi_legacy(i))
-> +#define irq_is_spi(k, i) (gic_is_v5(k) ? irq_is_spi_v5(i) : irq_is_spi_legacy(i))
-> +#define irq_is_lpi(k, i) (gic_is_v5(k) ? irq_is_lpi_v5(i) : irq_is_lpi_legacy(i))
-> +
-> +#define irq_is_private(k, i) (gic_is_v5(k) ? irq_is_ppi_v5(i) : i < VGIC_NR_PRIVATE_IRQS)
->  
->  enum vgic_type {
->  	VGIC_V2,		/* Good ol' GICv2 */
-> @@ -418,8 +432,13 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu);
->  
->  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
-> -#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
-> +#define vgic_ready(k)		((k)->arch.vgic.ready)
-
-What is this for? Nothing seem to be using it yet. How different is it
-from the 'initialized' field?
-
-> +#define vgic_valid_spi_legacy(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
-> +#define vgic_valid_spi_v5(k, i)	(irq_is_spi(k, i) && \
-> +				 (FIELD_GET(GICV5_HWIRQ_ID, i) < (k)->arch.vgic.nr_spis))
-> +#define vgic_valid_spi(k, i) (((k)->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V5) ? \
-> +				vgic_valid_spi_legacy(k, i) : vgic_valid_spi_v5(k, i))
+On Mon, 15 Dec 2025 at 11:44, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 >
+> synchronize_vcpu_pstate() doesn't make use of the reference to exit_code,
+> remove the parameter.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
 
-This macro has its v5/nv5 statements in the opposite order of all the
-others. Some consistency would be welcome.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-Thanks,
+Cheers,
+/fuad
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/switch.c        | 2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c         | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index c5d5e5b86eaf..afecbdd3c1e9 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -854,7 +854,7 @@ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code,
+>         return false;
+>  }
+>
+> -static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu)
+>  {
+>         /*
+>          * Check for the conditions of Cortex-A510's #2077057. When these occur
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index d3b9ec8a7c28..779089e42681 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -211,7 +211,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>         const exit_handler_fn *handlers = kvm_get_exit_handler_array(vcpu);
+>
+> -       synchronize_vcpu_pstate(vcpu, exit_code);
+> +       synchronize_vcpu_pstate(vcpu);
+>
+>         /*
+>          * Some guests (e.g., protected VMs) are not be allowed to run in
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 9984c492305a..9db3f11a4754 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -536,7 +536,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+>
+>  static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+> -       synchronize_vcpu_pstate(vcpu, exit_code);
+> +       synchronize_vcpu_pstate(vcpu);
+>
+>         /*
+>          * If we were in HYP context on entry, adjust the PSTATE view
+> --
+> 2.52.0
+>
