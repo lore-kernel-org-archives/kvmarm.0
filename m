@@ -1,249 +1,300 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013013.outbound.protection.outlook.com [40.107.162.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F159286D5C;
-	Mon, 15 Dec 2025 10:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.13
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765796136; cv=fail; b=LK+eX9z65pd3OFYcoMdpNh+xRfA/t8pFed96h2DzKrfykSGRNmalE9w+UxQqcbZH72arSAEgQB3zzIR16GBGJJ3NGbh+NGlAgmWuHREPefdvuBq2+k4eC5gZ/dWq2fIswApy9BnC2apld+yq6vhiBv0693K7Xh4gyUHfyQ1x5Z8=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765796136; c=relaxed/simple;
-	bh=59VMslqeMHHHUHmLphIKRDuZ/k53wTGDzVMx+2ruiRg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YEduIffCQLRzHCl73ocEKBjawMX/PIyS1Q3vGJ17mq7Y0oSWEbyjZUH2TP8ocvz6meFtgvkJT3LdlroWssHtQflinEVTr32jXqsPLlnTx2TV8FXAXOFKx6sc5wlwr32ZtodCjooy88ZO4UzLHkyhBmBuuiNIA6jmkfzJ0YbE3HY=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=J+hbE/ol; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=J+hbE/ol; arc=fail smtp.client-ip=40.107.162.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1278329A9C8
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 11:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765798991; cv=none; b=aP8XnqIUsCi1pVneZZia0lNwnCu6FiNuotlX5Qe0dN//DFulHyN36XEc0Ctbhhuph4g8IWKeM+KZTKBl44NJgEebXHIpyoRa3sde4q2NkSDDQaoTRiAIaEPhXj3T4Z8PtoiwgkZPPyTgyV1Gj7K6HbN5HYMluNhb1eL/CGnnRws=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765798991; c=relaxed/simple;
+	bh=1P1thL9zI5U/OHGIiYzXdaJ4xWzTSugzI554aAfiLM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LQehdsu6nJaFWJUpE1YwERaJYjxMoGiAwFfc7SClLVtPSsGTp0F1TJG62oqrfoqKtAN0GIljbUBpi9M3K/HhwaFjumEh0xh9jQeKuAwsUF1d7iTKaddr/LH40hXFybYD+mNiIs/7M6z2txo7ePnpFLCM091kHoOvZm9iL5Oq9Ek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SH4xPbFG; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="J+hbE/ol";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="J+hbE/ol"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=uzqh24qEdx246lh1ZzmHMwUsgpgAS93o070lojpC0YlOvAg4X0R5kObNcZJvwvH7UTh+xjP9o8r1LfSpy6NZr9cE0ZoaxfqfEtFbb3r6Gdf6NMlg8rlgGH1ii3c9L5GJb9n5Dqr2eJikeHJ0hZQ68xgIFUuhavtmV7bCAaR8rZ0DH/bcXLm421DhcxfLY/K2KPkNgYyxVLDZMj4IsQpylmoKnioBJlxy8n5ZINcNyEX25cKGkP7e0HKEcAJBfGd3ZmOvrX+mqAe25Iz2l9P2Yr7YZ7CB9PyXtQv2oSXWRmHi4IZqkovX0/IRxzyUhL2KXM8jrgXHVoZLb05U/7+o9Q==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=59VMslqeMHHHUHmLphIKRDuZ/k53wTGDzVMx+2ruiRg=;
- b=uv/7mOLBX2J8TggAqGqssDUKCuUc0LM1FzRwq6h1M9CiBVfVt4VDGbmaqBO3xpdigs9EhGWP8SD8xVKAR/Bb4hv661rvbDsK1CHreXrWXx0PHcmWkavNaDIHQD5US1y13zIrzazuVCIxS5ZPbd60B6WziCZwkUkZfqfM5yR1qVpYHK4NIsLx+rd4/6mxMmr9RFb5pdUUt7MWbiGl7SeZyoRG3NIL9ciZpVnTIcuUPRAqKTK4M5F4037cb+ipvhW3EGZd/iVu7MSD+h4+ofd8ggI7kysFbnORBae+sD5sPkcgH9CV1X/IuZsUibc8AR5qwkQ10L0g7tgsUaQS0r6TOA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=59VMslqeMHHHUHmLphIKRDuZ/k53wTGDzVMx+2ruiRg=;
- b=J+hbE/olcAhr5PZLoKm6EpfxFUwidxYR/T5KHV6hlCkc6dSfPjwaO36Z1zNhb0SU6jrMMhmyAvao88ytEfKcDx6nEx6QwAly5ZepCK/8yGfc0LBCPqdfScr1jllqhJLAUP2lWS/dSLiySl292BxLyFoUW/3XtS7ZY3IaTdMe9hw=
-Received: from DUZPR01CA0293.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b7::7) by AS4PR08MB7950.eurprd08.prod.outlook.com
- (2603:10a6:20b:576::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 10:55:25 +0000
-Received: from DB1PEPF0003922E.eurprd03.prod.outlook.com
- (2603:10a6:10:4b7:cafe::c4) by DUZPR01CA0293.outlook.office365.com
- (2603:10a6:10:4b7::7) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.13 via Frontend Transport; Mon,
- 15 Dec 2025 10:55:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF0003922E.mail.protection.outlook.com (10.167.8.101) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.4
- via Frontend Transport; Mon, 15 Dec 2025 10:55:23 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FOm9wTGZa2V09bFqLwlQuPxl+EiF5P2xPLiSQTDBXZOzXuyKjCTki3J8nYpaQU8Ic9IPHwQlG5cyu6hu5gxKe7HLFoaWD0mXyN7jVHWli9jVhOiWE9kkFMNj5j8kcBhsW0DoSPUf1dNYQ7khxah02L2O5nd5oq0sVfFELlpNb+0PuJLSN8ci7v5Gvz3aIe4+1WXHBOxX6mu8FLe2D2x2YykYS7UXsf6svYPdZYzN3Y9BM5bFDUb+JdXP0ViYBh4NscoboiBfdvj82K5qUZEVAtP6M/SvusIM8Q/nqW0dsMJKN/kGocEC7j9YcPqVfxyX+UA4jCWWo5bcb4uwtMMKtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=59VMslqeMHHHUHmLphIKRDuZ/k53wTGDzVMx+2ruiRg=;
- b=xQx4TRHt44fIHEPhQJb7lpXLyAgTJCuxp35TUCoPopC0dJK+0tR4CbS8JuQCibdrQIMNJFRmkV7U8cBM312mdGaBgtWG2fRKqi6utytfi13NalL8JRS45BJz4JvE101RzpHvH1S0xyMzXMUvr4eakDLFP5F+UJl7/eCqNFRmyrNLXUuE3NNwk8ACD81Oi+sI8wcpS6r3hjeoTjzr1p7UhapXN2fVcRWH6eO6m3G1Q8m4tKtcMiaI+Ig8ajbLDjX+wSKdkLBr4qP4YT+nkfKwd06zOK6Od2zLsk4pTYn3R6NwFCav0k18i3BIt8sLuIFuIUPUYZ3Zfd0H0ZyxQHudig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=59VMslqeMHHHUHmLphIKRDuZ/k53wTGDzVMx+2ruiRg=;
- b=J+hbE/olcAhr5PZLoKm6EpfxFUwidxYR/T5KHV6hlCkc6dSfPjwaO36Z1zNhb0SU6jrMMhmyAvao88ytEfKcDx6nEx6QwAly5ZepCK/8yGfc0LBCPqdfScr1jllqhJLAUP2lWS/dSLiySl292BxLyFoUW/3XtS7ZY3IaTdMe9hw=
-Received: from VI1PR08MB3871.eurprd08.prod.outlook.com (2603:10a6:803:b7::17)
- by GV1PR08MB11090.eurprd08.prod.outlook.com (2603:10a6:150:1ed::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
- 2025 10:54:20 +0000
-Received: from VI1PR08MB3871.eurprd08.prod.outlook.com
- ([fe80::98c3:33df:8fd4:b704]) by VI1PR08MB3871.eurprd08.prod.outlook.com
- ([fe80::98c3:33df:8fd4:b704%4]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
- 10:54:19 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"lkp@intel.com" <lkp@intel.com>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>, Timothy
- Hayes <Timothy.Hayes@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, nd
-	<nd@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "maz@kernel.org"
-	<maz@kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, "lpieralisi@kernel.org"
-	<lpieralisi@kernel.org>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Thread-Topic: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Thread-Index: AQHca3snr2OLKgEPBUyx+ouJOXBKPrUfFFyAgAN2/wA=
-Date: Mon, 15 Dec 2025 10:54:19 +0000
-Message-ID: <fd72d2f3cee71081d6abca6bdefd20c2962708b0.camel@arm.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
-	 <202512131338.pYhd9ptc-lkp@intel.com>
-In-Reply-To: <202512131338.pYhd9ptc-lkp@intel.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	VI1PR08MB3871:EE_|GV1PR08MB11090:EE_|DB1PEPF0003922E:EE_|AS4PR08MB7950:EE_
-X-MS-Office365-Filtering-Correlation-Id: e921b786-d2a4-4a9a-b44e-08de3bc872ef
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|38070700021;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?UlVHbHNnZ0luR2lRVW9kNlEwVkNWVktYSGFYWlQrYU5zaG9MbzVMR1RSMUFz?=
- =?utf-8?B?R0lvcnIxa3M4bEthTjdWZWxmamU4amNqVXBlVkYzME5KYlUrMktSUGZBVGJs?=
- =?utf-8?B?M3pqRngyRnV4LzRFenZtempVZWd5WFNxRjZJMDNiejlSRXBVeWU0K2pOMWdK?=
- =?utf-8?B?OFQ1QURGelNmU0taeFIyMDNpV3lnT290clV2SERDb2tySjFJMThFd2NYQTNl?=
- =?utf-8?B?TGo2cUd1TXpqUnVWMVc4cW1VaVV3Q1VZWDNlREd6MDNpaEE3eXRGZGRmMENK?=
- =?utf-8?B?UHpoTVR0azlTZDFZWnlDa01mUEMzNG04ZGp2b1V2cmdCb0tBR1V3TlBMQW94?=
- =?utf-8?B?anBSZW9zaEdHckwyTW9Gb24xSFJxVkJqNUNFcFBGaDVpbVI2TEozZi9nTnll?=
- =?utf-8?B?QTdaVEdXK0kzVmpsZk5hUmZHQXhMVWM3Zi9OcHM1czIzSHI1TFB0TlVpbUhr?=
- =?utf-8?B?STVUQUNaNjBDRmpYcEhMN00rMC84NzJSdkNjRnVSQnpXdWZYUFlWc1lmTXgz?=
- =?utf-8?B?YUlycmFkN0ZEMXgzTG1TemJ4K09scUV6b0dSb21ZL3Z5eWVZeVVLMnppa1ZX?=
- =?utf-8?B?eXZTYmhNakRBL3dLNThxNDZTMmE0S3prTXh4WmYyRys5UzJtenFIU25MdUlv?=
- =?utf-8?B?YlNxaVcrQ2hKSVpEemdFdlI0SFNGVGQxUzVCUGwzYUtzaEVwRGpKdlBkQWRx?=
- =?utf-8?B?M0NkU2NXSkdhNnJZaERmVDBwM3M4ZHd1aDZOZFJDTW5kSmFWLzBQejlHN3lj?=
- =?utf-8?B?ZlpiWUtrSnRHR25tUXloNU9VbHJtODhvSnpxVmg3RVNXQzV5c0FjTHlXUDl1?=
- =?utf-8?B?Zzk5bFRaa3dYbnJmM0pOZ1RlSnhkb0FSa0MzRVEwbXlrUHdQRWZZZCt3YXhz?=
- =?utf-8?B?dDVuUVgvLzcxcmNLd3FYSkFCUGlEVVlTOC9VcGhDTSt2bWpVT3dRd2o1TE5k?=
- =?utf-8?B?R3NrRmlsM2FjbVpsd2daZFBnOFk4dE03eldkNmgxanpHSDRlNUhmYVZneHJ1?=
- =?utf-8?B?Y25DclcwUEsrdHBkU3E2c0N3c2R2ajgyeTRWWG5LZEtxUUVkZHQ4K2VQS01I?=
- =?utf-8?B?dkI3WnpjS2dLcWNYc3NISTMrRnBvckxPNUNvZmIxdjdseG40ZFZ2WWc1OHd5?=
- =?utf-8?B?WS91UzhMZkd6R2xlNW1FWG1mRjFudlZaZ1BFSlF5OGYrQkpCRjE1SCtDMlI5?=
- =?utf-8?B?NlY5ZHBBdTdwZklGUlhDRUg0UG5WV3VlWGZZSlJSZ21saTBQUG1hMDlwcFlv?=
- =?utf-8?B?NlZ1WHE3UXpZLzRrZDRncEZ2bEtvYjJGbFAwUzY4YUlsNkg2M1drRnRwV1FL?=
- =?utf-8?B?bWF4WjczRS9acDBMcnpMVDNxb1pUM0dkVk54VlFJaE9Qa1FvZEV3ZThKbWV5?=
- =?utf-8?B?UDlvS0hhZzNiS0J3aTZhTnJkN3ZjZkhYLzdGZG9sRFZoVzdLQ1hzN2RqcDAv?=
- =?utf-8?B?RWxTK3cwWHpiMnBSTWNtdHF4OSttTXd1a00xYzhwaGdrZFIyM2JkUU56eFpR?=
- =?utf-8?B?NVVncURhaVNJc2s5RGI0MGFtMm5WUjJGQzMySk4yQUxqWVpsZ0pLS2gxV3Ix?=
- =?utf-8?B?b042bklSbmxEUGtadHovNXhqcVdzdVJ1ZEdOcStkTkc0NlhPZzljcWNPak9q?=
- =?utf-8?B?c0o4dWdQLzZTaXQ4U2xMUTNWZlV4a2hCeGQwSllCUmdJbVBDNnIxTHBoVjNp?=
- =?utf-8?B?Y3ArY3M5K2R4cDNKYTJ1T2VVemtuT3pwZ0NGcXZYYzlhWXJ4ZGNzdkQ4Y3Iy?=
- =?utf-8?B?bVo3MHVDOXF3L2JaNmZUQUN1MnJiRjJZSEQwdVBKVDVSRXd6S3NSL0ljUktB?=
- =?utf-8?B?NEd0S083L051SGtRU1c5TTJRcFpmWFUxcDlJSytUa0c4ZlVUL3BkMHhEVXFY?=
- =?utf-8?B?VnAxM3BIL0w1RjNna0VpcVV6bzhQRnZ0bUxmUXFQaUZWNzYwSWhqMFNEV2tU?=
- =?utf-8?B?ejVKdXNpNWphdHdwYW1UYW9QNTl5R3pKUThGWEpxT3BTYWZwU2MwSkoyWjdk?=
- =?utf-8?B?dlBsbmw2UVZPQS9kZGVjdkt0U3M0RWJ5Mk01NHQ1U0dZT2xhT1R5enFCcDhG?=
- =?utf-8?Q?Xd6IDO?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR08MB3871.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E996B11B12A2D044806555CF58130173@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SH4xPbFG"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42b3b0d76fcso1994386f8f.3
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 03:43:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765798988; x=1766403788; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HLb7lu6k1dl1c8hC4JILF0bEB9OOGY9XCBW6C8+pPO4=;
+        b=SH4xPbFGkSskaMUux95KEpk2C53QXscJ86lrwHXmuOcV2hm5+0UAk6stArZcHtoUOp
+         fRmfso+QammaDVWZ05med1x6Zum+Y0XiUwn8ODX07lllD2s5LfS07xDzUvKaTGpuJA/i
+         QAbCyvenuSm4AS4H85Sb9NB4Lz9VyjPsNcjviQ237JZTuf9wG42H7L+rwoODVrG1XA9n
+         TthNJpdtkbf2M5oEZ6NIvtxlptRGrumUquiv31pZEekmghY1/fMRXlxMB6OnZuaV0Gt4
+         xEWZX2mxAZGPipH4kRRZNW8BROfA8EMDyvhjN0fe/uo2AvuakmhTdKlxmOdqIg1mI0lk
+         44Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765798988; x=1766403788;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HLb7lu6k1dl1c8hC4JILF0bEB9OOGY9XCBW6C8+pPO4=;
+        b=stAx1pmn0aKHXW+kYKt6m+3Fs27KmSgezlO7qjcDBPRwrSDsra5lwcXIvJqo6X8vpx
+         n1+MFyMIdunUltUk1p/Y4EefCE7mZusRTlWIEUfx7YDMvYniBBPXCyCyUQXTCfofa1jw
+         xmFs8TiuoLqdoEvkgXwtMrrR8MFLx47/m30uGk1IlWhCDLS4nqHfpzqzKfHT9JaCdF61
+         EVAeSTZmV5220yJky/VLlNAopuQTh5EeRUNoorCkt71Uvil63mgiyQumoIb5+4NzETCO
+         etiP1BBEG/9ZUou2tKvYMXgYbqW3MrSizf9i/htYQzwCmI6zXTzzhZL8hWWbrP/YhHXm
+         GKTw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3cehPlNzaLbSXWpWZ2zLINx7j0jtAv5mBJLkFAKaiWfEDLZOoxnbfzvmGUz3hPurL8CUDobw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzR78TGjB9z7Ovwz+ppBd/twPmsb7dj46nVGFfvVEcpNFPPNoHY
+	TEoVfgXK/CYOtxjatlcj3KPpH1nb2TG5abNQ7czIAzwlxW0u5qceD/Ba
+X-Gm-Gg: AY/fxX4HIypA53vlmKJ6fl3HgmNj2VhFhSgndJtpOT6nEgvKy6s4FW2014ejJ1amjTY
+	NcQjl9IQZ3jqSiCEkKALimxOhDrcdNEIYa39zd3Nnrxp9EtEQjrAl06chU+VovNmoqJxUYnNoTY
+	KoMHj0e17yf0GqVXM5ZrPFUuooSPz30VdiAluEz6K3H3HtQ4Omro1Fkn25xdq9EjmHIfBXe3ZYC
+	uJSz+TcziyfVJZ4uwP1Zu0eNqnX/K4ZGmGkFx2xfoqRWAVWMJrDUjpOWxEUpa5XKoFEiNelYzY4
+	iVd8EoOavyEAqt9mj5XZicotTaqgVL5BGYwqjPR5fNqh3i2pr8Newt8W2/LU+T5jjH9wBq0uDkq
+	ARGhO0HktuAADoZItTommz5ODERpJchNL5tPU++8/3mEIEORkMXdVcrx2EkXouKH/m5K+PBaWvD
+	GqEm9ul4A5sZ3sgr38npwBVVdmTArRwdc=
+X-Google-Smtp-Source: AGHT+IEeDQpvobbuwupfGiM5uFsRvzqhSqqhXPwsogSR24Yld7AT9v3CQqs0OrKCGgHyBRAjSgk9dw==
+X-Received: by 2002:a05:6000:22c1:b0:431:104:6db2 with SMTP id ffacd0b85a97d-4310104705fmr1298336f8f.3.1765798988051;
+        Mon, 15 Dec 2025 03:43:08 -0800 (PST)
+Received: from [10.24.67.48] ([15.248.3.88])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fb0fc8d5fsm21235995f8f.2.2025.12.15.03.43.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Dec 2025 03:43:07 -0800 (PST)
+Message-ID: <bc93c396-78b1-491c-8857-41114aa585d7@gmail.com>
+Date: Mon, 15 Dec 2025 11:43:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR08MB11090
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF0003922E.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	10185e66-9f9c-4bc0-1f03-08de3bc84c85
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|35042699022|7416014|376014|14060799003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?V3RUSW1GdG5CR1dWL3R2d2o5M2ZqZUJ3dXlGaXRuNjd1S3h0a3lvQnh4NW5w?=
- =?utf-8?B?TzUrK2NkblUrYkM1ZjBEbCtSNnRLWm5NNFkzd09IdUN2QUtDaGVwaHdlYmFt?=
- =?utf-8?B?Z0pEZGJ4WTFuaXgzSmE1Zk9iZm9yMnl0Zmp2d3VxNURPMmE5SVlsOCsvZWFP?=
- =?utf-8?B?dVhsQTRiUFlXanN3bjRmeGZlb0lzd0huRDVReW1wNlVqVE5mQWxscnQ3K2Rk?=
- =?utf-8?B?U1hUalYxRUhzTktxSGVXQzFrcHphVkVhSkZXcm9KcUwyamFoVmU1eDBqZUNY?=
- =?utf-8?B?Y3B5YjM0L1kxT1BsbU5OYkZZaGsxYlhmUVpiR2tJNEFsYndQZnhiK0Y1SE44?=
- =?utf-8?B?cnZQNGpHS3IvK2RtaGV3OTVMaWdNQzRsbFd3QWlWSGZ2TjZIcEJ0NEJ5dkl3?=
- =?utf-8?B?dmhNU041bkltUm5EZUFQWGZmbHRWT29uMFpsK1pJYWNpc3FWWGxFR3J3Z2F2?=
- =?utf-8?B?ZDVnSC9iNlU2QkQ5d1J3NlRjUkx2Sm9UREZENURKczZTYURaL1piaGNvYk10?=
- =?utf-8?B?a1FzQ2tCcHIyd2xMSStTbnl6VHhxUE1LV1IzMmphQnVyL05oaXp3eHJtZGZK?=
- =?utf-8?B?MlBLbjBnK0FlYkluZXlYRCtHaWcrckZnU2pGZ1ZxN0tMNkFGdzJsSVNXdU5j?=
- =?utf-8?B?TTBFenZFV3dta2xvRUozbGFtR1FhUVlTdjdxdG1WaXB2cGNiOHdSSWVUQW43?=
- =?utf-8?B?V3F2Z2czQUtMSWtOSHZ0WGdycTkwM21nSmNlUnpGVHdsZTgvNXRvTmIyWTNR?=
- =?utf-8?B?Wmt1TzFSYmw4WGFPU1RhVTc2Q3FOQ3kxeEY5c3U3a2twaEJic0tzYUJOU1kx?=
- =?utf-8?B?U0dqcHM0bEZKanl5YTFnRW1hM1pFM2g4S29teUhMWmNrWmRYUnBLZWtQVmUx?=
- =?utf-8?B?QVh2Q1dMUUF0TVNaN1ZMSnBGeHViMUczSjVtYjU4RkZ1SGNlWS9yRXlIU2Jj?=
- =?utf-8?B?b1hjTEpCOVdNaExESUt5SDdwUmJUcUhSbU9HZHI2SXhGR1NKMEVxN3lTZzJV?=
- =?utf-8?B?MnV2eC9wL0d5T09PQll0UXhPTmttRG5CTjdwWUhZK0pLSEFHWkVvS0JzRFd3?=
- =?utf-8?B?RHU4d2RnTjFYRndSYXVQOHgrRDFIeVZTUEFENjFUT3ZPUW9LbE1XSXdBOFd0?=
- =?utf-8?B?WitOYmc5YWFadUJFU093OHlQVTNwT0xwQmQrNGFqRFE4MldtRTdldUcwZ2JL?=
- =?utf-8?B?S29xais4cVI0c0JYZXk5Y1YrelZiNnlNWGs4SGlkNzZycEdkMjAwVFYza0Fy?=
- =?utf-8?B?SVhqczZJbTB5VmtjQ2l5Y2p6Tm9CYkpNb3dQYUhUaDlwcjRBMnBQVWJSaUZ6?=
- =?utf-8?B?dHptRVZPWlpic3dOVlpJbFBEakRLZWpjZEV2NWpYd0gwM3RGYlNraFZJOURV?=
- =?utf-8?B?bjdCdDFWUmVBQmRIRjRDdHY5Vzk5blBKTG5tY3ZlUjN0VlRROUxJbkp1VnZE?=
- =?utf-8?B?TDN0eGpsOHRPZFd5RlEwQ0hNL1luY04xV3RENEJsR3J5TEdNTXJCc25nTFJ5?=
- =?utf-8?B?K3BjMUhhQnhFV09lZmcwLzIvaUJSSlI1Q1BzNTdkUG83MENKNkExYURxeFNa?=
- =?utf-8?B?NWliUmswVG9XSTI2dHl6MktXZXp6dEtva0ZmZDQrMUZhaUVUQ2tHNW1zRUpR?=
- =?utf-8?B?NDA3QVRPRDhjYVhPeUlHclVsa3FjMXVSY1pRdkhaM3lJVnBBdlIyNk56V2hU?=
- =?utf-8?B?bjNYN2tIRWN0RWF2akJhclh5ZVN6Rkx3S3owazRaOUhsaHBrKzRnUE4wNC9H?=
- =?utf-8?B?aHEvTHlId0xYOFlCV2NlTTRxNGNqQjFFc2NoMzNQb2FXRWFPcUJKdFFjMi9w?=
- =?utf-8?B?Q0VFNUgvdEdRNXBOMCtkTnp1ZWZXWGwwRURmSUdZNVJCQ050cUpIWlJiQk9y?=
- =?utf-8?B?TVB4WnFNSDRYanRjY3ZReGpHMDR0ZWhGcTRIazh6ZEQyUUJEUGNnNTVORjFj?=
- =?utf-8?B?MnVLVEVTZ25BbjFIYjVMTTlsWUk2dHA1a1hHczQvcC9wZkh4b0hycG4vdWZ4?=
- =?utf-8?B?cHhqWXpCWmRNTnhva1ZzbWJ4aXUxcFZsOGI5MUJnZEZzSDFiR0dESWdGZkEz?=
- =?utf-8?B?VUpUTXMvWlp6K2pjVlYyNWl1a2htZGozOCtLUDVYOGwyUzhtUUYvb3ZmL0RT?=
- =?utf-8?Q?yFJY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(35042699022)(7416014)(376014)(14060799003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 10:55:23.9937
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e921b786-d2a4-4a9a-b44e-08de3bc872ef
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF0003922E.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR08MB7950
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] KVM: arm64: Add pre_fault_memory implementation
+To: Marc Zyngier <maz@kernel.org>
+Cc: oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
+ will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com,
+ xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com
+References: <20251119154910.97716-1-jackabt.amazon@gmail.com>
+ <20251119154910.97716-2-jackabt.amazon@gmail.com>
+ <86see3r7e9.wl-maz@kernel.org>
+Content-Language: en-US
+From: "Thomson, Jack" <jackabt.amazon@gmail.com>
+In-Reply-To: <86see3r7e9.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gU2F0LCAyMDI1LTEyLTEzIGF0IDEzOjU5ICswODAwLCBrZXJuZWwgdGVzdCByb2JvdCB3cm90
-ZToNCj4gQWxsIGVycm9ycyAobmV3IG9uZXMgcHJlZml4ZWQgYnkgPj4pOg0KPiANCj4gwqDCoCBJ
-biBmaWxlIGluY2x1ZGVkIGZyb20gYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oOjM2
-LA0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBmcm9tIGluY2x1ZGUv
-bGludXgva3ZtX2hvc3QuaDo0NSwNCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgZnJvbSBhcmNoL2FybTY0L2tlcm5lbC9hc20tb2Zmc2V0cy5jOjE2Og0KPiA+ID4gaW5j
-bHVkZS9rdm0vYXJtX3ZnaWMuaDozOTI6MjY6IGVycm9yOiBmaWVsZCAnZ2ljdjVfdnBlJyBoYXMN
-Cj4gPiA+IGluY29tcGxldGUgdHlwZQ0KPiDCoMKgwqDCoCAzOTIgfMKgwqDCoMKgwqDCoMKgwqAg
-c3RydWN0IGdpY3Y1X3ZwZSBnaWN2NV92cGU7DQo+IMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIF5+fn5+fn5+fg0KPiDC
-oMKgIG1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoxODI6IGFyY2gvYXJtNjQv
-a2VybmVsL2FzbS0NCj4gb2Zmc2V0cy5zXSBFcnJvciAxDQo+IMKgwqAgbWFrZVszXTogVGFyZ2V0
-ICdwcmVwYXJlJyBub3QgcmVtYWRlIGJlY2F1c2Ugb2YgZXJyb3JzLg0KPiDCoMKgIG1ha2VbMl06
-ICoqKiBbTWFrZWZpbGU6MTMxNDogcHJlcGFyZTBdIEVycm9yIDINCj4gwqDCoCBtYWtlWzJdOiBU
-YXJnZXQgJ3ByZXBhcmUnIG5vdCByZW1hZGUgYmVjYXVzZSBvZiBlcnJvcnMuDQo+IMKgwqAgbWFr
-ZVsxXTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2VdIEVycm9yIDINCj4gwqDCoCBtYWtl
-WzFdOiBUYXJnZXQgJ3ByZXBhcmUnIG5vdCByZW1hZGUgYmVjYXVzZSBvZiBlcnJvcnMuDQo+IMKg
-wqAgbWFrZTogKioqIFtNYWtlZmlsZToyNDg6IF9fc3ViLW1ha2VdIEVycm9yIDINCj4gwqDCoCBt
-YWtlOiBUYXJnZXQgJ3ByZXBhcmUnIG5vdCByZW1hZGUgYmVjYXVzZSBvZiBlcnJvcnMuDQo+IA0K
-DQpJJ3ZlIGxvY2F0ZWQgdGhlIHVuZGVybHlpbmcgaXNzdWUgLSB0aGUgZGVmaW5pdGlvbiBvZiBz
-dHJ1Y3QgZ2ljdjVfdnBlDQp3YXMgd3JhcHBlZCBpbiBhbiAjaWZkZWYgQ09ORklHX0tWTSBibG9j
-aywgYW5kIHRoZSB0d28gZmFpbGluZyBidWlsZHMNCmhhdmUgS1ZNIGRpc2FibGVkLg0KDQpJJ3Zl
-IGZpeGVkIHRoZSBpc3N1ZSBsb2NhbGx5IChkcm9wcGVkIHRoZSAjaWZkZWYpLCBhbmQgd2lsbCBw
-b3N0IGENCmZpeGVkIGNvbW1pdCBhcyBwYXJ0IG9mIHYyIG9mIHRoaXMgc2VyaWVzLg0KDQpTYXNj
-aGENCg==
+
+
+On 24/11/2025 11:34 am, Marc Zyngier wrote:
+> On Wed, 19 Nov 2025 15:49:08 +0000,
+> Jack Thomson <jackabt.amazon@gmail.com> wrote:
+>>
+>> From: Jack Thomson <jackabt@amazon.com>
+>>
+>> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
+>> off the stage-2 faulting logic to either gmem_abort() or
+>> user_mem_abort().
+>>
+>> Add an optional page_size output parameter to user_mem_abort() to
+>> return the VMA page size, which is needed when pre-faulting.
+>>
+>> Update the documentation to clarify x86 specific behaviour.
+>>
+>> Signed-off-by: Jack Thomson <jackabt@amazon.com>
+>> ---
+>>   Documentation/virt/kvm/api.rst |  3 +-
+>>   arch/arm64/kvm/Kconfig         |  1 +
+>>   arch/arm64/kvm/arm.c           |  1 +
+>>   arch/arm64/kvm/mmu.c           | 73 ++++++++++++++++++++++++++++++++--
+>>   4 files changed, 73 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 57061fa29e6a..30872d080511 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -6493,7 +6493,8 @@ Errors:
+>>   KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
+>>   for the current vCPU state.  KVM maps memory as if the vCPU generated a
+>>   stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
+>> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
+>> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
+>> +Accessed.
+>>   
+>>   In the case of confidential VM types where there is an initial set up of
+>>   private guest memory before the guest is 'finalized'/measured, this ioctl
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 4f803fd1c99a..6872aaabe16c 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -25,6 +25,7 @@ menuconfig KVM
+>>   	select HAVE_KVM_CPU_RELAX_INTERCEPT
+>>   	select KVM_MMIO
+>>   	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>> +	select KVM_GENERIC_PRE_FAULT_MEMORY
+>>   	select VIRT_XFER_TO_GUEST_WORK
+>>   	select KVM_VFIO
+>>   	select HAVE_KVM_DIRTY_RING_ACQ_REL
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 870953b4a8a7..88c5dc2b4ee8 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -327,6 +327,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>   	case KVM_CAP_IRQFD_RESAMPLE:
+>>   	case KVM_CAP_COUNTER_OFFSET:
+>>   	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+>> +	case KVM_CAP_PRE_FAULT_MEMORY:
+>>   		r = 1;
+> 
+> How does with pKVM, where the host is not in charge of dealing with
+> stage-2?
+For the pKVM case would
+     if (vcpu_is_protected(vcpu))
+         return -EPERM;
+be the appropriate way to handle this?
+>>   		break;
+>>   	case KVM_CAP_SET_GUEST_DEBUG2:
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 7cc964af8d30..cba09168fc6d 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1599,8 +1599,8 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   
+>>   static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   			  struct kvm_s2_trans *nested,
+>> -			  struct kvm_memory_slot *memslot, unsigned long hva,
+>> -			  bool fault_is_perm)
+>> +			  struct kvm_memory_slot *memslot, long *page_size,
+> 
+> Why is page_size a signed type? A page size is never negative.
+> 
+>> +			  unsigned long hva, bool fault_is_perm)
+> 
+> I really wish we'd stop adding parameters to this function, as it has
+> long stopped being readable. It would make a lot more sense if we
+> passed a descriptor for the fault, containing the ipa, hva, memslot
+> and fault type.
+I found a patch series which looks to address this [1]. Would you like
+this fixed for this series?
+
+[1] 
+https://lore.kernel.org/linux-arm-kernel/20250821210042.3451147-1-seanjc@google.com/
+>>   {
+>>   	int ret = 0;
+>>   	bool topup_memcache;
+>> @@ -1878,6 +1878,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	kvm_release_faultin_page(kvm, page, !!ret, writable);
+>>   	kvm_fault_unlock(kvm);
+>>   
+>> +	if (page_size)
+>> +		*page_size = vma_pagesize;
+>> +
+>>   	/* Mark the page dirty only if the fault is handled successfully */
+>>   	if (writable && !ret)
+>>   		mark_page_dirty_in_slot(kvm, memslot, gfn);
+>> @@ -2080,8 +2083,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>>   		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
+>>   				 esr_fsc_is_permission_fault(esr));
+>>   	else
+>> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+>> -				     esr_fsc_is_permission_fault(esr));
+>> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
+>> +				     hva, esr_fsc_is_permission_fault(esr));
+>>   	if (ret == 0)
+>>   		ret = 1;
+>>   out:
+>> @@ -2457,3 +2460,65 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+>>   
+>>   	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled, now_enabled);
+>>   }
+>> +
+>> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>> +				    struct kvm_pre_fault_memory *range)
+>> +{
+>> +	int ret, idx;
+>> +	hva_t hva;
+>> +	phys_addr_t end;
+>> +	struct kvm_memory_slot *memslot;
+>> +	struct kvm_vcpu_fault_info stored_fault, *fault_info;
+>> +
+>> +	long page_size = PAGE_SIZE;
+>> +	phys_addr_t ipa = range->gpa;
+>> +	gfn_t gfn = gpa_to_gfn(range->gpa);
+> 
+> nit: Please order this in a more readable way, preferably with long
+> line first.
+> 
+>> +
+>> +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> 
+> ??? Aren't we already guaranteed to be under the SRCU read lock?
+> 
+>> +
+>> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu)) {
+>> +		ret = -ENOENT;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+>> +	if (!memslot) {
+>> +		ret = -ENOENT;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	fault_info = &vcpu->arch.fault;
+>> +	stored_fault = *fault_info;
+> 
+> If this is a vcpu ioctl, can the fault information be actually valid
+> while userspace is issuing an ioctl? Wouldn't that mean that we are
+> exiting to userspace in the middle of handling an exception?
+> 
+>> +
+>> +	/* Generate a synthetic abort for the pre-fault address */
+>> +	fault_info->esr_el2 = ESR_ELx_EC_DABT_LOW;
+>> +	fault_info->esr_el2 &= ~ESR_ELx_ISV;
+> 
+> You are constructing this from scratch. How can ISV be set?
+> 
+>> +	fault_info->esr_el2 |= ESR_ELx_FSC_FAULT_L(KVM_PGTABLE_LAST_LEVEL);
+>> +
+>> +	fault_info->hpfar_el2 = HPFAR_EL2_NS |
+>> +		FIELD_PREP(HPFAR_EL2_FIPA, ipa >> 12);
+>> +
+>> +	if (kvm_slot_has_gmem(memslot)) {
+>> +		ret = gmem_abort(vcpu, ipa, NULL, memslot, false);
+>> +	} else {
+>> +		hva = gfn_to_hva_memslot_prot(memslot, gfn, NULL);
+>> +		if (kvm_is_error_hva(hva)) {
+>> +			ret = -EFAULT;
+>> +			goto out;
+>> +		}
+>> +		ret = user_mem_abort(vcpu, ipa, NULL, memslot, &page_size, hva,
+>> +				     false);
+>> +	}
+>> +
+>> +	if (ret < 0)
+>> +		goto out;
+>> +
+>> +	end = (range->gpa & ~(page_size - 1)) + page_size;
+> 
+> This suspiciously looks like one of the __ALIGN_KERNEL* macros.
+> 
+>> +	ret = min(range->size, end - range->gpa);
+>> +
+>> +out:
+>> +	*fault_info = stored_fault;
+>> +out_unlock:
+>> +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>> +	return ret;
+>> +}
+> 
+> Thanks,
+> 
+> 	M.
+> 
+
+-- 
+Thanks,
+Jack
