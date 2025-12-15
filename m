@@ -1,112 +1,145 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74E42E54CC;
-	Mon, 15 Dec 2025 00:15:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D931CA4A
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 05:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765757756; cv=none; b=UBWBS1IPxCmVqIJekJjS93QKTmZ3mDgf0ApYb7gMoCTGtVZn3QXP9fuY8sVfdXrBz3HckftJBjrZYwVTK39BoEfe/Ig+d+p+ASJovlKetvj7Dr8+kbPNLq1bbeiiFQ8K1FGKguaHOj17KGTYo5mie7xwkO45u0SjYtMzADe1zWI=
+	t=1765778107; cv=none; b=OT3KuBZaxI6SgUG8YvhmWBqzxVw6z2zBsB5rWTpXtar09gaJU8if+eyNii7cCuQxYp7S/0oqeqqVwCFuy1Z9pIHfO2dZG/ebm0OfA6MdTl44QK014viPjiEp+atngL5MFrrJeX71dFtWQ3W3mgIx8ofv/53gMeb4zB8GE1ys6Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765757756; c=relaxed/simple;
-	bh=6vO9OPJFXH8fJHuAE5U1pt8kHsXsUM50SQnjRnDfTjc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rxlm4p2q8lfgRskfFuzN05QbEicZ+ORneeoMONVZuCuAUl+k0tawiEen7q8vBFd4sx2y3DBZ0FCTazfvHS2AjJyKjlGSxjhCcUs9DH4E9GpzRwISaLHm/kHMzD+G53vMaj/XkoNuHbx9chkfj0TiYqwDzdEIkfZZJYx9TPDjf9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BnAUT1ZF; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1765778107; c=relaxed/simple;
+	bh=l+eRO9cUwdOLQGXpGCxkU0xWlzqvEtT06h1zGGZRF8o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ugx6Ks9tfJEUKGlXSTYrqjdTJYIyx2retI9NSMdPIMg1HETktvZ0o1/hGNCv8CbPrvZAX6LsMQqpQnDVKruWFDQlvTiQCaQCy21GKcitpvJtPbzhyX3qFGpaMSn4kQI/B8b3p4yNSMj5T3dCo79FTl66ycRviLbSStGjsDh/wVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B9fkVznx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BnAUT1ZF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765757755; x=1797293755;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6vO9OPJFXH8fJHuAE5U1pt8kHsXsUM50SQnjRnDfTjc=;
-  b=BnAUT1ZFNwBEfTmcgs2Xdv1nSWTe+EFBkN0c6nSUKdCX4yevSlFNvXWk
-   FeQvNsTuaHLQ4u3sOvHRTr9ISdZubLUCrb4oEYebjtmRMoWTSSs3sEtpc
-   AuptQIWMZda8xyLqkWNB5/n/MBKKtWwEqo360126BlsGSnZwTJTTHpuUC
-   Jvla9Gg0SR7Fmp6BSYbe8oG2sQ/NTStvICn/Xvmf+xOF4g83xEs0Y6Yv8
-   Isd+poUoVPefmzEHXxzaDDr/NUdCOUWr9jQOdpfGi81X/uX/w4uYRjcZX
-   aDrC6ETuepxkE+Iwp2CkKqctGGrSZi5s4cg7rVa2XSFsV9arxR42SP9wt
-   g==;
-X-CSE-ConnectionGUID: yQzKI+z4RmeylpQlatEuAQ==
-X-CSE-MsgGUID: tK93Iqw8TdODlDYn8IvPzA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11642"; a="85253708"
-X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
-   d="scan'208";a="85253708"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2025 16:15:54 -0800
-X-CSE-ConnectionGUID: g0FLMlKmS8O7naC0yBHObg==
-X-CSE-MsgGUID: cDHUDq0hQO6apXALujtp6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
-   d="scan'208";a="202093788"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by orviesa004.jf.intel.com with ESMTP; 14 Dec 2025 16:15:50 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUwFg-000000002Vs-2YCT;
-	Mon, 15 Dec 2025 00:15:48 +0000
-Date: Mon, 15 Dec 2025 01:15:42 +0100
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 31/32] Documentation: KVM: Introduce documentation for
- VGICv5
-Message-ID: <202512150153.QbgdGdcn-lkp@intel.com>
-References: <20251212152215.675767-32-sascha.bischoff@arm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9fkVznx"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765778103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d05K16DKQiEd3StceTnrw6JfNIHdbpDM1WqXFgxTmJw=;
+	b=B9fkVznxLpPqsDz5fCQzv3M4RsXU88R+F1wZRcsk6GhrBE1Hb2cqdU3v0D/i041gmSo5A0
+	yqAgiAKTR7hO3FWD1EnH0pUuGaoJb2pBzqwsS5R1xxQtjZCs6cI7FvHd1yHrXmhGIjpW5A
+	+z+hr1O0pDqCc4pUfaGsRa/R7Z8+bGQ=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-8zKBKR9mPdS3eN5zlWCS5g-1; Mon, 15 Dec 2025 00:54:59 -0500
+X-MC-Unique: 8zKBKR9mPdS3eN5zlWCS5g-1
+X-Mimecast-MFC-AGG-ID: 8zKBKR9mPdS3eN5zlWCS5g_1765778099
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7b82c2c2ca2so4769638b3a.1
+        for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 21:54:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765778099; x=1766382899;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d05K16DKQiEd3StceTnrw6JfNIHdbpDM1WqXFgxTmJw=;
+        b=TlAx0uRhBNaPIk9z5trODlsNY363Jdy/5/i4k2R7bD6Aj9fKgxwVirft9GoAHKJdnU
+         ik8r6r+OVEhzCu7MskLBbuOwoPgZgDpDIhT8r4wksr4BXqyrlSKzQWua3eo790IBb/2a
+         0elvRwK0y020Y/xEZ286XXeCipRAf8YkkDJSgupoSDYQybJF/fd2dO0K7JV9xFGpY4wi
+         hWI+fcchSXNztgo+O6Ghn2CwyL5/BpAB2gNF7ukYR+nNC5775Ej/jI0lAPRWAxSYxYwy
+         eJdDoqerfOKcbvDPSeF/IvMXQiziKsEKFykrpn8g9RIJoxtN1p1vrFqx5yB5+s9ZCoNZ
+         32Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/O/o/nevuozAtlxqPx337AlXORAdS5bxiaTuW3JmGyhO9uRqeLiEbQyaiCE6JdOpImzztebs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyTvW3GF0xe7udulX+46mTYgMnovp8ezepWuin8U1xJfm9sIUvf
+	GgE6fOjrxe9Brle5+Ot+jABS7Uz9LmMM+ZHbsuIbQxzI+q8DiuUOKkpoiEe09WVk9yvnoGxk3WX
+	ZKRoet1s1o1Dbj4Wjx88aE3pfrq6kfogJGqKNY2KM8V/TiVy+SepMnZ4qzw==
+X-Gm-Gg: AY/fxX4Y5gt+n3G9T5jWse/JtY4v9EfFqmTyiYewlK2VotcqTzJeqGK2QzLLbjGjkU+
+	WfO+gPzJKB3GwiErdX1FAHVNl4xF6ZQ7cN2GmqtBYDBNcUbydwl3WqwJ2UxyY4mKaxzEoV7VQO3
+	0USew7UMcI+4XwsyP+9vEIZY1VlEw742Np59o55jzYzhPXberG40my6YhIr/a09cG4bnPexJzdf
+	i4hh0rB9msQKm8233F33qFY1wZCV3qxmiCBuPm0NFnjZim6tgcLy9FcZCgE4jtz5f6AJ8rIhfY1
+	KOrMQKzn/wXC1FGG0GoHrxHt8sz6ASDugwUE9Bpc6cSxEsuohfytEkajCdVbUV3kL4Wulnelp6x
+	Iogj7TDP4xwjyWrCFbBAt8R84z5hiRDhm+Z/tNnplJ8urX/mSfA==
+X-Received: by 2002:a05:6a00:4909:b0:7f7:1fcf:689c with SMTP id d2e1a72fcca58-7f71fcf69d3mr4683897b3a.9.1765778098691;
+        Sun, 14 Dec 2025 21:54:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE966N7Oe3FYB9Ygha15iCWE5PrCNEQSbD/T0JrM44KTdQUsyD3mTxS9KuJWZ4khGMwT3U8QA==
+X-Received: by 2002:a05:6a00:4909:b0:7f7:1fcf:689c with SMTP id d2e1a72fcca58-7f71fcf69d3mr4683888b3a.9.1765778098358;
+        Sun, 14 Dec 2025 21:54:58 -0800 (PST)
+Received: from [192.168.68.51] (n175-34-62-5.mrk21.qld.optusnet.com.au. [175.34.62.5])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c5093a4bsm11405855b3a.50.2025.12.14.21.54.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Dec 2025 21:54:57 -0800 (PST)
+Message-ID: <c41a18ed-f282-449c-949c-17ced2e92790@redhat.com>
+Date: Mon, 15 Dec 2025 15:54:52 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-32-sascha.bischoff@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: sea_to_user sefltest failure
+To: Sebastian Ott <sebott@redhat.com>, Jiaqi Yan <jiaqiyan@google.com>
+Cc: Oliver Upton <oupton@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+References: <1478ac09-8134-5551-13b6-c7be096262af@redhat.com>
+ <CACw3F52i_Yr+8Gd1=H=EMi7NnVJ8WCgMkaG1dSe8FD7PvOsW8w@mail.gmail.com>
+ <c44b75bd-bf54-0aab-78a2-89f448cf126c@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <c44b75bd-bf54-0aab-78a2-89f448cf126c@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: lnUYHgnbaWs6GHOvioM3rtNIG0QGmtrMqV3GX3yB11Y_1765778099
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Sascha,
+On 12/12/25 4:11 AM, Sebastian Ott wrote:
+> On Thu, 11 Dec 2025, Jiaqi Yan wrote:
+>> CONFIGs seem alright to me. Do you boot kernel with cmdline options like "default_hugepagesz=1G hugepagesz=1G hugepages=64", or dynamically set up
+>> huge pages via "echo 64 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages"?
+> 
+> Neither of these. When I do the test is skipped:
+> # echo 64 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
 
-kernel test robot noticed the following build warnings:
+The backing memory is tied to 1GB hugetlb pages which are available on 4KB
+and 16KB host, but not on 64KB host. So I guess 512MB hugetlb pages shall
+be used on 64KB host?
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.19-rc1 next-20251212]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> # ./arm64/sea_to_user
+> Random seed: 0x6b8b4567
+> # Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+> # Before EINJect: data=0xbaadcafe
+> # EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x80241234bad
+> ok 1 # SKIP EINJ module probably not loaded?sh: line 1: /sys/kernel/debug/apei/einj/error_type: No such file or directory
+> Bail out! Failed to write EINJ entry: No such file or directory (2)
+> # 1 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
+> # Planned tests != run tests (0 != 1)
+> # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:1 error:0
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-32-sascha.bischoff%40arm.com
-patch subject: [PATCH 31/32] Documentation: KVM: Introduce documentation for VGICv5
-reproduce: (https://download.01.org/0day-ci/archive/20251215/202512150153.QbgdGdcn-lkp@intel.com/reproduce)
+On one of my machines where RAS feature used to work, the test case passed
+on 4KB host.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512150153.QbgdGdcn-lkp@intel.com/
+host$ cat /proc/1/smaps | grep KernelPageSize | head -n 1
+KernelPageSize:        4 kB
+host$ modprobe einj
+host$ echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
 
-All warnings (new ones prefixed by >>):
+host$ ./sea_to_user
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x400081234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x400081234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/error_inject - done
+# Memory UER EINJected
+# SIGBUS (7) received, dumping siginfo...
+# si_signo=7, si_errno=0, si_code=4, si_addr=0xffff41234000
+ok 1 # SKIP SEA is claimed by host APEI
 
-   ERROR: Cannot find file ./include/linux/mutex.h
-   ERROR: Cannot find file ./include/linux/mutex.h
-   WARNING: No kernel-doc for file ./include/linux/mutex.h
-   ERROR: Cannot find file ./include/linux/fwctl.h
-   WARNING: No kernel-doc for file ./include/linux/fwctl.h
->> Documentation/virt/kvm/devices/arm-vgic-v5.rst: WARNING: document isn't included in any toctree [toc.not_included]
+Thanks,
+Gavin
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
