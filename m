@@ -1,43 +1,71 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E031DDF3
-	for <kvmarm@lists.linux.dev>; Sun, 14 Dec 2025 12:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74E42E54CC;
+	Mon, 15 Dec 2025 00:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765714732; cv=none; b=GHO+iQpKi2HlOK7eU1/JRnVCg72qlCrjhtjCiBHq/oZthiKcwV7AUyT10dNOG7c5iO+SDVvFDCaDUcCQrAoSGkFEIxwuBXjE8jXKm2Z+coQ6B3pnnGTax5i8JwW/JdsOUstAMrK7wTriscn777PefqCBxVP50z6tpJF1egkCMvM=
+	t=1765757756; cv=none; b=UBWBS1IPxCmVqIJekJjS93QKTmZ3mDgf0ApYb7gMoCTGtVZn3QXP9fuY8sVfdXrBz3HckftJBjrZYwVTK39BoEfe/Ig+d+p+ASJovlKetvj7Dr8+kbPNLq1bbeiiFQ8K1FGKguaHOj17KGTYo5mie7xwkO45u0SjYtMzADe1zWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765714732; c=relaxed/simple;
-	bh=Wca8yvalyxtSQH/XJSSaImT9Ra4CF5mpJ5QmuhAfhAM=;
+	s=arc-20240116; t=1765757756; c=relaxed/simple;
+	bh=6vO9OPJFXH8fJHuAE5U1pt8kHsXsUM50SQnjRnDfTjc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUZJTOv3bMgWPc5LPkIC8wVyNwLpBwGI788RocUwOzaIlOFbQq++o7m//7xEBWopmw16JXA4lXEsqh5EgoZ5GRJugkJa0/qYtzxEGvYgJy9aljvmh6HN1QTu7OYlp76qsnh0SStg4GaALMjY0zDYGBaLe0oCu6TVKOR0Djb8m9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vTv9hKGM; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rxlm4p2q8lfgRskfFuzN05QbEicZ+ORneeoMONVZuCuAUl+k0tawiEen7q8vBFd4sx2y3DBZ0FCTazfvHS2AjJyKjlGSxjhCcUs9DH4E9GpzRwISaLHm/kHMzD+G53vMaj/XkoNuHbx9chkfj0TiYqwDzdEIkfZZJYx9TPDjf9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BnAUT1ZF; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vTv9hKGM"
-Date: Sun, 14 Dec 2025 20:18:42 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765714727;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e0Rtq02u4ALdXbWLdQuFWEAwLztJaqUa3MxILk+qipg=;
-	b=vTv9hKGMVqpUCNXD7Kr50vG8fAIReJ542cYQqEEak4yI4RoUqGG6jT41ppiGt+T6TY+Siy
-	I29EoPf4ZlKjjCw9+0OIAIrXHOjTE2b34qjlqACRhKNVzB4k5V2LLkk5mfBVfWmyxChlq0
-	64w0lUqBVOVz9sOjOb+t7KVunN6jGIw=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Leo Yan <leo.yan@linux.dev>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
-	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, james.clark@linaro.org,
-	mark.rutland@arm.com, james.morse@arm.com
-Subject: Re: [RFC PATCH v6 05/35] KVM: arm64: Add KVM_CAP_ARM_SPE capability
-Message-ID: <20251214121842.GA16796@debian-dev>
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-6-alexandru.elisei@arm.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BnAUT1ZF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765757755; x=1797293755;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6vO9OPJFXH8fJHuAE5U1pt8kHsXsUM50SQnjRnDfTjc=;
+  b=BnAUT1ZFNwBEfTmcgs2Xdv1nSWTe+EFBkN0c6nSUKdCX4yevSlFNvXWk
+   FeQvNsTuaHLQ4u3sOvHRTr9ISdZubLUCrb4oEYebjtmRMoWTSSs3sEtpc
+   AuptQIWMZda8xyLqkWNB5/n/MBKKtWwEqo360126BlsGSnZwTJTTHpuUC
+   Jvla9Gg0SR7Fmp6BSYbe8oG2sQ/NTStvICn/Xvmf+xOF4g83xEs0Y6Yv8
+   Isd+poUoVPefmzEHXxzaDDr/NUdCOUWr9jQOdpfGi81X/uX/w4uYRjcZX
+   aDrC6ETuepxkE+Iwp2CkKqctGGrSZi5s4cg7rVa2XSFsV9arxR42SP9wt
+   g==;
+X-CSE-ConnectionGUID: yQzKI+z4RmeylpQlatEuAQ==
+X-CSE-MsgGUID: tK93Iqw8TdODlDYn8IvPzA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11642"; a="85253708"
+X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
+   d="scan'208";a="85253708"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2025 16:15:54 -0800
+X-CSE-ConnectionGUID: g0FLMlKmS8O7naC0yBHObg==
+X-CSE-MsgGUID: cDHUDq0hQO6apXALujtp6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,148,1763452800"; 
+   d="scan'208";a="202093788"
+Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
+  by orviesa004.jf.intel.com with ESMTP; 14 Dec 2025 16:15:50 -0800
+Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vUwFg-000000002Vs-2YCT;
+	Mon, 15 Dec 2025 00:15:48 +0000
+Date: Mon, 15 Dec 2025 01:15:42 +0100
+From: kernel test robot <lkp@intel.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 31/32] Documentation: KVM: Introduce documentation for
+ VGICv5
+Message-ID: <202512150153.QbgdGdcn-lkp@intel.com>
+References: <20251212152215.675767-32-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,32 +74,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251114160717.163230-6-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20251212152215.675767-32-sascha.bischoff@arm.com>
 
-On Fri, Nov 14, 2025 at 04:06:46PM +0000, Alexandru Elisei wrote:
+Hi Sascha,
 
-[...]
+kernel test robot noticed the following build warnings:
 
-> +void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
-> +{
-> +	struct arm_spu_entry *entry;
-> +
-> +	guard(mutex)(&arm_spus_lock);
-> +
-> +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-> +	if (!entry)
-> +		return;
-> +
-> +	entry->arm_spu = arm_spu;
-> +	list_add_tail(&entry->link, &arm_spus);
-> +
-> +	if (list_is_singular(&arm_spus))
-> +		static_branch_enable(&kvm_spe_available);
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.19-rc1 next-20251212]
+[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-We can simply check if list_empty(&arm_spus) in kvm_supports_spe(), thus
-the static key kvm_spe_available is not needed.  Another benefit is this
-is consistent with CPU PMU's virt implementation.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20251212152215.675767-32-sascha.bischoff%40arm.com
+patch subject: [PATCH 31/32] Documentation: KVM: Introduce documentation for VGICv5
+reproduce: (https://download.01.org/0day-ci/archive/20251215/202512150153.QbgdGdcn-lkp@intel.com/reproduce)
 
-Thanks,
-Leo
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512150153.QbgdGdcn-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   ERROR: Cannot find file ./include/linux/mutex.h
+   ERROR: Cannot find file ./include/linux/mutex.h
+   WARNING: No kernel-doc for file ./include/linux/mutex.h
+   ERROR: Cannot find file ./include/linux/fwctl.h
+   WARNING: No kernel-doc for file ./include/linux/fwctl.h
+>> Documentation/virt/kvm/devices/arm-vgic-v5.rst: WARNING: document isn't included in any toctree [toc.not_included]
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
