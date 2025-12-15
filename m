@@ -1,76 +1,221 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E29133290C
-	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 11:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7D0316915;
+	Mon, 15 Dec 2025 11:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765799205; cv=none; b=FsgXMG/b9HIgE87NvvqDfqDx832Ecq3+MqIomLagfSi0WHJeExJaTDM6bAoRnqQdARfzF031n0azfPRpZot6F8VS+4QindWkJBcJeYv1AsDPqOvu5W7WKlyVPpUpqCK7oF1tpViK2I1McW2R+sJzCSGx12aqJtU26e8y59H6hX0=
+	t=1765799523; cv=none; b=UfcEcFNgEA7vSQfe5wU0y5bR5hWRCZGecTZnwJD8nKaOjzRVdv0inOtrn1XW0no1xnBao1BfexMK24XrN5tWpQJMQFsefKt2PwUCg+SRQLRwadjp1BsOm2wClVNhAh8ihAq0R9KyYS1i2C/paEPxU/U9iauPnCUCjRZSxdOhMxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765799205; c=relaxed/simple;
-	bh=VqfUUx2eslgn7ShVCtIsqJDTLLPiO9ZT85rQqHrBemw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sUkVm6tTde+RgNpkYSfYOSZu2i4Narx7SEx1v5CJN5B2Dgh2H272nLR/4WuDReMn8lO2uvTGksph6zTtugaLZxj3QHEfksBaGbi5c/nHc4nd32FexJUiskatCcGSJh0ZJLApSBh2+nW1zbsyXundXjbXMiBZNszEbfytT1Glwcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7322F497;
-	Mon, 15 Dec 2025 03:46:36 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F1B63F73B;
-	Mon, 15 Dec 2025 03:46:41 -0800 (PST)
-Date: Mon, 15 Dec 2025 11:46:38 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Leo Yan <leo.yan@linux.dev>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org,
-	catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, james.clark@linaro.org,
-	mark.rutland@arm.com, james.morse@arm.com
-Subject: Re: [RFC PATCH v6 05/35] KVM: arm64: Add KVM_CAP_ARM_SPE capability
-Message-ID: <aT_1HimOyJk6H1ko@raptor>
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-6-alexandru.elisei@arm.com>
- <20251214121842.GA16796@debian-dev>
+	s=arc-20240116; t=1765799523; c=relaxed/simple;
+	bh=JnLOHFJSBCxTCbFcO3IwUKhfZyQvwK42bdXHq4zEKAU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YKPYdJnOpUKsMTmohdAoLNcpczxQgUdUFRGKnfmvv/PGvsr6kl4Z76SewlTkf3YNPy+NnwPjE22Hmfc6y5SMb2HgVbwUbnhcMYXoxoLOB9NUdiTX75TpA9ZSptBvm0oafVFi2SoetjakW1GTKZd4+13x45dBH90ZxYPQhBBVEIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecrITf35; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecrITf35"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CA7CC4CEF5;
+	Mon, 15 Dec 2025 11:52:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765799523;
+	bh=JnLOHFJSBCxTCbFcO3IwUKhfZyQvwK42bdXHq4zEKAU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ecrITf35hlLUYBMQR+704mj6RKcWsVAQ+AXtBmyohBf25HQtOXMOpkSqtePUMlGb4
+	 +1/b5izSnh73C+EDjhuYl5DVRpC9LvfmcxsK/dExtREkLLRVNz3Zk3KcBblrgtlWNf
+	 gf6yClbgqUhb+xQ6l0HwffnukjDQAZq/WDKeMkgg8gWKWvRvOHXK44wQjSeIcyW+t/
+	 6oqaJxEr6E0dyV1K9/tFsOXG5lRa9qkuRFi27XlUXoBaXGZ5qIHjTBzwu/KQKz3Dtn
+	 XKpvb6P3jfT3KpUwjyHmPLW/Lz/fyWPOSCGCZtgY9zhI440oNUDY4wDMeMYdp06c0j
+	 /d3Cqe3PHaBpw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vV77R-0000000CkVl-0Dus;
+	Mon, 15 Dec 2025 11:52:01 +0000
+Date: Mon, 15 Dec 2025 11:52:00 +0000
+Message-ID: <86ldj4nesf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 02/32] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated ICH_VMCR_EL2
+In-Reply-To: <20251212152215.675767-3-sascha.bischoff@arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+	<20251212152215.675767-3-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251214121842.GA16796@debian-dev>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Leo,
+On Fri, 12 Dec 2025 15:22:35 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+> 
+> The VGIC-v3 code relied on hand-written definitions for the
+> ICH_VMCR_EL2 register. This register, and the associated fields, is
+> now generated as part of the sysreg framework. Move to using the
+> generated definitions instead of the hand-written ones.
+> 
+> There are no functional changes as part of this change.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h      | 21 ---------
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c      | 64 ++++++++++++----------------
+>  arch/arm64/kvm/vgic/vgic-v3-nested.c |  8 ++--
+>  arch/arm64/kvm/vgic/vgic-v3.c        | 48 ++++++++++-----------
+>  4 files changed, 54 insertions(+), 87 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 9df51accbb025..b3b8b8cd7bf1e 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -560,7 +560,6 @@
+>  #define SYS_ICC_SRE_EL2			sys_reg(3, 4, 12, 9, 5)
+>  #define SYS_ICH_EISR_EL2		sys_reg(3, 4, 12, 11, 3)
+>  #define SYS_ICH_ELRSR_EL2		sys_reg(3, 4, 12, 11, 5)
+> -#define SYS_ICH_VMCR_EL2		sys_reg(3, 4, 12, 11, 7)
+>  
+>  #define __SYS__LR0_EL2(x)		sys_reg(3, 4, 12, 12, x)
+>  #define SYS_ICH_LR0_EL2			__SYS__LR0_EL2(0)
+> @@ -988,26 +987,6 @@
+>  #define ICH_LR_PRIORITY_SHIFT	48
+>  #define ICH_LR_PRIORITY_MASK	(0xffULL << ICH_LR_PRIORITY_SHIFT)
+>  
+> -/* ICH_VMCR_EL2 bit definitions */
+> -#define ICH_VMCR_ACK_CTL_SHIFT	2
+> -#define ICH_VMCR_ACK_CTL_MASK	(1 << ICH_VMCR_ACK_CTL_SHIFT)
+> -#define ICH_VMCR_FIQ_EN_SHIFT	3
+> -#define ICH_VMCR_FIQ_EN_MASK	(1 << ICH_VMCR_FIQ_EN_SHIFT)
+> -#define ICH_VMCR_CBPR_SHIFT	4
+> -#define ICH_VMCR_CBPR_MASK	(1 << ICH_VMCR_CBPR_SHIFT)
+> -#define ICH_VMCR_EOIM_SHIFT	9
+> -#define ICH_VMCR_EOIM_MASK	(1 << ICH_VMCR_EOIM_SHIFT)
+> -#define ICH_VMCR_BPR1_SHIFT	18
+> -#define ICH_VMCR_BPR1_MASK	(7 << ICH_VMCR_BPR1_SHIFT)
+> -#define ICH_VMCR_BPR0_SHIFT	21
+> -#define ICH_VMCR_BPR0_MASK	(7 << ICH_VMCR_BPR0_SHIFT)
+> -#define ICH_VMCR_PMR_SHIFT	24
+> -#define ICH_VMCR_PMR_MASK	(0xffUL << ICH_VMCR_PMR_SHIFT)
+> -#define ICH_VMCR_ENG0_SHIFT	0
+> -#define ICH_VMCR_ENG0_MASK	(1 << ICH_VMCR_ENG0_SHIFT)
+> -#define ICH_VMCR_ENG1_SHIFT	1
+> -#define ICH_VMCR_ENG1_MASK	(1 << ICH_VMCR_ENG1_SHIFT)
+> -
+>  /*
+>   * Permission Indirection Extension (PIE) permission encodings.
+>   * Encodings with the _O suffix, have overlays applied (Permission Overlay Extension).
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 0b670a033fd87..24a2074f3a8cf 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -569,11 +569,11 @@ static int __vgic_v3_highest_priority_lr(struct kvm_vcpu *vcpu, u32 vmcr,
+>  			continue;
+>  
+>  		/* Group-0 interrupt, but Group-0 disabled? */
+> -		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG0_MASK))
+> +		if (!(val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG0_MASK))
+>  			continue;
+>  
+>  		/* Group-1 interrupt, but Group-1 disabled? */
+> -		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_ENG1_MASK))
+> +		if ((val & ICH_LR_GROUP) && !(vmcr & ICH_VMCR_EL2_VENG1_MASK))
+>  			continue;
+>  
+>  		/* Not the highest priority? */
+> @@ -646,19 +646,19 @@ static int __vgic_v3_get_highest_active_priority(void)
+>  
+>  static unsigned int __vgic_v3_get_bpr0(u32 vmcr)
+>  {
+> -	return (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
+> +	return FIELD_GET(ICH_VMCR_EL2_VBPR0, vmcr);
+>  }
+>  
+>  static unsigned int __vgic_v3_get_bpr1(u32 vmcr)
+>  {
+>  	unsigned int bpr;
+>  
+> -	if (vmcr & ICH_VMCR_CBPR_MASK) {
+> +	if (vmcr & ICH_VMCR_EL2_VCBPR_MASK) {
+>  		bpr = __vgic_v3_get_bpr0(vmcr);
+>  		if (bpr < 7)
+>  			bpr++;
+>  	} else {
+> -		bpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
+> +		bpr = FIELD_GET(ICH_VMCR_EL2_VBPR1, vmcr);
+>  	}
+>  
+>  	return bpr;
+> @@ -758,7 +758,7 @@ static void __vgic_v3_read_iar(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  	if (grp != !!(lr_val & ICH_LR_GROUP))
+>  		goto spurious;
+>  
+> -	pmr = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
+> +	pmr = FIELD_GET(ICH_VMCR_EL2_VPMR, vmcr);
+>  	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
+>  	if (pmr <= lr_prio)
+>  		goto spurious;
+> @@ -806,7 +806,7 @@ static int ___vgic_v3_write_dir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  	int lr;
+>  
+>  	/* EOImode == 0, nothing to be done here */
+> -	if (!(vmcr & ICH_VMCR_EOIM_MASK))
+> +	if (!FIELD_GET(ICH_VMCR_EL2_VEOIM_MASK, vmcr))
 
-On Sun, Dec 14, 2025 at 08:18:42PM +0800, Leo Yan wrote:
-> On Fri, Nov 14, 2025 at 04:06:46PM +0000, Alexandru Elisei wrote:
-> 
-> [...]
-> 
-> > +void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
-> > +{
-> > +	struct arm_spu_entry *entry;
-> > +
-> > +	guard(mutex)(&arm_spus_lock);
-> > +
-> > +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-> > +	if (!entry)
-> > +		return;
-> > +
-> > +	entry->arm_spu = arm_spu;
-> > +	list_add_tail(&entry->link, &arm_spus);
-> > +
-> > +	if (list_is_singular(&arm_spus))
-> > +		static_branch_enable(&kvm_spe_available);
-> 
-> We can simply check if list_empty(&arm_spus) in kvm_supports_spe(), thus
-> the static key kvm_spe_available is not needed.  Another benefit is this
-> is consistent with CPU PMU's virt implementation.
+nit: FIELD_GET() doesn't bring anything here. Similar comment applies
+to most 'if (val & MASK)' constructs that get changed here.
 
-Sure, that makes sense. I think I added a static key because I was thinking
-about performance on hot paths, but looking at the series I forgot to actually
-make use of it.
+>  		return 1;
+>  
+>  	/* No deactivate to be performed on an LPI */
+> @@ -849,7 +849,7 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  	}
+>  
+>  	/* EOImode == 1 and not an LPI, nothing to be done here */
+> -	if ((vmcr & ICH_VMCR_EOIM_MASK) && !(vid >= VGIC_MIN_LPI))
+> +	if (FIELD_GET(ICH_VMCR_EL2_VEOIM_MASK, vmcr) && !(vid >= VGIC_MIN_LPI))
+>  		return;
+>  
+>  	lr_prio = (lr_val & ICH_LR_PRIORITY_MASK) >> ICH_LR_PRIORITY_SHIFT;
+> @@ -865,12 +865,12 @@ static void __vgic_v3_write_eoir(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  
+>  static void __vgic_v3_read_igrpen0(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
+>  {
+> -	vcpu_set_reg(vcpu, rt, !!(vmcr & ICH_VMCR_ENG0_MASK));
+> +	vcpu_set_reg(vcpu, rt, !!FIELD_GET(ICH_VMCR_EL2_VENG0_MASK, vmcr));
+
+Here, !! is actually really superfluous and makes it harder to
+understand what is being done. Similar thing for IRGPEN1.
+
+Apart from these two points, this looks OK to me.
 
 Thanks,
-Alex
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
