@@ -1,202 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5F332905
-	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 15:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09D8338916
+	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 15:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765813200; cv=none; b=YTmDIpS4lvTH34ZwNLp2FlvDbUxUYe/P8Zz6A9SRzhdJfdA4iFSxrjCPf0vTUW/sFkBuprPWpNmMYr9myzogrtPVvGTjs0lstB9O3NIsCaHwhZ1Uga2UoZN4fto0eMfjzhysOY9xpxPeooVlOtBz2+t/qMiasW8VAa/innhYpMM=
+	t=1765813537; cv=none; b=ita3Fj0hGN6bb2mBaHaHLlINH9Qf3UrzyDQ1zw2jO/ni4AsPW8OiqXj8iGmLhwHUgOpAxTKM5g9Pb51YBzfn0vHo9uIzWEAQJnhqaSVFAjTZmjsxIQontxcnM2RBN86S6gRSiF7AENYbTzaG1VUoZSgKuZFRlCUIkpq0R/kkdWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765813200; c=relaxed/simple;
-	bh=NNGXQKqBQZbnje1gjg2G6ZhajCgMPQ8PSuFfhBtys80=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rtBFiYG8zfnz9JkzDrYy5bBZG4d0YUlPb8qQ6qfoVbCjuL5cjxkBt29fWbkFyqX3qGT7otXc+y4HRgpNUz1h25tI4MsFNuUh0QmzVtoAW+pik58aV+7kO1ERrifhas3lAzzoeUtBZ5ZnP1iczBzPXGRrOmA0U232jFtf68xd3Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=diGwjhFn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765813537; c=relaxed/simple;
+	bh=QLYTCjX2EZ84iw7nVlOSDJ86AmUekPGCFfsO1BJfBhI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nhabp8FS/la9FhLt1iRATY5pFPloxC+AidvUs/TQvZuLqhP3+kznJwhfGMMBWyiXFxdRJ58Swz4qHf1i1Oc5/p0ZsfXz9TMBO4yC5hmHRu4oE/b3hdnbJh1qVMioGLopLWEusmFU23JDPxU85eJN7krjTBbi0pNq8p+BSYcoAhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2MhykaDv; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="diGwjhFn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A58E2C4CEF5;
-	Mon, 15 Dec 2025 15:39:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765813198;
-	bh=NNGXQKqBQZbnje1gjg2G6ZhajCgMPQ8PSuFfhBtys80=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=diGwjhFnIfzE6klmHxeeo24/ZshmHQARx8yMCETFM7iVrjQUeRIAfZzyJicI9UgqT
-	 P3cwBxSKMW9iUesdpvZBOKaTA2qY5Y3Nc4X1kYG1OBabp4nbX5q8X4NJdC7q+wNzTi
-	 +a0dqu3NEcxIr5gBnEmpO5SmP2hilTzIVQCNa1/R7l7Xdxq8xDhD1ENR+xh3LvUdPL
-	 QJaSbYtB0iC5gTZ6aovYA1HMTTPxMlJN1s3ZbNf4jEorVie/JaA9E4VxrxU0I4+BT6
-	 6RUOIQCirgzuUlHg4ukBz7ptpwLy8WhwA4fEpudMIPktlwVmUv0zxEnbxkUL9qiH5E
-	 sNWgGgMIEs/cA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vVAg0-0000000CoHk-1sPv;
-	Mon, 15 Dec 2025 15:39:56 +0000
-Date: Mon, 15 Dec 2025 15:39:56 +0000
-Message-ID: <86h5troisz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	will@kernel.org,
-	tabba@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 2/4] KVM: arm64: Print register encoding if there's no accessor
-In-Reply-To: <aUAmh32jCUOWMg8K@raptor>
-References: <20251215114409.212512-1-alexandru.elisei@arm.com>
-	<20251215114409.212512-3-alexandru.elisei@arm.com>
-	<86ike7onhr.wl-maz@kernel.org>
-	<aUAmh32jCUOWMg8K@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2MhykaDv"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-47775585257so26065615e9.1
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 07:45:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765813534; x=1766418334; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bw36UYHiJwTnMGEVt20djLkGP5pKUV/ucx4MipOtVRg=;
+        b=2MhykaDvvU1P0JmpvA6BbS4y1GFn75U06J3cQpgJ1cBU34NPiqQNJIz+gAT1QBcn2U
+         IXgV3BecM+W7EfbjTK/SCGd65KOgrrYZZ6LFMh6ITLOm5wXsasQccudSTQ6QkXHh4E63
+         Q6qPpUZtzhh5s2e8axbx2FAdayuTBVEuAwETXz39EsSF6TgzLH6/hK4D/JYexiGleAMk
+         /elYHFZtkGoKT6yO+xyCy+KMPbzsk05T9PpCcdv4oUNzZHRqZE3rMNPoL+tKk57bdzGN
+         d2lbUcdN+yXWpoIbnC2Y2EmdiehFZ43IEFuxDgMFqqfCHTnAgWrW3KWJtwDxsQtarpeZ
+         y+5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765813534; x=1766418334;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bw36UYHiJwTnMGEVt20djLkGP5pKUV/ucx4MipOtVRg=;
+        b=jyHxdzL4R7bfHxexYPDOkfNAIdyP0CZ+1Yp0vNSllVcSw1UhkXtIK913P+NiMbjkZQ
+         yO1oboVD9h5UiFWF4Jp3wDzYUW0skPHyr+Yi3kb9I1+fhvWXz/3d33jvJIjBLqwtRTe/
+         aQ/aT+34Wl5VBTSAUNJ4u5UOMrSRH85t54Zp7EI1T8GAoWXom8gA60ToRdSBmU3yG/wJ
+         Ogyi2Rwi5t22xSaF8wpgMOr5qjjfJLpZo8MnyK/CORvsS4KE8xlx1auvRIrXonqtYYFu
+         4fBdYmiCsijFUnzbO4gJ4nRCsLV7HFw9VnUKXAUPR1JIn3ktheTQSCpJt2Cd1zPZgZs0
+         68Ng==
+X-Gm-Message-State: AOJu0YyxijmJ0u30gNextLaPKMy/ZFAc/mKky0TL/dyMRrQZYnJuGXOI
+	VWN/mIWGuLEiCTgQmDZHUZMOwgS4CFnaG7yPeyig/nNNTl0lXxVrADV5jamBAy4LGAQrmSK+2RU
+	EsaFgISB4SNBm3n6tGhalvCy99c4Fs7urSkvLbB/UYOgIzjHy3syLMLcOrCC3SALTCbfAukVur9
+	E4sBaN4LXrVm44oWXRRebTzxKMXbBVn0w=
+X-Google-Smtp-Source: AGHT+IFvCN7OJ47OliZuHF+F6SZwHJvJOtHHqhXWSZq7DLxhATMKUb5NKWIlhsqiu0gI3E0gMagNgYMmzg==
+X-Received: from wmrc6.prod.google.com ([2002:a05:600c:ac6:b0:46e:1f26:9212])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3b07:b0:477:8a2a:123e
+ with SMTP id 5b1f17b1804b1-47a8f916502mr130881835e9.33.1765813533898; Mon, 15
+ Dec 2025 07:45:33 -0800 (PST)
+Date: Mon, 15 Dec 2025 15:45:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.239.gd5f0c6e74e-goog
+Message-ID: <20251215154533.3154405-1-tabba@google.com>
+Subject: [PATCH v1 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, 
+	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Dec 2025 15:17:27 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, Dec 15, 2025 at 01:58:40PM +0000, Marc Zyngier wrote:
-> > On Mon, 15 Dec 2025 11:44:07 +0000,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Configuring a register trap without specifying an accessor function is
-> > > abviously a bug. Instead of calling die() when that happens, let's be a bit
-> > > more helpful and print the register encoding and kill the virtual machine
-> > > instead.
-> > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 8 +++++++-
-> > >  1 file changed, 7 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index c8fd7c6a12a1..d669f6fef177 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -4668,7 +4668,13 @@ static void perform_access(struct kvm_vcpu *vcpu,
-> > >  	 * that we don't know how to handle. This certainly qualifies
-> > >  	 * as a gross bug that should be fixed right away.
-> > >  	 */
-> > > -	BUG_ON(!r->access);
-> > > +	if (!r->access) {
-> > > +		KVM_BUG(1, vcpu->kvm,
-> > > +			"Unexpected access to register: { Op0(%2u), Op1(%2u), CRn(%2u), CRm(%2u), Op2(%2u) } (%s)",
-> > > +			params->Op0, params->Op1, params->CRn, params->CRm, params->Op2,
-> > > +			str_write_read(params->is_write));
-> > > +		return;
-> > > +	}
-> > 
-> > Why not writing
-> > 
-> > 	if (KVM_BUG(!r>access, ...))
-> > 		return;
-> > 
-> > instead? And you could reuse the format that's already defined in
-> > print_sys_reg_msg().
-> > 
-> > You could instead consider injecting an UNDEF in the guest, which I
-> 
-> Injecting an undefined instruction exception early in the boot process can lead
-> to an infinite loop of undefined instruction exceptions in the guest. This is
-> what happens for the unhandled PIRE0_EL1 trap that the previous patch fixes. The
-> guest access takes place in __cpu_setup(), when there are no vectors
-> installed.
+This series tidies up a few things in the KVM selftests. It addresses an
+error in memory alignment, hardens the arm64 MMU configuration for
+selftests, and fixes minor documentation issues.
 
-*Linux* crashes in this way. Who cares about Linux?
+First, for arm64, the series explicitly disables translation table walks
+for the unused upper virtual address range (TTBR1). Since selftests run
+entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
+active could lead to unpredictable behavior if guest code accesses high
+addresses. We set EPD1 (and TBI1) to ensure such accesses
+deterministically generate translation faults.
 
-It's a matter of consistency. When KVM unexpectedly traps something,
-we inject an UNDEF *today*. Why should the lack of an access callback
-be treated any differently? What material difference does it make to
-the guest?
+Second, the series fixes the `page_align()` implementation in both arm64
+and riscv. The previous version incorrectly rounded up already-aligned
+addresses to the *next* page, potentially wasting memory or causing
+unexpected gaps. After fixing the logic in the arch-specific files, the
+function is moved to the common `kvm_util.h` header to eliminate code
+duplication.
 
-Someone who wants to understand what is happening in their guest can
-attach a debugger to it and find out.
+Finally, a few comments and argument descriptions in `kvm_util` are
+updated to match the actual code implementation.
 
->
-> If you're ok with this, I can move forward with the below:
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c8fd7c6a12a1..516072417649 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4668,7 +4668,10 @@ static void perform_access(struct kvm_vcpu *vcpu,
->          * that we don't know how to handle. This certainly qualifies
->          * as a gross bug that should be fixed right away.
->          */
-> -       BUG_ON(!r->access);
-> +       if (!r->access) {
-> +               bad_trap(vcpu, params, r, "Unexpected register access");
-> +               return;
-> +       }
-> 
->         /* Skip instruction if instructed so */
->         if (likely(r->access(vcpu, params, r)))
-> 
-> And this is what KVM prints (the register encoding is outside the trace snippet,
-> if you think that would make a difference to the end user):
-> 
-> [ 4926.964472] ------------[ cut here ]------------
-> [ 4926.964529] Unexpected Unexpected register access
-                 ^^^^^^^^^^^^^^^^^^^^^
+Based on Linux 6.19-rc1.
 
-You can clean-up the message...
+Cheers,
+/fuad
 
-> [ 4926.964713] WARNING: arch/arm64/kvm/sys_regs.c:64 at bad_trap.isra.0+0x70/0x7c, CPU#5: kvm-vcpu-0/179
-> [ 4926.965014] Modules linked in:
-> [ 4926.965097] CPU: 5 UID: 0 PID: 179 Comm: kvm-vcpu-0 Not tainted 6.19.0-rc1-dirty #85 PREEMPT
-> [ 4926.965240] Hardware name: FVP Base RevC (DT)
-> [ 4926.965316] pstate: 63402005 (nZCv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-> [ 4926.965442] pc : bad_trap.isra.0+0x70/0x7c
-> [ 4926.965564] lr : bad_trap.isra.0+0x70/0x7c
-> [ 4926.965687] sp : ffff800080be39f0
-> [ 4926.965760] x29: ffff800080be39f0 x28: ffff0008031e2dc0 x27: 0000000000000000
-> [ 4926.965943] x26: 0000000000000000 x25: 0000000000000000 x24: 000000000000ae80
-> [ 4926.966124] x23: ffff000800b78048 x22: ffff00080164c9c0 x21: ffff0008031e2dc0
-> [ 4926.966314] x20: ffff000800b78000 x19: ffff000800b78000 x18: ffffffffff00b468
-> [ 4926.966506] x17: 0000000000000000 x16: 0000000000000000 x15: ffffa991688ee120
-> [ 4926.966689] x14: fffffffffe00b467 x13: 0000000000001408 x12: 0000000000001470
-> [ 4926.966874] x11: 0000000000000058 x10: 0000000000000018 x9 : ffff000875334bc0
-> [ 4926.967058] x8 : 0000000002bfffa8 x7 : 0000000000000081 x6 : ffff000877f34bc0
-> [ 4926.967241] x5 : 0000000000000081 x4 : ffffa991674022a8 x3 : 0000000000000001
-> [ 4926.967423] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff0008031e2dc0
-> [ 4926.967605] Call trace:
-> [ 4926.967664]  bad_trap.isra.0+0x70/0x7c (P)
-> [ 4926.967805]  perform_access+0xcc/0xd8
-> [ 4926.967943]  kvm_handle_sys_reg+0x100/0x170
-> [ 4926.968068]  handle_exit+0x58/0x168
-> [ 4926.968187]  kvm_arch_vcpu_ioctl_run+0x2f8/0x900
-> [ 4926.968336]  kvm_vcpu_ioctl+0x168/0xa18
-> [ 4926.968479]  __arm64_sys_ioctl+0x2ec/0xaf4
-> [ 4926.968599]  invoke_syscall.constprop.0+0x48/0xc8
-> [ 4926.968758]  do_el0_svc+0x3c/0xb8
-> [ 4926.968903]  el0_svc+0x3c/0x160
-> [ 4926.969014]  el0t_64_sync_handler+0xa0/0xe4
-> [ 4926.969137]  el0t_64_sync+0x198/0x19c
-> [ 4926.969255] ---[ end trace 0000000000000000 ]---
-> [ 4926.969427] kvm [166]:  { Op0( 3), Op1( 0), CRn(10), CRm( 2), Op2( 2), func_write },
+Fuad Tabba (5):
+  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+  KVM: arm64: selftests: Fix incorrect rounding in page_align()
+  KVM: riscv: selftests: Fix incorrect rounding in page_align()
+  KVM: selftests: Move page_align() to shared header
+  KVM: selftests: Fix typos and stale comments in kvm_util
 
-Works for me. The only small snag is that you only ever get one of
-these, irrespective of the register. Not a big deal.
+ tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
+ tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
+ 5 files changed, 14 insertions(+), 13 deletions(-)
 
-Thanks,
 
-	M.
-
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
 -- 
-Without deviation from the norm, progress is not possible.
+2.52.0.239.gd5f0c6e74e-goog
+
