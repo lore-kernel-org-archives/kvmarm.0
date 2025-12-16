@@ -1,110 +1,112 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FD5223336
-	for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 21:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB46222585
+	for <kvmarm@lists.linux.dev>; Tue, 16 Dec 2025 00:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765834959; cv=none; b=B/PGqsa7EucVs7txZ3ETAK8Qqi90ePOYEqIe3rzr89t+pCLWCLozFhSuNtMO5NgNy0kTT6YP+kfE3WKtyCHI+1Em+wHwev8HZAgTx4R8QyeiMZrNzQ2f52czVyJAfrzVb6sTLj2aqCJSfh4e6j1uwlrzOb8jSRWItMFJXX2e0uE=
+	t=1765846719; cv=none; b=MiTACwc/wESahOercrfXTPaM2373Cx1UrcWwHaQS+FMobyYX4bRrOcfS/1F9kcGrWZ5mfb2Q4w5SMZopEPBRslmZ51ilWnAdsRLPgge5dejB3bvygKxMw1QGD8+ifnRbSdl0tAYwJSTo2B5D9AS+6UvmFhtt4tgmbHBTQMS8ZI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765834959; c=relaxed/simple;
-	bh=y/8o7pjE+jv9Xhh+oyH0nf+UDZ7vRHXmjAwqd0BO/ZM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hrrqgYRGVxKvd1l7Un/XJDJwxS8dyXYQ1wLf2aJX8jQWDirtHasy9k/eATB/z4uu0+nuJnl2d7i+YWU0gcEhVfVBgYr3RviMv1+0u/rY1sJDMOAtpY/Re64l+iiW9hdwRu/eTd8DlvrUXe/qqRZ7IZuzch5TrjC19LdODDSY4Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0C55FFEC;
-	Mon, 15 Dec 2025 13:42:29 -0800 (PST)
-Received: from [10.57.78.22] (unknown [10.57.78.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 97E3D3F73B;
-	Mon, 15 Dec 2025 13:42:34 -0800 (PST)
-Message-ID: <f080bfaf-9946-42ee-98c4-b31badc65621@arm.com>
-Date: Mon, 15 Dec 2025 21:42:33 +0000
+	s=arc-20240116; t=1765846719; c=relaxed/simple;
+	bh=GeX6NVbppM2GsiOCZwgdWG2OXHBblO2gL54N7qIuEWs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sAAvE+0tlpxYHJGwTEW4WnE4bz+NPO+0XCZnUGPF0XRqXcF9eCbHeoAeGhLjgcsq0c71Y0A+qI5Xcwxv7wVy2bGgiynUODv+OihoImNwJrU0F2fYDvo487H3ej7KPTtsCxvN2dZwQOi4OQtvhw3dO5Y04l1Zb7w5SBPJizTISLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=j2YQSly7; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="j2YQSly7"
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-8b144ec3aa8so392005785a.2
+        for <kvmarm@lists.linux.dev>; Mon, 15 Dec 2025 16:58:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1765846717; x=1766451517; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DrHNT0ZwzeHqirYSDva6eOqkz8F2/giVsByWb392zck=;
+        b=j2YQSly7CzAumJItePmRnBl5Bo9JXJrXstebjELnb6sz5uXVlmozL8+tuLIbAytauu
+         ffSHwAGXaRH3O9ro/lLHDmHnc9EvmZWQAOvaQ0tAfha8lDXaYfS9HtHrgCJaQEzA0Mwn
+         kSVQvtM+QnwzzuSTQRQkZadFAnrbjCJfMKFNGGhXFZrE4xlpFdIohjXBTs3YJ6QVOtLI
+         s5CbeoQcTAymWiBgww8GfwNmKyXaWseC/D3BrbkA6xaMLdt/8FQyuUDgRKItPx9SSncl
+         ylJJqxLowKtVIzwqKDHzbd8uXsrULoL/FRkspEE3mdokNVlZtG0Qdh+C5IKnXQ8s2RyU
+         RZDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765846717; x=1766451517;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DrHNT0ZwzeHqirYSDva6eOqkz8F2/giVsByWb392zck=;
+        b=ZjKcfP+8ZofdcBrRiy8I+SPM6Gxsuodxhb8YihV+cCsztgJ6tPZwT1a3aCZLwg9ZwE
+         87kV1EhOCeIGYbhDcJ1z50jLv6/4chZwGXZ//01krDsV8DcSXKSBQaA4ACbymfKfLC36
+         sfbrIp0qopqGtxZHcOh3PzvUArequDLwudWG1JyPCREpteq8Rbxk6ZKtvYV9853ZyPFv
+         xlEV88kdMvLmeaJLIcgjwn1ir/FBXWrRDMAPUP6P2yaSTJwE++CuTCeu9BGVVYjv/v+A
+         N77yMPd/J9Q7KyoGSBvqoop/InmRL6riNsiwe21fej2G/nZFuL+12jGeof05aFJGzFIJ
+         LouA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUssZRfBoBMGfjL14GXkCGiyrF5W/7lkSb09VntVyfD0ZrU2i1oWoozH/SDZz1Je/M5FpcsAk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw9vokdqkiAkWzXlj4v513J3Z+L2Lk+MTiHhT13Xwox2x9DvCj8
+	CXkU8BYWHy0z2+zWZPJisil/IuAwP+48dxRmYwXQnf/wbTidfuenmFxXzkSONv+/bmU=
+X-Gm-Gg: AY/fxX4HnefCfA4W2vuNnkiq3iwFlTVsw9vjgoIc0vrrna6i3Bm9JkuoFGNTWlWBXWE
+	Pbw61Nj32K+az0F7WTAh7fWltIpYFF0KDsDLK1vFoNR/vUlz0P/COvBKe7+Vbrp+G4IbmOL8UGz
+	7tqdTLyH6IP65JYwMlPT4ql1hJwayGNXCMU6G+J3u0gxmjbSaIO/Wp/CfdA+t/idfh8LCMzf5FU
+	CUD4vFfJPQiF5kgg2rrzXYhoS0dxdYXwrevYbSbdIkP/QCGWF2TICbwL3FehjDoTdfxSHllNjKb
+	roQ4IDECS41yzYNynNgYIZF7X4L0TLnQz2JYYGPyXNYE3lhW7TNE/oMzwaMtUB169/eyU4fYjh2
+	KejmhlkI02brZkWIWiD9LXAjTB7BZgrKVm7T+7S5DqexZN9jY8UEDFMVtuFix66zylABvhXb93K
+	hpFEfuag78GJaTva62N8uPEw34de40DYkINEYxeuep+N1VyT/yrI3WfwIO
+X-Google-Smtp-Source: AGHT+IHK7ERi0e8OdQxsP0t8K4Zuz+cR8Z/0Up6pTGFh+jCgiiMooXvue23D3Qf/UTTuC5ib3dsdcw==
+X-Received: by 2002:a05:620a:4002:b0:89e:67a9:fced with SMTP id af79cd13be357-8bb3b359498mr1796140685a.66.1765846715921;
+        Mon, 15 Dec 2025 16:58:35 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8be31b55a32sm72625785a.28.2025.12.15.16.58.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 16:58:35 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vVJOc-000000008ML-3OBX;
+	Mon, 15 Dec 2025 20:58:34 -0400
+Date: Mon, 15 Dec 2025 20:58:34 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mostafa Saleh <smostafa@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, iommu@lists.linux.dev,
+	catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, joro@8bytes.org, jean-philippe@linaro.org,
+	praan@google.com, danielmentz@google.com, mark.rutland@arm.com,
+	qperret@google.com, tabba@google.com
+Subject: Re: [PATCH v5 04/27] iommu/io-pgtable-arm: Factor kernel specific
+ code out
+Message-ID: <20251216005834.GC31492@ziepe.ca>
+References: <20251117184815.1027271-1-smostafa@google.com>
+ <20251117184815.1027271-5-smostafa@google.com>
+ <20251128164541.GA812105@ziepe.ca>
+ <aTw2x1UlldJGVA4Y@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v6 01/35] arm64/sysreg: Add new SPE fields
-Content-Language: en-GB
-To: Alexandru Elisei <alexandru.elisei@arm.com>, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, yuzenghui@huawei.com,
- will@kernel.org, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Cc: james.clark@linaro.org, mark.rutland@arm.com, james.morse@arm.com
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-2-alexandru.elisei@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20251114160717.163230-2-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTw2x1UlldJGVA4Y@google.com>
 
-On 14/11/2025 16:06, Alexandru Elisei wrote:
-> Add the PMBSR_EL1.MSS2, PMBISR_EL1.MaxBuffSize, PMBLIMITR_EL1.nVM and
-
-minor nit:                ^PMBIDR_EL1
-
-> PMBIDR_EL1.AddrMode fields, which will be used by KVM.
+On Fri, Dec 12, 2025 at 03:37:43PM +0000, Mostafa Saleh wrote:
+> On Fri, Nov 28, 2025 at 12:45:41PM -0400, Jason Gunthorpe wrote:
+> > On Mon, Nov 17, 2025 at 06:47:51PM +0000, Mostafa Saleh wrote:
+> > > Some of the used APIs are only part of the kernel and are not
+> > > available in the hypervisor, factor those out:
+> > > - alloc/free memory
+> > 
+> > Why not provide the iommu-pages API for the hypervisor environment?
+> > 
+> > Same for virt_to_phys, that could be moved into an iommu-pages wrapper
+> > too..
 > 
+> I guess that's possible, but then we would have to stub dma_map/unmap,
+> which might a bit ugly. I will look more into it.
 
-The defintions look correct to me.
+I am hoping to drop the dma_map/unmap and replace it with an arch
+cache flush call directly since the code is no longer modular and
+relying on the DMA API will have some problems with a future patch
+series I'm expecting..
 
-Suzuki
-
-
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->   arch/arm64/tools/sysreg | 18 ++++++++++++++----
->   1 file changed, 14 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 1c6cdf9d54bb..1e7b69594f04 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -3070,7 +3070,9 @@ EndSysreg
->   
->   Sysreg	PMBLIMITR_EL1	3	0	9	10	0
->   Field	63:12	LIMIT
-> -Res0	11:6
-> +Res0	11:8
-> +Field	7	nVM
-> +Res0	6
->   Field	5	PMFZ
->   Res0	4:3
->   Enum	2:1	FM
-> @@ -3085,7 +3087,8 @@ Field	63:0	PTR
->   EndSysreg
->   
->   Sysreg	PMBSR_EL1	3	0	9	10	3
-> -Res0	63:32
-> +Res0	63:56
-> +Field	55:32	MSS2
->   Enum	31:26	EC
->   	0b000000	BUF
->   	0b100100	FAULT_S1
-> @@ -3112,13 +3115,20 @@ Field	7:0	Attr
->   EndSysreg
->   
->   Sysreg	PMBIDR_EL1	3	0	9	10	7
-> -Res0	63:12
-> +Res0	63:48
-> +Field	47:32	MaxBuffSize
-> +Res0	31:12
->   Enum	11:8	EA
->   	0b0000	NotDescribed
->   	0b0001	Ignored
->   	0b0010	SError
->   EndEnum
-> -Res0	7:6
-> +Enum	7:6	AddrMode
-> +	0b00	VM_ONLY
-> +	0b01	BOTH
-> +	0b10	RESERVED
-> +	0b11	nVM_ONLY
-> +EndEnum
->   Field	5	F
->   Field	4	P
->   Field	3:0	ALIGN
-
+Jason
