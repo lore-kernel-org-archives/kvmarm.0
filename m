@@ -1,108 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580341D5CF2;
-	Wed, 17 Dec 2025 00:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A433A1E75
+	for <kvmarm@lists.linux.dev>; Wed, 17 Dec 2025 09:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765933042; cv=none; b=UPxtd6O2ZfkzflmiHVCWDahmWx7tNa8TmROSjbPByocYrTm4CqiKyTTTui35EK5AEitFFrOPBqtG7udNBWb7kZrPfSk/4V/X+A+7ZfQzALLtxuk60rT2/G582aLX9d9myy/Md5VszMe+SnBvWg78dZmNGj/1ZCbIKVqWgIFXPBY=
+	t=1765963106; cv=none; b=M9SZkL5RDqFN/BzUVfHkb7M3WYRuDvRr/MjhiyT3OR4TL0ehlYmj4WiLZsgKbvMbIKC9p4G0VkTE06y7RM9/aNN5A2BzMcPteSApe3wy2Eo2tucIzH8NGbpKNHOvxICTpIxPOJMbsnf1NeRG/C+G+buPFJxbTynOM7pmWM5xaDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765933042; c=relaxed/simple;
-	bh=z/6R4VG7TSlEesI3ViMverTeFsRJZ0O4JC2zjpfP2Qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WpcXxrjWhpdLJigrMsiKeEDcT+PU4Xhrx734YDay95Vi3SuBTRYDNyK67B0wxiAb/tj0tc5u8lXfe0p7dL1edGNyA154CkMK0P4y4Ss7WGqrEnAiAjh+T4W9y2IZUEw5+MnzhuWEror/NTlSSxLsNq7/aN6DTsbMfM2WO8FAN/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CRrc1Bgy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1765963106; c=relaxed/simple;
+	bh=7Y02OZvOxXnLNayVDBuC1N/CZtD5Y5yPcSygrhZZtUI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CDK6t2yyBSaiviryTadtn9SaCI8co//2pLhMsh1foLE1KnQAMGJWq1StCGscOw3Ws32gnv3b93tqrAUGtlxucqkP7Qx5iEC4bH3Glw9ZLH5dCXUTn+FWOmu0qalXb+P7H2ouDuN/1iVGT1Po+VVulDRwZg5QTousVkluAlZrUe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFVNTP4E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CRrc1Bgy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54E8BC4CEF1;
-	Wed, 17 Dec 2025 00:57:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFVNTP4E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 583D5C4CEF5;
+	Wed, 17 Dec 2025 09:18:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765933041;
-	bh=z/6R4VG7TSlEesI3ViMverTeFsRJZ0O4JC2zjpfP2Qk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CRrc1Bgy2SxAbkikgt/whkMk/lJo1AAfKhN2dGFMCLOJ3YBkBoz4vh5jprB7HPVhh
-	 k3rgpO5yQu48UDdQFC6U+yUh1g1eDYQpMDVqIahRxzZn7W3Dn388xnfFvvvqgeeXQL
-	 36Dl/4m5zU/b36HkromCRw+KNtP/7MRpLe6HbO3smygG3aAbShDZLRGUHmRURzge4N
-	 LWD/8M0g+HPPzo7ok5wbyTPiBOKp8QrB1kjaaDMjuIlUDSudc9rZU4A39wMrIz2euG
-	 Z5oJUkxEKac3d6wMFieFYAsyWkzVWhRTDF+7HeMhA9zuCdByVavMEOp5Q2NnLwK5bH
-	 ybv1b3lbSRRnA==
-Date: Tue, 16 Dec 2025 16:57:19 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 18/24] KVM: arm64: Enforce PMU event filter at
- vcpu_load()
-Message-ID: <aUH_7yYZsmFlRvEc@kernel.org>
-References: <20251209205121.1871534-1-coltonlewis@google.com>
- <20251209205121.1871534-19-coltonlewis@google.com>
+	s=k20201202; t=1765963106;
+	bh=7Y02OZvOxXnLNayVDBuC1N/CZtD5Y5yPcSygrhZZtUI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=vFVNTP4EmLidG8cSKtBE1jZnLrlxPDNxtOgV5aSc38bboGUdCMd1zMphF0D0N0XGW
+	 zOn1LqSj3nV1pNyuTW6HhYop8NkiYg1n7H/P5mOrryJDI2ywwjVw21iA8vaxJCpkfF
+	 2gbUYvZMs6TuA4Zhv29/qsPWi4+XTQVB68D+/jNXFIXM9RSLqrxP3dGL+Zjs78g5kw
+	 80h52yCHpti8EKgZ8Yqa6B/RT8GrgaY1SEPtk8EjQL2kmxdIL5Zk15Iej4GMLDWNyM
+	 twNcb/k8wBk9yc1c9PRcIudU+Dlwbvnsh6k3Z+9gEa84CePiNjgjKF8Fc5xMxj0rsM
+	 GVGFXxlWjVISw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vVnfr-0000000DIRv-415h;
+	Wed, 17 Dec 2025 09:18:24 +0000
+Date: Wed, 17 Dec 2025 09:18:23 +0000
+Message-ID: <867bulo49s.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	qperret@google.com,
+	will@kernel.org,
+	tabba@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 0/4] KVM: arm64: pKVM fixes
+In-Reply-To: <20251216103053.47224-1-alexandru.elisei@arm.com>
+References: <20251216103053.47224-1-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209205121.1871534-19-coltonlewis@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Re-reading this patch...
+On Tue, 16 Dec 2025 10:30:49 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> v2 can be found at [1].
+> 
+> Similar to [2], when trying to run an unprotected VM on FVP with S1PIE enabled
+> and kvm-arm.mode=protected, writes to PIRE0_EL1 made by the guest in
+> __cpu_setup() are trapped by KVM and the BUG_ON(!r->access) is hit. That's
+> because HFGWTR_EL2.nPIRE0_EL1 is an inverse polarity trap and the FGT values for
+> the unprotected pKVM VCPU weren't being propagated from kvm_arch_vcpu_load().
+> 
+> Couldn't figure out how to run a protected pKVM VM, so that's untested.
 
-On Tue, Dec 09, 2025 at 08:51:15PM +0000, Colton Lewis wrote:
-> The KVM API for event filtering says that counters do not count when
-> blocked by the event filter. To enforce that, the event filter must be
-> rechecked on every load since it might have changed since the last
-> time the guest wrote a value.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Just directly state that this is guarding against userspace programming
-an unsupported event ID.
+	M.
 
-> +static void kvm_pmu_apply_event_filter(struct kvm_vcpu *vcpu)
-> +{
-> +	struct arm_pmu *pmu = vcpu->kvm->arch.arm_pmu;
-> +	u64 evtyper_set = ARMV8_PMU_EXCLUDE_EL0 |
-> +		ARMV8_PMU_EXCLUDE_EL1;
-> +	u64 evtyper_clr = ARMV8_PMU_INCLUDE_EL2;
-> +	u8 i;
-> +	u64 val;
-> +	u64 evsel;
-> +
-> +	if (!pmu)
-> +		return;
-> +
-> +	for (i = 0; i < pmu->hpmn_max; i++) {
-
-Iterate the bitmask of counters and you'll handle the cycle counter 'for
-free'.
-
-<snip>
-
-> +		val = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-> +		evsel = val & kvm_pmu_event_mask(vcpu->kvm);
-> +
-> +		if (vcpu->kvm->arch.pmu_filter &&
-> +		    !test_bit(evsel, vcpu->kvm->arch.pmu_filter))
-> +			val |= evtyper_set;
-> +
-> +		val &= ~evtyper_clr;
-> +		write_pmevtypern(i, val);
-
-</snip>
-
-This all needs to be shared with writethrough_pmevtyper() instead of
-open-coding the same thing.
-
-Thanks,
-Oliver
+-- 
+Without deviation from the norm, progress is not possible.
