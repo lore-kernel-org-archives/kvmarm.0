@@ -1,53 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A433A1E75
-	for <kvmarm@lists.linux.dev>; Wed, 17 Dec 2025 09:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10DB33FE08;
+	Wed, 17 Dec 2025 09:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765963106; cv=none; b=M9SZkL5RDqFN/BzUVfHkb7M3WYRuDvRr/MjhiyT3OR4TL0ehlYmj4WiLZsgKbvMbIKC9p4G0VkTE06y7RM9/aNN5A2BzMcPteSApe3wy2Eo2tucIzH8NGbpKNHOvxICTpIxPOJMbsnf1NeRG/C+G+buPFJxbTynOM7pmWM5xaDk=
+	t=1765964081; cv=none; b=G69VA/HGb5VXy2QVAFAAbWxkq0m2iUj1sox/gkjwi2f6vzu+8F2Fgv+m3VlaXai70fj27qBfhPrpu1hXzfkLzGnYSMHuj4oRKrDyKCcgQ75WyFUBIoGZk6PqKu0d9BKEC7GG2OoSYUS6l16vXoknQuNayp5N7bevCAz6GJwr3VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765963106; c=relaxed/simple;
-	bh=7Y02OZvOxXnLNayVDBuC1N/CZtD5Y5yPcSygrhZZtUI=;
+	s=arc-20240116; t=1765964081; c=relaxed/simple;
+	bh=7fWOO4IGNdrsluVaIpmb0wvFgE7AVE1LUfc4e55khsI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CDK6t2yyBSaiviryTadtn9SaCI8co//2pLhMsh1foLE1KnQAMGJWq1StCGscOw3Ws32gnv3b93tqrAUGtlxucqkP7Qx5iEC4bH3Glw9ZLH5dCXUTn+FWOmu0qalXb+P7H2ouDuN/1iVGT1Po+VVulDRwZg5QTousVkluAlZrUe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFVNTP4E; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=E/fgc74wDmeXsYjDunMQQkkhararHE50QDyn//vr0UgzFzXxfb9Ydr6eoXu2KPyf05dnFtYuzv5/gZyTKGZc07Eio1szPnhQ1MCChtC+zty7cTlVNcMdforodH9w/czCyyvsDJ/13oa+BZAL36oC1yEJ/pK8zBpl6J3gTqG94B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j717YF/U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFVNTP4E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 583D5C4CEF5;
-	Wed, 17 Dec 2025 09:18:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j717YF/U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AE0CC4CEF5;
+	Wed, 17 Dec 2025 09:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765963106;
-	bh=7Y02OZvOxXnLNayVDBuC1N/CZtD5Y5yPcSygrhZZtUI=;
+	s=k20201202; t=1765964081;
+	bh=7fWOO4IGNdrsluVaIpmb0wvFgE7AVE1LUfc4e55khsI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vFVNTP4EmLidG8cSKtBE1jZnLrlxPDNxtOgV5aSc38bboGUdCMd1zMphF0D0N0XGW
-	 zOn1LqSj3nV1pNyuTW6HhYop8NkiYg1n7H/P5mOrryJDI2ywwjVw21iA8vaxJCpkfF
-	 2gbUYvZMs6TuA4Zhv29/qsPWi4+XTQVB68D+/jNXFIXM9RSLqrxP3dGL+Zjs78g5kw
-	 80h52yCHpti8EKgZ8Yqa6B/RT8GrgaY1SEPtk8EjQL2kmxdIL5Zk15Iej4GMLDWNyM
-	 twNcb/k8wBk9yc1c9PRcIudU+Dlwbvnsh6k3Z+9gEa84CePiNjgjKF8Fc5xMxj0rsM
-	 GVGFXxlWjVISw==
+	b=j717YF/UPJ34QC/9vpPuspyHZDISNBeEGz4kzvEBemrD94NNkEftQ6gs5Jpt5VmCO
+	 Q45pbEJTMDo4eTYadjgnG7wzxdH8JCI4CtHmumnAArx5MtzeBEEXHuM24MBNyeCF7c
+	 uX/MpdN1PvWiZoGmLk2WEbh+3vlwUJotBRLwFv3kaxt8ZLwhMNyLirHF3eLgM7gyTA
+	 GSIbjOdJuLCoR4/Y5b1Afflr0y27mqlAVwuxiS+ybX5v82RWY0Qdfama3+kmXDSrqF
+	 UCAQRKuA7sFU5ri+bV5GFuhjGzTi/yaSXgQfmK2En4ZRBCAfzSsXWbmUptBbTbYRtH
+	 fJhFbiIqDZemA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vVnfr-0000000DIRv-415h;
-	Wed, 17 Dec 2025 09:18:24 +0000
-Date: Wed, 17 Dec 2025 09:18:23 +0000
-Message-ID: <867bulo49s.wl-maz@kernel.org>
+	id 1vVnva-0000000DIi6-3o0A;
+	Wed, 17 Dec 2025 09:34:39 +0000
+Date: Wed, 17 Dec 2025 09:34:38 +0000
+Message-ID: <865xa5o3ip.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	qperret@google.com,
-	will@kernel.org,
-	tabba@google.com,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 0/4] KVM: arm64: pKVM fixes
-In-Reply-To: <20251216103053.47224-1-alexandru.elisei@arm.com>
-References: <20251216103053.47224-1-alexandru.elisei@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH 16/32] KVM: arm64: gic: Introduce irq_queue and set_pending_state to irq_ops
+In-Reply-To: <20251212152215.675767-17-sascha.bischoff@arm.com>
+References: <20251212152215.675767-1-sascha.bischoff@arm.com>
+	<20251212152215.675767-17-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,24 +66,65 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 16 Dec 2025 10:30:49 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, 12 Dec 2025 15:22:40 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> v2 can be found at [1].
+> There are times when the default behaviour of vgic_queue_irq_unlock is
+> undesirable. This is because some GICs, such a GICv5 which is the main
+> driver for this change, handle the majority of the interrupt lifecycle
+> in hardware. In this case, there is no need for a per-VCPU AP list as
+> the interrupt can be made pending directly. This is done either via
+> the ICH_PPI_x_EL2 registers for PPIs, or with the VDPEND system
+> instruction for SPIs and LPIs.
 > 
-> Similar to [2], when trying to run an unprotected VM on FVP with S1PIE enabled
-> and kvm-arm.mode=protected, writes to PIRE0_EL1 made by the guest in
-> __cpu_setup() are trapped by KVM and the BUG_ON(!r->access) is hit. That's
-> because HFGWTR_EL2.nPIRE0_EL1 is an inverse polarity trap and the FGT values for
-> the unprotected pKVM VCPU weren't being propagated from kvm_arch_vcpu_load().
+> The queue_irq_unlock function is made overridable using a new function
+> pointer in struct irq_ops. In kvm_vgic_inject_irq,
+> vgic_queue_irq_unlock is overridden if the function pointer is
+> non-null.
 > 
-> Couldn't figure out how to run a protected pKVM VM, so that's untested.
+> Additionally, a new function is added via a function pointer -
+> set_pending_state. The intent is for this to be used to directly set
+> the pending state in hardware.
+> 
+> Both of these new irq_ops are unused in this change - it is purely
+> providing the infrastructure itself. The subsequent PPI injection
+> changes provide a demonstration of their usage.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic.c |  9 ++++++++-
+>  include/kvm/arm_vgic.h     | 15 +++++++++++++++
+>  2 files changed, 23 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 1fe3dcc997860..fc01c6d07fe62 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -547,7 +547,14 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  	else
+>  		irq->pending_latch = true;
+>  
+> -	vgic_queue_irq_unlock(kvm, irq, flags);
+> +	if (irq->ops && irq->ops->set_pending_state)
+> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
+> +
+> +	if (irq->ops && irq->ops->queue_irq_unlock)
+> +		WARN_ON_ONCE(!irq->ops->queue_irq_unlock(kvm, irq, flags));
+> +	else
+> +		vgic_queue_irq_unlock(kvm, irq, flags);
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+I find it slightly dubious to WARN() in one case but not the other.
+
+More importantly, why isn't the per-irq queue_unlock operation tucked
+into the vgic_queue_irq_unlock() primitive? We have 16 call sites for
+this function, and it is odd that only the injection primitive would
+benefit from this.
+
+Thanks,
 
 	M.
 
