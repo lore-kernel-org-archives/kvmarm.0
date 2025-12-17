@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06354330B18;
-	Wed, 17 Dec 2025 11:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C59B3A1E9A;
+	Wed, 17 Dec 2025 11:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765969628; cv=none; b=JT587WfuCk30PgEdn3n9qOWvhKPB+vhM3MihiXPN1Q444cHnA/f6cG+ltx6nnvsWRNZ5pIbHNaBBx8gC+DpZpa9mw/tW/NS2HbZoghn+lIjh8x64i5idwmBijrMOnKxvOyI1uYDym473XDynbB8riRh5tdp2/nAeFPZX7h44/U4=
+	t=1765971635; cv=none; b=Z5+Rrgiqq6dkn4uHEpesUm5wYWDXF2HNmDvka1O+iIqWd+l7aR2o4ZaO9A0ohGhkzspzVz486t0ZWQOyHZGjamiXgiWUIM5eXEXTHuV7Vid1mO2KP6LW/ZcvWALNq0GwEXwOYhgYTd/aDKMnX1kDIoW2shosR46lv4iFixTx5qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765969628; c=relaxed/simple;
-	bh=CGfoUU3YMKMF5WdQXpAhkwi+Ex2ibfiHK3XhHbVV/UM=;
+	s=arc-20240116; t=1765971635; c=relaxed/simple;
+	bh=uqwVsWJ8uisJ2wNnLh7lsr40H7RB5s1TQv5LWb9t0R4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LWQftCmkLp1Rpl1h6YL8jXHHLvZ93mz98lBPYn+PbVf8OXBlxv+NT4Xtc4lqhsu6X7hRRsKpsMfDbOfOXdEx1Uz8dZso2/ffH7D9ZV3/v4f7Hp/330TZJp95CaJBIMmomUb3QE5rapHZvYRokHTcWQvBrjFzeepW8lzZwuAsYvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ssoiGGxm; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Amg4LTdx/REun/uUCUX2t1nXwB+ps8G97/GFw+E4J1uSGdHTsKSt0fQ8kYMaFuEBVbxSjO6x46mVTMIRuKqdzfMC1WQh4ps6wNwc4dGjUjwUWuY/PhKh5BzBo3pJWXKFNTkN0IfdqMYmF/ZjTzbDOzlY9zkvaTpWct7FkgUWnYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FNybXqu8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ssoiGGxm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 362AEC4CEF5;
-	Wed, 17 Dec 2025 11:07:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FNybXqu8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FF23C4CEF5;
+	Wed, 17 Dec 2025 11:40:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765969627;
-	bh=CGfoUU3YMKMF5WdQXpAhkwi+Ex2ibfiHK3XhHbVV/UM=;
+	s=k20201202; t=1765971634;
+	bh=uqwVsWJ8uisJ2wNnLh7lsr40H7RB5s1TQv5LWb9t0R4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ssoiGGxmWunEifaWEYASXUMQ6hARqYcuJ4MsrpwGDidyYCBqDts184EbCrUymrN8J
-	 o+NcLn9xL6aCby185qvRjhsZP7UX7HxEJZHv4o5zoyKcGFtzT6kidp2jUuBUOasTMB
-	 ghOdoh15RhII/Gst6EwMORVAFAhs8LxqMDuoJpot7pv7el7/8Itr+emSvicZ3El/Nt
-	 sV2Vn0NPr9SCRoeTz+vSOKF1I+oQoW2QxfEODom6OOQma8lucGR0fLHbfxUwBIBdeA
-	 xkyIX8ZWo0qoTih5rBBTFGS8uHTSIErzR/rQWaWNhtVx0cOyoTYjI5SgYiJ/eWwu0D
-	 /hTDFaLwydHWg==
+	b=FNybXqu812pCpuRRRwMC9R7TwkcMb2fQtVD1jCfoC4Ri6bEZqaLvs1Uv5WeuVQL8r
+	 sZ0ffVl7jcNeCcNEcB53jDJyXtByxIMMJWd70zt2NsEo4MBGRGTgEWb7rFC0ScIX8d
+	 UKPSt/9/YgKVSYJrk/7rZXVHZA72eO0O2TmiyUswuHK4+W6DZpLqcYCNSyJlnN6WKP
+	 4wlMrizNmjG9ZDfA0Jr5YFM4V0tlFc3ndegm1UaAEtxJuAsNxP1gYU+y+VIvcgN0FI
+	 Gbo3E2cRybovmdKIROhZbCGpcYXNS+CXpjiLnhdG/mdqwz/7o5uKLYap5S5lLKLu2b
+	 +TCrk+i6kN4tQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vVpN3-0000000DL3c-0Zkn;
-	Wed, 17 Dec 2025 11:07:05 +0000
-Date: Wed, 17 Dec 2025 11:07:04 +0000
-Message-ID: <863459nz8n.wl-maz@kernel.org>
+	id 1vVptP-0000000DLhr-3EaW;
+	Wed, 17 Dec 2025 11:40:31 +0000
+Date: Wed, 17 Dec 2025 11:40:31 +0000
+Message-ID: <861pktnxow.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -51,10 +51,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	<peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 13/32] KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp interface
-In-Reply-To: <20251212152215.675767-14-sascha.bischoff@arm.com>
+Subject: Re: [PATCH 15/32] KVM: arm64: gic-v5: Implement direct injection of PPIs
+In-Reply-To: <20251212152215.675767-16-sascha.bischoff@arm.com>
 References: <20251212152215.675767-1-sascha.bischoff@arm.com>
-	<20251212152215.675767-14-sascha.bischoff@arm.com>
+	<20251212152215.675767-16-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,392 +70,196 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Dec 2025 15:22:39 +0000,
+On Fri, 12 Dec 2025 15:22:40 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Introduce hyp functions to save/restore the following GICv5 state:
+> GICv5 is able to directly inject PPI pending state into a guest using
+> a mechanism called DVI whereby the pending bit for a paticular PPI is
+> driven directly by the physically-connected hardware. This mechanism
+> itself doesn't allow for any ID translation, so the host interrupt is
+> directly mapped into a guest with the same interrupt ID.
 > 
-> * ICC_ICSR_EL1
-> * ICH_APR_EL2
-> * ICH_PPI_ACTIVERx_EL2
-> * ICH_PPI_DVIRx_EL2
-> * ICH_PPI_ENABLERx_EL2
-> * ICH_PPI_PENDRRx_EL2
-> * ICH_PPI_PRIORITYRx_EL2
-> * ICH_VMCR_EL2
+> When mapping a virtual interrupt to a physical interrupt via
+> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
+> PPI or not. If it is, and the host's interrupt ID matches that used
+> for the guest DVI is enabled, and the interrupt itself is marked as
+> directly_injected.
 > 
-> All of these are saved/restored to/from the KVM vgic_v5 CPUIF shadow
-> state.
+> When the interrupt is unmapped again, this process is reversed, and
+> DVI is disabled for the interrupt again.
 > 
-> The ICSR must be save/restored as this register is shared between host
-> and guest. Therefore, to avoid leaking host state to the guest, this
-> must be saved and restored. Moreover, as this can by used by the host
-> at any time, it must be save/restored eagerly. Note: the host state is
-> not preserved as the host should only use this register when
-> preemption is disabled.
-> 
-> As part of restoring the ICH_VMCR_EL2 and ICH_APR_EL2, GICv3-compat
-> mode is also disabled by setting the ICH_VCTLR_EL2.V3 bit to 0. The
-> correspoinding GICv3-compat mode enable is part of the VMCR & APR
-> restore for a GICv3 guest as it only takes effect when actually
-> running a guest.
+> Note: the expectation is that a directly injected PPI is disabled on
+> the host while the guest state is loaded. The reason is that although
+> DVI is enabled to drive the guest's pending state directly, the host
+> pending state also remains driven. In order to avoid the same PPI
+> firing on both the host and the guest, the host's interrupt must be
+> disabled (masked). This is left up to the code that owns the device
+> generating the PPI as this needs to be handled on a per-VM basis. One
+> VM might use DVI, while another might not, in which case the physical
+> PPI should be enabled for the latter.
 > 
 > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/include/asm/kvm_asm.h   |   4 +
->  arch/arm64/include/asm/kvm_hyp.h   |   8 ++
->  arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  32 ++++++
->  arch/arm64/kvm/hyp/vgic-v5.c       | 155 +++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/vhe/Makefile    |   2 +-
->  include/kvm/arm_vgic.h             |  28 ++++++
->  7 files changed, 229 insertions(+), 2 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/vgic-v5.c
+>  arch/arm64/kvm/vgic/vgic-v5.c | 22 ++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    | 16 ++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h    |  1 +
+>  include/kvm/arm_vgic.h        |  1 +
+>  4 files changed, 40 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index a1ad12c72ebf1..5f669299fb956 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
-> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_vmcr_aprs,
-
-As we recently found out with v2/v3, delaying saving VMCR (and
-therefore lobbing it with the APRs) is a bad idea if you need to look
-at it from inside the run loop.
-
-In general, please align the behaviour with the existing
-infrastructure as often as possible. We can always optimise things
-later once GICv5 becomes relevant.
-
-> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_aprs,
-> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_ppi_state,
-> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_ppi_state,
->  };
->  
->  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 76ce2b94bd97e..f6cf59a719ac6 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -87,6 +87,14 @@ void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
->  void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
->  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
->  
-> +/* GICv5 */
-> +void __vgic_v5_save_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if);
-> +void __vgic_v5_restore_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if);
-> +void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if);
-> +void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if);
-> +void __vgic_v5_save_icsr(struct vgic_v5_cpu_if *cpu_if);
-> +void __vgic_v5_restore_icsr(struct vgic_v5_cpu_if *cpu_if);
-> +
->  #ifdef __KVM_NVHE_HYPERVISOR__
->  void __timer_enable_traps(struct kvm_vcpu *vcpu);
->  void __timer_disable_traps(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index a244ec25f8c5b..d860fbe9bc476 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -26,7 +26,7 @@ hyp-obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o
->  	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
->  	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o stacktrace.o ffa.o
->  hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-> -	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
-> +	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o ../vgic-v5.o
->  hyp-obj-y += ../../../kernel/smccc-call.o
->  hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
->  hyp-obj-y += $(lib-objs)
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index a7c689152f686..6bc5a4f75fd01 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -586,6 +586,34 @@ static void handle___pkvm_teardown_vm(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) = __pkvm_teardown_vm(handle);
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 2fb2db23ed39a..22558080711eb 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -54,6 +54,28 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
 >  }
 >  
-> +static void handle___vgic_v5_save_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v5_save_vmcr_aprs(kern_hyp_va(cpu_if));
-> +}
-> +
-> +static void handle___vgic_v5_restore_vmcr_aprs(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v5_restore_vmcr_aprs(kern_hyp_va(cpu_if));
-> +}
-> +
-> +static void handle___vgic_v5_save_ppi_state(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v5_save_ppi_state(kern_hyp_va(cpu_if));
-> +}
-> +
-> +static void handle___vgic_v5_restore_ppi_state(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(struct vgic_v5_cpu_if *, cpu_if, host_ctxt, 1);
-> +
-> +	__vgic_v5_restore_ppi_state(kern_hyp_va(cpu_if));
-> +}
-> +
->  typedef void (*hcall_t)(struct kvm_cpu_context *);
->  
->  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
-> @@ -627,6 +655,10 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__pkvm_vcpu_load),
->  	HANDLE_FUNC(__pkvm_vcpu_put),
->  	HANDLE_FUNC(__pkvm_tlb_flush_vmid),
-> +	HANDLE_FUNC(__vgic_v5_save_vmcr_aprs),
-> +	HANDLE_FUNC(__vgic_v5_restore_vmcr_aprs),
-> +	HANDLE_FUNC(__vgic_v5_save_ppi_state),
-> +	HANDLE_FUNC(__vgic_v5_restore_ppi_state),
->  };
->  
->  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> diff --git a/arch/arm64/kvm/hyp/vgic-v5.c b/arch/arm64/kvm/hyp/vgic-v5.c
-> new file mode 100644
-> index 0000000000000..11b67ae09e326
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/vgic-v5.c
-
-maz@valley-girl:~/hot-poop/arm-platforms$ find . -name vgic-v5.c
-./arch/arm64/kvm/vgic/vgic-v5.c
-./arch/arm64/kvm/hyp/vgic-v5.c
-
-It doesn't look like much, but that's *very* annoying. Which is why we
-have vgic-v3.c on one side, and vgic-v3-sr.c on the other. Consider
-doing the same thing here.
-
-> @@ -0,0 +1,155 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
 > +/*
-> + * Copyright (C) 2025 - ARM Ltd
+> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
 > + */
-> +
-> +#include <hyp/adjust_pc.h>
-> +
-> +#include <linux/compiler.h>
-> +#include <linux/irqchip/arm-gic-v5.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/kvm_hyp.h>
-> +#include <asm/kvm_mmu.h>
-> +
-> +void __vgic_v5_save_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if)
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
 > +{
-> +	cpu_if->vgic_vmcr = read_sysreg_s(SYS_ICH_VMCR_EL2);
-> +	cpu_if->vgic_apr = read_sysreg_s(SYS_ICH_APR_EL2);
-> +}
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
 > +
-> +static void  __vgic_v5_compat_mode_disable(void)
-> +{
-> +	sysreg_clear_set_s(SYS_ICH_VCTLR_EL2, ICH_VCTLR_EL2_V3, 0);
-> +	isb();
-> +}
-> +
-> +void __vgic_v5_restore_vmcr_aprs(struct vgic_v5_cpu_if *cpu_if)
-> +{
-> +	__vgic_v5_compat_mode_disable();
-> +
-> +	write_sysreg_s(cpu_if->vgic_vmcr, SYS_ICH_VMCR_EL2);
-> +	write_sysreg_s(cpu_if->vgic_apr, SYS_ICH_APR_EL2);
-> +}
-> +
-> +void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if)
-> +{
-> +	cpu_if->vgic_ppi_activer_exit[0] =
-> +		read_sysreg_s(SYS_ICH_PPI_ACTIVER0_EL2);
-> +	cpu_if->vgic_ppi_activer_exit[1] =
-> +		read_sysreg_s(SYS_ICH_PPI_ACTIVER1_EL2);
+> +	if (ppi >= 128)
+> +		return -EINVAL;
 
-Please don't break assignments. Long lines are fine.
+Surely this is bad. *very* bad. How can we get here the first place?
 
 > +
-> +	cpu_if->vgic_ich_ppi_enabler_exit[0] =
-> +		read_sysreg_s(SYS_ICH_PPI_ENABLER0_EL2);
-> +	cpu_if->vgic_ich_ppi_enabler_exit[1] =
-> +		read_sysreg_s(SYS_ICH_PPI_ENABLER1_EL2);
-> +
-> +	cpu_if->vgic_ppi_pendr_exit[0] = read_sysreg_s(SYS_ICH_PPI_PENDR0_EL2);
-> +	cpu_if->vgic_ppi_pendr_exit[1] = read_sysreg_s(SYS_ICH_PPI_PENDR1_EL2);
-> +
-> +	cpu_if->vgic_ppi_priorityr[0] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR0_EL2);
-> +	cpu_if->vgic_ppi_priorityr[1] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR1_EL2);
-> +	cpu_if->vgic_ppi_priorityr[2] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR2_EL2);
-> +	cpu_if->vgic_ppi_priorityr[3] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR3_EL2);
-> +	cpu_if->vgic_ppi_priorityr[4] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR4_EL2);
-> +	cpu_if->vgic_ppi_priorityr[5] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR5_EL2);
-> +	cpu_if->vgic_ppi_priorityr[6] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR6_EL2);
-> +	cpu_if->vgic_ppi_priorityr[7] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR7_EL2);
-> +	cpu_if->vgic_ppi_priorityr[8] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR8_EL2);
-> +	cpu_if->vgic_ppi_priorityr[9] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR9_EL2);
-> +	cpu_if->vgic_ppi_priorityr[10] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR10_EL2);
-> +	cpu_if->vgic_ppi_priorityr[11] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR11_EL2);
-> +	cpu_if->vgic_ppi_priorityr[12] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR12_EL2);
-> +	cpu_if->vgic_ppi_priorityr[13] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR13_EL2);
-> +	cpu_if->vgic_ppi_priorityr[14] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR14_EL2);
-> +	cpu_if->vgic_ppi_priorityr[15] =
-> +		read_sysreg_s(SYS_ICH_PPI_PRIORITYR15_EL2);
+> +	if (dvi) {
+> +		/* Set the bit */
+> +		cpu_if->vgic_ppi_dvir[ppi / 64] |= 1UL << (ppi % 64);
+> +	} else {
+> +		/* Clear the bit */
+> +		cpu_if->vgic_ppi_dvir[ppi / 64] &= ~(1UL << (ppi % 64));
+> +	}
 
-There is clearly scope for optimisation here. The most likely case is
-that we will only care about a handful of PPIs, all grouped in the
-first 4 registers. That's a good reason to track the PPIs that the
-guest can see.
+This should be simplified:
+
+diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+index d74cc3543b9a4..f434ee85f7e1a 100644
+--- a/arch/arm64/kvm/vgic/vgic-v5.c
++++ b/arch/arm64/kvm/vgic/vgic-v5.c
+@@ -191,8 +191,8 @@ bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+ 				   struct vgic_irq *irq)
+ {
+ 	struct vgic_v5_cpu_if *cpu_if;
+-	const u32 id_bit = BIT_ULL(irq->intid % 64);
+ 	const u32 reg = FIELD_GET(GICV5_HWIRQ_ID, irq->intid) / 64;
++	unsigned long *p;
+ 
+ 	if (!vcpu || !irq)
+ 		return false;
+@@ -203,10 +203,8 @@ bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+ 
+ 	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+ 
+-	if (irq_is_pending(irq))
+-		cpu_if->vgic_ppi_pendr[reg] |= id_bit;
+-	else
+-		cpu_if->vgic_ppi_pendr[reg] &= ~id_bit;
++	p = (unsigned long *)&cpu_if->vgic_ppi_pendr[reg];
++	__assign_bit(irq->intid % 64, p, irq_is_pending(irq));
+ 
+ 	return true;
+ }
+@@ -449,17 +447,13 @@ int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
+ {
+ 	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+ 	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
++	unsigned long *p;
+ 
+ 	if (ppi >= 128)
+ 		return -EINVAL;
+ 
+-	if (dvi) {
+-		/* Set the bit */
+-		cpu_if->vgic_ppi_dvir[ppi / 64] |= 1UL << (ppi % 64);
+-	} else {
+-		/* Clear the bit */
+-		cpu_if->vgic_ppi_dvir[ppi / 64] &= ~(1UL << (ppi % 64));
+-	}
++	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
++	__assign_bit(ppi % 64, p, dvi);
+ 
+ 	return 0;
+ }
+
+(yes, unsigned long and u64 are the same thing on any sane
+architecture).
 
 > +
-> +	/* Now that we are done, disable DVI */
-> +	write_sysreg_s(0, SYS_ICH_PPI_DVIR0_EL2);
-> +	write_sysreg_s(0, SYS_ICH_PPI_DVIR1_EL2);
+> +	return 0;
 > +}
 > +
-> +void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if)
-> +{
-> +	 /* Now enable DVI so that the guest's interrupt config takes over */
-> +	 write_sysreg_s(cpu_if->vgic_ppi_dvir[0], SYS_ICH_PPI_DVIR0_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_dvir[1], SYS_ICH_PPI_DVIR1_EL2);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 1005ff5f36235..1fe3dcc997860 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -577,12 +577,28 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	irq->host_irq = host_irq;
+>  	irq->hwintid = data->hwirq;
+>  	irq->ops = ops;
 > +
-> +	 write_sysreg_s(cpu_if->vgic_ppi_activer_entry[0],
-> +			SYS_ICH_PPI_ACTIVER0_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_activer_entry[1],
-> +			SYS_ICH_PPI_ACTIVER1_EL2);
+> +	if (vgic_is_v5(vcpu->kvm)) {
+> +		/* Nothing for us to do */
+> +		if (!irq_is_ppi_v5(irq->intid))
+> +			return 0;
 > +
-> +	 write_sysreg_s(cpu_if->vgic_ich_ppi_enabler_entry[0],
-> +			SYS_ICH_PPI_ENABLER0_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ich_ppi_enabler_entry[1],
-> +			SYS_ICH_PPI_ENABLER1_EL2);
-> +
-> +	 /* Update the pending state of the NON-DVI'd PPIs, only */
-> +	 write_sysreg_s(cpu_if->vgic_ppi_pendr_entry[0] &
-> +				~cpu_if->vgic_ppi_dvir[0],
+> +		if (FIELD_GET(GICV5_HWIRQ_ID, irq->intid) == irq->hwintid) {
+> +			if (!vgic_v5_set_ppi_dvi(vcpu, irq->hwintid, true))
+> +				irq->directly_injected = true;
 
-Again, don't insert line breaks in logical operations.
+The error handling gives me the creeps. If we can end-up at this stage
+with the wrong INTID, we're screwed.
 
-> +			SYS_ICH_PPI_PENDR0_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_pendr_entry[1] &
-> +				~cpu_if->vgic_ppi_dvir[1],
-> +			SYS_ICH_PPI_PENDR1_EL2);
+> +		}
+> +	}
 > +
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[0],
-> +			SYS_ICH_PPI_PRIORITYR0_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[1],
-> +			SYS_ICH_PPI_PRIORITYR1_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[2],
-> +			SYS_ICH_PPI_PRIORITYR2_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[3],
-> +			SYS_ICH_PPI_PRIORITYR3_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[4],
-> +			SYS_ICH_PPI_PRIORITYR4_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[5],
-> +			SYS_ICH_PPI_PRIORITYR5_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[6],
-> +			SYS_ICH_PPI_PRIORITYR6_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[7],
-> +			SYS_ICH_PPI_PRIORITYR7_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[8],
-> +			SYS_ICH_PPI_PRIORITYR8_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[9],
-> +			SYS_ICH_PPI_PRIORITYR9_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[10],
-> +			SYS_ICH_PPI_PRIORITYR10_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[11],
-> +			SYS_ICH_PPI_PRIORITYR11_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[12],
-> +			SYS_ICH_PPI_PRIORITYR12_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[13],
-> +			SYS_ICH_PPI_PRIORITYR13_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[14],
-> +			SYS_ICH_PPI_PRIORITYR14_EL2);
-> +	 write_sysreg_s(cpu_if->vgic_ppi_priorityr[15],
-> +			SYS_ICH_PPI_PRIORITYR15_EL2);
-> +}
-> +
-> +void __vgic_v5_save_icsr(struct vgic_v5_cpu_if *cpu_if)
-> +{
-> +	cpu_if->vgic_icsr = read_sysreg_s(SYS_ICC_ICSR_EL1);
-> +}
-> +
-> +void __vgic_v5_restore_icsr(struct vgic_v5_cpu_if *cpu_if)
-> +{
-> +	write_sysreg_s(cpu_if->vgic_icsr, SYS_ICC_ICSR_EL1);
-> +}
-> diff --git a/arch/arm64/kvm/hyp/vhe/Makefile b/arch/arm64/kvm/hyp/vhe/Makefile
-> index afc4aed9231ac..fcf5e68ab591c 100644
-> --- a/arch/arm64/kvm/hyp/vhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/vhe/Makefile
-> @@ -10,4 +10,4 @@ CFLAGS_switch.o += -Wno-override-init
+>  	return 0;
+>  }
 >  
->  obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o
->  obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
-> -	 ../fpsimd.o ../hyp-entry.o ../exception.o
-> +	 ../fpsimd.o ../hyp-entry.o ../exception.o ../vgic-v5.o
+>  /* @irq->irq_lock must be held */
+>  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
+>  {
+> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
+> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
+> +
+> +	irq->directly_injected = false;
+>  	irq->hw = false;
+>  	irq->hwintid = 0;
+>  	irq->ops = NULL;
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 6e1f386dffade..b6e3f5e3aba18 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -363,6 +363,7 @@ void vgic_debug_init(struct kvm *kvm);
+>  void vgic_debug_destroy(struct kvm *kvm);
+>  
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu);
+>  void vgic_v5_put(struct kvm_vcpu *vcpu);
+>  void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
 > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index fbbaef4ad2114..525c8b83e83c9 100644
+> index 45d83f45b065d..ce9e149b85a58 100644
 > --- a/include/kvm/arm_vgic.h
 > +++ b/include/kvm/arm_vgic.h
-> @@ -359,7 +359,35 @@ struct vgic_v3_cpu_if {
->  };
->  
->  struct vgic_v5_cpu_if {
-> +	u64	vgic_apr;
-> +	u64	vgic_vmcr;
-> +
-> +	/* PPI register state */
->  	u64	vgic_ppi_hmr[2];
-> +	u64	vgic_ppi_dvir[2];
-> +	u64	vgic_ppi_priorityr[16];
-> +
-> +	/* The pending state of the guest. This is merged with the exit state */
-> +	u64	vgic_ppi_pendr[2];
-> +
-> +	/* The state flushed to the regs when entering the guest */
-> +	u64	vgic_ppi_activer_entry[2];
-> +	u64	vgic_ich_ppi_enabler_entry[2];
-> +	u64	vgic_ppi_pendr_entry[2];
-> +
-> +	/* The saved state of the regs when leaving the guest */
-> +	u64	vgic_ppi_activer_exit[2];
-> +	u64	vgic_ich_ppi_enabler_exit[2];
-> +	u64	vgic_ppi_pendr_exit[2];
-
-See my comment on patch 17, requesting to make these entry/exit states
-per CPU, and not per vcpu.
-
-> +
-> +	/*
-> +	 * The ICSR is re-used across host and guest, and hence it needs to be
-> +	 * saved/restored. Only one copy is required as the host should block
-> +	 * preemption between executing GIC CDRCFG and acccessing the
-> +	 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-> +	 * it is the hyp's responsibility to keep the state constistent.
-> +	 */
-> +	u64	vgic_icsr;
->  };
->  
->  struct vgic_cpu {
+> @@ -163,6 +163,7 @@ struct vgic_irq {
+>  	bool enabled:1;
+>  	bool active:1;
+>  	bool hw:1;			/* Tied to HW IRQ */
+> +	bool directly_injected:1;	/* A directly injected HW IRQ */
+>  	bool on_lr:1;			/* Present in a CPU LR */
+>  	refcount_t refcount;		/* Used for LPIs */
+>  	u32 hwintid;			/* HW INTID number */
 
 Thanks,
 
