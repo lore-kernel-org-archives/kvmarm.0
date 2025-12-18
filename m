@@ -1,131 +1,285 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE8D25F797
-	for <kvmarm@lists.linux.dev>; Thu, 18 Dec 2025 10:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F15318152
+	for <kvmarm@lists.linux.dev>; Thu, 18 Dec 2025 18:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766054879; cv=none; b=Qd8WiRaZ6JLzrikfmsy/a5urjPn07WEqe9dOg8IhEbnzwWyNLEYtgH8ANJ6nWZB8930Zeo9zFhe/io+jf8FbvT7tKFBfq95uQ+BhfK1c2vLCheoNFNaT/0iYjJz+jNIk9+xaee6rnDn/4JvoxCq2sN6eiMqDb12YUXI/HKeeNS0=
+	t=1766082405; cv=none; b=sZaGJfogZLtXzAPnGBniWvJHojHD5Zg+uQh7VQfsY7iVFKKm2ggTdqvW2H5sXuvRXFLGhzHCyGrxa+h/lqsa09jT38IbxU5JlKHdB9iz/VWXr2EKSfEVq0gvgO8oc2VHXplRZYt5x8NmWY/+PkQeq0gJVMV+8amCZvKBcdQxG2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766054879; c=relaxed/simple;
-	bh=bC5rC0odBPaYGZvlXWgt5joBmxtgcwQdHn95OPKSfxk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=UM1Wqx92eR8XC0i5aa3ZczHnqqRqZBsatVC3vdW0N6D7hCFYc9mdgYlztHr+7prNDZn5MHVEK1MUrvN0uVReboieIAn5ASlpU2c8PPCeaNNsVVZZkgQh9ag3JlFWUIwSh4Rur1zXZc6R5bQAcfxoWrDYxCEay7K9RXSaqIuWbeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=chaCpu8v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1766082405; c=relaxed/simple;
+	bh=V5yN8cHqboweJq8h/RQv2guONPGVgdoM8C39QjQd/t0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PVtOyvhw+v/uQ3eBx4oK+pM9gLzeQKZLdiKW4RUJfDlghef+U6fGzXcicLCjlvoZCCzD1z3DfwYnCtaUcJ83mfCowQHdYv7OfRqff2wA3UhtmO9Xy0AGZvAGezjultMD51MNlLhNGFpmyGqKlVVJC5MiZy1N03CTc8Rt8sgqh6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JzHCXC4g; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chaCpu8v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766054876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pp9UhEKJ7Aa1makSg7Sp20zlDcbU41vV+Bf96yUQzM0=;
-	b=chaCpu8vtcqvwqgKW7z4w+5/o3/+6f79bTJ19LgDuQ0/d+jsSB4BWxsP76wTNeey1kR6Qp
-	qfiJMtTHJ8vvWRmgJu3lTtVDby+uXLI9e9W+xwyM/atOtbQw15w6yP03Qb+dIXYswriVOT
-	dCpAJ3hNSXO8nQLawX9oOme7Hcd569Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-102-twF_mV5INsyWFaRFyvy1uw-1; Thu, 18 Dec 2025 05:47:55 -0500
-X-MC-Unique: twF_mV5INsyWFaRFyvy1uw-1
-X-Mimecast-MFC-AGG-ID: twF_mV5INsyWFaRFyvy1uw_1766054874
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42fb1c2c403so333896f8f.3
-        for <kvmarm@lists.linux.dev>; Thu, 18 Dec 2025 02:47:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JzHCXC4g"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-34c3501d784so1155165a91.1
+        for <kvmarm@lists.linux.dev>; Thu, 18 Dec 2025 10:26:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766082399; x=1766687199; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/gxkmJ9TQs3AS8Vr3vipzxPLV2YRbYePD93yjaTsRBs=;
+        b=JzHCXC4gz94mq7Ykkj92Ch3aqd1uoS+P2URBnlmCltfOu4Uig87JGekJV+cG7/pU+f
+         GanwFlOvBXkczQqd1e4A3jow36qNchSpGm0GwTa3Go18pPCvRzVq87Yn7QCw2ORd49pD
+         CTpfgKY6VwmQecfYxRh8HuOnxIDAytD4B5DR6NxEriU7JY7XFTjHO4he4Q1Oixfbuawx
+         nrflkWfpw6kN8AFJ8WuMkypyDG0Muy6KIM3SqJ1i6gCNMRaWVajbJ/EyQ2wpmz423TOR
+         TV/o8IlUWu7CMkKtLUUI++QjjkSWNa/S1BUepnBJp3SVF5UQq6LVwoRlowEFe3taPAkp
+         90Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766054874; x=1766659674;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pp9UhEKJ7Aa1makSg7Sp20zlDcbU41vV+Bf96yUQzM0=;
-        b=VQ6IVsNxGOVCEz6+KBfvb9LidP0AZNw5If+28OD+lta2gmnQsCaSwnQ20Y/SSTJIGZ
-         gsiFhYwXiVoBe/dTB/QAroM1t9iDeTTN+X4c2CP+i9Z1ZT3Il1gb3ybuQseuYERNUXq2
-         6e5vauvHbJ33QETAsQAp4DWCpB9WyFi5J9aF8MCfO2XIKOoYuq+Aaoqdr2+maNdvNNm1
-         UZqowNqe6obXNSEHIDcc9Due9Dd/a3LKefLVIMpFfBpI5OpMEVVZkUCXHcHsBwi053ws
-         /dhG4JCEldMZsRrFFCH9jGjT9uwXoZKmMvzDtFf0yFy4gTZnBNMOQA94BovF6iEBv3wk
-         UjHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWq2/6tICzEwiobn/yPLF2l4r6sh4NhCoSChyKkJy+6WKPQlMbWOP9WWHgoR9rZZoxuZb5++j8=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz+n8MaJGs5V7MlN1NP1og7Ru1ugGgUH1dJBktOKyvx4WveNzwu
-	zWe4beZTbNzCRopdCwnZkciDNohFSEaSDWnQ1FJa95WURZua1buCYpDaEXLwvUak4ykJ6qqaNfH
-	nEOwQWksDl1rF74Sml/vvaB7nKsbPeGN9RxCGR4MqpqIQahL9+01NSBtvTw==
-X-Gm-Gg: AY/fxX532EL6OU9YRsD7yXTpU8U9KcDbYZSDZKfWosO6hveVAqI2AHyhcGXcD5EtQ69
-	WViqKgNFj3tV0y6dghHVcNRaDDm0cj4zW9bcGuQfMk4gnkKMBEmY+lTjDqecku7VQwrwuD0TToZ
-	bbDTXjT7F7PBfleChprxle+YuENrdAPZaxke77z8yX2joRxEdCMEQyvtGpNkoLLbkWq1kvK0lRz
-	svPfrJxuW4SK2CIMK5pkxT9827ebzcH4EXlRhfXnWENpzQ5THcR3QFLdAAP/jWkChoM6nbB8EHK
-	APNPUIrvAwIpdYirxYSBXVPUc3RrY16De4llKxV1zSwXurYam6VAwGtEHSu1YV8js/5as0qZ+Og
-	GkxsQhFpKWdKCrFbGzkMlx5VOJbQsgD73O4Ay09GfpVXQY/ngyXfSOtLdYQ==
-X-Received: by 2002:a05:6000:2310:b0:431:c73:48a8 with SMTP id ffacd0b85a97d-4310c7349cfmr5741365f8f.29.1766054874046;
-        Thu, 18 Dec 2025 02:47:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEFuywpjPrOv/NfID+cPGxbswKBxASUTRoemJwfrew+cKOcN66jSr00yj2VRvWLEsTsvRQvgw==
-X-Received: by 2002:a05:6000:2310:b0:431:c73:48a8 with SMTP id ffacd0b85a97d-4310c7349cfmr5741323f8f.29.1766054873556;
-        Thu, 18 Dec 2025 02:47:53 -0800 (PST)
-Received: from rh (p200300f6af0aa4009cef065b67c5ea88.dip0.t-ipconnect.de. [2003:f6:af0a:a400:9cef:65b:67c5:ea88])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432449987a4sm4239256f8f.31.2025.12.18.02.47.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Dec 2025 02:47:53 -0800 (PST)
-Date: Thu, 18 Dec 2025 11:47:52 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, 
-    Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
-cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
-    kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 0/2] arm: add kvm-psci-version vcpu property
-In-Reply-To: <20251202160853.22560-1-sebott@redhat.com>
-Message-ID: <ea9d0e28-27eb-be68-7292-780c0120f1c1@redhat.com>
-References: <20251202160853.22560-1-sebott@redhat.com>
+        d=1e100.net; s=20230601; t=1766082399; x=1766687199;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/gxkmJ9TQs3AS8Vr3vipzxPLV2YRbYePD93yjaTsRBs=;
+        b=r1b8SLsdgd0MakF8D/ntTozSrzW/Pw9sPiunYIgUI1j5EnHQCK7Jwixt2ov7eVVQiE
+         0a9OZ0fPv+cMzNCVUH1BrJqED6OIPxmzq1WbHZRHwD0z00SNY0uk90bjhu9+BDMjiKqN
+         q/h5tbuZ5ttzZbBf6J8SUNrYTivHHkc0SMszGf1KcjOLFWFfGLP3x4QgPSKm34KQTbf1
+         Blqu+wrtAM0F1KFomP8d48oDIMsBuzJmbY6fQ+kdQ4nF9T0fgERbBgr0Uhxiipn4CQb8
+         AYXDzsQw4gviRLl34kX3u4ULyhu7CVlx0vmHaecTjjZwKQ+BpNa8tsyq2ueC/a7PaDqA
+         JdRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYLxps0K0sTTMaZB6Qqt4ui3uSaL7680kWa+KqRD+11Rq9ecFWYm0AJJpQNaKY5qV+1gBEzD4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzpD9mOcSIdqGzBUOqZbImpObwxRvgsQhpP4QBxTlwKxn6dZiRr
+	7t6WJmzdjzdHm9T2fLTbZ+Yk7sFm1/OCMSMmt9h5r2Tvo4g2H8Kze6WT9VPyDdxHa9drvj05hHb
+	IXgwS3g==
+X-Google-Smtp-Source: AGHT+IGOJzRw3+tnCjYs2ZQwqi4LKMDc4l1C1xVPazx7uAjNqwk2hnkWloo6cOhDiQsW1rx8Q3BctsVZqNg=
+X-Received: from pjso12.prod.google.com ([2002:a17:90a:c08c:b0:34c:6892:136f])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1d49:b0:340:c060:4d44
+ with SMTP id 98e67ed59e1d1-34e921353ffmr280520a91.14.1766082399177; Thu, 18
+ Dec 2025 10:26:39 -0800 (PST)
+Date: Thu, 18 Dec 2025 10:26:37 -0800
+In-Reply-To: <769da4d7-0e8c-447a-be6b-1e3ad9a0ae36@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: z2Ahu7nD0luVU1ZQiU0yPEkJXOtAspKzZaj4f_wvIT4_1766054874
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Mime-Version: 1.0
+References: <20250915215432.362444-1-minipli@grsecurity.net>
+ <176314469132.1828515.1099412303366772472.b4-ty@google.com>
+ <15788499-87c6-4e57-b3ae-86d3cc61a278@grsecurity.net> <aRufV8mPlW3uKMo4@google.com>
+ <083276ef-ff1b-4ac3-af19-3f73b1581d39@grsecurity.net> <0274322e-e28c-4511-a565-6bb85bfade8b@grsecurity.net>
+ <3bac29b9-4c49-4e5d-997e-9e4019a2fceb@grsecurity.net> <aUNci6Oy1EXXoQuY@google.com>
+ <769da4d7-0e8c-447a-be6b-1e3ad9a0ae36@grsecurity.net>
+Message-ID: <aURHXUX3tC8ElwFa@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] Better backtraces for leaf functions
+From: Sean Christopherson <seanjc@google.com>
+To: Mathias Krause <minipli@grsecurity.net>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Andrew Jones <andrew.jones@linux.dev>, 
+	Eric Auger <eric.auger@redhat.com>, Thomas Huth <thuth@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hello Peter,
+VICTORY IS MINE!!!!!!!
 
-On Tue, 2 Dec 2025, Sebastian Ott wrote:
-> This series adds a vcpu knob to request a specific PSCI version
-> from KVM via the KVM_REG_ARM_PSCI_VERSION FW register.
->
-> The use case for this is to support migration between host kernels
-> that differ in their default (a.k.a. most recent) PSCI version.
->
-> Note: in order to support PSCI v0.1 we need to drop vcpu
-> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
-> Alternatively we could limit support to versions >=0.2 .
->
-> Changes since V3 [3]:
-> * changed variable name as requested by Eric
-> * added R-B
-> Changes since V2 [2]:
-> * fix kvm_get_psci_version() when the prop is not specified - thanks Eric!
-> * removed the assertion in kvm_get_psci_version() so that this also works
->  with a future kernel/psci version
-> * added R-B
-> Changes since V1 [1]:
-> * incorporated feedback from Peter and Eric
->
-> [1] https://lore.kernel.org/kvmarm/20250911144923.24259-1-sebott@redhat.com/
-> [2] https://lore.kernel.org/kvmarm/20251030165905.73295-1-sebott@redhat.com/
-> [3] https://lore.kernel.org/kvmarm/20251112181357.38999-1-sebott@redhat.com/
->
-> Sebastian Ott (2):
->  target/arm/kvm: add constants for new PSCI versions
->  target/arm/kvm: add kvm-psci-version vcpu property
->
-> docs/system/arm/cpu-features.rst |  5 +++
-> target/arm/cpu.h                 |  6 +++
-> target/arm/kvm-consts.h          |  2 +
-> target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
-> 4 files changed, 76 insertions(+), 1 deletion(-)
->
-> --
+On Thu, Dec 18, 2025, Mathias Krause wrote:
+> On 18.12.25 02:44, Sean Christopherson wrote:
+> > On Fri, Nov 21, 2025, Mathias Krause wrote:
+> >> On 18.11.25 02:47, Mathias Krause wrote:
+> >>
+> >> Finally found it. It's register corruption within both host and guest.
+> >> [...]
+> > 
+> > *sigh*
+> > 
+> > I'm not going to type out the first dozen words that escaped my mouth when
+> > reading this.  I happen to like my job :-)
+> 
+> Me too, that's why I had to switch tasks to gain back some sanity ;)
+> 
+> > [...]
+> >> I hacked up something to verify my theory and made 'regs' "per-cpu". It
+> >> needs quite some code churn and I'm not all that happy with it. IMHO,
+> >> 'regs' and lots of the other VMX management state should be part of some
+> >> vcpu struct or something. In fact, struct vmx_test already has a
+> >> 'guest_regs' but using it won't work, as we need offsetable absolute
+> >> memory references for the inline ASM in vmx_enter_guest() to work as it
+> >> cannot make use of register-based memory references at all. (My hack
+> >> uses a global 'scratch_regs' with mutual exclusion on its usage.)
+> > 
+> > So, much to my chagrin, I started coding away before reading your entire mail
+> > (I got through the paragraph about 'regs' getting clobbered, and then came back
+> > to the rest later; that was a mistake).
+> 
+> A common mistake of mine: writing lengthy explanations that don't get
+> read. Maybe I should start included some tl;dr section for such cases ;)
 
-Anything else that needs to be done to get this merged?
+FWIW, I like the lengthy, detailed explanations.  I just got excited about having
+a clever idea for addressing the regs.
 
-Sebastian
+> > The test itself is also flawed.  On top of this race that you spotted:
+> > 
+> >  @@ -9985,11 +9985,11 @@ static void vmx_sipi_signal_test(void)                
+> >        /* update CR3 on AP */                                                  
+> >        on_cpu(1, update_cr3, (void *)read_cr3());                              
+> >                                                                                
+> >  +     vmx_set_test_stage(0);                                                  
+> >  +                                                                             
+> >        /* start AP */                                                          
+> >        on_cpu_async(1, sipi_test_ap_thread, NULL);                             
+> >                                                                                
+> >  -     vmx_set_test_stage(0);                                                  
+> >  -                                                                             
+> >        /* BSP enter guest */                                                   
+> >        enter_guest();                                                          
+> >   }                                
+> > 
+> > This snippet is also broken:
+> > 
+> > 	vmx_set_test_stage(1);
+> > 
+> > 	/* AP enter guest */
+> > 	enter_guest();
+> > 
+> > because the BSP can think the AP has entered WFS before it has even attempted
+> > VMLAUNCH.  It's "fine" so long as there are host CPUs available, but the test
+> > fails 100% for me if I run KUT in a VM with e.g. j<number of CPUs>, and on an
+> > Ivybridge server CPU, it fails pretty consistently.  No idea why, maybe a slower
+> > nested VM-Enter path?  E.g. the test passes on EMR even if I run with j<2x CPUs>.
+> 
+> Yeah, I noticed the failing synchronization between the vCPUs too. I
+> even tried to fix them by introducing a few more states (simply more
+> steps). However, then I ended up in deadlocks, as the AP re-enters
+> vmx_sipi_test_guest() multiple times (well, twice). It was likely
+> related to the register corruption, I only noticed later. So I believed
+> those magic sleeps (delay(SIPI_SIGNAL_TEST_DELAY)) are for the lack of
+> synchronization and should account for the time span of the AP setting a
+> new step value but not yet having switched to the guest.
+> It might be worth revisiting my attempts of explicitly adding new step
+> states, now with the register corrupting being handled...
+> 
+> > 
+> > Unfortunately, I can't think of any way to fix that problem.  To recognize the
+> > SIPI, the AP needs to do VM-Enter with a WFS activity state, and I'm struggling
+> > to think of a way to atomically write software-visible state at the time of VM-Enter.
+> > E.g. in theory, the test could peek at the LAUNCHED field in the VMCS, but that
+> > would require reverse engineering the VMCS layout for every CPU.  If KVM emulated
+> > any VM-wide MSRs, maybe we could throw one in the MSR load list?  But all the ones
+> > I can think of, e.g. Hyper-V's partition-wide MSRs, aren't guaranteed to be available.
+> 
+> Ahh, that explains the deadlock I observed. So adding more states won't
+> help. Yeah, it needs some trickery... or those magic sleeps :D
 
+Trickery obtained!  MSR_KVM_WALL_CLOCK_NEW to the rescue.  Even if with a delay
+on the AP but not the BSP:
+
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 6bfd6280..047eb1f5 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -9869,7 +9869,7 @@ static void vmx_sipi_test_guest(void)
+                /* wait AP enter guest with activity=WAIT_SIPI */
+                while (vmx_get_test_stage() != 1)
+                        ;
+-               delay(SIPI_SIGNAL_TEST_DELAY);
++               // delay(SIPI_SIGNAL_TEST_DELAY);
+ 
+                /* First SIPI signal */
+                apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
+@@ -9938,6 +9938,7 @@ static void sipi_test_ap_thread(void *data)
+        vmcs_write(GUEST_ACTV_STATE, ACTV_WAIT_SIPI);
+ 
+        vmx_set_test_stage(1);
++       delay(SIPI_SIGNAL_TEST_DELAY);
+ 
+        /* AP enter guest */
+        enter_guest();
+
+Writing MSR_KVM_WALL_CLOCK_NEW via the AP's VM-Entry load list passes with.
+
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 510454a6..2d140ee5 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -6,6 +6,7 @@
+ 
+ #include <asm/debugreg.h>
+ 
++#include "kvmclock.h"
+ #include "vmx.h"
+ #include "msr.h"
+ #include "processor.h"
+@@ -1967,7 +1968,7 @@ struct vmx_msr_entry {
+        u32 index;
+        u32 reserved;
+        u64 value;
+-} __attribute__((packed));
++} __attribute__((packed)) __attribute__((aligned(16)));
+ 
+ #define MSR_MAGIC 0x31415926
+ struct vmx_msr_entry *exit_msr_store, *entry_msr_load, *exit_msr_load;
+@@ -9861,6 +9862,8 @@ static void vmx_init_signal_test(void)
+         */
+ }
+ 
++static bool use_kvm_wall_clock;
++
+ #define SIPI_SIGNAL_TEST_DELAY 100000000ULL
+ 
+ static void vmx_sipi_test_guest(void)
+@@ -9869,7 +9872,7 @@ static void vmx_sipi_test_guest(void)
+                /* wait AP enter guest with activity=WAIT_SIPI */
+                while (vmx_get_test_stage() != 1)
+                        ;
+-               delay(SIPI_SIGNAL_TEST_DELAY);
++               // delay(SIPI_SIGNAL_TEST_DELAY);
+ 
+                /* First SIPI signal */
+                apic_icr_write(APIC_DEST_PHYSICAL | APIC_DM_STARTUP | APIC_INT_ASSERT, id_map[1]);
+@@ -9903,6 +9906,12 @@ static void vmx_sipi_test_guest(void)
+        }
+ }
+ 
++static const struct vmx_msr_entry msr_load_wall_clock = {
++       .index = MSR_KVM_WALL_CLOCK_NEW,
++       .reserved = 0,
++       .value = 1,
++};
++
+ static void sipi_test_ap_thread(void *data)
+ {
+        struct guest_regs *regs = this_cpu_guest_regs();
+@@ -9937,7 +9946,15 @@ static void sipi_test_ap_thread(void *data)
+        /* Set guest activity state to wait-for-SIPI state */
+        vmcs_write(GUEST_ACTV_STATE, ACTV_WAIT_SIPI);
+ 
+-       vmx_set_test_stage(1);
++       if (use_kvm_wall_clock) {
++               wrmsr(MSR_KVM_WALL_CLOCK_NEW, 0);
++               vmcs_write(ENT_MSR_LD_CNT, 1);
++               vmcs_write(ENTER_MSR_LD_ADDR, virt_to_phys(&msr_load_wall_clock));
++       } else {
++               vmx_set_test_stage(1);
++       }
++
++       delay(SIPI_SIGNAL_TEST_DELAY);
+ 
+        /* AP enter guest */
+        enter_guest();
+@@ -9980,6 +9997,8 @@ static void vmx_sipi_signal_test(void)
+        u64 cpu_ctrl_0 = CPU_SECONDARY;
+        u64 cpu_ctrl_1 = 0;
+ 
++       use_kvm_wall_clock = this_cpu_has_kvm() && this_cpu_has(KVM_FEATURE_CLOCKSOURCE2);
++
+        /* passthrough lapic to L2 */
+        disable_intercept_for_x2apic_msrs();
+        vmcs_write(PIN_CONTROLS, vmcs_read(PIN_CONTROLS) & ~PIN_EXTINT);
+@@ -9996,6 +10015,13 @@ static void vmx_sipi_signal_test(void)
+        /* start AP */
+        on_cpu_async(1, sipi_test_ap_thread, NULL);
+ 
++       if (use_kvm_wall_clock) {
++               while (rdmsr(MSR_KVM_WALL_CLOCK_NEW) != 1)
++                       cpu_relax();
++
++               vmx_set_test_stage(1);
++       }
++
+        /* BSP enter guest */
+        enter_guest();
+ }
+ 
