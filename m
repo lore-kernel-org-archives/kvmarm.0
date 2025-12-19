@@ -1,177 +1,105 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF70535C1AB
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D60221DAE;
+	Fri, 19 Dec 2025 19:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766168140; cv=none; b=jAxBDncDR4gnDhaogqzT4bUnmsmVODosisqdcCM4j5XbnPSs5wgGDveuclYq4EICCb3BoU2o+1S6M7UhAzNVfYdVuOj5aP5fx2r7idoekmoEAPjgUP4eHbw4yZAh9UVRKwdg32qaCrGuLQt1OH8WcSwPyVKaPqw0a4ACYAoRAF4=
+	t=1766172531; cv=none; b=BTw10cw8/u38vYjAaVj7MdRIbp91y9/ccL0KnhS3/LbaBCYyUkvE2Ofie78cJAKf/QfsdV6PV/BbCkHttfpOECe6RWhAtq2N3v1uwZNzKKXwMB0eNtmV3AwemJfA+tj3jCx5QRSzLtTyanGJi2M/XZOPzSXtEJaroydhrSSTr6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766168140; c=relaxed/simple;
-	bh=UT/ccxfE0FkF1xO/T5xkqUNISMVdtunSNKnCUKEewRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nMT3owF0OEGujmPFQ9qhd5jmFbE1HhNP0osJje0hevXbx+5b0dvkpuEOLekysAunxHhhv2zUHF1quns4qUIrlukGFCtjaP4h96OD7YgFXmc+Nx/uS/cRwPZSoNHR6vhcJD+Igc5y4qelWvGHENI16c3w+0ISImaxRcg/XKcLhAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB7351756;
-	Fri, 19 Dec 2025 10:15:29 -0800 (PST)
-Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6F3CC3F5CA;
-	Fri, 19 Dec 2025 10:15:32 -0800 (PST)
-From: Ben Horgan <ben.horgan@arm.com>
-To: ben.horgan@arm.com
-Cc: amitsinght@marvell.com,
-	baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com,
-	carl@os.amperecomputing.com,
-	dave.martin@arm.com,
-	david@kernel.org,
-	dfustini@baylibre.com,
-	fenghuay@nvidia.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	jonathan.cameron@huawei.com,
-	kobak@nvidia.com,
-	lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	peternewman@google.com,
-	punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com,
-	reinette.chatre@intel.com,
-	rohit.mathew@arm.com,
-	scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v2 45/45] arm_mpam: Quirk CMN-650's CSU NRDY behaviour
-Date: Fri, 19 Dec 2025 18:11:47 +0000
-Message-ID: <20251219181147.3404071-46-ben.horgan@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
+	s=arc-20240116; t=1766172531; c=relaxed/simple;
+	bh=djKhHEwOK60o6/v7COi0fZNMDvLwIhB3VYDbW9TITiE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ElTOI251uWSnu5NgMbAk7axOln+Lk7vIAvE9LKb37zNv/Wog4jaS9E/JJ1kZoD6bAYsF1c8OOv9J57SPrNKtV3TVRa1m2PaF1jangqO9xBB9v+fVHsBfATCeUOlKfyMQwWp5QNQ96XWNmlsYCqTu024bNB6PQi3GbnPjP1K88Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cu6X3hu1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cu6X3hu1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8D1BC4CEF1;
+	Fri, 19 Dec 2025 19:28:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766172530;
+	bh=djKhHEwOK60o6/v7COi0fZNMDvLwIhB3VYDbW9TITiE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Cu6X3hu1SH740JSIHC08MNNEvXpKxenoEz4kPe9ibti6ydI4XTA9YubGW5NReMD1Q
+	 fQXSNoKLT/2LdfUroQDmP1b6OISabbOvge3K8ibxiQiHg257skmM5sNwPa4UqHcDt0
+	 IoaAQI4Lr3AhpoyrtMPni50cxyf3Z2/e0Z1i+vgfRXRC0sJqDmtDgdH31KwNkLBRZu
+	 jevXFoOrW54S0lbnRtb6Ys6Y2fEe3erOn0N7s5bfByuiC5hviVOJN2Z1gTUtoGrYak
+	 zjQ54D2LF2D5j8SphzcYpFUVTCCjSuL798lpa+JfCOlrq1Cdamx+64Nqa3QUwel56T
+	 E3nQOAWYcHmNQ==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v3 0/4] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Fri, 19 Dec 2025 19:28:06 +0000
+Message-Id: <20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEanRWkC/4XNQQ6CMBCF4auYrq3plNqCK+9hXBSYQoOAmZJGQ
+ 7i7hZgYVyz/N8k3MwtIHgO7HGZGGH3w45AiOx5Y1dqhQe7r1EwKeQYhc97FnlvqteIBp3TkhE3
+ g1lLVpg3L0phCF0pAxZLxJHT+tfm3e+rWh2mk9/Yuwrp+5UzsyBG44IV2KGpZgsnx2iEN+DiN1
+ LCVjvLHAag9TiZOG+kkKKegdH/csiwf0h2fhhoBAAA=
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1744; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=djKhHEwOK60o6/v7COi0fZNMDvLwIhB3VYDbW9TITiE=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpRads3BeObYkMUbxOa2L8G5cc9dXvTvMSBHGjT
+ UgF8XJQfnyJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaUWnbAAKCRAk1otyXVSH
+ 0HZwB/9IkoCpvXO2yiOCeRPdgHwF4hNdXjVN52TdsH6yiRX495D77BhnPlvgk8kuX2nDu7TIn/S
+ CY5IvV83CRbbmHVGYf30iDiBC9CC0uecVOV3MIIch4k/F5aP3cgm32Webw+tLbP0EFGX8U2ivph
+ Z03pw06qQpU/esK80jabA+j/D5fEdTr0rkgZbd6MG0f1ImdJTiWDAm7IoZN09fp82t9e7m6h1qt
+ D4H7ewKWliyTz3qrN5DFhyk+5/QKIr60unp9Y7oGi8lWdDdzldOHUCV0JzwtPKqRFNtTpWXb8ts
+ JySIr9MDVzyTaNF1pSXdsa0THuADC7ZRGvVjglr/iqP0g1e2
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-From: James Morse <james.morse@arm.com>
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to report a result per register,
+making it much easier to see what the problem being reported is.
 
-CMN-650 is afflicted with an erratum where the CSU NRDY bit never clears.
-This tells us the monitor never finishes scanning the cache. The erratum
-document says to wait the maximum time, then ignore the field.
+A similar, though less severe, issue exists with the validation of the
+individual bitfields in registers due to the use of immediately fatal
+asserts. Update those asserts to be standard kselftest reports.
 
-Add a flag to indicate whether this is the final attempt to read the
-counter, and when this quirk is applied, ignore the NRDY field.
+Finally we have a fix for spurious errors on some NV systems.
 
-This means accesses to this counter will always retry, even if the counter
-was previously programmed to the same values.
-
-The counter value is not expected to be stable, it drifts up and down with
-each allocation and eviction. The CSU register provides the value for a
-point in time.
-
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- Documentation/arch/arm64/silicon-errata.rst |  3 +++
- drivers/resctrl/mpam_devices.c              | 12 ++++++++++++
- drivers/resctrl/mpam_internal.h             |  6 ++++++
- 3 files changed, 21 insertions(+)
+Changes in v3:
+- Rebase onto v6.19-rc1.
+- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
 
-diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index e810b2a8f40e..3667650036fb 100644
---- a/Documentation/arch/arm64/silicon-errata.rst
-+++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -213,6 +213,9 @@ stable kernels.
- | ARM            | GIC-700         | #2941627        | ARM64_ERRATUM_2941627       |
- +----------------+-----------------+-----------------+-----------------------------+
- +----------------+-----------------+-----------------+-----------------------------+
-+| ARM            | CMN-650         | #3642720        | N/A                         |
-++----------------+-----------------+-----------------+-----------------------------+
-++----------------+-----------------+-----------------+-----------------------------+
- | Broadcom       | Brahma-B53      | N/A             | ARM64_ERRATUM_845719        |
- +----------------+-----------------+-----------------+-----------------------------+
- | Broadcom       | Brahma-B53      | N/A             | ARM64_ERRATUM_843419        |
-diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index 912736cd86b6..e0b27eb77fa7 100644
---- a/drivers/resctrl/mpam_devices.c
-+++ b/drivers/resctrl/mpam_devices.c
-@@ -691,6 +691,12 @@ static const struct mpam_quirk mpam_quirks[] = {
- 	.iidr_mask  = MPAM_IIDR_MATCH_ONE,
- 	.workaround = T241_MBW_COUNTER_SCALE_64,
- 	},
-+	{
-+	/* ARM CMN-650 CSU erratum 3642720 */
-+	.iidr       = MPAM_IIDR_ARM_CMN_650,
-+	.iidr_mask  = MPAM_IIDR_MATCH_ONE,
-+	.workaround = IGNORE_CSU_NRDY,
-+	},
- 	{ NULL } /* Sentinel */
- };
- 
-@@ -1003,6 +1009,7 @@ struct mon_read {
- 	enum mpam_device_features	type;
- 	u64				*val;
- 	int				err;
-+	bool				waited_timeout;
- };
- 
- static bool mpam_ris_has_mbwu_long_counter(struct mpam_msc_ris *ris)
-@@ -1249,6 +1256,10 @@ static void __ris_msmon_read(void *arg)
- 		if (mpam_has_feature(mpam_feat_msmon_csu_hw_nrdy, rprops))
- 			nrdy = now & MSMON___NRDY;
- 		now = FIELD_GET(MSMON___VALUE, now);
-+
-+		if (mpam_has_quirk(IGNORE_CSU_NRDY, msc) && m->waited_timeout)
-+			nrdy = false;
-+
- 		break;
- 	case mpam_feat_msmon_mbwu_31counter:
- 	case mpam_feat_msmon_mbwu_44counter:
-@@ -1386,6 +1397,7 @@ int mpam_msmon_read(struct mpam_component *comp, struct mon_cfg *ctx,
- 			.ctx = ctx,
- 			.type = type,
- 			.val = val,
-+			.waited_timeout = true,
- 		};
- 		*val = 0;
- 
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 1e7574a9d244..e206decd3048 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -222,6 +222,7 @@ enum mpam_device_quirks {
- 	T241_SCRUB_SHADOW_REGS,
- 	T241_FORCE_MBW_MIN_TO_ONE,
- 	T241_MBW_COUNTER_SCALE_64,
-+	IGNORE_CSU_NRDY,
- 	MPAM_QUIRK_LAST
- };
- 
-@@ -247,6 +248,11 @@ struct mpam_quirk {
- 				FIELD_PREP_CONST(MPAMF_IIDR_REVISION,    0)	| \
- 				FIELD_PREP_CONST(MPAMF_IIDR_IMPLEMENTER, 0x36b)
- 
-+#define MPAM_IIDR_ARM_CMN_650	FIELD_PREP_CONST(MPAMF_IIDR_PRODUCTID,   0)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_VARIANT,     0)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_REVISION,    0)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_IMPLEMENTER, 0x43b)
-+
- /* The values for MSMON_CFG_MBWU_FLT.RWBW */
- enum mon_filter_options {
- 	COUNT_BOTH	= 0,
--- 
-2.43.0
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
+
+---
+Mark Brown (4):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
+      KVM: selftests: arm64: Skip all 32 bit IDs when set_id_regs is aarch64 only
+
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 150 ++++++++++++++++++------
+ 1 file changed, 111 insertions(+), 39 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
