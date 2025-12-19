@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B149734AAFC
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB0C34B400
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167987; cv=none; b=V9I7nTxKQLnTG8RMls2segVzvyuU53JjwYADg48U77l6Jx6nbAJEZGtkVyyck3GlIb6MRYI9TqUAiDS/d4ACJrua/2VaAJSZLLt1XbHHb0rLrfFratSgT9JjrjHtA1oxMpMmH/4XzaK+8G0hMDSfQSMD8306ggKbccAjz/2PabM=
+	t=1766167990; cv=none; b=C2L7NVxHynRJSfV+c3Utoe7u82CFs4dLsPFo/MsHUUd0/NuT2/eCXrvgVAF9czfFlTk1UhADyzMrFjCIWVGXMBqOqe9a3cy8OE5ydUqAKxVsmJR1vZBrsP5vOygOUTezaEshllod1+RhXiH16loilKqRctymoGweks4HrQJJ6aU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766167987; c=relaxed/simple;
-	bh=c4OfQVJRc/IohHusBVXD4m7FAqU2Pmhk+Yr1HO5nl/U=;
+	s=arc-20240116; t=1766167990; c=relaxed/simple;
+	bh=HF4i+UeOKhpLiniwq2yQNzmGsmaIF8nfKMHCqd3uwjQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fOc0leJ81KLU9zoDSRw0BWq3e6SOld0UC0Pc0YoQ6gQiWobdiwo4FGlaq58i4ttdVU3JB4yIMxT0KHpKtanNFwmco/IgWDE9wJTXdKk8eN4sUyF28zUHoKWMiyQ9VE+WdFd5dNGzBvyf2t70heHa6K7bcE224gix/zE6D07ZOpA=
+	 MIME-Version; b=N0bFJ8AAjU88QawNawWczaT9wQlOmO1P+0b7bgHsBj0zvsbnrgORqWFJch2RnVoKOA7/2UIh6X76FuvTfX3/aaYyy1IMUZ0FypyWzlZCHaSfHRQbIHePC0BBixMZ1QzNCH6m5uHI+VG7vVNXnp7iExemiEy4U5mmwfyyVlog3mM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12F37FEC;
-	Fri, 19 Dec 2025 10:12:57 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA87DFEC;
+	Fri, 19 Dec 2025 10:13:01 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B875D3F5CA;
-	Fri, 19 Dec 2025 10:12:59 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 721DE3F5CA;
+	Fri, 19 Dec 2025 10:13:04 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 13/45] KVM: arm64: Force guest EL1 to use user-space's partid configuration
-Date: Fri, 19 Dec 2025 18:11:15 +0000
-Message-ID: <20251219181147.3404071-14-ben.horgan@arm.com>
+Subject: [PATCH v2 14/45] KVM: arm64: Use kernel-space partid configuration for hypercalls
+Date: Fri, 19 Dec 2025 18:11:16 +0000
+Message-ID: <20251219181147.3404071-15-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -66,59 +66,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: James Morse <james.morse@arm.com>
+On nVHE systems whether or not MPAM is enabled, EL2 continues to use
+partid-0 for hypercalls, even when the host may have configured its kernel
+threads to use a different partid. 0 may have been assigned to another
+task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
+same partid as the kernel thread does on the host.
 
-While we trap the guest's attempts to read/write the MPAM control
-registers, the hardware continues to use them. Guest-EL0 uses KVM's
-user-space's configuration, as the value is left in the register, and
-guest-EL1 uses either the host kernel's configuration, or in the case of
-VHE, the UNKNOWN reset value of MPAM1_EL1.
-
-We want to force the guest-EL1 to use KVM's user-space's MPAM
-configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
-programmed the same and on VHE copy MPAM0_EL1 into the guest's
-MPAM1_EL1. There is no need to restore as this is out of context once TGE
-is set.
-
-Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
-Defer EL2 handling until next patch
----
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index f28c6cf4fe1b..a2e8f6187675 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -183,6 +183,16 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
- }
- NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index a7c689152f68..5c1de7e7dd38 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -635,6 +635,11 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+ 	unsigned long hcall_min = 0;
+ 	hcall_t hfn;
  
-+/*
-+ * The _EL0 value was written by the host's context switch and belongs to the
-+ * VMM. Copy this into the guest's _EL1 register.
-+ */
-+static inline void __mpam_guest_load(void)
-+{
-+	if (system_supports_mpam())
-+		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1), SYS_MPAM1);
-+}
++	if (system_supports_mpam()) {
++		write_sysreg_s(read_sysreg_s(SYS_MPAM1_EL1), SYS_MPAM2_EL2);
++		isb();
++	}
 +
- /**
-  * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
-  *
-@@ -222,6 +232,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- 	 */
- 	__sysreg32_restore_state(vcpu);
- 	__sysreg_restore_user_state(guest_ctxt);
-+	__mpam_guest_load();
- 
- 	if (unlikely(is_hyp_ctxt(vcpu))) {
- 		__sysreg_restore_vel2_state(vcpu);
+ 	/*
+ 	 * If pKVM has been initialised then reject any calls to the
+ 	 * early "privileged" hypercalls. Note that we cannot reject
 -- 
 2.43.0
 
