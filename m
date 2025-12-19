@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 046243590A3
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405B1359F8C
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766168091; cv=none; b=E7vcxrwjzry3x1kau0PWOyaFzKTTBFJAyTfl4zu7nAOH/K4lFAP2HTeokmidGRH6S/My21ZoRmTcL6eW80f4opCCP1jjhD1b6oBMC2a7ro9dl6ZWn/FMDsMyveVKP0kSvZMNsj3P9SES2kt8u32cDmZB6cBWxu1qM1Xdf2+jtHw=
+	t=1766168098; cv=none; b=IVGjgX9ELnHmD6ZCz89KIhEFDFyshpoXKfaBve0tdGnyFBbcKTo3uCKuJMW6XV97z2f9N1JF61/rFs+w8d7+9FeRxsMhKdw5Td2Ca7JS33bfT0dY4wRH5xtemH05r+IpgdyOiMqnHSW9elMIY98o9J0mXRfSX8x7oUxqCelymQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766168091; c=relaxed/simple;
-	bh=0RVsNG1IdvDiX2XG57WUm//SVaio5ZakHup31zHaYjM=;
+	s=arc-20240116; t=1766168098; c=relaxed/simple;
+	bh=3uNXc5/fLUTPTe5mCppn43ck+x9pAlZJiUuimY6Qi7Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gSzGImq9fTdMeHdbztmMq/M74vmP1UKpKtVOLd7pNaM84J+exwxilI2fYW8NyVeV1SEWfsNXDxSgXIeZiq12pMkerzWEKhfuXMEgc7s0hBWR8KeglFiYJSD1lqY3JfDD+DtfaufMVmHe4WMd9luCZwv2HQb7S+1lKqC1gr/vqU0=
+	 MIME-Version; b=oPwV6YiC8xwOwpR4o4d6Bczn+NW+mkpBVSbdF0Wxtd3Etsn0vmc2pf9WCxJucNXqDCzGx6HxGoKviPHSxmsa+IMmW+A0JAFyhBmg1ubr0KOPYbEIbhHrqKBEwgZHgOnTQod31HcpgEXJC7DhCvQ/CdbS4RPcGAvHisklh+JkdTo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83FA91688;
-	Fri, 19 Dec 2025 10:14:42 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CF2C1691;
+	Fri, 19 Dec 2025 10:14:47 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3A5133F5CA;
-	Fri, 19 Dec 2025 10:14:45 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E6E813F5CA;
+	Fri, 19 Dec 2025 10:14:49 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 35/45] arm_mpam: resctrl: Add resctrl_arch_cntr_read() & resctrl_arch_reset_cntr()
-Date: Fri, 19 Dec 2025 18:11:37 +0000
-Message-ID: <20251219181147.3404071-36-ben.horgan@arm.com>
+Subject: [PATCH v2 36/45] arm_mpam: resctrl: Update the rmid reallocation limit
+Date: Fri, 19 Dec 2025 18:11:38 +0000
+Message-ID: <20251219181147.3404071-37-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -68,78 +68,122 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-When used in ABMC mode, resctrl uses a different set of helpers to read and
-reset the counters.
+resctrl's limbo code needs to be told when the data left in a cache is
+small enough for the partid+pmg value to be re-allocated.
 
-Add these.
+x86 uses the cache size divided by the number of rmid users the cache may
+have. Do the same, but for the smallest cache, and with the number of
+partid-and-pmg users.
+
+Querying the cache size can't happen until after cacheinfo_sysfs_init() has
+run, so mpam_resctrl_setup() must wait until then.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- drivers/resctrl/mpam_resctrl.c | 43 ++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ drivers/resctrl/mpam_resctrl.c | 54 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 8a1263986145..ef60bc0c7bd8 100644
+index ef60bc0c7bd8..84f517cb047a 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -458,6 +458,28 @@ int resctrl_arch_rmid_read(struct rdt_resource	*r, struct rdt_mon_domain *d,
- 				 closid, rmid, val);
- }
+@@ -16,6 +16,7 @@
+ #include <linux/resctrl.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
++#include <linux/wait.h>
  
-+/* MBWU counters when in ABMC mode */
-+int resctrl_arch_cntr_read(struct rdt_resource *r, struct rdt_mon_domain *d,
-+			   u32 closid, u32 rmid, int mon_idx,
-+			   enum resctrl_event_id eventid, u64 *val)
-+{
-+	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[eventid];
-+	struct mpam_resctrl_dom *l3_dom;
-+	struct mpam_component *mon_comp;
+ #include <asm/mpam.h>
+ 
+@@ -52,6 +53,13 @@ static bool exposed_mon_capable;
+  */
+ static bool cdp_enabled;
+ 
++/*
++ * mpam_resctrl_pick_caches() needs to know the size of the caches. cacheinfo
++ * populates this from a device_initcall(). mpam_resctrl_setup() must wait.
++ */
++static bool cacheinfo_ready;
++static DECLARE_WAIT_QUEUE_HEAD(wait_cacheinfo_ready);
 +
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
-+	if (eventid == QOS_L3_OCCUP_EVENT_ID || !mon->class)
-+		return -EINVAL;
-+
-+	l3_dom = container_of(d, struct mpam_resctrl_dom, resctrl_mon_dom);
-+	mon_comp = l3_dom->mon_comp[eventid];
-+
-+	return read_mon_cdp_safe(mon, mon_comp, mpam_feat_msmon_mbwu, mon_idx,
-+				 closid, rmid, val);
-+}
-+
- static void __reset_mon(struct mpam_resctrl_mon *mon, struct mpam_component *mon_comp,
- 			int mon_idx,
- 			enum resctrl_conf_type cdp_type, u32 closid, u32 rmid)
-@@ -513,6 +535,27 @@ void resctrl_arch_reset_rmid(struct rdt_resource *r, struct rdt_mon_domain *d,
+ /*
+  * L3 local/total may come from different classes - what is the number of MBWU
+  * 'on L3'?
+@@ -556,6 +564,38 @@ void resctrl_arch_reset_cntr(struct rdt_resource *r, struct rdt_mon_domain *d,
  	reset_mon_cdp_safe(mon, mon_comp, USE_PRE_ALLOCATED, closid, rmid);
  }
  
-+/* Reset an assigned counter */
-+void resctrl_arch_reset_cntr(struct rdt_resource *r, struct rdt_mon_domain *d,
-+			     u32 closid, u32 rmid, int cntr_id,
-+			     enum resctrl_event_id eventid)
++/*
++ * The rmid realloc threshold should be for the smallest cache exposed to
++ * resctrl.
++ */
++static int update_rmid_limits(struct mpam_class *class)
 +{
-+	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[eventid];
-+	struct mpam_resctrl_dom *l3_dom;
-+	struct mpam_component *mon_comp;
++	u32 num_unique_pmg = resctrl_arch_system_num_rmid_idx();
++	struct mpam_props *cprops = &class->props;
++	struct cacheinfo *ci;
 +
-+	if (!mpam_is_enabled())
-+		return;
++	lockdep_assert_cpus_held();
 +
-+	if (eventid == QOS_L3_OCCUP_EVENT_ID || !mon->class)
-+		return;
++	/* Assume cache levels are the same size for all CPUs... */
++	ci = get_cpu_cacheinfo_level(smp_processor_id(), class->level);
++	if (!ci || ci->size == 0) {
++		pr_debug("Could not read cache size for class %u\n",
++			 class->level);
++		return -EINVAL;
++	}
 +
-+	l3_dom = container_of(d, struct mpam_resctrl_dom, resctrl_mon_dom);
-+	mon_comp = l3_dom->mon_comp[eventid];
++	if (!mpam_has_feature(mpam_feat_msmon_csu, cprops))
++		return 0;
 +
-+	reset_mon_cdp_safe(mon, mon_comp, USE_PRE_ALLOCATED, closid, rmid);
++	if (!resctrl_rmid_realloc_limit ||
++	    ci->size < resctrl_rmid_realloc_limit) {
++		resctrl_rmid_realloc_limit = ci->size;
++		resctrl_rmid_realloc_threshold = ci->size / num_unique_pmg;
++	}
++
++	return 0;
 +}
 +
  static bool cache_has_usable_cpor(struct mpam_class *class)
  {
  	struct mpam_props *cprops = &class->props;
+@@ -996,6 +1036,9 @@ static void mpam_resctrl_pick_counters(void)
+ 			/* CSU counters only make sense on a cache. */
+ 			switch (class->type) {
+ 			case MPAM_CLASS_CACHE:
++				if (update_rmid_limits(class))
++					continue;
++
+ 				counter_update_class(QOS_L3_OCCUP_EVENT_ID, class);
+ 				return;
+ 			default:
+@@ -1708,6 +1751,8 @@ int mpam_resctrl_setup(void)
+ 	int err = 0;
+ 	struct mpam_resctrl_res *res;
+ 
++	wait_event(wait_cacheinfo_ready, cacheinfo_ready);
++
+ 	cpus_read_lock();
+ 	for (enum resctrl_res_level i = 0; i < RDT_NUM_RESOURCES; i++) {
+ 		res = &mpam_resctrl_controls[i];
+@@ -1773,6 +1818,15 @@ int mpam_resctrl_setup(void)
+ 	return err;
+ }
+ 
++static int __init __cacheinfo_ready(void)
++{
++	cacheinfo_ready = true;
++	wake_up(&wait_cacheinfo_ready);
++
++	return 0;
++}
++device_initcall_sync(__cacheinfo_ready);
++
+ #ifdef CONFIG_MPAM_KUNIT_TEST
+ #include "test_mpam_resctrl.c"
+ #endif
 -- 
 2.43.0
 
