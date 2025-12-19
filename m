@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C2E3491DE
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B149734AAFC
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167987; cv=none; b=Ev8EpvJBzeQvw0pTvCCUnVe5TbvOnv7/Dot3pjqvyMgkuJ8dph+uFuxuv32OzosGSWyVktr3RjrpBqBNG42/ziyWneI00t4ZvcQGHpghiDKcZFGIJvDsfn5UUcndE28m/NNYIV7XA0c+I4zts+ci0xmp8EonQm6D6QpDbWFvVsk=
+	t=1766167987; cv=none; b=V9I7nTxKQLnTG8RMls2segVzvyuU53JjwYADg48U77l6Jx6nbAJEZGtkVyyck3GlIb6MRYI9TqUAiDS/d4ACJrua/2VaAJSZLLt1XbHHb0rLrfFratSgT9JjrjHtA1oxMpMmH/4XzaK+8G0hMDSfQSMD8306ggKbccAjz/2PabM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766167987; c=relaxed/simple;
-	bh=BM7ERcn9XvNNiREPeJmt/JnAG/BrGhmOHhksgkGHqbc=;
+	bh=c4OfQVJRc/IohHusBVXD4m7FAqU2Pmhk+Yr1HO5nl/U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PJD6TFl/zfmWeO+hnBl3qL6Fu4qUnMz14sNXZpyXHsaFavskxctLOkgEErecvXU+BZKA1IHm6v3TSwR6LRVTW548M2WjxLjlv/TqtpDmTGEyDx4l5rpMvrM+3myIwpgcIGWm0e46aPfifNR0L138tGWukOXY5MMwDrPye4X6cxQ=
+	 MIME-Version; b=fOc0leJ81KLU9zoDSRw0BWq3e6SOld0UC0Pc0YoQ6gQiWobdiwo4FGlaq58i4ttdVU3JB4yIMxT0KHpKtanNFwmco/IgWDE9wJTXdKk8eN4sUyF28zUHoKWMiyQ9VE+WdFd5dNGzBvyf2t70heHa6K7bcE224gix/zE6D07ZOpA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 764621688;
-	Fri, 19 Dec 2025 10:12:42 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 12F37FEC;
+	Fri, 19 Dec 2025 10:12:57 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 274FF3F5CA;
-	Fri, 19 Dec 2025 10:12:45 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B875D3F5CA;
+	Fri, 19 Dec 2025 10:12:59 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 10/45] arm64: mpam: Add cpu_pm notifier to restore MPAM sysregs
-Date: Fri, 19 Dec 2025 18:11:12 +0000
-Message-ID: <20251219181147.3404071-11-ben.horgan@arm.com>
+Subject: [PATCH v2 13/45] KVM: arm64: Force guest EL1 to use user-space's partid configuration
+Date: Fri, 19 Dec 2025 18:11:15 +0000
+Message-ID: <20251219181147.3404071-14-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -68,75 +68,57 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-The MPAM system registers will be lost if the CPU is reset during PSCI's
-CPU_SUSPEND.
+While we trap the guest's attempts to read/write the MPAM control
+registers, the hardware continues to use them. Guest-EL0 uses KVM's
+user-space's configuration, as the value is left in the register, and
+guest-EL1 uses either the host kernel's configuration, or in the case of
+VHE, the UNKNOWN reset value of MPAM1_EL1.
 
-Add a PM notifier to restore them.
-
-mpam_thread_switch(current) can't be used as this won't make any changes if
-the in-memory copy says the register already has the correct value. In
-reality the system register is UNKNOWN out of reset.
+We want to force the guest-EL1 to use KVM's user-space's MPAM
+configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
+programmed the same and on VHE copy MPAM0_EL1 into the guest's
+MPAM1_EL1. There is no need to restore as this is out of context once TGE
+is set.
 
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- arch/arm64/kernel/mpam.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+Changes since rfc:
+Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
+Defer EL2 handling until next patch
+---
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
-index e6feff2324ac..dbe0a2d05abb 100644
---- a/arch/arm64/kernel/mpam.c
-+++ b/arch/arm64/kernel/mpam.c
-@@ -4,6 +4,7 @@
- #include <asm/mpam.h>
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index f28c6cf4fe1b..a2e8f6187675 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -183,6 +183,16 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+ }
+ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
  
- #include <linux/arm_mpam.h>
-+#include <linux/cpu_pm.h>
- #include <linux/jump_label.h>
- #include <linux/percpu.h>
- 
-@@ -13,12 +14,41 @@ DEFINE_PER_CPU(u64, arm64_mpam_current);
- 
- u64 arm64_mpam_global_default;
- 
-+static int mpam_pm_notifier(struct notifier_block *self,
-+			    unsigned long cmd, void *v)
++/*
++ * The _EL0 value was written by the host's context switch and belongs to the
++ * VMM. Copy this into the guest's _EL1 register.
++ */
++static inline void __mpam_guest_load(void)
 +{
-+	u64 regval;
-+	int cpu = smp_processor_id();
-+
-+	switch (cmd) {
-+	case CPU_PM_EXIT:
-+		/*
-+		 * Don't use mpam_thread_switch() as the system register
-+		 * value has changed under our feet.
-+		 */
-+		regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
-+		write_sysreg_s(regval, SYS_MPAM1_EL1);
-+		isb();
-+
-+		write_sysreg_s(regval, SYS_MPAM0_EL1);
-+
-+		return NOTIFY_OK;
-+	default:
-+		return NOTIFY_DONE;
-+	}
++	if (system_supports_mpam())
++		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1), SYS_MPAM1);
 +}
 +
-+static struct notifier_block mpam_pm_nb = {
-+	.notifier_call = mpam_pm_notifier,
-+};
-+
- static int __init arm64_mpam_register_cpus(void)
- {
- 	u64 mpamidr = read_sanitised_ftr_reg(SYS_MPAMIDR_EL1);
- 	u16 partid_max = FIELD_GET(MPAMIDR_EL1_PARTID_MAX, mpamidr);
- 	u8 pmg_max = FIELD_GET(MPAMIDR_EL1_PMG_MAX, mpamidr);
+ /**
+  * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+  *
+@@ -222,6 +232,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+ 	__sysreg_restore_user_state(guest_ctxt);
++	__mpam_guest_load();
  
-+	cpu_pm_register_notifier(&mpam_pm_nb);
- 	return mpam_register_requestor(partid_max, pmg_max);
- }
- /* Must occur before mpam_msc_driver_init() from subsys_initcall() */
+ 	if (unlikely(is_hyp_ctxt(vcpu))) {
+ 		__sysreg_restore_vel2_state(vcpu);
 -- 
 2.43.0
 
