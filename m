@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EE7343204
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD613446CF
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167949; cv=none; b=EipM9nyFrXqqr0vb5JHDnd5FOBaThPLaIoRdFDauXalyhJQOjCckxaAKCgP2fij5qk9bti3mo1TWPrlAc3BpqVpU8ku7gQ4r2WT6AxxIQ5pE4/nWhUIo2VB3Zzu5hxxr0/n9IajHWQOaY0qYcl/PhIODt148Sww0i+mTJA6KCRo=
+	t=1766167953; cv=none; b=FqPstNX+CZSPb8upIYTRtLdTsGzjeAKOYNFrntnIsZZx33W8kEwn8QdwZjnVPl1dUi++nncbRtMaBILLkVdSlQgh0XC+xlcO1r4z71Sd9lwfqA7TqdmUCbbnujtWQJQ9M6/WnZ8ISsUh8I78y+hdefQElrG/sEkUWrDRqYghzgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766167949; c=relaxed/simple;
-	bh=B0yAzYu6BlHcgh3uC/YWN9Rba7BbkM2vWxcAfB7DDe4=;
+	s=arc-20240116; t=1766167953; c=relaxed/simple;
+	bh=0kRbcYReCYLKHHl8teK40W8k6urdnfAdEGWHwofeDRs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rC5hOlRMeSuke6CKYjZlVVsdfBheIwrbOKX1ZTb8HdwxoipwQe9CaN5HavWiPcB2Af9Qlleml9Yv09mQUeQm0AeRG1ivw1ZnJIojy3ZY6qAiqgKm0jWqdY1V8jM1Z0Yo39lWJ0R9b6Y3+5sJXpksgra13vRx816YouORz9JMcfQ=
+	 MIME-Version; b=Upg16J33V9kt5hyPf8+TImziLNumOOogcARZygjR0RIZlxbdBopJmN/gUKZnVlCdKafgwtKtEEaiECqcKCaxQyFZ2FMFEqFC9A9X1YIWXpLMpNp9WJoYwkknOQBgDma81e1k7ymsE67IGk+5eYmqztmhQwgmQnFzYg2PrfdZxxQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1243106F;
-	Fri, 19 Dec 2025 10:12:18 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9611A15A1;
+	Fri, 19 Dec 2025 10:12:23 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 859E03F5CA;
-	Fri, 19 Dec 2025 10:12:21 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3E92C3F5CA;
+	Fri, 19 Dec 2025 10:12:26 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 05/45] KVM: arm64: Preserve host MPAM configuration when changing traps
-Date: Fri, 19 Dec 2025 18:11:07 +0000
-Message-ID: <20251219181147.3404071-6-ben.horgan@arm.com>
+Subject: [PATCH v2 06/45] KVM: arm64: Make MPAMSM_EL1 accesses UNDEF
+Date: Fri, 19 Dec 2025 18:11:08 +0000
+Message-ID: <20251219181147.3404071-7-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -66,60 +66,33 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When kvm enables or disables MPAM traps to EL2 it clears all other bits in
-MPAM2_EL2.  Notably, it clears the partition ids (PARTIDs) and performance
-monitoring groups (PMGs). Avoid changing these bits in anticipation of
-adding support for MPAM in the kernel. Otherwise, on a VHE system with the
-host running at EL2 where MPAM2_EL2 and MPAM1_EL1 access the same register,
-any attempt to use MPAM to monitor or partition resources for kernel space
-would be foiled by running a KVM guest. Additionally, MPAM2_EL2.EnMPAMSM is
-always set to 0 which causes MPAMSM_EL1 to always trap. Keep EnMPAMSM set
-to 1 when not in a guest so that the kernel can use MPAMSM_EL1.
+The MPAMSM_EL1 controls the MPAM labeling for an SMCU, Streaming Mode
+Compute Unit. As there is on MPAM support in kvm, make sure MPAMSM_EL1
+accesses trigger an UNDEF.
+
+The range of valid configurations for the PARTID and PMG in MPAMSM_EL1 is
+not currently specified in Arm Architectural Reference Manual but the
+architect has confirmed that it is intended to be the same as that for the
+cpu configuration in the MPAMy_ELx registers.
 
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index c5d5e5b86eaf..63195275a8b8 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -269,7 +269,8 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c8fd7c6a12a1..72654ab984ee 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -3373,6 +3373,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
- static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
- {
--	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
-+	u64 clr = MPAM2_EL2_EnMPAMSM;
-+	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
- 
- 	if (!system_supports_mpam())
- 		return;
-@@ -279,18 +280,21 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
- 		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
- 	} else {
- 		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
--		r |= MPAM2_EL2_TIDR;
-+		set |= MPAM2_EL2_TIDR;
- 	}
- 
--	write_sysreg_s(r, SYS_MPAM2_EL2);
-+	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
- }
- 
- static inline void __deactivate_traps_mpam(void)
- {
-+	u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
-+	u64 set = MPAM2_EL2_EnMPAMSM;
+ 	{ SYS_DESC(SYS_MPAM1_EL1), undef_access },
+ 	{ SYS_DESC(SYS_MPAM0_EL1), undef_access },
++	{ SYS_DESC(SYS_MPAMSM_EL1), undef_access },
 +
- 	if (!system_supports_mpam())
- 		return;
+ 	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
  
--	write_sysreg_s(0, SYS_MPAM2_EL2);
-+	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
- 
- 	if (system_supports_mpam_hcr())
- 		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
 -- 
 2.43.0
 
