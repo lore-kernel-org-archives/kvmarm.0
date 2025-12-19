@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D342134A784
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C2E3491DE
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167981; cv=none; b=UDKx7K/CI6NjSyuTw86Ulvx48tKzxWa7jwwVAof0syD5jGb4YsahFN2VxeTHKN+Zijoc6aiH8bH9Nzdw+/kGVgbXalcBlM9oPrXl89tZxZrP3WavUNwN2Z1bsIHqKDZrJg/ZD6/4EpKVnXR3pwebsTNz2JvwPPYyy1UqdJDqsXQ=
+	t=1766167987; cv=none; b=Ev8EpvJBzeQvw0pTvCCUnVe5TbvOnv7/Dot3pjqvyMgkuJ8dph+uFuxuv32OzosGSWyVktr3RjrpBqBNG42/ziyWneI00t4ZvcQGHpghiDKcZFGIJvDsfn5UUcndE28m/NNYIV7XA0c+I4zts+ci0xmp8EonQm6D6QpDbWFvVsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766167981; c=relaxed/simple;
-	bh=+W5Lq5m04qSXuwHbdM2z037frhDwt2bZZJK4lFlPP3U=;
+	s=arc-20240116; t=1766167987; c=relaxed/simple;
+	bh=BM7ERcn9XvNNiREPeJmt/JnAG/BrGhmOHhksgkGHqbc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=igBbF6ze7Jg/kShXPVFsIAUU3M8ySZ243JGQDrtW06Z8TSgksU4vgjDXioFQQs2bgrC8+DPuJ02zhlF5iT/jTN9x8mXVqlkCf+CraoKOirCBlHFTTRgXz6w9+uV0xUWrsCEWp4xIYhdUOdHxvnJzIXdugtxiG91pnsQadZXqOCk=
+	 MIME-Version; b=PJD6TFl/zfmWeO+hnBl3qL6Fu4qUnMz14sNXZpyXHsaFavskxctLOkgEErecvXU+BZKA1IHm6v3TSwR6LRVTW548M2WjxLjlv/TqtpDmTGEyDx4l5rpMvrM+3myIwpgcIGWm0e46aPfifNR0L138tGWukOXY5MMwDrPye4X6cxQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 599451684;
-	Fri, 19 Dec 2025 10:12:52 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 764621688;
+	Fri, 19 Dec 2025 10:12:42 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E01863F5CA;
-	Fri, 19 Dec 2025 10:12:54 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 274FF3F5CA;
+	Fri, 19 Dec 2025 10:12:45 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -51,11 +51,10 @@ Cc: amitsinght@marvell.com,
 	oupton@kernel.org,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev,
-	Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v2 12/45] arm64: mpam: Add helpers to change a task or cpu's MPAM PARTID/PMG values
-Date: Fri, 19 Dec 2025 18:11:14 +0000
-Message-ID: <20251219181147.3404071-13-ben.horgan@arm.com>
+	kvmarm@lists.linux.dev
+Subject: [PATCH v2 10/45] arm64: mpam: Add cpu_pm notifier to restore MPAM sysregs
+Date: Fri, 19 Dec 2025 18:11:12 +0000
+Message-ID: <20251219181147.3404071-11-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -69,78 +68,75 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-Care must be taken when modifying the PARTID and PMG of a task in any
-per-task structure as writing these values may race with the task being
-scheduled in, and reading the modified values.
+The MPAM system registers will be lost if the CPU is reset during PSCI's
+CPU_SUSPEND.
 
-Add helpers to set the task properties, and the CPU default value.  These
-use WRITE_ONCE() that pairs with the READ_ONCE() in mpam_get_regval() to
-avoid causing torn values.
+Add a PM notifier to restore them.
 
-CC: Dave Martin <Dave.Martin@arm.com>
+mpam_thread_switch(current) can't be used as this won't make any changes if
+the in-memory copy says the register already has the correct value. In
+reality the system register is UNKNOWN out of reset.
+
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-Keep comment attached to mpam_get_regval()
-Add internal helper, __mpam_regval() (Jonathan)
----
- arch/arm64/include/asm/mpam.h | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ arch/arm64/kernel/mpam.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
-index c4cb015e8d8f..a7fd0656bf90 100644
---- a/arch/arm64/include/asm/mpam.h
-+++ b/arch/arm64/include/asm/mpam.h
+diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
+index e6feff2324ac..dbe0a2d05abb 100644
+--- a/arch/arm64/kernel/mpam.c
++++ b/arch/arm64/kernel/mpam.c
 @@ -4,6 +4,7 @@
- #ifndef __ASM__MPAM_H
- #define __ASM__MPAM_H
+ #include <asm/mpam.h>
  
-+#include <linux/bitfield.h>
+ #include <linux/arm_mpam.h>
++#include <linux/cpu_pm.h>
  #include <linux/jump_label.h>
  #include <linux/percpu.h>
- #include <linux/sched.h>
-@@ -22,6 +23,22 @@ DECLARE_PER_CPU(u64, arm64_mpam_current);
-  */
- extern u64 arm64_mpam_global_default;
  
-+static inline u64 __mpam_regval(u16 partid_d, u16 partid_i, u8 pmg_d, u8 pmg_i)
-+{
-+	return FIELD_PREP(MPAM0_EL1_PARTID_D, partid_d) |
-+		FIELD_PREP(MPAM0_EL1_PARTID_I, partid_i) |
-+		FIELD_PREP(MPAM0_EL1_PMG_D, pmg_d) |
-+		FIELD_PREP(MPAM0_EL1_PMG_I, pmg_i);
-+}
-+
-+static inline void mpam_set_cpu_defaults(int cpu, u16 partid_d, u16 partid_i,
-+					 u8 pmg_d, u8 pmg_i)
-+{
-+	u64 default_val = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
-+
-+	WRITE_ONCE(per_cpu(arm64_mpam_default, cpu), default_val);
-+}
-+
- /*
-  * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
-  * which may race with reads in mpam_thread_switch(). Ensure only one of the old
-@@ -45,6 +62,17 @@ static inline u64 mpam_get_regval(struct task_struct *tsk)
- #endif
- }
+@@ -13,12 +14,41 @@ DEFINE_PER_CPU(u64, arm64_mpam_current);
  
-+static inline void mpam_set_task_partid_pmg(struct task_struct *tsk,
-+					    u16 partid_d, u16 partid_i,
-+					    u8 pmg_d, u8 pmg_i)
+ u64 arm64_mpam_global_default;
+ 
++static int mpam_pm_notifier(struct notifier_block *self,
++			    unsigned long cmd, void *v)
 +{
-+#ifdef CONFIG_ARM64_MPAM
-+	u64 regval = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
++	u64 regval;
++	int cpu = smp_processor_id();
 +
-+	WRITE_ONCE(task_thread_info(tsk)->mpam_partid_pmg, regval);
-+#endif
++	switch (cmd) {
++	case CPU_PM_EXIT:
++		/*
++		 * Don't use mpam_thread_switch() as the system register
++		 * value has changed under our feet.
++		 */
++		regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
++		write_sysreg_s(regval, SYS_MPAM1_EL1);
++		isb();
++
++		write_sysreg_s(regval, SYS_MPAM0_EL1);
++
++		return NOTIFY_OK;
++	default:
++		return NOTIFY_DONE;
++	}
 +}
 +
- static inline void mpam_thread_switch(struct task_struct *tsk)
++static struct notifier_block mpam_pm_nb = {
++	.notifier_call = mpam_pm_notifier,
++};
++
+ static int __init arm64_mpam_register_cpus(void)
  {
- 	u64 oldregval;
+ 	u64 mpamidr = read_sanitised_ftr_reg(SYS_MPAMIDR_EL1);
+ 	u16 partid_max = FIELD_GET(MPAMIDR_EL1_PARTID_MAX, mpamidr);
+ 	u8 pmg_max = FIELD_GET(MPAMIDR_EL1_PMG_MAX, mpamidr);
+ 
++	cpu_pm_register_notifier(&mpam_pm_nb);
+ 	return mpam_register_requestor(partid_max, pmg_max);
+ }
+ /* Must occur before mpam_msc_driver_init() from subsys_initcall() */
 -- 
 2.43.0
 
