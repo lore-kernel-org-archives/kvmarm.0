@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2616F33F8C7
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61EDF341AC0
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:12:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167928; cv=none; b=Sl7MhjK5h3i0Ljc/bHPX7fySqA8Fd0QIuO63QT29gSpjEqECDDFwLJb2BZvgn3CMtFX9N3hzglPb7e3jtLbkcIE6cq8X8vySVr3x3pPKSsXudgqH9FcF7HL6qprKzFAo9cFndxG64TMX85jdYpeb9UBRi7lHbAf9oswMPX3J1vw=
+	t=1766167933; cv=none; b=fWLwLTahyVpfeZ1d/vHQwxKZAX5A8ULDRL8esGOlUnzupUDlCCKK6NpbVgWrGpOaTvHVjO0zfVfsK+gVV1tUmKirHk1159OgAsgdEg+N3c2vYo9B8spq2f6rImjOLb/RhGnS/lCrQT8Y4ko+MovSTf3WBkSN50Yas/uyyD2HvI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766167928; c=relaxed/simple;
-	bh=sRUIdkbJ2DfrewEwPwMZEUMfDZFTpz1JF+MvWipeHq4=;
+	s=arc-20240116; t=1766167933; c=relaxed/simple;
+	bh=UkaD1JsQUwZoaJqi84VfDa7Sm0Ylmx909NI9FicWQ+g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ly1wr8dzlDo3pSf5GfitDQjo7lVtXFdc+RoPJdZsntSs6b/9HIyz3d/+hinn6YezCdwOZdCFJEqNLciebT/k/AbgluEv+7StIocmj6eFLwSIvY/F1jt4icq+7r8m6t6/lvoQAHPV+XCmC3apakaMNjrF4TQUd3hXpvKwGPh1UH4=
+	 MIME-Version; b=pi5ClOru1Jqm+RJ1Xj00z9JEgr2NEiY0FnNgIW1QrulS/K14rIRC9kEctAhEHbFy47VrfQK1EHKb3vLHcPUywhD4kiVJHDC8GSJZRMvaulHk/wN91i9LoLrmaVJsR60dDLUEws3/TsLxPPFyo0wUVZyN/44m61GzIF3UBWwxz18=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 484FA106F;
-	Fri, 19 Dec 2025 10:11:59 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E413FEC;
+	Fri, 19 Dec 2025 10:12:04 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AFCF63F5CA;
-	Fri, 19 Dec 2025 10:12:01 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A80D93F5CA;
+	Fri, 19 Dec 2025 10:12:06 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,11 +52,11 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev,
-	kernel test robot <lkp@intel.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH v2 01/45] arm_mpam: Stop using uninitialized variables in __ris_msmon_read()
-Date: Fri, 19 Dec 2025 18:11:03 +0000
-Message-ID: <20251219181147.3404071-2-ben.horgan@arm.com>
+	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH v2 02/45] arm_mpam: Remove duplicate linux/srcu.h header
+Date: Fri, 19 Dec 2025 18:11:04 +0000
+Message-ID: <20251219181147.3404071-3-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -68,49 +68,32 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Dan has reported two uses of uninitialized variables in __ris_msmon_read().
-If an unknown monitor type is encountered then the local variable, now, is
-used uninitialized. Fix this by returning early on error. If a non-mbwu
-monitor is being read then the local variable, overflow, is not initialized
-but still read. Initialize it to false as overflow is not relevant for csu
-monitors.
+From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/r/202512091519.RBwiJcSq-lkp@intel.com/
-Closes: https://lore.kernel.org/r/202512100547.N7QPYgfb-lkp@intel.com/
+./drivers/resctrl/mpam_internal.h: linux/srcu.h is included more than once.
+
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=27328
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Acked-by: James Morse <james.morse@arm.com>
+[BH: Keep alphabetical order]
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- drivers/resctrl/mpam_devices.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/resctrl/mpam_internal.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index 0b5b158e1aaf..b495d5291868 100644
---- a/drivers/resctrl/mpam_devices.c
-+++ b/drivers/resctrl/mpam_devices.c
-@@ -1072,7 +1072,7 @@ static void __ris_msmon_read(void *arg)
- 	u64 now;
- 	bool nrdy = false;
- 	bool config_mismatch;
--	bool overflow;
-+	bool overflow = false;
- 	struct mon_read *m = arg;
- 	struct mon_cfg *ctx = m->ctx;
- 	bool reset_on_next_read = false;
-@@ -1176,10 +1176,11 @@ static void __ris_msmon_read(void *arg)
- 	}
- 	mpam_mon_sel_unlock(msc);
- 
--	if (nrdy) {
-+	if (nrdy)
- 		m->err = -EBUSY;
-+
-+	if (m->err)
- 		return;
--	}
- 
- 	*m->val += now;
- }
+diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+index e79c3c47259c..17cdc3080d58 100644
+--- a/drivers/resctrl/mpam_internal.h
++++ b/drivers/resctrl/mpam_internal.h
+@@ -12,7 +12,6 @@
+ #include <linux/jump_label.h>
+ #include <linux/llist.h>
+ #include <linux/mutex.h>
+-#include <linux/srcu.h>
+ #include <linux/spinlock.h>
+ #include <linux/srcu.h>
+ #include <linux/types.h>
 -- 
 2.43.0
 
