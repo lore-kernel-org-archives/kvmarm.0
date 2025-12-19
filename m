@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991C335CB9F
-	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2417035C1AB
+	for <kvmarm@lists.linux.dev>; Fri, 19 Dec 2025 18:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766168127; cv=none; b=kEfe9QGcB1W1LoB7oecPaqJTT8WnJs1S6Bvsit3ZHiw4+Np37QCpPpEmKqVdymprmTLmaOKP1JyK6EEjZ13U+Lk33rDG3vDSGlKwEOyzvjTKK0ce42eOObXmFbKAgIXOcNBQLSBFJGub0ddOs0dIKLqjP2AIXz2QBdSi6+t80sI=
+	t=1766168132; cv=none; b=h2hcwpde/s/IE9J1+Xzohcod+dfPSZXBpouq4IqjgyvULHQXGfclGEJc851UPeKkRPN/brloe/yeJvpPtzf1teaBfmcEzMs1kzVYs1aICjUMN3iaDlC9y9gRj3zPYctNSKFGzZF8JvDV/Gvs2nn5e330FJnK0HHhyyKSCtkwSGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766168127; c=relaxed/simple;
-	bh=AZC72CyH4dzpXY/SVIxnI/11WQ81YzgDSmpmWbOznxw=;
+	s=arc-20240116; t=1766168132; c=relaxed/simple;
+	bh=cX1nG+kDNM1UH82tsUyLLNzEaNg+8nWV0fcf6sPFuac=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LyZeK64NI1oRVV1VmIxT3TgxmkklTHFZ49bZHS1bCiY5kVkPugs/GLau9HxqYv25LGpThvR2+q9mEyBn8oqex+UcVrGLx5GitwI3nYk4F42N6QiFUVoYLPxnGea0fXx2iElZBQh+GSew3MTYEnpvRoTPrLpdntsw4IwK75fFt68=
+	 MIME-Version; b=giR6XBNjRoIR3Q3gXx0BhUhgyc0clKvHvmYcuaN1fLjHvcNZC8I6Oq4wzoTQDxylJHePRdB5QQANYrIjknHXffivhzSDIjDoHw5YiVsjDf0Y+klu8JMp79MUb5CEHx/RoUMT9+qyNZftFvUQWGWRHFysjxm0B3WCuMFD5eARILc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 995DB16F3;
-	Fri, 19 Dec 2025 10:15:15 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54E2016F8;
+	Fri, 19 Dec 2025 10:15:20 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4E12B3F5CA;
-	Fri, 19 Dec 2025 10:15:18 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 075EE3F5CA;
+	Fri, 19 Dec 2025 10:15:22 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v2 42/45] arm_mpam: Add workaround for T241-MPAM-1
-Date: Fri, 19 Dec 2025 18:11:44 +0000
-Message-ID: <20251219181147.3404071-43-ben.horgan@arm.com>
+Subject: [PATCH v2 43/45] arm_mpam: Add workaround for T241-MPAM-4
+Date: Fri, 19 Dec 2025 18:11:45 +0000
+Message-ID: <20251219181147.3404071-44-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
@@ -68,32 +68,25 @@ Content-Transfer-Encoding: 8bit
 
 From: Shanker Donthineni <sdonthineni@nvidia.com>
 
-The MPAM bandwidth partitioning controls will not be correctly configured,
-and hardware will retain default configuration register values, meaning
-generally that bandwidth will remain unprovisioned.
+In the T241 implementation of memory-bandwidth partitioning, in the absence
+of contention for bandwidth, the minimum bandwidth setting can affect the
+amount of achieved bandwidth. Specifically, the achieved bandwidth in the
+absence of contention can settle to any value between the values of
+MPAMCFG_MBW_MIN and MPAMCFG_MBW_MAX.  Also, if MPAMCFG_MBW_MIN is set
+zero (below 0.78125%), once a core enters a throttled state, it will never
+leave that state.
 
-To address the issue, follow the below steps after updating the MBW_MIN
-and/or MBW_MAX registers.
+The first issue is not a cocern if the MPAM software allows to program
+MPAMCFG_MBW_MIN through the sysfs interface. This patch ensures program
+MBW_MIN=1 (0.78125%) whenever MPAMCFG_MBW_MIN=0 is programmed.
 
- - Perform 64b reads from all 12 bridge MPAM shadow registers at offsets
-   (0x360048 + slice*0x10000 + partid*8). These registers are read-only.
- - Continue iterating until all 12 shadow register values match in a loop.
-   pr_warn_once if the values fail to match within the loop count 1000.
- - Perform 64b writes with the value 0x0 to the two spare registers at
-   offsets 0x1b0000 and 0x1c0000.
+In the scenario where the resctrl doesn't support the MBW_MIN interface via
+sysfs, to achieve bandwidth closer to MW_MAX in the absence of contention,
+software should configure a relatively narrow gap between MBW_MIN and
+MBW_MAX. The recommendation is to use a 5% gap to mitigate the problem.
 
-In the hardware, writes to the MPAMCFG_MBW_MAX MPAMCFG_MBW_MIN registers
-are transformed into broadcast writes to the 12 shadow registers. The
-final two writes to the spare registers cause a final rank of downstream
-micro-architectural MPAM registers to be updated from the shadow copies.
-The intervening loop to read the 12 shadow registers helps avoid a race
-condition where writes to the spare registers occur before all shadow
-registers have been updated.
-
-[ morse: Merged the min/max update into a single
-  mpam_quirk_post_config_change() helper. Stashed the t241_id in the msc
-  instead of carrying the physical address around. Test the msc quirk bit
-  instead of a static key. ]
+[ morse: Added as second quirk, adapted to use the new intermediate values
+in mpam_extend_config() ]
 
 Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
 Signed-off-by: James Morse <james.morse@arm.com>
@@ -101,183 +94,144 @@ Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
 Changes since rfc:
 MPAM_IIDR_NVIDIA_T421 -> MPAM_IIDR_NVIDIA_T241
-return err from init
-Be specific about the errata in the init name,
-  mpam_enable_quirk_nvidia_t241 -> mpam_enable_quirk_nvidia_t241_1
+Handling when reset_mbw_min is set
 ---
  Documentation/arch/arm64/silicon-errata.rst |  2 +
- drivers/resctrl/mpam_devices.c              | 88 +++++++++++++++++++++
- drivers/resctrl/mpam_internal.h             |  9 +++
- 3 files changed, 99 insertions(+)
+ drivers/resctrl/mpam_devices.c              | 59 +++++++++++++++------
+ drivers/resctrl/mpam_internal.h             |  1 +
+ 3 files changed, 46 insertions(+), 16 deletions(-)
 
 diff --git a/Documentation/arch/arm64/silicon-errata.rst b/Documentation/arch/arm64/silicon-errata.rst
-index a7ec57060f64..4e86b85fe3d6 100644
+index 4e86b85fe3d6..b18bc704d4a1 100644
 --- a/Documentation/arch/arm64/silicon-errata.rst
 +++ b/Documentation/arch/arm64/silicon-errata.rst
-@@ -246,6 +246,8 @@ stable kernels.
+@@ -248,6 +248,8 @@ stable kernels.
  +----------------+-----------------+-----------------+-----------------------------+
- | NVIDIA         | T241 GICv3/4.x  | T241-FABRIC-4   | N/A                         |
+ | NVIDIA         | T241 MPAM       | T241-MPAM-1     | N/A                         |
  +----------------+-----------------+-----------------+-----------------------------+
-+| NVIDIA         | T241 MPAM       | T241-MPAM-1     | N/A                         |
++| NVIDIA         | T241 MPAM       | T241-MPAM-4     | N/A                         |
 ++----------------+-----------------+-----------------+-----------------------------+
  +----------------+-----------------+-----------------+-----------------------------+
  | Freescale/NXP  | LS2080A/LS1043A | A-008585        | FSL_ERRATUM_A008585         |
  +----------------+-----------------+-----------------+-----------------------------+
 diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index 1c574b5710d8..1b923a44f304 100644
+index 1b923a44f304..76aa8654fc74 100644
 --- a/drivers/resctrl/mpam_devices.c
 +++ b/drivers/resctrl/mpam_devices.c
-@@ -29,6 +29,16 @@
- 
- #include "mpam_internal.h"
- 
-+/* Values for the T241 errata workaround */
-+#define T241_CHIPS_MAX			4
-+#define T241_CHIP_NSLICES		12
-+#define T241_SPARE_REG0_OFF		0x1b0000
-+#define T241_SPARE_REG1_OFF		0x1c0000
-+#define T241_CHIP_ID(phys)		FIELD_GET(GENMASK_ULL(44, 43), phys)
-+#define T241_SHADOW_REG_OFF(sidx, pid)	(0x360048 + (sidx) * 0x10000 + (pid) * 8)
-+#define SMCCC_SOC_ID_T241		0x036b0241
-+static void __iomem *t241_scratch_regs[T241_CHIPS_MAX];
-+
- /*
-  * mpam_list_lock protects the SRCU lists when writing. Once the
-  * mpam_enabled key is enabled these lists are read-only,
-@@ -630,7 +640,45 @@ static struct mpam_msc_ris *mpam_get_or_create_ris(struct mpam_msc *msc,
- 	return ERR_PTR(-ENOENT);
- }
- 
-+static int mpam_enable_quirk_nvidia_t241_1(struct mpam_msc *msc,
-+					  const struct mpam_quirk *quirk)
-+{
-+	s32 soc_id = arm_smccc_get_soc_id_version();
-+	struct resource *r;
-+	phys_addr_t phys;
-+
-+	/*
-+	 * A mapping to a device other than the MSC is needed, check
-+	 * SOC_ID is  NVIDIA T241 chip (036b:0241)
-+	 */
-+	if (soc_id < 0 || soc_id != SMCCC_SOC_ID_T241)
-+		return -EINVAL;
-+
-+	r = platform_get_resource(msc->pdev, IORESOURCE_MEM, 0);
-+	if (!r)
-+		return -EINVAL;
-+
-+	/* Find the internal registers base addr from the CHIP ID */
-+	msc->t241_id = T241_CHIP_ID(r->start);
-+	phys = FIELD_PREP(GENMASK_ULL(45, 44), msc->t241_id) | 0x19000000ULL;
-+
-+	t241_scratch_regs[msc->t241_id] = ioremap(phys, SZ_8M);
-+	if (WARN_ON_ONCE(!t241_scratch_regs[msc->t241_id]))
-+		return -EINVAL;
-+
-+	pr_info_once("Enabled workaround for NVIDIA T241 erratum T241-MPAM-1\n");
-+
-+	return 0;
-+}
-+
- static const struct mpam_quirk mpam_quirks[] = {
+@@ -679,6 +679,12 @@ static const struct mpam_quirk mpam_quirks[] = {
+ 	.iidr_mask  = MPAM_IIDR_MATCH_ONE,
+ 	.workaround = T241_SCRUB_SHADOW_REGS,
+ 	},
 +	{
-+	/* NVIDIA t241 erratum T241-MPAM-1 */
-+	.init       = mpam_enable_quirk_nvidia_t241_1,
++	/* NVIDIA t241 erratum T241-MPAM-4 */
 +	.iidr       = MPAM_IIDR_NVIDIA_T241,
 +	.iidr_mask  = MPAM_IIDR_MATCH_ONE,
-+	.workaround = T241_SCRUB_SHADOW_REGS,
++	.workaround = T241_FORCE_MBW_MIN_TO_ONE,
 +	},
  	{ NULL } /* Sentinel */
  };
  
-@@ -1378,6 +1426,44 @@ static void mpam_reset_msc_bitmap(struct mpam_msc *msc, u16 reg, u16 wd)
- 	__mpam_write_reg(msc, reg, bm);
+@@ -1464,6 +1470,17 @@ static void mpam_quirk_post_config_change(struct mpam_msc_ris *ris, u16 partid,
+ 		mpam_apply_t241_erratum(ris, partid);
  }
  
-+static void mpam_apply_t241_erratum(struct mpam_msc_ris *ris, u16 partid)
++static u16 mpam_wa_t241_force_mbw_min_to_one(struct mpam_props *props)
 +{
-+	int sidx, i, lcount = 1000;
-+	void __iomem *regs;
-+	u64 val0, val;
++	u16 max_hw_value, min_hw_granule, res0_bits;
 +
-+	regs = t241_scratch_regs[ris->vmsc->msc->t241_id];
++	res0_bits = 16 - props->bwa_wd;
++	max_hw_value = ((1 << props->bwa_wd) - 1) << res0_bits;
++	min_hw_granule = ~max_hw_value;
 +
-+	for (i = 0; i < lcount; i++) {
-+		/* Read the shadow register at index 0 */
-+		val0 = readq_relaxed(regs + T241_SHADOW_REG_OFF(0, partid));
-+
-+		/* Check if all the shadow registers have the same value */
-+		for (sidx = 1; sidx < T241_CHIP_NSLICES; sidx++) {
-+			val = readq_relaxed(regs +
-+					    T241_SHADOW_REG_OFF(sidx, partid));
-+			if (val != val0)
-+				break;
-+		}
-+		if (sidx == T241_CHIP_NSLICES)
-+			break;
-+	}
-+
-+	if (i == lcount)
-+		pr_warn_once("t241: inconsistent values in shadow regs");
-+
-+	/* Write a value zero to spare registers to take effect of MBW conf */
-+	writeq_relaxed(0, regs + T241_SPARE_REG0_OFF);
-+	writeq_relaxed(0, regs + T241_SPARE_REG1_OFF);
-+}
-+
-+static void mpam_quirk_post_config_change(struct mpam_msc_ris *ris, u16 partid,
-+					  struct mpam_config *cfg)
-+{
-+	if (mpam_has_quirk(T241_SCRUB_SHADOW_REGS, ris->vmsc->msc))
-+		mpam_apply_t241_erratum(ris, partid);
++	return min_hw_granule + 1;
 +}
 +
  /* Called via IPI. Call while holding an SRCU reference */
  static void mpam_reprogram_ris_partid(struct mpam_msc_ris *ris, u16 partid,
  				      struct mpam_config *cfg)
-@@ -1465,6 +1551,8 @@ static void mpam_reprogram_ris_partid(struct mpam_msc_ris *ris, u16 partid,
- 		mpam_write_partsel_reg(msc, PRI, pri_val);
+@@ -1508,10 +1525,15 @@ static void mpam_reprogram_ris_partid(struct mpam_msc_ris *ris, u16 partid,
+ 
+ 	if (mpam_has_feature(mpam_feat_mbw_min, rprops) &&
+ 	    mpam_has_feature(mpam_feat_mbw_min, cfg)) {
+-		if (cfg->reset_mbw_min)
+-			mpam_write_partsel_reg(msc, MBW_MIN, 0);
+-		else
++		if (cfg->reset_mbw_min) {
++			u16 reset = 0;
++
++			if (mpam_has_quirk(T241_FORCE_MBW_MIN_TO_ONE, msc))
++				reset = mpam_wa_t241_force_mbw_min_to_one(rprops);
++			mpam_write_partsel_reg(msc, MBW_MIN, reset);
++		} else {
+ 			mpam_write_partsel_reg(msc, MBW_MIN, cfg->mbw_min);
++		}
  	}
  
-+	mpam_quirk_post_config_change(ris, partid, cfg);
+ 	if (mpam_has_feature(mpam_feat_mbw_max, rprops) &&
+@@ -2539,6 +2561,18 @@ static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg
+ 	u16 min, min_hw_granule, delta;
+ 	u16 max_hw_value, res0_bits;
+ 
++	/*
++	 * Calculate the values the 'min' control can hold.
++	 * e.g. on a platform with bwa_wd = 8, min_hw_granule is 0x00ff because
++	 * those bits are RES0. Configurations of this value are effectively
++	 * zero. But configurations need to saturate at min_hw_granule on
++	 * systems with mismatched bwa_wd, where the 'less than 0' values are
++	 * implemented on some MSC, but not others.
++	 */
++	res0_bits = 16 - cprops->bwa_wd;
++	max_hw_value = ((1 << cprops->bwa_wd) - 1) << res0_bits;
++	min_hw_granule = ~max_hw_value;
 +
- 	mutex_unlock(&msc->part_sel_lock);
+ 	/*
+ 	 * MAX and MIN should be set together. If only one is provided,
+ 	 * generate a configuration for the other. If only one control
+@@ -2548,19 +2582,6 @@ static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg
+ 	 */
+ 	if (mpam_has_feature(mpam_feat_mbw_max, cfg) &&
+ 	    !mpam_has_feature(mpam_feat_mbw_min, cfg)) {
+-		/*
+-		 * Calculate the values the 'min' control can hold.
+-		 * e.g. on a platform with bwa_wd = 8, min_hw_granule is 0x00ff
+-		 * because those bits are RES0. Configurations of this value
+-		 * are effectively zero. But configurations need to saturate
+-		 * at min_hw_granule on systems with mismatched bwa_wd, where
+-		 * the 'less than 0' values are implemented on some MSC, but
+-		 * not others.
+-		 */
+-		res0_bits = 16 - cprops->bwa_wd;
+-		max_hw_value = ((1 << cprops->bwa_wd) - 1) << res0_bits;
+-		min_hw_granule = ~max_hw_value;
+-
+ 		delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
+ 		if (cfg->mbw_max > delta)
+ 			min = cfg->mbw_max - delta;
+@@ -2570,6 +2591,12 @@ static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg
+ 		cfg->mbw_min = max(min, min_hw_granule);
+ 		mpam_set_feature(mpam_feat_mbw_min, cfg);
+ 	}
++
++	if (mpam_has_quirk(T241_FORCE_MBW_MIN_TO_ONE, class) &&
++	    cfg->mbw_min <= min_hw_granule) {
++		cfg->mbw_min = min_hw_granule + 1;
++		mpam_set_feature(mpam_feat_mbw_min, cfg);
++	}
  }
  
+ static void mpam_reset_component_cfg(struct mpam_component *comp)
 diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 5989f3670af3..871ca2169173 100644
+index 871ca2169173..b4f2505519b2 100644
 --- a/drivers/resctrl/mpam_internal.h
 +++ b/drivers/resctrl/mpam_internal.h
-@@ -130,6 +130,9 @@ struct mpam_msc {
- 	void __iomem		*mapped_hwpage;
- 	size_t			mapped_hwpage_sz;
- 
-+	/* Values only used on some platforms for quirks */
-+	u32			t241_id;
-+
- 	struct mpam_garbage	garbage;
- };
- 
-@@ -216,6 +219,7 @@ struct mpam_props {
- 
+@@ -220,6 +220,7 @@ struct mpam_props {
  /* Workaround bits for msc->quirks */
  enum mpam_device_quirks {
-+	T241_SCRUB_SHADOW_REGS,
+ 	T241_SCRUB_SHADOW_REGS,
++	T241_FORCE_MBW_MIN_TO_ONE,
  	MPAM_QUIRK_LAST
  };
  
-@@ -236,6 +240,11 @@ struct mpam_quirk {
- 				FIELD_PREP_CONST(MPAMF_IIDR_REVISION,    0xf)	| \
- 				FIELD_PREP_CONST(MPAMF_IIDR_IMPLEMENTER, 0xfff)
- 
-+#define MPAM_IIDR_NVIDIA_T241	FIELD_PREP_CONST(MPAMF_IIDR_PRODUCTID,   0x241)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_VARIANT,     0)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_REVISION,    0)	| \
-+				FIELD_PREP_CONST(MPAMF_IIDR_IMPLEMENTER, 0x36b)
-+
- /* The values for MSMON_CFG_MBWU_FLT.RWBW */
- enum mon_filter_options {
- 	COUNT_BOTH	= 0,
 -- 
 2.43.0
 
