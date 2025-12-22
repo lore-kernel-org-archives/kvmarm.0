@@ -1,71 +1,43 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1D934F485;
-	Mon, 22 Dec 2025 16:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1632D0C62
+	for <kvmarm@lists.linux.dev>; Mon, 22 Dec 2025 18:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766422407; cv=none; b=US5kKsTO7Uqr5s6Plt6ELMQF6zScpeYZo9zE//4f7MB3tElpALsL5meANEKW7OrEaR2+Okv/74YGd0/4J1p6yliRoeRRura6tv483egxKnR4IZ4O7bgMPvbUMH7/nos8bMIM/FMbK+HnJ/w1EW1w0ecS7H1Nj6sctTj2fMSnO+4=
+	t=1766426792; cv=none; b=HBg6sR0elTCHDgqwXML0ZhOjNHjgPHN4GONp/H22cLnItEA/zQUXCWwqA+OM5oJ1gvqNEeNeNmtB4b+pDuewd+gZzlVoT/HORhJcTImyxiD3j5ExcUqQmPvlcMH/HFi5KjkBESFvLmFUr821zQb9GFPWSwehA/Rqd9A9hP5C6Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766422407; c=relaxed/simple;
-	bh=SLzPCyVSf2GCKYqR6ihp41nIyXMktxWN6o79iAcwaVc=;
+	s=arc-20240116; t=1766426792; c=relaxed/simple;
+	bh=CQsSsbliIcyPp1VRQTPFQdTLRH4YhJiBswXOEthVJ08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dK9O1gM4wCF9ojHCjka3IrxWuFT91kgKmyaBKCQ5kA4nb3pp9GTB1oxS1vuWm6gOlte+ZB6jUpTp7MP65NmRMl+xzppfnbzhf7AGBndXZb18sNgFWEcNNa3Bxcu6weQmQrJeKFlbIJ9yz7qbn831PajMj/MFh0YamY3psDJeTes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TWRWEj6j; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNa7AJ5GWlc0k9AD9GNZMEGb4ZCsGKDhCUHG6ZRfewYS2EBEhnYn7JrrrDsmappKACoW74C0sZpApd8SysGGLo/mATQT+tptcX5CfqjXxlsk/ru3tkcLFBN3hrUeZfjzY3LAwHr+huuoMNI2h2Mt39MDR+g0O0ijdmRxNub+hPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=avw/BcKo; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TWRWEj6j"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766422406; x=1797958406;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SLzPCyVSf2GCKYqR6ihp41nIyXMktxWN6o79iAcwaVc=;
-  b=TWRWEj6jswPKwFATdx2TyUi/xMY4YZ/kSTbHIz7nxuaCYDmeP7z+l86H
-   kqSURJZqNsqIlYqhM08yod8qKYxXkEbu/d4MwFXlNKJa5D5mRilW7tYVV
-   +qjlC47cbOo49M7DiyoBpMud+tkEh4je8YfkUzZclKfLx4Xt7bNBhybcB
-   SL3r8BDLCh2wppW3GYbB7qlZVF7SA+HttarODiruyZ+L/Mtbo0rW3MuEw
-   +3IhQFStlgpvVKMvykZGSdc8tvg+tF9pR8uof5J5AcJMuDzbp2kojB2pb
-   /zKe9YganBMJfOLZ2tYjiDxBN1onyGoKyeGf2D78sErvMIMzt29Q3PsrO
-   A==;
-X-CSE-ConnectionGUID: L1gShBqdSoio5lmJtMmsrQ==
-X-CSE-MsgGUID: xkv7O37QTo+1dvwLO0OhSA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="55849965"
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="55849965"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 08:53:26 -0800
-X-CSE-ConnectionGUID: 6fDkPJhHRFmrLp8CGDNaLQ==
-X-CSE-MsgGUID: AZDQkn5AQxWF4NRtHppNNg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="204049302"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by fmviesa005.fm.intel.com with ESMTP; 22 Dec 2025 08:53:22 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXj9s-000000005Ym-1Tsx;
-	Mon, 22 Dec 2025 16:53:20 +0000
-Date: Mon, 22 Dec 2025 17:52:47 +0100
-From: kernel test robot <lkp@intel.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Message-ID: <202512221751.nHKObHNq-lkp@intel.com>
-References: <20251212152215.675767-15-sascha.bischoff@arm.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="avw/BcKo"
+Date: Mon, 22 Dec 2025 12:06:08 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766426783;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MD+k29yEgQqQtWq7yJ0+IwowUibiEOtC9WU2KKaDscU=;
+	b=avw/BcKo42R+Ay4EEthtfmeZ5W8JefBuR0FojzfVz4LpGT247fjXQLe7L3LrLKsODAQ3Ao
+	AvutCZfCqhp/OCF0ebVQ24Zc+1yluTlQy3ouO+TFGicMFff+odeWFMgp1+ngK91lfcm6Po
+	WojIATe0n94SDnECoCuCJIYPrl9g6FE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, 
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org
+Subject: Re: [PATCH v2 2/5] KVM: arm64: selftests: Fix incorrect rounding in
+ page_align()
+Message-ID: <20251222-f8d98d81659c01f79e16da2f@orel>
+References: <20251215165155.3451819-1-tabba@google.com>
+ <20251215165155.3451819-3-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,84 +46,43 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251212152215.675767-15-sascha.bischoff@arm.com>
+In-Reply-To: <20251215165155.3451819-3-tabba@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Sascha,
+On Mon, Dec 15, 2025 at 04:51:52PM +0000, Fuad Tabba wrote:
+> The implementation of `page_align()` in `processor.c` calculates
+> alignment incorrectly for values that are already aligned. Specifically,
+> `(v + vm->page_size) & ~(vm->page_size - 1)` aligns to the *next* page
+> boundary even if `v` is already page-aligned, potentially wasting a page
+> of memory.
+> 
+> Fix the calculation to use standard alignment logic: `(v + vm->page_size
+> - 1) & ~(vm->page_size - 1)`.
+> 
+> Fixes: 7a6629ef746d ("kvm: selftests: add virt mem support for aarch64")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  tools/testing/selftests/kvm/lib/arm64/processor.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 5b379da8cb90..607a4e462984 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -23,7 +23,7 @@ static vm_vaddr_t exception_handlers;
+>  
+>  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+>  {
+> -	return (v + vm->page_size) & ~(vm->page_size - 1);
+> +	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+>  }
+>  
+>  static uint64_t pgd_index(struct kvm_vm *vm, vm_vaddr_t gva)
+> -- 
+> 2.52.0.239.gd5f0c6e74e-goog
+> 
+>
 
-kernel test robot noticed the following build errors:
+Thanks for finding and fixing this. I'll get my paper bag out later.
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.19-rc2 next-20251219]
-[cannot apply to kvmarm/next arm64/for-next/core kvm/queue kvm/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Sascha-Bischoff/KVM-arm64-Account-for-RES1-bits-in-DECLARE_FEAT_MAP-and-co/20251212-233140
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212152215.675767-15-sascha.bischoff%40arm.com
-patch subject: [PATCH 14/32] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-config: arm64-allnoconfig-bpf (https://download.01.org/0day-ci/archive/20251222/202512221751.nHKObHNq-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project ecaf673850beb241957352bd61e95ed34256635f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221751.nHKObHNq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512221751.nHKObHNq-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:16:
-   In file included from ./include/linux/kvm_host.h:45:
-   In file included from ./arch/arm64/include/asm/kvm_host.h:36:
->> ./include/kvm/arm_vgic.h:392:19: error: field has incomplete type 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                          ^
-   ./include/kvm/arm_vgic.h:392:9: note: forward declaration of 'struct gicv5_vpe'
-     392 |         struct gicv5_vpe gicv5_vpe;
-         |                ^
-   1 error generated.
-
-
-vim +392 ./include/kvm/arm_vgic.h
-
-   360	
-   361	struct vgic_v5_cpu_if {
-   362		u64	vgic_apr;
-   363		u64	vgic_vmcr;
-   364	
-   365		/* PPI register state */
-   366		u64	vgic_ppi_hmr[2];
-   367		u64	vgic_ppi_dvir[2];
-   368		u64	vgic_ppi_priorityr[16];
-   369	
-   370		/* The pending state of the guest. This is merged with the exit state */
-   371		u64	vgic_ppi_pendr[2];
-   372	
-   373		/* The state flushed to the regs when entering the guest */
-   374		u64	vgic_ppi_activer_entry[2];
-   375		u64	vgic_ich_ppi_enabler_entry[2];
-   376		u64	vgic_ppi_pendr_entry[2];
-   377	
-   378		/* The saved state of the regs when leaving the guest */
-   379		u64	vgic_ppi_activer_exit[2];
-   380		u64	vgic_ich_ppi_enabler_exit[2];
-   381		u64	vgic_ppi_pendr_exit[2];
-   382	
-   383		/*
-   384		 * The ICSR is re-used across host and guest, and hence it needs to be
-   385		 * saved/restored. Only one copy is required as the host should block
-   386		 * preemption between executing GIC CDRCFG and acccessing the
-   387		 * ICC_ICSR_EL1. A guest, of course, can never guarantee this, and hence
-   388		 * it is the hyp's responsibility to keep the state constistent.
-   389		 */
-   390		u64	vgic_icsr;
-   391	
- > 392		struct gicv5_vpe gicv5_vpe;
-   393	};
-   394	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
