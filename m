@@ -1,32 +1,33 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4918F328B64
-	for <kvmarm@lists.linux.dev>; Tue, 23 Dec 2025 09:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AB032863F
+	for <kvmarm@lists.linux.dev>; Tue, 23 Dec 2025 09:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766482538; cv=none; b=REqpGP4BvBFxZ3CK1XUVi30ESjBb2h2xXoLVUp7JyBQyiaTEEaMkJKUX9f5eJ9tlaNQ76KCRDR1ZAV1VjZFg8baL9PRyGy6YRahB38ZxR9Y9Ll4qQ6t5cYR1tO4nDzsk8YMAXDK+/+CEVmIw1NIFYqiex/NUp1MctUBVXyV+8CY=
+	t=1766482538; cv=none; b=aGiXc/fcEBjKCcAjrtrJBp6jqQ/51hqQ9YEFAFkcr/oxwhc9dzOB6FQksBp5LJV2UCdQBVutWynIFb+zu7KJq17QRZLfM5tpvQ5gwgHBj4gj0rQjYoMIgS/Hs8TVzVQAj08T9reSOcEKpXhta0DekMu8rEFF7cwKTWScKkPHiVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766482538; c=relaxed/simple;
-	bh=GpFHrUd29g/MPp6vUQobSzu/TtAz2kuU0zHJeWlbmAM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mL+Nf/YoTC0lmRd/GGmokEEIp/5nABIlMYmpM0iA8P0d+iShwbS3nNg8NTeKaIVU77fEJFOAh1tCAIsW4zjKQIFLMgJIVSB6d70bDAAj4H8bVfzfLdbqKDHkALYBeSMNeYMcSgDvPmPPLZM93y3Oigk8s4+y9PNHu5fUY95xN58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.224
+	bh=1yAEzN3t9mYt0o4pvx/HWJkEbSd12F9axhEL2Tf8+KQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EIDyQC8ODgTlPZhejTnuDCLu6KBa5lsw28YVvrZ4U8D1Imsc7iXQDIW9StvWEpfkaHuhCbnKpOXLftH+z/rR73tOjBNB6+4dnmI4Mce4qDVjHlmxz5zwLHDHFyrYwVQ4helqGU7S+gUOei5GwUIhxg6v+RWjsFNNX2tPUarY+y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.226
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
 Received: from mail.maildlp.com (unknown [172.19.163.15])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4db8tD5Sdrz1cyrj;
-	Tue, 23 Dec 2025 17:32:20 +0800 (CST)
+	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4db8tC4PtVzKm70;
+	Tue, 23 Dec 2025 17:32:19 +0800 (CST)
 Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 94E9C40539;
+	by mail.maildlp.com (Postfix) with ESMTPS id 9C58C4056C;
 	Tue, 23 Dec 2025 17:35:26 +0800 (CST)
 Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
  dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 23 Dec 2025 17:35:21 +0800
+ 15.2.1544.11; Tue, 23 Dec 2025 17:35:22 +0800
 Received: from huawei.com (10.90.31.46) by kwepemq200004.china.huawei.com
  (7.202.195.237) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 23 Dec
- 2025 17:35:20 +0800
+ 2025 17:35:21 +0800
 From: Zhou Wang <wangzhou1@hisilicon.com>
 To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
@@ -34,10 +35,12 @@ To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
 CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
 	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>,
 	<wangzhou1@hisilicon.com>
-Subject: [PATCH v8 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
-Date: Tue, 23 Dec 2025 17:33:36 +0800
-Message-ID: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
+Subject: [PATCH v8 3/7] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
+Date: Tue, 23 Dec 2025 17:33:39 +0800
+Message-ID: <20251223093343.3822498-4-wangzhou1@hisilicon.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
+References: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,114 +52,146 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
  kwepemq200004.china.huawei.com (7.202.195.237)
 
-Armv8.7 introduces single-copy atomic 64-byte loads and stores
-instructions and its variants named under FEAT_{LS64, LS64_V}.
-Add support for Armv8.7 FEAT_{LS64, LS64_V}:
-- Add identifying and enabling in the cpufeature list
-- Expose the support of FEAT_LS64 to userspace through HWCAP3 and cpuinfo
-- Add related hwcap test
-- Handle the trap of unsupported memory (normal/uncacheable) access in a VM
+From: Yicong Yang <yangyicong@hisilicon.com>
 
-A real scenario for this feature is that the userspace driver can make use of
-this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
-directly into the hardware.
+If FEAT_LS64WB not supported, FEAT_LS64* instructions only support
+to access Device/Uncacheable memory, otherwise a data abort for
+unsupported Exclusive or atomic access (0x35, UAoEF) is generated
+per spec. It's implementation defined whether the target exception
+level is routed and is possible to implemented as route to EL2 on a
+VHE VM according to DDI0487L.b Section C3.2.6 Single-copy atomic
+64-byte load/store.
 
-Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
-MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
+If it's implemented as generate the DABT to the final enabled stage
+(stage-2), inject the UAoEF back to the guest after checking the
+memslot is valid.
 
-[1] https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
+Acked-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Oliver Upton <oupton@kernel.org>
+Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ arch/arm64/include/asm/esr.h         |  8 +++++++
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/inject_fault.c        | 34 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 14 +++++++++++-
+ 4 files changed, 56 insertions(+), 1 deletion(-)
 
-Tested with updated hwcap test(host in VHE):
-[root@localhost tmp]# ./hwcap
-[...]
-# LS64 present
-ok 226 cpuinfo_match_LS64
-ok 227 sigill_LS64
-ok 228 # SKIP sigbus_LS64
-# 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
-
-Tested with updated hwcap test(guest in VHE):
-root@localhost:/mnt# ./hwcap
-[...]
-# LS64 present
-ok 226 cpuinfo_match_LS64
-ok 227 sigill_LS64
-ok 228 # SKIP sigbus_LS64
-# 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-# Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
-
-Tested nVHE case as well, same log as above.
-
-Change since v7:
-- Tiny spelling fix in 1/7
-- Change the order between 5/7 and 6/7
-- Remove has_ls64, use has_cpuid_feature directly in 6/7
-- Add Acked-by from Arnd and Oliver
-- Trap st64bv from EL0 to EL1/EL2
-- Rebase on v6.19-rc1
-Link: https://lore.kernel.org/all/20251107072127.448953-1-wangzhou1@hisilicon.com/
-
-Change since v6:
-- Add exception inject about nested VM in 3/7
-- Remove __maybe_unused related codes in 7/7, replace to use asm clobber
-- Add my signoff in each patch
-- Rebase on v6.18-rc4
-Link: https://lore.kernel.org/all/20251024090819.4097819-1-wangzhou1@hisilicon.com/
-
-Change since v5:
-- Rebase on v6.18-rc2 and fix the conflicts
-- Add more description in elf_hwcaps.rst as suggested by Catalin Marinas
-Link: https://lore.kernel.org/all/20250818064806.25417-1-yangyicong@huawei.com/
-
-Change since v4:
-- Rebase on v6.17-rc2 and fix the conflicts
-Link: https://lore.kernel.org/linux-arm-kernel/20250715081356.12442-1-yangyicong@huawei.com/
-
-Change since v3:
-- Inject DABT fault for LS64 fault on unsupported memory but with valid memslot
-Link: https://lore.kernel.org/linux-arm-kernel/20250626080906.64230-1-yangyicong@huawei.com/
-
-Change since v2:
-- Handle the LS64 fault to userspace and allow userspace to inject LS64 fault
-- Reorder the patches to make KVM handling prior to feature support
-Link: https://lore.kernel.org/linux-arm-kernel/20250331094320.35226-1-yangyicong@huawei.com/
-
-Change since v1:
-- Drop the support for LS64_ACCDATA
-- handle the DABT of unsupported memory type after checking the memory attributes
-Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
-
-Marc Zyngier (2):
-  KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
-  KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-
-Yicong Yang (5):
-  KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
-    memory
-  arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
-  KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
-  arm64: Add support for FEAT_{LS64, LS64_V}
-  kselftest/arm64: Add HWCAP test for FEAT_LS64
-
- Documentation/arch/arm64/booting.rst      | 12 ++++++
- Documentation/arch/arm64/elf_hwcaps.rst   |  7 ++++
- Documentation/virt/kvm/api.rst            | 43 ++++++++++++++++----
- arch/arm64/include/asm/el2_setup.h        | 12 +++++-
- arch/arm64/include/asm/esr.h              |  8 ++++
- arch/arm64/include/asm/hwcap.h            |  1 +
- arch/arm64/include/asm/kvm_emulate.h      |  7 ++++
- arch/arm64/include/uapi/asm/hwcap.h       |  1 +
- arch/arm64/kernel/cpufeature.c            | 28 +++++++++++++
- arch/arm64/kernel/cpuinfo.c               |  1 +
- arch/arm64/kvm/inject_fault.c             | 34 ++++++++++++++++
- arch/arm64/kvm/mmio.c                     | 27 ++++++++++++-
- arch/arm64/kvm/mmu.c                      | 14 ++++++-
- arch/arm64/tools/cpucaps                  |  2 +
- include/uapi/linux/kvm.h                  |  3 +-
- tools/testing/selftests/arm64/abi/hwcap.c | 49 +++++++++++++++++++++++
- 16 files changed, 238 insertions(+), 11 deletions(-)
-
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 4975a92cbd17..7e86d400864e 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -124,6 +124,7 @@
+ #define ESR_ELx_FSC_SEA_TTW(n)	(0x14 + (n))
+ #define ESR_ELx_FSC_SECC	(0x18)
+ #define ESR_ELx_FSC_SECC_TTW(n)	(0x1c + (n))
++#define ESR_ELx_FSC_EXCL_ATOMIC	(0x35)
+ #define ESR_ELx_FSC_ADDRSZ	(0x00)
+ 
+ /*
+@@ -488,6 +489,13 @@ static inline bool esr_fsc_is_access_flag_fault(unsigned long esr)
+ 	       (esr == ESR_ELx_FSC_ACCESS_L(0));
+ }
+ 
++static inline bool esr_fsc_is_excl_atomic_fault(unsigned long esr)
++{
++	esr = esr & ESR_ELx_FSC;
++
++	return esr == ESR_ELx_FSC_EXCL_ATOMIC;
++}
++
+ static inline bool esr_fsc_is_addr_sz_fault(unsigned long esr)
+ {
+ 	esr &= ESR_ELx_FSC;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index c9eab316398e..bab967d65715 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -47,6 +47,7 @@ void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+ int kvm_inject_serror_esr(struct kvm_vcpu *vcpu, u64 esr);
+ int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr);
++int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr);
+ void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+ 
+ static inline int kvm_inject_sea_dabt(struct kvm_vcpu *vcpu, u64 addr)
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index dfcd66c65517..6cc7ad84d7d8 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -253,6 +253,40 @@ int kvm_inject_sea(struct kvm_vcpu *vcpu, bool iabt, u64 addr)
+ 	return 1;
+ }
+ 
++static int kvm_inject_nested_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
++{
++	u64 esr = FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_DABT_LOW) |
++		  FIELD_PREP(ESR_ELx_FSC, ESR_ELx_FSC_EXCL_ATOMIC) |
++		  ESR_ELx_IL;
++
++	vcpu_write_sys_reg(vcpu, addr, FAR_EL2);
++	return kvm_inject_nested_sync(vcpu, esr);
++}
++
++/**
++ * kvm_inject_dabt_excl_atomic - inject a data abort for unsupported exclusive
++ *				 or atomic access
++ * @vcpu: The VCPU to receive the data abort
++ * @addr: The address to report in the DFAR
++ *
++ * It is assumed that this code is called from the VCPU thread and that the
++ * VCPU therefore is not currently executing guest code.
++ */
++int kvm_inject_dabt_excl_atomic(struct kvm_vcpu *vcpu, u64 addr)
++{
++	u64 esr;
++
++	if (is_nested_ctxt(vcpu) && (vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM))
++		return kvm_inject_nested_excl_atomic(vcpu, addr);
++
++	__kvm_inject_sea(vcpu, false, addr);
++	esr = vcpu_read_sys_reg(vcpu, exception_esr_elx(vcpu));
++	esr &= ~ESR_ELx_FSC;
++	esr |= ESR_ELx_FSC_EXCL_ATOMIC;
++	vcpu_write_sys_reg(vcpu, esr, exception_esr_elx(vcpu));
++	return 1;
++}
++
+ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+ {
+ 	unsigned long addr, esr;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 48d7c372a4cd..edc348431d71 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1845,6 +1845,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		return ret;
+ 	}
+ 
++	/*
++	 * Guest performs atomic/exclusive operations on memory with unsupported
++	 * attributes (e.g. ld64b/st64b on normal memory when no FEAT_LS64WB)
++	 * and trigger the exception here. Since the memslot is valid, inject
++	 * the fault back to the guest.
++	 */
++	if (esr_fsc_is_excl_atomic_fault(kvm_vcpu_get_esr(vcpu))) {
++		kvm_inject_dabt_excl_atomic(vcpu, kvm_vcpu_get_hfar(vcpu));
++		return 1;
++	}
++
+ 	if (nested)
+ 		adjust_nested_fault_perms(nested, &prot, &writable);
+ 
+@@ -2082,7 +2093,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 	/* Check the stage-2 fault is trans. fault or write fault */
+ 	if (!esr_fsc_is_translation_fault(esr) &&
+ 	    !esr_fsc_is_permission_fault(esr) &&
+-	    !esr_fsc_is_access_flag_fault(esr)) {
++	    !esr_fsc_is_access_flag_fault(esr) &&
++	    !esr_fsc_is_excl_atomic_fault(esr)) {
+ 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
+ 			kvm_vcpu_trap_get_class(vcpu),
+ 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
 -- 
 2.33.0
 
