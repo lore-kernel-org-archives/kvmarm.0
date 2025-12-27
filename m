@@ -1,122 +1,104 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB1A22370A;
-	Thu, 25 Dec 2025 06:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9607C7E0FF
+	for <kvmarm@lists.linux.dev>; Sat, 27 Dec 2025 08:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766644028; cv=none; b=svJMmRcSkLmIpzsucdTeV0+BHIE7j7LnDVS/FvGkQUJuD64ZaFdZUPJfwGhrV++fqBgYvTHJ5agPkCv4JlZZF6Hb5Rdgy14fWcVYgdqyu3rlh8IwphoOeF5O0blvczoIUv1KsB3fK72gGka9GnkzQw53q5kuQYqBDetFAZuDTJU=
+	t=1766823061; cv=none; b=DlixfBqcJXA16WOS4KkowaNqs/ynrS9RPYtThDX1W3QGhmPm/f6j8fu3sDMbj70LoErEduIh4vS8aoC4fj4k0uv7ldF1PBj9UDV/dgSUL0wr4h6QzjIr/NMI9jsTCJ7TFJuUPiar8w9iIv2re6yWPgwqMeTRJfEjAxlKwcLRqAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766644028; c=relaxed/simple;
-	bh=p1XfubM0YWj6WnMP8u+aCWSf2k0v8QcI9Wgv+fon5Ck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bOPpssthunWgKo8FO9F1PkCw6oVFpKzpRrPDNKvEIAUhHh4QwTl0euQNdzFhSoQp8UXaQjfoyplm9SWS4FwsQG0dIBe4iYNOAcZDVOuffDBDQ+pdG6k+1xWDztJQMvj+zQNI1bgTPAaLvEzMjvkn5/S0tPiYfcbidlkX9PQonG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E4dzvruN; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1766823061; c=relaxed/simple;
+	bh=J2ok+ix3vEQ6p5c36SdDS0HeFCDLTm2fYHCT0RbXVgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TNbfSdknlkOTWXfgc78mRuUjKhfqp+GLKW6QUTf3P1RYwJoUkYx1p03R8qkH6/vVK5sXcsiS419i7/+A30S+7cilKGyLoQZLRjaBhfKEnE4DPVBGKaoJ4RaHzvNJZZHMWjQwZEKA+TeINJdQMz2yZ+y0W93zic8Omjy8W2cfZgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=H+9fkiU4; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E4dzvruN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766644027; x=1798180027;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=p1XfubM0YWj6WnMP8u+aCWSf2k0v8QcI9Wgv+fon5Ck=;
-  b=E4dzvruNcXQE5dw9kyc+jRTBrmIE7QvS576jan+va5QuBsyRkHFlktZH
-   vS/jnf6/P0u400jmA2rsbb2BQmmm2qun4SR/Xcsa79iHWj80++5q4vlVY
-   LKhE+gXWjunWXMVTVyp5HlAFlMe6KxxmVMYU42qVkeWNEDxNUeAuPrK/F
-   9/JZZhfCsAIv1FOKpt0qc53RNF+jHSoTLTBLNWwelZh8DMgTQFjje2r+a
-   6cCb3dznAgHmk8riR5vVQZH4dMfne9Dey9KfneJg/RkABA1/qKC6rLnH8
-   5BpiLgNRR4KWcJuxdFqdzXA1+moZ/16Jr51pec23Hvjhg9nbFNbDKoV17
-   g==;
-X-CSE-ConnectionGUID: eSZzOOORR+iR1/AU4yT2Ow==
-X-CSE-MsgGUID: 7kdlGmN1RCKLbjnjUI8A7Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11652"; a="68340497"
-X-IronPort-AV: E=Sophos;i="6.21,175,1763452800"; 
-   d="scan'208";a="68340497"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2025 22:27:06 -0800
-X-CSE-ConnectionGUID: DUtRii2LTCeg4q7vXPJ1zA==
-X-CSE-MsgGUID: a7dRTs5tS6S+a0BISdFYdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,175,1763452800"; 
-   d="scan'208";a="200649863"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.14]) ([10.124.240.14])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2025 22:26:59 -0800
-Message-ID: <43d1cde6-2277-4f3c-8e7d-59e6edb2228a@linux.intel.com>
-Date: Thu, 25 Dec 2025 14:26:56 +0800
+	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="H+9fkiU4"
+dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=J2ok+ix3vEQ6p5c36SdDS0HeFCDLTm2fYHCT0RbXVgI=;
+	b=H+9fkiU4frIcdc48Rhq3gZIW9YLvewGIxSr6lK0OzkR2t7LpkPTg90khcCKpmNQFOk+3lpw7/
+	CTjWkiXUUyy8P54arcb6LyzBEkbeZHourDgwCJ/JpAus18orA7CYYKaPp5wuVo77owvqM0PZ8RQ
+	P+dvufmSQ5nH36V91PM9rVk=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4ddZpg0R0ZznTW4;
+	Sat, 27 Dec 2025 16:07:39 +0800 (CST)
+Received: from kwepemf100008.china.huawei.com (unknown [7.202.181.222])
+	by mail.maildlp.com (Postfix) with ESMTPS id B5B61405AD;
+	Sat, 27 Dec 2025 16:10:49 +0800 (CST)
+Received: from [10.174.178.24] (10.174.178.24) by
+ kwepemf100008.china.huawei.com (7.202.181.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Sat, 27 Dec 2025 16:10:48 +0800
+Message-ID: <6aa59eae-2632-7e4d-ff6b-565fe5c2649f@huawei.com>
+Date: Sat, 27 Dec 2025 16:10:48 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 15/44] KVM: x86/pmu: Snapshot host (i.e. perf's)
- reported PMU capabilities
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
- Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>,
- Andy Lutomirski <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
- Sandipan Das <sandipan.das@amd.com>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-16-seanjc@google.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 0/45] arm_mpam: Add KVM/arm64 and resctrl glue code
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20251206001720.468579-16-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To: James Morse <james.morse@arm.com>, Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
+	Kefeng Wang <wangkefeng.wang@huawei.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+ <20251219181147.3404071-26-ben.horgan@arm.com>
+Reply-To: <20251219181147.3404071-1-ben.horgan@arm.com>
+From: Zeng Heng <zengheng4@huawei.com>
+In-Reply-To: <20251219181147.3404071-26-ben.horgan@arm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemf100008.china.huawei.com (7.202.181.222)
+
+> One major departure from the previous snapshot branches referenced in the
+> base driver series is that the same MPAM setting are used for kernel-space
+> and user-space. That is, MPAM1_EL1 is set to the same value as MPAM0_EL1
+> rather than keeping the default value. The advantages of this are that it
+> is closer to the x86 model where the closid is globally applicable, all
+> partids are usable from user-space and user-space can't bypass MPAM
+> controls by doing the work in the kernel. However, this causes some
+> priority inversion where a high priority task waits to take a mutex held by
+> another whose resources are restricted by MPAM. It also adds some extra
+> isb(). I would be interested in opinions/data on the policy for MPAM in
+> kernel space, i.e how MPAM1_EL1 is set.
+
+Another advantage is that, given the small size of the L2 cache,
+frequent switching of MPAM configurations between kernel and user modes
+can cause cache-capacity jitter, making it difficult to isolate
+interference from noisy neighborhood.
+
+However, in addition to the issues mentioned above, updating the
+MPAM1_EL1 configuration also exposes interrupt handling to the MPAM
+settings of the current task.
+
+I still agree with the current modification of setting MPAM1_EL1 to the
+same value as MPAM0_EL1. However, the ARM MPAM hardware supports more
+flexible configuration schemes than x86 RDT and another approach is also
+worth considering: Software can let a control group choose whether
+kernel mode follows the user mode MPAM settings, or whether the kernel
+mode configuration is delegated to the default control group, though
+this may change the existing user interface.
 
 
-On 12/6/2025 8:16 AM, Sean Christopherson wrote:
-> Take a snapshot of the unadulterated PMU capabilities provided by perf so
-> that KVM can compare guest vPMU capabilities against hardware capabilities
-> when determining whether or not to intercept PMU MSRs (and RDPMC).
->
-> Reviewed-by: Sandipan Das <sandipan.das@amd.com>
-> Tested-by: Xudong Hao <xudong.hao@intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/pmu.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 487ad19a236e..7c219305b61d 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -108,6 +108,8 @@ void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
->  	bool is_intel = boot_cpu_data.x86_vendor == X86_VENDOR_INTEL;
->  	int min_nr_gp_ctrs = pmu_ops->MIN_NR_GP_COUNTERS;
->  
-> +	perf_get_x86_pmu_capability(&kvm_host_pmu);
-> +
->  	/*
->  	 * Hybrid PMUs don't play nice with virtualization without careful
->  	 * configuration by userspace, and KVM's APIs for reporting supported
-
-Hi Sean,
-
-It looks a merging error here. We don't need this patch.
-
-The original patch "51f34b1 ("KVM: x86/pmu: Snapshot host (i.e. perf's)
-reported PMU capabilities")" had been merged into upstream and subsequently
-we submitted a new patch "034417c1439a ("KVM: x86/pmu: Don't try to get
-perf capabilities for hybrid CPUs")" to fix the warning introduced from
-previous patch  "51f34b1 ("KVM: x86/pmu: Snapshot host (i.e. perf's)
-reported PMU capabilities")". Thanks.
-
--Dapeng Mi
-
-
+Best Regards,
+Zeng Heng
