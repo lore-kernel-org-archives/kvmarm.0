@@ -1,273 +1,137 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3507725DD1E
-	for <kvmarm@lists.linux.dev>; Sun, 28 Dec 2025 13:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8B22FBDF2
+	for <kvmarm@lists.linux.dev>; Mon, 29 Dec 2025 23:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766928098; cv=none; b=RGCzmPAPdMviEU7fNH7S6GVuR9ot116HcYzNP+mCAdeMpdxKsQDPJw+ULe9o8XSkfqovuO3eRv1wGS23BanwkPxdi/bifPEBwasApaL51XZrJisp0dijUuHGMisHsnHiiJCBC57a6/HJIHvK3kn7jdg2MtnsPqLdjhr8RDp5tVM=
+	t=1767052645; cv=none; b=OBpgES0Ipp8fPe0Up/59jI6hXO2mN2Z8eReYXAAB8VGf9RSlSzegtlbLsmeKtiTiDbz58yYmJWzHDC0L4SriJY46AEa85eAPtvOyMxINdA178M0fR4xT2HyndZo2x7a3jnoxlwYqwC1bopjoAGxoNiIUaI3sWZ4Ih8unEi/bIWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766928098; c=relaxed/simple;
-	bh=ALXasUN+LrCY1Kw1mJi1uRGYS1BLunwnlJBnwmwD3MQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kP6jfDi53vNnQS0NuXR+QPfq4i63ODGmmQVhaIJML9mbS39yfxIOilTual92DAY2YnFvsvg/M9s+CYMC0ycychDV+101RRLry20tAYWHN4vZqatmIhL4R7YaAh1VqOYpqxL5wJZT3xL55dSBh4vaLZoM0eHZf/SiixBv4wYkhp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMDUcGwD; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1767052645; c=relaxed/simple;
+	bh=XsdXtJjKqE4UQSylmLBTu+OUvPU6Hv2It+NLCukC3Fw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MZFfq92WTOKF+0G5t5o34IjObqBMePqLoisyF0W6apIPSqFimUSmsC3RHtqJ7sIz3yZPDPzOUrlgeaGhlT1mRABX5evj7/ed6k7M4utR+bDic3poYO/o4/mok8a2M9Qoajh6aq3OJ0RwP6DvQW6fU0HmFSesu64G/DRBdcFvKz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a8fKTjaQ; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMDUcGwD"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b8e49d8b35so10240289b3a.3
-        for <kvmarm@lists.linux.dev>; Sun, 28 Dec 2025 05:21:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a8fKTjaQ"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7c240728e2aso20431839b3a.3
+        for <kvmarm@lists.linux.dev>; Mon, 29 Dec 2025 15:57:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766928096; x=1767532896; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NsMbiiRw5pwuhYdj9qM0uJazKIcwvpy1o66u9nBUaH4=;
-        b=QMDUcGwDaaOtr/V56Bv/NMPb2Nw0YxNIVj6ICNpK7pcilyWshNouFPZVxk7X8ZUCRk
-         +TtjjeIy8rT7yV9KrcPuOjkQAyqlw9aVjBF1MqUy4Ix+PxuuLF0O+/n6A+Mz1Qwgm8vs
-         1BRuclr4GxYfFS2ewvIZW6FJ/0Vhj8mv6q5wzck+8kKfPCYp/7YnsFlGA5jljK1D1AKJ
-         AVISHKD7vR1ZkmTrMmna63GfyAcNBPxXjmYP86VeAoinJ0zVfopFu1LqyzyVdp9JOPCV
-         TVdMtjlKvFTK0f7hGRaLZGZXx8ztsupe1EpaJLMRiyFqNHW2nCdvQ9HqT3bvx6zQo1hD
-         ksNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766928096; x=1767532896;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1767052643; x=1767657443; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NsMbiiRw5pwuhYdj9qM0uJazKIcwvpy1o66u9nBUaH4=;
-        b=SjPP89OLNQPu//tFsQVkt9973bFyGjtLFZAfX6TRegAnwDFv41etTGIB3ky+/bjbf1
-         99dzuQ2w4ZHu8mhHd6qIEXAlQbvRoPje26UsZs0W3ay3xE4rd3TO/t8MuRKJuAVY++Hn
-         HF0xdAvFtHMQRFgH36j+4DgXghAKMFkbHXo8893zWBGIbO3q4wbZFNPzQc8Hf39IA2j/
-         tOziQW4B1xl/JObOcKz0mQj0nMSSn4fXUJ7bbBUhcWg6BATEy2TNHCy6Gr8Or1Bzny8x
-         mstWKPo9Eyw38Eo1Ma5xZ9LorX71SzLphoAfUAbuRV4P6y/AwglfA4O0ESF8/de03EnG
-         /HqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXRS4ful0zGwPq2mpOcs/N0d6nciGwTNnNUgTYnFj1UTPkcBsfhEVUUdXzJpcU0+XG/KeNpuOY=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxKal/9VXUTqNeHTYZMAmFab6DWAHnHPt60Eop8l8YRVFX/5lro
-	JB9GsgDElZy2i/WNqIIcLvzCV6DsxwejcUWHVSlfMDP4Y9nXQiv6hknY
-X-Gm-Gg: AY/fxX59okM8ZsX8/HHwIw0/fX0j4c2IkbM3TZUJ4MMQmNObTAVzky+LVmcMcWmpp7l
-	B3OIRcxOfrVz8fBb6v0Gy6AEkT+WnvZSMGsj6chNCVcO79FcxmWum23SLST2HwbajwqscG/J4yc
-	E9G1H1tQ2N+G2oMUJXyQNQWQnB5ws85Pxgaq5aBce/+C8hbZ7+Jzv8/xDDWOEVUKBetW2HIgYTR
-	Tq75ZDCP8sO46cm5LhMNUrKhZKGGcYtsWnEn1IbdWDiZ3EYmow8EfgksvdoImmOV7u8wWBLzMEv
-	HlZ705/GFWrnBptJSgj0OAbaw9XCx/OPjXzPLejAN5aOQ1hoorsNzdPwxm3gFCvCNuxcmOfQn7t
-	3N4QWmFkfaBBXtnA20bt/WDmgnST0MXqct2R8SFxI01v1rf2CRyxiNCCv94WgJNqkPmziSCiBen
-	iMyMmdScE198OLnoki/WWdDVxpMwmIbcFsgdo3oXYMFxIizhmQ0Zy70zda/8yO2ki1AZIWVzQmW
-	8BcmICkbtk3ILBlGl/CaROac8mgS9JyIW+8/Q==
-X-Google-Smtp-Source: AGHT+IHeg/aDmTAdO7reMjcuq8FZ1iHZdOJNA4rNPYOoWbba+9Xx9UUwrhaHrn5Pm5j+3g0csgItJg==
-X-Received: by 2002:a05:6a20:e290:b0:364:13c3:3dd0 with SMTP id adf61e73a8af0-376a8eb6c35mr29010710637.36.1766928096301;
-        Sun, 28 Dec 2025 05:21:36 -0800 (PST)
-Received: from [172.27.236.57] (ec2-13-250-3-147.ap-southeast-1.compute.amazonaws.com. [13.250.3.147])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c1e7bd602desm24490702a12.21.2025.12.28.05.21.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Dec 2025 05:21:34 -0800 (PST)
-Message-ID: <77111894-1b9f-4970-b41f-48e3a4c4b754@gmail.com>
-Date: Sun, 28 Dec 2025 21:21:25 +0800
+        bh=vaCAmCD1pI2PB4kVDvq818qZSC88KaBTxMeyOFyVIUw=;
+        b=a8fKTjaQ4XxSs0L7OyJAxgSLPjQ/ThP8tgvRem+Rgy0xPXF0pb26ujUBj+DYyVDGGq
+         Xq5ybnSBiAEcv1QLzO8V2ikNMV8GtOv9ZePmCjUJBWCxn0+VT1r4EuhWmDXBLQeuL4vB
+         434HclW32lOnikzKfkZ0ESo0X69NlUzZpGghGp3H6l2srB9Yash+CSgB5Vsbc7i769x0
+         bh7eLIRl8xXt9s7M/VS5VQhxK4cgHXmNpomE5qJ94bjruxQZv18DLMljcQFQP8CEvzRW
+         hAFSznffOvXR/OQacENCMzeaIZ30UiSC/CXR0cB8U6l5TqKKJB7W5s4OKrYmRH5f3afX
+         bvsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767052643; x=1767657443;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vaCAmCD1pI2PB4kVDvq818qZSC88KaBTxMeyOFyVIUw=;
+        b=Akobcpk4TSegCm+4CKS0CBxnZwRWZQsikJ0qJQ5IScj8jgM85rmxWjRr76Nur3USFO
+         TL19UpzW3rqPHvGaURDNWotKs4fhpF7eYv2YyluDSjkiiyCgqR4cgD3U7seBQF8OKNBl
+         ACpCUUf07+uce6Laeq2agHQfTe7u6mwRdDUwBi7qHZo8UA0TvK3YAFmy9QaYxaH7SF/X
+         ro9nx3GO5QR/vzIKLIY8t7Ided9ICmGUZG8yhm15XNLjXKEd/ZBzRZWJWqNcInslNL3y
+         rqBowD8NAtDOr977MkGOJhVwzo92mf31bgFFLwC1LpIZL6EODuC6Uq6xvLfb801MZFHJ
+         XJDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRY04Oewb4joApKYZYRIlYYVJe4Z4RhzSlMtA1Ht0IOjTbVAQhFCYqAu05X+LshJEa+Nfnddw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzF/d8LrKpzJzeZTe7PWRTmJbgGdFwIpah7BAu97nRNKXCd0Beg
+	rhUuK5myJflVjCCd3JFUhS8DXXdhlEbosR4FdUtJ+FZwc+2cu/kHcUEFP/inj8EW0X+fLgZJRyU
+	tpZZVMA==
+X-Google-Smtp-Source: AGHT+IGWSzvMBdAgSpc1cQ4FNAzud2F9vkcmbgsGWHl/uECW+mXFCBlsNw6jhBxprH27ZWhYhxw4eDFyKfA=
+X-Received: from pjhk89.prod.google.com ([2002:a17:90a:4ce2:b0:34c:1d76:2fe9])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9185:b0:343:af1:9a57
+ with SMTP id adf61e73a8af0-376aa8e98d6mr28981483637.56.1767052643109; Mon, 29
+ Dec 2025 15:57:23 -0800 (PST)
+Date: Mon, 29 Dec 2025 15:57:21 -0800
+In-Reply-To: <43d1cde6-2277-4f3c-8e7d-59e6edb2228a@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF
- events
-To: Tian Zheng <zhengtian10@huawei.com>, maz@kernel.org,
- oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net,
- pbonzini@redhat.com, will@kernel.org
-Cc: linux-kernel@vger.kernel.org, yuzenghui@huawei.com,
- wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com,
- zhengchuan@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, suzuki.poulose@arm.com
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
- <20251121092342.3393318-5-zhengtian10@huawei.com>
- <87df4cba-b191-49cf-9486-fc379470a6eb@gmail.com>
- <f8e59e80-33b2-47cd-a042-11f28cc61645@huawei.com>
-Content-Language: en-US
-From: Robert Hoo <robert.hoo.linux@gmail.com>
-In-Reply-To: <f8e59e80-33b2-47cd-a042-11f28cc61645@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20251206001720.468579-1-seanjc@google.com> <20251206001720.468579-16-seanjc@google.com>
+ <43d1cde6-2277-4f3c-8e7d-59e6edb2228a@linux.intel.com>
+Message-ID: <aVMVYY_WkNClfXuj@google.com>
+Subject: Re: [PATCH v6 15/44] KVM: x86/pmu: Snapshot host (i.e. perf's)
+ reported PMU capabilities
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
+	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/24/2025 2:15 PM, Tian Zheng wrote:
-> 
-> 
-> On 12/17/2025 9:39 PM, Robert Hoo wrote:
->> On 11/21/2025 5:23 PM, Tian Zheng wrote:
->>> From: eillon <yezhenyu2@huawei.com>
->>>
->>> Implement the HDBSS enable/disable functionality using the
->>> KVM_CAP_ARM_HW_DIRTY_STATE_TRACK ioctl.
->>>
->>> Userspace (e.g., QEMU) can enable HDBSS by invoking the ioctl
->>> at the start of live migration, configuring the buffer size.
->>> The feature is disabled by invoking the ioctl again with size
->>> set to 0 once migration completes.
->>>
->>> Add support for updating the dirty bitmap based on the HDBSS
->>> buffer. Similar to the x86 PML implementation, KVM flushes the
->>> buffer on all VM-Exits, so running vCPUs only need to be kicked
->>> to force a VM-Exit.
->>>
->>> Signed-off-by: eillon <yezhenyu2@huawei.com>
->>> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
->>> ---
->>>   arch/arm64/include/asm/kvm_host.h |  10 +++
->>>   arch/arm64/include/asm/kvm_mmu.h  |  17 +++++
->>>   arch/arm64/kvm/arm.c              | 107 ++++++++++++++++++++++++++++++
->>>   arch/arm64/kvm/handle_exit.c      |  45 +++++++++++++
->>>   arch/arm64/kvm/hyp/vhe/switch.c   |   1 +
->>>   arch/arm64/kvm/mmu.c              |  10 +++
->>>   arch/arm64/kvm/reset.c            |   3 +
->>>   include/linux/kvm_host.h          |   1 +
->>>   8 files changed, 194 insertions(+)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/ 
->>> asm/kvm_host.h
->>> index d962932f0e5f..408e4c2b3d1a 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -87,6 +87,7 @@ int __init kvm_arm_init_sve(void);
->>>   u32 __attribute_const__ kvm_target_cpu(void);
->>>   void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
->>>   void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
->>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
->>>
->>>   struct kvm_hyp_memcache {
->>>       phys_addr_t head;
->>> @@ -793,6 +794,12 @@ struct vcpu_reset_state {
->>>       bool        reset;
->>>   };
->>>
->>> +struct vcpu_hdbss_state {
->>> +    phys_addr_t base_phys;
->>> +    u32 size;
->>> +    u32 next_index;
->>> +};
->>> +
->>>   struct vncr_tlb;
->>>
->>>   struct kvm_vcpu_arch {
->>> @@ -897,6 +904,9 @@ struct kvm_vcpu_arch {
->>>
->>>       /* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
->>>       struct vncr_tlb    *vncr_tlb;
->>> +
->>> +    /* HDBSS registers info */
->>> +    struct vcpu_hdbss_state hdbss;
->>>   };
->>>
->>>   /*
->>> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/ 
->>> asm/kvm_mmu.h
->>> index e4069f2ce642..6ace1080aed5 100644
->>> --- a/arch/arm64/include/asm/kvm_mmu.h
->>> +++ b/arch/arm64/include/asm/kvm_mmu.h
->>> @@ -331,6 +331,23 @@ static __always_inline void __load_stage2(struct 
->>> kvm_s2_mmu *mmu,
->>>       asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
->>>   }
->>>
->>> +static __always_inline void __load_hdbss(struct kvm_vcpu *vcpu)
->>> +{
->>> +    struct kvm *kvm = vcpu->kvm;
->>> +    u64 br_el2, prod_el2;
->>> +
->>> +    if (!kvm->enable_hdbss)
->>> +        return;
->>> +
->>> +    br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu- >arch.hdbss.size);
->>> +    prod_el2 = vcpu->arch.hdbss.next_index;
->>> +
->>> +    write_sysreg_s(br_el2, SYS_HDBSSBR_EL2);
->>> +    write_sysreg_s(prod_el2, SYS_HDBSSPROD_EL2);
->>> +
->>> +    isb();
->>> +}
->>> +
->>>   static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
->>>   {
->>>       return container_of(mmu->arch, struct kvm, arch);
->>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>> index 870953b4a8a7..64f65e3c2a89 100644
->>> --- a/arch/arm64/kvm/arm.c
->>> +++ b/arch/arm64/kvm/arm.c
->>> @@ -79,6 +79,92 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
->>>       return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
->>>   }
->>>
->>> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
->>> +{
->>> +    struct page *hdbss_pg = NULL;
->>> +
->>> +    hdbss_pg = phys_to_page(vcpu->arch.hdbss.base_phys);
->>> +    if (hdbss_pg)
->>> +        __free_pages(hdbss_pg, vcpu->arch.hdbss.size);
->>> +
->>> +    vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
->>> +        .base_phys = 0,
->>> +        .size = 0,
->>> +        .next_index = 0,
->>> +    };
->>> +}
->>> +
->>> +static int kvm_cap_arm_enable_hdbss(struct kvm *kvm,
->>> +                    struct kvm_enable_cap *cap)
->>> +{
->>> +    unsigned long i;
->>> +    struct kvm_vcpu *vcpu;
->>> +    struct page *hdbss_pg = NULL;
->>> +    int size = cap->args[0];
->>> +    int ret = 0;
->>> +
->>> +    if (!system_supports_hdbss()) {
->>> +        kvm_err("This system does not support HDBSS!\n");
->>> +        return -EINVAL;
->>> +    }
->>> +
->>> +    if (size < 0 || size > HDBSS_MAX_SIZE) {
->>> +        kvm_err("Invalid HDBSS buffer size: %d!\n", size);
->>> +        return -EINVAL;
->>> +    }
->>> +
->>
->> I think you should check if it's already enabled here. What if user space 
->> calls this twice?
-> 
-> Ok, I review the implement of qemu, when disable the hdbss feature in
-> ram_save_cleanup, size=0 will be set, so here can add a check, if (size
-> && kvm->arch.enable_hdbss), we will do nothing.
-> 
+On Thu, Dec 25, 2025, Dapeng Mi wrote:
+>=20
+> On 12/6/2025 8:16 AM, Sean Christopherson wrote:
+> > Take a snapshot of the unadulterated PMU capabilities provided by perf =
+so
+> > that KVM can compare guest vPMU capabilities against hardware capabilit=
+ies
+> > when determining whether or not to intercept PMU MSRs (and RDPMC).
+> >
+> > Reviewed-by: Sandipan Das <sandipan.das@amd.com>
+> > Tested-by: Xudong Hao <xudong.hao@intel.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/pmu.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > index 487ad19a236e..7c219305b61d 100644
+> > --- a/arch/x86/kvm/pmu.c
+> > +++ b/arch/x86/kvm/pmu.c
+> > @@ -108,6 +108,8 @@ void kvm_init_pmu_capability(const struct kvm_pmu_o=
+ps *pmu_ops)
+> >  	bool is_intel =3D boot_cpu_data.x86_vendor =3D=3D X86_VENDOR_INTEL;
+> >  	int min_nr_gp_ctrs =3D pmu_ops->MIN_NR_GP_COUNTERS;
+> > =20
+> > +	perf_get_x86_pmu_capability(&kvm_host_pmu);
+> > +
+> >  	/*
+> >  	 * Hybrid PMUs don't play nice with virtualization without careful
+> >  	 * configuration by userspace, and KVM's APIs for reporting supported
+>=20
+> Hi Sean,
+>=20
+> It looks a merging error here. We don't need this patch.
 
-I mean you should check if ' kvm->enable_hdbss' is already set, if so, return 
-rather than alloc_pages() in below (you have allocated in previous call with 
-valid 'size').
+Gah, right you are.  I overlooked it because it didn't conflict on a rebase=
+, and
+I once again forgot to test on a hybrid PMU, grr.
 
-qemu is just one of the user space applications that would possibly call this 
-API, you cannot rely on your qemu patch's flow/sequence as assumption to design 
-a KVM API's implementation.
+Thanks!
 
->>
->>> +    /* Enable the HDBSS feature if size > 0, otherwise disable it. */
->>> +    if (size) {
->>> +        kvm_for_each_vcpu(i, vcpu, kvm) {
->>> +            hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT, size);
->>> +            if (!hdbss_pg) {
->>> +                kvm_err("Alloc HDBSS buffer failed!\n");
->>> +                ret = -ENOMEM;
->>> +                goto error_alloc;
->>> +            }
->>> +
->>> +            vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
->>> +                .base_phys = page_to_phys(hdbss_pg),
->>> +                .size = size,
->>> +                .next_index = 0,
->>> +            };
->>> +        }
->>> +
->>> +        kvm->enable_hdbss = true;
->>> +        kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS;
->>
-
-
+> The original patch "51f34b1 ("KVM: x86/pmu: Snapshot host (i.e. perf's)
+> reported PMU capabilities")" had been merged into upstream and subsequent=
+ly
+> we submitted a new patch "034417c1439a ("KVM: x86/pmu: Don't try to get
+> perf capabilities for hybrid CPUs")" to fix the warning introduced from
+> previous patch=C2=A0 "51f34b1 ("KVM: x86/pmu: Snapshot host (i.e. perf's)
+> reported PMU capabilities")". Thanks.
+>=20
+> -Dapeng Mi
+>=20
+>=20
