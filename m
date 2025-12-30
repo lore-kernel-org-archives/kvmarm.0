@@ -1,57 +1,57 @@
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFDB2C237F
-	for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 23:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159AA309EE4
+	for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 23:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767135736; cv=none; b=LtTeu2XSO+HjypHAjKOY6uB7t0vAXRWPEecckonPyX14evX8cF9XdpokJqAODhljLHX+2GLmZSbNzqJOpO48CRqz3xDktB+zOq9SV7nokJtVgCgIwjmFjMO1DtjHtOhZRjWDW+DEwkAKmE83JYNXHilEo2GZdRFkVKL97d49iJA=
+	t=1767135739; cv=none; b=AeDk43M+lR4fI6YF1hWatISxnKB0zdYvgOQJsbWJW6D+bMmtC/e4Oib9cExBMZh+wrGLyafdxVSOBFUdSRkCvCeBCkee43NUOdZfKHT7gOZfsKp4d35FwU0ZYCkZqBHQNpkE6cIxsit2npKowVrRMdIgPe/QctaROcueSIWZPuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767135736; c=relaxed/simple;
-	bh=2ZolxtbeL/TfZv1wuBul5eMq3hwecEq8h3mFaMWxBTA=;
+	s=arc-20240116; t=1767135739; c=relaxed/simple;
+	bh=L1SYXQiqNle3gLGTfCVE+Svz9FsBQhnc4uiADka+aHk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=noNsK8YQhygkwcTHwOsJRxyMS18dPhPiz5azx92cEYyh3CkSfdkjKNQjrPmBbn+o117nfLtIS0RK6E2Yxd+Bvdss8mHaQfsdvi/hVftX26mO19PAkZepWhNhSQrmBRRXb6rNAYPntJ1C3lBeaTV2NFwBwcadQi47cRNEgIqqbi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hM7P8Bn7; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=mHIeIZXSvtzM1mualQ0JaiWOTRpBX6OamCC6s0uUQFQObTwGlJ9mlR5fSgBhoz/eoP/cpGkRa/NLlZ6tRlQyA+EgoXcQDy5LVT8pVXfBQaW6izFSXIwehCfvtvsC2v2JoRkVZUI/JLQjD0IO89wljeoKISrvpqWsgUIhhkKZzS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lUJPjPUo; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hM7P8Bn7"
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34c37b8dc4fso21900581a91.2
-        for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 15:02:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lUJPjPUo"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c3dfa080662so11340a12.1
+        for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 15:02:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767135733; x=1767740533; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1767135735; x=1767740535; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=aempC3xup8zdxs82u0niExWKRbrEWWiY7rS3u4Pr19E=;
-        b=hM7P8Bn7m9FhoNEly49FRwNXKsLxPvDngLisSpUOo7L0Ya67kuH4W/+CODl0vT2qBX
-         NyCgziUr+eQtw170RNwO1VW8ogk7sAayQ0e+xbVpPcq9/NMdvtxinegEHnPwBJC4Z4ll
-         u7naL5/9aqaB+B1vem+4EPtrNySlc2H+4I6YTd8QfrdgeMHBKfirF/79lM1yJn3+E9/b
-         xRXsfuOK5sdqmZgUASnixXTjxcB1/WEzGC6CXJkaUoEOXwpYWkrwft+MnBd9JEptsiFl
-         mMY/rb91jUqB0Yd/9LmJZpJgXcOPTbLDzxK7adSG6UOo9gSqlPu92tJ//ViePo4wXNtZ
-         BKPA==
+        bh=A7fpsi0DvuznhTE1Zn3HtOIUiJjnW+9EfXyg1RrLtBE=;
+        b=lUJPjPUo37VEyZovj8XTNaKU6U58YvOoBnZGRN0mtf/aqPh78gBl3siPoYa6iLMnp/
+         Epg3ceUOaDcCVRwez275fr59w06Mh5qcat0sKvAe4XvJusw9ela4n+66XeLZ8aesO+7X
+         IeS534zE1xUpjH76GOIem8IUTJE5lpgKtrWmMbbDsmWMaWwcX01grj2EUb5JsD0B7ZUI
+         16ok4GneDT8ybovWLoqR/or3+XuVr6Zju+8oT8+/gCZMJmu8zuOFfuk0jnKZ819GdgCk
+         KQaFzv509FuCehDCO5+xk9gqthIbLw968IcMyvFnTaGGkeYmn05VijjFBdnA8UILE7ec
+         TtDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767135733; x=1767740533;
+        d=1e100.net; s=20230601; t=1767135735; x=1767740535;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aempC3xup8zdxs82u0niExWKRbrEWWiY7rS3u4Pr19E=;
-        b=AJnFxOMP64Io7FtVwkSSxEKhEQTN5CNqAaZnjAhyPEARVkcDReAcSRai2Sh8Y+1Zm0
-         axaICEO5TU1xRecG7ud7tnVcmf5KkDHfXe/01gxipFVGCMgxs5jKRuGTXrZBAAdqxZwQ
-         +xouCdSa/085uci70JRhjVavXGNS/EESMEho3OUiIONcv5ADXMsB9oHH0X+BpsHTqq9o
-         2cwHEP+cM9FoCkVcOWlNaeELU1nvVOEMCpNI/XrUTk/90S8zLZL8x29Zos8DWRUZ8efy
-         pK7AhXYgzbuVEGUxskGm7FIm06aa8JvR8KwG/5JMF/o9MMuAHiN1Gm/P239XLlo6g1jG
-         ljhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzM+nyiUzWCZPQUj8AnltIdiQPnY8nRv3WRaQZPquY6r88OKTBV8qWsI8/OAKA7LGULKLfzvI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx/iUK1UMsDIOGW4K8cM7nqVKDF5j821V10ef9HgwQK3ikAyv8l
-	JJzHZgMOSE3gMLF0ahmfDxeDER7qRrG6fq0ZTh5IruO2TTdKBVN8SuE4KZm3ps4yRnwmA6gVa7w
-	30DHCDw==
-X-Google-Smtp-Source: AGHT+IF1//ZF8YQZFDW338R6CLvvv/Jhm6bfFusPZNwPuigVsAoIaoiYhFuoR4zT4Z2vqbXSCzOrQaND/Kk=
-X-Received: from pjbpm1.prod.google.com ([2002:a17:90b:3c41:b0:34a:b3a0:78b9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:52:b0:34c:94f0:fc09
- with SMTP id 98e67ed59e1d1-34e92139d60mr28142377a91.10.1767135733534; Tue, 30
- Dec 2025 15:02:13 -0800 (PST)
+        bh=A7fpsi0DvuznhTE1Zn3HtOIUiJjnW+9EfXyg1RrLtBE=;
+        b=ofUa/EiUeBYYerE+stERg4qovU8uI+qMGRa+RF/uMnxyWWNGfa8ANRDcMq1zCW/SBX
+         yfvr60qF8/JELQJQrtXUF69qEgqaLFp8/Sk2eAYDGdKGr/1qldKZ+ocW1D9JjWl6v9sf
+         L8pN18jGFaJXQ+e45eEYszktHd6UkmBBR2OgMT5gqs95Ys9SYUoPG/gF7Xslmhv+MCUg
+         NN+5SyoH39he9zYl0gSPF0lLRRtczyANt+c22w7jn+MLK0LbGMZHz1RVwQJVVKEGduXk
+         2EfQgw5PekUCX7RtE+xCHp3jNQwxTNqM0argwco0GGSIRnva9Hj3Y/mzSQnGK7tKDsos
+         AKbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUg6TyXR7wyHJAsfOjwGxxWiQF5nbJ832Tbrv6xsgbHxLKdJ0CYIO8POeoNJzRIaOcVFBntwPI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxL9BNsCmrfEBPk1dgRVYFaOAUMyOYj6A5boZXgPx2r9wlFu1wN
+	meXP2LCnv8FGNFBxcKPYGZQxzjZgOBZtQkjuPXKP20mdKTgPSx0ukuRp9pw6gxC8zf3ZOR2vGev
+	txHxXBA==
+X-Google-Smtp-Source: AGHT+IEDv3PqfDUF2AaKu2cqsZdRy1TYjAx9BPIyTm2+oOAnKpWrJ3J7Os+kj78BhbIr6Dp0qwwHYlrIeMQ=
+X-Received: from pfbem48.prod.google.com ([2002:a05:6a00:3770:b0:7f9:3450:d9b0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:aa7:9309:0:b0:7e8:3fcb:bc41
+ with SMTP id d2e1a72fcca58-7ff547df601mr29528623b3a.22.1767135735167; Tue, 30
+ Dec 2025 15:02:15 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Dec 2025 15:01:41 -0800
+Date: Tue, 30 Dec 2025 15:01:42 -0800
 In-Reply-To: <20251230230150.4150236-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -61,8 +61,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20251230230150.4150236-1-seanjc@google.com>
 X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251230230150.4150236-13-seanjc@google.com>
-Subject: [PATCH v4 12/21] KVM: selftests: Add a stage-2 MMU instance to kvm_vm
+Message-ID: <20251230230150.4150236-14-seanjc@google.com>
+Subject: [PATCH v4 13/21] KVM: selftests: Reuse virt mapping functions for
+ nested EPTs
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -77,37 +78,337 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a stage-2 MMU instance so that architectures that support nested
-virtualization (more specifically, nested stage-2 page tables) can create
-and track stage-2 page tables for running L2 guests.  Plumb the structure
-into common code to avoid cyclical dependencies, and to provide some line
-of sight to having common APIs for creating stage-2 mappings.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
 
-As a bonus, putting the member in common code justifies using stage2_mmu
-instead of tdp_mmu for x86.
+Rework tdp_map() and friends to use __virt_pg_map() and drop the custom
+EPT code in __tdp_pg_map() and tdp_create_pte().  The EPT code and
+__virt_pg_map() are practically identical, the main differences are:
+  - EPT uses the EPT struct overlay instead of the PTE masks.
+  - EPT always assumes 4-level EPTs.
 
+To reuse __virt_pg_map(), extend the PTE masks to work with EPT's RWX and
+X-only capabilities, and provide a tdp_mmu_init() API so that EPT can pass
+in the EPT PTE masks along with the root page level (which is currently
+hardcoded to '4').
+
+Don't reuse KVM's insane overloading of the USER bit for EPT_R as there's
+no reason to multiplex bits in the selftests, e.g. selftests aren't trying
+to shadow guest PTEs and thus don't care about funnelling protections into
+a common permissions check.
+
+Another benefit of reusing the code is having separate handling for
+upper-level PTEs vs 4K PTEs, which avoids some quirks like setting the
+large bit on a 4K PTE in the EPTs.
+
+For all intents and purposes, no functional change intended.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+Co-developed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ .../selftests/kvm/include/x86/kvm_util_arch.h |   4 +-
+ .../selftests/kvm/include/x86/processor.h     |  16 ++-
+ .../testing/selftests/kvm/lib/x86/processor.c |  21 +++-
+ tools/testing/selftests/kvm/lib/x86/vmx.c     | 119 +++---------------
+ 4 files changed, 52 insertions(+), 108 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index c1497515fa6a..371d55e0366e 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -116,7 +116,12 @@ struct kvm_vm {
- 	uint32_t dirty_ring_size;
- 	uint64_t gpa_tag_mask;
+diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+index 05a1fc1780f2..1cf84b8212c6 100644
+--- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
++++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+@@ -14,6 +14,8 @@ struct pte_masks {
+ 	uint64_t present;
+ 	uint64_t writable;
+ 	uint64_t user;
++	uint64_t readable;
++	uint64_t executable;
+ 	uint64_t accessed;
+ 	uint64_t dirty;
+ 	uint64_t huge;
+@@ -37,8 +39,6 @@ struct kvm_vm_arch {
+ 	uint64_t s_bit;
+ 	int sev_fd;
+ 	bool is_pt_protected;
+-
+-	struct kvm_mmu *tdp_mmu;
+ };
+ 
+ static inline bool __vm_arch_has_protected_memory(struct kvm_vm_arch *arch)
+diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
+index 973f2069cd3b..4c0d2fc83c1c 100644
+--- a/tools/testing/selftests/kvm/include/x86/processor.h
++++ b/tools/testing/selftests/kvm/include/x86/processor.h
+@@ -1442,6 +1442,8 @@ enum pg_level {
+ #define PTE_PRESENT_MASK(mmu)		((mmu)->arch.pte_masks.present)
+ #define PTE_WRITABLE_MASK(mmu)		((mmu)->arch.pte_masks.writable)
+ #define PTE_USER_MASK(mmu)		((mmu)->arch.pte_masks.user)
++#define PTE_READABLE_MASK(mmu)		((mmu)->arch.pte_masks.readable)
++#define PTE_EXECUTABLE_MASK(mmu)	((mmu)->arch.pte_masks.executable)
+ #define PTE_ACCESSED_MASK(mmu)		((mmu)->arch.pte_masks.accessed)
+ #define PTE_DIRTY_MASK(mmu)		((mmu)->arch.pte_masks.dirty)
+ #define PTE_HUGE_MASK(mmu)		((mmu)->arch.pte_masks.huge)
+@@ -1449,13 +1451,23 @@ enum pg_level {
+ #define PTE_C_BIT_MASK(mmu)		((mmu)->arch.pte_masks.c)
+ #define PTE_S_BIT_MASK(mmu)		((mmu)->arch.pte_masks.s)
+ 
+-#define is_present_pte(mmu, pte)	(!!(*(pte) & PTE_PRESENT_MASK(mmu)))
++/*
++ * For PTEs without a PRESENT bit (i.e. EPT entries), treat the PTE as present
++ * if it's executable or readable, as EPT supports execute-only PTEs, but not
++ * write-only PTEs.
++ */
++#define is_present_pte(mmu, pte)		\
++	(PTE_PRESENT_MASK(mmu) ?		\
++	 !!(*(pte) & PTE_PRESENT_MASK(mmu)) :	\
++	 !!(*(pte) & (PTE_READABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu))))
++#define is_executable_pte(mmu, pte)	\
++	((*(pte) & (PTE_EXECUTABLE_MASK(mmu) | PTE_NX_MASK(mmu))) == PTE_EXECUTABLE_MASK(mmu))
+ #define is_writable_pte(mmu, pte)	(!!(*(pte) & PTE_WRITABLE_MASK(mmu)))
+ #define is_user_pte(mmu, pte)		(!!(*(pte) & PTE_USER_MASK(mmu)))
+ #define is_accessed_pte(mmu, pte)	(!!(*(pte) & PTE_ACCESSED_MASK(mmu)))
+ #define is_dirty_pte(mmu, pte)		(!!(*(pte) & PTE_DIRTY_MASK(mmu)))
+ #define is_huge_pte(mmu, pte)		(!!(*(pte) & PTE_HUGE_MASK(mmu)))
+-#define is_nx_pte(mmu, pte)		(!!(*(pte) & PTE_NX_MASK(mmu)))
++#define is_nx_pte(mmu, pte)		(!is_executable_pte(mmu, pte))
+ 
+ void tdp_mmu_init(struct kvm_vm *vm, int pgtable_levels,
+ 		  struct pte_masks *pte_masks);
+diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
+index 8a9298a72897..41316cac94e0 100644
+--- a/tools/testing/selftests/kvm/lib/x86/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86/processor.c
+@@ -165,6 +165,10 @@ static void virt_mmu_init(struct kvm_vm *vm, struct kvm_mmu *mmu,
+ 		mmu->pgd_created = true;
+ 		mmu->arch.pte_masks = *pte_masks;
+ 	}
++
++	TEST_ASSERT(mmu->pgtable_levels == 4 || mmu->pgtable_levels == 5,
++		    "Selftests MMU only supports 4-level and 5-level paging, not %u-level paging",
++		    mmu->pgtable_levels);
+ }
+ 
+ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+@@ -180,6 +184,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 		.dirty		=	BIT_ULL(6),
+ 		.huge		=	BIT_ULL(7),
+ 		.nx		=	BIT_ULL(63),
++		.executable	=	0,
+ 		.c		=	vm->arch.c_bit,
+ 		.s		=	vm->arch.s_bit,
+ 	};
+@@ -190,10 +195,10 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ void tdp_mmu_init(struct kvm_vm *vm, int pgtable_levels,
+ 		  struct pte_masks *pte_masks)
+ {
+-	TEST_ASSERT(!vm->arch.tdp_mmu, "TDP MMU already initialized");
++	TEST_ASSERT(!vm->stage2_mmu.pgtable_levels, "TDP MMU already initialized");
+ 
+-	vm->arch.tdp_mmu = calloc(1, sizeof(*vm->arch.tdp_mmu));
+-	virt_mmu_init(vm, vm->arch.tdp_mmu, pte_masks);
++	vm->stage2_mmu.pgtable_levels = pgtable_levels;
++	virt_mmu_init(vm, &vm->stage2_mmu, pte_masks);
+ }
+ 
+ static void *virt_get_pte(struct kvm_vm *vm, struct kvm_mmu *mmu,
+@@ -223,7 +228,8 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
+ 	paddr = vm_untag_gpa(vm, paddr);
+ 
+ 	if (!is_present_pte(mmu, pte)) {
+-		*pte = PTE_PRESENT_MASK(mmu) | PTE_WRITABLE_MASK(mmu);
++		*pte = PTE_PRESENT_MASK(mmu) | PTE_READABLE_MASK(mmu) |
++		       PTE_WRITABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu);
+ 		if (current_level == target_level)
+ 			*pte |= PTE_HUGE_MASK(mmu) | (paddr & PHYSICAL_PAGE_MASK);
+ 		else
+@@ -269,6 +275,9 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
+ 	TEST_ASSERT(vm_untag_gpa(vm, paddr) == paddr,
+ 		    "Unexpected bits in paddr: %lx", paddr);
+ 
++	TEST_ASSERT(!PTE_EXECUTABLE_MASK(mmu) || !PTE_NX_MASK(mmu),
++		    "X and NX bit masks cannot be used simultaneously");
++
+ 	/*
+ 	 * Allocate upper level page tables, if not already present.  Return
+ 	 * early if a hugepage was created.
+@@ -286,7 +295,9 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
+ 	pte = virt_get_pte(vm, mmu, pte, vaddr, PG_LEVEL_4K);
+ 	TEST_ASSERT(!is_present_pte(mmu, pte),
+ 		    "PTE already present for 4k page at vaddr: 0x%lx", vaddr);
+-	*pte = PTE_PRESENT_MASK(mmu) | PTE_WRITABLE_MASK(mmu) | (paddr & PHYSICAL_PAGE_MASK);
++	*pte = PTE_PRESENT_MASK(mmu) | PTE_READABLE_MASK(mmu) |
++	       PTE_WRITABLE_MASK(mmu) | PTE_EXECUTABLE_MASK(mmu) |
++	       (paddr & PHYSICAL_PAGE_MASK);
+ 
+ 	/*
+ 	 * Neither SEV nor TDX supports shared page tables, so only the final
+diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
+index ea1c09f9e8ab..e3737b3d9120 100644
+--- a/tools/testing/selftests/kvm/lib/x86/vmx.c
++++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
+@@ -25,21 +25,6 @@ bool enable_evmcs;
+ struct hv_enlightened_vmcs *current_evmcs;
+ struct hv_vp_assist_page *current_vp_assist;
+ 
+-struct eptPageTableEntry {
+-	uint64_t readable:1;
+-	uint64_t writable:1;
+-	uint64_t executable:1;
+-	uint64_t memory_type:3;
+-	uint64_t ignore_pat:1;
+-	uint64_t page_size:1;
+-	uint64_t accessed:1;
+-	uint64_t dirty:1;
+-	uint64_t ignored_11_10:2;
+-	uint64_t address:40;
+-	uint64_t ignored_62_52:11;
+-	uint64_t suppress_ve:1;
+-};
+-
+ int vcpu_enable_evmcs(struct kvm_vcpu *vcpu)
+ {
+ 	uint16_t evmcs_ver;
+@@ -58,13 +43,24 @@ int vcpu_enable_evmcs(struct kvm_vcpu *vcpu)
+ 
+ void vm_enable_ept(struct kvm_vm *vm)
+ {
++	struct pte_masks pte_masks;
++
+ 	TEST_ASSERT(kvm_cpu_has_ept(), "KVM doesn't support nested EPT");
+-	if (vm->arch.tdp_mmu)
+-		return;
+-
+-	/* TODO: Drop eptPageTableEntry in favor of PTE masks. */
+-	struct pte_masks pte_masks = (struct pte_masks) {
  
 +	/*
-+	 * "mmu" is the guest's stage-1, with a short name because the vast
-+	 * majority of tests only care about the stage-1 MMU.
++	 * EPTs do not have 'present' or 'user' bits, instead bit 0 is the
++	 * 'readable' bit.
 +	 */
- 	struct kvm_mmu mmu;
-+	struct kvm_mmu stage2_mmu;
++	pte_masks = (struct pte_masks) {
++		.present	=	0,
++		.user		=	0,
++		.readable	=	BIT_ULL(0),
++		.writable	=	BIT_ULL(1),
++		.executable	=	BIT_ULL(2),
++		.huge		=	BIT_ULL(7),
++		.accessed	=	BIT_ULL(8),
++		.dirty		=	BIT_ULL(9),
++		.nx		=	0,
+ 	};
  
- 	struct kvm_vm_arch arch;
+ 	/* TODO: Add support for 5-level EPT. */
+@@ -120,8 +116,8 @@ vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
+ 	vmx->vmwrite_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmwrite);
+ 	memset(vmx->vmwrite_hva, 0, getpagesize());
  
+-	if (vm->arch.tdp_mmu)
+-		vmx->eptp_gpa = vm->arch.tdp_mmu->pgd;
++	if (vm->stage2_mmu.pgd_created)
++		vmx->eptp_gpa = vm->stage2_mmu.pgd;
+ 
+ 	*p_vmx_gva = vmx_gva;
+ 	return vmx;
+@@ -377,82 +373,6 @@ void prepare_vmcs(struct vmx_pages *vmx, void *guest_rip, void *guest_rsp)
+ 	init_vmcs_guest_state(guest_rip, guest_rsp);
+ }
+ 
+-static void tdp_create_pte(struct kvm_vm *vm,
+-			   struct eptPageTableEntry *pte,
+-			   uint64_t nested_paddr,
+-			   uint64_t paddr,
+-			   int current_level,
+-			   int target_level)
+-{
+-	if (!pte->readable) {
+-		pte->writable = true;
+-		pte->readable = true;
+-		pte->executable = true;
+-		pte->page_size = (current_level == target_level);
+-		if (pte->page_size)
+-			pte->address = paddr >> vm->page_shift;
+-		else
+-			pte->address = vm_alloc_page_table(vm) >> vm->page_shift;
+-	} else {
+-		/*
+-		 * Entry already present.  Assert that the caller doesn't want
+-		 * a hugepage at this level, and that there isn't a hugepage at
+-		 * this level.
+-		 */
+-		TEST_ASSERT(current_level != target_level,
+-			    "Cannot create hugepage at level: %u, nested_paddr: 0x%lx",
+-			    current_level, nested_paddr);
+-		TEST_ASSERT(!pte->page_size,
+-			    "Cannot create page table at level: %u, nested_paddr: 0x%lx",
+-			    current_level, nested_paddr);
+-	}
+-}
+-
+-
+-void __tdp_pg_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
+-		  int target_level)
+-{
+-	const uint64_t page_size = PG_LEVEL_SIZE(target_level);
+-	void *eptp_hva = addr_gpa2hva(vm, vm->arch.tdp_mmu->pgd);
+-	struct eptPageTableEntry *pt = eptp_hva, *pte;
+-	uint16_t index;
+-
+-	TEST_ASSERT(vm->mode == VM_MODE_PXXVYY_4K,
+-		    "Unknown or unsupported guest mode: 0x%x", vm->mode);
+-
+-	TEST_ASSERT((nested_paddr >> 48) == 0,
+-		    "Nested physical address 0x%lx is > 48-bits and requires 5-level EPT",
+-		    nested_paddr);
+-	TEST_ASSERT((nested_paddr % page_size) == 0,
+-		    "Nested physical address not on page boundary,\n"
+-		    "  nested_paddr: 0x%lx page_size: 0x%lx",
+-		    nested_paddr, page_size);
+-	TEST_ASSERT((nested_paddr >> vm->page_shift) <= vm->max_gfn,
+-		    "Physical address beyond beyond maximum supported,\n"
+-		    "  nested_paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+-		    paddr, vm->max_gfn, vm->page_size);
+-	TEST_ASSERT((paddr % page_size) == 0,
+-		    "Physical address not on page boundary,\n"
+-		    "  paddr: 0x%lx page_size: 0x%lx",
+-		    paddr, page_size);
+-	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
+-		    "Physical address beyond beyond maximum supported,\n"
+-		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+-		    paddr, vm->max_gfn, vm->page_size);
+-
+-	for (int level = PG_LEVEL_512G; level >= PG_LEVEL_4K; level--) {
+-		index = (nested_paddr >> PG_LEVEL_SHIFT(level)) & 0x1ffu;
+-		pte = &pt[index];
+-
+-		tdp_create_pte(vm, pte, nested_paddr, paddr, level, target_level);
+-
+-		if (pte->page_size)
+-			break;
+-
+-		pt = addr_gpa2hva(vm, pte->address * vm->page_size);
+-	}
+-}
+-
+ /*
+  * Map a range of EPT guest physical addresses to the VM's physical address
+  *
+@@ -473,6 +393,7 @@ void __tdp_pg_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
+ void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
+ 	       uint64_t size, int level)
+ {
++	struct kvm_mmu *mmu = &vm->stage2_mmu;
+ 	size_t page_size = PG_LEVEL_SIZE(level);
+ 	size_t npages = size / page_size;
+ 
+@@ -480,7 +401,7 @@ void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
+ 	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
+ 
+ 	while (npages--) {
+-		__tdp_pg_map(vm, nested_paddr, paddr, level);
++		__virt_pg_map(vm, mmu, nested_paddr, paddr, level);
+ 		nested_paddr += page_size;
+ 		paddr += page_size;
+ 	}
 -- 
 2.52.0.351.gbe84eed79e-goog
 
