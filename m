@@ -1,118 +1,164 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AE0241665;
-	Tue, 30 Dec 2025 15:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCE0221FCF
+	for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 23:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767109069; cv=none; b=BgwgwFDkrTKus3myODDPciKapTG+uiu6WXQYr6EUiN6aCksDcbqeP+oLjPXT7MEHU2Oq8HPxoAvJT6WrxLPd5lqkSWhN8PEw603Ej3ZVyd2kwhnnVpOfrezvK/LMC+5hdr/b6PKEsdxj+ZvFKdf49nx2GQYt9Wr0IdppJyCPM8U=
+	t=1767135716; cv=none; b=KYay5taYLYpeXZ0v2jcuCbjYhpOnt16kIcce5fWp16zesCJ8jdAMQ4D0ltN7paWRs04oGzWKBMweu9rN7BMWCqqBX9dr+iyhlW8b0nmw5S4GWeYFPhI7pjNLHYC/wYjV+1Ku2g/ii6Sh6fSsLnutGM67qentxsjwqUt4X9bitjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767109069; c=relaxed/simple;
-	bh=tIwfl2Yo5eMip565qmwOXZSIPkclnpZAD+5EurUHNVw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DoBhmp7xyoNgmspurlD2GOiUAtiUCPsttTFV6R7Ntv1rs0Z8moUa8HA3a/jVTyFt6N4n2jrYFaUmFxGwCOfp6wUlHqbMIuvGYSyH3bmZsKQkuut0/xWaNoDwEM35CTbmNvMg8ZJtn9cxKKcm5fne15baUHKqHooYt01RJdi4vw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOvBWjJl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767135716; c=relaxed/simple;
+	bh=Kx/fiK6tmrPIcA1iG4moF7Z6llpjtEf+Pn2+HnOib1o=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=idT1LnTtspkVhTq/OFLzyIdKUmO0QLzVE8LY0FxnQ3iqJyL9SqXNBG6fjWJrt++jpTx9CQmhQeIghBeGyiXBW7fIAGzMplamfvdfkYGeWG+eKanSIh70sa5ow460q0giN7fyJMrJkYPSAbOj7nurUfEqVcK5quQ82mjhogyn9r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMy438cV; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOvBWjJl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E14FAC4CEFB;
-	Tue, 30 Dec 2025 15:37:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767109068;
-	bh=tIwfl2Yo5eMip565qmwOXZSIPkclnpZAD+5EurUHNVw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jOvBWjJlBGAthPusa3MDujJmLlYaso7weZf+GtJvANkPCdvYcG7TwslhAmVQIjX9d
-	 AXU3EkJ++N4YnAijFojLLxMIXIR1kCNb4pIAhxGiRcIGSa8zwsWH14fZUUquclInZg
-	 QFp/qPUVdatEVbH94cQKoXQ7gAdqroACPW2KUR8ET/z+L1z33cE9dlRPItp5irO2AX
-	 Rc3gwlx1Rp6ALhLryzPMQ2P11/ImygzBtgxFoMZ1JOOyulC/2+NDaXacKl5bHq+tZG
-	 aiOy+FXeg/Y2o030RAE96JJKuRaq+FLPi7hQReRNDpLLZM0I/Lev2m2WM8IdNxXxUB
-	 ZfsTwJth2sUJQ==
-Received: from lfbn-nan-1-2237-32.w92-139.abo.wanadoo.fr ([92.139.188.32] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vabn8-0000000G15P-2bwo;
-	Tue, 30 Dec 2025 15:37:46 +0000
-Date: Tue, 30 Dec 2025 15:37:45 +0000
-Message-ID: <87pl7wdlpy.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Petteri Kangaslampi <pekangas@google.com>
-Cc: kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] KVM: arm64: Fix hyp VA size between layout and MMU
-In-Reply-To: <20251223193440.1441657-2-pekangas@google.com>
-References: <20251223193440.1441657-1-pekangas@google.com>
-	<20251223193440.1441657-2-pekangas@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMy438cV"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7b80de683efso19262871b3a.3
+        for <kvmarm@lists.linux.dev>; Tue, 30 Dec 2025 15:01:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767135713; x=1767740513; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DduiMfmTpcy5dWbJfJJBZV4wRgqp4T0woAtqbJ6bKWQ=;
+        b=SMy438cV1UiQDQsT54yhIbj5Iw8KiFFfR7wO/J+pWknBu3UzsoY7fsoqE+0H3ogS8w
+         ziLwfwbKtANVxSLPneN7BPk9wmFCKu7aR5mvJmOyJo8DZ0H90KNuIe1Ay/QkYWSwXAGs
+         rRru6lMBCUw1FJmPY7KHTIXuQB+1tRLBgkXUinaAvk9ZgbeWBzqcQJyE6bOb2TOQyroU
+         OXwI0RT+e5p6jn/G9Y1jpmzU6ifBGr9zYktlfqtEFAe9qHXxzt8X21rzEbR+jOO4imeQ
+         JgCphUYUKobMeSFdd9xqzN53K/xFWl3w7VYqxoEA8BW/FTBVdlVWd5+eM481IYsScqNQ
+         KiMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767135713; x=1767740513;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DduiMfmTpcy5dWbJfJJBZV4wRgqp4T0woAtqbJ6bKWQ=;
+        b=A4v1RXfbYHIQ2SUWePmVWsQynRNV6LtiaZFd4hT7+U13vv1pPQXLmgOeJ3+O5d7Kn6
+         oNHyL4tt9Z79UKec305LxyhiyBBvzHP7wMZ2Y0m9MwWFKvY49yNSUQ8hyZr1X6FTBmja
+         cAcW0m/NsYl+5uQ03kjV2B1euD5bwnnr6Y+QGvZxQpO+Xl04sPDPr3NYu2TLEaHMBS5k
+         oFBiD0CzOuMELqKVIH3XGbYi4qsPpL3t5wxI9yvUL7+UaxsluM4NMKf0yE3z+jEtAdRf
+         wPGt6N5Kl4QmFqnkwYeXvO9sBaY+diY42KyjQgI4huFO7/jUNxSMUwy4yBrVvfAtovov
+         WeYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEG5604T2Ibyibq9ylMA/Znw8cbgEK82UNksU3ECPha05Cw79o5PcEhXp6QU1ZgVIVlOBS/ls=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyBmW8j08xdzfB0Xe+896lfZvUoLL0Q9ii8Z/WB/48F3WUR1K8v
+	TtnChS3nCXmZq254OXN4I3uT3VLHDnS/Nb7CFGp0EqEVpIRLIcZeKaQ82z72yuNfHGz6Vrf11z+
+	Iw3qMXw==
+X-Google-Smtp-Source: AGHT+IFl5YLLzZS88Mfh7NFRVwFsdWY7dXmSPWiNHP66M1DsoJkgDWwQHxi6m97nCMs9lyQggVclX+5VgK0=
+X-Received: from pjbge24.prod.google.com ([2002:a17:90b:e18:b0:34c:cb46:dad7])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:e083:b0:361:3bec:fe28
+ with SMTP id adf61e73a8af0-376a9de5b35mr35584887637.37.1767135712714; Tue, 30
+ Dec 2025 15:01:52 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 30 Dec 2025 15:01:29 -0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 92.139.188.32
-X-SA-Exim-Rcpt-To: pekangas@google.com, kvmarm@lists.linux.dev, oliver.upton@linux.dev, vdonnefort@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20251230230150.4150236-1-seanjc@google.com>
+Subject: [PATCH v4 00/21] KVM: selftests: Add Nested NPT support
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Yosry Ahmed <yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 23 Dec 2025 19:34:40 +0000,
-Petteri Kangaslampi <pekangas@google.com> wrote:
-> 
-> Use a consistent hypervisor VA size between memory layout and MMU
-> initialization logic when the kernel is configured for less than
-> IDMAP_VA_BITS of VA space.
->
-> Signed-off-by: Petteri Kangaslampi <pekangas@google.com>
-> ---
->  arch/arm64/kvm/va_layout.c | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index f6ca0193a96f..76cdd62550e1 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -49,7 +49,7 @@ static void init_hyp_physvirt_offset(void)
->  
->  /*
->   * We want to generate a hyp VA with the following format (with V ==
-> - * vabits_actual):
-> + * hypervisor VA bits):
->   *
->   *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
->   *  ---------------------------------------------------------
-> @@ -62,10 +62,17 @@ __init void kvm_compute_layout(void)
->  {
->  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
->  	u64 hyp_va_msb;
-> +	u32 hyp_va_bits;
-> +
-> +	/*
-> +	 * We use the bigger of IDMAP_VA_BITS and kernel VA size as the
-> +	 * hypervisor VA address space size. See mmu.c.
-> +	 */
-> +	hyp_va_bits = max(IDMAP_VA_BITS, vabits_actual);
+Yosry's series to add support for nested NPT, and extends vmx_dirty_log_test
+and kvm_dirty_log_test (with -n, using memstress) to cover nested SVM.
 
-Instead of duplicating the logic from kvm_mmu_init(), I'd rather you
-make sure there is a single place where the EL2 VA width is computed,
-and use that consistently all over the place.
+Note, I'm mildly concerned the last patch to extend nested_dirty_log_test to
+validate KVM's handling of READ faults could be flaky, e.g. maybe if someone
+is running the test under heavy memory pressure and the to-be-access page is
+swapped between the write-from-host and read-from-guest?  But unless someone
+knows/shows it'll be flaky, I'm inclined to apply it and hope for the best.
 
-Since you were complaining about the spread of the VA layout handling,
-starting with this sort of consolidation seems like a decent starting
-point.
+v4:
+ - Document the likely reason for setting A/D bits.
+ - Put "mmu" structure in common "struct kvm".
+ - Make it clear PTE accessors are predicates.
+ - Assert that the stage-2 MMU is initialized at most once.
+ - Make READABLE a standalone bit (don't overload USER).
+ - Don't alias PRESENT => READABLE for EPT.
+ - Fix the A/D bit definitions for EPT.
+ - Drop the function comment for __tdp_map().
+ - Add a patch to extend the nested_dirty_log_test to verify that KVM creates
+   writable SPTEs when the gPTEs are writable and dirty.
 
-Thanks,
+v3:
+ - https://lore.kernel.org/all/20251127013440.3324671-1-yosry.ahmed@linux.dev
+ - Dropped the patches that landed in kvm-x86.
+ - Reshuffled some patches and cleanups.
+ - Introduced kvm_mmu data structures to hold the root, page table
+   levels, and page table masks (Sean).
+ - Extended memstress as well to cover nested SVM.
 
-	M.
+v2: https://lore.kernel.org/kvm/20251021074736.1324328-1-yosry.ahmed@linux.dev
 
+Sean Christopherson (7):
+  KVM: selftests: Add "struct kvm_mmu" to track a given MMU instance
+  KVM: selftests: Plumb "struct kvm_mmu" into x86's MMU APIs
+  KVM: selftests: Add a "struct kvm_mmu_arch arch" member to kvm_mmu
+  KVM: selftests: Add a stage-2 MMU instance to kvm_vm
+  KVM: selftests: Move TDP mapping functions outside of vmx.c
+  KVM: selftests: Rename vm_get_page_table_entry() to vm_get_pte()
+  KVM: selftests: Test READ=>WRITE dirty logging behavior for shadow MMU
+
+Yosry Ahmed (14):
+  KVM: selftests: Make __vm_get_page_table_entry() static
+  KVM: selftests: Stop passing a memslot to nested_map_memslot()
+  KVM: selftests: Rename nested TDP mapping functions
+  KVM: selftests: Kill eptPageTablePointer
+  KVM: selftests: Stop setting A/D bits when creating EPT PTEs
+  KVM: selftests: Move PTE bitmasks to kvm_mmu
+  KVM: selftests: Use a TDP MMU to share EPT page tables between vCPUs
+  KVM: selftests: Stop passing VMX metadata to TDP mapping functions
+  KVM: selftests: Reuse virt mapping functions for nested EPTs
+  KVM: selftests: Allow kvm_cpu_has_ept() to be called on AMD CPUs
+  KVM: selftests: Add support for nested NPTs
+  KVM: selftests: Set the user bit on nested NPT PTEs
+  KVM: selftests: Extend vmx_dirty_log_test to cover SVM
+  KVM: selftests: Extend memstress to run on nested SVM
+
+ tools/testing/selftests/kvm/Makefile.kvm      |   2 +-
+ .../kvm/include/arm64/kvm_util_arch.h         |   2 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  18 +-
+ .../kvm/include/loongarch/kvm_util_arch.h     |   1 +
+ .../kvm/include/riscv/kvm_util_arch.h         |   1 +
+ .../kvm/include/s390/kvm_util_arch.h          |   1 +
+ .../selftests/kvm/include/x86/kvm_util_arch.h |  22 ++
+ .../selftests/kvm/include/x86/processor.h     |  58 +++-
+ .../selftests/kvm/include/x86/svm_util.h      |   9 +
+ tools/testing/selftests/kvm/include/x86/vmx.h |  16 +-
+ .../selftests/kvm/lib/arm64/processor.c       |  38 +--
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  28 +-
+ .../selftests/kvm/lib/loongarch/processor.c   |  28 +-
+ .../selftests/kvm/lib/riscv/processor.c       |  31 ++-
+ .../selftests/kvm/lib/s390/processor.c        |  16 +-
+ .../testing/selftests/kvm/lib/x86/memstress.c |  66 +++--
+ .../testing/selftests/kvm/lib/x86/processor.c | 237 ++++++++++++----
+ tools/testing/selftests/kvm/lib/x86/svm.c     |  24 ++
+ tools/testing/selftests/kvm/lib/x86/vmx.c     | 251 ++++-------------
+ .../selftests/kvm/x86/hyperv_tlb_flush.c      |   2 +-
+ .../selftests/kvm/x86/nested_dirty_log_test.c | 259 ++++++++++++++++++
+ .../x86/smaller_maxphyaddr_emulation_test.c   |   4 +-
+ .../selftests/kvm/x86/vmx_dirty_log_test.c    | 179 ------------
+ .../kvm/x86/vmx_nested_la57_state_test.c      |   2 +-
+ 24 files changed, 726 insertions(+), 569 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86/nested_dirty_log_test.c
+ delete mode 100644 tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
+
+
+base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
 -- 
-Jazz isn't dead. It just smells funny.
+2.52.0.351.gbe84eed79e-goog
+
