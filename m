@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BBFD2882D3;
-	Tue, 30 Dec 2025 15:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82AE0241665;
+	Tue, 30 Dec 2025 15:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767108869; cv=none; b=SS2ERXmlJtUNXIRUEXztmgc+bKxNKpj3kv/m1BifuidP5XcMaKcpHhISKMc8NLViUSHR+WceuwcZ73SainU7XDCdIS6RmsVACXgzuM0iZzxONTw3IOjKxrSxFJadSNWNUYEkL8zcnrdnc6x9/mmN55vzoTbJXlm1nlOmwk/EA3k=
+	t=1767109069; cv=none; b=BgwgwFDkrTKus3myODDPciKapTG+uiu6WXQYr6EUiN6aCksDcbqeP+oLjPXT7MEHU2Oq8HPxoAvJT6WrxLPd5lqkSWhN8PEw603Ej3ZVyd2kwhnnVpOfrezvK/LMC+5hdr/b6PKEsdxj+ZvFKdf49nx2GQYt9Wr0IdppJyCPM8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767108869; c=relaxed/simple;
-	bh=yjdh34Hmqne37G11Loiam1Ed+hhJrJ/NSB0q9oo+YsU=;
+	s=arc-20240116; t=1767109069; c=relaxed/simple;
+	bh=tIwfl2Yo5eMip565qmwOXZSIPkclnpZAD+5EurUHNVw=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qu4avbLFfcoy0acoNMvFboPlbFv2D11gJq6Z9Mr6qI7HRILq96IQwvSvLvKckvNBODRb2tgLRPan/bhyeI+tTninukx3S8L+s9e0QnzXYRnDeTqtYAM3R7sYTt03MLi3lzSS3BbE6oKLtHKskjA1a6fUZJAGxDWuiPdI+xgDBQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTzabqQC; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=DoBhmp7xyoNgmspurlD2GOiUAtiUCPsttTFV6R7Ntv1rs0Z8moUa8HA3a/jVTyFt6N4n2jrYFaUmFxGwCOfp6wUlHqbMIuvGYSyH3bmZsKQkuut0/xWaNoDwEM35CTbmNvMg8ZJtn9cxKKcm5fne15baUHKqHooYt01RJdi4vw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOvBWjJl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTzabqQC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9139C4CEFB;
-	Tue, 30 Dec 2025 15:34:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOvBWjJl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E14FAC4CEFB;
+	Tue, 30 Dec 2025 15:37:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767108868;
-	bh=yjdh34Hmqne37G11Loiam1Ed+hhJrJ/NSB0q9oo+YsU=;
+	s=k20201202; t=1767109068;
+	bh=tIwfl2Yo5eMip565qmwOXZSIPkclnpZAD+5EurUHNVw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iTzabqQCHIVzDVkUuv8Shn2YZNuawMeUh8aV1N6CErDCet3+LEFPixMu+9bbrYIpb
-	 P9OJ8qNFVCsHn8c1ZH66hfK9Dv+3tC0sQ3xTN/niouoT7t+i5GVnmWhxmpydzTrLFT
-	 3zvxyqIf0XbPXivH1j2TG5L7SbKQISmm9lMnEMlyFaatvbMcGlb6rVe48isAyLWXEu
-	 2I+J2Wxv7BP8S3iSDhCCIPnF2Lexi3c2N7pFvXzfxbgRRsnaLCMkoL+jDByadCmcL5
-	 EDVId8HE+fASLPwmFMPZ+oSKSzJC2woNESvh13YUSuLbyJZPNzlpihgkUrMPsL9RyM
-	 FjSwmdoy1zVNQ==
+	b=jOvBWjJlBGAthPusa3MDujJmLlYaso7weZf+GtJvANkPCdvYcG7TwslhAmVQIjX9d
+	 AXU3EkJ++N4YnAijFojLLxMIXIR1kCNb4pIAhxGiRcIGSa8zwsWH14fZUUquclInZg
+	 QFp/qPUVdatEVbH94cQKoXQ7gAdqroACPW2KUR8ET/z+L1z33cE9dlRPItp5irO2AX
+	 Rc3gwlx1Rp6ALhLryzPMQ2P11/ImygzBtgxFoMZ1JOOyulC/2+NDaXacKl5bHq+tZG
+	 aiOy+FXeg/Y2o030RAE96JJKuRaq+FLPi7hQReRNDpLLZM0I/Lev2m2WM8IdNxXxUB
+	 ZfsTwJth2sUJQ==
 Received: from lfbn-nan-1-2237-32.w92-139.abo.wanadoo.fr ([92.139.188.32] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vabju-0000000G12w-1N55;
-	Tue, 30 Dec 2025 15:34:26 +0000
-Date: Tue, 30 Dec 2025 15:34:25 +0000
-Message-ID: <87qzscdlvi.wl-maz@kernel.org>
+	id 1vabn8-0000000G15P-2bwo;
+	Tue, 30 Dec 2025 15:37:46 +0000
+Date: Tue, 30 Dec 2025 15:37:45 +0000
+Message-ID: <87pl7wdlpy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Petteri Kangaslampi <pekangas@google.com>
 Cc: kvmarm@lists.linux.dev,
@@ -46,9 +46,10 @@ Cc: kvmarm@lists.linux.dev,
 	Will Deacon <will@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/1] KVM: arm64: Fix hyp VA size between layout and MMU
-In-Reply-To: <20251223193440.1441657-1-pekangas@google.com>
+Subject: Re: [PATCH 1/1] KVM: arm64: Fix hyp VA size between layout and MMU
+In-Reply-To: <20251223193440.1441657-2-pekangas@google.com>
 References: <20251223193440.1441657-1-pekangas@google.com>
+	<20251223193440.1441657-2-pekangas@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,33 +65,50 @@ X-SA-Exim-Rcpt-To: pekangas@google.com, kvmarm@lists.linux.dev, oliver.upton@lin
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 23 Dec 2025 19:34:39 +0000,
+On Tue, 23 Dec 2025 19:34:40 +0000,
 Petteri Kangaslampi <pekangas@google.com> wrote:
 > 
-> All,
+> Use a consistent hypervisor VA size between memory layout and MMU
+> initialization logic when the kernel is configured for less than
+> IDMAP_VA_BITS of VA space.
+>
+> Signed-off-by: Petteri Kangaslampi <pekangas@google.com>
+> ---
+>  arch/arm64/kvm/va_layout.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
 > 
-> In the KVM initialization code, kvm_mmu_init() and
-> kvm_compute_layout() use different logic when determining the
-> hypervisor's virtual address space size. Specifically, the MMU code
-> uses the larger of vabits_actual (the kernel's VA size) and
-> IDMAP_VA_BITS (48 bits), while the VA layout code just uses the
-> kernel's VA size.
-> 
-> This means that if the kernel is configured with a VA size of less
-> than 48 bits (like happens in our environment), the assumptions used
-> to calculate hyp_physvirt_offset and the code that determines VA
-> ranges to use for mappings in hyp/nvhe/mm.c get out of sync, which can
-> results in mapping failures.
-> 
-> The immediate fix is pretty obvious and attached here. This is against
-> 6.12 but I don't think this code has changed recently. I think longer
-> term refactoring knowledge of the hypervisor's address space into one
-> place might be helpful; currently it is a bit spread out.
+> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
+> index f6ca0193a96f..76cdd62550e1 100644
+> --- a/arch/arm64/kvm/va_layout.c
+> +++ b/arch/arm64/kvm/va_layout.c
+> @@ -49,7 +49,7 @@ static void init_hyp_physvirt_offset(void)
+>  
+>  /*
+>   * We want to generate a hyp VA with the following format (with V ==
+> - * vabits_actual):
+> + * hypervisor VA bits):
+>   *
+>   *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
+>   *  ---------------------------------------------------------
+> @@ -62,10 +62,17 @@ __init void kvm_compute_layout(void)
+>  {
+>  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
+>  	u64 hyp_va_msb;
+> +	u32 hyp_va_bits;
+> +
+> +	/*
+> +	 * We use the bigger of IDMAP_VA_BITS and kernel VA size as the
+> +	 * hypervisor VA address space size. See mmu.c.
+> +	 */
+> +	hyp_va_bits = max(IDMAP_VA_BITS, vabits_actual);
 
-I'm sorry, but posting a patch against a kernel that is over a year
-old doesn't help. It may apply, but it doesn't mean it works. Please
-post a tested patch against the latest released kernel, or even
-better, the latest -rc.
+Instead of duplicating the logic from kvm_mmu_init(), I'd rather you
+make sure there is a single place where the EL2 VA width is computed,
+and use that consistently all over the place.
+
+Since you were complaining about the spread of the VA layout handling,
+starting with this sort of consolidation seems like a decent starting
+point.
 
 Thanks,
 
