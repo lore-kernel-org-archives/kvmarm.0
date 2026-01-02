@@ -1,31 +1,31 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ACB27FB28
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 17:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7879262FD0
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 17:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767373387; cv=none; b=RHkLWKqPBE/G8GEA7YYkHTxY2mah+AxD6k7CuHAFbs73hoYJs3Zsqbw0r7ylGb7XiQA9B7pgb2UbuqyKNguDAZSXrMNAYQYafNyqycnpV5MuNVbabuqw2d2bfa1ax+9rGra9ZmtDCu5xlpm1esitjuQTTYwn0M9WwLGjX3Anlkk=
+	t=1767373461; cv=none; b=kXAyxDz6HJ3lNx53htznVBtt6D8P44ifG3SBuWAAKoh4PSqG422WnMQYNfYMCFVHkVlRrlI/SznP+HhcxBmF6hXBnYnWqr5Ag/DT83SkeTZLGcPNI18ysH0l8UBiLH13XKshut9DJFewlEhuxzfl1vUzPl7SOHV0YPsZV8aY6t0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767373387; c=relaxed/simple;
-	bh=JtRgiIz4qm7QwkSobh9knxZkbdl4ppeJJ0eoR86dqEI=;
+	s=arc-20240116; t=1767373461; c=relaxed/simple;
+	bh=AA0GiriPvxHu5l9dMiPGzsMaKRoZR7YB+y0m1FP73+M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PQ5X+1Clq/+ELthAeYgIM3qNWiYiUYNkXs0bo7q3kQrLAyLquQhFYtFgKtWSs6tg1n/38xNMy5Nm1n4Vj1PGPUOLkPNneXXlDwGJxDbaoSxjn5VSUn4/kn2CN7URzfGI8PTh/BMHmAI6kgDZoJYdPOnuqpA3pc8bREx1H4RKuhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GONbZMow; arc=none smtp.client-ip=91.218.175.183
+	 Content-Type:Content-Disposition:In-Reply-To; b=TJp8rrEfM1CT7pL65j9aGG7GkXx6wm83av5xUPph1DfFUBbtWwf7hquq965w0WX7CruX9mTHw2HhYnKYokSrH7ahROQsgfwPQ3i5JDGRnZKBFOCcBFFlJY3dmBAPy2y4dAsdToTD5n8eZI3nW8nuEj4sHGv907k8ofwWFe4ttJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gcjMVEgM; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GONbZMow"
-Date: Fri, 2 Jan 2026 17:02:53 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gcjMVEgM"
+Date: Fri, 2 Jan 2026 17:03:49 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767373380;
+	t=1767373448;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VquIGlMG22FiqzSomuVxO3pJuNTPu1MzbM7EM1lJb+o=;
-	b=GONbZMowDit/CV6j92ss1DbpkpRLpd6qgnfPipRYspttY2hjT9J8/ZF3pok9rWI/4fjbSf
-	hs+i0uPiXAMWZJwTtp/Fzpg+0n0R9LSGrjR5qoZU2OU/PKQk7gz+ub8uJKEEqVgu6Pn7fL
-	J/YI5uLwXzBRESM9/1oHrvonV9ZHBoA=
+	bh=kMbovm/gG/7jubGENqfjP/9rxqSn/HJfGYv99VNhtHo=;
+	b=gcjMVEgM+r9x0LCC9CNLWmc8hkGGczkEUcOS+ZUDjiXsI5+UDN+fVo4JgvC0Tz39SlTk4g
+	ELNQYbp1SMiKD6mZDD6hUF/Hhz55lFxsvuTSq/b7fV9ZYQJLtryImwzf0g3U06LT2LmP7D
+	6arYDRy1xXoqqsfCF4lTg1hx123J1j8=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
@@ -38,11 +38,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 08/21] KVM: selftests: Add a "struct kvm_mmu_arch
- arch" member to kvm_mmu
-Message-ID: <sckc5rvtxzmzra5l4otjoe5smm3r2xmieyybyx6xlxibrngegi@4r7iks23pa56>
+Subject: Re: [PATCH v4 12/21] KVM: selftests: Add a stage-2 MMU instance to
+ kvm_vm
+Message-ID: <3kuuj6toya5xlv74yrl4wg74b52wsvfqv3gigdbsdaqs7eibt5@th3b5x3dik7y>
 References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-9-seanjc@google.com>
+ <20251230230150.4150236-13-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,103 +51,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251230230150.4150236-9-seanjc@google.com>
+In-Reply-To: <20251230230150.4150236-13-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 30, 2025 at 03:01:37PM -0800, Sean Christopherson wrote:
-> Add an arch structure+field in "struct kvm_mmu" so that architectures can
-> track arch-specific information for a given MMU.
+On Tue, Dec 30, 2025 at 03:01:41PM -0800, Sean Christopherson wrote:
+> Add a stage-2 MMU instance so that architectures that support nested
+> virtualization (more specifically, nested stage-2 page tables) can create
+> and track stage-2 page tables for running L2 guests.  Plumb the structure
+> into common code to avoid cyclical dependencies, and to provide some line
+> of sight to having common APIs for creating stage-2 mappings.
 > 
-> No functional change intended.
+> As a bonus, putting the member in common code justifies using stage2_mmu
+> instead of tdp_mmu for x86.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 
 > ---
->  tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h     | 2 ++
->  tools/testing/selftests/kvm/include/kvm_util.h                | 2 ++
->  tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h | 1 +
->  tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h     | 1 +
->  tools/testing/selftests/kvm/include/s390/kvm_util_arch.h      | 1 +
->  tools/testing/selftests/kvm/include/x86/kvm_util_arch.h       | 2 ++
->  6 files changed, 9 insertions(+)
+>  tools/testing/selftests/kvm/include/kvm_util.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> index b973bb2c64a6..4a2033708227 100644
-> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
-> @@ -2,6 +2,8 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
->  
-> +struct kvm_mmu_arch {};
-> +
->  struct kvm_vm_arch {
->  	bool	has_gic;
->  	int	gic_fd;
 > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 39558c05c0bf..c1497515fa6a 100644
+> index c1497515fa6a..371d55e0366e 100644
 > --- a/tools/testing/selftests/kvm/include/kvm_util.h
 > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -92,6 +92,8 @@ struct kvm_mmu {
->  	bool pgd_created;
->  	uint64_t pgd;
->  	int pgtable_levels;
-> +
-> +	struct kvm_mmu_arch arch;
->  };
+> @@ -116,7 +116,12 @@ struct kvm_vm {
+>  	uint32_t dirty_ring_size;
+>  	uint64_t gpa_tag_mask;
 >  
->  struct kvm_vm {
-> diff --git a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
+> +	/*
+> +	 * "mmu" is the guest's stage-1, with a short name because the vast
+> +	 * majority of tests only care about the stage-1 MMU.
+> +	 */
+>  	struct kvm_mmu mmu;
+> +	struct kvm_mmu stage2_mmu;
 >  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
+>  	struct kvm_vm_arch arch;
 >  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
->  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
->  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> index e43a57d99b56..d5095900e442 100644
-> --- a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
-> @@ -2,6 +2,7 @@
->  #ifndef SELFTEST_KVM_UTIL_ARCH_H
->  #define SELFTEST_KVM_UTIL_ARCH_H
->  
-> +struct kvm_mmu_arch {};
->  struct kvm_vm_arch {};
->  
->  #endif  // SELFTEST_KVM_UTIL_ARCH_H
-> diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> index 972bb1c4ab4c..456e5ca170df 100644
-> --- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> +++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
-> @@ -10,6 +10,8 @@
->  
->  extern bool is_forced_emulation_enabled;
->  
-> +struct kvm_mmu_arch {};
-> +
->  struct kvm_vm_arch {
->  	vm_vaddr_t gdt;
->  	vm_vaddr_t tss;
 > -- 
 > 2.52.0.351.gbe84eed79e-goog
 > 
