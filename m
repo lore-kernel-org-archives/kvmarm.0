@@ -1,31 +1,31 @@
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7CE2C3276
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 16:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ACB27FB28
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 17:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767373127; cv=none; b=kxf3WVg3ca9cGabUE87p7rr+vj6hffjV0QK61oWmmIzGN2LkrbXoiXrMpxj6P6OAUMNkdjeKhK8me1SlgU4qSCQgwE5LXUdpLf/lFnx4ltzF4d+JNs8zEN/2f8M1NKXfTf5vZ2imU2FRVqU5wx8uxg9vov3NgxYnUakj2MuGI2E=
+	t=1767373387; cv=none; b=RHkLWKqPBE/G8GEA7YYkHTxY2mah+AxD6k7CuHAFbs73hoYJs3Zsqbw0r7ylGb7XiQA9B7pgb2UbuqyKNguDAZSXrMNAYQYafNyqycnpV5MuNVbabuqw2d2bfa1ax+9rGra9ZmtDCu5xlpm1esitjuQTTYwn0M9WwLGjX3Anlkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767373127; c=relaxed/simple;
-	bh=zw/m5RqmSJ7ns2Awc3++dE85qaJs/sr5TDrf1QfSkLw=;
+	s=arc-20240116; t=1767373387; c=relaxed/simple;
+	bh=JtRgiIz4qm7QwkSobh9knxZkbdl4ppeJJ0eoR86dqEI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pa37QAzBwS386gtEihZZZpZzv7OwjA4P2wnq4Ms/qKCUwJhecr0JbFMgqkA1gAMp5PYUOwYS/378JwSbObm/fkCfRoIHEquxYW1oFofwr0CJcfW9A4K4H24gOkbnlZJz1bYRcKPG5bF1QwIpJWmJwyam+d02Z0ixP2DTIy6+pb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=k+stiLoG; arc=none smtp.client-ip=95.215.58.176
+	 Content-Type:Content-Disposition:In-Reply-To; b=PQ5X+1Clq/+ELthAeYgIM3qNWiYiUYNkXs0bo7q3kQrLAyLquQhFYtFgKtWSs6tg1n/38xNMy5Nm1n4Vj1PGPUOLkPNneXXlDwGJxDbaoSxjn5VSUn4/kn2CN7URzfGI8PTh/BMHmAI6kgDZoJYdPOnuqpA3pc8bREx1H4RKuhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GONbZMow; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k+stiLoG"
-Date: Fri, 2 Jan 2026 16:58:31 +0000
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GONbZMow"
+Date: Fri, 2 Jan 2026 17:02:53 +0000
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767373123;
+	t=1767373380;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/adiBUQZ/Qfmrr9PCE7JkH+ijh6pLAj2iSLGgdDMeSc=;
-	b=k+stiLoG2msiz8lDhi0bK0hfFL0ljxjmLODRlAEWWpsz6Wk7P/3pT/HCHF3JyWeTPpcJ7d
-	aMGosRJm7ObB3I3sfFf1GgVxnCt+zIl5yM+WCAw1Kyhwc2MFBg3u7RCuEJ/6ztn6B2lauL
-	lKPJ7WtdryBm5BSsd21cHGaTirpQ1pU=
+	bh=VquIGlMG22FiqzSomuVxO3pJuNTPu1MzbM7EM1lJb+o=;
+	b=GONbZMowDit/CV6j92ss1DbpkpRLpd6qgnfPipRYspttY2hjT9J8/ZF3pok9rWI/4fjbSf
+	hs+i0uPiXAMWZJwTtp/Fzpg+0n0R9LSGrjR5qoZU2OU/PKQk7gz+ub8uJKEEqVgu6Pn7fL
+	J/YI5uLwXzBRESM9/1oHrvonV9ZHBoA=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Yosry Ahmed <yosry.ahmed@linux.dev>
 To: Sean Christopherson <seanjc@google.com>
@@ -38,11 +38,11 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
 	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
 	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 11/21] KVM: selftests: Stop passing VMX metadata to
- TDP mapping functions
-Message-ID: <pa4l62zp7wf77xdxoliuj2f7gliyan37fdcyl5tyblpknfu5iu@voe5mj6tz7vk>
+Subject: Re: [PATCH v4 08/21] KVM: selftests: Add a "struct kvm_mmu_arch
+ arch" member to kvm_mmu
+Message-ID: <sckc5rvtxzmzra5l4otjoe5smm3r2xmieyybyx6xlxibrngegi@4r7iks23pa56>
 References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-12-seanjc@google.com>
+ <20251230230150.4150236-9-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,226 +51,103 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251230230150.4150236-12-seanjc@google.com>
+In-Reply-To: <20251230230150.4150236-9-seanjc@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Tue, Dec 30, 2025 at 03:01:40PM -0800, Sean Christopherson wrote:
-> From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> 
-> The root GPA can now be retrieved from the nested MMU, stop passing VMX
-> metadata. This is in preparation for making these functions work for
-> NPTs as well.
-
-Super nit: I think at this point the root GPA is already being retrieved
-from the nested MMU, so maybe s/can now be/is?
-
-Also, maybe call it TDP MMU or stage2 MMU since it was renamed.
-
-> 
-> Opportunistically drop tdp_pg_map() since it's unused.
+On Tue, Dec 30, 2025 at 03:01:37PM -0800, Sean Christopherson wrote:
+> Add an arch structure+field in "struct kvm_mmu" so that architectures can
+> track arch-specific information for a given MMU.
 > 
 > No functional change intended.
 > 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+
 > ---
->  tools/testing/selftests/kvm/include/x86/vmx.h | 11 ++-----
->  .../testing/selftests/kvm/lib/x86/memstress.c | 11 +++----
->  tools/testing/selftests/kvm/lib/x86/vmx.c     | 33 +++++++------------
->  .../selftests/kvm/x86/vmx_dirty_log_test.c    |  9 +++--
->  4 files changed, 24 insertions(+), 40 deletions(-)
+>  tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h     | 2 ++
+>  tools/testing/selftests/kvm/include/kvm_util.h                | 2 ++
+>  tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h | 1 +
+>  tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h     | 1 +
+>  tools/testing/selftests/kvm/include/s390/kvm_util_arch.h      | 1 +
+>  tools/testing/selftests/kvm/include/x86/kvm_util_arch.h       | 2 ++
+>  6 files changed, 9 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86/vmx.h b/tools/testing/selftests/kvm/include/x86/vmx.h
-> index 1fd83c23529a..4dd4c2094ee6 100644
-> --- a/tools/testing/selftests/kvm/include/x86/vmx.h
-> +++ b/tools/testing/selftests/kvm/include/x86/vmx.h
-> @@ -557,14 +557,9 @@ bool load_vmcs(struct vmx_pages *vmx);
+> diff --git a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> index b973bb2c64a6..4a2033708227 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/kvm_util_arch.h
+> @@ -2,6 +2,8 @@
+>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>  #define SELFTEST_KVM_UTIL_ARCH_H
 >  
->  bool ept_1g_pages_supported(void);
+> +struct kvm_mmu_arch {};
+> +
+>  struct kvm_vm_arch {
+>  	bool	has_gic;
+>  	int	gic_fd;
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 39558c05c0bf..c1497515fa6a 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -92,6 +92,8 @@ struct kvm_mmu {
+>  	bool pgd_created;
+>  	uint64_t pgd;
+>  	int pgtable_levels;
+> +
+> +	struct kvm_mmu_arch arch;
+>  };
 >  
-> -void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm, uint64_t nested_paddr,
-> -		uint64_t paddr);
-> -void tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm, uint64_t nested_paddr,
-> -	     uint64_t paddr, uint64_t size);
-> -void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
-> -				       struct kvm_vm *vm);
-> -void tdp_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -			 uint64_t addr, uint64_t size);
-> +void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
-> +void tdp_identity_map_default_memslots(struct kvm_vm *vm);
-> +void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
->  bool kvm_cpu_has_ept(void);
->  void vm_enable_ept(struct kvm_vm *vm);
->  void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm);
-> diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> index 00f7f11e5f0e..3319cb57a78d 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> @@ -59,7 +59,7 @@ uint64_t memstress_nested_pages(int nr_vcpus)
->  	return 513 + 10 * nr_vcpus;
->  }
+>  struct kvm_vm {
+> diff --git a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+> index e43a57d99b56..d5095900e442 100644
+> --- a/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/loongarch/kvm_util_arch.h
+> @@ -2,6 +2,7 @@
+>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>  #define SELFTEST_KVM_UTIL_ARCH_H
 >  
-> -static void memstress_setup_ept_mappings(struct vmx_pages *vmx, struct kvm_vm *vm)
-> +static void memstress_setup_ept_mappings(struct kvm_vm *vm)
->  {
->  	uint64_t start, end;
+> +struct kvm_mmu_arch {};
+>  struct kvm_vm_arch {};
 >  
-> @@ -68,16 +68,15 @@ static void memstress_setup_ept_mappings(struct vmx_pages *vmx, struct kvm_vm *v
->  	 * KVM can shadow the EPT12 with the maximum huge page size supported
->  	 * by the backing source.
->  	 */
-> -	tdp_identity_map_1g(vmx, vm, 0, 0x100000000ULL);
-> +	tdp_identity_map_1g(vm, 0, 0x100000000ULL);
+>  #endif  // SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+> index e43a57d99b56..d5095900e442 100644
+> --- a/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/riscv/kvm_util_arch.h
+> @@ -2,6 +2,7 @@
+>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>  #define SELFTEST_KVM_UTIL_ARCH_H
 >  
->  	start = align_down(memstress_args.gpa, PG_SIZE_1G);
->  	end = align_up(memstress_args.gpa + memstress_args.size, PG_SIZE_1G);
-> -	tdp_identity_map_1g(vmx, vm, start, end - start);
-> +	tdp_identity_map_1g(vm, start, end - start);
->  }
+> +struct kvm_mmu_arch {};
+>  struct kvm_vm_arch {};
 >  
->  void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[])
->  {
-> -	struct vmx_pages *vmx;
->  	struct kvm_regs regs;
->  	vm_vaddr_t vmx_gva;
->  	int vcpu_id;
-> @@ -87,11 +86,11 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
+>  #endif  // SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
+> index e43a57d99b56..d5095900e442 100644
+> --- a/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/s390/kvm_util_arch.h
+> @@ -2,6 +2,7 @@
+>  #ifndef SELFTEST_KVM_UTIL_ARCH_H
+>  #define SELFTEST_KVM_UTIL_ARCH_H
 >  
->  	vm_enable_ept(vm);
->  	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
-> -		vmx = vcpu_alloc_vmx(vm, &vmx_gva);
-> +		vcpu_alloc_vmx(vm, &vmx_gva);
+> +struct kvm_mmu_arch {};
+>  struct kvm_vm_arch {};
 >  
->  		/* The EPTs are shared across vCPUs, setup the mappings once */
->  		if (vcpu_id == 0)
-> -			memstress_setup_ept_mappings(vmx, vm);
-> +			memstress_setup_ept_mappings(vm);
+>  #endif  // SELFTEST_KVM_UTIL_ARCH_H
+> diff --git a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> index 972bb1c4ab4c..456e5ca170df 100644
+> --- a/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> +++ b/tools/testing/selftests/kvm/include/x86/kvm_util_arch.h
+> @@ -10,6 +10,8 @@
 >  
->  		/*
->  		 * Override the vCPU to run memstress_l1_guest_code() which will
-> diff --git a/tools/testing/selftests/kvm/lib/x86/vmx.c b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> index 9d4e391fdf2c..ea1c09f9e8ab 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/vmx.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/vmx.c
-> @@ -409,8 +409,8 @@ static void tdp_create_pte(struct kvm_vm *vm,
->  }
+>  extern bool is_forced_emulation_enabled;
 >  
->  
-> -void __tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -		  uint64_t nested_paddr, uint64_t paddr, int target_level)
-> +void __tdp_pg_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-> +		  int target_level)
->  {
->  	const uint64_t page_size = PG_LEVEL_SIZE(target_level);
->  	void *eptp_hva = addr_gpa2hva(vm, vm->arch.tdp_mmu->pgd);
-> @@ -453,12 +453,6 @@ void __tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
->  	}
->  }
->  
-> -void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -		uint64_t nested_paddr, uint64_t paddr)
-> -{
-> -	__tdp_pg_map(vmx, vm, nested_paddr, paddr, PG_LEVEL_4K);
-> -}
-> -
->  /*
->   * Map a range of EPT guest physical addresses to the VM's physical address
->   *
-> @@ -476,9 +470,8 @@ void tdp_pg_map(struct vmx_pages *vmx, struct kvm_vm *vm,
->   * Within the VM given by vm, creates a nested guest translation for the
->   * page range starting at nested_paddr to the page range starting at paddr.
->   */
-> -void __tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -	       uint64_t nested_paddr, uint64_t paddr, uint64_t size,
-> -		  int level)
-> +void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-> +	       uint64_t size, int level)
->  {
->  	size_t page_size = PG_LEVEL_SIZE(level);
->  	size_t npages = size / page_size;
-> @@ -487,23 +480,22 @@ void __tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
->  	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
->  
->  	while (npages--) {
-> -		__tdp_pg_map(vmx, vm, nested_paddr, paddr, level);
-> +		__tdp_pg_map(vm, nested_paddr, paddr, level);
->  		nested_paddr += page_size;
->  		paddr += page_size;
->  	}
->  }
->  
-> -void tdp_map(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -	     uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-> +void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
-> +	     uint64_t size)
->  {
-> -	__tdp_map(vmx, vm, nested_paddr, paddr, size, PG_LEVEL_4K);
-> +	__tdp_map(vm, nested_paddr, paddr, size, PG_LEVEL_4K);
->  }
->  
->  /* Prepare an identity extended page table that maps all the
->   * physical pages in VM.
->   */
-> -void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
-> -				       struct kvm_vm *vm)
-> +void tdp_identity_map_default_memslots(struct kvm_vm *vm)
->  {
->  	uint32_t s, memslot = 0;
->  	sparsebit_idx_t i, last;
-> @@ -520,16 +512,15 @@ void tdp_identity_map_default_memslots(struct vmx_pages *vmx,
->  		if (i > last)
->  			break;
->  
-> -		tdp_map(vmx, vm, (uint64_t)i << vm->page_shift,
-> +		tdp_map(vm, (uint64_t)i << vm->page_shift,
->  			(uint64_t)i << vm->page_shift, 1 << vm->page_shift);
->  	}
->  }
->  
->  /* Identity map a region with 1GiB Pages. */
-> -void tdp_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
-> -			    uint64_t addr, uint64_t size)
-> +void tdp_identity_map_1g(struct kvm_vm *vm, uint64_t addr, uint64_t size)
->  {
-> -	__tdp_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
-> +	__tdp_map(vm, addr, addr, size, PG_LEVEL_1G);
->  }
->  
->  bool kvm_cpu_has_ept(void)
-> diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> index 5c8cf8ac42a2..370f8d3117c2 100644
-> --- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> @@ -80,7 +80,6 @@ void l1_guest_code(struct vmx_pages *vmx)
->  static void test_vmx_dirty_log(bool enable_ept)
->  {
->  	vm_vaddr_t vmx_pages_gva = 0;
-> -	struct vmx_pages *vmx;
->  	unsigned long *bmap;
->  	uint64_t *host_test_mem;
->  
-> @@ -96,7 +95,7 @@ static void test_vmx_dirty_log(bool enable_ept)
->  	if (enable_ept)
->  		vm_enable_ept(vm);
->  
-> -	vmx = vcpu_alloc_vmx(vm, &vmx_pages_gva);
-> +	vcpu_alloc_vmx(vm, &vmx_pages_gva);
->  	vcpu_args_set(vcpu, 1, vmx_pages_gva);
->  
->  	/* Add an extra memory slot for testing dirty logging */
-> @@ -120,9 +119,9 @@ static void test_vmx_dirty_log(bool enable_ept)
->  	 * GPAs as the EPT enabled case.
->  	 */
->  	if (enable_ept) {
-> -		tdp_identity_map_default_memslots(vmx, vm);
-> -		tdp_map(vmx, vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, PAGE_SIZE);
-> -		tdp_map(vmx, vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, PAGE_SIZE);
-> +		tdp_identity_map_default_memslots(vm);
-> +		tdp_map(vm, NESTED_TEST_MEM1, GUEST_TEST_MEM, PAGE_SIZE);
-> +		tdp_map(vm, NESTED_TEST_MEM2, GUEST_TEST_MEM, PAGE_SIZE);
->  	}
->  
->  	bmap = bitmap_zalloc(TEST_MEM_PAGES);
+> +struct kvm_mmu_arch {};
+> +
+>  struct kvm_vm_arch {
+>  	vm_vaddr_t gdt;
+>  	vm_vaddr_t tss;
 > -- 
 > 2.52.0.351.gbe84eed79e-goog
 > 
