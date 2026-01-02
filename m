@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1ACD2D0636
-	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 11:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E26A2D8DC2
+	for <kvmarm@lists.linux.dev>; Fri,  2 Jan 2026 11:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767354231; cv=none; b=iix3NxvP+LuwX2TislSRGn8VMXQAjmdOaP+OH+jf4mt4FlegTWpM4WVewv5aLTYk7Xsx3t62HQX3hmfIJVXGhbm6Rb7+HuzIsHt4nMfRlfIlmbV7N+QKIqqez75zV9AfPoojxKa34PfgDsmqQucieAfgD6TDwzp5SYn0mNc4Km0=
+	t=1767354504; cv=none; b=cV7psNhGsM1NRiaXN1/dqIoJ+JItuSP+o3SZj6e6Tj1Pls0XYvM9PirWFcswJI7S865EHWhXf5awHeqbumkXFRqZ967nbD392F4vhvAbeAUcEr626xmazN6rV4PVnKo1M30X+9ZfNQmGSqinHGszclSiAhGfW0rjiy2ViuC0PXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767354231; c=relaxed/simple;
-	bh=xJwGmhXkOkhk4HhlGaMLySyIX4vb2ceapOSwG9YqAIY=;
+	s=arc-20240116; t=1767354504; c=relaxed/simple;
+	bh=sSv6RO3o3rC6Da1Oa5tAQIbjpXTvj+64ziLV8K8Dx8w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mEdMm6NWIvVssRpByZi4/uLpWd1FDVb7jbmhVMW3smDN4VcItFN6WACV1iXjXgMHg5f25l2h3/ZHCg7xB1cR74DcRS9TFdh86QYcepyEn89cFJqR+tW2ZHZQj2i8qtKkRzqS7xEZW459i9oHZVa6m4dCS2O3co7CBMQMu3cOJAw=
+	 In-Reply-To:Content-Type; b=o0oCIwkuveSSWCrWQ0W60j7JPRZv8xRhCGA+57L43x4tr8LRRk80JEKugd4bgVY3rjU7QtBNasJEGOeXWIGJudWUsF//+AMYmhftBNi/6zONhOf2BKojqeZJ7Dboj61owf/QCpik0tmFgAdiAcvUpqCT8IOd+T21b2ZPaRRAd9g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06138497;
-	Fri,  2 Jan 2026 03:43:42 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3FAF497;
+	Fri,  2 Jan 2026 03:48:14 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B0813F63F;
-	Fri,  2 Jan 2026 03:43:43 -0800 (PST)
-Message-ID: <187ac0bf-cd7e-4fed-8236-9097c938ab8c@arm.com>
-Date: Fri, 2 Jan 2026 11:43:42 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A2C63F63F;
+	Fri,  2 Jan 2026 03:48:16 -0800 (PST)
+Message-ID: <c3132e11-a4e5-4a74-96b5-4a253ff9e3e3@arm.com>
+Date: Fri, 2 Jan 2026 11:48:15 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/45] KVM: arm64: Preserve host MPAM configuration
- when changing traps
+Subject: Re: [PATCH v2 13/45] KVM: arm64: Force guest EL1 to use user-space's
+ partid configuration
 To: Oliver Upton <oupton@kernel.org>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -43,69 +43,63 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  will@kernel.org, corbet@lwn.net, maz@kernel.org, joey.gouly@arm.com,
  suzuki.poulose@arm.com, kvmarm@lists.linux.dev
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-6-ben.horgan@arm.com> <aUWvGjGyU7DUW8MI@kernel.org>
+ <20251219181147.3404071-14-ben.horgan@arm.com> <aUWxLp2GUk2_p58e@kernel.org>
 From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <aUWvGjGyU7DUW8MI@kernel.org>
+In-Reply-To: <aUWxLp2GUk2_p58e@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Oliver,
 
-On 12/19/25 20:01, Oliver Upton wrote:
-> Hi Ben,
-> 
-> On Fri, Dec 19, 2025 at 06:11:07PM +0000, Ben Horgan wrote:
->> When kvm enables or disables MPAM traps to EL2 it clears all other bits in
->> MPAM2_EL2.  Notably, it clears the partition ids (PARTIDs) and performance
->> monitoring groups (PMGs). Avoid changing these bits in anticipation of
->> adding support for MPAM in the kernel. Otherwise, on a VHE system with the
->> host running at EL2 where MPAM2_EL2 and MPAM1_EL1 access the same register,
->> any attempt to use MPAM to monitor or partition resources for kernel space
->> would be foiled by running a KVM guest. Additionally, MPAM2_EL2.EnMPAMSM is
->> always set to 0 which causes MPAMSM_EL1 to always trap. Keep EnMPAMSM set
->> to 1 when not in a guest so that the kernel can use MPAMSM_EL1.
+On 12/19/25 20:10, Oliver Upton wrote:
+> On Fri, Dec 19, 2025 at 06:11:15PM +0000, Ben Horgan wrote:
+>> From: James Morse <james.morse@arm.com>
 >>
+>> While we trap the guest's attempts to read/write the MPAM control
+>> registers, the hardware continues to use them. Guest-EL0 uses KVM's
+>> user-space's configuration, as the value is left in the register, and
+>> guest-EL1 uses either the host kernel's configuration, or in the case of
+>> VHE, the UNKNOWN reset value of MPAM1_EL1.
+>>
+>> We want to force the guest-EL1 to use KVM's user-space's MPAM
+>> configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
+>> programmed the same and on VHE copy MPAM0_EL1 into the guest's
+>> MPAM1_EL1. There is no need to restore as this is out of context once TGE
+>> is set.
+>>
+>> Signed-off-by: James Morse <james.morse@arm.com>
 >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 >> ---
->>  arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++----
->>  1 file changed, 8 insertions(+), 4 deletions(-)
+>> Changes since rfc:
+>> Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
+>> Defer EL2 handling until next patch
+>> ---
+>>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 11 +++++++++++
+>>  1 file changed, 11 insertions(+)
 >>
->> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> index c5d5e5b86eaf..63195275a8b8 100644
->> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
->> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
->> @@ -269,7 +269,8 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+>> index f28c6cf4fe1b..a2e8f6187675 100644
+>> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+>> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+>> @@ -183,6 +183,16 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>>  }
+>>  NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
 >>  
->>  static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
->>  {
->> -	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
->> +	u64 clr = MPAM2_EL2_EnMPAMSM;
->> +	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
->>  
->>  	if (!system_supports_mpam())
->>  		return;
->> @@ -279,18 +280,21 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
->>  		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
->>  	} else {
->>  		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
->> -		r |= MPAM2_EL2_TIDR;
->> +		set |= MPAM2_EL2_TIDR;
->>  	}
->>  
->> -	write_sysreg_s(r, SYS_MPAM2_EL2);
->> +	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+>> +/*
+>> + * The _EL0 value was written by the host's context switch and belongs to the
+>> + * VMM. Copy this into the guest's _EL1 register.
+>> + */
+>> +static inline void __mpam_guest_load(void)
+>> +{
+>> +	if (system_supports_mpam())
+>> +		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1), SYS_MPAM1);
 > 
-> I'd recommend documenting that writes to MPAM1_EL1 are followed by an
-> ISB. Otherwise it isn't obvious here where context synchronization is
-> happening (if at all).
+> nit: I'd prefer using a mask to extract the fields of interest, guarding
+> against future architecture doing something silly with the RES0 fields
+> of these registers.
 
-Ok, but why are you mentioning it here?
-
-This is just updating the traps while ensuring the partid/pmg are
-unchanged. The traps are only relevant once we change exception level
-and for activation they are synchronized in __guest_enter() and the eret
-when returning to userspace.
+Sure, I'll make this change.
 
 > 
 > Thanks,
