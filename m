@@ -1,207 +1,76 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40F6309DDB
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 16:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D84C30C35F
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 16:43:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631373; cv=none; b=VgVDBbwIj/PdrWhM/9LKqSQCOJhrDb+6gfQ/48a1fip7XemJQ4w8nozMEbHnyxzzYjv99JhVpQlBNva3sJHiyXty8CWvtxjedWMbsw/Lm3NIO8qyKu20PFnRHG4+Tni2Nt2oj4CsCe8oiJkCvFp2bZrOx3ec/+Wdh5dWZ3xQyBo=
+	t=1767631442; cv=none; b=MVs8MoVTC+4L4rXXhqnwftG0iVdcB/dfhHGu5jHH+FyWI7op/+gOubp7HQqakNzst1vWiFqJwD+P4p/qKpDMn5kZa3fzU0WIepQ2bAnbQqvffiDAJ/zbKiHOuKjIZ/+OCBE8tveHTndUfvSLVegS9hzIYcSgH7KLH0d9FjARyFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631373; c=relaxed/simple;
-	bh=RB4rAQd3NWxdqwAZKr4RLn1B/AxxmDCJxqvEcuJSFZE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tUofluBVBiUocHGr0M7nbjXpQyeUhJ8qusiFGV7JnvddX6+TLt/a7uuG67ZByxjIb5FQ+/5qJLUEirxl3uKOC/he+NpfmmzpxHfB4WwNxLezMFOHlQPOHzHpk5eKlPARylxQ89v6NVK9vHq1KvudVqeei5+xIGy5AUXvS+umyow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 83E4C339;
-	Mon,  5 Jan 2026 08:42:40 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 374173F6A8;
-	Mon,  5 Jan 2026 08:42:45 -0800 (PST)
-Date: Mon, 5 Jan 2026 16:42:34 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	james.clark@linaro.org, mark.rutland@arm.com, james.morse@arm.com
-Subject: Re: [RFC PATCH v6 17/35] KVM: arm64: Add writable SPE system
- registers to VCPU context
-Message-ID: <aVvp-vp47ZIc5vfH@raptor>
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-18-alexandru.elisei@arm.com>
- <3ccbd4df-92a3-4d70-9ed8-c4a5658508d1@arm.com>
+	s=arc-20240116; t=1767631442; c=relaxed/simple;
+	bh=5wvBUuUMJ1rvgRQBArsVsAzHb1Q/NkrYlzjfQ9EbY5Y=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WFrXhsXfiakqOvM1EOlxwQLd9zzyjpwerAm5BoJOXaAdZBDP5BsGX6eJc8xaIawnDp3MnfFDHhUnv8rzLKhW0akDgfbjEU2MjPv0ktbUnaMGy0XpL9lkxZQnF3t6N4HJpIDSQTCOaPzwsna2sPsLf1rV41cp9mjwy9I9ESaJ9ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlKq35SSczJ46DD;
+	Tue,  6 Jan 2026 00:42:55 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 61DA240086;
+	Tue,  6 Jan 2026 00:43:56 +0800 (CST)
+Received: from localhost (10.126.174.38) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 5 Jan
+ 2026 16:43:54 +0000
+Date: Mon, 5 Jan 2026 16:43:52 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v2 05/45] KVM: arm64: Preserve host MPAM configuration
+ when changing traps
+Message-ID: <20260105164352.00001e3c@huawei.com>
+In-Reply-To: <20251219181147.3404071-6-ben.horgan@arm.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+	<20251219181147.3404071-6-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3ccbd4df-92a3-4d70-9ed8-c4a5658508d1@arm.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Hi Suzuki,
+On Fri, 19 Dec 2025 18:11:07 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
 
-On Tue, Dec 16, 2025 at 11:54:54AM +0000, Suzuki K Poulose wrote:
-> On 14/11/2025 16:06, Alexandru Elisei wrote:
-> > Add the writable SPE registers to the VCPU context. The registers for now
-> > have generic accessors, with proper handling to be added. PMSIDR_EL1 and
-> > PMBIDR_EL1 are not part of the VCPU context because they are read-only
-> > registers.
-..
-> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > index 3ad6b7c6e4ba..0821ebfb03fa 100644
-> > --- a/arch/arm64/kvm/debug.c
-> > +++ b/arch/arm64/kvm/debug.c
-> > @@ -38,19 +38,28 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
-> >   {
-> >   	preempt_disable();
-> > -	/*
-> > -	 * This also clears MDCR_EL2_E2PB_MASK and MDCR_EL2_E2TB_MASK
-> > -	 * to disable guest access to the profiling and trace buffers
-> > -	 */
-> >   	vcpu->arch.mdcr_el2 = FIELD_PREP(MDCR_EL2_HPMN,
-> >   					 *host_data_ptr(nr_event_counters));
-> > +	/*
-> > +	 * This also clears MDCR_EL2_E2PB_MASK to disable guest access to the
-> > +	 * trace buffer.
+> When kvm enables or disables MPAM traps to EL2 it clears all other bits in
+> MPAM2_EL2.  Notably, it clears the partition ids (PARTIDs) and performance
+> monitoring groups (PMGs). Avoid changing these bits in anticipation of
+> adding support for MPAM in the kernel. Otherwise, on a VHE system with the
+> host running at EL2 where MPAM2_EL2 and MPAM1_EL1 access the same register,
+> any attempt to use MPAM to monitor or partition resources for kernel space
+> would be foiled by running a KVM guest. Additionally, MPAM2_EL2.EnMPAMSM is
+> always set to 0 which causes MPAMSM_EL1 to always trap. Keep EnMPAMSM set
+> to 1 when not in a guest so that the kernel can use MPAMSM_EL1.
 > 
-> nit: MDCR_EL2_E2TB_MASK is for the trace buffer.
-
-Indeed, I'll fix.
-
-Thanks,
-Alex
-
-> 
-> 
-> Suzuki
-> 
-> 
-> > +	 */
-> >   	vcpu->arch.mdcr_el2 |= (MDCR_EL2_TPM |
-> > -				MDCR_EL2_TPMS |
-> >   				MDCR_EL2_TTRF |
-> >   				MDCR_EL2_TPMCR |
-> >   				MDCR_EL2_TDRA |
-> >   				MDCR_EL2_TDOSA);
-> > +	if (vcpu_has_spe(vcpu)) {
-> > +		/* Set buffer owner to EL1 and trap the buffer registers. */
-> > +		vcpu->arch.mdcr_el2 |= FIELD_PREP(MDCR_EL2_E2PB, MDCR_EL2_E2PB_EL1_TRAP);
-> > +		/* Leave TPMS zero and don't trap the sampling registers. */
-> > +	} else {
-> > +		/* Trap the sampling registers. */
-> > +		vcpu->arch.mdcr_el2 |= MDCR_EL2_TPMS;
-> > +		/* Leave E2PB zero and trap the buffer registers. */
-> > +	}
-> > +
-> >   	/* Is the VM being debugged by userspace? */
-> >   	if (vcpu->guest_debug)
-> >   		/* Route all software debug exceptions to EL2 */
-> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> > index 0c4896c6a873..5b3dc622cf82 100644
-> > --- a/arch/arm64/kvm/spe.c
-> > +++ b/arch/arm64/kvm/spe.c
-> > @@ -8,6 +8,7 @@
-> >   #include <linux/kvm_host.h>
-> >   #include <linux/perf/arm_spe_pmu.h>
-> > +#include <asm/kvm_emulate.h>
-> >   #include <asm/kvm_spe.h>
-> >   #include <asm/sysreg.h>
-> > @@ -78,6 +79,18 @@ u8 kvm_spe_get_pmsver_limit(void)
-> >   	return min(pmsver, ID_AA64DFR0_EL1_PMSVer_V1P5);
-> >   }
-> > +bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
-> > +{
-> > +	__vcpu_assign_sys_reg(vcpu, val, reg);
-> > +
-> > +	return true;
-> > +}
-> > +
-> > +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
-> > +{
-> > +	return __vcpu_sys_reg(vcpu, reg);
-> > +}
-> > +
-> >   static u64 max_buffer_size_to_pmbidr_el1(u64 size)
-> >   {
-> >   	u64 msb_idx, num_bits;
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index ac859c39c2be..5eeea229b46e 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1374,6 +1374,28 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> >   	return 0;
-> >   }
-> > +static unsigned int spe_visibility(const struct kvm_vcpu *vcpu,
-> > +				   const struct sys_reg_desc *r)
-> > +{
-> > +	if (vcpu_has_spe(vcpu))
-> > +		return 0;
-> > +
-> > +	return REG_HIDDEN;
-> > +}
-> > +
-> > +static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> > +			   const struct sys_reg_desc *r)
-> > +{
-> > +	u64 val = p->regval;
-> > +	int reg = r->reg;
-> > +
-> > +	if (p->is_write)
-> > +		return kvm_spe_write_sysreg(vcpu, reg, val);
-> > +
-> > +	p->regval = kvm_spe_read_sysreg(vcpu, reg);
-> > +	return true;
-> > +}
-> > +
-> >   /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
-> >   #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
-> >   	{ SYS_DESC(SYS_DBGBVRn_EL1(n)),					\
-> > @@ -1406,6 +1428,14 @@ static int set_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r,
-> >   	  .reset = reset_pmevtyper,					\
-> >   	  .access = access_pmu_evtyper, .reg = (PMEVTYPER0_EL0 + n), }
-> > +#define SPE_TRAPPED_REG(name)						\
-> > +	SYS_DESC(SYS_##name), .reg = name, .access = access_spe_reg,	\
-> > +	.reset = reset_val, .val = 0, .visibility = spe_visibility
-> > +
-> > +#define SPE_UNTRAPPED_REG(name)						\
-> > +	SYS_DESC(SYS_##name), .reg = name, .access = undef_access,	\
-> > +	.reset = reset_val, .val = 0, .visibility = spe_visibility
-> > +
-> >   /* Macro to expand the AMU counter and type registers*/
-> >   #define AMU_AMEVCNTR0_EL0(n) { SYS_DESC(SYS_AMEVCNTR0_EL0(n)), undef_access }
-> >   #define AMU_AMEVTYPER0_EL0(n) { SYS_DESC(SYS_AMEVTYPER0_EL0(n)), undef_access }
-> > @@ -3323,19 +3353,19 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >   	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
-> >   	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
-> > -	{ SYS_DESC(SYS_PMSCR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSNEVFR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSICR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSIRR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSFCR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSEVFR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSLATFR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSIDR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMBLIMITR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMBPTR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMBSR_EL1), undef_access },
-> > -	{ SYS_DESC(SYS_PMSDSFR_EL1), undef_access },
-> > -	/* PMBIDR_EL1 is not trapped */
-> > +	{ SPE_UNTRAPPED_REG(PMSCR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSNEVFR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSICR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSIRR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSFCR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSEVFR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSLATFR_EL1) },
-> > +	{ SYS_DESC(SYS_PMSIDR_EL1), .access = undef_access },
-> > +	{ SPE_TRAPPED_REG(PMBLIMITR_EL1) },
-> > +	{ SPE_TRAPPED_REG(PMBPTR_EL1) },
-> > +	{ SPE_TRAPPED_REG(PMBSR_EL1) },
-> > +	{ SPE_UNTRAPPED_REG(PMSDSFR_EL1) },
-> > +	{ SYS_DESC(SYS_PMBIDR_EL1), .access = undef_access },
-> >   	{ PMU_SYS_REG(PMINTENSET_EL1),
-> >   	  .access = access_pminten, .reg = PMINTENSET_EL1,
-> 
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Seems to match what I'd expect from the spec, so LGTM.
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
