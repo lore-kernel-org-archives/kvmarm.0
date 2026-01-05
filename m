@@ -1,94 +1,175 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840FD28725F
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 16:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC5330DEC1
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 16:42:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631027; cv=none; b=V1Gc3e3WkIjonInRX0XXrxhmw9omCvcmnDKRlN5f0uHsctcUAa+cz4duKJZx0xwx9bfvbmjE16FeMq/NAfy/RSPLOK4C2x+z7sgnfsX4q5hpceBN3NFr3dVgPlkwHAC0+p7fVCtzM/qg7BWNnHqkosJS0f0VQyelSA2DR7h22M8=
+	t=1767631345; cv=none; b=NZrzDDv9SRGLoR6M0bODKBBeKlbUxIxX/rWdslcjT4WGnRWHlnDBO+zCHVge6bBd2HXhH5NrLw1wQK3ZxoXHPg5i/lFg7WNqS+e3dtisv5c3JyxGfriYpJew9I9qX4N1IebzrNwHn1yjlxi+yTD6/GNJK3T1UAyvbF9iuxuz81w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631027; c=relaxed/simple;
-	bh=EErNRIHka0BO075l5rGbqV68pFySKcZluidHmZJjJk4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=omSBLgNQa4QJO6lY2od6StJ2VRJUcLPNUYA1sMdaPNDem01HAcFv5ZAqVWnhYDG8noVDc0+V5Y151L40zX4tMN99pCGa0DcNEcj7XlsPVeU55J2VNEItCY/OO4REyVAg68Di2Db21dSpEGU7cc8Fsggo9oha9tvY3oezWirfdOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlKg61DGVzJ46Bd;
-	Tue,  6 Jan 2026 00:36:02 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id C41E040570;
-	Tue,  6 Jan 2026 00:37:02 +0800 (CST)
-Received: from localhost (10.126.174.38) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 5 Jan
- 2026 16:37:01 +0000
-Date: Mon, 5 Jan 2026 16:36:59 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v2 04/45] arm64/sysreg: Add MPAMSM_EL1 register
-Message-ID: <20260105163659.000012f2@huawei.com>
-In-Reply-To: <20251219181147.3404071-5-ben.horgan@arm.com>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
-	<20251219181147.3404071-5-ben.horgan@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767631345; c=relaxed/simple;
+	bh=BeNNzMgR4KZDiH5AXkEv2zHUISDLOQh+88WxWfAVjNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bZDzbOu8rzKt8HUNWibu+2ZErQQZFshGPd4xDA2vxpjDcMOr3dPGoiZBtvP6eLKlomKAnA26+7/EBrpsffJiJfLpVy2PhrdC4TdGwNBJqxqZMmJ0rOEeGRK7DPLl1qzUWrwOyYEwnuPAXtSPaWK7/e7xe/E1DWGT+0wS0+g/YME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 975A1339;
+	Mon,  5 Jan 2026 08:42:15 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C7F33F6A8;
+	Mon,  5 Jan 2026 08:42:20 -0800 (PST)
+Date: Mon, 5 Jan 2026 16:42:09 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	james.clark@linaro.org, mark.rutland@arm.com, james.morse@arm.com
+Subject: Re: [RFC PATCH v6 16/35] KVM: arm64: Advertise SPE version in
+ ID_AA64DFR0_EL1.PMSver
+Message-ID: <aVvppjU3OXXIcJIo@raptor>
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-17-alexandru.elisei@arm.com>
+ <36416368-4447-4b16-8496-3e3d603d88d4@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <36416368-4447-4b16-8496-3e3d603d88d4@arm.com>
 
-On Fri, 19 Dec 2025 18:11:06 +0000
-Ben Horgan <ben.horgan@arm.com> wrote:
+Hi Suzuki,
 
-> The MPAMSM_EL1 register determines the MPAM configuration for an SMCU. Add
-> the register definition.
+Thanks for having a look.
+
+On Tue, Dec 16, 2025 at 11:40:20AM +0000, Suzuki K Poulose wrote:
+> On 14/11/2025 16:06, Alexandru Elisei wrote:
+> > The VCPU registers are reset during the KVM_ARM_VCPU_INIT ioctl, before
+> > userspace can set the desired SPU. Assume that the VCPU is initialized from
 > 
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-
-Matches the spec
-
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/tools/sysreg | 8 ++++++++
->  1 file changed, 8 insertions(+)
 > 
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 8921b51866d6..afbb55c9b038 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -5052,6 +5052,14 @@ Field	31:16	PARTID_D
->  Field	15:0	PARTID_I
->  EndSysreg
->  
-> +Sysreg	MPAMSM_EL1	3	0	10	5	3
-> +Res0	63:48
-> +Field	47:40	PMG_D
-> +Res0	39:32
-> +Field	31:16	PARTID_D
-> +Res0	15:0
-> +EndSysreg
-> +
->  Sysreg	ISR_EL1	3	0	12	1	0
->  Res0	63:11
->  Field	10	IS
+> > a thread that runs on one of the physical CPUs that correspond to the SPU
+> > that userspace will choose for the VM. Set PMSVer to that CPUs hardware
+> > value.
+> 
+> This doesn't match the code. See below.
 
+Indeed.
+
+> 
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >   arch/arm64/include/asm/kvm_spe.h |  6 ++++++
+> >   arch/arm64/kvm/spe.c             | 10 ++++++++++
+> >   arch/arm64/kvm/sys_regs.c        | 10 +++++++++-
+> >   3 files changed, 25 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> > index 6ce70cf2abaf..5e6d7e609a48 100644
+> > --- a/arch/arm64/include/asm/kvm_spe.h
+> > +++ b/arch/arm64/include/asm/kvm_spe.h
+> > @@ -33,6 +33,8 @@ static __always_inline bool kvm_supports_spe(void)
+> >   void kvm_spe_init_vm(struct kvm *kvm);
+> >   int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu);
+> > +u8 kvm_spe_get_pmsver_limit(void);
+> > +
+> >   int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> >   int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> >   int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> > @@ -53,6 +55,10 @@ static inline int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >   {
+> >   	return 0;
+> >   }
+> > +static inline u8 kvm_spe_get_pmsver_limit(void)
+> > +{
+> > +	return 0;
+> > +}
+> >   static inline int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> >   {
+> >   	return -ENXIO;
+> > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> > index 6bd074e40f6c..0c4896c6a873 100644
+> > --- a/arch/arm64/kvm/spe.c
+> > +++ b/arch/arm64/kvm/spe.c
+> > @@ -68,6 +68,16 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >   	return 0;
+> >   }
+> > +u8 kvm_spe_get_pmsver_limit(void)
+> > +{
+> > +	unsigned int pmsver;
+> > +
+> > +	pmsver = SYS_FIELD_GET(ID_AA64DFR0_EL1, PMSVer,
+> > +			       read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1));
+> 
+> The read_sanitised_ftr_reg() gives you the system wide sanitised
+> version, not the one on the current CPU. You may need
+> read_sysreg_s() instead here.
+
+Yes.
+
+> 
+> 
+> > +
+> > +	return min(pmsver, ID_AA64DFR0_EL1_PMSVer_V1P5);
+> > +}
+> > +
+> >   static u64 max_buffer_size_to_pmbidr_el1(u64 size)
+> >   {
+> >   	u64 msb_idx, num_bits;
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index e67eb39ddc11..ac859c39c2be 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -29,6 +29,7 @@
+> >   #include <asm/kvm_hyp.h>
+> >   #include <asm/kvm_mmu.h>
+> >   #include <asm/kvm_nested.h>
+> > +#include <asm/kvm_spe.h>
+> >   #include <asm/perf_event.h>
+> >   #include <asm/sysreg.h>
+> > @@ -1652,6 +1653,9 @@ static s64 kvm_arm64_ftr_safe_value(u32 id, const struct arm64_ftr_bits *ftrp,
+> >   		case ID_AA64DFR0_EL1_DebugVer_SHIFT:
+> >   			kvm_ftr.type = FTR_LOWER_SAFE;
+> >   			break;
+> > +		case ID_AA64DFR0_EL1_PMSVer_SHIFT:
+> > +			kvm_ftr.type = FTR_LOWER_SAFE;
+> 
+> PMSVer is already FTR_LOWER_SAFE, and we don't need to override it here ?
+> (unlike the DebugVer or PMU Ver)
+
+Don't need to override it, yes, didn't realize that it's FTR_LOWER_SAFE in
+cpufeature.c when I wrote this.
+
+> 
+> > +			break;
+> >   		}
+> >   		break;
+> >   	case SYS_ID_DFR0_EL1:
+> > @@ -2021,8 +2025,11 @@ static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+> >   		val |= SYS_FIELD_PREP(ID_AA64DFR0_EL1, PMUVer,
+> >   				      kvm_arm_pmu_get_pmuver_limit());
+> > -	/* Hide SPE from guests */
+> >   	val &= ~ID_AA64DFR0_EL1_PMSVer_MASK;
+> > +	if (vcpu_has_spe(vcpu)) {
+> > +		val |= SYS_FIELD_PREP(ID_AA64DFR0_EL1, PMSVer,
+> > +				      kvm_spe_get_pmsver_limit());
+> > +	}
+> 
+> So, we ignore value that the user sets and go with what the SPE instance
+> that has been chosen ? Should we make it non-writable then ?
+
+I modelled this after how PMUVer is handled, though that's not an excuse for
+getting it wrong. My intention was to limit the maximum version that userspace
+can set to the version of the SPU assigned to the VM.
+
+But now that I think about it, some SPE versions introduce new fields in a
+record, and there's no way for KVM to hide that if userspace set a lower version
+for the VM. So I guess for now I'll not allow userspace to write PMSVer and
+revisit it if someone wants it.
+
+Thanks,
+Alex
