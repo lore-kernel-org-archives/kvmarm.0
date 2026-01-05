@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04432F25E4
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C5A3321BD
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628196; cv=none; b=Ceb8iwnBl84jrV1ZiAQcJm3fsAEcwN3AtPD4e6x9V8YR2z9dJs54mI5whCP+4Cw+V8Kd2Rle9W1XUziBQ7yy3pw06b52hPsfd8ZDKTsePhbgZo6fa2S1Q5AO6hYO/lkA7KRHZKNVoMfMyeG3e124MA6V0kp2ANtjkQTmmcjmFcM=
+	t=1767628200; cv=none; b=fxvt3mXxZjg7rn6oHfrsUUg3FUN4CQjDQmzUXPzF8YAFm/8d2I5RmenN5gpywSUUGx6NFegMyS1+s84bYj2Ncy3Os2q63L/g912vfAZFJ6roV4avw/9HRP5eCCvFEyyGeg53wHfsiqB+Dti1AqIT0PHzyLMaF0DqN8f+NTFT4sY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628196; c=relaxed/simple;
-	bh=EiR6H2PI7nrIrBLjfYnWtgkFePwcLsCE5gSk6ktCNXc=;
+	s=arc-20240116; t=1767628200; c=relaxed/simple;
+	bh=27wZopcJw7/cJco+fEt26YdM4d1w7aPLBlaekI7TuiA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uJMEnd/3t9H2hbxcvfW8RSgdcdXD/cVbHROhfsxD6bAXh1gmgTJbjFxrZEwkLm8AgW0kHpZsupguLEHh9vAk2/NMpfrbdsIKtbWfBOZLSRuspK2YiLrTVbkNbRz9Rj1d57RS/TsCYUN5z04WVrg9Ac6Gtx1mrkp5l3YwOkogkAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBAIRSDY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=J/6DPrA/VyH1G/SUUM/1bqp/ethrt0z4amW79ZLCNa0EQP007mtrSu+tAb/32zzbpiSOFG5GORAQ2q+kmZPOo9LimkAGrxSfaAyqJuhw8vCKFDoLvk/qwh2e/cwcJLCjGMOY6KlxIOt4XLS/FLvda1rAtQWkINc60rb2SWgWn9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuGYWTvq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBAIRSDY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A85FC19422;
-	Mon,  5 Jan 2026 15:49:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuGYWTvq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A35A0C116D0;
+	Mon,  5 Jan 2026 15:49:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628196;
-	bh=EiR6H2PI7nrIrBLjfYnWtgkFePwcLsCE5gSk6ktCNXc=;
+	s=k20201202; t=1767628199;
+	bh=27wZopcJw7/cJco+fEt26YdM4d1w7aPLBlaekI7TuiA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rBAIRSDYUKhc0GKyLg828rNJP/qvq5dmeIVRDu5lPb/0YjbNzAtuMeexjV/izbd2U
-	 vETtcCVLAJhzubw+LeR/NvTdBUUH8XdQy6tZOM/6BvovJmplpLRaJFpYNii7T2CIa8
-	 rcsa7VUZsD77hOknzd844kAt4YhXvByD9OUUjyksq7Op6QSemNRZ86KtxBTUylLtzt
-	 KJYv9IdkhHdx7YOO2n/YGapiOd1qIbGca7GFDmrfCCh9/HE6OmoAFMs2DsD/vJSjFi
-	 ffh9wuNcCKpvyINvLF8uSr62I3TMQp25ys+qsAHn+YYd8m3rRSo+Pg68hLFj3ZEJjb
-	 oVeMGrNivtTpw==
+	b=MuGYWTvqQD1sFgUn6M1jUx+okntJxvijjH9G/U1Fm1THAZh7nbLBhg22GlhcRhtKu
+	 0oayrkClGgGOCYJiJU+/1xUEJJx7nR8P7Yb78AAgYzvN3/P/IipeNA7L3aTYMvPZWs
+	 8D/Uz0GFvCjhIRzLziiVg3ArVvQx+NhDztYrOmKvkl9TZ5B+YUTkH3zhpHbm7bgy3Q
+	 rbPu6mIRlKZyWpaEhazWP1ST3VVAF1gWNAi7HEEVrRf1pXSm7ZzKKSq6kW0mgTwnf3
+	 blWHPGM4NuliCyelt37YGxTxvocDg64+ofBYv2pqashSdDhWvMMHGwZ3VwVBRC8k7+
+	 qZCQ69X+H8kug==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 02/30] KVM: arm64: Remove redundant 'pgt' pointer checks from MMU notifiers
-Date: Mon,  5 Jan 2026 15:49:10 +0000
-Message-ID: <20260105154939.11041-3-will@kernel.org>
+Subject: [PATCH 03/30] KVM: arm64: Rename __pkvm_pgtable_stage2_unmap()
+Date: Mon,  5 Jan 2026 15:49:11 +0000
+Message-ID: <20260105154939.11041-4-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,81 +54,56 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The MMU notifiers are registered by kvm_init_mmu_notifier() only after
-kvm_arch_init_vm() has returned successfully. Since the latter function
-initialises the 'kvm->arch.mmu.pgt' pointer (and allocates the VM handle
-when pKVM is enabled), the initialisation checks in the MMU notifiers
-are not required.
-
-Remove the redundant checks from the MMU notifier callbacks.
+In preparation for adding support for protected VMs, where pages are
+donated rather than shared, rename __pkvm_pgtable_stage2_unmap() to
+__pkvm_pgtable_stage2_unshare() to make it clearer about what is going
+on.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/mmu.c  | 9 ---------
- arch/arm64/kvm/pkvm.c | 9 ++++++---
- 2 files changed, 6 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/pkvm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2b260bdf3202..5d18927f76ba 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2208,9 +2208,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	if (!kvm->arch.mmu.pgt)
--		return false;
--
- 	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
- 			     (range->end - range->start) << PAGE_SHIFT,
- 			     range->may_block);
-@@ -2223,9 +2220,6 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	u64 size = (range->end - range->start) << PAGE_SHIFT;
- 
--	if (!kvm->arch.mmu.pgt)
--		return false;
--
- 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, true);
-@@ -2239,9 +2233,6 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
- 	u64 size = (range->end - range->start) << PAGE_SHIFT;
- 
--	if (!kvm->arch.mmu.pgt)
--		return false;
--
- 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
- 						   range->start << PAGE_SHIFT,
- 						   size, false);
 diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index d7a0f69a9982..7797813f4dbe 100644
+index 7797813f4dbe..42f6e50825ac 100644
 --- a/arch/arm64/kvm/pkvm.c
 +++ b/arch/arm64/kvm/pkvm.c
-@@ -329,9 +329,6 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
- 	struct pkvm_mapping *mapping;
- 	int ret;
- 
--	if (!handle)
--		return 0;
--
- 	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
- 		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
- 					mapping->nr_pages);
-@@ -347,6 +344,12 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
- void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
- 					u64 addr, u64 size)
- {
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
-+	pkvm_handle_t handle = kvm->arch.pkvm.handle;
-+
-+	if (!handle)
-+		return;
-+
- 	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
+@@ -322,7 +322,7 @@ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
+ 	return 0;
  }
  
+-static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 end)
++static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64 end)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+ 	pkvm_handle_t handle = kvm->arch.pkvm.handle;
+@@ -350,7 +350,7 @@ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+ 	if (!handle)
+ 		return;
+ 
+-	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
++	__pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+ }
+ 
+ void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
+@@ -386,7 +386,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 			return -EAGAIN;
+ 
+ 		/* Remove _any_ pkvm_mapping overlapping with the range, bigger or smaller. */
+-		ret = __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
++		ret = __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+ 		if (ret)
+ 			return ret;
+ 		mapping = NULL;
+@@ -409,7 +409,7 @@ int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+ 	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
+ 
+-	return __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
++	return __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+ }
+ 
+ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
 -- 
 2.52.0.351.gbe84eed79e-goog
 
