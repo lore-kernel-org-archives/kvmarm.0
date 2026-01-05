@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981142FFDF7
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F083321A1
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628206; cv=none; b=uTmNGznQTZju7Onr1BrEtlBBsBqpKw0IrhWRF0slATIWv5sxhV7PFbBhzxLaXWq5pdvqs4My0AmEdRGdA7TbpPWdkW4EfUO6fBYPdm31yF3TeqH79amkGw1WaAuznIOdLUpUNZA4ePKoZrNkIoIEi4m53VIh/l+eLhiGzfGag2c=
+	t=1767628209; cv=none; b=nF8JWoQ9gN6+vohSCGbSJoFOYK+8KDReQGparDw2UWi4vG2sEVQ0JThgnhJFA1OVqQZeOHXbSyewo/7H9CIx9wnhbP4W8K9fPwZsSp+DssSSrZeprCaM88p8fnMYXEKla87HlBN4ETNY+1lraFueQBsfS5CslLP9XQB2XHhvq3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628206; c=relaxed/simple;
-	bh=slfr55E2le7kv/1YuB/BPrtDozKTarzMBTzRIRUEr8I=;
+	s=arc-20240116; t=1767628209; c=relaxed/simple;
+	bh=+/NGTWZlDwhdjhF3q+DED2fDBv7biV9jEmodadqNXiY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gq/p6hRvhuA5VvPT5gZ4JWj4kMviHlhjQd5udwI3dnPgub2jRQwM5k0/IKl8KZ2U6HWYP3lgnY524yZ9DKyIMynSCUb/HPSQ6IZ1e8ESxq7IaS6Ng98RTd8taitVxM+F34jxtNDbrMpOyqoYq0NHVxH0nV9mUUI4hp1Ph5qB6C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNe2ibjz; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Wa7aqbdBJSSLQHCO/d9LAwNuHlF4RqewbH+CbfGSD8Uv/8WsYYy0BQ4RLaEupkqvTWkZfmBU7ns4GWUzm6I7srqfJgx9pf4/c75s1+488SyZPb+Rfx1a9IEMLnxsAp4UVk5SC+6ZgWnSJJKssYqCVMqJcIXSmmjq0dAQvPVIlDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZuBtfQQe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNe2ibjz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F5A5C19421;
-	Mon,  5 Jan 2026 15:50:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZuBtfQQe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F11EC19425;
+	Mon,  5 Jan 2026 15:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628205;
-	bh=slfr55E2le7kv/1YuB/BPrtDozKTarzMBTzRIRUEr8I=;
+	s=k20201202; t=1767628208;
+	bh=+/NGTWZlDwhdjhF3q+DED2fDBv7biV9jEmodadqNXiY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PNe2ibjzuSwchxppJkcNekOmPZiyvcX2vgZVhiTNwmI+HRhxbVPeU6mvM00A4hBgS
-	 zibDsgfG0sZ49CPxi2HBT5oPZmpoOWmRlXaNc0iL4qBiwOQVV++Plz6AUagm7+WBlz
-	 7Yw8Wfdvyk3yt0LSUWAG3Tw4vNKvWiN2Q7pHCp5o0bFugNkLqTyNPebQKWD4KcLkln
-	 /9E4Sq5JF91eQEGBr5QfOe47HPcG5sN1Fr1sCWH9mfjUCt1egaGfORAR9eOAr5U/Vo
-	 RmvZSsjH4DfwAF5Yg06wPKDrrQI3jAVI/A7uf2KQSb22ZFkXbesBoTJ512EIEe2lGs
-	 VZB4jf/bBAFrA==
+	b=ZuBtfQQeDu1/vsq//9QEnHF2dav6VCABvdxvsKA7R3TEQNCLuloTxL6HzWy4lIxT8
+	 GY3AZVyMKsREO/yHfcCmKvRw3vML71EUmv4eE4kYytjLGOj4pgdthy5PWi58YNnSj0
+	 JOBLAY09Ww5S8cOg0iZDuIX6nqBUYMu1nrfVA4yXD8Hfj3/V1LqA/r4cuO9nD1NRYw
+	 3+ZSMrkCawRIfX7u0omxoEtgoYETnXrGYwsTB+Vd8+a043rOWfsHz2GEh4F9JlebU3
+	 SmCk91v+uB3EXrbCtPwJNmTcoq/jgUyKhkh4HFAPCm6QL3V9Zo35cXnFa3/0eaptkr
+	 3SY8O9QOdCC/g==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 05/30] KVM: arm64: Expose self-hosted debug regs as RAZ/WI for protected guests
-Date: Mon,  5 Jan 2026 15:49:13 +0000
-Message-ID: <20260105154939.11041-6-will@kernel.org>
+Subject: [PATCH 06/30] KVM: arm64: Remove pointless is_protected_kvm_enabled() checks from hyp
+Date: Mon,  5 Jan 2026 15:49:14 +0000
+Message-ID: <20260105154939.11041-7-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,39 +54,119 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Fuad Tabba <tabba@google.com>
+When pKVM is not enabled, the host shouldn't issue pKVM-specific
+hypercalls and so there's no point checking for this in the EL2
+hypercall handling code.
 
-Debug and trace are not currently supported for protected guests, so
-trap accesses to the related registers and emulate them as RAZ/WI for
-now. Although this isn't strictly compatible with the architecture, it's
-sufficient for Linux guests and means that debug support can be added
-later on.
+Remove the redundant is_protected_kvm_enabled() checks.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 33 ++----------------------------
+ 1 file changed, 2 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 3108b5185c20..c106bb796ab0 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -372,6 +372,14 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
- 	/* Cache maintenance by set/way operations are restricted. */
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index a7c689152f68..62a56c6084ca 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -169,9 +169,6 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
+ 	DECLARE_REG(u64, hcr_el2, host_ctxt, 3);
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
  
- 	/* Debug and Trace Registers are restricted. */
-+	RAZ_WI(SYS_DBGBVRn_EL1(0)),
-+	RAZ_WI(SYS_DBGBCRn_EL1(0)),
-+	RAZ_WI(SYS_DBGWVRn_EL1(0)),
-+	RAZ_WI(SYS_DBGWCRn_EL1(0)),
-+	RAZ_WI(SYS_MDSCR_EL1),
-+	RAZ_WI(SYS_OSLAR_EL1),
-+	RAZ_WI(SYS_OSLSR_EL1),
-+	RAZ_WI(SYS_OSDLR_EL1),
+-	if (!is_protected_kvm_enabled())
+-		return;
+-
+ 	hyp_vcpu = pkvm_load_hyp_vcpu(handle, vcpu_idx);
+ 	if (!hyp_vcpu)
+ 		return;
+@@ -185,12 +182,8 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
  
- 	/* Group 1 ID registers */
- 	HOST_HANDLED(SYS_REVIDR_EL1),
+ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
+ {
+-	struct pkvm_hyp_vcpu *hyp_vcpu;
++	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 
+-	if (!is_protected_kvm_enabled())
+-		return;
+-
+-	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 	if (hyp_vcpu)
+ 		pkvm_put_hyp_vcpu(hyp_vcpu);
+ }
+@@ -254,9 +247,6 @@ static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+ 		goto out;
+@@ -278,9 +268,6 @@ static void handle___pkvm_host_unshare_guest(struct kvm_cpu_context *host_ctxt)
+ 	struct pkvm_hyp_vm *hyp_vm;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vm = get_np_pkvm_hyp_vm(handle);
+ 	if (!hyp_vm)
+ 		goto out;
+@@ -298,9 +285,6 @@ static void handle___pkvm_host_relax_perms_guest(struct kvm_cpu_context *host_ct
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+ 		goto out;
+@@ -318,9 +302,6 @@ static void handle___pkvm_host_wrprotect_guest(struct kvm_cpu_context *host_ctxt
+ 	struct pkvm_hyp_vm *hyp_vm;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vm = get_np_pkvm_hyp_vm(handle);
+ 	if (!hyp_vm)
+ 		goto out;
+@@ -340,9 +321,6 @@ static void handle___pkvm_host_test_clear_young_guest(struct kvm_cpu_context *ho
+ 	struct pkvm_hyp_vm *hyp_vm;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vm = get_np_pkvm_hyp_vm(handle);
+ 	if (!hyp_vm)
+ 		goto out;
+@@ -359,9 +337,6 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
+ 	struct pkvm_hyp_vcpu *hyp_vcpu;
+ 	int ret = -EINVAL;
+ 
+-	if (!is_protected_kvm_enabled())
+-		goto out;
+-
+ 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
+ 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
+ 		goto out;
+@@ -421,12 +396,8 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ static void handle___pkvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
+-	struct pkvm_hyp_vm *hyp_vm;
++	struct pkvm_hyp_vm *hyp_vm = get_np_pkvm_hyp_vm(handle);
+ 
+-	if (!is_protected_kvm_enabled())
+-		return;
+-
+-	hyp_vm = get_np_pkvm_hyp_vm(handle);
+ 	if (!hyp_vm)
+ 		return;
+ 
 -- 
 2.52.0.351.gbe84eed79e-goog
 
