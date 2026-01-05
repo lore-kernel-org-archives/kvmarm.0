@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9720B3321BD
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8E9316195
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:51:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628259; cv=none; b=uTVk1sx7+CEjSwlU5DCKqaRVmn0QlzSaudh+ujzfIHQ0azo3aJQmappX9q6105PuCw4ywPSRrdG4WTwU9OOILvyugbeaQx76efl8y4xZp8HvFtlg85sp4HjdRT1Ki5LnVcVC1ur48p3M2Y/MhLbxEexjA+Rl2DFaiVh6ADyABBc=
+	t=1767628264; cv=none; b=YN6iBA7BDhoTF19f/gUXIbpvVSyla3kDKdwj0jy9MqnXN/kwBdGEaSARx29apO+Mf+f3nIgiaHvlh6s7Bdpo6f+1Dh2LU/2i9DK8NkRbcybuWPyRFXR7NHmlM56HFkWBbQnnNQgx6PbBhJRVkEzBEzVql7TH7JJ+tj6FYomVjUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628259; c=relaxed/simple;
-	bh=ReZO4nEoAFKs1VIoWkegfR0g0ToMLtVz4CXpRkmj0zc=;
+	s=arc-20240116; t=1767628264; c=relaxed/simple;
+	bh=KyqwmpkT0XzVRJbn7urXKIik32fzcIYZDfk4aQ0aieE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gi4z5BnhbBXHfFHVnf30jYF/cKyGon+6+IsCvIJxFj49VC2IsCszbsJlYyDcika/aPpw+cEEJsMgzlxt0qKUQaxNL+o8wMacunkHvvqTYE7eBr68VL4Xy8OUzCE3TQKz0w/xQTIjO9wNMQzKCoEMshYfWw2zBC3OovOPnk66iJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+IZUUAg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=NilpAD1BicMxXbU4VGENKkMd3a4PLDd1SnlDdedw5/+ishj0Sc17LTuIDxGyw/MNqRGkjDE1k6MqqHmUEiw5Yauxrg482q1CREQqVfDJPYuDqZnJcHVhZ9Dmgbhfxp16bKzawZs+xgZ784Qgb2BBX3UdB1tbgTQrygxdnJfL++A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCM+ZLI9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+IZUUAg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E561EC19425;
-	Mon,  5 Jan 2026 15:50:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCM+ZLI9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08AABC116D0;
+	Mon,  5 Jan 2026 15:50:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628258;
-	bh=ReZO4nEoAFKs1VIoWkegfR0g0ToMLtVz4CXpRkmj0zc=;
+	s=k20201202; t=1767628261;
+	bh=KyqwmpkT0XzVRJbn7urXKIik32fzcIYZDfk4aQ0aieE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e+IZUUAgWszcoCZTpYDWEptUuoR55s8TxMNIcDXLPtb5aEQrEsw8jkvwongXtwlxQ
-	 EutZS2nbowl0cfiRa1P+3QzKkkB3RGsRs1pC4Hih2BzucMFeYvmVYhg9PceSmBfOpI
-	 X3Lh8Z0D16OcTMSyvArqM2Sc7q5ClHkwk6aMkfqtSGJvIfyXovh+gohlOQVgKr8ka2
-	 kvR7yUz9xTDHwwVqlvyIIOyrptR7M9MFuOPj3++DVfu7fHnlDoyvg1y3CxNdsmUfum
-	 DHwmXmppDgB+Rr9V17S7AqQZITD0WJYIYgBU4adbq1eRjVRlwxf9Phd5py48sy9YGy
-	 diqLgBsIJnplA==
+	b=DCM+ZLI9kuIX/R+wDd/Gm6pbCS+OmMIkYOTgk6DaWZKIWHTZoNJNBbHFuuQglit75
+	 XgedsYD9/uZuXFfzPz62V59BZXo0Nb+D+CLzAsIj15ntaQsBtr3yr9I3VaR6yQRHEJ
+	 YF7+n8v9qn2Hsxnhyy+8g9P4ecC/IcMH2Bpxm3YmPZysm4tH1bvlKlLAcsehkMG7Re
+	 pC/TY2GwAUOf9wXg0LX2EAlRdhHqnNOn1W5KLDdV4mjE/JvuJ44KlQruR0EtUHXm3z
+	 3sQrhhrtap7L6Clmyd/NuVSvq++kB4XBsjVcWeGuQLb5fQjK4D85FmrtwZiAMLN2+W
+	 XV16PNYe9Ovxw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 22/30] KVM: arm64: Return -EFAULT from VCPU_RUN on access to a poisoned pte
-Date: Mon,  5 Jan 2026 15:49:30 +0000
-Message-ID: <20260105154939.11041-23-will@kernel.org>
+Subject: [PATCH 23/30] KVM: arm64: Add hvc handler at EL2 for hypercalls from protected VMs
+Date: Mon,  5 Jan 2026 15:49:31 +0000
+Message-ID: <20260105154939.11041-24-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,141 +54,96 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If a protected vCPU faults on an IPA which appears to be mapped, query
-the hypervisor to determine whether or not the faulting pte has been
-poisoned by a forceful reclaim. If the pte has been poisoned, return
--EFAULT back to userspace rather than retrying the instruction forever.
+Add a hypercall handler at EL2 for hypercalls originating from protected
+VMs. For now, this implements only the FEATURES and MEMINFO calls, but
+subsequent patches will implement the SHARE and UNSHARE functions
+necessary for virtio.
+
+Unhandled hypercalls (including PSCI) are passed back to the host.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h              |  1 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 10 +++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 37 +++++++++++++++++++
- arch/arm64/kvm/pkvm.c                         |  9 +++--
- 5 files changed, 55 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c         | 37 ++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c       |  1 +
+ 3 files changed, 39 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 286a7379a368..178e2c2724ef 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -86,6 +86,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_in_poison_fault,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_force_reclaim_guest_page,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index f27b037abaf3..5e6cdafcdd69 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
- int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
-+int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu);
- int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
- int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
- int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 7d66cdd7de57..7ff87eb91112 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -570,6 +570,15 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
- }
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index a5a7bb453f3e..c904647d2f76 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -88,6 +88,7 @@ struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle);
+ struct pkvm_hyp_vm *get_np_pkvm_hyp_vm(pkvm_handle_t handle);
+ void put_pkvm_hyp_vm(struct pkvm_hyp_vm *hyp_vm);
  
-+static void handle___pkvm_vcpu_in_poison_fault(struct kvm_cpu_context *host_ctxt)
-+{
-+	int ret;
-+	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-+
-+	ret = hyp_vcpu ? __pkvm_vcpu_in_poison_fault(hyp_vcpu) : -EINVAL;
-+	cpu_reg(host_ctxt, 1) = ret;
-+}
-+
- static void handle___pkvm_force_reclaim_guest_page(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-@@ -637,6 +646,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_unreserve_vm),
- 	HANDLE_FUNC(__pkvm_init_vm),
- 	HANDLE_FUNC(__pkvm_init_vcpu),
-+	HANDLE_FUNC(__pkvm_vcpu_in_poison_fault),
- 	HANDLE_FUNC(__pkvm_force_reclaim_guest_page),
- 	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
- 	HANDLE_FUNC(__pkvm_start_teardown_vm),
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 5d6028c41125..57bc7ade30de 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -825,6 +825,43 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
- 	return 0;
- }
++bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
+ bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
+ bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
+ void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index df340de59eed..5cdec49e989b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -4,6 +4,8 @@
+  * Author: Fuad Tabba <tabba@google.com>
+  */
  
-+int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-+	kvm_pte_t pte;
-+	s8 level;
-+	u64 ipa;
-+	int ret;
++#include <kvm/arm_hypercalls.h>
 +
-+	switch (kvm_vcpu_trap_get_class(&hyp_vcpu->vcpu)) {
-+	case ESR_ELx_EC_DABT_LOW:
-+	case ESR_ELx_EC_IABT_LOW:
-+		if (kvm_vcpu_trap_is_translation_fault(&hyp_vcpu->vcpu))
+ #include <linux/kvm_host.h>
+ #include <linux/mm.h>
+ 
+@@ -934,3 +936,38 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
+ 	hyp_spin_unlock(&vm_table_lock);
+ 	return err;
+ }
++/*
++ * Handler for protected VM HVC calls.
++ *
++ * Returns true if the hypervisor has handled the exit (and control
++ * should return to the guest) or false if it hasn't (and the handling
++ * should be performed by the host).
++ */
++bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
++	bool handled = true;
++
++	switch (smccc_get_function(vcpu)) {
++	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
++		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
++		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
++		if (smccc_get_arg1(vcpu) ||
++		    smccc_get_arg2(vcpu) ||
++		    smccc_get_arg3(vcpu)) {
 +			break;
-+		fallthrough;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	ipa = kvm_vcpu_get_fault_ipa(&hyp_vcpu->vcpu);
-+	ipa |= kvm_vcpu_get_hfar(&hyp_vcpu->vcpu) & GENMASK(11, 0);
-+
-+	guest_lock_component(vm);
-+	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-+	if (ret)
-+		goto unlock;
-+
-+	if (level != KVM_PGTABLE_LAST_LEVEL) {
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	ret = guest_pte_is_poisoned(pte);
-+unlock:
-+	guest_unlock_component(vm);
-+	return ret;
-+}
-+
- int __pkvm_host_share_hyp(u64 pfn)
- {
- 	u64 phys = hyp_pfn_to_phys(pfn);
-diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index d1926cb08c76..14865907610c 100644
---- a/arch/arm64/kvm/pkvm.c
-+++ b/arch/arm64/kvm/pkvm.c
-@@ -417,10 +417,13 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			return -EINVAL;
- 
- 		/*
--		 * We raced with another vCPU.
-+		 * We either raced with another vCPU or the guest PTE
-+		 * has been poisoned by an erroneous host access.
- 		 */
--		if (mapping)
--			return -EAGAIN;
-+		if (mapping) {
-+			ret = kvm_call_hyp_nvhe(__pkvm_vcpu_in_poison_fault);
-+			return ret ? -EFAULT : -EAGAIN;
 +		}
++
++		val[0] = PAGE_SIZE;
++		break;
++	default:
++		/* Punt everything else back to the host, for now. */
++		handled = false;
++	}
++
++	if (handled)
++		smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
++	return handled;
++}
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index d3b9ec8a7c28..b62e25e8bb7e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -190,6 +190,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
  
- 		ret = kvm_call_hyp_nvhe(__pkvm_host_donate_guest, pfn, gfn);
- 	} else {
+ static const exit_handler_fn pvm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_HVC64]		= kvm_handle_pvm_hvc64,
+ 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
+ 	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
 -- 
 2.52.0.351.gbe84eed79e-goog
 
