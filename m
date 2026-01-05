@@ -1,104 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABC330DEC1;
-	Mon,  5 Jan 2026 16:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6701E412A
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 16:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767631556; cv=none; b=rPy+npUcl7b0z0YlKfduPyD2VKOuYaNZiVye3kc5/rB92l7cVw3zAtIdveyuCZoxtLQyKS38503dPJA2oUPgkF0/pm1GxVQHhijgGj4Tv/IGzDpTjSBkrmX3lLuIclziIt6VTkmpQo6O+gvRQsB+Zz8tE8x5CANKF5bTS7rt5qo=
+	t=1767631667; cv=none; b=nswh2c+35U24PmpiTrizhRc9ksg5KD8ZMvGm/McBcoT9HmOpJV0iNqEv9L5KOgKm6Yo7i3Z9IUKi4NNNpsPqTO8kRDZaPH3ogfK9jKNwGk/ySoS7ZzPGmKGTe1A6EG3sDr21L3276ULSpW2Ro8BjAZ9Bj4OXEnHm6dC7TnaO02Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767631556; c=relaxed/simple;
-	bh=hRalsOfosJADEMwrxolfPeTiI+tRS96R5nKkLXSFV/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IyYwDY8kHKAGltiEDCXX2vHHSaHeQT0vPUf5TlZEkhZIiQQU3F5H/NaT9NpQ9SjlwsolpRc0u+vdvGd8GdGyM2hBO9ZowKWJnQ+18b62Z50lmSiisgEU1mfqGlocXsaxwYAqjn3M43R/zFRvevNlYtm/GwrfYZRwNo53LUDobxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dPfguw5w; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPfguw5w"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B224C116D0;
-	Mon,  5 Jan 2026 16:45:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767631555;
-	bh=hRalsOfosJADEMwrxolfPeTiI+tRS96R5nKkLXSFV/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dPfguw5wUf0G5rvgYSSC+g28McqYU8gqXVj8JYZ+U8ufWLR7fto+11FmxnlkVAxpl
-	 N7iSNf2UWBzRnGn+E1W12qH2/H+zIhgltq1o+HRYJA6RrIeL5Jyqv/WVux6VeBIM2j
-	 uTYiGXzfhMmrH2o7mFMzPfqVGZQgD/acDW0xD67Fy5HXACXJKk0PCRSJkfEAZ7vkdL
-	 BCDDhWuwbUSAnGqGGrgJpAIFoGeZ6aPJtbJeZwPKvP7KL2exfNnBx8jZ52jx1XNasD
-	 Ut3JWJH/qncBbGk9Tdbkd2sW1v+zKNwNRvPUnuM/jhFQAxKfXQv+6T59eyayyKb1py
-	 7Z/KNGAwnelPg==
-Date: Mon, 5 Jan 2026 16:45:50 +0000
-From: Mark Brown <broonie@kernel.org>
+	s=arc-20240116; t=1767631667; c=relaxed/simple;
+	bh=jB79SVycgpWUHqu56CTIEX8Dr2rt+TWxNn3oa0hK3gA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TWH9WyWKdnckJGI2GUZr4lmdTxq8aDZ6E6TRxhQzdLsMKOmwNUlzBL4M9BJ/bSN63MphvB8rZk++yNfNLs/hdCThkHLYmELodWtcOzXk/Igha48ADFZ+ouDTEKq7y8ScJU+SSYgYYUbLx05XHC5WqlxG2i/odd1bCmlYubvR0Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlKwW0qpSzHnGhT;
+	Tue,  6 Jan 2026 00:47:39 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id A183B40570;
+	Tue,  6 Jan 2026 00:47:41 +0800 (CST)
+Received: from localhost (10.126.174.38) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 5 Jan
+ 2026 16:47:40 +0000
+Date: Mon, 5 Jan 2026 16:47:38 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Ben Horgan <ben.horgan@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] KVM: selftests: arm64: Skip all 32 bit IDs when
- set_id_regs is aarch64 only
-Message-ID: <90fb25bd-fa79-4980-902b-497346a3e6d5@sirena.org.uk>
-References: <20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org>
- <20251219-kvm-arm64-set-id-regs-aarch64-v3-4-bfa474ec3218@kernel.org>
- <363e440d-4e29-4286-ade4-b4be2f856859@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v2 06/45] KVM: arm64: Make MPAMSM_EL1 accesses UNDEF
+Message-ID: <20260105164738.0000792f@huawei.com>
+In-Reply-To: <20251219181147.3404071-7-ben.horgan@arm.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+	<20251219181147.3404071-7-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="jUgQ9HrVrHCgvOyK"
-Content-Disposition: inline
-In-Reply-To: <363e440d-4e29-4286-ade4-b4be2f856859@arm.com>
-X-Cookie: So many women
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
+On Fri, 19 Dec 2025 18:11:08 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
 
---jUgQ9HrVrHCgvOyK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> The MPAMSM_EL1 controls the MPAM labeling for an SMCU, Streaming Mode
+> Compute Unit. As there is on MPAM support in kvm, make sure MPAMSM_EL1
+> accesses trigger an UNDEF.
+> 
+> The range of valid configurations for the PARTID and PMG in MPAMSM_EL1 is
+> not currently specified in Arm Architectural Reference Manual but the
+> architect has confirmed that it is intended to be the same as that for the
+> cpu configuration in the MPAMy_ELx registers.
 
-On Fri, Jan 02, 2026 at 02:50:07PM +0000, Ben Horgan wrote:
-> On 12/19/25 19:28, Mark Brown wrote:
+Good to know but I'm not seeing why it matters in this patch. Perhaps
+a little more on that?
 
-> > +			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
-> > +				ksft_test_result_skip("%s value seen in guest\n",
-> > +						      get_reg_name(reg_id));
-> > +				break;
-> > +			}
-> > +
+> 
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 
-> Unnecessary? The decision for which regs are testing is made in
-> guest_code().
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
-The guest code has a fixed list of registers it reads blindly and we
-skip the write for these so our expected value won't be something we
-explicitly set.  The actual test is done here in the host code and it
-seems both more maintainable to keep the skip adjacent to the live test
-and clearer to be more explicit about nothing actually being tested.
+> ---
+>  arch/arm64/kvm/sys_regs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c8fd7c6a12a1..72654ab984ee 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -3373,6 +3373,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	{ SYS_DESC(SYS_MPAM1_EL1), undef_access },
+>  	{ SYS_DESC(SYS_MPAM0_EL1), undef_access },
+> +	{ SYS_DESC(SYS_MPAMSM_EL1), undef_access },
+> +
+>  	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+>  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+>  
 
-> > +	if (aarch64_only && sys_reg_CRm(encoding) < 4) {
-
-> Doesn't this exclude more registers than needed? E.g. MIDR?
-
-Yes, I took this test from somewhere without thinking about it properly
-- it's been so long I can't remember but it was clearly wrong in this
-context.  I'll update.
-
---jUgQ9HrVrHCgvOyK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlb6r0ACgkQJNaLcl1U
-h9B3Wwf9Ei81DVRAliYp+f2cGXjW5ohJtH7FHEVkRHuPfeDT/8tWAFsmGjASwsQv
-4Xm4CiVybCEghpj+Ld9vTaF0LYm1yaNVkTPl0EuIWBxMXBxI2OaXhqZ2+N8tzhQ7
-vdBXg9vaumylp81y7RDEeaHySwWg7ZtydV4zNMoq6bRkq02iwcuuDuC6hYwUSOFR
-hpr3yKDBfZ/kDHzZ3IUFrKiGQQCKuHtZ0FZgBPP0syz9rMVmxBaAAyKPGNmEtuvv
-iH5iQy58lagYJfMrRFTxYnAg4w0jN9VIFjiSxabF213G+fIyx0qtpw6X2SiZBof9
-e6MtF7Jgpg4sNydpvFXSxryixWYU3A==
-=HcmY
------END PGP SIGNATURE-----
-
---jUgQ9HrVrHCgvOyK--
