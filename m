@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F1730171E
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04432F25E4
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628193; cv=none; b=js4Yy3uJaYnNI5XN3gIpXrRKFk2y+SBuQy1DXCBVg+uHDIo54M2cJfFzIIMVa3wXd9zSaInTf1NOXdZjGixQJ1xVgY1aYaYR9AnXDcx5CUTaHd8LZGk+xmzIpI5V7/no590s5ILbPLYQ9MOjmpfgTbLSZi3JPSE5+Y3f0luYhyk=
+	t=1767628196; cv=none; b=Ceb8iwnBl84jrV1ZiAQcJm3fsAEcwN3AtPD4e6x9V8YR2z9dJs54mI5whCP+4Cw+V8Kd2Rle9W1XUziBQ7yy3pw06b52hPsfd8ZDKTsePhbgZo6fa2S1Q5AO6hYO/lkA7KRHZKNVoMfMyeG3e124MA6V0kp2ANtjkQTmmcjmFcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628193; c=relaxed/simple;
-	bh=zbwUAySWAKjA5IrzqGLt8nDlDXfGLsLP1mmjtywGkbs=;
+	s=arc-20240116; t=1767628196; c=relaxed/simple;
+	bh=EiR6H2PI7nrIrBLjfYnWtgkFePwcLsCE5gSk6ktCNXc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uEX3nz3E1p7c75ekEqqV1zT4tBRLUBqB5ARAuJ3IqkllPjvVZpvdS03Kf3llqTW6WZygW/tReQS8FIQRqgy9PJ2M8vbci155e0/psTmo/0G/+hb5tMT6pM2QE2NXthtbohLzEOTAF/xZVa8RjJx9vrWFrfYDfelijdXpJkIPkTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqXUjuL8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=uJMEnd/3t9H2hbxcvfW8RSgdcdXD/cVbHROhfsxD6bAXh1gmgTJbjFxrZEwkLm8AgW0kHpZsupguLEHh9vAk2/NMpfrbdsIKtbWfBOZLSRuspK2YiLrTVbkNbRz9Rj1d57RS/TsCYUN5z04WVrg9Ac6Gtx1mrkp5l3YwOkogkAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBAIRSDY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqXUjuL8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79298C19421;
-	Mon,  5 Jan 2026 15:49:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBAIRSDY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A85FC19422;
+	Mon,  5 Jan 2026 15:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628193;
-	bh=zbwUAySWAKjA5IrzqGLt8nDlDXfGLsLP1mmjtywGkbs=;
+	s=k20201202; t=1767628196;
+	bh=EiR6H2PI7nrIrBLjfYnWtgkFePwcLsCE5gSk6ktCNXc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GqXUjuL8mG+UzSHn4GOzS4zVbbXHEekIk6Pe6h2VhGl7QSANUlCCg57jauug2icjX
-	 tbmEh+dbwhD3LQARUd5sUAa8SZC1M+iNBbJ+JpE89Zqno0wXMdPhQQLiKMPjOucZBo
-	 X5KNePecN/NxlOW2CZaNRSRvSFURZhDmXson9DvpqwRilT+3b6sVK7OzqLyBlDGCKY
-	 na2VsmWDIYnON+sYzMwtqVZQ2qkdksHWoG42LIZZuyWSJ8TlUn3rLuvillW1L6xaO5
-	 4VwupIhrtjazXjQqFKGHJsjuNGEI97zE81jztVXsndW/GrdRofTzx1FDeQH7q1ovNe
-	 Qd9hrwOVSzM8A==
+	b=rBAIRSDYUKhc0GKyLg828rNJP/qvq5dmeIVRDu5lPb/0YjbNzAtuMeexjV/izbd2U
+	 vETtcCVLAJhzubw+LeR/NvTdBUUH8XdQy6tZOM/6BvovJmplpLRaJFpYNii7T2CIa8
+	 rcsa7VUZsD77hOknzd844kAt4YhXvByD9OUUjyksq7Op6QSemNRZ86KtxBTUylLtzt
+	 KJYv9IdkhHdx7YOO2n/YGapiOd1qIbGca7GFDmrfCCh9/HE6OmoAFMs2DsD/vJSjFi
+	 ffh9wuNcCKpvyINvLF8uSr62I3TMQp25ys+qsAHn+YYd8m3rRSo+Pg68hLFj3ZEJjb
+	 oVeMGrNivtTpw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 01/30] KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
-Date: Mon,  5 Jan 2026 15:49:09 +0000
-Message-ID: <20260105154939.11041-2-will@kernel.org>
+Subject: [PATCH 02/30] KVM: arm64: Remove redundant 'pgt' pointer checks from MMU notifiers
+Date: Mon,  5 Jan 2026 15:49:10 +0000
+Message-ID: <20260105154939.11041-3-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,129 +54,81 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit ddcadb297ce5 ("KVM: arm64: Ignore EAGAIN for walks outside of a
-fault") introduced a new walker flag ('KVM_PGTABLE_WALK_HANDLE_FAULT')
-to KVM's page-table code. When set, the walk logic maintains its
-previous behaviour of terminating a walk as soon as the visitor callback
-returns an error. However, when the flag is clear, the walk will
-continue if the visitor returns -EAGAIN and the error is then suppressed
-and returned as zero to the caller.
+The MMU notifiers are registered by kvm_init_mmu_notifier() only after
+kvm_arch_init_vm() has returned successfully. Since the latter function
+initialises the 'kvm->arch.mmu.pgt' pointer (and allocates the VM handle
+when pKVM is enabled), the initialisation checks in the MMU notifiers
+are not required.
 
-Clearing the flag is beneficial when write-protecting a range of IPAs
-with kvm_pgtable_stage2_wrprotect() but is not useful in any other
-cases, either because we are operating on a single page (e.g.
-kvm_pgtable_stage2_mkyoung() or kvm_phys_addr_ioremap()) or because the
-early termination is desirable (e.g. when mapping pages from a fault in
-user_mem_abort()).
+Remove the redundant checks from the MMU notifier callbacks.
 
-Subsequently, commit e912efed485a ("KVM: arm64: Introduce the EL1 pKVM
-MMU") hooked up pKVM's hypercall interface to the MMU code at EL1 but
-failed to propagate any of the walker flags. As a result, page-table
-walks at EL2 fail to set KVM_PGTABLE_WALK_HANDLE_FAULT even when the
-early termination semantics are desirable on the fault handling path.
-
-Rather than complicate the pKVM hypercall interface, invert the flag so
-that the whole thing can be simplified and only pass the new flag
-('KVM_PGTABLE_WALK_IGNORE_EAGAIN') from the wrprotect code.
-
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Fixes: fce886a60207 ("KVM: arm64: Plumb the pKVM MMU in KVM")
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 6 +++---
- arch/arm64/kvm/hyp/pgtable.c         | 5 +++--
- arch/arm64/kvm/mmu.c                 | 8 +++-----
- 3 files changed, 9 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/mmu.c  | 9 ---------
+ arch/arm64/kvm/pkvm.c | 9 ++++++---
+ 2 files changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index fc02de43c68d..8b78d573fbcf 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -293,8 +293,8 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
-  *					children.
-  * @KVM_PGTABLE_WALK_SHARED:		Indicates the page-tables may be shared
-  *					with other software walkers.
-- * @KVM_PGTABLE_WALK_HANDLE_FAULT:	Indicates the page-table walk was
-- *					invoked from a fault handler.
-+ * @KVM_PGTABLE_WALK_IGNORE_EAGAIN:	Don't terminate the walk early if
-+ *					the walker returns -EAGAIN.
-  * @KVM_PGTABLE_WALK_SKIP_BBM_TLBI:	Visit and update table entries
-  *					without Break-before-make's
-  *					TLB invalidation.
-@@ -307,7 +307,7 @@ enum kvm_pgtable_walk_flags {
- 	KVM_PGTABLE_WALK_TABLE_PRE		= BIT(1),
- 	KVM_PGTABLE_WALK_TABLE_POST		= BIT(2),
- 	KVM_PGTABLE_WALK_SHARED			= BIT(3),
--	KVM_PGTABLE_WALK_HANDLE_FAULT		= BIT(4),
-+	KVM_PGTABLE_WALK_IGNORE_EAGAIN		= BIT(4),
- 	KVM_PGTABLE_WALK_SKIP_BBM_TLBI		= BIT(5),
- 	KVM_PGTABLE_WALK_SKIP_CMO		= BIT(6),
- };
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 947ac1a951a5..9abc0a6cf448 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -144,7 +144,7 @@ static bool kvm_pgtable_walk_continue(const struct kvm_pgtable_walker *walker,
- 	 * page table walk.
- 	 */
- 	if (r == -EAGAIN)
--		return !(walker->flags & KVM_PGTABLE_WALK_HANDLE_FAULT);
-+		return walker->flags & KVM_PGTABLE_WALK_IGNORE_EAGAIN;
- 
- 	return !r;
- }
-@@ -1262,7 +1262,8 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
- {
- 	return stage2_update_leaf_attrs(pgt, addr, size, 0,
- 					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
--					NULL, NULL, 0);
-+					NULL, NULL,
-+					KVM_PGTABLE_WALK_IGNORE_EAGAIN);
- }
- 
- void kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 48d7c372a4cd..2b260bdf3202 100644
+index 2b260bdf3202..5d18927f76ba 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1563,14 +1563,12 @@ static void adjust_nested_exec_perms(struct kvm *kvm,
- 		*prot &= ~KVM_PGTABLE_PROT_PX;
+@@ -2208,9 +2208,6 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+ 
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+-	if (!kvm->arch.mmu.pgt)
+-		return false;
+-
+ 	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+@@ -2223,9 +2220,6 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
+ 
+-	if (!kvm->arch.mmu.pgt)
+-		return false;
+-
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+ 						   range->start << PAGE_SHIFT,
+ 						   size, true);
+@@ -2239,9 +2233,6 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
+ 
+-	if (!kvm->arch.mmu.pgt)
+-		return false;
+-
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+ 						   range->start << PAGE_SHIFT,
+ 						   size, false);
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index d7a0f69a9982..7797813f4dbe 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -329,9 +329,6 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+ 	struct pkvm_mapping *mapping;
+ 	int ret;
+ 
+-	if (!handle)
+-		return 0;
+-
+ 	for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+ 					mapping->nr_pages);
+@@ -347,6 +344,12 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+ 					u64 addr, u64 size)
+ {
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
++	pkvm_handle_t handle = kvm->arch.pkvm.handle;
++
++	if (!handle)
++		return;
++
+ 	__pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
  }
  
--#define KVM_PGTABLE_WALK_MEMABORT_FLAGS (KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED)
--
- static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		      struct kvm_s2_trans *nested,
- 		      struct kvm_memory_slot *memslot, bool is_perm)
- {
- 	bool write_fault, exec_fault, writable;
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
- 	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
- 	unsigned long mmu_seq;
-@@ -1665,7 +1663,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct kvm_pgtable *pgt;
- 	struct page *page;
- 	vm_flags_t vm_flags;
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_MEMABORT_FLAGS;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 
- 	if (fault_is_perm)
- 		fault_granule = kvm_vcpu_trap_get_perm_fault_granule(vcpu);
-@@ -1933,7 +1931,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- /* Resolve the access fault by making the page young again. */
- static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- {
--	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_HANDLE_FAULT | KVM_PGTABLE_WALK_SHARED;
-+	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
- 	struct kvm_s2_mmu *mmu;
- 
- 	trace_kvm_access_fault(fault_ipa);
 -- 
 2.52.0.351.gbe84eed79e-goog
 
