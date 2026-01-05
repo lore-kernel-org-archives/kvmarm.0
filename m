@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8E9316195
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:51:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF3E13B293
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628264; cv=none; b=YN6iBA7BDhoTF19f/gUXIbpvVSyla3kDKdwj0jy9MqnXN/kwBdGEaSARx29apO+Mf+f3nIgiaHvlh6s7Bdpo6f+1Dh2LU/2i9DK8NkRbcybuWPyRFXR7NHmlM56HFkWBbQnnNQgx6PbBhJRVkEzBEzVql7TH7JJ+tj6FYomVjUw=
+	t=1767628265; cv=none; b=ez2+wPc7ckfbpxZ4GuBWx0YVOfuLF5J+ASs3JLhcKY+Ics50husO98nAboCgdsD0z5EonWwmoTNROSpX3XO7wnsemy7OKgdfdF6W0iqFlWydPDCbT7R+liJvo2i6C1/DyA/PiLxLiHYopeq5i4iQXH39jhFsq+TaEhYTckQPy6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628264; c=relaxed/simple;
-	bh=KyqwmpkT0XzVRJbn7urXKIik32fzcIYZDfk4aQ0aieE=;
+	s=arc-20240116; t=1767628265; c=relaxed/simple;
+	bh=YNvu255a1Tw9yZ9O0OupE0EjkgOrXU/xt1/DGcp4Abo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NilpAD1BicMxXbU4VGENKkMd3a4PLDd1SnlDdedw5/+ishj0Sc17LTuIDxGyw/MNqRGkjDE1k6MqqHmUEiw5Yauxrg482q1CREQqVfDJPYuDqZnJcHVhZ9Dmgbhfxp16bKzawZs+xgZ784Qgb2BBX3UdB1tbgTQrygxdnJfL++A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCM+ZLI9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Ehr/YD6Tb+xzmW3XW8V6iktf4hDFk5axqrYjBbA6Mz95ZkLCFW7w0Z+aTlczGbR8kTCtI8NMttawyRViIclc+eacxOisEXkWtdNIyijKieeLLBUWSY7OtrNAwjxW4WPZYxht06sz3U0ha6AVss8XocEgy4caNP8Z+l/j8F1+2X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KmT2HtlU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCM+ZLI9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08AABC116D0;
-	Mon,  5 Jan 2026 15:50:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KmT2HtlU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F45EC19424;
+	Mon,  5 Jan 2026 15:51:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628261;
-	bh=KyqwmpkT0XzVRJbn7urXKIik32fzcIYZDfk4aQ0aieE=;
+	s=k20201202; t=1767628264;
+	bh=YNvu255a1Tw9yZ9O0OupE0EjkgOrXU/xt1/DGcp4Abo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DCM+ZLI9kuIX/R+wDd/Gm6pbCS+OmMIkYOTgk6DaWZKIWHTZoNJNBbHFuuQglit75
-	 XgedsYD9/uZuXFfzPz62V59BZXo0Nb+D+CLzAsIj15ntaQsBtr3yr9I3VaR6yQRHEJ
-	 YF7+n8v9qn2Hsxnhyy+8g9P4ecC/IcMH2Bpxm3YmPZysm4tH1bvlKlLAcsehkMG7Re
-	 pC/TY2GwAUOf9wXg0LX2EAlRdhHqnNOn1W5KLDdV4mjE/JvuJ44KlQruR0EtUHXm3z
-	 3sQrhhrtap7L6Clmyd/NuVSvq++kB4XBsjVcWeGuQLb5fQjK4D85FmrtwZiAMLN2+W
-	 XV16PNYe9Ovxw==
+	b=KmT2HtlUpbUE/7+63Ea6mKBVfbsFbDCKuH24gLyvqvLsG1QlXU+jLgnka+4XDpKrL
+	 VRVjNqzquoiSPpyOeyU3kme7s4dF84XSNJD+tze4A6n8TD7spMesfSPIxoKln+8Gst
+	 qiLo/9LFEyQfDvmmB23fD4IKOAxtrMvDeOUlB5vhZYiv6vhrzxVrykdHa5U8fz7o48
+	 RnO0yEMCNrlugxuh0zbjJQr0mycas1GLGJPjL+ZJMyJuAf2rDN2TWA/IayWvM/IFBh
+	 mxXikXNF/uPI8A3f+R4MHtAevTxRqj3/5mh4jxGqCWVQGuJ5JyDvJktlkXznPdRwmr
+	 Z4LcpMgNP+VAA==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 23/30] KVM: arm64: Add hvc handler at EL2 for hypercalls from protected VMs
-Date: Mon,  5 Jan 2026 15:49:31 +0000
-Message-ID: <20260105154939.11041-24-will@kernel.org>
+Subject: [PATCH 24/30] KVM: arm64: Implement the MEM_SHARE hypercall for protected VMs
+Date: Mon,  5 Jan 2026 15:49:32 +0000
+Message-ID: <20260105154939.11041-25-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,96 +54,157 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a hypercall handler at EL2 for hypercalls originating from protected
-VMs. For now, this implements only the FEATURES and MEMINFO calls, but
-subsequent patches will implement the SHARE and UNSHARE functions
-necessary for virtio.
-
-Unhandled hypercalls (including PSCI) are passed back to the host.
+Implement the ARM_SMCCC_KVM_FUNC_MEM_SHARE hypercall to allow protected
+VMs to share memory (e.g. the swiotlb bounce buffers) back to the host.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  1 +
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 37 ++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/switch.c       |  1 +
- 3 files changed, 39 insertions(+)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 32 ++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 61 +++++++++++++++++++
+ 3 files changed, 94 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index a5a7bb453f3e..c904647d2f76 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -88,6 +88,7 @@ struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle);
- struct pkvm_hyp_vm *get_np_pkvm_hyp_vm(pkvm_handle_t handle);
- void put_pkvm_hyp_vm(struct pkvm_hyp_vm *hyp_vm);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 5e6cdafcdd69..42fd60c5cfc9 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -35,6 +35,7 @@ extern unsigned long hyp_nr_cpus;
  
-+bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code);
- bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
- bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code);
- void kvm_init_pvm_id_regs(struct kvm_vcpu *vcpu);
+ int __pkvm_prot_finalize(void);
+ int __pkvm_host_share_hyp(u64 pfn);
++int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
+ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 57bc7ade30de..365c769c82a4 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -888,6 +888,38 @@ int __pkvm_host_share_hyp(u64 pfn)
+ 	return ret;
+ }
+ 
++int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
++{
++	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
++	u64 phys, ipa = hyp_pfn_to_phys(gfn);
++	kvm_pte_t pte;
++	int ret;
++
++	host_lock_component();
++	guest_lock_component(vm);
++
++	ret = get_valid_guest_pte(vm, ipa, &pte, &phys);
++	if (ret)
++		goto unlock;
++
++	ret = -EPERM;
++	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) != PKVM_PAGE_OWNED)
++		goto unlock;
++	if (__host_check_page_state_range(phys, PAGE_SIZE, PKVM_NOPAGE))
++		goto unlock;
++
++	ret = 0;
++	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
++				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
++				       &vcpu->vcpu.arch.pkvm_memcache, 0));
++	WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
++unlock:
++	guest_unlock_component(vm);
++	host_unlock_component();
++
++	return ret;
++}
++
+ int __pkvm_host_unshare_hyp(u64 pfn)
+ {
+ 	u64 phys = hyp_pfn_to_phys(pfn);
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index df340de59eed..5cdec49e989b 100644
+index 5cdec49e989b..d8afa2b98542 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -4,6 +4,8 @@
-  * Author: Fuad Tabba <tabba@google.com>
-  */
- 
-+#include <kvm/arm_hypercalls.h>
-+
- #include <linux/kvm_host.h>
- #include <linux/mm.h>
- 
-@@ -934,3 +936,38 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
+@@ -936,6 +936,58 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
  	hyp_spin_unlock(&vm_table_lock);
  	return err;
  }
-+/*
-+ * Handler for protected VM HVC calls.
-+ *
-+ * Returns true if the hypervisor has handled the exit (and control
-+ * should return to the guest) or false if it hasn't (and the handling
-+ * should be performed by the host).
-+ */
-+bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u64 val[4] = { SMCCC_RET_INVALID_PARAMETER };
-+	bool handled = true;
 +
-+	switch (smccc_get_function(vcpu)) {
-+	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-+		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-+		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
-+		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
-+		if (smccc_get_arg1(vcpu) ||
-+		    smccc_get_arg2(vcpu) ||
++static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
++{
++	u64 elr;
++
++	/* Fake up a data abort (level 3 translation fault on write) */
++	vcpu->arch.fault.esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
++				   ESR_ELx_WNR | ESR_ELx_FSC_FAULT |
++				   FIELD_PREP(ESR_ELx_FSC_LEVEL, 3);
++
++	/* Shuffle the IPA around into the HPFAR */
++	vcpu->arch.fault.hpfar_el2 = (HPFAR_EL2_NS | (ipa >> 8)) & HPFAR_MASK;
++
++	/* This is a virtual address. 0's good. Let's go with 0. */
++	vcpu->arch.fault.far_el2 = 0;
++
++	/* Rewind the ELR so we return to the HVC once the IPA is mapped */
++	elr = read_sysreg(elr_el2);
++	elr -= 4;
++	write_sysreg(elr, elr_el2);
++
++	return ARM_EXCEPTION_TRAP;
++}
++
++static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	struct pkvm_hyp_vcpu *hyp_vcpu;
++	u64 ipa = smccc_get_arg1(vcpu);
++
++	if (!PAGE_ALIGNED(ipa))
++		goto out_guest;
++
++	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
++	switch (__pkvm_guest_share_host(hyp_vcpu, hyp_phys_to_pfn(ipa))) {
++	case 0:
++		ret[0] = SMCCC_RET_SUCCESS;
++		goto out_guest;
++	case -ENOENT:
++		/*
++		 * Convert the exception into a data abort so that the page
++		 * being shared is mapped into the guest next time.
++		 */
++		*exit_code = __pkvm_memshare_page_req(vcpu, ipa);
++		goto out_host;
++	}
++
++out_guest:
++	return true;
++out_host:
++	return false;
++}
++
+ /*
+  * Handler for protected VM HVC calls.
+  *
+@@ -952,6 +1004,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+ 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE);
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
+ 		if (smccc_get_arg1(vcpu) ||
+@@ -962,6 +1015,14 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 
+ 		val[0] = PAGE_SIZE;
+ 		break;
++	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
++		if (smccc_get_arg2(vcpu) ||
 +		    smccc_get_arg3(vcpu)) {
 +			break;
 +		}
 +
-+		val[0] = PAGE_SIZE;
++		handled = pkvm_memshare_call(val, vcpu, exit_code);
 +		break;
-+	default:
-+		/* Punt everything else back to the host, for now. */
-+		handled = false;
-+	}
-+
-+	if (handled)
-+		smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
-+	return handled;
-+}
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index d3b9ec8a7c28..b62e25e8bb7e 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -190,6 +190,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
- 
- static const exit_handler_fn pvm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
-+	[ESR_ELx_EC_HVC64]		= kvm_handle_pvm_hvc64,
- 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
- 	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+ 	default:
+ 		/* Punt everything else back to the host, for now. */
+ 		handled = false;
 -- 
 2.52.0.351.gbe84eed79e-goog
 
