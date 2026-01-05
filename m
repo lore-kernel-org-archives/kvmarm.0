@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEE33074B1
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9720B3321BD
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 15:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767628257; cv=none; b=V+FbDvX3fbY92xM4/eqiylEMSpWvOzvMEjZPrzqDQnc+DjNJ3r3W2T3wVrZfQhfx6t9W381jU0JBoJiz/v3YmySZQytEF9gf25eVLI7ntboBbbEgPBRnv3c0avE7GEN3AXpYcl7AH9utwP4yPEBjSrdgrNwZ5H03GqHj5PMuMwA=
+	t=1767628259; cv=none; b=uTVk1sx7+CEjSwlU5DCKqaRVmn0QlzSaudh+ujzfIHQ0azo3aJQmappX9q6105PuCw4ywPSRrdG4WTwU9OOILvyugbeaQx76efl8y4xZp8HvFtlg85sp4HjdRT1Ki5LnVcVC1ur48p3M2Y/MhLbxEexjA+Rl2DFaiVh6ADyABBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767628257; c=relaxed/simple;
-	bh=EpzLnQBXn8mrjL7opGuG4rLr8XkES6NfQqysWJd4Q5Q=;
+	s=arc-20240116; t=1767628259; c=relaxed/simple;
+	bh=ReZO4nEoAFKs1VIoWkegfR0g0ToMLtVz4CXpRkmj0zc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HOqYnq7yvTv1P92i8KYCkS2Wa1uJ6DKy/TwGmG/y7ihSrY/JrREMCUu0eqvDwbku8KzjR1xB/ha83+p06TR9dAZgA0M8+fY17hvCC5ZkkSIpiO3wMlQHFHovNbfqmZjv2JIhbvAzhl836EAPwbfgF6x6t4BYJi/XViQZLvbykPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IWyh+2Wx; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Gi4z5BnhbBXHfFHVnf30jYF/cKyGon+6+IsCvIJxFj49VC2IsCszbsJlYyDcika/aPpw+cEEJsMgzlxt0qKUQaxNL+o8wMacunkHvvqTYE7eBr68VL4Xy8OUzCE3TQKz0w/xQTIjO9wNMQzKCoEMshYfWw2zBC3OovOPnk66iJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+IZUUAg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IWyh+2Wx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A96C19422;
-	Mon,  5 Jan 2026 15:50:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+IZUUAg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E561EC19425;
+	Mon,  5 Jan 2026 15:50:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767628255;
-	bh=EpzLnQBXn8mrjL7opGuG4rLr8XkES6NfQqysWJd4Q5Q=;
+	s=k20201202; t=1767628258;
+	bh=ReZO4nEoAFKs1VIoWkegfR0g0ToMLtVz4CXpRkmj0zc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IWyh+2WxW1HOlaOPWsrAdZGs3Y5DmMID9N5Xo12zgMxhdKsk4NtOePnDVVWkwHXBR
-	 T7A8Teq0oMDx8qsLw/hLMNkESZeko20oppSb6leBjQp9RssAZBJ4Jm+1DXkZ0TbLv8
-	 v2EhXkJZbMNyXiOggHtcxHGPzTtzwiSg4kVGEoYtU2CvAEywyGquPdA4dgP5DxXLfw
-	 z+/j61fxuyjuyq2ISYrtg3HuXcT8enb6uFyzicM5i24sW7KCdT70w8Jg28/oyVqT7W
-	 20+8SZQDnGBgbwY36bYxcL0pCsOLIH+BH+LNchq6WE4itAW9YQizBF2aHQUC8QYUOT
-	 YTHTxaXyL24KQ==
+	b=e+IZUUAgWszcoCZTpYDWEptUuoR55s8TxMNIcDXLPtb5aEQrEsw8jkvwongXtwlxQ
+	 EutZS2nbowl0cfiRa1P+3QzKkkB3RGsRs1pC4Hih2BzucMFeYvmVYhg9PceSmBfOpI
+	 X3Lh8Z0D16OcTMSyvArqM2Sc7q5ClHkwk6aMkfqtSGJvIfyXovh+gohlOQVgKr8ka2
+	 kvR7yUz9xTDHwwVqlvyIIOyrptR7M9MFuOPj3++DVfu7fHnlDoyvg1y3CxNdsmUfum
+	 DHwmXmppDgB+Rr9V17S7AqQZITD0WJYIYgBU4adbq1eRjVRlwxf9Phd5py48sy9YGy
+	 diqLgBsIJnplA==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH 21/30] KVM: arm64: Reclaim faulting page from pKVM in spurious fault handler
-Date: Mon,  5 Jan 2026 15:49:29 +0000
-Message-ID: <20260105154939.11041-22-will@kernel.org>
+Subject: [PATCH 22/30] KVM: arm64: Return -EFAULT from VCPU_RUN on access to a poisoned pte
+Date: Mon,  5 Jan 2026 15:49:30 +0000
+Message-ID: <20260105154939.11041-23-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260105154939.11041-1-will@kernel.org>
 References: <20260105154939.11041-1-will@kernel.org>
@@ -54,98 +54,141 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Host kernel accesses to pages that are inaccessible at stage-2 result in
-the injection of a translation fault, which is fatal unless an exception
-table fixup is registered for the faulting PC (e.g. for user access
-routines). This is undesirable, since a get_user_pages() call could be
-used to obtain a reference to a donated page and then a subsequent
-access via a kernel mapping would lead to a panic().
-
-Rework the spurious fault handler so that stage-2 faults injected back
-into the host result in the target page being forcefully reclaimed when
-no exception table fixup handler is registered.
+If a protected vCPU faults on an IPA which appears to be mapped, query
+the hypervisor to determine whether or not the faulting pte has been
+poisoned by a forceful reclaim. If the pte has been poisoned, return
+-EFAULT back to userspace rather than retrying the instruction forever.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/virt.h |  6 ++++++
- arch/arm64/kvm/pkvm.c         |  7 +++++++
- arch/arm64/mm/fault.c         | 15 +++++++++------
- 3 files changed, 22 insertions(+), 6 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h              |  1 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 10 +++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 37 +++++++++++++++++++
+ arch/arm64/kvm/pkvm.c                         |  9 +++--
+ 5 files changed, 55 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index b51ab6840f9c..e80addc923a4 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -94,6 +94,12 @@ static inline bool is_pkvm_initialized(void)
- 	       static_branch_likely(&kvm_protected_mode_initialized);
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 286a7379a368..178e2c2724ef 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -86,6 +86,7 @@ enum __kvm_host_smccc_func {
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
++	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_in_poison_fault,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_force_reclaim_guest_page,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index f27b037abaf3..5e6cdafcdd69 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+ int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+ int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
++int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu);
+ int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
+ int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
+ int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 7d66cdd7de57..7ff87eb91112 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -570,6 +570,15 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
  }
  
-+#ifdef CONFIG_KVM
-+bool pkvm_reclaim_guest_page(phys_addr_t phys);
-+#else
-+static inline bool pkvm_reclaim_guest_page(phys_addr_t phys) { return false; }
-+#endif
++static void handle___pkvm_vcpu_in_poison_fault(struct kvm_cpu_context *host_ctxt)
++{
++	int ret;
++	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
 +
- /* Reports the availability of HYP mode */
- static inline bool is_hyp_mode_available(void)
++	ret = hyp_vcpu ? __pkvm_vcpu_in_poison_fault(hyp_vcpu) : -EINVAL;
++	cpu_reg(host_ctxt, 1) = ret;
++}
++
+ static void handle___pkvm_force_reclaim_guest_page(struct kvm_cpu_context *host_ctxt)
  {
+ 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+@@ -637,6 +646,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_unreserve_vm),
+ 	HANDLE_FUNC(__pkvm_init_vm),
+ 	HANDLE_FUNC(__pkvm_init_vcpu),
++	HANDLE_FUNC(__pkvm_vcpu_in_poison_fault),
+ 	HANDLE_FUNC(__pkvm_force_reclaim_guest_page),
+ 	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
+ 	HANDLE_FUNC(__pkvm_start_teardown_vm),
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 5d6028c41125..57bc7ade30de 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -825,6 +825,43 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
+ 	return 0;
+ }
+ 
++int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
++{
++	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
++	kvm_pte_t pte;
++	s8 level;
++	u64 ipa;
++	int ret;
++
++	switch (kvm_vcpu_trap_get_class(&hyp_vcpu->vcpu)) {
++	case ESR_ELx_EC_DABT_LOW:
++	case ESR_ELx_EC_IABT_LOW:
++		if (kvm_vcpu_trap_is_translation_fault(&hyp_vcpu->vcpu))
++			break;
++		fallthrough;
++	default:
++		return -EINVAL;
++	}
++
++	ipa = kvm_vcpu_get_fault_ipa(&hyp_vcpu->vcpu);
++	ipa |= kvm_vcpu_get_hfar(&hyp_vcpu->vcpu) & GENMASK(11, 0);
++
++	guest_lock_component(vm);
++	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
++	if (ret)
++		goto unlock;
++
++	if (level != KVM_PGTABLE_LAST_LEVEL) {
++		ret = -EINVAL;
++		goto unlock;
++	}
++
++	ret = guest_pte_is_poisoned(pte);
++unlock:
++	guest_unlock_component(vm);
++	return ret;
++}
++
+ int __pkvm_host_share_hyp(u64 pfn)
+ {
+ 	u64 phys = hyp_pfn_to_phys(pfn);
 diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-index 8be91051699e..d1926cb08c76 100644
+index d1926cb08c76..14865907610c 100644
 --- a/arch/arm64/kvm/pkvm.c
 +++ b/arch/arm64/kvm/pkvm.c
-@@ -563,3 +563,10 @@ int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	WARN_ON_ONCE(1);
- 	return -EINVAL;
- }
-+
-+bool pkvm_reclaim_guest_page(phys_addr_t phys)
-+{
-+	int ret = kvm_call_hyp_nvhe(__pkvm_force_reclaim_guest_page, phys);
-+
-+	return !ret || ret == -EAGAIN;
-+}
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 2294f2061866..5d62abee5262 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -289,9 +289,6 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
- 	if (!is_el1_data_abort(esr) || !esr_fsc_is_translation_fault(esr))
- 		return false;
+@@ -417,10 +417,13 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 			return -EINVAL;
  
--	if (is_pkvm_stage2_abort(esr))
--		return false;
--
- 	local_irq_save(flags);
- 	asm volatile("at s1e1r, %0" :: "r" (addr));
- 	isb();
-@@ -302,8 +299,12 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
- 	 * If we now have a valid translation, treat the translation fault as
- 	 * spurious.
- 	 */
--	if (!(par & SYS_PAR_EL1_F))
-+	if (!(par & SYS_PAR_EL1_F)) {
-+		if (is_pkvm_stage2_abort(esr))
-+			return pkvm_reclaim_guest_page(par & SYS_PAR_EL1_PA);
-+
- 		return true;
-+	}
+ 		/*
+-		 * We raced with another vCPU.
++		 * We either raced with another vCPU or the guest PTE
++		 * has been poisoned by an erroneous host access.
+ 		 */
+-		if (mapping)
+-			return -EAGAIN;
++		if (mapping) {
++			ret = kvm_call_hyp_nvhe(__pkvm_vcpu_in_poison_fault);
++			return ret ? -EFAULT : -EAGAIN;
++		}
  
- 	/*
- 	 * If we got a different type of fault from the AT instruction,
-@@ -389,9 +390,11 @@ static void __do_kernel_fault(unsigned long addr, unsigned long esr,
- 	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
- 		return;
- 
--	if (WARN_RATELIMIT(is_spurious_el1_translation_fault(addr, esr, regs),
--	    "Ignoring spurious kernel translation fault at virtual address %016lx\n", addr))
-+	if (is_spurious_el1_translation_fault(addr, esr, regs)) {
-+		WARN_RATELIMIT(!is_pkvm_stage2_abort(esr),
-+			"Ignoring spurious kernel translation fault at virtual address %016lx\n", addr);
- 		return;
-+	}
- 
- 	if (is_el1_mte_sync_tag_check_fault(esr)) {
- 		do_tag_recovery(addr, esr, regs);
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_donate_guest, pfn, gfn);
+ 	} else {
 -- 
 2.52.0.351.gbe84eed79e-goog
 
