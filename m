@@ -1,30 +1,30 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38F931B13B
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 17:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAFD33AD87
+	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 17:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767634816; cv=none; b=djCIV+jX0GlwceUn1+L3ZPUZmfLElKrj2PgwDNdIYPftz/Vy3j+S6NVH51tA5n2+wSE7O477obgB85LVK9+T9ebFlnEZpjPqwwIHDUXsvEO6042L0GT9A+xzvedQ3maEEdD+1mAe1sgM2d+DTFTAR7U8RddMevnm67sgpAF/jM0=
+	t=1767634961; cv=none; b=mz/vMSbbrDWBJtMNYTf2WhXApjl08vpGwn0B2gP9Dsf982oNfPLTnHjz22x1cT6qZbKmQace37zET9IyW5x7c8+Zz9VYld3vc5Md8R20QL4JlLzjY3UtErrZvJ8e7tu7XnHiTZhJyb7mGntCp2voQR0AS0ZANSaYUT8TCTTiDZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767634816; c=relaxed/simple;
-	bh=PEuJkoItlMCDyN3ZHNhE3UfMwhjSUmGZFpnct/LlekM=;
+	s=arc-20240116; t=1767634961; c=relaxed/simple;
+	bh=rNIrp7cJ4mWBCfnlRZ2/zU5msLgJCSRD8s1xbpNqFMY=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XgFFZVC30tjeDr3Q05hp1PWsBNIgMxm4Vc3eWo3qzoLkwoD0FU1/fSkXOPZ9dBi7MWQyYyzOm0fsJ8iL7dOZGJaKf27LusDhfCXOXMgjDbG4GDRZiQVcHEvezcwnL6TsrpnR+goij1MfQwKXCpMVNrA/rz8S+OJFhIDB6hFeilQ=
+	 MIME-Version:Content-Type; b=WSEgNeOposTNDuFjCVzGW0AJYX5p+sLRmWc5UqXhAAZPeBzuaRhcBC3r1ckQA/FdozlEs9z35amVvbxUhi4h9i/f9/YeQb0BM7Zh3ExmBaIJTKzkVljcEUY7AwpM2jafoswwQ6Rf95bIu1xueGlURuBlJobpOnFz20lfUSqezxw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlM526ZjtzHnGcc;
-	Tue,  6 Jan 2026 01:40:06 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlM7w1RF4zJ46BK;
+	Tue,  6 Jan 2026 01:42:36 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 83CB840539;
-	Tue,  6 Jan 2026 01:40:09 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 7566940086;
+	Tue,  6 Jan 2026 01:42:36 +0800 (CST)
 Received: from localhost (10.126.174.38) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 5 Jan
- 2026 17:40:07 +0000
-Date: Mon, 5 Jan 2026 17:40:05 +0000
+ 2026 17:42:34 +0000
+Date: Mon, 5 Jan 2026 17:42:33 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Ben Horgan <ben.horgan@arm.com>
 CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
@@ -40,12 +40,12 @@ CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
 	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
 	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
 	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v2 15/45] arm_mpam: resctrl: Add boilerplate cpuhp and
- domain allocation
-Message-ID: <20260105174005.00001ba0@huawei.com>
-In-Reply-To: <20251219181147.3404071-16-ben.horgan@arm.com>
+Subject: Re: [PATCH v2 16/45] arm_mpam: resctrl: Sort the order of the
+ domain lists
+Message-ID: <20260105174233.00004df8@huawei.com>
+In-Reply-To: <20251219181147.3404071-17-ben.horgan@arm.com>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
-	<20251219181147.3404071-16-ben.horgan@arm.com>
+	<20251219181147.3404071-17-ben.horgan@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,132 +58,74 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 19 Dec 2025 18:11:17 +0000
+On Fri, 19 Dec 2025 18:11:18 +0000
 Ben Horgan <ben.horgan@arm.com> wrote:
 
 > From: James Morse <james.morse@arm.com>
 > 
-> resctrl has its own data structures to describe its resources. We can't use
-> these directly as we play tricks with the 'MBA' resource, picking the MPAM
-> controls or monitors that best apply. We may export the same component as
-> both L3 and MBA.
+> resctrl documents that the domains appear in numeric order in the schemata
+> file. This means a little more work is needed when bringing a domain
+> online.
 > 
-> Add mpam_resctrl_exports[] as the array of class->resctrl mappings we are
-> exporting, and add the cpuhp hooks that allocated and free the resctrl
-> domain structures.
-> 
-> While we're here, plumb in a few other obvious things.
-> 
-> CONFIG_ARM_CPU_RESCTRL is used to allow this code to be built even though
-> it can't yet be linked against resctrl.
+> Add the support for this, using resctrl_find_domain() to find the point to
+> insert in the list.
 > 
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Domain list is an rcu list
-> Add synchronize_rcu() to free the deleted element
-> Code flow simplification (Jonathan)
+I guess this was split out to try and make previous patch easier to read.
+I'm not sure I'd bother in this particular case as those TODOs were
+ugly, but anyhow LGTM
 
-Just trivial stuff and that one what do we loop over thing that
-we continued discussing in the RFC thread (I think you already
-tidied that up)  Nothing here to stop:
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-(which is another way of saying I'm not planning to read it again :)
 
-
+> ---
+>  drivers/resctrl/mpam_resctrl.c | 21 +++++++++++++++++----
+>  1 file changed, 17 insertions(+), 4 deletions(-)
+> 
 > diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-> new file mode 100644
-> index 000000000000..4beeeded00ff
-> --- /dev/null
+> index 4beeeded00ff..5481d9cc69d9 100644
+> --- a/drivers/resctrl/mpam_resctrl.c
 > +++ b/drivers/resctrl/mpam_resctrl.c
-
-> +
-> +static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+> @@ -117,6 +117,21 @@ static bool mpam_resctrl_offline_domain_hdr(unsigned int cpu,
+>  	return false;
+>  }
+>  
+> +static void mpam_resctrl_domain_insert(struct list_head *list,
+> +				       struct rdt_domain_hdr *new)
 > +{
-> +	struct mpam_class *class = comp->class;
+> +	struct rdt_domain_hdr *err;
+> +	struct list_head *pos = NULL;
 > +
-> +	if (class->type == MPAM_CLASS_CACHE)
-> +		return comp->comp_id;
+> +	lockdep_assert_held(&domain_list_lock);
 > +
-> +	/* TODO: repaint domain ids to match the L3 domain ids */
-> +	/*
-> +	 * Otherwise, expose the ID used by the firmware table code.
-Maybe more turns up in here. Otherwise, easily fits in single line comment.
-> +	 */
-> +	return comp->comp_id;
+> +	err = resctrl_find_domain(list, new->id, &pos);
+> +	if (WARN_ON_ONCE(err))
+> +		return;
+> +
+> +	list_add_tail_rcu(&new->list, pos);
 > +}
-
-> +static struct mpam_resctrl_dom *
-> +mpam_resctrl_get_domain_from_cpu(int cpu, struct mpam_resctrl_res *res)
-> +{
-> +	struct mpam_resctrl_dom *dom;
-> +	struct rdt_ctrl_domain *ctrl_d;
-> +	struct rdt_resource *r = &res->resctrl_res;
 > +
-> +	lockdep_assert_cpus_held();
-> +
-> +	list_for_each_entry_rcu(ctrl_d, &r->ctrl_domains, hdr.list) {
-
-As a reminder, though I think you already changed this, discussion carried
-on wrt to the RFC version of this loop.
-
-> +		dom = container_of(ctrl_d, struct mpam_resctrl_dom,
-> +				   resctrl_ctrl_dom);
-> +
-> +		if (cpumask_test_cpu(cpu, &dom->ctrl_comp->affinity))
-> +			return dom;
-> +	}
-> +
-> +	return NULL;
-> +}
-
-> +
-> +void mpam_resctrl_offline_cpu(unsigned int cpu)
-> +{
-> +	resctrl_offline_cpu(cpu);
-> +
-> +	guard(mutex)(&domain_list_lock);
-> +	for (int i = 0; i < RDT_NUM_RESOURCES; i++) {
-> +		struct mpam_resctrl_res *res;
-> +		struct mpam_resctrl_dom *dom;
-> +		struct rdt_mon_domain *mon_d;
-> +		struct rdt_ctrl_domain *ctrl_d;
-> +		bool ctrl_dom_empty, mon_dom_empty;
-> +
-> +		res = &mpam_resctrl_controls[i];
-> +		if (!res->class)
-> +			continue;	// dummy resource
-> +
-> +		dom = mpam_resctrl_get_domain_from_cpu(cpu, res);
-> +		if (WARN_ON_ONCE(!dom))
-> +			continue;
-> +
-> +		ctrl_dom_empty = true;
-> +		if (exposed_alloc_capable) {
-> +			ctrl_d = &dom->resctrl_ctrl_dom;
-> +			ctrl_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &ctrl_d->hdr);
-> +			if (ctrl_dom_empty)
-> +				resctrl_offline_ctrl_domain(&res->resctrl_res, ctrl_d);
-> +		}
-really small thing but I'd do 
-		} else {
-			ctrl_dom_empty = true;
-		}
-here to make it visually obvious why that is set to true. The initialize and override
-if we have more info pattern is to me less readable.
-
-> +
-> +		mon_dom_empty = true;
-> +		if (exposed_mon_capable) {
-> +			mon_d = &dom->resctrl_mon_dom;
-> +			mon_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &mon_d->hdr);
-> +			if (mon_dom_empty)
-> +				resctrl_offline_mon_domain(&res->resctrl_res, mon_d);
-> +		}
-Similar for this one.
-> +
-> +		if (ctrl_dom_empty && mon_dom_empty)
-> +			kfree(dom);
-> +	}
-> +}
+>  static struct mpam_resctrl_dom *
+>  mpam_resctrl_alloc_domain(unsigned int cpu, struct mpam_resctrl_res *res)
+>  {
+> @@ -154,8 +169,7 @@ mpam_resctrl_alloc_domain(unsigned int cpu, struct mpam_resctrl_res *res)
+>  		ctrl_d = &dom->resctrl_ctrl_dom;
+>  		mpam_resctrl_domain_hdr_init(cpu, ctrl_comp, &ctrl_d->hdr);
+>  		ctrl_d->hdr.type = RESCTRL_CTRL_DOMAIN;
+> -		/* TODO: this list should be sorted */
+> -		list_add_tail_rcu(&ctrl_d->hdr.list, &r->ctrl_domains);
+> +		mpam_resctrl_domain_insert(&r->ctrl_domains, &ctrl_d->hdr);
+>  		err = resctrl_online_ctrl_domain(r, ctrl_d);
+>  		if (err) {
+>  			dom = ERR_PTR(err);
+> @@ -169,8 +183,7 @@ mpam_resctrl_alloc_domain(unsigned int cpu, struct mpam_resctrl_res *res)
+>  		mon_d = &dom->resctrl_mon_dom;
+>  		mpam_resctrl_domain_hdr_init(cpu, ctrl_comp, &mon_d->hdr);
+>  		mon_d->hdr.type = RESCTRL_MON_DOMAIN;
+> -		/* TODO: this list should be sorted */
+> -		list_add_tail_rcu(&mon_d->hdr.list, &r->mon_domains);
+> +		mpam_resctrl_domain_insert(&r->mon_domains, &mon_d->hdr);
+>  		err = resctrl_online_mon_domain(r, mon_d);
+>  		if (err) {
+>  			dom = ERR_PTR(err);
 
