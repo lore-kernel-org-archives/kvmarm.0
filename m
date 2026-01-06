@@ -1,114 +1,157 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65110325486
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 11:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141333FCC
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 11:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767699233; cv=none; b=Mh0cOyVliggBMhN97UHtlGnBBV1Y0Y40L42i7DdHvZkPbrs4T/FrUyGCkRoSt0O+6863uDMbxyHERSxd/hV6tY7hh4KUGqDdw5siqCm1VPAXBZa+akd89O+Kha3yRE7hJ/Ddc5YtI8uQK2f9hejEleTvwzEK6TnuzzjmEVWn+ew=
+	t=1767700532; cv=none; b=LcFudDt2oyfdBUFaxuL6Ftfl+0QWYvS5ABVeK6eQpRXjO/zUDg8rvtTNM3bik7IOvrsHLijZ/VerGn0I3X94JGrWZA2sxOIhoA5uxiX+L6UAGql5qsfVIxLciuR2pj9KUle0xBpUZmEKzObBXz0RyYlkI3DZOFGzBKwoLeGC0LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767699233; c=relaxed/simple;
-	bh=G2XXRGjhwUhj7uKDeVyJc97ff9kBPoqZDL9T+lDTp04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MOr6+JDQ6NxK7AYNFgbE2RplIn0dvKwkIcegWULjEGl8VhY8WO91jaQvceWVih7XbzrPMedrfdN5TeIxWSr13f42poAe0eE8V5zWYbTmezejlSryDVzM27J2Q1OqkV12VIkxecu+BW2K1lIIh70uGSIxMwGTkDUpo/nwJ7066zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3717497;
-	Tue,  6 Jan 2026 03:33:43 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D26E33F5A1;
-	Tue,  6 Jan 2026 03:33:45 -0800 (PST)
-Message-ID: <316c5635-75af-4ebb-ad2c-fab0742beb20@arm.com>
-Date: Tue, 6 Jan 2026 11:33:44 +0000
+	s=arc-20240116; t=1767700532; c=relaxed/simple;
+	bh=iEWTktqHCbzEVKRgHNUFCRTLtZNn2iTcXCgVFnSkUnk=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ki9V/FJTzaPxmcCebla6ckM8sNsqbzHLc2ziGGI29+PWe+RCR8ADNme1zczZSzpKvAaNTuRfdvs3IGVVxuImwJA/hE/ceY0RifISSZkNBQL/Zs6pNh0fEFxcw6+j2OJrNcB960m2LwrZ//IF4QjBPNeWKrbTQh+VdlV0KzMpfqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlqNp3LmBzHnHBb;
+	Tue,  6 Jan 2026 19:55:22 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8ED2040539;
+	Tue,  6 Jan 2026 19:55:26 +0800 (CST)
+Received: from localhost (10.48.155.65) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
+ 2026 11:55:25 +0000
+Date: Tue, 6 Jan 2026 11:55:23 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v2 24/45] arm_mpam: resctrl: Convert to/from MPAMs
+ fixed-point formats
+Message-ID: <20260106115523.00003a86@huawei.com>
+In-Reply-To: <20251219181147.3404071-25-ben.horgan@arm.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+	<20251219181147.3404071-25-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 23/45] arm_mpam: resctrl: Add rmid index helpers
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-24-ben.horgan@arm.com>
- <20260106112115.00000201@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260106112115.00000201@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Hi Jonathan,
+On Fri, 19 Dec 2025 18:11:26 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
 
-On 1/6/26 11:21, Jonathan Cameron wrote:
-> On Fri, 19 Dec 2025 18:11:25 +0000
-> Ben Horgan <ben.horgan@arm.com> wrote:
+> From: Dave Martin <Dave.Martin@arm.com>
 > 
->> From: James Morse <james.morse@arm.com>
->>
->> Because MPAM's pmg aren't identical to RDT's rmid, resctrl handles some
->> data structures by index. This allows x86 to map indexes to RMID, and MPAM
->> to map them to partid-and-pmg.
->>
->> Add the helpers to do this.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> one comment inline.
-> I messed around with GENMASK + field_prep()/field_get() - new
-> versions of these with no need for runtime constant masks, but
-> it ended up as not that much more readable than what you have here.
+> MPAM uses a fixed-point formats for some hardware controls.  Resctrl
+> provides the bandwidth controls as a percentage. Add helpers to convert
+> between these.
 > 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> ---
->> Changes since rfc:
->> Use ~0U instead of ~0 in lhs of left shift
->> ---
->>  drivers/resctrl/mpam_resctrl.c | 28 ++++++++++++++++++++++++++++
->>  include/linux/arm_mpam.h       |  3 +++
->>  2 files changed, 31 insertions(+)
->>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index 4275b1a85887..bdbc5504964b 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
->> @@ -120,6 +120,34 @@ u32 resctrl_arch_get_num_closid(struct rdt_resource *ignored)
->>  	return mpam_partid_max + 1;
->>  }
->>  
->> +u32 resctrl_arch_system_num_rmid_idx(void)
->> +{
->> +	u8 closid_shift = fls(mpam_pmg_max);
->> +	u32 num_partid = resctrl_arch_get_num_closid(NULL);
->> +
->> +	return num_partid << closid_shift;
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+
+Perhaps it's just me, but I found this hard to check mostly because
+of the spec being very light when describing this (that I could
+find, maybe there is more somewhere else).
+
+So whilst I'll give a tag, I'd like ideally a little more documentation,
+particularly around the oddity of the left aligned field and max value
+of bwa_wd being 16.
+
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+> ---
+>  drivers/resctrl/mpam_resctrl.c | 41 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
 > 
-> Given I think you restrict mpam_pmg_max to be power of 2 elsewhere,
-> doesn't this end up the same as something like
-> 	return mpam_pmg_max * resctrl_arch_get_num_closid(NULL);
-> Maybe its worth keeping it in the form you have here as
-> it sort of provides documentation for how you pack those IDs
+> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+> index bdbc5504964b..a20656e49edc 100644
+> --- a/drivers/resctrl/mpam_resctrl.c
+> +++ b/drivers/resctrl/mpam_resctrl.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/limits.h>
+>  #include <linux/list.h>
+> +#include <linux/math.h>
+>  #include <linux/printk.h>
+>  #include <linux/rculist.h>
+>  #include <linux/resctrl.h>
+> @@ -246,6 +247,46 @@ static bool cache_has_usable_cpor(struct mpam_class *class)
+>  	return class->props.cpbm_wd <= 32;
+>  }
+>  
+> +/*
+> + * Each fixed-point hardware value architecturally represents a range
+> + * of values: the full range 0% - 100% is split contiguously into
+> + * (1 << cprops->bwa_wd) equal bands.
 
-We only warn if (mpam_pmg_max + 1) is a power of 2 and so I'll keep this
-as it is, although yours is equivalent in the expected case.
+This bit of the spec is really confusing.  I particularly like
+BWA_WD being 6 bits but only allowed to take values up to 16. That took
+me a while to spot as I couldn't work out what this was supposed to do if that
+was 32.
 
-> 
->> +}
-> 
+Anyhow this is a request for a bit more documentation for this function such
+as explaining the field is left aligned to bit 16.
 
-Thanks,
 
-Ben
+> + * Find the nearest percentage value to the upper bound of the selected band:
+> + */
+> +static u32 mbw_max_to_percent(u16 mbw_max, struct mpam_props *cprops)
+> +{
+> +	u32 val = mbw_max;
+> +
+> +	val >>= 16 - cprops->bwa_wd;
+> +	val += 1;
+> +	val *= MAX_MBA_BW;
+> +	val = DIV_ROUND_CLOSEST(val, 1 << cprops->bwa_wd);
+> +
+> +	return val;
+> +}
+> +
+> +/*
+> + * Find the band whose upper bound is closest to the specified percentage.
+> + *
+> + * A round-to-nearest policy is followed here as a balanced compromise
+> + * between unexpected under-commit of the resource (where the total of
+> + * a set of resource allocations after conversion is less than the
+> + * expected total, due to rounding of the individual converted
+> + * percentages) and over-commit (where the total of the converted
+> + * allocations is greater than expected).
+> + */
+> +static u16 percent_to_mbw_max(u8 pc, struct mpam_props *cprops)
+> +{
+> +	u32 val = pc;
+> +
+> +	val <<= cprops->bwa_wd;
+> +	val = DIV_ROUND_CLOSEST(val, MAX_MBA_BW);
+> +	val = max(val, 1) - 1;
+> +	val <<= 16 - cprops->bwa_wd;
+> +
+> +	return val;
+> +}
+> +
+>  /* Test whether we can export MPAM_CLASS_CACHE:{2,3}? */
+>  static void mpam_resctrl_pick_caches(void)
+>  {
 
