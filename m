@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D7F320A38
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 11:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65110325486
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 11:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767698490; cv=none; b=aZM51xeB+3sh4R0pbjqldUQgj+ZQYcmjJTfwt2KTr/tdp/lRiazDLV+SWI/U4G108W67JgfSUgq92pra+S0aOJoaNpXNPOa+0VQDmo0gVd8F+ivZQRBGAluKvPRjcWNwrliPnNGmpAJLpOIQG4O+dVt090dCO/JCJOV/NTyg7hQ=
+	t=1767699233; cv=none; b=Mh0cOyVliggBMhN97UHtlGnBBV1Y0Y40L42i7DdHvZkPbrs4T/FrUyGCkRoSt0O+6863uDMbxyHERSxd/hV6tY7hh4KUGqDdw5siqCm1VPAXBZa+akd89O+Kha3yRE7hJ/Ddc5YtI8uQK2f9hejEleTvwzEK6TnuzzjmEVWn+ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767698490; c=relaxed/simple;
-	bh=HtVQxGqxmycZRrMSpUGFDno6BjtIe7FZF0i2ITi6/3E=;
+	s=arc-20240116; t=1767699233; c=relaxed/simple;
+	bh=G2XXRGjhwUhj7uKDeVyJc97ff9kBPoqZDL9T+lDTp04=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mm+eeLHoTE3najxxDTHtMRSsfpp2N/DpqwN3o9Xc2uHMSBYkj1gsfZ3xzIKd5k+0OdCJBFcPvyHCtxFr7kX2kQVNgcwpzvQsd0s6GojrbF/J+MKCBgHjUNRFpCsJk1EEhxWgrtlhX6dUxM9LQt3qaTJ6fJqcNy2DPPyJh5Crc04=
+	 In-Reply-To:Content-Type; b=MOr6+JDQ6NxK7AYNFgbE2RplIn0dvKwkIcegWULjEGl8VhY8WO91jaQvceWVih7XbzrPMedrfdN5TeIxWSr13f42poAe0eE8V5zWYbTmezejlSryDVzM27J2Q1OqkV12VIkxecu+BW2K1lIIh70uGSIxMwGTkDUpo/nwJ7066zo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 93F3C1596;
-	Tue,  6 Jan 2026 03:21:20 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D3717497;
+	Tue,  6 Jan 2026 03:33:43 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F8D83F5A1;
-	Tue,  6 Jan 2026 03:21:22 -0800 (PST)
-Message-ID: <22eadfd1-67f9-470f-8e4e-b9af4dc869e1@arm.com>
-Date: Tue, 6 Jan 2026 11:21:20 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D26E33F5A1;
+	Tue,  6 Jan 2026 03:33:45 -0800 (PST)
+Message-ID: <316c5635-75af-4ebb-ad2c-fab0742beb20@arm.com>
+Date: Tue, 6 Jan 2026 11:33:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 22/45] arm_mpam: resctrl: Add CDP emulation
+Subject: Re: [PATCH v2 23/45] arm_mpam: resctrl: Add rmid index helpers
 To: Jonathan Cameron <jonathan.cameron@huawei.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -42,82 +42,70 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
  joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-23-ben.horgan@arm.com>
- <20260105180700.000037c8@huawei.com>
+ <20251219181147.3404071-24-ben.horgan@arm.com>
+ <20260106112115.00000201@huawei.com>
 From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <20260105180700.000037c8@huawei.com>
+In-Reply-To: <20260106112115.00000201@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Jonathan,
 
-On 1/5/26 18:07, Jonathan Cameron wrote:
-> On Fri, 19 Dec 2025 18:11:24 +0000
+On 1/6/26 11:21, Jonathan Cameron wrote:
+> On Fri, 19 Dec 2025 18:11:25 +0000
 > Ben Horgan <ben.horgan@arm.com> wrote:
 > 
 >> From: James Morse <james.morse@arm.com>
 >>
->> Intel RDT's CDP feature allows the cache to use a different control value
->> depending on whether the accesses was for instruction fetch or a data
->> access. MPAM's equivalent feature is the other way up: the CPU assigns a
->> different partid label to traffic depending on whether it was instruction
->> fetch or a data access, which causes the cache to use a different control
->> value based solely on the partid.
+>> Because MPAM's pmg aren't identical to RDT's rmid, resctrl handles some
+>> data structures by index. This allows x86 to map indexes to RMID, and MPAM
+>> to map them to partid-and-pmg.
 >>
->> MPAM can emulate CDP, with the side effect that the alternative partid is
->> seen by all MSC, it can't be enabled per-MSC.
+>> Add the helpers to do this.
 >>
->> Add the resctrl hooks to turn this on or off. Add the helpers that match a
->> closid against a task, which need to be aware that the value written to
->> hardware is not the same as the one resctrl is using.
->>
->> Update the 'arm64_mpam_global_default' variable the arch code uses during
->> context switch to know when the per-cpu value should be used instead.
->>
->> Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
->> equivalent needs programming twice by the resctrl glue, as resctrl expects
->> the bandwidth controls to be applied independently for both data and
->> instruction-fetch.
->>
->> CC: Dave Martin <Dave.Martin@arm.com>
->> CC: Amit Singh Tomar <amitsinght@marvell.com>
 >> Signed-off-by: James Morse <james.morse@arm.com>
 >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> one comment inline.
+> I messed around with GENMASK + field_prep()/field_get() - new
+> versions of these with no need for runtime constant masks, but
+> it ended up as not that much more readable than what you have here.
 > 
-> Minor thing below.
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> 
-> 
->> diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
->> index 5a78299ec464..ba0312b55d9f 100644
->> --- a/include/linux/arm_mpam.h
->> +++ b/include/linux/arm_mpam.h
->> @@ -5,6 +5,7 @@
->>  #define __LINUX_ARM_MPAM_H
+>> ---
+>> Changes since rfc:
+>> Use ~0U instead of ~0 in lhs of left shift
+>> ---
+>>  drivers/resctrl/mpam_resctrl.c | 28 ++++++++++++++++++++++++++++
+>>  include/linux/arm_mpam.h       |  3 +++
+>>  2 files changed, 31 insertions(+)
+>>
+>> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+>> index 4275b1a85887..bdbc5504964b 100644
+>> --- a/drivers/resctrl/mpam_resctrl.c
+>> +++ b/drivers/resctrl/mpam_resctrl.c
+>> @@ -120,6 +120,34 @@ u32 resctrl_arch_get_num_closid(struct rdt_resource *ignored)
+>>  	return mpam_partid_max + 1;
+>>  }
 >>  
->>  #include <linux/acpi.h>
->> +#include <linux/resctrl_types.h>
+>> +u32 resctrl_arch_system_num_rmid_idx(void)
+>> +{
+>> +	u8 closid_shift = fls(mpam_pmg_max);
+>> +	u32 num_partid = resctrl_arch_get_num_closid(NULL);
+>> +
+>> +	return num_partid << closid_shift;
 > 
-> This seems odd as nothing added to the header in this path appears to need it.
-> Maybe should be down in the c file or in a different patch?
+> Given I think you restrict mpam_pmg_max to be power of 2 elsewhere,
+> doesn't this end up the same as something like
+> 	return mpam_pmg_max * resctrl_arch_get_num_closid(NULL);
+> Maybe its worth keeping it in the form you have here as
+> it sort of provides documentation for how you pack those IDs
 
-Yep, moved it to patch 33, arm_mpam: resctrl: Allow resctrl to allocate
-monitors.
+We only warn if (mpam_pmg_max + 1) is a power of 2 and so I'll keep this
+as it is, although yours is equivalent in the expected case.
 
 > 
->>  #include <linux/types.h>
->>  
->>  struct mpam_msc;
->> @@ -56,6 +57,8 @@ void resctrl_arch_set_cpu_default_closid(int cpu, u32 closid);
->>  void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
->>  void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid);
->>  void resctrl_arch_sched_in(struct task_struct *tsk);
->> +bool resctrl_arch_match_closid(struct task_struct *tsk, u32 closid);
->> +bool resctrl_arch_match_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
->>  
->>  /**
->>   * mpam_register_requestor() - Register a requestor with the MPAM driver
+>> +}
 > 
 
 Thanks,
