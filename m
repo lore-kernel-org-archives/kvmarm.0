@@ -1,121 +1,121 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70EF1322DC1
-	for <kvmarm@lists.linux.dev>; Mon,  5 Jan 2026 18:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5324F3161B1
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 09:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767636428; cv=none; b=dGuhfkdAwHUV+p4Ua7xCRdL4vYROOpqbRXxycftv/3JqmRp6RXVBv/xfUQ31GiKoUrM5hK1WclBkl0t/tXCpfDFgLQREefexx23I6/KVlVUz8x4r2ERldfahLCdT+Dx2Ypi7e0hw7PzCyaJ8jv1HlwpP/neJtSUT0DkoCJnrgY8=
+	t=1767691470; cv=none; b=o8J2PFN6uYP8jPdt1xretXY7Ut+79L4arKL4kza0H4voTAR8pJxKDVzM3yi+xd8GHrGQuP4syT1BIuO0Hif9XV8Gkz2qTubzSr1m3xVsYGmc28UJiqAK+eOeuqQhPVfYABtPVuVldRLjPvcq2FIueN/SSNr82dijxtGmGNki8TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767636428; c=relaxed/simple;
-	bh=wMtq55yehU7jxMKK4y/AuGl1pnUMI3BU12K6DYUkvnQ=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MJ56KS2t8O8hu/auhRAa+UPVz9h2OWVAxjtwhuR1jPTJsEoASCvYHgJkvoYG6+6iBYfaBbuHaO/Qe3EPF6dKjKGCGNyzfQOFfq14SefCJ71K+hp2BaPvQr7LQ1d62WRBLT30JNt8iLjr+i2Xkb9SoFznBjifmw3IdiLNGPOvSso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlMh73cXdzJ46BT;
-	Tue,  6 Jan 2026 02:07:03 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id C6D5040086;
-	Tue,  6 Jan 2026 02:07:03 +0800 (CST)
-Received: from localhost (10.126.174.38) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 5 Jan
- 2026 18:07:02 +0000
-Date: Mon, 5 Jan 2026 18:07:00 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v2 22/45] arm_mpam: resctrl: Add CDP emulation
-Message-ID: <20260105180700.000037c8@huawei.com>
-In-Reply-To: <20251219181147.3404071-23-ben.horgan@arm.com>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
-	<20251219181147.3404071-23-ben.horgan@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767691470; c=relaxed/simple;
+	bh=hMrKzPKwz67JgoKxLU1YaBlRJJnDreZeCQvtwVIB3NA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X+b5GljDzIDa/QC4YloGfgQVPZFtNUERuqk61St+SdH5alJVHgwkv2avdzNgV/0tYUlHc4aAu+gM3CyEIM0EdKLYfm/bpzDSZsS8eLiP830qFAr8TVqOgh3wOMyE98K/T1DBpW9vdNY6EOacTk+QYxT5p1E8SRIRhQKGgEpuSPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h7yXnKTS; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h7yXnKTS"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-4775e00b16fso4713955e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 01:24:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767691466; x=1768296266; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+LqF8/lht1o9n/0GpUByxOJv4W80ArGZN3sXAN7aJgw=;
+        b=h7yXnKTSSl7nhzswRApRS0CPsxfXcj9HsmSsLO2BgRlvb8Cd2UpeJPn1EjAzDKiv1U
+         nohr1M/lwcrDQE4okw4TLg6o/oeeicBlJK535l4Ylkbge/IaxXZfLeStu1jV84QpEPMr
+         QGkVd/5KfydmSf8nAf6xIZBMg1yCbfnZVqGhQQ2MwZuPz1wv2VpgLzQsBHLXdjSlZDYo
+         jJh0UOnOQDrhvG2ijYTUuBIuKSeUa2FH+JhAurmoNo+LnTdL64XmRm3eY0sloXwwgcKv
+         CsSO996QXx/Go8eE043ArUe1xyCXq/n89crSvmJGlT9yJ4lLK+KTQTMl0X4mB8dJBTUg
+         Y2vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767691466; x=1768296266;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+LqF8/lht1o9n/0GpUByxOJv4W80ArGZN3sXAN7aJgw=;
+        b=i93zW0kGmLpTcnrNNPZBDW5bTY1Cre+izv1nUaJJjNhPmOWVvKwV6exqixe+QZ/RNS
+         zgaSw3cnAu8MKKcwaxJ29mlZN31T2WATOoaOEfKhFTrSF5WxGqOg1QZWnxnHvaOlh1yU
+         EPXZHbDWrGaT86pzUznmEs7Fax5ZP0rPY9f1WsM2V7Lgi6O8OxDbFyUI+9LtimPRhboH
+         Ec2J5e+qykdDfDqJ9/+YkYtRsgUXQhtgvyJmtvGsRJFsu76/zqY/1VE5d34Xf2AYSY08
+         1Gy0zOTzbvvLOue/FBrxYWf7MtAwJcaJ/RU4fYYJULbyy3ntbVz692sylOY4AvsAqN/v
+         5TwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnUZHF5c5Wp1iH9iFB3LfCR9r0GUW0eJ1/K7s38utj+Z8OAgJGnfyuA8iY4BR4UZrppazjOtE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxEeFMbslDogEkMQXxyOLf4PF4tONcqfZzuw+uRNablN1ey7oQq
+	DLxR/WbqCpR5zU0krio14EUdL+FDWx0fF5nZJHqtNiO8t6RYD5QIGH7YnNBMREBt1MLmdQT09Lj
+	QJg==
+X-Google-Smtp-Source: AGHT+IGJDvWpfC1ugVJSYdWQcUeMnYmXOhwJri2fdiSaOwSbZ5cVH4Myj4tyQgT04GoXs3XHWR0vuJXjyQ==
+X-Received: from wmbdu14.prod.google.com ([2002:a05:600c:634e:b0:477:9b3e:67e3])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3555:b0:479:33be:b23e
+ with SMTP id 5b1f17b1804b1-47d7f090045mr30939095e9.17.1767691466044; Tue, 06
+ Jan 2026 01:24:26 -0800 (PST)
+Date: Tue,  6 Jan 2026 09:24:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
+Message-ID: <20260106092425.1529428-1-tabba@google.com>
+Subject: [PATCH v3 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, 
+	pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, 
+	itaru.kitayama@fujitsu.com, andrew.jones@linux.dev, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 19 Dec 2025 18:11:24 +0000
-Ben Horgan <ben.horgan@arm.com> wrote:
+Changes from v2 [1]:
+- Collected Reviewed-by tags from the previous version (thanks!)
+- Rebased on 6.19-rc4
+- No code changes
 
-> From: James Morse <james.morse@arm.com>
-> 
-> Intel RDT's CDP feature allows the cache to use a different control value
-> depending on whether the accesses was for instruction fetch or a data
-> access. MPAM's equivalent feature is the other way up: the CPU assigns a
-> different partid label to traffic depending on whether it was instruction
-> fetch or a data access, which causes the cache to use a different control
-> value based solely on the partid.
-> 
-> MPAM can emulate CDP, with the side effect that the alternative partid is
-> seen by all MSC, it can't be enabled per-MSC.
-> 
-> Add the resctrl hooks to turn this on or off. Add the helpers that match a
-> closid against a task, which need to be aware that the value written to
-> hardware is not the same as the one resctrl is using.
-> 
-> Update the 'arm64_mpam_global_default' variable the arch code uses during
-> context switch to know when the per-cpu value should be used instead.
-> 
-> Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
-> equivalent needs programming twice by the resctrl glue, as resctrl expects
-> the bandwidth controls to be applied independently for both data and
-> instruction-fetch.
-> 
-> CC: Dave Martin <Dave.Martin@arm.com>
-> CC: Amit Singh Tomar <amitsinght@marvell.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+This series tidies up a few things in the KVM selftests. It addresses an
+error in memory alignment, hardens the arm64 MMU configuration for
+selftests, and fixes minor documentation issues.
 
-Minor thing below.
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+First, for arm64, the series explicitly disables translation table walks
+for the unused upper virtual address range (TTBR1). Since selftests run
+entirely in the lower range (TTBR0), leaving TTBR1 uninitialized but
+active could lead to unpredictable behavior if guest code accesses high
+addresses. We set EPD1 (and TBI1) to ensure such accesses
+deterministically generate translation faults.
+
+Second, the series fixes the `page_align()` implementation in both arm64
+and riscv. The previous version incorrectly rounded up already-aligned
+addresses to the *next* page, potentially wasting memory or causing
+unexpected gaps. After fixing the logic in the arch-specific files, the
+function is moved to the common `kvm_util.h` header to eliminate code
+duplication.
+
+Finally, a few comments and argument descriptions in `kvm_util` are
+updated to match the actual code implementation.
+
+Based on Linux 6.19-rc4.
+
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/all/20251215165155.3451819-1-tabba@google.com/
+
+Fuad Tabba (5):
+  KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+  KVM: arm64: selftests: Fix incorrect rounding in page_align()
+  KVM: riscv: selftests: Fix incorrect rounding in page_align()
+  KVM: selftests: Move page_align() to shared header
+  KVM: selftests: Fix typos and stale comments in kvm_util
+
+ tools/testing/selftests/kvm/include/arm64/processor.h | 4 ++++
+ tools/testing/selftests/kvm/include/kvm_util.h        | 9 +++++++--
+ tools/testing/selftests/kvm/lib/arm64/processor.c     | 7 ++-----
+ tools/testing/selftests/kvm/lib/kvm_util.c            | 2 +-
+ tools/testing/selftests/kvm/lib/riscv/processor.c     | 5 -----
+ 5 files changed, 14 insertions(+), 13 deletions(-)
 
 
-> diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
-> index 5a78299ec464..ba0312b55d9f 100644
-> --- a/include/linux/arm_mpam.h
-> +++ b/include/linux/arm_mpam.h
-> @@ -5,6 +5,7 @@
->  #define __LINUX_ARM_MPAM_H
->  
->  #include <linux/acpi.h>
-> +#include <linux/resctrl_types.h>
-
-This seems odd as nothing added to the header in this path appears to need it.
-Maybe should be down in the c file or in a different patch?
-
->  #include <linux/types.h>
->  
->  struct mpam_msc;
-> @@ -56,6 +57,8 @@ void resctrl_arch_set_cpu_default_closid(int cpu, u32 closid);
->  void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
->  void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid);
->  void resctrl_arch_sched_in(struct task_struct *tsk);
-> +bool resctrl_arch_match_closid(struct task_struct *tsk, u32 closid);
-> +bool resctrl_arch_match_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
->  
->  /**
->   * mpam_register_requestor() - Register a requestor with the MPAM driver
+base-commit: 9ace4753a5202b02191d54e9fdf7f9e3d02b85eb
+-- 
+2.52.0.351.gbe84eed79e-goog
 
