@@ -1,100 +1,103 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA9078F4F
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 14:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BFE3019D9
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 14:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767710280; cv=none; b=Cr8ft5hXrk3CUq6SNHo4dhQWjF0i+ADEySvBTD4eOztMOnyqGb/jGDutsd426zMCj4oBpfQIk0/4zZaNdbhbR/PoeKPQizlF6raclrVwg5XFM8ZlrDFAfPO381HTe4ffPWuMA+zt6Ok3HLlGAYL1j+alI+JMHnfXH85XLFiCZvo=
+	t=1767710455; cv=none; b=VIbYSkLd/e3ywEpj4E+JcZ4SqLC6CZMLWRAxrS62ppuaSDTacv5gaiSG0TEhN/08wmwYba8vkXw1/vLOPf0UCcsgIJWAvLnSy3AyqYLrL/L2Vp8+YFqRaz1PjyMCAvf8BRZyGbTf3WmYSxonVNDZLL1z2b95xe/xDNzYwjp76Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767710280; c=relaxed/simple;
-	bh=ZIpw7DGuumGa1FD7GXVFkr+3tTtl45NsJhEhEzPwX6Y=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bpMndmlkJfmq24VMRogCFxdnUn7qaHQnqVeHmXP17CW587jf5YeuSjV5kYSrdN72Mlc57hHdWZy3X21RWOqd9ecFm+83Xov1HZfOFkhvBBu3teAXIX2GCopbHcuu76Yz1lPDDok6BJoXrYM0Y1EjBtxa3WkNbFMOW9Ow5H0bAUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlv0L0LzDzJ46fN;
-	Tue,  6 Jan 2026 22:37:54 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id B743E4057F;
-	Tue,  6 Jan 2026 22:37:55 +0800 (CST)
-Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
- 2026 14:37:54 +0000
-Date: Tue, 6 Jan 2026 14:37:52 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
-Subject: Re: [PATCH v2 33/45] arm_mpam: resctrl: Allow resctrl to allocate
- monitors
-Message-ID: <20260106143752.00000600@huawei.com>
-In-Reply-To: <20251219181147.3404071-34-ben.horgan@arm.com>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
-	<20251219181147.3404071-34-ben.horgan@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767710455; c=relaxed/simple;
+	bh=8F0aF74Y4+WS8/EMlJ1AENNqNR/jUk0wYfGBYH3ykZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+9XksgyCWBpOBZRRl2CYxFvohBBKqSrQ/tmQZSmNd3goo03igTgfxLiKD2t7VCCVhPDf9lkHptgDWk+6j+8oHIE1CuyPl2T5vXbqu2mwWVYoKyRxlyfegQDFzX+wtpz/Y45G5vXDMNhP2PYo47NjViTt3ASVvzTh9b8wMj8ALg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ebcqn7BA; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ebcqn7BA"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-59b685d2b79so597001e87.3
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 06:40:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767710452; x=1768315252; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lg9Rt1HeKklkA4y0U78VeQ93uQ/qnZsmQ3EenAnRpxE=;
+        b=ebcqn7BAA+EbANMqLI6D3oO2s3MGVZBhtV1Yd0A1gvCjcoT7fPO6NXnQoPtAQsp6JL
+         8YCFs4OmqWrvtaKnpoQz7zeFP6DNyMdzzccIviuVqBGDx7ZFzNahcVPr7qh0EPZZUNi/
+         E0/XhGE2HVJuSHd2UShmjZg+1dUMXd00v2Y/VbfHYg6PmKkBrhH7z1UQfMPvydzmFuW+
+         wOPw4J5juG/+daBxmqiNE3jDaZRc7XFsn5hvDzDuxMjAdSD5kxsfj/KPtIyfgkp2hNvz
+         rjXTfZRf1U9uAboexm8bwdzKh3AIPfXrBj2yiIUiqqhkdKZoU14qBTLz9nCqbQVnurux
+         x6Eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767710452; x=1768315252;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lg9Rt1HeKklkA4y0U78VeQ93uQ/qnZsmQ3EenAnRpxE=;
+        b=chS42xUUcP79XAjUIGfZIcLGhq4CIbFsVJcXFsZUlonlFG3H5o50FaBofgrR4kLWwa
+         3Uk1NWBxRHl/cJ1kiiGHzN5PF5W4g4JAUWWJ/dPYM+2zpAbtss1quNcZASjeOXHpzsYL
+         /gxS2idbQzagvMpeEofz6XKEY+iuDbIYx2yHe57xHEEzpiXjSwZo6WI/Xu2hagQ+SeoR
+         z1j3w0OJ+fgxnT0arke4V/mVgWtMSHWFpqpHX63GI4gjevjOceA0UP+lS/8T1hxfGv6v
+         dpoooZxx+eOfadJY90kk1ZY7a7FZmjKwN8P4FyBpkN9Mixo/igu8ekyIBEqffz3EWHsD
+         mghQ==
+X-Gm-Message-State: AOJu0YyjYoCltGKfN+vbHndMgPemjiK/hf23H3mzp9+/H1jfBbk4P08M
+	AHtSUmiow5VGfFt+/oNooh4UQJbju+bMtHpL37K4Ucn17Tq+wMsvRGQatmvz3/v7h4FcqwLFHQ1
+	xKcrjrg==
+X-Gm-Gg: AY/fxX58ElzxZQEun8/F/uM0cntAjhDhiyH43/ogQJfSiGgZpMphng+q9/HsZ2351VD
+	pVNcepRG7W5FYSRXB7xImATrH2M+Hdb3hjuX9ZGcEbxPzjeyf+8UDhl3PnspxTaJcuZAyq8TDP4
+	+d7zwjxtq3QcvoJuc16BWz+Ud5/l/jKTGkSQdNVBJGjAUBHhNBk/CrK6JJGZhj2osdf6RZf1jbk
+	4iGMd0SHAUowvBwoqlzzl9qQIIO9k9gp77hBZxNllEcCksSz1OoW2HBMSjDgZNR7Uqflle/Erok
+	VwczB5PH+YkE38A/RIkuO7IMM+YXzm+pD2NbXr4sli7K9e4dajye/syZSIoJ9jOGcaacwX+a46y
+	mnAlOMKuAUfXucBzXa2pqFY8mobP0vdRaOWiBNECZbR3J65nuR86NApROJbA0eZ3482g09M2JaH
+	iSB+OGwCPr+ohqHq/DcaGrGIl/2SApF/d/OwHdgQbEmO0yzQK4
+X-Google-Smtp-Source: AGHT+IGQmMYGyg67e59L/Ani6cot2XLoJXjG2yxRGQlWaxQkbv8b63wrBDjE/OQoVm5vCXoynokutw==
+X-Received: by 2002:a05:651c:12c2:b0:37b:97ae:6728 with SMTP id 38308e7fff4ca-382eaac9c78mr9558871fa.34.1767710451570;
+        Tue, 06 Jan 2026 06:40:51 -0800 (PST)
+Received: from google.com (228.231.88.34.bc.googleusercontent.com. [34.88.231.228])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-382eb3a0046sm5577981fa.8.2026.01.06.06.40.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 06:40:50 -0800 (PST)
+Date: Tue, 6 Jan 2026 14:40:47 +0000
+From: Quentin Perret <qperret@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH 06/30] KVM: arm64: Remove pointless
+ is_protected_kvm_enabled() checks from hyp
+Message-ID: <cokixmkyotfs6ts2rqn4xa7iseno6hk34eon76raujupedgsff@hmkoakf5kr44>
+References: <20260105154939.11041-1-will@kernel.org>
+ <20260105154939.11041-7-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260105154939.11041-7-will@kernel.org>
 
-On Fri, 19 Dec 2025 18:11:35 +0000
-Ben Horgan <ben.horgan@arm.com> wrote:
-
-> From: James Morse <james.morse@arm.com>
+On Monday 05 Jan 2026 at 15:49:14 (+0000), Will Deacon wrote:
+> When pKVM is not enabled, the host shouldn't issue pKVM-specific
+> hypercalls and so there's no point checking for this in the EL2
+> hypercall handling code.
 > 
-> When resctrl wants to read a domain's 'QOS_L3_OCCUP', it needs to allocate
-> a monitor on the corresponding resource. Monitors are allocated by class
-> instead of component.
-> 
-> MBM monitors are much more complicated, if there are enough monitors, they
-> will be pre-allocated and free-running. If ABMC is in use instead then
-> 'some' are pre-allocated in a different way, and need assigning.
-> 
-> Add helpers to allocate a CSU monitor. These helper return an out of range
-> value for MBM counters.
-> 
-> Allocating a montitor context is expected to block until hardware resources
+> Remove the redundant is_protected_kvm_enabled() checks.
 
-monitor
+That made me wonder if we should further divide the HVC space to have a
+'pKVM only' range in addition to the privileged/unprivileged split, so
+we could WARN in the core HVC handler in the pretty unlikely event that
+we take a pKVM-only call in {n,h}VHE.
 
-> become available. This only makes sense for QOS_L3_OCCUP as unallocated MBM
-> counters are losing data.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since rfc:
-> USE_RMID_IDX -> USE_PRE_ALLOCATED in comment
-> Remove unnecessary arch_mon_ctx = NULL
-As with some other patches, I'm not taking the time at this point to dig
-into all the interactions with resctl as others will cover that much better
-than me.
+But yes there is no point in littering the code with is_protected_kvm_enabled()
+checks all over, so:
 
-Too much to get done :( 
+    Reviewed-by: Quentin Perret <qperret@google.com>
 
-With that in mind.
-
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-J
+Thanks,
+Quentin
