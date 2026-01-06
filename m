@@ -1,82 +1,103 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39A28341AD8
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 17:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392772FE079
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 17:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767721049; cv=none; b=CObGEAjZzmtuVBV8ixD4AT+umoRpOABIPFK1upoSzNbBFp8CB7oqetUVx6agB1BIMC1hyJuE4ov4KF/W8lyJqivP2uXWFtXbsTnP7iHCj6Py2/krf6rCS6Mew3i5tOReYqreo/OH4KsSS7zKDpg0+7/9iLc0CkpnKPpEvZS5+JQ=
+	t=1767721394; cv=none; b=TCW5/e4Vt/rHi77dHG3IKPGJuRwHjUmoTSFKACu1Aw90necOTSZf8wgYb/KU3xL+TWCFLNaGN6SFjnt0W7tl4pnOQfoiJ2IREc+jzSfyLcU1s8JvPHEtj2lRIng+J42hznyXp392aqFTxHopZBNgxk5HZKquyfTBRHFpL83kFc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767721049; c=relaxed/simple;
-	bh=FPuKa2PkeKUlTGCelYOFIYuyDbUY4kgkt8fqAjPJSoI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hnnmxz7iXvJQ0VvA9Yf87DkFkIfplwf6TRyPmLeRloZe/LLa+XzUsUHCXgRZ3SOgB51lfJUjjyL2IuTf3QHQno5AFchQX4ZX3EUUsxl5AFCBd3ea6B3mSZq+WASPiRfnVSZRDd6IGiYBZbiM0SJN0dXR4tKdQN2xm1Q1GOa1xXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D67BA497;
-	Tue,  6 Jan 2026 09:37:20 -0800 (PST)
-Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 257753F5A1;
-	Tue,  6 Jan 2026 09:37:26 -0800 (PST)
-From: Mark Rutland <mark.rutland@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: broonie@kernel.org,
-	catalin.marinas@arm.com,
-	mark.rutland@arm.com,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	tabba@google.com,
-	will@kernel.org
-Subject: [PATCH 3/3] KVM: arm64: Remove ISB after writing FPEXC32_EL2
-Date: Tue,  6 Jan 2026 17:37:07 +0000
-Message-Id: <20260106173707.3292074-4-mark.rutland@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20260106173707.3292074-1-mark.rutland@arm.com>
-References: <20260106173707.3292074-1-mark.rutland@arm.com>
+	s=arc-20240116; t=1767721394; c=relaxed/simple;
+	bh=RF1u3eonBZzegDg1PZuS6BezgVys09l39qBCJ0/zL0U=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rDDXH9p3oo6LGyX0H+HIstUrSA+HobIPepariT8UMaNwBykwlBCg0wcr/IM/e9JRHKsGPeeIozvkZrFqNMlpti0FfoIfhzB41Ncw//csYzrbl718cdII7NPmpgrlqS3FXyz38STzkxBc91MEiIFIb+ZmFrTCgvRfojcmSxW9LaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=wA8AGwnU; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="wA8AGwnU"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=lC/vPrppfWWJLMXtqrkEQhEuGW9UilLVWhfYhsLXqlM=;
+	b=wA8AGwnUx1Vq5QigHCn0VYFfK4J5ZNl8Ntb+EC5rG1ToX7ySH9N0CRiIQpm75yRmrrJxMpPRs
+	/2H/zmJxLE+C3vnLaJKQQtOfJbYl98JaAprg+qmVkx5lo4yoYhpqh+3KKM4G26tGMTna1y6Zc5T
+	56A9cor4yPwLMcOXjD90jVI=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dlycr0KYxz1vp16;
+	Wed,  7 Jan 2026 01:21:15 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlygD270QzJ46Bs;
+	Wed,  7 Jan 2026 01:23:20 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2DFD440086;
+	Wed,  7 Jan 2026 01:23:22 +0800 (CST)
+Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
+ 2026 17:23:21 +0000
+Date: Tue, 6 Jan 2026 17:23:17 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 01/36] KVM: arm64: Account for RES1 bits in
+ DECLARE_FEAT_MAP() and co
+Message-ID: <20260106172317.00001463@huawei.com>
+In-Reply-To: <20251219155222.1383109-2-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-2-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-The value of FPEX32_EL2 has no effect on execution in AArch64 state, and
-consequently there's no need for an ISB after writing to it in the hyp
-code (which executes in AArch64 state). When performing an exception
-return to AArch32 state, the exception return will provide the necessary
-context synchronization event.
+On Fri, 19 Dec 2025 15:52:36 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-Remove the redundant ISB.
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> None of the registers we manage in the feature dependency infrastructure
+> so far has any RES1 bit. This is about to change, as VTCR_EL2 has
+> its bit 31 being RES1.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/include/hyp/switch.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Oh goody.
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 8dce3da85da35..91aa1862349cb 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -59,10 +59,8 @@ static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- 	 * If FP/ASIMD is not implemented, FPEXC is UNDEFINED and any access to
- 	 * it will cause an exception.
- 	 */
--	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd()) {
-+	if (vcpu_el1_is_32bit(vcpu) && system_supports_fpsimd())
- 		write_sysreg(1 << 30, fpexc32_el2);
--		isb();
--	}
- }
- 
- static inline void __activate_cptr_traps_nvhe(struct kvm_vcpu *vcpu)
--- 
-2.30.2
+> 
+> In order to not fail the consistency checks by not describing a bit,
+> add RES1 bits to the set of immutable bits. This requires some extra
+> surgery for the FGT handling, as we now need to track RES1 bits there
+> as well.
+> 
+> There are no RES1 FGT bits *yet*. Watch this space.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+FWIW it seems correct.  The only thing I wondered about is
+the assumption that if there is an error best thing to do is
+to assume it was res0 that was wrong and paper over it.
+I guess we can't do anything better if that does happen.
 
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+Process thing though: before anyone can merge this, Sasha
+please take a look at submitting patches documentation.
+
+When you 'post' a patch that was written by someone else you have
+handled the patch and for the Developer Certificate of origin stuff
+to work you have to add your Signed-off-by after theirs.
+
+Jonathan
