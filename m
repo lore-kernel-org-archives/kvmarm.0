@@ -1,168 +1,470 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F65EEA8
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 16:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767715328; cv=pass; b=XQezAEoGO7TSqBKoi43HNQrEQEkjlxFipiwsWG4it1TvrpCI8+LB8X+XwR1v+mgYrso5ldHxcMQsqTmxOZO1/VnGl641jMOioS9xEkHr2Q6s5Hc7EaNRX3d1T9phaNJldspXgoyTFwWmpHqqS83uhRAXepUXEP+q+MmgZlp5xSg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767715328; c=relaxed/simple;
-	bh=Bbx6kybqDTyLUdOd+QGJdlDjxR+Gxq/E2JorMYNy69M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IIsU+YK0ke6plQFZcoZ9XTB+7qa/AjdQ/Y9B93VxJIq9pXswbXyuLKZ644pjlLOOsgP/XJrYAQj2Rijlfgxfk049ytsAGDeJ7VH8/1yUc+5+bkdRymJgWEQkCELI1QTcsBv0WuEP5le8E4OCdxK96KHPSmPmLhSL0xsFQORkUMc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bubQZn9l; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bubQZn9l"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ee147baf7bso472471cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 08:02:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767715326; cv=none;
-        d=google.com; s=arc-20240605;
-        b=KW2X2n40JP7eaFkpllxk0dr6an2BFy2LodCBRNWuDmEuDLBO6vpjkFM4EoGLNYVVPq
-         pRHOx1l7YX4/4j8ljASAKY2a4pFhXJw2cETXzeevhymQCnZw4vY3icW2tt5SiNeCb5wA
-         dUOkjy6dSKermKTmMOWHO6k8reAqFEcZineuIwoJtkawqnCyRGRMiHaB0e3IKd2F9vqH
-         8HVFgAZHizrupq0na5eKp4i+f1IMHl61cWq4S3PkdBQLm5IxdioYBLPd1QiEYwQBdWms
-         a9aineabRpGoDUdqkRr8w9NOy0C3/0q3NB0Vjwbg5m/pMT69VYKR5+iMJI8DNsUXbh1y
-         FpjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
-        fh=OsVEnhpHfDtKQejlv1Bgs/tZPAfr3IJ2Ck5WUUi92Sc=;
-        b=ef6tXk9K479wv4aHXEkn9e2KG/5V9VCd+9rvhfhQeEwvZEC15iBSagCoKkQUT0yksm
-         JTKk0w8tcAUd7+Y2i47rQey3o5D9QQ3W8eBT2EIcoQGr5kf4u1xucg9jEuO9mD0Mvc3W
-         +TThxn4Skn8B2SNPmqhwJIr10uiCoqAKver3h1ticw8QMcjT8dk2HrOnoqTbEl4iMzcp
-         OlK8650tTYMrmB9V5ZqWRWa/pgIl4g5NEQYojcg+seEdOPGq1HB1R73k+M/6ZxcRmN/h
-         03+FppUu12xYZh9IvvGzFG4jCgE1i+sXEZzjvGK2SCyADkAZqvADlsM3BOYp20+/0cDi
-         Lg6A==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767715326; x=1768320126; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
-        b=bubQZn9lfvQviVupOkryWbzboK7DJl4XPb72exDf6W21p9Atx/HAU7u1/wmp6x9cVD
-         AS73vNF4gnosq+wdMBF1a+d9Z3ZxwNR6QSLRoQ9bJZM8tZw9PjzUNJt9+e0DFTGButtQ
-         +asQ/5t269CUnKurxAJC22E6bSc0zeIgClul8ELnN+M/IbZ4VWF/i8YKpt9EtcJbcdDT
-         kyjUzEhgAZh39xebZgHmQHEeEt0LML19CDCLwsvPMNfTwQ9kh6fmQcplD3tE99gCJTEF
-         m5eUpq4w6RhEjrB5QiGnO5hq4UAM5qAs39Nx7VVsAawKnEaX4tM10ZHDknxZGPdWXaXf
-         PHnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767715326; x=1768320126;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
-        b=d/7Mr+Y0546p7g9SBE8O9QiJxhCnDOeduvPA5BsVLv4qygLfJb6h7pcHfMcQIKK5fW
-         DqofSSNW0G0LiHuaLozhjCZqKvWJHJGrQyNPwn2rMQebRFxLpyS+WWpvRnxLpOnwLrDR
-         6O4/SDPj5Gx2IxeYyU3OWlkAD1tKCUrj1V7GTyCisTF/QdxvHJc74Olc9ClP9PNpSFek
-         bMuCTjDoNUTmzOuZxoR3CnuwKsMqhbw2hOp4mgH4z5fwpAJET646yMx0ys0PK3n72Hao
-         Aqy2dS9HR+UJ+8+Ygn0kv008AGAHi233zuAWuz9QCrVjbNeMXAAmrn839nu5D9l2OwQa
-         sGzQ==
-X-Gm-Message-State: AOJu0YwO7gMX7A5K7YnwzfIxHbFPfxjzBmkOslKV9pp0eGKTfXhsiJB/
-	14gbTiqPrgH8LU8lQPSs43i7yzfKpTeCpPZnq/EAZ5y2VGJIC4Hd5gR0OjgJc1mjNO8/STogXym
-	iymUaUynZBeNWcZ0ix58n+QVXmiAuCSzI9yAeGI1x
-X-Gm-Gg: AY/fxX6Fxyio87m0Pk3sjbOkalVDzkIXm30523brme98BdsyYGHKWxlxd3W6Pu9FAlG
-	g6yGR9YXk5+OrK4vjOmD8kygBldw+L58duCsanGcm9kHcwEu9yrtGB5zTxiWXEbYRYPeFE8Egrt
-	mijrA2JVGcjUXj3+F4lfuJdT6KgRKmt8Ls6BdIgibFgAJrCb/6T6dwz+F/K12jOACEqTw+7/aih
-	mtL1MurR0Prexlc36ZWeDBSxIUD4HeGgZD1LrbWZAjV63owbNfJ+aS40EdDA6tX0B088Xfo
-X-Google-Smtp-Source: AGHT+IHxG68k4H7QxOCqcUestNOdt2ymq6k/B9L/EOR9jHs12J8OklAbo9pVNZdm2PJbf3+p7kEjNGC1B4QDwRgIwpM=
-X-Received: by 2002:a05:622a:355:b0:4f1:9c3f:2845 with SMTP id
- d75a77b69052e-4ffa96218abmr6005851cf.9.1767715325130; Tue, 06 Jan 2026
- 08:02:05 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9DF3BB4A
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 16:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767715596; cv=none; b=GE8MoYqf6ZaUnkiM5WinXEfWvWQZ2O8hPDgjsjXcA2/KkSpcweoABbR6s9x4gUVPiFB/x0IQsXkWv4sMULWHi7FFPG1mKDsE5lCzmGU/BVisKaVVTJ9PK/X83v68rkmWrFw8tgxJiNfR9WpcYCTW0ZgdM7/TE9loNZeJMFOotlw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767715596; c=relaxed/simple;
+	bh=RVjpS/Sgy+IuuSLYARQ7OT6EHrneL0parMIx63KTKPs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BGr8hbrLOKj+K4GegySLxMBZNT7nWcBfrXY0MIdPqKaz9KLDSWYzel23hWQTGuSutAYLHy0shRXgOd6AUyohr6rzcYbZTmZgSGD9kGAiM6RvRF5q/B+uLurW2TvDyjti5dd8CBXuEpwc61DEleOiH5SWIB9ezUq3jow607qawz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F40B6497;
+	Tue,  6 Jan 2026 08:06:26 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18DB33F6A8;
+	Tue,  6 Jan 2026 08:06:31 -0800 (PST)
+Date: Tue, 6 Jan 2026 16:06:29 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 18/36] KVM: arm64: gic-v5: Implement PPI interrupt
+ injection
+Message-ID: <20260106160629.GC1982@e124191.cambridge.arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+ <20251219155222.1383109-19-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260105154939.11041-1-will@kernel.org> <20260105154939.11041-20-will@kernel.org>
-In-Reply-To: <20260105154939.11041-20-will@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 6 Jan 2026 16:01:28 +0000
-X-Gm-Features: AQt7F2p9bIGiuS3iUUJfep_yOAaw5pVkKkYP_KCrIopHGcAfqqtRaJGG_En4JyE
-Message-ID: <CA+EHjTzNcTOR5sZpBTUXUP++yqOZEvmfs=S3wqBTG-YT=hxoKQ@mail.gmail.com>
-Subject: Re: [PATCH 19/30] KVM: arm64: Annotate guest donations with handle
- and gfn in host stage-2
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251219155222.1383109-19-sascha.bischoff@arm.com>
 
-Hi Will,
-
-On Mon, 5 Jan 2026 at 15:50, Will Deacon <will@kernel.org> wrote:
->
-> Handling host kernel faults arising from accesses to donated guest
-> memory will require an rmap-like mechanism to identify the guest mapping
-> of the faulting page.
->
-> Extend the page donation logic to encode the guest handle and gfn
-> alongside the owner information in the host stage-2 pte.
->
-> Signed-off-by: Will Deacon <will@kernel.org>
+On Fri, Dec 19, 2025 at 03:52:42PM +0000, Sascha Bischoff wrote:
+> This change introduces interrupt injection for PPIs for GICv5-based
+> guests.
+> 
+> The lifecycle of PPIs is largely managed by the hardware for a GICv5
+> system. The hypervisor injects pending state into the guest by using
+> the ICH_PPI_PENDRx_EL2 registers. These are used by the hardware to
+> pick a Highest Priority Pending Interrupt (HPPI) for the guest based
+> on the enable state of each individual interrupt. The enable state and
+> priority for each interrupt are provided by the guest itself (through
+> writes to the PPI registers).
+> 
+> When Direct Virtual Interrupt (DVI) is set for a particular PPI, the
+> hypervisor is even able to skip the injection of the pending state
+> altogether - it all happens in hardware.
+> 
+> The result of the above is that no AP lists are required for GICv5,
+> unlike for older GICs. Instead, for PPIs the ICH_PPI_* registers
+> fulfil the same purpose for all 128 PPIs. Hence, as long as the
+> ICH_PPI_* registers are populated prior to guest entry, and merged
+> back into the KVM shadow state on exit, the PPI state is preserved,
+> and interrupts can be injected.
+> 
+> When injecting the state of a PPI the state is merged into the KVM's
+> shadow state using the set_pending_state irq_op. The directly sets the
+> relevant bit in the shadow ICH_PPI_PENDRx_EL2, which is presented to
+> the guest (and GICv5 hardware) on next guest entry. The
+> queue_irq_unlock irq_op is required to kick the vCPU to ensure that it
+> seems the new state. The result is that no AP lists are used for
+> private interrupts on GICv5.
+> 
+> Prior to entering the guest, vgic_v5_flush_ppi_state is called from
+> kvm_vgic_flush_hwstate. The effectively snapshots the shadow PPI
+> pending state (twice - an entry and an exit copy) in order to track
+> any changes. These changes can come from a guest consuming an
+> interrupt or from a guest making an Edge-triggered interrupt pending.
+> 
+> When returning from running a guest, the guest's PPI state is merged
+> back into KVM's shadow state in vgic_v5_merge_ppi_state from
+> kvm_vgic_sync_hwstate. The Enable and Active state is synced back for
+> all PPIs, and the pending state is synced back for Edge PPIs (Level is
+> driven directly by the devices generating said levels). The incoming
+> pending state from the guest is merged with KVM's shadow state to
+> avoid losing any incoming interrupts.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 7d1844e2888d..1a341337b272 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -1063,6 +1063,19 @@ static void hyp_poison_page(phys_addr_t phys)
->         hyp_fixmap_unmap();
+>  arch/arm64/kvm/vgic/vgic-v5.c | 159 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    |  46 +++++++---
+>  arch/arm64/kvm/vgic/vgic.h    |  47 ++++++++--
+>  include/kvm/arm_vgic.h        |   3 +
+>  4 files changed, 235 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 46c70dfc7bb08..cb3dd872d16a6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -56,6 +56,165 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
 >  }
->
-> +#define KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK GENMASK(15, 0)
-> +#define KVM_HOST_INVALID_PTE_GUEST_GFN_MASK    GENMASK(56, 16)
-> +static u64 host_stage2_encode_gfn_meta(struct pkvm_hyp_vm *vm, u64 gfn)
+>  
+> +static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+> +					  struct vgic_irq *irq)
 > +{
-> +       pkvm_handle_t handle = vm->kvm.arch.pkvm.handle;
+> +	struct vgic_v5_cpu_if *cpu_if;
+> +	const u64 id_bit = BIT_ULL(irq->intid % 64);
+> +	const u32 reg = FIELD_GET(GICV5_HWIRQ_ID, irq->intid) / 64;
 > +
-> +       WARN_ON(!FIELD_FIT(KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK, handle));
-
-Instead of (or in addition to) this check, should we also have a
-compile time check to ensure that the handle fits? We have
-KVM_MAX_PVMS and HANDLE_OFFSET, albeit HANDLE_OFFSET, so we can
-calculate whether it fits.
-
-Cheers,
-/fuad
-
-> +       WARN_ON(!FIELD_FIT(KVM_HOST_INVALID_PTE_GUEST_GFN_MASK, gfn));
+> +	if (!vcpu || !irq)
+> +		return false;
 > +
-> +       return FIELD_PREP(KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK, handle) |
-> +              FIELD_PREP(KVM_HOST_INVALID_PTE_GUEST_GFN_MASK, gfn);
+> +	/* Skip injecting the state altogether */
+> +	if (irq->directly_injected)
+> +		return true;
+> +
+> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	if (irq_is_pending(irq))
+> +		cpu_if->vgic_ppi_pendr[reg] |= id_bit;
+> +	else
+> +		cpu_if->vgic_ppi_pendr[reg] &= ~id_bit;
+> +
+> +	return true;
 > +}
 > +
->  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
+> +/*
+> + * For GICv5, the PPIs are mostly directly managed by the hardware. We
+> + * (the hypervisor) handle the pending, active, enable state
+> + * save/restore, but don't need the PPIs to be queued on a per-VCPU AP
+> + * list. Therefore, sanity check the state, unlock, and return.
+> + */
+> +static bool vgic_v5_ppi_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+> +					 unsigned long flags)
+> +	__releases(&irq->irq_lock)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	lockdep_assert_held(&irq->irq_lock);
+> +
+> +	if (WARN_ON_ONCE(!__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid)))
+> +		goto out_unlock_fail;
+> +
+> +	vcpu = irq->target_vcpu;
+> +	if (WARN_ON_ONCE(!vcpu))
+> +		goto out_unlock_fail;
+> +
+> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +
+> +	/* Directly kick the target VCPU to make sure it sees the IRQ */
+> +	kvm_make_request(KVM_REQ_IRQ_PENDING, vcpu);
+> +	kvm_vcpu_kick(vcpu);
+> +
+> +	return true;
+> +
+> +out_unlock_fail:
+> +	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
+> +
+> +	return false;
+> +}
+> +
+> +static struct irq_ops vgic_v5_ppi_irq_ops = {
+> +	.set_pending_state = vgic_v5_ppi_set_pending_state,
+> +	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+> +};
+> +
+> +void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
+> +{
+> +	if (WARN_ON(!irq))
+> +		return;
+> +
+> +	scoped_guard(raw_spinlock, &irq->irq_lock) {
+> +		if (!WARN_ON(irq->ops))
+> +			irq->ops = &vgic_v5_ppi_irq_ops;
+> +	}
+> +}
+> +
+> +/*
+> + * Detect any PPIs state changes, and propagate the state with KVM's
+> + * shadow structures.
+> + */
+> +void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +
+> +	for (reg = 0; reg < 2; reg++) {
+> +		unsigned long changed_bits;
+> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
+> +		const unsigned long activer = cpu_if->vgic_ppi_activer_exit[reg];
+> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
+> +
+> +		/*
+> +		 * Track what changed across enabler, activer, pendr, but mask
+> +		 * with ~DVI.
+> +		 */
+> +		changed_bits = cpu_if->vgic_ich_ppi_enabler_entry[reg] ^ enabler;
+> +		changed_bits |= cpu_if->vgic_ppi_activer_entry[reg] ^ activer;
+> +		changed_bits |= cpu_if->vgic_ppi_pendr_entry[reg] ^ pendr;
+> +		changed_bits &= ~cpu_if->vgic_ppi_dvir[reg];
+> +
+> +		for_each_set_bit(i, &changed_bits, 64) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +
+> +			scoped_guard(raw_spinlock, &irq->irq_lock) {
+> +				irq->enabled = !!(enabler & BIT(i));
+> +				irq->active = !!(activer & BIT(i));
+> +
+> +				/* This is an OR to avoid losing incoming edges! */
+> +				if (irq->config == VGIC_CONFIG_EDGE)
+> +					irq->pending_latch |= !!(pendr & BIT(i));
+> +			}
+> +
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +		}
+> +
+> +		/* Re-inject the exit state as entry state next time! */
+> +		cpu_if->vgic_ich_ppi_enabler_entry[reg] = enabler;
+> +		cpu_if->vgic_ppi_activer_entry[reg] = activer;
+> +
+> +		/*
+> +		 * Pending state is a bit different. We only propagate back
+> +		 * pending state for Edge interrupts. Moreover, this is OR'd
+> +		 * with the incoming state to make sure we don't lose incoming
+> +		 * edges. Use the (inverse) HMR to mask off all Level bits, and
+> +		 * OR.
+> +		 */
+> +		cpu_if->vgic_ppi_pendr[reg] |= pendr & ~cpu_if->vgic_ppi_hmr[reg];
+> +	}
+> +}
+> +
+> +void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	/*
+> +	 * We're about to enter the guest. Copy the shadow state to the pending
+> +	 * reg that will be written to the ICH_PPI_PENDRx_EL2 regs. While the
+> +	 * guest is running we track any incoming changes to the pending state in
+> +	 * vgic_ppi_pendr. The incoming changes are merged with the outgoing
+> +	 * changes on the return path.
+> +	 */
+> +	cpu_if->vgic_ppi_pendr_entry[0] = cpu_if->vgic_ppi_pendr[0];
+> +	cpu_if->vgic_ppi_pendr_entry[1] = cpu_if->vgic_ppi_pendr[1];
+> +
+> +	/*
+> +	 * Make sure that we can correctly detect "edges" in the PPI
+> +	 * state. There's a path where we never actually enter the guest, and
+> +	 * failure to do this risks losing pending state
+> +	 */
+> +	cpu_if->vgic_ppi_pendr_exit[0] = cpu_if->vgic_ppi_pendr[0];
+> +	cpu_if->vgic_ppi_pendr_exit[1] = cpu_if->vgic_ppi_pendr[1];
+> +
+> +}
+> +
+>  /*
+>   * Not all PPIs are guaranteed to be implemented for
+>   * GICv5. Deterermine which ones are, and generate a mask. This is
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index ac8cb0270e1e4..cb5d43b34462b 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -105,6 +105,14 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
+>  	if (WARN_ON(!vcpu))
+>  		return NULL;
+>  
+> +	if (vgic_is_v5(vcpu->kvm) &&
+> +	    __irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, intid)) {
+> +		u32 int_num = FIELD_GET(GICV5_HWIRQ_ID, intid);
+> +
+> +		int_num = array_index_nospec(int_num, VGIC_V5_NR_PRIVATE_IRQS);
+> +		return &vcpu->arch.vgic_cpu.private_irqs[int_num];
+> +	}
+> +
+>  	/* SGIs and PPIs */
+>  	if (intid < VGIC_NR_PRIVATE_IRQS) {
+>  		intid = array_index_nospec(intid, VGIC_NR_PRIVATE_IRQS);
+> @@ -258,10 +266,12 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+>  	 * If the distributor is disabled, pending interrupts shouldn't be
+>  	 * forwarded.
+>  	 */
+> -	if (irq->enabled && irq_is_pending(irq)) {
+> -		if (unlikely(irq->target_vcpu &&
+> -			     !irq->target_vcpu->kvm->arch.vgic.enabled))
+> -			return NULL;
+> +	if (irq_is_enabled(irq) && irq_is_pending(irq)) {
+> +		if (irq->target_vcpu) {
+> +			if (!vgic_is_v5(irq->target_vcpu->kvm) &&
+> +			    unlikely(!irq->target_vcpu->kvm->arch.vgic.enabled))
+> +				return NULL;
+> +		}
+
+Don't understand this, can you explain?
+
+Thanks,
+Joey
+
+>  
+>  		return irq->target_vcpu;
+>  	}
+> @@ -836,9 +846,11 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>  		vgic_release_deleted_lpis(vcpu->kvm);
+>  }
+>  
+> -static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+> +static void vgic_fold_state(struct kvm_vcpu *vcpu)
 >  {
->         u64 ipa = hyp_pfn_to_phys(gfn);
-> @@ -1105,6 +1118,7 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
->         struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
->         u64 phys = hyp_pfn_to_phys(pfn);
->         u64 ipa = hyp_pfn_to_phys(gfn);
-> +       u64 meta;
->         int ret;
->
->         host_lock_component();
-> @@ -1118,7 +1132,9 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
->         if (ret)
->                 goto unlock;
->
-> -       WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_GUEST));
-> +       meta = host_stage2_encode_gfn_meta(vm, gfn);
-> +       WARN_ON(host_stage2_set_owner_metadata_locked(phys, PAGE_SIZE,
-> +                                                     PKVM_ID_GUEST, meta));
->         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
->                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
->                                        &vcpu->vcpu.arch.pkvm_memcache, 0));
-> --
-> 2.52.0.351.gbe84eed79e-goog
->
+> -	if (kvm_vgic_global_state.type == VGIC_V2)
+> +	if (vgic_is_v5(vcpu->kvm))
+> +		vgic_v5_fold_ppi_state(vcpu);
+> +	else if (kvm_vgic_global_state.type == VGIC_V2)
+>  		vgic_v2_fold_lr_state(vcpu);
+>  	else
+>  		vgic_v3_fold_lr_state(vcpu);
+> @@ -1045,8 +1057,10 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  	if (can_access_vgic_from_kernel())
+>  		vgic_save_state(vcpu);
+>  
+> -	vgic_fold_lr_state(vcpu);
+> -	vgic_prune_ap_list(vcpu);
+> +	vgic_fold_state(vcpu);
+> +
+> +	if (!vgic_is_v5(vcpu->kvm))
+> +		vgic_prune_ap_list(vcpu);
+>  }
+>  
+>  /* Sync interrupts that were deactivated through a DIR trap */
+> @@ -1070,6 +1084,17 @@ static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>  		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>  }
+>  
+> +static void vgic_flush_state(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vgic_is_v5(vcpu->kvm)) {
+> +		vgic_v5_flush_ppi_state(vcpu);
+> +		return;
+> +	}
+> +
+> +	scoped_guard(raw_spinlock, &vcpu->arch.vgic_cpu.ap_list_lock)
+> +		vgic_flush_lr_state(vcpu);
+> +}
+> +
+>  /* Flush our emulation state into the GIC hardware before entering the guest. */
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> @@ -1106,13 +1131,12 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  
+>  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+>  
+> -	scoped_guard(raw_spinlock, &vcpu->arch.vgic_cpu.ap_list_lock)
+> -		vgic_flush_lr_state(vcpu);
+> +	vgic_flush_state(vcpu);
+>  
+>  	if (can_access_vgic_from_kernel())
+>  		vgic_restore_state(vcpu);
+>  
+> -	if (vgic_supports_direct_irqs(vcpu->kvm))
+> +	if (vgic_supports_direct_irqs(vcpu->kvm) && !vgic_is_v5(vcpu->kvm))
+>  		vgic_v4_commit(vcpu);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index d5d9264f0a1e9..978d7f8426361 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -132,6 +132,28 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
+>  		return irq->pending_latch || irq->line_level;
+>  }
+>  
+> +/* Requires the irq_lock to be held by the caller. */
+> +static inline bool irq_is_enabled(struct vgic_irq *irq)
+> +{
+> +	if (irq->enabled)
+> +		return true;
+> +
+> +	/*
+> +	 * We always consider GICv5 interrupts as enabled as we can
+> +	 * always inject them. The state is handled by the hardware,
+> +	 * and the hardware will only signal the interrupt to the
+> +	 * guest once the guest enables it.
+> +	 */
+> +	if (irq->target_vcpu) {
+> +		u32 vgic_model = irq->target_vcpu->kvm->arch.vgic.vgic_model;
+> +
+> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  static inline bool vgic_irq_is_mapped_level(struct vgic_irq *irq)
+>  {
+>  	return irq->config == VGIC_CONFIG_LEVEL && irq->hw;
+> @@ -364,7 +386,10 @@ void vgic_debug_destroy(struct kvm *kvm);
+>  
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+>  void vgic_v5_get_implemented_ppis(void);
+> +void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
+>  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+> +void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
+> +void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu);
+>  void vgic_v5_put(struct kvm_vcpu *vcpu);
+>  void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+> @@ -433,15 +458,6 @@ void vgic_its_invalidate_all_caches(struct kvm *kvm);
+>  int vgic_its_inv_lpi(struct kvm *kvm, struct vgic_irq *irq);
+>  int vgic_its_invall(struct kvm_vcpu *vcpu);
+>  
+> -bool system_supports_direct_sgis(void);
+> -bool vgic_supports_direct_msis(struct kvm *kvm);
+> -bool vgic_supports_direct_sgis(struct kvm *kvm);
+> -
+> -static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
+> -{
+> -	return vgic_supports_direct_msis(kvm) || vgic_supports_direct_sgis(kvm);
+> -}
+> -
+>  int vgic_v4_init(struct kvm *kvm);
+>  void vgic_v4_teardown(struct kvm *kvm);
+>  void vgic_v4_configure_vsgis(struct kvm *kvm);
+> @@ -481,6 +497,19 @@ static inline bool vgic_is_v3(struct kvm *kvm)
+>  	return kvm_vgic_global_state.type == VGIC_V3 || vgic_is_v3_compat(kvm);
+>  }
+>  
+> +bool system_supports_direct_sgis(void);
+> +bool vgic_supports_direct_msis(struct kvm *kvm);
+> +bool vgic_supports_direct_sgis(struct kvm *kvm);
+> +
+> +static inline bool vgic_supports_direct_irqs(struct kvm *kvm)
+> +{
+> +	/* GICv5 always supports direct IRQs */
+> +	if (vgic_is_v5(kvm))
+> +		return true;
+> +
+> +	return vgic_supports_direct_msis(kvm) || vgic_supports_direct_sgis(kvm);
+> +}
+> +
+>  int vgic_its_debug_init(struct kvm_device *dev);
+>  void vgic_its_debug_destroy(struct kvm_device *dev);
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 500709bd62c8d..b5180edbd1165 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -32,6 +32,9 @@
+>  #define VGIC_MIN_LPI		8192
+>  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>  
+> +/* GICv5 constants */
+> +#define VGIC_V5_NR_PRIVATE_IRQS	128
+> +
+>  #define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
+>  
+>  #define __irq_is_sgi(t, i)						\
+> -- 
+> 2.34.1
