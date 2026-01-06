@@ -1,297 +1,111 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39972314A6C
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 16:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7472EACEE;
+	Tue,  6 Jan 2026 16:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767716812; cv=none; b=AGRUEhDfL7Nfi6ptVraI0ZS769bJHeWMeEkz5r8okC+sRitKhQ6GWO8SuypWJSeFAZa+Et/uCMhUWTbF+kKsaAhpw36/fie+JaWYjNYhi1FpfzVqTWyOZkvisls7RRPd2wV6A4el0bwEOv5Vl8mBgP2TBn6rToyJtcLcmJXLHNg=
+	t=1767717665; cv=none; b=LI9niz31aWNgfbZNX2Ask8S3jqr6+4R6JwXWG6JR7xvUJzflMGoeBJr6P430xsHWWdWqxfvLXrViXeL8DyrTgmvQMJ//FSpGp1JGzkf+2cc+l2TF85SwTLn3CaInvyLTp5it+wFwp39Y9cqJ9/+BAoC2WYyUZXRxL/MqQFoQb/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767716812; c=relaxed/simple;
-	bh=nlfTEC5pmR1JRg1s+mONFiOiwOSiMJA45Ei7NGRGpQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sJ0eo+eyQM/L49wAP588Nh2o9dqg+xoM6q5s58QbZKJoCbSCohmgdgXtM/4AIohlVPUFuAO7yzpY8J9uIYtQXiMdC8uNUY/qC35g4MXA+GqqPct6Oy2Ai0RnK6kOPrVku1NFFCVm2zjLu2ldoGE8XtyjMZfZiPFx5MJAsnjaWxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cEvYQQ0w; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1767717665; c=relaxed/simple;
+	bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ocsSMKLC8Bpi/7gicpc4Aq38kdcdTYpXcxaFcAxDleMbpOBYHNsUuzHYYcTIQx03ugkVj2DBh5VKryIfmuVJ1sK07LPylIf4T8Y9skAWU6TgXXwpk39NV9Ks6Hk2juSF1bfsFTt2CUWDZoUfaP5pM60zFBEXXuGS00Lx5UBkGi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kgh5MwyV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cEvYQQ0w"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477ba2c1ca2so12075205e9.2
-        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 08:26:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767716808; x=1768321608; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=w+Ejsdv+4cSG7ZPhph+YM70TsgyLaB5ykH3UcPAAKxY=;
-        b=cEvYQQ0w3aHe78r8uE3fSjp6EFVDVu7R1/zKeUnWlP+5SdV0YBlIueeL3tMo8ZuMR6
-         Ux6PeEFZ3hEU/1roUq8qaVMLIBJlPW3YkLxeOOP28AmWwOaibDEaI/uYwBeBKctGMvhd
-         FC0XwtmMyJIJIWm9R1rtQsvO9mSzPz4momc2GHKCmTMvgqSc2U2lfjLA2cedMZkhrmBX
-         FuNYsm5CerYjH/op6MdLN1Pwxc6Na+9xjg9aEKeeKvbBGDKLyMRgbrdMfrShVvFh7vgn
-         K6ex9p72jjHOKqrN2tVJLquv+zX7CdEav8i0E/9bhHljkDw38+0ZPy6WsaZHtaGvOB9p
-         pT+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767716808; x=1768321608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=w+Ejsdv+4cSG7ZPhph+YM70TsgyLaB5ykH3UcPAAKxY=;
-        b=sI/O5EzG6Iy78PloctIGiK9GksBT22dDn2JBXiE2sstPnyL6eCze5jSgljSYWLOb+X
-         tvliBgpwEBiAxJxIQNehXSThLdzJcD8MeMN+B6FI22yo1dHC5lwVz6okiP7MkLl3l7MC
-         ZmJPZSGuZcn3pXQ8f2zFvHp0sjKGXJokzuz4xM2XU2wIn6K1WPDxrSGFqeUEN1QvkVOf
-         ZCea/8zOt2n1OdoRxCMe756i2P0bBKDrbRa8iAuDFp3uMuxvSzuPoiQAxHdXO/5NLuSt
-         MqeVi9dsC/DfEonCU6Fybe3tgOPqBvYzF1WBhfY1XSuy8UbJaGEcEEnv9VK8fY6MIVyv
-         yd/A==
-X-Gm-Message-State: AOJu0YzBhl+gfdcF0unHI2NJdCbE7txs3MRc7enkRIUak1cbqunMSZDm
-	MiAO5qJaAG4/f1c2um98ImssjkD1PbkBvZrLpiKSJ6s4uA5+bGfNPo/4NMfkCM9sWQ==
-X-Gm-Gg: AY/fxX4KjNf5K5NSiY1gHvdNUQAxPgVyW1OKo+i01ORRf5AdFvKVxrvpawFaaR9B4FB
-	KvvYE792YYeC2ktXP/9yN30Tir81fXHgXoSpJErgQV93Co6BGAAA0g/IjSM7LwrJEE/R+Fp/ifo
-	1aik16SbqP4UMVkOcYngWsUNoXvXgHmIjytV1P5jWZjxPy+IfwrA2FkVLbECaVIRKzTYQLCIMFZ
-	ZSxSO7E+HZ7gjFGavtvVyVJRLaUyH2XyCivGvbmtOOFBz6ncMCqiqZCUJiDBxD5ZI+4LvWnNIJ1
-	RriLAuWsm02KzjrPbvfh2ovoZqSzXKLzb6BJREztp1BGC5lgRRxCA5HbuLrg7fDFud62ObJ3/RN
-	Jhgw3LJYdum+OvF28UBy+OsYhyUmbIKJNEvdv+3yfGjHJnxzN03gUBoqKkQqnEF/08SVjQyln2h
-	p8xvihZzWNCbOQiaG3/IocjUr7aGEjhl39kT98Fql6X0o6vS+YAg==
-X-Google-Smtp-Source: AGHT+IF7hlGyFV379hs3oKbqbIx8gkC6RYZlwJeShX+Gt9MMQwN8OR3S6eiOzaGyxDfGnvr8mxiw5w==
-X-Received: by 2002:a05:600c:8216:b0:476:4efc:8ed4 with SMTP id 5b1f17b1804b1-47d7f073134mr38448755e9.11.1767716808352;
-        Tue, 06 Jan 2026 08:26:48 -0800 (PST)
-Received: from google.com (44.145.34.34.bc.googleusercontent.com. [34.34.145.44])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f410c25sm57181765e9.2.2026.01.06.08.26.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 08:26:47 -0800 (PST)
-Date: Tue, 6 Jan 2026 16:26:44 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH 13/30] KVM: arm64: Introduce
- __pkvm_reclaim_dying_guest_page()
-Message-ID: <aV03xOYPTdurX2k4@google.com>
-References: <20260105154939.11041-1-will@kernel.org>
- <20260105154939.11041-14-will@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kgh5MwyV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459EBC16AAE;
+	Tue,  6 Jan 2026 16:41:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767717664;
+	bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=kgh5MwyVHs4IkOtgvFOEPcihx+pynI1zJ20VujdRC50HFKB3rxahAAmuOMeD8Tnyr
+	 XBJIavPRit/wbyRPqgk4Qn525S1HcdnVkMXfoQfuqlkd2glyRHRmB94bhy0F2EAhCv
+	 wV55ipYKDcTLwFhthFcanqMtRj200e/n4Bqzq5ORJmlaq8TAVvFMNwdb+ej9sj+rbZ
+	 Ex1X3OPfBRjt/DWZPEDnZLjaKRhzIYOQXnhgP2/CfALKD+rxxW9NCBkuS8FnHi/U1a
+	 94CTWIoOt1a22jVClX46ikvIYle21evOulXcA8x5XnsIKYHPW27mLfvQaWsN4qhQ3+
+	 OPluFY5HTO3yw==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v4 0/5] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Tue, 06 Jan 2026 16:35:40 +0000
+Message-Id: <20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105154939.11041-14-will@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANw5XWkC/4XNQQrCMBCF4atI1kYy09i0rryHuEjqpA1qKxMJi
+ vTupkUQcdHl/wa+eYlIHCiK3eolmFKIYehz6PVKNJ3tW5LhlFugwi0orOQ5XaXla6llpHs+SqY
+ 2Smu56fJGzhlTl7VW0Ihs3Jh8eMz+4Zi7C/E+8HN+l2BaP3KhFuQEUsm69KRO6MBUtD8T93TZD
+ NyKiU745QD0EoeZKw16BO01OP/HFV8OoV7iisw5b7XR1BQI1Q83juMbbqCidWkBAAA=
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1991; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=iYEeHk+9DnSGURMUeHt4qgmcIQTVl4/JW3coGdB0WE4=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpXTsZJaHZBU6eSm/oS3vIxB086dFSrrNy9mg8y
+ YYRR/3jr9CJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCaV07GQAKCRAk1otyXVSH
+ 0KZdB/wMSYXCt+ixrXxV5dAlXxTU/oY9SrbGIghLJnY440lUJGfPhSa2/3nQJYZtxDv1/thanJk
+ i4VKeEYt1iwOj58R4Al6zporgAN/Bytdfk4WAflO+bqxMe9n9v9/Z/czfDZl9Zv3p44PloVypUy
+ 5DPDAP1bVm6vLldJrL21ljZL47TQLye7L3rlvUh5Dl6SwAGQbu3NZwak5MjCJZVeqig6fSP3zfe
+ uQ+iUKaQReg5k0FXGHWXhhdswuen8OAuUajCek2mygWYpht4WWPWXrAHkwNfnp+lxBtlxQEj/lZ
+ Yb+qcPYCri+r0mJKwnqCcW4eZZwZzjSxUR9qqrh3L+xdjtSm
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-On Mon, Jan 05, 2026 at 03:49:21PM +0000, Will Deacon wrote:
-> To enable reclaim of pages from a protected VM during teardown,
-> introduce a new hypercall to reclaim a single page from a protected
-> guest that is in the dying state.
-> 
-> Since the EL2 code is non-preemptible, the new hypercall deliberately
-> acts on a single page at a time so as to allow EL1 to reschedule
-> frequently during the teardown operation.
-> 
-> Co-developed-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to report a result per register,
+making it much easier to see what the problem being reported is.
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+A similar, though less severe, issue exists with the validation of the
+individual bitfields in registers due to the use of immediately fatal
+asserts. Update those asserts to be standard kselftest reports.
 
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |  1 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
->  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  9 +++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 79 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c                | 14 ++++
->  6 files changed, 105 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index cad3ba5e1c5a..f14f845aeedd 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -86,6 +86,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 9c0cc53d1dc9..cde38a556049 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
-> +int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
->  int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
->  			    enum kvm_pgtable_prot prot);
->  int __pkvm_host_unshare_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vm *hyp_vm);
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> index 04c7ca703014..506831804f64 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-> @@ -74,6 +74,7 @@ int __pkvm_init_vm(struct kvm *host_kvm, unsigned long vm_hva,
->  int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
->  		     unsigned long vcpu_hva);
->  
-> +int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
->  int __pkvm_start_teardown_vm(pkvm_handle_t handle);
->  int __pkvm_finalize_teardown_vm(pkvm_handle_t handle);
->  
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index a5ee1103ce1f..b1940e639ad3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -570,6 +570,14 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
->  }
->  
-> +static void handle___pkvm_reclaim_dying_guest_page(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-> +	DECLARE_REG(u64, gfn, host_ctxt, 2);
-> +
-> +	cpu_reg(host_ctxt, 1) = __pkvm_reclaim_dying_guest_page(handle, gfn);
-> +}
-> +
->  static void handle___pkvm_start_teardown_vm(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-> @@ -622,6 +630,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__pkvm_unreserve_vm),
->  	HANDLE_FUNC(__pkvm_init_vm),
->  	HANDLE_FUNC(__pkvm_init_vcpu),
-> +	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
->  	HANDLE_FUNC(__pkvm_start_teardown_vm),
->  	HANDLE_FUNC(__pkvm_finalize_teardown_vm),
->  	HANDLE_FUNC(__pkvm_vcpu_load),
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index ae126ab9febf..edbfe0e3dc58 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -725,6 +725,32 @@ static int __guest_check_page_state_range(struct pkvm_hyp_vm *vm, u64 addr,
->  	return check_page_state_range(&vm->pgt, addr, size, &d);
->  }
->  
-> +static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep, u64 *physp)
-> +{
-> +	kvm_pte_t pte;
-> +	u64 phys;
-> +	s8 level;
-> +	int ret;
-> +
-> +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-> +	if (ret)
-> +		return ret;
-> +	if (!kvm_pte_valid(pte))
-> +		return -ENOENT;
-> +	if (level != KVM_PGTABLE_LAST_LEVEL)
-> +		return -E2BIG;
-> +
-> +	phys = kvm_pte_to_phys(pte);
-> +	ret = check_range_allowed_memory(phys, phys + PAGE_SIZE);
-> +	if (WARN_ON(ret))
-> +		return ret;
-> +
-> +	*ptep = pte;
-> +	*physp = phys;
-> +
-> +	return 0;
-> +}
-> +
->  int __pkvm_host_share_hyp(u64 pfn)
->  {
->  	u64 phys = hyp_pfn_to_phys(pfn);
-> @@ -958,6 +984,59 @@ static int __guest_check_transition_size(u64 phys, u64 ipa, u64 nr_pages, u64 *s
->  	return 0;
->  }
->  
-> +static void hyp_poison_page(phys_addr_t phys)
-> +{
-> +	void *addr = hyp_fixmap_map(phys);
-> +
-> +	memset(addr, 0, PAGE_SIZE);
-> +	/*
-> +	 * Prefer kvm_flush_dcache_to_poc() over __clean_dcache_guest_page()
-> +	 * here as the latter may elide the CMO under the assumption that FWB
-> +	 * will be enabled on CPUs that support it. This is incorrect for the
-> +	 * host stage-2 and would otherwise lead to a malicious host potentially
-> +	 * being able to read the contents of newly reclaimed guest pages.
-> +	 */
-> +	kvm_flush_dcache_to_poc(addr, PAGE_SIZE);
-> +	hyp_fixmap_unmap();
-> +}
-> +
-> +int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
-> +{
-> +	u64 ipa = hyp_pfn_to_phys(gfn);
-> +	kvm_pte_t pte;
-> +	u64 phys;
-> +	int ret;
-> +
-> +	host_lock_component();
-> +	guest_lock_component(vm);
-> +
-> +	ret = get_valid_guest_pte(vm, ipa, &pte, &phys);
-> +	if (ret)
-> +		goto unlock;
-> +
-> +	switch (guest_get_page_state(pte, ipa)) {
-> +	case PKVM_PAGE_OWNED:
-> +		WARN_ON(__host_check_page_state_range(phys, PAGE_SIZE, PKVM_NOPAGE));
-> +		hyp_poison_page(phys);
-> +		break;
-> +	case PKVM_PAGE_SHARED_OWNED:
-> +		WARN_ON(__host_check_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
-> +		break;
-> +	default:
-> +		ret = -EPERM;
-> +		goto unlock;
-> +	}
-> +
-> +	WARN_ON(kvm_pgtable_stage2_unmap(&vm->pgt, ipa, PAGE_SIZE));
-> +	WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HOST));
-> +
-> +unlock:
-> +	guest_unlock_component(vm);
-> +	host_unlock_component();
-> +
-> +	return ret;
-> +}
-> +
->  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
->  {
->  	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> index 7f8191f96fc3..9f0997150cf5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-> @@ -832,6 +832,20 @@ teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
->  	unmap_donated_memory_noclear(addr, size);
->  }
->  
-> +int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn)
-> +{
-> +	struct pkvm_hyp_vm *hyp_vm;
-> +	int ret = -EINVAL;
-> +
-> +	hyp_spin_lock(&vm_table_lock);
-> +	hyp_vm = get_vm_by_handle(handle);
-> +	if (hyp_vm && hyp_vm->kvm.arch.pkvm.is_dying)
-> +		ret = __pkvm_host_reclaim_page_guest(gfn, hyp_vm);
-> +	hyp_spin_unlock(&vm_table_lock);
-> +
-> +	return ret;
-> +}
-> +
->  int __pkvm_start_teardown_vm(pkvm_handle_t handle)
->  {
->  	struct pkvm_hyp_vm *hyp_vm;
-> -- 
-> 2.52.0.351.gbe84eed79e-goog
-> 
+Finally we have a fix for spurious errors on some NV systems.
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+Changes in v4:
+- Correct check for 32 bit ID registers.
+- Link to v3: https://patch.msgid.link/20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org
+
+Changes in v3:
+- Rebase onto v6.19-rc1.
+- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
+
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
+
+---
+Mark Brown (5):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
+      KVM: selftests: arm64: Skip all 32 bit IDs when set_id_regs is aarch64 only
+      KVM: selftests: arm64: Use is_aarch32_id_reg() in test_vm_ftr_id_regs()
+
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 159 ++++++++++++++++++------
+ 1 file changed, 119 insertions(+), 40 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
+
