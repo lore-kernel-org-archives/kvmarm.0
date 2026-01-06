@@ -1,124 +1,141 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5452435A949
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 18:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307BD33A9DD
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 19:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767725008; cv=none; b=cZ0rrwFRoOGemxsDybk+xGor4yO5TiWwAgqws3E8Py2lcnCcQjVoraYp/k2zB/2bLVAMh1UFJ1mlaKZpuYJuDcx5bdXolbRl8oBaLgXA7gfrmv94AVRjI1c2Ux17lk4EvFu6vFPASI45Ktjgou0Wl6nOaWxHkj5PWiEVLWSx9QQ=
+	t=1767728813; cv=none; b=t117u8gKkHd7mBL0k43Odm0X0v9cdZEyHBbhJyMm1tIOTe/3c2UzlGGu+rE7yaPZwXPzzjxgDY3kafgPsOgoGB30AltA5SsKn3A43jR9JUuIeAcRByHnOHz+iCyWgX/11JoBgpLJZJ0SP8OEEDIz/f6w+PTwyDm+8RCfkEGF+kI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767725008; c=relaxed/simple;
-	bh=8AQMo2bKqiVJpCXgq53DOTeAVQHmYvXvePKtYRdRIvU=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dqeXioFQ+SNbvwp2UiFpPeX5F7SkhtpLbzBic3HHOVg3ltR59vih3sH5OwwAiBJEH7LYgAbzC89tfobipwyFIf8wbF5pj9/iU68bheeSrylV/8r5f1lOZlKJF85//rrJwQaU4mGhDCTD1axziRSanamL4zPKDDQ9lHD3mMpDGMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Ti/Cnbq3; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767728813; c=relaxed/simple;
+	bh=KuSdBZ9CI3H4fvaeuI0u6Uz4UfBd8FAZf6zVOAwDu9c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PzjX24Num9BNyU/hOibzwQs3Hgkf21hQe8fUP/FD5zNFTUHAKqRQ94t3biMbXYhOByCDtcGdCgAua3XoVUgKHa6XJbF4edkHts8gEDEoqRTlklTqumiPNRpEMJ5y0dLx3odXlgJmUnJ5eicldKhT2qlwGtE0I/EX0pvEd2zT/vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QFd1srFz; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Ti/Cnbq3"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=CPZANbv0STzLtH3a80Pr5HXtHvD2VOOOrggZl0/fcv8=;
-	b=Ti/Cnbq3Wap4TdpoBsmDo7OUQ/W8DNZ1jPFaI8gBzFKMtHOud505NkRbTi0R0KmxwnFyDO1hI
-	gcupkrbCdKSxjaM0xu278dJRfXk8wikYzs2p6Mgx8LTNmtx9qhJPS0QHAd6PyFECgAz4hVmlJZh
-	1a9hvWXIT4m36vmfhBzN0kw=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dm0P45zMsz1vnvh;
-	Wed,  7 Jan 2026 02:41:12 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dm0RS4LKXzJ4680;
-	Wed,  7 Jan 2026 02:43:16 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 90B1C40565;
-	Wed,  7 Jan 2026 02:43:18 +0800 (CST)
-Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
- 2026 18:43:17 +0000
-Date: Tue, 6 Jan 2026 18:43:13 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 07/36] KVM: arm64: gic: Introduce interrupt type
- helpers
-Message-ID: <20260106184313.00002a8c@huawei.com>
-In-Reply-To: <20251219155222.1383109-8-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-8-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QFd1srFz"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-34cc88eca7eso2606085a91.2
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 11:46:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767728811; x=1768333611; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZriMaEA+mukSvHum14D+f4jkgVLElfimaxrHlh88e8w=;
+        b=QFd1srFz0h6z/+F31SrbnLlXOdGeymN/92xs/7+Zt0rybvYZM580BnaU89DRfpkTaK
+         5ISn4NqKrQu3BlJb1qFTrkYrHzKgMnFyQ2mlaa5E0DsXocxHoYvaS3wVo8heGAavZEO5
+         UoB3GfskFH4BKdUvFEnsCYHrbdRaVZvxzRCQNNZfYysG4Ey+Z3RgSWat1lNj7//odQzB
+         i9Do7OLM2wXW1Kqadd8fUzGgzft8HyjUKzb5L1HoPP2IeSxWLGIhTgn+y6YQmmRhggqK
+         1W/V4qXTvg9rngze2jumx50tNuV28lgQmCaacAe83ROZRkunvqmpThIZX700/DAVOx8X
+         Y35A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767728811; x=1768333611;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZriMaEA+mukSvHum14D+f4jkgVLElfimaxrHlh88e8w=;
+        b=Nf3qHuhqzQnK6pojPlvhimmEWw77kwTu5HGhWSkoWQxwvObpaMucaOELNn4dMalEEO
+         X4hL0OxublT93WKtiOkbDLPE1b/MXROY06ot4vqXju8AH44HRBPXJK5bKyqdurS9/72Y
+         nrb6wlDITupChWC/h0IJm5NALjtaFO+5pc/Q51oHFu+rbSS6Aloe2QZpCAssOkrCSuYn
+         ubH2gvFJQUy5IqEA6VdyEV2O0rexmVPJinN8k/E5s8qK8mtCfwyBquN45XiquV50H9XZ
+         UB+MDn5CcpAMevWtM/MlUuGSJiOqxPF8y+OVyN4wz41Ys8sHmBnjasmRP2HlGB7dGgeA
+         ckNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWn4ld2E6U3a4OPSI/cy2k4pNICYKM50WOuNH9ix5yDfYkusivPUQ/QHRg6uk0z8VFB0HFJQt8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyTOazo1D7y9iC1eRg7KDeHWt72Q211vtIDuoIGUbSalhLuJUG5
+	PfsF+VQ0eAQeOIgWCJgEAJP+NkABHJi7qKeac7a98GlPtNW6ZlCT9cbgvQ2g++lIeJFtL3qBWxN
+	4SrsCfg==
+X-Google-Smtp-Source: AGHT+IGZby64OMYDLsQncM6OFaUmrTDXzxVCp6nfZzSkjGTInUpS7Y2UQJcRJ5iTle12BuWLNTTKOzutkWY=
+X-Received: from pjbbj19.prod.google.com ([2002:a17:90b:893:b0:34c:a40f:705a])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1c87:b0:34c:a35d:de16
+ with SMTP id 98e67ed59e1d1-34f68c282c6mr196827a91.11.1767728811460; Tue, 06
+ Jan 2026 11:46:51 -0800 (PST)
+Date: Tue, 6 Jan 2026 11:46:49 -0800
+In-Reply-To: <20260106092425.1529428-5-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Mime-Version: 1.0
+References: <20260106092425.1529428-1-tabba@google.com> <20260106092425.1529428-5-tabba@google.com>
+Message-ID: <aV1mqQtALFIUBHVM@google.com>
+Subject: Re: [PATCH v3 4/5] KVM: selftests: Move page_align() to shared header
+From: Sean Christopherson <seanjc@google.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, maz@kernel.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, 
+	itaru.kitayama@fujitsu.com, andrew.jones@linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 19 Dec 2025 15:52:38 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> GICv5 has moved from using interrupt ranges for different interrupt
-> types to using some of the upper bits of the interrupt ID to denote
-> the interrupt type. This is not compatible with older GICs (which rely
-> on ranges of interrupts to determine the type), and hence a set of
-> helpers is introduced. These helpers take a struct kvm*, and use the
-> vgic model to determine how to interpret the interrupt ID.
+On Tue, Jan 06, 2026, Fuad Tabba wrote:
+> To avoid code duplication, move page_align() to the shared `kvm_util.h`
+> header file.
 > 
-> Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
-> helper is introduced to determine if an interrupt is private - SGIs
-> and PPIs for older GICs, and PPIs only for GICv5.
+> No functional change intended.
 > 
-> The helpers are plumbed into the core vgic code, as well as the Arch
-> Timer and PMU code.
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util.h    | 5 +++++
+>  tools/testing/selftests/kvm/lib/arm64/processor.c | 5 -----
+>  tools/testing/selftests/kvm/lib/riscv/processor.c | 5 -----
+>  3 files changed, 5 insertions(+), 10 deletions(-)
 > 
-> There should be no functional changes as part of this change.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Hi Sascha,
-
-A bit of bikeshedding / 'valuable' naming feedback to end the day.
-Otherwise LGTM.
-
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index b261fb3968d03..6778f676eaf08 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-...
-
->  enum vgic_type {
->  	VGIC_V2,		/* Good ol' GICv2 */
-> @@ -418,8 +488,12 @@ u64 vgic_v3_get_misr(struct kvm_vcpu *vcpu);
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 81f4355ff28a..dabbe4c3b93f 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -1258,6 +1258,11 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
+>  	return __vm_enable_cap(vm, KVM_CAP_VM_DISABLE_NX_HUGE_PAGES, 0);
+>  }
 >  
->  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->  #define vgic_initialized(k)	((k)->arch.vgic.initialized)
-> -#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
-> +#define vgic_valid_nv5_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
-> +#define vgic_valid_v5_spi(k, i)	(irq_is_spi(k, i) && \
-> +				 (FIELD_GET(GICV5_HWIRQ_ID, i) < (k)->arch.vgic.nr_spis))
-> +#define vgic_valid_spi(k, i) (vgic_is_v5(k) ?				\
-> +			      vgic_valid_v5_spi(k, i) : vgic_valid_nv5_spi(k, i))
+> +static inline uint64_t page_align(struct kvm_vm *vm, uint64_t v)
 
-nv is a little awkward as a name as immediately makes me thinking
-nested virtualization instead of not v5 (which I guess is the thinking behind that?)
+Maybe vm_page_align()?  So that it's a bit more obvious when reading call sites
+that the alignment is done with respect to the guest's "base" page size, not the
+host's page size.
 
-Probably just me and naming it v23 will break if we get to GIC version 23 :)
-nv5 breaks when we get GICv6 ;)
-
-
+> +{
+> +	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+> +}
+> +
+>  /*
+>   * Arch hook that is invoked via a constructor, i.e. before exeucting main(),
+>   * to allow for arch-specific setup that is common to all tests, e.g. computing
+> diff --git a/tools/testing/selftests/kvm/lib/arm64/processor.c b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> index 607a4e462984..143632917766 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/arm64/processor.c
+> @@ -21,11 +21,6 @@
 >  
->  bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
->  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
-
+>  static vm_vaddr_t exception_handlers;
+>  
+> -static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> -{
+> -	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+> -}
+> -
+>  static uint64_t pgd_index(struct kvm_vm *vm, vm_vaddr_t gva)
+>  {
+>  	unsigned int shift = (vm->pgtable_levels - 1) * (vm->page_shift - 3) + vm->page_shift;
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> index d5e8747b5e69..f8ff4bf938d9 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -26,11 +26,6 @@ bool __vcpu_has_ext(struct kvm_vcpu *vcpu, uint64_t ext)
+>  	return !ret && !!value;
+>  }
+>  
+> -static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+> -{
+> -	return (v + vm->page_size - 1) & ~(vm->page_size - 1);
+> -}
+> -
+>  static uint64_t pte_addr(struct kvm_vm *vm, uint64_t entry)
+>  {
+>  	return ((entry & PGTBL_PTE_ADDR_MASK) >> PGTBL_PTE_ADDR_SHIFT) <<
+> -- 
+> 2.52.0.351.gbe84eed79e-goog
+> 
