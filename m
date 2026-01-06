@@ -1,238 +1,168 @@
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4703D19CCFC
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 15:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767715191; cv=none; b=Uo48ENvBtfxxSVL/f4J3sGjNUK2TNvo/aG3D5rOYYolTyF76d2IkfzM8OIBjOxcfTGRpEIZPV4y039oeQwjo/T0QLFxfMFVCuh4t0XCjVP1zoCfKlhXfNdFo1A5GYiYJJrbHZuTa29Kr8Lw/fycdbMRaDOUaTgU/KkD7NWXmjI8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767715191; c=relaxed/simple;
-	bh=usNCg98JZzPUx5YO1iUbjXtLglJxpMC5jJp1tab0F24=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AbP6tY38Nm1Lyxcj25ZHIfZMn1H0vqRbqosQVNwRFBU+KDQ1AS2kVbaJzQmSD9nJyUJtTkq88ULq9DUtgbbCwGkUSTQKetLi11VOTcQUP88GcYzy7JU87UPWjksw8ct87eFoDxNorpbzA9DLixx+qsn2b/rZuhf7Vmjc1tz2E0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPWCaI+F; arc=none smtp.client-ip=209.85.128.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F65EEA8
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 16:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767715328; cv=pass; b=XQezAEoGO7TSqBKoi43HNQrEQEkjlxFipiwsWG4it1TvrpCI8+LB8X+XwR1v+mgYrso5ldHxcMQsqTmxOZO1/VnGl641jMOioS9xEkHr2Q6s5Hc7EaNRX3d1T9phaNJldspXgoyTFwWmpHqqS83uhRAXepUXEP+q+MmgZlp5xSg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767715328; c=relaxed/simple;
+	bh=Bbx6kybqDTyLUdOd+QGJdlDjxR+Gxq/E2JorMYNy69M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IIsU+YK0ke6plQFZcoZ9XTB+7qa/AjdQ/Y9B93VxJIq9pXswbXyuLKZ644pjlLOOsgP/XJrYAQj2Rijlfgxfk049ytsAGDeJ7VH8/1yUc+5+bkdRymJgWEQkCELI1QTcsBv0WuEP5le8E4OCdxK96KHPSmPmLhSL0xsFQORkUMc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bubQZn9l; arc=pass smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPWCaI+F"
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-47d3ffb0f44so7271655e9.3
-        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 07:59:42 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bubQZn9l"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ee147baf7bso472471cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 06 Jan 2026 08:02:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767715326; cv=none;
+        d=google.com; s=arc-20240605;
+        b=KW2X2n40JP7eaFkpllxk0dr6an2BFy2LodCBRNWuDmEuDLBO6vpjkFM4EoGLNYVVPq
+         pRHOx1l7YX4/4j8ljASAKY2a4pFhXJw2cETXzeevhymQCnZw4vY3icW2tt5SiNeCb5wA
+         dUOkjy6dSKermKTmMOWHO6k8reAqFEcZineuIwoJtkawqnCyRGRMiHaB0e3IKd2F9vqH
+         8HVFgAZHizrupq0na5eKp4i+f1IMHl61cWq4S3PkdBQLm5IxdioYBLPd1QiEYwQBdWms
+         a9aineabRpGoDUdqkRr8w9NOy0C3/0q3NB0Vjwbg5m/pMT69VYKR5+iMJI8DNsUXbh1y
+         FpjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
+        fh=OsVEnhpHfDtKQejlv1Bgs/tZPAfr3IJ2Ck5WUUi92Sc=;
+        b=ef6tXk9K479wv4aHXEkn9e2KG/5V9VCd+9rvhfhQeEwvZEC15iBSagCoKkQUT0yksm
+         JTKk0w8tcAUd7+Y2i47rQey3o5D9QQ3W8eBT2EIcoQGr5kf4u1xucg9jEuO9mD0Mvc3W
+         +TThxn4Skn8B2SNPmqhwJIr10uiCoqAKver3h1ticw8QMcjT8dk2HrOnoqTbEl4iMzcp
+         OlK8650tTYMrmB9V5ZqWRWa/pgIl4g5NEQYojcg+seEdOPGq1HB1R73k+M/6ZxcRmN/h
+         03+FppUu12xYZh9IvvGzFG4jCgE1i+sXEZzjvGK2SCyADkAZqvADlsM3BOYp20+/0cDi
+         Lg6A==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767715181; x=1768319981; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=recndSpVRxacMOc/NQ+rqHcm8FvHHulQC7DjT4UhT8s=;
-        b=HPWCaI+FEO5Rh/GKEHm0UJaIKZEzgowi9CUTyndAIBVON4g5WJmL5tTkIX1yS+HCUV
-         +gXmgQg5Mq91oGSV8SS17I0Ow9S3fInArrcpsBNu7c2nLvUAU2XNj58CIJrTEpAERGoB
-         tpHBlL1X22eCpcuJybhC1D6obcNFzaKZ3V3Tas0W3daRBcRDBHTM9wVuxd/k3QfURJOb
-         VwcUfmy6eifEBYFBax36rP9FQ20McOzgEm4CywisGpTO8beoDVM+c/qFneDkTzd7NN+7
-         6t1JDpfuP4Jruc8pSnemrzR0AEHI2a8EUycwJzpdGoJFP7P3ylc5FCg/AAzxJ7Y+p5XP
-         u6Uw==
+        d=google.com; s=20230601; t=1767715326; x=1768320126; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
+        b=bubQZn9lfvQviVupOkryWbzboK7DJl4XPb72exDf6W21p9Atx/HAU7u1/wmp6x9cVD
+         AS73vNF4gnosq+wdMBF1a+d9Z3ZxwNR6QSLRoQ9bJZM8tZw9PjzUNJt9+e0DFTGButtQ
+         +asQ/5t269CUnKurxAJC22E6bSc0zeIgClul8ELnN+M/IbZ4VWF/i8YKpt9EtcJbcdDT
+         kyjUzEhgAZh39xebZgHmQHEeEt0LML19CDCLwsvPMNfTwQ9kh6fmQcplD3tE99gCJTEF
+         m5eUpq4w6RhEjrB5QiGnO5hq4UAM5qAs39Nx7VVsAawKnEaX4tM10ZHDknxZGPdWXaXf
+         PHnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767715181; x=1768319981;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=recndSpVRxacMOc/NQ+rqHcm8FvHHulQC7DjT4UhT8s=;
-        b=AWjpTe3KIyt0a8hgzV6AFRO/kWw9utXqd+FlLwDdpeaN8cChdwYtOZ+E859iGATrSB
-         NSVW+FqARwVLZl5wNDjSV1UkFZ3hbuS+qQhH6SUwrMN2CLZNgPgDKDgnteuEJvbgBotQ
-         m0NDiC99XL4vgzPDxC+DyK1reQNXOTsLRcQIJw00NLsCKqxwKl0Cltrf3s086HfPKJUh
-         fndCLknOr5VmwnpHSDWqztn/nrQWKDJ2mJNUP6wUkywlMBj9MzTxvNBdiG+3lvg6pRGm
-         mvCdMTxlD7VcBKBgjocjwIXs+Zwc/IH3/SNmrf7ur+dJbyCJjs/Mh6UZxdOrD14jCqjA
-         UINA==
-X-Gm-Message-State: AOJu0YyTOJbeW8ClB+yKc7HkrRTJjauAjG8EkYBkBlpjX10zBu1Z+dNn
-	ZrnaysZ9+QZWPsSwaLyRp9dxyUX/ccPCTeaMz66PIRTNH9cFM6IQKg0RjO6JdzjnZQ==
-X-Gm-Gg: AY/fxX6SmjwdMCrtl2CX1Rm6PFt+5G1RTMFrl3Omn7l0Plx+1/7BlCIyWloBDzCBrjU
-	nmQUDnpSJ+pSvFtBBOa3UNYGIp9IWxATwsKs6qF93YaXjmzxVz4Mz5q2WdqtJZJDMlb92sYMfR4
-	SMj8Oe1U9UtOOSt4XIc+pyXg2ZQ8YciEFOwT5GNordT6NDmivh7+ciGtV9dZk+2qo1xNEybniLd
-	1SDUC97VkK+6MDAkISM4MGvYodz/NuJtAvCrQx04t5y/NmaQE+HusOVoWdpnOYFQjgkwLapOxWn
-	mJEU1YzhyNBvveFedh09bUyJSsreDB1zOy7fQGg3y+D3eMo8YS/45j9BKzQzN5COwoCO+bx9cai
-	7WQvqKBMVs1UrFhrpHVU5NwNreKq1dlLXUpKJJOnJepjZsYtVLKy96wR/MqaRUSp9le9RAE1tXk
-	+6o8p4Mj2zb77Jiyyao2H1tHSKS7eIIofjpNHL9HfjbXa2WEy0+g==
-X-Google-Smtp-Source: AGHT+IHgQG4n6bkU9UNc+S3Rf0s0cs9v/rYkSfUX4JjXBVVvp3ClgsYmai2b+ZGXIe7uEjuKIwHjXw==
-X-Received: by 2002:a05:600c:a108:b0:471:14b1:da13 with SMTP id 5b1f17b1804b1-47d7f36e2abmr28330165e9.14.1767715180422;
-        Tue, 06 Jan 2026 07:59:40 -0800 (PST)
-Received: from google.com (44.145.34.34.bc.googleusercontent.com. [34.34.145.44])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ff0b2sm5090628f8f.42.2026.01.06.07.59.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Jan 2026 07:59:40 -0800 (PST)
-Date: Tue, 6 Jan 2026 15:59:37 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH 27/30] KVM: arm64: Add some initial documentation for pKVM
-Message-ID: <aV0xaa8MpsmxMMkL@google.com>
-References: <20260105154939.11041-1-will@kernel.org>
- <20260105154939.11041-28-will@kernel.org>
+        d=1e100.net; s=20230601; t=1767715326; x=1768320126;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4VV8FamiqOwZAM5+PYXtFxVyVObmz3z5a4+8kZS6YUk=;
+        b=d/7Mr+Y0546p7g9SBE8O9QiJxhCnDOeduvPA5BsVLv4qygLfJb6h7pcHfMcQIKK5fW
+         DqofSSNW0G0LiHuaLozhjCZqKvWJHJGrQyNPwn2rMQebRFxLpyS+WWpvRnxLpOnwLrDR
+         6O4/SDPj5Gx2IxeYyU3OWlkAD1tKCUrj1V7GTyCisTF/QdxvHJc74Olc9ClP9PNpSFek
+         bMuCTjDoNUTmzOuZxoR3CnuwKsMqhbw2hOp4mgH4z5fwpAJET646yMx0ys0PK3n72Hao
+         Aqy2dS9HR+UJ+8+Ygn0kv008AGAHi233zuAWuz9QCrVjbNeMXAAmrn839nu5D9l2OwQa
+         sGzQ==
+X-Gm-Message-State: AOJu0YwO7gMX7A5K7YnwzfIxHbFPfxjzBmkOslKV9pp0eGKTfXhsiJB/
+	14gbTiqPrgH8LU8lQPSs43i7yzfKpTeCpPZnq/EAZ5y2VGJIC4Hd5gR0OjgJc1mjNO8/STogXym
+	iymUaUynZBeNWcZ0ix58n+QVXmiAuCSzI9yAeGI1x
+X-Gm-Gg: AY/fxX6Fxyio87m0Pk3sjbOkalVDzkIXm30523brme98BdsyYGHKWxlxd3W6Pu9FAlG
+	g6yGR9YXk5+OrK4vjOmD8kygBldw+L58duCsanGcm9kHcwEu9yrtGB5zTxiWXEbYRYPeFE8Egrt
+	mijrA2JVGcjUXj3+F4lfuJdT6KgRKmt8Ls6BdIgibFgAJrCb/6T6dwz+F/K12jOACEqTw+7/aih
+	mtL1MurR0Prexlc36ZWeDBSxIUD4HeGgZD1LrbWZAjV63owbNfJ+aS40EdDA6tX0B088Xfo
+X-Google-Smtp-Source: AGHT+IHxG68k4H7QxOCqcUestNOdt2ymq6k/B9L/EOR9jHs12J8OklAbo9pVNZdm2PJbf3+p7kEjNGC1B4QDwRgIwpM=
+X-Received: by 2002:a05:622a:355:b0:4f1:9c3f:2845 with SMTP id
+ d75a77b69052e-4ffa96218abmr6005851cf.9.1767715325130; Tue, 06 Jan 2026
+ 08:02:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260105154939.11041-28-will@kernel.org>
+References: <20260105154939.11041-1-will@kernel.org> <20260105154939.11041-20-will@kernel.org>
+In-Reply-To: <20260105154939.11041-20-will@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 6 Jan 2026 16:01:28 +0000
+X-Gm-Features: AQt7F2p9bIGiuS3iUUJfep_yOAaw5pVkKkYP_KCrIopHGcAfqqtRaJGG_En4JyE
+Message-ID: <CA+EHjTzNcTOR5sZpBTUXUP++yqOZEvmfs=S3wqBTG-YT=hxoKQ@mail.gmail.com>
+Subject: Re: [PATCH 19/30] KVM: arm64: Annotate guest donations with handle
+ and gfn in host stage-2
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jan 05, 2026 at 03:49:35PM +0000, Will Deacon wrote:
-> Add some initial documentation for pKVM to help people understand what
-> is supported, the limitations of protected VMs when compared to
-> non-protected VMs and also what is left to do.
-> 
+Hi Will,
+
+On Mon, 5 Jan 2026 at 15:50, Will Deacon <will@kernel.org> wrote:
+>
+> Handling host kernel faults arising from accesses to donated guest
+> memory will require an rmap-like mechanism to identify the guest mapping
+> of the faulting page.
+>
+> Extend the page donation logic to encode the guest handle and gfn
+> alongside the owner information in the host stage-2 pte.
+>
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  .../admin-guide/kernel-parameters.txt         |   4 +-
->  Documentation/virt/kvm/arm/index.rst          |   1 +
->  Documentation/virt/kvm/arm/pkvm.rst           | 101 ++++++++++++++++++
->  3 files changed, 104 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/virt/kvm/arm/pkvm.rst
-> 
-> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> index a8d0afde7f85..9939dc5654d2 100644
-> --- a/Documentation/admin-guide/kernel-parameters.txt
-> +++ b/Documentation/admin-guide/kernel-parameters.txt
-> @@ -3141,8 +3141,8 @@ Kernel parameters
->  			for the host. To force nVHE on VHE hardware, add
->  			"arm64_sw.hvhe=0 id_aa64mmfr1.vh=0" to the
->  			command-line.
-> -			"nested" is experimental and should be used with
-> -			extreme caution.
-> +			"nested" and "protected" are experimental and should be
-> +			used with extreme caution.
->  
->  	kvm-arm.vgic_v3_group0_trap=
->  			[KVM,ARM,EARLY] Trap guest accesses to GICv3 group-0
-> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
-> index ec09881de4cf..0856b4942e05 100644
-> --- a/Documentation/virt/kvm/arm/index.rst
-> +++ b/Documentation/virt/kvm/arm/index.rst
-> @@ -10,6 +10,7 @@ ARM
->     fw-pseudo-registers
->     hyp-abi
->     hypercalls
-> +   pkvm
->     pvtime
->     ptp_kvm
->     vcpu-features
-> diff --git a/Documentation/virt/kvm/arm/pkvm.rst b/Documentation/virt/kvm/arm/pkvm.rst
-> new file mode 100644
-> index 000000000000..1882bde8cc0b
-> --- /dev/null
-> +++ b/Documentation/virt/kvm/arm/pkvm.rst
-> @@ -0,0 +1,101 @@
-> +.. SPDX-License-Identifier: GPL-2.0
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 7d1844e2888d..1a341337b272 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -1063,6 +1063,19 @@ static void hyp_poison_page(phys_addr_t phys)
+>         hyp_fixmap_unmap();
+>  }
+>
+> +#define KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK GENMASK(15, 0)
+> +#define KVM_HOST_INVALID_PTE_GUEST_GFN_MASK    GENMASK(56, 16)
+> +static u64 host_stage2_encode_gfn_meta(struct pkvm_hyp_vm *vm, u64 gfn)
+> +{
+> +       pkvm_handle_t handle = vm->kvm.arch.pkvm.handle;
 > +
-> +====================
-> +Protected KVM (pKVM)
-> +====================
-> +
-> +**NOTE**: pKVM is currently an experimental, development feature and
-> +subject to breaking changes as new isolation features are implemented.
-> +Please reach out to the developers at kvmarm@lists.linux.dev if you have
-> +any questions.
-> +
-> +Overview
-> +========
-> +
-> +Booting a host kernel with '``kvm-arm.mode=protected``' enables
-> +"Protected KVM" (pKVM). During boot, pKVM installs a stage-2 identity
-> +map page-table for the host and uses it to isolate the hypervisor
-> +running at EL2 from the rest of the host running at EL1/0.
-> +
-> +If ``CONFIG_PROTECTED_VM_UAPI=y``, pKVM permits creation of protected
-> +virtual machines (pVMs) by passing the ``KVM_VM_TYPE_ARM_PROTECTED``
-> +machine type identifier to the ``KVM_CREATE_VM`` ioctl(). The hypervisor
-> +isolates pVMs from the host by unmapping pages from the stage-2 identity
-> +map as they are accessed by a pVM. Hypercalls are provided for a pVM to
-> +share specific regions of its IPA space back with the host, allowing
-> +for communication with the VMM. See hypercalls.rst for more details.
-> +
-> +Isolation mechanisms
-> +====================
-> +
-> +pKVM relies on a number of mechanisms to isolate PVMs from the host:
-> +
-> +CPU memory isolation
-> +--------------------
-> +
-> +Status: Isolation of anonymous memory and metadata pages.
-> +
-> +Metadata pages (e.g. page-table pages and '``struct kvm_vcpu``' pages)
-> +are donated from the host to the hypervisor during pVM creation and
-> +are consequently unmapped from the stage-2 identity map until the pVM is
-> +destroyed.
-> +
-> +Similarly to regular KVM, pages are lazily mapped into the guest in
-> +response to stage-2 page faults handled by the host. However, when
-> +running a pVM, these pages are first pinned and then unmapped from the
-> +stage-2 identity map as part of the donation procedure. This gives rise
-> +to some user-visible differences when compared to non-protected VMs,
-> +largely due to the lack of MMU notifiers:
-> +
-> +* Memslots cannot be moved or deleted once the pVM has started running.
-> +* Read-only memslots and dirty logging are not supported.
-> +* With the exception of swap, file-backed pages cannot be mapped into a
-> +  pVM.
-> +* Donated pages are accounted against ``RLIMIT_MLOCK`` and so the VMM
-> +  must have a sufficient resource limit or be granted ``CAP_IPC_LOCK``.
+> +       WARN_ON(!FIELD_FIT(KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK, handle));
 
-Perhaps worth to add that there's no runtime reclaim either so the accounting
-will only grow until the VM is destroyed?
+Instead of (or in addition to) this check, should we also have a
+compile time check to ensure that the handle fits? We have
+KVM_MAX_PVMS and HANDLE_OFFSET, albeit HANDLE_OFFSET, so we can
+calculate whether it fits.
 
-> +* Changes to the VMM address space (e.g. a ``MAP_FIXED`` mmap() over a
-> +  mapping associated with a memslot) are not reflected in the guest and
-> +  may lead to loss of coherency.
-> +* Accessing pVM memory that has not been shared back will result in the
-> +  delivery of a SIGSEGV.
-> +* If a system call accesses pVM memory that has not been shared back
-> +  then it will either return ``-EFAULT`` or forcefully reclaim the
-> +  memory pages. Reclaimed memory is zeroed by the hypervisor and a
-> +  subsequent attempt to access it in the pVM will return ``-EFAULT``
-> +  from the ``VCPU_RUN`` ioctl().
+Cheers,
+/fuad
+
+> +       WARN_ON(!FIELD_FIT(KVM_HOST_INVALID_PTE_GUEST_GFN_MASK, gfn));
 > +
-> +CPU state isolation
-> +-------------------
+> +       return FIELD_PREP(KVM_HOST_INVALID_PTE_GUEST_HANDLE_MASK, handle) |
+> +              FIELD_PREP(KVM_HOST_INVALID_PTE_GUEST_GFN_MASK, gfn);
+> +}
 > +
-> +Status: **Unimplemented.**
-> +
-> +DMA isolation using an IOMMU
-> +----------------------------
-> +
-> +Status: **Unimplemented.**
-> +
-> +Proxying of Trustzone services
-> +------------------------------
-> +
-> +Status: FF-A and PSCI calls from the host are proxied by the pKVM
-> +hypervisor.
-> +
-> +The FF-A proxy ensures that the host cannot share pVM or hypervisor
-> +memory with Trustzone as part of a "confused deputy" attack.
-> +
-> +The PSCI proxy ensures that CPUs always have the stage-2 identity map
-> +installed when they are executing in the host.
-> +
-> +Protected VM firmware (pvmfw)
-> +-----------------------------
-> +
-> +Status: **Unimplemented.**
-> +
-> +Resources
-> +=========
-> +
-> +Quentin Perret's KVM Forum 2022 talk entitled "Protected KVM on arm64: A
-> +technical deep dive" remains a good resource for learning more about
-> +pKVM, despite some of the details having changed in the meantime:
-> +
-> +https://www.youtube.com/watch?v=9npebeVFbFw
-> -- 
+>  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
+>  {
+>         u64 ipa = hyp_pfn_to_phys(gfn);
+> @@ -1105,6 +1118,7 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+>         struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
+>         u64 phys = hyp_pfn_to_phys(pfn);
+>         u64 ipa = hyp_pfn_to_phys(gfn);
+> +       u64 meta;
+>         int ret;
+>
+>         host_lock_component();
+> @@ -1118,7 +1132,9 @@ int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+>         if (ret)
+>                 goto unlock;
+>
+> -       WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_GUEST));
+> +       meta = host_stage2_encode_gfn_meta(vm, gfn);
+> +       WARN_ON(host_stage2_set_owner_metadata_locked(phys, PAGE_SIZE,
+> +                                                     PKVM_ID_GUEST, meta));
+>         WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
+>                                        pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
+>                                        &vcpu->vcpu.arch.pkvm_memcache, 0));
+> --
 > 2.52.0.351.gbe84eed79e-goog
-> 
+>
