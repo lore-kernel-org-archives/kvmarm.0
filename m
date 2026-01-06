@@ -1,121 +1,100 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60DF2BE7B2
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 18:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255963451A7;
+	Tue,  6 Jan 2026 18:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767722916; cv=none; b=OiQebNXqz1i3YfiR59WkjFJ0SU1iUq12ClhoPdwypJJg1TH1JYHH0hAZD2MvspOY3bDiDo15t0LDfTFWsICLIikYpi3phhyw65PBrfSixS3lVLJHfzKrQX0Z0zvohvBHLAk5dc5IaRm6Uhr0ON/ZehfqQydkTN64B4fA/IJHtyQ=
+	t=1767723227; cv=none; b=lJ+dcnTwiay0DATrc7dx6CJO28LaS3FUA/gZMyktUuy9rABltNS8WND8nKMbyPRSEqR2ql1tyhyxoFWoxAASdZOt+M+CQbuwWLM27Y4msjWeYdWvmboRzxFEkDO3QNff77tuym2gRpSbCVoZh5rDa8dK/sjqP/pOtmlkn/u8iFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767722916; c=relaxed/simple;
-	bh=6kcghfu5O79TqLucQGZBy8XqbwXkYYTb6Hqta1vf5fY=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rf+f/XhIdAxCZ8BVqWWmbem5UHepBr1pMnBFTQdUvXbQYAAr/1LCB9a/RRS+IjAh2W7akGUR90fKEDHgMNDBhDrwKugdeoy4gtv/0316VSLsxliu0+Gfc1jIDp8vjH9MzQ4DK8XdXloekaeXkJd1mXfJ8odhugO+cD5jLQDVkfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=b1uDB+j5; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767723227; c=relaxed/simple;
+	bh=X4ptDMl7qmbB25sxy/xvgjNdj3xGXDDDDxfwSx5avLo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ipoKPzLs+ssb9E4+nUzB0fsEI4EiL6V40X2Axyg+elZv0oiKDdsr9IqcXPtGmYcqQLtIEfajVq8CJLPsVRqILd14F9YWSKHXFx3xOqyDrP/fbl0B1my9ppOAYyCaTSekVlOtDxvO0E3gZdbGW0YTf1NlBQSc3M7BFYS5uc06Trs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iv71P5Sj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="b1uDB+j5"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=sDv1QnnUOF68a8kXkDA6TOieF24PvJ5g67KKk/Nk94o=;
-	b=b1uDB+j52vLbyZwJVrpn81CB1AaJzX5AG703pfb11++Y9qfjni/sDs4GEy96hc6Y3ejo5rKcK
-	nRU4D95rdDFuVDtv2E9HSSbZu9d0/rbxVkg5Q+uRqHyySlsm1OQP8Qpf8hTEggQNtqCsTk0XOgE
-	uUPQQWqtOnkerh/YbP7LPy8=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dlzcs1hvmz1vns1;
-	Wed,  7 Jan 2026 02:06:21 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlzgB4sp9zHnGhr;
-	Wed,  7 Jan 2026 02:08:22 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4A6374057E;
-	Wed,  7 Jan 2026 02:08:27 +0800 (CST)
-Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
- 2026 18:08:26 +0000
-Date: Tue, 6 Jan 2026 18:08:24 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iv71P5Sj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7464C116C6;
+	Tue,  6 Jan 2026 18:13:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767723226;
+	bh=X4ptDMl7qmbB25sxy/xvgjNdj3xGXDDDDxfwSx5avLo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Iv71P5SjEa9HG3SWK6MLgREPnx6XzaExqiCoQHCuE74b/eQ/woqqcd0c417uTHbfr
+	 jfAv8ve6BC+YsWu90CgAw69+QIQarPf2QAgLDr0IUtNuhCugOKGrejNveimokTEh6x
+	 2sySlBLxA9msyhr3cLCogu+s7lAnje8HZbbatbHwJHakGh07tqhFDmFeMsNzlEs+ug
+	 qRCNaKJMBJC2+CMTQObMTonpOUc8+33e1Va1xEZN8qBf0XOyieMk48N6z+66JtvTNr
+	 AxH0bb8+22Yl+8MavySgBYtW6xf/mxVi08abXuIQtfPMsGrvY3Pi6ES7k3Ctgqbp1F
+	 t0UKQ+TSC4Txg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdBYu-0000000HQzg-15oA;
+	Tue, 06 Jan 2026 18:13:44 +0000
+Date: Tue, 06 Jan 2026 18:13:43 +0000
+Message-ID: <86eco2mwx4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 05/36] arm64/sysreg: Add GICR CDNMIA encoding
-Message-ID: <20260106180824.00005516@huawei.com>
-In-Reply-To: <20251219155222.1383109-6-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-6-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: gic: Check for vGICv3 when clearing TWI
+In-Reply-To: <20260106165154.3321753-1-sascha.bischoff@arm.com>
+References: <20260106165154.3321753-1-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Dec 2025 15:52:37 +0000
+On Tue, 06 Jan 2026 16:52:10 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> The encoding for the GICR CDNMIA system instruction is thus far unused
-> (and shall remain unused for the time being). However, in order to
-> plumb the FGTs into KVM correctly, KVM needs to be made aware of the
-> encoding of this system instruction.
+> 
+> Explicitly check for the vgic being v3 when disabling TWI. Failure to
+> check this can result in using the wrong view of the vgic CPU IF union
+> causing undesirable/unexpected behaviour.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
->  arch/arm64/include/asm/sysreg.h | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  arch/arm64/kvm/arm.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index b3b8b8cd7bf1e..e99acb6dbd5d8 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1059,6 +1059,7 @@
->  #define GICV5_OP_GIC_CDPRI		sys_insn(1, 0, 12, 1, 2)
->  #define GICV5_OP_GIC_CDRCFG		sys_insn(1, 0, 12, 1, 5)
->  #define GICV5_OP_GICR_CDIA		sys_insn(1, 0, 12, 3, 0)
-> +#define GICV5_OP_GICR_CDNMIA		sys_insn(1, 0, 12, 3, 1)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 4f80da0c0d1de..620a465248d1b 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -569,6 +569,7 @@ static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
+>  		return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
 >  
->  /* Definitions for GIC CDAFF */
->  #define GICV5_GIC_CDAFF_IAFFID_MASK	GENMASK_ULL(47, 32)
-> @@ -1105,6 +1106,12 @@
->  #define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
->  #define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
->  
-> +/* Definitions for GICR CDNMIA */
-> +#define GICV5_GIC_CDNMIA_VALID_MASK	BIT_ULL(32)
-> +#define GICV5_GICR_CDNMIA_VALID(r)	FIELD_GET(GICV5_GIC_CDNMIA_VALID_MASK, r)
+>  	return single_task_running() &&
+> +	       vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
+>  	       (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+>  		vcpu->kvm->arch.vgic.nassgireq);
+>  }
 
-Why the R for just this one?
+Nice one. Wonder how many other similar cases we have... :-/
 
-There is precedence with GICV5_GICR_CDIA_VALID() but I've no idea
-why that one got the R (and not the field definitions next to it)
-either!
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-Lorenzo, guessing that was in your main gicv5 series?
+	M.
 
-Given it's GICR CDIA (and here GICR CDNMIA) in the spec, I think
-all the definitions should have the R but maybe I'm missing something.
-
-Jonathan
-
-
-> +#define GICV5_GIC_CDNMIA_TYPE_MASK	GENMASK_ULL(31, 29)
-> +#define GICV5_GIC_CDNMIA_ID_MASK	GENMASK_ULL(23, 0)
-> +
->  #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
->  #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
->  
-
+-- 
+Without deviation from the norm, progress is not possible.
