@@ -1,128 +1,180 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2D233A9DD
-	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 15:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4FE233149
+	for <kvmarm@lists.linux.dev>; Tue,  6 Jan 2026 15:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767711979; cv=none; b=EnMtKIo/9FqdMrlE4u5W7FkuJUXQ9EWBUR2c62qE+Udwe2QWEkuCdmJzwtw/KQ4iDPt+eiYCGxXPyrRa7EeIJH5GpvdW/QCFQp53QMV6jxcac0C4RCexKLQvM9+hiJmx1SD7PtifF6vWxN6apnH7bO3ky9g1uVVngDDB8yYXotY=
+	t=1767712160; cv=none; b=RSc6jXZeI8i46OfyNLKX2y+mDZKCVTthoeEzQDFCOGkPx7/TPpdkdpaOKzJVASEPW+BVAQiJx/Aot6lDDtjA5GadR5bTClOuzZia0RLXmTNUedYE5KaXCRDCW8aGBklbKeslMblDP9qusvWd4uCW3AogK6kmjL9fGj+Z0Dtd4x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767711979; c=relaxed/simple;
-	bh=zUzbDaAUWKW1REAiG6IUFo1KPQJfq7xHWWl2saQmulA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=riM/feBlQx/GKAtCCzv6xw1IJck0biOK8+5iHAg2vTuTj7s7CVcbzmqUYA1v+FA4tM7lwrXWzDc+4nlk8LqnAr50D0Ck+4VAU9tflYau5JPPyQvRO5+6a+c1FAEUzjqsf1/OrSLtxCQdBBt4l6PvmOxrYBGY96bwPDIRkijM8As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C7304497;
-	Tue,  6 Jan 2026 07:06:09 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C9B7A3F5A1;
-	Tue,  6 Jan 2026 07:06:14 -0800 (PST)
-Date: Tue, 6 Jan 2026 15:06:12 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 27/36] KVM: arm64: gic-v5: Mandate architected PPI for
- PMU emulation on GICv5
-Message-ID: <20260106150612.GB1982@e124191.cambridge.arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
- <20251219155222.1383109-28-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1767712160; c=relaxed/simple;
+	bh=VLDxT8b0UWtlbuOXC0YolSOK8Z20JQLPGrMeLewuo8A=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gcgw+AbqvW4UWsNVgvcrQKEPN30A/vEMWs/NICUQ8gKbOzXb5JDwHH53/WaHTnJFjOQTA4Ous17T7egk/emqMh3Xfjz65okVML+DzKgx0TfW/flH9KVK4KmSr8x8Yol8OAqHxIxzoZd93kC5e4crSZQkNTs9/Qkp/un4xCJjVCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dlvhN685qzHnHBX;
+	Tue,  6 Jan 2026 23:09:08 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3B2D940086;
+	Tue,  6 Jan 2026 23:09:13 +0800 (CST)
+Received: from localhost (10.195.245.156) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 6 Jan
+ 2026 15:09:11 +0000
+Date: Tue, 6 Jan 2026 15:09:07 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
+	"Zeng Heng" <zengheng4@huawei.com>
+Subject: Re: [PATCH v2 40/45] arm_mpam: Generate a configuration for min
+ controls
+Message-ID: <20260106150907.0000457b@huawei.com>
+In-Reply-To: <20251219181147.3404071-41-ben.horgan@arm.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+	<20251219181147.3404071-41-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251219155222.1383109-28-sascha.bischoff@arm.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Question,
+On Fri, 19 Dec 2025 18:11:42 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
 
-On Fri, Dec 19, 2025 at 03:52:45PM +0000, Sascha Bischoff wrote:
-> Make it mandatory to use the architected PPI when running a GICv5
-> guest. Attempts to set anything other than the architected PPI (23)
-> are rejected.
+> From: James Morse <james.morse@arm.com>
 > 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> MPAM supports a minimum and maximum control for memory bandwidth. The
+> purpose of the minimum control is to give priority to tasks that are below
+> their minimum value. Resctrl only provides one value for the bandwidth
+> configuration, which is used for the maximum.
+> 
+> The minimum control is always programmed to zero on hardware that supports
+> it.
+> 
+> Generate a minimum bandwidth value that is 5% lower than the value provided
+> by resctrl. This means tasks that are not receiving their target bandwidth
+> can be prioritised by the hardware.
+
+I'm not sure this policy make sense in general as there will be bandwidth
+heavy background tasks where we want to make sure they only use up to X%
+of bandwidth, but don't care if they don't get that.  I guess maybe those
+are always in the %5 or less category so maybe this policy is fine.
+Ah well, can revisit later I guess as long as we keep this as the default
+for any new controls.
+
+> 
+> For component reset reuse the same calculation so that the default is a
+> value resctrl can set.
+> 
+> CC: Zeng Heng <zengheng4@huawei.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+
+Most, maybe all the other cases have split test from implementation. I'd
+probably do that here just for consistency.
+
+A few things inline.
+
+J
+
+
+
 > ---
->  arch/arm64/kvm/pmu-emul.c | 14 ++++++++++++--
->  include/kvm/arm_pmu.h     |  5 ++++-
->  2 files changed, 16 insertions(+), 3 deletions(-)
+> Add reset_mbw_min
+> Clear min cfg when setting max
+> use mpam_extend_config on component reset
+> ---
+>  drivers/resctrl/mpam_devices.c      | 76 +++++++++++++++++++++++++++--
+>  drivers/resctrl/mpam_internal.h     |  3 ++
+>  drivers/resctrl/mpam_resctrl.c      |  2 +
+>  drivers/resctrl/test_mpam_devices.c | 66 +++++++++++++++++++++++++
+>  4 files changed, 142 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index afc838ea2503e..2d3b50dec6c5d 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -962,8 +962,13 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
->  		if (!vgic_initialized(vcpu->kvm))
->  			return -ENODEV;
+> diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
+> index c20b2757b86b..deea46c2a6c3 100644
+> --- a/drivers/resctrl/mpam_devices.c
+> +++ b/drivers/resctrl/mpam_devices.c
+> @@ -721,6 +721,13 @@ static void mpam_ris_hw_probe(struct mpam_msc_ris *ris)
+>  			mpam_set_feature(mpam_feat_mbw_part, props);
 >  
-> -		if (!kvm_arm_pmu_irq_initialized(vcpu))
-> -			return -ENXIO;
-> +		if (!kvm_arm_pmu_irq_initialized(vcpu)) {
-> +			/* Use the architected irq number for GICv5. */
-> +			if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
-> +				vcpu->arch.pmu.irq_num = KVM_ARMV8_PMU_GICV5_IRQ;
-> +			else
-> +				return -ENXIO;
-> +		}
-
-This relaxes the KVM_ARM_VCPU_PMU_V3_INIT uAPI to not need
-KVM_ARM_VCPU_PMU_V3_IRQ to be called first for gic-v5, right?
-
-Maybe that's intentional, but it should be mentioned in the commit and maybe
-even in the docs (Documentation/virt/kvm/devices/vcpu.rst)?
-
-Thanks,
-Joey
-
->  
->  		ret = kvm_vgic_set_owner(vcpu, vcpu->arch.pmu.irq_num,
->  					 &vcpu->arch.pmu);
-> @@ -988,6 +993,11 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  	unsigned long i;
->  	struct kvm_vcpu *vcpu;
->  
-> +	/* On GICv5, the PMUIRQ is architecturally mandated to be PPI 23 */
-> +	if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5 &&
-> +	    irq != KVM_ARMV8_PMU_GICV5_IRQ)
-> +		return false;
+>  		props->bwa_wd = FIELD_GET(MPAMF_MBW_IDR_BWA_WD, mbw_features);
 > +
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
->  		if (!kvm_arm_pmu_irq_initialized(vcpu))
->  			continue;
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 96754b51b4116..0a36a3d5c8944 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -12,6 +12,9 @@
->  
->  #define KVM_ARMV8_PMU_MAX_COUNTERS	32
->  
-> +/* PPI #23 - architecturally specified for GICv5 */
-> +#define KVM_ARMV8_PMU_GICV5_IRQ		0x20000017
+> +		/*
+> +		 * The BWA_WD field can represent 0-63, but the control fields it
+> +		 * describes have a maximum of 16 bits.
+
+I'm lost to why this only matters now!  Feels like that makes sense way earlier
+in the series. Particularly as that detail confused me no end in the bandwidth
+/ percent calculation patches.
+
+> +		 */
+> +		props->bwa_wd = min(props->bwa_wd, 16);
 > +
->  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
->  struct kvm_pmc {
->  	u8 idx;	/* index into the pmu->pmc array */
-> @@ -38,7 +41,7 @@ struct arm_pmu_entry {
->  };
+>  		if (props->bwa_wd && FIELD_GET(MPAMF_MBW_IDR_HAS_MAX, mbw_features))
+>  			mpam_set_feature(mpam_feat_mbw_max, props);
 >  
->  bool kvm_supports_guest_pmuv3(void);
-> -#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
-> +#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num != 0)
->  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
->  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
->  void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
-> -- 
-> 2.34.1
+
+> +static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg)
+> +{
+> +	struct mpam_props *cprops = &class->props;
+> +	u16 min, min_hw_granule, delta;
+> +	u16 max_hw_value, res0_bits;
+
+Probably makes sense to drag some of these into the scope below.
+
+> +
+> +	/*
+> +	 * MAX and MIN should be set together. If only one is provided,
+> +	 * generate a configuration for the other. If only one control
+> +	 * type is supported, the other value will be ignored.
+> +	 *
+> +	 * Resctrl can only configure the MAX.
+> +	 */
+> +	if (mpam_has_feature(mpam_feat_mbw_max, cfg) &&
+> +	    !mpam_has_feature(mpam_feat_mbw_min, cfg)) {
+> +		/*
+> +		 * Calculate the values the 'min' control can hold.
+> +		 * e.g. on a platform with bwa_wd = 8, min_hw_granule is 0x00ff
+> +		 * because those bits are RES0. Configurations of this value
+> +		 * are effectively zero. But configurations need to saturate
+> +		 * at min_hw_granule on systems with mismatched bwa_wd, where
+> +		 * the 'less than 0' values are implemented on some MSC, but
+> +		 * not others.
+> +		 */
+> +		res0_bits = 16 - cprops->bwa_wd;
+> +		max_hw_value = ((1 << cprops->bwa_wd) - 1) << res0_bits;
+> +		min_hw_granule = ~max_hw_value;
+> +
+> +		delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
+> +		if (cfg->mbw_max > delta)
+> +			min = cfg->mbw_max - delta;
+> +		else
+> +			min = 0;
+> +
+> +		cfg->mbw_min = max(min, min_hw_granule);
+> +		mpam_set_feature(mpam_feat_mbw_min, cfg);
+> +	}
+> +}
+> +
+>
