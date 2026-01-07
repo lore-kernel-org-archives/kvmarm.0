@@ -1,88 +1,148 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215563093C4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 12:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14E4315D23
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 12:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767787207; cv=none; b=sDrK3l8CYo93x9t/cyhqyYje0hzX6rhUhKCCbj4Ij7i3sgIhjxxhNfOFkSplJjLPKB3VNt/9e2WBW9Uj23MyVgqK8Pe548P9xowbWu7xa9mi35gX7ekoQElM+QaNcJqzxG2dX/eCA+zZFHEKLwrIBZn9F8d56i4q9KdTeMq/IpY=
+	t=1767788533; cv=none; b=BoEViKM55v3eMaNPWBkkcEurkz56onRpmp7AmJu0dVA6XTzZT20e6uAtSvVxAg4d/lIv4G32OExNz1E+fIddBOR/fDOP4T2zsjIgiRLWFB6GHFxtObWIt2eMV8HVO18xbs9YSjxvZYsIagDxdUvqkYw38rLEbcAkbLP4Ff2hiJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767787207; c=relaxed/simple;
-	bh=DFzcXBzUKkY3oB1avFcHqpTKyx2NIBr33jUnOa1uluc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cVFKb6+9fqD/V5X5hq4vofrcIrVTEZArvmSmr/FyEOUDEw/4gKmVbmsuT+3DvYj6FuVXyJaUrWfY7PYC4qrfEcIxXk/Ilrf+gJsGq3f3922Di5wtkDn9aJFNtDqNlKOwRPnV23JPDE02KEbSqklGCw+Xxsd18YcDsI2UWIKyOUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=buAczF4h; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767788533; c=relaxed/simple;
+	bh=p7UYyZxC4uKCcyOUBAcr3iUz7F5ptluIAzWnVKY9IAE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iGUqSof2vf3vX+K9zMy0BchKY+UeExrVFi4LhKTRce4SVDbyLA363JEsqBvQQz4YRvOhPDKA3mXvqwVGUp+3rkKk5YWR1YhKQCWBwgQ1CRGRozp5wUfO460o2WUwUnBsowtewt0CaaGdB8OBV4fJ9ScS9Yj+t1I4qVSh1DTxXBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=1VRyJ+0B; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="buAczF4h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945D8C19421;
-	Wed,  7 Jan 2026 12:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767787205;
-	bh=DFzcXBzUKkY3oB1avFcHqpTKyx2NIBr33jUnOa1uluc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=buAczF4h9LdQUJ6l4BOZWhEC6r+tsX+AzMnJ3stxO/TW8aLEH5Tk8QQYxk0DIClsX
-	 dqh2RjVqOtxXYH7jPauiYAolTUYAFQl2itwgc2rZTJGJiL+g3tbnDX3wCZsjklz89W
-	 N/m5/ZuAryf6lURGeGEG7X20AsuHxWILr+jA0jwLKHHL5eKO051I52n3iKnMfmUXaY
-	 SAw1u7gjVv49B9iDu6ZRL/F/g+Y19Od6mn1DHG7QGzbP9oqtCFd6AEqUf526Ui+Fqg
-	 6nA+wSTSHI5Vzen5yajdZmH+kSF7OxrlXgZ5irajHGhRYhIjSDk5LC3PXxwrrn9e16
-	 wMlZdN1CE85Ag==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdSCp-000000003aK-1F7E;
-	Wed, 07 Jan 2026 12:00:03 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: broonie@kernel.org,
-	catalin.marinas@arm.com,
-	tabba@google.com,
-	will@kernel.org,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH 0/3] KVM: arm64: Trivial FPSIMD cleanups
-Date: Wed,  7 Jan 2026 11:59:53 +0000
-Message-ID: <176778718617.2735797.4211814414552789582.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260106173707.3292074-1-mark.rutland@arm.com>
-References: <20260106173707.3292074-1-mark.rutland@arm.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="1VRyJ+0B"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=3qyYX76QlWUIX26TwaxqltqE5qHT9hotMM6BfsYSweg=;
+	b=1VRyJ+0B4zb5a96x3vwFxKCbJI3YjjVOn3TaHvt4BuD6wdqmEzpeFGcGWQj1f/eNak6eTFwG/
+	mM2uVMv2ZcL/TkAS1Fx479HMdy7LHOgv702e6IKcg7OLwdmLE+15WFd0BY/uJZl1UxvKmzJXMPm
+	vZ60TdQ5GD/L8a2aZWgMzWY=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmRtN1S47z1P7PT;
+	Wed,  7 Jan 2026 20:19:40 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmRx11LFYzHnH4x;
+	Wed,  7 Jan 2026 20:21:57 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4BBD240086;
+	Wed,  7 Jan 2026 20:22:03 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 12:22:02 +0000
+Date: Wed, 7 Jan 2026 12:22:00 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 17/36] KVM: arm64: gic: Introduce irq_queue and
+ set_pending_state to irq_ops
+Message-ID: <20260107122200.00004455@huawei.com>
+In-Reply-To: <20251219155222.1383109-18-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-18-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, mark.rutland@arm.com, broonie@kernel.org, catalin.marinas@arm.com, tabba@google.com, will@kernel.org, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Tue, 06 Jan 2026 17:37:04 +0000, Mark Rutland wrote:
-> This series contains a few trivial cleanup patches left over from all
-> the FPSIMD/SVE/SME rework last year, all rebased atop v6.19-rc1:
+On Fri, 19 Dec 2025 15:52:41 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+
+> There are times when the default behaviour of vgic_queue_irq_unlock is
+
+Nice to make function names explicit in a patch description by using
+vgic_queue_irq_unlock() style. Some subsystems insist we do that in commit
+descriptions. No idea if kvm does though.
+
+> undesirable. This is because some GICs, such a GICv5 which is the main
+> driver for this change, handle the majority of the interrupt lifecycle
+> in hardware. In this case, there is no need for a per-VCPU AP list as
+> the interrupt can be made pending directly. This is done either via
+> the ICH_PPI_x_EL2 registers for PPIs, or with the VDPEND system
+> instruction for SPIs and LPIs.
 > 
-> * Patch 1 corrects a comment which I typo'd.
-> * Patch 2 repacks some flag indices to be adjacent.
-> * Patch 3 removes an unnecssary ISB.
+> The queue_irq_unlock function is made overridable using a new function
+> pointer in struct irq_ops. In kvm_vgic_inject_irq,
+> vgic_queue_irq_unlock is overridden if the function pointer is
+> non-null.
 > 
-> [...]
+> Additionally, a new function is added via a function pointer -
+> set_pending_state. The intent is for this to be used to directly set
+> the pending state in hardware.
+> 
+> Both of these new irq_ops are unused in this change - it is purely
+> providing the infrastructure itself. The subsequent PPI injection
+> changes provide a demonstration of their usage.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-Applied to next, thanks!
+Trivial stuff only.
 
-[1/3] KVM: arm64: Fix comment in fpsimd_lazy_switch_to_host()
-      commit: 334a1a1e1a5f8b4b172683e7507cfec566313a7c
-[2/3] KVM: arm64: Shuffle KVM_HOST_DATA_FLAG_* indices
-      commit: acd8bfaa9384300a509c8aff5ee4a59a06eb2b2b
-[3/3] KVM: arm64: Remove ISB after writing FPEXC32_EL2
-      commit: b1a9a9b96169bf1f9cb94b8aa33601996fad1e9c
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
-Cheers,
+> ---
+>  arch/arm64/kvm/vgic/vgic.c | 11 +++++++++++
+>  include/kvm/arm_vgic.h     | 15 +++++++++++++++
+>  2 files changed, 26 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index d88570bb2f9f0..ac8cb0270e1e4 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -404,6 +404,13 @@ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq,
+>  
+>  	lockdep_assert_held(&irq->irq_lock);
+>  
+> +	/*
+> +	 * If we have the queue_irq_unlock irq_op, we want to override
+> +	 * the default behaviour. Call that, and return early.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+I'd say this comment is really just saying what the code clearly does
+so provides not benefit. So drop it.
+
+> +	 */
+> +	if (irq->ops && irq->ops->queue_irq_unlock)
+> +		return irq->ops->queue_irq_unlock(kvm, irq, flags);
+> +
+>  retry:
+>  	vcpu = vgic_target_oracle(irq);
+>  	if (irq->vcpu || !vcpu) {
+> @@ -547,7 +554,11 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  	else
+>  		irq->pending_latch = true;
+>  
+> +	if (irq->ops && irq->ops->set_pending_state)
+> +		WARN_ON_ONCE(!irq->ops->set_pending_state(vcpu, irq));
+> +
+>  	vgic_queue_irq_unlock(kvm, irq, flags);
+> +
+Reasonable change, for readability but not relevant to this patch, so don't
+do it here.
+
+>  	vgic_put_irq(kvm, irq);
+>  
+>  	return 0;
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
 
 
