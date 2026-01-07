@@ -1,42 +1,42 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
+Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB1439E172
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4AF327BF6
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767803944; cv=none; b=KKuiU7c1HHsyJJRUig1Z63TheaQpn4V2XEK0lNaIiGJPFUBe++v+dRvTNOzjwCm97Nw+u0rY6+LqgvFYxMQ0AHfI3WDSZHSE0EblGW23HMzJExFw5eAG5ZZT31hblFoN+SLQfqOeU1sLFiaj02AAWuOOhbWbDZgOXXbzhkEFSHc=
+	t=1767804688; cv=none; b=q7cws4t3rhQnK3ZV4mw515l3CqUmRdArZvNJ/+h0+D47J5XAYxrp84fPE1S2OeyYkq97ROagJNrDJIqWdiWLLj3BQIOPtxzBfficd6TuI/wbgF4pjsGIXEfPrjm4C5CU0BHsLHvn8tlN4Q69yiq5h6vjd0kL/DU2l7ehr6Ms8kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767803944; c=relaxed/simple;
-	bh=IJmDYrE8/Uk/o3s7aADyz+eYAyTHNj+vocj0+RyRnkI=;
+	s=arc-20240116; t=1767804688; c=relaxed/simple;
+	bh=3ol7RsguyxLJHmLBaeFw1Ne81MaMqEY5wsLuayf73Fc=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sIBxkf3LkQeUcAsiXeGG+omQgcJpcBSQMyJ3It39OLpt/t6SyCiZwJpXqsM0Keg17LQoGOhgScei9/ZXRZH4gVkZtFc7Q1unxl7hods47AgnKLaMwy6aNUuYn6EXZizLChYV2V4sM/dqRClrE0fjTY5opgnyHZdkQiz76Ps2IMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=UMjGj3Sk; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=uVas9HeRsIpgd0jd+93Vz2sNAj99Ge5ZMnH3R6HijUCiJHy7UyMGomwWtDu9+HIBZAnHCMyZ/BWWHkELEivyjUFDvGJzATSeY7P3SRZPHfwlLATep01FNurlqVqaughy3m+a5Tt0/RZayG8lCPVGuTYho6CgaXc/m7jMX4a44Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TxGob7h0; arc=none smtp.client-ip=119.8.177.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="UMjGj3Sk"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TxGob7h0"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=IkZNkEWJiIzQP6nFkM8MXtoymSNqfy192edAVWu80uY=;
-	b=UMjGj3Sk++uQFhfm7fbcP2jPPrx69x67g6ehTav5r/4BsndGjVpj6m9L9E69L6axgH1i21FJw
-	qOh9/3bSdzrfQ0BOU7BhX7YED6hBuYn67uoASFz2m6gA4PDKVfx/egqsMX9toQrs5EASwjd2A+a
-	NBh15YGvwXDPjcSY4tqK+6Q=
+	bh=5C6jQWVfkjb28klDVK2/Iw/96XcNiZg8oDzeVlxXTuw=;
+	b=TxGob7h0J7DyuITFxG5P7tY9Io8orxNuKiZH+YRkufrT4nWVdkiU2l7kV+5x5BPK/EV8L/l0x
+	sMed21REJUZVbtC+308p685yXNK61w+Fhh68QkeVEwB8SZfQR0/dWk6l2eVj9pzVdvdkkDPs/1b
+	h8k022PqXjg0agVhvTtpYfU=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmYZg0n9dz1P6gZ;
-	Thu,  8 Jan 2026 00:36:26 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmYdH5RMWzHnGcw;
-	Thu,  8 Jan 2026 00:38:43 +0800 (CST)
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmYsG4dt4zN0f4;
+	Thu,  8 Jan 2026 00:49:06 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmYvZ3nqtzHnGdR;
+	Thu,  8 Jan 2026 00:51:06 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3B31640569;
-	Thu,  8 Jan 2026 00:38:50 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 06DAB40570;
+	Thu,  8 Jan 2026 00:51:13 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 16:38:49 +0000
-Date: Wed, 7 Jan 2026 16:38:47 +0000
+ 2026 16:51:12 +0000
+Date: Wed, 7 Jan 2026 16:51:10 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 35/36] KVM: arm64: selftests: Introduce a minimal
- GICv5 PPI selftest
-Message-ID: <20260107163847.00000fe9@huawei.com>
-In-Reply-To: <20251219155222.1383109-36-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 36/36] KVM: arm64: gic-v5: Communicate
+ userspace-drivable PPIs via a UAPI
+Message-ID: <20260107165110.0000638d@huawei.com>
+In-Reply-To: <20251219155222.1383109-37-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-36-sascha.bischoff@arm.com>
+	<20251219155222.1383109-37-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -63,245 +63,133 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
 On Fri, 19 Dec 2025 15:52:48 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> This basic selftest creates a vgic_v5 device (if supported), and tests
-> that one of the PPI interrupts works as expected with a basic
-> single-vCPU guest.
+> GICv5 systems will likely not support the full set of PPIs. The
+> presence of any virtual PPI is tied to the presence of the physical
+> PPI. Therefore, the available PPIs will be limited by the physical
+> host. Userspace cannot drive any PPIs that are not implemented.
 > 
-> Upon starting, the guest enables interrupts. That means that it is
-> initialising all PPIs to have reasonable priorities, but marking them
-> as disabled. Then the priority mask in the ICC_PCR_EL1 is set, and
-> interrupts are enable in ICC_CR0_EL1. At this stage the guest is able
-> to recieve interrupts. The first IMPDEF PPI (64) is enabled and
-> kvm_irq_line is used to inject the state into the guest.
+> Moreover, it is not desirable to expose all PPIs to the guest in the
+> first place, even if they are supported in hardware. Some devices,
+> such as the arch timer, are implemented in KVM, and hence those PPIs
+> shouldn't be driven by userspace, either.
 > 
-> The guest's interrupt handler has an explicit WFI in order to ensure
-> that the guest skips WFI when there are pending and enabled PPI
-> interrupts.
+> Provided a new UAPI:
+>   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
+> 
+> This allows userspace to query which PPIs it is able to drive via
+> KVM_IRQ_LINE.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Hi Sascha,
 
-A few comments inline.
+A couple of trivial comments on this patch.
 
-> diff --git a/tools/testing/selftests/kvm/arm64/vgic_v5.c b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> new file mode 100644
-> index 0000000000000..5879fbd71042d
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/vgic_v5.c
-> @@ -0,0 +1,248 @@
+Overall, to me as a definite non expert in kvm GIC emulation this
+series looks to be in a pretty good state.
 
-> +static void test_vgic_v5_ppis(uint32_t gic_dev_type)
+Thanks,
+
+Jonathan
+> ---
+>  .../virt/kvm/devices/arm-vgic-v5.rst          | 13 ++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h             |  1 +
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c         | 25 +++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic-v5.c                 |  8 ++++++
+>  include/kvm/arm_vgic.h                        |  5 ++++
+>  include/linux/irqchip/arm-gic-v5.h            |  4 +++
+>  tools/arch/arm64/include/uapi/asm/kvm.h       |  1 +
+>  7 files changed, 57 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> index 9904cb888277d..d9f2917b609c5 100644
+> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
+> @@ -25,6 +25,19 @@ Groups:
+>        request the initialization of the VGIC, no additional parameter in
+>        kvm_device_attr.addr. Must be called after all VCPUs have been created.
+>  
+> +   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
+> +      request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
+> +      be directly driven from userspace with GICv5, and the returned mask
+> +      informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
+> +
+> +      Userspace must allocate and point to __u64[2] with of data in
+
+with of?
+
+> +      kvm_device_attr.addr. When this call returns, the provided memory will be
+> +      populated with the userspace PPI mask. The lower __u64 contains the mask
+> +      for the lower 64 PPIS, with the remaining 64 being in the second __u64.
+> +
+> +      This is a read-only attribute, and cannot be set. Attempts to set it are
+> +      rejected.
+> +
+>    Errors:
+>  
+>      =======  ========================================================
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index 78903182bba08..360c78ed4f104 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -719,6 +719,25 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
+>  	.has_attr = vgic_v3_has_attr,
+>  };
+>  
+> +static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
+> +				      struct kvm_device_attr *attr)
 > +{
-> +	struct ucall uc;
-> +	struct kvm_vcpu *vcpus[NR_VCPUS];
-> +	struct vm_gic v;
-> +	int ret, i;
+> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> +	struct gicv5_vm *gicv5_vm = &dev->kvm->arch.vgic.gicv5_vm;
+> +	int i, ret;
 > +
-> +	v.gic_dev_type = gic_dev_type;
-> +	v.vm = __vm_create(VM_SHAPE_DEFAULT, NR_VCPUS, 0);
+> +	guard(mutex)(&dev->kvm->arch.config_lock);
 > +
-> +	v.gic_fd = kvm_create_device(v.vm, gic_dev_type);
-> +
-> +	for (i = 0; i < NR_VCPUS; ++i)
-> +		vcpus[i] = vm_vcpu_add(v.vm, i, guest_code);
-> +
-> +	vm_init_descriptor_tables(v.vm);
-> +	vm_install_exception_handler(v.vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-> +
-> +	for (i = 0; i < NR_VCPUS; i++)
-> +		vcpu_init_descriptor_tables(vcpus[i]);
-> +
-> +	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> +			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
-> +
-> +	while (1) {
-> +		ret = run_vcpu(vcpus[0]);
-> +
-> +		switch (get_ucall(vcpus[0], &uc)) {
-> +		case UCALL_SYNC:
-> +			/*
-> +			 * The guest is ready for the next level
-> +			 * change. Set high if ready, and lower if it
+> +	for (i = 0; i < 2; ++i) {
 
-Odd line wrap. Go to 80 chars.
+Can drag declaration of i into loop init.
+Also I just noticed the series is rather random wrt to pre or post increment
+in cases where it doesn't matter. I'd go with post increment for for loops.
+I took a quick look at a random file in this directory and that's what is used there.
 
-> +			 * has been consumed.
-> +			 */
-> +			if (uc.args[1] == GUEST_CMD_IS_READY ||
-> +			    uc.args[1] == GUEST_CMD_IRQ_DIEOI) {
-> +				u64 irq = 64;
-> +				bool level = uc.args[1] == GUEST_CMD_IRQ_DIEOI ? 0 : 1;
-> +
-> +				irq &= KVM_ARM_IRQ_NUM_MASK;
-Can use FIELD_PREP in tools. Seems likely to be useful here.
 
-> +				irq |= KVM_ARM_IRQ_TYPE_PPI << KVM_ARM_IRQ_TYPE_SHIFT;
-> +
-> +				_kvm_irq_line(v.vm, irq, level);
-> +			} else if (uc.args[1] == GUEST_CMD_IS_AWAKE) {
-> +				pr_info("Guest skipping WFI due to pending IRQ\n");
-> +			} else if (uc.args[1] == GUEST_CMD_IRQ_CDIA) {
-> +				pr_info("Guest acknowledged IRQ\n");
-> +			}
-> +
-> +			continue;
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			break;
-> +		case UCALL_DONE:
-> +			goto done;
-> +		default:
-> +			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-> +		}
+> +		ret = put_user(gicv5_vm->userspace_ppis[i], uaddr);
+> +		if (ret)
+> +			return ret;
+> +		uaddr++;
 > +	}
-> +
-> +done:
-> +	TEST_ASSERT(ret == 0, "Failed to test GICv5 PPIs");
-> +
-> +	vm_gic_destroy(&v);
-> +}
-> +
-> +/*
-> + * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
-
-Comment needs an update given you pass in v5
-
-Maybe worth pulling this out as a library function for both sets of tests.
-If not, rip out the v2, v3 code from here and the type parameter as that is
-all code that will bit rot.
-
-> + */
-> +int test_kvm_device(uint32_t gic_dev_type)
-> +{
-> +	struct kvm_vcpu *vcpus[NR_VCPUS];
-> +	struct vm_gic v;
-> +	uint32_t other;
-> +	int ret;
-> +
-> +	v.vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
-> +
-> +	/* try to create a non existing KVM device */
-> +	ret = __kvm_test_create_device(v.vm, 0);
-> +	TEST_ASSERT(ret && errno == ENODEV, "unsupported device");
-> +
-> +	/* trial mode */
-> +	ret = __kvm_test_create_device(v.vm, gic_dev_type);
-> +	if (ret)
-> +		return ret;
-> +	v.gic_fd = kvm_create_device(v.vm, gic_dev_type);
-> +
-> +	ret = __kvm_create_device(v.vm, gic_dev_type);
-> +	TEST_ASSERT(ret < 0 && errno == EEXIST, "create GIC device twice");
-> +
-> +	/* try to create the other gic_dev_types */
-> +	other = KVM_DEV_TYPE_ARM_VGIC_V2;
-> +	if (!__kvm_test_create_device(v.vm, other)) {
-> +		ret = __kvm_create_device(v.vm, other);
-> +		TEST_ASSERT(ret < 0 && (errno == EINVAL || errno == EEXIST),
-> +				"create GIC device while other version exists");
-> +	}
-> +
-> +	other = KVM_DEV_TYPE_ARM_VGIC_V3;
-> +	if (!__kvm_test_create_device(v.vm, other)) {
-> +		ret = __kvm_create_device(v.vm, other);
-> +		TEST_ASSERT(ret < 0 && (errno == EINVAL || errno == EEXIST),
-> +				"create GIC device while other version exists");
-> +	}
-> +
-> +	other = KVM_DEV_TYPE_ARM_VGIC_V5;
-> +	if (!__kvm_test_create_device(v.vm, other)) {
-> +		ret = __kvm_create_device(v.vm, other);
-> +		TEST_ASSERT(ret < 0 && (errno == EINVAL || errno == EEXIST),
-> +				"create GIC device while other version exists");
-> +	}
-> +
-> +	vm_gic_destroy(&v);
 > +
 > +	return 0;
 > +}
 
-> +
-> +int main(int ac, char **av)
-> +{
-> +	int ret;
-> +	int pa_bits;
-> +	int cnt_impl = 0;
-> +
-> +	test_disable_default_vgic();
-> +
-> +	pa_bits = vm_guest_mode_params[VM_MODE_DEFAULT].pa_bits;
-> +	max_phys_size = 1ULL << pa_bits;
-> +
-> +	ret = test_kvm_device(KVM_DEV_TYPE_ARM_VGIC_V5);
-> +	if (!ret) {
-> +		pr_info("Running VGIC_V5 tests.\n");
-> +		run_tests(KVM_DEV_TYPE_ARM_VGIC_V5);
-> +		cnt_impl++;
-> +	} else {
-> +		pr_info("No GICv5 support; Not running GIC_v5 tests.\n");
-> +		exit(KSFT_SKIP);
-> +	}
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index bf72982d6a2e8..04300926683b6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -122,6 +122,14 @@ int vgic_v5_init(struct kvm *kvm)
+>  		}
+>  	}
+>  
+> +	/*
+> +	 * We only allow userspace to drive the SW_PPI, if it is
+> +	 * implemented.
+> +	 */
 
-Flip to exit early on no device.
+	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
 
-	if (ret) {
-		pr_info("..);
-		exit(KSFT_SKIP);
-	}
+Is under 80 chars (just) so go with that.
 
-	pr_info(...);
-	run_tests(...
-..
 
-	return 0;
-
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] = GICV5_SW_PPI & GICV5_HWIRQ_ID;
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] &= ppi_caps->impl_ppi_mask[0];
+> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[1] = 0;
 > +
-> +	return 0;
-> +}
-> +
-> +
-
-Bonus blank line at end of file. One is fine.
-
-> diff --git a/tools/testing/selftests/kvm/include/arm64/gic_v5.h b/tools/testing/selftests/kvm/include/arm64/gic_v5.h
-> new file mode 100644
-> index 0000000000000..5daaa84318bb1
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/arm64/gic_v5.h
-> @@ -0,0 +1,148 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +
-> +#ifndef __SELFTESTS_GIC_V5_H
-> +#define __SELFTESTS_GIC_V5_H
-> +
-> +#include <asm/barrier.h>
-> +#include <asm/sysreg.h>
-> +
-> +#include <linux/bitfield.h>
-> +
-> +#include "processor.h"
-
-> +
-> +/* Definitions for GICR CDIA */
-> +#define GICV5_GIC_CDIA_VALID_MASK	BIT_ULL(32)
-> +#define GICV5_GICR_CDIA_VALID(r)	FIELD_GET(GICV5_GIC_CDIA_VALID_MASK, r)
-> +#define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
-> +#define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
-> +#define GICV5_GIC_CDIA_INTID		GENMASK_ULL(31, 0)
-> +
-> +/* Definitions for GICR CDNMIA */
-> +#define GICV5_GIC_CDNMIA_VALID_MASK	BIT_ULL(32)
-> +#define GICV5_GICR_CDNMIA_VALID(r)	FIELD_GET(GICV5_GIC_CDNMIA_VALID_MASK, r)
-> +#define GICV5_GIC_CDNMIA_TYPE_MASK	GENMASK_ULL(31, 29)
-> +#define GICV5_GIC_CDNMIA_ID_MASK	GENMASK_ULL(23, 0)
-
-If we are updating the sysreg.h ones, remember to add R here as well.
-
+>  	return 0;
+>  }
 
 
