@@ -1,195 +1,70 @@
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4AF327BF6
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6687934D918
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767804688; cv=none; b=q7cws4t3rhQnK3ZV4mw515l3CqUmRdArZvNJ/+h0+D47J5XAYxrp84fPE1S2OeyYkq97ROagJNrDJIqWdiWLLj3BQIOPtxzBfficd6TuI/wbgF4pjsGIXEfPrjm4C5CU0BHsLHvn8tlN4Q69yiq5h6vjd0kL/DU2l7ehr6Ms8kc=
+	t=1767805171; cv=none; b=HRfir1Frel64xlsDG2jqxFXYDDkRJQQ8prX4yhWPBZGCDf8DxvWjpARS/rBQu4IXZKZOj4xXWqv4B8ycoWQu5kNVyzqaAnsP2IeHDOtgGf/LQYhUqx0K75Sgi58icQu+8gHXoUCJcnOjaxfl1T5ZfOLvUkPWUu+5udsl/Fnwyv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767804688; c=relaxed/simple;
-	bh=3ol7RsguyxLJHmLBaeFw1Ne81MaMqEY5wsLuayf73Fc=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uVas9HeRsIpgd0jd+93Vz2sNAj99Ge5ZMnH3R6HijUCiJHy7UyMGomwWtDu9+HIBZAnHCMyZ/BWWHkELEivyjUFDvGJzATSeY7P3SRZPHfwlLATep01FNurlqVqaughy3m+a5Tt0/RZayG8lCPVGuTYho6CgaXc/m7jMX4a44Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=TxGob7h0; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="TxGob7h0"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=5C6jQWVfkjb28klDVK2/Iw/96XcNiZg8oDzeVlxXTuw=;
-	b=TxGob7h0J7DyuITFxG5P7tY9Io8orxNuKiZH+YRkufrT4nWVdkiU2l7kV+5x5BPK/EV8L/l0x
-	sMed21REJUZVbtC+308p685yXNK61w+Fhh68QkeVEwB8SZfQR0/dWk6l2eVj9pzVdvdkkDPs/1b
-	h8k022PqXjg0agVhvTtpYfU=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmYsG4dt4zN0f4;
-	Thu,  8 Jan 2026 00:49:06 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmYvZ3nqtzHnGdR;
-	Thu,  8 Jan 2026 00:51:06 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 06DAB40570;
-	Thu,  8 Jan 2026 00:51:13 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 16:51:12 +0000
-Date: Wed, 7 Jan 2026 16:51:10 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 36/36] KVM: arm64: gic-v5: Communicate
- userspace-drivable PPIs via a UAPI
-Message-ID: <20260107165110.0000638d@huawei.com>
-In-Reply-To: <20251219155222.1383109-37-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-37-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1767805171; c=relaxed/simple;
+	bh=uGId2twk8vagHHovwim/VkM3xk7H/dWaYingV8uZFAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qZLt4FCY9eyirtULnETLzFv8j7ZDHRmn5ZsS8rpK+uNwvY2kSBEc8A+LFP/R8qCRtpbNflpdpV6z0ZdhqlD+b2QyW5X8JIyjHp5G6QtzIcpSk1Nr311KxhhI7EXKVEyO44NDTRgzpHG7BKqYi4vOaUl5hGG5y9dYGN9YqZdqCfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf11.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay04.hostedemail.com (Postfix) with ESMTP id D6C631A0474;
+	Wed,  7 Jan 2026 16:59:12 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf11.hostedemail.com (Postfix) with ESMTPA id 790192002C;
+	Wed,  7 Jan 2026 16:59:09 +0000 (UTC)
+Date: Wed, 7 Jan 2026 11:59:36 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, jstultz@google.com,
+ qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
+ kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 00/30] Tracefs support for pKVM
+Message-ID: <20260107115936.4f4a8965@gandalf.local.home>
+In-Reply-To: <867bttmmzw.wl-maz@kernel.org>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+	<867bttmmzw.wl-maz@kernel.org>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+X-Stat-Signature: 44shsiadfkcuojskzj7atpzqz4f1uwqm
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: 790192002C
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19LQ9MFuL2LaCgUQAtwlkXmJZlyiYnSKhM=
+X-HE-Tag: 1767805149-424335
+X-HE-Meta: U2FsdGVkX18MLNG4uKP17KPandcrOvhgFIeJTSOG5VxsbSslz/R9wG2Hsx0QalMvyVcXnpgQTOoOScyZerqNlskwc42IA1hV0ImsJbTcdkGJofwc5uG1wlHcJIORHfl5vYLAL/FXL/tWm0jGSydjqQc+fRan7we14dHrIVnHBVZCS8WmVhNEQ6GZ0m8zDamLgi5cAJcIZU608Qg3QVo5sT2LS20XQ2MTA335YRO0jTXzAx/cFk7OcVSNFcY2jwRU2v6XUh3vKC2P6jk2IIGwNFfOvwxzBhYnOVtLslkmOw7QNfW2rAGcItsSp4JdPW0ETvSfxDfcErPvz1emNfCoBmKyuO8R+p+f
 
-On Fri, 19 Dec 2025 15:52:48 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Wed, 07 Jan 2026 16:00:19 +0000
+Marc Zyngier <maz@kernel.org> wrote:
 
-> GICv5 systems will likely not support the full set of PPIs. The
-> presence of any virtual PPI is tied to the presence of the physical
-> PPI. Therefore, the available PPIs will be limited by the physical
-> host. Userspace cannot drive any PPIs that are not implemented.
+> I quite like the shape of this now, at least for the KVM side of
+> things. The comments I have can be addressed down the line, and don't
+> impact the actual functionality.
 > 
-> Moreover, it is not desirable to expose all PPIs to the guest in the
-> first place, even if they are supported in hardware. Some devices,
-> such as the arch timer, are implemented in KVM, and hence those PPIs
-> shouldn't be driven by userspace, either.
+> Now, the first 18 patches definitely need acks from the relevant
+> maintainers before I can queue this.
 > 
-> Provided a new UAPI:
->   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> 
-> This allows userspace to query which PPIs it is able to drive via
-> KVM_IRQ_LINE.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Steven?
 
-A couple of trivial comments on this patch.
-
-Overall, to me as a definite non expert in kvm GIC emulation this
-series looks to be in a pretty good state.
+Yeah, it's on my todo list to finish my review.
 
 Thanks,
 
-Jonathan
-> ---
->  .../virt/kvm/devices/arm-vgic-v5.rst          | 13 ++++++++++
->  arch/arm64/include/uapi/asm/kvm.h             |  1 +
->  arch/arm64/kvm/vgic/vgic-kvm-device.c         | 25 +++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-v5.c                 |  8 ++++++
->  include/kvm/arm_vgic.h                        |  5 ++++
->  include/linux/irqchip/arm-gic-v5.h            |  4 +++
->  tools/arch/arm64/include/uapi/asm/kvm.h       |  1 +
->  7 files changed, 57 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/devices/arm-vgic-v5.rst b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> index 9904cb888277d..d9f2917b609c5 100644
-> --- a/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> +++ b/Documentation/virt/kvm/devices/arm-vgic-v5.rst
-> @@ -25,6 +25,19 @@ Groups:
->        request the initialization of the VGIC, no additional parameter in
->        kvm_device_attr.addr. Must be called after all VCPUs have been created.
->  
-> +   KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> +      request the mask of userspace-drivable PPIs. Only a subset of the PPIs can
-> +      be directly driven from userspace with GICv5, and the returned mask
-> +      informs userspace of which it is allowed to drive via KVM_IRQ_LINE.
-> +
-> +      Userspace must allocate and point to __u64[2] with of data in
-
-with of?
-
-> +      kvm_device_attr.addr. When this call returns, the provided memory will be
-> +      populated with the userspace PPI mask. The lower __u64 contains the mask
-> +      for the lower 64 PPIS, with the remaining 64 being in the second __u64.
-> +
-> +      This is a read-only attribute, and cannot be set. Attempts to set it are
-> +      rejected.
-> +
->    Errors:
->  
->      =======  ========================================================
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> index 78903182bba08..360c78ed4f104 100644
-> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> @@ -719,6 +719,25 @@ struct kvm_device_ops kvm_arm_vgic_v3_ops = {
->  	.has_attr = vgic_v3_has_attr,
->  };
->  
-> +static int vgic_v5_get_userspace_ppis(struct kvm_device *dev,
-> +				      struct kvm_device_attr *attr)
-> +{
-> +	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-> +	struct gicv5_vm *gicv5_vm = &dev->kvm->arch.vgic.gicv5_vm;
-> +	int i, ret;
-> +
-> +	guard(mutex)(&dev->kvm->arch.config_lock);
-> +
-> +	for (i = 0; i < 2; ++i) {
-
-Can drag declaration of i into loop init.
-Also I just noticed the series is rather random wrt to pre or post increment
-in cases where it doesn't matter. I'd go with post increment for for loops.
-I took a quick look at a random file in this directory and that's what is used there.
-
-
-> +		ret = put_user(gicv5_vm->userspace_ppis[i], uaddr);
-> +		if (ret)
-> +			return ret;
-> +		uaddr++;
-> +	}
-> +
-> +	return 0;
-> +}
-
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index bf72982d6a2e8..04300926683b6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -122,6 +122,14 @@ int vgic_v5_init(struct kvm *kvm)
->  		}
->  	}
->  
-> +	/*
-> +	 * We only allow userspace to drive the SW_PPI, if it is
-> +	 * implemented.
-> +	 */
-
-	/* We only allow userspace to drive the SW_PPI, if it is implemented. */
-
-Is under 80 chars (just) so go with that.
-
-
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] = GICV5_SW_PPI & GICV5_HWIRQ_ID;
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[0] &= ppi_caps->impl_ppi_mask[0];
-> +	kvm->arch.vgic.gicv5_vm.userspace_ppis[1] = 0;
-> +
->  	return 0;
->  }
-
-
+-- Steve
