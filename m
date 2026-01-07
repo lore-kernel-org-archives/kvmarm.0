@@ -1,85 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EF723EAB4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 11:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09DD27280A
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 11:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767785017; cv=none; b=tB3gCOSIPYGT68mRLonuXUefZZBBQp4uf8H2ShziM4FJWl8oa5fW/59ZKtODNr/3YJ6SvzrWDYloSWiVlWl5JJBETFsKXVnYlQntvJvCHP43b/yAFQ/zdCfIDxhsSSXU/9tTXQUOXiQLPmiRYeX7/vN6IOMPD30uP0uGICgQlW0=
+	t=1767785105; cv=none; b=moH06W5aLHv2TjAtPBH9YLKjD+f7pzREpFFMLAFKPpfVLLlvvV0kwjfDzscN35HxEkrJbMZ5vCqlZcvcSjf+AMffwqu3oT5M1wQFOxMQukNPZaWNyYB7xaE6flObIUcwPrHpDxJXfEtrMmB87Fkzcu1IMuMdKABL/a8FvCjqtmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767785017; c=relaxed/simple;
-	bh=dn2+c2FoopOCirq4VSlDMFYYIIkVyKutLY5f+zRioxM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PjwApsDiuCpd0X2yNKJqKxdWMIC2gDzDlm4JXsRq4lZexykHavwBXYtWDPQzwt0HmRStPcxJKcQDkxvtvur7v7YFK9R88TVPhpmcL96XwdF0r7t0jwuwwrTPkWBpxSHPMdJFjAK9bCYFbS3YWsgdR5zRGUqLnpR71iZEnX+tZ1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSwrZQqS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767785105; c=relaxed/simple;
+	bh=SjBQYtf4n6nBNqiksTyT2WcvJ5cY7yVeRtu6eJRxcjI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l+5kduiMxKkarXNjrNv4vH8DsbyPRZ4DSMRHfJ63GIOU3sqiKqGwYF7N3Cozo7zydU+jNQFFNoxc+YVRev4lOsT46/3EWHf/x69vz3p2m4AXSftZ5nJQZyerd22pxD0akVzUqrXZfC1BcTI1WC8sO3BtcBg9aN3TS68Z/RwdIa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=U0iqRGZl; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSwrZQqS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E9EAC4CEF7;
-	Wed,  7 Jan 2026 11:23:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767785017;
-	bh=dn2+c2FoopOCirq4VSlDMFYYIIkVyKutLY5f+zRioxM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YSwrZQqSBpYh0wMySfXpKWuVeMacsQxTdE/FO4cNwMqzYRrzeL5lgzq0vN3iBW/iB
-	 8vGQn/05f4TeIQONJCr8kvOX+Al8ar0a5F38Z9odHjAWCgTIgBq//bspytddLJDgLc
-	 PZzcLPGdo0kpPkpTJ8W5mGnEu73SiWU195V4FLw3NWfCamsRhvqunc9bg2lMaExvQR
-	 fa2hKg7vdkzosyNaZMxT/GAauhy6UM7f1mEmKvEopDcMAKOAMMs4XZMoVydFCGml2X
-	 gvXzzPpg95htzdzENFWgmdis/QGqzovg/1wQLMgQDT8I637Uio/uR5MxsuLM2XO7hf
-	 OugUd3cdbNHKg==
-Date: Wed, 7 Jan 2026 11:23:32 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	catalin.marinas@arm.com, maz@kernel.org, oliver.upton@linux.dev,
-	tabba@google.com, will@kernel.org
-Subject: Re: [PATCH 2/3] KVM: arm64: Shuffle KVM_HOST_DATA_FLAG_* indices
-Message-ID: <36fd77fb-362b-455b-8507-f59360153c91@sirena.org.uk>
-References: <20260106173707.3292074-1-mark.rutland@arm.com>
- <20260106173707.3292074-3-mark.rutland@arm.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="U0iqRGZl"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Mx4HxkvxS5+KY/vZ//YKmAqZ2BvXN0nyzwAdGObB9i0=;
+	b=U0iqRGZl6n9h324NEVa8ZWn78Bdn60SKfDDxTUQ0R656dKatCNfUfi9kjB4S2w58iSU6/KGZe
+	xK2hvfybERfeBxcFPBUEQ4d+i7VkdF8r/dbF6WDgB3GowSEpPmw06LttPFNEgv5ceAQFouC1jU/
+	U3kb+jVKp05F+2cXl3Qh3wQ=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmQcn24vXz1vpDm;
+	Wed,  7 Jan 2026 19:22:49 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmQg8449hzJ468L;
+	Wed,  7 Jan 2026 19:24:52 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id A9FED40539;
+	Wed,  7 Jan 2026 19:24:55 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 11:24:54 +0000
+Date: Wed, 7 Jan 2026 11:24:53 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 13/36] KVM: arm64: gic: Set vgic_model before initing
+ private IRQs
+Message-ID: <20260107112453.00004fb9@huawei.com>
+In-Reply-To: <20251219155222.1383109-14-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-14-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wmrKsawYFX++f6+M"
-Content-Disposition: inline
-In-Reply-To: <20260106173707.3292074-3-mark.rutland@arm.com>
-X-Cookie: Is there life before breakfast?
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
+On Fri, 19 Dec 2025 15:52:40 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
---wmrKsawYFX++f6+M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Different GIC types require the private IRQs to be initialised
+> differently. GICv5 is the culprit as it supports both a different
+> number of private IRQs, and all of these are PPIs (there are no
+> SGIs). Moreover, as GICv5 uses the top bits of the interrupt ID to
+> encode the type, the intid also needs to computed differently.
+> 
+> Up until now, the GIC model has been set after initialising the
+> private IRQs for a VCPU. Move this earlier to ensure that the GIC
+> model is available when configuring the private IRQs.
+Hi Sascha,
 
-On Tue, Jan 06, 2026 at 05:37:06PM +0000, Mark Rutland wrote:
-> There's a gap in the KVM_HOST_DATA_FLAG_* indices since the removal of
-> KVM_HOST_DATA_FLAG_HOST_SVE_ENABLED and
-> KVM_HOST_DATA_FLAG_HOST_SME_ENABLED in commits:
->=20
-> * 459f059be702 ("KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN")
-> * 407a99c4654e ("KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN")
->=20
-> Shuffle the indices to remove the gap, as Oliver requested at the time of
-> the removals:
+Good to mention you are moving a bit more than just the type
+initialization. One question on whether it makes sense to move
+vgic_dist_base inline.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index c602f24bab1bb..bcc2c79f7833c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -140,6 +140,12 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  		goto out_unlock;
+>  	}
+>  
+> +	kvm->arch.vgic.in_kernel = true;
+> +	kvm->arch.vgic.vgic_model = type;
+> +	kvm->arch.vgic.implementation_rev = KVM_VGIC_IMP_REV_LATEST;
 
---wmrKsawYFX++f6+M
-Content-Type: application/pgp-signature; name="signature.asc"
+Moving these looks fine.
 
------BEGIN PGP SIGNATURE-----
+> +
+> +	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmleQjMACgkQJNaLcl1U
-h9Dlkwf+PzIZ1iMjULrauU21DeSQdSgVk/G/LtZhuHfqa5HZo0nQ+i3mQ9QrlK0a
-Y4oXxW9UM2TMruaFCtmP/6IY6+LxjgaDC4vxdb31tInKlqNt8JnCpS3M1kvCJ84W
-K+xLBUo0FgmvVPwjTG8WlNN4Q31uAaeAC+TrVwmpiSXBQCSyyd8XwRAMsu4fpQpg
-5f0vHHJkMudSdvsIf6SkcsEfOcINARqpLE55+fqUZD0uEj3Ll2pKGTwPDE7duMYR
-gwliFxV3LftkKdY1v0RdFkXOegvNcQaJxslMjzDJPSmBszGjknMcBHEFRloKXdRX
-TtxGO+yz+ktywVsZrNcrdCxV3QJIsA==
-=qbTT
------END PGP SIGNATURE-----
+Does this need to move?  The rest of the *base =
+stuff is still where this code originally came from.
+Might well be necessary but I'd expect a little in the patch description on why.
 
---wmrKsawYFX++f6+M--
+> +
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		ret = vgic_allocate_private_irqs_locked(vcpu, type);
+>  		if (ret)
+> @@ -156,12 +162,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  		goto out_unlock;
+>  	}
+>  
+> -	kvm->arch.vgic.in_kernel = true;
+> -	kvm->arch.vgic.vgic_model = type;
+> -	kvm->arch.vgic.implementation_rev = KVM_VGIC_IMP_REV_LATEST;
+> -
+> -	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+> -
+>  	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+>  	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+>  
+
