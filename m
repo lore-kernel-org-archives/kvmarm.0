@@ -1,213 +1,224 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4C832548C
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 14:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0573314C4;
+	Wed,  7 Jan 2026 14:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767795712; cv=none; b=cVQ+zcPGpqcvWJtX0UdvT2o5odza0sWEVByo1GLYhojn30JSXwoj6f9dd3LZPDJng8qjZoiyIYku2PPjEGzhIAr6DvQ4w8CSq0TSOs2hECxbDSAjtZEZDxdP/e8Z7OiOfMPs9pntus2MGvrdiOcZnWQ/aXlu1RtQnVTzCMREhIo=
+	t=1767795800; cv=none; b=Po+6RxqOufJRlpn88YJ+wFxs1xRol2oqJG0sbvr6e8NIPNm77wIhUKw+kmUoNn2Usz4AWXecmnUt09CbXzwD18EU2hIRaWbzkgKag8KjuhGszR/s/S965ZYckxXRlbWkfR3gWdFZ8se3Vxw8OtiXUlevVVAEILhl+nasPVilntA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767795712; c=relaxed/simple;
-	bh=Ht8CVL4cTZCeRAc2yCMcXfuJQ3mjv+Vgn2jqJp2gRP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ohFobUKHNcmR1ogIXSdaqRzqed+0aX2LFjFXg1VcnATXadfx32Y3Gak2/8Pqu68RDLf9CyFyMyP+GPBeLXQ30dfxQeg8d8yyE/qfeiGEEqtBLE1QstgyBLHGP2d6SvjdUa9W5rZOkdvjOBPSeZv5PGxcMa/Xlx/RFJdh2gX0gZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA800497;
-	Wed,  7 Jan 2026 06:21:37 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9382A3F6A8;
-	Wed,  7 Jan 2026 06:21:39 -0800 (PST)
-Message-ID: <818b03f6-effb-4e7e-9ee8-49917504a5dd@arm.com>
-Date: Wed, 7 Jan 2026 14:21:37 +0000
+	s=arc-20240116; t=1767795800; c=relaxed/simple;
+	bh=5UKSsihQ8uBHKEEpz2pGVATVXYt1q/oiiCprN1RFCIk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QOk4V+CiiiylnZIcScTwwx6ADo+2PEyoBb+B2wdRQpe0lXR7TKOYpXBzc1FxKs9b+8GjGLyo4bZhFXFpWEs+QSlv/QXHd14f26bS8nHTLE3w9bAQkrKtW9qiLj9i4s7850e6WWTRB54O6FCY8PsleCEB93Y8fFJfQMjdVPUTxBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p421+hZX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p421+hZX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77B7EC4CEF1;
+	Wed,  7 Jan 2026 14:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767795799;
+	bh=5UKSsihQ8uBHKEEpz2pGVATVXYt1q/oiiCprN1RFCIk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p421+hZXHWdO0ictRkRluuI5Tkh2oysMgF1rLf2zsJXCej+RjCifpk855q986ERUp
+	 IzolNiPKbx6MFs9Tb4YGWeOrW7F8sOxG+709oc7Z3bchESwavV9xjPdGr3vNIDwko+
+	 Gaulhha/Q3QubVKE7JrZvcK5/Q4wut2kr1vIU63pETrVjq91j8BZxzwN14znJTkXjd
+	 Sh51iQSmHXYjBWxkWnsolxPmT9cD+BKapX1oIEuUgMYSWm8hT8fhFyaaj1diiS51l2
+	 EJbx/pbgT5sTbgecHeLkkYr1ipD3NlHIKYVEWZ+7+ARXO89AwN6ZyrlwmvYRNfbccJ
+	 qIUodVx0FBmdg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdURQ-000000006DR-2ZBD;
+	Wed, 07 Jan 2026 14:23:16 +0000
+Date: Wed, 07 Jan 2026 14:23:16 +0000
+Message-ID: <86bjj5mrhn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Stephen Boyd <sboyd@kernel.org>,
+	"Christopher S. Hall" <christopher.s.hall@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v9 25/30] KVM: arm64: Sync boot clock with the nVHE/pKVM hyp
+In-Reply-To: <20251202093623.2337860-26-vdonnefort@google.com>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+	<20251202093623.2337860-26-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 25/45] arm_mpam: resctrl: Add support for 'MB' resource
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- Zeng Heng <zengheng4@huawei.com>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-26-ben.horgan@arm.com>
- <20260106121944.0000499e@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260106121944.0000499e@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org, tglx@linutronix.de, sboyd@kernel.org, christopher.s.hall@intel.com, richardcochran@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Jonathan,
+On Tue, 02 Dec 2025 09:36:18 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> Configure the hypervisor tracing clock with the kernel boot clock. For
+> tracing purposes, the boot clock is interesting: it doesn't stop on
+> suspend. However, it is corrected on a regular basis, which implies the
+> need to re-evaluate it every once in a while.
+> 
+> Cc: John Stultz <jstultz@google.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Stephen Boyd <sboyd@kernel.org>
+> Cc: Christopher S. Hall <christopher.s.hall@intel.com>
+> Cc: Richard Cochran <richardcochran@gmail.com>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index f83650a7aad9..375607c67285 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -93,6 +93,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___tracing_unload,
+>  	__KVM_HOST_SMCCC_FUNC___tracing_enable,
+>  	__KVM_HOST_SMCCC_FUNC___tracing_swap_reader,
+> +	__KVM_HOST_SMCCC_FUNC___tracing_update_clock,
+>  };
+>  
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/trace.h b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> index 7da8788ce527..fd641e1b1c23 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/trace.h
+> @@ -11,6 +11,7 @@ int __tracing_load(unsigned long desc_va, size_t desc_size);
+>  void __tracing_unload(void);
+>  int __tracing_enable(bool enable);
+>  int __tracing_swap_reader(unsigned int cpu);
+> +void __tracing_update_clock(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
+>  #else
+>  static inline void *tracing_reserve_entry(unsigned long length) { return NULL; }
+>  static inline void tracing_commit_entry(void) { }
+> @@ -19,5 +20,6 @@ static inline int __tracing_load(unsigned long desc_va, size_t desc_size) { retu
+>  static inline void __tracing_unload(void) { }
+>  static inline int __tracing_enable(bool enable) { return -ENODEV; }
+>  static inline int __tracing_swap_reader(unsigned int cpu) { return -ENODEV; }
+> +static inline void __tracing_update_clock(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
+>  #endif
+>  #endif
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index 8b78b29c2069..45b8f70828de 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -613,6 +613,18 @@ static void handle___tracing_swap_reader(struct kvm_cpu_context *host_ctxt)
+>  	cpu_reg(host_ctxt, 1) = __tracing_swap_reader(cpu);
+>  }
+>  
+> +static void handle___tracing_update_clock(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(u32, mult, host_ctxt, 1);
+> +	DECLARE_REG(u32, shift, host_ctxt, 2);
+> +	DECLARE_REG(u64, epoch_ns, host_ctxt, 3);
+> +	DECLARE_REG(u64, epoch_cyc, host_ctxt, 4);
+> +
+> +	__tracing_update_clock(mult, shift, epoch_ns, epoch_cyc);
+> +
+> +	cpu_reg(host_ctxt, 1) = 0;
 
-On 1/6/26 12:19, Jonathan Cameron wrote:
-> On Fri, 19 Dec 2025 18:11:27 +0000
-> Ben Horgan <ben.horgan@arm.com> wrote:
-> 
->> From: James Morse <james.morse@arm.com>
->>
->> resctrl supports 'MB', as a percentage throttling of traffic somewhere
->> after the L3. This is the control that mba_sc uses, so ideally the class
->> chosen should be as close as possible to the counters used for mba_local.
->>
->> MB's percentage control should be backed either with the fixed point
-> 
-> either's "or" is missing.  (sentence should include the second choice)
-> 
->> fraction MBW_MAX. The bandwidth portion bitmaps is not used as its tricky
->> to pick which bits to use to avoid contention, and may be possible to
->> expose this as something other than a percentage in the future.
->>
->> CC: Zeng Heng <zengheng4@huawei.com>
->> Co-developed-by: Dave Martin <Dave.Martin@arm.com>
->> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
->> Signed-off-by: James Morse <james.morse@arm.com>>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> 
-> As mentioned in earlier review I'd like an overview doc of the heuristics
-> used to map to the resctrl everything is a xeon view of the world.
-> 
-> At least some of our platforms are far enough from this view that the
-> heuristics fail (others can provide more info on that than I can).
-> That's fine as I'd rather not squash something inappropriate into a
-> viewpoint that doesn't fit. Better to leave those for later solutions!
+What's the purpose of setting X1 to 0? This is a call returning void,
+so I don't immediately see the need for this.
 
-Yes, this is still in the pipeline.
+> +}
+> +
+>  typedef void (*hcall_t)(struct kvm_cpu_context *);
+>  
+>  #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
+> @@ -658,6 +670,7 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__tracing_unload),
+>  	HANDLE_FUNC(__tracing_enable),
+>  	HANDLE_FUNC(__tracing_swap_reader),
+> +	HANDLE_FUNC(__tracing_update_clock),
+>  };
+>  
+>  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/trace.c b/arch/arm64/kvm/hyp/nvhe/trace.c
+> index df9d66fcb3c9..97e9f6c1a52c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/trace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/trace.c
+> @@ -271,3 +271,19 @@ int __tracing_swap_reader(unsigned int cpu)
+>  
+>  	return ret;
+>  }
+> +
+> +void __tracing_update_clock(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
+> +{
+> +	int cpu;
+> +
+> +	/* After this loop, all CPUs are observing the new bank... */
+> +	for (cpu = 0; cpu < hyp_nr_cpus; cpu++) {
+> +		struct simple_rb_per_cpu *simple_rb = per_cpu_ptr(trace_buffer.simple_rbs, cpu);
+> +
+> +		while (READ_ONCE(simple_rb->status) == SIMPLE_RB_WRITING)
+> +			;
+> +	}
+> +
+> +	/* ...we can now override the old one and swap. */
+> +	trace_clock_update(mult, shift, epoch_ns, epoch_cyc);
+> +}
+> diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+> index 2866effe28ec..1e5fc27f0e9d 100644
+> --- a/arch/arm64/kvm/hyp_trace.c
+> +++ b/arch/arm64/kvm/hyp_trace.c
+> @@ -4,15 +4,133 @@
+>   * Author: Vincent Donnefort <vdonnefort@google.com>
+>   */
+>  
+> +#include <linux/cpumask.h>
+>  #include <linux/trace_remote.h>
+> +#include <linux/tracefs.h>
+>  #include <linux/simple_ring_buffer.h>
+>  
+> +#include <asm/arch_timer.h>
+>  #include <asm/kvm_host.h>
+>  #include <asm/kvm_hyptrace.h>
+>  #include <asm/kvm_mmu.h>
+>  
+>  #include "hyp_trace.h"
+>  
+> +/* Same 10min used by clocksource when width is more than 32-bits */
+> +#define CLOCK_MAX_CONVERSION_S	600
+> +/*
+> + * Time to give for the clock init. Long enough to get a good mult/shift
+> + * estimation. Short enough to not delay the tracing start too much.
+> + */
+> +#define CLOCK_INIT_MS		100
+> +/*
+> + * Time between clock checks. Must be small enough to catch clock deviation when
+> + * it is still tiny.
+> + */
+> +#define CLOCK_UPDATE_MS		500
 
-> 
-> 
-> Otherwise, just minor comments inline.
-> 
-> Jonathan
-> 
->> ---
->>  drivers/resctrl/mpam_resctrl.c | 212 ++++++++++++++++++++++++++++++++-
->>  1 file changed, 211 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index a20656e49edc..e376841c5596 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
-> 
-> ...
-> 
->> +static u32 get_mba_min(struct mpam_props *cprops)
->> +{
->> +	u32 val = 0;
->> +
->> +	if (mba_class_use_mbw_max(cprops))
->> +		val = mbw_max_to_percent(val, cprops);
->> +	else
->> +		WARN_ON_ONCE(1);
->> +
->> +	return val;
-> 
-> I'd be tempted to handle the error case first to make
-> clear this is really just a sanity checking wrapper around the max_to_percent()
-> function.
-> 
-> 	if (!mba_class_use_mbw_max(cprops)) {
-> 		WARN_ON_ONCE(1);
-> 		return 0;
-> 	}
-> 
-> 	return mbw_max_to_percent(val, cprops);
-
-Sure, I've updated this.
-
-> 
->> +}
-> 
->> +/*
->> + * topology_matches_l3() - Is the provided class the same shape as L3
->> + * @victim:		The class we'd like to pretend is L3.
->> + *
->> + * resctrl expects all the world's a Xeon, and all counters are on the
->> + * L3. We play fast and loose with this, mapping counters on other
->> + * classes - provided the CPU->domain mapping is the same kind of shape.
->> + *
->> + * Using cacheinfo directly would make this work even if resctrl can't
->> + * use the L3 - but cacheinfo can't tell us anything about offline CPUs.
->> + * Using the L3 resctrl domain list also depends on CPUs being online.
->> + * Using the mpam_class we picked for L3 so we can use its domain list
->> + * assumes that there are MPAM controls on the L3.
->> + * Instead, this path eventually uses the mpam_get_cpumask_from_cache_id()
->> + * helper which can tell us about offline CPUs ... but getting the cache_id
->> + * to start with relies on at least one CPU per L3 cache being online at
->> + * boot.
-> 
-> So the usual mess of maxcpus=1 breaks it for anything other than first L3?
-> I'm not entirely against that but it may be a little unexpected.
-
-Yes but this doesn't really add any knew restriction as the mpam base
-driver only enables mpam when all (known) msc have been probed and for
-an msc on a cache we only ever access it from the cpus local to that cache.
-
-> 
->> + *
->> + * Walk the victim component list and compare the affinity mask with the
->> + * corresponding L3. The topology matches if each victim:component's affinity
->> + * mask is the same as the CPU's corresponding L3's. These lists/masks are
->> + * computed from firmware tables so don't change at runtime.
->> + */
->> +static bool topology_matches_l3(struct mpam_class *victim)
-> 
-> 
-> 
->> +
->>  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
->>  				     enum resctrl_res_level type)
->>  {
->>  	struct mpam_class *class = res->class;
->> +	struct mpam_props *cprops = &class->props;
->>  	struct rdt_resource *r = &res->resctrl_res;
->>  
->>  	switch (r->rid) {
->> @@ -361,6 +531,20 @@ static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
->>  		 * 'all the bits' is the correct answer here.
->>  		 */
->>  		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
->> +		break;
->> +	case RDT_RESOURCE_MBA:
->> +		r->alloc_capable = true;
->> +		r->schema_fmt = RESCTRL_SCHEMA_RANGE;
->> +		r->ctrl_scope = RESCTRL_L3_CACHE;
->> +
->> +		r->membw.delay_linear = true;
->> +		r->membw.throttle_mode = THREAD_THROTTLE_UNDEFINED;
->> +		r->membw.min_bw = get_mba_min(cprops);
->> +		r->membw.max_bw = MAX_MBA_BW;
->> +		r->membw.bw_gran = get_mba_granularity(cprops);
->> +
->> +		r->name = "MB";
->> +
-> 
-> Probably should be consistent with either a blank line before break or not.
-> That might also make the diff a little nicer.
-
-Dropped the blank line.
-
-> 
->>  		break;
->>  	default:
->>  		break;
-> 
-> 
+If these definitions are common, can't we reuse the existing ones?
+Specially given that this isn't EL2 code.
 
 Thanks,
 
-Ben
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
