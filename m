@@ -1,100 +1,124 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9745E33032C
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 09:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B76B225A35
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 10:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767779704; cv=none; b=U2YCsjCvbBjRK/Z4ZSOkNyi4IRyDLlRLnMajvGjNpvKzYFd62PSL2avA792nWW/JegwCAOCPrFqk1V80bIYmivt8OIuiTT2/6bEwTJUNqsP1xwiJ1kJ7zNqycyVhcI77yFof3ySzonx4wjTx2WiijbYSgSLYXx528nQRioVS7V8=
+	t=1767781860; cv=none; b=GWTU43ZE4aLDSdMsMzEORXo5kPViqJaK7QCTKDdMcAs9KI4zH75vXHuV6miiKq56D0Jpw4wpd2G4lWxA+ed2Ijj0oDq2aKbpA0AnTMQk859qzxr4v7HTE2iytVQQNuwYsaA2dMKws6MKirDGUWQtof7QGxS4Yp8MozMEvOOSAeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767779704; c=relaxed/simple;
-	bh=vrkv7GDpiRHLHqapN5GYUcOnVs6hQ6GL4tGQ1fm+LNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f4EwVs71qNcfHF/buz87ELZVuMjivet3IKRYuSGHhw54VUnfFnJrO2QwdSScQCI+jTf4btIbCKiIc6O7dm4nBe9nQzwx1cmfmGJXO7DyddDJEtGV8JGe4vXrsIC05yF3Yf3SXGbhgz9hewE+dJNNQdDi+tgB+Pi/5ZKLh1x9Fkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 398DB497;
-	Wed,  7 Jan 2026 01:54:55 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25C213F6A8;
-	Wed,  7 Jan 2026 01:55:00 -0800 (PST)
-Message-ID: <4cb1ad60-f8cc-4efd-9c9d-9ae52001e547@arm.com>
-Date: Wed, 7 Jan 2026 09:54:58 +0000
+	s=arc-20240116; t=1767781860; c=relaxed/simple;
+	bh=y66d4ZsBbdgMNhfmUFwWifieGmqMWXkMURwj5GPCb/U=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SZD0GwqU1FahW0GYX4JAxehubymd7wdqtM7vNoP03QtvvQ7YZVx7+RVum+2lc4TH2q5fJDne/LHn5OBgpTJWLLCOcTJKmo8YIV8NC9p+3OQ/x+ZPU4Ce3kXdKX+kx4jmutdDni+MWX9Pz0y3KpWfa6SaaHNOHD33aa3k6aVwrOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=gDF2IkL2; arc=none smtp.client-ip=119.8.177.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="gDF2IkL2"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=wJh6sKL4QAS0b5S62m0cU+/CYmQY81urSbcRIZncouY=;
+	b=gDF2IkL2fkPSOMme51XAPHStUfn6PruUAX6/XTpIPVF0kQcFxsaEcEtPgPgO5HSxHzSN1EMWF
+	H5wpyqkB4h7bJKalruKXUh7EBPX+qt13LVkKRiEuxy5yLbmf664NBa7T1NlVZ4NYjjbm6h/5l8e
+	z64WxAyj0kiJLM3fwqJhJKs=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmPQL5KS1zN1J4;
+	Wed,  7 Jan 2026 18:28:42 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmPSj6cKszJ46dr;
+	Wed,  7 Jan 2026 18:30:45 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id F2C6240565;
+	Wed,  7 Jan 2026 18:30:48 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 10:30:45 +0000
+Date: Wed, 7 Jan 2026 10:30:44 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 08/36] KVM: arm64: Introduce kvm_call_hyp_nvhe_res()
+Message-ID: <20260107103044.00000df0@huawei.com>
+In-Reply-To: <20251219155222.1383109-9-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-9-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 4/5] KVM: selftests: arm64: Skip all 32 bit IDs when
- set_id_regs is aarch64 only
-To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
- Oliver Upton <oupton@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org>
- <20260106-kvm-arm64-set-id-regs-aarch64-v4-4-c7ef4551afb3@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260106-kvm-arm64-set-id-regs-aarch64-v4-4-c7ef4551afb3@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Hi Mark,
+On Fri, 19 Dec 2025 15:52:38 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-On 1/6/26 16:35, Mark Brown wrote:
-> On an aarch64 only system the 32 bit ID registers have UNDEFINED values.
-> As a result set_id_regs skips tests for setting fields in these registers
-> when testing an aarch64 only guest. This has the side effect of meaning
-> that we don't record an expected value for these registers, meaning that
-> when the subsequent tests for values being visible in guests and preserved
-> over reset check the value they can spuriously fail. This can be seen by
-> running on an emulated system with both NV and 32 bit enabled, NV will
-> result in the guests created by the test program being 64 bit only but
-> the 32 bit ID registers will have values.
+> There are times when it is desirable to have more than one return
+> value for a hyp call. Split out kvm_call_hyp_nvhe_res from
+> kvm_call_hyp_nvhe such that it is possible to directly provide struct
+> arm_smccc_res from the calling code. Thereby, additional return values
+> can be stored in res.a2, etc.
 > 
-> Also skip those tests that use the values set in the field setting tests
-> for aarch64 only guests in order to avoid these spurious failures.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+One question inline, mostly because I'm curious rather than a suggestion
+to change anything
+
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
 > ---
->  tools/testing/selftests/kvm/arm64/set_id_regs.c | 49 ++++++++++++++++++-------
->  1 file changed, 36 insertions(+), 13 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 15 ++++++++++-----
+>  1 file changed, 10 insertions(+), 5 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index 5837da63e9b9..908b3c8947d9 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -295,6 +295,13 @@ static const char *get_reg_name(u64 id)
->  	}
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b552a1e03848c..971b153b0a3fa 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1208,14 +1208,19 @@ void kvm_arm_resume_guest(struct kvm *kvm);
+>  #define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
 >  
-> +static inline bool is_aarch32_id_reg(u64 id)
-> +{
-> +	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
-> +		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
-> +		sys_reg_CRm(id) <= 3);
-> +}
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+> -#define kvm_call_hyp_nvhe(f, ...)						\
+> +#define kvm_call_hyp_nvhe_res(res, f, ...)				\
+>  	({								\
+> -		struct arm_smccc_res res;				\
+> -									\
+> +		struct arm_smccc_res *__res = res;			\
+
+What's the purpose of the local variable? Type sanity check?
+Feels like typecheck() would make the intent clearer.
+Meh. Not used anywhere in arch/arm64 so maybe not.
+
+
+
+>  		arm_smccc_1_1_hvc(KVM_HOST_SMCCC_FUNC(f),		\
+> -				  ##__VA_ARGS__, &res);			\
+> -		WARN_ON(res.a0 != SMCCC_RET_SUCCESS);			\
+> +				  ##__VA_ARGS__, __res);		\
+> +		WARN_ON(__res->a0 != SMCCC_RET_SUCCESS);		\
+> +	})
 > +
-
-This check looks correct to me now.
-
-Not touched in this patch but the check for aarch64_only looks suspect to me.
-
-From main()
-val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1));
-el0 = FIELD_GET(ID_AA64PFR0_EL1_EL0, val);
-aarch64_only = (el0 == ID_AA64PFR0_EL1_EL0_IMP);
-
-As we are concerned with system registers that are accessible from EL1 and higher
-should this not be checking ID_AA64PFR0_EL1_EL1 rather than ID_AA64PFR0_EL1_EL0?
-Not sure if it makes sense for the two to be different though.
-
-Thanks,
-
-Ben
+> +#define kvm_call_hyp_nvhe(f, ...)					\
+> +	({								\
+> +		struct arm_smccc_res res;				\
+>  									\
+> +		kvm_call_hyp_nvhe_res(&res, f, ##__VA_ARGS__);		\
+>  		res.a1;							\
+>  	})
+>  
 
