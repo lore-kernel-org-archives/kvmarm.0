@@ -1,145 +1,151 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6083132548C
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 18:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767809229; cv=none; b=NJ8VQ2pR1QtavsdcoT1+waEWIyAoXP5wpV+tNycNEG8XptxazaX73eDwoBN6wgb7TycQPMQjoZkvn5urAdJejfnqVM2s6tzyBNDhiRideRhjwiTHakJvlJYSdyFo4TqA686x6/H97n+W0lWjnqwh9xfcaRZRBoiW/GTF2rM8CoU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767809229; c=relaxed/simple;
-	bh=xXE/PlTwR8mL0+jghSbaljIqMREGIinKz771yCV9QtA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aDqtlHQknE6FiexD7h04WEvy70rVY6EDtpIjYLIz1PlfTUqsiEkXoikszmV7N7BlsVQqbTiiEKMQngfBSTSpJHvPNCxaXGzAyE7U8lZ9tTfzVhltqDIqlc/Ngij21WbcZ+E/Wq5cGF97VsAj5H/PI3c4Qun1Lrk9Ju1DEs025KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1vdAJjt; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8692E1FFC48
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 19:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767813934; cv=pass; b=aCr6Y10f5JMau8S9CacEKKVln7dy/w0QKhhv3Tuxl5YB09UYJnZcCzSPCGsKmb+LDLE11QsnzBenEw6WAabzoU71d50n6vmip5bgUaKoGQIOKaHiQOJBLQ29Qou8Zy0FPvKcHuZGf17fwy7ie/aQqB9hpGfX6DLy60WOJpHX9O4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767813934; c=relaxed/simple;
+	bh=z8fphxS7A/1Qur4z0EwbQJFYY7ZrGXkIomdruCTWhiw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RwqfHWtmEfQ3w3J1Ah+07ilbGcRHbCMjiujF3OJk57VFtqVW6AkPjONSzsqPhStJH9ojEh3cfKK1Gre878gSrlA+R7mlQAj3gYnJfx+CUQ2YCnpXX6QJA/0los8COEAmhRMASAqx4q5W9B3iqDa+ckm+LGj5o8O5mNCR+JWeZNQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TAZRJnhu; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1vdAJjt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2D0DC4CEF7;
-	Wed,  7 Jan 2026 18:07:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767809228;
-	bh=xXE/PlTwR8mL0+jghSbaljIqMREGIinKz771yCV9QtA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L1vdAJjtamO6TJmlh2ImsjLWtgjJX7WbIZZ+PoGkhVgyyEfrJlRUYUvAj94g1AyGr
-	 CTKabkogo2XFQ2z1rLmBY3FZQdsPFYFf58M3DX8yBLWl757sQd9DXDvzWHkDU0I65L
-	 OCtGtKkHxOVFz2UndTaP6if6QW4oNB7SCc5cOUALrwQFxLDf3bBSSzG00nHyJBUruK
-	 LPisK2J/uMaFH7LgPDqTK6yNrc1fcJqzhSYndhrsID4BEpNZNCmL6+fqXG/6Su4Erp
-	 XU5j4abvo3sowRKwWVrMdswU4+M4vBzL2bwNVXa+awdzEs14kp/ju3q9M8as06UydA
-	 6iz47Rhbk7a0Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdXw2-00000000A9B-28Wh;
-	Wed, 07 Jan 2026 18:07:06 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 3/3] arm64: Unconditionally enable EPAN support
-Date: Wed,  7 Jan 2026 18:07:01 +0000
-Message-ID: <20260107180701.2858276-4-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260107180701.2858276-1-maz@kernel.org>
-References: <20260107180701.2858276-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TAZRJnhu"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee147baf7bso575631cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Jan 2026 11:25:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767813930; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F0fqmXieGyFaQBeUkjvPy4PJF2wEvdhSkF/34VGqNPtf8jzbWW3VRlP5IC5DSsOZGn
+         nl3rJzzSX0ePKFwvccaZJWBQ6DPGqPDw5BxTN5MdBXFatiNVLIDz9nwMjtrGcDVXhizu
+         A7iof2S19oa5u4hnhgA03Op2MeFsNYDXcGYuyp6FHOX/jzK2VaYuoVGLsDE+k40OKCuP
+         M3OLPFkEiYvQzwTCIxsmJFDsGxcUqo7lMxyw0R6Se3iPb6z/MXNe27WlfPBvadwv4MYC
+         m5qANOvr2bFJyWOtDvN2pHrVrq3wr938JFw4HJJf5OsSiQxZe5yJTkBvvEqN+KJaxAoV
+         Kwqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=sdQze0tFMfdCcZRE+Fz1xsHkvoih7BkzLiCp0crO/Bc=;
+        fh=tBCQ4llejgucIwwMOnuECiFavjLRcsvz9PlFV5XfMzY=;
+        b=Ewax6O/xaoIzer2vM0lHdhjl6MStfT8CN9Dr9fbKEMh53AGXd79W51iePf6xcjesSU
+         7TTYoqfXJ5B7+A4ubRZTKJJbwrMIi8zZGEgI4jQRr+/oXtZrKkKeXxz6orfmlsDwCxQ+
+         rZyHriI6YfkZXLYIutnQmuAw7w+fQcWcqSAGr6jfyyUdOP2D2lbvZDkcmbvQktBSJUaC
+         OmceQwvPN0RPjQPOIptwCLXN9goq2TrCAhOAFLWHl7y8CM76YJaEi19UsL+f4Vf7X5py
+         kkb6xXtnHesgWMcclcP16NGaoempjZqXHjdlUBeSRcE8KC4DisfVtlzpofM5fKbyF4QO
+         eCtQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1767813930; x=1768418730; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sdQze0tFMfdCcZRE+Fz1xsHkvoih7BkzLiCp0crO/Bc=;
+        b=TAZRJnhusLhxyOOBK8xOcCh9cZtFcMv5OY/NE0IimnmANto2LR14yqgP2sRLZBS7Nr
+         riaJTy/IU+GXwWQB2Rl0EfBPSAce+01Z8txcQGScWYe440FV2wc2dELzENMLgpg44ghx
+         0dbCSYYpunOTSu1l9UWeS+vUJVU3Bn/lyU9UBVwOGAGnA9/oAXwqq/KTsdWfoQ934kRt
+         um9Pc9S0EP32nm0FiEvoODz/D4PO6ocY1biA65wd7Qm0PpyD1mNdXL3uiimUIVVn2QpE
+         4eEDNpMV2Ev+khp/8a5GkO/19BNFbqKLlr6/ZEP77ip2xwzTIP44CjYz3Tl2UyVmNrA/
+         yhGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1767813930; x=1768418730;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sdQze0tFMfdCcZRE+Fz1xsHkvoih7BkzLiCp0crO/Bc=;
+        b=CI2VY8oPqFg15NwxtPtR6igXCWLs/tzrIX5Ptp9z/juDlGBDLH2dAaDkLLXzNuXTqD
+         QslcufNOt/MKsJKwxhUW1X9YULtmNSE6hdhxtTRj8HA0iOdMyJ1HQ3++6buNx8FGTNeA
+         pf7/5mQRXLlr6O+MBb7FudAACsxqUu4TiedfD1mukPkADtcKn0xKkV9GSVyz4T7MH++m
+         djwvSSigYxNEJGFNRPYJDFgroMTYj4jIhWpaj29Ej2Fa3LNERLy2acmlbYdSOgLr17EM
+         GJmrQvYHKfOh+DSHizfzDHLtd8sLCjgYu3NXN2Z1osArP9wNulGVQZ+sLUN5rL75J1B7
+         xA1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXEg5FRGCC9AuSjNFhi5MMn8F38RJj+eSeZu1do8oVuSu194cO9Jwy2XuxR6G/dZMEJaLBQh3M=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw/iaVUrx4qs/kz9fvZ2a3gRIwm1WhCMPG4/WHtWUsgCYDa2T7x
+	MkjSCu0vRNxJQYv3aRmIIfKWYYlMt/SwV7OrQSGFmOpNbCUAv+GNJKtHaTeJk9Co4c/gE9J4CX4
+	/HO+y0cXGbQZVa06eKkaEOTDIyet3Iq5KiDHoyx0Z
+X-Gm-Gg: AY/fxX4zM8NzoCohykz3Mfbz21qwAzL0KgSaaGDcYYKdbaIj30dPlQWPPn4sfZWJMA1
+	wh3CvqROVjC97C0kB/yHIgyuMrToFr+fJI7xILD1UR9dXmhaGl0ZrW9ABFvAE7/NCFSYhkIpvAY
+	3JYzPOuzeLFa4qPEa/7/qjqlTZlKLd+8+NE2XVEaQ/39V7gJcpaYFPDx5+IVG1YkCwxdYDmc0zE
+	NQZc53aUR0vHw+3U8vM2dY+JTlgkkgEtd1DEZPLBrusRgyE2qdgZ0CMFhxlP6qaC32UezDY
+X-Received: by 2002:a05:622a:5cc:b0:4ff:7d0c:c1cf with SMTP id
+ d75a77b69052e-4ffb3aa6b6bmr15709851cf.0.1767813929956; Wed, 07 Jan 2026
+ 11:25:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-1-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-1-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 7 Jan 2026 19:24:52 +0000
+X-Gm-Features: AQt7F2osm9O_NLuokFKY_-m1ya4_XJF8FlJHLjM1yNQTzxjP3vc84G0MiN9eNTY
+Message-ID: <CA+EHjTwsX9+3XZBZo8PHvaP24fVxBKSdg_raJGL46nX5hE-4rA@mail.gmail.com>
+Subject: Re: [PATCH v9 01/30] arm64/sysreg: Update SMIDR_EL1 to DDI0601 2025-06
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-While FEAT_PAN3 is pretty recent, having it permanently enabled costs
-exactly nothing, and does help with exec-only mappings on these fancy
-ARMv9.2 machines that are rumoured to exist.
+On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+>
+> Update the definiton of SMIDR_EL1 in the sysreg definition to reflect the
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/Kconfig                  | 13 -------------
- arch/arm64/configs/hardening.config |  3 ---
- arch/arm64/include/asm/cpucaps.h    |  2 --
- arch/arm64/kernel/cpufeature.c      |  2 --
- 4 files changed, 20 deletions(-)
+nit: definiton->definition
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index fcfb62ec4bae8..c31079f4b611a 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -2120,19 +2120,6 @@ config ARM64_MTE
- 
- endmenu # "ARMv8.5 architectural features"
- 
--menu "ARMv8.7 architectural features"
--
--config ARM64_EPAN
--	bool "Enable support for Enhanced Privileged Access Never (EPAN)"
--	default y
--	help
--	  Enhanced Privileged Access Never (EPAN) allows Privileged
--	  Access Never to be used with Execute-only mappings.
--
--	  The feature is detected at runtime, and will remain disabled
--	  if the cpu does not implement the feature.
--endmenu # "ARMv8.7 architectural features"
--
- config AS_HAS_MOPS
- 	def_bool $(as-instr,.arch_extension mops)
- 
-diff --git a/arch/arm64/configs/hardening.config b/arch/arm64/configs/hardening.config
-index 24179722927e1..e59034e7af256 100644
---- a/arch/arm64/configs/hardening.config
-+++ b/arch/arm64/configs/hardening.config
-@@ -18,6 +18,3 @@ CONFIG_ARM64_BTI_KERNEL=y
- CONFIG_ARM64_MTE=y
- CONFIG_KASAN_HW_TAGS=y
- CONFIG_ARM64_E0PD=y
--
--# Available in ARMv8.7 and later.
--CONFIG_ARM64_EPAN=y
-diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-index 177c691914f87..13c0fa54ea19f 100644
---- a/arch/arm64/include/asm/cpucaps.h
-+++ b/arch/arm64/include/asm/cpucaps.h
-@@ -19,8 +19,6 @@ cpucap_is_possible(const unsigned int cap)
- 			   "cap must be < ARM64_NCAPS");
- 
- 	switch (cap) {
--	case ARM64_HAS_EPAN:
--		return IS_ENABLED(CONFIG_ARM64_EPAN);
- 	case ARM64_SVE:
- 		return IS_ENABLED(CONFIG_ARM64_SVE);
- 	case ARM64_SME:
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 716440d147a2d..30eea68178c87 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -2547,7 +2547,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.cpu_enable = cpu_enable_pan,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, PAN, IMP)
- 	},
--#ifdef CONFIG_ARM64_EPAN
- 	{
- 		.desc = "Enhanced Privileged Access Never",
- 		.capability = ARM64_HAS_EPAN,
-@@ -2555,7 +2554,6 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		ARM64_CPUID_FIELDS(ID_AA64MMFR1_EL1, PAN, PAN3)
- 	},
--#endif /* CONFIG_ARM64_EPAN */
- 	{
- 		.desc = "LSE atomic instructions",
- 		.capability = ARM64_HAS_LSE_ATOMICS,
--- 
-2.47.3
+> information in DD0601 2025-06. This includes somewhat more generic ways of
+> describing the sharing of SMCUs, more information on supported priorities
+> and provides additional resolution for describing affinity groups.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
+It matches the spec.
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+> ---
+>  arch/arm64/tools/sysreg | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+> index 8921b51866d6..6bf143bfe57c 100644
+> --- a/arch/arm64/tools/sysreg
+> +++ b/arch/arm64/tools/sysreg
+> @@ -3660,11 +3660,15 @@ Field   3:0     BS
+>  EndSysreg
+>
+>  Sysreg SMIDR_EL1       3       1       0       0       6
+> -Res0   63:32
+> +Res0   63:60
+> +Field  59:56   NSMC
+> +Field  55:52   HIP
+> +Field  51:32   AFFINITY2
+>  Field  31:24   IMPLEMENTER
+>  Field  23:16   REVISION
+>  Field  15      SMPS
+> -Res0   14:12
+> +Field  14:13   SH
+> +Res0   12
+>  Field  11:0    AFFINITY
+>  EndSysreg
+>
+>
+> --
+> 2.47.3
+>
