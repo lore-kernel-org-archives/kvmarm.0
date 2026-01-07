@@ -1,42 +1,42 @@
 Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8799A34F246
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19F533A701
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767802360; cv=none; b=O0+G1l61RcH3jEZF5sBMM5VwCls7w+gA6dFMFcK0m5HyvHovx8fR2tmckuah2N0nlZDn6qAwVAF48lL5R9JnanPaeriRxN2zbRZwkv2FbYs+ZpUoSVGJC5rMR95giha44G9ImXVk26llNWGLXiAsSDzarbvwqLHthfIyJ74NRqU=
+	t=1767802401; cv=none; b=En/UlfLCAKAYDtN5AyxHD4tV2+Wf2Qk2be2Kqa2E5yJhyfCeGPvYicHYwxXfxQVmJSipa+4ObhB+vk+Ca/5BTFhGvAgNt/Ew9dOj2eQ99Z6Pw6MQlWzZGnVkqPuLWESULpSVyC24nz1s1zW88+JZkW7JxKP6LouQNZ9XVuuhnJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767802360; c=relaxed/simple;
-	bh=08V3A1CUeNqrrsFDdlmhFiwRCXZgzw8XqV+zmq8IxC4=;
+	s=arc-20240116; t=1767802401; c=relaxed/simple;
+	bh=NkzegpdHfjoedUnY83okiK/zwnS60pk4peMXfbe4QUo=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sm+aP0vLLoV1IbXbKuEc5x9alirJcWXVG/hf2Z3IfYH6H4AyulFGGO9DISmGMGDcNmyHhbynqfP1DU2AYVc6EpBRWjsEIqo7lc2Tv8iGTw9H6ow3+2ZSdJNyo0vqMQABy21MZTPE/IB+mNNWsM4CLwFBWchhHT/rmie06qf/Fhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=VhN3APYA; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=tNwVV2oGn4HF7g4m82GCbrAsj1uxIlnUb99Llx5iweDRO2nsAtzE0oI5Q8t0isetKYViEct4cRl5jHv31vGzVFwQypnWs4Wq0NE0GMKWZMERZ/vb7HBQbUm0J70hwsjY9h0FY9yRnSRO+lCf7lYgPdhiNshT73P1Opv5+7TgI2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=RTq+K4Uq; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="VhN3APYA"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="RTq+K4Uq"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=IfbhaZoobr3IKngcO11YDj7yW5shTZnJBe+jJ+BAfBo=;
-	b=VhN3APYA8fOCtP255sVosi977cSkdzO8mKn3UVava9UwUOCUQTUaWdc7l5arsUs75em7L6fcJ
-	/o7+P8CMCTahY56adRa26mRANolSi3mndLa9phf1cczgZmK0kbnbHJGSYjv/cLQ2lI1LDjP+1qQ
-	UJS2/BlbKoHzgPV9FYyqcpU=
+	bh=wmClf/DpRm1O0q3u5kTCy3g7sCT/97ATQsJnWVzDbpU=;
+	b=RTq+K4UquUAb3nrBVWcz3v69WzNI6BJ3UPJfIlYaXFbArRrdNh7aZ5MC0ZnRfkcnZ8FSAq79i
+	4pD/+gjFoDxlb3dLCn6C5tOcjw0qk4k1atljLT8WLioUvKXKxcJZim56RcbZQi5EZmfHbB2izm8
+	XUpSs1iw6jA9pOS8C/bme+U=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmY0B1pwTz1P6mx;
-	Thu,  8 Jan 2026 00:10:02 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmY0t6Pp3z1P6jW;
+	Thu,  8 Jan 2026 00:10:38 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmY2s5wLjzJ4683;
-	Thu,  8 Jan 2026 00:12:21 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmY3Z4Pv4zJ4673;
+	Thu,  8 Jan 2026 00:12:58 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 454BB4056B;
-	Thu,  8 Jan 2026 00:12:25 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 1047A4056A;
+	Thu,  8 Jan 2026 00:13:02 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 16:12:24 +0000
-Date: Wed, 7 Jan 2026 16:12:23 +0000
+ 2026 16:13:01 +0000
+Date: Wed, 7 Jan 2026 16:13:00 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 28/36] KVM: arm64: gic: Hide GICv5 for protected
- guests
-Message-ID: <20260107161223.0000307f@huawei.com>
-In-Reply-To: <20251219155222.1383109-29-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 29/36] KVM: arm64: gic-v5: Hide FEAT_GCIE from NV
+ GICv5 guests
+Message-ID: <20260107161300.00003470@huawei.com>
+In-Reply-To: <20251219155222.1383109-30-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-29-sascha.bischoff@arm.com>
+	<20251219155222.1383109-30-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -66,16 +66,11 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 19 Dec 2025 15:52:45 +0000
+On Fri, 19 Dec 2025 15:52:46 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> We don't support running protected guest with GICv5 at the
-> moment. Therefore, be sure that we don't expose it to the guest at all
-
-Tidy up line wrap to 75 ish chars.
-
-> by actively hiding it when running a protected guest.
+> Currently, NV guests are not supported with GICv5. Therefore, make
+> sure that FEAT_GCIE is always hidden from such guests.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Seems fine to me, but I know almost nothing about protected guests, so no tag.
-
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
