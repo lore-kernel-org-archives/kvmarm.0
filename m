@@ -1,175 +1,355 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1DB30B512
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 12:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27A19D081
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 12:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767789967; cv=none; b=h05oVuXTeovTBSNv7VhpMOIzM9wpEETznt25QGZSfpcooX2oPW4ZWZTt2XXRQjYF/TFG3Z1hbQSfUPTXR84Dn0nu+j57XuH/lS2AeSA1GnYykl27ll4gSORy8T8H58StF4kb66CUrBBGVB3iBTf3PCeO6EQzA6iK9IoFlvf1ECM=
+	t=1767790217; cv=none; b=DdICs+aeByx9OPFVVbFU8iqlJXPpFqrIkoSUUOzzng2hljJy2PDEDVF0mKCnRh5O1K9tMTi1h2XFRAAtNuT0NppKXpNEJlm2k7QaGmrJim8JQri6SBVOziW1gfs71lTowNvf3c14dkigGo01h7fnUtZsBsLBwKwtkeGajtgv3hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767789967; c=relaxed/simple;
-	bh=syl65owdP/RoGcNFHCnmuoWpmj3uNZRH9TwzlTpjGms=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mrIM6coHiVafsM8RFNxzWrMIcyXqpcc8LIY4j1GvwEIUT+UUTZh60DpUHK1hmrVN+UAEIboh0tA68perhE934b48C1jSBTCKRvbLS2Gm812HlWI4b4xKgWAidK4SSjz8gMBkhCTg0ojKLWkz/UzAW8igrYWFfnY18lRgQFUXhMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rJIQXrmD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767790217; c=relaxed/simple;
+	bh=h4SDbZXi20v+1B+H4vjYJEdLHCytOLnr5R+tik99ZG8=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cy7ZVWLxkBkQTEH9XnCNhbiLH25/Q8cfxz2s8gneMPi9tVTRLHg/DGIXmgJjE1PzXZ21V7GG08MqOUuDApijKQ7HcS+VFbDpXjp85/9Uy9YpudFBzzyAu8AefAkQ7d6dMYKCx0sFb1FxBeA1PR6QDpkOj7OmBRUmw4rTiDsSc4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=EM0bNlUo; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rJIQXrmD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3771DC4CEF7;
-	Wed,  7 Jan 2026 12:46:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767789965;
-	bh=syl65owdP/RoGcNFHCnmuoWpmj3uNZRH9TwzlTpjGms=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rJIQXrmD2xnnqMZ65SkCCDm7c0xLAcMx7CHgIa4bV4T/EZwd5+9CW/iaI+TmDj5/y
-	 KwhVL0Ha+NwsHueK4axzL6PoUFENR222xJOG87+WGqaBTJ8a9QNbCUKHWAvrZ3mCOJ
-	 6tjyt/8ky3XsyAW3nxIYEFFkRD8v9Y1U3oe5VRsEaOxCoU/P0N5wn7DuA23HwxpsFT
-	 JeXP8UVM/XUoh8AStF5S1X+cG1vT76wye+zILPfuj24CfDVzSD9Mz+fk4r+/IulhnF
-	 BzVVkjEUxvYklmKhp5bB9jbB6DZnyuJxog4lgU21ov3TRUMpes4mIn/LKchTg07c1w
-	 yuV5hEZmEm4bw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdSvK-000000004LB-3tNb;
-	Wed, 07 Jan 2026 12:46:03 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH] KVM: arm64: Don't blindly set set PSTATE.PAN on guest exit
-Date: Wed,  7 Jan 2026 12:46:00 +0000
-Message-ID: <20260107124600.2736328-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="EM0bNlUo"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=tHSrZXqTclvnCa4GZfb7eNQ5vNhESQnZrK3L8ntXphs=;
+	b=EM0bNlUocvKvjhjCoZ2Gad/Wz8EGPsQ1QLv4h5+wFvfSfD6QgqKa4xib9r1fY/1Do3jaEtG+S
+	j89Mrsf1gXnR9jsLR5GXXrLWerCG+wpoGFfVPXIRUJACvqAIX31auLhdcItgSuisQAUddfGLJS4
+	Tfa0GrYANFzTxwEDP6IKRus=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmSW44YNbz1vp50;
+	Wed,  7 Jan 2026 20:48:00 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmSYP3JcKzHnGk2;
+	Wed,  7 Jan 2026 20:50:01 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9777F40571;
+	Wed,  7 Jan 2026 20:50:07 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
+ 2026 12:50:06 +0000
+Date: Wed, 7 Jan 2026 12:50:05 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 18/36] KVM: arm64: gic-v5: Implement PPI interrupt
+ injection
+Message-ID: <20260107125005.000056dc@huawei.com>
+In-Reply-To: <20251219155222.1383109-19-sascha.bischoff@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-19-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-We set PSTATE.PAN to 1 on exiting from a guest if PAN support has
-been compiled in and that it exists on the HW. However, this is not
-necessarily correct.
+On Fri, 19 Dec 2025 15:52:42 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-In a nVHE configuration, there is no notion of PAN at EL2, so setting
-PSTATE.PAN to anything is pointless.
+> This change introduces interrupt injection for PPIs for GICv5-based
+> guests.
+> 
+> The lifecycle of PPIs is largely managed by the hardware for a GICv5
+> system. The hypervisor injects pending state into the guest by using
+> the ICH_PPI_PENDRx_EL2 registers. These are used by the hardware to
+> pick a Highest Priority Pending Interrupt (HPPI) for the guest based
+> on the enable state of each individual interrupt. The enable state and
+> priority for each interrupt are provided by the guest itself (through
+> writes to the PPI registers).
+> 
+> When Direct Virtual Interrupt (DVI) is set for a particular PPI, the
+> hypervisor is even able to skip the injection of the pending state
+> altogether - it all happens in hardware.
+> 
+> The result of the above is that no AP lists are required for GICv5,
+> unlike for older GICs. Instead, for PPIs the ICH_PPI_* registers
+> fulfil the same purpose for all 128 PPIs. Hence, as long as the
+> ICH_PPI_* registers are populated prior to guest entry, and merged
+> back into the KVM shadow state on exit, the PPI state is preserved,
+> and interrupts can be injected.
+> 
+> When injecting the state of a PPI the state is merged into the KVM's
+> shadow state using the set_pending_state irq_op. The directly sets the
+> relevant bit in the shadow ICH_PPI_PENDRx_EL2, which is presented to
+> the guest (and GICv5 hardware) on next guest entry. The
+> queue_irq_unlock irq_op is required to kick the vCPU to ensure that it
+> seems the new state. The result is that no AP lists are used for
+> private interrupts on GICv5.
+> 
+> Prior to entering the guest, vgic_v5_flush_ppi_state is called from
+> kvm_vgic_flush_hwstate. The effectively snapshots the shadow PPI
+> pending state (twice - an entry and an exit copy) in order to track
+> any changes. These changes can come from a guest consuming an
+> interrupt or from a guest making an Edge-triggered interrupt pending.
+> 
+> When returning from running a guest, the guest's PPI state is merged
+> back into KVM's shadow state in vgic_v5_merge_ppi_state from
+> kvm_vgic_sync_hwstate. The Enable and Active state is synced back for
+> all PPIs, and the pending state is synced back for Edge PPIs (Level is
+> driven directly by the devices generating said levels). The incoming
+> pending state from the guest is merged with KVM's shadow state to
+> avoid losing any incoming interrupts.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+Minor things inline
 
-Furthermore, not setting PAN to 0 when CONFIG_ARM64_PAN isn't set
-means we run with the *guest's* PSTATE.PAN (which might be set to 1),
-and we will explode on the next userspace access. Yes, the architecture
-is delightful in that particular corner.
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 159 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    |  46 +++++++---
+>  arch/arm64/kvm/vgic/vgic.h    |  47 ++++++++--
+>  include/kvm/arm_vgic.h        |   3 +
+>  4 files changed, 235 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 46c70dfc7bb08..cb3dd872d16a6 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -56,6 +56,165 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
+>  }
+>  
+> +static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+> +					  struct vgic_irq *irq)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if;
+> +	const u64 id_bit = BIT_ULL(irq->intid % 64);
 
-Fix the whole thing by always setting PAN to something when running
-VHE (which implies PAN support), and only ignore it when running nVHE.
+Obviously the % 64 means other bits of irq->intid above the HWIRQ_ID
+field don't matter, but this still seems a little odd.  I'd extract
+the field first, then use that for the reg and id_bit or just
+do those inline where they are used.
 
-Reported-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_asm.h |  2 ++
- arch/arm64/include/asm/sysreg.h  |  3 ++-
- arch/arm64/kernel/image-vars.h   |  1 +
- arch/arm64/kvm/hyp/entry.S       |  4 +++-
- arch/arm64/kvm/va_layout.c       | 28 ++++++++++++++++++++++++++++
- 5 files changed, 36 insertions(+), 2 deletions(-)
+	const u32 hwirq_id = FIELD_GET(GICV5_HWIRQ_ID, irq->intid);
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index a1ad12c72ebf1..ce516d8187b1b 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -300,6 +300,8 @@ void kvm_get_kimage_voffset(struct alt_instr *alt,
- 	__le32 *origptr, __le32 *updptr, int nr_inst);
- void kvm_compute_final_ctr_el0(struct alt_instr *alt,
- 	__le32 *origptr, __le32 *updptr, int nr_inst);
-+void kvm_pan_patch_el2_entry(struct alt_instr *alt,
-+			     __le32 *origptr, __le32 *updptr, int nr_inst);
- void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr_virt,
- 	u64 elr_phys, u64 par, uintptr_t vcpu, u64 far, u64 hpfar);
- 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 129a5349e9984..939f9c5bbae67 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -91,7 +91,8 @@
-  */
- #define pstate_field(op1, op2)		((op1) << Op1_shift | (op2) << Op2_shift)
- #define PSTATE_Imm_shift		CRm_shift
--#define SET_PSTATE(x, r)		__emit_inst(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
-+#define ENCODE_PSTATE(x, r)		(0xd500401f | PSTATE_ ## r | ((!!x) << PSTATE_Imm_shift))
-+#define SET_PSTATE(x, r)		__emit_inst(ENCODE_PSTATE(x, r))
- 
- #define PSTATE_PAN			pstate_field(0, 4)
- #define PSTATE_UAO			pstate_field(0, 3)
-diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 85bc629270bd9..211f0e2e55e21 100644
---- a/arch/arm64/kernel/image-vars.h
-+++ b/arch/arm64/kernel/image-vars.h
-@@ -86,6 +86,7 @@ KVM_NVHE_ALIAS(kvm_patch_vector_branch);
- KVM_NVHE_ALIAS(kvm_update_va_mask);
- KVM_NVHE_ALIAS(kvm_get_kimage_voffset);
- KVM_NVHE_ALIAS(kvm_compute_final_ctr_el0);
-+KVM_NVHE_ALIAS(kvm_pan_patch_el2_entry);
- KVM_NVHE_ALIAS(spectre_bhb_patch_loop_iter);
- KVM_NVHE_ALIAS(spectre_bhb_patch_loop_mitigation_enable);
- KVM_NVHE_ALIAS(spectre_bhb_patch_wa3);
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index 9f4e8d68ab505..d1ccddf9e87d9 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -126,7 +126,9 @@ SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 
- 	add	x1, x1, #VCPU_CONTEXT
- 
--	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
-+	alternative_cb ARM64_ALWAYS_SYSTEM, kvm_pan_patch_el2_entry
-+	nop
-+	alternative_cb_end
- 
- 	// Store the guest regs x2 and x3
- 	stp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index 91b22a014610b..bf888d150dc79 100644
---- a/arch/arm64/kvm/va_layout.c
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -296,3 +296,31 @@ void kvm_compute_final_ctr_el0(struct alt_instr *alt,
- 	generate_mov_q(read_sanitised_ftr_reg(SYS_CTR_EL0),
- 		       origptr, updptr, nr_inst);
- }
-+
-+void kvm_pan_patch_el2_entry(struct alt_instr *alt,
-+			     __le32 *origptr, __le32 *updptr, int nr_inst)
-+{
-+	/*
-+	 * If we're running at EL1 without hVHE, then SCTLR_EL2.SPAN means
-+	 * nothing to us (it is RES1), and we don't need to set PSTATE.PAN
-+	 * to anything useful.
-+	 */
-+	if (!is_kernel_in_hyp_mode() && !cpus_have_cap(ARM64_KVM_HVHE))
-+		return;
-+
-+	/*
-+	 * Leap of faith: at this point, we must be running VHE one way or
-+	 * another, and FEAT_PAN is required to be implemented. If KVM
-+	 * explodes at runtime because your system does not abide by this
-+	 * requirement, call your favourite HW vendor, they have screwed up.
-+	 *
-+	 * We don't expect hVHE to access any userspace mapping, so always
-+	 * set PSTATE.PAN on enty. Same thing if we have PAN enabled on an
-+	 * EL2 kernel. Only force it to 0 if we have not configured PAN in
-+	 * the kernel (and you know this is really silly).
-+	 */
-+	if (cpus_have_cap(ARM64_KVM_HVHE) || IS_ENABLED(CONFIG_ARM64_PAN))
-+		*updptr = cpu_to_le32(ENCODE_PSTATE(1, PAN));
-+	else
-+		*updptr = cpu_to_le32(ENCODE_PSTATE(0, PAN));
-+}
--- 
-2.47.3
+	if (irq_is_pending(irq))
+		cpu_if->vgic_ppi_pendr[hwirq_id / 64] |= hwirq_id % 64;
+..
+
+Which matches style you used for similar cases in earlier patches.
+
+> +	const u32 reg = FIELD_GET(GICV5_HWIRQ_ID, irq->intid) / 64;
+> +
+> +	if (!vcpu || !irq)
+> +		return false;
+> +
+> +	/* Skip injecting the state altogether */
+> +	if (irq->directly_injected)
+> +		return true;
+> +
+> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	if (irq_is_pending(irq))
+> +		cpu_if->vgic_ppi_pendr[reg] |= id_bit;
+> +	else
+> +		cpu_if->vgic_ppi_pendr[reg] &= ~id_bit;
+> +
+> +	return true;
+> +}
+
+
+> +void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
+> +{
+> +	if (WARN_ON(!irq))
+> +		return;
+> +
+> +	scoped_guard(raw_spinlock, &irq->irq_lock) {
+Not checked on for whether code ends up outside this lock. If not
+use a guard(raw_spinlock)(&irq->irq_lock);
+
+> +		if (!WARN_ON(irq->ops))
+> +			irq->ops = &vgic_v5_ppi_irq_ops;
+> +	}
+> +}
+> +
+> +/*
+> + * Detect any PPIs state changes, and propagate the state with KVM's
+> + * shadow structures.
+> + */
+> +void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +
+> +	for (reg = 0; reg < 2; reg++) {
+It's now considered fine to declare loop variables in the loop and always
+nice to limit their scope.
+
+	for (int reg = 0; reg < 2...
+
+> +		unsigned long changed_bits;
+> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
+> +		const unsigned long activer = cpu_if->vgic_ppi_activer_exit[reg];
+> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
+
+...
+
+> +
+> +void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	/*
+> +	 * We're about to enter the guest. Copy the shadow state to the pending
+> +	 * reg that will be written to the ICH_PPI_PENDRx_EL2 regs. While the
+> +	 * guest is running we track any incoming changes to the pending state in
+> +	 * vgic_ppi_pendr. The incoming changes are merged with the outgoing
+> +	 * changes on the return path.
+> +	 */
+> +	cpu_if->vgic_ppi_pendr_entry[0] = cpu_if->vgic_ppi_pendr[0];
+> +	cpu_if->vgic_ppi_pendr_entry[1] = cpu_if->vgic_ppi_pendr[1];
+> +
+> +	/*
+> +	 * Make sure that we can correctly detect "edges" in the PPI
+> +	 * state. There's a path where we never actually enter the guest, and
+> +	 * failure to do this risks losing pending state
+> +	 */
+> +	cpu_if->vgic_ppi_pendr_exit[0] = cpu_if->vgic_ppi_pendr[0];
+> +	cpu_if->vgic_ppi_pendr_exit[1] = cpu_if->vgic_ppi_pendr[1];
+> +
+Drop this blank line.
+
+> +}
+
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index ac8cb0270e1e4..cb5d43b34462b 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+
+> @@ -258,10 +266,12 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+>  	 * If the distributor is disabled, pending interrupts shouldn't be
+>  	 * forwarded.
+>  	 */
+> -	if (irq->enabled && irq_is_pending(irq)) {
+> -		if (unlikely(irq->target_vcpu &&
+> -			     !irq->target_vcpu->kvm->arch.vgic.enabled))
+> -			return NULL;
+> +	if (irq_is_enabled(irq) && irq_is_pending(irq)) {
+> +		if (irq->target_vcpu) {
+
+Just from a readability point of view, maybe clearer to get rid of
+the 'else# path for this one first.
+
+		if (!irq->target_vcpu)
+			return NULL;
+
+		if (!vgic_is_v5(irq->target_vcpu->kvm) &&
+		    unlikely(!irq->target_vcpu->kvm->arch.vgic.enabled))
+			return NULL;
+
+		return irq->target_vcpu;
+
+Though I see this code might go away anyway...
+
+> +			if (!vgic_is_v5(irq->target_vcpu->kvm) &&
+> +			    unlikely(!irq->target_vcpu->kvm->arch.vgic.enabled))
+> +				return NULL;
+> +		}
+>  
+>  		return irq->target_vcpu;
+>  	}
+
+
+
+>  /* Flush our emulation state into the GIC hardware before entering the guest. */
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> @@ -1106,13 +1131,12 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  
+>  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+>  
+> -	scoped_guard(raw_spinlock, &vcpu->arch.vgic_cpu.ap_list_lock)
+> -		vgic_flush_lr_state(vcpu);
+> +	vgic_flush_state(vcpu);
+>  
+>  	if (can_access_vgic_from_kernel())
+>  		vgic_restore_state(vcpu);
+>  
+> -	if (vgic_supports_direct_irqs(vcpu->kvm))
+> +	if (vgic_supports_direct_irqs(vcpu->kvm) && !vgic_is_v5(vcpu->kvm))
+
+This feels like a somewhat backwards check.
+No function to check it vgic_is_v4? Similar cases elsewhere.
+
+>  		vgic_v4_commit(vcpu);
+>  }
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index d5d9264f0a1e9..978d7f8426361 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -132,6 +132,28 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
+>  		return irq->pending_latch || irq->line_level;
+>  }
+>  
+> +/* Requires the irq_lock to be held by the caller. */
+
+Can you use a lockdep notation to make that explicit?
+
+> +static inline bool irq_is_enabled(struct vgic_irq *irq)
+> +{
+> +	if (irq->enabled)
+> +		return true;
+> +
+> +	/*
+> +	 * We always consider GICv5 interrupts as enabled as we can
+> +	 * always inject them. The state is handled by the hardware,
+> +	 * and the hardware will only signal the interrupt to the
+> +	 * guest once the guest enables it.
+
+With my fussy reviewer hat on, that's wrapped a bit early.  Go up
+to 80 chars for comments.
+
+> +	 */
+> +	if (irq->target_vcpu) {
+> +		u32 vgic_model = irq->target_vcpu->kvm->arch.vgic.vgic_model;
+> +
+> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
+> +			return true;
+> +	}
+> +
+> +	return false;
+> +}
+
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 500709bd62c8d..b5180edbd1165 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -32,6 +32,9 @@
+>  #define VGIC_MIN_LPI		8192
+>  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
+>  
+> +/* GICv5 constants */
+> +#define VGIC_V5_NR_PRIVATE_IRQS	128
+
+You have earlier checks against this value (there was one around PPI DVI setup 
+a few patches back).  So probably better to pull the define earlier and
+use it there as well?
+
+> +
+>  #define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
+>  
+>  #define __irq_is_sgi(t, i)						\
 
