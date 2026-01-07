@@ -1,146 +1,213 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BF83242B3;
-	Wed,  7 Jan 2026 13:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4C832548C
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 14:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767793514; cv=none; b=AAPzon6/W2/oP/hH1nKZZPD7mLbkUdrtSc9ums3MeCTDxIdLK4sjDC4HFaOxkIlGPDE38omgb1mThYjR4HW32Nbn6YNH3RC3aumebuORbykAkqULYPmhmRphAfx0RH1W6prMweZIcHT5JvTMxZQZXz8K2rB8XxaaH5/N8nOZOiw=
+	t=1767795712; cv=none; b=cVQ+zcPGpqcvWJtX0UdvT2o5odza0sWEVByo1GLYhojn30JSXwoj6f9dd3LZPDJng8qjZoiyIYku2PPjEGzhIAr6DvQ4w8CSq0TSOs2hECxbDSAjtZEZDxdP/e8Z7OiOfMPs9pntus2MGvrdiOcZnWQ/aXlu1RtQnVTzCMREhIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767793514; c=relaxed/simple;
-	bh=FUnu2/d32Z+rAwqi5Nbaz8wsPSyg/MoQclwAm3YXqJk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cBJ7xjE++cATlKO68DblykCeI2dLwgI9QJ2tyWa8+wnIUDJXJOm7uLxbr1WO9HbsUNkzNmFHmBM9W3ERlDfWv20R0fwMtLWI3vxtW+KjlboOZoVnFCxnWEzQMKvR8cojZqQAWZWirBJQK35TU6uvOqHr7OnEK8J9hfF95S0PBJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itAl+snn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itAl+snn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6149C4CEF7;
-	Wed,  7 Jan 2026 13:45:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767793514;
-	bh=FUnu2/d32Z+rAwqi5Nbaz8wsPSyg/MoQclwAm3YXqJk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=itAl+snnQm40572JvVmDdz8fg0UKD82AkqmTnYzf0FqWfkzJSUt0WvzaReVRrJJ6h
-	 tcVIJ36cfg7wOZJxuEo4QQi4XI9UziTM88AFs/dLEspvRUANEw1qFwfaHDfyTpQyrY
-	 htNZP/BPlGFclpvjzFxaEF5Jewz7fMmxrsyvz1YoQJyKb5RztrkKM8lk7ZI0W11Orw
-	 gasKTLhSTJcXU97+VdtxTxi4j7q8FS2YgLDEL9foemX5/udIE5TQBbEUX44jq0ZQEa
-	 IANNpcfJuWELF5OFxMIO8orhEG4cpTIGTUpCe0d3HwoPr/SJY5njTSzlGgBAS3VXFB
-	 7HB12GuhC2CvA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vdTqZ-000000005dY-2U3q;
-	Wed, 07 Jan 2026 13:45:11 +0000
-Date: Wed, 07 Jan 2026 13:45:11 +0000
-Message-ID: <86cy3lmt94.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	linux-trace-kernel@vger.kernel.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	jstultz@google.com,
-	qperret@google.com,
-	will@kernel.org,
-	aneesh.kumar@kernel.org,
-	kernel-team@android.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 21/30] KVM: arm64: Initialise hyp_nr_cpus for nVHE hyp
-In-Reply-To: <20251202093623.2337860-22-vdonnefort@google.com>
-References: <20251202093623.2337860-1-vdonnefort@google.com>
-	<20251202093623.2337860-22-vdonnefort@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1767795712; c=relaxed/simple;
+	bh=Ht8CVL4cTZCeRAc2yCMcXfuJQ3mjv+Vgn2jqJp2gRP4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ohFobUKHNcmR1ogIXSdaqRzqed+0aX2LFjFXg1VcnATXadfx32Y3Gak2/8Pqu68RDLf9CyFyMyP+GPBeLXQ30dfxQeg8d8yyE/qfeiGEEqtBLE1QstgyBLHGP2d6SvjdUa9W5rZOkdvjOBPSeZv5PGxcMa/Xlx/RFJdh2gX0gZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA800497;
+	Wed,  7 Jan 2026 06:21:37 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9382A3F6A8;
+	Wed,  7 Jan 2026 06:21:39 -0800 (PST)
+Message-ID: <818b03f6-effb-4e7e-9ee8-49917504a5dd@arm.com>
+Date: Wed, 7 Jan 2026 14:21:37 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 25/45] arm_mpam: resctrl: Add support for 'MB' resource
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ Zeng Heng <zengheng4@huawei.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+ <20251219181147.3404071-26-ben.horgan@arm.com>
+ <20260106121944.0000499e@huawei.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <20260106121944.0000499e@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 02 Dec 2025 09:36:14 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
-> 
-> Knowing the number of CPUs is necessary for determining the boundaries
-> of per-cpu variables, which will be used for upcoming hypervisor
-> tracing. hyp_nr_cpus which stores this value, is only initialised for
-> the pKVM hypervisor. Make it accessible for the nVHE hypervisor as well.
-> 
-> With the kernel now responsible for initialising hyp_nr_cpus, the
-> nr_cpus parameter is no longer needed in __pkvm_init.
-> 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index e6be1f5d0967..b169d85458f9 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -128,8 +128,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
->  #ifdef __KVM_NVHE_HYPERVISOR__
->  void __pkvm_init_switch_pgd(phys_addr_t pgd, unsigned long sp,
->  		void (*fn)(void));
-> -int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
-> -		unsigned long *per_cpu_base, u32 hyp_va_bits);
-> +int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_base, u32 hyp_va_bits);
->  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
->  #endif
->  
-> @@ -146,5 +145,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
->  extern unsigned long kvm_nvhe_sym(__icache_flags);
->  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
->  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
-> +extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
->  
->  #endif /* __ARM64_KVM_HYP_H__ */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 052bf0d4d0b0..7ba427f9608c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -35,6 +35,7 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_nested.h>
->  #include <asm/kvm_pkvm.h>
-> @@ -2396,7 +2397,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
->  	preempt_disable();
->  	cpu_hyp_init_context();
->  	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
-> -				num_possible_cpus(), kern_hyp_va(per_cpu_base),
-> +				kern_hyp_va(per_cpu_base),
->  				hyp_va_bits);
->  	cpu_hyp_init_features();
->  
-> @@ -2605,6 +2606,8 @@ static int __init init_hyp_mode(void)
->  		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] = (unsigned long)page_addr;
->  	}
->  
-> +	kvm_nvhe_sym(hyp_nr_cpus) = num_possible_cpus();
+Hi Jonathan,
 
-Is num_possible_cpus() always the correct thing to do? Given that pKVM
-doesn't support late onlining, this really should be the number of
-online CPUs.
+On 1/6/26 12:19, Jonathan Cameron wrote:
+> On Fri, 19 Dec 2025 18:11:27 +0000
+> Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+>> From: James Morse <james.morse@arm.com>
+>>
+>> resctrl supports 'MB', as a percentage throttling of traffic somewhere
+>> after the L3. This is the control that mba_sc uses, so ideally the class
+>> chosen should be as close as possible to the counters used for mba_local.
+>>
+>> MB's percentage control should be backed either with the fixed point
+> 
+> either's "or" is missing.  (sentence should include the second choice)
+> 
+>> fraction MBW_MAX. The bandwidth portion bitmaps is not used as its tricky
+>> to pick which bits to use to avoid contention, and may be possible to
+>> expose this as something other than a percentage in the future.
+>>
+>> CC: Zeng Heng <zengheng4@huawei.com>
+>> Co-developed-by: Dave Martin <Dave.Martin@arm.com>
+>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+>> Signed-off-by: James Morse <james.morse@arm.com>>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> 
+> As mentioned in earlier review I'd like an overview doc of the heuristics
+> used to map to the resctrl everything is a xeon view of the world.
+> 
+> At least some of our platforms are far enough from this view that the
+> heuristics fail (others can provide more info on that than I can).
+> That's fine as I'd rather not squash something inappropriate into a
+> viewpoint that doesn't fit. Better to leave those for later solutions!
 
-Probably not a big deal, but worth thinking about it.
+Yes, this is still in the pipeline.
+
+> 
+> 
+> Otherwise, just minor comments inline.
+> 
+> Jonathan
+> 
+>> ---
+>>  drivers/resctrl/mpam_resctrl.c | 212 ++++++++++++++++++++++++++++++++-
+>>  1 file changed, 211 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+>> index a20656e49edc..e376841c5596 100644
+>> --- a/drivers/resctrl/mpam_resctrl.c
+>> +++ b/drivers/resctrl/mpam_resctrl.c
+> 
+> ...
+> 
+>> +static u32 get_mba_min(struct mpam_props *cprops)
+>> +{
+>> +	u32 val = 0;
+>> +
+>> +	if (mba_class_use_mbw_max(cprops))
+>> +		val = mbw_max_to_percent(val, cprops);
+>> +	else
+>> +		WARN_ON_ONCE(1);
+>> +
+>> +	return val;
+> 
+> I'd be tempted to handle the error case first to make
+> clear this is really just a sanity checking wrapper around the max_to_percent()
+> function.
+> 
+> 	if (!mba_class_use_mbw_max(cprops)) {
+> 		WARN_ON_ONCE(1);
+> 		return 0;
+> 	}
+> 
+> 	return mbw_max_to_percent(val, cprops);
+
+Sure, I've updated this.
+
+> 
+>> +}
+> 
+>> +/*
+>> + * topology_matches_l3() - Is the provided class the same shape as L3
+>> + * @victim:		The class we'd like to pretend is L3.
+>> + *
+>> + * resctrl expects all the world's a Xeon, and all counters are on the
+>> + * L3. We play fast and loose with this, mapping counters on other
+>> + * classes - provided the CPU->domain mapping is the same kind of shape.
+>> + *
+>> + * Using cacheinfo directly would make this work even if resctrl can't
+>> + * use the L3 - but cacheinfo can't tell us anything about offline CPUs.
+>> + * Using the L3 resctrl domain list also depends on CPUs being online.
+>> + * Using the mpam_class we picked for L3 so we can use its domain list
+>> + * assumes that there are MPAM controls on the L3.
+>> + * Instead, this path eventually uses the mpam_get_cpumask_from_cache_id()
+>> + * helper which can tell us about offline CPUs ... but getting the cache_id
+>> + * to start with relies on at least one CPU per L3 cache being online at
+>> + * boot.
+> 
+> So the usual mess of maxcpus=1 breaks it for anything other than first L3?
+> I'm not entirely against that but it may be a little unexpected.
+
+Yes but this doesn't really add any knew restriction as the mpam base
+driver only enables mpam when all (known) msc have been probed and for
+an msc on a cache we only ever access it from the cpus local to that cache.
+
+> 
+>> + *
+>> + * Walk the victim component list and compare the affinity mask with the
+>> + * corresponding L3. The topology matches if each victim:component's affinity
+>> + * mask is the same as the CPU's corresponding L3's. These lists/masks are
+>> + * computed from firmware tables so don't change at runtime.
+>> + */
+>> +static bool topology_matches_l3(struct mpam_class *victim)
+> 
+> 
+> 
+>> +
+>>  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
+>>  				     enum resctrl_res_level type)
+>>  {
+>>  	struct mpam_class *class = res->class;
+>> +	struct mpam_props *cprops = &class->props;
+>>  	struct rdt_resource *r = &res->resctrl_res;
+>>  
+>>  	switch (r->rid) {
+>> @@ -361,6 +531,20 @@ static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
+>>  		 * 'all the bits' is the correct answer here.
+>>  		 */
+>>  		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
+>> +		break;
+>> +	case RDT_RESOURCE_MBA:
+>> +		r->alloc_capable = true;
+>> +		r->schema_fmt = RESCTRL_SCHEMA_RANGE;
+>> +		r->ctrl_scope = RESCTRL_L3_CACHE;
+>> +
+>> +		r->membw.delay_linear = true;
+>> +		r->membw.throttle_mode = THREAD_THROTTLE_UNDEFINED;
+>> +		r->membw.min_bw = get_mba_min(cprops);
+>> +		r->membw.max_bw = MAX_MBA_BW;
+>> +		r->membw.bw_gran = get_mba_granularity(cprops);
+>> +
+>> +		r->name = "MB";
+>> +
+> 
+> Probably should be consistent with either a blank line before break or not.
+> That might also make the diff a little nicer.
+
+Dropped the blank line.
+
+> 
+>>  		break;
+>>  	default:
+>>  		break;
+> 
+> 
 
 Thanks,
 
-	M.
+Ben
 
--- 
-Without deviation from the norm, progress is not possible.
