@@ -1,42 +1,42 @@
 Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E3C35A94F
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 15:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D637B36C0C1
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 15:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767798529; cv=none; b=a96uDppfSbdT3byqgiH6YWU63xsx3nP1GpvV0uB5I3QdDleDu65QVYhX81pQvMVBGtmgB/yyWw4ZGR8pZPotuI5oQ/MkK4Mn44bEwsxptSriAuaEvax6lNLILbfOQVzR1ennOFPk3LIVqF+cmzD8Zmphejt25Nux2FCQ/s1Lz3A=
+	t=1767799065; cv=none; b=YPk/sbGqU2NaMzGPv2XSqRXJOokNqdlKfV3mwDWUXKpsBw0X9XMs8hIEQXPCRC1BNFT6vcpBByWn+2PEwELjFEcJ+Sgg19oQZBqL0SzVmRAMxgRrGLs5LfHBjECvH41OLzk9ck4EA+fp0jhwqdLS8CVQGNK4+MyMvthdn6FJe90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767798529; c=relaxed/simple;
-	bh=rjjSF2GjLLnuTppckhQgvKZBsEngKusMJE2hNZFdC3c=;
+	s=arc-20240116; t=1767799065; c=relaxed/simple;
+	bh=72aqjGByciRxNun/Ak8UlAY9Vd26yC8sPkaYoCCtQAg=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gv8Vss3Aw9YQ2z8zr4oVEyOBRV79t/ZSsvR9Ds4QSa1zGdTfj0C3fHNfIvtp4TY1Ng5/cpVR81+UIlrYGbvBppYLKbMRblftZ75/OaEM0ZKxx0GJo/251lAXpbiKzH7lD4gA49gKZBP3ygs7FxWy6KaCI8r/GOeDpNZgBt386iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ITmUrG3a; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=lfL8JQxMGtkBWgq5x5DRSGjAiUrXgIem/RlIqoEKYHx9Q0eLQki2x7o6rqa43gCGJ+V09kDbZbRsAEFl1SA2s/C0tXs8vwBq0Xsfwia5OLBmBJmnepw/PLBHP2VHazavNVQ0yGzLVuMXg1mm1y3wE2BEpkuf+8DFImDsK6mAAT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=elUV80mu; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ITmUrG3a"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="elUV80mu"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=2x/3meMA0G6VDYoHbJ4AHA6vDOYL4w15qQ/fKhtmMm4=;
-	b=ITmUrG3aql95a+0mkqRCs4CkZs3jBo7KClazcloMblBygqzUg7YtcxiBH74AyvDsXD0trZ634
-	LF228aRXerWBfkVnah2wGUfBd62jcd9epzFNMe3tihiQUsEjcJRZzzKYc5cttUJreN8tNXMdeX8
-	7vjGmWX9qRilDkCfHfIwvj0=
+	bh=m0m6qrjM++EX1JPQbt0U+H0JDa6SDyotsLzRZmvjPOI=;
+	b=elUV80muaVjrHBusOw+FMQaH2tX6IiLXEtBLQWqkUHmRO1e+Lb5UDdL6SOUBfDhWHyB29mAcz
+	QdoCY90ABhQDw2JvnkXuIlkvajdrN+gptLwU1tJP1Fk8tiPqSoxqEpTdxB4rAZqWAfw16nnNEen
+	fvHAtc4P82QYqGcQ4W9s09o=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmWZf0nrKz1P7MM;
-	Wed,  7 Jan 2026 23:06:17 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmWmx1QPQz1P7sc;
+	Wed,  7 Jan 2026 23:15:13 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmWdK6J81zJ469G;
-	Wed,  7 Jan 2026 23:08:37 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmWqc6FxGzJ46Cj;
+	Wed,  7 Jan 2026 23:17:32 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3EAF740539;
-	Wed,  7 Jan 2026 23:08:41 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 40AAA40539;
+	Wed,  7 Jan 2026 23:17:36 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 15:08:40 +0000
-Date: Wed, 7 Jan 2026 15:08:38 +0000
+ 2026 15:17:35 +0000
+Date: Wed, 7 Jan 2026 15:17:33 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 21/36] KVM: arm64: gic-v5: Finalize GICv5 PPIs and
- generate mask
-Message-ID: <20260107150838.00004e00@huawei.com>
-In-Reply-To: <20251219155222.1383109-22-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 22/36] KVM: arm64: gic-v5: Trap and mask guest PPI
+ register accesses
+Message-ID: <20260107151733.00003028@huawei.com>
+In-Reply-To: <20251219155222.1383109-23-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-22-sascha.bischoff@arm.com>
+	<20251219155222.1383109-23-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -69,77 +69,151 @@ X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
 On Fri, 19 Dec 2025 15:52:43 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> We only want to expose a subset of the PPIs to a guest. If a PPI does
-> not have an owner, it is not being actively driven by a device. The
-> SW_PPI is a special case, as it is likely for userspace to wish to
-> inject that.
+> A guest should not be able to detect if a PPI that is not exposed to
+> the guest is implemented or not. If the writes to the PPI registers
+> are not masked, it becomes possible for the guest to detect the
+> presence of all implemented PPIs on the host.
 > 
-> Therefore, just prior to running the guest for the first time, we need
-> to finalize the PPIs. A mask is generated which, when combined with
-> trapping a guest's PPI accesses, allows for the guest's view of the
-> PPI to be filtered.
+> Guest writes to the following registers are masked:
+> 
+> ICC_CACTIVERx_EL1
+> ICC_SACTIVERx_EL1
+> ICC_CPENDRx_EL1
+> ICC_SPENDRx_EL1
+> ICC_ENABLERx_EL1
+> ICC_PRIORITYRx_EL1
+> 
+> When a guest writes these registers, the write is masked with the set
+> of PPIs actually exposed to the guest, and the state is written back
+> to KVM's shadow state..
+
+One . seems enough.
+
+> 
+> Reads for the above registers are not masked. When the guest is
+> running and reads from the above registers, it is presented with what
+> KVM provides in the ICH_PPI_x_EL2 registers, which is the masked
+> version of what the guest last wrote.
+> 
+> The ICC_PPI_HMRx_EL1 register is used to determine which PPIs use
+> Level-sensitive semantics, and which use Edge. For a GICv5 guest, the
+> correct view of the virtual PPIs must be provided to the guest, and
+> hence this must also be trapped, but only for reads. The content of
+> the HMRs is calculated and masked when finalising the PPI state for
+> the guest.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-
-Minor suggestion inline. Either way
-
+A few bits inline but nothing significant so I'll assume you tidy those up
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index c7ecc4f40b1e5..f1fa63e67c1f6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -81,6 +81,66 @@ static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
->  	return priority_mask;
+> ---
+>  arch/arm64/kvm/config.c   |  22 ++++++-
+>  arch/arm64/kvm/sys_regs.c | 133 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 153 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index eb0c6f4d95b6d..f81bfdadd12fb 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1586,8 +1586,26 @@ static void __compute_ich_hfgrtr(struct kvm_vcpu *vcpu)
+>  {
+>  	__compute_fgt(vcpu, ICH_HFGRTR_EL2);
+>  
+> -	/* ICC_IAFFIDR_EL1 *always* needs to be trapped when running a guest */
+> +	/*
+> +	 * ICC_IAFFIDR_EL1 and ICH_PPI_HMRx_EL1 *always* needs to be
+
+need to be
+
+> +	 * trapped when running a guest.
+> +	 **/
+
+*/
+
+>  	*vcpu_fgt(vcpu, ICH_HFGRTR_EL2) &= ~ICH_HFGRTR_EL2_ICC_IAFFIDR_EL1;
+> +	*vcpu_fgt(vcpu, ICH_HFGRTR_EL2) &= ~ICH_HFGRTR_EL2_ICC_PPI_HMRn_EL1;
+> +}
+
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 383ada0d75922..cef13bf6bb3a1 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -696,6 +696,111 @@ static bool access_gicv5_iaffid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	return true;
 >  }
 >  
-> +static int vgic_v5_finalize_state(struct kvm_vcpu *vcpu)
+> +static bool access_gicv5_ppi_hmr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +				 const struct sys_reg_desc *r)
 > +{
-> +	if (!ppi_caps)
-> +		return -ENXIO;
+> +	if (p->is_write)
+> +		return ignore_write(vcpu, p);
 > +
-> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[0] = 0;
-> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[1] = 0;
-> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[0] = 0;
-> +	vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[1] = 0;
-> +	for (int i = 0; i < VGIC_V5_NR_PRIVATE_IRQS; ++i) {
-> +		int reg = i / 64;
-> +		u64 bit = BIT_ULL(i % 64);
-> +		struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
-> +
-> +		raw_spin_lock(&irq->irq_lock);
-> +
-A little nicer perhaps with:
-		guard(raw_spin_lock(&irq->irq_lock);
-> +		/*
-> +		 * We only expose PPIs with an owner or thw SW_PPI to
-> +		 * the guest.
-> +		 */
-> +		if (!irq->owner && irq->intid == GICV5_SW_PPI)
-> +			goto unlock;
-and
-			continue;
-> +
-> +		/*
-> +		 * If the PPI isn't implemented, we can't pass it
-> +		 * through to a guest anyhow.
-> +		 */
-> +		if (!(ppi_caps->impl_ppi_mask[reg] & bit))
-> +			goto unlock;
-and
-			continue;
-> +
-> +		vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_mask[reg] |= bit;
-> +
-> +		if (irq->config == VGIC_CONFIG_LEVEL)
-> +			vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[reg] |= bit;
-> +
-> +unlock:
-> +		raw_spin_unlock(&irq->irq_lock);
-Then the label and unlock can go away.
-
+> +	if (p->Op2 == 0) {	/* ICC_PPI_HMR0_EL1 */
+> +		p->regval = vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[0];
+> +	} else {		/* ICC_PPI_HMR1_EL1 */
+> +		p->regval = vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hmr[1];
 > +	}
+
+No {} as single line statements in all legs.
+
+However, I'd be tempted to use a local variable for the index like you've
+done in many other cases
+	
+	unsigned int index;
+
+...
+
+	index = p->Op2 == 0 ? 0 : 1;
+	p->regval = vcpu->arch.vgic_cpu.vgic_v5.vgic_ppi_hrm[index];
+
+Or use the p->Op2 % 2 as you do in ppi_enabler.
+
+
 > +
-> +	return 0;
+> +	return true;
 > +}
+> +
+> +static bool access_gicv5_ppi_enabler(struct kvm_vcpu *vcpu,
+> +				     struct sys_reg_params *p,
+> +				     const struct sys_reg_desc *r)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u64 masked_write;
+> +
+> +	/* We never expect to get here with a read! */
+> +	if (WARN_ON_ONCE(!p->is_write))
+> +		return undef_access(vcpu, p, r);
+> +
+> +	masked_write = p->regval & cpu_if->vgic_ppi_mask[p->Op2 % 2];
+> +	cpu_if->vgic_ich_ppi_enabler_entry[p->Op2 % 2] = masked_write;
+> +
+> +	return true;
+> +}
+> +
+> +static bool access_gicv5_ppi_pendr(struct kvm_vcpu *vcpu,
+> +				   struct sys_reg_params *p,
+> +				   const struct sys_reg_desc *r)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u64 masked_write;
+> +
+> +	/* We never expect to get here with a read! */
+> +	if (WARN_ON_ONCE(!p->is_write))
+> +		return undef_access(vcpu, p, r);
+> +
+> +	masked_write = p->regval & cpu_if->vgic_ppi_mask[p->Op2 % 2];
+> +
+> +	if (p->Op2 & 0x2) {	/* SPENDRx */
+> +		cpu_if->vgic_ppi_pendr_entry[p->Op2 % 2] |= masked_write;
+> +	} else {		/* CPENDRx */
+> +		cpu_if->vgic_ppi_pendr_entry[p->Op2 % 2] &= ~masked_write;
+> +	}
+
+No {} wanted in kernel style when all legs are single line statements.
+Same applies in a few other cases that follow.
+
+> +
+> +	return true;
+> +}
+> +
 
