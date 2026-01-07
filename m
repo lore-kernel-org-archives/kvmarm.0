@@ -1,149 +1,138 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6201B392B84
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 15:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041993A89DC;
+	Wed,  7 Jan 2026 15:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767799758; cv=none; b=LgUdVHmt1xQjOWAKpRLxD7kCRJ31OOrxcPHeBre67EDepFcqPchDdEz7pcMBNDzIMZEm+kV+dyAk/LTB5gSqPWgFh5qVaEGh+U+v1SyIlRk3X38znBrVFlbUSVwlQljTZViBShkaEodLvB0jdwt4U1Ng184FBIcHw3Rev4EUCzQ=
+	t=1767800426; cv=none; b=qZkRgnFON9I+8m20yW8PPFztM4RZT1Txm/9BAP2j/RVvy79w97awtsWnuP3AzENxV32sa7CsAJOgFnlqav/G0mecAHcHCLQGhzZCzdlXMaqf9ojQPV9qdqzgGMgGig05s5w6We1S878bOtCSTwm6+7UxZpWqLqSb30ak468R2YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767799758; c=relaxed/simple;
-	bh=XLIGZ5SHU3D+sSaIf1FinSVBpaSiNdId+gE+gvhJwaE=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SyPJfVir1g1GtJtWeXX3O27Ji88EM9n1HV/ek2K0SuxYPhiD9RJgYjjSU6pLdlupaSLVYPc1Y1wVl2qvZ+oeufvKVDr8h4PWBtRjBbyn6hGh+xz1pAv+tN8/rIU+pCu12a9l4GDzKFaxnpNxl0JUU5JmwCnS6zoDRWZuBT8NbwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jMGy3VcV; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767800426; c=relaxed/simple;
+	bh=Xr0NRyAzk4dBNy+oJhpszKz1ke0Az0ldJi1gPQPAEJg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gFWhmfn1wkJh9o1akRLVNLfE0rMmArn0C7jqY15iXpWhilOiW0nco+8kLRssuorLOovxdzj6uyDtHCIrJ+d0gnhRVO1yqh5HnpzIEKNsMTV72ni6iyXIMRfEI0w6vj2RJbO4uh8x8XwNikhr0+NEkzIsWkXEa0AzQk/dtAM646s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LOZErcX2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jMGy3VcV"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=zDlUnTvuZxuMrJIH4ow24pBUWtnNP7Q50L+kLUFzNWA=;
-	b=jMGy3VcVOW7DZMezg6yQfxHIB5ezBtAWDxtwlBZ7b1sS2lDeS5emUJc7P7qX8r38BxoKITmIO
-	IVuH+QudZI9wCGEngfd/zF6aW5ukpft+Hlx+0xmC0yGn+AMxjxTskUIEqxi5wfbYKX0gkygBB5T
-	zw9Ut2QyiCwWyMHm8bdanHs=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmX2X22M9z1vnNY;
-	Wed,  7 Jan 2026 23:27:00 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmX4r6R4FzHnGfP;
-	Wed,  7 Jan 2026 23:29:00 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4510A40570;
-	Wed,  7 Jan 2026 23:29:07 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 15:29:06 +0000
-Date: Wed, 7 Jan 2026 15:29:05 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 23/36] KVM: arm64: gic-v5: Support GICv5 interrupts
- with KVM_IRQ_LINE
-Message-ID: <20260107152905.00001d81@huawei.com>
-In-Reply-To: <20251219155222.1383109-24-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-24-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOZErcX2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74DE2C4CEF1;
+	Wed,  7 Jan 2026 15:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767800425;
+	bh=Xr0NRyAzk4dBNy+oJhpszKz1ke0Az0ldJi1gPQPAEJg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LOZErcX2LYG0+yb4trCkM6SjaIIN5aaC/qd8DDOyfR5SLQ/PZzt5cNQGiJbB4sKXV
+	 z2zwYcX+CqTPLMmFU/MLMGeWLkRaSXpVjzn9Z/gwSOOgJZoRQ3r5BNi52MEOefOoXk
+	 JvLwu1LCzhZ8dBq1BiH5c+L1hU3T1cT/u3wutxBumRGaqUv9S9zQ0bjQ/ePba4pZeM
+	 KYbWDbWJulDpTC00SC42AqKS/mco6qzTP8QXZ24aO+BDQ6FMd3fWep/5uploOzLEjF
+	 Iz+JQN2yL+xK+U195UXvwR3pQkI6tmiQxe+gux1Qfmhzky257VUJTaVhHBtK2L2WKB
+	 NFcb+0IoxSijg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdVe2-000000007Z8-3nQ6;
+	Wed, 07 Jan 2026 15:40:23 +0000
+Date: Wed, 07 Jan 2026 15:40:22 +0000
+Message-ID: <868qe9mnx5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 29/30] KVM: arm64: Add selftest event support to nVHE/pKVM hyp
+In-Reply-To: <20251202093623.2337860-30-vdonnefort@google.com>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+	<20251202093623.2337860-30-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Dec 2025 15:52:43 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> Interrupts under GICv5 look quite different to those from older Arm
-> GICs. Specifically, the type is encoded in the top bits of the
-> interrupt ID.
+On Tue, 02 Dec 2025 09:36:22 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Extend KVM_IRQ_LINE to cope with GICv5 PPIs and SPIs. The requires
-> subtly changing the KVM_IRQ_LINE API for GICv5 guests. For older Arm
-> GICs, PPIs had to be in the range of 16-31, and SPIs had to be
-> 32-1019, but this no longer holds true for GICv5. Instead, for a GICv5
-> guest support PPIs in the range of 0-127, and SPIs in the range
-> 0-65535. The documentation is updated accordingly.
+> Add a selftest event that can be triggered from a `write_event` tracefs
+> file. This intends to be used by trace remote selftests.
 > 
-> The SPI range doesn't cover the full SPI range that a GICv5 system can
-> potentially cope with (GICv5 provides up to 24-bits of SPI ID space,
-> and we only have 16 bits to work with in KVM_IRQ_LINE). However, 65k
-> SPIs is more than would be reasonably expected on systems for years to
-> come.
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> Note: As the GICv5 KVM implementation currently doesn't support
-> injecting SPIs attempts to do so will fail. This restruction will
-
-restriction
-
-In general,  worth spell checking the lot. (something I always
-forget to do for my own series!)
-
-> lifted as the GICv5 KVM support evolves.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-One passing comment inline. Perhaps there isn't a suitable place to put
-vgic_is_v5() though. I haven't checked.
-
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-> ---
->  Documentation/virt/kvm/api.rst |  6 ++++--
->  arch/arm64/kvm/arm.c           | 21 ++++++++++++++++++---
->  arch/arm64/kvm/vgic/vgic.c     |  4 ++++
->  3 files changed, 26 insertions(+), 5 deletions(-)
-> 
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 94f8d13ab3b58..4448e8a5fc076 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -45,6 +45,8 @@
->  #include <kvm/arm_pmu.h>
->  #include <kvm/arm_psci.h>
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 37c015b54ff6..e2de7ad64938 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -96,6 +96,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___tracing_update_clock,
+>  	__KVM_HOST_SMCCC_FUNC___tracing_reset,
+>  	__KVM_HOST_SMCCC_FUNC___tracing_enable_event,
+> +	__KVM_HOST_SMCCC_FUNC___tracing_write_event,
+>  };
 >  
-> +#include <linux/irqchip/arm-gic-v5.h>
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> diff --git a/arch/arm64/include/asm/kvm_hypevents.h b/arch/arm64/include/asm/kvm_hypevents.h
+> index 268b3cd7a1b2..c276fd28e0bf 100644
+> --- a/arch/arm64/include/asm/kvm_hypevents.h
+> +++ b/arch/arm64/include/asm/kvm_hypevents.h
+> @@ -42,4 +42,15 @@ HYP_EVENT(hyp_exit,
+>  	),
+>  	HE_PRINTK("reason=%s", __hyp_enter_exit_reason_str(__entry->reason))
+>  );
 > +
->  #include "sys_regs.h"
->  
->  static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-> @@ -1430,16 +1432,29 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  		if (!vcpu)
->  			return -EINVAL;
->  
-> -		if (irq_num < VGIC_NR_SGIS || irq_num >= VGIC_NR_PRIVATE_IRQS)
-> +		if (kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
+> +HYP_EVENT(selftest,
+> +	HE_PROTO(u64 id),
+> +	HE_STRUCT(
+> +		he_field(u64, id)
+> +	),
+> +	HE_ASSIGN(
+> +		__entry->id = id;
+> +	),
+> +	RE_PRINTK("id=%llu", __entry->id)
 
-Maybe it's worth moving the vgic_is_v5() helper to somewhere that makes it useable
-here?
+Not strictly related to this patch, but I find that the trace itself
+lacks context. For example:
 
+[001]	  323.847422: hyp_enter reason=hvc
+[001]	  323.847423: hyp_exit reason=eret_host
+[001]	  323.847688: hyp_enter reason=hvc
+[001]	  323.847688: hyp_exit reason=eret_host
+[001]	  323.847706: hyp_enter reason=hvc
+[001]	  323.847707: hyp_exit reason=eret_host
+[001]	  323.847722: hyp_enter reason=hvc
+[001]	  323.847723: hyp_exit reason=eret_host
 
-> +			if (irq_num >= VGIC_V5_NR_PRIVATE_IRQS)
-> +				return -EINVAL;
-> +
-> +			/* Build a GICv5-style IntID here */
-> +			irq_num |= FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
-> +		} else if (irq_num < VGIC_NR_SGIS ||
-> +			   irq_num >= VGIC_NR_PRIVATE_IRQS) {
->  			return -EINVAL;
-> +		}
->  
->  		return kvm_vgic_inject_irq(kvm, vcpu, irq_num, level, NULL);
+That's all fine as long as I'm dealing with a single guest, or even
+with a single vcpu. Trying to trace multiple guests, or even multiple
+vcpus makes the whole thing completely unusable, because I have no
+idea what I'm looking at.
 
+To make this useful, having some context provided by the host really
+is required.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
