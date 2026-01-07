@@ -1,115 +1,122 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286FB31D367
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 10:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06591322B61
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 10:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767782954; cv=pass; b=g0Wdvt5+Ya07lYnOnhAUIN0Z5TxemwpztEgnHksrsCJjjfDPecfsML/izFx5ISGgtJhnnVAHX9U07NRGhG20NrNvn/qLIP6Vdluf1+mEHn9Q7JpiPEwRAyHmMRuvhxeN8SokCKYLlTeSoXNSrN1p8ZBOmjMmX2Zd0Lxc+kbOrCk=
+	t=1767783011; cv=pass; b=D83AWjvbdBtyh5CEpeaK+ZZSsPLchgxmmkjk6PQTrleQEFe4vAnkxeHFC5fB4deyA9Alu8hANCDgT3nDMicRJ9XLYgKRpPzsalH52hoZwHuPNWIh4i3XmTFX4HMd83ZLdwT/STu7TUUcwouinY7dx/02hpvm4s9NvZAwDC3mK1o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767782954; c=relaxed/simple;
-	bh=jeAdAqRUsi10JLjqXYI2dUzriqfWukGffIBuJG24uLk=;
+	s=arc-20240116; t=1767783011; c=relaxed/simple;
+	bh=/1bs9t/kmUPdb9U00UsWUIKLi0vlejIXdWJfAhov7os=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cmsG75NVcN3XgUkrdOq89ZqJtIog/DvleGC/JT05tUhu0WBlvl5R6MzFQodFAyyAARyBolq6wWMXKM8+AAyu2l+SEwkdagX2rMYmLJr4aQNzk15H5fuLDRPYbwoOkXy8lPldtJsyzlqdo4Bt1O/FoPX6yRu22RXrru9qkfpuLOw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d1UsEUrV; arc=pass smtp.client-ip=209.85.160.177
+	 To:Cc:Content-Type; b=QAL10xmBHTLQo0LGiuJvKq1sDzk6R+AH4uHiryQeHlWn0ZKnT067fzZGCBwvH7npmjHtdzdw6k4sJCjoAa+g9T6pMqAFlsy3TAcjNKeSfMgOSVNAXTd24pnSTwFtR/UgTGnKexos6F414E2PGQdpxwD+Qkp5osZNqIf9w2aNFO8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U3YZVev4; arc=pass smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d1UsEUrV"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4edb8d6e98aso427601cf.0
-        for <kvmarm@lists.linux.dev>; Wed, 07 Jan 2026 02:49:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767782952; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U3YZVev4"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ee147baf7bso331351cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 07 Jan 2026 02:50:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767783007; cv=none;
         d=google.com; s=arc-20240605;
-        b=JszqKxqTPrVWcVevV4EEO7wS5u0eoWEzhj8zeW1OqDLiudDRzjiSBXQTycuEVzzZLA
-         lo87eQ6DAOl2ENfn5HVv4e8ALbqI1KW5cQtVVicuL1dZjs3qETqj27vsLf7Qwu14/9+7
-         kDULOIcKQ6x3j6l81Di1ZWA4oqR3XQXGgwlkhbZt+2ctSVUy3P7Joy01lDOZJ9m2wczg
-         7fY/HRHwFt0adsX78K8I1IVGZ0VI6VieeVCDnD1+YgLOdKrvzYcK38Ws/F5Z6yeHujNs
-         +sSD9UmXySOGNK+4ZI0ONUfyN5coCse9X7zOwxAVhNiNngZvvMPEMqHZeAHo0HvrQwbM
-         ACbA==
+        b=JxSsQtrsZ3qv3acs1bVdMnXmtEq6Bhixr4PvjYlIU90g+NyBWqCrv1LDwaS2UfpGBj
+         Npeu9DyEMIAzo9Cs2cSI4gtY2D/jfBZXFPn3DEIn/K9ORX0xwHVtXsDpo9avTKi7mxHz
+         ppgUwdX8a8wqqj0G8930LYdFcRWHSzlCgJAnE6c5bfnG9KD1upKkEGaS7MUrvLvKhW82
+         DhMQqKnAHYBAd4ud41DllWLP/u904SmOE/+fNAwPAMjD/hFXDKL3jh+qLKcnljb2UhNK
+         NOtWMw0efJrjUtsGgGEi8fCv+07lewCuSg2W4W1X4y0qfCg9gqZX1ntIGzD6zShrG3uo
+         /hiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=4igsSMJUm2pHmfSuYxdMWMQVSss89GbaNEs4ZiMiGRI=;
-        fh=Fno+E+I80VZy/XRqm2fy8oFwHmy/S05HB7Eo/YSHEcs=;
-        b=J6uceUwQHje+G0E3o2X40fr3r5hxGtyIW9aPORTwOlQlJrsRulLrU+KMsbvaPLBdN5
-         dKNpNlou+EqCiBUDVZOmDY6NVQCbtaIn+v71i/tjhmxUqhpOVDBufWWxMD7vullpBKoC
-         Fkq+/UMHSxjJFvLHBQkSMT7iKSje32SU3ZjG2W6MlPMpGyL+Z6ljB60IFLLhoPAQb084
-         cvhNKKnWdXKN66HntNPxDARBbXCEdQ5WCTkp9xkmtAB9pWsqJqSjASRgQ/xVNmBIAGYr
-         nS/xJmPbcHst0iAdKGuWzZtMMU38AcQcQukZWIvLlzWD6IZQEm/2qZzYp0yd5dqlQPJv
-         UX8Q==;
+        bh=J9Kb3oOMS7dtZg79uYFU5rgqJ0l2yPeAHjyNaUZDKkY=;
+        fh=PAHSbsKizU85g4cpswVEP14EbS8leQR7ZnQStht+ut0=;
+        b=O9wh2ZJONJih7d6jK3topdVSvrTJB6soxtBRmdB4VncF5nFvmVTeb8NvByvPBvwsPm
+         oGaYnBnrG7t8tYI1FQvC4DippaS4CosNbweM+VzPIRUDhq4kGceaYbrz9PMQoyqf2hnP
+         9+VmKElEhkzRZESyXS2le6w1PR18K4Mc0l3C0ebVshPmTMN2iDbwAR1hbFF+ObMt0Ay0
+         9iz+rUZLiQ8S6vOFsVWsmqo63Q0MtxkkFInj5b+M2MA2DVy5lX4ycixOAJMPg+tILJqE
+         FV9IrZI1ILgYvtP0CGcqym+YbLEOLDZkTgtnNFcBXtE+uKSqKAvz/hrApS4kORF6zswk
+         FsQw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767782952; x=1768387752; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1767783007; x=1768387807; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4igsSMJUm2pHmfSuYxdMWMQVSss89GbaNEs4ZiMiGRI=;
-        b=d1UsEUrVLB8LpWxGcBGlOrKxB2NL4Pd3Lk6jFkkJGfQ6yU7av/tc20rwX+O12HkXNx
-         xE+mQtqM9suXRzl8NmZRC7jsvSbfrp8o1PvV7Rg8iGL7xN2Fgh5eeXulPC0lXFcpK+31
-         zHwMjFWibC6wqyK8BEm00peHrPxmKuGxIe0tx9/VS//SZWYzAXEb5Pdy2MGGfBvLugwq
-         HPZxIRIzAW3FlQ9gnT40UEo3CT5txUDcCFSdga4rq2sr9bNxFzrv5PTyV9scxZmSJ+Mw
-         XMJMQ6jRbffiG8urdD5ldDF/IfB58N+eSfNNOnjgjzj7VRZu/Co2i+oy6ntsRugETRXE
-         D6PQ==
+        bh=J9Kb3oOMS7dtZg79uYFU5rgqJ0l2yPeAHjyNaUZDKkY=;
+        b=U3YZVev4Bn57Ukios9VJhnPab9v7/qogE4VqBdMrX7OM7yozhz3NZzxenlLkeQCoaz
+         mXPs5YWcUMwYXN18nB+goKY7LCj+hzvwQrbbd5yH/ZDZf46oOWWfVfifABd8dhCGjs0h
+         iTFI8xBmb+wWaMqg5aKevPDS4WOg4p6G83ntuXSdyT7EvmwZN3SbA1Ld0OyADMDvVJTh
+         LzBpiHZkMfyCoqC/AvrvWK4k46jrNr0MNP/lYZniV0obG1vRZfJZfLp3RK7yD1oQbDGd
+         v/2Kn8lBLgBHHAM0rTYRtvzS170BaKHSANqX8BNH1dtxtabgc2//q3gTrSZB8CxQnZei
+         0ZIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767782952; x=1768387752;
+        d=1e100.net; s=20230601; t=1767783007; x=1768387807;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4igsSMJUm2pHmfSuYxdMWMQVSss89GbaNEs4ZiMiGRI=;
-        b=UjxkD7kXdWlwxl+I7iCFygJtPSRoKnyEWSNio15bllhBXHLSTJil5rD9rHd3G6yaJW
-         cpXKRK/TYVMv5sGq1hAf2I7sFpTYdhVnyOPLVDTzl3O6TM3b7pLsCOIUFYzlrpx8P+pd
-         FO2X4Ul8J+z3zDhqyK34dHik+Rm3hWGADnw6UDwnkBR74HmPRXPngx507kMNNWfDf30J
-         swCZnKKlO3dhzaizVMLnvKlRAwQJzb48uHp443ZypJVhWRTNocjfxwe0wQFzFBnAIT5z
-         xruGB1ybqWvKUJvFDSZzGjkf3+fjZkvAJBrlVm7joVsgB8jX2AE87c1eq4/aQdPsJryR
-         hWSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJNUFZDB1dHgzGmYyjsGPv4xt9lYsnqlVtBhgeKodiL3UkdZgssNcDSLE+hj6HKufBEJJCutA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxjJmHvsdENTZTosm3jk3gSQgo/BZhLd0I2GNUfhSbhOqj6AK5T
-	7KpprGpCfy3CgJn5DIyJDufR5VOEFxSMsU14lUoldkZFOoUd0x4GT3EQRkj2njkzIiL5Eh2n1hI
-	RHtiP/ZdMmGhNooNVdxkU6JirVfbe4PVe/gN5CabX
-X-Gm-Gg: AY/fxX7gSYCoywEuRAyFKDHd72Jptqqj0m7hJc7Ikedaf2hmTfE0aetRxU3i6w32BnF
-	iUdVdX59VjGl2yB8hlUw6iHS5K8XaccCtEMm3sYLGkEcL6DTKQjn0PwpSnRhnvbOy/fJs4dsQWG
-	iQQG+myxNVWGD1soW0mECUzj1tnpyTZj3CVz+vPxg/+nuRhF5OmG/wEVnn0rPHc8/52Qez/h8nS
-	zBc4LEKpbA53RbLhaT30c7hYSbzLk1UdiWVef5MKn0zmAykjZ9Ot6Hv2jMO//pdBTIsejnSjXGp
-	E9jRMwlNHzfRc2ppT/BQCinN
-X-Received: by 2002:a05:622a:48e:b0:4ff:7d4f:85d6 with SMTP id
- d75a77b69052e-4ffb3ca5633mr9973581cf.4.1767782951799; Wed, 07 Jan 2026
- 02:49:11 -0800 (PST)
+        bh=J9Kb3oOMS7dtZg79uYFU5rgqJ0l2yPeAHjyNaUZDKkY=;
+        b=chfkJwiRHmPk3VbdebSVjpNr+gkz6kPeG+a5w7RXCI9whyPq6913zVVGtDLRGb7RRy
+         nPeQArksGHa4s0bXDf+DHPlLDA56RDOK/MZs+jqzLnOd7gUaEtiE1RngAkiq9l4WHXTs
+         pih+sTjOxOdCWE93b8YGlyZTF9lCpSjtUTrTiMOpiw8ejKEKvP9Ipk71l/i0+iKGozlo
+         NJM2GVadPm/ruRKTbiMT61dLBk9FK2NmUwji8E7Du6aXU9cZZqcGSyHO0gMVj/Vo/jqL
+         eY7v/MkcDp5F74rxLNpI/fCmcHtedcGztbfkPH5t7mzVA4v2+j9dCapbj+6fo7o15BmP
+         tyqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXNLJFcagQ5+638NRZnTgmRTcl8SSZ7Y2CxFcTUca32ik5EBSU34IDWfLZAjr68D/H8E/KPmQU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzH4x4pvA1cZDGS8cRIAJQ3y3NACwJfmSKQ4qWwyGp2MQnYGFXC
+	dNurWd8RiLmr/msGTNwng2qsu4fTZ7KS/r1EHJW2tAYVGSKufyOUie/Di7685lCfvMXOGDXuIgo
+	dmIbGzBTaAURzSRdE/fgbrfaPsqhW0wDdA+YsQM6Q
+X-Gm-Gg: AY/fxX6W4WRswwJttJBKb7Jd9txkkFuI8BCcteH4JsamzKX+mFZoXNVz1mtLvpL/Fx/
+	HeVTfPo3lbnsiv0qXGOxVRCEXC0SkB6NYHEBhy8cSvpYdA8iI8IEnxkvQNeiDVUf5rOxUSNUwVg
+	Kzdsv/DMM4NZQoGXDQLjWgBwfo3MXEBsBBk73PgJFvixnq/F8Kodgv6CAOPcdLUv2c2ORkWfnb5
+	zSXaRGE51599/7EQGuh0SmeUSt/3PxbfGAFd17PF+jazX8RIwtJ/OlfwAPWlu5CR4jsxBGSjORf
+	5J9D5QPv00rtaOg0v1KynYCb
+X-Google-Smtp-Source: AGHT+IE10rh+DN78N9YiMcwVYhJscwv8cpbNaNZBCYyl495p1sfIe8xo499YH5McJSOq9oBWKGVccLjtgAYQ8/EyETw=
+X-Received: by 2002:ac8:740e:0:b0:4fb:e3b0:aae6 with SMTP id
+ d75a77b69052e-4ffb3ee7ca4mr7057461cf.1.1767783007011; Wed, 07 Jan 2026
+ 02:50:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260106173707.3292074-1-mark.rutland@arm.com> <20260106173707.3292074-2-mark.rutland@arm.com>
-In-Reply-To: <20260106173707.3292074-2-mark.rutland@arm.com>
+References: <20260106173707.3292074-1-mark.rutland@arm.com> <20260106173707.3292074-3-mark.rutland@arm.com>
+In-Reply-To: <20260106173707.3292074-3-mark.rutland@arm.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 7 Jan 2026 10:48:35 +0000
-X-Gm-Features: AQt7F2o5E_UoBDHB2Y99kOqP1XdD5xVVTTSRk8eYLRdaG-60Me90Qfr9L6BWJlU
-Message-ID: <CA+EHjTy9n+eFe4Oxjsw1zO1QxtR7UTnpnb=jjTJU3Qz329PC3Q@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Fix comment in fpsimd_lazy_switch_to_host()
+Date: Wed, 7 Jan 2026 10:49:30 +0000
+X-Gm-Features: AQt7F2o3m38Z6d968yzTAfqCtkyv0VzU80IdiRiSLmqPB7tJYi9cn0hpoI97f68
+Message-ID: <CA+EHjTyroHqMj5nHZvcwuqO64rQO1iMbSApW8mnNarHyR0zzzA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Shuffle KVM_HOST_DATA_FLAG_* indices
 To: Mark Rutland <mark.rutland@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
 	broonie@kernel.org, catalin.marinas@arm.com, maz@kernel.org, 
 	oliver.upton@linux.dev, will@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Mark,
-
 On Tue, 6 Jan 2026 at 17:37, Mark Rutland <mark.rutland@arm.com> wrote:
 >
-> The comment in fpsimd_lazy_switch_to_host() erroneously says guest traps
-> for FPSIMD/SVE/SME are disabled by fpsimd_lazy_switch_to_guest(). In
-> reality, the traps are disabled by __activate_cptr_traps(), and
-> fpsimd_lazy_switch_to_guest() only manipulates the SVE vector length.
+> There's a gap in the KVM_HOST_DATA_FLAG_* indices since the removal of
+> KVM_HOST_DATA_FLAG_HOST_SVE_ENABLED and
+> KVM_HOST_DATA_FLAG_HOST_SME_ENABLED in commits:
 >
-> This was mistake; I accidentally copy+pasted the wrong function name in
-> commit:
+> * 459f059be702 ("KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN")
+> * 407a99c4654e ("KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN")
 >
->   59419f10045b ("KVM: arm64: Eagerly switch ZCR_EL{1,2}")
+> Shuffle the indices to remove the gap, as Oliver requested at the time of
+> the removals:
 >
-> Fix the comment.
+>   https://lore.kernel.org/linux-arm-kernel/Z6qC4qn47ONfDCSH@linux.dev/
 >
-> Fixes: 59419f10045b ("KVM: arm64: Eagerly switch ZCR_EL{1,2}")
+> There should be no functional change as a result of this patch.
+
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+>
 > Signed-off-by: Mark Rutland <mark.rutland@arm.com>
 > Cc: Catalin Marinas <catalin.marinas@arm.com>
 > Cc: Fuad Tabba <tabba@google.com>
@@ -118,35 +125,30 @@ On Tue, 6 Jan 2026 at 17:37, Mark Rutland <mark.rutland@arm.com> wrote:
 > Cc: Oliver Upton <oliver.upton@linux.dev>
 > Cc: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_host.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index c5d5e5b86eaf0..8dce3da85da35 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -495,7 +495,7 @@ static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
->         /*
->          * When the guest owns the FP regs, we know that guest+hyp traps for
->          * any FPSIMD/SVE/SME features exposed to the guest have been disabled
-> -        * by either fpsimd_lazy_switch_to_guest() or kvm_hyp_handle_fpsimd()
-> +        * by either __activate_cptr_traps() or kvm_hyp_handle_fpsimd()
->          * prior to __guest_entry(). As __guest_entry() guarantees a context
-
-nit: Since the new function name is shorter, you could reflow the
-paragraph and move the word 'prior' to the line above.
-
-Either way:
-Tested-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
- Cheers,
-/fuad
-
-
-
->          * synchronization event, we don't need an ISB here to avoid taking
->          * traps for anything that was exposed to the guest.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac7f970c78830..4c8b4274f669e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -710,11 +710,11 @@ struct cpu_sve_state {
+>  struct kvm_host_data {
+>  #define KVM_HOST_DATA_FLAG_HAS_SPE                     0
+>  #define KVM_HOST_DATA_FLAG_HAS_TRBE                    1
+> -#define KVM_HOST_DATA_FLAG_TRBE_ENABLED                        4
+> -#define KVM_HOST_DATA_FLAG_EL1_TRACING_CONFIGURED      5
+> -#define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT         6
+> -#define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED              7
+> -#define KVM_HOST_DATA_FLAG_HAS_BRBE                    8
+> +#define KVM_HOST_DATA_FLAG_TRBE_ENABLED                        2
+> +#define KVM_HOST_DATA_FLAG_EL1_TRACING_CONFIGURED      3
+> +#define KVM_HOST_DATA_FLAG_VCPU_IN_HYP_CONTEXT         4
+> +#define KVM_HOST_DATA_FLAG_L1_VNCR_MAPPED              5
+> +#define KVM_HOST_DATA_FLAG_HAS_BRBE                    6
+>         unsigned long flags;
+>
+>         struct kvm_cpu_context host_ctxt;
 > --
 > 2.30.2
 >
