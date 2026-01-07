@@ -1,355 +1,146 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27A19D081
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 12:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BF83242B3;
+	Wed,  7 Jan 2026 13:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767790217; cv=none; b=DdICs+aeByx9OPFVVbFU8iqlJXPpFqrIkoSUUOzzng2hljJy2PDEDVF0mKCnRh5O1K9tMTi1h2XFRAAtNuT0NppKXpNEJlm2k7QaGmrJim8JQri6SBVOziW1gfs71lTowNvf3c14dkigGo01h7fnUtZsBsLBwKwtkeGajtgv3hk=
+	t=1767793514; cv=none; b=AAPzon6/W2/oP/hH1nKZZPD7mLbkUdrtSc9ums3MeCTDxIdLK4sjDC4HFaOxkIlGPDE38omgb1mThYjR4HW32Nbn6YNH3RC3aumebuORbykAkqULYPmhmRphAfx0RH1W6prMweZIcHT5JvTMxZQZXz8K2rB8XxaaH5/N8nOZOiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767790217; c=relaxed/simple;
-	bh=h4SDbZXi20v+1B+H4vjYJEdLHCytOLnr5R+tik99ZG8=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cy7ZVWLxkBkQTEH9XnCNhbiLH25/Q8cfxz2s8gneMPi9tVTRLHg/DGIXmgJjE1PzXZ21V7GG08MqOUuDApijKQ7HcS+VFbDpXjp85/9Uy9YpudFBzzyAu8AefAkQ7d6dMYKCx0sFb1FxBeA1PR6QDpkOj7OmBRUmw4rTiDsSc4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=EM0bNlUo; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767793514; c=relaxed/simple;
+	bh=FUnu2/d32Z+rAwqi5Nbaz8wsPSyg/MoQclwAm3YXqJk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cBJ7xjE++cATlKO68DblykCeI2dLwgI9QJ2tyWa8+wnIUDJXJOm7uLxbr1WO9HbsUNkzNmFHmBM9W3ERlDfWv20R0fwMtLWI3vxtW+KjlboOZoVnFCxnWEzQMKvR8cojZqQAWZWirBJQK35TU6uvOqHr7OnEK8J9hfF95S0PBJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itAl+snn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="EM0bNlUo"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=tHSrZXqTclvnCa4GZfb7eNQ5vNhESQnZrK3L8ntXphs=;
-	b=EM0bNlUocvKvjhjCoZ2Gad/Wz8EGPsQ1QLv4h5+wFvfSfD6QgqKa4xib9r1fY/1Do3jaEtG+S
-	j89Mrsf1gXnR9jsLR5GXXrLWerCG+wpoGFfVPXIRUJACvqAIX31auLhdcItgSuisQAUddfGLJS4
-	Tfa0GrYANFzTxwEDP6IKRus=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmSW44YNbz1vp50;
-	Wed,  7 Jan 2026 20:48:00 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmSYP3JcKzHnGk2;
-	Wed,  7 Jan 2026 20:50:01 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9777F40571;
-	Wed,  7 Jan 2026 20:50:07 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 12:50:06 +0000
-Date: Wed, 7 Jan 2026 12:50:05 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 18/36] KVM: arm64: gic-v5: Implement PPI interrupt
- injection
-Message-ID: <20260107125005.000056dc@huawei.com>
-In-Reply-To: <20251219155222.1383109-19-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-19-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itAl+snn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6149C4CEF7;
+	Wed,  7 Jan 2026 13:45:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767793514;
+	bh=FUnu2/d32Z+rAwqi5Nbaz8wsPSyg/MoQclwAm3YXqJk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=itAl+snnQm40572JvVmDdz8fg0UKD82AkqmTnYzf0FqWfkzJSUt0WvzaReVRrJJ6h
+	 tcVIJ36cfg7wOZJxuEo4QQi4XI9UziTM88AFs/dLEspvRUANEw1qFwfaHDfyTpQyrY
+	 htNZP/BPlGFclpvjzFxaEF5Jewz7fMmxrsyvz1YoQJyKb5RztrkKM8lk7ZI0W11Orw
+	 gasKTLhSTJcXU97+VdtxTxi4j7q8FS2YgLDEL9foemX5/udIE5TQBbEUX44jq0ZQEa
+	 IANNpcfJuWELF5OFxMIO8orhEG4cpTIGTUpCe0d3HwoPr/SJY5njTSzlGgBAS3VXFB
+	 7HB12GuhC2CvA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdTqZ-000000005dY-2U3q;
+	Wed, 07 Jan 2026 13:45:11 +0000
+Date: Wed, 07 Jan 2026 13:45:11 +0000
+Message-ID: <86cy3lmt94.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 21/30] KVM: arm64: Initialise hyp_nr_cpus for nVHE hyp
+In-Reply-To: <20251202093623.2337860-22-vdonnefort@google.com>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+	<20251202093623.2337860-22-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Dec 2025 15:52:42 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> This change introduces interrupt injection for PPIs for GICv5-based
-> guests.
+On Tue, 02 Dec 2025 09:36:14 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> The lifecycle of PPIs is largely managed by the hardware for a GICv5
-> system. The hypervisor injects pending state into the guest by using
-> the ICH_PPI_PENDRx_EL2 registers. These are used by the hardware to
-> pick a Highest Priority Pending Interrupt (HPPI) for the guest based
-> on the enable state of each individual interrupt. The enable state and
-> priority for each interrupt are provided by the guest itself (through
-> writes to the PPI registers).
+> Knowing the number of CPUs is necessary for determining the boundaries
+> of per-cpu variables, which will be used for upcoming hypervisor
+> tracing. hyp_nr_cpus which stores this value, is only initialised for
+> the pKVM hypervisor. Make it accessible for the nVHE hypervisor as well.
 > 
-> When Direct Virtual Interrupt (DVI) is set for a particular PPI, the
-> hypervisor is even able to skip the injection of the pending state
-> altogether - it all happens in hardware.
+> With the kernel now responsible for initialising hyp_nr_cpus, the
+> nr_cpus parameter is no longer needed in __pkvm_init.
 > 
-> The result of the above is that no AP lists are required for GICv5,
-> unlike for older GICs. Instead, for PPIs the ICH_PPI_* registers
-> fulfil the same purpose for all 128 PPIs. Hence, as long as the
-> ICH_PPI_* registers are populated prior to guest entry, and merged
-> back into the KVM shadow state on exit, the PPI state is preserved,
-> and interrupts can be injected.
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> When injecting the state of a PPI the state is merged into the KVM's
-> shadow state using the set_pending_state irq_op. The directly sets the
-> relevant bit in the shadow ICH_PPI_PENDRx_EL2, which is presented to
-> the guest (and GICv5 hardware) on next guest entry. The
-> queue_irq_unlock irq_op is required to kick the vCPU to ensure that it
-> seems the new state. The result is that no AP lists are used for
-> private interrupts on GICv5.
-> 
-> Prior to entering the guest, vgic_v5_flush_ppi_state is called from
-> kvm_vgic_flush_hwstate. The effectively snapshots the shadow PPI
-> pending state (twice - an entry and an exit copy) in order to track
-> any changes. These changes can come from a guest consuming an
-> interrupt or from a guest making an Edge-triggered interrupt pending.
-> 
-> When returning from running a guest, the guest's PPI state is merged
-> back into KVM's shadow state in vgic_v5_merge_ppi_state from
-> kvm_vgic_sync_hwstate. The Enable and Active state is synced back for
-> all PPIs, and the pending state is synced back for Edge PPIs (Level is
-> driven directly by the devices generating said levels). The incoming
-> pending state from the guest is merged with KVM's shadow state to
-> avoid losing any incoming interrupts.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Minor things inline
-
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 159 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    |  46 +++++++---
->  arch/arm64/kvm/vgic/vgic.h    |  47 ++++++++--
->  include/kvm/arm_vgic.h        |   3 +
->  4 files changed, 235 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 46c70dfc7bb08..cb3dd872d16a6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -56,6 +56,165 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
->  }
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index e6be1f5d0967..b169d85458f9 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -128,8 +128,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
+>  #ifdef __KVM_NVHE_HYPERVISOR__
+>  void __pkvm_init_switch_pgd(phys_addr_t pgd, unsigned long sp,
+>  		void (*fn)(void));
+> -int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+> -		unsigned long *per_cpu_base, u32 hyp_va_bits);
+> +int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_base, u32 hyp_va_bits);
+>  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+>  #endif
 >  
-> +static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
-> +					  struct vgic_irq *irq)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if;
-> +	const u64 id_bit = BIT_ULL(irq->intid % 64);
-
-Obviously the % 64 means other bits of irq->intid above the HWIRQ_ID
-field don't matter, but this still seems a little odd.  I'd extract
-the field first, then use that for the reg and id_bit or just
-do those inline where they are used.
-
-	const u32 hwirq_id = FIELD_GET(GICV5_HWIRQ_ID, irq->intid);
-
-	if (irq_is_pending(irq))
-		cpu_if->vgic_ppi_pendr[hwirq_id / 64] |= hwirq_id % 64;
-..
-
-Which matches style you used for similar cases in earlier patches.
-
-> +	const u32 reg = FIELD_GET(GICV5_HWIRQ_ID, irq->intid) / 64;
-> +
-> +	if (!vcpu || !irq)
-> +		return false;
-> +
-> +	/* Skip injecting the state altogether */
-> +	if (irq->directly_injected)
-> +		return true;
-> +
-> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	if (irq_is_pending(irq))
-> +		cpu_if->vgic_ppi_pendr[reg] |= id_bit;
-> +	else
-> +		cpu_if->vgic_ppi_pendr[reg] &= ~id_bit;
-> +
-> +	return true;
-> +}
-
-
-> +void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
-> +{
-> +	if (WARN_ON(!irq))
-> +		return;
-> +
-> +	scoped_guard(raw_spinlock, &irq->irq_lock) {
-Not checked on for whether code ends up outside this lock. If not
-use a guard(raw_spinlock)(&irq->irq_lock);
-
-> +		if (!WARN_ON(irq->ops))
-> +			irq->ops = &vgic_v5_ppi_irq_ops;
-> +	}
-> +}
-> +
-> +/*
-> + * Detect any PPIs state changes, and propagate the state with KVM's
-> + * shadow structures.
-> + */
-> +void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	int i, reg;
-> +
-> +	for (reg = 0; reg < 2; reg++) {
-It's now considered fine to declare loop variables in the loop and always
-nice to limit their scope.
-
-	for (int reg = 0; reg < 2...
-
-> +		unsigned long changed_bits;
-> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
-> +		const unsigned long activer = cpu_if->vgic_ppi_activer_exit[reg];
-> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
-
-...
-
-> +
-> +void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	/*
-> +	 * We're about to enter the guest. Copy the shadow state to the pending
-> +	 * reg that will be written to the ICH_PPI_PENDRx_EL2 regs. While the
-> +	 * guest is running we track any incoming changes to the pending state in
-> +	 * vgic_ppi_pendr. The incoming changes are merged with the outgoing
-> +	 * changes on the return path.
-> +	 */
-> +	cpu_if->vgic_ppi_pendr_entry[0] = cpu_if->vgic_ppi_pendr[0];
-> +	cpu_if->vgic_ppi_pendr_entry[1] = cpu_if->vgic_ppi_pendr[1];
-> +
-> +	/*
-> +	 * Make sure that we can correctly detect "edges" in the PPI
-> +	 * state. There's a path where we never actually enter the guest, and
-> +	 * failure to do this risks losing pending state
-> +	 */
-> +	cpu_if->vgic_ppi_pendr_exit[0] = cpu_if->vgic_ppi_pendr[0];
-> +	cpu_if->vgic_ppi_pendr_exit[1] = cpu_if->vgic_ppi_pendr[1];
-> +
-Drop this blank line.
-
-> +}
-
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index ac8cb0270e1e4..cb5d43b34462b 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-
-> @@ -258,10 +266,12 @@ struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
->  	 * If the distributor is disabled, pending interrupts shouldn't be
->  	 * forwarded.
->  	 */
-> -	if (irq->enabled && irq_is_pending(irq)) {
-> -		if (unlikely(irq->target_vcpu &&
-> -			     !irq->target_vcpu->kvm->arch.vgic.enabled))
-> -			return NULL;
-> +	if (irq_is_enabled(irq) && irq_is_pending(irq)) {
-> +		if (irq->target_vcpu) {
-
-Just from a readability point of view, maybe clearer to get rid of
-the 'else# path for this one first.
-
-		if (!irq->target_vcpu)
-			return NULL;
-
-		if (!vgic_is_v5(irq->target_vcpu->kvm) &&
-		    unlikely(!irq->target_vcpu->kvm->arch.vgic.enabled))
-			return NULL;
-
-		return irq->target_vcpu;
-
-Though I see this code might go away anyway...
-
-> +			if (!vgic_is_v5(irq->target_vcpu->kvm) &&
-> +			    unlikely(!irq->target_vcpu->kvm->arch.vgic.enabled))
-> +				return NULL;
-> +		}
+> @@ -146,5 +145,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+>  extern unsigned long kvm_nvhe_sym(__icache_flags);
+>  extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+>  extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
+> +extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
 >  
->  		return irq->target_vcpu;
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 052bf0d4d0b0..7ba427f9608c 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -35,6 +35,7 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  #include <asm/kvm_nested.h>
+>  #include <asm/kvm_pkvm.h>
+> @@ -2396,7 +2397,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
+>  	preempt_disable();
+>  	cpu_hyp_init_context();
+>  	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
+> -				num_possible_cpus(), kern_hyp_va(per_cpu_base),
+> +				kern_hyp_va(per_cpu_base),
+>  				hyp_va_bits);
+>  	cpu_hyp_init_features();
+>  
+> @@ -2605,6 +2606,8 @@ static int __init init_hyp_mode(void)
+>  		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] = (unsigned long)page_addr;
 >  	}
-
-
-
->  /* Flush our emulation state into the GIC hardware before entering the guest. */
->  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  {
-> @@ -1106,13 +1131,12 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
 >  
->  	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
->  
-> -	scoped_guard(raw_spinlock, &vcpu->arch.vgic_cpu.ap_list_lock)
-> -		vgic_flush_lr_state(vcpu);
-> +	vgic_flush_state(vcpu);
->  
->  	if (can_access_vgic_from_kernel())
->  		vgic_restore_state(vcpu);
->  
-> -	if (vgic_supports_direct_irqs(vcpu->kvm))
-> +	if (vgic_supports_direct_irqs(vcpu->kvm) && !vgic_is_v5(vcpu->kvm))
+> +	kvm_nvhe_sym(hyp_nr_cpus) = num_possible_cpus();
 
-This feels like a somewhat backwards check.
-No function to check it vgic_is_v4? Similar cases elsewhere.
+Is num_possible_cpus() always the correct thing to do? Given that pKVM
+doesn't support late onlining, this really should be the number of
+online CPUs.
 
->  		vgic_v4_commit(vcpu);
->  }
->  
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index d5d9264f0a1e9..978d7f8426361 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -132,6 +132,28 @@ static inline bool irq_is_pending(struct vgic_irq *irq)
->  		return irq->pending_latch || irq->line_level;
->  }
->  
-> +/* Requires the irq_lock to be held by the caller. */
+Probably not a big deal, but worth thinking about it.
 
-Can you use a lockdep notation to make that explicit?
+Thanks,
 
-> +static inline bool irq_is_enabled(struct vgic_irq *irq)
-> +{
-> +	if (irq->enabled)
-> +		return true;
-> +
-> +	/*
-> +	 * We always consider GICv5 interrupts as enabled as we can
-> +	 * always inject them. The state is handled by the hardware,
-> +	 * and the hardware will only signal the interrupt to the
-> +	 * guest once the guest enables it.
+	M.
 
-With my fussy reviewer hat on, that's wrapped a bit early.  Go up
-to 80 chars for comments.
-
-> +	 */
-> +	if (irq->target_vcpu) {
-> +		u32 vgic_model = irq->target_vcpu->kvm->arch.vgic.vgic_model;
-> +
-> +		if (vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 500709bd62c8d..b5180edbd1165 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -32,6 +32,9 @@
->  #define VGIC_MIN_LPI		8192
->  #define KVM_IRQCHIP_NUM_PINS	(1020 - 32)
->  
-> +/* GICv5 constants */
-> +#define VGIC_V5_NR_PRIVATE_IRQS	128
-
-You have earlier checks against this value (there was one around PPI DVI setup 
-a few patches back).  So probably better to pull the define earlier and
-use it there as well?
-
-> +
->  #define is_v5_type(t, i)	(FIELD_GET(GICV5_HWIRQ_TYPE, (i)) == (t))
->  
->  #define __irq_is_sgi(t, i)						\
-
+-- 
+Without deviation from the norm, progress is not possible.
