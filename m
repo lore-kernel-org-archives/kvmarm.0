@@ -1,42 +1,42 @@
 Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26A7350A3C
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEB433E364
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 16:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767802138; cv=none; b=gB2/dkpF64EO6aIwQEmMJ42XuJEjspk10E0pNusbgoQEaQH4PvAo/J5wdUu8MM5soIBgUOK8jqEVjeHuyk9uSHqvHs+vpHSClMztSOv05awZk0jfK+VKcdUBHkizfK0UlQdJE1gp0Y8aS+w+F08Yu1/x2XIuYwZu4K+aXlT/jgo=
+	t=1767802314; cv=none; b=DC0s9flu5w0rddlKB9fX+FKngkG/M3GuvsXbwvdvy2xARXA/+/nfBWs7btCfVbAfZzW1oqE/tZ5BJ7hcFzUfJ6hgKeN+CGEaWVksLxjknFHkGJPfvVRG750ivbGhx6wDNkzFHXXDD0RV3rh89YuY7GjWO16kDGPsSoE19tdrivE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767802138; c=relaxed/simple;
-	bh=9t0BYeSb14nKm4LFO11dg4sM7qCWC+SYrXv63cs9irc=;
+	s=arc-20240116; t=1767802314; c=relaxed/simple;
+	bh=H7p093PbuyPCd0xz2rejhyv9A6nf+asOEhJYRLH2U3Y=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q2NNU5Gi7qGVqToodBJBg8qDfim6X1jYvd2zjIfVBGkOXv5HcuZzXoFycWyKoRixnK7so8NJBkEzbGrA4lGnbFfAHlFkRkdjJy5cQ8ScjZHX8kWfm8DflVSC0KI4m8k6rKkr2su/I+EbxUU/8odAzfndCFcDLQ27K9J8Az6P14E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cCvUJgDO; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=jf3XfsV6lccluJs+gCNLvUq+qW2tmKbKdHTHOq0jau2G5fze4EQTJ8GIZ6LsogSU02eQtCDaYTLFzV9owonHHKR4IQ05FYpNoVizHDI92A3Wo4dO75GuApu7lBK7drq3BdWfsb0+KeO9J5A4jcZsjv7vr7hRmeO6zeHagdXQPGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=IP1gbG4h; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cCvUJgDO"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="IP1gbG4h"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=e5IbqEz5mr4wxl5S1XL1pTXse7zZi1lcxr+VuF8a5xA=;
-	b=cCvUJgDOC6LAP9IqYwxSvtr+AjbiGNJkRw9VOuAF4Hr6D+kJwG68NMWAIE0iG4S7EBEo1p4ny
-	3x0AjIKalpRk+g6lIp37cLvRTtvqmSQ/sJFraf/URr1SnqBHnet9QgRZkL3JcmgagP5z5e4GZR7
-	HwQR/VVsubyEtAXTDG50oGw=
+	bh=RVt95oRL/KXDNdcI2dZusgPIXzVemppS5pbly2uJxJk=;
+	b=IP1gbG4hSTj5/TzwaMlFRmEdxgdGiSknNJlNRL9Ja8zq8sGcwkkVseHCh8exT4TIKCYc5S+3r
+	1sFL/+Ord8DzS7YNiuLawd4I9oqm0YjOF1XtPQsduiAcV9eSH8NeDFytbRSz/sRX/moPc5W2d/M
+	TKX25nqHbOv84kdVtGA0onk=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmXvx4YJXz1P7H7;
-	Thu,  8 Jan 2026 00:06:21 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmXyZ27CDzHnGdT;
-	Thu,  8 Jan 2026 00:08:38 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dmXz94T0vz1P7H7;
+	Thu,  8 Jan 2026 00:09:09 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmY1p2KWpzHnGdq;
+	Thu,  8 Jan 2026 00:11:26 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id B46A940086;
-	Thu,  8 Jan 2026 00:08:44 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BAE7C40565;
+	Thu,  8 Jan 2026 00:11:32 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 16:08:43 +0000
-Date: Wed, 7 Jan 2026 16:08:42 +0000
+ 2026 16:11:31 +0000
+Date: Wed, 7 Jan 2026 16:11:30 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,11 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 26/36] KVM: arm64: gic-v5: Bump arch timer for GICv5
-Message-ID: <20260107160842.00003c8e@huawei.com>
-In-Reply-To: <20251219155222.1383109-27-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v2 27/36] KVM: arm64: gic-v5: Mandate architected PPI
+ for PMU emulation on GICv5
+Message-ID: <20260107161130.00006440@huawei.com>
+In-Reply-To: <20251219155222.1383109-28-sascha.bischoff@arm.com>
 References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-27-sascha.bischoff@arm.com>
+	<20251219155222.1383109-28-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -68,225 +69,40 @@ X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
 On Fri, 19 Dec 2025 15:52:45 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> Now that GICv5 has arrived, the arch timer requires some TLC to
-> address some of the key differences introduced with GICv5.
-> 
-> For PPIs on GICv5, the set_pending_state and queue_irq_unlock irq_ops
-> are used as AP lists are not required at all for GICv5. The arch timer
-> also introduces an irq_op - get_input_level. Extend the
-> arch-timer-provided irq_ops to include the two PPI ops for vgic_v5
-> guests.
-> 
-> When possible, DVI (Direct Virtual Interrupt) is set for PPIs when
-> using a vgic_v5, which directly inject the pending state in to the
-
-into ?
-
-> guest. This means that the host never sees the interrupt for the guest
-> for these interrupts. This has two impacts.
-> 
-> * First of all, the kvm_cpu_has_pending_timer check is updated to
->   explicitly check if the timers are expected to fire.
-> 
-> * Secondly, for mapped timers (which use DVI) they must be masked on
->   the host prior to entering a GICv5 guest, and unmasked on the return
->   path. This is handled in set_timer_irq_phys_masked.
-> 
-> The final, but rather important, change is that the architected PPIs
-> for the timers are made mandatory for a GICv5 guest. Attempts to set
-> them to anything else are actively rejected. Once a vgic_v5 is
-> initialised, the arch timer PPIs are also explicitly reinitialised to
-> ensure the correct GICv5-compatible PPIs are used - this also adds in
-> the GICv5 PPI type to the intid.
+> Make it mandatory to use the architected PPI when running a GICv5
+> guest. Attempts to set anything other than the architected PPI (23)
+> are rejected.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Various comments inline. 
-
-J
 > ---
->  arch/arm64/kvm/arch_timer.c     | 110 ++++++++++++++++++++++++++------
->  arch/arm64/kvm/vgic/vgic-init.c |   9 +++
->  arch/arm64/kvm/vgic/vgic-v5.c   |   8 +--
->  include/kvm/arm_arch_timer.h    |   7 +-
->  include/kvm/arm_vgic.h          |   4 ++
->  5 files changed, 115 insertions(+), 23 deletions(-)
+>  arch/arm64/kvm/pmu-emul.c | 14 ++++++++++++--
+>  include/kvm/arm_pmu.h     |  5 ++++-
+>  2 files changed, 16 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 6f033f6644219..78d66a67b34ac 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-
-
->  void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
-> @@ -1034,12 +1079,15 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
->  	if (timer->enabled) {
->  		for (int i = 0; i < nr_timers(vcpu); i++)
->  			kvm_timer_update_irq(vcpu, false,
-> -					     vcpu_get_timer(vcpu, i));
-> +					vcpu_get_timer(vcpu, i));
-
-Unrelated change, and a bad one at that!
-
-
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index afc838ea2503e..2d3b50dec6c5d 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -962,8 +962,13 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  		if (!vgic_initialized(vcpu->kvm))
+>  			return -ENODEV;
 >  
->  		if (irqchip_in_kernel(vcpu->kvm)) {
-> -			kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_vtimer));
-> +			kvm_vgic_reset_mapped_irq(
-> +				vcpu, timer_irq(map.direct_vtimer));
+> -		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> -			return -ENXIO;
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu)) {
+> +			/* Use the architected irq number for GICv5. */
+> +			if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
+> +				vcpu->arch.pmu.irq_num = KVM_ARMV8_PMU_GICV5_IRQ;
+> +			else
+> +				return -ENXIO;
+Might as well flip logic and exit quickly on error.
 
-Also unrelated and not a good change.
+			if (vcpu->kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V5)
+As before it might be nice to make the helper for this visible.
 
->  			if (map.direct_ptimer)
-> -				kvm_vgic_reset_mapped_irq(vcpu, timer_irq(map.direct_ptimer));
-> +				kvm_vgic_reset_mapped_irq(
-> +					vcpu,
-> +					timer_irq(map.direct_ptimer));
+				return -ENXIO;
 
-Leave all these alone.
-
->  		}
->  	}
->  
-> @@ -1092,10 +1140,19 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
->  		      HRTIMER_MODE_ABS_HARD);
->  }
->  
-> +/*
-> + * This is always called during kvm_arch_init_vm, but will also be
-> + * called from kvm_vgic_create if we have a vGICv5.
-> + */
->  void kvm_timer_init_vm(struct kvm *kvm)
->  {
-> +	/*
-> +	 * Set up the default PPIs - note that we adjust them based on
-> +	 * the model of the GIC as GICv5 uses a different way to
-> +	 * describing interrupts.
-> +	 */
->  	for (int i = 0; i < NR_KVM_TIMERS; i++)
-> -		kvm->arch.timer_data.ppi[i] = default_ppi[i];
-> +		kvm->arch.timer_data.ppi[i] = get_vgic_ppi(kvm, default_ppi[i]);
->  }
->  
->  void kvm_timer_cpu_up(void)
-> @@ -1347,6 +1404,7 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
->  		}
->  
->  		arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
-> +		arch_timer_irq_ops_vgic_v5.flags |= VGIC_IRQ_SW_RESAMPLE;
->  		WARN_ON(irq_domain_push_irq(domain, host_vtimer_irq,
->  					    (void *)TIMER_VTIMER));
->  	}
-> @@ -1497,10 +1555,13 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
->  			break;
->  
->  		/*
-> -		 * We know by construction that we only have PPIs, so
-> -		 * all values are less than 32.
-> +		 * We know by construction that we only have PPIs, so all values
-> +		 * are less than 32 for non-GICv5 vgics. On GICv5, they are
-
-VGICs maybe?  It's not consistent in existing comments in this file though.
-
-> +		 * architecturally defined to be under 32 too. However, we mask
-> +		 * off most of the bits as we might be presented with a GICv5
-> +		 * style PPI where the type is encoded in the top-bits.
->  		 */
-> -		ppis |= BIT(irq);
-> +		ppis |= BIT(irq & 0x1f);
->  	}
->  
->  	valid = hweight32(ppis) == nr_timers(vcpu);
-> @@ -1538,7 +1599,9 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->  {
->  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
->  	struct timer_map map;
-> +	struct irq_ops *ops;
->  	int ret;
-> +	int irq;
-Might as well put irq on same line as ret
-
->  
->  	if (timer->enabled)
->  		return 0;
-> @@ -1556,20 +1619,22 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->  		return -EINVAL;
->  	}
->  
-> +	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
-> +				      &arch_timer_irq_ops;
-> +
->  	get_timer_map(vcpu, &map);
->  
-> -	ret = kvm_vgic_map_phys_irq(vcpu,
-> -				    map.direct_vtimer->host_timer_irq,
-> -				    timer_irq(map.direct_vtimer),
-> -				    &arch_timer_irq_ops);
-> +	irq = timer_irq(map.direct_vtimer);
-> +	ret = kvm_vgic_map_phys_irq(vcpu, map.direct_vtimer->host_timer_irq,
-> +				    irq, ops);
-
-As irq is only used with this value in here, I'd avoid having the local variable
-that changes meaning.
-
-	ret = kvm_vgic_map_phys_irq(vcpu, map.direct_vtimer->host_timer_irq,
-				    timer_irq(map.direct_vtimer), ops);
->  	if (ret)
->  		return ret;
->  
->  	if (map.direct_ptimer) {
-> +		irq = timer_irq(map.direct_ptimer);
->  		ret = kvm_vgic_map_phys_irq(vcpu,
->  					    map.direct_ptimer->host_timer_irq,
-> -					    timer_irq(map.direct_ptimer),
-> -					    &arch_timer_irq_ops);
-> +					    irq, ops);
-As above
-					    timer_irq(map.direct_ptimer), ops);
-
-Doesn't make it much harder to read and avoids the local variable
-being needed.
->  	}
->  
->  	if (ret)
-> @@ -1627,6 +1692,15 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->  		goto out;
->  	}
->  
-> +	/*
-> +	 * The PPIs for the Arch Timers arch architecturally defined for
-> +	 * GICv5. Reject anything that changes them from the specified value.
-> +	 */
-> +	if (vgic_is_v5(vcpu->kvm) && vcpu->kvm->arch.timer_data.ppi[idx] != irq) {
-> +		ret = -EINVAL;
-> +		goto out;
-
-Whilst you are here, maybe throw some guard() magic dust at this and do a direct return?
-Or leave it for someone else who has more spare time ;)
-
-> +	}
-> +
->  	/*
->  	 * We cannot validate the IRQ unicity before we run, so take it at
->  	 * face value. The verdict will be given on first vcpu run, for each
-
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index 7310841f45121..6cb9c20f9db65 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-
->  
->  struct arch_timer_context {
-> @@ -130,6 +132,9 @@ void kvm_timer_init_vhe(void);
->  #define timer_vm_data(ctx)		(&(timer_context_to_vcpu(ctx)->kvm->arch.timer_data))
->  #define timer_irq(ctx)			(timer_vm_data(ctx)->ppi[arch_timer_ctx_index(ctx)])
->  
-> +#define get_vgic_ppi(k, i) (((k)->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V5) ? \
-> +				(i) : ((i) | FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI)))
-
-Similar to earlier comment I'd use FIELD_PREP() for i as well but not that important
-I'm just lazy about remembering where the numbers go.
-
-
-
->  
+			vcpu->arch.pmu.irq_num = KVM_ARMV8_PMU_GICV5_IRQl;
+		}
+> +		}
 
