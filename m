@@ -1,75 +1,94 @@
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A86532AAA4
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 15:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D0036AB59;
+	Wed,  7 Jan 2026 16:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767801100; cv=none; b=SCnGzc/JFz+DKCkqS24xhzEPBN3zCOjkRlTT2qL2WwLZTIR7HVtf38sIjwGyT0xabCvy4PrhiDz4Aaee6+tfvLPmj11agrs6T/jNjc8EYysMj2wVBskoNry9gJYxiiCnX8DcZqxRHPE+cDVYFKaQR07rg+xNQJZw4GbrN1cW8FM=
+	t=1767801623; cv=none; b=qa70GvNmbVwwHppH6XDtEOKbnay9O7jDX9wAa+mbacw0roWTFL/LSZWMvpq53qLq6XbZRZCr+nJiGFe0HaSXv+fr+wXLCCExRIswrY+dfmntl9qSM0iIgF5HE53kbYSwyctp37qrfJvL5fY5Omj7HG8i2anptLpX1k3vYbB391Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767801100; c=relaxed/simple;
-	bh=OWerPOUQ2qyMwxUERnEoE85nHva9y8ZjPtMfT8VCHbE=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AkFG4g9ejTgz6m5oyyzwIeBJeyTBcdRyrXUIuTYQyGCKRJQep80wvi1HFTb3lkirDRdrfQgYxlVszpNNUwUBnkNJ3EhTJ3K7oxNU8oPTeNTXdjm1vQMyzrT3Oiuw8i6KFfpktyglF509Lk0hTP7a8DXLV65slw+pvE3wfEV7tlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=0DG0uPab; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767801623; c=relaxed/simple;
+	bh=kDeqG5V92SZP2NV1PoswoenUBEghTt7ONN91xP8+7Lo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pl3w/uqD0OT79J1QtqT+JmD66AL6YHVBpptstvRVI9SRFu+Jf6bWAghReeO2oeqwV5GD9+t1qGLquZrxyi0Nxtc5A5naVhPDM0hlswOy/usKFAljHhaRTOdF3jw0PQNkE3PERT7vLyOrqQVGyzooKhecEQ9M1ibS2bk+Y1irWXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czmpa2Qg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="0DG0uPab"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=3h699r3iIg9ZV2/0qzLto2y8f/0Q/GjzRgr1Ae6rVsA=;
-	b=0DG0uPabO7T7KHB5XrTHYqQda7cleLiCOeYDBEqWNYkTa5JMwWXuLYDCJtKnpLKvpdbZl/Wmk
-	ZgHeFa3T3BqCSHYy6CLuwy9DZg3IYpZhpNsYRXsaKKuFdTvw+uiW7dXLQfj5+C0CRQ8SWuZiQEq
-	k9u8FGQdxBG1LBA2kTpnPtQ=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dmXXC694HzMrcG;
-	Wed,  7 Jan 2026 23:49:15 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmXZW6Q4zzHnGg3;
-	Wed,  7 Jan 2026 23:51:15 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4D6B440086;
-	Wed,  7 Jan 2026 23:51:22 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 15:51:21 +0000
-Date: Wed, 7 Jan 2026 15:51:20 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 25/36] KVM: arm64: gic-v5: Reset vcpu state
-Message-ID: <20260107155120.00000801@huawei.com>
-In-Reply-To: <20251219155222.1383109-26-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-26-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czmpa2Qg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEF69C4CEF1;
+	Wed,  7 Jan 2026 16:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767801622;
+	bh=kDeqG5V92SZP2NV1PoswoenUBEghTt7ONN91xP8+7Lo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=czmpa2QgmsQkWisik1uqcVXOAfYJKWtKd+vLyIvUq3Na45Ylc55yIRWjLvR+tkFxV
+	 VyF5NGrV8Qxfd8CJ5SHrwyr5pfSkJP4pVsMsjG/TR9MwtHjj9zKhdcN98Y8ADpNkKR
+	 Qn0X5U3N4CcsPCA9pN1fjVLTcbB4BKpc5XAj5cZJtBs6lUi4BTMyMarmyc0ahciZ6Z
+	 vQdQn+vJrOh/WWoZHo4GZz7MQmA25zSIxpspt0BRwq5br1PdpT2n7y2aPA+OkkOwFw
+	 pkUUAMbMmeMJwBQM2bTYOn6mQZ5amj3LmA74UASvp9lIkkUPWwoGL+4mefg5NuTlO/
+	 oO2WNcxcOEqXg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vdVxL-000000007vK-3Qny;
+	Wed, 07 Jan 2026 16:00:19 +0000
+Date: Wed, 07 Jan 2026 16:00:19 +0000
+Message-ID: <867bttmmzw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 00/30] Tracefs support for pKVM
+In-Reply-To: <20251202093623.2337860-1-vdonnefort@google.com>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 19 Dec 2025 15:52:44 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> Limit the number of ID and priority bits supported based on the
-> hardware capabilities when resetting the vcpu state.
+On Tue, 02 Dec 2025 09:35:53 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> The growing set of features supported by the hypervisor in protected
+> mode necessitates debugging and profiling tools. Tracefs is the
+> ideal candidate for this task:
+
+[...]
+
+I quite like the shape of this now, at least for the KVM side of
+things. The comments I have can be addressed down the line, and don't
+impact the actual functionality.
+
+Now, the first 18 patches definitely need acks from the relevant
+maintainers before I can queue this.
+
+Steven?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
