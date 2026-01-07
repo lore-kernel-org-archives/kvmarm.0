@@ -1,140 +1,85 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4ED9308F35
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 11:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EF723EAB4
+	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 11:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767784770; cv=none; b=QE2BL5Ps/oB3Wa0KL00VJUQyCfCDXIckZP7dHRVS53QtkKJJAs8S91fkrKlG94CAmem2XZHc3UoRvmCZZbJ6Q/QOUVzlac7neETWzpT7ZBpn5iLKnKwfmMAoUMzTZ9XsDJZQrjn5tpilWhfrdH0ig3jG0RCSk0/xVj8PZfnD4R0=
+	t=1767785017; cv=none; b=tB3gCOSIPYGT68mRLonuXUefZZBBQp4uf8H2ShziM4FJWl8oa5fW/59ZKtODNr/3YJ6SvzrWDYloSWiVlWl5JJBETFsKXVnYlQntvJvCHP43b/yAFQ/zdCfIDxhsSSXU/9tTXQUOXiQLPmiRYeX7/vN6IOMPD30uP0uGICgQlW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767784770; c=relaxed/simple;
-	bh=p3upgpqcyPXcVAGuSKJJgmgj4MuGiUrvRQn8UCLNKC8=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DK37HA2thkaG74EXwt5o18CzbjHvz4qjzZdAxVFrCvGz5AOUl5fDSY91qTkgadrxGxsw27dvtAUYkNZkI4zQKcVz02MPqzcp7fcdjTw6Yes/dbPM6eDCYjqnK//feO12RtLsZ3DUCi9A/SVi76cuawWgAsDJ6XEnhl6fMEoAMOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=RR2OQnXM; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1767785017; c=relaxed/simple;
+	bh=dn2+c2FoopOCirq4VSlDMFYYIIkVyKutLY5f+zRioxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PjwApsDiuCpd0X2yNKJqKxdWMIC2gDzDlm4JXsRq4lZexykHavwBXYtWDPQzwt0HmRStPcxJKcQDkxvtvur7v7YFK9R88TVPhpmcL96XwdF0r7t0jwuwwrTPkWBpxSHPMdJFjAK9bCYFbS3YWsgdR5zRGUqLnpR71iZEnX+tZ1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSwrZQqS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="RR2OQnXM"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=R2ekXdwkRaQOz3Sz8euHH7R8sRGKGoQ61Xj6VYJaUFo=;
-	b=RR2OQnXMbTS/HVamxAIuS9XrpdZf8asUYRx9ouGYFlJ0jf+C0JB+qXwNh1m29HysXLAYNkZ9P
-	y17RdxnYQm7UenfQxVnyMb+hjXIxUjgd7O2+NnJXTzW6fKu8Yufm7egOx8nfNLGw6Uxvot8WNBa
-	flu/arIx3XDvKl0Z5dLw2SY=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dmQVL1HMVz1vp2G;
-	Wed,  7 Jan 2026 19:17:14 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dmQXk0SNczJ46mZ;
-	Wed,  7 Jan 2026 19:19:18 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2D57A40570;
-	Wed,  7 Jan 2026 19:19:21 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 7 Jan
- 2026 11:19:20 +0000
-Date: Wed, 7 Jan 2026 11:19:18 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 11/36] KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs
-Message-ID: <20260107111918.000037f7@huawei.com>
-In-Reply-To: <20251219155222.1383109-12-sascha.bischoff@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	<20251219155222.1383109-12-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSwrZQqS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E9EAC4CEF7;
+	Wed,  7 Jan 2026 11:23:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767785017;
+	bh=dn2+c2FoopOCirq4VSlDMFYYIIkVyKutLY5f+zRioxM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YSwrZQqSBpYh0wMySfXpKWuVeMacsQxTdE/FO4cNwMqzYRrzeL5lgzq0vN3iBW/iB
+	 8vGQn/05f4TeIQONJCr8kvOX+Al8ar0a5F38Z9odHjAWCgTIgBq//bspytddLJDgLc
+	 PZzcLPGdo0kpPkpTJ8W5mGnEu73SiWU195V4FLw3NWfCamsRhvqunc9bg2lMaExvQR
+	 fa2hKg7vdkzosyNaZMxT/GAauhy6UM7f1mEmKvEopDcMAKOAMMs4XZMoVydFCGml2X
+	 gvXzzPpg95htzdzENFWgmdis/QGqzovg/1wQLMgQDT8I637Uio/uR5MxsuLM2XO7hf
+	 OugUd3cdbNHKg==
+Date: Wed, 7 Jan 2026 11:23:32 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	catalin.marinas@arm.com, maz@kernel.org, oliver.upton@linux.dev,
+	tabba@google.com, will@kernel.org
+Subject: Re: [PATCH 2/3] KVM: arm64: Shuffle KVM_HOST_DATA_FLAG_* indices
+Message-ID: <36fd77fb-362b-455b-8507-f59360153c91@sirena.org.uk>
+References: <20260106173707.3292074-1-mark.rutland@arm.com>
+ <20260106173707.3292074-3-mark.rutland@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wmrKsawYFX++f6+M"
+Content-Disposition: inline
+In-Reply-To: <20260106173707.3292074-3-mark.rutland@arm.com>
+X-Cookie: Is there life before breakfast?
+
+
+--wmrKsawYFX++f6+M
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 19 Dec 2025 15:52:39 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-
-> Extend the existing FGT/FGU infrastructure to include the GICv5 trap
-> registers (ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, ICH_HFGITR_EL2). This
-> involves mapping the trap registers and their bits to the
-> corresponding feature that introduces them (FEAT_GCIE for all, in this
-> case), and mapping each trap bit to the system register/instruction
-> controlled by it.
+On Tue, Jan 06, 2026 at 05:37:06PM +0000, Mark Rutland wrote:
+> There's a gap in the KVM_HOST_DATA_FLAG_* indices since the removal of
+> KVM_HOST_DATA_FLAG_HOST_SVE_ENABLED and
+> KVM_HOST_DATA_FLAG_HOST_SME_ENABLED in commits:
 >=20
-> As of this change, none of the GICv5 instructions or register accesses
-> are being trapped.
+> * 459f059be702 ("KVM: arm64: Remove VHE host restore of CPACR_EL1.ZEN")
+> * 407a99c4654e ("KVM: arm64: Remove VHE host restore of CPACR_EL1.SMEN")
 >=20
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Hi Sascha,
+> Shuffle the indices to remove the gap, as Oliver requested at the time of
+> the removals:
 
-Superficial stuff only on code flow to make it easier to extend next
-time.
+Reviewed-by: Mark Brown <broonie@kernel.org>
 
-Jonathan
+--wmrKsawYFX++f6+M
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 3845b188551b6..5f57dc07cc482 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmleQjMACgkQJNaLcl1U
+h9Dlkwf+PzIZ1iMjULrauU21DeSQdSgVk/G/LtZhuHfqa5HZo0nQ+i3mQ9QrlK0a
+Y4oXxW9UM2TMruaFCtmP/6IY6+LxjgaDC4vxdb31tInKlqNt8JnCpS3M1kvCJ84W
+K+xLBUo0FgmvVPwjTG8WlNN4Q31uAaeAC+TrVwmpiSXBQCSyyd8XwRAMsu4fpQpg
+5f0vHHJkMudSdvsIf6SkcsEfOcINARqpLE55+fqUZD0uEj3Ll2pKGTwPDE7duMYR
+gwliFxV3LftkKdY1v0RdFkXOegvNcQaJxslMjzDJPSmBszGjknMcBHEFRloKXdRX
+TtxGO+yz+ktywVsZrNcrdCxV3QJIsA==
+=qbTT
+-----END PGP SIGNATURE-----
 
-> @@ -1511,11 +1595,19 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
->  	__compute_fgt(vcpu, HAFGRTR_EL2);
-> =20
->  	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
-> -		return;
-> +		goto skip_fgt2;
-
-Nicer to avoid more complex code flow and just make the next
-block an if.
-
-	if (cpus_have_final_cap(ARM64_HAS_FGT2)) {
-		__compute_fgt(vcpu, HFGRTR2_EL2);
-		__compute_fgt(vcpu, HFGWTR2_EL2);
-		__compute_fgt(vcpu, HFGITR2_EL2);
-		__compute_fgt(vcpu, HDFGRTR2_EL2);
-		__compute_fgt(vcpu, HDFGWTR2_EL2);
-	}
-> =20
->  	__compute_fgt(vcpu, HFGRTR2_EL2);
->  	__compute_fgt(vcpu, HFGWTR2_EL2);
->  	__compute_fgt(vcpu, HFGITR2_EL2);
->  	__compute_fgt(vcpu, HDFGRTR2_EL2);
->  	__compute_fgt(vcpu, HDFGWTR2_EL2);
-> +
-> +skip_fgt2:
-> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
-Given the above shows this code sometimes gets extended I'd
-be tempted to just go with
-	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
-		__compute_fgt(vcpu, ICH_HFGRTR_EL2);
-		__compute_fgt(vcpu, ICH_HFGWTR_EL2);
-		__compute_fgt(vcpu, ICH_HFGITR_EL2);
-	}
-
-=46rom the start and avoid future churn or goto nasties.
-
->=09
-> +		return;
-> +
-> +	__compute_fgt(vcpu, ICH_HFGRTR_EL2);
-> +	__compute_fgt(vcpu, ICH_HFGWTR_EL2);
-> +	__compute_fgt(vcpu, ICH_HFGITR_EL2);
->  }
-
-
-
+--wmrKsawYFX++f6+M--
