@@ -1,122 +1,253 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B3C2E0418;
-	Thu,  8 Jan 2026 15:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702A02264AA
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 16:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767887856; cv=none; b=FLius49z4IQZVMM4wx8Evoxn3KKiPK1W9mHtyBB7l9ih2OnseajgM0D/Nk4z3dHpTTaabZ98smzPZYi15YU5dTzM53xs1JqqcEgoJiiHXNsNsSCXUebtrZbkff5TjALU1En1FUgvdJQqjUpMiUyh8Hj7qVKX4gd2dWpqZxau8aA=
+	t=1767888643; cv=none; b=YTHWVPg1jcunTz1lSDQZ4SyBHct0up6jMEi6mq1J9fDG3fm2w/158tjpYrC3u1fkD7giAYd2GoucebXdycELHvhkseAAUXZLvGKgt1HJEvgzxk/rviYejNEqFesWsP8VzPhPy8jppBc4sX7hzYSMT7bl5WN7MKynw9V5/zzHjMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767887856; c=relaxed/simple;
-	bh=iQ8rrKAjkcgXBG7XLBNg/l9mT/9ufxiMSqzt1QWzGdc=;
+	s=arc-20240116; t=1767888643; c=relaxed/simple;
+	bh=Tej4awhuCuuXOnYNKdex5U5yvlB1jVTrTzmYMPKg94g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DgvFqN/0zzM2HlHlAT8zY4HyPzAo/0hr9JdLkvGHLNFWbNnox+OfJiKusXYkZVi5RaXzslvJ0NvRES/UuTtVH6G8uO1n7ZSfqwb7KHxR6raAd2Kd6QK6eMnnLegPIMSX1tVrXB3odZPJ59UpohmFOoXbQXl2hnX9VWWWpn+Kgu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVqoIYbJ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVqoIYbJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3F9C116C6;
-	Thu,  8 Jan 2026 15:57:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767887856;
-	bh=iQ8rrKAjkcgXBG7XLBNg/l9mT/9ufxiMSqzt1QWzGdc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KVqoIYbJP02PJTKnx446NUd3M2a4Ep19Dg9tIX7oreQpKKsd0WMGyTFUJ1sDhiXWY
-	 0KtS2dh6VfgyUiSD3OiTxpJZuxbKYxR/1hBRHWLrheX8ST7mB39HkyvpUsmPfrqN88
-	 zi6iOhwIStpoif0an8L2fuMSf78ynLUxFwnTboH07mvxdH5xzvVP2Pa/PObcK+/jFt
-	 5f0Go3ejIGh1XNrnasudUdmrt3GrXSY1SW6VzhXuIQObithqCt61PeKuSTMW7jw8O3
-	 U/OdvxARLkNQXqgRv4AUcd1QcZtEXws/csV64jdEvNo1pOhtcobf51yh7jVdB467pq
-	 wLj1opru/g8eg==
-Date: Thu, 8 Jan 2026 15:57:24 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 02/30] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
-Message-ID: <e50b4923-ee45-43de-9d4e-344546c635bb@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-2-8be3867cb883@kernel.org>
- <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
- <3c8b4a5e-89f4-47e0-9a5d-24399407db0c@sirena.org.uk>
- <CA+EHjTxLkLjPj=1vwDqROXOUXi2LhOQb90WP6dFaTiYG1nWovA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PFL65HFA7qUSufMEhRRBLILlKwoKdKYPV0n53jmcJAWu+DfoW+w4JysrIDJoZP3lD3hUioLed8jsNs4jJlwOQJtXbWcdcXNEI/HQgfQeIFwfD3CiKM22x+XM983PMy/lIl57eIv9BFKe7NKW3Z0CxEvrb8a09/vzBY1/n3DOcGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 27899497;
+	Thu,  8 Jan 2026 08:10:34 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 491613F5A1;
+	Thu,  8 Jan 2026 08:10:38 -0800 (PST)
+Date: Thu, 8 Jan 2026 16:10:31 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v2 19/36] KVM: arm64: gic-v5: Check for pending PPIs
+Message-ID: <20260108161031.GA223579@e124191.cambridge.arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+ <20251219155222.1383109-20-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KOrZZL+m63ovft+Q"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTxLkLjPj=1vwDqROXOUXi2LhOQb90WP6dFaTiYG1nWovA@mail.gmail.com>
-X-Cookie: If you suspect a man, don't employ him.
-
-
---KOrZZL+m63ovft+Q
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20251219155222.1383109-20-sascha.bischoff@arm.com>
 
-On Thu, Jan 08, 2026 at 02:09:34PM +0000, Fuad Tabba wrote:
-> On Thu, 8 Jan 2026 at 11:54, Mark Brown <broonie@kernel.org> wrote:
-> > On Wed, Jan 07, 2026 at 07:25:04PM +0000, Fuad Tabba wrote:
-> > > On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+Small nit,
 
-> > > Should we also preserve the remaining old bits from SMCR_EL1, i.e.,
-> > > copy over the bits that aren't
-> > > SMCR_ELx_LEN_MASK|SMCR_ELx_FA64|SMCR_ELx_EZT0? For now they are RES0,
-> > > but that could change.
+On Fri, Dec 19, 2025 at 03:52:42PM +0000, Sascha Bischoff wrote:
+> This change allows KVM to check for pending PPI interrupts. This has
+> two main components:
+> 
+> First of all, the effective priority mask is calculated.  This is a
+> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
+> the currently running priority as determined from the VPE's
+> ICH_APR_EL1. If an interrupt's prioirity is greater than or equal to
+> the effective priority mask, it can be signalled. Otherwise, it
+> cannot.
+> 
+> Secondly, any Enabled and Pending PPIs must be checked against this
+> compound priority mask. The reqires the PPI priorities to by synced
+> back to the KVM shadow state - this is skipped in general operation as
+> it isn't required and is rather expensive. If any Enabled and Pending
+> PPIs are of sufficient priority to be signalled, then there are
+> pending PPIs. Else, there are not.  This ensures that a VPE is not
+> woken when it cannot actually process the pending interrupts.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 121 ++++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    |   5 +-
+>  arch/arm64/kvm/vgic/vgic.h    |   1 +
+>  3 files changed, 126 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index cb3dd872d16a6..c7ecc4f40b1e5 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -56,6 +56,31 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  	return 0;
+>  }
+>  
+> +static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u32 highest_ap, priority_mask;
+> +
+> +	/*
+> +	 * Counting the number of trailing zeros gives the current
+> +	 * active priority. Explicitly use the 32-bit version here as
+> +	 * we have 32 priorities. 0x20 then means that there are no
+> +	 * active priorities.
+> +	 */
+> +	highest_ap = cpu_if->vgic_apr ? __builtin_ctz(cpu_if->vgic_apr) : 32;
+> +
+> +	/*
+> +	 * An interrupt is of sufficient priority if it is equal to or
+> +	 * greater than the priority mask. Add 1 to the priority mask
+> +	 * (i.e., lower priority) to match the APR logic before taking
+> +	 * the min. This gives us the lowest priority that is masked.
+> +	 */
+> +	priority_mask = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, cpu_if->vgic_vmcr);
+> +	priority_mask = min(highest_ap, priority_mask + 1);
+> +
+> +	return priority_mask;
+> +}
+> +
+>  static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
+>  					  struct vgic_irq *irq)
+>  {
+> @@ -131,6 +156,102 @@ void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
+>  	}
+>  }
+>  
+> +
+> +/*
+> + * Sync back the PPI priorities to the vgic_irq shadow state
+> + */
+> +static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +
+> +	/* We have 16 PPI Priority regs */
+> +	for (reg = 0; reg < 16; reg++) {
+> +		const unsigned long priorityr = cpu_if->vgic_ppi_priorityr[reg];
+> +
+> +		for (i = 0; i < 8; ++i) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +			u8 priority;
+> +
+> +			priority = (priorityr >> (i * 8)) & 0x1f;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 8 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +
+> +			scoped_guard(raw_spinlock, &irq->irq_lock)
+> +				irq->priority = priority;
+> +
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +		}
+> +	}
+> +}
+> +
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	int i, reg;
+> +	unsigned int priority_mask;
+> +
+> +	/* If no pending bits are set, exit early */
+> +	if (likely(!cpu_if->vgic_ppi_pendr[0] && !cpu_if->vgic_ppi_pendr[1]))
+> +		return false;
+> +
+> +	priority_mask = vgic_v5_get_effective_priority_mask(vcpu);
+> +
+> +	/* If the combined priority mask is 0, nothing can be signalled! */
+> +	if (!priority_mask)
+> +		return false;
+> +
+> +	/* The shadow priority is only updated on demand, sync it across first */
+> +	vgic_v5_sync_ppi_priorities(vcpu);
+> +
+> +	for (reg = 0; reg < 2; reg++) {
+> +		unsigned long possible_bits;
+> +		const unsigned long enabler = cpu_if->vgic_ich_ppi_enabler_exit[reg];
+> +		const unsigned long pendr = cpu_if->vgic_ppi_pendr_exit[reg];
+> +		bool has_pending = false;
+> +
+> +		/* Check all interrupts that are enabled and pending */
+> +		possible_bits = enabler & pendr;
+> +
+> +		/*
+> +		 * Optimisation: pending and enabled with no active priorities
+> +		 */
+> +		if (possible_bits && priority_mask > 0x1f)
+> +			return true;
+> +
+> +		for_each_set_bit(i, &possible_bits, 64) {
+> +			struct vgic_irq *irq;
+> +			u32 intid;
+> +
+> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
+> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
+> +
+> +			irq = vgic_get_vcpu_irq(vcpu, intid);
+> +
+> +			scoped_guard(raw_spinlock, &irq->irq_lock) {
+> +				/*
+> +				 * We know that the interrupt is
+> +				 * enabled and pending, so only check
+> +				 * the priority.
+> +				 */
+> +				if (irq->priority <= priority_mask)
+> +					has_pending = true;
+> +			}
+> +
+> +			vgic_put_irq(vcpu->kvm, irq);
+> +
+> +			if (has_pending)
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  /*
+>   * Detect any PPIs state changes, and propagate the state with KVM's
+>   * shadow structures.
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index cb5d43b34462b..dfec6ed7936ed 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -1180,9 +1180,12 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+>  	unsigned long flags;
+>  	struct vgic_vmcr vmcr;
+>  
+> -	if (!vcpu->kvm->arch.vgic.enabled)
+> +	if (!vcpu->kvm->arch.vgic.enabled && !vgic_is_v5(vcpu->kvm))
+>  		return false;
+>  
+> +	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5)
 
-> > My thinking here is that any new bits are almost certainly going to need
-> > explicit support (like with the addition of ZT0) and that copying them
-> > forward without understanding is more likely to lead to a bug like
-> > exposing state we didn't mean to than clearing them will.
+        if (vgic_is_v5(vcpu->kvm))
 
-> I understand the 'secure by default' intent for enable bits, but I'm
-> concerned that this implementation changes the current behavior of the
-> host kernel, which isn't mentioned in the commit message. Previously,
-> both the feature enablement code (cpu_enable_fa64) and the vector
-> length setting code (sme_set_vq/write_vl) performed a RMW, preserving
-> existing bits in SMCR_EL1. This new macro zeroes out any bits not
-> explicitly tracked here.
+Otherwise:
 
-The behaviour is unchanged since we're always choosing the same value in
-the end, it's just a question of rearranging when do it which is the
-explicit goal of the change.  There won't be a change in behaviour until
-later on in the series when we start potentially choosing other settings
-for KVM guests.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-> In terms of copying them over, if they were set from the beginning,
-> doesn't that mean that that explicit support was already added?
-
-That's a bit circular, with the new interface if someone updates the
-kernel to set some new bits they're going to have to update this code as
-part of that.  A part of the goal here is to make it harder to make a
-mistake with remembering what needs to be updatd when.
-
---KOrZZL+m63ovft+Q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlf0+QACgkQJNaLcl1U
-h9DQbgf/VzVntYNXV0km5HLDgB/SG9k64BqiNt0fbx3g83qjVtQuNw5OJfx/AI40
-3CRrW3Hr1lIspMdVhwa+8lv5cpSyGzWnLWbmRJBVb6v++Hsslg9O824KM1LtRJqZ
-herBG1MKR8P2+yGtEt2cxbABtHH3ONEEFdEIOiGDAH7jkRY36Gfwx6QwV8/QA+Ey
-81r9gsksZDexFnwMz51S8jMdplvo3wMaDOQnytnH3YzQ9vC0B3Gfre+cAjqF2b99
-xN9M8G1+jCOiBeLIDPIEXCC0RPPOJb+mEpy6yUcn7l3k4AaReGbGrqBPtboVRUFT
-dB+n4q24DpQwRk1kIs62RHkorXoV/A==
-=Ud9D
------END PGP SIGNATURE-----
-
---KOrZZL+m63ovft+Q--
+> +		return vgic_v5_has_pending_ppi(vcpu);
+> +
+>  	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.pending_last)
+>  		return true;
+>  
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 978d7f8426361..65c031da83e78 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -388,6 +388,7 @@ int vgic_v5_probe(const struct gic_kvm_info *info);
+>  void vgic_v5_get_implemented_ppis(void);
+>  void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
+>  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
+>  void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu);
+>  void vgic_v5_load(struct kvm_vcpu *vcpu);
+> -- 
+> 2.34.1
