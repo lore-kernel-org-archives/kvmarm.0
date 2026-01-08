@@ -1,298 +1,546 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012009.outbound.protection.outlook.com [52.101.66.9])
+Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011015.outbound.protection.outlook.com [40.107.74.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82E94383B5
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 09:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.9
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767866154; cv=fail; b=C4Rjx0JdzuTxuYEY9KeYf3ZoaijZ43U0frnlO2rBHiDqn6epOVIPmTHpInXuqEacSGQRccw7T7yVta+ZY7pVOD9ClmS3ZbB3scOjZZQwQeGgXSqlNtbsGbezy6Xsx2Hj8GgzywsPWizBbyATgxskt5DRIpZnbZmG5hXDlEJMrYs=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767866154; c=relaxed/simple;
-	bh=MAu1Dn/bm3+J4fPsA1ta5md2/e0e7aYW1dXuqIbgaA8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9493D7D13
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 10:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767866805; cv=fail; b=V66Q7VzaJgvLpkYj4qnybQkPXvEq7c9l+2xmP0bNJdzqpT+nCes38nSSzQ9TnTh2SQe1Ht0+ob4R6Bbd1tOc7UJybx8rbwBoSCeS6kj1IJdQLyLuys0judFkFfYlsIKzT3ZOmE2MuOwZF81jeMD8S587UXSAr0cWSagxpMZIFtY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767866805; c=relaxed/simple;
+	bh=RW5Pe0XOUXwZcw40S3yh9eNqw2VoRLaW/rSoQklnohk=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=by0L7ubDytoMcmIVfZP9pVzwLxsg5JMnh1OqwhMiyB7GqwtN1cXYdL+Xbel2cU418iUOWtmcQEf/ki9u7dvZjf0R3+iTjThRVNx9FIU0ItdOUnU7Q8KzlLxnZ7oFbSgv6vX8jJjq8VBN4Bu9WUNJiVtEL5Nug7TrU2eax/tD74w=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VFSEs3wC; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=VFSEs3wC; arc=fail smtp.client-ip=52.101.66.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	 Content-Type:MIME-Version; b=bRwjdpB4EcrhGZcWERxmMzQomb8W5t3KMLrwmH0aG9ILp6jUCKY6gTMVDmPrqI8eGdAMjBu3R0z78p0ov2u7bK6gN/erWB6OqI+Fy9ly5S8Tx0YRG9ofVa1+kOPH6bQBF+QprNOgVCv+PXh3GS5bunAoXqF3+W763dwCgyVku2M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=LL9TOOrn; arc=fail smtp.client-ip=40.107.74.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VFSEs3wC";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="VFSEs3wC"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=vGBpGew/0nuysYqWpUlrmLFYbq42e3JYdLZdaoBDPgO+kn5dERlvimuOod6oqELKQEvGEU0E0AVHqmxKKJ5KCg1WJErePK6dwK6Tj+j9p02e59jAcbXuKUN6A8t/hoCW7znbWaSR7LhHsqeZAR4FoF9/EuueLkubp5rGY7IDhwn8yuK2l2qrKneF1ZISNtAHrqlnBXTUfOhpASIm3RpuOKUP2K9iJ7tJN12irQprQ6wJGWU5uycU/OZAuz32xRvkxw/qu9tZomPvhcaizVSUdLLg32emZlpZ1Qxj/sXVDtFcAYhxihPki61m+QGxErr9kvyfD02fskys2imQ+wa6+Q==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MAu1Dn/bm3+J4fPsA1ta5md2/e0e7aYW1dXuqIbgaA8=;
- b=yW0OI6MLpEyl3c7n+xMcCKd/okiFtv/B6IwU0I0TohOnu+4cAGnkLWKq1yZzcI1ex2FMNGiMGHpiPmwTnDnoee0Fqot+LTimqlRTikSsnl9CuQqhNEdNYf5PU67vtgWS3Iqf4YsZaLXTCbOtWH/OcnFT96Mj375ML0L1Bs252FDgl0qfrGks+UdwuTe1WRohGOG6N+b90It0obTU2ACY6Pvg9Svs8xezz5gpr8BDq2JIOUKMb5JVMt1GZBlY2LGZvalXYbNBz0e87off+FHsj4b6Kyvo5B1vBG5dq+a/X047xh8sfiyEeWpluVsKvwwBn9JkMP+U3jg8DTBio5wOQA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=huawei.com smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MAu1Dn/bm3+J4fPsA1ta5md2/e0e7aYW1dXuqIbgaA8=;
- b=VFSEs3wC8rJyRmX5VLBm/bkESGk3ucMiLgjiR+FMV3lsr20wAWrgkHws6fzbOjtaE802I1B9BlKWvVudEoEZBZh5SgD89mwpf3QPclF8vaxzDLCZExC8cnbrJ0gwAA757sr3dCipDilEB3+dD8UKrZ3APwLUaiWc38ofNjBeU2Y=
-Received: from DB3PR08CA0005.eurprd08.prod.outlook.com (2603:10a6:8::18) by
- PR3PR08MB5754.eurprd08.prod.outlook.com (2603:10a6:102:91::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9478.4; Thu, 8 Jan 2026 09:55:37 +0000
-Received: from DB1PEPF000509E8.eurprd03.prod.outlook.com
- (2603:10a6:8:0:cafe::9d) by DB3PR08CA0005.outlook.office365.com
- (2603:10a6:8::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.3 via Frontend Transport; Thu, 8
- Jan 2026 09:55:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509E8.mail.protection.outlook.com (10.167.242.58) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.1
- via Frontend Transport; Thu, 8 Jan 2026 09:55:37 +0000
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="LL9TOOrn"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LYa7rIsUx/nQBGMhJElw+XaYlMaTAjEY+L6uDotGr5vJtg0CjnmpO57mwUquEqFrajQcPTFjpDZ7PFqGhzznHyG8fDReTHvy4r8//b+6+y+x+Ag9QxbtB7NfBSLzSywuYt0EDYSI/jI3cSf9f7uPz8Zwas1X4I+qSCVE4bafjBw1iBsLxIn//eBxySrwUEtIvjYPH+7b4C/pHsyp1V4BVkhMvshSChtU8XDrAImZwC/BvJLTHt9KHAJawArw1kgYvi1si1vrOR98efTKtdhnTjMB7P85Ez3rOwTbc3h3kNDqCXM7P4C62BLoPjrd1fsnN5SAcYy69GlX/BaTEtgZtQ==
+ b=SrDM6k7QfeS8fQkLN0MUvhP/EuiQuyNxd8Tu/rhYAULnYpLxGOZiv/oTa2naPj0OVAJgrhhum6lQnp7pqdYTCHM2B5bhqZZFhUCelWxIKA5qM6/iVXQ7nb7wrZn2x0YUUi+qqQQg5XxbTRlFqVmzEUnQCyd7xyIlYO0NrsG5WvLjCv8MvowYUOXWFIY7Q4Nb3JkPPzlTrICFSdv/xQ7x+pkVd7bUfyz0tk9IPpea0fSeaYJgg04QD9fBzxPDWdcf13aUdpMr/CbGE8NWNXDJApC3vg3GVtSGQWL3v1vQR5m7e+zC/wct4dKFtDnGZakgwjbH9Z+9nv8wtskIbrvAjA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MAu1Dn/bm3+J4fPsA1ta5md2/e0e7aYW1dXuqIbgaA8=;
- b=OXVFTxVIfYy1tdCjUYRE6GfP0QEP9YfdFCFy+8GpxDOMJ/MF5ZKwSoOa8ydY0r8zie3EB2DNL+mpsTLOuz/W6NQtGGfadoNVfGEBe2WBGhYGsd9weWXtvVzO9GnSb5mtV1q58tz5he8sDm6wWkvGz5gqLymWenhw4iIOiH/3vmcbZDYqczeV0OmchV4c5XsPtDa/71sTv/guKBfMgehVRVl/HEmyCq9WVcLN48vVqqNQdB+xGXTs1Y7FRAav0FEwX7aAflX7otqGaM2ucBA6ukLI0EYb/TwnmH60naAjvCxlAP7ZRwxqo9P8Dc/IJvg7w8sg8WgLgc9bBzKK4Vz4cw==
+ bh=UhmuWdDldKpEkZuj+IIlPPNYhgUUy6WffEQ6u3PXw0o=;
+ b=a5In+TX+KakDj2WEK9YsjlLTK5P4pr2eKJ8RjEtyXpYqX0A0As5vCWjtSnKVSm7cxKlx3CKhxm33ccbc/S0ZmIj5lnKS8omcq69vxUUD0j/pzZ5uUvhwU3wBc41mN89wxMsBuX5ihxEfIHNCnvYivqLu5dkMlJh98oDKfpddazGhDWxTnQ+Ay/eoU0KYZXmK9th8Op7bx3IVWa2DcZdmpVjfuxF/plYA+u8Z7wlaSDk1Na5RcoR/AA5HnwClsr/oO4at4RbF5SwXa+Mjdbvt5XB1b2WRqznXu8XtyN1E8GApN/rOcX5s8JfyEQqF7SXiBbiNsRjlV23jDWQbT6/r2g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ smtp.mailfrom=fujitsu.com; dmarc=pass action=none header.from=fujitsu.com;
+ dkim=pass header.d=fujitsu.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fujitsu.com;
+ s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MAu1Dn/bm3+J4fPsA1ta5md2/e0e7aYW1dXuqIbgaA8=;
- b=VFSEs3wC8rJyRmX5VLBm/bkESGk3ucMiLgjiR+FMV3lsr20wAWrgkHws6fzbOjtaE802I1B9BlKWvVudEoEZBZh5SgD89mwpf3QPclF8vaxzDLCZExC8cnbrJ0gwAA757sr3dCipDilEB3+dD8UKrZ3APwLUaiWc38ofNjBeU2Y=
-Received: from AS8PR08MB6744.eurprd08.prod.outlook.com (2603:10a6:20b:397::10)
- by AS8PR08MB9364.eurprd08.prod.outlook.com (2603:10a6:20b:5ab::13) with
+ bh=UhmuWdDldKpEkZuj+IIlPPNYhgUUy6WffEQ6u3PXw0o=;
+ b=LL9TOOrnLz4R0GC0xyj9FqL8dQ4Uky+ycHLUWYSBA58dPgwgy3jN38hPmXRBDksKDwlqa5QJN1122TlbTdWacgaJku2aAEkokagtMv9brwNhKCYPmYJGbO11+eKMsNx58jA108BuIkYeUvYDRFVlks10mBllfpEgj2k2wUe4ffRmTnksQbbsdOjZdOVKZFfTOM+Rmb41EKiebdHAMQFQ3WxsM4ZeURRrENSZ1+gsCpzm96Rd7ybC5gAivs96ShnfNq45r9Qe0PL2LwjviHwKEZWJ/2HXsblcVGAfO98vMWMapjkhIyWfiHN82TE5zIaTHxpIuDq6CHIFNIQCj17GXA==
+Received: from OSZPR01MB8798.jpnprd01.prod.outlook.com (2603:1096:604:15f::6)
+ by OSCPR01MB13198.jpnprd01.prod.outlook.com (2603:1096:604:350::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9478.4; Thu, 8 Jan
- 2026 09:54:33 +0000
-Received: from AS8PR08MB6744.eurprd08.prod.outlook.com
- ([fe80::c07d:23d6:efa7:7ddb]) by AS8PR08MB6744.eurprd08.prod.outlook.com
- ([fe80::c07d:23d6:efa7:7ddb%6]) with mapi id 15.20.9499.002; Thu, 8 Jan 2026
- 09:54:33 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "lpieralisi@kernel.org"
-	<lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>, Suzuki
- Poulose <Suzuki.Poulose@arm.com>, nd <nd@arm.com>, "peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, "maz@kernel.org"
-	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
-Subject: Re: [PATCH v2 10/36] KVM: arm64: gic-v5: Sanitize
- ID_AA64PFR2_EL1.GCIE
-Thread-Topic: [PATCH v2 10/36] KVM: arm64: gic-v5: Sanitize
- ID_AA64PFR2_EL1.GCIE
-Thread-Index: AQHccP+A2Tk0cVHCD0G6AA5H+3aHGbVGpv6AgAGAlgA=
-Date: Thu, 8 Jan 2026 09:54:33 +0000
-Message-ID: <66960fc2d53ac7dab5396ba76e2e2b80faae565d.camel@arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
-	 <20251219155222.1383109-11-sascha.bischoff@arm.com>
-	 <20260107105803.000050be@huawei.com>
-In-Reply-To: <20260107105803.000050be@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.1; Thu, 8 Jan
+ 2026 10:06:33 +0000
+Received: from OSZPR01MB8798.jpnprd01.prod.outlook.com
+ ([fe80::e366:d390:4474:8cfa]) by OSZPR01MB8798.jpnprd01.prod.outlook.com
+ ([fe80::e366:d390:4474:8cfa%6]) with mapi id 15.20.9520.001; Thu, 8 Jan 2026
+ 10:06:33 +0000
+From: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: "amitsinght@marvell.com" <amitsinght@marvell.com>,
+	"baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
+	"baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
+	"carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
+	"dave.martin@arm.com" <dave.martin@arm.com>, "david@kernel.org"
+	<david@kernel.org>, "dfustini@baylibre.com" <dfustini@baylibre.com>,
+	"fenghuay@nvidia.com" <fenghuay@nvidia.com>, "gshan@redhat.com"
+	<gshan@redhat.com>, "james.morse@arm.com" <james.morse@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+	"kobak@nvidia.com" <kobak@nvidia.com>, "lcherian@marvell.com"
+	<lcherian@marvell.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "peternewman@google.com"
+	<peternewman@google.com>, "punit.agrawal@oss.qualcomm.com"
+	<punit.agrawal@oss.qualcomm.com>, "quic_jiles@quicinc.com"
+	<quic_jiles@quicinc.com>, "reinette.chatre@intel.com"
+	<reinette.chatre@intel.com>, "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
+	"scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
+	"sdonthineni@nvidia.com" <sdonthineni@nvidia.com>, "xhao@linux.alibaba.com"
+	<xhao@linux.alibaba.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+	"oupton@kernel.org" <oupton@kernel.org>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v2 07/45] arm64: mpam: Context switch the MPAM registers
+Thread-Topic: [PATCH v2 07/45] arm64: mpam: Context switch the MPAM registers
+Thread-Index: AQHccRMRYC92ZSxNGkuKLdWYe8Oqx7VIKps5
+Date: Thu, 8 Jan 2026 10:06:33 +0000
+Message-ID:
+ <OSZPR01MB87987088A6A033D03458AD188B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+ <20251219181147.3404071-8-ben.horgan@arm.com>
+In-Reply-To: <20251219181147.3404071-8-ben.horgan@arm.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	AS8PR08MB6744:EE_|AS8PR08MB9364:EE_|DB1PEPF000509E8:EE_|PR3PR08MB5754:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d223b4f-f0d0-411c-ce2d-08de4e9c12da
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|1800799024|366016|38070700021;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?cTdDRDhJNEs2amJGcFdhQ3BBQlJHS0tBSlh5OVNWcXFMcDN5Q0Y5SE5SMktt?=
- =?utf-8?B?TzRDVmtudVZSb290T0R5Wnhld1AyNGYvaVdlck5iZkpEMUF2SlR1Tm5oS0da?=
- =?utf-8?B?cWpveDZkRVRLV0tydm8rV044dDU4a01Vd0RER1d0bHVCUlVQZnR0MWwrRDdQ?=
- =?utf-8?B?SytsZFdIWUNOR2xDTUJDa1FGbjdyZkVaTUJ4Vm42NTJ3T2RTMGdIR0hpWmZS?=
- =?utf-8?B?RU1mVkF2K0RiMzFKeC9HWklaSVlra3o2Zm85SlYrQm1CQWM3aEdPc1ZTQXNx?=
- =?utf-8?B?UXZ3L3p0ZWppalVhcEZ3V2FFaGtEbW5CNEVUaFZIZk1kMUIySFZyZnErSkpE?=
- =?utf-8?B?MzNBWjI1RVJGbGZYYjlUWlRTNlU4Zk9NY3NzWFU3YU5USE1sNEZSWG5JelVX?=
- =?utf-8?B?Y01QOTdXY1kyMU5MS0hhQ0JrUXl5TkRZQW9uQWFyTUNiazc1anI5QUMxcExV?=
- =?utf-8?B?MlArVlloWmtlMjJFNzFNOWtwVDZRUGtiSDNScmxQVmtTVkljT1htNnVBMG9t?=
- =?utf-8?B?RUVOQTlneFpkT09HcXBmMFpadnE1M1dIakdhM2NtSndQeUNmVFY0VC9MaUQr?=
- =?utf-8?B?Qmk0bThOUVo5ckJHK3VJMExDTmltREJ3ZWdYQ1dLQ2hJN2ZzcTJuYm1tMVpm?=
- =?utf-8?B?eStQYVdacXZxbnZ3Y1dVRVVOQXRzdGxKdWdKRURHWlY2MEJldXlZSmZGOEJW?=
- =?utf-8?B?MDdMVEFTTXpOcVVsV3AzNCsxNnRnU0xhMENEWlpDV1c3S0NSclBBeGZITE5o?=
- =?utf-8?B?WTRsK2NCaUwrcnZoWFlBQkRZVDgrYmlZb2lvSjl4T3pxbHpkdEo0dEUrSHFM?=
- =?utf-8?B?QXBBbVJnZGFBYzU1OUUwOTkzeEpTT0YyTitJNDFCdmZ4cUZxYXE2dUs5THla?=
- =?utf-8?B?RWxJUzlqVngreSt0NVdIdmdvQkFkK05jdlB6UG1UU0Nsb052c1FsL0lFbVVs?=
- =?utf-8?B?UGs2QmVVZE04eXovdkRZUFJ3dC9jcW9wbjlGRnNqZGEvYXZOU3QrSGt4Y09M?=
- =?utf-8?B?T3p3dEg2WXI1Rkk0eThJY2RocUJTMjBKT2p2L1BHT0VaSWtCM2dNVWxJK1pv?=
- =?utf-8?B?KzVuT084ak5mS0pwTHEyRm11eXNxVkRaSStsMHFyU25BVnZBVi9qZjZsQjdw?=
- =?utf-8?B?aHpDMzBxRUpmeDJzaktNVGJQOEY5SDVmRStyb1lNWCtEK0lBOWhXYWk0VURa?=
- =?utf-8?B?TkhhNkgrSmN0SnhjSE1sbW80RmRyOVh0b3cwS1dvTUFQYUNCUU9Fa0taWHFK?=
- =?utf-8?B?TGsvSGJMZ3VhN1pJUUp1RXoyd0l1emZFWURPalJlcHRWeTRiejRWaCtVOGQ4?=
- =?utf-8?B?SGtybVl2N2Jub0d4OWN3N2x5YlZVYnJ1eXNIeDg5eWxxOGcrVTBVZFJpNGtR?=
- =?utf-8?B?bHpjczF4ajlaTEhuU3duY3BDNTdoMVpSeklWaFBPdzhKK0VTVWN0dFZSSjdG?=
- =?utf-8?B?R3NmSUtjbDA4TkZVVEFNL01Jam5FQU05dGcwcXQ4WFM2L0tlN1Z3Um1xZzRt?=
- =?utf-8?B?Y2kwRGI3cm1TYXpkbWtycWhjWEQ5K3dnVGQvdVlxckZIMlRQeFVWR2Fwb04w?=
- =?utf-8?B?SWg0UXlTaDRCSXkxWldUUlFDbkp1UUQ2eTZnY1c4akZ5QlNlZmZiUDh1dThF?=
- =?utf-8?B?aUdqTDFFelluemVySFNXcVVHODF2cmNwM0lpZFhkdkh3RVNIeHVJQzBIYmVl?=
- =?utf-8?B?VXkyZE9OdE43VWpxZDFSL1ZIeThwSmJROHo5VjRjczVDSnFETTJ5b3BjQkZ0?=
- =?utf-8?B?MXFMRVpMMkQ5ZnZndk1pckdnV3l2TkJlenNWRHZYN0tZK1VHZ2Nxa1JDdTZr?=
- =?utf-8?B?TmlMNDlUVkxMaUJTeTcyRmhxem44NlFwOWlmWnpXRUNMNlZYMXc4ZkNWTTZo?=
- =?utf-8?B?NjZYMTBYVHlocDBHOEJSTFhETy9INVM2dVdTc1FQRG52aWpUYW1HZzdVaFRJ?=
- =?utf-8?B?UXpPZmd3Yk9DaW9ULzBPVXlYL01uZktLVmJPbCtoemRBa0NKOGdxUkxzcmRY?=
- =?utf-8?B?UUVHR3ptYm9EQlI3UU1TVjF0TUZ6bDF3Z2V1WWpTZmlGVFRNbitBS0ZXRERo?=
- =?utf-8?Q?rxxLNL?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB6744.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <20885025D6294B47810834BD8298EEDF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+msip_labels:
+ MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_Enabled=True;MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_SiteId=a19f121d-81e1-4858-a9d8-736e267fd4c7;MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_SetDate=2026-01-08T10:06:33.298Z;MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_Name=FUJITSU-RESTRICTED;MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_ContentBits=1;MSIP_Label_a7295cc1-d279-42ac-ab4d-3b0f4fece050_Method=Standard;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fujitsu.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: OSZPR01MB8798:EE_|OSCPR01MB13198:EE_
+x-ms-office365-filtering-correlation-id: 092ad6a0-d20b-403e-7d7b-08de4e9d9a2a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700021|1580799027;
+x-microsoft-antispam-message-info:
+ =?iso-2022-jp?B?dFFxTzhHUUFUSm9BSm5yM241QTJNUWlSMnhVUkV4Y3dDQlJwNnNjd3Q5?=
+ =?iso-2022-jp?B?UmJ5d2VLd21TR2JqZElXYjlwdkpHcTNtZVVIR250T1JXb255YXV4SGZ3?=
+ =?iso-2022-jp?B?eDFWcy9UeG9UQU9DamFtSFFTRSs1QXFqc0VwSVZLKytNRi9CaXhpTDFw?=
+ =?iso-2022-jp?B?UGswQVRmRG9DRlJyUXlRbVdkYjJ6RkJtelIrekhDR0prc0h4V242RFUv?=
+ =?iso-2022-jp?B?bC9qUHA1a2VoQ3V1cWtSTUtpVVNGSGlGeUgzTGZRL3RYdFlXYS9hbWZp?=
+ =?iso-2022-jp?B?VU5SdkRJQ3JsT0dVY25VdjYvdEgvSzNSeHJOMjdJbC9uVjg4akQ3N3lz?=
+ =?iso-2022-jp?B?NVl5blpSZDdhakxocnMwMXdKWVhhQzhrWnBQN2M2bmVLMW1USTRBU1R2?=
+ =?iso-2022-jp?B?QnpJdHRIanBmUlo2d2xhbW9FTjVIU3QyWUExNU9BbVNOek1RVHg4a256?=
+ =?iso-2022-jp?B?K1luTFlpVGFBcjZyZ3hIcUhZSmJOZ0JCeVJvVEhxSUtGL0M4M1hFc2Fi?=
+ =?iso-2022-jp?B?cVd6K0NSM3NXVG9jdnV2S0kvUTZhUEwvUTJYOEFIQU9Zelh5MXBoL01u?=
+ =?iso-2022-jp?B?SndyMFlwUXl6TTZVUUF1THR6LzI3MWNJRElCb0V4OGtuZmo3U1E4a1hv?=
+ =?iso-2022-jp?B?YkJPc1VwOHdEaEwzTjNXcC9Rb1lKdk1HMnJza0VGRHg1K1hSYTVXNWtw?=
+ =?iso-2022-jp?B?bkpYa3NSb1dlOWdxWEoyUXIxZGJYdlI5KzdpWnlSRmlGaE4wZXk1WEtv?=
+ =?iso-2022-jp?B?WHlGNWo2Q2tDUTFlc3doSGFFWjBrU1ZmTkZIcG1Dd1NGbnV1ZDE0dENZ?=
+ =?iso-2022-jp?B?MC9hTDNLQW9zT0pZUXk3c2RUUHB2NlAzM3dvQnlDbWNDVzJKV21TRER1?=
+ =?iso-2022-jp?B?emc5MXJnblo4dktDam5Ja2taWm1RNjNmTTVQdThMV00yWCs0TWF1Uk04?=
+ =?iso-2022-jp?B?M2g4NWN4dklmaldhZllVTkN1RGt0bDJZb0h1bGpCeUZnb1RnV2sydm1x?=
+ =?iso-2022-jp?B?cWVBUEZqZll0aDMzQkdLS1RJMTN6dDRybitkNzZFcUVkQzYzWVdrUncx?=
+ =?iso-2022-jp?B?YlJBZ1RxdVJsc2svUWNOUndBWHlLSmVvWkNsN1R1QU5INEkrMzlVRXRt?=
+ =?iso-2022-jp?B?SWJPUmhXZGFKREpPRll2U0xnTXZ5ckhFMWhrbDB5eEZ6Zzl4VzE3OW9N?=
+ =?iso-2022-jp?B?K1c2a2Vxckp1cWN2V1VuM0NXb2ljNkJQOVhma3ptYXhmSU5WZVpNbTVz?=
+ =?iso-2022-jp?B?L1J5VGVYc2NrSTdqTE05OWlLQlp0R3RuOHJmbW1yTVhhME9RcWxXZE0v?=
+ =?iso-2022-jp?B?QU4zNUY4QWJJaHA4Qys2ZFNGeEQ3OXl2SDkwQnpCNGJrbDREOWNJU0tQ?=
+ =?iso-2022-jp?B?UnNudzU5NTlTaHY2V2Y2cnQ3ZlRjUnFBb3VURzY4c2JIUXF5RlF0a3ox?=
+ =?iso-2022-jp?B?RFBkbWtBU1B3Si9HNVRLQnB0TlFLTkd5TzF4NXVKd2NSeDgrYUx2dkhm?=
+ =?iso-2022-jp?B?cUYxaC9tSFNVMVZDYzVGZlRiQ0tVVUkxckV0VHlIUURLcFNZSTg2SThG?=
+ =?iso-2022-jp?B?RDJNeVlOUnNvZnJ4MUpQVnY5Y1RkdHVYUmcvVlVHZnNSMExnWnNiOTB4?=
+ =?iso-2022-jp?B?U3NBQi81RmFNT09OZG9kdjlZZGZkNlloM2w3L0gyWjBWcUFSajRyN1Nq?=
+ =?iso-2022-jp?B?SlFIbjdZNEhYa1JrTDNmV1FVWUV1RmdWck1qVk9seW5Ta213UmF2THR6?=
+ =?iso-2022-jp?B?QWIyNUxkVzBPWGhsQ2Nld3lucXAzM2NFY3ozbVZxb0k3OVZpT3VGTDVC?=
+ =?iso-2022-jp?B?cEVsSE1PQXczZDZHQk9jVmUvQnh6TGliYzMwcEo0WlY1cDd3RW10L3M4?=
+ =?iso-2022-jp?B?ZU1NTExIVkRMdEUxckxoWEIwNFRXRGlNUDNjL2hIaW5iK3NvdDQ1eUo2?=
+ =?iso-2022-jp?B?T0dQVjB5VUpDRUdrcURQZVlqcHdZaWxWd1ZsMWl3bkcwR2QveWtVc0ZX?=
+ =?iso-2022-jp?B?aUt4L2lXeDV2SWdFamJ1SDNGV2hxRUNWaHZEQ3NnUHdVQ2RjSkxRdGZI?=
+ =?iso-2022-jp?B?VmJONGZHK0xVdElpaUN4ZmFuRGJreE1LcWxKb1dFQTV3Q09yemc5L01v?=
+ =?iso-2022-jp?B?RjVMSXRyL2ZmUzdySFdDUjhET00yMDFtaDBhMzJLdmVhRFlDeEdNOVR4?=
+ =?iso-2022-jp?B?dGlTTCtFLzRyNXdlYmUweWtnNU93TXNOVW9Vd3V6dFM5Qi82WGx5Wjg2?=
+ =?iso-2022-jp?B?QyswUT09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OSZPR01MB8798.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700021)(1580799027);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-2022-jp?B?WSt2UnIwSGR2bmsvN0VpY3I2K3F3TnZORjlLR05RR3hodENoOC9RNzE1?=
+ =?iso-2022-jp?B?UTEyRk5PSkp2SURLbHBkdU05aE0xU0U5S3EzaXBZandVdkNqUkF3cmFp?=
+ =?iso-2022-jp?B?TnovWnhVZ0JhYlRseEo5WFRXWFpDc3U5VktEb1A2NWlnVzZPdGlEQXd3?=
+ =?iso-2022-jp?B?OGtyM0ZJcERrZlMvMVBFbHRSMm43UEQvWExYTVRHdE9DV203R2dLZDl0?=
+ =?iso-2022-jp?B?T3d2VkVjMkpEK1JQa3N1dEJITW5OLzBNNTFudXkxVmRwWjRvV2N5Q2Vq?=
+ =?iso-2022-jp?B?TmRSNXpha21XK3c2bUUyWTk3VHlIWVBQNzQwMjFCWXA3aWJnWHkxaEFi?=
+ =?iso-2022-jp?B?L240UlNJdmg0V0NlRVFYb2gzRXBiRlBhQktid1JVTGVMVEtrVE51UXhu?=
+ =?iso-2022-jp?B?VjRHQ1cvTWxWaXE4dVBQeE8yMXFLdGM0dHRpY2JzaUl4TWZ3WllJVHRu?=
+ =?iso-2022-jp?B?eTBDQ0JTbFVxMXBjQmNKQnhtSjFsQ1FCZnFKd0ErOWJTVHlGd20rUEJP?=
+ =?iso-2022-jp?B?bDdYdmVGNmFWdDIzWDJWUGoxVE9XTUM4bUY5MFlWTW81Z2MzbStWbTBo?=
+ =?iso-2022-jp?B?UzVHa1Y1NEs4NmpZT3pWMjhXQTJhZ3gwYlIyUGg5elJXWlpjcXl0WVdp?=
+ =?iso-2022-jp?B?SXBrWU45Sy81T29xZjJaaDRHaklISEVmNFE5M0R4ZXNmOVVsbzdwSURn?=
+ =?iso-2022-jp?B?bS9kTWxHY0E2cE1MV0FrcjNZK0s1TmliNU9OMEJNUEliWjd3N2tRdTZv?=
+ =?iso-2022-jp?B?QllLaU1PQ1dLMHFkYkZ5T1NvMTZid1Z6dUlOKy9vMVpHelEzRTFLSmp2?=
+ =?iso-2022-jp?B?bUJxdzVGYWttTWZoNXp2b1RRU1g2RG16cWxrQi9wbE5BUmI4VEpIZHVL?=
+ =?iso-2022-jp?B?ZDNxQ3czb1J5WENvdHFlYklIeVVxWDF2NmhkVjZDUnJlL3lTdFRaNkJh?=
+ =?iso-2022-jp?B?bFRpQ2dIcFBWSlV5MkhOY3loV0o3ZzBhNGlmNWloRVFiUjZHTlhiOGFM?=
+ =?iso-2022-jp?B?OGZCQzlNTFJjN1kwdGNQYno2U3NoWFpBQzNXd1FHc3RNaXF3dFZSaURN?=
+ =?iso-2022-jp?B?MmJjaVBKZzlld2grZzhESzlIdS9HZkVlZ011UDdiVVV0UlVTbDhyOWR5?=
+ =?iso-2022-jp?B?enAvSUREUytnS3ViME5lbjZudXhOSDRIWUNwakZycGM0dVowWnliZXpi?=
+ =?iso-2022-jp?B?V2YvSHpiL0UvMkZMN2xUMm1xTWpBY2dGVzYyZ2JBTVJ4NkkzTkJPQ1RC?=
+ =?iso-2022-jp?B?d0JSOEdpb0dIV0x0K2Z5N0RJUEZzL1lTdEI3eWo4NGlBSWpqWnNQRnBT?=
+ =?iso-2022-jp?B?QnVCWk1tb25iUkJ2elNST3FOLzFMbjdFMUt2UEs1OWVZQ0RBeDNwd1Jt?=
+ =?iso-2022-jp?B?WnR2dHlVR2xLQUtJM1NqR01WUlFQZ0E5OVJXYTMxcktRVFM0aU9icG9n?=
+ =?iso-2022-jp?B?aFdGZ2RDcllBcDdFZ3BzREJVZUV5VXR3YUJ3aHVHN0lTRzBadlJ4R09r?=
+ =?iso-2022-jp?B?d3k4YmZ0WmZYajhqU25mbHJwZWVpU0IvN200cGZKK0xWMnpJU1E2VVZQ?=
+ =?iso-2022-jp?B?ZUFSUGc0c0FFZEg3OFh5Tk1YRy8yWVZIWGpIMzd2Q3ZCT1ZYd242VXFv?=
+ =?iso-2022-jp?B?dDNHRmZ5bTArNGUzbUswVEtVb256Q0wrMDFrdTZBaGEwR01WM1hKRzBl?=
+ =?iso-2022-jp?B?ZC9WNXp2YnYwL0ZBMlhCYkc5VkRPaDlPRXBSKzE0aGFCVmpoMGRNYWNL?=
+ =?iso-2022-jp?B?NUE4RUQ5ckZkV2dhL2tnMmN2RHZzQ2UrRFQwOXRVYW9VMHRtMEhsZTda?=
+ =?iso-2022-jp?B?L2toallpL25MZjl6N3oxNTBLWlh5eEpDbE8vakxwcjV6N1hKb3FjSzEz?=
+ =?iso-2022-jp?B?VHlJUDVXUnRsQUk0cjdoWU5TcC96MFZjKzVKWVJ4V2VUb3pVaXZYMjU0?=
+ =?iso-2022-jp?B?ZHgrQ1U4cDgvT2xyUmVyTkhVUEpISEtmZC83b0tPZi9Bbi9vTTNZVzZM?=
+ =?iso-2022-jp?B?TTF1UDdQZ0tTSGM0eW1WNDdpNldaZkFHZ002U2VYdGVxUmNIbmJobE9p?=
+ =?iso-2022-jp?B?cHhoc2RvK0VoenZyNi9CVlBLMlJZc0Y2RW9KWDMxK3FFSHZXQ2Q2Nk9U?=
+ =?iso-2022-jp?B?L1Ixa0Npcm1iaGMwaEtEamJlSEZMMWlRaXhKaGxTcVo2eHRlZGVtT3h3?=
+ =?iso-2022-jp?B?bDRIT0VOOXQxNERFdzRMZXd4MGNibDZHNW96WXBWMzBxYkExcGlDQ21v?=
+ =?iso-2022-jp?B?allQWURBdGt2Y3Z3aWYrYkxQTXRkUnUxRE1Bb3VVR1JjS3QyK04xQWxW?=
+ =?iso-2022-jp?B?YWRWQSs2STRDZzFUUGZ3SFJCanJQckZuOWE3Y1hQMDkxS2U5WE9ZZlZB?=
+ =?iso-2022-jp?B?TXRaa0picjJ3cnZnNTJ2azlZTXNoYTdvZDJiWUZDbldWVld6Y0tlYVZz?=
+ =?iso-2022-jp?B?bWZ4YzgzbVg3WGtVaUFyR3FDU0RTTkdRM3FzQ3YyNjRvVnpNTXlwUkx5?=
+ =?iso-2022-jp?B?TjdRZ2VhUzRVcEFVMGJ1V0srV0s3ekxPUjFRdz09?=
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB9364
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509E8.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	aefe7063-f7d7-4b7a-2246-08de4e9becc5
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|35042699022|1800799024|82310400026|14060799003|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?K29nRnl1L0ZUL282ZGdCYnhsb1FGU2RDM0txQmtza1lkeWozSUY2M1hmc2xC?=
- =?utf-8?B?b2lmazlBZnRaS21yRFhFYkRMT1VhSEpPekh3amhnOEpNWU1kRW9wejVudkdx?=
- =?utf-8?B?T2Q2YW1vNnYvY1UweWxTdHk1UE1YK2g2U3ZxelRVc2w4TVp0ZllzTm0wV0gw?=
- =?utf-8?B?b3pPU3NnKzlLZEhUSTQrem1QSkR2YzRpVHFRcUl5Yjk4aDhKV2tVWTJKZitE?=
- =?utf-8?B?SFM4K04rbjZDTktkR2NSRmtneGxaYjlWMk9qNERtKzZkZmk5dlk2Y1ZpK3NQ?=
- =?utf-8?B?aFVocDJZYmtnV2lwanppaUNaNGdHeFhESGtlaW5WdnpYdTBOeWZWc1l1czRa?=
- =?utf-8?B?MWR4bmhuRnhnZ2JuS2IwRmpRcDMzSTl2OWlYMFNqWFBBSzRLRzV4R0x1ZkRt?=
- =?utf-8?B?cDhkQjlLRXJIMjRaK2o3NzVmMTVVQ3cxRHpHbmk5ckRQL0ZxYXVpbXVmMzRY?=
- =?utf-8?B?NVh2cFFHSk1kTndMMkdjOVk1Q0s1SXR0d24vT3ZGME5LaDd2L05YYmtSYU9R?=
- =?utf-8?B?eXJvNTFqZkNGMVpzY3lTY1ZqM2VXZEZOb0pqcG1YbkV6cGVLYmJ0dXdCekEz?=
- =?utf-8?B?Z3JWNFlpRWIxZDNKMTA3OGtGbWsyaDFDR1dybVBhL1lpR0NWYzhDdytVN3Ay?=
- =?utf-8?B?Q2ZCdlhkRDdwdzJGTjhoNlkxMEZwSGJuaUMrdUxKZFQ3YkZtdWVscTBtZUFz?=
- =?utf-8?B?OUs2aHVJNWxCR3MrZko3aXk2aTE1Z0Q4Z0pnemhTUHRXRDlONlpJYUVnSEJH?=
- =?utf-8?B?RVlmYU8wajNwRTlHYnFmQW9raFRSQkZtbWJoR0VEZGdoWFhzTXZ1Y0V6SlBK?=
- =?utf-8?B?SGVNT0EzcXRoQ0krL2lOa3RtTzJJZ2d5VkhDbWtKSVArRzM5VUM1ZDFYcHQ4?=
- =?utf-8?B?U004UlNIYjM0UnI0c2xydGpLVXFMemdVSXR4Vlk1NEFacDB2ZGdBa0lCSE0y?=
- =?utf-8?B?ejZ4UzI4aWk3ZENKV2pyUnR3Zm91eVpUeWJuMWhwenloSFVtUHFGejlNa2pR?=
- =?utf-8?B?bys0NGxuS2tPMHRtdnkxS3BNODlPbWd6c0Q3MGE1TUlQS1pUTElvZnRPM1lx?=
- =?utf-8?B?cHhHWWtFS1lPTFZ5bytNcEtjYWlVWEk5YzhxYXBQdGVDOHBnK3VxajQ2NkVS?=
- =?utf-8?B?OU5BQ2pWQlllM2dsVFFNVytpbG9Eb25PSlhLQk5UTTh2d0pRRGg3UUFJTEpB?=
- =?utf-8?B?ajdrajZDd2Q5NTlJZy9PQXBXQzhNYU5LY2U5bG9DcUJwcTZMQVgrbXJEelN1?=
- =?utf-8?B?QUlEU0piaUkrZXdnTHBreEhIRFUzNVBjSjU1MU5aZG01dDBKd2Y3M0JNemlL?=
- =?utf-8?B?M3ZwckpBaVVDcjBKMUIra2V2Tk12STBVVm0yMEN1TUpjdms1b05UbC9DTHps?=
- =?utf-8?B?cUZ6TUo1Uk4ySlFic1JNNUkwenVjTXkxNVlFNGVUNGNCekl0WEtreVQvWVZW?=
- =?utf-8?B?UnJ4dExydDArOW1BTDFFaTNiU254NDBBSGRGb0I4V015YksvYmJiQWVtS1ZZ?=
- =?utf-8?B?WEhtL2llYkNBZHFVQWlUVkpPL29SZ1BCZEhzMHpaTy9CdTg2ZHpsNkFVOGt6?=
- =?utf-8?B?NEh3cWNDY2dMT1Zudy9Eb0hMZk96QkwzNG03ekduODRTQWVqUXNuUkxVTlRL?=
- =?utf-8?B?bktFNzhQaS9EM0VwMUFsOEpKa1hyUUhVVldteTZJOFM4Snl6Y0NXUWhySTNa?=
- =?utf-8?B?VzhNOEpESzRVMmpOL1VLWUpta0plWnJZYjBWNkN6QzRBZnV2cWg5bDJDc1ZT?=
- =?utf-8?B?VU9Tekc4N0E4NldVM280RUl5MktrcFRqU0VPTm9sdXd6NE4rOHU0WXRPUys3?=
- =?utf-8?B?UjlKZ3dUVmVBeHFWa3l4ajNCWmFtek9VcE9WSU5OQWZYMDB5UUdMbGdtNzM2?=
- =?utf-8?B?Z2VjT2x3VHNqazMwOFFqUFltRzR0SW1lTzBxUVBJZTlEaVhUSjZwakRiWFVM?=
- =?utf-8?B?aEwzMjlueFVTU2c0bjd4L1FqWk5YUWg3Y1ZqL2JmRXVlVzdETlJQK21oT2sz?=
- =?utf-8?B?cFU0VFRmWldNMEdkLzRTRUVrNWdRV2ZSSmtrWmxpdTY3S2pDd2JlclFiMjBO?=
- =?utf-8?B?QnJlamcxVktYNUlPV0g3bEVlWWREQWpaUU1mTW9vWmF4K1ZNMWcrV0I3NkdH?=
- =?utf-8?Q?MoHA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(1800799024)(82310400026)(14060799003)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 09:55:37.0296
+X-OriginatorOrg: fujitsu.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: OSZPR01MB8798.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 092ad6a0-d20b-403e-7d7b-08de4e9d9a2a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2026 10:06:33.6285
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d223b4f-f0d0-411c-ce2d-08de4e9c12da
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509E8.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR08MB5754
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a19f121d-81e1-4858-a9d8-736e267fd4c7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QCKi4Ag0QJuxRWhlmMwju9MQKp7HBG4XA/Cz1nVOIIXsf5EFSPQkQvIArMAq7DGQH8GxcPXTYTkmclrG1xNqk1SpM1Lw5uxMcxYxhugdt6Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSCPR01MB13198
 
-T24gV2VkLCAyMDI2LTAxLTA3IGF0IDEwOjU4ICswMDAwLCBKb25hdGhhbiBDYW1lcm9uIHdyb3Rl
-Og0KPiBPbiBGcmksIDE5IERlYyAyMDI1IDE1OjUyOjM5ICswMDAwDQo+IFNhc2NoYSBCaXNjaG9m
-ZiA8U2FzY2hhLkJpc2Nob2ZmQGFybS5jb20+IHdyb3RlOg0KPiANCj4gPiBTZXQgdGhlIGd1ZXN0
-J3MgdmlldyBvZiB0aGUgR0NJRSBmaWVsZCB0byBJTVAgd2hlbiBydW5uaW5nIGEgR0lDdjUNCj4g
-PiBWTSwNCj4gPiBOSSBvdGhlcndpc2UuIFJlamVjdCBhbnkgd3JpdGVzIHRvIHRoZSByZWdpc3Rl
-ciB0aGF0IHRyeSB0byBkbw0KPiA+IGFueXRoaW5nIGJ1dCBzZXQgR0NJRSB0byBJTVAgd2hlbiBy
-dW5uaW5nIGEgR0lDdjUgVk0uDQo+ID4gDQo+ID4gQXMgcGFydCBvZiB0aGlzIGNoYW5nZSwgd2Ug
-YWxzbyBpbnRyb2R1Y2UgdmdpY19pc192NShrdm0pLCBpbiBvcmRlcg0KPiA+IHRvDQo+ID4gY2hl
-Y2sgaWYgdGhlIGd1ZXN0IGlzIGEgR0lDdjUtbmF0aXZlIFZNLiBXZSdyZSBhbHNvIHJlcXVpcmVk
-IHRvDQo+ID4gZXh0ZW5kDQo+ID4gdmdpY19pc192M19jb21wYXQgdG8gY2hlY2sgZm9yIHRoZSBh
-Y3R1YWwgdmdpY19tb2RlbC4gVGhpcyBoYXMgb25lDQo+ID4gcG90ZW50aWFsIGlzc3VlIC0gaWYg
-YW55IG9mIHRoZSB2Z2ljX2lzX3YqIGNoZWNrcyBhcmUgdXNlZCBwcmlvciB0bw0KPiA+IHNldHRp
-bmcgdGhlIHZnaWNfbW9kZWwgKHRoYXQgaXMsIGJlZm9yZSBrdm1fdmdpY19jcmVhdGUpIHRoZW4N
-Cj4gPiB2Z2ljX21vZGVsIHdpbGwgYmUgc2V0IHRvIDAsIHdoaWNoIGNhbiByZXN1bHQgaW4gYSBm
-YWxzZS1wb3NpdGl2ZS4NCj4gPiANCj4gPiBDby1hdXRob3JlZC1ieTogVGltb3RoeSBIYXllcyA8
-dGltb3RoeS5oYXllc0Bhcm0uY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFRpbW90aHkgSGF5ZXMg
-PHRpbW90aHkuaGF5ZXNAYXJtLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTYXNjaGEgQmlzY2hv
-ZmYgPHNhc2NoYS5iaXNjaG9mZkBhcm0uY29tPg0KPiBIaSBTYXNjaGEsIFRpbW90aHkNCj4gDQo+
-IFRoZSBtYXNraW5nIG9mIHZhbCBoYXMgbWUgYSBsaXR0bGUgY29uZnVzZWQgaW4gdGhlIHNhbml0
-aXplIGZ1bmN0aW9uLg0KPiBQcm9iYWJseSBuZWVkcyBhIHNsaWdodGx5IHJld3JpdGUuDQoNClll
-YWgsIGFncmVlZC4NCg0KPiANCj4gSm9uYXRoYW4NCj4gDQo+ID4gLS0tDQo+ID4gwqBhcmNoL2Fy
-bTY0L2t2bS9zeXNfcmVncy5jwqAgfCAzOSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
-LS0tDQo+ID4gLS0tLQ0KPiA+IMKgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLmggfCAxMCArKysr
-KysrKystDQo+ID4gwqAyIGZpbGVzIGNoYW5nZWQsIDQwIGluc2VydGlvbnMoKyksIDkgZGVsZXRp
-b25zKC0pDQo+ID4gDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMg
-Yi9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+ID4gaW5kZXggYzhmZDdjNmExMmExMy4uYTA2
-NWY4OTM5YmM4ZiAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jDQo+
-ID4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYw0KPiA+IEBAIC0xNzU4LDYgKzE3NTgs
-NyBAQCBzdGF0aWMgdTggcG11dmVyX3RvX3BlcmZtb24odTggcG11dmVyKQ0KPiA+IMKgDQo+ID4g
-wqBzdGF0aWMgdTY0IHNhbml0aXNlX2lkX2FhNjRwZnIwX2VsMShjb25zdCBzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsDQo+ID4gdTY0IHZhbCk7DQo+ID4gwqBzdGF0aWMgdTY0IHNhbml0aXNlX2lkX2Fh
-NjRwZnIxX2VsMShjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ID4gdTY0IHZhbCk7DQo+
-ID4gK3N0YXRpYyB1NjQgc2FuaXRpc2VfaWRfYWE2NHBmcjJfZWwxKGNvbnN0IHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSwNCj4gPiB1NjQgdmFsKTsNCj4gPiDCoHN0YXRpYyB1NjQgc2FuaXRpc2VfaWRf
-YWE2NGRmcjBfZWwxKGNvbnN0IHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwNCj4gPiB1NjQgdmFsKTsN
-Cj4gPiDCoA0KPiA+IMKgLyogUmVhZCBhIHNhbml0aXNlZCBjcHVmZWF0dXJlIElEIHJlZ2lzdGVy
-IGJ5IHN5c19yZWdfZGVzYyAqLw0KPiA+IEBAIC0xNzgzLDEwICsxNzg0LDcgQEAgc3RhdGljIHU2
-NCBfX2t2bV9yZWFkX3Nhbml0aXNlZF9pZF9yZWcoY29uc3QNCj4gPiBzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUsDQo+ID4gwqAJCXZhbCA9IHNhbml0aXNlX2lkX2FhNjRwZnIxX2VsMSh2Y3B1LCB2YWwp
-Ow0KPiA+IMKgCQlicmVhazsNCj4gPiDCoAljYXNlIFNZU19JRF9BQTY0UEZSMl9FTDE6DQo+ID4g
-LQkJdmFsICY9IElEX0FBNjRQRlIyX0VMMV9GUE1SIHwNCj4gPiAtCQkJKGt2bV9oYXNfbXRlKHZj
-cHUtPmt2bSkgPw0KPiA+IC0JCQkgSURfQUE2NFBGUjJfRUwxX01URUZBUiB8DQo+ID4gSURfQUE2
-NFBGUjJfRUwxX01URVNUT1JFT05MWSA6DQo+ID4gLQkJCSAwKTsNCj4gPiArCQl2YWwgPSBzYW5p
-dGlzZV9pZF9hYTY0cGZyMl9lbDEodmNwdSwgdmFsKTsNCj4gPiDCoAkJYnJlYWs7DQo+ID4gwqAJ
-Y2FzZSBTWVNfSURfQUE2NElTQVIxX0VMMToNCj4gPiDCoAkJaWYgKCF2Y3B1X2hhc19wdHJhdXRo
-KHZjcHUpKQ0KPiA+IEBAIC0yMDI0LDYgKzIwMjIsMjAgQEAgc3RhdGljIHU2NCBzYW5pdGlzZV9p
-ZF9hYTY0cGZyMV9lbDEoY29uc3QNCj4gPiBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCB2YWwp
-DQo+ID4gwqAJcmV0dXJuIHZhbDsNCj4gPiDCoH0NCj4gPiDCoA0KPiA+ICtzdGF0aWMgdTY0IHNh
-bml0aXNlX2lkX2FhNjRwZnIyX2VsMShjb25zdCBzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsDQo+ID4g
-dTY0IHZhbCkNCj4gPiArew0KPiANCj4gVGhlIGNvZGUgZmxvdyBpbiBoZXJlIHNlZW1zIGNvbmZ1
-c2luZywgc28gbWF5YmUgbmVlZHMgYSByZXRoaW5rIGV2ZW4NCj4gaWYgaXQNCj4gd29ya3MuwqAg
-RmVlbHMgbGlrZSB3ZSBuZWVkIGEgbWFzayBmaXJzdCBvZiBldmVyeXRoaW5nIHRoZSBrZXJuZWwN
-Cj4gdW5kZXJzdGFuZHMsDQo+IHRoZW4gc3BlY2lmaWMgbWFza2luZyBvdXQgLyBzZXR0aW5nIG9m
-IHBhcnRzIGZvciBlYWNoIGZlYXR1cmUuDQo+IEknbSBub3Qgc3VyZSBpZiB0aGUgaW5pdGlhbCBt
-YXNrIGlzIGhhbmRsZWQgYnkgdGhlIGNhbGxlciAoZGlkbid0DQo+IGNoZWNrIGJ1dA0KPiBpdCdz
-IGluIHRoZSByZWdpc3RlciBhcnJheSBzdHJ1Y3R1cmUpLg0KPiBBbHNvIEkgbG92ZSBjcm9zc2lu
-ZyBzcGVjcyB3aGVyZSB0aGUgZ2ljdjUgc3BlYyBzYXlzIGFsbCB0aGUgb3RoZXINCj4gZmllbGRz
-IGFyZQ0KPiByZXNlcnZlZCBhbmQgdGhleSBhcmVuJ3QgYW55IG1vcmUuwqAgV291bGQgaGF2ZSBi
-ZWVuIGJldHRlciBpZiB0aGF0DQo+IGhhZA0KPiBqdXN0IHNhaWQgc2VlIGFybSBhcm0gZm9yIHRo
-ZSBvdGhlciBwYXJ0cyBvZiB0aGlzIHJlZ2lzdGVyLg0KPiANCj4gPiArCXZhbCAmPSBJRF9BQTY0
-UEZSMl9FTDFfRlBNUiB8DQo+ID4gKwkJKGt2bV9oYXNfbXRlKHZjcHUtPmt2bSkgPw0KPiA+ICsJ
-CQlJRF9BQTY0UEZSMl9FTDFfTVRFRkFSIHwNCj4gPiBJRF9BQTY0UEZSMl9FTDFfTVRFU1RPUkVP
-TkxZIDogMCk7DQo+IA0KPiBTbyB0aGlzIGVpdGhlciBtYXNrcyBvdXQgZXZlcnl0aGluZyBvdGhl
-ciB0aGFuIEZQUk0gb3IgbWFza3Mgb3V0DQo+IGV2ZXJ5dGhpbmcgb3RoZXINCj4gdGhhbiBFTDFf
-TVRFRkFSLCBFTDFfTVRFU1RPUkVfT05MWSBhbmQgRlBNUi4NCj4gDQo+IEhlbmNlLi4uDQo+IA0K
-PiA+ICsNCj4gPiArCWlmICh2Z2ljX2lzX3Y1KHZjcHUtPmt2bSkpIHsNCj4gPiArCQl2YWwgJj0g
-fklEX0FBNjRQRlIyX0VMMV9HQ0lFX01BU0s7DQo+IA0KPiBUaGlzIGlzIGRvaW5nIG5vdGhpbmcg
-YXMgdGhhdCBmaWVsZCBpc24ndCBzZXQgYW55d2F5IGluIGVpdGhlciBvZiB0aGUNCj4gZWFybGll
-cg0KPiBwb3NzaWJsZSBtYXNraW5ncyBvZiB2YWwuDQo+IA0KPiA+ICsJCXZhbCB8PSBTWVNfRklF
-TERfUFJFUF9FTlVNKElEX0FBNjRQRlIyX0VMMSwgR0NJRSwNCj4gPiBJTVApOw0KPiA+ICsJfQ0K
-PiA+ICsNCj4gPiArCXJldHVybiB2YWw7DQo+ID4gK30NCj4gDQo+IA0KDQpJJ3ZlIHRha2VuIHlv
-dXIgYWR2aWNlIGhlcmUsIGFuZCB0aGUgZmxvdyBpcyBub3cgbXVjaCBjbGVhcmVyLiBUaGFua3Mu
-DQoNCldlIG5vdyBmaXJzdCBhbGxvdyB0aHJvdWdoIGFsbCBGUE1SIGFuZCBNVEUqIGZpZWxkcywg
-dGhlbiBmaWx0ZXIgb3V0DQp0aGUgTVRFIGZpZWxkcyBpZiBNVEUgaXNuJ3Qgc3VwcG9ydGVkLiBG
-aW5hbGx5LCB0aGUgR0NJRSBmaWVsZCBpcyBzZXQNCmZvciBHSUN2NS1iYXNlZCBndWVzdHMuDQoN
-ClNhc2NoYQ0K
+Hello Ben,=0A=
+=0A=
+> From: James Morse <james.morse@arm.com>=0A=
+> =0A=
+> MPAM allows traffic in the SoC to be labeled by the OS, these labels are=
+=0A=
+> used to apply policy in caches and bandwidth regulators, and to monitor=
+=0A=
+> traffic in the SoC. The label is made up of a PARTID and PMG value. The x=
+86=0A=
+> equivalent calls these CLOSID and RMID, but they don't map precisely.=0A=
+> =0A=
+> MPAM has two CPU system registers that is used to hold the PARTID and PMG=
+=0A=
+> values that traffic generated at each exception level will use. These can=
+=0A=
+> be set per-task by the resctrl file system. (resctrl is the defacto=0A=
+> interface for controlling this stuff).=0A=
+> =0A=
+> Add a helper to switch this.=0A=
+> =0A=
+> struct task_struct's separate CLOSID and RMID fields are insufficient to=
+=0A=
+> implement resctrl using MPAM, as resctrl can change the PARTID (CLOSID) a=
+nd=0A=
+> PMG (sort of like the RMID) separately. On x86, the rmid is an independen=
+t=0A=
+> number, so a race that writes a mismatched closid and rmid into hardware =
+is=0A=
+> benign. On arm64, the pmg bits extend the partid.=0A=
+> (i.e. partid-5 has a pmg-0 that is not the same as partid-6's pmg-0).  In=
+=0A=
+> this case, mismatching the values will 'dirty' a pmg value that resctrl=
+=0A=
+> believes is clean, and is not tracking with its 'limbo' code.=0A=
+> =0A=
+> To avoid this, the partid and pmg are always read and written as a pair.=
+=0A=
+> Instead of making struct task_struct's closid and rmid fields an=0A=
+> endian-unsafe union, add the value to struct thread_info and always use=
+=0A=
+> READ_ONCE()/WRITE_ONCE() when accessing this field.=0A=
+> =0A=
+> Resctrl allows a per-cpu 'default' value to be set, this overrides the=0A=
+> values when scheduling a task in the default control-group, which has=0A=
+> PARTID 0. The way 'code data prioritisation' gets emulated means the=0A=
+> register value for the default group needs to be a variable.=0A=
+> =0A=
+> The current system register value is kept in a per-cpu variable to avoid=
+=0A=
+> writing to the system register if the value isn't going to change.  Write=
+s=0A=
+> to this register may reset the hardware state for regulating bandwidth.=
+=0A=
+> =0A=
+> Finally, there is no reason to context switch these registers unless ther=
+e=0A=
+> is a driver changing the values in struct task_struct. Hide the whole thi=
+ng=0A=
+> behind a static key. This also allows the driver to disable MPAM in=0A=
+> response to errors reported by hardware. Move the existing static key to=
+=0A=
+> belong to the arch code, as in the future the MPAM driver may become a=0A=
+> loadable module.=0A=
+> =0A=
+> All this should depend on whether there is an MPAM driver, hide it behind=
+=0A=
+> CONFIG_ARM64_MPAM.=0A=
+> =0A=
+> CC: Amit Singh Tomar <amitsinght@marvell.com>=0A=
+> Signed-off-by: James Morse <james.morse@arm.com>=0A=
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>=0A=
+> ---=0A=
+> CONFIG_MPAM -> CONFIG_ARM64_MPAM in commit message=0A=
+> Remove extra DECLARE_STATIC_KEY_FALSE=0A=
+> Function name in comment, __mpam_sched_in() -> mpam_thread_switch()=0A=
+> Remove unused headers=0A=
+> Expand comment (Jonathan)=0A=
+> ---=0A=
+>  arch/arm64/Kconfig                   |  2 +=0A=
+>  arch/arm64/include/asm/mpam.h        | 73 ++++++++++++++++++++++++++++=
+=0A=
+>  arch/arm64/include/asm/thread_info.h |  3 ++=0A=
+>  arch/arm64/kernel/Makefile           |  1 +=0A=
+>  arch/arm64/kernel/mpam.c             | 13 +++++=0A=
+>  arch/arm64/kernel/process.c          |  7 +++=0A=
+>  drivers/resctrl/mpam_devices.c       |  2 -=0A=
+>  drivers/resctrl/mpam_internal.h      |  4 +-=0A=
+>  8 files changed, 101 insertions(+), 4 deletions(-)=0A=
+>  create mode 100644 arch/arm64/include/asm/mpam.h=0A=
+>  create mode 100644 arch/arm64/kernel/mpam.c=0A=
+> =0A=
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig=0A=
+> index 93173f0a09c7..cdcc5b76a110 100644=0A=
+> --- a/arch/arm64/Kconfig=0A=
+> +++ b/arch/arm64/Kconfig=0A=
+> @@ -2049,6 +2049,8 @@ config ARM64_MPAM=0A=
+>  =0A=
+>            MPAM is exposed to user-space via the resctrl pseudo filesyste=
+m.=0A=
+>  =0A=
+> +         This option enables the extra context switch code.=0A=
+> +=0A=
+>  endmenu # "ARMv8.4 architectural features"=0A=
+>  =0A=
+>  menu "ARMv8.5 architectural features"=0A=
+> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.=
+h=0A=
+> new file mode 100644=0A=
+> index 000000000000..2ab3dca6977c=0A=
+> --- /dev/null=0A=
+> +++ b/arch/arm64/include/asm/mpam.h=0A=
+> @@ -0,0 +1,73 @@=0A=
+> +/* SPDX-License-Identifier: GPL-2.0 */=0A=
+> +/* Copyright (C) 2025 Arm Ltd. */=0A=
+> +=0A=
+> +#ifndef __ASM__MPAM_H=0A=
+> +#define __ASM__MPAM_H=0A=
+> +=0A=
+> +#include <linux/jump_label.h>=0A=
+> +#include <linux/percpu.h>=0A=
+> +#include <linux/sched.h>=0A=
+> +=0A=
+> +#include <asm/sysreg.h>=0A=
+> +=0A=
+> +DECLARE_STATIC_KEY_FALSE(mpam_enabled);=0A=
+> +DECLARE_PER_CPU(u64, arm64_mpam_default);=0A=
+> +DECLARE_PER_CPU(u64, arm64_mpam_current);=0A=
+> +=0A=
+> +/*=0A=
+> + * The value of the MPAM0_EL1 sysreg when a task is in resctrl's default=
+ group.=0A=
+> + * This is used by the context switch code to use the resctrl CPU proper=
+ty=0A=
+> + * instead. The value is modified when CDP is enabled/disabled by mounti=
+ng=0A=
+> + * the resctrl filesystem.=0A=
+> + */=0A=
+> +extern u64 arm64_mpam_global_default;=0A=
+> +=0A=
+> +/*=0A=
+> + * The resctrl filesystem writes to the partid/pmg values for threads an=
+d CPUs,=0A=
+> + * which may race with reads in mpam_thread_switch(). Ensure only one of=
+ the old=0A=
+> + * or new values are used. Particular care should be taken with the pmg =
+field as=0A=
+> + * mpam_thread_switch() may read a partid and pmg that don't match, caus=
+ing this=0A=
+> + * value to be stored with cache allocations, despite being considered '=
+free' by=0A=
+> + * resctrl.=0A=
+> + *=0A=
+> + * A value in struct thread_info is used instead of struct task_struct a=
+s the=0A=
+> + * cpu's u64 register format is used. In struct task_struct there are tw=
+o u32,=0A=
+> + * rmid and closid for the x86 case, but as we can't use them here do so=
+mething=0A=
+> + * else. Creating a union would mean only accesses from the created u64 =
+would be=0A=
+> + * endian safe and so be less clear.=0A=
+> + */=0A=
+> +static inline u64 mpam_get_regval(struct task_struct *tsk)=0A=
+> +{=0A=
+> +#ifdef CONFIG_ARM64_MPAM=0A=
+> +       return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);=0A=
+> +#else=0A=
+> +       return 0;=0A=
+> +#endif=0A=
+> +}=0A=
+> +=0A=
+> +static inline void mpam_thread_switch(struct task_struct *tsk)=0A=
+> +{=0A=
+> +       u64 oldregval;=0A=
+> +       int cpu =3D smp_processor_id();=0A=
+> +       u64 regval =3D mpam_get_regval(tsk);=0A=
+> +=0A=
+> +       if (!IS_ENABLED(CONFIG_ARM64_MPAM) ||=0A=
+> +           !static_branch_likely(&mpam_enabled))=0A=
+> +               return;=0A=
+> +=0A=
+> +       if (regval =3D=3D READ_ONCE(arm64_mpam_global_default))=0A=
+> +               regval =3D READ_ONCE(per_cpu(arm64_mpam_default, cpu));=
+=0A=
+> +=0A=
+> +       oldregval =3D READ_ONCE(per_cpu(arm64_mpam_current, cpu));=0A=
+> +       if (oldregval =3D=3D regval)=0A=
+> +               return;=0A=
+> +=0A=
+> +       write_sysreg_s(regval, SYS_MPAM1_EL1);=0A=
+> +       isb();=0A=
+> +=0A=
+> +       /* Synchronising the EL0 write is left until the ERET to EL0 */=
+=0A=
+> +       write_sysreg_s(regval, SYS_MPAM0_EL1);=0A=
+> +=0A=
+> +       WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);=0A=
+> +}=0A=
+=0A=
+How about changing the code as follows? (Refer to "mte_thread_switch(next);=
+" in "arch/arm64/kernel/process.c")=0A=
+=0A=
+ static inline u64 mpam_get_regval(struct task_struct *tsk)=0A=
+ {=0A=
+-#ifdef CONFIG_ARM64_MPAM=0A=
+        return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);=0A=
+-#else=0A=
+-       return 0;=0A=
+-#endif=0A=
+ }=0A=
+=0A=
++#ifdef CONFIG_ARM64_MPAM=0A=
+ static inline void mpam_thread_switch(struct task_struct *tsk)=0A=
+ {=0A=
+        u64 oldregval;=0A=
+        int cpu =3D smp_processor_id();=0A=
+        u64 regval =3D mpam_get_regval(tsk);=0A=
+=0A=
+-       if (!IS_ENABLED(CONFIG_ARM64_MPAM) ||=0A=
+-           !static_branch_likely(&mpam_enabled))=0A=
++       if (!static_branch_likely(&mpam_enabled))=0A=
+                return;=0A=
+=0A=
+        if (regval =3D=3D READ_ONCE(arm64_mpam_global_default))=0A=
+@@ -101,4 +96,8 @@ static inline void mpam_thread_switch(struct task_struct=
+ *tsk)=0A=
+=0A=
+        WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);=0A=
+ }=0A=
++#else=0A=
++static inline void mpam_thread_switch(struct task_struct *tsk){}=0A=
++#endif=0A=
++=0A=
+Best regards,=0A=
+Shaopeng TAN=0A=
+=0A=
+> +#endif /* __ASM__MPAM_H */=0A=
+> diff --git a/arch/arm64/include/asm/thread_info.h b/arch/arm64/include/as=
+m/thread_info.h=0A=
+> index a803b887b0b4..fc801a26ff9e 100644=0A=
+> --- a/arch/arm64/include/asm/thread_info.h=0A=
+> +++ b/arch/arm64/include/asm/thread_info.h=0A=
+> @@ -41,6 +41,9 @@ struct thread_info {=0A=
+>  #ifdef CONFIG_SHADOW_CALL_STACK=0A=
+>          void                    *scs_base;=0A=
+>          void                    *scs_sp;=0A=
+> +#endif=0A=
+> +#ifdef CONFIG_ARM64_MPAM=0A=
+> +       u64                     mpam_partid_pmg;=0A=
+>  #endif=0A=
+>          u32                     cpu;=0A=
+>  };=0A=
+> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile=0A=
+> index 76f32e424065..15979f366519 100644=0A=
+> --- a/arch/arm64/kernel/Makefile=0A=
+> +++ b/arch/arm64/kernel/Makefile=0A=
+> @@ -67,6 +67,7 @@ obj-$(CONFIG_CRASH_DUMP)              +=3D crash_dump.o=
+=0A=
+>  obj-$(CONFIG_VMCORE_INFO)               +=3D vmcore_info.o=0A=
+>  obj-$(CONFIG_ARM_SDE_INTERFACE)         +=3D sdei.o=0A=
+>  obj-$(CONFIG_ARM64_PTR_AUTH)            +=3D pointer_auth.o=0A=
+> +obj-$(CONFIG_ARM64_MPAM)               +=3D mpam.o=0A=
+>  obj-$(CONFIG_ARM64_MTE)                 +=3D mte.o=0A=
+>  obj-y                                   +=3D vdso-wrap.o=0A=
+>  obj-$(CONFIG_COMPAT_VDSO)               +=3D vdso32-wrap.o=0A=
+> diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c=0A=
+> new file mode 100644=0A=
+> index 000000000000..9866d2ca0faa=0A=
+> --- /dev/null=0A=
+> +++ b/arch/arm64/kernel/mpam.c=0A=
+> @@ -0,0 +1,13 @@=0A=
+> +// SPDX-License-Identifier: GPL-2.0=0A=
+> +/* Copyright (C) 2025 Arm Ltd. */=0A=
+> +=0A=
+> +#include <asm/mpam.h>=0A=
+> +=0A=
+> +#include <linux/jump_label.h>=0A=
+> +#include <linux/percpu.h>=0A=
+> +=0A=
+> +DEFINE_STATIC_KEY_FALSE(mpam_enabled);=0A=
+> +DEFINE_PER_CPU(u64, arm64_mpam_default);=0A=
+> +DEFINE_PER_CPU(u64, arm64_mpam_current);=0A=
+> +=0A=
+> +u64 arm64_mpam_global_default;=0A=
+> diff --git a/arch/arm64/kernel/process.c b/arch/arm64/kernel/process.c=0A=
+> index fba7ca102a8c..b510c0699313 100644=0A=
+> --- a/arch/arm64/kernel/process.c=0A=
+> +++ b/arch/arm64/kernel/process.c=0A=
+> @@ -51,6 +51,7 @@=0A=
+>  #include <asm/fpsimd.h>=0A=
+>  #include <asm/gcs.h>=0A=
+>  #include <asm/mmu_context.h>=0A=
+> +#include <asm/mpam.h>=0A=
+>  #include <asm/mte.h>=0A=
+>  #include <asm/processor.h>=0A=
+>  #include <asm/pointer_auth.h>=0A=
+> @@ -737,6 +738,12 @@ struct task_struct *__switch_to(struct task_struct *=
+prev,=0A=
+>          if (prev->thread.sctlr_user !=3D next->thread.sctlr_user)=0A=
+>                  update_sctlr_el1(next->thread.sctlr_user);=0A=
+>  =0A=
+> +       /*=0A=
+> +        * MPAM thread switch happens after the DSB to ensure prev's acce=
+sses=0A=
+> +        * use prev's MPAM settings.=0A=
+> +        */=0A=
+> +       mpam_thread_switch(next);=0A=
+> +=0A=
+>          /* the actual thread switch */=0A=
+>          last =3D cpu_switch_to(prev, next);=0A=
+>  =0A=
+> diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_device=
+s.c=0A=
+> index b495d5291868..860181266b15 100644=0A=
+> --- a/drivers/resctrl/mpam_devices.c=0A=
+> +++ b/drivers/resctrl/mpam_devices.c=0A=
+> @@ -29,8 +29,6 @@=0A=
+>  =0A=
+>  #include "mpam_internal.h"=0A=
+>  =0A=
+> -DEFINE_STATIC_KEY_FALSE(mpam_enabled); /* This moves to arch code */=0A=
+> -=0A=
+>  /*=0A=
+>   * mpam_list_lock protects the SRCU lists when writing. Once the=0A=
+>   * mpam_enabled key is enabled these lists are read-only,=0A=
+> diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_inter=
+nal.h=0A=
+> index aaaf31ca9210..e6e7ba4342d6 100644=0A=
+> --- a/drivers/resctrl/mpam_internal.h=0A=
+> +++ b/drivers/resctrl/mpam_internal.h=0A=
+> @@ -16,12 +16,12 @@=0A=
+>  #include <linux/srcu.h>=0A=
+>  #include <linux/types.h>=0A=
+>  =0A=
+> +#include <asm/mpam.h>=0A=
+> +=0A=
+>  #define MPAM_MSC_MAX_NUM_RIS    16=0A=
+>  =0A=
+>  struct platform_device;=0A=
+>  =0A=
+> -DECLARE_STATIC_KEY_FALSE(mpam_enabled);=0A=
+> -=0A=
+>  #ifdef CONFIG_MPAM_KUNIT_TEST=0A=
+>  #define PACKED_FOR_KUNIT __packed=0A=
+>  #else=0A=
+> --=0A=
+> 2.43.0=0A=
