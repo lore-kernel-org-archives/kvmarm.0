@@ -1,174 +1,302 @@
-Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011035.outbound.protection.outlook.com [52.101.65.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614104311D3
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 09:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767864080; cv=none; b=DFFoba6+xoDR3Ms85Uk9hwwO30BH4/HMMdd3f4wrQ89gvNYa3hkOS4Fi56jVrB0vy3Op/U2y5scB+fZ5MtkLaUq8nuCxixGbpzPhS98yMdzg7zpWHIx8rYpcZQPkHCH0Jn9GtbUG4qZ3YXWPcCvYlfwpqm2vOVk1SKJNGhhbE6k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767864080; c=relaxed/simple;
-	bh=Yhm+kvNMMwY0AAcw7KrULiS69CclNuOwE7YYon2Cj5A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FFMDr80rC0werQ14c9A703GKYnY1fQLifbL6c/2vJw1XoCPka73+DMvIwp29jLQGDGEE4FI2Dv9l4ITu0pBew/J5MlsYVEBxDZVZE0+Qc/aqacRAUBV31zLTDoOEAxVU+1jpM6y6i1D85iQJ50BZiPVDnTS4HaH/Fr2ddX0bNf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.222
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dmzp930JqzLlXJ;
-	Thu,  8 Jan 2026 17:17:53 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id BE82140565;
-	Thu,  8 Jan 2026 17:21:08 +0800 (CST)
-Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 8 Jan 2026 17:21:08 +0800
-Received: from [10.67.121.115] (10.67.121.115) by
- kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 8 Jan 2026 17:21:07 +0800
-Message-ID: <16395515-1b66-8d71-abb0-d63db661ee62@hisilicon.com>
-Date: Thu, 8 Jan 2026 17:20:43 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5B103A7E12
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 09:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.35
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767864896; cv=fail; b=XW6CJVo5sMZVj+gHewEt+IPYTyMERPIYasZyt5KsKPu/9MoIV+dEK+PwBOOd4m6k8qshnAwCMDLL0MYOfABH8GgzPvOF8u8BrYBJ52U9/UFr+9IiF2A57X4SbJZVFBldF+X8fyhy257t5KnVFsteVe/0sYMqkvpuqbLG0N+N81I=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767864896; c=relaxed/simple;
+	bh=yyd4cGPy4pPLsa0RjXj8ymzplSqEfD6juBNKx0BMVo4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=h7cS4USCASKIwSNV6voo3uv9A+LxE2KZ1yZBxoChGKN5l6/H6uTykUHdFXEcH3Pp081boBMfKnhjPXeoLHfKYbTI0MG+JIRtuTtGtaES2i1JGLO12lmV6X2HBeGSatX95Fe3AuZ1e5cChhnOTz4c1sNFAdZyBqg1yClcdUKug6Q=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YpdBEzCQ; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=YpdBEzCQ; arc=fail smtp.client-ip=52.101.65.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YpdBEzCQ";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="YpdBEzCQ"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=Mi2MXFHr+qJkKKMKteHdPy9K14vhEUlcidUAhsGXQFzCR3x4xCVMEjG0Nn2nnlb4RJWFyHnu5DPBmY0YNUiahW7r7B1NTgGOS+PkDtavCFj9p++9rOxw+kSJrg5cwYTbCFYbf0DDO+ah/zkVurRezyfhp9demZtykZKYYy42a0t8PvN/UTXKOahkl4OYdtIxgatuDxsXnjtilLbxe7irZyya9csohiRAjVXx5XDLcevc15KOMeVzmE83f2F4mGlAJapvn/utw8FjQ4nJinukrazn3PlsoFWAzpMnvc/K+6aO4XZgGo+dI3b+b90Nbq1UrqHLoWwkNL5+IQx63IYYWw==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yyd4cGPy4pPLsa0RjXj8ymzplSqEfD6juBNKx0BMVo4=;
+ b=JRcr7L5zGZJsKtJBARNow2BV35I7Ct2OdcrASwyIrbaMzoOrGLxBs3nW+hOKBfYTHkKUnWayGY237TisIFHgSikr+/tXw/0AgnEenMe6fQTA1Y0OdhTTDCAYXLQ+kwhw6KTPiR8UqkaAiwOF0Ru23CcCu/TBkFMadGqlKvxkxPvsHIV1ifwF3JM99JjvETFD/7CqNfZCaWIUVNGAsNuzDbEVekm8tuEzsVWJTbV8BlSstVD8ZVc2IZOkial4KIdp2gYL0J/aD2PT3G0bU1vO+1Q3a3nKfL8MBsWUE3yYfrnA+P9FaYNrR2Bp3tl0T0IpZP/IGGc/Slvmdii3gN7z4g==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=huawei.com smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yyd4cGPy4pPLsa0RjXj8ymzplSqEfD6juBNKx0BMVo4=;
+ b=YpdBEzCQWBJHTRq+TyWhF57iokJU7Qyt146aK/aZ12iPFHr5GkYFP6Qjo78lQBEXNS74pcTQTedIzL48aUlLQBZYcorT5XLSBTjr04C2LerMcL4C72KrlFzeCxr1B2WkXfVu8Wo7EtMZZ/Iy+N+bcakcCZNQ/zKS30scGirZd6o=
+Received: from DUZPR01CA0022.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:46b::12) by VI0PR08MB10390.eurprd08.prod.outlook.com
+ (2603:10a6:800:207::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.3; Thu, 8 Jan
+ 2026 09:34:35 +0000
+Received: from DU6PEPF0000B61C.eurprd02.prod.outlook.com
+ (2603:10a6:10:46b:cafe::1a) by DUZPR01CA0022.outlook.office365.com
+ (2603:10a6:10:46b::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9499.3 via Frontend Transport; Thu, 8
+ Jan 2026 09:35:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ DU6PEPF0000B61C.mail.protection.outlook.com (10.167.8.135) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.1
+ via Frontend Transport; Thu, 8 Jan 2026 09:34:34 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xV8tk+6jGmOedeMBRwnRPMeilhoWZO/Iegsokv/CHbdA8xqKgZ9OxgTsB1R9/EevSIiDYPGQVT+9kdIDGqkpXaG21PlR4Ijtw5KzqSVcGImmHE+eu5ZlTSp/aS6TtYmfaHyhgIuQgKl1xNknqN980Mm0FBBwnlwwy9rkSmC0RGMFNbFUr1Ze/v0dAaaydMO4rpH+jlLIzRbRVdprwnWqLdZRPLeXs/dyQlJ0bIcfOR13/ZlHuqEY6Fri10qsE3haWL+kItZa3WOKU+C6pQpMWrJT9utejZMJkQ8Ci65ED4k6zzUKtX8L0nqavc7zXJjvrunFSZLWgwZl3abQoRxrZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yyd4cGPy4pPLsa0RjXj8ymzplSqEfD6juBNKx0BMVo4=;
+ b=vk+s+6bBRtIv84FCfNZoCYH+I0kk5ShHnGSgU2Lh8YJCEVVKDzm+Ka5SQiFVeQ38MtCCYBDKu+D40R4Mv5k0Frr8JaUqcGjwrYOGtxmijq6AVJbW21ykQfnyiAUtS9hHwCMGiftjH+JM/3QAVPSTM7VkxQC6J0Aeh9WDOoMtyaNsn38m4oFe2QxI2G2uMRxhvz5Idnap+ECKuiiEj8RxC/W15b2vSrg0tGnAEcd74eTrnmbuvFYLy0iK05Q7nUW2XF+s9eJPvPeq0YOYulNFBiJRWX2mz9Wskkvm7Iu+nl95KU3MmEFoaha3Yv56xUUOVqT5Guc0mYZwD8NY00YapA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yyd4cGPy4pPLsa0RjXj8ymzplSqEfD6juBNKx0BMVo4=;
+ b=YpdBEzCQWBJHTRq+TyWhF57iokJU7Qyt146aK/aZ12iPFHr5GkYFP6Qjo78lQBEXNS74pcTQTedIzL48aUlLQBZYcorT5XLSBTjr04C2LerMcL4C72KrlFzeCxr1B2WkXfVu8Wo7EtMZZ/Iy+N+bcakcCZNQ/zKS30scGirZd6o=
+Received: from AS8PR08MB6744.eurprd08.prod.outlook.com (2603:10a6:20b:397::10)
+ by AS8PR08MB6278.eurprd08.prod.outlook.com (2603:10a6:20b:29a::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.3; Thu, 8 Jan
+ 2026 09:33:31 +0000
+Received: from AS8PR08MB6744.eurprd08.prod.outlook.com
+ ([fe80::c07d:23d6:efa7:7ddb]) by AS8PR08MB6744.eurprd08.prod.outlook.com
+ ([fe80::c07d:23d6:efa7:7ddb%6]) with mapi id 15.20.9499.002; Thu, 8 Jan 2026
+ 09:33:30 +0000
+From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+To: "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "lpieralisi@kernel.org"
+	<lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>, Suzuki
+ Poulose <Suzuki.Poulose@arm.com>, nd <nd@arm.com>, "peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, "maz@kernel.org"
+	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 07/36] KVM: arm64: gic: Introduce interrupt type
+ helpers
+Thread-Topic: [PATCH v2 07/36] KVM: arm64: gic: Introduce interrupt type
+ helpers
+Thread-Index: AQHccP+Amw5F4YQtr0Wu9c2UcjY0frVFlqCAgAKLEoA=
+Date: Thu, 8 Jan 2026 09:33:30 +0000
+Message-ID: <5b9fd030e3048fadcd4ac95ddb0671e1af7dc960.camel@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	 <20251219155222.1383109-8-sascha.bischoff@arm.com>
+	 <20260106184313.00002a8c@huawei.com>
+In-Reply-To: <20260106184313.00002a8c@huawei.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.52.3-0ubuntu1.1 
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+x-ms-traffictypediagnostic:
+	AS8PR08MB6744:EE_|AS8PR08MB6278:EE_|DU6PEPF0000B61C:EE_|VI0PR08MB10390:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab8ce925-715f-4c11-64b7-08de4e99224e
+x-checkrecipientrouted: true
+nodisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?utf-8?B?NkdGVWs4TUxjVkV0Z2Q1UHVtb1ZjSjVpSDdUZk5nL2JoMmFsU01iVisyRU1q?=
+ =?utf-8?B?dGg4eFh4eUZka2xGOFF2b0NoZXg5dFVXZGR1QWV1elpkbnVNbVN0SFNLUEFu?=
+ =?utf-8?B?NWJBVjIyVFRMdmc4UzhvajRDNlJ1dS8xQnJMUTcvRkM0Yi9vTWtDV1l3b1lx?=
+ =?utf-8?B?aXNRbHhBRzRHbms1dFZCeWNqOHdrTGZYQVlIVnRaS0NDMzgyZTc5L1gvQzVY?=
+ =?utf-8?B?NU5ocWdqeVpTTUFqVlN6SmxGNzJ1a0g2cTRPYUpUd04xdk1LOGhDUEVFbWxu?=
+ =?utf-8?B?dzRRcVNGMVlEMzU3SEpISHZsNU00SGQ5NHpKMVpSdXlMM3BBYTBqcHpjRVJj?=
+ =?utf-8?B?QVhtSnhpRW9LelZpQnFMWmNialB1c1ZkT0pSYVNVS3pVWWRocDU3OERZQ00y?=
+ =?utf-8?B?dFNJZ1hXUW0wN2FaQUlXVVk5eWJxcEM4UnJVM1RsTjV2ZkxRRktIWlNzWEgr?=
+ =?utf-8?B?M0JhM1JONW9hNXFlV3VURkUrUjJVQnlOZFdWQ1NROE5hZytRaW5mMGZwYVVx?=
+ =?utf-8?B?MndPL1pRcUtiSm5NTW1hWTViT09Pb0tiZXgzakt3WEowdlRwR0xMWE1GMW1w?=
+ =?utf-8?B?eXZSaDI5MlRCbTF0MkYraWE1UHZ0bHppTi9Qdnc3SlRlNU8xWEVqZ21oMFFE?=
+ =?utf-8?B?WFNaeDFOK0ZJYWN0YXpGOUJpMUxyZEJITC9LSkVQMTdOTWVEdlFHcldoKzB3?=
+ =?utf-8?B?SGVUa2xkS1RKTk5Kci9zVU1vaDNlSk1hNTdKQVBESWdWbnczMTU1OURFbzlZ?=
+ =?utf-8?B?NVk5dEZtdk5HaVdMRTlOK3dVTUplSm1qQ1N5ZWxwbDlDMlk0MXZldUR1ejdo?=
+ =?utf-8?B?T2lRWmZnTzl5Nk5sQytKSkZ5R0lNNnZueEc2WkJtZWgrbTg5QXRncERMcktx?=
+ =?utf-8?B?OCtic3l2VDhPeGxoeTdFN2d3QjRaYVpmVlpaeGUybHhlUWhaVmZZSkhWVkxT?=
+ =?utf-8?B?SkVqMEJLdHZnZEc4TXZJOHJQcVV3NXNvUzZhL1NLdkRuOHBUU1E4dmlKSVA4?=
+ =?utf-8?B?Q09kSW1wNHIzbnhQbWZXN3NPVDBZSXd3MG44WUsydWxPdXV4ZTNCNEVYcXlP?=
+ =?utf-8?B?NFhGb3NiT1R5U01qSnBsZ0UrL01ob21OTW5hUVNiVnpuSTl0Mk9NcExUWmFl?=
+ =?utf-8?B?b0hYQUxYa0piYVNxU1FPY0V3dDVCeDl1b1BLZHluS3N2WTVJbXhPaXozK0Ft?=
+ =?utf-8?B?UmFCUE0wcmdXQlc5czVJTEZVUzVuZThENFNLbTNWQVc1TG44WmgzK1NMeEhN?=
+ =?utf-8?B?UmVYL2tvOXRkc2Q5bGVPbzUwaE5jOTBuWE5zb2lsc0kzcXNrWUdUVi81blBC?=
+ =?utf-8?B?cHN1dEIzdmdkZjVBMENuSmVhVUJxbzFzTitXM2QwN0Y0aC92OUZ6b1NvL3Ay?=
+ =?utf-8?B?M3lvYlQydTZXTkJkT2dHTkRrZEpEUmNpRUtKZjc3L09PMHB2YVFyZS9ORGx0?=
+ =?utf-8?B?MWFLb3R5Z0NRQXRubGRkbW5TalMyN2orNjU4MWJZaWR3Mm1GS3ppZllMODFn?=
+ =?utf-8?B?VUoxbGVEcFVzYTFEUXJJMUdxd2s0SFNYclNmNmxyTnlWZUdtTWo2Sm5DL2lG?=
+ =?utf-8?B?MFFHM0FRQStJWUpueDJHbUhtcUkweHZVTjJTdDlwZWo3MlN2cG1wZDRVL3pu?=
+ =?utf-8?B?eVBKOHpadkczYUVTY2R0TktNaVJNY0VBSGZVWmVFcUJEUTMwQ0dDVGxGeVdu?=
+ =?utf-8?B?WUs1VEY3OC9jV0kvRTltenp1dUFPbzE4Rkhpa3RQdDhXdi9pNWZDLysyUFAv?=
+ =?utf-8?B?WHVZeFpJRGFEdkMwZktSWmp6VFEwYzhhbUh1Y2JGdUl3YXhiYWVNbDE0eVR0?=
+ =?utf-8?B?TndTMUp0RlcrQ0o1NS9CeHRxcGdxRWdER1BiS3A1VnhXV2xCSFBiOGxJSENE?=
+ =?utf-8?B?dENVLyt5bWxMbUlWd2hMaHNTc1lhRFc1aW0wZy9ObGFQZ2dkRVNiWEhSbDNN?=
+ =?utf-8?B?L0RYNGc0MDArdFIwcGY0RWg1OElRbGVBWGdITkM4b0RzY01BTUdDdUJpWWxB?=
+ =?utf-8?B?TS81M3ByRFpIMmVveFlQdmp6U2pLUE85Z1hyVWgwaUhaN2tZSXRZbk9vWHhm?=
+ =?utf-8?Q?LTLDNe?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR08MB6744.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2F13F5E32425D249BFBDBD4417E4BCEC@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v8 0/7] Add support for FEAT_{LS64, LS64_V} and related
- tests
-Content-Language: en-US
-To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
-	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
-	<arnd@arndb.de>, <yuzenghui@huawei.com>
-CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
-	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
-References: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-In-Reply-To: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemq200004.china.huawei.com (7.202.195.237)
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6278
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ DU6PEPF0000B61C.eurprd02.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	a281dd0d-bbb3-45ce-a222-08de4e98fc03
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|14060799003|376014|35042699022|36860700013|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MVRUMnJPMDNEODlIQ3RhYWJ2ZEE3dnZNVEJET2EwZG5uYXZSVC85dW4vNGZ2?=
+ =?utf-8?B?MERJZ0xmb1dQaWZveE5UcS8wVDVwT0hsZUpQYlI4L3FtNG0zcHphaW1NVWE5?=
+ =?utf-8?B?SzV3YkN6OVdSU3Q5ZGQ3ODlxSENid1NSYVFZR0JKSVBQSE02Mk9ySG1KaUtn?=
+ =?utf-8?B?TUdNaHh6TEQ2MFc1eGFKUnhySWdkbmV3NERXWEkzLzQrY3JrWXVab05weVFI?=
+ =?utf-8?B?MGhJTUJUR0xWQ0FveTJ0T1lINjNpVjJ2OEtTRVA4bzNHQ2h5Q3RKRkU2R2Zj?=
+ =?utf-8?B?dG5hNUxESm8yWXROMW5rS2Q3Nm5OUlZ1K0ptR0E0S0ZJbDBMVkV2M3hLSmpl?=
+ =?utf-8?B?cnB0OWo1OGE3RlEvVjdKU3dQWTFXSU5RK1Z6SmVxQzRhb1BwZ0lGUlZITm5P?=
+ =?utf-8?B?djRUSVpQRUhYNzhrMWF2Qk9ndlljd1gvdS8yTVhHK20vRHIvQlZRTWRNL1N6?=
+ =?utf-8?B?bWlPaXVSMERoN21hZGkvZVdzcThWZmV6RGtzQUZNUUphekxhWFpoMm1XYU9R?=
+ =?utf-8?B?MFQ2dVBWcDJNaHVGRUplSVZjSEdYYlhhQWxXS3NVQXhOYUdxUEEyaFdFUElX?=
+ =?utf-8?B?MlpmZFNzdW9SS0tHV2pybFVERHV2NUltZHZnS21MVG9nT3lsdzZCZmkyYVBk?=
+ =?utf-8?B?T2NGdE9Ha3hSUnpjdkkySU5uYVZKaVRLQll6ZW1VZVdoM1czNFVlZXNPWmRI?=
+ =?utf-8?B?N0NPTWNaN2EvOENoUFFaaGh6eUFXb0hvVlVtUDRCbStBdW5wNE1pbTg5eUMy?=
+ =?utf-8?B?UmNmbVIweVI1dmIzZ2dnUmxQVW1Mbm9ndHhka2ZiVFlQbk9EQ0Z4MjhsT0hi?=
+ =?utf-8?B?b2t6QVZ0OUZOcVpndUVsdEVzU2ZQdEpiSHFUYnpnU0hXYWdBbWExWFhjZ0I4?=
+ =?utf-8?B?aFo1S1RKdEgvL1dmcjZNVUFNUzZxdHZlNlF2a2tKNWpNSHpSa0wwc0xFanBQ?=
+ =?utf-8?B?QytZcWdielFpNnpkaCtkaFZjK25CQ243dVVLWUpWSERROUY4d2JtVHFMUnBC?=
+ =?utf-8?B?VXZBOFVLdjZjcThMRVI4U2JQZTN3WUlBaHBpMC82a3o1K1FTK3FMcklWeTFO?=
+ =?utf-8?B?OGZQTHYxMDQ4c0dycG94Zm5yQVNGZURvYWtXOVZ0WDJ6NDIrSjV6MEEzMXda?=
+ =?utf-8?B?U1dheXhRWURYanpwRWN2SEtKdmxJd2d5VWRYMUk1NGUvT3dZdnJwV0hhYkE1?=
+ =?utf-8?B?R2k1VHJob2VqQThTQVN5d044VEJhM2RlTGtMTWpMbVM5NVMyalpOdHBXbUhq?=
+ =?utf-8?B?NkVzTFQ5ODRwQlVJS1dqTkEwQTdkK3dRdkkrMWtZbmxFU3hBRjRFaFlEb2Vz?=
+ =?utf-8?B?SEdLak1jbUhhRjRVRTVoUzE2VEFuOXFVR0EwTkxITCtrZGpiS0VMKy95MHhQ?=
+ =?utf-8?B?a3FhTnBlUmJ4Qm1TOVFSK011L0tDd2hFRXFUZmlaVnBabWZJSzdMWlRHSWx6?=
+ =?utf-8?B?aHlOVjFzeG1SVW9TOHNhOVpzY2swUDlCWmRaRk51SGU4dmNNY2I2Z0s2d1pS?=
+ =?utf-8?B?dlM5TDl1di9LRWxadGpsTHJoT2lZTXZpN2FGM1BiV1VKZ3RuT2ZRQXFtdndK?=
+ =?utf-8?B?NytIOWtHdVl3ajljVW1uakJQL3BWSER3UTZkY0NiSjQvcU5MWC9KV29iWTYv?=
+ =?utf-8?B?VHFnWW5lY005QlhmVnJ1WUZDbnVuWEZwZ3QwQndRaG9ibW10M3lqY0lvYnRv?=
+ =?utf-8?B?cnhNT2NsNC8wN0cvcWZxVHRKVVcySHhKamxpRHltTGcwbFQ0SHhmbkkxalZ5?=
+ =?utf-8?B?cXpnNFg3ZXpwM0RleTIrVkQ0N3I2dTVXeHNHMEl6TytSSnJhRHR1Ry9PTTNK?=
+ =?utf-8?B?QmhIdXg0T3VPRmE1ME5OcVppdnN2NmUwZGwzSGNYbEZtUEFjTGZLRGw1akNG?=
+ =?utf-8?B?cXg0Sm43RWp3SW4wb0kxOU5DNDU0MUcwOHdpZ3d3Rkd6YzhoRWd1czN1aWJL?=
+ =?utf-8?B?b05QbVRma1p5ZkZPcXhEanV6SEFKR0NSVEhPb1ZNYzRJeGJ1VTNHNzZXRjZK?=
+ =?utf-8?B?V2tDdEgrNmZXVHpwM1pqdHdYWkROdEFieDl6VWVqMnk5c0V3QXJvMkh0OS9q?=
+ =?utf-8?B?UnZQYTNCS3oySzJlSFFoSDloNmtmcnZNL0g1TkRsMmdSdVd6ajRBSWdVM1l4?=
+ =?utf-8?Q?QMVs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(376014)(35042699022)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2026 09:34:34.4622
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab8ce925-715f-4c11-64b7-08de4e99224e
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DU6PEPF0000B61C.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR08MB10390
 
-On 2025/12/23 17:33, Zhou Wang wrote:
-> Armv8.7 introduces single-copy atomic 64-byte loads and stores
-> instructions and its variants named under FEAT_{LS64, LS64_V}.
-> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
-> - Add identifying and enabling in the cpufeature list
-> - Expose the support of FEAT_LS64 to userspace through HWCAP3 and cpuinfo
-> - Add related hwcap test
-> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
-> 
-> A real scenario for this feature is that the userspace driver can make use of
-> this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
-> directly into the hardware.
-> 
-> Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
-> MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
-> 
-> [1] https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
-
-Hi,
-
-Gentle ping about this series... If there is no more comment, is there a chance to
-take it in this cycle?
-
-Best,
-Zhou
-
-> 
-> Tested with updated hwcap test(host in VHE):
-> [root@localhost tmp]# ./hwcap
-> [...]
-> # LS64 present
-> ok 226 cpuinfo_match_LS64
-> ok 227 sigill_LS64
-> ok 228 # SKIP sigbus_LS64
-> # 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-> # Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
-> 
-> Tested with updated hwcap test(guest in VHE):
-> root@localhost:/mnt# ./hwcap
-> [...]
-> # LS64 present
-> ok 226 cpuinfo_match_LS64
-> ok 227 sigill_LS64
-> ok 228 # SKIP sigbus_LS64
-> # 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
-> # Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
-> 
-> Tested nVHE case as well, same log as above.
-> 
-> Change since v7:
-> - Tiny spelling fix in 1/7
-> - Change the order between 5/7 and 6/7
-> - Remove has_ls64, use has_cpuid_feature directly in 6/7
-> - Add Acked-by from Arnd and Oliver
-> - Trap st64bv from EL0 to EL1/EL2
-> - Rebase on v6.19-rc1
-> Link: https://lore.kernel.org/all/20251107072127.448953-1-wangzhou1@hisilicon.com/
-> 
-> Change since v6:
-> - Add exception inject about nested VM in 3/7
-> - Remove __maybe_unused related codes in 7/7, replace to use asm clobber
-> - Add my signoff in each patch
-> - Rebase on v6.18-rc4
-> Link: https://lore.kernel.org/all/20251024090819.4097819-1-wangzhou1@hisilicon.com/
-> 
-> Change since v5:
-> - Rebase on v6.18-rc2 and fix the conflicts
-> - Add more description in elf_hwcaps.rst as suggested by Catalin Marinas
-> Link: https://lore.kernel.org/all/20250818064806.25417-1-yangyicong@huawei.com/
-> 
-> Change since v4:
-> - Rebase on v6.17-rc2 and fix the conflicts
-> Link: https://lore.kernel.org/linux-arm-kernel/20250715081356.12442-1-yangyicong@huawei.com/
-> 
-> Change since v3:
-> - Inject DABT fault for LS64 fault on unsupported memory but with valid memslot
-> Link: https://lore.kernel.org/linux-arm-kernel/20250626080906.64230-1-yangyicong@huawei.com/
-> 
-> Change since v2:
-> - Handle the LS64 fault to userspace and allow userspace to inject LS64 fault
-> - Reorder the patches to make KVM handling prior to feature support
-> Link: https://lore.kernel.org/linux-arm-kernel/20250331094320.35226-1-yangyicong@huawei.com/
-> 
-> Change since v1:
-> - Drop the support for LS64_ACCDATA
-> - handle the DABT of unsupported memory type after checking the memory attributes
-> Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
-> 
-> Marc Zyngier (2):
->   KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
->   KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
-> 
-> Yicong Yang (5):
->   KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
->     memory
->   arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
->   KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
->   arm64: Add support for FEAT_{LS64, LS64_V}
->   kselftest/arm64: Add HWCAP test for FEAT_LS64
-> 
->  Documentation/arch/arm64/booting.rst      | 12 ++++++
->  Documentation/arch/arm64/elf_hwcaps.rst   |  7 ++++
->  Documentation/virt/kvm/api.rst            | 43 ++++++++++++++++----
->  arch/arm64/include/asm/el2_setup.h        | 12 +++++-
->  arch/arm64/include/asm/esr.h              |  8 ++++
->  arch/arm64/include/asm/hwcap.h            |  1 +
->  arch/arm64/include/asm/kvm_emulate.h      |  7 ++++
->  arch/arm64/include/uapi/asm/hwcap.h       |  1 +
->  arch/arm64/kernel/cpufeature.c            | 28 +++++++++++++
->  arch/arm64/kernel/cpuinfo.c               |  1 +
->  arch/arm64/kvm/inject_fault.c             | 34 ++++++++++++++++
->  arch/arm64/kvm/mmio.c                     | 27 ++++++++++++-
->  arch/arm64/kvm/mmu.c                      | 14 ++++++-
->  arch/arm64/tools/cpucaps                  |  2 +
->  include/uapi/linux/kvm.h                  |  3 +-
->  tools/testing/selftests/arm64/abi/hwcap.c | 49 +++++++++++++++++++++++
->  16 files changed, 238 insertions(+), 11 deletions(-)
-> 
+T24gVHVlLCAyMDI2LTAxLTA2IGF0IDE4OjQzICswMDAwLCBKb25hdGhhbiBDYW1lcm9uIHdyb3Rl
+Og0KPiBPbiBGcmksIDE5IERlYyAyMDI1IDE1OjUyOjM4ICswMDAwDQo+IFNhc2NoYSBCaXNjaG9m
+ZiA8U2FzY2hhLkJpc2Nob2ZmQGFybS5jb20+IHdyb3RlOg0KPiANCj4gPiBHSUN2NSBoYXMgbW92
+ZWQgZnJvbSB1c2luZyBpbnRlcnJ1cHQgcmFuZ2VzIGZvciBkaWZmZXJlbnQgaW50ZXJydXB0DQo+
+ID4gdHlwZXMgdG8gdXNpbmcgc29tZSBvZiB0aGUgdXBwZXIgYml0cyBvZiB0aGUgaW50ZXJydXB0
+IElEIHRvIGRlbm90ZQ0KPiA+IHRoZSBpbnRlcnJ1cHQgdHlwZS4gVGhpcyBpcyBub3QgY29tcGF0
+aWJsZSB3aXRoIG9sZGVyIEdJQ3MgKHdoaWNoDQo+ID4gcmVseQ0KPiA+IG9uIHJhbmdlcyBvZiBp
+bnRlcnJ1cHRzIHRvIGRldGVybWluZSB0aGUgdHlwZSksIGFuZCBoZW5jZSBhIHNldCBvZg0KPiA+
+IGhlbHBlcnMgaXMgaW50cm9kdWNlZC4gVGhlc2UgaGVscGVycyB0YWtlIGEgc3RydWN0IGt2bSos
+IGFuZCB1c2UNCj4gPiB0aGUNCj4gPiB2Z2ljIG1vZGVsIHRvIGRldGVybWluZSBob3cgdG8gaW50
+ZXJwcmV0IHRoZSBpbnRlcnJ1cHQgSUQuDQo+ID4gDQo+ID4gSGVscGVycyBhcmUgaW50cm9kdWNl
+ZCBmb3IgUFBJcywgU1BJcywgYW5kIExQSXMuIEFkZGl0aW9uYWxseSwgYQ0KPiA+IGhlbHBlciBp
+cyBpbnRyb2R1Y2VkIHRvIGRldGVybWluZSBpZiBhbiBpbnRlcnJ1cHQgaXMgcHJpdmF0ZSAtIFNH
+SXMNCj4gPiBhbmQgUFBJcyBmb3Igb2xkZXIgR0lDcywgYW5kIFBQSXMgb25seSBmb3IgR0lDdjUu
+DQo+ID4gDQo+ID4gVGhlIGhlbHBlcnMgYXJlIHBsdW1iZWQgaW50byB0aGUgY29yZSB2Z2ljIGNv
+ZGUsIGFzIHdlbGwgYXMgdGhlDQo+ID4gQXJjaA0KPiA+IFRpbWVyIGFuZCBQTVUgY29kZS4NCj4g
+PiANCj4gPiBUaGVyZSBzaG91bGQgYmUgbm8gZnVuY3Rpb25hbCBjaGFuZ2VzIGFzIHBhcnQgb2Yg
+dGhpcyBjaGFuZ2UuDQo+ID4gDQo+ID4gU2lnbmVkLW9mZi1ieTogU2FzY2hhIEJpc2Nob2ZmIDxz
+YXNjaGEuYmlzY2hvZmZAYXJtLmNvbT4NCj4gSGkgU2FzY2hhLA0KPiANCj4gQSBiaXQgb2YgYmlr
+ZXNoZWRkaW5nIC8gJ3ZhbHVhYmxlJyBuYW1pbmcgZmVlZGJhY2sgdG8gZW5kIHRoZSBkYXkuDQo+
+IE90aGVyd2lzZSBMR1RNLg0KPiANCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9rdm0vYXJtX3Zn
+aWMuaCBiL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgNCj4gPiBpbmRleCBiMjYxZmIzOTY4ZDAzLi42
+Nzc4ZjY3NmVhZjA4IDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgNCj4g
+PiArKysgYi9pbmNsdWRlL2t2bS9hcm1fdmdpYy5oDQo+IC4uLg0KPiANCj4gPiDCoGVudW0gdmdp
+Y190eXBlIHsNCj4gPiDCoAlWR0lDX1YyLAkJLyogR29vZCBvbCcgR0lDdjIgKi8NCj4gPiBAQCAt
+NDE4LDggKzQ4OCwxMiBAQCB1NjQgdmdpY192M19nZXRfbWlzcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUpOw0KPiA+IMKgDQo+ID4gwqAjZGVmaW5lIGlycWNoaXBfaW5fa2VybmVsKGspCSghISgoaykt
+PmFyY2gudmdpYy5pbl9rZXJuZWwpKQ0KPiA+IMKgI2RlZmluZSB2Z2ljX2luaXRpYWxpemVkKGsp
+CSgoayktPmFyY2gudmdpYy5pbml0aWFsaXplZCkNCj4gPiAtI2RlZmluZSB2Z2ljX3ZhbGlkX3Nw
+aShrLCBpKQkoKChpKSA+PSBWR0lDX05SX1BSSVZBVEVfSVJRUykgJiYNCj4gPiBcDQo+ID4gKyNk
+ZWZpbmUgdmdpY192YWxpZF9udjVfc3BpKGssIGkpCSgoKGkpID49DQo+ID4gVkdJQ19OUl9QUklW
+QVRFX0lSUVMpICYmIFwNCj4gPiDCoAkJCSgoaSkgPCAoayktPmFyY2gudmdpYy5ucl9zcGlzICsN
+Cj4gPiBWR0lDX05SX1BSSVZBVEVfSVJRUykpDQo+ID4gKyNkZWZpbmUgdmdpY192YWxpZF92NV9z
+cGkoaywgaSkJKGlycV9pc19zcGkoaywgaSkgJiYgXA0KPiA+ICsJCQkJIChGSUVMRF9HRVQoR0lD
+VjVfSFdJUlFfSUQsIGkpIDwNCj4gPiAoayktPmFyY2gudmdpYy5ucl9zcGlzKSkNCj4gPiArI2Rl
+ZmluZSB2Z2ljX3ZhbGlkX3NwaShrLCBpKSAodmdpY19pc192NShrKQ0KPiA+ID8JCQkJXA0KPiA+
+ICsJCQnCoMKgwqDCoMKgIHZnaWNfdmFsaWRfdjVfc3BpKGssIGkpIDoNCj4gPiB2Z2ljX3ZhbGlk
+X252NV9zcGkoaywgaSkpDQo+IA0KPiBudiBpcyBhIGxpdHRsZSBhd2t3YXJkIGFzIGEgbmFtZSBh
+cyBpbW1lZGlhdGVseSBtYWtlcyBtZSB0aGlua2luZw0KPiBuZXN0ZWQgdmlydHVhbGl6YXRpb24g
+aW5zdGVhZCBvZiBub3QgdjUgKHdoaWNoIEkgZ3Vlc3MgaXMgdGhlDQo+IHRoaW5raW5nIGJlaGlu
+ZCB0aGF0PykNCj4gDQo+IFByb2JhYmx5IGp1c3QgbWUgYW5kIG5hbWluZyBpdCB2MjMgd2lsbCBi
+cmVhayBpZiB3ZSBnZXQgdG8gR0lDDQo+IHZlcnNpb24gMjMgOikNCj4gbnY1IGJyZWFrcyB3aGVu
+IHdlIGdldCBHSUN2NiA7KQ0KDQpBYnNvbHV0ZWx5IGFncmVlZCBoZXJlLiBUaGUgdjUgYW5kIG52
+NSBtYWNyb3Mgd2VyZSBub3QgdXNlZCBhbnl3aGVyZSwNCnNvIEkndmUgcmUtd29ya2VkIHRoaXMg
+YSBiaXQgdG8gYmUgbW9yZSBpbiB0aGUgc3R5bGUgb2YgdGhvc2UgYWRkZWQNCmVhcmxpZXI6DQoN
+Ci0jZGVmaW5lIHZnaWNfdmFsaWRfbnY1X3NwaShrLCBpKSAgICAgICAoKChpKSA+PSBWR0lDX05S
+X1BSSVZBVEVfSVJRUykgJiYgXA0KLSAgICAgICAgICAgICAgICAgICAgICAgKChpKSA8IChrKS0+
+YXJjaC52Z2ljLm5yX3NwaXMgKyBWR0lDX05SX1BSSVZBVEVfSVJRUykpDQotI2RlZmluZSB2Z2lj
+X3ZhbGlkX3Y1X3NwaShrLCBpKSAgICAgICAgKGlycV9pc19zcGkoaywgaSkgJiYgXA0KLSAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgKEZJRUxEX0dFVChHSUNWNV9IV0lSUV9JRCwgaSkg
+PCAoayktPmFyY2gudmdpYy5ucl9zcGlzKSkNCi0jZGVmaW5lIHZnaWNfdmFsaWRfc3BpKGssIGkp
+ICh2Z2ljX2lzX3Y1KGspID8gICAgICAgICAgICAgICAgICAgICAgICAgIFwNCi0gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHZnaWNfdmFsaWRfdjVfc3BpKGssIGkpIDogdmdpY192YWxpZF9u
+djVfc3BpKGssIGkpKQ0KKyNkZWZpbmUgdmdpY192YWxpZF9zcGkoaywgaSkgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KKyAgICAgICAoeyAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KKyAgICAg
+ICAgICAgICAgIGJvb2wgX19yZXQgPSBpcnFfaXNfc3BpKGssIGkpOyAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXA0KKyAgICAgICAgICAgICAgIHN3aXRjaCAoKGsp
+LT5hcmNoLnZnaWMudmdpY19tb2RlbCkgeyAgICAgICAgICAgICAgICAgICAgXA0KKyAgICAgICAg
+ICAgICAgIGNhc2UgS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1Y1OiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXA0KKyAgICAgICAgICAgICAgICAgICAgICAgX19yZXQgJj0gRklFTERfR0VUKEdJQ1Y1
+X0hXSVJRX0lELCBpKSA8IChrKS0+YXJjaC52Z2ljLm5yX3NwaXM7IFwNCisgICAgICAgICAgICAg
+ICAgICAgICAgIGJyZWFrOyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IFwNCisgICAgICAgICAgICAgICBkZWZhdWx0OiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwNCisgICAgICAgICAgICAgICAgICAgICAgIF9fcmV0ICY9IChp
+KSA8ICgoayktPmFyY2gudmdpYy5ucl9zcGlzICsgVkdJQ19OUl9QUklWQVRFX0lSUVMpOyBcDQor
+ICAgICAgICAgICAgICAgfSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBcDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQorICAgICAgICAgICAgICAgX19yZXQ7
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcDQorICAg
+ICAgIH0pDQoNCk1vcmUgdmVyYm9zZSAod2l0aCBhbm5veWluZyBsaW5lIGxlbmd0aHMpLCBidXQg
+Y2VydGFpbmx5IG1vcmUgc2NhbGFibGUNCmFuZCByZW1vdmVzIHRoZSBuYW1pbmcgaXNzdWUgYWx0
+b2dldGhlci4gUGVyc29uYWxseSwgSSBwcmVmZXIgaXQNCmJlY2F1c2UgaXQgaXMgbW9yZSBhbGln
+bmVkIHdpdGggdGhlIHJlbGF0ZWQgbWFjcm9zIGFib3ZlLg0KDQpJcyB0aGlzIHByZWZlcmFibGUv
+YWNjZXB0YWJsZT8NCg0KVGhhbmtzLA0KU2FzY2hhDQoNCj4gDQo+IA0KPiA+IMKgDQo+ID4gwqBi
+b29sIGt2bV92Y3B1X2hhc19wZW5kaW5nX2lycXMoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsNCj4g
+PiDCoHZvaWQga3ZtX3ZnaWNfc3luY19od3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7DQo+
+IA0KDQo=
