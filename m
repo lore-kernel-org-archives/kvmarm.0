@@ -1,113 +1,98 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D122C283C89
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 20:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26347329C7D
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 20:42:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767904404; cv=none; b=c1z/qbO2jxaIZhAZ3XH01hU8OFmMQBZjz1+JOXKU5SVB6rxYj/ugOGAs1qWGm7st50p9Bb3gkxW0H5I/WPBkq4h33bbBi3quBiuwfXSqPknv0nV8kmOS4Kr+RHTd+qnBPgvED/+u/bxwXVaVap+Pbf8bTo0fiJuhkJaGIJWXkLY=
+	t=1767904953; cv=none; b=pRuRhCBCkv21kPXmGzod2oYCPYwkZyti12HqG/5AyMx8JCxfqCv+Q+N33hsv7IYSf/1Frf5prxC9C3j4HW3K6fD13IYTr27HbpfO5AMPuFb3LC95CJNSdXnEuMK8qWaC7Ha1iXgpxpwuRS4cTeAhaLLPfwm9oL4HvJzaoAp5/So=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767904404; c=relaxed/simple;
-	bh=iATZpNcktO46+cDNnAgxodjZQtQ3YNqdoni2XqoB0S0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FFY9Q7LBAxjEqJNfGwfaxfs44kWEwcGol2lyQEsRWKXfBFqtj6gOMBX2zNPCtAaJxaVuuudZAS9+OJx4oPjmA6+jya4jQ2vw/6EFpuScBHH2sHR+4uONf8SE944o30ieWTnmBS8r3EvYJnXNJp6U+ROBMBoF78AAfQiSeLYx9bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GvqDx8b6; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1767904953; c=relaxed/simple;
+	bh=Q8WYExuLOEp/bupQY9UWQNgtNdSfmpYPB9TNJ4b3CsU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p1RglstKc1iy0d2HoHZ1227c4BRhw2CZpMKZM9AU9WSagUu4yV12GLHIqmVMWqidjeFNByy9/ujmWJ6teqDsSM5l0BmFVXUBeo2Bzj/uF7FY+xmAKB9M1VhdxXJw254E8NACszdP2CY4TBt2TEmoFVoubOADaU6Bi9NFUZalfFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7dBHZmh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GvqDx8b6"
-Date: Thu, 8 Jan 2026 20:33:13 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767904400;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lqob6m0vV00E9z3vAvV17AnmV6r8/G5JFmQWsGjfzkA=;
-	b=GvqDx8b6D94Zu6W4aoe3fj7eBDt43YEIRHeVXWEDmqy3M3ZbHQ8fO0XbIiq835vHQYDrxZ
-	wrABcteH8d9vVTOnXbd3ossltQFBNjWJqxC03UmTyzAO4PXkQMKCPGuCASZqRT+HP6WVTv
-	TbJqonNWrKWTeTTIaEw3Qz2uOrCnpUI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 21/21] KVM: selftests: Test READ=>WRITE dirty logging
- behavior for shadow MMU
-Message-ID: <542ogwlbwiajdw2txep4ra7patrsnporvruqicuffazlai6drv@ybperj2axkl3>
-References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-22-seanjc@google.com>
- <t7dcszq3quhqprdcqz7keykxbmqf62pdelqrkeilpbmsrnuji5@a3lplybmlbwf>
- <aV_cLAlz4v1VOkDt@google.com>
- <gzyjze3wszmrwxdwnudij6nfqdxzihm37uappfqxorfjy5vatf@hffzaobbm3g7>
- <aV_3-lhnZ-MoKnjv@google.com>
- <3xrew6ag7pefka7wava4z7ht54e6xlpwbywcm2ivsgnkdbahe4@yqzsaxnhedj7>
- <aWATlfisv8ZVZi0c@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7dBHZmh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA81C116C6;
+	Thu,  8 Jan 2026 20:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767904952;
+	bh=Q8WYExuLOEp/bupQY9UWQNgtNdSfmpYPB9TNJ4b3CsU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i7dBHZmhaOeeKOxU12m1Dk059TO/5Q6LC9lH75xKBQhF9lvYWK5CtHo5uHIFpeU7T
+	 U1+V+bzxhIbBnAmGoUxRjd0akZSvsponMb8KoNkUBZ730SkZB1Shoi+6hfwrgNrchE
+	 WIgTFjbfchSeN/lvEHWmV31rpWKlk6ds5ACvYH/mgI+zAAbr57ISM2WpsCPt5SW8gq
+	 G88myd10E//DlNJGxo4jy9OLD5QuBpYfqO+zizgG8ymP0MY2J4yhstRDL/IKWh3dzZ
+	 b+XPRtMG3rg6IJBErHLij0XfMGiMjiJlBwgCyzDH4cY2u9O6+QTyrAIPXbQe4Baa2G
+	 sTHO/n3Aa6fpg==
+From: Oliver Upton <oupton@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Oliver Upton <oupton@kernel.org>
+Subject: [PATCH] KVM: arm64: nv: Respect stage-2 write permssion when setting stage-1 AF
+Date: Thu,  8 Jan 2026 12:42:30 -0800
+Message-ID: <20260108204230.677172-1-oupton@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWATlfisv8ZVZi0c@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 08, 2026 at 12:29:09PM -0800, Sean Christopherson wrote:
-> On Thu, Jan 08, 2026, Yosry Ahmed wrote:
-> > On Thu, Jan 08, 2026 at 10:31:22AM -0800, Sean Christopherson wrote:
-> > > On Thu, Jan 08, 2026, Yosry Ahmed wrote:
-> > > > >  	/*
-> > > > > -	 * Add an identity map for GVA range [0xc0000000, 0xc0002000).  This
-> > > > > +	 * Add an identity map for GVA range [0xc0000000, 0xc0004000).  This
-> > > > >  	 * affects both L1 and L2.  However...
-> > > > >  	 */
-> > > > > -	virt_map(vm, GUEST_TEST_MEM, GUEST_TEST_MEM, TEST_MEM_PAGES);
-> > > > > +	virt_map(vm, TEST_MEM_BASE, TEST_MEM_BASE, TEST_MEM_PAGES);
-> > > > >  
-> > > > >  	/*
-> > > > > -	 * ... pages in the L2 GPA range [0xc0001000, 0xc0003000) will map to
-> > > > > -	 * 0xc0000000.
-> > > > > +	 * ... pages in the L2 GPA ranges [0xc0001000, 0xc0002000) and
-> > > > > +	 * [0xc0003000, 0xc0004000) will map to 0xc0000000 and 0xc0001000
-> > > > > +	 * respectively.
-> > > > 
-> > > > Are these ranges correct? I thought L2 GPA range [0xc0002000,
-> > > > 0xc0004000) will map to [0xc0000000, 0xc0002000).
-> > > 
-> > > Gah, no.  I looked at the comments after changing things around, but my eyes had
-> > > glazed over by that point.
-> > > 
-> > > > Also, perhaps it's better to express those in terms of the macros?
-> > > > 
-> > > > L2 GPA range [TEST_MEM_ALIAS_BASE, TEST_MEM_ALIAS_BASE + 2*PAGE_SIZE)
-> > > > will map to [TEST_MEM_BASE, TEST_MEM_BASE + 2*PAGE_SIZE)?
-> > > 
-> > > Hmm, no, at some point we need to concretely state the addresses, so that people
-> > > debugging this know what to expect, i.e. don't have to manually compute the
-> > > addresses from the macros in order to debug.
-> > 
-> > I was trying to avoid a situation where the comment gets out of sync
-> > with the macros in a way that gets confusing. Maybe reference both if
-> > it's not too verbose?
-> > 
-> > 	/*
-> > 	 * ... pages in the L2 GPA range [0xc0002000, 0xc0004000) at
-> > 	 * TEST_MEM_ALIAS_BASE will map to [[0xc0000000, 0xc0002000) at
-> > 	 * TEST_MEM_BASE.
-> > 	 */
-> 
-> Heh, your solution to a mitigate a comment getting out of sync is to add more
-> things to the comment that can get out of sync :-D
-> 
-> Unless you feel very strongly about having the names of the macros in the comments,
-> I'd prefer to keep just the raw addresses.
+Naturally, updating the Access Flag in a stage-1 descriptor requires
+write permission at stage-2, although this isn't actually enforced in
+KVM's software PTW.
 
-I don't feel strongly :)
+Generate a stage-2 permission fault if the stage-1 walk attempts to
+update the descriptor and its corresponding stage-2 translation lacks
+write permission.
+
+Fixes: bff8aa213dee ("KVM: arm64: Implement HW access flag management in stage-1 SW PTW")
+Signed-off-by: Oliver Upton <oupton@kernel.org>
+---
+ arch/arm64/kvm/at.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index 53bf70126f81..808d26bed182 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -403,6 +403,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		   struct s1_walk_result *wr, u64 va)
+ {
+ 	u64 va_top, va_bottom, baddr, desc, new_desc, ipa;
++	struct kvm_s2_trans s2_trans = {};
+ 	int level, stride, ret;
+ 
+ 	level = wi->sl;
+@@ -420,8 +421,6 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		ipa = baddr | index;
+ 
+ 		if (wi->s2) {
+-			struct kvm_s2_trans s2_trans = {};
+-
+ 			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
+ 			if (ret) {
+ 				fail_s1_walk(wr,
+@@ -515,6 +514,11 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+ 		new_desc |= PTE_AF;
+ 
+ 	if (new_desc != desc) {
++		if (wi->s2 && !kvm_s2_trans_writable(&s2_trans)) {
++			fail_s1_walk(wr, ESR_ELx_FSC_PERM_L(level), true);
++			return -EPERM;
++		}
++
+ 		ret = kvm_swap_s1_desc(vcpu, ipa, desc, new_desc, wi);
+ 		if (ret)
+ 			return ret;
+
+base-commit: 9448598b22c50c8a5bb77a9103e2d49f134c9578
+-- 
+2.47.3
+
