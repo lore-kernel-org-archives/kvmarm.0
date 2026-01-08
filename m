@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6714E6DF6;
-	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC6F44D6A3;
+	Thu,  8 Jan 2026 14:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881651; cv=none; b=HnaHhri1fvSpQOTTY0GxHC6BweoGnc9yNW7kxGDkmZACTjeVwEscsvVyWlhJWJDqwEceaauaS1W6sbfb3bCJhA+LKAuVpw2OGehum4Xs58U2WLZvQvEOxKePIU37smVPs7QlfpgfagWI9ADauMWPVl659sI1qKLr0PVrHrbhR1c=
+	t=1767881955; cv=none; b=Zc/ChbdKeqf9fKV/n8q2snnqYx6umQWwsyo1B/M+beZQagGdwKL49A3r/bWXvL53CRVeFjGdztEsr2qMa62VdXuSLyg8fCFc7rZysCneTrBawcUXIbEEIgraGjIEKOLdR2PlEBg+t288LoHkj7axA6qZdtDQ8HUnj4zIKY2cAJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881651; c=relaxed/simple;
-	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
+	s=arc-20240116; t=1767881955; c=relaxed/simple;
+	bh=Kmij4qyDrN8Z0vImiN8j8I9vDenr/lmN1w+0d4gtGj4=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D24JSsj0Vu1Pn3EwqRJHpLUDDvW4Bxlx1a9EQGu3KDUJ/xutMuuQ6ITsFHjl68XfjuxBoFRZ7E0OtunFOr6ahwFbTJlaAauz37EisSqQNYqZNwtpQ8i35IWomLMMQ/iPQEjtn4S1GFKitK1L78EaKmbjug2VtWUPFykA4weqk5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkjFvcQ6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=iZJhewwN4GMWiuuw+Or0Fs2qiBecCHw7150i1A+3QEwotTbXE+dG+z8UxmZFrQe+gHQ2eHuvLnwl0EBMLaLfQR9XlZ9e7ygW6vk+Aiiz08l9Bde4k8PvdD89rOX+0/vlgFnLCqJH1pjDXVMGSp9V4SsxvlUe/jP9e9jkn04htBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lpcp3w7g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkjFvcQ6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04B25C19422;
-	Thu,  8 Jan 2026 14:14:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lpcp3w7g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 369ECC116C6;
+	Thu,  8 Jan 2026 14:19:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767881651;
-	bh=PclDSMkxQTnfjWJ1QJChIBnve9ojYFh9rJwlsRzU3g0=;
+	s=k20201202; t=1767881955;
+	bh=Kmij4qyDrN8Z0vImiN8j8I9vDenr/lmN1w+0d4gtGj4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KkjFvcQ6BqxLJ+uLScB6z4Kil0b0v50RHuWDZACioD+s7xd3vngRo+zgT0b7LIHq5
-	 Glx1BqKsiWfr9woZRag7Q51VeJ+5GVkBwlUspr+3o2SHdGB7RRvXjj5VAKNaKxOOYU
-	 Vs2N8e2j5TDG9MU7BVKhFHK2pcT8mldsEJxZe+N+CLhFLQflvSjDHp+6oY17c5Ra6p
-	 yJU4Fkyxb7QkcXlhgLNNsZp9oDPoXKmnOd8TnThYPjKhCbTvc1Y8m39c8RvxMGdlAA
-	 MVZHVtXSEQ3qp1Yue/GhjREToLDmpvuaJOadJzh3lNdkV+XZuFxUEviUXvXm3VmlQo
-	 AsK03Q8B9/i6g==
+	b=lpcp3w7g4XxQeU/e4Cup0Ls3LdTAVUc+FH8WBXDZJURrCvMO1FVHzQCNO+mnfqsvT
+	 P6Ilbu/knDjXmRjn5IrVFb9ZTyfxturMu96i/CgkGjB81hd7C703TvIzUT3uHZ/nkT
+	 WefCRw9MQxWjRjV0Ta+utaWiRlozOOCx566yQTL3I9yz4RBXL2zlH0cuoB70hb7+wK
+	 Sa77JV4SLIaPJ8fpxoV0Sq2LBw2sQDwSIxBIpiWCxZpigX5T4hIYlcJXFuNqnk/jz5
+	 iUsvxN+uW0N0rUGtrGd41eDk1GIAtRzyjgnIb9KSeQ1l5+VWLo8tOTqOntdai0nIQf
+	 gfKIvLlT1lE7w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vdqm8-00000000Qvv-31WT;
-	Thu, 08 Jan 2026 14:14:08 +0000
-Date: Thu, 08 Jan 2026 14:14:08 +0000
-Message-ID: <86344gmbtb.wl-maz@kernel.org>
+	id 1vdqr3-00000000R22-0vOA;
+	Thu, 08 Jan 2026 14:19:13 +0000
+Date: Thu, 08 Jan 2026 14:19:12 +0000
+Message-ID: <861pk0mbkv.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -45,10 +45,10 @@ Cc: kvmarm@lists.linux.dev,
 	aneesh.kumar@kernel.org,
 	steven.price@arm.com,
 	tabba@google.com
-Subject: Re: [PATCH kvmtool v4 15/15] arm64: smccc: Start sending PSCI to userspace
-In-Reply-To: <20250930103130.197534-17-suzuki.poulose@arm.com>
+Subject: Re: [PATCH kvmtool v4 01/15] Allow pausing the VM from vcpu thread
+In-Reply-To: <20250930103130.197534-2-suzuki.poulose@arm.com>
 References: <20250930103130.197534-1-suzuki.poulose@arm.com>
-	<20250930103130.197534-17-suzuki.poulose@arm.com>
+	<20250930103130.197534-2-suzuki.poulose@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,65 +64,97 @@ X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kern
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 30 Sep 2025 11:31:30 +0100,
+On Tue, 30 Sep 2025 11:31:15 +0100,
 Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
 > 
-> From: Oliver Upton <oliver.upton@linux.dev>
+> Pausing the VM from a vCPU thread doesn't work today, as it waits indefinitely
+> for a signal that never comes. By using the "current_kvm_cpu", enlighten the
+> kvm__pause() to skip the current CPU and do it inline. This also brings in a
+> restriction that a following kvm__continue() must be called from the same vCPU
+> thread.
 > 
-> kvmtool now has a PSCI implementation that complies with v1.0 of the
-> specification. Use the SMCCC filter to start sending these calls out to
-> userspace for further handling. While at it, shut the door on the
-> legacy, KVM-specific v0.1 functions.
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Link: https://lore.kernel.org/all/20230918104028.GA17744@willie-the-truck/
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
->  arm64/include/kvm/kvm-config-arch.h |  8 +++++--
->  arm64/smccc.c                       | 37 +++++++++++++++++++++++++++++
->  2 files changed, 43 insertions(+), 2 deletions(-)
+>  kvm.c | 35 +++++++++++++++++++++++++++++++----
+>  1 file changed, 31 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-> index ee031f01..3158fadf 100644
-> --- a/arm64/include/kvm/kvm-config-arch.h
-> +++ b/arm64/include/kvm/kvm-config-arch.h
-> @@ -15,6 +15,7 @@ struct kvm_config_arch {
->  	u64		fw_addr;
->  	unsigned int	sve_max_vq;
->  	bool		no_pvtime;
-> +	bool		in_kernel_smccc;
->  };
+> diff --git a/kvm.c b/kvm.c
+> index 07089cf1..cc25ecdb 100644
+> --- a/kvm.c
+> +++ b/kvm.c
+> @@ -59,6 +59,8 @@ const char *kvm_exit_reasons[] = {
 >  
->  int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> @@ -52,11 +53,14 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
->  			   "Force virtio devices to use PCI as their default "	\
->  			   "transport (Deprecated: Use --virtio-transport "	\
->  			   "option instead)", virtio_transport_parser, kvm),	\
-> -        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
-> +	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
->  		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
->  		     "Type of interrupt controller to emulate in the guest",	\
->  		     irqchip_parser, NULL),					\
->  	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
-> -		"Address where firmware should be loaded"),
-> +		"Address where firmware should be loaded"),			\
-> +	OPT_BOOLEAN('\0', "in-kernel-smccc", &(cfg)->in_kernel_smccc,		\
-> +			"Disable userspace handling of SMCCC, instead"		\
-> +			" relying on the in-kernel implementation"),
->
+>  static int pause_event;
+>  static DEFINE_MUTEX(pause_lock);
+> +static struct kvm_cpu *pause_req_cpu;
+> +
+>  extern struct kvm_ext kvm_req_ext[];
+>  
+>  static char kvm_dir[PATH_MAX];
+> @@ -573,9 +575,25 @@ void kvm__reboot(struct kvm *kvm)
+>  
+>  void kvm__continue(struct kvm *kvm)
+>  {
+> +	/*
+> +	 * We must ensure that the resume request comes from the same context
+> +	 * as the one requested the pause, especially if it was issued from a
+> +	 * vCPU thread.
+> +	 */
+> +	if (current_kvm_cpu) {
+> +		if (pause_req_cpu != current_kvm_cpu ||
+> +		    !current_kvm_cpu->paused)
+> +			die("Trying to resume VM from invalid context");
+> +		current_kvm_cpu->paused = 0;
+> +	}
+>  	mutex_unlock(&pause_lock);
+>  }
+>  
+> +/*
+> + * Mark all active CPUs as paused, until kvm__continue() is issued.
+> + * NOTE: If this is called from a cpu thread, kvm__continue() must
+> + * be called from the same thread.
+> + */
+>  void kvm__pause(struct kvm *kvm)
+>  {
+>  	int i, paused_vcpus = 0;
+> @@ -590,10 +608,17 @@ void kvm__pause(struct kvm *kvm)
+>  	if (pause_event < 0)
+>  		die("Failed creating pause notification event");
+>  	for (i = 0; i < kvm->nrcpus; i++) {
+> -		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0)
+> -			pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
+> -		else
+> -			paused_vcpus++;
+> +		if (kvm->cpus[i]->is_running && kvm->cpus[i]->paused == 0) {
+> +			if (current_kvm_cpu != kvm->cpus[i]) {
+> +				pthread_kill(kvm->cpus[i]->thread, SIGKVMPAUSE);
+> +				continue;
+> +			} else if (current_kvm_cpu) {
+> +				current_kvm_cpu->paused = 1;
+> +				pause_req_cpu = current_kvm_cpu;
 
-nit: this really is about PSCI, not SMCCC. The fact that we use the
-SMCCC interface to route PSCI calls is an implementation detail,
-really. The other thing is that this is a change in default behaviour,
-and I'd rather keep in-kernel PSCI to be the default, specially given
-that this otherwise silently fails on old kernels.
+This is also set as we leave the function. Why do we need to set it
+twice?
 
-To that effect, I'd suggest the following instead:
-
-+	OPT_BOOLEAN('\0', "psci", &(cfg)->userspace_psci,		\
-+			"Request userspace handling of PSCI, instead"		\
-+			" relying on the in-kernel implementation"),
-
-and the code modified accordingly.
+> +				/* fall through to update our count */
+> +			}
+> +		}
+> +		paused_vcpus++;
+>  	}
+>  
+>  	while (paused_vcpus < kvm->nrcpus) {
+> @@ -604,6 +629,8 @@ void kvm__pause(struct kvm *kvm)
+>  		paused_vcpus += cur_read;
+>  	}
+>  	close(pause_event);
+> +	/* Remember the context requesting pause */
+> +	pause_req_cpu = current_kvm_cpu;
+>  }
+>  
+>  void kvm__notify_paused(void)
 
 Thanks,
 
