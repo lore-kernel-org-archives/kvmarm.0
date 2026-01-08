@@ -1,160 +1,118 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F6F3446D8
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 14:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47553329C7D;
+	Thu,  8 Jan 2026 15:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767884032; cv=none; b=Q79O0krerZqNuisrMM6BQ49+KP6qwlHqAgcM+43iorxpxsl3qV90AnVKgA30g9PQtQw+OoCW/Nckiu1YLFQ7kck7oGht8gzeCFP1ZpfVyeMdnHBWKAZLMMUx7WmiJDImrk2Q/G4yQvUppcyes4Ow3OJbIk+jliBPkB+JopAdMjU=
+	t=1767885987; cv=none; b=KxOx7Yubk88iE0j0jm9xVKsiY0oCckape7wxRL1O3K4rC81G+lSL3fwbLil5HEsI/tkKRsXyKNT1SHVL0EIzFTEjCX5mhXTYlEVFze9I0RF9CmvAhopwIz4raTgKjlk9uE9Hh29eSaX0eSxLzArcaduliS3fPyqSUnR/NpqJwNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767884032; c=relaxed/simple;
-	bh=rNpuBgLIllEGB0VexiqF4WSTX84x5OKyhI/Ki/dM5z4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hK0H1vxOmyrEzu8WnmyPWMnV7ytEtitZ3/PpM22KorHHK+XLg9rMDnxBzNK52YzuWXuMwBKYY1Ve2OnrXJ8zYKrdQKSBpa9fD3N3XHLOuAYs2U7vIbZEFtbsehdCSgGjul80kevYd+E9LerNh1RaBWcDVHXPzFvPtAzOLp+GNQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 964B81515;
-	Thu,  8 Jan 2026 06:53:39 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 799983F6A8;
-	Thu,  8 Jan 2026 06:53:39 -0800 (PST)
-Message-ID: <5b7a66e2-7310-4770-bb7c-c7d7993cd6fe@arm.com>
-Date: Thu, 8 Jan 2026 14:53:37 +0000
+	s=arc-20240116; t=1767885987; c=relaxed/simple;
+	bh=+ovEomnQgps42mBgCaU8zAij1WwMupnacumZo1P2P/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lhi7KiirX8GqSxO1V++aXQmyrxZAtMZcMTzNOlk/n6g1+BrJCFF4ZLQIDqcF+bgCu9WdjdW2/vsjepRv2nF6uBeF2ee3zPr4Sq8vAfPjuNGeDwD0QpPocLsHS8FJNKB3yW0MTF1+pIr6W340aXlE1VtnEpjDfxYlsYg5yiiYDaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YICLigBh; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YICLigBh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8ACC116C6;
+	Thu,  8 Jan 2026 15:26:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767885986;
+	bh=+ovEomnQgps42mBgCaU8zAij1WwMupnacumZo1P2P/A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YICLigBh8it9PyFKds+w/KJn+a3+w/NSUl5i6g44lYWLNx/pKfE3KuVPNx+9ZmeWY
+	 qzCiTTNbx9N2mbSeZqKM08M945LqyJn1jwWAyqP1YSJJ9RbtWAmnCtsXb4x1IlDaw4
+	 LWngcz1AwfsdsNnc8QbWccMiuR3qV+sMH5DHaGrUmXkxx1TmFld5OX0TkmnLD0dS4C
+	 AaevQGJsM2bp4bejW/keV+Asjy8379X9swsWCoiWuPQu6x9u/lZ53KOYNCtfSqw9j0
+	 zuogC2bjuvLTXjG1A2ORCWMV+HotsAa2/ZUJibCpOHvvbD562U7WdJ9ns7YrQkwAWJ
+	 WEbw9Um5Jq+xw==
+Date: Thu, 8 Jan 2026 15:26:21 +0000
+From: Will Deacon <will@kernel.org>
+To: perlarsen@google.com
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Armelle Laine <armellel@google.com>,
+	Sebastien Ene <sebastianene@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in
+ host handler
+Message-ID: <aV_MnW8cg7IsWPuD@willie-the-truck>
+References: <20251119-host-direct-messages-v3-0-c74d04944b26@google.com>
+ <20251119-host-direct-messages-v3-1-c74d04944b26@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 39/45] arm_mpam: resctrl: Call resctrl_init() on
- platforms that can support resctrl
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-40-ben.horgan@arm.com>
- <20260106145831.000055aa@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260106145831.000055aa@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119-host-direct-messages-v3-1-c74d04944b26@google.com>
 
-Hi Jonathan,
-
-On 1/6/26 14:58, Jonathan Cameron wrote:
-> On Fri, 19 Dec 2025 18:11:41 +0000
-> Ben Horgan <ben.horgan@arm.com> wrote:
+On Wed, Nov 19, 2025 at 02:07:53AM +0000, Per Larsen via B4 Relay wrote:
+> From: Sebastian Ene <sebastianene@google.com>
 > 
->> From: James Morse <james.morse@arm.com>
->>
->> Now that MPAM links against resctrl, call resctrl_init() to register the
->> filesystem and setup resctrl's structures.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> Allow direct messages to be forwarded from the host. The host should
+> not be sending framework messages so they are filtered out.
 > 
-> Just minor suggestions inline.  I'm not sure the for loop macros
-> are worth doing but that particular pair of loops feel awfully familiar
-> at this point, so maybe. 
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> Signed-off-by: Per Larsen <perlarsen@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/ffa.c | 22 ++++++++++++++++++++++
+>  include/linux/arm_ffa.h       |  3 +++
+>  2 files changed, 25 insertions(+)
 > 
-> Either way..
-> 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> index 58b7d0c477d7fce235fc70d089d175c7879861b5..a38a3ab497e5eac11777109684a33f02d88d09a1 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
+> @@ -862,6 +862,23 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
+>  	hyp_spin_unlock(&host_buffers.lock);
+>  }
 >  
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index 059148c38a38..bbb12b5dfd8c 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
-> 
->> @@ -1840,11 +1861,70 @@ int mpam_resctrl_setup(void)
->>  		pr_warn("Number of PMG is not a power of 2! resctrl may misbehave");
->>  	}
->>  
->> -	/* TODO: call resctrl_init() */
->> +	err = resctrl_init();
->> +	if (!err)
->> +		WRITE_ONCE(resctrl_enabled, true);
-> 
-> Trivial but I'd prefer the error path out of line.
-> 
-> 	if (err)
-> 		return err;
-> 
-> 	WRITE_ONCE(resctrl_enabled, true);
-> 	
-> 	return 0;
+> +static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
+> +			      struct kvm_cpu_context *ctxt,
+> +			      u64 vm_handle)
+> +{
+> +	DECLARE_REG(u32, flags, ctxt, 2);
+> +
+> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
+> +
+> +	/* filter out framework messages */
+> +	if (FIELD_GET(FFA_MSG_FLAGS_MSG_TYPE, flags)) {
 
-Ok, updated.
+Wouldn't we be better off just checking that flags is 0? The rest of it
+is SBZ or MBZ in the current spec.
 
->>  
->>  	return err;
->>  }
-> 
->> +
->> +/*
->> + * The driver is detaching an MSC from this class, if resctrl was using it,
->> + * pull on resctrl_exit().
->> + */
->> +void mpam_resctrl_teardown_class(struct mpam_class *class)
->> +{
->> +	int i;
->> +	struct mpam_resctrl_res *res;
->> +	struct mpam_resctrl_mon *mon;
->> +
->> +	might_sleep();
->> +
->> +	for (i = 0; i < RDT_NUM_RESOURCES; i++) {
-> There are enough iterators over these that I wonder
-> if it is worth some macros.
->  
-> 	for_each_mpam_resctrl_control(res) {
-> 	}
-> and
-> 	for_each_mpam_resctrl_counter(mon) {
-> 	}
+> +		ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
+> +		return;
+> +	}
+> +
+> +	arm_smccc_1_2_smc(args, res);
+> +}
+> +
+>  bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  {
+>  	struct arm_smccc_1_2_regs res;
+> @@ -920,6 +937,11 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
+>  	case FFA_PARTITION_INFO_GET:
+>  		do_ffa_part_get(&res, host_ctxt);
+>  		goto out_handled;
+> +	case FFA_MSG_SEND_DIRECT_REQ:
+> +	case FFA_FN64_MSG_SEND_DIRECT_REQ:
+> +
 
-The index is often needed too so I changed to helpers that include it too:
-for_each_mpam_resctrl_control(res, rid) and
-for_each_mpam_resctrl_mon(mon, eventid).
+Weird whitespace addition ^^
 
-> 
-> 
->> +		res = &mpam_resctrl_controls[i];
->> +		if (res->class == class) {
->> +			res->class = NULL;
->> +			break;
->> +		}
->> +	}
->> +	for (i = 0; i < QOS_NUM_EVENTS; i++) {
->> +		mon = &mpam_resctrl_counters[i];
->> +		if (mon->class == class) {
->> +			mon->class = NULL;
->> +
->> +			mpam_resctrl_teardown_mon(mon, class);
->> +
->> +			break;
->> +		}
->> +	}
->> +}
->> +
->>  static int __init __cacheinfo_ready(void)
->>  {
->>  	cacheinfo_ready = true;
-> 
+> +		do_ffa_direct_msg(&res, host_ctxt, HOST_FFA_ID);
 
-Thanks,
+What's the point of passing HOST_FFA_ID here? Is that supposed to end up
+in the Sender ID bits of W1?
 
-Ben
-
+Will
