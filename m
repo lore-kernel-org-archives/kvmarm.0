@@ -1,94 +1,92 @@
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B105447DFBE
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 14:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C0048AE1B
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 14:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881414; cv=pass; b=f/RWOmcHEaZV4LHIyaJIDvq0UtuwSR2JnIbYJ1+lEcaVGWqSIRVj+3fEgJFrOxdlWdF9mI0fMH1tjd4xie/6/stb0hpmWQSHDL7IrQ3iHKLJkeApPedr2qtlBh6ElykO460pyoKRl07eAIAdK4UlyM7Qc62TPqfP5P9jDj8OunE=
+	t=1767881421; cv=pass; b=h4WzJl6GxrHMyN5I8M4cuO1NKsXjEfV69cZcI9ozfJFZ2zweee1FMgOszYa+vn8Y0Q5EhB7kr3voChEKfhIp+wOe1qT4r5zhrQPBTVmZb3pJHQnUAywgn2QjC382FMwRzfTXiqHo3s7NlQ3u97qGEySslbOBPF6His3wtzm1wPM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881414; c=relaxed/simple;
-	bh=YkKdPv86ApMrpTeTFnhz+IcSUQLsILOLPvJQz1PDFUE=;
+	s=arc-20240116; t=1767881421; c=relaxed/simple;
+	bh=nd9v6rOTsgtmeIcSOzUf+JTIDj5sX0xCl7dm1iZzN1U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j1tVOtfMy/apC0Qm+iuCeXOGyG7G9KeeJ7DZnxEXe5QBZCQ77HxaWxd1pn+EfCLoFdICiSzd/hPuh2s9I5r2SnTZ6d+Erxrs4LWmHfFI0C7sz39CN2+qVKic+R8L2uh/CY3Iq53+iYIEqKuUZGK1CECn6BEVMg8uBf45t9NIN8I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vQ6QTJCK; arc=pass smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=bFQSCERJ46hF0WGDa3nbVGguPbAKvexjjU+D+MBEpsB3iNyzSHvOc9hUgEGIRL493B2VggEMUs4NLnSM9jEkVoFsRFRLsEzpwsFFonZBnPW8z7PjyGtMK1xFuR8WLFnqstc7sMjQjgo2bi1b7B1A255qNFZjDRy3XOMsz8LcuSs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=onzhDGCW; arc=pass smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vQ6QTJCK"
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4edb8d6e98aso1158111cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 Jan 2026 06:10:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767881411; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="onzhDGCW"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ffbaaafac4so742921cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jan 2026 06:10:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767881418; cv=none;
         d=google.com; s=arc-20240605;
-        b=R/IQs8c/csyIvX+d5YsP/X4PTwuLdNnY/+hAujma7gto2kWoTSOPMxslBlFgbXUZWK
-         BemjX4FuJ4S5UndcCnY6UPVwaaBtVHJR20V7wUj32dYrYXSlVtOfNEjlDRFe61YO4lg6
-         hQhGP2Xw1ub6Tedl5/rjfHgh5iNZxm0o9A5Oel6tH3Xfz4cPar//wvPo0Pehg1Oi3SsY
-         3274nECqLoiMHoJI9CNcR5exc082pz0tukp4P7kZWDul9N0+r9X9HhbPDEQ/w3v1kG6G
-         lbq3aPlyw693lOZM6JhJzxe7VCJGOHfTFfRYZpzDiYj7n0lDHiQTsxJCuayjLz3D8Sgj
-         g9oQ==
+        b=L6hXxdLlcgghcRriZgl5Quzy+MFslIf+HMrYBb8uRpkL3o4kOlaT5k8xxzNNTCGAaS
+         htLGq6AqCVCSwjej8bLAEw0epQxPtKgjLrAk5iyL69UNSC3i/zoOv+VQEZMtd7zxKAeE
+         BH0R7DjILHYroSIVqvE3ah/klSRElV8nFZNt/tdPvUaHuqH5TJl4/uTNSZlAXHMYEvro
+         Kery6zOwVtEeHpGToUCAFgDp2M3/IRZbQy+7QyjFtSy12POsiVht5IHauii7ATRgO1Xl
+         WO89QcvqJ1SmLWyYcmqYVAAV6hEaZLydpaYnWPaTyWUko7D3xmcn7DHq6ZgPNSyrdYK8
+         RW7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=TGOhyPqsKhZPttb5gff3fg7ZFzXcVrSNwuwgJbbCpXM=;
-        fh=Xp4NJihs4z3/r94d+6IVupDVYvJrHMj0aUS+w2XCtg0=;
-        b=KP+2q/0jvwlqgsYLVq3ZePU0svvXk+WpCGZnYCEh9G/8pAbdSU8qRg2jNhckGGkBtj
-         QZsxNhuwjh1uuIos1wuto/xp+OhY5q0ZNEqhu1aaltZGgFxt4mO03TqUBJ9ory/uN3lI
-         35+5HznvcVFJDQ9Jwsd3H0I4c2iCjrjod457UK9mF5ElxDYVrf3q9CDDvoInpFBY1Rw9
-         FKHJ0UdIHihwlO64h2mP+h9E5kJmq9VdTQQ7djKA/Z6ofAQ/Eym53K02FyqP1NPrnzAM
-         JWmRvzkd4+DJhYoC9txSw1OwNHBBYUWZOFJxLJl1LvhGYdye7iAWLqjFnlVMdzNrVevr
-         zLFg==;
+        bh=M6v8yJzivCkGRPQD2RD9WlokTdTcLOTAtGeFegCEmXw=;
+        fh=ZBMQlOs8uRnO7QPLtnh+nzkfxnM7CSJEptaoL9k0iJ8=;
+        b=jyQ5IEjNFjR71bOxCfClAYlJeCCll2d6tWbsyRwbcO9RkXEgXoQJHyDl0aYW6P0mtM
+         9MYXaZtC2TM5TYb8LaIGOZIoZpDyHnt8IEmAnLRmLgcOac1Qls4UwQVsM1aNnirW6frX
+         zpi69DWmEdHbbID6751bmpQHT3gsvf8eYZQDVPTaChLj1HLJm9OcQ4dkbjCfhT6bdIxS
+         kf4B7Io6zygpr5G23lpAU36YQpmK2TyawEDF3IJ3QQZkDWe1wV/GkLSQKia+/clfQsaa
+         Wj9UUNpS+S1pgiJH+eTUnKeIpeDte+FKqdz0ON/ATtodSvLInkbY+i7vOcJMPSOsUgss
+         sy7Q==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767881411; x=1768486211; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1767881418; x=1768486218; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TGOhyPqsKhZPttb5gff3fg7ZFzXcVrSNwuwgJbbCpXM=;
-        b=vQ6QTJCK/lbUKRl88k2B+YSJdqIga4Fdc5QCHqedUy+ak76Cd0gbg/+81KT1zDhJFW
-         ig5FQlPt50BOnzZ7UFEq8POfBzV89/o7bldPcMwJCpTe8UyjUo29W2RQbilu+HeiRtck
-         k2nO5TE8TJUMJwuA6C+m/GL+bwTZOoIh+OBsdQtQH+Plkc/XWSd2TcyKcA724opvIuuH
-         L4ACGw+h7U6IjgUEdiB2zKR3FrA1ClAGlp0yULI9arGJdN9591kWE8r7uwz2QEoYPijy
-         6fg6CqSo7mVFR/ES/31RNwMJhRaIX5+LcWQrWWOPzMGq66Ladjb05Q+V6SOUqGw9lFSG
-         V/CA==
+        bh=M6v8yJzivCkGRPQD2RD9WlokTdTcLOTAtGeFegCEmXw=;
+        b=onzhDGCWdZCd7PfmKRq4y1zbHAp66M45iu6dmryHfxbGWmthEwVZ/1buX/UrVvs/wL
+         OhZOXqnLnGPrTmbRGJfn4ohCiW2ZYULOnhBix2CsiSAHxKWezIx/g9RH7PUQad3BCiCu
+         IygQZIPcLD7kvYNgfWvhZeKI8bkFR1zgjgk7K60fNDGW0NArPLqSAOu9wU95E7BTpswu
+         gnbNE8mSdtdM5Dz0sGsXtIbU0gzdUnL9vah9PV5XasK1gVdhbMoYhVljBi/nPQ+EvOp0
+         LiHoE6GTRq4sj79qEn+nLyalABINE/7KY5E7lR9BtOaPoRq0xkqoa3SBkjClErKWgNmQ
+         YQ+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767881411; x=1768486211;
+        d=1e100.net; s=20230601; t=1767881418; x=1768486218;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TGOhyPqsKhZPttb5gff3fg7ZFzXcVrSNwuwgJbbCpXM=;
-        b=Mal7gf0iU6BSo6vT5ZWv+yTwCK041/gmA0mMEY5eXwYtbPeukBFPWrl7MwhSEi4iNk
-         BCXkr2EZbuOqrUsHPpYM8p25WOpssIaXCC7SvXPhZAPNqHUha1zv+3zfwXKMSZhztUsa
-         LQGoXRPYU5WV8JWB9mcznYJD81RzU5KFTX7fNsgRJDyX1+hnLi3jmBxyhkCy/tSLgari
-         021Gawgz+h8dvk4yqbK9vMpnIH4nT0oDwASrjO/RYdovR/FQjSJEnBC3FdIGUHtN4lxU
-         24DcJ+1mbqYqZUNV/XgMxWz0/Fkgib5pdAL0y1Ku1sVQroSGJOIbX4I8xt2w1l62Q4R+
-         yfvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvi07/RpO3Dp35uTloXpzofipZ2U81CUF3Kh6NUFVCs/U4uPZWWH0QF592rwcGba/Wzj6LctU=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzPN5bde3o0spnNRWXeT2ObFLfIP3n+myge56lYxOWbdeobY5bU
-	HX4YiqHdUGd9lG/mmd6W910Ywf8qpPhC+EFtL2f/8MniXU4mMoTFkLi3G+b/gm1EkEiEeL+88lT
-	JfopOJ55+dMPzsuwY3hLutRz0knMLwTX2sePQGucj
-X-Gm-Gg: AY/fxX5iLdZ1pj0l9e9Xz07VVegXDAX3DFkO9jOp45xgpXWfdWam3bPZg3phKFo1EqF
-	om6hl9OcRqNubPlS/UuyDrLIdsWA06JKD6YSr6EZ+eH+s/e7fBEZEX3e5YwE+BpalhqvGUY62fo
-	+PYKNs/JbP7uAQuVIn56SkWjr9V4CGF3wvnZhCV4CJ0gYzujPlsvCDg0cOWcai6Woz7PT8ETZre
-	O0Jr2asZ2/DFiMxQLhva0tY33QbOUm7Zcv1eKZ0vGTExZrEqQP9vOto/75WxfyUJwWBnubs
-X-Received: by 2002:ac8:7d45:0:b0:4f3:7b37:81b with SMTP id
- d75a77b69052e-4ffc0a80347mr7952831cf.18.1767881411175; Thu, 08 Jan 2026
- 06:10:11 -0800 (PST)
+        bh=M6v8yJzivCkGRPQD2RD9WlokTdTcLOTAtGeFegCEmXw=;
+        b=EAcWCD8AtfrtiFtR4d4t/+LT5xhCWY3LtUQLBfwLeb2VYhsSmOdFT5l+DvzThWqXGM
+         pBLiO03yL9Fl1n+217pPh/9nhFG0dYxhXypW00+gS71qhuhlEknb7MRFrGgfevMHYuEf
+         6obOf4gSCZ4+Em7QB/BviMtETLzu/oFFogveUly/TAFJnAxxRWWM6AUG8288OhD/f8Tl
+         +iDfE2IrVdt2EiQ7I+0vdpePqBGVqP52M17Qv8s2XHJgJbneTi1RSbFTDAEAnTnzI+i1
+         gAuk4Mbf+1LClVld4aZm+vrB53RtfQdVNiFUifg8333S+Y1XfdqZBomATBHXrXNqgLTk
+         3J4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU2gAgXWfb+pNmKpurVZOXqjFg+iIC1dcbfv+JZmzK+66oNUIgD6ab4gK3MXPHpx9nTkAcZ9js=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz74lgrTwD404VT7sPibp2o3FRVT8H59JKB8Net8lUFPCkWkMaH
+	qANNUPXwpjoSNdtWxG6TgA1BQtMMYDyMgW2fZctF4Rh2nWnNAHBTMIy7pZbSwPDL7b02GSLW+dM
+	n9kQ8AbIN74DAxUVpBEzU98ZN3/oPSZRgxp172brD
+X-Gm-Gg: AY/fxX4iqN1Oxq71nx5+cvKfzAp806srToNbhV1cpAac7Z3RuTTI4Ogr7ERPq+FSXPd
+	dRVaUAeKykyvYQ9YW7H0MuiMeZYhoq56vKHes6iWdVJHdjcqnGAV49ebhE79G9pVxZKK+5Acxr8
+	0dmeHR1obPNs420Z5byV5h0UXfjWX2g5Fm9rFjIBWvJdztOBWS+/6LglqRU+IkAcL9IzN+LtGuk
+	dRh1zY5jCGtCLP8MpzzOoK8KpJzeYgNGK8dCedwqy0NHK+6g04RSTQn/kWaeZyxG9HZ6k/q
+X-Received: by 2002:a05:622a:1191:b0:4fb:e3b0:aae6 with SMTP id
+ d75a77b69052e-4ffc0897ee3mr8604171cf.1.1767881418089; Thu, 08 Jan 2026
+ 06:10:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-2-8be3867cb883@kernel.org> <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
- <3c8b4a5e-89f4-47e0-9a5d-24399407db0c@sirena.org.uk>
-In-Reply-To: <3c8b4a5e-89f4-47e0-9a5d-24399407db0c@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-6-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-6-8be3867cb883@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 8 Jan 2026 14:09:34 +0000
-X-Gm-Features: AQt7F2rujxIGY5_NcyYbFMLNUJyJwV68zqszeu4LHx3dTWaBmmJ-A6j-sa3_670
-Message-ID: <CA+EHjTxLkLjPj=1vwDqROXOUXi2LhOQb90WP6dFaTiYG1nWovA@mail.gmail.com>
-Subject: Re: [PATCH v9 02/30] arm64/fpsimd: Update FA64 and ZT0 enables when
- loading SME state
+Date: Thu, 8 Jan 2026 14:09:41 +0000
+X-Gm-Features: AQt7F2rcFTpAi-WrxH-BJGuce-rrvqsGKbxHYZVaorpjl6SSauHiDAfYA3cghe4
+Message-ID: <CA+EHjTznG=6+bYW+mmmBs_QqZ2rXkKTzNxA5KSh3S67H_BBaHg@mail.gmail.com>
+Subject: Re: [PATCH v9 06/30] KVM: arm64: Pay attention to FFR parameter in
+ SVE save and load
 To: Mark Brown <broonie@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -101,54 +99,47 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Eric Auger <eric.auger@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 8 Jan 2026 at 11:54, Mark Brown <broonie@kernel.org> wrote:
+On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
 >
-> On Wed, Jan 07, 2026 at 07:25:04PM +0000, Fuad Tabba wrote:
-> > On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
+> The hypervisor copies of the SVE save and load functions are prototyped
+> with third arguments specifying FFR should be accessed but the assembly
+> functions overwrite whatever is supplied to unconditionally access FFR.
+> Remove this and use the supplied parameter.
 >
-> > > +#define sme_cond_update_smcr(vl, fa64, zt0, reg)               \
-> > > +       do {                                                    \
-> > > +               u64 __old = read_sysreg_s((reg));               \
-> > > +               u64 __new = vl;                                 \
-> > > +               if (fa64)                       \
-> > > +                       __new |= SMCR_ELx_FA64;                 \
-> > > +               if (zt0)                                        \
-> > > +                       __new |= SMCR_ELx_EZT0;                 \
-> > > +               if (__old != __new)                             \
-> > > +                       write_sysreg_s(__new, (reg));           \
-> > > +       } while (0)
-> > > +
+> This has no effect currently since FFR is always present for SVE but will
+> be important for SME.
 >
-> > Should we cap the VL based on SMCR_ELx_LEN_MASK (as we do in
-> > sve_cond_update_zcr_vq())?
->
-> Yes, although I fear if we've got to the point where we've ever got a
-> bigger value going in we're going to have bigger problems.
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 
-Yeah, but I think that we should be consistent with the SVE case, at
-the very least, not to confuse the next person (e.g., future me) who
-might look at the two and wonder why they are different.
-
-> > Should we also preserve the remaining old bits from SMCR_EL1, i.e.,
-> > copy over the bits that aren't
-> > SMCR_ELx_LEN_MASK|SMCR_ELx_FA64|SMCR_ELx_EZT0? For now they are RES0,
-> > but that could change.
->
-> My thinking here is that any new bits are almost certainly going to need
-> explicit support (like with the addition of ZT0) and that copying them
-> forward without understanding is more likely to lead to a bug like
-> exposing state we didn't mean to than clearing them will.
-
-I understand the 'secure by default' intent for enable bits, but I'm
-concerned that this implementation changes the current behavior of the
-host kernel, which isn't mentioned in the commit message. Previously,
-both the feature enablement code (cpu_enable_fa64) and the vector
-length setting code (sme_set_vq/write_vl) performed a RMW, preserving
-existing bits in SMCR_EL1. This new macro zeroes out any bits not
-explicitly tracked here.
-
-In terms of copying them over, if they were set from the beginning,
-doesn't that mean that that explicit support was already added?
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
+
+
+> ---
+>  arch/arm64/kvm/hyp/fpsimd.S | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> index e950875e31ce..6e16cbfc5df2 100644
+> --- a/arch/arm64/kvm/hyp/fpsimd.S
+> +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> @@ -21,13 +21,11 @@ SYM_FUNC_START(__fpsimd_restore_state)
+>  SYM_FUNC_END(__fpsimd_restore_state)
+>
+>  SYM_FUNC_START(__sve_restore_state)
+> -       mov     x2, #1
+>         sve_load 0, x1, x2, 3
+>         ret
+>  SYM_FUNC_END(__sve_restore_state)
+>
+>  SYM_FUNC_START(__sve_save_state)
+> -       mov     x2, #1
+>         sve_save 0, x1, x2, 3
+>         ret
+>  SYM_FUNC_END(__sve_save_state)
+>
+> --
+> 2.47.3
+>
