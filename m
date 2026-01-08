@@ -1,254 +1,174 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CF42F28EF
-	for <kvmarm@lists.linux.dev>; Wed,  7 Jan 2026 23:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614104311D3
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 09:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767827637; cv=none; b=VJYvfF792VMfFSMqD4x9GOViXp9gI72Za+iwsJFdkOhiCpzQVkn6lqDhHfNypCHEWLse4j6g5O6xOnK3CLOA1hm7lrHGc/lk43wcxzjlYngu9+ibeAi8u5RO4oBHzYgAelmQEqb/P/XlLxgr+W31TFWwqBmDkZiD06veCZkhPe0=
+	t=1767864080; cv=none; b=DFFoba6+xoDR3Ms85Uk9hwwO30BH4/HMMdd3f4wrQ89gvNYa3hkOS4Fi56jVrB0vy3Op/U2y5scB+fZ5MtkLaUq8nuCxixGbpzPhS98yMdzg7zpWHIx8rYpcZQPkHCH0Jn9GtbUG4qZ3YXWPcCvYlfwpqm2vOVk1SKJNGhhbE6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767827637; c=relaxed/simple;
-	bh=Jy64zneAKwy0rKILEqV/YoGs8qWJ+teoZELZJO5YOUA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=neQwS9YAGKXHcZqJ1qmgNVf1HT7zkPBlX2Ut3HY1vs1PR15zD5GEP8SJb6UZfN2NyVyCpbiWXC1A7FSJEskqYIQ24gzzYn1aTUOoLl2RPQcfSz9RvQ35ZJt3l9qtbpaKaz4kkskGBrIr+EFc7Wr1rbQw9lg8zQzeVi6nT5xm9MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u5Bh4aFM; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u5Bh4aFM"
-Date: Wed, 7 Jan 2026 23:12:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1767827632;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rR1fnvTTjB0CTE6RfkOtCAeY2jGW4kIZ+UMk8iaKGdI=;
-	b=u5Bh4aFM/DJ6EI3tKWN9ieFoB4g6EEjw1qSeYhK/tQ+6PGvPQrzcSVID7cPg1+zCvC6KFm
-	XbMjwJ3hL72SpmGfx9q0LV4fstFFuDLFPPm5Dw+mLKGD28qAisxn74YyTOvcRrbHUMU5DQ
-	sLtTKWYIAxdxWioTvQMqczCGjCOTVFs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 16/21] KVM: selftests: Add support for nested NPTs
-Message-ID: <fj2wis2dluwtlaawrelfj25ldsk35dpbytytd2koemnv2va4np@feeu6in4gjjg>
-References: <20251230230150.4150236-1-seanjc@google.com>
- <20251230230150.4150236-17-seanjc@google.com>
+	s=arc-20240116; t=1767864080; c=relaxed/simple;
+	bh=Yhm+kvNMMwY0AAcw7KrULiS69CclNuOwE7YYon2Cj5A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=FFMDr80rC0werQ14c9A703GKYnY1fQLifbL6c/2vJw1XoCPka73+DMvIwp29jLQGDGEE4FI2Dv9l4ITu0pBew/J5MlsYVEBxDZVZE0+Qc/aqacRAUBV31zLTDoOEAxVU+1jpM6y6i1D85iQJ50BZiPVDnTS4HaH/Fr2ddX0bNf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dmzp930JqzLlXJ;
+	Thu,  8 Jan 2026 17:17:53 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id BE82140565;
+	Thu,  8 Jan 2026 17:21:08 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 8 Jan 2026 17:21:08 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 8 Jan 2026 17:21:07 +0800
+Message-ID: <16395515-1b66-8d71-abb0-d63db661ee62@hisilicon.com>
+Date: Thu, 8 Jan 2026 17:20:43 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251230230150.4150236-17-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v8 0/7] Add support for FEAT_{LS64, LS64_V} and related
+ tests
+Content-Language: en-US
+To: <catalin.marinas@arm.com>, <will@kernel.org>, <maz@kernel.org>,
+	<oliver.upton@linux.dev>, <joey.gouly@arm.com>, <suzuki.poulose@arm.com>,
+	<arnd@arndb.de>, <yuzenghui@huawei.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<yangyccccc@gmail.com>, <prime.zeng@hisilicon.com>, <xuwei5@huawei.com>
+References: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <20251223093343.3822498-1-wangzhou1@hisilicon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-On Tue, Dec 30, 2025 at 03:01:45PM -0800, Sean Christopherson wrote:
-> From: Yosry Ahmed <yosry.ahmed@linux.dev>
+On 2025/12/23 17:33, Zhou Wang wrote:
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+> - Add identifying and enabling in the cpufeature list
+> - Expose the support of FEAT_LS64 to userspace through HWCAP3 and cpuinfo
+> - Add related hwcap test
+> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
 > 
-> Implement nCR3 and NPT initialization functions, similar to the EPT
-> equivalents, and create common TDP helpers for enablement checking and
-> initialization. Enable NPT for nested guests by default if the TDP MMU
-> was initialized, similar to VMX.
+> A real scenario for this feature is that the userspace driver can make use of
+> this to implement direct WQE (workqueue entry) - a mechanism to fill WQE
+> directly into the hardware.
 > 
-> Reuse the PTE masks from the main MMU in the NPT MMU, except for the C
-> and S bits related to confidential VMs.
+> Picked Marc's 2 patches form [1] for handling the LS64 trap in a VM on emulated
+> MMIO and the introduce of KVM_EXIT_ARM_LDST64B.
 > 
-> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> [1] https://lore.kernel.org/linux-arm-kernel/20240815125959.2097734-1-maz@kernel.org/
 
-Funny story, I missed a teeny tiny part here..
+Hi,
 
-diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-index 18e9e9089643..2e5c480c9afd 100644
---- a/tools/testing/selftests/kvm/lib/x86/svm.c
-+++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-@@ -46,6 +46,9 @@ vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva)
-        svm->msr_gpa = addr_gva2gpa(vm, (uintptr_t)svm->msr);
-        memset(svm->msr_hva, 0, getpagesize());
+Gentle ping about this series... If there is no more comment, is there a chance to
+take it in this cycle?
 
-+       if (vm->stage2_mmu.pgd_created)
-+               svm->ncr3_gpa = vm->stage2_mmu.pgd;
-+
-        *p_svm_gva = svm_gva;
-        return svm;
- }
+Best,
+Zhou
 
----
-
-The good news is that the test still passes after we start ACTUALLY
-USING the nested NPT :)
-
-> ---
->  .../selftests/kvm/include/x86/processor.h     |  2 ++
->  .../selftests/kvm/include/x86/svm_util.h      |  9 ++++++++
->  .../testing/selftests/kvm/lib/x86/memstress.c |  4 ++--
->  .../testing/selftests/kvm/lib/x86/processor.c | 15 +++++++++++++
->  tools/testing/selftests/kvm/lib/x86/svm.c     | 21 +++++++++++++++++++
->  .../selftests/kvm/x86/vmx_dirty_log_test.c    |  4 ++--
->  6 files changed, 51 insertions(+), 4 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> index d134c886f280..deb471fb9b51 100644
-> --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> @@ -1477,6 +1477,8 @@ void __virt_pg_map(struct kvm_vm *vm, struct kvm_mmu *mmu, uint64_t vaddr,
->  void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
->  		    uint64_t nr_bytes, int level);
->  
-> +void vm_enable_tdp(struct kvm_vm *vm);
-> +bool kvm_cpu_has_tdp(void);
->  void tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr, uint64_t size);
->  void tdp_identity_map_default_memslots(struct kvm_vm *vm);
->  void tdp_identity_map_1g(struct kvm_vm *vm,  uint64_t addr, uint64_t size);
-> diff --git a/tools/testing/selftests/kvm/include/x86/svm_util.h b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> index b74c6dcddcbd..5d7c42534bc4 100644
-> --- a/tools/testing/selftests/kvm/include/x86/svm_util.h
-> +++ b/tools/testing/selftests/kvm/include/x86/svm_util.h
-> @@ -27,6 +27,9 @@ struct svm_test_data {
->  	void *msr; /* gva */
->  	void *msr_hva;
->  	uint64_t msr_gpa;
-> +
-> +	/* NPT */
-> +	uint64_t ncr3_gpa;
->  };
->  
->  static inline void vmmcall(void)
-> @@ -57,6 +60,12 @@ struct svm_test_data *vcpu_alloc_svm(struct kvm_vm *vm, vm_vaddr_t *p_svm_gva);
->  void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp);
->  void run_guest(struct vmcb *vmcb, uint64_t vmcb_gpa);
->  
-> +static inline bool kvm_cpu_has_npt(void)
-> +{
-> +	return kvm_cpu_has(X86_FEATURE_NPT);
-> +}
-> +void vm_enable_npt(struct kvm_vm *vm);
-> +
->  int open_sev_dev_path_or_exit(void);
->  
->  #endif /* SELFTEST_KVM_SVM_UTILS_H */
-> diff --git a/tools/testing/selftests/kvm/lib/x86/memstress.c b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> index 3319cb57a78d..407abfc34909 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/memstress.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/memstress.c
-> @@ -82,9 +82,9 @@ void memstress_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
->  	int vcpu_id;
->  
->  	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
-> -	TEST_REQUIRE(kvm_cpu_has_ept());
-> +	TEST_REQUIRE(kvm_cpu_has_tdp());
->  
-> -	vm_enable_ept(vm);
-> +	vm_enable_tdp(vm);
->  	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
->  		vcpu_alloc_vmx(vm, &vmx_gva);
->  
-> diff --git a/tools/testing/selftests/kvm/lib/x86/processor.c b/tools/testing/selftests/kvm/lib/x86/processor.c
-> index 29e7d172f945..a3a4c9a4cbcb 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/processor.c
-> @@ -8,7 +8,9 @@
->  #include "kvm_util.h"
->  #include "pmu.h"
->  #include "processor.h"
-> +#include "svm_util.h"
->  #include "sev.h"
-> +#include "vmx.h"
->  
->  #ifndef NUM_INTERRUPTS
->  #define NUM_INTERRUPTS 256
-> @@ -472,6 +474,19 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
->  	}
->  }
->  
-> +void vm_enable_tdp(struct kvm_vm *vm)
-> +{
-> +	if (kvm_cpu_has(X86_FEATURE_VMX))
-> +		vm_enable_ept(vm);
-> +	else
-> +		vm_enable_npt(vm);
-> +}
-> +
-> +bool kvm_cpu_has_tdp(void)
-> +{
-> +	return kvm_cpu_has_ept() || kvm_cpu_has_npt();
-> +}
-> +
->  void __tdp_map(struct kvm_vm *vm, uint64_t nested_paddr, uint64_t paddr,
->  	       uint64_t size, int level)
->  {
-> diff --git a/tools/testing/selftests/kvm/lib/x86/svm.c b/tools/testing/selftests/kvm/lib/x86/svm.c
-> index d239c2097391..8e4795225595 100644
-> --- a/tools/testing/selftests/kvm/lib/x86/svm.c
-> +++ b/tools/testing/selftests/kvm/lib/x86/svm.c
-> @@ -59,6 +59,22 @@ static void vmcb_set_seg(struct vmcb_seg *seg, u16 selector,
->  	seg->base = base;
->  }
->  
-> +void vm_enable_npt(struct kvm_vm *vm)
-> +{
-> +	struct pte_masks pte_masks;
-> +
-> +	TEST_ASSERT(kvm_cpu_has_npt(), "KVM doesn't supported nested NPT");
-> +
-> +	/*
-> +	 * NPTs use the same PTE format, but deliberately drop the C-bit as the
-> +	 * per-VM shared vs. private information is only meant for stage-1.
-> +	 */
-> +	pte_masks = vm->mmu.arch.pte_masks;
-> +	pte_masks.c = 0;
-> +
-> +	tdp_mmu_init(vm, vm->mmu.pgtable_levels, &pte_masks);
-> +}
-> +
->  void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_rsp)
->  {
->  	struct vmcb *vmcb = svm->vmcb;
-> @@ -102,6 +118,11 @@ void generic_svm_setup(struct svm_test_data *svm, void *guest_rip, void *guest_r
->  	vmcb->save.rip = (u64)guest_rip;
->  	vmcb->save.rsp = (u64)guest_rsp;
->  	guest_regs.rdi = (u64)svm;
-> +
-> +	if (svm->ncr3_gpa) {
-> +		ctrl->nested_ctl |= SVM_NESTED_CTL_NP_ENABLE;
-> +		ctrl->nested_cr3 = svm->ncr3_gpa;
-> +	}
->  }
->  
->  /*
-> diff --git a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> index 370f8d3117c2..032ab8bf60a4 100644
-> --- a/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> +++ b/tools/testing/selftests/kvm/x86/vmx_dirty_log_test.c
-> @@ -93,7 +93,7 @@ static void test_vmx_dirty_log(bool enable_ept)
->  	/* Create VM */
->  	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
->  	if (enable_ept)
-> -		vm_enable_ept(vm);
-> +		vm_enable_tdp(vm);
->  
->  	vcpu_alloc_vmx(vm, &vmx_pages_gva);
->  	vcpu_args_set(vcpu, 1, vmx_pages_gva);
-> @@ -170,7 +170,7 @@ int main(int argc, char *argv[])
->  
->  	test_vmx_dirty_log(/*enable_ept=*/false);
->  
-> -	if (kvm_cpu_has_ept())
-> +	if (kvm_cpu_has_tdp())
->  		test_vmx_dirty_log(/*enable_ept=*/true);
->  
->  	return 0;
-> -- 
-> 2.52.0.351.gbe84eed79e-goog
+> Tested with updated hwcap test(host in VHE):
+> [root@localhost tmp]# ./hwcap
+> [...]
+> # LS64 present
+> ok 226 cpuinfo_match_LS64
+> ok 227 sigill_LS64
+> ok 228 # SKIP sigbus_LS64
+> # 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
+> # Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
+> 
+> Tested with updated hwcap test(guest in VHE):
+> root@localhost:/mnt# ./hwcap
+> [...]
+> # LS64 present
+> ok 226 cpuinfo_match_LS64
+> ok 227 sigill_LS64
+> ok 228 # SKIP sigbus_LS64
+> # 120 skipped test(s) detected. Consider enabling relevant config options to improve coverage.
+> # Totals: pass:108 fail:0 xfail:0 xpass:0 skip:120 error:0
+> 
+> Tested nVHE case as well, same log as above.
+> 
+> Change since v7:
+> - Tiny spelling fix in 1/7
+> - Change the order between 5/7 and 6/7
+> - Remove has_ls64, use has_cpuid_feature directly in 6/7
+> - Add Acked-by from Arnd and Oliver
+> - Trap st64bv from EL0 to EL1/EL2
+> - Rebase on v6.19-rc1
+> Link: https://lore.kernel.org/all/20251107072127.448953-1-wangzhou1@hisilicon.com/
+> 
+> Change since v6:
+> - Add exception inject about nested VM in 3/7
+> - Remove __maybe_unused related codes in 7/7, replace to use asm clobber
+> - Add my signoff in each patch
+> - Rebase on v6.18-rc4
+> Link: https://lore.kernel.org/all/20251024090819.4097819-1-wangzhou1@hisilicon.com/
+> 
+> Change since v5:
+> - Rebase on v6.18-rc2 and fix the conflicts
+> - Add more description in elf_hwcaps.rst as suggested by Catalin Marinas
+> Link: https://lore.kernel.org/all/20250818064806.25417-1-yangyicong@huawei.com/
+> 
+> Change since v4:
+> - Rebase on v6.17-rc2 and fix the conflicts
+> Link: https://lore.kernel.org/linux-arm-kernel/20250715081356.12442-1-yangyicong@huawei.com/
+> 
+> Change since v3:
+> - Inject DABT fault for LS64 fault on unsupported memory but with valid memslot
+> Link: https://lore.kernel.org/linux-arm-kernel/20250626080906.64230-1-yangyicong@huawei.com/
+> 
+> Change since v2:
+> - Handle the LS64 fault to userspace and allow userspace to inject LS64 fault
+> - Reorder the patches to make KVM handling prior to feature support
+> Link: https://lore.kernel.org/linux-arm-kernel/20250331094320.35226-1-yangyicong@huawei.com/
+> 
+> Change since v1:
+> - Drop the support for LS64_ACCDATA
+> - handle the DABT of unsupported memory type after checking the memory attributes
+> Link: https://lore.kernel.org/linux-arm-kernel/20241202135504.14252-1-yangyicong@huawei.com/
+> 
+> Marc Zyngier (2):
+>   KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+>   KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
+> 
+> Yicong Yang (5):
+>   KVM: arm64: Handle DABT caused by LS64* instructions on unsupported
+>     memory
+>   arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
+>   KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
+>   arm64: Add support for FEAT_{LS64, LS64_V}
+>   kselftest/arm64: Add HWCAP test for FEAT_LS64
+> 
+>  Documentation/arch/arm64/booting.rst      | 12 ++++++
+>  Documentation/arch/arm64/elf_hwcaps.rst   |  7 ++++
+>  Documentation/virt/kvm/api.rst            | 43 ++++++++++++++++----
+>  arch/arm64/include/asm/el2_setup.h        | 12 +++++-
+>  arch/arm64/include/asm/esr.h              |  8 ++++
+>  arch/arm64/include/asm/hwcap.h            |  1 +
+>  arch/arm64/include/asm/kvm_emulate.h      |  7 ++++
+>  arch/arm64/include/uapi/asm/hwcap.h       |  1 +
+>  arch/arm64/kernel/cpufeature.c            | 28 +++++++++++++
+>  arch/arm64/kernel/cpuinfo.c               |  1 +
+>  arch/arm64/kvm/inject_fault.c             | 34 ++++++++++++++++
+>  arch/arm64/kvm/mmio.c                     | 27 ++++++++++++-
+>  arch/arm64/kvm/mmu.c                      | 14 ++++++-
+>  arch/arm64/tools/cpucaps                  |  2 +
+>  include/uapi/linux/kvm.h                  |  3 +-
+>  tools/testing/selftests/arm64/abi/hwcap.c | 49 +++++++++++++++++++++++
+>  16 files changed, 238 insertions(+), 11 deletions(-)
 > 
