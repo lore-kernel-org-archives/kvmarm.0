@@ -1,167 +1,115 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DD535CBB0
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 10:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2956B43E49A;
+	Thu,  8 Jan 2026 11:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767869550; cv=none; b=RgzcAph3RsbUgKerj9MeEGamwPMl93Hc7ZmRCcA5lZcM/3pAhIF0W2f+mYL/0yohTkTj0GZOXcn8lw1mCZLl0uJAFd9+b80DBHPlhdLa2p+UIJAfxjydQHmv/cGqZF9DFLfV7mNAOCa8PjIlp30A5SyphawLxRLhrK0SscJJXpM=
+	t=1767873283; cv=none; b=hFAhWc8njk0DP6j840r055cygyzdEWdZMYiSTaCyLjq2Lh2Z0hvfEchlLVyoTdY0gL9+RsTZtAF8VxW5kSYgVO9/EV7qpUUsf1DuS5HUpb879AQiDohhPquk3TQUIj+mTn+O5Zyr+jy9uICleCXExqbUrzxwJcLWOyAEujR2cro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767869550; c=relaxed/simple;
-	bh=CEX+vCwuDDkooxC5ARTwk1yRfhNVbvlrHD+dxMr0BlA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rjOYztnZJjOxkbYz9hNzpK0KRrwiWySVergpvJP2NwWO3Q9ojsW+x8dmcBPPONG3o5AVk2kE1du4ThC5TSIbBbfoj0+Q40WJ0c/NI2vUlPdRG6EPsKafiMJRY0hb5DtOfHL9Ud490QFSwYgsNKvrwvJUSkM4Jp4IOIHpw0THYVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DA494497;
-	Thu,  8 Jan 2026 02:52:02 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A27633F6A8;
-	Thu,  8 Jan 2026 02:52:02 -0800 (PST)
-Message-ID: <adcc278e-6be6-4658-821a-eb8995d65512@arm.com>
-Date: Thu, 8 Jan 2026 10:52:00 +0000
+	s=arc-20240116; t=1767873283; c=relaxed/simple;
+	bh=2QEBB0tMTbcvjFiR3Bb1wbKlZRI1fz02/DZZV9eNhGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lWzMXGwYvZqKkPdRrkCjmcoxO3qZQkf7WN4fDckejdioq7va7ShQmSPGaab5roMbbJWBNUi+HRF/9i/7Gd7/iHjkjAQCky8ZwtX1ydlSOzsCGSbJsGSNXdfKrWanrroyvQnApMgHWnhk43x3hedSGiQ9lr9vasR3Azx/frT0pSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gztWuRWW; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gztWuRWW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EECC116C6;
+	Thu,  8 Jan 2026 11:54:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767873282;
+	bh=2QEBB0tMTbcvjFiR3Bb1wbKlZRI1fz02/DZZV9eNhGg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gztWuRWWWZMayVuI+eb83hb3O95TWjuvXHPnEaq9PU++6FKFEs9agoO8gkYWsLZoQ
+	 AUiOfOAzMknl1KMV1WWRlutba9l6uoUNrHhvu0FBq2uFDn5jpUBzNuZfUQG+FaWQiy
+	 TQrhqyCltaiDZV7MUi4zRKt5lBONbDFu79sjvv63PnDEqWgZx4+WeSFhIbcWa3ZLyd
+	 ccZlJiz329makknk+Pp+h3XLmy4RCnWlzOneHdEprUjri/PYwlvjwZMRdmhPX44NwX
+	 UD4KU7TcamImNx7mzmBzSxb5xMoKo//IO2Ns/eUIaBFOYPgElqwojBE81i/eviy23g
+	 LZPpq0A0TAzqw==
+Date: Thu, 8 Jan 2026 11:54:31 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 02/30] arm64/fpsimd: Update FA64 and ZT0 enables when
+ loading SME state
+Message-ID: <3c8b4a5e-89f4-47e0-9a5d-24399407db0c@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-2-8be3867cb883@kernel.org>
+ <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 27/45] arm_mpam: resctrl: Add support for csu counters
-To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
-Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
- "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
- "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
- "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
- "dave.martin@arm.com" <dave.martin@arm.com>,
- "david@kernel.org" <david@kernel.org>,
- "dfustini@baylibre.com" <dfustini@baylibre.com>,
- "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
- "gshan@redhat.com" <gshan@redhat.com>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "kobak@nvidia.com" <kobak@nvidia.com>,
- "lcherian@marvell.com" <lcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "peternewman@google.com" <peternewman@google.com>,
- "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
- "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
- "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
- "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
- "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
- "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
- "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
- "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-28-ben.horgan@arm.com>
- <OSZPR01MB87980DA8A2534414337384608B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <OSZPR01MB87980DA8A2534414337384608B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="sEpEXEQvmS/iAzMe"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTxdSnpFHkm6o85EtjQjAWemBfcv9Oq6omWyrrMdkOuuVA@mail.gmail.com>
+X-Cookie: If you suspect a man, don't employ him.
 
-Hi Shaopeng,
 
-On 1/8/26 10:44, Shaopeng Tan (Fujitsu) wrote:
-> Hello Ben,
-> 
->> From: James Morse <james.morse@arm.com>
->>
->> resctrl exposes a counter via a file named llc_occupancy. This isn't really
->> a counter as its value goes up and down, this is a snapshot of the cache
->> storage usage monitor.
->>
->> Add some picking code to find a cache as close as possible to the L3 that
->> supports the CSU monitor.
->>
->> If there is an L3, but it doesn't have any controls, force the L3 resource
->> to exist. The existing topology_matches_l3() and
->> mpam_resctrl_domain_hdr_init() code will ensure this looks like the L3,
->> even if the class belongs to a later cache.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since rfc:
->> Allow csu counters however many partid or pmg there are
->> else if -> if
->> reduce scope of local variables
->> drop has_csu
->> ---
->>  drivers/resctrl/mpam_internal.h |   6 ++
->>  drivers/resctrl/mpam_resctrl.c  | 148 ++++++++++++++++++++++++++++++++
->>  2 files changed, 154 insertions(+)
-[...]
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index f8d8c241797a..5fde610cc9d7 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
-[...]
->>  
->> +static void mpam_resctrl_monitor_init(struct mpam_resctrl_mon *mon,
->> +                                     enum resctrl_event_id type)
->> +{
->> +       struct mpam_resctrl_res *res = &mpam_resctrl_controls[RDT_RESOURCE_L3];
->> +       struct rdt_resource *l3 = &res->resctrl_res;
->> +
->> +       lockdep_assert_cpus_held();
->> +
->> +       /* There also needs to be an L3 cache present */
->> +       if (get_cpu_cacheinfo_id(smp_processor_id(), 3) == -1)
->> +               return;
->> +
->> +       /*
->> +        * If there are no MPAM resources on L3, force it into existence.
->> +        * topology_matches_l3() already ensures this looks like the L3.
->> +        * The domain-ids will be fixed up by mpam_resctrl_domain_hdr_init().
->> +        */
->> +       if (!res->class) {
->> +               pr_warn_once("Faking L3 MSC to enable counters.\n");
->> +               res->class = mpam_resctrl_counters[type].class;
->> +       }
->> +
->> +       /* Called multiple times!, once per event type */
->> +       if (exposed_mon_capable) {
->> +               l3->mon_capable = true;
->> +
->> +               /* Setting name is necessary on monitor only platforms */
->> +               l3->name = "L3";
->> +               l3->mon_scope = RESCTRL_L3_CACHE;
->> +
->> +               resctrl_enable_mon_event(type);
->> +
->> +               /*
->> +                * Unfortunately, num_rmid doesn't mean anything for
->> +                * mpam, and its exposed to user-space!
->> +                * num-rmid is supposed to mean the number of groups
->> +                * that can be created, both control or monitor groups.
->> +                * For mpam, each control group has its own pmg/rmid
->> +                * space.
->> +                */
->> +               l3->mon.num_rmid = 1;
->> +       }
->> +}
-> 
-> Dave posted the following patch, Will you apply it?
-> https://lore.kernel.org/lkml/20250820131621.54983-1-Dave.Martin@arm.com/
+--sEpEXEQvmS/iAzMe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thanks for the reminder. I'll squash that into this patch.
+On Wed, Jan 07, 2026 at 07:25:04PM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:21, Mark Brown <broonie@kernel.org> wrote:
 
-> 
-> Best regards,
-> Shaopeng TAN
-> 
-> 
+> > +#define sme_cond_update_smcr(vl, fa64, zt0, reg)               \
+> > +       do {                                                    \
+> > +               u64 __old = read_sysreg_s((reg));               \
+> > +               u64 __new = vl;                                 \
+> > +               if (fa64)                       \
+> > +                       __new |= SMCR_ELx_FA64;                 \
+> > +               if (zt0)                                        \
+> > +                       __new |= SMCR_ELx_EZT0;                 \
+> > +               if (__old != __new)                             \
+> > +                       write_sysreg_s(__new, (reg));           \
+> > +       } while (0)
+> > +
 
-Thanks,
+> Should we cap the VL based on SMCR_ELx_LEN_MASK (as we do in
+> sve_cond_update_zcr_vq())?
 
-Ben
+Yes, although I fear if we've got to the point where we've ever got a
+bigger value going in we're going to have bigger problems.
 
+> Should we also preserve the remaining old bits from SMCR_EL1, i.e.,
+> copy over the bits that aren't
+> SMCR_ELx_LEN_MASK|SMCR_ELx_FA64|SMCR_ELx_EZT0? For now they are RES0,
+> but that could change.
+
+My thinking here is that any new bits are almost certainly going to need
+explicit support (like with the addition of ZT0) and that copying them
+forward without understanding is more likely to lead to a bug like
+exposing state we didn't mean to than clearing them will.
+
+--sEpEXEQvmS/iAzMe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlfmvYACgkQJNaLcl1U
+h9C5wgf9G+XKmo011/eubfLKJPyBw+Fnrf+TV1a7La9Ua9nDLvYoLuH2+ogXAq0J
+Y2jWf3r7uTwF23+nOLzN6uyqWmqu0RHeW9LSOk4wDgqJDNNnA4UwpNauRFdfFQgd
+5ANBOv6nviVTd0TpmjfCD2OoFKvbx+VHFXoonEsPFCSneA9IHd/8N21I/0q6sSr4
++5BKfPAr6d0Gk9NS3w1CRfB3XkOcG4Jf/vbJ1fjszfznHkWG1xV0R081qLd+GcDE
+fXUJjF6YAttCNEd57BrKpHNENZnNcNYwW5OvWhsUMG7N754fVb5utrd6b6Rd4xGf
+XcUYMxOkTJpeO7vgmY5AHpVUzXiVfA==
+=JsxG
+-----END PGP SIGNATURE-----
+
+--sEpEXEQvmS/iAzMe--
