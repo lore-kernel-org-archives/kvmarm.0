@@ -1,91 +1,93 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873BB4A65FD
-	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 14:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755E24AC381
+	for <kvmarm@lists.linux.dev>; Thu,  8 Jan 2026 14:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767881426; cv=pass; b=WyBi6tLn+y1k3s/ulHd89nw2RsrCTPilKy9Z/IsUB7JfWBznPzH+zUvEiXZOcvhIiXSIE6izGUUEXnS9lJ1Ycix/gdGJcxh41xEX0Z8tK9FPXf4hQ1pVlYe73j6u046luVSvUqH6MpvhecAxBkqQhgpKCe9Qi94cdMIimZTC+6E=
+	t=1767881430; cv=pass; b=I4FbuBaVvUXebzlOsbRzLvzKnFKvLhN3sdXG0a5vC3Q2yI8ApSl2zqh1g5cChmH/txHjjN/cfISrBWou2zgVs1xaKz/lOF0Qt9xNB7NRlxXHvGsgqWWc1O+OkPWZ3ra/fyQYp7NYrzGzt1tT60czvR98G7HnLNwHNjiAOltmD+c=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767881426; c=relaxed/simple;
-	bh=fqIKEGVdrdDwWR5GKD0/DnIsXWNq4kTzHRbVfGW+jJo=;
+	s=arc-20240116; t=1767881430; c=relaxed/simple;
+	bh=6s+1Fa+lgma2W6VO//e9W/EKZ99EnAtWNWD0KjYryo0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TIsdEQeEdaZ++RpO/q79I3nUipnl+D2uuhiNxmOc+zIZrgOj3U+zAeAuetRZ/2XcjEPzbgfzRnbDLWf4Vx8+WrOD9PxmD3UO5DHgHuPVytWYklJUJJtfI9/qSLiWu8y6c0L/MosZZzI3+23WN/tk1ByVQCyDRBp4REPfCh02wr0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qkrPrWy4; arc=pass smtp.client-ip=209.85.160.182
+	 To:Cc:Content-Type; b=A3ciWbqh15rNN13VHpeMQQLub0ntbmVFQB/4q6qnTDW7ikmhdV1rFRMZ0IdrXuBPwfcvplNp274OCVCCQqpUoPp8td6vD3cHrQF1o3+lXDqeP1OSza1lXLh3Q3p7E4eWoIfnAYBFL4K+8pvlKzHdk/K4vQGMgCqOd8Fo5juhdw8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ffZivEz5; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qkrPrWy4"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ffbaaafac4so743111cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 08 Jan 2026 06:10:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767881423; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ffZivEz5"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ee243b98caso845961cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 08 Jan 2026 06:10:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767881427; cv=none;
         d=google.com; s=arc-20240605;
-        b=W1V387Zu8E2kZaAGVCf8lEyl0CuZu+1SnkdEIHV7f8n85mpXIuIMyjOMwuI1pG3Nod
-         OTbw/6Q2EIhQYeXfxTtd53S3a2s4280vFz4UJLpn+NH799ekeRwNYlm5TmYPsNksvWmQ
-         k35i+LDBLPY+H/k+0HT5+MWqA6uKB39t/dG1Y3hQJxjHIDbSMQ72zhswvfB2CT+I7qIn
-         LWilngBKDXpA/Iz1sLMF+PLZGIyP8RsNDJaE+Vq5ugBtQRsF0wXdaWmkPtORQ0kICdpU
-         jfwoaS7drdbWdq7bPw8prqFXYHiK8QUChNRODlcdaUODXuA36GcGQ64JuxqB376/zd0g
-         PRfQ==
+        b=XdiSC3DwuZLD5OqJoz2ZRPnRIE6NYdCam4MYu4O2XiKyHa5yow4TB7p7Qi+xZVgyFh
+         k8qfUJMiM93OOby+BTee8yOdV3t5h7DIEsVSGgEvWsSaOQjzQAF9zsksN5AJkT/BdE3i
+         TyxZiE0bFAfvvCDSNlv2pzx0re8dBCY3RuddranQEGtKLiqym+TUQsyTjGn9yrd17/eM
+         wMXGFCJ6CzZnSsqsi1tv1RuokxD2CIHo4PoHcIvUXhiE2qKIzQMTAb9ZZGQ5YfjGkpAo
+         SlCfwLFqnvdIdn0zVRAlL2Hjzsp4JGqKmQ9lEz2f8uj+GAyc73eFRXfDpzl9qmoRaSSa
+         D4Gg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=NaZEGS72KLSqcxT/8N5H1mx02StcfqZHeuPXe2e7POg=;
-        fh=NeR+NieSi3w31yg1WhJ2Wv4J1Hxrh3Qe3YGinC3QTTo=;
-        b=ednBVe3pmksdhA0AC7Ddbp/WWvZaIzKC9Vy07ruaEeXthDpljXnhmXbIypNEn9wM3C
-         koiszr/fpcvDwbHrCdCXUjIvFBPTcyJEhqwn+oVPON6AQi6Fhwv7zI+gxCpX5jkWzrcC
-         smdP9r6v9u1frg4Ataom0D+w9vDqPxupM3TGbs2i4jrr8sNFXF6ZtSlJHzp1UZBMDIWY
-         kqdsbZLi8UJG/JNXTFdDzseQyINpZVUCFX9BjLZLo7LeO6GD72x/uInSSVKLzBtiBVOz
-         LboYx+ZAXDKluGWhU+iONRxxDjn2jH6khPyOzmyTTH7EFHtlketGEV3xETH9Nikv4aTI
-         LRgQ==;
+        bh=UkFBVVF2FUVuKrFgmcHW8CUldvJtVwVqevSTZGxcxL0=;
+        fh=q8qlfcpHELgdov4nQULUMaaPUs2h7mhGKE8p6Kp1fcw=;
+        b=i+O46uEvimMSEJfYDVNDtIHu3OjwlXIoTqzjH4FWjsow260yI3eqc6kWfQ+Jy1zqNT
+         ncd2kfXPcgQWpHKZ4+SwV1PBA43gCG2OThpB0aVjyFuWPD+pM5cFGxF5d3+IqicK7TmJ
+         0PfY8JWbGdJSQPUDcwAfFRib1T2lbk2rmAaL7jPfuWe/QA9cHFr8S3q+BlyA6N0DsYv7
+         IVVtfMdWWsyPbPDA9wb1gwVmW8Lfc0KFeI4YNB5PtgVgK1+SXvcTzm6fWbuHM5M3UNX8
+         Xi39uDYQDG5/Z64TcMnbrCLGfAcCzk0grskK5xXFAnzhAOLChR6vt3AjHkVtV+dpC+1m
+         8YwQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767881423; x=1768486223; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1767881427; x=1768486227; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NaZEGS72KLSqcxT/8N5H1mx02StcfqZHeuPXe2e7POg=;
-        b=qkrPrWy4kZOoWqyuewOxsid3sWVKOaV8rLzcSeV+hSjJEMR5eII/62cbECnIWpWRHP
-         KFnc++Hdw3yo5fs6ifLaz0DB/QnszbeF4K6VithI92DYMYPkY2XobJ8v+u/N2Z0d8RMa
-         /7hpQXDpoYhe+DEXP5PbYVIfCJvJMBnrUd6hlEYJRvWtc6vbsJafuAudQJsZWdcRbM2o
-         CacKw0zGsGWF/HCSOxe5xERMCeGHdivPUCDqmWPGKCmFMLfPG6f10hpnMNASS+UmQtOr
-         jOHHKinIGsi6uJkf9V+B2+g1I/aHB/Dkc+tHF6VSd6eb9u3C+9vFI8jRUZdYek/6cPu/
-         2uLg==
+        bh=UkFBVVF2FUVuKrFgmcHW8CUldvJtVwVqevSTZGxcxL0=;
+        b=ffZivEz5Drup04XTIRki97TTQPrvRyLwBt1oQxoNoyQU2SGswnx4g/oUFDmZd2Cm5Y
+         eCNhWtKCb8l2zn+s1Q1F/Iqm9UREUieRP1vVRGHdEQDTQzk/uInftWRK6VRGcoYi52B4
+         g3rnuZQa0wR8dDOzFIYrUB99vJg3NdL8ji0BC7YKo/bjeiA2vqJW+H8uYiP4yojEL/z0
+         uBiISPlCCWvyToFK7nal3MhgP/acO3OHUkJM/vMkmG671/bM4BlFUFNuGmVwnv68j/iE
+         +sqHyEwUSd/gULtbZJxPvquBUkLVBGQdOTrNJwdfLbnc+EV0GrQYDdZGKdenMHFu33yn
+         L7Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767881423; x=1768486223;
+        d=1e100.net; s=20230601; t=1767881427; x=1768486227;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NaZEGS72KLSqcxT/8N5H1mx02StcfqZHeuPXe2e7POg=;
-        b=dkvkUI4zUvf5Rr8QZuB6w0hfxdM89a6UNB7CFKkT7se397Qf1icj89WAfY8iDqpTQe
-         jCX/uLZZMLttiOirTZmHzseRAqkl4JeGoYtZK4v2FB8fOrJEQ5ddPXPWhgMmHrLsnBPF
-         NqQDun0a8DHk+sq05q8HLaGSGlIRCdxsa28LPon2D31ViHKUwekwgPCZAzN7/m69xt8k
-         75p/EPYRmZXU0S8jzfaWy1MFzAY4yrK+7d+gtO+IRq03hhVLnqgLrMnDFJTgWXjJv5MJ
-         +cauFHlRGQ5T+b2cZzAseiLAtKkKpepJhSh3UGn8MT78mkSmydOtw9BA/sckJorh1snI
-         yhsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFAvypgiF+d+xds2MvZbeCiJSuCH42V6vHVHYbZ3QPB5Ar3BBkrq4G0A+1MO4f+E28Co/0tlg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzS6tkjrikdO3tWQg8WBnra4xBHCl3Iaw+m1q0frBkNmWQJIp0i
-	Dhij6z4sQ7mNtDONQx0kT9mMt46efz5Ek2vw/yr3ZvesAUr4ckZqjI8iIrLtix49YBVfDcLJG/B
-	f4uqVjBixOlQHlzHRrsrKxqTy2F/s+OlVyo/hpEVT
-X-Gm-Gg: AY/fxX6P4y0uLT6ZjQ1qiKAW2riXasxjTWbuMIPJP2G5BXD5Ih2wikQZNUtexFbgdy4
-	IBrDV3cLYOFp4gO8dJezepWPCpzr5iHnbUIAr08sMqkqCWkx6vbuHimIMgcDAPgy3mtoYoEagLw
-	vu5wG+SYNIki4jFLfP53KTS3bghY1y6jqmsUaSo0s77WtwP64AmDbk8A1ZuMS17AgCyykBjZqQm
-	Z2cSMUs2PQg3CjTcPeBzLTh0wUNW0W3/J0XDKYp1scY+QZ7Y069pv9/QEpvbpTdQI6ah1uk
-X-Received: by 2002:ac8:574f:0:b0:4f1:9c6e:cf1c with SMTP id
- d75a77b69052e-4ffc0997e9emr8640981cf.17.1767881422911; Thu, 08 Jan 2026
- 06:10:22 -0800 (PST)
+        bh=UkFBVVF2FUVuKrFgmcHW8CUldvJtVwVqevSTZGxcxL0=;
+        b=pBErrLdUjNM/kdEdq0RHZBXYQErdkl/4FntGcjkBjqAchcxADruYLq/eDSTYs5Tj+N
+         yanb3SxmnKwqiZKGNc1YCX2PhgiamLBNLavA/A80oA8bkwbKACi2FuPfww5EDM6uAMmi
+         9jbEB1kYBZnG0S/pINS9fqxn3JBXTaSIn8JA572xnsZbbOSU244lYCMg9026ujxsQxLc
+         K6lV05LwYcbtGXhSmJUdu2jC1gGmcHEIg+SWXsPrTZKXC+9w03DD2A9HdzfSHq1VuWxD
+         p8+O9aZuH/PRf3MqlgsrHTSqbx6O6CQV/l8CAEvBSFwWGvbQsnOU25GP608u02QKMvxu
+         TyxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEGIh6uHwNMkfeI+QHJdObJLBIXAsPja7U8PD1upzYHUTwYIl28LxcQbxHOpwN3TwhTnEPbqA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx6p+zH0idbCb5crFJUldspWN4BlaiLn7GKGCK+HOSF4mg+uS0K
+	2V0y67j87lNR2+v4GAA+dpHoCg5xaYn0uHEyvX8T1BaSS2HKc6jrxiSSh98aWBoPKOtsACjGE2W
+	KDIBcO+SkO05845v5+CQQG1p2aLtbWyxbRfu7JJ5s
+X-Gm-Gg: AY/fxX487fxDC3bh9hKzTs0C/VefE81POR15ovEu2aXp+zR+y4cQ0/C1/laW4MrXG0j
+	6+Q+wimFsgg6x3IrtAEZ0E4t+G230k9kPn9hVWTAkLbzPWkrDQYhKZDiTePljDgrhltnPdBwa2f
+	gOjbErUZzQ8VCuHkcnwkcoq9PPlP77m53ruJUHyoaXYT9/suWuyUT2bFuGq3szNsGPweMmLesFx
+	IIVV1++TwTze4e0jlafv+cSQ1bj933gw5afYhZGg7US/hODvNhITNU1yHs4fM+uxlK0//xvekHq
+	Zq80iJE=
+X-Received: by 2002:a05:622a:54a:b0:4f4:bb86:504f with SMTP id
+ d75a77b69052e-4ffc0a70687mr8479691cf.16.1767881426893; Thu, 08 Jan 2026
+ 06:10:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-7-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-7-8be3867cb883@kernel.org>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-8-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-8-8be3867cb883@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 8 Jan 2026 14:09:46 +0000
-X-Gm-Features: AQt7F2pJrrFIu8j-RnjtZsOw-SyaBAdPJA09Q8QxhF8SmvfGBU7bWTwW9oJJhUU
-Message-ID: <CA+EHjTzTjaZoGQzivOSd97Z9VzySOAM=Qvye0p-R5rzUDwrSFw@mail.gmail.com>
-Subject: Re: [PATCH v9 07/30] KVM: arm64: Pull ctxt_has_ helpers to start of sysreg-sr.h
+Date: Thu, 8 Jan 2026 14:09:50 +0000
+X-Gm-Features: AQt7F2q2Xuj85YtjC8aNYrYefXO_WXhklsHw1E8DTYu1HFx1qzlPPDyk9yC5egA
+Message-ID: <CA+EHjTx8hu=WEu54Bt82PtcsOdQHaVkw9ivQSSC9=SV7bf1Zvg@mail.gmail.com>
+Subject: Re: [PATCH v9 08/30] KVM: arm64: Move SVE state access macros after
+ feature test macros
 To: Mark Brown <broonie@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -100,9 +102,9 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
 >
-> Rather than add earlier prototypes of specific ctxt_has_ helpers let's just
-> pull all their definitions to the top of sysreg-sr.h so they're all
-> available to all the individual save/restore functions.
+> In preparation for SME support move the macros used to access SVE state
+> after the feature test macros, we will need to test for SME subfeatures to
+> determine the size of the SME state.
 >
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 
@@ -111,119 +113,80 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
+
+
 > ---
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 84 +++++++++++++++---------------
->  1 file changed, 41 insertions(+), 43 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 50 +++++++++++++++++++--------------------
+>  1 file changed, 25 insertions(+), 25 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index a17cbe7582de..5624fd705ae3 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -16,8 +16,6 @@
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac7f970c7883..e6d25db10a6b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1048,31 +1048,6 @@ struct kvm_vcpu_arch {
+>  #define NESTED_SERROR_PENDING  __vcpu_single_flag(sflags, BIT(8))
 >
-> -static inline bool ctxt_has_s1poe(struct kvm_cpu_context *ctxt);
-> -
->  static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
->  {
->         struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
-> @@ -28,47 +26,6 @@ static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
->         return vcpu;
->  }
 >
-> -static inline bool ctxt_is_guest(struct kvm_cpu_context *ctxt)
-> -{
-> -       return host_data_ptr(host_ctxt) != ctxt;
-> -}
+> -/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> -#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+> -                            sve_ffr_offset((vcpu)->arch.sve_max_vl))
 > -
-> -static inline u64 *ctxt_mdscr_el1(struct kvm_cpu_context *ctxt)
-> -{
-> -       struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
+> -#define vcpu_sve_max_vq(vcpu)  sve_vq_from_vl((vcpu)->arch.sve_max_vl)
 > -
-> -       if (ctxt_is_guest(ctxt) && kvm_host_owns_debug_regs(vcpu))
-> -               return &vcpu->arch.external_mdscr_el1;
+> -#define vcpu_sve_zcr_elx(vcpu)                                         \
+> -       (unlikely(is_hyp_ctxt(vcpu)) ? ZCR_EL2 : ZCR_EL1)
 > -
-> -       return &ctxt_sys_reg(ctxt, MDSCR_EL1);
-> -}
+> -#define sve_state_size_from_vl(sve_max_vl) ({                          \
+> -       size_t __size_ret;                                              \
+> -       unsigned int __vq;                                              \
+> -                                                                       \
+> -       if (WARN_ON(!sve_vl_valid(sve_max_vl))) {                       \
+> -               __size_ret = 0;                                         \
+> -       } else {                                                        \
+> -               __vq = sve_vq_from_vl(sve_max_vl);                      \
+> -               __size_ret = SVE_SIG_REGS_SIZE(__vq);                   \
+> -       }                                                               \
+> -                                                                       \
+> -       __size_ret;                                                     \
+> -})
 > -
-> -static inline u64 ctxt_midr_el1(struct kvm_cpu_context *ctxt)
-> -{
-> -       struct kvm *kvm = kern_hyp_va(ctxt_to_vcpu(ctxt)->kvm);
+> -#define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.sve_max_vl)
 > -
-> -       if (!(ctxt_is_guest(ctxt) &&
-> -             test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &kvm->arch.flags)))
-> -               return read_cpuid_id();
-> -
-> -       return kvm_read_vm_id_reg(kvm, SYS_MIDR_EL1);
-> -}
-> -
-> -static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-> -{
-> -       *ctxt_mdscr_el1(ctxt)   = read_sysreg(mdscr_el1);
-> -
-> -       // POR_EL0 can affect uaccess, so must be saved/restored early.
-> -       if (ctxt_has_s1poe(ctxt))
-> -               ctxt_sys_reg(ctxt, POR_EL0)     = read_sysreg_s(SYS_POR_EL0);
-> -}
-> -
-> -static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> -{
-> -       ctxt_sys_reg(ctxt, TPIDR_EL0)   = read_sysreg(tpidr_el0);
-> -       ctxt_sys_reg(ctxt, TPIDRRO_EL0) = read_sysreg(tpidrro_el0);
-> -}
-> -
->  static inline bool ctxt_has_mte(struct kvm_cpu_context *ctxt)
->  {
->         struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
-> @@ -131,6 +88,47 @@ static inline bool ctxt_has_sctlr2(struct kvm_cpu_context *ctxt)
->         return kvm_has_sctlr2(kern_hyp_va(vcpu->kvm));
->  }
+>  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
+>                                  KVM_GUESTDBG_USE_SW_BP | \
+>                                  KVM_GUESTDBG_USE_HW | \
+> @@ -1108,6 +1083,31 @@ struct kvm_vcpu_arch {
 >
-> +static inline bool ctxt_is_guest(struct kvm_cpu_context *ctxt)
-> +{
-> +       return host_data_ptr(host_ctxt) != ctxt;
-> +}
+>  #define vcpu_gp_regs(v)                (&(v)->arch.ctxt.regs)
+>
+> +/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> +#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
+> +                            sve_ffr_offset((vcpu)->arch.sve_max_vl))
 > +
-> +static inline u64 *ctxt_mdscr_el1(struct kvm_cpu_context *ctxt)
-> +{
-> +       struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
+> +#define vcpu_sve_max_vq(vcpu)  sve_vq_from_vl((vcpu)->arch.sve_max_vl)
 > +
-> +       if (ctxt_is_guest(ctxt) && kvm_host_owns_debug_regs(vcpu))
-> +               return &vcpu->arch.external_mdscr_el1;
+> +#define vcpu_sve_zcr_elx(vcpu)                                         \
+> +       (unlikely(is_hyp_ctxt(vcpu)) ? ZCR_EL2 : ZCR_EL1)
 > +
-> +       return &ctxt_sys_reg(ctxt, MDSCR_EL1);
-> +}
+> +#define sve_state_size_from_vl(sve_max_vl) ({                          \
+> +       size_t __size_ret;                                              \
+> +       unsigned int __vq;                                              \
+> +                                                                       \
+> +       if (WARN_ON(!sve_vl_valid(sve_max_vl))) {                       \
+> +               __size_ret = 0;                                         \
+> +       } else {                                                        \
+> +               __vq = sve_vq_from_vl(sve_max_vl);                      \
+> +               __size_ret = SVE_SIG_REGS_SIZE(__vq);                   \
+> +       }                                                               \
+> +                                                                       \
+> +       __size_ret;                                                     \
+> +})
 > +
-> +static inline u64 ctxt_midr_el1(struct kvm_cpu_context *ctxt)
-> +{
-> +       struct kvm *kvm = kern_hyp_va(ctxt_to_vcpu(ctxt)->kvm);
+> +#define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.sve_max_vl)
 > +
-> +       if (!(ctxt_is_guest(ctxt) &&
-> +             test_bit(KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS, &kvm->arch.flags)))
-> +               return read_cpuid_id();
-> +
-> +       return kvm_read_vm_id_reg(kvm, SYS_MIDR_EL1);
-> +}
-> +
-> +static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
-> +{
-> +       *ctxt_mdscr_el1(ctxt)   = read_sysreg(mdscr_el1);
-> +
-> +       // POR_EL0 can affect uaccess, so must be saved/restored early.
-> +       if (ctxt_has_s1poe(ctxt))
-> +               ctxt_sys_reg(ctxt, POR_EL0)     = read_sysreg_s(SYS_POR_EL0);
-> +}
-> +
-> +static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-> +{
-> +       ctxt_sys_reg(ctxt, TPIDR_EL0)   = read_sysreg(tpidr_el0);
-> +       ctxt_sys_reg(ctxt, TPIDRRO_EL0) = read_sysreg(tpidrro_el0);
-> +}
-> +
->  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  {
->         ctxt_sys_reg(ctxt, SCTLR_EL1)   = read_sysreg_el1(SYS_SCTLR);
+>  /*
+>   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
+>   * memory backed version of a register, and not the one most recently
 >
 > --
 > 2.47.3
