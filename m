@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 512173590DC
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 09:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F8F32FA3D
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 09:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767951458; cv=none; b=ZfB5rzIMIze3db1ceVB33O3kDUQ0TZ6at/XdCsgHonMfxXuybTwEUbDI7P4sf8BCJCrel1C49lzIo5ju0NrvJqmae1ZbsbwwS2WuFN15/RLRv+zAj2Mxg9O3bIXMIv2fEeCEqbzK/6GuGRxD9p7/Ui0IZCSbE89uogGrNYDnbAY=
+	t=1767952535; cv=none; b=JlJp+/FsfJ8CgSqo+bLsI4kwW7+6UGntJyXr7UDNAjOcHRbydg6r4Y+GQBGgmcMGxZ3CiZ9alhULG9PQ9icFIJfczCRLjVAsUegUs1jAavqxgGie0xmx0rkJ3dZRgmw6Etr4iBVKT5D3wA2LymQmfLXliNhZ7bARj0E5NwuiYws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767951458; c=relaxed/simple;
-	bh=5GwKXguCVQ5SO3AjXktjwV1RqhgrBo8UtTaYWHtVwys=;
+	s=arc-20240116; t=1767952535; c=relaxed/simple;
+	bh=3Jh0IvY8TP9ooTAfdOJMij+3/iEv+13/l2GC1bcifO0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IX56MQMpQ2QdgBmY2HqV7VpSYy2TujMeRI5rMuW2erc4Y+AztivpJKcDs3r6NfQYGLG/xctyZxT3n5k+V258CQBk34S7zPeuTg+soSfIjbCeOtQjQMtjrRMtXweMl11a+RxY1nTd8zLnKEn6xv4TQ9cl07GzdnvCFZ2Boabx6AU=
+	 In-Reply-To:Content-Type; b=r7EzSe6BPFGiYDW/BPSNylZhX/Mo3RUfhInvRaMhZ57wQBswc3kQaSGrUH7wLZXiL5xA7FMp2R1dx7PYOoWrf62sQvTGddWFWOz5SMke0InL/GMpsZbfrEDuL+8K5lXnpSI6sRAGB/GZjsJi4/xJ2FO+x50g6yDIGyPWjUkW9JM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F223B497;
-	Fri,  9 Jan 2026 01:37:29 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 575F7497;
+	Fri,  9 Jan 2026 01:55:26 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEC643F6A8;
-	Fri,  9 Jan 2026 01:37:30 -0800 (PST)
-Message-ID: <8929c30b-9220-42f9-9a04-db414919a36f@arm.com>
-Date: Fri, 9 Jan 2026 09:37:28 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6C4643F5A1;
+	Fri,  9 Jan 2026 01:55:26 -0800 (PST)
+Message-ID: <37dfa4c6-8326-4013-b292-b3e58ff6601c@arm.com>
+Date: Fri, 9 Jan 2026 09:55:24 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/45] arm64: mpam: Add helpers to change a task or
- cpu's MPAM PARTID/PMG values
+Subject: Re: [PATCH v2 15/45] arm_mpam: resctrl: Add boilerplate cpuhp and
+ domain allocation
 To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
 Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
  "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
@@ -61,102 +61,118 @@ Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
  "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
 References: <20251219181147.3404071-1-ben.horgan@arm.com>
- <20251219181147.3404071-13-ben.horgan@arm.com>
- <OSZPR01MB87982085E0E5B09D0FBB58208B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+ <20251219181147.3404071-16-ben.horgan@arm.com>
+ <OSZPR01MB87980D7660524C1FF389A4518B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
 From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <OSZPR01MB87982085E0E5B09D0FBB58208B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+In-Reply-To: <OSZPR01MB87980D7660524C1FF389A4518B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 Hi Shaopeng,
 
-On 1/8/26 10:18, Shaopeng Tan (Fujitsu) wrote:
-> Hello  Ben,
+On 1/8/26 10:36, Shaopeng Tan (Fujitsu) wrote:
+> Hello Ben,
 > 
 >> From: James Morse <james.morse@arm.com>
 >>
->> Care must be taken when modifying the PARTID and PMG of a task in any
->> per-task structure as writing these values may race with the task being
->> scheduled in, and reading the modified values.
+>> resctrl has its own data structures to describe its resources. We can't use
+>> these directly as we play tricks with the 'MBA' resource, picking the MPAM
+>> controls or monitors that best apply. We may export the same component as
+>> both L3 and MBA.
 >>
->> Add helpers to set the task properties, and the CPU default value.  These
->> use WRITE_ONCE() that pairs with the READ_ONCE() in mpam_get_regval() to
->> avoid causing torn values.
+>> Add mpam_resctrl_exports[] as the array of class->resctrl mappings we are
+>> exporting, and add the cpuhp hooks that allocated and free the resctrl
+>> domain structures.
 >>
->> CC: Dave Martin <Dave.Martin@arm.com>
+>> While we're here, plumb in a few other obvious things.
+>>
+>> CONFIG_ARM_CPU_RESCTRL is used to allow this code to be built even though
+>> it can't yet be linked against resctrl.
+>>
 >> Signed-off-by: James Morse <james.morse@arm.com>
 >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 >> ---
->> Changes since rfc:
->> Keep comment attached to mpam_get_regval()
->> Add internal helper, __mpam_regval() (Jonathan)
+>> Domain list is an rcu list
+>> Add synchronize_rcu() to free the deleted element
+>> Code flow simplification (Jonathan)
 >> ---
->>  arch/arm64/include/asm/mpam.h | 28 ++++++++++++++++++++++++++++
->>  1 file changed, 28 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
->> index c4cb015e8d8f..a7fd0656bf90 100644
->> --- a/arch/arm64/include/asm/mpam.h
->> +++ b/arch/arm64/include/asm/mpam.h
->> @@ -4,6 +4,7 @@
->>  #ifndef __ASM__MPAM_H
->>  #define __ASM__MPAM_H
+[...]
+>> diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
+>> index 860181266b15..303aacfcb9d6 100644
+>> --- a/drivers/resctrl/mpam_devices.c
+>> +++ b/drivers/resctrl/mpam_devices.c
+>> @@ -1628,6 +1628,9 @@ static int mpam_cpu_online(unsigned int cpu)
+>>                          mpam_reprogram_msc(msc);
+>>          }
 >>  
->> +#include <linux/bitfield.h>
->>  #include <linux/jump_label.h>
->>  #include <linux/percpu.h>
->>  #include <linux/sched.h>
->> @@ -22,6 +23,22 @@ DECLARE_PER_CPU(u64, arm64_mpam_current);
->>   */
->>  extern u64 arm64_mpam_global_default;
->>  
->> +static inline u64 __mpam_regval(u16 partid_d, u16 partid_i, u8 pmg_d, u8 pmg_i)
->> +{
->> +       return FIELD_PREP(MPAM0_EL1_PARTID_D, partid_d) |
->> +               FIELD_PREP(MPAM0_EL1_PARTID_I, partid_i) |
->> +               FIELD_PREP(MPAM0_EL1_PMG_D, pmg_d) |
->> +               FIELD_PREP(MPAM0_EL1_PMG_I, pmg_i);
->> +}
->> +
->> +static inline void mpam_set_cpu_defaults(int cpu, u16 partid_d, u16 partid_i,
->> +                                        u8 pmg_d, u8 pmg_i)
->> +{
->> +       u64 default_val = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
->> +
->> +       WRITE_ONCE(per_cpu(arm64_mpam_default, cpu), default_val);
->> +}
->> +
->>  /*
->>   * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
->>   * which may race with reads in mpam_thread_switch(). Ensure only one of the old
->> @@ -45,6 +62,17 @@ static inline u64 mpam_get_regval(struct task_struct *tsk)
->>  #endif
->>  }
->>  
->> +static inline void mpam_set_task_partid_pmg(struct task_struct *tsk,
->> +                                           u16 partid_d, u16 partid_i,
->> +                                           u8 pmg_d, u8 pmg_i)
->> +{
->> +#ifdef CONFIG_ARM64_MPAM
+>> +       if (mpam_is_enabled())
+>> +               mpam_resctrl_online_cpu(cpu);
 > 
-> Since `mpam_set_task_partid_pmg()` is only called from MPAM, is this necessary?
+> return mpam_resctrl_online_cpu(cpu);
 
-Yes because mpam_partid_pmg only exists when CONFIG_ARM64_MPAM is enabled.
+Ack
 
+> 
+> Considering the fixes added in [PATCH v2 27/45],
+> How about changing the code as follows? 
+> 
+> +		err = mpam_resctrl_control_init(res, i);
+> +		if (err) {
+> +			pr_debug("Failed to initialise rid %u\n", i);
+> +			pr_debug("Internal error %d - resctrl not supported\n", err);
+> +			cpus_read_unlock();
+> +			return err;
+> +		}
+> +	}
+> +           /* Find some classes to use for monitors */
+> +         mpam_resctrl_pick_counters();
+> +         for (enum resctrl_event_id j = 0; j < QOS_NUM_EVENTS; j++) {
+> +         …
+> + }
+> +	cpus_read_unlock();
+
+Hmm, probably better to propagate the error from
+mpam_resctrl_monitor_init_abmc() rather moving the early exit.
+
+> 
 > 
 > Best regards,
 > Shaopeng TAN
 > 
->> +       u64 regval = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
+>> +       if (!exposed_alloc_capable && !exposed_mon_capable) {
+>> +               pr_debug("No alloc(%u) or monitor(%u) found - resctrl not supported\n",
+>> +                        exposed_alloc_capable, exposed_mon_capable);
+>> +               return -EOPNOTSUPP;
+>> +       }
 >> +
->> +       WRITE_ONCE(task_thread_info(tsk)->mpam_partid_pmg, regval);
->> +#endif
+>> +       if (!is_power_of_2(mpam_pmg_max + 1)) {
+>> +               /*
+>> +                * If not all the partid*pmg values are valid indexes,
+>> +                * resctrl may allocate pmg that don't exist. This
+>> +                * should cause an error interrupt.
+>> +                */
+>> +               pr_warn("Number of PMG is not a power of 2! resctrl may misbehave");
+>> +       }
+>> +
+>> +       /* TODO: call resctrl_init() */
+>> +
+>> +       return err;
 >> +}
+>> diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
+>> index 7f00c5285a32..2c7d1413a401 100644
+>> --- a/include/linux/arm_mpam.h
+>> +++ b/include/linux/arm_mpam.h
+>> @@ -49,6 +49,9 @@ static inline int mpam_ris_create(struct mpam_msc *msc, u8 ris_idx,
+>>  }
+>>  #endif
+>>  
+>> +bool resctrl_arch_alloc_capable(void);
+>> +bool resctrl_arch_mon_capable(void);
 >> +
->>  static inline void mpam_thread_switch(struct task_struct *tsk)
->>  {
->>          u64 oldregval;
+>>  /**
+>>   * mpam_register_requestor() - Register a requestor with the MPAM driver
+>>   * @partid_max:                The maximum PARTID value the requestor can generate.
 >> --
 >> 2.43.0
 
