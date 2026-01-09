@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682DD341AA0;
-	Fri,  9 Jan 2026 22:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04622FC881;
+	Fri,  9 Jan 2026 22:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767998074; cv=none; b=tvtFYcp8uIey0i+IhgvevcsdAXw7b/2doqubvPWzigXX1EZz0dIm1bwv/0fOWFTvoKBOn+Th7QlUEkn7VixwDRRKJsKNM+4YP+SVjO/RGOciPiQEsKZJkGvb9TBA67ed9AysD6xg4Zb3L2YBcCwEh649XzTrYp0JNSxMv1JCJ/c=
+	t=1767998073; cv=none; b=YJFfFH6qkT6Egj3uUXhk8yRZnSgrVVs2Nim4YTykYjRFZMYJwf2pHIH58Ugt3HgaXHy1tj/R5z7qXMEkWJCbmS6GULWwmsXjzCiokKbEirLMB1fIogwTT9t04aAznVYRU6dwHvZyRJP7RzePlVmVWWE/wCpye8f4Pj8C5CoOjQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767998074; c=relaxed/simple;
-	bh=tIvspsneeLwDiomVsTRPwrdHkeMhFvZLlssLRaJyK48=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NB31kHU+oRxx/+mtOi8/wdLQQRs6pOiau1554BOo49wRbPFp9QqFX+4Z7zW9mro4QPz3kc5S3FudqMyBWc5Nw04OnyODpHmXHL9LoY3jXSJvM2mZaNuPt7QXf/X08yxpNKhEuGh+e6JFMEWujbL3vY6admEtin8DbJVXy/Yw6Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hr5ggYBY; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767998073; c=relaxed/simple;
+	bh=uANFCEmcX63XWgQM35Dj9Sq/pNBgm6UWZiRuDN/bYHk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dDllrv9Pesnz2s6CGIpozGg4UggITDrCheTLj+r97RFDyG+lO9MauwyGbZZbUygVNL1APOxuM1ESIhwmlRJ/J+3qxykwqyqteAw601R/QScbBomXLWexKWYKoiuAj9ZUeHl9H4SXoPMcQjXJw+XBHJxuD/0nna91N3yYWp76kBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Thoa/ioL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hr5ggYBY"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44B71C19421;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Thoa/ioL"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 30545C4CEF1;
 	Fri,  9 Jan 2026 22:34:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1767998073;
-	bh=tIvspsneeLwDiomVsTRPwrdHkeMhFvZLlssLRaJyK48=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=hr5ggYBYoKwuQWxE28Z+24Z/FACu7sWJaF+asG1cvCWnJD7oorLB1Aaoh0QsJP0+8
-	 D0QLgp4XXYSpxPzyNc/VTxe0qKZal/TdVMMyj+ugY9VeoMcEhSbJ/oDSHGa7ThflEt
-	 t0Dplam8RmmaaEPR2Hp5mQueJ7J8KamGJuu0jU8T0lZ0aSJQVIssjrY8Eh7dd5f0Qn
-	 bPzscz0+uNEHLFvpksuxLyGhydughg/SvNJ/1iLAFMRvRUhoxCsDGVb7XKsp5FQoaI
-	 E28i1/gZ7G1+Qzk+A7gUevKuK2yQBdk6gPjtAcbAaY4oAcwAAVyvHZHGLy1lyA9l9I
-	 lKFgwumGCUf2w==
+	bh=uANFCEmcX63XWgQM35Dj9Sq/pNBgm6UWZiRuDN/bYHk=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=Thoa/ioL0nM6mNscnM56WzY7G525LisjSJgnXQLe1iKQERT+gZ5iGKQBuHyHOs6KL
+	 Bj6amDZWF6vGWS/HdJwd+lR/kwjMdVylhAtROLS/dPXpvm0kENP6P0wSwsBUo7FAJO
+	 YymYC5dmRBwRIUytvk3etprdPod4kl+V6RfLCwr6buniajidwKzr2n3sGBNG5ybCqg
+	 C5GPtnjZUdDv92gf87GGDSMYluTjHp6H7wCg8zIQZwCX3SiWrvIrTm7vs8PpsXAZor
+	 BFBhx0KS7OeUixVZS/hVKxRqPsedrISFgSr8Z+IVKtyOFZYRZLfsgALLPjEM+3Dnic
+	 rKdl5r6JrmUSQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 350CCD277C1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257CDD277C3;
 	Fri,  9 Jan 2026 22:34:33 +0000 (UTC)
 From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
-Date: Fri, 09 Jan 2026 22:34:25 +0000
-Subject: [PATCH v4 1/2] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in host
- handler
+Subject: [PATCH v4 0/2] KVM: arm64: Support FF-A direct messaging
+ interfaces
+Date: Fri, 09 Jan 2026 22:34:24 +0000
+Message-Id: <20260109-host-direct-messages-v4-0-95da4221d186@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,9 +41,11 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260109-host-direct-messages-v4-1-95da4221d186@google.com>
-References: <20260109-host-direct-messages-v4-0-95da4221d186@google.com>
-In-Reply-To: <20260109-host-direct-messages-v4-0-95da4221d186@google.com>
+X-B4-Tracking: v=1; b=H4sIAHCCYWkC/43PSwrCMBCA4auUrI3k2bSuvIe4aJNJG7CNJCUop
+ Xc3LYKICi7/gfmGmVGE4CCiQzGjAMlF58ccYlcg3TdjB9iZ3IgRJilhNe59nLBxAfSEB4ix6SB
+ iyQg1ykrZtAbl1WsA624bezrn7l2cfLhvVxJdp0+Qk+9gophgUXKQqlJUV/bYed9dYK/9gFYxs
+ X8UlpXaMqXB8lJx8qHwl0Lpj+cSz4pWwhBRC9Gy8k1ZluUB9++Vt0UBAAA=
+X-Change-ID: 20251029-host-direct-messages-5201d7f55abd
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
  Suzuki K Poulose <suzuki.poulose@arm.com>, 
  Zenghui Yu <yuzenghui@huawei.com>, 
@@ -55,11 +57,11 @@ Cc: Armelle Laine <armellel@google.com>,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
  linux-kernel@vger.kernel.org, Per Larsen <perlarsen@google.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1767998072; l=2212;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1767998072; l=2128;
  i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
- bh=w/i2Ml6dE6jz3JLbRWYLcU7BlfS1xCbyKvHbkV2MRRA=;
- b=xYmKBs65rSUnbTXmKTCxgMWon/4X3RUxdPsG8Cj2usbIGZu9UjyDqahHlTM25wI9lFyU8ezGk
- Fra7TJtjhoHCo/5jmgFb0vOVgISe6ixXpeX4H3s8r+Y3SFWE/Xfx9yn
+ bh=uANFCEmcX63XWgQM35Dj9Sq/pNBgm6UWZiRuDN/bYHk=;
+ b=aF5ssKxPqGYzDwYPs8/gWzPT7cTJyRm20BTQzTtIOoTQd/xoO6zxYErntLB+vTzD6UWo39jzZ
+ dKqyl3XVnZ3BHNqSquFeV8afUAqccCekAcLicvAKDugexTc/BgVe7lg
 X-Developer-Key: i=perlarsen@google.com; a=ed25519;
  pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
 X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
@@ -67,73 +69,59 @@ X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
 X-Original-From: Per Larsen <perlarsen@google.com>
 Reply-To: perlarsen@google.com
 
-From: Sebastian Ene <sebastianene@google.com>
+Support FFA_MSG_SEND_DIRECT_REQ unconditionally.
+Support FFA_MSG_SEND_DIRECT_REQ2 if hypervisor negotiated version 1.2+.
 
-Allow direct messages to be forwarded from the host. The host should
-not be sending framework messages so they are filtered out.
+Framework messages (FF-A control plane) are filtered out. For
+FFA_MSG_SEND_DIRECT_REQ, we look at flags in w2. Messages using the REQ2
+interface are always partition messages.
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
-Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+The second patch was part of a previous patch set [0] but was dropped
+since the use case was unclear. A clear use case has now appeared: use
+TPM device with CRB over FF-A when kernel boots with pkvm [1].
+
+Tested by booting Android under QEMU.
+
+Best Regards,
+Per
+
+[0]: https://lore.kernel.org/all/20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com/
+[1]: https://lore.kernel.org/all/20251027191729.1704744-1-yeoreum.yun@arm.com/
+ 
+
 Signed-off-by: Per Larsen <perlarsen@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/ffa.c | 20 ++++++++++++++++++++
+Changes in v4:
+- 1/2: do_ffa_direct_msg: check that flag in w2 is zero; drop unused vm_handle parameter.
+- 2/2: ffa_call_supported: simplify logic by reordering cases.
+-      do_ffa_direct_msg: switch polarity of check and update comment.
+- Link to v3: https://lore.kernel.org/r/20251119-host-direct-messages-v3-0-c74d04944b26@google.com
+
+Changes in v3:
+- Filter out framework messages as suggested by Will Deacon. Update cover letter accordingly.
+- Update trailers: Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+- Link to v2: https://lore.kernel.org/r/20251030-host-direct-messages-v2-0-9f27cef36730@google.com
+
+Changes in v2:
+- 1/2: Drop support for FFA_ID_GET interface in host handler.
+- Link to v1: https://lore.kernel.org/r/20251030-host-direct-messages-v1-0-463e57871c8f@google.com
+
+---
+Per Larsen (1):
+      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
+
+Sebastian Ene (1):
+      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in host handler
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 33 ++++++++++++++++++++++++++++++++-
  include/linux/arm_ffa.h       |  3 +++
- 2 files changed, 23 insertions(+)
+ 2 files changed, 35 insertions(+), 1 deletion(-)
+---
+base-commit: 372800cb95a35a7c40a07e2e0f7de4ce6786d230
+change-id: 20251029-host-direct-messages-5201d7f55abd
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index f731cc4c3f280a32acccca0de92b9ac6c8e05602..fc84595007f310004def7d525371fa7c128f244a 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -862,6 +862,22 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
- 	hyp_spin_unlock(&host_buffers.lock);
- }
- 
-+static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
-+			      struct kvm_cpu_context *ctxt)
-+{
-+	DECLARE_REG(u32, flags, ctxt, 2);
-+
-+	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-+
-+	/* filter out framework messages and validate SBZ/MBZ bits */
-+	if (flags) {
-+		ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
-+		return;
-+	}
-+
-+	arm_smccc_1_2_smc(args, res);
-+}
-+
- bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- {
- 	struct arm_smccc_1_2_regs res;
-@@ -920,6 +936,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_PARTITION_INFO_GET:
- 		do_ffa_part_get(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_MSG_SEND_DIRECT_REQ:
-+	case FFA_FN64_MSG_SEND_DIRECT_REQ:
-+		do_ffa_direct_msg(&res, host_ctxt);
-+		goto out_handled;
- 	}
- 
- 	if (ffa_call_supported(func_id))
-diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-index 81e603839c4a51873090b7e22edbe7b33a7e94df..d209d0cdac1eb804be01e4607acac8f76cc99e40 100644
---- a/include/linux/arm_ffa.h
-+++ b/include/linux/arm_ffa.h
-@@ -130,6 +130,9 @@
- #define FFA_FEAT_RXTX_MIN_SZ_16K	2
- #define FFA_FEAT_RXTX_MIN_SZ_MASK	GENMASK(1, 0)
- 
-+/* FFA message flags */
-+#define FFA_MSG_FLAGS_MSG_TYPE		BIT(31)
-+
- /* FFA Bus/Device/Driver related */
- struct ffa_device {
- 	u32 id;
-
+Best regards,
 -- 
-2.52.0.457.g6b5491de43-goog
+Per Larsen <perlarsen@google.com>
 
 
