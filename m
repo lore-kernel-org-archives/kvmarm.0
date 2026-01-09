@@ -1,183 +1,208 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACC03644AD
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 15:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767972597; cv=none; b=RPYzcqBA0s4K64XDf/3oWrC0vwGQgL/hjh9oZOzs/qQZP173j/6k8v/hCCEv70ZRYVAD1HAcS0tXgY2XyWKUE6sYCYW2rTvM4xOqz8NbnYp5LqdhuiaF6ysP6gpeBdor9G+Axq2DGtrlN4QsNURZoB4uWswrQjBkJHatItdXtww=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767972597; c=relaxed/simple;
-	bh=1c0AQK3xhIu2znG0zekbf9B+11RVbRRJX5tzuxSaaU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p3T96QOpVpnQodi3IvqcppN7LuRVvq+rGjlK3SzGHlMFlRHejRhyWuc1O5Xi8bVMkQAbXKVnKOvO14x5UE8F0yMcDXi2HDF0kP+iB2F+uPRaJY5ao5HPHPrg9m06M2InQhlVZ95FnqDXARwK3Pd+k79unynMJ8wf1UwgxgDo8oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mLQbC2bK; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1EE3563F3
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 15:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767974176; cv=pass; b=ky5l63IwjkwcZ6ywI0WxdtXhPDaRXIKT47eg1SNzMXqw2DlGbVeSfF8Oy5dl4qkNvHmODKcaHK9IDu6ItVos5qwFoNPoJqjL/1tcKLK5wCFYsZQ7q1/mwEl2b0s8C1NMhK2DLh5e6C6GWoWypfTT2yqoLDHVaKfO7XoRmbhN/3g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767974176; c=relaxed/simple;
+	bh=iK5AUYKKnG1GCt/80DpdeQQfwbtmqro71Xoh6GzOc/Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cZZzwP/pe8Q/rs2hUNXVWW3pEYvvI5tV/rGyj85uhk4sDNgZZeM3j/Vc0ugmsDmD+6sRnRMM0clfSAq0bRFVCHfYmknngvYKGBB0Si2SbpTqaU/ENJdNIUk4A170oanXsrWXuDCMWq6WFcc0gcVMuFk+ocXrhqVpYTnI21dDM4w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HgE/xowY; arc=pass smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mLQbC2bK"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-37fd6e91990so41226911fa.3
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 07:29:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HgE/xowY"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4ee243b98caso353711cf.1
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 07:56:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767974174; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k8650laHYPnMMR9UMqLtigkXe3Vo1xnljCDl3cItLPk1zFcKLoVkzQMQzrVBp2BY+S
+         4zV4KxST6cvVH6SwTW+VYDkm+1zEEj2j2w9J0xtn/blW/D7eNvxzGQItLBzTBxUwfB9F
+         nUDVHuRDq8huXwGGDJ55RsBZW5GnMpz9fVKjQBfha3C7c5rEvCv0/jF8POey33ejX49P
+         RCAK3hMPpW3HeXLkJ69xhehzPETBda06V8UQjitZMw5UDc4Y0zQMCVHm9af0bdYhBd29
+         YSnmaJdW+oORtyChbsyO5/xd1C+UvOvuriFBLsDhp+WgqBDCoxPCFiKJr6GmIdBd2p4w
+         wrCQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=U8I+9Z/SzReDIbFo3xnWDAd13nvsAbuR5scsRwJQ9D4=;
+        fh=BDA3EUaqLwABm5vQm82twiQFsWu6CafkoVClXHoQ48U=;
+        b=VtwCp13vDS2Etm1X4cCusBztUKe3gsKbqjoy2m5P1n/SjXRxTjpFWnRdkY+Jh4xP4N
+         WL1S4fuElDpkZuDNH3sPIzEI2ToF0S+H2cm7hkw4gXv1+H1nMAdy6n6V6gB9FGHwMdI3
+         0+PcKHBmkW6cZTVfY8IjC5LrGNx7WdNx3Rz88+Ap2vJqLLO23bohcydoENh/Nm7RlO4Y
+         LIKMEmN2ybtpd8mn/z5FWkHNph3cxEUTVR47M0aWpHYXg5GM1xf4IhUZZPwDPyv8kWZc
+         4ucGE5rRRB3z4/vs/yyaOmDgVjpKfxWI8IxSRpqY3+EzE4/VKCbnmlAv+foim9w/2LKN
+         oHUw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767972583; x=1768577383; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zPBnskPpYnDrBKJagTKqMfwyx58rk4gEgkXSmBAM15I=;
-        b=mLQbC2bKF8bIo6v4W5tVRtM4Ln1vNjtVtE+bixXqHY7BR9A6VSFgNu2TyZfwh7KY8H
-         Z81275+711tZHtuBVh/4N3f1jv9sYvBmrNrEtmESrtBhU+XjDqEsTfytoU9kGznHp5od
-         FuiaspyBt9qGM/6HTkq4Ar0JThr/Z3TehgfMHkolgFilnqwcEKjs+TFJwlwChDAaxalA
-         VIg0RTGt+MNJ5oHGiD4GrJgICQGitHCvd3a1nJTUHlM97S1RpFS9vI7BF6WcvrrHVSLS
-         hlR0YOom1Gv07k33wKADZ8XO2arAV7E/wj2rgJM1K+DQBhMwIFMa/lSnGLwABCVrAeBe
-         vTCg==
+        d=google.com; s=20230601; t=1767974174; x=1768578974; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8I+9Z/SzReDIbFo3xnWDAd13nvsAbuR5scsRwJQ9D4=;
+        b=HgE/xowYgs1WmccmDgueOeL5aOA3ADgYYAP43LElu/seOtA7cZ2aL3DxvYuoSJBf6x
+         7cgBdRdhczFFpNWfbp5R1hCQRGP6pF0FeNOTrXwszCufh6h6DAaZYoBXe9chZ9XCBzsK
+         muS3Em8+0WUyoq9TR1VvcCf0Aozl0Eoe01Tiuh4V7Nl3v1Gy/w7p9Yc5FqFmBuHDx5+M
+         p1EWO++gDIMbjb8hiuNCuNpfxmfMyR/sb3UIWhIhcMdTabhJUDiWmdawOc4AAsY3Mbjw
+         w8i64/7xAaxL+3vC/uBaqoQ/suuMM7a9MAthXCIYfP2CbaQOA63fVIzL6L7Pi/tE2JKT
+         vv7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767972583; x=1768577383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zPBnskPpYnDrBKJagTKqMfwyx58rk4gEgkXSmBAM15I=;
-        b=HSMdC2ShrIb+rP4kSUNggHtftU1SbvoUQwcWEDfAxY32d0JCxBbIOd8a/SAGZUMMiu
-         x0iTZHegoN6WiSTZxRs0OyfIhBmio+Lh6n6TKtCkR5vIkHUtTkqIvr7WtTxewfINq+/g
-         7RmDyfSRBSJFdiwK4MiIhAENOvL3/r+ZbhJ2d9AyakQIyBjnx2a0EZDdls7koqWeYydx
-         kWvUtZjdONW2OKkJybPQkouPhdWi+JP/roJNfa75afWuH+5VEa62RzSe9gXqS+K9QHGa
-         2GfhayaIpPFgoxRnibA07IsXwS/WFZdaSy6KDSUSaXJHZSMHFDEbMrGNQxGtH9v2f7YN
-         nN0w==
-X-Gm-Message-State: AOJu0YzWKQMKA/GUA/WIyrYzSS3n4OY5Qo1B8YjuTMrkAZo2WZr5u3St
-	FVKQSgDKVPWrfptSl/XJwbrHWKjDmOK4/sKZpgqbbIR07DrDFCm/CGVEZe+zsGmGJA==
-X-Gm-Gg: AY/fxX5EmC6S883TLTmv2bkl6BJC01frGDsXb6dWqqzIDP9doP/zH2kkmyf5qP0ejZX
-	PdRYd03jszRJGZB9qHDJfoYnIa7oFQKgJZy+SqeVSgRoKqKuCeZg8q7HctutFRuAbwkmy2R0NEn
-	jsjMwCNVeU2DI+tpOMxdpHzcfVmcPcExCVWY9+hXD7u8ZdQ76GDySzCdKcV99OBSLYGLNSQiHBP
-	HWSAx0GMKW3oXI+wQdFwxPsWGjTFHNOULsyHyMgB1YJuC7926xIoHlOKL+Nmeu6fgWpQnRLw6JC
-	YELJkIerNQyjiIL9ndkox/bUrfBGjnx8DoQcxCjAWiWrP8h40sgfKgqFEvmE5UVinGueZHzexJi
-	tZmIN8EXPs0ePG6kFAaPojamkyc0/LvXaWWCoXCDLwUz2cbGJ1W1kW4dGWQaA05URx7vBIXRCHq
-	Sy/HC5Akgyp4dPSxC0gAQj+NLJCXX7RiGMFVhW1ZmIY9ReDwgY
-X-Google-Smtp-Source: AGHT+IH+8WmaJO0kxfCWQE2RPwoBlC27rMLx+Y0gqPcFuf286nwSQ2Sl5j9cfWQe1J0V1YWWD8+BUw==
-X-Received: by 2002:a05:651c:a07:b0:37a:2d8c:c0a8 with SMTP id 38308e7fff4ca-382ff841fd7mr29287061fa.34.1767972582971;
-        Fri, 09 Jan 2026 07:29:42 -0800 (PST)
-Received: from google.com (228.231.88.34.bc.googleusercontent.com. [34.88.231.228])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-382ff00220esm16720351fa.24.2026.01.09.07.29.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jan 2026 07:29:42 -0800 (PST)
-Date: Fri, 9 Jan 2026 15:29:38 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Fuad Tabba <tabba@google.com>, Vincent Donnefort <vdonnefort@google.com>, 
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH 22/30] KVM: arm64: Return -EFAULT from VCPU_RUN on access
- to a poisoned pte
-Message-ID: <vs26wb435olhc4p5b4owotm5zzwr2znwafsgfskkicymj25mbj@nllj54ubgtgl>
-References: <20260105154939.11041-1-will@kernel.org>
- <20260105154939.11041-23-will@kernel.org>
- <s4p2ximtz7pki3waw245jtbl5znuco2ijrzsddlmln5x6rgxee@qbek4vpwn3kl>
- <aWEXRgagcULlftqk@willie-the-truck>
+        d=1e100.net; s=20230601; t=1767974174; x=1768578974;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U8I+9Z/SzReDIbFo3xnWDAd13nvsAbuR5scsRwJQ9D4=;
+        b=F8Rj+RZYPLm30mNi852K/lR2jdpS1AiAxHndPbF3jRdl5wtCr7f2hiUhJ+ScIQ0wry
+         RM02wXsw7K9vTTpo8qWXBosT7dtjGzBxxB/od78KwgbaaiUkb5X7DTZzeNSES8R49bND
+         6R715avlTQQKTRAg1RUrWQ0HMlBjzZ7hRsPQhEG7JhA2eyemFjO2zcCOoOxrOjVcMCcA
+         UDHECdx5k9HDdAYjIsHerYMfCO6dRXzo4WS+q49MNJTgVAiQE0u2u3tOmr+efiEamErN
+         IqXD1xMAN5gNge9xdvKAumB9/0SOWjCjJ053KK24nKyIZwuDd9kcuxGmyT4mK52nE932
+         vwjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsYccUFU4022gDxRNYOpGv8T+PlyRJPcVTW/DLmUEs70yyWRFuMQt899l9T2dag2xmFK5Ru80=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzY7EoD5rSct5XwSJZ95UbIPJjOGprU8UgjAyfLpQZq29zkQxEn
+	sv+Ypp6aYQ81zmyHDlqz5wG7VYkils83tFgCAOR2ZWBi7fGln3TlFFnj2wS7OLhRipGxwgy/y+J
+	nViiaDohgwnuDtabyYmQrmNfC1uff/PvaL2ATaiO7
+X-Gm-Gg: AY/fxX48UdfDHUm1TuPGKelPcujDSXK1b+yhIVNG7ZAiKZd5ThOGxETOkehGbkzeqoh
+	z9oO8SZTKCK+v6gy0vpUP9fD9BCoeCI/TfUbqaLmPjR6+zIugqI3ubdUTe9Z3cWtD2BhxGS00if
+	PGxPoOzp1OLEYs6vtGgSPyBAha+sNgvYbnWa0NVwyPt+gITJCwyZ83AIAtI2XnwMbCEmknOWuQw
+	AUpm+WT+ZK3skC+XlZIrK6YTNRzpLgTqdSjF6QykskDVd3jB/nWjcRtfU4jEVU8m+H2bCjp
+X-Received: by 2002:a05:622a:206:b0:4ff:a96a:90fc with SMTP id
+ d75a77b69052e-4ffca10c9e7mr11956941cf.0.1767974173794; Fri, 09 Jan 2026
+ 07:56:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWEXRgagcULlftqk@willie-the-truck>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-11-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-11-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 9 Jan 2026 15:55:36 +0000
+X-Gm-Features: AZwV_Qjl7-V6jtqPJiWFE-pNSysqHN43mjzymjYZ55x2bRwN0FRgaHUdOP2UPAs
+Message-ID: <CA+EHjTznZj94NFVQGG8Bi0=kkQUMYA0omdGS++83jwLj-CDRNQ@mail.gmail.com>
+Subject: Re: [PATCH v9 11/30] KVM: arm64: Define internal features for SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Friday 09 Jan 2026 at 14:57:10 (+0000), Will Deacon wrote:
-> On Tue, Jan 06, 2026 at 03:54:06PM +0000, Quentin Perret wrote:
-> > On Monday 05 Jan 2026 at 15:49:30 (+0000), Will Deacon wrote:
-> > > +int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
-> > > +{
-> > > +	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-> > > +	kvm_pte_t pte;
-> > > +	s8 level;
-> > > +	u64 ipa;
-> > > +	int ret;
-> > > +
-> > > +	switch (kvm_vcpu_trap_get_class(&hyp_vcpu->vcpu)) {
-> > > +	case ESR_ELx_EC_DABT_LOW:
-> > > +	case ESR_ELx_EC_IABT_LOW:
-> > > +		if (kvm_vcpu_trap_is_translation_fault(&hyp_vcpu->vcpu))
-> > > +			break;
-> > > +		fallthrough;
-> > > +	default:
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	ipa = kvm_vcpu_get_fault_ipa(&hyp_vcpu->vcpu);
-> > > +	ipa |= kvm_vcpu_get_hfar(&hyp_vcpu->vcpu) & GENMASK(11, 0);
-> > 
-> > Why is all the above needed? Could we simplify by having the host pass
-> > the IPA to the hcall?
-> 
-> I was just a little nervous about exposing an oracle here if we take the
-> gfn as an argument as it would provide the host with a pretty easy
-> mechanism to monitor the page access pattern of a guest after the initial
-> donation had occurred.
+Hi Mark,
 
-Aha, I see what you mean. I guess if we scope that hcall to only
-discover if a gfn is poisoned we're not exposing too much, but
-contextualizing the call to the fault also sounds good to me. Perhaps a
-small comment would help?
+On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
+>
+> In order to simplify interdependencies in the rest of the series define
+> the feature detection for SME and it's subfeatures.  Due to the need for
 
-> > > +	guest_lock_component(vm);
-> > > +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-> > > +	if (ret)
-> > > +		goto unlock;
-> > > +
-> > > +	if (level != KVM_PGTABLE_LAST_LEVEL) {
-> > > +		ret = -EINVAL;
-> > > +		goto unlock;
-> > > +	}
-> > > +
-> > > +	ret = guest_pte_is_poisoned(pte);
-> > > +unlock:
-> > > +	guest_unlock_component(vm);
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  int __pkvm_host_share_hyp(u64 pfn)
-> > >  {
-> > >  	u64 phys = hyp_pfn_to_phys(pfn);
-> > > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> > > index d1926cb08c76..14865907610c 100644
-> > > --- a/arch/arm64/kvm/pkvm.c
-> > > +++ b/arch/arm64/kvm/pkvm.c
-> > > @@ -417,10 +417,13 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > >  			return -EINVAL;
-> > >  
-> > >  		/*
-> > > -		 * We raced with another vCPU.
-> > > +		 * We either raced with another vCPU or the guest PTE
-> > > +		 * has been poisoned by an erroneous host access.
-> > >  		 */
-> > > -		if (mapping)
-> > > -			return -EAGAIN;
-> > > +		if (mapping) {
-> > > +			ret = kvm_call_hyp_nvhe(__pkvm_vcpu_in_poison_fault);
-> > 
-> > It's not too bad, but it's a shame we now issue that every time we have
-> > such a race (which is frequent-ish). Could we perhaps only issue it if
-> > at least one page has been forcefully reclaimed since boot?
-> 
-> On the plus side, it avoids an unconditional walk from the fault path
-> at EL2 (which is what we have in Android!).
-> 
-> It's a bit fiddly to implement your idea in the host, since the forceful
-> reclaim happens in a really terrible context but I could track it at EL2
-> and make __pkvm_vcpu_in_poison_fault() return early instead?
+nit: it's -> its
 
-I guess EL2 could easily publish something in the host kvm struct as
-well if we really wanted to, it's pinned as shared with EL2 and
-accessible from the hyp_vm, which we retrieve in the force reclaim path.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-> It's also
-> worth bearing in mind that we've already serialised the concurrent fault
-> and done a GUP by this point, so performance is somewhat of a lost
-> cause...
+Cheers,
+/fuad
 
-That is very true, so happy to keep all these micro-optimization for
-later.
 
-Thanks,
-Quentin
+
+> vector length configuration we define a flag for SME like for SVE.  We
+> also have two subfeatures which add architectural state, FA64 and SME2,
+> which are configured via the normal ID register scheme.
+>
+> Also provide helpers which check if the vCPU is in streaming mode or has
+> ZA enabled.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+
+
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 35 ++++++++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/sys_regs.c         |  2 +-
+>  2 files changed, 35 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 0f3d26467bf0..0816180dc551 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -353,6 +353,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS             10
+>         /* Unhandled SEAs are taken to userspace */
+>  #define KVM_ARCH_FLAG_EXIT_SEA                         11
+> +       /* SME exposed to guest */
+> +#define KVM_ARCH_FLAG_GUEST_HAS_SME                    12
+>         unsigned long flags;
+>
+>         /* VM-wide vCPU feature set */
+> @@ -1062,7 +1064,16 @@ struct kvm_vcpu_arch {
+>  #define vcpu_has_sve(vcpu)     kvm_has_sve((vcpu)->kvm)
+>  #endif
+>
+> -#define vcpu_has_vec(vcpu) vcpu_has_sve(vcpu)
+> +#define kvm_has_sme(kvm)       (system_supports_sme() &&               \
+> +                                test_bit(KVM_ARCH_FLAG_GUEST_HAS_SME, &(kvm)->arch.flags))
+> +
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define vcpu_has_sme(vcpu)     kvm_has_sme(kern_hyp_va((vcpu)->kvm))
+> +#else
+> +#define vcpu_has_sme(vcpu)     kvm_has_sme((vcpu)->kvm)
+> +#endif
+> +
+> +#define vcpu_has_vec(vcpu) (vcpu_has_sve(vcpu) || vcpu_has_sme(vcpu))
+>
+>  #ifdef CONFIG_ARM64_PTR_AUTH
+>  #define vcpu_has_ptrauth(vcpu)                                         \
+> @@ -1602,6 +1613,28 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  #define kvm_has_sctlr2(k)                              \
+>         (kvm_has_feat((k), ID_AA64MMFR3_EL1, SCTLRX, IMP))
+>
+> +#define kvm_has_fa64(k)                                        \
+> +       (system_supports_fa64() &&                      \
+> +        kvm_has_feat((k), ID_AA64SMFR0_EL1, FA64, IMP))
+> +
+> +#define kvm_has_sme2(k)                                        \
+> +       (system_supports_sme2() &&                      \
+> +        kvm_has_feat((k), ID_AA64PFR1_EL1, SME, SME2))
+> +
+> +#ifdef __KVM_NVHE_HYPERVISOR__
+> +#define vcpu_has_sme2(vcpu)    kvm_has_sme2(kern_hyp_va((vcpu)->kvm))
+> +#define vcpu_has_fa64(vcpu)    kvm_has_fa64(kern_hyp_va((vcpu)->kvm))
+> +#else
+> +#define vcpu_has_sme2(vcpu)    kvm_has_sme2((vcpu)->kvm)
+> +#define vcpu_has_fa64(vcpu)    kvm_has_fa64((vcpu)->kvm)
+> +#endif
+> +
+> +#define vcpu_in_streaming_mode(vcpu) \
+> +       (__vcpu_sys_reg(vcpu, SVCR) & SVCR_SM_MASK)
+> +
+> +#define vcpu_za_enabled(vcpu) \
+> +       (__vcpu_sys_reg(vcpu, SVCR) & SVCR_ZA_MASK)
+> +
+>  static inline bool kvm_arch_has_irq_bypass(void)
+>  {
+>         return true;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c8fd7c6a12a1..3576e69468db 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1945,7 +1945,7 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>  static unsigned int sme_visibility(const struct kvm_vcpu *vcpu,
+>                                    const struct sys_reg_desc *rd)
+>  {
+> -       if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SME, IMP))
+> +       if (vcpu_has_sme(vcpu))
+>                 return 0;
+>
+>         return REG_HIDDEN;
+>
+> --
+> 2.47.3
+>
