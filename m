@@ -1,83 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD3033D6C2;
-	Thu,  8 Jan 2026 21:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E4B1C5D5E;
+	Fri,  9 Jan 2026 00:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767909231; cv=none; b=Jww0M2XNkeaMt1osOGsS9LP4fdod0bTveq0WicAX2wDJ0V0Fdj72DLL46sMH2ufjM9oGDEef5OZlxfR0bRQ6jhYfNltjX5V7mBCxga8NX1Z+9jgX4Ujj29v3bVSj133dPpvSZqFTDQkTGai0TRJE74uMTQuQv5DtY17trYyYjXk=
+	t=1767918601; cv=none; b=nQNjDRBJKUpXJSD6i+FO+MCGy4jYF2dxWqa0EcHmSGiWI7iAxwwHiqFtICewqxqzHYM5vgTKcWAUOuBrh52D6SO9zg0XpBTpJ5xtR/dTXcIjMbY/j72fuHTxwX3QpFcct61Rsf6ECJvv1Leka8Lk13LcILxVMH9+5SIGlJZfYvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767909231; c=relaxed/simple;
-	bh=pES8CNvgEWUrZSrme3hkhLAvBUh0MV/JNCf1LMiME4k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=p6A5CMdleYnH1M4jLvlSh1XdT7WTtdTaml+w4cSCXt3rWu9tU/riC3S4BUMLO1XKEQw0hyMdOs+slLHh+t+1yU6tRF+r4/cudeN5dInityPn0KnAcug0MFLOcNnCbO9o85L3FvRLVR9IGAhXWF/OMFrIsXuN0s3gHxLAfRTIemE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gsx2osJ7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1767918601; c=relaxed/simple;
+	bh=mX5XbuFq3oY1fgctrRQBbLXQxLXqk+y8wzPmf6LEIxk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=du46/D4R0v1LowpHjQMSc+FsOEm/71FVDS3LgaFhkV9BxCef2DLhzNVxJvCHRM6K+boG27/GV7xSw2yWbRVJf+Md10370CjO0xMUjmgFvZX1vN3i+sBVU/JWLEX8vbTm98pdavi4G4Qtfw12gpudYEV7QUx6kEP1mqjibOWB3Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CtWgBhSf; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gsx2osJ7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3DCC116C6;
-	Thu,  8 Jan 2026 21:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767909231;
-	bh=pES8CNvgEWUrZSrme3hkhLAvBUh0MV/JNCf1LMiME4k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Gsx2osJ7hvB0mpEKQ4fqhnwT2ViurpZNG2S3fBsbAu0UMzSzFsVt9m70Wib8e3q25
-	 me4TZhsJ+iRHr+5NwZNtKxHIlTQHQg5EIHLtj0Uv1pz+eRvT8SnYAyGWPl+f33nm6Y
-	 tsxhXx1odR9DBjVbB2c4t69tZpVurqUFS3WPray2iRp1laPgIvkRKfmohAUkRsisMS
-	 XbQ7J/JIDLf9XYw02DqeAaX2Ax1K7IoxBJHAMViDszRveLaAaN6b94QV7K4OLSzN8D
-	 IgKSCK5k/VyIl1XQdhSSW6zWoAtIGx3GuOsoiYb2qtQpmES5fl7jPXiRACs8bEcJGw
-	 uK4jglxXRlfDg==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, Ankit Soni <Ankit.Soni@amd.com>,
- Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu
- <baolu.lu@linux.intel.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, kvm@vger.kernel.org, iommu@lists.linux.dev,
- linux-kernel@vger.kernel.org, Sairaj Kodilkar <sarunkod@amd.com>, Vasant
- Hegde <vasant.hegde@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>, Joao
- Martins <joao.m.martins@oracle.com>, Francesco Lavra
- <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>, Naveen
- Rao <Naveen.Rao@amd.com>, Crystal Wood <crwood@redhat.com>
-Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
- the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold
- ir_list_lock across IRTE updates in IOMMU)
-In-Reply-To: <874iovu742.ffs@tglx>
-References: <20250611224604.313496-2-seanjc@google.com>
- <20250611224604.313496-40-seanjc@google.com>
- <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d>
- <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com> <874iovu742.ffs@tglx>
-Date: Thu, 08 Jan 2026 22:53:47 +0100
-Message-ID: <87pl7jsrdg.ffs@tglx>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CtWgBhSf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1767918601; x=1799454601;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=mX5XbuFq3oY1fgctrRQBbLXQxLXqk+y8wzPmf6LEIxk=;
+  b=CtWgBhSft7qKOIpKv4EWtzblbtp+5ef4vZOqBo6fPRpLTQ8QPlzcFGFx
+   GbCHJIpaGrR/EzCq3ypJ1u4kcgZmwm7r2wisNnrBjfIULb/32JGUxfuq8
+   6MG17ViCUoMkzTcOieTh5uuOy86k/AlhyAK4jdDr9hFi9g9ZG+QLJZ7j5
+   uwtVdcc0DY0gFH6tucsLiHxs3QkI7VgtAA4iQRch8bwz8AAOE7ovj+9lu
+   gZXOqqXHDapC+L8L40hWlYSWLx4ESHczBEiaeDiAWJ+MgMOZfI3izI5Q+
+   CmKGAsb6hJLCmGQ7ZaoEEr+PcLXgJ9u9Ha0E+VJk3orIiXEbEgvr3mCxS
+   g==;
+X-CSE-ConnectionGUID: qqmAK9l7ToGlCr+s3Hb2sw==
+X-CSE-MsgGUID: xbqsMyIHSFyredH6TGo2Yg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11665"; a="86720687"
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="86720687"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 16:30:00 -0800
+X-CSE-ConnectionGUID: +aM55RQfSiK4CVJ+HHZuLw==
+X-CSE-MsgGUID: FprPpiFKRD+vf2GC5TB/5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,211,1763452800"; 
+   d="scan'208";a="203255856"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.240.14]) ([10.124.240.14])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2026 16:29:52 -0800
+Message-ID: <a34caf32-a0e0-4bd1-a670-14ecb3756ae6@linux.intel.com>
+Date: Fri, 9 Jan 2026 08:29:50 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 39/44] KVM: VMX: Bug the VM if either MSR auto-load
+ list is full
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Mingwei Zhang <mizhang@google.com>, Xudong Hao <xudong.hao@intel.com>,
+ Sandipan Das <sandipan.das@amd.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
+References: <20251206001720.468579-1-seanjc@google.com>
+ <20251206001720.468579-40-seanjc@google.com>
+ <04c70698-e523-43ae-9092-f360c848d797@linux.intel.com>
+ <aWANuxukqWmo36N0@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <aWANuxukqWmo36N0@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 08 2026 at 22:28, Thomas Gleixner wrote:
-> On Mon, Dec 22 2025 at 15:09, Paolo Bonzini wrote:
->> Of the three, the most sketchy is (a); notably, __setup_irq() calls
->> wake_up_process outside desc->lock.  Therefore I'd like so much to treat
->> it as a kernel/irq/ bug; and the simplest (perhaps too simple...) fix is
->
-> It's not more sketchy than VIRT assuming that it can do what it wants
-> under rq->lock. :)
 
-And just for the record, that's not the only place in the irq core which
-has that lock chain.
+On 1/9/2026 4:04 AM, Sean Christopherson wrote:
+> On Mon, Dec 08, 2025, Dapeng Mi wrote:
+>> On 12/6/2025 8:17 AM, Sean Christopherson wrote:
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 38491962b2c1..2c50ebf4ff1b 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -1098,6 +1098,7 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
+>>>  {
+>>>  	int i, j = 0;
+>>>  	struct msr_autoload *m = &vmx->msr_autoload;
+>>> +	struct kvm *kvm = vmx->vcpu.kvm;
+>>>  
+>>>  	switch (msr) {
+>>>  	case MSR_EFER:
+>>> @@ -1134,12 +1135,10 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
+>>>  	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
+>>>  	j = vmx_find_loadstore_msr_slot(&m->host, msr);
+>>>  
+>>> -	if ((i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS) ||
+>>> -	    (j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS)) {
+>>> -		printk_once(KERN_WARNING "Not enough msr switch entries. "
+>>> -				"Can't add msr %x\n", msr);
+>>> +	if (KVM_BUG_ON(i < 0 && m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm) ||
+>>> +	    KVM_BUG_ON(j < 0 &&  m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
+>> nit: Remove one extra space before "m->host.nr".
+> Oh, that's intentional, so that the rest of the line is aligned with the "guest"
+> line above.
 
-irq_set_affinity_locked()       // invoked with desc::lock held
-   if (desc->affinity_notify)
-      schedule_work()           // Ends up taking rq::lock
+Good to know. Thanks.
 
-and that's the case since cd7eab44e994 ("genirq: Add IRQ affinity
-notifiers"), which was added 15 years ago.
-
-Are you still claiming that this is a kernel/irq bug?
-
-Thanks,
-
-        tglx
 
