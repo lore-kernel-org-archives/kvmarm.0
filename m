@@ -1,391 +1,172 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0BF220F2C
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 16:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767974451; cv=pass; b=TEZ4Q5XDGz7ukPNy8SpLh+FQRlO5FYSaFKELK/pqkqYx+wgGJA2k6ttaeNKpC/LKbPNiEkkLb2YompVrGTOa3aa+4LiVbXR5//YxAGlY7fvPNIiITH8Uv2aI6NfavhXkcrpMVhF8hr2A0yc52NZ3jVL7uwY3lPeZqbIvzYIXxnQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767974451; c=relaxed/simple;
-	bh=2nfwmb94yGrA9ID/nouOw462cfRKH8fQ5ttQFoLy0TQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XHUhHAge/7ZXG9rbFgfqZRWWOG1jhRhw/pCH007SADbst+fJ1OE7uYyAOU79cumvXs2+Ujm+TBCZ/Myi1eYd5NNeuoY54sOJQC4zk9ux0vQFJRr6Zkfufr52qQaUwmO4UarZhrS5nVJirvDLLBwy43wdoiykEJWMzjftc/d0sfg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zpYOY+cq; arc=pass smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D25255E43
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 16:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767976177; cv=none; b=Qv+U53EhTRcWUNy/y0/u7nQNkOn95uD82hVpALaLvCJIm59YpDGuXN43iGHmkJsSPH9ETzfWUKeVAA2Hmcsxbd0YZzBuNNwhEUC/hFafB3v05L1LmoPROjQMmP/AnvoTdrDXECR0+NB0cXV+Um+o8ptk89rw/8FruktSyWTd6ZQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767976177; c=relaxed/simple;
+	bh=bWACLZCekTaSogrljOMoW53UvcGLcQvttUrYQ10xHgs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K3BbAS71g3KPng6f/5RvbHTPcTWb1ugya7iWloWFQ724tT4dOpKejmDhQYv2D8/FvQn4Sso2dmrgFpBGtU9hdaQv6Y75UM3o2gTwGKqUKR445RJHkQIuvyitlnE/7Q1fBYy35an97RRIkM/1hyxZs/tBJoZFFGTsax7D/EhpTd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jwxjAvyi; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zpYOY+cq"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ee243b98caso356531cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 08:00:48 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1767974448; cv=none;
-        d=google.com; s=arc-20240605;
-        b=MGfjCa7sun3tVNGlAUGaq2OEPn9oCRJ5DrsEGtddt0ouJQ28Nfz2hPC9/9IfcaXg16
-         QS5IUCIX4f5Uo7q4NM5KxuHDTFYQJ5VwWMgCXXD8OEQrQxNZI2Ff60P82CcrQ1WFUmbV
-         SBc9L9mTCsd/3ZLthzgCAAToWvlE0FUTtT1tO8pDS0AVajc2CEydMdwjz1nOpkyOR6dB
-         bszE1QA2Kocfg7EhhwLAr7z4VQR6hLXr6u6cCnk2dkEaXlDPVjXcUjFO2ha4tmvqLsEr
-         9sJU8C/bavl+bpUs6DC3Z23m7zTE1ulNSTauO/Dj+kQnvJsJLgHuwiGx/Im8DLZ193pg
-         ngHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=S7VtbjVgRK26yiEqOOgv/l78iDPH0hDYbqMKU+cHyxE=;
-        fh=lyiTKxDy0yjodRFooyZHF5cq41b2i79gyJIMEy9ckjI=;
-        b=V6/Hk7IffjxeWXDbiDDI721+Dt/eQw5UGAs85iXHSFbfgq8udZ/QnoMaQ/YxFuEQVm
-         5HOADjA+InrvyzlwMfU5/ZpiCAPZYWc1FOGrQuheTp6C4fu1GJ1N0CHvNrufXa66kpim
-         wP7+MnX8DLtSX3i4ym/6Yojbvl7qnTUpuqbNWf25a1K+gKNKJNX6STK6PkWHPWKmdek9
-         D8/7PVNe8RLUhvxmPDIk/mEzDdNRzxFNDvinLpLxEiDE6Txf/Eedzad9z2EEvj5oAvbH
-         lzkuJkMzrdLPgYUyEvNSvY0oP+K8busk+Hs9Z/G2C+DBNNNC17OeE2UstEXhkmj9JvIq
-         PLZA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwxjAvyi"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so36927975e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 08:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1767974448; x=1768579248; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=S7VtbjVgRK26yiEqOOgv/l78iDPH0hDYbqMKU+cHyxE=;
-        b=zpYOY+cqKd5F6r6dnGKURDswgEZSHWmTlxi24sXb1abPhB8O/2u0i6xJGmmH3dG757
-         GoukGnZ3Na0l3w7voYoi5Q9ShZKH0+Jbg9bVsL7jx9m8ssH+6q8/FYjVwYma3evPpJvP
-         Qww8E4cVuJgQ4KQbRv5IbhVPX/h4Cax7GN4UNV3Saeyxg1x7QLWP+PJMJJlnaKX67Q26
-         60bcHLGGq0HPyB2jz7Fy6NvZ2p5VWlOZB3HJWneOAX+mI99T8m+WLsNOyxJ4qRRaJ5HI
-         EkWJ6lhUw/J9eTmxAGcRSZxNh0bAVbPoWiOrZB3z8djYYLyUHfy4XNdE4JvKQslxifv2
-         NsYw==
+        d=linaro.org; s=google; t=1767976175; x=1768580975; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E87lHJdowwtu3YidaoeJSfoS6xk/5FNJEHNpvmHqK4w=;
+        b=jwxjAvyiCY4UpYtZV4bltghq4kQ8eFelhseQeTDxy+yGoV0NibMNjStxKS6zzbwLO3
+         vo0DBQ8RfMtx+t1GuQhuWM7rNrAhI6YFlprmtgQSlkrIACYhzcjG75D6MYTmQtH3yFok
+         udcs3Au9g09fPEeBDsScJpnPpbiEd9WCUreD2d2yT0lv2KJ68ZPNg9fvZPHYKzksYAvi
+         yGHdw/BI2did5ZDOyEEhGG4h23kTLsSbZfsDYnxuzEZFUgq0sORpcjD6zEfYGTHo12Ny
+         ktxgR9Tb+Lu0s5PUkVP24poOtEL6V18LWrxfr1y3isMnKC6dHVTSudbjqdqQXdraCIAs
+         EgGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767974448; x=1768579248;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S7VtbjVgRK26yiEqOOgv/l78iDPH0hDYbqMKU+cHyxE=;
-        b=mpPLBxsAdlHUTbS5AZz4rmblajU/y1iQzadPZAR4uJ2UDGo5svAUvL5QYkNNqpUPpk
-         qQZB3nJu0Zw0DRxeZHrjtPUFo+eB8INP27Zu6xVY0vf2UEM8lDOMMwuX4g1zAgHZJsg1
-         g9lPRPlbUTH3byLAInjc2cA6b0NT87jdhYXsXsGZNhaXug3pw5uuIFTrBvgmzq3LoXPd
-         t7iwq4w/pen3CU5434845l7FPwaDDZEfQIDk6ksgi2besKNSWMGSbYQJfkE74Py/7LL3
-         JUEOhYqIg2wo2qQ9eYFFRBKXfC9NAIAUWj8RTQL6BTJRjZdtrkedcojVZ4mdoNTnfMKM
-         PaMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCMyvAgV+DAJuC53kU82cenxfIMmJExNgU11Z9/zV8L51TTcNtkjnhjIl7Dh6Y4I4LTL3Rcio=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx4nMmpBjvaTsi8YjLsQvJCwOnACQ1c2jBZQOgeRWB2q2oA5xXq
-	7vgUenzUFCUgLXvUOoj5CtueYXhDNDNvdsBkBZQsXSvT/tSrsfGUWfQT8bPxyrT+FT+itVpOAby
-	3XFIo7ukWLENoDXKlRg2YVgJCllkww2BlZILkc8Q+
-X-Gm-Gg: AY/fxX7PWdsR93w9YeZC4SjH6Vi2Yo90UAGeMX70etG6XwMciQalbWjdW7eDZRp7wrV
-	yUznsrcJJVF+lcynkyV9yCIRSbFKkmT21Zs5LU6de8zKXcLn/kX/OUQjTtzKe1+XBsbfL2pYk8Q
-	yREZMGxdiH4ZIL5r8eQz8pBJvhl3A1WuF77KWmVfPeHO5Az3jS+B1lQjzFQf483f5F8XEu77PML
-	Lv8GkGToMZn8TalT0mHae1avYPziqjfoRTaQG+I792oHPCRsKnKtm3n1etfYUH/5tKZj5Ud
-X-Received: by 2002:ac8:5fc5:0:b0:4b7:9a9e:833f with SMTP id
- d75a77b69052e-4ffcb1e49dbmr10419571cf.7.1767974445761; Fri, 09 Jan 2026
- 08:00:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1767976175; x=1768580975;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E87lHJdowwtu3YidaoeJSfoS6xk/5FNJEHNpvmHqK4w=;
+        b=CJW05rFCexHdxfpexblmZd7Uc0waJwiSg7W3x4uXC1FN0vniSHEtU5QDVpmFzYP/00
+         1cr+LAC72NF5eGnNeO07RFr3tg3gaxG0o4JLwB2HOoepCsKtyKRk89wP+Tdc0XCJzykU
+         Gi41F4itbIHmi3/Zk+ktqvKL6VFtQ0zMniOITmdJS8SyoqeUbnhrV0GHPENMd0SxHD/b
+         fl/xx+Eqv4fAJIaH8BxAneGQcmzP0GYQpNzhKCfKsoXCr0HbTy1nHk1W6RfgkQP/o/zc
+         8gxtCN7QH2u1oU8iK4VAAeNbbDLh6CLVpIe+HGLfINwTebpXs+RW69img39dTp23OUSt
+         AyPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGlcn2YrDksxP+KbG2JXFT71xoe3xojtugUMkJRmCvsDXm6UgAhtsQQPZQSA6Eon7AYDfFygQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yybhgm0FuS6cdTGCKP8G+eAeTbMXz08qccOesgRyYYhJcg9F+cP
+	BEXq7tiVted16+KY589tfdhU5OFlmJb5Mk+CO8bM75ww19z+1Q9FLI1XIo58/+/lI5E=
+X-Gm-Gg: AY/fxX7So89udCn44NhHyMcOMZUP30ivr1np6WW5h/r1i8THDKbY4pJ+AU4fUAaDeQP
+	mJKdJ0aHQgVeKiwse5ae8wG353I8HR4pHJU6r+4JhWMzRxVFXU9XmDf1RO66uBH8GlZFSbDWSnb
+	NIC2WrNcKQHx1ChbDslBpUk8hBPbQc0kVZaSv1buYDHxdUXglffpXAOkCoqZURXmZkwO2Z9EJAe
+	l4J40eK3ew4ZECsgF+vH9GhXRcvEn6I+eTr9HInoKiwplndTW0QADj9ZHHmWJVOGBegjEHY8Zio
+	DGOzC60ba0oLgDVXa8V3+klFfoercGQsoCWmU9DIx5wajtH1lo0dG2iEzlHTxiab/G3xMFpDo4L
+	XxlvytwfLuKFN4dtP7NJzD756uNZRJC9ZnCJsoUJyAYgCtmRjutvcC7BBdKp+zwUK0DDnoi5y/C
+	ae7n6K1LGyzAFehAu5
+X-Google-Smtp-Source: AGHT+IGmzL1tXZl8ZPSvbm1DNjtYU9LFptg5q1JatUZDvK/eZmYzIHWMM1cUqtN42COJOMK1PRCMUg==
+X-Received: by 2002:a05:600c:4e49:b0:477:a36f:1a57 with SMTP id 5b1f17b1804b1-47d84b1897fmr112990735e9.3.1767976174573;
+        Fri, 09 Jan 2026 08:29:34 -0800 (PST)
+Received: from [192.168.1.3] ([185.48.77.170])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d7f703a8csm213675025e9.13.2026.01.09.08.29.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Jan 2026 08:29:34 -0800 (PST)
+Message-ID: <38443801-af4e-4ce1-a1c2-603eca8d90da@linaro.org>
+Date: Fri, 9 Jan 2026 16:29:33 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-14-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-14-8be3867cb883@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 9 Jan 2026 15:59:00 +0000
-X-Gm-Features: AZwV_QjAJH2K5qg87J2uUGDkra1sJbu4XzFdX96_aa60XR7lg7WJ3FZ7haLvZNk
-Message-ID: <CA+EHjTw-6-BFcr60+tgDzOE-OfcetD7yQtbNMkqr7BgiMXfeJA@mail.gmail.com>
-Subject: Re: [PATCH v9 14/30] KVM: arm64: Implement SME vector length configuration
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-
-On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
->
-> SME implements a vector length which architecturally looks very similar
-> to that for SVE, configured in a very similar manner.  This controls the
-> vector length used for the ZA matrix register, and for the SVE vector
-> and predicate registers when in streaming mode.  The only substantial
-> difference is that unlike SVE the architecture does not guarantee that
-> any particular vector length will be implemented.
->
-> Configuration for SME vector lengths is done using a virtual register as
-> for SVE, hook up the implementation for the virtual register.  Since we
-> do not yet have support for any of the new SME registers stub register
-> access functions are provided that only allow VL configuration.  These
-> will be extended as the SME specific registers, as for SVE.
->
-> Since vq_available() is currently only defined for CONFIG_SVE add a stub
-> for builds where that is disabled.
->
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/fpsimd.h   |  1 +
->  arch/arm64/include/asm/kvm_host.h | 24 ++++++++++--
->  arch/arm64/include/uapi/asm/kvm.h |  9 +++++
->  arch/arm64/kvm/guest.c            | 82 +++++++++++++++++++++++++++++++--------
->  4 files changed, 96 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
-> index 146c1af55e22..8b0840bd7e14 100644
-> --- a/arch/arm64/include/asm/fpsimd.h
-> +++ b/arch/arm64/include/asm/fpsimd.h
-> @@ -340,6 +340,7 @@ static inline int sve_max_vl(void)
->         return -EINVAL;
->  }
->
-> +static inline bool vq_available(enum vec_type type, unsigned int vq) { return false; }
->  static inline bool sve_vq_available(unsigned int vq) { return false; }
->
->  static inline void sve_user_disable(void) { BUILD_BUG(); }
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 3a3330b2a6a9..b41700df3ce9 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -810,8 +810,15 @@ struct kvm_vcpu_arch {
->          * low 128 bits of the SVE Z registers.  When the core
->          * floating point code saves the register state of a task it
->          * records which view it saved in fp_type.
-> +        *
-> +        * If SME support is also present then it provides an
-> +        * alternative view of the SVE registers accessed as for the Z
-> +        * registers when PSTATE.SM is 1, plus an additional set of
-> +        * SME specific state in the matrix register ZA and LUT
-> +        * register ZT0.
->          */
->         void *sve_state;
-> +       void *sme_state;
->         enum fp_type fp_type;
->         unsigned int max_vl[ARM64_VEC_MAX];
->
-> @@ -1098,14 +1105,23 @@ struct kvm_vcpu_arch {
->
->  #define vcpu_gp_regs(v)                (&(v)->arch.ctxt.regs)
->
-> -/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> -#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
-> -                            sve_ffr_offset((vcpu)->arch.max_vl[ARM64_VEC_SVE]))
-> -
->  #define vcpu_vec_max_vq(vcpu, type) sve_vq_from_vl((vcpu)->arch.max_vl[type])
->
->  #define vcpu_sve_max_vq(vcpu)  vcpu_vec_max_vq(vcpu, ARM64_VEC_SVE)
-> +#define vcpu_sme_max_vq(vcpu)  vcpu_vec_max_vq(vcpu, ARM64_VEC_SME)
-> +
-> +#define vcpu_sve_max_vl(vcpu)  ((vcpu)->arch.max_vl[ARM64_VEC_SVE])
-> +#define vcpu_sme_max_vl(vcpu)  ((vcpu)->arch.max_vl[ARM64_VEC_SME])
->
-> +#define vcpu_max_vl(vcpu) max(vcpu_sve_max_vl(vcpu), vcpu_sme_max_vl(vcpu))
-> +#define vcpu_max_vq(vcpu) sve_vq_from_vl(vcpu_max_vl(vcpu))
-> +
-> +#define vcpu_cur_sve_vl(vcpu) (vcpu_in_streaming_mode(vcpu) ? \
-> +                              vcpu_sme_max_vl(vcpu) : vcpu_sve_max_vl(vcpu))
-
-nit: This isn't really the current VL, but the current max VL. That
-said, I don't think 'cur_max` is a better name. Maybe a comment or
-something?
-
-> +/* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> +#define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +     \
-> +                            sve_ffr_offset(vcpu_cur_sve_vl(vcpu)))
->
->  #define vcpu_sve_zcr_elx(vcpu)                                         \
->         (unlikely(is_hyp_ctxt(vcpu)) ? ZCR_EL2 : ZCR_EL1)
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index c67564f02981..498a49a61487 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -354,6 +354,15 @@ struct kvm_arm_counter_offset {
->  #define KVM_ARM64_SVE_VLS_WORDS        \
->         ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
->
-> +/* SME registers */
-> +#define KVM_REG_ARM64_SME              (0x17 << KVM_REG_ARM_COPROC_SHIFT)
-> +
-> +/* Vector lengths pseudo-register: */
-> +#define KVM_REG_ARM64_SME_VLS          (KVM_REG_ARM64 | KVM_REG_ARM64_SME | \
-> +                                        KVM_REG_SIZE_U512 | 0xfffe)
-> +#define KVM_ARM64_SME_VLS_WORDS        \
-> +       ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
-> +
->  /* Bitmap feature firmware registers */
->  #define KVM_REG_ARM_FW_FEAT_BMAP               (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
->  #define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)                (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 456ef61b6ed5..2a1fdcb0ec49 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -310,22 +310,20 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->  #define vq_mask(vq) ((u64)1 << ((vq) - SVE_VQ_MIN) % 64)
->  #define vq_present(vqs, vq) (!!((vqs)[vq_word(vq)] & vq_mask(vq)))
->
-> -static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +static int get_vec_vls(enum vec_type vec_type, struct kvm_vcpu *vcpu,
-> +                     const struct kvm_one_reg *reg)
->  {
->         unsigned int max_vq, vq;
->         u64 vqs[KVM_ARM64_SVE_VLS_WORDS];
->
-> -       if (!vcpu_has_sve(vcpu))
-> -               return -ENOENT;
-> -
-> -       if (WARN_ON(!sve_vl_valid(vcpu->arch.max_vl[ARM64_VEC_SVE])))
-> +       if (WARN_ON(!sve_vl_valid(vcpu->arch.max_vl[vec_type])))
->                 return -EINVAL;
->
->         memset(vqs, 0, sizeof(vqs));
->
-> -       max_vq = vcpu_sve_max_vq(vcpu);
-> +       max_vq = vcpu_vec_max_vq(vcpu, vec_type);
->         for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> -               if (sve_vq_available(vq))
-> +               if (vq_available(vec_type, vq))
->                         vqs[vq_word(vq)] |= vq_mask(vq);
->
->         if (copy_to_user((void __user *)reg->addr, vqs, sizeof(vqs)))
-> @@ -334,40 +332,41 @@ static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         return 0;
->  }
->
-> -static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +static int set_vec_vls(enum vec_type vec_type, struct kvm_vcpu *vcpu,
-> +                      const struct kvm_one_reg *reg)
->  {
->         unsigned int max_vq, vq;
->         u64 vqs[KVM_ARM64_SVE_VLS_WORDS];
->
-> -       if (!vcpu_has_sve(vcpu))
-> -               return -ENOENT;
-> -
->         if (kvm_arm_vcpu_vec_finalized(vcpu))
->                 return -EPERM; /* too late! */
->
-> -       if (WARN_ON(vcpu->arch.sve_state))
-> +       if (WARN_ON(!sve_vl_valid(vcpu->arch.max_vl[vec_type])))
->                 return -EINVAL;
->
->         if (copy_from_user(vqs, (const void __user *)reg->addr, sizeof(vqs)))
->                 return -EFAULT;
->
-> +       if (WARN_ON(vcpu->arch.sve_state || vcpu->arch.sme_state))
-> +               return -EINVAL;
-> +
-
-Can this ever happen? kvm_arm_vcpu_vec_finalized() is checked above,
-and vcpu->arch.{sve,sme}_state are only assigned in
-kvm_vcpu_finalize_vec() immediately before setting the finalized flag.
-
-Cheers,
-/fuad
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v6 29/35] KVM: arm64: Pin the SPE buffer in the host
+ and map it at stage 2
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-30-alexandru.elisei@arm.com>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <20251114160717.163230-30-alexandru.elisei@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
->         max_vq = 0;
->         for (vq = SVE_VQ_MIN; vq <= SVE_VQ_MAX; ++vq)
->                 if (vq_present(vqs, vq))
->                         max_vq = vq;
->
-> -       if (max_vq > sve_vq_from_vl(kvm_max_vl[ARM64_VEC_SVE]))
-> +       if (max_vq > sve_vq_from_vl(kvm_max_vl[vec_type]))
->                 return -EINVAL;
->
->         /*
->          * Vector lengths supported by the host can't currently be
->          * hidden from the guest individually: instead we can only set a
-> -        * maximum via ZCR_EL2.LEN.  So, make sure the available vector
-> +        * maximum via xCR_EL2.LEN.  So, make sure the available vector
->          * lengths match the set requested exactly up to the requested
->          * maximum:
->          */
->         for (vq = SVE_VQ_MIN; vq <= max_vq; ++vq)
-> -               if (vq_present(vqs, vq) != sve_vq_available(vq))
-> +               if (vq_present(vqs, vq) != vq_available(vec_type, vq))
->                         return -EINVAL;
->
->         /* Can't run with no vector lengths at all: */
-> @@ -375,11 +374,27 @@ static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->                 return -EINVAL;
->
->         /* vcpu->arch.sve_state will be alloc'd by kvm_vcpu_finalize_sve() */
-> -       vcpu->arch.max_vl[ARM64_VEC_SVE] = sve_vl_from_vq(max_vq);
-> +       vcpu->arch.max_vl[vec_type] = sve_vl_from_vq(max_vq);
->
->         return 0;
->  }
->
-> +static int get_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       if (!vcpu_has_sve(vcpu))
-> +               return -ENOENT;
-> +
-> +       return get_vec_vls(ARM64_VEC_SVE, vcpu, reg);
-> +}
-> +
-> +static int set_sve_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       if (!vcpu_has_sve(vcpu))
-> +               return -ENOENT;
-> +
-> +       return set_vec_vls(ARM64_VEC_SVE, vcpu, reg);
-> +}
-> +
->  #define SVE_REG_SLICE_SHIFT    0
->  #define SVE_REG_SLICE_BITS     5
->  #define SVE_REG_ID_SHIFT       (SVE_REG_SLICE_SHIFT + SVE_REG_SLICE_BITS)
-> @@ -533,6 +548,39 @@ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         return 0;
->  }
->
-> +static int get_sme_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       if (!vcpu_has_sme(vcpu))
-> +               return -ENOENT;
-> +
-> +       return get_vec_vls(ARM64_VEC_SME, vcpu, reg);
-> +}
-> +
-> +static int set_sme_vls(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       if (!vcpu_has_sme(vcpu))
-> +               return -ENOENT;
-> +
-> +       return set_vec_vls(ARM64_VEC_SME, vcpu, reg);
-> +}
-> +
-> +static int get_sme_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       /* Handle the KVM_REG_ARM64_SME_VLS pseudo-reg as a special case: */
-> +       if (reg->id == KVM_REG_ARM64_SME_VLS)
-> +               return get_sme_vls(vcpu, reg);
-> +
-> +       return -EINVAL;
-> +}
-> +
-> +static int set_sme_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> +{
-> +       /* Handle the KVM_REG_ARM64_SME_VLS pseudo-reg as a special case: */
-> +       if (reg->id == KVM_REG_ARM64_SME_VLS)
-> +               return set_sme_vls(vcpu, reg);
-> +
-> +       return -EINVAL;
-> +}
->  int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
->  {
->         return -EINVAL;
-> @@ -711,6 +759,7 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         case KVM_REG_ARM_FW_FEAT_BMAP:
->                 return kvm_arm_get_fw_reg(vcpu, reg);
->         case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
-> +       case KVM_REG_ARM64_SME: return get_sme_reg(vcpu, reg);
->         }
->
->         return kvm_arm_sys_reg_get_reg(vcpu, reg);
-> @@ -728,6 +777,7 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         case KVM_REG_ARM_FW_FEAT_BMAP:
->                 return kvm_arm_set_fw_reg(vcpu, reg);
->         case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
-> +       case KVM_REG_ARM64_SME: return set_sme_reg(vcpu, reg);
->         }
->
->         return kvm_arm_sys_reg_set_reg(vcpu, reg);
->
-> --
-> 2.47.3
->
+On 14/11/2025 4:07 pm, Alexandru Elisei wrote:
+> If the SPU encounters a translation fault when it attempts to write a
+> profiling record to memory, it stops profiling and asserts the PMBIRQ
+> interrupt.  Interrupts are not delivered instantaneously to the CPU, and
+> this creates a profiling blackout window where the profiled CPU executes
+> instructions, but no samples are collected.
+> 
+> This is not desirable, and the SPE driver avoids it by keeping the buffer
+> mapped for the entire the profiling session.
+> 
+> KVM maps memory at stage 2 when the guest accesses it, following a fault on
+> a missing stage 2 translation, which means that the problem is present in a
+> SPE enabled virtual machine. Worse yet, the blackout windows are
+> unpredictable: the guest profiling the same process can during one
+> profiling session, not trigger any stage 2 faults (the entire buffer memory
+> is already mapped at stage 2), but worst case scenario, during another
+> profiling session, trigger stage 2 faults for every record it attempts to
+> write (if KVM keeps removing the buffer pages from stage 2), or something
+> in between - some records trigger a stage 2 fault, some don't.
+> 
+> The solution is for KVM to follow what the SPE driver does: keep the buffer
+> mapped at stage 2 while ProfilingBufferEnabled() is true. To accomplish
+
+Hi Alex,
+
+The problem is that the driver enables and disables the buffer every 
+time the target process is switched out unless you explicitly ask for 
+per-CPU mode. Is there some kind of heuristic you can add to prevent 
+pinning and unpinning unless something actually changes?
+
+Otherwise it's basically unusable with normal perf commands and larger 
+buffer sizes. Take these basic examples were I've added a filter so no 
+SPE data is even recorded:
+
+  $ perf record -e arm_spe/min_latency=1000,event_filter=10/ -m,256M --\
+      true
+
+On a kernel with lockep and kmemleak etc this takes 20s to complete. On 
+a normal kernel build it still takes 4s.
+
+Much worse is anything more complicated than just 'true' which will have 
+more context switching:
+
+$ perf record -e arm_spe/min_latency=1000,event_filter=10/ -m,256M --\
+     perf stat true
+
+This takes 3 minutes or 50 seconds to complete (with and without kernel 
+debugging features respectively)
+
+For comparison, running these on the host all take less than half a 
+second. I measured each pin/unpin taking about 0.2s and the basic 'true' 
+example resulting in 100 context switches which adds up to the 20s.
+
+Another interesting stat is that the second example says 'true' ends up 
+running at an average clock speed of 4Mhz:
+
+           12683357      cycles   #    0.004 GHz
+
+You also get warnings like this
+
+  rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+  rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-0): P53/1:b..l
+  rcu: 	(detected by 0, t=6503 jiffies, g=8461, q=43 ncpus=1)
+  task:perf            state:R  running task     stack:0     pid:53 
+tgid:53    ppid:52     task_flags:0x400000 flags:0x00000008
+  Call trace:
+   __switch_to+0x1b8/0x2d8 (T)
+   __schedule+0x8b4/0x1050
+   preempt_schedule_common+0x2c/0xb8
+   preempt_schedule+0x30/0x38
+   _raw_spin_unlock+0x60/0x70
+   finish_fault+0x330/0x408
+   do_pte_missing+0x7d4/0x1188
+   handle_mm_fault+0x244/0x568
+   do_page_fault+0x21c/0x548
+   do_translation_fault+0x44/0x68
+   do_mem_abort+0x4c/0x100
+   el0_da+0x58/0x200
+   el0t_64_sync_handler+0xc0/0x130
+   el0t_64_sync+0x198/0x1a0
+
+If we can't add a heuristic to keep the buffer pinned, it almost seems 
+like the random blackouts would be preferable to pinning being so slow.
+
