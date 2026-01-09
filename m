@@ -1,40 +1,48 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EB519E819
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 15:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E9619E819
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 15:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767970842; cv=none; b=NhHOuxBrBuzG1T5elKWw9B30q+eis2No38Tnq1rpbEwlLEkHI1dQiZadLM9y/pjZgEI/eOwCNAva6wV6uh8EuGjIE3G6X72VG+oLzlaf6wSUsQfn+QBr34Uvg6w9lTOP0YiGaN1ZN9YwngN08bqcVg8XPfvhshDsC9jrF0cscAQ=
+	t=1767970909; cv=none; b=qP6bZT0Lpwkcajsrey0CX3tWXckimKTo4RXvrJwo4uerEOaESbmv6SYlnUBawZF0DKF3ftFcCIt7WX8UX1bay5ZXcks4rhY1gDY0tbryyw7e1tPBAOpzsqaihJ4ty1nnMpFIiEdcaeqs2wipKIpAyW05oE77NZSh5OGEw6Iqfls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767970842; c=relaxed/simple;
-	bh=hKmj/adgE8+4de5/o6tkckhlWEXU/T5Uh01DwBGO0FM=;
+	s=arc-20240116; t=1767970909; c=relaxed/simple;
+	bh=EfyZeMcdGYG1Wkkz7uSj7yy5+WlI+vUfvjVYy8QffGY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s1MP8j79ERxZw+Ygrzdu0Tea4U7wIIpGR4Npazs9fvR1PhwT+zs26zcsUWKz2ro0aKZw50h1PqmwO5ria80Sh1Dk4AnDFA2PvFTIX3SDOgAbjYxxyjiordHvr6fRzdef9lpXmbnUUu2Fi33TmHOpeiJGardLc27pVRpgtSkGcOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D33DFEC;
-	Fri,  9 Jan 2026 07:00:25 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 21D6D3F6A8;
-	Fri,  9 Jan 2026 07:00:30 -0800 (PST)
-Date: Fri, 9 Jan 2026 15:00:27 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v2 33/36] KVM: arm64: gic-v5: Probe for GICv5 device
-Message-ID: <20260109150027.GB223579@e124191.cambridge.arm.com>
-References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
- <20251219155222.1383109-34-sascha.bischoff@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=al7hhyxN3g6R9WYoYkIpovWC3LfXdlTQYG2jo+xXfKxb93xDC6lY3zHAVuhIbKlgh//FNm3WM+3yt3QAG1bT2mtkUwRqll/Xdw3Aw87jfQkAttsYbwdEJoUv+Qa7tdyes1QtxJMDZUOxujs5tEczN4H8vBI8yTksgNBWTfpy8uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZBW6RbGZ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBW6RbGZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9C72C4CEF1;
+	Fri,  9 Jan 2026 15:01:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1767970909;
+	bh=EfyZeMcdGYG1Wkkz7uSj7yy5+WlI+vUfvjVYy8QffGY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZBW6RbGZKKBFHftx6uokbHQpCynVoLmZs2NICmpUa1v7bXPBGAjwFKxfhn8t90NJI
+	 zEqfWNsJ/whwreBSBoTh6zBwAxXnOLahBravaIY/qNtxT9LZVXpl36avlzcN61vav5
+	 yixpkpJNrRNQTvf53dE1ViP2FzWK9NQrgHze4huLEqNPq7TLNMfA1D8/0mZjW/ylRf
+	 LZrczl6JSkv7lNxbC4buxZCUtxPevDHOJRlxW/Me2VdWR4IFE9PHCUckqCWrDf/O0e
+	 WJygYDeM6k9GZ3RiZhqKJcZ+iD3v+yYBAr4IgxFDxmNvW8E4qjwwlzBoLGzQqKtA8T
+	 4RpZrGWFI11nQ==
+Date: Fri, 9 Jan 2026 15:01:43 +0000
+From: Will Deacon <will@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH 24/30] KVM: arm64: Implement the MEM_SHARE hypercall for
+ protected VMs
+Message-ID: <aWEYV-Pg5tPCtvaQ@willie-the-truck>
+References: <20260105154939.11041-1-will@kernel.org>
+ <20260105154939.11041-25-will@kernel.org>
+ <aV0uJDtZwbu2iKhs@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,107 +51,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251219155222.1383109-34-sascha.bischoff@arm.com>
+In-Reply-To: <aV0uJDtZwbu2iKhs@google.com>
 
-On Fri, Dec 19, 2025 at 03:52:47PM +0000, Sascha Bischoff wrote:
-> The basic GICv5 PPI support is now complete. Allow probing for a
-> native GICv5 rather than just the legacy support.
+On Tue, Jan 06, 2026 at 03:45:40PM +0000, Vincent Donnefort wrote:
+> [...]
 > 
-> The implementation doesn't support protected VMs with GICv5 at this
-> time. Therefore, if KVM has protected mode enabled the native GICv5
-> init is skipped, but legacy VMs are allowed if the hardware supports
-> it.
+> > @@ -952,6 +1004,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+> >  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+> >  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
+> > +		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE);
+> >  		break;
+> >  	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
+> >  		if (smccc_get_arg1(vcpu) ||
+> > @@ -962,6 +1015,14 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  
+> >  		val[0] = PAGE_SIZE;
+> >  		break;
+> > +	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
+> > +		if (smccc_get_arg2(vcpu) ||
+> > +		    smccc_get_arg3(vcpu)) {
+> > +			break;
+> > +		}
 > 
-> At this stage the GICv5 KVM implementation only supports PPIs, and
-> doesn't interact with the host IRS at all. This means that there is no
-> need to check how many concurrent VMs or vCPUs per VM are supported by
-> the IRS - the PPI support only requires the CPUIF. The support is
-> artificially limited to VGIC_V5_MAX_CPUS, i.e. 512, vCPUs per VM.
-> 
-> With this change it becomes possible to run basic GICv5-based VMs,
-> provided that they only use PPIs.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> ---
+> I wonder if that shouldn't go into pkvm_memshare_call(): that function has the
+> knowledge of the argument content since we pass vcpu.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+I decided to keep all the zero-arg checking in the top-level switch so
+that people adding new hypercalls are encouraged to add those checks as
+well :p
 
-
->  arch/arm64/kvm/vgic/vgic-v5.c | 39 +++++++++++++++++++++++++++--------
->  1 file changed, 30 insertions(+), 9 deletions(-)
+> Otherwise:
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 97d67c1d16541..bf72982d6a2e8 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -12,22 +12,13 @@ static struct vgic_v5_ppi_caps *ppi_caps;
->  
->  /*
->   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
-> - * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
-> - * registers a VGIC_V3 device.
->   */
->  int vgic_v5_probe(const struct gic_kvm_info *info)
->  {
->  	u64 ich_vtr_el2;
->  	int ret;
->  
-> -	if (!cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY))
-> -		return -ENODEV;
-> -
->  	kvm_vgic_global_state.type = VGIC_V5;
-> -	kvm_vgic_global_state.has_gcie_v3_compat = true;
-> -
-> -	/* We only support v3 compat mode - use vGICv3 limits */
-> -	kvm_vgic_global_state.max_gic_vcpus = VGIC_V3_MAX_CPUS;
->  
->  	kvm_vgic_global_state.vcpu_base = 0;
->  	kvm_vgic_global_state.vctrl_base = NULL;
-> @@ -35,6 +26,32 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	kvm_vgic_global_state.has_gicv4 = false;
->  	kvm_vgic_global_state.has_gicv4_1 = false;
->  
-> +	/*
-> +	 * GICv5 is currently not supported in Protected mode. Skip the
-> +	 * registration of GICv5 completely to make sure no guests can create a
-> +	 * GICv5-based guest.
-> +	 */
-> +	if (is_protected_kvm_enabled()) {
-> +		kvm_info("GICv5-based guests are not supported with pKVM\n");
-> +		goto skip_v5;
-> +	}
-> +
-> +	kvm_vgic_global_state.max_gic_vcpus = VGIC_V5_MAX_CPUS;
-> +
-> +	ret = kvm_register_vgic_device(KVM_DEV_TYPE_ARM_VGIC_V5);
-> +	if (ret) {
-> +		kvm_err("Cannot register GICv5 KVM device.\n");
-> +		goto skip_v5;
-> +	}
-> +
-> +	kvm_info("GCIE system register CPU interface\n");
-> +
-> +skip_v5:
-> +	/* If we don't support the GICv3 compat mode we're done. */
-> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_LEGACY))
-> +		return 0;
-> +
-> +	kvm_vgic_global_state.has_gcie_v3_compat = true;
->  	ich_vtr_el2 =  kvm_call_hyp_ret(__vgic_v3_get_gic_config);
->  	kvm_vgic_global_state.ich_vtr_el2 = (u32)ich_vtr_el2;
->  
-> @@ -50,6 +67,10 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  		return ret;
->  	}
->  
-> +	/* We potentially limit the max VCPUs further than we need to here */
-> +	kvm_vgic_global_state.max_gic_vcpus = min(VGIC_V3_MAX_CPUS,
-> +						  VGIC_V5_MAX_CPUS);
-> +
->  	static_branch_enable(&kvm_vgic_global_state.gicv3_cpuif);
->  	kvm_info("GCIE legacy system register CPU interface\n");
->  
-> -- 
-> 2.34.1
+> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+
+Thanks,
+
+Will
