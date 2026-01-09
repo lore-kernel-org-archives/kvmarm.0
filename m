@@ -1,130 +1,242 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A86255E43
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 16:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767976194; cv=none; b=GIyw26ntt5ruIiN24JgQ5i4S31/g3BYFNxZTdV74AdVXc1ZpEiq4aoKyoEAl6QJLVaq21jBsQY1mKMrGzO0FDuoqhWUNqd0gbhQd66txqADA/0JUvDWe4LHLorGkjPpesacOabLq2kC+QfLYW6c37eUkP9YCPzDAwp3MFuT33N8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767976194; c=relaxed/simple;
-	bh=UvTVTF8nfEujcFPt/XShhDXGNTvbVzJWBQPca5w8kck=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PcQAw+CvlLR0inV2b5It+OkxvfkgElI5+qw8ce1ISt9pPvO+FFaR6CfaHiAs1fGAQXLXqilQ+yKesgktjMsariOra+431IBhf/7h2R1mPdWN3EveKikQ5lin19qSTA+wJmphRZUwFdQVNmksaJ75UPipuqX7AOEFFVE5ZTVHmLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gZDqvnI4; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61F9329E79
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 16:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.179
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1767976286; cv=pass; b=oNRYYai8VAgvc+raeYXfnKbzPIsKcq7fQzGdTI8rwUZQsMqC6rraHkoL6w+Dvand0ZlXnhT510jMBl+uucErdxqmg0QO9pateg5Pv8eC/vqZD6a4mCnxOU/idM7soM6D6ZuuSgha87/Krs4zLvGr9kjRogrRD9z54FkrLAr7aBU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1767976286; c=relaxed/simple;
+	bh=TvYZA4dBSlsSpGSZUaKtQ+jUGYaXayrnDE16b2gj2N0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XTgXuwMlqRxmVRW+ONg75+j2mXX9/GSUOKmCmUPp8dZdKp2Ioo37fhCs+R0Deehj/ydxC5wxOKKESHKuILSkUJqT0aSa7gw3eN89MWE6cBXqDm5RIdgZoyhSkyr3iuHUXn7HGDbOee4IlcVdp7AF46Nevj92+1PJJDUvhYjgmS4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LQZKFD5G; arc=pass smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gZDqvnI4"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4775e891b5eso21276705e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 08:29:52 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LQZKFD5G"
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4edb8d6e98aso600001cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 09 Jan 2026 08:31:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1767976284; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X9FdLxnNDNFnf5JP1Vg/UOBeO6PmJujTNd2WeU2PdFEHRUfH30j/gvAM36mAmtGiC4
+         A27fohPFHwcQV8iuxDOlOWd5sLI2nIOLm6dQ6e5y+e656EB82ctKMXz+WVNOQBW3+s4h
+         ZUeor/Hf+8cQy7cO1txEPJbvQxEQgrprV1ffBnIDnRc7taDFH7SJqoRxGrWsBsDRpP/T
+         UMmjGqQbOv4yPs8j1CWTjOS6Z31DaEcf5YPxs4SC+SqamF+NC3E41z89ot3Sbu0MJ9XO
+         ZDqUAXAG6xL1hvSYY8953xEN5UHhczj5JSsXR8KjJD2oalf61Vh4FrSXv2gvsRobkzLw
+         vKBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=bOqelCfA+niHr585Q7gjhs1CWJtFJzsgDt10/9RfHhM=;
+        fh=dyzUIx/UCED874XZ6ZJwKvltUSPYKzcy3HaeOnoHN3k=;
+        b=fZFf3VqfmqzRKjCdLc/UvvTaZEQxHZQV/EVB/LgzsLBMURlaNbv7sMzqMvcw7G2tjJ
+         dwfP8tCJxrPMynDnreJ8oQ1o1USGkv+7b/3p8Y9dduTb16u8fjEOIPTE4jQGOjcA7iWM
+         ICL9ICZ/VXSV1ztWdDgY68X01fqt8TZ/q1nA0NHjkUkSQzkFayZJOYdk5YrH8GrbD+G2
+         GJbBfSUb+uEzClbb/l2tZdAxdAzNeRr5l/i59t0XLJA96gP0QXka7M6eEglSxZNi5Ak8
+         69KNZX8gJXbyhIFyzAmf8nWWGtzkSi8jXLKzHIgv0yE2spq+uryMoDO/+NdDr/C/WsB5
+         fwZw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1767976191; x=1768580991; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sH82HZeooQjJu3LbcyB4SEm/Qe0ZcN7MT6wknG495Aw=;
-        b=gZDqvnI4rls0aB4DSxUFYp54QlRGyw9+ntM18qtFUgHI3lNqTjXgzLnKT2rFRCpwYL
-         Jq98T8bh0R15jolsEF1C7yc7Csxa/JN7m5w50cbmpMoUGdZqX8q0CNRZa6NROgwDid6a
-         UkssuAhsvSeHQWb0K2IqlvQpz7JsLPrmhn0dgkrITZbyGP26/e9iiSWo3PdgtZXPG3kM
-         IlbLQSTZkUhVRZ8xqWZ1lNiB/an+84R11iCGBCaiWIDOA0dfA4dedamKNycRFZZvlgL+
-         p5l15fF2brFZNx3JrIjEfDy0kTrg1zeWXAqNwTdVGrqLiLqoZj8weKm7Iq0wTYMGapmW
-         Gcxg==
+        d=google.com; s=20230601; t=1767976284; x=1768581084; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOqelCfA+niHr585Q7gjhs1CWJtFJzsgDt10/9RfHhM=;
+        b=LQZKFD5GLQGtW/b9lUYAufF95OsRu4zGIEGBTGO+6XNUQ3eqY8XBVSyuY80Lwbedu/
+         s32yPDIpvaqQKV0WbPeZu2fp988ogxGJcQ70sSg6i/dEkeP6MT35HvMiJnC/I+0mtAJu
+         QUjFiICCHX/xBDWCw2mgSoqWMvU6ES49E8l64yQBZ44WIDHS11vjlzMDNKh8SKJskK7G
+         HMgdbllFLof14bTv+XyNUnpon15zKapyrRYwxH3BC7k09h9alLRYqS27RyiY5xFytiSA
+         IjpSsVWqAnUqbPMQs5veFwZj1WbM2tLp9DTWNcXyPKRW2RKHPYhR0XqCP8KTcshnPb2s
+         VnuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1767976191; x=1768580991;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sH82HZeooQjJu3LbcyB4SEm/Qe0ZcN7MT6wknG495Aw=;
-        b=agkwYaIo0NcDf3GP8cudgkPU8LBrrkM4dlJlkAYUScBr4W/uoCWH2ItRXwRHhZGYqa
-         TTnKxW10HCx3nf1xSuEDsCDR6Pgxfe9muzwfDASzSJ932+YTyx1o8HmY4W6c2DYvb6f7
-         FqNxJIte+kUjy0ffukQ+BcHK4m7wdURNKcSmf7QfSeD9hQXk6uuP1RQWmx0LP1KRfu04
-         AaEvyq/H91NjcKWbGit/ztk8BJTzCFhvvU6yJkoYg31OiFulIIR7o+RqS+Qnm827Y4uB
-         2VoZucijYtwo6jDdCXNEn/e35YNQzbtaXNOcVIyaE1QwB3vyo4PX4XSVy7TPCLzYsKR1
-         l4UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwBidduzUmTQDYsm0NINVjRcoJF3p/4EfHT26F9D0Uj6mtEX34EtLU7nAvL93UCbJuSGrPhzE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyQ6z1UzmQXKOSXrRC36zirbWQJ3RK748SYTjrwV20WJ3nnvK2J
-	0RIeTtAvDPh0GZv2jIMAA/wUB/3LTA6HyQk4zRWkB4x1FrJ/uvlSjspZMZbmshGluQM=
-X-Gm-Gg: AY/fxX5hrb6gIgEq06P/pq1PQOiKUZvC4FdQY0dFnskCm8y63wBqm1OgogpwlA2a8sw
-	jfaZyIZXgTpMKCGLcxcEcBsB4GeHlclzootUOwQ9Jh1OE3HEha7wtnrLELtR5Tq3jr9dR3DhDRJ
-	VcARrgLTn9LsTq2l77edXmQalX8rEhFyvRDmutCa1rm9ousTgsBZqUuLCkUTdT05EkOqHr6eIZk
-	RfPaGNG/GpFpPTmPqfQ1NbfWrhJOqXbXezQs+EFj4mmKI1fS4ZkEDAPgd0Rz/Ibb2SsrS+yNwmk
-	IoylcoWmNKJLRPvURZgrc+1gLNIrvi/LsEr1vzbZaUbExhwXK8yyWgvc6Ev6/U5vpNUSfbr/1s9
-	uTPVA6rYMzoiA7QfsC2S+WQl2P0vNlIDbv3IiUxz3/cNe2E512aNjcp54uVcZtgNYPMWxFKKWtN
-	Ubpvb0L+JggYAJu3b4
-X-Google-Smtp-Source: AGHT+IFvEex0eSGI0zBvBOU+P4xfAclyVh4ZDcQNrtmGp7L94SuKsKC0/wbJy9k8++p9SZf17t8s9Q==
-X-Received: by 2002:a05:600c:444c:b0:477:9f34:17b8 with SMTP id 5b1f17b1804b1-47d84b0a9e5mr121188225e9.1.1767976191330;
-        Fri, 09 Jan 2026 08:29:51 -0800 (PST)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8678cad8sm70961885e9.3.2026.01.09.08.29.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Jan 2026 08:29:51 -0800 (PST)
-Message-ID: <1aaffbcd-ba0c-4371-80d7-ce59ac7f13a9@linaro.org>
-Date: Fri, 9 Jan 2026 16:29:50 +0000
+        d=1e100.net; s=20230601; t=1767976284; x=1768581084;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bOqelCfA+niHr585Q7gjhs1CWJtFJzsgDt10/9RfHhM=;
+        b=YhRJtPG9xMrajs9XCXuTL9LuryEYjVT7qB1SRkjOxJxIccjDGgxP8PnLj5MxGhvp1x
+         HHlWd0I2mWwJrJ+MFd7w3TMog/c/EyD6g2Q3HTCOaNN8oduC14YqoyhYkWZ530W1g7nG
+         LSwPJoHGKf7LQigixp0VrV01orb4ClgSHOoCItX038Y/TaKODRcH2oh85BOf9dQsFkoX
+         bkl3m54pCi+kSt+7wnMfHBbdED4pMVbZaNCi+m2OxDmdDuM6Q7Js90xgMyAu1q7qozuQ
+         SyUMnuRq9cC7Ywhciwgbv//kKRt9f6+ILI8YqwkJWqEHA1b+nlHsRagTLXfz3tZKkzPK
+         Zg0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWCjcGRCa0iWfmavC9u3CsM4zZ2lWyuJ+xY2Q3N32kgkFrQmSiMczwgnBrV7pvk8tu20OcvrUA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yze2hUr4RsYuiKrnRkc6/8wYD7/6z6/b0lfRsuDL3V6gXK3Ai2Y
+	oYAUC72MVhw85PounYI5lfbCAJNFdkO7oinLeeZantvQ0KdnO8uv1WY/lVHrfLiG2htFCfTlW8l
+	TYMM84+6Hieq5a/Ndxk1srrsmMQ3x6syAzMagIYSr
+X-Gm-Gg: AY/fxX5YmtNOump+31Rwmr83F5nv7hF7dwY3BcwEeuGYH9Pvp0fP7wN/5vEKdHFi3re
+	XoWO9yhoFvjh8SHgWFV5AsjFrH2DmDvq7K2nu+5Dh+zqNsWW20N8Zra7AdZV3mVgU9l+DOVvcWV
+	92Eq/18pmNjMTRrQmLNXelvMps44uHhX0p9jM6ZcNWlZI+NSpLajpoXYmECiaMMOKBJkPaDs8Mj
+	VXIeKWiofPVudt0oWtmenjLOGmo+DAO4Bnn+YCLMGWOcUJdTZ1IQN2ncWtMksuLgXnx84bd
+X-Received: by 2002:ac8:5d8d:0:b0:4ed:70d6:6618 with SMTP id
+ d75a77b69052e-4ffca3899e0mr12373901cf.10.1767976283510; Fri, 09 Jan 2026
+ 08:31:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v6 03/35] KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig
- option
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-4-alexandru.elisei@arm.com>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <20251114160717.163230-4-alexandru.elisei@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-15-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-15-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 9 Jan 2026 16:31:00 +0000
+X-Gm-Features: AZwV_Qg_Mx3Uve2Ajz9vtAn4ZY1Okl_E_qqP5nAl07n9Fwy2xIITsZXnkaSndwU
+Message-ID: <CA+EHjTzP9roJNcHhVrcGm9RMAn0E+RGPkJ57w44OL4fy3EW-wA@mail.gmail.com>
+Subject: Re: [PATCH v9 15/30] KVM: arm64: Support SME control registers
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-
-
-On 14/11/2025 4:06 pm, Alexandru Elisei wrote:
-> Add a new configuration option that will be used for KVM SPE emulation.
-> CONFIG_KVM_ARM_SPE depends on the SPE driver being builtin because:
-> 
-> 1. The SPE driver maintains a cpumask of physical CPUs that support SPE,
->     and that will be used by KVM to emulate SPE on heterogeneous systems.
-> 
-> 2. KVM will rely on the SPE driver enabling the SPE interrupt at the GIC
->     level.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
+>
+> SME is configured by the system registers SMCR_EL1 and SMCR_EL2, add
+> definitions and userspace access for them.  These control the SME vector
+> length in a manner similar to that for SVE and also have feature enable
+> bits for SME2 and FA64.  A subsequent patch will add management of them
+> for guests as part of the general floating point context switch, as is
+> done for the equivalent SVE registers.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->   arch/arm64/kvm/Kconfig | 8 ++++++++
->   1 file changed, 8 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 4f803fd1c99a..31388b5b2655 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -83,4 +83,12 @@ config PTDUMP_STAGE2_DEBUGFS
->   
->   	  If in doubt, say N.
->   
-> +config KVM_ARM_SPE
-> +	bool
-> +	depends on KVM && ARM_SPE_PMU=y
-
-I think the most common configuration is module, so requiring built-in 
-isn't great. If there's any way of avoiding it, even if it costs a 
-little bit of pain, it would be good for adoption.
-
-It was basically the first thing I got stuck on trying to get it to 
-work. Or if it really can't be done, maybe some kind of debug message to 
-say why enabling failed.
-
-> +	default n
-> +	help
-> +	  Adds support for Statistical Profiling Extension (SPE) in virtual
-> +	  machines.
+>  arch/arm64/include/asm/kvm_host.h     |  2 ++
+>  arch/arm64/include/asm/vncr_mapping.h |  1 +
+>  arch/arm64/kvm/sys_regs.c             | 36 ++++++++++++++++++++++++++++++++++-
+>  3 files changed, 38 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index b41700df3ce9..f24441244a68 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -504,6 +504,7 @@ enum vcpu_sysreg {
+>         CPTR_EL2,       /* Architectural Feature Trap Register (EL2) */
+>         HACR_EL2,       /* Hypervisor Auxiliary Control Register */
+>         ZCR_EL2,        /* SVE Control Register (EL2) */
+> +       SMCR_EL2,       /* SME Control Register (EL2) */
+>         TTBR0_EL2,      /* Translation Table Base Register 0 (EL2) */
+>         TTBR1_EL2,      /* Translation Table Base Register 1 (EL2) */
+>         TCR_EL2,        /* Translation Control Register (EL2) */
+> @@ -542,6 +543,7 @@ enum vcpu_sysreg {
+>         VNCR(ACTLR_EL1),/* Auxiliary Control Register */
+>         VNCR(CPACR_EL1),/* Coprocessor Access Control */
+>         VNCR(ZCR_EL1),  /* SVE Control */
+> +       VNCR(SMCR_EL1), /* SME Control */
+>         VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
+>         VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
+>         VNCR(TCR_EL1),  /* Translation Control Register */
+> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+> index c2485a862e69..44b12565321b 100644
+> --- a/arch/arm64/include/asm/vncr_mapping.h
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -44,6 +44,7 @@
+>  #define VNCR_HDFGWTR_EL2       0x1D8
+>  #define VNCR_ZCR_EL1            0x1E0
+>  #define VNCR_HAFGRTR_EL2       0x1E8
+> +#define VNCR_SMCR_EL1          0x1F0
+>  #define VNCR_TTBR0_EL1          0x200
+>  #define VNCR_TTBR1_EL1          0x210
+>  #define VNCR_FAR_EL1            0x220
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 3576e69468db..5c912139d264 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2827,6 +2827,37 @@ static bool access_gic_elrsr(struct kvm_vcpu *vcpu,
+>         return true;
+>  }
+>
+> +static unsigned int sme_el2_visibility(const struct kvm_vcpu *vcpu,
+> +                                      const struct sys_reg_desc *rd)
+> +{
+> +       return __el2_visibility(vcpu, rd, sme_visibility);
+> +}
 > +
->   endif # VIRTUALIZATION
+> +static bool access_smcr_el2(struct kvm_vcpu *vcpu,
+> +                           struct sys_reg_params *p,
+> +                           const struct sys_reg_desc *r)
+> +{
+> +       unsigned int vq;
+> +       u64 smcr;
+> +
+> +       if (guest_hyp_sve_traps_enabled(vcpu)) {
 
+Should this be guest_hyp_sme_traps_enabled() ?
+
+> +               kvm_inject_nested_sve_trap(vcpu);
+
+And by the same token, should this be kvm_inject_nested_sme_trap()?
+That function doesn't exist, but would inject ESR_ELx_EC_SME instead
+of ESR_ELx_EC_SVE.
+
+> +               return false;
+> +       }
+> +
+> +       if (!p->is_write) {
+> +               p->regval = __vcpu_sys_reg(vcpu, SMCR_EL2);
+> +               return true;
+> +       }
+> +
+> +       smcr = p->regval;
+> +       vq = SYS_FIELD_GET(SMCR_ELx, LEN, smcr) + 1;
+> +       vq = min(vq, vcpu_sme_max_vq(vcpu));
+> +       __vcpu_assign_sys_reg(vcpu, SMCR_EL2, SYS_FIELD_PREP(SMCR_ELx, LEN,
+> +                                                            vq - 1));
+
+I think this might be wrong. This code only writes the LEN, discarding
+other fields in SMCR_EL2. The analogous SVE code in access_zcr_el2()
+is only concerned with the length, and doesn't need to worry about
+other bits to preserve.
+
+Should this be something along the lines of the below instead?
+
++       smcr = p->regval;
++       vq = SYS_FIELD_GET(SMCR_ELx, LEN, smcr) + 1;
++       vq = min(vq, vcpu_sme_max_vq(vcpu));
++       smcr &= ~SMCR_ELx_LEN_MASK;
++       smcr |= SYS_FIELD_PREP(SMCR_ELx, LEN, vq - 1);
++       __vcpu_assign_sys_reg(vcpu, SMCR_EL2, smcr);
+
+Cheers,
+/fuad
+
+
+
+
+> +       return true;
+> +}
+> +
+>  static unsigned int s1poe_visibility(const struct kvm_vcpu *vcpu,
+>                                      const struct sys_reg_desc *rd)
+>  {
+> @@ -3291,7 +3322,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>         { SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+>         { SYS_DESC(SYS_TRFCR_EL1), undef_access },
+>         { SYS_DESC(SYS_SMPRI_EL1), undef_access },
+> -       { SYS_DESC(SYS_SMCR_EL1), undef_access },
+> +       { SYS_DESC(SYS_SMCR_EL1), NULL, reset_val, SMCR_EL1, 0, .visibility = sme_visibility },
+>         { SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+>         { SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+>         { SYS_DESC(SYS_TCR_EL1), access_vm_reg, reset_val, TCR_EL1, 0 },
+> @@ -3655,6 +3686,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>
+>         EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+>
+> +       EL2_REG_FILTERED(SMCR_EL2, access_smcr_el2, reset_val, 0,
+> +                        sme_el2_visibility),
+> +
+>         EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
+>         EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
+>         EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
+>
+> --
+> 2.47.3
+>
