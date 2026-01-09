@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5332523EAA0
-	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 14:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2A329ACD7
+	for <kvmarm@lists.linux.dev>; Fri,  9 Jan 2026 14:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1767969054; cv=none; b=encvdKakOIFfdXbKa0ju+AvmaEd1R4durg/GxHrLZor0WLecvLXAjg5sGmQv9OjFd6XvWWlxPmCmQ1H7dFtiIOtoXaWNqExuuRcwPtKsilDqKbf1UFyTHQy5L670PqEFTb8qcHQ7hJ6IR6bRl4xwZWDv28gKRzakx8bKhlx39kk=
+	t=1767969119; cv=none; b=Au/7zPzKSIgvbBMiWCVQCNEuliQ0EasvJNlKFq/EA2BkISvtCNFk5PKvwMwyyDQyaqgb3VetIRlusN9ZCJqJdXRL1hqPDs9mB7yUjKhe3C4UicxSECoG12y7/RPBlLH35+AY2r5d1pdTjSWb5B08eC6I1F331DRVfpsFRX2B2ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1767969054; c=relaxed/simple;
-	bh=WRMdRB0WGfKqmMwZE2T0s3rmNl/KXUBkFrpSMhObnwA=;
+	s=arc-20240116; t=1767969119; c=relaxed/simple;
+	bh=0OMbNmKBSAMlscTFPF8U3b40AirkRJymWHIakbWKdGE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dA1gX8daVnhC3aWf7UbLfgP+Kupx3Ct5v+Rh0ofw7lXuwWjguR5/4peThYK6/s6WudI3z+00D9Mkn71H7ldZYt5Dm+fq4+eCR0ZHSRZk1dXlCNs0GQr7zC3jc3p515qVRHiSrCeW3YTDSEByv6GEuUqsA8zyzZ3Oj6MiQxG1ZXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SUrPBhq1; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODMJtF7Ydy5+9FkHvFzRCtvvkMSli+ulwJ1NJAKAZkyN6g+DqItOUlic66A+qc5ew7x+td726pW5sMbrmbN6y/x3Njoe+E03AUq7iIFNqu3iXVQp7k4UF+qfyzYvgifkYfZ5y1FryJ9D2Nptnheck/nhEjFKp7ZKXIQaxNojPnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Npv1PWvf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SUrPBhq1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2301CC4CEF1;
-	Fri,  9 Jan 2026 14:30:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Npv1PWvf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B94C19422;
+	Fri,  9 Jan 2026 14:31:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1767969053;
-	bh=WRMdRB0WGfKqmMwZE2T0s3rmNl/KXUBkFrpSMhObnwA=;
+	s=k20201202; t=1767969117;
+	bh=0OMbNmKBSAMlscTFPF8U3b40AirkRJymWHIakbWKdGE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SUrPBhq1CEgxQCSYoCG7gEf6kyj7n6NyJdfnTyJYW2KQu+ya+3jlF4/TRpKzqp1/v
-	 UI59BPREbt8kFaFuYpqrxwyXLbEMJ5u4o4QqpDfapdnhZZqkebKhWtoxRxFYgCVIFT
-	 4zlXLarv/4zOJ+Uhhz3a8r+mdjUaAUs3x1zi5LM7cKwNErcJysuNob3u62rwjF/jF7
-	 CHAexiWjjjTugv59dlY83T1XJOhMYfpB18fsD9Rt9HZaDZAyvekYTNl7GfQ127M3lA
-	 CVW6Tt/k1mYBloqNkqPu1o8AuiNWy639+k4yVDM6mNrMO6CS6hfiMfrCOCVzKLstlX
-	 6AawgeGxb6aNA==
-Date: Fri, 9 Jan 2026 14:30:47 +0000
+	b=Npv1PWvfKh73fHrLyHLRxaGOSwG4aeYUBagLOYcTsqMVVvsqN/eQO9e6gUFDjHyo4
+	 Le0q+UQCNpbTW74gmYPLDxkzq++Ucm5XiSkIQXtdJpvEeyhgOO5eDVy2jG0X3vzN6j
+	 mwC9JqfYUil61lR5544cNKDxLmYaaYrGLmW/E1JJb0fOqFF0rAGbFwPsIk8HwjnQTg
+	 UObK6pyrDrCmA9HXo2bnSLnk9b3rH8Fnxr6v/U6zTzgY40r9YkqF0KohE6z7TmD2CE
+	 10eYPRSP40aJYA7BjDdZ2Lqcy8aMI97bPuxiDj58yPpa9tWt3EOXG+AS9ggSCy6Gc6
+	 APLJocfJ4THdw==
+Date: Fri, 9 Jan 2026 14:31:51 +0000
 From: Will Deacon <will@kernel.org>
 To: Quentin Perret <qperret@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -38,11 +38,12 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH 10/30] KVM: arm64: Introduce __pkvm_host_donate_guest()
-Message-ID: <aWERFx9PwX1yED9H@willie-the-truck>
+Subject: Re: [PATCH 02/30] KVM: arm64: Remove redundant 'pgt' pointer checks
+ from MMU notifiers
+Message-ID: <aWERVxw-57pzi6ko@willie-the-truck>
 References: <20260105154939.11041-1-will@kernel.org>
- <20260105154939.11041-11-will@kernel.org>
- <ocpyeygxhp52jt2mcqq4tmdodubrfdwo4xqvbphmr34x4etrkk@f3ag3a7j5fru>
+ <20260105154939.11041-3-will@kernel.org>
+ <7g66xbfmfqf67qcowjuu725h3l33ecxhkffmlzxsjtbusk5eor@khlpkp7jdfzr>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,29 +52,28 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ocpyeygxhp52jt2mcqq4tmdodubrfdwo4xqvbphmr34x4etrkk@f3ag3a7j5fru>
+In-Reply-To: <7g66xbfmfqf67qcowjuu725h3l33ecxhkffmlzxsjtbusk5eor@khlpkp7jdfzr>
 
-On Tue, Jan 06, 2026 at 02:48:00PM +0000, Quentin Perret wrote:
-> On Monday 05 Jan 2026 at 15:49:18 (+0000), Will Deacon wrote:
-> > +static void handle___pkvm_host_donate_guest(struct kvm_cpu_context *host_ctxt)
-> > +{
-> > +	DECLARE_REG(u64, pfn, host_ctxt, 1);
-> > +	DECLARE_REG(u64, gfn, host_ctxt, 2);
-> > +	struct pkvm_hyp_vcpu *hyp_vcpu;
-> > +	int ret = -EINVAL;
-> > +
-> > +	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-> > +	if (!hyp_vcpu)
+On Tue, Jan 06, 2026 at 02:32:12PM +0000, Quentin Perret wrote:
+> On Monday 05 Jan 2026 at 15:49:10 (+0000), Will Deacon wrote:
+> > The MMU notifiers are registered by kvm_init_mmu_notifier() only after
+> > kvm_arch_init_vm() has returned successfully. Since the latter function
+> > initialises the 'kvm->arch.mmu.pgt' pointer (and allocates the VM handle
+> > when pKVM is enabled), the initialisation checks in the MMU notifiers
+> > are not required.
 > 
-> I guess we should check this is a protected VM here, else a malicious
-> host could donate pages to an np-guest. I didn't try to think through
-> the implications, perhaps it's fine, but it feels unecessary so I'd say
-> let's be restrictive here.
+> It took me a while to remember, but I think these checks are needed for
+> the free path rather than init. In particular, the doc for
+> mmu_notifier_ops::release() (from which we free the pgt) says that it
+> "can run concurrently with other mmu notifier" (see mmu_notifier.h), which
+> is fun.
+> 
+> Had you considered that path? If so, probably worth expanding in the
+> commit description why this is safe?
 
-It's definitely harmless to add the check, but it's also hard to justify
-in my opinion. Can you think of anything that can actually go wrong it
-a malicious host donates memory to a non-protected guest? Generally,
-I think the fewer places where we have to distinguish between a
-protected and a non-protected guest in the hypervisor, the better.
+
+Urgh....
+
+Let me get back to you on that :)
 
 Will
