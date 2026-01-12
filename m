@@ -1,152 +1,163 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90AB31DF248
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 12:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA96357721
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 12:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768219311; cv=none; b=GdwxcJlHdpx01LIrE2xaGJGgK1ZywF6ZRZsK/IPkWof9XyWV+M2MHq+QWDY4Lxfjd6TYFZZG51G1gpK0HmqBfkjizsw3wUusggyVKT3rfjfToY6CLTLeJQWI/r8bvmLdQssk9XwLosu2lpchMW0S+vPaKrGwWq2/C2UrnbOuqXE=
+	t=1768219765; cv=none; b=pyI2WH1dA1NUUOhUlQzLmDvGtXu+JdewaaASMlGDHf3t+dkqpiN7MvJPg/XkLn6SIqope5BfW40TkIoO14HAtgL5d4UHBMVWP4AhyDC4AwQA5LtuilAjosO5QWi9jHFgfHNJqP2plYbcEWTttIrR/8h/9sqcDqQbx+w3HBcHFik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768219311; c=relaxed/simple;
-	bh=mxI4UQAAGzY3RINut2eupTGQN7GWpnif6zdDROXBn6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YHRtHbPoZRUJfoHZZE1bY5FhCs+eEpiR5DQBue3DZ1ZPqvIw47FSoXi/VwNgCGNXU+q4pUQNq5dw0JyOTZCk482jwux+WxqzjH8v2C1TFi7iIc4gntvAEE0FNj0TE3u2OmKRn4e/bkW5At5AlULnRqgKYLSDe89aU7RngBqAT1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5867B497;
-	Mon, 12 Jan 2026 04:01:42 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 42ED53F59E;
-	Mon, 12 Jan 2026 04:01:47 -0800 (PST)
-Date: Mon, 12 Jan 2026 12:01:44 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: James Clark <james.clark@linaro.org>
-Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
-	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
-	yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-Subject: Re: [RFC PATCH v6 29/35] KVM: arm64: Pin the SPE buffer in the host
- and map it at stage 2
-Message-ID: <aWTiqNfMPQzGBmHk@raptor>
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-30-alexandru.elisei@arm.com>
- <38443801-af4e-4ce1-a1c2-603eca8d90da@linaro.org>
+	s=arc-20240116; t=1768219765; c=relaxed/simple;
+	bh=D+dY7N5K/TqDh41Y15Y4J9E6rqEj5T76OzifegaKev8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=naSIC/l8YGvr+WYuHp/p7xmIo3TQGi6zSE+KZjpJ5yKMYYSoUAX4Sqmd00QeBYH3uZAsXLz16YfsJ4wxuWuq/RWAaFYFqQ2Q1F8YbBdoQaQ7GYZa7KX+bKzJDEcHD62h/fes6hORCQqJaHFbUcP7FXbW8WoKvoJzGgdaAOh1mrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Z9HcSeYG; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z9HcSeYG"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-477bf34f5f5so50501355e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 04:09:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1768219760; x=1768824560; darn=lists.linux.dev;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QTQwB3rZvEI+7UgNbenEQSikhCpce+1ZGVw/HdNyvwI=;
+        b=Z9HcSeYGz0nGX/rcKkG4rfeBlynMjDWk+vcwAve53UQpjz46kxTVmYeiyS3c3kZgRl
+         iv5ZvPWgRS6L9fMsALi2nNresBevNwwp+C9LDi/v8W+ehlWg2VEtKUgrMiKsy3YUfQY5
+         5g9G7xXBMrr3HAgeqTKc0NaWVeC4zBmbjLyrcE+YjdBo9GVI+xJWZ5NoPsjslhd3/Q5N
+         /zv7UxCVC4VTznj38KnO3t8n73II+7mVIVpplxZmfmvjsAruagVno4Z0zG1a1Ze5+iqI
+         flyHhzAJDCYPr2qNlnq2zAR+I5BSSpgdT6JDKgSB8WKymdgM5101xgPhpLBt1wroFouz
+         7OJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768219760; x=1768824560;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QTQwB3rZvEI+7UgNbenEQSikhCpce+1ZGVw/HdNyvwI=;
+        b=GeBptRrvpDQKknoKQT3AQBRDPUN8CXCuQh7cdRyhF1F1lNSouB4XkrnjUg72w2qIgV
+         ZZq5KR7k4GUF/P8Sx2xCA0yKtA0PLSbGC41n6Ezzs3lmKjmwh03Ih6ximAVrYvQnoRAX
+         cpJBz3Zhu6QlS43N39z+6J8JFDywidUWjWgRPrmk28C7o9xgEU6qlTJbGWha/fx8o/U0
+         rXDlwuTmCpECMW4qFyoIsAYDDNH2ycbvLsNSeFGHmAiAjDLhbQKhzSmmbpZd49iUVGOC
+         A7MBo94+k2jqUYD6WlGQpcvOPW+BkLubQ2PLzvjKKnjTv8w3wZnUibX8qqLf5Gh9YFny
+         gwfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLx4sQpMejcWy5P4gYVwW+0oOVoFjpy0nJ594wMhE+irhJDpGiLNybwGfn2yD9KY/HVP/QLZs=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxryLakr5WiFa6bOiAFlOfADhXfJO3JiJ4Vs4Y1LVWTC2raVNfT
+	YRFG9s0QqUFw3lVqFkxPi2uQztJYWpzBLYLUzFPpTjy32bs79HDNpoMfeJz7VBz116w=
+X-Gm-Gg: AY/fxX7+wmXFJYs0wJVsiXgc3y7xQ9UBzN+x4/GKZhCVjrBM6Mv8BybSZEbt4+mLdd4
+	NnWe9L7GD6CsGFPe1QQ1nkwp7J+xbX1xoFPHdJyD8Aq4EVao3xzmvBMv89NxNGu16nHS5vrBT0e
+	VTDlKVC2Pyu2GvcomAEL7cWGq+K0VVedfAAdlJPHDgKLSkYSGvGxipORGHBTMVYLyY67Hw7A6D6
+	PUM6uvF3f7PvFa/XoiBdBilr7R6dN5IPOW9Z++bnZJhZ+m76pPaEK7/q8rGj4pf0JhfaubojsKQ
+	Mu9qq/qphDorW5ZPPvV+4YEXjykvGJeMJGrKD7HqXYapvFNnzSaEswNlHI9LhPBRAdgYd5W3cbv
+	lKy2I6qiufKBHIUh/FVviDiprARM8BKjC+UZ2P9v9tjKnPmF96oAK1A3BzPwYiOlQSzIIhUMQaC
+	fQZt7TLcAU2Fws4sJ3NXmemKGgOohVmGK0IncitA==
+X-Google-Smtp-Source: AGHT+IEVxqtmZ8Iypu6KLmzuavgzaMjHW05m9rZ/bXcJq5/QJRKZ+HKa1MwjTddrSFEfzenNCE6K9w==
+X-Received: by 2002:a05:600c:500d:b0:477:b642:9dc1 with SMTP id 5b1f17b1804b1-47d84b3baa1mr144825325e9.20.1768219760432;
+        Mon, 12 Jan 2026 04:09:20 -0800 (PST)
+Received: from [192.168.1.3] ([185.48.77.170])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d8702534dsm144173975e9.2.2026.01.12.04.09.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Jan 2026 04:09:20 -0800 (PST)
+Message-ID: <d7db9f17-012e-43d7-a0a5-58b254dd7e33@linaro.org>
+Date: Mon, 12 Jan 2026 12:09:19 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38443801-af4e-4ce1-a1c2-603eca8d90da@linaro.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v6 03/35] KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig
+ option
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
+ oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-4-alexandru.elisei@arm.com>
+ <1aaffbcd-ba0c-4371-80d7-ce59ac7f13a9@linaro.org> <aWTaXBse_R_LjJE-@raptor>
+Content-Language: en-US
+From: James Clark <james.clark@linaro.org>
+In-Reply-To: <aWTaXBse_R_LjJE-@raptor>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi James,
 
-On Fri, Jan 09, 2026 at 04:29:33PM +0000, James Clark wrote:
-> 
-> 
-> On 14/11/2025 4:07 pm, Alexandru Elisei wrote:
-> > If the SPU encounters a translation fault when it attempts to write a
-> > profiling record to memory, it stops profiling and asserts the PMBIRQ
-> > interrupt.  Interrupts are not delivered instantaneously to the CPU, and
-> > this creates a profiling blackout window where the profiled CPU executes
-> > instructions, but no samples are collected.
-> > 
-> > This is not desirable, and the SPE driver avoids it by keeping the buffer
-> > mapped for the entire the profiling session.
-> > 
-> > KVM maps memory at stage 2 when the guest accesses it, following a fault on
-> > a missing stage 2 translation, which means that the problem is present in a
-> > SPE enabled virtual machine. Worse yet, the blackout windows are
-> > unpredictable: the guest profiling the same process can during one
-> > profiling session, not trigger any stage 2 faults (the entire buffer memory
-> > is already mapped at stage 2), but worst case scenario, during another
-> > profiling session, trigger stage 2 faults for every record it attempts to
-> > write (if KVM keeps removing the buffer pages from stage 2), or something
-> > in between - some records trigger a stage 2 fault, some don't.
-> > 
-> > The solution is for KVM to follow what the SPE driver does: keep the buffer
-> > mapped at stage 2 while ProfilingBufferEnabled() is true. To accomplish
-> 
-> Hi Alex,
-> 
-> The problem is that the driver enables and disables the buffer every time
-> the target process is switched out unless you explicitly ask for per-CPU
-> mode. Is there some kind of heuristic you can add to prevent pinning and
-> unpinning unless something actually changes?
-> 
-> Otherwise it's basically unusable with normal perf commands and larger
-> buffer sizes. Take these basic examples were I've added a filter so no SPE
-> data is even recorded:
-> 
->  $ perf record -e arm_spe/min_latency=1000,event_filter=10/ -m,256M --\
->      true
-> 
-> On a kernel with lockep and kmemleak etc this takes 20s to complete. On a
-> normal kernel build it still takes 4s.
-> 
-> Much worse is anything more complicated than just 'true' which will have
-> more context switching:
-> 
-> $ perf record -e arm_spe/min_latency=1000,event_filter=10/ -m,256M --\
->     perf stat true
-> 
-> This takes 3 minutes or 50 seconds to complete (with and without kernel
-> debugging features respectively)
-> 
-> For comparison, running these on the host all take less than half a second.
-> I measured each pin/unpin taking about 0.2s and the basic 'true' example
-> resulting in 100 context switches which adds up to the 20s.
-> 
-> Another interesting stat is that the second example says 'true' ends up
-> running at an average clock speed of 4Mhz:
-> 
->           12683357      cycles   #    0.004 GHz
-> 
-> You also get warnings like this
-> 
->  rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
->  rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-0): P53/1:b..l
->  rcu: 	(detected by 0, t=6503 jiffies, g=8461, q=43 ncpus=1)
->  task:perf            state:R  running task     stack:0     pid:53 tgid:53
-> ppid:52     task_flags:0x400000 flags:0x00000008
->  Call trace:
->   __switch_to+0x1b8/0x2d8 (T)
->   __schedule+0x8b4/0x1050
->   preempt_schedule_common+0x2c/0xb8
->   preempt_schedule+0x30/0x38
->   _raw_spin_unlock+0x60/0x70
->   finish_fault+0x330/0x408
->   do_pte_missing+0x7d4/0x1188
->   handle_mm_fault+0x244/0x568
->   do_page_fault+0x21c/0x548
->   do_translation_fault+0x44/0x68
->   do_mem_abort+0x4c/0x100
->   el0_da+0x58/0x200
->   el0t_64_sync_handler+0xc0/0x130
->   el0t_64_sync+0x198/0x1a0
 
-This is awful, I was able to reproduce it.
+On 12/01/2026 11:26 am, Alexandru Elisei wrote:
+> Hi James,
+> 
+> On Fri, Jan 09, 2026 at 04:29:50PM +0000, James Clark wrote:
+>>
+>>
+>> On 14/11/2025 4:06 pm, Alexandru Elisei wrote:
+>>> Add a new configuration option that will be used for KVM SPE emulation.
+>>> CONFIG_KVM_ARM_SPE depends on the SPE driver being builtin because:
+>>>
+>>> 1. The SPE driver maintains a cpumask of physical CPUs that support SPE,
+>>>      and that will be used by KVM to emulate SPE on heterogeneous systems.
+>>>
+>>> 2. KVM will rely on the SPE driver enabling the SPE interrupt at the GIC
+>>>      level.
+>>>
+>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+>>> ---
+>>>    arch/arm64/kvm/Kconfig | 8 ++++++++
+>>>    1 file changed, 8 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>>> index 4f803fd1c99a..31388b5b2655 100644
+>>> --- a/arch/arm64/kvm/Kconfig
+>>> +++ b/arch/arm64/kvm/Kconfig
+>>> @@ -83,4 +83,12 @@ config PTDUMP_STAGE2_DEBUGFS
+>>>    	  If in doubt, say N.
+>>> +config KVM_ARM_SPE
+>>> +	bool
+>>> +	depends on KVM && ARM_SPE_PMU=y
+>>
+>> I think the most common configuration is module, so requiring built-in isn't
+>> great. If there's any way of avoiding it, even if it costs a little bit of
+>> pain, it would be good for adoption.
+> 
+> I'm not sure how that could be done. You need the buffer maintenance interrupt
+> to do a VM exit so KVM can inject the virtual interrupt back into the guest,
+> otherwise there's a possibility of a large blackout window when the buffer is
+> full.
+
+Without expanding more I don't see how injecting an interrupt is 
+strongly related to the way it's compiled.
 
 > 
-> If we can't add a heuristic to keep the buffer pinned, it almost seems like
-> the random blackouts would be preferable to pinning being so slow.
+> The code also relies on the SPE driver to probe all the SPUs in the system.
+> 
 
-I guess I could make it so the memory is kept pinned when the buffer is
-disabled. And then unpin that memory only when the guest enables a buffer that
-doesn't intersect with it. And also have a timer to unpin memory so it doesn't
-stay pinned forever, together with some sort of memory aging mechanism. This is
-getting to be very complex.
+I don't think that's a hard requirement either, the KVM code could 
+fairly easily do this itself. Inline the common code and put it in a 
+shared header etc. I'm sure there are lots of creative ways to flip the 
+dependencies that might not be "proper" software engineering. But like I 
+said a bit of pain here might be beneficial overall.
 
-And all of this still requires walking the guest's stage 1
-each time the buffer is enabled, because even though the VAs might be the same,
-the VA->IPA mappings might have changed.
+>>
+>> It was basically the first thing I got stuck on trying to get it to work. Or
+>> if it really can't be done, maybe some kind of debug message to say why
+>> enabling failed.
+> 
+> When you search for the symbol in menuconfig you get a list of the symbols it
+> depends on.
 
-I'll try to prototype something, see if I can get an improvement.
+Right, but that doesn't address the problems of adoption at all.
 
-Question: if having a large buffer is an issue, couldn't the VMM just restrict
-the buffer size? Or having a large buffer size is that important?
+Having it on by default when SPE and KVM are already enabled in their 
+default configs is the difference between people being able to use this 
+with zero friction vs 200 people all getting stuck and then coming to 
+ask me why it's not working and distros having to update SPE from being 
+a module to static.
 
-Thanks,
-Alex
+> 
+> Thanks,
+> Alex
+
+
