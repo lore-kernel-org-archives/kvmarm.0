@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CCF3644C1
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41C936997B
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237198; cv=none; b=oOofRlmiqYU/OZQA7kpAff9SAvpN/mtviYpeCqkSEUNfMj5eh5aiU8794R99FFc7rfDunQ3rO0NLWrNCoKcPECcAcUasn9fZsJtIhLmfMzsPvQvIESkGiVK74z3VH8VoPCRox9tTgjKUl9ij8agu+MlAhqJt6g2L8WKe0KwxY3c=
+	t=1768237203; cv=none; b=KAD4g1LMJCsxGxwiupdJJ6sOX1OA8b/vdaeCg3H4jNGSrXOrcFPwwCQLfgvkDQXdAYD8I5ea645vO5PL9SP0Frn8UD40gD8vNWQGYeCRM/Gdl3RkkVGvJOgcSiYz7dpuMX9D4RgCdhvZqbAWobYOW3jkYQ99Wl2Mx7PYb/7xEkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237198; c=relaxed/simple;
-	bh=QfwhqVTlOw0+rN66pc9fTV3/5ynC59P3wyYCu+l4kf8=;
+	s=arc-20240116; t=1768237203; c=relaxed/simple;
+	bh=oj4fcTHoEXtPA7MG6nGH+9WSMY2ShQSL6A2VkyhxVJM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pOinwZf4dr1qMQ93+qLQCw/OXubG/7G1YjRVMd5jx8hoPXNEDWE5t70g1mppjCvnlEfftz/MwN0mLvdQK8Mb0wtR5MIBfp2gtIfY+wOP/DfA5eAqtLp67vcO2Yar7Fn+o7EhRDwaOZkaidWujEYXp04esucUfZO4R4vCQVY/T2Q=
+	 MIME-Version; b=awCokhAMk7AtRUSegK1D8m915rdaURrIjE5KT5DHJYFCZshDBsNbFNjwKfDUY9JgMHS08buduNe2C0Vk7TE2FSsuIjuWDtjewPK6JPXQwCgHmQut9kjXQELrq9nNAKXtYibwYUahWvE0fUtLavn9zwoeriuzQZa0d15fphBCBHo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D8641516;
-	Mon, 12 Jan 2026 08:59:49 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC9E3153B;
+	Mon, 12 Jan 2026 08:59:54 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 96F8D3F694;
-	Mon, 12 Jan 2026 08:59:50 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5FFA33F694;
+	Mon, 12 Jan 2026 08:59:56 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -51,12 +51,10 @@ Cc: amitsinght@marvell.com,
 	oupton@kernel.org,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev,
-	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-	Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH v3 01/47] arm_mpam: Remove duplicate linux/srcu.h header
-Date: Mon, 12 Jan 2026 16:58:28 +0000
-Message-ID: <20260112165914.4086692-2-ben.horgan@arm.com>
+	kvmarm@lists.linux.dev
+Subject: [PATCH v3 02/47] arm_mpam: Use non-atomic bitops when modifying feature bitmap
+Date: Mon, 12 Jan 2026 16:58:29 +0000
+Message-ID: <20260112165914.4086692-3-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -68,33 +66,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-
-./drivers/resctrl/mpam_internal.h: linux/srcu.h is included more than once.
+In the test__props_mismatch() kunit test we rely on the struct mpam_props
+being packed to ensure memcmp doesn't consider packing. Making it packed
+reduces the alignment of the features bitmap and so breaks a requirement
+for the use of atomics. As we don't rely on the set/clear of these bits
+being atomic, just make them non-atomic.
 
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=27328
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Acked-by: James Morse <james.morse@arm.com>
-[BH: Keep alphabetical order]
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- drivers/resctrl/mpam_internal.h | 1 -
- 1 file changed, 1 deletion(-)
+Changes since v2:
+Add comment (Jonathan)
+---
+ drivers/resctrl/mpam_internal.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index e79c3c47259c..17cdc3080d58 100644
+index 17cdc3080d58..e8971842b124 100644
 --- a/drivers/resctrl/mpam_internal.h
 +++ b/drivers/resctrl/mpam_internal.h
-@@ -12,7 +12,6 @@
- #include <linux/jump_label.h>
- #include <linux/llist.h>
- #include <linux/mutex.h>
--#include <linux/srcu.h>
- #include <linux/spinlock.h>
- #include <linux/srcu.h>
- #include <linux/types.h>
+@@ -200,8 +200,12 @@ struct mpam_props {
+ } PACKED_FOR_KUNIT;
+ 
+ #define mpam_has_feature(_feat, x)	test_bit(_feat, (x)->features)
+-#define mpam_set_feature(_feat, x)	set_bit(_feat, (x)->features)
+-#define mpam_clear_feature(_feat, x)	clear_bit(_feat, (x)->features)
++/*
++ * The non-atomic get/set operations are used because if struct mpam_props is
++ * packed, the alignment requirements for atomics aren't met.
++ */
++#define mpam_set_feature(_feat, x)	__set_bit(_feat, (x)->features)
++#define mpam_clear_feature(_feat, x)	__clear_bit(_feat, (x)->features)
+ 
+ /* The values for MSMON_CFG_MBWU_FLT.RWBW */
+ enum mon_filter_options {
 -- 
 2.43.0
 
