@@ -1,128 +1,131 @@
-Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65528366DA3
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F97E34DCF7
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768236153; cv=none; b=f1pjNiYopFCSOD6CjvP+VaQviKU73R6vLYRYZIGSQBzvRxZ0IWQLcwWFfB3klRSFS0KJX/zNv4RIhvAdP1E6dNGY84eXNPi1VdXrXvk8W0p8EzyA93dcA7vATiE0l8jTxyBqTMbBbd6zzXeTOzqMqrVnLiMwJd+QeFcwB+7y5fQ=
+	t=1768236365; cv=none; b=qjgL9dBdxBKZJoyYBdYEYteifKzX2kS2aaPsCHL2HCgXB1vWtYvU8LoUadw62NOqMuv1KMBX8n3uuYWwDY9sKw3353oCp1ohqd89xB47tjhOX+Ag0BjpcGtZFM/xULkx67IEOKy+bUo+Rn1klGFbs7unnhuxP8xNATiEuCS28OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768236153; c=relaxed/simple;
-	bh=GCV/3QBtc+eIdYfvw5hxOGvLLmtdFxdHoXyuuvKPKYM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ri7OGcWaZIl9wsT4qmTbjRqqNsuvwtKz1eY5hJy1wQeECyatm9Z12P6hk8JT2FFD9VCmzx3Z7hCq4tglARBcu7/H68hjV15afg+Bj7p3QZu4SjS9CUAmvaf1cECm8R8s0k7FXGjUGtcobPe9OdZLTnyqHWD1YNaGL/lL26Fx+sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=BbiUjK5U; arc=none smtp.client-ip=119.8.177.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="BbiUjK5U"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=eZmC8E9x0lsORQcKBHO7BPce7Bp4VCsTTDrVTj1p9/k=;
-	b=BbiUjK5UomxqSiXsKG9eFzkpXanoKP+1SBcbtDaePrflU8sK/g28VzaBCBsf8TdrXeuVEpFVt
-	bXLPjve1C4smFydsDNsbelt8NqQaGS/jbc3M5UeJV2867Fny+cCBph7iHOgWfPERst3eyCOdvJX
-	Ro/y+PTtKpmuNgmNFB/6bKw=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dqdQc4Bw1zMksc;
-	Tue, 13 Jan 2026 00:40:08 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqdSx2mVMzJ46F7;
-	Tue, 13 Jan 2026 00:42:09 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 050C340086;
-	Tue, 13 Jan 2026 00:42:21 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 16:42:20 +0000
-Date: Mon, 12 Jan 2026 16:42:19 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 36/36] KVM: arm64: gic-v5: Communicate
- userspace-driveable PPIs via a UAPI
-Message-ID: <20260112164219.00001d70@huawei.com>
-In-Reply-To: <20260109170400.1585048-37-sascha.bischoff@arm.com>
-References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-37-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1768236365; c=relaxed/simple;
+	bh=V9n3/b41okkgq5OYMtIUAnW35o5EQjM/7E/5PAAvxyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bLLunKRlQ8XWs++Z2SRiji9QBnAAxSQhCNnD7q3CeIbiA7GvNgVCm4vos/pbKHrdF/m9yzhQoAJJcvRyflQ+fbY8jpiMCgj8YStHZrAym3g3Oia2gfgmpSvst7AM84w78GEA/AVJX0n3OjNIBo12oW4CWBxMUgeM/5VGrJsui5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63C03497;
+	Mon, 12 Jan 2026 08:45:49 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 23FB13F59E;
+	Mon, 12 Jan 2026 08:45:50 -0800 (PST)
+Message-ID: <02781a6f-fc15-4eef-8747-90dc2ba4e20c@arm.com>
+Date: Mon, 12 Jan 2026 16:45:49 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 25/45] arm_mpam: resctrl: Add support for 'MB' resource
+To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
+Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
+ "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
+ "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
+ "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
+ "dave.martin@arm.com" <dave.martin@arm.com>,
+ "david@kernel.org" <david@kernel.org>,
+ "dfustini@baylibre.com" <dfustini@baylibre.com>,
+ "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
+ "gshan@redhat.com" <gshan@redhat.com>,
+ "james.morse@arm.com" <james.morse@arm.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "kobak@nvidia.com" <kobak@nvidia.com>,
+ "lcherian@marvell.com" <lcherian@marvell.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "peternewman@google.com" <peternewman@google.com>,
+ "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
+ "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
+ "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
+ "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
+ "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
+ "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
+ "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+ "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ Zeng Heng <zengheng4@huawei.com>
+References: <20251219181147.3404071-1-ben.horgan@arm.com>
+ <20251219181147.3404071-26-ben.horgan@arm.com>
+ <OSZPR01MB8798E323F3DC4A528C411FB58B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <OSZPR01MB8798E323F3DC4A528C411FB58B85A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
- dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 9 Jan 2026 17:04:50 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+Hi Shaopeng,
 
-> GICv5 systems will likely not support the full set of PPIs. The
-> presence of any virtual PPI is tied to the presence of the physical
-> PPI. Therefore, the available PPIs will be limited by the physical
-> host. Userspace cannot drive any PPIs that are not implemented.
+On 1/8/26 10:42, Shaopeng Tan (Fujitsu) wrote:
+> Hello Ben,
 > 
-> Moreover, it is not desirable to expose all PPIs to the guest in the
-> first place, even if they are supported in hardware. Some devices,
-> such as the arch timer, are implemented in KVM, and hence those PPIs
-> shouldn't be driven by userspace, either.
+>> From: James Morse <james.morse@arm.com>
+>>
+>> resctrl supports 'MB', as a percentage throttling of traffic somewhere
+>> after the L3. This is the control that mba_sc uses, so ideally the class
+>> chosen should be as close as possible to the counters used for mba_local.
+>>
+>> MB's percentage control should be backed either with the fixed point
+>> fraction MBW_MAX. The bandwidth portion bitmaps is not used as its tricky
+>> to pick which bits to use to avoid contention, and may be possible to
+>> expose this as something other than a percentage in the future.
+>>
+>> CC: Zeng Heng <zengheng4@huawei.com>
+>> Co-developed-by: Dave Martin <Dave.Martin@arm.com>
+>> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+>> Signed-off-by: James Morse <james.morse@arm.com>>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> ---
+>>  drivers/resctrl/mpam_resctrl.c | 212 ++++++++++++++++++++++++++++++++-
+>>  1 file changed, 211 insertions(+), 1 deletion(-)
+>>
+[...]
+>>  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
+>>                                       enum resctrl_res_level type)
+>>  {
+>>          struct mpam_class *class = res->class;
+>> +       struct mpam_props *cprops = &class->props;
+>>          struct rdt_resource *r = &res->resctrl_res;
+>>  
+>>          switch (r->rid) {
+>> @@ -361,6 +531,20 @@ static int mpam_resctrl_control_init(struct mpam_resctrl_res *res,
+>>                   * 'all the bits' is the correct answer here.
+>>                   */
+>>                  r->cache.shareable_bits = resctrl_get_default_ctrl(r);
+>> +               break;
+>> +       case RDT_RESOURCE_MBA:
+>> +               r->alloc_capable = true;
+>> +               r->schema_fmt = RESCTRL_SCHEMA_RANGE;
+>> +               r->ctrl_scope = RESCTRL_L3_CACHE;
 > 
-> Provided a new UAPI:
->   KVM_DEV_ARM_VGIC_GRP_CTRL => KVM_DEV_ARM_VGIC_USERPSPACE_PPIs
-> 
-> This allows userspace to query which PPIs it is able to drive via
-> KVM_IRQ_LINE.
-> 
-> Additionally, introduce a check in kvm_vm_ioctl_irq_line() to reject
-> any PPIs not in the userspace mask.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> 
-> FOLD: Limit KVM_IRQ_LINE PPIs
+> Could you please elaborate why RESCTRL_L3_CACHE is required here?
 
-Looks like you did a squash rather than a fixup merge and failed to drop this.
+The location of the mba control in resctrl is named using the id of the
+l3 cache and so needs to associated with it. James is working on some
+documentation that will mention this along with other things.
 
-Otherwise, just one trivial thing below.
+> 
+> Best regards,
+> Shaopeng TAN
+> 
+
 
 Thanks,
 
-Jonathan
-
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 1cfd1e53b060e..e15c97395f50f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1437,6 +1437,14 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  			if (irq_num >= VGIC_V5_NR_PRIVATE_IRQS)
->  				return -EINVAL;
->  
-> +			/*
-> +			 * Only allow PPIs that are explicitly exposed to
-> +			 * usespace to be driven via KVM_IRQ_LINE
-> +			 */
-> +			u64 mask = kvm->arch.vgic.gicv5_vm.userspace_ppis[irq_num / 64];
-
-Inline declarations are still normally limited to when we need to have
-them, e.g for cleanup.h stuff.  So declare mask at top of appropriate
-scope.
-
-> +			if (!(mask & BIT_ULL(irq_num % 64)))
-> +				return -EINVAL;
-> +
->  			/* Build a GICv5-style IntID here */
->  			irq_num |= FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
->  		} else if (irq_num < VGIC_NR_SGIS ||
-
+Ben
 
