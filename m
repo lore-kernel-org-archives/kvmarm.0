@@ -1,92 +1,92 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3555F37417D
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 18:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DE23126C2
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 19:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768242999; cv=pass; b=lVaBo32ak3Pdl2q+cE38VXV0T4M4Ym5RaV/bh7D1owvt62YZMvBegPD+wvMku14+9WX8IHMNra5O9FvDXTMtRcyCXEY39rw2bVmF6QnQAcG4sn2064Wgjj0NlX2wxaVfq5H2YJTNgfBIqwPIXtUTo9f3dl+qxfJEAjDraYvPbQU=
+	t=1768244964; cv=pass; b=a4MASksDd/X2beRwuUuDqczG3GdBq9PnK9WyaAToN6R0zRpzI858aYc+XAqLyjntCNbfzfLT/DeXV61Sx9J8CNSdW4t6QbAut1xA0B0rTAAe8oUBR5Aj/VuTJ7BM0CRgY2XmLVYBaupL1hvWvhc/G5LBEXGeC7zeijJn7eWrVTc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768242999; c=relaxed/simple;
-	bh=EIrMm4XF6YXDK5QFU6GazWT7Q5wK9ZblkKgC5n9hRM0=;
+	s=arc-20240116; t=1768244964; c=relaxed/simple;
+	bh=xheA9QOjQXvJoAbTTZVMmFI6y8wl+wMqp+t7iExkGCo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LrFqnXNEmW8m8U7T2dYWzLk6QAiI2NMIWLjFdlcekwHBXYmoM7dpBfLyiUelR36pchCj911wxKsdLyemwRRGsCUT4SsD10JT4qA3Bz1pcffp+oR4qnu1r1W8qwcCkch/8+uS7Z5cIO9uAyi3UAfhAoOsGvdtyJCY7y44aPvl+Fw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sKTKhq1S; arc=pass smtp.client-ip=209.85.160.180
+	 To:Cc:Content-Type; b=hDj+IK8n6aQmG61lbkYBEpmTQELfYnOVbnnpp8wfwNDs9MWVyb4E+6CU+4UBQdXWrK0odauddwP/AfgaUaiOTzb9oKrX4rjPy8q4ojvowjj0mqs3AWgo0NgxWNZ7ngqfl2nyTFVEAZVdciboQ1VW5w/cKipaKX61qV3hFuFcS0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kvowFPsE; arc=pass smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sKTKhq1S"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4edb8d6e98aso26681cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 10:36:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768242997; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kvowFPsE"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ffbaaafac4so43671cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 11:09:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768244962; cv=none;
         d=google.com; s=arc-20240605;
-        b=WlXalr/uFDoLTAeiIGIZpdvBWVdf3x2Ngr6n2BzsDFOPYZIQ1SklsMoJnmbQ+IhtOf
-         pG4Dcci+Kw8Wy+GYuEvXBetgBBRGd3261DftyQVpXVOW/+y73ep215F7LUHbMLmhDu9Z
-         nKqasfqHO2/7NQ25P5tvyOkaERukhB9auQL17f31gPn9R19MhRCufeljPk9O9HkgU7GC
-         qxjtcTVxvSwPS9N0a6X3qeUF3Is3zppZdV9WGv+XmeNH6YuT2W1sPy91zvFTU01IZkrP
-         StIpEYzVMhoi8sYR6/efx9VhHowCz9jTYbEx4V3PywNvKxNplJueJxVTr8Cy5k/OeLIa
-         Sg1A==
+        b=fMSnWBz94c/rglB3pbO6+q8LyTIFpYDhmO9SMbohJeVIcrFN9/mTTFxO8pzUp0/IkC
+         4naKA1m4F+OvEhJuEhDlNX/Fhy6gtk6Mcd9TAQpmel5G2/1BWuas0/zTvnW0T5jwzDJw
+         v+M3VAtcznq5Hz3bQ5S2noKKicmAKZkd/lHPVQ1p9h5RE9FkY1Dk1Qib+lfZ0tgIZCwB
+         V6fqrto3QvFh3oVe8EWz1uYZ3adRIT26FteUunmlLNVUzk2GIZaF/ffXdUYjVQfwHqYj
+         +7GGgZqUkvEPh9ovQ8dgKgCh9jgXB11e+tOtJdcObGjEXC0q2THg2Uf/ejLFhJXt8c5A
+         ekgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=YeVorztV8L2661ciMsTJRNHNSwWuFDTDQ9Xn6dJSHXo=;
-        fh=U04n+/VIvuJG93NpEn+KE8cmXCVi+0RjOuzyXVqDFPo=;
-        b=RyRVmuuJNge299csc53eSgM9VfXOzRT5BqKTYvo2GiyuZXkf0mDH6HItjaM0PxJ6x9
-         ahsIhUc8mIWmQ+hiRCcpoMxQvKDc+v2So7oFbUggURNGeDjkPBg8Nh1Wlw/jpe3TZXph
-         x4Xb2V0+rjOOMhIkksVNNS6GilcH/ZaTwPdYJh5wLrLNlnLO7td238c4nySgnHcQ6yB2
-         tB1mfRMqCLX+Sg4zezC58ANoFIgksSG2YiF5gq6GYqbJ4UkVfFnAprQA8CS+1KQR/Xa3
-         cTZlrXxEsIDJSrO6DJGlTT9zIGfRK4tPfCQr0U29Z3f5Qoi5t8fcQ5h50w3DQHJVM0en
-         /TcQ==;
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        fh=Uq7wUOoZZT2wwkdWjKwo4QElOctyeUYDKhS1DMcWv9Y=;
+        b=T2ijS6fgoSlOMw/GhzG0jBkK3rsJwT81E2mCl2IzYOKNVNeOLHNggJL34bkAB7KMQ/
+         cft55AZXkt2KS3i0FgHvvHm8pQyBdIuv1Zm8TxnXwLRJjD8Yp7Lr4jEMoyU8DsBPPY28
+         QH0Di3Fq+azm9f2afNqkXhSRaUFdeegs78U4nb7L6Pf26pBcMcQTYEa8+85oTCt39qzR
+         KKnYF/nEgA1wvqE+0yCWhU/gV9WAj+jFgBfW2BXUUHYN74mN6oohvBgvQO93+CXN773+
+         3uMXbF3XnjVW0LPTHDEzXxDlgRbtvedn1Qj5QxhZHB1VCiOoLmCwVjnt1RxVMIaLDJmX
+         3nhw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768242997; x=1768847797; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1768244962; x=1768849762; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YeVorztV8L2661ciMsTJRNHNSwWuFDTDQ9Xn6dJSHXo=;
-        b=sKTKhq1SJZsmDN+bnYz2JFzamdxUAzKlIuX/YKVxFahKYPqnKMlmx0lnCuTvE1cR+d
-         4LPYWVvimwemo7IvH5yGUiq4wgapj2/jvCC6rPss/eGrrg0AJ9dK/IN0E2taYI9qmiH+
-         7yXq80CeWzXDNOolAcL9AmlU/GYCk4DFhVoam/nUFlYtslemEULAEhlVyRqL6A2IgiIi
-         xVmUIfoggOZbvpxBkCSjbxfZ0pVEPsWtgawfh/G++IYzTzngEsCymhYdcFSGD8zTAo6S
-         WSbuqOK+ywqwvCLgf0REwamZZbswfQpPTeyeCpswJV/0ule4QlKpP1cYdoM+s5Hj6hF5
-         O1nA==
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        b=kvowFPsELGf/epF5fb8K1pk+3558FLh+X5KUJ0d1tjmCjLngQxEFguTh3WyiR9FCpV
+         7zvHItZIhb8+2Ozxh6RnIT6OGbuPXWcH4lnivEeJmj+q8M2V1fmrRuAm3m6Eed+pLVBp
+         TXnFY/G8dIOGHhCYId5PJExZvni3vaXz1C/P8bGVHWClVsLHTWPJEv704qQsromMhFuw
+         AaAMP/nIzkKjlhnTebRC6N9M6J0j6kg8DQLfp1Az0rneKZ0WU9W4/1XKD69pGcPCO56Q
+         p4x1Sv7Vu2FM37a/gyv/Z8IoIEsp/yAT0BAqMqLJ9FE1NjE01LgClzf5eZ06y7qVCsYn
+         NANw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768242997; x=1768847797;
+        d=1e100.net; s=20230601; t=1768244962; x=1768849762;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YeVorztV8L2661ciMsTJRNHNSwWuFDTDQ9Xn6dJSHXo=;
-        b=YK86AcH+Gkr0Bufti533QynFDvKrnVxgu7y2fvBRRc2p405dVZn1uBKjIoRbIc8wJb
-         VkPSiYZuSKNB7OeSf7JusVf7/wA/up+4Qcah58pp9Ox5hvD4sYT4xACqTPjZ8Nony0AT
-         LG+YvHPN9aBjhWUj+ZDezQBzgKepDn2IUVA+3gtHOjT9Y7j4DFEyBkas4NWWXRf5F90t
-         Q6Yc3/YEBr9ou8P7TrYz30pY0BeZr/RHt7ZAVtWliIm65yJQIloRtm7M+C5jxkKT2zit
-         006hMPwQnuxqt0+d2cBiCcnvbjkZd1ufdhX1+F1L9nN86O6brgO+gON2L20htF03Wtz7
-         fl/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWXEFkLCDLpZxq/OhgtprWmmNSByzy741xDnyJ427sfOqKf1SLNnvCzW5QuC0KmTbstvIM5FaA=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywz91FGoY32KVsCkukLNYi5fVHD08zwNyGWFg/PrwjDkQtzij58
-	u6PUcs5Aov1GBVtAX0V+j3fmXefORAKeTcms+HP5Xu6HPOZhhNI3ZBnLM6Xnkt0ly78BxUlEn47
-	CEoj5yYddXmLESwitufmKlZPcsg9lSIc9XJqRJl3j
-X-Gm-Gg: AY/fxX7sNHYSd+Whp1WJXv+u9jpAXWv+3D4aqnWkFrb+jevnGJUjssCDRvk53LHzt4C
-	K4TNpH744/rFMtW9zAyrEydBBjBg8r8Twl106zWVAvmTsLZtVQi5Qu4LQhguRtS6tMwKQoP5Wmv
-	AoV9XtEBbuNkAH5cCT3pcXBEOf2g7NqEfDw+o9ULF8FacRSECkw7SctSoZnxMmH5s75QKy1djJq
-	WVFjF8L3o/O9mHypDQ5v3QxgyUIDY5LJbcEFB50M/oS7J5Cdxs+wnoJ3+Wv7cKw57EltCdt
-X-Received: by 2002:ac8:505a:0:b0:4f3:54eb:f26e with SMTP id
- d75a77b69052e-5013a3c78b1mr163381cf.1.1768242996667; Mon, 12 Jan 2026
- 10:36:36 -0800 (PST)
+        bh=CI3Qkkbb89cv5bbaE9HcvbYXyBW2GfCAOd3nwRVqS/M=;
+        b=Q/6tm7WXAxaqxkdUlmHFOrE4eyIygWFLrrJZhUyU73kVB+Mm10GTbOliqzHtuzcFuD
+         18gx9cTVU34Z076z3IjWozsWA5HVilI+DJ4GKddCGfPPtwuoGyuKYYRRo+U3lutuYD3O
+         kNVutqUAcnYHrIkLJyKar3A0Sgx5o4F4BcbFKWBDaJNCzLlfP3JoRLpOxoyglRIDvquc
+         GB1sTJcpJv3J7BdzbBZCGL2+EDAPULFo8uEIy4wKN6pmeytijggG0NL9Kv3yzSthOLfe
+         wLUUH//2OAms6gFXX63fUbDN0JZQV3xEWeNzJN8p3tegIXQhL6ORpdfZnOMRBKx/E1kX
+         MBzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWfS4G8H6SumXI2kuSlLM6ggwmgJSB3HtZUUzbAlDMsD4g2EGidLcCFypLWtbtUrE5Yj9on8H4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyoQb40o7Gq+yszE1EuDsVxJqETlcLFbD142fqpV2oYE1JM5TtJ
+	eFLfeaiy1vDOXrlEpuBQrf5Cr4mpHX8NeAaBlVtlksL8CbypddjLc0HM2jQtXLlm++xyAr/Ipa/
+	egAzNUEbyULtEhJsj/Bkkt19T+48tgGuY0a6xEfJ7
+X-Gm-Gg: AY/fxX4kgsNDn3NyXtSQkGuOoDtrrnSaWn6ACFBr0BS/7waG+T2rzYxR/3zNk1FzAbk
+	3IP7migPoGPJvoK4nc0SD63KYo5r9TRd2oQmoMl+blbK6Fis/mWA3u629E1UG0tqkKc8THq1Nr7
+	22n4MH+wwgAlr/iYDwdN7mzRXqsPM63HX6k82RsDttOFZA09wVE9/rrd7HZDxUeqrXnpIZ/PTbw
+	yxJuKCn8mkbbI9Qi2poUIP5opvTg9joJcoWURXFQu8fciPTW3stbDRk/JGjDK3qD0h96k+u
+X-Received: by 2002:ac8:5d42:0:b0:4f1:9c6e:cf1c with SMTP id
+ d75a77b69052e-5013a41792cmr752671cf.17.1768244961509; Mon, 12 Jan 2026
+ 11:09:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-20-8be3867cb883@kernel.org>
-In-Reply-To: <20251223-kvm-arm64-sme-v9-20-8be3867cb883@kernel.org>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-21-8be3867cb883@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 12 Jan 2026 18:35:00 +0000
-X-Gm-Features: AZwV_Qio1zjivzMeQYMIWVOvizuY7XatkfCAEo9m4hnoTRYK322NCwDdKHaZ9i8
-Message-ID: <CA+EHjTyovGEkb6svw-=wR=DF52j-wWTawJ5a19EuvSt4i9Re2Q@mail.gmail.com>
-Subject: Re: [PATCH v9 20/30] KVM: arm64: Support userspace access to
- streaming mode Z and P registers
+Date: Mon, 12 Jan 2026 19:08:00 +0000
+X-Gm-Features: AZwV_Qjgu-sXQZIHm3TAlOW62aUWk-t7wcra038ZJt2_3BJ_d28PSVA3xv4zVCM
+Message-ID: <CA+EHjTz4vDFdhbZMz6mNacdzSJLFfVbQKMGmSo=Vt9bSB4ho0Q@mail.gmail.com>
+Subject: Re: [PATCH v9 21/30] KVM: arm64: Flush register state on writes to
+ SVCR.SM and SVCR.ZA
 To: Mark Brown <broonie@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -101,132 +101,121 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 >
-> SME introduces a mode called streaming mode where the Z, P and optionally
-> FFR registers can be accessed using the SVE instructions but with the SME
-> vector length. Reflect this in the ABI for accessing the guest registers by
-> making the vector length for the vcpu reflect the vector length that would
-> be seen by the guest were it running, using the SME vector length when the
-> guest is configured for streaming mode.
+> Writes to the physical SVCR.SM and SVCR.ZA change the state of PSTATE.SM
+> and PSTATE.ZA, causing other floating point state to reset. Emulate this
+> behaviour for writes done via the KVM userspace ABI.
 >
-> Since SME may be present without SVE we also update the existing checks for
-> access to the Z, P and V registers to check for either SVE or streaming
-> mode. When not in streaming mode the guest floating point state may be
-> accessed via the V registers.
+> Setting PSTATE.ZA to 1 causes ZA and ZT0 to be reset to 0, these are stored
+> in sme_state. Setting PSTATE.ZA to 0 causes ZA and ZT0 to become inaccesible
+> so no reset is needed.
+
+nit: inaccesible -> inaccessible
+
 >
-> Any VMM that supports SME must be aware of the need to configure streaming
-> mode prior to writing the floating point registers that this creates.
+> Any change in PSTATE.SM causes the V, Z, P, FFR and FPMR registers to be
+> reset to 0 and FPSR to be reset to 0x800009f.
 >
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/guest.c | 38 ++++++++++++++++++++++++++++++++++----
->  1 file changed, 34 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 24 ++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c         | 29 ++++++++++++++++++++++++++++-
+>  2 files changed, 52 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 2a1fdcb0ec49..90dcacb35f01 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -73,6 +73,11 @@ static u64 core_reg_offset_from_id(u64 id)
->         return id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK | KVM_REG_ARM_CORE);
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 44595a789a97..bd7a9a4efbc3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1147,6 +1147,30 @@ struct kvm_vcpu_arch {
 >
-> +static bool vcpu_has_sve_regs(const struct kvm_vcpu *vcpu)
-> +{
-> +       return vcpu_has_sve(vcpu) || vcpu_in_streaming_mode(vcpu);
-> +}
-> +
->  static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
->  {
->         int size;
-> @@ -110,9 +115,10 @@ static int core_reg_size_from_offset(const struct kvm_vcpu *vcpu, u64 off)
->         /*
->          * The KVM_REG_ARM64_SVE regs must be used instead of
->          * KVM_REG_ARM_CORE for accessing the FPSIMD V-registers on
-> -        * SVE-enabled vcpus:
-> +        * SVE-enabled vcpus or when a SME enabled vcpu is in
-> +        * streaming mode:
->          */
-> -       if (vcpu_has_sve(vcpu) && core_reg_offset_is_vreg(off))
-> +       if (vcpu_has_sve_regs(vcpu) && core_reg_offset_is_vreg(off))
->                 return -EINVAL;
+>  #define vcpu_sve_state_size(vcpu) sve_state_size_from_vl((vcpu)->arch.max_vl[ARM64_VEC_SVE])
 >
->         return size;
-> @@ -426,6 +432,24 @@ struct vec_state_reg_region {
->         unsigned int upad;      /* extra trailing padding in user memory */
->  };
->
-> +/*
-> + * We represent the Z and P registers to userspace using either the
-> + * SVE or SME vector length, depending on which features the guest has
-> + * and if the guest is in streaming mode.
-> + */
-> +static unsigned int vcpu_sve_cur_vq(struct kvm_vcpu *vcpu)
-> +{
-> +       unsigned int vq = 0;
+> +#define vcpu_sme_state(vcpu) (kern_hyp_va((vcpu)->arch.sme_state))
 > +
-> +       if (vcpu_has_sve(vcpu))
-> +               vq = vcpu_sve_max_vq(vcpu);
+> +#define sme_state_size_from_vl(vl, sme2) ({                            \
+> +       size_t __size_ret;                                              \
+> +       unsigned int __vq;                                              \
+> +                                                                       \
+> +       if (WARN_ON(!sve_vl_valid(vl))) {                               \
+> +               __size_ret = 0;                                         \
+> +       } else {                                                        \
+> +               __vq = sve_vq_from_vl(vl);                              \
+> +               __size_ret = ZA_SIG_REGS_SIZE(__vq);                    \
+> +               if (sme2)                                               \
+> +                       __size_ret += ZT_SIG_REG_SIZE;                  \
+> +       }                                                               \
+> +                                                                       \
+> +       __size_ret;                                                     \
+> +})
 > +
-> +       if (vcpu_in_streaming_mode(vcpu))
-> +               vq = vcpu_sme_max_vq(vcpu);
-> +
-> +       return vq;
-> +}
+> +#define vcpu_sme_state_size(vcpu) ({                                   \
+> +       unsigned long __vl;                                             \
+> +       __vl = (vcpu)->arch.max_vl[ARM64_VEC_SME];                      \
+> +       sme_state_size_from_vl(__vl, vcpu_has_sme2(vcpu));              \
+> +})
 > +
 >  /*
->   * Validate SVE register ID and get sanitised bounds for user/kernel SVE
->   * register copy
-> @@ -466,7 +490,7 @@ static int sve_reg_to_region(struct vec_state_reg_region *region,
->                 if (!vcpu_has_sve(vcpu) || (reg->id & SVE_REG_SLICE_MASK) > 0)
-
-Should this be vcpu_has_sve_regs()? (zreg range)
-
->                         return -ENOENT;
+>   * Only use __vcpu_sys_reg/ctxt_sys_reg if you know you want the
+>   * memory backed version of a register, and not the one most recently
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 51f175bbe8d1..4ecfcb0af24c 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -927,6 +927,33 @@ static unsigned int hidden_visibility(const struct kvm_vcpu *vcpu,
+>         return REG_HIDDEN;
+>  }
 >
-> -               vq = vcpu_sve_max_vq(vcpu);
-> +               vq = vcpu_sve_cur_vq(vcpu);
->
->                 reqoffset = SVE_SIG_ZREG_OFFSET(vq, reg_num) -
->                                 SVE_SIG_REGS_OFFSET;
-> @@ -476,7 +500,7 @@ static int sve_reg_to_region(struct vec_state_reg_region *region,
->                 if (!vcpu_has_sve(vcpu) || (reg->id & SVE_REG_SLICE_MASK) > 0)
+> +static int set_svcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +                   u64 val)
+> +{
+> +       u64 old = __vcpu_sys_reg(vcpu, rd->reg);
+> +
+> +       if (val & SVCR_RES0)
+> +               return -EINVAL;
+> +
+> +       if ((val & SVCR_ZA) && !(old & SVCR_ZA) && vcpu->arch.sme_state)
+> +               memset(vcpu->arch.sme_state, 0, vcpu_sme_state_size(vcpu));
+> +
+> +       if ((val & SVCR_SM) != (old & SVCR_SM)) {
+> +               memset(vcpu->arch.ctxt.fp_regs.vregs, 0,
+> +                      sizeof(vcpu->arch.ctxt.fp_regs.vregs));
+> +
+> +               if (vcpu->arch.sve_state)
+> +                       memset(vcpu->arch.sve_state, 0,
+> +                              vcpu_sve_state_size(vcpu));
 
-And should this also be vcpu_has_sve_regs()? (preg range)
+If sve_state isn't allocated, this means that we've gotten here before
+finalization. Is it better to return an error rather than silently
+skipping this?
 
-Should you also handle FFR here, considering that in streaming mode
-it's optional?
+> +
+> +               __vcpu_assign_sys_reg(vcpu, FPMR, 0);
+> +               vcpu->arch.ctxt.fp_regs.fpsr = 0x800009f;
+
+This matches the Arm Arm, but can we use a define or construct it,
+rather than using a magic number?
 
 Cheers,
 /fuad
 
 
-
->                         return -ENOENT;
->
-> -               vq = vcpu_sve_max_vq(vcpu);
-> +               vq = vcpu_sve_cur_vq(vcpu);
->
->                 reqoffset = SVE_SIG_PREG_OFFSET(vq, reg_num) -
->                                 SVE_SIG_REGS_OFFSET;
-> @@ -515,6 +539,9 @@ static int get_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         if (!kvm_arm_vcpu_vec_finalized(vcpu))
->                 return -EPERM;
->
-> +       if (!vcpu_has_sve_regs(vcpu))
-> +               return -EBUSY;
+> +       }
 > +
->         if (copy_to_user(uptr, vcpu->arch.sve_state + region.koffset,
->                          region.klen) ||
->             clear_user(uptr + region.klen, region.upad))
-> @@ -541,6 +568,9 @@ static int set_sve_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
->         if (!kvm_arm_vcpu_vec_finalized(vcpu))
->                 return -EPERM;
->
-> +       if (!vcpu_has_sve_regs(vcpu))
-> +               return -EBUSY;
+> +       __vcpu_assign_sys_reg(vcpu, rd->reg, val);
+> +       return 0;
+> +}
 > +
->         if (copy_from_user(vcpu->arch.sve_state + region.koffset, uptr,
->                            region.klen))
->                 return -EFAULT;
+>  static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>                                    const struct sys_reg_desc *r)
+>  {
+> @@ -3512,7 +3539,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>                     CTR_EL0_DminLine_MASK |
+>                     CTR_EL0_L1Ip_MASK |
+>                     CTR_EL0_IminLine_MASK),
+> -       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility  },
+> +       { SYS_DESC(SYS_SVCR), undef_access, reset_val, SVCR, 0, .visibility = sme_visibility, .set_user = set_svcr },
+>         { SYS_DESC(SYS_FPMR), undef_access, reset_val, FPMR, 0, .visibility = fp8_visibility },
+>
+>         { PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
 >
 > --
 > 2.47.3
