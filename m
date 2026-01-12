@@ -1,332 +1,276 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2F12D7DD1
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 11:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768218850; cv=none; b=P1H6bVGYLnBy8kH/wG2fwi2IXsBk3x8eW0E6MDefUzclK+62R2EBnGxzy771XbTCNqsi0kOb7+X2vUPkhA+bqijF/eWGduTD4asmeXo2/MRo3W+TE/VZzPLY/4r9Vd0s8AC4Rg4gfFu4TzJKFXeOY+2ATV0gM7bAiKLUfoUsaqo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768218850; c=relaxed/simple;
-	bh=m3lSldEfRyC50t/kPCa1n87VX38ATt4LyNO0RNXPUjo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ksTjfkiNQwvIYoAcIGjPOiKuEk7vXtB/uH/6lg/wapVt4UJOiy6bbNLaiqdn657+zQhRjjrzXJ+OLJ5mlEFQMjrqK1gm6fAxTn3nDoAZ+KwzwFp1+yNNiPC7IdUkIzCSYSWIMKEt1R9vnt1PXqYRFMOtBoGNYA8Uhm5lM7LAZlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=y2ECdQA+; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B1B3570D1
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 12:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768219203; cv=pass; b=N1ro3fJ4XcFNBILzMAfyEPNwh1OuyeWgvpU654bU9T5Y/ksIFonFbNYwgP490FhJau7xT49meaOAEbwCzcUCXSC5kuCYY7kKxa19GAhWuNPHX9nMamp3FvBLfNL8y0/tTtoJoAEtAX8GLZB+MarfsloeN1AHWBP+JE2kU/JqtZk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768219203; c=relaxed/simple;
+	bh=M1jG2cxx4p2/zCe7hGXotN8Edhf4Ww+MYu2JyhVnpu4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oRPxka7fOVqnWX4tvvtPAptYreY/fEYSwQcZpM2ldsXVBOfOFXgiwotj96wwgseyWVMcx4yymQd+tsF2QMCKpShns7JvVFstVeezG3Q6fWFP7KRtHyQfNo9BZ8WwvRPxWpx1wo0NOns2bBRb3WPJ48bY/duUaaIly3JjcKyuQsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zoig/PzS; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y2ECdQA+"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42fbc305552so4617260f8f.0
-        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 03:54:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zoig/PzS"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ee147baf7bso799301cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 04:00:00 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768219200; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Y5Ug6OIT2evF0yFWfr06gWUvWlprNwvJBkKEQW7kpWaKS/5cuK6ZfyHmgKdPqsBiUY
+         zWWGzPQzrNTzb2ijzh5Ix8Md/7K3Ndes61nIjCzH2gl4gKvv24wvWc75bEQD//3+5Azh
+         lqbVarMFgJI2lq8gz1m8ef/zzpZ6TlyIdQOVvVBPb5gDvrITS2mKhQY80ehm4lL6CaGy
+         gwjLAR/uGAkl7YKyjlPAUozXSc66FkoKSoZZnFIpX/f61irXhZig+7ABXmWuJ7FU4xI7
+         6MWffSJO79Qy1gvHQe3ECQRLzVMAJC+VnMl+cQ8cscv+V9ng0l1EpDGqt7sre8AO0BsG
+         emsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=EhverceljAAUxMEU3GTIMI93Myxn5CKaFJOdFr79HIY=;
+        fh=VPICPU5BQ26bLUB2liIyXvMmwrej7cNDrevuvMa+Y3E=;
+        b=I9JSw1fLqQPiQJj3FIBRYBv4GVCVpSNcS1enMHyEYsABJ+ZLNQKDeg2sM+a53R/YcJ
+         vNXpzBAPMFqG90udjeenARGG6urcfsAn/+qlsMDArCSkG/8MC/tpsEwWao1RhVGnT3p6
+         GysWgpch/ynLPNER/YAMQ3gBCjgFP4QunxMZbpQ1AyxQLJouW/FTSsIC+kof1dpBnWpF
+         dDVrP3ebq7lexQjRMKqF3yK8yvhIzTNXCsU677nkIXDQ0gUGxMkIE5A6Jk+LoGigJ5qN
+         MBL8oVa3/e7jViclyafif7V3Japul26VDH+bi0wJXHfKq3shV2hMhOYSPgLXpt5FhXIe
+         gAEw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1768218847; x=1768823647; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YWii3J6C1NMQBmfiw8z1OVB/aGlQS9lfRhCmvYhOn4I=;
-        b=y2ECdQA+YNFsJIMjzc8b2H1UMrULHe8zSyAIhsY2njRQ6JDacLX4bTNQnLNHaOm8wK
-         9XfumZl0IDdjKnKprQHMvSTf+la+jKoNXK3W38ok2pu1HmxKF3ejRgWVSOc5rT2xzaZK
-         zvdBDciQ/WROyf/mitCC22yFgC5c+TMgyIpHPeficaIO9bQXU+0vfBZlH44WSFG+fOdg
-         zf9lIq3YQ8aPdKnHe9oQkH+xYYiYXYMtc+31DgU9XuE94gC3fm3EhqfuvxPai3tkDFF0
-         c+9ah01KXQYR4Y/eECUXxgTcQik1kIAB1FHtZzcFp1J4xx51kfpPCGrZBXADGz7t9dui
-         yfHw==
+        d=google.com; s=20230601; t=1768219200; x=1768824000; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EhverceljAAUxMEU3GTIMI93Myxn5CKaFJOdFr79HIY=;
+        b=zoig/PzSVpZrlXlUEHUsUUVB3n6Vi06wFlFz8JaNg31ZjcsRMSKC1CjRWv9WrghOOw
+         ksgICbtWn/d73fQ5zadT0/KTeMDoczs4d2u8TEqN0pRWVoXGLIFhjHKTamZUiRPeMARW
+         BpUyZ4CxZCgryHfXMuA5PQRzkn7IRk/fS4PXL+UYbsfn1g45QX/r+72em0wQLNjOufHo
+         lQi1tRoqyYF9ItbWvy3kG6K2Bh03ly4pO6ZYazfba7s7Mj2ppP+gG5n2csUlNmzwKJkW
+         3JDmIChVXZe5w5LFXuhgxaNuLG8/ysW4QcHOi5xcK4ORY21Kc86KfS28zyl/nLctS76v
+         VPGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768218847; x=1768823647;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YWii3J6C1NMQBmfiw8z1OVB/aGlQS9lfRhCmvYhOn4I=;
-        b=sCA5LaohfVZohTWrnkUKURkB4xduTHznXy5yl8A+gn/uZ+w/Or38ZQzNWIPYk+DJ+F
-         hbjfgMvguPC/9QNjSb3qAf2JuQL9KnZKsmAtmJ4Iq9lHe6cbxB3A9AtwwWC7Ogdfuw+6
-         jGhBlngy4r9O06d9jqplLDKRnxIEO7MoTcc9+i4e4E/F7Rj3tVpWQH+62Rh/ZCRjYbs9
-         7WzajI7W5I+M8GL4MBjX2I6xHJoG08XYP1mTD/ulUzTi1DrXCFp/HUCbzCY7FS8Aa1Oq
-         oibZ6X6mXp45dY3kIm1bdCNcTdY+Ez0h5jA36ruagZIyZm1ArsrssLz+maIfswTxllhb
-         My4g==
-X-Forwarded-Encrypted: i=1; AJvYcCULas6gAeMEyIvnWF1nad8XrEGordRn16xDKCmnkP0PGyZd1a/HPkGbzy2kbXC2vtXL0qaIPf4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YypMO3WDbXoUdyshjCnkfcbB1FKLzt5L2SucU8v+4Mmqlrs6l2g
-	r1qGWuBdNaFiQCZUgI5rJp6q9iP1g5hTBzi46h2L3esOUqLlI0+wMVO4EoKbOpuFjIwq8GxYOc0
-	1qAeS
-X-Gm-Gg: AY/fxX4yFupHH2BhwlWpyhtUl7pnJbdC2c+A8uL/y50Mgk79ngH949xCkOxB5/WqRIx
-	EiHPCMKfdTPZ4Q0KdJmydQIIQ8+IqdBXnFIEDkoKmznjAnP4XQY2X8awd23v86Er9I5vhQkl1PG
-	DXfDEotIeR1w5cq+mQAjpwv4ZH3uJRb2NifaH7Q0+6Db5/xUyNcJPfIbha/6y2dKAiudcWDXrug
-	OUdxG2qWJfWDAOt0JQwyO2jOHbiWLV3B1hjDZ1giXRLEzktqWvcZNBGPTbki0GF3i1Bce108vPT
-	lS27z8hS7yIxVnUFBHRHFE+xJFaLpuqkdjYdI2z+hIZsW+8LmkRS3CLIfTmvyfx26kbT2RzaGKB
-	vN1ho5n23p+sIMDBwaIjT6vkAFiQWM/iQh9JhpUzAFNa63RISKA532IyaVY2O91n29OxAMnnNBf
-	YMSIHeapQTZ+1nbqq9
-X-Google-Smtp-Source: AGHT+IEsjn+zK0lCbsdK1N0GQkVVBrmVbqGLvj60sSFEXUeA30O5MzdZ36mYjp8mtJBulQAHIaZUdA==
-X-Received: by 2002:a5d:6a8c:0:b0:432:dd71:8f2c with SMTP id ffacd0b85a97d-432dd71908bmr8978495f8f.10.1768218847107;
-        Mon, 12 Jan 2026 03:54:07 -0800 (PST)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df9c5sm39252935f8f.22.2026.01.12.03.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 03:54:06 -0800 (PST)
-Message-ID: <adacaff6-c6c7-47a5-993a-29f006fe1b86@linaro.org>
-Date: Mon, 12 Jan 2026 11:54:05 +0000
+        d=1e100.net; s=20230601; t=1768219200; x=1768824000;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EhverceljAAUxMEU3GTIMI93Myxn5CKaFJOdFr79HIY=;
+        b=qlZ5SH7+4WHWR4I38jMfL9Y3BY8yWGEuxwym+RSjyW3GDDUrku6t3s1EIGbHY4C2cj
+         PWW77fR8vWeuaI49SQi4FoapaZHhr9LOP/8s4bb6rycw5MWvXATH2RYvYIjZAzD3MxOa
+         7cyTPNpb4EJzoL3z7BPh23qzSDo9NqXRGVzHyBY6USVLs6kwrY4tC/Dkdf1Kwffs8uIi
+         Ng9OrvvpDg+8XptgYLHvdrQMik2KiHctVPGdTJY48n3bBz2+Z+3om8PJaJOxOWyeKg92
+         TcCJZeqA2uNGMr/CfIPZFKV3ul/8nQ5Lk/SeXMiCrHpeTzoMBgamtWepK/Pmbr0h+Zqd
+         e55w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+649g8kcVflTgFiAvwNj3WBUuK0BCVqaITxTD14LyfHhTtDljR+8VQWHzeK8WrXdrsK553cs=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy81eq5+ZGlIv5q3loNSUSjIwD8GPYw5WOe80tvuyy1uSJstZUY
+	bvZBdQU27SWdGI4NquJVOXSMuOEAlt8Q3kbO+O1vGlMbla8uE8idxgVw0y9QftYOHG3R6RjZ/+g
+	kaJQ97jF+aAbnnZ7Ln7JhLwNQ//6rJHrRU4tChO9t
+X-Gm-Gg: AY/fxX7L8RXgN5Gfen4aKLn94u9Gl2yXS/8O5fIXK6mLvGzaaNSKJpeeEF4HOAuA85r
+	1CoGIULvmRV6+wN5KWktxmtUsnHrITu8crJ04bsrqaoyOIMtaouCjv/zbC4lvDD8mYx1TtYWQsw
+	pti12rAJe9YsW82gAvxLH6DcREb4J3tgHVSf7FxkYeWOTHxZtg4g1IRvOvNc3FPG7WeCf8FkiCc
+	tgd+tnfHgLVVe7H4u5gLXH9n7gC8m0K/O5o5qvW51Buw+C61znAxpkDCv8alQ1o+8gKVz9F
+X-Received: by 2002:ac8:5891:0:b0:4ff:bfdd:3f46 with SMTP id
+ d75a77b69052e-5011979b086mr17248321cf.15.1768219199451; Mon, 12 Jan 2026
+ 03:59:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v6 19/35] KVM: arm64: Trap PMBIDR_EL1 and PMSIDR_EL1
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-20-alexandru.elisei@arm.com>
- <f7d73dc3-aa4a-4c32-aabb-21a61a2f773f@linaro.org> <aWTa76KXpIwzPh4k@raptor>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <aWTa76KXpIwzPh4k@raptor>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-18-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-18-8be3867cb883@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 12 Jan 2026 11:59:22 +0000
+X-Gm-Features: AZwV_QjlL10TIxuJSo-17cIhu7wpBka538OyBuaIYcHbCwZvW100GJwAVVv1kGY
+Message-ID: <CA+EHjTwxc=+1TodVR7X96fnKu-mykivdFxMbB5nUrw_h4MGKHg@mail.gmail.com>
+Subject: Re: [PATCH v9 18/30] KVM: arm64: Support SME priority registers
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Mark,
 
+On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
+>
+> SME has optional support for configuring the relative priorities of PEs
+> in systems where they share a single SME hardware block, known as a
+> SMCU. Currently we do not have any support for this in Linux and will
+> also hide it from KVM guests, pending experience with practical
+> implementations. The interface for configuring priority support is via
+> two new system registers, these registers are always defined when SME is
+> available.
+>
+> The register SMPRI_EL1 allows control of SME execution priorities. Since
+> we disable SME priority support for guests this register is RES0, define
+> it as such and enable fine grained traps for SMPRI_EL1 to ensure that
+> guests can't write to it even if the hardware supports priorites.  Since
 
-On 12/01/2026 11:28 am, Alexandru Elisei wrote:
-> Hi James,
-> 
-> On Fri, Jan 09, 2026 at 04:29:37PM +0000, James Clark wrote:
->>
->>
->> On 14/11/2025 4:07 pm, Alexandru Elisei wrote:
->>> PMBIDR_EL1 and PMSIDR_EL1 are read-only registers that describe the SPE
->>> implementation. Trap reads to allow KVM to control how SPE is described to
->>> a virtual machine. In particular, this is needed to:
->>>
->>> - Advertise the maximum buffer size set by userspace in
->>>     PMBIDR_EL1.MaxBuffSize.
->>> - Hide in PMSIDR_EL1, if necessary, the presence of FEAT_SPE_FDS and
->>>     FEAT_SPE_FnE, both of which add new registers which are already
->>>     trapped via the FGU mechanism.
->>>
->>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>> ---
->>>    arch/arm64/include/asm/kvm_spe.h |  4 +-
->>>    arch/arm64/kvm/config.c          | 13 ++++-
->>>    arch/arm64/kvm/spe.c             | 82 +++++++++++++++++++++++++++++++-
->>>    arch/arm64/kvm/sys_regs.c        | 13 +++--
->>>    4 files changed, 103 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
->>> index 3506d8c4c661..47b94794cc5f 100644
->>> --- a/arch/arm64/include/asm/kvm_spe.h
->>> +++ b/arch/arm64/include/asm/kvm_spe.h
->>> @@ -40,7 +40,7 @@ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->>>    int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
->>>    bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val);
->>> -u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg);
->>> +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg, u32 encoding);
->>>    #else
->>>    struct kvm_spe {
->>>    };
->>> @@ -78,7 +78,7 @@ static inline bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
->>>    {
->>>    	return true;
->>>    }
->>> -static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
->>> +static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg, u32 encoding)
->>>    {
->>>    	return 0;
->>>    }
->>> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
->>> index 24bb3f36e9d5..ed6b167b7aa8 100644
->>> --- a/arch/arm64/kvm/config.c
->>> +++ b/arch/arm64/kvm/config.c
->>> @@ -6,6 +6,7 @@
->>>    #include <linux/kvm_host.h>
->>>    #include <asm/kvm_emulate.h>
->>> +#include <asm/kvm_spe.h>
->>>    #include <asm/kvm_nested.h>
->>>    #include <asm/sysreg.h>
->>> @@ -1489,6 +1490,16 @@ static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
->>>    		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
->>>    }
->>> +static void __compute_hdfgrtr(struct kvm_vcpu *vcpu)
->>> +{
->>> +	__compute_fgt(vcpu, HDFGRTR_EL2);
->>> +
->>> +	if (vcpu_has_spe(vcpu)) {
->>> +		*vcpu_fgt(vcpu, HDFGRTR_EL2) |= HDFGRTR_EL2_PMBIDR_EL1;
->>> +		*vcpu_fgt(vcpu, HDFGRTR_EL2) |= HDFGRTR_EL2_PMSIDR_EL1;
->>> +	}
->>> +}
->>> +
->>>    static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
->>>    {
->>>    	__compute_fgt(vcpu, HDFGWTR_EL2);
->>> @@ -1505,7 +1516,7 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
->>>    	__compute_fgt(vcpu, HFGRTR_EL2);
->>>    	__compute_hfgwtr(vcpu);
->>>    	__compute_fgt(vcpu, HFGITR_EL2);
->>> -	__compute_fgt(vcpu, HDFGRTR_EL2);
->>> +	__compute_hdfgrtr(vcpu);
->>>    	__compute_hdfgwtr(vcpu);
->>>    	__compute_fgt(vcpu, HAFGRTR_EL2);
->>> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
->>> index 5b3dc622cf82..92eb46276c71 100644
->>> --- a/arch/arm64/kvm/spe.c
->>> +++ b/arch/arm64/kvm/spe.c
->>> @@ -22,10 +22,16 @@ struct arm_spu_entry {
->>>    	struct arm_spe_pmu *arm_spu;
->>>    };
->>> +static u64 max_buffer_size_to_pmbidr_el1(u64 size);
->>> +
->>>    void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
->>>    {
->>>    	struct arm_spu_entry *entry;
->>> +	/* PMBIDR_EL1 cannot be trapped without FEAT_FGT. */
->>> +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
->>> +		return;
->>> +
->>
->> Isn't this only required if you want to report a different PMBIDR value? If
->> the value in hardware is already what you want to give to guests then it's
->> not strictly required. Maybe it's something we can do as an addition later
->> to make it usable in more places.
-> 
-> The maximum buffer size is advertised in PMBIDR_EL1.
-> 
-> Thanks,
-> Alex
-> 
+nit: priorites -> priorities
 
-I know, but 0 "unlimited" is a valid value, and that's what's already in 
-PMBIDR. You only need to trap if the value doesn't match what's already 
-there.
+> the register should be readable with fixed contents we only trap writes,
+> not reads. Since there is no host support for using priorities the
+> register currently left with a value of 0 by the host so we do not need
+> to update the value for guests.
+>
+> There is also an EL2 register SMPRIMAP_EL2 for virtualisation of
+> priorities, this is RES0 when priority configuration is not supported
+> but has no specific traps available.  When saving state from a nested
+> guest we overwite any value the guest stored.
 
-You can also "probe" the maximum buffer size without this by attempting 
-to set the limit pointer and looking at the buffer management error code.
+nit: overwite -> overwrite
 
-The first thing I did when I went to use this was comment this out 
-because my hardware doesn't support FGT. But the rest of it works fine 
-without, maybe other people could benefit in the future too.
+>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h     |  1 +
+>  arch/arm64/include/asm/vncr_mapping.h |  1 +
+>  arch/arm64/kvm/config.c               |  3 +++
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c    |  7 +++++++
+>  arch/arm64/kvm/sys_regs.c             | 30 +++++++++++++++++++++++++++++-
+>  5 files changed, 41 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index fead6988f47c..44595a789a97 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -546,6 +546,7 @@ enum vcpu_sysreg {
+>         VNCR(CPACR_EL1),/* Coprocessor Access Control */
+>         VNCR(ZCR_EL1),  /* SVE Control */
+>         VNCR(SMCR_EL1), /* SME Control */
+> +       VNCR(SMPRIMAP_EL2),     /* Streaming Mode Priority Mapping Register */
+>         VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
+>         VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
+>         VNCR(TCR_EL1),  /* Translation Control Register */
+> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+> index 44b12565321b..a2a84af6585b 100644
+> --- a/arch/arm64/include/asm/vncr_mapping.h
+> +++ b/arch/arm64/include/asm/vncr_mapping.h
+> @@ -45,6 +45,7 @@
+>  #define VNCR_ZCR_EL1            0x1E0
+>  #define VNCR_HAFGRTR_EL2       0x1E8
+>  #define VNCR_SMCR_EL1          0x1F0
+> +#define VNCR_SMPRIMAP_EL2      0x1F0
 
->>
->>>    	/* TODO: pKVM and nVHE support */
->>>    	if (is_protected_kvm_enabled() || !has_vhe())
->>>    		return;
->>> @@ -86,9 +92,81 @@ bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
->>>    	return true;
->>>    }
->>> -u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
->>> +static bool kvm_spe_has_feat_spe_fds(struct kvm *kvm)
->>> +{
->>> +	struct arm_spe_pmu *spe_pmu = kvm->arch.kvm_spe.arm_spu;
->>> +
->>> +	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P4) &&
->>> +	       FIELD_GET(PMSIDR_EL1_FDS, spe_pmu->pmsidr_el1);
->>> +}
->>> +
->>> +static bool kvm_spe_has_feat_spe_fne(struct kvm *kvm)
->>> +{
->>> +	struct arm_spe_pmu *spe_pmu = kvm->arch.kvm_spe.arm_spu;
->>> +
->>> +	return kvm_has_feat(kvm, ID_AA64DFR0_EL1, PMSVer, V1P2) &&
->>> +	       FIELD_GET(PMSIDR_EL1_FnE, spe_pmu->pmsidr_el1);
->>> +}
->>> +
->>> +static u64 kvm_spe_get_pmsidr_el1(struct kvm_vcpu *vcpu)
->>>    {
->>> -	return __vcpu_sys_reg(vcpu, reg);
->>> +	struct kvm *kvm = vcpu->kvm;
->>> +	u64 pmsidr = kvm->arch.kvm_spe.arm_spu->pmsidr_el1;
->>> +
->>> +	/* Filter out known RES0 bits. */
->>> +	pmsidr &= ~GENMASK_ULL(63, 33);
->>> +
->>> +	if (!kvm_spe_has_feat_spe_fne(kvm))
->>> +		pmsidr &= ~PMSIDR_EL1_FnE;
->>> +
->>> +	if (!kvm_spe_has_feat_spe_fds(kvm))
->>> +		pmsidr &= ~PMSIDR_EL1_FDS;
->>> +
->>> +	return pmsidr;
->>> +}
->>> +
->>> +static u64 kvm_spe_get_pmbidr_el1(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct kvm *kvm = vcpu->kvm;
->>> +	struct kvm_spe *kvm_spe = &kvm->arch.kvm_spe;
->>> +	u64 max_buffer_size = kvm_spe->max_buffer_size;
->>> +	u64 pmbidr_el1 = kvm_spe->arm_spu->pmbidr_el1;
->>> +
->>> +	/* Filter out known RES0 bits. */
->>> +	pmbidr_el1 &= ~(GENMASK_ULL(63, 48) | GENMASK_ULL(31, 12));
->>> +
->>> +	if (!kvm_has_feat(kvm, ID_AA64DFR2_EL1, SPE_nVM, IMP)) {
->>> +		pmbidr_el1 &= ~PMBIDR_EL1_AddrMode;
->>> +		pmbidr_el1 |= PMBIDR_EL1_AddrMode_VM_ONLY;
->>> +	}
->>> +
->>> +	pmbidr_el1 &= ~PMBIDR_EL1_MaxBuffSize;
->>> +	pmbidr_el1 |= max_buffer_size_to_pmbidr_el1(max_buffer_size);
->>> +
->>> +	return pmbidr_el1;
->>> +}
->>> +
->>> +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg, u32 encoding)
->>> +{
->>> +	u64 val = 0;
->>> +
->>> +	switch (encoding) {
->>> +	case SYS_PMBIDR_EL1:
->>> +		val = kvm_spe_get_pmbidr_el1(vcpu);
->>> +		break;
->>> +	case SYS_PMSIDR_EL1:
->>> +		val = kvm_spe_get_pmsidr_el1(vcpu);
->>> +		break;
->>> +	case SYS_PMBLIMITR_EL1:
->>> +	case SYS_PMBPTR_EL1:
->>> +	case SYS_PMBSR_EL1:
->>> +		val = __vcpu_sys_reg(vcpu, reg);
->>> +		break;
->>> +	default:
->>> +		WARN_ON_ONCE(1);
->>> +	}
->>> +
->>> +	return val;
->>>    }
->>>    static u64 max_buffer_size_to_pmbidr_el1(u64 size)
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 5eeea229b46e..db86d1dcd148 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -1386,13 +1386,18 @@ static unsigned int spe_visibility(const struct kvm_vcpu *vcpu,
->>>    static bool access_spe_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->>>    			   const struct sys_reg_desc *r)
->>>    {
->>> +	u32 encoding = reg_to_encoding(r);
->>>    	u64 val = p->regval;
->>>    	int reg = r->reg;
->>> -	if (p->is_write)
->>> +	if (p->is_write) {
->>> +		if (WARN_ON_ONCE(encoding == SYS_PMBIDR_EL1 ||
->>> +				 encoding == SYS_PMSIDR_EL1))
->>> +			return write_to_read_only(vcpu, p, r);
->>>    		return kvm_spe_write_sysreg(vcpu, reg, val);
->>> +	}
->>> -	p->regval = kvm_spe_read_sysreg(vcpu, reg);
->>> +	p->regval = kvm_spe_read_sysreg(vcpu, reg, encoding);
->>>    	return true;
->>>    }
->>> @@ -3360,12 +3365,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->>>    	{ SPE_UNTRAPPED_REG(PMSFCR_EL1) },
->>>    	{ SPE_UNTRAPPED_REG(PMSEVFR_EL1) },
->>>    	{ SPE_UNTRAPPED_REG(PMSLATFR_EL1) },
->>> -	{ SYS_DESC(SYS_PMSIDR_EL1), .access = undef_access },
->>> +	{ SYS_DESC(SYS_PMSIDR_EL1), .access = access_spe_reg, .visibility = spe_visibility },
->>>    	{ SPE_TRAPPED_REG(PMBLIMITR_EL1) },
->>>    	{ SPE_TRAPPED_REG(PMBPTR_EL1) },
->>>    	{ SPE_TRAPPED_REG(PMBSR_EL1) },
->>>    	{ SPE_UNTRAPPED_REG(PMSDSFR_EL1) },
->>> -	{ SYS_DESC(SYS_PMBIDR_EL1), .access = undef_access },
->>> +	{ SYS_DESC(SYS_PMBIDR_EL1), .access = access_spe_reg, .visibility = spe_visibility },
->>>    	{ PMU_SYS_REG(PMINTENSET_EL1),
->>>    	  .access = access_pminten, .reg = PMINTENSET_EL1,
->>
+This should be 0x1F8.
 
+>  #define VNCR_TTBR0_EL1          0x200
+>  #define VNCR_TTBR1_EL1          0x210
+>  #define VNCR_FAR_EL1            0x220
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 7e26991b2df1..0088635a95bd 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -1481,6 +1481,9 @@ static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
+>
+>         if (cpus_have_final_cap(ARM64_WORKAROUND_AMPERE_AC03_CPU_38))
+>                 *vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
+> +
+> +       if (kvm_has_feat(vcpu->kvm, ID_AA64PFR1_EL1, SME, IMP))
+> +               *vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_nSMPRI_EL1;
+
+Is the intention to _disable_ the trap in this case? I think you
+wanted to enable them.
+
+>  }
+>
+>  static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> index f28c6cf4fe1b..07aa4378c58a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> @@ -80,6 +80,13 @@ static void __sysreg_save_vel2_state(struct kvm_vcpu *vcpu)
+>
+>         if (ctxt_has_sctlr2(&vcpu->arch.ctxt))
+>                 __vcpu_assign_sys_reg(vcpu, SCTLR2_EL2, read_sysreg_el1(SYS_SCTLR2));
+> +
+> +       /*
+> +        * We block SME priorities so SMPRIMAP_EL2 is RES0, however we
+> +        * do not have traps to block access so the guest might have
+> +        * updated the state, overwrite anything there.
+
+nit: overwrite -> overwriting
+
+Cheers,
+/fuad
+
+> +        */
+> +       __vcpu_assign_sys_reg(vcpu, SMPRIMAP_EL2, 0);
+>  }
+>
+>  static void __sysreg_restore_vel2_state(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index a7ab02822023..51f175bbe8d1 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -691,6 +691,15 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+>                 return read_zero(vcpu, p);
+>  }
+>
+> +static int set_res0(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +                   u64 val)
+> +{
+> +       if (val)
+> +               return -EINVAL;
+> +
+> +       return 0;
+> +}
+> +
+>  /*
+>   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
+>   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
+> @@ -1979,6 +1988,15 @@ static unsigned int fp8_visibility(const struct kvm_vcpu *vcpu,
+>         return REG_HIDDEN;
+>  }
+>
+> +static unsigned int sme_raz_visibility(const struct kvm_vcpu *vcpu,
+> +                                      const struct sys_reg_desc *rd)
+> +{
+> +       if (vcpu_has_sme(vcpu))
+> +               return REG_RAZ;
+> +
+> +       return REG_HIDDEN;
+> +}
+> +
+>  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  {
+>         if (!vcpu_has_sve(vcpu))
+> @@ -3349,7 +3367,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>
+>         { SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
+>         { SYS_DESC(SYS_TRFCR_EL1), undef_access },
+> -       { SYS_DESC(SYS_SMPRI_EL1), undef_access },
+> +
+> +       /*
+> +        * SMPRI_EL1 is UNDEF when SME is disabled, the UNDEF is
+> +        * handled via FGU which is handled without consulting this
+> +        * table.
+> +        */
+> +       { SYS_DESC(SYS_SMPRI_EL1), trap_raz_wi, .visibility = sme_raz_visibility },
+> +
+>         { SYS_DESC(SYS_SMCR_EL1), NULL, reset_val, SMCR_EL1, 0, .visibility = sme_visibility },
+>         { SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
+>         { SYS_DESC(SYS_TTBR1_EL1), access_vm_reg, reset_unknown, TTBR1_EL1 },
+> @@ -3719,6 +3744,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>
+>         EL2_REG_VNCR(HCRX_EL2, reset_val, 0),
+>
+> +       { SYS_DESC(SYS_SMPRIMAP_EL2), .reg = SMPRIMAP_EL2,
+> +         .access = trap_raz_wi, .set_user = set_res0, .reset = reset_val,
+> +         .val = 0, .visibility = sme_el2_visibility },
+>         EL2_REG_FILTERED(SMCR_EL2, access_smcr_el2, reset_val, 0,
+>                          sme_el2_visibility),
+>
+>
+> --
+> 2.47.3
+>
