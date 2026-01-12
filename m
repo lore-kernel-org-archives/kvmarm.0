@@ -1,42 +1,42 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2CE2609CC
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECE72BE035
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768229096; cv=none; b=O++50eoI6fY7InE12VpAHz2GJ8VPhkvAxrOeVLE583tBOUNIjlr5ZNED1RwKOU2Oi80WhKFJ1mqj8U0sJm9Oin/qUm3FCiycgyL3g1DJWaQ9Xnxp3QsGfhpLMlk6lGnQ3ytFMXQyZoSGMuCEzVLZzgRZbkqiWX+1H3fHZE6VBqQ=
+	t=1768229167; cv=none; b=sTDpZrWJvKDBsFxsCe3w6ZmaJatXcOo3m5B+gDdqgyAEkk01sCdsorQ1XR4i6/jlSQPW8045HwnvxTxIMRhI6xo8NT0E/VHEMbmMfbhCmZw/3Sh8WBOnAHH3gjElxOqY0T6bXIYAQbZzogA/x+pKIZi6bFQmuSvaI8haJZ+zmZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768229096; c=relaxed/simple;
-	bh=VnwkMIIgaEYSLedyuxgc9yYxRRqLv1xIN7vb5KkFceI=;
+	s=arc-20240116; t=1768229167; c=relaxed/simple;
+	bh=XTb/z7XQHfqLK7sr7EOs9zX6RbyrCrneAOhhEaggHi0=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fwDLGGDRi3YzEVR0cvw40PA8Sa6SwZ4u/dMVooKCmM4DlT5qiqm+tJfEm17mE8pjNJNDQYdm+6AzkGmfGB/Nn6Rn7BOf0QMkC67PHDK4ArCaYSEGzIy+z2FZXyjldrd6RXf5U1LPeZKfnYbLb1zma3uIt4oH50RJhLLJW5aezhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jiHuwV+S; arc=none smtp.client-ip=119.8.177.37
+	 MIME-Version:Content-Type; b=MiK+uVz6OPDxUX5xs0dKFnQT7ZhDBT0Pn60XtqEZDGpwP9jv3aQQzuNkscnarpFAtPv5hefk8drsEH+UUB7ojyje9fDVYYxcT5IvZ/tXaXhguVWTbhalbEOXnbZRjn/UZBL53sYL9bdOe+pQczpyQyWCgbBGWHyGVGmCctf5sH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=cymrG1ZG; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jiHuwV+S"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="cymrG1ZG"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=vMnk2nrwaBQSLtVwuvjNTQsDRNVJoNxtkl+t1xXaVJg=;
-	b=jiHuwV+SzxDsOQWNeyZNje1+9aHNrJNLTQJEJ4mqXMshZ+h7XxymWNC4kgMjpTG985x00TI89
-	HTA5KX9uLSTmZ+E8iLFye8iQ5NOjaEQM83Fv1Kxm0EwBpDCL3tVtOHizYfu8u1OAUz14/hcuYil
-	XovRTzfDuACht55m71ScaHw=
+	bh=wcfwhviD+3DU7mCwVMqId0aDxEX8Zf7Gb4cXQFIqiJE=;
+	b=cymrG1ZGTAoPDiXOPvfmXEmEO3QuJDyHKc2mCo5XgFtXJvy3YkdKwXCnNOL2WCsFJF4d8cfNS
+	ViQMtxAng/+5BPzJSCSU9viuiAANmEBrP8CCtCqONNB4Iqxz84Wdf6Vni566ISQlrLN7AY1mh+y
+	CVcmEsMhCElbt3/ge2mtLmE=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dqZpz5HTZz1vny8;
-	Mon, 12 Jan 2026 22:42:35 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dqZr76Yr0z1P7Js;
+	Mon, 12 Jan 2026 22:43:35 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqZsJ4XlxzJ467H;
-	Mon, 12 Jan 2026 22:44:36 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqZth3MXmzJ46Ck;
+	Mon, 12 Jan 2026 22:45:48 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2884D40539;
-	Mon, 12 Jan 2026 22:44:48 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 0049040539;
+	Mon, 12 Jan 2026 22:46:00 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 14:44:47 +0000
-Date: Mon, 12 Jan 2026 14:44:46 +0000
+ 2026 14:45:59 +0000
+Date: Mon, 12 Jan 2026 14:45:57 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,11 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 08/36] KVM: arm64: gic: Introduce interrupt type
- helpers
-Message-ID: <20260112144446.000064d1@huawei.com>
-In-Reply-To: <20260109170400.1585048-9-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v3 09/36] KVM: arm64: gic-v5: Add Arm copyright header
+Message-ID: <20260112144557.00005986@huawei.com>
+In-Reply-To: <20260109170400.1585048-10-sascha.bischoff@arm.com>
 References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-9-sascha.bischoff@arm.com>
+	<20260109170400.1585048-10-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -69,24 +68,29 @@ X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
 On Fri, 9 Jan 2026 17:04:41 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> GICv5 has moved from using interrupt ranges for different interrupt
-> types to using some of the upper bits of the interrupt ID to denote
-> the interrupt type. This is not compatible with older GICs (which rely
-> on ranges of interrupts to determine the type), and hence a set of
-> helpers is introduced. These helpers take a struct kvm*, and use the
-> vgic model to determine how to interpret the interrupt ID.
-> 
-> Helpers are introduced for PPIs, SPIs, and LPIs. Additionally, a
-> helper is introduced to determine if an interrupt is private - SGIs
-> and PPIs for older GICs, and PPIs only for GICv5.
-> 
-> The helpers are plumbed into the core vgic code, as well as the Arch
-> Timer and PMU code.
-> 
-> There should be no functional changes as part of this change.
+> This header was mistakenly omitted during the creation of this
+> file. Add it now. Better late than never.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
+Thanks for splitting it out.
+
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
+> ---
+>  arch/arm64/kvm/vgic/vgic-v5.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 2d3811f4e1174..23d0a495d855e 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -1,4 +1,7 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2025, 2026 Arm Ltd.
+> + */
+>  
+>  #include <kvm/arm_vgic.h>
+>  #include <linux/irqchip/arm-vgic-info.h>
 
