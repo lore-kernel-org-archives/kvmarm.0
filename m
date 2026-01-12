@@ -1,42 +1,42 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C946132A3D8
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181D27EFE9
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768226624; cv=none; b=d11FzodTUAEclJlAOC31x5Tgen4n9mVV2zAFoBd+5pdZ5LzMXO6n5ha0Lz6U7YV57ZGeBbvThlnV6eGwuT290ERxq0OcGnqQXEJy6YKBkcCaWdMWrzNwoZ5z8x1hUOXBdr9IOW+omsCbBjJgz+QmRA5wOssJm3YsWxyBZQVcqfk=
+	t=1768228646; cv=none; b=rHk2cD4uuUJC6uQvEA2U6shiFHPn2lgM+hS94Q/eVa2JHxN2Ze6gF8WwdpWqSqDSBpJDAOQe+DSlQ8jPl6JLjzheBzTHpEPN3F/oF9gdwBknEEtVBYzp8vYGKedt9/W8TLcrkoNmLgppwyANV+Cx2M/EGPRu0Q77q71p4eHvqis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768226624; c=relaxed/simple;
-	bh=seWUExliqHGtzHDDPvK7y3fwz1uenF5u/4fspeNr9Og=;
+	s=arc-20240116; t=1768228646; c=relaxed/simple;
+	bh=QDDzo4ESjp7jFEvLWQnH6YUSWce7ImYeXfTjgDxTimQ=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CAcPRDRZPTzFgmEKyBzeeiKedDjJD0YyDnmwOy5e3Y2A0PEkEmPxiHfUcvgDmgOAtM9bP5r3yHDz6e0o5dP9ltnXi0G027Hsixet5AwugNe0qBWZ0BhDmzugbtCZvkEt0dkKsz2zGMXyi02jAm4H5iYRXYHoAFcEJQ8nf582QzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=toi4ve4Z; arc=none smtp.client-ip=119.8.177.37
+	 MIME-Version:Content-Type; b=ef/A7Z9KoW/7fcIBRnb/QKczt75RRpkIwxMUYvd1l9oR/xT6r9+4XtCOU7pQVYj8at77+TqJak8BTlE6lCoEn5vKJtP+3pzOkrH2e3NRyl/keMJF4GXDnAJ/0JJZ3ROygl8jA3zVKRcMf8foW3RNEsY9qkrP49qT/f7ig59Wd0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ODq7LQDw; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="toi4ve4Z"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ODq7LQDw"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=sVORYiGzozd8PgS1TYW2hZdt+MykAODXljoXpk9UEaQ=;
-	b=toi4ve4Z2YYpRNsPIV2dweYIRTGBe599kg+jTzANbb/ias1DEO500ep4ZgH1QtdPd3R49OT93
-	u4G0RrtSgZGBzpuIcxHXFejABhcHZbs6RjM9MdjNuGPDKx8P3Ai7SzyNsSNdePXNE9nSG8/fSDt
-	2I9owLIb/+SJ3CiCeaOSNWA=
+	bh=x0QhXSCaxvz44BA0HsV/IQ3kwCARdbhUj53s3V+cfH4=;
+	b=ODq7LQDwD5asnR14b4xgrukojHgVeMiNcxUTB4BPmL2RlzuPp9D5X6Rf7FGsQEF+gLMeF8z8m
+	bVcRrDpiuZBpgXFGH3NTi7+lxqlsgWvRk9eNwUTpy611wY4I9+4IuAOMiu5Zy0uRAJrADAFBGtM
+	PxRAuOktYFOMPVg0JFaOxe8=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dqYvN68Hkz1vnsZ;
-	Mon, 12 Jan 2026 22:01:20 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqYxj63G8zJ46ZP;
-	Mon, 12 Jan 2026 22:03:21 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dqZf041Xhz1P6jN;
+	Mon, 12 Jan 2026 22:34:48 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqZhY11CmzJ467X;
+	Mon, 12 Jan 2026 22:37:01 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 51C8340584;
-	Mon, 12 Jan 2026 22:03:33 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id A20F040086;
+	Mon, 12 Jan 2026 22:37:12 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 14:03:31 +0000
-Date: Mon, 12 Jan 2026 14:03:30 +0000
+ 2026 14:37:11 +0000
+Date: Mon, 12 Jan 2026 14:37:10 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 03/36] arm64/sysreg: Drop ICH_HFGRTR_EL2.ICC_HAPR_EL1
- and make RES1
-Message-ID: <20260112140330.0000205c@huawei.com>
-In-Reply-To: <20260109170400.1585048-4-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v3 06/36] KVM: arm64: gic: Set vgic_model before initing
+ private IRQs
+Message-ID: <20260112143710.00007f9d@huawei.com>
+In-Reply-To: <20260109170400.1585048-7-sascha.bischoff@arm.com>
 References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-4-sascha.bischoff@arm.com>
+	<20260109170400.1585048-7-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -63,52 +63,23 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 9 Jan 2026 17:04:39 +0000
+On Fri, 9 Jan 2026 17:04:40 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> The GICv5 architecture is dropping the ICC_HAPR_EL1 and ICV_HAPR_EL1
-> system registers. These registers were never added to the sysregs, but
-> the traps for them were.
+> Different GIC types require the private IRQs to be initialised
+> differently. GICv5 is the culprit as it supports both a different
+> number of private IRQs, and all of these are PPIs (there are no
+> SGIs). Moreover, as GICv5 uses the top bits of the interrupt ID to
+> encode the type, the intid also needs to computed differently.
 > 
-> Drop the trap bit from the ICH_HFGRTR_EL2 and make it Res1 as per the
-> upcoming GICv5 spec change. Additionally, update the EL2 setup code to
-> not attempt to set that bit.
+> Up until now, the GIC model has been set after initialising the
+> private IRQs for a VCPU. Move this earlier to ensure that the GIC
+> model is available when configuring the private IRQs. While we're at
+> it, also move the setting of the in_kernel flag and implementation
+> revision to keep them grouped together as before.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-I'll take your word on it wrt to the spec change. For completeness.
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-> ---
->  arch/arm64/include/asm/el2_setup.h | 1 -
->  arch/arm64/tools/sysreg            | 2 +-
->  2 files changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-> index cacd20df1786e..07c12f4a69b41 100644
-> --- a/arch/arm64/include/asm/el2_setup.h
-> +++ b/arch/arm64/include/asm/el2_setup.h
-> @@ -225,7 +225,6 @@
->  		     ICH_HFGRTR_EL2_ICC_ICSR_EL1		| \
->  		     ICH_HFGRTR_EL2_ICC_PCR_EL1			| \
->  		     ICH_HFGRTR_EL2_ICC_HPPIR_EL1		| \
-> -		     ICH_HFGRTR_EL2_ICC_HAPR_EL1		| \
->  		     ICH_HFGRTR_EL2_ICC_CR0_EL1			| \
->  		     ICH_HFGRTR_EL2_ICC_IDRn_EL1		| \
->  		     ICH_HFGRTR_EL2_ICC_APR_EL1)
-> diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-> index 8921b51866d64..dab5bfe8c9686 100644
-> --- a/arch/arm64/tools/sysreg
-> +++ b/arch/arm64/tools/sysreg
-> @@ -4579,7 +4579,7 @@ Field	7	ICC_IAFFIDR_EL1
->  Field	6	ICC_ICSR_EL1
->  Field	5	ICC_PCR_EL1
->  Field	4	ICC_HPPIR_EL1
-> -Field	3	ICC_HAPR_EL1
-> +Res1	3
->  Field	2	ICC_CR0_EL1
->  Field	1	ICC_IDRn_EL1
->  Field	0	ICC_APR_EL1
-
