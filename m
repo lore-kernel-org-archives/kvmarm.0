@@ -1,197 +1,79 @@
-Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+Received: from imap4.hz.codethink.co.uk (imap4.hz.codethink.co.uk [188.40.203.114])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEDB3644A1
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A912364036;
+	Mon, 12 Jan 2026 16:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.203.114
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768233700; cv=none; b=Y9HKmHVnpKBa0uju0SoRVml8283EQJRlTfbnQX/UziCAqkiY+aL8e7UIQ9B/eF6o5MvoCYuKtSZKYheZHB3c4qhEkRMQuYZn0UTdVw+JCJlnKY1ipsd2K+gCVxX5roA2o6laCnEP0tkRWLmDOuDYsCY7jrk3n/a14cd5LWleh/I=
+	t=1768233868; cv=none; b=kiqxXitoXrpKpV+TxfcZLbXCsem8gxSk0xtWabS123mP8Ped48f6LKdom6eLFPkxbY5bY7Cinc6ifl0G/FeCJ27auG35KihKIvP+Ap1N4WAm6VEZgm6RnViB0eXtCyHXLjfH13X8Opn+CmE9GqS3Jmy1EmaJGZbR/zC82ZPW7xc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768233700; c=relaxed/simple;
-	bh=6MF92TvasTIdr3GIdsu59m2q747zJ/WqCYaYH/J02xI=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aJXlIl4eQix7I3q/B01W3+9gG7Sv4qKjcZYgfrMUwtJ2iwGwNccN4Om7aLbGnU8di6DFCoWk0tBxfiQrN9wtum11v9EoUCJagYeaQ06k2J9imP5cxBfN4k2wAzg+wmfGl+SIasjGxmBaeREr0hALO7Bsuhs0ED/uvf6cCsvbKAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=hrV8v8yW; arc=none smtp.client-ip=119.8.177.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1768233868; c=relaxed/simple;
+	bh=L3oSihylbwOWrL0ae+O/tBvWeHbgJoxxCKYgMwxI5Kc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=drKNQOo3eaoraA9gXr8f3vRvN2BH8DS3KDdCE9VSkrN0AWgCQAeYSP/UY9pzohIJyq0Phv6V/MFsErwBEIPaNGHuJoGBtwGYkDneUjeB9Ms5rfweVWGyvTRSBt8JkZSbSncZuWSxeMz+/0G8X672aAg5ewVQdwWaeCGwTPH1i+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=t/3ERgCS; arc=none smtp.client-ip=188.40.203.114
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="hrV8v8yW"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Uzdhc/5bjAQXTXTPZi/QQirOrHAvE9iAR7tdve+8Jig=;
-	b=hrV8v8yWqGNh6CIrkr0yxWAsCjFBQm8+RAbVkFulD4Rxec3q7ksTCMZbj/oZHzZoUidUNNz8m
-	2DepDKKEvqN4m0NC4BNJCCFFxYMA4wzz5HxvqW/F5RyyocsB4RgSTKq9NMFW57OFfTcCQ70hFHc
-	7AOZBxzlqJQIqJP/ynXDFHE=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dqcWT3l3Vz1vnsC;
-	Mon, 12 Jan 2026 23:59:17 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqcYp2KfgzJ46F9;
-	Tue, 13 Jan 2026 00:01:18 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id E5D2540573;
-	Tue, 13 Jan 2026 00:01:29 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 16:01:29 +0000
-Date: Mon, 12 Jan 2026 16:01:27 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
-	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
-	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
-	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 19/36] KVM: arm64: gic-v5: Implement PPI interrupt
- injection
-Message-ID: <20260112160127.00005f84@huawei.com>
-In-Reply-To: <20260109170400.1585048-20-sascha.bischoff@arm.com>
-References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-20-sascha.bischoff@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="t/3ERgCS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=codethink.co.uk; s=imap4-20230908; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:In-Reply-To:
+	References; bh=SEhgUjECnk9waqiLf4vh2SAG8fSbncDeiW5IMVeFkBs=; b=t/3ERgCSv452Zu
+	si/rfCFRMbdtABlf7EVwIMo8LEK6JoNmfPCNJC09dkQSV28EKnzb6ZqbcilAMhC0b50p71+ltdS2V
+	ncQBxPgRsWoEbCqMe8bqMLKcLTMt1hcIUJrpkDgU+2XxU6P/cFx0uTpfpPbd0nLPx7E4rF/DSIKNs
+	UVXIcbt8kbRJMAFBNJnBekOwXXiO7WvNDuVn50dtDoXljPCIx8Ye+h0LrcTkUqsK0L/Sn1iHPYUKS
+	JD6CaTDxKFO9r9kP0QI4ZFB+czrB1yNE3tEkPYwtOI8pf2ENVlMsyWaAzSVuTu0QUcAhh4yjHKZjb
+	OvLu9mvCKLJqWXMzJUFA==;
+Received: from [167.98.27.226] (helo=rainbowdash)
+	by imap4.hz.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1vfKOs-00FRCK-HQ; Mon, 12 Jan 2026 16:04:14 +0000
+Received: from ben by rainbowdash with local (Exim 4.99.1)
+	(envelope-from <ben@rainbowdash>)
+	id 1vfKOs-00000002Wzy-0tK8;
+	Mon, 12 Jan 2026 16:04:14 +0000
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	catalin.marinas@arm.com,
+	oupton@kernel.org,
+	maz@kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ben Dooks <ben.dooks@codethink.co.uk>
+Subject: [PATCH] KVM: arm64: fix missing <asm/stackpage/nvhe.h> include
+Date: Mon, 12 Jan 2026 16:04:13 +0000
+Message-Id: <20260112160413.603493-1-ben.dooks@codethink.co.uk>
+X-Mailer: git-send-email 2.37.2.352.g3c44437643
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Transfer-Encoding: 8bit
+Sender: srv_ts003@codethink.com
 
-On Fri, 9 Jan 2026 17:04:45 +0000
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+Include <asm/stackpage/nvhe.h> for kvm_arm_hyp_stack_base
+declaration which fixes the following sparse warning:
 
-> This change introduces interrupt injection for PPIs for GICv5-based
-> guests.
-> 
-> The lifecycle of PPIs is largely managed by the hardware for a GICv5
-> system. The hypervisor injects pending state into the guest by using
-> the ICH_PPI_PENDRx_EL2 registers. These are used by the hardware to
-> pick a Highest Priority Pending Interrupt (HPPI) for the guest based
-> on the enable state of each individual interrupt. The enable state and
-> priority for each interrupt are provided by the guest itself (through
-> writes to the PPI registers).
-> 
-> When Direct Virtual Interrupt (DVI) is set for a particular PPI, the
-> hypervisor is even able to skip the injection of the pending state
-> altogether - it all happens in hardware.
-> 
-> The result of the above is that no AP lists are required for GICv5,
-> unlike for older GICs. Instead, for PPIs the ICH_PPI_* registers
-> fulfil the same purpose for all 128 PPIs. Hence, as long as the
-> ICH_PPI_* registers are populated prior to guest entry, and merged
-> back into the KVM shadow state on exit, the PPI state is preserved,
-> and interrupts can be injected.
-> 
-> When injecting the state of a PPI the state is merged into the KVM's
-> shadow state using the set_pending_state irq_op. The directly sets the
-> relevant bit in the shadow ICH_PPI_PENDRx_EL2, which is presented to
-> the guest (and GICv5 hardware) on next guest entry. The
-> queue_irq_unlock irq_op is required to kick the vCPU to ensure that it
-> seems the new state. The result is that no AP lists are used for
-> private interrupts on GICv5.
-> 
-> Prior to entering the guest, vgic_v5_flush_ppi_state is called from
-> kvm_vgic_flush_hwstate. The effectively snapshots the shadow PPI
-> pending state (twice - an entry and an exit copy) in order to track
-> any changes. These changes can come from a guest consuming an
-> interrupt or from a guest making an Edge-triggered interrupt pending.
-> 
-> When returning from running a guest, the guest's PPI state is merged
-> back into KVM's shadow state in vgic_v5_merge_ppi_state from
-> kvm_vgic_sync_hwstate. The Enable and Active state is synced back for
-> all PPIs, and the pending state is synced back for Edge PPIs (Level is
-> driven directly by the devices generating said levels). The incoming
-> pending state from the guest is merged with KVM's shadow state to
-> avoid losing any incoming interrupts.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-Trivial naming thing inline. Either way
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+arch/arm64/kvm/arm.c:63:1: warning: symbol 'kvm_arm_hyp_stack_base' was not declared. Should it be static?
 
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 160 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    |  40 +++++++--
->  arch/arm64/kvm/vgic/vgic.h    |  25 ++++--
->  3 files changed, 209 insertions(+), 16 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index bf2c77bafa1d3..c1899add8f5c3 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -139,6 +139,166 @@ void vgic_v5_get_implemented_ppis(void)
->  		ppi_caps->impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_PMUIRQ);
->  }
->  
-> +static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
-> +					  struct vgic_irq *irq)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if;
-> +	const u32 id = FIELD_GET(GICV5_HWIRQ_ID, irq->intid);
-See below. This seems like reasonable naming choice where I suggest
-adding a local variable. 
-> +	unsigned long *p;
-> +
-> +	if (!vcpu || !irq)
-> +		return false;
-> +
-> +	/*
-> +	 * For DVI'd interrupts, the state is directly driven by the host
-> +	 * hardware connected to the interrupt line. There is nothing for us to
-> +	 * do here. Moreover, this is just broken!
-> +	 */
-> +	if (WARN_ON(irq->directly_injected))
-> +		return true;
-> +
-> +	cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	p = (unsigned long *)&cpu_if->vgic_ppi_pendr[id / 64];
-> +	__assign_bit(id % 64, p, irq_is_pending(irq));
-> +
-> +	return true;
-> +}
+Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+---
+ arch/arm64/kvm/arm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->  /*
->   * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
->   */
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index c465ff51cb073..1cdfa5224ead5 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -105,6 +105,18 @@ struct vgic_irq *vgic_get_vcpu_irq(struct kvm_vcpu *vcpu, u32 intid)
->  	if (WARN_ON(!vcpu))
->  		return NULL;
->  
-> +	if (vgic_is_v5(vcpu->kvm)) {
-> +		u32 int_num;
-> +
-> +		if (!__irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, intid))
-> +			return NULL;
-> +
-> +		int_num = FIELD_GET(GICV5_HWIRQ_ID, intid);
-
-I'd use an extra local variable to avoid int_num changing meaning like this.
-Perhaps 
-		u32 int_num, hwirq_id;
-
-		hwirq_id = FIELD_GET(GICV5_HWIRQ_ID, intid);
-		int_num = array_index_nospec(hwirq_id, VGIC_V5_NR_PRIVATE_IRQS);
-
-or just id = FIELD_GET() given use above.
-
-
-> +		int_num = array_index_nospec(int_num, VGIC_V5_NR_PRIVATE_IRQS);
-> +
-> +		return &vcpu->arch.vgic_cpu.private_irqs[int_num];
-> +	}
-> +
-
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4f80da0c0d1d..b3543ad2eb44 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -40,6 +40,7 @@
+ #include <asm/kvm_pkvm.h>
+ #include <asm/kvm_ptrauth.h>
+ #include <asm/sections.h>
++#include <asm/stacktrace/nvhe.h>
+ 
+ #include <kvm/arm_hypercalls.h>
+ #include <kvm/arm_pmu.h>
+-- 
+2.37.2.352.g3c44437643
 
