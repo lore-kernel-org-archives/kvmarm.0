@@ -1,42 +1,42 @@
 Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181D27EFE9
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B20E25A33F
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 14:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768228646; cv=none; b=rHk2cD4uuUJC6uQvEA2U6shiFHPn2lgM+hS94Q/eVa2JHxN2Ze6gF8WwdpWqSqDSBpJDAOQe+DSlQ8jPl6JLjzheBzTHpEPN3F/oF9gdwBknEEtVBYzp8vYGKedt9/W8TLcrkoNmLgppwyANV+Cx2M/EGPRu0Q77q71p4eHvqis=
+	t=1768228774; cv=none; b=NdMp9N2AIdLdIqKy/VNpNU8U6iWgNZKu6MbI/5sALycA9WSJkZqlCkRGieL3nNo8IRATNSyY6ddSHaYFSVeHdz4eVsHIVaO0Wy20tDqJDfhWBAnrlHkAauI/aEJbP4fhOncbmaRoSQ5HDSq88Kcw5H3FmaoIBqz+VhQp72PxAv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768228646; c=relaxed/simple;
-	bh=QDDzo4ESjp7jFEvLWQnH6YUSWce7ImYeXfTjgDxTimQ=;
+	s=arc-20240116; t=1768228774; c=relaxed/simple;
+	bh=4QGIpd2556JBWc6uYugaED9VLvbemSO123/Mutbd40s=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ef/A7Z9KoW/7fcIBRnb/QKczt75RRpkIwxMUYvd1l9oR/xT6r9+4XtCOU7pQVYj8at77+TqJak8BTlE6lCoEn5vKJtP+3pzOkrH2e3NRyl/keMJF4GXDnAJ/0JJZ3ROygl8jA3zVKRcMf8foW3RNEsY9qkrP49qT/f7ig59Wd0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=ODq7LQDw; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=jckuJ6GPcIkkh3h/rC86eVuIxKVXNuXASv9HD2nV5AqypV3Y7RMch92p2CMOb0jbZDm4AcEwVoXElNs6MjFBCpOSbUt68pCwfVTPGun9IWiNtmZubnvfZZy3XgjoOCTYJS9+u1cv88skyLS7cUd6OY47usNNuBwuuuBwRQCNxcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=XXqW77EI; arc=none smtp.client-ip=119.8.177.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="ODq7LQDw"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="XXqW77EI"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=x0QhXSCaxvz44BA0HsV/IQ3kwCARdbhUj53s3V+cfH4=;
-	b=ODq7LQDwD5asnR14b4xgrukojHgVeMiNcxUTB4BPmL2RlzuPp9D5X6Rf7FGsQEF+gLMeF8z8m
-	bVcRrDpiuZBpgXFGH3NTi7+lxqlsgWvRk9eNwUTpy611wY4I9+4IuAOMiu5Zy0uRAJrADAFBGtM
-	PxRAuOktYFOMPVg0JFaOxe8=
+	bh=UAy+C5sEfXpHk9jTElPcoZZz2H8yOU52jg7XT4/1ARQ=;
+	b=XXqW77EI0cCltAZNyDTm3GDFWEvrwJMY1fuGWUeiV9OkUjcZuTQCVaMVhIt8o6aq0PZrF1PZA
+	+5X0WjZAWjjVklkwovD2K8qsqKMNbuAvw/iKi1HdVwuYUeLTvQHNdhV5thXvNLtG+nDpkLRgbg9
+	kZmNlpp7Ly8iTkCpie4afc0=
 Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dqZf041Xhz1P6jN;
-	Mon, 12 Jan 2026 22:34:48 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqZhY11CmzJ467X;
-	Mon, 12 Jan 2026 22:37:01 +0800 (CST)
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dqZhb21jfz1P7Hv;
+	Mon, 12 Jan 2026 22:37:03 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqZl76D6bzJ46Dm;
+	Mon, 12 Jan 2026 22:39:15 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id A20F040086;
-	Mon, 12 Jan 2026 22:37:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 5FE5440570;
+	Mon, 12 Jan 2026 22:39:27 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 14:37:11 +0000
-Date: Mon, 12 Jan 2026 14:37:10 +0000
+ 2026 14:39:26 +0000
+Date: Mon, 12 Jan 2026 14:39:25 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,11 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 06/36] KVM: arm64: gic: Set vgic_model before initing
- private IRQs
-Message-ID: <20260112143710.00007f9d@huawei.com>
-In-Reply-To: <20260109170400.1585048-7-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v3 05/36] arm64/sysreg: Add GICR CDNMIA encoding
+Message-ID: <20260112143925.00005226@huawei.com>
+In-Reply-To: <20260109170400.1585048-6-sascha.bischoff@arm.com>
 References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-7-sascha.bischoff@arm.com>
+	<20260109170400.1585048-6-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -69,17 +68,47 @@ X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
 On Fri, 9 Jan 2026 17:04:40 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> Different GIC types require the private IRQs to be initialised
-> differently. GICv5 is the culprit as it supports both a different
-> number of private IRQs, and all of these are PPIs (there are no
-> SGIs). Moreover, as GICv5 uses the top bits of the interrupt ID to
-> encode the type, the intid also needs to computed differently.
-> 
-> Up until now, the GIC model has been set after initialising the
-> private IRQs for a VCPU. Move this earlier to ensure that the GIC
-> model is available when configuring the private IRQs. While we're at
-> it, also move the setting of the in_kernel flag and implementation
-> revision to keep them grouped together as before.
+> The encoding for the GICR CDNMIA system instruction is thus far unused
+> (and shall remain unused for the time being). However, in order to
+> plumb the FGTs into KVM correctly, KVM needs to be made aware of the
+> encoding of this system instruction.
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+If it does make sense to clean up GICV5_GIC[R]_CDIA_...
+to add the R that can happen separately.
+
+Jonathan
+
+
+> ---
+>  arch/arm64/include/asm/sysreg.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index b3b8b8cd7bf1e..97797761a07bf 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1059,6 +1059,7 @@
+>  #define GICV5_OP_GIC_CDPRI		sys_insn(1, 0, 12, 1, 2)
+>  #define GICV5_OP_GIC_CDRCFG		sys_insn(1, 0, 12, 1, 5)
+>  #define GICV5_OP_GICR_CDIA		sys_insn(1, 0, 12, 3, 0)
+> +#define GICV5_OP_GICR_CDNMIA		sys_insn(1, 0, 12, 3, 1)
+>  
+>  /* Definitions for GIC CDAFF */
+>  #define GICV5_GIC_CDAFF_IAFFID_MASK	GENMASK_ULL(47, 32)
+> @@ -1105,6 +1106,12 @@
+>  #define GICV5_GIC_CDIA_TYPE_MASK	GENMASK_ULL(31, 29)
+>  #define GICV5_GIC_CDIA_ID_MASK		GENMASK_ULL(23, 0)
+>  
+> +/* Definitions for GICR CDNMIA */
+> +#define GICV5_GICR_CDNMIA_VALID_MASK	BIT_ULL(32)
+> +#define GICV5_GICR_CDNMIA_VALID(r)	FIELD_GET(GICV5_GICR_CDNMIA_VALID_MASK, r)
+> +#define GICV5_GICR_CDNMIA_TYPE_MASK	GENMASK_ULL(31, 29)
+> +#define GICV5_GICR_CDNMIA_ID_MASK	GENMASK_ULL(23, 0)
+> +
+>  #define gicr_insn(insn)			read_sysreg_s(GICV5_OP_GICR_##insn)
+>  #define gic_insn(v, insn)		write_sysreg_s(v, GICV5_OP_GIC_##insn)
+>  
+
