@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B5037F757
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4247437F8A6
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237414; cv=none; b=aaxtlaDsGTi3tpmwTADqIXtWExJqI4i04vpIgl5AujB7u3RIf5EV7XvH3DrUFjU4SnwoD4wmOjSyCOGnxpA9ceHF/WKHAOqkoo4FHY54B9cnPPZgg4kp4XZu11hATgsjCJB6q71/WIXjKlq2852NJy5EP9dac3DWmHz8NIhIBzA=
+	t=1768237418; cv=none; b=p3BhffylHkDPHlGg7Wl7O4ezQtCWVD/L4fYoSZt6qb6LmrXK5e5GiJF52em4QQ6mJNu4izT+9ZN++GHSyQ6FOM+ebFiCS3W4+ogccc07EXZ23E8THTA+0xXVDXz6B8CeGOU8mw8XmjGCIu1gGjv9m+p/2bBJ3FovcU10e55wAdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237414; c=relaxed/simple;
-	bh=OgmqEXgXUmgciIkHLIkAY5iNqXHOnVsygx9ea1Cc5MA=;
+	s=arc-20240116; t=1768237418; c=relaxed/simple;
+	bh=ibA4AG82N+wgQdalVLwiuG3+DFHSO2owfhRyL09NLI0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ce3Te16sk10v03airaj6cOz9bxDrh0EQanKU8oY2WttjVdA7n0aUnIhfiKG82cgm4wa++LiarfUAlF1Q+UTerRntudwIq1p/wb5vE3ttDGpetbSQG52oWl6K5x4+79TahP9gGpDhc/UYf1mVLlB7B1w3klE18mJdPHKJ8vTH1yM=
+	 MIME-Version; b=HTRzhGsfai/7gVAwwvr8PKNzeJLt+THDRTfOkMmM3fZIo7+PvVVzxIUEi0zpTHe8ecpeZlHZY+SOFoQSzRq9kNG3dU9R7nrmKdZCxUB+gwGvm2y8PIukha9wqavQPOwd3ZPobNPnfa/d1e0xfWTnYekDtclX0U6A1f97laPeqIM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D25F31516;
-	Mon, 12 Jan 2026 09:03:22 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F6F1153B;
+	Mon, 12 Jan 2026 09:03:28 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7545F3F694;
-	Mon, 12 Jan 2026 09:03:24 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E181B3F694;
+	Mon, 12 Jan 2026 09:03:29 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -51,10 +51,11 @@ Cc: amitsinght@marvell.com,
 	oupton@kernel.org,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev
-Subject: [PATCH v3 40/47] arm_mpam: resctrl: Call resctrl_init() on platforms that can support resctrl
-Date: Mon, 12 Jan 2026 16:59:07 +0000
-Message-ID: <20260112165914.4086692-41-ben.horgan@arm.com>
+	kvmarm@lists.linux.dev,
+	Zeng Heng <zengheng4@huawei.com>
+Subject: [PATCH v3 41/47] arm_mpam: Generate a configuration for min controls
+Date: Mon, 12 Jan 2026 16:59:08 +0000
+Message-ID: <20260112165914.4086692-42-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -68,272 +69,202 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-Now that MPAM links against resctrl, call resctrl_init() to register the
-filesystem and setup resctrl's structures.
+MPAM supports a minimum and maximum control for memory bandwidth. The
+purpose of the minimum control is to give priority to tasks that are below
+their minimum value. Resctrl only provides one value for the bandwidth
+configuration, which is used for the maximum.
 
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+The minimum control is always programmed to zero on hardware that supports
+it.
+
+Generate a minimum bandwidth value that is 5% lower than the value provided
+by resctrl. This means tasks that are not receiving their target bandwidth
+can be prioritised by the hardware.
+
+For component reset reuse the same calculation so that the default is a
+value resctrl can set.
+
+CC: Zeng Heng <zengheng4@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
+Changes since rfc:
+Add reset_mbw_min
+Clear min cfg when setting max
+use mpam_extend_config on component reset
+
 Changes since v2:
-Use for_each_mpam...
-error path tidying
+bwa_wd limit to 16 moved to earlier patch
+restrict scope of min and delta variables
+move code out of loop so smaller change for quirking min
+move testing into its own commit
 ---
- drivers/resctrl/mpam_devices.c  | 32 +++++++++++--
- drivers/resctrl/mpam_internal.h |  4 ++
- drivers/resctrl/mpam_resctrl.c  | 82 ++++++++++++++++++++++++++++++++-
- 3 files changed, 113 insertions(+), 5 deletions(-)
+ drivers/resctrl/mpam_devices.c  | 69 ++++++++++++++++++++++++++++++---
+ drivers/resctrl/mpam_internal.h |  3 ++
+ drivers/resctrl/mpam_resctrl.c  |  2 +
+ 3 files changed, 69 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index c2127570cf37..9fbe4fe3b13a 100644
+index 9fbe4fe3b13a..37bd8efc6ecf 100644
 --- a/drivers/resctrl/mpam_devices.c
 +++ b/drivers/resctrl/mpam_devices.c
-@@ -73,6 +73,14 @@ static DECLARE_WORK(mpam_broken_work, &mpam_disable);
- /* When mpam is disabled, the printed reason to aid debugging */
- static char *mpam_disable_reason;
- 
-+/*
-+ * Whether resctrl has been setup. Used by cpuhp in preference to
-+ * mpam_is_enabled(). The disable call after an error interrupt makes
-+ * mpam_is_enabled() false before the cpuhp callbacks are made.
-+ * Reads/writes should hold mpam_cpuhp_state_lock, (or be cpuhp callbacks).
-+ */
-+static bool mpam_resctrl_enabled;
-+
- /*
-  * An MSC is a physical container for controls and monitors, each identified by
-  * their RIS index. These share a base-address, interrupts and some MMIO
-@@ -1635,7 +1643,7 @@ static int mpam_cpu_online(unsigned int cpu)
- 			mpam_reprogram_msc(msc);
+@@ -1394,8 +1394,12 @@ static void mpam_reprogram_ris_partid(struct mpam_msc_ris *ris, u16 partid,
  	}
  
--	if (mpam_is_enabled())
-+	if (mpam_resctrl_enabled)
- 		return mpam_resctrl_online_cpu(cpu);
- 
- 	return 0;
-@@ -1681,7 +1689,7 @@ static int mpam_cpu_offline(unsigned int cpu)
- {
- 	struct mpam_msc *msc;
- 
--	if (mpam_is_enabled())
-+	if (mpam_resctrl_enabled)
- 		mpam_resctrl_offline_cpu(cpu);
- 
- 	guard(srcu)(&mpam_srcu);
-@@ -2543,6 +2551,7 @@ static void mpam_enable_once(void)
- 	}
- 
- 	static_branch_enable(&mpam_enabled);
-+	mpam_resctrl_enabled = true;
- 	mpam_register_cpuhp_callbacks(mpam_cpu_online, mpam_cpu_offline,
- 				      "mpam:online");
- 
-@@ -2602,24 +2611,39 @@ static void mpam_reset_class(struct mpam_class *class)
- void mpam_disable(struct work_struct *ignored)
- {
- 	int idx;
-+	bool do_resctrl_exit;
- 	struct mpam_class *class;
- 	struct mpam_msc *msc, *tmp;
- 
-+	if (mpam_is_enabled())
-+		static_branch_disable(&mpam_enabled);
-+
- 	mutex_lock(&mpam_cpuhp_state_lock);
- 	if (mpam_cpuhp_state) {
- 		cpuhp_remove_state(mpam_cpuhp_state);
- 		mpam_cpuhp_state = 0;
- 	}
-+
-+	/*
-+	 * Removing the cpuhp state called mpam_cpu_offline() and told resctrl
-+	 * all the CPUs are offline.
-+	 */
-+	do_resctrl_exit = mpam_resctrl_enabled;
-+	mpam_resctrl_enabled = false;
- 	mutex_unlock(&mpam_cpuhp_state_lock);
- 
--	static_branch_disable(&mpam_enabled);
-+	if (do_resctrl_exit)
-+		mpam_resctrl_exit();
- 
- 	mpam_unregister_irqs();
- 
- 	idx = srcu_read_lock(&mpam_srcu);
- 	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
--				 srcu_read_lock_held(&mpam_srcu))
-+				 srcu_read_lock_held(&mpam_srcu)) {
- 		mpam_reset_class(class);
-+		if (do_resctrl_exit)
-+			mpam_resctrl_teardown_class(class);
+ 	if (mpam_has_feature(mpam_feat_mbw_min, rprops) &&
+-	    mpam_has_feature(mpam_feat_mbw_min, cfg))
+-		mpam_write_partsel_reg(msc, MBW_MIN, 0);
++	    mpam_has_feature(mpam_feat_mbw_min, cfg)) {
++		if (cfg->reset_mbw_min)
++			mpam_write_partsel_reg(msc, MBW_MIN, 0);
++		else
++			mpam_write_partsel_reg(msc, MBW_MIN, cfg->mbw_min);
 +	}
- 	srcu_read_unlock(&mpam_srcu, idx);
  
- 	mutex_lock(&mpam_list_lock);
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 8f73528414af..d9f52023d730 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -450,12 +450,16 @@ int mpam_get_cpumask_from_cache_id(unsigned long cache_id, u32 cache_level,
- 
- #ifdef CONFIG_RESCTRL_FS
- int mpam_resctrl_setup(void);
-+void mpam_resctrl_exit(void);
- int mpam_resctrl_online_cpu(unsigned int cpu);
- void mpam_resctrl_offline_cpu(unsigned int cpu);
-+void mpam_resctrl_teardown_class(struct mpam_class *class);
- #else
- static inline int mpam_resctrl_setup(void) { return 0; }
-+static inline void mpam_resctrl_exit(void) { }
- static inline int mpam_resctrl_online_cpu(unsigned int cpu) { return 0; }
- static inline void mpam_resctrl_offline_cpu(unsigned int cpu) { }
-+static inline void mpam_resctrl_teardown_class(struct mpam_class *class) { }
- #endif /* CONFIG_RESCTRL_FS */
- 
- /*
-diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 8e2fea2e51d3..e7b839c478fd 100644
---- a/drivers/resctrl/mpam_resctrl.c
-+++ b/drivers/resctrl/mpam_resctrl.c
-@@ -70,6 +70,12 @@ static bool cdp_enabled;
- static bool cacheinfo_ready;
- static DECLARE_WAIT_QUEUE_HEAD(wait_cacheinfo_ready);
- 
-+/*
-+ * If resctrl_init() succeeded, resctrl_exit() can be used to remove support
-+ * for the filesystem in the event of an error.
-+ */
-+static bool resctrl_enabled;
-+
- /*
-  * L3 local/total may come from different classes - what is the number of MBWU
-  * 'on L3'?
-@@ -316,6 +322,9 @@ static int resctrl_arch_mon_ctx_alloc_no_wait(enum resctrl_event_id evtid)
- {
- 	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	if (!mon->class)
- 		return -EINVAL;
- 
-@@ -358,6 +367,9 @@ static void resctrl_arch_mon_ctx_free_no_wait(enum resctrl_event_id evtid,
- {
- 	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
- 
-+	if (!mpam_is_enabled())
-+		return;
-+
- 	if (!mon->class)
- 		return;
- 
-@@ -458,6 +470,9 @@ int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_mon_domain *d,
- 
- 	resctrl_arch_rmid_read_context_check();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	if (eventid >= QOS_NUM_EVENTS || !mon->class)
- 		return -EINVAL;
- 
-@@ -1398,6 +1413,9 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
- 	lockdep_assert_cpus_held();
- 	lockdep_assert_irqs_enabled();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	/*
- 	 * No need to check the CPU as mpam_apply_config() doesn't care, and
- 	 * resctrl_arch_update_domains() relies on this.
-@@ -1460,6 +1478,9 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
- 	lockdep_assert_cpus_held();
- 	lockdep_assert_irqs_enabled();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	list_for_each_entry_rcu(d, &r->ctrl_domains, hdr.list) {
- 		for (enum resctrl_conf_type t = 0; t < CDP_NUM_TYPES; t++) {
- 			struct resctrl_staged_config *cfg = &d->staged_config[t];
-@@ -1824,7 +1845,11 @@ int mpam_resctrl_setup(void)
- 		return -EOPNOTSUPP;
+ 	if (mpam_has_feature(mpam_feat_mbw_max, rprops) &&
+ 	    mpam_has_feature(mpam_feat_mbw_max, cfg)) {
+@@ -1510,6 +1514,7 @@ static void mpam_init_reset_cfg(struct mpam_config *reset_cfg)
+ 		.reset_cpbm = true,
+ 		.reset_mbw_pbm = true,
+ 		.reset_mbw_max = true,
++		.reset_mbw_min = true,
+ 	};
+ 	bitmap_fill(reset_cfg->features, MPAM_FEATURE_LAST);
+ }
+@@ -2408,6 +2413,45 @@ static void __destroy_component_cfg(struct mpam_component *comp)
  	}
- 
--	/* TODO: call resctrl_init() */
-+	err = resctrl_init();
-+	if (err)
-+		return err;
-+
-+	WRITE_ONCE(resctrl_enabled, true);
- 
- 	return 0;
- 
-@@ -1834,6 +1859,61 @@ int mpam_resctrl_setup(void)
- 	return err;
  }
  
-+void mpam_resctrl_exit(void)
++static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg)
 +{
-+	if (!READ_ONCE(resctrl_enabled))
-+		return;
++	struct mpam_props *cprops = &class->props;
++	u16 min_hw_granule, max_hw_value, res0_bits;
 +
-+	WRITE_ONCE(resctrl_enabled, false);
-+	resctrl_exit();
-+}
++	/*
++	 * Calculate the values the 'min' control can hold.
++	 * e.g. on a platform with bwa_wd = 8, min_hw_granule is 0x00ff because
++	 * those bits are RES0. Configurations of this value are effectively
++	 * zero. But configurations need to saturate at min_hw_granule on
++	 * systems with mismatched bwa_wd, where the 'less than 0' values are
++	 * implemented on some MSC, but not others.
++	 */
++	res0_bits = 16 - cprops->bwa_wd;
++	max_hw_value = ((1 << cprops->bwa_wd) - 1) << res0_bits;
++	min_hw_granule = ~max_hw_value;
 +
-+static void mpam_resctrl_teardown_mon(struct mpam_resctrl_mon *mon, struct mpam_class *class)
-+{
-+	u32 num_mbwu_mon = l3_num_allocated_mbwu;
++	/*
++	 * MAX and MIN should be set together. If only one is provided,
++	 * generate a configuration for the other. If only one control
++	 * type is supported, the other value will be ignored.
++	 *
++	 * Resctrl can only configure the MAX.
++	 */
++	if (mpam_has_feature(mpam_feat_mbw_max, cfg) &&
++	    !mpam_has_feature(mpam_feat_mbw_min, cfg)) {
++		u16 min, delta;
 +
-+	if (!mon->mbwu_idx_to_mon)
-+		return;
++		delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
++		if (cfg->mbw_max > delta)
++			min = cfg->mbw_max - delta;
++		else
++			min = 0;
 +
-+	if (mon->assigned_counters) {
-+		__free_mbwu_mon(class, mon->assigned_counters, num_mbwu_mon);
-+		mon->assigned_counters = NULL;
-+		kfree(mon->mbwu_idx_to_mon);
-+	} else {
-+		__free_mbwu_mon(class, mon->mbwu_idx_to_mon, num_mbwu_mon);
-+	}
-+	mon->mbwu_idx_to_mon = NULL;
-+}
-+
-+/*
-+ * The driver is detaching an MSC from this class, if resctrl was using it,
-+ * pull on resctrl_exit().
-+ */
-+void mpam_resctrl_teardown_class(struct mpam_class *class)
-+{
-+	struct mpam_resctrl_res *res;
-+	enum resctrl_res_level rid;
-+	struct mpam_resctrl_mon *mon;
-+	enum resctrl_event_id eventid;
-+
-+	might_sleep();
-+
-+	for_each_mpam_resctrl_control(res, rid) {
-+		if (res->class == class) {
-+			res->class = NULL;
-+			break;
-+		}
-+	}
-+	for_each_mpam_resctrl_mon(mon, eventid) {
-+		if (mon->class == class) {
-+			mon->class = NULL;
-+
-+			mpam_resctrl_teardown_mon(mon, class);
-+			break;
-+		}
++		cfg->mbw_min = max(min, min_hw_granule);
++		mpam_set_feature(mpam_feat_mbw_min, cfg);
 +	}
 +}
 +
- static int __init __cacheinfo_ready(void)
+ static void mpam_reset_component_cfg(struct mpam_component *comp)
  {
- 	cacheinfo_ready = true;
+ 	int i;
+@@ -2426,6 +2470,8 @@ static void mpam_reset_component_cfg(struct mpam_component *comp)
+ 			comp->cfg[i].mbw_pbm = GENMASK(cprops->mbw_pbm_bits - 1, 0);
+ 		if (cprops->bwa_wd)
+ 			comp->cfg[i].mbw_max = GENMASK(15, 16 - cprops->bwa_wd);
++
++		mpam_extend_config(comp->class, &comp->cfg[i]);
+ 	}
+ }
+ 
+@@ -2701,24 +2747,37 @@ static bool mpam_update_config(struct mpam_config *cfg,
+ 	maybe_update_config(cfg, mpam_feat_cpor_part, newcfg, cpbm, has_changes);
+ 	maybe_update_config(cfg, mpam_feat_mbw_part, newcfg, mbw_pbm, has_changes);
+ 	maybe_update_config(cfg, mpam_feat_mbw_max, newcfg, mbw_max, has_changes);
++	maybe_update_config(cfg, mpam_feat_mbw_min, newcfg, mbw_min, has_changes);
+ 
+ 	return has_changes;
+ }
+ 
+ int mpam_apply_config(struct mpam_component *comp, u16 partid,
+-		      struct mpam_config *cfg)
++		      struct mpam_config *user_cfg)
+ {
+ 	struct mpam_write_config_arg arg;
+ 	struct mpam_msc_ris *ris;
++	struct mpam_config cfg;
+ 	struct mpam_vmsc *vmsc;
+ 	struct mpam_msc *msc;
+ 
+ 	lockdep_assert_cpus_held();
+ 
+ 	/* Don't pass in the current config! */
+-	WARN_ON_ONCE(&comp->cfg[partid] == cfg);
++	WARN_ON_ONCE(&comp->cfg[partid] == user_cfg);
++
++	/*
++	 * Copy the config to avoid writing back the 'extended' version to
++	 * the caller.
++	 * This avoids mpam_devices.c setting a mbm_min that mpam_resctrl.c
++	 * is unaware of ... when it then changes mbm_max to be lower than
++	 * mbm_min.
++	 */
++	cfg = *user_cfg;
++
++	mpam_extend_config(comp->class, &cfg);
+ 
+-	if (!mpam_update_config(&comp->cfg[partid], cfg))
++	if (!mpam_update_config(&comp->cfg[partid], &cfg))
+ 		return 0;
+ 
+ 	arg.comp = comp;
+diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+index d9f52023d730..69cb75616561 100644
+--- a/drivers/resctrl/mpam_internal.h
++++ b/drivers/resctrl/mpam_internal.h
+@@ -278,10 +278,12 @@ struct mpam_config {
+ 	u32	cpbm;
+ 	u32	mbw_pbm;
+ 	u16	mbw_max;
++	u16	mbw_min;
+ 
+ 	bool	reset_cpbm;
+ 	bool	reset_mbw_pbm;
+ 	bool	reset_mbw_max;
++	bool	reset_mbw_min;
+ 
+ 	struct mpam_garbage	garbage;
+ };
+@@ -618,6 +620,7 @@ static inline void mpam_resctrl_teardown_class(struct mpam_class *class) { }
+  * MPAMCFG_MBW_MAX - MPAM memory maximum bandwidth partitioning configuration
+  *                   register
+  */
++#define MPAMCFG_MBW_MAX_MAX_NR_BITS	16
+ #define MPAMCFG_MBW_MAX_MAX		GENMASK(15, 0)
+ #define MPAMCFG_MBW_MAX_HARDLIM		BIT(31)
+ 
+diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+index e7b839c478fd..019f7a1d74fd 100644
+--- a/drivers/resctrl/mpam_resctrl.c
++++ b/drivers/resctrl/mpam_resctrl.c
+@@ -1446,6 +1446,8 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+ 		if (mpam_has_feature(mpam_feat_mbw_max, cprops)) {
+ 			cfg.mbw_max = percent_to_mbw_max(cfg_val, cprops);
+ 			mpam_set_feature(mpam_feat_mbw_max, &cfg);
++			/* Allow the min to be calculated from the max */
++			mpam_clear_feature(mpam_feat_mbw_min, &cfg);
+ 			break;
+ 		}
+ 		fallthrough;
 -- 
 2.43.0
 
