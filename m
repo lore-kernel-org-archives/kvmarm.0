@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1B63793CB
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB643793CB
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237333; cv=none; b=D3QRtubJF5euonqVPqQHfYZ0Ep7uZ/S0lTRvsKcCCGyRvhB6T+RZILkRJ3o7xOVpk/bQ98j18m3YTgRJy64teGl0+tXwmPLbNTFJ5LzueMLyapirGAInfOT2M/8YgxLC9LELR6L7K948CIOfnQHDjZBJmgwKlQIJUGeoTTJ6zPk=
+	t=1768237337; cv=none; b=exeoUpNx2wuOxI8BgOUav7uvPS8pRVWD8XfvsFE9B6LuidN2rR9714F46HZJFt4UNEWjb+F8KIssvdqPWKojWJKsjInZprnieBuoHzBOLO6PUQK8MxHTZ9GRYKZ7p5uBwPqmTINWqfmxFmYx19tMnQKz3ny86D/BSbd3PjJxW6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237333; c=relaxed/simple;
-	bh=2Miqm0KB13OozQgN+fEkHp/HOnnIdBf7yCG7l6NX5bk=;
+	s=arc-20240116; t=1768237337; c=relaxed/simple;
+	bh=Gn4VoHl8oLD79m2frVjhCmEUM5uS1TNpkx8fZ5FMwt8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eTX886jIt4j2YSYr4Ci7WB2USqrxyuBOdJDdjzEYpH2U4m8EdngYELTsvQXtrT1nTUdEpf2RqrCUaYU7+oOjENoFUrt5f7W4utzcyYKAQxc+0LElC6+fdhxs/HMQtotGJ8CRgJUuXpXz29sgsl95z8EDsnzvtIPGpTwCEV7oStE=
+	 MIME-Version; b=UDOWFk8bAGoWfdSkQxh4TxkwBN1VtJscVasA29lVm/Cu2bOdB+iYRcwjVgoDfppN38WbEzjGvemdcMew7s3+fRCelPdx21OhAmVFSuiP6mic28HGNpuskKQmUVjuvjg8orJgNHsP+SQiw/Pjfj7l9zlx938Rkq7RsZyIIf56QVM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2A001516;
-	Mon, 12 Jan 2026 09:02:00 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3BF431596;
+	Mon, 12 Jan 2026 09:02:06 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 658413F694;
-	Mon, 12 Jan 2026 09:02:02 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D23A23F694;
+	Mon, 12 Jan 2026 09:02:07 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v3 25/47] arm_mpam: resctrl: Add kunit test for rmid idx conversions
-Date: Mon, 12 Jan 2026 16:58:52 +0000
-Message-ID: <20260112165914.4086692-26-ben.horgan@arm.com>
+Subject: [PATCH v3 26/47] arm_mpam: resctrl: Wait for cacheinfo to be ready
+Date: Mon, 12 Jan 2026 16:58:53 +0000
+Message-ID: <20260112165914.4086692-27-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -66,83 +66,73 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As MPAM's pmg are scoped by partid and RDT's rmid are global the
-rescrl mapping to an index needs to differ.
+In order to calculate the rmid realloc threshold the size of the cache
+needs to be known. Cache domains will also be named after the cache id. So
+that this information can be extracted from cacheinfo we need to wait for
+it to be ready. The cacheinfo information is populated in device_initcall()
+so we wait for that.
 
-Add some tests for the MPAM rmid mapping.
-
+Signed-off-by: James Morse <james.morse@arm.com>
+[horgan: split out from another patch]
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- drivers/resctrl/test_mpam_resctrl.c | 49 +++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+This is moved into it's own patch to allow all uses of cacheinfo to be
+valid when they are introduced.
+---
+ drivers/resctrl/mpam_resctrl.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/drivers/resctrl/test_mpam_resctrl.c b/drivers/resctrl/test_mpam_resctrl.c
-index b93d6ad87e43..a20da161d965 100644
---- a/drivers/resctrl/test_mpam_resctrl.c
-+++ b/drivers/resctrl/test_mpam_resctrl.c
-@@ -296,6 +296,54 @@ static void test_percent_to_max_rounding(struct kunit *test)
- 	KUNIT_EXPECT_LE(test, 4 * num_rounded_up, 3 * total);
+diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+index 92b2a2d4b51d..3ca977527698 100644
+--- a/drivers/resctrl/mpam_resctrl.c
++++ b/drivers/resctrl/mpam_resctrl.c
+@@ -16,6 +16,7 @@
+ #include <linux/resctrl.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
++#include <linux/wait.h>
+ 
+ #include <asm/mpam.h>
+ 
+@@ -45,6 +46,13 @@ static bool exposed_mon_capable;
+  */
+ static bool cdp_enabled;
+ 
++/*
++ * We use cacheinfo to discover the size of the caches and their id. cacheinfo
++ * populates this from a device_initcall(). mpam_resctrl_setup() must wait.
++ */
++static bool cacheinfo_ready;
++static DECLARE_WAIT_QUEUE_HEAD(wait_cacheinfo_ready);
++
+ bool resctrl_arch_alloc_capable(void)
+ {
+ 	return exposed_alloc_capable;
+@@ -745,6 +753,8 @@ int mpam_resctrl_setup(void)
+ 	struct mpam_resctrl_res *res;
+ 	enum resctrl_res_level rid;
+ 
++	wait_event(wait_cacheinfo_ready, cacheinfo_ready);
++
+ 	cpus_read_lock();
+ 	for_each_mpam_resctrl_control(res, rid) {
+ 		INIT_LIST_HEAD_RCU(&res->resctrl_res.ctrl_domains);
+@@ -784,6 +794,15 @@ int mpam_resctrl_setup(void)
+ 	return 0;
  }
  
-+struct rmid_idx_case {
-+	u32 max_partid;
-+	u32 max_pmg;
-+};
-+
-+static const struct rmid_idx_case rmid_idx_cases[] = {
-+	{0, 0}, {1, 4}, {3, 1}, {5, 9}, {4, 4}, {100, 11}, {0xFFFF, 0xFF},
-+};
-+
-+static void test_rmid_idx_desc(const struct rmid_idx_case *param, char *desc)
++static int __init __cacheinfo_ready(void)
 +{
-+	snprintf(desc, KUNIT_PARAM_DESC_SIZE, "max_partid=%d, max_pmg=%d\n",
-+		 param->max_partid, param->max_pmg);
++	cacheinfo_ready = true;
++	wake_up(&wait_cacheinfo_ready);
++
++	return 0;
 +}
++device_initcall_sync(__cacheinfo_ready);
 +
-+KUNIT_ARRAY_PARAM(test_rmid_idx, rmid_idx_cases, test_rmid_idx_desc);
-+
-+static void test_rmid_idx_encoding(struct kunit *test)
-+{
-+	u32 orig_mpam_partid_max = mpam_partid_max;
-+	u32 orig_mpam_pmg_max = mpam_pmg_max;
-+	const struct rmid_idx_case *param = test->param_value;
-+	u32 idx, num_idx, count = 0;
-+
-+	mpam_partid_max = param->max_partid;
-+	mpam_pmg_max = param->max_pmg;
-+
-+	for (u32 partid = 0; partid <= mpam_partid_max; partid++) {
-+		for (u32 pmg = 0; pmg <= mpam_pmg_max; pmg++) {
-+			u32 partid_out, pmg_out;
-+
-+			idx = resctrl_arch_rmid_idx_encode(partid, pmg);
-+			/* Confirm there are no holes in the rmid idx range */
-+			KUNIT_EXPECT_EQ(test, count, idx);
-+			count++;
-+			resctrl_arch_rmid_idx_decode(idx, &partid_out, &pmg_out);
-+			KUNIT_EXPECT_EQ(test, pmg, pmg_out);
-+			KUNIT_EXPECT_EQ(test, partid, partid_out);
-+		}
-+	}
-+	num_idx = resctrl_arch_system_num_rmid_idx();
-+	KUNIT_EXPECT_EQ(test, idx + 1, num_idx);
-+
-+	/* Restore global variables that were messed with */
-+	mpam_partid_max = orig_mpam_partid_max;
-+	mpam_pmg_max = orig_mpam_pmg_max;
-+}
-+
- static struct kunit_case mpam_resctrl_test_cases[] = {
- 	KUNIT_CASE(test_get_mba_granularity),
- 	KUNIT_CASE_PARAM(test_mbw_max_to_percent, test_percent_value_gen_params),
-@@ -304,6 +352,7 @@ static struct kunit_case mpam_resctrl_test_cases[] = {
- 	KUNIT_CASE(test_percent_to_max_rounding),
- 	KUNIT_CASE_PARAM(test_percent_max_roundtrip_stability,
- 			 test_all_bwa_wd_gen_params),
-+	KUNIT_CASE_PARAM(test_rmid_idx_encoding, test_rmid_idx_gen_params),
- 	{}
- };
- 
+ #ifdef CONFIG_MPAM_KUNIT_TEST
+ #include "test_mpam_resctrl.c"
+ #endif
 -- 
 2.43.0
 
