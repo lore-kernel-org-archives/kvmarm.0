@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BDD37998D
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B4F378D8C
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237279; cv=none; b=V2DUOpflza9E0yc0BQeIywhqWqD49j7LdRf+HqCDYIcNQrnTU6KAuFp43E7TU/fti5cpO0pQ6DEsRKUEkxrrp76tD2Hm8k+Hjo+9V8kkG9EwDs8s1cVgPMx9w9fohB8rhoTxh7paMtQumw1TTrJcoiFgz4wRTMlfnhfnjzrc3Hk=
+	t=1768237288; cv=none; b=lb2zt6KdSbp+S9WPdVI0LnQbNF+OC84iyKWm0XT2xK+w13DH57yP1rvFPNbH0TfToEpigiTKz9CQJi+oHtHA/X3/dlt1hLKdWrdww3k6XQiatJn2AEfxoxkTkXcfeNcDyJM+gicAaXNgE6TniPeWDLZYci+iSdecI9gi4C4xe0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237279; c=relaxed/simple;
-	bh=Yv6a469eHxtF+nsY/gf0/FjeU2RBV5U9ilftexhtp+c=;
+	s=arc-20240116; t=1768237288; c=relaxed/simple;
+	bh=Py/sYxDkA/fJ5baQpdFJ3JUYaM8/emboOVHIUPXdi4U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RA28J4LPzXfNryh3yGcdP9+4orS0lLfYst/i30jh/mQsgMLSk/r8J2iz2RJai6OFxLEexr4Yt2UqafacuNNmD1hm3DMWgA6lh+Zsjmi0164IH9TjYjxGutTPu4YI9DG7jtbd82uQf+JeJNB42ECgMzsGjWOEIKAEMwc/VxVxUmk=
+	 MIME-Version; b=KE9/7b8KciLxXXKXLGgh6K/zN05ySrDKf5GDl6IToA3lZAJAMO25S6LeUDFeJA16INPxUuLx8iOrLxdxCHQCMoJsq0JzFpGC2D3v9Nkw5nIoTOzR7vTv9ovvPfx9QRArj2q8sR2uFDzCj6osmCTc9mMc2Hys61gHWp4yNJNCHJI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E0D315A1;
-	Mon, 12 Jan 2026 09:01:11 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BA1D51516;
+	Mon, 12 Jan 2026 09:01:16 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E53913F694;
-	Mon, 12 Jan 2026 09:01:12 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5E6A33F694;
+	Mon, 12 Jan 2026 09:01:18 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v3 16/47] arm_mpam: resctrl: Pick the caches we will use as resctrl resources
-Date: Mon, 12 Jan 2026 16:58:43 +0000
-Message-ID: <20260112165914.4086692-17-ben.horgan@arm.com>
+Subject: [PATCH v3 17/47] arm_mpam: resctrl: Implement resctrl_arch_reset_all_ctrls()
+Date: Mon, 12 Jan 2026 16:58:44 +0000
+Message-ID: <20260112165914.4086692-18-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -68,140 +68,92 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-Systems with MPAM support may have a variety of control types at any point
-of their system layout. We can only expose certain types of control, and
-only if they exist at particular locations.
+We already have a helper for resetting an mpam class and component.  Hook
+it up to resctrl_arch_reset_all_ctrls() and the domain offline path.
 
-Start with the well-known caches. These have to be depth 2 or 3 and support
-MPAM's cache portion bitmap controls, with a number of portions fewer than
-resctrl's limit.
-
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-Jonathan:
-Remove brackets
-Compress debug message
-Use temp var, r
-
 Changes since v2:
-Return -EINVAL in mpam_resctrl_control_init() for unknown rid
+Don't expose unlocked reset
 ---
- drivers/resctrl/mpam_resctrl.c | 90 +++++++++++++++++++++++++++++++++-
- 1 file changed, 88 insertions(+), 2 deletions(-)
+ drivers/resctrl/mpam_devices.c  |  4 ++--
+ drivers/resctrl/mpam_internal.h |  6 ++++++
+ drivers/resctrl/mpam_resctrl.c  | 15 +++++++++++++++
+ 3 files changed, 23 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 4dba6f58f79c..1566d0c686e6 100644
---- a/drivers/resctrl/mpam_resctrl.c
-+++ b/drivers/resctrl/mpam_resctrl.c
-@@ -65,9 +65,94 @@ struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
- 	return &mpam_resctrl_controls[l].resctrl_res;
+diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
+index b81d5c7f44ca..0dd7f613f7a3 100644
+--- a/drivers/resctrl/mpam_devices.c
++++ b/drivers/resctrl/mpam_devices.c
+@@ -2544,7 +2544,7 @@ static void mpam_enable_once(void)
+ 	       mpam_partid_max + 1, mpam_pmg_max + 1);
  }
  
-+static bool cache_has_usable_cpor(struct mpam_class *class)
+-static void mpam_reset_component_locked(struct mpam_component *comp)
++void mpam_reset_component_locked(struct mpam_component *comp)
+ {
+ 	struct mpam_vmsc *vmsc;
+ 
+@@ -2568,7 +2568,7 @@ static void mpam_reset_component_locked(struct mpam_component *comp)
+ 	}
+ }
+ 
+-static void mpam_reset_class_locked(struct mpam_class *class)
++void mpam_reset_class_locked(struct mpam_class *class)
+ {
+ 	struct mpam_component *comp;
+ 
+diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+index e394ee78918a..f89ceaf7623d 100644
+--- a/drivers/resctrl/mpam_internal.h
++++ b/drivers/resctrl/mpam_internal.h
+@@ -393,6 +393,12 @@ extern u8 mpam_pmg_max;
+ void mpam_enable(struct work_struct *work);
+ void mpam_disable(struct work_struct *work);
+ 
++/* Reset all the RIS in a class under cpus_read_lock() */
++void mpam_reset_class_locked(struct mpam_class *class);
++
++/* Reset all the RIS in a component under cpus_read_lock() */
++void mpam_reset_component_locked(struct mpam_component *comp);
++
+ int mpam_apply_config(struct mpam_component *comp, u16 partid,
+ 		      struct mpam_config *cfg);
+ 
+diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+index 1566d0c686e6..683bdd6989d4 100644
+--- a/drivers/resctrl/mpam_resctrl.c
++++ b/drivers/resctrl/mpam_resctrl.c
+@@ -169,6 +169,19 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+ 	return comp->comp_id;
+ }
+ 
++void resctrl_arch_reset_all_ctrls(struct rdt_resource *r)
 +{
-+	struct mpam_props *cprops = &class->props;
-+
-+	if (!mpam_has_feature(mpam_feat_cpor_part, cprops))
-+		return false;
-+
-+	/* resctrl uses u32 for all bitmap configurations */
-+	return class->props.cpbm_wd <= 32;
-+}
-+
-+/* Test whether we can export MPAM_CLASS_CACHE:{2,3}? */
-+static void mpam_resctrl_pick_caches(void)
-+{
-+	struct mpam_class *class;
 +	struct mpam_resctrl_res *res;
 +
 +	lockdep_assert_cpus_held();
 +
-+	guard(srcu)(&mpam_srcu);
-+	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
-+				 srcu_read_lock_held(&mpam_srcu)) {
-+		if (class->type != MPAM_CLASS_CACHE) {
-+			pr_debug("class %u is not a cache\n", class->level);
-+			continue;
-+		}
++	if (!mpam_is_enabled())
++		return;
 +
-+		if (class->level != 2 && class->level != 3) {
-+			pr_debug("class %u is not L2 or L3\n", class->level);
-+			continue;
-+		}
-+
-+		if (!cache_has_usable_cpor(class)) {
-+			pr_debug("class %u cache misses CPOR\n", class->level);
-+			continue;
-+		}
-+
-+		if (!cpumask_equal(&class->affinity, cpu_possible_mask)) {
-+			pr_debug("class %u has missing CPUs, mask %*pb != %*pb\n", class->level,
-+				 cpumask_pr_args(&class->affinity),
-+				 cpumask_pr_args(cpu_possible_mask));
-+			continue;
-+		}
-+
-+		if (class->level == 2)
-+			res = &mpam_resctrl_controls[RDT_RESOURCE_L2];
-+		else
-+			res = &mpam_resctrl_controls[RDT_RESOURCE_L3];
-+		res->class = class;
-+		exposed_alloc_capable = true;
-+	}
++	res = container_of(r, struct mpam_resctrl_res, resctrl_res);
++	mpam_reset_class_locked(res->class);
 +}
 +
- static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
+ static void mpam_resctrl_domain_hdr_init(int cpu, struct mpam_component *comp,
+ 					 struct rdt_domain_hdr *hdr)
  {
--	/* TODO: initialise the resctrl resources */
-+	struct mpam_class *class = res->class;
-+	struct rdt_resource *r = &res->resctrl_res;
-+
-+	switch (r->rid) {
-+	case RDT_RESOURCE_L2:
-+	case RDT_RESOURCE_L3:
-+		r->alloc_capable = true;
-+		r->schema_fmt = RESCTRL_SCHEMA_BITMAP;
-+		r->cache.arch_has_sparse_bitmasks = true;
-+
-+		r->cache.cbm_len = class->props.cpbm_wd;
-+		/* mpam_devices will reject empty bitmaps */
-+		r->cache.min_cbm_bits = 1;
-+
-+		if (r->rid == RDT_RESOURCE_L2) {
-+			r->name = "L2";
-+			r->ctrl_scope = RESCTRL_L2_CACHE;
-+		} else {
-+			r->name = "L3";
-+			r->ctrl_scope = RESCTRL_L3_CACHE;
-+		}
-+
-+		/*
-+		 * Which bits are shared with other ...things...
-+		 * Unknown devices use partid-0 which uses all the bitmap
-+		 * fields. Until we configured the SMMU and GIC not to do this
-+		 * 'all the bits' is the correct answer here.
-+		 */
-+		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
+@@ -352,6 +365,8 @@ void mpam_resctrl_offline_cpu(unsigned int cpu)
+ 			continue;
  
- 	return 0;
- }
-@@ -302,7 +387,8 @@ int mpam_resctrl_setup(void)
- 		res->resctrl_res.rid = rid;
- 	}
- 
--	/* TODO: pick MPAM classes to map to resctrl resources */
-+	/* Find some classes to use for controls */
-+	mpam_resctrl_pick_caches();
- 
- 	/* Initialise the resctrl structures from the classes */
- 	for_each_mpam_resctrl_control(res, rid) {
+ 		if (exposed_alloc_capable) {
++			mpam_reset_component_locked(dom->ctrl_comp);
++
+ 			ctrl_d = &dom->resctrl_ctrl_dom;
+ 			ctrl_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &ctrl_d->hdr);
+ 			if (ctrl_dom_empty)
 -- 
 2.43.0
 
