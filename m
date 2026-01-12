@@ -1,42 +1,42 @@
 Received: from sinmsgout03.his.huawei.com (sinmsgout03.his.huawei.com [119.8.177.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4802436C0DC
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B1C24A07C
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 16:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768235337; cv=none; b=UujDFavZHvbZUZGmxHDP424WUjgK0G6K1E2vajQz83mKZcUmvMi+u4vrZGlO8+49SgCjF/iZaPTcnol7Wy+rHhmcnPIanQ+MsUBnfaFHGaXJ2fFF4gyvW1VKwn8JezzPMCCswXnmTnjx12dCfHfJt1rylQnbbB6GVI5Zgp/Rlog=
+	t=1768235413; cv=none; b=HEZ1yJbE+00l6eB4msmZ6Fpg28F7ieEPAHaULkIYfH5WArprDalgkAyaaMO+ZcnnQdYGIw/jHRVBfqpDHReUqdQ8JxJf4/6D4AnX/hw1vDiQHhyOuIH/13UTlepHUFUpUd4N8LL4WT/x/5TxSd02vEGgwJU6bxduLj2VdWUBYPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768235337; c=relaxed/simple;
-	bh=zW/6QXkoGhIQ0B9emspd1pf+7Ckj3VpZWETFkOGu+I8=;
+	s=arc-20240116; t=1768235413; c=relaxed/simple;
+	bh=vuE7L+1uXxM/QNh0tjk6FPVUYyh8IZQbH/76jG+2pf8=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ilxaa42V/7Pxu6wB4dc3UPaDhnVx9FzTcUEz3W4qH8v8aIwSaJ+1HQ99Cd1LMBl9rQ9rX+d74zDwncuox0l9z9c5abbUBh1YWpUBdn7bUwcgt6m8TZtwAo1m+LEbDKsCeuA7OIeRLpredf38InspiD6IDG5UGQbDGusCuUfjIYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=AeMRjfEs; arc=none smtp.client-ip=119.8.177.38
+	 MIME-Version:Content-Type; b=LoX6JjDuLvl8omtf2PVcBnr3la7snaJIJDa6t8kZY0V+61uCPwRP8YShuK3IjbiRoKk5Bmrc32Ip8YrrO4kF41usY3R68q+Uv7dB0Uf8AHEpo8i3WNVsniIp2BWmnuuvUSWqBbiXFDMPKPRux5ZngVq/4Zd8bDlz8ZeIlq/aEUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=W6pHH4qs; arc=none smtp.client-ip=119.8.177.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="AeMRjfEs"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="W6pHH4qs"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=A9VektO+CAqvLnE0XPzoW3dtG8/MTTC0nCaZjXHsMNQ=;
-	b=AeMRjfEsuuc2juhgk3xNdgTRVEM3ZYCBydzsqcnLjRTmLEhgy3FXeVtFQKl44yTTUynr6j74L
-	V8HzsNjW77KU1TjGg/cE6SNqdz5B6vG6VqXqwP02Y0VXHwtlNI3hXJ9SokSTFS4+7tyWH8ilFOH
-	pJw6RIT/JOkW3O9O1x0WzHo=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
-	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dqd6k0GDmzMpPg;
-	Tue, 13 Jan 2026 00:26:21 +0800 (CST)
+	bh=iumCkYZyOeqq6qA1Zq+gU2yZ5NWDLFCQDfxsLa8JXpo=;
+	b=W6pHH4qsg6b29YAavzGeAAMkopao0UbaBSN1XIMkAOrRDLQVPGo39SIphHV6p6s1K8ykyunYn
+	ur2TEBelhEkRjE/8KA2W+G/ySQTAJ00ieinUVu/SBgKTVvJYRgOjWEMDWH/B9x0V5lu5FmqX/rE
+	8nCEO5kg3wQWX2S5kqW0H60=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dqd8H2Jp1zMpPg;
+	Tue, 13 Jan 2026 00:27:43 +0800 (CST)
 Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqd926PttzJ46DD;
-	Tue, 13 Jan 2026 00:28:22 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqdBW449PzHnGfQ;
+	Tue, 13 Jan 2026 00:29:39 +0800 (CST)
 Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8501640569;
-	Tue, 13 Jan 2026 00:28:34 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id D766E40569;
+	Tue, 13 Jan 2026 00:29:55 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
  (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
- 2026 16:28:33 +0000
-Date: Mon, 12 Jan 2026 16:28:32 +0000
+ 2026 16:29:55 +0000
+Date: Mon, 12 Jan 2026 16:29:54 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,12 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v3 27/36] KVM: arm64: gic-v5: Mandate architected PPI
- for PMU emulation on GICv5
-Message-ID: <20260112162832.00005a62@huawei.com>
-In-Reply-To: <20260109170400.1585048-28-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v3 30/36] KVM: arm64: gic-v5: Introduce
+ kvm_arm_vgic_v5_ops and register them
+Message-ID: <20260112162954.00002020@huawei.com>
+In-Reply-To: <20260109170400.1585048-31-sascha.bischoff@arm.com>
 References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
-	<20260109170400.1585048-28-sascha.bischoff@arm.com>
+	<20260109170400.1585048-31-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -66,18 +66,13 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
  dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Fri, 9 Jan 2026 17:04:47 +0000
+On Fri, 9 Jan 2026 17:04:48 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> Make it mandatory to use the architected PPI when running a GICv5
-> guest. Attempts to set anything other than the architected PPI (23)
-> are rejected.
+> Only the KVM_DEV_ARM_VGIC_GRP_CTRL->KVM_DEV_ARM_VGIC_CTRL_INIT op is
+> currently supported. All other ops are stubbed out.
 > 
-> Additionally, KVM_ARM_VCPU_PMU_V3_INIT is relaxed to no longer require
-> KVM_ARM_VCPU_PMU_V3_IRQ to be called for GICv5-based guests. In this
-> case, the architectued PPI is automatically used.
-> 
-> Documentation is bumped accordingly.
-> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
