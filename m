@@ -1,184 +1,130 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CC73563E7
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 12:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B3714BF92
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 12:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768220046; cv=none; b=krXDurQgRt8FO48BLSNhem09vinHLqduyn9/DwPb7He0v2zzprx+Oiah5OOvlySMSKveVigvInLc3Bu4KDjA0tbIkEiQBNtKyZpl4aTVUWw5MR5dUZFunsTCcz4WBHODFIRCoX9rW8ZNJj3N9kRPAUtMXRq80UcHj0ALO5YWikw=
+	t=1768221724; cv=none; b=j0SYKCqRzY+zu6447yUIECaPpbltWXXoejg808WDCBI4Le/iz74VSHSq4LKVgOZM0LKAjAqkxBWrDDM8xYhG32KXJy32Qi3amM0HDEqBkOQfeq8x2sOITEA6+sr2m1hNxus+kbQIX/iUnsn8bZdw32T+LGeEYQkv8mEgmhnLzxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768220046; c=relaxed/simple;
-	bh=QmYlGaujFEsE9XLmHDyT0RbhVJRLgGd9k1Ng3vTOcB8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Hb5IADQo7WV36BMko3AhSiCjUd3wkDoKj7eFprfPe2VcBdcbs/WMafc2OJ8tBeXHBwi19cnr6SgHo//bAj8tJ3L9VzzUhcKMbIxB54EhKXwTe0gHT7//v80sBy9mosaflBLHG+rGQFS0cFy/YK+xT2QhyhrvOSSl8VvjGZ+SELU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hTP96GhC; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1768221724; c=relaxed/simple;
+	bh=156pxg3To0Jclr6ygI/YePOmO8C/eVIC2Q1wLolLpGg=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mVtbBS3kV9mWT+qqPWz5N/bnMHdPOuS+ZTELx9ntsQIO7zGNvf4Osb5LKchTDbi8kzRfqsTSy1orrHONQSP1yFVU6dQWy87ZhaCFNhvEDoFMSMA/VF4Y2UAFA4MwHiF8MrCg2okXvPIES+6Bt6n42+mnUq1FUazJUJVRrUGoM/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=zD1UjWIC; arc=none smtp.client-ip=119.8.177.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hTP96GhC"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42fb6ce71c7so5336844f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 04:14:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1768220043; x=1768824843; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=m5vBcByaSbLsGX5Zr65hjskcoFy3cdK9/53jX67HxjI=;
-        b=hTP96GhCcA41kufj6kMnYJCgjhB/GzBO81eqyayRySAuBlYpLAivJiophBiS5yKNpQ
-         EMWUWKqtmHnFi7ronvRtQeTOL6SvDgzSaDLcpsmNkOthxUxXzHIRhoeDE0Mz4S4AjsQf
-         /rST5Weazn7vZkv3p85ViSg4RPNuw9QfFnJYlJngX5D9T2QAI9lQa/D3sFM0L61XlHKp
-         h5KWOQOdQsL4si2UsybcjBg1u8r163OLpxrV5UrGkgTrpZiSjWCvijcRVkarBH3RZCZz
-         PRhdOf98qFqLTSGG6yhLcik3xzZ5lv3n44c77yVrTVU8I8Xgw7nIzxSNYRfiZcB8zoFP
-         8dow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768220043; x=1768824843;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5vBcByaSbLsGX5Zr65hjskcoFy3cdK9/53jX67HxjI=;
-        b=V2fG542yzFoM2pv8zf0YvNF3k5YuL50LJqoUE8CqSjWGuTk3wuTJOIr2QD97b1zHQo
-         oTZXD8jq1srTcXlXXPk0xBZkmWIYQQHK2B9O17FtgPZkObEXL9X0joEa5S3RfaLJpDhS
-         fMS0NR1iO4P9cMF91Q67AcTRIEkELZfFnhZpF8DY161ZdTqI/rxd3zhiNca4WWo1mxpI
-         fizBQZ0lDnMTRssWDobbkwL32N/ARLssYcGMq0HxU2t2BboohfdIFEDv1YQM+a8P3bya
-         xS82B/tW9xihEIB++dS92U+Eo4CDSmjMLszg+lA5e/H6MTnHzKAXa7kF2qdfZMA47gJg
-         QqOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwnPRZ0ZuKhzvf6JNxLl7EiYwsbsMKsH2K2suVxwMjZ8lzOZMwEGXYRpW5U+DUO3j2qJF+EHI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyuaoQEPp3Xt177PPaB+6foan/l1MbhD8tlDruQkL3A5+jKisGe
-	5kb5HKpLMVc3/SzAG54oxlNA81tFhIHgoS8+p9+fmUfKQtOdgrzhywg5aseyn1SctOA=
-X-Gm-Gg: AY/fxX5e5LURypLsZY88QNzBQBW0xK0rrDDSmdo42KeIb95yOH1Yi5bi/jyzA2T3HHR
-	eJpk4+Z7grBiX8OqUtC6+r/HDmi/exiAiGpfDcAg3pK6TmCrS1NXbm7QLb8RKO7LdWUSwT1/7DY
-	sU93ByN//RuBjQZMnznJc/w8Ew3ojCEetn+czPEe2oGKYIfC4qcVTCgPCVD245ztiOIDlhhzWR/
-	+HFI/ObnsM3I/xIyAmwnGjQogv2tXSvSdW1QTYDnYuhoHRiR5687bXTE+viYIU2kL6eBpoy3v2c
-	2F2tGVd/JtCvw5fBuYlzKTJ03sm4gTRJBEv7jPl/3sO/+tke5h5LfqVGHhNxRXTudKJ8WWFnE78
-	xk2Puv79TdV4jPOTqfPDyvFEusC8CYqSCG6RNiLn440xG8huRLVou56LEAzLEfYPIhvH4zRffWl
-	V/c+/jA3o8Vq/v1D7xnUxpj6ohrJo=
-X-Google-Smtp-Source: AGHT+IFyLJu85DhzDzB9NUkNFHVuGwdXkS6SskSTBpWBs4uFpxP0oRfyAXxIBuq4lyp+uGbpQRo27A==
-X-Received: by 2002:a05:6000:22c7:b0:430:f6bc:2f8b with SMTP id ffacd0b85a97d-432c37d2faemr19857760f8f.45.1768220042989;
-        Mon, 12 Jan 2026 04:14:02 -0800 (PST)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5ee870sm38632600f8f.36.2026.01.12.04.14.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Jan 2026 04:14:02 -0800 (PST)
-Message-ID: <24dbbfea-f068-4352-9212-30821feed796@linaro.org>
-Date: Mon, 12 Jan 2026 12:14:01 +0000
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="zD1UjWIC"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=TMWrNodyPbH0cxOyXghaAdCqoid1aUqucu2YzK3hs90=;
+	b=zD1UjWICSccTtmI2eRKhTbmbc6ZzCS7MrAwECZrg4sM4bW5c6vjY09H0kHYj9d5crjWv1LGzW
+	/iwWFNvY42eqIir1KhwPiMGpQMTTn3pJBI8SRFxXI3+i32Lwk0rRThnvYWVWz2UzgIWhupoWjz7
+	VhuPm6XGVIM7K27bkERVbls=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dqX5363Y6z1vp0g;
+	Mon, 12 Jan 2026 20:39:35 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dqX7J1bc9zHnH4f;
+	Mon, 12 Jan 2026 20:41:32 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 37D0640086;
+	Mon, 12 Jan 2026 20:41:48 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Mon, 12 Jan
+ 2026 12:41:44 +0000
+Date: Mon, 12 Jan 2026 12:41:43 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, "lpieralisi@kernel.org"
+	<lpieralisi@kernel.org>, Timothy Hayes <Timothy.Hayes@arm.com>, "Suzuki
+ Poulose" <Suzuki.Poulose@arm.com>, nd <nd@arm.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>, "maz@kernel.org"
+	<maz@kernel.org>, "oliver.upton@linux.dev" <oliver.upton@linux.dev>
+Subject: Re: [PATCH v2 02/36] KVM: arm64: gic-v3: Switch vGIC-v3 to use
+ generated ICH_VMCR_EL2
+Message-ID: <20260112124143.000009c9@huawei.com>
+In-Reply-To: <4117fd5aca061db0857c0fc87f320b01f3347376.camel@arm.com>
+References: <20251219155222.1383109-1-sascha.bischoff@arm.com>
+	<20251219155222.1383109-3-sascha.bischoff@arm.com>
+	<20260106180022.00006dcd@huawei.com>
+	<cdef264835c24f1e2155cadd5a414fb34d06bca3.camel@arm.com>
+	<4117fd5aca061db0857c0fc87f320b01f3347376.camel@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v6 03/35] KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig
- option
-From: James Clark <james.clark@linaro.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
-References: <20251114160717.163230-1-alexandru.elisei@arm.com>
- <20251114160717.163230-4-alexandru.elisei@arm.com>
- <1aaffbcd-ba0c-4371-80d7-ce59ac7f13a9@linaro.org> <aWTaXBse_R_LjJE-@raptor>
- <d7db9f17-012e-43d7-a0a5-58b254dd7e33@linaro.org>
-Content-Language: en-US
-In-Reply-To: <d7db9f17-012e-43d7-a0a5-58b254dd7e33@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
+On Fri, 9 Jan 2026 16:57:18 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
+> On Wed, 2026-01-07 at 10:55 +0000, Sascha Bischoff wrote:
+> > On Tue, 2026-01-06 at 18:00 +0000, Jonathan Cameron wrote: =20
+> > > On Fri, 19 Dec 2025 15:52:36 +0000
+> > > Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> > >  =20
+> > > > From: Sascha Bischoff <Sascha.Bischoff@arm.com>
+> > > >=20
+> > > > The VGIC-v3 code relied on hand-written definitions for the
+> > > > ICH_VMCR_EL2 register. This register, and the associated fields,
+> > > > is
+> > > > now generated as part of the sysreg framework. Move to using the
+> > > > generated definitions instead of the hand-written ones.
+> > > >=20
+> > > > There are no functional changes as part of this change.
+> > > >=20
+> > > > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com> =20
+> > > Hi Sascha
+> > >=20
+> > > Happy new year.=A0 There is a bit in here that isn't obviously going
+> > > to result in no functional change. I'm too lazy to chase where the
+> > > value
+> > > goes to check it it's a real bug or not.
+> > >=20
+> > > Otherwise this is inconsistent on whether the _MASK or define
+> > > without
+> > > it from the sysreg generated header is used in FIELD_GET() /
+> > > FIELD_PREP()
+> > >=20
+> > > I'd always use the _MASK version. =20
+> >=20
+> > Hi Jonathan,
+> >=20
+> > I've updated the code to use the _MASK version.
+> >  =20
+> Hi Jonathan,
+>=20
+> I've actually had a change of heart (sorry!). I think it is clearer to
+> use the _MASK version when explicitly using the value as a mask, but to
+> drop that for the FIELD_x() ops as in that case we're naming a field.
+>=20
+> I've gone through and made the usage of those consistent.
 
-On 12/01/2026 12:09 pm, James Clark wrote:
-> 
-> 
-> On 12/01/2026 11:26 am, Alexandru Elisei wrote:
->> Hi James,
->>
->> On Fri, Jan 09, 2026 at 04:29:50PM +0000, James Clark wrote:
->>>
->>>
->>> On 14/11/2025 4:06 pm, Alexandru Elisei wrote:
->>>> Add a new configuration option that will be used for KVM SPE emulation.
->>>> CONFIG_KVM_ARM_SPE depends on the SPE driver being builtin because:
->>>>
->>>> 1. The SPE driver maintains a cpumask of physical CPUs that support 
->>>> SPE,
->>>>      and that will be used by KVM to emulate SPE on heterogeneous 
->>>> systems.
->>>>
->>>> 2. KVM will rely on the SPE driver enabling the SPE interrupt at the 
->>>> GIC
->>>>      level.
->>>>
->>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>> ---
->>>>    arch/arm64/kvm/Kconfig | 8 ++++++++
->>>>    1 file changed, 8 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->>>> index 4f803fd1c99a..31388b5b2655 100644
->>>> --- a/arch/arm64/kvm/Kconfig
->>>> +++ b/arch/arm64/kvm/Kconfig
->>>> @@ -83,4 +83,12 @@ config PTDUMP_STAGE2_DEBUGFS
->>>>          If in doubt, say N.
->>>> +config KVM_ARM_SPE
->>>> +    bool
->>>> +    depends on KVM && ARM_SPE_PMU=y
->>>
->>> I think the most common configuration is module, so requiring built- 
->>> in isn't
->>> great. If there's any way of avoiding it, even if it costs a little 
->>> bit of
->>> pain, it would be good for adoption.
->>
->> I'm not sure how that could be done. You need the buffer maintenance 
->> interrupt
->> to do a VM exit so KVM can inject the virtual interrupt back into the 
->> guest,
->> otherwise there's a possibility of a large blackout window when the 
->> buffer is
->> full.
-> 
-> Without expanding more I don't see how injecting an interrupt is 
-> strongly related to the way it's compiled.
-> 
->>
->> The code also relies on the SPE driver to probe all the SPUs in the 
->> system.
->>
-> 
-> I don't think that's a hard requirement either, the KVM code could 
-> fairly easily do this itself. Inline the common code and put it in a 
-> shared header etc. I'm sure there are lots of creative ways to flip the 
-> dependencies that might not be "proper" software engineering. But like I 
-> said a bit of pain here might be beneficial overall.
-> 
->>>
->>> It was basically the first thing I got stuck on trying to get it to 
->>> work. Or
->>> if it really can't be done, maybe some kind of debug message to say why
->>> enabling failed.
->>
->> When you search for the symbol in menuconfig you get a list of the 
->> symbols it
->> depends on.
+Fair enough.  I'd have argued that there should never have been both
+in the first place in the generated header as the non _MASK ones add
+no value. The only argument I can think of is that we don't normally
+use _MASK for single bit defines when doing doing it by hand, but such
+is life. I do think you are setting yourself up for a world in which new
+patches mix these up and you get to post lots of review feedback on it ;)
 
-Also, it wasn't easy for me to find this either. I had to read the code 
-and debug it. I find it hard to believe that other people won't get 
-stuck here without a warning. It will be "I've got SPE, I've got KVM but 
-it's just not working and there's no warning".
+Jonathan
 
-> 
-> Right, but that doesn't address the problems of adoption at all.
-> 
-> Having it on by default when SPE and KVM are already enabled in their 
-> default configs is the difference between people being able to use this 
-> with zero friction vs 200 people all getting stuck and then coming to 
-> ask me why it's not working and distros having to update SPE from being 
-> a module to static.
-> 
->>
->> Thanks,
->> Alex
-> 
-> 
+>=20
+> Sascha
+>=20
+> >  =20
 
