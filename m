@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10244376BD3
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC24E376BEE
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237375; cv=none; b=kk5Dk2Gg81tMFMA1W+nUlS5aU7SE3R3aLYkp1R7CMmOckcSppr/1cyQ3g1AbBs4J3ecvhnkBm686TJ+XjluM/U0W+hc/lHghHsNdLGgYzizWTb3Wr927cXmb01TaVR+iUEWBi5kuWphf/Azqaxoz/0pw0vdhI8kfIJrJIszOpRs=
+	t=1768237380; cv=none; b=FIIKlNx/K2T/r2Pfb4Ft2HYkcnPWudIKATCMkYTopu7SdQkh8ggV5vDO7vmdARMZn1Z1dV8jSfzpBiHJbgLXx6IyraV4gaueWjMm1ZayeRJsovvZt5TS5hS8hAKbP8sfGLsw4D9P3xeVf6zJrlq8oivmioEheW3RH6Jmsm8ZXPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237375; c=relaxed/simple;
-	bh=2z/oMA7DNiHcSqIJlZknRnVzdhneN19nfELdo1d0NCg=;
+	s=arc-20240116; t=1768237380; c=relaxed/simple;
+	bh=NmdJUjnDXvgUJ5W0mtrQtxfWsn7zVkzPexB89arReZ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LoLTgeRi+2Z2j2lHUV+iuy2yzlfUTM4HtSFiJD7KzoN8JGdUAeEuzdtTmx59kJpLjSoqEM5CuxmV3lxUtDIJoADlYMvzR5JYWcsc5hf6cdbWybG618oj5GQ7PfmNPXgiJ9fqqBSwXs7ZR+xo5yHvIrnAQLCI18Xfz+xdRayDCoc=
+	 MIME-Version; b=aczx64xr7uUpXUuks9jL/Wxgk83/a4HWz9bdFLZMH5J7QG5cIMW9pYIHvvEzTm0BzqWCubMY9LeTeJCbdCNArFcPJW6oUkyYvjRzn4cm1qBfqMK8HIsWWeRvvwuu2+D/yWYlAhl1VqKUAmwtigWLbOTUYa/aCltrK70F/QnepfY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE7F8153B;
-	Mon, 12 Jan 2026 09:02:44 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 256881516;
+	Mon, 12 Jan 2026 09:02:50 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4BEBF3F694;
-	Mon, 12 Jan 2026 09:02:46 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BDC453F694;
+	Mon, 12 Jan 2026 09:02:51 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v3 33/47] arm_mpam: resctrl: Add resctrl_arch_config_cntr() for ABMC use
-Date: Mon, 12 Jan 2026 16:59:00 +0000
-Message-ID: <20260112165914.4086692-34-ben.horgan@arm.com>
+Subject: [PATCH v3 34/47] arm_mpam: resctrl: Allow resctrl to allocate monitors
+Date: Mon, 12 Jan 2026 16:59:01 +0000
+Message-ID: <20260112165914.4086692-35-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -68,69 +68,177 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-ABMC has a helper resctrl_arch_config_cntr() for changing the mapping
-between 'cntr_id' and a CLOSID/RMID pair.
+When resctrl wants to read a domain's 'QOS_L3_OCCUP', it needs to allocate
+a monitor on the corresponding resource. Monitors are allocated by class
+instead of component.
 
-Add the helper.
+MBM monitors are much more complicated, if there are enough monitors, they
+will be pre-allocated and free-running. If ABMC is in use instead then
+'some' are pre-allocated in a different way, and need assigning.
 
-For MPAM this is done by updating the mon->mbwu_idx_to_mon[] array, and as
-usual CDP means it needs doing in three different ways.
+Add helpers to allocate a CSU monitor. These helper return an out of range
+value for MBM counters.
+
+Allocating a montitor context is expected to block until hardware resources
+become available. This only makes sense for QOS_L3_OCCUP as unallocated MBM
+counters are losing data.
 
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- drivers/resctrl/mpam_resctrl.c | 37 ++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+Changes since rfc:
+USE_RMID_IDX -> USE_PRE_ALLOCATED in comment
+Remove unnecessary arch_mon_ctx = NULL
 
+Changes since v2:
+Add include of resctrl_types.h as dropped from earlier patch
+---
+ drivers/resctrl/mpam_internal.h | 14 ++++++-
+ drivers/resctrl/mpam_resctrl.c  | 67 +++++++++++++++++++++++++++++++++
+ include/linux/arm_mpam.h        |  5 +++
+ 3 files changed, 85 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+index 58076abd5de3..8f73528414af 100644
+--- a/drivers/resctrl/mpam_internal.h
++++ b/drivers/resctrl/mpam_internal.h
+@@ -29,6 +29,14 @@ struct platform_device;
+ #define PACKED_FOR_KUNIT
+ #endif
+ 
++/*
++ * This 'mon' values must not alias an actual monitor, so must be larger than
++ * U16_MAX, but not be confused with an errno value, so smaller than
++ * (u32)-SZ_4K.
++ * USE_PRE_ALLOCATED is used to avoid confusion with an actual monitor.
++ */
++#define USE_PRE_ALLOCATED	(U16_MAX + 1)
++
+ static inline bool mpam_is_enabled(void)
+ {
+ 	return static_branch_likely(&mpam_enabled);
+@@ -216,7 +224,11 @@ enum mon_filter_options {
+ };
+ 
+ struct mon_cfg {
+-	u16			mon;
++	/*
++	 * mon must be large enough to hold out of range values like
++	 * USE_PRE_ALLOCATED
++	 */
++	u32			mon;
+ 	u8			pmg;
+ 	bool			match_pmg;
+ 	bool			csu_exclude_clean;
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 2a9efc6c6fae..9198af3221d5 100644
+index 9198af3221d5..c01419c1a381 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -776,6 +776,43 @@ static void mpam_resctrl_pick_counters(void)
- 			     mpam_resctrl_counters[QOS_L3_MBM_TOTAL_EVENT_ID].class);
+@@ -22,6 +22,8 @@
+ 
+ #include "mpam_internal.h"
+ 
++DECLARE_WAIT_QUEUE_HEAD(resctrl_mon_ctx_waiters);
++
+ /*
+  * The classes we've picked to map to resctrl resources, wrapped
+  * in with their resctrl structure.
+@@ -293,6 +295,71 @@ struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
+ 	return &mpam_resctrl_controls[l].resctrl_res;
  }
  
-+static void __config_cntr(struct mpam_resctrl_mon *mon, u32 cntr_id,
-+			  enum resctrl_conf_type cdp_type, u32 closid, u32 rmid,
-+			  bool assign)
-+{
-+	u32 mbwu_idx, mon_idx = resctrl_get_config_index(cntr_id, cdp_type);
-+
-+	closid = resctrl_get_config_index(closid, cdp_type);
-+	mbwu_idx = resctrl_arch_rmid_idx_encode(closid, rmid);
-+	WARN_ON_ONCE(mon_idx > l3_num_allocated_mbwu);
-+
-+	if (assign)
-+		mon->mbwu_idx_to_mon[mbwu_idx] = mon->assigned_counters[mon_idx];
-+	else
-+		mon->mbwu_idx_to_mon[mbwu_idx] = -1;
-+}
-+
-+void resctrl_arch_config_cntr(struct rdt_resource *r, struct rdt_mon_domain *d,
-+			      enum resctrl_event_id evtid, u32 rmid, u32 closid,
-+			      u32 cntr_id, bool assign)
++static int resctrl_arch_mon_ctx_alloc_no_wait(enum resctrl_event_id evtid)
 +{
 +	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
 +
-+	if (!mon->mbwu_idx_to_mon || !mon->assigned_counters) {
-+		pr_debug("monitor arrays not allocated\n");
-+		return;
-+	}
++	if (!mon->class)
++		return -EINVAL;
 +
-+	if (cdp_enabled) {
-+		__config_cntr(mon, cntr_id, CDP_CODE, closid, rmid, assign);
-+		__config_cntr(mon, cntr_id, CDP_DATA, closid, rmid, assign);
-+	} else {
-+		__config_cntr(mon, cntr_id, CDP_NONE, closid, rmid, assign);
++	switch (evtid) {
++	case QOS_L3_OCCUP_EVENT_ID:
++		/* With CDP, one monitor gets used for both code/data reads */
++		return mpam_alloc_csu_mon(mon->class);
++	case QOS_L3_MBM_LOCAL_EVENT_ID:
++	case QOS_L3_MBM_TOTAL_EVENT_ID:
++		return USE_PRE_ALLOCATED;
++	default:
++		return -EOPNOTSUPP;
 +	}
-+
-+	resctrl_arch_reset_rmid(r, d, closid, rmid, evtid);
 +}
 +
- bool resctrl_arch_mbm_cntr_assign_enabled(struct rdt_resource *r)
++void *resctrl_arch_mon_ctx_alloc(struct rdt_resource *r,
++				 enum resctrl_event_id evtid)
++{
++	DEFINE_WAIT(wait);
++	int *ret;
++
++	ret = kmalloc(sizeof(*ret), GFP_KERNEL);
++	if (!ret)
++		return ERR_PTR(-ENOMEM);
++
++	do {
++		prepare_to_wait(&resctrl_mon_ctx_waiters, &wait,
++				TASK_INTERRUPTIBLE);
++		*ret = resctrl_arch_mon_ctx_alloc_no_wait(evtid);
++		if (*ret == -ENOSPC)
++			schedule();
++	} while (*ret == -ENOSPC && !signal_pending(current));
++	finish_wait(&resctrl_mon_ctx_waiters, &wait);
++
++	return ret;
++}
++
++static void resctrl_arch_mon_ctx_free_no_wait(enum resctrl_event_id evtid,
++					      u32 mon_idx)
++{
++	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
++
++	if (!mon->class)
++		return;
++
++	if (evtid == QOS_L3_OCCUP_EVENT_ID)
++		mpam_free_csu_mon(mon->class, mon_idx);
++
++	wake_up(&resctrl_mon_ctx_waiters);
++}
++
++void resctrl_arch_mon_ctx_free(struct rdt_resource *r,
++			       enum resctrl_event_id evtid, void *arch_mon_ctx)
++{
++	u32 mon_idx = *(u32 *)arch_mon_ctx;
++
++	kfree(arch_mon_ctx);
++
++	resctrl_arch_mon_ctx_free_no_wait(evtid, mon_idx);
++}
++
+ static bool cache_has_usable_cpor(struct mpam_class *class)
  {
- 	if (r != &mpam_resctrl_controls[RDT_RESOURCE_L3].resctrl_res)
+ 	struct mpam_props *cprops = &class->props;
+diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
+index 7d23c90f077d..e1461e32af75 100644
+--- a/include/linux/arm_mpam.h
++++ b/include/linux/arm_mpam.h
+@@ -5,6 +5,7 @@
+ #define __LINUX_ARM_MPAM_H
+ 
+ #include <linux/acpi.h>
++#include <linux/resctrl_types.h>
+ #include <linux/types.h>
+ 
+ struct mpam_msc;
+@@ -62,6 +63,10 @@ u32 resctrl_arch_rmid_idx_encode(u32 closid, u32 rmid);
+ void resctrl_arch_rmid_idx_decode(u32 idx, u32 *closid, u32 *rmid);
+ u32 resctrl_arch_system_num_rmid_idx(void);
+ 
++struct rdt_resource;
++void *resctrl_arch_mon_ctx_alloc(struct rdt_resource *r, enum resctrl_event_id evtid);
++void resctrl_arch_mon_ctx_free(struct rdt_resource *r, enum resctrl_event_id evtid, void *ctx);
++
+ /**
+  * mpam_register_requestor() - Register a requestor with the MPAM driver
+  * @partid_max:		The maximum PARTID value the requestor can generate.
 -- 
 2.43.0
 
