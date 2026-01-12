@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41C936997B
-	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7484937417A
+	for <kvmarm@lists.linux.dev>; Mon, 12 Jan 2026 17:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768237203; cv=none; b=KAD4g1LMJCsxGxwiupdJJ6sOX1OA8b/vdaeCg3H4jNGSrXOrcFPwwCQLfgvkDQXdAYD8I5ea645vO5PL9SP0Frn8UD40gD8vNWQGYeCRM/Gdl3RkkVGvJOgcSiYz7dpuMX9D4RgCdhvZqbAWobYOW3jkYQ99Wl2Mx7PYb/7xEkg=
+	t=1768237209; cv=none; b=O4rcMHACaNEwrTdiIpNn9rZX1FeGsEXOQPTSV8hTEDYMyW4+nOnw1KZQrarnvQwoSxcjm9d3EAiX5/RkoNSXStrXEGuIdQRLDAOq8sjKuNirPjOxCmiT7niqn1GSZXWxVMLLEwdCLKKkTREYQh3lhrhjB2DGObCK9xlTvLnzky4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768237203; c=relaxed/simple;
-	bh=oj4fcTHoEXtPA7MG6nGH+9WSMY2ShQSL6A2VkyhxVJM=;
+	s=arc-20240116; t=1768237209; c=relaxed/simple;
+	bh=cPwFzaNsCVBLrSBGfelVpK03vtC73cmxcYReuG99TiE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=awCokhAMk7AtRUSegK1D8m915rdaURrIjE5KT5DHJYFCZshDBsNbFNjwKfDUY9JgMHS08buduNe2C0Vk7TE2FSsuIjuWDtjewPK6JPXQwCgHmQut9kjXQELrq9nNAKXtYibwYUahWvE0fUtLavn9zwoeriuzQZa0d15fphBCBHo=
+	 MIME-Version; b=WCN92uhTh70v3M7FoCOe88Rh9URn2Xq2FLQzQ6abWSw3opC98sVdvbM64QmmfHt0VEfr8uTcHvfBnNyC5xMzZYP3S4Ezez12UwKcGUTLV4ZE0ng+XTsaRcQW6uMO0AeeYa7onbhf2vUD3ZcbGefdcCxb4pgXqeYOJFO17oG7HiA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC9E3153B;
-	Mon, 12 Jan 2026 08:59:54 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 419701596;
+	Mon, 12 Jan 2026 09:00:00 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 5FFA33F694;
-	Mon, 12 Jan 2026 08:59:56 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CDBCD3F694;
+	Mon, 12 Jan 2026 09:00:01 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -52,9 +52,9 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: [PATCH v3 02/47] arm_mpam: Use non-atomic bitops when modifying feature bitmap
-Date: Mon, 12 Jan 2026 16:58:29 +0000
-Message-ID: <20260112165914.4086692-3-ben.horgan@arm.com>
+Subject: [PATCH v3 03/47] arm64/sysreg: Add MPAMSM_EL1 register
+Date: Mon, 12 Jan 2026 16:58:30 +0000
+Message-ID: <20260112165914.4086692-4-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
@@ -66,40 +66,34 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In the test__props_mismatch() kunit test we rely on the struct mpam_props
-being packed to ensure memcmp doesn't consider packing. Making it packed
-reduces the alignment of the features bitmap and so breaks a requirement
-for the use of atomics. As we don't rely on the set/clear of these bits
-being atomic, just make them non-atomic.
+The MPAMSM_EL1 register determines the MPAM configuration for an SMCU. Add
+the register definition.
 
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since v2:
-Add comment (Jonathan)
----
- drivers/resctrl/mpam_internal.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/tools/sysreg | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 17cdc3080d58..e8971842b124 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -200,8 +200,12 @@ struct mpam_props {
- } PACKED_FOR_KUNIT;
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 8921b51866d6..afbb55c9b038 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -5052,6 +5052,14 @@ Field	31:16	PARTID_D
+ Field	15:0	PARTID_I
+ EndSysreg
  
- #define mpam_has_feature(_feat, x)	test_bit(_feat, (x)->features)
--#define mpam_set_feature(_feat, x)	set_bit(_feat, (x)->features)
--#define mpam_clear_feature(_feat, x)	clear_bit(_feat, (x)->features)
-+/*
-+ * The non-atomic get/set operations are used because if struct mpam_props is
-+ * packed, the alignment requirements for atomics aren't met.
-+ */
-+#define mpam_set_feature(_feat, x)	__set_bit(_feat, (x)->features)
-+#define mpam_clear_feature(_feat, x)	__clear_bit(_feat, (x)->features)
- 
- /* The values for MSMON_CFG_MBWU_FLT.RWBW */
- enum mon_filter_options {
++Sysreg	MPAMSM_EL1	3	0	10	5	3
++Res0	63:48
++Field	47:40	PMG_D
++Res0	39:32
++Field	31:16	PARTID_D
++Res0	15:0
++EndSysreg
++
+ Sysreg	ISR_EL1	3	0	12	1	0
+ Res0	63:11
+ Field	10	IS
 -- 
 2.43.0
 
