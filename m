@@ -1,212 +1,149 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4913806B8
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 10:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0D438E5CA
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 12:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768301584; cv=none; b=Aac6RN4vgrPMwqsjSdbGYPUiiNkqVJAmL1/L+uaO0tS6mU5pXVUO6IKhk9Q5PPZOC5OGpytiUpf+3+BdSF08QWeKGNkZRrVWZ0Jhrb/7+zmCYqezOQ41Gw0PvMmZtJzXi8bw9PAUcK2cfn0r8IZLcgK/NLFKGZDnCp9TapWz7/M=
+	t=1768306272; cv=none; b=T1j9pwH8B0lj2p3JFmR/t8ZMb7YS0akXF4RGkY7PPDs3LTEg/M6LYsmXPZy3rd92RFNbcK117RzLyRg2V5g7C4AeKKiKiUVe9Z335WruBMfb6AngK4Xb8Anj1uYn4gdAQ+6hJiZl/K+dvG2iICopaR8vOF8kapp60ATOpnOM+sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768301584; c=relaxed/simple;
-	bh=4ud7s/x//wWO9M9VSXwDrnbrgUVZaWyUIXKR42pioi8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jnr4s0bzFAg/ZUOHTNrQaokF/0maCukABjfC9ENCBYa6Avq6rCXCBtVLk1Twj+Xu3H7tj6iLVtwXL1IZm5srCxp9ZPDRCU7rgskWEbfRvhJyjbB7153bBRY/XpJMDj8siaTzRlWPLyGAnIDs3Wwlx4DvoGZovTkoMrhMLwYJMWA=
+	s=arc-20240116; t=1768306272; c=relaxed/simple;
+	bh=t3AVbgBejNV3YOE7Fe351AcCZ/6rnzkz7G8SngGhrvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XdhCuENTnY1w6DhPAbJseZNLDw6yMwCJZo2N/Bi/P9B7x+Cb86O6HKupKkxMOUnTJYFWSdq/UDd4kN0O++6gpdo5Q3JB9+yRH4Om8zhiuknG+AXUkIMwkbVuV5N56jZ7D7eKFxAxW8tBbgmBo5G1G30bNjvEUjxEeK2ADbmH5A4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D8BD497;
-	Tue, 13 Jan 2026 02:52:55 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E56233F5A1;
-	Tue, 13 Jan 2026 02:52:58 -0800 (PST)
-Message-ID: <75ea1f3d-7589-4946-bffe-406459ee77d2@arm.com>
-Date: Tue, 13 Jan 2026 10:52:57 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7B2AD497;
+	Tue, 13 Jan 2026 04:11:01 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5956B3F59E;
+	Tue, 13 Jan 2026 04:11:06 -0800 (PST)
+Date: Tue, 13 Jan 2026 12:11:00 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v3 27/36] KVM: arm64: gic-v5: Mandate architected PPI for
+ PMU emulation on GICv5
+Message-ID: <20260113121100.GA801634@e124191.cambridge.arm.com>
+References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
+ <20260109170400.1585048-28-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 28/30] KVM: arm64: selftests: Skip impossible invalid
- value tests
-To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>
-Cc: Dave Martin <Dave.Martin@arm.com>, Fuad Tabba <tabba@google.com>,
- Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Peter Maydell <peter.maydell@linaro.org>, Eric Auger <eric.auger@redhat.com>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-28-8be3867cb883@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20251223-kvm-arm64-sme-v9-28-8be3867cb883@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260109170400.1585048-28-sascha.bischoff@arm.com>
 
-Hi Mark,
+On Fri, Jan 09, 2026 at 05:04:47PM +0000, Sascha Bischoff wrote:
+> Make it mandatory to use the architected PPI when running a GICv5
+> guest. Attempts to set anything other than the architected PPI (23)
+> are rejected.
+> 
+> Additionally, KVM_ARM_VCPU_PMU_V3_INIT is relaxed to no longer require
+> KVM_ARM_VCPU_PMU_V3_IRQ to be called for GICv5-based guests. In this
+> case, the architectued PPI is automatically used.
+> 
+> Documentation is bumped accordingly.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 
-On 12/23/25 01:21, Mark Brown wrote:
-> The set_id_regs test currently assumes that there will always be invalid
-> values available in bitfields for it to generate but this may not be the
-> case if the architecture has defined meanings for every possible value for
-> the bitfield. An assert added in commit bf09ee918053e ("KVM: arm64:
-> selftests: Remove ARM64_FEATURE_FIELD_BITS and its last user") refuses to
-> run for single bit fields which will show the issue most readily but there
-> is no reason wider ones can't show the same issue.
-> 
-> Rework the tests for invalid value to check if an invalid value can be
-> generated and skip the test if not, removing the assert.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
 > ---
->  tools/testing/selftests/kvm/arm64/set_id_regs.c | 58 ++++++++++++++++++++-----
->  1 file changed, 46 insertions(+), 12 deletions(-)
+>  Documentation/virt/kvm/devices/vcpu.rst |  5 +++--
+>  arch/arm64/kvm/pmu-emul.c               | 13 +++++++++++--
+>  include/kvm/arm_pmu.h                   |  5 ++++-
+>  3 files changed, 18 insertions(+), 5 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> index 322cd13b9352..641194c5005a 100644
-> --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-> @@ -318,11 +318,12 @@ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  }
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> index 60bf205cb3730..5e38058200105 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -37,7 +37,8 @@ Returns:
+>  A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+>  number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+>  type must be same for each vcpu. As a PPI, the interrupt number is the same for
+> -all vcpus, while as an SPI it must be a separate number per vcpu.
+> +all vcpus, while as an SPI it must be a separate number per vcpu. For
+> +GICv5-based guests, the architected PPI (23) must be used.
 >  
->  /* Return an invalid value to a given ftr_bits an ftr value */
-> -uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
-> +uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr,
-> +			   bool *skip)
->  {
->  	uint64_t ftr_max = ftr_bits->mask >> ftr_bits->shift;
+>  1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+>  ---------------------------------------
+> @@ -50,7 +51,7 @@ Returns:
+>  	 -EEXIST  Interrupt number already used
+>  	 -ENODEV  PMUv3 not supported or GIC not initialized
+>  	 -ENXIO   PMUv3 not supported, missing VCPU feature or interrupt
+> -		  number not set
+> +		  number not set (non-GICv5 guests, only)
+>  	 -EBUSY   PMUv3 already initialized
+>  	 =======  ======================================================
 >  
-> -	TEST_ASSERT(ftr_max > 1, "This test doesn't support single bit features");
-> +	*skip = false;
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index afc838ea2503e..ba7f22b636040 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -962,8 +962,13 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>  		if (!vgic_initialized(vcpu->kvm))
+>  			return -ENODEV;
 >  
->  	if (ftr_bits->sign == FTR_UNSIGNED) {
->  		switch (ftr_bits->type) {
-> @@ -330,42 +331,72 @@ uint64_t get_invalid_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
->  			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-
-Don't you want the check you've got in the signed case here to deal with
-safe_val or ftr being equal to ftr_max. In the 1 bit case we there won't
-be any invalid values if the safe_val and ftr are different.
-
->  			break;
->  		case FTR_LOWER_SAFE:
-> +			if (ftr == ftr_max)
-> +				*skip = true;
->  			ftr++;
->  			break;
->  		case FTR_HIGHER_SAFE:
-> +			if (ftr == 0)
-> +				*skip = true;
->  			ftr--;
->  			break;
->  		case FTR_HIGHER_OR_ZERO_SAFE:
-> -			if (ftr == 0)
-> +			switch (ftr) {
-> +			case 0:
->  				ftr = ftr_max;
-> -			else
-> +				break;
-> +			case 1:
-> +				*skip = true;
-> +				break;
-> +			default:
->  				ftr--;
-> -			break;
-> +				break;
-> +			}
-
-Missing break for the outer switch statement.
-
->  		default:
-> +			*skip = true;
->  			break;
->  		}
->  	} else if (ftr != ftr_max) {
->  		switch (ftr_bits->type) {
->  		case FTR_EXACT:
->  			ftr = max((uint64_t)ftr_bits->safe_val + 1, ftr + 1);
-> +			if (ftr > ftr_max)
-> +				*skip = true;
->  			break;
->  		case FTR_LOWER_SAFE:
-> -			ftr++;
-> +			if (ftr == ftr_max)
-> +				*skip = true;
-
-This is the opposite condition of the enclosing else if.
-
-> +			else
-> +				ftr++;
->  			break;
->  		case FTR_HIGHER_SAFE:
-> -			ftr--;
-> -			break;
-> -		case FTR_HIGHER_OR_ZERO_SAFE:
->  			if (ftr == 0)
-> -				ftr = ftr_max - 1;
-> +				*skip = true;
-
-Isn't ftr_max, -1, invalid in FTR_HIGHER_SAFE case when ftr is 0. Also,
-need to check for the actual highest.
-
->  			else
->  				ftr--;
->  			break;
-> +		case FTR_HIGHER_OR_ZERO_SAFE:
-> +			switch (ftr) {
-> +			case 0:
-> +				if (ftr_max > 1)
-> +					ftr = ftr_max - 1;
-> +				else
-> +					*skip = true;
-> +				break;
-> +			case 1:
-> +				*skip = true;
-> +				break;
-> +			default:
-> +				ftr--;
-> +				break;
-> +			break;
-> +			}
->  		default:
-> +			*skip = true;
->  			break;
->  		}
->  	} else {
-> -		ftr = 0;
-> +		*skip = true;
-
-Why do we always skip when signed and ftr is -1? Wouldn't 0 be an
-invalid in the FTR_LOWER_SAFE case.
-
->  	}
+> -		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> -			return -ENXIO;
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu)) {
+> +			if (!vgic_is_v5(vcpu->kvm))
+> +				return -ENXIO;
+> +
+> +			/* Use the architected irq number for GICv5. */
+> +			vcpu->arch.pmu.irq_num = KVM_ARMV8_PMU_GICV5_IRQ;
+> +		}
 >  
->  	return ftr;
-> @@ -400,12 +431,15 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, uint64_t reg,
->  	uint8_t shift = ftr_bits->shift;
->  	uint64_t mask = ftr_bits->mask;
->  	uint64_t val, old_val, ftr;
-> +	bool skip;
->  	int r;
+>  		ret = kvm_vgic_set_owner(vcpu, vcpu->arch.pmu.irq_num,
+>  					 &vcpu->arch.pmu);
+> @@ -988,6 +993,10 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+>  	unsigned long i;
+>  	struct kvm_vcpu *vcpu;
 >  
->  	val = vcpu_get_reg(vcpu, reg);
->  	ftr = (val & mask) >> shift;
+> +	/* On GICv5, the PMUIRQ is architecturally mandated to be PPI 23 */
+> +	if (vgic_is_v5(kvm) && irq != KVM_ARMV8_PMU_GICV5_IRQ)
+> +		return false;
+> +
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (!kvm_arm_pmu_irq_initialized(vcpu))
+>  			continue;
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 96754b51b4116..0a36a3d5c8944 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -12,6 +12,9 @@
 >  
-> -	ftr = get_invalid_value(ftr_bits, ftr);
-> +	ftr = get_invalid_value(ftr_bits, ftr, &skip);
-> +	if (skip)
-> +		return;
+>  #define KVM_ARMV8_PMU_MAX_COUNTERS	32
 >  
->  	old_val = val;
->  	ftr <<= shift;
-> 
-
-
-Thanks,
-
-Ben
-
+> +/* PPI #23 - architecturally specified for GICv5 */
+> +#define KVM_ARMV8_PMU_GICV5_IRQ		0x20000017
+> +
+>  #if IS_ENABLED(CONFIG_HW_PERF_EVENTS) && IS_ENABLED(CONFIG_KVM)
+>  struct kvm_pmc {
+>  	u8 idx;	/* index into the pmu->pmc array */
+> @@ -38,7 +41,7 @@ struct arm_pmu_entry {
+>  };
+>  
+>  bool kvm_supports_guest_pmuv3(void);
+> -#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+> +#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num != 0)
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+>  void kvm_pmu_set_counter_value_user(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+> -- 
+> 2.34.1
