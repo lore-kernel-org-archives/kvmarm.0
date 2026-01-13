@@ -1,256 +1,226 @@
-Received: from mail-dl1-f74.google.com (mail-dl1-f74.google.com [74.125.82.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9228F3815C4
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 19:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768333476; cv=none; b=jkXx2YJemm7sDeLdcZ/pCRDsiBhWrjvSKKGj/wRJVO2Ve5Yr+NP1d+j6oRyidNUQUufL4aXq4WkaZxrCnZqY1SuJ+9wlaMqzBnu3zdEXnNeWAvaquzZVWkvnM/IZuIDoaSWSFyaFm0XXIQ2LJjDbskKW8bZ4xHr9pEPTvLj64Vo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768333476; c=relaxed/simple;
-	bh=9beGvur0hQMCRdqdbzjjb80dUCVbPaoiYXiOUDD3dNM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AWHpI0ZG6L570vhBcIWnCWv6nh1GLO4mG5SLtkiB+uIf8jHkUwWv1RQ01be5TOf1g6iNsr+qtiarxaSuYsoylNnwLSz89IY9QeJBExGBTVGoBtJHheBLAgpUMl1tWQTzGGV6YuBhdY8Z8pH/ZGt8y6DdCeuvNa53Q0ZTfoF+9D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pekangas.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DC4LIqEu; arc=none smtp.client-ip=74.125.82.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pekangas.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC252F3608
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 22:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768342775; cv=fail; b=UpCsrmA1xzv2+xd+lRPnsj/g9A8tWEjkWld3YgM9MWjkcwOuQysZR/YnBe8CdaJYvoKaweS6ko6ykvng6eSqBeuwkA0M2LMWZAbznPMg+Fbb5HtUveS1J1VlxJToFPZFnN91mVEvLJcyd7vmrVHtAXdKWsUOvLPMolMqA7xtFvs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768342775; c=relaxed/simple;
+	bh=qL9gcuo8umnhxF+PTeU5/x5XH7Evu5gmXADmbtKl7u4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=i/dlIur26igCtw5K1FL8MWZahIaaDhgS2oY4cWAb4ol7ASmQWCGg5DVF0fWz0BQi23PEWp6Sb1cYE8c8tvv/iqXqmTh4++WjVnavhBuMwM9Zml7tZvabT48L9D0KswSBTHUhIUGTx5lXWp4DQQ7eZoFB3u3hhSIMGEShFI69qXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cWtwiC+m; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DC4LIqEu"
-Received: by mail-dl1-f74.google.com with SMTP id a92af1059eb24-11dd10b03d9so10450010c88.0
-        for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 11:44:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768333474; x=1768938274; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ho649RqPWtDKTBK/otaPjQ2vodB52aFfCurSi2+zmns=;
-        b=DC4LIqEuXT5Fe4o6FgmB6QGkW53xLQ4CEpVfMvRPdKsgtLyNbhWVtRfrvitxkdPJLg
-         9bdZWt8FPHD0H+y8wkDyv5MYGRL2KXJvS888LaMUu0WHJl2TBXp4qqcomqed4iHxNWmK
-         TGOh8dTmCPuvruPhOdo6ya6XnwwTL4lWzIcgspbmpXpesF1AokTnnML07ZId/mF/x3Mh
-         10ihqiNyPGRIL4rHuUTK2hJMEXqrs7tF0aH8e1f5ddrwDtV9u876J6ubg3Y7x+S34XLB
-         s1L1/Qj5E+vwbv9jKMtgcxOHaKS40/VrmtOcJZPPmJCQzGFHjT/IQ9+/htKQCO59Cugt
-         Wypg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768333474; x=1768938274;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ho649RqPWtDKTBK/otaPjQ2vodB52aFfCurSi2+zmns=;
-        b=uUeh12kViKcw8UJc8MgFGg6VnjvwZgtW428QjCTw6mGh+JqbJMLhWTLCtl8mL+4oGk
-         X5wC5YpTXzilbeHOaOKZFq2935UWNc/RGRUKZSYheRcPrTO5tc25Owb1PtuqrLsqqQgq
-         O/dPUe1jyrlJmzeDz6ImycABgBG0VtbkWtfkIOtAeum99jKPxOnjLgQoKLnBKOdvPOJI
-         UT5Vm/icxaPir5XgF6JwFJm51DBPfJ/OZBdaz0JvgUiUxrpJZZpNtq0irfdpySPhMT3C
-         6GKMUXH92YoLuVpm4oXkzQEJDQ7WCp0d/35+6OoVAaVyoukzlB16lB2x2nicxzxFytvV
-         11fw==
-X-Gm-Message-State: AOJu0Yy6Uxgxj9h5Wg5WjKilf4p3LPF3s0KUcFEZF0Y5hqmF/bD4zGU1
-	Wj7mwxVe8YEm4GaMoUHeXbBakIxz6QdJLRkjnqxK5YWfgWv9JxVXm7iUdEFqJhisFfDBhru5A53
-	ZFHUzhxGfm0jHJBZ3kMeU1NULhylWqCvdgqkH8+Jj27t0ssDBaF6KnAIp7Pc0p6bJUH75sROO6Z
-	oPEQsWbIaZk5L4BhMq0Sxw/48+GqHoU3eKv19E4XKgkb7SOXU=
-X-Received: from dlbcq13.prod.google.com ([2002:a05:7022:248d:b0:11d:cf4c:62ab])
- (user=pekangas job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:701b:220b:b0:119:e56b:98bf with SMTP id a92af1059eb24-12336a82526mr109229c88.38.1768333473633;
- Tue, 13 Jan 2026 11:44:33 -0800 (PST)
-Date: Tue, 13 Jan 2026 19:44:09 +0000
-In-Reply-To: <20260113194409.2970324-1-pekangas@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cWtwiC+m"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1768342774; x=1799878774;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qL9gcuo8umnhxF+PTeU5/x5XH7Evu5gmXADmbtKl7u4=;
+  b=cWtwiC+mVJ2fJXghmWvD6bkKjRr4iJxUOO84Z8cmjVfRvFmw4g203Qf7
+   vEFNxPZj65SdIUezH7JxBIAZAnaMlnbBQASGEb77Vwr51GkevrmFJauez
+   CsqXVe+ap2cwb8ZOd+qyxJgq1IqyfRgA9532iypAvByp313xkidIOVm7U
+   qC97Ggm2HZIm0ZoIRHbrRtAprg8WEOIv2jRMSNaWzNLIAQ2x4LZm+o4Av
+   wqbfS2y6Lb3Hy2nQe5UtUuRrVNYI3uzeE3P8+fqUmwrdTzWXOBPlC3+xe
+   zfrJjqpJbaFwHZfrOPxFBx3xf1QushHu0ro4JLMrIgsVUOn1EhJ1lsfmK
+   Q==;
+X-CSE-ConnectionGUID: ofBefmzsTFyBGojng6R9+Q==
+X-CSE-MsgGUID: YvM+27atQAqgp3buMwGP1g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11670"; a="80360290"
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="80360290"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:19:33 -0800
+X-CSE-ConnectionGUID: Jz4jOFKAQcq7+REO+HqMbQ==
+X-CSE-MsgGUID: 9AJ0epMKTYWlyqoeBJDKZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,224,1763452800"; 
+   d="scan'208";a="209030668"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2026 14:19:33 -0800
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 14:19:31 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Tue, 13 Jan 2026 14:19:31 -0800
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.16) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 13 Jan 2026 14:19:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vkNgEzqi5GNlVKSbxAbxNBR6Ar9drUvivO9vMJ7kOR44/lnA9VTjaTWwHxoN44QPQbGH+23e0bBNRMNVjZkIXvg70HERoedwHla1kUhFxNKm/ILOeUHS2VO+7qi/IZdjD8OtfBUFu3h1ahsTE86ZNK7Y4E/QI/ZPcJDnvEnis0T2vKK9lTDgfwAdfTJU8aAav2ZVe7R7rVC2yhKWCrde+bVO2zrc7cAYIjW1IYtHznJbWrcBCmVxiQBGvv8py8U7moUNdB9NQh90uvwx0SWMK+1p5ylkKaW0paZ1oKpMfsUH7YHv7M+kCrbPaXjnE9BLHWPR+JQx6Ef5WZ7mDV+OyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B/U0fWtnqJfPO9QOGMxWQYPMN3lnCTPVy72s8Zg4oSI=;
+ b=ZlP6JMN9APjZXQ3kk5A3EaSIXzjCFe1BdhThMEOV2l0WlmNmNRIozWg73s86erYIt1z3NlN9tt90glticmU+gWnVu/JWGDxdJ9quaP3RhJY7xs1+Ab9dToVxh1N6/BbOPOU61JTvh7h70CvKrRNwzwj1ejsu+KKLk5kBM6vjsVr3Mr1suixg9mh37dG9SrWCPC//iB+Wf1BWusfktA9pYz44H+C4OLqk4xcgXSNWYrHW/c7CfGYyUvO6w9OktN0XhpnFkwiZbE+vaHQHdxxCuqOlOf5BSJvOpf9jYAxXghazb0ZpbvsjiUWZjJ4qvG7UP2j0/Vrgr0M2Wa/g7dI2tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7566.namprd11.prod.outlook.com (2603:10b6:806:34d::7)
+ by CY8PR11MB7265.namprd11.prod.outlook.com (2603:10b6:930:98::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9499.7; Tue, 13 Jan
+ 2026 22:19:29 +0000
+Received: from SN7PR11MB7566.namprd11.prod.outlook.com
+ ([fe80::eccb:f6e0:36cd:a989]) by SN7PR11MB7566.namprd11.prod.outlook.com
+ ([fe80::eccb:f6e0:36cd:a989%5]) with mapi id 15.20.9499.005; Tue, 13 Jan 2026
+ 22:19:28 +0000
+Message-ID: <a48260d0-108c-470f-be72-1fd5235cf136@intel.com>
+Date: Tue, 13 Jan 2026 14:18:48 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 27/47] arm_mpam: resctrl: Add support for 'MB' resource
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <rohit.mathew@arm.com>,
+	<scott@os.amperecomputing.com>, <sdonthineni@nvidia.com>,
+	<tan.shaopeng@fujitsu.com>, <xhao@linux.alibaba.com>,
+	<catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
+	<maz@kernel.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
+	<suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>, Zeng Heng
+	<zengheng4@huawei.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-28-ben.horgan@arm.com>
+Content-Language: en-US
+From: Reinette Chatre <reinette.chatre@intel.com>
+In-Reply-To: <20260112165914.4086692-28-ben.horgan@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0232.namprd04.prod.outlook.com
+ (2603:10b6:303:87::27) To SN7PR11MB7566.namprd11.prod.outlook.com
+ (2603:10b6:806:34d::7)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260113194409.2970324-1-pekangas@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260113194409.2970324-2-pekangas@google.com>
-Subject: [PATCH v2 1/1] KVM: arm64: Calculate hyp VA size only once
-From: Petteri Kangaslampi <pekangas@google.com>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Vincent Donnefort <vdonnefort@google.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Petteri Kangaslampi <pekangas@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7566:EE_|CY8PR11MB7265:EE_
+X-MS-Office365-Filtering-Correlation-Id: 87cc2b7c-65f5-4535-420a-08de52f1d13d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?amRZVTlnODZydWtIRVF3Qjhid3FPUEpERzdLODZMNEVZTEV3WFBRdUgrZEZN?=
+ =?utf-8?B?ZHRUMnRiUURsb2lJd1hod0RtenhDMW40czI3TFF2bURBdkpQa3l1N2pPNnIw?=
+ =?utf-8?B?U0p6WTRkTG1UYnNnbzd6WHg4QktpME4xSUFNZEdOR2tPZnFDM3ZPL2pkcGY2?=
+ =?utf-8?B?bjBndXlwZGxiVE43R3hQZEh6WVVEVFA5UWNpMldVU3VwbWN3QkNnRTJDcVov?=
+ =?utf-8?B?U0xaMzd0NUEyVGYrSjJIRTlhenEwV0JtVGx4WXNQYjRxVDFJZG1XeEVhRTM0?=
+ =?utf-8?B?YWo4SFFuM3dobjBmLytEQnZuQTRKUzJJb2xJbE5NanNTdWFsRUdQZlZkaVBH?=
+ =?utf-8?B?TEJyNEwybFVaNVhmelRWbnV0WnV6TWladEVnd3RMMzBDbmhMTy9tNk9GRXZ4?=
+ =?utf-8?B?YVQxb0N4U0FPR2dObDZEaTdoZHFNMkxyeU5XUjhEMGtNVWZObnFOK3oyc0lQ?=
+ =?utf-8?B?WTJrc1FFYWZDN3kzUmlTN3gvMFJlV1FORUwra0srYWpzek42WWZQZUxmZGxw?=
+ =?utf-8?B?eWtyblF0SjAzWG9IUjdVWGVEN3p6Q2pRdXVWYXlDa1ZaZFluK0lPQlRnMlRD?=
+ =?utf-8?B?SnY1YnZvUnVWcTFwZDFHTnhzS0lsZUE0TFdzK1NrNEk4L21YblFjRnNiS0tw?=
+ =?utf-8?B?OEpCQk1DS1ZTcGZZZEFQK3Q2YzZQb3RKd0hwV2ovSlFnMFViRytxalkyc3NV?=
+ =?utf-8?B?MWs2MlBWVkxZWDY3bVhhQlZ1b2pmQTJUSy90dkJYWlN1V29mMS9YMWdyblFT?=
+ =?utf-8?B?aXAwVzRxdTk4UEdQR3JwNzFDdktVRlBCUis5N0NRMlFxQmpLemtSSjkxTFVU?=
+ =?utf-8?B?aW44WnNhZ2daVVV1THd6bFVqOWFOVUluVDdGbExWc3EzTy9lZzNuV0RDV3pJ?=
+ =?utf-8?B?aUlPUXY0SndTTFd0M2g5aHVXOFZSekJmZTF3ejZkRVF1MjhzR3lSOXRUNUR2?=
+ =?utf-8?B?NmlMNkhjeUxTbHh3bGUzM0xwQ3BBandxK0ZQdFJtR1dYZnFTVmsrMFlCQTRq?=
+ =?utf-8?B?MDJYZUF1eElpblN0RTV3Wlp4d3B6MmNJbHhZWWl2VDZzU0o0czYraWRwU1d3?=
+ =?utf-8?B?emxKVW9oQ1RPb0VPSGw3VkhqWVRCQ1AzcXJMbGJ3OGx1ME8zNUxjcjByOStE?=
+ =?utf-8?B?MjNxMGV5cUFLTUVuMmtRd2NBTm1YeW5oVmpmeitWUVZWL3RqL09DUE51UzZO?=
+ =?utf-8?B?WkFpaytoM0JzZERibWxkV1A2TmtPdzM3emZqa3VXSGhJNkVRWXFqcDRvRmtp?=
+ =?utf-8?B?bTN0azdkUWl0TmRMTEI5RkN6Vy91eFRkbFhoVFJCWWlyK3VwbnllblNOejZB?=
+ =?utf-8?B?UmxqRCtVRFlyd1diNzhFbkJna3BuUVhjQ1NRd21sR3UzaWpiQVJuN1JxZHJH?=
+ =?utf-8?B?WGdmK0ZWT3RCVDBUbkxxNys0MGxodTZDWi9FMDNqUHFnYnJvS2g4Y2VsTEd1?=
+ =?utf-8?B?R20xcXRSN2RJRFNnTTluVEJUS0gzaE5teCtFS0NVbTh4Yk44OHVDUDdLUytz?=
+ =?utf-8?B?dis1TFFXa09oS1NVaHlaM0FoYWhEVnZyR3BNWmI1M1BDUnhmSEsvVjJ5NGk3?=
+ =?utf-8?B?YXVOa0RyeGk2c3NWblBOdjdzdWd2V2V5MWhGSlB4TE8xSHhVWEdRYjBvczBN?=
+ =?utf-8?B?QXhFd2Zkb2pPRFI0em0yZ0JydE9BQ29iNExXU2k0YXd3cHdBZFpXbU5xVEhO?=
+ =?utf-8?B?U3h0ZkkvWkRxNFdzck5TcFR0UnByU0RUVGJPUi9nU0h3ZXFIZUo4VjNzSmZQ?=
+ =?utf-8?B?K0VjOERIL0ZWeUdOcVZ2d1pITFpQMHNkQWx1WjdBdmdVYU9YdFFwTFlMbmlK?=
+ =?utf-8?B?WmdtUHdJZnVUMWVlM3RoM0p1dUluSXVLdjdVMEJ2cTdFQnp6UmVNTC9iUFdH?=
+ =?utf-8?B?VkpWM2V3QVo1Q0xsZHJhQmphUkJ1NmVrYncxTnEzSnlSRUMvMDBlUC9jdWtL?=
+ =?utf-8?B?V1NqNVNSNlZNQ0tmMUp3MWZpdWtHTWlTL2Z1UnlTYnJPYzl0T05CeGJrTW5R?=
+ =?utf-8?B?Mzh4WmxhcWFBPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7566.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RkU1SFF1RGZtUFVLUDBaOCtMUGF5VGZSZGdVSkp6dkUrRDI0VXRaUXBuRmNw?=
+ =?utf-8?B?OVZ6Wk81SitDNnFVV0xiMjVrc1RUYlRKUEZyaEZGSFpTcUJ1S29Wa25SVkdE?=
+ =?utf-8?B?bXlMYnNLcjhPenllcnp0a0s3YnpVd2czSHU5dHppZ1ZtOXpFa1FHM2YvL3hh?=
+ =?utf-8?B?V01YbEtkNEVySGw5bTVZMHRpY3BYbU0yMWp1cUk3SkQrUHJsSlNEckJ4dUk4?=
+ =?utf-8?B?Tk1tdDhtZysxcTd6WWRQdkJMVitsU1J0Zzhad0E3aFdxeW1CZHVxQW5LZkFB?=
+ =?utf-8?B?ZXhmVkZFRUY5N0Mvc3N5aG9TeXdENjY4ZWFacHQydzNNS3Q4UVBOa1dZN0Vq?=
+ =?utf-8?B?elV5L2I0SEFUSGs1akxHWHpmajVPN3Z2SDZhYjZxdGdpdm5iVmhmNjJDdGp1?=
+ =?utf-8?B?OFpMYlNXQ3IvZjE1bU9ZcFlUanNaMy9OME5EZTZyai9SYURtSW1BdGtiMndQ?=
+ =?utf-8?B?NytBOTZvK29PcG1uRW1vZVlnY2ZMSUFwUzRQV3VyS0cvcXpOcVRnVGpmbW4v?=
+ =?utf-8?B?T3ZzRitXNUFiUjdsUmY0MGZOaGdSRkZrM0RDaFhaMjBDbVg3NkJ2QjlpSEQw?=
+ =?utf-8?B?U1hXLzFlcWZseGJnbEhjN3BKMEw4cHo1NnQwTW5yd21Seno2K2tzT0VRUnV5?=
+ =?utf-8?B?ODZkT1BrTkRBcVJIVkozSkRCY1YwT3RNVkdJV3RIK09MQkp3T0lVTEJvalVh?=
+ =?utf-8?B?NmttN3QzTjJ1U1IxMnhNUVhXUnAyUjh5RmYwdjIwM3d1NTBWSUZRejlpMkph?=
+ =?utf-8?B?eS9haWcxQkdxajFjdUErc0xHeXVGWDZUUUsyd0grZ20rS3E4WjR2SVZPenh0?=
+ =?utf-8?B?ZXdLNlZCU25uNVBqVmRCZTFqWXNXTS96eWltejdSVCsra3J2dzdZeUJBOWVh?=
+ =?utf-8?B?bXlJeEZadXcweUJQQVR2bzljUXhxc2ZYVnBNR3FvMlJMSkwzZFlNMlh1OGpR?=
+ =?utf-8?B?ZkpaVXZmQTBwMHBLaUc3cHlVVTRSRGp2U2FHclFUWUdDVnhYMTNBWXhnMTRt?=
+ =?utf-8?B?dlF0WkQxRWtUQW8xd25vd3VQWCs2cG5Vb1NaaStHWFA2NkliQUIxVWNDOUFm?=
+ =?utf-8?B?eEROZXc5ODVMUmx2V3lHUEFNaGYyaXA4VndxVmJ0RkMxSlRkN2taandZZHla?=
+ =?utf-8?B?dWsvVk1FZXoxSDB5RDdMWlErdmM0MVc3MTJCcnBKdHlwdVk5aGROT0FMZEZh?=
+ =?utf-8?B?MTJKT2I3cm4zQVdWTk5SWFFoaEVvZnd1ek9YK2xOeVpua0E0bng2VWdnZlJL?=
+ =?utf-8?B?V2JJTUR5cjcvSVE2WGF4L3NyZFdwUzVabGFaN01VSnQ5OStLcTRCU1JRYWdq?=
+ =?utf-8?B?ZCs5UVVoWC9UZk11WDdFTmhNODNMYkJUN21qL2Mzd1I0VTdyS1RzeWhHQS8v?=
+ =?utf-8?B?WU91U0lDa3J3VGpXMmw3OHFCME5jZzRJOXFwanhUcy9CQkk1ZldicncwL3Nk?=
+ =?utf-8?B?SVJjTFVRaW9oNTNsdDVKa3E0QnA0T2tnTExvdUhJUDVyVlhaQnNTT0YySCtl?=
+ =?utf-8?B?S2pWakR1cE93d21rQlR1Q29HNElLejNVLzRYOVhjOU9zdDZiaUloZzdiNCt6?=
+ =?utf-8?B?RFFkdTJEc3pCNGpXaUIrZS92a05jTnRTTENFakw2NFAwK3VxOW12akVMTldI?=
+ =?utf-8?B?NGs5VmRuS3hPNUJwUkFldnNORkhSQ2NGVlp3Q1hqU2lta2I1M0ppYmtiNk9J?=
+ =?utf-8?B?akdqYWR0cHYzOXowSnIvKzNLOXpvRitMZ1ZFK2NkSnFsQmh6UUJqRlZaY3RL?=
+ =?utf-8?B?RGVFUFFSQVh5NDF1amwwVjdkMFBFcGZoWTNxRVM3UGpjeFRINURhRTVBOEc2?=
+ =?utf-8?B?Vkp1b2lobkV2WTAraExRQnc3RFZ2aG9IMFNHVGhXdXhIVmswOWo1cEk0TDd6?=
+ =?utf-8?B?cllFamN2elF2WG95VnU0ZVo0UWxBK3Erck5URTUwUXJrUEZJU3dkWjJ2S2Zn?=
+ =?utf-8?B?bkF1QVFtcjl3ai81eTg2czRxYjhLcitXSTU0RGxxZmhQYlNGVGJTWSs2enNj?=
+ =?utf-8?B?SlVMQmtoQjlkTm04RjJtbjFpUUFuZlF0Z0xyQXZMbGx5MDdtNlZYMkRPMjg2?=
+ =?utf-8?B?Vk5mbXlrVlphU3l6UEhhZUZQUCsyMWxDd21Demh1MXdlczlSUzk1b0QxS3RK?=
+ =?utf-8?B?LzAwdGM1aGI3bEZvRmRJNTB1d3oydnh0TVdUd1dmME15TlBMeExiYnNsQXpl?=
+ =?utf-8?B?aGV1Z0VRRjlYRWt5Z2lYVnpaOWRPWjg4QkpFWXdQS1lZY0FTZWdFMENGbUhX?=
+ =?utf-8?B?WXlaWVo0MEJ6QitPM2pZdXhXVmtLdXlXTWQvc1ZGMjVxVHpLS3JIVG1QUVRT?=
+ =?utf-8?B?Q0pLOG9GcEpkaUNsbm82a1hPbld3SjJEcGtkMktkWEp0RE1Ga0hKbWI1UzhG?=
+ =?utf-8?Q?zddy4xQO4paKkVCQ=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87cc2b7c-65f5-4535-420a-08de52f1d13d
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7566.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2026 22:19:28.8512
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wF+QgsleYNJESBeFe+gozNNERAvlV4tpytqJfW75E9SaTRiZlm0jwkjPncJ1tMsX0dAfafMKIat1Vl8IoqsC1PaOaVpjR0G8xPW2TD5kcSM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7265
+X-OriginatorOrg: intel.com
 
-Calculate the hypervisor's VA size only once to maintain consistency
-between the memory layout and MMU initialization logic. Previously the
-two would be inconsistent when the kernel is configured for less than
-IDMAP_VA_BITS of VA space.
+Hi Ben,
 
-Signed-off-by: Petteri Kangaslampi <pekangas@google.com>
----
- arch/arm64/include/asm/kvm_mmu.h |  3 ++-
- arch/arm64/kvm/arm.c             |  4 ++--
- arch/arm64/kvm/mmu.c             | 28 ++++-----------------------
- arch/arm64/kvm/va_layout.c       | 33 +++++++++++++++++++++++++++-----
- 4 files changed, 36 insertions(+), 32 deletions(-)
+On 1/12/26 8:58 AM, Ben Horgan wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> resctrl supports 'MB', as a percentage throttling of traffic somewhere
+> after the L3. This is the control that mba_sc uses, so ideally the class
+> chosen should be as close as possible to the counters used for mba_local.
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 2dc5e6e742bb..d968aca0461a 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -103,6 +103,7 @@ alternative_cb_end
- void kvm_update_va_mask(struct alt_instr *alt,
- 			__le32 *origptr, __le32 *updptr, int nr_inst);
- void kvm_compute_layout(void);
-+u32 kvm_hyp_va_bits(void);
- void kvm_apply_hyp_relocations(void);
- 
- #define __hyp_pa(x) (((phys_addr_t)(x)) + hyp_physvirt_offset)
-@@ -185,7 +186,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
- 
- phys_addr_t kvm_mmu_get_httbr(void);
- phys_addr_t kvm_get_idmap_vector(void);
--int __init kvm_mmu_init(u32 *hyp_va_bits);
-+int __init kvm_mmu_init(u32 hyp_va_bits);
- 
- static inline void *__kvm_vector_slot2addr(void *base,
- 					   enum arm64_hyp_spectre_vector slot)
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4f80da0c0d1d..4703f0e15102 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2568,7 +2568,7 @@ static void pkvm_hyp_init_ptrauth(void)
- /* Inits Hyp-mode on all online CPUs */
- static int __init init_hyp_mode(void)
- {
--	u32 hyp_va_bits;
-+	u32 hyp_va_bits = kvm_hyp_va_bits();
- 	int cpu;
- 	int err = -ENOMEM;
- 
-@@ -2582,7 +2582,7 @@ static int __init init_hyp_mode(void)
- 	/*
- 	 * Allocate Hyp PGD and setup Hyp identity mapping
- 	 */
--	err = kvm_mmu_init(&hyp_va_bits);
-+	err = kvm_mmu_init(hyp_va_bits);
- 	if (err)
- 		goto out_err;
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 48d7c372a4cd..d5a506c99f73 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -2284,11 +2284,9 @@ static struct kvm_pgtable_mm_ops kvm_hyp_mm_ops = {
- 	.virt_to_phys		= kvm_host_pa,
- };
- 
--int __init kvm_mmu_init(u32 *hyp_va_bits)
-+int __init kvm_mmu_init(u32 hyp_va_bits)
- {
- 	int err;
--	u32 idmap_bits;
--	u32 kernel_bits;
- 
- 	hyp_idmap_start = __pa_symbol(__hyp_idmap_text_start);
- 	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
-@@ -2302,25 +2300,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
- 	 */
- 	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
- 
--	/*
--	 * The ID map is always configured for 48 bits of translation, which
--	 * may be fewer than the number of VA bits used by the regular kernel
--	 * stage 1, when VA_BITS=52.
--	 *
--	 * At EL2, there is only one TTBR register, and we can't switch between
--	 * translation tables *and* update TCR_EL2.T0SZ at the same time. Bottom
--	 * line: we need to use the extended range with *both* our translation
--	 * tables.
--	 *
--	 * So use the maximum of the idmap VA bits and the regular kernel stage
--	 * 1 VA bits to assure that the hypervisor can both ID map its code page
--	 * and map any kernel memory.
--	 */
--	idmap_bits = IDMAP_VA_BITS;
--	kernel_bits = vabits_actual;
--	*hyp_va_bits = max(idmap_bits, kernel_bits);
--
--	kvm_debug("Using %u-bit virtual addresses at EL2\n", *hyp_va_bits);
-+	kvm_debug("Using %u-bit virtual addresses at EL2\n", hyp_va_bits);
- 	kvm_debug("IDMAP page: %lx\n", hyp_idmap_start);
- 	kvm_debug("HYP VA range: %lx:%lx\n",
- 		  kern_hyp_va(PAGE_OFFSET),
-@@ -2345,7 +2325,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
- 		goto out;
- 	}
- 
--	err = kvm_pgtable_hyp_init(hyp_pgtable, *hyp_va_bits, &kvm_hyp_mm_ops);
-+	err = kvm_pgtable_hyp_init(hyp_pgtable, hyp_va_bits, &kvm_hyp_mm_ops);
- 	if (err)
- 		goto out_free_pgtable;
- 
-@@ -2354,7 +2334,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
- 		goto out_destroy_pgtable;
- 
- 	io_map_base = hyp_idmap_start;
--	__hyp_va_bits = *hyp_va_bits;
-+	__hyp_va_bits = hyp_va_bits;
- 	return 0;
- 
- out_destroy_pgtable:
-diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-index 91b22a014610..2346f9435a71 100644
---- a/arch/arm64/kvm/va_layout.c
-+++ b/arch/arm64/kvm/va_layout.c
-@@ -46,9 +46,31 @@ static void init_hyp_physvirt_offset(void)
- 	hyp_physvirt_offset = (s64)__pa(kern_va) - (s64)hyp_va;
- }
- 
-+/*
-+ * Calculate the actual VA size used by the hypervisor
-+ */
-+__init u32 kvm_hyp_va_bits(void)
-+{
-+	/*
-+	 * The ID map is always configured for 48 bits of translation, which may
-+	 * be different from the number of VA bits used by the regular kernel
-+	 * stage 1.
-+	 *
-+	 * At EL2, there is only one TTBR register, and we can't switch between
-+	 * translation tables *and* update TCR_EL2.T0SZ at the same time. Bottom
-+	 * line: we need to use the extended range with *both* our translation
-+	 * tables.
-+	 *
-+	 * So use the maximum of the idmap VA bits and the regular kernel stage
-+	 * 1 VA bits as the hypervisor VA size to assure that the hypervisor can
-+	 * both ID map its code page and map any kernel memory.
-+	 */
-+	return max(IDMAP_VA_BITS, vabits_actual);
-+}
-+
- /*
-  * We want to generate a hyp VA with the following format (with V ==
-- * vabits_actual):
-+ * hypervisor VA bits):
-  *
-  *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
-  *  ---------------------------------------------------------
-@@ -61,10 +83,11 @@ __init void kvm_compute_layout(void)
- {
- 	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
- 	u64 hyp_va_msb;
-+	u32 hyp_va_bits = kvm_hyp_va_bits();
- 
- 	/* Where is my RAM region? */
--	hyp_va_msb  = idmap_addr & BIT(vabits_actual - 1);
--	hyp_va_msb ^= BIT(vabits_actual - 1);
-+	hyp_va_msb  = idmap_addr & BIT(hyp_va_bits - 1);
-+	hyp_va_msb ^= BIT(hyp_va_bits - 1);
- 
- 	tag_lsb = fls64((u64)phys_to_virt(memblock_start_of_DRAM()) ^
- 			(u64)(high_memory - 1));
-@@ -72,9 +95,9 @@ __init void kvm_compute_layout(void)
- 	va_mask = GENMASK_ULL(tag_lsb - 1, 0);
- 	tag_val = hyp_va_msb;
- 
--	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && tag_lsb != (vabits_actual - 1)) {
-+	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && tag_lsb != (hyp_va_bits - 1)) {
- 		/* We have some free bits to insert a random tag. */
--		tag_val |= get_random_long() & GENMASK_ULL(vabits_actual - 2, tag_lsb);
-+		tag_val |= get_random_long() & GENMASK_ULL(hyp_va_bits - 2, tag_lsb);
- 	}
- 	tag_val >>= tag_lsb;
- 
--- 
-2.52.0.457.g6b5491de43-goog
+fyi ... [1] enabled total memory bandwidth to also be used as input to
+software controller and additionally enabled user space to set per resource group
+which memory bandwidth event is used as input to the software controller.
+
+Reinette
+
+[1] https://lore.kernel.org/all/20241206163148.83828-1-tony.luck@intel.com/
+
 
