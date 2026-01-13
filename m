@@ -1,41 +1,37 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D7338F23D
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 12:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED9D38E5FB
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 12:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768306617; cv=none; b=YfQcE7xapUJTf55CY6lJdFV1H4Lrr03yrrTDPLznflKrfzd9pNUqaFRMixFIWoIiGI7askk84/frNPTU5X83BvZpSUclB/ZPucRTD5OBxiayQQmMtmWHSvYgEzPY8Kr7YjpdEsvH3vPibL5lh+hn7EBim+NwDkJoIiHcsLIGUCs=
+	t=1768308511; cv=none; b=ACsS+SA4U6Vsyeo/R5pxtNZPHWo5XmJIBgZ/vsfz2zPblktppBmH0pn6HYV3vIJ497bV4Km1IQOVdEOd7NIywBYfeBXgyoQnd1NsRyIKhUqLyJDnMUv26yN6F0RV4mxDEcg22JrA01ik/lvaLC7e1buIrqfkEqW9jTtyfU7VIJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768306617; c=relaxed/simple;
-	bh=RmqklHpjm8P2OXRUbwUU2y1fJAyau/F4IXAn3dZWSV8=;
+	s=arc-20240116; t=1768308511; c=relaxed/simple;
+	bh=SaXvwV/cVBPZ20DeAZx7bxdfUTNhM0j5tTacSDfg/Uo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QA9n1GZk3yL38Qxpak4drspSAWECMqQa4cbotes0G1Sv18/oXx3akIBvREiRGintUc9R959ZjY+nu8BnlEEXjyc5M4SqIC0m/hUSswn9wpYS4syoJWkNhvVbaO6ad/Z9o1659+QZo9N2ZlsGP1nng35gq5gBMqK5RaF2sYnfKoM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=UWBvjUPLujnJPG1gPDv8eRFVi1Y1XRokt/p7O8T7UaIXH0dRjCKIa0o2Rc3uRCxBTEtjFuWTVXDra+eT+eh5q+QSjCD1P0WdCrZq2drJ+H8J47D5ujqITVFlFAbILufsXDlIv9ny6cjbI+h92DmiIhJgVnEnT3ucNVuphgCkcRk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06457497;
-	Tue, 13 Jan 2026 04:16:47 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9B093F59E;
-	Tue, 13 Jan 2026 04:16:51 -0800 (PST)
-Date: Tue, 13 Jan 2026 12:16:49 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v3 21/36] KVM: arm64: gic-v5: Check for pending PPIs
-Message-ID: <20260113121649.GB801634@e124191.cambridge.arm.com>
-References: <20260109170400.1585048-1-sascha.bischoff@arm.com>
- <20260109170400.1585048-22-sascha.bischoff@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5932A497;
+	Tue, 13 Jan 2026 04:48:22 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 462EE3F59E;
+	Tue, 13 Jan 2026 04:48:27 -0800 (PST)
+Date: Tue, 13 Jan 2026 12:48:24 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: James Clark <james.clark@linaro.org>
+Cc: mark.rutland@arm.com, james.morse@arm.com, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Subject: Re: [RFC PATCH v6 19/35] KVM: arm64: Trap PMBIDR_EL1 and PMSIDR_EL1
+Message-ID: <aWY_GGzNW85ZR7dP@raptor>
+References: <20251114160717.163230-1-alexandru.elisei@arm.com>
+ <20251114160717.163230-20-alexandru.elisei@arm.com>
+ <f7d73dc3-aa4a-4c32-aabb-21a61a2f773f@linaro.org>
+ <aWTa76KXpIwzPh4k@raptor>
+ <adacaff6-c6c7-47a5-993a-29f006fe1b86@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,227 +40,140 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260109170400.1585048-22-sascha.bischoff@arm.com>
+In-Reply-To: <adacaff6-c6c7-47a5-993a-29f006fe1b86@linaro.org>
 
-On Fri, Jan 09, 2026 at 05:04:46PM +0000, Sascha Bischoff wrote:
-> This change allows KVM to check for pending PPI interrupts. This has
-> two main components:
-> 
-> First of all, the effective priority mask is calculated.  This is a
-> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
-> the currently running priority as determined from the VPE's
-> ICH_APR_EL1. If an interrupt's priority is greater than or equal to
-> the effective priority mask, it can be signalled. Otherwise, it
-> cannot.
-> 
-> Secondly, any Enabled and Pending PPIs must be checked against this
-> compound priority mask. The reqires the PPI priorities to by synced
-> back to the KVM shadow state - this is skipped in general operation as
-> it isn't required and is rather expensive. If any Enabled and Pending
-> PPIs are of sufficient priority to be signalled, then there are
-> pending PPIs. Else, there are not.  This ensures that a VPE is not
-> woken when it cannot actually process the pending interrupts.
-> 
+Hi James,
 
-The PPI state is no longer synced to the KVM shadow state in
-vgic_v5_has_pending_ppi(), only done on WFI.
+On Mon, Jan 12, 2026 at 11:54:05AM +0000, James Clark wrote:
+> 
+> 
+> On 12/01/2026 11:28 am, Alexandru Elisei wrote:
+> > Hi James,
+> > 
+> > On Fri, Jan 09, 2026 at 04:29:37PM +0000, James Clark wrote:
+> > > 
+> > > 
+> > > On 14/11/2025 4:07 pm, Alexandru Elisei wrote:
+> > > > PMBIDR_EL1 and PMSIDR_EL1 are read-only registers that describe the SPE
+> > > > implementation. Trap reads to allow KVM to control how SPE is described to
+> > > > a virtual machine. In particular, this is needed to:
+> > > > 
+> > > > - Advertise the maximum buffer size set by userspace in
+> > > >     PMBIDR_EL1.MaxBuffSize.
+> > > > - Hide in PMSIDR_EL1, if necessary, the presence of FEAT_SPE_FDS and
+> > > >     FEAT_SPE_FnE, both of which add new registers which are already
+> > > >     trapped via the FGU mechanism.
+> > > > 
+> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > ---
+> > > >    arch/arm64/include/asm/kvm_spe.h |  4 +-
+> > > >    arch/arm64/kvm/config.c          | 13 ++++-
+> > > >    arch/arm64/kvm/spe.c             | 82 +++++++++++++++++++++++++++++++-
+> > > >    arch/arm64/kvm/sys_regs.c        | 13 +++--
+> > > >    4 files changed, 103 insertions(+), 9 deletions(-)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+> > > > index 3506d8c4c661..47b94794cc5f 100644
+> > > > --- a/arch/arm64/include/asm/kvm_spe.h
+> > > > +++ b/arch/arm64/include/asm/kvm_spe.h
+> > > > @@ -40,7 +40,7 @@ int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> > > >    int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+> > > >    bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val);
+> > > > -u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg);
+> > > > +u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg, u32 encoding);
+> > > >    #else
+> > > >    struct kvm_spe {
+> > > >    };
+> > > > @@ -78,7 +78,7 @@ static inline bool kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val)
+> > > >    {
+> > > >    	return true;
+> > > >    }
+> > > > -static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
+> > > > +static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg, u32 encoding)
+> > > >    {
+> > > >    	return 0;
+> > > >    }
+> > > > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > > > index 24bb3f36e9d5..ed6b167b7aa8 100644
+> > > > --- a/arch/arm64/kvm/config.c
+> > > > +++ b/arch/arm64/kvm/config.c
+> > > > @@ -6,6 +6,7 @@
+> > > >    #include <linux/kvm_host.h>
+> > > >    #include <asm/kvm_emulate.h>
+> > > > +#include <asm/kvm_spe.h>
+> > > >    #include <asm/kvm_nested.h>
+> > > >    #include <asm/sysreg.h>
+> > > > @@ -1489,6 +1490,16 @@ static void __compute_hfgwtr(struct kvm_vcpu *vcpu)
+> > > >    		*vcpu_fgt(vcpu, HFGWTR_EL2) |= HFGWTR_EL2_TCR_EL1;
+> > > >    }
+> > > > +static void __compute_hdfgrtr(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	__compute_fgt(vcpu, HDFGRTR_EL2);
+> > > > +
+> > > > +	if (vcpu_has_spe(vcpu)) {
+> > > > +		*vcpu_fgt(vcpu, HDFGRTR_EL2) |= HDFGRTR_EL2_PMBIDR_EL1;
+> > > > +		*vcpu_fgt(vcpu, HDFGRTR_EL2) |= HDFGRTR_EL2_PMSIDR_EL1;
+> > > > +	}
+> > > > +}
+> > > > +
+> > > >    static void __compute_hdfgwtr(struct kvm_vcpu *vcpu)
+> > > >    {
+> > > >    	__compute_fgt(vcpu, HDFGWTR_EL2);
+> > > > @@ -1505,7 +1516,7 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+> > > >    	__compute_fgt(vcpu, HFGRTR_EL2);
+> > > >    	__compute_hfgwtr(vcpu);
+> > > >    	__compute_fgt(vcpu, HFGITR_EL2);
+> > > > -	__compute_fgt(vcpu, HDFGRTR_EL2);
+> > > > +	__compute_hdfgrtr(vcpu);
+> > > >    	__compute_hdfgwtr(vcpu);
+> > > >    	__compute_fgt(vcpu, HAFGRTR_EL2);
+> > > > diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+> > > > index 5b3dc622cf82..92eb46276c71 100644
+> > > > --- a/arch/arm64/kvm/spe.c
+> > > > +++ b/arch/arm64/kvm/spe.c
+> > > > @@ -22,10 +22,16 @@ struct arm_spu_entry {
+> > > >    	struct arm_spe_pmu *arm_spu;
+> > > >    };
+> > > > +static u64 max_buffer_size_to_pmbidr_el1(u64 size);
+> > > > +
+> > > >    void kvm_host_spe_init(struct arm_spe_pmu *arm_spu)
+> > > >    {
+> > > >    	struct arm_spu_entry *entry;
+> > > > +	/* PMBIDR_EL1 cannot be trapped without FEAT_FGT. */
+> > > > +	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> > > > +		return;
+> > > > +
+> > > 
+> > > Isn't this only required if you want to report a different PMBIDR value? If
+> > > the value in hardware is already what you want to give to guests then it's
+> > > not strictly required. Maybe it's something we can do as an addition later
+> > > to make it usable in more places.
+> > 
+> > The maximum buffer size is advertised in PMBIDR_EL1.
+> > 
+> > Thanks,
+> > Alex
+> > 
+> 
+> I know, but 0 "unlimited" is a valid value, and that's what's already in
+> PMBIDR. You only need to trap if the value doesn't match what's already
+> there.
+> 
+> You can also "probe" the maximum buffer size without this by attempting to
+> set the limit pointer and looking at the buffer management error code.
+> 
+> The first thing I did when I went to use this was comment this out because
+> my hardware doesn't support FGT. But the rest of it works fine without,
+> maybe other people could benefit in the future too.
 
-Can you update the commit message / explain the rationale there.
+I could add a new capability for setting the maximum buffer size (or to set a
+buffer size different than what the hardware advertises), enabled when FEAT_FGT
+is implement by the hardware. But that means not allowing KVM SPE on Neoverse
+because of erratum 3023823 [1]. So I don't think you would be able to use KVM
+SPE out of the box on your hardware anyway (if I understood correctly that
+you've been using a Neoverse CPU to test the series).
+
+[1] https://developer.arm.com/documentation/SDEN-885747/34-0
 
 Thanks,
-Joey
-
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 133 ++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    |   3 +
->  arch/arm64/kvm/vgic/vgic.h    |   1 +
->  3 files changed, 137 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index c1899add8f5c3..3e2a01e3008c4 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -139,6 +139,29 @@ void vgic_v5_get_implemented_ppis(void)
->  		ppi_caps->impl_ppi_mask[0] |= BIT_ULL(GICV5_ARCH_PPI_PMUIRQ);
->  }
->  
-> +static u32 vgic_v5_get_effective_priority_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u32 highest_ap, priority_mask;
-> +
-> +	/*
-> +	 * Counting the number of trailing zeros gives the current active
-> +	 * priority. Explicitly use the 32-bit version here as we have 32
-> +	 * priorities. 32 then means that there are no active priorities.
-> +	 */
-> +	highest_ap = cpu_if->vgic_apr ? __builtin_ctz(cpu_if->vgic_apr) : 32;
-> +
-> +	/*
-> +	 * An interrupt is of sufficient priority if it is equal to or
-> +	 * greater than the priority mask. Add 1 to the priority mask
-> +	 * (i.e., lower priority) to match the APR logic before taking
-> +	 * the min. This gives us the lowest priority that is masked.
-> +	 */
-> +	priority_mask = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, cpu_if->vgic_vmcr);
-> +
-> +	return min(highest_ap, priority_mask + 1);
-> +}
-> +
->  static bool vgic_v5_ppi_set_pending_state(struct kvm_vcpu *vcpu,
->  					  struct vgic_irq *irq)
->  {
-> @@ -216,6 +239,112 @@ void vgic_v5_set_ppi_ops(struct vgic_irq *irq)
->  		irq->ops = &vgic_v5_ppi_irq_ops;
->  }
->  
-> +/*
-> + * Sync back the PPI priorities to the vgic_irq shadow state for any interrupts
-> + * exposed to the guest (skipping all others).
-> + */
-> +static void vgic_v5_sync_ppi_priorities(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u64 priorityr;
-> +
-> +	/*
-> +	 * We have 16 PPI Priority regs, but only have a few interrupts that the
-> +	 * guest is allowed to use. Limit our sync of PPI priorities to those
-> +	 * actually exposed to the guest by first iterating over the mask of
-> +	 * exposed PPIs.
-> +	 */
-> +	for (int mask_reg = 0; mask_reg < 2; mask_reg++) {
-> +		unsigned long *p;
-> +		int i;
-> +
-> +		p = (unsigned long *)&vcpu->kvm->arch.vgic.gicv5_vm.vgic_ppi_mask[mask_reg];
-> +
-> +		for_each_set_bit(i, p, 64) {
-> +			struct vgic_irq *irq;
-> +			int pri_idx, pri_reg;
-> +			u32 intid;
-> +			u8 priority;
-> +
-> +			pri_reg = (mask_reg * 64 + i) / 8;
-> +			pri_idx = (mask_reg * 64 + i) % 8;
-> +
-> +			priorityr = cpu_if->vgic_ppi_priorityr[pri_reg];
-> +			priority = (priorityr >> (pri_idx * 8)) & GENMASK(4, 0);
-> +
-> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
-> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, mask_reg * 64 + i);
-> +
-> +			irq = vgic_get_vcpu_irq(vcpu, intid);
-> +
-> +			scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-> +				irq->priority = priority;
-> +
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +		}
-> +	}
-> +}
-> +
-> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	unsigned int priority_mask;
-> +
-> +	/* If no pending bits are set, exit early */
-> +	if (!cpu_if->vgic_ppi_pendr[0] && !cpu_if->vgic_ppi_pendr[1])
-> +		return false;
-> +
-> +	priority_mask = vgic_v5_get_effective_priority_mask(vcpu);
-> +
-> +	/* If the combined priority mask is 0, nothing can be signalled! */
-> +	if (!priority_mask)
-> +		return false;
-> +
-> +	for (int reg = 0; reg < 2; reg++) {
-> +		const u64 enabler = cpu_if->vgic_ppi_enabler[reg];
-> +		const u64 pendr = cpu_if->vgic_ppi_pendr[reg];
-> +		unsigned long possible_bits;
-> +		int i;
-> +
-> +		/* Check all interrupts that are enabled and pending */
-> +		possible_bits = enabler & pendr;
-> +
-> +		/*
-> +		 * Optimisation: pending and enabled with no active priorities
-> +		 */
-> +		if (possible_bits && priority_mask == 32)
-> +			return true;
-> +
-> +		for_each_set_bit(i, &possible_bits, 64) {
-> +			bool has_pending = false;
-> +			struct vgic_irq *irq;
-> +			u32 intid;
-> +
-> +			intid = FIELD_PREP(GICV5_HWIRQ_TYPE, GICV5_HWIRQ_TYPE_PPI);
-> +			intid |= FIELD_PREP(GICV5_HWIRQ_ID, reg * 64 + i);
-> +
-> +			irq = vgic_get_vcpu_irq(vcpu, intid);
-> +
-> +			scoped_guard(raw_spinlock_irqsave, &irq->irq_lock) {
-> +				/*
-> +				 * We know that the interrupt is
-> +				 * enabled and pending, so only check
-> +				 * the priority.
-> +				 */
-> +				if (irq->priority <= priority_mask)
-> +					has_pending = true;
-> +			}
-> +
-> +			vgic_put_irq(vcpu->kvm, irq);
-> +
-> +			if (has_pending)
-> +				return true;
-> +		}
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  /*
->   * Detect any PPIs state changes, and propagate the state with KVM's
->   * shadow structures.
-> @@ -348,6 +477,10 @@ void vgic_v5_put(struct kvm_vcpu *vcpu)
->  	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
->  
->  	WRITE_ONCE(cpu_if->gicv5_vpe.resident, false);
-> +
-> +	/* The shadow priority is only updated on entering WFI */
-> +	if (vcpu_get_flag(vcpu, IN_WFI))
-> +		vgic_v5_sync_ppi_priorities(vcpu);
->  }
->  
->  void vgic_v5_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1cdfa5224ead5..8f2782ad31f74 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -1174,6 +1174,9 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
->  	unsigned long flags;
->  	struct vgic_vmcr vmcr;
->  
-> +	if (vgic_is_v5(vcpu->kvm))
-> +		return vgic_v5_has_pending_ppi(vcpu);
-> +
->  	if (!vcpu->kvm->arch.vgic.enabled)
->  		return false;
->  
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index c8f538e65303f..2c067b571d563 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -366,6 +366,7 @@ int vgic_v5_probe(const struct gic_kvm_info *info);
->  void vgic_v5_get_implemented_ppis(void);
->  void vgic_v5_set_ppi_ops(struct vgic_irq *irq);
->  int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
-> +bool vgic_v5_has_pending_ppi(struct kvm_vcpu *vcpu);
->  void vgic_v5_flush_ppi_state(struct kvm_vcpu *vcpu);
->  void vgic_v5_fold_ppi_state(struct kvm_vcpu *vcpu);
->  void vgic_v5_load(struct kvm_vcpu *vcpu);
-> -- 
-> 2.34.1
+Alex
