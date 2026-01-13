@@ -1,87 +1,73 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768292E2665
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 15:15:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32164392B88
+	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 15:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768317351; cv=none; b=a3Qa/PlX01jeOy9DHQXYvZrU2LCIHYYtXXtZ8wxDbpTI5I8HwwbZ4PVeHtV0S11mo2ARWUDThg7Y+eP/q6ZAzgLAMWBqpuMsq3/xP6GyuJM1k0YvvLTLDVFOThUPfQGMhyG2iRjk9h6rwNWAGoFxS6IB8pYEynp3G5k3YjqP4wQ=
+	t=1768318006; cv=none; b=JrR5u3mChRMbnGAMP2o5prcUBltvbg6rz06qm5nPK8OLRF/W1YBjGaGiIst/ecglgvWe7VfBSKtXybHGY5/CFv4jMOkV0oQaQeqwZiXXNw9fgSGbnhyGPoDntI8BS3dYlqlNro7DfieJdK23rhv46VbJGJWCDakeeY5PgQyxIbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768317351; c=relaxed/simple;
-	bh=JVEfB+Xp7YTwjoOGKdBDPGEm0NcnZw5pNrlW8gTUk5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JW3xdB1Ss1YdKhjyfqeMR3N+h5pWFtF2DHLk/dWpnXvkjP9dHlVyg4exSYWh4T92RGJCrnVx5sCN+s5MoMrJ89x9P6Qq1mZzBxnqXPbq6HZcTnbwgIc3LB9UuBAGslM12nL9/LVb2lX0MzcGN0+/HjJY/8RHhKwmGm1+F5KA0J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19BDB497;
-	Tue, 13 Jan 2026 07:15:43 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFF8A3F632;
-	Tue, 13 Jan 2026 07:15:44 -0800 (PST)
-Message-ID: <5bd84ae7-b9ea-49a8-a2e7-1ccd09117126@arm.com>
-Date: Tue, 13 Jan 2026 15:15:43 +0000
+	s=arc-20240116; t=1768318006; c=relaxed/simple;
+	bh=jcLEc7oseEp0qd0xCNImovtFiuZuhRL1O26AaSohcJY=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LF0UPGLUUxkRAvA7BKF12JtV4bXOUsz9HemdzOnc1zLmTbN2IP4WqdIxwDSoZEkhCci+PfPwKQyzgQ7BT8qW3nBIduFM0KoVmY0BHG9hznjoRrQ8CfSwBSZbXJ/zXDXhTAxiggDVVGWLhAHQmA7IYRAyau9XFsI8XC7EOYWQS7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.83])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4drCl24l7GzHnH5j;
+	Tue, 13 Jan 2026 23:26:22 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id CFAAD40572;
+	Tue, 13 Jan 2026 23:26:40 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 13 Jan
+ 2026 15:26:39 +0000
+Date: Tue, 13 Jan 2026 15:26:38 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v3 32/47] arm_mpam: resctrl: Add kunit test for ABMC/CDP
+ interactions
+Message-ID: <20260113152638.00003e32@huawei.com>
+In-Reply-To: <20260112165914.4086692-33-ben.horgan@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+	<20260112165914.4086692-33-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 26/47] arm_mpam: resctrl: Wait for cacheinfo to be
- ready
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-27-ben.horgan@arm.com>
- <20260113150159.000053f7@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260113150159.000053f7@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-Hi Jonathan,
+On Mon, 12 Jan 2026 16:58:59 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
 
-On 1/13/26 15:01, Jonathan Cameron wrote:
-> On Mon, 12 Jan 2026 16:58:53 +0000
-> Ben Horgan <ben.horgan@arm.com> wrote:
+> From: James Morse <james.morse@arm.com>
 > 
->> In order to calculate the rmid realloc threshold the size of the cache
->> needs to be known. Cache domains will also be named after the cache id. So
->> that this information can be extracted from cacheinfo we need to wait for
->> it to be ready. The cacheinfo information is populated in device_initcall()
->> so we wait for that.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> [horgan: split out from another patch]
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> This is moved into it's own patch to allow all uses of cacheinfo to be
->> valid when they are introduced.
+> ABMC exposes a fun corner case where a platform with one monitor can use
+> ABMC for assignable counters - but not when CDP is enabled.
 > 
-> I don't mind the patch but I'm not entirely following this comment. Is
-> the point that previously there was a sneaky user before this was added in
-> the series?
-
-Yes, arm_mpam: resctrl: Add support for 'MB' resource, accesses
-cacheinfo so wanted to order this patch before that.
-
+> Add some tests.
 > 
-> Anyhow, that's not in the patch itself so
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-
-Thanks,
-
-Ben
-
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
