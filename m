@@ -1,107 +1,101 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23FE343D78
-	for <kvmarm@lists.linux.dev>; Tue, 13 Jan 2026 17:18:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EBF359FB3;
+	Tue, 13 Jan 2026 19:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768324710; cv=none; b=sQbaAcVJE3maHrpIT/wzvGOehv4AOozA28SAdhpVKhwwDg4aFIjOO3Z1T7jKyOUxXB33IzsbwdYdd1FTkH5Safwn+B+C7BOfuLul1T1iB+B6DR+1Iuap6+05v6mNp0eW2u4lwVN+zeZiKJstxBU7Z5VpSIr8w0ap6Sd3otadrHg=
+	t=1768331316; cv=none; b=qPMbWcF6L1Otk60OgO73lqezvJpKEVhyos4hLSYONKyacX3bvGO8ZchvYcV+kfdSz300cyX/wfetWpJDwQoiscsDJ9TgQdP8i/5npIe2Kc5x0GywqvkMbqGUUsfi0FLnJRN657A6X6pJCavzAc1/Faol2AduVJI9i1Yhf5+f7BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768324710; c=relaxed/simple;
-	bh=1Uz18wbSQv5iZ/v00qK/QlkUmmmGMwN+5i3nVQwPZ5c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TrmfHtJcsXP1MsxsAmdo4aL2QaAh5JbyG73FpdaGanng1QBWT4x/pclJ116mJmCMqWrCW7Bs3igbkZGHPBvDQvf/suHZhDpRyvjL98QoHsypjN3lswuz3ledUlyZmEmqfFGIj8HTykTkPNBQwdtOOcrs8kaZa5a9WIdwCoLfFFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 57B24497;
-	Tue, 13 Jan 2026 09:18:19 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1E963F632;
-	Tue, 13 Jan 2026 09:18:20 -0800 (PST)
-Message-ID: <f4e77744-cb32-4cea-a23f-3cd1a2ae9d79@arm.com>
-Date: Tue, 13 Jan 2026 17:18:19 +0000
+	s=arc-20240116; t=1768331316; c=relaxed/simple;
+	bh=BlG7Ssce28/FBGer2w45hjxLQrro3n1kR5hQ9PoxQUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZEomG4BmjCWT5SklZDS1pR33d4zq8FxKJcE6g/tV5TAI6wtSChG8kvKb7GUP/sv6R/8O49Bl3SPWmY4nVHXOuZAWyGiqrqZssA+htPVuAVzqkujBJ3REpLPFjxRBZA5euEUUs+CfMppGeMlvqRQnZaZatBDQteuEl4WVcHuqrfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFe+UyiA; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFe+UyiA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AAC7C116C6;
+	Tue, 13 Jan 2026 19:08:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768331315;
+	bh=BlG7Ssce28/FBGer2w45hjxLQrro3n1kR5hQ9PoxQUo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uFe+UyiAM8nw1RpAZ8dnDlZg7/u+WeSfZkLTq7hnyWk/FNs6VBsAtz048ZbbD5t9S
+	 sMryJrpGRz4zXqNq/VugUWEiTtkVm407BclAEbyYBo8ZXLyYcRCP0kTrYmT/vBtZE1
+	 ydoUfR7Y75lBJf8cLjhopc9HQWUwMMAGmE5PTe51i5DMO/Qcu8w4IWY/pN19OMiCuT
+	 PbHW0nF0dSWtdmm6qJRxA94B4J62po295i/yIZaGjC8D93JhOS4K5ZuanffOipvgWc
+	 P3BLm5C3i2DzEKJBiA6O3CrVWchyOJdcHOxkI8+fc0/cSnBSN51m/+k9rPsF0GanYs
+	 +/G1hpujfSJSg==
+Date: Tue, 13 Jan 2026 19:08:29 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 18/30] KVM: arm64: Support SME priority registers
+Message-ID: <24d06740-f8da-43d0-9e40-81323f6a9237@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-18-8be3867cb883@kernel.org>
+ <CA+EHjTwxc=+1TodVR7X96fnKu-mykivdFxMbB5nUrw_h4MGKHg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 18/45] arm_mpam: resctrl: Implement
- resctrl_arch_reset_all_ctrls()
-To: Zeng Heng <zengheng4@huawei.com>, jonathan.cameron@huawei.com
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- catalin.marinas@arm.com, corbet@lwn.net, dave.martin@arm.com,
- david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com,
- gshan@redhat.com, james.morse@arm.com, joey.gouly@arm.com, kobak@nvidia.com,
- kvmarm@lists.linux.dev, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- maz@kernel.org, oupton@kernel.org, peternewman@google.com,
- punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
- reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- suzuki.poulose@arm.com, tan.shaopeng@fujitsu.com, will@kernel.org,
- xhao@linux.alibaba.com, wangkefeng.wang@huawei.com
-References: <20260105175154.00002041@huawei.com>
- <20260109034506.1176234-1-zengheng4@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260109034506.1176234-1-zengheng4@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hJ8Uz2qkTdkXhDSA"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwxc=+1TodVR7X96fnKu-mykivdFxMbB5nUrw_h4MGKHg@mail.gmail.com>
+X-Cookie: All models over 18 years of age.
 
-Hi Zeng,
 
-On 1/9/26 03:45, Zeng Heng wrote:
->> From: James Morse <james.morse@arm.com>
->> Date: Fri, 5 Dec 2025 21:58:32 +0000
->> Subject: [PATCH v2 18/45] arm_mpam: resctrl: Implement resctrl_arch_reset_all_ctrls()
->>
->> We already have a helper for resetting an mpam class and component.  Hook
->> it up to resctrl_arch_reset_all_ctrls() and the domain offline path.
->>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->>  drivers/resctrl/mpam_devices.c  |  6 +++---
->>  drivers/resctrl/mpam_internal.h |  7 +++++++
->>  drivers/resctrl/mpam_resctrl.c  | 15 +++++++++++++++
->>  3 files changed, 25 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index bc4f1c80eab..d32e8700245 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
->> @@ -353,6 +366,8 @@ void mpam_resctrl_offline_cpu(unsigned int cpu)
->>
->>  		ctrl_dom_empty = true;
->>  		if (exposed_alloc_capable) {
->> +			mpam_reset_component_locked(dom->ctrl_comp);
->> +
->>  			ctrl_d = &dom->resctrl_ctrl_dom;
->>  			ctrl_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &ctrl_d->hdr);
->>  			if (ctrl_dom_empty)
-> 
-> mpam_cpu_offline() already directly calls mpam_reset_ris() to reset the
-> MPAM MSC that is about to go offline. So why here still need
-> mpam_resctrl_offline_cpu() to invoke mpam_reset_component_locked(),
-> which ends up calling mpam_reset_ris() again?
-> 
-> Please point it out if I might have overlooked anything, thank you.
+--hJ8Uz2qkTdkXhDSA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yeah, this doesn't look right. A component will usually have affinity
-with more than one cpu and if we weren't doing the reset elsewhere we
-should only be doing the component level reset when the last of those
-cpus goes offline. I'll give this cpu offline/online code another look over.
+On Mon, Jan 12, 2026 at 11:59:22AM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
 
-> 
-> 
-> Best Regards,
-> Zeng Heng
-> 
+> > +       /*
+> > +        * We block SME priorities so SMPRIMAP_EL2 is RES0, however we
+> > +        * do not have traps to block access so the guest might have
+> > +        * updated the state, overwrite anything there.
+>=20
+> nit: overwrite -> overwriting
 
-Thanks,
+> > +        */
+> > +       __vcpu_assign_sys_reg(vcpu, SMPRIMAP_EL2, 0);
+> >  }
 
-Ben
+My original is correct here - the action we are taking is that we will
+overwrite the value.  To use overwriting we'd need something more like
+"handle this by overwriting anything there".
 
+--hJ8Uz2qkTdkXhDSA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlmmCwACgkQJNaLcl1U
+h9DLzQf9ECKYlxB9v/nA6ULn595t/Ut+L10MjxH5UG+Bx55K2Z6nM9DNxKzi74iW
+92pZ/UIu2DAB+mKumhcHsSGtFvDONyUqeZwfIUE5XYWH+VoBEMQC4DIdYRi2YDwb
+zSfvAh2lqiySy9RHeI6orV6dKs9u3HVxF/eb85+XpPbswIiOej4OW5RECEPrPUmC
+A4ohL7KRW4flNvHV7WrA6gPpy+dAbkkh2/zP2V1VhwhKydikY7gAEyt5ec2BmK8o
+aREwbFcuMiRGJaXWU+LhNmgus3k0YGLjZTOrtd+YmDlwCYv5qTjdbtc4iU82BusN
+bjR4dgGoOXiso3+khcbbpEsljh4Oiw==
+=Xsd1
+-----END PGP SIGNATURE-----
+
+--hJ8Uz2qkTdkXhDSA--
