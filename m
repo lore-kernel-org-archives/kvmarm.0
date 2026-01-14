@@ -1,133 +1,154 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100BE396B92
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 11:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0854B2236FA;
+	Wed, 14 Jan 2026 12:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768391945; cv=none; b=r42av9Btz4CeGoZ2s7w70vOMcg6y9gIpOwKKoP8dwCFVqs4AfZCPVycSUQgSnTMxMBbrLEen7QpTr6WhljtLVBDG18V9Bv2zLKn/gqVvjqvnf7ffBZJHkFW0+eQXf88BKCjihlBbemA5B36FfC4Ok9ZooLhG5Sh69BF6YsntyAQ=
+	t=1768392392; cv=none; b=Le+PrZhlStwJq7U4L3FamMRjCQvC6sEYrCq4j2o09SKqUplBFF8DvhP6+QLNHpTc9MqLmdN81v/qbcWJvnnrbueaotL6h9xNksHWgSx9zkdQOGXyBVaFiNq9bKRXliW3Hnr9voS5MG3df5GfLt44odLIlLlIg7hu0dIJAyztGvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768391945; c=relaxed/simple;
-	bh=s0M/sSyTqAkSyLV5sUqkTDP/QBn2D28VCgAkL5NG6Lg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E6CV5HuJt7tSSUpNpr7lgB6nFM9/6kD1Sm+HIfr6N8bpE5zt715NnR9IS3Rb2bOKArLP9+Y4mK+9SgJatzkOT8tkBqNNO8OeBGEjpCMpu499TTJ008nr+cXIQ7Yq6zh4CJyiiGpA1ZW6TMRpO+bnyzKyybZr7Qv5Q/wqh4LLrsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 437CA1424;
-	Wed, 14 Jan 2026 03:58:53 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B95203F632;
-	Wed, 14 Jan 2026 03:58:58 -0800 (PST)
-From: Joey Gouly <joey.gouly@arm.com>
-To: kvm@vger.kernel.org
-Cc: alexandru.elisei@arm.com,
-	andrew.jones@linux.dev,
-	eric.auger@redhat.com,
+	s=arc-20240116; t=1768392392; c=relaxed/simple;
+	bh=IXiea1JAWy8hq5EFO/KtmMlzvJWcD+fDKDcocQOcQFk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MS0ERt+Bjk3/WaYzL6L/yZ7yp4fHncUdv2nsrSxdorTT2zLKfyAQmY2W/eJyB9RbE5wg/sJNruovbqK3MbEmsoo/VOoWz17pi5aCpXG3RIq6/niJRM4PynfZtBRDxFPVfoR5Q7gpn++Qb8kFcfvDTToFcFDNW8aLhXbzv08lgp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DOF9TCfD; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DOF9TCfD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D1CC16AAE;
+	Wed, 14 Jan 2026 12:06:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768392391;
+	bh=IXiea1JAWy8hq5EFO/KtmMlzvJWcD+fDKDcocQOcQFk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DOF9TCfDTk6eih11jEFeuuENrvGypFtZ6oAZOvC8fddU3ObXKUkomJ3EBphmogvlI
+	 lbzyTJ7ODiErL3sk+WZIGKvpN2GSfjVVf1M6XAwYmgkJRj2Y3JJHe842j9dOpdk4b/
+	 /gWuRf3m7/3JHU25MM8R5fcZZ9UAFMJBQt9FXhdCLfzdl0ThRIHAY6JIV3XXcltMBc
+	 PJYphZmZ8pN4WNZhQ+oi02UI5wgpEQafeU0sAQX/8lFVLn9koX2rE9KvyWi3K2GQwx
+	 h+ZKO4Ia7nkrG4WTFhaqLv5ZUW+/rtZ9G4c5bwnbQMjhWlFt2T+Mi3KZqmoY+yGYDY
+	 kZxSYGqWMsDBw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vfzds-00000002AbS-4B8R;
+	Wed, 14 Jan 2026 12:06:29 +0000
+Date: Wed, 14 Jan 2026 12:06:28 +0000
+Message-ID: <86pl7cl7p7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com,
+	baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com,
+	carl@os.amperecomputing.com,
+	dave.martin@arm.com,
+	david@kernel.org,
+	dfustini@baylibre.com,
+	fenghuay@nvidia.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	jonathan.cameron@huawei.com,
+	kobak@nvidia.com,
+	lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peternewman@google.com,
+	punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com,
+	reinette.chatre@intel.com,
+	rohit.mathew@arm.com,
+	scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	oupton@kernel.org,
 	joey.gouly@arm.com,
-	maz@kernel.org,
-	kvmarm@lists.linux.dev,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v5 10/11] arm64: run at EL2 if supported
-Date: Wed, 14 Jan 2026 11:57:02 +0000
-Message-Id: <20260114115703.926685-11-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260114115703.926685-1-joey.gouly@arm.com>
-References: <20260114115703.926685-1-joey.gouly@arm.com>
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 12/47] KVM: arm64: Force guest EL1 to use user-space's partid configuration
+In-Reply-To: <20260112165914.4086692-13-ben.horgan@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+	<20260112165914.4086692-13-ben.horgan@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If VHE is supported, continue booting at EL2, otherwise continue booting at
-EL1.
+On Mon, 12 Jan 2026 16:58:39 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> From: James Morse <james.morse@arm.com>
+> 
+> While we trap the guest's attempts to read/write the MPAM control
+> registers, the hardware continues to use them. Guest-EL0 uses KVM's
+> user-space's configuration, as the value is left in the register, and
+> guest-EL1 uses either the host kernel's configuration, or in the case of
+> VHE, the UNKNOWN reset value of MPAM1_EL1.
+> 
+> We want to force the guest-EL1 to use KVM's user-space's MPAM
+> configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
+> programmed the same and on VHE copy MPAM0_EL1 into the guest's
+> MPAM1_EL1. There is no need to restore as this is out of context once TGE
+> is set.
+> 
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> Changes since rfc:
+> Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
+> Defer EL2 handling until next patch
+> 
+> Changes since v2:
+> Use mask (Oliver)
+> ---
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> index f28c6cf4fe1b..9fb8e6628611 100644
+> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> @@ -183,6 +183,18 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+>  }
+>  NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+>  
+> +/*
+> + * The _EL0 value was written by the host's context switch and belongs to the
+> + * VMM. Copy this into the guest's _EL1 register.
+> + */
+> +static inline void __mpam_guest_load(void)
+> +{
+> +	u64 mask = MPAM0_EL1_PARTID_D | MPAM0_EL1_PARTID_I | MPAM0_EL1_PMG_D | MPAM0_EL1_PMG_I;
+> +
+> +	if (system_supports_mpam())
+> +		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1) & mask, SYS_MPAM1);
+> +}
+> +
+>  /**
+>   * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+>   *
+> @@ -222,6 +234,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+>  	 */
+>  	__sysreg32_restore_state(vcpu);
+>  	__sysreg_restore_user_state(guest_ctxt);
+> +	__mpam_guest_load();
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
----
- arm/cstart64.S         | 21 +++++++++++++++++----
- lib/arm64/asm/sysreg.h |  5 +++++
- 2 files changed, 22 insertions(+), 4 deletions(-)
+What's the rationale for doing this independently of rest of the MPAM
+stuff in __activate_traps_mpam()?
 
-diff --git a/arm/cstart64.S b/arm/cstart64.S
-index 2b93f234..49cf8ed6 100644
---- a/arm/cstart64.S
-+++ b/arm/cstart64.S
-@@ -15,10 +15,14 @@
- #include <asm/thread_info.h>
- #include <asm/sysreg.h>
- 
-+/*
-+ * Initialise the EL used for running the tests.
-+ * If started at EL2 and VHE is supported, EL2 is used, otherwise EL1 is used.
-+ */
- .macro init_el, tmp
- 	mrs	\tmp, CurrentEL
- 	cmp	\tmp, CurrentEL_EL2
--	b.ne	1f
-+	b.ne	2f
- 	/* EL2 setup */
- 	mrs	\tmp, mpidr_el1
- 	msr	vmpidr_el2, \tmp
-@@ -41,17 +45,26 @@
- 	msr_s	SYS_HFGWTR2_EL2, \tmp
- 	msr_s	SYS_HFGITR2_EL2, \tmp
- .Lskip_fgt_\@:
-+	/* check VHE is supported */
-+	mrs	\tmp, ID_AA64MMFR1_EL1
-+	ubfx	\tmp, \tmp, ID_AA64MMFR1_EL1_VH_SHIFT, #4
-+	cbz	\tmp, 1f
-+	ldr	\tmp, =(INIT_HCR_EL2)
-+	msr	hcr_el2, \tmp
-+	isb
-+	b	2f
-+1:
- 	mov	\tmp, #0
- 	msr	cptr_el2, \tmp
- 	ldr	\tmp, =(INIT_HCR_EL2_EL1_ONLY)
- 	msr	hcr_el2, \tmp
- 	mov	\tmp, PSR_MODE_EL1t
- 	msr	spsr_el2, \tmp
--	adrp	\tmp, 1f
--	add	\tmp, \tmp, :lo12:1f
-+	adrp	\tmp, 2f
-+	add	\tmp, \tmp, :lo12:2f
- 	msr	elr_el2, \tmp
- 	eret
--1:
-+2:
- .endm
- 
- 
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index ed776716..f2d05018 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -80,6 +80,8 @@ asm(
- #define ID_AA64MMFR0_EL1_FGT_SHIFT	56
- #define ID_AA64MMFR0_EL1_FGT_FGT2	0x2
- 
-+#define ID_AA64MMFR1_EL1_VH_SHIFT	8
-+
- #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
- #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
- #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
-@@ -116,9 +118,12 @@ asm(
- #define SCTLR_EL1_TCF0_SHIFT	38
- #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
- 
-+#define HCR_EL2_TGE		_BITULL(27)
- #define HCR_EL2_RW		_BITULL(31)
-+#define HCR_EL2_E2H		_BITULL(34)
- 
- #define INIT_HCR_EL2_EL1_ONLY	(HCR_EL2_RW)
-+#define INIT_HCR_EL2		(HCR_EL2_TGE | HCR_EL2_E2H | HCR_EL2_RW)
- 
- #define SYS_HFGRTR_EL2		sys_reg(3, 4, 1, 1, 4)
- #define SYS_HFGWTR_EL2		sys_reg(3, 4, 1, 1, 5)
+	M.
+
 -- 
-2.25.1
-
+Without deviation from the norm, progress is not possible.
