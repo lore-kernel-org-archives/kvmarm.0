@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0854B2236FA;
-	Wed, 14 Jan 2026 12:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9593E394494;
+	Wed, 14 Jan 2026 12:09:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768392392; cv=none; b=Le+PrZhlStwJq7U4L3FamMRjCQvC6sEYrCq4j2o09SKqUplBFF8DvhP6+QLNHpTc9MqLmdN81v/qbcWJvnnrbueaotL6h9xNksHWgSx9zkdQOGXyBVaFiNq9bKRXliW3Hnr9voS5MG3df5GfLt44odLIlLlIg7hu0dIJAyztGvI=
+	t=1768392557; cv=none; b=Oh3agXq6eHTJVV0Yv6Q6sqcYXS01lXQ4Z3tUtFeN3LkO2w4D9RAo+kkM3Pf2Ri22nXnLaJ52oxAyFhBO6rdXR+U5rU/AMMcxduu5ykoNon8ldaVi95ROvfan4PFQOUcT49MLGtFS/2k9NSFnSfF8CLSdQkTnV0BvJrvDj7Rji8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768392392; c=relaxed/simple;
-	bh=IXiea1JAWy8hq5EFO/KtmMlzvJWcD+fDKDcocQOcQFk=;
+	s=arc-20240116; t=1768392557; c=relaxed/simple;
+	bh=UZ6UaW73MvuZLl2m3trmg4FmJ33q86AJAI/EqVwy3eo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MS0ERt+Bjk3/WaYzL6L/yZ7yp4fHncUdv2nsrSxdorTT2zLKfyAQmY2W/eJyB9RbE5wg/sJNruovbqK3MbEmsoo/VOoWz17pi5aCpXG3RIq6/niJRM4PynfZtBRDxFPVfoR5Q7gpn++Qb8kFcfvDTToFcFDNW8aLhXbzv08lgp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DOF9TCfD; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=k2osxzVilFeMqPDVcGcG4MctVUt8LpDSi8BNEEbxzCR9phG0zpCfKZpU35e3fr3H5cDBzojl4JQ7fuuDZw9A3yILfE57jA1NUTGG1y/117a9HTAqcxgvQLjsOxc4LtXt40Xxm0ox2IfWzgOgDPlyHVh529xQl6fxA7Z9JArob/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5PGkgA+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DOF9TCfD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D1CC16AAE;
-	Wed, 14 Jan 2026 12:06:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5PGkgA+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D8DC4CEF7;
+	Wed, 14 Jan 2026 12:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768392391;
-	bh=IXiea1JAWy8hq5EFO/KtmMlzvJWcD+fDKDcocQOcQFk=;
+	s=k20201202; t=1768392557;
+	bh=UZ6UaW73MvuZLl2m3trmg4FmJ33q86AJAI/EqVwy3eo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DOF9TCfDTk6eih11jEFeuuENrvGypFtZ6oAZOvC8fddU3ObXKUkomJ3EBphmogvlI
-	 lbzyTJ7ODiErL3sk+WZIGKvpN2GSfjVVf1M6XAwYmgkJRj2Y3JJHe842j9dOpdk4b/
-	 /gWuRf3m7/3JHU25MM8R5fcZZ9UAFMJBQt9FXhdCLfzdl0ThRIHAY6JIV3XXcltMBc
-	 PJYphZmZ8pN4WNZhQ+oi02UI5wgpEQafeU0sAQX/8lFVLn9koX2rE9KvyWi3K2GQwx
-	 h+ZKO4Ia7nkrG4WTFhaqLv5ZUW+/rtZ9G4c5bwnbQMjhWlFt2T+Mi3KZqmoY+yGYDY
-	 kZxSYGqWMsDBw==
+	b=r5PGkgA+XlzZQU2HUMFnrn0jhMvX+OUhlgjjF1MIYiSHvbV+R9hnpC50s1ZlIKEgo
+	 gMXXz7MCvIoUk3qJpF3sF6AfBRUf6thwF2wBB5oBIbfibRcB6etYDN4yZMao1z4KcH
+	 BvIN7zdV25pkC7PHtof5b9GafMqbRWI8S3hBTsmr93Gq0mz1QF7QfpUZcGg84VCPL+
+	 fMmj90AMIKc8eqqUmJSJG0pmb/tevR51m6CJh/X6RsAvbXY/gq8J30FfaNi35akuBM
+	 RqqMZo5xv8+nlH5MnUSJQrHAzoo2p+nqyNym4ibNGgpuxcmJF7CYX/lwS2G9tnheL9
+	 DSTA4fWm5e3Yg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vfzds-00000002AbS-4B8R;
-	Wed, 14 Jan 2026 12:06:29 +0000
-Date: Wed, 14 Jan 2026 12:06:28 +0000
-Message-ID: <86pl7cl7p7.wl-maz@kernel.org>
+	id 1vfzgY-00000002AgB-45bU;
+	Wed, 14 Jan 2026 12:09:15 +0000
+Date: Wed, 14 Jan 2026 12:09:14 +0000
+Message-ID: <86o6mwl7kl.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com,
@@ -67,10 +67,10 @@ Cc: amitsinght@marvell.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 12/47] KVM: arm64: Force guest EL1 to use user-space's partid configuration
-In-Reply-To: <20260112165914.4086692-13-ben.horgan@arm.com>
+Subject: Re: [PATCH v3 13/47] KVM: arm64: Use kernel-space partid configuration for hypercalls
+In-Reply-To: <20260112165914.4086692-14-ben.horgan@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
-	<20260112165914.4086692-13-ben.horgan@arm.com>
+	<20260112165914.4086692-14-ben.horgan@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -86,67 +86,42 @@ X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unis
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 12 Jan 2026 16:58:39 +0000,
+On Mon, 12 Jan 2026 16:58:40 +0000,
 Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> From: James Morse <james.morse@arm.com>
+> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
+> partid-0 for hypercalls, even when the host may have configured its kernel
+> threads to use a different partid. 0 may have been assigned to another
+> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
+> same partid as the kernel thread does on the host.
 > 
-> While we trap the guest's attempts to read/write the MPAM control
-> registers, the hardware continues to use them. Guest-EL0 uses KVM's
-> user-space's configuration, as the value is left in the register, and
-> guest-EL1 uses either the host kernel's configuration, or in the case of
-> VHE, the UNKNOWN reset value of MPAM1_EL1.
-> 
-> We want to force the guest-EL1 to use KVM's user-space's MPAM
-> configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
-> programmed the same and on VHE copy MPAM0_EL1 into the guest's
-> MPAM1_EL1. There is no need to restore as this is out of context once TGE
-> is set.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
-> Changes since rfc:
-> Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
-> Defer EL2 handling until next patch
-> 
 > Changes since v2:
-> Use mask (Oliver)
+> Use mask
+> Use read_sysreg_el1 to cope with hvhe
 > ---
->  arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> index f28c6cf4fe1b..9fb8e6628611 100644
-> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> @@ -183,6 +183,18 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
->  }
->  NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index a7c689152f68..ad99d8a73a9e 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -635,6 +635,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+>  	unsigned long hcall_min = 0;
+>  	hcall_t hfn;
 >  
-> +/*
-> + * The _EL0 value was written by the host's context switch and belongs to the
-> + * VMM. Copy this into the guest's _EL1 register.
-> + */
-> +static inline void __mpam_guest_load(void)
-> +{
-> +	u64 mask = MPAM0_EL1_PARTID_D | MPAM0_EL1_PARTID_I | MPAM0_EL1_PMG_D | MPAM0_EL1_PMG_I;
+> +	if (system_supports_mpam()) {
+> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
+> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
 > +
-> +	if (system_supports_mpam())
-> +		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1) & mask, SYS_MPAM1);
-> +}
-> +
->  /**
->   * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
->   *
-> @@ -222,6 +234,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
->  	 */
->  	__sysreg32_restore_state(vcpu);
->  	__sysreg_restore_user_state(guest_ctxt);
-> +	__mpam_guest_load();
+> +		write_sysreg_s(read_sysreg_el1(SYS_MPAM1) & mask, SYS_MPAM2_EL2);
+> +		isb();
+> +	}
 
-What's the rationale for doing this independently of rest of the MPAM
-stuff in __activate_traps_mpam()?
+Is it really OK to not preserve the rest of MPAM2_EL2? This explicitly
+clears MPAM2_EL2.MPAMEN, which feels counter-productive.
 
 	M.
 
