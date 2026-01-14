@@ -1,97 +1,162 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC00B2BFC85;
-	Wed, 14 Jan 2026 17:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF93432D42A;
+	Wed, 14 Jan 2026 17:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768411680; cv=none; b=nPmcsqw0LC8ljFbzHZiRbLAZnCnfvVGZyH84SgXNLTYnSaXUJYiKe/ADVA9gGTcEXI5kLeFI7PCnEzSTOcXRRaODJE5qSfIPFZDkjPm+D4EdE1NtY2Azj51wcxhjc03m162XEeWhtZlr73lMFtlGBlfQW8f/AsSObWFABbnlw+M=
+	t=1768413030; cv=none; b=ewK3EHBtKBY8IgSBJ/xLfBzgq68VhQwA7HYORzZOlq39satbbNF7KbaDMqjBrZxvf45FbAI6czFds4RTn2MHybRVcfIptjBo2FgWwnTLQp9IFqaiEq5WD4nQ9hC0fiI2NbxXuCdEY4Hy2oWfTf+7ZzSxcCEjLbsDeZvbHrf1mEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768411680; c=relaxed/simple;
-	bh=MKErPubq+4dytiNTQQKxbBYuZq0PRZbULHtHlGPOA9U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BE03Gu4TIeg1HIhNGtm7484AyBfZ+R6RAx8x94KaEp6hWnIWjFGUKk4qfM+KJlKH8gKbKHs2OYBM5ijdtmrCJJpyvzJUAlq0UnnSSecK08aPoKbz4f8cyUT7Z0/hDhXFPPL3OuT7HczqoEOGmjnoXJaf8tuFbBqCRgn1edN2/HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NPNzAUNV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768413030; c=relaxed/simple;
+	bh=F6cbQLf9UARh7CD8RoRzbiMKpPHFPVB2C0c+e23aWI4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YQTJIzq7lC3wzRWNzztH9C+3EhimUx+ZP/xrTgHJoBqkoBPUVAJQNdyAVIT6W0pTXwRpAnPAYPkMsLf2O2RjWgrZje19YNJV3R9AA7qE2EX8H75e4GmYXiRFVcQ+UztqRI17K+MjSX9AjCyvHIp1bLZUgQcdpzVGY7UUGrOY0hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AoFOzJDP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NPNzAUNV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D171AC4CEF7;
-	Wed, 14 Jan 2026 17:27:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoFOzJDP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 634AAC4CEF7;
+	Wed, 14 Jan 2026 17:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768411679;
-	bh=MKErPubq+4dytiNTQQKxbBYuZq0PRZbULHtHlGPOA9U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NPNzAUNVJjw7ci4jNIO2uMrDaRZ+xEVkHOjM5IQaB+UAc/c442sRxq+JFqShLlNHu
-	 XfqXYF3w43bN21mG+uwwl5Iy8UmeqdAF6OK+8BA3dJRHuc3qxpeZ7sISIDpad07B+b
-	 jv0O9lGX3cAw6lWQMYieUSLvbvMcZ62jwgH84qc3c3mRz2fGAgBep8rPfPeqZAy0jo
-	 2dfXmVozyUzfknjXc8Ivt7BoXalm2KIXNSEnqIHuiqB0zUpwqgkgpaDN17ovsedGUq
-	 yYEBZ8Lc+y9wmjLpRmdkKVnH4HYJqOsm4rroiYmT2UWZVGLhiIVe2pKwFyE4zUS7iv
-	 BdEdk1L1lKyHw==
-Date: Wed, 14 Jan 2026 17:27:53 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 23/30] KVM: arm64: Context switch SME state for guests
-Message-ID: <5a053bb6-5052-4664-b0cb-f05d56d4679d@sirena.org.uk>
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-23-8be3867cb883@kernel.org>
- <CA+EHjTyYcrWwBR0AwwdWFfOSwbmTMOhSee7y_-vrMfOxphrvqw@mail.gmail.com>
+	s=k20201202; t=1768413030;
+	bh=F6cbQLf9UARh7CD8RoRzbiMKpPHFPVB2C0c+e23aWI4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AoFOzJDPAV+aUvTHu2W1JqLU2FVetimtn0KpFkscDiPAQyeYmjTPqLbuFeQxvAbTG
+	 c02gAa9SQhDKO6dZvMF07gxCfIX8sCJM/DqZ08HLr791QULxdWwaRLsmqfiK+2bsdU
+	 q4btGoUwuQ652ws305BUnp5P++cB1HCU6/1tWgDO/+I0JXjyZGd9B1EflgGY3Nx8y7
+	 xBfPEXi7zjCwJxYyhL5e27L8laEPoxZm9gDAGyebUqXlXgM9s9+OZYkmIQjbgy2mLh
+	 NTvqDv9hjo8ysTI6F1yPEAkGNqK6zKAi7K2reLSNWeDclIbT7+hqtpiH4bqZImrleY
+	 Wex2pcc3BzGtw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vg50l-00000002H1E-2GRL;
+	Wed, 14 Jan 2026 17:50:27 +0000
+Date: Wed, 14 Jan 2026 17:50:26 +0000
+Message-ID: <86ms2gkrrx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com,
+	baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com,
+	carl@os.amperecomputing.com,
+	dave.martin@arm.com,
+	david@kernel.org,
+	dfustini@baylibre.com,
+	fenghuay@nvidia.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	jonathan.cameron@huawei.com,
+	kobak@nvidia.com,
+	lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peternewman@google.com,
+	punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com,
+	reinette.chatre@intel.com,
+	rohit.mathew@arm.com,
+	scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 13/47] KVM: arm64: Use kernel-space partid configuration for hypercalls
+In-Reply-To: <fe013731-4bbf-47c2-85f8-842f781ae2f3@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+	<20260112165914.4086692-14-ben.horgan@arm.com>
+	<86o6mwl7kl.wl-maz@kernel.org>
+	<b9e10419-b4de-4cb6-93b6-07e878d2072a@arm.com>
+	<fe013731-4bbf-47c2-85f8-842f781ae2f3@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5VzuVXkE42Zf47rW"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTyYcrWwBR0AwwdWFfOSwbmTMOhSee7y_-vrMfOxphrvqw@mail.gmail.com>
-X-Cookie: Absence makes the heart grow frantic.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Wed, 14 Jan 2026 16:50:50 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 1/14/26 14:39, Ben Horgan wrote:
+> > Hi Marc,
+> > 
+> > On 1/14/26 12:09, Marc Zyngier wrote:
+> >> On Mon, 12 Jan 2026 16:58:40 +0000,
+> >> Ben Horgan <ben.horgan@arm.com> wrote:
+> >>>
+> >>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
+> >>> partid-0 for hypercalls, even when the host may have configured its kernel
+> >>> threads to use a different partid. 0 may have been assigned to another
+> >>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
+> >>> same partid as the kernel thread does on the host.
+> >>>
+> >>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> >>> ---
+> >>> Changes since v2:
+> >>> Use mask
+> >>> Use read_sysreg_el1 to cope with hvhe
+> >>> ---
+> >>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
+> >>>  1 file changed, 8 insertions(+)
+> >>>
+> >>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> >>> index a7c689152f68..ad99d8a73a9e 100644
+> >>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> >>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> >>> @@ -635,6 +635,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+> >>>  	unsigned long hcall_min = 0;
+> >>>  	hcall_t hfn;
+> >>>  
+> >>> +	if (system_supports_mpam()) {
+> >>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
+> >>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
+> >>> +
+> >>> +		write_sysreg_s(read_sysreg_el1(SYS_MPAM1) & mask, SYS_MPAM2_EL2);
+> >>> +		isb();
+> >>> +	}
+> >>
+> >> Is it really OK to not preserve the rest of MPAM2_EL2? This explicitly
+> >> clears MPAM2_EL2.MPAMEN, which feels counter-productive.
+> >>
+> >> 	M.
+> >>
+> > 
+> > There are 3 things to consider:
+> > 1. traps - these are only relevant when we leave EL2 and are dealt with
+> > in __activate_traps_mpam(). (This also covers EnMPAMSM which is a
+> > not-trap bit.)
+> > 2. MPAM2_EL2.MPAMEN - this is read only as long as we have an EL3 and if
+> > we don't have EL3 will be 0 anyway from el2_setup.h and MPAM won't be
+> > considered supported in the kernel.
+> > 3. The alternate partid space fields which are kept as zero and relate
+> > to FEAT_RME.
+> > 
+> > So, safe. Ok with you or would you rather I make it more obviously safe?
+> 
+> As discussed offline, to avoid having to reason about MPAM2_EL2.MPAMEN
+> I'll set this bit to 1 in this write as we are already assuming mpam is
+> enabled and we want to keep it enabled.
 
---5VzuVXkE42Zf47rW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Sounds good, thanks.
 
-On Tue, Jan 13, 2026 at 02:24:56PM +0000, Fuad Tabba wrote:
-> On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
+	M.
 
-> > +#define sme_cond_update_smcr_vq(val, reg)                      \
-> > +       do {                                                    \
-> > +               u64 __smcr = read_sysreg_s((reg));              \
-> > +               u64 __new = __smcr & ~SMCR_ELx_LEN_MASK;        \
-> > +               __new |= (val) & SMCR_ELx_LEN_MASK;             \
-
-> Similar to what I pointed out in patch 15 [1], I think you need to
-> preserve the other bits, since SMCR isn't just about the length.
-
-This does preserve the existing bits?  It reads SMCR, masks out and then
-replaces the length.
-
---5VzuVXkE42Zf47rW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmln0hgACgkQJNaLcl1U
-h9BMEAf/RF9rOJl8ekbOzDRQR11JDX39xOnp1XjKNL/LwADVFknoshEFGbwNHbg7
-57daW1rnmcC+bbYUI884dlgzpo1QO8eu4Ln3iZDbBO3RiskXsxPq0/Aw9YPMpukh
-389uJu/fYy9Ag03Cgwp1Gcp7bMqs3eDrjnW6q4Rdaqc6tzECGGKLYT25uZjD9qdu
-n5jJy4QwQfmTpm1eH93FgHCkiW5PHP8wUv+dYDQ02i/Bg1ZOuiOeiof+YcAfZoxn
-okZ9Seieeb/x/OD9CYTtepifFAelR40y3pF8VLhESbkMzGiy7v6SmiCWhPvFhNkF
-uyOxnmGui2Xy46sOprB2XcG91p5l5g==
-=e2HB
------END PGP SIGNATURE-----
-
---5VzuVXkE42Zf47rW--
+-- 
+Without deviation from the norm, progress is not possible.
