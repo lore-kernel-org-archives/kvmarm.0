@@ -1,271 +1,158 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB3E257845
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 09:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768382876; cv=none; b=GWnGH4mg/Q4b0H7t3HeLWvvNvHqCtHuORqxdrXKllp6VyJBZFkyKKkkvIC0vBjPDc9AG6/kWH+KCPIeELOLFkCSNVqFjOM9kNigqvv0VNmxPCQmn8hSIQD49w12LJ59qos6/jyNldMOD8o9bX+AQikX5mDtBYSL2ih7FcYDktLA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768382876; c=relaxed/simple;
-	bh=vT/SHrgrKq6WisSwZQKI5TBKlgZu6AE9Vrb37GEgtks=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fRZWFFhZ/gwRpJm34/9UVeLt4f50lB60Ph4XED2fESw4bjVIk7tAYguJx6feMVJgWilFjUpp+ncORZtoGLJzy0t4wxo5oDaFXndVCSCuQB6INThqFFzoLIggMcccKa3y1VSh0Hh50Vaby4RNG/Jv3/d7vWhgY6VSFks96Yn487g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CTe0721k; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CBB38E120
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 10:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768385349; cv=pass; b=rtTindfOCfKQP5YnU3R4p4YY9MV0GVTgwN36ATbfyT0hhv7Mzth6o9UVQjwPLKIJB1Zix0WyIphwvP+mftzvG/d3/AGzWGMuHJNHu5NM49pbFkyuFonY+a6XUVcoKi3x9Tem/ZURcbcfbzQ8OhZLwGKovnd09Qk5nxsCUyo6KLI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768385349; c=relaxed/simple;
+	bh=cboAZC/N7GAkgRpHFH255dWg88gOhZq5k/rXBB7Or3M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t0M2jV5KYFK/f4yZ6WC1NFB/HqeW1r1BiaBDwxxZBwD5N5iy4/WQd5sukq7kso+2aRpPjImIdVeZuf79g2h28bznWKG/9qhL1kG2bcF5pHaPn30H9HjV5lobdfOPBQJbITrVrs6MGWwhm0v7E1E9Xc92Sk5FNZHui2DpGfVM+XY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ELgeT6+b; arc=pass smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CTe0721k"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-432d2c7a8b9so4658762f8f.2
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 01:27:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ELgeT6+b"
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47ee0a62115so41515e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 02:09:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768385346; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ksGN26r6X93pvPU8srXCLFpjkWiYIDaXINJMXiWmrjgsf0sM21GcY8XYjyTMylCRii
+         kLie0zM+F79ZTo5ZJW1aEjvTFUJ+QPMNi7UFrYhiSFOEu+zhmTL/Tfsnen6zhyeclUKT
+         nkYqcn8RrBzUjXXP7nyeHQXDXrSdQNR7N3Sp0aUYsCtJEdieB95lK9oDKPThHNuADGx1
+         VUjFngaAgmucBDZA8O7zv83P9yXwNfG32iQFvzuY6LJFzOYDkHOsr+NiozsexUdZVNmE
+         OvcERJyQgcwsuMy8++LVDn8DZx4Y6vCCF2BH6cMfF2BneAY57wUCHpTQ/gEgGDQasy2F
+         BngQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=9I9WuN49vDzL3jcHM+WJ2QBCVFtv9a9q6bPtMasJkpo=;
+        fh=HOiaXTy8wxiqu6Bl7rYQS27FLeXSuG90i1tV9HVtrH8=;
+        b=AxX2S1ySwUVC4amn4i2yyq7Oe8QP5PexMHtwDBhaQLq+nRsb0/vx3MUnhtQ13vZe+f
+         MbRFp8Dgx1pxfqkV9PxgL1s3tIdrwB8K7TcOh7Gw89C/fYEhywSZFD5omJfYXdWzvYDQ
+         ty5demi1EzbPLgpICgB+1NJxOcEG8oBfRX/cZ+QBELWq9cFgGFzE4HMt9ppSdiWtDI4V
+         iXkZaE+tj3IaBFAFUXmqpsodES/gSg7Tg85FX/OZjfmuXSKJkdqs4zlr3V4VWR6EsGFY
+         U3H+d4Ukrrld1ThOYUjjc4WfRy+Ix9FIvryIPzxWF0kEXg98y5zcQ887hv9UM+RUOpMT
+         0XsA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768382870; x=1768987670; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kap4gu0a51WoqK/VPbkwUanlik+X2vGOaSYLGv2cqSA=;
-        b=CTe0721kgFaSK8tlE6bs6uqk+a1dCJFIXsh7FX37uAwpchBynM/ZiBz34OaDjruNZO
-         ysxjHRz0bDn3oi7sdOBar3J7RP6cv+HU5S5oR3rbUIa5989jM+urkhPitNf6uPFce82f
-         6d09MjTOEhR45VUEPuNhqAvJVreLBJZXQIFKAR56vKUxZNxB9hKI6lZmGMGx+sXn6h8B
-         jKkWP5nFeBlBcZ63hR6jFSOusR8rv0Q8Mnxl/69jGSKep2tnqMdNXYrAXHME47YSKh77
-         2gvxUKuuDq9xZ2CAL0UScV8FSxZ0JofinACo1LgaLnaV4gcFX5FbNGHJri3Is7qOJWr1
-         iT6g==
+        d=google.com; s=20230601; t=1768385346; x=1768990146; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9I9WuN49vDzL3jcHM+WJ2QBCVFtv9a9q6bPtMasJkpo=;
+        b=ELgeT6+bD0pEHoOus9rQfsM6mgbSEYjEYHcLIV/9JBywMgeqM/AMxt0W/xoFcnx62T
+         mIj9XNEKOqV9IKDYKO2omyDkD3ZcKW0oawBT0xrRRgkxspjA0YqMrjaYheIkeP07jXwb
+         wVMoEJn5mDJq4mQt2sdQaIhLGyN0Ma7GeDzBDZ0q9ab7f54R4ieuk7Y14NCyhlvtnR9G
+         wuHC8VTD3npCjaq79WdpLmaJHgDK53Z5Q5ho8NzuzMrPTBApqfTgV/QNujD/xZlPiZU0
+         KCOlPFF6MqF8NH/N9pUrsRqm6wiZ9060CRpMvu0UJnq9AIR2k39dMqKga7yS2BxPe5wr
+         iyJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768382870; x=1768987670;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kap4gu0a51WoqK/VPbkwUanlik+X2vGOaSYLGv2cqSA=;
-        b=tzGFwE4zjXPmOB69jluKN6MiC5nfRJ6dBhr7/AFUVWu6bCTEpbAgUGxq8d+sSzfrA6
-         GQnfjHZ1h58RH5qtNuEIgA3b/T/sPnU7nekVukMRFZnXkVUUANeCAOCbzgUf/jbNdUzC
-         oXOUjpmkJ8Ag1LMKG/y3Qo3Wcg/FOZ7syIYTR+WkMghGGwfCbsuxoDQbQvE4vQeBJ6lg
-         37WsYkaNUlJf4uREPsrlIHR+FvzGMsUew3FVCknrIU24+4AYmFRh6uDErmggsNyrE9Uu
-         +XEGjKJ3fIUExXettvgpJnA+EFh6Tcpai5mGkoGWw8xfAJ96Hxmk/kZY2vZ/1KU0kPTb
-         Zf3Q==
-X-Gm-Message-State: AOJu0YyLTONG+EY3OwCNBnrVQ8TcaNjPwB8sRSq5B0OaiVAtBbqvHLdo
-	vnFF27tC3SaO+QbjjC1okWmCdrusP8Ubb1Znva1uDIWczdovN4tYjFcCutCSWsJZqw==
-X-Gm-Gg: AY/fxX5xsodgOAafmnCSagbdz3hdpVQEzd62GGQuxbF0l4wok6vPAqSLaz3r2wKvfzm
-	ILODVa9znf4xj9T7/OeOeeZa0uw97oTwDSeS3CUEoamNZo3U/QTbNoAiE+NQvwZeKuIsvjQX5on
-	ivYIxIFZUrQTGqlfCJLhnmZkb2tOuoJ6ueeocGgQDbAATqXY68Z2mKiThQIvqmASlDAa6WGmP3r
-	trMZZa3vw7gKmfb4zgqV2koS9JteynLjfAGQUvmpkYPL5HfeNx5H/6LvlIWEZmOpl6Hv4INzGdd
-	CE9ScIptfjR9xc+htgYpaplB+Nvupj/WK1TgEH/CHg9eOH7HY4qIKv1ZdTFRZH0QAilndT6Omii
-	0doOtgqwlELDx4P8q5+u8IQ3QXEVRBTyFcjyWEZTTjiv32XK4VVfjlbedNayLfAmUEsgt5tnn+6
-	ZiActGcKeWNO2e8+2nrko8VHuoEHpzS6oGETJXsqVMuOsnOrdmDA==
-X-Received: by 2002:a05:6000:2011:b0:431:4c6:724d with SMTP id ffacd0b85a97d-4342c5487f2mr2035382f8f.29.1768382870113;
-        Wed, 14 Jan 2026 01:27:50 -0800 (PST)
-Received: from google.com (44.145.34.34.bc.googleusercontent.com. [34.34.145.44])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-432bd5df96asm48157294f8f.28.2026.01.14.01.27.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jan 2026 01:27:49 -0800 (PST)
-Date: Wed, 14 Jan 2026 09:27:46 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Petteri Kangaslampi <pekangas@google.com>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] KVM: arm64: Calculate hyp VA size only once
-Message-ID: <aWdhkpXRLEek7AnL@google.com>
-References: <20260113194409.2970324-1-pekangas@google.com>
- <20260113194409.2970324-2-pekangas@google.com>
+        d=1e100.net; s=20230601; t=1768385346; x=1768990146;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9I9WuN49vDzL3jcHM+WJ2QBCVFtv9a9q6bPtMasJkpo=;
+        b=INItQMwPmajfKcc/cWwpZMLzU//VHk+lmyM397NxcjLpIGFQZ9i4X0p9H7KKLhuVPD
+         IHjKbufJwGTsu2zikb3hvPdUamtI13TpQ2C4EqGTk2kSq2W+tJKXwGvD/AC5CUqYCoK5
+         IEHQMvaeTdfpL8ao1NoNH2IAnimgQ31zsVz5yKfQaxcBp8pVVdzbzf4j7cbclPArbrU3
+         TJNcfVOYN4/AdkQA9ZZXI/5M+moPvbZ5Mav+p44Twl2GW0R6omEc8orESVOjG3zYDUxJ
+         I/59uXfCvv1jbO2VaLSf61ansNyDxff/ru1wYqA6iVLNaDQpbs7pxa3WrjnT2hBn0qJp
+         rmRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVYpLkfuYhsBObb8mak9XwS7fQ1gq7FcLcXQcTjfegLD1l9FLv/igr6v4zAlRulxpmypu4buvY=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw8whNphWU40xMRhv4uo4fbML6RyRTjEhBGkvPZbiApOj2fSd0C
+	B7/lDKZXa1cvOF9L27vnqZklDv/LqZK/7B+nemvItHt3OUFdZgJ7yy1JVYs1CNTQv4Z5EuSSSY1
+	LyUNKrHQ9VupEuOhWFnXsVYjjc6wiiU0nqW2bSfUx
+X-Gm-Gg: AY/fxX4UnaP0kjJ7DxlcZD9/uy5+b9Q+UOUCo21kLqsckAQkoIi23MwjEOf3gGaONzu
+	N/DsrmVA94gxbn0Z+NxsdngZaO8mAHe2ctzmbil+qsHHSsjx8mnDSmz/uwDh/LM0YCRXYOos7Pl
+	LsvWs4Dw1c1EhyRbnBbFY2h75K5i1VgeFJfl2hgy80Xa5KUbOKtdZuRtgPsBk5z8fJEyg/MutQi
+	/yQMXN2/vVnQabf5dANIt9BzfUilDluCHU/RM4nlZmBwlreJs//vaW14WVNyBczWo/chSC6w+3p
+	yJ6Lngd9/rk44zu33aoXO+6Kwg==
+X-Received: by 2002:a05:600c:4c09:b0:477:772e:9b76 with SMTP id
+ 5b1f17b1804b1-47ee452990amr280725e9.7.1768385345996; Wed, 14 Jan 2026
+ 02:09:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260113194409.2970324-2-pekangas@google.com>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-19-8be3867cb883@kernel.org> <CA+EHjTwQ4fLBE1YXoB6M0eamSgGDW=nfLaC+-_surBfVbh3byQ@mail.gmail.com>
+ <6f0e94ab-7c9c-4705-a90b-aea09ca629de@sirena.org.uk>
+In-Reply-To: <6f0e94ab-7c9c-4705-a90b-aea09ca629de@sirena.org.uk>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 14 Jan 2026 10:08:27 +0000
+X-Gm-Features: AZwV_QjZbcO1T13jUPtvWgDAfMEoLsYIn7-Rzu9SF6LWm46DZ1iruQdxKvCCi9Y
+Message-ID: <CA+EHjTwJw0D2w3oGC_ZSJsciUgiACoLAcRQv+_QSsA_bJKYj+A@mail.gmail.com>
+Subject: Re: [PATCH v9 19/30] KVM: arm64: Provide assembly for SME register access
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jan 13, 2026 at 07:44:09PM +0000, Petteri Kangaslampi wrote:
-> Calculate the hypervisor's VA size only once to maintain consistency
-> between the memory layout and MMU initialization logic. Previously the
-> two would be inconsistent when the kernel is configured for less than
-> IDMAP_VA_BITS of VA space.
-> 
-> Signed-off-by: Petteri Kangaslampi <pekangas@google.com>
+On Tue, 13 Jan 2026 at 19:20, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Mon, Jan 12, 2026 at 05:59:17PM +0000, Fuad Tabba wrote:
+> > On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
+>
+> > > +void __sme_save_state(void const *state, bool restore_zt);
+> > > +void __sme_restore_state(void const *state, bool restore_zt);
+>
+> > Would it be a good idea to pass the VL to these functions. Currently,
+> > they assume that the hardware's current VL matches the buffer's
+> > intended layout. But if there is a mismatch between the guest's VL and
+> > the current one, this could be difficult to debug. Passing the VL and
+> > checking it against _sme_rdsvl would be an inexpensive way to avoid
+> > these.
+>
+> This mirrors the way that we've handled this for the SVE and for the
+> host kernel.  We don't really have any good way to tell anything about
+> problems if things go wrong inside the hypervisor.
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
+I know this is how we've handled this for the SVE, but back then we
+only had one VL and one mode to worry about. The chances of something
+going wrong now are much higher.
 
-> ---
->  arch/arm64/include/asm/kvm_mmu.h |  3 ++-
->  arch/arm64/kvm/arm.c             |  4 ++--
->  arch/arm64/kvm/mmu.c             | 28 ++++-----------------------
->  arch/arm64/kvm/va_layout.c       | 33 +++++++++++++++++++++++++++-----
->  4 files changed, 36 insertions(+), 32 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 2dc5e6e742bb..d968aca0461a 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -103,6 +103,7 @@ alternative_cb_end
->  void kvm_update_va_mask(struct alt_instr *alt,
->  			__le32 *origptr, __le32 *updptr, int nr_inst);
->  void kvm_compute_layout(void);
-> +u32 kvm_hyp_va_bits(void);
->  void kvm_apply_hyp_relocations(void);
->  
->  #define __hyp_pa(x) (((phys_addr_t)(x)) + hyp_physvirt_offset)
-> @@ -185,7 +186,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
->  
->  phys_addr_t kvm_mmu_get_httbr(void);
->  phys_addr_t kvm_get_idmap_vector(void);
-> -int __init kvm_mmu_init(u32 *hyp_va_bits);
-> +int __init kvm_mmu_init(u32 hyp_va_bits);
->  
->  static inline void *__kvm_vector_slot2addr(void *base,
->  					   enum arm64_hyp_spectre_vector slot)
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 4f80da0c0d1d..4703f0e15102 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2568,7 +2568,7 @@ static void pkvm_hyp_init_ptrauth(void)
->  /* Inits Hyp-mode on all online CPUs */
->  static int __init init_hyp_mode(void)
->  {
-> -	u32 hyp_va_bits;
-> +	u32 hyp_va_bits = kvm_hyp_va_bits();
->  	int cpu;
->  	int err = -ENOMEM;
->  
-> @@ -2582,7 +2582,7 @@ static int __init init_hyp_mode(void)
->  	/*
->  	 * Allocate Hyp PGD and setup Hyp identity mapping
->  	 */
-> -	err = kvm_mmu_init(&hyp_va_bits);
-> +	err = kvm_mmu_init(hyp_va_bits);
->  	if (err)
->  		goto out_err;
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 48d7c372a4cd..d5a506c99f73 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2284,11 +2284,9 @@ static struct kvm_pgtable_mm_ops kvm_hyp_mm_ops = {
->  	.virt_to_phys		= kvm_host_pa,
->  };
->  
-> -int __init kvm_mmu_init(u32 *hyp_va_bits)
-> +int __init kvm_mmu_init(u32 hyp_va_bits)
->  {
->  	int err;
-> -	u32 idmap_bits;
-> -	u32 kernel_bits;
->  
->  	hyp_idmap_start = __pa_symbol(__hyp_idmap_text_start);
->  	hyp_idmap_start = ALIGN_DOWN(hyp_idmap_start, PAGE_SIZE);
-> @@ -2302,25 +2300,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
->  	 */
->  	BUG_ON((hyp_idmap_start ^ (hyp_idmap_end - 1)) & PAGE_MASK);
->  
-> -	/*
-> -	 * The ID map is always configured for 48 bits of translation, which
-> -	 * may be fewer than the number of VA bits used by the regular kernel
-> -	 * stage 1, when VA_BITS=52.
-> -	 *
-> -	 * At EL2, there is only one TTBR register, and we can't switch between
-> -	 * translation tables *and* update TCR_EL2.T0SZ at the same time. Bottom
-> -	 * line: we need to use the extended range with *both* our translation
-> -	 * tables.
-> -	 *
-> -	 * So use the maximum of the idmap VA bits and the regular kernel stage
-> -	 * 1 VA bits to assure that the hypervisor can both ID map its code page
-> -	 * and map any kernel memory.
-> -	 */
-> -	idmap_bits = IDMAP_VA_BITS;
-> -	kernel_bits = vabits_actual;
-> -	*hyp_va_bits = max(idmap_bits, kernel_bits);
-> -
-> -	kvm_debug("Using %u-bit virtual addresses at EL2\n", *hyp_va_bits);
-> +	kvm_debug("Using %u-bit virtual addresses at EL2\n", hyp_va_bits);
->  	kvm_debug("IDMAP page: %lx\n", hyp_idmap_start);
->  	kvm_debug("HYP VA range: %lx:%lx\n",
->  		  kern_hyp_va(PAGE_OFFSET),
-> @@ -2345,7 +2325,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
->  		goto out;
->  	}
->  
-> -	err = kvm_pgtable_hyp_init(hyp_pgtable, *hyp_va_bits, &kvm_hyp_mm_ops);
-> +	err = kvm_pgtable_hyp_init(hyp_pgtable, hyp_va_bits, &kvm_hyp_mm_ops);
->  	if (err)
->  		goto out_free_pgtable;
->  
-> @@ -2354,7 +2334,7 @@ int __init kvm_mmu_init(u32 *hyp_va_bits)
->  		goto out_destroy_pgtable;
->  
->  	io_map_base = hyp_idmap_start;
-> -	__hyp_va_bits = *hyp_va_bits;
-> +	__hyp_va_bits = hyp_va_bits;
->  	return 0;
->  
->  out_destroy_pgtable:
-> diff --git a/arch/arm64/kvm/va_layout.c b/arch/arm64/kvm/va_layout.c
-> index 91b22a014610..2346f9435a71 100644
-> --- a/arch/arm64/kvm/va_layout.c
-> +++ b/arch/arm64/kvm/va_layout.c
-> @@ -46,9 +46,31 @@ static void init_hyp_physvirt_offset(void)
->  	hyp_physvirt_offset = (s64)__pa(kern_va) - (s64)hyp_va;
->  }
->  
-> +/*
-> + * Calculate the actual VA size used by the hypervisor
-> + */
-> +__init u32 kvm_hyp_va_bits(void)
-> +{
-> +	/*
-> +	 * The ID map is always configured for 48 bits of translation, which may
-> +	 * be different from the number of VA bits used by the regular kernel
-> +	 * stage 1.
-> +	 *
-> +	 * At EL2, there is only one TTBR register, and we can't switch between
-> +	 * translation tables *and* update TCR_EL2.T0SZ at the same time. Bottom
-> +	 * line: we need to use the extended range with *both* our translation
-> +	 * tables.
-> +	 *
-> +	 * So use the maximum of the idmap VA bits and the regular kernel stage
-> +	 * 1 VA bits as the hypervisor VA size to assure that the hypervisor can
-> +	 * both ID map its code page and map any kernel memory.
-> +	 */
-> +	return max(IDMAP_VA_BITS, vabits_actual);
-> +}
-> +
->  /*
->   * We want to generate a hyp VA with the following format (with V ==
-> - * vabits_actual):
-> + * hypervisor VA bits):
->   *
->   *  63 ... V |     V-1    | V-2 .. tag_lsb | tag_lsb - 1 .. 0
->   *  ---------------------------------------------------------
-> @@ -61,10 +83,11 @@ __init void kvm_compute_layout(void)
->  {
->  	phys_addr_t idmap_addr = __pa_symbol(__hyp_idmap_text_start);
->  	u64 hyp_va_msb;
-> +	u32 hyp_va_bits = kvm_hyp_va_bits();
->  
->  	/* Where is my RAM region? */
-> -	hyp_va_msb  = idmap_addr & BIT(vabits_actual - 1);
-> -	hyp_va_msb ^= BIT(vabits_actual - 1);
-> +	hyp_va_msb  = idmap_addr & BIT(hyp_va_bits - 1);
-> +	hyp_va_msb ^= BIT(hyp_va_bits - 1);
->  
->  	tag_lsb = fls64((u64)phys_to_virt(memblock_start_of_DRAM()) ^
->  			(u64)(high_memory - 1));
-> @@ -72,9 +95,9 @@ __init void kvm_compute_layout(void)
->  	va_mask = GENMASK_ULL(tag_lsb - 1, 0);
->  	tag_val = hyp_va_msb;
->  
-> -	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && tag_lsb != (vabits_actual - 1)) {
-> +	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE) && tag_lsb != (hyp_va_bits - 1)) {
->  		/* We have some free bits to insert a random tag. */
-> -		tag_val |= get_random_long() & GENMASK_ULL(vabits_actual - 2, tag_lsb);
-> +		tag_val |= get_random_long() & GENMASK_ULL(hyp_va_bits - 2, tag_lsb);
->  	}
->  	tag_val >>= tag_lsb;
->  
-> -- 
-> 2.52.0.457.g6b5491de43-goog
-> 
+
+> > > +SYM_FUNC_START(__sve_get_vl)
+> > > +       _sve_rdvl       0, 1
+> > > +       ret
+> > > +SYM_FUNC_END(__sve_get_vl)
+>
+> > Since this is just one instruction, would it be better to implement it
+> > as an inline assembly in the header file rather than a full
+> > SYM_FUNC_START, to reduce the overhead?
+>
+> Actually this isn't referenced anymore so could just be deleted.  It
+> mirrors what we've got in the host code, we have to hand assemble
+> everything because we still don't require binutils that supports SVE,
+> let alone SME, and that's done with macros that do argument validation
+> which don't play nice with C.  Even with an assembler that supports the
+> instruction using a SVE instruction from C code gets annoying.  It has
+> crossed my mind to inline but it never seemed worth the effort
+>
+> > > +SYM_FUNC_START(__sme_save_state)
+>
+> > I think that this needs an isb(). We need to ensure that SMCR updates
+> > are visible here. Looking ahead to where you introduce
+> > __hyp_sme_save_guest(), that doesn't have a barrier after updating
+> > SMCR. The alternative is to call the barrier where it's needed, but
+> > make sure that this is well documented.
+>
+> I think we should put the barrier where the update that needs it is.
+
+That's fine, but then we should at least document this.
+
+Cheers,
+/fuad
