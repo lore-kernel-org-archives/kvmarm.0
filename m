@@ -1,162 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF93432D42A;
-	Wed, 14 Jan 2026 17:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4666C2F39D7;
+	Wed, 14 Jan 2026 18:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768413030; cv=none; b=ewK3EHBtKBY8IgSBJ/xLfBzgq68VhQwA7HYORzZOlq39satbbNF7KbaDMqjBrZxvf45FbAI6czFds4RTn2MHybRVcfIptjBo2FgWwnTLQp9IFqaiEq5WD4nQ9hC0fiI2NbxXuCdEY4Hy2oWfTf+7ZzSxcCEjLbsDeZvbHrf1mEU=
+	t=1768414932; cv=none; b=l8eLWoXzKhsGJYu+iZoAANRRJsDqQTF4aDv25nVsZUfEx4UPCwnVtkeX6r8bJFmMVfwdbjMFhtPo9WvjLn4C/Xal8k2BW/PYxgGioWxQI1EWrCnfWJkmhQQh16TrAPpq4MDlG5PuvTrkPMKhueoyEQ+q4WQMWaW8MI6Y1UqiqOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768413030; c=relaxed/simple;
-	bh=F6cbQLf9UARh7CD8RoRzbiMKpPHFPVB2C0c+e23aWI4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YQTJIzq7lC3wzRWNzztH9C+3EhimUx+ZP/xrTgHJoBqkoBPUVAJQNdyAVIT6W0pTXwRpAnPAYPkMsLf2O2RjWgrZje19YNJV3R9AA7qE2EX8H75e4GmYXiRFVcQ+UztqRI17K+MjSX9AjCyvHIp1bLZUgQcdpzVGY7UUGrOY0hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AoFOzJDP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768414932; c=relaxed/simple;
+	bh=tcknC6iemaw7J5r4is+1RFQMsTj8mbkEYsrSA6D6Saw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YeGh2TkGZ+xujEu49iTscHhbDPLCHQLyS3huzF9AERfRBpM3IXosH3KqCGiWSFO1S5X/I56GvkkgnXEjxJ4y5Sdht7LGqHvGzevl7mcCIePaINQ7AqVBI3JPwe57awqWBQsgZK4be+OA6fORRQFja+rXsXv6xu+hTplHZQa4Azs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnv936Pw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AoFOzJDP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 634AAC4CEF7;
-	Wed, 14 Jan 2026 17:50:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnv936Pw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C6A5C19421;
+	Wed, 14 Jan 2026 18:22:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768413030;
-	bh=F6cbQLf9UARh7CD8RoRzbiMKpPHFPVB2C0c+e23aWI4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AoFOzJDPAV+aUvTHu2W1JqLU2FVetimtn0KpFkscDiPAQyeYmjTPqLbuFeQxvAbTG
-	 c02gAa9SQhDKO6dZvMF07gxCfIX8sCJM/DqZ08HLr791QULxdWwaRLsmqfiK+2bsdU
-	 q4btGoUwuQ652ws305BUnp5P++cB1HCU6/1tWgDO/+I0JXjyZGd9B1EflgGY3Nx8y7
-	 xBfPEXi7zjCwJxYyhL5e27L8laEPoxZm9gDAGyebUqXlXgM9s9+OZYkmIQjbgy2mLh
-	 NTvqDv9hjo8ysTI6F1yPEAkGNqK6zKAi7K2reLSNWeDclIbT7+hqtpiH4bqZImrleY
-	 Wex2pcc3BzGtw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vg50l-00000002H1E-2GRL;
-	Wed, 14 Jan 2026 17:50:27 +0000
-Date: Wed, 14 Jan 2026 17:50:26 +0000
-Message-ID: <86ms2gkrrx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com,
-	baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com,
-	carl@os.amperecomputing.com,
-	dave.martin@arm.com,
-	david@kernel.org,
-	dfustini@baylibre.com,
-	fenghuay@nvidia.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	jonathan.cameron@huawei.com,
-	kobak@nvidia.com,
-	lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	peternewman@google.com,
-	punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com,
-	reinette.chatre@intel.com,
-	rohit.mathew@arm.com,
-	scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 13/47] KVM: arm64: Use kernel-space partid configuration for hypercalls
-In-Reply-To: <fe013731-4bbf-47c2-85f8-842f781ae2f3@arm.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
-	<20260112165914.4086692-14-ben.horgan@arm.com>
-	<86o6mwl7kl.wl-maz@kernel.org>
-	<b9e10419-b4de-4cb6-93b6-07e878d2072a@arm.com>
-	<fe013731-4bbf-47c2-85f8-842f781ae2f3@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1768414931;
+	bh=tcknC6iemaw7J5r4is+1RFQMsTj8mbkEYsrSA6D6Saw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gnv936PwAOYqla2o5RLnSGyPnWK7eepNYoigSv3xXJ9tqfUVL17uGzncwmmSr8jmA
+	 fh4eTYbjwkRZaR/lWB4BeQFZeI321YENVp8PuJFL27WkKn6hGS7oxQ3cluEXsJKnUf
+	 e+CWfzWOQOHbIi1FxuPUJvknfYFlCBcidWhMHmmDTsRmlcrzYEpjBMYMaEoTVksV3U
+	 fApWuGawlIvleBifk6rYfDE4Q+QM7Y/6v3afg+uN1IThtpoL1Pr8o8yr+UBntNCr1j
+	 6RfbmLF9dPh2zIAHhUCaPHd+V49mgU2eFN3GXxpC4hWgyf7Rz4pazXUXqAZC71JL5u
+	 nbaDt7DOD7v/Q==
+Date: Wed, 14 Jan 2026 18:22:05 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 25/30] KVM: arm64: Expose SME to nested guests
+Message-ID: <2498896a-78cb-4184-82ac-6497b1e9bd03@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-25-8be3867cb883@kernel.org>
+ <CA+EHjTwZCcMFT6gAM2oaQz5V_vqEBmVuggFBbABbXPvC+U919Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GsOJE4+Rwb8rI0F1"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwZCcMFT6gAM2oaQz5V_vqEBmVuggFBbABbXPvC+U919Q@mail.gmail.com>
+X-Cookie: Absence makes the heart grow frantic.
 
-On Wed, 14 Jan 2026 16:50:50 +0000,
-Ben Horgan <ben.horgan@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 1/14/26 14:39, Ben Horgan wrote:
-> > Hi Marc,
-> > 
-> > On 1/14/26 12:09, Marc Zyngier wrote:
-> >> On Mon, 12 Jan 2026 16:58:40 +0000,
-> >> Ben Horgan <ben.horgan@arm.com> wrote:
-> >>>
-> >>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
-> >>> partid-0 for hypercalls, even when the host may have configured its kernel
-> >>> threads to use a different partid. 0 may have been assigned to another
-> >>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
-> >>> same partid as the kernel thread does on the host.
-> >>>
-> >>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> >>> ---
-> >>> Changes since v2:
-> >>> Use mask
-> >>> Use read_sysreg_el1 to cope with hvhe
-> >>> ---
-> >>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
-> >>>  1 file changed, 8 insertions(+)
-> >>>
-> >>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> >>> index a7c689152f68..ad99d8a73a9e 100644
-> >>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> >>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> >>> @@ -635,6 +635,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
-> >>>  	unsigned long hcall_min = 0;
-> >>>  	hcall_t hfn;
-> >>>  
-> >>> +	if (system_supports_mpam()) {
-> >>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
-> >>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
-> >>> +
-> >>> +		write_sysreg_s(read_sysreg_el1(SYS_MPAM1) & mask, SYS_MPAM2_EL2);
-> >>> +		isb();
-> >>> +	}
-> >>
-> >> Is it really OK to not preserve the rest of MPAM2_EL2? This explicitly
-> >> clears MPAM2_EL2.MPAMEN, which feels counter-productive.
-> >>
-> >> 	M.
-> >>
-> > 
-> > There are 3 things to consider:
-> > 1. traps - these are only relevant when we leave EL2 and are dealt with
-> > in __activate_traps_mpam(). (This also covers EnMPAMSM which is a
-> > not-trap bit.)
-> > 2. MPAM2_EL2.MPAMEN - this is read only as long as we have an EL3 and if
-> > we don't have EL3 will be 0 anyway from el2_setup.h and MPAM won't be
-> > considered supported in the kernel.
-> > 3. The alternate partid space fields which are kept as zero and relate
-> > to FEAT_RME.
-> > 
-> > So, safe. Ok with you or would you rather I make it more obviously safe?
-> 
-> As discussed offline, to avoid having to reason about MPAM2_EL2.MPAMEN
-> I'll set this bit to 1 in this write as we are already assuming mpam is
-> enabled and we want to keep it enabled.
 
-Sounds good, thanks.
+--GsOJE4+Rwb8rI0F1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	M.
+On Tue, Jan 13, 2026 at 02:37:57PM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 
--- 
-Without deviation from the norm, progress is not possible.
+> >         case SYS_ID_AA64PFR1_EL1:
+> > -               /* Only support BTI, SSBS, CSV2_frac */
+> > +               /* Only support BTI, SME, SSBS, CSV2_frac */
+> >                 val &= ~(ID_AA64PFR1_EL1_PFAR           |
+> >                          ID_AA64PFR1_EL1_MTEX           |
+> >                          ID_AA64PFR1_EL1_THE            |
+> >                          ID_AA64PFR1_EL1_GCS            |
+> >                          ID_AA64PFR1_EL1_MTE_frac       |
+> >                          ID_AA64PFR1_EL1_NMI            |
+> > -                        ID_AA64PFR1_EL1_SME            |
+
+> Should we also limit this to SME2, i.e.
+
+> + val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64PFR1_EL1, SME, SME2);
+
+> That said, we don't do anything similar to SVE, but it might also be
+> worth doing that there.
+
+This feels like a general approach issue with these registers that's out
+of scope for this series, it's not just the vector extensions which
+could introduce new state or anything else that requires explicit
+support.  AIUI the theory here is that we bootstrap from the host's
+sanitised registers so the time to add any required limits on future
+values would be when enabling them for the host kernel, assuming KVM
+support isn't added simultaneously.
+
+--GsOJE4+Rwb8rI0F1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmln3swACgkQJNaLcl1U
+h9D5Awf+IRsqdR9I7nYCFQPlwzCHBQBbuNnWwG5/UXXDqIc3+6wyvcIQNcpbea0/
+TQLaQPJEdkXSt9dQkg0iKdV3YBSDo8IW8JMvqDcgNueXpfuJdIPFDerneL0HTO/l
+/80XNxIjRpwrR71w+bFdSGWj6TpDcgtNYQj4z1wT6wRQ3VoQxnRsNiZoxObmnM8A
+t1DLEPg1EigeOwvBt12Q6yOVBiAM+lAF04JU7Kq28s3Nho38aMBGrMkiz9zLY/bv
+Lk+KVaDLIh5KmecygdX5rm/EEyT96tV/fj+NXrctDs2+/ktqa2JYtF2PpuQuNXZx
+6dDmflaX69rqabPcKmADbMedkpxJRA==
+=kw66
+-----END PGP SIGNATURE-----
+
+--GsOJE4+Rwb8rI0F1--
