@@ -1,54 +1,25 @@
-Received: from fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com [35.158.23.94])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3AF223336
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 13:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.158.23.94
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96AED2BE056
+	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 14:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768399036; cv=none; b=b1MHdk1Fb2BwDQyoNzMsEm5z3yq4ygn8HUbXptJxRdSWG7DfuSKbAkLJjuc+UP82tQKzVm17s0fRoUqs9abvnbJGzYfUjE4lN2P5Z6uR9vCfWw5R4Hea8sLtpffcxowwhakobFFl2m1aajn3CGDLhnilZdLPsADvzVyBMeVOYDk=
+	t=1768401607; cv=none; b=KuDLsFKXHiF+v4Q8ci8U0M20uAbGK4Q5zAn8vhzDMReaKT85L41hcu27R0aB+0XehFQqBL+TU+LEKz2BdeE4mZPet10hpTtSI5c6WXDMXAG5HO/cm27KsuE8/T8fJwydD7CRQJhpwn2+aQrTXekRTnPphNGtMEN4fZsm6I/somo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768399036; c=relaxed/simple;
-	bh=1JkDlurwWk55AzLOFJDArMZykzGsjV26pSqNxyrQBe4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QUHEQamhSgyy2kKo0BGi8xJSDpxnApbXPwvOgkR//G98OHYe6h7WX+qv+VsFe8dALEkbasH5oPMH5Tlzo09SdOvcDwEG6n/yVIlI7EjT9Mb9nddmQinTNtbu1SnYXPdpILf6fl7p0O7/+2tesDPyz5EjQpIUCzAxpPkX+OJUGY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ei4qX3mg; arc=none smtp.client-ip=35.158.23.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ei4qX3mg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768399035; x=1799935035;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=X0wS+NExQh+M8KgHpz2Gdy3x5KfpNxu9ZGrCLn5oS58=;
-  b=Ei4qX3mgd81vByPvrJVF8LH+edpdxnl0uRQN3FXC0J+hSJbw+GADzSyy
-   hNbftZ4qhXGm2QC1dX7RtUFhGKWsc3tcsLUm60RYoEFnhnqm0H7tJ4diI
-   o59VkTvIMMvoEWNzZ7rOUmUccCFxkBRFogjw8HDWz/okw1jnPcFRmjDOx
-   q5ORCa8ZiBB71e2ByYqIGNRQa2DQkMvqCcKVCxa69kByNVwIZTbOYrxBY
-   85NmJOn+r1NzWVMPNFwoPOth47X7HsLYgYBLKFWMhyQ8ZYJD6mW91PDzC
-   yGx562qM+wtpBzEHKNLTpw7TbaWIWbhWFxsb+G81BwvLqHWzvFrUUcs3z
-   g==;
-X-CSE-ConnectionGUID: iO8DhPxBRPuaaivOKTdJYg==
-X-CSE-MsgGUID: Xpamj4VgTXmh9bqFPpAB6A==
-X-IronPort-AV: E=Sophos;i="6.21,225,1763424000"; 
-   d="scan'208";a="7900619"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-008.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2026 13:57:13 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.225:26534]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.30.60:2525] with esmtp (Farcaster)
- id fbe8cebb-b0d5-489e-8423-36b49c4d2af0; Wed, 14 Jan 2026 13:57:13 +0000 (UTC)
-X-Farcaster-Flow-ID: fbe8cebb-b0d5-489e-8423-36b49c4d2af0
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Wed, 14 Jan 2026 13:57:12 +0000
-Received: from [192.168.15.25] (10.106.82.12) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Wed, 14 Jan 2026
- 13:57:08 +0000
-Message-ID: <e402f9b9-84a1-4234-8caf-bb9f2a1e9a2f@amazon.com>
-Date: Wed, 14 Jan 2026 13:57:08 +0000
+	s=arc-20240116; t=1768401607; c=relaxed/simple;
+	bh=6pTioNudaehgaYePcdWKBdNS5VrsxZK06qKSC5dkqG8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nQvcDTgWDtd9OLc032SOPiTNAC2qMNm/l4Ki+KmZt0WBvvbASZt9uiKxSidG5t5Wbt/FmzQMJY21iusNhhyBrgwpjbtsuL0jWTrr2q0acG/yUEMVVsDxIUrFPCbuxf7nGzfmsjzanep5hKP5SMW0P9qzKcU5N9pUqeLyME31saE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3DA541515;
+	Wed, 14 Jan 2026 06:39:58 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 179563F632;
+	Wed, 14 Jan 2026 06:39:59 -0800 (PST)
+Message-ID: <b9e10419-b4de-4cb6-93b6-07e878d2072a@arm.com>
+Date: Wed, 14 Jan 2026 14:39:58 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,100 +27,85 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v8 01/13] x86: export set_direct_map_valid_noflush to KVM
- module
-To: Dave Hansen <dave.hansen@intel.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
-	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com"
-	<mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org"
-	<luto@kernel.org>, "peterz@infradead.org" <peterz@infradead.org>,
-	"willy@infradead.org" <willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>,
-	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz"
-	<vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com"
-	<surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org"
-	<ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev"
-	<martin.lau@linux.dev>, "eddyz87@gmail.com" <eddyz87@gmail.com>,
-	"song@kernel.org" <song@kernel.org>, "yonghong.song@linux.dev"
-	<yonghong.song@linux.dev>, "john.fastabend@gmail.com"
-	<john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>,
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
-	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com"
-	<peterx@redhat.com>, "jannh@google.com" <jannh@google.com>,
-	"pfalcato@suse.de" <pfalcato@suse.de>, "shuah@kernel.org" <shuah@kernel.org>,
-	"riel@surriel.com" <riel@surriel.com>, "baohua@kernel.org"
-	<baohua@kernel.org>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"jgross@suse.com" <jgross@suse.com>, "yu-cheng.yu@intel.com"
-	<yu-cheng.yu@intel.com>, "kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com"
-	<coxu@redhat.com>, "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
-	"ackerleytng@google.com" <ackerleytng@google.com>, "maobibo@loongson.cn"
-	<maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>,
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "isaku.yamahata@intel.com"
-	<isaku.yamahata@intel.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "vannapurve@google.com"
-	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
-	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
- Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <20251205165743.9341-1-kalyazin@amazon.com>
- <20251205165743.9341-2-kalyazin@amazon.com>
- <9409531b-589b-4a54-b122-06a3cf0846f3@intel.com>
+Subject: Re: [PATCH v3 13/47] KVM: arm64: Use kernel-space partid
+ configuration for hypercalls
+To: Marc Zyngier <maz@kernel.org>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-14-ben.horgan@arm.com> <86o6mwl7kl.wl-maz@kernel.org>
+From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <9409531b-589b-4a54-b122-06a3cf0846f3@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <86o6mwl7kl.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D006EUC001.ant.amazon.com (10.252.51.203) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
+Hi Marc,
 
+On 1/14/26 12:09, Marc Zyngier wrote:
+> On Mon, 12 Jan 2026 16:58:40 +0000,
+> Ben Horgan <ben.horgan@arm.com> wrote:
+>>
+>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
+>> partid-0 for hypercalls, even when the host may have configured its kernel
+>> threads to use a different partid. 0 may have been assigned to another
+>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
+>> same partid as the kernel thread does on the host.
+>>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> ---
+>> Changes since v2:
+>> Use mask
+>> Use read_sysreg_el1 to cope with hvhe
+>> ---
+>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> index a7c689152f68..ad99d8a73a9e 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> @@ -635,6 +635,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+>>  	unsigned long hcall_min = 0;
+>>  	hcall_t hfn;
+>>  
+>> +	if (system_supports_mpam()) {
+>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
+>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
+>> +
+>> +		write_sysreg_s(read_sysreg_el1(SYS_MPAM1) & mask, SYS_MPAM2_EL2);
+>> +		isb();
+>> +	}
+> 
+> Is it really OK to not preserve the rest of MPAM2_EL2? This explicitly
+> clears MPAM2_EL2.MPAMEN, which feels counter-productive.
+> 
+> 	M.
+> 
 
-On 05/12/2025 17:26, Dave Hansen wrote:
-> On 12/5/25 08:57, Kalyazin, Nikita wrote:
-> ...
->> +EXPORT_SYMBOL_FOR_MODULES(set_direct_map_valid_noflush, "kvm");
-> 
-> I think this export is a bad idea. The interface is abhorrent enough,
-> but exporting it just invites abuse and bugs.
-> 
-> I think what this really needs is a pair of helpers that are just:
-> 
->          folio_zap_direct_map()
-> and
->          folio_restore_direct_map()
-> 
-> that take a folio. *Those* can get exported to modules and those should
-> internally flush the TLB and not expect callers to do it.
+There are 3 things to consider:
+1. traps - these are only relevant when we leave EL2 and are dealt with
+in __activate_traps_mpam(). (This also covers EnMPAMSM which is a
+not-trap bit.)
+2. MPAM2_EL2.MPAMEN - this is read only as long as we have an EL3 and if
+we don't have EL3 will be 0 anyway from el2_setup.h and MPAM won't be
+considered supported in the kernel.
+3. The alternate partid space fields which are kept as zero and relate
+to FEAT_RME.
 
-Thanks, implemented in the v9.
+So, safe. Ok with you or would you rather I make it more obviously safe?
+
+Thanks,
+
+Ben
+
