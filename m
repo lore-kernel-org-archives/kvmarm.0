@@ -1,126 +1,108 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DDC3A4F28
-	for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 16:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4788A2D73A6;
+	Wed, 14 Jan 2026 17:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768409459; cv=none; b=OgaTN56dWfSaKatg9YzKr7DmR3Hj60sUXHLy/te8WxNh0etWf67Ea7GO5BAliFL/NKEusYBjN7hBn81KK7nQtWOb5aFijyo5HJrJtXM45ocvU3znZrK/seBcrRvKAJVWD9qUTbwuyzzxxhd9Z4jEvaOs13U/3qetp141lk7lKuI=
+	t=1768410452; cv=none; b=jzIE4kkYt+TaxJ75LULMybvnQ3klyRUnCzFXXyd+3dWn5wL8TLBsj4vGZyKDJ3CKjhJqrOcJnTdJheUiLHoNQX+C4RhwfZR75/jvRAOZjYqbATnQhVVic/HEdkkyw8bGA+Q1O0dUg1qAOxcM8WI247er1bxVtfxM+R/AAmDKGg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768409459; c=relaxed/simple;
-	bh=PNs3KuzkMQSve3RYBz0j8JMSUNrIAZB1SZQgiHB6G0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=SItxJtHxsrXlcwO4tSYQaibKa3tqx1K/PqQdemEAsTVru0Jn/kVRaqaxZs3guAWp32xbRJ/qe/rf48+zthfFfHJkHpTHJDddTcwKKXE8ZbYAWzEEGEL7Azodwfyf0j7LnxRH//XhFL2zAImYdhtHAteoOwtG4XdNDD11W7oVUpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 547731515;
-	Wed, 14 Jan 2026 08:50:50 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 32FBE3F632;
-	Wed, 14 Jan 2026 08:50:52 -0800 (PST)
-Message-ID: <fe013731-4bbf-47c2-85f8-842f781ae2f3@arm.com>
-Date: Wed, 14 Jan 2026 16:50:50 +0000
+	s=arc-20240116; t=1768410452; c=relaxed/simple;
+	bh=MGElqEXwoRbt8mMzLI9gWMm6tx51R4BHJkiacnjgofs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lICmki7wmFHah8wHSxJwY/mkGkTonIKvgZU5FovRuziF8YfwJk6MmYEm2fFaEYIsbrTPoA8om68ASfjLHpqMp8+EGe1zpOgoWvRkLgG0o2qIpmJuq85kqK0lc2k4JUAmPog7AKQf+L02qQ5Te4RA/NEcMHqumLEgFQhZ4s1b8Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vEolMwCH; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vEolMwCH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE6DFC4CEF7;
+	Wed, 14 Jan 2026 17:07:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768410451;
+	bh=MGElqEXwoRbt8mMzLI9gWMm6tx51R4BHJkiacnjgofs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vEolMwCHO3gyuvdGmOE3O9pKCM5M8SbSniKQidIWzOSx0PpTJ7Hj4ZwnGYFesCRZ3
+	 nUL/jdfJLelH5D0whFKOjdwr35MISlOXKDOa6Lbi19ptoggFUpvSTGZlhxy8wcydSe
+	 2ru/TkW9rbl9o0etsJta6Ukc466KaXjOjS0EZlRUsIFFI5uicpeVB9DXRy+PEASF5k
+	 BFWehX7gdc0YEru5parDTnCckbHf4EXKG0ybaCo62t3jvZVfDovR7/4iu9t8FWPKOS
+	 0BvNX/YWefxE1P6ozppwQ4KuBl43vg9R78UIaOZkuSwgv6K/q5DHyUyj8B/+g5oMax
+	 iic2DLJRvz0ug==
+Date: Wed, 14 Jan 2026 17:07:25 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Ben Horgan <ben.horgan@arm.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v9 22/30] KVM: arm64: Expose SME specific state to
+ userspace
+Message-ID: <1b5493ed-2d44-47e2-916b-3a5052e3b88f@sirena.org.uk>
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
+ <20251223-kvm-arm64-sme-v9-22-8be3867cb883@kernel.org>
+ <CA+EHjTwMy1crsZLqfy8_Y56NFPJZ7vGyN-egc433GhxB_n=7aA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 13/47] KVM: arm64: Use kernel-space partid
- configuration for hypercalls
-From: Ben Horgan <ben.horgan@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-14-ben.horgan@arm.com> <86o6mwl7kl.wl-maz@kernel.org>
- <b9e10419-b4de-4cb6-93b6-07e878d2072a@arm.com>
-Content-Language: en-US
-In-Reply-To: <b9e10419-b4de-4cb6-93b6-07e878d2072a@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wWm1d/lEDlGXNOgF"
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTwMy1crsZLqfy8_Y56NFPJZ7vGyN-egc433GhxB_n=7aA@mail.gmail.com>
+X-Cookie: Absence makes the heart grow frantic.
 
-Hi Marc,
 
-On 1/14/26 14:39, Ben Horgan wrote:
-> Hi Marc,
-> 
-> On 1/14/26 12:09, Marc Zyngier wrote:
->> On Mon, 12 Jan 2026 16:58:40 +0000,
->> Ben Horgan <ben.horgan@arm.com> wrote:
->>>
->>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
->>> partid-0 for hypercalls, even when the host may have configured its kernel
->>> threads to use a different partid. 0 may have been assigned to another
->>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
->>> same partid as the kernel thread does on the host.
->>>
->>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->>> ---
->>> Changes since v2:
->>> Use mask
->>> Use read_sysreg_el1 to cope with hvhe
->>> ---
->>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 8 ++++++++
->>>  1 file changed, 8 insertions(+)
->>>
->>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> index a7c689152f68..ad99d8a73a9e 100644
->>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> @@ -635,6 +635,14 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->>>  	unsigned long hcall_min = 0;
->>>  	hcall_t hfn;
->>>  
->>> +	if (system_supports_mpam()) {
->>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
->>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
->>> +
->>> +		write_sysreg_s(read_sysreg_el1(SYS_MPAM1) & mask, SYS_MPAM2_EL2);
->>> +		isb();
->>> +	}
->>
->> Is it really OK to not preserve the rest of MPAM2_EL2? This explicitly
->> clears MPAM2_EL2.MPAMEN, which feels counter-productive.
->>
->> 	M.
->>
-> 
-> There are 3 things to consider:
-> 1. traps - these are only relevant when we leave EL2 and are dealt with
-> in __activate_traps_mpam(). (This also covers EnMPAMSM which is a
-> not-trap bit.)
-> 2. MPAM2_EL2.MPAMEN - this is read only as long as we have an EL3 and if
-> we don't have EL3 will be 0 anyway from el2_setup.h and MPAM won't be
-> considered supported in the kernel.
-> 3. The alternate partid space fields which are kept as zero and relate
-> to FEAT_RME.
-> 
-> So, safe. Ok with you or would you rather I make it more obviously safe?
+--wWm1d/lEDlGXNOgF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-As discussed offline, to avoid having to reason about MPAM2_EL2.MPAMEN
-I'll set this bit to 1 in this write as we are already assuming mpam is
-enabled and we want to keep it enabled.
+On Tue, Jan 13, 2026 at 02:06:53PM +0000, Fuad Tabba wrote:
+> On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 
-> 
-> Thanks,
-> 
-> Ben
-> 
-> 
+> > +static int sme_reg_to_region(struct vec_state_reg_region *region,
+> > +                            struct kvm_vcpu *vcpu,
+> > +                            const struct kvm_one_reg *reg)
+> > +{
 
-Thanks,
+> > +       reg_num = (reg->id & SVE_REG_ID_MASK) >> SVE_REG_ID_SHIFT;
 
-Ben
+> You use array_index_nospec() below for koffset, but it might be worth
+> using it for intermediate values, such as this one.
 
+This is following the existing pattern for the SVE registers, I'm
+trusting the logic there.
+
+> > +       sme_state_size = vcpu_sme_state_size(vcpu);
+
+> Is it worth caching this value and storing it in arch, since the state
+> size doesn't change after finalization?
+
+It feels marginal, and we've not been caching it for SVE all this time.
+Most of the time we use the value we're doing so as part of a fairly
+expensive operation so it seems like a reasonable choice.
+
+--wWm1d/lEDlGXNOgF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmlnzUwACgkQJNaLcl1U
+h9Cvrgf7BgTXha0CzEi5j4VgVBXcclvOZGymP1dBDz6D4Y8U/TMKH/bpOQcIjws/
+lkQGHPmKpBCHKgkE9ZCJu5oOQqQdCjFh9pHQQZwJM1QMRg/P/cwzO+CoyMsIkb1A
+4o2x/8WgiXF4LRsm4hmHRDR51VYSsH+Pg2dVgpSdiyIG1xi02AzthMF9vY0/fEiE
+GHKptYCfpxgy14m/Ns0VKGfgNXAXH6reAeVqWVo5BQ0K9a5M1pFAIoLyaKFulRTR
+0jgqosqFLXemYeGJ99w1TFrJRO3bltyiVULxBQBDupshqNvIwApsbjn92T0Qh8ir
+VwMGpz89Lk6CAe/3AHGVTw/0GgAFBw==
+=h+Uy
+-----END PGP SIGNATURE-----
+
+--wWm1d/lEDlGXNOgF--
