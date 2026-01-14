@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4666C2F39D7;
-	Wed, 14 Jan 2026 18:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36EF296BB7;
+	Wed, 14 Jan 2026 18:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768414932; cv=none; b=l8eLWoXzKhsGJYu+iZoAANRRJsDqQTF4aDv25nVsZUfEx4UPCwnVtkeX6r8bJFmMVfwdbjMFhtPo9WvjLn4C/Xal8k2BW/PYxgGioWxQI1EWrCnfWJkmhQQh16TrAPpq4MDlG5PuvTrkPMKhueoyEQ+q4WQMWaW8MI6Y1UqiqOg=
+	t=1768416520; cv=none; b=S2UpYv6x/s2JSydgbWz9+zjwTO6yAB8tZ8hGNQerrQ5ElG5nvut2bDghmJk63lys/CIqPhpycHw09dg+QdRZNa7CNgr8m2WGiKWH4cXuvu8XyhZjvbzqZpl15xP+wTozsu/LsvoXhlTgkOiZ2IrBGlDx8suHxxrqdcxh2JOUrKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768414932; c=relaxed/simple;
-	bh=tcknC6iemaw7J5r4is+1RFQMsTj8mbkEYsrSA6D6Saw=;
+	s=arc-20240116; t=1768416520; c=relaxed/simple;
+	bh=8KBWIbkpJwQyTeH+b5e850ZKQFUEMxvg18f8SI8BdoE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YeGh2TkGZ+xujEu49iTscHhbDPLCHQLyS3huzF9AERfRBpM3IXosH3KqCGiWSFO1S5X/I56GvkkgnXEjxJ4y5Sdht7LGqHvGzevl7mcCIePaINQ7AqVBI3JPwe57awqWBQsgZK4be+OA6fORRQFja+rXsXv6xu+hTplHZQa4Azs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnv936Pw; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=EtXKoPGSXr+NKSzSiNg5bbDMjYa/lY3REtzaMsJ7684sugDgBLG+H53UiIEiBXxJvX/TfklAnZbLY1BhEMXyonr/CxRg/oci4JMI2psqAXFefN7ff9+y/wtrrFHZbg/c3S/VkBElgrGN/nDFdnBoSzrVaVSpIpQHzGe+PPfSugc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/3YuIa8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnv936Pw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C6A5C19421;
-	Wed, 14 Jan 2026 18:22:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/3YuIa8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4C58C4CEF7;
+	Wed, 14 Jan 2026 18:48:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768414931;
-	bh=tcknC6iemaw7J5r4is+1RFQMsTj8mbkEYsrSA6D6Saw=;
+	s=k20201202; t=1768416520;
+	bh=8KBWIbkpJwQyTeH+b5e850ZKQFUEMxvg18f8SI8BdoE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gnv936PwAOYqla2o5RLnSGyPnWK7eepNYoigSv3xXJ9tqfUVL17uGzncwmmSr8jmA
-	 fh4eTYbjwkRZaR/lWB4BeQFZeI321YENVp8PuJFL27WkKn6hGS7oxQ3cluEXsJKnUf
-	 e+CWfzWOQOHbIi1FxuPUJvknfYFlCBcidWhMHmmDTsRmlcrzYEpjBMYMaEoTVksV3U
-	 fApWuGawlIvleBifk6rYfDE4Q+QM7Y/6v3afg+uN1IThtpoL1Pr8o8yr+UBntNCr1j
-	 6RfbmLF9dPh2zIAHhUCaPHd+V49mgU2eFN3GXxpC4hWgyf7Rz4pazXUXqAZC71JL5u
-	 nbaDt7DOD7v/Q==
-Date: Wed, 14 Jan 2026 18:22:05 +0000
+	b=t/3YuIa8oSi/xC/GW3dpb1lZoupC4+ZqSiMYqsiRYtEJqPu5VpCncmLyynSJcab6m
+	 lBJCYevFVEIqegwtLZxHvJqoCjsSXqVVmVsUGI2i5/xAgIiynXIiqV3aVETrQ8pzsj
+	 j/r3LUKh0rJQ7on5AQeo4bk0Y9Xj1uCAYfpwyc9l9iKtksfZ0yQ/yrGOwPx+9pRZO+
+	 FlEG6BL+gLBeSR4cWfZovOpnukvKBAAhf14aDSHc0HB+ZCwyzzyOikgCTwD7+I5dJw
+	 RenN+N1iQg2SsDCExcca65J2x4S77imYS+qqfgCjzcZzgOuVQUnogF40oQgmb+PTt6
+	 U6IahqNfIZSFA==
+Date: Wed, 14 Jan 2026 18:48:34 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Fuad Tabba <tabba@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
@@ -42,11 +42,12 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 25/30] KVM: arm64: Expose SME to nested guests
-Message-ID: <2498896a-78cb-4184-82ac-6497b1e9bd03@sirena.org.uk>
+Subject: Re: [PATCH v9 26/30] KVM: arm64: Provide interface for configuring
+ and enabling SME for guests
+Message-ID: <3be5b6a7-3b26-4899-8313-c849c28300ca@sirena.org.uk>
 References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-25-8be3867cb883@kernel.org>
- <CA+EHjTwZCcMFT6gAM2oaQz5V_vqEBmVuggFBbABbXPvC+U919Q@mail.gmail.com>
+ <20251223-kvm-arm64-sme-v9-26-8be3867cb883@kernel.org>
+ <CA+EHjTxFfY_XkEQrNvme94uHoxQLWEaX1q1MikbcmwmUMq=NwA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,58 +55,51 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GsOJE4+Rwb8rI0F1"
+	protocol="application/pgp-signature"; boundary="oq+yxN5i7kBipvCG"
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTwZCcMFT6gAM2oaQz5V_vqEBmVuggFBbABbXPvC+U919Q@mail.gmail.com>
+In-Reply-To: <CA+EHjTxFfY_XkEQrNvme94uHoxQLWEaX1q1MikbcmwmUMq=NwA@mail.gmail.com>
 X-Cookie: Absence makes the heart grow frantic.
 
 
---GsOJE4+Rwb8rI0F1
+--oq+yxN5i7kBipvCG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Jan 13, 2026 at 02:37:57PM +0000, Fuad Tabba wrote:
+On Tue, Jan 13, 2026 at 02:40:58PM +0000, Fuad Tabba wrote:
 > On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
 
-> >         case SYS_ID_AA64PFR1_EL1:
-> > -               /* Only support BTI, SSBS, CSV2_frac */
-> > +               /* Only support BTI, SME, SSBS, CSV2_frac */
-> >                 val &= ~(ID_AA64PFR1_EL1_PFAR           |
-> >                          ID_AA64PFR1_EL1_MTEX           |
-> >                          ID_AA64PFR1_EL1_THE            |
-> >                          ID_AA64PFR1_EL1_GCS            |
-> >                          ID_AA64PFR1_EL1_MTE_frac       |
-> >                          ID_AA64PFR1_EL1_NMI            |
-> > -                        ID_AA64PFR1_EL1_SME            |
+> > Due to the overlap with sizing the SVE state we finalise both SVE and
+> > SME with a single finalization, preventing any further changes to the
+> > SVE and SME configuration once KVM_ARM_VCPU_VEC (an alias for _VCPU_SVE)
+> > has been finalised. This is not a thing of great elegance but it ensures
 
-> Should we also limit this to SME2, i.e.
+> With KVM_ARM_VCPU_VEC being an alias for KVM_ARM_VCPU_SVE, wouldn't
+> kvm_arm_vcpu_finalize() fail for guests that have only SME enabled but
+> not SVE?
 
-> + val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64PFR1_EL1, SME, SME2);
+If one of the extensions hasn't been enabled then the goal is that
+finalizing should lock in the current state and prevent enabling it in
+future but you should be able to finalize.  The check for vcpu_has_sve()
+which blocks finialization is changed to vcpu_has_vec() which is true if
+either SVE or SME is enabled.
 
-> That said, we don't do anything similar to SVE, but it might also be
-> worth doing that there.
+We should, however, ensure that the VL of disabled vector types isn't
+taken into account when allocating state in order to avoid wasting
+memory - I'll update for that.
 
-This feels like a general approach issue with these registers that's out
-of scope for this series, it's not just the vector extensions which
-could introduce new state or anything else that requires explicit
-support.  AIUI the theory here is that we bootstrap from the host's
-sanitised registers so the time to add any required limits on future
-values would be when enabling them for the host kernel, assuming KVM
-support isn't added simultaneously.
-
---GsOJE4+Rwb8rI0F1
+--oq+yxN5i7kBipvCG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmln3swACgkQJNaLcl1U
-h9D5Awf+IRsqdR9I7nYCFQPlwzCHBQBbuNnWwG5/UXXDqIc3+6wyvcIQNcpbea0/
-TQLaQPJEdkXSt9dQkg0iKdV3YBSDo8IW8JMvqDcgNueXpfuJdIPFDerneL0HTO/l
-/80XNxIjRpwrR71w+bFdSGWj6TpDcgtNYQj4z1wT6wRQ3VoQxnRsNiZoxObmnM8A
-t1DLEPg1EigeOwvBt12Q6yOVBiAM+lAF04JU7Kq28s3Nho38aMBGrMkiz9zLY/bv
-Lk+KVaDLIh5KmecygdX5rm/EEyT96tV/fj+NXrctDs2+/ktqa2JYtF2PpuQuNXZx
-6dDmflaX69rqabPcKmADbMedkpxJRA==
-=kw66
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmln5QEACgkQJNaLcl1U
+h9Afugf/W7S3f9Opih1jYVPqRq1ITFPwn4oIVQt8vWQtOp6phpgeaEbVAIaBYQIe
+eD4G1cgA3KXUU+K2fKQo2Ar61nctTEgEr+58MPeuamj4Z1hB2a3Vy5hTGB5LyIv9
+U1EE5voSYFgHHl9+EZafvLf6DuTiPu6MksgwgBDiYvXF+sxtbZSKMHRPMVSYw8BQ
+CEtdcOsodX04euF5khtGm1eSiHeJKuUAaPAEuqMYrFbMSzUHm6MZWm9rWP9JV1Po
+p57BJt8/aUj19+5Q0LS6gnK/ozmrxfxf12t+3HXTcVxD79OOh1Tzw9DxwLDQVhnA
+PbSht5ECwKz//OhF0SUzlplD7m5Wwg==
+=bu0G
 -----END PGP SIGNATURE-----
 
---GsOJE4+Rwb8rI0F1--
+--oq+yxN5i7kBipvCG--
