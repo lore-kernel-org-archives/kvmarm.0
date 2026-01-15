@@ -1,58 +1,145 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B223D3DA7CC
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 17:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFEF3BF314
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768499956; cv=none; b=GvHdP24uqR+YlpAqzrS0uw4ouQoPvgLDTA8jMG5022+jmJIfUk2Jb0KSL0t2/p9eKjr8LICGf1hMr4764OvPLRvPI8hlu6IibDArtPh/u5xWWhN9HT9IDCGwIlnt/1Ez6cw471Pxxa1IDASc9KOMf2mvT3MSMRdQZn+In7Rg2PU=
+	t=1768500214; cv=none; b=qIM3X1eVYi1/DuanvDZW2rMX2U7qj0Vkw2nYaXRJcAZtnjWHt2KanlY4PMTewPUIOnQ7lrDvOcibV+GEwe51e87RpzGGAhFeLVS65d/mXr8h8+UD+si8GQRGnMQEFC/OHrkjCHsvkaEdK00XHASYxCTWrWZqKqcsKycxelb6m1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768499956; c=relaxed/simple;
-	bh=nw9u7hY4Y9oNk8zEMNV5PCcDN3kvUufG+BbqCJuTOgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eMxsbQcCWLNHE1im4pLEPPiqit8UpikdvTpSN9QEwlXfVkIKwsXCGeOycno/9dVY7AdI2QfdCrGI1TRctm/GNUxu+7wfMzUt7AHBgyBSD2M9ETFGwsAjjSW4BStwJe62K45+FOpyJsdC40JSoRZaPBQ3OFaprQeBazwe/YqR69g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 275851515;
-	Thu, 15 Jan 2026 09:59:07 -0800 (PST)
-Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 81B5D3F632;
-	Thu, 15 Jan 2026 09:59:08 -0800 (PST)
-Date: Thu, 15 Jan 2026 17:59:05 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
-	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
-	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com, reinette.chatre@intel.com,
-	rohit.mathew@arm.com, scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 03/47] arm64/sysreg: Add MPAMSM_EL1 register
-Message-ID: <aWkq6QoePWYSEG0b@arm.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-4-ben.horgan@arm.com>
+	s=arc-20240116; t=1768500214; c=relaxed/simple;
+	bh=jsOCVRbDYK9JC0QzEE3fZQhFzKNeuG1HxlOeYltavZU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A1hbm0HaKPZUN/c2UpxGzqMBqGFZqmJC+I8+873TtWuQqrx6nduj52a3rXIz88e/yOtd8uy7GRxF3+S8Fq1aibwBBwvak0Zr7t4z/IY1zWdTCcM9KpRPH/xExu+bQEtYnFohxAzi9SDEi8sUF6wuz61bPRrswXE1z7JTCUD8/NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpvAZTz0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpvAZTz0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B77C16AAE;
+	Thu, 15 Jan 2026 18:03:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768500214;
+	bh=jsOCVRbDYK9JC0QzEE3fZQhFzKNeuG1HxlOeYltavZU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TpvAZTz0D6AvekolmeASjyDdjp3fxMuAvqjOFCgZ2Pbq117gVPwnk9tG9Cl007zaO
+	 ey/tbk145Xi7BzZ3Zl6G2nkvzkAlhPhfyL/fFjAS2RwEkh+7SLvZjODzKE+Bl2kl80
+	 KnE2+KEtwVQ0wFOeDHdA1lhBxV6uzT/549OnIsybPFLnS8bcbOLxGJGWPiWkhuumq4
+	 KGPKrZ/7vNVh/bZbiJX2GZa7U2uU8oEexKsJRMm0/IWrukPaiwxgtEHRLpw2An0gCu
+	 u/nUn5pw9oTfjBPsbKaZUDlveyxUXyXU48/d2aj7gZq2Bmp1Q2xSI2fIJ29j8KebuS
+	 d6LpHGl4DEFow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgRgx-00000002cUt-3lXd;
+	Thu, 15 Jan 2026 18:03:32 +0000
+Date: Thu, 15 Jan 2026 18:03:27 +0000
+Message-ID: <86bjiuda8g.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,	linux-arm-kernel@lists.infradead.org,	oliver.upton@linux.dev,	will@kernel.org,	joey.gouly@arm.com,	suzuki.poulose@arm.com,	yuzenghui@huawei.com,	catalin.marinas@arm.com,	vladimir.murzin@arm.com
+Subject: Re: [PATCH v6 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+In-Reply-To: <CA+EHjTwX-kDg24LMHCyMVP3Xpdpv55WyP2AxeWXa5CKk1yyudQ@mail.gmail.com>
+References: <20251211104710.151771-1-tabba@google.com>
+	<20251211104710.151771-9-tabba@google.com>
+	<86h5smlxyo.wl-maz@kernel.org>
+	<CA+EHjTzEtPta5VHr5R0r0v7ui7-8xv5me29uk2devZ=S14RHqw@mail.gmail.com>
+	<86fr86lv3d.wl-maz@kernel.org>
+	<CA+EHjTwX-kDg24LMHCyMVP3Xpdpv55WyP2AxeWXa5CKk1yyudQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260112165914.4086692-4-ben.horgan@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jan 12, 2026 at 04:58:30PM +0000, Ben Horgan wrote:
-> The MPAMSM_EL1 register determines the MPAM configuration for an SMCU. Add
-> the register definition.
+On Thu, 15 Jan 2026 16:14:39 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> On Thu, 15 Jan 2026 at 16:05, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 15 Jan 2026 15:19:48 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Thu, 15 Jan 2026 at 15:03, Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > On Thu, 11 Dec 2025 10:47:08 +0000,
+> > > > Fuad Tabba <tabba@google.com> wrote:
+> > > > >
+> > > > > Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
+> > > > > support all features, restrict which IOCTLs are allowed depending on
+> > > > > whether the associated feature is supported.
+> > > > >
+> > > > > Use the existing VM capability check as the source of truth to whether
+> > > > > an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
+> > > > > associated capabilities.
+> > > > >
+> > > > > Suggested-by: Oliver Upton <oupton@kernel.org>
+> > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > > > ---
+> > > > >  arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
+> > > > >  arch/arm64/kvm/arm.c              |  3 +++
+> > > > >  2 files changed, 24 insertions(+)
+> > > > >
+> > > > > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > > > > index 5b564576160d..0fa8c84816fd 100644
+> > > > > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > > > > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > > > > @@ -9,6 +9,7 @@
+> > > > >  #include <linux/arm_ffa.h>
+> > > > >  #include <linux/memblock.h>
+> > > > >  #include <linux/scatterlist.h>
+> > > > > +#include <asm/kvm_host.h>
+> > > > >  #include <asm/kvm_pgtable.h>
+> > > > >
+> > > > >  /* Maximum number of VMs that can co-exist under pKVM. */
+> > > > > @@ -43,6 +44,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+> > > > >       case KVM_CAP_ARM_SVE:
+> > > > >       case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+> > > > >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> > > > > +     case KVM_CAP_ARM_BASIC:
+> > > >
+> > > > Can we instead rely on an existing VM capability? I'm not overly keen
+> > > > exposing something new to userspace (KVM_CAP_ARM_BASIC) for something
+> > > > that really is KVM's own internal problems.
+> > > >
+> > > > Looking at the history, a bunch of things have always been present:
+> > > > KVM_CAP_NR_VCPUS, for example. You could even #define
+> > > > KVM_CAP_ARM_BASIC to that if you want.
+> > >
+> > > I wasn't too crazy about that either. I like the idea of defining it
+> > > as an alias of KVM_CAP_NR_VCPUS. I'll do that when I respin.
+> >
+> > I've done something [1]. If that works for you, let me know and I'll
+> > just merge that.
+> 
+> That works for the previous patch (7/9), which is where you've made
+> the change. But since the alias is defined in `arm.c` it wouldn't work
+> in this patch (8/9), because the function kvm_pkvm_ext_allowed() is
+> defined in  `asm/kvm_pkvm.h`.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+I dropped it from patch 8/9 for the reason below.
+
+> Defining the alias in `asm/kvm_pkvm.h`
+> or in `asm/kvm_host.h` should solve this, since both files are visible
+> in arm.c (and in kvm_pkvm.h in both cases).
+
+Nope. The compiler spots that this is the same value twice in the
+switch, and compile fails. I only kept it as syntactic sugar in arm.c,
+but I could otherwise drop it entirely.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
