@@ -1,54 +1,25 @@
-Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20A0342528;
-	Thu, 15 Jan 2026 15:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923E73570AE
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 15:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768490763; cv=none; b=XNwVngOzOQ1bSSz8PrVo9vaWO6yEWMgvXDAGIib+hd0LuzjIWn8mWKJexKfhimaKdxV2+EN9b0e+VOmQ9HBJF1qvag26ArwGfTLo0NcsDEzRhe7+JEuwjfM6uAI04FsAT7FVquS4qXL4BzTABPLAEQZIwLIt+QuJ1+XPFSZzgrI=
+	t=1768491844; cv=none; b=vFsLS75QWt9y+T7pu51enBmwkATvyoy3kKNok+wTfcDm1CGY//fgBpRuNzbqv/8aC2zhTXzx9RLWY4wEE04T63sWs3PBDDyBhd+C3MravkP93TAW6diREQMo6UONUVXMYJTWCuqI+K5MKVWLpUT/PnbK/O/JuyLUlsvGmHVMBqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768490763; c=relaxed/simple;
-	bh=NsWXJRngFC156YQRHmekUX9Gr1w2AJtYuY37Wjse5YE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=A+ylvrq/D1PBzzHTwl4puGt2SY/xEgo3Q9QkokkfkjDeICWGQRGkS8mg7VXZWWYf9ZmRWV8pP2S4WzRr3avPW/ULOwiRYTjyaaeiV9E4AbtDibyCCLbamNxXvV8idp2pshqKUqjPZBkD3COXL3NW9RrVwKidpJ9oOxQ/7VF5S84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=FXG6WoCr; arc=none smtp.client-ip=18.156.205.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="FXG6WoCr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768490758; x=1800026758;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=ErA/nUzcQBK9RfXLPHVY+KZIrd4BxzBjllIcAZaOcaQ=;
-  b=FXG6WoCrffSIxjvEQezrfJyRjynDp8vzIrv/J48PsGf85152tATOYF7p
-   +57aUZb9zLhrH2TYm/SVHrGdeoXZ/e6QsG41ugGjNcavq833InivA4bEV
-   YNmgjXo0SF6rPeFCbFWOPBTpYQ2RzvwTl+460+AyMmD5r1awW/Z43xWDR
-   ihQEgGktBPU0fDhVdFJP/T8pug5kMH5KRwi//ux0kybo7r2WzsJDkPxYU
-   igJoNx9M0tmZS/WAPni9FHvs+M25CNwVYWbUZEDB4jZvLxsw4eqTmCrR+
-   avB7z8OSA3BlepkbNo3lBMFIdvJPBo4jNz0IoaFW/nlie4hS5ppYxZ73i
-   A==;
-X-CSE-ConnectionGUID: JEI06koAS36Pqlka9p/LFg==
-X-CSE-MsgGUID: fziZ5aPzRHWEX3iC92dDgA==
-X-IronPort-AV: E=Sophos;i="6.21,228,1763424000"; 
-   d="scan'208";a="7652838"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 15:25:39 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:3758]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.6.3:2525] with esmtp (Farcaster)
- id 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c; Thu, 15 Jan 2026 15:25:39 +0000 (UTC)
-X-Farcaster-Flow-ID: 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 15 Jan 2026 15:25:32 +0000
-Received: from [192.168.15.69] (10.106.82.11) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Thu, 15 Jan 2026
- 15:25:28 +0000
-Message-ID: <094591b6-97eb-4cae-aa08-fececcba4ba1@amazon.com>
-Date: Thu, 15 Jan 2026 15:25:27 +0000
+	s=arc-20240116; t=1768491844; c=relaxed/simple;
+	bh=4zxoxpZ8WdqXuRvm0leoPyoaBDX40Ms5ZTqvzSuvC74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OwPFpMrQCd8VoycbDmGycIlh02hBpc1OME96MOgRwIBCm6y+NGG0vyUzBV4hhx0AoSebW90rKqXLFkqblqtDMJcF6eMjq6J75qZgN7LtZK0fDY7dJsJ+Cf164bI+qyNAYXQAwEx0XrWLKvVBybrjv7iifVZKjUNVbu+PCDTRllE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D99C5FEC;
+	Thu, 15 Jan 2026 07:43:53 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B62DD3F59E;
+	Thu, 15 Jan 2026 07:43:55 -0800 (PST)
+Message-ID: <90561371-96f0-4bdb-8316-1b657f26da54@arm.com>
+Date: Thu, 15 Jan 2026 15:43:54 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -56,131 +27,247 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap, restore}_direct_map
- helpers
-To: Heiko Carstens <hca@linux.ibm.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>, "joey.gouly@arm.com"
-	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
-	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"luto@kernel.org" <luto@kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org"
-	<david@kernel.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
-	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
-	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
-	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
-	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
-	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
-	<gor@linux.ibm.com>, "Jonathan.Cameron@huawei.com"
-	<Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
-	<shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>,
-	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
-	<wyihan@google.com>, "yang@os.amperecomputing.com"
-	<yang@os.amperecomputing.com>, "vannapurve@google.com"
-	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
-	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
- Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <20260114134510.1835-1-kalyazin@amazon.com>
- <20260114134510.1835-2-kalyazin@amazon.com>
- <20260115121209.7060B42-hca@linux.ibm.com>
+Subject: Re: [PATCH v3 28/47] arm_mpam: resctrl: Add support for csu counters
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, rohit.mathew@arm.com, scott@os.amperecomputing.com,
+ sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com,
+ catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, maz@kernel.org,
+ oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com,
+ kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-29-ben.horgan@arm.com>
+ <e65d2b54-e14c-4b1d-a9ea-04b6e0eb051f@intel.com>
+From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <20260115121209.7060B42-hca@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+In-Reply-To: <e65d2b54-e14c-4b1d-a9ea-04b6e0eb051f@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D012EUC004.ant.amazon.com (10.252.51.220) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
+Hi Reinette,
 
-
-On 15/01/2026 12:12, Heiko Carstens wrote:
-> On Wed, Jan 14, 2026 at 01:45:23PM +0000, Kalyazin, Nikita wrote:
->> From: Nikita Kalyazin <kalyazin@amazon.com>
+On 1/13/26 23:14, Reinette Chatre wrote:
+> Hi Ben,
+> 
+> On 1/12/26 8:58 AM, Ben Horgan wrote:
+>> From: James Morse <james.morse@arm.com>
 >>
->> These allow guest_memfd to remove its memory from the direct map.
->> Only implement them for architectures that have direct map.
->> In folio_zap_direct_map(), flush TLB on architectures where
->> set_direct_map_valid_noflush() does not flush it internally.
+>> resctrl exposes a counter via a file named llc_occupancy. This isn't really
+>> a counter as its value goes up and down, this is a snapshot of the cache
+>> storage usage monitor.
+>>
+>> Add some picking code to find a cache as close as possible to the L3 that
+>> supports the CSU monitor.
+>>
+>> If there is an L3, but it doesn't have any controls, force the L3 resource
+>> to exist. The existing topology_matches_l3() and
+>> mpam_resctrl_domain_hdr_init() code will ensure this looks like the L3,
+>> even if the class belongs to a later cache.
+>>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+>> Signed-off-by: James Morse <james.morse@arm.com>
+>> Co-developed-by: Dave Martin <dave.martin@arm.com>
+>> Signed-off-by: Dave Martin <dave.martin@arm.com>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> ---
+>> Changes since rfc:
+>> Allow csu counters however many partid or pmg there are
+>> else if -> if
+>> reduce scope of local variables
+>> drop has_csu
+>>
+>> Changes since v2:
+>> return -> break so works for mbwu in later patch
+>> add for_each_mpam_resctrl_mon
+>> return error from mpam_resctrl_monitor_init(). It may fail when is abmc
+>> allocation introduced in a later patch.
+>> Squashed in patch from Dave Martin:
+>> https://lore.kernel.org/lkml/20250820131621.54983-1-Dave.Martin@arm.com/
+>> ---
+>>  drivers/resctrl/mpam_internal.h |   6 ++
+>>  drivers/resctrl/mpam_resctrl.c  | 173 +++++++++++++++++++++++++++++++-
+>>  2 files changed, 174 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+>> index f89ceaf7623d..21cc776e57aa 100644
+>> --- a/drivers/resctrl/mpam_internal.h
+>> +++ b/drivers/resctrl/mpam_internal.h
+>> @@ -349,6 +349,12 @@ struct mpam_resctrl_res {
+>>  	struct rdt_resource	resctrl_res;
+>>  };
+>>  
+>> +struct mpam_resctrl_mon {
+>> +	struct mpam_class	*class;
+>> +
+>> +	/* per-class data that resctrl needs will live here */
+>> +};
+>> +
+>>  static inline int mpam_alloc_csu_mon(struct mpam_class *class)
+>>  {
+>>  	struct mpam_props *cprops = &class->props;
+>> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+>> index 7402bf4293b6..5020a5faed96 100644
+>> --- a/drivers/resctrl/mpam_resctrl.c
+>> +++ b/drivers/resctrl/mpam_resctrl.c
+>> @@ -37,6 +37,21 @@ static struct mpam_resctrl_res mpam_resctrl_controls[RDT_NUM_RESOURCES];
+>>  /* The lock for modifying resctrl's domain lists from cpuhp callbacks. */
+>>  static DEFINE_MUTEX(domain_list_lock);
+>>  
+>> +/*
+>> + * The classes we've picked to map to resctrl events.
+>> + * Resctrl believes all the worlds a Xeon, and these are all on the L3. This
+>> + * array lets us find the actual class backing the event counters. e.g.
+>> + * the only memory bandwidth counters may be on the memory controller, but to
+>> + * make use of them, we pretend they are on L3.
+>> + * Class pointer may be NULL.
+>> + */
+>> +static struct mpam_resctrl_mon mpam_resctrl_counters[QOS_NUM_EVENTS];
+>> +
+>> +#define for_each_mpam_resctrl_mon(mon, eventid)					\
+>> +	for (eventid = 0, mon = &mpam_resctrl_counters[eventid];		\
+>> +	     eventid < QOS_NUM_EVENTS;						\
+>> +	     eventid++, mon = &mpam_resctrl_counters[eventid])
+>> +
+> 
+> Reading the above loop and how it is used to call mpam_resctrl_monitor_init() for every event
+> it looks like there is an implicit assumption that MPAM supports all events known to
+> resctrl.
+> 
+> Please consider the most recent resctrl feature "telemetry monitoring" currently queued
+> for inclusion: https://lore.kernel.org/lkml/20251217172121.12030-1-tony.luck@intel.com/
+> 
+> (You can find latest resctrl code queued for inclusion on the x86/cache branch of
+> git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git)
+
+I'll test against this.
+
+> 
+> New telemetry monitoring introduces several new events known to resctrl. Specifically, here
+> is how enum resctrl_event_id looks at the moment:
+> 
+> /* Event IDs */                                                                 
+> enum resctrl_event_id {                                                         
+> 	/* Must match value of first event below */                             
+> 	QOS_FIRST_EVENT			= 0x01,                                 
+[...]
+
+Thanks for bringing this to my attention. mpam_resctrl_monitor_init()
+won't be called for all events known to resctrl as
+mpam_resctrl_pick_counters() will only set a class for the 3 that MPAM
+knows about. Still, it is probably best to restrict the iterator to the
+relevant ones.
+
+> };                                     
 > 
 > ...
 > 
->> diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
->> index d3ce04a4b248..df4a487b484d 100644
->> --- a/arch/s390/mm/pageattr.c
->> +++ b/arch/s390/mm/pageattr.c
->> @@ -412,6 +412,24 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>        return __set_memory((unsigned long)page_to_virt(page), nr, flags);
->>   }
->>
->> +int folio_zap_direct_map(struct folio *folio)
+>> @@ -582,6 +677,57 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+>>  	return comp->comp_id;
+>>  }
+>>  
+>> +static int mpam_resctrl_monitor_init(struct mpam_resctrl_mon *mon,
+>> +				     enum resctrl_event_id type)
 >> +{
->> +     unsigned long addr = (unsigned long)folio_address(folio);
->> +     int ret;
+>> +	struct mpam_resctrl_res *res = &mpam_resctrl_controls[RDT_RESOURCE_L3];
+>> +	struct rdt_resource *l3 = &res->resctrl_res;
 >> +
->> +     ret = set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                        folio_nr_pages(folio), false);
->> +     flush_tlb_kernel_range(addr, addr + folio_size(folio));
+>> +	lockdep_assert_cpus_held();
 >> +
->> +     return ret;
->> +}
+>> +	/* There also needs to be an L3 cache present */
+>> +	if (get_cpu_cacheinfo_id(smp_processor_id(), 3) == -1)
+>> +		return 0;
+>> +
+>> +	/*
+>> +	 * If there are no MPAM resources on L3, force it into existence.
+>> +	 * topology_matches_l3() already ensures this looks like the L3.
+>> +	 * The domain-ids will be fixed up by mpam_resctrl_domain_hdr_init().
+>> +	 */
+>> +	if (!res->class) {
+>> +		pr_warn_once("Faking L3 MSC to enable counters.\n");
+>> +		res->class = mpam_resctrl_counters[type].class;
+>> +	}
+>> +
+>> +	/* Called multiple times!, once per event type */
+>> +	if (exposed_mon_capable) {
+>> +		l3->mon_capable = true;
+>> +
+>> +		/* Setting name is necessary on monitor only platforms */
+>> +		l3->name = "L3";
+>> +		l3->mon_scope = RESCTRL_L3_CACHE;
+>> +
+>> +		resctrl_enable_mon_event(type);
 > 
-> The instructions used in the s390 implementation of
-> set_direct_map_valid_noflush() do flush TLB entries.
-> The extra flush_tlb_kernel_range() is not required.
+> btw, the telemetry work also changed this function prototype to be:
+> 	bool resctrl_enable_mon_event(enum resctrl_event_id eventid, bool any_cpu,
+> 				      unsigned int binary_bits, void *arch_priv);
 
-Thanks, Heiko.  Will update in the next version.
+I will update to use the new signature.
+
+> 
+> If I understand correctly resctrl_enable_mon_event() will be called for every event in 
+> enum resctrl_event_id which now contains events that may not actually be supported. I think it
+> may be safer to be specific in which events MPAM wants to enable.
+
+As noted above, this only happens for the ones chosen
+mpam_resctrl_pick_counters().
+
+> 
+>> +
+>> +		/*
+>> +		 * Unfortunately, num_rmid doesn't mean anything for
+>> +		 * mpam, and its exposed to user-space!
+>> +		 *
+> 
+> The idea of adding a per MON group "num_mon_groups" file has been floated a couple of
+> times now. I have not heard any objections against doing something like this.
+> https://lore.kernel.org/all/cbe665c2-fe83-e446-1696-7115c0f9fd76@arm.com/
+> https://lore.kernel.org/lkml/46767ca7-1f1b-48e8-8ce6-be4b00d129f9@intel.com/
+
+Hmm, I see now that 'num_rmid' is documented as an upper bound and so
+neither 1 or mpam_pmg_max + 1 agree with the documentation.
+
+"
+"num_rmids":
+		The number of RMIDs available. This is the
+		upper bound for how many "CTRL_MON" + "MON"
+		groups can be created.
+"
+
+So, if I understand correctly you're proposing setting
+num_rmids = num_pmg * num_partids on arm platforms and that in the
+interim this can then be used to calculate the num_pmg by calculating
+num_closid/num_rmid but that a per CTRL_MON num_mon_groups should be
+added to make this consistent across architectures?
+
+> 
+>> +		 * num-rmid is supposed to mean the minimum number of
+>> +		 * monitoring groups that can exist simultaneously, including
+>> +		 * the default monitoring group for each control group.
+>> +		 *
+>> +		 * For mpam, each control group has its own pmg/rmid space, so
+>> +		 * it is not appropriate to advertise the whole rmid_idx space
+>> +		 * here.  But the pmgs corresponding to the parent control
+>> +		 * group can be allocated freely:
+>> +		 */
+>> +		l3->mon.num_rmid = mpam_pmg_max + 1;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+> 
+> Reinette
+> 
+
+I appreciate that you have shared this resctrl knowledge with me.
+
+Thanks,
+
+Ben
 
