@@ -1,77 +1,99 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493B5314B71
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 11:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1601392C29;
+	Thu, 15 Jan 2026 11:49:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768477017; cv=none; b=WA4MsewDWJFB66FhPe/ixLvOgSmgljtjOjPFBlas6FCm+vbEHhjig495WSIaB02OYJFz/+6xoWlQn8geLvs/8zUWvGanCTLzRDXzlrA7ore7Rd2CcPVOnf7xV+MEUQZBhj5OXZVWPNu7VGpkClTrD1QFQvMGkCXLDgpbWigCn9w=
+	t=1768477752; cv=none; b=eFVAkyhWtce48BiU72hEEAY9/qzpGOSjfHK8E0QK52PDk1bdiZWv1MZJ7mVmw6ggUL4nGCkddrCrynocH9E6T7HdCRC50HS3ceMYUShA08FCbPtdEvvTFt5qMkFKnfqY28mcRNnLvYZBApQHWL3e78qeE36rE0Gtw9RjJSVrA5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768477017; c=relaxed/simple;
-	bh=aVqDQl7Lvv4CydiS25maDbhux0WcPxIG/Z10i5KXjcA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F99azOtCMVxa10Hl6kfZyFT9PnczmWqrTwfcRorH9MNUdVcXKdxRJNlyqHHnCem/HXhGp7JC6LiML0/XFD87IzLM0wxdLEhA0RrJzZ3XBQaBVY9YuURfGwfJLYF3XwbTlG6wBC2N95Ryh0EnODHAkmvL4uorNtJ6ZZ42wNGkC2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FA0FFEC;
-	Thu, 15 Jan 2026 03:36:47 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DCC003F694;
-	Thu, 15 Jan 2026 03:36:48 -0800 (PST)
-Message-ID: <440ea311-67b7-4b7a-936c-845fce4919b5@arm.com>
-Date: Thu, 15 Jan 2026 11:36:47 +0000
+	s=arc-20240116; t=1768477752; c=relaxed/simple;
+	bh=b5MwZd6IEwDZvkIBVY2DBQ3kAUAx76ac/X+w5A+//CI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DbL0MNJxsz/qZSVyf4wLhjbyGSNFZ5RZ8FUdfjgvGomMBSGAZw4nv5mh02ia7chdwf73nThp4bhx/fM0MLOr2YfEGZ0ruCnMpKgf+nmlqxAr6lQbsvWdpBNc/XPDhcdm/z/NZ0bYXL5vpLA+wRIiWR+C3S6qW9DhsWbaT3K2mYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uBayVj/n; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uBayVj/n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EFBCC116D0;
+	Thu, 15 Jan 2026 11:49:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768477752;
+	bh=b5MwZd6IEwDZvkIBVY2DBQ3kAUAx76ac/X+w5A+//CI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=uBayVj/nfVUeKP5xuoOl/hqvGbfAlSTDNpCkRC4vmTamfH+4cHQXpSspH+7ClelXY
+	 Kd7LCVJ2WqFtgCZDAd3oMJUnKO66tepzxTGO7MIzzY4QqQIWAAU9K0KDvLchhd4qdk
+	 EYYjMgHIDjh92/oyfw4PRFEa7g9YsYx91zYivm9iEt7Sxds3GvMCSfepG/evmTjidY
+	 U71xn1q85ZcC4ukEvJH0Iq8chmqWAAgAgbCV3TZtp9ALCxxfnaxAkfHTTEGIPFbVPj
+	 moA1by4q7rvYqWIO9Zfx68rsh+TJFGgKgwngTBSVuZcORwQAS4tjfbMggLhq85IiHS
+	 w1w0pJPZdnMHw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgLqf-00000002VhW-35WM;
+	Thu, 15 Jan 2026 11:49:09 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 0/6] KVM: arm64: VTCR_EL2 conversion to feature dependency framework
+Date: Thu, 15 Jan 2026 11:49:06 +0000
+Message-ID: <176847771285.3689365.14003323952807162943.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251210173024.561160-1-maz@kernel.org>
+References: <20251210173024.561160-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/47] arm_mpam: Add KVM/arm64 and resctrl glue code
-To: Peter Newman <peternewman@google.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
- reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <CALPaoCh=brY6+_oJZXJLfpv_Qkz0i0RuPfuRa+TgXLu_xV6rsQ@mail.gmail.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <CALPaoCh=brY6+_oJZXJLfpv_Qkz0i0RuPfuRa+TgXLu_xV6rsQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Peter,
+On Wed, 10 Dec 2025 17:30:18 +0000, Marc Zyngier wrote:
+> This is a follow-up on my VTCR_EL2 sanitisation series, with extra
+> goodies, mostly as a consequence of Alexandru's patches and review.
+> 
+> * From [1]:
+> 
+>   - Added two patches fixing some FEAT_XNX issues: one dating back
+>     from the hVHE introduction, and the other related to the newer
+>     stuff in 6.19.
+> 
+> [...]
 
-On 1/15/26 11:14, Peter Newman wrote:
-> Hi Ben,
-> 
-> On Mon, Jan 12, 2026 at 5:59 PM Ben Horgan <ben.horgan@arm.com> wrote:
-[...]
-> 
-> Like before, I applied the patches and successfully booted a kernel on
-> a baremetal Google Cloud C4A instance. I was able to confirm that the
-> resources we expect were present and I was able to successfully run
-> the monitor assignment test cases I used to validate ABMC on AMD
-> systems. (Though I had to hack the driver to pretend there were less
-> MBWU monitors so that the counter assignment interfaces would become
-> available.)
-> 
-> My use cases only cover resctrl in the host, so I didn't try any of
-> the KVM integration, but I can at least say there wasn't any evidence
-> that it interfered with resctrl.
-> 
-> Tested-by: Peter Newman <peternewman@google.com>
+Applied to next, thanks!
 
-Thanks for the testing!
+[2/6] arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
+      commit: f1640174c8a769511641bfd5b7da16c4943e2c64
+[3/6] arm64: Convert VTCR_EL2 to sysreg infratructure
+      commit: a035001dea37b885efb934e25057430ae1193d0a
+[4/6] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+      commit: c259d763e6b09a463c85ff6b1d20ede92da48d24
+[5/6] KVM: arm64: Convert VTCR_EL2 to config-driven sanitisation
+      commit: 9d2de51825598fc8e76f596c16368362753d8021
+[6/6] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
+      commit: 80cbfd7174f31010982f065e8ae73bf337992105
 
-Ben
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
