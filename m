@@ -1,132 +1,147 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889803BFE47
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 17:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536053D7D19
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 17:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768499501; cv=none; b=U8TG3bEufNPbX6x+kCQxuElk33pZfjFJOdtk+7ifIcp+ET01XxIX/O1vNhkwYBWE5IASOWIkbHrgtXBqbPmvRp4r8rbqxP+KJ5VSg5tD8EH7FaqIUpBfKDVy21B3zL6BAH9lMfwVMeO9jOR28mOfrONU6jIZAqlrj+1A1bmaKBM=
+	t=1768499906; cv=none; b=Mo7i5x2Kby+4yEeEhOlt5m7BFcLP9d6K2VTJZPMa+nmE7Eruzt4XAbNZ3lC1E2LF+5Tx0z7atbqZU97Xq3saj9JosIMlOwpAEx5Y5jNEAWlD0f1VPz/O0Ll4pUwuhAITSaSrXTdJqfxt2Z+lflUUljNd1HlAERyIRSBsb/Vd434=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768499501; c=relaxed/simple;
-	bh=rwhwtL/vZdSfci2C/j6AljUlfCkGvdxX8zWaQP0BXQU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=muosyL/BpIT99KP37WYP3BpesOYKwmGbTwf7XOHOIlQXzK05ZITasfkBAlIqSTtLDp80Y1Ub+/B1E9gxn34+XdqJYZ5xIfXO0IJ7Ds7GNOIFWfS8kFT5C+ZeZM3ubR/1PhDIumILcayRPoP5jyxaj/T3KMvoMFp72oRtk3oiYa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FPzWWIKc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FPzWWIKc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768499499;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BiyawKDjYdDN3hhvAQEOzn6Z13gC9C2oLhMaZUIuXYQ=;
-	b=FPzWWIKcumaEveFF9G2p0Hn/UIpEM3OmZMgt69GbktJXDeBc+gRDOvlXAW95/lBP8KPxiY
-	/19dTA69X9LHp8KliBX4hoJhsOsVev6twB5hDUdcpEY3hYDrCO7H6aSq9HLNVWtdBCBsqe
-	AIMLhzycAoLt5kmu8qKg3FDWRSBVGEc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-8NimCG6SOcC6b94_i6_9oA-1; Thu, 15 Jan 2026 12:51:38 -0500
-X-MC-Unique: 8NimCG6SOcC6b94_i6_9oA-1
-X-Mimecast-MFC-AGG-ID: 8NimCG6SOcC6b94_i6_9oA_1768499496
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-431054c09e3so1115522f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 09:51:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768499496; x=1769104296;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BiyawKDjYdDN3hhvAQEOzn6Z13gC9C2oLhMaZUIuXYQ=;
-        b=mr1urOcIV7oEnh8wztnfOkAsZUKLFgL/7Q+c8FKOnZ4+BTn3Iu4tQris47sKaA0QmX
-         oBqpQ+H7sCpZrdNqVyX1eSot5eXKjPtASJtoyML/sl6KG+AcZmeZ8SYPmrHd0x+MYGYJ
-         UepWuSO391v8asNZTMnJJ9t7Sn53CTFW94Ekep2B7/J0IJt5qCdgHbXQAS/mVkafVTCO
-         2wRYxaZUXYU9tTkveCZ6vrzHTkmz68+39e1GcaFtes9mYVC+0dblx0jWaQ6TZgHVP3jj
-         MHViu+O1BA/joWfoefw/5CVjX6vb2dp1Yb27Yg1s8ufX1I4HJyxjMWzSy1u96dawHDSj
-         yEUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW32iyQU/KVGZtizGuQ9O4zB/OZhNSik8kclnJfR5Lgc9gMd3q6GMldPKapxk8ePfaeUFArNYI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw3JnESSX5UEsjbjWqmXAJ/ANO15o13BGwq6MgLCoSrvdEx1J6Z
-	A/QhLfxYvD+Fu8LF+9RmW+7gzOMRfQhGdmPuPiydd1lgrrZ7j0sT2oTpy1QXW1lEmLj1Tbia9V0
-	osNYN57FLwhtnUFtO8IfMvA9SvDTzRiaKET0Q59xXPBWGSZmy6cXA311pzg==
-X-Gm-Gg: AY/fxX7cyBmDqRHtKTg18RD7PElHLXH3QtjkJCZKdJTinuK0siu+i3wC0RC4+FBYFgb
-	TyDFt2DZfg6tkZyLdOyDztkmg18A965785uWb7Gn1h6CDjXr56B9eyA1rXmiDeCtwpvIZHNxMGf
-	lcRNnvRu+KP3M233VDzosZda0QnXZSI1qauxq7pXqq1Kz240Er2WePhKO6eCrjlYYKYVu0aQnFP
-	B+1RscDQA1xqBECoqEI0Aka07UU8rHgvIMKg62MYN6XrfIh7V6HMZc0EOPR2RbtnEkh4J2VdJfg
-	MvdNpo7BfoJ0y1R76KCrepsmi2QxKjnI/P3apylmKqShCUJOkMc8JNsEcgi0uElEMcbUTelK6jw
-	41lUEdmb4xu2ko9CAlqr6feceN4tAWI0x5ksOFkWzUP9UFoec2vy3Azc9nQ==
-X-Received: by 2002:a05:6000:1845:b0:432:c0e6:cfcd with SMTP id ffacd0b85a97d-4356998af3emr255084f8f.22.1768499495802;
-        Thu, 15 Jan 2026 09:51:35 -0800 (PST)
-X-Received: by 2002:a05:6000:1845:b0:432:c0e6:cfcd with SMTP id ffacd0b85a97d-4356998af3emr255043f8f.22.1768499495216;
-        Thu, 15 Jan 2026 09:51:35 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43569926ffcsm355884f8f.18.2026.01.15.09.51.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Jan 2026 09:51:34 -0800 (PST)
-Message-ID: <2b38fed6-dcd5-4ae7-8e46-4abec54ed82f@redhat.com>
-Date: Thu, 15 Jan 2026 18:51:33 +0100
+	s=arc-20240116; t=1768499906; c=relaxed/simple;
+	bh=1wN3PPHtPVqGIWnYZebrBVaw2Ke0fEyBoqFnxD+ZMzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fezVnBXDk/e53zAeN+BXL5+AU09dCKoePEj0w0EwBpQX9IiivINcx42GRb67dGD2JFi5rudZWyVnOWaB1DgFnKXKjY3exXXv6qgQyy7HwXAQBhcVotgdq6M7+HdVrFOoDinA5ru5ItLQI6zyV42g4o6tiH66fEFYxRIrc/4qeQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC2261515;
+	Thu, 15 Jan 2026 09:58:16 -0800 (PST)
+Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3ADC73F632;
+	Thu, 15 Jan 2026 09:58:18 -0800 (PST)
+Date: Thu, 15 Jan 2026 17:58:15 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com, reinette.chatre@intel.com,
+	rohit.mathew@arm.com, scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 06/47] arm64: mpam: Context switch the MPAM registers
+Message-ID: <aWkqt37FJ5l6QD0E@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-7-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: eric.auger@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v5 00/11] arm64: EL2 support
-To: Andrew Jones <andrew.jones@linux.dev>, Joey Gouly <joey.gouly@arm.com>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, maz@kernel.org,
- kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-References: <20260114115703.926685-1-joey.gouly@arm.com>
- <csscff65cagzfgyvsseufdqupde64z5x73llmzgzci7u43pzbs@fv7pfn4jxrdv>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <csscff65cagzfgyvsseufdqupde64z5x73llmzgzci7u43pzbs@fv7pfn4jxrdv>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: awA1I9wU69JKEtfcVMTmaZrvw1k9dhC5CBZOuzOikWY_1768499496
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260112165914.4086692-7-ben.horgan@arm.com>
 
+On Mon, Jan 12, 2026 at 04:58:33PM +0000, Ben Horgan wrote:
+>  menu "ARMv8.5 architectural features"
+> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
+> new file mode 100644
+> index 000000000000..14011e5970ce
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/mpam.h
+> @@ -0,0 +1,67 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (C) 2025 Arm Ltd. */
+> +
+> +#ifndef __ASM__MPAM_H
+> +#define __ASM__MPAM_H
+> +
+> +#include <linux/jump_label.h>
+> +#include <linux/percpu.h>
+> +#include <linux/sched.h>
+> +
+> +#include <asm/sysreg.h>
+> +
+> +DECLARE_STATIC_KEY_FALSE(mpam_enabled);
+> +DECLARE_PER_CPU(u64, arm64_mpam_default);
+> +DECLARE_PER_CPU(u64, arm64_mpam_current);
+> +
+> +/*
+> + * The value of the MPAM0_EL1 sysreg when a task is in resctrl's default group.
+> + * This is used by the context switch code to use the resctrl CPU property
+> + * instead. The value is modified when CDP is enabled/disabled by mounting
+> + * the resctrl filesystem.
+> + */
+> +extern u64 arm64_mpam_global_default;
+> +
+> +/*
+> + * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
+> + * which may race with reads in mpam_thread_switch(). Ensure only one of the old
+> + * or new values are used. Particular care should be taken with the pmg field as
+> + * mpam_thread_switch() may read a partid and pmg that don't match, causing this
+> + * value to be stored with cache allocations, despite being considered 'free' by
+> + * resctrl.
+> + */
+> +#ifdef CONFIG_ARM64_MPAM
+> +static inline u64 mpam_get_regval(struct task_struct *tsk)
+> +{
+> +	return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);
+> +}
+> +
+> +static inline void mpam_thread_switch(struct task_struct *tsk)
+> +{
+> +	u64 oldregval;
+> +	int cpu = smp_processor_id();
+> +	u64 regval = mpam_get_regval(tsk);
+> +
+> +	if (!static_branch_likely(&mpam_enabled))
+> +		return;
+> +
+> +	if (regval == READ_ONCE(arm64_mpam_global_default))
+> +		regval = READ_ONCE(per_cpu(arm64_mpam_default, cpu));
+> +
+> +	oldregval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
+> +	if (oldregval == regval)
+> +		return;
+> +
+> +	write_sysreg_s(regval, SYS_MPAM1_EL1);
+> +	isb();
+> +
+> +	/* Synchronising the EL0 write is left until the ERET to EL0 */
+> +	write_sysreg_s(regval, SYS_MPAM0_EL1);
 
+Since we have an isb() already, does it make any difference if we write
+MPAM0 before the barrier? Similar question for other places where we
+write these two registers.
 
-On 1/15/26 6:40 PM, Andrew Jones wrote:
-> On Wed, Jan 14, 2026 at 11:56:52AM +0000, Joey Gouly wrote:
->> Hi all,
->>
->> This series is for adding support to running the kvm-unit-tests at EL2.
->>
->> Changes since v4[1]:
->> 	- changed env var to support EL2=1,y,Y
->> 	- replaced ifdef in selftest with test_exception_prep()
->>
->> Thanks,
->> Joey
->>
->> [1] https://lore.kernel.org/kvmarm/20251204142338.132483-1-joey.gouly@arm.com/
->>
-> Hi Joey,
->
-> So this series doesn't appear to regress current tests, but it also
-> doesn't seem to completely work. I noticed these issues when running
-> with EL2=1 (there could be more):
->
->  - timer test times out
->  - all debug-bp fail
->  - all watchpoint received tests fail for debug-wp
->  - micro-bench hits the assert in gicv3_lpi_alloc_tables()
->    lib/arm/gic-v3.c:183: assert failed: gicv3_data.redist_base[cpu]: Redistributor for cpu0 not initialized. Did cpu0 enable the GIC?
-I tend to agree with Drew. Do we want new tests to be merged if they are
-known to be failing?
+At some point, we should go through __switch_to() and coalesce the isbs
+into fewer as we keep accumulating them (e.g. all those switch function
+setting some sync variable if needed).
 
-Thanks
+> +
+> +	WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);
 
-Eric
->
-> Thanks,
-> drew
->
+Is it too expensive to read the MPAM sysregs and avoid carrying around
+another per-CPU state? You use it for pm restoring but we could just
+save it in cpu_do_suspend() like other sysregs. Not a big issue, it just
+feels like this function got unnecessarily complicated (it took me a bit
+to figure out what it all does).
 
+A related question - is resctrl_arch_set_cdp_enabled() always called in
+non-preemptible contexts? We potentially have a race between setting
+current->mpam_partid_msg and arm64_mpam_global_default, so the check in
+mpam_thread_switch() can get confused.
+
+And I couldn't figure out where the MPAMx_EL1 registers are written. If
+any global/per-cpu/per-task value is changed, does the kernel wait until
+the next thread switch to write the sysreg? The only places I can found
+touching these sysregs are the thread switch, pm notifiers and KVM.
+
+-- 
+Catalin
