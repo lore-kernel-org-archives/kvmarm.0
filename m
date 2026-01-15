@@ -1,420 +1,279 @@
-Received: from fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.72.182.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E11036BCDC;
-	Thu, 15 Jan 2026 11:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.72.182.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C10376BEF
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 11:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768475062; cv=none; b=kfl/X+88AxmM6/lbKOQA8vmgPUKoJcl614N1vh9PFgd8Scj2/6IkXCMLBlKWKFwV53/knhOpSQOlgmfEOMoMGc0aG/EuL+fWvYVhtH3Wy01L+3KVqq6QuM4Ejmu9G8xd7/qp1YW93GiZmkd0JCBVcOnzb2TQiVjWZotsMGQx+WU=
+	t=1768475674; cv=none; b=gmRjCUE+2Rqsy3MJM1wFJyemr5VmDKrj2ZqfSlnftmoL31wdpAogeuK98T+O/jgHggP3+q62GPH2BLRWTX2vu7b+kQOzzsL+pzxHgCnwszPxpEPzp8LddNXhkcFvZXGsuIxjfpTCI4wrIptHgYUjzd+SLX4A2TNgK9esm+E0U98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768475062; c=relaxed/simple;
-	bh=3PFB344/1JVRWGs+D2Rl641FmNl+HKaPGoGER5dyQi8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sUNlRimMQxgQEkyXxjlZvkjZkLrhBiqCxp7bxdXYE2A0XV8u5d9ee+Kz6hW8YXZwS/Oj4ZOrRA5Z7f2BNcPAq333IcIb8ZHCHo6cDsz5wkD8dwCQ8QuLr5rJOY76XV0EAYzdrOR914MQmIEGM2m6MIk5wvQNzKfCFjP0RM73W9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=UZIBe6b5; arc=none smtp.client-ip=3.72.182.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1768475674; c=relaxed/simple;
+	bh=crk2BPKgOABwEMqIT88wHU85QBtM8jrCzokUqOBOo24=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ky5Ry9lHzVIU3xLLUNw5lqJtOvisx5Xxeerz/9sem+qZthhk+zO3Ya93DTVUv8y0aMC+syWrAhqjxCNAi10WhKnM2mKiN4mzE3em+N5K8Ot2q36G2bwSnAD4+wezynn0Y+69vAuKYTvQnYL0ezXm730Y2kW0NC/DA5fSvPKMJOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fwg4PP1W; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="UZIBe6b5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fwg4PP1W"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b876bf5277dso250535866b.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 03:14:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1768475060; x=1800011060;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=mJnfQzk/Ndl7hOirTyKcnaRJiF2TZLcunnrc7x/sQ1k=;
-  b=UZIBe6b5mSbPvNCHxzJ4jwP1b8yHI9zBl3P5I8pP48yZ1McEsYx8BTuy
-   BBNZ2y4y98PiTOlGmJjDUdYKE1EB9H4c8/n+0dqZ8zClFMk2vtlagg+gv
-   Fs88eTen9NV4qdHDHIb3kJsPW6yd3UiO7Tn71/zMfM5Rz1aAHZRjp0G8g
-   CvBlZKmmGuCfQNCCB/RUbgpSOnThosDmF0H96F6K4J5u46zteZhzBubRJ
-   rvCqOlrq4kfoodDszWbMYhWc/ddY9soDTzPriwWrGbNx4dn6/C38fSLjI
-   QcQnQnHwR92j4N1DNJ7JaQJT7x+Of41WbdFNO2RX8Poj2GCIndmb3SZt6
-   g==;
-X-CSE-ConnectionGUID: tMK6TlvWQCyiAhzaIHOmmQ==
-X-CSE-MsgGUID: 4v5E16YYSDiYhbf89Ug3ZA==
-X-IronPort-AV: E=Sophos;i="6.21,228,1763424000"; 
-   d="scan'208";a="7947458"
-Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
-  by internal-fra-out-003.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 11:04:01 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:31144]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.30.60:2525] with esmtp (Farcaster)
- id 78798bdf-4355-47da-99ae-a3a26432276e; Thu, 15 Jan 2026 11:04:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 78798bdf-4355-47da-99ae-a3a26432276e
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 15 Jan 2026 11:04:00 +0000
-Received: from [192.168.15.69] (10.106.82.11) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Thu, 15 Jan 2026
- 11:03:57 +0000
-Message-ID: <373776f9-fe57-4374-8f8f-c43fdb193f19@amazon.com>
-Date: Thu, 15 Jan 2026 11:03:56 +0000
+        d=google.com; s=20230601; t=1768475671; x=1769080471; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MASScfCP1EDzrcxDg5IdgyEQHS3BC9CGtRRE53o2vFY=;
+        b=fwg4PP1W6SO1Uj4Cg2V3vtUW4l8vhWCb2+foNrqR74KCSpMM9upHDVjUfAs954lX3/
+         6+Epd1l+wtQlq0NE4QL4joJuIc4SFurIKz0+6LmVvCHCMk/7BCdt2uXe/gXBgnYZOU3u
+         0Z26HQNjOPtYqpHsvyKFTmVilMiPrjLNudEuArLiwvr8gyLcB0t/y/XUFBCgLaNUVrS7
+         Fh2nkgwyWMUqs8tEIIsGflu8C7bXznL2cLORG0DcR5scsvzSBzQAHp8P1qb3IYUypcMz
+         c5bN0wQGU/+pMUSLVcq+SVMOGZE0DrDl94qXirGGzGiPgM6J8lxgiIy/WyBHROOSxcG7
+         z2ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768475671; x=1769080471;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=MASScfCP1EDzrcxDg5IdgyEQHS3BC9CGtRRE53o2vFY=;
+        b=nWLtwFH5T6tVNkSXPWReou7gNPmKU57emJqRo2RtY0UG4ZvkG6yQWMAlazGOT9EN0R
+         bQbbGHz3TcOEModDASR5GDOHSX0+0UhpxPSYOM8nMQzgKEVRIBALiCaMhNZefimcqcH4
+         qFkUkhwJV+tzt6Dg7IqxpIlhkZp0CvWAV/NS3ZgDJQGVVZDi0U1cWScem08wFDBjKf9w
+         V81ZMfhU15n5jD6/fd7ePI620PjpaosOiPzXegtDDheg3sI4WBOEWK4qgvzxzanqxFSr
+         iCe4rPCEuFGvs1TSYwmNUTp4Ks7+uzu7pAG/QXaW1uB7Q/0IR7prNUN24qCbzLw+Iyvq
+         1DWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8NteSKuq3BvINtoWtVFplJJz/utUn/wWA/Xb8eMFQ3ADR2sh16LHDypet6Fot8YmXLpBpOKk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxuttmpOaDeUKFJGg8dSoZZNnVCJCx0LEmE1S1wyF7FefL+W/8u
+	YUzBtO6nfZCXLeZ/i8KVP35rSEHR/jC/oOI7v9ykEaC8MKZG6tK26ccCMIObX9Xbp0oAE+n9v9W
+	KofiQzeev03wdyPWL8rwQ3bgsM446t0bY9kThHflj
+X-Gm-Gg: AY/fxX6VJ8j/Vi9Vo3jqDWfvgw1XZaaxZ8fj3HLM1OipomPwBTU6MbGsZ87TK3IHfQv
+	5rXz2VFuY4ecktTuDEoiVaI/gwF0z5lmt9CZ1yFQRfVdKeuTtaOk55Z+0Xugts2/6oq0BwixhDg
+	eK7Of6HeAtlZCPMRY/YvME4qWp2uhg1OcshGYcb+RiIXUOghSn2vdR52E4K9LtVE4LdpHC2EALA
+	9qBnqSnp3Yhk7GWXs1+m2VbxK+6Yigto4DIZVonzqgP/jlyHLYE0B+LHuy1ypw5Omp9j5Z3Pcmq
+	I4NnCNIBooyFoEF/HhJApyN8omgj+A9lnrJ1
+X-Received: by 2002:a17:907:3f13:b0:b79:ea1b:f13d with SMTP id
+ a640c23a62f3a-b8777a7953dmr294862466b.2.1768475670767; Thu, 15 Jan 2026
+ 03:14:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap, restore}_direct_map
- helpers
-To: Huacai Chen <chenhuacai@kernel.org>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>, "joey.gouly@arm.com"
-	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
-	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"luto@kernel.org" <luto@kernel.org>, "peterz@infradead.org"
-	<peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org"
-	<david@kernel.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com"
-	<Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
-	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
-	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
-	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
-	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
-	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "dev.jain@arm.com" <dev.jain@arm.com>,
-	"gor@linux.ibm.com" <gor@linux.ibm.com>, "hca@linux.ibm.com"
-	<hca@linux.ibm.com>, "Jonathan.Cameron@huawei.com"
-	<Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
-	"pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
-	<shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>,
-	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
-	<wyihan@google.com>, "yang@os.amperecomputing.com"
-	<yang@os.amperecomputing.com>, "vannapurve@google.com"
-	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
-	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
- Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
-	"Cali, Marco" <xmarcalx@amazon.co.uk>
-References: <20260114134510.1835-1-kalyazin@amazon.com>
- <20260114134510.1835-2-kalyazin@amazon.com>
- <CAAhV-H6S4bVdpwbER84-iwSE+bQrFu_gF=Ww-bCFxThJ7WiUwQ@mail.gmail.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
- CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
- i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
-In-Reply-To: <CAAhV-H6S4bVdpwbER84-iwSE+bQrFu_gF=Ww-bCFxThJ7WiUwQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D015EUA002.ant.amazon.com (10.252.50.219) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+In-Reply-To: <20260112165914.4086692-1-ben.horgan@arm.com>
+From: Peter Newman <peternewman@google.com>
+Date: Thu, 15 Jan 2026 12:14:19 +0100
+X-Gm-Features: AZwV_QiEcqX9Z62pOe8axjpGIo-oG2d6Z-8Wh0LIfRSc7y-vQKSv9qD72xMgM5w
+Message-ID: <CALPaoCh=brY6+_oJZXJLfpv_Qkz0i0RuPfuRa+TgXLu_xV6rsQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/47] arm_mpam: Add KVM/arm64 and resctrl glue code
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com, 
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, 
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, 
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, 
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, 
+	reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, 
+	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, 
+	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, maz@kernel.org, 
+	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Ben,
 
+On Mon, Jan 12, 2026 at 5:59=E2=80=AFPM Ben Horgan <ben.horgan@arm.com> wro=
+te:
+>
+> This new version of the mpam missing pieces has no major rework from the
+> previous version. It's mainly small corrections and code tidying based on
+> review and things I spotted along the way. To be able to merge this we ne=
+ed
+> review from more people and people to start testing on their platforms an=
+d
+> giving some Tested-by tags.
+>
+> Change list in patches.
+>
+> As mentioned in the cover letter for v2, one major departure from the
+> previous snapshot branches referenced in the base driver series is that t=
+he
+> same MPAM setting are used for kernel-space and user-space. There are pro=
+s
+> and cons of choosing this policy but I think it is the best thing to star=
+t
+> with as there are AMD plans for adding a resctrl feature to allow a
+> different closid/rmid configuration for user-space from kernel space. The
+> AMD feature is called PLZA and is mentioned in this lpc slide deck[1]. Th=
+is
+> gives us a path forward to add support for having the EL1 and EL0 MPAM
+> partid/pmg configuration differ from each other.
+>
+> From James' cover letter:
+>
+> This is the missing piece to make MPAM usable resctrl in user-space. This=
+ has
+> shed its debugfs code and the read/write 'event configuration' for the mo=
+nitors
+> to make the series smaller.
+>
+> This adds the arch code and KVM support first. I anticipate the whole thi=
+ng
+> going via arm64, but if goes via tip instead, the an immutable branch wit=
+h those
+> patches should be easy to do.
+>
+> Generally the resctrl glue code works by picking what MPAM features it ca=
+n expose
+> from the MPAM drive, then configuring the structs that back the resctrl h=
+elpers.
+> If your platform is sufficiently Xeon shaped, you should be able to get L=
+2/L3 CPOR
+> bitmaps exposed via resctrl. CSU counters work if they are on/after the L=
+3. MBWU
+> counters are considerably more hairy, and depend on hueristics around the=
+ topology,
+> and a bunch of stuff trying to emulate ABMC.
+> If it didn't pick what you wanted it to, please share the debug messages =
+produced
+> when enabling dynamic debug and booting with:
+> | dyndbg=3D"file mpam_resctrl.c +pl"
+>
+> I've not found a platform that can test all the behaviours around the mon=
+itors,
+> so this is where I'd expect the most bugs.
+>
+> The MPAM spec that describes all the system and MMIO registers can be fou=
+nd here:
+> https://developer.arm.com/documentation/ddi0598/db/?lang=3Den
+> (Ignored the 'RETIRED' warning - that is just arm moving the documentatio=
+n around.
+>  This document has the best overview)
+>
+>
+> Based on v6.19-rc5
+> This series can be retrieved from:
+> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v3
+>
+> v2 can be found at:
+> https://lore.kernel.org/linux-arm-kernel/20251219181147.3404071-1-ben.hor=
+gan@arm.com/
+>
+> rfc can be found at:
+> https://lore.kernel.org/linux-arm-kernel/20251205215901.17772-1-james.mor=
+se@arm.com/
+>
+> [1] https://lpc.events/event/19/contributions/2093/attachments/1958/4172/=
+resctrl%20Microconference%20LPC%202025%20Tokyo.pdf
+>
+> Ben Horgan (10):
+>   arm_mpam: Use non-atomic bitops when modifying feature bitmap
+>   arm64/sysreg: Add MPAMSM_EL1 register
+>   KVM: arm64: Preserve host MPAM configuration when changing traps
+>   KVM: arm64: Make MPAMSM_EL1 accesses UNDEF
+>   arm64: mpam: Initialise and context switch the MPAMSM_EL1 register
+>   KVM: arm64: Use kernel-space partid configuration for hypercalls
+>   arm_mpam: resctrl: Add rmid index helpers
+>   arm_mpam: resctrl: Add kunit test for rmid idx conversions
+>   arm_mpam: resctrl: Wait for cacheinfo to be ready
+>   arm_mpam: resctrl: Add kunit test for mbw min control generation
+>
+> Dave Martin (2):
+>   arm_mpam: resctrl: Convert to/from MPAMs fixed-point formats
+>   arm_mpam: resctrl: Add kunit test for control format conversions
+>
+> James Morse (30):
+>   arm64: mpam: Context switch the MPAM registers
+>   arm64: mpam: Re-initialise MPAM regs when CPU comes online
+>   arm64: mpam: Advertise the CPUs MPAM limits to the driver
+>   arm64: mpam: Add cpu_pm notifier to restore MPAM sysregs
+>   arm64: mpam: Add helpers to change a task or cpu's MPAM PARTID/PMG
+>     values
+>   KVM: arm64: Force guest EL1 to use user-space's partid configuration
+>   arm_mpam: resctrl: Add boilerplate cpuhp and domain allocation
+>   arm_mpam: resctrl: Sort the order of the domain lists
+>   arm_mpam: resctrl: Pick the caches we will use as resctrl resources
+>   arm_mpam: resctrl: Implement resctrl_arch_reset_all_ctrls()
+>   arm_mpam: resctrl: Add resctrl_arch_get_config()
+>   arm_mpam: resctrl: Implement helpers to update configuration
+>   arm_mpam: resctrl: Add plumbing against arm64 task and cpu hooks
+>   arm_mpam: resctrl: Add CDP emulation
+>   arm_mpam: resctrl: Add support for 'MB' resource
+>   arm_mpam: resctrl: Add support for csu counters
+>   arm_mpam: resctrl: Pick classes for use as mbm counters
+>   arm_mpam: resctrl: Pre-allocate free running monitors
+>   arm_mpam: resctrl: Pre-allocate assignable monitors
+>   arm_mpam: resctrl: Add kunit test for ABMC/CDP interactions
+>   arm_mpam: resctrl: Add resctrl_arch_config_cntr() for ABMC use
+>   arm_mpam: resctrl: Allow resctrl to allocate monitors
+>   arm_mpam: resctrl: Add resctrl_arch_rmid_read() and
+>     resctrl_arch_reset_rmid()
+>   arm_mpam: resctrl: Add resctrl_arch_cntr_read() &
+>     resctrl_arch_reset_cntr()
+>   arm_mpam: resctrl: Update the rmid reallocation limit
+>   arm_mpam: resctrl: Add empty definitions for assorted resctrl
+>     functions
+>   arm64: mpam: Select ARCH_HAS_CPU_RESCTRL
+>   arm_mpam: resctrl: Call resctrl_init() on platforms that can support
+>     resctrl
+>   arm_mpam: Generate a configuration for min controls
+>   arm_mpam: Quirk CMN-650's CSU NRDY behaviour
+>
+> Jiapeng Chong (1):
+>   arm_mpam: Remove duplicate linux/srcu.h header
+>
+> Shanker Donthineni (4):
+>   arm_mpam: Add quirk framework
+>   arm_mpam: Add workaround for T241-MPAM-1
+>   arm_mpam: Add workaround for T241-MPAM-4
+>   arm_mpam: Add workaround for T241-MPAM-6
+>
+>  Documentation/arch/arm64/silicon-errata.rst |    9 +
+>  arch/arm64/Kconfig                          |    6 +-
+>  arch/arm64/include/asm/el2_setup.h          |    3 +-
+>  arch/arm64/include/asm/mpam.h               |   98 +
+>  arch/arm64/include/asm/resctrl.h            |    2 +
+>  arch/arm64/include/asm/thread_info.h        |    3 +
+>  arch/arm64/kernel/Makefile                  |    1 +
+>  arch/arm64/kernel/cpufeature.c              |   21 +-
+>  arch/arm64/kernel/mpam.c                    |   58 +
+>  arch/arm64/kernel/process.c                 |    7 +
+>  arch/arm64/kvm/hyp/include/hyp/switch.h     |   12 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c          |    8 +
+>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c          |   13 +
+>  arch/arm64/kvm/sys_regs.c                   |    2 +
+>  arch/arm64/tools/sysreg                     |    8 +
+>  drivers/resctrl/Kconfig                     |    9 +-
+>  drivers/resctrl/Makefile                    |    1 +
+>  drivers/resctrl/mpam_devices.c              |  306 ++-
+>  drivers/resctrl/mpam_internal.h             |  131 +-
+>  drivers/resctrl/mpam_resctrl.c              | 1930 +++++++++++++++++++
+>  drivers/resctrl/test_mpam_devices.c         |   66 +
+>  drivers/resctrl/test_mpam_resctrl.c         |  426 ++++
+>  include/linux/arm_mpam.h                    |   32 +
+>  23 files changed, 3119 insertions(+), 33 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/mpam.h
+>  create mode 100644 arch/arm64/include/asm/resctrl.h
+>  create mode 100644 arch/arm64/kernel/mpam.c
+>  create mode 100644 drivers/resctrl/mpam_resctrl.c
+>  create mode 100644 drivers/resctrl/test_mpam_resctrl.c
 
-On 15/01/2026 10:54, Huacai Chen wrote:
-> Hi, Nikita,
+Like before, I applied the patches and successfully booted a kernel on
+a baremetal Google Cloud C4A instance. I was able to confirm that the
+resources we expect were present and I was able to successfully run
+the monitor assignment test cases I used to validate ABMC on AMD
+systems. (Though I had to hack the driver to pretend there were less
+MBWU monitors so that the counter assignment interfaces would become
+available.)
 
-Hi Huacai,
+My use cases only cover resctrl in the host, so I didn't try any of
+the KVM integration, but I can at least say there wasn't any evidence
+that it interfered with resctrl.
 
-> 
-> On Wed, Jan 14, 2026 at 9:45 PM Kalyazin, Nikita <kalyazin@amazon.co.uk> wrote:
->>
->> From: Nikita Kalyazin <kalyazin@amazon.com>
->>
->> These allow guest_memfd to remove its memory from the direct map.
->> Only implement them for architectures that have direct map.
->> In folio_zap_direct_map(), flush TLB on architectures where
->> set_direct_map_valid_noflush() does not flush it internally.
->>
->> The new helpers need to be accessible to KVM on architectures that
->> support guest_memfd (x86 and arm64).  Since arm64 does not support
->> building KVM as a module, only export them on x86.
->>
->> Direct map removal gives guest_memfd the same protection that
->> memfd_secret does, such as hardening against Spectre-like attacks
->> through in-kernel gadgets.
->>
->> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
->> ---
->>   arch/arm64/include/asm/set_memory.h     |  2 ++
->>   arch/arm64/mm/pageattr.c                | 12 ++++++++++++
->>   arch/loongarch/include/asm/set_memory.h |  2 ++
->>   arch/loongarch/mm/pageattr.c            | 16 ++++++++++++++++
->>   arch/riscv/include/asm/set_memory.h     |  2 ++
->>   arch/riscv/mm/pageattr.c                | 16 ++++++++++++++++
->>   arch/s390/include/asm/set_memory.h      |  2 ++
->>   arch/s390/mm/pageattr.c                 | 18 ++++++++++++++++++
->>   arch/x86/include/asm/set_memory.h       |  2 ++
->>   arch/x86/mm/pat/set_memory.c            | 20 ++++++++++++++++++++
->>   include/linux/set_memory.h              | 10 ++++++++++
->>   11 files changed, 102 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/set_memory.h b/arch/arm64/include/asm/set_memory.h
->> index 90f61b17275e..d949f1deb701 100644
->> --- a/arch/arm64/include/asm/set_memory.h
->> +++ b/arch/arm64/include/asm/set_memory.h
->> @@ -14,6 +14,8 @@ int set_memory_valid(unsigned long addr, int numpages, int enable);
->>   int set_direct_map_invalid_noflush(struct page *page);
->>   int set_direct_map_default_noflush(struct page *page);
->>   int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
->> +int folio_zap_direct_map(struct folio *folio);
->> +int folio_restore_direct_map(struct folio *folio);
->>   bool kernel_page_present(struct page *page);
->>
->>   int set_memory_encrypted(unsigned long addr, int numpages);
->> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
->> index f0e784b963e6..a94eff324dda 100644
->> --- a/arch/arm64/mm/pageattr.c
->> +++ b/arch/arm64/mm/pageattr.c
->> @@ -357,6 +357,18 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>          return set_memory_valid(addr, nr, valid);
->>   }
->>
->> +int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), false);
->> +}
->> +
->> +int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), true);
->> +}
->> +
->>   #ifdef CONFIG_DEBUG_PAGEALLOC
->>   /*
->>    * This is - apart from the return value - doing the same
->> diff --git a/arch/loongarch/include/asm/set_memory.h b/arch/loongarch/include/asm/set_memory.h
->> index 55dfaefd02c8..9bc80ac420a9 100644
->> --- a/arch/loongarch/include/asm/set_memory.h
->> +++ b/arch/loongarch/include/asm/set_memory.h
->> @@ -18,5 +18,7 @@ bool kernel_page_present(struct page *page);
->>   int set_direct_map_default_noflush(struct page *page);
->>   int set_direct_map_invalid_noflush(struct page *page);
->>   int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
->> +int folio_zap_direct_map(struct folio *folio);
->> +int folio_restore_direct_map(struct folio *folio);
->>
->>   #endif /* _ASM_LOONGARCH_SET_MEMORY_H */
->> diff --git a/arch/loongarch/mm/pageattr.c b/arch/loongarch/mm/pageattr.c
->> index f5e910b68229..14bd322dd112 100644
->> --- a/arch/loongarch/mm/pageattr.c
->> +++ b/arch/loongarch/mm/pageattr.c
->> @@ -236,3 +236,19 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>
->>          return __set_memory(addr, 1, set, clear);
->>   }
->> +
->> +int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       int ret;
->> +
->> +       ret = set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                          folio_nr_pages(folio), false);
->> +
->> +       return ret;
-> Why not use a single statement which is the same as the ARM64 version?
-> The RISCV version has the same problem.
+Tested-by: Peter Newman <peternewman@google.com>
 
-No reason for them to be different.  Will update in the next version. 
-Thank you!
-
-> 
-> Huacai
-> 
->> +}
->> +
->> +int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), true);
->> +}
->> diff --git a/arch/riscv/include/asm/set_memory.h b/arch/riscv/include/asm/set_memory.h
->> index 87389e93325a..16557b70c830 100644
->> --- a/arch/riscv/include/asm/set_memory.h
->> +++ b/arch/riscv/include/asm/set_memory.h
->> @@ -43,6 +43,8 @@ static inline int set_kernel_memory(char *startp, char *endp,
->>   int set_direct_map_invalid_noflush(struct page *page);
->>   int set_direct_map_default_noflush(struct page *page);
->>   int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
->> +int folio_zap_direct_map(struct folio *folio);
->> +int folio_restore_direct_map(struct folio *folio);
->>   bool kernel_page_present(struct page *page);
->>
->>   #endif /* __ASSEMBLER__ */
->> diff --git a/arch/riscv/mm/pageattr.c b/arch/riscv/mm/pageattr.c
->> index 3f76db3d2769..2c218868114b 100644
->> --- a/arch/riscv/mm/pageattr.c
->> +++ b/arch/riscv/mm/pageattr.c
->> @@ -401,6 +401,22 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>          return __set_memory((unsigned long)page_address(page), nr, set, clear);
->>   }
->>
->> +int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       int ret;
->> +
->> +       ret = set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                          folio_nr_pages(folio), false);
->> +
->> +       return ret;
->> +}
->> +
->> +int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), true);
->> +}
->> +
->>   #ifdef CONFIG_DEBUG_PAGEALLOC
->>   static int debug_pagealloc_set_page(pte_t *pte, unsigned long addr, void *data)
->>   {
->> diff --git a/arch/s390/include/asm/set_memory.h b/arch/s390/include/asm/set_memory.h
->> index 94092f4ae764..fc73652e5715 100644
->> --- a/arch/s390/include/asm/set_memory.h
->> +++ b/arch/s390/include/asm/set_memory.h
->> @@ -63,6 +63,8 @@ __SET_MEMORY_FUNC(set_memory_4k, SET_MEMORY_4K)
->>   int set_direct_map_invalid_noflush(struct page *page);
->>   int set_direct_map_default_noflush(struct page *page);
->>   int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
->> +int folio_zap_direct_map(struct folio *folio);
->> +int folio_restore_direct_map(struct folio *folio);
->>   bool kernel_page_present(struct page *page);
->>
->>   #endif
->> diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
->> index d3ce04a4b248..df4a487b484d 100644
->> --- a/arch/s390/mm/pageattr.c
->> +++ b/arch/s390/mm/pageattr.c
->> @@ -412,6 +412,24 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>          return __set_memory((unsigned long)page_to_virt(page), nr, flags);
->>   }
->>
->> +int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       unsigned long addr = (unsigned long)folio_address(folio);
->> +       int ret;
->> +
->> +       ret = set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                          folio_nr_pages(folio), false);
->> +       flush_tlb_kernel_range(addr, addr + folio_size(folio));
->> +
->> +       return ret;
->> +}
->> +
->> +int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), true);
->> +}
->> +
->>   bool kernel_page_present(struct page *page)
->>   {
->>          unsigned long addr;
->> diff --git a/arch/x86/include/asm/set_memory.h b/arch/x86/include/asm/set_memory.h
->> index 61f56cdaccb5..7208af609121 100644
->> --- a/arch/x86/include/asm/set_memory.h
->> +++ b/arch/x86/include/asm/set_memory.h
->> @@ -90,6 +90,8 @@ int set_pages_rw(struct page *page, int numpages);
->>   int set_direct_map_invalid_noflush(struct page *page);
->>   int set_direct_map_default_noflush(struct page *page);
->>   int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
->> +int folio_zap_direct_map(struct folio *folio);
->> +int folio_restore_direct_map(struct folio *folio);
->>   bool kernel_page_present(struct page *page);
->>
->>   extern int kernel_set_to_readonly;
->> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
->> index 6c6eb486f7a6..3f0fc30eb320 100644
->> --- a/arch/x86/mm/pat/set_memory.c
->> +++ b/arch/x86/mm/pat/set_memory.c
->> @@ -2656,6 +2656,26 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->>          return __set_pages_np(page, nr);
->>   }
->>
->> +int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       unsigned long addr = (unsigned long)folio_address(folio);
->> +       int ret;
->> +
->> +       ret = set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                          folio_nr_pages(folio), false);
->> +       flush_tlb_kernel_range(addr, addr + folio_size(folio));
->> +
->> +       return ret;
->> +}
->> +EXPORT_SYMBOL_FOR_MODULES(folio_zap_direct_map, "kvm");
->> +
->> +int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return set_direct_map_valid_noflush(folio_page(folio, 0),
->> +                                           folio_nr_pages(folio), true);
->> +}
->> +EXPORT_SYMBOL_FOR_MODULES(folio_restore_direct_map, "kvm");
->> +
->>   #ifdef CONFIG_DEBUG_PAGEALLOC
->>   void __kernel_map_pages(struct page *page, int numpages, int enable)
->>   {
->> diff --git a/include/linux/set_memory.h b/include/linux/set_memory.h
->> index 3030d9245f5a..8d1c8a7f7d79 100644
->> --- a/include/linux/set_memory.h
->> +++ b/include/linux/set_memory.h
->> @@ -40,6 +40,16 @@ static inline int set_direct_map_valid_noflush(struct page *page,
->>          return 0;
->>   }
->>
->> +static inline int folio_zap_direct_map(struct folio *folio)
->> +{
->> +       return 0;
->> +}
->> +
->> +static inline int folio_restore_direct_map(struct folio *folio)
->> +{
->> +       return 0;
->> +}
->> +
->>   static inline bool kernel_page_present(struct page *page)
->>   {
->>          return true;
->> --
->> 2.50.1
->>
->>
-
+Thanks,
+-Peter
