@@ -1,155 +1,186 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.156.205.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2095B350D4A
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 15:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768490438; cv=pass; b=ZVJ3zyxx/4hZ60vVoL+ioLpACJSj9Ajoh6qcvRF7ciddYeJEzb9+6W5Hp40JQM0d/0cznnb4izjSvQpvOx51xgYieQjQrd+Lvr3DhphgopdBjm1JEEjRkSgBsNAH/J7VkuCFcovGLwYaeqIPXI06baZoF5qRgvsTacCtc5EO9og=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768490438; c=relaxed/simple;
-	bh=FvMwnXysfRvWYKa7aSVULY0PqRlALfnQBxg+gjKCw1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uWd6ORoSikWVZi7FLwqDGWUdPNWhIejWbfRVoeULHSEMG4F2bogpRZzEUcPG/PjxKF3FZ0wCkunqUnZD0dwlAZkj9S2prBu8Vwt/zIQpXenMdXesIvKU0ExE8GMRfugAibZyJmHsaUuxrIXzVngyMo18YgSOyHw3icJC+G+ks1s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PEgzxhiC; arc=pass smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20A0342528;
+	Thu, 15 Jan 2026 15:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.156.205.64
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768490763; cv=none; b=XNwVngOzOQ1bSSz8PrVo9vaWO6yEWMgvXDAGIib+hd0LuzjIWn8mWKJexKfhimaKdxV2+EN9b0e+VOmQ9HBJF1qvag26ArwGfTLo0NcsDEzRhe7+JEuwjfM6uAI04FsAT7FVquS4qXL4BzTABPLAEQZIwLIt+QuJ1+XPFSZzgrI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768490763; c=relaxed/simple;
+	bh=NsWXJRngFC156YQRHmekUX9Gr1w2AJtYuY37Wjse5YE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=A+ylvrq/D1PBzzHTwl4puGt2SY/xEgo3Q9QkokkfkjDeICWGQRGkS8mg7VXZWWYf9ZmRWV8pP2S4WzRr3avPW/ULOwiRYTjyaaeiV9E4AbtDibyCCLbamNxXvV8idp2pshqKUqjPZBkD3COXL3NW9RrVwKidpJ9oOxQ/7VF5S84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=FXG6WoCr; arc=none smtp.client-ip=18.156.205.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PEgzxhiC"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47a95a96d42so52615e9.1
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 07:20:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768490427; cv=none;
-        d=google.com; s=arc-20240605;
-        b=enPEj1HpjWan80zcBPZRzL6DYiy4+AzzEwg+DF6fav0f7KAjXiU8aoHGYV/mCssd1u
-         0E8oKPxlM/4QPFAo2c/h71uR8iPoG6l5ipa1SX8xEr55oKTh+dl13umyA+Kt4aA5bjjr
-         R5qqpGiqezUlsp3VqvCkDkm0YBQkviwVtREqOGiruoZibJAuhVWzmlKPfpLnxtEikTMQ
-         C45lJM0NloNS1lsYUokcDWGvUml5oRmVOTdsqO8isKuYBOBKFQAyeFyS2KXTscwomsIQ
-         KwhF5oDGIMwaqy3v/K2ZVrlOmqIjYkPsgDj+5cTUrehe6+nJ2XCnpHzUE783OPg2cy+Y
-         BcBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=6JHhgPo73JFubMx4EP8h9jX67e75KNMkM7M/+r7y04Y=;
-        fh=vxg7jDbV4KUkB1p2dijbmgxOcCsnV64udQg+GHT6RZo=;
-        b=UEkLn49BacH+6oduwbUwNpfKj/k2J0lliLK2WwQe8Z4IIiv2sDfi07w8xumlcQUwRx
-         Et2kZ0p/igrgIKYpyagCdPPsGYlNrfWz20xOLUR9iglv6FDjOEtykegPKAzMclKc/5Vd
-         LieVMOM/O39tKfCn1JFLMA/BqOgBBt7BuOBhCxVyytBq+l1Eo04flNoxedk871sowIhy
-         qNRAMCT9QlDX1dd3PjyQzTCNeAf68wx0Ai2fax2B8hSsJI/bR7CXoWfOdPz1yYBqiy9y
-         Y03+Z4RzSSc2D9Dc3hKr/dUYlyWLMdMXq4YnpeImWJbOnIKrbvFQ3ws4iUxJATkyEuGD
-         uCeQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="FXG6WoCr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768490427; x=1769095227; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6JHhgPo73JFubMx4EP8h9jX67e75KNMkM7M/+r7y04Y=;
-        b=PEgzxhiC7c7uZ0ihnP2dj6KEt9VTJRAn0MJvmqLvSZGK15IOPM2HPC5FBRXNHEpgKa
-         jsSJ6MjckiLsGSyxI7JdsoUW8rvXWPQwiEMj7SGlDEy1QXwDuzvWD//wwNV3Ux14i8a/
-         0G44AeI7PIt5uKn/J+QyAjAFX4kvfvYhNtKIUlVah6kgd+SdUYkdWCZG9fAF++jKQfQm
-         6dETjcQFhsxrxgk/oLR6yxx6XNqi9VR6q+05Ah0sXyEOd5qGECHKUN9Aj/oOo5etgZ/F
-         4eTrpbLihvWgi8kK0FhIhKshra6Ietmp5kqtKEey1SsvoXWdtJPv3Krp/k86YZjaYOOl
-         HNiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768490427; x=1769095227;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6JHhgPo73JFubMx4EP8h9jX67e75KNMkM7M/+r7y04Y=;
-        b=GG4xaGzDDhtVf5OL5BrcFoRehwj4hr+iJFLPZevnN8qxW6Gp5BDtQV+kQX5LL7UuXP
-         AMlWH4kP6HHBIeA0Zog/tHNo8NV74tN1TZ5rcJiK2RETLcAMzdoGYdnzVlRiWtuQejOC
-         Eb6IaJwlSlKV9bQqQYHRO/IWShCvE9KLXl2Id/KgmExo4f41PFOBsjBeYQY8nEeVIuh4
-         q9kfX6BEy60ocT1Q8bbK+rBnPwSNQRS6yBmVmnZ9bIJ+6c6if28GLXnBgahPXap5Oj7y
-         L4iqoXmlkMU6Z5VW22xPqQgvvTWUVXAH9BowaRfPP1t/LV0hpjbrOnucNH6LCLZYw69i
-         hjYw==
-X-Gm-Message-State: AOJu0YwU5rcn+sGMYtBOnAcTEqYRcTWdABzZHjMrUOqfdj4aiZl4MW1e
-	ZEYKwzGUl5DHx2qBkmyiDOQT/x8/hUNPEIz5dF5cSWvboU+GjJyv7YdKe8RKkSyRGgEtHV0pSl8
-	Bbdtp6xlc17nG9sSOvfFwen91tTg3ID1Q61aRA36p
-X-Gm-Gg: AY/fxX6v0Qjn3nql4aPL+2HOReWHP3hiCL9TawdrhhEmvq/zhuDMvLwaWGx+5E2QBkC
-	cez/L8cDLH8O+KH5j1LhIn5oGh64rA7kO01EasdYLaZJ3uJwGKdqM0WKbjmkgAXoMfGbkIunz7x
-	BEoLW4stmyxmyF14rhpqLi3bgd1qRgutNb9z4VoCFij5/cdQQvzPq8C6LZWrwHgyV2zLjdh0sOe
-	oBN21Saz3F+Tt4g4iJAEab/Cp888bB6RDAVmYafYSWws1thkms2d4P24EjiF6eDob6ermyg
-X-Received: by 2002:a05:600c:310c:b0:477:86fd:fb47 with SMTP id
- 5b1f17b1804b1-47f83f3a12cmr746125e9.8.1768490427073; Thu, 15 Jan 2026
- 07:20:27 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768490758; x=1800026758;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=ErA/nUzcQBK9RfXLPHVY+KZIrd4BxzBjllIcAZaOcaQ=;
+  b=FXG6WoCrffSIxjvEQezrfJyRjynDp8vzIrv/J48PsGf85152tATOYF7p
+   +57aUZb9zLhrH2TYm/SVHrGdeoXZ/e6QsG41ugGjNcavq833InivA4bEV
+   YNmgjXo0SF6rPeFCbFWOPBTpYQ2RzvwTl+460+AyMmD5r1awW/Z43xWDR
+   ihQEgGktBPU0fDhVdFJP/T8pug5kMH5KRwi//ux0kybo7r2WzsJDkPxYU
+   igJoNx9M0tmZS/WAPni9FHvs+M25CNwVYWbUZEDB4jZvLxsw4eqTmCrR+
+   avB7z8OSA3BlepkbNo3lBMFIdvJPBo4jNz0IoaFW/nlie4hS5ppYxZ73i
+   A==;
+X-CSE-ConnectionGUID: JEI06koAS36Pqlka9p/LFg==
+X-CSE-MsgGUID: fziZ5aPzRHWEX3iC92dDgA==
+X-IronPort-AV: E=Sophos;i="6.21,228,1763424000"; 
+   d="scan'208";a="7652838"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-001.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2026 15:25:39 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:3758]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.6.3:2525] with esmtp (Farcaster)
+ id 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c; Thu, 15 Jan 2026 15:25:39 +0000 (UTC)
+X-Farcaster-Flow-ID: 78f75ae8-5037-4d9b-ae68-7dfcd2a25e3c
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Thu, 15 Jan 2026 15:25:32 +0000
+Received: from [192.168.15.69] (10.106.82.11) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Thu, 15 Jan 2026
+ 15:25:28 +0000
+Message-ID: <094591b6-97eb-4cae-aa08-fececcba4ba1@amazon.com>
+Date: Thu, 15 Jan 2026 15:25:27 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251211104710.151771-1-tabba@google.com> <20251211104710.151771-9-tabba@google.com>
- <86h5smlxyo.wl-maz@kernel.org>
-In-Reply-To: <86h5smlxyo.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 15 Jan 2026 15:19:48 +0000
-X-Gm-Features: AZwV_QgE41uEPI9Vg4fByEIPIpbH-ItbLeWT-3oeGpbf0mTS4ASvGnEoNWEl8Pg
-Message-ID: <CA+EHjTzEtPta5VHr5R0r0v7ui7-8xv5me29uk2devZ=S14RHqw@mail.gmail.com>
-Subject: Re: [PATCH v6 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	vladimir.murzin@arm.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap, restore}_direct_map
+ helpers
+To: Heiko Carstens <hca@linux.ibm.com>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
+	"oupton@kernel.org" <oupton@kernel.org>, "joey.gouly@arm.com"
+	<joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
+	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"luto@kernel.org" <luto@kernel.org>, "peterz@infradead.org"
+	<peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org"
+	<david@kernel.org>, "lorenzo.stoakes@oracle.com"
+	<lorenzo.stoakes@oracle.com>, "Liam.Howlett@oracle.com"
+	<Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
+	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
+	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
+	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
+	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
+	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
+	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
+	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
+	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
+	<gor@linux.ibm.com>, "Jonathan.Cameron@huawei.com"
+	<Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"pjw@kernel.org" <pjw@kernel.org>, "shijie@os.amperecomputing.com"
+	<shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>,
+	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
+	<wyihan@google.com>, "yang@os.amperecomputing.com"
+	<yang@os.amperecomputing.com>, "vannapurve@google.com"
+	<vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>,
+	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev"
+	<patrick.roy@linux.dev>, "Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri,
+ Takahiro" <itazur@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>
+References: <20260114134510.1835-1-kalyazin@amazon.com>
+ <20260114134510.1835-2-kalyazin@amazon.com>
+ <20260115121209.7060B42-hca@linux.ibm.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <20260115121209.7060B42-hca@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D012EUC004.ant.amazon.com (10.252.51.220) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-Hi Marc,
 
-On Thu, 15 Jan 2026 at 15:03, Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 11 Dec 2025 10:47:08 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
-> > support all features, restrict which IOCTLs are allowed depending on
-> > whether the associated feature is supported.
-> >
-> > Use the existing VM capability check as the source of truth to whether
-> > an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
-> > associated capabilities.
-> >
-> > Suggested-by: Oliver Upton <oupton@kernel.org>
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
-> >  arch/arm64/kvm/arm.c              |  3 +++
-> >  2 files changed, 24 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index 5b564576160d..0fa8c84816fd 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -9,6 +9,7 @@
-> >  #include <linux/arm_ffa.h>
-> >  #include <linux/memblock.h>
-> >  #include <linux/scatterlist.h>
-> > +#include <asm/kvm_host.h>
-> >  #include <asm/kvm_pgtable.h>
-> >
-> >  /* Maximum number of VMs that can co-exist under pKVM. */
-> > @@ -43,6 +44,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
-> >       case KVM_CAP_ARM_SVE:
-> >       case KVM_CAP_ARM_PTRAUTH_ADDRESS:
-> >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> > +     case KVM_CAP_ARM_BASIC:
->
-> Can we instead rely on an existing VM capability? I'm not overly keen
-> exposing something new to userspace (KVM_CAP_ARM_BASIC) for something
-> that really is KVM's own internal problems.
->
-> Looking at the history, a bunch of things have always been present:
-> KVM_CAP_NR_VCPUS, for example. You could even #define
-> KVM_CAP_ARM_BASIC to that if you want.
 
-I wasn't too crazy about that either. I like the idea of defining it
-as an alias of KVM_CAP_NR_VCPUS. I'll do that when I respin.
+On 15/01/2026 12:12, Heiko Carstens wrote:
+> On Wed, Jan 14, 2026 at 01:45:23PM +0000, Kalyazin, Nikita wrote:
+>> From: Nikita Kalyazin <kalyazin@amazon.com>
+>>
+>> These allow guest_memfd to remove its memory from the direct map.
+>> Only implement them for architectures that have direct map.
+>> In folio_zap_direct_map(), flush TLB on architectures where
+>> set_direct_map_valid_noflush() does not flush it internally.
+> 
+> ...
+> 
+>> diff --git a/arch/s390/mm/pageattr.c b/arch/s390/mm/pageattr.c
+>> index d3ce04a4b248..df4a487b484d 100644
+>> --- a/arch/s390/mm/pageattr.c
+>> +++ b/arch/s390/mm/pageattr.c
+>> @@ -412,6 +412,24 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
+>>        return __set_memory((unsigned long)page_to_virt(page), nr, flags);
+>>   }
+>>
+>> +int folio_zap_direct_map(struct folio *folio)
+>> +{
+>> +     unsigned long addr = (unsigned long)folio_address(folio);
+>> +     int ret;
+>> +
+>> +     ret = set_direct_map_valid_noflush(folio_page(folio, 0),
+>> +                                        folio_nr_pages(folio), false);
+>> +     flush_tlb_kernel_range(addr, addr + folio_size(folio));
+>> +
+>> +     return ret;
+>> +}
+> 
+> The instructions used in the s390 implementation of
+> set_direct_map_valid_noflush() do flush TLB entries.
+> The extra flush_tlb_kernel_range() is not required.
 
-Cheers,
-/fuad
+Thanks, Heiko.  Will update in the next version.
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
