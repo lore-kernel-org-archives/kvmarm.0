@@ -1,103 +1,195 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BE011E8826;
-	Thu, 15 Jan 2026 12:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CE538E100
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 12:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768478851; cv=none; b=lDaov9pLk6o/4gPCiVY3X6JNxJw1WWdCeo9ZBMztDfMz9A0mAZww1YltUqjLt6Sol2zgWDQgMDNhzWh57CKkVZkndnQX5mFH3NrTI93FsreoK23xUHfgIVLTBRfZNwjqM43dgywEemCTNpx6v0BlgJDSKo4MzndwVOCgEUyefSk=
+	t=1768478973; cv=none; b=E4FJi6cmQtUYRn77GqsSfdOjv+h05pn7TfL/bbWiAX5WSqtufWc4uOM8PxRKUEsbJ+aTGOJnIWjXbap7mkPJLDGvC/yUVvduoIxLYOG2EOavXbY5ZOkhdJJ9ydSVlP0zotYc+SzEFVspQx8zM3zQ5pdl+KN2LaeOkVDZGBoUpxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768478851; c=relaxed/simple;
-	bh=f9T+RVKITvC3zGHO9fSKmJDHGMMiKmOzSVT26F83cNE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TIMCIA8RZNBF1e7UawUFttlbe0D3yxGIH8htNiGAYJ6jKu48qjB+h4eHqLxazbK6Z2c0LHZLlNulpd+GU37k6Nm6aa6ctqtbnkhdV2Yo8XFOqMIIQwPKDJjO4KgpaskgmOQ6A4Zx1k2F/1eHLHXe1r2JUIvb6fM6HRyBGXNgYvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2dIoPLx; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2dIoPLx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1CC3C116D0;
-	Thu, 15 Jan 2026 12:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768478850;
-	bh=f9T+RVKITvC3zGHO9fSKmJDHGMMiKmOzSVT26F83cNE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U2dIoPLxARHFp6Wt9YYVD65OkaRzS6qKuuOMzIhOCpfcMkc94p4VpEEiiGCQ063QI
-	 ivQL6K3tIdrgQXsyhRhjqXDT2VeXRqGkCAjHfF/3WE3qNGK3WDZpyKTvkbO6DNvsuS
-	 /14JK3r3wWVrZ2BScofbQbl3r4a1eUZd1BCqn2iQaDQJU7AplAWk0o0aFg7GaDXVhY
-	 CB7+44tkTPhNEUhDau5kaHq6a9m+Nkulvy4ImNk+HLLtuFzUdwC9I7phmjCBjGPJWb
-	 9Da+p6v+u5RvQ3/XGpiqA9VFAH8w2dFJUf5fIOtnVEazRRaEom2briQBnh4hdr2nY5
-	 Ps+oU0G7G7dBg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vgM8O-00000002W0n-3UaY;
-	Thu, 15 Jan 2026 12:07:28 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	Yao Yuan <yaoyuan@linux.alibaba.com>
-Subject: Re: [PATCH v4 0/9] KVM: arm64: Add support for FEAT_IDST
-Date: Thu, 15 Jan 2026 12:07:22 +0000
-Message-ID: <176847883532.3732984.5442091537766378905.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260108173233.2911955-1-maz@kernel.org>
-References: <20260108173233.2911955-1-maz@kernel.org>
+	s=arc-20240116; t=1768478973; c=relaxed/simple;
+	bh=wKnTEikqhS4NMm/VDSqQnliYLJaNLFe5Z2Y8Fwg2fBI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QqRESQW5QGt0Dq8sSJU6mA0OzrgZ8lj27PxclibXAybkZ6+ol0/OK/I/+13IVRUoV6hN50AOaxpaxsPvH44E/eu/p4TEAr3Hy6m45oaROku5hgSVGEy0Vg5qBzaBKR64gXecqJjceBlEKbd0Mjl8on+Fs0GCJKSUvhe0hU0kXv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dsMGS2wBgzHnH8m;
+	Thu, 15 Jan 2026 20:09:04 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id 406CC40570;
+	Thu, 15 Jan 2026 20:09:26 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Thu, 15 Jan
+ 2026 12:09:24 +0000
+Date: Thu, 15 Jan 2026 12:09:23 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Gavin Shan <gshan@redhat.com>
+CC: Ben Horgan <ben.horgan@arm.com>, <amitsinght@marvell.com>,
+	<baisheng.gao@unisoc.com>, <baolin.wang@linux.alibaba.com>,
+	<carl@os.amperecomputing.com>, <dave.martin@arm.com>, <david@kernel.org>,
+	<dfustini@baylibre.com>, <fenghuay@nvidia.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>
+Subject: Re: [PATCH v3 06/47] arm64: mpam: Context switch the MPAM registers
+Message-ID: <20260115120923.000079fa@huawei.com>
+In-Reply-To: <12779ebc-1928-42db-8a44-ee97e2a58fd1@redhat.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+	<20260112165914.4086692-7-ben.horgan@arm.com>
+	<12779ebc-1928-42db-8a44-ee97e2a58fd1@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, ben.horgan@arm.com, yaoyuan@linux.alibaba.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Thu, 08 Jan 2026 17:32:24 +0000, Marc Zyngier wrote:
-> FEAT_IDST appeared in ARMv8.4, and allows ID registers to be trapped
-> if they are not implemented. This only concerns 3 registers (GMID_EL1,
-> CCSIDR2_EL1 and SMIDR_EL1), which are part of features that may not be
-> exposed to the guest even if present on the host.
+On Thu, 15 Jan 2026 14:47:28 +0800
+Gavin Shan <gshan@redhat.com> wrote:
+
+> Hi Ben,
 > 
-> For these registers, the HW should report them with EC=0x18, even if
-> the feature isn't implemented.
+> On 1/13/26 12:58 AM, Ben Horgan wrote:
+> > From: James Morse <james.morse@arm.com>
+> > 
+> > MPAM allows traffic in the SoC to be labeled by the OS, these labels are
+> > used to apply policy in caches and bandwidth regulators, and to monitor
+> > traffic in the SoC. The label is made up of a PARTID and PMG value. The x86
+> > equivalent calls these CLOSID and RMID, but they don't map precisely.
+> > 
+> > MPAM has two CPU system registers that is used to hold the PARTID and PMG
+> > values that traffic generated at each exception level will use. These can
+> > be set per-task by the resctrl file system. (resctrl is the defacto
+> > interface for controlling this stuff).
+> > 
+> > Add a helper to switch this.
+> > 
+> > struct task_struct's separate CLOSID and RMID fields are insufficient to
+> > implement resctrl using MPAM, as resctrl can change the PARTID (CLOSID) and
+> > PMG (sort of like the RMID) separately. On x86, the rmid is an independent
+> > number, so a race that writes a mismatched closid and rmid into hardware is
+> > benign. On arm64, the pmg bits extend the partid.
+> > (i.e. partid-5 has a pmg-0 that is not the same as partid-6's pmg-0).  In
+> > this case, mismatching the values will 'dirty' a pmg value that resctrl
+> > believes is clean, and is not tracking with its 'limbo' code.
+> > 
+> > To avoid this, the partid and pmg are always read and written as a
+> > pair. This requires a new u64 field. In struct task_struct there are two
+> > u32, rmid and closid for the x86 case, but as we can't use them here do
+> > something else. Add this new field, mpam_partid_pmg, to struct thread_info
+> > to avoid adding more architecture specific code to struct task_struct.
+> > Always use READ_ONCE()/WRITE_ONCE() when accessing this field.
+> > 
+> > Resctrl allows a per-cpu 'default' value to be set, this overrides the
+> > values when scheduling a task in the default control-group, which has
+> > PARTID 0. The way 'code data prioritisation' gets emulated means the
+> > register value for the default group needs to be a variable.
+> > 
+> > The current system register value is kept in a per-cpu variable to avoid
+> > writing to the system register if the value isn't going to change.  Writes
+> > to this register may reset the hardware state for regulating bandwidth.
+> > 
+> > Finally, there is no reason to context switch these registers unless there
+> > is a driver changing the values in struct task_struct. Hide the whole thing
+> > behind a static key. This also allows the driver to disable MPAM in
+> > response to errors reported by hardware. Move the existing static key to
+> > belong to the arch code, as in the future the MPAM driver may become a
+> > loadable module.
+> > 
+> > All this should depend on whether there is an MPAM driver, hide it behind
+> > CONFIG_ARM64_MPAM.
+> > 
+> > CC: Amit Singh Tomar <amitsinght@marvell.com>
+> > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> > Signed-off-by: James Morse <james.morse@arm.com>
+> > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> > ---
+> > Changes since rfc:
+> > CONFIG_MPAM -> CONFIG_ARM64_MPAM in commit message
+> > Remove extra DECLARE_STATIC_KEY_FALSE
+> > Function name in comment, __mpam_sched_in() -> mpam_thread_switch()
+> > Remove unused headers
+> > Expand comment (Jonathan)
+> > 
+> > Changes since v2:
+> > Tidy up ifdefs
+> > ---
+> >   arch/arm64/Kconfig                   |  2 +
+> >   arch/arm64/include/asm/mpam.h        | 67 ++++++++++++++++++++++++++++
+> >   arch/arm64/include/asm/thread_info.h |  3 ++
+> >   arch/arm64/kernel/Makefile           |  1 +
+> >   arch/arm64/kernel/mpam.c             | 13 ++++++
+> >   arch/arm64/kernel/process.c          |  7 +++
+> >   drivers/resctrl/mpam_devices.c       |  2 -
+> >   drivers/resctrl/mpam_internal.h      |  4 +-
+> >   8 files changed, 95 insertions(+), 4 deletions(-)
+> >   create mode 100644 arch/arm64/include/asm/mpam.h
+> >   create mode 100644 arch/arm64/kernel/mpam.c
+> >   
 > 
-> [...]
+> With the following nitpick addressed:
+> 
 
-Applied to next, thanks!
+I commented on the nitpick.
 
-[1/9] arm64: Repaint ID_AA64MMFR2_EL1.IDS description
-      commit: 4a7fe842b8a3f3c173c3075f03c60c3f9f62e299
-[2/9] KVM: arm64: Add trap routing for GMID_EL1
-      commit: 1ad9767accfcb81f404aa3d37d46b3eb494dce2f
-[3/9] KVM: arm64: Add a generic synchronous exception injection primitive
-      commit: 19f75678238734ef383f9e10d8e1020873e97170
-[4/9] KVM: arm64: Handle FEAT_IDST for sysregs without specific handlers
-      commit: d78a14decd494caf72ea0144624621e7e43ae451
-[5/9] KVM: arm64: Handle CSSIDR2_EL1 and SMIDR_EL1 in a generic way
-      commit: f07ef1bef67ca08799df262cc901971ac274783d
-[6/9] KVM: arm64: Force trap of GMID_EL1 when the guest doesn't have MTE
-      commit: 70a5ce4efc0e1194718aad6f26332c99e6a119db
-[7/9] KVM: arm64: pkvm: Add a generic synchronous exception injection primitive
-      commit: e5d40a5a97c1d57e89aa5f324734065c6580b436
-[8/9] KVM: arm64: pkvm: Report optional ID register traps with a 0x18 syndrome
-      commit: 592dc2c020686536dae1c427c78cf558a3df4414
-[9/9] KVM: arm64: selftests: Add a test for FEAT_IDST
-      commit: b638a9d0f8965b98403022cb91d8f3b31170eb35
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-Cheers,
+> > diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+> > index 76f32e424065..15979f366519 100644
+> > --- a/arch/arm64/kernel/Makefile
+> > +++ b/arch/arm64/kernel/Makefile
+> > @@ -67,6 +67,7 @@ obj-$(CONFIG_CRASH_DUMP)		+= crash_dump.o
+> >   obj-$(CONFIG_VMCORE_INFO)		+= vmcore_info.o
+> >   obj-$(CONFIG_ARM_SDE_INTERFACE)		+= sdei.o
+> >   obj-$(CONFIG_ARM64_PTR_AUTH)		+= pointer_auth.o
+> > +obj-$(CONFIG_ARM64_MPAM)		+= mpam.o
+> >   obj-$(CONFIG_ARM64_MTE)			+= mte.o
+> >   obj-y					+= vdso-wrap.o
+> >   obj-$(CONFIG_COMPAT_VDSO)		+= vdso32-wrap.o
+> > diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
+> > new file mode 100644
+> > index 000000000000..9866d2ca0faa
+> > --- /dev/null
+> > +++ b/arch/arm64/kernel/mpam.c
+> > @@ -0,0 +1,13 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/* Copyright (C) 2025 Arm Ltd. */
+> > +
+> > +#include <asm/mpam.h>
+> > +
+> > +#include <linux/jump_label.h>
+> > +#include <linux/percpu.h>
+> > +  
+> 
+> Nitpick: Needn't include those two header files since they have been included
+> to <asm/mpam.h>
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+That is a non obvious include chain that we should not rely on.
+Please keep the headers and continue to follow include what you use
+style (with exceptions when a given header is clearly documented as always including
+another like some of the bit map stuff.) It is more obviously correct and
+causes less grief if headers get refactored in future.
 
+>   
+> > +DEFINE_STATIC_KEY_FALSE(mpam_enabled);
+> > +DEFINE_PER_CPU(u64, arm64_mpam_default);
+> > +DEFINE_PER_CPU(u64, arm64_mpam_current);
+> > +
+> > +u64 arm64_mpam_global_default;
+
+> 
 
