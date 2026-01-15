@@ -1,72 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299AE275B0F
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 02:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6F829A2
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 02:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768443309; cv=none; b=fZkVg+jYRA8fOVyqUCNfTehjhgfvZh+3fbqnqPO2gdVqQTuV9bWR81h1KyF7yiLrbyWKqGc8yCRP7BS/sQU71lM6MBVFzNDHexnEHD2Su7hucqO7MRrRDPAZRtuEO3NMclMZWSxpUs+eiMrFMX8ZaTQxzOQD2IRwueRJZAHDKp0=
+	t=1768443397; cv=none; b=YZ2f/clO7hppGM2OKF8Y+gtlukXL7fJeZSZYz3N6Z/OaD/6VF2IsCWDPUiooYtw8MCzZv5YipGtuhPapAb2FKA3tn1K1cgmCa44ep/8Nvf0kypyoeRXS9T+H6Oa/6D9kDKDV9ruJA1MPPB1aIQ0nHSJTT9+KLFO8sv8R4CpAJog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768443309; c=relaxed/simple;
-	bh=eBbieCwBHiWcFUG7hDjEHdyb43nn4ge2y9+D2+InXxU=;
+	s=arc-20240116; t=1768443397; c=relaxed/simple;
+	bh=XRbqoNb+TPuwNugFKX3t0XCiYfn4NeEV3B9HNRbntt4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qg44JX9s6NNJdfHoNl/NokBU1zJCt++reKVfOBg0bekmBR8wX1B10FOMDJa7CmoAjM4nXQmOjSj5J2UKNsa9sbBnPWtHrb5x1Fa/iVxmr44jkzhvFc4RlbOakjJj89E9ABNpzseqamcj3ceIt4NlxH5VSKzSlLwNNRzhXTT7LZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZWeLGuu; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=lLwlFuCVLbdX2IlE6LlbXTQXtN1PLevoFPydTjgegFf80H62Op/5zj7sFZe95MT0fAo2PHEJ3wCfnJTNdihEzBNvha2auvntI4A7OGC953yolIlpbN3V8SisG/nfbuR+Hs7qfa6BMvEIXVvweWDFpL4g2MCGuSj5bMkuJYw8N88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=clojrNpT; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZWeLGuu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="clojrNpT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768443307;
+	s=mimecast20190719; t=1768443395;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wVLNaYRdyTd3Y3bYKBBodLvCmiY6IvN6c8AunBjxbBE=;
-	b=ZZWeLGuutR5Djx+mEGsmhULaes/xVqCjfadpJAb08rJ1+wUK2TVI50PSTPA2kDRBk08rad
-	iEEys6n8SUoaaH1hzdt9rZCLCDHlG5wf48a0LhcdhR8nkSTizEwMD4dO2dFItqqNPfTMTl
-	4MWqHmYp1//xgDtm2gwETtSk70UulvY=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=8dlgkmxWqaDOQOHWSmTqUqR3tikn8dprMTMa25/WTs0=;
+	b=clojrNpThDyewucDxQIn4WKg8CoIxsn17MoVc0o6zwb7S4a6D0EPscN3En+yk9VxtqqWow
+	FibfLGRu5x/xlPgYWc0kQTxEnzRjnmfGDuTq7WJcj+S2354o3FnMqiGJJxtfD1M7KzAMH9
+	5QCGAvssFOC1yothszbhhXHm1dsAWJI=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-30-QEA8LszhPW6dxuV7Yw3HYQ-1; Wed, 14 Jan 2026 21:15:04 -0500
-X-MC-Unique: QEA8LszhPW6dxuV7Yw3HYQ-1
-X-Mimecast-MFC-AGG-ID: QEA8LszhPW6dxuV7Yw3HYQ_1768443303
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c337cde7e40so204713a12.1
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 18:15:03 -0800 (PST)
+ us-mta-455-6rSUSPypOeeRnozokCsoww-1; Wed, 14 Jan 2026 21:16:33 -0500
+X-MC-Unique: 6rSUSPypOeeRnozokCsoww-1
+X-Mimecast-MFC-AGG-ID: 6rSUSPypOeeRnozokCsoww_1768443392
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2a0a4b748a0so10868175ad.1
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 18:16:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768443303; x=1769048103;
+        d=1e100.net; s=20230601; t=1768443392; x=1769048192;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wVLNaYRdyTd3Y3bYKBBodLvCmiY6IvN6c8AunBjxbBE=;
-        b=V+pIjfjFlPc+hoKJ/hMX2VyUWqo4fwjQfHB0tiOrwEzmNvlqv2otzHsP621vEt/79h
-         yLCZ8QJ3D9LC4jrEf0asjTim8kn69dKEuRQqINk/ocz8+gC48pKvN201vHwzJB/Qag++
-         +Oj+tFeBjW1qNLlKkUI2bxVYPzuVbMcEKqoy9M09X0DzP/8cbF5IgtwELDy1NKBvPoMc
-         JWNolQUuCNAEHMzjYytrG+tdShwLcTamtUzJIQQ38tMQ7KmqRHkTeMfWOlSon07AJ+xk
-         +OfOm5c4O6AAl1WhRvaUVlCO1rtqAjEFJzw61jTKgFaaqcqcmLi0LOZQP90eia/7I3q3
-         J8uw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdvD4i68vZw9BGHd2we4KerUNwBfnScAyyGPIMD0fOwIAjCX663x7pbJpu4FSp5PtZx4vxCwQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyXKtJjskQ1uGRHGP1+RLgrR0Cz/Za/Vp8LFwU+rM5gVMQd4mFl
-	P1JVmtEi0l7alXo/dJnEqLF6R8MuOwYsqXaykMhoeUZpA6AXiAizuTkMmhGq+zUb5gGJvHgJjgM
-	TSd99lRuRzY6eQmlG8F8dPWQFd0jEHJX8qifTsGjoCvyG947oa+Q7cUE6RQ==
-X-Gm-Gg: AY/fxX5dnJc+iuLV3k3L83TDU2ALiTGS5iDwNyU0/5MXMgcg4VcA/nYlhYp5KXEBGbQ
-	4LRSW7P1KZai7nlLxtTSqJ93EJdtVYXTyJpwBgmHkBNo9sJqJcG6aig8KlpVjw7u8nclcbZmAZ/
-	BpxlWZIt0SmLmTOIKsuIJD9zgtSUpcDQh70nYlZ21xGg0m9j4abogDfQdy3Shqh5swkMvsu1gR2
-	j1zEsXQk8o2/Lu1sJdy1eUSi5VvSggLRI+w05mkxYZfPFLqc2fD1jxtYE2fizkbMllcyyVBvcGY
-	IMip92qdsNe7SJvjxmyxIqO5Z2QjuRr5TYLQ5wZvn3Ou+Fjt3Nv+zLBL1ABKorBMNVQ8E9/PRHt
-	vFhEw4VTeO2w=
-X-Received: by 2002:a05:6a20:7f96:b0:361:2c56:fca8 with SMTP id adf61e73a8af0-38bed1ca1c6mr4829226637.50.1768443302903;
-        Wed, 14 Jan 2026 18:15:02 -0800 (PST)
-X-Received: by 2002:a05:6a20:7f96:b0:361:2c56:fca8 with SMTP id adf61e73a8af0-38bed1ca1c6mr4829208637.50.1768443302510;
-        Wed, 14 Jan 2026 18:15:02 -0800 (PST)
+        bh=8dlgkmxWqaDOQOHWSmTqUqR3tikn8dprMTMa25/WTs0=;
+        b=h6vFxMFVTZvvlt4cmBXuzXKkcQVG3qqtGCbRVm2q1s6ttyrmcpf3swXlGmwVFKRisJ
+         hfgejMHxSrMi4t6G2lTVjC/xRrNM93MwpszZhGTHoNbNXKW8Iyic81JPo2iZyTD6cioo
+         Pt6OrqCjVz6pzLFVAwBl2ojIq3cPp5eI4dl0qx7S5v4sozOzmbr/+UJSqNLHNruJRMBK
+         WSL2RszLtkOEa2DR0fuBXMiiS4L+It4TmM2v1OLobHJrHD6IuRt/BRGcMolT96cnVioC
+         cq6aNqCk78AzzEnFDeLz1liZIKc4qP9UjdAml+tFJX7jJ8k3zVClnbjx1fWNZkhczuis
+         2WHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXTemv/PFOhdornvOw3hqM1JTJ7cOouYqG4ooVOE/87NvatGLy4cebZTrj+XpaeubK6tV3jYdE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxMErmaY3hNHx08eeLx3E6CH8cnkzWhPTQUmZhWUDaSOPEgUDg7
+	oyY0LOzfI48JJAHWHP3NxYJ7+CD615iLcqluoc1/G2C0Nyhg7gmmY9ugvZN8C6QXl2q1mPDC+Lc
+	pd2xyuLk4w/QhORkZvNTnSvM/TKM6j63auj2vu7BP6x+q1zJfyUAMZXVZYA==
+X-Gm-Gg: AY/fxX6PzWOYodChqJhQJgi7MQhZAeiYHqNKK7obeRHt4EY5BcuZ/27xOp246EQzdQ7
+	44tgLYQ0U3O7BhJ7zjbBfSz0ZjYOreldKt0g1hWq6s2FJ1ksD/1QC3libIrg5V8QEQlf0rSkuoe
+	OvYJaA7CdYFKqNJrHv9ZR/gQveCQbogBnBD38v1k43nU3orfSDiDrVoo4idwsaC8cNeiGNw5nab
+	rWEHZvnA0333XjFcWO+vktK9J3uwpy1caYmNq4hXwWd+oKFtgnuoTwfvDK+lAInorntLhVjScW1
+	TfRgF62395GxnOfqF2AAEMbFVJAWENiQ1AzufvpzUyXKDlOPKB2tJQXNNIdm8qsWzN03kbuo+nQ
+	liuRQkrX4tcI=
+X-Received: by 2002:a17:902:ce92:b0:2a0:97d2:a25d with SMTP id d9443c01a7336-2a59bb51ffemr43748495ad.15.1768443392059;
+        Wed, 14 Jan 2026 18:16:32 -0800 (PST)
+X-Received: by 2002:a17:902:ce92:b0:2a0:97d2:a25d with SMTP id d9443c01a7336-2a59bb51ffemr43748275ad.15.1768443391605;
+        Wed, 14 Jan 2026 18:16:31 -0800 (PST)
 Received: from [10.72.112.168] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfc2f481sm23240011a12.10.2026.01.14.18.14.50
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a3e3c3ae21sm233902385ad.7.2026.01.14.18.16.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jan 2026 18:15:01 -0800 (PST)
-Message-ID: <cf2cc08b-9170-4ef2-9f99-e2d901b40c61@redhat.com>
-Date: Thu, 15 Jan 2026 10:14:48 +0800
+        Wed, 14 Jan 2026 18:16:31 -0800 (PST)
+Message-ID: <fa352909-0a8d-45a6-8965-6328299e2e0d@redhat.com>
+Date: Thu, 15 Jan 2026 10:16:08 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,8 +74,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/47] arm_mpam: Use non-atomic bitops when modifying
- feature bitmap
+Subject: Re: [PATCH v3 03/47] arm64/sysreg: Add MPAMSM_EL1 register
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -90,31 +89,25 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
  joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-3-ben.horgan@arm.com>
+ <20260112165914.4086692-4-ben.horgan@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260112165914.4086692-3-ben.horgan@arm.com>
+In-Reply-To: <20260112165914.4086692-4-ben.horgan@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: eTurNy1P3Mcj6MG9EjMdSiT-xmQpINSEX6PAYGfxZM8_1768443303
+X-Mimecast-MFC-PROC-ID: Hb72Wl5JLSQgP7QLsfLrH1FJtIE7FtsihLPf5t1qVWw_1768443392
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/13/26 12:58 AM, Ben Horgan wrote:
-> In the test__props_mismatch() kunit test we rely on the struct mpam_props
-> being packed to ensure memcmp doesn't consider packing. Making it packed
-> reduces the alignment of the features bitmap and so breaks a requirement
-> for the use of atomics. As we don't rely on the set/clear of these bits
-> being atomic, just make them non-atomic.
+> The MPAMSM_EL1 register determines the MPAM configuration for an SMCU. Add
+> the register definition.
 > 
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
-> Changes since v2:
-> Add comment (Jonathan)
-> ---
->   drivers/resctrl/mpam_internal.h | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
+>   arch/arm64/tools/sysreg | 8 ++++++++
+>   1 file changed, 8 insertions(+)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
