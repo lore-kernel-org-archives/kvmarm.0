@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196F71EF09B
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF442857CD
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768501019; cv=none; b=W8QEFPXeY0SttTSRO4GSUmkTE7UzdevgL3NjlzII7noVbK8viSQtH7aqs4Bqc6e6vdY/qhUe9z7ChnyFgpq0rogMzCTM5qtqDk1Vy8xfhirogKWSdnDVFX+wUeYeSO5iFNtvxJxzhqhZyPifR/GvgeKiS26FrJIYwqHlfyKF1Lo=
+	t=1768501212; cv=none; b=s1DyeAMZtojfO3n1qIwdWZ2Yi2Okb/GbXbzBCACQK0AkqBvJaBbDOZJrER1q7ASuwLUELczqR7c2ux06we0gypUiY8WCBvBOZYX9wzxsqRuMs485T9muAfmwB9iqhxBlcx/lQajbqFz9DhNG0NiZ4QDH4e5WU/WVTFjQW8H2HeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768501019; c=relaxed/simple;
-	bh=vkUae6H9MJaAh4/qbR0VmYjcV0Wtm8RWtwoYs7cfGOY=;
+	s=arc-20240116; t=1768501212; c=relaxed/simple;
+	bh=KPoynAePCDPyPst9uXCLzbkFncttkYqJv6+6SXThhqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=efm9fdiBk2U+lgY50lLSel1W6QF0vKh4Z2dXXOccI2ZyS07wrHnXkKbmvmNYkEg8rYL6keuECHXRFOLyNoX2pkMhBl/DJzDD844gF2r9zVMZRWztp6XwySklgfxU6tx3CvcDw/TwtxX/Qi9teION/r4EKao7SOyk2xux5kqXugs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=s2y5WlTrmSOOd90tLfAvs7wh8xzL1FLZgQTp2b1LDvKX/2Rf1dHi9WHZwFDUCA5hnBavdWPEWQy8DCylXgt2iTFYQ4uEEhLUiHUId0+gxIAmE9DilQS9QQYHsmbWSaivpLWZ+qcLjkXvnhHnuwOwaGQAhaTMx26kjP6MAg067WM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF95F1515;
-	Thu, 15 Jan 2026 10:16:50 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C5691515;
+	Thu, 15 Jan 2026 10:20:03 -0800 (PST)
 Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F1593F632;
-	Thu, 15 Jan 2026 10:16:52 -0800 (PST)
-Date: Thu, 15 Jan 2026 18:16:49 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF1DC3F632;
+	Thu, 15 Jan 2026 10:20:04 -0800 (PST)
+Date: Thu, 15 Jan 2026 18:20:02 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
@@ -34,11 +34,11 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
 	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
 	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
 	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 08/47] arm64: mpam: Advertise the CPUs MPAM limits to
- the driver
-Message-ID: <aWkvEcil3hrr0319@arm.com>
+Subject: Re: [PATCH v3 09/47] arm64: mpam: Add cpu_pm notifier to restore
+ MPAM sysregs
+Message-ID: <aWkv0jsX-tMHEo9G@arm.com>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-9-ben.horgan@arm.com>
+ <20260112165914.4086692-10-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -47,27 +47,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260112165914.4086692-9-ben.horgan@arm.com>
+In-Reply-To: <20260112165914.4086692-10-ben.horgan@arm.com>
 
-On Mon, Jan 12, 2026 at 04:58:35PM +0000, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> Requestors need to populate the MPAM fields for any traffic they send on
-> the interconnect. For the CPUs these values are taken from the
-> corresponding MPAMy_ELx register. Each requestor may have a limit on the
-> largest PARTID or PMG value that can be used. The MPAM driver has to
-> determine the system-wide minimum supported PARTID and PMG values.
-> 
-> To do this, the driver needs to be told what each requestor's limit is.
-> 
-> CPUs are special, but this infrastructure is also needed for the SMMU and
-> GIC ITS. Call the helper to tell the MPAM driver what the CPUs can do.
-> 
-> The return value can be ignored by the arch code as it runs well before the
-> MPAM driver starts probing.
-> 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+On Mon, Jan 12, 2026 at 04:58:36PM +0000, Ben Horgan wrote:
+> +static int mpam_pm_notifier(struct notifier_block *self,
+> +			    unsigned long cmd, void *v)
+> +{
+> +	u64 regval;
+> +	int cpu = smp_processor_id();
+> +
+> +	switch (cmd) {
+> +	case CPU_PM_EXIT:
+> +		/*
+> +		 * Don't use mpam_thread_switch() as the system register
+> +		 * value has changed under our feet.
+> +		 */
+> +		regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
+> +		write_sysreg_s(regval, SYS_MPAM1_EL1);
+> +		isb();
+> +
+> +		write_sysreg_s(regval, SYS_MPAM0_EL1);
+> +
+> +		return NOTIFY_OK;
+> +	default:
+> +		return NOTIFY_DONE;
+> +	}
+> +}
 
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+This looks fine unless we decide to save/restore them in the low-level
+suspend/resume functions.
+
+-- 
+Catalin
