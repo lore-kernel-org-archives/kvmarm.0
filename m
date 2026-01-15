@@ -1,120 +1,130 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5694C3D34A6
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29A63C1FFB
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768500553; cv=none; b=W0uVw1b9VrKLY8vMPHDSlc4Sm3qYlpj7n4qCzNErp2LeZBAKP46Rlrs+tachrDn8F+xZiUSQuGn0kpl9sCsaFiDkOQ08Z9m+KZkG6+QsVJmu2OiqotH/G2JlcfCPIjg5p4f8RCsPKZUm8l4OWE9ShBZOREORCjMBgyVtZ4zwG5E=
+	t=1768500859; cv=none; b=Ip2ntr4gLXcPBGxScE+4v1P0y+Zfs/COYzTDr6kKuPlxcL+UbFl5BuGJ/pWnHZoVcVBFjXmb2M+Mqll78riG7DAcWQ7LAsMMD29Mq2mHOQv0PSsax98tuXBRlrp3sRnnGBgXOP1A6D9t8OuY8FZZX6aEwu6BoTBGbaDoxaq2pqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768500553; c=relaxed/simple;
-	bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=QrsU6p0YrIVk6gi4CR+/eS9zwAbGHGzCZyvZXRdg/j0OzSIAzNK6t7ogq3vfbs2XqySdsuKGANEREmxfZHlLJvbIrPCMBfp1otQVFSP1znzG3BCIzPDZTMXd+db0Or5oK1AdMElIywCpxj8u2IwEmZZQqdVf5o5aWVVGyJAchMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lqK8Rdxw; arc=none smtp.client-ip=209.85.161.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lqK8Rdxw"
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65f7130d6aeso3325512eaf.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 10:09:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768500551; x=1769105351; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
-        b=lqK8Rdxwtsjp39+RVcs0qYprpV8wUB4grdAWnsSCchIeQ5JDpOmVxk0fUFglrSYuqA
-         1ml+Px+I/s2rEGh2V74jHdE5N27XQbKviZbK9MK3HUunDO0OG6RGGp2eq8sNtnlS35Gr
-         BnnXStQ6XxTSnmYFQVIrkrIYojwxKlMoqAKzdipJmp1adYdbYh1qQzwmhdEC5WVpcahl
-         UMahfK145EbysMYEfuDUclT3ZU05RxnKYTuklUkWeAi/4ZBbBzFpe9pmYnN5f9/BorXH
-         uvzlmP0YIqk6lMV8jeeR+rkPMxldStRPfKcwViKDmCy3nVrNXlsR+lDnMC4km8xOOlkO
-         GD8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768500551; x=1769105351;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
-        b=Lr+//gaVU+PI//RnQjYlmREzhBfEH7U1W6Jc5k1f668XZce1VRndr2qkMmBX9afg6d
-         4yhQ7QsxGpEf8ogpH+TTjJl5NVPS2IheNam09dcMMVC/lvyrfsWf+Yh3efRV7MPkbOVh
-         aGA6BW18+1mV6aadxZlMwABM/F0S2zBc+DBSSlC+EYZUZ79MthOOR9uZBpfWET9G9Ckz
-         maW49nFsNygXvzclO8p3tLaHXsXsMCTaPEbPl3eXPNOUoOLUDQW2FC9wA0aE5OljWwPk
-         wv00riALZaSQVEIWjUfaw4Ywxe80ZeHKsmsv7im3kYd56ZX7WhrS97/cDZFJ1/WVQuSh
-         37Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUQd3iNBrJeZ2ZS4Bff/cK2doVv7HjDoeFfKa46rjWRWi56TFUg+QINbPPNVB12PyzoW7jqjhk=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw5jtjYwBOm+i3muCuqUh/DRx4TZIFJfDSCHrFGenj8BUwoO2kk
-	BS0tml8USutFeFMAvJV1m8auhIPXvoG1Y1N4ihEd13DzXa/E2sN+rkX/v1qO9y0zVNah9bcRDbJ
-	ImIzg+JmxTXY4YzQYASe5HwOq/g==
-X-Received: from iobet8.prod.google.com ([2002:a05:6602:4c08:b0:957:5463:901e])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:480e:b0:660:ffa9:e2ce with SMTP id 006d021491bc7-661189e47e2mr16014eaf.83.1768500551087;
- Thu, 15 Jan 2026 10:09:11 -0800 (PST)
-Date: Thu, 15 Jan 2026 18:09:10 +0000
-In-Reply-To: <aWjlfl85vSd6sMwT@willie-the-truck> (message from Will Deacon on
- Thu, 15 Jan 2026 13:02:54 +0000)
+	s=arc-20240116; t=1768500859; c=relaxed/simple;
+	bh=1XuHrhVtSTcMZaW1xEwtwfZo2m+YZvlSj7FW1cSFzkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lcvVgE9MS2Ekv+m9WSGpX15e2LoOUhZuQuXYSj3QI+LstdBtWasTvU45c4/5+O35BOmhK0eBS/UWpoKlCn7RTYlvbnly4rt04t9JyiIav2VY6JKmyMw5hWc4TfBMxs1G6ZbYfydPRvyYGp2prEqcD/T0LHL1wTk/cI/1v+aZd+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D2791515;
+	Thu, 15 Jan 2026 10:14:10 -0800 (PST)
+Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E26803F632;
+	Thu, 15 Jan 2026 10:14:11 -0800 (PST)
+Date: Thu, 15 Jan 2026 18:14:09 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com, reinette.chatre@intel.com,
+	rohit.mathew@arm.com, scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 07/47] arm64: mpam: Re-initialise MPAM regs when CPU
+ comes online
+Message-ID: <aWkucXgE6g2lwvkj@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-8-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntpl7a694p.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5 00/24] ARM64 PMU Partitioning
-From: Colton Lewis <coltonlewis@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: oupton@kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
-	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260112165914.4086692-8-ben.horgan@arm.com>
 
-Will Deacon <will@kernel.org> writes:
+On Mon, Jan 12, 2026 at 04:58:34PM +0000, Ben Horgan wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> Now that the MPAM system registers are expected to have values that change,
+> reprogram them based on the previous value when a CPU is brought online.
+> 
+> Previously MPAM's 'default PARTID' of 0 was always used for MPAM in
+> kernel-space as this is the PARTID that hardware guarantees to
+> reset. Because there are a limited number of PARTID, this value is exposed
+> to user-space, meaning resctrl changes to the resctrl default group would
+> also affect kernel threads.  Instead, use the task's PARTID value for
+> kernel work on behalf of user-space too. The default of 0 is kept for both
+> user-space and kernel-space when MPAM is not enabled.
+> 
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> Changes since rfc:
+> CONFIG_MPAM -> CONFIG_ARM64_MPAM
+> Check mpam_enabled
+> Comment about relying on ERET for synchronisation
+> Update commit message
+> ---
+>  arch/arm64/kernel/cpufeature.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index c840a93b9ef9..0cdfb3728f43 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -86,6 +86,7 @@
+>  #include <asm/kvm_host.h>
+>  #include <asm/mmu.h>
+>  #include <asm/mmu_context.h>
+> +#include <asm/mpam.h>
+>  #include <asm/mte.h>
+>  #include <asm/hypervisor.h>
+>  #include <asm/processor.h>
+> @@ -2483,13 +2484,17 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
+>  static void
+>  cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
+>  {
+> -	/*
+> -	 * Access by the kernel (at EL1) should use the reserved PARTID
+> -	 * which is configured unrestricted. This avoids priority-inversion
+> -	 * where latency sensitive tasks have to wait for a task that has
+> -	 * been throttled to release the lock.
+> -	 */
+> -	write_sysreg_s(0, SYS_MPAM1_EL1);
 
-> On Tue, Dec 09, 2025 at 03:00:59PM -0800, Oliver Upton wrote:
->> On Tue, Dec 09, 2025 at 08:50:57PM +0000, Colton Lewis wrote:
->> > This series creates a new PMU scheme on ARM, a partitioned PMU that
->> > allows reserving a subset of counters for more direct guest access,
->> > significantly reducing overhead. More details, including performance
->> > benchmarks, can be read in the v1 cover letter linked below.
->> >
->> > An overview of what this series accomplishes was presented at KVM
->> > Forum 2025. Slides [1] and video [2] are linked below.
->> >
->> > The long duration between v4 and v5 is due to time spent on this
->> > project being monopolized preparing this feature for internal
->> > production. As a result, there are too many improvements to fully list
->> > here, but I will cover the notable ones.
+Is this comment about priority inversion no longer valid? I see thread
+switching sets the same value for both MPAM0 and MPAM1 registers but I
+couldn't find an explanation why this is now better when it wasn't
+before.
 
->> Thanks for reposting. I think there's still quite a bit of ground to
->> cover on the KVM side of this, but I would definitely appreciate it if
->> someone with more context on the perf side of things could chime in.
+MPAM1 will also be inherited by IRQ handlers AFAICT.
 
->> Will, IIRC you had some thoughts around counter allocation, right?
+> +	int cpu = smp_processor_id();
+> +	u64 regval = 0;
+> +
+> +	if (IS_ENABLED(CONFIG_ARM64_MPAM) && static_branch_likely(&mpam_enabled))
+> +		regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
+> +
+> +	write_sysreg_s(regval, SYS_MPAM1_EL1);
+> +	isb();
+> +
+> +	/* Synchronising the EL0 write is left until the ERET to EL0 */
+> +	write_sysreg_s(regval, SYS_MPAM0_EL1);
 
-> Right, I was hoping that the host counter reservation could be more
-> dynamic than a cmdline option. Perf already has support for pinning
-> events to a CPU, so the concept of some counters being unavailable
-> shouldn't be too much for the driver to handle. You might just need to
-> create some fake pinned events so that perf code understands what is
-> happening.
+I mentioned before, is it worth waiting until ERET?
 
-Thanks Will. I have a few followup questions:
+Related to this, do LDTR/STTR use MPAM0 or MPAM1? I couldn't figure out
+from the Arm ARM. If they use MPAM0, then we need the ISB early for the
+uaccess routines, at least in the thread switching path (an earlier
+patch).
 
-1. Are you suggesting this be done whenever we enter a guest so the host
-always has access to the full range in host context? That would be the
-most dynamic.
-
-2. How should we handle the possibility a real event already occupies a
-counter wanted by the guest? Is there a good way to create our fake
-pinned events then force a reschedule so perf moves the real events out
-of the way?
-
-3. Is there an existing fake event type that tells perf not to touch
-hardware?
-
-4. Can you point to any example code that already does something like
-this?
-
+-- 
+Catalin
