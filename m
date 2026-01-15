@@ -1,89 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832A339C65F;
-	Thu, 15 Jan 2026 13:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C177D334C14;
+	Thu, 15 Jan 2026 13:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768482181; cv=none; b=PUFRgYz/D5HKNFQKH2398T748RV5FI4MOl6OuAq/QE5hUP28YEU8zift+KtYx9FHT/HY36h2B7CG+XnRrod1LEFi+DD1TdEbTHgoMroFLnlSCisSfnzZy2tArR7OmO1fIf+bFTy0FYXpK3Qxp8e9D5UiBw3TRYOLYRqvZ2lznAo=
+	t=1768484698; cv=none; b=ixgtDdZwp1Eg7XsgSrkk0iddGFWyywcWp6zm0ewqcy5F1Y7uwVjZYlXGmBJ0vIKLR0JcIe7qItYUNibLllanr4JjqI/a4mJiZJha+FGucIRAbOqQxdZ/CX1VohTA22DS0a4tVA2cBWYZ6J//WZ0BAzcC1I2maABJ9V03buGRm2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768482181; c=relaxed/simple;
-	bh=1gDjKnngSQPKg3Vknl3yXRygZb7k/1wDPmUo8MM+pc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ld8rsnbvEEq+AoZ8iBn7nm7NWDy8YtHJNHHBTqMF835k3J3JMqIGavKTBxpo1hbVH4iyIY3QESrTtIER5Oo6FP4mZuDJXC9gk7GyA+9hqFmZd3l4kIP2bizLpUvw5TOdUFwDPf+4h32EeEk1bQc5dYKhm9Vp1vj/ksnOtLDfk/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nMG03Zuo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768484698; c=relaxed/simple;
+	bh=DXUK5OShB9en+nMT8mpBNu33HgXEnxxQ/vgq26T3Tx4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S0iWYi1bsPPnrq+M5H91I6rMsW+S1kWoIl9ipjDxfAuTb7OXAsFdhBGAjx/9nqWA4IOwe2hZMphz6w0YDe4ixls3Pq+SzQ7UEyn8tu2W+oq77vFJhrAX7WNpJ9W93kG4fbEknSgDROJGvVY7VIHlrLLQy8zQWTwVUtScZ1WVMK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4Zm+eDV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nMG03Zuo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63564C116D0;
-	Thu, 15 Jan 2026 13:02:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4Zm+eDV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64264C116D0;
+	Thu, 15 Jan 2026 13:44:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768482181;
-	bh=1gDjKnngSQPKg3Vknl3yXRygZb7k/1wDPmUo8MM+pc0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nMG03Zuo6Csrn6WHfCHjDfqu1QbA8uAASYMKnXqefFqhoOux1p1rY/Bwqbw/hy4De
-	 bFSSVdOGRrHgXAccrBwi+7qgrFZK3oqciJJa4Uj9MUJXFp4w+glQNmNY2dQ8RgkuhR
-	 W9XKUFkXsbs7TrN6K7Qd5J7y7xu5ls6lKJhot/zqZZfA9ce+XmsUHF+MEx9fPq/7PJ
-	 Qz+ztj4Z/wba1kgw/z69ZjK534VDYhrcs3m/ZYfZGq5RGFynVoMIWZdrAK1ceHmXSG
-	 1/PTmhGrATF9c7+kHeA+pEWO5a7+fGhRjvvWo1OfFy1C8slWsPpCOMGyLqxZ3VwTXr
-	 2/NGACdF6j6CA==
-Date: Thu, 15 Jan 2026 13:02:54 +0000
-From: Will Deacon <will@kernel.org>
-To: Oliver Upton <oupton@kernel.org>
-Cc: Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>, Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v5 00/24] ARM64 PMU Partitioning
-Message-ID: <aWjlfl85vSd6sMwT@willie-the-truck>
-References: <20251209205121.1871534-1-coltonlewis@google.com>
- <aTiqK7gKKKzGGwgW@kernel.org>
+	s=k20201202; t=1768484698;
+	bh=DXUK5OShB9en+nMT8mpBNu33HgXEnxxQ/vgq26T3Tx4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=G4Zm+eDVr715b7zc+K4GFEoGu+xrAqhbtPjXRmDZCdel8oIJS9zC8QvzWQF+iHMvf
+	 KVXvx6k8weAuWqytg1z5NLAJid/dAKHu0Vc8W8Ju0c3XTnSyb+2F0CljO+pImAtqKm
+	 zonnD7ot93W/64d/jJXyMwzLNvJFlJmj0evnsBCUZ7cx6aXWzkWUIhQq4yr3GNlqlH
+	 oCz689y9fkywS0JPdT9VBcd5XzwWdXQlYmB5rnQIhwsj5BVbtJa2TsdIZE1smxQKwC
+	 PPw9xJtf6Jtn30++Ritbe4HTLF+3pXU30mDiz35oHfGQKov898uJa4MvKrZG2HVeVK
+	 SA3WkhfXXyUqA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgNeh-00000002XXF-3FHQ;
+	Thu, 15 Jan 2026 13:44:55 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Fuad Tabba <tabba@google.com>
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	will@kernel.org,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	anup@brainfault.org,
+	atish.patra@linux.dev,
+	itaru.kitayama@fujitsu.com,
+	andrew.jones@linux.dev,
+	seanjc@google.com,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v4 0/5] KVM: selftests: Alignment fixes and arm64 MMU cleanup
+Date: Thu, 15 Jan 2026 13:44:53 +0000
+Message-ID: <176848468177.3734174.14845458952708831898.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260109082218.3236580-1-tabba@google.com>
+References: <20260109082218.3236580-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aTiqK7gKKKzGGwgW@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, will@kernel.org, pbonzini@redhat.com, shuah@kernel.org, anup@brainfault.org, atish.patra@linux.dev, itaru.kitayama@fujitsu.com, andrew.jones@linux.dev, seanjc@google.com, oupton@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Dec 09, 2025 at 03:00:59PM -0800, Oliver Upton wrote:
-> On Tue, Dec 09, 2025 at 08:50:57PM +0000, Colton Lewis wrote:
-> > This series creates a new PMU scheme on ARM, a partitioned PMU that
-> > allows reserving a subset of counters for more direct guest access,
-> > significantly reducing overhead. More details, including performance
-> > benchmarks, can be read in the v1 cover letter linked below.
-> > 
-> > An overview of what this series accomplishes was presented at KVM
-> > Forum 2025. Slides [1] and video [2] are linked below.
-> > 
-> > The long duration between v4 and v5 is due to time spent on this
-> > project being monopolized preparing this feature for internal
-> > production. As a result, there are too many improvements to fully list
-> > here, but I will cover the notable ones.
+On Fri, 09 Jan 2026 08:22:13 +0000, Fuad Tabba wrote:
+> Changes from v3 [1]:
+> - Renamed page_align() to vm_page_align() (Sean)
 > 
-> Thanks for reposting. I think there's still quite a bit of ground to
-> cover on the KVM side of this, but I would definitely appreciate it if
-> someone with more context on the perf side of things could chime in.
+> This series tidies up a few things in the KVM selftests. It addresses an
+> error in memory alignment, hardens the arm64 MMU configuration for
+> selftests, and fixes minor documentation issues.
 > 
-> Will, IIRC you had some thoughts around counter allocation, right?
+> [...]
 
-Right, I was hoping that the host counter reservation could be more
-dynamic than a cmdline option. Perf already has support for pinning
-events to a CPU, so the concept of some counters being unavailable
-shouldn't be too much for the driver to handle. You might just need to
-create some fake pinned events so that perf code understands what is
-happening.
+Applied to next, thanks!
 
-Will
+[1/5] KVM: arm64: selftests: Disable unused TTBR1_EL1 translations
+      commit: 7e03d07d03a486c66d5c084c7185b1bef29049e9
+[2/5] KVM: arm64: selftests: Fix incorrect rounding in page_align()
+      commit: dd0c5d04d13cae8ff2694ef83d1ae5804d6d9798
+[3/5] KVM: riscv: selftests: Fix incorrect rounding in page_align()
+      commit: 582b39463f1c0774e0b3cb5be2118e8564b7941e
+[4/5] KVM: selftests: Move page_align() to shared header
+      commit: de00d07321cf3f182762de2308c08062d5b824c0
+[5/5] KVM: selftests: Fix typos and stale comments in kvm_util
+      commit: e0a99a2b72f3c6365d9f4d6943ed45f7fc286b70
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
