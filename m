@@ -1,145 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFEF3BF314
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5694C3D34A6
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 18:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768500214; cv=none; b=qIM3X1eVYi1/DuanvDZW2rMX2U7qj0Vkw2nYaXRJcAZtnjWHt2KanlY4PMTewPUIOnQ7lrDvOcibV+GEwe51e87RpzGGAhFeLVS65d/mXr8h8+UD+si8GQRGnMQEFC/OHrkjCHsvkaEdK00XHASYxCTWrWZqKqcsKycxelb6m1A=
+	t=1768500553; cv=none; b=W0uVw1b9VrKLY8vMPHDSlc4Sm3qYlpj7n4qCzNErp2LeZBAKP46Rlrs+tachrDn8F+xZiUSQuGn0kpl9sCsaFiDkOQ08Z9m+KZkG6+QsVJmu2OiqotH/G2JlcfCPIjg5p4f8RCsPKZUm8l4OWE9ShBZOREORCjMBgyVtZ4zwG5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768500214; c=relaxed/simple;
-	bh=jsOCVRbDYK9JC0QzEE3fZQhFzKNeuG1HxlOeYltavZU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A1hbm0HaKPZUN/c2UpxGzqMBqGFZqmJC+I8+873TtWuQqrx6nduj52a3rXIz88e/yOtd8uy7GRxF3+S8Fq1aibwBBwvak0Zr7t4z/IY1zWdTCcM9KpRPH/xExu+bQEtYnFohxAzi9SDEi8sUF6wuz61bPRrswXE1z7JTCUD8/NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TpvAZTz0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768500553; c=relaxed/simple;
+	bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=QrsU6p0YrIVk6gi4CR+/eS9zwAbGHGzCZyvZXRdg/j0OzSIAzNK6t7ogq3vfbs2XqySdsuKGANEREmxfZHlLJvbIrPCMBfp1otQVFSP1znzG3BCIzPDZTMXd+db0Or5oK1AdMElIywCpxj8u2IwEmZZQqdVf5o5aWVVGyJAchMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lqK8Rdxw; arc=none smtp.client-ip=209.85.161.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TpvAZTz0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B77C16AAE;
-	Thu, 15 Jan 2026 18:03:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768500214;
-	bh=jsOCVRbDYK9JC0QzEE3fZQhFzKNeuG1HxlOeYltavZU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TpvAZTz0D6AvekolmeASjyDdjp3fxMuAvqjOFCgZ2Pbq117gVPwnk9tG9Cl007zaO
-	 ey/tbk145Xi7BzZ3Zl6G2nkvzkAlhPhfyL/fFjAS2RwEkh+7SLvZjODzKE+Bl2kl80
-	 KnE2+KEtwVQ0wFOeDHdA1lhBxV6uzT/549OnIsybPFLnS8bcbOLxGJGWPiWkhuumq4
-	 KGPKrZ/7vNVh/bZbiJX2GZa7U2uU8oEexKsJRMm0/IWrukPaiwxgtEHRLpw2An0gCu
-	 u/nUn5pw9oTfjBPsbKaZUDlveyxUXyXU48/d2aj7gZq2Bmp1Q2xSI2fIJ29j8KebuS
-	 d6LpHGl4DEFow==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vgRgx-00000002cUt-3lXd;
-	Thu, 15 Jan 2026 18:03:32 +0000
-Date: Thu, 15 Jan 2026 18:03:27 +0000
-Message-ID: <86bjiuda8g.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,	linux-arm-kernel@lists.infradead.org,	oliver.upton@linux.dev,	will@kernel.org,	joey.gouly@arm.com,	suzuki.poulose@arm.com,	yuzenghui@huawei.com,	catalin.marinas@arm.com,	vladimir.murzin@arm.com
-Subject: Re: [PATCH v6 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
-In-Reply-To: <CA+EHjTwX-kDg24LMHCyMVP3Xpdpv55WyP2AxeWXa5CKk1yyudQ@mail.gmail.com>
-References: <20251211104710.151771-1-tabba@google.com>
-	<20251211104710.151771-9-tabba@google.com>
-	<86h5smlxyo.wl-maz@kernel.org>
-	<CA+EHjTzEtPta5VHr5R0r0v7ui7-8xv5me29uk2devZ=S14RHqw@mail.gmail.com>
-	<86fr86lv3d.wl-maz@kernel.org>
-	<CA+EHjTwX-kDg24LMHCyMVP3Xpdpv55WyP2AxeWXa5CKk1yyudQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lqK8Rdxw"
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-65f7130d6aeso3325512eaf.0
+        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 10:09:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768500551; x=1769105351; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
+        b=lqK8Rdxwtsjp39+RVcs0qYprpV8wUB4grdAWnsSCchIeQ5JDpOmVxk0fUFglrSYuqA
+         1ml+Px+I/s2rEGh2V74jHdE5N27XQbKviZbK9MK3HUunDO0OG6RGGp2eq8sNtnlS35Gr
+         BnnXStQ6XxTSnmYFQVIrkrIYojwxKlMoqAKzdipJmp1adYdbYh1qQzwmhdEC5WVpcahl
+         UMahfK145EbysMYEfuDUclT3ZU05RxnKYTuklUkWeAi/4ZBbBzFpe9pmYnN5f9/BorXH
+         uvzlmP0YIqk6lMV8jeeR+rkPMxldStRPfKcwViKDmCy3nVrNXlsR+lDnMC4km8xOOlkO
+         GD8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768500551; x=1769105351;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s1vml7vcnt1Rp1v6JVpJDpiVuPBFnkJqBrKshWU1rJQ=;
+        b=Lr+//gaVU+PI//RnQjYlmREzhBfEH7U1W6Jc5k1f668XZce1VRndr2qkMmBX9afg6d
+         4yhQ7QsxGpEf8ogpH+TTjJl5NVPS2IheNam09dcMMVC/lvyrfsWf+Yh3efRV7MPkbOVh
+         aGA6BW18+1mV6aadxZlMwABM/F0S2zBc+DBSSlC+EYZUZ79MthOOR9uZBpfWET9G9Ckz
+         maW49nFsNygXvzclO8p3tLaHXsXsMCTaPEbPl3eXPNOUoOLUDQW2FC9wA0aE5OljWwPk
+         wv00riALZaSQVEIWjUfaw4Ywxe80ZeHKsmsv7im3kYd56ZX7WhrS97/cDZFJ1/WVQuSh
+         37Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQd3iNBrJeZ2ZS4Bff/cK2doVv7HjDoeFfKa46rjWRWi56TFUg+QINbPPNVB12PyzoW7jqjhk=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw5jtjYwBOm+i3muCuqUh/DRx4TZIFJfDSCHrFGenj8BUwoO2kk
+	BS0tml8USutFeFMAvJV1m8auhIPXvoG1Y1N4ihEd13DzXa/E2sN+rkX/v1qO9y0zVNah9bcRDbJ
+	ImIzg+JmxTXY4YzQYASe5HwOq/g==
+X-Received: from iobet8.prod.google.com ([2002:a05:6602:4c08:b0:957:5463:901e])
+ (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6820:480e:b0:660:ffa9:e2ce with SMTP id 006d021491bc7-661189e47e2mr16014eaf.83.1768500551087;
+ Thu, 15 Jan 2026 10:09:11 -0800 (PST)
+Date: Thu, 15 Jan 2026 18:09:10 +0000
+In-Reply-To: <aWjlfl85vSd6sMwT@willie-the-truck> (message from Will Deacon on
+ Thu, 15 Jan 2026 13:02:54 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+Message-ID: <gsntpl7a694p.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v5 00/24] ARM64 PMU Partitioning
+From: Colton Lewis <coltonlewis@google.com>
+To: Will Deacon <will@kernel.org>
+Cc: oupton@kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, 
+	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Thu, 15 Jan 2026 16:14:39 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> On Thu, 15 Jan 2026 at 16:05, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Thu, 15 Jan 2026 15:19:48 +0000,
-> > Fuad Tabba <tabba@google.com> wrote:
-> > >
-> > > Hi Marc,
-> > >
-> > > On Thu, 15 Jan 2026 at 15:03, Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > On Thu, 11 Dec 2025 10:47:08 +0000,
-> > > > Fuad Tabba <tabba@google.com> wrote:
-> > > > >
-> > > > > Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
-> > > > > support all features, restrict which IOCTLs are allowed depending on
-> > > > > whether the associated feature is supported.
-> > > > >
-> > > > > Use the existing VM capability check as the source of truth to whether
-> > > > > an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
-> > > > > associated capabilities.
-> > > > >
-> > > > > Suggested-by: Oliver Upton <oupton@kernel.org>
-> > > > > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > > > > ---
-> > > > >  arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
-> > > > >  arch/arm64/kvm/arm.c              |  3 +++
-> > > > >  2 files changed, 24 insertions(+)
-> > > > >
-> > > > > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > > > > index 5b564576160d..0fa8c84816fd 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > > > > @@ -9,6 +9,7 @@
-> > > > >  #include <linux/arm_ffa.h>
-> > > > >  #include <linux/memblock.h>
-> > > > >  #include <linux/scatterlist.h>
-> > > > > +#include <asm/kvm_host.h>
-> > > > >  #include <asm/kvm_pgtable.h>
-> > > > >
-> > > > >  /* Maximum number of VMs that can co-exist under pKVM. */
-> > > > > @@ -43,6 +44,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
-> > > > >       case KVM_CAP_ARM_SVE:
-> > > > >       case KVM_CAP_ARM_PTRAUTH_ADDRESS:
-> > > > >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> > > > > +     case KVM_CAP_ARM_BASIC:
-> > > >
-> > > > Can we instead rely on an existing VM capability? I'm not overly keen
-> > > > exposing something new to userspace (KVM_CAP_ARM_BASIC) for something
-> > > > that really is KVM's own internal problems.
-> > > >
-> > > > Looking at the history, a bunch of things have always been present:
-> > > > KVM_CAP_NR_VCPUS, for example. You could even #define
-> > > > KVM_CAP_ARM_BASIC to that if you want.
-> > >
-> > > I wasn't too crazy about that either. I like the idea of defining it
-> > > as an alias of KVM_CAP_NR_VCPUS. I'll do that when I respin.
-> >
-> > I've done something [1]. If that works for you, let me know and I'll
-> > just merge that.
-> 
-> That works for the previous patch (7/9), which is where you've made
-> the change. But since the alias is defined in `arm.c` it wouldn't work
-> in this patch (8/9), because the function kvm_pkvm_ext_allowed() is
-> defined in  `asm/kvm_pkvm.h`.
+Will Deacon <will@kernel.org> writes:
 
-I dropped it from patch 8/9 for the reason below.
+> On Tue, Dec 09, 2025 at 03:00:59PM -0800, Oliver Upton wrote:
+>> On Tue, Dec 09, 2025 at 08:50:57PM +0000, Colton Lewis wrote:
+>> > This series creates a new PMU scheme on ARM, a partitioned PMU that
+>> > allows reserving a subset of counters for more direct guest access,
+>> > significantly reducing overhead. More details, including performance
+>> > benchmarks, can be read in the v1 cover letter linked below.
+>> >
+>> > An overview of what this series accomplishes was presented at KVM
+>> > Forum 2025. Slides [1] and video [2] are linked below.
+>> >
+>> > The long duration between v4 and v5 is due to time spent on this
+>> > project being monopolized preparing this feature for internal
+>> > production. As a result, there are too many improvements to fully list
+>> > here, but I will cover the notable ones.
 
-> Defining the alias in `asm/kvm_pkvm.h`
-> or in `asm/kvm_host.h` should solve this, since both files are visible
-> in arm.c (and in kvm_pkvm.h in both cases).
+>> Thanks for reposting. I think there's still quite a bit of ground to
+>> cover on the KVM side of this, but I would definitely appreciate it if
+>> someone with more context on the perf side of things could chime in.
 
-Nope. The compiler spots that this is the same value twice in the
-switch, and compile fails. I only kept it as syntactic sugar in arm.c,
-but I could otherwise drop it entirely.
+>> Will, IIRC you had some thoughts around counter allocation, right?
 
-Thanks,
+> Right, I was hoping that the host counter reservation could be more
+> dynamic than a cmdline option. Perf already has support for pinning
+> events to a CPU, so the concept of some counters being unavailable
+> shouldn't be too much for the driver to handle. You might just need to
+> create some fake pinned events so that perf code understands what is
+> happening.
 
-	M.
+Thanks Will. I have a few followup questions:
 
--- 
-Without deviation from the norm, progress is not possible.
+1. Are you suggesting this be done whenever we enter a guest so the host
+always has access to the full range in host context? That would be the
+most dynamic.
+
+2. How should we handle the possibility a real event already occupies a
+counter wanted by the guest? Is there a good way to create our fake
+pinned events then force a reschedule so perf moves the real events out
+of the way?
+
+3. Is there an existing fake event type that tells perf not to touch
+hardware?
+
+4. Can you point to any example code that already does something like
+this?
+
