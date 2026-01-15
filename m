@@ -1,124 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81B730AAD4
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 14:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583B72E11A6
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 15:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768487864; cv=none; b=nXrqrtjVNLBg2FiaObrJ87LB2o/I54C6avVBJIDu0yG3yeL5MleAtw0YYULUaVYxCWag1QWyHT0Xdg3/geY508ic7wn4fCuEeJ1ao3cyNPykTavgPETF+klozJ1ub/by9fm/kNMMJFCFRpugMcGZpl4DIJIlheAZ7u2w9wcqWzg=
+	t=1768489428; cv=none; b=tNPKhqx1IT8RfsMZIXS5y/UQuOrFbOYi1ps7l8L2kKt9GrKsuSzSFZx38ueta+vIwT2KvHofSd53Cij57wIoj7rRFiIqJyPb4zhsRIewBoN0wWa4cdaHtH4rSgaNstXK2T3jxNg20RSwh63AemL0+RWkZX5A5DV0Vi7xiodTM0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768487864; c=relaxed/simple;
-	bh=td1PrujXoDUrovW6IQuY837sgXqpXqWHZRDHa3SZrqw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PE5ctOl/tm59+HPCc/rIwgf5MQcSFWfEuKK6/GziZJZIuh03cn0IgnBsm51UpJY2pzJvrOX/GRYKXesv93JzKsJZl0Nxjuqn5CpybNGCGpkdzlr+Ey+KlmUcEWD8mlSBSa66atEipdeq0JHEdiOZdpAeeBgCoX+hUeu4NSE7EtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AFE1FEC;
-	Thu, 15 Jan 2026 06:37:31 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D3FE83F632;
-	Thu, 15 Jan 2026 06:37:32 -0800 (PST)
-Message-ID: <46047ccd-3b45-4bce-a71b-47dadc1eab88@arm.com>
-Date: Thu, 15 Jan 2026 14:37:31 +0000
+	s=arc-20240116; t=1768489428; c=relaxed/simple;
+	bh=IomSoaKDjFHmV/r1mkpq9gL3BQYgXNcAVFd336zBXbw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JlupI/75BAdKsp0J3ehq7QLh5udc3LC9qrYFLjgkjR4KjHwAnctf7xeJAosCk+UBvAA1AT7ET0bNALH7j3Tx5heOB2bAciqclbRxy0StaWDE1C4oc2eWRTqQJSPntd9bTsxwDReW8N1WfsLFRIRBzlnYGte2/FTlCK75Kao5q6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEDrr9fO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEDrr9fO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEA0CC116D0;
+	Thu, 15 Jan 2026 15:03:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768489426;
+	bh=IomSoaKDjFHmV/r1mkpq9gL3BQYgXNcAVFd336zBXbw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AEDrr9fOTUYSFiLkg4xrDl6EGCM9/VrDLjsWW0HX9Q92yoffZlX8KcmD6uy+P8yq6
+	 72z+YY8qTffeS0x09GrMySTQrz2uNPLo85vsZQVXAYXdZzvQSIlAWb+uqUZjO75lcO
+	 oizY/+s8h8kiMaoDv2NxVVd7rMOPGlQTOgFOHfJbZBy1NZtmmv656qXfFO3S7GcdSd
+	 Rgl3CApzlCZrx1YK3931JXigstScPBCKHn7VEEp/r4WHSfbeTJQcgg11QjQyhrKvNQ
+	 IC1hVkjD23colBxmMNB6CFtnL/qkdO75rLPF6AwdEUPYygE8LDqEqEHxLV+P4HSxSR
+	 utDrL6R+JV8Dg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgOsy-00000002ZBB-2pIB;
+	Thu, 15 Jan 2026 15:03:44 +0000
+Date: Thu, 15 Jan 2026 15:03:43 +0000
+Message-ID: <86h5smlxyo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vladimir.murzin@arm.com
+Subject: Re: [PATCH v6 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+In-Reply-To: <20251211104710.151771-9-tabba@google.com>
+References: <20251211104710.151771-1-tabba@google.com>
+	<20251211104710.151771-9-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND v2 0/45] arm_mpam: Add KVM/arm64 and resctrl glue
- code
-To: Zeng Heng <zengheng4@huawei.com>, james.morse@arm.com
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- catalin.marinas@arm.com, corbet@lwn.net, dave.martin@arm.com,
- david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com,
- gshan@redhat.com, joey.gouly@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, kvmarm@lists.linux.dev, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- maz@kernel.org, oupton@kernel.org, peternewman@google.com,
- punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
- reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- suzuki.poulose@arm.com, tan.shaopeng@fujitsu.com, will@kernel.org,
- sunnanyong@huawei.com, Babu Moger <bmoger@amd.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260114065149.1108631-1-zengheng4@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <20260114065149.1108631-1-zengheng4@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Zeng,
-
-+CC Babu (Comments on PLZA)
-
-On 1/14/26 06:51, Zeng Heng wrote:
->> From: Ben Horgan <ben.horgan@arm.com>
->> Date: Fri, 19 Dec 2025 18:11:02 +0000
->> Subject: [PATCH v2 00/45] arm_mpam: Add KVM/arm64 and resctrl glue code
->>
->> One major departure from the previous snapshot branches referenced in the
->> base driver series is that the same MPAM setting are used for kernel-space
->> and user-space. That is, MPAM1_EL1 is set to the same value as MPAM0_EL1
->> rather than keeping the default value. The advantages of this are that it
->> is closer to the x86 model where the closid is globally applicable, all
->> partids are usable from user-space and user-space can't bypass MPAM
->> controls by doing the work in the kernel. However, this causes some
->> priority inversion where a high priority task waits to take a mutex held by
->> another whose resources are restricted by MPAM. It also adds some extra
->> isb(). I would be interested in opinions/data on the policy for MPAM in
->> kernel space, i.e how MPAM1_EL1 is set.
+On Thu, 11 Dec 2025 10:47:08 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Another advantage is that, given the small size of the L2 cache,
-> frequent switching of MPAM configurations between kernel and user modes
-> can cause cache-capacity jitter, making it difficult to isolate
-> interference from noisy neighborhood.
+> Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
+> support all features, restrict which IOCTLs are allowed depending on
+> whether the associated feature is supported.
 > 
-> However, in addition to the issues mentioned above, updating the
-> MPAM1_EL1 configuration also exposes interrupt handling to the MPAM
-> settings of the current task.
-
-Makes sense, thanks for these two observations.
-
+> Use the existing VM capability check as the source of truth to whether
+> an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
+> associated capabilities.
 > 
-> I still agree with the current modification of setting MPAM1_EL1 to the
-> same value as MPAM0_EL1. However, the ARM MPAM hardware supports more
-> flexible configuration schemes than x86 RDT and another approach is also
-> worth considering: Software can let a control group choose whether
-> kernel mode follows the user mode MPAM settings, or whether the kernel
-> mode configuration is delegated to the default control group, though
-> this may change the existing user interface.
-
-I wonder if this would be possible in AMD PLZA as well. Babu?
-
+> Suggested-by: Oliver Upton <oupton@kernel.org>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
+>  arch/arm64/kvm/arm.c              |  3 +++
+>  2 files changed, 24 insertions(+)
 > 
-> At the LPC resctrl micro-conference, Babu also mentioned the PLZA proposal
-> as an attempt to address the issues raised above. Seems like no clear
-> interface was presented yet. Wait to see what new interface that solution
-> will introduce.
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 5b564576160d..0fa8c84816fd 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -9,6 +9,7 @@
+>  #include <linux/arm_ffa.h>
+>  #include <linux/memblock.h>
+>  #include <linux/scatterlist.h>
+> +#include <asm/kvm_host.h>
+>  #include <asm/kvm_pgtable.h>
+>  
+>  /* Maximum number of VMs that can co-exist under pKVM. */
+> @@ -43,6 +44,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_SVE:
+>  	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+>  	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> +	case KVM_CAP_ARM_BASIC:
 
-Yes, I watched a recording of that. :)
+Can we instead rely on an existing VM capability? I'm not overly keen
+exposing something new to userspace (KVM_CAP_ARM_BASIC) for something
+that really is KVM's own internal problems.
 
-> 
-> One last thing, please add me to the CC list for future MPAM patch series.
-> I'll provide timely testing on my local aarch64 environment and review
-> feedback. Thanks.
-
-Will do. Apologies for not doing this earlier and thank you for the
-promise of testing and reviews :) There is a v3 which you have hopefully
-seen.
-
-> 
-> 
-> Best Regards,
-> Zeng Heng
-> 
-> 
+Looking at the history, a bunch of things have always been present:
+KVM_CAP_NR_VCPUS, for example. You could even #define
+KVM_CAP_ARM_BASIC to that if you want.
 
 Thanks,
 
-Ben
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
