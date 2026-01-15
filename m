@@ -1,96 +1,75 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4487632471E
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 21:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768511233; cv=pass; b=rMu3uqUd+s4lyk7KmDHElGEsk0YQb58QEmFLpVmPog8iJMWINW2CFQiRW1/0awveAnJ/qVfsPFxyC704a9TpG3zyNsxa4d8m8wes+EiFmkCVaXH2V1yJX5CjbLn7KFNNTQXuPyt/lKL2n5/5SavUrnXrAzbSaNv85CQrKGjE39U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768511233; c=relaxed/simple;
-	bh=Yj5Px6CBHG4dfhDnY0aiL+o/Xd3AGh3M1dNNpc7+Hj0=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49163322A28
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 21:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768513234; cv=none; b=LiHZtpkgzRtjNtrELldTCebx1CjlWYx6G6wAbYcE/BvpXIzVtroBzPLn4YpaxkNbBK+YGK/FX87TWtWv00ejTyVm5/MeFS7sNdH1TKTSXIoZ0ONF/aGZD7xZJ/7phwCyTL/ZomI22ZTAnjxKcRMrpHjtcVtzv/TJEgsMdDVhQjg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768513234; c=relaxed/simple;
+	bh=YLVgLT4dUXUIoNeLlkn8NPNLP7+k5vVkNVKFyec+BfQ=;
 	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NxetH2wwt9p+YUt1lPHQeKvCfW1Ol6l4d9Pkf0pUMRF62PQOaXztu1JQSMXcgfPgQE0nBvI5Ebs/YbP4u61irrVroCz5c9Kgdabz5cjV6YX05eRIIsKmDFmj0xJI55HhKL6W8IRwK7s4e1gwEznOeRzN4XbJMM5dcaSfBaY9Au0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jWAaMhmF; arc=pass smtp.client-ip=209.85.217.43
+	 To:Cc:Content-Type; b=RNuwrcWbXXAq8jLKgAQXbkkuX3+gNeaJQF1jVN5MVk+0t2zjr+rsFg/78mWT1X6iqy1u9KgLKOY7x1fRqnHUdIDy4y5o6w/OimjrIkqogaYY/NT/NhwuM6gA5GUvukdWeae7afpGfZ3xZbZ8TNtXt80C8Jp68sDy0mujPHGh02c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=llU+My9K; arc=none smtp.client-ip=209.85.217.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jWAaMhmF"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-5ebb6392f58so456511137.0
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 13:07:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768511227; cv=none;
-        d=google.com; s=arc-20240605;
-        b=GOvoQZD3DDDx0hoKrubUJJPjrHT6t6wWQ0fR6vghOLzxCoYqDAp16xQUGSc1GMvL5r
-         1T32TEg5z8WHoFJbUCPwFybbDP6SSMgZ1+kS3vibNw6CCCNage7v5xaxhwpfaGRG2Yfd
-         49sE9I3yjlzJC+7TUiulYYNVXUR2vg3jnkh285A3LPRd0QL/zsIHtGn3cmFJvsoDINVy
-         EU0xuwMFjgWvOF5KTENgY01dxA9AQFhwcSBt7PhZEDgg2fpBaxX2vWDqvp8uD6yGf67d
-         ZwFL8oVuMtc9/qlJqwz7hjJ4jg5TKUunzBECaRU7TusTr9iAb6dnm25Jc2HaYrcw7Dhj
-         IC4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
-         :from:dkim-signature;
-        bh=y4BwArZ5FLhyM5BEN34gjuDvwbvdpN2Nxoskvco/5nM=;
-        fh=jLFQr7A1nVR/W/0cRCzk1QBQSN8dJMAu3S68dJFfOKY=;
-        b=QOdfP+ibp9tX8KyOymakChFJmHjMye0zXQ0LV80grxnp/6H3B+bt54lNWomLoPxQJH
-         E7zSkM4N9et+zPsYDv8UgTRDJgNMjP0FDh6tJD0nDWILz9JvYcEe5kVM40lCKgigUbFF
-         90JvJ3A0OwDexjlz/Ehg6br3MnH2YjIq5kI3yZTP7b1bFvLpHTkpy/qZGCpxpd/ij5S4
-         g4zPOpTqQZvr5C5GVZDyYzAXBtVmuow5sk8Bd3ULqI6CCt6RmkD5wXBFEs0lPJkqhnEi
-         IBBaWvzxKqLiDaVSf0BpIOFxSg4Zu0fPObQPuziJCDf+UTeQ2m3MFemM1kPAbr6x/iaD
-         Gxxg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="llU+My9K"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5eea6f90d7fso994448137.3
+        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 13:40:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768511227; x=1769116027; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1768513230; x=1769118030; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4BwArZ5FLhyM5BEN34gjuDvwbvdpN2Nxoskvco/5nM=;
-        b=jWAaMhmFJfRnahC361lyIAqQSJTBzrotBx9BuHyQnEyeHooBykvzIOhbNOIXjGkP4E
-         HzL1rhvhjabYXulihG8TeDtD405Ca5DfrqtmpJW9tU0AP3enjrl0k6NxCM3WFOySZE5M
-         keZ+RaQJsi/4RQ49540Qn/8QjeQM9QETg1Qd+AoWqzgxx2XzzX16dpkHYpvIdvYFiHpN
-         ks9Okodae/2PQQm7pW7LL0LtWo88EqWG0+YbsXxPe5bAXEcbG5k3iXPlyydYJqN6Kbwy
-         vi4PjQo5a3uGiz9jaZQYx0kbT3HVy0kjUf0AYhY7u+SRupXrcHzU6kES1E01ozQTcgMX
-         vjWg==
+        bh=4NEsY4l4MT9Q6cBqefYtZtOy3s+dR+V7JNDYTBav7MA=;
+        b=llU+My9K2xemDBq+gPi/JSMddOdvJAMpR80uB/Zg+4ST3ejeDSsp9HIHy7rVXf1ria
+         lX7iNsAkjf8tUsxma9cOeKgrUPdkwZ1I6rmXF5cYKVtjj/wy2Z9PlZKF8yppYnHo7kzk
+         x2HGl07FwpxsDjV2xpxMpeWkXU04k51X3hhqqZHRfXxG9Zpgnd75SBkU2etALyYldUfM
+         Vb/7XU+oFVQJFQaPwNA2Y4K2DqCoC6SwyPfWXRL2qi4NGfndqPM7apIe1Glo5BQb7s1y
+         5lsYo9oDICWrnCI4w9StjJGBwQmVVcuDfu0iEPBl+fpbcIiqu+p8Kf0nDRQKvUxnDQFY
+         u4jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768511227; x=1769116027;
+        d=1e100.net; s=20230601; t=1768513230; x=1769118030;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=y4BwArZ5FLhyM5BEN34gjuDvwbvdpN2Nxoskvco/5nM=;
-        b=pbBOJAqbuhjJARC4Ybz3NAxsSnFWlbMKE7u/1aJvPskCWfLRFqW+8Z6ZycK8vBjsni
-         EvV+M+nAFPWeP/ouyDGbmsRfpcTM0MZqhYaJdXQ0lEJ5fDrSHPUvrlEecEy6p+PPjkFU
-         F10abz7ASnmdUXn5zC+nQ9JMdgQVqT5WvcCdas5lYm5dJ2dWl/t/9RhpAGhlJUVMw0kI
-         cU3OkBYVfOVpAvUSNHAL+XeevY/G1tRrE00iQhMU/G4zbN2EtioorBlzDKjnMwlnEfha
-         VmBM1gj6zv6GwCPV7ZKrlDKKKHlcZDE8q2mC3zLp3jKsoApH6aDJlEg2SkVxidJjYvo9
-         5kLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXRAK7+03fkAo4jdgOakE68UeCaqEDCOzGG2Ua58qtHWHSpirqKQeZcvMvcaT1rnQdc5es5fSY=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzf7syf+5ZP2WTB2b7YMqe/1FQP0qzQ9VCqSEkxPFRtkxUv522Y
-	t9/ivoYNhnbcNP/m9q0sMZJj+HcEM92xiQfX/EXsOCI0blHm1pwXNt8mwrVcYcJc9naspZn/LXH
-	1fTe+7wadSAL6+h+NEcF/Uhk6niUVU6fsK/CMd+q8
-X-Gm-Gg: AY/fxX7ctW323/uzW9K9P9Fg1Z5wcBuVXUmcwXcw6U+g44JV2W3cxuqyoO43PxOIaSR
-	GP3ZtjoKok5wGavJR9gqRcEN1Os8Y5/4X/kF8hBux2gnBXOuolcJt060LaeAUKZTc8TC1whhio8
-	PUcQ/wCwIYGgHtruaN6XTvA7o+sEpGM4wY+XrvVXdPRMRP23/2r+IVtfHP+2zX+inJlcgRMaYFG
-	eS3yhzH8Vj5wRuPDtNiQXwSrfcaE5Mi0Q4qF+3CPgsFU5N29sxE7+xmDvq79PySrXdH+eGLiLGA
-	o03l5OQGoe4fBm95ly6lE0luBQ==
-X-Received: by 2002:a05:6102:945:b0:5df:aff3:c41c with SMTP id
- ada2fe7eead31-5f1a719e362mr155618137.30.1768511226367; Thu, 15 Jan 2026
- 13:07:06 -0800 (PST)
+        bh=4NEsY4l4MT9Q6cBqefYtZtOy3s+dR+V7JNDYTBav7MA=;
+        b=e3N8fBf+TsMyroUWpdBVeT1dOMIQM7GX2+zAthS0pFiKiJR00eukbgAwRv9mfrdVuU
+         te+uxPRpKiuF+4s19QZfW80fXqXkzif3B+LHM9IC+RdFtpQTOKxscmMiStbH+XIj0Tj0
+         BnPz7uCQjJdz+KNL+xMNzipzYk52Vo7aNWRuu2HBNZtkcycj4jGFD08je2VrLyRSQPb+
+         eoklJ/Is4wwMslY3M6vxWhmWircomtAWs8MuWmrZlNYIsRGb0dnSlyIvfJGuNqLTankc
+         Msm5gdFFnHnEpLMLZLd14JDzL6EGr4d/ZrHkNSYukECXrRHc9373mMT1Ymy7j5AQpIhl
+         DJrg==
+X-Forwarded-Encrypted: i=1; AJvYcCX74XMC+4MQJ0p2rlIqSBEP2cmjV/Oo5eEp3eoLLtUizS9BzYbiOj2J+fb6+ce17ZYhSqLiZqo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzCZEaJDVq6LuA6LNxHpWf4zviMqD1J1aquM61q+mQUwPcSxv7U
+	NshxNNMkXORTh46nU9hlXqnLQwunlKAYzpvHpWbobV8vaVyv5uXb0VB3Jnsv8YmNBsdo/1Cuyjj
+	6NObMWxHW54r1Eb2y8fmEL9Lyp0NDwAo6kxWTMs7/
+X-Gm-Gg: AY/fxX5iOCObQSOQGD1+Ma+dkA8IHO0I9CR4sg2pf4X3NeEbC8ZgFhnPokXsMsd8JbQ
+	h99bh1ArzQbb3aWSlQ3SS/l6K+L9qJUxqIygqppwc3cn2JSbYW5PZOD+Lrw/prNKfoZzKQviFIV
+	Sql1cxVBodUoey3gy4oF1U5noBtwXdw7MIVST9uvS0hj3TxJ11s4fKaHVbFNJzxdg5k3u0HgD1O
+	1RvTEgCMXvKq/y/FLol9cvTRX6YfWGHW+cIcYoIrPkar6JNi9iS9H9mX4Nrd8yY3I9ICdE+EuLA
+	8aJMZuNXMMAeWSbbM7Im52yOfAqu3S1+fK58
+X-Received: by 2002:a05:6102:947:b0:5db:cec7:810b with SMTP id
+ ada2fe7eead31-5f1a556dabcmr465899137.29.1768513229577; Thu, 15 Jan 2026
+ 13:40:29 -0800 (PST)
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 13:07:05 -0800
+ HTTPREST; Thu, 15 Jan 2026 13:40:28 -0800
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 15 Jan 2026 13:07:05 -0800
+ HTTPREST; Thu, 15 Jan 2026 13:40:28 -0800
 From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <20260114134510.1835-2-kalyazin@amazon.com>
-References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-2-kalyazin@amazon.com>
+In-Reply-To: <20260114134510.1835-3-kalyazin@amazon.com>
+References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-3-kalyazin@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 15 Jan 2026 13:07:05 -0800
-X-Gm-Features: AZwV_QitN6L4bb0XJb_ZZH7nFdRT7CH1pyddv4cbgutSArI7UeCs00Q7KzDEw7c
-Message-ID: <CAEvNRgGXeow48BUJYyuAOUp8qK97v1LdF4KdTB=Nbk7pTs9tfw@mail.gmail.com>
-Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap,restore}_direct_map helpers
+Date: Thu, 15 Jan 2026 13:40:28 -0800
+X-Gm-Features: AZwV_Qj-0gm6vYHJJ3iH96aBpuGEWZXgwnMiQkeNvlZWuDVc-Nc0GygCth2Cvyc
+Message-ID: <CAEvNRgGrpv5h04s+btubhUFHo=d6mBFbr2BVrMt=bWuWOztdJQ@mail.gmail.com>
+Subject: Re: [PATCH v9 02/13] mm/gup: drop secretmem optimization from gup_fast_folio_allowed
 To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
 	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
@@ -148,80 +127,89 @@ Content-Type: text/plain; charset="UTF-8"
 
 "Kalyazin, Nikita" <kalyazin@amazon.co.uk> writes:
 
-> From: Nikita Kalyazin <kalyazin@amazon.com>
+> From: Patrick Roy <patrick.roy@linux.dev>
 >
-> These allow guest_memfd to remove its memory from the direct map.
-> Only implement them for architectures that have direct map.
-> In folio_zap_direct_map(), flush TLB on architectures where
-> set_direct_map_valid_noflush() does not flush it internally.
+> This drops an optimization in gup_fast_folio_allowed() where
+> secretmem_mapping() was only called if CONFIG_SECRETMEM=y. secretmem is
+> enabled by default since commit b758fe6df50d ("mm/secretmem: make it on
+> by default"), so the secretmem check did not actually end up elided in
+> most cases anymore anyway.
 >
-> The new helpers need to be accessible to KVM on architectures that
-> support guest_memfd (x86 and arm64).  Since arm64 does not support
-> building KVM as a module, only export them on x86.
+> This is in preparation of the generalization of handling mappings where
+> direct map entries of folios are set to not present.  Currently,
+> mappings that match this description are secretmem mappings
+> (memfd_secret()).  Later, some guest_memfd configurations will also fall
+> into this category.
 >
-> Direct map removal gives guest_memfd the same protection that
-> memfd_secret does, such as hardening against Spectre-like attacks
-> through in-kernel gadgets.
->
+> Signed-off-by: Patrick Roy <patrick.roy@linux.dev>
+> Acked-by: Vlastimil Babka <vbabka@suse.cz>
 > Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
 > ---
->  arch/arm64/include/asm/set_memory.h     |  2 ++
->  arch/arm64/mm/pageattr.c                | 12 ++++++++++++
->  arch/loongarch/include/asm/set_memory.h |  2 ++
->  arch/loongarch/mm/pageattr.c            | 16 ++++++++++++++++
->  arch/riscv/include/asm/set_memory.h     |  2 ++
->  arch/riscv/mm/pageattr.c                | 16 ++++++++++++++++
->  arch/s390/include/asm/set_memory.h      |  2 ++
->  arch/s390/mm/pageattr.c                 | 18 ++++++++++++++++++
->  arch/x86/include/asm/set_memory.h       |  2 ++
->  arch/x86/mm/pat/set_memory.c            | 20 ++++++++++++++++++++
->  include/linux/set_memory.h              | 10 ++++++++++
->  11 files changed, 102 insertions(+)
+>  mm/gup.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
 >
-> diff --git a/arch/arm64/include/asm/set_memory.h b/arch/arm64/include/asm/set_memory.h
-> index 90f61b17275e..d949f1deb701 100644
-> --- a/arch/arm64/include/asm/set_memory.h
-> +++ b/arch/arm64/include/asm/set_memory.h
-> @@ -14,6 +14,8 @@ int set_memory_valid(unsigned long addr, int numpages, int enable);
->  int set_direct_map_invalid_noflush(struct page *page);
->  int set_direct_map_default_noflush(struct page *page);
->  int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid);
-> +int folio_zap_direct_map(struct folio *folio);
-> +int folio_restore_direct_map(struct folio *folio);
->  bool kernel_page_present(struct page *page);
+> diff --git a/mm/gup.c b/mm/gup.c
+> index 95d948c8e86c..9cad53acbc99 100644
+> --- a/mm/gup.c
+> +++ b/mm/gup.c
+> @@ -2739,7 +2739,6 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  {
+>  	bool reject_file_backed = false;
+>  	struct address_space *mapping;
+> -	bool check_secretmem = false;
+>  	unsigned long mapping_flags;
 >
->  int set_memory_encrypted(unsigned long addr, int numpages);
-> diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
-> index f0e784b963e6..a94eff324dda 100644
-> --- a/arch/arm64/mm/pageattr.c
-> +++ b/arch/arm64/mm/pageattr.c
-> @@ -357,6 +357,18 @@ int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
->  	return set_memory_valid(addr, nr, valid);
->  }
->
-> +int folio_zap_direct_map(struct folio *folio)
-> +{
-> +	return set_direct_map_valid_noflush(folio_page(folio, 0),
-> +					    folio_nr_pages(folio), false);
-> +}
-> +
-> +int folio_restore_direct_map(struct folio *folio)
-> +{
-> +	return set_direct_map_valid_noflush(folio_page(folio, 0),
-> +					    folio_nr_pages(folio), true);
-> +}
-> +
+>  	/*
+> @@ -2751,14 +2750,6 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
 
-Was going to suggest a _noflush suffix to these functions, but saw
-Aneesh's comment that these functions actually do flush_tlb_kernel [1]
+Copying some lines the diff didn't contain:
 
-[1] https://lore.kernel.org/all/yq5ajz07czvz.fsf@kernel.org/
+	/*
+	 * If we aren't pinning then no problematic write can occur. A long term
+	 * pin is the most egregious case so this is the one we disallow.
+	 */
+	if ((flags & (FOLL_PIN | FOLL_LONGTERM | FOLL_WRITE)) ==
+	    (FOLL_PIN | FOLL_LONGTERM | FOLL_WRITE))
 
-Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+If we're pinning, can we already return true here? IIUC this function
+is passed a folio that is file-backed, and the check if (!mapping) is
+just there to catch the case where the mapping got truncated.
 
->  #ifdef CONFIG_DEBUG_PAGEALLOC
->  /*
->   * This is - apart from the return value - doing the same
+Or should we wait for the check where the mapping got truncated? If so,
+then maybe we can move this "are we pinning" check to after this check
+and remove the reject_file_backed variable?
+
+	/*
+	 * The mapping may have been truncated, in any case we cannot determine
+	 * if this mapping is safe - fall back to slow path to determine how to
+	 * proceed.
+	 */
+	if (!mapping)
+		return false;
+
+
+>  		reject_file_backed = true;
 >
-> [...snip...]
+>  	/* We hold a folio reference, so we can safely access folio fields. */
+> -
+> -	/* secretmem folios are always order-0 folios. */
+> -	if (IS_ENABLED(CONFIG_SECRETMEM) && !folio_test_large(folio))
+> -		check_secretmem = true;
+> -
+> -	if (!reject_file_backed && !check_secretmem)
+> -		return true;
+> -
+>  	if (WARN_ON_ONCE(folio_test_slab(folio)))
+>  		return false;
 >
+> @@ -2800,7 +2791,7 @@ static bool gup_fast_folio_allowed(struct folio *folio, unsigned int flags)
+>  	 * At this point, we know the mapping is non-null and points to an
+>  	 * address_space object.
+>  	 */
+> -	if (check_secretmem && secretmem_mapping(mapping))
+> +	if (secretmem_mapping(mapping))
+>  		return false;
+>  	/* The only remaining allowed file system is shmem. */
+>  	return !reject_file_backed || shmem_mapping(mapping);
+> --
+> 2.50.1
