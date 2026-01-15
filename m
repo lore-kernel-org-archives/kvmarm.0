@@ -1,108 +1,157 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251083A9006
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 15:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466FA3A1E63;
+	Thu, 15 Jan 2026 15:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768492175; cv=none; b=s3F8B6iMS043mMTMHvvrqEgBlA3akw0IEzffx9KtR4aUniPCK12mcIr79V2qFgE0nGy3Jgq6PgXQcaoElFkb/GLORv1OzSI9iNmHs1G02pLeaQRRyc0dGYBYbGueKwWGPji0sOOLnD44XxwuMR44LiRA7Vycjn3piRcfk+JiNsc=
+	t=1768492532; cv=none; b=VTm1VYFFIx/JI+mw9sjDh+mB8/NgDwo8PrXsxw4CjtUqs5JTu36ov1eAbK9BJCYSrst+KlMaMM/+mksTs1bo/7H0QfX6Z63q1kushony8HRgji/CJNIuV2jCh/+x3J+O7LZRlsoUENNvJcMwo68451BU3eN9GOjKVygx8Lab6nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768492175; c=relaxed/simple;
-	bh=DJosCagNxl42FnOET8OWwknghA7dpDe3mYQUJhuz+b4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mu8s1dNG+IbCbfaS5+S2vCESq7UE55Rj31jHevEtokaN3qioxhdf3jgrK+kGMDXDypuCwHaN5EBo4lG0BPRyCK5QscEq++bSWbF/A28k1+VGARWvP7mkt25vXnqpuG3C45Z3b/m/FFyT/QnAQsRdo2mSXrcQKR9Miu6HTX5AqEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AzxaXADS; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1768492532; c=relaxed/simple;
+	bh=46BFkTdwtLapqZHArkx23WouduY4BLv38XWs7Y82E7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ECueSyTIRNEWFH7spDB5ZT7QqlZNIDoxw4jdj6pGePkKhKvzd80g8YJuSfZNRiByUwzoV3u/qOonvCOJMjKkByRffWebxQEtRFWqPCy21wxpgPShTGZv4pKhEap+/0l0rXM4UYeveRlj5h0UkOpAssQYFWYa8wHEL6/v6fRhB/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=O2rIC7Vp; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AzxaXADS"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6505d3b84bcso1595999a12.3
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 07:49:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768492172; x=1769096972; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DJosCagNxl42FnOET8OWwknghA7dpDe3mYQUJhuz+b4=;
-        b=AzxaXADSaHo4T3Ynel2NO8vp7S5qkVAE+M0KSRkZ9C7qqlZU74qdGDvqDbjouXLbJt
-         SYU8CuvPRh6ie3wVkMd3kPQDcgu4zI3B29LOMNtBRgG5QvXkHmkKpCeGXPpYeCsCSFy1
-         YTyEYj04kmnPoWkYLhWdZM/wBv2zbBV8/idmu44+3OTjmQQ0EhEoPlO/QWRe/PNXXFNF
-         nf86bEA1TP7ipeONwLkyIROFxMfQcimSpWRu7WKUKcYrZvP3UOw6Q6nL2XgyRjVtFJwt
-         c8ymWGj18rj1/6uL0Vw3nIY6wfBn9D63BuljYyPYS0n7srBOSd+NYmZS9vAYe1VtQjlB
-         vSsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768492172; x=1769096972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DJosCagNxl42FnOET8OWwknghA7dpDe3mYQUJhuz+b4=;
-        b=RfLlDENdbXFazPuvZAwcmqTZ72+wMwOd3wiByl/JQnf8lJMTJZYNvKlTSTTP1C5u91
-         L7KHkZOUF2uhpCLt6X0uUWX3ZRIyP8rGCtYuNnpnRt5pdgFjC+YJqTMRXIAVdGGMjRYe
-         /lbjQ3xy4EQqyhu68b3O8mFjKw+EXcBJnfbd3vGqChrrTEDaVryCapKT3YclfxWHWmjD
-         kLmxrwvhneE7KD/C2WmY49iMbesfYSP4UenA5cIxZyLOt+2ShVu71RSS3BXYaRzPn3qg
-         fOlLIOSBh7gDd6G9Rh1rnWvrLYL1tTuCfNO4wMjV0Z8RoLchkKAL+Ka0zXwAmuMdfZrN
-         fRXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUvpXt4PdcP/Vrb0B5vBe3ustN/n5QmWy3iIjPDv2LoA6d6RQVaauwGY/5LEj/0ITHPHjeYheA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YykYiw/Y9r/GuCjXMNKntxA/ToGECOhhyuUue5/33hkZuMiBD5G
-	n67kI1B5linRZPurSeTqqDSz6REeVnciWPB+5J9Z/emvcFTEPuq9VuvMWassr7nyu9Q0tTiousQ
-	er3OllO8vpsOAQPFhG5dLK3rPNHGguzt1wkr+tH4h
-X-Gm-Gg: AY/fxX6pB8LyqBMOwt4ZPveck3MmVOKqEr9gIdBT3a3F2jmeOVh42fs+J3QgfbIGnkF
-	nKq4CQw7BOAgI+BP8kGpkWOmK/ovKLnp2XlebBjCPks4o55gdD8iiV3flS3WH3I5/3QrKIrwHHK
-	6JTOtcWv+w6yfRPwta7XBNo9IDahQ6HycqH+4iyuyCwz8E1jNycSNZ3evvky85AxVDfzSPIttlU
-	WQgnKNsYQ3TMllcLifL6vcWcYDI8fooKMQrbTgEkzz43/tjMVWd4vbHFoJgWY7a7w6Wh7IMgJwZ
-	XxzZ0aKRg1yeZjZltSVtU39HywhQHGTy+fJ3
-X-Received: by 2002:a17:907:7201:b0:b73:4d06:bc8 with SMTP id
- a640c23a62f3a-b8793038b15mr3226666b.53.1768492172042; Thu, 15 Jan 2026
- 07:49:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="O2rIC7Vp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=q5bkL3Phvitbtx1bT4hfJIq6tZnmxPD0rFJlAMAShJ4=; b=O2rIC7VppOmyI4NJVqpXeNx1ps
+	9E8lXOJndmHISi9czu2yHfSrQTRbYobUU55b39rEMzyDlLR6z+C4bKlMldkk0zKZcDtVQyRXirthW
+	KI1r01BntklxKvuUMRRrhgmfBmFnpmdmRgaKJwlaz+Qr95fzmRdU8AMMwVYhCB/fCB/gyfRfTEhdL
+	oCCHfn5loLBrr7rjqMykoBHhlmKOfS1Z5lF7LMiDAfY3TLvCDDF6etTTuk+ncZAGMIu/wScOPq3Qt
+	ysh0B8nLJ2h3UIs60lSbHici2O7xcYYlHYyatawLyoOOL6mJoOtWjhMKRYG6tjN8XoPCMrGZHt0W7
+	BP1PTC9g==;
+Received: from willy by casper.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vgPgp-00000007w8N-2zaT;
+	Thu, 15 Jan 2026 15:55:15 +0000
+Date: Thu, 15 Jan 2026 15:55:15 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oupton@kernel.org" <oupton@kernel.org>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"david@kernel.org" <david@kernel.org>,
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"vbabka@suse.cz" <vbabka@suse.cz>,
+	"rppt@kernel.org" <rppt@kernel.org>,
+	"surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"andrii@kernel.org" <andrii@kernel.org>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>,
+	"jgg@ziepe.ca" <jgg@ziepe.ca>,
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+	"peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>,
+	"pfalcato@suse.de" <pfalcato@suse.de>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"riel@surriel.com" <riel@surriel.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"jgross@suse.com" <jgross@suse.com>,
+	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
+	"kas@kernel.org" <kas@kernel.org>,
+	"coxu@redhat.com" <coxu@redhat.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
+	"ackerleytng@google.com" <ackerleytng@google.com>,
+	"maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"prsampat@amd.com" <prsampat@amd.com>,
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	"jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>,
+	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+	"alex@ghiti.fr" <alex@ghiti.fr>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"dev.jain@arm.com" <dev.jain@arm.com>,
+	"gor@linux.ibm.com" <gor@linux.ibm.com>,
+	"hca@linux.ibm.com" <hca@linux.ibm.com>,
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>,
+	"pjw@kernel.org" <pjw@kernel.org>,
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
+	"svens@linux.ibm.com" <svens@linux.ibm.com>,
+	"thuth@redhat.com" <thuth@redhat.com>,
+	"wyihan@google.com" <wyihan@google.com>,
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
+	"vannapurve@google.com" <vannapurve@google.com>,
+	"jackmanb@google.com" <jackmanb@google.com>,
+	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
+	"patrick.roy@linux.dev" <patrick.roy@linux.dev>,
+	"Thomson, Jack" <jackabt@amazon.co.uk>,
+	"Itazuri, Takahiro" <itazur@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>,
+	"Cali, Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH v9 01/13] set_memory: add folio_{zap,restore}_direct_map
+ helpers
+Message-ID: <aWkN4yzwPtotaTeq@casper.infradead.org>
+References: <20260114134510.1835-1-kalyazin@amazon.com>
+ <20260114134510.1835-2-kalyazin@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260112165914.4086692-1-ben.horgan@arm.com> <20260112165914.4086692-30-ben.horgan@arm.com>
-In-Reply-To: <20260112165914.4086692-30-ben.horgan@arm.com>
-From: Peter Newman <peternewman@google.com>
-Date: Thu, 15 Jan 2026 16:49:20 +0100
-X-Gm-Features: AZwV_QgJIFOY7mytVZj-oToaIVE2HXo1QdZ-MKrOSwI7DjzIv776hEYevEscmU0
-Message-ID: <CALPaoCh+mRLJEfhKBve3hRf+vHHoObjvWRt74OfpopgtR9g9FQ@mail.gmail.com>
-Subject: Re: [PATCH v3 29/47] arm_mpam: resctrl: Pick classes for use as mbm counters
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com, 
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, 
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, 
-	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, 
-	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, 
-	reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, 
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, 
-	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, maz@kernel.org, 
-	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260114134510.1835-2-kalyazin@amazon.com>
 
-Hi Ben,
+On Wed, Jan 14, 2026 at 01:45:23PM +0000, Kalyazin, Nikita wrote:
+> +int folio_zap_direct_map(struct folio *folio)
+> +{
+> +	return set_direct_map_valid_noflush(folio_page(folio, 0),
+> +					    folio_nr_pages(folio), false);
+> +}
 
-On Mon, Jan 12, 2026 at 6:02=E2=80=AFPM Ben Horgan <ben.horgan@arm.com> wro=
-te:
->
-> From: James Morse <james.morse@arm.com>
->
-> resctrl has two types of counters, NUMA-local and global. MPAM has only
-> bandwidth counters, but the position of the MSC may mean it counts
-> NUMA-local, or global traffic.
->
-> But the topology information is not available.
->
-> Apply a heuristic: the L2 or L3 supports bandwidth monitors, these are
-> probably NUMA-local. If the memory controller supports bandwidth monitors=
-,
-> they are probably global.
+The implementation isn't the greatest.  None of the implementations
+of set_direct_map_valid_noflush() actually do anything with the struct
+page; they all call page_address() or page_to_virt() (fundamentally the
+same thing).  So converting folio->page->address is a bit inefficient.
 
-Are remote memory accesses not cached? How do we know an MBWU monitor
-residing on a cache won't count remote traffic?
-
-Thanks,
--Peter
+It feels like we should change set_direct_map_valid_noflush() to take a
+const void * and pass either page_address() or folio_address(), depending
+whether the caller has a page or a folio.  What do you think?
