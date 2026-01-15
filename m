@@ -1,72 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8223242925
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 02:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299AE275B0F
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 02:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768443199; cv=none; b=nFbUa9s7SPGKZG7R2EAyi/7/t6noHszk6778dKgTAhyD3CvqeOQppu0vAvcGjeO/JtiQUTvUAMp/Jh0P1PD7283DDkJYpPmOs+ZQpogIfos8+kIfABYI1YzmIxbq4yXycmo68DIlz4FPF7tl9jUJEOWeAtH4ASDXRnpH9HrPjiM=
+	t=1768443309; cv=none; b=fZkVg+jYRA8fOVyqUCNfTehjhgfvZh+3fbqnqPO2gdVqQTuV9bWR81h1KyF7yiLrbyWKqGc8yCRP7BS/sQU71lM6MBVFzNDHexnEHD2Su7hucqO7MRrRDPAZRtuEO3NMclMZWSxpUs+eiMrFMX8ZaTQxzOQD2IRwueRJZAHDKp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768443199; c=relaxed/simple;
-	bh=8GLGXuPs93ibDOjKWmu5Fr2kMEjgfbYxMX2KPwd+TuM=;
+	s=arc-20240116; t=1768443309; c=relaxed/simple;
+	bh=eBbieCwBHiWcFUG7hDjEHdyb43nn4ge2y9+D2+InXxU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SuSUI57oH5vpXiZ0Obov4wk6ySJsoy51lFF6/1yi9v37bOsL4J3GxHDSR1Ztv4/AtCU6DifTZPmj0uJ/dmZGVGvnYwNoufXmtg/ifqjC8DQ3NzZgzoYPwPEZkshVgrFdD/jppW65NNx2NKw79+KXjn61B29N2NfbXDkSF5B42SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hLUlIcDy; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=Qg44JX9s6NNJdfHoNl/NokBU1zJCt++reKVfOBg0bekmBR8wX1B10FOMDJa7CmoAjM4nXQmOjSj5J2UKNsa9sbBnPWtHrb5x1Fa/iVxmr44jkzhvFc4RlbOakjJj89E9ABNpzseqamcj3ceIt4NlxH5VSKzSlLwNNRzhXTT7LZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZWeLGuu; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hLUlIcDy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZWeLGuu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768443197;
+	s=mimecast20190719; t=1768443307;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Toy1ZyaLVodwPTTRmNCo/wZeyOVmB3/xwLKWz+z4Kq0=;
-	b=hLUlIcDyO3z2i3trfMPWNSxYWuIyvrWuuc/Qo2CZJfyBkH8DNwZY/KKcH3vX344XMew4QB
-	tXpmRnKoIpoqX4dndYm4beuw9Al1jekRTr01jNdO0LxrAuncSnDuVmjFXgyTttC2BxneAu
-	rPXK9faHi5TI891zSZkBxtoRgN2inpc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wVLNaYRdyTd3Y3bYKBBodLvCmiY6IvN6c8AunBjxbBE=;
+	b=ZZWeLGuutR5Djx+mEGsmhULaes/xVqCjfadpJAb08rJ1+wUK2TVI50PSTPA2kDRBk08rad
+	iEEys6n8SUoaaH1hzdt9rZCLCDHlG5wf48a0LhcdhR8nkSTizEwMD4dO2dFItqqNPfTMTl
+	4MWqHmYp1//xgDtm2gwETtSk70UulvY=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-237-pT30m6hqOvS5Y_BoDmFqxA-1; Wed, 14 Jan 2026 21:13:15 -0500
-X-MC-Unique: pT30m6hqOvS5Y_BoDmFqxA-1
-X-Mimecast-MFC-AGG-ID: pT30m6hqOvS5Y_BoDmFqxA_1768443194
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-34cc88eca7eso362513a91.2
-        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 18:13:15 -0800 (PST)
+ us-mta-30-QEA8LszhPW6dxuV7Yw3HYQ-1; Wed, 14 Jan 2026 21:15:04 -0500
+X-MC-Unique: QEA8LszhPW6dxuV7Yw3HYQ-1
+X-Mimecast-MFC-AGG-ID: QEA8LszhPW6dxuV7Yw3HYQ_1768443303
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c337cde7e40so204713a12.1
+        for <kvmarm@lists.linux.dev>; Wed, 14 Jan 2026 18:15:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768443194; x=1769047994;
+        d=1e100.net; s=20230601; t=1768443303; x=1769048103;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Toy1ZyaLVodwPTTRmNCo/wZeyOVmB3/xwLKWz+z4Kq0=;
-        b=JoOq66Gd86mCte4IIFhzt0aG/NGZ94YBucUCgpRafAxRByOhU2EqDnWedyYgW9aURy
-         i8emMz9rA6d+f4QVtc9zuSCCRfGvGW0nWjmA5D/n2tXqadlsnYIekWIs5etjEkFA2Ey6
-         Ee/jqEpegz+usUwEDCQ0Ik7V58RC6egpY8Y8vqM3IHcZrINroaVg0Jd5Ye2sd544eNuZ
-         sfiY+okhQ44+VsBhbfAxiSNQv6N/eAJoqrbbDEdXRzG5wP2yffN+ub3EVUqNSU1TA/xw
-         SGPve4yKaj0t7xg2+XP8IDaezy2MF0Efh6stobHe3ynladPXQmOrWiryFSSdj1ybG13d
-         Q4ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUSttJtsc6H9k2PD8aORlcnv5BDPr8HqdwYmRrYZoG07j6L07H6cSot1e1iqlxCJRwyNPBtWkc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzf85+O9+1Q6jfHVZSDpWKK/XZ8fhpRu+lZDSZ/AH9gO5Opuxgk
-	kfiTLmXdx5/kOxDs0Jw6ID8xnbtmdjQBt5vtR1m1z+1Y5FnU1dcYLAxhOkv4E40Y0dpTXAjGx10
-	I7Qv7BUrhhlcPHbtQI+Ix0Lz74nZ3/UVWyR0516w049GBIAThjB3AoMotgg==
-X-Gm-Gg: AY/fxX7fA79+X+G/yjREAzvCTO5FvyT98qDShaV3vkhLbBR+tGki55rqyyAF3bIVEK+
-	FpoRtAJvEbusgqvfaXbEXj9yubtnzsxnzZPrKE86YpsIZs0a/UqD9COZhNW1cYzztbbGgzJstuu
-	sw7Qyqo790Mx/vjVsulhdrTsYKSCNTK+m2/ZAfj15e86sp7YulKfBTZviU9Pf5aZ6WA34damIAo
-	qeRsfwhBD38enRBuB1vSAPjb0F2GOVdt2VFTYQEBJd6ZuiSY4CdOhbC5NBnYTabrQTZFTu4AZqi
-	qDO0+OwCbN0c0DAcb97sGsI/SfNLa0iB4UfQyh0GEJbXDwwAbRtXm3wU0ACP85E/dAf5HAT45I5
-	L89FlH6jEDyc=
-X-Received: by 2002:a17:90b:3b87:b0:34a:b8e0:dd64 with SMTP id 98e67ed59e1d1-3510b08f706mr3668306a91.1.1768443194158;
-        Wed, 14 Jan 2026 18:13:14 -0800 (PST)
-X-Received: by 2002:a17:90b:3b87:b0:34a:b8e0:dd64 with SMTP id 98e67ed59e1d1-3510b08f706mr3668262a91.1.1768443193741;
-        Wed, 14 Jan 2026 18:13:13 -0800 (PST)
+        bh=wVLNaYRdyTd3Y3bYKBBodLvCmiY6IvN6c8AunBjxbBE=;
+        b=V+pIjfjFlPc+hoKJ/hMX2VyUWqo4fwjQfHB0tiOrwEzmNvlqv2otzHsP621vEt/79h
+         yLCZ8QJ3D9LC4jrEf0asjTim8kn69dKEuRQqINk/ocz8+gC48pKvN201vHwzJB/Qag++
+         +Oj+tFeBjW1qNLlKkUI2bxVYPzuVbMcEKqoy9M09X0DzP/8cbF5IgtwELDy1NKBvPoMc
+         JWNolQUuCNAEHMzjYytrG+tdShwLcTamtUzJIQQ38tMQ7KmqRHkTeMfWOlSon07AJ+xk
+         +OfOm5c4O6AAl1WhRvaUVlCO1rtqAjEFJzw61jTKgFaaqcqcmLi0LOZQP90eia/7I3q3
+         J8uw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdvD4i68vZw9BGHd2we4KerUNwBfnScAyyGPIMD0fOwIAjCX663x7pbJpu4FSp5PtZx4vxCwQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyXKtJjskQ1uGRHGP1+RLgrR0Cz/Za/Vp8LFwU+rM5gVMQd4mFl
+	P1JVmtEi0l7alXo/dJnEqLF6R8MuOwYsqXaykMhoeUZpA6AXiAizuTkMmhGq+zUb5gGJvHgJjgM
+	TSd99lRuRzY6eQmlG8F8dPWQFd0jEHJX8qifTsGjoCvyG947oa+Q7cUE6RQ==
+X-Gm-Gg: AY/fxX5dnJc+iuLV3k3L83TDU2ALiTGS5iDwNyU0/5MXMgcg4VcA/nYlhYp5KXEBGbQ
+	4LRSW7P1KZai7nlLxtTSqJ93EJdtVYXTyJpwBgmHkBNo9sJqJcG6aig8KlpVjw7u8nclcbZmAZ/
+	BpxlWZIt0SmLmTOIKsuIJD9zgtSUpcDQh70nYlZ21xGg0m9j4abogDfQdy3Shqh5swkMvsu1gR2
+	j1zEsXQk8o2/Lu1sJdy1eUSi5VvSggLRI+w05mkxYZfPFLqc2fD1jxtYE2fizkbMllcyyVBvcGY
+	IMip92qdsNe7SJvjxmyxIqO5Z2QjuRr5TYLQ5wZvn3Ou+Fjt3Nv+zLBL1ABKorBMNVQ8E9/PRHt
+	vFhEw4VTeO2w=
+X-Received: by 2002:a05:6a20:7f96:b0:361:2c56:fca8 with SMTP id adf61e73a8af0-38bed1ca1c6mr4829226637.50.1768443302903;
+        Wed, 14 Jan 2026 18:15:02 -0800 (PST)
+X-Received: by 2002:a05:6a20:7f96:b0:361:2c56:fca8 with SMTP id adf61e73a8af0-38bed1ca1c6mr4829208637.50.1768443302510;
+        Wed, 14 Jan 2026 18:15:02 -0800 (PST)
 Received: from [10.72.112.168] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-352678c6a10sm574950a91.15.2026.01.14.18.13.00
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfc2f481sm23240011a12.10.2026.01.14.18.14.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jan 2026 18:13:12 -0800 (PST)
-Message-ID: <aee2390d-faa8-4060-8441-9d70d6d7bc67@redhat.com>
-Date: Thu, 15 Jan 2026 10:12:57 +0800
+        Wed, 14 Jan 2026 18:15:01 -0800 (PST)
+Message-ID: <cf2cc08b-9170-4ef2-9f99-e2d901b40c61@redhat.com>
+Date: Thu, 15 Jan 2026 10:14:48 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,7 +74,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/47] arm_mpam: Remove duplicate linux/srcu.h header
+Subject: Re: [PATCH v3 02/47] arm_mpam: Use non-atomic bitops when modifying
+ feature bitmap
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -87,35 +88,33 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  scott@os.amperecomputing.com, sdonthineni@nvidia.com,
  tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
  will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
- Abaci Robot <abaci@linux.alibaba.com>
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-2-ben.horgan@arm.com>
+ <20260112165914.4086692-3-ben.horgan@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260112165914.4086692-2-ben.horgan@arm.com>
+In-Reply-To: <20260112165914.4086692-3-ben.horgan@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: drBNH0A1qKLs-X40_sRfQVH6RmTVRZfVrH_hjEFUsg8_1768443194
+X-Mimecast-MFC-PROC-ID: eTurNy1P3Mcj6MG9EjMdSiT-xmQpINSEX6PAYGfxZM8_1768443303
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 1/13/26 12:58 AM, Ben Horgan wrote:
-> From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-> 
-> ./drivers/resctrl/mpam_internal.h: linux/srcu.h is included more than once.
+> In the test__props_mismatch() kunit test we rely on the struct mpam_props
+> being packed to ensure memcmp doesn't consider packing. Making it packed
+> reduces the alignment of the features bitmap and so breaks a requirement
+> for the use of atomics. As we don't rely on the set/clear of these bits
+> being atomic, just make them non-atomic.
 > 
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=27328
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-> Acked-by: James Morse <james.morse@arm.com>
-> [BH: Keep alphabetical order]
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
->   drivers/resctrl/mpam_internal.h | 1 -
->   1 file changed, 1 deletion(-)
+> Changes since v2:
+> Add comment (Jonathan)
+> ---
+>   drivers/resctrl/mpam_internal.h | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
