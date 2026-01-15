@@ -1,184 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0415342CB2;
-	Thu, 15 Jan 2026 09:05:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C87F35F8AA;
+	Thu, 15 Jan 2026 09:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768467933; cv=none; b=FEHc0ZjW5Te/5IH9vwWtDYaPaQXMBUg1PWBuAgdJVfHHAe9yZL1kFZbhXmzNLnpgyKS5mf4pXwYeRmW833AI2Rgbm0BTuZqMH5KL7NaPG/+OpYBgGQSIcV01aO+02wJz6MsAv9elgwkhOCsiz0YP00e1gxmopPo7YWUhTHowhwo=
+	t=1768469427; cv=none; b=lStsQEruo1qWP993fpt08pP1CBkBCzdK1LcCCPX80vqZ49JWGGVtWot/XrTX8dUP0AfLz/QsCYFLEVI8sPYeRnUAlgTC+Y0VuA21FBcUEPBNIkDtSpHuMaF7VWwxb2MMMAWfS2W4kGWKnaN8RBX2wH4ipVBbpOUz+aQSxVwrgQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768467933; c=relaxed/simple;
-	bh=SbCaNkzKCMcW9Kc/6M5IX9Rq4Uea6Zy1g6Z7MZnMaOY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LQekgAKQPo11qRSzSSopazP8gVZ1JDdbnfSGZUOZZ3R41lQvvjahaPnvUhVGpT4Pghy29Q+vcKsvQ13vKb3hYoyoRhV0hTwQ6myT7Tg4o5DI+NLccgTRyh0JJAw5VMNtpLMMOcuPGPAKGmMjzlSuNv2FaK0tJzk5zY+6+JnCT4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqu1/tn/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768469427; c=relaxed/simple;
+	bh=cJNKCP0S+IAx/bWZM2AbRlGc+iRV/rZqSadbifWheuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=kAl91iwTAQYleFndRNSgiTtkA1QtMvkbUXEfKtQwyR7yN6BN57yMq5o38YJj9k475UwXYnKDztaDcnrXODevIJGYuC6iVpWfG12rNuUHJwqhGnMW5LP0XRYanhFQugU0XJdjufOqHc5zEFYfQDjmPj9LZ++fCX8DdgmgwZ2bEmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mkDdcCVO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqu1/tn/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE16C19421;
-	Thu, 15 Jan 2026 09:05:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mkDdcCVO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9557C19423;
+	Thu, 15 Jan 2026 09:30:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768467932;
-	bh=SbCaNkzKCMcW9Kc/6M5IX9Rq4Uea6Zy1g6Z7MZnMaOY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mqu1/tn/H1Cn66X0wOisAmEkgVqjyp4CrHzPw3OgDvP/7/cBIh3t/MW2MvKutZ7hu
-	 BS0BcwtIGbRKcGhqM/Mz5IN///efYhJUMSQFi+93xwhcZruDD6zdgHN2WIAuFgaJHJ
-	 6zRuv/meI2OtrEa52DwTarq31eGXod4jIzPscqZ8vRaFPv58+MTjYbE9Nn4xWRxTx8
-	 L8XUEAEfiRtNwu3TqzzP7ms5KR8W3e2wzgvSO+JjJwYNlddx45/WhjMdW8LXX79ay6
-	 7T3tTMv+tKLNviYUXwbvp7PwYHj13t5pAk2X/ImqL21eJAqHelogqbg05VqgxFcscB
-	 RNug2W6D0KpNw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vgJIH-00000002SKy-1xCP;
-	Thu, 15 Jan 2026 09:05:29 +0000
-Date: Thu, 15 Jan 2026 09:05:28 +0000
-Message-ID: <86ldhzkzzb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com,
-	baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com,
-	carl@os.amperecomputing.com,
-	dave.martin@arm.com,
-	david@kernel.org,
-	dfustini@baylibre.com,
-	fenghuay@nvidia.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	jonathan.cameron@huawei.com,
-	kobak@nvidia.com,
-	lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	peternewman@google.com,
-	punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com,
-	reinette.chatre@intel.com,
-	rohit.mathew@arm.com,
-	scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
+	s=k20201202; t=1768469426;
+	bh=cJNKCP0S+IAx/bWZM2AbRlGc+iRV/rZqSadbifWheuY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mkDdcCVOGHX77maeQl0UPb+8HF67I611jGweU7DWQ5BdkuM+zuO2caUQu0OHCZmdD
+	 YLwrmF1/fCjbgOdDs9bkzZvN0n6pc62/9/xfaT3kbaIk7amDoWsh4qm06zDYcBfoWz
+	 qes/pfXsxNHTdOQU5VpQLkRLQ3wb64hH5tT2U43wdxdEyYDvyTXDKlpPdqVyAHYC8q
+	 VTZUSrUem/taulqsB4Lu93fNcgSXrgy8ipfPFG3o3T1PlivWCjTUxzgC8W8VyxEn6X
+	 i7MP23VjojUvwaTiLVSbdODq7A1jTZ1u6vOpCTdWvR+MYFFvEMzjDkbApJICzQUq+W
+	 3LZF/dQqxqsPw==
+Date: Thu, 15 Jan 2026 01:30:25 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 12/47] KVM: arm64: Force guest EL1 to use user-space's partid configuration
-In-Reply-To: <92041294-b332-4b8b-aeed-d8bbad1a7289@arm.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
-	<20260112165914.4086692-13-ben.horgan@arm.com>
-	<86pl7cl7p7.wl-maz@kernel.org>
-	<92041294-b332-4b8b-aeed-d8bbad1a7289@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Subject: KVM/arm64 fixes for 6.19
+Message-ID: <aWizsSzD3fRWMsAc@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, 14 Jan 2026 14:50:22 +0000,
-Ben Horgan <ben.horgan@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 1/14/26 12:06, Marc Zyngier wrote:
-> > On Mon, 12 Jan 2026 16:58:39 +0000,
-> > Ben Horgan <ben.horgan@arm.com> wrote:
-> >>
-> >> From: James Morse <james.morse@arm.com>
-> >>
-> >> While we trap the guest's attempts to read/write the MPAM control
-> >> registers, the hardware continues to use them. Guest-EL0 uses KVM's
-> >> user-space's configuration, as the value is left in the register, and
-> >> guest-EL1 uses either the host kernel's configuration, or in the case of
-> >> VHE, the UNKNOWN reset value of MPAM1_EL1.
-> >>
-> >> We want to force the guest-EL1 to use KVM's user-space's MPAM
-> >> configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
-> >> programmed the same and on VHE copy MPAM0_EL1 into the guest's
-> >> MPAM1_EL1. There is no need to restore as this is out of context once TGE
-> >> is set.
-> >>
-> >> Signed-off-by: James Morse <james.morse@arm.com>
-> >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> >> ---
-> >> Changes since rfc:
-> >> Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
-> >> Defer EL2 handling until next patch
-> >>
-> >> Changes since v2:
-> >> Use mask (Oliver)
-> >> ---
-> >>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 13 +++++++++++++
-> >>  1 file changed, 13 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> >> index f28c6cf4fe1b..9fb8e6628611 100644
-> >> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> >> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-> >> @@ -183,6 +183,18 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
-> >>  }
-> >>  NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
-> >>  
-> >> +/*
-> >> + * The _EL0 value was written by the host's context switch and belongs to the
-> >> + * VMM. Copy this into the guest's _EL1 register.
-> >> + */
-> >> +static inline void __mpam_guest_load(void)
-> >> +{
-> >> +	u64 mask = MPAM0_EL1_PARTID_D | MPAM0_EL1_PARTID_I | MPAM0_EL1_PMG_D | MPAM0_EL1_PMG_I;
-> >> +
-> >> +	if (system_supports_mpam())
-> >> +		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1) & mask, SYS_MPAM1);
-> >> +}
-> >> +
-> >>  /**
-> >>   * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
-> >>   *
-> >> @@ -222,6 +234,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
-> >>  	 */
-> >>  	__sysreg32_restore_state(vcpu);
-> >>  	__sysreg_restore_user_state(guest_ctxt);
-> >> +	__mpam_guest_load();
-> > 
-> > What's the rationale for doing this independently of rest of the MPAM
-> > stuff in __activate_traps_mpam()?
-> 
-> The __activate_traps_mpam() is relevant even for nvhe but
-> __mpam_guest_load() is only need in vhe as otherwise we can rely on
-> MPAM1_EL1 and MPAM0_EL0 having the same partid/pmg configuration
+Hi Paolo,
 
-It is completely unclear to me what enforces this. Please point me to
-the code that does that.
+Here is the first (and likely only) set of fixes for 6.19. Small batch
+of changes fixing issues in non-standard configurations like pKVM, hVHE,
+and nested.
 
-> (although this MPAM policy will likely become configurable sometime down
-> the line).
-
-Or not. the VM only exists as an extension of userspace, and I don't
-see on what grounds it should get its own MPAM configuration.
-
-> Besides that it just makes the naming less exact.
-
-I don't care about the naming. I care about how the configuration flow
-is organised. And so far, this seems extremely messy.
-
-Can you please document what gets configured when and in which mode?
+Details are in the tag, please pull.
 
 Thanks,
+Oliver
 
-	M.
+The following changes since commit f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1da:
 
--- 
-Without deviation from the norm, progress is not possible.
+  Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags/kvmarm-fixes-6.19-1
+
+for you to fetch changes up to 19cffd16ed6489770272ba383ff3aaec077e01ed:
+
+  KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers (2026-01-10 02:19:52 -0800)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 6.19
+
+ - Ensure early return semantics are preserved for pKVM fault handlers
+
+ - Fix case where the kernel runs with the guest's PAN value when
+   CONFIG_ARM64_PAN is not set
+
+ - Make stage-1 walks to set the access flag respect the access
+   permission of the underlying stage-2, when enabled
+
+ - Propagate computed FGT values to the pKVM view of the vCPU at
+   vcpu_load()
+
+ - Correctly program PXN and UXN privilege bits for hVHE's stage-1 page
+   tables
+
+ - Check that the VM is actually using VGICv3 before accessing the GICv3
+   CPU interface
+
+ - Delete some unused code
+
+----------------------------------------------------------------
+Alexandru Elisei (4):
+      KVM: arm64: Copy FGT traps to unprotected pKVM VCPU on VCPU load
+      KVM: arm64: Inject UNDEF for a register trap without accessor
+      KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_hyp()
+      KVM: arm64: Remove unused parameter in synchronize_vcpu_pstate()
+
+Dongxu Sun (1):
+      KVM: arm64: Remove unused vcpu_{clear,set}_wfx_traps()
+
+Marc Zyngier (2):
+      KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
+      KVM: arm64: Don't blindly set set PSTATE.PAN on guest exit
+
+Oliver Upton (1):
+      KVM: arm64: nv: Respect stage-2 write permssion when setting stage-1 AF
+
+Sascha Bischoff (1):
+      KVM: arm64: gic: Check for vGICv3 when clearing TWI
+
+Will Deacon (1):
+      KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
+
+ arch/arm64/include/asm/kvm_asm.h        |  2 ++
+ arch/arm64/include/asm/kvm_emulate.h    | 16 ----------------
+ arch/arm64/include/asm/kvm_pgtable.h    | 16 ++++++++++++----
+ arch/arm64/include/asm/sysreg.h         |  3 ++-
+ arch/arm64/kernel/image-vars.h          |  1 +
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/at.c                     |  8 ++++++--
+ arch/arm64/kvm/hyp/entry.S              |  4 +++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  3 +++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c          |  1 -
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+ arch/arm64/kvm/hyp/pgtable.c            |  5 +++--
+ arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+ arch/arm64/kvm/mmu.c                    | 12 +++++-------
+ arch/arm64/kvm/sys_regs.c               |  5 ++++-
+ arch/arm64/kvm/va_layout.c              | 28 ++++++++++++++++++++++++++++
+ 17 files changed, 73 insertions(+), 38 deletions(-)
