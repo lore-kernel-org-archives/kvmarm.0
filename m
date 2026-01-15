@@ -1,143 +1,133 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC3F27A92D
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 16:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26102BFC70
+	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 16:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768492976; cv=none; b=U3tnsMZgfNS0Sw7hS4GTPGWAogXOJ5QqKbKG7NySg6YW0NBA4CicH6BnE7/b92/lBSOjP9qaTZxBAacjIyPjx7X0WmGUMIDt7UzT1cKV8HFhvv5AXS/GT1YsgRABbFbSpmv1GX4pt7GKvKHksZbIGk/pYyBPMXM6OntiIxP00Ys=
+	t=1768493145; cv=none; b=GdDxb3IUUTaYaKpPXoJL9N/qIroX+5DNSKrsNvSM3CWH6ZSfLcTiNAuzbdp+sI+hMg92N8nkMpTMsiTSfn//te5tzJZqOJZxy4iaXf/x1gpOAYDI5dudX1QROHiQkoxubggtfkodgUSky/EYvO0jwvxn0n3VumM6Hz4k4BNEIcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768492976; c=relaxed/simple;
-	bh=TxMNyNfGxrBeD+6PAEXVMMBQhhhXwTBE60B8VUXfbpM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hZ40aGuQnmZWVKIvyUjE1W3IiCxgTMCfpF7L/D2JWlA9EEZullKmcpbjS1tSnkGgpcGw/z8797yzUW8/lt6TvJ1q/+v75WcETLNT3qdoqHP/tCkLwy4hDsycFgmLeB1VhJ7djsgiGow9cNPJoyLKjowqGvwJ26/rWQGGMmaSOhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FB911515;
-	Thu, 15 Jan 2026 08:02:47 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3D44F3F632;
-	Thu, 15 Jan 2026 08:02:49 -0800 (PST)
-Message-ID: <2f53c085-6bc2-4b5f-936c-5ee0d3b0648d@arm.com>
-Date: Thu, 15 Jan 2026 16:02:47 +0000
+	s=arc-20240116; t=1768493145; c=relaxed/simple;
+	bh=IqXfpQMSe5Bc42TV9K9KEsrFbbGkWI5+nq8h1vmGF1s=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dEM8AM3ioLRUj2dEYhEJ2trqi1HEFMBUkQjV8VwFzmbMZTgFAgrspjL/K6nQKG3sjzMkU9zM4N5qNvoERnGoOWMFXeWtfbf2tQpiQKuvytORgX5Rb1vFkocBx5xHGiHLL19bFIoZ9ujEmN4XqMWhS+vWjI8wlOd48Bti8cnd9EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhP6JI5Q; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhP6JI5Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47752C116D0;
+	Thu, 15 Jan 2026 16:05:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768493145;
+	bh=IqXfpQMSe5Bc42TV9K9KEsrFbbGkWI5+nq8h1vmGF1s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mhP6JI5QPxOrcz4QO2QLcThZgZjpJ/rUNw5WkRCZ+HfaSeHtoJkpqAvh0zwD2jgz5
+	 g0MOT1YF0p2DN+KjPJkbLcvTTQAo4IHStPau1lkBsY2V+2lXUi/u/dq4l/JzCktzap
+	 b9SkgOYh6S1lNpuqcSndgM1BsrLlqZkg2/MfcFLEX00lnp1tPxsh3XLz6hr8dk050P
+	 CNHXv24wK7ylkQLUMMSlAXKYJ61SoLnjelLB2RsSiLkRl6gYpxkQLEfYjnh0EWQrCb
+	 3x+E2giWiBEj3ie5ANb2A4bIV+M0uwOQIkWyNoN97ROGWPdj94yP7T/CXFcBuZiZUg
+	 BvCLK8SivC1MA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgPqw-00000002aLK-3tBN;
+	Thu, 15 Jan 2026 16:05:43 +0000
+Date: Thu, 15 Jan 2026 16:05:42 +0000
+Message-ID: <86fr86lv3d.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	will@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	vladimir.murzin@arm.com
+Subject: Re: [PATCH v6 8/9] KVM: arm64: Check whether a VM IOCTL is allowed in pKVM
+In-Reply-To: <CA+EHjTzEtPta5VHr5R0r0v7ui7-8xv5me29uk2devZ=S14RHqw@mail.gmail.com>
+References: <20251211104710.151771-1-tabba@google.com>
+	<20251211104710.151771-9-tabba@google.com>
+	<86h5smlxyo.wl-maz@kernel.org>
+	<CA+EHjTzEtPta5VHr5R0r0v7ui7-8xv5me29uk2devZ=S14RHqw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 37/47] arm_mpam: resctrl: Update the rmid reallocation
- limit
-To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
-Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
- "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
- "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
- "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
- "dave.martin@arm.com" <dave.martin@arm.com>,
- "david@kernel.org" <david@kernel.org>,
- "dfustini@baylibre.com" <dfustini@baylibre.com>,
- "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
- "gshan@redhat.com" <gshan@redhat.com>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "kobak@nvidia.com" <kobak@nvidia.com>,
- "lcherian@marvell.com" <lcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "peternewman@google.com" <peternewman@google.com>,
- "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
- "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
- "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
- "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
- "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
- "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
- "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
- "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-38-ben.horgan@arm.com>
- <OSZPR01MB8798ED2AFBA3EDFA0D2AFB9B8B8CA@OSZPR01MB8798.jpnprd01.prod.outlook.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <OSZPR01MB8798ED2AFBA3EDFA0D2AFB9B8B8CA@OSZPR01MB8798.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, will@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Shaopeng,
-
-On 1/15/26 10:05, Shaopeng Tan (Fujitsu) wrote:
-> Hello Ben,
+On Thu, 15 Jan 2026 15:19:48 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
->> From: James Morse <james.morse@arm.com>
->>
->> resctrl's limbo code needs to be told when the data left in a cache is
->> small enough for the partid+pmg value to be re-allocated.
->>
->> x86 uses the cache size divided by the number of rmid users the cache may
->> have. Do the same, but for the smallest cache, and with the number of
->> partid-and-pmg users.
->>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since v2:
->> Move waiting for cache info into it's own patch
->> ---
->>  drivers/resctrl/mpam_resctrl.c | 35 ++++++++++++++++++++++++++++++++++
->>  1 file changed, 35 insertions(+)
->>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
->> index 5adc78f9c96f..a6be3ce84241 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
->> @@ -561,6 +561,38 @@ void resctrl_arch_reset_cntr(struct rdt_resource *r, struct rdt_mon_domain *d,
->>          reset_mon_cdp_safe(mon, mon_comp, USE_PRE_ALLOCATED, closid, rmid);
->>  }
->>  
->> +/*
->> + * The rmid realloc threshold should be for the smallest cache exposed to
->> + * resctrl.
->> + */
->> +static int update_rmid_limits(struct mpam_class *class)
->> +{
->> +       u32 num_unique_pmg = resctrl_arch_system_num_rmid_idx();
->> +       struct mpam_props *cprops = &class->props;
->> +       struct cacheinfo *ci;
->> +
->> +       lockdep_assert_cpus_held();
->> +
->> +       /* Assume cache levels are the same size for all CPUs... */
->> +       ci = get_cpu_cacheinfo_level(smp_processor_id(), class->level);
->> +       if (!ci || ci->size == 0) {
->> +               pr_debug("Could not read cache size for class %u\n",
->> +                        class->level);
->> +               return -EINVAL;
->> +       }
->> +
->> +       if (!mpam_has_feature(mpam_feat_msmon_csu, cprops))
->> +               return 0;
+> Hi Marc,
 > 
-> Shouldn't it be return -EOPNOTSUPP;?
-
-The intent of returning 0 here is that if csu is not supported on this
-class then there is nothing to do and hence no error.
-
+> On Thu, 15 Jan 2026 at 15:03, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 11 Dec 2025 10:47:08 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > Certain VM IOCTLs are tied to specific VM features. Since pKVM does not
+> > > support all features, restrict which IOCTLs are allowed depending on
+> > > whether the associated feature is supported.
+> > >
+> > > Use the existing VM capability check as the source of truth to whether
+> > > an IOCTL is allowed for a particular VM by mapping the IOCTLs with their
+> > > associated capabilities.
+> > >
+> > > Suggested-by: Oliver Upton <oupton@kernel.org>
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_pkvm.h | 21 +++++++++++++++++++++
+> > >  arch/arm64/kvm/arm.c              |  3 +++
+> > >  2 files changed, 24 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> > > index 5b564576160d..0fa8c84816fd 100644
+> > > --- a/arch/arm64/include/asm/kvm_pkvm.h
+> > > +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> > > @@ -9,6 +9,7 @@
+> > >  #include <linux/arm_ffa.h>
+> > >  #include <linux/memblock.h>
+> > >  #include <linux/scatterlist.h>
+> > > +#include <asm/kvm_host.h>
+> > >  #include <asm/kvm_pgtable.h>
+> > >
+> > >  /* Maximum number of VMs that can co-exist under pKVM. */
+> > > @@ -43,6 +44,7 @@ static inline bool kvm_pkvm_ext_allowed(struct kvm *kvm, long ext)
+> > >       case KVM_CAP_ARM_SVE:
+> > >       case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+> > >       case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> > > +     case KVM_CAP_ARM_BASIC:
+> >
+> > Can we instead rely on an existing VM capability? I'm not overly keen
+> > exposing something new to userspace (KVM_CAP_ARM_BASIC) for something
+> > that really is KVM's own internal problems.
+> >
+> > Looking at the history, a bunch of things have always been present:
+> > KVM_CAP_NR_VCPUS, for example. You could even #define
+> > KVM_CAP_ARM_BASIC to that if you want.
 > 
-> However, before the function update_rmid_limits() is called, there is a check: if (cache_has_usable_csu(class) && topology_matches_l3(class)).
-> cache_has_usable_csu(class) already contains an identical check. Therefore, I think it's safe to remove this redundant one.
+> I wasn't too crazy about that either. I like the idea of defining it
+> as an alias of KVM_CAP_NR_VCPUS. I'll do that when I respin.
 
-Yes, the check is redundant and can be removed. (If it were to stay it
-should be moved to be before call get_cpu_cacheinfo_level() call so that
-wouldn't give spurious errors for non-cache cpus.)
+I've done something [1]. If that works for you, let me know and I'll
+just merge that.
 
 Thanks,
 
-Ben
+	M.
 
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/pkvm-features-6.20&id=8823485a697de5c280a7a2632620338722f16663
+
+-- 
+Without deviation from the norm, progress is not possible.
