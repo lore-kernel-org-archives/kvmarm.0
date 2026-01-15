@@ -1,123 +1,184 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D5F326937
-	for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 09:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768467791; cv=pass; b=dZqYFLvr4oAa34YybPSl2wrVpc5QpPalz7TvcNqvsgvqjH9qgc6QVC5M5zDuxILikI0Ljo3ZlUduTcyBishQSiEzj2dkCxUubDLfxCXoir3xxICWBxfhqS9jsjrJLx21VFaJvIuWYFwQyn/wxRbfLe8Tq4n9X6qOGJt06DOrnxk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768467791; c=relaxed/simple;
-	bh=03g5GHo7VUuroNdnNffpeJG0qnrQfvR4X6uMf/z1OKw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MqwlZRNoT+D/XX4vzuuj2yUd7aFPuG2S3eyPJUfZbOi5liGhW4KGaeoDERi3c79wALN82CoNFFNO8kVBvaAj1hXGz42VfA0zng1AKTH4PEBJxjT3I+60Za26C+DAwvhNMyKQCod7+ZQFpz89Obqrtmvl+6JPTmuIoaZeNqTKFh4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2V9vosrN; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0415342CB2;
+	Thu, 15 Jan 2026 09:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768467933; cv=none; b=FEHc0ZjW5Te/5IH9vwWtDYaPaQXMBUg1PWBuAgdJVfHHAe9yZL1kFZbhXmzNLnpgyKS5mf4pXwYeRmW833AI2Rgbm0BTuZqMH5KL7NaPG/+OpYBgGQSIcV01aO+02wJz6MsAv9elgwkhOCsiz0YP00e1gxmopPo7YWUhTHowhwo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768467933; c=relaxed/simple;
+	bh=SbCaNkzKCMcW9Kc/6M5IX9Rq4Uea6Zy1g6Z7MZnMaOY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LQekgAKQPo11qRSzSSopazP8gVZ1JDdbnfSGZUOZZ3R41lQvvjahaPnvUhVGpT4Pghy29Q+vcKsvQ13vKb3hYoyoRhV0hTwQ6myT7Tg4o5DI+NLccgTRyh0JJAw5VMNtpLMMOcuPGPAKGmMjzlSuNv2FaK0tJzk5zY+6+JnCT4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqu1/tn/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2V9vosrN"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5014acad6f2so263191cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 15 Jan 2026 01:03:09 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768467788; cv=none;
-        d=google.com; s=arc-20240605;
-        b=irgMQ1tUbb1cM/rx/LzjZcHB7O6cG7gNn0/Uju1/MhVsc71+71dwN2siD4NunGHzOv
-         V+Vd8BVPRLWCQIXBjmUYLNdXZlTSDecSyMrNcZtLCfBQRVjydMkA7WcUwlRSeaqbn2p9
-         qxAHPyTVX17vQ/TcnjPwDZTDxa6n9OHl7Zn8jEHWHxPy2TzjFJtXxB8UdWrGkbA71LW0
-         g0VfLrtAa3tQcTJOBmztUzrPWr9IpTSgTRWUk+8Xl41PoSoZ130KEJFArOPd4VGnO0cQ
-         MyVMsip0HJE84aVuSpIboNyqwPkVMxpbg+HZHojfOoy4ThZmStgV9CWw4o2SI0czxqGt
-         d+FA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
-        fh=bq6GaEX5DdAv1Q8w/xZMrGqMeUIOs4UVU4SIv0bH6IA=;
-        b=IZZHhGzntFKnSe/E1jTab9bfvq3qMxrRFFBpGy55Inib2QV59E/vfii1Yix5gBHLOq
-         IDQPY0/IZ28WQ7vTxe14JhPWYYGiqX3WVEQ7+CGbvhMSQ0sXDBr+eZluGiNot24Me5PG
-         aFEZupSc7eZWJ+LsZMbzg7RURXdsKz/p/GL5HsVxJEzk83Nv7Dn1ELGK0hhfnJxBIvbJ
-         B+9HKo9PTk93xec0nEv6FOEevAtGHDTg7ZgBjHOzPsZjTUC1z3uC0+4tM0rPYtOY62Us
-         /92G2M2BRkpcqJQEig2K0Au6SUVY8WFIs+ttF5LFGuXD6g/vUe3/HdHtVVE4b6LVEhvo
-         vT7g==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768467788; x=1769072588; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
-        b=2V9vosrNywHKknS6eGOmL8j5uwjHK2XHRNWsJdQ+RgLQqZa3GqsE/XJQdB/wh2p4Bj
-         Bs9jRz4ykTe7DhOHZ9lt5zFV0KT87YMO7jcTlImpH9VV0j7KIH6rzSn0RKxOlYvLOeam
-         XgIjiSR++uxx0kSQSGK9NB0FJvCdTg9jx1emoA3y4i+BPcYONoVWO9FydHw5QSU+4Bg4
-         RRBaBKGzeja+3HcjP7SOasy0bioowjPoN/a8XFsKUBVQXZ6l5XIG0UbuIwA1j9afEZF+
-         bZs0AkUSF7C4EAuvXCoBeiXstjcU4yfO1sNxeo5Vu7GBZS8pLKEfPa1zWiPLKoc6TPkw
-         u0hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768467788; x=1769072588;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jaHTBHlKT0XpapwOdZ2HklxNZ/MZMO/Ynn29Wqw5zNk=;
-        b=bq+Kln1nGwPO1a29MjZI8hLnT9physRTbRqc9Tsm2VnVYnBEBnvwNOieaBVSfuei3Z
-         QGuNfINYe2LKe6m0Ga/MWq2ZCXCAmQf8tNjinityzant7+sy5KuNW3wx0RCv2NjC0cHS
-         uNncvaa5vAEWk4zXBDXB11iU5Pwmd2Cietw+fyicdoFpgrhyyWIghPsLO2dynDXvz9qm
-         WGlopwHENHWOXbEIarZhcVWKnLSOgQj9q1TVXLs955qwGwiEINNyGAdBjOkX90vast26
-         LFFExshMd8kT1MvV/hkJmPABpT6WLgt9deLlx/dE/rgqZ9U6ujWqq1BP78bIexsm+x0I
-         Lx3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVwbT7J/+5wTDSosSj/eKH9zvIXS/WNuZHvt3yraliSPPrX7/3zV8Szt3fevS+9e4YDgGHyl5s=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzBT37+SkZFPoM3LUnCrozNWOcNWsyiMQ+9v4tLqjzjL+Cq9vmU
-	1d6Xet+bCPlMAy1hVZIUt3hRlps0BxY8n29i4/8wUA247UuNdrUYsETEbpLUgEfcY7lUKHPS8yV
-	OzettLptpT74Vrnf7xY4X0PnPC2oOLfUfUpPGWc02
-X-Gm-Gg: AY/fxX7E29oq4xgMiyZKsCNtOrmlnQQfqLLEzWp+TxmCPQaww7ZvZiIS9akmQY4gs9D
-	CqgS4T1j0eke/BKj62qcJaDiBzeAH1H+OAemdmcyWepGzs0vhBYrtYLKoqUlFvIRPcPed9jOMpt
-	XQeNfxi3+auhwGElXlKQeHRfkL4sudCa3DGUEQvp8Pw1w3sFNITq0dfG+VwjxjJKGsqNQUTRTpJ
-	iSlAb8KUjulDIBLJeGzqEmpIm+PFtXtYwHKOF6MboYpBbc+bn6WHyUZfuglodo7YCjoVRBj
-X-Received: by 2002:ac8:5dd3:0:b0:4f0:2e33:81aa with SMTP id
- d75a77b69052e-5026ed4f925mr5343061cf.11.1768467788106; Thu, 15 Jan 2026
- 01:03:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqu1/tn/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE16C19421;
+	Thu, 15 Jan 2026 09:05:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768467932;
+	bh=SbCaNkzKCMcW9Kc/6M5IX9Rq4Uea6Zy1g6Z7MZnMaOY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mqu1/tn/H1Cn66X0wOisAmEkgVqjyp4CrHzPw3OgDvP/7/cBIh3t/MW2MvKutZ7hu
+	 BS0BcwtIGbRKcGhqM/Mz5IN///efYhJUMSQFi+93xwhcZruDD6zdgHN2WIAuFgaJHJ
+	 6zRuv/meI2OtrEa52DwTarq31eGXod4jIzPscqZ8vRaFPv58+MTjYbE9Nn4xWRxTx8
+	 L8XUEAEfiRtNwu3TqzzP7ms5KR8W3e2wzgvSO+JjJwYNlddx45/WhjMdW8LXX79ay6
+	 7T3tTMv+tKLNviYUXwbvp7PwYHj13t5pAk2X/ImqL21eJAqHelogqbg05VqgxFcscB
+	 RNug2W6D0KpNw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vgJIH-00000002SKy-1xCP;
+	Thu, 15 Jan 2026 09:05:29 +0000
+Date: Thu, 15 Jan 2026 09:05:28 +0000
+Message-ID: <86ldhzkzzb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com,
+	baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com,
+	carl@os.amperecomputing.com,
+	dave.martin@arm.com,
+	david@kernel.org,
+	dfustini@baylibre.com,
+	fenghuay@nvidia.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	jonathan.cameron@huawei.com,
+	kobak@nvidia.com,
+	lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peternewman@google.com,
+	punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com,
+	reinette.chatre@intel.com,
+	rohit.mathew@arm.com,
+	scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH v3 12/47] KVM: arm64: Force guest EL1 to use user-space's partid configuration
+In-Reply-To: <92041294-b332-4b8b-aeed-d8bbad1a7289@arm.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+	<20260112165914.4086692-13-ben.horgan@arm.com>
+	<86pl7cl7p7.wl-maz@kernel.org>
+	<92041294-b332-4b8b-aeed-d8bbad1a7289@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
- <20251223-kvm-arm64-sme-v9-23-8be3867cb883@kernel.org> <CA+EHjTyYcrWwBR0AwwdWFfOSwbmTMOhSee7y_-vrMfOxphrvqw@mail.gmail.com>
- <5a053bb6-5052-4664-b0cb-f05d56d4679d@sirena.org.uk>
-In-Reply-To: <5a053bb6-5052-4664-b0cb-f05d56d4679d@sirena.org.uk>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 15 Jan 2026 09:02:31 +0000
-X-Gm-Features: AZwV_Qg4xCZRn6ebTpsQyf1oiKPYkQGhv7VLsovgzCpdoBOU9QpCHpXoiLQKrWU
-Message-ID: <CA+EHjTwMs6BzZwtcNjyZnxLb9Gs01B1RcDvo1RB-f2w98eMzFQ@mail.gmail.com>
-Subject: Re: [PATCH v9 23/30] KVM: arm64: Context switch SME state for guests
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Eric Auger <eric.auger@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 14 Jan 2026 at 17:28, Mark Brown <broonie@kernel.org> wrote:
->
-> On Tue, Jan 13, 2026 at 02:24:56PM +0000, Fuad Tabba wrote:
-> > On Tue, 23 Dec 2025 at 01:23, Mark Brown <broonie@kernel.org> wrote:
->
-> > > +#define sme_cond_update_smcr_vq(val, reg)                      \
-> > > +       do {                                                    \
-> > > +               u64 __smcr = read_sysreg_s((reg));              \
-> > > +               u64 __new = __smcr & ~SMCR_ELx_LEN_MASK;        \
-> > > +               __new |= (val) & SMCR_ELx_LEN_MASK;             \
->
-> > Similar to what I pointed out in patch 15 [1], I think you need to
-> > preserve the other bits, since SMCR isn't just about the length.
->
-> This does preserve the existing bits?  It reads SMCR, masks out and then
-> replaces the length.
+On Wed, 14 Jan 2026 14:50:22 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 1/14/26 12:06, Marc Zyngier wrote:
+> > On Mon, 12 Jan 2026 16:58:39 +0000,
+> > Ben Horgan <ben.horgan@arm.com> wrote:
+> >>
+> >> From: James Morse <james.morse@arm.com>
+> >>
+> >> While we trap the guest's attempts to read/write the MPAM control
+> >> registers, the hardware continues to use them. Guest-EL0 uses KVM's
+> >> user-space's configuration, as the value is left in the register, and
+> >> guest-EL1 uses either the host kernel's configuration, or in the case of
+> >> VHE, the UNKNOWN reset value of MPAM1_EL1.
+> >>
+> >> We want to force the guest-EL1 to use KVM's user-space's MPAM
+> >> configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
+> >> programmed the same and on VHE copy MPAM0_EL1 into the guest's
+> >> MPAM1_EL1. There is no need to restore as this is out of context once TGE
+> >> is set.
+> >>
+> >> Signed-off-by: James Morse <james.morse@arm.com>
+> >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> >> ---
+> >> Changes since rfc:
+> >> Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
+> >> Defer EL2 handling until next patch
+> >>
+> >> Changes since v2:
+> >> Use mask (Oliver)
+> >> ---
+> >>  arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 13 +++++++++++++
+> >>  1 file changed, 13 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> >> index f28c6cf4fe1b..9fb8e6628611 100644
+> >> --- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> >> +++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+> >> @@ -183,6 +183,18 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
+> >>  }
+> >>  NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
+> >>  
+> >> +/*
+> >> + * The _EL0 value was written by the host's context switch and belongs to the
+> >> + * VMM. Copy this into the guest's _EL1 register.
+> >> + */
+> >> +static inline void __mpam_guest_load(void)
+> >> +{
+> >> +	u64 mask = MPAM0_EL1_PARTID_D | MPAM0_EL1_PARTID_I | MPAM0_EL1_PMG_D | MPAM0_EL1_PMG_I;
+> >> +
+> >> +	if (system_supports_mpam())
+> >> +		write_sysreg_el1(read_sysreg_s(SYS_MPAM0_EL1) & mask, SYS_MPAM1);
+> >> +}
+> >> +
+> >>  /**
+> >>   * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+> >>   *
+> >> @@ -222,6 +234,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+> >>  	 */
+> >>  	__sysreg32_restore_state(vcpu);
+> >>  	__sysreg_restore_user_state(guest_ctxt);
+> >> +	__mpam_guest_load();
+> > 
+> > What's the rationale for doing this independently of rest of the MPAM
+> > stuff in __activate_traps_mpam()?
+> 
+> The __activate_traps_mpam() is relevant even for nvhe but
+> __mpam_guest_load() is only need in vhe as otherwise we can rely on
+> MPAM1_EL1 and MPAM0_EL0 having the same partid/pmg configuration
 
-You're right. Sorry for the noise.
+It is completely unclear to me what enforces this. Please point me to
+the code that does that.
 
-Cheers,
-/fuad
+> (although this MPAM policy will likely become configurable sometime down
+> the line).
+
+Or not. the VM only exists as an extension of userspace, and I don't
+see on what grounds it should get its own MPAM configuration.
+
+> Besides that it just makes the naming less exact.
+
+I don't care about the naming. I care about how the configuration flow
+is organised. And so far, this seems extremely messy.
+
+Can you please document what gets configured when and in which mode?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
