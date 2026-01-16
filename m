@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5641E346FC6
-	for <kvmarm@lists.linux.dev>; Fri, 16 Jan 2026 11:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DCC346AF4
+	for <kvmarm@lists.linux.dev>; Fri, 16 Jan 2026 11:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768561476; cv=none; b=enCnL0lAyKuPcmB4iJ+wkMtMr4mZDOSuNMB1r+vk0XSYtja9iKNc4mSptl0t5vb+g2Egdc/F93+g5YFI1sFR66z54jCagPbjuyvwMB7gqhSOwZChnesZjH+2mbSHfXtUPXU9+D2vF67LFyzcBI5LT/XYeETGwwJks83w8ltdDRA=
+	t=1768561566; cv=none; b=j/Mnv3mO0C37sGCQA5lOm17rgR6/00s+PSxqtCm+H5N9+zqt3QmedGnKDkGk00raeFPcLoWFhl24G0SHLGWAGq4YrxSUG/Rux1+AnyNmjMSQ9oZlhQZANnip2SPYwJaHqS5/x1ZcSB7dTg2vLUUL3IXuuMU5+7EDgdXuakbHWJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768561476; c=relaxed/simple;
-	bh=4l0FmMZtL1nzRzFcB12kJUY9J/80RhFDcGGqxCkD/XU=;
+	s=arc-20240116; t=1768561566; c=relaxed/simple;
+	bh=OE5jpHCInFGuUzU0heJSkaZnla0jboO+ctAjAww3CA4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EmZ6G89db/RKjE6m7XdnFNhlVLZi3dHWSpu8A1nAoBE/RWVRz+J0kAYnrQOl3OUnf274DIR0/I9aIutI2sqbBuxtRYZgP++sCMdDPvi8ubm/m29k38TIQ1BpMF0yiv6v9e8zQwaqV5KBDwJW2JjafYSfTUydo2IFdCMnOPodRiU=
+	 In-Reply-To:Content-Type; b=ctC6AWRVpx2K4DxT+27nu6Oet8PCiEbFWls5iY0G1JG6nAgo8zOnega4v10UPF9Kg+G+hz3zhLmwNtqJUFckP1ffWqOXMNsoPSG1LLy2aDuqMcXAgLHBsmud9XeRDqMXVA/shcIymAcjOJYuvIJx6uzq5+T/qiMKzza+FWiAGVo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2EF21515;
-	Fri, 16 Jan 2026 03:04:23 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1B0E1515;
+	Fri, 16 Jan 2026 03:05:57 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CEF0E3F59E;
-	Fri, 16 Jan 2026 03:04:25 -0800 (PST)
-Message-ID: <2ef49c6c-9de8-4aca-9e78-726b8665cdeb@arm.com>
-Date: Fri, 16 Jan 2026 11:04:24 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F6863F59E;
+	Fri, 16 Jan 2026 03:05:59 -0800 (PST)
+Message-ID: <6647ad19-6499-4e7b-9e4d-445e1a7153a4@arm.com>
+Date: Fri, 16 Jan 2026 11:05:57 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 31/47] arm_mpam: resctrl: Pre-allocate assignable
- monitors
+Subject: Re: [PATCH v3 00/47] arm_mpam: Add KVM/arm64 and resctrl glue code
 To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
 Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
  "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
@@ -61,63 +60,23 @@ Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
  "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
  "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
 References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-32-ben.horgan@arm.com>
- <TYCPR01MB88047C83A1CE49648667437B8B8DA@TYCPR01MB8804.jpnprd01.prod.outlook.com>
+ <TYCPR01MB8804896CC8CF6EC43780F2628B8DA@TYCPR01MB8804.jpnprd01.prod.outlook.com>
 From: Ben Horgan <ben.horgan@arm.com>
 Content-Language: en-US
-In-Reply-To: <TYCPR01MB88047C83A1CE49648667437B8B8DA@TYCPR01MB8804.jpnprd01.prod.outlook.com>
+In-Reply-To: <TYCPR01MB8804896CC8CF6EC43780F2628B8DA@TYCPR01MB8804.jpnprd01.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Shaopeng,
 
-On 1/16/26 10:34, Shaopeng Tan (Fujitsu) wrote:
+On 1/16/26 10:47, Shaopeng Tan (Fujitsu) wrote:
 > Hello Ben,
 > 
->> From: James Morse <james.morse@arm.com>
->>
->> When there are not enough monitors, MPAM is able to emulate ABMC by making
->> a smaller number of monitors assignable. These monitors still need to be
->> allocated from the driver, and mapped to whichever control/monitor group
->> resctrl wants to use them with.
->>
->> Add a second array to hold the monitor values indexed by resctrl's cntr_id.
->>
->> When CDP is in use, two monitors are needed so the available number of
->> counters halves. Platforms with one monitor will have zero monitors when
->> CDP is in use.
->>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-[...]
->> +bool resctrl_arch_mbm_cntr_assign_enabled(struct rdt_resource *r)
->> +{
->> +       if (r != &mpam_resctrl_controls[RDT_RESOURCE_L3].resctrl_res)
->> +               return false;
->> +
->> +       return mpam_resctrl_abmc_enabled();
->> +}
->> +
->> +int resctrl_arch_mbm_cntr_assign_set(struct rdt_resource *r, bool enable)
->> +{
->> +       return -EINVAL;
->> +}
+> I ran the MPAM driver on NVIDIA's Grace machine,  and it seems to be working fine.
 > 
-> $ echo "default" | sudo tee /sys/fs/resctrl/info/L3_MON/mbm_assign_mode
-> default
-> tee: /sys/fs/resctrl/info/L3_MON/mbm_assign_mode:Invalid argument
-> "return  -EOPNOTSUPP;" might be better.
+> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 
-I'll keep this as -EINVAL in the case when 'enable' matches the current mode
-and change it to return 0 when there is nothing to change. This will match the 
-behaviour once this is handled in resctrl. See the outcome of the discussion on
-this resctrl patch [1] Note, that I haven't yet updated the patch to match the 
-discussion. Any objection?
-
-[1] https://lore.kernel.org/lkml/bf8bb682-6a4d-4f39-916c-952719fcf48d@arm.com/
-
-Thanks,
+Thanks for the testing!
 
 Ben
 
