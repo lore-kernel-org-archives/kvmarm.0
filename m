@@ -1,115 +1,179 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF24932B9B4
-	for <kvmarm@lists.linux.dev>; Fri, 16 Jan 2026 15:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.143.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A890A2E719B;
+	Fri, 16 Jan 2026 17:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.143.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768578672; cv=none; b=YYUJ9qMr+JCwPH34VNkmrJ2i6ElPi6+Yu13uqDASTLjmHExDZeLrRPIl0JKGg0SA30X3BVs3X3L/8M0FFELTXULQjtN4uQ8X13TrIQufx8XnVHr5lum91/BoQ4cfMoR5/hyPRYDSKCZ+dQjzTpqYI1iiiKl58r120NdTRxLfYWo=
+	t=1768584513; cv=none; b=UYgnZiS7x12plWO67FWRyf34hT4gjb9Z95cO1WN8dPWjroQ7Uf4E3tBe727mp8u5Dh8m8izN/+CGzfilLZeSqAFwm3xPl7wF/WYc9kb1bJtRLtKd6tUpn5LqbaqE/t6QF0sQF1DUb6UyDJsF89tyxvBqaMyMpobCEQGJSlvHaec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768578672; c=relaxed/simple;
-	bh=fnlSlZnU7oCJrisjIXP/Vic1Zz0cNeWecHQHoVx8P+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OMy9G2GxFMN4DZkYC0TR1zwcHi81kCRHW2MWHJBmIDXVHt+/ehSbeX6FPVplPxnriAZIAiOhdJ2s2RxS2Nrt1mIKa/RL98lTJK71B9vy65ZZeRUz/hYLaC4XSHeUL9huuDQDOQZobfGq4G4aqG+OKX74PixMy6pcxcpynldmJsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8922B1515;
-	Fri, 16 Jan 2026 07:51:03 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DC563F59E;
-	Fri, 16 Jan 2026 07:51:05 -0800 (PST)
-Date: Fri, 16 Jan 2026 15:51:02 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
-	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
-	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com, reinette.chatre@intel.com,
-	rohit.mathew@arm.com, scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 02/47] arm_mpam: Use non-atomic bitops when modifying
- feature bitmap
-Message-ID: <aWpeZrgvSn2ab4VG@arm.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-3-ben.horgan@arm.com>
- <aWonpc52-BMzcx8Q@arm.com>
- <b192241e-1b34-4d6c-bbb4-b53cdd98526f@arm.com>
- <c1dcc2a6-ca11-49e7-b7cd-d2ec70fed7f1@arm.com>
+	s=arc-20240116; t=1768584513; c=relaxed/simple;
+	bh=4v4BzucaIF1lo4RO/U0n/TNkpEdnblnTY4xoTJ1ZwN4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iy2MA9tv9eNdW18RczqsrOof2zbJvZEzW01/xl2bdU4+5+KYsuU+t5kifnJCsmge3FZTA5ZNhU4/3Mb6Qeg4EC9s6+NfJmIwqZhJkDZl+PmbGU//saE28xKl/wjVBYmC7MPGHZxpK4ls5lr6MzvcjyHM4xRKY4tixmUWO9qO3W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZLRsFVDj; arc=none smtp.client-ip=63.178.143.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZLRsFVDj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1768584512; x=1800120512;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=iixAuY6QcleXCDLiS0osecYXCL2wD+IcnkmdhMNMceE=;
+  b=ZLRsFVDjzKyBWAmAa9raNcUxUdC3DS4qoix1Ox/WxUWZ+Xc73vJBkpQu
+   K+6Hq8H+N9Et1PLf0A+jOAU2uZg04cgglcjqROJ9rvBG7R+u7PyxFA5mS
+   3E3F1h99dHlf85Q+APayS1FpOFl2Z67EjkGdpdyexCuM9UnrZ+wjUN80x
+   zI8mKFTLPsEQP3sYG3K0wQrpRR/IPLeXwy9652Ik3lv4YOgCBZNSCHYL8
+   1wr8+bV/ShsSeUzP2sEAFSc3HZSJkpS7Jyc/6xC/Kq9+UzZgC9lQYE7ed
+   DNRx4jjFSXWabspNKcowIW7g/QqIHj56QzIWKctqDqqxqmKy4T7RSKA/M
+   Q==;
+X-CSE-ConnectionGUID: Qy9RLilmSb6mwlMCH/r26Q==
+X-CSE-MsgGUID: FqlFUMb2T4mzbA9VY5PHdA==
+X-IronPort-AV: E=Sophos;i="6.21,231,1763424000"; 
+   d="scan'208";a="7924510"
+Received: from ip-10-6-6-97.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.6.97])
+  by internal-fra-out-010.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2026 17:28:13 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.236:17818]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.21.80:2525] with esmtp (Farcaster)
+ id 2ee969a8-f047-4c24-83b9-0d6192b592bb; Fri, 16 Jan 2026 17:28:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 2ee969a8-f047-4c24-83b9-0d6192b592bb
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
+ Fri, 16 Jan 2026 17:28:13 +0000
+Received: from [192.168.12.13] (10.106.82.9) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35; Fri, 16 Jan 2026
+ 17:28:08 +0000
+Message-ID: <318407ba-ecb6-4691-8911-645fb8c20250@amazon.com>
+Date: Fri, 16 Jan 2026 17:28:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c1dcc2a6-ca11-49e7-b7cd-d2ec70fed7f1@arm.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct
+ map
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kalyazin@amazon.co.uk"
+	<kalyazin@amazon.co.uk>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>
+CC: "david@kernel.org" <david@kernel.org>, "svens@linux.ibm.com"
+	<svens@linux.ibm.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "jgross@suse.com"
+	<jgross@suse.com>, "surenb@google.com" <surenb@google.com>, "vbabka@suse.cz"
+	<vbabka@suse.cz>, "riel@surriel.com" <riel@surriel.com>, "pfalcato@suse.de"
+	<pfalcato@suse.de>, "x86@kernel.org" <x86@kernel.org>, "rppt@kernel.org"
+	<rppt@kernel.org>, "thuth@redhat.com" <thuth@redhat.com>,
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "maz@kernel.org"
+	<maz@kernel.org>, "peterx@redhat.com" <peterx@redhat.com>, "ast@kernel.org"
+	<ast@kernel.org>, "Annapurve, Vishal" <vannapurve@google.com>,
+	"pjw@kernel.org" <pjw@kernel.org>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "hca@linux.ibm.com"
+	<hca@linux.ibm.com>, "willy@infradead.org" <willy@infradead.org>,
+	"wyihan@google.com" <wyihan@google.com>, "ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>, "yang@os.amperecomputing.com"
+	<yang@os.amperecomputing.com>, "jolsa@kernel.org" <jolsa@kernel.org>,
+	"jmattson@google.com" <jmattson@google.com>, "luto@kernel.org"
+	<luto@kernel.org>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
+	"haoluo@google.com" <haoluo@google.com>, "patrick.roy@linux.dev"
+	<patrick.roy@linux.dev>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "coxu@redhat.com" <coxu@redhat.com>,
+	"mhocko@suse.com" <mhocko@suse.com>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "hpa@zytor.com"
+	<hpa@zytor.com>, "song@kernel.org" <song@kernel.org>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "maobibo@loongson.cn"
+	<maobibo@loongson.cn>, "peterz@infradead.org" <peterz@infradead.org>,
+	"oupton@kernel.org" <oupton@kernel.org>, "lorenzo.stoakes@oracle.com"
+	<lorenzo.stoakes@oracle.com>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>, "jthoughton@google.com"
+	<jthoughton@google.com>, "Jonathan.Cameron@huawei.com"
+	<Jonathan.Cameron@huawei.com>, "Yu, Yu-cheng" <yu-cheng.yu@intel.com>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "yonghong.song@linux.dev"
+	<yonghong.song@linux.dev>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"shuah@kernel.org" <shuah@kernel.org>, "prsampat@amd.com" <prsampat@amd.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
+	"itazur@amazon.co.uk" <itazur@amazon.co.uk>, "suzuki.poulose@arm.com"
+	<suzuki.poulose@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"dev.jain@arm.com" <dev.jain@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>,
+	"jackabt@amazon.co.uk" <jackabt@amazon.co.uk>, "daniel@iogearbox.net"
+	<daniel@iogearbox.net>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
+	"andrii@kernel.org" <andrii@kernel.org>, "mingo@redhat.com"
+	<mingo@redhat.com>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "derekmn@amazon.com"
+	<derekmn@amazon.com>, "xmarcalx@amazon.co.uk" <xmarcalx@amazon.co.uk>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
+	<sdf@fomichev.me>, "jackmanb@google.com" <jackmanb@google.com>,
+	"bp@alien8.de" <bp@alien8.de>, "corbet@lwn.net" <corbet@lwn.net>,
+	"ackerleytng@google.com" <ackerleytng@google.com>, "jannh@google.com"
+	<jannh@google.com>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"kas@kernel.org" <kas@kernel.org>, "will@kernel.org" <will@kernel.org>,
+	"seanjc@google.com" <seanjc@google.com>
+References: <20260114134510.1835-1-kalyazin@amazon.com>
+ <20260114134510.1835-8-kalyazin@amazon.com>
+ <e619ded526a2f9a4cec4f74383cef31519624935.camel@intel.com>
+ <294bca75-2f3e-46db-bb24-7c471a779cc1@amazon.com>
+ <bb58a21f91113ca39f8888d718d4450a5fd72808.camel@intel.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJnrNfABQkFps9DAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOpfgD/exazh4C2Z8fNEz54YLJ6tuFEgQrVQPX6nQ/PfQi2+dwBAMGTpZcj9Z9NvSe1
+ CmmKYnYjhzGxzjBs8itSUvWIcMsFzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmes18AFCQWmz0MCGwwACgkQr5LKIKmaZPNTlQEA+q+rGFn7273rOAg+rxPty0M8lJbT
+ i2kGo8RmPPLu650A/1kWgz1AnenQUYzTAFnZrKSsXAw5WoHaDLBz9kiO5pAK
+In-Reply-To: <bb58a21f91113ca39f8888d718d4450a5fd72808.camel@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D004EUC001.ant.amazon.com (10.252.51.190) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-On Fri, Jan 16, 2026 at 12:12:53PM +0000, Ben Horgan wrote:
-> On 1/16/26 12:02, Ben Horgan wrote:
-> > On 1/16/26 11:57, Catalin Marinas wrote:
-> >> On Mon, Jan 12, 2026 at 04:58:29PM +0000, Ben Horgan wrote:
-> >>> In the test__props_mismatch() kunit test we rely on the struct mpam_props
-> >>> being packed to ensure memcmp doesn't consider packing. Making it packed
-> >>> reduces the alignment of the features bitmap and so breaks a requirement
-> >>> for the use of atomics. As we don't rely on the set/clear of these bits
-> >>> being atomic, just make them non-atomic.
-> >>>
-> >>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> >>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> >>> ---
-> >>> Changes since v2:
-> >>> Add comment (Jonathan)
-> >>> ---
-> >>>  drivers/resctrl/mpam_internal.h | 8 ++++++--
-> >>>  1 file changed, 6 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-> >>> index 17cdc3080d58..e8971842b124 100644
-> >>> --- a/drivers/resctrl/mpam_internal.h
-> >>> +++ b/drivers/resctrl/mpam_internal.h
-> >>> @@ -200,8 +200,12 @@ struct mpam_props {
-> >>>  } PACKED_FOR_KUNIT;
-> >>>  
-> >>>  #define mpam_has_feature(_feat, x)	test_bit(_feat, (x)->features)
-> >>> -#define mpam_set_feature(_feat, x)	set_bit(_feat, (x)->features)
-> >>> -#define mpam_clear_feature(_feat, x)	clear_bit(_feat, (x)->features)
-> >>> +/*
-> >>> + * The non-atomic get/set operations are used because if struct mpam_props is
-> >>> + * packed, the alignment requirements for atomics aren't met.
-> >>> + */
-> >>> +#define mpam_set_feature(_feat, x)	__set_bit(_feat, (x)->features)
-> >>> +#define mpam_clear_feature(_feat, x)	__clear_bit(_feat, (x)->features)
-> >>
-> >> After discussing privately, I can see how test__props_mismatch() can
-> >> end up with unaligned atomics on the mmap_props::features array. Happy to
-> >> pick it up for 6.19 (probably the first patch as well, though that's
-> >> harmless).
-> > 
-> > Yes please.
-> > 
-> >>
-> >> Is there a Fixes tag here for future reference?
-> >>
-> > 
-> > Yes, the mpam_set/clear macros were introduced in
+
+
+On 16/01/2026 15:34, Edgecombe, Rick P wrote:
+> On Fri, 2026-01-16 at 15:00 +0000, Nikita Kalyazin wrote:
+>>> Does this assume the folio would not have been split after it was
+>>> zapped? As in, if it was zapped at 2MB granularity (no 4KB direct
+>>> map split required) but then restored at 4KB (split required)? Or
+>>> it gets merged somehow before this?
+>>
+>> AFAIK it can't be zapped at 2MB granularity as the zapping code will
+>> inevitably cause splitting because guest_memfd faults occur at the
+>> base page granularity as of now.
 > 
-> The mpam_set_clear() actually comes after in:
-> c10ca83a7783 arm_mpam: Merge supported features during mpam_enable() into mpam_class
-> but I think the fixes below is still the correct one as it is where we could 
-> first start seeing the problem.
-> > 
-> > Fixes: 8c90dc68a5de ("arm_mpam: Probe the hardware features resctrl supports")
+> Ah, right since there are no huge pages currently. Then the huge page
+> series will need to keep this in mind and figure out some solution.
+> Probably worth a comment on that assumption to help anyone that changes
+> it.
 
-Yes, I left the original as that's the one first introducing the atomic
-bitops on this structure.
+Makes sense.  I'll leave a comment.
 
--- 
-Catalin
+> 
+> I imagine this feature is really targeted towards machines running a
+> bunch of untrusted VMs, so cloud hypervisors really. In that case the
+> direct map will probably be carved up pretty quick. Did you consider
+> just breaking the full direct map to 4k at the start when it's in use?
+
+That's an interesting point, I haven't thought about it from this 
+perspective.  We should run some tests internally to see if it'd help. 
+This will likely change with support for huge pages coming in though.
