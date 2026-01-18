@@ -1,127 +1,318 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73471500941
-	for <kvmarm@lists.linux.dev>; Sat, 17 Jan 2026 00:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7088F2E6116;
+	Sun, 18 Jan 2026 10:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768608245; cv=none; b=gyGPgBO3Cq7wrEoa1EMLklJD4nDMJvKu3+pGCe0ZAU0QJBhOL83Uzop0JgSAIgwXW/27ktAngfr6TA5JGEMY0BvvVUXd81es6S0ELcTXVeuG+AK8+z1QMug4q+7t5dA5w+I83gJV5qGz6vgSxLbk3bIEegyhUF6IL7ke0NN7koA=
+	t=1768732179; cv=none; b=UoiJ65AT1/R8C1MU+ByvbjApshgMvZbo+Hglfdt4hXGXIygQgWoGMT4YqgbcqCiM7aJV1WeG/fum5Ty7eIdIashmWyPYGNe0b5VHGEBepmzVoM/X5FXiHBXeC9lRQIZKiCVY6V80+fMn0o58bgv72TZl1fXoUp4JkX7ry4tlajM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768608245; c=relaxed/simple;
-	bh=gQ49HnwgetN2nDbDg2sBxHse+CaBcYv4VByJE8oyVFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuL032Er2DP6tYxL0wPSyw+crjnd+9DhD7QxaJ08pWyPAvYRtOREEiDf5YjLIqoVI3iz/RNgXT6BxVjqVV16+NBO/K2fcfgMuE9+C7Ft9PnR5L8rYbSr8Yr3CAto+Wk+EKOJkgkRBjcqcZSKZt+TfX9s8URuCe/j22G6wL77mlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJs6dRFs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768732179; c=relaxed/simple;
+	bh=gveXft6/1suUPTPK6+A5Xp+d6HUxC5Rum+LnGx54Z34=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p4pVXQ5YJNNI7ZdgulZ82k2JjWHW/Iu1ESBCo3YQCy83jd4Idp02I+b59RCc0HR+HBYwXNxQyUV6UDiJWM7Jv2oQc3b9koMySojlJhbLjLITl2HGOjXvd/YR+6LLE/t+0IXoO8iVWwnRTRXsBCpQyUKXdgwueeXyJitFH4d+Utk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAg8SQ34; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJs6dRFs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 967C8C116C6;
-	Sat, 17 Jan 2026 00:04:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAg8SQ34"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EB4C116D0;
+	Sun, 18 Jan 2026 10:29:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768608245;
-	bh=gQ49HnwgetN2nDbDg2sBxHse+CaBcYv4VByJE8oyVFU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PJs6dRFsROanapwatHjpvVgku2MWedGCtQ1cs2kaQANdqrg4n9m66oQWx5FzHX+d4
-	 2Xw9jWFWM1JdgBiBM2j2mnd5QlOKBef4E5WqDwC6ibMwip1UlBb8jRGktmKQqOG6v+
-	 x9L4v+4fsrMvjM55h72ODVW+gC/JR1/2Wme7y4cNvsob3k6NaWQ+1jmCOV8aMj7uN8
-	 ZYc+b4eDH4wfaStI7uPLksgTHnyr59bkF2WuOm7sg/LGxjU+F09BTGFMxeApkB+9Uo
-	 sf2rwvocPWnR7/R/LZnBfx0go6Lm4BEhhQ5B1fhRVnp6vBdJBEAzD/sj00w3I19GgB
-	 rZCzKFL13+hnA==
-Date: Sat, 17 Jan 2026 00:03:59 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH 17/30] KVM: arm64: Generalise
- kvm_pgtable_stage2_set_owner()
-Message-ID: <aWrR700urENbFLcW@willie-the-truck>
-References: <20260105154939.11041-1-will@kernel.org>
- <20260105154939.11041-18-will@kernel.org>
- <rm55zbvakwmh5ny25bosf3jjiehfubcm2st5q4porsmnffuod5@edygmhqq2ckn>
- <aWFM7NnBkRiM4OQI@willie-the-truck>
+	s=k20201202; t=1768732179;
+	bh=gveXft6/1suUPTPK6+A5Xp+d6HUxC5Rum+LnGx54Z34=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PAg8SQ34N7V5zfoeO5GtoEL9UQifKC7eLdMV2frsoTrL8LU4axpA8CeiRRhKTvq0m
+	 oaA7gw0kzauZOCwu7oub2ydchUcB95crLuKOdu+NimK0ZISO1gvmweNctcNJ0MbVGP
+	 4QrUX0iKOzH070KN41Ag79BznCu67CanxXYthxrHsOcxtTOc+f/7PeCdmMcOWqBR+P
+	 PnMNVg2phw3srLl9lmct5H0JQy/dK21KKHO1zP3JceVCkr+HV+i4wd7PVYH8eKYGQW
+	 3kXWnap2jurM+o8iuPDNECi52Oi2vguIsyk/IUQtsTr2XSn1RiPRq20u6y0MCoNO8x
+	 KOOD8zahmrgYQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vhQ2K-00000003I58-1NCe;
+	Sun, 18 Jan 2026 10:29:36 +0000
+Date: Sun, 18 Jan 2026 10:29:35 +0000
+Message-ID: <87ldhvdxio.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Thomson, Jack" <jackabt.amazon@gmail.com>
+Cc: oliver.upton@linux.dev,
+	pbonzini@redhat.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	isaku.yamahata@intel.com,
+	xmarcalx@amazon.co.uk,
+	kalyazin@amazon.co.uk,
+	jackabt@amazon.com,
+	Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH v4 1/3] KVM: arm64: Add pre_fault_memory implementation
+In-Reply-To: <ea7786e4-8b67-4a9f-b2c6-c0e4cd325cc3@gmail.com>
+References: <20260113152643.18858-1-jackabt.amazon@gmail.com>
+	<20260113152643.18858-2-jackabt.amazon@gmail.com>
+	<86jyxjkxus.wl-maz@kernel.org>
+	<ea7786e4-8b67-4a9f-b2c6-c0e4cd325cc3@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aWFM7NnBkRiM4OQI@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jackabt.amazon@gmail.com, oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com, xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com, vladimir.murzin@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jan 09, 2026 at 06:46:04PM +0000, Will Deacon wrote:
-> On Tue, Jan 06, 2026 at 03:20:15PM +0000, Quentin Perret wrote:
-> > On Monday 05 Jan 2026 at 15:49:25 (+0000), Will Deacon wrote:
-> > >  /**
-> > > - * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-> > > - *				    track ownership.
-> > > + * kvm_pgtable_stage2_annotate() - Unmap and annotate pages in the IPA space
-> > > + *				   to track ownership (and more).
-> > >   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> > >   * @addr:	Base intermediate physical address to annotate.
-> > >   * @size:	Size of the annotated range.
-> > >   * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-> > >   *		page-table pages.
-> > > - * @owner_id:	Unique identifier for the owner of the page.
-> > > + * @annotation:	A 62-bit value that will be stored in the page tables.
-> > > + *		@annotation[0] and @annotation[63] must be 0.
-> > > + * 		@annotation[62:1] is stored in the page tables.
-> > >   *
-> > >   * By default, all page-tables are owned by identifier 0. This function can be
-> > >   * used to mark portions of the IPA space as owned by other entities. When a
-> > > @@ -673,8 +678,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > >   *
-> > >   * Return: 0 on success, negative error code on failure.
-> > >   */
-> > > -int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > -				 void *mc, u8 owner_id);
-> > > +int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > +				void *mc, kvm_pte_t annotation);
+On Fri, 16 Jan 2026 14:33:42 +0000,
+"Thomson, Jack" <jackabt.amazon@gmail.com> wrote:
+> 
+> 
+> Hey Marc,
+> 
+> Thanks for the review.
+> 
+> On 15/01/2026 9:51 am, Marc Zyngier wrote:
+> > [+ Vladimir, who was also looking at this patch]
 > > 
-> > While we're on this topic, perhaps we could go one step further and 'type'
-> > the annotation itself? For instance have a 'type' and 'meta' parameter
-> > directly at the kvm_pgatble_stage2_annotate() level instead of leaving
-> > that up to the callers. This would allow to have one place to allocate
-> > annotation 'types' (donated pages, locked PTE, MMIO guard, ...) and one
-> > way to serialize/deserialize them. That 'type' would be stored in top 2
-> > or 3 bits of the PTE for instance, and decoding of the 'meta' field would
-> > be dependant on the type value. Thoughts?
+> > On Tue, 13 Jan 2026 15:26:40 +0000,
+> > Jack Thomson <jackabt.amazon@gmail.com> wrote:
+> >> 
+> >> From: Jack Thomson <jackabt@amazon.com>
+> >> 
+> >> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
+> >> off the stage-2 faulting logic to either gmem_abort() or
+> >> user_mem_abort().
+> >> 
+> >> Add an optional page_size output parameter to user_mem_abort() to
+> >> return the VMA page size, which is needed when pre-faulting.
+> >> 
+> >> Update the documentation to clarify x86 specific behaviour.
+> >> 
+> >> Signed-off-by: Jack Thomson <jackabt@amazon.com>
+> >> ---
+> >>   Documentation/virt/kvm/api.rst |  3 +-
+> >>   arch/arm64/kvm/Kconfig         |  1 +
+> >>   arch/arm64/kvm/arm.c           |  1 +
+> >>   arch/arm64/kvm/mmu.c           | 79 ++++++++++++++++++++++++++++++++--
+> >>   4 files changed, 79 insertions(+), 5 deletions(-)
+> >> 
+> >> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> >> index 01a3abef8abb..44cfd9e736bb 100644
+> >> --- a/Documentation/virt/kvm/api.rst
+> >> +++ b/Documentation/virt/kvm/api.rst
+> >> @@ -6493,7 +6493,8 @@ Errors:
+> >>   KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
+> >>   for the current vCPU state.  KVM maps memory as if the vCPU generated a
+> >>   stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
+> >> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
+> >> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
+> >> +Accessed.
+> >>     In the case of confidential VM types where there is an initial
+> >> set up of
+> >>   private guest memory before the guest is 'finalized'/measured, this ioctl
+> >> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> >> index 4f803fd1c99a..6872aaabe16c 100644
+> >> --- a/arch/arm64/kvm/Kconfig
+> >> +++ b/arch/arm64/kvm/Kconfig
+> >> @@ -25,6 +25,7 @@ menuconfig KVM
+> >>   	select HAVE_KVM_CPU_RELAX_INTERCEPT
+> >>   	select KVM_MMIO
+> >>   	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+> >> +	select KVM_GENERIC_PRE_FAULT_MEMORY
+> >>   	select VIRT_XFER_TO_GUEST_WORK
+> >>   	select KVM_VFIO
+> >>   	select HAVE_KVM_DIRTY_RING_ACQ_REL
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index 4f80da0c0d1d..19bac68f737f 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -332,6 +332,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> >>   	case KVM_CAP_COUNTER_OFFSET:
+> >>   	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
+> >>   	case KVM_CAP_ARM_SEA_TO_USER:
+> >> +	case KVM_CAP_PRE_FAULT_MEMORY:
+> >>   		r = 1;
+> >>   		break;
+> >>   	case KVM_CAP_SET_GUEST_DEBUG2:
+> >> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> >> index 48d7c372a4cd..499b131f794e 100644
+> >> --- a/arch/arm64/kvm/mmu.c
+> >> +++ b/arch/arm64/kvm/mmu.c
+> >> @@ -1642,8 +1642,8 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>     static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t
+> >> fault_ipa,
+> >>   			  struct kvm_s2_trans *nested,
+> >> -			  struct kvm_memory_slot *memslot, unsigned long hva,
+> >> -			  bool fault_is_perm)
+> >> +			  struct kvm_memory_slot *memslot, unsigned long *page_size,
+> >> +			  unsigned long hva, bool fault_is_perm)
+> >>   {
+> >>   	int ret = 0;
+> >>   	bool topup_memcache;
+> >> @@ -1923,6 +1923,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >>   	kvm_release_faultin_page(kvm, page, !!ret, writable);
+> >>   	kvm_fault_unlock(kvm);
+> >>   +	if (page_size)
+> >> +		*page_size = vma_pagesize;
+> >> +
+> >>   	/* Mark the page dirty only if the fault is handled successfully */
+> >>   	if (writable && !ret)
+> >>   		mark_page_dirty_in_slot(kvm, memslot, gfn);
+> >> @@ -2196,8 +2199,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> >>   		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
+> >>   				 esr_fsc_is_permission_fault(esr));
+> >>   	else
+> >> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> >> -				     esr_fsc_is_permission_fault(esr));
+> >> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
+> >> +				     hva, esr_fsc_is_permission_fault(esr));
+> >>   	if (ret == 0)
+> >>   		ret = 1;
+> >>   out:
+> >> @@ -2573,3 +2576,71 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
+> >>     	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled,
+> >> now_enabled);
+> >>   }
+> >> +
+> >> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> >> +				    struct kvm_pre_fault_memory *range)
+> >> +{
+> >> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
+> >> +	struct kvm_s2_trans nested_trans, *nested = NULL;
+> >> +	unsigned long page_size = PAGE_SIZE;
+> >> +	struct kvm_memory_slot *memslot;
+> >> +	phys_addr_t ipa = range->gpa;
+> >> +	phys_addr_t end;
+> >> +	hva_t hva;
+> >> +	gfn_t gfn;
+> >> +	int ret;
+> >> +
+> >> +	if (vcpu_is_protected(vcpu))
+> >> +		return -EOPNOTSUPP;
+> > 
+> > This feels pretty odd. If you have advertised the capability, then
+> > saying "not supported" at this stage is not on.
+> > 
 > 
-> I don't think a global 'type' space is particularly beneficial, as most
-> annotations (with the exception of PTE_LOCKED) are specific to the owner
-> and putting them into a single number space will just waste bits.
+> Thanks good point, I think I can actually just drop this completely since
+> kvm_pvm_ext_allowed() would already exclude this as a capacility.
+>
+
+I think you still need some runtime handling, just in case userspace
+is acting silly.
+
+> >> +
+> >> +	/*
+> >> +	 * We may prefault on a shadow stage 2 page table if we are
+> >> +	 * running a nested guest.  In this case, we have to resolve the L2
+> >> +	 * IPA to the L1 IPA first, before knowing what kind of memory should
+> >> +	 * back the L1 IPA.
+> >> +	 *
+> >> +	 * If the shadow stage 2 page table walk faults, then we return
+> >> +	 * -EFAULT
+> >> +	 */
+> >> +	if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu) &&
+> >> +	    vcpu->arch.hw_mmu->nested_stage2_enabled) {
+> >> +		ret = kvm_walk_nested_s2(vcpu, ipa, &nested_trans);
+> >> +		if (ret)
+> >> +			return -EFAULT;
+> > 
+> > And then what? Userspace is completely screwed here, with no way to
+> > make any forward progress, because the L1 is in charge of that S2, and
+> > L1 is not running. What's the outcome? Light a candle and pray?
+> > 
+> > Also, the IPA you are passing as a parameter means absolutely nothing
+> > in the context of L2. Userspace doesn't have the faintest clue about
+> > the memory map presented to L2, as that's L1 business. L1 can
+> > absolutely present to L2 a memory map that doesn't have a single
+> > address in common with its own.
+> > 
+> > So this really doesn't work at all.
+> > 
+> Would just returning -EOPNOTSUPP in this case like:
+
+Absolutely *not*. Userspace has no idea what the guest is doing, and
+cannot influence it (other than disabling nesting altogether). This is
+just as bad a -EFAULT.
+
 > 
-> But I do like the idea of encoding an annotation type in the pte and
-> defining those per-owner. I think it would also make some of the code
-> more robust; for example, I noticed that __pkvm_guest_unshare_host()
-> isn't putting back the right annotation with my series when I started
-> looking at implementing your idea.
+>   if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu) &&
+>       vcpu->arch.hw_mmu->nested_stage2_enabled)
+>     return -EOPNOTSUPP;
+>
+> be the best way to continue for now?
+
+We both know that what you actually mean is "this doesn't match my use
+case, let someone else deal with it". To which my answer is that you
+either fully support pre-faulting, or you don't at all. There is no
+middle ground.
+
+> >> +
+> >> +		ipa = kvm_s2_trans_output(&nested_trans);
+> >> +		nested = &nested_trans;
+> >> +	}
+> >> +
+> >> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu))
+> >> +		return -ENOENT;
+> >> +
+> >> +	/* Generate a synthetic abort for the pre-fault address */
+> >> +	fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
+> >> +		ESR_ELx_FSC_FAULT_L(KVM_PGTABLE_LAST_LEVEL);
+> > 
+> > Why level 3? You must present a fault that matches the level at which
+> > the emulated fault would actually occur, because the rest of the
+> > infrastructure relies on that (at least on the permission path, and
+> > more to come).
+> > 
 > 
-> I'll come back with a diff. It won't be quite what you're suggesting,
-> but let's see what you think.
+> Ack, thanks I was relying on the fact `fault_is_perm` was hardcoded to
+> false. I'll replace with something like:
+> 
+>   pgt = vcpu->arch.hw_mmu->pgt;
+>   ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, &level);
+>   if (ret)
+>     return ret;
+>
+>   fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
+>     ESR_ELx_FSC_FAULT_L(level);
+>   fault_info->hpfar_el2 = HPFAR_EL2_NS |
+>     FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
 
-Ok, so this took a fair bit longer than I initially thought it would.
+If a mapping exists, you probably don't want to replay the fault. And
+this needs to occur while the mmu_lock is held.
 
-In the end, I've ended up with something closer to what you seem to have
-in mind: kvm_pgtable_stage2_annotate() now takes both a 'type' and an
-annotation but it's not without complexity:
+> 
+> > Taking a step back on all this, 90% of the problems are there because
+> > you are trying to support prefaulting a guest that is already running.
+> > If you limited this to actually *pre*-faulting the guest, it would be
+> > the easiest thing ever, and wouldn't suffer from any of the above (you
+> > can't be in a nested context if you haven't run).
+> > 
+> > What prevents you from doing so? I'm perfectly happy to make this a
+> > separate API if this contradicts other implementations. Or are you
+> > relying on other side effects of the "already running" state?
+> 
+> We would need this to work on an already running guest.
 
-  * We're extremely short on bits when endoding the guest gfn + handle.
-    The gfn can be 40 bits with LPA2 and 4k pages, so with the 16-bit
-    handle and a 4-bit type, that leaves only 3 bits for the owner.
+Then you need to fully support pre-faulting the guest even when it is
+in a nested context, without resorting to coping-out in situations
+that do not match your narrow use-case. Which means populating the
+canonical s2_mmu even when you're not in that particular context.
 
-  * Non-zero invalid ptes are 'counted', so I've had to adjust the
-    reclaim path to map pages back into the host immediately rather than
-    go via a typed annotation.
+Thanks,
 
-Despite that, I think it's a slight improvement for now. We may end up
-revisiting it if we want to squeeze more bits out of the host
-annotations, but I'll include it in v2 for you to have a look at.
+	M.
 
-Will
+-- 
+Jazz isn't dead. It just smells funny.
