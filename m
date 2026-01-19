@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4884135CBDA
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875E3221543
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826850; cv=none; b=qhhBcmU1Fp2iBVdqWEVFClLqeNrdQ5IowSSS50CnDy3MOpi6pxM2vBxPyd0eQ0/NehmEYoPKlRwx9eiPLqoasJ7AOKbGgO4JaQw8R3dR2vWRW5iL97ikEIqMdU2BRexBPASNQSeK01TyfbFGVRUuQbJcvLtbpXVH69Grt88x+10=
+	t=1768826853; cv=none; b=WOjqEL+GeBOYMthMbXIG0FmAm4GjL0siPy1QUoC+nJlUZdvcaWkT8AFDJDDqNSvO9CdTMFNa/eWhgFI5vUJ/ESp858xqJQQn2Dh+VprBin5Nvv5XLvmoiHDtUuCfGPjAkHX3gzui+yttDrhcQN1Gm5CEhXppqb0QsCeAEnv1noo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826850; c=relaxed/simple;
-	bh=+cARwCwpQUeDQnfqxAPpwj1RIaWT9jf8yyrYcxiDo58=;
+	s=arc-20240116; t=1768826853; c=relaxed/simple;
+	bh=QIytrQ+JfCPY7Q3YwnW8a4Og7XxTsWbx3KsFumlCxiQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PEC2xI5PKQ+r+R8k4am0O5c/vxNNmrhMvFT/pBqk2yr9aHGQKZsH9WyxqnRmBRRGzsXBUPi524LW7E8iB82/sG7sM0KFygdEROrORtIs9AlKkGgI5Tl3Lln3mkZgepNo+dmZX4Yuy+yyYhij1qRtil9wGkiCTAZTY46ygHi+h80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FU1DQ1dN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=FWVKbk25KrctsJpAz9YMzgJdymI/k/Mv6M2PxBnjwWvn50zaiTxrCZy1fxB6GLYr4qCSneOxPWPm471Hb/cHLTLTtKgLCVdFWTMZirnhTndmBwjgtu1PuO9q+Qse9ko99SHfm21OQERzpU0OhgOhOpLtfwIR0yBdDOlWAu0IRsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NiF+0H2b; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FU1DQ1dN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E7E9C116C6;
-	Mon, 19 Jan 2026 12:47:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NiF+0H2b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD18FC19424;
+	Mon, 19 Jan 2026 12:47:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826850;
-	bh=+cARwCwpQUeDQnfqxAPpwj1RIaWT9jf8yyrYcxiDo58=;
+	s=k20201202; t=1768826853;
+	bh=QIytrQ+JfCPY7Q3YwnW8a4Og7XxTsWbx3KsFumlCxiQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FU1DQ1dN49f34Tbibanzq/RpjM2rx6FphTkrfFGg+9UuLgeRQVwNRECzktrQ/Y54f
-	 RiStaCWL7fqqsHcbAeHeHAjrBGmjsGUEnunk97ptexbvUpp7++oIc3THLNNDHteU0L
-	 j2z4BD+ZJOS5nqXtJ0vwi7kqXlT5lP0rKwWoNnIZB8cbvFbJ4rSZgut6kPrfrfr38w
-	 lk/z13pmNt6DRPBnbFFx3leSbX/6MhEi5xj+c/GlWzjD1BbRi5LOuG/y9gTysgYxU7
-	 WVf7V1lUq4R6u6uHJjt6umh+dqq+ZzLL4MPKYPd1fFPisYG4OYz5MkhLyUWawrMh+6
-	 yMcNSq4xeV7SQ==
+	b=NiF+0H2bfF2Qb1ajGj1R+aEucc0tewjwIKdkT9f6PXgO2wIc2D4pTk5epyHp1dGE1
+	 gAkKapugTSt3Six+tATtLeRqtkuQRHCJT8Q/GFwHOGHJlDaYmwYDxU0ZyAXSWC1xh6
+	 PZB67fdHdxHbPrshnN6RQhTao0gibntg1WgTacs7nidGkNt+Eedv399yZtL2M97o9D
+	 sPMruWov3HvdfxDfmesVGvzYQWzNVOYN0LCYyWMu095yCiBlbFwffSa1BHJmLONoj6
+	 D904AWlQ4Ydkcytv7oAdVbJD4eHaZ0/9n4SCYmQ8L0Wvo2Onv3DiZa0KBP2MYqpvvA
+	 shv16tzAYoz6A==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH v2 12/35] KVM: arm64: Introduce __pkvm_host_donate_guest()
-Date: Mon, 19 Jan 2026 12:46:05 +0000
-Message-ID: <20260119124629.2563-13-will@kernel.org>
+Subject: [PATCH v2 13/35] KVM: arm64: Hook up donation hypercall to pkvm_pgtable_stage2_map()
+Date: Mon, 19 Jan 2026 12:46:06 +0000
+Message-ID: <20260119124629.2563-14-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260119124629.2563-1-will@kernel.org>
 References: <20260119124629.2563-1-will@kernel.org>
@@ -54,144 +54,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In preparation for supporting protected VMs, whose memory pages are
-isolated from the host, introduce a new pKVM hypercall to allow the
-donation of pages to a guest.
+Mapping pages into a protected guest requires the donation of memory
+from the host.
+
+Extend pkvm_pgtable_stage2_map() to issue a donate hypercall when the
+target VM is protected. Since the hypercall only handles a single page,
+the splitting logic used for the share path is not required.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h              |  1 +
- arch/arm64/include/asm/kvm_pgtable.h          |  2 +-
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 21 +++++++++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 30 +++++++++++++++++++
- 5 files changed, 55 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pkvm.c | 58 ++++++++++++++++++++++++++++++-------------
+ 1 file changed, 41 insertions(+), 17 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 2b5ceaed0d7e..2750b75b5b8f 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
- 	/* Hypercalls available only when pKVM has finalised */
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_donate_guest,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 8b78d573fbcf..9ce55442b621 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -98,7 +98,7 @@ typedef u64 kvm_pte_t;
- 					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index a39dacd1d617..1814e17d600e 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -373,31 +373,55 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	struct kvm_hyp_memcache *cache = mc;
+ 	u64 gfn = addr >> PAGE_SHIFT;
+ 	u64 pfn = phys >> PAGE_SHIFT;
++	u64 end = addr + size;
+ 	int ret;
  
- #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
--#define KVM_MAX_OWNER_ID		1
-+#define KVM_MAX_OWNER_ID		3
+-	if (size != PAGE_SIZE && size != PMD_SIZE)
+-		return -EINVAL;
+-
+ 	lockdep_assert_held_write(&kvm->mmu_lock);
++	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, end - 1);
  
- /*
-  * Used to indicate a pte for which a 'break-before-make' sequence is in
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 5f9d56754e39..9c0cc53d1dc9 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -28,6 +28,7 @@ enum pkvm_component_id {
- 	PKVM_ID_HOST,
- 	PKVM_ID_HYP,
- 	PKVM_ID_FFA,
-+	PKVM_ID_GUEST,
- };
+-	/*
+-	 * Calling stage2_map() on top of existing mappings is either happening because of a race
+-	 * with another vCPU, or because we're changing between page and block mappings. As per
+-	 * user_mem_abort(), same-size permission faults are handled in the relax_perms() path.
+-	 */
+-	mapping = pkvm_mapping_iter_first(&pgt->pkvm_mappings, addr, addr + size - 1);
+-	if (mapping) {
+-		if (size == (mapping->nr_pages * PAGE_SIZE))
++	if (kvm_vm_is_protected(kvm)) {
++		/* Protected VMs are mapped using RWX page-granular mappings */
++		if (WARN_ON_ONCE(size != PAGE_SIZE))
++			return -EINVAL;
++
++		if (WARN_ON_ONCE(prot != KVM_PGTABLE_PROT_RWX))
++			return -EINVAL;
++
++		/*
++		 * We raced with another vCPU.
++		 */
++		if (mapping)
+ 			return -EAGAIN;
  
- extern unsigned long hyp_nr_cpus;
-@@ -39,6 +40,7 @@ int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
- int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
-+int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
- int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
- 			    enum kvm_pgtable_prot prot);
- int __pkvm_host_unshare_guest(u64 gfn, u64 nr_pages, struct pkvm_hyp_vm *hyp_vm);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index ebcbdd1cb232..c04300b51c9a 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -238,6 +238,26 @@ static int pkvm_refill_memcache(struct pkvm_hyp_vcpu *hyp_vcpu)
- 			       &host_vcpu->arch.pkvm_memcache);
- }
+-		/* Remove _any_ pkvm_mapping overlapping with the range, bigger or smaller. */
+-		ret = __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+-		if (ret)
+-			return ret;
+-		mapping = NULL;
++		ret = kvm_call_hyp_nvhe(__pkvm_host_donate_guest, pfn, gfn);
++	} else {
++		if (WARN_ON_ONCE(size != PAGE_SIZE && size != PMD_SIZE))
++			return -EINVAL;
++
++		/*
++		 * We either raced with another vCPU or we're changing between
++		 * page and block mappings. As per user_mem_abort(), same-size
++		 * permission faults are handled in the relax_perms() path.
++		 */
++		if (mapping) {
++			if (size == (mapping->nr_pages * PAGE_SIZE))
++				return -EAGAIN;
++
++			/*
++			 * Remove _any_ pkvm_mapping overlapping with the range,
++			 * bigger or smaller.
++			 */
++			ret = __pkvm_pgtable_stage2_unshare(pgt, addr, end);
++			if (ret)
++				return ret;
++
++			mapping = NULL;
++		}
++
++		ret = kvm_call_hyp_nvhe(__pkvm_host_share_guest, pfn, gfn,
++					size / PAGE_SIZE, prot);
+ 	}
  
-+static void handle___pkvm_host_donate_guest(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(u64, pfn, host_ctxt, 1);
-+	DECLARE_REG(u64, gfn, host_ctxt, 2);
-+	struct pkvm_hyp_vcpu *hyp_vcpu;
-+	int ret = -EINVAL;
-+
-+	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-+	if (!hyp_vcpu || !pkvm_hyp_vcpu_is_protected(hyp_vcpu))
-+		goto out;
-+
-+	ret = pkvm_refill_memcache(hyp_vcpu);
-+	if (ret)
-+		goto out;
-+
-+	ret = __pkvm_host_donate_guest(pfn, gfn, hyp_vcpu);
-+out:
-+	cpu_reg(host_ctxt, 1) =  ret;
-+}
-+
- static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(u64, pfn, host_ctxt, 1);
-@@ -592,6 +612,7 @@ static const hcall_t host_hcall[] = {
+-	ret = kvm_call_hyp_nvhe(__pkvm_host_share_guest, pfn, gfn, size / PAGE_SIZE, prot);
+ 	if (WARN_ON(ret))
+ 		return ret;
  
- 	HANDLE_FUNC(__pkvm_host_share_hyp),
- 	HANDLE_FUNC(__pkvm_host_unshare_hyp),
-+	HANDLE_FUNC(__pkvm_host_donate_guest),
- 	HANDLE_FUNC(__pkvm_host_share_guest),
- 	HANDLE_FUNC(__pkvm_host_unshare_guest),
- 	HANDLE_FUNC(__pkvm_host_relax_perms_guest),
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 0abf6c3acdf7..f24e8ce2c40c 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -969,6 +969,36 @@ static int __guest_check_transition_size(u64 phys, u64 ipa, u64 nr_pages, u64 *s
- 	return 0;
- }
- 
-+int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
-+{
-+	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-+	u64 phys = hyp_pfn_to_phys(pfn);
-+	u64 ipa = hyp_pfn_to_phys(gfn);
-+	int ret;
-+
-+	host_lock_component();
-+	guest_lock_component(vm);
-+
-+	ret = __host_check_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_OWNED);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = __guest_check_page_state_range(vm, ipa, PAGE_SIZE, PKVM_NOPAGE);
-+	if (ret)
-+		goto unlock;
-+
-+	WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_GUEST));
-+	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
-+				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
-+				       &vcpu->vcpu.arch.pkvm_memcache, 0));
-+
-+unlock:
-+	guest_unlock_component(vm);
-+	host_unlock_component();
-+
-+	return ret;
-+}
-+
- int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
- 			    enum kvm_pgtable_prot prot)
- {
 -- 
 2.52.0.457.g6b5491de43-goog
 
