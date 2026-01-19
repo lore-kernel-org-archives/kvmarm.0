@@ -1,168 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687CF22D792
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 15:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FB81A3172;
+	Mon, 19 Jan 2026 15:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768836703; cv=none; b=E07/IK/o6rRDzsWI1wG30mzyEVD2vU0PShIj+hTYFLqiZDWAlIu16dz5h9vT5dV+J3ccLN3qyAIYUDg4vQNsGnxegnbd4YkuVSoEksrUNNRH8UpnNwxS0TIObWPwVgX+FJzU60Kzt86TTAVWB0VaqQKut19tm1oiAn/fLKwX0s8=
+	t=1768836855; cv=none; b=f0qqTFRpZWSiLa7vv8Id3DdetFygQk9i2rPSZj6Y/o4kbVwB0WZwE3w2C4eRXIJnx4t4ZjGrD5FLN6jc0IRUIHd/dj12C/GPo9S6Z0a8IQcB6qcC4BplTd8Wm/DPHG1kS1GT+ixIdqpCkAWhmuCJd9LNm0w5EitUECqYJzLYZpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768836703; c=relaxed/simple;
-	bh=/rgSfvuoOmWZqLiBHAMfWUI3zYu8SsF6wQBhEmGOkj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AIqU0cPFBbR08UKprILjXXjbyDe+s9Nk1HhSNYRHr521BMLSIfmJV8AWoHkwFwYjevzSjikQI1x+o0m80Vx5MdIZ3O6SFDJavmSgLrIXHVJNo6IxzqVxg18XAmaoRvzYF/2+iYhLQTh9YYM2M3+Ml69hLijxdPsfZwv8Hi8dvcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1ACDF497;
-	Mon, 19 Jan 2026 07:31:34 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DBC2F3F694;
-	Mon, 19 Jan 2026 07:31:35 -0800 (PST)
-Message-ID: <22b2f36f-80c2-49b7-9e8a-4528a5113ede@arm.com>
-Date: Mon, 19 Jan 2026 15:31:34 +0000
+	s=arc-20240116; t=1768836855; c=relaxed/simple;
+	bh=EV9T2myKyHW3Va2uCiNnqCvAhEhltNmAw8tpzkkdAzE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j0b89vzcTsc0LtnG1/6tXNJKLcbqt3wH2DvX2zHQ67yLTjrzhhB67KohcItqTzdJhsXKQXnRD2pctSIGyANls2drpe/76xnh/6KPFZviSZePZzXMFGJBwPTy7MzwFqqUpgNscTcGTZ31JL/K5fVLp72FCXT4ZEtcqmChFwPfCn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnTPBamt; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnTPBamt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6981CC116C6;
+	Mon, 19 Jan 2026 15:34:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768836854;
+	bh=EV9T2myKyHW3Va2uCiNnqCvAhEhltNmAw8tpzkkdAzE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hnTPBamtcpdz1LcA6KzmSTKkAZ+TFdl7qyRNKWE3Akp48IOYXqvoOqmcFIyjLmtcA
+	 j8slHUynBdR7vCN2o5vdKzJJ+AJPt2faLJ7NDN9kmc9vEUgolojkGLCFHaiaM8DGuy
+	 ayds765ZMJhLuH/0dSdeAPclWKXpdn/ehgC1SI3hNTv5WrpcA59Shg2UVKLtjNiadm
+	 3dnm61SJHT4FfTqP/Z6CuaT9OqoAvL95U62K2ZA0FlZNfEPAR9iEkfm1YIoieddOeO
+	 r6fBFs3NruE+FS+bG+MFkqIqDe47vIrXlGpGOlIKd9ZSmW1mpyAJPmYXEWOH+1RsVQ
+	 g96pudsYi2RCQ==
+Date: Mon, 19 Jan 2026 15:34:07 +0000
+From: Will Deacon <will@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
+	broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
+	mark.rutland@arm.com, arnd@arndb.de,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
+ for swpX emulation.
+Message-ID: <aW5O714hfl7DCl04@willie-the-truck>
+References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+ <20251214112248.901769-10-yeoreum.yun@arm.com>
+ <86ms3knl6s.wl-maz@kernel.org>
+ <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 10/47] arm64: mpam: Initialise and context switch the
- MPAMSM_EL1 register
-To: Gavin Shan <gshan@redhat.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-11-ben.horgan@arm.com>
- <08172e9b-37d6-4e90-a5a9-b8a083a5a3c6@redhat.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <08172e9b-37d6-4e90-a5a9-b8a083a5a3c6@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
 
-Hi Gavin,
+On Mon, Dec 15, 2025 at 09:56:04AM +0000, Yeoreum Yun wrote:
+> Hi,
+> 
+> > On Sun, 14 Dec 2025 11:22:48 +0000,
+> > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> > >
+> > > Apply the FEAT_LSUI instruction to emulate the deprecated swpX
+> > > instruction, so that toggling of the PSTATE.PAN bit can be removed when
+> > > LSUI-related instructions are used.
+> > >
+> > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> >
+> > It really begs the question: what are the odds of ever seeing a CPU
+> > that implements both LSUI and AArch32?
+> >
+> > This seems extremely unlikely to me.
+> 
+> Well, I'm not sure how many CPU will have
+> both ID_AA64PFR0_EL1.EL0 bit as 0b0010 and FEAT_LSUI
+> (except FVP currently) -- at least the CPU what I saw,
+> most of them set ID_AA64PFR0_EL1.EL0 as 0b0010.
 
-On 1/19/26 06:51, Gavin Shan wrote:
-> Hi Ben,
-> 
-> On 1/13/26 12:58 AM, Ben Horgan wrote:
->> The MPAMSM_EL1 sets the MPAM labels, PMG and PARTID, for loads and stores
->> generated by a shared SMCU. Disable the traps so the kernel can use it
->> and
->> set it to the same configuration as the per-EL cpu MPAM configuration.
->>
->> If an SMCU is not shared with other cpus then it is implementation
->> defined whether the configuration from MPAMSM_EL1 is used or that from
->> the appropriate MPAMy_ELx. As we set the same, PMG_D and PARTID_D,
->> configuration for MPAM0_EL1, MPAM1_EL1 and MPAMSM_EL1 the resulting
->> configuration is the same regardless.
->>
->> The range of valid configurations for the PARTID and PMG in MPAMSM_EL1 is
->> not currently specified in Arm Architectural Reference Manual but the
->> architect has confirmed that it is intended to be the same as that for
->> the
->> cpu configuration in the MPAMy_ELx registers.
->>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since v2:
->> Mention PMG_D and PARTID_D specifically int he commit message
->> Add paragraph in commit message on range of MPAMSM_EL1 fields
->> ---
->>   arch/arm64/include/asm/el2_setup.h | 3 ++-
->>   arch/arm64/include/asm/mpam.h      | 2 ++
->>   arch/arm64/kernel/cpufeature.c     | 2 ++
->>   arch/arm64/kernel/mpam.c           | 3 +++
->>   4 files changed, 9 insertions(+), 1 deletion(-)
->>
-> 
-> One nitpick below...
-> 
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> 
->> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/
->> asm/el2_setup.h
->> index cacd20df1786..d37984c09799 100644
->> --- a/arch/arm64/include/asm/el2_setup.h
->> +++ b/arch/arm64/include/asm/el2_setup.h
->> @@ -504,7 +504,8 @@
->>       check_override id_aa64pfr0,
->> ID_AA64PFR0_EL1_MPAM_SHIFT, .Linit_mpam_\@, .Lskip_mpam_\@, x1, x2
->>     .Linit_mpam_\@:
->> -    msr_s    SYS_MPAM2_EL2, xzr        // use the default partition
->> +    mov    x0, #MPAM2_EL2_EnMPAMSM_MASK
->> +    msr_s    SYS_MPAM2_EL2, x0        // use the default partition,
->>                           // and disable lower traps
->>       mrs_s    x0, SYS_MPAMIDR_EL1
->>       tbz    x0, #MPAMIDR_EL1_HAS_HCR_SHIFT, .Lskip_mpam_\@  // skip
->> if no MPAMHCR reg
->> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/
->> mpam.h
->> index 14011e5970ce..7b3d3abad162 100644
->> --- a/arch/arm64/include/asm/mpam.h
->> +++ b/arch/arm64/include/asm/mpam.h
->> @@ -53,6 +53,8 @@ static inline void mpam_thread_switch(struct
->> task_struct *tsk)
->>           return;
->>         write_sysreg_s(regval, SYS_MPAM1_EL1);
->> +    if (system_supports_sme())
->> +        write_sysreg_s(regval & (MPAMSM_EL1_PARTID_D |
->> MPAMSM_EL1_PMG_D), SYS_MPAMSM_EL1);
->>       isb();
->>         /* Synchronising the EL0 write is left until the ERET to EL0 */
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/
->> cpufeature.c
->> index 0cdfb3728f43..2ede543b3eeb 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -2491,6 +2491,8 @@ cpu_enable_mpam(const struct
->> arm64_cpu_capabilities *entry)
->>           regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
->>         write_sysreg_s(regval, SYS_MPAM1_EL1);
->> +    if (system_supports_sme())
->> +        write_sysreg_s(regval & (MPAMSM_EL1_PARTID_D |
->> MPAMSM_EL1_PMG_D), SYS_MPAMSM_EL1);
->>       isb();
->>         /* Synchronising the EL0 write is left until the ERET to EL0 */
->> diff --git a/arch/arm64/kernel/mpam.c b/arch/arm64/kernel/mpam.c
->> index dbe0a2d05abb..6ce4a36469ce 100644
->> --- a/arch/arm64/kernel/mpam.c
->> +++ b/arch/arm64/kernel/mpam.c
->> @@ -28,6 +28,9 @@ static int mpam_pm_notifier(struct notifier_block
->> *self,
->>            */
->>           regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
->>           write_sysreg_s(regval, SYS_MPAM1_EL1);
->> +        if (system_supports_sme())
->> +            write_sysreg_s(regval & (MPAMSM_EL1_PARTID_D |
->> MPAMSM_EL1_PMG_D),
->> +                       SYS_MPAMSM_EL1);
-> 
-> { } is missed here.
+Just to make sure I understand you, you're saying that you have seen
+a real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
 
-Addded.
+> If you this seems useless, I don't have any strong comments
+> whether drop patches related to deprecated swp instruction parts
+> (patch 8-9 only) or not.
+> (But, I hope to pass this decision to maintaining perspective...)
 
-> 
->>           isb();
->>             write_sysreg_s(regval, SYS_MPAM0_EL1);
-> 
-> Thanks,
-> Gavin
-> 
+I think it depends on whether or not the hardware exists. Marc thinks
+that it's extremely unlikely whereas you appear to have seen some (but
+please confirm).
 
-Thanks,
-
-Ben
-
+Will
