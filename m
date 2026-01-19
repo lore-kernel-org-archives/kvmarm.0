@@ -1,359 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9E635E555
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826887; cv=none; b=LntkZlLHiN7L0yIeBsKavhX0toAeIKVAUww5JV7jRUEDRJB/QLJVI0hB3uqKI4BM2t/OFlxgi1WS9l0ic042Bv3XeP2S4myYkQGDUXXvfqTwFqZ7fP/M15DhE09GbUCuMLuPj9FyqqbRyR8jN1jHtsC0clzxSdas/KBZ+5cN6dk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826887; c=relaxed/simple;
-	bh=GpcJQTp33npVBpg5/HBuV7HtkRiZ8dpEfkojHzLrxio=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vGMyVgZHENtsCPemJiAaVrqSFsX688zLr9bVTotHV78L7Jvx1Qjstzx9P8P06Jdp4cIsGFzhUwWysFONLsbsgRk8J6v1t55ab6j9aCTykKNTQkeF9rb7sdUxOwnrb5CvFsa3xJwfNiao0TvIuROlRiqFmfebrDjlz9Kb0iZsiBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vGhZ2owo; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F2835F8D2
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768826888; cv=pass; b=tdds7n7tGauUhsbM+JzjTZ+1HaILfDx3ipVJIrXYyDhFOy5UhekVCkgFvZDgBPA3598Ir9ymxpW3yr0iXdE8V60bg876GqM+3MCkcS7bB/0+g5zm6ZFLZ4CRL/rZ21nuniElBUC+uZnWrkqaWWXAc5l7k2hQuOxnWp+0pPmQ1H0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768826888; c=relaxed/simple;
+	bh=kQHpNwAOUKHPYMoA/Ux1hVpdJHc11cXbz0W7Aqrta0E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jdi84sXpQd4ZiIQ3F3mC1kdy2rC1aJTqrIj3KO5NKJ3HPoidzEDrDCk9siwSWr5xgjuV2WUQYc1PQHtrtafr+Qy3SL9FkMQwyPU+QGnzsZrpV6V7BM+Q4UZCwo2yCOAusfTusU7X7AkQyA+pb74YxwvPfbtj9gwdn7k1NEICHwI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UWI0VLVe; arc=pass smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vGhZ2owo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9987BC19424;
-	Mon, 19 Jan 2026 12:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826887;
-	bh=GpcJQTp33npVBpg5/HBuV7HtkRiZ8dpEfkojHzLrxio=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vGhZ2owoBxlKN1ximzep3m6vJQ2O4A8pBN1Er2A2nULoEIHtKqlAvNBC3IZSovm8I
-	 weVRf/4DMGtyTxC7NjiUrplv4fpChv4rTDDSGvhmwFgi3IpWddIREdi49lRddGSL4Z
-	 GeXeXZgRJlijt/Av7ISrq/avjVKeW/WJOlxdmmtnkByJQzNsx0JUk2Eu2d8/FWCsHO
-	 O2l7UETkLCxhza7Sv8plsqvUsywyynnYZjeMh2aQBBafhkBZD757XbnB1rWxKmz8xF
-	 Gqt9jiS8ShWPskg3SNE7sPZ/3jzv9/UWqBIk/C5excH6XN1ghQgMIDxBCQSbZu7yxa
-	 EM8EwMsOpP6VA==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH v2 24/35] KVM: arm64: Introduce hypercall to force reclaim of a protected page
-Date: Mon, 19 Jan 2026 12:46:17 +0000
-Message-ID: <20260119124629.2563-25-will@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260119124629.2563-1-will@kernel.org>
-References: <20260119124629.2563-1-will@kernel.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UWI0VLVe"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so992081866b.2
+        for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 04:48:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1768826885; cv=none;
+        d=google.com; s=arc-20240605;
+        b=IPFuFZ8nGl3MDj4KDsQSm4D7TTMZ8wLmZH92lYI8Cxp3BiFtTmaw5d8vR4x41o6sak
+         K6ZVFtN8QaPgyU3x8oXb7s1nlEYoM5Ds4cO3FOGw5DT8luGT/cjAI6zUT9awuscpquDE
+         sRWz/cuibuqfEtA47RkNXDWHZMSnomgClWMl3l9MC9LoDq0BzDiUlJc0DOWt0Jqj85tA
+         innL4D4vo9YVzbrMYoyH9ytQLZWwvrzGzYYT/SuzK9OJwkGS7T/ZqIk7I21+lTA/g3I8
+         NzQCWnfqUG4Kh3AkHN0UC4QrJ+yvqqnhSrGN5UkDxFTDSVExB7xhY98CHEefrelYqVTF
+         Z+TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
+        fh=f+QNdRojIybo70HNFxmM6ucnrMt5hWhZ5Euh9+yVHTc=;
+        b=aQJjfavJ4z5rMER83iGFzZrcdWEddOZPNy7X/yNe/wB0NFYTREhYKIE1IGZKjOcCAv
+         X6YolHRIGEH7pSRpFy66PdBBM1dHTQOl4HeqbNzu8Z4gvxmKJiYY4JFLLl633BY+I5PC
+         hIldegybP1yAU2vnKH8dD5GQ3ToBymkxLyB1V2K1WahBkoUhbzXjOnrdtP88ERuk1bvS
+         qPwuAX4xD81oVPT+OoSnBnMDHAMS6mzdH9V4GbLyg+Hy3/IQf729nSpXvdDPj8N/oFoH
+         edRe9j0RKvpucScug3T3+qus2xAlpyG2ApdKiXFLnav8x75wpGSqzjCSCZ2rCtfgy51M
+         5G5g==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1768826885; x=1769431685; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
+        b=UWI0VLVefwlo8ylrQbeSsTz9RTHZf8mkVfK4M5D6gdGlI7nOqqRLoucjUJ3eD042Au
+         t8YHtki9xA5GKorOC2xzecayr4UC9ZUZMlenFIXVvZ/ZTCl5nk/SzRmVma5z/YmrzFkt
+         DK8Ej8ePwMoGQ9IXqTMrddg7AgXNRpWfZNligqdoePqlB51sjXY5sPihinxagYy+HbC/
+         O238fCP5QtxjFbUbYGDgAR2v1rAcLyqfUryMZvi7fKa0+OJ9naGQC4qg7Kelx+ev5xzg
+         LHs5DH8pbNpV0M5I/bM+2JS6gHrpYjerfuuzOf+w4wXjd3Rv36Kw9zvs93SNgOC3zbUi
+         XoFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768826885; x=1769431685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
+        b=ugiHh2nQFNCvq3YPCkQqDwS1jy7N2eMp6xWi0hbQt3e5cB8r6ha4gY//XDBq6QN3k5
+         VNDzJpFnOKjhaXiiuU/2B9qRCsyj/lx41EXlsaZSEoXRsybjQt4LPxIWrizPmJNIxpCd
+         s6NDFlRpSWSCllDnJk2zgFy8o0agdezHmHuZNjNvYHa/h5LLjlIDpQPaNRSleHf+/8N4
+         qkjhvw2ZgT4IsDKxZnHXboyQw+kHidzyDeH8xVQhyf0og8GzQDDut980MR7ffYcqE15V
+         cTor8dB8dmC0gO4zEcXSbT40ZEWGhNPlnwRSQUTMpjVv9pghNHllkPSxzo8Ns8x9e1DX
+         hXgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXeF9BZATzSp2IA+gOUsa4Nun7d9hTwgmT4wB2PHEHEnTWXyQr/Kkh+bETpHmoOsuRhzpS34m0=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwjKV+NzE8MEiL+rfvL+9FbyJTMo26hfdwzbP8MgPAg2lSiAd7O
+	2whxXdBLNJPkefb/HCDOGFrgv8Hr/o6sDdwAt+9rccbmlPd7hg/kvSjwZdX2qdk2GGMVG0Zo4TN
+	3yPY+SW1IDhXPT6HG89bVMu9GSQd5f4J54dbjJ4Sf
+X-Gm-Gg: AY/fxX41tWIKo3CvuWkrf0fOyrP/KU6g5M5xwERhAyGYOdtNrJi+RK4e/tQB7huewvr
+	/EyKmmWGgRcxA4dN/tCi1ajWQ9fsFg5JjpozrX5P6XDO6aA6pcjNcf3T5O25QuzstXOUc6JMiJb
+	6klLrRabgg4VhdLFhNGfWZZ6J5koXiR09QzIRpu7c9V9gY8+yycScoYzF2UAbtKBFBw0Jp22mv2
+	ACE7d6kShVVMXQWZ3xpZh2SqdWTDb3bVgfXdV5dB43R/ECLq8O4OWeXweIAT4R1Pet4KjDLmh+5
+	BZuGlZd/u2dpanxSBsAYk5hxgKh7edRBn1id+9fOzzKxMQo=
+X-Received: by 2002:a17:907:3f8a:b0:b87:7485:b4a8 with SMTP id
+ a640c23a62f3a-b8792b3c4e1mr857024566b.0.1768826884302; Mon, 19 Jan 2026
+ 04:48:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260112165914.4086692-1-ben.horgan@arm.com> <20260112165914.4086692-30-ben.horgan@arm.com>
+ <CALPaoCh+mRLJEfhKBve3hRf+vHHoObjvWRt74OfpopgtR9g9FQ@mail.gmail.com> <c157d2b6-7282-438f-b9e7-1a24be3fbf53@arm.com>
+In-Reply-To: <c157d2b6-7282-438f-b9e7-1a24be3fbf53@arm.com>
+From: Peter Newman <peternewman@google.com>
+Date: Mon, 19 Jan 2026 13:47:52 +0100
+X-Gm-Features: AZwV_QiZJBdvmI194c6LN0fqut2vJhOeVYj5jDyWBOT_GKG0XUzMZqV82Gtifu8
+Message-ID: <CALPaoCi0fR5sUVsjXi25XHBrhn3whFvKDpEvUGSM5Hjd2LZP6w@mail.gmail.com>
+Subject: Re: [PATCH v3 29/47] arm_mpam: resctrl: Pick classes for use as mbm counters
+To: James Morse <james.morse@arm.com>
+Cc: Ben Horgan <ben.horgan@arm.com>, amitsinght@marvell.com, baisheng.gao@unisoc.com, 
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, 
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, 
+	fenghuay@nvidia.com, gshan@redhat.com, jonathan.cameron@huawei.com, 
+	kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, punit.agrawal@oss.qualcomm.com, 
+	quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, 
+	scott@os.amperecomputing.com, sdonthineni@nvidia.com, 
+	tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, 
+	will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce a new hypercall, __pkvm_force_reclaim_guest_page(), to allow
-the host to forcefully reclaim a physical page that was previous donated
-to a protected guest. This results in the page being zeroed and the
-previous guest mapping being poisoned so that new pages cannot be
-subsequently donated at the same IPA.
+Hi James,
 
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/kvm_asm.h              |   1 +
- arch/arm64/include/asm/kvm_pgtable.h          |   6 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   1 +
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |   6 +
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   1 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 127 +++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                |   4 +-
- 8 files changed, 152 insertions(+), 2 deletions(-)
+On Mon, Jan 19, 2026 at 1:04=E2=80=AFPM James Morse <james.morse@arm.com> w=
+rote:
+>
+> Hi Peter,
+>
+> On 15/01/2026 15:49, Peter Newman wrote:
+> > On Mon, Jan 12, 2026 at 6:02=E2=80=AFPM Ben Horgan <ben.horgan@arm.com>=
+ wrote:
+> >> From: James Morse <james.morse@arm.com>
+> >>
+> >> resctrl has two types of counters, NUMA-local and global. MPAM has onl=
+y
+> >> bandwidth counters, but the position of the MSC may mean it counts
+> >> NUMA-local, or global traffic.
+> >>
+> >> But the topology information is not available.
+> >>
+> >> Apply a heuristic: the L2 or L3 supports bandwidth monitors, these are
+> >> probably NUMA-local. If the memory controller supports bandwidth monit=
+ors,
+> >> they are probably global.
+>
+> > Are remote memory accesses not cached? How do we know an MBWU monitor
+> > residing on a cache won't count remote traffic?
+>
+> It will, yes you get double counting. Is forbidding both mbm_total and mb=
+m_local preferable?
+>
+> I think this comes from 'total' in mbm_total not really having the obviou=
+s meaning of the
+> word:
+> If I have CPUs in NUMA-A and no memory controllers, then NUMA-B has no CP=
+Us, and all the
+> memory-controllers.
+> With MPAM: we've only got one bandwidth counter, it doesn't know where th=
+e traffic goes
+> after the MSC. mbm-local on the L3 would reflect all the bandwidth, and m=
+bm-total on the
+> memory-controllers would have the  same number.
+> I think on x86 mbm_local on the CPUs would read zero as zero traffic went=
+ to the 'local'
+> memory controller, and mbm_total would reflect all the memory bandwidth. =
+(so 'total'
+> really means 'other')
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 2e7e8e7771f6..39e4e588ca4f 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -90,6 +90,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_force_reclaim_guest_page,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index eb2a6258d83d..4c069f875a85 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -114,6 +114,12 @@ enum kvm_invalid_pte_type {
- 	 * ownership.
- 	 */
- 	KVM_HOST_INVALID_PTE_TYPE_DONATION,
-+
-+	/*
-+	 * The page has been forcefully reclaimed from the guest by the
-+	 * host.
-+	 */
-+	KVM_GUEST_INVALID_PTE_TYPE_POISONED,
- };
- 
- static inline bool kvm_pte_valid(kvm_pte_t pte)
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index cde38a556049..f27b037abaf3 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
- int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
- int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
-+int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
- int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
- int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
- 			    enum kvm_pgtable_prot prot);
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-index dee1a406b0c2..4cedb720c75d 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-@@ -30,6 +30,12 @@ enum pkvm_page_state {
- 	 * struct hyp_page.
- 	 */
- 	PKVM_NOPAGE			= BIT(0) | BIT(1),
-+
-+	/*
-+	 * 'Meta-states' which aren't encoded directly in the PTE's SW bits (or
-+	 * the hyp_vmemmap entry for the host)
-+	 */
-+	PKVM_POISON			= BIT(2),
- };
- #define PKVM_PAGE_STATE_MASK		(BIT(0) | BIT(1))
- 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index 506831804f64..a5a7bb453f3e 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -78,6 +78,7 @@ int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
- int __pkvm_start_teardown_vm(pkvm_handle_t handle);
- int __pkvm_finalize_teardown_vm(pkvm_handle_t handle);
- 
-+struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle);
- struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
- 					 unsigned int vcpu_idx);
- void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index f43c50ae2d81..e68b5d24bdad 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -570,6 +570,13 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
- 	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
- }
- 
-+static void handle___pkvm_force_reclaim_guest_page(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-+
-+	cpu_reg(host_ctxt, 1) = __pkvm_host_force_reclaim_page_guest(phys);
-+}
-+
- static void handle___pkvm_reclaim_dying_guest_page(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
-@@ -631,6 +638,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__pkvm_unreserve_vm),
- 	HANDLE_FUNC(__pkvm_init_vm),
- 	HANDLE_FUNC(__pkvm_init_vcpu),
-+	HANDLE_FUNC(__pkvm_force_reclaim_guest_page),
- 	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
- 	HANDLE_FUNC(__pkvm_start_teardown_vm),
- 	HANDLE_FUNC(__pkvm_finalize_teardown_vm),
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index f4638fe9d77a..49b309b8d7d2 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -613,6 +613,35 @@ static u64 host_stage2_encode_gfn_meta(struct pkvm_hyp_vm *vm, u64 gfn)
- 	       FIELD_PREP(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, gfn);
- }
- 
-+static int host_stage2_decode_gfn_meta(kvm_pte_t pte, struct pkvm_hyp_vm **vm,
-+				       u64 *gfn)
-+{
-+	pkvm_handle_t handle;
-+	u64 meta;
-+
-+	if (WARN_ON(kvm_pte_valid(pte)))
-+		return -EINVAL;
-+
-+	if (FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) !=
-+	    KVM_HOST_INVALID_PTE_TYPE_DONATION) {
-+		return -EINVAL;
-+	}
-+
-+	if (FIELD_GET(KVM_HOST_DONATION_PTE_OWNER_MASK, pte) != PKVM_ID_GUEST)
-+		return -EPERM;
-+
-+	meta = FIELD_GET(KVM_HOST_DONATION_PTE_EXTRA_MASK, pte);
-+	handle = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
-+	*vm = get_vm_by_handle(handle);
-+	if (!*vm) {
-+		/* We probably raced with teardown; try again */
-+		return -EAGAIN;
-+	}
-+
-+	*gfn = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, meta);
-+	return 0;
-+}
-+
- static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot prot)
- {
- 	/*
-@@ -809,8 +838,20 @@ static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_pa
- 	return 0;
- }
- 
-+static bool guest_pte_is_poisoned(kvm_pte_t pte)
-+{
-+	if (kvm_pte_valid(pte))
-+		return false;
-+
-+	return FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) ==
-+	       KVM_GUEST_INVALID_PTE_TYPE_POISONED;
-+}
-+
- static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
- {
-+	if (guest_pte_is_poisoned(pte))
-+		return PKVM_POISON;
-+
- 	if (!kvm_pte_valid(pte))
- 		return PKVM_NOPAGE;
- 
-@@ -839,6 +880,8 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
- 	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
- 	if (ret)
- 		return ret;
-+	if (guest_pte_is_poisoned(pte))
-+		return -EHWPOISON;
- 	if (!kvm_pte_valid(pte))
- 		return -ENOENT;
- 	if (level != KVM_PGTABLE_LAST_LEVEL)
-@@ -1104,6 +1147,84 @@ static void hyp_poison_page(phys_addr_t phys)
- 	hyp_fixmap_unmap();
- }
- 
-+static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
-+				      u64 *gfn)
-+{
-+	enum pkvm_page_state state;
-+	kvm_pte_t pte;
-+	s8 level;
-+	int ret;
-+
-+	if (!addr_is_memory(phys))
-+		return -EFAULT;
-+
-+	state = get_host_state(hyp_phys_to_page(phys));
-+	switch (state) {
-+	case PKVM_PAGE_OWNED:
-+	case PKVM_PAGE_SHARED_OWNED:
-+	case PKVM_PAGE_SHARED_BORROWED:
-+		/* The access should no longer fault; try again. */
-+		return -EAGAIN;
-+	case PKVM_NOPAGE:
-+		break;
-+	default:
-+		return -EPERM;
-+	}
-+
-+	ret = kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, &level);
-+	if (ret)
-+		return ret;
-+
-+	if (WARN_ON(level != KVM_PGTABLE_LAST_LEVEL))
-+		return -EINVAL;
-+
-+	return host_stage2_decode_gfn_meta(pte, vm, gfn);
-+}
-+
-+int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys)
-+{
-+	struct pkvm_hyp_vm *vm;
-+	u64 gfn, ipa, pa;
-+	kvm_pte_t pte;
-+	int ret;
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	host_lock_component();
-+
-+	ret = host_stage2_get_guest_info(phys, &vm, &gfn);
-+	if (ret)
-+		goto unlock_host;
-+
-+	ipa = hyp_pfn_to_phys(gfn);
-+	guest_lock_component(vm);
-+	ret = get_valid_guest_pte(vm, ipa, &pte, &pa);
-+	if (ret)
-+		goto unlock_guest;
-+
-+	WARN_ON(pa != phys);
-+	if (guest_get_page_state(pte, ipa) != PKVM_PAGE_OWNED) {
-+		ret = -EPERM;
-+		goto unlock_guest;
-+	}
-+
-+	/* We really shouldn't be allocating, so don't pass a memcache */
-+	ret = kvm_pgtable_stage2_annotate(&vm->pgt, ipa, PAGE_SIZE, NULL,
-+					  KVM_GUEST_INVALID_PTE_TYPE_POISONED,
-+					  0);
-+	if (ret)
-+		goto unlock_guest;
-+
-+	hyp_poison_page(phys);
-+	WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HOST));
-+unlock_guest:
-+	guest_unlock_component(vm);
-+unlock_host:
-+	host_unlock_component();
-+	hyp_spin_unlock(&vm_table_lock);
-+
-+	return ret;
-+}
-+
- int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
- {
- 	u64 ipa = hyp_pfn_to_phys(gfn);
-@@ -1138,7 +1259,11 @@ int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
- 	guest_unlock_component(vm);
- 	host_unlock_component();
- 
--	return ret;
-+	/*
-+	 * -EHWPOISON implies that the page was forcefully reclaimed already
-+	 * so return success for the GUP pin to be dropped.
-+	 */
-+	return ret && ret != -EHWPOISON ? ret : 0;
- }
- 
- int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index c5772417372d..2836c68c1ea5 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -231,10 +231,12 @@ void pkvm_hyp_vm_table_init(void *tbl)
- /*
-  * Return the hyp vm structure corresponding to the handle.
-  */
--static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
-+struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
- {
- 	unsigned int idx = vm_handle_to_idx(handle);
- 
-+	hyp_assert_lock_held(&vm_table_lock);
-+
- 	if (unlikely(idx >= KVM_MAX_PVMS))
- 		return NULL;
- 
--- 
-2.52.0.457.g6b5491de43-goog
+Our software is going off the definition from the Intel SDM:
 
+"This event monitors the L3 external bandwidth satisfied by the local
+memory. In most platforms that support this event, L3 requests are
+likely serviced by a memory system with non-uniform memory
+architecture. This allows bandwidth to off-package memory resources to
+be tracked by subtracting local from total bandwidth (for instance,
+bandwidth over QPI to a memory controller on another physical
+processor could be tracked by subtraction).
+
+On NUMA-capable hardware that can support this event where all memory
+is local, mbm_local =3D=3D mbm_total, but in practice you can't read them
+at the same time from userspace, so if you read mbm_total first,
+you'll probably get a small negative result for remote bandwidth.
+
+>
+> I think what MPAM is doing here is still useful as a system normally has =
+both CPUs and
+> memory controllers in the NUMA nodes, and you can use this to spot a cont=
+rol/monitor group
+> on a NUMA-node that is hammering all the memory (outlier mbm_local), or t=
+he same where a
+> NUMA-node's memory controller is getting hammered by all the NUMA nodes (=
+outlier
+> mbm_total)
+>
+> I've not heard of a platform with both memory bandwidth monitors at L3 an=
+d the memory
+> controller, so this may be a theoretical issue.
+>
+> Shall we only expose one of mbm-local/total to prevent this being seen by=
+ user-space?
+
+I believe in the current software design, MPAM is only able to support
+mbm_total, as an individual MSC (or class of MSCs with the same
+configuration) can't separate traffic by destination, so it must be
+the combined value. On a hardware design where MSCs were placed such
+that one only counts local traffic and another only counts remote, the
+resctrl MPAM driver would have to understand the hardware
+configuration well enough to be able to produce counts following
+Intel's definition of mbm_local and mbm_total.
+
+Thanks,
+-Peter
