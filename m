@@ -1,93 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FB81A3172;
-	Mon, 19 Jan 2026 15:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25D926D4F7
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 15:47:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768836855; cv=none; b=f0qqTFRpZWSiLa7vv8Id3DdetFygQk9i2rPSZj6Y/o4kbVwB0WZwE3w2C4eRXIJnx4t4ZjGrD5FLN6jc0IRUIHd/dj12C/GPo9S6Z0a8IQcB6qcC4BplTd8Wm/DPHG1kS1GT+ixIdqpCkAWhmuCJd9LNm0w5EitUECqYJzLYZpo=
+	t=1768837636; cv=none; b=Utl8u3BToPM1lliayQo/LBdEvSAhQxrjTSIU9sF5sFiYfurNW1jLBVYtChHKqUFF9gGZVPlXVLJeJmxUgNEc6OWSVPx78f8MvCyEacKAdrasM699/G1Ajm422IUqXlJo9Q60MXNeloIu+PEsC9yyPZhagSgL8tKa0uSIRio0Nzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768836855; c=relaxed/simple;
-	bh=EV9T2myKyHW3Va2uCiNnqCvAhEhltNmAw8tpzkkdAzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j0b89vzcTsc0LtnG1/6tXNJKLcbqt3wH2DvX2zHQ67yLTjrzhhB67KohcItqTzdJhsXKQXnRD2pctSIGyANls2drpe/76xnh/6KPFZviSZePZzXMFGJBwPTy7MzwFqqUpgNscTcGTZ31JL/K5fVLp72FCXT4ZEtcqmChFwPfCn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnTPBamt; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnTPBamt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6981CC116C6;
-	Mon, 19 Jan 2026 15:34:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768836854;
-	bh=EV9T2myKyHW3Va2uCiNnqCvAhEhltNmAw8tpzkkdAzE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hnTPBamtcpdz1LcA6KzmSTKkAZ+TFdl7qyRNKWE3Akp48IOYXqvoOqmcFIyjLmtcA
-	 j8slHUynBdR7vCN2o5vdKzJJ+AJPt2faLJ7NDN9kmc9vEUgolojkGLCFHaiaM8DGuy
-	 ayds765ZMJhLuH/0dSdeAPclWKXpdn/ehgC1SI3hNTv5WrpcA59Shg2UVKLtjNiadm
-	 3dnm61SJHT4FfTqP/Z6CuaT9OqoAvL95U62K2ZA0FlZNfEPAR9iEkfm1YIoieddOeO
-	 r6fBFs3NruE+FS+bG+MFkqIqDe47vIrXlGpGOlIKd9ZSmW1mpyAJPmYXEWOH+1RsVQ
-	 g96pudsYi2RCQ==
-Date: Mon, 19 Jan 2026 15:34:07 +0000
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, catalin.marinas@arm.com,
-	broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, yangyicong@hisilicon.com,
-	scott@os.amperecomputing.com, joey.gouly@arm.com,
-	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
-	mark.rutland@arm.com, arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
- for swpX emulation.
-Message-ID: <aW5O714hfl7DCl04@willie-the-truck>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
- <20251214112248.901769-10-yeoreum.yun@arm.com>
- <86ms3knl6s.wl-maz@kernel.org>
- <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
+	s=arc-20240116; t=1768837636; c=relaxed/simple;
+	bh=6BWds6VcmhM8rrmg/2Uz4DjMpaoIhYlomG7kJ5pFMD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qwnEi+XxwAKQ52UPcAnf9l2oXWOk295rW4OfK3p6BOZhwA3Uy568JuuEcoy09bXcrx4gg/WTSvCVG4Tprh5q5EYxoC0WJbJMXy121Y/yIQqAkKUlPdms7wf8uLLpFmbFA42kbDXAGiffThOCryXm/hPnwaJ73CpRndwP0HZZRME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C0554FEC;
+	Mon, 19 Jan 2026 07:47:07 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8F3963F694;
+	Mon, 19 Jan 2026 07:47:09 -0800 (PST)
+Message-ID: <e0be8ced-4bfe-437a-ae4d-9b4dcc15d100@arm.com>
+Date: Mon, 19 Jan 2026 15:47:07 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 11/47] arm64: mpam: Add helpers to change a task or
+ cpu's MPAM PARTID/PMG values
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, will@kernel.org,
+ corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-12-ben.horgan@arm.com> <aWk8aZafbtXx5bPu@arm.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <aWk8aZafbtXx5bPu@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 15, 2025 at 09:56:04AM +0000, Yeoreum Yun wrote:
-> Hi,
+Hi Catalin,
+
+On 1/15/26 19:13, Catalin Marinas wrote:
+> On Mon, Jan 12, 2026 at 04:58:38PM +0000, Ben Horgan wrote:
+>> +static inline void mpam_set_task_partid_pmg(struct task_struct *tsk,
+>> +					    u16 partid_d, u16 partid_i,
+>> +					    u8 pmg_d, u8 pmg_i)
+>> +{
+>> +#ifdef CONFIG_ARM64_MPAM
+>> +	u64 regval = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
+>> +
+>> +	WRITE_ONCE(task_thread_info(tsk)->mpam_partid_pmg, regval);
+>> +#endif
+>> +}
 > 
-> > On Sun, 14 Dec 2025 11:22:48 +0000,
-> > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> > >
-> > > Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-> > > instruction, so that toggling of the PSTATE.PAN bit can be removed when
-> > > LSUI-related instructions are used.
-> > >
-> > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> >
-> > It really begs the question: what are the odds of ever seeing a CPU
-> > that implements both LSUI and AArch32?
-> >
-> > This seems extremely unlikely to me.
-> 
-> Well, I'm not sure how many CPU will have
-> both ID_AA64PFR0_EL1.EL0 bit as 0b0010 and FEAT_LSUI
-> (except FVP currently) -- at least the CPU what I saw,
-> most of them set ID_AA64PFR0_EL1.EL0 as 0b0010.
+> Isn't this function, together with mpam_thread_switch(), in an enclosing
+> #ifdef already?
 
-Just to make sure I understand you, you're saying that you have seen
-a real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
+Yes, I'll remove the inner #ifdef.
 
-> If you this seems useless, I don't have any strong comments
-> whether drop patches related to deprecated swp instruction parts
-> (patch 8-9 only) or not.
-> (But, I hope to pass this decision to maintaining perspective...)
+Thanks,
 
-I think it depends on whether or not the hardware exists. Marc thinks
-that it's extremely unlikely whereas you appear to have seen some (but
-please confirm).
+Ben
 
-Will
