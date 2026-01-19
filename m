@@ -1,128 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FEE350280;
-	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CFA306486
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768815541; cv=none; b=YcDtS1CJO2UYNn3snhllEGCo5cHKeNbg6Jze2Ie/VOSDp5yiEPVHfgvy3ooNzNFRqFo5kk1j2nlbYoT97Rjs/1U3WdguyITzs/XJfCel6EqwJmXgMj9cWqLxgsbwT9TJ1Z7Ahg97tJDnhASerS3AUpyrON7TetiTQEvRl9EWWBI=
+	t=1768820217; cv=none; b=QjEXqeJdOzZPuUDjhDUS3K7NkDP/w/wcLi2Xa6OwZAWHz/tJzDRFscyK9IRIppuLys1XGuZtHtlWrckPg7aq4iKW7Y07UPCzSIUaIb3Tz4hQrahwQMGRgF3JXQgzxq7D1eF9kbXKtiv/aAtxjAHj5L/rErAhKU17UdrLstCTmIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768815541; c=relaxed/simple;
-	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cVCO3NOSQs/q97OwuiEJky/+EOMwHLMV2LCz3h6oMk8MuL4Wc3uCQ2jTH7n6+CqGywWTqCl8iCNH9/QmfxNhgysiDswovpv4bVEBrYxyvq5ge1+7uKOIRzZbm+d7ChALRQsDnSrNaknH9i27qlvXg9l08eVmLGH2M/VIG+Bn3PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXmDqQ/x; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768820217; c=relaxed/simple;
+	bh=SGH3ts8Vw9wIWOIUny++sl2jqEmIiwIy+4HgW5CQ+I4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Vf1Mx7Z8TT5yO8jR96nua9ldp9tjQqIXk7GomIHwdL8Xpp9ClEEYo/76yFwgox5g+IEv6CLLulQU+PH2/TjSg3QchoXEdsRF4SK5Sm4FIeg55Iu+6WihIWr+qIrEl8qci/2tEHZDEP7UiH+Rmnocswem8kUqP8VTrObhclYaBvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDLBj9NB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXmDqQ/x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD2AC116C6;
-	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDLBj9NB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18BAEC19422;
+	Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768815541;
-	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FXmDqQ/xcE7jFSyt+rW9m8C3jgFKnw1SMkYYkNv26nPYeJEPiAZEzgEvE3Wshrb+b
-	 yFVnLJU1YZu23fyZpFrBJII+QHi695VOpIlwjEWoFRNKr/1ywOydjbG64mgWycHaPt
-	 c7C9u8h9kP/4S6nV17KqVxK2L1NQmH4tqF+S+QKXSytAuZrnp339Ltmp0tdcXVqKu3
-	 t/KCGkgrlj+XzsB3FGSITAcoRyod4ct2xGf+wtuKFSF7FWj1J38w1of2BprSg7yI65
-	 uz56vhpcyLSvC/NIPOq6IEYxPbKjtM6iiS+05zHJRAmFaFQSH13qnGQtC1+6lzyORP
-	 z23iQWefG1o4A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1768820217;
+	bh=SGH3ts8Vw9wIWOIUny++sl2jqEmIiwIy+4HgW5CQ+I4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oDLBj9NBj6Wpr0asAuXsL0HDF+wOP3F6eyHwOJpZYl6Qz1CVmXE2/rNcYnB6oOuka
+	 bBOSjeaIkcyOEVrH5afpeUQy1BMEwVc29V1OBLzPmjdydT32nQcJkq3hCqWUvE66A3
+	 qP2lOWGl0VlnFQ1mUahVW6oYt3qw20M6MVNDRk4O+A8OmOIN8Ri0waKJw7KYbblHZ7
+	 Vrj4Ivw+7aKTp0KKPg5O9xIQMQeAk9CN5tSJcLaQkwfDNmC62cDHR5PjViSj/AY3H4
+	 VnFZTqZKr7MdYLmxgV8fzb6+ZazaBCuG5fIaB6Cu9qR9COSz30Z0SNoy14H5qxH3TD
+	 i47pVO16+e6nw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vhlit-00000003Wfc-0NBv;
-	Mon, 19 Jan 2026 09:38:59 +0000
-Date: Mon, 19 Jan 2026 09:38:58 +0000
-Message-ID: <867btec571.wl-maz@kernel.org>
+	id 1vhmwJ-00000003YVK-0lL7;
+	Mon, 19 Jan 2026 10:56:55 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: Andre Przywara <Andre.Przywara@arm.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"julien.thierry.kdev@gmail.com"
-	<julien.thierry.kdev@gmail.com>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Alexandru Elisei <Alexandru.Elisei@arm.com>,
-	nd <nd@arm.com>
-Subject: Re: [PATCH kvmtool v4 5/7] arm64: Add FEAT_E2H0 support
-In-Reply-To: <c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
-References: <20250924134511.4109935-1-andre.przywara@arm.com>
-	<20250924134511.4109935-6-andre.przywara@arm.com>
-	<c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH 2/6] KVM: arm64: Add KVM_PGTABLE_S2_AS_S1 flag
+Date: Mon, 19 Jan 2026 10:56:47 +0000
+Message-ID: <20260119105651.255693-3-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260119105651.255693-1-maz@kernel.org>
+References: <20260119105651.255693-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, Andre.Przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, Alexandru.Elisei@arm.com, nd@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 16 Jan 2026 18:12:40 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
->=20
-> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
-> > From: Marc Zyngier <maz@kernel.org>
-> >=20
-> > The --nested option allows a guest to boot at EL2 without FEAT_E2H0
-> > (i.e. mandating VHE support). While this is great for "modern"
-> > operating
-> > systems and hypervisors, a few legacy guests are stuck in a distant
-> > past.
-> >=20
-> > To support those, add the --e2h0 command line option, that exposes
-> > FEAT_E2H0 to the guest, at the expense of a number of other features,
-> > such
-> > as FEAT_NV2. This is conditioned on the host itself supporting
-> > FEAT_E2H0.
-> >=20
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->=20
-> One inline comment below, but irrespective:
->=20
-> Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
-[...]
+Plumb the MT_S2{,_FWB}_AS_S1 memory types into the KVM_S2_MEMATTR()
+macro with a new KVM_PGTABLE_S2_AS_S1 flag.
 
-> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-> > index 42dc11dad..5e4f3a7dd 100644
-> > --- a/arm64/kvm-cpu.c
-> > +++ b/arm64/kvm-cpu.c
-> > @@ -76,6 +76,11 @@ static void kvm_cpu__select_features(struct kvm
-> > *kvm, struct kvm_vcpu_init *init
-> > =C2=A0		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
-> > =C2=A0			die("EL2 (nested virt) is not supported");
-> > =C2=A0		init->features[0] |=3D 1UL << KVM_ARM_VCPU_HAS_EL2;
-> > +		if (kvm->cfg.arch.e2h0) {
-> > +			if (!kvm__supports_extension(kvm,
-> > KVM_CAP_ARM_EL2_E2H0))
-> > +				die("FEAT_E2H0 is not supported");
-> > +			init->features[0] |=3D 1UL <<
-> > KVM_ARM_VCPU_HAS_EL2_E2H0;
-> > +		}
->=20
-> --e2h0 is only consumed if --nested is also set (correctly so, by my
-> understanding & the KVM docs).
->=20
-> Maybe it is worth printing that it isn't consumed without --nested if
-> only --e2h0 is supplied? Avoids the user thinking that it has an effect
-> when it doesn't. (Alternatively, make --e2h0 imply --nested, but I'm
-> not a fan of that, personally.)
+Nobody selects it yet.
 
-Sure, I can add a warning indicating that the option is ignored.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_pgtable.h |  2 ++
+ arch/arm64/kvm/hyp/pgtable.c         | 13 ++++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-Thanks,
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index fc02de43c68dd..9ce51a637da0a 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -232,10 +232,12 @@ struct kvm_pgtable_mm_ops {
+  * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the CPUs have
+  *				ARM64_HAS_STAGE2_FWB.
+  * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
++ * @KVM_PGTABLE_S2_AS_S1:	Final memory attributes are that of Stage-1.
+  */
+ enum kvm_pgtable_stage2_flags {
+ 	KVM_PGTABLE_S2_NOFWB			= BIT(0),
+ 	KVM_PGTABLE_S2_IDMAP			= BIT(1),
++	KVM_PGTABLE_S2_AS_S1			= BIT(2),
+ };
+ 
+ /**
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 947ac1a951a5b..3c5f399b1b986 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -659,7 +659,18 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+ 	}
+ }
+ 
+-#define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
++#define KVM_S2_MEMATTR(pgt, attr)					\
++	({								\
++		kvm_pte_t __attr;					\
++		if((pgt)->flags & KVM_PGTABLE_S2_AS_S1)			\
++			__attr = PAGE_S2_MEMATTR(AS_S1,			\
++						 stage2_has_fwb(pgt));	\
++		else							\
++			__attr = PAGE_S2_MEMATTR(attr,			\
++						 stage2_has_fwb(pgt));	\
++									\
++		__attr;							\
++	})
+ 
+ static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
+ {
+-- 
+2.47.3
 
-	M.
-
---=20
-Without deviation from the norm, progress is not possible.
