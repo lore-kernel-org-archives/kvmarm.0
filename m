@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CFA306486
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EBF3587A9
 	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768820217; cv=none; b=QjEXqeJdOzZPuUDjhDUS3K7NkDP/w/wcLi2Xa6OwZAWHz/tJzDRFscyK9IRIppuLys1XGuZtHtlWrckPg7aq4iKW7Y07UPCzSIUaIb3Tz4hQrahwQMGRgF3JXQgzxq7D1eF9kbXKtiv/aAtxjAHj5L/rErAhKU17UdrLstCTmIE=
+	t=1768820217; cv=none; b=ZLYqE8IRta/AirgdAEGJURdrHSTQnpvH7ms89yUxYfQIcctGTZeLdSoGtla3slv8RaWWUpM0h2bK67p+Ob2xbfOH/vZW2rUTHC3HFXwcjXinDUFd47TOoNULVoQBmvgMJGL3dWUI0RIOent42kHPdUFFQznsYjEZhsjPQ8gsnQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768820217; c=relaxed/simple;
-	bh=SGH3ts8Vw9wIWOIUny++sl2jqEmIiwIy+4HgW5CQ+I4=;
+	bh=Dm/szfHimmX0FDqaxAVh9kHmntpiqJjHXOSsKyz6SVc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Vf1Mx7Z8TT5yO8jR96nua9ldp9tjQqIXk7GomIHwdL8Xpp9ClEEYo/76yFwgox5g+IEv6CLLulQU+PH2/TjSg3QchoXEdsRF4SK5Sm4FIeg55Iu+6WihIWr+qIrEl8qci/2tEHZDEP7UiH+Rmnocswem8kUqP8VTrObhclYaBvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDLBj9NB; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bwHZaTjedLjbDsP+Ko0YMgjZWfHt8TX+GkAeQ3jRhVK1FuX9HSRXWbEyG3mo7CRTXlRYEIO93iQLnmjAp1Pz4Dbzk9iLi/HGDbMQeIekESOA/QseroNPajin63jRad/Aiw/UmnL6BJpASGT6O+2X7augFXu9/BEp7QiJnSfJaOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPn17J6T; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDLBj9NB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18BAEC19422;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPn17J6T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09132C4AF09;
 	Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1768820217;
-	bh=SGH3ts8Vw9wIWOIUny++sl2jqEmIiwIy+4HgW5CQ+I4=;
+	bh=Dm/szfHimmX0FDqaxAVh9kHmntpiqJjHXOSsKyz6SVc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oDLBj9NBj6Wpr0asAuXsL0HDF+wOP3F6eyHwOJpZYl6Qz1CVmXE2/rNcYnB6oOuka
-	 bBOSjeaIkcyOEVrH5afpeUQy1BMEwVc29V1OBLzPmjdydT32nQcJkq3hCqWUvE66A3
-	 qP2lOWGl0VlnFQ1mUahVW6oYt3qw20M6MVNDRk4O+A8OmOIN8Ri0waKJw7KYbblHZ7
-	 Vrj4Ivw+7aKTp0KKPg5O9xIQMQeAk9CN5tSJcLaQkwfDNmC62cDHR5PjViSj/AY3H4
-	 VnFZTqZKr7MdYLmxgV8fzb6+ZazaBCuG5fIaB6Cu9qR9COSz30Z0SNoy14H5qxH3TD
-	 i47pVO16+e6nw==
+	b=WPn17J6Tvl8EoN2zKl/y/GPQ/6B2Z2EQ2ZtlBkv9lAnBF9Nv1APoQ1zz8iq5ZWXK/
+	 eAyIsYZEAkqgbUNwUbgO9PgSSaJLJ41qXMowyfYevnklhe4pBpQKMJ1Olhvz4NMGtN
+	 taP7ECFW6I85rjGNOvzlC1kmf+3GdPkVd/s3fhpQ7rnmNuyKJsbp8mhV1VBIe0AlfN
+	 S2mwRBMiAEfHZ+IHaOAIe6C+g7PpTGKHKj30c8yEQqj9UgkYiF9G92yyEBnnIGdx+R
+	 nn0AdE93UbCXIe3GiZhGt2iv0L7d2VS3eZI02A/5+gcCh4UbHSkzfPl1srLIPOVqWZ
+	 bMLa3WHr036xg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vhmwJ-00000003YVK-0lL7;
+	id 1vhmwI-00000003YVK-3zmM;
 	Mon, 19 Jan 2026 10:56:55 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -42,9 +42,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 2/6] KVM: arm64: Add KVM_PGTABLE_S2_AS_S1 flag
-Date: Mon, 19 Jan 2026 10:56:47 +0000
-Message-ID: <20260119105651.255693-3-maz@kernel.org>
+Subject: [PATCH 1/6] arm64: Add MT_S2{,_FWB}_AS_S1 encodings
+Date: Mon, 19 Jan 2026 10:56:46 +0000
+Message-ID: <20260119105651.255693-2-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260119105651.255693-1-maz@kernel.org>
 References: <20260119105651.255693-1-maz@kernel.org>
@@ -60,58 +60,59 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Plumb the MT_S2{,_FWB}_AS_S1 memory types into the KVM_S2_MEMATTR()
-macro with a new KVM_PGTABLE_S2_AS_S1 flag.
+pKVM usage of S2 translation on the host is purely for isolation
+purposes, not translation. To that effect, the memory attributes
+being used must be that of S1.
 
-Nobody selects it yet.
+With FWB=0, this is easily achieved by using the Normal Cacheable
+type (which is the weakest possible memory type) at S2, and let S1
+pick something stronger as required.
+
+With FWB=1, the attributes are combined in a different way, and we
+cannot arbitrarily use Normal Cacheable. We can, however, use a
+memattr encoding that indicates that the final attributes are that
+of Stage-1.
+
+Add these encoding and a few pointers to the relevant parts of the
+specification. It might come handy some day.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h |  2 ++
- arch/arm64/kvm/hyp/pgtable.c         | 13 ++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/memory.h | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index fc02de43c68dd..9ce51a637da0a 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -232,10 +232,12 @@ struct kvm_pgtable_mm_ops {
-  * @KVM_PGTABLE_S2_NOFWB:	Don't enforce Normal-WB even if the CPUs have
-  *				ARM64_HAS_STAGE2_FWB.
-  * @KVM_PGTABLE_S2_IDMAP:	Only use identity mappings.
-+ * @KVM_PGTABLE_S2_AS_S1:	Final memory attributes are that of Stage-1.
+diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
+index 9d54b2ea49d66..a2b7a33966ff1 100644
+--- a/arch/arm64/include/asm/memory.h
++++ b/arch/arm64/include/asm/memory.h
+@@ -175,19 +175,24 @@
+ #define MT_DEVICE_nGnRE		4
+ 
+ /*
+- * Memory types for Stage-2 translation
++ * Memory types for Stage-2 translation when HCR_EL2.FWB=0. See R_HMNDG,
++ * R_TNHFM, R_GQFSF and I_MCQKW for the details on how these attributes get
++ * combined with Stage-1.
   */
- enum kvm_pgtable_stage2_flags {
- 	KVM_PGTABLE_S2_NOFWB			= BIT(0),
- 	KVM_PGTABLE_S2_IDMAP			= BIT(1),
-+	KVM_PGTABLE_S2_AS_S1			= BIT(2),
- };
+ #define MT_S2_NORMAL		0xf
+ #define MT_S2_NORMAL_NC		0x5
+ #define MT_S2_DEVICE_nGnRE	0x1
++#define MT_S2_AS_S1		MT_S2_NORMAL
  
- /**
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 947ac1a951a5b..3c5f399b1b986 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -659,7 +659,18 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 	}
- }
+ /*
+- * Memory types for Stage-2 translation when ID_AA64MMFR2_EL1.FWB is 0001
+- * Stage-2 enforces Normal-WB and Device-nGnRE
++ * Memory types for Stage-2 translation when HCR_EL2.FWB=1. Stage-2 enforces
++ * Normal-WB and Device-nGnRE, unless we actively say that S1 wins. See
++ * R_VRJSW and R_RHWZM for details.
+  */
+ #define MT_S2_FWB_NORMAL	6
+ #define MT_S2_FWB_NORMAL_NC	5
+ #define MT_S2_FWB_DEVICE_nGnRE	1
++#define MT_S2_FWB_AS_S1		7
  
--#define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt))
-+#define KVM_S2_MEMATTR(pgt, attr)					\
-+	({								\
-+		kvm_pte_t __attr;					\
-+		if((pgt)->flags & KVM_PGTABLE_S2_AS_S1)			\
-+			__attr = PAGE_S2_MEMATTR(AS_S1,			\
-+						 stage2_has_fwb(pgt));	\
-+		else							\
-+			__attr = PAGE_S2_MEMATTR(attr,			\
-+						 stage2_has_fwb(pgt));	\
-+									\
-+		__attr;							\
-+	})
- 
- static int stage2_set_xn_attr(enum kvm_pgtable_prot prot, kvm_pte_t *attr)
- {
+ #ifdef CONFIG_ARM64_4K_PAGES
+ #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
 -- 
 2.47.3
 
