@@ -1,66 +1,72 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384943590DD
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 11:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054722DB78E
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 11:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768821047; cv=none; b=JvlReghzNfEVuC5QJLdUG7R0L6BOVm/VkFvLZxkVq6fmt344zwp/goZDszNBsbcucH3c9bAC3gCabTEWl5uC4QWEDAzVfdA/7NCVRRjrCxZEm5WzFnkzbnHD1X6CfxgfU04ONnR+CtO7JN8F5+v6XrZjKEuY0fDn7X+3hIUtrr8=
+	t=1768823627; cv=none; b=Z4LLrdVao3ZzoTuL+YMJLVWgow/AZ1EjRpIiLuHTDiCJNkki5CEruINZHdyeOC2WLuk4UKnvEvBuxoEW9gcaulpOPUsa8YQiQtek69pr4RyzsGsJ54CJDJZHhRE8MMBUba9qa1VUqavA3mTfse1l/Vz2Pzsb+HYuOdEbe9XkIz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768821047; c=relaxed/simple;
-	bh=JgQIG2mEIN7Ft0uxr1kvE//MgY/eJteBGp6wjRM8Zck=;
+	s=arc-20240116; t=1768823627; c=relaxed/simple;
+	bh=X/IQrtZ2SX+KmfDdXufjlKUb+uTlgQsiZy0goUQH8N0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R7SL79GAG5pSxiyCjlQDBk4lCITlNN4fTdyYiFja6UcuehugU05qwowk4KHYLX4ATZnYouNxRNkYOw1ONqQW78jZlW2EMPZvcZ5JFEyUG8dcNFjl4DhS3cCdfeJXX7OuyqqooVrUiDDjRuzAHnDQXE/anboou0fIx77aAgqyocw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+NEB1TF; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=TiAh/Td3ESJcN6BxFn4aT9Y1E8i07AtR4ecv1hQhrSJxQ6dRuYCh6wfvXV5KXRTJUIEg5hpgUel72Ez+XTpl2JtlHY4AFLWi1Zr4b0GPGeYIJIhThZffq2KyrJ5XfUvCWPicHaOGHrcXrENQehphUXuzCTSanWkAclay5gUdWrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NvKDgSN2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+NEB1TF"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47ee937ecf2so29544615e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 03:10:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1768821043; x=1769425843; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hJ2qz5Sc4o5xQKpn60NA0bOq+C5q4mcRTMre+DDqfZ8=;
-        b=K+NEB1TFnlLXCDBog3xK3pC42wi66Cj1who1ZlnPewDPOEfhAiObs36543/x7s9MOw
-         8wk6MIUQbczdRX0cvCq1x3m729/3DkEyQ/Nw2p3i9s20tfmGQ6jImFPczBjslc90LBWT
-         C0UTDSHbJnSs0wy4/BcrGLPIqZZFmDVY2/ASw1LdbGQaOb7kzOuBrh9ZDB65eYbiwnv3
-         cqdPbJ8exvc4k6PdXEeIfNjAW2nhwccHJJ1LWxm7dGdel3ZuYygp59kJCkzBWD3HPopT
-         TKfJZk/k7D+Kzj5LlrHeVxUZsa0LEreCj3pa9o5JV48X5tDyWrxMeLWLjPdHDM84oi8T
-         1D+Q==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NvKDgSN2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768823624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tyj6uNMCFoW5fF4G2dbHO9MqaihjqT5fM5v3O8Ea3wY=;
+	b=NvKDgSN2E+lOfQLTo/4wumMc3tnBUQs82x8bnee6Uqc0U1o3NQMf/NuV4nWDdDM5fdRk5e
+	H0bvh39zuT2qjgA94/ujappGy+++zm3aLKtmXAmtHlA5rRLnzl6UmQuS/fX17q05SMGscr
+	kTTbte4MOS2kCOvJiNWRX56rPHwoNEo=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-391-GSPyX1BGM9eH_ySW7mSxtg-1; Mon, 19 Jan 2026 06:53:41 -0500
+X-MC-Unique: GSPyX1BGM9eH_ySW7mSxtg-1
+X-Mimecast-MFC-AGG-ID: GSPyX1BGM9eH_ySW7mSxtg_1768823620
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2a0f4822f77so85956945ad.2
+        for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 03:53:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768821043; x=1769425843;
+        d=1e100.net; s=20230601; t=1768823620; x=1769428420;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hJ2qz5Sc4o5xQKpn60NA0bOq+C5q4mcRTMre+DDqfZ8=;
-        b=SC0ArrQywyniIVezGSLYEOFQjFJeWVayz9dwMmvMRTvp0+1ezY/MBAdql1yIbsKxbd
-         Xefa3SZw4f9Vr0oiDrfKIz/gFtb6ekZpULYP7bGOFBo+iVOeTDMxgsHAdedGCTaoEyrv
-         gFMD2OsbZOY/h5qF0EioXX+UAVf316cU5IV149hU4qY/H3M0Uw82GQzJMJ2mrLkdEwqc
-         4nL0jQ9uw6rc5ewnTdp6xvoQKLMVzw41mX0S5nTjybWqc4DkG52IFNrqPEJOLFyGiMdW
-         DCcu7TBcQftLG3GlRAWHn+qo9/uZ4xH0DOwl8rlqCN2ihR55HRcThWp3kzmVOGZQjo2+
-         GmvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUlLqs67chXJB3LG0UW83OtEHxAablPmhRzDOVYe4+qaS4rZh/CUgLJZrHyEoGgmP8wsF5zaA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwMMauOT7ZSM6vqeGO1+z/PpxtnABBPI5QuLPPraHJgVS7/yJyk
-	eIpJ1phcb0EEqG4agjxfooejdyCw15kImmUWl+YTx6We2OAziVcXCYEa
-X-Gm-Gg: AY/fxX4nem5aFuuc1R3lvgWZ7MU37/bFikxOJ3sszVMXNjr1n3cu3BHkHw7l9tiCfHm
-	bHguQP9TNCQsvDnkwNALlytxo7Ssp49O69hoduZArgQ6M8d172SsiDEEebqRCRhcDNVJOD91WF0
-	fJNQqdbWna1dD0ODf7NRAE2IBVJTogeVRt16Bu0iwuaI/YGkxXhmAN0oPMdxa0dfTe1NDnrog9s
-	h/IR8SBU0A5eSQ1ISJsEPGZW2P7bvFRn5HMjF+kkSWhgSpw+E/jQv8C0iMyITZrmThJhpEyIkd1
-	1PPOGTsPG/IaF1V+LV+8kCfefwUrUIybABbqH7qDXFvdMbKgIJVnsaCv5Raas1SgLkZzJAdHi/N
-	5rSw7pWfnA6pqmFRAGsCGeEBaOZTvcWPs6C30p7o0DJMM5j6HMJu6zT7JP/MtOzBTf7ZcNs/sWB
-	L7sfnpGocDA/TUqADPfCNwTWnZqZHC2DZ8dyob6GzQPw==
-X-Received: by 2002:a05:600c:8184:b0:475:d9de:952e with SMTP id 5b1f17b1804b1-4801e530d08mr129410295e9.1.1768821043145;
-        Mon, 19 Jan 2026 03:10:43 -0800 (PST)
-Received: from [10.24.66.11] ([15.248.2.27])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47f429071besm240510305e9.10.2026.01.19.03.10.41
+        bh=tyj6uNMCFoW5fF4G2dbHO9MqaihjqT5fM5v3O8Ea3wY=;
+        b=fYCkHO6SLRz7qlCieYwkTb+DMJ8luL+qQwS+mBbps3i/iww0Z8mL/WfhUP1znfIAQ1
+         vC6C81Z8iLWtw8S4dsZ5cpIOxgEKeD0lGhbHhPMfDCJusBJy/eCgKquk6hOXZXk9gYac
+         bTqVz4w6KQr7z/mOPqXEC/YL11IM36nOmkUp3TtEu9yaHwvKy4QhvjCT0hPRRYq/UTnK
+         Ca3d0idl1BT2bSkHk9mzPIHchs70Lzfl8L0BJso/GKDz3LJ2/7d87PvhdANJz2WF1EqB
+         W1PzrlyqXjl2clJmMVsuu4rZa05A0SxJqRH/z1YAPOPdaEd8rCUDLuKEv5w6Q/A7Xn/Z
+         lFqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWId7cJ3z7IoEhc/PbzGwTcarKjkK2kT8Xj660Sa7sAbdMyrC/z5fi1odPp3OQl/Wwo5gc0GQA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yz9+AZKMfYLVKpxsvqub59wv6lzKJjsie0AGigrS9sapSBncIbO
+	6hRtLm3pW+7jy5aJDX51pBqz6SGWtnRELiah8vyzM+QFRauVJbf5/pnP+4CuE5+coNm3uhl2Ayy
+	mOdkE0qY8BcQrL1rYisT0QUNriNaYmUaoiYgfoqMn78zmRN0IBSs8iTu3Jw==
+X-Gm-Gg: AZuq6aKiB2EC+BDBaZDxfnB9Z+RXJ9qsQbUG05HwAXolKodrcicYmQz8sM75wy/qTvL
+	gH5fpit7unJ531xxHJuPP210DyOmzSe3txwAGQPIxifuqFANFnR6ScsvGN8d0tGnEpgRs2/5exm
+	j5hCZGl/NcsOMlyOs5JVhjRkjFr5bdW6MTwjOeTUIlF4fxU5GQD+O0UhytwdE5tjtmrDMKiqXvr
+	SFreKyHXMixvS5zppqTDF5vPu7Fi7n7ct/O7ox6OI+iG1G5G3r4MWhzfQESfYWsiMFHqW8Gkl0L
+	2cViG55BEbwFs5r8TIIHN2zGG5yKnwUgFPL928QQCjW4KlWt35KcqEqI8zF/flDn7IXHgaMnVtG
+	/+GFbfVcQF8A=
+X-Received: by 2002:a17:903:1104:b0:29e:9c82:a920 with SMTP id d9443c01a7336-2a7188589bcmr104434645ad.6.1768823620191;
+        Mon, 19 Jan 2026 03:53:40 -0800 (PST)
+X-Received: by 2002:a17:903:1104:b0:29e:9c82:a920 with SMTP id d9443c01a7336-2a7188589bcmr104434415ad.6.1768823619707;
+        Mon, 19 Jan 2026 03:53:39 -0800 (PST)
+Received: from [10.72.112.128] ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190ce2ebsm94819245ad.32.2026.01.19.03.53.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Jan 2026 03:10:42 -0800 (PST)
-Message-ID: <c8d5dd11-2b99-40bc-bb50-4d3a738ad765@gmail.com>
-Date: Mon, 19 Jan 2026 11:10:41 +0000
+        Mon, 19 Jan 2026 03:53:38 -0800 (PST)
+Message-ID: <36e12dad-833f-4498-a6da-f4fc2ca081d3@redhat.com>
+Date: Mon, 19 Jan 2026 19:53:25 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -68,279 +74,352 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/3] KVM: arm64: Add pre_fault_memory implementation
-To: Marc Zyngier <maz@kernel.org>
-Cc: oliver.upton@linux.dev, pbonzini@redhat.com, joey.gouly@arm.com,
- suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com,
- will@kernel.org, shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, isaku.yamahata@intel.com,
- xmarcalx@amazon.co.uk, kalyazin@amazon.co.uk, jackabt@amazon.com,
- Vladimir Murzin <vladimir.murzin@arm.com>
-References: <20260113152643.18858-1-jackabt.amazon@gmail.com>
- <20260113152643.18858-2-jackabt.amazon@gmail.com>
- <86jyxjkxus.wl-maz@kernel.org>
- <ea7786e4-8b67-4a9f-b2c6-c0e4cd325cc3@gmail.com>
- <87ldhvdxio.wl-maz@kernel.org>
+Subject: Re: [PATCH v3 27/47] arm_mpam: resctrl: Add support for 'MB' resource
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ Zeng Heng <zengheng4@huawei.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-28-ben.horgan@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20260112165914.4086692-28-ben.horgan@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 32rRJCWTL2P3LePFTwVBHc3a-Pr1fWZQUtkYOJKrOWw_1768823620
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-From: "Thomson, Jack" <jackabt.amazon@gmail.com>
-In-Reply-To: <87ldhvdxio.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Marc,
+Hi Ben,
 
-On 18/01/2026 10:29 am, Marc Zyngier wrote:
-> On Fri, 16 Jan 2026 14:33:42 +0000,
-> "Thomson, Jack" <jackabt.amazon@gmail.com> wrote:
->>
->>
->> Hey Marc,
->>
->> Thanks for the review.
->>
->> On 15/01/2026 9:51 am, Marc Zyngier wrote:
->>> [+ Vladimir, who was also looking at this patch]
->>>
->>> On Tue, 13 Jan 2026 15:26:40 +0000,
->>> Jack Thomson <jackabt.amazon@gmail.com> wrote:
->>>>
->>>> From: Jack Thomson <jackabt@amazon.com>
->>>>
->>>> Add kvm_arch_vcpu_pre_fault_memory() for arm64. The implementation hands
->>>> off the stage-2 faulting logic to either gmem_abort() or
->>>> user_mem_abort().
->>>>
->>>> Add an optional page_size output parameter to user_mem_abort() to
->>>> return the VMA page size, which is needed when pre-faulting.
->>>>
->>>> Update the documentation to clarify x86 specific behaviour.
->>>>
->>>> Signed-off-by: Jack Thomson <jackabt@amazon.com>
->>>> ---
->>>>    Documentation/virt/kvm/api.rst |  3 +-
->>>>    arch/arm64/kvm/Kconfig         |  1 +
->>>>    arch/arm64/kvm/arm.c           |  1 +
->>>>    arch/arm64/kvm/mmu.c           | 79 ++++++++++++++++++++++++++++++++--
->>>>    4 files changed, 79 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>>> index 01a3abef8abb..44cfd9e736bb 100644
->>>> --- a/Documentation/virt/kvm/api.rst
->>>> +++ b/Documentation/virt/kvm/api.rst
->>>> @@ -6493,7 +6493,8 @@ Errors:
->>>>    KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
->>>>    for the current vCPU state.  KVM maps memory as if the vCPU generated a
->>>>    stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
->>>> -CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
->>>> +CoW.  However, on x86, KVM does not mark any newly created stage-2 PTE as
->>>> +Accessed.
->>>>      In the case of confidential VM types where there is an initial
->>>> set up of
->>>>    private guest memory before the guest is 'finalized'/measured, this ioctl
->>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->>>> index 4f803fd1c99a..6872aaabe16c 100644
->>>> --- a/arch/arm64/kvm/Kconfig
->>>> +++ b/arch/arm64/kvm/Kconfig
->>>> @@ -25,6 +25,7 @@ menuconfig KVM
->>>>    	select HAVE_KVM_CPU_RELAX_INTERCEPT
->>>>    	select KVM_MMIO
->>>>    	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
->>>> +	select KVM_GENERIC_PRE_FAULT_MEMORY
->>>>    	select VIRT_XFER_TO_GUEST_WORK
->>>>    	select KVM_VFIO
->>>>    	select HAVE_KVM_DIRTY_RING_ACQ_REL
->>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->>>> index 4f80da0c0d1d..19bac68f737f 100644
->>>> --- a/arch/arm64/kvm/arm.c
->>>> +++ b/arch/arm64/kvm/arm.c
->>>> @@ -332,6 +332,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>>>    	case KVM_CAP_COUNTER_OFFSET:
->>>>    	case KVM_CAP_ARM_WRITABLE_IMP_ID_REGS:
->>>>    	case KVM_CAP_ARM_SEA_TO_USER:
->>>> +	case KVM_CAP_PRE_FAULT_MEMORY:
->>>>    		r = 1;
->>>>    		break;
->>>>    	case KVM_CAP_SET_GUEST_DEBUG2:
->>>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>>> index 48d7c372a4cd..499b131f794e 100644
->>>> --- a/arch/arm64/kvm/mmu.c
->>>> +++ b/arch/arm64/kvm/mmu.c
->>>> @@ -1642,8 +1642,8 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>      static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t
->>>> fault_ipa,
->>>>    			  struct kvm_s2_trans *nested,
->>>> -			  struct kvm_memory_slot *memslot, unsigned long hva,
->>>> -			  bool fault_is_perm)
->>>> +			  struct kvm_memory_slot *memslot, unsigned long *page_size,
->>>> +			  unsigned long hva, bool fault_is_perm)
->>>>    {
->>>>    	int ret = 0;
->>>>    	bool topup_memcache;
->>>> @@ -1923,6 +1923,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->>>>    	kvm_release_faultin_page(kvm, page, !!ret, writable);
->>>>    	kvm_fault_unlock(kvm);
->>>>    +	if (page_size)
->>>> +		*page_size = vma_pagesize;
->>>> +
->>>>    	/* Mark the page dirty only if the fault is handled successfully */
->>>>    	if (writable && !ret)
->>>>    		mark_page_dirty_in_slot(kvm, memslot, gfn);
->>>> @@ -2196,8 +2199,8 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->>>>    		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
->>>>    				 esr_fsc_is_permission_fault(esr));
->>>>    	else
->>>> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
->>>> -				     esr_fsc_is_permission_fault(esr));
->>>> +		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, NULL,
->>>> +				     hva, esr_fsc_is_permission_fault(esr));
->>>>    	if (ret == 0)
->>>>    		ret = 1;
->>>>    out:
->>>> @@ -2573,3 +2576,71 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled)
->>>>      	trace_kvm_toggle_cache(*vcpu_pc(vcpu), was_enabled,
->>>> now_enabled);
->>>>    }
->>>> +
->>>> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
->>>> +				    struct kvm_pre_fault_memory *range)
->>>> +{
->>>> +	struct kvm_vcpu_fault_info *fault_info = &vcpu->arch.fault;
->>>> +	struct kvm_s2_trans nested_trans, *nested = NULL;
->>>> +	unsigned long page_size = PAGE_SIZE;
->>>> +	struct kvm_memory_slot *memslot;
->>>> +	phys_addr_t ipa = range->gpa;
->>>> +	phys_addr_t end;
->>>> +	hva_t hva;
->>>> +	gfn_t gfn;
->>>> +	int ret;
->>>> +
->>>> +	if (vcpu_is_protected(vcpu))
->>>> +		return -EOPNOTSUPP;
->>>
->>> This feels pretty odd. If you have advertised the capability, then
->>> saying "not supported" at this stage is not on.
->>>
->>
->> Thanks good point, I think I can actually just drop this completely since
->> kvm_pvm_ext_allowed() would already exclude this as a capacility.
->>
+On 1/13/26 12:58 AM, Ben Horgan wrote:
+> From: James Morse <james.morse@arm.com>
 > 
-> I think you still need some runtime handling, just in case userspace
-> is acting silly.
+> resctrl supports 'MB', as a percentage throttling of traffic somewhere
+> after the L3. This is the control that mba_sc uses, so ideally the class
+> chosen should be as close as possible to the counters used for mba_local.
 > 
-
-Yeah makes sense I'll put something in.
-
->>>> +
->>>> +	/*
->>>> +	 * We may prefault on a shadow stage 2 page table if we are
->>>> +	 * running a nested guest.  In this case, we have to resolve the L2
->>>> +	 * IPA to the L1 IPA first, before knowing what kind of memory should
->>>> +	 * back the L1 IPA.
->>>> +	 *
->>>> +	 * If the shadow stage 2 page table walk faults, then we return
->>>> +	 * -EFAULT
->>>> +	 */
->>>> +	if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu) &&
->>>> +	    vcpu->arch.hw_mmu->nested_stage2_enabled) {
->>>> +		ret = kvm_walk_nested_s2(vcpu, ipa, &nested_trans);
->>>> +		if (ret)
->>>> +			return -EFAULT;
->>>
->>> And then what? Userspace is completely screwed here, with no way to
->>> make any forward progress, because the L1 is in charge of that S2, and
->>> L1 is not running. What's the outcome? Light a candle and pray?
->>>
->>> Also, the IPA you are passing as a parameter means absolutely nothing
->>> in the context of L2. Userspace doesn't have the faintest clue about
->>> the memory map presented to L2, as that's L1 business. L1 can
->>> absolutely present to L2 a memory map that doesn't have a single
->>> address in common with its own.
->>>
->>> So this really doesn't work at all.
->>>
->> Would just returning -EOPNOTSUPP in this case like:
+> MB's percentage control should be backed either with the fixed point
+> fraction MBW_MAX or bandwidth portion bitmaps. The bandwidth portion
+> bitmaps is not used as its tricky to pick which bits to use to avoid
+> contention, and may be possible to expose this as something other than a
+> percentage in the future.
 > 
-> Absolutely *not*. Userspace has no idea what the guest is doing, and
-> cannot influence it (other than disabling nesting altogether). This is
-> just as bad a -EFAULT.
+> CC: Zeng Heng <zengheng4@huawei.com>
+> Co-developed-by: Dave Martin <Dave.Martin@arm.com>
+> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+> Signed-off-by: James Morse <james.morse@arm.com>>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> Changes since v2:
+> Code flow change
+> Commit message 'or'
+> ---
+>   drivers/resctrl/mpam_resctrl.c | 209 ++++++++++++++++++++++++++++++++-
+>   1 file changed, 208 insertions(+), 1 deletion(-)
 > 
->>
->>    if (kvm_is_nested_s2_mmu(vcpu->kvm, vcpu->arch.hw_mmu) &&
->>        vcpu->arch.hw_mmu->nested_stage2_enabled)
->>      return -EOPNOTSUPP;
->>
->> be the best way to continue for now?
-> 
-> We both know that what you actually mean is "this doesn't match my use
-> case, let someone else deal with it". To which my answer is that you
-> either fully support pre-faulting, or you don't at all. There is no
-> middle ground.
-> 
+> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+> index 3ca977527698..7402bf4293b6 100644
+> --- a/drivers/resctrl/mpam_resctrl.c
+> +++ b/drivers/resctrl/mpam_resctrl.c
+> @@ -248,6 +248,33 @@ static bool cache_has_usable_cpor(struct mpam_class *class)
+>   	return class->props.cpbm_wd <= 32;
+>   }
+>   
+> +static bool mba_class_use_mbw_max(struct mpam_props *cprops)
+> +{
+> +	return (mpam_has_feature(mpam_feat_mbw_max, cprops) &&
+> +		cprops->bwa_wd);
+> +}
+> +
+> +static bool class_has_usable_mba(struct mpam_props *cprops)
+> +{
+> +	return mba_class_use_mbw_max(cprops);
+> +}
+> +
+> +/*
+> + * Calculate the worst-case percentage change from each implemented step
+> + * in the control.
+> + */
+> +static u32 get_mba_granularity(struct mpam_props *cprops)
+> +{
+> +	if (!mba_class_use_mbw_max(cprops))
+> +		return 0;
+> +
+> +	/*
+> +	 * bwa_wd is the number of bits implemented in the 0.xxx
+> +	 * fixed point fraction. 1 bit is 50%, 2 is 25% etc.
+> +	 */
+> +	return DIV_ROUND_UP(MAX_MBA_BW, 1 << cprops->bwa_wd);
+> +}
+> +
+>   /*
+>    * Each fixed-point hardware value architecturally represents a range
+>    * of values: the full range 0% - 100% is split contiguously into
+> @@ -298,6 +325,94 @@ static u16 percent_to_mbw_max(u8 pc, struct mpam_props *cprops)
+>   	return val;
+>   }
+>   
+> +static u32 get_mba_min(struct mpam_props *cprops)
+> +{
+> +	if (!mba_class_use_mbw_max(cprops)) {
+> +		WARN_ON_ONCE(1);
+> +		return 0;
+> +	}
+> +
+> +	return mbw_max_to_percent(0, cprops);
+> +}
+> +
+> +/* Find the L3 cache that has affinity with this CPU */
+> +static int find_l3_equivalent_bitmask(int cpu, cpumask_var_t tmp_cpumask)
+> +{
+> +	u32 cache_id = get_cpu_cacheinfo_id(cpu, 3);
+> +
+> +	lockdep_assert_cpus_held();
+> +
+> +	return mpam_get_cpumask_from_cache_id(cache_id, 3, tmp_cpumask);
+> +}
+> +
+> +/*
+> + * topology_matches_l3() - Is the provided class the same shape as L3
+> + * @victim:		The class we'd like to pretend is L3.
+> + *
+> + * resctrl expects all the world's a Xeon, and all counters are on the
+> + * L3. We play fast and loose with this, mapping counters on other
+> + * classes - provided the CPU->domain mapping is the same kind of shape.
+> + *
+> + * Using cacheinfo directly would make this work even if resctrl can't
+> + * use the L3 - but cacheinfo can't tell us anything about offline CPUs.
+> + * Using the L3 resctrl domain list also depends on CPUs being online.
+> + * Using the mpam_class we picked for L3 so we can use its domain list
+> + * assumes that there are MPAM controls on the L3.
+> + * Instead, this path eventually uses the mpam_get_cpumask_from_cache_id()
+> + * helper which can tell us about offline CPUs ... but getting the cache_id
+> + * to start with relies on at least one CPU per L3 cache being online at
+> + * boot.
+> + *
+> + * Walk the victim component list and compare the affinity mask with the
+> + * corresponding L3. The topology matches if each victim:component's affinity
+> + * mask is the same as the CPU's corresponding L3's. These lists/masks are
+> + * computed from firmware tables so don't change at runtime.
+> + */
+> +static bool topology_matches_l3(struct mpam_class *victim)
+> +{
+> +	int cpu, err;
+> +	struct mpam_component *victim_iter;
+> +	cpumask_var_t __free(free_cpumask_var) tmp_cpumask;
+> +
 
-Sorry if it came across as a cop-out, I think I just misunderstood your
-earlier comment about taking a step back and looking at an easier
-approach. If this is required I'll definitely look at full support for
-pre-faulting.
+A warning reported by checkpatch.pl like below.
 
->>>> +
->>>> +		ipa = kvm_s2_trans_output(&nested_trans);
->>>> +		nested = &nested_trans;
->>>> +	}
->>>> +
->>>> +	if (ipa >= kvm_phys_size(vcpu->arch.hw_mmu))
->>>> +		return -ENOENT;
->>>> +
->>>> +	/* Generate a synthetic abort for the pre-fault address */
->>>> +	fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
->>>> +		ESR_ELx_FSC_FAULT_L(KVM_PGTABLE_LAST_LEVEL);
->>>
->>> Why level 3? You must present a fault that matches the level at which
->>> the emulated fault would actually occur, because the rest of the
->>> infrastructure relies on that (at least on the permission path, and
->>> more to come).
->>>
->>
->> Ack, thanks I was relying on the fact `fault_is_perm` was hardcoded to
->> false. I'll replace with something like:
->>
->>    pgt = vcpu->arch.hw_mmu->pgt;
->>    ret = kvm_pgtable_get_leaf(pgt, gpa, &pte, &level);
->>    if (ret)
->>      return ret;
->>
->>    fault_info->esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
->>      ESR_ELx_FSC_FAULT_L(level);
->>    fault_info->hpfar_el2 = HPFAR_EL2_NS |
->>      FIELD_PREP(HPFAR_EL2_FIPA, gpa >> 12);
-> 
-> If a mapping exists, you probably don't want to replay the fault. And
-> this needs to occur while the mmu_lock is held.
-> 
+WARNING: Missing a blank line after declarations
+#117: FILE: drivers/resctrl/mpam_resctrl.c:375:
++	struct mpam_component *victim_iter;
++	cpumask_var_t __free(free_cpumask_var) tmp_cpumask;
 
-Got you thanks.
+Besides, it'd better to initialize @tmp_cpumask:
 
->>
->>> Taking a step back on all this, 90% of the problems are there because
->>> you are trying to support prefaulting a guest that is already running.
->>> If you limited this to actually *pre*-faulting the guest, it would be
->>> the easiest thing ever, and wouldn't suffer from any of the above (you
->>> can't be in a nested context if you haven't run).
->>>
->>> What prevents you from doing so? I'm perfectly happy to make this a
->>> separate API if this contradicts other implementations. Or are you
->>> relying on other side effects of the "already running" state?
->>
->> We would need this to work on an already running guest.
-> 
-> Then you need to fully support pre-faulting the guest even when it is
-> in a nested context, without resorting to coping-out in situations
-> that do not match your narrow use-case. Which means populating the
-> canonical s2_mmu even when you're not in that particular context.
+cpumask_var_t __free(free_cpumask_var) tmp_cpumask = CPUMASK_VAR_NULL;
 
-Will do, I'll work on a next revision with this case.
+> +	if (!alloc_cpumask_var(&tmp_cpumask, GFP_KERNEL))
+> +		return false;
+> +
+> +	guard(srcu)(&mpam_srcu);
+> +	list_for_each_entry_srcu(victim_iter, &victim->components, class_list,
+> +				 srcu_read_lock_held(&mpam_srcu)) {
+> +		if (cpumask_empty(&victim_iter->affinity)) {
+> +			pr_debug("class %u has CPU-less component %u - can't match L3!\n",
+> +				 victim->level, victim_iter->comp_id);
+> +			return false;
+> +		}
+> +
+> +		cpu = cpumask_any(&victim_iter->affinity);
+> +		if (WARN_ON_ONCE(cpu >= nr_cpu_ids))
+> +			return false;
+> +
+> +		cpumask_clear(tmp_cpumask);
+> +		err = find_l3_equivalent_bitmask(cpu, tmp_cpumask);
+> +		if (err) {
+> +			pr_debug("Failed to find L3's equivalent component to class %u component %u\n",
+> +				 victim->level, victim_iter->comp_id);
+> +			return false;
+> +		}
+> +
+> +		/* Any differing bits in the affinity mask? */
+> +		if (!cpumask_equal(tmp_cpumask, &victim_iter->affinity)) {
+> +			pr_debug("class %u component %u has Mismatched CPU mask with L3 equivalent\n"
+> +				 "L3:%*pbl != victim:%*pbl\n",
+> +				 victim->level, victim_iter->comp_id,
+> +				 cpumask_pr_args(tmp_cpumask),
+> +				 cpumask_pr_args(&victim_iter->affinity));
+> +
+> +			return false;
+> +		}
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>   /* Test whether we can export MPAM_CLASS_CACHE:{2,3}? */
+>   static void mpam_resctrl_pick_caches(void)
+>   {
+> @@ -340,9 +455,62 @@ static void mpam_resctrl_pick_caches(void)
+>   	}
+>   }
+>   
+> +static void mpam_resctrl_pick_mba(void)
+> +{
+> +	struct mpam_class *class, *candidate_class = NULL;
+> +	struct mpam_resctrl_res *res;
+> +
+> +	lockdep_assert_cpus_held();
+> +
+> +	guard(srcu)(&mpam_srcu);
+> +	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
+> +				 srcu_read_lock_held(&mpam_srcu)) {
+> +		struct mpam_props *cprops = &class->props;
+> +
+> +		if (class->level < 3) {
+> +			pr_debug("class %u is before L3\n", class->level);
+> +			continue;
+> +		}
+> +
+> +		if (!class_has_usable_mba(cprops)) {
+> +			pr_debug("class %u has no bandwidth control\n",
+> +				 class->level);
+> +			continue;
+> +		}
+> +
+> +		if (!cpumask_equal(&class->affinity, cpu_possible_mask)) {
+> +			pr_debug("class %u has missing CPUs\n", class->level);
+> +			continue;
+> +		}
+> +
+> +		if (!topology_matches_l3(class)) {
+> +			pr_debug("class %u topology doesn't match L3\n",
+> +				 class->level);
+> +			continue;
+> +		}
+> +
+> +		/*
+> +		 * mba_sc reads the mbm_local counter, and waggles the MBA
+> +		 * controls. mbm_local is implicitly part of the L3, pick a
+> +		 * resource to be MBA that as close as possible to the L3.
+> +		 */
+> +		if (!candidate_class || class->level < candidate_class->level)
+> +			candidate_class = class;
+> +	}
+> +
+> +	if (candidate_class) {
+> +		pr_debug("selected class %u to back MBA\n",
+> +			 candidate_class->level);
+> +		res = &mpam_resctrl_controls[RDT_RESOURCE_MBA];
+> +		res->class = candidate_class;
+> +		exposed_alloc_capable = true;
+> +	}
+> +}
+> +
+>   static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
+>   {
+>   	struct mpam_class *class = res->class;
+> +	struct mpam_props *cprops = &class->props;
+>   	struct rdt_resource *r = &res->resctrl_res;
+>   
+>   	switch (r->rid) {
+> @@ -372,6 +540,19 @@ static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
+>   		 */
+>   		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
+>   		break;
+> +	case RDT_RESOURCE_MBA:
+> +		r->alloc_capable = true;
+> +		r->schema_fmt = RESCTRL_SCHEMA_RANGE;
+> +		r->ctrl_scope = RESCTRL_L3_CACHE;
+> +
+> +		r->membw.delay_linear = true;
+> +		r->membw.throttle_mode = THREAD_THROTTLE_UNDEFINED;
+> +		r->membw.min_bw = get_mba_min(cprops);
+> +		r->membw.max_bw = MAX_MBA_BW;
+> +		r->membw.bw_gran = get_mba_granularity(cprops);
+> +
+> +		r->name = "MB";
+> +		break;
+>   	default:
+>   		return -EINVAL;
+>   	}
+> @@ -386,7 +567,17 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+>   	if (class->type == MPAM_CLASS_CACHE)
+>   		return comp->comp_id;
+>   
+> -	/* TODO: repaint domain ids to match the L3 domain ids */
+> +	if (topology_matches_l3(class)) {
+> +		/* Use the corresponding L3 component ID as the domain ID */
+> +		int id = get_cpu_cacheinfo_id(cpu, 3);
+> +
+> +		/* Implies topology_matches_l3() made a mistake */
+> +		if (WARN_ON_ONCE(id == -1))
+> +			return comp->comp_id;
+> +
+> +		return id;
+> +	}
+> +
+>   	/* Otherwise, expose the ID used by the firmware table code. */
+>   	return comp->comp_id;
+>   }
+> @@ -426,6 +617,12 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+>   	case RDT_RESOURCE_L3:
+>   		configured_by = mpam_feat_cpor_part;
+>   		break;
+> +	case RDT_RESOURCE_MBA:
+> +		if (mpam_has_feature(mpam_feat_mbw_max, cprops)) {
+> +			configured_by = mpam_feat_mbw_max;
+> +			break;
+> +		}
+> +		fallthrough;
+>   	default:
+>   		return resctrl_get_default_ctrl(r);
+>   	}
+> @@ -437,6 +634,8 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+>   	switch (configured_by) {
+>   	case mpam_feat_cpor_part:
+>   		return cfg->cpbm;
+> +	case mpam_feat_mbw_max:
+> +		return mbw_max_to_percent(cfg->mbw_max, cprops);
+>   	default:
+>   		return resctrl_get_default_ctrl(r);
+>   	}
+> @@ -481,6 +680,13 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+>   		cfg.cpbm = cfg_val;
+>   		mpam_set_feature(mpam_feat_cpor_part, &cfg);
+>   		break;
+> +	case RDT_RESOURCE_MBA:
+> +		if (mpam_has_feature(mpam_feat_mbw_max, cprops)) {
+> +			cfg.mbw_max = percent_to_mbw_max(cfg_val, cprops);
+> +			mpam_set_feature(mpam_feat_mbw_max, &cfg);
+> +			break;
+> +		}
+> +		fallthrough;
+>   	default:
+>   		return -EINVAL;
+>   	}
+> @@ -764,6 +970,7 @@ int mpam_resctrl_setup(void)
+>   
+>   	/* Find some classes to use for controls */
+>   	mpam_resctrl_pick_caches();
+> +	mpam_resctrl_pick_mba();
+>   
+>   	/* Initialise the resctrl structures from the classes */
+>   	for_each_mpam_resctrl_control(res, rid) {
 
-Thanks again for looking.
+Thanks,
+Gavin
 
-Jack
