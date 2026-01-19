@@ -1,37 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EBF3587A9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DA130CD8F
 	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768820217; cv=none; b=ZLYqE8IRta/AirgdAEGJURdrHSTQnpvH7ms89yUxYfQIcctGTZeLdSoGtla3slv8RaWWUpM0h2bK67p+Ob2xbfOH/vZW2rUTHC3HFXwcjXinDUFd47TOoNULVoQBmvgMJGL3dWUI0RIOent42kHPdUFFQznsYjEZhsjPQ8gsnQU=
+	t=1768820217; cv=none; b=JC4qQ01e7nApObaUceeVo7Eq9GK2BaOrYNDJRt/ABK6ewLeCFUOuF+aQ94yCzdC8ak9tTI0Yee2+5YWqN7yTzE1F1nHlD1yHy8uHYCIOMAVMtHgmasM98/rYMDj+h9Gye6aOOkHcElVgt90/jlLrAf3GwdiuD5fQaf3VxRYjARA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1768820217; c=relaxed/simple;
-	bh=Dm/szfHimmX0FDqaxAVh9kHmntpiqJjHXOSsKyz6SVc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bwHZaTjedLjbDsP+Ko0YMgjZWfHt8TX+GkAeQ3jRhVK1FuX9HSRXWbEyG3mo7CRTXlRYEIO93iQLnmjAp1Pz4Dbzk9iLi/HGDbMQeIekESOA/QseroNPajin63jRad/Aiw/UmnL6BJpASGT6O+2X7augFXu9/BEp7QiJnSfJaOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPn17J6T; arc=none smtp.client-ip=10.30.226.201
+	bh=+At1IbBtGnJKCQBdyPPtACTjJjP82alOLGMVRxdUrr0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WA18EK9IeHjFadvLne/F22WStuTbn6s2ie0+56AzOQa7l9n+XrEWN9zONUs/kfUZLtULZXS9ZHOjHIpFarjvoC6XX8C7OFFOXiXUz21eQ5twrfuPcpStD5o4UdcK/YJvpoAq7ErWMr7hh0OmeK+UemM4MKhO7ePmmFQ2B4xiU2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rCUFcs26; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPn17J6T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09132C4AF09;
-	Mon, 19 Jan 2026 10:56:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rCUFcs26"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7BEC116C6;
+	Mon, 19 Jan 2026 10:56:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768820217;
-	bh=Dm/szfHimmX0FDqaxAVh9kHmntpiqJjHXOSsKyz6SVc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WPn17J6Tvl8EoN2zKl/y/GPQ/6B2Z2EQ2ZtlBkv9lAnBF9Nv1APoQ1zz8iq5ZWXK/
-	 eAyIsYZEAkqgbUNwUbgO9PgSSaJLJ41qXMowyfYevnklhe4pBpQKMJ1Olhvz4NMGtN
-	 taP7ECFW6I85rjGNOvzlC1kmf+3GdPkVd/s3fhpQ7rnmNuyKJsbp8mhV1VBIe0AlfN
-	 S2mwRBMiAEfHZ+IHaOAIe6C+g7PpTGKHKj30c8yEQqj9UgkYiF9G92yyEBnnIGdx+R
-	 nn0AdE93UbCXIe3GiZhGt2iv0L7d2VS3eZI02A/5+gcCh4UbHSkzfPl1srLIPOVqWZ
-	 bMLa3WHr036xg==
+	s=k20201202; t=1768820216;
+	bh=+At1IbBtGnJKCQBdyPPtACTjJjP82alOLGMVRxdUrr0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rCUFcs26jIdaWZm/OTN5XSTR9tpmwDaxhoEsRrCNvkWPQdFXacysw5XnLc+1OhPmo
+	 QHHnRh6RqaEsmztkORXUVD55Df8kg36waWLOFB0SdOEe1q1HPGTZ1ErjD3qZ/do0J/
+	 5kIpBIYs3b4TOv3XHWvSCsXE1kIF99pflt8uFCD2sIe9XAm39ZY/6I23fnl3L6OWE2
+	 0WcbndlGfzW3nle+qBsou6IrulrgUWd85+9pJh2uGxei8xz7FDKL9Na/sz52L9HeQL
+	 JtFQBAJvvoUmtUWeFpJBiwq07qg2cYun7whpe1EazgQTD9LfMv4W48QDQKMMJqvoqe
+	 QrWafwSnvpY3w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vhmwI-00000003YVK-3zmM;
-	Mon, 19 Jan 2026 10:56:55 +0000
+	id 1vhmwI-00000003YVK-2yfA;
+	Mon, 19 Jan 2026 10:56:54 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
@@ -42,12 +41,10 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Quentin Perret <qperret@google.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: [PATCH 1/6] arm64: Add MT_S2{,_FWB}_AS_S1 encodings
-Date: Mon, 19 Jan 2026 10:56:46 +0000
-Message-ID: <20260119105651.255693-2-maz@kernel.org>
+Subject: [PATCH 0/6] KVM: arm64: ... and FWB for all
+Date: Mon, 19 Jan 2026 10:56:45 +0000
+Message-ID: <20260119105651.255693-1-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260119105651.255693-1-maz@kernel.org>
-References: <20260119105651.255693-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,59 +57,46 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-pKVM usage of S2 translation on the host is purely for isolation
-purposes, not translation. To that effect, the memory attributes
-being used must be that of S1.
+[Yes, you can tell what I was listening to]
 
-With FWB=0, this is easily achieved by using the Normal Cacheable
-type (which is the weakest possible memory type) at S2, and let S1
-pick something stronger as required.
+Today, running in protected mode puts the host under it's own S2 with
+FWB=0, even if the rest of the guests are running with FWB=1. The
+rationale for this special-casing of the host is that we want the
+combined attributes to actually reflect the ones exposed by S1.
 
-With FWB=1, the attributes are combined in a different way, and we
-cannot arbitrarily use Normal Cacheable. We can, however, use a
-memattr encoding that indicates that the final attributes are that
-of Stage-1.
+We therefore use NormalCacheable (which is the weakest memory type) as
+the default attributes at S2 so that S1 can only strengthen the final
+memory type.
 
-Add these encoding and a few pointers to the relevant parts of the
-specification. It might come handy some day.
+But there is no reason why we cannot achieve the same effect with
+FWB. We normally use FWB to enforce cacheable memory from S2,
+irrespective of S1. But it is possible to configure the S2 attributes
+as "pass-through", so that the S1 attributes are always used.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/memory.h | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+This small series implements that change, adding a flag that actually
+describes what we are trying to do (instead of the NOFWB flag which is
+pretty obscure), and fixes an interesting gotcha with CMOs.
+Interestingly, CMOs never actually worked with NOFWB on an FWB-aware
+platform...
 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 9d54b2ea49d66..a2b7a33966ff1 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -175,19 +175,24 @@
- #define MT_DEVICE_nGnRE		4
- 
- /*
-- * Memory types for Stage-2 translation
-+ * Memory types for Stage-2 translation when HCR_EL2.FWB=0. See R_HMNDG,
-+ * R_TNHFM, R_GQFSF and I_MCQKW for the details on how these attributes get
-+ * combined with Stage-1.
-  */
- #define MT_S2_NORMAL		0xf
- #define MT_S2_NORMAL_NC		0x5
- #define MT_S2_DEVICE_nGnRE	0x1
-+#define MT_S2_AS_S1		MT_S2_NORMAL
- 
- /*
-- * Memory types for Stage-2 translation when ID_AA64MMFR2_EL1.FWB is 0001
-- * Stage-2 enforces Normal-WB and Device-nGnRE
-+ * Memory types for Stage-2 translation when HCR_EL2.FWB=1. Stage-2 enforces
-+ * Normal-WB and Device-nGnRE, unless we actively say that S1 wins. See
-+ * R_VRJSW and R_RHWZM for details.
-  */
- #define MT_S2_FWB_NORMAL	6
- #define MT_S2_FWB_NORMAL_NC	5
- #define MT_S2_FWB_DEVICE_nGnRE	1
-+#define MT_S2_FWB_AS_S1		7
- 
- #ifdef CONFIG_ARM64_4K_PAGES
- #define IOREMAP_MAX_ORDER	(PUD_SHIFT)
+Patches on top of 6.19-rc5.
+
+Marc Zyngier (6):
+  arm64: Add MT_S2{,_FWB}_AS_S1 encodings
+  KVM: arm64: Add KVM_PGTABLE_S2_AS_S1 flag
+  KVM: arm64: Make stage2_pte_cacheable() return false when S2_AS_S1 is
+    set
+  KVM: arm64: Switch pKVM host S2 over to KVM_PGTABLE_S2_AS_S1
+  KVM: arm64: Kill KVM_PGTABLE_S2_NOFWB
+  KVM: arm64: Simplify PAGE_S2_MEMATTR
+
+ arch/arm64/include/asm/kvm_pgtable.h  |  7 +++---
+ arch/arm64/include/asm/memory.h       | 11 ++++++---
+ arch/arm64/include/asm/pgtable-prot.h |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |  4 +++-
+ arch/arm64/kvm/hyp/pgtable.c          | 32 +++++++++++++++++++--------
+ 5 files changed, 39 insertions(+), 19 deletions(-)
+
 -- 
 2.47.3
 
