@@ -1,178 +1,179 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F1A21638D
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:23:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7762935EDBA
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768825408; cv=none; b=bv0MeGpupFhuoynR8nFeNvB67tyRKR+w1GZ0T2FAysyV7NbCzmR9FzGtr3OpXE8D6dLX73e+vHetFgLINjmQqL1KKvpMTsy/qDuRnuN+rYVift9DoB3LSDgqdH5oSFa01OuWHvza2rDl6P+BsjxGZQK1ZJIzDXzwfkC5zUg8jgI=
+	t=1768826813; cv=none; b=W1WO9MafCDBp+Qtq3/UOLyGjXMsTrAHe4uN9b+OZBRktyR4Gi1kNk+EWVP3NGr9nSNAYYM2XECXlWW3ze9xh4Rr/PYm1z6VihvnF+/IvmtWUwweniZPTClsgq/QLLwgEHaMe0iVef2em3G7eynGr1jlWX6sR/IgmH3tBZHjSk7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768825408; c=relaxed/simple;
-	bh=aOy6FI7GeudVcvAEG/d42TKDEg3rmbhIQ3RHpbHxLTg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GJrRv/8iO6IDt+4yfVD4w0qnbxy0cI2v4yCZS1NmDxgwS12otp7rGAQyQvNuMrJgquwbJWMSMXjcWPs8+qrqqeHnAGJ3Gr5AVeS5WAcyQBBCTomzzdrhNBxMaFGVHBbeiZYtu9+qtrbwExq6bdEucYWGifMMtiL4n/gHw94j1XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 367A5339;
-	Mon, 19 Jan 2026 04:23:13 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0635F3F632;
-	Mon, 19 Jan 2026 04:23:14 -0800 (PST)
-Message-ID: <f19cab15-0626-4d13-b25e-1c194294e62f@arm.com>
-Date: Mon, 19 Jan 2026 12:23:13 +0000
+	s=arc-20240116; t=1768826813; c=relaxed/simple;
+	bh=YJ9e/R24mcZ6mGK1DihOlExa+pPF4aCUH5QlK/D4yPA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o+ORaObis9rB1FP1yG79x4dBODX/LoWsg5+4i3KWqWe/KEMCDWpwytNaKoi/2TSgSp66O2AHPHgY97PyfN27XQeP43nVG/T4TiqSvyqn4ZLYYTczFqAw0msnWu4Ik/1rvbxgN6IK8vsBuDlPT+Up53X270iix/5kHQbyyFyet1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bzJoVJs4; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bzJoVJs4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E8E8C116C6;
+	Mon, 19 Jan 2026 12:46:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768826813;
+	bh=YJ9e/R24mcZ6mGK1DihOlExa+pPF4aCUH5QlK/D4yPA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bzJoVJs4+Lai5ii+QpmQH2AnEboNDuMEW6z1pXg0DoOfY9/LkjYPjDAJpbD7Ok6y5
+	 K0GKXBsJx7D0SW6ewUvxDh4M6ZkUIBP3Kf/mtzy/0tkmiq1qgfKV6BXUJAODW7VIrc
+	 WYVn7dAQERvEXDvhqxKD4PKw1Rh1rzOgWbw9W/oW6U3Ckeo6RgOOL/LCKLo8d3JtD8
+	 7C96PLv0rHi8Khypx+/W5DfEQ3IrOMz3G1M8GPm+VPccVlLpxFj1YeORwU1kiwGi0w
+	 mX+oalBQJQNM+xuOqxqnuktImP5swhoXNYq3O/kcaqxlgWvjID1BlpWXvCzLEFTwDh
+	 JCPYbztIsAqSQ==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: [PATCH v2 00/35] KVM: arm64: Add support for protected guest memory with pKVM
+Date: Mon, 19 Jan 2026 12:45:53 +0000
+Message-ID: <20260119124629.2563-1-will@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 06/47] arm64: mpam: Context switch the MPAM registers
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, will@kernel.org,
- corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-7-ben.horgan@arm.com> <aWkqt37FJ5l6QD0E@arm.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <aWkqt37FJ5l6QD0E@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Catalin,
+Hi folks,
 
-On 1/15/26 17:58, Catalin Marinas wrote:
-> On Mon, Jan 12, 2026 at 04:58:33PM +0000, Ben Horgan wrote:
->>  menu "ARMv8.5 architectural features"
->> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
->> new file mode 100644
->> index 000000000000..14011e5970ce
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/mpam.h
->> @@ -0,0 +1,67 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/* Copyright (C) 2025 Arm Ltd. */
->> +
->> +#ifndef __ASM__MPAM_H
->> +#define __ASM__MPAM_H
->> +
->> +#include <linux/jump_label.h>
->> +#include <linux/percpu.h>
->> +#include <linux/sched.h>
->> +
->> +#include <asm/sysreg.h>
->> +
->> +DECLARE_STATIC_KEY_FALSE(mpam_enabled);
->> +DECLARE_PER_CPU(u64, arm64_mpam_default);
->> +DECLARE_PER_CPU(u64, arm64_mpam_current);
->> +
->> +/*
->> + * The value of the MPAM0_EL1 sysreg when a task is in resctrl's default group.
->> + * This is used by the context switch code to use the resctrl CPU property
->> + * instead. The value is modified when CDP is enabled/disabled by mounting
->> + * the resctrl filesystem.
->> + */
->> +extern u64 arm64_mpam_global_default;
->> +
->> +/*
->> + * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
->> + * which may race with reads in mpam_thread_switch(). Ensure only one of the old
->> + * or new values are used. Particular care should be taken with the pmg field as
->> + * mpam_thread_switch() may read a partid and pmg that don't match, causing this
->> + * value to be stored with cache allocations, despite being considered 'free' by
->> + * resctrl.
->> + */
->> +#ifdef CONFIG_ARM64_MPAM
->> +static inline u64 mpam_get_regval(struct task_struct *tsk)
->> +{
->> +	return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);
->> +}
->> +
->> +static inline void mpam_thread_switch(struct task_struct *tsk)
->> +{
->> +	u64 oldregval;
->> +	int cpu = smp_processor_id();
->> +	u64 regval = mpam_get_regval(tsk);
->> +
->> +	if (!static_branch_likely(&mpam_enabled))
->> +		return;
->> +
->> +	if (regval == READ_ONCE(arm64_mpam_global_default))
->> +		regval = READ_ONCE(per_cpu(arm64_mpam_default, cpu));
->> +
->> +	oldregval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
->> +	if (oldregval == regval)
->> +		return;
->> +
->> +	write_sysreg_s(regval, SYS_MPAM1_EL1);
->> +	isb();
->> +
->> +	/* Synchronising the EL0 write is left until the ERET to EL0 */
->> +	write_sysreg_s(regval, SYS_MPAM0_EL1);
-> 
-> Since we have an isb() already, does it make any difference if we write
-> MPAM0 before the barrier? Similar question for other places where we
-> write these two registers.
+It's back and it's even bigger than before!
 
-The reason for the isb() placement is to document that it's not required
-for the MPAM0_EL1. All instructions running at EL1take their MPAM
-configuration from MPAM1_EL1. This includes LDTR and STTR as you asked
-about in a different thread.
+Although the first patch has been picked up as a fix (thanks, Oliver),
+review feedback has resulted in some additional patches being included
+in the series. If you'd like to see the first version, it's available
+here:
 
-> 
-> At some point, we should go through __switch_to() and coalesce the isbs
-> into fewer as we keep accumulating them (e.g. all those switch function
-> setting some sync variable if needed).
-> 
->> +
->> +	WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);
-> 
-> Is it too expensive to read the MPAM sysregs and avoid carrying around
-> another per-CPU state? You use it for pm restoring but we could just
-> save it in cpu_do_suspend() like other sysregs. Not a big issue, it just
-> feels like this function got unnecessarily complicated (it took me a bit
-> to figure out what it all does).
+  https://lore.kernel.org/kvmarm/20260105154939.11041-1-will@kernel.org/
 
-It's done this way as it matches what's done in x86. I expect it would
-be cheap enough to read the register to check whether a write is required.
+Changes since v1 include:
 
-> 
-> A related question - is resctrl_arch_set_cdp_enabled() always called in
-> non-preemptible contexts? We potentially have a race between setting
-> current->mpam_partid_msg and arm64_mpam_global_default, so the check in
-> mpam_thread_switch() can get confused.
+  * Change hypercall order so that pKVM-specific calls are in their own
+    range
+  * Make 'pkvm_handle_t' a u16 and check its size at compile-time
+  * Rework pte annotations to take a 4-bit type field
+  * Fix a memory leak on the kvm_arch_init_vm() failure path
+  * Pass KVM_PGTABLE_WALK_IGNORE_EAGAIN when mapping into the host idmap
+  * Avoid host annotation when reclaiming guest pages
+  * Re-instate guest pte metadata when unsharing a page
+  * Extend selftests to cover guest share and unshare hypercalls
+  * Drop broken MMU notifier changes
+  * Documentation tweaks
 
-The resctrl filesystem can only ever get mounted once and
-resctrl_arch_set_cdp_enabled() is always called in mount. In
-rdt_get_tree(), rdt_enable_ctx() calls resctrl_arch_set_cdp_enabled().
-This is done while holding the rdtgroup_mutex and the user can't change
-the mpam configuration from the default until the mutex is released and
-it can claim it.
+As before, patches are based on v6.19-rc4 and are also available at:
 
-> 
-> And I couldn't figure out where the MPAMx_EL1 registers are written. If
-> any global/per-cpu/per-task value is changed, does the kernel wait until
-> the next thread switch to write the sysreg? The only places I can found
-> touching these sysregs are the thread switch, pm notifiers and KVM.
-> 
+  https://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git/log/?h=kvm/protected-memory
 
-If the task configuration is changed then the MPAM sysreg will only be
-updated the next time it goes into the kernel. So, just eventually
-consistent. For cpu configuration, update_closid_rmid() gets called
-which ipis the cpus and ends up calling mpam_thread_switch() from
-resctrl_arch_sched_in().
+All feedback welcome.
 
-Thanks,
+Cheers,
 
-Ben
+Will
+
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>
+Cc: Mostafa Saleh <smostafa@google.com>
+
+--->8
+
+Fuad Tabba (1):
+  KVM: arm64: Expose self-hosted debug regs as RAZ/WI for protected
+    guests
+
+Quentin Perret (2):
+  KVM: arm64: Refactor enter_exception64()
+  KVM: arm64: Inject SIGSEGV on illegal accesses
+
+Will Deacon (32):
+  KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers
+  KVM: arm64: Don't leak stage-2 page-table if VM fails to init under
+    pKVM
+  KVM: arm64: Move handle check into pkvm_pgtable_stage2_destroy_range()
+  KVM: arm64: Rename __pkvm_pgtable_stage2_unmap()
+  KVM: arm64: Don't advertise unsupported features for protected guests
+  KVM: arm64: Remove is_protected_kvm_enabled() checks from hypercalls
+  KVM: arm64: Ignore MMU notifier callbacks for protected VMs
+  KVM: arm64: Prevent unsupported memslot operations on protected VMs
+  KVM: arm64: Ignore -EAGAIN when mapping in pages for the pKVM host
+  KVM: arm64: Split teardown hypercall into two phases
+  KVM: arm64: Introduce __pkvm_host_donate_guest()
+  KVM: arm64: Hook up donation hypercall to pkvm_pgtable_stage2_map()
+  KVM: arm64: Handle aborts from protected VMs
+  KVM: arm64: Introduce __pkvm_reclaim_dying_guest_page()
+  KVM: arm64: Hook up reclaim hypercall to pkvm_pgtable_stage2_destroy()
+  KVM: arm64: Avoid pointless annotation when mapping host-owned pages
+  KVM: arm64: Generalise kvm_pgtable_stage2_set_owner()
+  KVM: arm64: Introduce host_stage2_set_owner_metadata_locked()
+  KVM: arm64: Change 'pkvm_handle_t' to u16
+  KVM: arm64: Annotate guest donations with handle and gfn in host
+    stage-2
+  KVM: arm64: Introduce hypercall to force reclaim of a protected page
+  KVM: arm64: Reclaim faulting page from pKVM in spurious fault handler
+  KVM: arm64: Return -EFAULT from VCPU_RUN on access to a poisoned pte
+  KVM: arm64: Add hvc handler at EL2 for hypercalls from protected VMs
+  KVM: arm64: Implement the MEM_SHARE hypercall for protected VMs
+  KVM: arm64: Implement the MEM_UNSHARE hypercall for protected VMs
+  KVM: arm64: Allow userspace to create protected VMs when pKVM is
+    enabled
+  KVM: arm64: Add some initial documentation for pKVM
+  KVM: arm64: Extend pKVM page ownership selftests to cover guest
+    donation
+  KVM: arm64: Register 'selftest_vm' in the VM table
+  KVM: arm64: Extend pKVM page ownership selftests to cover forced
+    reclaim
+  KVM: arm64: Extend pKVM page ownership selftests to cover guest hvcs
+
+ .../admin-guide/kernel-parameters.txt         |   4 +-
+ Documentation/virt/kvm/arm/index.rst          |   1 +
+ Documentation/virt/kvm/arm/pkvm.rst           | 103 +++
+ arch/arm64/include/asm/kvm_asm.h              |  27 +-
+ arch/arm64/include/asm/kvm_emulate.h          |   5 +
+ arch/arm64/include/asm/kvm_host.h             |   9 +-
+ arch/arm64/include/asm/kvm_pgtable.h          |  51 +-
+ arch/arm64/include/asm/kvm_pkvm.h             |   4 +-
+ arch/arm64/include/asm/virt.h                 |   6 +
+ arch/arm64/kvm/Kconfig                        |  10 +
+ arch/arm64/kvm/arm.c                          |  12 +-
+ arch/arm64/kvm/hyp/exception.c                | 100 +--
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   9 +
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |   6 +
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   7 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 125 ++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 595 ++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 224 ++++++-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   1 +
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            |   8 +
+ arch/arm64/kvm/hyp/pgtable.c                  |  38 +-
+ arch/arm64/kvm/mmu.c                          | 122 +++-
+ arch/arm64/kvm/pkvm.c                         | 149 ++++-
+ arch/arm64/mm/fault.c                         |  31 +-
+ include/uapi/linux/kvm.h                      |   5 +
+ 25 files changed, 1405 insertions(+), 247 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/pkvm.rst
+
+-- 
+2.52.0.457.g6b5491de43-goog
 
