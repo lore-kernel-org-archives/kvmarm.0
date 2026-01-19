@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DA1338905;
-	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FEE350280;
+	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768814034; cv=none; b=rimuapYJAiJtvQd9PihdQmkRhqeZybThQ4FhRG6e3Ur2SF6tHAkRmCibN+bjX2BbxYbcPuXixX7gdobWDO39HmjDiWiCIrYxEyDRcqLLmAQcqrpg/rbs9zi66pH0aSfWMcpQUAOfrMHmVSQTh2YG/c88FKJlRHCSNizmh3lUXgY=
+	t=1768815541; cv=none; b=YcDtS1CJO2UYNn3snhllEGCo5cHKeNbg6Jze2Ie/VOSDp5yiEPVHfgvy3ooNzNFRqFo5kk1j2nlbYoT97Rjs/1U3WdguyITzs/XJfCel6EqwJmXgMj9cWqLxgsbwT9TJ1Z7Ahg97tJDnhASerS3AUpyrON7TetiTQEvRl9EWWBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768814034; c=relaxed/simple;
-	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	s=arc-20240116; t=1768815541; c=relaxed/simple;
+	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VIpM6vew7bP1nZOVvWThXN7vlD8fuDGddwfd3OMQ7fzrh9yHfWk4uxUFF9HGcaksIjLRw0Tkr+141vEERhuFWn0FmPj9WVWH3MchAmhgbUpDS2sVH+gs+OwC+D/bujX41kDk85aB78MN8WNJ0VrSC2udoYywPLhIa8Qgnu0g9dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkvNbbQn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=cVCO3NOSQs/q97OwuiEJky/+EOMwHLMV2LCz3h6oMk8MuL4Wc3uCQ2jTH7n6+CqGywWTqCl8iCNH9/QmfxNhgysiDswovpv4bVEBrYxyvq5ge1+7uKOIRzZbm+d7ChALRQsDnSrNaknH9i27qlvXg9l08eVmLGH2M/VIG+Bn3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXmDqQ/x; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkvNbbQn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B77AC16AAE;
-	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXmDqQ/x"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DD2AC116C6;
+	Mon, 19 Jan 2026 09:39:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768814034;
-	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	s=k20201202; t=1768815541;
+	bh=A1HF+c89D77043i9Z2YC3U06/ILbBibQS8Yb/UCStdI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IkvNbbQnnX+8pbedE00vceSUSIo9oHdhXGFRTVSIQy07FfIIKMSh2lqx4fnIdXtzP
-	 EBkBGpwkY9FX6jpGiSNNs5Qm7K+XVnMkb6yns5hWW6TXrKSIUdwmyo3/hBHA4NnHxi
-	 q1Ku/IV9DBpLkifKm7fmeaOjhKtucVg/I0HEButv3WiqZ+e9wM7Qb3gkhGKZR59FY8
-	 ePR8PTuTCXU9XHd7WWJZQyKBn2cBvxdCb+8b79Phd02/ECBy82rtAiVILyS1NlrLFn
-	 /NX6IoJAoLxLlJh++0yyUKKNIBDTcK0bs6o122pBtchVz0vEZx51AEGgY19iT7sqNx
-	 8t9y3h0Cs8OqQ==
+	b=FXmDqQ/xcE7jFSyt+rW9m8C3jgFKnw1SMkYYkNv26nPYeJEPiAZEzgEvE3Wshrb+b
+	 yFVnLJU1YZu23fyZpFrBJII+QHi695VOpIlwjEWoFRNKr/1ywOydjbG64mgWycHaPt
+	 c7C9u8h9kP/4S6nV17KqVxK2L1NQmH4tqF+S+QKXSytAuZrnp339Ltmp0tdcXVqKu3
+	 t/KCGkgrlj+XzsB3FGSITAcoRyod4ct2xGf+wtuKFSF7FWj1J38w1of2BprSg7yI65
+	 uz56vhpcyLSvC/NIPOq6IEYxPbKjtM6iiS+05zHJRAmFaFQSH13qnGQtC1+6lzyORP
+	 z23iQWefG1o4A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vhlKZ-00000003WE1-3wA0;
-	Mon, 19 Jan 2026 09:13:52 +0000
-Date: Mon, 19 Jan 2026 09:13:51 +0000
-Message-ID: <868qduc6cw.wl-maz@kernel.org>
+	id 1vhlit-00000003Wfc-0NBv;
+	Mon, 19 Jan 2026 09:38:59 +0000
+Date: Mon, 19 Jan 2026 09:38:58 +0000
+Message-ID: <867btec571.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: Andre Przywara <Andre.Przywara@arm.com>,
@@ -46,11 +46,11 @@ Cc: Andre Przywara <Andre.Przywara@arm.com>,
 	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
 	Alexandru Elisei <Alexandru.Elisei@arm.com>,
 	nd <nd@arm.com>
-Subject: Re: [PATCH kvmtool v4 3/7] arm64: nested: Add support for setting maintenance IRQ
-In-Reply-To: <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+Subject: Re: [PATCH kvmtool v4 5/7] arm64: Add FEAT_E2H0 support
+In-Reply-To: <c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
 References: <20250924134511.4109935-1-andre.przywara@arm.com>
-	<20250924134511.4109935-4-andre.przywara@arm.com>
-	<3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+	<20250924134511.4109935-6-andre.przywara@arm.com>
+	<c83e97aec2fd95548a5c4d2aa395b7fc09a9f38d.camel@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,92 +67,60 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, Andre.Przywara@arm.com, will@kernel.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 16 Jan 2026 18:10:11 +0000,
+On Fri, 16 Jan 2026 18:12:40 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 >=20
 > On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
-> > Uses the new VGIC KVM device attribute to set the maintenance IRQ.
-> > This is fixed to use PPI 9, as a platform decision made by kvmtool,
-> > matching the SBSA recommendation.
-> > Use the opportunity to pass the kvm pointer to
-> > gic__generate_fdt_nodes(),
-> > as this simplifies the call and allows us access to the nested_virt
-> > on
-> > the way.
+> > From: Marc Zyngier <maz@kernel.org>
 > >=20
+> > The --nested option allows a guest to boot at EL2 without FEAT_E2H0
+> > (i.e. mandating VHE support). While this is great for "modern"
+> > operating
+> > systems and hypervisors, a few legacy guests are stuck in a distant
+> > past.
+> >=20
+> > To support those, add the --e2h0 command line option, that exposes
+> > FEAT_E2H0 to the guest, at the expense of a number of other features,
+> > such
+> > as FEAT_NV2. This is conditioned on the host itself supporting
+> > FEAT_E2H0.
+> >=20
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> > =C2=A0arm64/arm-cpu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 2 +-
-> > =C2=A0arm64/gic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++--
-> > =C2=A0arm64/include/kvm/gic.h |=C2=A0 2 +-
-> > =C2=A03 files changed, 26 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-> > index 69bb2cb2c..0843ac051 100644
-> > --- a/arm64/arm-cpu.c
-> > +++ b/arm64/arm-cpu.c
-> > @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct
-> > kvm *kvm)
-> > =C2=A0{
-> > =C2=A0	int timer_interrupts[4] =3D {13, 14, 11, 10};
-> > =C2=A0
-> > -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
-> > +	gic__generate_fdt_nodes(fdt, kvm);
-> > =C2=A0	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-> > =C2=A0	pmu__generate_fdt_nodes(fdt, kvm);
-> > =C2=A0}
-> > diff --git a/arm64/gic.c b/arm64/gic.c
-> > index b0d3a1abb..e35986c06 100644
-> > --- a/arm64/gic.c
-> > +++ b/arm64/gic.c
-> > @@ -11,6 +11,8 @@
-> > =C2=A0
-> > =C2=A0#define IRQCHIP_GIC 0
-> > =C2=A0
-> > +#define GIC_MAINT_IRQ	9
-> > +
-> > =C2=A0static int gic_fd =3D -1;
-> > =C2=A0static u64 gic_redists_base;
-> > =C2=A0static u64 gic_redists_size;
-> > @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
-> > =C2=A0
-> > =C2=A0	int lines =3D irq__get_nr_allocated_lines();
-> > =C2=A0	u32 nr_irqs =3D ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
-> > +	u32 maint_irq =3D GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
-> > =C2=A0	struct kvm_device_attr nr_irqs_attr =3D {
-> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
-> > =C2=A0		.addr	=3D (u64)(unsigned long)&nr_irqs,
-> > =C2=A0	};
-> > +	struct kvm_device_attr maint_irq_attr =3D {
-> > +		.group	=3D KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
-> > +		.addr	=3D (u64)(unsigned long)&maint_irq,
-> > +	};
-> > =C2=A0	struct kvm_device_attr vgic_init_attr =3D {
-> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_CTRL,
-> > =C2=A0		.attr	=3D KVM_DEV_ARM_VGIC_CTRL_INIT,
-> > @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
-> > =C2=A0			return ret;
-> > =C2=A0	}
-> > =C2=A0
-> > +	if (kvm->cfg.arch.nested_virt &&
-> > +	=C2=A0=C2=A0=C2=A0 !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_att=
-r)) {
-> > +		ret =3D ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
-> > &maint_irq_attr);
-> > +		if (ret)
-> > +			return ret;
-> > +	}
 >=20
-> With GICv3 are things not a little broken if we're trying to do nested
-> but don't have the ability to set the maint IRQ? It feels to me as if
-> an error should be returned if the attr doesn't exist.
+> One inline comment below, but irrespective:
 >=20
-> Also, the way that the FDT is generated means that we'd still generate
-> the property for the maint IRQ, even if we can't set it here.
+> Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
+[...]
 
-Yup, this definitely need fixing. Thanks for catching this.
+> > diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> > index 42dc11dad..5e4f3a7dd 100644
+> > --- a/arm64/kvm-cpu.c
+> > +++ b/arm64/kvm-cpu.c
+> > @@ -76,6 +76,11 @@ static void kvm_cpu__select_features(struct kvm
+> > *kvm, struct kvm_vcpu_init *init
+> > =C2=A0		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
+> > =C2=A0			die("EL2 (nested virt) is not supported");
+> > =C2=A0		init->features[0] |=3D 1UL << KVM_ARM_VCPU_HAS_EL2;
+> > +		if (kvm->cfg.arch.e2h0) {
+> > +			if (!kvm__supports_extension(kvm,
+> > KVM_CAP_ARM_EL2_E2H0))
+> > +				die("FEAT_E2H0 is not supported");
+> > +			init->features[0] |=3D 1UL <<
+> > KVM_ARM_VCPU_HAS_EL2_E2H0;
+> > +		}
+>=20
+> --e2h0 is only consumed if --nested is also set (correctly so, by my
+> understanding & the KVM docs).
+>=20
+> Maybe it is worth printing that it isn't consumed without --nested if
+> only --e2h0 is supplied? Avoids the user thinking that it has an effect
+> when it doesn't. (Alternatively, make --e2h0 imply --nested, but I'm
+> not a fan of that, personally.)
+
+Sure, I can add a warning indicating that the option is ignored.
+
+Thanks,
 
 	M.
 
