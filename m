@@ -1,197 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD5D296BA8
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 07:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DA1338905;
+	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768806120; cv=none; b=dMqcvYMRm1zAXlyHxEOgT287hQOeQvAk4RynmzfveNzmg1Dqd+2N8HczlaGet3ZzqNs0MR9Pyl8Zt1lzUHKVMspZm7x9YK9O/eRPeSCvQn+RUjftfmBvKHmfebrvnmeMDUAv6O6ZhpxEWd3e/TX794Ih5vZN+FscNlSXKfzhcLc=
+	t=1768814034; cv=none; b=rimuapYJAiJtvQd9PihdQmkRhqeZybThQ4FhRG6e3Ur2SF6tHAkRmCibN+bjX2BbxYbcPuXixX7gdobWDO39HmjDiWiCIrYxEyDRcqLLmAQcqrpg/rbs9zi66pH0aSfWMcpQUAOfrMHmVSQTh2YG/c88FKJlRHCSNizmh3lUXgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768806120; c=relaxed/simple;
-	bh=/fpSS+eW+Zkt7Np4DBoJ3jAvYqxEfaTyXYAtHPsWTqo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VqtilY8PtRfv1F7n2n+qicHZBZt0Qd30eN4EmKPRQn8D7/Hv3iFVdkJ+x/fLKUz/qxnZvMcnx88VRBg1C8dTdlRPGQwFUOdjwLYeHx9iwDaVYnulDvxIJrRoJnw1mkLPcR9766/tZBOyZ6DSp7saXr73ijSmwQ9hXXVdjgg1bdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rb8cfs0v; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1768814034; c=relaxed/simple;
+	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VIpM6vew7bP1nZOVvWThXN7vlD8fuDGddwfd3OMQ7fzrh9yHfWk4uxUFF9HGcaksIjLRw0Tkr+141vEERhuFWn0FmPj9WVWH3MchAmhgbUpDS2sVH+gs+OwC+D/bujX41kDk85aB78MN8WNJ0VrSC2udoYywPLhIa8Qgnu0g9dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkvNbbQn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rb8cfs0v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1768806117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vdo0qnYDrXLCXtFaJcl+GhOfaYV/uNMOUVAlOziaLwk=;
-	b=Rb8cfs0vEFVZU601pFJHTM8hYhpsagscFoxg+BQ47aUkol4xI8kBrhUUH8uj8+JU7Bxa5z
-	N8vZbsyyKDg5yje7wBcIMNJSljZ2B/P9bu8ygiC9Ehd9HZe2ranQgwiOu0P9kzLkEoVVBf
-	J9RjwqFQYOCHAbVhbLFfECVJyX6CYPI=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-459-ZV4Q1N8xN2G2lWgSEOysUA-1; Mon, 19 Jan 2026 02:01:55 -0500
-X-MC-Unique: ZV4Q1N8xN2G2lWgSEOysUA-1
-X-Mimecast-MFC-AGG-ID: ZV4Q1N8xN2G2lWgSEOysUA_1768806114
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2a0d43fcb2fso94176765ad.3
-        for <kvmarm@lists.linux.dev>; Sun, 18 Jan 2026 23:01:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768806114; x=1769410914;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vdo0qnYDrXLCXtFaJcl+GhOfaYV/uNMOUVAlOziaLwk=;
-        b=NiVS+g8s7ZHqET1TLBo6nqOElizDY8CoX23BkKNon8nHNgsfxyxHiKzLWdrhxY8wLO
-         ApBnhgaSusDYrdLpE2VKUv3uYVi9ifyBZkADgSpIABxEMLQxE7kqk7wQLxU5bjcelzSt
-         CE6sUG7fAGgxtBmzPA6G2IDJ0GdIy8vAtBo9ITnz6Sjc/Q1oa0UMImVceqXIqzyCQ2Tj
-         PMqaBJdNp9FKdmxWk9BZhrCdf95+0z2KCQhXRlJFu3XKHQs4OK7C154AXCiDF0rKAUGL
-         m17UY6Btj/4JUZ7l6JrxCKYSqG5+oIflirPTIxq2tcSxgKOVM+p/G0GCR6bfxxRBr+q9
-         7nvA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvxIK0z0lLKLl2NZQ4cxux5k2qG+kumoqvH3ouFCcL4k3dlKxsBH4AW799y7Mebms4h4AAFZ4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxGkJfm/whG7xQZ1TxbvERLCqm0sfZQaoEZnxEiZGeVk2X2zAW6
-	GPGWCFemC6xOScGhvgGlDdDDkjCVGdwcuh7qeJPWHuwe3VvEqzJ7i7QKM66Is7Acj4NSUwggdYR
-	apeZ0LnaN6a/IDci6Jhxpu8rG6F+iBGELlyokSr1EKRvtvkhAJbIIU/nwKw==
-X-Gm-Gg: AZuq6aJsg3vF8W8388KnKuav13JpVLLT3lhXdUXNSeNWrfqbKAshYp5vFY4UPkQ0mTl
-	lPQ+WRL5zs6Px5RpR2f+KLMU8TCAmHZ5HsoszJysgK9Rax2zjW8sRkHL0Udm6C43bCn/aaAzJro
-	oVVrSUeV2bzulJx2TJOLEPw8Md0zrwYcawY75z3X/kRkkncRkXrnSeRxpUT/5iw8MbXib0itMj3
-	jMTRN/C1Rx3MA1bI23ROrT8lbf5ymTjxgK5+bwkymHi5r41OtfE3u4CswPLfVp0OSbnQBBxem9i
-	ab4C0BZnUM+NkYIlj528TV2004V0/+1Ze5ZDiC7J2klXnf21AhatLnvhOPNOqmgVzbbDKJwwguv
-	xvQU1EmoXHJo=
-X-Received: by 2002:a17:903:2f82:b0:2a5:8c95:d823 with SMTP id d9443c01a7336-2a717529fcbmr87592455ad.10.1768806114235;
-        Sun, 18 Jan 2026 23:01:54 -0800 (PST)
-X-Received: by 2002:a17:903:2f82:b0:2a5:8c95:d823 with SMTP id d9443c01a7336-2a717529fcbmr87592265ad.10.1768806113791;
-        Sun, 18 Jan 2026 23:01:53 -0800 (PST)
-Received: from [10.72.112.128] ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a7190ab9cbsm85652905ad.14.2026.01.18.23.01.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 18 Jan 2026 23:01:53 -0800 (PST)
-Message-ID: <57a015c3-9a4b-478b-8cb6-6c61f84c0b74@redhat.com>
-Date: Mon, 19 Jan 2026 15:01:41 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkvNbbQn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B77AC16AAE;
+	Mon, 19 Jan 2026 09:13:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768814034;
+	bh=57hVyZc6Qb6WqXaX1b7Nwyn01w3kd+um+ve1XNKrtUg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IkvNbbQnnX+8pbedE00vceSUSIo9oHdhXGFRTVSIQy07FfIIKMSh2lqx4fnIdXtzP
+	 EBkBGpwkY9FX6jpGiSNNs5Qm7K+XVnMkb6yns5hWW6TXrKSIUdwmyo3/hBHA4NnHxi
+	 q1Ku/IV9DBpLkifKm7fmeaOjhKtucVg/I0HEButv3WiqZ+e9wM7Qb3gkhGKZR59FY8
+	 ePR8PTuTCXU9XHd7WWJZQyKBn2cBvxdCb+8b79Phd02/ECBy82rtAiVILyS1NlrLFn
+	 /NX6IoJAoLxLlJh++0yyUKKNIBDTcK0bs6o122pBtchVz0vEZx51AEGgY19iT7sqNx
+	 8t9y3h0Cs8OqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vhlKZ-00000003WE1-3wA0;
+	Mon, 19 Jan 2026 09:13:52 +0000
+Date: Mon, 19 Jan 2026 09:13:51 +0000
+Message-ID: <868qduc6cw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"julien.thierry.kdev@gmail.com"
+	<julien.thierry.kdev@gmail.com>,
+	"kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Alexandru Elisei <Alexandru.Elisei@arm.com>,
+	nd <nd@arm.com>
+Subject: Re: [PATCH kvmtool v4 3/7] arm64: nested: Add support for setting maintenance IRQ
+In-Reply-To: <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+References: <20250924134511.4109935-1-andre.przywara@arm.com>
+	<20250924134511.4109935-4-andre.przywara@arm.com>
+	<3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 11/47] arm64: mpam: Add helpers to change a task or
- cpu's MPAM PARTID/PMG values
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-12-ben.horgan@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260112165914.4086692-12-ben.horgan@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: RUJLsxa-qhnRmyEvXnEu_CzgIxAUl8bUc_cZf2DAJX4_1768806114
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, Andre.Przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, Alexandru.Elisei@arm.com, nd@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Ben,
+On Fri, 16 Jan 2026 18:10:11 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+>=20
+> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
+> > Uses the new VGIC KVM device attribute to set the maintenance IRQ.
+> > This is fixed to use PPI 9, as a platform decision made by kvmtool,
+> > matching the SBSA recommendation.
+> > Use the opportunity to pass the kvm pointer to
+> > gic__generate_fdt_nodes(),
+> > as this simplifies the call and allows us access to the nested_virt
+> > on
+> > the way.
+> >=20
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > ---
+> > =C2=A0arm64/arm-cpu.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 2 +-
+> > =C2=A0arm64/gic.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++--
+> > =C2=A0arm64/include/kvm/gic.h |=C2=A0 2 +-
+> > =C2=A03 files changed, 26 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
+> > index 69bb2cb2c..0843ac051 100644
+> > --- a/arm64/arm-cpu.c
+> > +++ b/arm64/arm-cpu.c
+> > @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct
+> > kvm *kvm)
+> > =C2=A0{
+> > =C2=A0	int timer_interrupts[4] =3D {13, 14, 11, 10};
+> > =C2=A0
+> > -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
+> > +	gic__generate_fdt_nodes(fdt, kvm);
+> > =C2=A0	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
+> > =C2=A0	pmu__generate_fdt_nodes(fdt, kvm);
+> > =C2=A0}
+> > diff --git a/arm64/gic.c b/arm64/gic.c
+> > index b0d3a1abb..e35986c06 100644
+> > --- a/arm64/gic.c
+> > +++ b/arm64/gic.c
+> > @@ -11,6 +11,8 @@
+> > =C2=A0
+> > =C2=A0#define IRQCHIP_GIC 0
+> > =C2=A0
+> > +#define GIC_MAINT_IRQ	9
+> > +
+> > =C2=A0static int gic_fd =3D -1;
+> > =C2=A0static u64 gic_redists_base;
+> > =C2=A0static u64 gic_redists_size;
+> > @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
+> > =C2=A0
+> > =C2=A0	int lines =3D irq__get_nr_allocated_lines();
+> > =C2=A0	u32 nr_irqs =3D ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
+> > +	u32 maint_irq =3D GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
+> > =C2=A0	struct kvm_device_attr nr_irqs_attr =3D {
+> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> > =C2=A0		.addr	=3D (u64)(unsigned long)&nr_irqs,
+> > =C2=A0	};
+> > +	struct kvm_device_attr maint_irq_attr =3D {
+> > +		.group	=3D KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
+> > +		.addr	=3D (u64)(unsigned long)&maint_irq,
+> > +	};
+> > =C2=A0	struct kvm_device_attr vgic_init_attr =3D {
+> > =C2=A0		.group	=3D KVM_DEV_ARM_VGIC_GRP_CTRL,
+> > =C2=A0		.attr	=3D KVM_DEV_ARM_VGIC_CTRL_INIT,
+> > @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
+> > =C2=A0			return ret;
+> > =C2=A0	}
+> > =C2=A0
+> > +	if (kvm->cfg.arch.nested_virt &&
+> > +	=C2=A0=C2=A0=C2=A0 !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_att=
+r)) {
+> > +		ret =3D ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
+> > &maint_irq_attr);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+>=20
+> With GICv3 are things not a little broken if we're trying to do nested
+> but don't have the ability to set the maint IRQ? It feels to me as if
+> an error should be returned if the attr doesn't exist.
+>=20
+> Also, the way that the FDT is generated means that we'd still generate
+> the property for the maint IRQ, even if we can't set it here.
 
-On 1/13/26 12:58 AM, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> Care must be taken when modifying the PARTID and PMG of a task in any
-> per-task structure as writing these values may race with the task being
-> scheduled in, and reading the modified values.
-> 
-> Add helpers to set the task properties, and the CPU default value.  These
-> use WRITE_ONCE() that pairs with the READ_ONCE() in mpam_get_regval() to
-> avoid causing torn values.
-> 
-> CC: Dave Martin <Dave.Martin@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since rfc:
-> Keep comment attached to mpam_get_regval()
-> Add internal helper, __mpam_regval() (Jonathan)
-> ---
->   arch/arm64/include/asm/mpam.h | 28 ++++++++++++++++++++++++++++
->   1 file changed, 28 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
-> index 7b3d3abad162..c9b73f1af7ce 100644
-> --- a/arch/arm64/include/asm/mpam.h
-> +++ b/arch/arm64/include/asm/mpam.h
-> @@ -4,6 +4,7 @@
->   #ifndef __ASM__MPAM_H
->   #define __ASM__MPAM_H
->   
-> +#include <linux/bitfield.h>
->   #include <linux/jump_label.h>
->   #include <linux/percpu.h>
->   #include <linux/sched.h>
-> @@ -22,6 +23,22 @@ DECLARE_PER_CPU(u64, arm64_mpam_current);
->    */
->   extern u64 arm64_mpam_global_default;
->   
-> +static inline u64 __mpam_regval(u16 partid_d, u16 partid_i, u8 pmg_d, u8 pmg_i)
-> +{
-> +	return FIELD_PREP(MPAM0_EL1_PARTID_D, partid_d) |
-> +		FIELD_PREP(MPAM0_EL1_PARTID_I, partid_i) |
-> +		FIELD_PREP(MPAM0_EL1_PMG_D, pmg_d) |
-> +		FIELD_PREP(MPAM0_EL1_PMG_I, pmg_i);
-> +}
+Yup, this definitely need fixing. Thanks for catching this.
 
-Nitpick: Alignment issues in the lines for 2nd/3rd/4th FIELD_PREP().
+	M.
 
-	return FIELD_PREP(...) |
-	       FIELD_PREP(...) |
-                FIELD_PREP(...) |
-                FIELD_PREP(...);
-
-> +
-> +static inline void mpam_set_cpu_defaults(int cpu, u16 partid_d, u16 partid_i,
-> +					 u8 pmg_d, u8 pmg_i)
-> +{
-> +	u64 default_val = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
-> +
-> +	WRITE_ONCE(per_cpu(arm64_mpam_default, cpu), default_val);
-> +}
-> +
-
-per_cpu(arm64_mpam_default) won't be reachable until CONFIG_ARM64_MPAM is set.
-So I think both mpam_set_cpu_defaults() and __mpam_regval() need to be protected
-by '#ifdef CONFIG_ARM64_MPAM ... #endif'.
-
->   /*
->    * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
->    * which may race with reads in mpam_thread_switch(). Ensure only one of the old
-> @@ -36,6 +53,17 @@ static inline u64 mpam_get_regval(struct task_struct *tsk)
->   	return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);
->   }
->   
-> +static inline void mpam_set_task_partid_pmg(struct task_struct *tsk,
-> +					    u16 partid_d, u16 partid_i,
-> +					    u8 pmg_d, u8 pmg_i)
-> +{
-> +#ifdef CONFIG_ARM64_MPAM
-> +	u64 regval = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
-> +
-> +	WRITE_ONCE(task_thread_info(tsk)->mpam_partid_pmg, regval);
-> +#endif
-> +}
-> +
->   static inline void mpam_thread_switch(struct task_struct *tsk)
->   {
->   	u64 oldregval;
-
-Thanks,
-Gavin
-
+--=20
+Without deviation from the norm, progress is not possible.
