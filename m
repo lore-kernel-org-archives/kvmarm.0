@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D36221543
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F6D221543
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826829; cv=none; b=EGPP/kJdlcgdaHGWb20cZSwzOy2k1ICkvLNjh2fa9yCIUiTnK8X1AU2Zyr8tNYnB2UhltmS8mgtYmQYEq3rj8J/AhhHHGVL2RKKTiI9HwU4C8iPSJyvWJBDy6irTS0f9kkpufiueBcd1+cDl0BtpmZDDTti5faA6o/nGAUYsag0=
+	t=1768826832; cv=none; b=UOlL27Hch0o2y41zFQyz00sR1kT/4AtKfLSCX1i30fQyp9Vhp7mbeOXBeZN37r1Nb/d0ilOV+OPHV0pbm8c6/G624FATVjmRlIgMLqd1lJkNFVJljOwPIOb/YQHxs/S61fXwbaK6mVZ9DiskBKaDZMUq5/fH7Ae1zQ37mMng5fM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826829; c=relaxed/simple;
-	bh=ilZyBr/0UC+YHcdnNiHjYBCPLVUAoDM/YjJevxwCSLE=;
+	s=arc-20240116; t=1768826832; c=relaxed/simple;
+	bh=Ci8Yc7ndwDlszED/Qx1HGsS3eO9VUT9SMiftdYGNQu0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SxTVs06I8U+fwmwHzDYX65PgA3aOpDQMdpVJL0j0jKxIie2whNLDBou1SL7iOo7Xq/wFXs9kQJ8LkTgjWf5aPVJE3bn7Lkn9UQf2pmWdL2VLPAAUHkW2Sx3f/OdwGylMKRCeUb63flYmrVFlS2CwVEH8U3hrnXguvEBx4vASfLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=urV5s74X; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cThhWQH9YeSiE+QGuDwpFnSW4KaZJScfw6nBAXTOPIH7lWpYPc4micnZFDnakdlft45cMqvSj+t6OzDWSqauYaqlFTp+jmnmM0aJsJ5oYFitOzCrxfMpXaEKstyGEqN1HlQDekkrsK8i4zW30pVH3FS3/fF9i27ghhBYRFJF0xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+kax+mF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="urV5s74X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ADE0C2BC87;
-	Mon, 19 Jan 2026 12:47:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+kax+mF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222CBC116C6;
+	Mon, 19 Jan 2026 12:47:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826828;
-	bh=ilZyBr/0UC+YHcdnNiHjYBCPLVUAoDM/YjJevxwCSLE=;
+	s=k20201202; t=1768826831;
+	bh=Ci8Yc7ndwDlszED/Qx1HGsS3eO9VUT9SMiftdYGNQu0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=urV5s74X02f5AftapIIiz8YtQH6vJMrOr44HiLy45D9q4TWtQbMp31L4atPFOmAB8
-	 UGt5He0/Ekap1yGSA/kyht74lYv4AZpkdSkA5AAvuymO2NEePcWVjHS+dI7r+u5pWp
-	 H5stgc6/np8rOOJqCUuAs/5LdvTAnMJyfb3nidy15tMhU0prfK5Lyzu4Hr/F5hNOYf
-	 mWpXU5Ir8leO3kuRqxUoy7aJlDHRo6m8OGYXzK4bqSmHXDoatKcKd/JOYMDrokFGRD
-	 Fy5433DHejJQvBlaxOaq6YUnTnhE4bdHm37lC10f41+vjYWzWvVXp3pTGMBfZ2yIDW
-	 6u5Tt4X1AOVPA==
+	b=L+kax+mFuRN3ESDhczlAuyD1l3SxYTvc0LuBJJvNxSL9yW0Tmwni1tTupHx0CRQag
+	 2ZUPTwTToR9s9KbzvtArqerdYpOdalYAD77fPrj5Ubpet1iEMLGKhd4m2vvm5Vhoty
+	 4Ise9kfMx92nTCCN28VIngy4Vq8Yr7OLh0X2wg9uu7zH/1niw5c7B3LC/TfyVQtdUe
+	 wPfrxH4y8FfwKjw41yUL7+B40vcOxgggBIAGFrh2HLJr6FxzkFov5DAX5Sw5s6HZj5
+	 EFxiHU8ceqqFbpA5XxE0tRcFBOcextPcLnPrIh7SFL3FGPDcrw6DIqUEw9pkp5AbcI
+	 LG06VOagfk4bQ==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH v2 05/35] KVM: arm64: Don't advertise unsupported features for protected guests
-Date: Mon, 19 Jan 2026 12:45:58 +0000
-Message-ID: <20260119124629.2563-6-will@kernel.org>
+Subject: [PATCH v2 06/35] KVM: arm64: Expose self-hosted debug regs as RAZ/WI for protected guests
+Date: Mon, 19 Jan 2026 12:45:59 +0000
+Message-ID: <20260119124629.2563-7-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260119124629.2563-1-will@kernel.org>
 References: <20260119124629.2563-1-will@kernel.org>
@@ -54,32 +54,39 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Both SVE and PMUv3 are treated as "restricted" features for protected
-guests and attempts to access their corresponding architectural state
-from a protected guest result in an undefined exception being injected
-by the hypervisor.
+From: Fuad Tabba <tabba@google.com>
 
-Since these exceptions are unexpected and typically fatal for the guest,
-don't advertise these features for protected guests.
+Debug and trace are not currently supported for protected guests, so
+trap accesses to the related registers and emulate them as RAZ/WI for
+now. Although this isn't strictly compatible with the architecture, it's
+sufficient for Linux guests and means that debug support can be added
+later on.
 
+Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pkvm.h | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 0aecd4ac5f45..5a71d25febca 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -37,8 +37,6 @@ static inline bool kvm_pvm_ext_allowed(long ext)
- 	case KVM_CAP_MAX_VCPU_ID:
- 	case KVM_CAP_MSI_DEVID:
- 	case KVM_CAP_ARM_VM_IPA_SIZE:
--	case KVM_CAP_ARM_PMU_V3:
--	case KVM_CAP_ARM_SVE:
- 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 		return true;
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index 3108b5185c20..c106bb796ab0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -372,6 +372,14 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+ 	/* Cache maintenance by set/way operations are restricted. */
+ 
+ 	/* Debug and Trace Registers are restricted. */
++	RAZ_WI(SYS_DBGBVRn_EL1(0)),
++	RAZ_WI(SYS_DBGBCRn_EL1(0)),
++	RAZ_WI(SYS_DBGWVRn_EL1(0)),
++	RAZ_WI(SYS_DBGWCRn_EL1(0)),
++	RAZ_WI(SYS_MDSCR_EL1),
++	RAZ_WI(SYS_OSLAR_EL1),
++	RAZ_WI(SYS_OSLSR_EL1),
++	RAZ_WI(SYS_OSDLR_EL1),
+ 
+ 	/* Group 1 ID registers */
+ 	HOST_HANDLED(SYS_REVIDR_EL1),
 -- 
 2.52.0.457.g6b5491de43-goog
 
