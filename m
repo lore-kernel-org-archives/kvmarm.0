@@ -1,197 +1,151 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F2835F8D2
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826888; cv=pass; b=tdds7n7tGauUhsbM+JzjTZ+1HaILfDx3ipVJIrXYyDhFOy5UhekVCkgFvZDgBPA3598Ir9ymxpW3yr0iXdE8V60bg876GqM+3MCkcS7bB/0+g5zm6ZFLZ4CRL/rZ21nuniElBUC+uZnWrkqaWWXAc5l7k2hQuOxnWp+0pPmQ1H0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826888; c=relaxed/simple;
-	bh=kQHpNwAOUKHPYMoA/Ux1hVpdJHc11cXbz0W7Aqrta0E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jdi84sXpQd4ZiIQ3F3mC1kdy2rC1aJTqrIj3KO5NKJ3HPoidzEDrDCk9siwSWr5xgjuV2WUQYc1PQHtrtafr+Qy3SL9FkMQwyPU+QGnzsZrpV6V7BM+Q4UZCwo2yCOAusfTusU7X7AkQyA+pb74YxwvPfbtj9gwdn7k1NEICHwI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UWI0VLVe; arc=pass smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27CC35FF55
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768826890; cv=none; b=ne7OIy2TcHWc6N0dxGkbvIIOcVCEUsMsXRHXo1boGsXN+ldEOvWvG0VOj67G5KR2DHZsPByqDI39vGpUIoagJ36yyRCerUrTcNSb/Sc3lExn+zwSH+DZzExgd+ZvQe7xNe1MdOhpqM0d8SCuwv8KMDz1iazGQA8+JgWwpO+ISXI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768826890; c=relaxed/simple;
+	bh=eBPe3irIgFQzZeiJ/hcXb69SVpuZxRIfYJxRGW/nywE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=W3RuDa6bnwA0SiEuRKwFgHVHHaAStm2TDsvDAulJ/pJCqa4MO0Ic/rDquXnYLg/1kUgdLuTGychP8aNteeREE9fMTSA9BYguhKV4BkX//hQm4zCuKBvi1NudrJ9Kw92IWEBjwc5J7iaEemyqhIZ5ntkc34sYuQbpADxkHkZd+o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WI+yY+XK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UWI0VLVe"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b79f8f7ea43so992081866b.2
-        for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 04:48:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768826885; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IPFuFZ8nGl3MDj4KDsQSm4D7TTMZ8wLmZH92lYI8Cxp3BiFtTmaw5d8vR4x41o6sak
-         K6ZVFtN8QaPgyU3x8oXb7s1nlEYoM5Ds4cO3FOGw5DT8luGT/cjAI6zUT9awuscpquDE
-         sRWz/cuibuqfEtA47RkNXDWHZMSnomgClWMl3l9MC9LoDq0BzDiUlJc0DOWt0Jqj85tA
-         innL4D4vo9YVzbrMYoyH9ytQLZWwvrzGzYYT/SuzK9OJwkGS7T/ZqIk7I21+lTA/g3I8
-         NzQCWnfqUG4Kh3AkHN0UC4QrJ+yvqqnhSrGN5UkDxFTDSVExB7xhY98CHEefrelYqVTF
-         Z+TQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
-        fh=f+QNdRojIybo70HNFxmM6ucnrMt5hWhZ5Euh9+yVHTc=;
-        b=aQJjfavJ4z5rMER83iGFzZrcdWEddOZPNy7X/yNe/wB0NFYTREhYKIE1IGZKjOcCAv
-         X6YolHRIGEH7pSRpFy66PdBBM1dHTQOl4HeqbNzu8Z4gvxmKJiYY4JFLLl633BY+I5PC
-         hIldegybP1yAU2vnKH8dD5GQ3ToBymkxLyB1V2K1WahBkoUhbzXjOnrdtP88ERuk1bvS
-         qPwuAX4xD81oVPT+OoSnBnMDHAMS6mzdH9V4GbLyg+Hy3/IQf729nSpXvdDPj8N/oFoH
-         edRe9j0RKvpucScug3T3+qus2xAlpyG2ApdKiXFLnav8x75wpGSqzjCSCZ2rCtfgy51M
-         5G5g==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768826885; x=1769431685; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
-        b=UWI0VLVefwlo8ylrQbeSsTz9RTHZf8mkVfK4M5D6gdGlI7nOqqRLoucjUJ3eD042Au
-         t8YHtki9xA5GKorOC2xzecayr4UC9ZUZMlenFIXVvZ/ZTCl5nk/SzRmVma5z/YmrzFkt
-         DK8Ej8ePwMoGQ9IXqTMrddg7AgXNRpWfZNligqdoePqlB51sjXY5sPihinxagYy+HbC/
-         O238fCP5QtxjFbUbYGDgAR2v1rAcLyqfUryMZvi7fKa0+OJ9naGQC4qg7Kelx+ev5xzg
-         LHs5DH8pbNpV0M5I/bM+2JS6gHrpYjerfuuzOf+w4wXjd3Rv36Kw9zvs93SNgOC3zbUi
-         XoFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768826885; x=1769431685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dXrxi/sUt3m+ih60Bf8tH6DyGI8ZFaGSjWDzM7R/mGQ=;
-        b=ugiHh2nQFNCvq3YPCkQqDwS1jy7N2eMp6xWi0hbQt3e5cB8r6ha4gY//XDBq6QN3k5
-         VNDzJpFnOKjhaXiiuU/2B9qRCsyj/lx41EXlsaZSEoXRsybjQt4LPxIWrizPmJNIxpCd
-         s6NDFlRpSWSCllDnJk2zgFy8o0agdezHmHuZNjNvYHa/h5LLjlIDpQPaNRSleHf+/8N4
-         qkjhvw2ZgT4IsDKxZnHXboyQw+kHidzyDeH8xVQhyf0og8GzQDDut980MR7ffYcqE15V
-         cTor8dB8dmC0gO4zEcXSbT40ZEWGhNPlnwRSQUTMpjVv9pghNHllkPSxzo8Ns8x9e1DX
-         hXgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXeF9BZATzSp2IA+gOUsa4Nun7d9hTwgmT4wB2PHEHEnTWXyQr/Kkh+bETpHmoOsuRhzpS34m0=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwjKV+NzE8MEiL+rfvL+9FbyJTMo26hfdwzbP8MgPAg2lSiAd7O
-	2whxXdBLNJPkefb/HCDOGFrgv8Hr/o6sDdwAt+9rccbmlPd7hg/kvSjwZdX2qdk2GGMVG0Zo4TN
-	3yPY+SW1IDhXPT6HG89bVMu9GSQd5f4J54dbjJ4Sf
-X-Gm-Gg: AY/fxX41tWIKo3CvuWkrf0fOyrP/KU6g5M5xwERhAyGYOdtNrJi+RK4e/tQB7huewvr
-	/EyKmmWGgRcxA4dN/tCi1ajWQ9fsFg5JjpozrX5P6XDO6aA6pcjNcf3T5O25QuzstXOUc6JMiJb
-	6klLrRabgg4VhdLFhNGfWZZ6J5koXiR09QzIRpu7c9V9gY8+yycScoYzF2UAbtKBFBw0Jp22mv2
-	ACE7d6kShVVMXQWZ3xpZh2SqdWTDb3bVgfXdV5dB43R/ECLq8O4OWeXweIAT4R1Pet4KjDLmh+5
-	BZuGlZd/u2dpanxSBsAYk5hxgKh7edRBn1id+9fOzzKxMQo=
-X-Received: by 2002:a17:907:3f8a:b0:b87:7485:b4a8 with SMTP id
- a640c23a62f3a-b8792b3c4e1mr857024566b.0.1768826884302; Mon, 19 Jan 2026
- 04:48:04 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WI+yY+XK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6CBEC116C6;
+	Mon, 19 Jan 2026 12:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768826890;
+	bh=eBPe3irIgFQzZeiJ/hcXb69SVpuZxRIfYJxRGW/nywE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WI+yY+XKe231b3ZUriObbCV72KfvpmRkVu7FGB0+OKlHgNL58w7cp4IMZGKgy5Tcd
+	 77LRIsKY+1aF4hBr46luHPKX9S4+/rdlXst7unOEdfJCbETtNedoEDMzsKceIDzEpQ
+	 rqHsXDiylvJpWHopYXJEEB/fpIrYZT0gc5epw1h40+VXogwxoKSCwM5hC+7bIof3gI
+	 n3gQSiGh3WTILvBEX+YFWJn6sm3LDah2gxqP9wD9u8kdHi1O9pyDoAgm3EL8N8xMgI
+	 J4EGtZlhuroe6OgDesRixV3Rs8tPF52JNcZCF7XIhB4jhA99HYa/Pg3g1yTiDYjiJH
+	 j2dlt3Z65bEWw==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: [PATCH v2 25/35] KVM: arm64: Reclaim faulting page from pKVM in spurious fault handler
+Date: Mon, 19 Jan 2026 12:46:18 +0000
+Message-ID: <20260119124629.2563-26-will@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260119124629.2563-1-will@kernel.org>
+References: <20260119124629.2563-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260112165914.4086692-1-ben.horgan@arm.com> <20260112165914.4086692-30-ben.horgan@arm.com>
- <CALPaoCh+mRLJEfhKBve3hRf+vHHoObjvWRt74OfpopgtR9g9FQ@mail.gmail.com> <c157d2b6-7282-438f-b9e7-1a24be3fbf53@arm.com>
-In-Reply-To: <c157d2b6-7282-438f-b9e7-1a24be3fbf53@arm.com>
-From: Peter Newman <peternewman@google.com>
-Date: Mon, 19 Jan 2026 13:47:52 +0100
-X-Gm-Features: AZwV_QiZJBdvmI194c6LN0fqut2vJhOeVYj5jDyWBOT_GKG0XUzMZqV82Gtifu8
-Message-ID: <CALPaoCi0fR5sUVsjXi25XHBrhn3whFvKDpEvUGSM5Hjd2LZP6w@mail.gmail.com>
-Subject: Re: [PATCH v3 29/47] arm_mpam: resctrl: Pick classes for use as mbm counters
-To: James Morse <james.morse@arm.com>
-Cc: Ben Horgan <ben.horgan@arm.com>, amitsinght@marvell.com, baisheng.gao@unisoc.com, 
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, 
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, 
-	fenghuay@nvidia.com, gshan@redhat.com, jonathan.cameron@huawei.com, 
-	kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, punit.agrawal@oss.qualcomm.com, 
-	quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, 
-	scott@os.amperecomputing.com, sdonthineni@nvidia.com, 
-	tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, 
-	will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi James,
+Host kernel accesses to pages that are inaccessible at stage-2 result in
+the injection of a translation fault, which is fatal unless an exception
+table fixup is registered for the faulting PC (e.g. for user access
+routines). This is undesirable, since a get_user_pages() call could be
+used to obtain a reference to a donated page and then a subsequent
+access via a kernel mapping would lead to a panic().
 
-On Mon, Jan 19, 2026 at 1:04=E2=80=AFPM James Morse <james.morse@arm.com> w=
-rote:
->
-> Hi Peter,
->
-> On 15/01/2026 15:49, Peter Newman wrote:
-> > On Mon, Jan 12, 2026 at 6:02=E2=80=AFPM Ben Horgan <ben.horgan@arm.com>=
- wrote:
-> >> From: James Morse <james.morse@arm.com>
-> >>
-> >> resctrl has two types of counters, NUMA-local and global. MPAM has onl=
-y
-> >> bandwidth counters, but the position of the MSC may mean it counts
-> >> NUMA-local, or global traffic.
-> >>
-> >> But the topology information is not available.
-> >>
-> >> Apply a heuristic: the L2 or L3 supports bandwidth monitors, these are
-> >> probably NUMA-local. If the memory controller supports bandwidth monit=
-ors,
-> >> they are probably global.
->
-> > Are remote memory accesses not cached? How do we know an MBWU monitor
-> > residing on a cache won't count remote traffic?
->
-> It will, yes you get double counting. Is forbidding both mbm_total and mb=
-m_local preferable?
->
-> I think this comes from 'total' in mbm_total not really having the obviou=
-s meaning of the
-> word:
-> If I have CPUs in NUMA-A and no memory controllers, then NUMA-B has no CP=
-Us, and all the
-> memory-controllers.
-> With MPAM: we've only got one bandwidth counter, it doesn't know where th=
-e traffic goes
-> after the MSC. mbm-local on the L3 would reflect all the bandwidth, and m=
-bm-total on the
-> memory-controllers would have the  same number.
-> I think on x86 mbm_local on the CPUs would read zero as zero traffic went=
- to the 'local'
-> memory controller, and mbm_total would reflect all the memory bandwidth. =
-(so 'total'
-> really means 'other')
+Rework the spurious fault handler so that stage-2 faults injected back
+into the host result in the target page being forcefully reclaimed when
+no exception table fixup handler is registered.
 
-Our software is going off the definition from the Intel SDM:
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/include/asm/virt.h |  6 ++++++
+ arch/arm64/kvm/pkvm.c         |  7 +++++++
+ arch/arm64/mm/fault.c         | 15 +++++++++------
+ 3 files changed, 22 insertions(+), 6 deletions(-)
 
-"This event monitors the L3 external bandwidth satisfied by the local
-memory. In most platforms that support this event, L3 requests are
-likely serviced by a memory system with non-uniform memory
-architecture. This allows bandwidth to off-package memory resources to
-be tracked by subtracting local from total bandwidth (for instance,
-bandwidth over QPI to a memory controller on another physical
-processor could be tracked by subtraction).
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index b51ab6840f9c..e80addc923a4 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -94,6 +94,12 @@ static inline bool is_pkvm_initialized(void)
+ 	       static_branch_likely(&kvm_protected_mode_initialized);
+ }
+ 
++#ifdef CONFIG_KVM
++bool pkvm_reclaim_guest_page(phys_addr_t phys);
++#else
++static inline bool pkvm_reclaim_guest_page(phys_addr_t phys) { return false; }
++#endif
++
+ /* Reports the availability of HYP mode */
+ static inline bool is_hyp_mode_available(void)
+ {
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 8be91051699e..d1926cb08c76 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -563,3 +563,10 @@ int pkvm_pgtable_stage2_split(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 	WARN_ON_ONCE(1);
+ 	return -EINVAL;
+ }
++
++bool pkvm_reclaim_guest_page(phys_addr_t phys)
++{
++	int ret = kvm_call_hyp_nvhe(__pkvm_force_reclaim_guest_page, phys);
++
++	return !ret || ret == -EAGAIN;
++}
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index 2294f2061866..5d62abee5262 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -289,9 +289,6 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
+ 	if (!is_el1_data_abort(esr) || !esr_fsc_is_translation_fault(esr))
+ 		return false;
+ 
+-	if (is_pkvm_stage2_abort(esr))
+-		return false;
+-
+ 	local_irq_save(flags);
+ 	asm volatile("at s1e1r, %0" :: "r" (addr));
+ 	isb();
+@@ -302,8 +299,12 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
+ 	 * If we now have a valid translation, treat the translation fault as
+ 	 * spurious.
+ 	 */
+-	if (!(par & SYS_PAR_EL1_F))
++	if (!(par & SYS_PAR_EL1_F)) {
++		if (is_pkvm_stage2_abort(esr))
++			return pkvm_reclaim_guest_page(par & SYS_PAR_EL1_PA);
++
+ 		return true;
++	}
+ 
+ 	/*
+ 	 * If we got a different type of fault from the AT instruction,
+@@ -389,9 +390,11 @@ static void __do_kernel_fault(unsigned long addr, unsigned long esr,
+ 	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
+ 		return;
+ 
+-	if (WARN_RATELIMIT(is_spurious_el1_translation_fault(addr, esr, regs),
+-	    "Ignoring spurious kernel translation fault at virtual address %016lx\n", addr))
++	if (is_spurious_el1_translation_fault(addr, esr, regs)) {
++		WARN_RATELIMIT(!is_pkvm_stage2_abort(esr),
++			"Ignoring spurious kernel translation fault at virtual address %016lx\n", addr);
+ 		return;
++	}
+ 
+ 	if (is_el1_mte_sync_tag_check_fault(esr)) {
+ 		do_tag_recovery(addr, esr, regs);
+-- 
+2.52.0.457.g6b5491de43-goog
 
-On NUMA-capable hardware that can support this event where all memory
-is local, mbm_local =3D=3D mbm_total, but in practice you can't read them
-at the same time from userspace, so if you read mbm_total first,
-you'll probably get a small negative result for remote bandwidth.
-
->
-> I think what MPAM is doing here is still useful as a system normally has =
-both CPUs and
-> memory controllers in the NUMA nodes, and you can use this to spot a cont=
-rol/monitor group
-> on a NUMA-node that is hammering all the memory (outlier mbm_local), or t=
-he same where a
-> NUMA-node's memory controller is getting hammered by all the NUMA nodes (=
-outlier
-> mbm_total)
->
-> I've not heard of a platform with both memory bandwidth monitors at L3 an=
-d the memory
-> controller, so this may be a theoretical issue.
->
-> Shall we only expose one of mbm-local/total to prevent this being seen by=
- user-space?
-
-I believe in the current software design, MPAM is only able to support
-mbm_total, as an individual MSC (or class of MSCs with the same
-configuration) can't separate traffic by destination, so it must be
-the combined value. On a hardware design where MSCs were placed such
-that one only counts local traffic and another only counts remote, the
-resctrl MPAM driver would have to understand the hardware
-configuration well enough to be able to produce counts following
-Intel's definition of mbm_local and mbm_total.
-
-Thanks,
--Peter
