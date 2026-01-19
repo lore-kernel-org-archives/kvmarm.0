@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE36235FF69
-	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F3F35E555
+	for <kvmarm@lists.linux.dev>; Mon, 19 Jan 2026 12:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768826902; cv=none; b=O28p8ertSQpnDB6KZe/DK1rw9oc/EwI8AOieLQAKdBn/Pyce1RQSPYyKSKXFpY8fpvmtYZe+sRphkA1MhL8usYO8sIyemFgXkL/3Ni/8jtpLCSWsPB9/ZKlF4ugI0hEAailG0SxHVYBdzBi3lIhDrMnY+I4XhyFcv3MkbaAU3a4=
+	t=1768826905; cv=none; b=lFAvRe2UDGWwwtSQr96LrxUFNerL2R05fqD6gblI4o4TgA8nk948IGXBRqKmoM+8P0RUAufjUa0axnCedpqc4UMvGJZFjexulufug8DAQJIpg+9Pd914hmB7tDqLK9bn90qiaaxWwahSz0IUvhweWjOdsfjeMdgr0N0YtGiB43E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768826902; c=relaxed/simple;
-	bh=dVWfvIfyOr8qBQ0+yJXKHDLffmDd3mqOBXloDEZtcSo=;
+	s=arc-20240116; t=1768826905; c=relaxed/simple;
+	bh=dekMq/+/xWUD85cQcB1UPG3flAftjw3ev+fgfqiserg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qfnJlwxbl2btB56AWBJ0sLBrRnYfdP4n2qHWUfDKawAEqdaKtZRvDklvFb3x9Jb5xYMzdSlgM59MNmGvABMk7w8+RUw5293fbmwypjpkV38nMBUyrroSQju6LSZjVVokAnVRGHAv5+efuMVtGAQIVaT/esEernBXeV7jZfk2LNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YytEKQKN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cw6880ajAot25ugxWJO614XtVSyfxoMFjNoVuDpcyAS/jV+xV5REn4+2EyoG9wJ/DT9JiM8jnZMrYwXPDnCEXhbby4obaGNQICdiumaa9O4aZ0m4+UwsZSsCq1E2fj0kseeMNdtxEMtuvs4oYMd2Fx3WlLQYJoNI2edKTIo4GLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HmAXOsOu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YytEKQKN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3F4EC116C6;
-	Mon, 19 Jan 2026 12:48:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HmAXOsOu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A741C116C6;
+	Mon, 19 Jan 2026 12:48:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768826902;
-	bh=dVWfvIfyOr8qBQ0+yJXKHDLffmDd3mqOBXloDEZtcSo=;
+	s=k20201202; t=1768826905;
+	bh=dekMq/+/xWUD85cQcB1UPG3flAftjw3ev+fgfqiserg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YytEKQKNsYNvUTGtBZpw1eRz9f4ruIfgzsE+2Nh0UV4owUExbIQgKxVAgebuh5shd
-	 DehqHJnDTk3JuNYxzuSMDvvZFAE45uoeosKlvp/zAuXXhThlmPBeDCs7aW9U2LqQsz
-	 Lc3YpJAG68nv54lVquz91ooXTllfRMy12wkre24rM7z1RwzGxuMybtUP0Ss0FE5Xu/
-	 Rg6cTIDES9jHcXA02erKdr9En24d4zKrfAq/mfVAx+ykjEkuZQPlriBMAHyMG6tv/5
-	 1lx8Z0SfZM8NvaSYJ0oVAqF5+LrPFCxQiwMvnqi5EIHFA6qt7LoAQzSURGw6LRixhh
-	 MaamyBuoAD6qQ==
+	b=HmAXOsOuhURoZHkuzO61amYHDPIxfOjv8IYkqueyMkynGcHkbnlx4C0UQgffYQtPF
+	 e9ChMtEjVnLsK0LtAyOqDqXO+14ndR2TFIliwPquW6VbbXFK2s6kMvLjx7LrZ2T6Ro
+	 96aA4JSVFyYk8csAHGAVpUgK9PRbnb8P62IPSE42CdDQXnApD6JaQo2MwnNd2cwSv8
+	 Aswr6emWVtSxPC/3EvCJrqnLFj1lvVaxInKu6ABrZpTzhuHQbDnoF1BEyn6HzucNHs
+	 dsorEWQNHL6h9p5FvrPrw99vB0rXe2sx8nrZCW2JzrJCGMR9LzH2eD3BLj23e5rRvC
+	 628IgPI/pVs1g==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -40,9 +40,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Fuad Tabba <tabba@google.com>,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>
-Subject: [PATCH v2 29/35] KVM: arm64: Implement the MEM_UNSHARE hypercall for protected VMs
-Date: Mon, 19 Jan 2026 12:46:22 +0000
-Message-ID: <20260119124629.2563-30-will@kernel.org>
+Subject: [PATCH v2 30/35] KVM: arm64: Allow userspace to create protected VMs when pKVM is enabled
+Date: Mon, 19 Jan 2026 12:46:23 +0000
+Message-ID: <20260119124629.2563-31-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260119124629.2563-1-will@kernel.org>
 References: <20260119124629.2563-1-will@kernel.org>
@@ -54,122 +54,143 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the ARM_SMCCC_KVM_FUNC_MEM_UNSHARE hypercall to allow
-protected VMs to unshare memory that was previously shared with the host
-using the ARM_SMCCC_KVM_FUNC_MEM_SHARE hypercall.
+Introduce a new VM type for KVM/arm64 to allow userspace to request the
+creation of a "protected VM" when the host has booted with pKVM enabled.
 
-Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+For now, this depends on CONFIG_EXPERT and results in a taint on first
+use as many aspects of a protected VM are not yet protected!
+
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 34 +++++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 22 ++++++++++++
- 3 files changed, 57 insertions(+)
+ arch/arm64/include/asm/kvm_pkvm.h |  2 +-
+ arch/arm64/kvm/Kconfig            | 10 ++++++++++
+ arch/arm64/kvm/arm.c              |  8 +++++++-
+ arch/arm64/kvm/mmu.c              |  3 ---
+ arch/arm64/kvm/pkvm.c             | 11 ++++++++++-
+ include/uapi/linux/kvm.h          |  5 +++++
+ 6 files changed, 33 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 42fd60c5cfc9..e41a128b0854 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -36,6 +36,7 @@ extern unsigned long hyp_nr_cpus;
- int __pkvm_prot_finalize(void);
- int __pkvm_host_share_hyp(u64 pfn);
- int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
-+int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
- int __pkvm_host_unshare_hyp(u64 pfn);
- int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 7535a45565f4..3969a92dc3e2 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -999,6 +999,40 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
- 	return ret;
- }
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+index 5a71d25febca..507d9c53e2eb 100644
+--- a/arch/arm64/include/asm/kvm_pkvm.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -16,7 +16,7 @@
  
-+int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
-+{
-+	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-+	u64 meta, phys, ipa = hyp_pfn_to_phys(gfn);
-+	kvm_pte_t pte;
-+	int ret;
+ #define HYP_MEMBLOCK_REGIONS 128
+ 
+-int pkvm_init_host_vm(struct kvm *kvm);
++int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
+ int pkvm_create_hyp_vm(struct kvm *kvm);
+ bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+ void pkvm_destroy_hyp_vm(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 4f803fd1c99a..47fa06c9da94 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -83,4 +83,14 @@ config PTDUMP_STAGE2_DEBUGFS
+ 
+ 	  If in doubt, say N.
+ 
++config PROTECTED_VM_UAPI
++	bool "Expose protected VMs to userspace (experimental)"
++	depends on KVM && EXPERT
++	help
++	  Say Y here to enable experimental (i.e. in development)
++	  support for creating protected virtual machines using KVM's
++	  KVM_CREATE_VM ioctl() when booted with pKVM enabled.
 +
-+	host_lock_component();
-+	guest_lock_component(vm);
++	  Unless you are a KVM developer, say N.
 +
-+	ret = get_valid_guest_pte(vm, ipa, &pte, &phys);
-+	if (ret)
-+		goto unlock;
-+
-+	ret = -EPERM;
-+	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) != PKVM_PAGE_SHARED_OWNED)
-+		goto unlock;
-+	if (__host_check_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED))
-+		goto unlock;
-+
-+	ret = 0;
-+	meta = host_stage2_encode_gfn_meta(vm, gfn);
-+	WARN_ON(host_stage2_set_owner_metadata_locked(phys, PAGE_SIZE,
-+						      PKVM_ID_GUEST, meta));
-+	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
-+				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
-+				       &vcpu->vcpu.arch.pkvm_memcache, 0));
-+unlock:
-+	guest_unlock_component(vm);
-+	host_unlock_component();
-+
-+	return ret;
-+}
-+
- int __pkvm_host_unshare_hyp(u64 pfn)
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6a218739621d..7a59f0e32efc 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -157,6 +157,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
  {
- 	u64 phys = hyp_pfn_to_phys(pfn);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 4133556560d9..4ddb3d70f9c0 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -989,6 +989,19 @@ static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return false;
+ 	int ret;
+ 
++	if (type & ~KVM_VM_TYPE_ARM_MASK)
++		return -EINVAL;
++
+ 	mutex_init(&kvm->arch.config_lock);
+ 
+ #ifdef CONFIG_LOCKDEP
+@@ -188,9 +191,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 		 * If any failures occur after this is successful, make sure to
+ 		 * call __pkvm_unreserve_vm to unreserve the VM in hyp.
+ 		 */
+-		ret = pkvm_init_host_vm(kvm);
++		ret = pkvm_init_host_vm(kvm, type);
+ 		if (ret)
+ 			goto err_uninit_mmu;
++	} else if (type & KVM_VM_TYPE_ARM_PROTECTED) {
++		ret = -EINVAL;
++		goto err_uninit_mmu;
+ 	}
+ 
+ 	kvm_vgic_early_init(kvm);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index b21a5bf3d104..bbc569b583e6 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -881,9 +881,6 @@ static int kvm_init_ipa_range(struct kvm_s2_mmu *mmu, unsigned long type)
+ 	u64 mmfr0, mmfr1;
+ 	u32 phys_shift;
+ 
+-	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+-		return -EINVAL;
+-
+ 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+ 	if (is_protected_kvm_enabled()) {
+ 		phys_shift = kvm_ipa_limit;
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 14865907610c..6d6b1ef1cc62 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -219,9 +219,13 @@ void pkvm_destroy_hyp_vm(struct kvm *kvm)
+ 	mutex_unlock(&kvm->arch.config_lock);
  }
  
-+static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu;
-+	u64 ipa = smccc_get_arg1(vcpu);
+-int pkvm_init_host_vm(struct kvm *kvm)
++int pkvm_init_host_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	int ret;
++	bool protected = type & KVM_VM_TYPE_ARM_PROTECTED;
 +
-+	if (!PAGE_ALIGNED(ipa))
-+		return;
++	if (protected && !IS_ENABLED(CONFIG_PROTECTED_VM_UAPI))
++		return -EINVAL;
+ 
+ 	if (pkvm_hyp_vm_is_created(kvm))
+ 		return -EINVAL;
+@@ -236,6 +240,11 @@ int pkvm_init_host_vm(struct kvm *kvm)
+ 		return ret;
+ 
+ 	kvm->arch.pkvm.handle = ret;
++	kvm->arch.pkvm.is_protected = protected;
++	if (protected) {
++		pr_warn_once("kvm: protected VMs are for development only, tainting kernel\n");
++		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index dddb781b0507..9316a827a826 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -689,6 +689,11 @@ struct kvm_enable_cap {
+ #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
+ #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
+ 	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
 +
-+	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
-+	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa)))
-+		ret[0] = SMCCC_RET_SUCCESS;
-+}
++#define KVM_VM_TYPE_ARM_PROTECTED	(1UL << 31)
++#define KVM_VM_TYPE_ARM_MASK		(KVM_VM_TYPE_ARM_IPA_SIZE_MASK | \
++					 KVM_VM_TYPE_ARM_PROTECTED)
 +
  /*
-  * Handler for protected VM HVC calls.
-  *
-@@ -1006,6 +1019,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
- 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
- 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
- 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE);
-+		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_UNSHARE);
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
- 		if (smccc_get_arg1(vcpu) ||
-@@ -1024,6 +1038,14 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
- 
- 		handled = pkvm_memshare_call(val, vcpu, exit_code);
- 		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
-+		if (smccc_get_arg2(vcpu) ||
-+		    smccc_get_arg3(vcpu)) {
-+			break;
-+		}
-+
-+		pkvm_memunshare_call(val, vcpu);
-+		break;
- 	default:
- 		/* Punt everything else back to the host, for now. */
- 		handled = false;
+  * ioctls for /dev/kvm fds:
+  */
 -- 
 2.52.0.457.g6b5491de43-goog
 
