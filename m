@@ -1,284 +1,143 @@
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013044.outbound.protection.outlook.com [40.107.162.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEF043E4A8
-	for <kvmarm@lists.linux.dev>; Tue, 20 Jan 2026 18:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.44
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768932059; cv=fail; b=AYuZqWnl/jH9/Te9Z2HSt2YU+TWRu6aUkAXo+I3XIOl4aWtltYz9klO8zYj99qg11/sk6/6pWvru7eTmzjYU2R9q1vN17xXliKs9KSBAyqTo85YiNolYnK/o1kopXyITm6FapR5I1+Qn6O2eXrpTi30KfvWYq/QflpmIXSeFsbM=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768932059; c=relaxed/simple;
-	bh=YNuWqjQxSzFDOp06spFohPFnBWrwikXnmruZXPwjzRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=EEutXz12DH6hb4Z4IItE4iYUwwLk0JzD3o2KMJOcsd6y43ZQQBsDL9XtgaeQcxNx9u0/sLvf2BmXZQFjUMLeXKo/Vxx3Ihe5CUr4cHkwAI1kAuqWdRNW4Ip3tvt2/OY2OmcAIB+CV1LKAkM5jo5Q5rYcfoDX5EQjzmfYm55QpRI=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Aav1Wq7c; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Aav1Wq7c; arc=fail smtp.client-ip=40.107.162.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC42D1303;
+	Tue, 20 Jan 2026 21:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768943768; cv=none; b=A8BCqtNuDg8CDcAuqGzopqhDqD2Vl2rBGgzjnZn4+YmtfvQDDkv7MuZNf1JwjW7mmaRGedQcGCF+VHVL2eZLYPK5E+Brc1EybW2TOBCufqa0UG3chxWpqrKw1/jmLyENAYYWQCdRLLKkVP93pYpRMF1GCDWNUnT9zPAkpyCYTPo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768943768; c=relaxed/simple;
+	bh=k+AXef9xJ0NMYxE0xeBDoDL6TDip/0guYNTErye5XeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EMyMFhpJfF9nR77CgWejMs5of20QFeZx3B88IBlBnUaRwhL136AiSXWpMz5AV1zfVLM6mRn+IdDkUd6umHelmdWP/PbGlgzi/BDPAwWnulJBbG2JmAH4VZHIibHpDlWaW+YOyhpC0wNMTe1L19c+Hm+fco3ROy8CGNc+CS9yDSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ViOxTvm/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Aav1Wq7c";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Aav1Wq7c"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=Z0n2i7S94gfCRzh9zBXEgiB9ika77gvMDMIF0mtA/ZAiWi8d1h/5g0usuGgjpm83wj4ZoZ5LFic+jai8pkoLZbBCMfcyPsLCDoXsAdsfUgNjah+uirfA78m3uligRxbpFwactu5ZwjmovSBKKFmGSEsiN5eZiviTQOhoehdbTa8s3Pv6dc4Uaqy4YCF016EQmPQR47DO8ou3NJaO2hOQoblSoxvFi0taRRdvrfpXgvQ0766jiqvY9NadZ7MeSgaAvK1/D+UjVYi965QJXhhTymq3mvrmz5QPlOKjDhLR1PlmZbEArUXsmws/aVaxRXNlEyg9SYK4fMuquY1FdLQDBQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3TpFgnWSCJaNySnxTSQPb9RzYkEc5LDj7PF0vFgP4gE=;
- b=nLLB7j5p0bl14H/4695CBPdKCXpx/xCNz/zAu8ave8FaYPtJaIhiZt/8PW5KH7jRZIrciEaPibEDctlp3N5KJ1KBrY3tdkjgUOhmd6Fqjl7AX7Gd5fp0Tr/HmcZfUpIhckjEWMmom3oCZaTyHEJN5pypTMJGrEnMOMBtWK7KooCBh7kNAdAigPna5U86x+DALVskIBBaRAgZup3Q8U6QGeMQlt/f/TnuNSf0mt3esKYOFv3ICYA0aSfn3Tb5iJaBGJl0DJd4l6TEFMt/07Ae0r6LEFFpVmWezV/ELJpP2yu/UO61Hx13bCJISc2RZ4ns+o1D+IpwVyiPKuJdp7vNpQ==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3TpFgnWSCJaNySnxTSQPb9RzYkEc5LDj7PF0vFgP4gE=;
- b=Aav1Wq7c08td3UgTHEH60aOD5RQ1twwQJ5bkH/Xig5DBeKtU7P2FRR+MGVqsrRPB1iISCxdJcNARaJ963tHW8abOC/fHjYIrUF9KUY4BJeXzQj4LEU9he/nhAwML1C5kcohZ3hQ7nlNZkjN2uW/8u+N0jR2CUQXNOpxn23O0z+8=
-Received: from DU2PR04CA0346.eurprd04.prod.outlook.com (2603:10a6:10:2b4::33)
- by PR3PR08MB5643.eurprd08.prod.outlook.com (2603:10a6:102:84::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
- 2026 18:00:53 +0000
-Received: from DU2PEPF0001E9C5.eurprd03.prod.outlook.com
- (2603:10a6:10:2b4:cafe::2b) by DU2PR04CA0346.outlook.office365.com
- (2603:10a6:10:2b4::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9520.12 via Frontend Transport; Tue,
- 20 Jan 2026 18:00:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU2PEPF0001E9C5.mail.protection.outlook.com (10.167.8.74) with Microsoft SMTP
- Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.4 via
- Frontend Transport; Tue, 20 Jan 2026 18:00:53 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uPlYnMt55hEz9DjAYHhjMVsBcmhQNQekYPN8LPO5FRBMNzAZjbpjUzWr3ziRM89DglorKwwIKwSOA+IsXcHwpp0NkrFjpfS5lCJzuSpY3/bPVCdkkxQAS0vF9aIs/xAssP283/1W60mCxDLHaOJphxhDRyRnXGlPaxqMv/otXTRTeMsPjRconAjzlAYIQDq78q/lNAa2QeirX5qS0imv0vkevJBbz2712OgOO1uRFzc4kbFlp75bsnEvL7KhMU3J+jYFu21K7rBmTtAsJei9I6wcbshrxff2Goe2JKj2pMl55R6Q6zJrnm4FYfv+Tg37raAufQD1VU4VCUYE7emAxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3TpFgnWSCJaNySnxTSQPb9RzYkEc5LDj7PF0vFgP4gE=;
- b=KT88QAjx5E+X/1iwHK0sMBvBgRvBJR+nvTYoD+6mQTs0hL5HZ/Qv4UPIcBOoDLvzkB+DH1J6uQQHgzwVKyNcg3hqKl/PpYb2DRH/fA8mA+uyYPN8MIia0Fkc1Csh/GBVAnVK4gQp2kR8g8QFCx6inyeHr/0ndlN76+DszYC5/ZmYqkX17dKcU4UBXFRKXQ3e1oyEiW61OTprmLrFu5lEh7WYAEb68Lx2bDQiytW8LVVyi9HYxKtkOLnFYsl18Hf+SUIlgIZP+EHR7URB3SCZRPTeFIaENf+BYqIS5IGEIQEHbAxlWMJ4SpDXDdsAT8lCFdQU33QCbKGzzrmWqAZ6gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3TpFgnWSCJaNySnxTSQPb9RzYkEc5LDj7PF0vFgP4gE=;
- b=Aav1Wq7c08td3UgTHEH60aOD5RQ1twwQJ5bkH/Xig5DBeKtU7P2FRR+MGVqsrRPB1iISCxdJcNARaJ963tHW8abOC/fHjYIrUF9KUY4BJeXzQj4LEU9he/nhAwML1C5kcohZ3hQ7nlNZkjN2uW/8u+N0jR2CUQXNOpxn23O0z+8=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by AM9PR08MB6097.eurprd08.prod.outlook.com
- (2603:10a6:20b:280::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
- 2026 17:59:51 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98%3]) with mapi id 15.20.9520.011; Tue, 20 Jan 2026
- 17:59:50 +0000
-Date: Tue, 20 Jan 2026 17:59:47 +0000
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	catalin.marinas@arm.com, broonie@kernel.org, oliver.upton@linux.dev,
-	miko.lenczewski@arm.com, kevin.brodsky@arm.com, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org,
-	yangyicong@hisilicon.com, scott@os.amperecomputing.com,
-	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
-	shuah@kernel.org, arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
- for swpX emulation.
-Message-ID: <aW/Ck3M3Xg02DpQX@e129823.arm.com>
-References: <20251214112248.901769-1-yeoreum.yun@arm.com>
- <20251214112248.901769-10-yeoreum.yun@arm.com>
- <86ms3knl6s.wl-maz@kernel.org>
- <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
- <aW5O714hfl7DCl04@willie-the-truck>
- <aW6w6+B21NbUuszA@e129823.arm.com>
- <aW9O6R7v-ybhrm66@J2N7QTR9R3>
- <aW9T5b+Y2b2JOZHk@e129823.arm.com>
- <aW9sBkUVnpAkPkxN@willie-the-truck>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aW9sBkUVnpAkPkxN@willie-the-truck>
-X-ClientProxiedBy: LO4P123CA0368.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18e::13) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ViOxTvm/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 264A3C16AAE;
+	Tue, 20 Jan 2026 21:16:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768943763;
+	bh=k+AXef9xJ0NMYxE0xeBDoDL6TDip/0guYNTErye5XeE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ViOxTvm/wBcqrRmueJcnA2eKsVM7IiLX+iKhZBMtBWp/RG2pbtop2vcWb6ApVoSzc
+	 ppGw8yQVNtX5fBIU76SqhbZjAMA00XB4JsFh/5TkfLxxJZ3KWTNe5jR19wYqKTlyii
+	 vePMRNc+fVaocz2/WIyg1fDLR+m3Q+gt45QkjwuY8XWAKMQp6J5g8gzoB/2ZuUF74m
+	 5/UWws6pLVPOk9qkiYYZ0dnMFLcdpCaHuHHFKqued+U5Kn8gySLomhmG7lqVgR7Rkz
+	 2SY1yf46R8DnIsw7Bdq6mVuo5veVy5sFTp1bUZYuYg3tmykv5SJvIovGBCu2ZsoiDy
+	 BKqNYbr1op2pA==
+Date: Tue, 20 Jan 2026 14:15:58 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in
+ DECLARE_FEAT_MAP() and co
+Message-ID: <20260120211558.GA834868@ax162>
+References: <20251210173024.561160-1-maz@kernel.org>
+ <20251210173024.561160-5-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|AM9PR08MB6097:EE_|DU2PEPF0001E9C5:EE_|PR3PR08MB5643:EE_
-X-MS-Office365-Filtering-Correlation-Id: 052014af-1f8d-4b7a-3003-08de584dda65
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info-Original:
- =?us-ascii?Q?sl/zSVH1kIbyd2faSFWxjTVFVrWuifMFy4Gd4mzjucZrbmXOBGC+4pg0aFM7?=
- =?us-ascii?Q?sr0Wsvh2tLVRK4Nxg5n571Og6C3m22IcZajIHMUil4Fh0aLQ1fuFeVV9kVkR?=
- =?us-ascii?Q?vzI+OUvQMtDYIN0NwTnT4rFaT7MUJwgvtx4r2HYDgB1dEIaQhQepbXRNSvC7?=
- =?us-ascii?Q?uy6lJJUNbpQfqQkynvOyAZAKt7Mp0fFjCsdC4ieOjzjWGxCpTnJ2ElS+v0ow?=
- =?us-ascii?Q?qegzBACJivHDBOyFkanJyf7ZgmIxUQIQHDidId8EwVwN67L3MQcVCFPnhuVX?=
- =?us-ascii?Q?Pmd+e/SHzHAZoIqPxZMgpgfFg4ZNQw80bqRTcrh8t9K6vxSdDTe9tuJx5/0X?=
- =?us-ascii?Q?qcf/tG+EWAAeS9q6CnT6Nu/lwE6YhgQvHwn3ktd507+y3V8CrBsAcK4JeE12?=
- =?us-ascii?Q?A0tNjYKbiS4/7blijW6VuwHew/YL06NRvRQ3uyt5Mq02YNyG/LoOjcpo8Ge5?=
- =?us-ascii?Q?NM54Nvb5oJwIkH1AQYj0X0RZwLy67IabZYPuPsVQk6ZxdKmXldhz95/abTAd?=
- =?us-ascii?Q?3s5dV9d/ymsaanRxueLUUzkm5MwaRDv8JUD4FVpmQpDpHxyneP0pojeoISyx?=
- =?us-ascii?Q?ux2FovQDHS7KxgJxFcjWpNeY9baYpLiu/WLEgxg1yVbDe17pTwYX+VJuETkX?=
- =?us-ascii?Q?mIASJb/jwuzLjghKsOVgfyIImGy9+mPlrFUxANeYHr1UnxVs0h8p1e/H5cYT?=
- =?us-ascii?Q?jjFtJbk6ls5hQ9kQNBi5rFgp89r885j7uMsbEPvocvT5BJpJUKkGodIk02qP?=
- =?us-ascii?Q?Bcx8NDpWzVOLbyv7vvtPSBy/OixqR4BgWNZ+EKfw6tnsldruUeP4cDnqEq9N?=
- =?us-ascii?Q?WNaI+uWxQUAF1ypubNRm2vFhV3NSO+MR2RXeyZujh4PWdSpH1YoJOlUyYgNG?=
- =?us-ascii?Q?uMrdTdZqxJZKVdNaj0sXjh1ZxPAzAzaoWM8Ng1/f+42hzJ5KWu3tEyuOKgH6?=
- =?us-ascii?Q?hRE/noSCWaFV3PobbkBQmkMSg7C4gRJGXXDnGH9r2dSC/3V2IZ4MszMPcKXa?=
- =?us-ascii?Q?s/QiFStmK7Ybeyn3ETk2buxRguAMqWbMAlthg2jR111FOeRrez90gMe8uyzw?=
- =?us-ascii?Q?VlIxg8IfxkYWOwuQzuAZ7iVJwt+T4oiIMe474W36KAQ9i9tGknDLePZ7l/aJ?=
- =?us-ascii?Q?HIXb2LmGOgqnZn4kwK1UaMD8imaj1okpDIX42avP2V6EGgL29hXPA0oIjrqE?=
- =?us-ascii?Q?6EzKAeiXVeKroEbPe6dbwXvtgGJmiCVHDHqfFVjDkwH2xijjR6UTKDNfd+M8?=
- =?us-ascii?Q?SkIDD8gT93LLxps8S1w3EIBu6/lB+26K4A5tWAd+rk98w7Kj5L0JEdWWcKO6?=
- =?us-ascii?Q?PgPkcC32hkAAHYBfP6Hf2LFHa/8qvnpiQlsk1d2u7i11e805j+SwbJOwOaAo?=
- =?us-ascii?Q?fBF0Ki28WnBWrHKkX7Dg3+ftUVDFZ20ndsrwj27GbfQ3ML/0VOpmfXskGvpn?=
- =?us-ascii?Q?p/KgzU8NQIqbPHojkrJgMdTM4NK6H4zganD/85uGh29wJOcMO4g/y/6VGin9?=
- =?us-ascii?Q?15lKQbVAvuXMHsApv1jnEM97sLe7JU6P1ai088zHZXuUig2QpkE8iUg7WObA?=
- =?us-ascii?Q?yb2ZODrA495AaKL7D+s=3D?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB6097
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU2PEPF0001E9C5.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	3b172354-3c03-4230-1cea-08de584db511
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|35042699022|376014|7416014|82310400026|14060799003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Ahtdhs64qyO6EQ7HiZ7BzliUm9IcK9TFVUr/YZYZh+DjDDXY+12CDAH1nL4+?=
- =?us-ascii?Q?QpJUIk3KcrQWjDUFSZ9dOqjybRVqKx0RRG0/JVvj4+q1hfQuk+N9kkO7PuLg?=
- =?us-ascii?Q?Z4h/4eu5vlEWcYmmn+/YQfd+RqPsEXtsvdiTFOjkj8y/Xz369mvF+yRUwJDs?=
- =?us-ascii?Q?SsSrDG0ITnxlKGUjQltbDuwDHJggAsRtkvJV3SU+4t2S2fWKRmU5lEx3syb+?=
- =?us-ascii?Q?9VdInFF9wTk8ymMB8+ys9pcp4JJdp9+UfV78iBBR8A+fGdzWUvIOQ5laP9aS?=
- =?us-ascii?Q?k9uLXc07Qo8eCH0mySsgzA8DVyhWen2Ow3z6ihgWjhZ9rTZrg/Twoz6mZuyE?=
- =?us-ascii?Q?uA5Ervqr29WHvkRVyp20AvmEdmUzO0dH9zXe1QGb7qfb+NYv8tGKaVQzP4cd?=
- =?us-ascii?Q?29IFcnRRQfdRMzMhbMTklDFpVyX6I764WpO/hOZaC922ckGqKUoh8JRW2Fsj?=
- =?us-ascii?Q?Bsi3VrpnrPf51bVtBmakYbAAOfOxJJpxn45lNL8SDYOYANQGxYUzViXNb45C?=
- =?us-ascii?Q?//mSK0zy14Hj2AJ1cqZUBVm0EaxFzstqOWvnGKmrxqUUNSDstxs6MOCxmTwu?=
- =?us-ascii?Q?eIo4P+9hWrEt/pjlgt9+sqSLRxU8aBCJdn2/95SGApE3Qtkp6NNUGFdTCvPU?=
- =?us-ascii?Q?m+dYRRU5mYcHbU5JrfprGDioEMiToTXE8+TZq/U0gCzmzCxFMVwY+RTjs9aI?=
- =?us-ascii?Q?K4sMdrHMYpA4SHnyoBV6t4VnnjlQVPKb9cD6J2TsM/sWD8SqRxYXU3LW16Tr?=
- =?us-ascii?Q?etjyTy+ojNpe8ZXvY9FdosixhZaLGTZaJzPtE8pP8RnIpVu6KL5/zALj/nOC?=
- =?us-ascii?Q?ZB300cYR/MWGh3BfxMLfMg+T0PyKduObXsd43FF6QZ8j8PPQ0pWGhPAEfd2T?=
- =?us-ascii?Q?TepVmeVNr/duUGGHmKGG3LJJeDHa/YT7EQ6WXBtht/zYeBdv2HVC7PIM+bG0?=
- =?us-ascii?Q?iUtcsy3MHIoVA/zBRT2CfTFJ8xzxz8W08QjxsAXpf459jfZULYHyQ9TW+S9m?=
- =?us-ascii?Q?DtGn8SohwIql4gsYDiIk17CbzXcomuvzdGw7Zrk08jf4r0iGbleCdy+ip3tm?=
- =?us-ascii?Q?PbJXCh+4PXlKaWC/74TmIEiV+AkEPewzT8fwd1ML2U2AnHkXlYVLnPB3UO7x?=
- =?us-ascii?Q?8tt0K9Mxjxqradvhbb5aDjEbDCJFw88+0Vy1w37zhMkOm76hxhkhZv+KwosK?=
- =?us-ascii?Q?b3h9qVwUltPk1jK0KvS6CBSUQbpk3zmEHZpL/uLBlwEsjtmVI1D6RNUM//KY?=
- =?us-ascii?Q?5o/xoeEOREXxOsK4OJJgTFGWePMCq/2LRZldGbCifp30tOoioQwhPigzP7fq?=
- =?us-ascii?Q?ujTShfnqQWhAvS2rKo8VcmR0iCNuswL32T+g9ufTq6oiRRvxouQ83vGHq0Oa?=
- =?us-ascii?Q?hCD5swEPqouKEA9BqrylmqnqX467as/abhfm7A0771/J/C90gRb4ePDiK4RD?=
- =?us-ascii?Q?3IKiUf6v1abjEWfWGzt+WR+2QtNnxhUOnP/0Cz1ARy6cs1ZQ3WfFWHrQ1+Z6?=
- =?us-ascii?Q?Ao8kS9qenyG5pSEg43yqah73bsoCblBZ80tonby04HAP9C+smzlrSbV+TxNy?=
- =?us-ascii?Q?XJ349tyXmILmZGVj80Jmge7tIvqatfuUgqO+BqrW/w02edSFW+7S8mlgXhhi?=
- =?us-ascii?Q?xFaMuIXCdXn9wF2AwZEJezZN/vu1/vMdSaUwc+OuKIF1v/yz5OjkpBIe9tUs?=
- =?us-ascii?Q?wI8/qw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(35042699022)(376014)(7416014)(82310400026)(14060799003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2026 18:00:53.1996
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 052014af-1f8d-4b7a-3003-08de584dda65
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU2PEPF0001E9C5.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR08MB5643
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210173024.561160-5-maz@kernel.org>
 
-> On Tue, Jan 20, 2026 at 10:07:33AM +0000, Yeoreum Yun wrote:
-> > Hi Mark,
-> >
-> > > On Mon, Jan 19, 2026 at 10:32:11PM +0000, Yeoreum Yun wrote:
-> > > > > On Mon, Dec 15, 2025 at 09:56:04AM +0000, Yeoreum Yun wrote:
-> > > > > > > On Sun, 14 Dec 2025 11:22:48 +0000,
-> > > > > > > Yeoreum Yun <yeoreum.yun@arm.com> wrote:
-> > > > > > > >
-> > > > > > > > Apply the FEAT_LSUI instruction to emulate the deprecated swpX
-> > > > > > > > instruction, so that toggling of the PSTATE.PAN bit can be removed when
-> > > > > > > > LSUI-related instructions are used.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> > > > > > >
-> > > > > > > It really begs the question: what are the odds of ever seeing a CPU
-> > > > > > > that implements both LSUI and AArch32?
-> > > > > > >
-> > > > > > > This seems extremely unlikely to me.
-> > > > > >
-> > > > > > Well, I'm not sure how many CPU will have
-> > > > > > both ID_AA64PFR0_EL1.EL0 bit as 0b0010 and FEAT_LSUI
-> > > > > > (except FVP currently) -- at least the CPU what I saw,
-> > > > > > most of them set ID_AA64PFR0_EL1.EL0 as 0b0010.
-> > > > >
-> > > > > Just to make sure I understand you, you're saying that you have seen
-> > > > > a real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
-> > > > >
-> > > > > > If you this seems useless, I don't have any strong comments
-> > > > > > whether drop patches related to deprecated swp instruction parts
-> > > > > > (patch 8-9 only) or not.
-> > > > > > (But, I hope to pass this decision to maintaining perspective...)
-> > > > >
-> > > > > I think it depends on whether or not the hardware exists. Marc thinks
-> > > > > that it's extremely unlikely whereas you appear to have seen some (but
-> > > > > please confirm).
-> > > >
-> > > > What I meant was not a 32-bit CPU with LSUI, but a CPU that supports
-> > > > 32-bit EL0 compatibility (i.e. ID_AA64PFR0_EL1.EL0 = 0b0010).
-> > > > My point was that if CPUs implementing LSUI do appear, most of them will likely
-> > > > continue to support the existing 32-bit EL0 compatibility that
-> > > > the majority of current CPUs already have.
-> > >
-> > > That doesn't really answer Will's question. Will asked:
-> > >
-> > >   Just to make sure I understand you, you're saying that you have seen a
-> > >   real CPU that implements both 32-bit EL0 *and* FEAT_LSUI?
-> > >
-> > > IIUC you have NOT seen any specific real CPU that supports this, and you
-> > > have been testing on an FVP AEM model (which can be configured to
-> > > support this combination of features). Can you please confirm?
-> > >
-> > > I don't beleive it's likely that we'll see hardware that supports
-> > > both FEAT_LSUI and AArch32 (at EL0).
-> >
-> > Yes. I've tested in FVP model. and the latest of my reply said
-> > I confirmed that Marc's and your view was right.
->
-> It's probably still worth adding something to the cpufeature stuff to
-> WARN() if we spot both LSUI and support for AArch32.
->
+Hi Marc,
 
-On second thought, while a CPU that implements LSUI is unlikely to
-support AArch32 compatibility,
-I don't think LSUI requires the absence of AArch32.
-These two are independent features (and in fact our FVP reports/supports both).
+On Wed, Dec 10, 2025 at 05:30:22PM +0000, Marc Zyngier wrote:
+> None of the registers we manage in the feature dependency infrastructure
+> so far has any RES1 bit. This is about to change, as VTCR_EL2 has
+> its bit 31 being RES1.
+> 
+> In order to not fail the consistency checks by not describing a bit,
+> add RES1 bits to the set of immutable bits. This requires some extra
+> surgery for the FGT handling, as we now need to track RES1 bits there
+> as well.
+> 
+> There are no RES1 FGT bits *yet*. Watch this space.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Given that, I'm not sure a WARN is really necessary.
-Would it be sufficient to just drop the patch for swpX instead?
+After this change in -next as commit c259d763e6b0 ("KVM: arm64: Account
+for RES1 bits in DECLARE_FEAT_MAP() and co"), I am seeing several
+"undefined behavior" errors on my two arm64 boxes.
 
-Thanks!
+  $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
+  Linux version 6.19.0-rc4-00014-gc259d763e6b0 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 13:59:52 MST 2026
+  kvm [1]: nv: 568 coarse grained trap handlers
+  kvm [1]: Undefined hfgrtr_masks behaviour, bits fff7ffffffffffff
+  kvm [1]: Undefined hfgwtr_masks behaviour, bits fff7baffe9db39fb
+  kvm [1]: Undefined hfgitr_masks behaviour, bits dfffffffffffffff
+  kvm [1]: Undefined hdfgrtr_masks behaviour, bits fffdfb3fffcffeff
+  kvm [1]: Undefined hdfgwtr_masks behaviour, bits 73f7763bbfbffdbf
+  kvm [1]: Undefined hafgrtr_masks behaviour, bits 0003fffffffe001f
+  kvm [1]: Undefined hfgrtr2_masks behaviour, bits 0000000000007fff
+  kvm [1]: Undefined hfgwtr2_masks behaviour, bits 0000000000007ffd
+  kvm [1]: Undefined hfgitr2_masks behaviour, bits 0000000000000003
+  kvm [1]: Undefined hdfgrtr2_masks behaviour, bits 0000000001dfffff
+  kvm [1]: Undefined hdfgwtr2_masks behaviour, bits 0000000001f9ffbf
+  kvm [1]: IPA Size Limit: 44 bits
+  kvm [1]: vgic-v2@c0e0000
+  kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
+  kvm [1]: GIC system register CPU interface enabled
+  kvm [1]: vgic interrupt IRQ9
+  kvm [1]: Hyp nVHE mode initialized successfully
 
---
-Sincerely,
-Yeoreum Yun
+At the parent change, there are no warnings:
+
+  $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
+  Linux version 6.19.0-rc4-00013-ga035001dea37 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 14:05:51 MST 2026
+  kvm [1]: nv: 568 coarse grained trap handlers
+  kvm [1]: IPA Size Limit: 44 bits
+  kvm [1]: vgic-v2@c0e0000
+  kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
+  kvm [1]: GIC system register CPU interface enabled
+  kvm [1]: vgic interrupt IRQ9
+  kvm [1]: Hyp nVHE mode initialized successfully
+
+Is this expected? If there is any other information I can provide from
+this machine, I am more than happy to do so.
+
+Cheers,
+Nathan
+
+# bad: [d08c85ac8894995d4b0d8fb48d2f6a3e53cd79ab] Add linux-next specific files for 20260119
+# good: [24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7] Linux 6.19-rc6
+git bisect start 'd08c85ac8894995d4b0d8fb48d2f6a3e53cd79ab' '24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7'
+# good: [6639b8bb674daa8e7781884a599e971b71aa2520] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/ath/ath.git
+git bisect good 6639b8bb674daa8e7781884a599e971b71aa2520
+# good: [28b7eb3c316bddbe6ba570caf68f560ecc06e66a] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+git bisect good 28b7eb3c316bddbe6ba570caf68f560ecc06e66a
+# bad: [7bdf87f63d2577b8eab4f732e33e91d71d3fba4b] Merge branch 'linux-next' of https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git
+git bisect bad 7bdf87f63d2577b8eab4f732e33e91d71d3fba4b
+# good: [27eb76f30bfc3d9f2d3f8f4879fb54f788fdbdb9] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git
+git bisect good 27eb76f30bfc3d9f2d3f8f4879fb54f788fdbdb9
+# good: [79a02a116a52c96311b04be8051030c8bd730bb8] Merge branch into tip/master: 'x86/cpu'
+git bisect good 79a02a116a52c96311b04be8051030c8bd730bb8
+# bad: [1e0ce70c66b8f7fb248d1c6b74a4139e5ac452bc] Merge branch 'next' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
+git bisect bad 1e0ce70c66b8f7fb248d1c6b74a4139e5ac452bc
+# good: [5d1563869e30923c5a8de291ce63d2fa82e08202] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
+git bisect good 5d1563869e30923c5a8de291ce63d2fa82e08202
+# bad: [c24170ec742d06021ae7f14df9a1885714ab6095] Merge branch kvm-arm64/selftests-6.20 into kvmarm-master/next
+git bisect bad c24170ec742d06021ae7f14df9a1885714ab6095
+# bad: [80cbfd7174f31010982f065e8ae73bf337992105] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
+git bisect bad 80cbfd7174f31010982f065e8ae73bf337992105
+# good: [9e27085c33cca7ad26bec0af2c17aab072dd802e] KVM: arm64: nv: Respect stage-2 write permssion when setting stage-1 AF
+git bisect good 9e27085c33cca7ad26bec0af2c17aab072dd802e
+# good: [f1640174c8a769511641bfd5b7da16c4943e2c64] arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
+git bisect good f1640174c8a769511641bfd5b7da16c4943e2c64
+# bad: [c259d763e6b09a463c85ff6b1d20ede92da48d24] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+git bisect bad c259d763e6b09a463c85ff6b1d20ede92da48d24
+# good: [a035001dea37b885efb934e25057430ae1193d0a] arm64: Convert VTCR_EL2 to sysreg infratructure
+git bisect good a035001dea37b885efb934e25057430ae1193d0a
+# first bad commit: [c259d763e6b09a463c85ff6b1d20ede92da48d24] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
