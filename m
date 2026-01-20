@@ -1,111 +1,177 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE0343E4A4;
-	Tue, 20 Jan 2026 14:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34C540FD83
+	for <kvmarm@lists.linux.dev>; Tue, 20 Jan 2026 14:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768918209; cv=none; b=npdPgVghcFzCIBUF3zz1xHAKnOdOGkyunSL10e6v+J9Rm9dSDGf0R5L4OJvCAFCTqTGZ+WWgoT7tEbDmgSdytyf8YcFoVHeq+MyiGE8Ch/Crp0uetvsBhI/cRUDCXdI2nm6d8uUHSBR5MkTUb/KVbexBB2c/EOOIJKI4Ws+m+sM=
+	t=1768921041; cv=none; b=mw17YPKGjmoiVC3qip9xX78Q5l+2s7YoyABQktlsxzQzhXPGTiZaUgBnJ5vwHFv3lhstaKNPCgtxUw2d/o2GvMhLk2DgF/L6dRVtlhvHBQQCuGMOZzhekr3/a20ag2bZZF73qaszHEA4LCXCcQTYCkb/8cDIxCo2W0jDbL+lA58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768918209; c=relaxed/simple;
-	bh=Ym1BChiDA/nfvHPs0Pfn4x26/vTjDWdcKmeSW/i2+E8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NPjCgA67o530sZizzw7Htx8rF01ZmRbINtG+pmDVrA99BpkMbuFf2l7jwhFhGk9UvmIS3NcxvCsp9mhN6qFyK8DjwFUn9vxyBq+gQG0LP7JbWbve1mLewo8utp0beQzOfErh7O9hynXjGL787bzqpXSwv5Tm8GelF7SnLjueI1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYpbZuFl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768921041; c=relaxed/simple;
+	bh=Yj7rTjIjMAZ0Wi0ai+L3m3KiOtHRAzqMbeSv8nGF5Pw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RZsFCGceWnsjSCP4QVWSsHWfgDqzcQRdHzSY5XwZYncQaYVCiQUSCnKAX634qvXPdSeWMrtnbuR3xGdfRjGkjXI2C8xdyqEkP+T+blYDTlwgDnwkkOTX9yCPJ1poXNV2odvOaU7Qdn55QNwlUBP2qk7gfVEcV+RjFA6L4QmfmXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eXOQrxmD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYpbZuFl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8F47C4AF0B;
-	Tue, 20 Jan 2026 14:10:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eXOQrxmD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FE3CC16AAE;
+	Tue, 20 Jan 2026 14:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768918208;
-	bh=Ym1BChiDA/nfvHPs0Pfn4x26/vTjDWdcKmeSW/i2+E8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KYpbZuFluE7Uc8y1vpgERaU6XAa5n/fvQ/K56ZbqGt3sRL5iQF21JCt+kALvLIugx
-	 FyVaRlMeMTI8Ih94Sz5EFdsDwE93XxHrSRisOlawIKJneUtql5nqD3nwWJNSjc5Ora
-	 Xve2KhQIT4X+PvjLymzzZt1SZNPCK0lbklFE68IYwcEpMnxW2NFoOh49AvA/MX2O5x
-	 9RDv7nSvqunBctVvkVSrMIIQ05S/GTVsLs9CBwcp7Ey0ztr7MyIhazqm4yJ5xRdWsD
-	 icxl3qapy2SikY3ermb7927dsvsNNK76kZU0Z69iDaslwUQD9wqvXvIXgM2plbEXOw
-	 0OuVAOlpTAI1Q==
-Date: Tue, 20 Jan 2026 14:10:02 +0000
-From: Will Deacon <will@kernel.org>
-To: perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Armelle Laine <armellel@google.com>,
-	Sebastien Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in
- host handler
-Message-ID: <aW-MugHHrJVQQKxc@willie-the-truck>
-References: <20260109-host-direct-messages-v4-0-95da4221d186@google.com>
- <20260109-host-direct-messages-v4-1-95da4221d186@google.com>
+	s=k20201202; t=1768921041;
+	bh=Yj7rTjIjMAZ0Wi0ai+L3m3KiOtHRAzqMbeSv8nGF5Pw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eXOQrxmD9aE1aSJbILqPkFSnLeeTGbtAmBzNsleHo205AckpXoiPSaGU0cWZjUWl5
+	 rFsc0TO+xnGjkm+wrakHzInyFDm+R4OSF1YbU6s1njHQCeYXbtKCq0f6FqBhP44qbG
+	 /ndAUdBOjKkxN0852Sl7qARy38Rp4xQ/K828PFjbwUyU6Z6yA1NmjIs94S2N6f/zOa
+	 nRovAjKtRUGt4oYONCTOXGgZnTUrHipfk1zTeH+ij5l3Cs4DqM7/wLU3zz3K0t+IUU
+	 tiiU0+VL3EDu49Nu0zQAogkuRTMyvqpko4BfyOa1CO4UCnvyGGyJ8E/zR7jjxGGiDt
+	 f913JWJ+LqypQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1viDAV-00000003yyv-0llw;
+	Tue, 20 Jan 2026 14:57:19 +0000
+Date: Tue, 20 Jan 2026 14:57:18 +0000
+Message-ID: <864iogcoxd.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org
+Subject: Re: [PATCH v2 3/5] KVM: arm64: Refactor enter_exception64()
+In-Reply-To: <20251211113828.370370-4-tabba@google.com>
+References: <20251211113828.370370-1-tabba@google.com>
+	<20251211113828.370370-4-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260109-host-direct-messages-v4-1-95da4221d186@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jan 09, 2026 at 10:34:25PM +0000, Per Larsen via B4 Relay wrote:
-> From: Sebastian Ene <sebastianene@google.com>
+On Thu, 11 Dec 2025 11:38:26 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Allow direct messages to be forwarded from the host. The host should
-> not be sending framework messages so they are filtered out.
+> From: Quentin Perret <qperret@google.com>
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Signed-off-by: Per Larsen <perlarsen@google.com>
+> To simplify the injection of exceptions into the host in pKVM context,
+> refactor enter_exception64() to split out the logic for calculating the
+> exception vector offset and the target CPSR.
+> 
+> Extract two new helper functions:
+>  - get_except64_offset(): Calculates exception vector offset based on
+>    current/target exception levels and exception type
+>  - get_except64_cpsr(): Computes the new CPSR/PSTATE when taking an
+>    exception
+> 
+> A subsequent patch will use these helpers to inject UNDEF exceptions
+> into the host when MTE system registers are accessed with MTE disabled.
+> Extracting the helpers allows that code to reuse the exception entry
+> logic without duplicating the CPSR and vector offset calculations.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 20 ++++++++++++++++++++
->  include/linux/arm_ffa.h       |  3 +++
->  2 files changed, 23 insertions(+)
+>  arch/arm64/include/asm/kvm_emulate.h |   5 ++
+>  arch/arm64/kvm/hyp/exception.c       | 100 ++++++++++++++++-----------
+>  2 files changed, 63 insertions(+), 42 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index f731cc4c3f280a32acccca0de92b9ac6c8e05602..fc84595007f310004def7d525371fa7c128f244a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -862,6 +862,22 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
->  	hyp_spin_unlock(&host_buffers.lock);
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index c9eab316398e..c3f04bd5b2a5 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -71,6 +71,11 @@ static inline int kvm_inject_serror(struct kvm_vcpu *vcpu)
+>  	return kvm_inject_serror_esr(vcpu, ESR_ELx_ISV);
 >  }
 >  
-> +static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
-> +			      struct kvm_cpu_context *ctxt)
-> +{
-> +	DECLARE_REG(u32, flags, ctxt, 2);
-> +
-> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-> +
-> +	/* filter out framework messages and validate SBZ/MBZ bits */
-> +	if (flags) {
-> +		ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
-> +
-> +	arm_smccc_1_2_smc(args, res);
+> +unsigned long get_except64_offset(unsigned long psr, unsigned long target_mode,
+> +				  enum exception_type type);
+> +unsigned long get_except64_cpsr(unsigned long old, bool has_mte,
+> +				unsigned long sctlr, unsigned long mode);
 
-I thought we were going to validate that the sender is HOST_FFA_ID?
+s/cpsr/pstate/ as we don't need to introduce more 32bit terminology.
 
-> diff --git a/include/linux/arm_ffa.h b/include/linux/arm_ffa.h
-> index 81e603839c4a51873090b7e22edbe7b33a7e94df..d209d0cdac1eb804be01e4607acac8f76cc99e40 100644
-> --- a/include/linux/arm_ffa.h
-> +++ b/include/linux/arm_ffa.h
-> @@ -130,6 +130,9 @@
->  #define FFA_FEAT_RXTX_MIN_SZ_16K	2
->  #define FFA_FEAT_RXTX_MIN_SZ_MASK	GENMASK(1, 0)
+> +
+>  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
 >  
-> +/* FFA message flags */
-> +#define FFA_MSG_FLAGS_MSG_TYPE		BIT(31)
+>  void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> index bef40ddb16db..d3bcda665612 100644
+> --- a/arch/arm64/kvm/hyp/exception.c
+> +++ b/arch/arm64/kvm/hyp/exception.c
+> @@ -65,12 +65,25 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+>  		vcpu->arch.ctxt.spsr_und = val;
+>  }
+>  
+> +unsigned long get_except64_offset(unsigned long psr, unsigned long target_mode,
+> +				  enum exception_type type)
+> +{
+> +	u64 mode = psr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> +	u64 exc_offset;
 > +
+> +	if      (mode == target_mode)
+> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> +	else if ((mode | PSR_MODE_THREAD_BIT) == target_mode)
+> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> +	else if (!(mode & PSR_MODE32_BIT))
+> +		exc_offset = LOWER_EL_AArch64_VECTOR;
+> +	else
+> +		exc_offset = LOWER_EL_AArch32_VECTOR;
+> +
+> +	return exc_offset + type;
+> +}
+> +
+>  /*
+> - * This performs the exception entry at a given EL (@target_mode), stashing PC
+> - * and PSTATE into ELR and SPSR respectively, and compute the new PC/PSTATE.
+> - * The EL passed to this function *must* be a non-secure, privileged mode with
+> - * bit 0 being set (PSTATE.SP == 1).
+> - *
+>   * When an exception is taken, most PSTATE fields are left unchanged in the
+>   * handler. However, some are explicitly overridden (e.g. M[4:0]). Luckily all
+>   * of the inherited bits have the same position in the AArch64/AArch32 SPSR_ELx
+> @@ -82,50 +95,17 @@ static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+>   * Here we manipulate the fields in order of the AArch64 SPSR_ELx layout, from
+>   * MSB to LSB.
+>   */
+> -static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> -			      enum exception_type type)
+> +unsigned long get_except64_cpsr(unsigned long old, bool has_mte,
+> +				unsigned long sctlr, unsigned long target_mode)
 
-This hunk is no longer needed now that we're just checking for the flags
-being zero.
+I really dislike the has_mte and sctlr thing.
 
-Will
+The main reason is that it will not scale as we end-up hiding more
+feature on the host (think PM and FEAT_EBEP, for example). Even worse,
+some bits are not necessarily sourced from PSTATE, nor SCTLR (EXLOCK
+depends on GCSCR_ELx, for example).
+
+I think you really need to turn this into something that is flexible
+enough that it can work for both host and guest, with an actual
+abstraction. It is likely to look like a list of register accessors to
+get to the correct data.
+
+But it could well be that open-coding it is the least horrid solution.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
