@@ -1,243 +1,393 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013029.outbound.protection.outlook.com [40.107.159.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9581146AEFC
-	for <kvmarm@lists.linux.dev>; Tue, 20 Jan 2026 15:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768922897; cv=pass; b=YO3Fv9H4Yr4W6HXmtNKD6mYG6LKcZv4MqmUWApWGBXu7nE4BUGW+GF7l8lqndcYZXFevzYmDI9GaJ0Nc27M6yKLQFNMqVlri2xM8BHTM0CAVsizBUVCH1W6ZYRfCMMqA3YNp6HKCY92obkYn5tZ51cf9+y4NoAwMquOuCsQQeTQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768922897; c=relaxed/simple;
-	bh=CjZdxht1enMOf+3v9JjMW2617y8WRsmePW7pLjxbFhQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bFd/19mhli3nOg1g9vfVB38FvhmISNN1LVgBqJc002ZyTxjXzdiKeptOTAq15krLvFiKV2/ua8V1i48bFBCyoYGk4drWjIwaMLf2wUT99h9/mpW2yCoA0kbgOVArhCYf8hjhPpQpAH3dDJ4iBHRwExgSGxXrpA8D1Wq9sI77Wwg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p3Dkk6nc; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2476944CF59
+	for <kvmarm@lists.linux.dev>; Tue, 20 Jan 2026 15:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.29
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1768923969; cv=fail; b=a6jIzK7IHj2OebxHakaGc2JRjzb/8vPaxr1uORNXJ1Ci1mEhINMGNzHVnMSz2SueQCIwopS9Ifok7sCGwlvwa98ZrugpQOcXHbEaqnI9wb7/OSqybWdC7Dc1Rcbz7ipAGZf90qodw4HpR/NzGH910ZHf2pk2ICEFUYD8bplCXLo=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1768923969; c=relaxed/simple;
+	bh=TU6JhYwh19oW4Z5eFuFKnc1C5kN/K14kZ6oZgc7UvaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=QgXjpIeewm7Mih/xRNMSUWWkLJg8XX9HUnnCzaFpz1pTiqhV1/soQopd+Sv85uG+665mEd9tJFPDFhGKrGdbRfjTAXaQH/sXvdpOW/puefe8iFgN3kzNUskprp4QF18YLlHp6B1nM93vqGiuSS/l+KT40szOq7d4vqLw94iOHzE=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NwG/oa5t; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=NwG/oa5t; arc=fail smtp.client-ip=40.107.159.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p3Dkk6nc"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-64c893f3a94so11238875a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 20 Jan 2026 07:28:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1768922893; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YRDdcWUb4/0vxkp4xH8F5HI55BaXYlKXJWNinI7i6JlnrDpDl0AoYbYGGh0ZB9DiZs
-         R45+Ey4rOhyJebcxwSum3RLxPtbJFXVUQxMRy/9uY6NnmdAkzqqSLFcNlBuv7VpCEuzC
-         LTyE5poklc0RNjgLasmebW8t2VRM6Eg+FUyfYGohNdflWYOjfWnNvQDJty4H5ejy5/KJ
-         w3NBwzyXvbPAdCRdJttDYAG23/jJrhkqumhTIPfCpZsSzKWWD2CY4/67/bQ2S9jiKqEt
-         J7kx1zvFh54H0pOKPmpZAuj1qNFhMBKMQnx11qPyu0Mcy0WDHLefBFIAGuGAKnD9u3k3
-         nwAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=I1zCNGgef8h4dx5wfQYzWOmcIl2PEe8tEJazBc1BpM8=;
-        fh=v1CPlbnAf9i2iV/Uxqi2D7qUSMSHD7izCot+OcKKofY=;
-        b=jWf2S7HK4KbsMTa1u27pReYLkf7ok/kXL6gXEYFgh9OJOBYMnsyB73b9a0JHH5dIbV
-         sDclFMt5JNB8sreIfZiXKxlaOvrYAcUmFqMQaXSIIQl3UVPnXz9IMBr8PtjvYfGsucfk
-         w5CHFJsJ3R02GHk5iVCCCGpguzHRFHKtSyVxNoY0ADkUfP8qtfBex12wmU+Q1HA8vlkk
-         OAu7hp13KIAo3q65CcWlUMZ8SyvNX2b6Ergn6CVcRVDfj09Du9pqlSUaVBZyVP3coKgq
-         QLTHXYGCVvRWJ5ui1KTldsuHOz4YXUzOQS4qEzOq+ai9iesng73uhbrmdJKDIE33omfc
-         s8AQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1768922893; x=1769527693; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I1zCNGgef8h4dx5wfQYzWOmcIl2PEe8tEJazBc1BpM8=;
-        b=p3Dkk6ncjPk5coVyERMUsuMM7wYPPKGiYwwHbtSDZrbyP1nbuIKRqOhWdIQtFb+nco
-         PuuWs6nmT+7kL43W2QghmjiMtDSML/U2ATM0JhTq16RdauoBdO1GCCjqTQiHxuLoPrfN
-         NXG+kyP8qjWRq8L8hUe6B2S1moqlYGgEDeBW/6EW7/KWmCaFUYuJ2QRNIN6PSLnhb4kP
-         OJBu4rRQNduWOI+Yoi/1BDByDrzmzAG9e1VxikajtpcS5GViKfjMFiqsb5tS3p8UOXm+
-         0OjAPEUj9FuFqX8aC9jQrakCRS/zPeIiAajgwrfP4ekp+kMQa2Q9erSE3B7elqq+Vglv
-         SxHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1768922893; x=1769527693;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=I1zCNGgef8h4dx5wfQYzWOmcIl2PEe8tEJazBc1BpM8=;
-        b=tMi0Kq5iM4YbKXHKShB7T5LC5C0QdrC99eZt9Ex1aCwnyZuxNpy1RnNuQwm4D6EDms
-         e955IS29Ovuab8QOBTScpn4VoUqz0mxgTbxuXqJQCMeASHlexoDwnfxgF8sM7We0yFsF
-         3KVmVYOfMNje0TpZ8etu+9HwBjWNqb1+RDXVjEsWMRBG9N0JIpaMq4pyCKQ/eZAwIsGS
-         9VgHVNDXsSp+JkQKPl+fycJ3+67jmdfh2VkdFRGlOOZWCvnks5z/F9FlVkVqC7m0hsO+
-         ulH68kY6sxqGp6igwIf3o4hOALiqDI1Y2iBW+zkJ2SwusuTyxqbWAkeOqEr0uU5pczcr
-         7f4A==
-X-Forwarded-Encrypted: i=1; AJvYcCVJI/L4UzHrkRggx+Ygo5qiC0BybWTGuojTPB4Uhyc6sOcflTGBAkml7CPIjevWaSCTLkbynaA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwhRqVi9vEe+OoGeckasqjkjani7NzB54UNQfUDVi2N3nZS8jhx
-	bFcs1XetsEtOPCkqr3bFWLm6X+tsqrEyG4nVj+yDxBKDaHSzMEvggKiH0+9wGkVh8kNF3+cUoyv
-	ciWEOwGvsgxtog2zEIElDmeuhp0YrxIJvHkOlM5+8
-X-Gm-Gg: AZuq6aIG/rc1tjOfUi0uLARkbbRkL0ISL/o67r9LIFORWpDVVVe93UT+ZC6D0XQWol/
-	/zOWNah4076wLmtlzxK2C25iCmj3MhlBokE4J9UpiO9W+OtKd6w/BOH7tNyUqZUyZ+kPOqtxZ3U
-	2S0ov350LKGtGNoJEFZjcku8CWe1aNgD2GDbv9oK8c+cenS8CDc1/ehABI/uTrFI1gbjjMveb7I
-	c0sIPobiw9jOYQmLn4AcjDD0AXeTKdY2il99PJiBzoipyKcs8SowMZyIKtiIJ6kWb41y4I/Gu3l
-	iVBkzO49Jby++iOM7qdfDgm7OQGIm47TP8m8
-X-Received: by 2002:a17:907:948d:b0:b3a:8070:e269 with SMTP id
- a640c23a62f3a-b879389056fmr1590488066b.14.1768922892289; Tue, 20 Jan 2026
- 07:28:12 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NwG/oa5t";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="NwG/oa5t"
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
+ b=rLovj9UEIpVzBPG0jF5UGIUd1MDgU5zdo6/EM5xETBpQyURoQkj/2dAyIfe5nbCyuEUKtv3UOzrXnsdN1fPqH0MM0SUpx3G6e0OZa2t1RG/lOuWBc033CZnxhK/z8cqkI6dQFLxEeI120+XMj0db/+yLpVauuTg8cXQU29opnLa6ItYf3RbNUsR2caRxMyr5OK5NJsO+2OLbvwq3zkgt8Y/vDfW5C/ljws8tZ2m+6iFDVs/U9xDlcYO6O1pmvReXs1Cp1V7p5gp8kD6AcBTnIcwUpXyBo7XwxFLxYq5ZswzWFEan1FdXMJ+Ha2F0CLtguqL9FbIFUI5NAWTg6eXmHQ==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TSqKY+NFCvbw7DBaMRqAKRA9ScBsyr4d9/cM5uAxKrI=;
+ b=fzWKpv8aFwtww0eqITDMRD/ql8B5A5pBMmuZB4ojjb+SPSpQWmVkCyO00CltKEh6ahhRzFkuppBBAYiFOW81g2SdboPfKsHJFAP6yKgzEloaZ8VxOV2/XdXoMx5otzDwNip/RZnNW4wKWKhkAliD1uAhj2hxIzc4DZ+svsqz0O6T6uSZ2lABHzkCBVb05poMsk1GJXN97BMN9uA3UZepO8OZxrvZf0pZEUdWw3cfSK+XS89v/yu6zrCBASF5BlLJ5L1EhjWKt1KXbR++OXsKXqCE7ExpnIArAET9U+nMSFw/uMmFbdPi9gQXSkJI3gLafMO3uprcwXE5CzLf6p/o0g==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
+ (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
+ (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TSqKY+NFCvbw7DBaMRqAKRA9ScBsyr4d9/cM5uAxKrI=;
+ b=NwG/oa5tBDLu5r0DMdZySt2TtM88imXakGPqggMT8C/op3Nlvs9sbVyvXY+VtcLsvcoTCFpKh+zMBdA6YODFhYO49qXndX1mRYoJJtLOK3rDI/dXXjuNqWMccyFfXOkNDgd3zm3nj8J3Eddjzy2YgwKjy7bVixNo0dPvhY9kW5Q=
+Received: from AS4P189CA0061.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:659::10)
+ by DU0PR08MB9394.eurprd08.prod.outlook.com (2603:10a6:10:421::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
+ 2026 15:45:58 +0000
+Received: from AMS0EPF000001B3.eurprd05.prod.outlook.com
+ (2603:10a6:20b:659:cafe::fc) by AS4P189CA0061.outlook.office365.com
+ (2603:10a6:20b:659::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.8 via Frontend Transport; Tue,
+ 20 Jan 2026 15:45:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=arm.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
+ client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
+Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
+ AMS0EPF000001B3.mail.protection.outlook.com (10.167.16.167) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9542.4
+ via Frontend Transport; Tue, 20 Jan 2026 15:45:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pIrP6augi1DkUpAen9KBgv+zIYMOCe6HPhCkKWLxPZ7rcA59PQbiggOeSgaMclhoY3SaFrk1W6a501MeIwr0M1aQT31nYDUgpJ2ahzUbiWOoflu/r4Hn52WenK/84RZD7QnMgS9QcDw0nWdDXCAZUSwd+Sbwbyyvhx5lYSnQ3oVxECE86a1a5/mq79mqLs6uiRqa4NVV/y9Bb76xBaVSefLQhGAPC2ihByRuFcq/PsTyp35GFyOz6Z10i7ErdC7hP87LH5lrEwjblsysRRo+T5uZNpu+6e6zrfz/WdLnTfe4SWFYnw3wNYBpmlyGvmUZqq7TFoh4RMPerBRGusX4LQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TSqKY+NFCvbw7DBaMRqAKRA9ScBsyr4d9/cM5uAxKrI=;
+ b=SeeIvX6uWkqu6yxbJXdPnby/xOKHkc1N/GGUOOjGWZKriQVoI5h/YbWbZrJ8pr0nSAtDoFIKesd/vIgniQpCNJ761DdIuMMJorEZFfVQGnfw4NkG1dgq/Cisb+zF5Cb2xt6mWZqyQn8YrE1BZzkEZVjr+Z9gGDkoK++UaDS8nkU4l0NXDmGtp3/3QCtINSJt81CPFR/BudvMDa7q9OWZ85r7ko87xRlVyXnkoHRye9PejO/D6FjHBUXXLNkgYW8MObi49EzNtgSP5sjOhaV4t0of7z22KhmyQpuK5DgdXXPxFdrJaPO8bhBeew711l3VKLdvMltSskFzdAt1Ah7Y3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TSqKY+NFCvbw7DBaMRqAKRA9ScBsyr4d9/cM5uAxKrI=;
+ b=NwG/oa5tBDLu5r0DMdZySt2TtM88imXakGPqggMT8C/op3Nlvs9sbVyvXY+VtcLsvcoTCFpKh+zMBdA6YODFhYO49qXndX1mRYoJJtLOK3rDI/dXXjuNqWMccyFfXOkNDgd3zm3nj8J3Eddjzy2YgwKjy7bVixNo0dPvhY9kW5Q=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20) by PAXPR08MB7671.eurprd08.prod.outlook.com
+ (2603:10a6:102:245::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9520.12; Tue, 20 Jan
+ 2026 15:44:53 +0000
+Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
+ ([fe80::8c9b:58d2:2080:eb98%3]) with mapi id 15.20.9520.011; Tue, 20 Jan 2026
+ 15:44:53 +0000
+Date: Tue, 20 Jan 2026 15:44:49 +0000
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: catalin.marinas@arm.com, maz@kernel.org, broonie@kernel.org,
+	oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, yangyicong@hisilicon.com,
+	scott@os.amperecomputing.com, joey.gouly@arm.com,
+	yuzenghui@huawei.com, pbonzini@redhat.com, shuah@kernel.org,
+	mark.rutland@arm.com, arnd@arndb.de,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 RESEND 6/9] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aW+i8dAsciz+WwrA@e129823.arm.com>
+References: <20251214112248.901769-1-yeoreum.yun@arm.com>
+ <20251214112248.901769-7-yeoreum.yun@arm.com>
+ <aW5dzb0ldp8u8Rdm@willie-the-truck>
+ <aW6tix/GeqgXpTUN@e129823.arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aW6tix/GeqgXpTUN@e129823.arm.com>
+X-ClientProxiedBy: LO4P265CA0321.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:390::12) To GV1PR08MB10521.eurprd08.prod.outlook.com
+ (2603:10a6:150:163::20)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260112165914.4086692-1-ben.horgan@arm.com> <20260112165914.4086692-29-ben.horgan@arm.com>
- <e65d2b54-e14c-4b1d-a9ea-04b6e0eb051f@intel.com> <90561371-96f0-4bdb-8316-1b657f26da54@arm.com>
- <f2e9d7e2-1f99-45e4-9cf9-49e1ce2f08e9@intel.com> <0eb7fc76-179e-4e55-b13e-78cea775c2ba@arm.com>
-In-Reply-To: <0eb7fc76-179e-4e55-b13e-78cea775c2ba@arm.com>
-From: Peter Newman <peternewman@google.com>
-Date: Tue, 20 Jan 2026 16:28:01 +0100
-X-Gm-Features: AZwV_Qjn2fnxvYPOYMmk0_TL0MsbH8v-arEYq7xOCEX18DkcfIXaElQDJPpxd5Q
-Message-ID: <CALPaoCjK=VoYriKCGUrtTs=xKxkU34nnwxHKjjy6QVbmD99yhw@mail.gmail.com>
-Subject: Re: [PATCH v3 28/47] arm_mpam: resctrl: Add support for csu counters
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: Reinette Chatre <reinette.chatre@intel.com>, amitsinght@marvell.com, 
-	baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, 
-	carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, 
-	dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, 
-	james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, 
-	lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, punit.agrawal@oss.qualcomm.com, 
-	quic_jiles@quicinc.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, 
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, 
-	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, maz@kernel.org, 
-	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-TrafficTypeDiagnostic:
+	GV1PR08MB10521:EE_|PAXPR08MB7671:EE_|AMS0EPF000001B3:EE_|DU0PR08MB9394:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82a15ee0-4b4d-478a-56b4-08de583b01a4
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info-Original:
+ =?us-ascii?Q?NrLeDQ57ahksTzmvrdEKIAPLC/32C2sJ7FobLx8QsQQXWnbX999mQCFc7/Jf?=
+ =?us-ascii?Q?N9LnVtskqRES6x/xJIzIS0dANtLIV+LLNRsv9YwICnhLkWMKWfV+ZlQrFKr9?=
+ =?us-ascii?Q?bt1j43RC+GQ/JTF/VsA9jZSiIC/Y71i9WmMFD3zsMXItdAYq4zZpp1CZov9p?=
+ =?us-ascii?Q?w/oCTNDXnmnx81nkPxfhkccYMpM1G4p7S2y92uMCG0vFuEoV7Otplhp/bXcv?=
+ =?us-ascii?Q?uzG2pQiUhN4IoAW9cjAdm8g4AZzEIqfHny7/nBddiuKICLpMhxMwkTrsgw8i?=
+ =?us-ascii?Q?uQ8nvfVAH3zOv41pnq1xmVueimG/C1rqzIxfEPP9CgHc8qSvwEbdqFNDcCm3?=
+ =?us-ascii?Q?+nu7jKPlPMA2RzTJcPl/XXry6Z9ivZoTECaQHSQ7w7xfr1UXkwtebz5tJykZ?=
+ =?us-ascii?Q?FWJpqg5/t7rAkq/b7VYIrMVzqru4nC1s5m0VSKDdyFPCEs6IaApIXI4A5ope?=
+ =?us-ascii?Q?1FO2ZR1aryyQXb088dnjbjySvnOyBkFIsQe4sATpCLOZhttYP6WYp36+EAw7?=
+ =?us-ascii?Q?6u5YpStX1lar4opeHY/I5bdr7jy4KSMzV7IsGTGbX21bHLGgreGsUqkbateF?=
+ =?us-ascii?Q?A1Fnp0BL4+kVz2VxaC0BXWFnjLjeUigNIc2P4s+iXwGoq8Gx4t8flq9AopWH?=
+ =?us-ascii?Q?p0qKJa0sv+K/OGWirRNfjElJlnq2glBzgeamxkRSS9eKJMM2qGq0FtohhJKv?=
+ =?us-ascii?Q?0ReBOcQ+iFbJQTAUED0taTfjMG1SDPFa/ikMNXoDJJxj6af5t6sb5+AQNYAC?=
+ =?us-ascii?Q?7AtVGjzP79KXiME9JqC2tmbtp2XLzh3F0a7JQBt3RvI7aVmSc8OofoVI9jvv?=
+ =?us-ascii?Q?iW184ghfBUpVk2AynjPIe9kB0KQ8F3c1APVQiTzJwm/4+BaiLD7Ax0+aQhnV?=
+ =?us-ascii?Q?tRr5tAzGxnMmykKYZXw8ZluzozJm2atT4zGASrjFZqBmW9H2TFxg8c1X3YMG?=
+ =?us-ascii?Q?f1QmGe4ZP3TAI0pwiYHUwVUsv1xtJ0ANKIRyGz5RTJOknApaN8rkfYfqf9wc?=
+ =?us-ascii?Q?xdutSK+KfgwG5zDWEzkxh4AxkOmcjnyP/IvbYjuGJSKwJRv8IfJ2XuTXKC69?=
+ =?us-ascii?Q?9/ckX5SSYznpImUREyF1gMsLIOuZ5Wmr2BooATe3R/r/vNHAY7vnpKkpltHg?=
+ =?us-ascii?Q?dGwmYIK9YgajZLksf52NhP07FXNiC9q5XwyBlQE7I5SOIn/z8I28lJutydoJ?=
+ =?us-ascii?Q?y7Sx4Gag9FSsquNl8Y8/gNiBsDoIM8bvKiHYvDuHJoci5rFlW5Lx6bTwMPDe?=
+ =?us-ascii?Q?KLR1h0cAJgep//G9SOoNJsP+hKz+tHHaMwV6G6OInUtI4Oh4VJ8YBvlgZfN6?=
+ =?us-ascii?Q?QS4Ht8zYDo5CsHT2ZocS5r4VGU9d0+uMBYVi7P+IHgbCVFZtHfic083eIOJc?=
+ =?us-ascii?Q?8O4iwyhtyEHpXIrW9x2iEqPbzDd+7trcJiy1btTxVNLaVx38tCjpPLpMqFQW?=
+ =?us-ascii?Q?PLagdp2fTH3//l+7er9T17UkCRWBouMDQ0DmmREXGQEN5jJcxYFetOX2apPi?=
+ =?us-ascii?Q?T+42m0TIVUnXlxm2LGYc9mKGM/jrZz+xUrtpabFocVerTTHWBsqPBl79Kv2w?=
+ =?us-ascii?Q?h8gIrmCtiAKen1GGPqs=3D?=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB7671
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AMS0EPF000001B3.eurprd05.prod.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	e8e33603-26f3-4bb4-db21-08de583ad9f8
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|35042699022|376014|7416014|1800799024|82310400026|36860700013|14060799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?vaF2bQdn6YHjZ76xXdVJjdP/aNJ2g3f7DFqw8vqvd+nq9jdroHn4sfb2a4Is?=
+ =?us-ascii?Q?UUHix2WKzPGvSrBYes9GqXZX2GuzQc3+qEcc11zj4I5SqyD/RzsgQ4j+JhdQ?=
+ =?us-ascii?Q?l3f8OdCVeym3kF2yktGrejhf9OAd3jc8yAjn5QPYJU6cl3x4C6cFFB3e7KTc?=
+ =?us-ascii?Q?zqrcCq62Cskw/BKfk7UT2qFXIBgUqoiNYpfZobhxFrKjyr/UARP4Gj+j80/t?=
+ =?us-ascii?Q?eeXbnCLY+hoC59mE3GmeaTAGUqeTcanjgKXUH/4AsOHFXaY8eROmBvX717b7?=
+ =?us-ascii?Q?1kQHgcTw+adnM2NVFr3OOAceGiTgu8oNF1e84gNZ4aC9/PmcF31joTXqbr2p?=
+ =?us-ascii?Q?gn77qc47RLyo9nfOBtWVNFT9zg6axCG06WiuvwllAG0HfO7CQfDvFksy+b4u?=
+ =?us-ascii?Q?KDw7hHYarE/iq+23cz48wvysZoqcXP/Vq6wdzjtwFTKqCTC4mSkpd5TiIdc6?=
+ =?us-ascii?Q?Iwywu7hY4i7tAuvpgLZRbWWFBCw0Da1mUvxiYI93dK4FaOM0Sy+STbksth2E?=
+ =?us-ascii?Q?+GSyoC7vEEYHuZPSf0xgH6ilHbscKNhKU3c9fOKcTQT/3gdZBYqJO4LZFP0v?=
+ =?us-ascii?Q?hXcSaATrvHzsH/ckBPuZwqqZaLzCf9cBTxzC5L01KauPRMkNFaAEIl6aVrF7?=
+ =?us-ascii?Q?FMiHxPD51rS47i733dVwWSKLDH5hdCthYGfXtmkmio10saj2vFZZWBOzxqSp?=
+ =?us-ascii?Q?wqTOUC3sNRSxjdAiDIzUzpbbGfSLbIZPg/TPl8VNKys63kBxhTLSKa3XL9Ix?=
+ =?us-ascii?Q?i3PlaP3B31pPxeKf9RGTKXV0HzWfhKRuEkWRN7MlnlvWaL8pe5yS4aiJ5mkP?=
+ =?us-ascii?Q?A3yzcoOmsFw+l9BnOZpL6JrWnDWa+9qd5w7ntexfd9BSeVahk6V3Ptid+Xtb?=
+ =?us-ascii?Q?4X2Z5emKGtVvDX//xarYBWkkjo4KkNXD7SpabW9CrcJNiONREcO/5rDc8rKA?=
+ =?us-ascii?Q?Ww+ANLqyIXIl0r36TNaAIutevWsIbCoWLZ+g2SQMqpHS5KvJUhGWDtmPcQjI?=
+ =?us-ascii?Q?8R3lc86Q1ZNQB1keCyGztOhLaq82CphS3x8e6pyQ3/APS2D1b+iD8pa1k9Nh?=
+ =?us-ascii?Q?nHOCxlg8TRwjgSKhuPQxNtfoa8IG1I8iqBAX6kj6Z4dMPLstkuhBvKoBPic7?=
+ =?us-ascii?Q?xiT49GNz30pmhM1hcGwQYrHCBTY8H5QPLQ269v1vCNEv89DssbRNnO1g4lx1?=
+ =?us-ascii?Q?bIEEgtFT19Ay7EuV/BGtSsmJd08SqJzglV8XesfUXDHLChsVGbRFgYlzFJvO?=
+ =?us-ascii?Q?07mA3gPAlMSA5xxz7i6umA7svbPmuwMMwSTy15Sk+PoYPk2TvYr8CpEanxiL?=
+ =?us-ascii?Q?J2h6P22VwB/m8aq9itSQb/x4LpAx31jNSh+vUVDGY2Lv1V5uHUc8xhZ9CVak?=
+ =?us-ascii?Q?UghUkCf/CwYm7I5RvXdGSr/UE60XaKqCWF0SLMbfARCyUuqKdvIxiaRiKwYR?=
+ =?us-ascii?Q?u3nIbh1fPIpu3S4eTUbcdkwYxJ0wpRYJngDIFtdn5iF/oyrVtFFTEb0q0W/j?=
+ =?us-ascii?Q?jRaQPH5VAMBohlv8ZWSaqHjXAE2eSol7y1q+L37MYKqVym3kYd1CVgCYokv8?=
+ =?us-ascii?Q?vDuwwIKMdOdWvqujGwJmzzKf2yICN6nw/j6pPfNMrK1cGvyHZdnKEPbbY6H3?=
+ =?us-ascii?Q?RKYGSCVxeYKrzSiS2smxqmnTLLOyS7yrlxbgXH8423G/ehaoQUzIG0h3w7m7?=
+ =?us-ascii?Q?kvypCg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(376014)(7416014)(1800799024)(82310400026)(36860700013)(14060799003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2026 15:45:58.6069
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82a15ee0-4b4d-478a-56b4-08de583b01a4
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF000001B3.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB9394
 
-Hi Ben,
+> Hi Will,
+>
+> > On Sun, Dec 14, 2025 at 11:22:45AM +0000, Yeoreum Yun wrote:
+> > > Current futex atomic operations are implemented with ll/sc instructions
+> > > and clearing PSTATE.PAN.
+> > >
+> > > Since Armv9.6, FEAT_LSUI supplies not only load/store instructions but
+> > > also atomic operation for user memory access in kernel it doesn't need
+> > > to clear PSTATE.PAN bit anymore.
+> > >
+> > > With theses instructions some of futex atomic operations don't need to
+> > > be implmented with ldxr/stlxr pair instead can be implmented with
+> > > one atomic operation supplied by FEAT_LSUI.
+> > >
+> > > However, some of futex atomic operation don't have matched
+> > > instructuion i.e) eor or cmpxchg with word size.
+> > > For those operation, uses cas{al}t to implement them.
+> > >
+> > > Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> > > ---
+> > >  arch/arm64/include/asm/futex.h | 180 ++++++++++++++++++++++++++++++++-
+> > >  1 file changed, 178 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> > > index f8cb674bdb3f..6778ff7e1c0e 100644
+> > > --- a/arch/arm64/include/asm/futex.h
+> > > +++ b/arch/arm64/include/asm/futex.h
+> > > @@ -9,6 +9,8 @@
+> > >  #include <linux/uaccess.h>
+> > >  #include <linux/stringify.h>
+> > >
+> > > +#include <asm/alternative.h>
+> > > +#include <asm/alternative-macros.h>
+> > >  #include <asm/errno.h>
+> > >
+> > >  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+> > > @@ -86,11 +88,185 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> > >  	return ret;
+> > >  }
+> > >
+> > > +#ifdef CONFIG_AS_HAS_LSUI
+> > > +
+> > > +/*
+> > > + * When the LSUI feature is present, the CPU also implements PAN, because
+> > > + * FEAT_PAN has been mandatory since Armv8.1. Therefore, there is no need to
+> > > + * call uaccess_ttbr0_enable()/uaccess_ttbr0_disable() around each LSUI
+> > > + * operation.
+> > > + */
+> >
+> > I'd prefer not to rely on these sorts of properties because:
+> >
+> >   - CPU bugs happen all the time
+> >   - Virtualisation and idreg overrides mean illegal feature combinations
+> >     can show up
+> >   - The architects sometimes change their mind
+> >
+> > So let's either drop the assumption that we have PAN if LSUI *or* actually
+> > test that someplace during feature initialisation.
+>
+> Thanks for detail explain. I'll drop the my silly assumption and
+> call the uaccess_ttbr0_enable()/disable() then.
+>
+> >
+> > > +
+> > > +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> > > +
+> > > +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op, mb)				\
+> > > +static __always_inline int						\
+> > > +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> > > +{									\
+> > > +	int ret = 0;							\
+> > > +	int oldval;							\
+> > > +									\
+> > > +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
+> > > +	__LSUI_PREAMBLE							\
+> > > +"1:	" #asm_op #mb "	%w3, %w2, %1\n"					\
+> >
+> > What's the point in separating the barrier suffix from the rest of the
+> > instruction mnemonic? All the callers use -AL.
+>
+> Agree. I'll remove this.
+>
+> >
+> > > +"2:\n"									\
+> > > +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
+> > > +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
+> > > +	: "r" (oparg)							\
+> > > +	: "memory");							\
+> > > +									\
+> > > +	if (!ret)							\
+> > > +		*oval = oldval;						\
+> > > +									\
+> > > +	return ret;							\
+> > > +}
+> > > +
+> > > +LSUI_FUTEX_ATOMIC_OP(add, ldtadd, al)
+> > > +LSUI_FUTEX_ATOMIC_OP(or, ldtset, al)
+> > > +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr, al)
+> > > +LSUI_FUTEX_ATOMIC_OP(set, swpt, al)
+> > > +
+> > > +static __always_inline int
+> > > +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
+> > > +{
+> > > +	int ret = 0;
+> > > +
+> > > +	asm volatile("// __lsui_cmpxchg64\n"
+> > > +	__LSUI_PREAMBLE
+> > > +"1:	casalt	%x2, %x3, %1\n"
+> >
+> >
+> > How bizarre, they changed the order of the AL and T compared to SWPTAL.
+> > Fair enough...
+> >
+> > Also, I don't think you need the 'x' prefix on the 64-bit variables.
+>
+> Right. I'll remove useless prefix.
+>
+> >
+> > > +"2:\n"
+> > > +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
+> > > +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
+> > > +	: "r" (newval)
+> > > +	: "memory");
+> >
+> > Don't you need to update *oldval here if the CAS didn't fault?
+>
+> No. if CAS doesn't make fault the oldval update already.
+>
+> >
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +
+> > > +static __always_inline int
+> > > +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> > > +{
+> > > +	u64 __user *uaddr64;
+> > > +	bool futex_on_lo;
+> > > +	int ret = -EAGAIN, i;
+> > > +	u32 other, orig_other;
+> > > +	union {
+> > > +		struct futex_on_lo {
+> > > +			u32 val;
+> > > +			u32 other;
+> > > +		} lo_futex;
+> > > +
+> > > +		struct futex_on_hi {
+> > > +			u32 other;
+> > > +			u32 val;
+> > > +		} hi_futex;
+> > > +
+> > > +		u64 raw;
+> > > +	} oval64, orig64, nval64;
+> > > +
+> > > +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
+> > > +	futex_on_lo = (IS_ALIGNED((unsigned long)uaddr, sizeof(u64)) ==
+> > > +			IS_ENABLED(CONFIG_CPU_LITTLE_ENDIAN));
+> >
+> > Just make LSUI depend on !CPU_BIG_ENDIAN in Kconfig. The latter already
+> > depends on BROKEN and so we'll probably drop it soon anyway. There's
+> > certainly no need to care about it for new features and it should simplify
+> > the code you have here if you can assume little-endian.
+>
+> Thanks. then I'll enable LSUI feature only !CPU_BIG_ENDIAN.
+>
+> >
+> > > +
+> > > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> > > +		if (get_user(oval64.raw, uaddr64))
+> > > +			return -EFAULT;
+> >
+> > Since oldval is passed to us as an argument, can we get away with a
+> > 32-bit get_user() here?
+>
+> It's not a probelm. but is there any sigificant difference?
 
-On Fri, Jan 16, 2026 at 11:29=E2=80=AFAM Ben Horgan <ben.horgan@arm.com> wr=
-ote:
->
-> Hi Reinette, Peter,
->
-> On 1/15/26 18:54, Reinette Chatre wrote:
-> > Hi Ben,
-> >
-> > On 1/15/26 7:43 AM, Ben Horgan wrote:
-> >> On 1/13/26 23:14, Reinette Chatre wrote:
-> >>> On 1/12/26 8:58 AM, Ben Horgan wrote:
-> > ...
-> >>>> +
-> >>>> +          /*
-> >>>> +           * Unfortunately, num_rmid doesn't mean anything for
-> >>>> +           * mpam, and its exposed to user-space!
-> >>>> +           *
-> >>>
-> >>> The idea of adding a per MON group "num_mon_groups" file has been flo=
-ated a couple of
-> >>> times now. I have not heard any objections against doing something li=
-ke this.
-> >>> https://lore.kernel.org/all/cbe665c2-fe83-e446-1696-7115c0f9fd76@arm.=
-com/
-> >>> https://lore.kernel.org/lkml/46767ca7-1f1b-48e8-8ce6-be4b00d129f9@int=
-el.com/
-> >>
-> >> Hmm, I see now that 'num_rmid' is documented as an upper bound and so
-> >> neither 1 or mpam_pmg_max + 1 agree with the documentation.
-> >>
-> >> "
-> >> "num_rmids":
-> >>              The number of RMIDs available. This is the
-> >>              upper bound for how many "CTRL_MON" + "MON"
-> >>              groups can be created.
-> >> "
-> >
-> > Please note that this documentation has been refactored (without changi=
-ng its
-> > meaning). The above quoted text is specific to L3 monitoring and with t=
-he
-> > addition of telemetry monitoring the relevant text now reads:
-> >       The upper bound for how many "CTRL_MON" + "MON" can be created
-> >       is the smaller of the L3_MON and PERF_PKG_MON "num_rmids" values.
-> >
-> >>
-> >> So, if I understand correctly you're proposing setting
-> >> num_rmids =3D num_pmg * num_partids on arm platforms and that in the
-> >> interim this can then be used to calculate the num_pmg by calculating
-> >> num_closid/num_rmid but that a per CTRL_MON num_mon_groups should be
-> >> added to make this consistent across architectures?
-> >
-> > Yes for num_rmids =3D num_pmg * num_partids.
->
-> Ok, I don't really see another option.
->
-> The motivation for this is that to me
-> > this looks like the value that best matches the num_rmids documentation=
-. I understand
-> > the RMID vs PMG is difficult so my proposal is certainly not set in sto=
-ne and I would like to
-> > hear motivation for different interpretations. "calculating num_pmg" is=
- not obvious
-> > though. I interpret "num_pmg" here as number of monitor groups per cont=
-rol group and on
-> > an Arm system this is indeed num_closid/num_rmids (if num_rmids =3D num=
-_pmg * num_partids)
-> > but on x86 it is just num_rmids. Having user space depend on such compu=
-tation to determine how
-> > many monitor groups per control group would thus require that user spac=
-e knows whether the
-> > underlying system is Arm or x86 and would go against goal of having res=
-ctrl as a generic interface.
-> >
-> > The way forward may be to deprecate (somehow) num_rmids and transition =
-to something
-> > like "num_mon_groups" but it is currently vague how "num_mon_groups" ma=
-y look like. That thread
-> > (https://lore.kernel.org/lkml/46767ca7-1f1b-48e8-8ce6-be4b00d129f9@inte=
-l.com/) fizzled
-> > out after raising a few options how it may look.
-> >
-> > Another proposal was to add a "mon_id_includes_control_id" to use as an=
-other "guide" to
-> > determine how many monitoring groups can be created but at the time it =
-seemed an intermediary
-> > step for user to determine the number of monitor groups that resctrl ca=
-n also provide.
-> > https://lore.kernel.org/lkml/CALPaoChad6=3Dxqz+BQQd=3DdB915xhj1gusmcrS9=
-ya+T2GyhTQc5Q@mail.gmail.com/
->
-> Just thinking about it now but the "mon_id_includes_control_id" option
-> seems the best to me as it is a single bit option that along with
-> "num_rmids" let's you know which monitor groups you can create and if
-> it's sensible to move monitor groups between CTRL MON groups.
->
-> The "num_mon_groups" per CTRL MON group would also need to be
-> interpreted together with "num_rmid" to know if it is a global or per
-> CTRL MON upper bound. This option also uses multiple files to give the
-> same bit of information.
->
-> >
-> > Making this consistent across architectures is the goal since resctrl a=
-ims to be
-> > a generic interface. Users should not need to do things like infer whic=
-h system they
-> > are running on by looking at output of resctrl files as mentioned.
-> >
-> > fwiw ...  there seems to be a usage by Google to compare num_rmids to n=
-um_closids to determine
-> > how to interact with resctrl:
-> > https://lore.kernel.org/lkml/CALPaoCgSO7HzK9BjyM8yL50oPyq9kBj64Nkgyo1WE=
-JrWy5uHUg@mail.gmail.com/
->
-> Unfortunately, it looks like we're about to break this heuristic :( At
-> least, until a way to get this information generically in resctrl is
-> decided upon.
+Also, seems for 32-bit get_user() i believe this is to read the
+*other" 32-bits to call __lsui_cmpxchg64().
+However, this would be call the get_user() with different address
+accoding to uaddr (uaddr -1 or uaddr + 1).
 
-We actually ended up going with the "mon_id_includes_control_id" approach.
+So if there is no significant difference for get_user() between 32-bit
+and 64-bit, I hope to keep this as it is.
 
-The property it represents is rather fundamental to what a monitoring
-group actually is and is a low-level implementation detail that is
-difficult to hide. Google generally needs support for as many
-monitoring IDs as jobs it expects to be able to run on a machine, so
-the number of monitoring groups will be routinely maxed out (and there
-will be some jobs that are forever stuck in the default group because
-no RMIDs were free at the time it started[1])
+[...]
 
-Thanks,
--Peter
-
-[1] https://lore.kernel.org/lkml/CALPaoCjTwySGX9i7uAtCWLKQpmELKP55xDLJhHmUv=
-e8ptsfFTw@mail.gmail.com/
+--
+Sincerely,
+Yeoreum Yun
