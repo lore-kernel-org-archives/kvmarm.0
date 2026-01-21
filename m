@@ -1,100 +1,143 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250FB3E958F
-	for <kvmarm@lists.linux.dev>; Wed, 21 Jan 2026 19:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A16635A923;
+	Wed, 21 Jan 2026 23:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769022413; cv=none; b=XdQ8/xvJVnhscUKMXwXVb98FTSFHsxOwUtvy2NYdI/eXPOALswGRCJ8Qs1ZXEvhnTeRfaVIZHBPp7HVU71VKEoIZbhe7i1rPwW279xgTru3tW7IfYCDYjsGWnJiWX6VJtcTk1/35Lh2PwWbUWJfWWdgdxS34MfuJCA+7v0ntn8M=
+	t=1769038331; cv=none; b=ar7Rv+bs/WaD+drXoSGKndPQW+zAjpPBbflYALbXXMy97MpDSuUpciU/XUJNlysIIqzTykwWXEJ2jFpguQhAdquYJ336ocntfqz5Xoaec8d2+8Z+SumviZvZTGy187yRPnA4UO4asUYoSn0IdyfWolMLXMXSMU1ljYEmlPvuP7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769022413; c=relaxed/simple;
-	bh=gC1ASY4XTWOU9NSvQyEf85WEp3yTpQCXJkzGjWaR5EM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dmz8wN0lz2izaHsVwhCGojSpqGYmolahVGs6c5lo2P8cswrLVCoviQEiWfGxw7J5RFUfzlcHUkCkWpm9A64IJ/95Vebnhf68iA2VTGlAqQE6qYWIfpj43ilCmwplEzEizNAMjZB5i32cL1WGf5dutZ/GfhkYOjzkLhm7QIu8ToI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 073731684;
-	Wed, 21 Jan 2026 11:06:45 -0800 (PST)
-Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6B6533F632;
-	Wed, 21 Jan 2026 11:06:48 -0800 (PST)
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	maz@kernel.org,
-	broonie@kernel.org,
-	oliver.upton@linux.dev,
-	miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com,
-	ardb@kernel.org,
-	suzuki.poulose@arm.com,
-	lpieralisi@kernel.org,
-	scott@os.amperecomputing.com,
-	joey.gouly@arm.com,
-	yuzenghui@huawei.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	mark.rutland@arm.com,
-	arnd@arndb.de,
-	Yeoreum Yun <yeoreum.yun@arm.com>
-Subject: [PATCH v12 7/7] arm64: armv8_deprecated: disable swp emulation when FEAT_LSUI present
-Date: Wed, 21 Jan 2026 19:06:22 +0000
-Message-Id: <20260121190622.2218669-8-yeoreum.yun@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260121190622.2218669-1-yeoreum.yun@arm.com>
-References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1769038331; c=relaxed/simple;
+	bh=nkvchCcqQhAAmS8zGkyfFLYiFbzKmdwcZy36WJKOnTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c1pqJ7qU0Vuuh/zgDLP79JexxINipMsaSyuPr9aQuE9IsDjfNkokJSe2Ccf5zOS/3Fa1t80pIaXuYmaPoPmu+pqv5DEbuLwGGlj2ztkGIxBIU7enO6Gl1nD/aOkzhPl6Ad+y2RQ2BD/pkyXaupB2H78Fu16+6yU2L5SwLLnb7LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5QIBB47; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5QIBB47"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D8A6C4CEF1;
+	Wed, 21 Jan 2026 23:32:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769038329;
+	bh=nkvchCcqQhAAmS8zGkyfFLYiFbzKmdwcZy36WJKOnTQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A5QIBB47jUpqq11SfeZHWLtxbdvAc23J4MyRuKt6xZg2GJaG/AV/K+R/V13BJT1PD
+	 F/vxCKLlutlfJJ4pWuv0fXK9Og/pGhxYd37c0cAe8wTG/UeSMmxjg2Rkb72TsVeDxk
+	 nRILcxpnUhD0kpOc/bNcJ+lBjo9iX+P2JHykg90vTAkZI82b5Fbt1FHjLoJFNiL10Z
+	 3RHscnBl/3fwxVJetTPNpnRP8PZk0tbEJyauBYu4+IosVXcnyhmgoHBVZvT9HpvpVM
+	 rCHcYOW76iqah73IVuqdqyNTK/R6dMWxc7u6QLAYYGf8h6b5LCW29mktFc4Y+ficZ1
+	 JSNgClFkU62Xg==
+Date: Wed, 21 Jan 2026 16:32:04 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in
+ DECLARE_FEAT_MAP() and co
+Message-ID: <20260121233204.GA1507843@ax162>
+References: <20251210173024.561160-1-maz@kernel.org>
+ <20251210173024.561160-5-maz@kernel.org>
+ <20260120211558.GA834868@ax162>
+ <86zf67b5oa.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86zf67b5oa.wl-maz@kernel.org>
 
-The purpose of supporting LSUI is to eliminate PAN toggling.
-CPUs that support LSUI are unlikely to support a 32-bit runtime.
-Since environments that support both LSUI and
-a 32-bit runtimeare expected to be extremely rare,
-not to emulate the SWP instruction using LSUI instructions
-in order to remove PAN toggling, and instead simply disable SWP emulation.
+On Wed, Jan 21, 2026 at 10:50:45AM +0000, Marc Zyngier wrote:
+> Let me guess: Cortex-A72 or similarly ancient ARM-designed CPUs, as
+> hinted by the lack of GICv3 TDIR control? Then these do not have
+> FEAT_FGT.
 
-Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
----
- arch/arm64/kernel/armv8_deprecated.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Yeah, Cortex-A72 for the one box and an Ampere Altra Q80-26 (which I
+believe is Neoverse-N1 cores?), so indeed, no FGT it seems.
 
-diff --git a/arch/arm64/kernel/armv8_deprecated.c b/arch/arm64/kernel/armv8_deprecated.c
-index e737c6295ec7..049754f7da36 100644
---- a/arch/arm64/kernel/armv8_deprecated.c
-+++ b/arch/arm64/kernel/armv8_deprecated.c
-@@ -610,6 +610,22 @@ static int __init armv8_deprecated_init(void)
- 	}
- 
- #endif
-+
-+#ifdef CONFIG_SWP_EMULATION
-+	/*
-+	 * The purpose of supporting LSUI is to eliminate PAN toggling.
-+	 * CPUs that support LSUI are unlikely to support a 32-bit runtime.
-+	 * Since environments that support both LSUI and a 32-bit runtime
-+	 * are expected to be extremely rare, we choose not to emulate
-+	 * the SWP instruction using LSUI instructions in order to remove PAN toggling,
-+	 * and instead simply disable SWP emulation.
-+	 */
-+	if (cpus_have_final_cap(ARM64_HAS_LSUI)) {
-+		insn_swp.status = INSN_UNAVAILABLE;
-+		pr_info("swp/swpb instruction emulation is not supported on this system\n");
-+	}
-+#endif
-+
- 	for (int i = 0; i < ARRAY_SIZE(insn_emulations); i++) {
- 		struct insn_emulation *ie = insn_emulations[i];
- 
--- 
-LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
+> The issue stems from the fact that as an optimisation, we skip the
+> parsing of the FGT trap table on such hardware, which also results in
+> the FGT masks of known bits not being updated. We then compute the
+> effective feature map, and discover that the two don't match.
+> 
+> It was harmless so far, as we were only dealing with RES0 bits, and
+> assuming that anything that wasn't a RES0 bit was a stateful bit. With
+> the introduction of RES1 handling, we've run out of luck. To be clear,
+> that's just a warning, not a functional issue.
+> 
+> At this point, I don't think the above "optimisation" is worth having.
+> This is only done *once*, at boot time, so the gain is extremely
+> small. I'd like the checks to be effective irrespective of the HW the
+> kernel runs on, which is consistent with what we do for other tables
+> describing the architectural state.
+> 
+> Anyway, I came up with the following hack, which performs the checks,
+> but avoid inserting the FGT information in the sysreg xarray if the HW
+> doesn't support it, as a memory saving measure. Please let me know if
+> that helps (it does on my old boxes).
 
+Works for me as well, no warnings on either box with this patch applied.
+If it is useful for a follow up submission:
+
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 88336336efc9f..fa8fa09de67dc 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -2284,9 +2284,6 @@ int __init populate_nv_trap_config(void)
+>  	kvm_info("nv: %ld coarse grained trap handlers\n",
+>  		 ARRAY_SIZE(encoding_to_cgt));
+>  
+> -	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> -		goto check_mcb;
+> -
+>  	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+>  		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+>  		union trap_config tc;
+> @@ -2306,6 +2303,15 @@ int __init populate_nv_trap_config(void)
+>  			}
+>  
+>  			tc.val |= fgt->tc.val;
+> +
+> +			if (!aggregate_fgt(tc)) {
+> +				ret = -EINVAL;
+> +				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+> +			}
+> +
+> +			if (!cpus_have_final_cap(ARM64_HAS_FGT))
+> +				continue;
+> +
+>  			prev = xa_store(&sr_forward_xa, enc,
+>  					xa_mk_value(tc.val), GFP_KERNEL);
+>  
+> @@ -2313,11 +2319,6 @@ int __init populate_nv_trap_config(void)
+>  				ret = xa_err(prev);
+>  				print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+>  			}
+> -
+> -			if (!aggregate_fgt(tc)) {
+> -				ret = -EINVAL;
+> -				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+> -			}
+>  		}
+>  	}
+>  
+> @@ -2333,7 +2334,6 @@ int __init populate_nv_trap_config(void)
+>  	kvm_info("nv: %ld fine grained trap handlers\n",
+>  		 ARRAY_SIZE(encoding_to_fgt));
+>  
+> -check_mcb:
+>  	for (int id = __MULTIPLE_CONTROL_BITS__; id < __COMPLEX_CONDITIONS__; id++) {
+>  		const enum cgt_group_id *cgids;
+>  
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
