@@ -1,147 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB423161B5;
-	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379C52C21DD
+	for <kvmarm@lists.linux.dev>; Wed, 21 Jan 2026 09:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768984039; cv=none; b=aWjTKh7I9UDHjR9jdw3oa5auNdhNCcL3La/jaDG+MUT4aSrLTqGbX638VPTUuOwwFKb2yby8GE3b0VV8cwvvjWsFE+WxCbwkXmNVginN+WpUpNqSpe3B3/uPCZJQ32tZmovotTEnWzkM7QCqpYPgQWycfcxzNLwfzHgb80d3LK4=
+	t=1768988363; cv=none; b=nZemQtKYBQSjnfspikLfY8eklGM89SaR06kRMU8nAzv3dL8Gsg5RKD1KbTnQ8FO9KASzAjS7o3VrWHeDb1IT5mVFlTLTs6t2YtpR90EyVhsW+sqBjtfc91+k6bXmsMs1Kml4Y4BIe6G29pFUCzGH24B18zESTpwWHKzWpG4yjyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768984039; c=relaxed/simple;
-	bh=r68ZJJJ1c7EdvRJdPd1/xrzeCtM1H4vRuF8Sk5sagfo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=iKdqzcr5quye5qGY8HUv+YmNRVuRdFqt3b5/sEzwEdhJZyJaK1ZjTo+veE7FlqDHc3qe0mE4K4uhBw08Llma4WxhVOmYQwDcyq7fjbpzTCrV9NNuqUXsI0f1Ts/EbbObQ5pnmB+gfOHlMSqRWINLUaVP+6eHH1v4JQceejOAqE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8bqYrmy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768988363; c=relaxed/simple;
+	bh=6TUgpJxKh+r42S1F4Wrkpyb8Ir4NoTjV1eG8SILKXOk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sL9Zl+b3N0jLRroeUq6HavLtopOBEuvchn9w+5r9lwps5l3IHro6FLDPGZLKqn4ZCDNeVYYodR3L7jwC5i7oey15uqNt0yksih+D2Nayn413OTicBxPG5QbRxXqllwgL3+xbxsFiJ94htEEosYI5+IJzooPvwtkVaCbTuitpByE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U37TlUUr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8bqYrmy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54989C16AAE;
-	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768984039;
-	bh=r68ZJJJ1c7EdvRJdPd1/xrzeCtM1H4vRuF8Sk5sagfo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=d8bqYrmyq14J/TY1vZXDknH7w87TyZyLl+S14hUghuModX9AJ2mzrEJGgnzd5slwM
-	 fu2WfP10uH3NltgSh3BYcWAtbaNoduPhJ5viLDRHV5o4bCB6lyBzD5fnYF+m4/A6mj
-	 hCciz9vBQvDIP6rQvGRa8g5L/Sex4MJCu0w9yid9QjH3gPPhqn+hxXQhyT20ss2JIm
-	 fgqigz3FxthYHqDAmw5WEmc0IeONopl3ZthjYWZLg7PIWVdyNCyP+SRyjjuiaV/BVu
-	 VTevcnHjtkNYhW/QbYozbIem1R7ydqCLgwAmKijiG3OIZfxJL+qd9wy7wzRE5bebK8
-	 vYS5t6qoia5bw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48AEEC44500;
-	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
-From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
-Date: Wed, 21 Jan 2026 08:27:13 +0000
-Subject: [PATCH v5 2/2] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in
- host handler
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U37TlUUr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1768988361;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t2/xT8iPwxVBhXyFiskTxjU+UnFqiORTdZoi4L7IpKI=;
+	b=U37TlUUrrP15/sjXyEj2btYruaUPaIGK5UARPapHFfHXp52gxzO1r0sm41eVJiLLkCw49I
+	6ggUWFF35VsPYhVgGzxmnEM6Mgf+XpIGF6NOGyQnzC3UZy4W8tlo1d2IGEHbEwgRiknA1n
+	mtQ56c/S6dpqTqTdV9p8n5PE7SyJP8I=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-343-1ssNS6VEOJ2oq6eEPmr6Qw-1; Wed, 21 Jan 2026 04:39:20 -0500
+X-MC-Unique: 1ssNS6VEOJ2oq6eEPmr6Qw-1
+X-Mimecast-MFC-AGG-ID: 1ssNS6VEOJ2oq6eEPmr6Qw_1768988359
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47d3c9b8c56so72917965e9.0
+        for <kvmarm@lists.linux.dev>; Wed, 21 Jan 2026 01:39:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1768988359; x=1769593159;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t2/xT8iPwxVBhXyFiskTxjU+UnFqiORTdZoi4L7IpKI=;
+        b=GxyzXP5ePDkF7MNHaXSrzVOgHsV82oOVmBC/3KGx6dJKGFsVQIWQwWPF1u1Mel1Skx
+         fFDAyD3cwaS5jD3keE9dP+5ARuPeOeukKAOXZnoUDKvkCfpZiNRoFD/Nx/8lnx2mUGPi
+         Fl9Hd9j+dSsOa6a2dZwMYm7pSho3uGqGrGydYCyxUhpKrhvr9uoXS+edi3WrvDm6Fnu1
+         37W3dxz+ffDCOF1ARO9ZCSJPJBbqAV/JojNAp6vXlMKU/4nwVl3+wanqSAyg2ZD5WhuC
+         Cc8JZY/Mh+/NCJrw5EvSE8/QJ8EXbFgdhYR0nOlbZ3e5cI57wbQIWqkG81f5kVWdswSy
+         WVqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWTC5kVlxeOq3KU2UHJtp5wjYqYSdOf1AnBLbtUUKpXKCu5+eDvOWWfYB6nnxzW6RMNHBsIKDg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzXdPKMsX9aTgZ7416wxehiTh+YuFH87LlQ4e4iFKmGfQ7eFUyZ
+	Pbk8lgiY7mnae3jZtGUJo5VSpLzHsmrgzJ36uu/1AHT9azhaJEzaPTTG832ae/+e2KBOF6622yo
+	skTGvKMvbEwipEQnDc1K6JRl5rWp3fhXP8DSEVPEA5QiECIWMXHtOkEkqIg==
+X-Gm-Gg: AZuq6aJK6Jt9YImqv+CVLtrdBnbnRBtdSN7anZtpBhDK1bOHm0HIX4YhAtAWD7EU0b8
+	tgjwxt8ua1mkkkkarTiQR6Sx6vXzf6b6GollCqhiF1S/4OwLhIBb++s/tzorWRqYHQab3EPfY6c
+	YnrjO5DmJf3WC+dL/Rfv4BMPKHvPwk4744Myb83ieyoDxY13r+8eSnhor8A0KbByH23MOZQXCSm
+	6q47U490LXDBiLw0pNmqzzuZ8U6GJ2RqyH5I/Gql0IfQAG12q4WhKM2cFBeNjWrWPjzi3KVQwUJ
+	DUWsc2bjW8sWoXbTe7c9E1k/q/BYo13vkcaN7gAhqnkgXCwXdx9uA+ESy6kvEnDmDan6l68OrQu
+	eRbJ12wEwWtJNZxwGgTbW01hB0c0YC6ZegELqi3wqjaiqs65JvMi21rInAg==
+X-Received: by 2002:a05:600c:37c8:b0:47e:e87f:4bba with SMTP id 5b1f17b1804b1-4801eb0e1cfmr211975325e9.29.1768988358825;
+        Wed, 21 Jan 2026 01:39:18 -0800 (PST)
+X-Received: by 2002:a05:600c:37c8:b0:47e:e87f:4bba with SMTP id 5b1f17b1804b1-4801eb0e1cfmr211974895e9.29.1768988358401;
+        Wed, 21 Jan 2026 01:39:18 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:f0e:9070:527b:9dff:feef:3874? ([2a01:e0a:f0e:9070:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4804245245esm20022655e9.0.2026.01.21.01.39.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jan 2026 01:39:17 -0800 (PST)
+Message-ID: <5fbdeab4-d8b2-487f-89e6-fb00037e5773@redhat.com>
+Date: Wed, 21 Jan 2026 10:39:16 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v4 0/2] arm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+References: <20251202160853.22560-1-sebott@redhat.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20251202160853.22560-1-sebott@redhat.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: vJROdwbYaCLqTruWI-5z5szQtbI0ktUu-XP2IyLLqbo_1768988359
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260121-host-direct-messages-v5-2-2c1614c94e80@google.com>
-References: <20260121-host-direct-messages-v5-0-2c1614c94e80@google.com>
-In-Reply-To: <20260121-host-direct-messages-v5-0-2c1614c94e80@google.com>
-To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Zenghui Yu <yuzenghui@huawei.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
- Oliver Upton <oupton@kernel.org>
-Cc: Armelle Laine <armellel@google.com>, 
- Sebastien Ene <sebastianene@google.com>, 
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Per Larsen <perlarsen@google.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1768984038; l=2874;
- i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
- bh=qhcYKwAWcN8zYuALz8BfQQd2qzT5+68uMqM1AI8ru7s=;
- b=wDNdZFgbPAKqh1Dj89bs6SryRSDS5CvEDvRzSjZaKAPy0slJ3E9kCleOP7/iPjEB4/da2+K3r
- ymUkX9NRNvfCfCo/ixmNyp4fFXE9K07y+kkhLDTnbJgeG+MhqOTLQzi
-X-Developer-Key: i=perlarsen@google.com; a=ed25519;
- pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
-X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
- auth_id=402
-X-Original-From: Per Larsen <perlarsen@google.com>
-Reply-To: perlarsen@google.com
 
-From: Per Larsen <perlarsen@google.com>
+Hi Sebastian,
 
-FF-A 1.2 adds the DIRECT_REQ2 messaging interface which is similar to
-the existing FFA_MSG_SEND_DIRECT_{REQ,RESP} functions and can use the
-existing handler function. Add support for FFA_MSG_SEND_DIRECT_REQ2 in
-the host ffa handler.
+On 12/2/25 5:08 PM, Sebastian Ott wrote:
+> This series adds a vcpu knob to request a specific PSCI version
+> from KVM via the KVM_REG_ARM_PSCI_VERSION FW register.
+>
+> The use case for this is to support migration between host kernels
+> that differ in their default (a.k.a. most recent) PSCI version.
+>
+> Note: in order to support PSCI v0.1 we need to drop vcpu
+> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+> Alternatively we could limit support to versions >=0.2 .
+>
+> Changes since V3 [3]:
+> * changed variable name as requested by Eric
+> * added R-B
+> Changes since V2 [2]:
+> * fix kvm_get_psci_version() when the prop is not specified - thanks Eric!
+> * removed the assertion in kvm_get_psci_version() so that this also works
+>   with a future kernel/psci version
+> * added R-B
+> Changes since V1 [1]:
+> * incorporated feedback from Peter and Eric
+>
+> [1] https://lore.kernel.org/kvmarm/20250911144923.24259-1-sebott@redhat.com/
+> [2] https://lore.kernel.org/kvmarm/20251030165905.73295-1-sebott@redhat.com/
+> [3] https://lore.kernel.org/kvmarm/20251112181357.38999-1-sebott@redhat.com/
+>
+> Sebastian Ott (2):
+>   target/arm/kvm: add constants for new PSCI versions
+>   target/arm/kvm: add kvm-psci-version vcpu property
+>
+>  docs/system/arm/cpu-features.rst |  5 +++
+>  target/arm/cpu.h                 |  6 +++
+>  target/arm/kvm-consts.h          |  2 +
+>  target/arm/kvm.c                 | 64 +++++++++++++++++++++++++++++++-
+>  4 files changed, 76 insertions(+), 1 deletion(-)
+>
+Feel free to add my
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
-Signed-off-by: Per Larsen <perlarsen@google.com>
----
- arch/arm64/kvm/hyp/nvhe/ffa.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+I was able to migrate from a host featuring "KVM: arm64: Add support for
+PSCI v1.2 and v1.3" to an "old" one that doesn't using
+,kvm-psci-version=1.1
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-index 9967916278a7ca051500946ef2fcfe7bb40e0e8d..17b92f7faaf68e56aef0ebbe58710b7485a87231 100644
---- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-+++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-@@ -684,11 +684,12 @@ static bool ffa_call_supported(u64 func_id)
- 	case FFA_NOTIFICATION_GET:
- 	case FFA_NOTIFICATION_INFO_GET:
- 	/* Optional interfaces added in FF-A 1.2 */
--	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
- 	case FFA_MSG_SEND_DIRECT_RESP2:		/* Optional per 7.5.1 */
- 	case FFA_CONSOLE_LOG:			/* Optional per 13.1: not in Table 13.1 */
- 	case FFA_PARTITION_INFO_GET_REGS:	/* Optional for virtual instances per 13.1 */
- 		return false;
-+	case FFA_MSG_SEND_DIRECT_REQ2:		/* Optional per 7.5.1 */
-+		return hyp_ffa_version >= FFA_VERSION_1_2;
- 	}
- 
- 	return true;
-@@ -866,6 +867,7 @@ static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
- 			      struct kvm_cpu_context *ctxt,
- 			      u64 vm_handle)
- {
-+	DECLARE_REG(u64, func_id, ctxt, 0);
- 	DECLARE_REG(u32, flags, ctxt, 2);
- 
- 	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-@@ -875,8 +877,12 @@ static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
- 		return;
- 	}
- 
--	/* filter out framework messages and validate SBZ/MBZ bits */
--	if (flags) {
-+	/*
-+	 * filter out framework messages and validate SBZ/MBZ flag bits.
-+	 * FFA_MSG_SEND_DIRECT_REQ2 implies flag-less partition message.
-+	 */
-+	if ((func_id == FFA_MSG_SEND_DIRECT_REQ ||
-+	     func_id == FFA_FN64_MSG_SEND_DIRECT_REQ) && flags) {
- 		ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
- 		return;
- 	}
-@@ -942,6 +948,10 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	case FFA_PARTITION_INFO_GET:
- 		do_ffa_part_get(&res, host_ctxt);
- 		goto out_handled;
-+	case FFA_MSG_SEND_DIRECT_REQ2:
-+		if (!ffa_call_supported(func_id))
-+			goto out_not_supported;
-+		fallthrough;
- 	case FFA_MSG_SEND_DIRECT_REQ:
- 	case FFA_FN64_MSG_SEND_DIRECT_REQ:
- 		do_ffa_direct_msg(&res, host_ctxt, HOST_FFA_ID);
-@@ -951,6 +961,7 @@ bool kvm_host_ffa_handler(struct kvm_cpu_context *host_ctxt, u32 func_id)
- 	if (ffa_call_supported(func_id))
- 		return false; /* Pass through */
- 
-+out_not_supported:
- 	ffa_to_smccc_error(&res, FFA_RET_NOT_SUPPORTED);
- out_handled:
- 	ffa_set_retval(host_ctxt, &res);
+Thanks
 
--- 
-2.52.0.457.g6b5491de43-goog
-
+Eric
 
