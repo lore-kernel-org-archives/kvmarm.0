@@ -1,98 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7357F37F757;
-	Wed, 21 Jan 2026 16:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B21339855
+	for <kvmarm@lists.linux.dev>; Wed, 21 Jan 2026 16:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769012444; cv=none; b=G4Rt76zdL6kJczs5tQ+TSEmV65WUD8bY51qvZIqfQvHw/+b1YTWcqKTv6LVCXF8KfAEZcjUJ2Z1EDBJDKHHynOW3ZoZKMDIlpqMbNcBs9GGdPjzL1q8SV+J+m0C6x65ZOgXqglYZ7UlB0jsr6YtUcIBib1OkWt1QV8EiZXN4LhA=
+	t=1769012628; cv=none; b=tA/0eSIVKqesJxQgrHZ0kCWlxizh8b1Uo4abFwSF8RwnTb4A4EOC3QLthTb2ewaw9h5YMpuze5X9650vx9ZBYAkcU4QH3tcEMX+LlEhlElEh8SGkwcVJNfYPn91qB5FkNnA4mCp59+Icm+vvpkZs+Qty1wTd6p1/mHQQpj8kmQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769012444; c=relaxed/simple;
-	bh=1zrLB9YYiuSPiB+hTb+W3k1yLnlV8BF5PevPGnV9vcs=;
+	s=arc-20240116; t=1769012628; c=relaxed/simple;
+	bh=OdsdWoj5bitWH44V1FFwMrwQesA+OP83xj6JU1BgNCU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZzqopF9Vk5EoULr1awQL68uyjOcF4w8VVdtGH2zRHLuf4UcDm+FSmV00AacglkYNq1wYwx7XkBIZ2+OKuxWfJ5eKXTLYlF86n5fF7V0hZ1ZzHkOxEAIpM+T9f1dKgA/NIYlinY0uz0edSY9YP7TNzbnyoErEaxD8StA7HHuJuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QISwPij8; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QISwPij8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DF4C4CEF1;
-	Wed, 21 Jan 2026 16:20:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769012443;
-	bh=1zrLB9YYiuSPiB+hTb+W3k1yLnlV8BF5PevPGnV9vcs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QISwPij8Wrto3Bs19w6vqe3S2S5wUbzZBIkAYoW3q5GKX1oPPXFRUPe1kitED+Afh
-	 P+qH1izc6yuCkE0EYlusxPbZ7hCHHqf21r/qBEdXvqXF7UAgd857zey6uVJ4Xgt/MW
-	 MHMDvGAh7sXRHkbMW23lVMUlAD63w1vI8ZhNW+nG3uarIrZdYR0P6xaGU2GzL7GNZg
-	 cXkfdI3oNMKE4jw8heAnjacEfhDglbXo4tELdNeXigasbn2JhCOYWFkj90bCGBAPGe
-	 9slvHJrZgYXFftd3CHOiTy1JaF86l5T1y3z2zhubcNAzg1QVOy2RVW+DMnR6EoBJqZ
-	 MUA+ohMHg8Qrw==
-Date: Wed, 21 Jan 2026 16:20:36 +0000
-From: Will Deacon <will@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>,
-	catalin.marinas@arm.com, broonie@kernel.org, oliver.upton@linux.dev,
-	miko.lenczewski@arm.com, kevin.brodsky@arm.com, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org,
-	yangyicong@hisilicon.com, scott@os.amperecomputing.com,
-	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
-	shuah@kernel.org, arnd@arndb.de,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v11 RESEND 9/9] arm64: armv8_deprecated: apply FEAT_LSUI
- for swpX emulation.
-Message-ID: <aXD81LT6TX32vlTS@willie-the-truck>
-References: <86ms3knl6s.wl-maz@kernel.org>
- <aT/bNLQyKcrAZ6Fb@e129823.arm.com>
- <aW5O714hfl7DCl04@willie-the-truck>
- <aW6w6+B21NbUuszA@e129823.arm.com>
- <aW9O6R7v-ybhrm66@J2N7QTR9R3>
- <aW9T5b+Y2b2JOZHk@e129823.arm.com>
- <aW9sBkUVnpAkPkxN@willie-the-truck>
- <aW/Ck3M3Xg02DpQX@e129823.arm.com>
- <aXDbBKhE1SdCW6q4@willie-the-truck>
- <aXDn3iRXEtgaUtnp@e129823.arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AFLvu6IniZGZ81hg31tFyTggxztvYdBEwHTXYCx68qzET7J3wmT6SoymtjXY6CzHyWj0LpiCmIfe0pQcuOnhVtXuEo8ezdq1VD6et3tHf0gyOx6QGdQBHvnJ/jpUTHowDepxkn5LNqAmSlcEUnWLavd/bjSfpD0wey5lxxugOa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1ACDE1476;
+	Wed, 21 Jan 2026 08:23:39 -0800 (PST)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C6D23F694;
+	Wed, 21 Jan 2026 08:23:44 -0800 (PST)
+Date: Wed, 21 Jan 2026 16:23:39 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: ... and FWB for all
+Message-ID: <20260121162339.GA1846642@e124191.cambridge.arm.com>
+References: <20260119105651.255693-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aXDn3iRXEtgaUtnp@e129823.arm.com>
+In-Reply-To: <20260119105651.255693-1-maz@kernel.org>
 
-On Wed, Jan 21, 2026 at 02:51:10PM +0000, Yeoreum Yun wrote:
-> > On Tue, Jan 20, 2026 at 05:59:47PM +0000, Yeoreum Yun wrote:
-> > > On second thought, while a CPU that implements LSUI is unlikely to
-> > > support AArch32 compatibility,
-> > > I don't think LSUI requires the absence of AArch32.
-> > > These two are independent features (and in fact our FVP reports/supports both).
-> >
-> > Did you have to configure the FVP specially for this or that a "default"
-> > configuration?
-> >
-> > > Given that, I'm not sure a WARN is really necessary.
-> > > Would it be sufficient to just drop the patch for swpX instead?
-> >
-> > Given that the whole point of LSUI is to remove the PAN toggling, I think
-> > we should make an effort to make sure that we don't retain PAN toggling
-> > paths at runtime that could potentially be targetted by attackers. If we
-> > drop the SWP emulation patch and then see that we have AArch32 at runtime,
-> > we should forcefully disable the SWP emulation but, since we don't actually
-> > think we're going to see this in practice, the WARN seemed simpler.
+After a crash course in FWB,
+
+On Mon, Jan 19, 2026 at 10:56:45AM +0000, Marc Zyngier wrote:
+> [Yes, you can tell what I was listening to]
 > 
-> TBH, I missed the FVP configuration option clusterX.max_32bit_el, which
-> can disable AArch32 support by setting it to -1 (default: 3).
-> Given this, I think it’s reasonable to emit a WARN when LSUI is enabled and
-> drop the SWP emulation path under that condition.
+> Today, running in protected mode puts the host under it's own S2 with
+> FWB=0, even if the rest of the guests are running with FWB=1. The
+> rationale for this special-casing of the host is that we want the
+> combined attributes to actually reflect the ones exposed by S1.
+> 
+> We therefore use NormalCacheable (which is the weakest memory type) as
+> the default attributes at S2 so that S1 can only strengthen the final
+> memory type.
+> 
+> But there is no reason why we cannot achieve the same effect with
+> FWB. We normally use FWB to enforce cacheable memory from S2,
+> irrespective of S1. But it is possible to configure the S2 attributes
+> as "pass-through", so that the S1 attributes are always used.
+> 
+> This small series implements that change, adding a flag that actually
+> describes what we are trying to do (instead of the NOFWB flag which is
+> pretty obscure), and fixes an interesting gotcha with CMOs.
+> Interestingly, CMOs never actually worked with NOFWB on an FWB-aware
+> platform...
 
-I'm asking about the default value.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-If Arm are going to provide models that default to having both LSUI and
-AArch32 EL0 supported, then the WARN is just going to annoy people.
-
-Please can you find out whether or not that's the case?
-
-Will
+Thanks,
+Joey
+> 
+> Patches on top of 6.19-rc5.
+> 
+> Marc Zyngier (6):
+>   arm64: Add MT_S2{,_FWB}_AS_S1 encodings
+>   KVM: arm64: Add KVM_PGTABLE_S2_AS_S1 flag
+>   KVM: arm64: Make stage2_pte_cacheable() return false when S2_AS_S1 is
+>     set
+>   KVM: arm64: Switch pKVM host S2 over to KVM_PGTABLE_S2_AS_S1
+>   KVM: arm64: Kill KVM_PGTABLE_S2_NOFWB
+>   KVM: arm64: Simplify PAGE_S2_MEMATTR
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h  |  7 +++---
+>  arch/arm64/include/asm/memory.h       | 11 ++++++---
+>  arch/arm64/include/asm/pgtable-prot.h |  4 ++--
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  4 +++-
+>  arch/arm64/kvm/hyp/pgtable.c          | 32 +++++++++++++++++++--------
+>  5 files changed, 39 insertions(+), 19 deletions(-)
+> 
+> -- 
+> 2.47.3
+> 
