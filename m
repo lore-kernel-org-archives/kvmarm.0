@@ -1,143 +1,131 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC42D1303;
-	Tue, 20 Jan 2026 21:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BEB30E0F4;
+	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768943768; cv=none; b=A8BCqtNuDg8CDcAuqGzopqhDqD2Vl2rBGgzjnZn4+YmtfvQDDkv7MuZNf1JwjW7mmaRGedQcGCF+VHVL2eZLYPK5E+Brc1EybW2TOBCufqa0UG3chxWpqrKw1/jmLyENAYYWQCdRLLKkVP93pYpRMF1GCDWNUnT9zPAkpyCYTPo=
+	t=1768984039; cv=none; b=WVz8g0bv0E0oE7X9MfW4qv7Dc33ka/jwoJCal1LyLU/ko8kw4dmKJWTZ83M7wxbBWWUB4PU7qMEEUiz4QMRxvkCdcA9rX84CJwHG66cSqS1A8S/zGY1IIioR7107uYuokPiIuM4eB6ARH8lMX6Oqvqjc6plRCGjIqOSx7Zm7zqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768943768; c=relaxed/simple;
-	bh=k+AXef9xJ0NMYxE0xeBDoDL6TDip/0guYNTErye5XeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EMyMFhpJfF9nR77CgWejMs5of20QFeZx3B88IBlBnUaRwhL136AiSXWpMz5AV1zfVLM6mRn+IdDkUd6umHelmdWP/PbGlgzi/BDPAwWnulJBbG2JmAH4VZHIibHpDlWaW+YOyhpC0wNMTe1L19c+Hm+fco3ROy8CGNc+CS9yDSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ViOxTvm/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1768984039; c=relaxed/simple;
+	bh=cQzCdOlysfcwSAXig6FKFPi8qbVKzsFXGYR1TM3D2sM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JYEj35aaySVX5ppEVIOxpvfQptozQyL7T9suizml2z7Bb88RK7ljwWHE3XEYHLqzZOTx2LSyFSyxD52+0pLByCa8iaqqaET1RhhqxHsQ75OLPDiUsBPsEjK1yW7b+CxjA07aXG1N8YUxVIP1BIaxVguj6SiF/GutKV9O7xVVgxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lT6jnocm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ViOxTvm/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 264A3C16AAE;
-	Tue, 20 Jan 2026 21:16:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lT6jnocm"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 32A6EC116D0;
+	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1768943763;
-	bh=k+AXef9xJ0NMYxE0xeBDoDL6TDip/0guYNTErye5XeE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ViOxTvm/wBcqrRmueJcnA2eKsVM7IiLX+iKhZBMtBWp/RG2pbtop2vcWb6ApVoSzc
-	 ppGw8yQVNtX5fBIU76SqhbZjAMA00XB4JsFh/5TkfLxxJZ3KWTNe5jR19wYqKTlyii
-	 vePMRNc+fVaocz2/WIyg1fDLR+m3Q+gt45QkjwuY8XWAKMQp6J5g8gzoB/2ZuUF74m
-	 5/UWws6pLVPOk9qkiYYZ0dnMFLcdpCaHuHHFKqued+U5Kn8gySLomhmG7lqVgR7Rkz
-	 2SY1yf46R8DnIsw7Bdq6mVuo5veVy5sFTp1bUZYuYg3tmykv5SJvIovGBCu2ZsoiDy
-	 BKqNYbr1op2pA==
-Date: Tue, 20 Jan 2026 14:15:58 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in
- DECLARE_FEAT_MAP() and co
-Message-ID: <20260120211558.GA834868@ax162>
-References: <20251210173024.561160-1-maz@kernel.org>
- <20251210173024.561160-5-maz@kernel.org>
+	s=k20201202; t=1768984039;
+	bh=cQzCdOlysfcwSAXig6FKFPi8qbVKzsFXGYR1TM3D2sM=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=lT6jnocmKaTUTUIUSaR71vM51dCqr5y0XS/hX8kz41bkQsLsbUEEamUN6t/IYdE21
+	 7tE6HjKfS6mtPfbzvGOrxidWDyE+1f/ia/trWks1zd9lE699/6MOImxLvibJmjjSWa
+	 a4LdNGdo6APOWAMbl7QYoe0UaADzai44BXCNLZJ8o/TP4jkUTxDFBekxFZzkC+6Qgv
+	 dLcFFauRoOBso3vQdyp3hVLR2cFyt7URypTM0YTzyNAM5C5jhcfk3Gb/nfRMdJfZjd
+	 nmdmHuIVqOlCur4saqMhO5N9iuRMFEsfVR880LU+WKreq/C+mzI0DMPSZSd04ovfhs
+	 EKSxRLaQktw3g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F37BC44502;
+	Wed, 21 Jan 2026 08:27:19 +0000 (UTC)
+From: Per Larsen via B4 Relay <devnull+perlarsen.google.com@kernel.org>
+Subject: [PATCH v5 0/2] KVM: arm64: Support FF-A direct messaging
+ interfaces
+Date: Wed, 21 Jan 2026 08:27:11 +0000
+Message-Id: <20260121-host-direct-messages-v5-0-2c1614c94e80@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251210173024.561160-5-maz@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOCNcGkC/43PwWrDMAwG4FcpPs9Dku042WnvMXpIbTkxrHWxg
+ 1kpefc5ZWOMrrDjL9D3S1dROEcu4mV3FZlrLDGdWjBPO+Hm8TSxjL5lQUAGgQY5p7JIHzO7RR6
+ 5lHHiIg0BehuMGQ9etNVz5hA/buzbvuU5liXly62l4jb9AhX8DVaUIHWn2NjeouvD65TS9M7PL
+ h3FJlb6j0JNGQJZx0F1VsGdon4UxAfPVdUUZ7UHPWh9oO5O0d9KBwiPFL3dYvyoidBj/1tZ1/U
+ TYrxToYsBAAA=
+X-Change-ID: 20251029-host-direct-messages-5201d7f55abd
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Armelle Laine <armellel@google.com>, 
+ Sebastien Ene <sebastianene@google.com>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Per Larsen <perlarsen@google.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1768984038; l=2274;
+ i=perlarsen@google.com; s=20250508; h=from:subject:message-id;
+ bh=cQzCdOlysfcwSAXig6FKFPi8qbVKzsFXGYR1TM3D2sM=;
+ b=tbWIPz2+0mSpsec3Xa3QoVglkBclxYCItvNgsUk21mpl9u7YjOgTnHoVxhKwd+Rz1XkEVsTsA
+ 3tEGoyXf7EwCFP5X0SfvcVeTrifAgIygwdr8/RQgY1zrcCx1dWrnp4i
+X-Developer-Key: i=perlarsen@google.com; a=ed25519;
+ pk=jjc/Ta4VmrLRmMoahP6d1mBcKzvWU+nsmdtYe2oS2kQ=
+X-Endpoint-Received: by B4 Relay for perlarsen@google.com/20250508 with
+ auth_id=402
+X-Original-From: Per Larsen <perlarsen@google.com>
+Reply-To: perlarsen@google.com
 
-Hi Marc,
+Support FFA_MSG_SEND_DIRECT_REQ unconditionally.
+Support FFA_MSG_SEND_DIRECT_REQ2 if hypervisor negotiated version 1.2+.
 
-On Wed, Dec 10, 2025 at 05:30:22PM +0000, Marc Zyngier wrote:
-> None of the registers we manage in the feature dependency infrastructure
-> so far has any RES1 bit. This is about to change, as VTCR_EL2 has
-> its bit 31 being RES1.
-> 
-> In order to not fail the consistency checks by not describing a bit,
-> add RES1 bits to the set of immutable bits. This requires some extra
-> surgery for the FGT handling, as we now need to track RES1 bits there
-> as well.
-> 
-> There are no RES1 FGT bits *yet*. Watch this space.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Framework messages (FF-A control plane) are filtered out. For
+FFA_MSG_SEND_DIRECT_REQ, we look at flags in w2. Messages using the REQ2
+interface are always partition messages.
 
-After this change in -next as commit c259d763e6b0 ("KVM: arm64: Account
-for RES1 bits in DECLARE_FEAT_MAP() and co"), I am seeing several
-"undefined behavior" errors on my two arm64 boxes.
+The second patch was part of a previous patch set [0] but was dropped
+since the use case was unclear. A clear use case has now appeared: use
+TPM device with CRB over FF-A when kernel boots with pkvm [1].
 
-  $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
-  Linux version 6.19.0-rc4-00014-gc259d763e6b0 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 13:59:52 MST 2026
-  kvm [1]: nv: 568 coarse grained trap handlers
-  kvm [1]: Undefined hfgrtr_masks behaviour, bits fff7ffffffffffff
-  kvm [1]: Undefined hfgwtr_masks behaviour, bits fff7baffe9db39fb
-  kvm [1]: Undefined hfgitr_masks behaviour, bits dfffffffffffffff
-  kvm [1]: Undefined hdfgrtr_masks behaviour, bits fffdfb3fffcffeff
-  kvm [1]: Undefined hdfgwtr_masks behaviour, bits 73f7763bbfbffdbf
-  kvm [1]: Undefined hafgrtr_masks behaviour, bits 0003fffffffe001f
-  kvm [1]: Undefined hfgrtr2_masks behaviour, bits 0000000000007fff
-  kvm [1]: Undefined hfgwtr2_masks behaviour, bits 0000000000007ffd
-  kvm [1]: Undefined hfgitr2_masks behaviour, bits 0000000000000003
-  kvm [1]: Undefined hdfgrtr2_masks behaviour, bits 0000000001dfffff
-  kvm [1]: Undefined hdfgwtr2_masks behaviour, bits 0000000001f9ffbf
-  kvm [1]: IPA Size Limit: 44 bits
-  kvm [1]: vgic-v2@c0e0000
-  kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
-  kvm [1]: GIC system register CPU interface enabled
-  kvm [1]: vgic interrupt IRQ9
-  kvm [1]: Hyp nVHE mode initialized successfully
+Tested by booting Android under QEMU.
 
-At the parent change, there are no warnings:
+Best Regards,
+Per
 
-  $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
-  Linux version 6.19.0-rc4-00013-ga035001dea37 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 14:05:51 MST 2026
-  kvm [1]: nv: 568 coarse grained trap handlers
-  kvm [1]: IPA Size Limit: 44 bits
-  kvm [1]: vgic-v2@c0e0000
-  kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
-  kvm [1]: GIC system register CPU interface enabled
-  kvm [1]: vgic interrupt IRQ9
-  kvm [1]: Hyp nVHE mode initialized successfully
+[0]: https://lore.kernel.org/all/20250730-virtio-msg-ffa-v9-0-7f1b55c8d149@google.com/
+[1]: https://lore.kernel.org/all/20251027191729.1704744-1-yeoreum.yun@arm.com/
+ 
 
-Is this expected? If there is any other information I can provide from
-this machine, I am more than happy to do so.
+Signed-off-by: Per Larsen <perlarsen@google.com>
+---
+Changes in v5:
+- 1/2: do_ffa_direct_msg: validate that sender is HOST_FFA_ID.
+- Link to v4: https://lore.kernel.org/r/20260109-host-direct-messages-v4-0-95da4221d186@google.com
 
-Cheers,
-Nathan
+Changes in v4:
+- 1/2: do_ffa_direct_msg: check that flag in w2 is zero; drop unused vm_handle parameter.
+- 2/2: ffa_call_supported: simplify logic by reordering cases.
+-      do_ffa_direct_msg: switch polarity of check and update comment.
+- Link to v3: https://lore.kernel.org/r/20251119-host-direct-messages-v3-0-c74d04944b26@google.com
 
-# bad: [d08c85ac8894995d4b0d8fb48d2f6a3e53cd79ab] Add linux-next specific files for 20260119
-# good: [24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7] Linux 6.19-rc6
-git bisect start 'd08c85ac8894995d4b0d8fb48d2f6a3e53cd79ab' '24d479d26b25bce5faea3ddd9fa8f3a6c3129ea7'
-# good: [6639b8bb674daa8e7781884a599e971b71aa2520] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/ath/ath.git
-git bisect good 6639b8bb674daa8e7781884a599e971b71aa2520
-# good: [28b7eb3c316bddbe6ba570caf68f560ecc06e66a] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
-git bisect good 28b7eb3c316bddbe6ba570caf68f560ecc06e66a
-# bad: [7bdf87f63d2577b8eab4f732e33e91d71d3fba4b] Merge branch 'linux-next' of https://git.kernel.org/pub/scm/linux/kernel/git/xen/tip.git
-git bisect bad 7bdf87f63d2577b8eab4f732e33e91d71d3fba4b
-# good: [27eb76f30bfc3d9f2d3f8f4879fb54f788fdbdb9] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/broonie/spi.git
-git bisect good 27eb76f30bfc3d9f2d3f8f4879fb54f788fdbdb9
-# good: [79a02a116a52c96311b04be8051030c8bd730bb8] Merge branch into tip/master: 'x86/cpu'
-git bisect good 79a02a116a52c96311b04be8051030c8bd730bb8
-# bad: [1e0ce70c66b8f7fb248d1c6b74a4139e5ac452bc] Merge branch 'next' of https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
-git bisect bad 1e0ce70c66b8f7fb248d1c6b74a4139e5ac452bc
-# good: [5d1563869e30923c5a8de291ce63d2fa82e08202] Merge branch 'for-next' of https://git.kernel.org/pub/scm/linux/kernel/git/trace/linux-trace.git
-git bisect good 5d1563869e30923c5a8de291ce63d2fa82e08202
-# bad: [c24170ec742d06021ae7f14df9a1885714ab6095] Merge branch kvm-arm64/selftests-6.20 into kvmarm-master/next
-git bisect bad c24170ec742d06021ae7f14df9a1885714ab6095
-# bad: [80cbfd7174f31010982f065e8ae73bf337992105] KVM: arm64: Honor UX/PX attributes for EL2 S1 mappings
-git bisect bad 80cbfd7174f31010982f065e8ae73bf337992105
-# good: [9e27085c33cca7ad26bec0af2c17aab072dd802e] KVM: arm64: nv: Respect stage-2 write permssion when setting stage-1 AF
-git bisect good 9e27085c33cca7ad26bec0af2c17aab072dd802e
-# good: [f1640174c8a769511641bfd5b7da16c4943e2c64] arm64: Convert ID_AA64MMFR0_EL1.TGRAN{4,16,64}_2 to UnsignedEnum
-git bisect good f1640174c8a769511641bfd5b7da16c4943e2c64
-# bad: [c259d763e6b09a463c85ff6b1d20ede92da48d24] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
-git bisect bad c259d763e6b09a463c85ff6b1d20ede92da48d24
-# good: [a035001dea37b885efb934e25057430ae1193d0a] arm64: Convert VTCR_EL2 to sysreg infratructure
-git bisect good a035001dea37b885efb934e25057430ae1193d0a
-# first bad commit: [c259d763e6b09a463c85ff6b1d20ede92da48d24] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+Changes in v3:
+- Filter out framework messages as suggested by Will Deacon. Update cover letter accordingly.
+- Update trailers: Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
+- Link to v2: https://lore.kernel.org/r/20251030-host-direct-messages-v2-0-9f27cef36730@google.com
+
+Changes in v2:
+- 1/2: Drop support for FFA_ID_GET interface in host handler.
+- Link to v1: https://lore.kernel.org/r/20251030-host-direct-messages-v1-0-463e57871c8f@google.com
+
+---
+Per Larsen (1):
+      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ2 in host handler
+
+Sebastian Ene (1):
+      KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in host handler
+
+ arch/arm64/kvm/hyp/nvhe/ffa.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 38 insertions(+), 1 deletion(-)
+---
+base-commit: 6c790212c588fddeb0d852f2790840753bb604b1
+change-id: 20251029-host-direct-messages-5201d7f55abd
+
+Best regards,
+-- 
+Per Larsen <perlarsen@google.com>
+
+
