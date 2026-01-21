@@ -1,84 +1,200 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708DF44D6B0
-	for <kvmarm@lists.linux.dev>; Wed, 21 Jan 2026 10:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED2C2C375E;
+	Wed, 21 Jan 2026 10:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1768990603; cv=none; b=KxNbLcFmmJHEXpOH0ayQzcKrs2huA62ygrnHZhvgEY5eL7a6SJAHNdnhmUjmc+jJB96W7jx2gan7Y70VzwzFC7Yf8NhPSipbA91KMBAbVfJm5sGqV6ZINTwHp+p4Q5iPSXwxv+QkadTkY1Y9xa3CK9X4T37g4BVZ7xvau1BL7AY=
+	t=1768992648; cv=none; b=hh83C98HESOzjdssIJZZPr20ELgx4/Q0bF7UuSeBRRzBKz0la357dYqKzs+FjvRm6RBq5ds+1GyePh/2HI0OVdek1Uav11r8aT00vhbdWeFPTjYE0QIzZ2z7dHo6nm1wjT6tLB9tgSEySAWBa1qU+DaQiDMTCKaWuKciC6GaNac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1768990603; c=relaxed/simple;
-	bh=DBJZZRs/h/af7KxNl8l2fGPhBoXEKSi8bZWRgDolhJE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fbu+47o0+VC2VWyujtT4B2o+/tHF3GVeEhDVNUT4KNQKpTrSDrdQazOxG9+pN7sjpeLMyPog8qcTbl47FoINWdthm4GpOlZaCxbEP+V8B1A/96Pzu5BHts8idM7gZOEPBgTnygoi8SlZ7R0QCJSim8obkQtdTxy/XTiBdIrwEOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lwZxIFjd; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1768992648; c=relaxed/simple;
+	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CyuQNx9Yweew8DRUWTxEsbAtTKWkC7piz0vGOPCu/layDlX4znrU7br1crlw1saEF6Y3RYB5WFXK9UrYOkZUFwOcEsRXDkoQ6ZpfZoUqFanEKyBnZMRFvcTaDbr1SAL2xVX119axKsrvS+mEe6KN0UE3QmF31xWwb90w3C9ZiJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laLO8FnW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lwZxIFjd"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1768990599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nJvSFAuR3Pk/7986jCrxf9amO+0VQYQ+3sUulNfFyU4=;
-	b=lwZxIFjdRpZOja2XmzGbHhHRf+eXBIHyxXHA1bs0AkCJbgGHA99lfd1FGFtkFExDabAK8z
-	5lAdIBzM77+Up6idcEwd58Gw3iFyNLOnRkmWJZTjZPsPlBkvOjK73jfVWrY6JMxHuXJyE1
-	KK5mklWJU1Gki5ziL+WnZaFiVeKZenU=
-From: Zenghui Yu <zenghui.yu@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	zenghui.yu@linux.dev,
-	wanghaibin.wang@huawei.com
-Subject: [PATCH] KVM: arm64: nv: Return correct RES0 bits for FGT registers
-Date: Wed, 21 Jan 2026 18:16:31 +0800
-Message-Id: <20260121101631.41037-1-zenghui.yu@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laLO8FnW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC326C116D0;
+	Wed, 21 Jan 2026 10:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1768992647;
+	bh=CfWWd4eTZ7SIvAFdgkWvswQfPdfwTP4jeQ6wPYFjh1o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=laLO8FnWyyK8MtpwGzmwWyciuntO3Rup/T85ja0myQmL46b8N413Bbvq6LyRXfwHp
+	 nVOca27zcoxzQAA4eLhyaPdrQoQaa9PulWCGI3/ZouvXpI2AAcHynevgy151ZLE9eu
+	 INhmN9DQUJhIaffOlnhBg6JhhPTqRkiBgNPSeGDyqFe06PHmQuSabsK1tNhnnhnaf9
+	 lPcunAeH/9XixAVOXdaTA1TK7DrbhlX/IpeZokjzWof3T+4u6t7xKos+lrzg1aStSz
+	 04GLDK0nlwoVRxFgLYGvS+77+10oXNG4D1AchkGl1HbZgDvrx1z+f7oWKir5z+gyXp
+	 sVSSKSRmkl8iA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1viVnR-00000004HPP-2D8L;
+	Wed, 21 Jan 2026 10:50:45 +0000
+Date: Wed, 21 Jan 2026 10:50:45 +0000
+Message-ID: <86zf67b5oa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Sebastian Ene <sebastianene@google.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Account for RES1 bits in DECLARE_FEAT_MAP() and co
+In-Reply-To: <20260120211558.GA834868@ax162>
+References: <20251210173024.561160-1-maz@kernel.org>
+	<20251210173024.561160-5-maz@kernel.org>
+	<20260120211558.GA834868@ax162>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: nathan@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, alexandru.elisei@arm.com, Sascha.Bischoff@arm.com, qperret@google.com, tabba@google.com, sebastianene@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+Hi Nathan,
 
-We had extended the sysreg masking infrastructure to more general
-registers, instead of restricting it to VNCR-backed registers, since
-commit a0162020095e ("KVM: arm64: Extend masking facility to arbitrary
-registers"). Fix kvm_get_sysreg_res0() to reflect this fact.
+Thanks for reporting this.
 
-Note that we're sure that we only deal with FGT registers in
-kvm_get_sysreg_res0(), the
+On Tue, 20 Jan 2026 21:15:58 +0000,
+Nathan Chancellor <nathan@kernel.org> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Dec 10, 2025 at 05:30:22PM +0000, Marc Zyngier wrote:
+> > None of the registers we manage in the feature dependency infrastructure
+> > so far has any RES1 bit. This is about to change, as VTCR_EL2 has
+> > its bit 31 being RES1.
+> > 
+> > In order to not fail the consistency checks by not describing a bit,
+> > add RES1 bits to the set of immutable bits. This requires some extra
+> > surgery for the FGT handling, as we now need to track RES1 bits there
+> > as well.
+> > 
+> > There are no RES1 FGT bits *yet*. Watch this space.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> 
+> After this change in -next as commit c259d763e6b0 ("KVM: arm64: Account
+> for RES1 bits in DECLARE_FEAT_MAP() and co"), I am seeing several
+> "undefined behavior" errors on my two arm64 boxes.
+> 
+>   $ journalctl -k -g '(Linux version|kvm)' --no-hostname -o cat
+>   Linux version 6.19.0-rc4-00014-gc259d763e6b0 (nathan@framework-amd-ryzen-maxplus-395) (aarch64-linux-gcc (GCC) 15.2.0, GNU ld (GNU Binutils) 2.45) #1 SMP PREEMPT_DYNAMIC Tue Jan 20 13:59:52 MST 2026
+>   kvm [1]: nv: 568 coarse grained trap handlers
+>   kvm [1]: Undefined hfgrtr_masks behaviour, bits fff7ffffffffffff
+>   kvm [1]: Undefined hfgwtr_masks behaviour, bits fff7baffe9db39fb
+>   kvm [1]: Undefined hfgitr_masks behaviour, bits dfffffffffffffff
+>   kvm [1]: Undefined hdfgrtr_masks behaviour, bits fffdfb3fffcffeff
+>   kvm [1]: Undefined hdfgwtr_masks behaviour, bits 73f7763bbfbffdbf
+>   kvm [1]: Undefined hafgrtr_masks behaviour, bits 0003fffffffe001f
+>   kvm [1]: Undefined hfgrtr2_masks behaviour, bits 0000000000007fff
+>   kvm [1]: Undefined hfgwtr2_masks behaviour, bits 0000000000007ffd
+>   kvm [1]: Undefined hfgitr2_masks behaviour, bits 0000000000000003
+>   kvm [1]: Undefined hdfgrtr2_masks behaviour, bits 0000000001dfffff
+>   kvm [1]: Undefined hdfgwtr2_masks behaviour, bits 0000000001f9ffbf
+>   kvm [1]: IPA Size Limit: 44 bits
+>   kvm [1]: vgic-v2@c0e0000
+>   kvm [1]: GICv3 sysreg trapping enabled ([C], reduced performance)
+>   kvm [1]: GIC system register CPU interface enabled
+>   kvm [1]: vgic interrupt IRQ9
+>   kvm [1]: Hyp nVHE mode initialized successfully
 
-	if (sr < __VNCR_START__)
+Let me guess: Cortex-A72 or similarly ancient ARM-designed CPUs, as
+hinted by the lack of GICv3 TDIR control? Then these do not have
+FEAT_FGT.
 
-is actually a never false, which should probably be removed later.
+The issue stems from the fact that as an optimisation, we skip the
+parsing of the FGT trap table on such hardware, which also results in
+the FGT masks of known bits not being updated. We then compute the
+effective feature map, and discover that the two don't match.
 
-Fixes: 69c19e047dfe ("KVM: arm64: Add TCR2_EL2 to the sysreg arrays")
-Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
----
- arch/arm64/kvm/emulate-nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It was harmless so far, as we were only dealing with RES0 bits, and
+assuming that anything that wasn't a RES0 bit was a stateful bit. With
+the introduction of RES1 handling, we've run out of luck. To be clear,
+that's just a warning, not a functional issue.
+
+At this point, I don't think the above "optimisation" is worth having.
+This is only done *once*, at boot time, so the gain is extremely
+small. I'd like the checks to be effective irrespective of the HW the
+kernel runs on, which is consistent with what we do for other tables
+describing the architectural state.
+
+Anyway, I came up with the following hack, which performs the checks,
+but avoid inserting the FGT information in the sysreg xarray if the HW
+doesn't support it, as a memory saving measure. Please let me know if
+that helps (it does on my old boxes).
+
+Thanks,
+
+	M.
 
 diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 834f13fb1fb7..2d04fb56746e 100644
+index 88336336efc9f..fa8fa09de67dc 100644
 --- a/arch/arm64/kvm/emulate-nested.c
 +++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2428,7 +2428,7 @@ static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
+@@ -2284,9 +2284,6 @@ int __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld coarse grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_cgt));
  
- 	masks = kvm->arch.sysreg_masks;
+-	if (!cpus_have_final_cap(ARM64_HAS_FGT))
+-		goto check_mcb;
+-
+ 	for (int i = 0; i < ARRAY_SIZE(encoding_to_fgt); i++) {
+ 		const struct encoding_to_trap_config *fgt = &encoding_to_fgt[i];
+ 		union trap_config tc;
+@@ -2306,6 +2303,15 @@ int __init populate_nv_trap_config(void)
+ 			}
  
--	return masks->mask[sr - __VNCR_START__].res0;
-+	return masks->mask[sr - __SANITISED_REG_START__].res0;
- }
+ 			tc.val |= fgt->tc.val;
++
++			if (!aggregate_fgt(tc)) {
++				ret = -EINVAL;
++				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
++			}
++
++			if (!cpus_have_final_cap(ARM64_HAS_FGT))
++				continue;
++
+ 			prev = xa_store(&sr_forward_xa, enc,
+ 					xa_mk_value(tc.val), GFP_KERNEL);
  
- static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
--- 
-2.34.1
+@@ -2313,11 +2319,6 @@ int __init populate_nv_trap_config(void)
+ 				ret = xa_err(prev);
+ 				print_nv_trap_error(fgt, "Failed FGT insertion", ret);
+ 			}
+-
+-			if (!aggregate_fgt(tc)) {
+-				ret = -EINVAL;
+-				print_nv_trap_error(fgt, "FGT bit is reserved", ret);
+-			}
+ 		}
+ 	}
+ 
+@@ -2333,7 +2334,6 @@ int __init populate_nv_trap_config(void)
+ 	kvm_info("nv: %ld fine grained trap handlers\n",
+ 		 ARRAY_SIZE(encoding_to_fgt));
+ 
+-check_mcb:
+ 	for (int id = __MULTIPLE_CONTROL_BITS__; id < __COMPLEX_CONDITIONS__; id++) {
+ 		const enum cgt_group_id *cgids;
+ 
 
+-- 
+Without deviation from the norm, progress is not possible.
