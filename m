@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3DE2C11D5
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 15:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D3B6FC3
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 15:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769094211; cv=none; b=ASLiFRzsteAw0tD4R7C8Sy3DZUUuIWh3qKFT3oKwuOCVtArr/CLfzIxSCY8DpjWOJ+4zMGgzGB6mu7PqRtTmJvi0Fg5wR+nY7M6/+sANu/fPJRcRvDi3gKbjPwjADLReykw5slg7frYno7PDk9QA5d/NuryFFdxpdh2yZ4xmqoA=
+	t=1769094263; cv=none; b=ma/2K6J957KH8Iv/5A8HZ/B6CoUIqLavTgox/4pZjW3g7eBgJBuwFQev2wRCDChufvkuhEW3BXMBHEX8Qkg54l+ObEcRsoq0gYaC3pWy97V1is8vl+9gQezliusIyt49MtWEQUb7ADj9fw/lqEg5E0DBciygBnrApCTPkJ0NCi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769094211; c=relaxed/simple;
-	bh=W7OL1DzXiTNMqnoJ2zpzUEZ753uxhw9UxvzRwjFtEyc=;
+	s=arc-20240116; t=1769094263; c=relaxed/simple;
+	bh=cGpqtKOTFWyChTNyIREce8ooLgtl/FKn1zr/zdRaoCU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bszUY4ovvxsP/8aaVE2bNRbGINcWVyVgjPYVDQY4NNbGizYVshCw5LB0zxDbgg1qQLW3tFTZ75oplreFyeCCf9j/R9ez2lKeYE1b9qfYxdR/J+/4OH3OC0b/qtF5H21reTpfGPYLb6eKmJ46CmcmZPknvoBrWYhuAX+mgxo0jeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSCY3zfM; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=VaarLwdYxRR56DnEbsnuY0t1yXnOm13E6jtRE5nqVVrSfTarx2Rb34Pb3GH8vYQ+I8g1UMA0x04Eo+uWAMLOXXREyGgbappX0lvKnnrGfmeTtT2bghhNLD70Q/PxOH8fdnLl1S2T2bejPoQCzBL71B9v8+82Yi4n8BkMkKbHrBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ix/Ec5tD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSCY3zfM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8546CC116C6;
-	Thu, 22 Jan 2026 15:03:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ix/Ec5tD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C79AC116D0;
+	Thu, 22 Jan 2026 15:04:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769094211;
-	bh=W7OL1DzXiTNMqnoJ2zpzUEZ753uxhw9UxvzRwjFtEyc=;
+	s=k20201202; t=1769094262;
+	bh=cGpqtKOTFWyChTNyIREce8ooLgtl/FKn1zr/zdRaoCU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JSCY3zfMOG2pyN9chEr5QNrJet6vWraeb0GFj+2Gc2JMh9b4hWS1+dH5uZ4p7MAhk
-	 upJmDaKq1bG8Zb+8Ty/Q6C0SUSOF5KlTmb6rjCcPv/l6AHESoh8YLCL+LjBT2fvZpu
-	 ezEEshS82H3rIKcv2ZCpBcrsikiohMyrjOM4SgDJPeyflNGP128ChDjGV4E47catyY
-	 gFD7Axsn+wCPMvC79Y4+W4ZBnOlQkQk75Vzgw44Jh2Ms4LbkijT+nPTe4xXxkLTaZi
-	 Sya/Z3gch/vT+UyA7cHvGszxfsp2x9f+b+SKtnBRvhJrLyixLHBajT+CiQ2kCuiUqC
-	 U2mHZaJDY1mbQ==
-Date: Thu, 22 Jan 2026 15:03:26 +0000
+	b=Ix/Ec5tDrikMzZbccvSYYPF3cgbGhNlwZ6R91UAmxYDz9kU40eU0aLoSgJtyxPQi0
+	 f7a5wVWIFcop9+eLJ4XeiDFHi2cU/ctXBq54VMgCmDCr5hmbY572dlN8EgFPIvGqJR
+	 AZjUKsRtRRJ69DEiwKzM4iPYZfWW/OF2dVg1byyU9C0ZLKrUCr/aFCSyJHVMX0X2fR
+	 S/xHdl+NVFccszwiwauCZBH0wRCAsboxmVFfW6ErPxJ3mrb9ykH12AnfYbM2ayTAcz
+	 1dsCykqcqYWsUsRFdxfR5e40sK+yzKmJGP9ydv0URAHGW20tOPCbNgP/QiLYwusGXm
+	 ogQFtTHugcnWg==
+Date: Thu, 22 Jan 2026 15:04:17 +0000
 From: Will Deacon <will@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -34,10 +34,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
 	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 6/6] KVM: arm64: Simplify PAGE_S2_MEMATTR
-Message-ID: <aXI8PqEi0tnn6RP6@willie-the-truck>
+Subject: Re: [PATCH 3/6] KVM: arm64: Make stage2_pte_cacheable() return false
+ when S2_AS_S1 is set
+Message-ID: <aXI8cchH7l1SHbQR@willie-the-truck>
 References: <20260119105651.255693-1-maz@kernel.org>
- <20260119105651.255693-7-maz@kernel.org>
+ <20260119105651.255693-4-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -46,56 +47,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260119105651.255693-7-maz@kernel.org>
+In-Reply-To: <20260119105651.255693-4-maz@kernel.org>
 
-On Mon, Jan 19, 2026 at 10:56:51AM +0000, Marc Zyngier wrote:
-> Restore PAGE_S2_MEMATTR() to its former glory, keeping the use of
-> FWB as an implementation detail.
+On Mon, Jan 19, 2026 at 10:56:48AM +0000, Marc Zyngier wrote:
+> We cannot tell from the S2 attributes whether what we map is memory
+> or not when S2_AS_S1 is set, and issuing a CMO on device memory may
+> not be the best idea.
+> 
+> In this particular case, pretend that the mapping isn't cacheable.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/include/asm/pgtable-prot.h | 4 ++--
->  arch/arm64/kvm/hyp/pgtable.c          | 6 ++----
->  2 files changed, 4 insertions(+), 6 deletions(-)
+>  arch/arm64/kvm/hyp/pgtable.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-> index 161e8660edddc..d27e8872fe3c8 100644
-> --- a/arch/arm64/include/asm/pgtable-prot.h
-> +++ b/arch/arm64/include/asm/pgtable-prot.h
-> @@ -109,10 +109,10 @@ static inline bool __pure lpa2_is_enabled(void)
->  #define PAGE_KERNEL_EXEC	__pgprot(_PAGE_KERNEL_EXEC)
->  #define PAGE_KERNEL_EXEC_CONT	__pgprot(_PAGE_KERNEL_EXEC_CONT)
->  
-> -#define PAGE_S2_MEMATTR(attr, has_fwb)					\
-> +#define PAGE_S2_MEMATTR(attr)						\
->  	({								\
->  		u64 __val;						\
-> -		if (has_fwb)						\
-> +		if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))		\
->  			__val = PTE_S2_MEMATTR(MT_S2_FWB_ ## attr);	\
->  		else							\
->  			__val = PTE_S2_MEMATTR(MT_S2_ ## attr);		\
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 3c2f7967fdc03..34c9afa442932 100644
+> index 3c5f399b1b986..07561a227f75e 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -660,11 +660,9 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
->  	({								\
->  		kvm_pte_t __attr;					\
->  		if((pgt)->flags & KVM_PGTABLE_S2_AS_S1)			\
-> -			__attr = PAGE_S2_MEMATTR(AS_S1,			\
-> -						 stage2_has_fwb());	\
-> +			__attr = PAGE_S2_MEMATTR(AS_S1);		\
->  		else							\
-> -			__attr = PAGE_S2_MEMATTR(attr,			\
-> -						 stage2_has_fwb());	\
-> +			__attr = PAGE_S2_MEMATTR(attr);			\
->  									\
+> @@ -911,6 +911,14 @@ static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
+>  {
+>  	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> +
+> +	/*
+> +	 * With S2_AS_S1, we have no idea whether the OA is actual memory or
+> +	 * a device. Don't even try a CMO on that.
+> +	 */
+> +	if (pgt->flags & KVM_PGTABLE_S2_AS_S1)
+> +		return false;
+> +
+>  	return kvm_pte_valid(pte) && memattr == KVM_S2_MEMATTR(pgt, NORMAL);
 
-
-tbh, I'd probably just kill stage2_has_fwb() entirely and use the cap
-everywhere...
-
-Up to you.
+Since KVM_PGTABLE_S2_AS_S1 is only set for the pKVM host stage-2 and
+that doesn't provide any cache maintenance callbacks in its
+kvm_pgtable_mm_ops, I don't think the current code is actually broken,
+although it's harmless to add the check (and the comment might benefit
+from some additional rewording?).
 
 Will
