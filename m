@@ -1,207 +1,269 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EA035D60F
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 15:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769097278; cv=none; b=h4QCNpNl4BEOQyZDEoa55X3JoakEHVaO7EWcPZYYfrG6MD7rN+1pJ0CUXxX6yji4t9kPVzt/GaVxgollFUtB+bI/b8XlRLjuRvNgenS/VNrlR+NteHqli7yxfd8KFDM7WP+2Zjf5NLjU9g+bbjHQ45mYrm2MisQ8ucnCDRgxU0g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769097278; c=relaxed/simple;
-	bh=pmZ573aErmXEJQfvpdj39t6Luwct0Y4/EMwrSrD2q8g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eLbMZJ69QXh/6bUFtXIK2lownlgSedb5d09NIw0U3UT4Rvusd4esUOuyXJY1AkzbOiLCjdp/VGQDYWF5dMVqhXiBTwc08jACbqdD8+R37RLrdnT52Wg07d9E3xSzie+U122AekRfm3VuB+/yEwVfpTKav0pzKkQ1zPwU14ekPOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9620B1476;
-	Thu, 22 Jan 2026 07:54:21 -0800 (PST)
-Received: from [10.1.39.184] (e134369.arm.com [10.1.39.184])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8A3DC3F694;
-	Thu, 22 Jan 2026 07:54:26 -0800 (PST)
-Message-ID: <a8e44aea-89a3-40d0-82e8-295d5f315065@arm.com>
-Date: Thu, 22 Jan 2026 15:54:24 +0000
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAE3395718
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 16:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769099668; cv=pass; b=mkOwgg3Z94rNgksfL4H6Kz1r3l+Dz3G0Z7A0Z4d3Cyh5+QOLg1+zfm+U/MADg5VifvnT2wH/o74HuncCxkVKDh/cmooy/PffJxBovtCdhwilUnobSYjxKEF+lQlUv573DmX20nNTjoPpFSecpYSkZFY0q5TxZy2lZhJcZKCu51c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769099668; c=relaxed/simple;
+	bh=ZYIqU7xPcH37zvSybjI3FPpHQTFAEV4LoCN7S8Ljj9w=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b3zFnIf6r+nnJYaQ4p8PcgcDVV2JRpzFmLsYlagT1MPvyvFLA9LmFPYPcpmSYylWG6O02+BrhZpfCWyAzzeIqX9ZAiWxbQG1NTpqwi77z1uSkflbTTvEtwpEcKwN6Kqv8qDowCwhzHR9ZW7tbDjAOdDin5pkJpqlyLnf6JiJolY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KecpCGKl; arc=pass smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KecpCGKl"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5f52b3d98cfso427136137.2
+        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 08:34:23 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769099662; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NEGCQbbc3/K7PhdEpXnNfjI/Ct4k8Y0NjLoFGcGgcbAerzPRbuD4JuwR+Rx/dlZXuC
+         3w95kP32Buu0A572IRNn7gM/7/bxY+EEaVazqe0+pRFEbamBXOjUtTpo/xizJeA7zYLc
+         8GJIt4sxTorpO4g7QP30xjP8Fs2kyVJY5RFpPfUPo6RHy94rTa0pgFZCjcgleZYiNFRn
+         pVH7vPYI98YrjMcSNJHGZuxkKULQf419gRrr0mc+irSsS+LDIJ/PhCM/t+hRpvRr3We2
+         VOyLyKFIkva+wF6TBql6KCEphJQuLX9ggC1YjsnTg6Lno3HeLNqVk4bb+jOe7F6CImFz
+         ZwVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
+        fh=dWBG3VPpTUyXQYpBgVrZq74F8MgTxqRfuTdRP1oD8mw=;
+        b=BVTEmtssC1cuw1SNVshGHfty6aQjWRwqe4ecAnUafFJnQTXy7iT5b4GG7A5AM6JB4i
+         kpS5fSmd+pm1sEGCuprsCpX53pFugWnBEf4vHW7gOIV4x/fBfPDDUPiq1fL0+Er8PkLC
+         ISD+juDS1bAOJ5+NQczwIZ0giEMADGy/qSl1ClJA3hfNHOJ/hAL3gz1Hk4wJuxJLdD7a
+         aztibY9pNf/MjDNfBKNhlGni5kA/8Klk8QJTM0Q5pJh9pFBrMDYPI88dsNLBpiI60dcn
+         wzXsjiYlii3LTvJ/xWhzs8lAgEMcVQBDFOOKXInqIbQbzdf1152jhQwYRPI/wXsMnb/5
+         U6YA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769099662; x=1769704462; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
+        b=KecpCGKlaxnLRceW4uMmJQUJpQSMztwRJlMPKDEIC33FaRHRtSDnK5S8GfS0kg8v4Q
+         rJEOF/gP+QDCLTtpX8jClddogYH8cURxX+Ee8CfzmR/Vl3SWkyT/uaw4d4yKyfmsuIc2
+         xnqFjbKDeNULT+21HHbJuZI+H3MZt7DhJr/yEYQeHYjZ9mx1Wzair6Zz3Hjoa6nhybO5
+         lEtKS6zaRQchl0j+dFnGpfrOijz6oryyus6vL/iebk53/IpNrPC1wd9cnRUIZX5BQXiZ
+         934jEBq0XYRv+fqstL8hiAzX5jaO6gHEgEEoYDHsmR3jzR/DfiV3zwWI68WzbuTFC2K+
+         MMlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769099662; x=1769704462;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
+        b=Ez5u95eMq37dxwCJqlDW3sx7WR+gH/gXnZ5Nk1GZ1DxZvdRnmCVoWT+gVbVUzehjqL
+         8aKJxYfhV7J5baamDIPDGVc5/Gt0mEB/FJqyATgZBI4vEhHnbS9UZ2Vh7JTUBjdO8oxX
+         Uev3ax2m2lO96jczct5LJhcvTJhdFLCKhWpHu0y+3/pA2e+9ogMK5h/UN/Zwf7rV/1/O
+         RR+j/BqSiIO3CUeOnYJZGEcu4IbsZsNDUw3uV4ZEku7I6c9Vq42rnd85W9awSa2nimvM
+         OpvDF+wzwSLEc5ZKF79GHoHnwxk39/gL7VfCId8KsSdIwdoGHmClvcoW2ORy0p1zACjH
+         tVzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPxaIPBxbOVt1w/BoInXZx2CdCGqtvps/FzUglg07bwDGzJ9mp99F1N/MuPU5xoseh1MuC6Vg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwgG5P8U1XTiWit0vsUBh5bAu+sT6rHGYbRRMdhnhiLnJscAayw
+	iHT4Ke/itaOfsUUEoUQExITHpHRbCCraL8rzs5fQikFHZ3xf7s+pLQu9yFvxcSAtMzEZiPGObwO
+	IwyWvzbyAt9oGOt/45Bevoa+MJ4W9nZu0SXhqx1Kn
+X-Gm-Gg: AZuq6aKtpgzW2qtdQ9WompOTWcS5N5ZYC+fs+3E0BUzoeLWFGM4tdfucqJgTsgSDn5M
+	gl2F9eaMpTwG3Qe3LW/RwVU/R06/z8R2br6dPZUZkWlsPM41lZZbvTdWOCRamHKEhqNLAFpaBp7
+	Q/1+ahqkV8SRj2FUnnAzeU/m/PlWl9dDcv7Q3Ne49YI6F7Ffig/BlBqyh7WM3lVB8gjztaYABoq
+	nkxEUqMN5a0RlfVo7X1qEm1DqHO59s6t7KKyUws/3xP9t53JiI2KkJS86yauRe8/iSp+uzqw+XK
+	5E7/
+X-Received: by 2002:a05:6102:c52:b0:5ee:9e4b:a81c with SMTP id
+ ada2fe7eead31-5f54bc6d8edmr83779137.22.1769099661387; Thu, 22 Jan 2026
+ 08:34:21 -0800 (PST)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 22 Jan 2026 08:34:20 -0800
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 22 Jan 2026 08:34:20 -0800
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <a2b79af7-e5d1-4668-bff3-606f57d32dfc@amazon.com>
+References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-8-kalyazin@amazon.com>
+ <CAEvNRgEzVhEzr-3GWTsE7GSBsPdvVLq7WFEeLHzcmMe=R9S51w@mail.gmail.com> <a2b79af7-e5d1-4668-bff3-606f57d32dfc@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v4 3/7] arm64: nested: Add support for setting
- maintenance IRQ
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>,
- "will@kernel.org" <will@kernel.org>,
- "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>
-Cc: "maz@kernel.org" <maz@kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- Alexandru Elisei <Alexandru.Elisei@arm.com>
-References: <20250924134511.4109935-1-andre.przywara@arm.com>
- <20250924134511.4109935-4-andre.przywara@arm.com>
- <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
-Content-Language: en-US
-From: Andre Przywara <andre.przywara@arm.com>
-In-Reply-To: <3d2a364595956d06624102684418bdad2a9d20b6.camel@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Date: Thu, 22 Jan 2026 08:34:20 -0800
+X-Gm-Features: AZwV_QgNvHql-EMuz2B4VijAKAK9511fycMrz6pi1d87rdZBUNlP58MQhoc9tIU
+Message-ID: <CAEvNRgF46M1jp0+eBu2wQMO7P1afyo00SOkENFwvB2KYX3dnFA@mail.gmail.com>
+Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct map
+To: kalyazin@amazon.com, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "kernel@xen0n.name" <kernel@xen0n.name>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, 
+	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
+	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>, 
+	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
+	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
+	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>, 
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>, 
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, 
+	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
+	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>, 
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com" <jgross@suse.com>, 
+	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>, "kas@kernel.org" <kas@kernel.org>, 
+	"coxu@redhat.com" <coxu@redhat.com>, "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, 
+	"maobibo@loongson.cn" <maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>, 
+	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, 
+	"alex@ghiti.fr" <alex@ghiti.fr>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>, 
+	"hca@linux.ibm.com" <hca@linux.ibm.com>, 
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"pjw@kernel.org" <pjw@kernel.org>, 
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>, 
+	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>, 
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>, 
+	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>, 
+	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
+	"Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>, 
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Sascha,
+Nikita Kalyazin <kalyazin@amazon.com> writes:
 
-many thanks for having a look!
+Was preparing the reply but couldn't get to it before the
+meeting. Here's what was also discussed at the guest_memfd biweekly on
+2026-01-22:
 
-On 16/01/2026 18:10, Sascha Bischoff wrote:
-> On Wed, 2025-09-24 at 14:45 +0100, Andre Przywara wrote:
->> Uses the new VGIC KVM device attribute to set the maintenance IRQ.
->> This is fixed to use PPI 9, as a platform decision made by kvmtool,
->> matching the SBSA recommendation.
->> Use the opportunity to pass the kvm pointer to
->> gic__generate_fdt_nodes(),
->> as this simplifies the call and allows us access to the nested_virt
->> on
->> the way.
+>
+> [...snip...]
+>
+>>> @@ -423,6 +464,12 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
+>>>                kvm_gmem_mark_prepared(folio);
+>>>        }
+>>>
+>>> +     err = kvm_gmem_folio_zap_direct_map(folio);
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>   arm64/arm-cpu.c         |  2 +-
->>   arm64/gic.c             | 26 ++++++++++++++++++++++++--
->>   arm64/include/kvm/gic.h |  2 +-
->>   3 files changed, 26 insertions(+), 4 deletions(-)
+>> Perhaps the check for gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP should
+>> be done here before making the call to kvm_gmem_folio_zap_direct_map()
+>> to make it more obvious that zapping is conditional.
+>
+> Makes sense to me.
+>
 >>
->> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
->> index 69bb2cb2c..0843ac051 100644
->> --- a/arm64/arm-cpu.c
->> +++ b/arm64/arm-cpu.c
->> @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt, struct
->> kvm *kvm)
->>   {
->>   	int timer_interrupts[4] = {13, 14, 11, 10};
->>   
->> -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
->> +	gic__generate_fdt_nodes(fdt, kvm);
->>   	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->>   	pmu__generate_fdt_nodes(fdt, kvm);
->>   }
->> diff --git a/arm64/gic.c b/arm64/gic.c
->> index b0d3a1abb..e35986c06 100644
->> --- a/arm64/gic.c
->> +++ b/arm64/gic.c
->> @@ -11,6 +11,8 @@
->>   
->>   #define IRQCHIP_GIC 0
->>   
->> +#define GIC_MAINT_IRQ	9
->> +
->>   static int gic_fd = -1;
->>   static u64 gic_redists_base;
->>   static u64 gic_redists_size;
->> @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
->>   
->>   	int lines = irq__get_nr_allocated_lines();
->>   	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
->> +	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
->>   	struct kvm_device_attr nr_irqs_attr = {
->>   		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->>   		.addr	= (u64)(unsigned long)&nr_irqs,
->>   	};
->> +	struct kvm_device_attr maint_irq_attr = {
->> +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
->> +		.addr	= (u64)(unsigned long)&maint_irq,
->> +	};
->>   	struct kvm_device_attr vgic_init_attr = {
->>   		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
->>   		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
->> @@ -325,6 +332,13 @@ static int gic__init_gic(struct kvm *kvm)
->>   			return ret;
->>   	}
->>   
->> +	if (kvm->cfg.arch.nested_virt &&
->> +	    !ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &maint_irq_attr)) {
->> +		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
->> &maint_irq_attr);
->> +		if (ret)
->> +			return ret;
->> +	}
-> 
-> With GICv3 are things not a little broken if we're trying to do nested
-> but don't have the ability to set the maint IRQ? It feels to me as if
-> an error should be returned if the attr doesn't exist.
+>> Perhaps also add a check for kvm_arch_gmem_supports_no_direct_map() so
+>> this call can be completely removed by the compiler if it wasn't
+>> compiled in.
+>
+> But if it is compiled in, we will be paying the cost of the call on
+> every page fault?  Eg on arm64, it will call the following:
+>
+> bool can_set_direct_map(void)
+> {
+>
+> ...
+>
+> 	return rodata_full || debug_pagealloc_enabled() ||
+> 		arm64_kfence_can_set_direct_map() || is_realm_world();
+> }
+>
 
-OK, I changed it slightly to return an error now if either the HAS call 
-or the SET call fails.
+You're right that this could end up paying the cost on every page
+fault. Please ignore this request!
 
-> Also, the way that the FDT is generated means that we'd still generate
-> the property for the maint IRQ, even if we can't set it here.
+>>
+>> The kvm_gmem_folio_no_direct_map() check should probably remain in
+>> kvm_gmem_folio_zap_direct_map() since that's a "if already zapped, don't
+>> zap again" check.
+>>
+>>> +     if (err) {
+>>> +             ret = vmf_error(err);
+>>> +             goto out_folio;
+>>> +     }
+>>> +
+>>>        vmf->page = folio_file_page(folio, vmf->pgoff);
+>>>
+>>>   out_folio:
+>>> @@ -533,6 +580,8 @@ static void kvm_gmem_free_folio(struct folio *folio)
+>>>        kvm_pfn_t pfn = page_to_pfn(page);
+>>>        int order = folio_order(folio);
+>>>
+>>> +     kvm_gmem_folio_restore_direct_map(folio);
+>>> +
+>>
+>> I can't decide if the kvm_gmem_folio_no_direct_map(folio) should be in
+>> the caller or within kvm_gmem_folio_restore_direct_map(), since this
+>> time it's a folio-specific property being checked.
+>
+> I'm tempted to keep it similar to the kvm_gmem_folio_zap_direct_map()
+> case.  How does the fact it's a folio-speicific property change your
+> reasoning?
+>
 
-That should now be solved automatically, because the DT addition depends 
-on --nested, but that fails above now if the kernel doesn't support the 
-device ATTR.
+This is good too:
 
-Does that sound okay? Or do you want more refactoring to make things 
-more explicit, to accommodate GICv5 better?
+  if (kvm_gmem_folio_no_direct_map(folio))
+          kvm_gmem_folio_restore_direct_map(folio)
 
-Cheers,
-Andre
+>>
+>> Perhaps also add a check for kvm_arch_gmem_supports_no_direct_map() so
+>> this call can be completely removed by the compiler if it wasn't
+>> compiled in. IIUC whether the check is added in the caller or within
+>> kvm_gmem_folio_restore_direct_map() the call can still be elided.
+>
+> Same concern as the above about kvm_gmem_folio_zap_direct_map(), ie the
+> performance of the case where kvm_arch_gmem_supports_no_direct_map() exists.
+>
 
-> 
-> Thanks,
-> Sascha
-> 
->> +
->>   	irq__routing_init(kvm);
->>   
->>   	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
->> @@ -342,7 +356,7 @@ static int gic__init_gic(struct kvm *kvm)
->>   }
->>   late_init(gic__init_gic)
->>   
->> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
->> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->>   {
->>   	const char *compatible, *msi_compatible = NULL;
->>   	u64 msi_prop[2];
->> @@ -350,8 +364,12 @@ void gic__generate_fdt_nodes(void *fdt, enum
->> irqchip_type type)
->>   		cpu_to_fdt64(ARM_GIC_DIST_BASE),
->> cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->>   		0, 0,				/* to be filled */
->>   	};
->> +	u32 maint_irq[] = {
->> +		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->> cpu_to_fdt32(GIC_MAINT_IRQ),
->> +		gic__get_fdt_irq_cpumask(kvm) | IRQ_TYPE_LEVEL_HIGH
->> +	};
->>   
->> -	switch (type) {
->> +	switch (kvm->cfg.arch.irqchip) {
->>   	case IRQCHIP_GICV2M:
->>   		msi_compatible = "arm,gic-v2m-frame";
->>   		/* fall-through */
->> @@ -377,6 +395,10 @@ void gic__generate_fdt_nodes(void *fdt, enum
->> irqchip_type type)
->>   	_FDT(fdt_property_cell(fdt, "#interrupt-cells",
->> GIC_FDT_IRQ_NUM_CELLS));
->>   	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
->>   	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
->> +	if (kvm->cfg.arch.nested_virt) {
->> +		_FDT(fdt_property(fdt, "interrupts", maint_irq,
->> +				  sizeof(maint_irq)));
->> +	}
->>   	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_GIC));
->>   	_FDT(fdt_property_cell(fdt, "#address-cells", 2));
->>   	_FDT(fdt_property_cell(fdt, "#size-cells", 2));
->> diff --git a/arm64/include/kvm/gic.h b/arm64/include/kvm/gic.h
->> index ad8bcbf21..8490cca60 100644
->> --- a/arm64/include/kvm/gic.h
->> +++ b/arm64/include/kvm/gic.h
->> @@ -36,7 +36,7 @@ struct kvm;
->>   int gic__alloc_irqnum(void);
->>   int gic__create(struct kvm *kvm, enum irqchip_type type);
->>   int gic__create_gicv2m_frame(struct kvm *kvm, u64 msi_frame_addr);
->> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type);
->> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm);
->>   u32 gic__get_fdt_irq_cpumask(struct kvm *kvm);
->>   
->>   int gic__add_irqfd(struct kvm *kvm, unsigned int gsi, int
->> trigger_fd,
-> 
+Please ignore this request!
 
+>>
+>>>        kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
+>>>   }
+>>>
+>>> @@ -596,6 +645,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>>>        /* Unmovable mappings are supposed to be marked unevictable as well. */
+>>>        WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>>>
+>>> +     if (flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
+>>> +             mapping_set_no_direct_map(inode->i_mapping);
+>>> +
+>>>        GMEM_I(inode)->flags = flags;
+>>>
+>>>        file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
+>>> @@ -807,6 +859,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+>>>        if (!is_prepared)
+>>>                r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
+>>>
+>>> +     kvm_gmem_folio_zap_direct_map(folio);
+>>> +
+>>
+>> Is there a reason why errors are not handled when faulting private memory?
+>
+> No, I can't see a reason.  Will add a check, thanks.
+>
+>>
+>>>        folio_unlock(folio);
+>>>
+>>>        if (!r)
+>>> --
+>>> 2.50.1
