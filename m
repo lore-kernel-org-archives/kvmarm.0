@@ -1,97 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8425129A9C9
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 09:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4EC3236437
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 09:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769072870; cv=none; b=iDMqDVGziAraC3HHirrk+mv+m84CvqCFABYcfvaPXvCvBaThmsHWlicjkcO6gSrjTMYZWKJzyy2gn+u6ZUPP8M6yOmC2xOd+TMkZw0h5hlJb6weqWXpmfRWoBOgUZJ71R8KkOAD2YL9YYuuLmGGBjR3GFvl7Pyoyum86LO6Q+1A=
+	t=1769073070; cv=none; b=f8Ux/ZQGuiYaINdRHMvpFD4ww4uo09zFcPrsDcvJLKb+ZLNviDsiATL62i4V5hWYoaspuKE6s3jlKoASonaRzR+cdcSq0eTL8U1F9xiaLp7SPtD8CeZZZRlQ5U+URXEeGwut5iR5UbR3nhxI9IHORI2pQ6bsIvtrCf/RLkbIc6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769072870; c=relaxed/simple;
-	bh=ui6FN7ArLwvtBIDbQfy5pRl8V5wQYtCl40jZiB+Dt7s=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cMDSG4MPDX6ina09u32slLcuBaaA9AJFvFwQudPi+kQXhtr0RMOv8udcDGVFQyr65vZxPmOgPlaDo79kfGTpvc613NbGGQx8JwFm5Vf98jb78UCefTyTccHTpV+z6o2uxPEk3a6uMTcXIWHIPWM9HcMsno42Eju/7QmPI8Glx54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlGu7ZQi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769073070; c=relaxed/simple;
+	bh=LFW90VWHJHnmtxUoM+a3yP6IR8eMMDNjSdMlhzJlmnY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lWHc/CylY5S4wf8Cl6mINgEA0S2mhONUc97y42UjOVvy+Tf8j+qaId5K/WRo8qeP/SpWGptoEJYTfs4s4YvNqzCL3Ownt0hhf5KhpOHTnOQqgzvAVkDnIBfblL5gMiUuiGtKppTqnKNRJQFjVAVuQep15amhNnCS+6EnDvympHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eYUHP9Nc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlGu7ZQi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEA0C16AAE;
-	Thu, 22 Jan 2026 09:07:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eYUHP9Nc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A891C16AAE;
+	Thu, 22 Jan 2026 09:11:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769072870;
-	bh=ui6FN7ArLwvtBIDbQfy5pRl8V5wQYtCl40jZiB+Dt7s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DlGu7ZQigpyXDRtUNgOEXuz96GQ02SGJ+awi9gUlb0RB5dLcNjp+nd7YxQYOppJmC
-	 c8Tk+A7FzrYzkeVhPojlZxrwf6ms+7n0dUCWry/xEaKpV7s7/st27NXs/4vVODmbby
-	 odzEW6ci2kBbOWtIZyNbTqQNpoyCXlMvNzzTVW3bD76c66SqZqco6ALXFKXeox2ogT
-	 381kKIZPzfZjybMqVT70ivqV5a3UlmXtv/OwTk5Uc4mTbUpjAe6enjDOu0lJT9uU+c
-	 gCYaWKd73PoGOUQ3YRFKRxuWq8guTZ9QJwZlBK8GNu4ijj0PCg8diyySTSsoRH0mWg
-	 6bfAXqNyC1nVA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1769073070;
+	bh=LFW90VWHJHnmtxUoM+a3yP6IR8eMMDNjSdMlhzJlmnY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eYUHP9Ncnk0czUylGrVq34W4sQ/D7IQEbxX3lFNcK07HFU+/P66K09I5iXwhp/npo
+	 aoMFUOJVQ0ayjKypW5RvEdqI6n1OCNUnjO/TxvoKQjVBLyuxnWfAnMyVRdsPp92r8m
+	 hZ1jaJUCuEFW8oEu7yr41IM+T/OZ8hknrwoMRRuQJWQMGLpN8Pj746v4TUPyTm02cf
+	 jM8ps15g6A9f9zyAQ1yck8CmomoXPzp/hM0S75bbz7EvASiiz63yO83QzNnCUXb0Hl
+	 Tg/s5e44Be8OV2bjDdo+6OIUU4D9308id5Al3MqRCAOyQhN6rUAhb7E77h4Yz+6Ewy
+	 r8CZvY/aepsUA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1viqfM-00000004cQS-0rIx;
-	Thu, 22 Jan 2026 09:07:48 +0000
-Date: Thu, 22 Jan 2026 09:07:47 +0000
-Message-ID: <86wm1aaucc.wl-maz@kernel.org>
+	id 1viqia-00000004cWq-0JnX;
+	Thu, 22 Jan 2026 09:11:08 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	wanghaibin.wang@huawei.com
-Subject: Re: [PATCH] KVM: arm64: nv: Return correct RES0 bits for FGT registers
-In-Reply-To: <20260121101631.41037-1-zenghui.yu@linux.dev>
-References: <20260121101631.41037-1-zenghui.yu@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Always populate FGT masks at boot time
+Date: Thu, 22 Jan 2026 09:11:05 +0000
+Message-ID: <176907305595.536564.11529095810436212819.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260122085153.535538-1-maz@kernel.org>
+References: <20260122085153.535538-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, nathan@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 21 Jan 2026 10:16:31 +0000,
-Zenghui Yu <zenghui.yu@linux.dev> wrote:
+On Thu, 22 Jan 2026 08:51:53 +0000, Marc Zyngier wrote:
+> We currently only populate the FGT masks if the underlying HW does
+> support FEAT_FGT. However, with the addition of the RES1 support for
+> system registers, this results in a lot of noise at boot time, as
+> reported by Nathan.
 > 
-> From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+> That's because even if FGT isn't supported, we still check for the
+> attribution of the bits to particular features, and not keeping the
+> masks up-to-date leads to (fairly harmess) warnings.
 > 
-> We had extended the sysreg masking infrastructure to more general
-> registers, instead of restricting it to VNCR-backed registers, since
-> commit a0162020095e ("KVM: arm64: Extend masking facility to arbitrary
-> registers"). Fix kvm_get_sysreg_res0() to reflect this fact.
+> [...]
 
-Huh, what a howler! Thanks a lot for spotting this!
+Applied to next, thanks!
 
-> 
-> Note that we're sure that we only deal with FGT registers in
-> kvm_get_sysreg_res0(), the
-> 
-> 	if (sr < __VNCR_START__)
-> 
-> is actually a never false, which should probably be removed later.
+[1/1] KVM: arm64: Always populate FGT masks at boot time
+      commit: 54adbfe40e3b6d238293cc36ef071ed9f35c8af7
 
-I think the biggest mistake is to have several places where we perform
-sysreg index to array index conversions. We should try to unify that.
-
-> 
-> Fixes: 69c19e047dfe ("KVM: arm64: Add TCR2_EL2 to the sysreg arrays")
-> Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
-
-Cc: stable@vger.kernel.org
-
-Thanks again,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
