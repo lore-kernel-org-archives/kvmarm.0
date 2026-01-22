@@ -1,49 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC803EBF3F
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 17:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F203A3CBD
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 17:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769101208; cv=none; b=q8yS56dvK/UoCRgbIthisKALAysQCRBPCE0B+uZKVGitcmwbwOcZnsnT9Rer6v5yENs8avch6E3XX2WSSJY10joMKG+cm5j/mH1+qaJMmDPQxcVn2fOPZ+XPXbujxfM8SVMeSolnEpkZ9bO50FcxDeOWog4VAB3DAXnu3Tivg7s=
+	t=1769101212; cv=none; b=DMgVeT6fVc8IS7f7dI2IP/2ewLCKpebmXkuSv5mLDtFjqU1stwGjvMWWpZ20Uj8H7ngso+cZRAcjFIVXu14U3a2q4KWrdG8RhWBuDbxXZICacd8JC48AMYdtmhFD//vt/I/ZvguumpLE6wW22QmzE1GXO8g/DTzRVcy4srY1Z3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769101208; c=relaxed/simple;
-	bh=/kVRH7OmN6EDRj9qO26TDaI1PWDz6NtgN64FPwIvgqY=;
+	s=arc-20240116; t=1769101212; c=relaxed/simple;
+	bh=V4PTp6AWZI5MWQxX8DtA8YX5B5nuTx9/oXx6sLHPHns=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W8nREHpuJz2Q03bC+fM5udzN07gyuAp02dwg62/Nl2odUMmYXknn5Pd1K0f8XU6GcyO4DEXjIYzJwFR7Ykv/IqWizjFpas5Tklrg2tMFrka5GOmZyLNGAml6SqmKM4ClIgDI9BGlQ650KTHMoe+pVK1Gr0VAX+nlp6ppoL0g2bM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X6WtaTXS; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=LOkJFHIMR4BGIRukFnQo1I3YCr121FfkFSZkyyTksIhLOv7uK7AwB+nFfUNJ4K6x7eanRVX5zJntbiLK6qT+p8hrlG9wb9xIsy6uETecjtqSv3yFqp+rVLYSu3UYpmcaFHXxQayDHLXDDpVoFPKH0UMAk9pTrPdSkOz7g0UnLz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sll4VSfP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X6WtaTXS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CA2CC19423;
-	Thu, 22 Jan 2026 17:00:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sll4VSfP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C151C116C6;
+	Thu, 22 Jan 2026 17:00:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769101207;
-	bh=/kVRH7OmN6EDRj9qO26TDaI1PWDz6NtgN64FPwIvgqY=;
+	s=k20201202; t=1769101211;
+	bh=V4PTp6AWZI5MWQxX8DtA8YX5B5nuTx9/oXx6sLHPHns=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X6WtaTXS+RGPqz3QNaE5Z975zw7cbweVuLPVUBi3sjk5fgA4wSwQzRSiNmj2RmftH
-	 5cFVLOJj7VkznY2vRcU7F1/MWr0RINqXQLrZNhlc9O1iYCQ1lWIvQlfoudkGLYnGSs
-	 Bw6sxvcNOBJ2f3i3RzUd4aCq3oDT3duvCP3hkpn04iDVYROxBeSwmyHCIjjeB+GKdi
-	 bRfULfJk0UF7HYJX+LsS6qd+evo3dx+jEjeQwVqNJ8WHF8RbmpHZgSEgeSNvacjz2Z
-	 5RXLg+I9uwiHsZkIIMXjPrOwtZ1+8nf2SQnWu6RKyyjRkKGFJKF+1WiLSaZihOtXpj
-	 nEYVQ+aekpsOw==
+	b=Sll4VSfPLggvYsQbc3VOhucDxRupzWN1AuuHZ54KrRTjWY9lINoovHVXg7KRwOqCk
+	 r6WlpQn5X1ma2kC4jq5sqLD3uD7Rj4Ri7VrdV2k24Un8X/XFxzblxPIWlHEmFpq8Zv
+	 hu6pu2xR7q1aP7xVNQuLYSEQVVTZg5jdd+bIHSaj5Tw0YHuxCZScdzUDn9gKrU4nxj
+	 UiGiDk4X5WV3yCNam86OrMAsRIMZegnv3MLJJ7ZonSSZkHpIZgqjR9gqwLKMV0ByzO
+	 zU9P7UIm7SslBOKhALIOCekPuVHiT7xn6rPnAxGQf0l30MJzM8KN8HT4OqpWpkKtm0
+	 7zDhOUAE+cguQ==
 From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Marc Zyngier <maz@kernel.org>
-Cc: catalin.marinas@arm.com,
-	kernel-team@android.com,
-	Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+To: catalin.marinas@arm.com,
+	maz@kernel.org,
+	arnd@arndb.de,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
 	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] arm64: Unconditionally compile LSE/PAN/EPAN support
-Date: Thu, 22 Jan 2026 16:59:44 +0000
-Message-ID: <176907700325.2035103.13197425164234703706.b4-ty@kernel.org>
+	Zhou Wang <wangzhou1@hisilicon.com>
+Cc: kernel-team@android.com,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	yangyccccc@gmail.com,
+	prime.zeng@hisilicon.com,
+	xuwei5@huawei.com
+Subject: Re: [PATCH v8 RESEND 0/7] Add support for FEAT_{LS64, LS64_V} and related tests
+Date: Thu, 22 Jan 2026 16:59:45 +0000
+Message-ID: <176908829115.2153926.13840796658975178943.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260107180701.2858276-1-maz@kernel.org>
-References: <20260107180701.2858276-1-maz@kernel.org>
+In-Reply-To: <20260119022928.149358-1-wangzhou1@hisilicon.com>
+References: <20260119022928.149358-1-wangzhou1@hisilicon.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,22 +57,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On Wed, 07 Jan 2026 18:06:58 +0000, Marc Zyngier wrote:
-> FEAT_LSE and FEAT_PAN have been around for a *very* long time (ARMv8.1
-> was published 11 years ago), and it is about time we enable these by
-> default. The additional text is very small, the advantages pretty
-> large in terms of performance (LSE) and security (PAN), and it is very
-> hard to find a semi-modern machine that doesn't have these (even the
-> RPi5 is ARMv8.2...).
+On Mon, 19 Jan 2026 10:29:21 +0800, Zhou Wang wrote:
+> Armv8.7 introduces single-copy atomic 64-byte loads and stores
+> instructions and its variants named under FEAT_{LS64, LS64_V}.
+> Add support for Armv8.7 FEAT_{LS64, LS64_V}:
+> - Add identifying and enabling in the cpufeature list
+> - Expose the support of FEAT_LS64 to userspace through HWCAP3 and cpuinfo
+> - Add related hwcap test
+> - Handle the trap of unsupported memory (normal/uncacheable) access in a VM
 > 
 > [...]
 
-Applied first two to arm64 (for-next/cpufeature), thanks!
+Applied first six to arm64 (for-next/cpufeature), thanks!
 
-[1/3] arm64: Unconditionally enable LSE support
-      https://git.kernel.org/arm64/c/6191b25d8bd9
-[2/3] arm64: Unconditionally enable PAN support
-      https://git.kernel.org/arm64/c/018a231b0260
+[1/7] KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+      https://git.kernel.org/arm64/c/f174a9ffcd48
+[2/7] KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
+      https://git.kernel.org/arm64/c/902eebac8fa3
+[3/7] KVM: arm64: Handle DABT caused by LS64* instructions on unsupported memory
+      https://git.kernel.org/arm64/c/2937aeec9dc5
+[4/7] arm64: Provide basic EL2 setup for FEAT_{LS64, LS64_V} usage at EL0/1
+      https://git.kernel.org/arm64/c/dea58da4b6fe
+[5/7] KVM: arm64: Enable FEAT_{LS64, LS64_V} in the supported guest
+      https://git.kernel.org/arm64/c/151b92c92a45
+[6/7] arm64: Add support for FEAT_{LS64, LS64_V}
+      https://git.kernel.org/arm64/c/58ce78667a64
+
+and the selftest to (for-next/selftests):
+
+[7/7] kselftest/arm64: Add HWCAP test for FEAT_LS64
+      https://git.kernel.org/arm64/c/57a96356bb69
 
 Cheers,
 -- 
