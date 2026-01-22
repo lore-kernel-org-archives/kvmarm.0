@@ -1,269 +1,189 @@
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAE3395718
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 16:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86C738A29C
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 16:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.50
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769099668; cv=pass; b=mkOwgg3Z94rNgksfL4H6Kz1r3l+Dz3G0Z7A0Z4d3Cyh5+QOLg1+zfm+U/MADg5VifvnT2wH/o74HuncCxkVKDh/cmooy/PffJxBovtCdhwilUnobSYjxKEF+lQlUv573DmX20nNTjoPpFSecpYSkZFY0q5TxZy2lZhJcZKCu51c=
+	t=1769100285; cv=pass; b=jaVWgPCOBgKEjAoTV3N28CECb/Dw7l2rPLUKSdTu26rS+beg4/iFegMJx2HyBqKoHxsBW7CqjMcOFSpU5GJuFCvOd9IJiOqr078hqEhnTvdQW8FPkgXwjWin1lIFhwYPibL1ThBIliM1IqnYzkEedsoLJe8hJ1fJe/LVS719NYM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769099668; c=relaxed/simple;
-	bh=ZYIqU7xPcH37zvSybjI3FPpHQTFAEV4LoCN7S8Ljj9w=;
+	s=arc-20240116; t=1769100285; c=relaxed/simple;
+	bh=i278ipBKd9t4eNryNmv1UqNg417NlVEpdzsVGz5SQq0=;
 	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b3zFnIf6r+nnJYaQ4p8PcgcDVV2JRpzFmLsYlagT1MPvyvFLA9LmFPYPcpmSYylWG6O02+BrhZpfCWyAzzeIqX9ZAiWxbQG1NTpqwi77z1uSkflbTTvEtwpEcKwN6Kqv8qDowCwhzHR9ZW7tbDjAOdDin5pkJpqlyLnf6JiJolY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KecpCGKl; arc=pass smtp.client-ip=209.85.217.52
+	 To:Cc:Content-Type; b=Sya79xkDU4YICCa5tcilXmul9sqSiSURs+Jn6Ww/iPGD2G8HvajwOUp/hWna9a9xgrBDAJkxKVgC4E2dAWKEHYdeXY3fvG6Lf7GnBOYDf8tjm71ZjVRJ2ilWG0FUxQrXFevTFpvA8O9AiMwZ5tsKKXu/zArwrfPM7lsi4JJp4aE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xmin/dkb; arc=pass smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KecpCGKl"
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5f52b3d98cfso427136137.2
-        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 08:34:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769099662; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xmin/dkb"
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-94121102a54so732630241.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 08:44:42 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769100280; cv=none;
         d=google.com; s=arc-20240605;
-        b=NEGCQbbc3/K7PhdEpXnNfjI/Ct4k8Y0NjLoFGcGgcbAerzPRbuD4JuwR+Rx/dlZXuC
-         3w95kP32Buu0A572IRNn7gM/7/bxY+EEaVazqe0+pRFEbamBXOjUtTpo/xizJeA7zYLc
-         8GJIt4sxTorpO4g7QP30xjP8Fs2kyVJY5RFpPfUPo6RHy94rTa0pgFZCjcgleZYiNFRn
-         pVH7vPYI98YrjMcSNJHGZuxkKULQf419gRrr0mc+irSsS+LDIJ/PhCM/t+hRpvRr3We2
-         VOyLyKFIkva+wF6TBql6KCEphJQuLX9ggC1YjsnTg6Lno3HeLNqVk4bb+jOe7F6CImFz
-         ZwVA==
+        b=NtXyMOv1GlXVvWv8QZ6X8DyFdZKT1uvRH+uuNnMP8i9MZfhC5gfv9N+VGWGdzo4FCO
+         yHxTIFcXek+56n2QvtLPuk0fbG0vD6mDPUpDXhN/9TW5epQu0Fauzgj5oPVHawla6Yi6
+         insqP0GwxaTezIBFM/ebYyo5QnEZewtf6AouvnyCPgsK8Fr43+mHwDMngvtavZkiRQFJ
+         UdIk0lgXocFJLIvyzsaiXn/E/rwGEuLIbVv0gH72zetFli5TKXNVFXrDRdm2+27blHeD
+         jyKxtTC6kpdZkJbsaVoPKi/X+LhQdUShLd+pyd9kIK5upQFnYbCoyzJvJe24Fgyav4lO
+         3lWA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:dkim-signature;
-        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
-        fh=dWBG3VPpTUyXQYpBgVrZq74F8MgTxqRfuTdRP1oD8mw=;
-        b=BVTEmtssC1cuw1SNVshGHfty6aQjWRwqe4ecAnUafFJnQTXy7iT5b4GG7A5AM6JB4i
-         kpS5fSmd+pm1sEGCuprsCpX53pFugWnBEf4vHW7gOIV4x/fBfPDDUPiq1fL0+Er8PkLC
-         ISD+juDS1bAOJ5+NQczwIZ0giEMADGy/qSl1ClJA3hfNHOJ/hAL3gz1Hk4wJuxJLdD7a
-         aztibY9pNf/MjDNfBKNhlGni5kA/8Klk8QJTM0Q5pJh9pFBrMDYPI88dsNLBpiI60dcn
-         wzXsjiYlii3LTvJ/xWhzs8lAgEMcVQBDFOOKXInqIbQbzdf1152jhQwYRPI/wXsMnb/5
-         U6YA==;
+        bh=i278ipBKd9t4eNryNmv1UqNg417NlVEpdzsVGz5SQq0=;
+        fh=APPonD9eIpI9tFYBWpXwJwxsro5P/Ss56ooueWk2PmI=;
+        b=iw3JS4JeryFWWs//ImkQrI1l+LONvgUPAQ0vJKsCq7sB6wlV+r3+PdnU7cUdzl0A/o
+         qkr0tjx62B12MmvdIe+4h7jeSTQWvRosVHOtOBJTEaNdhuKWpoNRCkWyxQgp1Pgfc5Vn
+         vo9gwY7scbFdL9ChjjM4WUcWciYO9f+oyWdieq0caCngMZcU6TdUeDyOPdwcX6lFsx+h
+         Gt0elov+SrjBOKCmrrF2FN/FtJfsr4k1BANmqbPTbv8EajGua4segBR5nTHNtBiKciuu
+         8MLYESkrXb0E2DL5PvOBSXuDMS6IJtINqcHk+0lTCxhckNoZJ6TcH5JWio4PAKeHO8M6
+         FbJQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769099662; x=1769704462; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1769100280; x=1769705080; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
-        b=KecpCGKlaxnLRceW4uMmJQUJpQSMztwRJlMPKDEIC33FaRHRtSDnK5S8GfS0kg8v4Q
-         rJEOF/gP+QDCLTtpX8jClddogYH8cURxX+Ee8CfzmR/Vl3SWkyT/uaw4d4yKyfmsuIc2
-         xnqFjbKDeNULT+21HHbJuZI+H3MZt7DhJr/yEYQeHYjZ9mx1Wzair6Zz3Hjoa6nhybO5
-         lEtKS6zaRQchl0j+dFnGpfrOijz6oryyus6vL/iebk53/IpNrPC1wd9cnRUIZX5BQXiZ
-         934jEBq0XYRv+fqstL8hiAzX5jaO6gHEgEEoYDHsmR3jzR/DfiV3zwWI68WzbuTFC2K+
-         MMlA==
+        bh=i278ipBKd9t4eNryNmv1UqNg417NlVEpdzsVGz5SQq0=;
+        b=Xmin/dkbkupsNjHGMGRHQEgBqkAxAsx1nExA8qtIo0exgmb/E74H5eW/k5yAQgPNa0
+         jgjXIbR1ZuUzu4UL+lMcals9thfNe+9+QCw3Q+ELRmV+EbazGZhn4xOMdfpbvsa9xvVu
+         eqsbY7kcBUDKGvJLUWIY2Y6DSnueoZJG4nkZ90Xugkk4Ts8XPg4b2e8WHZsZyg2C2XEw
+         Hn2olBHSnvHN4gT2KM6c8h5MyrH3FJKair2QnivfYD7UcFIESkfQZrqrslmVJkKkTVa8
+         H5aFgbL8ylYVSjSTREGBi4ZpNlep6i87IzjDHO87cbHQRXT8J0Qv3Tcwzfy/7BjZ84pC
+         2tnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769099662; x=1769704462;
+        d=1e100.net; s=20230601; t=1769100280; x=1769705080;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L0r70yq+P7UB3qkVO5/x8sBghKy9pd209cUDvkPIBxI=;
-        b=Ez5u95eMq37dxwCJqlDW3sx7WR+gH/gXnZ5Nk1GZ1DxZvdRnmCVoWT+gVbVUzehjqL
-         8aKJxYfhV7J5baamDIPDGVc5/Gt0mEB/FJqyATgZBI4vEhHnbS9UZ2Vh7JTUBjdO8oxX
-         Uev3ax2m2lO96jczct5LJhcvTJhdFLCKhWpHu0y+3/pA2e+9ogMK5h/UN/Zwf7rV/1/O
-         RR+j/BqSiIO3CUeOnYJZGEcu4IbsZsNDUw3uV4ZEku7I6c9Vq42rnd85W9awSa2nimvM
-         OpvDF+wzwSLEc5ZKF79GHoHnwxk39/gL7VfCId8KsSdIwdoGHmClvcoW2ORy0p1zACjH
-         tVzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPxaIPBxbOVt1w/BoInXZx2CdCGqtvps/FzUglg07bwDGzJ9mp99F1N/MuPU5xoseh1MuC6Vg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwgG5P8U1XTiWit0vsUBh5bAu+sT6rHGYbRRMdhnhiLnJscAayw
-	iHT4Ke/itaOfsUUEoUQExITHpHRbCCraL8rzs5fQikFHZ3xf7s+pLQu9yFvxcSAtMzEZiPGObwO
-	IwyWvzbyAt9oGOt/45Bevoa+MJ4W9nZu0SXhqx1Kn
-X-Gm-Gg: AZuq6aKtpgzW2qtdQ9WompOTWcS5N5ZYC+fs+3E0BUzoeLWFGM4tdfucqJgTsgSDn5M
-	gl2F9eaMpTwG3Qe3LW/RwVU/R06/z8R2br6dPZUZkWlsPM41lZZbvTdWOCRamHKEhqNLAFpaBp7
-	Q/1+ahqkV8SRj2FUnnAzeU/m/PlWl9dDcv7Q3Ne49YI6F7Ffig/BlBqyh7WM3lVB8gjztaYABoq
-	nkxEUqMN5a0RlfVo7X1qEm1DqHO59s6t7KKyUws/3xP9t53JiI2KkJS86yauRe8/iSp+uzqw+XK
-	5E7/
-X-Received: by 2002:a05:6102:c52:b0:5ee:9e4b:a81c with SMTP id
- ada2fe7eead31-5f54bc6d8edmr83779137.22.1769099661387; Thu, 22 Jan 2026
- 08:34:21 -0800 (PST)
+        bh=i278ipBKd9t4eNryNmv1UqNg417NlVEpdzsVGz5SQq0=;
+        b=qVkoPK3Dc5bRl4sBROdCn5/z1YyaboVq2ebKDJoJqOiGDzYuKvDw2b9fBN8dGQyQG6
+         wwXBcSlPGdzN9nJvuNgefq8Cc3zIhus82QPB04R56Sj8XMjoJaYvWGubKv6A6TW67y2m
+         pM9dxk0CmWY+uFYDKmkQXUPJ7zNFjABvG1qRFgiWlJaLilohGGblTFdWf0zLIIw+ASje
+         hQxVVOL7/YinH0Td2bBc3JfpoFNtxwYqrQMdMn7w/e69sK75huJCIMq03nvyr9iGG9PK
+         JTX97K2Orv83xGuLyScEuMuxb/guYi1ztXbqAQD2zbM9qd1q5ix7TS70tn1Ma0BXBbkB
+         dmIA==
+X-Forwarded-Encrypted: i=1; AJvYcCWNK1S9+8Zn1G0ABDFKhKuxOwZafiIRWKmXms5OOcg9am9/aH/HvzjVE++9MtzI+W/r7yQ6NWQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxYjQKAubrZhVp0stjFmDyRmV6Wt8sAFxwR7vRE2Po06nhvLoOg
+	E1jnr7YEHrGEw2ojLmfn2NYbf9wIAfyZsVeMV6ul86QRoK2ymbHrkI2zZ7WrmIrB70ZMyGgZ5ic
+	87zr5LuObJIKsyYFNSxQVb3lO5vkmovxbSQ2y4vDl
+X-Gm-Gg: AZuq6aIOGmmR5rq4HrmCGupTu3XyQK16A69IQTunULAYscQhvvno7lfqFOyAlZ7LIXC
+	k/MpF/c71HpN/kgyn/weotX0dp8h/Tv1DotcMyzdWYwM0bn46LR+RGPkZfdi4zCQT3ndU35Os+/
+	9aNz0KO4R/RG59prP7bWXut+Ox0gimc/IH1GBQcQQjrCaC5APDxici8LMAsDfs6UDLIgt3ldtmb
+	4+kQEXRvbn1vM8GrVOKrQlX9nKGeI9Yb59UcWVTN1KZq+QceEmOodnuWOXsvfvt0unlmw==
+X-Received: by 2002:a05:6102:d89:b0:5ec:c528:4df8 with SMTP id
+ ada2fe7eead31-5f54bc628cbmr124387137.28.1769100279450; Thu, 22 Jan 2026
+ 08:44:39 -0800 (PST)
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 22 Jan 2026 08:34:20 -0800
+ HTTPREST; Thu, 22 Jan 2026 08:44:38 -0800
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 22 Jan 2026 08:34:20 -0800
+ HTTPREST; Thu, 22 Jan 2026 08:44:38 -0800
 From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <a2b79af7-e5d1-4668-bff3-606f57d32dfc@amazon.com>
+In-Reply-To: <8c1fb4092547e2453ddcdcfab97f06e273ad17d8.camel@intel.com>
 References: <20260114134510.1835-1-kalyazin@amazon.com> <20260114134510.1835-8-kalyazin@amazon.com>
- <CAEvNRgEzVhEzr-3GWTsE7GSBsPdvVLq7WFEeLHzcmMe=R9S51w@mail.gmail.com> <a2b79af7-e5d1-4668-bff3-606f57d32dfc@amazon.com>
+ <ed01838830679880d3eadaf6f11c539b9c72c22d.camel@intel.com>
+ <CAGtprH_qGGRvk3uT74-wWXDiQyY1N1ua+_P2i-0UMmGWovaZuw@mail.gmail.com> <8c1fb4092547e2453ddcdcfab97f06e273ad17d8.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Date: Thu, 22 Jan 2026 08:34:20 -0800
-X-Gm-Features: AZwV_QgNvHql-EMuz2B4VijAKAK9511fycMrz6pi1d87rdZBUNlP58MQhoc9tIU
-Message-ID: <CAEvNRgF46M1jp0+eBu2wQMO7P1afyo00SOkENFwvB2KYX3dnFA@mail.gmail.com>
+Date: Thu, 22 Jan 2026 08:44:38 -0800
+X-Gm-Features: AZwV_QjFiVCL1GgMB61exuGngD3MnDbAOiFUMFZ1rYdJZrzTGdTea8E5DMfoinE
+Message-ID: <CAEvNRgEbG-RhCTsX1D8a3MgEKN2dfMuKj0tY0MZZioEzjw=4Xw@mail.gmail.com>
 Subject: Re: [PATCH v9 07/13] KVM: guest_memfd: Add flag to remove from direct map
-To: kalyazin@amazon.com, "Kalyazin, Nikita" <kalyazin@amazon.co.uk>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "Annapurve, Vishal" <vannapurve@google.com>
+Cc: "david@kernel.org" <david@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
+	"jgross@suse.com" <jgross@suse.com>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"surenb@google.com" <surenb@google.com>, "riel@surriel.com" <riel@surriel.com>, 
+	"pfalcato@suse.de" <pfalcato@suse.de>, "peterx@redhat.com" <peterx@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"rppt@kernel.org" <rppt@kernel.org>, "thuth@redhat.com" <thuth@redhat.com>, 
+	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "maz@kernel.org" <maz@kernel.org>, 
+	"svens@linux.ibm.com" <svens@linux.ibm.com>, "ast@kernel.org" <ast@kernel.org>, "vbabka@suse.cz" <vbabka@suse.cz>, 
+	"pjw@kernel.org" <pjw@kernel.org>, "alex@ghiti.fr" <alex@ghiti.fr>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"hca@linux.ibm.com" <hca@linux.ibm.com>, "willy@infradead.org" <willy@infradead.org>, 
+	"wyihan@google.com" <wyihan@google.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>, "jolsa@kernel.org" <jolsa@kernel.org>, 
+	"jmattson@google.com" <jmattson@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, 
+	"luto@kernel.org" <luto@kernel.org>, "haoluo@google.com" <haoluo@google.com>, 
+	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "kernel@xen0n.name" <kernel@xen0n.name>, 
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>, 
-	"joey.gouly@arm.com" <joey.gouly@arm.com>, "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, 
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>, 
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org" <willy@infradead.org>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "david@kernel.org" <david@kernel.org>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "coxu@redhat.com" <coxu@redhat.com>, 
+	"mhocko@suse.com" <mhocko@suse.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, "song@kernel.org" <song@kernel.org>, 
+	"oupton@kernel.org" <oupton@kernel.org>, "jhubbard@nvidia.com" <jhubbard@nvidia.com>, 
+	"kernel@xen0n.name" <kernel@xen0n.name>, "hpa@zytor.com" <hpa@zytor.com>, 
 	"lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>, "mhocko@suse.com" <mhocko@suse.com>, 
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
-	"andrii@kernel.org" <andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>, 
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"sdf@fomichev.me" <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, 
-	"jhubbard@nvidia.com" <jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>, 
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>, 
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>, 
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com" <jgross@suse.com>, 
-	"yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>, "kas@kernel.org" <kas@kernel.org>, 
-	"coxu@redhat.com" <coxu@redhat.com>, "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, 
-	"maobibo@loongson.cn" <maobibo@loongson.cn>, "prsampat@amd.com" <prsampat@amd.com>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>, 
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, 
-	"alex@ghiti.fr" <alex@ghiti.fr>, "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, 
-	"borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>, 
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "martin.lau@linux.dev" <martin.lau@linux.dev>, 
+	"jthoughton@google.com" <jthoughton@google.com>, "Yu, Yu-cheng" <yu-cheng.yu@intel.com>, 
+	"maobibo@loongson.cn" <maobibo@loongson.cn>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, 
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>, "peterz@infradead.org" <peterz@infradead.org>, 
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"chenhuacai@kernel.org" <chenhuacai@kernel.org>, "prsampat@amd.com" <prsampat@amd.com>, 
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, 
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>, 
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "itazur@amazon.co.uk" <itazur@amazon.co.uk>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>, 
 	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com" <gor@linux.ibm.com>, 
-	"hca@linux.ibm.com" <hca@linux.ibm.com>, 
-	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>, 
-	"pjw@kernel.org" <pjw@kernel.org>, 
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>, "svens@linux.ibm.com" <svens@linux.ibm.com>, 
-	"thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>, 
-	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>, 
-	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com" <jackmanb@google.com>, 
-	"aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>, "patrick.roy@linux.dev" <patrick.roy@linux.dev>, 
-	"Thomson, Jack" <jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>, 
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco" <xmarcalx@amazon.co.uk>
+	"jackabt@amazon.co.uk" <jackabt@amazon.co.uk>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
+	"agordeev@linux.ibm.com" <agordeev@linux.ibm.com>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "joey.gouly@arm.com" <joey.gouly@arm.com>, 
+	"derekmn@amazon.com" <derekmn@amazon.com>, "xmarcalx@amazon.co.uk" <xmarcalx@amazon.co.uk>, 
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, "kpsingh@kernel.org" <kpsingh@kernel.org>, 
+	"kalyazin@amazon.co.uk" <kalyazin@amazon.co.uk>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "sdf@fomichev.me" <sdf@fomichev.me>, 
+	"jackmanb@google.com" <jackmanb@google.com>, "bp@alien8.de" <bp@alien8.de>, "corbet@lwn.net" <corbet@lwn.net>, 
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, "jannh@google.com" <jannh@google.com>, 
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kas@kernel.org" <kas@kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "will@kernel.org" <will@kernel.org>, 
+	"seanjc@google.com" <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Nikita Kalyazin <kalyazin@amazon.com> writes:
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> writes:
 
-Was preparing the reply but couldn't get to it before the
-meeting. Here's what was also discussed at the guest_memfd biweekly on
-2026-01-22:
-
->
-> [...snip...]
->
->>> @@ -423,6 +464,12 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>>                kvm_gmem_mark_prepared(folio);
->>>        }
->>>
->>> +     err = kvm_gmem_folio_zap_direct_map(folio);
+> On Fri, 2026-01-16 at 09:30 -0800, Vishal Annapurve wrote:
+>> > TDX does some clearing at the direct map mapping for pages that
+>> > comes from gmem, using a special instruction. It also does some
+>> > clflushing at the direct map address for these pages. So I think we
+>> > need to make sure TDs don't pull from gmem fds with this flag.
 >>
->> Perhaps the check for gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP should
->> be done here before making the call to kvm_gmem_folio_zap_direct_map()
->> to make it more obvious that zapping is conditional.
+>> Disabling this feature for TDX VMs for now seems ok. I assume TDX
+>> code can establish temporary mappings to the physical memory and
+>> therefore doesn't necessarily have to rely on direct map.
 >
-> Makes sense to me.
+> Can, as in, can be changed to? It doesn't now, because the direct map
+> is reliable today.
 >
 >>
->> Perhaps also add a check for kvm_arch_gmem_supports_no_direct_map() so
->> this call can be completely removed by the compiler if it wasn't
->> compiled in.
+>> Is it safe to say that we can remove direct map for guest memory for
+>> TDX VMs (and ideally other CC VMs as well) in future as needed?
 >
-> But if it is compiled in, we will be paying the cost of the call on
-> every page fault?  Eg on arm64, it will call the following:
->
-> bool can_set_direct_map(void)
-> {
->
-> ...
->
-> 	return rodata_full || debug_pagealloc_enabled() ||
-> 		arm64_kfence_can_set_direct_map() || is_realm_world();
-> }
+> Linux code doesn't need to read the cipher text of course, but it does
+> need to help with memory cleaning on the errata systems. Doing a new
+> mapping for each page getting reclaimed would add cost to the shutdown
+> path.
 >
 
-You're right that this could end up paying the cost on every page
-fault. Please ignore this request!
+Can we disable direct map removal for errata systems using TDX only,
+instead of all TDX?
 
->>
->> The kvm_gmem_folio_no_direct_map() check should probably remain in
->> kvm_gmem_folio_zap_direct_map() since that's a "if already zapped, don't
->> zap again" check.
->>
->>> +     if (err) {
->>> +             ret = vmf_error(err);
->>> +             goto out_folio;
->>> +     }
->>> +
->>>        vmf->page = folio_file_page(folio, vmf->pgoff);
->>>
->>>   out_folio:
->>> @@ -533,6 +580,8 @@ static void kvm_gmem_free_folio(struct folio *folio)
->>>        kvm_pfn_t pfn = page_to_pfn(page);
->>>        int order = folio_order(folio);
->>>
->>> +     kvm_gmem_folio_restore_direct_map(folio);
->>> +
->>
->> I can't decide if the kvm_gmem_folio_no_direct_map(folio) should be in
->> the caller or within kvm_gmem_folio_restore_direct_map(), since this
->> time it's a folio-specific property being checked.
->
-> I'm tempted to keep it similar to the kvm_gmem_folio_zap_direct_map()
-> case.  How does the fact it's a folio-speicific property change your
-> reasoning?
->
+If it's complicated to figure that out, we can disable direct map
+removal for TDX for now and figure that out later.
 
-This is good too:
-
-  if (kvm_gmem_folio_no_direct_map(folio))
-          kvm_gmem_folio_restore_direct_map(folio)
-
->>
->> Perhaps also add a check for kvm_arch_gmem_supports_no_direct_map() so
->> this call can be completely removed by the compiler if it wasn't
->> compiled in. IIUC whether the check is added in the caller or within
->> kvm_gmem_folio_restore_direct_map() the call can still be elided.
+> Then there is the clfush. It is not actually required for the most
+> part. There is a TDX flag to check to see if you need to do it, so we
+> could probably remove the direct map accesses for some systems and
+> avoid temporary mappings.
 >
-> Same concern as the above about kvm_gmem_folio_zap_direct_map(), ie the
-> performance of the case where kvm_arch_gmem_supports_no_direct_map() exists.
->
+> So long term, I don't see a problem. For the old systems it would have
+> extra cost of temporary mappings at shutdown, but I would have imagined
+> direct map removal would have been costly too.
 
-Please ignore this request!
-
->>
->>>        kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
->>>   }
->>>
->>> @@ -596,6 +645,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->>>        /* Unmovable mappings are supposed to be marked unevictable as well. */
->>>        WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->>>
->>> +     if (flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
->>> +             mapping_set_no_direct_map(inode->i_mapping);
->>> +
->>>        GMEM_I(inode)->flags = flags;
->>>
->>>        file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
->>> @@ -807,6 +859,8 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->>>        if (!is_prepared)
->>>                r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
->>>
->>> +     kvm_gmem_folio_zap_direct_map(folio);
->>> +
->>
->> Is there a reason why errors are not handled when faulting private memory?
->
-> No, I can't see a reason.  Will add a check, thanks.
->
->>
->>>        folio_unlock(folio);
->>>
->>>        if (!r)
->>> --
->>> 2.50.1
+Is there a way to check if the code is running on the errata system and
+set up the temporary mappings only for those?
