@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C38261B91
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 11:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499133563C3
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 11:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080000; cv=none; b=P8gtUvZ19PIXKqscG9qsMWpoOXRtMFWAfwxeSTh9gysG89O7o6IYA2AfMquvmXzqpqXo+RLhAgUKIbHb5Rdj9OLa8IbPp0uaYaBZIzijaFl7lBXSqUPpEKLONDHfHvujMWLdG/kEbEusx2GvGKsSkGBzelP+xR1jsZvCdl+2Grc=
+	t=1769080865; cv=none; b=uARDQLr1yjBVTjRMfBqktHsfYKe1RyFBhe9hEdX3NwaFkn8XKhb9xdJPMtR5pPEBOKk4Iv1ACJdxwK+VQ75bEJI25Pp1ogH8mCrT9hd9s2efl+xLeGgedzteKnJQ6rla6y9oJCerP4ycbECKJLFT6TY5wMhH7GZEuPhN1JeWGiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080000; c=relaxed/simple;
-	bh=Mo+fFuWnIyY+jgV07bD38jQAwustmT9SpjnI6YUi2b8=;
+	s=arc-20240116; t=1769080865; c=relaxed/simple;
+	bh=o32rk+JyaJNxu8btX6h4oEaxPbgGO8dvLv4C88GmALo=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=erWj0rl3xBRa6P2X9kF0OFa5pIj7cM1FmL1jA44xOqMj3J9XWT7eOFCDTKXx5hU4pcOkSv47v41SC76jUwPQkgWwktZBjDvua/PwdCPag4iBk/qtt20tgWxTT6ZDM1LHAXJRKS0ToDNpDidXd/tVAty/TgOz9L575qj2M4/6Jsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p1b846Gb; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FBpu/VyCaSgv8DPJGCjp4ylYOftEdN5HLHe31tdw5nNlrSRRBhO+zscCOhhbKo2J9ZPFdGiMc7H3Niqmc3LZv5B124qTFwECOvSQogl7BEtJRN9BJdFW6YIooA0tlmdPgCPTnGFMAvTQm/fsfnjDc7Tl7F5c8Sq+9E+heY+smcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eshTjwg4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1b846Gb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F093EC116C6;
-	Thu, 22 Jan 2026 11:06:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eshTjwg4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2BC2C116C6;
+	Thu, 22 Jan 2026 11:21:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769080000;
-	bh=Mo+fFuWnIyY+jgV07bD38jQAwustmT9SpjnI6YUi2b8=;
+	s=k20201202; t=1769080863;
+	bh=o32rk+JyaJNxu8btX6h4oEaxPbgGO8dvLv4C88GmALo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p1b846Gb+8Y5s21R+XIbTNsWZpkXO2Ni51bV1WLh2eC+4h27z4S4Wtb/scgL5k/Wf
-	 K4dopOW/ez2E1yvXP9Ujc3DruRIGZ25eL8d8MpPQniY8PiBg0qOAEuuap4vBBh8cVG
-	 I9i9oFksgbzFK8qQ/dFwIueXQKlVlzPfQAYDK8O+Rfviwj8oqVhVB/gKCtjh3H8S2K
-	 yPeclA5ezp/wwvKUE1FWkFvt2cw4dHYjZTYImSc2UIuuUyxHkdDPtQEXqSgI6hCc5a
-	 YIgXS89oBkpDZwzroEH4+rKeKrN9Y34d7Ie7iEEmPQuJRqaC9SqMxD3PF31BKOY+gw
-	 yq+sIZc3wzS2Q==
+	b=eshTjwg4NvacmOKkE+LKLjV3WeR2Fm1nSFTZPk3SF6Gpk084wLgF9UjGKCN1ufEda
+	 Z7T/xxAZtWKntwCat4cox6GJUiEONPxESUaxlJeiEiAamm9npyLkKpM0FPDontjCmT
+	 k585eJj0nZMZS0zTBGimkLk4ifHIo93+4nzGXj/mPJ2JKnY66TFm3jSfo4Qonym5xO
+	 mcyA2K5WN5aO080hXPFlPO1ZNIvUl1vDDiPp+H8k9fb02tub+TJMdjm6URW90qiskn
+	 l44BJaXjDxB/M/NAK8+aGww14KPAQ/rYRCboWXuA/cTVP3mQm7RCp3rZPZ/SuR3dRd
+	 17VJc6QxTT4/Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1visWL-00000004emC-2omE;
-	Thu, 22 Jan 2026 11:06:37 +0000
-Date: Thu, 22 Jan 2026 11:06:37 +0000
-Message-ID: <86tswdc3eq.wl-maz@kernel.org>
+	id 1viskH-00000004f33-3MHB;
+	Thu, 22 Jan 2026 11:21:01 +0000
+Date: Thu, 22 Jan 2026 11:21:01 +0000
+Message-ID: <86sebxc2qq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -44,11 +44,10 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 3/3] arm64: Unconditionally enable EPAN support
-In-Reply-To: <aXH43Dr-5OrXNOyy@willie-the-truck>
+Subject: Re: [PATCH 2/3] arm64: Unconditionally enable PAN support
+In-Reply-To: <20260107180701.2858276-3-maz@kernel.org>
 References: <20260107180701.2858276-1-maz@kernel.org>
-	<20260107180701.2858276-4-maz@kernel.org>
-	<aXH43Dr-5OrXNOyy@willie-the-truck>
+	<20260107180701.2858276-3-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,40 +63,30 @@ X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 22 Jan 2026 10:15:56 +0000,
-Will Deacon <will@kernel.org> wrote:
-> 
-> On Wed, Jan 07, 2026 at 06:07:01PM +0000, Marc Zyngier wrote:
-> > While FEAT_PAN3 is pretty recent, having it permanently enabled costs
-> > exactly nothing, and does help with exec-only mappings on these fancy
-> > ARMv9.2 machines that are rumoured to exist.
-> 
-> I'm not sure it's _entirely_ accurate to say this one costs us "exactly
-> nothing":
-> 
-> > diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
-> > index 177c691914f87..13c0fa54ea19f 100644
-> > --- a/arch/arm64/include/asm/cpucaps.h
-> > +++ b/arch/arm64/include/asm/cpucaps.h
-> > @@ -19,8 +19,6 @@ cpucap_is_possible(const unsigned int cap)
-> >  			   "cap must be < ARM64_NCAPS");
-> >  
-> >  	switch (cap) {
-> > -	case ARM64_HAS_EPAN:
-> > -		return IS_ENABLED(CONFIG_ARM64_EPAN);
-> >  	case ARM64_SVE:
-> >  		return IS_ENABLED(CONFIG_ARM64_SVE);
-> >  	case ARM64_SME:
-> 
-> as this means cpus_have_cap(EPAN) always ends up doing a test_bit(). It's
-> not exactly expensive, but it feels a little premature when compared to
-> PAN and LSE so I'll probably just take those changes for now.
+Hi Will,
 
-Ah, fair enough. It can probably wait another few years then!
+On Wed, 07 Jan 2026 18:07:00 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> FEAT_PAN has been around since ARMv8.1 (over 11 years ago), has no compiler
+> dependency (we have our own accessors), and is a great security benefit.
+> 
+> Drop CONFIG_ARM64_PAN, and make the support unconditionnal.
 
-Cheers,
+Since you mentioned that you were planning to merge this patch, I'd
+like to point out that a related change[1] is on its way to Linus via
+the KVM tree for 6.19. It is also in -next due to dependencies.
+
+Could you please place these patches on a branch that I can pull in
+the kvmarm tree to resolve the conflict? It really amounts to
+reverting this patch now that we are guaranteed to have PAN on an
+PAN- machine.
+
+Thanks,
 
 	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=fixes&id=86364832ba6f2777db98391060b2d7f69938ad9b
 
 -- 
 Without deviation from the norm, progress is not possible.
