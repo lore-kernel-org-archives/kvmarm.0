@@ -1,100 +1,101 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8563EDAB1
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 11:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3DE2C11D5
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 15:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080946; cv=none; b=ruZdlFNDNXfGGIksF9ruLHZ/McREDVERlUFAGGcvByKafiHgrc+vKeViRKYsPH86jbRYKPkJDAgwpPuOGG+fkl0jCw7AvCjvnieG9wIJDCJBtesxFkbf5MkLeN45kYFRv7//vxDcdJuJneDoc1Uo3yx8KlwgUauvIsOKvUgiD1M=
+	t=1769094211; cv=none; b=ASLiFRzsteAw0tD4R7C8Sy3DZUUuIWh3qKFT3oKwuOCVtArr/CLfzIxSCY8DpjWOJ+4zMGgzGB6mu7PqRtTmJvi0Fg5wR+nY7M6/+sANu/fPJRcRvDi3gKbjPwjADLReykw5slg7frYno7PDk9QA5d/NuryFFdxpdh2yZ4xmqoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080946; c=relaxed/simple;
-	bh=OdWY89KmceouUs7zXgKdsrUWStlEJZ/cbcWK+E3LnJg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Pm10ihpdwba6z/L22b00HowzsaYpio7045xxGZ+8AAKfh53qY4Muueaa+WERLb382cm16g1ZcXx1usD+7w73+W3RN0NRXwMqPziOzcokw8IymqfFpHTdO/Ef9ZaV/QqItnhpa6n6KsfF69AhaH+ANsj3VVqRXF9jFja5swE3wuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qtt/PFFA; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
+	s=arc-20240116; t=1769094211; c=relaxed/simple;
+	bh=W7OL1DzXiTNMqnoJ2zpzUEZ753uxhw9UxvzRwjFtEyc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bszUY4ovvxsP/8aaVE2bNRbGINcWVyVgjPYVDQY4NNbGizYVshCw5LB0zxDbgg1qQLW3tFTZ75oplreFyeCCf9j/R9ez2lKeYE1b9qfYxdR/J+/4OH3OC0b/qtF5H21reTpfGPYLb6eKmJ46CmcmZPknvoBrWYhuAX+mgxo0jeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSCY3zfM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qtt/PFFA"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b8773bf3ddbso72149666b.1
-        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 03:22:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769080943; x=1769685743; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jzz0jXpTSjvajgmP5WETefk5h6QUuCbHINLblfWMNco=;
-        b=qtt/PFFAPGlbDqHUeHRKHULiCybPzXEvpqq4LUAoITTOhgVkHmadKntPspbu2zM/wn
-         ppAWDBcDe2utQqGaHlpDKukazoxL7DbBbu8lizE/kptaecEcLQ4t5dKDDI5aQRMVD8qs
-         803g4ZMo/+MrMcq+inAcnPq362FDOwnIEGGynlV0c9NNgtCrT+CInKOSixwOJJJb/gRC
-         RJ9bj1LYjcofgLvl4YEc7Z2GayD+F+2ZPycSK0GBUj1FglonIc3II3qRARnyc+q+7PSm
-         n6Uo2QQpO2/dUA6OsSQWNHvgJvf/r8pdTO8PO1L1iWberMRMSnlguX4qhKwSzegRAViK
-         yZzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769080943; x=1769685743;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jzz0jXpTSjvajgmP5WETefk5h6QUuCbHINLblfWMNco=;
-        b=k87NE4uloTvW5KFJ5gItjmWBJc72bsFUj5cUBOJVGSSShLk+/uxm+WXd/JBm2BluFi
-         OHSl+OF5n/zYiyUVv8Bbs3li2wmgGKScvO1rBryzh0Jm9XBcqwcDeLsIPrOToJEO+G9s
-         zQgehzPv64Ic7AM2E04uOp5R62vbIHdTF1LuHIQPvUAEFKB5QDDeddwnjRigR1cqX2SD
-         8rO8/GxUd/p4hUWKooFWzA5sCXuE13j+OMGMJa1WQIzhEtiyXkvD1tWLyHR4p68Y0cd/
-         blDFR4zFtQCE2TnUAlnyJoWhS7bQQPsDm3AgM7znu9kaBjb5HTpdsNcLgOP0cuIq720r
-         yIeg==
-X-Gm-Message-State: AOJu0Yw4qXprGGJjIzEO3WAgR8tMhrMkXX8tnjI9E2HP6cuTnPGdRnYh
-	FMbnaCL3bdC/0GRuJyOeuWz9nBLIrsTLHgEdjzH9+1ij3RT6i3g05KCWwy9OKU81UHkKzQcxAGl
-	OvWKFXjuNWgd7mm5Wi7oncNQhS7mBNIBrr8R9OUtIeSREWdfEemacqc586BpJ9Qq5jRqjzH6yRg
-	6k5EFi9eSnJhOtywLKKRGJLN+wIlaKz7s=
-X-Received: from edsw3.prod.google.com ([2002:aa7:da43:0:b0:64b:595b:709f])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:fe07:b0:b83:1327:920d
- with SMTP id a640c23a62f3a-b880005a0e3mr620986066b.0.1769080942869; Thu, 22
- Jan 2026 03:22:22 -0800 (PST)
-Date: Thu, 22 Jan 2026 11:22:18 +0000
-In-Reply-To: <20260122112218.531948-1-tabba@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSCY3zfM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8546CC116C6;
+	Thu, 22 Jan 2026 15:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769094211;
+	bh=W7OL1DzXiTNMqnoJ2zpzUEZ753uxhw9UxvzRwjFtEyc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JSCY3zfMOG2pyN9chEr5QNrJet6vWraeb0GFj+2Gc2JMh9b4hWS1+dH5uZ4p7MAhk
+	 upJmDaKq1bG8Zb+8Ty/Q6C0SUSOF5KlTmb6rjCcPv/l6AHESoh8YLCL+LjBT2fvZpu
+	 ezEEshS82H3rIKcv2ZCpBcrsikiohMyrjOM4SgDJPeyflNGP128ChDjGV4E47catyY
+	 gFD7Axsn+wCPMvC79Y4+W4ZBnOlQkQk75Vzgw44Jh2Ms4LbkijT+nPTe4xXxkLTaZi
+	 Sya/Z3gch/vT+UyA7cHvGszxfsp2x9f+b+SKtnBRvhJrLyixLHBajT+CiQ2kCuiUqC
+	 U2mHZaJDY1mbQ==
+Date: Thu, 22 Jan 2026 15:03:26 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 6/6] KVM: arm64: Simplify PAGE_S2_MEMATTR
+Message-ID: <aXI8PqEi0tnn6RP6@willie-the-truck>
+References: <20260119105651.255693-1-maz@kernel.org>
+ <20260119105651.255693-7-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260122112218.531948-1-tabba@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260122112218.531948-5-tabba@google.com>
-Subject: [PATCH v3 4/4] KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260119105651.255693-7-maz@kernel.org>
 
-When initializing HCR traps in protected mode, use kvm_has_mte() to
-check for MTE support rather than kvm_has_feat(kvm, ID_AA64PFR1_EL1,
-MTE, IMP).
+On Mon, Jan 19, 2026 at 10:56:51AM +0000, Marc Zyngier wrote:
+> Restore PAGE_S2_MEMATTR() to its former glory, keeping the use of
+> FWB as an implementation detail.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/pgtable-prot.h | 4 ++--
+>  arch/arm64/kvm/hyp/pgtable.c          | 6 ++----
+>  2 files changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index 161e8660edddc..d27e8872fe3c8 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -109,10 +109,10 @@ static inline bool __pure lpa2_is_enabled(void)
+>  #define PAGE_KERNEL_EXEC	__pgprot(_PAGE_KERNEL_EXEC)
+>  #define PAGE_KERNEL_EXEC_CONT	__pgprot(_PAGE_KERNEL_EXEC_CONT)
+>  
+> -#define PAGE_S2_MEMATTR(attr, has_fwb)					\
+> +#define PAGE_S2_MEMATTR(attr)						\
+>  	({								\
+>  		u64 __val;						\
+> -		if (has_fwb)						\
+> +		if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))		\
+>  			__val = PTE_S2_MEMATTR(MT_S2_FWB_ ## attr);	\
+>  		else							\
+>  			__val = PTE_S2_MEMATTR(MT_S2_ ## attr);		\
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 3c2f7967fdc03..34c9afa442932 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -660,11 +660,9 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
+>  	({								\
+>  		kvm_pte_t __attr;					\
+>  		if((pgt)->flags & KVM_PGTABLE_S2_AS_S1)			\
+> -			__attr = PAGE_S2_MEMATTR(AS_S1,			\
+> -						 stage2_has_fwb());	\
+> +			__attr = PAGE_S2_MEMATTR(AS_S1);		\
+>  		else							\
+> -			__attr = PAGE_S2_MEMATTR(attr,			\
+> -						 stage2_has_fwb());	\
+> +			__attr = PAGE_S2_MEMATTR(attr);			\
+>  									\
 
-kvm_has_mte() provides a more comprehensive check:
- - kvm_has_feat() only checks if MTE is in the guest's ID register view
-   (i.e., what we advertise to the guest)
- - kvm_has_mte() checks both system_supports_mte() AND whether
-   KVM_ARCH_FLAG_MTE_ENABLED is set for this VM instance
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+tbh, I'd probably just kill stage2_has_fwb() entirely and use the cap
+everywhere...
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 8911338961c5..9b933424e70a 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -82,7 +82,7 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
- 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
- 		val &= ~(HCR_AMVOFFEN);
- 
--	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, IMP)) {
-+	if (!kvm_has_mte(kvm)) {
- 		val |= HCR_TID5;
- 		val &= ~(HCR_DCT | HCR_ATA);
- 	}
--- 
-2.52.0.457.g6b5491de43-goog
+Up to you.
 
+Will
