@@ -1,54 +1,54 @@
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C803ECBD8
-	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 11:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8563EDAB1
+	for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 11:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769080945; cv=none; b=P4pGYxrdKx8QKBz8RbK9UY6tnZrS308Yse/R5vu+J6nANN4ddfO/NdpD+L8ceoP8utGqy/0XnryeDvJMQtcZ9gENbBUy0Om/n9flGgIQQFPCsF/48CbMSNEbt+mDFwjvDYUv7kKc+FJ1Gm2x91WQGsZYFRyJkHIRQcK6OoZFK+s=
+	t=1769080946; cv=none; b=ruZdlFNDNXfGGIksF9ruLHZ/McREDVERlUFAGGcvByKafiHgrc+vKeViRKYsPH86jbRYKPkJDAgwpPuOGG+fkl0jCw7AvCjvnieG9wIJDCJBtesxFkbf5MkLeN45kYFRv7//vxDcdJuJneDoc1Uo3yx8KlwgUauvIsOKvUgiD1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769080945; c=relaxed/simple;
-	bh=AFDNR9MQSw6tKC05e/O2QNZA6nlRYNoQOpO2C2wQWL4=;
+	s=arc-20240116; t=1769080946; c=relaxed/simple;
+	bh=OdWY89KmceouUs7zXgKdsrUWStlEJZ/cbcWK+E3LnJg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PY9OqivgYYG6lJWcNR45Xag0j0i4AIcQckEp5UAJz4NJK8PX/p2nxOC06641HaanoSwEj085UGOJKkvAkYkLoxGVUBYlr6LrYjdK9sqJPNN+RNAujMxhSNGkF+xikVZ01Vm1MRCYngkhOMw1qeoYFTs3DxLpkTvFrpkRp9Xwj/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3ksVTMbO; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=Pm10ihpdwba6z/L22b00HowzsaYpio7045xxGZ+8AAKfh53qY4Muueaa+WERLb382cm16g1ZcXx1usD+7w73+W3RN0NRXwMqPziOzcokw8IymqfFpHTdO/Ef9ZaV/QqItnhpa6n6KsfF69AhaH+ANsj3VVqRXF9jFja5swE3wuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qtt/PFFA; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3ksVTMbO"
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-42fd46385c0so526481f8f.0
-        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 03:22:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qtt/PFFA"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b8773bf3ddbso72149666b.1
+        for <kvmarm@lists.linux.dev>; Thu, 22 Jan 2026 03:22:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769080941; x=1769685741; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1769080943; x=1769685743; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+k1LmUzPe66jfGdVIo8KvWNogHSOvBXaX+ewOgvEHqk=;
-        b=3ksVTMbO2ic9brIx/2NuEB8UpnuRZak9KAmSZFGZZ7+LlM6pLRr+ZhJs4rOlRBwRSY
-         uTr4iQra1b4IcOKRk2u0SjqK8dFpe7qrXVlT038hqEXf91GXj10vgvJ2qk/PusNM29P7
-         ctpEsoOUCf+v1o56NgfrE6Gl76KRt7rmF4AKyqTVp6v4E4zhM2VXCKdb+J0kG8Nb4iXW
-         akjBzz9Hsj7kEG5UAt+0RzHUojzFSueu5E7F87mDJS1Nq//EgfKYe7fRPQWvlx88LGV2
-         fs6mM36wZngUbXoRMNKQOg8aceGF3QEqpanyi37FuY1hDOVbkCXKWvSjZDtsElJisMvK
-         hG6g==
+        bh=jzz0jXpTSjvajgmP5WETefk5h6QUuCbHINLblfWMNco=;
+        b=qtt/PFFAPGlbDqHUeHRKHULiCybPzXEvpqq4LUAoITTOhgVkHmadKntPspbu2zM/wn
+         ppAWDBcDe2utQqGaHlpDKukazoxL7DbBbu8lizE/kptaecEcLQ4t5dKDDI5aQRMVD8qs
+         803g4ZMo/+MrMcq+inAcnPq362FDOwnIEGGynlV0c9NNgtCrT+CInKOSixwOJJJb/gRC
+         RJ9bj1LYjcofgLvl4YEc7Z2GayD+F+2ZPycSK0GBUj1FglonIc3II3qRARnyc+q+7PSm
+         n6Uo2QQpO2/dUA6OsSQWNHvgJvf/r8pdTO8PO1L1iWberMRMSnlguX4qhKwSzegRAViK
+         yZzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769080941; x=1769685741;
+        d=1e100.net; s=20230601; t=1769080943; x=1769685743;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+k1LmUzPe66jfGdVIo8KvWNogHSOvBXaX+ewOgvEHqk=;
-        b=Sv9sG+BMj1mDdnpH4+qfybmyFrGa+YuEoXqj2sV8bCPX3Yfi6QvOeIDlk6J2kww1p8
-         Uem+N9yKdd9MdlvxtgXM56jM0gituJkVoizijwIMip6dgQZM1ZD3A1tGYz+1ybX1nEsG
-         JT+bZ8yS9t6p8isYmMieDVNfLRKs7cUT6TqEBfUxaiZhd9nfpRra792TrIp0nY0aW8kW
-         jImXp+MeQi6Mrt6qgfrmGcikRpp+BeiVTzxNlTKjKJ6F4zeD7FmKBzjsyd971lQYNfWE
-         SN27HN5NVcpRGHq04nahaPno0a2t+gYPgGw233CaCBYHAqvDGcXgAA+Ga7li9teXdvLz
-         jE/g==
-X-Gm-Message-State: AOJu0YyRkuYm0klroJS/qvwPSZw1vyv+ATBlHH34E4RqYA+3vq+I3LmU
-	6LuW0fstmZG+j5C8tieouNU0qKHqfQNd6hbXb8kdry31bDS5V6qNRME2MRXFx0kyqEDAFZU2BTy
-	t8a7NTvhdLWIOs+aun9QBO4/BeVFxpUOfa+fI6cLW0uVoauBa6S1dA9eiJrknJNW45CWXACRd6g
-	tcNjTnX125gf3l/H3KPEnsg17K7p2BMcA=
-X-Received: from wro14.prod.google.com ([2002:a05:6000:41ce:b0:435:9760:a8f1])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:48:b0:435:729b:c390
- with SMTP id ffacd0b85a97d-435729bc399mr20497315f8f.47.1769080940774; Thu, 22
- Jan 2026 03:22:20 -0800 (PST)
-Date: Thu, 22 Jan 2026 11:22:16 +0000
+        bh=jzz0jXpTSjvajgmP5WETefk5h6QUuCbHINLblfWMNco=;
+        b=k87NE4uloTvW5KFJ5gItjmWBJc72bsFUj5cUBOJVGSSShLk+/uxm+WXd/JBm2BluFi
+         OHSl+OF5n/zYiyUVv8Bbs3li2wmgGKScvO1rBryzh0Jm9XBcqwcDeLsIPrOToJEO+G9s
+         zQgehzPv64Ic7AM2E04uOp5R62vbIHdTF1LuHIQPvUAEFKB5QDDeddwnjRigR1cqX2SD
+         8rO8/GxUd/p4hUWKooFWzA5sCXuE13j+OMGMJa1WQIzhEtiyXkvD1tWLyHR4p68Y0cd/
+         blDFR4zFtQCE2TnUAlnyJoWhS7bQQPsDm3AgM7znu9kaBjb5HTpdsNcLgOP0cuIq720r
+         yIeg==
+X-Gm-Message-State: AOJu0Yw4qXprGGJjIzEO3WAgR8tMhrMkXX8tnjI9E2HP6cuTnPGdRnYh
+	FMbnaCL3bdC/0GRuJyOeuWz9nBLIrsTLHgEdjzH9+1ij3RT6i3g05KCWwy9OKU81UHkKzQcxAGl
+	OvWKFXjuNWgd7mm5Wi7oncNQhS7mBNIBrr8R9OUtIeSREWdfEemacqc586BpJ9Qq5jRqjzH6yRg
+	6k5EFi9eSnJhOtywLKKRGJLN+wIlaKz7s=
+X-Received: from edsw3.prod.google.com ([2002:aa7:da43:0:b0:64b:595b:709f])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:fe07:b0:b83:1327:920d
+ with SMTP id a640c23a62f3a-b880005a0e3mr620986066b.0.1769080942869; Thu, 22
+ Jan 2026 03:22:22 -0800 (PST)
+Date: Thu, 22 Jan 2026 11:22:18 +0000
 In-Reply-To: <20260122112218.531948-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260122112218.531948-1-tabba@google.com>
 X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260122112218.531948-3-tabba@google.com>
-Subject: [PATCH v3 2/4] KVM: arm64: Trap MTE access and discovery when MTE is disabled
+Message-ID: <20260122112218.531948-5-tabba@google.com>
+Subject: [PATCH v3 4/4] KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org
 Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
@@ -67,81 +67,34 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-If MTE is not supported by the hardware, or is disabled in the kernel
-configuration (`CONFIG_ARM64_MTE=n`) or command line (`arm64.nomte`),
-the kernel stops advertising MTE to userspace and avoids using MTE
-instructions. However, this is a software-level disable only.
+When initializing HCR traps in protected mode, use kvm_has_mte() to
+check for MTE support rather than kvm_has_feat(kvm, ID_AA64PFR1_EL1,
+MTE, IMP).
 
-When MTE hardware is present and enabled by EL3 firmware, leaving
-`HCR_EL2.ATA` set allows the host to execute MTE instructions (STG, LDG,
-etc.) and access allocation tags in physical memory.
-
-Prevent this by clearing `HCR_EL2.ATA` when MTE is disabled. Remove it
-from the `HCR_HOST_NVHE_FLAGS` default, and conditionally set it in
-`cpu_prepare_hyp_mode()` only when `system_supports_mte()` returns true.
-This causes MTE instructions to trap to EL2 when `HCR_EL2.ATA` is
-cleared.
-
-Additionally, set `HCR_EL2.TID5` when MTE is disabled. This traps reads
-of `GMID_EL1` (Multiple tag transfer ID register) to EL2, preventing the
-discovery of MTE parameters (such as tag block size) when the feature is
-suppressed.
-
-Early boot code in `head.S` temporarily keeps `HCR_ATA` set to avoid
-special-casing initialization paths. This is safe because this code
-executes before untrusted code runs and will clear `HCR_ATA` if MTE is
-disabled.
+kvm_has_mte() provides a more comprehensive check:
+ - kvm_has_feat() only checks if MTE is in the guest's ID register view
+   (i.e., what we advertise to the guest)
+ - kvm_has_mte() checks both system_supports_mte() AND whether
+   KVM_ARCH_FLAG_MTE_ENABLED is set for this VM instance
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/include/asm/kvm_arm.h | 2 +-
- arch/arm64/kernel/head.S         | 2 +-
- arch/arm64/kvm/arm.c             | 6 ++++++
- 3 files changed, 8 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index e500600e4b9b..752e3e1604e8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -101,7 +101,7 @@
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
- 			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 | HCR_TID1)
--#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
-+#define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
- #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H | HCR_AMO | HCR_IMO | HCR_FMO)
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 8911338961c5..9b933424e70a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -82,7 +82,7 @@ static void pvm_init_traps_hcr(struct kvm_vcpu *vcpu)
+ 	if (!kvm_has_feat(kvm, ID_AA64PFR0_EL1, AMU, IMP))
+ 		val &= ~(HCR_AMVOFFEN);
  
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index ca04b338cb0d..87a822e5c4ca 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -299,7 +299,7 @@ SYM_INNER_LABEL(init_el2, SYM_L_LOCAL)
- 	isb
- 0:
- 
--	init_el2_hcr	HCR_HOST_NVHE_FLAGS
-+	init_el2_hcr	HCR_HOST_NVHE_FLAGS | HCR_ATA
- 	init_el2_state
- 
- 	/* Hypervisor stub */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 4f80da0c0d1d..aeac113e5e74 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2044,6 +2044,12 @@ static void __init cpu_prepare_hyp_mode(int cpu, u32 hyp_va_bits)
- 		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
- 	else
- 		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
-+
-+	if (system_supports_mte())
-+		params->hcr_el2 |= HCR_ATA;
-+	else
-+		params->hcr_el2 |= HCR_TID5;
-+
- 	if (cpus_have_final_cap(ARM64_KVM_HVHE))
- 		params->hcr_el2 |= HCR_E2H;
- 	params->vttbr = params->vtcr = 0;
+-	if (!kvm_has_feat(kvm, ID_AA64PFR1_EL1, MTE, IMP)) {
++	if (!kvm_has_mte(kvm)) {
+ 		val |= HCR_TID5;
+ 		val &= ~(HCR_DCT | HCR_ATA);
+ 	}
 -- 
 2.52.0.457.g6b5491de43-goog
 
