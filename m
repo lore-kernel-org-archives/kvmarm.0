@@ -1,115 +1,119 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFCA1DF97C
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 19:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E8D28A3FA
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 19:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769195803; cv=none; b=vCc9sCU78uZG3ruaPADebDGGFAWVZkC5ajg/FJxxLMKeD61G+tC1dkJOinq98jUhbY9RNYayb7+G6OkBWklYD6SwMWe1PXjsZGAVsXJLhupwYeUuDVrSN/z5hhgRxQXB1nSvgc6bzRYdyKPdX/YYio5IUpVtlWvh4Svwf1zrzZ8=
+	t=1769196234; cv=none; b=aBMHMmRjbqjFUANhxoaDzHcu+cWfniWV56e3yEt49XIk8k3DMPbU7lqjC7pgH4owEevtah7AUbvpQzR6iDlgTEgVikiPhm2IVsCq5vOVR4kz454MPZ1vn5lzeM/hkQDsUiSjCg6Xu3PJh5/vyTu2ptVttsySpaVqc9xKxjPsDxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769195803; c=relaxed/simple;
-	bh=9rLCNYcKbPurJNMKZwPicJGqVzWqMF0eXcse6bywNwM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QqevVot7DRtZTNPi4YtfQIMWsJg7Aw1ZMemKtg5KIID1nR1Y+JsGV2ucWUQr1JHJWyISuViJHnFgGudZzjXJp1FUG/c762wgf7hR/a6yzboNnwMagOxn9XzG/tBBr0AUZj87ltz/soBDGuG+jSeth9ozScnMEnSYGrjGEj97o7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VF+4R3w4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769196234; c=relaxed/simple;
+	bh=ACfRcKHgQFUI4e3SZ6RwDZkzm7PXEJjxfGWgb+B+2ag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EL7FzEnTMKUKmVxxJLsMOCfMJgtrproiXVW+Oc9exhU/Eqy0FeE07mIv2Hm18+EwVQTm9sbh812WeQjCfHRY5d9Dh86fKIkmd78NWjRnBWY27mljaS/urtwBDB4Ogf5mgkZVQTs10jdHqGr9WQlST2uWCKpc18dQ3uq8XccIwO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D/Odg4pP; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VF+4R3w4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB28C4CEF1;
-	Fri, 23 Jan 2026 19:16:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769195803;
-	bh=9rLCNYcKbPurJNMKZwPicJGqVzWqMF0eXcse6bywNwM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VF+4R3w4Rdp3BO9CrR+APcM3lKO2ZXFeBeQO76RWwdG4CT49Ur3US8AUt8In+CQF6
-	 GUD2rbFb32917CjtCBEhs+SBp+al+g2QbXroaSdfUK2twtgWw5eB6okv078RNNIRmh
-	 xIHlyDZS37W66NqCQfGj6xI0vsBmy1TJEx+/idAIp/ohWH0w8QqiG+2a4oGO6OGeKR
-	 V76lCTdYodzvMli22K5DtMwTku37JgFm/IvICecB0z7p9o14MKritmZQWDjgygv4i/
-	 GHdDm1vk9dhQi9xliWXw+8GnElH4CP1jy03QvirhL7rOMBJDkqqgC3nDDJLdaIcaff
-	 bhk5XWxZwo6fA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vjMe9-00000005A2V-3DAj;
-	Fri, 23 Jan 2026 19:16:41 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v2 5/5] KVM: arm64: Simplify PAGE_S2_MEMATTR
-Date: Fri, 23 Jan 2026 19:16:37 +0000
-Message-ID: <20260123191637.715429-6-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260123191637.715429-1-maz@kernel.org>
-References: <20260123191637.715429-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D/Odg4pP"
+Date: Fri, 23 Jan 2026 13:23:41 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1769196227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oa7iGNimmxf4NkLdFCeEfPikE1lPlYJxPyIsdcse1T4=;
+	b=D/Odg4pPv448bA8y0YfiFsAHYHxAnTqkRNcAYUpsZzhVdTENW4aD4cedde5+qiGI2BWtMx
+	sVIGf+jvSVk79VF9eRThVaBq42D8VC6aqWsqecC7MZup6EwV6wuMfy+XkZhLWyjb+gyQPi
+	G50wkMTcVVzzxqeryfqEZP8yYpFQN18=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, 
+	eric.auger@redhat.com, maz@kernel.org, kvmarm@lists.linux.dev, 
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v6 00/14] arm64: EL2 support
+Message-ID: <ixq5fcyiey4prwl5luzlemznvjd6hk2pqj73rmlinnl233gfdy@b6mns7sf3dv5>
+References: <20260123165053.2250754-1-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com, tabba@google.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123165053.2250754-1-joey.gouly@arm.com>
+X-Migadu-Flow: FLOW_OUT
 
-Restore PAGE_S2_MEMATTR() to its former glory, keeping the use of
-FWB as an implementation detail.
+On Fri, Jan 23, 2026 at 04:50:39PM +0000, Joey Gouly wrote:
+> Hi all,
+> 
+> This series is for adding support to running the kvm-unit-tests at EL2.
+> 
+> Changes since v5[1]:
+> 	- make debug bp/wp skip on EL2
+> 	- fix microbench test
+> 	- add to CI
+> 	- applied the fixup's Drew talked about in v5
+> 
+> About this failure in micro-bench:
+> 
+> 	- micro-bench hits the assert in gicv3_lpi_alloc_tables()
+> 		lib/arm/gic-v3.c:183: assert failed: gicv3_data.redist_base[cpu]: Redistributor for cpu0 not initialized. Did cpu0 enable the GIC?	
+> 
+> in micro-bench.c lpi_prep() looks like this:
+> 
+> 	static bool lpi_prep(void)
+> 	{
+> 	        struct its_collection *col1;
+> 	        struct its_device *dev2;
+> 	        if (!gicv3_its_base())
+> 	                return false;
+> 
+> QEMU by default runs with gic-v2, so gicv3_its_base() should have returned
+> false and the lpi tests skipped. However because of the overflow mentioned in
+> the first commit (new to v6), the its_data.base was being overwritten to a
+> non-zero value.  This meant the test tried to do gic-v3 things on a gic-v2.
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-Tested-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/pgtable-prot.h | 4 ++--
- arch/arm64/kvm/hyp/pgtable.c          | 5 ++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+Nice work on the micro-bench/gic issue. Unfortunately the timer test still
+times out, and that breaks the new CI since that test is listed.
 
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index 161e8660edddc..d27e8872fe3c8 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -109,10 +109,10 @@ static inline bool __pure lpa2_is_enabled(void)
- #define PAGE_KERNEL_EXEC	__pgprot(_PAGE_KERNEL_EXEC)
- #define PAGE_KERNEL_EXEC_CONT	__pgprot(_PAGE_KERNEL_EXEC_CONT)
- 
--#define PAGE_S2_MEMATTR(attr, has_fwb)					\
-+#define PAGE_S2_MEMATTR(attr)						\
- 	({								\
- 		u64 __val;						\
--		if (has_fwb)						\
-+		if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))		\
- 			__val = PTE_S2_MEMATTR(MT_S2_FWB_ ## attr);	\
- 		else							\
- 			__val = PTE_S2_MEMATTR(MT_S2_ ## attr);		\
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 00e33a16494bd..a6f7533ce4974 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -653,13 +653,12 @@ void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 
- #define KVM_S2_MEMATTR(pgt, attr)					\
- 	({								\
--		bool __fwb = cpus_have_final_cap(ARM64_HAS_STAGE2_FWB);	\
- 		kvm_pte_t __attr;					\
- 									\
- 		if ((pgt)->flags & KVM_PGTABLE_S2_AS_S1)		\
--			__attr = PAGE_S2_MEMATTR(AS_S1,	__fwb);		\
-+			__attr = PAGE_S2_MEMATTR(AS_S1);		\
- 		else							\
--			__attr = PAGE_S2_MEMATTR(attr, __fwb);		\
-+			__attr = PAGE_S2_MEMATTR(attr);			\
- 									\
- 		__attr;							\
- 	})
--- 
-2.47.3
+# No EL2
 
+$ ./run_tests.sh -g timer
+PASS timer (18 tests)
+
+# EL2
+
+$ EL2=y ./run_tests.sh -g timer
+FAIL timer (timeout; duration=10s)
+
+$ TIMEOUT=90s EL2=y ./run_tests.sh -g timer
+FAIL timer (timeout; duration=90s)
+
+$ cat logs/timer.log
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine virt,virtualization=on -accel tcg -cpu max -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/timer.flat -smp 1 # -initrd /tmp/tmp.N15fhaPbhB
+CNTFRQ_EL0   : 0x0000000003b9aca0
+CNTPCT_EL0   : 0x00000000001d3a1f
+CNTP_CTL_EL0 : 0x0000000000000000
+CNTP_CVAL_EL0: 0x0000000000000000
+CNTVCT_EL0   : 0x00000000001d5884
+CNTV_CTL_EL0 : 0x0000000000000000
+CNTV_CVAL_EL0: 0x0000000000000000
+INFO: vtimer-busy-loop: After timer: 0x000000000027ae86
+INFO: vtimer-busy-loop: Expected   : 0x000000000027415b
+INFO: vtimer-busy-loop: Difference : 450 us
+PASS: vtimer-busy-loop: latency within 10 ms
+FAIL: vtimer-busy-loop: interrupt received
+PASS: vtimer-busy-loop: not pending before
+FAIL: vtimer-busy-loop: interrupt signal pending
+PASS: vtimer-busy-loop: no interrupt when timer is disabled
+PASS: vtimer-busy-loop: interrupt signal no longer pending
+PASS: vtimer-busy-loop: interrupt signal not pending
+INFO: vtimer-busy-loop: waiting for interrupt...
+qemu-system-aarch64: terminating on signal 15 from pid 112137 (timeout)
+
+
+Thanks,
+drew
