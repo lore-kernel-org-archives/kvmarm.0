@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12DE32D44E
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 14:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E1E330640
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 14:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769178504; cv=none; b=Amlz6LDUv1HIUFcmvd6oWp4QdrcF3SOgh9bBOgzv+VQReUQky5L64RZaRXz26i+HdTGusDy/TD2Zr+RuagLnQmx/ddm4qAzp0vZdhblnIRS8Y7S0OjO+P1K2Q6LpfLnbcDod1JWMuEcaVfb0pb3xF4JJezRIxmdtRS0dOommQxk=
+	t=1769178507; cv=none; b=PoONMzvID7wpiO3FEshcqtVqdcQirxHfy6m7Y3lqcDAUW07ju/zoVPabLKvkTFaHsU8otjElCKpl6ukwGzE3+xHh9aqgA0lLQj1KDiu/ZErtuJq/eyDlKL9eMDnGQaUbQb6EwG6wtoA/m3FYKkupXweQeJxEsczOATX9wBjpht8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769178504; c=relaxed/simple;
-	bh=bb+XBpULIKxHk5zQmPBWU98wAJkz6KkhOxQEMs7acXA=;
+	s=arc-20240116; t=1769178507; c=relaxed/simple;
+	bh=eq1t1+g9UJ3juuwCMJmc7estKsJWG6W1oyB8JBKlOW4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CkImt9UUINQNZUEkvLzd2rOGh8DGMno9Uu9WjygbrXe7Dbi94fLAZhRMQlywnvGlB1SOeFuXA+Uay4QvvjjOfqN4rpnwalgFcnFh71FKAp9WJPT0kP0pnn0M47nXPpBLWsd6/RRF30rY1WQxO73jLThaW6+xOwk88hOFg13tNN0=
+	 MIME-Version; b=rDMdRWFuhOR1DZFYaftBqv0l1cFIL3ooM0JaYApDR2byQu5X9YsDv3ZW+sPGJfFkNFYYocEQo77eUM+Gl1H5vCD4+6EX/UKcVCNI610Qg/Usg7RMgyYqXyHkw280cswsrK/OD2tDXNnlDXE4pJiIXA1NW52R9uFIzrccrrehb6A=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB3B71515;
-	Fri, 23 Jan 2026 06:28:15 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C05E61476;
+	Fri, 23 Jan 2026 06:28:17 -0800 (PST)
 Received: from e134369.cambridge.arm.com (e134369.arm.com [10.1.34.161])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E67DE3F740;
-	Fri, 23 Jan 2026 06:28:20 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B656E3F740;
+	Fri, 23 Jan 2026 06:28:22 -0800 (PST)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Will Deacon <will@kernel.org>
@@ -26,9 +26,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: [PATCH kvmtool v5 6/7] arm64: Generate HYP timer interrupt specifiers
-Date: Fri, 23 Jan 2026 14:27:28 +0000
-Message-ID: <20260123142729.604737-7-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v5 7/7] arm64: Handle virtio endianness reset when running nested
+Date: Fri, 23 Jan 2026 14:27:29 +0000
+Message-ID: <20260123142729.604737-8-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260123142729.604737-1-andre.przywara@arm.com>
 References: <20260123142729.604737-1-andre.przywara@arm.com>
@@ -42,99 +42,115 @@ Content-Transfer-Encoding: 8bit
 
 From: Marc Zyngier <maz@kernel.org>
 
-FEAT_VHE introduced a non-secure EL2 virtual timer, along with its
-interrupt line. Consequently the arch timer DT binding introduced a fifth
-interrupt to communicate this interrupt number.
-
-Refactor the interrupts property generation code to deal with a variable
-number of interrupts, and forward five interrupts instead of four in case
-nested virt is enabled.
+When running an EL2 guest, we need to make sure we don't sample
+SCTLR_EL1 to work out the virtio endianness, as this is likely
+to be a bit random.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
 ---
- arm64/arm-cpu.c           |  4 +---
- arm64/include/kvm/timer.h |  2 +-
- arm64/timer.c             | 29 ++++++++++++-----------------
- 3 files changed, 14 insertions(+), 21 deletions(-)
+ arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+ arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+ 2 files changed, 40 insertions(+), 12 deletions(-)
 
-diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
-index 0843ac05..5b5484d8 100644
---- a/arm64/arm-cpu.c
-+++ b/arm64/arm-cpu.c
-@@ -12,10 +12,8 @@
+diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+index 1af394aa..85646ad4 100644
+--- a/arm64/include/kvm/kvm-cpu-arch.h
++++ b/arm64/include/kvm/kvm-cpu-arch.h
+@@ -10,8 +10,9 @@
+ #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+ #define ARM_CPU_ID		3, 0, 0, 0
+ #define ARM_CPU_ID_MPIDR	5
+-#define ARM_CPU_CTRL		3, 0, 1, 0
+-#define ARM_CPU_CTRL_SCTLR_EL1	0
++#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
++#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
++#define SYS_HCR_EL2		3, 4, 1, 1, 0
  
- static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ struct kvm_cpu {
+ 	pthread_t	thread;
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 5e4f3a7d..35e1c639 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -12,6 +12,7 @@
+ 
+ #define SCTLR_EL1_E0E_MASK	(1 << 24)
+ #define SCTLR_EL1_EE_MASK	(1 << 25)
++#define HCR_EL2_TGE		(1 << 27)
+ 
+ static int debug_fd;
+ 
+@@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
  {
--	int timer_interrupts[4] = {13, 14, 11, 10};
--
- 	gic__generate_fdt_nodes(fdt, kvm);
--	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
-+	timer__generate_fdt_nodes(fdt, kvm);
- 	pmu__generate_fdt_nodes(fdt, kvm);
+ 	struct kvm_one_reg reg;
+ 	u64 psr;
+-	u64 sctlr;
++	u64 sctlr, bit;
++	u64 hcr = 0;
+ 
+ 	/*
+ 	 * Quoting the definition given by Peter Maydell:
+@@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+ 	 * We first check for an AArch32 guest: its endianness can
+ 	 * change when using SETEND, which affects the CPSR.E bit.
+ 	 *
+-	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+-	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
++	 * If we're AArch64, determine which SCTLR register to use,
++	 * depending on NV being used or not. Then use either the E0E
++	 * bit for EL0, or the EE bit for EL1/EL2.
+ 	 */
+ 	reg.id = ARM64_CORE_REG(regs.pstate);
+ 	reg.addr = (u64)&psr;
+@@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+ 	if (psr & PSR_MODE32_BIT)
+ 		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+ 
+-	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
++	if (vcpu->kvm->cfg.arch.nested_virt) {
++		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
++		reg.addr = (u64)&hcr;
++		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
++			die("KVM_GET_ONE_REG failed (HCR_EL2)");
++	}
++
++	switch (psr & PSR_MODE_MASK) {
++	case PSR_MODE_EL0t:
++		if (hcr & HCR_EL2_TGE)
++			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
++		else
++			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
++		bit = SCTLR_EL1_E0E_MASK;
++		break;
++	case PSR_MODE_EL1t:
++	case PSR_MODE_EL1h:
++		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
++		bit = SCTLR_EL1_EE_MASK;
++		break;
++	case PSR_MODE_EL2t:
++	case PSR_MODE_EL2h:
++		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
++		bit = SCTLR_EL1_EE_MASK;
++		break;
++	default:
++		die("What's that mode???\n");
++	}
++
+ 	reg.addr = (u64)&sctlr;
+ 	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+-		die("KVM_GET_ONE_REG failed (SCTLR_EL1)");
++		die("KVM_GET_ONE_REG failed (SCTLR_ELx)");
+ 
+-	if ((psr & PSR_MODE_MASK) == PSR_MODE_EL0t)
+-		sctlr &= SCTLR_EL1_E0E_MASK;
+-	else
+-		sctlr &= SCTLR_EL1_EE_MASK;
+-	return sctlr ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
++	return (sctlr & bit) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
  }
  
-diff --git a/arm64/include/kvm/timer.h b/arm64/include/kvm/timer.h
-index 928e9ea7..81e093e4 100644
---- a/arm64/include/kvm/timer.h
-+++ b/arm64/include/kvm/timer.h
-@@ -1,6 +1,6 @@
- #ifndef ARM_COMMON__TIMER_H
- #define ARM_COMMON__TIMER_H
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs);
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm);
- 
- #endif /* ARM_COMMON__TIMER_H */
-diff --git a/arm64/timer.c b/arm64/timer.c
-index 861f2d99..2ac6144f 100644
---- a/arm64/timer.c
-+++ b/arm64/timer.c
-@@ -5,31 +5,26 @@
- #include "kvm/timer.h"
- #include "kvm/util.h"
- 
--void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm, int *irqs)
-+void timer__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	const char compatible[] = "arm,armv8-timer\0arm,armv7-timer";
- 	u32 cpu_mask = gic__get_fdt_irq_cpumask(kvm);
--	u32 irq_prop[] = {
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[0]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	int irqs[5] = {13, 14, 11, 10, 12};
-+	int nr = ARRAY_SIZE(irqs);
-+	u32 irq_prop[nr * 3];
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[1]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
-+	if (!kvm->cfg.arch.nested_virt)
-+		nr--;
- 
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[2]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--
--		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
--		cpu_to_fdt32(irqs[3]),
--		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW),
--	};
-+	for (int i = 0; i < nr; i++) {
-+		irq_prop[i * 3 + 0] = cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI);
-+		irq_prop[i * 3 + 1] = cpu_to_fdt32(irqs[i]);
-+		irq_prop[i * 3 + 2] = cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_LOW);
-+	}
- 
- 	_FDT(fdt_begin_node(fdt, "timer"));
- 	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
--	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, nr * 3 * sizeof(irq_prop[0])));
- 	_FDT(fdt_property(fdt, "always-on", NULL, 0));
- 	if (kvm->cfg.arch.force_cntfrq > 0)
- 		_FDT(fdt_property_cell(fdt, "clock-frequency", kvm->cfg.arch.force_cntfrq));
+ void kvm_cpu__show_code(struct kvm_cpu *vcpu)
 -- 
 2.43.0
 
