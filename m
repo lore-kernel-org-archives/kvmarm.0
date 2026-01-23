@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC1E1FDA61
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95399285CBA
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769187071; cv=none; b=OFbhkRtCp+niVNXxAqSzJTepzpNTZUqKIdaKO4lXm3v99Ek16iUOHCLW29mx8de//2KGKAZq23E/0WX7qjrLzXed1BlqNuTGaMPT07CxagVyJYIEcqIAAs9skyDYjXs6fKq/XW+BDTgXLtrhNT8cI1meR2cjxo1AGDOwvQSny34=
+	t=1769187073; cv=none; b=seVFcalMk4g3l62b9SXToGMcb+PNexeBV0E3D/j2T1DBLJgdHLOv58tVFIEYBB2LCEbNHAo1h5rpIuarZXufHLglrNoHT7f6+HnoLdm77J5R0UQq4azwkE7yt8OgC49an2ZGy5tyVefzGXtij2SzLNTy9AOCNzkOvQImbVVk9Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769187071; c=relaxed/simple;
-	bh=Jq9hTm+PWw3J7nwlRwF/nIpZ3RQ50hoxepqhSZ3LRYQ=;
+	s=arc-20240116; t=1769187073; c=relaxed/simple;
+	bh=qMT4SOjpBVl5muZrm1yCxr4j1oujyqsjailAc+wXJlQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kgDlgq2/4MvlUAPwolaaYHhhe5IAWQoBR7AvRjdI8+Eg17pq+IL8zd9BY673VoV9EIcT95gTthNqB17myFKTCZS4GUsre75wIxLY9n/5Ijg/cOeUkrXHZysoqtMTTZy4Gw5SC01tmwLAwCcgFdDhKpWs5/Ic59Q0DZEhN6Wmo7A=
+	 MIME-Version; b=gQy9qspHMWf51s9LePTokG9j2LZ6PZmQggaIbAYIKyh1wpANk9vrlcsuhtdr+rQVkrmnlt0kl6Bw1Lsqtjq3+XDsnWzPYy3p1HvXINkFomXb67ImDsIpRD+8iijHZ9EGpy3QOUUaQfJuE4JZcLOyQSgjuQtvBhJ8RnYV+EifuzU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 911141596;
-	Fri, 23 Jan 2026 08:51:02 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4021D1684;
+	Fri, 23 Jan 2026 08:51:04 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D38373F694;
-	Fri, 23 Jan 2026 08:51:07 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 662FB3F694;
+	Fri, 23 Jan 2026 08:51:09 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: alexandru.elisei@arm.com,
@@ -27,9 +27,9 @@ Cc: alexandru.elisei@arm.com,
 	maz@kernel.org,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v6 04/14] arm64: efi: initialise SCTLR_ELx fully
-Date: Fri, 23 Jan 2026 16:50:43 +0000
-Message-Id: <20260123165053.2250754-5-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v6 05/14] arm64: efi: initialise the EL
+Date: Fri, 23 Jan 2026 16:50:44 +0000
+Message-Id: <20260123165053.2250754-6-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260123165053.2250754-1-joey.gouly@arm.com>
 References: <20260123165053.2250754-1-joey.gouly@arm.com>
@@ -41,75 +41,62 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Don't rely on the value of SCTLR_ELx when booting via EFI.
+Initialise the exception level, which may include dropping to EL1 from EL2,
+if VHE is not supported.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Acked-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- lib/arm/asm/setup.h   |  6 ++++++
- lib/arm/setup.c       |  2 ++
- lib/arm64/processor.c | 14 ++++++++++++++
- 3 files changed, 22 insertions(+)
+ arm/efi/crt0-efi-aarch64.S | 5 +++++
+ lib/arm/asm/setup.h        | 2 ++
+ lib/arm/setup.c            | 2 ++
+ 3 files changed, 9 insertions(+)
 
+diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
+index 71ce2794..5632fee0 100644
+--- a/arm/efi/crt0-efi-aarch64.S
++++ b/arm/efi/crt0-efi-aarch64.S
+@@ -147,6 +147,11 @@ _start:
+ 0:	ldp		x29, x30, [sp], #32
+ 	ret
+ 
++.globl do_init_el
++do_init_el:
++	init_el x16
++	ret
++
+ 	.section	.data
+ 
+ .balign 65536
 diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index 9f8ef82e..4e60d552 100644
+index 4e60d552..bf05ffbb 100644
 --- a/lib/arm/asm/setup.h
 +++ b/lib/arm/asm/setup.h
-@@ -28,6 +28,12 @@ void setup(const void *fdt, phys_addr_t freemem_start);
- 
+@@ -29,8 +29,10 @@ void setup(const void *fdt, phys_addr_t freemem_start);
  #include <efi.h>
  
-+#ifdef __aarch64__
-+void setup_efi_sctlr(void);
-+#else
-+static inline void setup_efi_sctlr(void) {}
-+#endif
-+
- efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
- 
+ #ifdef __aarch64__
++void do_init_el(void);
+ void setup_efi_sctlr(void);
+ #else
++static inline void do_init_el(void) {}
+ static inline void setup_efi_sctlr(void) {}
  #endif
+ 
 diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 67b5db07..49f5e0f6 100644
+index 49f5e0f6..5ff40b54 100644
 --- a/lib/arm/setup.c
 +++ b/lib/arm/setup.c
 @@ -349,6 +349,8 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
  {
  	efi_status_t status;
  
-+	setup_efi_sctlr();
++	do_init_el();
 +
+ 	setup_efi_sctlr();
+ 
  	exceptions_init();
- 
- 	memregions_init(arm_mem_regions, NR_MEM_REGIONS);
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index eb93fd7c..f9fea519 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -8,6 +8,7 @@
- #include <libcflat.h>
- #include <asm/ptrace.h>
- #include <asm/processor.h>
-+#include <asm/setup.h>
- #include <asm/thread_info.h>
- 
- static const char *vector_names[] = {
-@@ -271,3 +272,16 @@ bool __mmu_enabled(void)
- {
- 	return read_sysreg(sctlr_el1) & SCTLR_EL1_M;
- }
-+
-+#ifdef CONFIG_EFI
-+
-+void setup_efi_sctlr(void)
-+{
-+	/*
-+	 * EFI exits boot services with SCTLR_ELx.M=1, so keep
-+	 * the MMU enabled.
-+	 */
-+	write_sysreg(INIT_SCTLR_EL1_MMU_OFF | SCTLR_EL1_M, sctlr_el1);
-+}
-+
-+#endif
 -- 
 2.25.1
 
