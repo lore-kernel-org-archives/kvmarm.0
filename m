@@ -1,200 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC57291864;
-	Fri, 23 Jan 2026 16:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D302C236B;
+	Fri, 23 Jan 2026 16:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769184188; cv=none; b=p1GyH7TmRxgrWR7sBTaFwyf2/06KMlo6yWZI0B6UN0gMZS/q5+vafDi1a6m9qU96RZd9YUjUvdbCuVbGGj8pifgxRbtvO5YmIZUDzGp+/aKroesJ1IqfRXvD1y1+rwD0/wTrs1KTohj+d0d+collsc/csryi5fK3IdmELbyZnZ4=
+	t=1769186839; cv=none; b=Dwk4CNNV/CTDLbDEgR9qmS7OnEbn/Osb/kStyaV6x0suRnTnzFyvi8yraiUQdoekJ0b/639C4VqK+pYYniG7brAhQ45ipxSpUlQxiPZuugUtLPQ0Nhaoqwq74BLU/W3ibBNFczZfeWtgxmpsRh7sks/ypf5rNRWL8A44ZzYoARI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769184188; c=relaxed/simple;
-	bh=hz0hZLm5qBmhnhpon5YAJbFAAU2S/FnpSRE7JAKDmuY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F6pDYR1YWOasgpyhkE1KKee0OzbcqWe2r+Wf7Bu+ZSMfzdUagI2Osy/H3kE32Y1SXyt6ylreJ0JE2KIRP1W4hfXL1xv3yPDpkPmJWtNP84e0npG4ey/yJjIBq7LlnMgSRwd8+PDIL+eFtsXS+OcR7rynQFZ93N7vEctJH4Di30k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPVZMNBl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPVZMNBl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63BB2C4CEF1;
-	Fri, 23 Jan 2026 16:03:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769184187;
-	bh=hz0hZLm5qBmhnhpon5YAJbFAAU2S/FnpSRE7JAKDmuY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pPVZMNBl3ECIqQJsLoHa5r7NNKnWEF2Y5lTyfDub14CZPHo0aIfO/D2ZWGkiOxGzV
-	 8bj9TIb/DoXF8d7ejcVYmR6/awKhOw4VDzHJVKHGrbCeJ/WpiZGQUvf0LzvGX576x/
-	 uma+fGSx5NcjrmEyIx3eVLO4D0tdfE/DY138H29o1jupJ9dFgCOsF4kxlJQCaNfPiZ
-	 4rw6pA9bfPW9Fjo5fvSycRgLs436ivil3Y6dWbQ3fcwB+kDYEJEwz7fdtxAlUSa5bQ
-	 fpZPgd/fWgFnK3EyFtde4vMxIQl71mcfbT5Ntf1sIw2ZHFcTWEN40eE6B2ODtTpO1j
-	 TDD14rkZvRJXg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vjJcn-000000056kP-1fZN;
-	Fri, 23 Jan 2026 16:03:05 +0000
-Date: Fri, 23 Jan 2026 16:03:05 +0000
-Message-ID: <86jyx8b9l2.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
-	Will Deacon <will@kernel.org>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Sascha Bischoff <sascha.bischoff@arm.com>
-Subject: Re: [PATCH kvmtool v5 7/7] arm64: Handle virtio endianness reset when running nested
-In-Reply-To: <20260123142729.604737-8-andre.przywara@arm.com>
-References: <20260123142729.604737-1-andre.przywara@arm.com>
-	<20260123142729.604737-8-andre.przywara@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769186839; c=relaxed/simple;
+	bh=O6/jQjuig2dXbtPe18fgoEiOFWYi9Impt0Glflp0Nqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RecqqpOpu4z6FitULwEvOk6CSqAsXeDGk65SOj/yIiwJ8A0P6hiV7bBpqay3E3GTI/qzpX11Ben2zSotIPjcVH7yfqiANptgEx2IOpVyrH1YNKdc57IsVRxHyeVw/vf10USP1JUTecO8A2l8slS2G3Qk3ClFrNq5/OXR08t3Qc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CA6801476;
+	Fri, 23 Jan 2026 08:47:09 -0800 (PST)
+Received: from [10.57.67.240] (unknown [10.57.67.240])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78F1C3F694;
+	Fri, 23 Jan 2026 08:47:09 -0800 (PST)
+Message-ID: <a837d104-5df6-40bc-b129-eaf39fdab482@arm.com>
+Date: Fri, 23 Jan 2026 16:47:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: andre.przywara@arm.com, julien.thierry.kdev@gmail.com, will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, sascha.bischoff@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <20251217101125.91098-7-steven.price@arm.com>
+Content-Language: en-GB
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20251217101125.91098-7-steven.price@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Jan 2026 14:27:29 +0000,
-Andre Przywara <andre.przywara@arm.com> wrote:
+Hi Steven
+
+On 17/12/2025 10:10, Steven Price wrote:
+> There is one CAP which identified the presence of CCA, and two ioctls.
+> One ioctl is used to populate memory and the other is used when user
+> space is providing the PSCI implementation to identify the target of the
+> operation.
 > 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> When running an EL2 guest, we need to make sure we don't sample
-> SCTLR_EL1 to work out the virtio endianness, as this is likely
-> to be a bit random.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+Could we split these changes to the corresponding implementation patches
+? That might give us a full picture of how these UAPIs fit in the bigger
+picture.
+
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->  arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
->  arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
->  2 files changed, 40 insertions(+), 12 deletions(-)
+> Changes since v11:
+>   * Completely reworked to be more implicit. Rather than having explicit
+>     CAP operations to progress the realm construction these operations
+>     are done when needed (on populating and on first vCPU run).
+>   * Populate and PSCI complete are promoted to proper ioctls.
+> Changes since v10:
+>   * Rename symbols from RME to RMI.
+> Changes since v9:
+>   * Improvements to documentation.
+>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+> Changes since v8:
+>   * Minor improvements to documentation following review.
+>   * Bump the magic numbers to avoid conflicts.
+> Changes since v7:
+>   * Add documentation of new ioctls
+>   * Bump the magic numbers to avoid conflicts
+> Changes since v6:
+>   * Rename some of the symbols to make their usage clearer and avoid
+>     repetition.
+> Changes from v5:
+>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+> ---
+>   Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
+>   include/uapi/linux/kvm.h       | 23 ++++++++++++++
+>   2 files changed, 80 insertions(+)
 > 
-> diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-> index 1af394aa..85646ad4 100644
-> --- a/arm64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm64/include/kvm/kvm-cpu-arch.h
-> @@ -10,8 +10,9 @@
->  #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
->  #define ARM_CPU_ID		3, 0, 0, 0
->  #define ARM_CPU_ID_MPIDR	5
-> -#define ARM_CPU_CTRL		3, 0, 1, 0
-> -#define ARM_CPU_CTRL_SCTLR_EL1	0
-> +#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
-> +#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
-> +#define SYS_HCR_EL2		3, 4, 1, 1, 0
->  
->  struct kvm_cpu {
->  	pthread_t	thread;
-> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-> index 5e4f3a7d..35e1c639 100644
-> --- a/arm64/kvm-cpu.c
-> +++ b/arm64/kvm-cpu.c
-> @@ -12,6 +12,7 @@
->  
->  #define SCTLR_EL1_E0E_MASK	(1 << 24)
->  #define SCTLR_EL1_EE_MASK	(1 << 25)
-> +#define HCR_EL2_TGE		(1 << 27)
->  
->  static int debug_fd;
->  
-> @@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
->  {
->  	struct kvm_one_reg reg;
->  	u64 psr;
-> -	u64 sctlr;
-> +	u64 sctlr, bit;
-> +	u64 hcr = 0;
->  
->  	/*
->  	 * Quoting the definition given by Peter Maydell:
-> @@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
->  	 * We first check for an AArch32 guest: its endianness can
->  	 * change when using SETEND, which affects the CPSR.E bit.
->  	 *
-> -	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
-> -	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
-> +	 * If we're AArch64, determine which SCTLR register to use,
-> +	 * depending on NV being used or not. Then use either the E0E
-> +	 * bit for EL0, or the EE bit for EL1/EL2.
->  	 */
->  	reg.id = ARM64_CORE_REG(regs.pstate);
->  	reg.addr = (u64)&psr;
-> @@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
->  	if (psr & PSR_MODE32_BIT)
->  		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
->  
-> -	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
-> +	if (vcpu->kvm->cfg.arch.nested_virt) {
-> +		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
-> +		reg.addr = (u64)&hcr;
-> +		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-> +			die("KVM_GET_ONE_REG failed (HCR_EL2)");
-> +	}
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 01a3abef8abb..2d5dc7e48954 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6517,6 +6517,54 @@ the capability to be present.
+>   
+>   `flags` must currently be zero.
+>   
+> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
+> +------------------------------------
 > +
-> +	switch (psr & PSR_MODE_MASK) {
-> +	case PSR_MODE_EL0t:
-> +		if (hcr & HCR_EL2_TGE)
-> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-> +		else
-> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
-> +		bit = SCTLR_EL1_E0E_MASK;
-> +		break;
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vcpu ioctl
+> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
+> +:Returns: 0 if successful, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmi_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +  };
+> +
+> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+> +the target of the operation using `target_mpidr`, along with the status
+> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+> +
+> +If the kernel is handling PSCI then this is done automatically and the VMM
+> +doesn't need to call this ioctl.
+> +
+> +4.145 KVM_ARM_RMI_POPULATE
+> +--------------------------
+> +
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_arm_rmi_populate (in)
+> +:Returns: number of bytes populated, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmi_populate {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 source_uaddr;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +  };
+> +
+> +Populate a region of protected address space by copying the data from the user
+> +space pointer provided. This is only valid before any VCPUs have been run.
+> +The ioctl might not populate the entire region and user space may have to
+> +repeatedly call it (with updated pointers) to populate the entire region.
 
-A discussion with Sascha outlined a small bug here: when using the EL2
-translation regime (E2H==0), we sample the wrong bit (SCTLR_EL2.E0E
-does not exist in this case).
+It may be a good idea to spill out the restrictions on calling this,
+right ? We expect that the source_uaddr is a separate memory area
+from the "DRAM" (in shared mode) ?
 
-A potential fix is as follows, though I don't think anyone will care...
+Can this be called before/after converting the entire memory of the
+Guest to Private ? I believe, it must be done after the "initial
+change all of DRAM to private" ?
 
-	M.
+Suzuki
 
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 35e1c639..7b012e7a 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -12,7 +12,8 @@
- 
- #define SCTLR_EL1_E0E_MASK	(1 << 24)
- #define SCTLR_EL1_EE_MASK	(1 << 25)
--#define HCR_EL2_TGE		(1 << 27)
-+#define HCR_EL2_TGE		(1UL << 27)
-+#define HCR_EL2_E2H		(1UL << 34)
- 
- static int debug_fd;
- 
-@@ -442,11 +443,21 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 
- 	switch (psr & PSR_MODE_MASK) {
- 	case PSR_MODE_EL0t:
--		if (hcr & HCR_EL2_TGE)
-+		switch (hcr & (HCR_EL2_E2H | HCR_EL2_TGE)) {
-+		case HCR_EL2_E2H | HCR_EL2_TGE: /* EL2&0 */
- 			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
--		else
-+			bit = SCTLR_EL1_E0E_MASK;
-+			break;
-+		case HCR_EL2_TGE: 		/* EL2 */
-+			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-+			bit = SCTLR_EL1_EE_MASK;
-+			break;
-+		case HCR_EL2_E2H:		/* EL1&0 (VHE) */
-+		default:			/* EL1&0 (!VHE) */
- 			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
--		bit = SCTLR_EL1_E0E_MASK;
-+			bit = SCTLR_EL1_E0E_MASK;
-+			break;
-+		}
- 		break;
- 	case PSR_MODE_EL1t:
- 	case PSR_MODE_EL1h:
+>   
+>   .. _kvm_run:
+>   
+> @@ -8765,6 +8813,15 @@ helpful if user space wants to emulate instructions which are not
+>   This capability can be enabled dynamically even if VCPUs were already
+>   created and are running.
+>   
+> +7.47 KVM_CAP_ARM_RMI
+> +--------------------
+> +
+> +:Architectures: arm64
+> +:Target: VM
+> +:Parameters: None
+> +
+> +This capability indicates that support for CCA realms is available.
+> +
+>   8. Other capabilities.
+>   ======================
+>   
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index dddb781b0507..8e66ba9c81db 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
+>   #define KVM_CAP_GUEST_MEMFD_FLAGS 244
+>   #define KVM_CAP_ARM_SEA_TO_USER 245
+>   #define KVM_CAP_S390_USER_OPEREXEC 246
+> +#define KVM_CAP_ARM_RMI 247
+>   
+>   struct kvm_irq_routing_irqchip {
+>   	__u32 irqchip;
+> @@ -1628,4 +1629,26 @@ struct kvm_pre_fault_memory {
+>   	__u64 padding[5];
+>   };
+>   
+> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM  */
+> +struct kvm_arm_rmi_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +};
+> +
+> +#define KVM_ARM_VCPU_RMI_PSCI_COMPLETE	_IOW(KVMIO, 0xd6, struct kvm_arm_rmi_psci_complete)
+> +
+> +/* Available with KVM_CAP_ARM_RMI, only for VMs with KVM_VM_TYPE_ARM_REALM */
+> +struct kvm_arm_rmi_populate {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 source_uaddr;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +};
+> +
+> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE	(1 << 0)
+> +
+> +#define KVM_ARM_RMI_POPULATE	_IOW(KVMIO, 0xd7, struct kvm_arm_rmi_populate)
+> +
+>   #endif /* __LINUX_KVM_H */
 
--- 
-Without deviation from the norm, progress is not possible.
