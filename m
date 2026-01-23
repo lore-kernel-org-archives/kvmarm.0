@@ -1,45 +1,37 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287B830EF9D
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 14:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8C02848A7
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 15:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769178592; cv=none; b=n+quy82JaAF5eZ21jpnY2dvMWYb5bgFymED5ZUcZY/fIHpZezfeucM3wdYReYVxFKE1RSxTZEQsM9o4/p/Ltu3fXOPO/iJ7bpG+wBJluS0h5Z04UUT2H8P/QmuzeJLRLknb8DfqddW+G/1w3TD1Foqm6613k5O1T0Bq31Pb5w+g=
+	t=1769181444; cv=none; b=pw6gqTSK6KRx3lzR5dDTwk/BCXztL4Hi7Qv86j9mpnZbc+XVCdjHLh0y+vgr7k0YzINFyIexzCadxKlN5u7F4g6fmFx4JTDw6Z9ttULk78QY778UmrijTklrTWiBWn3zlRHPYlDUbz1Zj6Igp7CyENcfzbu6c+jWvR6xjOp4rIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769178592; c=relaxed/simple;
-	bh=JJDLe7eGZExcD8LMBpiKoylkuVZWtIwWKnlEfY9Gwyw=;
+	s=arc-20240116; t=1769181444; c=relaxed/simple;
+	bh=sUGwZyevPX4oX3b8wyABKJcckEZO3PSM9bEe0zfYMXk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NaHxgB6DS8DE/5sYIeUDLl17lz08gRJ0mFNZH6iVn5IpC4s1SAuwME8+PLyGYrqbc9lt66DU/hbxYVAgI/yJay1PkFpkp81JRzL8xNYOrMIFqVPdxE7Nl+dgqzv879djPYBQNhljOupRHd4e7cYzlgotSQgvZE6yY6kXDSundFo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=KWeKXcjT1uIVUJ0JqbhJfnMwWY1G4CqbzYkLqLsk/wvNP71FRKQw3k4GVAOKdJxSuulG2OwXM7IDMYM6qLLbi/61HTcRwXd3fdI/anqhKN/hmOu1d5DLw0nrck2rjRcjwfYd96Lm0oQ/z+Hpix/AZ2ilERuVOW8ZO+Afggcog3c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CEE1B1476;
-	Fri, 23 Jan 2026 06:29:43 -0800 (PST)
-Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 18F8F3F740;
-	Fri, 23 Jan 2026 06:29:44 -0800 (PST)
-Date: Fri, 23 Jan 2026 14:29:42 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
-	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
-	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com, reinette.chatre@intel.com,
-	rohit.mathew@arm.com, scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 06/47] arm64: mpam: Context switch the MPAM registers
-Message-ID: <aXOF1gYB_HEK8QPX@arm.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-7-ben.horgan@arm.com>
- <aWkqt37FJ5l6QD0E@arm.com>
- <f19cab15-0626-4d13-b25e-1c194294e62f@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 491A31515;
+	Fri, 23 Jan 2026 07:17:14 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0181E3F632;
+	Fri, 23 Jan 2026 07:17:18 -0800 (PST)
+Date: Fri, 23 Jan 2026 15:17:15 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: ... and FWB for all
+Message-ID: <aXOQ-3M7d2wSsAq-@raptor>
+References: <20260119105651.255693-1-maz@kernel.org>
+ <aXNoIrrjNnoQKkAg@raptor>
+ <86pl70bj42.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,98 +40,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f19cab15-0626-4d13-b25e-1c194294e62f@arm.com>
+In-Reply-To: <86pl70bj42.wl-maz@kernel.org>
 
-Hi Ben,
+Hi Marc,
 
-On Mon, Jan 19, 2026 at 12:23:13PM +0000, Ben Horgan wrote:
-> On 1/15/26 17:58, Catalin Marinas wrote:
-> > On Mon, Jan 12, 2026 at 04:58:33PM +0000, Ben Horgan wrote:
-> >> +static inline void mpam_thread_switch(struct task_struct *tsk)
-> >> +{
-> >> +	u64 oldregval;
-> >> +	int cpu = smp_processor_id();
-> >> +	u64 regval = mpam_get_regval(tsk);
-> >> +
-> >> +	if (!static_branch_likely(&mpam_enabled))
-> >> +		return;
-> >> +
-> >> +	if (regval == READ_ONCE(arm64_mpam_global_default))
-> >> +		regval = READ_ONCE(per_cpu(arm64_mpam_default, cpu));
-> >> +
-> >> +	oldregval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
-> >> +	if (oldregval == regval)
-> >> +		return;
-> >> +
-> >> +	write_sysreg_s(regval, SYS_MPAM1_EL1);
-> >> +	isb();
-> >> +
-> >> +	/* Synchronising the EL0 write is left until the ERET to EL0 */
-> >> +	write_sysreg_s(regval, SYS_MPAM0_EL1);
+On Fri, Jan 23, 2026 at 12:37:17PM +0000, Marc Zyngier wrote:
+> On Fri, 23 Jan 2026 12:22:58 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > > 
-> > Since we have an isb() already, does it make any difference if we write
-> > MPAM0 before the barrier? Similar question for other places where we
-> > write these two registers.
-> 
-> The reason for the isb() placement is to document that it's not required
-> for the MPAM0_EL1. All instructions running at EL1take their MPAM
-> configuration from MPAM1_EL1. This includes LDTR and STTR as you asked
-> about in a different thread.
-
-It's fine to keep it this way if LDTR/STTR are not affected by the MPAM0
-register.
-
-> >> +
-> >> +	WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);
+> > Hi Marc,
 > > 
-> > Is it too expensive to read the MPAM sysregs and avoid carrying around
-> > another per-CPU state? You use it for pm restoring but we could just
-> > save it in cpu_do_suspend() like other sysregs. Not a big issue, it just
-> > feels like this function got unnecessarily complicated (it took me a bit
-> > to figure out what it all does).
+> > On Mon, Jan 19, 2026 at 10:56:45AM +0000, Marc Zyngier wrote:
+> > > [Yes, you can tell what I was listening to]
+> > > 
+> > > Today, running in protected mode puts the host under it's own S2 with
+> > > FWB=0, even if the rest of the guests are running with FWB=1. The
+> > > rationale for this special-casing of the host is that we want the
+> > > combined attributes to actually reflect the ones exposed by S1.
+> > > 
+> > > We therefore use NormalCacheable (which is the weakest memory type) as
+> > > the default attributes at S2 so that S1 can only strengthen the final
+> > > memory type.
+> > > 
+> > > But there is no reason why we cannot achieve the same effect with
+> > > FWB. We normally use FWB to enforce cacheable memory from S2,
+> > > irrespective of S1. But it is possible to configure the S2 attributes
+> > > as "pass-through", so that the S1 attributes are always used.
+> > 
+> > Would you mind clarifying why FWB is preferable? Is it so that pkvm uses
+> > the same approach for configuring stage 2 for the host as for a guest? Or
+> > is it something else?
 > 
-> It's done this way as it matches what's done in x86. I expect it would
-> be cheap enough to read the register to check whether a write is required.
+> Having only one attribute encoding scheme to think about on a given
+> machine is vastly preferable, specially when you are debugging.
+> Additionally, FWB==0 may not be with us forever.
 
-Since you use it for CPU suspend/resume, I guess it's fine, it saves us
-from having to preserve it in the low-level asm sleep code. I don't have
-a strong preference either way.
+Got it, thanks for the explanation!
 
-> > A related question - is resctrl_arch_set_cdp_enabled() always called in
-> > non-preemptible contexts? We potentially have a race between setting
-> > current->mpam_partid_msg and arm64_mpam_global_default, so the check in
-> > mpam_thread_switch() can get confused.
-> 
-> The resctrl filesystem can only ever get mounted once and
-> resctrl_arch_set_cdp_enabled() is always called in mount. In
-> rdt_get_tree(), rdt_enable_ctx() calls resctrl_arch_set_cdp_enabled().
-> This is done while holding the rdtgroup_mutex and the user can't change
-> the mpam configuration from the default until the mutex is released and
-> it can claim it.
-
-What if resctrl_arch_set_cdp_enabled() gets preempted between updating
-current task partid and setting arm64_mpam_global_default? The mutex
-doesn't help.
-
-> > And I couldn't figure out where the MPAMx_EL1 registers are written. If
-> > any global/per-cpu/per-task value is changed, does the kernel wait until
-> > the next thread switch to write the sysreg? The only places I can found
-> > touching these sysregs are the thread switch, pm notifiers and KVM.
-> 
-> If the task configuration is changed then the MPAM sysreg will only be
-> updated the next time it goes into the kernel.
-
-Is it updated when it goes into the kernel or when we have a context
-switch? If you have a long-running user thread that is never scheduled
-out, it may not notice the update even if it entered the kernel (but no
-context switch).
-
-> So, just eventually
-> consistent. For cpu configuration, update_closid_rmid() gets called
-> which ipis the cpus and ends up calling mpam_thread_switch() from
-> resctrl_arch_sched_in().
-
-I see, it should be fine.
-
--- 
-Catalin
+Thanks,
+Alex
