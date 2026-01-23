@@ -1,147 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C52F30C626;
-	Fri, 23 Jan 2026 10:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2523009DE
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 11:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769163337; cv=none; b=AR4YcJ5gnAU8Dy58dmiStcn9NHGtKERZBRsGZM4hTg6nEelmKwvFLUZYWAHpQeFbdnTUU5/nrOIvYshLuIyNVVraxQBHPkvmqkNInKEFLV1s4NbIrrUoHkv2Ya4Z8QWNb0zfWgbdcJHoVWjJPjRLA/uoRZEgerXbdCO0MDXGRec=
+	t=1769168858; cv=none; b=BwQqqzfS4BiNKVhNDpmwcuDBGQRcL2GOMkq/sSqPD0qzUoQQcxE8sLOKR3Dfby2N7n1i6kcxcOytQLoWLeIj9Ssaf95UQ5TKgFIXgYdjWDAosqF+vYM9O7HEqJe3M9dbhXxQFlsDdGR+v2Tq7VPGdK5+CToVOZs15BnLOIJwjfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769163337; c=relaxed/simple;
-	bh=k/b+dJITvtNnuA/A7jPw9p34GBhaE6Jxv5uMmkmw/W4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A/tOYtvUnTqhvh8U3hCUK8uv2NiMGnmndl0/Wmc1Xj02QqbnVyR6mslfuTQO4z/RwzuMYxjXjl2MOj3LRUPWE5cLO+D7vtXvvpom/1r3sNoqBb+hSyez2LbDEJ5h1LtGt7EQyiqyflQN3do4c5AqZ5z3edKkpVPV7jkyQfxwwyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqxIU8P3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769168858; c=relaxed/simple;
+	bh=eRuKxWOMlnjHgiZEV5213EEYlA17aFkixqemYW9Czf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jyOFv1KiSevSgVYC56r1nYToTJHUgwOsRmzINQuOgMWIsHJOa+sJe5Vld7RyA5C+FlJYKfvZc484piKapPc/0ESsVQvsN4itWEWlzIQKosjI6750NU8fJ5gFsaNsm0S9B+/EMz7ZSY/qKyW2uZN3FQVNhKgn0gdwbaYz5bEWx7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=up2JIwyV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqxIU8P3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B76DDC19422;
-	Fri, 23 Jan 2026 10:15:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="up2JIwyV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D688C4CEF1;
+	Fri, 23 Jan 2026 11:47:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769163336;
-	bh=k/b+dJITvtNnuA/A7jPw9p34GBhaE6Jxv5uMmkmw/W4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fqxIU8P3qW1iTDPRn+vmRzJmUvNot1gnGLmmU9CFWV/c1zC5/uhdPjeITG4pX294e
-	 ZJYA7s0Q9+RA58irFOhiTfBWZpp3NG3cntuYoFqhAaI3CPiHdXqt5nqunvuNK/zEdh
-	 gdaCdrelppotw2h4CSedAbKO6dcv7dK7ZJQPfbbQD/D3w6mXhS6yntSOHq1nepSXtj
-	 O3WVy8rL9kpN1injEzqkVq5zmP9LpQkCLbDa2ULzsYUtpbuMPm1NPYs4BN6DtqDuCK
-	 cfPuue9/zzqBCcIPBUg4yExSiTP5OGHDk0RoOSLtichoj0GL90ff5VR5aNVT16w6eO
-	 D0ORhNzQW6Smw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1769168857;
+	bh=eRuKxWOMlnjHgiZEV5213EEYlA17aFkixqemYW9Czf8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=up2JIwyVxC3fpUH9haWPzKn5c3nHzuEvg0aXouWmG5305K3PWCwUM1DbulLpicVy4
+	 RC/OyEP0hvNthNs/jCasFbjn0QAORoSEagrQJe6Xj4y7PE8pkQlStcruO7DGuDKsU3
+	 d8BhMFtX2CyFp0FkBPsduDVvgioCGgcmv/4rJxUAPKE81Hh8jD2VWcrNhjChP6Z+u+
+	 tmq/qbSz3pFXKk0Np11A/MgqzlSNEXgqKoKwlEsSBj6o5U/m9CGwwYMUj9hWWoZzOI
+	 TTEBfxM2T6aUkfeuummifXHb6a/hGNaSDLRdoEFwGd9xq4ongDsSOGDhXe/cNoBZAv
+	 vAa/gmNJ9g5kQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vjECU-000000050O1-0jQR;
-	Fri, 23 Jan 2026 10:15:34 +0000
-Date: Fri, 23 Jan 2026 10:15:33 +0000
-Message-ID: <86qzrgbpoa.wl-maz@kernel.org>
+	id 1vjFdX-000000052LF-0pOC;
+	Fri, 23 Jan 2026 11:47:35 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Leonardo Bras <leo.bras@arm.com>
-Cc: Tian Zheng <zhengtian10@huawei.com>,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yezhenyu2@huawei.com,
-	xiexiangyou@huawei.com,
-	zhengchuan@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
-In-Reply-To: <aXI-XHF2jz7arOwg@devkitleo>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com>
-	<20251121092342.3393318-2-zhengtian10@huawei.com>
-	<86wm3iqlz8.wl-maz@kernel.org>
-	<aXI-XHF2jz7arOwg@devkitleo>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Fuad Tabba <tabba@google.com>
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Enforce MTE disablement at EL2
+Date: Fri, 23 Jan 2026 11:47:31 +0000
+Message-ID: <176916883962.704159.2345456855633126333.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260122112218.531948-1-tabba@google.com>
+References: <20260122112218.531948-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: leo.bras@arm.com, zhengtian10@huawei.com, oliver.upton@linux.dev, catalin.marinas@arm.com, corbet@lwn.net, pbonzini@redhat.com, will@kernel.org, linux-kernel@vger.kernel.org, yuzenghui@huawei.com, wangzhou1@hisilicon.com, yezhenyu2@huawei.com, xiexiangyou@huawei.com, zhengchuan@huawei.com, linuxarm@huawei.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 22 Jan 2026 15:12:28 +0000,
-Leonardo Bras <leo.bras@arm.com> wrote:
+On Thu, 22 Jan 2026 11:22:14 +0000, Fuad Tabba wrote:
+> Changes since v2 [1]:
+> - Trap accesses to GMID_EL1 by setting `HCR_EL2.TID5` when MTE is
+>   disabled (Marc)
+> - Dropped patch refactoring `enter_exception64()` in favor of open-coded
+>   logic in `inject_undef64()` in patch 3/4 (Marc)
+> - Based on Linux 6.19-rc6
 > 
-> On Sat, Nov 22, 2025 at 12:40:27PM +0000, Marc Zyngier wrote:
-> > On Fri, 21 Nov 2025 09:23:38 +0000,
-> > Tian Zheng <zhengtian10@huawei.com> wrote:
-> > > 
-> > > From: eillon <yezhenyu2@huawei.com>
-> > > 
-> > > The ARM architecture added the HDBSS feature and descriptions of
-> > > related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
-> > > add them to Linux.
-> > > 
-> > > Signed-off-by: eillon <yezhenyu2@huawei.com>
-> > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > > ---
-> > >  arch/arm64/include/asm/esr.h     |  2 ++
-> > >  arch/arm64/include/asm/kvm_arm.h |  1 +
-> > >  arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
-> > >  3 files changed, 31 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > index e1deed824464..a6f3cf0b9b86 100644
-> > > --- a/arch/arm64/include/asm/esr.h
-> > > +++ b/arch/arm64/include/asm/esr.h
-> > > @@ -159,6 +159,8 @@
-> > >  #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
-> > > 
-> > >  /* ISS2 field definitions for Data Aborts */
-> > > +#define ESR_ELx_HDBSSF_SHIFT	(11)
-> > > +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
-> > >  #define ESR_ELx_TnD_SHIFT	(10)
-> > >  #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
-> > >  #define ESR_ELx_TagAccess_SHIFT	(9)
-> > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > > index 1da290aeedce..b71122680a03 100644
-> > > --- a/arch/arm64/include/asm/kvm_arm.h
-> > > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > > @@ -124,6 +124,7 @@
-> > >  			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
-> > > 
-> > >  /* VTCR_EL2 Registers bits */
-> > > +#define VTCR_EL2_HDBSS		(1UL << 45)
-> > 
-> > I think it is time to convert VTCR_EL2 to the sysreg infrastructure
-> > instead of adding extra bits here.
-> 
-> 
-> Hi Marc, Tian,
-> 
-> Marc, IIUC the above was implemented by 
-> https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
-> 
-> Which was recently applied to next, and it its way to mainstream.
+> [...]
 
-Yes.
+Applied to next, thanks!
 
-> Tian, I think it's worth rebasing this patchset on top of the above.
+[1/4] KVM: arm64: Remove dead code resetting HCR_EL2 for pKVM
+      commit: c103c2dfe4975da31b67a0fcb95761359f30992d
+[2/4] KVM: arm64: Trap MTE access and discovery when MTE is disabled
+      commit: f35abcbb8a084db4c24b66ccc8db0405c08e2f61
+[3/4] KVM: arm64: Inject UNDEF when accessing MTE sysregs with MTE disabled
+      commit: 5ee8ad69da07d0e2cffa0ce2f2339c9ad2d587f2
+[4/4] KVM: arm64: Use kvm_has_mte() in pKVM trap initialization
+      commit: 230b080623fec2e1302df2afe2cf2dcb34f9c89b
 
-Probably not on top of the series, but cherry-picking the patch is
-fine. In general, developing anything on top of -next is a terrible
-idea.
-
-Thanks,
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
