@@ -1,107 +1,118 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69A01A08BC;
-	Fri, 23 Jan 2026 12:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD861FE47C
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769172949; cv=none; b=dbrmPn60NpTIl3ub7iE2hhnPYslSYzwSJz7Q1R/z65X7M91WC6jRwUW79ZS0DfE3OD8fTS17CKKY51fn+y932H706MbbqAnkseJRnjzAl9nPFJ3Ezj45RVmKgX6Tufklm27oJNfrbmOB3e41qFWNJcv08BTQ6VFgcc9o0fmeLRE=
+	t=1769174486; cv=none; b=QW4s4mFr958wlJAprHYSchvDI2nxr1BAuUFs9ntX9dgbFsohRLqsJPekeBZeMN6PmQ0uPlo5O0h0NqItstzt6E51bYNIqV/5bIgCAH21h/lH1qlWWwGEn/ksss26K1QHVS6uxk7qeC5k4QMUYdx1dZnDTONRjgTLFKx+mfY2x/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769172949; c=relaxed/simple;
-	bh=GcaMgzzRJVMZIDYWEMwJdb54aJDPROHZoomAa2LyUcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrSNawj2aVD3a1l2bWBTN9tZ5dCmoBSmtrox9qV6O6F4AWywcsH9HS9tGV91PLpWNdumSTyBq4pc4dcUdb2+g7KAJkJWZ17hPhBCtBoc5nBUJa8I16rZ0Mk5NuRvnjJTdeBZKF7mSYzp9WqWudj+Gsbl7u43RDKuRhvMEwHIZoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pHcFHW/X; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769174486; c=relaxed/simple;
+	bh=xEG1k5Uo5nCdIIR6mYFxMZwRKuY3FCpbvgd9q3J4Ahc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UnzQEI7XTaIu+k0rG3vzM9V+w2e7emDaIk0fWMOJApsjoc+vXrt7cDOLa9p63iJtPhjM1NIMLlN04kWiWXeW/oc08jIskGmuMlQPHeid5l0uOE6k1R4Fl2/mArsh/xefyO42bsZp6qBrPmSlW3XQ+Cu3qtS/NbA8eGiKWAIJFQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oDSDuF/e; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pHcFHW/X"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A79C4CEF1;
-	Fri, 23 Jan 2026 12:55:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oDSDuF/e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B87FC4CEF1;
+	Fri, 23 Jan 2026 13:21:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769172949;
-	bh=GcaMgzzRJVMZIDYWEMwJdb54aJDPROHZoomAa2LyUcc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pHcFHW/XhoB4yR0c7RrUSgqzjTmQdT1JTb99sdK1mTjrZmaQIQ+gUXZbsp7k9r28E
-	 4p5EX8n2PnELlfa7oVBobJOmjRGf8wAllbJGLU0V7jrNXvvwWrrpMrIY9P9oEwWqIJ
-	 fLD5aEHRJGBACNclN6lUXppO/IjA/xnQ78XsUe3BilaBfZmTcbRB7UN0vZqYFiW3SW
-	 u/lWYw64BNivYn82XTc4GsytJo3C+euWJJ6eyz8xApcXSSqulp2B/e1pVysA3j+L+k
-	 0W9kWRYfZLxhWsLJQnxDAT4WXNPqHZI45GdP0B4pxHA3UGwKfnZwG1nI8wBUNINagx
-	 yVq7lABae2stQ==
-Date: Fri, 23 Jan 2026 12:55:43 +0000
-From: Will Deacon <will@kernel.org>
-To: perlarsen@google.com
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1769174486;
+	bh=xEG1k5Uo5nCdIIR6mYFxMZwRKuY3FCpbvgd9q3J4Ahc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oDSDuF/etwnCDvURm08ToZTW3MSd5elqP5N1gRNV6L2brykML0L2WPSPBvNqHBKT4
+	 un4L14J/72NYNN9tzxXvK71tnGoWPiAlZVbtODT4us/imdJLcNhbNDW4oKNFq1LxIw
+	 YCTBl+zVfFpmo5N6iBt/cg0Yjg0/+gPnpnLwQXfnjgO9zcq5La37MBtecmQpzmW0ix
+	 D9zAzi0x2XXAs4MS/Vn6DE4epwAshpCxYN3yezgth5KkiAC6eWEFIUukG2gDnHEg10
+	 5Qr4TAcq3MIHwAOfHZy7W6Tt7JfVBe/7w/pJlGbVEo81ZlPqq9lGUkmDQDLknvi0Na
+	 w97Ggl3EK5/jw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vjH6K-000000053l8-1qIw;
+	Fri, 23 Jan 2026 13:21:24 +0000
+Date: Fri, 23 Jan 2026 13:21:24 +0000
+Message-ID: <86ldhobh2j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Yeoreum Yun <yeoreum.yun@arm.com>, Ben Horgan <ben.horgan@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
-	Armelle Laine <armellel@google.com>,
-	Sebastien Ene <sebastianene@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 1/2] KVM: arm64: Support FFA_MSG_SEND_DIRECT_REQ in
- host handler
-Message-ID: <aXNvzxoBXr-oRB8r@willie-the-truck>
-References: <20260121-host-direct-messages-v5-0-2c1614c94e80@google.com>
- <20260121-host-direct-messages-v5-1-2c1614c94e80@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH 3/6] KVM: arm64: Make stage2_pte_cacheable() return false when S2_AS_S1 is set
+In-Reply-To: <aXI8cchH7l1SHbQR@willie-the-truck>
+References: <20260119105651.255693-1-maz@kernel.org>
+	<20260119105651.255693-4-maz@kernel.org>
+	<aXI8cchH7l1SHbQR@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260121-host-direct-messages-v5-1-2c1614c94e80@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, qperret@google.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Per,
-
-On Wed, Jan 21, 2026 at 08:27:12AM +0000, Per Larsen via B4 Relay wrote:
-> From: Sebastian Ene <sebastianene@google.com>
+On Thu, 22 Jan 2026 15:04:17 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Allow direct messages to be forwarded from the host. The host should
-> not be sending framework messages so they are filtered out.
+> On Mon, Jan 19, 2026 at 10:56:48AM +0000, Marc Zyngier wrote:
+> > We cannot tell from the S2 attributes whether what we map is memory
+> > or not when S2_AS_S1 is set, and issuing a CMO on device memory may
+> > not be the best idea.
+> > 
+> > In this particular case, pretend that the mapping isn't cacheable.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 3c5f399b1b986..07561a227f75e 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -911,6 +911,14 @@ static void stage2_unmap_put_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> >  static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
+> >  {
+> >  	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
+> > +
+> > +	/*
+> > +	 * With S2_AS_S1, we have no idea whether the OA is actual memory or
+> > +	 * a device. Don't even try a CMO on that.
+> > +	 */
+> > +	if (pgt->flags & KVM_PGTABLE_S2_AS_S1)
+> > +		return false;
+> > +
+> >  	return kvm_pte_valid(pte) && memattr == KVM_S2_MEMATTR(pgt, NORMAL);
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> Reviewed-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Signed-off-by: Per Larsen <perlarsen@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/ffa.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> index f731cc4c3f280a32acccca0de92b9ac6c8e05602..9967916278a7ca051500946ef2fcfe7bb40e0e8d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> @@ -862,6 +862,28 @@ static void do_ffa_part_get(struct arm_smccc_1_2_regs *res,
->  	hyp_spin_unlock(&host_buffers.lock);
->  }
->  
-> +static void do_ffa_direct_msg(struct arm_smccc_1_2_regs *res,
-> +			      struct kvm_cpu_context *ctxt,
-> +			      u64 vm_handle)
-> +{
-> +	DECLARE_REG(u32, flags, ctxt, 2);
-> +
-> +	struct arm_smccc_1_2_regs *args = (void *)&ctxt->regs.regs[0];
-> +
-> +	if (vm_handle != HOST_FFA_ID) {
-> +		ffa_to_smccc_error(res, FFA_RET_INVALID_PARAMETERS);
-> +		return;
-> +	}
+> Since KVM_PGTABLE_S2_AS_S1 is only set for the pKVM host stage-2 and
+> that doesn't provide any cache maintenance callbacks in its
+> kvm_pgtable_mm_ops, I don't think the current code is actually broken,
 
-Sorry, but this isn't what I had in mind. 'vm_handle' is just a local
-variable and the only caller passes HOST_FFA_ID, so this isn't really
-achieving anything.
+Frankly, I have no idea how I came to such a stupid conclusion. My
+only way out is to blame Metallica (don't listen to that shit, kids!).
 
-What you had in v4 dropped the 'vm_handle' argument entirely, which I
-think is the right thing to do. However, the FF-A spec encodes the sender
-ID in bits 31:16 of register W1 and so _that_ is what I think we should
-be checking because _that_ is what the receiver will see.
+> although it's harmless to add the check (and the comment might benefit
+> from some additional rewording?).
 
-Honestly, we could avoid quite a lot of these review cycles if you
-actually replied to my emails on the list instead of just responding
-with a new patch series each time. It's supposed to be a technical
-discussion...
+I don't think there is much value in adding something that is not
+useful. I'll drop that patch altogether.
 
-Will
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
