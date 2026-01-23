@@ -1,81 +1,200 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8C02848A7
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 15:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC57291864;
+	Fri, 23 Jan 2026 16:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769181444; cv=none; b=pw6gqTSK6KRx3lzR5dDTwk/BCXztL4Hi7Qv86j9mpnZbc+XVCdjHLh0y+vgr7k0YzINFyIexzCadxKlN5u7F4g6fmFx4JTDw6Z9ttULk78QY778UmrijTklrTWiBWn3zlRHPYlDUbz1Zj6Igp7CyENcfzbu6c+jWvR6xjOp4rIc=
+	t=1769184188; cv=none; b=p1GyH7TmRxgrWR7sBTaFwyf2/06KMlo6yWZI0B6UN0gMZS/q5+vafDi1a6m9qU96RZd9YUjUvdbCuVbGGj8pifgxRbtvO5YmIZUDzGp+/aKroesJ1IqfRXvD1y1+rwD0/wTrs1KTohj+d0d+collsc/csryi5fK3IdmELbyZnZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769181444; c=relaxed/simple;
-	bh=sUGwZyevPX4oX3b8wyABKJcckEZO3PSM9bEe0zfYMXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KWeKXcjT1uIVUJ0JqbhJfnMwWY1G4CqbzYkLqLsk/wvNP71FRKQw3k4GVAOKdJxSuulG2OwXM7IDMYM6qLLbi/61HTcRwXd3fdI/anqhKN/hmOu1d5DLw0nrck2rjRcjwfYd96Lm0oQ/z+Hpix/AZ2ilERuVOW8ZO+Afggcog3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 491A31515;
-	Fri, 23 Jan 2026 07:17:14 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0181E3F632;
-	Fri, 23 Jan 2026 07:17:18 -0800 (PST)
-Date: Fri, 23 Jan 2026 15:17:15 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>, Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 0/6] KVM: arm64: ... and FWB for all
-Message-ID: <aXOQ-3M7d2wSsAq-@raptor>
-References: <20260119105651.255693-1-maz@kernel.org>
- <aXNoIrrjNnoQKkAg@raptor>
- <86pl70bj42.wl-maz@kernel.org>
+	s=arc-20240116; t=1769184188; c=relaxed/simple;
+	bh=hz0hZLm5qBmhnhpon5YAJbFAAU2S/FnpSRE7JAKDmuY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F6pDYR1YWOasgpyhkE1KKee0OzbcqWe2r+Wf7Bu+ZSMfzdUagI2Osy/H3kE32Y1SXyt6ylreJ0JE2KIRP1W4hfXL1xv3yPDpkPmJWtNP84e0npG4ey/yJjIBq7LlnMgSRwd8+PDIL+eFtsXS+OcR7rynQFZ93N7vEctJH4Di30k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPVZMNBl; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPVZMNBl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63BB2C4CEF1;
+	Fri, 23 Jan 2026 16:03:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769184187;
+	bh=hz0hZLm5qBmhnhpon5YAJbFAAU2S/FnpSRE7JAKDmuY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pPVZMNBl3ECIqQJsLoHa5r7NNKnWEF2Y5lTyfDub14CZPHo0aIfO/D2ZWGkiOxGzV
+	 8bj9TIb/DoXF8d7ejcVYmR6/awKhOw4VDzHJVKHGrbCeJ/WpiZGQUvf0LzvGX576x/
+	 uma+fGSx5NcjrmEyIx3eVLO4D0tdfE/DY138H29o1jupJ9dFgCOsF4kxlJQCaNfPiZ
+	 4rw6pA9bfPW9Fjo5fvSycRgLs436ivil3Y6dWbQ3fcwB+kDYEJEwz7fdtxAlUSa5bQ
+	 fpZPgd/fWgFnK3EyFtde4vMxIQl71mcfbT5Ntf1sIw2ZHFcTWEN40eE6B2ODtTpO1j
+	 TDD14rkZvRJXg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vjJcn-000000056kP-1fZN;
+	Fri, 23 Jan 2026 16:03:05 +0000
+Date: Fri, 23 Jan 2026 16:03:05 +0000
+Message-ID: <86jyx8b9l2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Will Deacon <will@kernel.org>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: Re: [PATCH kvmtool v5 7/7] arm64: Handle virtio endianness reset when running nested
+In-Reply-To: <20260123142729.604737-8-andre.przywara@arm.com>
+References: <20260123142729.604737-1-andre.przywara@arm.com>
+	<20260123142729.604737-8-andre.przywara@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86pl70bj42.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, julien.thierry.kdev@gmail.com, will@kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com, sascha.bischoff@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-On Fri, Jan 23, 2026 at 12:37:17PM +0000, Marc Zyngier wrote:
-> On Fri, 23 Jan 2026 12:22:58 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Mon, Jan 19, 2026 at 10:56:45AM +0000, Marc Zyngier wrote:
-> > > [Yes, you can tell what I was listening to]
-> > > 
-> > > Today, running in protected mode puts the host under it's own S2 with
-> > > FWB=0, even if the rest of the guests are running with FWB=1. The
-> > > rationale for this special-casing of the host is that we want the
-> > > combined attributes to actually reflect the ones exposed by S1.
-> > > 
-> > > We therefore use NormalCacheable (which is the weakest memory type) as
-> > > the default attributes at S2 so that S1 can only strengthen the final
-> > > memory type.
-> > > 
-> > > But there is no reason why we cannot achieve the same effect with
-> > > FWB. We normally use FWB to enforce cacheable memory from S2,
-> > > irrespective of S1. But it is possible to configure the S2 attributes
-> > > as "pass-through", so that the S1 attributes are always used.
-> > 
-> > Would you mind clarifying why FWB is preferable? Is it so that pkvm uses
-> > the same approach for configuring stage 2 for the host as for a guest? Or
-> > is it something else?
+On Fri, 23 Jan 2026 14:27:29 +0000,
+Andre Przywara <andre.przywara@arm.com> wrote:
 > 
-> Having only one attribute encoding scheme to think about on a given
-> machine is vastly preferable, specially when you are debugging.
-> Additionally, FWB==0 may not be with us forever.
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> When running an EL2 guest, we need to make sure we don't sample
+> SCTLR_EL1 to work out the virtio endianness, as this is likely
+> to be a bit random.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+>  arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+>  2 files changed, 40 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+> index 1af394aa..85646ad4 100644
+> --- a/arm64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm64/include/kvm/kvm-cpu-arch.h
+> @@ -10,8 +10,9 @@
+>  #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+>  #define ARM_CPU_ID		3, 0, 0, 0
+>  #define ARM_CPU_ID_MPIDR	5
+> -#define ARM_CPU_CTRL		3, 0, 1, 0
+> -#define ARM_CPU_CTRL_SCTLR_EL1	0
+> +#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
+> +#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
+> +#define SYS_HCR_EL2		3, 4, 1, 1, 0
+>  
+>  struct kvm_cpu {
+>  	pthread_t	thread;
+> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> index 5e4f3a7d..35e1c639 100644
+> --- a/arm64/kvm-cpu.c
+> +++ b/arm64/kvm-cpu.c
+> @@ -12,6 +12,7 @@
+>  
+>  #define SCTLR_EL1_E0E_MASK	(1 << 24)
+>  #define SCTLR_EL1_EE_MASK	(1 << 25)
+> +#define HCR_EL2_TGE		(1 << 27)
+>  
+>  static int debug_fd;
+>  
+> @@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  {
+>  	struct kvm_one_reg reg;
+>  	u64 psr;
+> -	u64 sctlr;
+> +	u64 sctlr, bit;
+> +	u64 hcr = 0;
+>  
+>  	/*
+>  	 * Quoting the definition given by Peter Maydell:
+> @@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	 * We first check for an AArch32 guest: its endianness can
+>  	 * change when using SETEND, which affects the CPSR.E bit.
+>  	 *
+> -	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+> -	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
+> +	 * If we're AArch64, determine which SCTLR register to use,
+> +	 * depending on NV being used or not. Then use either the E0E
+> +	 * bit for EL0, or the EE bit for EL1/EL2.
+>  	 */
+>  	reg.id = ARM64_CORE_REG(regs.pstate);
+>  	reg.addr = (u64)&psr;
+> @@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	if (psr & PSR_MODE32_BIT)
+>  		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+>  
+> -	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
+> +	if (vcpu->kvm->cfg.arch.nested_virt) {
+> +		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
+> +		reg.addr = (u64)&hcr;
+> +		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> +			die("KVM_GET_ONE_REG failed (HCR_EL2)");
+> +	}
+> +
+> +	switch (psr & PSR_MODE_MASK) {
+> +	case PSR_MODE_EL0t:
+> +		if (hcr & HCR_EL2_TGE)
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
+> +		else
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
+> +		bit = SCTLR_EL1_E0E_MASK;
+> +		break;
 
-Got it, thanks for the explanation!
+A discussion with Sascha outlined a small bug here: when using the EL2
+translation regime (E2H==0), we sample the wrong bit (SCTLR_EL2.E0E
+does not exist in this case).
 
-Thanks,
-Alex
+A potential fix is as follows, though I don't think anyone will care...
+
+	M.
+
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 35e1c639..7b012e7a 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -12,7 +12,8 @@
+ 
+ #define SCTLR_EL1_E0E_MASK	(1 << 24)
+ #define SCTLR_EL1_EE_MASK	(1 << 25)
+-#define HCR_EL2_TGE		(1 << 27)
++#define HCR_EL2_TGE		(1UL << 27)
++#define HCR_EL2_E2H		(1UL << 34)
+ 
+ static int debug_fd;
+ 
+@@ -442,11 +443,21 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+ 
+ 	switch (psr & PSR_MODE_MASK) {
+ 	case PSR_MODE_EL0t:
+-		if (hcr & HCR_EL2_TGE)
++		switch (hcr & (HCR_EL2_E2H | HCR_EL2_TGE)) {
++		case HCR_EL2_E2H | HCR_EL2_TGE: /* EL2&0 */
+ 			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
+-		else
++			bit = SCTLR_EL1_E0E_MASK;
++			break;
++		case HCR_EL2_TGE: 		/* EL2 */
++			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
++			bit = SCTLR_EL1_EE_MASK;
++			break;
++		case HCR_EL2_E2H:		/* EL1&0 (VHE) */
++		default:			/* EL1&0 (!VHE) */
+ 			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
+-		bit = SCTLR_EL1_E0E_MASK;
++			bit = SCTLR_EL1_E0E_MASK;
++			break;
++		}
+ 		break;
+ 	case PSR_MODE_EL1t:
+ 	case PSR_MODE_EL1h:
+
+-- 
+Without deviation from the norm, progress is not possible.
