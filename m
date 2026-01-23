@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95399285CBA
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAF12E3B15
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769187073; cv=none; b=seVFcalMk4g3l62b9SXToGMcb+PNexeBV0E3D/j2T1DBLJgdHLOv58tVFIEYBB2LCEbNHAo1h5rpIuarZXufHLglrNoHT7f6+HnoLdm77J5R0UQq4azwkE7yt8OgC49an2ZGy5tyVefzGXtij2SzLNTy9AOCNzkOvQImbVVk9Hg=
+	t=1769187074; cv=none; b=Sn8aa+H6A6e5+OLVSi3xKFfRJXtM7t/WGnAjbbwZucFCVv7amuhx151DPok3/3/jPL46ouAPDdtyc/o++hdlxl8Pdr9bhd0h4/4IG5VVRwMmrDtzn5aXdQgmy90fRxKaHCXDVIdS41Qlk9XxItE59mgRoQRAAFXlGOOUN/6oAVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769187073; c=relaxed/simple;
-	bh=qMT4SOjpBVl5muZrm1yCxr4j1oujyqsjailAc+wXJlQ=;
+	s=arc-20240116; t=1769187074; c=relaxed/simple;
+	bh=SjRlo0G7mY12gIHISQa3iEsUtLU19FopeVRDxJrsmxo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gQy9qspHMWf51s9LePTokG9j2LZ6PZmQggaIbAYIKyh1wpANk9vrlcsuhtdr+rQVkrmnlt0kl6Bw1Lsqtjq3+XDsnWzPYy3p1HvXINkFomXb67ImDsIpRD+8iijHZ9EGpy3QOUUaQfJuE4JZcLOyQSgjuQtvBhJ8RnYV+EifuzU=
+	 MIME-Version; b=esl/WKNbpIBi5se1cCJSCgzLHB1SRguxphVdWjoz/8Hse4lJYEbM/xSPfrrTI8xT8L7DTlYiAUmeMQzmvN/rspJeuOi35zmvc1Rwx0IIJCdOCbCJgSCevliLg/0vFmfmroGSLAALqjs+w8jQkhwkreeu/DulegpgAoWp4tR98jE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4021D1684;
-	Fri, 23 Jan 2026 08:51:04 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0CD401515;
+	Fri, 23 Jan 2026 08:51:06 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 662FB3F694;
-	Fri, 23 Jan 2026 08:51:09 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226713F694;
+	Fri, 23 Jan 2026 08:51:11 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: alexandru.elisei@arm.com,
@@ -27,9 +27,9 @@ Cc: alexandru.elisei@arm.com,
 	maz@kernel.org,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v6 05/14] arm64: efi: initialise the EL
-Date: Fri, 23 Jan 2026 16:50:44 +0000
-Message-Id: <20260123165053.2250754-6-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v6 06/14] arm64: timer: use hypervisor timers when at EL2
+Date: Fri, 23 Jan 2026 16:50:45 +0000
+Message-Id: <20260123165053.2250754-7-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260123165053.2250754-1-joey.gouly@arm.com>
 References: <20260123165053.2250754-1-joey.gouly@arm.com>
@@ -41,62 +41,133 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Initialise the exception level, which may include dropping to EL1 from EL2,
-if VHE is not supported.
+At EL2, with VHE:
+  CNT{P,V}_{TVAL,CTL}_EL0 is forwarded to CNTH{P,V}_{CVAL,TVAL,CTL}_EL0.
+
+Save the hypervisor physical and virtual timer IRQ numbers from the
+DT/ACPI.
 
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Acked-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/efi/crt0-efi-aarch64.S | 5 +++++
- lib/arm/asm/setup.h        | 2 ++
- lib/arm/setup.c            | 2 ++
- 3 files changed, 9 insertions(+)
+ arm/timer.c         | 12 +++++++++---
+ lib/acpi.h          |  2 ++
+ lib/arm/asm/timer.h | 11 +++++++++++
+ lib/arm/timer.c     | 19 +++++++++++++++++--
+ 4 files changed, 39 insertions(+), 5 deletions(-)
 
-diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-index 71ce2794..5632fee0 100644
---- a/arm/efi/crt0-efi-aarch64.S
-+++ b/arm/efi/crt0-efi-aarch64.S
-@@ -147,6 +147,11 @@ _start:
- 0:	ldp		x29, x30, [sp], #32
- 	ret
+diff --git a/arm/timer.c b/arm/timer.c
+index 2cb80518..43fb6d88 100644
+--- a/arm/timer.c
++++ b/arm/timer.c
+@@ -346,9 +346,15 @@ static void test_ptimer(void)
  
-+.globl do_init_el
-+do_init_el:
-+	init_el x16
-+	ret
-+
- 	.section	.data
- 
- .balign 65536
-diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
-index 4e60d552..bf05ffbb 100644
---- a/lib/arm/asm/setup.h
-+++ b/lib/arm/asm/setup.h
-@@ -29,8 +29,10 @@ void setup(const void *fdt, phys_addr_t freemem_start);
- #include <efi.h>
- 
- #ifdef __aarch64__
-+void do_init_el(void);
- void setup_efi_sctlr(void);
- #else
-+static inline void do_init_el(void) {}
- static inline void setup_efi_sctlr(void) {}
- #endif
- 
-diff --git a/lib/arm/setup.c b/lib/arm/setup.c
-index 49f5e0f6..5ff40b54 100644
---- a/lib/arm/setup.c
-+++ b/lib/arm/setup.c
-@@ -349,6 +349,8 @@ efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+ static void test_init(void)
  {
- 	efi_status_t status;
+-	assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
+-	ptimer_info.irq = TIMER_PTIMER_IRQ;
+-	vtimer_info.irq = TIMER_VTIMER_IRQ;
++	if (current_level() == CurrentEL_EL1) {
++		assert(TIMER_PTIMER_IRQ != -1 && TIMER_VTIMER_IRQ != -1);
++		ptimer_info.irq = TIMER_PTIMER_IRQ;
++		vtimer_info.irq = TIMER_VTIMER_IRQ;
++	} else {
++		assert(TIMER_HPTIMER_IRQ != -1 && TIMER_HVTIMER_IRQ != -1);
++		ptimer_info.irq = TIMER_HPTIMER_IRQ;
++		vtimer_info.irq = TIMER_HVTIMER_IRQ;
++	}
  
-+	do_init_el();
+ 	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_UNKNOWN, ptimer_unsupported_handler);
+ 	ptimer_info.read_ctl();
+diff --git a/lib/acpi.h b/lib/acpi.h
+index c330c877..66e3062d 100644
+--- a/lib/acpi.h
++++ b/lib/acpi.h
+@@ -290,6 +290,8 @@ struct acpi_table_gtdt {
+ 	u64 counter_read_block_address;
+ 	u32 platform_timer_count;
+ 	u32 platform_timer_offset;
++	u32 virtual_el2_timer_interrupt;
++	u32 virtual_el2_timer_flags;
+ };
+ 
+ /* Reset to default packing */
+diff --git a/lib/arm/asm/timer.h b/lib/arm/asm/timer.h
+index fd8f7796..0dcebc1c 100644
+--- a/lib/arm/asm/timer.h
++++ b/lib/arm/asm/timer.h
+@@ -21,12 +21,23 @@ struct timer_state {
+ 		u32 irq;
+ 		u32 irq_flags;
+ 	} vtimer;
++	struct {
++		u32 irq;
++		u32 irq_flags;
++	} hptimer;
++	struct {
++		u32 irq;
++		u32 irq_flags;
++	} hvtimer;
+ };
+ extern struct timer_state __timer_state;
+ 
+ #define TIMER_PTIMER_IRQ (__timer_state.ptimer.irq)
+ #define TIMER_VTIMER_IRQ (__timer_state.vtimer.irq)
+ 
++#define TIMER_HPTIMER_IRQ (__timer_state.hptimer.irq)
++#define TIMER_HVTIMER_IRQ (__timer_state.hvtimer.irq)
 +
- 	setup_efi_sctlr();
+ void timer_save_state(void);
  
- 	exceptions_init();
+ #endif /* !__ASSEMBLER__ */
+diff --git a/lib/arm/timer.c b/lib/arm/timer.c
+index ae702e41..8e36a570 100644
+--- a/lib/arm/timer.c
++++ b/lib/arm/timer.c
+@@ -38,10 +38,11 @@ static void timer_save_state_fdt(void)
+ 	 *      secure timer irq
+ 	 *      non-secure timer irq            (ptimer)
+ 	 *      virtual timer irq               (vtimer)
+-	 *      hypervisor timer irq
++	 *      hypervisor timer irq            (hptimer)
++	 *      hypervisor virtual timer irq    (hvtimer)
+ 	 */
+ 	prop = fdt_get_property(fdt, node, "interrupts", &len);
+-	assert(prop && len == (4 * 3 * sizeof(u32)));
++	assert(prop && len >= (4 * 3 * sizeof(u32)));
+ 
+ 	data = (u32 *) prop->data;
+ 	assert(fdt32_to_cpu(data[3]) == 1 /* PPI */ );
+@@ -50,6 +51,14 @@ static void timer_save_state_fdt(void)
+ 	assert(fdt32_to_cpu(data[6]) == 1 /* PPI */ );
+ 	__timer_state.vtimer.irq = PPI(fdt32_to_cpu(data[7]));
+ 	__timer_state.vtimer.irq_flags = fdt32_to_cpu(data[8]);
++	if (len == (5 * 3 * sizeof(u32))) {
++		assert(fdt32_to_cpu(data[9]) == 1 /* PPI */);
++		__timer_state.hptimer.irq = PPI(fdt32_to_cpu(data[10]));
++		__timer_state.hptimer.irq_flags = fdt32_to_cpu(data[11]);
++		assert(fdt32_to_cpu(data[12]) == 1 /* PPI */);
++		__timer_state.hvtimer.irq = PPI(fdt32_to_cpu(data[13]));
++		__timer_state.hvtimer.irq_flags = fdt32_to_cpu(data[14]);
++	}
+ }
+ 
+ #ifdef CONFIG_EFI
+@@ -72,6 +81,12 @@ static void timer_save_state_acpi(void)
+ 
+ 	__timer_state.vtimer.irq = gtdt->virtual_timer_interrupt;
+ 	__timer_state.vtimer.irq_flags = gtdt->virtual_timer_flags;
++
++	__timer_state.hptimer.irq = gtdt->non_secure_el2_interrupt;
++	__timer_state.hptimer.irq_flags = gtdt->non_secure_el2_flags;
++
++	__timer_state.hvtimer.irq = gtdt->virtual_el2_timer_interrupt;
++	__timer_state.hvtimer.irq_flags = gtdt->virtual_el2_timer_flags;
+ }
+ 
+ #else
 -- 
 2.25.1
 
