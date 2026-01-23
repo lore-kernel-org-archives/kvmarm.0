@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A4F285CBA
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E942347DD
+	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 16:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769187079; cv=none; b=dfeecJT7hsI60p0tUv6urHmacHabZXX28npw5qEWzpTStxeVALlYiiVNukhKcfH0mnlt9aOZUPs9xIOdRj+Nb63R2W/OnP+r3BmU88Gm8ZSaKsWGUEsHcidrYC5kMCmsjv/mynkcY4d8qVR6JrGpP9nEIG2khS+5iEav+hhFJTA=
+	t=1769187080; cv=none; b=BQZQWP3n0y0cotqwG5CRmUQr6nzXTqHHGuDx/upjzYZ1WzXJ38tH0QccNw8hY5y4Ylg/QMBGHb0yUmzj6qDyQ2NRqcdO0YK8168CKvLyORIDviTKSZXv3W3bp+oI/+QcpaWKNVPSfp/MILoelOpwt16/xp8UYQdO9HqRp7j5x40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769187079; c=relaxed/simple;
-	bh=8/5lADa9rJezdsohxT7wJlEG5NWEkbPeJiQJa1AUzkY=;
+	s=arc-20240116; t=1769187080; c=relaxed/simple;
+	bh=Y9vT8uDrc2u+sG0KjA0eAFsuuqyojZfE365Bl67ufFw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mGyD9XmvKDYJUJ4fmr65zhmbKrKuLTmQ5xuVV3VzkyN1FLUOaDSyc2rUO8niFL4AzcmweDFY1P+rgXr2ESJK+0GHPzyxYdslQfRZqXVpQdNexKSq6SFgAhNuqQHGAp9e+ROoWZohQZYO1o/TX+7IT02CaSya3XH2irHgpDQHUYo=
+	 MIME-Version; b=Taw7rE1DGgCbi2RGehHXgfsdDQF7Yx57+ov4egrFy6lL1Maz+wNCuzMQwbs8/RAtgqvqXltd27aK5XTDu4hjNHGNK0x3Eh51jR6zecY46+93iFS7NyZLsFD1kUXS3DWotCFFH5lAVUE1wzsxAhsIWolRT6KL7Tqq6vtrVmQPlZg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08D911688;
-	Fri, 23 Jan 2026 08:51:11 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A2D2168F;
+	Fri, 23 Jan 2026 08:51:12 -0800 (PST)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34A5F3F694;
-	Fri, 23 Jan 2026 08:51:16 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C81243F73F;
+	Fri, 23 Jan 2026 08:51:17 -0800 (PST)
 From: Joey Gouly <joey.gouly@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: alexandru.elisei@arm.com,
@@ -27,9 +27,9 @@ Cc: alexandru.elisei@arm.com,
 	maz@kernel.org,
 	kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [kvm-unit-tests PATCH v6 09/14] arm64: selftest: update test for running at EL2
-Date: Fri, 23 Jan 2026 16:50:48 +0000
-Message-Id: <20260123165053.2250754-10-joey.gouly@arm.com>
+Subject: [kvm-unit-tests PATCH v6 10/14] arm64: pmu: count EL2 cycles
+Date: Fri, 23 Jan 2026 16:50:49 +0000
+Message-Id: <20260123165053.2250754-11-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260123165053.2250754-1-joey.gouly@arm.com>
 References: <20260123165053.2250754-1-joey.gouly@arm.com>
@@ -41,87 +41,67 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+Count EL2 cycles if that's the EL kvm-unit-tests is running at!
 
-Remove some hard-coded assumptions that this test is running at EL1.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Acked-by: Marc Zyngier <maz@kernel.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/selftest.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ arm/pmu.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arm/selftest.c b/arm/selftest.c
-index 1553ed8e..33f4cf42 100644
---- a/arm/selftest.c
-+++ b/arm/selftest.c
-@@ -106,6 +106,8 @@ static bool und_works;
- static bool svc_works;
- static bool pabt_works;
- #if defined(__arm__)
-+static void test_exception_prep(void) { }
-+
- /*
-  * Capture the current register state and execute an instruction
-  * that causes an exception. The test handler will check that its
-@@ -232,6 +234,12 @@ static void user_psci_system_off(struct pt_regs *regs)
- 	__user_psci_system_off();
- }
- #elif defined(__aarch64__)
-+static unsigned long expected_level;
-+
-+static void test_exception_prep(void)
-+{
-+	expected_level = current_level();
-+}
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 2dc0822b..2fcec71a 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -121,6 +121,8 @@ static struct pmu pmu;
+ #define PMINTENCLR   __ACCESS_CP15(c9, 0, c14, 2)
+ #define PMCCNTR64    __ACCESS_CP15_64(0, c9)
  
- /*
-  * Capture the current register state and execute an instruction
-@@ -276,8 +284,7 @@ static bool check_regs(struct pt_regs *regs)
++#define PMCCFILTR_EL0_DEFAULT	0
++
+ static inline uint32_t get_id_dfr0(void) { return read_sysreg(ID_DFR0); }
+ static inline uint32_t get_pmcr(void) { return read_sysreg(PMCR); }
+ static inline void set_pmcr(uint32_t v) { write_sysreg(v, PMCR); }
+@@ -206,6 +208,9 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+ #define ID_DFR0_PMU_V3_8_5	0b0110
+ #define ID_DFR0_PMU_IMPDEF	0b1111
+ 
++#define PMCCFILTR_EL0_NSH	BIT(27)
++#define PMCCFILTR_EL0_DEFAULT	(current_level() == CurrentEL_EL2 ? PMCCFILTR_EL0_NSH : 0)
++
+ static inline uint32_t get_id_aa64dfr0(void) { return read_sysreg(id_aa64dfr0_el1); }
+ static inline uint32_t get_pmcr(void) { return read_sysreg(pmcr_el0); }
+ static inline void set_pmcr(uint32_t v) { write_sysreg(v, pmcr_el0); }
+@@ -246,8 +251,7 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+ #define PMCNTENSET_EL0 sys_reg(3, 3, 9, 12, 1)
+ #define PMCNTENCLR_EL0 sys_reg(3, 3, 9, 12, 2)
+ 
+-#define PMEVTYPER_EXCLUDE_EL1 BIT(31)
+-#define PMEVTYPER_EXCLUDE_EL0 BIT(30)
++#define PMEVTYPER_EXCLUDE_EL0 (BIT(30) | (current_level() == CurrentEL_EL2 ? BIT(27) : 0))
+ 
+ static bool is_event_supported(uint32_t n, bool warn)
  {
- 	unsigned i;
- 
--	/* exception handlers should always run in EL1 */
--	if (current_level() != CurrentEL_EL1)
-+	if (current_level() != expected_level)
- 		return false;
- 
- 	for (i = 0; i < ARRAY_SIZE(regs->regs); ++i) {
-@@ -301,7 +308,11 @@ static enum vector check_vector_prep(void)
- 		return EL0_SYNC_64;
- 
- 	asm volatile("mrs %0, daif" : "=r" (daif) ::);
--	expected_regs.pstate = daif | PSR_MODE_EL1h;
-+	expected_regs.pstate = daif;
-+	if (current_level() == CurrentEL_EL1)
-+		expected_regs.pstate |= PSR_MODE_EL1h;
-+	else
-+		expected_regs.pstate |= PSR_MODE_EL2h;
- 	return EL1H_SYNC;
- }
- 
-@@ -317,8 +328,8 @@ static bool check_und(void)
- 
- 	install_exception_handler(v, ESR_EL1_EC_UNKNOWN, unknown_handler);
- 
--	/* try to read an el2 sysreg from el0/1 */
--	test_exception("", "mrs x0, sctlr_el2", "", "x0");
-+	/* try to read an el3 sysreg from el0/1/2 */
-+	test_exception("", "mrs x0, sctlr_el3", "", "x0");
- 
- 	install_exception_handler(v, ESR_EL1_EC_UNKNOWN, NULL);
- 
-@@ -426,6 +437,8 @@ int main(int argc, char **argv)
- {
- 	report_prefix_push("selftest");
- 
-+	test_exception_prep();
+@@ -1063,7 +1067,8 @@ static bool check_cycles_increase(void)
+ 	/* init before event access, this test only cares about cycle count */
+ 	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
+-	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
 +
- 	if (argc < 2)
- 		report_abort("no test specified");
++	set_pmccfiltr(PMCCFILTR_EL0_DEFAULT);
  
+ 	set_pmcr(get_pmcr() | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_E);
+ 	isb();
+@@ -1118,7 +1123,7 @@ static bool check_cpi(int cpi)
+ 	/* init before event access, this test only cares about cycle count */
+ 	pmu_reset();
+ 	set_pmcntenset(1 << PMU_CYCLE_IDX);
+-	set_pmccfiltr(0); /* count cycles in EL0, EL1, but not EL2 */
++	set_pmccfiltr(PMCCFILTR_EL0_DEFAULT);
+ 
+ 	if (cpi > 0)
+ 		printf("Checking for CPI=%d.\n", cpi);
 -- 
 2.25.1
 
