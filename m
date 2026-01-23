@@ -1,54 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909BB280336
-	for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 12:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8B23A1C9;
+	Fri, 23 Jan 2026 12:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769171840; cv=none; b=F7e27NxnYik0QE4c1SrbQCOjmXyF+Z+Nsu825V0GfiNaYyIjnDajfrcZ2zmxbyS4AbmT6eb8qUPIrY7Mx9OblnyPKvhUvausyCcTCyYhylg/nxAYZDdBcxyW/ZfDbg4w97JItQuvxedfla9WPvdaVeQ2FTtjLE3aAtyBQ51ynO4=
+	t=1769172438; cv=none; b=saSeg7oWNSKfiDrL2lbampvmCtqRKb/TSZ7Eqxy0X6ndz/MGi5ziQzNSQKHkxDUv+iaYK7QqAWE+Tx3YvDJsvzEs0XmQm8rvUnsy8S0KNTv2az1WVTFLNh22nljXLpxkKBkBfkOc/fKmBokGzeM5KmkawRTOBJIw+WiEvBbCApc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769171840; c=relaxed/simple;
-	bh=mwBkwnK3l8wHlAUHktjFvg0/UeqqT/cK72Oq6z6rBLI=;
+	s=arc-20240116; t=1769172438; c=relaxed/simple;
+	bh=SpX5nlI+FpfkHYgP+EVPBN97fd681gAviX/lFFZNJ+8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jGPZS/wnDHift8e4tRksHFAeuYtBoWkugbiduifeIGNiHufLkhwXxAlIHL9AKVFPj6EL74epUBPmE2XK7dD8eNLhzFU5k0QOmJtHtKKNJ6kINrdCZx93VHpFgmy72keU9D7xAR8S0XdivyYnGtRltoBIZaQIya52WZ2bTCappTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aerUMdn0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FCDl4arr5Zh02UvvBWhjpB3PzOSZaZmPdjVR40UyZ8lDYUMGPPrlqTKobVGvQ13KiFYVfpJLBiIcivNJQUMYvLjKaXInY/qtB1nd9S58l82ylKAW5835yB2lw58t1+zLXpC1MkFDFKu6MDYU1/PRCTDEKAJTQpF41N/T4sZnxpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ElqLJZSz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aerUMdn0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 188DBC19422;
-	Fri, 23 Jan 2026 12:37:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ElqLJZSz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70597C4CEF1;
+	Fri, 23 Jan 2026 12:47:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769171840;
-	bh=mwBkwnK3l8wHlAUHktjFvg0/UeqqT/cK72Oq6z6rBLI=;
+	s=k20201202; t=1769172438;
+	bh=SpX5nlI+FpfkHYgP+EVPBN97fd681gAviX/lFFZNJ+8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aerUMdn0X+/4fq/Ac4kO/JhZirNWx3pRgCiC+vcgAOKYqgbiKqMjsH6eKheOKKc3h
-	 /GXq0T9xmKyOrNBosp2vdNAnWhd0NfH1inJBRnebszJk0m1EGqenOsU4ne6sM4syAh
-	 EmNJBTfZc+WyzfyZqGZQbN8QZhVIuINjLHZYM5IxasLSFVen9/C2N0hVOO2O3PwoQD
-	 tOArUY2DnSkxre4oJQAe9yuZlfCQ+3J564x+JRgy+c6hQTxglbHmIfUism0f5i62CH
-	 Zb70vxnAyIyZbpeRk0K+Yci4LqzCHh//12q93KVNUOZm0/LsTe31oUuACbVcmz/07f
-	 73OoMyRb0lDYA==
+	b=ElqLJZSz5em091t3wwNsbj3EjkzZsPNajERR83xC126xn2ZlETjjwYY5Xfhc+Eq0T
+	 Ry7QyC9VVuyUs36KXpRrAd3yrMFaohmY69mkcc/mKhPsWdSihRmHNEDcrbZHTvKmrU
+	 aElVMF+AiEyTg5qRXU1l/IE/4PVNnNU/AgfhJ6scksN5htvf6kwlSvFC848cjaUhud
+	 11MFzjsrAkfzSzlgUhAoiNOxbRvht4Fh7fl5eLs9ObYC7DCZkpjm5nhQln9FxRDx8b
+	 WJUHkkV70HlRrVr9OGDba1wkRNIR4gv+PaU9e7qvsy/ijccFRLwandNAF3AFWeJy0r
+	 d5h0eX5253SZA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vjGPd-000000053EJ-2l4c;
-	Fri, 23 Jan 2026 12:37:17 +0000
-Date: Fri, 23 Jan 2026 12:37:17 +0000
-Message-ID: <86pl70bj42.wl-maz@kernel.org>
+	id 1vjGZI-000000053M0-0V7n;
+	Fri, 23 Jan 2026 12:47:16 +0000
+Date: Fri, 23 Jan 2026 12:47:15 +0000
+Message-ID: <86o6mkbing.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH 0/6] KVM: arm64: ... and FWB for all
-In-Reply-To: <aXNoIrrjNnoQKkAg@raptor>
-References: <20260119105651.255693-1-maz@kernel.org>
-	<aXNoIrrjNnoQKkAg@raptor>
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 29/30] KVM: arm64: Add selftest event support to nVHE/pKVM hyp
+In-Reply-To: <aXNmKpHqVw93BegX@google.com>
+References: <20251202093623.2337860-1-vdonnefort@google.com>
+	<20251202093623.2337860-30-vdonnefort@google.com>
+	<868qe9mnx5.wl-maz@kernel.org>
+	<aXNmKpHqVw93BegX@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,52 +69,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com, tabba@google.com
+X-SA-Exim-Rcpt-To: vdonnefort@google.com, rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 23 Jan 2026 12:22:58 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, 23 Jan 2026 12:14:34 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Hi Marc,
-> 
-> On Mon, Jan 19, 2026 at 10:56:45AM +0000, Marc Zyngier wrote:
-> > [Yes, you can tell what I was listening to]
+> On Wed, Jan 07, 2026 at 03:40:22PM +0000, Marc Zyngier wrote:
+> > On Tue, 02 Dec 2025 09:36:22 +0000,
+> > Vincent Donnefort <vdonnefort@google.com> wrote:
+> > > 
+> > Not strictly related to this patch, but I find that the trace itself
+> > lacks context. For example:
 > > 
-> > Today, running in protected mode puts the host under it's own S2 with
-> > FWB=0, even if the rest of the guests are running with FWB=1. The
-> > rationale for this special-casing of the host is that we want the
-> > combined attributes to actually reflect the ones exposed by S1.
+> > [001]	  323.847422: hyp_enter reason=hvc
+> > [001]	  323.847423: hyp_exit reason=eret_host
+> > [001]	  323.847688: hyp_enter reason=hvc
+> > [001]	  323.847688: hyp_exit reason=eret_host
+> > [001]	  323.847706: hyp_enter reason=hvc
+> > [001]	  323.847707: hyp_exit reason=eret_host
+> > [001]	  323.847722: hyp_enter reason=hvc
+> > [001]	  323.847723: hyp_exit reason=eret_host
 > > 
-> > We therefore use NormalCacheable (which is the weakest memory type) as
-> > the default attributes at S2 so that S1 can only strengthen the final
-> > memory type.
+> > That's all fine as long as I'm dealing with a single guest, or even
+> > with a single vcpu. Trying to trace multiple guests, or even multiple
+> > vcpus makes the whole thing completely unusable, because I have no
+> > idea what I'm looking at.
 > > 
-> > But there is no reason why we cannot achieve the same effect with
-> > FWB. We normally use FWB to enforce cacheable memory from S2,
-> > irrespective of S1. But it is possible to configure the S2 attributes
-> > as "pass-through", so that the S1 attributes are always used.
+> > To make this useful, having some context provided by the host really
+> > is required.
 > 
-> Would you mind clarifying why FWB is preferable? Is it so that pkvm uses
-> the same approach for configuring stage 2 for the host as for a guest? Or
-> is it something else?
+> I could add to the event header the VM pid related to the currently loaded vCPU
+> (if any). I can access it easily with host_kvm->userspace_pid. WDYS?
 
-Having only one attribute encoding scheme to think about on a given
-machine is vastly preferable, specially when you are debugging.
-Additionally, FWB==0 may not be with us forever.
+It really should be the thread name, just like we already have for the
+kernel tracing. For example:
 
-> > This small series implements that change, adding a flag that actually
-> > describes what we are trying to do (instead of the NOFWB flag which is
-> > pretty obscure), and fixes an interesting gotcha with CMOs.
-> > Interestingly, CMOs never actually worked with NOFWB on an FWB-aware
-> > platform...
-> 
-> Hmm... as far I can tell pkvm doesn't populate
-> mm_ops->dcache_clean_inval_poc for host_mmu, so pKVM doesn't issue CMOs for
-> the host s2, with or without these changes.
+vgic_irq-2007    [005] ..... 180926.476735: kvm_sys_access: PC: 4119e4 SYS_ICC_DIR_EL1 (3,0,12,11,1) write
+vgic_irq-2010    [005] ..... 180926.534771: kvm_sys_access: PC: 40254c SYS_CNTV_CVAL_EL0 (3,3,14,3,2) write
+vgic_irq-2010    [005] ..... 180926.534777: kvm_sys_access: PC: 402554 SYS_CNTV_CTL_EL0 (3,3,14,3,1) write
+vgic_irq-2010    [005] ..... 180926.534789: kvm_sys_access: PC: 4025b8 SYS_CNTV_CTL_EL0 (3,3,14,3,1) write
+vgic_irq-2011    [010] ..... 180926.534790: kvm_sys_access: PC: 40254c SYS_CNTV_CVAL_EL0 (3,3,14,3,2) write
+vgic_irq-2010    [005] ..... 180926.534793: kvm_sys_access: PC: 4119e4 SYS_ICC_DIR_EL1 (3,0,12,11,1) write
 
-Yeah, I clearly was talking nonsense. I don't know how I came to this
-silly conclusion.
+This is a single guest, with concurrent vcpus. I'd like to be able to
+correlate that with what the hypervisor tracing outputs. At the very
+least the thread's PID. But the VM itself is pretty much irrelevant.
 
 Thanks,
 
