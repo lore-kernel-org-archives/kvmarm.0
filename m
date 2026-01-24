@@ -1,186 +1,119 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF54D2E414
-	for <kvmarm@lists.linux.dev>; Sat, 24 Jan 2026 07:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D03248F57
+	for <kvmarm@lists.linux.dev>; Sat, 24 Jan 2026 07:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769240831; cv=none; b=mCfWVeFmHN+9oPqExCM9TGV8bbmQ5JEewi1To6pA2pUonX7nBA5nsylLZfEqxKEGE9463rwoCzxNbLe5DvebMUfBye4xmnO5w/Sv3HKIb83FvEMw3l1l62Q8JL2KXEYJDARXkBgRHJm4727S4/MBLaRmi/p9MXt/b2wd+y33380=
+	t=1769240998; cv=none; b=Snai72Tq8mDx3YB+iNDbHLOZJL8wxHIO1bT658NIvdR+f/9QFM9j8M8m0BEcQyXzK6PrFv5K5rAAjHCjzqI2vVbblrdW1PSo4QHSnXcLaXGExt83tGkHPIrnWCJlV5FWOlfyfmaHfpRy1P+4WcDlQr0dXiLx4YDxSduzX6/4Qpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769240831; c=relaxed/simple;
-	bh=VMonpPDORVBzWWGlFxv6VqjO55xg9Co8gEtHsEjtK3c=;
+	s=arc-20240116; t=1769240998; c=relaxed/simple;
+	bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PnqpzcU8Y2FIwth8BhSJ8w/3tsbMNbt9WWIZJuIJlKqaR3Y6vHKyTF9n/nIarTdzXCjTUDn51EIuKCKfksODBRKokBwrsYETWOCieRqdIrYjpn4MOwJSNHn4ZyNVDDGagAvAUYx+drNJvO5lw24FE/iXODHN7g/56jEcrkXHGx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PaWDtq1t; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=FAbG3UzQJ8Ko+fVPuuU+rwxLi3nGXla3yVloqow2roUUFeTf1IKGpQE/9eIoD6+JjHU2BIOX8AAYSeItPq/P0QgunS13M3jOF2fkG8bUgn+6uCoFmVYaBWqFmzc/U+95ZaiVX5DM++72iROFKknVhVMW8b7BgwziGv4KHqJ5Jwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ok97up28; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PaWDtq1t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ok97up28"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769240828;
+	s=mimecast20190719; t=1769240995;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4v/ARzgQrLTE+mBIPvWEGmSWVJQf1rVB4tDf1RFfnKA=;
-	b=PaWDtq1tiRcFPPzI1QkjCMHmmn1oHeky64Tc8SDMZyshRzlI2cSJRFrmToyRZmM+at/od1
-	et7xSDp7KrKtgLqQmVNHV5VBtrfsuDVzdO7r3cdUvj5NfBwqZ4Uul/orFOR6T8u17Fxb7V
-	C/6WuVOyI1scPDBlrONhyQXXgnYgAJM=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
+	b=Ok97up28cwKzKuP+BwTkQqyLnQji+fmpvR+421Kl1UxREhVEKI9QEBXxtxoyxEmcNL6x5W
+	VBHafoFohNpvP8u0TuMEbo+EUR1MbW51qu3rsO3KWYS3q/QHW8ldsLzrDbFtkuI/vg+6ul
+	jW7c5S/bM2edBn7xKeUJ/A5MZLLw06g=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-BWc_pnrsPl-4YEtajbOfyw-1; Sat, 24 Jan 2026 02:47:07 -0500
-X-MC-Unique: BWc_pnrsPl-4YEtajbOfyw-1
-X-Mimecast-MFC-AGG-ID: BWc_pnrsPl-4YEtajbOfyw_1769240826
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-432c05971c6so2187327f8f.1
-        for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 23:47:06 -0800 (PST)
+ us-mta-221-D7bX__SpM76-nKZd2Pr0cA-1; Sat, 24 Jan 2026 02:49:53 -0500
+X-MC-Unique: D7bX__SpM76-nKZd2Pr0cA-1
+X-Mimecast-MFC-AGG-ID: D7bX__SpM76-nKZd2Pr0cA_1769240993
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-435af2d3144so544296f8f.3
+        for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 23:49:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769240825; x=1769845625;
+        d=1e100.net; s=20230601; t=1769240993; x=1769845793;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4v/ARzgQrLTE+mBIPvWEGmSWVJQf1rVB4tDf1RFfnKA=;
-        b=BD5H4uEU8WO/zRSWme8Zow898tVTPMD+fOjqfncz2g+2hu79UidOhrRK3pLUHGjUTZ
-         zmrC4TKrie4UVtOfvPzLIUvb/7LGFESOVdXyAaQePBtiWpfA87ikC+TU4xsD1u/48Idi
-         YczKNVNLSoJxFppiWmQ6A7EJ4tTVruzvIymZPXmdmp2rI80RdDh/08JkvPF46boK676i
-         iqGih4SqGGH6Bf6BuO9o9Kg91rwlBlD9l2NAzh8Pk8eWzFivn+jes0a4jmqzIydJt78Y
-         BDiNUrcJlRtaEnDmgeSl2/nBreDCvITuWCBHyO2L+vK0pRoL8DzDunyOMtjODoJFr+8D
-         eSrg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3BE5pFLx2AsLXPJp9mBU5GeLq1A4rk76yXT4Xlkig8yQr/hsss2C67EM0f3oR2DTCU5O4F0s=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxXgaf91AK1Hnan51lIjgIptvmyAVR04cCxHyylplsJ0fhZGnng
-	6sw5/oVZ+NghcX2zuiDL5QTG8NPRY4VY925bnxzYdNF1DQAaJKOJ06cqA5y/3Sp7UmoKyO9l193
-	IqaMeC4tSTvQ40pkE4u/y+BgNwC9wN2RkRojJlXrzhJd/uCV1nJCauQ9+xXunClhP0ce0HPWIyp
-	Xiz7mKrVyIn9C4KFPYgGHB84AGGP3uHSq5wy5RR2C+
-X-Gm-Gg: AZuq6aJ3k9h3oHRce7nzdd4mCp5Ynn2Jq8pN5MAW91z3YV9R6cZkHobpAFO36s3ZFa4
-	ezLiDKUDLyak6Yz1kyB3OKm3i3+vWPO0QWI5N2PpazHmclGsKSEbMSTBIZ37jquUE4dhc+KSoQx
-	g7Gmmy7wlKCXo/2bpV+74pBjPWeENy0NnCBRQH4C6sQ+QjNpK0mB7G1EnrJIPMHewrItRs09ewD
-	ixzdD/ZCqeASzdI74fWKatWCJdHt3vH3LqE4SBuSg4/FtA74EpJX0JQrgSZeF7t/Qbrkg==
-X-Received: by 2002:a5d:64e7:0:b0:430:f736:7cc with SMTP id ffacd0b85a97d-435b1ab83f6mr8611684f8f.1.1769240825315;
-        Fri, 23 Jan 2026 23:47:05 -0800 (PST)
-X-Received: by 2002:a5d:64e7:0:b0:430:f736:7cc with SMTP id
- ffacd0b85a97d-435b1ab83f6mr8611661f8f.1.1769240824848; Fri, 23 Jan 2026
- 23:47:04 -0800 (PST)
+        bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
+        b=HQmYlJKHpxb+CSakJUFuld4o+QldUwXOColTGbtzBthwQwB7bkROwac6fkkD0G9idE
+         8tRGkLkLRNcdwYm5kP8nBnqdbhJ+Wt3lfQOFn36OK8lAwXAUGycrDG91WKBUu1NRpcVT
+         WIuCfIA5P8lIvJgf+mhj2jUIoC1AxwAYcexxoWGwQhNhQqlKINGfYtfTwC54MrauiJLa
+         xA5sOxuqHi6klPIyEs0SS1TxArfMrLOOYCTCq8a6+iw40SeS3C5GHTlLTgNO4reSY2QP
+         w05eLRaVfBGbMMSYP42UM0/ZhY4sNZZRevvBnOlC59qfdYlnudiqP/TtJAhdmwrCMTv6
+         ucDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXi9MBcUQ8TC/gIvifHxeZlVkQb1aAv3g+ZXF7JH9Wu2zqPOCPhxptmdZg/dy1DJIYb5AxAWkM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxBHFuXgL+PHVJNNfoDYzj0Ohy7lVh6TiJmtccGGg6hszkP40Og
+	zoNWhIcmixhrRVbigjaX316QXO7AXrG0KuxeqxL0WJHxuX0OcFkLnsAcSIeNljIryy7UCyPQFY6
+	gS98wfqQSbuiBjQ9JaDcSoo5itair4JqaMxn9b/Qjx0cAcK2kZRG0rVO29adu6/skYNgwke97gU
+	qU3xfUndM7yHFbV1CUadd3TWjo7Bgh2cyX
+X-Gm-Gg: AZuq6aIbJCDwOfNH7JEVw56zQngBmQqR8Bwjj+Etc+TblE8Gc/XsBN/ZpnBqDCQfS76
+	qrky7ZbDKsgybeDwlweAIJPXWUxVRzQzOeEMWINjv2uGa1rWWnoDkkTtv/Ks5Tf7k2xbgJ8bxhA
+	YAUAFgNYlqLETUlHkjRUFy8BXlDRS+hFtJueKehS0TCPOEaf+UViGcitAohlE0KVDpjFD+But2+
+	oI6aDMRtiTKabfF0UO1kPonTkVqVnmlWi6vd4rSLHr4Wixr6Z+mMnh1/FU5v2k1fDzWLQ==
+X-Received: by 2002:a05:6000:601:b0:430:fdc8:8bbd with SMTP id ffacd0b85a97d-435b16039damr9146802f8f.41.1769240992690;
+        Fri, 23 Jan 2026 23:49:52 -0800 (PST)
+X-Received: by 2002:a05:6000:601:b0:430:fdc8:8bbd with SMTP id
+ ffacd0b85a97d-435b16039damr9146785f8f.41.1769240992303; Fri, 23 Jan 2026
+ 23:49:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <aWizsSzD3fRWMsAc@kernel.org>
-In-Reply-To: <aWizsSzD3fRWMsAc@kernel.org>
+References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-40-seanjc@google.com>
+ <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d>
+ <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com> <874iovu742.ffs@tglx>
+ <87pl7jsrdg.ffs@tglx> <5bea843b-dec8-4f15-bb7c-1d0550542034@redhat.com> <87sebxtrgp.ffs@tglx>
+In-Reply-To: <87sebxtrgp.ffs@tglx>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 24 Jan 2026 08:46:53 +0100
-X-Gm-Features: AZwV_Qin5BW9ER_Rro9iMC2v0VFsd8G87ICtOoRCsPXIgFxX4oq4YSVsDFm_Yo8
-Message-ID: <CABgObfYb7yK7CCq5iEXjfa+=DnYBUG7YnKxR-wjK0mY=nB47Dg@mail.gmail.com>
-Subject: Re: KVM/arm64 fixes for 6.19
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Date: Sat, 24 Jan 2026 08:49:40 +0100
+X-Gm-Features: AZwV_Qj6aLwVSas8vwNUo-Ndu2FBevRcUQp0THPxC18GLGDTRk3JARciXPkQtdQ
+Message-ID: <CABgObfbijO2k6fe6z03M3u--4ZKXxwPSf2RrasU1=J5rtj9CUg@mail.gmail.com>
+Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
+ the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock
+ across IRTE updates in IOMMU)
+To: Thomas Gleixner <tglx@kernel.org>
+Cc: Ankit Soni <Ankit.Soni@amd.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>, 
+	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
+	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>, 
+	Naveen Rao <Naveen.Rao@amd.com>, Crystal Wood <crwood@redhat.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: 7Tvk5sxk2A5eBLrxpjMrGvdDmaAEQx69GNEFe8fmht0_1769240826
+X-Mimecast-MFC-PROC-ID: FZXCkShQv0zc6hMyRsCZi6OqP5lX30iHl5ZJwSWH1AU_1769240993
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 15, 2026 at 10:30=E2=80=AFAM Oliver Upton <oupton@kernel.org> w=
+On Thu, Jan 22, 2026 at 7:47=E2=80=AFPM Thomas Gleixner <tglx@kernel.org> w=
 rote:
 >
-> Hi Paolo,
+> On Wed, Jan 21 2026 at 19:13, Paolo Bonzini wrote:
+> > On 1/8/26 22:53, Thomas Gleixner wrote:
+> >> Are you still claiming that this is a kernel/irq bug?
+> >
+> > Not really, I did say I'd like to treat it as a kernel/irq bug...
+> > but certainly didn't have hopes high enough to "claim" that.
+> > I do think that it's ugly to have locks that are internal,
+> > non-leaf and held around callbacks; but people smarter than
+> > me have thought about it and you can't call it a bug anyway.
 >
-> Here is the first (and likely only) set of fixes for 6.19. Small batch
-> of changes fixing issues in non-standard configurations like pKVM, hVHE,
-> and nested.
->
-> Details are in the tag, please pull.
+> Deep core code has a tendency to be ugly. But if it makes your life
+> easier, then these wakeups can be delayed via an irq_work to be outside
+> of the lock. That needs some life-time issues to be addressed, but
+> should be doable.
 
-Pulled, thanks - I waited to see if anything else came around from
-other architectures, but it seems like things are calm.
+Thanks for the suggestion---hopefully it's not needed at all and we
+can delay taking the lock in KVM.
 
 Paolo
-
-> Thanks,
-> Oliver
->
-> The following changes since commit f8f9c1f4d0c7a64600e2ca312dec824a0bc2f1=
-da:
->
->   Linux 6.19-rc3 (2025-12-28 13:24:26 -0800)
->
-> are available in the Git repository at:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/ tags=
-/kvmarm-fixes-6.19-1
->
-> for you to fetch changes up to 19cffd16ed6489770272ba383ff3aaec077e01ed:
->
->   KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walkers (2=
-026-01-10 02:19:52 -0800)
->
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 6.19
->
->  - Ensure early return semantics are preserved for pKVM fault handlers
->
->  - Fix case where the kernel runs with the guest's PAN value when
->    CONFIG_ARM64_PAN is not set
->
->  - Make stage-1 walks to set the access flag respect the access
->    permission of the underlying stage-2, when enabled
->
->  - Propagate computed FGT values to the pKVM view of the vCPU at
->    vcpu_load()
->
->  - Correctly program PXN and UXN privilege bits for hVHE's stage-1 page
->    tables
->
->  - Check that the VM is actually using VGICv3 before accessing the GICv3
->    CPU interface
->
->  - Delete some unused code
->
-> ----------------------------------------------------------------
-> Alexandru Elisei (4):
->       KVM: arm64: Copy FGT traps to unprotected pKVM VCPU on VCPU load
->       KVM: arm64: Inject UNDEF for a register trap without accessor
->       KVM: arm64: Remove extra argument for __pvkm_host_{share,unshare}_h=
-yp()
->       KVM: arm64: Remove unused parameter in synchronize_vcpu_pstate()
->
-> Dongxu Sun (1):
->       KVM: arm64: Remove unused vcpu_{clear,set}_wfx_traps()
->
-> Marc Zyngier (2):
->       KVM: arm64: Fix EL2 S1 XN handling for hVHE setups
->       KVM: arm64: Don't blindly set set PSTATE.PAN on guest exit
->
-> Oliver Upton (1):
->       KVM: arm64: nv: Respect stage-2 write permssion when setting stage-=
-1 AF
->
-> Sascha Bischoff (1):
->       KVM: arm64: gic: Check for vGICv3 when clearing TWI
->
-> Will Deacon (1):
->       KVM: arm64: Invert KVM_PGTABLE_WALK_HANDLE_FAULT to fix pKVM walker=
-s
->
->  arch/arm64/include/asm/kvm_asm.h        |  2 ++
->  arch/arm64/include/asm/kvm_emulate.h    | 16 ----------------
->  arch/arm64/include/asm/kvm_pgtable.h    | 16 ++++++++++++----
->  arch/arm64/include/asm/sysreg.h         |  3 ++-
->  arch/arm64/kernel/image-vars.h          |  1 +
->  arch/arm64/kvm/arm.c                    |  1 +
->  arch/arm64/kvm/at.c                     |  8 ++++++--
->  arch/arm64/kvm/hyp/entry.S              |  4 +++-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  3 +++
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  1 -
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
->  arch/arm64/kvm/hyp/pgtable.c            |  5 +++--
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  arch/arm64/kvm/mmu.c                    | 12 +++++-------
->  arch/arm64/kvm/sys_regs.c               |  5 ++++-
->  arch/arm64/kvm/va_layout.c              | 28 +++++++++++++++++++++++++++=
-+
->  17 files changed, 73 insertions(+), 38 deletions(-)
->
 
