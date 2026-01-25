@@ -1,119 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D03248F57
-	for <kvmarm@lists.linux.dev>; Sat, 24 Jan 2026 07:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769240998; cv=none; b=Snai72Tq8mDx3YB+iNDbHLOZJL8wxHIO1bT658NIvdR+f/9QFM9j8M8m0BEcQyXzK6PrFv5K5rAAjHCjzqI2vVbblrdW1PSo4QHSnXcLaXGExt83tGkHPIrnWCJlV5FWOlfyfmaHfpRy1P+4WcDlQr0dXiLx4YDxSduzX6/4Qpg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769240998; c=relaxed/simple;
-	bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CFD2741A0
+	for <kvmarm@lists.linux.dev>; Sun, 25 Jan 2026 13:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769349057; cv=pass; b=cmxphz58tkE5UA5J6Tw2mqLD2Gy1bufDPqQ/eYx6bOy+ST/3kEWBXHGhbyaG6QWLftdurxvTpWSXD26CIYTdKdlXKWPBVUjEYQQcMW5BeTedYgA0BKwkx2TJSaFXioTbaiTfP5bA+Vlm5v0g3xY8yqH5NkHsMDJ2vWIHC5HeG1g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769349057; c=relaxed/simple;
+	bh=rlAK/BatGRuo9kHWHuJjdpMjxK2eikEg2S8ysY4p7cE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FAbG3UzQJ8Ko+fVPuuU+rwxLi3nGXla3yVloqow2roUUFeTf1IKGpQE/9eIoD6+JjHU2BIOX8AAYSeItPq/P0QgunS13M3jOF2fkG8bUgn+6uCoFmVYaBWqFmzc/U+95ZaiVX5DM++72iROFKknVhVMW8b7BgwziGv4KHqJ5Jwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ok97up28; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=K7G9TtZyHOuZB/QiPqkYM5nfkZ6tBEvVYchyjjIqfIQ88lDKFD/hjQsAw+V+Bld0r5w0mut18XAQAV2tEMVdIGPYjaKwf9sdbxi0JgNkiEJNUDiyO8sx8no7Y9766Vh1vNrSI2541TrjiTCRXoZ+sMNAsngBz0RRGWgRvCTlAlQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FMvLaETN; arc=pass smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ok97up28"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1769240995;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
-	b=Ok97up28cwKzKuP+BwTkQqyLnQji+fmpvR+421Kl1UxREhVEKI9QEBXxtxoyxEmcNL6x5W
-	VBHafoFohNpvP8u0TuMEbo+EUR1MbW51qu3rsO3KWYS3q/QHW8ldsLzrDbFtkuI/vg+6ul
-	jW7c5S/bM2edBn7xKeUJ/A5MZLLw06g=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-D7bX__SpM76-nKZd2Pr0cA-1; Sat, 24 Jan 2026 02:49:53 -0500
-X-MC-Unique: D7bX__SpM76-nKZd2Pr0cA-1
-X-Mimecast-MFC-AGG-ID: D7bX__SpM76-nKZd2Pr0cA_1769240993
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-435af2d3144so544296f8f.3
-        for <kvmarm@lists.linux.dev>; Fri, 23 Jan 2026 23:49:53 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FMvLaETN"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-50299648ae9so497261cf.1
+        for <kvmarm@lists.linux.dev>; Sun, 25 Jan 2026 05:50:55 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769349055; cv=none;
+        d=google.com; s=arc-20240605;
+        b=NRc985g+xQHVDZcJh8DFpaRj72jOHEa2bAzy1TLaMN/CgH2bDjUp2ltxEmueM/Ben4
+         fVjavrw3EaUbZKVT7sgpiy+0/FHzYwDQJ4CCMCg4PJLQqd21VCq33t0THIbW6a3oHOqj
+         afGEuWdckeImiK3VgNPFuXzN/pJ/phEOCsQCGFId6BaBhklwjq4mOjOrcKf3KKqIP0ZM
+         X8dh579fmvuTU3Ru7ma0z07R8gY5OS0PK8NX1M5wGaXbJdWyx9J3zChZIbqgI/pnpef4
+         /gqLXBDowzoR7o5aVzxSsXjdl33lRjJ8/SR49+JKGsYF0lw1Iqlg5KevxhJcQYwrKrYU
+         UDfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=bvtCjytnh3m0w4xXt7ewKdUhvsuqlVQAf7Vxj7DBbXU=;
+        fh=oKlrb0qZ1hR4CAuTOFfiao8JkykPVcF24VV3oTmJ1vk=;
+        b=aLfbc9XGlGohdlmG6CeJGuygHgZJGC+0xViu4rs+ZUft6w5vUl95E0ntwE0WLCzqvB
+         QQtSRiJke48rpP1aSg2ipbHlEnYJf+YN+MqNSwNKtwA5cRmPGMzviVOxVkPtSjP3yteD
+         GoEXZ4bl5CvhnB+95D4FlhCRvrM1ECJxIx9bPpUiUSlUf24z6MxXD20hf0xBHsQvFPGa
+         MFpzfXh0N3AptS1nb2tXzS7IdO95fS/jLlMMYHylQYo9+ezQ2HMyFK6ZpSTl2rsUiio7
+         kIRvqpjpHuX/aLkJ7/VKwXk0OcS3Phs2iKc3S1+erqeyFhBHIlf2tWGgrFnZXgK3UrIX
+         XV8w==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769349055; x=1769953855; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bvtCjytnh3m0w4xXt7ewKdUhvsuqlVQAf7Vxj7DBbXU=;
+        b=FMvLaETNZyKSoaSxY6oThZVtiO+ip0ljxhQo4Vt/RgUrD4K1m5OMUaGahCS2boB5nx
+         Wy5VC/uC/c8w4sVqqamuiptx9fPc78BdNx6w4cN+kH7yvzYNH8xZkx+eLCXJwKkob0g7
+         URdyBgHFqmUpw9np/rcqaiT7WMmeSRAgIA6ZtrRoi598cvG96X43+wl2jYejvsvZNNuA
+         2m9q9aGnUR72phz+2zxveLaguuXeRxRND7E+ysN/z/HVvc0WTUTvLub5CFgmmSKao7ri
+         KaWKb74KXZ8275bXYVF+ULWrog0vAIsXDVKxvzcXQe2eINt4TyXdB4Bwd/iruwYD9o6X
+         cZgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769240993; x=1769845793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wjMnGoeDh+YdrtLg+xDqC4Hnv8XghUga4m38t6BAP9M=;
-        b=HQmYlJKHpxb+CSakJUFuld4o+QldUwXOColTGbtzBthwQwB7bkROwac6fkkD0G9idE
-         8tRGkLkLRNcdwYm5kP8nBnqdbhJ+Wt3lfQOFn36OK8lAwXAUGycrDG91WKBUu1NRpcVT
-         WIuCfIA5P8lIvJgf+mhj2jUIoC1AxwAYcexxoWGwQhNhQqlKINGfYtfTwC54MrauiJLa
-         xA5sOxuqHi6klPIyEs0SS1TxArfMrLOOYCTCq8a6+iw40SeS3C5GHTlLTgNO4reSY2QP
-         w05eLRaVfBGbMMSYP42UM0/ZhY4sNZZRevvBnOlC59qfdYlnudiqP/TtJAhdmwrCMTv6
-         ucDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXi9MBcUQ8TC/gIvifHxeZlVkQb1aAv3g+ZXF7JH9Wu2zqPOCPhxptmdZg/dy1DJIYb5AxAWkM=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxBHFuXgL+PHVJNNfoDYzj0Ohy7lVh6TiJmtccGGg6hszkP40Og
-	zoNWhIcmixhrRVbigjaX316QXO7AXrG0KuxeqxL0WJHxuX0OcFkLnsAcSIeNljIryy7UCyPQFY6
-	gS98wfqQSbuiBjQ9JaDcSoo5itair4JqaMxn9b/Qjx0cAcK2kZRG0rVO29adu6/skYNgwke97gU
-	qU3xfUndM7yHFbV1CUadd3TWjo7Bgh2cyX
-X-Gm-Gg: AZuq6aIbJCDwOfNH7JEVw56zQngBmQqR8Bwjj+Etc+TblE8Gc/XsBN/ZpnBqDCQfS76
-	qrky7ZbDKsgybeDwlweAIJPXWUxVRzQzOeEMWINjv2uGa1rWWnoDkkTtv/Ks5Tf7k2xbgJ8bxhA
-	YAUAFgNYlqLETUlHkjRUFy8BXlDRS+hFtJueKehS0TCPOEaf+UViGcitAohlE0KVDpjFD+But2+
-	oI6aDMRtiTKabfF0UO1kPonTkVqVnmlWi6vd4rSLHr4Wixr6Z+mMnh1/FU5v2k1fDzWLQ==
-X-Received: by 2002:a05:6000:601:b0:430:fdc8:8bbd with SMTP id ffacd0b85a97d-435b16039damr9146802f8f.41.1769240992690;
-        Fri, 23 Jan 2026 23:49:52 -0800 (PST)
-X-Received: by 2002:a05:6000:601:b0:430:fdc8:8bbd with SMTP id
- ffacd0b85a97d-435b16039damr9146785f8f.41.1769240992303; Fri, 23 Jan 2026
- 23:49:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1769349055; x=1769953855;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bvtCjytnh3m0w4xXt7ewKdUhvsuqlVQAf7Vxj7DBbXU=;
+        b=OmDhFukzUJuWyqlVVpSN/LP+rZkU+STylZj1dmAberylIiFqMIRFvaKWA5wVWaPCzz
+         AXui/DMuIcNJAqFM5IwcnKgC3rzWdc4vlfbRh8kehniB3JyqNmZ5LMI29CW1PW3dzMHs
+         Yh/mdTrqW21L1UAgBf5MFFsi8w+2O6nkaMtyAZal0uK3zGn6fbKYm8S6MgWjqBFkVbKK
+         S6ze3uYZkDk1VwEhYTxkuqiF+dghGQUvIS9BrqiWsT8K5zS4SH+W4SenKBSFb8whJ/z4
+         MaRz6h3G/+Ls+rjM18dcmTnaIHDm5DH90sWVccpPSa4QKcQeFNNW+xhlPIFzVs87nKmk
+         kAhg==
+X-Gm-Message-State: AOJu0YzWpg6p/G1LcRzzNOG+A58Uvbv/aEUxJrb2t+wmO+uPxqV2i7Pt
+	4BxtpVvs1hw+qOLUOt8lajNKMJtVyYRSiNLkQZP0dOjwFnzY51FH+JKwZBGk4vm1eGMNiZekHLq
+	2dQhiGU24jPhS7tYFTbhHaboO5eOc/Y0s9M899oyU
+X-Gm-Gg: AZuq6aLW5UbhnTCguh87weZ08czF9yHtucqoCVR+QQwAsdqptBOHJFZ05cFMJtOPUBa
+	xVy3X7d1C8MxhpoaQzjG5SHK9ZSLzZrThbombk5V29OzPK0TNog1K/wpvHnGgjRDofu3MH40MUc
+	5azgx0rWtJRmPEBceGw0qFLQkGSWR0TaZuT+PVVN/mBI5tRcMkW4+Bb9oxLap8DIc19czmimFD9
+	aMLS33e15rJXs1mj92W17I2xdMP0XV2gq1ry4y6SPxt+moAhWgfm7rmUG4RjcMKMaDSDi5K
+X-Received: by 2002:ac8:5987:0:b0:4ff:bfd9:dd31 with SMTP id
+ d75a77b69052e-5031428f089mr4086301cf.5.1769349054528; Sun, 25 Jan 2026
+ 05:50:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20250611224604.313496-2-seanjc@google.com> <20250611224604.313496-40-seanjc@google.com>
- <njhjud3e6wbdftzr3ziyuh5bhyvc5ndt5qvmg7rlvh5isoop2l@f2uxctws2c7d>
- <42513cb3-3c2e-4aa8-b748-23b6656a5096@redhat.com> <874iovu742.ffs@tglx>
- <87pl7jsrdg.ffs@tglx> <5bea843b-dec8-4f15-bb7c-1d0550542034@redhat.com> <87sebxtrgp.ffs@tglx>
-In-Reply-To: <87sebxtrgp.ffs@tglx>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 24 Jan 2026 08:49:40 +0100
-X-Gm-Features: AZwV_Qj6aLwVSas8vwNUo-Ndu2FBevRcUQp0THPxC18GLGDTRk3JARciXPkQtdQ
-Message-ID: <CABgObfbijO2k6fe6z03M3u--4ZKXxwPSf2RrasU1=J5rtj9CUg@mail.gmail.com>
-Subject: Re: possible deadlock due to irq_set_thread_affinity() calling into
- the scheduler (was Re: [PATCH v3 38/62] KVM: SVM: Take and hold ir_list_lock
- across IRTE updates in IOMMU)
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: Ankit Soni <Ankit.Soni@amd.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Joerg Roedel <joro@8bytes.org>, 
-	David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	Sairaj Kodilkar <sarunkod@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Joao Martins <joao.m.martins@oracle.com>, 
-	Francesco Lavra <francescolavra.fl@gmail.com>, David Matlack <dmatlack@google.com>, 
-	Naveen Rao <Naveen.Rao@amd.com>, Crystal Wood <crwood@redhat.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: FZXCkShQv0zc6hMyRsCZi6OqP5lX30iHl5ZJwSWH1AU_1769240993
-X-Mimecast-Originator: redhat.com
+References: <20260123191637.715429-1-maz@kernel.org> <20260123191637.715429-4-maz@kernel.org>
+In-Reply-To: <20260123191637.715429-4-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Sun, 25 Jan 2026 13:50:17 +0000
+X-Gm-Features: AZwV_QgL4MA9dzU0hsWQWkYWo_GVTF-8xtdiRpx6vT3QpIK8K8eZ4J0wi3LqHIQ
+Message-ID: <CA+EHjTyCLMpfwJ8_4hs2AZudQadvjqrRm7ULSsw0DQrsDEBFHQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] KVM: arm64: Switch pKVM host S2 over to KVM_PGTABLE_S2_AS_S1
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>, Alexandru Elisei <alexandru.elisei@arm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 22, 2026 at 7:47=E2=80=AFPM Thomas Gleixner <tglx@kernel.org> w=
-rote:
+On Fri, 23 Jan 2026 at 19:16, Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Wed, Jan 21 2026 at 19:13, Paolo Bonzini wrote:
-> > On 1/8/26 22:53, Thomas Gleixner wrote:
-> >> Are you still claiming that this is a kernel/irq bug?
-> >
-> > Not really, I did say I'd like to treat it as a kernel/irq bug...
-> > but certainly didn't have hopes high enough to "claim" that.
-> > I do think that it's ugly to have locks that are internal,
-> > non-leaf and held around callbacks; but people smarter than
-> > me have thought about it and you can't call it a bug anyway.
+> Since we have the basics to use the S1 memory attributes as the
+> final ones with FWB, flip the host over to that when FWB is present.
 >
-> Deep core code has a tendency to be ugly. But if it makes your life
-> easier, then these wakeups can be delayed via an irq_work to be outside
-> of the lock. That needs some life-time issues to be addressed, but
-> should be doable.
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Thanks for the suggestion---hopefully it's not needed at all and we
-can delay taking the lock in KVM.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-Paolo
-
+Cheers,
+/fuad
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 49db32f3ddf71..38f66a56a7665 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -19,7 +19,7 @@
+>  #include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+>
+> -#define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
+> +#define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_AS_S1 | KVM_PGTABLE_S2_IDMAP)
+>
+>  struct host_mmu host_mmu;
+>
+> @@ -324,6 +324,8 @@ int __pkvm_prot_finalize(void)
+>         params->vttbr = kvm_get_vttbr(mmu);
+>         params->vtcr = mmu->vtcr;
+>         params->hcr_el2 |= HCR_VM;
+> +       if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB))
+> +               params->hcr_el2 |= HCR_FWB;
+>
+>         /*
+>          * The CMO below not only cleans the updated params to the
+> --
+> 2.47.3
+>
