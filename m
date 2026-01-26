@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4035D336ED8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7378B3370EC;
 	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769429855; cv=none; b=EGC100mTRqCuAdW6zTtxQSJqCTWmKwL3gmABxfXCPvYIBZ6TMtyiu/M2VPBmF87JNzckKE2+PIaeZppjtSG3DYNwxsKRg/wMPhY4NCIG5nN/1yt5DE8/4hk7P5a8DU87pG9j5GISOLh6FewpBmbd8hCNeXImCzz/djshYcFJlJI=
+	t=1769429855; cv=none; b=EovF2n1EYfb1PeKdNVUOCHziFSPLj4AZDSnNq3nkj9cTwvAQBy9RUjJgaUBSWf36JIb8XbsFzUJ4OBowG6qLB6pwT8Si9US7U/8xOPYZs+GNKZ6jlKtssS40dbDByq2Tz0HOfrCUlG95AOojX48zs6UTEfaZ0K8FvJ/cxLM4zUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769429855; c=relaxed/simple;
-	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
+	bh=y57eypVaqnVgq3cxgx+jkvg59wcWPCxI619OLu3MS/k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rwvOIu/HrMvut1WOEi8YDVko/wmEsPgqPINXUbBEzsemFlL1ihvzjB2WjQyafsXHWujF1YYlScovdrzzj3J9ERA0ANraDwTVWIG96xtdu6sjN0Z7dHcijPjWq6e4078pxYeJYqFlkK48bmQ7wlM1gf/UqG2kAiCoxquq54CWZQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lynbX/MK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Lp+kmUB7jUryffqgMZ85CCMe6ZckT6GXmbH+0EoMZUhpdjg6ue/oGy4hYLXBSAXQ8F2PuHksDQMs88i1krZ8SZJufmQKe0ShS0NYKGPJIcS4BqWM2QQ7AN1nGJB0nwjIm9ib/N9A0LyiU5odcDJbJ64BL/25gC7lMfUdUN6QNRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThUj+RoH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lynbX/MK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E827C2BC87;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThUj+RoH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4901DC4AF0B;
 	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769429855;
-	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
+	bh=y57eypVaqnVgq3cxgx+jkvg59wcWPCxI619OLu3MS/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lynbX/MKrusm4/GddjW2C1EcTeaJQuHw8aiCSS7Qb59DG6haFmWjqQv91Lne9rOhP
-	 Xm18Ia8UBL0QVFeo1MfGDe9D8Lwyf8SXJH/WRy0VR/DKFE/5yW7OaVrnKc7M1H5fAG
-	 Fu0GoabENZb4J/VHE6F1CDaQ4ehq0QWkWTi/BFZJhtW7kIv7ler9nUPwTSrRcqhKRx
-	 dnEKDXMz1SnjJQjSNYriyxl5pRJw4kYydCYPwQLevyeSyDhUSyXsDEH7BrZudkIxGH
-	 X5MsVIOYwrWag99XWz8r9hSQxBY+pilf79P3e5Jhdt+mGIN/sgPLv/fLteN5azlCD5
-	 LOUN+L8P/YP2g==
+	b=ThUj+RoHAhJbCX5ENfAgxA2rpSz2ag1dE1DkeciOi0cxdE+7sJr4OFZpH/5IBPEcS
+	 Uylx2iPIev5R1POCXHtVxZ4XwqM1rZY+My3WM6qDWx5jZT0ygsEueDbK+E39aeJuZJ
+	 Qj0tSXPN678DVuqwfAqqrNiDKFluc53Md/dzRoLJk8N+Hz/HwV0pfMI5JK8M0S2ccf
+	 Zoyc6i3teMqU1hRQk9LyuEcWwnvZrtUytMWJCBPqkjNrA9aRC6V21KY4SNd4CTKeB8
+	 LYCv1HlBT3iA6iaIvqFNkWoYXSI1BDxWLGRPZvZT5kdMM3Udj+ZFoaqPV0reOugvnk
+	 vNvrLbviOIg5w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vkLXB-00000005hx6-1Ahu;
+	id 1vkLXB-00000005hx6-2Aqw;
 	Mon, 26 Jan 2026 12:17:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 07/20] KVM: arm64: Allow RES1 bits to be inferred from configuration
-Date: Mon, 26 Jan 2026 12:16:41 +0000
-Message-ID: <20260126121655.1641736-8-maz@kernel.org>
+Subject: [PATCH 08/20] KVM: arm64: Correctly handle SCTLR_EL1 RES1 bits for unsupported features
+Date: Mon, 26 Jan 2026 12:16:42 +0000
+Message-ID: <20260126121655.1641736-9-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
 References: <20260126121655.1641736-1-maz@kernel.org>
@@ -61,45 +61,68 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-So far, when a bit field is tied to an unsupported feature, we set
-it as RES0. This is almost forrect, but there are a few exceptions
-where the bits become RES1.
-
-Add a AS_RES1 qualifier that instruct the RESx computing code to
-simply do that.
+A bunch of SCTLR_EL1 bits must be set to RES1 when the controling
+feature is not present. Add the AS_RES1 qualifier where needed.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/config.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/config.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 8d152605999ba..6a4674fabf865 100644
+index 6a4674fabf865..68ed5af2b4d53 100644
 --- a/arch/arm64/kvm/config.c
 +++ b/arch/arm64/kvm/config.c
-@@ -24,6 +24,7 @@ struct reg_bits_to_feat_map {
- #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
- #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
- #define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bits */
-+#define	AS_RES1		BIT(4)	/* RES1 when not supported */
+@@ -1085,27 +1085,28 @@ static const DECLARE_FEAT_MAP(tcr2_el2_desc, TCR2_EL2,
+ 			      tcr2_el2_feat_map, FEAT_TCR2);
  
- 	unsigned long	flags;
- 
-@@ -1316,8 +1317,12 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
- 		else
- 			match = idreg_feat_match(kvm, &map[i]);
- 
--		if (!match || (map[i].flags & FIXED_VALUE))
--			resx.res0 |= reg_feat_map_bits(&map[i]);
-+		if (!match || (map[i].flags & FIXED_VALUE)) {
-+			if (map[i].flags & AS_RES1)
-+ 				resx.res1 |= reg_feat_map_bits(&map[i]);
-+			else
-+				resx.res0 |= reg_feat_map_bits(&map[i]);
-+		}
- 	}
- 
- 	return resx;
+ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
+-	NEEDS_FEAT(SCTLR_EL1_CP15BEN	|
+-		   SCTLR_EL1_ITD	|
+-		   SCTLR_EL1_SED,
+-		   FEAT_AA32EL0),
++	NEEDS_FEAT(SCTLR_EL1_CP15BEN, FEAT_AA32EL0),
++	NEEDS_FEAT_FLAG(SCTLR_EL1_ITD	|
++			SCTLR_EL1_SED,
++			AS_RES1, FEAT_AA32EL0),
+ 	NEEDS_FEAT(SCTLR_EL1_BT0	|
+ 		   SCTLR_EL1_BT1,
+ 		   FEAT_BTI),
+ 	NEEDS_FEAT(SCTLR_EL1_CMOW, FEAT_CMOW),
+-	NEEDS_FEAT(SCTLR_EL1_TSCXT, feat_csv2_2_csv2_1p2),
+-	NEEDS_FEAT(SCTLR_EL1_EIS	|
+-		   SCTLR_EL1_EOS,
+-		   FEAT_ExS),
++	NEEDS_FEAT_FLAG(SCTLR_EL1_TSCXT,
++			AS_RES1, feat_csv2_2_csv2_1p2),
++	NEEDS_FEAT_FLAG(SCTLR_EL1_EIS	|
++			SCTLR_EL1_EOS,
++			AS_RES1, FEAT_ExS),
+ 	NEEDS_FEAT(SCTLR_EL1_EnFPM, FEAT_FPMR),
+ 	NEEDS_FEAT(SCTLR_EL1_IESB, FEAT_IESB),
+ 	NEEDS_FEAT(SCTLR_EL1_EnALS, FEAT_LS64),
+ 	NEEDS_FEAT(SCTLR_EL1_EnAS0, FEAT_LS64_ACCDATA),
+ 	NEEDS_FEAT(SCTLR_EL1_EnASR, FEAT_LS64_V),
+ 	NEEDS_FEAT(SCTLR_EL1_nAA, FEAT_LSE2),
+-	NEEDS_FEAT(SCTLR_EL1_LSMAOE	|
+-		   SCTLR_EL1_nTLSMD,
+-		   FEAT_LSMAOC),
++	NEEDS_FEAT_FLAG(SCTLR_EL1_LSMAOE	|
++			SCTLR_EL1_nTLSMD,
++			AS_RES1, FEAT_LSMAOC),
+ 	NEEDS_FEAT(SCTLR_EL1_EE, FEAT_MixedEnd),
+ 	NEEDS_FEAT(SCTLR_EL1_E0E, feat_mixedendel0),
+ 	NEEDS_FEAT(SCTLR_EL1_MSCEn, FEAT_MOPS),
+@@ -1121,7 +1122,8 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
+ 	NEEDS_FEAT(SCTLR_EL1_NMI	|
+ 		   SCTLR_EL1_SPINTMASK,
+ 		   FEAT_NMI),
+-	NEEDS_FEAT(SCTLR_EL1_SPAN, FEAT_PAN),
++	NEEDS_FEAT_FLAG(SCTLR_EL1_SPAN,
++			AS_RES1, FEAT_PAN),
+ 	NEEDS_FEAT(SCTLR_EL1_EPAN, FEAT_PAN3),
+ 	NEEDS_FEAT(SCTLR_EL1_EnDA	|
+ 		   SCTLR_EL1_EnDB	|
 -- 
 2.47.3
 
