@@ -1,126 +1,202 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5681C32937A
-	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 11:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32147E55C;
+	Mon, 26 Jan 2026 12:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769428329; cv=none; b=r68WS48V2a2NHJkF0jg2FIz35Is3FRR7YaisdY6CZvlxywPL/KEuPyPSNahCr0RhICR/LlfBMc0JzmVE0uX9L2XsUUngPUi/kMP7EQ9Gkj+X4G+16HCz6SQv7UgaLP27oiDMKKjdWbwrtKGyOdryarSpGVJ0dk8Hq8VcaqQr8Tc=
+	t=1769429854; cv=none; b=g1490vEoPczMsTtnnEVo0QpH5W/yKBtWqOTQ9Jq8s0tTusBltme5RiEPEBJwupX7Hp/S0/raAI98abD21QNRn3QTlkHdC6n3T4/IeZX9Wem36CYPXjDIOvhyF37Jn3ip1KnUwcY6OCGt2hEwUG+nJenCeibFh0lhXb01CpudnWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769428329; c=relaxed/simple;
-	bh=hDMw340cZtDwIbgpEB1NZTb0kT4vbQHIOuSlQj+2tpw=;
+	s=arc-20240116; t=1769429854; c=relaxed/simple;
+	bh=4CuFIdQQd1g3gnlUboTpyugsPwO6x3okkcP8WL90MGo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=eV+wlkNDUUJlcySgoyt5bp9NV6EbXM0TgGgw1Jp2MaM6zhEqaXzaZGEV6/OTozN+treXrCrX9eMcjqcgMJ36TYh86JJtt9NSEj6SO1RJ/nCmW98faPHeYBnyIePf5eepsvON0SRv5BwLIsg+8IW7EoYk7qggSPHQbfiV4m2X3lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD7C4339;
-	Mon, 26 Jan 2026 03:51:59 -0800 (PST)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 207E73F5CA;
-	Mon, 26 Jan 2026 03:52:04 -0800 (PST)
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yezhenyu2@huawei.com,
-	xiexiangyou@huawei.com,
-	zhengchuan@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
+	 MIME-Version; b=ojkJkRAlCSXtwMxeWhE2kXU9dHmFppWc91GyBv4LeoMbBTo0VGUml19Gdd848YI7h6wB+3o+aSDVIzB4vCe2VhkU3p3wm8QnY8yGI8Mwq9dyhgMKbfVU1gf3zpL4xxTxCSnkbYhK/+DZnFNn5ztXed0mB5SDpj1buFHFsiZo2WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FnmCs0Y1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FnmCs0Y1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAD81C116C6;
+	Mon, 26 Jan 2026 12:17:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769429853;
+	bh=4CuFIdQQd1g3gnlUboTpyugsPwO6x3okkcP8WL90MGo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=FnmCs0Y1bApyPWBc0Th76EySBpOQ4YaacNSxCQcToayxKw/AjjtvHNHBjPqAORoAp
+	 xJmbG8BzGPAHsPpX24OtKkANitxspZIi0u/837ntFfamILr3RQSoP/6GbuaEO9VLUl
+	 YI1DmIAI7/PxWxVmqaw3wecl67VZxllrRrXysTNxSf3G7rWq29UQqKP1vDHmirLrR8
+	 +OG8nwUziPTKd3FDMmFiZOoNeNVzOXM8sqIsqDCIsnwOp9sX3cehp68s9zCwoH64GV
+	 LMEpu4l7pClzrgaJtK8U+ulPZ9wYRbOJR1KsAhHNHhAvm6PzpBdin5IHSvrdz1Br0p
+	 jeRHAEFEaOqig==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vkLX9-00000005hx6-3BP5;
+	Mon, 26 Jan 2026 12:17:31 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
-Date: Mon, 26 Jan 2026 11:50:35 +0000
-Message-ID: <aXdVCla1wV3sfcJd@devkitleo>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com> <20251121092342.3393318-2-zhengtian10@huawei.com> <86wm3iqlz8.wl-maz@kernel.org> <aXI-XHF2jz7arOwg@devkitleo> <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: [PATCH 01/20] arm64: Convert SCTLR_EL2 to sysreg infrastructure
+Date: Mon, 26 Jan 2026 12:16:35 +0000
+Message-ID: <20260126121655.1641736-2-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
+References: <20260126121655.1641736-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, Jan 26, 2026 at 10:21:42AM +0800, Tian Zheng wrote:
-> 
-> 
-> On 1/22/2026 11:12 PM, Leonardo Bras wrote:
-> > On Sat, Nov 22, 2025 at 12:40:27PM +0000, Marc Zyngier wrote:
-> > > On Fri, 21 Nov 2025 09:23:38 +0000,
-> > > Tian Zheng <zhengtian10@huawei.com> wrote:
-> > > > 
-> > > > From: eillon <yezhenyu2@huawei.com>
-> > > > 
-> > > > The ARM architecture added the HDBSS feature and descriptions of
-> > > > related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
-> > > > add them to Linux.
-> > > > 
-> > > > Signed-off-by: eillon <yezhenyu2@huawei.com>
-> > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> > > > ---
-> > > >   arch/arm64/include/asm/esr.h     |  2 ++
-> > > >   arch/arm64/include/asm/kvm_arm.h |  1 +
-> > > >   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
-> > > >   3 files changed, 31 insertions(+)
-> > > > 
-> > > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> > > > index e1deed824464..a6f3cf0b9b86 100644
-> > > > --- a/arch/arm64/include/asm/esr.h
-> > > > +++ b/arch/arm64/include/asm/esr.h
-> > > > @@ -159,6 +159,8 @@
-> > > >   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
-> > > > 
-> > > >   /* ISS2 field definitions for Data Aborts */
-> > > > +#define ESR_ELx_HDBSSF_SHIFT	(11)
-> > > > +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
-> > > >   #define ESR_ELx_TnD_SHIFT	(10)
-> > > >   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
-> > > >   #define ESR_ELx_TagAccess_SHIFT	(9)
-> > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > > > index 1da290aeedce..b71122680a03 100644
-> > > > --- a/arch/arm64/include/asm/kvm_arm.h
-> > > > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > > > @@ -124,6 +124,7 @@
-> > > >   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
-> > > > 
-> > > >   /* VTCR_EL2 Registers bits */
-> > > > +#define VTCR_EL2_HDBSS		(1UL << 45)
-> > > 
-> > > I think it is time to convert VTCR_EL2 to the sysreg infrastructure
-> > > instead of adding extra bits here.
-> > 
-> > 
-> > Hi Marc, Tian,
-> > 
-> > Marc, IIUC the above was implemented by
-> > https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
-> > 
-> > Which was recently applied to next, and it its way to mainstream.
-> > 
-> > Tian, I think it's worth rebasing this patchset on top of the above.
-> > 
-> 
-> Indeed, I've been following Marc's VTCR_EL2 patch and will rebase my
-> changes on top of it.
-> 
-> > BTW, I am working on using the feature enabled by this patchset on a new
-> > optimization, so please include me on any new release.
-> 
-> Sure, I'll make sure you're on the Cc list for the next revision.
+Convert SCTLR_EL2 to the sysreg infrastructure, as per the 2025-12_rel
+revision of the Registers.json file.
 
-Thanks!
+Note that we slightly deviate from the above, as we stick to the ARM
+ARM M.a definition of SCTLR_EL2[9], which is RES0, in order to avoid
+dragging the POE2 definitions...
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/sysreg.h       |  7 ---
+ arch/arm64/tools/sysreg               | 69 +++++++++++++++++++++++++++
+ tools/arch/arm64/include/asm/sysreg.h |  6 ---
+ 3 files changed, 69 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 939f9c5bbae67..30f0409b1c802 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -504,7 +504,6 @@
+ #define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+ #define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
+ 
+-#define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+ #define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+ #define SYS_SCTLR2_EL2			sys_reg(3, 4, 1, 0, 3)
+ #define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+@@ -837,12 +836,6 @@
+ #define SCTLR_ELx_A	 (BIT(1))
+ #define SCTLR_ELx_M	 (BIT(0))
+ 
+-/* SCTLR_EL2 specific flags. */
+-#define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
+-			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+-			 (BIT(29)))
+-
+-#define SCTLR_EL2_BT	(BIT(36))
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+ #else
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index a0f6249bd4f98..969a75615d612 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -3749,6 +3749,75 @@ UnsignedEnum	2:0	F8S1
+ EndEnum
+ EndSysreg
+ 
++Sysreg	SCTLR_EL2	3	4	1	0	0
++Field	63	TIDCP
++Field	62	SPINTMASK
++Field	61	NMI
++Field	60	EnTP2
++Field	59	TCSO
++Field	58	TCSO0
++Field	57	EPAN
++Field	56	EnALS
++Field	55	EnAS0
++Field	54	EnASR
++Res0	53:50
++Field	49:46	TWEDEL
++Field	45	TWEDEn
++Field	44	DSSBS
++Field	43	ATA
++Field	42	ATA0
++Enum	41:40	TCF
++	0b00	NONE
++	0b01	SYNC
++	0b10	ASYNC
++	0b11	ASYMM
++EndEnum
++Enum	39:38	TCF0
++	0b00	NONE
++	0b01	SYNC
++	0b10	ASYNC
++	0b11	ASYMM
++EndEnum
++Field	37	ITFSB
++Field	36	BT
++Field	35	BT0
++Field	34	EnFPM
++Field	33	MSCEn
++Field	32	CMOW
++Field	31	EnIA
++Field	30	EnIB
++Field	29	LSMAOE
++Field	28	nTLSMD
++Field	27	EnDA
++Field	26	UCI
++Field	25	EE
++Field	24	E0E
++Field	23	SPAN
++Field	22	EIS
++Field	21	IESB
++Field	20	TSCXT
++Field	19	WXN
++Field	18	nTWE
++Res0	17
++Field	16	nTWI
++Field	15	UCT
++Field	14	DZE
++Field	13	EnDB
++Field	12	I
++Field	11	EOS
++Field	10	EnRCTX
++Res0	9
++Field	8	SED
++Field	7	ITD
++Field	6	nAA
++Field	5	CP15BEN
++Field	4	SA0
++Field	3	SA
++Field	2	C
++Field	1	A
++Field	0	M
++EndSysreg
++
+ Sysreg	HCR_EL2		3	4	1	1	0
+ Field	63:60	TWEDEL
+ Field	59	TWEDEn
+diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
+index 178b7322bf049..f75efe98e9df3 100644
+--- a/tools/arch/arm64/include/asm/sysreg.h
++++ b/tools/arch/arm64/include/asm/sysreg.h
+@@ -847,12 +847,6 @@
+ #define SCTLR_ELx_A	 (BIT(1))
+ #define SCTLR_ELx_M	 (BIT(0))
+ 
+-/* SCTLR_EL2 specific flags. */
+-#define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
+-			 (BIT(18)) | (BIT(22)) | (BIT(23)) | (BIT(28)) | \
+-			 (BIT(29)))
+-
+-#define SCTLR_EL2_BT	(BIT(36))
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+ #define ENDIAN_SET_EL2		SCTLR_ELx_EE
+ #else
+-- 
+2.47.3
 
