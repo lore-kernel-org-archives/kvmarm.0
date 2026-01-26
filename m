@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F971336EC9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4035D336ED8;
 	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769429855; cv=none; b=ZSOmlY8e/9t40PhMu07HikD19IYJmsK7Pkt1giU9JNjJhM2z2woZPPP2kEECdw7wFCcq6o2AEPddHF+WzyZsSPHUa2s+fDF6LXl7XBotcpDHZMVGKAaLZtuUpGVkqV3XgeFlVOcbAGpiFK3TL4GUBQh43MrBvJ5fu6HLkOvTi5M=
+	t=1769429855; cv=none; b=EGC100mTRqCuAdW6zTtxQSJqCTWmKwL3gmABxfXCPvYIBZ6TMtyiu/M2VPBmF87JNzckKE2+PIaeZppjtSG3DYNwxsKRg/wMPhY4NCIG5nN/1yt5DE8/4hk7P5a8DU87pG9j5GISOLh6FewpBmbd8hCNeXImCzz/djshYcFJlJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1769429855; c=relaxed/simple;
-	bh=EHbYIfAX/AaecDmPp7DQIoSfrWZDbSrWEFdMI2Cgg6o=;
+	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dVGlSTBkojJG2DpmJY+70/2E7M/bqQtppL/gEmPFoNUH42eZMbrHK7CnerqZ90E0H2OGcrEsgtoGRVHAkLkN4ozLaB8pU41yJIHcOeb7M40YduLzgn1LIN7hN6yoDgVqr5QCq3u8igPUGsVJCB1GK383dBYPPgW87ncvQYzYJcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fa5J6m9p; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=rwvOIu/HrMvut1WOEi8YDVko/wmEsPgqPINXUbBEzsemFlL1ihvzjB2WjQyafsXHWujF1YYlScovdrzzj3J9ERA0ANraDwTVWIG96xtdu6sjN0Z7dHcijPjWq6e4078pxYeJYqFlkK48bmQ7wlM1gf/UqG2kAiCoxquq54CWZQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lynbX/MK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fa5J6m9p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E798DC19425;
-	Mon, 26 Jan 2026 12:17:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lynbX/MK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E827C2BC87;
+	Mon, 26 Jan 2026 12:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1769429855;
-	bh=EHbYIfAX/AaecDmPp7DQIoSfrWZDbSrWEFdMI2Cgg6o=;
+	bh=cjSjGxnYioTuTQkGGQeoMXFPLKV/lqjRqjCssEI4KVc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fa5J6m9pZxBan6agmM1EwLNX0adQteWrHkWqyvg9XelbNOjizRQ9fztC9eClXZ4ry
-	 Gvf5V3nvNLTTMTt3ZCj1exc55HuBu29a/2rZof+DeIfAiAtCgl+zU7Yfv86ChWu5cM
-	 UByja+Us/QfJXQKhSoKm7Nvm1eIjASh73tnbeI1vq+BcHzOGc6yrIpj2x5sc1lBAo2
-	 Ojt0xOj9CAoF7x5ADTaw+nNJ5/qN2MN8wY9rzCTBfoK6a71sHmz5stKjC8BO145VQu
-	 kG+GFcbNFlq9zwkw8KkP7NzPT6c6G2W3LMXn14J4h9kSARKwXmlEK3hjwxb1XseWgW
-	 Qqw7ocgtkBUNw==
+	b=lynbX/MKrusm4/GddjW2C1EcTeaJQuHw8aiCSS7Qb59DG6haFmWjqQv91Lne9rOhP
+	 Xm18Ia8UBL0QVFeo1MfGDe9D8Lwyf8SXJH/WRy0VR/DKFE/5yW7OaVrnKc7M1H5fAG
+	 Fu0GoabENZb4J/VHE6F1CDaQ4ehq0QWkWTi/BFZJhtW7kIv7ler9nUPwTSrRcqhKRx
+	 dnEKDXMz1SnjJQjSNYriyxl5pRJw4kYydCYPwQLevyeSyDhUSyXsDEH7BrZudkIxGH
+	 X5MsVIOYwrWag99XWz8r9hSQxBY+pilf79P3e5Jhdt+mGIN/sgPLv/fLteN5azlCD5
+	 LOUN+L8P/YP2g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vkLXA-00000005hx6-3ILP;
-	Mon, 26 Jan 2026 12:17:32 +0000
+	id 1vkLXB-00000005hx6-1Ahu;
+	Mon, 26 Jan 2026 12:17:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 05/20] KVM: arm64: Extend unified RESx handling to runtime sanitisation
-Date: Mon, 26 Jan 2026 12:16:39 +0000
-Message-ID: <20260126121655.1641736-6-maz@kernel.org>
+Subject: [PATCH 07/20] KVM: arm64: Allow RES1 bits to be inferred from configuration
+Date: Mon, 26 Jan 2026 12:16:41 +0000
+Message-ID: <20260126121655.1641736-8-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
 References: <20260126121655.1641736-1-maz@kernel.org>
@@ -61,89 +61,45 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add a new helper to retrieve the RESx values for a given system
-register, and use it for the runtime sanitisation.
+So far, when a bit field is tied to an unsupported feature, we set
+it as RES0. This is almost forrect, but there are a few exceptions
+where the bits become RES1.
 
-This results in slightly better code generation for a fairly hot
-path in the hypervisor.
+Add a AS_RES1 qualifier that instruct the RESx computing code to
+simply do that.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 13 +++++++++++++
- arch/arm64/kvm/emulate-nested.c   | 10 +---------
- arch/arm64/kvm/nested.c           | 13 ++++---------
- 3 files changed, 18 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/config.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a7e4cd8ebf56f..9dca94e4361f0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -635,6 +635,19 @@ struct kvm_sysreg_masks {
- 	struct resx mask[NR_SYS_REGS - __SANITISED_REG_START__];
- };
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 8d152605999ba..6a4674fabf865 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -24,6 +24,7 @@ struct reg_bits_to_feat_map {
+ #define	CALL_FUNC	BIT(1)	/* Needs to evaluate tons of crap */
+ #define	FIXED_VALUE	BIT(2)	/* RAZ/WI or RAO/WI in KVM */
+ #define	MASKS_POINTER	BIT(3)	/* Pointer to fgt_masks struct instead of bits */
++#define	AS_RES1		BIT(4)	/* RES1 when not supported */
  
-+#define kvm_get_sysreg_resx(k, sr)					\
-+	({                                                              \
-+		struct kvm_sysreg_masks *__masks;			\
-+		struct resx __resx = {};				\
-+									\
-+		__masks = (k)->arch.sysreg_masks;			\
-+		if (likely(__masks &&					\
-+			   sr >= __SANITISED_REG_START__ &&		\
-+			   sr < NR_SYS_REGS))				\
-+			__resx = __masks->mask[sr - __SANITISED_REG_START__]; \
-+		__resx;							\
-+	})
-+
- #define kvm_set_sysreg_resx(k, sr, resx)		\
- 	do {						\
- 		(k)->arch.sysreg_masks->mask[sr - __SANITISED_REG_START__] = resx; \
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 774cfbf5b43ba..43334cd2db9e5 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -2427,15 +2427,7 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+ 	unsigned long	flags;
  
- static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
- {
--	struct kvm_sysreg_masks *masks;
--
--	/* Only handle the VNCR-backed regs for now */
--	if (sr < __VNCR_START__)
--		return 0;
--
--	masks = kvm->arch.sysreg_masks;
--
--	return masks->mask[sr - __SANITISED_REG_START__].res0;
-+	return kvm_get_sysreg_resx(kvm, sr).res0;
- }
+@@ -1316,8 +1317,12 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
+ 		else
+ 			match = idreg_feat_match(kvm, &map[i]);
  
- static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index c5a45bc62153e..75a23f1c56d13 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1669,16 +1669,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
- u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *vcpu,
- 			     enum vcpu_sysreg sr, u64 v)
- {
--	struct kvm_sysreg_masks *masks;
--
--	masks = vcpu->kvm->arch.sysreg_masks;
--
--	if (masks) {
--		sr -= __SANITISED_REG_START__;
-+	struct resx resx;
+-		if (!match || (map[i].flags & FIXED_VALUE))
+-			resx.res0 |= reg_feat_map_bits(&map[i]);
++		if (!match || (map[i].flags & FIXED_VALUE)) {
++			if (map[i].flags & AS_RES1)
++ 				resx.res1 |= reg_feat_map_bits(&map[i]);
++			else
++				resx.res0 |= reg_feat_map_bits(&map[i]);
++		}
+ 	}
  
--		v &= ~masks->mask[sr].res0;
--		v |= masks->mask[sr].res1;
--	}
-+	resx = kvm_get_sysreg_resx(vcpu->kvm, sr);
-+	v &= ~resx.res0;
-+	v |= resx.res1;
- 
- 	return v;
- }
+ 	return resx;
 -- 
 2.47.3
 
