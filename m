@@ -1,168 +1,126 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670FF335077
-	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 10:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5681C32937A
+	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 11:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769424297; cv=none; b=TFsik22Zl1tkWGsI5xe1m/M7gLHsLMF8kFU7VYguTqMFw7DqXL54d6kl/fYU1RCofjMyD/aM/3KVOn1G9lwiKfgUn1Tq+jqZMqEo/Ogj1TLEptNocdJs7JnBW/HhlLru00VKIPrrAlz9SAetSNA04ZHMjup9T0mixts3M/Lw000=
+	t=1769428329; cv=none; b=r68WS48V2a2NHJkF0jg2FIz35Is3FRR7YaisdY6CZvlxywPL/KEuPyPSNahCr0RhICR/LlfBMc0JzmVE0uX9L2XsUUngPUi/kMP7EQ9Gkj+X4G+16HCz6SQv7UgaLP27oiDMKKjdWbwrtKGyOdryarSpGVJ0dk8Hq8VcaqQr8Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769424297; c=relaxed/simple;
-	bh=rQU0pqdKqe8avW/ctXbf7hWIvHSRj7RwdreDLZd/I2Y=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MH/sykXCJHvD6AAhA7Qrs1ra8bQEed48YlfW4MZV5rTCLvGenqxd5VoYRbRTVdvhGioudACgK3ZNjSIDyX2Xa13Jd3M49huHWE6kLUHVbEAPY3lBJlK52YTRLOvAlGMD5z2uAzypYkdJML5lCZLLS/KZDznqrnLdq+TLjZ9T+ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1VYM16OG; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1VYM16OG"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-480600391e2so7887525e9.0
-        for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 02:44:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769424293; x=1770029093; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rcuxT0tCf/T7ct2VsPnptK2x4TV5cU08DiX9A8D84RY=;
-        b=1VYM16OGDdJHQpU7IJr9rDNk4bP+6e5KiTaoaOwptp1TSAO71uVp3brtVNgmaS46IC
-         fJRvFqQlvrCIIM1wIrW8Y4Cz0EC5G1vE0Kgy5g3cs0tprM+DkY/EbGz1S4/0iq4LU3+n
-         Me7Mx5Y9eGoqxCG57chpdGr3rz13XPvS6K/60w2WJ3La6/t5i/yZN/7bqe1d736W+cmP
-         YT/5PyaYyf7qeeTwYXv6i8Q6m2X0DevkbP8FxloSlaW7B+WTT0K2ojIL9n22ffyIUzR2
-         tYUw7xEt6fRYRQSmft3i4/Z4XXQn+Dxdxg+OPBWHYDwcnpTal38NkP3ApfWjMvTD/4U9
-         doew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769424293; x=1770029093;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rcuxT0tCf/T7ct2VsPnptK2x4TV5cU08DiX9A8D84RY=;
-        b=kF3puxldbQO3uM0SzmAkOlu84n7Po6H+8oxByxSdOtGl7M1qH8FPPNyFsv6cP68BJ4
-         dkH4TvSStz8NO/a+1MMKuu4g9ejHYcN2Pc/ox78KJqPUCTRxkq+5kH8NsulwBCSnowI5
-         E3H9jXjTF6kTyFfjr0xUTMe5I1xUrBIYJ+qwcoh/4waR6BdASETIPgXPH2rLeNAdbjsW
-         eEOx31VsTgsa4DrSlWxDzSHQ5T87a79F0ryMYkKczVkx/PhQFuEhGT/q2iOL/P7mxuFO
-         0WUR9JAQkigQbOmCwQTnScLM12lO9aZpIIifIbNzuH7jjz5Qgv6quYvZTXY0z6MLORbC
-         L72w==
-X-Gm-Message-State: AOJu0YwvckwMA4YSG7fAryKdDIebALPPXa1yTEQNAjGjw0ZiEnQ0nt0N
-	1t1O+0vX6ZQlGjsJD+b9CPFRiE138R7oZ3Bx2IbkJlmj81b+m7vOjYofRq93OFclYl9yeRu6Q0G
-	jMuwPOW6MEDY7VVakYH/Uww==
-X-Received: from wmbdn2.prod.google.com ([2002:a05:600c:6542:b0:477:9b3e:67e3])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3ba0:b0:47d:5d27:2a7f with SMTP id 5b1f17b1804b1-4805d064554mr67628505e9.26.1769424293569;
- Mon, 26 Jan 2026 02:44:53 -0800 (PST)
-Date: Mon, 26 Jan 2026 10:44:19 +0000
-In-Reply-To: <20260126104419.1649811-1-vdonnefort@google.com>
+	s=arc-20240116; t=1769428329; c=relaxed/simple;
+	bh=hDMw340cZtDwIbgpEB1NZTb0kT4vbQHIOuSlQj+2tpw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=eV+wlkNDUUJlcySgoyt5bp9NV6EbXM0TgGgw1Jp2MaM6zhEqaXzaZGEV6/OTozN+treXrCrX9eMcjqcgMJ36TYh86JJtt9NSEj6SO1RJ/nCmW98faPHeYBnyIePf5eepsvON0SRv5BwLIsg+8IW7EoYk7qggSPHQbfiV4m2X3lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD7C4339;
+	Mon, 26 Jan 2026 03:51:59 -0800 (PST)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 207E73F5CA;
+	Mon, 26 Jan 2026 03:52:04 -0800 (PST)
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	oliver.upton@linux.dev,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	linux-kernel@vger.kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	yezhenyu2@huawei.com,
+	xiexiangyou@huawei.com,
+	zhengchuan@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v2 1/5] arm64/sysreg: Add HDBSS related register information
+Date: Mon, 26 Jan 2026 11:50:35 +0000
+Message-ID: <aXdVCla1wV3sfcJd@devkitleo>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
+References: <20251121092342.3393318-1-zhengtian10@huawei.com> <20251121092342.3393318-2-zhengtian10@huawei.com> <86wm3iqlz8.wl-maz@kernel.org> <aXI-XHF2jz7arOwg@devkitleo> <f27c6ada-7994-4ef8-a10e-27d26ed5af0f@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260126104419.1649811-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.52.0.457.g6b5491de43-goog
-Message-ID: <20260126104419.1649811-31-vdonnefort@google.com>
-Subject: [PATCH v10 30/30] tracing: selftests: Add hypervisor trace remote tests
-From: Vincent Donnefort <vdonnefort@google.com>
-To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	jstultz@google.com, qperret@google.com, will@kernel.org, 
-	aneesh.kumar@kernel.org, kernel-team@android.com, 
-	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Run the trace remote selftests with the trace remote 'hypervisor', This
-trace remote is most likely created when the arm64 KVM nVHE/pKVM
-hypervisor is in use.
+On Mon, Jan 26, 2026 at 10:21:42AM +0800, Tian Zheng wrote:
+> 
+> 
+> On 1/22/2026 11:12 PM, Leonardo Bras wrote:
+> > On Sat, Nov 22, 2025 at 12:40:27PM +0000, Marc Zyngier wrote:
+> > > On Fri, 21 Nov 2025 09:23:38 +0000,
+> > > Tian Zheng <zhengtian10@huawei.com> wrote:
+> > > > 
+> > > > From: eillon <yezhenyu2@huawei.com>
+> > > > 
+> > > > The ARM architecture added the HDBSS feature and descriptions of
+> > > > related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+> > > > add them to Linux.
+> > > > 
+> > > > Signed-off-by: eillon <yezhenyu2@huawei.com>
+> > > > Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> > > > ---
+> > > >   arch/arm64/include/asm/esr.h     |  2 ++
+> > > >   arch/arm64/include/asm/kvm_arm.h |  1 +
+> > > >   arch/arm64/tools/sysreg          | 28 ++++++++++++++++++++++++++++
+> > > >   3 files changed, 31 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> > > > index e1deed824464..a6f3cf0b9b86 100644
+> > > > --- a/arch/arm64/include/asm/esr.h
+> > > > +++ b/arch/arm64/include/asm/esr.h
+> > > > @@ -159,6 +159,8 @@
+> > > >   #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+> > > > 
+> > > >   /* ISS2 field definitions for Data Aborts */
+> > > > +#define ESR_ELx_HDBSSF_SHIFT	(11)
+> > > > +#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+> > > >   #define ESR_ELx_TnD_SHIFT	(10)
+> > > >   #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+> > > >   #define ESR_ELx_TagAccess_SHIFT	(9)
+> > > > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > > > index 1da290aeedce..b71122680a03 100644
+> > > > --- a/arch/arm64/include/asm/kvm_arm.h
+> > > > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > > > @@ -124,6 +124,7 @@
+> > > >   			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK)
+> > > > 
+> > > >   /* VTCR_EL2 Registers bits */
+> > > > +#define VTCR_EL2_HDBSS		(1UL << 45)
+> > > 
+> > > I think it is time to convert VTCR_EL2 to the sysreg infrastructure
+> > > instead of adding extra bits here.
+> > 
+> > 
+> > Hi Marc, Tian,
+> > 
+> > Marc, IIUC the above was implemented by
+> > https://lore.kernel.org/all/20251210173024.561160-1-maz@kernel.org
+> > 
+> > Which was recently applied to next, and it its way to mainstream.
+> > 
+> > Tian, I think it's worth rebasing this patchset on top of the above.
+> > 
+> 
+> Indeed, I've been following Marc's VTCR_EL2 patch and will rebase my
+> changes on top of it.
+> 
+> > BTW, I am working on using the feature enabled by this patchset on a new
+> > optimization, so please include me on any new release.
+> 
+> Sure, I'll make sure you're on the Cc list for the next revision.
 
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc
-new file mode 100644
-index 000000000000..64bf859d6406
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer size
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/buffer_size.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_buffer_size
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc
-new file mode 100644
-index 000000000000..7fe3b09b34e3
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer reset
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/reset.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_reset
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc
-new file mode 100644
-index 000000000000..b937c19ca7f9
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor non-consuming trace read
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/trace.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_trace
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc
-new file mode 100644
-index 000000000000..66aa1b76c147
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor consuming trace read
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/trace_pipe.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_trace_pipe
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc
-new file mode 100644
-index 000000000000..1dafde3414ab
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer unloading
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/unloading.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_unloading
--- 
-2.52.0.457.g6b5491de43-goog
+Thanks!
 
