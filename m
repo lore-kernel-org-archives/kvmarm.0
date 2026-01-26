@@ -1,202 +1,312 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03CFF279DB3
-	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 19:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0657120DD51
+	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 21:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769455023; cv=pass; b=jHRGDPhLd5vYI3ESFK7JGNV8w17wBCxhZz8DHU5q5vd3i9zPh+gPwnthpaRmNGABM9oYqGqeHUE5DI6JN1VLouZUiiyWqoNBnvMDmigTADxXtJN9MBKihWpUOiHOCd0GIjVhsQeEsA1DzxIoephaO0KI3IKSl9tCHpAlzxcuzuU=
+	t=1769463124; cv=pass; b=FjSeo+1A7BBtVlijcHOMNJLU7B7AI8sxB+ojyOJKt3gt3e5XNLcCvWQQcIHH0ytIqyr+mqC5RASPgDQFfkLDRDHk1dag8oPsL3mzCMh7HKtDK5LFwYR52Ij0dpEBnOg5bIPiBdnbmLonBlC8oc/S7w+v8OvLZSZCruhaPn3qmcc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769455023; c=relaxed/simple;
-	bh=shASez4WWN24nr1jfpbfUJWlDIHBrF006qMDmGLDxkw=;
+	s=arc-20240116; t=1769463124; c=relaxed/simple;
+	bh=x4ddBnE6UlmuM4UnSaFJuF1X0KUypj4oAt9SZYS5klo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JpHiiQHKDmKKFXKWdxHehxhqehitNVNXeY58kaoX+SAGVKoTvjRetW1Fw65MldWxV5iDu0nr4eWYbD3AIaiQ//mwyHnR9W8qz0hVlMV1no2NbL36kKoFrJukoh9XgTf5yG9xvd5XMl2cvhGyVZemJS9i5fC4kGq5L6EJlgw7Y7k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UYLUlIkA; arc=pass smtp.client-ip=209.85.160.176
+	 To:Cc:Content-Type; b=Eiekak/VlJpSi9hvuCFqkxhwWFetfJKqn534aYdWHsRh7yZmr/e19TLqKtU7BB2IbmtDXQ9f9bRPc6i0SELaJYHerpK8CXLgFJPlSwdSXUOaeb5cwnm92R6BHztAVHW85qpo12Fo2dJqnWxautMTAbOMPwYu7VziAyOrXWU+9Qw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=URCa2pmO; arc=pass smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UYLUlIkA"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5014acad6f2so48491cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 11:17:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769455021; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="URCa2pmO"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a1462573caso7075ad.0
+        for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 13:32:02 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769463122; cv=none;
         d=google.com; s=arc-20240605;
-        b=cEtw4wzu+FawRH2HdGv/YUeo3N+fhhiyyLKJ+c/F0Nkhm9IAgVmT6jsGsKFKCOE2D7
-         5kJDFYobw+XjOl2Jla/rhKG/NQVHqvBp8755rvlPZswHHfz+WU99PdFyvRgxNANJdktd
-         DzEnsrxwoe4nFs6259mYW3CrRfv2gb7eUrh2Fnqf+zAgZ7iNVUiq8WA9VKYIV9tBTlbg
-         QtPj9nw90r3NkA86lY9KMNaaDRaSSEi6uq/ddK7o19ywYBYRAobbouw4dlqhfooDOmG7
-         VcHUIVI/1sefp7TgjKH6IV0CZPYpUBhiSNLup6NS7IaaqnFJ6XVsXhWivwkK0/KJfb7O
-         mt0Q==
+        b=VTLRr68s07PrmYCFUUIEtYxNPqN2GglC3Rz+sS1wrK1Gl2724I6R5ENtsmFDrw06Jk
+         A/WYXCGxQrZQuI+HOczzDQHQ1qXzLY/LmIXqJ1hJcGw072tGAm10RoRVaHBYMQiwBCl9
+         dtoTuIOa0psIxSsDniuUuah+eMTSG0E++cak9/iXIh70XrOmlNJMe9z+tcuJx2TB1W0S
+         1IeggQvWvj6AMFubzMLGK8Ca3cDaJjI3B6NwqnbdjD7YQtu2/zxOtsC9rgZKusoaoI2A
+         oCA2jzJN/0PWVD3KonJvDb3uPkUReKaNKn0U+Bm34n6hyI1xs+Su5VrXqW2xaYjuzyj5
+         Y2rA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Q78Gf8ey3PlNHaQFSeNbIKQ639y8O+joeYk6mwpkVco=;
-        fh=cKTbDbQYTc+pleUDsHasQv4LjIooAs3OE4CRw2/lzRk=;
-        b=bYKrGOWq0YC20iEygZqoJUEBJ+UcuBCb7nTbknZwos7KoVij49wV/qQ165GsRfN+lw
-         4ICtC2Q+tQebxLm2Y+H5EFlRnj6uVDEV6Fm74+P+UzSOg4OTWI+gkAa2veLbr/j7rDe3
-         g/VAS8g8RG9viuiRJGds3Qo/tNdnU755vyQRfVBORN2Hnqkn/6Tug56jRu0jUaGc315w
-         bZUS+WJRBcmxTpeEZn8VSUXoiJjHXdkRMcOvowJTA4YCPshhCZiOB3D6AuQ5hYaEg/Tp
-         jKKOj4k4CnRWj6A+KTpffboqNdovoR7KFnBJkF8TprGGkwLqFOI+FckE5MBZGmi6QqRd
-         mxkA==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=GdffSHeo/iYpRVNWqMXBIRygwWn3EwsHPHsZ8am4tRk=;
+        fh=7TaHyhT7ELVKNoY+O22yzF+5TW7GVxNMQX6rx76BuM0=;
+        b=RaIbQOwtjr/OS2az1XONWfF/+vgemOIz7443cqXIb/yXlEsHmSNfL4sqFuGSkXs6KM
+         z6MAHRK+YOapwmxNeGvT6kIBujRMAc5omRCwKbl56euGbnS/qFfNqMY9mSV7SsEKYhbg
+         PefQ0q9VUtmX/Je4ZjUwVPUM3z+l6+06djMV7dYp9IwCAlXhAylkIQZ0Hpr4H5Cc43af
+         qcIwkqAt9r6sCAt+UPstHNX//rUoJjuJ7hijLgSsnRdesGCBIFyTtJDnAzy2JLVZtPvH
+         mxHKiSbSe62nL4gnColnvGURYivygUtGVtM8h3JTDAXntaCN8/8jbBq72i6MPtUxTyts
+         HRvg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769455021; x=1770059821; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q78Gf8ey3PlNHaQFSeNbIKQ639y8O+joeYk6mwpkVco=;
-        b=UYLUlIkAsJn3aFSpJ0MmYkAM686xToDHakEdqU648ALoIozUa9xpvBDGeGoB38ZDfo
-         UY0tBnGN1LkZXcVvB5o54JkC0oKg+aWwRfqknpMFuN9ZOGYQPArN1rurPxXKtSuxFLSl
-         sMBd/WJY8APET/aC7spmKi8Va3x0FtkmLMymN2wboBTj4bIAZ1xvCpiUGwiAQMgehuHc
-         DFpuNEMdbChGJIhQG5yjGO8KebewXtwSTt1Ci8gJyMQE0pcSjCcMl4H3HGtxwAYOk79V
-         yfNesc/EbDMm/no73o9MnzUOaBaW5HsV5Uz/cklTyLj6Uo25kJi+lYaJVzZzSQafjh+v
-         otWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769455021; x=1770059821;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1769463122; x=1770067922; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q78Gf8ey3PlNHaQFSeNbIKQ639y8O+joeYk6mwpkVco=;
-        b=dztiD8A2GnCbikNdPmOQq4J9JS1RXAsxJGn1f93GXOSU2MYJs9KkoLBD/BPIOaNFcW
-         +RA/ix4XQoUOZCDa5zTWrsFL0UJpNXRbjABb7HPkYfrt59R7pK0PxJeZyQiRFOcHJyDZ
-         0hLEHq3M0x1LnCIcN96tvbjhU9AWs/WjhDSk0aLfc8iz5ukzbG5M+HmlAQj0JmYEDla1
-         SDpUJEyf+ynk2F62VotuS4JESw6uqr6rjie+vO4CsopnYiXEsA3SOJhQqSmoV9Q3mUDk
-         dv2cMPh+wG4Z6dGtnzNHPrM2oKvpw7FuHEIMbcJQWzeR94pZTg5ytO5yfZa5S2j+Upu7
-         /Yhg==
-X-Gm-Message-State: AOJu0Yy6g/vS6ZParcebwr9OyHS+BSFmAUgU+X1FQeVnpQ52Q7FuJVfH
-	ETXgmQ2nclvetTKn0qdYtpxcIytcQVfvIfUVtQdXZrDvFUc17szov6KYM4rdEgz5O+BjDASCUp2
-	zV3NrfLGR8wUtF5EEMXKvqZFucYW1nvVbel4+HctIQUv+tS69IyVq0X4N
-X-Gm-Gg: AZuq6aLUodvCTSkE/Y89fYqAhpujtQbnxJYjgLCyYPTSKmpFTIPc+Y1H0UTU6cbXOqt
-	/M2cbhQf1xw7jG1oWzII4ijNiJiD/fWw1l7oI0eXeRDWRxuPa972mAHhDTcVEGOSkG8EToCrVck
-	07RgAxMbubRjc90PVlrwFv1BqRtujsxAXKpa9FJhGMIKVjRCb+DTDsxqJdpolccorJ0tI0Ajjmz
-	d/wH679/S4E0yu/4svnr6N6PBCKXrVUFgQeGi0pKsWQfj4OpxRnQdtAIkfU7Wr23DO3WSNA
-X-Received: by 2002:a05:622a:1651:b0:4f0:2e33:81aa with SMTP id
- d75a77b69052e-50314395914mr14193861cf.11.1769455020509; Mon, 26 Jan 2026
- 11:17:00 -0800 (PST)
+        bh=GdffSHeo/iYpRVNWqMXBIRygwWn3EwsHPHsZ8am4tRk=;
+        b=URCa2pmOBV2HS7tZ2CtmJ8APTNfcftq70HCKLr5spEmLfAjba+OmJOvgZimIghLW8W
+         ozEaQgWpWHbwicpTZ4rjl4o2a0CX/6jgJJ9iSxNHdhvcsBlZPkKzT9x9MMoqyDK8RGMk
+         qg44GC5gytEXViiZ3xFgP2RmjGVQkr97OyFgJ23ssh5zYGiZx0OkDq31Atl8mikWnOn9
+         n08JfSCZi0RNHeSbhzoa5FnSRD8gRSw71xfKBsdVk79r/hYwGktxEl36QgDt4cZ76HTG
+         yIhEEJh20hnBj1BZ8MVmvkcrc7iVVRJ6PrUw7844+7RBeK4eFmwNFDEca7oidtY2fhzF
+         3vxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769463122; x=1770067922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GdffSHeo/iYpRVNWqMXBIRygwWn3EwsHPHsZ8am4tRk=;
+        b=EewzBZTcQ7gi4+m1yaq0J8IloyBrvJSOR9G+OuASRWFMF8D1dyCY8tQdSX1PTqigX8
+         EemR6MbgH7tKNY+/IWjW7cR29ITJWfYOAsBqLHZp1LphVgKWU+QCvzUtXoGgjZ0b131M
+         gkW1kVs7Vs+ODYYEGy8iszStVqXspvezISqS7bLvGK+HW/RpMG8suqVrCKUNaY/1eHFE
+         TK6cHcpVUIhqRYsiI1ihYL3//EFJrSOIT5zEbtyBTVnam0iU1Gy1wXkEqMloWvDVWSd4
+         95Weu1x+S2Wzpl2CtwC4Ri3z6gTqPkXQeRVGAvJX460QD9Nd3WFIrZieoasxzHaChBVr
+         n1QA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEkYhYhmQtiWSrHgD/9BjTZyycqgwwcSoPkyIPxitYV7+pRub/sP6AxKjwCct0OOFQFw1/vqM=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzZOq4lKE4dQpfsxrzKv6bGmLJzEqQioyXBjT4a/nxoLJSG3R+m
+	lMrlTBPC1AqqbxJXU4CXswC16rfH+sbs3vBKlvBEKMvkJjf+22tUwr4tSfaFUOx2dQu61YXTuv/
+	cceQXY8akOJI4FhGjIR0Kqt0H7fd49BBa/M2uNGxM
+X-Gm-Gg: AZuq6aLBFwdZasOq4Q8HSu9J4JUqer2G8u1EqErhihaRiEQ4C/wLO019wc5dtKH9Y2l
+	kPHVCsFIBvfDyyFUUtwzGBoT/nA3mCIFkNnhy5WYSfudHFNldxpLQ5lwRGmAC48e0Fim1mvbZQ0
+	tneTizAkZSkjbBLSdraGUoOGKsdquPAAdNgsdUPJQKlUe5LmfS27MqVNqhmd9TFvaZaXDH8KXFa
+	Il7D/VvoG7Bz6GjfPDqYlPrJ+kzKksr997I4y5JLjTUm8JR4nWr5PVSTBEOIfH3x/74dcyxIWNT
+	VDtibzBfVP9LLJylXEZL30fN
+X-Received: by 2002:a17:903:18b:b0:2a0:7fac:c031 with SMTP id
+ d9443c01a7336-2a844e78abcmr3049555ad.14.1769463121618; Mon, 26 Jan 2026
+ 13:32:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-6-maz@kernel.org>
-In-Reply-To: <20260126121655.1641736-6-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 26 Jan 2026 19:15:00 +0000
-X-Gm-Features: AZwV_Qjj96yrEnieCy5TgVtfTcOY3xBDAy9jwhHwQBFe31riTdky8XYLoS7UhzA
-Message-ID: <CA+EHjTzmr+479uxdQgnM6Ai5jcx1=L2-ufQPD67fvqsCL1gZ8A@mail.gmail.com>
-Subject: Re: [PATCH 05/20] KVM: arm64: Extend unified RESx handling to runtime sanitisation
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com> <20260126104419.1649811-20-vdonnefort@google.com>
+In-Reply-To: <20260126104419.1649811-20-vdonnefort@google.com>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Mon, 26 Jan 2026 13:31:49 -0800
+X-Gm-Features: AZwV_QjRVAsI7BYNB-SSd0KqV-MZmQcJjsc_0anhfEHofc202jxoz2KReva1YZQ
+Message-ID: <CAC_TJvfzETz53ZXCk89ndqhj0+nuMUxPsB=NNT8kSZP-iwLm7A@mail.gmail.com>
+Subject: Re: [PATCH v10 19/30] KVM: arm64: Add PKVM_DISABLE_STAGE2_ON_PANIC
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	jstultz@google.com, qperret@google.com, will@kernel.org, 
+	aneesh.kumar@kernel.org, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Marc,
+On Mon, Jan 26, 2026 at 2:44=E2=80=AFAM Vincent Donnefort <vdonnefort@googl=
+e.com> wrote:
+>
+> On NVHE_EL2_DEBUG, when using pKVM, the host stage-2 is relaxed to grant
+> the kernel access to the stacktrace, hypervisor bug table and text to
+> symbolize addresses. This is unsafe for production. In preparation for
+> adding more debug options to NVHE_EL2_DEBUG, decouple the stage-2
+> relaxation into a separate option.
+>
+> While at it, rename PROTECTED_NVHE_STACKTRACE into PKVM_STACKTRACE,
+> following the same naming scheme as PKVM_DISABLE_STAGE2_ON_PANIC.
+>
+> Cc: Kalesh Singh <kaleshsingh@google.com>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
+Reviewed-by: Kalesh Singh <kaleshsingh@google.com>
+
+Thanks,
+Kalesh
+
 >
-> Add a new helper to retrieve the RESx values for a given system
-> register, and use it for the runtime sanitisation.
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 4f803fd1c99a..6498dec00fe9 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -43,9 +43,27 @@ menuconfig KVM
 >
-> This results in slightly better code generation for a fairly hot
-> path in the hypervisor.
+>           If unsure, say N.
 >
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 13 +++++++++++++
->  arch/arm64/kvm/emulate-nested.c   | 10 +---------
->  arch/arm64/kvm/nested.c           | 13 ++++---------
->  3 files changed, 18 insertions(+), 18 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index a7e4cd8ebf56f..9dca94e4361f0 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -635,6 +635,19 @@ struct kvm_sysreg_masks {
->         struct resx mask[NR_SYS_REGS - __SANITISED_REG_START__];
->  };
->
-> +#define kvm_get_sysreg_resx(k, sr)                                     \
-> +       ({                                                              \
-> +               struct kvm_sysreg_masks *__masks;                       \
-> +               struct resx __resx = {};                                \
-> +                                                                       \
-> +               __masks = (k)->arch.sysreg_masks;                       \
-> +               if (likely(__masks &&                                   \
-> +                          sr >= __SANITISED_REG_START__ &&             \
-> +                          sr < NR_SYS_REGS))                           \
-> +                       __resx = __masks->mask[sr - __SANITISED_REG_START__]; \
-> +               __resx;                                                 \
-> +       })
+> +if KVM
 > +
-
-This now covers all registers that need to be sanitized, not just
-VNCR-backed ones now.
-
-nit: wouldn't it be better to capture sr in a local variable rather
-than reuse it? It is an enum, but it would make checkpatch feel
-slightly better :)
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
-/fuad
-
-
-
-
-
->  #define kvm_set_sysreg_resx(k, sr, resx)               \
->         do {                                            \
->                 (k)->arch.sysreg_masks->mask[sr - __SANITISED_REG_START__] = resx; \
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 774cfbf5b43ba..43334cd2db9e5 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -2427,15 +2427,7 @@ static enum trap_behaviour compute_trap_behaviour(struct kvm_vcpu *vcpu,
+> +config PTDUMP_STAGE2_DEBUGFS
+> +       bool "Present the stage-2 pagetables to debugfs"
+> +       depends on DEBUG_KERNEL
+> +       depends on DEBUG_FS
+> +       depends on ARCH_HAS_PTDUMP
+> +       select PTDUMP
+> +       default n
+> +       help
+> +         Say Y here if you want to show the stage-2 kernel pagetables
+> +         layout in a debugfs file. This information is only useful for k=
+ernel developers
+> +         who are working in architecture specific areas of the kernel.
+> +         It is probably not a good idea to enable this feature in a prod=
+uction
+> +         kernel.
+> +
+> +         If in doubt, say N.
+> +
+>  config NVHE_EL2_DEBUG
+>         bool "Debug mode for non-VHE EL2 object"
+> -       depends on KVM
+> +       default n
+>         help
+>           Say Y here to enable the debug mode for the non-VHE KVM EL2 obj=
+ect.
+>           Failure reports will BUG() in the hypervisor. This is intended =
+for
+> @@ -53,10 +71,23 @@ config NVHE_EL2_DEBUG
 >
->  static u64 kvm_get_sysreg_res0(struct kvm *kvm, enum vcpu_sysreg sr)
->  {
-> -       struct kvm_sysreg_masks *masks;
+>           If unsure, say N.
+>
+> -config PROTECTED_NVHE_STACKTRACE
+> -       bool "Protected KVM hypervisor stacktraces"
+> -       depends on NVHE_EL2_DEBUG
+> +if NVHE_EL2_DEBUG
+> +
+> +config PKVM_DISABLE_STAGE2_ON_PANIC
+> +       bool "Disable the host stage-2 on panic"
+>         default n
+> +       help
+> +         Relax the host stage-2 on hypervisor panic to allow the kernel =
+to
+> +         unwind and symbolize the hypervisor stacktrace. This however ta=
+mpers
+> +         the system security. This is intended for local EL2 hypervisor
+> +         development.
+> +
+> +         If unsure, say N.
+> +
+> +config PKVM_STACKTRACE
+> +       bool "Protected KVM hypervisor stacktraces"
+> +       depends on PKVM_DISABLE_STAGE2_ON_PANIC
+> +       default y
+>         help
+>           Say Y here to enable pKVM hypervisor stacktraces on hyp_panic()
+>
+> @@ -66,21 +97,6 @@ config PROTECTED_NVHE_STACKTRACE
+>
+>           If unsure, or not using protected nVHE (pKVM), say N.
+>
+> -config PTDUMP_STAGE2_DEBUGFS
+> -       bool "Present the stage-2 pagetables to debugfs"
+> -       depends on KVM
+> -       depends on DEBUG_KERNEL
+> -       depends on DEBUG_FS
+> -       depends on ARCH_HAS_PTDUMP
+> -       select PTDUMP
+> -       default n
+> -       help
+> -         Say Y here if you want to show the stage-2 kernel pagetables
+> -         layout in a debugfs file. This information is only useful for k=
+ernel developers
+> -         who are working in architecture specific areas of the kernel.
+> -         It is probably not a good idea to enable this feature in a prod=
+uction
+> -         kernel.
 > -
-> -       /* Only handle the VNCR-backed regs for now */
-> -       if (sr < __VNCR_START__)
-> -               return 0;
+> -         If in doubt, say N.
 > -
-> -       masks = kvm->arch.sysreg_masks;
-> -
-> -       return masks->mask[sr - __SANITISED_REG_START__].res0;
-> +       return kvm_get_sysreg_resx(kvm, sr).res0;
+> +endif # NVHE_EL2_DEBUG
+> +endif # KVM
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index cc7d5d1709cb..54aedf93c78b 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -539,7 +539,7 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr=
+, u64 spsr,
+>
+>                 /* All hyp bugs, including warnings, are treated as fatal=
+. */
+>                 if (!is_protected_kvm_enabled() ||
+> -                   IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
+> +                   IS_ENABLED(CONFIG_PKVM_DISABLE_STAGE2_ON_PANIC)) {
+>                         struct bug_entry *bug =3D find_bug(elr_in_kimg);
+>
+>                         if (bug)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/hos=
+t.S
+> index eef15b374abb..3092befcd97c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -120,7 +120,7 @@ SYM_FUNC_START(__hyp_do_panic)
+>
+>         mov     x29, x0
+>
+> -#ifdef CONFIG_NVHE_EL2_DEBUG
+> +#ifdef PKVM_DISABLE_STAGE2_ON_PANIC
+>         /* Ensure host stage-2 is disabled */
+>         mrs     x0, hcr_el2
+>         bic     x0, x0, #HCR_VM
+> diff --git a/arch/arm64/kvm/hyp/nvhe/stacktrace.c b/arch/arm64/kvm/hyp/nv=
+he/stacktrace.c
+> index 5b6eeab1a774..7c832d60d22b 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/stacktrace.c
+> @@ -34,7 +34,7 @@ static void hyp_prepare_backtrace(unsigned long fp, uns=
+igned long pc)
+>         stacktrace_info->pc =3D pc;
 >  }
 >
->  static bool check_fgt_bit(struct kvm_vcpu *vcpu, enum vcpu_sysreg sr,
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index c5a45bc62153e..75a23f1c56d13 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -1669,16 +1669,11 @@ u64 limit_nv_id_reg(struct kvm *kvm, u32 reg, u64 val)
->  u64 kvm_vcpu_apply_reg_masks(const struct kvm_vcpu *vcpu,
->                              enum vcpu_sysreg sr, u64 v)
->  {
-> -       struct kvm_sysreg_masks *masks;
-> -
-> -       masks = vcpu->kvm->arch.sysreg_masks;
-> -
-> -       if (masks) {
-> -               sr -= __SANITISED_REG_START__;
-> +       struct resx resx;
+> -#ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
+> +#ifdef CONFIG_PKVM_STACKTRACE
+>  #include <asm/stacktrace/nvhe.h>
 >
-> -               v &= ~masks->mask[sr].res0;
-> -               v |= masks->mask[sr].res1;
-> -       }
-> +       resx = kvm_get_sysreg_resx(vcpu->kvm, sr);
-> +       v &= ~resx.res0;
-> +       v |= resx.res1;
+>  DEFINE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long)], pkvm_s=
+tacktrace);
+> @@ -134,11 +134,11 @@ static void pkvm_save_backtrace(unsigned long fp, u=
+nsigned long pc)
 >
->         return v;
+>         unwind(&state, pkvm_save_backtrace_entry, &idx);
 >  }
+> -#else /* !CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +#else /* !CONFIG_PKVM_STACKTRACE */
+>  static void pkvm_save_backtrace(unsigned long fp, unsigned long pc)
+>  {
+>  }
+> -#endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +#endif /* CONFIG_PKVM_STACKTRACE */
+>
+>  /*
+>   * kvm_nvhe_prepare_backtrace - prepare to dump the nVHE backtrace
+> diff --git a/arch/arm64/kvm/stacktrace.c b/arch/arm64/kvm/stacktrace.c
+> index af5eec681127..9724c320126b 100644
+> --- a/arch/arm64/kvm/stacktrace.c
+> +++ b/arch/arm64/kvm/stacktrace.c
+> @@ -197,7 +197,7 @@ static void hyp_dump_backtrace(unsigned long hyp_offs=
+et)
+>         kvm_nvhe_dump_backtrace_end();
+>  }
+>
+> -#ifdef CONFIG_PROTECTED_NVHE_STACKTRACE
+> +#ifdef CONFIG_PKVM_STACKTRACE
+>  DECLARE_KVM_NVHE_PER_CPU(unsigned long [NVHE_STACKTRACE_SIZE/sizeof(long=
+)],
+>                          pkvm_stacktrace);
+>
+> @@ -225,12 +225,12 @@ static void pkvm_dump_backtrace(unsigned long hyp_o=
+ffset)
+>                 kvm_nvhe_dump_backtrace_entry((void *)hyp_offset, stacktr=
+ace[i]);
+>         kvm_nvhe_dump_backtrace_end();
+>  }
+> -#else  /* !CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +#else  /* !CONFIG_PKVM_STACKTRACE */
+>  static void pkvm_dump_backtrace(unsigned long hyp_offset)
+>  {
+> -       kvm_err("Cannot dump pKVM nVHE stacktrace: !CONFIG_PROTECTED_NVHE=
+_STACKTRACE\n");
+> +       kvm_err("Cannot dump pKVM nVHE stacktrace: !CONFIG_PKVM_STACKTRAC=
+E\n");
+>  }
+> -#endif /* CONFIG_PROTECTED_NVHE_STACKTRACE */
+> +#endif /* CONFIG_PKVM_STACKTRACE */
+>
+>  /*
+>   * kvm_nvhe_dump_backtrace - Dump KVM nVHE hypervisor backtrace.
 > --
-> 2.47.3
+> 2.52.0.457.g6b5491de43-goog
 >
