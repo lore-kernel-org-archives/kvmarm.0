@@ -1,205 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2634B338936;
-	Mon, 26 Jan 2026 12:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7C4225413
+	for <kvmarm@lists.linux.dev>; Mon, 26 Jan 2026 14:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769429858; cv=none; b=sXrnRW8gqMTp4vIo0+NRTdgKnBh2RPl7GWPUuqtunXKSTmTrGo8NoVEzRQk3cTZ2jmwoS5Gl+nDV1rAjZQBtgli8RzhQahiV5Q66Si8qE9b40ZiGJQ6JqKUT+VRIMkHcnpE09j0z8sFUXTb8f6Ga6Cxy+IUo0oEO2p+Kw8AT4Ac=
+	t=1769437823; cv=none; b=F9D5vbej6Pf3kMODaxcrL5qO7lUPA7Dh9S2fsEuyCITFniGcgmXu9H0OiQnAvu+70bSwm6y8RQeqAJRYwBuXhhGjHMK7BWEZEAcoDaVVR/NKpIRz5RaVWnGq/KJghU7X1VD91yBSREuWam+jECAvxF36uC9rPK7T3od2UOnTNcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769429858; c=relaxed/simple;
-	bh=rJgheB6THcstxt2wbh5QI4RzkAO+EKvuEAN0WWCmPRA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuhWYd8zxPJ8i8/mJ1QJEJn6KYXn02rOsJTwNHmagqXbHnRIa5qSIgWI8KNr1X/s1A9WB4fvXMyzOjpB6rFvJsl43Iw/z985Gy3VHa7Vhfas6CtQD4YqhzYx0nGIr1Gs2NrM6Ml1srtvUBW77RHP6KXkOb1DOiKys6Q6wO0cc9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxYqgDIv; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxYqgDIv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093AAC116C6;
-	Mon, 26 Jan 2026 12:17:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769429858;
-	bh=rJgheB6THcstxt2wbh5QI4RzkAO+EKvuEAN0WWCmPRA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KxYqgDIvPwCgbKnPAopDR2//Jz9pVsvT5YHWC738jTDv4KBhEAyrwcrY/NyqNNJOA
-	 KUHBstcoKcMAdw6bGLLDK+mgfbJMd4nF6ew6cxdXvGv/KwM6ilQwhjr3j4SLSLJj+/
-	 nuHt7kh9EpaEJ2kKQkt949FoyRmYnFNsEV7MbnNOycVyIolEhAp43rgfPEvteYHJCN
-	 bi1cPvc7dRaiEO9gCF1hl4toIe/Sd7pubnURSoyovO38m7LkhQGpS3KmsnS02NG1C3
-	 Q3xtsDgoTEwHdOh8NpDj6WXzpRweM4FwqfwI+h4RQXyQP6MuoF4PJYc7eK/kTdXPqS
-	 BgRQqAajx4Pog==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vkLXE-00000005hx6-1DLf;
-	Mon, 26 Jan 2026 12:17:36 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH 20/20] KVM: arm64: Add debugfs file dumping computed RESx values
-Date: Mon, 26 Jan 2026 12:16:54 +0000
-Message-ID: <20260126121655.1641736-21-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260126121655.1641736-1-maz@kernel.org>
-References: <20260126121655.1641736-1-maz@kernel.org>
+	s=arc-20240116; t=1769437823; c=relaxed/simple;
+	bh=B7zB+MjQb7SRZ/5XrJXJrOxLelKo2UBqGdK18/DaHz0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z5MsUt+FekhD3W8SBujutVCwPUfbC3p4kUlybvamUrv5Icc0ng6dbMSipGpiCAAqLQ2C0GJKauba+Jr9/VItyf00uHhRQshU7J6OjXKiiTreilkhEYoINPSQCQkQqY7xDMtouoPhff3sTKgeJp3nw42Fb1sj6Wy67fTVDlOIinA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AE9D9339;
+	Mon, 26 Jan 2026 06:30:14 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C6BA3F632;
+	Mon, 26 Jan 2026 06:30:16 -0800 (PST)
+Message-ID: <b79b74ed-8d52-45a9-80fd-47ed030f362f@arm.com>
+Date: Mon, 26 Jan 2026 14:30:14 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/47] arm64: mpam: Context switch the MPAM registers
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, will@kernel.org,
+ corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-7-ben.horgan@arm.com> <aWkqt37FJ5l6QD0E@arm.com>
+ <f19cab15-0626-4d13-b25e-1c194294e62f@arm.com> <aXOF1gYB_HEK8QPX@arm.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <aXOF1gYB_HEK8QPX@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Computing RESx values is hard. Verifying that they are correct is
-harder. Add a debugfs file called "resx" that will dump all the RESx
-values for a given VM.
+Hi Catalin,
 
-I found it useful, maybe you will too.
+On 1/23/26 14:29, Catalin Marinas wrote:
+> Hi Ben,
+> 
+> On Mon, Jan 19, 2026 at 12:23:13PM +0000, Ben Horgan wrote:
+>> On 1/15/26 17:58, Catalin Marinas wrote:
+>>> On Mon, Jan 12, 2026 at 04:58:33PM +0000, Ben Horgan wrote:
+>>>> +static inline void mpam_thread_switch(struct task_struct *tsk)
+>>>> +{
+>>>> +	u64 oldregval;
+>>>> +	int cpu = smp_processor_id();
+>>>> +	u64 regval = mpam_get_regval(tsk);
+>>>> +
+>>>> +	if (!static_branch_likely(&mpam_enabled))
+>>>> +		return;
+>>>> +
+>>>> +	if (regval == READ_ONCE(arm64_mpam_global_default))
+>>>> +		regval = READ_ONCE(per_cpu(arm64_mpam_default, cpu));
+>>>> +
+>>>> +	oldregval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
+>>>> +	if (oldregval == regval)
+>>>> +		return;
+>>>> +
+>>>> +	write_sysreg_s(regval, SYS_MPAM1_EL1);
+>>>> +	isb();
+>>>> +
+>>>> +	/* Synchronising the EL0 write is left until the ERET to EL0 */
+>>>> +	write_sysreg_s(regval, SYS_MPAM0_EL1);
+>>>
+>>> Since we have an isb() already, does it make any difference if we write
+>>> MPAM0 before the barrier? Similar question for other places where we
+>>> write these two registers.
+>>
+>> The reason for the isb() placement is to document that it's not required
+>> for the MPAM0_EL1. All instructions running at EL1take their MPAM
+>> configuration from MPAM1_EL1. This includes LDTR and STTR as you asked
+>> about in a different thread.
+> 
+> It's fine to keep it this way if LDTR/STTR are not affected by the MPAM0
+> register.
+> 
+>>>> +
+>>>> +	WRITE_ONCE(per_cpu(arm64_mpam_current, cpu), regval);
+>>>
+>>> Is it too expensive to read the MPAM sysregs and avoid carrying around
+>>> another per-CPU state? You use it for pm restoring but we could just
+>>> save it in cpu_do_suspend() like other sysregs. Not a big issue, it just
+>>> feels like this function got unnecessarily complicated (it took me a bit
+>>> to figure out what it all does).
+>>
+>> It's done this way as it matches what's done in x86. I expect it would
+>> be cheap enough to read the register to check whether a write is required.
+> 
+> Since you use it for CPU suspend/resume, I guess it's fine, it saves us
+> from having to preserve it in the low-level asm sleep code. I don't have
+> a strong preference either way.
+> 
+>>> A related question - is resctrl_arch_set_cdp_enabled() always called in
+>>> non-preemptible contexts? We potentially have a race between setting
+>>> current->mpam_partid_msg and arm64_mpam_global_default, so the check in
+>>> mpam_thread_switch() can get confused.
+>>
+>> The resctrl filesystem can only ever get mounted once and
+>> resctrl_arch_set_cdp_enabled() is always called in mount. In
+>> rdt_get_tree(), rdt_enable_ctx() calls resctrl_arch_set_cdp_enabled().
+>> This is done while holding the rdtgroup_mutex and the user can't change
+>> the mpam configuration from the default until the mutex is released and
+>> it can claim it.
+> 
+> What if resctrl_arch_set_cdp_enabled() gets preempted between updating
+> current task partid and setting arm64_mpam_global_default? The mutex
+> doesn't help.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/sys_regs.c         | 98 +++++++++++++++++++++++++++++++
- 2 files changed, 99 insertions(+)
+I see, I had misinterpreted your question.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index c82b071ade2a5..54072f6ec9d4b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -375,6 +375,7 @@ struct kvm_arch {
- 
- 	/* Iterator for idreg debugfs */
- 	u8	idreg_debugfs_iter;
-+	u16	sr_resx_iter;
- 
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 88a57ca36d96c..f3f92b489b588 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5090,12 +5090,110 @@ static const struct seq_operations idregs_debug_sops = {
- 
- DEFINE_SEQ_ATTRIBUTE(idregs_debug);
- 
-+static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
-+{
-+	unsigned long i, sr_idx = 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+		const struct sys_reg_desc *r = &sys_reg_descs[i];
-+
-+		if (r->reg < __SANITISED_REG_START__)
-+			continue;
-+
-+		if (sr_idx == pos)
-+			return r;
-+
-+		sr_idx++;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void *sr_resx_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+	u16 *iter;
-+
-+	guard(mutex)(&kvm->arch.config_lock);
-+
-+	if (!kvm->arch.sysreg_masks)
-+		return NULL;
-+
-+	iter = &kvm->arch.sr_resx_iter;
-+	if (*iter != (u16)~0)
-+		return ERR_PTR(-EBUSY);
-+
-+	*iter = *pos;
-+	if (!sr_resx_find(kvm, *iter))
-+		iter = NULL;
-+
-+	return iter;
-+}
-+
-+static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	(*pos)++;
-+
-+	if (sr_resx_find(kvm, kvm->arch.sr_resx_iter + 1)) {
-+		kvm->arch.sr_resx_iter++;
-+
-+		return &kvm->arch.sr_resx_iter;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void sr_resx_stop(struct seq_file *s, void *v)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	if (IS_ERR(v))
-+		return;
-+
-+	guard(mutex)(&kvm->arch.config_lock);
-+
-+	kvm->arch.sr_resx_iter = ~0;
-+}
-+
-+static int sr_resx_show(struct seq_file *s, void *v)
-+{
-+	const struct sys_reg_desc *desc;
-+	struct kvm *kvm = s->private;
-+	struct resx resx;
-+
-+	desc = sr_resx_find(kvm, kvm->arch.sr_resx_iter);
-+
-+	if (!desc->name)
-+		return 0;
-+
-+	resx = kvm_get_sysreg_resx(kvm, desc->reg);
-+
-+	seq_printf(s, "%20s:\tRES0:%016llx\tRES1:%016llx\n",
-+		   desc->name, resx.res0, resx.res1);
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations sr_resx_sops = {
-+	.start	= sr_resx_start,
-+	.next	= sr_resx_next,
-+	.stop	= sr_resx_stop,
-+	.show	= sr_resx_show,
-+};
-+
-+DEFINE_SEQ_ATTRIBUTE(sr_resx);
-+
- void kvm_sys_regs_create_debugfs(struct kvm *kvm)
- {
- 	kvm->arch.idreg_debugfs_iter = ~0;
-+	kvm->arch.sr_resx_iter = ~0;
- 
- 	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
- 			    &idregs_debug_fops);
-+	debugfs_create_file("resx", 0444, kvm->debugfs_dentry, kvm,
-+			    &sr_resx_fops);
- }
- 
- static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *reg)
--- 
-2.47.3
+When looking into this I spotted that the per-cpu default,
+arm64_mpam_default, is not updated on the cdp enable and so the default
+tasks carry on running with the non-cdp default pmg/partid configuration.
+
+On the race itself, if current->mpam_partid_pmg is set but not
+arm64_mpam_global_default then if the current task is preempted at that
+point there is a discrepancy. When the task gets context switched back
+in then the comparison in mpam_thread_switch() will be false when true
+would be expected.
+
+In order to update arm64_mpam_default and make sure the mpam variables
+and registers for the online cpus are in the right state by the end of
+resctrl_arch_set_cdp_enabled() I'll add a per cpu call to
+resctrl_arch_sync_cpu_closid_rmid(). I'll also add something in the
+resume path so that arm64_mpam_default gets set correctly for the cpus
+that were offline.
+
+> 
+>>> And I couldn't figure out where the MPAMx_EL1 registers are written. If
+>>> any global/per-cpu/per-task value is changed, does the kernel wait until
+>>> the next thread switch to write the sysreg? The only places I can found
+>>> touching these sysregs are the thread switch, pm notifiers and KVM.
+>>
+>> If the task configuration is changed then the MPAM sysreg will only be
+>> updated the next time it goes into the kernel.
+> 
+> Is it updated when it goes into the kernel or when we have a context
+> switch? If you have a long-running user thread that is never scheduled
+> out, it may not notice the update even if it entered the kernel (but no
+> context switch).
+
+Yes, only on context switch.
+
+> 
+>> So, just eventually
+>> consistent. For cpu configuration, update_closid_rmid() gets called
+>> which ipis the cpus and ends up calling mpam_thread_switch() from
+>> resctrl_arch_sched_in().
+> 
+> I see, it should be fine.
+> 
+
+Thanks,
+
+Ben
 
