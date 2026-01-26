@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEC8314B65;
-	Mon, 26 Jan 2026 09:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3950332D43B;
+	Mon, 26 Jan 2026 09:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769420288; cv=none; b=Xn6Mntwd39dGZfwVRsa0wNioAj1549Jsh4VNseKzeG44uP20IxSeMl0VEw7TBoXy2qAZi+PXVqVECYYOR3AO+Aiuaxo4cMclVx+xDkRL3Ob0CFXZts+tmRwN3ye+3oNBaGzfpe9GjD9AFVme9i8DdVw6mouE2j8mC2nQEhYxPh8=
+	t=1769421060; cv=none; b=iIa4LznvUnMaEcU4+XbSYR/sEQ/iPYCTntRTfaum3O2i5XOTIb9CzaZtLRF9ZqoJpmUNm75z/uQq0J9m4TgFnYBQ++vNw4hMyBp44u9oNuZ2SaRGznM28kvAYECUW8K9XInIVSeP8euCUTl1pTpBLPcztfwQEXd+TDax8zbZNDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769420288; c=relaxed/simple;
-	bh=bPlCz6FJ7rX8Z5OmZuqzMLSzVV3SnTF6lYCixktKNII=;
+	s=arc-20240116; t=1769421060; c=relaxed/simple;
+	bh=b+QADDDNWFijtCScvWxdQYJqkyn6qiVV4dokss2M+ak=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZJN6urm3WkVTuwAmQIxbZzMu191yoapemW6Bt+7Zxduf83jGEKH7diSIpchmbDLyyAA4b9RrCGcNmAtqYYOzMYNfQFeRV7LF6df5pMiIDpaZt1vFzT2LU54lBHH7srkLqGqNJaIUkJqSTIDSrPY5gO4cu5ePW+z2BC2e93y5Ml0=
+	 In-Reply-To:Content-Type; b=phUcvfKda7yt9B6/HWb34LMs3u3GRDm2HL+XUsJIZUZy3/bbYXI2BKpAVrfLHw91HCRNNsYjvVF/CrL1SKd3TY0ZOYoggP3Ucv6+YtqvqxXbSKgc61U6CESISTXGPF5en1SNQICqJPhcy3b2tWh+F2oTIK/UJuD5/E3XX9iSDNA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 40972339;
-	Mon, 26 Jan 2026 01:37:59 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 04EF4339;
+	Mon, 26 Jan 2026 01:50:50 -0800 (PST)
 Received: from [10.57.8.194] (unknown [10.57.8.194])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1DF133F632;
-	Mon, 26 Jan 2026 01:38:00 -0800 (PST)
-Message-ID: <4b9070a2-0cb8-42ed-8ef3-d3c071fa14c3@arm.com>
-Date: Mon, 26 Jan 2026 09:37:58 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B8D583F632;
+	Mon, 26 Jan 2026 01:50:52 -0800 (PST)
+Message-ID: <e051c4bb-7b1c-4823-b81f-e4df5d8b1d9d@arm.com>
+Date: Mon, 26 Jan 2026 09:50:50 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,236 +27,202 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+Subject: Re: [PATCH v12 22/46] arm64: RMI: Create the realm descriptor
+To: Alper Gun <alpergun@google.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
 References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-7-steven.price@arm.com>
- <a837d104-5df6-40bc-b129-eaf39fdab482@arm.com>
+ <20251217101125.91098-23-steven.price@arm.com>
+ <CABpDEumQ=62nZ_xEN6oMHw=J+6ps=Gy=1vx8i=6Hz+BacO1Ymg@mail.gmail.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <a837d104-5df6-40bc-b129-eaf39fdab482@arm.com>
+In-Reply-To: <CABpDEumQ=62nZ_xEN6oMHw=J+6ps=Gy=1vx8i=6Hz+BacO1Ymg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 23/01/2026 16:47, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 17/12/2025 10:10, Steven Price wrote:
->> There is one CAP which identified the presence of CCA, and two ioctls.
->> One ioctl is used to populate memory and the other is used when user
->> space is providing the PSCI implementation to identify the target of the
->> operation.
+On 23/01/2026 18:57, Alper Gun wrote:
+> On Wed, Dec 17, 2025 at 2:13 AM Steven Price <steven.price@arm.com> wrote:
 >>
-> 
-> Could we split these changes to the corresponding implementation patches
-> ? That might give us a full picture of how these UAPIs fit in the bigger
-> picture.
-
-I could do that, but I was deliberately keeping this as a patch which
-contains the uABI interface so that the whole uABI is visible in one
-place. I was trying to reduce the amount to review for those who aren't
-so interested in the implementation details (especially for this series
-where we know it's going to change somewhat with the move to RMM v2.0).
-
+>> Creating a realm involves first creating a realm descriptor (RD). This
+>> involves passing the configuration information to the RMM. Do this as
+>> part of realm_ensure_created() so that the realm is created when it is
+>> first needed.
+>>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v11:
->>   * Completely reworked to be more implicit. Rather than having explicit
->>     CAP operations to progress the realm construction these operations
->>     are done when needed (on populating and on first vCPU run).
->>   * Populate and PSCI complete are promoted to proper ioctls.
->> Changes since v10:
->>   * Rename symbols from RME to RMI.
->> Changes since v9:
->>   * Improvements to documentation.
->>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->> Changes since v8:
->>   * Minor improvements to documentation following review.
->>   * Bump the magic numbers to avoid conflicts.
->> Changes since v7:
->>   * Add documentation of new ioctls
->>   * Bump the magic numbers to avoid conflicts
->> Changes since v6:
->>   * Rename some of the symbols to make their usage clearer and avoid
->>     repetition.
->> Changes from v5:
->>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>> New patch for v12
 >> ---
->>   Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
->>   include/uapi/linux/kvm.h       | 23 ++++++++++++++
->>   2 files changed, 80 insertions(+)
+>>  arch/arm64/kvm/rmi.c | 117 ++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 115 insertions(+), 2 deletions(-)
 >>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/
->> api.rst
->> index 01a3abef8abb..2d5dc7e48954 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6517,6 +6517,54 @@ the capability to be present.
->>     `flags` must currently be zero.
->>   +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
->> +------------------------------------
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index b51e68e56d56..18edc7eeb5fa 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -500,6 +500,106 @@ static void realm_unmap_shared_range(struct kvm *kvm,
+>>                              start, end);
+>>  }
+>>
+>> +/* Calculate the number of s2 root rtts needed */
+>> +static int realm_num_root_rtts(struct realm *realm)
+>> +{
+>> +       unsigned int ipa_bits = realm->ia_bits;
+>> +       unsigned int levels = 4 - get_start_level(realm);
+>> +       unsigned int sl_ipa_bits = levels * (RMM_PAGE_SHIFT - 3) +
+>> +                                  RMM_PAGE_SHIFT;
 >> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vcpu ioctl
->> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
->> +:Returns: 0 if successful, < 0 on error
+>> +       if (sl_ipa_bits >= ipa_bits)
+>> +               return 1;
 >> +
->> +::
+>> +       return 1 << (ipa_bits - sl_ipa_bits);
+>> +}
 >> +
->> +  struct kvm_arm_rmi_psci_complete {
->> +    __u64 target_mpidr;
->> +    __u32 psci_status;
->> +    __u32 padding[3];
->> +  };
+>> +static int realm_create_rd(struct kvm *kvm)
+>> +{
+>> +       struct realm *realm = &kvm->arch.realm;
+>> +       struct realm_params *params = realm->params;
+>> +       void *rd = NULL;
+>> +       phys_addr_t rd_phys, params_phys;
+>> +       size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
+>> +       int i, r;
+>> +       int rtt_num_start;
 >> +
->> +Where PSCI functions are handled by user space, the RMM needs to be
->> informed of
->> +the target of the operation using `target_mpidr`, along with the status
->> +(`psci_status`). The RMM v1.0 specification defines two functions
->> that require
->> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>> +       realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+>> +       rtt_num_start = realm_num_root_rtts(realm);
 >> +
->> +If the kernel is handling PSCI then this is done automatically and
->> the VMM
->> +doesn't need to call this ioctl.
+>> +       if (WARN_ON(realm->rd || !realm->params))
+>> +               return -EEXIST;
 >> +
->> +4.145 KVM_ARM_RMI_POPULATE
->> +--------------------------
+>> +       if (pgd_size / RMM_PAGE_SIZE < rtt_num_start)
+>> +               return -EINVAL;
 >> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vm ioctl
->> +:Parameters: struct kvm_arm_rmi_populate (in)
->> +:Returns: number of bytes populated, < 0 on error
+>> +       rd = (void *)__get_free_page(GFP_KERNEL);
+>> +       if (!rd)
+>> +               return -ENOMEM;
 >> +
->> +::
+>> +       rd_phys = virt_to_phys(rd);
+>> +       if (rmi_granule_delegate(rd_phys)) {
+>> +               r = -ENXIO;
+>> +               goto free_rd;
+>> +       }
 >> +
->> +  struct kvm_arm_rmi_populate {
->> +    __u64 base;
->> +    __u64 size;
->> +    __u64 source_uaddr;
->> +    __u32 flags;
->> +    __u32 reserved;
->> +  };
+>> +       for (i = 0; i < pgd_size; i += RMM_PAGE_SIZE) {
+>> +               phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i;
 >> +
->> +Populate a region of protected address space by copying the data from
->> the user
->> +space pointer provided. This is only valid before any VCPUs have been
->> run.
->> +The ioctl might not populate the entire region and user space may
->> have to
->> +repeatedly call it (with updated pointers) to populate the entire
->> region.
+>> +               if (rmi_granule_delegate(pgd_phys)) {
+>> +                       r = -ENXIO;
+>> +                       goto out_undelegate_tables;
+>> +               }
+>> +       }
+>> +
+>> +       params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
+>> +       params->rtt_level_start = get_start_level(realm);
+>> +       params->rtt_num_start = rtt_num_start;
+>> +       params->rtt_base = kvm->arch.mmu.pgd_phys;
+>> +       params->vmid = realm->vmid;
 > 
-> It may be a good idea to spill out the restrictions on calling this,
-> right ? We expect that the source_uaddr is a separate memory area
-> from the "DRAM" (in shared mode) ?
+> I don't see a way to configure rpv and hash_algo anymore. I assume they
+> are gone for a minimal userspace interface. Will there be a way to set
+> them going forward?
 
-Yes - I'd tried to say that by mentioning it's a "user space pointer",
-but I could make that more explicit.
+Yes the intention is that the uAPI will be extended in the future to
+allow these to be configured. This would be by exposing new capability
+flags and allowing the VMM to set the capability. This ensures that a
+basic VMM doesn't need to worry about them, but a more featured VMM can
+provide support for configuration.
 
-> Can this be called before/after converting the entire memory of the
-> Guest to Private ? I believe, it must be done after the "initial
-> change all of DRAM to private" ?
-
-It can be called before or after setting RIPAS and it implicitly sets
-RIPAS to RAM (I'll add something to make that explicit).
-
-With RMM v1.0 there's an ugly problem that INIT_RIPAS fails on a region
-which is already RIPAS RAM. This should be fixed with RMM v2.0. There's
-a workaround in patch 17 currently:
-
-		/* FIXME: Ugly hack to skip regions which are
-		 * already RIPAS_RAM
-		 */
-
-But that should go away.
-
-Note that with this proposed uAPI there is no mechanism for user space
-to directly set the RIPAS - it's assumed that all guestmem_fd regions
-should be set to RIPAS RAM at the time of the first VCPU run - which
-means the VMM doesn't need to do anything special.
-
-In the future we could consider a guestmem_fd flag or extra ioctl to
-allow the VMM to control RIPAS at a finer granularity. But so far we
-don't seem to have any compelling reason to expose that.
+This series is already rather long so I've attempted to drop optional
+parts to keep the complexity down while still providing something
+"useful" (i.e. can launch a realm guest and there's some meaningful
+extra security/attestation over a normal VM). There's loads of extra
+features in the spec which will come later.
 
 Thanks,
 Steve
 
-> Suzuki
-> 
->>     .. _kvm_run:
->>   @@ -8765,6 +8813,15 @@ helpful if user space wants to emulate
->> instructions which are not
->>   This capability can be enabled dynamically even if VCPUs were already
->>   created and are running.
->>   +7.47 KVM_CAP_ARM_RMI
->> +--------------------
 >> +
->> +:Architectures: arm64
->> +:Target: VM
->> +:Parameters: None
+>> +       params_phys = virt_to_phys(params);
 >> +
->> +This capability indicates that support for CCA realms is available.
+>> +       if (rmi_realm_create(rd_phys, params_phys)) {
+>> +               r = -ENXIO;
+>> +               goto out_undelegate_tables;
+>> +       }
 >> +
->>   8. Other capabilities.
->>   ======================
->>   diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->> index dddb781b0507..8e66ba9c81db 100644
->> --- a/include/uapi/linux/kvm.h
->> +++ b/include/uapi/linux/kvm.h
->> @@ -974,6 +974,7 @@ struct kvm_enable_cap {
->>   #define KVM_CAP_GUEST_MEMFD_FLAGS 244
->>   #define KVM_CAP_ARM_SEA_TO_USER 245
->>   #define KVM_CAP_S390_USER_OPEREXEC 246
->> +#define KVM_CAP_ARM_RMI 247
->>     struct kvm_irq_routing_irqchip {
->>       __u32 irqchip;
->> @@ -1628,4 +1629,26 @@ struct kvm_pre_fault_memory {
->>       __u64 padding[5];
->>   };
->>   +/* Available with KVM_CAP_ARM_RMI, only for VMs with
->> KVM_VM_TYPE_ARM_REALM  */
->> +struct kvm_arm_rmi_psci_complete {
->> +    __u64 target_mpidr;
->> +    __u32 psci_status;
->> +    __u32 padding[3];
->> +};
+>> +       if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
+>> +               WARN_ON(rmi_realm_destroy(rd_phys));
+>> +               r = -ENXIO;
+>> +               goto out_undelegate_tables;
+>> +       }
 >> +
->> +#define KVM_ARM_VCPU_RMI_PSCI_COMPLETE    _IOW(KVMIO, 0xd6, struct
->> kvm_arm_rmi_psci_complete)
+>> +       realm->rd = rd;
+>> +       WRITE_ONCE(realm->state, REALM_STATE_NEW);
+>> +       /* The realm is up, free the parameters.  */
+>> +       free_page((unsigned long)realm->params);
+>> +       realm->params = NULL;
 >> +
->> +/* Available with KVM_CAP_ARM_RMI, only for VMs with
->> KVM_VM_TYPE_ARM_REALM */
->> +struct kvm_arm_rmi_populate {
->> +    __u64 base;
->> +    __u64 size;
->> +    __u64 source_uaddr;
->> +    __u32 flags;
->> +    __u32 reserved;
->> +};
+>> +       return 0;
 >> +
->> +#define KVM_ARM_RMI_POPULATE_FLAGS_MEASURE    (1 << 0)
+>> +out_undelegate_tables:
+>> +       while (i > 0) {
+>> +               i -= RMM_PAGE_SIZE;
 >> +
->> +#define KVM_ARM_RMI_POPULATE    _IOW(KVMIO, 0xd7, struct
->> kvm_arm_rmi_populate)
+>> +               phys_addr_t pgd_phys = kvm->arch.mmu.pgd_phys + i;
 >> +
->>   #endif /* __LINUX_KVM_H */
-> 
+>> +               if (WARN_ON(rmi_granule_undelegate(pgd_phys))) {
+>> +                       /* Leak the pages if they cannot be returned */
+>> +                       kvm->arch.mmu.pgt = NULL;
+>> +                       break;
+>> +               }
+>> +       }
+>> +       if (WARN_ON(rmi_granule_undelegate(rd_phys))) {
+>> +               /* Leak the page if it isn't returned */
+>> +               return r;
+>> +       }
+>> +free_rd:
+>> +       free_page((unsigned long)rd);
+>> +       return r;
+>> +}
+>> +
+>>  static int realm_unmap_private_page(struct realm *realm,
+>>                                     unsigned long ipa,
+>>                                     unsigned long *next_addr)
+>> @@ -803,8 +903,21 @@ static int realm_init_ipa_state(struct kvm *kvm,
+>>
+>>  static int realm_ensure_created(struct kvm *kvm)
+>>  {
+>> -       /* Provided in later patch */
+>> -       return -ENXIO;
+>> +       int ret;
+>> +
+>> +       switch (kvm_realm_state(kvm)) {
+>> +       case REALM_STATE_NONE:
+>> +               break;
+>> +       case REALM_STATE_NEW:
+>> +               return 0;
+>> +       case REALM_STATE_DEAD:
+>> +               return -ENXIO;
+>> +       default:
+>> +               return -EBUSY;
+>> +       }
+>> +
+>> +       ret = realm_create_rd(kvm);
+>> +       return ret;
+>>  }
+>>
+>>  static int set_ripas_of_protected_regions(struct kvm *kvm)
+>> --
+>> 2.43.0
+>>
 
