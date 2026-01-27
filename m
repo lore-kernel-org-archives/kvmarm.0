@@ -1,90 +1,90 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C75B3242A9
-	for <kvmarm@lists.linux.dev>; Tue, 27 Jan 2026 17:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC2E3164C3
+	for <kvmarm@lists.linux.dev>; Tue, 27 Jan 2026 17:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769536758; cv=pass; b=KejB/ZbcqpL4V4BnGRqiy4PdTr3Op7Dyi+njlzGffyAFygwvikI+wPlt0DrYpQ4XgXIiI57a80xiHg1Cg/5X/Q/hJknmiwKMarh0Ha117fDjbDe3VRdCayT1BFlqVNTldcDCCwPRlsA3jfp6WlcdcAOctQBCh2Um03hxqYVfS+g=
+	t=1769536766; cv=pass; b=MxXFvXZLPgVceRL9uWitP9WjMndlLXnr2AMJqTOiwFyJkC8+iZPakuULcgNOpX5SpJKI/N09aHY7vl5knkM6vf9lHQH7jb5Qb8PwRsPYcAzpWGyrVEjxmFw6PwDGjbsMvvEUYa4ViEsjGPvd/0CHcDlFkl+oWKp/5HdTVcJ07hc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769536758; c=relaxed/simple;
-	bh=+hId3SRsn0ruZaW1Cfmoewhzbba8HuhwYa226fcimVY=;
+	s=arc-20240116; t=1769536766; c=relaxed/simple;
+	bh=LuYLHuhCerbgSFOxdxa54N8FGEdtX2o0/IlNWz3mAEY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A4bFR/lnEzEFrky8XLssaOYzMIQCx8EXX/qP72Px6Ucj7ADFFy9uQdKBtpR+ecu3FKHBSKELxaRod6sCMHf2I7RI3hqKTCfGe0Q8DagZ6uZFf/+sXo5EzhkohJ+/bb+PLHrvW7OfZZcvAmyKIQo+g6VEdtebCKfYIGsXMKQgzsw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HWM7YMKc; arc=pass smtp.client-ip=209.85.160.175
+	 To:Cc:Content-Type; b=MBVLwF6KzO+yKxJyN6oaR0/BKU3PjD9X4qbsLmrkrV2mAZT3mP4puNFojc/Hg/nCZT2ZZQOkhxWuv2HG1QUdcrGA9R5NXzagQoX5xQkvcKm4fmIn2S37bpcwUUCxfbGTGioUe/sRWvyV+Z2B/VDc/TjFG7Y+urPtTG61aYvZ1Hc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FpBn/H2U; arc=pass smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HWM7YMKc"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5014b5d8551so17241cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 27 Jan 2026 09:59:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1769536756; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FpBn/H2U"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-5014b5d8551so17391cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 27 Jan 2026 09:59:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769536763; cv=none;
         d=google.com; s=arc-20240605;
-        b=NL0FqbpQQ8Hz8xZRyNjDK5Ip+9GJlOm9EMnUNxi9cB2QJ5ffBaI/a2gT/XTwS4DX2P
-         6GH2LLX//ivBZ+k6vxYAXuG887IHUYGCpLSnXp5oLfbaXBetnLBhK52YbHjrbejx6U7K
-         7/chsonwx0OFHqLIgBlsVH4DvwzGiTpt+3Zm41GPrcFbiXds/z+iEibrAuwLd6bPHjr8
-         mw2EMxOGRNWoJCVHUKnx838lMmhOKfGF0myR5mhgao3EMhZrGh4laWsKQAvapanVdkRU
-         89HmoCcVCXGRyNaB+m8qun8ISD+fPNDvUG80sOY4Z7bPNlkx3KjbcYpa3XUshHizn1a8
-         dQeQ==
+        b=GApgs/oqSmeoaHECHd09dadXpnMZWVSrHgW2pmuzJnf1NJzSVwpMkbhDV+fZhZouXu
+         oknvdVuXLi7dR2TnRvfzW0Sj+/j1j0LGNTrFwIAEggWv0gyyacOYupgrwkJm/jtZu/1K
+         zq8Dre68qE4xMnzIj9wSDg0CDtX9NzRYQxLoJ7AQUbDPPSbq+WcOXvTxSDrSguX86AKR
+         WT2zwomfP9H1NVNIvnO/5EXGzrwqXWQrn4r8TgGY/a6gmgHnpVD6b9u9NS8cdOo0qtLv
+         1kYy8JDvhC6jBUJWh9tLIfL97LvjilGD+aAsAMXtsdtVFXvTJZys6pmT/vTS5bDSehDC
+         VUFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=WXQLAHVKOq8T4zWobG4KuuypQi16GgCGUfWQ2Xeqgb4=;
+        bh=UOQZvYTAv//pcJPda837MTWpR+PvpurRjquFigTQ1OA=;
         fh=cKTbDbQYTc+pleUDsHasQv4LjIooAs3OE4CRw2/lzRk=;
-        b=VHgfm0vTPZ6YvM76NiJPcGbiBprFTh6kRjMwto9CcC9GVdTaNFn2p7PuW5pWVSEPk5
-         N2RgZggce65SfQohemBGFPmNmtCjQrtbmPoRhZhN7/lR7YJx7p/jfvtzmRDincV7Vxrj
-         RWkmLL3UoyeBdh716Uz9xtG0zKhj2tqShrUPaoHETTWJTzyPmofIs7Y/xAPZMFSh0sSo
-         Oc8B563jf7NH9xIWGACCycgnmtqJyei/lrzjSvxJ2QxzffbyLQJPkjuCpbm9OFjJS01Y
-         zz5v5JqZjelo/K+xISI+OvkMex+3x+ERjIAhAvCjzKbpOJHjcjPfJbgPwz+19iu8zYR9
-         MGSw==;
+        b=Ho+ZlgqnnkT/mTNZYUI8KTnEtlr9f1Sv3ZDLjkRUnmgpfJCy8Hr5QKGf3qqa4Xr5gl
+         sbwLkTeIOLbXdJkv4CmRTRm2/jJFVX/l+ZWLgSXJwagetb8hmTWMCkoyLRMJ1OR9BPPW
+         Uf5KXJM3Gpdxou8Q3TRzC89uT4du4nXAnWqKWBkkU+W92HQHjIUJGp7EmjGfqwATwpkz
+         fg4YHmqgl/I+35aTlSXGieyke5wBK9mwQ7Q4R+h53onXGJNdyRkjVbiP3LgfwpbsXLEG
+         Cgio+P0FW97AO3LPRKkFSpv0rCO7+dad/XUF1m+OyLe/3ZioTN99LIoYUjnL4A00mMa2
+         EmQw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1769536756; x=1770141556; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1769536763; x=1770141563; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WXQLAHVKOq8T4zWobG4KuuypQi16GgCGUfWQ2Xeqgb4=;
-        b=HWM7YMKchj+lWuffUDtsJ8JDYLfufts5LZ0qGqkY71U2lg5zZn7mym7GgwPrRP8ig9
-         9bRNA5iK57UIh1RzQWwhBjhlvomp9std8y9Cow8CUR0oVhpe8FtBE9gQLvKCTKR0Eh8X
-         TOmaoqgBHu9PLjQo1CE0Z4tA2EXJqt/ncjVCPeTy4vnmj2eX93yBEexx2tQqFNu/FbaW
-         gAedn/e2Tl17rqryDKB2u67+F8OWFT41gDUaHNfHuMrUjCJK5pXPMrY0c5XUhhv0lwBH
-         8GkgPMAsuX85BTMGmSblis3Eul0aZQbSZ6JuE6Pz7f/z+dgQrzxw48kWIphblf0KeiZY
-         GIUg==
+        bh=UOQZvYTAv//pcJPda837MTWpR+PvpurRjquFigTQ1OA=;
+        b=FpBn/H2UgOoEiAhsdBki03c5dIcyHTqmNaTIqMp3usdm6nw2x0ieyPJOckNFj2eFuY
+         iF9OV0ZTolwoxjvBWQ9iwpf3+4SIGVQDseiRH5is+E9psbGN2CbKwNGba6JIpa3gn4hp
+         DdPGjhC8D3mtMyNoW8PAHcstfYipti+qA7VzJTl8xpnITLzoZN+plWVnGw+skNo4rIhf
+         3jUHLcYTtvzCtw7a/v3GLPfnet5G4OkrCnhJZG2WADN8hznZrSW7cnH/Zh8TpZK/REN4
+         6s90gC4S3N8kC57cd9VVGXUqxlmukYL76IyebWcPCaH1yjkPd0SWg0DspFtXBmD1jGKJ
+         8a6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769536756; x=1770141556;
+        d=1e100.net; s=20230601; t=1769536763; x=1770141563;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WXQLAHVKOq8T4zWobG4KuuypQi16GgCGUfWQ2Xeqgb4=;
-        b=MQ/lL9dA8MQ0z5GLmFXoFAjobYIJDZLeVjeSl9PQGt+2I+d8SnVZmjffozAtbTImia
-         wQP6OVycu+2bcHvC2eZaa99lGJqN3BDUFDv/nRtdAMZc6i0QkqE60DPLJ6QeooYMUGom
-         U1xNHY2rrXpXGvTOqj6Snu/hgaqhBDb8gymYeI1LquxapaZJAxoKPOCfuD5rIPRJyX3p
-         65FicNgVnt50+/sqtSz855suB+hQ7jawhy+1GmDXOWoXoL4nEycTsp+zYb7fXf4MkJgT
-         7989cpW5cN3JHH0fz5vtGqfnF8Rzep1FJeRS17T7Pvb/XCpA+wPw8Irb176L/ofIX/hc
-         GwiQ==
-X-Gm-Message-State: AOJu0YwWXp6yVHxqeYGuBtI8JFokmFKA2gxAUAPHST/uYtggtzPOdKeE
-	iWDofALmfbqKUb1Jl6fAtMRUI58fXCS9vwaiGlLO2qja61PBTSKb0F2X7+MFOjHM+vfRTHQzGko
-	O7MoGQJVvhCRpo9eyn3+L6AJntiI5cDhYV7cAv1nP
-X-Gm-Gg: AZuq6aJjKjrrW44TwhD5NuuCrSpNRG389Q9thmvm6BFRp+GNquw9K2v8TAWs1XoX8Ks
-	kzmE0rNmeQ0rV231EW0KgbuW6KPDSKl+biQ8xpHLkpBGE3MvWzO+0YqA1dQTqels/dupdZoQPCb
-	HNnrcwK6rrzKShinf9l94AqMQ1dtfCuhf3lB1mn58Vmu7Azq5qCmXzgQacTWBpccp54EolJ8gb/
-	VO7if6l6Le+ODzOt3AV8QvTLJSjIom/7pcNXNeRmFoNqZYZ+AvJt4BVS09L9AOa81hqhFOX
-X-Received: by 2002:ac8:7d89:0:b0:501:3b94:bcae with SMTP id
- d75a77b69052e-5032f479773mr10069921cf.8.1769536755734; Tue, 27 Jan 2026
- 09:59:15 -0800 (PST)
+        bh=UOQZvYTAv//pcJPda837MTWpR+PvpurRjquFigTQ1OA=;
+        b=gY8GU3lN/nfNEFP2I9wUojGFiQc+RN2gN+v4stPCXwrxtaacjMtsOOIo9aZFZURton
+         XQQI/KKzaiUEfDeF1GtdkdRW17czy4xI5ltELMeRzl/7kjEDbzXB6ZXxdrycJm6qrfUR
+         hoCk38x4iKQbJGK7s1eyVtXSkkf13cJYTbCc6t6XjZo88ULDf6p6Ql1pL4lHOSsevKSJ
+         +jlbnuPXySyuwPCCnnl5ztD/yRpo2NNM8ObSALiNNqH8qfobCi3FJRgJhMx32rSw1Ekg
+         bp8uCq9H13ootvh4WDL5ViXz5sSScwmJOWdqaVOuXYiuWXOSQ/2roxzsA8dQGBSwcwPk
+         MQ2g==
+X-Gm-Message-State: AOJu0Yzd1UDcDU9rwS2NJWt3HEBMCOigAjP8LOAgf7wczWB2uLl+piMJ
+	GKEOtJ9F9d/KaaWnIV0ItGCHuMSDp0krf5tlQ37+IwKcuHNZK7JeiMH/w1BasUPDJKGytOHnDbu
+	cpuOOKu1dQLUP1yyyStEu5iClgdqzyPY/DFH7gl9Hx8rCV9K3M/KHYZyl
+X-Gm-Gg: AZuq6aJVjA8rmylHNtD5HnHWCTxcLJTkVB4tZT8VBZAFj/reOMLoHn9jOZzkeIBRQfA
+	HHJlFR6CukIDWO6QdEbTbVp7q/kuNR3vekeY4NrycnlFmaeGNDD39BnnO63TYRxCEqnDUNJek8K
+	pwfNwdr1bUibUcJ4VLedC6L7QCObLky6d0Ye3alhxUIIJJXevh8+Dm1Pce+UXkskBQITo6WAK4D
+	r3KgEsoXCHLD8DdBr3oVT7HGdRNP+WI/fCMjLmASefZPFX+WTNiWiBkUvzZbyfKs/6f5ho5
+X-Received: by 2002:ac8:5acd:0:b0:4ed:ff77:1a85 with SMTP id
+ d75a77b69052e-5032f523d2cmr9890351cf.17.1769536763293; Tue, 27 Jan 2026
+ 09:59:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-7-maz@kernel.org>
-In-Reply-To: <20260126121655.1641736-7-maz@kernel.org>
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-8-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-8-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 27 Jan 2026 17:58:38 +0000
-X-Gm-Features: AZwV_QhS3T7BGI_KLXpUw2zt_uf_weVG0r6EiuX_Phs-QUEKVVf5BCeOHp72BZA
-Message-ID: <CA+EHjTzU=rNQd7YU9O+ombTsZgTHgFThe6BGP20ii2xC2V473Q@mail.gmail.com>
-Subject: Re: [PATCH 06/20] KVM: arm64: Inherit RESx bits from FGT register descriptors
+Date: Tue, 27 Jan 2026 17:58:46 +0000
+X-Gm-Features: AZwV_QhifucCrTaCB27apGhiPavJg-rm3JFwqkfMUM-JyXvNsgDNJJ3r6uYLx6U
+Message-ID: <CA+EHjTzk_0n+Z3+WmHz0no+dJAcAxCtJgQFFs9hHG4WAw0rX=A@mail.gmail.com>
+Subject: Re: [PATCH 07/20] KVM: arm64: Allow RES1 bits to be inferred from configuration
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
@@ -95,88 +95,60 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
 >
-> The FGT registers have their computed RESx bits stashed in specific
-> descriptors, which we can easily use when computing the masks used
-> for the guest.
->
-> This removes a bit of boilerplate code.
+> So far, when a bit field is tied to an unsupported feature, we set
+> it as RES0. This is almost forrect, but there are a few exceptions
+> where the bits become RES1.
+
+You need to correct forrect :)
+
+> Add a AS_RES1 qualifier that instruct the RESx computing code to
+> simply do that.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/config.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> index 8d152605999ba..6a4674fabf865 100644
+> --- a/arch/arm64/kvm/config.c
+> +++ b/arch/arm64/kvm/config.c
+> @@ -24,6 +24,7 @@ struct reg_bits_to_feat_map {
+>  #define        CALL_FUNC       BIT(1)  /* Needs to evaluate tons of crap */
+>  #define        FIXED_VALUE     BIT(2)  /* RAZ/WI or RAO/WI in KVM */
+>  #define        MASKS_POINTER   BIT(3)  /* Pointer to fgt_masks struct instead of bits */
+> +#define        AS_RES1         BIT(4)  /* RES1 when not supported */
+>
+>         unsigned long   flags;
+>
+> @@ -1316,8 +1317,12 @@ struct resx __compute_fixed_bits(struct kvm *kvm,
+>                 else
+>                         match = idreg_feat_match(kvm, &map[i]);
+>
+> -               if (!match || (map[i].flags & FIXED_VALUE))
+> -                       resx.res0 |= reg_feat_map_bits(&map[i]);
+> +               if (!match || (map[i].flags & FIXED_VALUE)) {
+> +                       if (map[i].flags & AS_RES1)
+> +                               resx.res1 |= reg_feat_map_bits(&map[i]);
+> +                       else
+> +                               resx.res0 |= reg_feat_map_bits(&map[i]);
+> +               }
+
+checkpatch is complaining about whitespaces here. I can't blame it.
+
+With those fixed, looks good to me.
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
 
+>         }
+>
+>         return resx;
 
-> ---
->  arch/arm64/kvm/config.c | 16 +++++-----------
->  1 file changed, 5 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index a907195bd44b6..8d152605999ba 100644
-> --- a/arch/arm64/kvm/config.c
-> +++ b/arch/arm64/kvm/config.c
-> @@ -1344,6 +1344,11 @@ struct resx compute_reg_resx_bits(struct kvm *kvm,
->         resx = compute_resx_bits(kvm, r->bit_feat_map, r->bit_feat_map_sz,
->                                  require, exclude);
->
-> +       if (r->feat_map.flags & MASKS_POINTER) {
-> +               resx.res0 |= r->feat_map.masks->res0;
-> +               resx.res1 |= r->feat_map.masks->res1;
-> +       }
-> +
->         tmp = compute_resx_bits(kvm, &r->feat_map, 1, require, exclude);
->
->         resx.res0 |= tmp.res0;
-> @@ -1424,47 +1429,36 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
->         switch (reg) {
->         case HFGRTR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgrtr_desc, 0, 0);
-> -               resx.res1 |= HFGRTR_EL2_RES1;
->                 break;
->         case HFGWTR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgwtr_desc, 0, 0);
-> -               resx.res1 |= HFGWTR_EL2_RES1;
->                 break;
->         case HFGITR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgitr_desc, 0, 0);
-> -               resx.res1 |= HFGITR_EL2_RES1;
->                 break;
->         case HDFGRTR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hdfgrtr_desc, 0, 0);
-> -               resx.res1 |= HDFGRTR_EL2_RES1;
->                 break;
->         case HDFGWTR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hdfgwtr_desc, 0, 0);
-> -               resx.res1 |= HDFGWTR_EL2_RES1;
->                 break;
->         case HAFGRTR_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hafgrtr_desc, 0, 0);
-> -               resx.res1 |= HAFGRTR_EL2_RES1;
->                 break;
->         case HFGRTR2_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgrtr2_desc, 0, 0);
-> -               resx.res1 |= HFGRTR2_EL2_RES1;
->                 break;
->         case HFGWTR2_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgwtr2_desc, 0, 0);
-> -               resx.res1 |= HFGWTR2_EL2_RES1;
->                 break;
->         case HFGITR2_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hfgitr2_desc, 0, 0);
-> -               resx.res1 |= HFGITR2_EL2_RES1;
->                 break;
->         case HDFGRTR2_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hdfgrtr2_desc, 0, 0);
-> -               resx.res1 |= HDFGRTR2_EL2_RES1;
->                 break;
->         case HDFGWTR2_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hdfgwtr2_desc, 0, 0);
-> -               resx.res1 |= HDFGWTR2_EL2_RES1;
->                 break;
->         case HCRX_EL2:
->                 resx = compute_reg_resx_bits(kvm, &hcrx_desc, 0, 0);
+
+
 > --
 > 2.47.3
 >
