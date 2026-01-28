@@ -1,143 +1,176 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD9919E97F;
-	Wed, 28 Jan 2026 12:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F322F25EF;
+	Wed, 28 Jan 2026 16:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769602724; cv=none; b=AhChG77u/DmFJSDKJKuQ2HiTalYHiXVVhOY6rcPv49DJYhwSrsqinyB0niJWvxSDPGnqcVrL11SvvZchL2B/KA+R/haxcmOUyNnwOItyNTSPBhTdElGne16CzA56k/VRodK4nlA7+rrNy1jhyvZ+Tbqpo+NfPyBmJIu2SawgtNI=
+	t=1769618871; cv=none; b=fMXXvA1v0Zcx/TsU9STJppq3fj+ZBreZFPGUcxJuah2QxVDON4YccL53as1EsOLMGWyQikaJjOw2KjJYBxyPXxZudLmcFYXEM026X/0lIRHn9/cRCCx5gA73yY3Tk3xorYeTBF4ObbrYf1pZjoAJ1acm/jMFUC1TrXkrhYAKGg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769602724; c=relaxed/simple;
-	bh=irHF387VhKHjsOnpsnW9NUk3sxxbxWzln/uy9xgtwqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=awkHM1aP4xodEhPeiEM8aN85iNxQ3jt2azKUTCmW2qnmc8HjM6PWRiB43xi2VEpHkb/MQ73nskNgWNAagvetip7B/aQYPU2knFMXvAJfUeQHZRA+h3bcL7MQrSTa0Lq2uWI+WtQMIaSJpmH9/06TJ9jFYeMMlkH5mmuZyHxxZtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TGlHRR6F; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1769618871; c=relaxed/simple;
+	bh=khVIv1qokt8EydR+iWBqZYjiiVSQkftreadhBsB8SBY=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XxWfdL6Z7KODAMpU6gJJUwgPEdkCyowejBoZSnVmbX/JwazI4u5iDoI7roCoC8IB0VN5ns2Kb4RPSw1QqWxFgihnbQedQzq7oq8faN3FDo4w75AaV2eCo/QVwynN1yL8yGmQzlzK/5B1nWjMueAaBkR2gU5f7byGXe2/KLP5BVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aUcelpKq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TGlHRR6F"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1769602723; x=1801138723;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=irHF387VhKHjsOnpsnW9NUk3sxxbxWzln/uy9xgtwqM=;
-  b=TGlHRR6F94rKBRysVGoeJUVVWNt0zxHcxUUHuGMVDEqG6cxjzZLmjTVh
-   zigjLlb+2U1wBFRVoTfL3919JzOQG/KyWzA3jTIUOyz58xeQBP0FdLJ+z
-   spzvXvY2wrp4kTwZD+hxyWWnzz6JXZWYzzqjcZAe2oGIZPXJspe6r+RvC
-   BJbktKaB0UGBZtPrNs2Z3M5R+ROzLzeE0qXwcvh3yz9xw4S+kCAnAPVlM
-   nVNfUL7B3UrEtVrHcp902Qq2ykB+vNPTTbEvSVuNxGVpxPlLTkb/OWSQ8
-   sivcrokU6gFz9flZablWyus71nF16DvcXnceFNs9VIDfN1LwwbItjmn74
-   Q==;
-X-CSE-ConnectionGUID: ab306jYNQbufsD93EA+GgQ==
-X-CSE-MsgGUID: LChokX3nSHWtHUmaHPOyKw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11684"; a="93469831"
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="93469831"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2026 04:18:43 -0800
-X-CSE-ConnectionGUID: Q7Z5V0R1RjCKaaK9/1JSxA==
-X-CSE-MsgGUID: tIAdhHReTWOiiIA7g/WWbw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,258,1763452800"; 
-   d="scan'208";a="212353797"
-Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 28 Jan 2026 04:18:35 -0800
-Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vl4VE-00000000ZeC-2fMW;
-	Wed, 28 Jan 2026 12:18:32 +0000
-Date: Wed, 28 Jan 2026 20:18:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"maz@kernel.org" <maz@kernel.org>,
-	"oupton@kernel.org" <oupton@kernel.org>,
-	"joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"tglx@kernel.org" <tglx@kernel.org>,
-	"mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-	"luto@kernel.org" <luto@kernel.org>
-Subject: Re: [PATCH v10 01/15] set_memory: set_direct_map_* to take address
-Message-ID: <202601282023.vzRHJBfU-lkp@intel.com>
-References: <20260126164445.11867-2-kalyazin@amazon.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aUcelpKq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63E13C116C6;
+	Wed, 28 Jan 2026 16:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769618871;
+	bh=khVIv1qokt8EydR+iWBqZYjiiVSQkftreadhBsB8SBY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aUcelpKqkT3/iXgxoD3lhQhBWBXwBiNiil4AkxSvO/XrNFqYQXlfA5LzT+9WPi8bo
+	 yuFJdHBd14kamuk11R6PxEGYcVE9o5pREU5FlUgZZf2+OcX7D/8NJ+rFJ0NLbpbqaU
+	 a4E4+InHd1SYdgJSU5L1v/GrJs2YPMVSNlHIZEVh+YPwoy3uxsVYeOaqxukolI6prO
+	 Zq9T83LroW3qeOMpp66lMALimg46NDDofXY4KnnwGxkBHMf8EgnqDUO/ixuTchvAay
+	 qYG7IWLySWO69Uor6OjwH5+fc22FpvjUVexQ4qKw/GnmP7V/VpxMJqcOscqa6OHvmV
+	 NzWnhaB+UGeTg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vl8ho-00000006T2w-46sY;
+	Wed, 28 Jan 2026 16:47:49 +0000
+Date: Wed, 28 Jan 2026 16:47:48 +0000
+Message-ID: <86cy2tbs5n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Mingwei Zhang <mizhang@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 0/3] KVM: arm64: Reschedule as needed when destroying the stage-2 page-tables
+In-Reply-To: <20251113052452.975081-1-rananta@google.com>
+References: <20251113052452.975081-1-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260126164445.11867-2-kalyazin@amazon.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, oupton@kernel.org, mizhang@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Nikita,
+On Thu, 13 Nov 2025 05:24:49 +0000,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Hello,
+> 
+> When destroying a fully-mapped 128G VM abruptly, the following scheduler
+> warning is observed:
+> 
+>   sched: CPU 0 need_resched set for > 100018840 ns (100 ticks) without schedule
+>   CPU: 0 UID: 0 PID: 9617 Comm: kvm_page_table_ Tainted: G O 6.16.0-smp-DEV #3 NONE
+>   Tainted: [O]=OOT_MODULE
+>   Call trace:
+>       show_stack+0x20/0x38 (C)
+>       dump_stack_lvl+0x3c/0xb8
+>       dump_stack+0x18/0x30
+>       resched_latency_warn+0x7c/0x88
+>       sched_tick+0x1c4/0x268
+>       update_process_times+0xa8/0xd8
+>       tick_nohz_handler+0xc8/0x168
+>       __hrtimer_run_queues+0x11c/0x338
+>       hrtimer_interrupt+0x104/0x308
+>       arch_timer_handler_phys+0x40/0x58
+>       handle_percpu_devid_irq+0x8c/0x1b0
+>       generic_handle_domain_irq+0x48/0x78
+>       gic_handle_irq+0x1b8/0x408
+>       call_on_irq_stack+0x24/0x30
+>       do_interrupt_handler+0x54/0x78
+>       el1_interrupt+0x44/0x88
+>       el1h_64_irq_handler+0x18/0x28
+>       el1h_64_irq+0x84/0x88
+>       stage2_free_walker+0x30/0xa0 (P)
+>       __kvm_pgtable_walk+0x11c/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       __kvm_pgtable_walk+0x180/0x258
+>       kvm_pgtable_walk+0xc4/0x140
+>       kvm_pgtable_stage2_destroy+0x5c/0xf0
+>       kvm_free_stage2_pgd+0x6c/0xe8
+>       kvm_uninit_stage2_mmu+0x24/0x48
+>       kvm_arch_flush_shadow_all+0x80/0xa0
+>       kvm_mmu_notifier_release+0x38/0x78
+>       __mmu_notifier_release+0x15c/0x250
+>       exit_mmap+0x68/0x400
+>       __mmput+0x38/0x1c8
+>       mmput+0x30/0x68
+>       exit_mm+0xd4/0x198
+>       do_exit+0x1a4/0xb00
+>       do_group_exit+0x8c/0x120
+>       get_signal+0x6d4/0x778
+>       do_signal+0x90/0x718
+>       do_notify_resume+0x70/0x170
+>       el0_svc+0x74/0xd8
+>       el0t_64_sync_handler+0x60/0xc8
+>       el0t_64_sync+0x1b0/0x1b8
+> 
+> The host kernel was running with CONFIG_PREEMPT_NONE=y, and since the
+> page-table walk operation takes considerable amount of time for a VM
+> with such a large number of PTEs mapped, the warning is seen.
+> 
+> To mitigate this, split the walk into smaller ranges, by checking for
+> cond_resched() between each range. Since the path is executed during
+> VM destruction, after the page-table structure is unlinked from the
+> KVM MMU, relying on cond_resched_rwlock_write() isn't necessary.
+> 
+> Patch-1 kills the assumption that the page-table hierarchy under the
+> table is free (in stage2_free_walker()). Instead, drop and clear the
+> references only on empty tables.
+> 
+> Patch-2 splits the kvm_pgtable_stage2_destroy() function into separate
+> 'walk' and 'free PGD' parts.
+> 
+> Patch-3 leverages the split and performs the walk periodically over
+> smaller ranges and calls cond_resched() between them.
+> 
+> The series was originally posted and merged [1], but was later reverted
+> due to syzkaller catching a UAF bug [2]. This series fixes the issue, and
+> the original need_resched warning is addressed.
+> 
+> [1]: https://lore.kernel.org/all/175582091313.1266576.4329884314263043118.b4-ty@linux.dev/
+> [2]: https://lore.kernel.org/all/20250910180930.3679473-1-oliver.upton@linux.dev/ 
+> 
+> Oliver Upton (1):
+>   KVM: arm64: Only drop references on empty tables in stage2_free_walker
+> 
+> Raghavendra Rao Ananta (2):
+>   KVM: arm64: Split kvm_pgtable_stage2_destroy()
+>   KVM: arm64: Reschedule as needed when destroying the stage-2
+>     page-tables
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h | 30 +++++++++++++
+>  arch/arm64/include/asm/kvm_pkvm.h    |  4 +-
+>  arch/arm64/kvm/hyp/pgtable.c         | 63 +++++++++++++++++++++++-----
+>  arch/arm64/kvm/mmu.c                 | 36 +++++++++++++++-
+>  arch/arm64/kvm/pkvm.c                | 11 ++++-
+>  5 files changed, 129 insertions(+), 15 deletions(-)
+> 
+> 
+> base-commit: dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa
 
-kernel test robot noticed the following build errors:
+As a heads-up: I am suspecting this series to break my NV guests in a
+pretty bad way. L2 and L3 guests are getting stuck, L0 and L1 barf on
+S2 PTs that are being destroyed. This stinks of TLB invalidation going
+very wrong, which would result in S2 management going similarly
+sideways.  I still need to work out whether that is just triggering
+something bad somewhere else.
 
-[auto build test ERROR on 0499add8efd72456514c6218c062911ccc922a99]
+For what it is worth, this reproduces on both M2 and QC machines.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kalyazin-Nikita/set_memory-set_direct_map_-to-take-address/20260127-005641
-base:   0499add8efd72456514c6218c062911ccc922a99
-patch link:    https://lore.kernel.org/r/20260126164445.11867-2-kalyazin%40amazon.com
-patch subject: [PATCH v10 01/15] set_memory: set_direct_map_* to take address
-config: loongarch-allnoconfig (https://download.01.org/0day-ci/archive/20260128/202601282023.vzRHJBfU-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 9b8addffa70cee5b2acc5454712d9cf78ce45710)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260128/202601282023.vzRHJBfU-lkp@intel.com/reproduce)
+Thanks,
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202601282023.vzRHJBfU-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> arch/loongarch/mm/pageattr.c:211:16: error: redefinition of 'addr' with a different type: 'unsigned long' vs 'const void *'
-     211 |         unsigned long addr = (unsigned long)addr;
-         |                       ^
-   arch/loongarch/mm/pageattr.c:209:48: note: previous definition is here
-     209 | int set_direct_map_invalid_noflush(const void *addr)
-         |                                                ^
-   1 error generated.
-
-
-vim +211 arch/loongarch/mm/pageattr.c
-
-   208	
-   209	int set_direct_map_invalid_noflush(const void *addr)
-   210	{
- > 211		unsigned long addr = (unsigned long)addr;
-   212	
-   213		if ((unsigned long)addr < vm_map_base)
-   214			return 0;
-   215	
-   216		return __set_memory((unsigned long)addr, 1, __pgprot(0),
-   217				    __pgprot(_PAGE_PRESENT | _PAGE_VALID));
-   218	}
-   219	
+	M.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Without deviation from the norm, progress is not possible.
