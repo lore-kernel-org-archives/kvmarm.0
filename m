@@ -1,101 +1,145 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCA32D5957
-	for <kvmarm@lists.linux.dev>; Wed, 28 Jan 2026 07:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769586766; cv=none; b=dOmZYY8LuyXjIUvmQIDsKoeTab+p9YLUsBP+qjWzodYpFswgxsJ6OQm/YQvj9PTWQbY5VT2VENGpqWdAde2pynVDpk0dgj4vYTnJquxS/xSfesn3S/RVGYZ00D52RkzmfXN/ZP52Dat0nSbhiT7g+TkicpTSdpTKMVOENZaDnms=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769586766; c=relaxed/simple;
-	bh=eOVs4X+ESJ01PqBxNg69Z1WgOUernm2wcipNPo8hv7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BB3Gw1xPCniVgDfsyAE9Xd/8os97heUMf6n4KoOHtTzkcbsNHKr7WwMo6X2u+erRMjK+UQYuoS4UxZq/IcXynrNR7ncVCSBAE/eEr4lQPySDeySivMxR3Rd2YLMzcc80czRN/f4i+9PGNH6eREZAtc+ehOI4HBmnu+NNhU/QrRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w+hX2TNQ; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6982DF12F
+	for <kvmarm@lists.linux.dev>; Wed, 28 Jan 2026 10:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769596129; cv=pass; b=VU/YF2F6wRJW5Vo7+eNn4jWj3hn/25nt5Ajy03KYGSr6vQyBQdQblHWfPjRGYP+cuN6JGBOSvelIPDV+5zuyVAhMCPObH64oOlN34nT0kl02KU6sDWbeC0DtnBSBYl/rH9R+CkSUiDn4Pzf+Des7cKhowHpouG7p1KlFHB422aY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769596129; c=relaxed/simple;
+	bh=TWpq0oCElre2qoxuaGV3eWiIi0GSeW1OgmW6PzbiAfI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e588EPCc7lH7sGd+5kvM6Crn4bgdc1km5rlUwhYfkjK5ptPqFyjbNYx29AGjimfR1oddqk7FnJGidarB2ypsoTXM6h4nT4Hs6lE5hpsCBIimfZb3FwLtUUjU/VoJmSK38AiTmRLeNwLGAgbvgJwdkymM4RB2FkLJI3NUm/t1DrA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fL231upf; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w+hX2TNQ"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1769586760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tGVVzEzdKIqtw2jMSkAdxRRepqF4t65vIU1oF5Z4Mr8=;
-	b=w+hX2TNQ9d3Jy4XIxg6K+yDvyUk7XbvOH2Y7fm8GzXL4ak06jW0Gte0uu0XbElU5edGYfo
-	/EJ8L2HTDspGdrITfl8fkjKB3B16XpWA0PeZ/E/rvY3D9+bYOsIE5yrnesp8joo/KJN+cU
-	2IqSx7uSxXdNAj0/M/lGjR1t/6m5zF8=
-From: Zenghui Yu <zenghui.yu@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	zenghui.yu@linux.dev,
-	wanghaibin.wang@huawei.com
-Subject: [PATCH] KVM: arm64: Fix various comments
-Date: Wed, 28 Jan 2026 15:52:08 +0800
-Message-Id: <20260128075208.23024-1-zenghui.yu@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fL231upf"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-5033b0b6eabso285641cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 28 Jan 2026 02:28:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769596127; cv=none;
+        d=google.com; s=arc-20240605;
+        b=jdz1Mw4v6rm6o1FzcT9wBj3hBF2xka5eFQ9n7UdeztuLxga/ZE/aL1YJmtG2iH+v+1
+         gUPVkIBvBtd1qqmQ4co9eazxD86wb5SM2s8Z9UwRNiuwCJPUBjxtOfW6mwXlYx0/NlFs
+         +pioZWAEtobZJa++Z5zxdSBdd9kzMpQKtFbXKYlmtIhZveagfEsHt8+dEYRPHLrYRQ5I
+         LKFD/V4XGIZXUHYuKLo5RS3bU0CV4WfoNlGbeQPW/nUJDRtURrWhQuQq2YIERwoEevZm
+         L75fK6QUXl2YaSBeR2RlGzpr/VmoV2hs/o7JSpqWJhmrX57AYSmAYf8oPs6e7dM7lNnF
+         /fvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=JvMIIZbSd7GJ9fTBCuvSnMcKyzbKcHEdp97Gn+39oUI=;
+        fh=OsVEnhpHfDtKQejlv1Bgs/tZPAfr3IJ2Ck5WUUi92Sc=;
+        b=WHwbXcAqfYAw/dmhMMQTeehTu3OhNp7qxTDMNKWobYdlrOEHpAWg9GU8GdrMAqLyLL
+         YjcU++g3zGhJ2OUH+Z9/FKNG30o0Z/lC+HLGnKmICRu9QMxu/Gj2f3a6MeWBr7VCMwsh
+         AeypRdWdL+rLmX2UqArbecrV1/KJrvjaD65kDffe5f0UEO8DuhHNDbn/wFPezuOOpxgW
+         B/od+F9VqBlsXT47YdtT5FatVZsWDpWej4cDAo2u8eDha9fCkA/fCw8dL9W7zKL5jM6P
+         qZ0O8fp9//3h7LPg9CsyxfmdBKbGOT9JyD9N32TO0YChx5j+BIsSFKWys0N+0Gtw/lwv
+         aaBQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769596127; x=1770200927; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=JvMIIZbSd7GJ9fTBCuvSnMcKyzbKcHEdp97Gn+39oUI=;
+        b=fL231upfl6Asb+6e3klqxDo6wR0x4WuIVWwW/tH5wWybiIXbwN6Dz7QYtgU2Sj2CFE
+         kwLOfSxc6G3gtsAuEDz3zJZrBtS34A4Fs400+VCE7Dpc+g31jouaTt7cMWcPk8yvtLHI
+         H4bpzI9VGHLjK8YMdnAThtfv58WVKB+MK8cBHMX8HqxtEq5Z1DKLBO9tT17IWFEMYAUW
+         MQPce6nRf72C74klKmlwecgGL/B7imYaZhFGU08DNKodxYyJjJifOfLWyUSrXaZsBs8G
+         EerSTtLQLiOadSpUrHLixnq+lgk5G6s2DHeoWrJv93R+aAHCcWqwBRx6ZztNYJV+vsZX
+         lM2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769596127; x=1770200927;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JvMIIZbSd7GJ9fTBCuvSnMcKyzbKcHEdp97Gn+39oUI=;
+        b=keA+ePAmWvqWMGSH6leVlgvlzwIudN+5ygnwnhsECydwdN9tDUeanG5au+h2ie6yCI
+         Dvk0Y3o4HpPwK8F8KmsI8dcI01QyqU6OHTRuO6c0FA8GkYPS5eXNqtQE7p+ihW6R4lgY
+         +oGZVYC2nYs4pSTk47X3C4BtZDmc+DZ3p+JM23JA6fGd9wFUmpceL9DH7py2cNIkp/dj
+         KgGEmmy92NH9gmKlIIrJJJkPxLtqpgv1+aCelQqG99aetfYW+jKVaRdrmUquzAm4gzzG
+         BUKp8SMK464wPxhOLeCXPHB6ZJeu6pg/p7eyvsd7SFfUHaJM13WYFhbPl5zUtKz7FquB
+         IMKg==
+X-Gm-Message-State: AOJu0YyQR5IcNOobBMRymCK3+msdlg/ADOzmmNLcX2Lkam/BElzo7Epf
+	lJGTMbkYcdj3ymS+4YOohFlFOQrJHWSmDmtL0v3DbHGWM+s4wgwUllIegjCsqUX0QXAqvNsDrXt
+	DVVJ7nUpT0LvCEWAhN3zJybWaYxEhJX5Xt25F+JO9
+X-Gm-Gg: AZuq6aJZbFUVzqxFtuagtLbeK9TIisGPiBNFWZuM07iNtB7QIlnFXAe5piOLcQ/3rMO
+	SmvLliQBvkSY1uZhq5aQh6QJ9mwKYWp15zZ3qO+0pbe9LGM4ZBbw0Uj3BlOKHNsU4d0/RxrpXif
+	xBBSESso4fNOOOpkul7mHryhukramJkvPh3fosNz0/TAQLMy9bxi+7Z389RQXSo616SC4XGOxtq
+	jx5EWlimn+GnRauWPCDWxlyKbhfWKDOu903e17VsNGkTTYppIvb0OYkvyTIy7OH7MWNtka3sAP7
+	QUd1/MAY88yH9KiGDWfmECgBVg==
+X-Received: by 2002:ac8:5743:0:b0:503:4bc:c925 with SMTP id
+ d75a77b69052e-5032f4dbbc4mr19998971cf.13.1769596126531; Wed, 28 Jan 2026
+ 02:28:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260119124629.2563-1-will@kernel.org> <20260119124629.2563-23-will@kernel.org>
+In-Reply-To: <20260119124629.2563-23-will@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 28 Jan 2026 10:28:09 +0000
+X-Gm-Features: AZwV_Qjs-WnEBIs4c2hvuOliOYVNdOz8-aWQ2TuJZEGeO7jiPDjVSORPKTi82lk
+Message-ID: <CA+EHjTzJ2=195bc4RwiOUY9Nt48fkHE8Oju6q0RwO76Eeq52aA@mail.gmail.com>
+Subject: Re: [PATCH v2 22/35] KVM: arm64: Change 'pkvm_handle_t' to u16
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
+	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+On Mon, 19 Jan 2026 at 12:48, Will Deacon <will@kernel.org> wrote:
+>
+> 'pkvm_handle_t' doesn't need to be a 32-bit type and subsequent patches
+> will rely on it being no more than 16 bits so that it can be encoded
+> into a pte annotation.
+>
+> Change 'pkvm_handle_t' to a u16 and add a compile-type check that the
+> maximum handle fits into the reduced type.
+>
+> Signed-off-by: Will Deacon <will@kernel.org>
 
-Use tab instead of whitespaces, as well as 2 minor typo fixes.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
----
- arch/arm64/include/asm/kvm_host.h    | 2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c   | 2 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Cheers,
+/fuad
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ac7f970c7883..96f254f616a0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -201,7 +201,7 @@ struct kvm_s2_mmu {
- 	 * host to parse the guest S2.
- 	 * This either contains:
- 	 * - the virtual VTTBR programmed by the guest hypervisor with
--         *   CnP cleared
-+	 *   CnP cleared
- 	 * - The value 1 (VMID=0, BADDR=0, CnP=1) if invalid
- 	 *
- 	 * We also cache the full VTCR which gets used for TLB invalidation,
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index f28c6cf4fe1b..b254d442e54e 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -205,7 +205,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * When running a normal EL1 guest, we only load a new vcpu
--	 * after a context switch, which imvolves a DSB, so all
-+	 * after a context switch, which involves a DSB, so all
- 	 * speculative EL1&0 walks will have already completed.
- 	 * If running NV, the vcpu may transition between vEL1 and
- 	 * vEL2 without a context switch, so make sure we complete
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index 61b44f3f2bf1..a2ccef116483 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -57,7 +57,7 @@ static int lr_map_idx_to_shadow_idx(struct shadow_if *shadow_if, int idx)
-  * as the L1 guest is in charge of provisioning the interrupts via its own
-  * view of the ICH_LR*_EL2 registers, which conveniently live in the VNCR
-  * page.  This means that the flow described above does work (there is no
-- * state to rebuild in the L0 hypervisor), and that most things happed on L2
-+ * state to rebuild in the L0 hypervisor), and that most things happen on L2
-  * load/put:
-  *
-  * - on L2 load: move the in-memory L1 vGIC configuration into a shadow,
--- 
-2.34.1
-
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c    | 1 +
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 3191d10a2622..60a5c87b0a17 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -247,7 +247,7 @@ struct kvm_smccc_features {
+>         unsigned long vendor_hyp_bmap_2; /* Function numbers 64-127 */
+>  };
+>
+> -typedef unsigned int pkvm_handle_t;
+> +typedef u16 pkvm_handle_t;
+>
+>  struct kvm_protected_vm {
+>         pkvm_handle_t handle;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index 9f0997150cf5..c5772417372d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -223,6 +223,7 @@ static struct pkvm_hyp_vm **vm_table;
+>
+>  void pkvm_hyp_vm_table_init(void *tbl)
+>  {
+> +       BUILD_BUG_ON((u64)HANDLE_OFFSET + KVM_MAX_PVMS > (pkvm_handle_t)-1);
+>         WARN_ON(vm_table);
+>         vm_table = tbl;
+>  }
+> --
+> 2.52.0.457.g6b5491de43-goog
+>
