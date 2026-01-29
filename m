@@ -1,239 +1,269 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CBA291C10;
-	Thu, 29 Jan 2026 18:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769710069; cv=none; b=qu+Pg6eQBNfu2xSk8mTOeysKJM5TAyY4yhpBc6ndWAhzzmWnQUHEQY1US/SinRtCgKNhwXWwkFoqe0NjPqFUS0qC4F+VuNQ3f8oCFjvSokNSZAClw4iVoqVhd6h3m0LbBog/bMaXRQyxKbmjUopWNMz2T3Jz9o2BK4v5gJU0bcY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769710069; c=relaxed/simple;
-	bh=y8ZtJVyNk9ohmp2p1L7tQB0ZKjo1utzINB/vHykqcRE=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gZ85pcsbD9Qf9AIXzjJ9opIujkf9Cx8SWZmtTN9ES7d7k+U1w0N6DlMlHvrW63iY0iHGMEbDn6wKwZItacZ4mQb92BQD5YUFqh7zQiXS7uPOHbNoJ9sfxZZkWlvpAufFB4ekam7XmRy/2PQZVmk+GxV5VzoQoxnFnSn0Z1//MV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HVfNTShB; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE634314A8E
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 18:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769710318; cv=pass; b=ihMfWZZZVCK0bB75SJAt2wFSFELfvkxJNaeS/dOwjFPCkmv27EtMU02qqDxY2lhtjNMjIo78AYUCEnomD2z8JieFRqsUygHXy/chQVU6hzSitlUWio0tvgoXdWZvvP9sFRuYG7o790N917xd85KnfiWbSL41XSjU3R16ka99ais=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769710318; c=relaxed/simple;
+	bh=M/HTTNEk3HJAJvMAG53DlqOlG2dQLxQZC7cUa1DucD8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m83xRb7SDHo7D4qzn3DuxXF/CAOU7OIF52Pbzg/hmWoJDfPhZ0SOTE4aod9dL4j8NnsNzxxxY6KgE3JuyKuM0FD5dhD01Y0/zGHaoI5UP5B8z38qLoE0vSV5Ga3asGqCyY8wQXdwYIHs8S6ttukthBJwCQjQbZtbxW/J/hrvRH0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MnvUSNy8; arc=pass smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HVfNTShB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D6BC4CEF7;
-	Thu, 29 Jan 2026 18:07:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769710069;
-	bh=y8ZtJVyNk9ohmp2p1L7tQB0ZKjo1utzINB/vHykqcRE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HVfNTShB0Yj0NLCGJtrpK7gu7DjT2P84O/Dt39AbyOMWWBY5mqRZ3/u6hTwtjAgC4
-	 6kcC8Csi0EL/n2CfZRQhVbmJxh8bgj97shM3nRy/agfF1TLszy9CiLSCkQJgaOqm9F
-	 NEhzXmYaJPij+y29wKRvKY278z075VkAl9msHJmajtnQNKvAKIFv2aUaZC3EitC0Hp
-	 ehThicIpPmhEqCCua0DLlHSsyOxf3iyC+nJHGoWpxwtXQ2gTKiFhM38WXPx8+uOHEl
-	 BVWasrGVDU4GHaa/D/dN23P443mGpG777IsteGsWlEtxFrxcYYi6URGsT8y4qLnk8l
-	 rDcCqwI6rtA9w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlWQk-00000006qU3-3emJ;
-	Thu, 29 Jan 2026 18:07:46 +0000
-Date: Thu, 29 Jan 2026 18:07:46 +0000
-Message-ID: <868qdgb8ct.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 13/20] KVM: arm64: Move RESx into individual register descriptors
-In-Reply-To: <86a4xwbakk.wl-maz@kernel.org>
-References: <20260126121655.1641736-1-maz@kernel.org>
-	<20260126121655.1641736-14-maz@kernel.org>
-	<CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-	<86a4xwbakk.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MnvUSNy8"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5033b0b6eabso3491cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 10:11:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1769710316; cv=none;
+        d=google.com; s=arc-20240605;
+        b=QzpOtuAW4y8gHtI++l/Rd8oD2uw8hOD/w7/EhvOulrwO4igQQdqG/9eqMfq7TAv+a5
+         H/S5k13wm8viE9j5RuabdrSoTgVbwgIR2QS6ICngqAbYPMery+LqERdYb1G+mzyf7LAj
+         //7Lv9BGeohzZIHy2Nv3JsZ2VU9/Wmr7BzYube4UnL8v3vG1bAYyJphCbuCzDhQqo/c7
+         qz/rI3b/gmlhuTFeforTqRL8aWWWVOFlgLFZxiItlGU4KSIT9swNs/2Sru+5/zE3RB3z
+         EZt42s+v6RU8R0gms5Jv+1UtitqzcROnGb4DlLIi+7tQiP3J0HUGDGZEzJ4gVE1nB5OK
+         yV8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=eXMpYReA76VSnWBdSDCeKOepff/FefCdjy4bJ9ZDLq8=;
+        fh=cKTbDbQYTc+pleUDsHasQv4LjIooAs3OE4CRw2/lzRk=;
+        b=g2w4WxWemOroVtVfIpj6uYREzSex6L0Ii7W9ZUqzFyD0+CfwczgAYDiwkCiclOCymL
+         eNoNJBiyn8m0YXhrZtJyRMhDTlHSMJ4+6Qj1qlRevYN91mj55UgshXg/uitXl6KivPO/
+         0d01bZzF9BRQZZ7ObwHuOVCGADLlZZ/nnViQp2L1KsmlPJYI7b8BmnWkBUaKDV/KO8qP
+         f2ZaXuAoEE1UbJnwSgUgp5wfZ+TG2VRN6k9xxRD9bVhRbbqgZ9QZAWPmDHLmNMFHFjI0
+         QIrqnTBZPWjm25GpA+PeOaHaT4sDpV9hDwiOM8AFuafVxBUQKd8tA2jHHn01Ip2wDY6e
+         C/og==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769710316; x=1770315116; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=eXMpYReA76VSnWBdSDCeKOepff/FefCdjy4bJ9ZDLq8=;
+        b=MnvUSNy8ob3DWgS9aoxWsLQO3ySr4Uc5Od1m7tXvOyEeHyvdO+CD+ylDnRqCjM34We
+         uC43T89b0p5eCsqqFqiQz/OfLOuare4iMYpJFvIvE7Jiskwr6BYur5851BXIZvWCC/DA
+         Da6JCQtwL0bI0/mJSsNF0R5O5pWW5UHSsa4LeIhCendQr3OpZymI6mH/m/Ef0SEvKDHh
+         mDNJlBJqmXHQ0uq3ohrZUDPfAU8tdondxNRIf9flOxn+og1DZOOV+JuwCO3rWoiQsLMQ
+         YYdTvjTThG2OCwOwpWVUQcaW5twPu4yBWWs5mnUOdF5ZvXQikglunwvPPBkUN7BuN81c
+         n8Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769710316; x=1770315116;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eXMpYReA76VSnWBdSDCeKOepff/FefCdjy4bJ9ZDLq8=;
+        b=qo4fZjcmg1x4XOowmk/2Gujk7uJtAfD/8oBrd7LI2NESMnzAuXeu7CepzqYJUPNtO5
+         1SRC5os3gxROEmY+d4P1FAvTeDLvJtHRCI+Kmiz2K0qGNtlGurOKxJS2C+9/THDMHLPx
+         ClX9HgcMaYa5vGCSLEOMwIUQ32nmFAmABgX8p4ocjp8DiMJQj08UkwvHOs0FVb/bg+Rv
+         U0UEXLk2DmplD6B9Hy2W758qMNCAp6P0YdkXzxSjtrp4vModyQ1ahV4398fxLB9qMLV2
+         +byi4fyNW+QiOU/tmQhVn61IyxDwxSfNmIhFuQdweMNrCvTvsnemHiKwoi3kVXC7eMZ+
+         bmAw==
+X-Gm-Message-State: AOJu0YwNpGEeDCfmIXJDn7OILQ98KO0wFYxN0qtDNfULMLOxwNRPjEpv
+	uqtQQSnJaS2kwVVQ8A7GoGSckoNzvUMjPlhM4ze4OaToA5NcXpnFkTH4z9Zbk2L0rX2bX8ftqs2
+	A9tV3GyJH4reNSDRCoz7geRJUk9s3foZqe48gQubI
+X-Gm-Gg: AZuq6aLZKBgTEUy54cIf+2UwMMYRx+EuYaWNDVzIPREH++Un91x6yj+MvYWd/1tBQVF
+	nXrrKrmUc5nNFgmjoiozSLFDtNhef+bbVUR3K8oNLveDfi8wEB/HrEg4EKW8GMYN825F9BRLRax
+	MsAITbKcAGnPY9pVTHp2zS/3LsNpzkR+PGFeWiaOUy+iTrD3ey8biQY5PHre59CqOWebtDM2FaW
+	6wNlWPPjqW6RD16bNIj1MCoqnX4x7+SFrMwBEBWSTo8EJLnGOV4D5dY0qOy0a4N/FluBkBj
+X-Received: by 2002:a05:622a:cb:b0:502:f07e:854c with SMTP id
+ d75a77b69052e-505d2963681mr233281cf.6.1769710313749; Thu, 29 Jan 2026
+ 10:11:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260126121655.1641736-1-maz@kernel.org> <20260126121655.1641736-20-maz@kernel.org>
+In-Reply-To: <20260126121655.1641736-20-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 29 Jan 2026 18:11:16 +0000
+X-Gm-Features: AZwV_QjF5yiUUIg5uEIM22NwSkF34FaWIG-B5xVFNjuS4Wq4b6ejFit-e1Zvicw
+Message-ID: <CA+EHjTztDe27zT6yHFiN+_64Husvs36JBWXZyKQ2N3AjuW63gQ@mail.gmail.com>
+Subject: Re: [PATCH 19/20] KVM: arm64: Add sanitisation to SCTLR_EL2
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 29 Jan 2026 17:19:55 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Thu, 29 Jan 2026 16:29:39 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > Instead of hacking the RES1 bits at runtime, move them into the
-> > > register descriptors. This makes it significantly nicer.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/config.c | 36 +++++++++++++++++++++++++++++-------
-> > >  1 file changed, 29 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > > index 7063fffc22799..d5871758f1fcc 100644
-> > > --- a/arch/arm64/kvm/config.c
-> > > +++ b/arch/arm64/kvm/config.c
-> > > @@ -30,6 +30,7 @@ struct reg_bits_to_feat_map {
-> > >  #define        RES0_WHEN_E2H1  BIT(7)  /* RES0 when E2H=1 and not supported */
-> > >  #define        RES1_WHEN_E2H0  BIT(8)  /* RES1 when E2H=0 and not supported */
-> > >  #define        RES1_WHEN_E2H1  BIT(9)  /* RES1 when E2H=1 and not supported */
-> > > +#define        FORCE_RESx      BIT(10) /* Unconditional RESx */
-> > >
-> > >         unsigned long   flags;
-> > >
-> > > @@ -107,6 +108,11 @@ struct reg_feat_map_desc {
-> > >   */
-> > >  #define NEEDS_FEAT(m, ...)     NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
-> > >
-> > > +/* Declare fixed RESx bits */
-> > > +#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
-> > > +#define FORCE_RES1(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
-> > > +                                               enforce_resx)
-> > > +
-> > >  /*
-> > >   * Declare the dependency between a non-FGT register, a set of
-> > >   * feature, and the set of individual bits it contains. This generates
-> > 
-> > nit: features
-> > 
-> > > @@ -230,6 +236,15 @@ struct reg_feat_map_desc {
-> > >  #define FEAT_HCX               ID_AA64MMFR1_EL1, HCX, IMP
-> > >  #define FEAT_S2PIE             ID_AA64MMFR3_EL1, S2PIE, IMP
-> > >
-> > > +static bool enforce_resx(struct kvm *kvm)
-> > > +{
-> > > +       /*
-> > > +        * Returning false here means that the RESx bits will be always
-> > > +        * addded to the fixed set bit. Yes, this is counter-intuitive.
-> > 
-> > nit: added
-> > 
-> > > +        */
-> > > +       return false;
-> > > +}
-> > 
-> > I see what you're doing here, but it took me a while to get it and
-> > convince myself that there aren't any bugs (my self couldn't find any
-> > bugs, but I wouldn't trust him that much). You already introduce a new
-> > flag, FORCE_RESx. Why not just check that directly in the
-> > compute_resx_bits() loop, before the check for CALL_FUNC?
-> > 
-> > + if (map[i].flags & FORCE_RESx)
-> > +     match = false;
-> > + else if (map[i].flags & CALL_FUNC)
-> > ...
-> > 
-> > The way it is now, to understand FORCE_RES0, you must trace a flag, a
-> > macro expansion, and a function pointer, just to set a boolean to
-> > false.
-> 
-> With that scheme, you'd write something like:
-> 
-> +#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx)
-> 
-> This construct would need a new __NEEDS_FEAT_0() macro that doesn't
-> take any argument other than flags. Something like below (untested).
-> 
-> 	M.
-> 
+Hi Marc,
+
+On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
+>
+> Sanitise SCTLR_EL2 the usual way. The most important aspect of
+> this is that we benefit from SCTLR_EL2.SPAN being RES1 when
+> HCR_EL2.E2H==0.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+This would change slightly when you change patch 12, but it matches
+the spec and those changes would be trivial to apply here.
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+
+
+
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  arch/arm64/kvm/config.c           | 82 +++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/nested.c           |  4 ++
+>  3 files changed, 87 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9dca94e4361f0..c82b071ade2a5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -495,7 +495,6 @@ enum vcpu_sysreg {
+>         DBGVCR32_EL2,   /* Debug Vector Catch Register */
+>
+>         /* EL2 registers */
+> -       SCTLR_EL2,      /* System Control Register (EL2) */
+>         ACTLR_EL2,      /* Auxiliary Control Register (EL2) */
+>         CPTR_EL2,       /* Architectural Feature Trap Register (EL2) */
+>         HACR_EL2,       /* Hypervisor Auxiliary Control Register */
+> @@ -526,6 +525,7 @@ enum vcpu_sysreg {
+>
+>         /* Anything from this can be RES0/RES1 sanitised */
+>         MARKER(__SANITISED_REG_START__),
+> +       SCTLR_EL2,      /* System Control Register (EL2) */
+>         TCR2_EL2,       /* Extended Translation Control Register (EL2) */
+>         SCTLR2_EL2,     /* System Control Register 2 (EL2) */
+>         MDCR_EL2,       /* Monitor Debug Configuration Register (EL2) */
 > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> index 9485e1f2dc0b7..364bdd1e5be51 100644
+> index eebafb90bcf62..562513a4683e2 100644
 > --- a/arch/arm64/kvm/config.c
 > +++ b/arch/arm64/kvm/config.c
-> @@ -79,6 +79,12 @@ struct reg_feat_map_desc {
->  		.match = (fun),				\
->  	}
->  
-> +#define __NEEDS_FEAT_0(m, f, w, ...)			\
-> +	{						\
-> +		.w	= (m),				\
-> +		.flags = (f),				\
-> +	}
+> @@ -1130,6 +1130,84 @@ static const struct reg_bits_to_feat_map sctlr_el1_feat_map[] = {
+>  static const DECLARE_FEAT_MAP(sctlr_el1_desc, SCTLR_EL1,
+>                               sctlr_el1_feat_map, FEAT_AA64EL1);
+>
+> +static const struct reg_bits_to_feat_map sctlr_el2_feat_map[] = {
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_CP15BEN,
+> +                       RES0_WHEN_E2H1 | RES1_WHEN_E2H0 | REQUIRES_E2H1,
+> +                       FEAT_AA32EL0),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_ITD   |
+> +                       SCTLR_EL2_SED,
+> +                       RES1_WHEN_E2H1 | RES0_WHEN_E2H0 | REQUIRES_E2H1,
+> +                       FEAT_AA32EL0),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_BT0, REQUIRES_E2H1, FEAT_BTI),
+> +       NEEDS_FEAT(SCTLR_EL2_BT, FEAT_BTI),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_CMOW, REQUIRES_E2H1, FEAT_CMOW),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_TSCXT,
+> +                       RES0_WHEN_E2H0 | RES1_WHEN_E2H1 | REQUIRES_E2H1,
+> +                       feat_csv2_2_csv2_1p2),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EIS   |
+> +                       SCTLR_EL2_EOS,
+> +                       AS_RES1, FEAT_ExS),
+> +       NEEDS_FEAT(SCTLR_EL2_EnFPM, FEAT_FPMR),
+> +       NEEDS_FEAT(SCTLR_EL2_IESB, FEAT_IESB),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EnALS, REQUIRES_E2H1, FEAT_LS64),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EnAS0, REQUIRES_E2H1, FEAT_LS64_ACCDATA),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EnASR, REQUIRES_E2H1, FEAT_LS64_V),
+> +       NEEDS_FEAT(SCTLR_EL2_nAA, FEAT_LSE2),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_LSMAOE        |
+> +                       SCTLR_EL2_nTLSMD,
+> +                       AS_RES1 | REQUIRES_E2H1, FEAT_LSMAOC),
+> +       NEEDS_FEAT(SCTLR_EL2_EE, FEAT_MixedEnd),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_E0E, REQUIRES_E2H1, feat_mixedendel0),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_MSCEn, REQUIRES_E2H1, FEAT_MOPS),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_ATA0  |
+> +                       SCTLR_EL2_TCF0,
+> +                       REQUIRES_E2H1, FEAT_MTE2),
+> +       NEEDS_FEAT(SCTLR_EL2_ATA        |
+> +                  SCTLR_EL2_TCF,
+> +                  FEAT_MTE2),
+> +       NEEDS_FEAT(SCTLR_EL2_ITFSB, feat_mte_async),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_TCSO0, REQUIRES_E2H1, FEAT_MTE_STORE_ONLY),
+> +       NEEDS_FEAT(SCTLR_EL2_TCSO,
+> +                  FEAT_MTE_STORE_ONLY),
+> +       NEEDS_FEAT(SCTLR_EL2_NMI        |
+> +                  SCTLR_EL2_SPINTMASK,
+> +                  FEAT_NMI),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_SPAN, AS_RES1 | REQUIRES_E2H1, FEAT_PAN),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EPAN, REQUIRES_E2H1, FEAT_PAN3),
+> +       NEEDS_FEAT(SCTLR_EL2_EnDA       |
+> +                  SCTLR_EL2_EnDB       |
+> +                  SCTLR_EL2_EnIA       |
+> +                  SCTLR_EL2_EnIB,
+> +                  feat_pauth),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_EnTP2, REQUIRES_E2H1, FEAT_SME),
+> +       NEEDS_FEAT(SCTLR_EL2_EnRCTX, FEAT_SPECRES),
+> +       NEEDS_FEAT(SCTLR_EL2_DSSBS, FEAT_SSBS),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_TIDCP, REQUIRES_E2H1, FEAT_TIDCP1),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_TWEDEL        |
+> +                       SCTLR_EL2_TWEDEn,
+> +                       REQUIRES_E2H1, FEAT_TWED),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_nTWE  |
+> +                       SCTLR_EL2_nTWI,
+> +                       AS_RES1 | REQUIRES_E2H1, FEAT_AA64EL2),
+> +       NEEDS_FEAT_FLAG(SCTLR_EL2_UCI   |
+> +                       SCTLR_EL2_UCT   |
+> +                       SCTLR_EL2_DZE   |
+> +                       SCTLR_EL2_SA0,
+> +                       REQUIRES_E2H1, FEAT_AA64EL2),
+> +       NEEDS_FEAT(SCTLR_EL2_WXN        |
+> +                  SCTLR_EL2_I          |
+> +                  SCTLR_EL2_SA         |
+> +                  SCTLR_EL2_C          |
+> +                  SCTLR_EL2_A          |
+> +                  SCTLR_EL2_M,
+> +                  FEAT_AA64EL2),
+> +       FORCE_RES0(SCTLR_EL2_RES0),
+> +       FORCE_RES1(SCTLR_EL2_RES1),
+> +};
 > +
->  #define __NEEDS_FEAT_FLAG(m, f, w, ...)			\
->  	CONCATENATE(__NEEDS_FEAT_, COUNT_ARGS(__VA_ARGS__))(m, f, w, __VA_ARGS__)
->  
-> @@ -95,9 +101,8 @@ struct reg_feat_map_desc {
->  #define NEEDS_FEAT(m, ...)	NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
->  
->  /* Declare fixed RESx bits */
-> -#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
-> -#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
-> -						enforce_resx)
-> +#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx)
-> +#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1)
->  
->  /*
->   * Declare the dependency between a non-FGT register, a set of
-> @@ -221,15 +226,6 @@ struct reg_feat_map_desc {
->  #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
->  #define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
->  
-> -static bool enforce_resx(struct kvm *kvm)
-> -{
-> -	/*
-> -	 * Returning false here means that the RESx bits will be always
-> -	 * addded to the fixed set bit. Yes, this is counter-intuitive.
-> -	 */
-> -	return false;
-> -}
-> -
->  static bool not_feat_aa64el3(struct kvm *kvm)
->  {
->  	return !kvm_has_feat(kvm, FEAT_AA64EL3);
-> @@ -996,7 +992,7 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
->  	NEEDS_FEAT(HCR_EL2_TWEDEL	|
->  		   HCR_EL2_TWEDEn,
->  		   FEAT_TWED),
-> -	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1, enforce_resx),
-> +	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1 | FORCE_RESx),
-
-Actually, this interacts badly with check_feat_map(), which tries to
-find whether we have fully populated the registers, excluding the RESx
-bits. But since we consider E2H to be a reserved but, we end-up with:
-
-[    0.141317] kvm [1]: Undefined HCR_EL2 behaviour, bits 0000000400000000
-
-With my approach, it was possible to distinguish the architecturally
-RESx bits (defined as RES0 or RES1), as they were the only ones with
-the FORCE_RESx attribute.
-
-I can work around it with
-
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 364bdd1e5be51..398458f4a6b7b 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -1283,7 +1283,7 @@ static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
- 	u64 mask = 0;
- 
- 	for (int i = 0; i < map_size; i++)
--		if (!(map[i].flags & FORCE_RESx))
-+		if (!(map[i].flags & FORCE_RESx) || !(map[i].bits & resx))
- 			mask |= map[i].bits;
- 
- 	if (mask != ~resx)
-
-but it becomes a bit awkward...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> +static const DECLARE_FEAT_MAP(sctlr_el2_desc, SCTLR_EL2,
+> +                             sctlr_el2_feat_map, FEAT_AA64EL2);
+> +
+>  static const struct reg_bits_to_feat_map mdcr_el2_feat_map[] = {
+>         NEEDS_FEAT(MDCR_EL2_EBWE, FEAT_Debugv8p9),
+>         NEEDS_FEAT(MDCR_EL2_TDOSA, FEAT_DoubleLock),
+> @@ -1249,6 +1327,7 @@ void __init check_feature_map(void)
+>         check_reg_desc(&sctlr2_desc);
+>         check_reg_desc(&tcr2_el2_desc);
+>         check_reg_desc(&sctlr_el1_desc);
+> +       check_reg_desc(&sctlr_el2_desc);
+>         check_reg_desc(&mdcr_el2_desc);
+>         check_reg_desc(&vtcr_el2_desc);
+>  }
+> @@ -1454,6 +1533,9 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum vcpu_sysreg reg)
+>         case SCTLR_EL1:
+>                 resx = compute_reg_resx_bits(kvm, &sctlr_el1_desc, 0, 0);
+>                 break;
+> +       case SCTLR_EL2:
+> +               resx = compute_reg_resx_bits(kvm, &sctlr_el2_desc, 0, 0);
+> +               break;
+>         case MDCR_EL2:
+>                 resx = compute_reg_resx_bits(kvm, &mdcr_el2_desc, 0, 0);
+>                 break;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 96e899dbd9192..ed710228484f3 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -1766,6 +1766,10 @@ int kvm_init_nv_sysregs(struct kvm_vcpu *vcpu)
+>         resx = get_reg_fixed_bits(kvm, SCTLR_EL1);
+>         set_sysreg_masks(kvm, SCTLR_EL1, resx);
+>
+> +       /* SCTLR_EL2 */
+> +       resx = get_reg_fixed_bits(kvm, SCTLR_EL2);
+> +       set_sysreg_masks(kvm, SCTLR_EL2, resx);
+> +
+>         /* SCTLR2_ELx */
+>         resx = get_reg_fixed_bits(kvm, SCTLR2_EL1);
+>         set_sysreg_masks(kvm, SCTLR2_EL1, resx);
+> --
+> 2.47.3
+>
