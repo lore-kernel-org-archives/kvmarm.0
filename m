@@ -1,152 +1,196 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A072D63E8
-	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from relay.hostedemail.com (smtprelay0010.hostedemail.com [216.40.44.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D286219ABC6
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769706176; cv=none; b=Q3H7pvYJafwHa/ONCbNzJgbsddLZfIXjJ5VIJ6bHeuiZqugRPKSdK/STv+58tpuBE0HAkvo+0T5VKPRt8+pPEkPEGLcbLKfApP6f1vWMmxZpOPdNv2FtXG7j4n6tE8XXZzoKCFxPGORBOuYr9b6+Xipgt9kz2LBVlkCyPt9+1tU=
+	t=1769706319; cv=none; b=TFlfE8Yr3z6FGq7bjeS0dn1wgn+XiejxgWHYLpfaJqKKHlSZUok/fLu9yttfepKrevz5M6bUU9EwjDnscyD2XmPwqDKRMbfqu932QL1fNgg85taTR3CJOn5rle35b6dbDm2agMJ0lnH16yx2IRQrwoKZZs5qNtzrx2TykvnS0zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769706176; c=relaxed/simple;
-	bh=q1gQCviJCAe+AZSj756VfNj4A1hZWH1AR6+aLsFTsRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=mvbQNVoULdJXjGlFr1XBKRKSUcOUjlnvvB5/i39szzoMoQkS7/Mu3dr84aQhoKEJsYDREHkwi/w/Zx93/a5u9sAwy5WoG2YuG4lFCBvDwejwLZeAQPN4kPL/uNugE94cSqT+uEM/8ce/gksj7ZXJBOKX1obVzphJaJsuieqW2ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E7529153B;
-	Thu, 29 Jan 2026 09:02:46 -0800 (PST)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 070FB3F73F;
-	Thu, 29 Jan 2026 09:02:50 -0800 (PST)
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oliver.upton@linux.dev,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	linux-kernel@vger.kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	yezhenyu2@huawei.com,
-	xiexiangyou@huawei.com,
-	zhengchuan@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Support set the DBM attr during memory abort
-Date: Thu, 29 Jan 2026 17:02:41 +0000
-Message-ID: <aXuSsVKtXBcffzo2@devkitleo>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251121092342.3393318-3-zhengtian10@huawei.com>
-References: <20251121092342.3393318-1-zhengtian10@huawei.com> <20251121092342.3393318-3-zhengtian10@huawei.com>
+	s=arc-20240116; t=1769706319; c=relaxed/simple;
+	bh=4ZVWEeoRYiyQeROefWmDzEV1Ldxeg+QgF2VlnxTOXPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uZdSix1O6IjCSagNJ+tVSPpuULtDiAm6QOxCyt6duSCpMBnnPG6P0XKhAdra1YnRA432AOqO+4gXGvg3ZfcALw+5NSoqirl00OHDbkSnpLZ/nSbAwb21ShmI6ABSEaq3moLwIe6X1kzhP40tODh+/g5kSYtfpncXlUmx+qG4yxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf03.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay07.hostedemail.com (Postfix) with ESMTP id 2F91C160201;
+	Thu, 29 Jan 2026 17:05:15 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf03.hostedemail.com (Postfix) with ESMTPA id 3B01F60015;
+	Thu, 29 Jan 2026 17:05:11 +0000 (UTC)
+Date: Thu, 29 Jan 2026 12:05:23 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v10 15/30] tracing: selftests: Add trace remote tests
+Message-ID: <20260129120523.6f710ff2@gandalf.local.home>
+In-Reply-To: <20260126104419.1649811-16-vdonnefort@google.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com>
+	<20260126104419.1649811-16-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: txaufewkoqfauzwkqo47d1diq43oa8q6
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: 3B01F60015
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX18BLc+YPC0Jad8q2qNeGSamiSkist3+hCI=
+X-HE-Tag: 1769706311-773773
+X-HE-Meta: U2FsdGVkX18Gk3kh6frTDRcDF0tQBXJ5dAmTOR263lq+mjgXcTAeLPXIei7FJ5BLztwLyBZ/hXl6282qf0MCx78WPvPe6Vd4hZ3PIYWs6aqPUk1zQHysAjLvy4PWfu9AeXLPj38m+I10sjlarN3a00PXUnFHJQX9Q5MOyImib//LQL1kI1ciw/GzqcOaBk2/HzpZTDnPxlrZDG7PqfRupWk7RJJOnqpfIpvAYNheYH44ACfHOpDFCvHEcSneqDvufOY14MT9W85629RcnJB2zXRvyjpWX8pd2/sGCkiPOBZ95Fpdlj71kk3Dw7E0oTWaWmKgQWyBEGEXGb1i0qEJModXvjth6QWh
 
-On Fri, Nov 21, 2025 at 05:23:39PM +0800, Tian Zheng wrote:
-> From: eillon <yezhenyu2@huawei.com>
-> 
-> Add DBM support to automatically promote write-clean pages to
-> write-dirty, preventing users from being trapped in EL2 due to
-> missing write permissions.
-> 
-> Since the DBM attribute was introduced in ARMv8.1 and remains
-> optional in later architecture revisions, including ARMv9.5.
-> 
-> Support set the DBM attr during user_mem_abort().
-> 
-> Signed-off-by: eillon <yezhenyu2@huawei.com>
-> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h | 4 ++++
->  arch/arm64/kvm/hyp/pgtable.c         | 6 ++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 2888b5d03757..2fa24953d1a6 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -91,6 +91,8 @@ typedef u64 kvm_pte_t;
-> 
->  #define KVM_PTE_LEAF_ATTR_HI_S2_XN	BIT(54)
-> 
-> +#define KVM_PTE_LEAF_ATTR_HI_S2_DBM	BIT(51)
+On Mon, 26 Jan 2026 10:44:04 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
+
+> --- /dev/null
+> +++ b/tools/testing/selftests/ftrace/test.d/remotes/trace.tc
+> @@ -0,0 +1,127 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +# description: Test trace remote non-consuming read
+> +# requires: remotes/test
 > +
->  #define KVM_PTE_LEAF_ATTR_HI_S1_GP	BIT(50)
-> 
->  #define KVM_PTE_LEAF_ATTR_S2_PERMS	(KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R | \
-> @@ -245,6 +247,7 @@ enum kvm_pgtable_stage2_flags {
->   * @KVM_PGTABLE_PROT_R:		Read permission.
->   * @KVM_PGTABLE_PROT_DEVICE:	Device attributes.
->   * @KVM_PGTABLE_PROT_NORMAL_NC:	Normal noncacheable attributes.
-> + * @KVM_PGTABLE_PROT_DBM:	Dirty bit management attribute.
->   * @KVM_PGTABLE_PROT_SW0:	Software bit 0.
->   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
->   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
-> @@ -257,6 +260,7 @@ enum kvm_pgtable_prot {
-> 
->  	KVM_PGTABLE_PROT_DEVICE			= BIT(3),
->  	KVM_PGTABLE_PROT_NORMAL_NC		= BIT(4),
-> +	KVM_PGTABLE_PROT_DBM			= BIT(5),
-> 
->  	KVM_PGTABLE_PROT_SW0			= BIT(55),
->  	KVM_PGTABLE_PROT_SW1			= BIT(56),
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index c351b4abd5db..ce41c6924ebe 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -694,6 +694,9 @@ static int stage2_set_prot_attr(struct kvm_pgtable *pgt, enum kvm_pgtable_prot p
->  	if (prot & KVM_PGTABLE_PROT_W)
->  		attr |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> 
-> +	if (prot & KVM_PGTABLE_PROT_DBM)
-> +		attr |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +. $TEST_DIR/remotes/functions
 > +
->  	if (!kvm_lpa2_is_enabled())
->  		attr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_LO_S2_SH, sh);
-> 
-> @@ -1303,6 +1306,9 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	if (prot & KVM_PGTABLE_PROT_W)
->  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W;
-> 
-> +	if (prot & KVM_PGTABLE_PROT_DBM)
-> +		set |= KVM_PTE_LEAF_ATTR_HI_S2_DBM;
+> +test_trace()
+> +{
+> +	echo 0 > tracing_on
+> +    assert_unloaded
 > +
->  	if (prot & KVM_PGTABLE_PROT_X)
->  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
-> 
+> +    echo 7 > buffer_size_kb
+> +    echo 1 > tracing_on
+> +    assert_loaded
+> +
+> +    # Simple test: Emit few events and try to read them
+> +    for i in $(seq 1 8); do
+> +        echo $i > write_event
+> +    done
+> +
+> +    check_trace 1 8 trace
+> +
+> +    #
+> +    # Test interaction with consuming read
+> +    #
+> +
+> +    cat trace_pipe > /dev/null &
+> +    pid=$!
+> +
+> +    sleep 1
+> +    kill $pid
+> +
+> +    test $(wc -l < trace) -eq 0
+> +
+> +    for i in $(seq 16 32); do
+> +        echo $i > write_event
+> +    done
+> +
+> +    check_trace 16 32 trace
+> +
+> +    #
+> +    # Test interaction with reset
+> +    #
+> +
+> +    echo 0 > trace
+> +
+> +    test $(wc -l < trace) -eq 0
+> +
+> +    for i in $(seq 1 8); do
+> +        echo $i > write_event
+> +    done
+> +
+> +    check_trace 1 8 trace
+> +
+> +    #
+> +    # Test interaction with lost events
+> +    #
+> +
+> +    # Ensure the writer is not on the reader page by reloading the buffer
+> +    echo 0 > tracing_on
+> +    echo 0 > trace
+> +    assert_unloaded
+> +    echo 1 > tracing_on
+> +    assert_loaded
+> +
+> +    # Ensure ring-buffer overflow by emitting events from the same CPU
+> +    for cpu in $(get_cpu_ids); do
+> +        break
+> +    done
+> +
+> +    events_per_page=$(($(get_page_size) / $(get_selftest_event_size))) # Approx: does not take TS into account
+> +    nr_events=$(($events_per_page * 2))
+> +    for i in $(seq 1 $nr_events); do
+> +        taskset -c $cpu echo $i > write_event
+> +    done
+> +
+> +    id=$(sed -n -e '1s/\[[0-9]*\]\s*[0-9]*.[0-9]*: [a-z]* id=\([0-9]*\)/\1/p' trace)
+> +    test $id -ne 1
+> +
+> +    check_trace $id $nr_events trace
+> +
+> +    #
+> +    # Test per-CPU interface
+> +    #
+> +    echo 0 > trace
+> +
+> +    for cpu in $(get_cpu_ids) ; do
+> +        taskset -c $cpu echo $cpu > write_event
+> +    done
+> +
+> +    for cpu in $(get_cpu_ids); do
+> +        cd per_cpu/cpu$cpu/
+> +
+> +        check_trace $cpu $cpu trace
+> +
+> +        cd - > /dev/null
+> +    done
+> +
+> +    #
+> +    # Test with hotplug
+> +    #
+> +
+> +    [ "$(get_cpu_ids | wc -l)" -ge 2 ] || return 0
+> +
+> +    echo 0 > trace
+> +
+> +    for cpu in $(get_cpu_ids); do
+> +        echo 0 > /sys/devices/system/cpu/cpu$cpu/online
+
+Note, my test VM doesn't have cpu0/online, so this needs to test for the
+existence of these files:
+
+ ./ftracetest: 105: /work/git/linux.git/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc: cannot create /sys/devices/system/cpu/cpu0/online: Permission denied
+
+-- Steve
 
 
-Hi Tian,
-
-I was re-reading this series while planning the other feature I am working 
-on top of this one.
-
-This patch, IMHO, is unrelated to the HDBSS feature.
-I get that HDBSS feature needs this bit being set in the page descriptor
-but it was not introduced in this feature.
-
-It was actually introduced in HAFDBS.
-
-So maybe it's worth to split this series in:
-- Enable HAFDBS for KVM, and
-- Enable HDBSS
-
-I have something here that could serve as a base for that, will clean that 
-up and send as an example.
-
-Thanks!
-Leo
+> +        break
+> +    done
+> +
+> +    for i in $(seq 1 8); do
+> +        echo $i > write_event
+> +    done
+> +
+> +    check_trace 1 8 trace
+> +
+> +    echo 1 > /sys/devices/system/cpu/cpu$cpu/online
+> +}
+> +
+> +if [ -z "$SOURCE_REMOTE_TEST" ]; then
+> +    set -e
+> +
+> +    setup_remote_test
+> +    test_trace
+> +fi
