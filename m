@@ -1,167 +1,217 @@
-Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A12A2EBBB9
-	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942434847E;
+	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769706986; cv=none; b=hIq3WVtcMIXYzF86286nHStbTdQ32x7hIzVvC+1r4bQtkEYpdo34Jo+eyrY4AvVYijPC/1HFauVLXB3eo9CyS4rcDdOYfcl1PLCFKDFvOjCg2ETOEwX5Jk0CZjjJn/ABo+GBv0mWQYvwK7stKXpm1FOxvY9qmgXPJeju1DfghvM=
+	t=1769707199; cv=none; b=tY0ClcZRm2yCL34bPgQIB+h5Bm17hZNf5GhtXx3Up1P2cGimhoRDIL7bqMZ/lGtOO8bUYbz8Jb6GWBLjR2NEgang/ta4tr/UTxH8pTe81BQZvG3YSOsjaDP83hFKao6mKprWS9BXLMqSVsfBEylvlQfXgYpSXfqefUlQ2zQmpJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769706986; c=relaxed/simple;
-	bh=DIkei0jGJGVjvv+44OMHHbjC1UWjNUL77TpE3HQ3Xao=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BDdFaZmPeB2OoAqMEmpvZeoWQgmPKo8xkKGJsU1NwhB33dvb59u2T4sNYq6i3zNoyrqUUVGJBgS2CbI29iu6ro9U+ycDtbgyozruYNJn5cqjazLm2pnFUSoxJRIuGfHl7HRJ2zh0zCV25hh6/is+V0zWTqS98w3pfTXrFhAr474=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf16.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay08.hostedemail.com (Postfix) with ESMTP id 8751014021A;
-	Thu, 29 Jan 2026 17:16:21 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf16.hostedemail.com (Postfix) with ESMTPA id 102F12000F;
-	Thu, 29 Jan 2026 17:16:17 +0000 (UTC)
-Date: Thu, 29 Jan 2026 12:16:29 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
- linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
- joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
- kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- jstultz@google.com, qperret@google.com, will@kernel.org,
- aneesh.kumar@kernel.org, kernel-team@android.com,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 16/30] Documentation: tracing: Add tracing remotes
-Message-ID: <20260129121629.25d2c0e7@gandalf.local.home>
-In-Reply-To: <20260126104419.1649811-17-vdonnefort@google.com>
-References: <20260126104419.1649811-1-vdonnefort@google.com>
-	<20260126104419.1649811-17-vdonnefort@google.com>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1769707199; c=relaxed/simple;
+	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gySHYrFN8Jy8shy+YjieLPhuYegBertReJgciSohf3dvVi/kPtjdPweibXsjb8lF2S7haMJz6c8lbWMU9FiyDJtdKePI1wSbIP0M8EI8Zs7QbghEvhTsZta5Wq0/EH0t42ozWcT7/0i5jQbscLAmJLSUuN0LSBvmhI8RP/aee68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDuDsdZ9; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDuDsdZ9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FC41C19425;
+	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769707198;
+	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nDuDsdZ9A1/96t9ZUiZauKtQ7g8FJhcHgJ9UltI/Q5noxZUxpZ3D0gR9G8rTo16JZ
+	 6o9YG3w5lA6wIagaYKTsXNhq1Xy99pJlnWWPFfO+YQIr5kvy8NichSX0SwrTO94nw0
+	 SltOwC9HvtvIGJYcqju/Ya1bsAy7rVinewblSOy3k2QcWb6TUMeuWpvxC4dhzot55Z
+	 c6Rj4zIwzNfdJB+vAt6k9OlvI/CzPHQH2dH6l7/3K5LuRkSr/EcXSXAWHan1A1z2um
+	 ACynIevFS4ED4bgVfpK1JcG6/HUhBt+jOAYKnELv/8F08fJhOYI9u9i3VQXjPu8ecY
+	 CkAQ5uwyD3CxQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vlVgS-00000006pTF-0Nzd;
+	Thu, 29 Jan 2026 17:19:56 +0000
+Date: Thu, 29 Jan 2026 17:19:55 +0000
+Message-ID: <86a4xwbakk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 13/20] KVM: arm64: Move RESx into individual register descriptors
+In-Reply-To: <CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
+References: <20260126121655.1641736-1-maz@kernel.org>
+	<20260126121655.1641736-14-maz@kernel.org>
+	<CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: ep3s1nwcwmudotqgrz3cu4m49n43768g
-X-Rspamd-Server: rspamout02
-X-Rspamd-Queue-Id: 102F12000F
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX19OPa/5QA9e3E6X19QE/d51EwPPz+it7TM=
-X-HE-Tag: 1769706977-932958
-X-HE-Meta: U2FsdGVkX19rPg+Qy8EyT28SApcghYzFdXkz9xvvD7CIbLz103mrT0yJNlOT43RNRaEB2ftg2o3Hy8+zeKfP59e+pxkTjKhBEkbvmdiL0/zaEd/WdFLM/gHZ9TRg/VXh6GmRt8MorrTZ6XTgzcldknrru07NbUwrHldiCv1GmxdLF+yKGZ2O5HwAFb8yHROm+rW/lZCOKjHHxojmSSdpMRdbjDX028QzVSjaOaaQMqJNl0y0UU/rm2lH/b/hR8feFYVOuQJogjWvygcnbvO56WzyMOUHR88rALpeqM4wWwSYi0UbvTsrM3hs+19n6p88zHkpOjuaC8a2jkKmmdenESn4aSk7CDWL3F+GP+Qr8WowJILBub2zV9kEYBd8JRE5
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 26 Jan 2026 10:44:05 +0000
-Vincent Donnefort <vdonnefort@google.com> wrote:
-
-> Add documentation about the newly introduced tracing remotes framework.
+On Thu, 29 Jan 2026 16:29:39 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> Hi Marc,
 > 
-> diff --git a/Documentation/trace/index.rst b/Documentation/trace/index.rst
-> index b4a429dc4f7a..d77ffb7e2d08 100644
-> --- a/Documentation/trace/index.rst
-> +++ b/Documentation/trace/index.rst
-> @@ -90,6 +90,17 @@ interactions.
->     user_events
->     uprobetracer
->  
-> +Remote Tracing
-> +--------------
-> +
-> +This section covers the framework to read compatible ring-buffers, written by
-> +entities outside of the kernel (most likely firmware or hypervisor)
-> +
-> +.. toctree::
-> +   :maxdepth: 1
-> +
-> +   remotes
-> +
->  Additional Resources
->  --------------------
->  
-> diff --git a/Documentation/trace/remotes.rst b/Documentation/trace/remotes.rst
-> new file mode 100644
-> index 000000000000..e7fb3ee96c30
-> --- /dev/null
-> +++ b/Documentation/trace/remotes.rst
-> @@ -0,0 +1,59 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +===============
-> +Tracing Remotes
-> +===============
-> +
-> +:Author: Vincent Donnefort <vdonnefort@google.com>
-> +
-> +Overview
-> +========
+> On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Instead of hacking the RES1 bits at runtime, move them into the
+> > register descriptors. This makes it significantly nicer.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/config.c | 36 +++++++++++++++++++++++++++++-------
+> >  1 file changed, 29 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+> > index 7063fffc22799..d5871758f1fcc 100644
+> > --- a/arch/arm64/kvm/config.c
+> > +++ b/arch/arm64/kvm/config.c
+> > @@ -30,6 +30,7 @@ struct reg_bits_to_feat_map {
+> >  #define        RES0_WHEN_E2H1  BIT(7)  /* RES0 when E2H=1 and not supported */
+> >  #define        RES1_WHEN_E2H0  BIT(8)  /* RES1 when E2H=0 and not supported */
+> >  #define        RES1_WHEN_E2H1  BIT(9)  /* RES1 when E2H=1 and not supported */
+> > +#define        FORCE_RESx      BIT(10) /* Unconditional RESx */
+> >
+> >         unsigned long   flags;
+> >
+> > @@ -107,6 +108,11 @@ struct reg_feat_map_desc {
+> >   */
+> >  #define NEEDS_FEAT(m, ...)     NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
+> >
+> > +/* Declare fixed RESx bits */
+> > +#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
+> > +#define FORCE_RES1(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
+> > +                                               enforce_resx)
+> > +
+> >  /*
+> >   * Declare the dependency between a non-FGT register, a set of
+> >   * feature, and the set of individual bits it contains. This generates
+> 
+> nit: features
+> 
+> > @@ -230,6 +236,15 @@ struct reg_feat_map_desc {
+> >  #define FEAT_HCX               ID_AA64MMFR1_EL1, HCX, IMP
+> >  #define FEAT_S2PIE             ID_AA64MMFR3_EL1, S2PIE, IMP
+> >
+> > +static bool enforce_resx(struct kvm *kvm)
+> > +{
+> > +       /*
+> > +        * Returning false here means that the RESx bits will be always
+> > +        * addded to the fixed set bit. Yes, this is counter-intuitive.
+> 
+> nit: added
+> 
+> > +        */
+> > +       return false;
+> > +}
+> 
+> I see what you're doing here, but it took me a while to get it and
+> convince myself that there aren't any bugs (my self couldn't find any
+> bugs, but I wouldn't trust him that much). You already introduce a new
+> flag, FORCE_RESx. Why not just check that directly in the
+> compute_resx_bits() loop, before the check for CALL_FUNC?
+> 
+> + if (map[i].flags & FORCE_RESx)
+> +     match = false;
+> + else if (map[i].flags & CALL_FUNC)
+> ...
+> 
+> The way it is now, to understand FORCE_RES0, you must trace a flag, a
+> macro expansion, and a function pointer, just to set a boolean to
+> false.
 
-Probably should start off with the rationale for remotes. Perhaps start
-with something like:
+With that scheme, you'd write something like:
 
-  Firmware and pkvm hypervisors are black boxes to the kernel. Having a way
-  to see what they are doing can be useful to debug both. This is where
-  remote tracing buffers come in. A remote tracing buffer is a ring buffer
-  executed by the firmware or hypervisor into memory that is memory mapped
-  to the host kernel. This is similar to how user space memory maps the
-  kernel ring buffer but in this case the kernel is acting like user space
-  and the firmware or hypervisor is the "kernel" side. With a trace remote
-  ring buffer, the firmware and hypervisor can record events for which the
-  host kernel can see and expose to user space.
++#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx)
 
-But we can expand on this later. The above should be the minimum added to
-allow people to understand why this is being created.
+This construct would need a new __NEEDS_FEAT_0() macro that doesn't
+take any argument other than flags. Something like below (untested).
 
--- Steve
+	M.
 
-> +A trace remote relies on ring-buffer remotes to read and control compatible
-> +tracing buffers, written by entity such as firmware or hypervisor.
-> +
-> +Once registered, a tracefs instance will appear for this remote in the Tracefs
-> +directory **remotes/**. This remote can be read and controlled using the same
-> +files as regular Tracefs instances such as **trace_pipe**, **tracing_on** or
-> +**trace**.
-> +
-> +Register a remote
-> +=================
-> +A remote must provide a set of callbacks `struct trace_remote_callbacks` whom
-> +description can be found below. Those callbacks allows Tracefs to enable and
-> +disable tracing and events, to load and unload a tracing buffer (a set of
-> +ring-buffers) and to swap a reader page with the head page, which enables
-> +consuming reading.
-> +
-> +.. kernel-doc:: include/linux/trace_remote.h
-> +
-> +Declare a remote event
-> +======================
-> +Macros are provided to ease the declaration of remote events, in a similar
-> +fashion to in-kernel events. A declaration must provide an ID, a description of
-> +the event arguments and how to print the event:
-> +
-> +.. code-block:: c
-> +
-> +	REMOTE_EVENT(foo, EVENT_FOO_ID,
-> +		RE_STRUCT(
-> +			re_field(u64, bar)
-> +		),
-> +		RE_PRINTK("bar=%lld", __entry->bar)
-> +	);
-> +
-> +Then those events must be declared in a C file with the following:
-> +
-> +.. code-block:: c
-> +
-> +	#define REMOTE_EVENT_INCLUDE_FILE foo_events.h
-> +	#include <trace/define_remote_events.h>
-> +
-> +This will provide a `struct remote_event remote_event_foo` that can be given to
-> +`trace_remote_register`.
-> +
-> +Simple ring-buffer
-> +==================
-> +A simple implementation for a ring-buffer writer can be found in
-> +kernel/trace/simple_ring_buffer.c.
-> +
-> +.. kernel-doc:: include/linux/simple_ring_buffer.h
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index 9485e1f2dc0b7..364bdd1e5be51 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -79,6 +79,12 @@ struct reg_feat_map_desc {
+ 		.match = (fun),				\
+ 	}
+ 
++#define __NEEDS_FEAT_0(m, f, w, ...)			\
++	{						\
++		.w	= (m),				\
++		.flags = (f),				\
++	}
++
+ #define __NEEDS_FEAT_FLAG(m, f, w, ...)			\
+ 	CONCATENATE(__NEEDS_FEAT_, COUNT_ARGS(__VA_ARGS__))(m, f, w, __VA_ARGS__)
+ 
+@@ -95,9 +101,8 @@ struct reg_feat_map_desc {
+ #define NEEDS_FEAT(m, ...)	NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
+ 
+ /* Declare fixed RESx bits */
+-#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
+-#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
+-						enforce_resx)
++#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx)
++#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1)
+ 
+ /*
+  * Declare the dependency between a non-FGT register, a set of
+@@ -221,15 +226,6 @@ struct reg_feat_map_desc {
+ #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+ #define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
+ 
+-static bool enforce_resx(struct kvm *kvm)
+-{
+-	/*
+-	 * Returning false here means that the RESx bits will be always
+-	 * addded to the fixed set bit. Yes, this is counter-intuitive.
+-	 */
+-	return false;
+-}
+-
+ static bool not_feat_aa64el3(struct kvm *kvm)
+ {
+ 	return !kvm_has_feat(kvm, FEAT_AA64EL3);
+@@ -996,7 +992,7 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
+ 	NEEDS_FEAT(HCR_EL2_TWEDEL	|
+ 		   HCR_EL2_TWEDEn,
+ 		   FEAT_TWED),
+-	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1, enforce_resx),
++	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1 | FORCE_RESx),
+ 	FORCE_RES0(HCR_EL2_RES0),
+ 	FORCE_RES1(HCR_EL2_RES1),
+ };
+@@ -1362,7 +1358,9 @@ struct resx compute_resx_bits(struct kvm *kvm,
+ 		if (map[i].flags & exclude)
+ 			continue;
+ 
+-		if (map[i].flags & CALL_FUNC)
++		if (map[i].flags & FORCE_RESx)
++			match = false;
++		else if (map[i].flags & CALL_FUNC)
+ 			match = map[i].match(kvm);
+ 		else
+ 			match = idreg_feat_match(kvm, &map[i]);
 
+-- 
+Without deviation from the norm, progress is not possible.
