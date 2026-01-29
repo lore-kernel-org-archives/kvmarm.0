@@ -1,42 +1,42 @@
-Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
+Received: from sinmsgout02.his.huawei.com (sinmsgout02.his.huawei.com [119.8.177.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A274388847
-	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 12:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAE037F8B1
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 12:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769688955; cv=none; b=UjfxJ2bm/rhPK6780nnQffMzbeB4+nvpDfua4CJWm+vVQoCEKvt7cRhHJNRnM4lTO/kerS8BT15zw+YNC+uUUmyhAqpBX3I7IFPTqP89hURVg42fJWx6jRwuPwefEvKQwA7RYiiI23RzL59fIhn7aDaqoCN9PngxwY63P5A3x0A=
+	t=1769689308; cv=none; b=q3sHrELxIy4qwxUmLnOqf+ODpXQefvXDARoDrP74b8QIbFjs10/bySI02Py3Uh6xrcymxY+i6szJHXle+pG4CKp25rOZ4ztZxWEkFQhibXv3w6pKiklGBxnKNX/9P3PxjHwWlRPDMe6g/CCQQ7aV/jut50AGwzmbquv6BwaN60Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769688955; c=relaxed/simple;
-	bh=0IK+DRm/Yda57JCyxXKFwl4KjzuOyT1Kblfcrg+u0bU=;
+	s=arc-20240116; t=1769689308; c=relaxed/simple;
+	bh=REowasn8xn/ytBAecJSuaCSFjx7jOXEuszdz8EtTRO0=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WvqOno5uYwOs3vneq7yWLfChNrIeR/2JYa0SVpDRhOBVPHEVrm3PmZqHwhHv3qmjAkVcJ/dtw3yfBe0YY8a5JAeaBCSi7krPIw6kq4DIF3qCxB9gpH4Wqs60GFZKcrYXeirX6hkIM/G9eP4IRrAdESSTul2dZPROGYkP44f/LsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=prWDpijG; arc=none smtp.client-ip=119.8.177.36
+	 MIME-Version:Content-Type; b=g1Qx0xVTzgGahLu9YToXkqE9DrhRHHVdKm7ka9opAikgZxvqYz6d0aZALGSkSgwlkg7qYG1q4rAY6Hlp4AuWzi67k3OspuD0VrJNl8AX4oUdxV1qZa1DLph3oKgFBC2qlvQy9B69CPcq6qnsn3f+MG+SC+V2YiApg3gyCV8FtR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=usnYy/1I; arc=none smtp.client-ip=119.8.177.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="prWDpijG"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="usnYy/1I"
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=OznORozYizQxwH0YPp/AAs48x/3QH3/xBBmeqZor+bQ=;
-	b=prWDpijG40MZmkg1lzmAGJw6xmt4IAKoEXYw3AUU90gjbb0oBm/bMqiWzRbjhgrO13AxqgaKN
-	gal8bbTwofUWrwhXvRnZJ0Eh7S4I+oWj6h7757vNn+INwVKhBzTMVX0EqJNiGFFenjRxjbGw0+N
-	d8fUrJVvIH2H/VC5BQ0ym0o=
-Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
-	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4f1yhm551Qz1P7P4;
-	Thu, 29 Jan 2026 20:13:12 +0800 (CST)
-Received: from mail.maildlp.com (unknown [172.18.224.83])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4f1ykf1dmTzHnGjf;
-	Thu, 29 Jan 2026 20:14:50 +0800 (CST)
+	bh=PElI1rsyETN147jyZgm5oFt9PCn+f+EDSDG27bKeDKA=;
+	b=usnYy/1IvNKv/ssW9vZHukk49Nj+gETALbUhNsfWuzLc1SdMz2fywO/yoD7DsLRhbu/QzB8VU
+	13t+yZ0OrUBzShlCO5kYDnIIdYTbcZAo4Jheh3ngCYBFkfS79/6j/34rdzWklEIMoG3jpXcHV1E
+	Qes7yuqlzEm/8+uUskuAC54=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.33])
+	by sinmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4f1yqW2NdTz1vnKn;
+	Thu, 29 Jan 2026 20:19:03 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4f1ysf5V1JzJ46BK;
+	Thu, 29 Jan 2026 20:20:54 +0800 (CST)
 Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
-	by mail.maildlp.com (Postfix) with ESMTPS id AA4B940569;
-	Thu, 29 Jan 2026 20:15:39 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id E716F40585;
+	Thu, 29 Jan 2026 20:21:33 +0800 (CST)
 Received: from localhost (10.203.177.15) by dubpeml500005.china.huawei.com
  (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 29 Jan
- 2026 12:15:35 +0000
-Date: Thu, 29 Jan 2026 12:15:34 +0000
+ 2026 12:21:33 +0000
+Date: Thu, 29 Jan 2026 12:21:31 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 CC: "linux-arm-kernel@lists.infradead.org"
@@ -48,12 +48,11 @@ CC: "linux-arm-kernel@lists.infradead.org"
 	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
 	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
 	<Timothy.Hayes@arm.com>
-Subject: Re: [PATCH v4 10/36] KVM: arm64: gic-v5: Detect implemented PPIs on
- boot
-Message-ID: <20260129121534.00001133@huawei.com>
-In-Reply-To: <20260128175919.3828384-11-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v4 21/36] KVM: arm64: gic-v5: Check for pending PPIs
+Message-ID: <20260129122131.00006a5a@huawei.com>
+In-Reply-To: <20260128175919.3828384-22-sascha.bischoff@arm.com>
 References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-11-sascha.bischoff@arm.com>
+	<20260128175919.3828384-22-sascha.bischoff@arm.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -66,27 +65,39 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
  dubpeml500005.china.huawei.com (7.214.145.207)
 
-On Wed, 28 Jan 2026 18:01:54 +0000
+On Wed, 28 Jan 2026 18:04:43 +0000
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-> As part of booting the system and initialising KVM, create and
-> populate a mask of the implemented PPIs. This mask allows future PPI
-> operations (such as save/restore or state, or syncing back into the
-> shadow state) to only consider PPIs that are actually implemented on
-> the host.
+> This change allows KVM to check for pending PPI interrupts. This has
+> two main components:
 > 
-> The set of implemented virtual PPIs matches the set of implemented
-> physical PPIs for a GICv5 host. Therefore, this mask represents all
-> PPIs that could ever by used by a GICv5-based guest on a specific
-> host.
+> First of all, the effective priority mask is calculated.  This is a
+> combination of the priority mask in the VPEs ICC_PCR_EL1.PRIORITY and
+> the currently running priority as determined from the VPE's
+> ICH_APR_EL1. If an interrupt's priority is greater than or equal to
+> the effective priority mask, it can be signalled. Otherwise, it
+> cannot.
 > 
-> Only architected PPIs are currently supported in KVM with
-> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
-> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
-> present. The timers are always assumed to be present; if we have KVM
-> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
-> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
-> always assumed to be present.
+> Secondly, any Enabled and Pending PPIs must be checked against this
+> compound priority mask. The reqires the PPI priorities to by synced
+> back to the KVM shadow state on WFI entry - this is skipped in general
+> operation as it isn't required and is rather expensive. If any Enabled
+> and Pending PPIs are of sufficient priority to be signalled, then
+> there are pending PPIs. Else, there are not. This ensures that a VPE
+> is not woken when it cannot actually process the pending interrupts.
+> 
+> As the PPI priorities are not synced back to the KVM shadow state on
+> every guest exit, they must by synced prior to checking if there are
+> pending interrupts for the guest. The sync itself happens in
+> vgic_v5_put() if, and only if, the vcpu is entering WFI as this is the
+> only case where it is not planned to run the vcpu thread again. If the
+> vcpu enters WFI, the vcpu thread will be descheduled and won't be
+> rescheduled again until it has a pending interrupt, which is checked
+> from kvm_arch_vcpu_runnable().
 > 
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+
+
