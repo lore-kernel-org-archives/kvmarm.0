@@ -1,251 +1,167 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65114332EA4
-	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A12A2EBBB9
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769706519; cv=none; b=Uu1fyufNaFen4CTyh8VYtV/MNJx2gHu8axnd8Wt04tWqBw0NQKa16JLg6O/UgACYCTZHPpKRFVsDjj88IoQWYKQs9Tw7bEN5cua00ao65IWjovFkVrbW0KvuAxNwygeK5k72KO5gxxQTcfskzVpxDQ5jlRP2pR7nrHyM9Iycvnc=
+	t=1769706986; cv=none; b=hIq3WVtcMIXYzF86286nHStbTdQ32x7hIzVvC+1r4bQtkEYpdo34Jo+eyrY4AvVYijPC/1HFauVLXB3eo9CyS4rcDdOYfcl1PLCFKDFvOjCg2ETOEwX5Jk0CZjjJn/ABo+GBv0mWQYvwK7stKXpm1FOxvY9qmgXPJeju1DfghvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769706519; c=relaxed/simple;
-	bh=sjXedIJ+gNEaYne2+kbU2h/1PxdCwRR1/VQWvqT3CGE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nHhgKPoI6DzDghHu+nimrwxpdEHoAqw9AR0Inj2p/8WkoIdBgEKRchY9jNP/XwQrnpF9dgF0ux2n69y2t1LuBWzVZiJd1/0JiCohQBz+tDQ8ZwYriABzLN8VVbmTIt+q3ZS3bU6Y8SA2yaOz02Zw2tAHELmdaI3YBtPcxnOtQwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CFF6153B;
-	Thu, 29 Jan 2026 09:08:31 -0800 (PST)
-Received: from [10.33.50.63] (e142021.arm.com [10.33.50.63])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B5653F73F;
-	Thu, 29 Jan 2026 09:08:36 -0800 (PST)
-Message-ID: <15de1a60-1dfb-41fd-a747-bd9564572d22@arm.com>
-Date: Thu, 29 Jan 2026 18:08:25 +0100
+	s=arc-20240116; t=1769706986; c=relaxed/simple;
+	bh=DIkei0jGJGVjvv+44OMHHbjC1UWjNUL77TpE3HQ3Xao=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BDdFaZmPeB2OoAqMEmpvZeoWQgmPKo8xkKGJsU1NwhB33dvb59u2T4sNYq6i3zNoyrqUUVGJBgS2CbI29iu6ro9U+ycDtbgyozruYNJn5cqjazLm2pnFUSoxJRIuGfHl7HRJ2zh0zCV25hh6/is+V0zWTqS98w3pfTXrFhAr474=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf16.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay08.hostedemail.com (Postfix) with ESMTP id 8751014021A;
+	Thu, 29 Jan 2026 17:16:21 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf16.hostedemail.com (Postfix) with ESMTPA id 102F12000F;
+	Thu, 29 Jan 2026 17:16:17 +0000 (UTC)
+Date: Thu, 29 Jan 2026 12:16:29 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 16/30] Documentation: tracing: Add tracing remotes
+Message-ID: <20260129121629.25d2c0e7@gandalf.local.home>
+In-Reply-To: <20260126104419.1649811-17-vdonnefort@google.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com>
+	<20260126104419.1649811-17-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvmtool v5 3/7] arm64: nested: Add support for setting
- maintenance IRQ
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>, "maz@kernel.org"
- <maz@kernel.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- Alexandru Elisei <Alexandru.Elisei@arm.com>,
- "will@kernel.org" <will@kernel.org>, nd <nd@arm.com>,
- "julien.thierry.kdev@gmail.com" <julien.thierry.kdev@gmail.com>
-References: <20260123142729.604737-1-andre.przywara@arm.com>
- <20260123142729.604737-4-andre.przywara@arm.com>
- <86fr7sb69h.wl-maz@kernel.org> <8db77da0-4772-499d-b140-350e4470e30d@arm.com>
- <c3b611b88e47c534ac050d02a8b4706111d679da.camel@arm.com>
-Content-Language: en-US
-From: Andre Przywara <andre.przywara@arm.com>
-In-Reply-To: <c3b611b88e47c534ac050d02a8b4706111d679da.camel@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: ep3s1nwcwmudotqgrz3cu4m49n43768g
+X-Rspamd-Server: rspamout02
+X-Rspamd-Queue-Id: 102F12000F
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19OPa/5QA9e3E6X19QE/d51EwPPz+it7TM=
+X-HE-Tag: 1769706977-932958
+X-HE-Meta: U2FsdGVkX19rPg+Qy8EyT28SApcghYzFdXkz9xvvD7CIbLz103mrT0yJNlOT43RNRaEB2ftg2o3Hy8+zeKfP59e+pxkTjKhBEkbvmdiL0/zaEd/WdFLM/gHZ9TRg/VXh6GmRt8MorrTZ6XTgzcldknrru07NbUwrHldiCv1GmxdLF+yKGZ2O5HwAFb8yHROm+rW/lZCOKjHHxojmSSdpMRdbjDX028QzVSjaOaaQMqJNl0y0UU/rm2lH/b/hR8feFYVOuQJogjWvygcnbvO56WzyMOUHR88rALpeqM4wWwSYi0UbvTsrM3hs+19n6p88zHkpOjuaC8a2jkKmmdenESn4aSk7CDWL3F+GP+Qr8WowJILBub2zV9kEYBd8JRE5
 
-Hi Sascha,
+On Mon, 26 Jan 2026 10:44:05 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-On 1/27/26 14:23, Sascha Bischoff wrote:
-> On Tue, 2026-01-27 at 12:07 +0000, Andre Przywara wrote:
->> Hi Marc,
->>
->> On 26/01/2026 18:03, Marc Zyngier wrote:
->>> On Fri, 23 Jan 2026 14:27:25 +0000,
->>> Andre Przywara <andre.przywara@arm.com> wrote:
->>>>
->>>> Uses the new VGIC KVM device attribute to set the maintenance
->>>> IRQ.
->>>> This is fixed to use PPI 9, as a platform decision made by
->>>> kvmtool,
->>>> matching the SBSA recommendation.
->>>> Use the opportunity to pass the kvm pointer to
->>>> gic__generate_fdt_nodes(),
->>>> as this simplifies the call and allows us access to the
->>>> nested_virt
->>>> config variable on the way.
->>>>
->>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>> ---
->>>>    arm64/arm-cpu.c         |  2 +-
->>>>    arm64/gic.c             | 29 +++++++++++++++++++++++++++--
->>>>    arm64/include/kvm/gic.h |  2 +-
->>>>    3 files changed, 29 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/arm64/arm-cpu.c b/arm64/arm-cpu.c
->>>> index 69bb2cb2..0843ac05 100644
->>>> --- a/arm64/arm-cpu.c
->>>> +++ b/arm64/arm-cpu.c
->>>> @@ -14,7 +14,7 @@ static void generate_fdt_nodes(void *fdt,
->>>> struct kvm *kvm)
->>>>    {
->>>>    	int timer_interrupts[4] = {13, 14, 11, 10};
->>>>    
->>>> -	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
->>>> +	gic__generate_fdt_nodes(fdt, kvm);
->>>>    	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->>>>    	pmu__generate_fdt_nodes(fdt, kvm);
->>>>    }
->>>> diff --git a/arm64/gic.c b/arm64/gic.c
->>>> index b0d3a1ab..2a595184 100644
->>>> --- a/arm64/gic.c
->>>> +++ b/arm64/gic.c
->>>> @@ -11,6 +11,8 @@
->>>>    
->>>>    #define IRQCHIP_GIC 0
->>>>    
->>>> +#define GIC_MAINT_IRQ	9
->>>> +
->>>>    static int gic_fd = -1;
->>>>    static u64 gic_redists_base;
->>>>    static u64 gic_redists_size;
->>>> @@ -302,10 +304,15 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    
->>>>    	int lines = irq__get_nr_allocated_lines();
->>>>    	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
->>>> +	u32 maint_irq = GIC_PPI_IRQ_BASE + GIC_MAINT_IRQ;
->>>>    	struct kvm_device_attr nr_irqs_attr = {
->>>>    		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->>>>    		.addr	= (u64)(unsigned long)&nr_irqs,
->>>>    	};
->>>> +	struct kvm_device_attr maint_irq_attr = {
->>>> +		.group	= KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ,
->>>> +		.addr	= (u64)(unsigned long)&maint_irq,
->>>> +	};
->>>>    	struct kvm_device_attr vgic_init_attr = {
->>>>    		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
->>>>    		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
->>>> @@ -325,6 +332,16 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    			return ret;
->>>>    	}
->>>>    
->>>> +	if (kvm->cfg.arch.nested_virt) {
->>>> +		ret = ioctl(gic_fd, KVM_HAS_DEVICE_ATTR,
->>>> &maint_irq_attr);
->>>> +		if (!ret)
->>>> +			ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR,
->>>> &maint_irq_attr);
->>>> +		if (ret) {
->>>> +			pr_err("could not set maintenance
->>>> IRQ\n");
->>>> +			return ret;
->>>> +		}
->>>> +	}
->>>> +
->>>>    	irq__routing_init(kvm);
->>>>    
->>>>    	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR,
->>>> &vgic_init_attr)) {
->>>> @@ -342,7 +359,7 @@ static int gic__init_gic(struct kvm *kvm)
->>>>    }
->>>>    late_init(gic__init_gic)
->>>>    
->>>> -void gic__generate_fdt_nodes(void *fdt, enum irqchip_type type)
->>>> +void gic__generate_fdt_nodes(void *fdt, struct kvm *kvm)
->>>>    {
->>>>    	const char *compatible, *msi_compatible = NULL;
->>>>    	u64 msi_prop[2];
->>>> @@ -350,8 +367,12 @@ void gic__generate_fdt_nodes(void *fdt, enum
->>>> irqchip_type type)
->>>>    		cpu_to_fdt64(ARM_GIC_DIST_BASE),
->>>> cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->>>>    		0, 0,				/* to be filled
->>>> */
->>>>    	};
->>>> +	u32 maint_irq[] = {
->>>> +		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->>>> cpu_to_fdt32(GIC_MAINT_IRQ),
->>>> +		gic__get_fdt_irq_cpumask(kvm) |
->>>> IRQ_TYPE_LEVEL_HIGH
->>>> +	};
->>>
->>> This looks utterly broken, and my guests barf on this:
->>>
->>>           intc {
->>>                   compatible = "arm,gic-v3";
->>>                   #interrupt-cells = <0x03>;
->>>                   interrupt-controller;
->>>                   reg = <0x00 0x3fff0000 0x00 0x10000 0x00
->>> 0x3fef0000 0x00 0x100000>;
->>>                   interrupts = <0x01 0x09 0x4000000>;
->>
->> Ah yeah, sorry, that's of course complete blunder, this got lost in
->> translation between v3 and v4.
->>                                             ^^^^^^^^^^^
->>> Are you testing on a big-endian box??? I fixed it with the patchlet
->>> below, but I also wonder why you added
->>> gic__get_fdt_irq_cpumask()...
->>
->> this was to accommodate GICv2 (it returns 0 for GICv3), and was the
->> equivalent of the hardcoded 0xff04 we had before. And though I guess
->> there would be no overlap between machines supporting nested virt and
->> having a GICv2 or a GICv2 emulation capable GICv3, I added this for
->> the
->> sake of completeness anyway, as it didn't feel right to make this
->> assumption in the otherwise generic code.
->>
->> Consider this fixed.
->>
->> Cheers,
->> Andre
+> Add documentation about the newly introduced tracing remotes framework.
 > 
-> Seems I'd missed this in v4. Sorry!
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> However, this made me think about GICv5 guests. Right now one can try
-> and create a nested guest with GICv2. Attempting to do so fails a
-> little ungracefully:
-> 
->    Error: could not set maintenance IRQ
-> 
->    Warning: Failed init: gic__init_gic
-> 
->    Fatal: Initialisation failed
-> 
-> It might be worth catching the v2 + nested combo explicitly and
-> returning a slightly more useful error.
+> diff --git a/Documentation/trace/index.rst b/Documentation/trace/index.rst
+> index b4a429dc4f7a..d77ffb7e2d08 100644
+> --- a/Documentation/trace/index.rst
+> +++ b/Documentation/trace/index.rst
+> @@ -90,6 +90,17 @@ interactions.
+>     user_events
+>     uprobetracer
+>  
+> +Remote Tracing
+> +--------------
+> +
+> +This section covers the framework to read compatible ring-buffers, written by
+> +entities outside of the kernel (most likely firmware or hypervisor)
+> +
+> +.. toctree::
+> +   :maxdepth: 1
+> +
+> +   remotes
+> +
+>  Additional Resources
+>  --------------------
+>  
+> diff --git a/Documentation/trace/remotes.rst b/Documentation/trace/remotes.rst
+> new file mode 100644
+> index 000000000000..e7fb3ee96c30
+> --- /dev/null
+> +++ b/Documentation/trace/remotes.rst
+> @@ -0,0 +1,59 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +===============
+> +Tracing Remotes
+> +===============
+> +
+> +:Author: Vincent Donnefort <vdonnefort@google.com>
+> +
+> +Overview
+> +========
 
-Mmmh, would that be really useful? You created that situation on the 
-model, right? I don't think it's a common scenario to run a guest in EL2 
-while having a GICv2 interrupt controller. And while we cannot 
-completely rule this out (as you have shown), I don't think it's common 
-enough to warrant an explicit check or message. At least it failed 
-(because the vGICv2 device doesn't implement 
-KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ), and barfed about the GIC, which should 
-give people that tinker with the GIC enough clues, right?
+Probably should start off with the rationale for remotes. Perhaps start
+with something like:
 
-Please let me know what you think!
+  Firmware and pkvm hypervisors are black boxes to the kernel. Having a way
+  to see what they are doing can be useful to debug both. This is where
+  remote tracing buffers come in. A remote tracing buffer is a ring buffer
+  executed by the firmware or hypervisor into memory that is memory mapped
+  to the host kernel. This is similar to how user space memory maps the
+  kernel ring buffer but in this case the kernel is acting like user space
+  and the firmware or hypervisor is the "kernel" side. With a trace remote
+  ring buffer, the firmware and hypervisor can record events for which the
+  host kernel can see and expose to user space.
 
-Cheers,
-Andre
+But we can expand on this later. The above should be the minimum added to
+allow people to understand why this is being created.
 
-> 
-> Thanks,
-> Sascha
-> 
->>
->>>
->>> 	M.
->>>
->>> diff --git a/arm64/gic.c b/arm64/gic.c
->>> index 2a59518..640ff35 100644
->>> --- a/arm64/gic.c
->>> +++ b/arm64/gic.c
->>> @@ -369,7 +369,7 @@ void gic__generate_fdt_nodes(void *fdt, struct
->>> kvm *kvm)
->>>    	};
->>>    	u32 maint_irq[] = {
->>>    		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
->>> cpu_to_fdt32(GIC_MAINT_IRQ),
->>> -		gic__get_fdt_irq_cpumask(kvm) |
->>> IRQ_TYPE_LEVEL_HIGH
->>> +		cpu_to_fdt32(gic__get_fdt_irq_cpumask(kvm) |
->>> IRQ_TYPE_LEVEL_HIGH),
->>>    	};
->>>    
->>>    	switch (kvm->cfg.arch.irqchip) {
->>>
->>
-> 
+-- Steve
+
+> +A trace remote relies on ring-buffer remotes to read and control compatible
+> +tracing buffers, written by entity such as firmware or hypervisor.
+> +
+> +Once registered, a tracefs instance will appear for this remote in the Tracefs
+> +directory **remotes/**. This remote can be read and controlled using the same
+> +files as regular Tracefs instances such as **trace_pipe**, **tracing_on** or
+> +**trace**.
+> +
+> +Register a remote
+> +=================
+> +A remote must provide a set of callbacks `struct trace_remote_callbacks` whom
+> +description can be found below. Those callbacks allows Tracefs to enable and
+> +disable tracing and events, to load and unload a tracing buffer (a set of
+> +ring-buffers) and to swap a reader page with the head page, which enables
+> +consuming reading.
+> +
+> +.. kernel-doc:: include/linux/trace_remote.h
+> +
+> +Declare a remote event
+> +======================
+> +Macros are provided to ease the declaration of remote events, in a similar
+> +fashion to in-kernel events. A declaration must provide an ID, a description of
+> +the event arguments and how to print the event:
+> +
+> +.. code-block:: c
+> +
+> +	REMOTE_EVENT(foo, EVENT_FOO_ID,
+> +		RE_STRUCT(
+> +			re_field(u64, bar)
+> +		),
+> +		RE_PRINTK("bar=%lld", __entry->bar)
+> +	);
+> +
+> +Then those events must be declared in a C file with the following:
+> +
+> +.. code-block:: c
+> +
+> +	#define REMOTE_EVENT_INCLUDE_FILE foo_events.h
+> +	#include <trace/define_remote_events.h>
+> +
+> +This will provide a `struct remote_event remote_event_foo` that can be given to
+> +`trace_remote_register`.
+> +
+> +Simple ring-buffer
+> +==================
+> +A simple implementation for a ring-buffer writer can be found in
+> +kernel/trace/simple_ring_buffer.c.
+> +
+> +.. kernel-doc:: include/linux/simple_ring_buffer.h
 
