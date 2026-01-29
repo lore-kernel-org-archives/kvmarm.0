@@ -1,217 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.hostedemail.com (smtprelay0014.hostedemail.com [216.40.44.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942434847E;
-	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E2C2EBBB9
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707199; cv=none; b=tY0ClcZRm2yCL34bPgQIB+h5Bm17hZNf5GhtXx3Up1P2cGimhoRDIL7bqMZ/lGtOO8bUYbz8Jb6GWBLjR2NEgang/ta4tr/UTxH8pTe81BQZvG3YSOsjaDP83hFKao6mKprWS9BXLMqSVsfBEylvlQfXgYpSXfqefUlQ2zQmpJY=
+	t=1769707293; cv=none; b=AP3wzCjjSSElRvFiOUUeNYZC1QkbkoaqW6OSymloheW6+4OvJrmPgeVZ9ChzsGO4QQWmd5B5f2E0vIwu1YGyyM6NgoZZ8Vj2r5pkYhEPZ2HLO5WyshO2ySj1XLdxjqAq3mQAvPzOC+FjVhaYjV+FJsQHXvXZFW6fHtfnxo0puu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707199; c=relaxed/simple;
-	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gySHYrFN8Jy8shy+YjieLPhuYegBertReJgciSohf3dvVi/kPtjdPweibXsjb8lF2S7haMJz6c8lbWMU9FiyDJtdKePI1wSbIP0M8EI8Zs7QbghEvhTsZta5Wq0/EH0t42ozWcT7/0i5jQbscLAmJLSUuN0LSBvmhI8RP/aee68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDuDsdZ9; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDuDsdZ9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FC41C19425;
-	Thu, 29 Jan 2026 17:19:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769707198;
-	bh=M9zkkp8wM7E5ap5HjR0KwRMMUfIjyulNEqM+9VTZ+4A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nDuDsdZ9A1/96t9ZUiZauKtQ7g8FJhcHgJ9UltI/Q5noxZUxpZ3D0gR9G8rTo16JZ
-	 6o9YG3w5lA6wIagaYKTsXNhq1Xy99pJlnWWPFfO+YQIr5kvy8NichSX0SwrTO94nw0
-	 SltOwC9HvtvIGJYcqju/Ya1bsAy7rVinewblSOy3k2QcWb6TUMeuWpvxC4dhzot55Z
-	 c6Rj4zIwzNfdJB+vAt6k9OlvI/CzPHQH2dH6l7/3K5LuRkSr/EcXSXAWHan1A1z2um
-	 ACynIevFS4ED4bgVfpK1JcG6/HUhBt+jOAYKnELv/8F08fJhOYI9u9i3VQXjPu8ecY
-	 CkAQ5uwyD3CxQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlVgS-00000006pTF-0Nzd;
-	Thu, 29 Jan 2026 17:19:56 +0000
-Date: Thu, 29 Jan 2026 17:19:55 +0000
-Message-ID: <86a4xwbakk.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 13/20] KVM: arm64: Move RESx into individual register descriptors
-In-Reply-To: <CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-References: <20260126121655.1641736-1-maz@kernel.org>
-	<20260126121655.1641736-14-maz@kernel.org>
-	<CA+EHjTw_4WJgiS7vTUprvJOjdNrnW=sjhazCkU9eQW8BUYuZZw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769707293; c=relaxed/simple;
+	bh=EGbH5tooJcr5/+8CHBlXgDb5QAFjgZqs3a028FAhAn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S0TEndlIgwObl6OtKWz8UcUqyFD0Ne1J+btHYJCXozQkcy6njy88NvctK3NbdD+blSBO6807hyNm6xGfL5+pOP23iWRLAGoYnAfx16m0W7ZtEZ+RkZIuNUpnKJ2X/16PypFJO7WV1PTqv1D8Gh7IQ5OLKSQ50zLxdulPNkLpx9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf05.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay01.hostedemail.com (Postfix) with ESMTP id 3A3D61BCF2;
+	Thu, 29 Jan 2026 17:21:28 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf05.hostedemail.com (Postfix) with ESMTPA id 943DA2000E;
+	Thu, 29 Jan 2026 17:21:24 +0000 (UTC)
+Date: Thu, 29 Jan 2026 12:21:36 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 17/30] tracing: load/unload page callbacks for
+ simple_ring_buffer
+Message-ID: <20260129122136.69873587@gandalf.local.home>
+In-Reply-To: <20260126104419.1649811-18-vdonnefort@google.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com>
+	<20260126104419.1649811-18-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: jtfheu8shqoipi9u5yzt3fkgzru6j7dw
+X-Rspamd-Server: rspamout01
+X-Rspamd-Queue-Id: 943DA2000E
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1+P5mzFd4ZWUvDj9SmD6phcMvBMATTT8U8=
+X-HE-Tag: 1769707284-904358
+X-HE-Meta: U2FsdGVkX1/oZ8BY+DTHEu7zvzBJzXR5GM/i1Uvhm0/GmhlbTOg04hWfxm7niWNweDUchAXGe3ZhEeezDlxl79OtF6b3lHBrpu5STLNTc2w6s1ILrFX8De22XyjnNCZ/4Dc1J5+aV6iKd0M6OEXA9Y0wsbGw/MfCfhwyuzcR2ilW687CSNKk9fY9uVhYx3NLMJJIBYgLGDW6G5mVk5CAPkBlVKq0E/pMnY87yUFzDj48l1Rcu10wsuV2ZAN+HRYdPTYLLOjYVRdDXEp7fpr4Ulx1vkR+WpnIUA/Ctd5bb1h51HmM2GhYFt1WntUckszQJ7ReqfKeRmylxjapYjyYNvYNkJ9HvDBW
 
-On Thu, 29 Jan 2026 16:29:39 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Instead of hacking the RES1 bits at runtime, move them into the
-> > register descriptors. This makes it significantly nicer.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/config.c | 36 +++++++++++++++++++++++++++++-------
-> >  1 file changed, 29 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-> > index 7063fffc22799..d5871758f1fcc 100644
-> > --- a/arch/arm64/kvm/config.c
-> > +++ b/arch/arm64/kvm/config.c
-> > @@ -30,6 +30,7 @@ struct reg_bits_to_feat_map {
-> >  #define        RES0_WHEN_E2H1  BIT(7)  /* RES0 when E2H=1 and not supported */
-> >  #define        RES1_WHEN_E2H0  BIT(8)  /* RES1 when E2H=0 and not supported */
-> >  #define        RES1_WHEN_E2H1  BIT(9)  /* RES1 when E2H=1 and not supported */
-> > +#define        FORCE_RESx      BIT(10) /* Unconditional RESx */
-> >
-> >         unsigned long   flags;
-> >
-> > @@ -107,6 +108,11 @@ struct reg_feat_map_desc {
-> >   */
-> >  #define NEEDS_FEAT(m, ...)     NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
-> >
-> > +/* Declare fixed RESx bits */
-> > +#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
-> > +#define FORCE_RES1(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
-> > +                                               enforce_resx)
-> > +
-> >  /*
-> >   * Declare the dependency between a non-FGT register, a set of
-> >   * feature, and the set of individual bits it contains. This generates
-> 
-> nit: features
-> 
-> > @@ -230,6 +236,15 @@ struct reg_feat_map_desc {
-> >  #define FEAT_HCX               ID_AA64MMFR1_EL1, HCX, IMP
-> >  #define FEAT_S2PIE             ID_AA64MMFR3_EL1, S2PIE, IMP
-> >
-> > +static bool enforce_resx(struct kvm *kvm)
-> > +{
-> > +       /*
-> > +        * Returning false here means that the RESx bits will be always
-> > +        * addded to the fixed set bit. Yes, this is counter-intuitive.
-> 
-> nit: added
-> 
-> > +        */
-> > +       return false;
-> > +}
-> 
-> I see what you're doing here, but it took me a while to get it and
-> convince myself that there aren't any bugs (my self couldn't find any
-> bugs, but I wouldn't trust him that much). You already introduce a new
-> flag, FORCE_RESx. Why not just check that directly in the
-> compute_resx_bits() loop, before the check for CALL_FUNC?
-> 
-> + if (map[i].flags & FORCE_RESx)
-> +     match = false;
-> + else if (map[i].flags & CALL_FUNC)
-> ...
-> 
-> The way it is now, to understand FORCE_RES0, you must trace a flag, a
-> macro expansion, and a function pointer, just to set a boolean to
-> false.
+On Mon, 26 Jan 2026 10:44:06 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-With that scheme, you'd write something like:
+> Add load/unload callback used for each admitted page in the ring-buffer.
+> This will be later useful for the pKVM hypervisor which uses a different
+> VA space and need to dynamically map/unmap the ring-buffer pages.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/include/linux/simple_ring_buffer.h b/include/linux/simple_ring_buffer.h
+> index f324df2f875b..ecd0e988c699 100644
+> --- a/include/linux/simple_ring_buffer.h
+> +++ b/include/linux/simple_ring_buffer.h
+> @@ -110,4 +110,11 @@ int simple_ring_buffer_reset(struct simple_rb_per_cpu *cpu_buffer);
+>   */
+>  int simple_ring_buffer_swap_reader_page(struct simple_rb_per_cpu *cpu_buffer);
+>  
+> +int __simple_ring_buffer_init(struct simple_rb_per_cpu *cpu_buffer,
+> +			      struct simple_buffer_page *bpages,
+> +			      const struct ring_buffer_desc *desc,
+> +			      void *(*load_page)(unsigned long va),
+> +			      void (*unload_page)(void *va));
+> +void __simple_ring_buffer_unload(struct simple_rb_per_cpu *cpu_buffer,
+> +				 void (*unload_page)(void *));
 
-+#define FORCE_RES0(m)          NEEDS_FEAT_FLAG(m, FORCE_RESx)
+Underscored functions are for internally used functions and I rather not
+have them for generic use (in include/linux).
 
-This construct would need a new __NEEDS_FEAT_0() macro that doesn't
-take any argument other than flags. Something like below (untested).
+Perhaps rename them as:
 
-	M.
+ int simple_ring_buffer_init_va()
+ void simple_ring_buffer_init_va()
 
-diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
-index 9485e1f2dc0b7..364bdd1e5be51 100644
---- a/arch/arm64/kvm/config.c
-+++ b/arch/arm64/kvm/config.c
-@@ -79,6 +79,12 @@ struct reg_feat_map_desc {
- 		.match = (fun),				\
- 	}
- 
-+#define __NEEDS_FEAT_0(m, f, w, ...)			\
-+	{						\
-+		.w	= (m),				\
-+		.flags = (f),				\
-+	}
-+
- #define __NEEDS_FEAT_FLAG(m, f, w, ...)			\
- 	CONCATENATE(__NEEDS_FEAT_, COUNT_ARGS(__VA_ARGS__))(m, f, w, __VA_ARGS__)
- 
-@@ -95,9 +101,8 @@ struct reg_feat_map_desc {
- #define NEEDS_FEAT(m, ...)	NEEDS_FEAT_FLAG(m, 0, __VA_ARGS__)
- 
- /* Declare fixed RESx bits */
--#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx, enforce_resx)
--#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1, \
--						enforce_resx)
-+#define FORCE_RES0(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx)
-+#define FORCE_RES1(m)		NEEDS_FEAT_FLAG(m, FORCE_RESx | AS_RES1)
- 
- /*
-  * Declare the dependency between a non-FGT register, a set of
-@@ -221,15 +226,6 @@ struct reg_feat_map_desc {
- #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
- #define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
- 
--static bool enforce_resx(struct kvm *kvm)
--{
--	/*
--	 * Returning false here means that the RESx bits will be always
--	 * addded to the fixed set bit. Yes, this is counter-intuitive.
--	 */
--	return false;
--}
--
- static bool not_feat_aa64el3(struct kvm *kvm)
- {
- 	return !kvm_has_feat(kvm, FEAT_AA64EL3);
-@@ -996,7 +992,7 @@ static const struct reg_bits_to_feat_map hcr_feat_map[] = {
- 	NEEDS_FEAT(HCR_EL2_TWEDEL	|
- 		   HCR_EL2_TWEDEn,
- 		   FEAT_TWED),
--	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1, enforce_resx),
-+	NEEDS_FEAT_FLAG(HCR_EL2_E2H, RES1_WHEN_E2H1 | FORCE_RESx),
- 	FORCE_RES0(HCR_EL2_RES0),
- 	FORCE_RES1(HCR_EL2_RES1),
- };
-@@ -1362,7 +1358,9 @@ struct resx compute_resx_bits(struct kvm *kvm,
- 		if (map[i].flags & exclude)
- 			continue;
- 
--		if (map[i].flags & CALL_FUNC)
-+		if (map[i].flags & FORCE_RESx)
-+			match = false;
-+		else if (map[i].flags & CALL_FUNC)
- 			match = map[i].match(kvm);
- 		else
- 			match = idreg_feat_match(kvm, &map[i]);
+Or maybe "_mm()" would be better?
 
--- 
-Without deviation from the norm, progress is not possible.
+-- Steve
+
