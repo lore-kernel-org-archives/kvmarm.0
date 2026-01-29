@@ -1,120 +1,94 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5594F34D93C
-	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A35D83502B4
+	for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 17:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769707788; cv=none; b=OBqE0KHpk9NEr3hdoRzQ74WCyPVo7wpc87S9yFfiAHNlTZ9M1UbaZlVriS+Xia6pe9okXpT7aTonIL/IwlDc6MKBErqF+GksmPuqSj4/eDovooGB5cOjYUZ+sDZaw3NWsxqNwCwugwVMEkO28m38UELRHSOtb502GpCQZnAazuY=
+	t=1769708008; cv=none; b=DucPjfMpNzLC+1UL+8XDa0dNw3AvYHH+09S0QQHbSJby03MpfRbxEqNNLSagyBWhhxWzCw5jUAaIsHQk1w1ppSAJzWGYMlfyA4hFsEvGXjXwwiamTFsCTwOQG+p/rpBmP9eP85S2CYfQm1h+i8XbZCZcs6goh0fa6PpEwIvjfM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769707788; c=relaxed/simple;
-	bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EDDVQ062v2VILgQDux2vqgwkFL8lJWv5nAizMa0CqHlO/hENeVvl+eCPJLHNP34oNcoJrkfFFYooOu6l6emkbGZT+7E+ipE6xY7rJOfrSlA5InpMb26knU4oI2n1zagMaTyA40PFIOIZ35m7IHf4ZOpcFSaoFpG8V1ChFH+QNg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qU0eG51L; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qU0eG51L"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4806d23e9f1so14181885e9.2
-        for <kvmarm@lists.linux.dev>; Thu, 29 Jan 2026 09:29:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1769707785; x=1770312585; darn=lists.linux.dev;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-        b=qU0eG51LqPAPNg6qG8b2tK1MAeotogohoXq5fwny5Fa0Q6E0OfDfDoWoIrveu3vgCw
-         p/zQMLXI/GW8UDgqv+ugZ9yjd02/olBYwwVoFb8uV3EULG0rRSMUUz6gQJ1VGWQXlPuz
-         xxb2UkWrAqPIqAvpP/Wn6bBg4nNIintKHq2wYJ1dcXeYvOO/HXGZGpYNGUhrg4Acp8Zi
-         CfmrUeknuiMkq172aiGeMQIU0FfifCSuYIIkZ3ArOarzZ2MSwBia54FpTgA8Q3pr5MMR
-         W2/zGt5lF8obx4DYM6JvRS+m3FiGBdVEcQaROzx6sQym+jnqcDBSXfXZ8rlA8ZRJDTyy
-         PAqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769707785; x=1770312585;
-        h=content-transfer-encoding:mime-version:message-id:date:user-agent
-         :references:in-reply-to:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=be866/Yp5BAQJMoBK98y8dBJLQ2gHvccZfOQ5Qw+jAY=;
-        b=MuOJEMLmjjnuysxLupsNQPEy91MgaQnLp0IBIYnMopaSp0FRDOPGti0V4Cb4ROXAWq
-         pOQo0sNtQWr8jjYAizFXS/gr3Cs6pUvrK16q9gPNcB1pesalV9u8DDwu83T54gAAuesE
-         futwap4kbca4fSp1NwQvhGDUtolE8uKReNpeTHGgeycd4RvhzcnWE9GTZsQZorQ3n1eB
-         G10XB408n+tVbupe2WDQDm5pRFTSiOS0ROuH4cdAz0/UN/BRaFoQs3kYxpARw8EsFACh
-         LaKJPZZEWi5pkVX02vKFhaXRsK72dkKJ91C3x7PPkIOFwf6cd1AxeoRuviy9Hlb+YeF2
-         dMdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRGYbr+mulBo30L1Y1A2Fgp+G0pzkKvLaMJ+hBMrZJoyyJyVVUEpX8d8gT6Oc3Qi4Zo603fsw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzR0CAHf/sfcaoB7I7Q6IqExiSndfgvJ1B8XDfGi5JIDkpEWrzl
-	UKsQnRfmc6TJM680jwIO8c4/SRULW1prFnDS5UfV7VWCvutOxNNFBlk3vcqZ/twf/WU=
-X-Gm-Gg: AZuq6aKx37Y11YHQ9PG00nsfC8h2NC94Zg2h9jJmDKYh92HPJjB04X+9b7AZW48iEKD
-	lQCy5wPYiKROx/dPhv3h/6MS352+LrpOLvcNG0e5WgSq927l7p0dUFJvq2TTM46st4uVnNXfRzX
-	WSaU+S55DJZ/9WVHFn9lHC/EwiYWv/JHOcoJiSYUJFIkbMUtt52hKQ4fioltyJDZkd8s7u09ruw
-	fGZpDAQ3mRFRaBFsxbRxg0wPGykxCj28dwV5Yno/pZC9b/+3i2/Bq+ecw/5OwtUBmgUlZz3o4Q5
-	GFf1PGj1yjkGhkpY+8Obbt/OBwQiZyMPqsn8ut+eLDPsTOXSBa+9aMFhVdH9q7uKrcca0Qlyelv
-	TqIazcEZgPl5aGqkjADUOnMdB4O+JCh6lUiqJenvtCPXi3mAfIa+DHGmcga0Y/GbEnAEcMdLaRs
-	b8WswSfFHwdwc=
-X-Received: by 2002:a05:600c:350b:b0:47a:935f:61a0 with SMTP id 5b1f17b1804b1-48069b9a017mr121874905e9.0.1769707784613;
-        Thu, 29 Jan 2026 09:29:44 -0800 (PST)
-Received: from draig.lan ([185.124.0.126])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-482da8eba27sm66755e9.6.2026.01.29.09.29.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jan 2026 09:29:43 -0800 (PST)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 067175F878;
-	Thu, 29 Jan 2026 17:29:43 +0000 (GMT)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>,  Joey Gouly <joey.gouly@arm.com>,
-  Catalin Marinas <catalin.marinas@arm.com>,  Suzuki K Poulose
- <suzuki.poulose@arm.com>,  Will Deacon <will@kernel.org>,  Paolo Bonzini
- <pbonzini@redhat.com>,  Jonathan Corbet <corbet@lwn.net>,  Shuah Khan
- <shuah@kernel.org>,  Oliver Upton <oupton@kernel.org>,  Dave Martin
- <Dave.Martin@arm.com>,  Fuad Tabba <tabba@google.com>,  Mark Rutland
- <mark.rutland@arm.com>,  Ben Horgan <ben.horgan@arm.com>,
-  linux-arm-kernel@lists.infradead.org,  kvmarm@lists.linux.dev,
-  linux-kernel@vger.kernel.org,  kvm@vger.kernel.org,
-  linux-doc@vger.kernel.org,  linux-kselftest@vger.kernel.org,  Peter
- Maydell <peter.maydell@linaro.org>,  Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v9 04/30] arm64/fpsimd: Check enable bit for FA64 when
- saving EFI state
-In-Reply-To: <76bf33a0-968d-4b99-a157-3eef076af69d@sirena.org.uk> (Mark
-	Brown's message of "Thu, 29 Jan 2026 16:41:05 +0000")
-References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org>
-	<20251223-kvm-arm64-sme-v9-4-8be3867cb883@kernel.org>
-	<87343o8jay.fsf@draig.linaro.org>
-	<76bf33a0-968d-4b99-a157-3eef076af69d@sirena.org.uk>
-User-Agent: mu4e 1.14.0-pre1; emacs 30.1
-Date: Thu, 29 Jan 2026 17:29:42 +0000
-Message-ID: <87wm1072ex.fsf@draig.linaro.org>
+	s=arc-20240116; t=1769708008; c=relaxed/simple;
+	bh=auwU+QBgHhgH17KufQIhJdeBeH5zMEuEcX0YOFiVem4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VacmiWKjWKC6CDpdVIrbQB2np5KZbDDqRJoi7a92tqrfFphkL8x5zQgmZu69o/LgXLM/vZr5QqTqogktK8wNu44d5H1H9WcFKOeNCmU5TuW+vYQ1ak3Zrpo1dOS6VWOblfINu/C47RdokGoJhY1hwzDO3Wfn0+Jl6c6lX/SYm2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf01.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay10.hostedemail.com (Postfix) with ESMTP id 59957C1143;
+	Thu, 29 Jan 2026 17:33:24 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf01.hostedemail.com (Postfix) with ESMTPA id F05996000F;
+	Thu, 29 Jan 2026 17:33:20 +0000 (UTC)
+Date: Thu, 29 Jan 2026 12:33:33 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 18/30] tracing: Check for undefined symbols in
+ simple_ring_buffer
+Message-ID: <20260129123333.0fd202f7@gandalf.local.home>
+In-Reply-To: <20260126104419.1649811-19-vdonnefort@google.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com>
+	<20260126104419.1649811-19-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: F05996000F
+X-Stat-Signature: o9j95uhm9j8efrdgmk8y4j5fexwz3idk
+X-Rspamd-Server: rspamout08
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX195dtwkrQT53/vFwD6QG82Q6vcucrU+d38=
+X-HE-Tag: 1769708000-307468
+X-HE-Meta: U2FsdGVkX19dFv0bDGXtajpi9gIAkPXXQ9oDOgmRZBRmxlm8Acxyn18GR3Tmtn0vFh7pabfVByLquAgT+uc4JK6bX73G6GCsvAfGS/gwxwBPOQwg6efHDhZIshRrRudtF8Xkv2LniQiLQTNbanq+fHp3VZd8QtR6DSmd5EmzSb8wqlmsgTyiAcKYhgYLZNDAnf4o0rTenTpSqSV7S5hpSr61etGLq4AFNJD4ZoZUiV7t6YI9WKzH8HoC1PkBaEGlsGQM3Af/ScefsG0V+PKoACC8OlNF28zt5PU+WI+eYBfmHl04QVXgXv0CwYzQUXBXNcLm1kx15d7gLGdHZ7Fqf+DFp1BnPS4UCFrag7mOKL33yhs3WV8KE65DQ2o+fHjeIgRKEs2YaSNcsWEqhPkJdQ==
 
-Mark Brown <broonie@kernel.org> writes:
+On Mon, 26 Jan 2026 10:44:07 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-> On Thu, Jan 29, 2026 at 04:39:33PM +0000, Alex Benn=C3=A9e wrote:
->> Mark Brown <broonie@kernel.org> writes:
->
->> > Currently when deciding if we need to save FFR when in streaming mode =
-prior
->> > to EFI calls we check if FA64 is supported by the system. Since KVM gu=
-est
->> > support will mean that FA64 might be enabled and disabled at runtime s=
-witch
->> > to checking if traps for FA64 are enabled in SMCR_EL1 instead.
->
->> This is conflicting with the now merged 63de2b3859ba1 (arm64/efi: Remove
->> unneeded SVE/SME fallback preserve/store handling) so I think this patch
->> can now be dropped?
->
-> Yes, this should go away in the next rebase.
+> The simple_ring_buffer implementation must remain simple enough to be
+> used by the pKVM hypervisor. Prevent the object build if unresolved
+> symbols are found.
+> 
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-Everything else applies cleanly though so thats good ;-)
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+-- Steve
+
+> 
+> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> index 9e86c43bf320..9f675d5d27c7 100644
+> --- a/kernel/trace/Makefile
+> +++ b/kernel/trace/Makefile
+> @@ -131,4 +131,20 @@ obj-$(CONFIG_TRACE_REMOTE) += trace_remote.o
+>  obj-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o
+>  obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+>  
+> +#
+> +# simple_ring_buffer is used by the pKVM hypervisor which does not have access
+> +# to all kernel symbols. Fail the build if forbidden symbols are found.
+> +#
+> +UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
+> +UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer
+> +UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+> +
+> +quiet_cmd_check_undefined = NM      $<
+> +      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
+> +
+> +$(obj)/%.o.checked: $(obj)/%.o FORCE
+> +	$(call if_changed,check_undefined)
+> +
+> +always-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o.checked
+> +
+>  libftrace-y := ftrace.o
+
