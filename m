@@ -1,174 +1,258 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A8735FF43;
-	Fri, 30 Jan 2026 17:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348A337F738
+	for <kvmarm@lists.linux.dev>; Fri, 30 Jan 2026 19:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769794002; cv=none; b=Ro6Wb7V5rj9lmnyvj/si608kqAuijEz6Vga8u8GRbJ5UDnx2w+dPp7kIQSvRHY2Val+M0DRDU692mUri40DxfcqaKUfCTeQ2G4HX3y5elYfjz4vEVcoAvROhsA1w1BUgR5ydZ+0aXTokI3oNGuh3xd2P4cB406KIBbPqD3Kvd9I=
+	t=1769801324; cv=none; b=atlIRmysu7lO62cAfjwRWWIsXNl7PPR0seqg0/XWfst/l7GdGnwJ8yWwBhuLyNYPmxL2fhUnBrucp4l9XqYrZNbklXoE1H1AOvVsdRiY4s9/Wh580/iSNcnHyENSzYehqMpps4kObmZNGql3oQBz0bsavhPhegWZQ+q7BMfxxXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769794002; c=relaxed/simple;
-	bh=M/J2fDQm2LgYTOtygveeKcKFKa3ZI9LGFPJPx+f2kn0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jXrNi0qaXxUXg2ima/pyyBU4DE8b3lkK5bp8j6NXLbvDM+TvS6/3Q54cW52xHV3B4WHxWtPILDQeEwOwW5PepZ+utw74GMsKGzsio/GoaqY2fqHJ9hkcvi47eA4vOgTd1PRA+GQ6bDhjNqWO22bv57Xl4zZZ7cDZ1//fGxEmGOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNG9iBZd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769801324; c=relaxed/simple;
+	bh=xha2tKLV6loVZapX6DrV2TpHDlxU/QfYCAu+9gTx3UM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=K7fe9drcdJ2Ev2wRfXQAj8Rjb0DJ4Pok+xhVuv6+fwkOxD55aD6Mm3pC6EuzXXSLcFciR/9JBirzhGCTdxa0v5GqlYOin3ZyoX3BwBpDad1/K1Yl7fwi1yWfa5y/aA3PzK7O/USg3gEJYoZgVEuI1uZxzssXRwPzX7IxBgKdQ5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XyKIrkXL; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jiaqiyan.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNG9iBZd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DD9DC116C6;
-	Fri, 30 Jan 2026 17:26:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769794002;
-	bh=M/J2fDQm2LgYTOtygveeKcKFKa3ZI9LGFPJPx+f2kn0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jNG9iBZdzYRLsPfcV3qNhestvrsV2JaXANbl6G0erDL29XxcuEuD32xOPeBR823Cu
-	 DjMDgBtTXeziu09ExIUwKXSciGbe9zSbLLJX3Mf4XGO04ZKuyQqmPzNqxqpVRI0WKZ
-	 Be/fSFhid/omnw0+b0NIk9PwxMxeV5Wyp+f746+IWkpUzOR0VllgV9Wk3KNet1x95J
-	 Z1mv2Hl60f6nA3LDuh88q8wThgfTYF5xOXb2/8f415oX+b+/R+J58J/FEUDkZU74WL
-	 fpzqhG8uI+AV4yMbsF4Z0D78ry7urDu8IIjGO4l1oCPkGR4q6IA5trR2U5A2iGAIBV
-	 u3CetnGjoJ4wg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlsGV-000000077vO-3lzt;
-	Fri, 30 Jan 2026 17:26:39 +0000
-Date: Fri, 30 Jan 2026 17:26:39 +0000
-Message-ID: <86zf5v9flc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	Timothy Hayes
-	<Timothy.Hayes@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	nd
-	<nd@arm.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	"oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>
-Subject: Re: [PATCH v4 11/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
-In-Reply-To: <6a45dd02fdd2e70e0722dc5b3087ecfb18f01e98.camel@arm.com>
-References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-12-sascha.bischoff@arm.com>
-	<861pj7baav.wl-maz@kernel.org>
-	<6a45dd02fdd2e70e0722dc5b3087ecfb18f01e98.camel@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XyKIrkXL"
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c613426e8dcso4216090a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 30 Jan 2026 11:28:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769801321; x=1770406121; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rjy71wms5szan9FXTuTPKKlYyd/zTVsqWF/S5ag+Qgc=;
+        b=XyKIrkXLxhJqwU5Yg5EoyrOrYEaWrE4hs44cHZM2096ZiZ0Ws00oO/U+x+/VVvm7QZ
+         m63OIyR+M9aKCWCwiizKc7QLrNvm8Z/kXWM4KSFcGOjMxs3vqzGq3Ya/SgZTlJTghoSo
+         5Q9BR0CGKWTBOYyOkOykFIvVqmVkjLEfo7nmg4C+PmGxOe2WfEJ2zeHqC/bWnDdTq7xJ
+         DcqQLTAPROzN5Yxk38arj2vG5GjnvNBnJEbTGWb2g5h+ASD+wlwZxsuCkBnrcHOaDKbl
+         A8p278kXu5zlEhDipoXhA0n5mSzIDOgg7AWBqr0yAXMArSjZDCE94U0SflHgJRm/Etgh
+         o9Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769801321; x=1770406121;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rjy71wms5szan9FXTuTPKKlYyd/zTVsqWF/S5ag+Qgc=;
+        b=hWoFMFUplr7At2TwjYfNtm2XjkuIKtP+RncYOFZly/t7TJzzVm/DPuLdmbv76nvgZy
+         o5TnzCaB5P1CKO6ulr2AmcbNtQ72Ulty6/3//vrvPdDtmoGpNbYvXi5R7MDQ8rvxZsVR
+         /CUtxtnn8quWZry7Ol3Rh46RxJj7atZLPWl1+7rVX/WX8whQa5GjPU6he7mmHZJnp0Yj
+         X7ibBz7S7nIHFx8w0iTqZhkbwKYphfYDBw97/r/0i1L/ZfdKuszT9fBZ5TJ7LdLq7CoW
+         rqI4r5mGTIwsv/YAXC0tJZbIyM0s0XAyh0ID5UTZNSWiWkTPz7Kppi2advfsQkdgSaAP
+         zAeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtDsPWK6LKj5hhCWLaAVAvIwQID6+cZS4SmWdh7fgbvPDc8TFrhzsvwz32evrBWj6ACEj0ewk=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwSd98TPsezHpmT6EYCe6ePWl2zB6nLo0aLGt+4S7xsj56IK1pV
+	OJGQX20bJfM6VyGAyYC/ncNzDayjcnMkLcd/JZNd1R475MuINT2tX63qmImv3w+Im2rl45HiBgs
+	GtVwUkjAGJZ9JaA==
+X-Received: from pgct22.prod.google.com ([2002:a05:6a02:5296:b0:bd9:19be:503c])
+ (user=jiaqiyan job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a20:a11c:b0:38e:9d3b:470b with SMTP id adf61e73a8af0-392e01096dbmr3663945637.42.1769801321501;
+ Fri, 30 Jan 2026 11:28:41 -0800 (PST)
+Date: Fri, 30 Jan 2026 19:28:37 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, yuzenghui@huawei.com, Timothy.Hayes@arm.com, Suzuki.Poulose@arm.com, nd@arm.com, peter.maydell@linaro.org, kvmarm@lists.linux.dev, jonathan.cameron@huawei.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Joey.Gouly@arm.com, lpieralisi@kernel.org, oliver.upton@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
+Message-ID: <20260130192837.890688-1-jiaqiyan@google.com>
+Subject: [PATCH v1] KVM: selftests: Improve sea_to_user test
+From: Jiaqi Yan <jiaqiyan@google.com>
+To: oupton@kernel.org
+Cc: sebott@redhat.com, gshan@redhat.com, yuzenghui@huawei.com, maz@kernel.org, 
+	rananta@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jiaqi Yan <jiaqiyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 30 Jan 2026 17:13:18 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
->=20
-> On Fri, 2026-01-30 at 11:38 +0000, Marc Zyngier wrote:
-> > On Wed, 28 Jan 2026 18:02:09 +0000,
-> > Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> > >=20
-> > > Set the guest's view of the GCIE field to IMP when running a GICv5
-> > > VM,
-> > > NI otherwise. Reject any writes to the register that try to do
-> > > anything but set GCIE to IMP when running a GICv5 VM.
-> > >=20
-> > > As part of this change, we're also required to extend
-> > > vgic_is_v3_compat() to check for the actual vgic_model. This has
-> > > one
-> > > potential issue - if any of the vgic_is_v*() checks are used prior
-> > > to
-> > > setting the vgic_model (that is, before kvm_vgic_create) then
-> > > vgic_model will be set to 0, which can result in a false-positive.
-> > >=20
-> > > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> > > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> > > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> > > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> > > ---
-> > > =C2=A0arch/arm64/kvm/sys_regs.c=C2=A0 | 42 ++++++++++++++++++++++++++=
-++++----
-> > > ----
-> > > =C2=A0arch/arm64/kvm/vgic/vgic.h | 10 ++++++++-
-> > > =C2=A02 files changed, 43 insertions(+), 9 deletions(-)
-> > >=20
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 88a57ca36d96..73dd2bd85c4f 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
-> > > =C2=A0
-> > > =C2=A0static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu,
-> > > u64 val);
-> > > =C2=A0static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu,
-> > > u64 val);
-> > > +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu,
-> > > u64 val);
-> > > =C2=A0static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu,
-> > > u64 val);
-> > > =C2=A0
-> > > =C2=A0/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > > @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const
-> > > struct kvm_vcpu *vcpu,
-> > > =C2=A0		val =3D sanitise_id_aa64pfr1_el1(vcpu, val);
-> > > =C2=A0		break;
-> > > =C2=A0	case SYS_ID_AA64PFR2_EL1:
-> > > -		val &=3D ID_AA64PFR2_EL1_FPMR |
-> > > -			(kvm_has_mte(vcpu->kvm) ?
-> > > -			 ID_AA64PFR2_EL1_MTEFAR |
-> > > ID_AA64PFR2_EL1_MTESTOREONLY :
-> > > -			 0);
-> > > +		val =3D sanitise_id_aa64pfr2_el1(vcpu, val);
-> > > =C2=A0		break;
-> > > =C2=A0	case SYS_ID_AA64ISAR1_EL1:
-> > > =C2=A0		if (!vcpu_has_ptrauth(vcpu))
-> > > @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const
-> > > struct kvm_vcpu *vcpu, u64 val)
-> > > =C2=A0	return val;
-> > > =C2=A0}
-> > > =C2=A0
-> > > +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu,
-> > > u64 val)
-> > > +{
-> > > +	val &=3D ID_AA64PFR2_EL1_FPMR |
-> > > +	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ID_AA64PFR2_EL1_MTEFAR |
-> > > +	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ID_AA64PFR2_EL1_MTESTOREONLY;
-> > > +
-> > > +	if (!kvm_has_mte(vcpu->kvm)) {
-> > > +		val &=3D ~ID_AA64PFR2_EL1_MTEFAR;
-> > > +		val &=3D ~ID_AA64PFR2_EL1_MTESTOREONLY;
-> > > +	}
-> > > +
-> > > +	if (vgic_is_v5(vcpu->kvm))
-> > > +		val |=3D SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE,
-> > > IMP);
-> >=20
-> > You probably want to clear the field before or'ing something in, or
-> > you may be promising more than we'd expect.
->=20
-> The GCIE field should already be zeroed at this point as it is filtered
-> out to begin with. If we have GICv5 (so FEAT_GCIE) we're explicitly
-> setting this field to IMP, else NI.
+Several improvments to the test for KVM_EXIT_ARM_SEA:
 
-As you can tell by now, I can't read. Apologies for the noise.
+- Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
+  unhandled MMIO kvm exit.
 
-Thanks,
+- Sync far_invalid to guest.
 
-	M.
+- Exit test with KSFT_SKIP or KSFT_FAIL when should.
 
---=20
-Without deviation from the norm, progress is not possible.
+- Add comment about VM backing memory type.
+
+Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+---
+ .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
+ 1 file changed, 53 insertions(+), 41 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+index 573dd790aeb8e..4a3511fa1f940 100644
+--- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
++++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+@@ -12,6 +12,11 @@
+  * including the notrigger feature. Otherwise the test will be skipped.
+  * The under-test platform's APEI should be unable to claim SEA. Otherwise
+  * the test will also be skipped.
++ *
++ * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
++ * there are more than 4 1G hugepage on the system. They can be allocated
++ * at runtime by:
++ *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+  */
+ 
+ #include <signal.h>
+@@ -98,11 +103,15 @@ static void write_einj_entry(const char *einj_path, uint64_t val)
+ 
+ static void inject_uer(uint64_t paddr)
+ {
+-	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1)
+-		ksft_test_result_skip("EINJ table no available in firmware");
++	if (access("/sys/firmware/acpi/tables/EINJ", R_OK) == -1) {
++		ksft_test_result_skip("EINJ table not available in firmware\n");
++		exit(KSFT_SKIP);
++	}
+ 
+-	if (access(EINJ_ETYPE, R_OK | W_OK) == -1)
+-		ksft_test_result_skip("EINJ module probably not loaded?");
++	if (access(EINJ_ETYPE, R_OK | W_OK) == -1) {
++		ksft_test_result_skip("EINJ module probably not loaded?\n");
++		exit(KSFT_SKIP);
++	}
+ 
+ 	write_einj_entry(EINJ_ETYPE, ERROR_TYPE_MEMORY_UER);
+ 	write_einj_entry(EINJ_FLAGS, MASK_MEMORY_UER);
+@@ -123,12 +132,13 @@ static void sigbus_signal_handler(int sig, siginfo_t *si, void *v)
+ 	ksft_print_msg("SIGBUS (%d) received, dumping siginfo...\n", sig);
+ 	ksft_print_msg("si_signo=%d, si_errno=%d, si_code=%d, si_addr=%p\n",
+ 		       si->si_signo, si->si_errno, si->si_code, si->si_addr);
+-	if (si->si_code == BUS_MCEERR_AR)
++	if (si->si_code == BUS_MCEERR_AR) {
+ 		ksft_test_result_skip("SEA is claimed by host APEI\n");
+-	else
++		exit(KSFT_SKIP);
++	} else {
+ 		ksft_test_result_fail("Exit with signal unhandled\n");
+-
+-	exit(0);
++		exit(KSFT_FAIL);
++	}
+ }
+ 
+ static void setup_sigbus_handler(void)
+@@ -158,7 +168,6 @@ static void expect_sea_handler(struct ex_regs *regs)
+ {
+ 	u64 esr = read_sysreg(esr_el1);
+ 	u64 far = read_sysreg(far_el1);
+-	bool expect_far_invalid = far_invalid;
+ 
+ 	GUEST_PRINTF("Handling Guest SEA\n");
+ 	GUEST_PRINTF("ESR_EL1=%#lx, FAR_EL1=%#lx\n", esr, far);
+@@ -166,7 +175,7 @@ static void expect_sea_handler(struct ex_regs *regs)
+ 	GUEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_CUR);
+ 	GUEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+ 
+-	if (expect_far_invalid) {
++	if (far_invalid) {
+ 		GUEST_ASSERT_EQ(esr & ESR_ELx_FnV, ESR_ELx_FnV);
+ 		GUEST_PRINTF("Guest observed garbage value in FAR\n");
+ 	} else {
+@@ -185,25 +194,19 @@ static void vcpu_inject_sea(struct kvm_vcpu *vcpu)
+ 	vcpu_events_set(vcpu, &events);
+ }
+ 
+-static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++static void validate_kvm_exit_arm_sea(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ {
+-	struct ucall uc;
+-	bool guest_done = false;
+ 	struct kvm_run *run = vcpu->run;
+ 	u64 esr;
+ 
+-	/* Resume the vCPU after error injection to consume the error. */
+-	vcpu_run(vcpu);
++	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
+ 
+-	ksft_print_msg("Dump kvm_run info about KVM_EXIT_%s\n",
+-		       exit_reason_str(run->exit_reason));
++	ksft_print_msg("Dumping kvm_run as arm_sea:\n");
+ 	ksft_print_msg("kvm_run.arm_sea: esr=%#llx, flags=%#llx\n",
+ 		       run->arm_sea.esr, run->arm_sea.flags);
+ 	ksft_print_msg("kvm_run.arm_sea: gva=%#llx, gpa=%#llx\n",
+ 		       run->arm_sea.gva, run->arm_sea.gpa);
+ 
+-	TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_ARM_SEA);
+-
+ 	esr = run->arm_sea.esr;
+ 	TEST_ASSERT_EQ(ESR_ELx_EC(esr), ESR_ELx_EC_DABT_LOW);
+ 	TEST_ASSERT_EQ(esr & ESR_ELx_FSC_TYPE, ESR_ELx_FSC_EXTABT);
+@@ -211,39 +214,48 @@ static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
+ 	TEST_ASSERT_EQ((esr & ESR_ELx_INST_SYNDROME), 0);
+ 	TEST_ASSERT_EQ(esr & ESR_ELx_VNCR, 0);
+ 
+-	if (!(esr & ESR_ELx_FnV)) {
+-		ksft_print_msg("Expect gva to match given FnV bit is 0\n");
++	far_invalid = esr & ESR_ELx_FnV;
++	sync_global_to_guest(vm, far_invalid);
++
++	if (!far_invalid) {
++		ksft_print_msg("Expect gva to match\n");
+ 		TEST_ASSERT_EQ(run->arm_sea.gva, EINJ_GVA);
+ 	}
+ 
+ 	if (run->arm_sea.flags & KVM_EXIT_ARM_SEA_FLAG_GPA_VALID) {
+-		ksft_print_msg("Expect gpa to match given KVM_EXIT_ARM_SEA_FLAG_GPA_VALID is set\n");
++		ksft_print_msg("Expect gpa to match\n");
+ 		TEST_ASSERT_EQ(run->arm_sea.gpa, einj_gpa & PAGE_ADDR_MASK);
+ 	}
++}
+ 
+-	far_invalid = esr & ESR_ELx_FnV;
+-
+-	/* Inject a SEA into guest and expect handled in SEA handler. */
+-	vcpu_inject_sea(vcpu);
++static void run_vm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++	bool guest_done = false;
+ 
+ 	/* Expect the guest to reach GUEST_DONE gracefully. */
+ 	do {
+ 		vcpu_run(vcpu);
+-		switch (get_ucall(vcpu, &uc)) {
+-		case UCALL_PRINTF:
+-			ksft_print_msg("From guest: %s", uc.buffer);
+-			break;
+-		case UCALL_DONE:
+-			ksft_print_msg("Guest done gracefully!\n");
+-			guest_done = 1;
+-			break;
+-		case UCALL_ABORT:
+-			ksft_print_msg("Guest aborted!\n");
+-			guest_done = 1;
+-			REPORT_GUEST_ASSERT(uc);
+-			break;
+-		default:
+-			TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
++		if (vcpu->run->exit_reason == KVM_EXIT_ARM_SEA) {
++			validate_kvm_exit_arm_sea(vm, vcpu);
++			vcpu_inject_sea(vcpu);
++		} else {
++			switch (get_ucall(vcpu, &uc)) {
++			case UCALL_PRINTF:
++				ksft_print_msg("From guest: %s", uc.buffer);
++				break;
++			case UCALL_DONE:
++				ksft_print_msg("Guest done gracefully!\n");
++				guest_done = 1;
++				break;
++			case UCALL_ABORT:
++				ksft_print_msg("Guest aborted!\n");
++				guest_done = 1;
++				REPORT_GUEST_ASSERT(uc);
++				break;
++			default:
++				TEST_FAIL("Unexpected ucall: %lu\n", uc.cmd);
++			}
+ 		}
+ 	} while (!guest_done);
+ }
+-- 
+2.53.0.rc2.204.g2597b5adb4-goog
+
