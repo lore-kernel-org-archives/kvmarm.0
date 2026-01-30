@@ -1,79 +1,167 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB95D3168EF
-	for <kvmarm@lists.linux.dev>; Fri, 30 Jan 2026 10:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC29379979;
+	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769767211; cv=none; b=q9zyLBiQg5YVOXgE0PdgRYMLrQ3ggKOvYA9/0OCbpdQ+j2X1DN5yAjeEbJwMfUdT4zBnSCUZBPfzGWMXb5bVXCe+xX7B6sRGiHJ1ySnzajEf75h9dw5+ROs8iFmWFG19wAQiDSu+STF7sQFggukUfIPXPrAJ5REAjT4kgDVdFC8=
+	t=1769771026; cv=none; b=gAY8oWVA8qiN5C0gywZtQh9mab5Xw3T2FXxA5EjNZYLQ6QfJ+pvhVGdWhhBsA11T0v6ZsfLhLhwFk8j+B6RxkIgLJa6uvtCM8cCT+0v3lvwGL8S9Ub5Fm+vkxQ1kFqAgCBhhkLaKxf9m2Rg15DXNG57AZIlNxybWTKZsdPw42jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769767211; c=relaxed/simple;
-	bh=n560YUW918HfytFqlbMcXwZThFp5BeKFVRQ7nLTXFfw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=koU+ZM0eIokPyFVCZWbu4rEk3OC1UANX16+kxJeInqZmT/caKmF0FhEVosKZFyPv8TQzbbZOIq2AFm0qXMeu2ulHa0f4J3PyApWVe42xgolGfDGE5r93JBgTBB6141D2E3mRmIUgpr9ceBse4Ldp+0WerweEvMkLuYKyd2+5AKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cna2S/7l; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769771026; c=relaxed/simple;
+	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cuo+hXjM9ACaldnwNch4HOrunN/eIoFcMqkDtqAR/95hHlqdZ6rC4xWD71gWBF9bG+0y6HPF8N12cZrzylL/McZS1HmAVirbzwctZODnGEI1kYDLRd8+QdtrakNC/p3CfvBJteaKvzoeNdfaGJrh2QhHu4vkL7CwgtCQFZpLtLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U/cRYyPI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cna2S/7l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54057C4CEF7;
-	Fri, 30 Jan 2026 10:00:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U/cRYyPI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486BFC4CEF7;
+	Fri, 30 Jan 2026 11:03:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769767211;
-	bh=n560YUW918HfytFqlbMcXwZThFp5BeKFVRQ7nLTXFfw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Cna2S/7l9k/UfECX1DGp6+UN9yxW/9XqF9nNMp5BEaseIxRGacLYszWqKMJivll23
-	 oKlWWpD5xFwkWHTKbxXT19sHSaEHuUjZOpCWRtC3S1kRAG1+6Xo7pUaLdtgQt/j6/m
-	 WnBGjGah9affdj1AuPpZ+sVJxGrQKm68DNFk/XaY24sXXk/+iq3AggRKpKECMUP8Cy
-	 /grOBaAMuSwEVhXBxuK3Jf/7DJINQXf59zVXPvPrRvTNObZt/QCKn3INyUTkMRLUk7
-	 yWgH+Ha9BS3knDJpVKGX6meTbYjhmSA9OoQlaMT0npM7TIgsKvCLUisbdiSCoP4Oij
-	 68x2xp68OPHfQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1769771026;
+	bh=b38Rv5/cdNrq8B4fEOLBB08SrNNsLGpLWY/NWYJxCBI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U/cRYyPIeNk+mH9kkKHgfKuinAWpbwOQUwLhRpYwMe3nwakojxxYtZ0GovQ4hc8KM
+	 1AarUWS9JEJjy1u/b4b2y8easykMTJKLZwLKQZ2s53RquSCVtNjdR9OxubxMkKn9ZL
+	 0D4lUahnDxu0XQBkxRbCKZuQbKIYKw3iDLahXACjVar7eiFjr9s3MsjOE5o6sey2VQ
+	 jC5Wzp8iDeDQ+24c53Apwo9rM8hUfoj7sQRqoXeD6lc+SDRRJ8QpShc0ZmjC6MyWOb
+	 Mty396Zom/TerG1J7OhAdRnyAQfATcxrKwh5LSvEtXxSGmsQL43OGdgERMtYa5YJKM
+	 Y4orVhX1/+zEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vllIO-000000071Qk-3Cqw;
-	Fri, 30 Jan 2026 10:00:08 +0000
+	id 1vlmHv-000000072Q6-3FVG;
+	Fri, 30 Jan 2026 11:03:43 +0000
+Date: Fri, 30 Jan 2026 11:03:43 +0000
+Message-ID: <864io3bbw0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	wanghaibin.wang@huawei.com
-Subject: Re: [PATCH] KVM: arm64: nv: Add trap config for DBGWCR<15>_EL1
-Date: Fri, 30 Jan 2026 10:00:05 +0000
-Message-ID: <176976718623.2311376.10358603736006188355.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260130094435.39942-1-zenghui.yu@linux.dev>
-References: <20260130094435.39942-1-zenghui.yu@linux.dev>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v4 10/36] KVM: arm64: gic-v5: Detect implemented PPIs on boot
+In-Reply-To: <20260128175919.3828384-11-sascha.bischoff@arm.com>
+References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
+	<20260128175919.3828384-11-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, wanghaibin.wang@huawei.com
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 30 Jan 2026 17:44:35 +0800, Zenghui Yu wrote:
-> Seems that it was missed when MDCR_EL2 was first added to the trap
-> forwarding infrastructure. Add it back.
+On Wed, 28 Jan 2026 18:01:54 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
+> As part of booting the system and initialising KVM, create and
+> populate a mask of the implemented PPIs. This mask allows future PPI
+> operations (such as save/restore or state, or syncing back into the
+> shadow state) to only consider PPIs that are actually implemented on
+> the host.
 > 
+> The set of implemented virtual PPIs matches the set of implemented
+> physical PPIs for a GICv5 host. Therefore, this mask represents all
+> PPIs that could ever by used by a GICv5-based guest on a specific
+> host.
+> 
+> Only architected PPIs are currently supported in KVM with
+> GICv5. Moreover, as KVM only supports a subset of all possible PPIS
+> (Timers, PMU, GICv5 SW_PPI) the PPI mask only includes these PPIs, if
+> present. The timers are always assumed to be present; if we have KVM
+> we have EL2, which means that we have the EL1 & EL2 Timer PPIs. If we
+> have a PMU (v3), then the PMUIRQ is present. The GICv5 SW_PPI is
+> always assumed to be present.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c    |  4 ++++
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 33 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.h         |  1 +
+>  include/kvm/arm_vgic.h             |  5 +++++
+>  include/linux/irqchip/arm-gic-v5.h | 10 +++++++++
+>  5 files changed, 53 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 86c149537493..653364299154 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -750,5 +750,9 @@ int kvm_vgic_hyp_init(void)
+>  	}
+>  
+>  	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
+> +
+> +	/* Always safe to call */
+> +	vgic_v5_get_implemented_ppis();
 
-Applied to next, thanks!
+What is the reason for calling this from the generic code, while it is
+v5-specific? I'd have expected this to be entirely contained in the v5
+subsystem.
 
-[1/1] KVM: arm64: nv: Add trap config for DBGWCR<15>_EL1
-      commit: 9d46e83a72392a644604458448a72d7c45977f0f
 
-Cheers,
+> +
+>  	return 0;
+>  }
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 23d0a495d855..9bd5a85ba203 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -8,6 +8,8 @@
+>  
+>  #include "vgic.h"
+>  
+> +static struct vgic_v5_ppi_caps *ppi_caps;
+> +
+>  /*
+>   * Probe for a vGICv5 compatible interrupt controller, returning 0 on success.
+>   * Currently only supports GICv3-based VMs on a GICv5 host, and hence only
+> @@ -53,3 +55,34 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  
+>  	return 0;
+>  }
+> +
+> +/*
+> + * Not all PPIs are guaranteed to be implemented for GICv5. Deterermine which
+> + * ones are, and generate a mask.
+> + */
+> +void vgic_v5_get_implemented_ppis(void)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
+> +		return;
+> +
+> +	/* Never freed again */
+> +	ppi_caps = kzalloc(sizeof(*ppi_caps), GFP_KERNEL);
+> +	if (!ppi_caps)
+> +		return;
+
+Maybe we can spare the call by statically allocating the PPI
+structure? Just the code calling kzalloc() costs us more than the 128
+bits required by the structure.
+
+Thanks,
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
