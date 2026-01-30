@@ -1,96 +1,241 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8EA367F28;
-	Fri, 30 Jan 2026 11:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335D13382F4
+	for <kvmarm@lists.linux.dev>; Fri, 30 Jan 2026 11:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769771942; cv=none; b=D38yLvYkVFGju7KgSrQJcOuitK/uQjfSz5JY3x9PQsgoTixxtuozhs2PQ9Ag4HyViv4y8mJBi53eMFgNeDj/rJIcWcBeTObOSw+IP24gYAtFOyr5U2il40+3J8GeevbVh1uyL+4wVeQYPikPPXE2Zhjwq//S+nfVm2gb0pMxklQ=
+	t=1769771978; cv=none; b=jrqbjEbutTXuTNF0WJUxZYDinwsRfX8IClAHY5xvxKIYqhnFgjwdzyvVHNcBwAss7sRJvWtElZWa6gYps4t5iryFkQ9UEUqPRfBx9ZmLnC/PBxjqr+kByH1wINRvfkl1FoNheXs6n8c+FA7hw2xGdqr70aYkvZZdZj68L9WScvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769771942; c=relaxed/simple;
-	bh=PQ+p73R80ETqkVCGJZy86pYL5c9ExyceZZ1ihJeBk6A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kliYtK1VqVIICTqko6toYLjrrzcXW5MYUEIpvXuoTLMcUAtKDXlJNQPafuiRD1Vs2gQk2NFgizrJjGZjZx3TkfC5nrykYRs3u8uCpXQlgs+Ef0N7ui0N5MhZYsB6rsJQc3H4Ja2q5It2sDQsL5IbVCWDVHr6yanSInM/ThijaRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyMsJfQz; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyMsJfQz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47BA9C4CEF7;
-	Fri, 30 Jan 2026 11:19:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769771942;
-	bh=PQ+p73R80ETqkVCGJZy86pYL5c9ExyceZZ1ihJeBk6A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IyMsJfQzjbkS4YBP1Z4DaBLKbyhqrJBvxRwvXEQOg/WwbLCPnvY8FtC1F8+zB92xj
-	 TCvbeDXUNQlAPMr5pdUcGFIZ/xsyR7Lp/hccOYRvryUUB7EUYJAdOi5f3n+YGZfDux
-	 HCWyT7KzcsGvHrOQfTtcMPCFxnHIZFaysYjmtN8eXykvVcpqg3X7NHg+A2DPEKEORw
-	 AwD1xG1u+HjXXSXIZMXGvvCLP4GDYh4G4txPB/tNzMD5mm7ekZcrk9tNoX+sFoHyR1
-	 X7Z3COTKCTQBqfx57wJ21fm3G5WmdMfz+ghp0JEPOlv1u7RKHuIfhr5Ek22o88Sd3Z
-	 1bRF6eQelSlYg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlmWi-000000072qr-0Xg1;
-	Fri, 30 Jan 2026 11:19:00 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: nd <nd@arm.com>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	yuzenghui@huawei.com,
-	peter.maydell@linaro.org,
-	lpieralisi@kernel.org,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	jonathan.cameron@huawei.com,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: (subset) [PATCH v4 00/36] KVM: arm64: Introduce vGIC-v5 with PPI support
-Date: Fri, 30 Jan 2026 11:18:57 +0000
-Message-ID: <176977191232.2312774.6420835979447644993.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
+	s=arc-20240116; t=1769771978; c=relaxed/simple;
+	bh=F9+2HWePr9b+krO6Qe1amKT2hQ/E8972Oy70sJrOqPk=;
+	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RJEXdQsJBB/7W2OjrTcpQTTtB2ubnqdgRgpJBtovdLt6qbkcPe1MZp0899BTQUersA91+0CdbyRWhiTtmY9jNqPd+3ujU01sV38vWOK7sj9ZTewDXzpP4AIesKpdCzGJRS4lHaUHOG07f/WFt/65HKvFfdh/qU0fDurwIrOBHaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0EE3A153B;
+	Fri, 30 Jan 2026 03:19:29 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A74593F73F;
+	Fri, 30 Jan 2026 03:19:30 -0800 (PST)
+Message-ID: <c97c3b57-7cfe-4c26-9c1c-f790371748b0@arm.com>
+Date: Fri, 30 Jan 2026 11:19:29 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, Sascha.Bischoff@arm.com, nd@arm.com, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 28/47] arm_mpam: resctrl: Add support for csu counters
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-29-ben.horgan@arm.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <20260112165914.4086692-29-ben.horgan@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 28 Jan 2026 17:59:19 +0000, Sascha Bischoff wrote:
-> This is the v4 of the patch series to add the virtual GICv5 [1] device
-> (vgic_v5). Only PPIs are supported by this initial series, and the
-> vgic_v5 implementation is restricted to the CPU interface,
-> only. Further patch series are to follow in due course, and will add
-> support for SPIs, LPIs, the GICv5 IRS, and the GICv5 ITS.
+Replying to myself...
+
+On 1/12/26 16:58, Ben Horgan wrote:
+> From: James Morse <james.morse@arm.com>
 > 
-> v1, v2, and v3 of this series can be found at [2], [3], [4], respectively.
+> resctrl exposes a counter via a file named llc_occupancy. This isn't really
+> a counter as its value goes up and down, this is a snapshot of the cache
+> storage usage monitor.
 > 
-> [...]
+> Add some picking code to find a cache as close as possible to the L3 that
+> supports the CSU monitor.
+> 
+> If there is an L3, but it doesn't have any controls, force the L3 resource
+> to exist. The existing topology_matches_l3() and
+> mpam_resctrl_domain_hdr_init() code will ensure this looks like the L3,
+> even if the class belongs to a later cache.
+> 
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Co-developed-by: Dave Martin <dave.martin@arm.com>
+> Signed-off-by: Dave Martin <dave.martin@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> Changes since rfc:
+> Allow csu counters however many partid or pmg there are
+> else if -> if
+> reduce scope of local variables
+> drop has_csu
+> 
+> Changes since v2:
+> return -> break so works for mbwu in later patch
+> add for_each_mpam_resctrl_mon
+> return error from mpam_resctrl_monitor_init(). It may fail when is abmc
+> allocation introduced in a later patch.
+> Squashed in patch from Dave Martin:
+> https://lore.kernel.org/lkml/20250820131621.54983-1-Dave.Martin@arm.com/
+> ---
+>  drivers/resctrl/mpam_internal.h |   6 ++
+>  drivers/resctrl/mpam_resctrl.c  | 173 +++++++++++++++++++++++++++++++-
+>  2 files changed, 174 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+> index f89ceaf7623d..21cc776e57aa 100644
+> --- a/drivers/resctrl/mpam_internal.h
+> +++ b/drivers/resctrl/mpam_internal.h
+> @@ -349,6 +349,12 @@ struct mpam_resctrl_res {
+>  	struct rdt_resource	resctrl_res;
+>  };
+>  
+> +struct mpam_resctrl_mon {
+> +	struct mpam_class	*class;
+> +
+> +	/* per-class data that resctrl needs will live here */
+> +};
+> +
+>  static inline int mpam_alloc_csu_mon(struct mpam_class *class)
+>  {
+>  	struct mpam_props *cprops = &class->props;
+> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+> index 7402bf4293b6..5020a5faed96 100644
+> --- a/drivers/resctrl/mpam_resctrl.c
+> +++ b/drivers/resctrl/mpam_resctrl.c
+> @@ -37,6 +37,21 @@ static struct mpam_resctrl_res mpam_resctrl_controls[RDT_NUM_RESOURCES];
+>  /* The lock for modifying resctrl's domain lists from cpuhp callbacks. */
+>  static DEFINE_MUTEX(domain_list_lock);
+>  
+> +/*
+> + * The classes we've picked to map to resctrl events.
+> + * Resctrl believes all the worlds a Xeon, and these are all on the L3. This
+> + * array lets us find the actual class backing the event counters. e.g.
+> + * the only memory bandwidth counters may be on the memory controller, but to
+> + * make use of them, we pretend they are on L3.
+> + * Class pointer may be NULL.
+> + */
+> +static struct mpam_resctrl_mon mpam_resctrl_counters[QOS_NUM_EVENTS];
+> +
+> +#define for_each_mpam_resctrl_mon(mon, eventid)					\
+> +	for (eventid = 0, mon = &mpam_resctrl_counters[eventid];		\
+> +	     eventid < QOS_NUM_EVENTS;						\
+> +	     eventid++, mon = &mpam_resctrl_counters[eventid])
+> +
+>  static bool exposed_alloc_capable;
+>  static bool exposed_mon_capable;
+>  
+> @@ -259,6 +274,28 @@ static bool class_has_usable_mba(struct mpam_props *cprops)
+>  	return mba_class_use_mbw_max(cprops);
+>  }
+>  
+> +static bool cache_has_usable_csu(struct mpam_class *class)
+> +{
+> +	struct mpam_props *cprops;
+> +
+> +	if (!class)
+> +		return false;
+> +
+> +	cprops = &class->props;
+> +
+> +	if (!mpam_has_feature(mpam_feat_msmon_csu, cprops))
+> +		return false;
+> +
+> +	/*
+> +	 * CSU counters settle on the value, so we can get away with
+> +	 * having only one.
+> +	 */
+> +	if (!cprops->num_csu_mon)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * Calculate the worst-case percentage change from each implemented step
+>   * in the control.
+> @@ -507,6 +544,64 @@ static void mpam_resctrl_pick_mba(void)
+>  	}
+>  }
+>  
+> +static void counter_update_class(enum resctrl_event_id evt_id,
+> +				 struct mpam_class *class)
+> +{
+> +	struct mpam_class *existing_class = mpam_resctrl_counters[evt_id].class;
+> +
+> +	if (existing_class) {
+> +		if (class->level == 3) {
+> +			pr_debug("Existing class is L3 - L3 wins\n");
+> +			return;
+> +		}
+> +
+> +		if (existing_class->level < class->level) {
+> +			pr_debug("Existing class is closer to L3, %u versus %u - closer is better\n",
+> +				 existing_class->level, class->level);
+> +			return;
+> +		}
+> +	}
+> +
+> +	mpam_resctrl_counters[evt_id].class = class;
+> +	exposed_mon_capable = true;
+> +}
+> +
+> +static void mpam_resctrl_pick_counters(void)
+> +{
+> +	struct mpam_class *class;
+> +
+> +	lockdep_assert_cpus_held();
+> +
+> +	guard(srcu)(&mpam_srcu);
+> +	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
+> +				 srcu_read_lock_held(&mpam_srcu)) {
+> +		if (class->level < 3) {
+> +			pr_debug("class %u is before L3", class->level);
+> +			continue;
+> +		}
+> +
+> +		if (!cpumask_equal(&class->affinity, cpu_possible_mask)) {
+> +			pr_debug("class %u does not cover all CPUs",
+> +				 class->level);
+> +			continue;
+> +		}
+> +
+> +		if (cache_has_usable_csu(class) && topology_matches_l3(class)) {
+> +			pr_debug("class %u has usable CSU, and matches L3 topology",
+> +				 class->level);
+> +
+> +			/* CSU counters only make sense on a cache. */
+> +			switch (class->type) {
+> +			case MPAM_CLASS_CACHE:
+> +				counter_update_class(QOS_L3_OCCUP_EVENT_ID, class);
 
-Applied to next, thanks!
+As the counter is named llc_occupancy (llc = last level cache) and we
+are naming the resource L3 it would be surprising to have llc_occupancy
+on anything other than an L3. Also, that L3 should be a last level
+cache. I'll update this as part of a general push to tighten up the
+heuristics in this series to make sure that in the future when more
+fitting user visible interfaces are added in resctrl we are able to use
+them rather than being stuck with something that almost fits.
 
-[02/36] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated ICH_VMCR_EL2
-        commit: 4a03431b742b4edc24fe1a14d355de1df6d80f86
-[03/36] arm64/sysreg: Drop ICH_HFGRTR_EL2.ICC_HAPR_EL1 and make RES1
-        commit: b583177aafe3ca753ddd3624c8731a93d0cd0b37
-[06/36] KVM: arm64: gic: Set vgic_model before initing private IRQs
-        commit: 9435c1e1431003e23aa34ef8e46c30d09c3dbcb5
-[32/36] irqchip/gic-v5: Check if impl is virt capable
-        commit: 3227c3a89d65fe7482312b7b27038d9ebd86f210
+> +				break;
+> +			default:
+> +				break;
+> +			}
+> +		}
+> +	}
+> +}
+> +
+[...]
 
-Cheers,
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
 
+Ben
 
