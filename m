@@ -1,192 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06642F745D;
-	Fri, 30 Jan 2026 11:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DDD37647B
+	for <kvmarm@lists.linux.dev>; Fri, 30 Jan 2026 12:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769773084; cv=none; b=B57IGltEcT8c+0z3skCrDYfVYm4arvaceQpUUBisVHaBV4KXaiJBg0AXlIvprA8dz+dtWB3VDWZgU4gWwHTS/k4MHnvvL6TfGZ7WwpaN7CX2w/nT4xzANby29+vzJt8DMshJYSwm8p19/tIcwt70Zl3j/xvf6Oh9C4aDuQA5BRo=
+	t=1769775711; cv=none; b=A2qRvrv6rHKO6wkmMfaEI+vhWQDLqMvkcgnzZm+E1bkxf6rgbAGwkxFYBHFLvcjiN+txVIV+CG2rzgHS0ByslY0mIijzy43irdvw8To8ohOpcPYmqLfX4T1NVtpshGlfhtU9XUWY6IbNQu//g37nWcw82XMGbbK8gBsA17u8WYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769773084; c=relaxed/simple;
-	bh=FF3Xw6u2vV5Q8XssxCyE4krJu70B6ir0Eoa3b81i4pQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FAKKtbSkEsMx1FLSKNKM4SRPAH5cxwDqxOCw5vNlVGzeGZI38gchVtEP3AeCc3MAFL0E+88t8LdWc9QxvDqTqTecsCZseE+Lfu4/6aFx6Bm/vdxSF4UbFz9WAVk1FeL0QUw88vGav3akJY2IHX3koQLJnZvWDi7xDNv/SP2YoKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E2rKCyBx; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2rKCyBx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3A9C116D0;
-	Fri, 30 Jan 2026 11:38:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769773083;
-	bh=FF3Xw6u2vV5Q8XssxCyE4krJu70B6ir0Eoa3b81i4pQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=E2rKCyBxcoDdTIVLU6FgQYzTHPoJ1KTNccZkfttJV04mxlsMMfYr2iJRETA+Bt8t8
-	 4NtMAJW/XRiKrKaz17sFCKlObjjLnb0yAfeTsz7zm7al/kdsbcVSR2x/qW+EAvlsLL
-	 RluQWaArAHe8RTCEZEIjStGbJDniXlkaJ2crtokFRKKFwEaRRtOLIi+3XxJTqXE+mb
-	 0WbAaIlTJzs4vjXMlEAX3GSubNTR8U7zubwuMx0YEAL04rY07GCbErhYfJ8ieb3LrB
-	 O4lzBFYus0rGyQH5LXcQEtJUmFU1QSs4pxFjje/dVD4etSC6gydZmrDFieZxZ4g6V/
-	 Jk04S93NVK4HA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vlmp7-0000000737G-1KMo;
-	Fri, 30 Jan 2026 11:38:01 +0000
-Date: Fri, 30 Jan 2026 11:38:00 +0000
-Message-ID: <861pj7baav.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v4 11/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
-In-Reply-To: <20260128175919.3828384-12-sascha.bischoff@arm.com>
-References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-12-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1769775711; c=relaxed/simple;
+	bh=4rW3klVonaRjqtTArWPp0tognmUQmSzmkxdoBF4gL3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e4+UYLlnPG0AfA0e8xcSUYer4vW9Ig3lBf7cJs3pS/B0oRKPYFFN6pXGp6qXgas7GJtHcq6/G+8THJbxzgmr1BYsnVYlsZYpRPeH54BLMNqpKg1t8jIBi+o0uwjcCYYSBaG9qVWWqTfkE3Zblb9nkJHvE5PGCgy52vdfURgLn7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F4148153B;
+	Fri, 30 Jan 2026 04:21:41 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9921D3F632;
+	Fri, 30 Jan 2026 04:21:43 -0800 (PST)
+Message-ID: <a069fd6f-41d8-45b4-b63d-ccace1a0f501@arm.com>
+Date: Fri, 30 Jan 2026 12:21:42 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 45/47] arm_mpam: Add workaround for T241-MPAM-4
+To: Fenghua Yu <fenghuay@nvidia.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-46-ben.horgan@arm.com>
+ <23f08379-301d-4ffc-bf6f-d6a7bb952724@nvidia.com>
+ <e38cb392-ff29-4008-aa4f-e9d7166836f0@arm.com>
+ <e10fa678-9564-4e09-a848-fac22e1c9a64@nvidia.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <e10fa678-9564-4e09-a848-fac22e1c9a64@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 28 Jan 2026 18:02:09 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> Set the guest's view of the GCIE field to IMP when running a GICv5 VM,
-> NI otherwise. Reject any writes to the register that try to do
-> anything but set GCIE to IMP when running a GICv5 VM.
-> 
-> As part of this change, we're also required to extend
-> vgic_is_v3_compat() to check for the actual vgic_model. This has one
-> potential issue - if any of the vgic_is_v*() checks are used prior to
-> setting the vgic_model (that is, before kvm_vgic_create) then
-> vgic_model will be set to 0, which can result in a false-positive.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/kvm/sys_regs.c  | 42 ++++++++++++++++++++++++++++++--------
->  arch/arm64/kvm/vgic/vgic.h | 10 ++++++++-
->  2 files changed, 43 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 88a57ca36d96..73dd2bd85c4f 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
->  
->  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
->  
->  /* Read a sanitised cpufeature ID register by sys_reg_desc */
-> @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
->  		val = sanitise_id_aa64pfr1_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64PFR2_EL1:
-> -		val &= ID_AA64PFR2_EL1_FPMR |
-> -			(kvm_has_mte(vcpu->kvm) ?
-> -			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
-> -			 0);
-> +		val = sanitise_id_aa64pfr2_el1(vcpu, val);
->  		break;
->  	case SYS_ID_AA64ISAR1_EL1:
->  		if (!vcpu_has_ptrauth(vcpu))
-> @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
->  	return val;
->  }
->  
-> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	val &= ID_AA64PFR2_EL1_FPMR |
-> +	       ID_AA64PFR2_EL1_MTEFAR |
-> +	       ID_AA64PFR2_EL1_MTESTOREONLY;
-> +
-> +	if (!kvm_has_mte(vcpu->kvm)) {
-> +		val &= ~ID_AA64PFR2_EL1_MTEFAR;
-> +		val &= ~ID_AA64PFR2_EL1_MTESTOREONLY;
-> +	}
-> +
-> +	if (vgic_is_v5(vcpu->kvm))
-> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+Hi Fenghua,
 
-You probably want to clear the field before or'ing something in, or
-you may be promising more than we'd expect.
+On 1/29/26 22:14, Fenghua Yu wrote:
+> Hi, Ben,
+> 
+> On 1/19/26 12:56, Ben Horgan wrote:
+>> Hi Fenghua,
+>>
+>> On 1/15/26 23:20, Fenghua Yu wrote:
+>>> Hi, Shanker and Ben,
+>>>
+>>> On 1/12/26 08:59, Ben Horgan wrote:
+>>>> From: Shanker Donthineni <sdonthineni@nvidia.com>
+>>>>
+>>>> In the T241 implementation of memory-bandwidth partitioning, in the
+>>>> absence
+>>>> of contention for bandwidth, the minimum bandwidth setting can
+>>>> affect the
+>>>> amount of achieved bandwidth. Specifically, the achieved bandwidth
+>>>> in the
+>>>> absence of contention can settle to any value between the values of
+>>>> MPAMCFG_MBW_MIN and MPAMCFG_MBW_MAX.  Also, if MPAMCFG_MBW_MIN is set
+>>>> zero (below 0.78125%), once a core enters a throttled state, it will
+>>>> never
+>>>> leave that state.
+>>>>
+>>>> The first issue is not a concern if the MPAM software allows to program
+>>>> MPAMCFG_MBW_MIN through the sysfs interface. This patch ensures program
+>>>> MBW_MIN=1 (0.78125%) whenever MPAMCFG_MBW_MIN=0 is programmed.
+>>>
+>>> When MBW_MIN=1, min mem bw can be very low when contention. This may
+>>> drop mem access performance. Is it possible to set MBW_MIN bigger so
+>>> that ensure the floor of mem access is high?
+>>
+>> Isn't that a policy decision rather than something we should be putting
+>> in a quirk framework?
+> 
+> MBW_MIN is 1% or 5% less than MBW_MAX.
+> 
+> The lower MBW_MIN hints hardware to lower mem bandwidth when mem access
+> contention. That causes memory performance degradation.
+> 
+> Is it possible to do the following changes to fix the performance issue?
+> 1. By default min mbw is equal to max mbw. So hardware won't lower
+> performance unless it's needed. This can fix the current performance issue.
+> 2. Add a new schemata line (e.g. MBI:<id>=x;<id>=y;...) to specify min
+> mbw just like max mbw specified by schemata line "MB:...". User can use
+> this line to change min mbw per partition per node. This could be added
+> in the future.
 
-> +
-> +	return val;
-> +}
-> +
->  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
->  {
->  	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
-> @@ -2221,6 +2236,16 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
->  	return set_id_reg(vcpu, rd, user_val);
->  }
->  
-> +static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-> +			       const struct sys_reg_desc *rd, u64 user_val)
-> +{
-> +	if (vgic_is_v5(vcpu->kvm) &&
-> +	    FIELD_GET(ID_AA64PFR2_EL1_GCIE_MASK, user_val) != ID_AA64PFR2_EL1_GCIE_IMP)
-> +		return -EINVAL;
-> +
-> +	return set_id_reg(vcpu, rd, user_val);
-> +}
-> +
->  /*
->   * Allow userspace to de-feature a stage-2 translation granule but prevent it
->   * from claiming the impossible.
-> @@ -3202,10 +3227,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  				       ID_AA64PFR1_EL1_RES0 |
->  				       ID_AA64PFR1_EL1_MPAM_frac |
->  				       ID_AA64PFR1_EL1_MTE)),
-> -	ID_WRITABLE(ID_AA64PFR2_EL1,
-> -		    ID_AA64PFR2_EL1_FPMR |
-> -		    ID_AA64PFR2_EL1_MTEFAR |
-> -		    ID_AA64PFR2_EL1_MTESTOREONLY),
-> +	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
-> +		    ~(ID_AA64PFR2_EL1_FPMR |
-> +		      ID_AA64PFR2_EL1_MTEFAR |
-> +		      ID_AA64PFR2_EL1_MTESTOREONLY |
-> +		      ID_AA64PFR2_EL1_GCIE)),
->  	ID_UNALLOCATED(4,3),
->  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->  	ID_HIDDEN(ID_AA64SMFR0_EL1),
+Thanks for bringing this up. It raises some more general queries about
+the handling of mbw_min and so I'll move the discussion to
+[PATCH v3 41/47] arm_mpam: Generate a configuration for min controls
+as it isn't specific to the nvidia quirks.
 
-Don't you also need something in kvm_finalize_sys_regs() to hide GICv5
-altogether if no irqchip has been instantiated? It'd be worth
-extending the "no-vgic-v3" test to also cover GICv5.
+> 
+> Thanks.
+> 
+> -Fenghua
 
 Thanks,
 
-	M.
+Ben
 
--- 
-Without deviation from the norm, progress is not possible.
