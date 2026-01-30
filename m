@@ -1,115 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC9F369997;
-	Fri, 30 Jan 2026 11:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8EA367F28;
+	Fri, 30 Jan 2026 11:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769771654; cv=none; b=SOnb2ggpgJWArZKmxu4UUEQcqcCyaIgrKLoEw5pDaeFDKC1LYIu77EPAcCCRiTpXpeu6LIcTFN45QiqcaCQRrUcOpXyyQNH+Vdim/OyeOxf5X4LS0261MNxgXMmKrW0zJK8oSwjkZ3BOX/qvbgS1R6mQCpP5mVIW+U8XmmFw2+Y=
+	t=1769771942; cv=none; b=D38yLvYkVFGju7KgSrQJcOuitK/uQjfSz5JY3x9PQsgoTixxtuozhs2PQ9Ag4HyViv4y8mJBi53eMFgNeDj/rJIcWcBeTObOSw+IP24gYAtFOyr5U2il40+3J8GeevbVh1uyL+4wVeQYPikPPXE2Zhjwq//S+nfVm2gb0pMxklQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769771654; c=relaxed/simple;
-	bh=RkCPF5y7vSOiUXky1JlxdTIgdWJ6xKp9N4kMf9l1z3I=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J/2/9XXQre6MIjqlV6p4I3gnjuNyfiiaiPd6ttanPOEdora+2Z865HKUpcTLn20Hfyhq6Kukyh7kFJkXPtg/1X4RO4Oy5KXM9v18goKf6ZV06RgcZ8ew0tkOfEGQ8SAP5acMF5t9DKlVUlG9AEqZ81oYm8C6ixVyMQJUbrbRUrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KhBEM8og; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769771942; c=relaxed/simple;
+	bh=PQ+p73R80ETqkVCGJZy86pYL5c9ExyceZZ1ihJeBk6A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kliYtK1VqVIICTqko6toYLjrrzcXW5MYUEIpvXuoTLMcUAtKDXlJNQPafuiRD1Vs2gQk2NFgizrJjGZjZx3TkfC5nrykYRs3u8uCpXQlgs+Ef0N7ui0N5MhZYsB6rsJQc3H4Ja2q5It2sDQsL5IbVCWDVHr6yanSInM/ThijaRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IyMsJfQz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KhBEM8og"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B70C4CEF7;
-	Fri, 30 Jan 2026 11:14:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IyMsJfQz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47BA9C4CEF7;
+	Fri, 30 Jan 2026 11:19:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769771654;
-	bh=RkCPF5y7vSOiUXky1JlxdTIgdWJ6xKp9N4kMf9l1z3I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KhBEM8ogaYsVlHTd3LjlzlK4vWaQvl+WjgE2Hq0PbYk8scjozn7h/UvYhfQQvRpTu
-	 2f1Abvg99uaAPNex+LK9dypEj5ytAdDlnaY5lWk/uAeXyc66ad750J74v3jKeEue2/
-	 s6Si80LvGMSW09uYB8nQDXNTnxHyn7ckuyDRhM/uPb9faph8vrQ/TLWMg4haO1ia8e
-	 WgIxJJH4X3+Hvglq4CEGC3hJoaFYGEd7At6tUCzoZpynRA5CL1NPWEdxt8ADgnF1DZ
-	 LZaV0SnL/kIGcpFLPq7EtoSoSpTMkNWv4CsBVC0d2EK/+0U0F4/dgVhVyFz1f/Iz1x
-	 vFSML5/99mxPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1769771942;
+	bh=PQ+p73R80ETqkVCGJZy86pYL5c9ExyceZZ1ihJeBk6A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=IyMsJfQzjbkS4YBP1Z4DaBLKbyhqrJBvxRwvXEQOg/WwbLCPnvY8FtC1F8+zB92xj
+	 TCvbeDXUNQlAPMr5pdUcGFIZ/xsyR7Lp/hccOYRvryUUB7EUYJAdOi5f3n+YGZfDux
+	 HCWyT7KzcsGvHrOQfTtcMPCFxnHIZFaysYjmtN8eXykvVcpqg3X7NHg+A2DPEKEORw
+	 AwD1xG1u+HjXXSXIZMXGvvCLP4GDYh4G4txPB/tNzMD5mm7ekZcrk9tNoX+sFoHyR1
+	 X7Z3COTKCTQBqfx57wJ21fm3G5WmdMfz+ghp0JEPOlv1u7RKHuIfhr5Ek22o88Sd3Z
+	 1bRF6eQelSlYg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vlmS4-000000072k6-1cXP;
-	Fri, 30 Jan 2026 11:14:12 +0000
-Date: Fri, 30 Jan 2026 11:14:11 +0000
-Message-ID: <86343nbbek.wl-maz@kernel.org>
+	id 1vlmWi-000000072qr-0Xg1;
+	Fri, 30 Jan 2026 11:19:00 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: nd <nd@arm.com>,
+	Joey Gouly <Joey.Gouly@arm.com>,
 	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	yuzenghui@huawei.com,
+	peter.maydell@linaro.org,
+	lpieralisi@kernel.org,
 	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v4 32/36] irqchip/gic-v5: Check if impl is virt capable
-In-Reply-To: <20260128175919.3828384-33-sascha.bischoff@arm.com>
+	jonathan.cameron@huawei.com,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: (subset) [PATCH v4 00/36] KVM: arm64: Introduce vGIC-v5 with PPI support
+Date: Fri, 30 Jan 2026 11:18:57 +0000
+Message-ID: <176977191232.2312774.6420835979447644993.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260128175919.3828384-1-sascha.bischoff@arm.com>
 References: <20260128175919.3828384-1-sascha.bischoff@arm.com>
-	<20260128175919.3828384-33-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, Sascha.Bischoff@arm.com, nd@arm.com, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 28 Jan 2026 18:07:33 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+On Wed, 28 Jan 2026 17:59:19 +0000, Sascha Bischoff wrote:
+> This is the v4 of the patch series to add the virtual GICv5 [1] device
+> (vgic_v5). Only PPIs are supported by this initial series, and the
+> vgic_v5 implementation is restricted to the CPU interface,
+> only. Further patch series are to follow in due course, and will add
+> support for SPIs, LPIs, the GICv5 IRS, and the GICv5 ITS.
 > 
-> Now that there is support for creating a GICv5-based guest with KVM,
-> check that the hardware itself supports virtualisation, skipping the
-> setting of struct gic_kvm_info if not.
+> v1, v2, and v3 of this series can be found at [2], [3], [4], respectively.
 > 
-> Note: If native GICv5 virt is not supported, then nor is
-> FEAT_GCIE_LEGACY, so we are able to skip altogether.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Lorenzo Pieralisi <lpieralisi@kernel.org>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  drivers/irqchip/irq-gic-v5-irs.c   |  4 ++++
->  drivers/irqchip/irq-gic-v5.c       | 10 ++++++++++
->  include/linux/irqchip/arm-gic-v5.h |  4 ++++
->  3 files changed, 18 insertions(+)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v5-irs.c b/drivers/irqchip/irq-gic-v5-irs.c
-> index ce2732d649a3..eebf9f219ac8 100644
-> --- a/drivers/irqchip/irq-gic-v5-irs.c
-> +++ b/drivers/irqchip/irq-gic-v5-irs.c
-> @@ -744,6 +744,10 @@ static int __init gicv5_irs_init(struct device_node *node)
->  	 */
->  	if (list_empty(&irs_nodes)) {
->  
-> +		idr = irs_readl_relaxed(irs_data, GICV5_IRS_IDR0);
-> +		gicv5_global_data.virt_capable =
-> +			!!FIELD_GET(GICV5_IRS_IDR0_VIRT, idr);
-> +
+> [...]
 
-I'll tidy-up this while cherry-picking it (spurious newline before the
-hunk, horrible split assignment...).
+Applied to next, thanks!
 
-Thanks,
+[02/36] KVM: arm64: gic-v3: Switch vGIC-v3 to use generated ICH_VMCR_EL2
+        commit: 4a03431b742b4edc24fe1a14d355de1df6d80f86
+[03/36] arm64/sysreg: Drop ICH_HFGRTR_EL2.ICC_HAPR_EL1 and make RES1
+        commit: b583177aafe3ca753ddd3624c8731a93d0cd0b37
+[06/36] KVM: arm64: gic: Set vgic_model before initing private IRQs
+        commit: 9435c1e1431003e23aa34ef8e46c30d09c3dbcb5
+[32/36] irqchip/gic-v5: Check if impl is virt capable
+        commit: 3227c3a89d65fe7482312b7b27038d9ebd86f210
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
