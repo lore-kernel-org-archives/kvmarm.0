@@ -1,175 +1,349 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E17082F;
-	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24C6239E7E
+	for <kvmarm@lists.linux.dev>; Sat, 31 Jan 2026 12:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769863044; cv=none; b=Pg+JxSOFiww111EtfI1KzlNCjqrFRDMhF5dCv9cP5ye8UOs3NH38YJoCRrE4jntnirTMW9KkCAYUsqNac2NE8uxp/IJ0gTkQ7M8RRClmwQgslvnH5YImlv1R3Zh3gLSpchkWEQWdNJNyxvUGV8LeRid727TbQeN9LOjDFRhKvSY=
+	t=1769864064; cv=none; b=fnwHm374m4/VanJqFtw8cAsqLDWM52aDJMrIQhpGEf/IOxpHWntGqdRsqUOhMqP5qdXGYVqOM5BZR+wbJ9TKM7xVJKEsQDMCx/nnZzTvMRO/9fCbqqbMHsUga2dhzjzAiKOEqVfcmJiTDP+gmZF8zup0+X/uyzD0gK3eX5V3q6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769863044; c=relaxed/simple;
-	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LrYiJigid+IP0/9h3eFN+HiQ2O7Jpt3m18TbU0wqiL6pMmxOwAc7B84Rwgwkl4FkO4a3L1EaPzCqpHqMCSVgrpli4p6RxvUWVqvg1YRsFUde2QNRJ9zpgvMiJpOM6LJUDBb4moZfEWV6k+Sye878wwCUpKaAEzzzoWcDUSKRVt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reEEehQ3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1769864064; c=relaxed/simple;
+	bh=SfsGBbXvkK2Pji1/B334fbzwCU/3TbY4g0oKDz9nKwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WnRIqjhELpgvBgCtCC4WfPZLiSnR0ItsanfCJEUJrd+Q2AUFrhtFNQKoc0XHmToaDeUGvOHrALDrWdSzyie/uQ0D6xZ0ASDBhbghGWUUUjiZlVDe1zZPgKI2c09ld3NNirUg7u7fAJZwvHGoZUHYUsTnkIpwLIv4S66bVk4fEpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2wIGTud; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reEEehQ3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9274DC4CEF1;
-	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1769863043;
-	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=reEEehQ3nh8RYvwtbrmLWy1plHoaLB8F6lEEKOloxSRyNL4c5k5Ewt+BSSULJJPBS
-	 wBjN4ID+3pO0inQw45Yea8cQnhV3mLA18DVovyqSGAgFeeggGf3XqQLIUJmC49LqaR
-	 +yeOgFz9mrgegKZWv8ORhlrb2mVRu5wq7Y4s6w78xZswhVo0B343GGXyKoeNNIQVy0
-	 oBhot26HilHhAiXALTogyyQOnOjRa1dua18piQ/eM4gDTReWJ6PDh0vTxnmYYHQrK7
-	 M7YrSjY/jvbvG+VYgDGxdaacyn35BeDf7RLXVWZh71jD3YXnVn5RJcieb2kNMzzM0n
-	 Pp+zZBXeSQwRA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vmAE4-00000007Hih-3fs1;
-	Sat, 31 Jan 2026 12:37:20 +0000
-Date: Sat, 31 Jan 2026 12:37:20 +0000
-Message-ID: <86y0le9cvz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jiaqi Yan <jiaqiyan@google.com>
-Cc: oupton@kernel.org,
-	sebott@redhat.com,
-	gshan@redhat.com,
-	yuzenghui@huawei.com,
-	rananta@google.com,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	pbonzini@redhat.com,
-	shuah@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: selftests: Improve sea_to_user test
-In-Reply-To: <20260130192837.890688-1-jiaqiyan@google.com>
-References: <20260130192837.890688-1-jiaqiyan@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2wIGTud"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4807068eacbso24866995e9.2
+        for <kvmarm@lists.linux.dev>; Sat, 31 Jan 2026 04:54:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1769864061; x=1770468861; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o2hEtjB3vGUr1RvLvra8FnQ23d7eG/R6cE9Zgtr/AEg=;
+        b=m2wIGTudkZzSUcAy+wA1uOqJvQhNnqyrxziwxJzV7konSfxZg+u/5np375xhJNwdiS
+         ZScf4QwMjP5j0aQRDSJx6nehTx1W5cb7e1yP+vZEwa5xa4gIENYG/hE0Mh/uPIPP4y6T
+         m0WlMe2k390BYJUDfroWBb/O7AMzerDlBgxXUbJ6+6q5hguxbTsJKlemIr2ffaVe3uwV
+         1InndgbAyQEYNvWqpIUGMy1oPP3M4xz/OtlyMjPdfMI2g+g7kWVLSPG2kFS/AggBHUyd
+         KPiaJgwsDZhCV5QF4F1p0HN56PS5wRu7y1Hh3ov2L94enG+PP0lUxhbiaJRvmYIrFRkz
+         X4oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1769864061; x=1770468861;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o2hEtjB3vGUr1RvLvra8FnQ23d7eG/R6cE9Zgtr/AEg=;
+        b=Qj5l4BWlKnN+En4VxXvVuKPKXQGpUnAJY1LNeClDiSsmk5iLbf13YXghqklVXDgkTg
+         gCAD4qWmKRayE941hcpz2x5f5NYEtflCdXcwV7VEmTV9Wwkho30FDde4IYhT7UxPDKWU
+         lCmMe5PzAGwFj4hZNSJ47V1+ygiHtg+jRLr2GweFzNBYa/pIKxe0zBPKCGRvOC0xHBDT
+         rAOE2RUFWMmhoCdAVYXwOpJaFXEPiUP1Ir52heyAYI1jmFwdOfbTQ8BUYDMa0Bl04rWd
+         +8xHEqT1+bBIs37++RdrS9xxGRHubLIArT1Ypag3BThqthD2K5qL4i003JsPUI1kzwk/
+         /u0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVrmSyw+V41D7AOOkiznmK99+urcBuG0q2MNA1XwftMO4Bq9LwnVq4TwEAjZhKsV+3m081kE24=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzY2q6snDU+CVmoF+hpSHJxeogFJPffjYRUd47N1sWxX+NtjFpM
+	tjeHiWFythj7Nen5z6/EWqO1hfuUEMAWASQG+DceyeAYECCqz7gdnhHgucmGhINrAw==
+X-Gm-Gg: AZuq6aJmFmfjPvaiGUCxLhEBdQdnHVak88ZWPFg27KyfYMxKQQ0cRu2tFQcZWBl1M/E
+	+osTjqAWX8pyJz0Naavj/bJALvkMI2YzVlER8OcUm/2LGQyt8j7gLnDsl3+upe+s5LisAZmRQGy
+	cCqTASCPZSxbIePXrKN1OlGZmBqb8idLGHJs/hCvYaFcOGs2flZxAAfbnMIgoD2SXNzP5o4F2nL
+	B05bbb/KUhFki9Gi0wc0eicVwSUnu/iSJEQ5hlcRslv6USGAtxRSM10CbNRjX8uSEtk7AFN1f5v
+	MiAEilJXGfB/ZwbL0MCpNLhmlSRf/0/98zLCRnmkp+Ik3kG4j3EgNeo9FrJhJza9iJT+I1S0P8C
+	FgZPCs/3DibAGSCDAyBhXH7O5AvsnMcIEsslfPcavMMFhElOnNGdQ3ImE1uJ12xzGmZxCm77/3o
+	9NJTfwRcw5ASrDfjqNtK8PbXEIvoAAGd38xfApxa2IvVL1vg5xLA==
+X-Received: by 2002:a05:600c:c0cd:b0:471:700:f281 with SMTP id 5b1f17b1804b1-482db623765mr62756295e9.25.1769864060981;
+        Sat, 31 Jan 2026 04:54:20 -0800 (PST)
+Received: from google.com (44.145.34.34.bc.googleusercontent.com. [34.34.145.44])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-435e10e483asm28108377f8f.3.2026.01.31.04.54.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 31 Jan 2026 04:54:20 -0800 (PST)
+Date: Sat, 31 Jan 2026 12:54:17 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org, maz@kernel.org,
+	oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
+	yuzenghui@huawei.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, jstultz@google.com,
+	qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
+	kernel-team@android.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 14/30] tracing: Add a trace remote module for testing
+Message-ID: <aX37eRjYBP4WmyS6@google.com>
+References: <20260126104419.1649811-1-vdonnefort@google.com>
+ <20260126104419.1649811-15-vdonnefort@google.com>
+ <20260129113452.190d4d79@gandalf.local.home>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jiaqiyan@google.com, oupton@kernel.org, sebott@redhat.com, gshan@redhat.com, yuzenghui@huawei.com, rananta@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260129113452.190d4d79@gandalf.local.home>
 
-On Fri, 30 Jan 2026 19:28:37 +0000,
-Jiaqi Yan <jiaqiyan@google.com> wrote:
+On Thu, Jan 29, 2026 at 11:34:52AM -0500, Steven Rostedt wrote:
+> On Mon, 26 Jan 2026 10:44:03 +0000
+> Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> Several improvments to the test for KVM_EXIT_ARM_SEA:
+> > diff --git a/kernel/trace/remote_test.c b/kernel/trace/remote_test.c
+> > new file mode 100644
+> > index 000000000000..059127489c99
+> > --- /dev/null
+> > +++ b/kernel/trace/remote_test.c
+> > @@ -0,0 +1,259 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (C) 2025 - Google LLC
+> > + * Author: Vincent Donnefort <vdonnefort@google.com>
+> > + */
+> > +
+> > +#include <linux/module.h>
+> > +#include <linux/simple_ring_buffer.h>
+> > +#include <linux/trace_remote.h>
+> > +#include <linux/tracefs.h>
+> > +#include <linux/types.h>
+> > +
+> > +#define REMOTE_EVENT_INCLUDE_FILE kernel/trace/remote_test_events.h
+> > +#include <trace/define_remote_events.h>
+> > +
+> > +static DEFINE_PER_CPU(struct simple_rb_per_cpu *, simple_rbs);
+> > +static struct trace_buffer_desc *remote_test_buffer_desc;
+> > +
+> > +/*
+> > + * The trace_remote lock already serializes accesses from the trace_remote_callbacks.
+> > + * However write_event can still race with load/unload.
+> > + */
+> > +static DEFINE_MUTEX(simple_rbs_lock);
+> > +
+> > +static int remote_test_load_simple_rb(int cpu, struct ring_buffer_desc *rb_desc)
+> > +{
+> > +	struct simple_rb_per_cpu *cpu_buffer;
+> > +	struct simple_buffer_page *bpages;
+> > +	int ret = -ENOMEM;
+> > +
+> > +	cpu_buffer = kmalloc(sizeof(*cpu_buffer), GFP_KERNEL);
+> > +	if (!cpu_buffer)
+> > +		return ret;
+> > +
+> > +	bpages = kmalloc_array(rb_desc->nr_page_va, sizeof(*bpages), GFP_KERNEL);
+> > +	if (!bpages)
+> > +		goto err_free_cpu_buffer;
+> > +
+> > +	ret = simple_ring_buffer_init(cpu_buffer, bpages, rb_desc);
+> > +	if (ret)
+> > +		goto err_free_bpages;
+> > +
+> > +	scoped_guard(mutex, &simple_rbs_lock)
+> > +		*per_cpu_ptr(&simple_rbs, cpu) = cpu_buffer;
 > 
-> - Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
->   unhandled MMIO kvm exit.
-> 
-> - Sync far_invalid to guest.
-> 
-> - Exit test with KSFT_SKIP or KSFT_FAIL when should.
-> 
-> - Add comment about VM backing memory type.
-> 
-> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
-> ---
->  .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
->  1 file changed, 53 insertions(+), 41 deletions(-)
+> Should there be some kind of check before blindly assigning the cpu_buffer?
+> If not, what is the mutex protecting from?
 
-Overall, this test is still pretty broken.
+This intends to order accesses with write_event_write(). trace_remote ensures
+that load/unload are always balanced, so I don't believe there's anything to
+test.
 
-For example, on my Altra box:
-
-maz@filthy-habits:~$ ./sea_to_user 
-Random seed: 0x6b8b4567
-# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-# Before EINJect: data=0xbaadcafe
-# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0xbad
-ok 1 # SKIP EINJ table not available in firmware
-
-Well, not quite. EINJ *is* available, it is just that this test,
-contrary to *all* the other tests, requires some insanely high
-privileges. But the test is making stupid assumption.
-
-But that's not all:
-
-maz@filthy-habits:~$ sudo ./sea_to_user 
-Random seed: 0x6b8b4567
-# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
-# Before EINJect: data=0xbaadcafe
-# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x80041234bad
-# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
-# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
-# echo 0x80041234bad > /sys/kernel/debug/apei/einj/param1 - done
-# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
-# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
-sh: 1: echo: echo: I/O error
-Bail out! Failed to write EINJ entry: Success (0)
-# Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Failed? Or Success? Who knows...
-
-But frankly, the whole "embedded shell script" is disgusting. What is
-wrong with driving the injection from the test itself, rather than
-this access()+popen()? popen() itself is a liability (see the man page
-for system()), and should never be used for this sort of things.
+I could add a WARN_ON though. and probably guard(mutex)(&simple_rbs_lock) is
+enough.
 
 > 
-> diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-> index 573dd790aeb8e..4a3511fa1f940 100644
-> --- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
-> +++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
-> @@ -12,6 +12,11 @@
->   * including the notrigger feature. Otherwise the test will be skipped.
->   * The under-test platform's APEI should be unable to claim SEA. Otherwise
->   * the test will also be skipped.
-> + *
-> + * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
-> + * there are more than 4 1G hugepage on the system. They can be allocated
-
-Why *more than*? Isn't that *at least* instead?
-
-> + * at runtime by:
-> + *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
->   */
-
-Why can't you provide an adequate diagnostic instead of this stuff:
-
-maz@filthy-habits:~$ ./sea_to_user 
-Random seed: 0x6b8b4567
-==== Test Assertion Failure ====
-  include/kvm_syscalls.h:58: mem != MAP_FAILED
-  pid=887 tid=887 errno=12 - Cannot allocate memory
-     1	0x0000000000405b4f: __kvm_mmap at kvm_syscalls.h:58 (discriminator 3)
-     2	 (inlined by) kvm_mmap at kvm_syscalls.h:65 (discriminator 3)
-     3	 (inlined by) vm_mem_add at kvm_util.c:1036 (discriminator 3)
-     4	0x0000000000402373: vm_create_with_sea_handler at sea_to_user.c:290
-     5	 (inlined by) main at sea_to_user.c:336
-     6	0x0000ffffb0dc229b: ?? ??:0
-     7	0x0000ffffb0dc237b: ?? ??:0
-     8	0x00000000004027ef: _start at ??:?
-  mmap() failed, rc: -1 errno: 12 (Cannot allocate memory)
-
-What is preventing you from not requiring huge pages? And not
-requiring 4kB as the base page size?
-
-Given how broken this is, I'm likely to disable this test until you
-fix it for real.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> > +
+> > +	return 0;
+> > +
+> > +err_free_bpages:
+> > +	kfree(bpages);
+> > +
+> > +err_free_cpu_buffer:
+> > +	kfree(cpu_buffer);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static void remote_test_unload_simple_rb(int cpu)
+> > +{
+> > +	struct simple_rb_per_cpu *cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
+> > +	struct simple_buffer_page *bpages;
+> > +
+> > +	if (!cpu_buffer)
+> > +		return;
+> > +
+> > +	guard(mutex)(&simple_rbs_lock);
+> > +
+> > +	bpages = cpu_buffer->bpages;
+> > +	simple_ring_buffer_unload(cpu_buffer);
+> > +	kfree(bpages);
+> > +	kfree(cpu_buffer);
+> > +	*per_cpu_ptr(&simple_rbs, cpu) = NULL;
+> > +}
+> > +
+> > +static struct trace_buffer_desc *remote_test_load(unsigned long size, void *unused)
+> > +{
+> > +	struct ring_buffer_desc *rb_desc;
+> > +	struct trace_buffer_desc *desc;
+> > +	size_t desc_size;
+> > +	int cpu, ret;
+> > +
+> > +	if (WARN_ON(remote_test_buffer_desc))
+> > +		return ERR_PTR(-EINVAL);
+> > +
+> > +	desc_size = trace_buffer_desc_size(size, num_possible_cpus());
+> > +	if (desc_size == SIZE_MAX) {
+> > +		ret = -E2BIG;
+> > +		goto err_unlock_cpus;
+> > +	}
+> > +
+> > +	desc = kmalloc(desc_size, GFP_KERNEL);
+> > +	if (!desc) {
+> > +		ret = -ENOMEM;
+> > +		goto err_unlock_cpus;
+> > +	}
+> > +
+> > +	ret = trace_remote_alloc_buffer(desc, desc_size, size, cpu_possible_mask);
+> > +	if (ret)
+> > +		goto err_free_desc;
+> > +
+> > +	for_each_ring_buffer_desc(rb_desc, cpu, desc) {
+> > +		ret = remote_test_load_simple_rb(rb_desc->cpu, rb_desc);
+> > +		if (ret)
+> > +			goto err;
+> > +	}
+> > +
+> > +	remote_test_buffer_desc = desc;
+> > +
+> > +	return remote_test_buffer_desc;
+> > +
+> > +err:
+> > +	for_each_ring_buffer_desc(rb_desc, cpu, remote_test_buffer_desc)
+> > +		remote_test_unload_simple_rb(rb_desc->cpu);
+> > +	trace_remote_free_buffer(remote_test_buffer_desc);
+> > +
+> > +err_free_desc:
+> > +	kfree(desc);
+> > +
+> > +err_unlock_cpus:
+> 
+> Where was the cpus_read lock taken?
+> 
+> > +	cpus_read_unlock();
+> > +
+> > +	return ERR_PTR(ret);
+> > +}
+> > +
+> > +static void remote_test_unload(struct trace_buffer_desc *desc, void *unused)
+> > +{
+> > +	struct ring_buffer_desc *rb_desc;
+> > +	int cpu;
+> > +
+> > +	if (WARN_ON(desc != remote_test_buffer_desc))
+> > +		return;
+> > +
+> > +	for_each_ring_buffer_desc(rb_desc, cpu, desc)
+> > +		remote_test_unload_simple_rb(rb_desc->cpu);
+> > +
+> > +	remote_test_buffer_desc = NULL;
+> > +	trace_remote_free_buffer(desc);
+> > +	kfree(desc);
+> > +}
+> > +
+> > +static int remote_test_enable_tracing(bool enable, void *unused)
+> > +{
+> > +	struct ring_buffer_desc *rb_desc;
+> > +	int cpu;
+> > +
+> > +	if (!remote_test_buffer_desc)
+> > +		return -ENODEV;
+> > +
+> > +	for_each_ring_buffer_desc(rb_desc, cpu, remote_test_buffer_desc)
+> > +		WARN_ON(simple_ring_buffer_enable_tracing(*per_cpu_ptr(&simple_rbs, rb_desc->cpu),
+> > +							  enable));
+> > +	return 0;
+> > +}
+> > +
+> > +static int remote_test_swap_reader_page(unsigned int cpu, void *unused)
+> > +{
+> > +	struct simple_rb_per_cpu *cpu_buffer;
+> > +
+> > +	if (cpu >= NR_CPUS)
+> > +		return -EINVAL;
+> > +
+> > +	cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
+> > +	if (!cpu_buffer)
+> > +		return -EINVAL;
+> > +
+> > +	return simple_ring_buffer_swap_reader_page(cpu_buffer);
+> > +}
+> > +
+> > +static int remote_test_reset(unsigned int cpu, void *unused)
+> > +{
+> > +	struct simple_rb_per_cpu *cpu_buffer;
+> > +
+> > +	if (cpu >= NR_CPUS)
+> > +		return -EINVAL;
+> > +
+> > +	cpu_buffer = *per_cpu_ptr(&simple_rbs, cpu);
+> > +	if (!cpu_buffer)
+> > +		return -EINVAL;
+> > +
+> > +	return simple_ring_buffer_reset(cpu_buffer);
+> > +}
+> > +
+> > +static int remote_test_enable_event(unsigned short id, bool enable, void *unused)
+> > +{
+> > +	if (id != REMOTE_TEST_EVENT_ID)
+> > +		return -EINVAL;
+> > +
+> > +	/*
+> > +	 * Let's just use the struct remote_event enabled field that is turned on and off by
+> > +	 * trace_remote. This is a bit racy but good enough for a simple test module.
+> > +	 */
+> > +	return 0;
+> > +}
+> > +
+> > +static ssize_t
+> > +write_event_write(struct file *filp, const char __user *ubuf, size_t cnt, loff_t *pos)
+> > +{
+> > +	struct remote_event_format_selftest *evt_test;
+> > +	struct simple_rb_per_cpu *cpu_buffer;
+> > +	unsigned long val;
+> > +	int ret;
+> > +
+> > +	ret = kstrtoul_from_user(ubuf, cnt, 10, &val);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	guard(mutex)(&simple_rbs_lock);
+> > +
+> > +	if (!remote_event_selftest.enabled)
+> > +		return -ENODEV;
+> > +
+> 
+> You want a guard(preempt)(); here...
+> 
+> > +	cpu_buffer = *this_cpu_ptr(&simple_rbs);
+> 
+> Otherwise this triggers:
+> 
+>  BUG: using smp_processor_id() in preemptible [00000000] code: bash/1096
+>  caller is write_event_write+0xe0/0x230 [remote_test]
+> 
+> -- Steve
+> 
+> > +	if (!cpu_buffer)
+> > +		return -ENODEV;
+> > +
+> > +	evt_test = simple_ring_buffer_reserve(cpu_buffer,
+> > +					      sizeof(struct remote_event_format_selftest),
+> > +					      trace_clock_global());
+> > +	if (!evt_test)
+> > +		return -ENODEV;
+> > +
+> > +	evt_test->hdr.id = REMOTE_TEST_EVENT_ID;
+> > +	evt_test->id = val;
+> > +
+> > +	simple_ring_buffer_commit(cpu_buffer);
+> > +
+> > +	return cnt;
+> > +}
+> > +
