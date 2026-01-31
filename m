@@ -1,269 +1,175 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011038.outbound.protection.outlook.com [40.107.208.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2806C8C1F
-	for <kvmarm@lists.linux.dev>; Sat, 31 Jan 2026 02:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.38
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769826612; cv=fail; b=kkLBWGVjzkgWHvqrDgbVO0KufizeOxc6tZXuoIj0ERSxorxlaNgQtxJnL1QsL0LN+hNR+VD3+NwDoE0/xKLdYaXwG4e+TCS5CxyuFmt/8vv31dnlFSYh2cN2/kcrQ3mTknV6KrlR26OFgsFG+ZawbNZqIzYNsGmC10FgPyXK9QE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769826612; c=relaxed/simple;
-	bh=kcQKBaUR/VkAhtSVlBhOAZfgAx+RQlzzbEKzw50vcJ8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=i2JdbA8IoWik1h6kwIdhDQt4FZ2A27d+JNtuKPhpFurOIOWFidqdam8VwIvCTMuj6vowO13GQ3B/SiqtryhqbHQjSBS6eURhMNYTvZc5IrKxTkg0cpEFwZonwgDQ/lWAObnU0qlxNNKUMOIDZ0UvBFacO9We3fzdeNiZQJOIcTA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gsUM+Il1; arc=fail smtp.client-ip=40.107.208.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E17082F;
+	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1769863044; cv=none; b=Pg+JxSOFiww111EtfI1KzlNCjqrFRDMhF5dCv9cP5ye8UOs3NH38YJoCRrE4jntnirTMW9KkCAYUsqNac2NE8uxp/IJ0gTkQ7M8RRClmwQgslvnH5YImlv1R3Zh3gLSpchkWEQWdNJNyxvUGV8LeRid727TbQeN9LOjDFRhKvSY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1769863044; c=relaxed/simple;
+	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LrYiJigid+IP0/9h3eFN+HiQ2O7Jpt3m18TbU0wqiL6pMmxOwAc7B84Rwgwkl4FkO4a3L1EaPzCqpHqMCSVgrpli4p6RxvUWVqvg1YRsFUde2QNRJ9zpgvMiJpOM6LJUDBb4moZfEWV6k+Sye878wwCUpKaAEzzzoWcDUSKRVt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=reEEehQ3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gsUM+Il1"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XR/vrlIgum2609PEJQoLs6BhbO0LHjka2e1ukZjGDZTWziVcycRS22PqMzG2YMcM/NMsjON5ohCP39eeZ2dNJamH41RaqehARZPEhquE7QsltIG2ihQg8wYwFY2ORqgLUVFb9hzYyUhGydgdQGCRw7s9/IQoeJ37oilyQgxJk5I0JsdfUS8p9GD8JPzMh+7D4vItoSXx1r4UVx+CdxDlbWAl+77urxwvuSBtDZslYLdKVd4adLV+/xkkatPlXqnkYc/J1TzJTnFo6Fnz2nE6tHX4BstvZcjSB0PtAcYb4zuP9F3eSMQ2suPEQZQ7jlGee2ZIJzAejhXdjnIm2LZfzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zOcgW+5biuJA7b2/w1+EwCVfZFkqb5UziDhIrT4AB7A=;
- b=HJ6ZaUDcWBK7KcASTgRC4eTzshNOlk7IsNjWVdYjWEuSsOpdhub9IPzwthQ0MsQznwcKVC10coFNQfIo4GI5vr+t00k3R77200HtVXsjlfrGCcrsBKKEzo55LmYZPXh5oa5hGt+hH3SCso6e8ayDM+dIbWNqMlGCqKYgxF85hLbtWzQ87b3qgRf+DccLwaqcKj3Xo3j5v2qd3ZSvD7bYfFiJ7NQ/bWG68kg/lxXvuuGu+vlk9+mUhs0aVi4t7sqoRnstp5vTpRq5zkxHHl2u8zLksWHeRHqGI4v8aMdvwDUFj9JLEdr9VEhmxIh89KUtJz403Bv8NnabvPZsAxy3Wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zOcgW+5biuJA7b2/w1+EwCVfZFkqb5UziDhIrT4AB7A=;
- b=gsUM+Il1lYN1+i0IQXrlV8q50CPRYBMm8DAyz+iwijAAZe9nyXI5Re2XnFR3TQO23bn0J3LZSYp4HGNNytxuw8yvL/E2S4fYdW4mmfs4QUtCI9sZ4HE+rsRiKm0j1xXgDBRLPuh1PVs9BBTm0/MXSbpJjI6o1n364Ev+r0qt4CwNneWug3nDWz9W5oDHQgByNu065yFDqEpAnBqHx6OLG8Ndg2y4xPCVtMNi1H5d2J/vI5bUpojBqd+Cmh9X1pski8WqADppsQBB74en+DRGA1jtZwxKoFGebKtJWCZ9w4ahvxylE/6JxJ+mOMwsu3qocIf1952h8XsEQgWxt+mm+g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL4PR12MB9506.namprd12.prod.outlook.com (2603:10b6:208:590::12)
- by SJ0PR12MB6831.namprd12.prod.outlook.com (2603:10b6:a03:47d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9564.12; Sat, 31 Jan
- 2026 02:30:05 +0000
-Received: from BL4PR12MB9506.namprd12.prod.outlook.com
- ([fe80::1250:4d33:ce3a:82af]) by BL4PR12MB9506.namprd12.prod.outlook.com
- ([fe80::1250:4d33:ce3a:82af%3]) with mapi id 15.20.9564.006; Sat, 31 Jan 2026
- 02:30:04 +0000
-Message-ID: <9e01328f-7f28-4b43-aaf4-59d3ce80c268@nvidia.com>
-Date: Fri, 30 Jan 2026 20:30:01 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 41/47] arm_mpam: Generate a configuration for min
- controls
-To: Ben Horgan <ben.horgan@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- "fenghuay@nvidia.com" <fenghuay@nvidia.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- gshan@redhat.com, james.morse@arm.com, kobak@nvidia.com,
- lcherian@marvell.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, peternewman@google.com,
- punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
- reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, tan.shaopeng@fujitsu.com,
- xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org,
- corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- Zeng Heng <zengheng4@huawei.com>
-References: <20260112165914.4086692-1-ben.horgan@arm.com>
- <20260112165914.4086692-42-ben.horgan@arm.com>
- <20260113153938.00007d6e@huawei.com>
- <80db7035-07d3-4fb4-a228-f9c67d2df1f4@arm.com>
-Content-Language: en-US
-From: Shanker Donthineni <sdonthineni@nvidia.com>
-In-Reply-To: <80db7035-07d3-4fb4-a228-f9c67d2df1f4@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DM6PR08CA0056.namprd08.prod.outlook.com
- (2603:10b6:5:1e0::30) To BL4PR12MB9506.namprd12.prod.outlook.com
- (2603:10b6:208:590::12)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="reEEehQ3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9274DC4CEF1;
+	Sat, 31 Jan 2026 12:37:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1769863043;
+	bh=H+l9h16Lew6InNs2ZzvZSZ4Z7A2kn1exqhyCUB1RLK0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=reEEehQ3nh8RYvwtbrmLWy1plHoaLB8F6lEEKOloxSRyNL4c5k5Ewt+BSSULJJPBS
+	 wBjN4ID+3pO0inQw45Yea8cQnhV3mLA18DVovyqSGAgFeeggGf3XqQLIUJmC49LqaR
+	 +yeOgFz9mrgegKZWv8ORhlrb2mVRu5wq7Y4s6w78xZswhVo0B343GGXyKoeNNIQVy0
+	 oBhot26HilHhAiXALTogyyQOnOjRa1dua18piQ/eM4gDTReWJ6PDh0vTxnmYYHQrK7
+	 M7YrSjY/jvbvG+VYgDGxdaacyn35BeDf7RLXVWZh71jD3YXnVn5RJcieb2kNMzzM0n
+	 Pp+zZBXeSQwRA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vmAE4-00000007Hih-3fs1;
+	Sat, 31 Jan 2026 12:37:20 +0000
+Date: Sat, 31 Jan 2026 12:37:20 +0000
+Message-ID: <86y0le9cvz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jiaqi Yan <jiaqiyan@google.com>
+Cc: oupton@kernel.org,
+	sebott@redhat.com,
+	gshan@redhat.com,
+	yuzenghui@huawei.com,
+	rananta@google.com,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	pbonzini@redhat.com,
+	shuah@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] KVM: selftests: Improve sea_to_user test
+In-Reply-To: <20260130192837.890688-1-jiaqiyan@google.com>
+References: <20260130192837.890688-1-jiaqiyan@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL4PR12MB9506:EE_|SJ0PR12MB6831:EE_
-X-MS-Office365-Filtering-Correlation-Id: 056b9e2a-81d2-4694-f864-08de6070a48f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dGRBZTFjNTN2bkVVVXFaRDNBMFpOL2phZXR0VE05Vk9uckNCRnBhcS9GZVRV?=
- =?utf-8?B?OXdoNndwSXFxS05SVmYzMHl4MHlvTnF2TU16VDl0ai9ic2p4MUIyc3NnYzZW?=
- =?utf-8?B?VXBWVlZFb24rUHVQRk9RNDlWd29zaENqN1MrR3lBYkdJMHZ0eklsUElmSjEw?=
- =?utf-8?B?MjVrU2xKL1Q4cUEzV3lKbHI2Y04vZzFZUFU1bGVTZWdCbUhYcUNBQzhPVHl2?=
- =?utf-8?B?SG91cEF1MHR4WTlTOE5uQitCNG1ERGlFZnN0U05OSWZLalhoN2RvdHBjUE1z?=
- =?utf-8?B?ZGJYK1ZnZTJKb05qbUpoellUcWFhUUV6QzZTd1Zsa1dvc2FwQnBVU0ZsYS81?=
- =?utf-8?B?MzlXT3FqWmhwdGFXMUsyZldDcG4vaGhuZzdudEViSSs2bEJZYm9WaWk5QlJx?=
- =?utf-8?B?RFREczA4Zmd2SVJaeWF4a1Rkcy9IVnB0ci90OUYyb1lDNi9NS0NSNC9CZElu?=
- =?utf-8?B?Y2p6UTdzSmIya3Nocy8zR0RZOERRYldlTU5XWU54MThTbVptVmJ4SGdKSncv?=
- =?utf-8?B?R2JCcjlhZUdpdk9GU0VwNUEzWGZvMG9LbDRUY3FqR0p6U0xjdUZKdDY4UUQ2?=
- =?utf-8?B?ZnZET255ajZ1OUdudzh5ZEFLRFdxMTJnZTJxVHAyaWNkMnZCYWJyZmlGcCtq?=
- =?utf-8?B?eTlkOUJCeDF5cmg1TFEwRXN3WmdOOEpjZDdVZUhoZHcrYm5kMGVsb2YyQ3N0?=
- =?utf-8?B?dmw3N09DOUFXT3BkZ1hxdXdIbFZ2WmRaVGJoVlJ6TXBmaTFBM1J6KytlN2Ez?=
- =?utf-8?B?enRrSXlJZC9iQ1JvSFgvR05oeXQzckxYZE13b1IxWjYxUko2RWJ2WXcyOGlY?=
- =?utf-8?B?WFVBYjFLQjFwMFVUSERISDdDaUJJNGNoWnVGSk9rVmtyQ3ZNSEtndW8vcE54?=
- =?utf-8?B?MC9CVVZXSU9iRENyVEVPR2xwclcyUnBYOWlWc01yc2ZpTWI0ZTVGNUJjd2xo?=
- =?utf-8?B?UHliSTRLQmpWaHA4K2o5TXhxOXJUQk1pQ2h3Q1pZck53Qkd0aTYxNkhRc1Zr?=
- =?utf-8?B?K1dpeS9USWI1ejdLME1odUhPRHZBVUdMV2xSSytGa0hmRGgzMzllSVM1SmlG?=
- =?utf-8?B?c0xJaXBpMlJJRWhuU1FGZisyRmpzWlZIU1NYR0luc0VJL2g2TGw3OFhub2VT?=
- =?utf-8?B?NmVCeG5vS09LNlp6R1pNTHlGK2R2OWVzcGtreFdvckh0U1FtTmlJTGtIWDJW?=
- =?utf-8?B?ZjJkeXplOUxwM3gxM3UyVC8ybVZMcHBYK0I1WVBIcDdIK01NZ1VxOHVyUGFo?=
- =?utf-8?B?b2NyWGIwWWN5YllZMzFKZy9ERFdPUSthU21IZjg4Y1JDMjJiTHhtYmRUY1o4?=
- =?utf-8?B?NU84UmxjRzJ1WUNLYnI3OXBOcmpveitJdm5DcURydUgzZ1ZEM0hJR2pucnBl?=
- =?utf-8?B?MVR3WXh2ZlM3cG5DbTdaVmlqZjE5YlloWDkyNmt1RkRJaGNSM2hZZklOSDJP?=
- =?utf-8?B?c0FSQ1FCODMrRzlTdFZWYjM0VXBZYWVYazRxVVF6OUxlQ0RTbU8rTEk1TVV0?=
- =?utf-8?B?bkZtTHBScXA1S3ZpNE13aWNQVFBCZ09pVTVpZUZDRFJ0TmIwWHFHLzdpNnZX?=
- =?utf-8?B?aWx3MjBPNnA1dUxtWi91bFo5cmpZUVY2YkRyUUxPNFN1cnU0bUdqVnNjeFlh?=
- =?utf-8?B?enVYdEVmSTZjWVQ4bkNmSTNqVVpMSE9ENGNkaUlMRHFhbHZhcHRPeGxvSko0?=
- =?utf-8?B?dk9Ja1F0d0k0eUV2elhLQ2U1VWxuejhvRHBvN0NYVVRTbUQ1bWhUOWNvUTZP?=
- =?utf-8?B?U2V6QkJnYzBzSXBrWFd6T2xPMDVOM1ROejZQbXlRMWxoOFdxMFYrejN6ZXlj?=
- =?utf-8?B?RTFLQWpoblI4UlFZZnFmd2V3dW8vR2tCZGNSSUdXSmpmeUVTOEduNExtbG1l?=
- =?utf-8?B?UHNrZ0xkZVE2NUV4Z0daU0VGd2F6WVM5cVBPTkpkZzl4aE10QVp3Q0E2eW1M?=
- =?utf-8?B?YjVsbUFrZ0k0QjROTythdnpubGdtdEdhNnMzMmNVeUJNRnh2R2JNamJFZE9N?=
- =?utf-8?B?M2ZwTXcxeGNsQWJGVVBjSGNNQ2tId0dRT1JWOUJhSVdKRWZMSDdxWEhDcHAx?=
- =?utf-8?B?Q04xRHhsS0xnUGJ0Ti83ZVg1THdGeVRiSkRiMzEwL1pyL3BPdm02QnVMbUFi?=
- =?utf-8?Q?FJxI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL4PR12MB9506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dDJEcCtoU3gwWVlTdTRqR0Y5OHNTQUo2UU9UVVlxVmZ0MzhXcEFlb2t4OUJ3?=
- =?utf-8?B?VlJsOEZwd3dacmVqdUVmYTZIMnlGdnUzYklkbFB5eU1BMnVRdnNsRnV4T0ph?=
- =?utf-8?B?ZTRkcFo4cytjaDZkam1tcmpYMCtUajlWaW8vaHp3U2tPVGkyME02Q0d6U0F3?=
- =?utf-8?B?OVBnYjRxaitWVmlvMTM2cFVIWFROcWdkTytHc0FGQXJUUmlpQ3lYVXRBOTdv?=
- =?utf-8?B?NFVVQWxSMytWQVBsZUh6dGJVajRwTXBkM3BRblRJTDcvV0VjMGxxM0l4aXJY?=
- =?utf-8?B?eGhvdkY5SXZVZmJJcERJZG1KblpTRTZseGM2MnU0ajl2VjdsVzVGYktqREg0?=
- =?utf-8?B?VHkxREdZUXhmelk2OHlQUkVuQ1J1aWZpWnpDNE5POThGSjVPVlRmTGdCT0JG?=
- =?utf-8?B?ODJyeS9HOS9iK01BSGFiQ3N0VUdWVDNORGdYL2ZSMitsYWZITCswUlhmdlNE?=
- =?utf-8?B?OW00NnhsREVZVXdHQWRyb2tUZ0lqN1dOMExsSFhFUW1WZ0o5UW1aWkdNZFV0?=
- =?utf-8?B?b1hIaTNNODA4Z2NoQUdTelRjSGg5L0hiQzRqTlN1SWhoUGJ6SzlMVkFRdkEz?=
- =?utf-8?B?NHB0SFpaWUpaRFY2M1RERDd4OC9NdWRRMlpicGlCWU5yU2lyNWNxaHBJYW1S?=
- =?utf-8?B?MXhCQWhjdUdGRkFnV1RYaURSZ29ESlB0a1VramNKL2FiWC9nRUwvSlFyd1Br?=
- =?utf-8?B?U2U1VDRvRmoxKzVKYTZTVVBjanFhNlFWOUVGbEt3S0VwVzlQS3NxZjJmZDBa?=
- =?utf-8?B?emE3TWhqMUd2T3IrTEJaZ2toR1dNSksyaEViaUZxUjFSMzVrYVFDamdPbzdL?=
- =?utf-8?B?L2lvSExLcnRXdEt4SVJqN0FEc1RGd2x6Qk1uTDN3dzY2aWMxYTM0YVdrTW9q?=
- =?utf-8?B?WUxYOGswT2tKdE54a29FdU9wM29vYVY2K3NFNGQ0RjZPSEFCTjdTcFRObDNm?=
- =?utf-8?B?UXQ2OWZGQ21zUzYrMnlNK0o2bkUrQ0V1NEZQOXgxY3VYWUVlT3Fpb0RDRFpu?=
- =?utf-8?B?NDkzcm5mK0ZpSXRvaGV2dlVkOFFOMzA1elp1MFlYd3FOMVJTZVZNZ1F2bkx2?=
- =?utf-8?B?bncwRDZIU0FER0lLNjhpY0ZqcUVzeWsyeXpodmZNUVhxbjZWNENhU2x1RTNv?=
- =?utf-8?B?STdoTFUzeUkrYjI5Q3hJMTB6ekhzK3h0WGRRMm5JSnVFN0J2NlEyN2hKZ2hj?=
- =?utf-8?B?bU5ydGJlOFZFamZ0UlJGejJVdmpNV0diR20yU0lEb3c5VWd4OTRkMjZDQjB3?=
- =?utf-8?B?MHd3NE1YNWJ5bmFDckUzb0RGalg3TlpWazBlSXZXWUN6Q25JS0wvcW1tQitJ?=
- =?utf-8?B?L3Ezd2xxdnBxUEY0UDF3aEdsTVhBR3ROMmZMSDRyQU5wVitPWGxFdk9JVyth?=
- =?utf-8?B?aERUMEtFYS9SeEN2U0pqSE1jRU44c0hEVHFYWTNzZi92MEU0Zkx4YTRyS1hw?=
- =?utf-8?B?OVA4UEJyRGkzdS9TTm5ncnNWTGNrdDlQR210dDJTeUQwZGZZRWh3QmZtS3A3?=
- =?utf-8?B?azZIKzJtalZRNGplRVNQTm42UEY4VWRDamRXU3ZHdjBRTEJ3NG1lMk9XWko4?=
- =?utf-8?B?RGREWDEyZUFkQlQ2OEsvTzZwbkZwVDNuTC82WFR0c1AvVTlyUDJheE01M1Uz?=
- =?utf-8?B?QkZ2NGljalpSOHBYcldCSlhTWC93N0gvbFVLb3E4UUhxR2ZodWYrR2doZUxs?=
- =?utf-8?B?QXEvWWxiMEhpbTFDZkV1RFFDTkJOSENLekxGQStTd3lhVWk2SUE0RFRtMTNR?=
- =?utf-8?B?cU12OUJSR2psSTVpWHAxN0p2cmIwYUg1QlRxSWV1amhZUGVEcTZxSDZweEJt?=
- =?utf-8?B?RUY0bWhVQzNwUzUyaEVXeFE4ZXJ5QzBpekwrR1NkR0E3clhnYjhwMjQzbVFP?=
- =?utf-8?B?c2hPK0p0Tyt5ZFVxUHc2MWcvSC84UnRGYVNNcVhuMFdiVUtOME94TFJjcTY0?=
- =?utf-8?B?dTMwL2RaajBQNVBQUHlhVXAzaThtU3pQajBsTHhabkR1dXF0bmh6and3T1Zp?=
- =?utf-8?B?aXE2L3VzYUtGdEN4UGhhNjV6T0lpMnVWOW9icmVPakpLTGhERmlZcEkyd2Iw?=
- =?utf-8?B?T1dLdGpudzNiT09aZVlOSzNsT2hSeG5wTjdkRTYxcDIvcVcrWnpqVStBa21m?=
- =?utf-8?B?eEV0NURKbmF3aWViWEYrYTlCQTlLcTZ3NElGc2ljOVBBdkI3Nk1sQVNWaGhY?=
- =?utf-8?B?bjd5NTI4QmN3S0l0dnZVVzdmUW5NU2trMExrZ1hiK0JLQmhEMStDR2gzVXYy?=
- =?utf-8?B?RXJpZHN1WThPTTlzVjZJTlArcnlzTDR6cnV3OTBldkNxTUtFdG5TWnJndUVa?=
- =?utf-8?B?SjJydjQzTmxzU1VTc0htaEZJVmJ1WHB6aFVtU1dwU0IwK3lOY2ZVZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 056b9e2a-81d2-4694-f864-08de6070a48f
-X-MS-Exchange-CrossTenant-AuthSource: BL4PR12MB9506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2026 02:30:04.7933
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xqS+Iy+6bAsUXLlIW/qWkMdtsDuPQRi6qmrSU3TiQmSw9eHGTnpDADfrhGCXPcG5JLV1uLF0s5TUNb13Ix+uuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6831
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jiaqiyan@google.com, oupton@kernel.org, sebott@redhat.com, gshan@redhat.com, yuzenghui@huawei.com, rananta@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Ben,
+On Fri, 30 Jan 2026 19:28:37 +0000,
+Jiaqi Yan <jiaqiyan@google.com> wrote:
+> 
+> Several improvments to the test for KVM_EXIT_ARM_SEA:
+> 
+> - Refactor run_vm to catch GUEST_FAIL, instead of causing confusing
+>   unhandled MMIO kvm exit.
+> 
+> - Sync far_invalid to guest.
+> 
+> - Exit test with KSFT_SKIP or KSFT_FAIL when should.
+> 
+> - Add comment about VM backing memory type.
+> 
+> Signed-off-by: Jiaqi Yan <jiaqiyan@google.com>
+> ---
+>  .../testing/selftests/kvm/arm64/sea_to_user.c | 94 +++++++++++--------
+>  1 file changed, 53 insertions(+), 41 deletions(-)
 
-On 1/30/2026 8:17 AM, Ben Horgan wrote:
-> External email: Use caution opening links or attachments
->
->
-> Hi Fenghua, Jonathan,
->
-> On 1/13/26 15:39, Jonathan Cameron wrote:
->> On Mon, 12 Jan 2026 16:59:08 +0000
->> Ben Horgan <ben.horgan@arm.com> wrote:
->>
->>> From: James Morse <james.morse@arm.com>
->>>
->>> MPAM supports a minimum and maximum control for memory bandwidth. The
->>> purpose of the minimum control is to give priority to tasks that are below
->>> their minimum value. Resctrl only provides one value for the bandwidth
->>> configuration, which is used for the maximum.
->>>
->>>
->>> Hence, I'll drop this patch, and update the mbw_min default to be 0xFFFF
->>> and for the value not to change even if mbw_max changes. I think this
->>> leaves us in the best position going forward without any heuristics that
->>> may come back to bite us later when proper support for a schema
->>> supporting mbw_min is added to resctrl.
+Overall, this test is still pretty broken.
 
-Background: I previouslyshared original fix(seecodesnippet below) with 
-James Morse
-~2 years ago to address the errata, which explicitly recommends usinga 
-5% gap for
-mitigation of the Hardware issue (the problem described in commit text 
-of T241-MPAM-4)
+For example, on my Altra box:
 
-For some reason theoriginalimplementationwas splitinto two patches:
-   - Generic change applicable toall chips
-   - Specific fixfor Graceerrata T241-MPAM-4
+maz@filthy-habits:~$ ./sea_to_user 
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0xbad
+ok 1 # SKIP EINJ table not available in firmware
 
+Well, not quite. EINJ *is* available, it is just that this test,
+contrary to *all* the other tests, requires some insanely high
+privileges. But the test is making stupid assumption.
 
-Issue: Dropping this patch impacts[PATCH v3 45/47] forthe errata fix. If 
-removalis
-necessary, please mergethis changeinto the T241-MPAM-4-specific patch.
+But that's not all:
 
---- a/drivers/platform/mpam/mpam_devices.c
-+++ b/drivers/platform/mpam/mpam_devices.c
-@@ -1190,8 +1190,12 @@ static void mpam_reprogram_ris_partid(struct
-mpam_msc_ris *ris, u16 partid, rprops->mbw_pbm_bits);
-          }
--       if (mpam_has_feature(mpam_feat_mbw_min, rprops))
--               mpam_write_partsel_reg(msc, MBW_MIN, 0);
-+       if (mpam_has_feature(mpam_feat_mbw_min, rprops)) {
-+               if (mpam_has_feature(mpam_feat_mbw_max, cfg))
-+                       mpam_write_partsel_reg(msc, MBW_MIN, cfg->mbw_min);
-+               else
-+                       mpam_write_partsel_reg(msc, MBW_MIN, 0);
-+       }
-         if (mpam_has_feature(mpam_feat_mbw_max, rprops)) {
-                 if (mpam_has_feature(mpam_feat_mbw_max, cfg)) @@
--2332,6 +2336,31 @@ static int __write_config(void *arg)
-          return 0;
-   }
-+static void mpam_extend_config(struct mpam_class *class, struct mpam_config *cfg)
-+{
-+       struct mpam_props *cprops = &class->props;
-+       u32 min, delta;
-+
-+       /*
-+        * MAX and MIN should be set together. If only one is provided,
-+        * generate a configuration for the other. If only one control
-+        * type is supported, the other value will be ignored.
-+        *
-+        * Resctrl can only configure the MAX.
-+        *
-+        * Parts affected by Nvidia's T241-MPAM-4 depend on this occurring,
-+        * and recommend a 5% difference.
-+        */
-+       if (mpam_has_feature(mpam_feat_mbw_max, cfg) &&
-+           !mpam_has_feature(mpam_feat_mbw_min, cfg)){
-+               delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
-+               min = max_t(s32, cfg->mbw_max - delta, BIT(cprops->bwa_wd));
-+
-+               cfg->mbw_min = max_t(s32, cfg->mbw_max - delta, BIT(16 - cprops->bwa_wd));
-+               mpam_set_feature(mpam_feat_mbw_min, cfg);
-+       }
-+}
+maz@filthy-habits:~$ sudo ./sea_to_user 
+Random seed: 0x6b8b4567
+# Mapped 0x40000 pages: gva=0x80000000 to gpa=0xff80000000
+# Before EINJect: data=0xbaadcafe
+# EINJ_GVA=0x81234bad, einj_gpa=0xff81234bad, einj_hva=0xffff41234bad, einj_hpa=0x80041234bad
+# echo 0x10 > /sys/kernel/debug/apei/einj/error_type - done
+# echo 0x2 > /sys/kernel/debug/apei/einj/flags - done
+# echo 0x80041234bad > /sys/kernel/debug/apei/einj/param1 - done
+# echo 0xffffffffffffffff > /sys/kernel/debug/apei/einj/param2 - done
+# echo 0x1 > /sys/kernel/debug/apei/einj/notrigger - done
+sh: 1: echo: echo: I/O error
+Bail out! Failed to write EINJ entry: Success (0)
+# Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Shanker
+Failed? Or Success? Who knows...
 
+But frankly, the whole "embedded shell script" is disgusting. What is
+wrong with driving the injection from the test itself, rather than
+this access()+popen()? popen() itself is a liability (see the man page
+for system()), and should never be used for this sort of things.
+
+> 
+> diff --git a/tools/testing/selftests/kvm/arm64/sea_to_user.c b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> index 573dd790aeb8e..4a3511fa1f940 100644
+> --- a/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> +++ b/tools/testing/selftests/kvm/arm64/sea_to_user.c
+> @@ -12,6 +12,11 @@
+>   * including the notrigger feature. Otherwise the test will be skipped.
+>   * The under-test platform's APEI should be unable to claim SEA. Otherwise
+>   * the test will also be skipped.
+> + *
+> + * The VM backing memory is tied to HugeTLB 1G hugepage so far. Make sure
+> + * there are more than 4 1G hugepage on the system. They can be allocated
+
+Why *more than*? Isn't that *at least* instead?
+
+> + * at runtime by:
+> + *   echo 4 > /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+>   */
+
+Why can't you provide an adequate diagnostic instead of this stuff:
+
+maz@filthy-habits:~$ ./sea_to_user 
+Random seed: 0x6b8b4567
+==== Test Assertion Failure ====
+  include/kvm_syscalls.h:58: mem != MAP_FAILED
+  pid=887 tid=887 errno=12 - Cannot allocate memory
+     1	0x0000000000405b4f: __kvm_mmap at kvm_syscalls.h:58 (discriminator 3)
+     2	 (inlined by) kvm_mmap at kvm_syscalls.h:65 (discriminator 3)
+     3	 (inlined by) vm_mem_add at kvm_util.c:1036 (discriminator 3)
+     4	0x0000000000402373: vm_create_with_sea_handler at sea_to_user.c:290
+     5	 (inlined by) main at sea_to_user.c:336
+     6	0x0000ffffb0dc229b: ?? ??:0
+     7	0x0000ffffb0dc237b: ?? ??:0
+     8	0x00000000004027ef: _start at ??:?
+  mmap() failed, rc: -1 errno: 12 (Cannot allocate memory)
+
+What is preventing you from not requiring huge pages? And not
+requiring 4kB as the base page size?
+
+Given how broken this is, I'm likely to disable this test until you
+fix it for real.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
