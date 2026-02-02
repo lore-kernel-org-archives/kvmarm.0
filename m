@@ -1,199 +1,168 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A282DCF58
-	for <kvmarm@lists.linux.dev>; Mon,  2 Feb 2026 09:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842A5358D14
+	for <kvmarm@lists.linux.dev>; Mon,  2 Feb 2026 10:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770026238; cv=none; b=i6SIdMoDlwfroIm4rW9rcNF4pduAWrHx2f8SfpUfum53o/hBx6L4Ah5U3aqYSaVsWVHynC028p/4lqXgHCvh2jBihBekwSehL3k3PvgROMJyCC3tU+0tMYOu+aThKH1/ky4r57n8S3vRxQldo+VH4hMqh/EKnYSDGO9ABw+nQjE=
+	t=1770027697; cv=none; b=o3xXbtmmoMHeqjlbP/GrjhuSEXJhTyjwannJsqVExb8kevsBQqinq0eRTS5b48i97Q5V1gQ56DvzWhen60jTfQ9xRJvLJNQeclXP9aTY/8F8hgd34mOAO1mE4qSaVKbGj3+8oMWr0s/YzcwghSaU5xPv4P7peKPYrvUpmY/XKx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770026238; c=relaxed/simple;
-	bh=McpcEFSPeqGeTz+B+AL6xVCJrRgiZy4Kf/HoS29sO+U=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PJ49SkkvSkCap6s6118u6DpgSBhjq3LjcZSD2y+gOzZvHhgIgpYpGfVsls4IUAq61IKzWZ/6Op48lXSVzdQRArRJVUNvDdElPFM9H8Ryb8QO/3XhyzGhNRAHBeZJ2G2PTM/vqyL92QUMYWzwa09oxCTGmw0Tjq8DfGhHMnJiVTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GlPzwBz3; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GlPzwBz3"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4806fce5ab1so25593195e9.2
-        for <kvmarm@lists.linux.dev>; Mon, 02 Feb 2026 01:57:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770026235; x=1770631035; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ENzMwMoZWO8vLhCKa/do6yK+Nqm+qfwsFu4e8Q1TWrM=;
-        b=GlPzwBz3hiDojyE67BPN9wyQhSyEFA+ZZAXilt+cQiv1zxTDni4SV4krdGUp8KPH7J
-         +Wl3nePrwziIqdK9V7nnYoHqcVoVurjBlMLc8HWAb9mQC9RN5U4rSgddYAHW8EhP71Un
-         MhB41vJaWv289Mj9ybDGsh86590klwtJLJRMJVFeK7D3aatVuh9es72Nnk7eA6wLn3rZ
-         C1vZh4rAIXjEazkeFHt3R8cKkVfJYZ/2XNaEYOUbY8X56yrFMjmd9/DxZ8zutEl5qmPu
-         Z35aT30r/pwPQfVveBnAAjvOqgzsCV7a5vYieR834myq9A7oE5G2lfnr+nbzrG+g3/TF
-         MSEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770026235; x=1770631035;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ENzMwMoZWO8vLhCKa/do6yK+Nqm+qfwsFu4e8Q1TWrM=;
-        b=LgJiVz/5C8lAXigtqGeGSIQ+y5qcoxXRUjEUpmkywfbwbkZiuwIjjHRvr6dBW/E6Q1
-         mt0gcv5aEpml65UUYUns2TH2b6tO55Bf7H9KVYT7ZPs/vFaTkixSjk4CBfB7PqdY5jkf
-         QmVLHKKpkYOLbPJa3mGawqDj9FUqhxcTr7bvJeB6blzkk4zv0DHeFJ1jwGxvYdPfq/d9
-         HvP7WNebdvkAwmUOKYrhqcMAlUhv78WEbUvGg8IpHSG9kgiowOGCmP+gsEl0rWe1L60L
-         PANSfgCb7PVd/tu44u02vOPAQkkHD+uukLtDBEr9Vi3MfHKecxmEBKZbB6rS8F+f2BpP
-         babA==
-X-Gm-Message-State: AOJu0YzIN5rgjByT1SNXp289ZjVggdrDq8xzvoEo9AbXhBSN2j5IuqBn
-	8WnG/D7rpXtjfm6PlOpKRciRv+GvqPt8TWaJIcBLdOpn6A1r4nwQVFQurGf8NHqYRRJUGGXoHJL
-	vew==
-X-Received: from wmbdn5.prod.google.com ([2002:a05:600c:6545:b0:480:69c2:3949])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:82cd:b0:482:ef72:5787
- with SMTP id 5b1f17b1804b1-482ef725dc0mr51293805e9.1.1770026235054; Mon, 02
- Feb 2026 01:57:15 -0800 (PST)
-Date: Mon,  2 Feb 2026 09:57:14 +0000
-In-Reply-To: <86wm0va4ni.wl-maz@kernel.org>
+	s=arc-20240116; t=1770027697; c=relaxed/simple;
+	bh=VMlZ/UOu1AFfPXpsSMFSWV+9VebetIrfvX/v7GCCL/8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SbBilRQv2dGQ7IzD99Q/1hqWvBVs9voyR8Y6/WEcbR+Lp0rmWaLMUYU/QT+zo11nay+V+CQ+UMcW8hVboaLMU2rCWS5ilZIa1SBrRWtTPArnMawmhyG4P4NW3mSydi9mUiuuOREoDAs5227QvkWWJOpgQRk8NXppgsOaXYCueUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B9D2339;
+	Mon,  2 Feb 2026 02:21:28 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A381C3F740;
+	Mon,  2 Feb 2026 02:21:29 -0800 (PST)
+Message-ID: <3ae02b5b-22ab-4778-a29d-709ca3163f58@arm.com>
+Date: Mon, 2 Feb 2026 10:21:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <86wm0va4ni.wl-maz@kernel.org>
-X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
-Message-ID: <20260202095714.4038391-1-tabba@google.com>
-Subject: Re: [PATCH 20/20] KVM: arm64: Add debugfs file dumping computed RESx values
-From: Fuad Tabba <tabba@google.com>
-To: maz@kernel.org
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
-	oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, 
-	catalin.marinas@arm.com, tabba@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 41/47] arm_mpam: Generate a configuration for min
+ controls
+To: Shanker Donthineni <sdonthineni@nvidia.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ "fenghuay@nvidia.com" <fenghuay@nvidia.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ gshan@redhat.com, james.morse@arm.com, kobak@nvidia.com,
+ lcherian@marvell.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, peternewman@google.com,
+ punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
+ reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, tan.shaopeng@fujitsu.com,
+ xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org,
+ corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ Zeng Heng <zengheng4@huawei.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-42-ben.horgan@arm.com>
+ <20260113153938.00007d6e@huawei.com>
+ <80db7035-07d3-4fb4-a228-f9c67d2df1f4@arm.com>
+ <9e01328f-7f28-4b43-aaf4-59d3ce80c268@nvidia.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <9e01328f-7f28-4b43-aaf4-59d3ce80c268@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-...
+Hi Shanker,
 
->
-> Yes please. We might as well do the right thing, and I can fold that
-> into my current series with you as a co-author.
->
-> Thanks,
+On 1/31/26 02:30, Shanker Donthineni wrote:
+> Hi Ben,
+> 
+> On 1/30/2026 8:17 AM, Ben Horgan wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> Hi Fenghua, Jonathan,
+>>
+>> On 1/13/26 15:39, Jonathan Cameron wrote:
+>>> On Mon, 12 Jan 2026 16:59:08 +0000
+>>> Ben Horgan <ben.horgan@arm.com> wrote:
+>>>
+>>>> From: James Morse <james.morse@arm.com>
+>>>>
+>>>> MPAM supports a minimum and maximum control for memory bandwidth. The
+>>>> purpose of the minimum control is to give priority to tasks that are
+>>>> below
+>>>> their minimum value. Resctrl only provides one value for the bandwidth
+>>>> configuration, which is used for the maximum.
+>>>>
+>>>>
+>>>> Hence, I'll drop this patch, and update the mbw_min default to be
+>>>> 0xFFFF
+>>>> and for the value not to change even if mbw_max changes. I think this
+>>>> leaves us in the best position going forward without any heuristics
+>>>> that
+>>>> may come back to bite us later when proper support for a schema
+>>>> supporting mbw_min is added to resctrl.
+> 
+> Background: I previouslyshared original fix(seecodesnippet below) with
+> James Morse
+> ~2 years ago to address the errata, which explicitly recommends usinga
+> 5% gap for
+> mitigation of the Hardware issue (the problem described in commit text
+> of T241-MPAM-4)
+> 
+> For some reason theoriginalimplementationwas splitinto two patches:
+>   - Generic change applicable toall chips
+>   - Specific fixfor Graceerrata T241-MPAM-4
+> >
+> Issue: Dropping this patch impacts[PATCH v3 45/47] forthe errata fix. If
+> removalis
+> necessary, please mergethis changeinto the T241-MPAM-4-specific patch.
 
-Here you go.
 
-Cheers,
-/fuad
+What's the behaviour on T241 when MBW_MIN is always 0xFFFF?
 
----
- arch/arm64/include/asm/kvm_host.h |  1 -
- arch/arm64/kvm/sys_regs.c         | 42 +++++--------------------------
- 2 files changed, 6 insertions(+), 37 deletions(-)
+I'm worried if we make a policy decision of how to set MBW_MIN based on
+MBW_MAX for this platform then we won't be able to support a
+configurable MBW_MIN in the future for this platform. As when MBW_MIN
+support is added in resctrl the user's configuration for this platform
+would change meaning on kernel upgrade.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 54072f6ec9d4..c82b071ade2a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -375,7 +375,6 @@ struct kvm_arch {
- 
- 	/* Iterator for idreg debugfs */
- 	u8	idreg_debugfs_iter;
--	u16	sr_resx_iter;
- 
- 	/* Hypercall features firmware registers' descriptor */
- 	struct kvm_smccc_features smccc_feat;
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f3f92b489b58..d33c39ea8fad 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5090,7 +5090,7 @@ static const struct seq_operations idregs_debug_sops = {
- 
- DEFINE_SEQ_ATTRIBUTE(idregs_debug);
- 
--static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
-+static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
- {
- 	unsigned long i, sr_idx = 0;
- 
-@@ -5100,10 +5100,8 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
- 		if (r->reg < __SANITISED_REG_START__)
- 			continue;
- 
--		if (sr_idx == pos)
-+		if (sr_idx++ == pos)
- 			return r;
--
--		sr_idx++;
- 	}
- 
- 	return NULL;
-@@ -5112,22 +5110,11 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
- static void *sr_resx_start(struct seq_file *s, loff_t *pos)
- {
- 	struct kvm *kvm = s->private;
--	u16 *iter;
--
--	guard(mutex)(&kvm->arch.config_lock);
- 
- 	if (!kvm->arch.sysreg_masks)
- 		return NULL;
- 
--	iter = &kvm->arch.sr_resx_iter;
--	if (*iter != (u16)~0)
--		return ERR_PTR(-EBUSY);
--
--	*iter = *pos;
--	if (!sr_resx_find(kvm, *iter))
--		iter = NULL;
--
--	return iter;
-+	return (void *)sr_resx_find(kvm, *pos);
- }
- 
- static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
-@@ -5136,36 +5123,20 @@ static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
- 
- 	(*pos)++;
- 
--	if (sr_resx_find(kvm, kvm->arch.sr_resx_iter + 1)) {
--		kvm->arch.sr_resx_iter++;
--
--		return &kvm->arch.sr_resx_iter;
--	}
--
--	return NULL;
-+	return (void *)sr_resx_find(kvm, *pos);
- }
- 
- static void sr_resx_stop(struct seq_file *s, void *v)
- {
--	struct kvm *kvm = s->private;
--
--	if (IS_ERR(v))
--		return;
--
--	guard(mutex)(&kvm->arch.config_lock);
--
--	kvm->arch.sr_resx_iter = ~0;
- }
- 
- static int sr_resx_show(struct seq_file *s, void *v)
- {
--	const struct sys_reg_desc *desc;
-+	const struct sys_reg_desc *desc = v;
- 	struct kvm *kvm = s->private;
- 	struct resx resx;
- 
--	desc = sr_resx_find(kvm, kvm->arch.sr_resx_iter);
--
--	if (!desc->name)
-+	if (!desc)
- 		return 0;
- 
- 	resx = kvm_get_sysreg_resx(kvm, desc->reg);
-@@ -5188,7 +5159,6 @@ DEFINE_SEQ_ATTRIBUTE(sr_resx);
- void kvm_sys_regs_create_debugfs(struct kvm *kvm)
- {
- 	kvm->arch.idreg_debugfs_iter = ~0;
--	kvm->arch.sr_resx_iter = ~0;
- 
- 	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
- 			    &idregs_debug_fops);
--- 
-2.53.0.rc1.225.gd81095ad13-goog
+> 
+> --- a/drivers/platform/mpam/mpam_devices.c
+> +++ b/drivers/platform/mpam/mpam_devices.c
+> @@ -1190,8 +1190,12 @@ static void mpam_reprogram_ris_partid(struct
+> mpam_msc_ris *ris, u16 partid, rprops->mbw_pbm_bits);
+>          }
+> -       if (mpam_has_feature(mpam_feat_mbw_min, rprops))
+> -               mpam_write_partsel_reg(msc, MBW_MIN, 0);
+> +       if (mpam_has_feature(mpam_feat_mbw_min, rprops)) {
+> +               if (mpam_has_feature(mpam_feat_mbw_max, cfg))
+> +                       mpam_write_partsel_reg(msc, MBW_MIN, cfg->mbw_min);
+> +               else
+> +                       mpam_write_partsel_reg(msc, MBW_MIN, 0);
+> +       }
+>         if (mpam_has_feature(mpam_feat_mbw_max, rprops)) {
+>                 if (mpam_has_feature(mpam_feat_mbw_max, cfg)) @@
+> -2332,6 +2336,31 @@ static int __write_config(void *arg)
+>          return 0;
+>   }
+> +static void mpam_extend_config(struct mpam_class *class, struct
+> mpam_config *cfg)
+> +{
+> +       struct mpam_props *cprops = &class->props;
+> +       u32 min, delta;
+> +
+> +       /*
+> +        * MAX and MIN should be set together. If only one is provided,
+> +        * generate a configuration for the other. If only one control
+> +        * type is supported, the other value will be ignored.
+> +        *
+> +        * Resctrl can only configure the MAX.
+> +        *
+> +        * Parts affected by Nvidia's T241-MPAM-4 depend on this occurring,
+> +        * and recommend a 5% difference.
+> +        */
+> +       if (mpam_has_feature(mpam_feat_mbw_max, cfg) &&
+> +           !mpam_has_feature(mpam_feat_mbw_min, cfg)){
+> +               delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
+> +               min = max_t(s32, cfg->mbw_max - delta, BIT(cprops-
+>>bwa_wd));
+> +
+> +               cfg->mbw_min = max_t(s32, cfg->mbw_max - delta, BIT(16 -
+> cprops->bwa_wd));
+> +               mpam_set_feature(mpam_feat_mbw_min, cfg);
+> +       }
+> +}
+> 
+> Shanker
+> 
+
+Thanks,
+
+Ben
 
