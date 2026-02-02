@@ -1,168 +1,199 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151E43563FE;
-	Mon,  2 Feb 2026 09:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A282DCF58
+	for <kvmarm@lists.linux.dev>; Mon,  2 Feb 2026 09:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770023669; cv=none; b=Z36mv1YeXiwKW49qxRrA/EBO3tUwj0lFHg27/a1VaTwWnnpSryhJiWkfj0o3N5T5BNPIQXiQZOY59Vo7WUHbT0X3K9Pb2XeWRMHx7Cp0+gENvDLHUXdPKP7ZDykX1EED5h0hKOQVMi7ENnK7KLZzhqBZWiwPYnIMgje4ESQE21E=
+	t=1770026238; cv=none; b=i6SIdMoDlwfroIm4rW9rcNF4pduAWrHx2f8SfpUfum53o/hBx6L4Ah5U3aqYSaVsWVHynC028p/4lqXgHCvh2jBihBekwSehL3k3PvgROMJyCC3tU+0tMYOu+aThKH1/ky4r57n8S3vRxQldo+VH4hMqh/EKnYSDGO9ABw+nQjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770023669; c=relaxed/simple;
-	bh=CdgeLmXVQi0CFJKfkUOWW2ZfhctpbwdNhykYHfA9aNo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PjQcAIOQFNBfebWOaeJUlwaVvAe5TEtB0ysqGH1ZHWpCRtMqNpRLg5rWRnImYPJrNdxvznaS+wSrZuuqsohPbNLtmn6e7OTHBocejrkuILOQ9aZUUs7P6UgUNe8eTdlYA9eZGp5qujo6mwMClmdavKtyhpyQMAe+vzNGW8KspmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNbXLeUg; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770026238; c=relaxed/simple;
+	bh=McpcEFSPeqGeTz+B+AL6xVCJrRgiZy4Kf/HoS29sO+U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=PJ49SkkvSkCap6s6118u6DpgSBhjq3LjcZSD2y+gOzZvHhgIgpYpGfVsls4IUAq61IKzWZ/6Op48lXSVzdQRArRJVUNvDdElPFM9H8Ryb8QO/3XhyzGhNRAHBeZJ2G2PTM/vqyL92QUMYWzwa09oxCTGmw0Tjq8DfGhHMnJiVTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GlPzwBz3; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNbXLeUg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C189C116C6;
-	Mon,  2 Feb 2026 09:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770023668;
-	bh=CdgeLmXVQi0CFJKfkUOWW2ZfhctpbwdNhykYHfA9aNo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jNbXLeUg92D7Ydkvq3UkgbqhWjQdwz4qm0OHxqAS3WSUe3ee2hRooMtkbug2asE5v
-	 +f6R/wwydBKrre8CF5tsDvt0T5h6FteO6sUhlarIPRi/zZvuJh5tY1ithcrP/A8Kb+
-	 nMxC7OpZig2+xUNwunmh3y3FnW82RE5xt1sRlBsV4AN+e3fkhe+tqognGYRrKC04AI
-	 5zTHI9f6qY+Q3Xz1yS3qyzYXCHklg73S9df23Hrk6rHBU7IBZP+fxZzc4shnh9w4PQ
-	 bOEPrpduAdSTTiSWi1+bphsme4BS1RaO98KLK/GZD30BolyGs5XQGGo4edhXnKmWuv
-	 G6wA7eigk56oA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vmq0n-00000007iNU-33Nc;
-	Mon, 02 Feb 2026 09:14:25 +0000
-Date: Mon, 02 Feb 2026 09:14:25 +0000
-Message-ID: <86wm0va4ni.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 20/20] KVM: arm64: Add debugfs file dumping computed RESx values
-In-Reply-To: <CA+EHjTxAEah7N1myCgc-XRDjSFLiQcYHQtNjLWt=Ns_Rag6vPw@mail.gmail.com>
-References: <20260126121655.1641736-1-maz@kernel.org>
-	<20260126121655.1641736-21-maz@kernel.org>
-	<CA+EHjTxAEah7N1myCgc-XRDjSFLiQcYHQtNjLWt=Ns_Rag6vPw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GlPzwBz3"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4806fce5ab1so25593195e9.2
+        for <kvmarm@lists.linux.dev>; Mon, 02 Feb 2026 01:57:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770026235; x=1770631035; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ENzMwMoZWO8vLhCKa/do6yK+Nqm+qfwsFu4e8Q1TWrM=;
+        b=GlPzwBz3hiDojyE67BPN9wyQhSyEFA+ZZAXilt+cQiv1zxTDni4SV4krdGUp8KPH7J
+         +Wl3nePrwziIqdK9V7nnYoHqcVoVurjBlMLc8HWAb9mQC9RN5U4rSgddYAHW8EhP71Un
+         MhB41vJaWv289Mj9ybDGsh86590klwtJLJRMJVFeK7D3aatVuh9es72Nnk7eA6wLn3rZ
+         C1vZh4rAIXjEazkeFHt3R8cKkVfJYZ/2XNaEYOUbY8X56yrFMjmd9/DxZ8zutEl5qmPu
+         Z35aT30r/pwPQfVveBnAAjvOqgzsCV7a5vYieR834myq9A7oE5G2lfnr+nbzrG+g3/TF
+         MSEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770026235; x=1770631035;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ENzMwMoZWO8vLhCKa/do6yK+Nqm+qfwsFu4e8Q1TWrM=;
+        b=LgJiVz/5C8lAXigtqGeGSIQ+y5qcoxXRUjEUpmkywfbwbkZiuwIjjHRvr6dBW/E6Q1
+         mt0gcv5aEpml65UUYUns2TH2b6tO55Bf7H9KVYT7ZPs/vFaTkixSjk4CBfB7PqdY5jkf
+         QmVLHKKpkYOLbPJa3mGawqDj9FUqhxcTr7bvJeB6blzkk4zv0DHeFJ1jwGxvYdPfq/d9
+         HvP7WNebdvkAwmUOKYrhqcMAlUhv78WEbUvGg8IpHSG9kgiowOGCmP+gsEl0rWe1L60L
+         PANSfgCb7PVd/tu44u02vOPAQkkHD+uukLtDBEr9Vi3MfHKecxmEBKZbB6rS8F+f2BpP
+         babA==
+X-Gm-Message-State: AOJu0YzIN5rgjByT1SNXp289ZjVggdrDq8xzvoEo9AbXhBSN2j5IuqBn
+	8WnG/D7rpXtjfm6PlOpKRciRv+GvqPt8TWaJIcBLdOpn6A1r4nwQVFQurGf8NHqYRRJUGGXoHJL
+	vew==
+X-Received: from wmbdn5.prod.google.com ([2002:a05:600c:6545:b0:480:69c2:3949])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:82cd:b0:482:ef72:5787
+ with SMTP id 5b1f17b1804b1-482ef725dc0mr51293805e9.1.1770026235054; Mon, 02
+ Feb 2026 01:57:15 -0800 (PST)
+Date: Mon,  2 Feb 2026 09:57:14 +0000
+In-Reply-To: <86wm0va4ni.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <86wm0va4ni.wl-maz@kernel.org>
+X-Mailer: git-send-email 2.53.0.rc1.225.gd81095ad13-goog
+Message-ID: <20260202095714.4038391-1-tabba@google.com>
+Subject: Re: [PATCH 20/20] KVM: arm64: Add debugfs file dumping computed RESx values
+From: Fuad Tabba <tabba@google.com>
+To: maz@kernel.org
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, 
+	oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, 
+	catalin.marinas@arm.com, tabba@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 02 Feb 2026 08:59:45 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Mon, 26 Jan 2026 at 12:17, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Computing RESx values is hard. Verifying that they are correct is
-> > harder. Add a debugfs file called "resx" that will dump all the RESx
-> > values for a given VM.
-> >
-> > I found it useful, maybe you will too.
-> 
-> I'm sure I will :)
-> 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  1 +
-> >  arch/arm64/kvm/sys_regs.c         | 98 +++++++++++++++++++++++++++++++
-> >  2 files changed, 99 insertions(+)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index c82b071ade2a5..54072f6ec9d4b 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -375,6 +375,7 @@ struct kvm_arch {
-> >
-> >         /* Iterator for idreg debugfs */
-> >         u8      idreg_debugfs_iter;
-> > +       u16     sr_resx_iter;
-> 
-> Storing `sr_resx_iter` in `struct kvm_arch` effectively makes this
-> debugfs file exclusive (returning -EBUSY on contention). Standard
-> `seq_file` implementations should be stateless, using the `loff_t
-> *pos` argument to track the index. This allows multiple users to read
-> the file simultaneously without blocking each other.
+...
 
-Yup, that's a good point. I guess I've lazily reimplemented a square
-wheel...
+>
+> Yes please. We might as well do the right thing, and I can fold that
+> into my current series with you as a co-author.
+>
+> Thanks,
 
-> 
-> >
-> >         /* Hypercall features firmware registers' descriptor */
-> >         struct kvm_smccc_features smccc_feat;
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 88a57ca36d96c..f3f92b489b588 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -5090,12 +5090,110 @@ static const struct seq_operations idregs_debug_sops = {
-> >
-> >  DEFINE_SEQ_ATTRIBUTE(idregs_debug);
-> >
-> > +static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
-> > +{
-> > +       unsigned long i, sr_idx = 0;
-> > +
-> > +       for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > +               const struct sys_reg_desc *r = &sys_reg_descs[i];
-> > +
-> > +               if (r->reg < __SANITISED_REG_START__)
-> > +                       continue;
-> > +
-> > +               if (sr_idx == pos)
-> > +                       return r;
-> > +
-> > +               sr_idx++;
-> > +       }
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +static void *sr_resx_start(struct seq_file *s, loff_t *pos)
-> > +{
-> > +       struct kvm *kvm = s->private;
-> > +       u16 *iter;
-> > +
-> > +       guard(mutex)(&kvm->arch.config_lock);
-> 
-> My understanding of `guard()` is that it releases the lock as soon as
-> the current scope ends (i.e., when `sr_resx_start() `returns). If the
-> intention was to protect the iteration, it seems like `sr_resx_next()`
-> and `sr_resx_show()` would end up running unprotected. That said,
-> converting this to a standard `seq_file` implementation should remove
-> the need for locking altogether.
-> 
-> I guess you based your code on the existing code for the idregs
-> debugfs. I had a look at that, and at vgic-debug, and I think they
-> both can be simplified and made more robust [1]. I also have a diff
-> that converts this to use `seq_file`. It's pretty similar to what I
-> have for idregs in the series I sent out [2]. Let me know if you'd
-> like me to share it.
+Here you go.
 
-Yes please. We might as well do the right thing, and I can fold that
-into my current series with you as a co-author.
+Cheers,
+/fuad
 
-Thanks,
+---
+ arch/arm64/include/asm/kvm_host.h |  1 -
+ arch/arm64/kvm/sys_regs.c         | 42 +++++--------------------------
+ 2 files changed, 6 insertions(+), 37 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 54072f6ec9d4..c82b071ade2a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -375,7 +375,6 @@ struct kvm_arch {
+ 
+ 	/* Iterator for idreg debugfs */
+ 	u8	idreg_debugfs_iter;
+-	u16	sr_resx_iter;
+ 
+ 	/* Hypercall features firmware registers' descriptor */
+ 	struct kvm_smccc_features smccc_feat;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f3f92b489b58..d33c39ea8fad 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5090,7 +5090,7 @@ static const struct seq_operations idregs_debug_sops = {
+ 
+ DEFINE_SEQ_ATTRIBUTE(idregs_debug);
+ 
+-static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
++static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
+ {
+ 	unsigned long i, sr_idx = 0;
+ 
+@@ -5100,10 +5100,8 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
+ 		if (r->reg < __SANITISED_REG_START__)
+ 			continue;
+ 
+-		if (sr_idx == pos)
++		if (sr_idx++ == pos)
+ 			return r;
+-
+-		sr_idx++;
+ 	}
+ 
+ 	return NULL;
+@@ -5112,22 +5110,11 @@ static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, u16 pos)
+ static void *sr_resx_start(struct seq_file *s, loff_t *pos)
+ {
+ 	struct kvm *kvm = s->private;
+-	u16 *iter;
+-
+-	guard(mutex)(&kvm->arch.config_lock);
+ 
+ 	if (!kvm->arch.sysreg_masks)
+ 		return NULL;
+ 
+-	iter = &kvm->arch.sr_resx_iter;
+-	if (*iter != (u16)~0)
+-		return ERR_PTR(-EBUSY);
+-
+-	*iter = *pos;
+-	if (!sr_resx_find(kvm, *iter))
+-		iter = NULL;
+-
+-	return iter;
++	return (void *)sr_resx_find(kvm, *pos);
+ }
+ 
+ static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
+@@ -5136,36 +5123,20 @@ static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
+ 
+ 	(*pos)++;
+ 
+-	if (sr_resx_find(kvm, kvm->arch.sr_resx_iter + 1)) {
+-		kvm->arch.sr_resx_iter++;
+-
+-		return &kvm->arch.sr_resx_iter;
+-	}
+-
+-	return NULL;
++	return (void *)sr_resx_find(kvm, *pos);
+ }
+ 
+ static void sr_resx_stop(struct seq_file *s, void *v)
+ {
+-	struct kvm *kvm = s->private;
+-
+-	if (IS_ERR(v))
+-		return;
+-
+-	guard(mutex)(&kvm->arch.config_lock);
+-
+-	kvm->arch.sr_resx_iter = ~0;
+ }
+ 
+ static int sr_resx_show(struct seq_file *s, void *v)
+ {
+-	const struct sys_reg_desc *desc;
++	const struct sys_reg_desc *desc = v;
+ 	struct kvm *kvm = s->private;
+ 	struct resx resx;
+ 
+-	desc = sr_resx_find(kvm, kvm->arch.sr_resx_iter);
+-
+-	if (!desc->name)
++	if (!desc)
+ 		return 0;
+ 
+ 	resx = kvm_get_sysreg_resx(kvm, desc->reg);
+@@ -5188,7 +5159,6 @@ DEFINE_SEQ_ATTRIBUTE(sr_resx);
+ void kvm_sys_regs_create_debugfs(struct kvm *kvm)
+ {
+ 	kvm->arch.idreg_debugfs_iter = ~0;
+-	kvm->arch.sr_resx_iter = ~0;
+ 
+ 	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
+ 			    &idregs_debug_fops);
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0.rc1.225.gd81095ad13-goog
+
