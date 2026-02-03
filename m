@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79A837473F
-	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 21:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8DE37880E
+	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 21:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770155153; cv=none; b=rD5eI2It10uw2WqVNB86gf+hKZItPrfJi77GRjgiHsn7SgVCVjIFGfcjlzIzOGkfq8oysIfhJrYPXjawRe3K49HJKObI+L3NNqPw+uUu0crdms8yAhPrpxDHbdL10Ef/f6AnL/8AmiDvoarcwPPwoMSDtns0UhkNnqsv+ycHaak=
+	t=1770155159; cv=none; b=D01TbO5N7yMrs1txG82dxOM2SseJvMIYocvwJ1DcSnbQj9yaTSYk2E1X+emVSd5qoqgwWBpDwWvDeT2XqJg3qy0LkORJwTKA54Q2B0Rm4AHS93p/+A+CZ4Yc8l0bVflwa6IC/tJ0tjVvyK1N/5822q019Ht2rK1RKJ631cV3e5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770155153; c=relaxed/simple;
-	bh=gV+9GbxzRd3gLvEoMFVPbG5EE7CIji3mtPAUGN+7hi8=;
+	s=arc-20240116; t=1770155159; c=relaxed/simple;
+	bh=mpjZsxraFB8kPx8lDe2up6Llteda/H7a2ubV/Y+U10Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HOlo3TKucbrxNiJM1cfz3zQiucaAe6zTvGKkUZVuZPbjnRKHdnpBa0Wwk0LsesSfPsqgOL2qWW6QrBoFYKSLZGu5RVUygAMX8mmlI7CQuU//pVAZAuN2B+75Gn4EtfDToNQhNZ2B/njTN0lXWyVR2QQSADCmBtl2omNRbeE+V3w=
+	 MIME-Version; b=MdczZdMflgWhEOzkUfj5bzSme0QlOEj1/4uH6RpCBs8ua1VY5tugV9kxZ1l9TceDB/BHx39rqrAyNfaj+ZE5m/24j8udQROOmRnCE7WJVdB48vUukiL0deAjE4vP+RX2fkVWrzxCxuz2CpEr71UMmgRp1X+VuRh49bHLrze6dxA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC0E6339;
-	Tue,  3 Feb 2026 13:45:44 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4F76497;
+	Tue,  3 Feb 2026 13:45:50 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B4D4D3F778;
-	Tue,  3 Feb 2026 13:45:45 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 982393F778;
+	Tue,  3 Feb 2026 13:45:51 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -54,10 +54,11 @@ Cc: amitsinght@marvell.com,
 	kvmarm@lists.linux.dev,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
-	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v4 19/41] arm_mpam: resctrl: Add plumbing against arm64 task and cpu hooks
-Date: Tue,  3 Feb 2026 21:43:20 +0000
-Message-ID: <20260203214342.584712-20-ben.horgan@arm.com>
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>,
+	Dave Martin <Dave.Martin@arm.com>
+Subject: [PATCH v4 20/41] arm_mpam: resctrl: Add CDP emulation
+Date: Tue,  3 Feb 2026 21:43:21 +0000
+Message-ID: <20260203214342.584712-21-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260203214342.584712-1-ben.horgan@arm.com>
 References: <20260203214342.584712-1-ben.horgan@arm.com>
@@ -71,125 +72,242 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-arm64 provides helpers for changing a task's and a cpu's mpam partid/pmg
-values.
+Intel RDT's CDP feature allows the cache to use a different control value
+depending on whether the accesses was for instruction fetch or a data
+access. MPAM's equivalent feature is the other way up: the CPU assigns a
+different partid label to traffic depending on whether it was instruction
+fetch or a data access, which causes the cache to use a different control
+value based solely on the partid.
 
-These are used to back a number of resctrl_arch_ functions. Connect them
-up.
+MPAM can emulate CDP, with the side effect that the alternative partid is
+seen by all MSC, it can't be enabled per-MSC.
+
+Add the resctrl hooks to turn this on or off. Add the helpers that match a
+closid against a task, which need to be aware that the value written to
+hardware is not the same as the one resctrl is using.
+
+Update the 'arm64_mpam_global_default' variable the arch code uses during
+context switch to know when the per-cpu value should be used instead. Also,
+update these per-cpu values and sync the resulting mpam partid/pmg
+configuration to hardware.
+
+Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
+equivalent needs programming twice by the resctrl glue, as resctrl expects
+the bandwidth controls to be applied independently for both data and
+instruction-fetch.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Tested-by: Peter Newman <peternewman@google.com>
+CC: Dave Martin <Dave.Martin@arm.com>
+CC: Amit Singh Tomar <amitsinght@marvell.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since v2:
-apostrophes in commit message
----
- drivers/resctrl/mpam_resctrl.c | 58 ++++++++++++++++++++++++++++++++++
- include/linux/arm_mpam.h       |  5 +++
- 2 files changed, 63 insertions(+)
+Changes since rfc:
+Fail cdp initialisation if there is only one partid
+Correct data/code confusion
 
+Changes since v2:
+Don't include unused header
+
+Changes since v3:
+Update the per-cpu values and sync to h/w
+---
+ arch/arm64/include/asm/mpam.h  |   1 +
+ drivers/resctrl/mpam_resctrl.c | 117 +++++++++++++++++++++++++++++++++
+ include/linux/arm_mpam.h       |   2 +
+ 3 files changed, 120 insertions(+)
+
+diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
+index 05aa71200f61..70d396e7b6da 100644
+--- a/arch/arm64/include/asm/mpam.h
++++ b/arch/arm64/include/asm/mpam.h
+@@ -4,6 +4,7 @@
+ #ifndef __ASM__MPAM_H
+ #define __ASM__MPAM_H
+ 
++#include <linux/arm_mpam.h>
+ #include <linux/bitfield.h>
+ #include <linux/jump_label.h>
+ #include <linux/percpu.h>
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 48d047510089..cd52ca279651 100644
+index cd52ca279651..12017264530a 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -8,6 +8,7 @@
- #include <linux/cpu.h>
- #include <linux/cpumask.h>
- #include <linux/errno.h>
-+#include <linux/limits.h>
- #include <linux/list.h>
- #include <linux/printk.h>
- #include <linux/rculist.h>
-@@ -37,6 +38,8 @@ static DEFINE_MUTEX(domain_list_lock);
+@@ -38,6 +38,10 @@ static DEFINE_MUTEX(domain_list_lock);
  static bool exposed_alloc_capable;
  static bool exposed_mon_capable;
  
-+static bool cdp_enabled;
-+
++/*
++ * MPAM emulates CDP by setting different PARTID in the I/D fields of MPAM0_EL1.
++ * This applies globally to all traffic the CPU generates.
++ */
+ static bool cdp_enabled;
+ 
  bool resctrl_arch_alloc_capable(void)
- {
- 	return exposed_alloc_capable;
-@@ -57,6 +60,61 @@ u32 resctrl_arch_get_num_closid(struct rdt_resource *ignored)
- 	return mpam_partid_max + 1;
+@@ -50,6 +54,72 @@ bool resctrl_arch_mon_capable(void)
+ 	return exposed_mon_capable;
  }
  
-+void resctrl_arch_sched_in(struct task_struct *tsk)
++bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
 +{
-+	lockdep_assert_preemption_disabled();
-+
-+	mpam_thread_switch(tsk);
-+}
-+
-+void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid)
-+{
-+	WARN_ON_ONCE(closid > U16_MAX);
-+	WARN_ON_ONCE(rmid > U8_MAX);
-+
-+	if (!cdp_enabled) {
-+		mpam_set_cpu_defaults(cpu, closid, closid, rmid, rmid);
-+	} else {
++	switch (rid) {
++	case RDT_RESOURCE_L2:
++	case RDT_RESOURCE_L3:
++		return cdp_enabled;
++	case RDT_RESOURCE_MBA:
++	default:
 +		/*
-+		 * When CDP is enabled, resctrl halves the closid range and we
-+		 * use odd/even partid for one closid.
++		 * x86's MBA control doesn't support CDP, so user-space doesn't
++		 * expect it.
 +		 */
-+		u32 partid_d = resctrl_get_config_index(closid, CDP_DATA);
-+		u32 partid_i = resctrl_get_config_index(closid, CDP_CODE);
-+
-+		mpam_set_cpu_defaults(cpu, partid_d, partid_i, rmid, rmid);
++		return false;
 +	}
 +}
 +
-+void resctrl_arch_sync_cpu_closid_rmid(void *info)
++/**
++ * resctrl_reset_task_closids() - Reset the PARTID/PMG values for all tasks.
++ *
++ * At boot, all existing tasks use partid zero for D and I.
++ * To enable/disable CDP emulation, all these tasks need relabelling.
++ */
++static void resctrl_reset_task_closids(void)
 +{
-+	struct resctrl_cpu_defaults *r = info;
++	struct task_struct *p, *t;
 +
-+	lockdep_assert_preemption_disabled();
-+
-+	if (r) {
-+		resctrl_arch_set_cpu_default_closid_rmid(smp_processor_id(),
-+							 r->closid, r->rmid);
++	read_lock(&tasklist_lock);
++	for_each_process_thread(p, t) {
++		resctrl_arch_set_closid_rmid(t, RESCTRL_RESERVED_CLOSID,
++					     RESCTRL_RESERVED_RMID);
 +	}
-+
-+	resctrl_arch_sched_in(current);
++	read_unlock(&tasklist_lock);
 +}
 +
-+void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid)
++int resctrl_arch_set_cdp_enabled(enum resctrl_res_level ignored, bool enable)
 +{
-+	WARN_ON_ONCE(closid > U16_MAX);
-+	WARN_ON_ONCE(rmid > U8_MAX);
++	u32 partid_i = RESCTRL_RESERVED_CLOSID, partid_d = RESCTRL_RESERVED_CLOSID;
++	int cpu;
 +
-+	if (!cdp_enabled) {
-+		mpam_set_task_partid_pmg(tsk, closid, closid, rmid, rmid);
-+	} else {
-+		u32 partid_d = resctrl_get_config_index(closid, CDP_DATA);
-+		u32 partid_i = resctrl_get_config_index(closid, CDP_CODE);
++	cdp_enabled = enable;
 +
-+		mpam_set_task_partid_pmg(tsk, partid_d, partid_i, rmid, rmid);
++	if (enable) {
++		if (mpam_partid_max < 1)
++			return -EINVAL;
++
++		partid_d = resctrl_get_config_index(RESCTRL_RESERVED_CLOSID, CDP_DATA);
++		partid_i = resctrl_get_config_index(RESCTRL_RESERVED_CLOSID, CDP_CODE);
 +	}
++
++	mpam_set_task_partid_pmg(current, partid_d, partid_i, 0, 0);
++	WRITE_ONCE(arm64_mpam_global_default, mpam_get_regval(current));
++
++	resctrl_reset_task_closids();
++
++	for_each_possible_cpu(cpu)
++		mpam_set_cpu_defaults(cpu, partid_d, partid_i, 0, 0);
++	on_each_cpu(resctrl_arch_sync_cpu_closid_rmid, NULL, 1);
++
++	return 0;
++}
++
++static bool mpam_resctrl_hide_cdp(enum resctrl_res_level rid)
++{
++	return cdp_enabled && !resctrl_arch_get_cdp_enabled(rid);
++}
++
+ /*
+  * MSC may raise an error interrupt if it sees an out or range partid/pmg,
+  * and go on to truncate the value. Regardless of what the hardware supports,
+@@ -115,6 +185,30 @@ void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid)
+ 	}
+ }
+ 
++bool resctrl_arch_match_closid(struct task_struct *tsk, u32 closid)
++{
++	u64 regval = mpam_get_regval(tsk);
++	u32 tsk_closid = FIELD_GET(MPAM0_EL1_PARTID_D, regval);
++
++	if (cdp_enabled)
++		tsk_closid >>= 1;
++
++	return tsk_closid == closid;
++}
++
++/* The task's pmg is not unique, the partid must be considered too */
++bool resctrl_arch_match_rmid(struct task_struct *tsk, u32 closid, u32 rmid)
++{
++	u64 regval = mpam_get_regval(tsk);
++	u32 tsk_closid = FIELD_GET(MPAM0_EL1_PARTID_D, regval);
++	u32 tsk_rmid = FIELD_GET(MPAM0_EL1_PMG_D, regval);
++
++	if (cdp_enabled)
++		tsk_closid >>= 1;
++
++	return (tsk_closid == closid) && (tsk_rmid == rmid);
 +}
 +
  struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
  {
  	if (l >= RDT_NUM_RESOURCES)
+@@ -246,6 +340,14 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+ 	dom = container_of(d, struct mpam_resctrl_dom, resctrl_ctrl_dom);
+ 	cprops = &res->class->props;
+ 
++	/*
++	 * When CDP is enabled, but the resource doesn't support it,
++	 * the control is cloned across both partids.
++	 * Pick one at random to read:
++	 */
++	if (mpam_resctrl_hide_cdp(r->rid))
++		type = CDP_DATA;
++
+ 	partid = resctrl_get_config_index(closid, type);
+ 	cfg = &dom->ctrl_comp->cfg[partid];
+ 
+@@ -273,6 +375,7 @@ u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+ 			    u32 closid, enum resctrl_conf_type t, u32 cfg_val)
+ {
++	int err;
+ 	u32 partid;
+ 	struct mpam_config cfg;
+ 	struct mpam_props *cprops;
+@@ -312,6 +415,20 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
+ 		return -EINVAL;
+ 	}
+ 
++	/*
++	 * When CDP is enabled, but the resource doesn't support it, we need to
++	 * apply the same configuration to the other partid.
++	 */
++	if (mpam_resctrl_hide_cdp(r->rid)) {
++		partid = resctrl_get_config_index(closid, CDP_CODE);
++		err = mpam_apply_config(dom->ctrl_comp, partid, &cfg);
++		if (err)
++			return err;
++
++		partid = resctrl_get_config_index(closid, CDP_DATA);
++		return mpam_apply_config(dom->ctrl_comp, partid, &cfg);
++	}
++
+ 	return mpam_apply_config(dom->ctrl_comp, partid, &cfg);
+ }
+ 
 diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
-index 2c7d1413a401..5a78299ec464 100644
+index 5a78299ec464..d329b1dc148b 100644
 --- a/include/linux/arm_mpam.h
 +++ b/include/linux/arm_mpam.h
-@@ -52,6 +52,11 @@ static inline int mpam_ris_create(struct mpam_msc *msc, u8 ris_idx,
- bool resctrl_arch_alloc_capable(void);
- bool resctrl_arch_mon_capable(void);
+@@ -56,6 +56,8 @@ void resctrl_arch_set_cpu_default_closid(int cpu, u32 closid);
+ void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
+ void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid);
+ void resctrl_arch_sched_in(struct task_struct *tsk);
++bool resctrl_arch_match_closid(struct task_struct *tsk, u32 closid);
++bool resctrl_arch_match_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
  
-+void resctrl_arch_set_cpu_default_closid(int cpu, u32 closid);
-+void resctrl_arch_set_closid_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
-+void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid);
-+void resctrl_arch_sched_in(struct task_struct *tsk);
-+
  /**
   * mpam_register_requestor() - Register a requestor with the MPAM driver
-  * @partid_max:		The maximum PARTID value the requestor can generate.
 -- 
 2.43.0
 
