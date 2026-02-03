@@ -1,164 +1,194 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CA538E5CF;
-	Mon,  2 Feb 2026 18:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C3D2F619A
+	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 09:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770057825; cv=none; b=nN8PcOM6023Msqf17HUB+rk1ry3OR7S/kdk/aH/vQeAJqWAYBs8IpJLrXpSP/FG6ncjxs4ylyc0BQlHvDF8DY6/ihfvBWfwwPSs0Ud/XBxjhiIBWKbxRLOmbubGl69CPnZFSnbz4fP9edsyZl7hd7hnk55yslhhxAuoedpcWtgQ=
+	t=1770111210; cv=none; b=qwxu4q577OSiQbSReVR+flf6WjH1QeSLLxS10tsm0z47tmdS/SH5KxxW3IVBK0aC8mqO8UH8LxgoFAVWKJlF44BZwZE4/M32x1JYn+vDAfwDJvflVL7eprOy2sZ6fi0FztdiC8XUn7yzeOmL4DpV6Wxa4jNdaAzy7IqorzsNZrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770057825; c=relaxed/simple;
-	bh=W6QElC8ez3cKzFnlWFTTok0DI6SuUFkBLxQ9HdMrWbo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aIovoEd/11nHRh/RbloycqbU3/C78qiBkG4ZvKcaN7D1mnyweKqujwKDCPtNdVGZkXNeDcIRj+BN0R6w9tk7Q2+6OjZn0DrbdvcPPNd+xeka5qx83tktvbqPuDKDKWTtkNbgyy+CW3dTEvWQOBGq42dqlFybkUUYTmf5g7R02t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJOBosqN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJOBosqN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A1E3C116C6;
-	Mon,  2 Feb 2026 18:43:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770057825;
-	bh=W6QElC8ez3cKzFnlWFTTok0DI6SuUFkBLxQ9HdMrWbo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FJOBosqN3dxHF90aKtnQo30khpNfyAeSsvJQ/2PKEye/M6Pqj0q7HYS0Uld/SGldy
-	 KIq4tDdPwUgL1XSVFThZ5tW+wgAanrBUxOVxXQb08vqjc1fCx0HWIZn8AD4e5oBOwK
-	 oCH4OVXAnkhrBFbI9lJ0JDWtVZM3PbdDd2Y0wL3uNF6rKZOFKI2vQTLmgtFP7JZSVL
-	 DDqMytFOWIaEfUYrLB6ejxuXJgJWvm0WIngGxXRwF41lR7J+2mLQayBisMIeXaw89t
-	 Oa7kv3g/R1HnfVGIqqag3nu8WQaLlb3r+zHF7M4YJSj7ZNZLufj8PIU7bduXCPQ5BC
-	 qWhhqGqXXlE/Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vmytj-00000007sAy-2REP;
-	Mon, 02 Feb 2026 18:43:43 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: [PATCH v2 20/20] KVM: arm64: Add debugfs file dumping computed RESx values
-Date: Mon,  2 Feb 2026 18:43:29 +0000
-Message-ID: <20260202184329.2724080-21-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260202184329.2724080-1-maz@kernel.org>
-References: <20260202184329.2724080-1-maz@kernel.org>
+	s=arc-20240116; t=1770111210; c=relaxed/simple;
+	bh=hrRYcsB8afw7E/aYVncf2Erojf9vJiWCY9oKpUehAW0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Dh7MRGDcmByu/VzJWCMDcVkoVN0RCEpuyedctk5DfaqV78IaU0aIPdOa2MtQX7+q+9kwXTIEHnJ69JcBb7IuLW0eqaQhdAFPBIDBAr+mJcTHKcqDXJHDRdThaYmY0pRCfv9mFkKfR2fcHHUh3jGTY4RDrjNWSK60+G9ltCtiLn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FB61339;
+	Tue,  3 Feb 2026 01:33:21 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A24D3F632;
+	Tue,  3 Feb 2026 01:33:22 -0800 (PST)
+Message-ID: <fd130189-b9b8-437e-9240-308a5897c9b5@arm.com>
+Date: Tue, 3 Feb 2026 09:33:20 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Ben Horgan <ben.horgan@arm.com>
+Subject: Re: [PATCH v3 41/47] arm_mpam: Generate a configuration for min
+ controls
+To: Shanker Donthineni <sdonthineni@nvidia.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ "fenghuay@nvidia.com" <fenghuay@nvidia.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ gshan@redhat.com, james.morse@arm.com, kobak@nvidia.com,
+ lcherian@marvell.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, peternewman@google.com,
+ punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com,
+ reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, tan.shaopeng@fujitsu.com,
+ xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org,
+ corbet@lwn.net, maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ Zeng Heng <zengheng4@huawei.com>, jasjits@nvidia.com,
+ Jason Sequeira <jsequeira@nvidia.com>, Vikram Sethi <vsethi@nvidia.com>
+References: <20260112165914.4086692-1-ben.horgan@arm.com>
+ <20260112165914.4086692-42-ben.horgan@arm.com>
+ <20260113153938.00007d6e@huawei.com>
+ <80db7035-07d3-4fb4-a228-f9c67d2df1f4@arm.com>
+ <9e01328f-7f28-4b43-aaf4-59d3ce80c268@nvidia.com>
+ <3ae02b5b-22ab-4778-a29d-709ca3163f58@arm.com>
+ <ca45ea06-53fa-4010-86c6-66213243b636@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <ca45ea06-53fa-4010-86c6-66213243b636@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Computing RESx values is hard. Verifying that they are correct is
-harder. Add a debugfs file called "resx" that will dump all the RESx
-values for a given VM.
+Hi Shanker, Fenghua,
 
-I found it useful, maybe you will too.
+On 2/2/26 16:34, Shanker Donthineni wrote:
+> Hi Ben,
+> 
+> On 2/2/2026 4:21 AM, Ben Horgan wrote:
+>> External email: Use caution opening links or attachments
+>>
+>>
+>> Hi Shanker,
+>>
+>> On 1/31/26 02:30, Shanker Donthineni wrote:
+>>> Hi Ben,
+>>>
+>>> On 1/30/2026 8:17 AM, Ben Horgan wrote:
+>>>> External email: Use caution opening links or attachments
+>>>>
+>>>>
+>>>> Hi Fenghua, Jonathan,
+>>>>
+>>>> On 1/13/26 15:39, Jonathan Cameron wrote:
+>>>>> On Mon, 12 Jan 2026 16:59:08 +0000
+>>>>> Ben Horgan <ben.horgan@arm.com> wrote:
+>>>>>
+>>>>>> From: James Morse <james.morse@arm.com>
+>>>>>>
+>>>>>> MPAM supports a minimum and maximum control for memory bandwidth. The
+>>>>>> purpose of the minimum control is to give priority to tasks that are
+>>>>>> below
+>>>>>> their minimum value. Resctrl only provides one value for the
+>>>>>> bandwidth
+>>>>>> configuration, which is used for the maximum.
+>>>>>>
+>>>>>>
+>>>>>> Hence, I'll drop this patch, and update the mbw_min default to be
+>>>>>> 0xFFFF
+>>>>>> and for the value not to change even if mbw_max changes. I think this
+>>>>>> leaves us in the best position going forward without any heuristics
+>>>>>> that
+>>>>>> may come back to bite us later when proper support for a schema
+>>>>>> supporting mbw_min is added to resctrl.
+>>> Background: I previouslyshared original fix(seecodesnippet below) with
+>>> James Morse
+>>> ~2 years ago to address the errata, which explicitly recommends usinga
+>>> 5% gap for
+>>> mitigation of the Hardware issue (the problem described in commit text
+>>> of T241-MPAM-4)
+>>>
+>>> For some reason theoriginalimplementationwas splitinto two patches:
+>>>    - Generic change applicable toall chips
+>>>    - Specific fixfor Graceerrata T241-MPAM-4
+>>> Issue: Dropping this patch impacts[PATCH v3 45/47] forthe errata fix. If
+>>> removalis
+>>> necessary, please mergethis changeinto the T241-MPAM-4-specific patch.
+>>
+>> What's the behaviour on T241 when MBW_MIN is always 0xFFFF?
+> 
+> Memory bandwidth throttling will not function correctly. The MPAM hardware
+> monitors MIN and MAX values for each active partition to maintain memory
+> bandwidth usage between MBW_MIN and MBW_MAX. Therefore, MBW_MIN must be
+> less than MBW_MAX (IMO, setting MBW_MIN to always 0xFFFF is incorrect)
 
-Co-developed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 68 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+Ah, yes. 0xFFFF is indeed a bad default. Looking at Table 5-3 in Mpam
+system component B.a I see that as all bandwidth will be below the
+minimum and so high preference the MBW_MAX will have no effect. I'll
+keep the default for MBW_MIN as 0 (or the minimum for grace).
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 88a57ca36d96c..d33c39ea8fadd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -5090,12 +5090,80 @@ static const struct seq_operations idregs_debug_sops = {
- 
- DEFINE_SEQ_ATTRIBUTE(idregs_debug);
- 
-+static const struct sys_reg_desc *sr_resx_find(struct kvm *kvm, loff_t pos)
-+{
-+	unsigned long i, sr_idx = 0;
-+
-+	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-+		const struct sys_reg_desc *r = &sys_reg_descs[i];
-+
-+		if (r->reg < __SANITISED_REG_START__)
-+			continue;
-+
-+		if (sr_idx++ == pos)
-+			return r;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void *sr_resx_start(struct seq_file *s, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	if (!kvm->arch.sysreg_masks)
-+		return NULL;
-+
-+	return (void *)sr_resx_find(kvm, *pos);
-+}
-+
-+static void *sr_resx_next(struct seq_file *s, void *v, loff_t *pos)
-+{
-+	struct kvm *kvm = s->private;
-+
-+	(*pos)++;
-+
-+	return (void *)sr_resx_find(kvm, *pos);
-+}
-+
-+static void sr_resx_stop(struct seq_file *s, void *v)
-+{
-+}
-+
-+static int sr_resx_show(struct seq_file *s, void *v)
-+{
-+	const struct sys_reg_desc *desc = v;
-+	struct kvm *kvm = s->private;
-+	struct resx resx;
-+
-+	if (!desc)
-+		return 0;
-+
-+	resx = kvm_get_sysreg_resx(kvm, desc->reg);
-+
-+	seq_printf(s, "%20s:\tRES0:%016llx\tRES1:%016llx\n",
-+		   desc->name, resx.res0, resx.res1);
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations sr_resx_sops = {
-+	.start	= sr_resx_start,
-+	.next	= sr_resx_next,
-+	.stop	= sr_resx_stop,
-+	.show	= sr_resx_show,
-+};
-+
-+DEFINE_SEQ_ATTRIBUTE(sr_resx);
-+
- void kvm_sys_regs_create_debugfs(struct kvm *kvm)
- {
- 	kvm->arch.idreg_debugfs_iter = ~0;
- 
- 	debugfs_create_file("idregs", 0444, kvm->debugfs_dentry, kvm,
- 			    &idregs_debug_fops);
-+	debugfs_create_file("resx", 0444, kvm->debugfs_dentry, kvm,
-+			    &sr_resx_fops);
- }
- 
- static void reset_vm_ftr_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *reg)
--- 
-2.47.3
+> 
+> Grace errata T241-MPAM-4 has two issues:
+> - MBW_MIN must be greater than 0 (WAR set to one when when it's zero) -
+> In the Grace implementation of memory-bandwidth partitioning (MPAM),
+>    in the absence of contention for bandwidth, the minimum bandwidth
+>    setting can affect the amount of achieved bandwidth. Specifically,
+>    the achieved bandwidth in the absence of contention can settle to any
+>    value between the values of MIN and MAX. This means if the gap between
+>    MIN and MAX is large then the BW can settle closer to MIN. To achieve
+>    BW closer to MAX in the absence of contention, software should configure
+>    a relatively narrow gap between MPAMCFG_MBW_MIN and MPAMCFG_MBW_MAX.
+>    The recommendation is to use a 5% gap, corresponding to an absolute
+>    difference of (0xFFFF * 0.05) = 0xCCC between MPAMCFG_MBW_MIN and
+>    MPAMCFG_MBW_MAX.
+
+Ok, thanks. I understand the issue more now.
+
+> 
+>> I'm worried if we make a policy decision of how to set MBW_MIN based on
+>> MBW_MAX for this platform then we won't be able to support a
+>> configurable MBW_MIN in the future for this platform.
+> 
+> Yes, we can't support generic programmable MBW_MIN for Grace chip. The
+> currentresctrl interface doesnot exposeMBW_MIN, preventingusers from
+> configuring the recommended5% gap. Without this interfacesupport,
+> theonly wayto applytheworkaround is through driver-level changes.
+> 
+>>   As when MBW_MIN
+>> support is added in resctrl the user's configuration for this platform
+>> would change meaning on kernel upgrade.
+> 
+> What is the timelineforaddingMBW_MIN support? We have two options.
+>  Option-A: Keep the current WAR 5% gap and don't allow users to program
+> MBW_MIN.
+>  Option-B:Remove the5% gap workaround and relyon usersto program MBW_MIN
+>             accordingto the Grace recommendations
+> whentheinterfacebecomes available.
+> 
+> We'll prefer option-B.
+
+The problem with option-B is that the transition introduces a change in
+user visible
+for any existing MBW_MAX configuration.
+
+If option-A is preferable to disabling MBW_MAX on grace until we have
+proper MBW_MIN support in resctrl then I think we should assume option-A.
+
+The work to decide how new schema is underway but it's difficult to say
+how long it will take.
+See: https://lore.kernel.org/lkml/aPtfMFfLV1l%2FRB0L@e133380.arm.com/
+
+Assuming that you're sure that the 5% gap is the best policy and that
+there are no other objections I'll add that policy back into the
+T241-MPAM-4 workaround and look into a way to ensure that we don't
+accidentally enable MBW_MIN support for grace comes when the proper
+support is added.
+
+> 
+> Thanks,
+> Shanker
+> 
+
+Thanks,
+
+Ben
 
