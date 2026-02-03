@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23583378822
-	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 21:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FCA3378831
+	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 21:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770155237; cv=none; b=TIjgRkggD3K4w7+5rettqePQGCbPB463nlhs7mSadc5bEg6z6Ce7qRwNSTibdNuFPtvVaaXyawVKG6bNCp3dI5M+AhZJPDAvobvx7tUjPOaRVavU/zAJMsBmjR92jatS1yHGZ4jKuhlTl+1rl8twoMHsy2TEROlmvk9BR4FaXGw=
+	t=1770155241; cv=none; b=ttz2jbvDWMgUB1x9PgM9YO3FqHmTrdrksoM5uUGdPTYUESXkEqTZ8FOyPo93UuG0E2NWs2g2LxsPP5kFGO+G8QtnmMagmBaFsu8gn9dDCCZuWlDVqgRLSQOpCUmvsN95iWhSGKF2Y6n/MvjgB5VrTNvZlQrUY3fj0GPy9FURzSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770155237; c=relaxed/simple;
-	bh=Wu7RpWRwnk910znRjdOu5hXdosEaOweLZNTDCO56B+Y=;
+	s=arc-20240116; t=1770155241; c=relaxed/simple;
+	bh=V2WX+UYWck/W43rFCasbFC0KiIg1UoGFU/AidfA7wus=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z4nUrck1L4CMOWvgbo3+JW341iLZRXlpMfZPJ8hkQcjN7QvXxTcqPjfgyVkOKuzKfh8L1alHNINg87ZFHEFRPtNXjOBFXMhRTP8P32myPEGSJWFiSO/byHjiIgP0iMPxNdjl5x8HXXMWbYGOYcYxuJp0wszynLUTLPbboackA0c=
+	 MIME-Version; b=JA5ZAFnb9RaVWOae95tfxOdbOXFXT7PNDvkUZ/jnOySP711Gg56phMnDi0eIyUJsV+r+asTw8j7khD1mgUXmA6JxRK9f2mpiXI4CsX6bCp0JtSnQUFn5KJZPwsV8rQTexCvEGfHAIslyfFQRGWHLfhul/nxL4m6GuzyHT3Cmn3k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 659A91515;
-	Tue,  3 Feb 2026 13:47:07 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4465D1516;
+	Tue,  3 Feb 2026 13:47:13 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3DFAD3F778;
-	Tue,  3 Feb 2026 13:47:08 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1F8B43F778;
+	Tue,  3 Feb 2026 13:47:13 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v4 33/41] arm_mpam: resctrl: Add empty definitions for assorted resctrl functions
-Date: Tue,  3 Feb 2026 21:43:34 +0000
-Message-ID: <20260203214342.584712-34-ben.horgan@arm.com>
+Subject: [PATCH v4 34/41] arm64: mpam: Select ARCH_HAS_CPU_RESCTRL
+Date: Tue,  3 Feb 2026 21:43:35 +0000
+Message-ID: <20260203214342.584712-35-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260203214342.584712-1-ben.horgan@arm.com>
 References: <20260203214342.584712-1-ben.horgan@arm.com>
@@ -71,132 +71,84 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-A few resctrl features and hooks need to be provided, but aren't needed or
-supported on MPAM platforms.
+Enough MPAM support is present to enable ARCH_HAS_CPU_RESCTRL.  Let it
+rip^Wlink!
 
-resctrl has individual hooks to separately enable and disable the
-closid/partid and rmid/pmg context switching code. For MPAM this is all the
-same thing, as the value in struct task_struct is used to cache the value
-that should be written to hardware. arm64's context switching code is
-enabled once MPAM is usable, but doesn't touch the hardware unless the
-value has changed.
+ARCH_HAS_CPU_RESCTRL indicates resctrl can be enabled. It is enabled by the
+arch code simply because it has 'arch' in its name.
 
-For now event configuration is not supported, and can be turned off by
-returning 'false' from resctrl_arch_is_evt_configurable().
-
-The new io_alloc feature is not supported either, always return false from
-the enable helper to indicate and fail the enable.
-
-Add this, and empty definitions for the other hooks.
+This removes ARM_CPU_RESCTRL as a mimic of X86_CPU_RESCTRL.  While here,
+move the ACPI dependency to the driver's Kconfig file.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Tested-by: Peter Newman <peternewman@google.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since v3:
-Add resctrl_arch_pre_mount() {}
-resctrl_arch_reset_rmid_all() signature update
-add stubs for abmc
-keep empty definitions together
----
- drivers/resctrl/mpam_resctrl.c | 60 ++++++++++++++++++++++++++++++++++
- include/linux/arm_mpam.h       |  9 +++++
- 2 files changed, 69 insertions(+)
+ arch/arm64/Kconfig               | 2 +-
+ arch/arm64/include/asm/resctrl.h | 2 ++
+ drivers/resctrl/Kconfig          | 7 +++++++
+ drivers/resctrl/Makefile         | 2 +-
+ 4 files changed, 11 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/include/asm/resctrl.h
 
-diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index e2b1afca5f01..db1aba14b41d 100644
---- a/drivers/resctrl/mpam_resctrl.c
-+++ b/drivers/resctrl/mpam_resctrl.c
-@@ -90,6 +90,66 @@ bool resctrl_arch_mon_capable(void)
- 	return exposed_mon_capable;
- }
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 0e8fa195580b..baeecb88771d 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -2027,7 +2027,7 @@ config ARM64_TLB_RANGE
+ config ARM64_MPAM
+ 	bool "Enable support for MPAM"
+ 	select ARM64_MPAM_DRIVER
+-	select ACPI_MPAM if ACPI
++	select ARCH_HAS_CPU_RESCTRL
+ 	help
+ 	  Memory System Resource Partitioning and Monitoring (MPAM) is an
+ 	  optional extension to the Arm architecture that allows each
+diff --git a/arch/arm64/include/asm/resctrl.h b/arch/arm64/include/asm/resctrl.h
+new file mode 100644
+index 000000000000..b506e95cf6e3
+--- /dev/null
++++ b/arch/arm64/include/asm/resctrl.h
+@@ -0,0 +1,2 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#include <linux/arm_mpam.h>
+diff --git a/drivers/resctrl/Kconfig b/drivers/resctrl/Kconfig
+index c34e059c6e41..672abea3b03c 100644
+--- a/drivers/resctrl/Kconfig
++++ b/drivers/resctrl/Kconfig
+@@ -1,6 +1,7 @@
+ menuconfig ARM64_MPAM_DRIVER
+ 	bool "MPAM driver"
+ 	depends on ARM64 && ARM64_MPAM
++	select ACPI_MPAM if ACPI
+ 	help
+ 	  Memory System Resource Partitioning and Monitoring (MPAM) driver for
+ 	  System IP, e.g. caches and memory controllers.
+@@ -22,3 +23,9 @@ config MPAM_KUNIT_TEST
+ 	  If unsure, say N.
  
-+bool resctrl_arch_is_evt_configurable(enum resctrl_event_id evt)
-+{
-+	return false;
-+}
+ endif
 +
-+void resctrl_arch_mon_event_config_read(void *info)
-+{
-+}
-+
-+void resctrl_arch_mon_event_config_write(void *info)
-+{
-+}
-+
-+void resctrl_arch_reset_rmid_all(struct rdt_resource *r, struct rdt_l3_mon_domain *d)
-+{
-+}
-+
-+void resctrl_arch_reset_cntr(struct rdt_resource *r, struct rdt_l3_mon_domain *d,
-+			     u32 closid, u32 rmid, int cntr_id,
-+			     enum resctrl_event_id eventid)
-+{
-+}
-+
-+void resctrl_arch_config_cntr(struct rdt_resource *r, struct rdt_l3_mon_domain *d,
-+			      enum resctrl_event_id evtid, u32 rmid, u32 closid,
-+			      u32 cntr_id, bool assign)
-+{
-+}
-+
-+int resctrl_arch_cntr_read(struct rdt_resource *r, struct rdt_l3_mon_domain *d,
-+			   u32 unused, u32 rmid, int cntr_id,
-+			   enum resctrl_event_id eventid, u64 *val)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+bool resctrl_arch_mbm_cntr_assign_enabled(struct rdt_resource *r)
-+{
-+	return false;
-+}
-+
-+int resctrl_arch_mbm_cntr_assign_set(struct rdt_resource *r, bool enable)
-+{
-+	return -EINVAL;
-+}
-+
-+int resctrl_arch_io_alloc_enable(struct rdt_resource *r, bool enable)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+bool resctrl_arch_get_io_alloc_enabled(struct rdt_resource *r)
-+{
-+	return false;
-+}
-+
-+void resctrl_arch_pre_mount(void)
-+{
-+}
-+
- bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
- {
- 	switch (rid) {
-diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
-index 86d5e326d2bd..f92a36187a52 100644
---- a/include/linux/arm_mpam.h
-+++ b/include/linux/arm_mpam.h
-@@ -67,6 +67,15 @@ struct rdt_resource;
- void *resctrl_arch_mon_ctx_alloc(struct rdt_resource *r, enum resctrl_event_id evtid);
- void resctrl_arch_mon_ctx_free(struct rdt_resource *r, enum resctrl_event_id evtid, void *ctx);
++config ARM64_MPAM_RESCTRL_FS
++	bool
++	default y if ARM64_MPAM_DRIVER && RESCTRL_FS
++	select RESCTRL_RMID_DEPENDS_ON_CLOSID
++	select RESCTRL_ASSIGN_FIXED
+diff --git a/drivers/resctrl/Makefile b/drivers/resctrl/Makefile
+index 40beaf999582..4f6d0e81f9b8 100644
+--- a/drivers/resctrl/Makefile
++++ b/drivers/resctrl/Makefile
+@@ -1,5 +1,5 @@
+ obj-$(CONFIG_ARM64_MPAM_DRIVER)			+= mpam.o
+ mpam-y						+= mpam_devices.o
+-mpam-$(CONFIG_ARM_CPU_RESCTRL)			+= mpam_resctrl.o
++mpam-$(CONFIG_ARM64_MPAM_RESCTRL_FS)		+= mpam_resctrl.o
  
-+/*
-+ * The CPU configuration for MPAM is cheap to write, and is only written if it
-+ * has changed. No need for fine grained enables.
-+ */
-+static inline void resctrl_arch_enable_mon(void) { }
-+static inline void resctrl_arch_disable_mon(void) { }
-+static inline void resctrl_arch_enable_alloc(void) { }
-+static inline void resctrl_arch_disable_alloc(void) { }
-+
- static inline unsigned int resctrl_arch_round_mon_val(unsigned int val)
- {
- 	return val;
+ ccflags-$(CONFIG_ARM64_MPAM_DRIVER_DEBUG)	+= -DDEBUG
 -- 
 2.43.0
 
