@@ -1,198 +1,221 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3AB374748
-	for <kvmarm@lists.linux.dev>; Tue,  3 Feb 2026 21:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80640392C4D
+	for <kvmarm@lists.linux.dev>; Wed,  4 Feb 2026 08:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770155282; cv=none; b=AHQJWFb3Xvdl7EUtrXfE/PTrBU2+jlGCT00tKfdjhWk1YNW16CnNep2j9fZPYCMW4eBUbA0nVzJU9JoEWKtRyEtolxQrE6WTqeS8ZuArgVy5+3e/XpXdcmAKmZKoAOTKgVjhW5dgKNlx5is0r0RWxqzdVIXVSuW/6ueTWiwCd5g=
+	t=1770193749; cv=none; b=AjRDQ6eNDuuK+OhTbX0r+fi6DmSGYCn0BlpPSDGcyH9eriPa+G8U6q6yLDHQn/t/Fmg5TB5IuvZTd1IXVPyQUwrQTU/4aX5qKnIEBV1MvkSyCVrRm92gKxL6wtYNZlsr/3orImrRcxLhyf+L2HtkIfagWPoBzNHqRutYZadRutY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770155282; c=relaxed/simple;
-	bh=9SmIv8jyb4TB0MoKTSFR+nlBNudY43GiPw6QBN4PbBI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbCfg2+VuAqbDiZLlk3jdzzHDIj9wNDEZQ5zUJbZ9zOvTHiV7x/fWiIzb2/0Xf5JbY4paJc3mFV/LHyawgL1gIkmbc2XH99+U9Gr03+kIqcXqHyBKQRNwARpC3sY1XbcLttoBCCokdDj/p2PPzq55QiZPuk9T32sWizXGoHF67c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25035339;
-	Tue,  3 Feb 2026 13:47:54 -0800 (PST)
-Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 21C4B3F778;
-	Tue,  3 Feb 2026 13:47:54 -0800 (PST)
-From: Ben Horgan <ben.horgan@arm.com>
-To: ben.horgan@arm.com
-Cc: amitsinght@marvell.com,
-	baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com,
-	carl@os.amperecomputing.com,
-	dave.martin@arm.com,
-	david@kernel.org,
-	dfustini@baylibre.com,
-	fenghuay@nvidia.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	jonathan.cameron@huawei.com,
-	kobak@nvidia.com,
-	lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	peternewman@google.com,
-	punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com,
-	reinette.chatre@intel.com,
-	rohit.mathew@arm.com,
-	scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev,
-	zengheng4@huawei.com,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v4 41/41] arm64: mpam: Add initial MPAM documentation
-Date: Tue,  3 Feb 2026 21:43:42 +0000
-Message-ID: <20260203214342.584712-42-ben.horgan@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260203214342.584712-1-ben.horgan@arm.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
+	s=arc-20240116; t=1770193749; c=relaxed/simple;
+	bh=ogq1XUSaR3OVUt/O17RmJdqbpaMKcMlDWDhDVswPWxk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nZ1FAqTNwT4DHZZ5WYmMZHmSRnAdOT10Io0QjiY8uzsizRZ7L4ME5YpcV3u7cXx2JFatLCNJcjHz03LZ+dtjbz7PVmCHJJkcc3VsuoWV2gppIa9bqxuPegde0yTnt6kNvAI6nnvZ40s/bgeDuRFYtSUNP4s9Fbf6MoRRmIkfBa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ozkXa3oR; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ozkXa3oR"
+Message-ID: <3f88cd49-68f1-4276-a067-b7c6beadb27c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1770193746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vJvGt7s8JNtP3SsZ3S09HKPpVrd466t4v0LgkkRbzps=;
+	b=ozkXa3oRSqL0pW6TZmVec7dzzDltMBrBxgtPsbRrpkqaxkwxYhT4d29cvEPDbyN7trAdBR
+	NgULJ6hqoKqhEMhjpdn1Q7jx3QjfMzCl5ffzYqrZpwwwZsJol11tJ5L0/AeZ8LmC1AXSv0
+	KFerAdFSk6IOSNvoHurxVupZFuuHYMU=
+Date: Wed, 4 Feb 2026 16:28:57 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 02/16] KVM: arm64: nv: Implement nested Stage-2 page
+ table walk logic
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ wanghaibin.wang@huawei.com
+References: <20240614144552.2773592-1-maz@kernel.org>
+ <20240614144552.2773592-3-maz@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zenghui Yu <zenghui.yu@linux.dev>
+In-Reply-To: <20240614144552.2773592-3-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-MPAM (Memory Partitioning and Monitoring) is now exposed to user-space via
-resctrl. Add some documentation so the user knows what features to expect.
+Hi Marc,
 
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Ben Horgan <ben.horgan@arm.com>
----
-Changes by Ben:
-Some tidying, update for current heuristics
----
- Documentation/arch/arm64/index.rst |  1 +
- Documentation/arch/arm64/mpam.rst  | 93 ++++++++++++++++++++++++++++++
- 2 files changed, 94 insertions(+)
- create mode 100644 Documentation/arch/arm64/mpam.rst
+[ chewing through the NV code.. ;-) ]
 
-diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-index 6a012c98bdcd..189fa760dade 100644
---- a/Documentation/arch/arm64/index.rst
-+++ b/Documentation/arch/arm64/index.rst
-@@ -23,6 +23,7 @@ ARM64 Architecture
-     memory
-     memory-tagging-extension
-     mops
-+    mpam
-     perf
-     pointer-authentication
-     ptdump
-diff --git a/Documentation/arch/arm64/mpam.rst b/Documentation/arch/arm64/mpam.rst
-new file mode 100644
-index 000000000000..0769bccff25e
---- /dev/null
-+++ b/Documentation/arch/arm64/mpam.rst
-@@ -0,0 +1,93 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+====
-+MPAM
-+====
-+
-+What is MPAM
-+============
-+  MPAM (Memory Partitioning and Monitoring) is a feature in the CPUs and memory
-+  system components such as the caches or memory controllers that allow memory
-+  traffic to be labelled, partitioned and monitored.
-+
-+  Traffic is labelled by the CPU, based on the control or monitor group the
-+  current task is assigned to using resctrl.  Partitioning policy can be set
-+  using the schemata file in resctrl, and monitor values read via resctrl.
-+  See Documentation/filesystems/resctrl.rst for more details.
-+
-+  This allows tasks that share memory system resources, such as caches, to be
-+  isolated from each other according to the partitioning policy (so called noisy
-+  neighbours).
-+
-+Supported Platforms
-+===================
-+  Use of this feature requires CPU support, support in the memory system
-+  components, and a description from firmware of where the MPAM device controls
-+  are in the MMIO address space. (e.g. the 'MPAM' ACPI table).
-+
-+  The MMIO device that provides MPAM controls/monitors for a memory system
-+  component is called a memory system component. (MSC).
-+
-+  Because the user interface to MPAM is via resctrl, only MPAM features that are
-+  compatible with resctrl can be exposed to user-space.
-+
-+  MSC are considered as a group based on the topology. MSC that correspond with
-+  the L3 cache are considered together, it is not possible to mix MSC between L2
-+  and L3 to 'cover' a resctrl schema.
-+
-+  The supported features are:
-+    * Cache portion bitmap controls (CPOR) on the L2 or L3 caches.  To expose
-+      CPOR at L2 or L3, every CPU must have a corresponding CPU cache at this
-+      level that also supports the feature.  Mismatched big/little platforms are
-+      not supported as resctrl's controls would then also depend on task
-+      placement.
-+
-+    * Memory bandwidth maximum controls (MBW_MAX) on or after the L3 cache.
-+      resctrl uses the L3 cache-id to identify where the memory bandwidth
-+      control is applied. For this reason the platform must have an L3 cache
-+      with cache-id's supplied by firmware. (It doesn't need to support MPAM.)
-+
-+      To be exported as the 'MB' schema, the topology of the group of MSC chosen
-+      must match the topology of the L3 cache so that the cache-id's can be
-+      repainted. For example: Platforms with Memory bandwidth maximum controls
-+      on CPU-less NUMA nodes cannot expose the 'MB' schema to resctrl as these
-+      nodes do not have a corresponding L3 cache. If the memory bandwidth
-+      control is on the memory rather than the L3 then there must be a single
-+      global L3 as otherwise it is unknown which L3 the traffic came from.
-+
-+      When the MPAM driver finds multiple groups of MSC it can use for the 'MB'
-+      schema, it prefers the group closest to the L3 cache.
-+
-+    * Cache Storage Usage (CSU) counters can expose the 'llc_occupancy' provided
-+      there is at least one CSU monitor on each MSC that makes up the L3 group.
-+      Exposing CSU counters from other caches or devices is not supported.
-+
-+    * Memory Bandwidth Usage (MBWU) on or after the L3 cache.  resctrl uses the
-+      L3 cache-id to identify where the memory bandwidth is measured. For this
-+      reason the platform must have an L3 cache with cache-id's supplied by
-+      firmware. (It doesn't need to support MPAM.)
-+
-+      Memory bandwidth monitoring makes use of MBWU monitors in each MSC that
-+      makes up the L3 group. If there are more monitors than the maximum number
-+      of control and monitor groups, these will be allocated and configured at
-+      boot. Otherwise, the monitors will not be usable as they are required to
-+      be free running. If the memory bandwidth monitoring is on the memory
-+      rather than the L3 then there must be a single global L3 as otherwise it
-+      is unknown which L3 the traffic came from.
-+
-+      To expose 'mbm_total_bytes', the topology of the group of MSC chosen must
-+      match the topology of the L3 cache so that the cache-id's can be
-+      repainted. For example: Platforms with Memory bandwidth monitors on
-+      CPU-less NUMA nodes cannot expose 'mbm_total_bytes' as these nodes do not
-+      have a corresponding L3 cache. 'mbm_local_bytes' is not exposed as MPAM
-+      cannot distinguish local traffic from global traffic.
-+
-+Feature emulation
-+=================
-+  MPAM will emulate the Code Data Prioritisation (CDP) feature on all platforms.
-+
-+Reporting Bugs
-+==============
-+  If you are not seeing the counters or controls you expect please share the
-+  debug messages produced when enabling dynamic debug and booting with:
-+  dyndbg="file mpam_resctrl.c +pl"
--- 
-2.43.0
+On 6/14/24 10:45 PM, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Based on the pseudo-code in the ARM ARM, implement a stage 2 software
+> page table walker.
 
+[...]
+
+> +static u32 compute_fsc(int level, u32 fsc)
+> +{
+> +	return fsc | (level & 0x3);
+> +}
+> +
+> +static int get_ia_size(struct s2_walk_info *wi)
+> +{
+> +	return 64 - wi->t0sz;
+> +}
+> +
+> +static int check_base_s2_limits(struct s2_walk_info *wi,
+> +				int level, int input_size, int stride)
+> +{
+> +	int start_size, ia_size;
+> +
+> +	ia_size = get_ia_size(wi);
+> +
+> +	/* Check translation limits */
+> +	switch (BIT(wi->pgshift)) {
+> +	case SZ_64K:
+> +		if (level == 0 || (level == 1 && ia_size <= 42))
+
+It looks broken as the pseudocode checks the limits based on
+*implemented PA size*, rather than on ia_size, which is essentially the
+input address size (64 - T0SZ) programmed by L1 hypervisor. They're
+different.
+
+We can probably get the implemented PA size by:
+
+AArch64.PAMax()
+{
+	parange = get_idreg_field_enum(kvm, ID_AA64MMFR0_EL1, PARANGE);
+	return id_aa64mmfr0_parange_to_phys_shift(parange);
+}
+
+Not sure if I've read the spec correctly.
+
+> +			return -EFAULT;
+> +		break;
+> +	case SZ_16K:
+> +		if (level == 0 || (level == 1 && ia_size <= 40))
+> +			return -EFAULT;
+> +		break;
+> +	case SZ_4K:
+> +		if (level < 0 || (level == 0 && ia_size <= 42))
+> +			return -EFAULT;
+> +		break;
+> +	}
+> +
+> +	/* Check input size limits */
+> +	if (input_size > ia_size)
+
+This is always false for the current code. ;-)
+
+> +		return -EFAULT;
+> +
+> +	/* Check number of entries in starting level table */
+> +	start_size = input_size - ((3 - level) * stride + wi->pgshift);
+> +	if (start_size < 1 || start_size > stride + 4)
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +/* Check if output is within boundaries */
+> +static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
+> +{
+> +	unsigned int output_size = wi->max_oa_bits;
+> +
+> +	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
+> +		return -1;
+> +
+> +	return 0;
+> +}
+> +
+> +/*
+> + * This is essentially a C-version of the pseudo code from the ARM ARM
+> + * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
+> + * that pseudocode in trying to understand this.
+> + *
+> + * Must be called with the kvm->srcu read lock held
+> + */
+> +static int walk_nested_s2_pgd(phys_addr_t ipa,
+> +			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
+> +{
+> +	int first_block_level, level, stride, input_size, base_lower_bound;
+> +	phys_addr_t base_addr;
+> +	unsigned int addr_top, addr_bottom;
+> +	u64 desc;  /* page table entry */
+> +	int ret;
+> +	phys_addr_t paddr;
+> +
+> +	switch (BIT(wi->pgshift)) {
+> +	default:
+> +	case SZ_64K:
+> +	case SZ_16K:
+> +		level = 3 - wi->sl;
+> +		first_block_level = 2;
+> +		break;
+> +	case SZ_4K:
+> +		level = 2 - wi->sl;
+> +		first_block_level = 1;
+> +		break;
+> +	}
+> +
+> +	stride = wi->pgshift - 3;
+> +	input_size = get_ia_size(wi);
+> +	if (input_size > 48 || input_size < 25)
+> +		return -EFAULT;
+> +
+> +	ret = check_base_s2_limits(wi, level, input_size, stride);
+> +	if (WARN_ON(ret))
+> +		return ret;
+> +
+> +	base_lower_bound = 3 + input_size - ((3 - level) * stride +
+> +			   wi->pgshift);
+> +	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
+> +
+> +	if (check_output_size(wi, base_addr)) {
+> +		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
+
+With a wrongly programmed base address, we should report the ADDRSZ
+fault at level 0 (as per R_BFHQH and the pseudocode). It's easy to fix.
+
+> +static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
+> +{
+> +	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
+> +
+> +	switch (vtcr & VTCR_EL2_TG0_MASK) {
+> +	case VTCR_EL2_TG0_4K:
+> +		wi->pgshift = 12;	 break;
+> +	case VTCR_EL2_TG0_16K:
+> +		wi->pgshift = 14;	 break;
+> +	case VTCR_EL2_TG0_64K:
+> +	default:	    /* IMPDEF: treat any other value as 64k */
+> +		wi->pgshift = 16;	 break;
+> +	}
+> +
+> +	wi->sl = FIELD_GET(VTCR_EL2_SL0_MASK, vtcr);
+> +	/* Global limit for now, should eventually be per-VM */
+> +	wi->max_oa_bits = min(get_kvm_ipa_limit(),
+                              ^^^
+
+Should we use AArch64.PAMax() instead? As the output address size is
+never larger than the implemented PA size.
+
+Now I'm wondering if we can let kvm_get_pa_bits() just return PAMax for
+(based on the exposed (to-L1) AA64MFR0.PARange value) and use it when
+possible.
+
+Thanks,
+Zenghui
