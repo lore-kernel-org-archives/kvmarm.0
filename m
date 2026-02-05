@@ -1,115 +1,122 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0DE22339
-	for <kvmarm@lists.linux.dev>; Thu,  5 Feb 2026 17:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DC82F8BC3
+	for <kvmarm@lists.linux.dev>; Thu,  5 Feb 2026 17:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770311165; cv=none; b=eUYBldfCjc8uTxzpANdY1l18TUWK2ADvLfHLVVPkt/53eEqimRpgE/DM3Nx9XG+mZ5hcwggkQGoLOqqaSPCaZR5FIwvNWvHUvC7nVgzEWUdhYQ0BnvtfUc70zF0yZw8b4Z1Bhz3rQNuilLwnwHdvNPc589wgAzlTor9Vxbl7DhI=
+	t=1770313301; cv=none; b=sUW6BkhQG6XquxlbelEoiUyFt5WCghtWgImacR+ylexw1/OpvrDsxHB6NVuPIZWbbojrcRzLMqauibIFgvR5usnmHkKPGaMRA+pVHCxDHj6UBWGCkzCjNFsS3mzEklp2guD2AhXqb40JmLrmNrde97fGMvjdMRYAQeenzTMOoHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770311165; c=relaxed/simple;
-	bh=+ggiuJ6rgpm0PJdw5izu+TS4/QQkwT9qxIic9BaESVo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mzoaF5UXE4c3dWpivH9001xrc9i3See99jRn7QjwZ4dw1rLPDn59p0iDF7uvrkEwGbaXQJ8ri+Zo85XrXvEymQJQn5buJJubodm8+JPE9/l+9zaRdLkpivFWpxeeHj+6LSDiOHqH5oMCJreZ7xkhk2ME9qe2VuetnwS5ZiQpOqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4f6NsL2811zHnGcj;
-	Fri,  6 Feb 2026 01:05:58 +0800 (CST)
-Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
-	by mail.maildlp.com (Postfix) with ESMTPS id 152ED40565;
-	Fri,  6 Feb 2026 01:06:01 +0800 (CST)
-Received: from localhost (10.48.151.164) by dubpeml500005.china.huawei.com
- (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 5 Feb
- 2026 17:05:59 +0000
-Date: Thu, 5 Feb 2026 17:05:57 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
-	<zengheng4@huawei.com>, <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v4 41/41] arm64: mpam: Add initial MPAM documentation
-Message-ID: <20260205170557.00000d4d@huawei.com>
-In-Reply-To: <20260203214342.584712-42-ben.horgan@arm.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
-	<20260203214342.584712-42-ben.horgan@arm.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1770313301; c=relaxed/simple;
+	bh=dmL7Lk+6dlXqEGvGe/Bs7X3mYeHB1WOarIYKrEOGFXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rz+SOUsYlUmBkpneC4ceYmVsSSCc0+YU/PGRgqc9U+W34ykIrAGat14HACrN0XlE6gcxe+MPBn5UVUEeaaZ5CZW0//n7qGNh0EZm/JnKv66M20y+I2M/yTjj1O80cpMPaWD1KG4nYE16um6rugJ0xj5mQGjK0Ko2yUl63wyBhRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf07.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id 0A3238C109;
+	Thu,  5 Feb 2026 17:41:37 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf07.hostedemail.com (Postfix) with ESMTPA id 1CB9120024;
+	Thu,  5 Feb 2026 17:41:34 +0000 (UTC)
+Date: Thu, 5 Feb 2026 12:42:08 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 15/30] tracing: selftests: Add trace remote tests
+Message-ID: <20260205124208.2ed7cff8@gandalf.local.home>
+In-Reply-To: <20260131132848.254084-16-vdonnefort@google.com>
+References: <20260131132848.254084-1-vdonnefort@google.com>
+	<20260131132848.254084-16-vdonnefort@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- dubpeml500005.china.huawei.com (7.214.145.207)
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 1CB9120024
+X-Stat-Signature: xrqfaergycraki9ixirzx4pqwqpkshpz
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/AAJG0H2Y0nJ6yIVW93vc/rmOZvsTHdvc=
+X-HE-Tag: 1770313294-751280
+X-HE-Meta: U2FsdGVkX1+uuRgLPQ0ZgTKxMjzwxSS3wkxfEc/ttq2P0equ3WYuTk1Eo8BUqwVZX+pHP5PyilUVvCZrp/Id69DfyKfI2Lcp/JUghTpize8GQcHlrhj+pA1vcARhFNwS9fozq1kAOB1M5jjdhbgyyftg7E6q0Tm13V0vgY0dBYjaHm8CJ9e43ks2XZGIkfziMs32Vie/pcc9aL59qt67rJDOd8YNL9sFIg4S/bmc3qWX6TEookAaDBK0BzqiQTGiYhmLBwffXuSRZsCBHFPgG/lyEUt40fCk9nEWr/1+qTYjj82gzk1WqrJTqJK1Isyl4D6JObzKUKNVidE/baBu0TfHLiCDT7J7kI1mj9b80sNlo4rLU0R/bknCw+sIoPJs4g4uWStQ1N19ite56C3RWzGZxfFk+rXqZPVMs/Cnb5Q=
 
-On Tue, 3 Feb 2026 21:43:42 +0000
-Ben Horgan <ben.horgan@arm.com> wrote:
+On Sat, 31 Jan 2026 13:28:33 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-> MPAM (Memory Partitioning and Monitoring) is now exposed to user-space via
-> resctrl. Add some documentation so the user knows what features to expect.
+> Exercise the tracefs interface for trace remote with a set of tests to
+> check:
 > 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes by Ben:
-> Some tidying, update for current heuristics
-> ---
->  Documentation/arch/arm64/index.rst |  1 +
->  Documentation/arch/arm64/mpam.rst  | 93 ++++++++++++++++++++++++++++++
->  2 files changed, 94 insertions(+)
->  create mode 100644 Documentation/arch/arm64/mpam.rst
+>   * loading/unloading (unloading.tc)
+>   * reset (reset.tc)
+>   * size changes (buffer_size.tc)
+>   * consuming read (trace_pipe.tc)
+>   * non-consuming read (trace.tc)
 > 
-> diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-> index 6a012c98bdcd..189fa760dade 100644
-> --- a/Documentation/arch/arm64/index.rst
-> +++ b/Documentation/arch/arm64/index.rst
-> @@ -23,6 +23,7 @@ ARM64 Architecture
->      memory
->      memory-tagging-extension
->      mops
-> +    mpam
->      perf
->      pointer-authentication
->      ptdump
-> diff --git a/Documentation/arch/arm64/mpam.rst b/Documentation/arch/arm64/mpam.rst
-> new file mode 100644
-> index 000000000000..0769bccff25e
-> --- /dev/null
-> +++ b/Documentation/arch/arm64/mpam.rst
-> @@ -0,0 +1,93 @@
-> +.. SPDX-License-Identifier: GPL-2.0
-> +
-> +====
-> +MPAM
-> +====
-> +
-> +What is MPAM
-> +============
+> Cc: Shuah Khan <skhan@linuxfoundation.org>
+> Cc: linux-kselftest@vger.kernel.org
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
+This still fails:
 
-> +  MPAM (Memory Partitioning and Monitoring) is a feature in the CPUs and memory
+=== Ftrace unit tests ===
+[1] Test trace remote buffer size	[PASS]
+[2] Test hypervisor trace buffer size	[UNSUPPORTED]
+[3] Test hypervisor trace buffer reset	[UNSUPPORTED]
+[4] Test hypervisor consuming trace read	[UNSUPPORTED]
+[5] Test hypervisor non-consuming trace read	[UNSUPPORTED]
+[6] Test hypervisor trace buffer unloading	[UNSUPPORTED]
+[7] Test trace remote reset	[PASS]
+[8] Test trace remote consuming read	[FAIL]
+[9] Test trace remote non-consuming read	[FAIL]
+[10] Test trace remote unloading	[PASS]
 
-I've not seen this style of indenting much in rst.  I checked a few
-files in this directory and it's not used in the ones I randomly picked.
-+ it's not what the kernel-documentation.rst file suggests is standard
-formatting.
+I added this patch and the two failed tests now pass:
 
-Other than that the content looks fine to me.
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/trace.tc b/tools/testing/selftests/ftrace/test.d/remotes/trace.tc
+index 081133ec45ff..dfc954a6a380 100644
+--- a/tools/testing/selftests/ftrace/test.d/remotes/trace.tc
++++ b/tools/testing/selftests/ftrace/test.d/remotes/trace.tc
+@@ -106,8 +106,10 @@ test_trace()
+     echo 0 > trace
+ 
+     for cpu in $(get_cpu_ids); do
+-        echo 0 > /sys/devices/system/cpu/cpu$cpu/online
+-        break
++        if [ -f /sys/devices/system/cpu/cpu$cpu/online ]; then
++            echo 0 > /sys/devices/system/cpu/cpu$cpu/online
++            break
++        fi
+     done
+ 
+     for i in $(seq 1 8); do
+diff --git a/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
+index d28eaee10c7c..146f0a9fe311 100644
+--- a/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
++++ b/tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
+@@ -102,8 +102,10 @@ test_trace_pipe()
+     echo 0 > trace
+ 
+     for cpu in $(get_cpu_ids); do
+-        echo 0 > /sys/devices/system/cpu/cpu$cpu/online
+-        break
++        if [ -f /sys/devices/system/cpu/cpu$cpu/online ]; then
++            echo 0 > /sys/devices/system/cpu/cpu$cpu/online
++            break
++        fi
+     done
+ 
+     for i in $(seq 1 8); do
 
-Jonathan
+-- Steve
