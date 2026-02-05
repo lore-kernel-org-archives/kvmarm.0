@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDC43EF0A1
-	for <kvmarm@lists.linux.dev>; Thu,  5 Feb 2026 16:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9B9436358
+	for <kvmarm@lists.linux.dev>; Thu,  5 Feb 2026 16:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770308193; cv=none; b=sutGXZM8VLnwNEqYiPbDSEfm4rUEFJK8b6vKGj/FGNMKVGNCuRGopbL5386xbY87cRzd2xY3oIzyjMIud/DCj/GI1cwHYNbASNkbnOt/+Dkn6aAiiwBwoFi2383aAoAFhmfih+nVbFMRzTkXPgwRCKQb76tfZ1y4X+jE5feAn9U=
+	t=1770308443; cv=none; b=QfCkxE2aiZsBVOPaI37NjnEoa2I0ZaC65uEfm+mHWzuipQbfRa9vgRHg76g6EdfIBG+i6LgVmgje71rh9WD178d9wt22sEgKdplKMHVIMuam+PrXM57YEsxLRQk6aAzfB2/P8iai55IA/qxvUJiIrrHytJVkfuST7gtWSuDzzx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770308193; c=relaxed/simple;
-	bh=MNkzB34P7cQqRXT25Kr9JHE2YCRHfmQ0v7uYbpp8pzM=;
+	s=arc-20240116; t=1770308443; c=relaxed/simple;
+	bh=3j9lC1ezcq1o4I4TKi+RkA8i98PkQhrH+eBR1wizp9M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ts3iElYDptYPvuOSpOdLDIR887h4UJJszlytGzOzGaPj2Ait/1uIi+0lCPqe+sUEj5UK6oaSrR5eHBolL3I/3ZDwwtCAZ+W6bEtaCgiMilO9y6VdTpLLCQOisCC+NKTwizgeMmnHLo++CR06RqvZf0HENQDi5/KfKUuzJZnmQyc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=N41WkGFs9T8lvhq0fxqnDr2FbFvnUzZWzi6TECjDclFgPi3YMsGM6hBv+YnxDQtF/xOdwSgocGG8rFX8rAfGXgsUjQQf8sZIYubBo6z0tH9cr8ltLNrX1yUTP83g6fqgC2DSkK2JpnPgWGexpMu6qOru2tM0UgpVEfzaYS1rIRc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56515339;
-	Thu,  5 Feb 2026 08:16:25 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EC098339;
+	Thu,  5 Feb 2026 08:20:35 -0800 (PST)
 Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E314C3F632;
-	Thu,  5 Feb 2026 08:16:25 -0800 (PST)
-Date: Thu, 5 Feb 2026 16:16:23 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85D6C3F632;
+	Thu,  5 Feb 2026 08:20:36 -0800 (PST)
+Date: Thu, 5 Feb 2026 16:20:33 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
@@ -36,10 +36,11 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
 	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
 	zengheng4@huawei.com, linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: Re: [PATCH v4 04/41] arm64: mpam: Context switch the MPAM registers
-Message-ID: <aYTCV8E9ZFn4_FND@arm.com>
+Subject: Re: [PATCH v4 05/41] arm64: mpam: Re-initialise MPAM regs when CPU
+ comes online
+Message-ID: <aYTDUStE3RJp_ht4@arm.com>
 References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-5-ben.horgan@arm.com>
+ <20260203214342.584712-6-ben.horgan@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,62 +49,25 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260203214342.584712-5-ben.horgan@arm.com>
+In-Reply-To: <20260203214342.584712-6-ben.horgan@arm.com>
 
-On Tue, Feb 03, 2026 at 09:43:05PM +0000, Ben Horgan wrote:
+On Tue, Feb 03, 2026 at 09:43:06PM +0000, Ben Horgan wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> MPAM allows traffic in the SoC to be labeled by the OS, these labels are
-> used to apply policy in caches and bandwidth regulators, and to monitor
-> traffic in the SoC. The label is made up of a PARTID and PMG value. The x86
-> equivalent calls these CLOSID and RMID, but they don't map precisely.
+> Now that the MPAM system registers are expected to have values that change,
+> reprogram them based on the previous value when a CPU is brought online.
 > 
-> MPAM has two CPU system registers that is used to hold the PARTID and PMG
-> values that traffic generated at each exception level will use. These can
-> be set per-task by the resctrl file system. (resctrl is the defacto
-> interface for controlling this stuff).
-> 
-> Add a helper to switch this.
-> 
-> struct task_struct's separate CLOSID and RMID fields are insufficient to
-> implement resctrl using MPAM, as resctrl can change the PARTID (CLOSID) and
-> PMG (sort of like the RMID) separately. On x86, the rmid is an independent
-> number, so a race that writes a mismatched closid and rmid into hardware is
-> benign. On arm64, the pmg bits extend the partid.
-> (i.e. partid-5 has a pmg-0 that is not the same as partid-6's pmg-0).  In
-> this case, mismatching the values will 'dirty' a pmg value that resctrl
-> believes is clean, and is not tracking with its 'limbo' code.
-> 
-> To avoid this, the partid and pmg are always read and written as a
-> pair. This requires a new u64 field. In struct task_struct there are two
-> u32, rmid and closid for the x86 case, but as we can't use them here do
-> something else. Add this new field, mpam_partid_pmg, to struct thread_info
-> to avoid adding more architecture specific code to struct task_struct.
-> Always use READ_ONCE()/WRITE_ONCE() when accessing this field.
-> 
-> Resctrl allows a per-cpu 'default' value to be set, this overrides the
-> values when scheduling a task in the default control-group, which has
-> PARTID 0. The way 'code data prioritisation' gets emulated means the
-> register value for the default group needs to be a variable.
-> 
-> The current system register value is kept in a per-cpu variable to avoid
-> writing to the system register if the value isn't going to change.  Writes
-> to this register may reset the hardware state for regulating bandwidth.
-> 
-> Finally, there is no reason to context switch these registers unless there
-> is a driver changing the values in struct task_struct. Hide the whole thing
-> behind a static key. This also allows the driver to disable MPAM in
-> response to errors reported by hardware. Move the existing static key to
-> belong to the arch code, as in the future the MPAM driver may become a
-> loadable module.
-> 
-> All this should depend on whether there is an MPAM driver, hide it behind
-> CONFIG_ARM64_MPAM.
+> Previously MPAM's 'default PARTID' of 0 was always used for MPAM in
+> kernel-space as this is the PARTID that hardware guarantees to
+> reset. Because there are a limited number of PARTID, this value is exposed
+> to user-space, meaning resctrl changes to the resctrl default group would
+> also affect kernel threads.  Instead, use the task's PARTID value for
+> kernel work on behalf of user-space too. The default of 0 is kept for both
+> user-space and kernel-space when MPAM is not enabled.
 > 
 > Tested-by: Gavin Shan <gshan@redhat.com>
 > Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 > Tested-by: Peter Newman <peternewman@google.com>
-> CC: Amit Singh Tomar <amitsinght@marvell.com>
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Reviewed-by: Gavin Shan <gshan@redhat.com>
