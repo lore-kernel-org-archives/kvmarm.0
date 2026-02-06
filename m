@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9271335F8D9
-	for <kvmarm@lists.linux.dev>; Fri,  6 Feb 2026 18:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10AD42315D
+	for <kvmarm@lists.linux.dev>; Fri,  6 Feb 2026 18:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770402961; cv=none; b=JG43jDTIJ9P5+u79UNkmqrEjVxzskbekWJv1yncyuV+3s0KXWx2FKL1UDX6GQrdCdClsnNVKpLSz5o2v7iXRNwddSf3LMM3A7u/TTintmp7foxUUbMQMJpxiwtBfeC2hteUzdx0s0PtxpqzzF8fQi085XAUlBYnSAlPdtkM0ETQ=
+	t=1770403022; cv=none; b=lbaw9RfPIOSrEJ7wxTE8CmJ3uqWlGMG4TEaFCnCA0hD7QF7qhgKm+lWws57m9XbtXgVh56uvu8qox+nN2X5aI0dftPv81xciQV4iwfUX190NuT5xzmNjH0W5UuckguAEFdeJ3QqI2sI9hGFUT0B5cebVbWb8k7i1EjgjZ61+3DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770402961; c=relaxed/simple;
-	bh=fAOnpi1k96zhhNFrBl7HalgkZEIqUwurYuGb5lXndXk=;
+	s=arc-20240116; t=1770403022; c=relaxed/simple;
+	bh=CehQn6ShgSVIZOBhGRqrC5UlJXuOMh3G+/j9hX2CJWM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MAkFGPC3DS7x6nr53JXjrbhz0QJWZmOcf+2z1biOZA2nK5uJ7dlqyTZkf8egUquq0H2RyzT7pIemG9kjbRVBDyHJOMj2apcyKdAW0mFF71Qv8M6mLKkS6gRSKAUGgDVcR0OAhBpZbs/gtP8tfNAI2n6FoxVrS/X1lsipRUDm9Uc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=N3JD5l30A8un2Nafj/Ym3um8A5ljHStj1PI0hHnCnmwNizgfXMiywcbmuWtcI0g+BzwpxJ7Tm0fxmqTmh22oMM/M1TSkdC+1R/wzsRqDaXTgFzVgH3A6q2ngIjBgDHZFwCnstSf7V6qlX+rqY0Wx1ukCf4dP+EgCygyIEpXvlV8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA525339;
-	Fri,  6 Feb 2026 10:35:54 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B738E339;
+	Fri,  6 Feb 2026 10:36:54 -0800 (PST)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E124E3F632;
-	Fri,  6 Feb 2026 10:35:57 -0800 (PST)
-Date: Fri, 6 Feb 2026 18:35:51 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 763D53F632;
+	Fri,  6 Feb 2026 10:36:58 -0800 (PST)
+Date: Fri, 6 Feb 2026 18:36:52 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -29,10 +29,10 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	lpieralisi@kernel.org, scott@os.amperecomputing.com,
 	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
 	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
-Subject: Re: [PATCH v12 0/7] support FEAT_LSUI
-Message-ID: <aYY0h1DtvDpEyekd@arm.com>
+Subject: Re: [PATCH v12 1/7] arm64: Kconfig: add support for LSUI
+Message-ID: <aYY0xOdUxn39ZPZh@arm.com>
 References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
- <aYWuqTqM5MvudI5V@e129823.arm.com>
+ <20260121190622.2218669-2-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,13 +41,21 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYWuqTqM5MvudI5V@e129823.arm.com>
+In-Reply-To: <20260121190622.2218669-2-yeoreum.yun@arm.com>
 
-On Fri, Feb 06, 2026 at 09:04:41AM +0000, Yeoreum Yun wrote:
-> Gentle ping in case of forgotten.
+On Wed, Jan 21, 2026 at 07:06:16PM +0000, Yeoreum Yun wrote:
+> Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+> previleged level to access to access user memory without clearing
+> PSTATE.PAN bit.
+> 
+> Add Kconfig option entry for FEAT_LSUI.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
 
-Not forgotten but lower priority given that the merging window is about
-to open this Sunday. The LSUI series is now aimed at the next cycle.
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+
+In general we should move the Kconfig addition last for bisectability,
+unless all the other patches introduced are ok on their own.
 
 -- 
 Catalin
