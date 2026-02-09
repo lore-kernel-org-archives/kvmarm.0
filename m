@@ -1,124 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EC93446C0;
-	Mon,  9 Feb 2026 09:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0254E1B4138
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 10:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770628931; cv=none; b=QjITMrqEs4LTrP/NHShdbi4XQGKBb7q9PADDOtUUdv43RssMj4UobfwvX1Ulufc8xyLQZMOG7ddfpZi3bxjuP8lf1XV75JGohzYqYtraNmHY2FnQaBvhsQv6ugk/pKO6NgArLI1VwR0KwInmnsvCJ+ehMzBe/dhOI5eE8Hkqs0k=
+	t=1770631449; cv=none; b=RTJmMOWvYpCVU0RDat5zDDMTGd5uhOvyxdafQkIPEB56VzH7h5EAr2h1XXPwmzKH7UQmjqt1mCzJEZGFUdkqhzAVg3QbvKKR/jY6nBCr58xT3R1eacG5qej0GvjFz8D8hK37cDRFYq1QJi5ziwgTJZciTKLuFcAJ2dxV70JAHa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770628931; c=relaxed/simple;
-	bh=cIMc0AWi7lb3E7b2oWk6KZ1wEX8lLo1DYxXZtE8SEWM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D/NxeFj0NaM5y3dtnx4ckf4PGJ4iCkgSAfTpjevbG+BVh/DBJE5yJI3wKeCXFeYVgf8cOMjqVg9hG6cBLZ4s0v/ytiTBeCaGmMOiUstvJcKzip7B53+0wXlA4A0Z7krHaXchKgNeqCJQUjGOxCPm9b/K6ZUDNzKhEbf6kDR5I/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEVMy3Ep; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEVMy3Ep"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 869EFC116C6;
-	Mon,  9 Feb 2026 09:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770628930;
-	bh=cIMc0AWi7lb3E7b2oWk6KZ1wEX8lLo1DYxXZtE8SEWM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lEVMy3Ep0br3N10YgShH2kguLeOfcPEKWyKjDkqj3lqK/INzRqSHTQiwXxjUwKaC0
-	 L71ZhKSZkxfxEG8LpnMij7geLIUI8Y+N+x1tKVX1sV0CHaaTfNqwTS6K4Dzif/LKN2
-	 Wvnp/RAxk2SSzwbZsgBElYArn1CrdHCg5iGRaFYgJo8rBryku4if7RfbBGaCgYp44c
-	 fcj+zO1fYwACYlsKNaSDv1vNIceUtCBXK4PyOirQZYOpL3VHjymruX8sPTCPjQjppj
-	 gzr+Q9BtY0upm32qrE0rXjt199e6GSigjD/IGmHPMZ/KnY1vvBSZd9otJ2I74aC/0n
-	 a3RV7wBGzTsDQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vpNT6-00000009iFb-0PfL;
-	Mon, 09 Feb 2026 09:22:08 +0000
-Date: Mon, 09 Feb 2026 09:22:07 +0000
-Message-ID: <86y0l2b7b4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: <kyle-jk.liao@mediatek.com>
-Cc: Oliver Upton <oupton@kernel.org>,
-	Joey
- Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Quentin
- Perret <qperret@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	<linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>,
-	<linux-mediatek@lists.infradead.org>,
-	<wsd_upstream@mediatek.com>,
-	<rock.yeh@mediatek.com>,
-	<hungwen.chien@mediatek.com>
-Subject: Re: [PATCH] KVM: arm64: Allow module-owned pages in host stage-2 range adjustment
-In-Reply-To: <20260209032421.1278325-1-kyle-jk.liao@mediatek.com>
-References: <20260209032421.1278325-1-kyle-jk.liao@mediatek.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1770631449; c=relaxed/simple;
+	bh=N38vbDeMMBRSF9rOlC/b2KTnP4Nk87rzrATIvwEGPWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L1FziAgisD6T2mHLPtnE3lmK6Mvf+gmXJ4N0S6bUZTAShDEpkGa4Fns4HHO6l1iFIkKOklXrXMMnPeI4pp5i6BzmUqb6jlgvbaGd/bUnuSPIEig7ChKQH5nOG83K9SpVJYYX4VjX+KaGM8un97r0y0vRX1BtK5Nnpo1s0o0MsG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 055A3339;
+	Mon,  9 Feb 2026 02:04:02 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 480D03F632;
+	Mon,  9 Feb 2026 02:04:03 -0800 (PST)
+Message-ID: <9a8a163e-887a-45fc-aae5-45e564360c8b@arm.com>
+Date: Mon, 9 Feb 2026 10:04:01 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kyle-jk.liao@mediatek.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com, qperret@google.com, vdonnefort@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, wsd_upstream@mediatek.com, rock.yeh@mediatek.com, hungwen.chien@mediatek.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
+To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
+Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
+ "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
+ "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
+ "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
+ "dave.martin@arm.com" <dave.martin@arm.com>,
+ "david@kernel.org" <david@kernel.org>,
+ "dfustini@baylibre.com" <dfustini@baylibre.com>,
+ "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
+ "gshan@redhat.com" <gshan@redhat.com>,
+ "james.morse@arm.com" <james.morse@arm.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "kobak@nvidia.com" <kobak@nvidia.com>,
+ "lcherian@marvell.com" <lcherian@marvell.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "peternewman@google.com" <peternewman@google.com>,
+ "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
+ "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
+ "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
+ "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
+ "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
+ "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
+ "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
+ "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+ "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+ "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
+ "joey.gouly@arm.com" <joey.gouly@arm.com>,
+ "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+ "zengheng4@huawei.com" <zengheng4@huawei.com>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+References: <20260203214342.584712-1-ben.horgan@arm.com>
+ <OSZPR01MB87983A126E58D3FE8A73A98F8B65A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <OSZPR01MB87983A126E58D3FE8A73A98F8B65A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 09 Feb 2026 03:24:13 +0000,
-<kyle-jk.liao@mediatek.com> wrote:
-> 
-> From: "kyle-jk.liao" <kyle-jk.liao@mediatek.com>
-> 
-> The host_stage2_adjust_range() function triggers a WARN_ON when
-> encountering pages marked as both PKVM_NOPAGE and PKVM_MODULE_OWNED_PAGE.
-> This occurs when load_unaligned_zeropad() accesses memory that crosses
-> page boundaries, where one of the pages is module-owned.
-> 
-> Extend the check to accept pages with the PKVM_MODULE_OWNED_PAGE flag
-> in addition to PKVM_NOPAGE, preventing spurious warnings during normal
-> module memory access patterns.
-> 
-> Signed-off-by: kyle-jk.liao <kyle-jk.liao@mediatek.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 49db32f3ddf7..baaabf4b5112 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -495,6 +495,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
->  	u64 granule;
->  	s8 level;
->  	int ret;
-> +	enum pkvm_page_state state;
->  
->  	hyp_assert_lock_held(&host_mmu.lock);
->  	ret = kvm_pgtable_get_leaf(&host_mmu.pgt, addr, &pte, &level);
-> @@ -505,8 +506,9 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
->  		return -EAGAIN;
->  
->  	if (pte) {
-> +		state = get_host_state(hyp_phys_to_page(addr));
->  		WARN_ON(addr_is_memory(addr) &&
-> -			get_host_state(hyp_phys_to_page(addr)) != PKVM_NOPAGE);
-> +			(state != PKVM_NOPAGE && state != (PKVM_NOPAGE | PKVM_MODULE_OWNED_PAGE)));
->  		return -EPERM;
->  	}
->  
+Hi Shaopeng,
 
-None of that exists upstream.
+On 2/9/26 08:25, Shaopeng Tan (Fujitsu) wrote:
+> Hello Ben,
+> 
+>> This new version of the mpam missing pieces series has a few significant
+>> changes in the mpam driver part of the series. The heuristics for deciding
+>> if features should be exposed are tightened. This is to fix some
+>> inaccuracies and avoid overcommitting before needed - shout if this changes
+>> anything on your platform. The final patch adds documentation which
+>> explains which features you should expect. The ABMC emulation is dropped
+>> for the moment as it requires resctrl changes to support for MPAM without
+>> breaking the abi. The default 5% gap for min_bw is dropped in favour of a
+>> simple default (kept for grace). The series is based on x86/resctrl [1] as
+>> resctrl has telemetry patches queued which change the arch interface.
+> 
+> Could you please elaborate on why fs/resctrl changes are required to support only the counter assignment part of ABMC?
+> Currently, many SoC chips have an insufficient number of memory bandwidth monitors.
 
-	M.
+Sure. When the counter assignment mode is 'mbm_event; resctrl assumes the mbm events are configurable. 
+The 'event_filter' files at
+    info/L3_MON/event_configs/<event>/event_filter 
+are used to display and set this configuration.
 
--- 
-Without deviation from the norm, progress is not possible.
+In MPAM event configuration is not supported and so showing a read/writable 'event_filter' file is 
+misleading to the user and needs to be hidden for MPAM support.
+
+Just to give you a flavour of the change, here's a hack to show the correct thing for MPAM:
+
+--- a/fs/resctrl/rdtgroup.c
++++ b/fs/resctrl/rdtgroup.c
+@@ -2338,6 +2338,9 @@ static int resctrl_mkdir_event_configs(struct rdt_resource *r, struct kernfs_nod
+                if (ret)
+                        goto out;
+ 
++               if (!resctrl_arch_is_evt_configurable(mevt->evtid))
++                       continue;
++
+
+
+> We would be grateful if you could support the counter assignment part of ABMC.
+
+It is not a big change in resctrl but I thought it best to not gate the rest of this series on
+an additional change in another subsystem. I am current looking into this and hope to get the 
+patches on the list early in the next cycle.
+
+> 
+> Best regards,
+> Shaopeng TAN
+> 
+> 
+Thanks,
+
+Ben
+
