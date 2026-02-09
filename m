@@ -1,236 +1,160 @@
-Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D179A32939A
-	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 22:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8BD26B973;
+	Mon,  9 Feb 2026 22:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770676871; cv=none; b=oDtP2k8DBTK9Apa+kWAKQGaW+zxTiZdnxVufwKTXN4EpgDqQ7G3MCIZKNKWYK5AB4c5d0A8VpK8H8zJrybIYh9k1uVwPpxStyWJ4e2PdO+JNKzd4r62ShuzJBJHPzBLSzQfO3OBLhsm/VaYz76J7JUyLt3/eR/Cmkmle1A1Tekc=
+	t=1770677108; cv=none; b=auABRRqgaqDrZKJpShbzoZWVcr3sxmhwMaekR00AiQukXEJGnPcKq7jDzUGzJNjcBqrUEwb/By0JGPli4QFnlVJZu1T84oT7I3REgzhfVSM/lm6+6vz7nPVoQpDPxZQIWR/TwyU72a4hmBR3KsJ4yfi51hcCLsgYDZdw/g51WhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770676871; c=relaxed/simple;
-	bh=IGbjYf4aDEdJzYqyHxQ48Lwc7zrh6q6MUfA91xc3mH0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uI7RnSryAe2TZSIEt2j7bAehfYa8IU/ZAprdodtkGYO1ZZpQU01dmxN40/BMy/2McOD1lZSEEYIss0L9f0FzAJTztAs8W4xqWwPPUjdixYRR2kX4rranQnubNuSkDCw8LgEFzPCrpApyNe4lS7HelhgxcHqDfXjBbYllf4Z39wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IJBIiyLU; arc=none smtp.client-ip=209.85.161.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1770677108; c=relaxed/simple;
+	bh=tkWj3JgcbeYlPLHKSXUowNE5MSQz4gAoqclO6I2NS5M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMLudTdQxgwyFiUXsMIraEbaHcGPDOTl8YKh6DIJ4yexNBePdsduUWdaw+ALwiIesPytVsfS2GZGqNE+Tim2kjICuJovJHDpYYwI1Hu0LSEvkHwmWS2tj6eY8QCW41MatakB63GZUn+pKlTSBhVklI+BcFAQBPAceCeeTBIUjM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KJRRYhMN; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IJBIiyLU"
-Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-6630c8af251so759029eaf.1
-        for <kvmarm@lists.linux.dev>; Mon, 09 Feb 2026 14:41:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770676862; x=1771281662; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8vsvPCwrm4qK2tJSRhYymVMX8OUXdkNYkDGMZ9conM=;
-        b=IJBIiyLUQyiZmhesK6F7d8ILDt8J7xYcMRZit3lGYpFZe5uITBc0eaUa1/8yQ3EpX8
-         Ao2HcZQIlW8X/BFdN1m9/bwPbVI64rHleKf3z0TRU7BI7/+KedrS9EdGR8KQvu/FF3ah
-         Qb2l7SLgxQ0h5a+QbRe4UIm5U8kka33wl5/4otOPQJQyw8VmAqhn+JF5vtJwRgEknuqi
-         SK3zanc8pWh72nGYEo0y2mszhV3vVvXLmksLHsUwppeUnWgWzb6Wmj8Bz/77Et+yPYfg
-         iTJytfOeIoQBUJjI4H+i3sVIlh3MKiekWr4VOFpKm5lkKvksBD5ZCQzxdzcDWC8BLMtN
-         fWOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770676862; x=1771281662;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8vsvPCwrm4qK2tJSRhYymVMX8OUXdkNYkDGMZ9conM=;
-        b=QdDxmFmbQ/vX6zsyHKkAQOHKw1fR58xLif4BVpVb2Y1SkE8oF/V74gCMwWc/BPcLHb
-         Xa68+OjLig9mp4xpxkIGARrodnhXdVzFzFQAuLJjmAVd663N1r+zLnr3/pQtc3uE3mTJ
-         oFmCJHWjLaxGhDHvprCrS4DVxrfvHuAAhwU3qnpcRWJnVsl/EDn7AsuS9Xh8+mpolKg/
-         8IdJXgo1wNVzPZd9kyTbMf+jFfN67/W0wupYcXJ61/2a51ok3iVB0KpUgm7rUMywMUCm
-         +5IJ7RDMvdZPCYJdmByGfbsGfYvS21cpq711gQkd9i0B+GSRlLBIUowEdu8nYfKYN3+W
-         6h8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWdJZU1nZBaPpjrmKFqAvCv8g6uN0urNzeueo4qmK5h/oDa3SAS8pFQvv4ASSV631jaVOwdNgk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyaqDuRgV05oDQlOjj6cafOkmk2kmFtGj1KyzvdRpMb0C+HY1p5
-	F6zxXDBeE9oB9T+beDHASP2w62u4UCVPmjY8cy/Ids1UOghwaX3UJethEz788vopXYxsT3XN2YG
-	YJQe30kK5bMayqka9OOs32P+Sqw==
-X-Received: from iomv22.prod.google.com ([2002:a5e:d716:0:b0:957:5d25:584])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:1622:b0:662:f8f6:e8d1 with SMTP id 006d021491bc7-66d09ac24cdmr6817429eaf.6.1770676861761;
- Mon, 09 Feb 2026 14:41:01 -0800 (PST)
-Date: Mon,  9 Feb 2026 22:14:11 +0000
-In-Reply-To: <20260209221414.2169465-1-coltonlewis@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KJRRYhMN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1770677107; x=1802213107;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tkWj3JgcbeYlPLHKSXUowNE5MSQz4gAoqclO6I2NS5M=;
+  b=KJRRYhMNGeV0qAXrGw94pYyU6Fv79+FluMXaCxQi+LqHiGge/dEQWfvS
+   GSJ6d9Rn654NfywmHNgjeuvk8m9AXu+YG2oZXzMncLzFnVwqotdjXHkrS
+   Ro+ECXdWui67nHEe5VEGh/vLPhebAcqm8edY4sxJFEteul6KfNaG3Hckq
+   kYkz2I4nTts3U980Uc+uthWe8j3W7WOBOE3EX26CCnKD8WxRnyJJwc3vx
+   nGXvSzDI0j5BzupjUZeFLITfeF+aAH4TzpQEiDSPhAr4D5lbbPEtu8N2E
+   ThWpyoMI/ocRb5FhO3LicG/U+TTpONHZMsd+EmVCPG4bTLH5r+dNnC0RS
+   A==;
+X-CSE-ConnectionGUID: l9AEN938Q2WiwEpPRoulMw==
+X-CSE-MsgGUID: rb9CjGaKRJeScLixmSasEQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11696"; a="89213177"
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="89213177"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 14:45:06 -0800
+X-CSE-ConnectionGUID: hD8YfJwIQVewqJzeCu1T2w==
+X-CSE-MsgGUID: 0pEVhVq7QsGfJlBgGcnrwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,283,1763452800"; 
+   d="scan'208";a="211031702"
+Received: from lkp-server01.sh.intel.com (HELO 765f4a05e27f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 09 Feb 2026 14:45:01 -0800
+Received: from kbuild by 765f4a05e27f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vpa03-00000000oNk-1EMJ;
+	Mon, 09 Feb 2026 22:44:59 +0000
+Date: Tue, 10 Feb 2026 06:44:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: kyle-jk.liao@mediatek.com, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Quentin Perret <qperret@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	wsd_upstream@mediatek.com, rock.yeh@mediatek.com,
+	hungwen.chien@mediatek.com,
+	"kyle-jk.liao" <kyle-jk.liao@mediatek.com>
+Subject: Re: [PATCH] KVM: arm64: Allow module-owned pages in host stage-2
+ range adjustment
+Message-ID: <202602100627.0HOjIqkT-lkp@intel.com>
+References: <20260209032421.1278325-1-kyle-jk.liao@mediatek.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260209221414.2169465-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260209221414.2169465-17-coltonlewis@google.com>
-Subject: [PATCH v6 16/19] KVM: arm64: Add vCPU device attr to partition the PMU
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260209032421.1278325-1-kyle-jk.liao@mediatek.com>
 
-Add a new PMU device attr to enable the partitioned PMU for a given
-VM. This capability can be set when the PMU is initially configured
-before the vCPU starts running and is allowed where PMUv3 and VHE are
-supported and the host driver was configured with
-arm_pmuv3.reserved_host_counters.
+Hi,
 
-The enabled capability is tracked by the new flag
-KVM_ARCH_FLAG_PARTITIONED_PMU_ENABLED.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/include/uapi/asm/kvm.h |  2 ++
- arch/arm64/kvm/pmu-direct.c       | 35 ++++++++++++++++++++++++++++---
- arch/arm64/kvm/pmu.c              | 14 +++++++++++++
- include/kvm/arm_pmu.h             |  9 ++++++++
- 5 files changed, 59 insertions(+), 3 deletions(-)
+[auto build test ERROR on kvmarm/next]
+[also build test ERROR on linus/master v6.19 next-20260209]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 41577ede0254f..f0b0a5edc7252 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -353,6 +353,8 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_WRITABLE_IMP_ID_REGS		10
- 	/* Unhandled SEAs are taken to userspace */
- #define KVM_ARCH_FLAG_EXIT_SEA				11
-+	/* Partitioned PMU Enabled */
-+#define KVM_ARCH_FLAG_PARTITION_PMU_ENABLED		12
- 	unsigned long flags;
- 
- 	/* VM-wide vCPU feature set */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index a792a599b9d68..3e0b7619f781d 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -436,6 +436,8 @@ enum {
- #define   KVM_ARM_VCPU_PMU_V3_FILTER		2
- #define   KVM_ARM_VCPU_PMU_V3_SET_PMU		3
- #define   KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS	4
-+#define   KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION	5
-+
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
-index 6ebb59d2aa0e7..1dbf50b8891f6 100644
---- a/arch/arm64/kvm/pmu-direct.c
-+++ b/arch/arm64/kvm/pmu-direct.c
-@@ -44,8 +44,8 @@ bool kvm_pmu_is_partitioned(struct arm_pmu *pmu)
- }
- 
- /**
-- * kvm_vcpu_pmu_is_partitioned() - Determine if given VCPU has a partitioned PMU
-- * @vcpu: Pointer to kvm_vcpu struct
-+ * kvm_pmu_is_partitioned() - Determine if given VCPU has a partitioned PMU
-+ * @kvm: Pointer to kvm_vcpu struct
-  *
-  * Determine if given VCPU has a partitioned PMU by extracting that
-  * field and passing it to :c:func:`kvm_pmu_is_partitioned`
-@@ -55,7 +55,36 @@ bool kvm_pmu_is_partitioned(struct arm_pmu *pmu)
- bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu)
- {
- 	return kvm_pmu_is_partitioned(vcpu->kvm->arch.arm_pmu) &&
--		false;
-+		test_bit(KVM_ARCH_FLAG_PARTITION_PMU_ENABLED, &vcpu->kvm->arch.flags);
-+}
-+
-+/**
-+ * has_kvm_pmu_partition_support() - If we can enable/disable partition
-+ *
-+ * Return: true if allowed, false otherwise.
-+ */
-+bool has_kvm_pmu_partition_support(void)
-+{
-+	return has_host_pmu_partition_support() &&
-+		kvm_supports_guest_pmuv3() &&
-+		armv8pmu_max_guest_counters > -1;
-+}
-+
-+/**
-+ * kvm_pmu_partition_enable() - Enable/disable partition flag
-+ * @kvm: Pointer to vcpu
-+ * @enable: Whether to enable or disable
-+ *
-+ * If we want to enable the partition, the guest is free to grab
-+ * hardware by accessing PMU registers. Otherwise, the host maintains
-+ * control.
-+ */
-+void kvm_pmu_partition_enable(struct kvm *kvm, bool enable)
-+{
-+	if (enable)
-+		set_bit(KVM_ARCH_FLAG_PARTITION_PMU_ENABLED, &kvm->arch.flags);
-+	else
-+		clear_bit(KVM_ARCH_FLAG_PARTITION_PMU_ENABLED, &kvm->arch.flags);
- }
- 
- /**
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 72d5b7cb3d93e..cdf51f24fdaf3 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -759,6 +759,19 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- 		return kvm_arm_pmu_v3_set_nr_counters(vcpu, n);
- 	}
-+	case KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION: {
-+		unsigned int __user *uaddr = (unsigned int __user *)(long)attr->addr;
-+		bool enable;
-+
-+		if (get_user(enable, uaddr))
-+			return -EFAULT;
-+
-+		if (!has_kvm_pmu_partition_support())
-+			return -EPERM;
-+
-+		kvm_pmu_partition_enable(kvm, enable);
-+		return 0;
-+	}
- 	case KVM_ARM_VCPU_PMU_V3_INIT:
- 		return kvm_arm_pmu_v3_init(vcpu);
- 	}
-@@ -798,6 +811,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	case KVM_ARM_VCPU_PMU_V3_FILTER:
- 	case KVM_ARM_VCPU_PMU_V3_SET_PMU:
- 	case KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS:
-+	case KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION:
- 		if (kvm_vcpu_has_pmu(vcpu))
- 			return 0;
- 	}
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 93586691a2790..ff898370fa63f 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -109,6 +109,8 @@ void kvm_pmu_load(struct kvm_vcpu *vcpu);
- void kvm_pmu_put(struct kvm_vcpu *vcpu);
- 
- void kvm_pmu_set_physical_access(struct kvm_vcpu *vcpu);
-+bool has_kvm_pmu_partition_support(void);
-+void kvm_pmu_partition_enable(struct kvm *kvm, bool enable);
- 
- #if !defined(__KVM_NVHE_HYPERVISOR__)
- bool kvm_vcpu_pmu_is_partitioned(struct kvm_vcpu *vcpu);
-@@ -311,6 +313,13 @@ static inline void kvm_pmu_host_counters_enable(void) {}
- static inline void kvm_pmu_host_counters_disable(void) {}
- static inline void kvm_pmu_handle_guest_irq(struct arm_pmu *pmu, u64 pmovsr) {}
- 
-+static inline bool has_kvm_pmu_partition_support(void)
-+{
-+	return false;
-+}
-+
-+static inline void kvm_pmu_partition_enable(struct kvm *kvm, bool enable) {}
-+
- #endif
- 
- #endif
+url:    https://github.com/intel-lab-lkp/linux/commits/kyle-jk-liao-mediatek-com/KVM-arm64-Allow-module-owned-pages-in-host-stage-2-range-adjustment/20260209-112902
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+patch link:    https://lore.kernel.org/r/20260209032421.1278325-1-kyle-jk.liao%40mediatek.com
+patch subject: [PATCH] KVM: arm64: Allow module-owned pages in host stage-2 range adjustment
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20260210/202602100627.0HOjIqkT-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260210/202602100627.0HOjIqkT-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202602100627.0HOjIqkT-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> arch/arm64/kvm/hyp/nvhe/mem_protect.c:513:53: error: use of undeclared identifier 'PKVM_MODULE_OWNED_PAGE'
+     513 |                         (state != PKVM_NOPAGE && state != (PKVM_NOPAGE | PKVM_MODULE_OWNED_PAGE)));
+         |                                                                          ^
+   1 error generated.
+
+
+vim +/PKVM_MODULE_OWNED_PAGE +513 arch/arm64/kvm/hyp/nvhe/mem_protect.c
+
+   492	
+   493	static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+   494	{
+   495		struct kvm_mem_range cur;
+   496		kvm_pte_t pte;
+   497		u64 granule;
+   498		s8 level;
+   499		int ret;
+   500		enum pkvm_page_state state;
+   501	
+   502		hyp_assert_lock_held(&host_mmu.lock);
+   503		ret = kvm_pgtable_get_leaf(&host_mmu.pgt, addr, &pte, &level);
+   504		if (ret)
+   505			return ret;
+   506	
+   507		if (kvm_pte_valid(pte))
+   508			return -EAGAIN;
+   509	
+   510		if (pte) {
+   511			state = get_host_state(hyp_phys_to_page(addr));
+   512			WARN_ON(addr_is_memory(addr) &&
+ > 513				(state != PKVM_NOPAGE && state != (PKVM_NOPAGE | PKVM_MODULE_OWNED_PAGE)));
+   514			return -EPERM;
+   515		}
+   516	
+   517		for (; level <= KVM_PGTABLE_LAST_LEVEL; level++) {
+   518			if (!kvm_level_supports_block_mapping(level))
+   519				continue;
+   520			granule = kvm_granule_size(level);
+   521			cur.start = ALIGN_DOWN(addr, granule);
+   522			cur.end = cur.start + granule;
+   523			if (!range_included(&cur, range))
+   524				continue;
+   525			*range = cur;
+   526			return 0;
+   527		}
+   528	
+   529		WARN_ON(1);
+   530	
+   531		return -EINVAL;
+   532	}
+   533	
+
 -- 
-2.53.0.rc2.204.g2597b5adb4-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
