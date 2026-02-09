@@ -1,54 +1,54 @@
 Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE9C329E65
-	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 22:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6688B328B61
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 22:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770676867; cv=none; b=gwv4u14kLKl+mj7ZlzlZFI7lkdz87Qk2n6QmD95WigdFh9kXCZD8gG2HIf7HlxwolEcM+3l3LBnocA6TIKsTxSC2N6HRLvmbTBpj2rw3czKhek6MhSTkkCLOrAe5HXokuev7KyxU02QMqYD1vRnN8acvqgzbs8SMhke7i48Qdwc=
+	t=1770676869; cv=none; b=mGqjExULn/ZPaf1X4fQ9bMUfCttqMH5XtTgMXJLMZLLyQPeEL4/LRrWhPILrdbZM/i4M2AaDCbvaRDv0sdQrf+xswRM/7tc2HfyoSegVm/B1w1t/LYBWq0lnS0PUoLGJlJFn6zWu57OAQ9iQZ9ocavuijMLV6/JYnyU0ArRbDoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770676867; c=relaxed/simple;
-	bh=pKWQ8eiEG2mrdGJZiqdIDMjf5MzF6cSVZ2+ozjk63zY=;
+	s=arc-20240116; t=1770676869; c=relaxed/simple;
+	bh=SHVJoQZ+YflPOx5JrxGn/C/DEC5GjFnR/d7ZsgewPiA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eh3SraY7Z0GomCTxKCc2HaunfsuCz19mLiPCI9IMTGze7ThGO25sREpKXYynePzLkChXh27kH3tikZezcKAxKLGt0tcqHON+xVr/oqNJUDwMF959uDhNRnizAYwV0M0ltcjyF5huqsC2u8FHeam0wlb27yHX+t9RpDAH2YdnbeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qOpRV36O; arc=none smtp.client-ip=209.85.161.73
+	 To:Cc:Content-Type; b=XDnDbQCXKO4Z1j1VUkiyK0imW8rfk30hDLEDOsFxRtR6XH3YnaquBi7C7/qHxWXi1SSy0ytc2Q/MI088lBZryz2s0/fJ/GZJ0VjmNECdjCeNCI7q5xWhQAj0OOHvSl8EKNxBTdTa/GQT+r4A+vK7Gn3GJ2nc+0DozOXWxnXLp68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tGQ/b48a; arc=none smtp.client-ip=209.85.161.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qOpRV36O"
-Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-6632b0d7401so16116047eaf.3
-        for <kvmarm@lists.linux.dev>; Mon, 09 Feb 2026 14:41:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tGQ/b48a"
+Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-66308f16e13so9035386eaf.0
+        for <kvmarm@lists.linux.dev>; Mon, 09 Feb 2026 14:41:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770676863; x=1771281663; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1770676865; x=1771281665; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N13aFr3ll/bgxK3rlveFMtlg5cOY53+sxi39a+VtEUU=;
-        b=qOpRV36OcXSd1RtORCXbzF2sRoEl1aKUyx2okDXTVHzPZF5eL0PW8FNh81tSZEYEl1
-         lAHizr0b6ZJ61ABjbh3p3kdlsXHtCBOo7deSV4zpaWFpvbc/SNmx92lee6ZQ65JrWU5c
-         yCRaGAjTLuUG5r73wpnNORooJy0uTbXUhAC3eIKWbfUyGG8AcZamEB/shssbHuDCOMpv
-         ayx3TaG7zSMHQx8lyS8G67wuZj7+bTF0G9TocX3gV1+8ENMs2zlDZk9+XsUAS+iB56h2
-         BBzNjd29IKKbxUwmhT7FUIoJOLlgKM4kTY6XUQq6OyesJdrCki13N629yTfzjbqb3YXU
-         MeMQ==
+        bh=/TKm1gU8lTLqEcn/8yRmMV0Zp5pYjSJjWs0bsDB+GUI=;
+        b=tGQ/b48apYVHlSlfvPqJ8evEfU5CfUdDbIUNmCWtZOAa4ZgS+lQHMqol6t5M4e7a2U
+         85WZ0FKVvVj2zzzRsXx+zca1r3jOPwTwtN7zEg+iinKT/ZA22ooAbzw/s/lgWA0KG62b
+         NczyIeGG1WAklCl+vFa1DvPwSPG74m//wpdHv6FUP1BWtLl6covJmQ+EhtA+Z+uwDHJo
+         C/T24cSEdv8CCPFWsyEDXBuLncY58N5H3YrErnOfMEb9Y2CISRe3MWhhKL8MvE+ntnkG
+         l/HKOV6btyHD/TfRLVuD0kPK7XuuBeDkBk0X/G7/dv60jj3cpYCBcixKZQug7dSHQUr/
+         B4Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770676863; x=1771281663;
+        d=1e100.net; s=20230601; t=1770676865; x=1771281665;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N13aFr3ll/bgxK3rlveFMtlg5cOY53+sxi39a+VtEUU=;
-        b=e2hXwPPkyVWjZdeGYp64BpX+wQ3Of/GYkAkBUx6sWpMGSZ4dtJAAgvpTldPkDdF8lE
-         TCUjNvlCmcgkGDAbI1S7U2fRUkIA9pDtrXOC/2a6MtNjMzSSlCRZU0v3evjsWQkbSThk
-         yVt7HevAnWuSDCwQg+gkI32+SwdtASYnTbc47AWlZS3fP20OLo/XAm8t/OCR79we8vVG
-         c/akE+LPSWJ66xdTqNZIuLfowyMaVItc7iff3CCKbh6vIDNXcuZ6rS6ZeFZjghq28ZWS
-         F4+e/+tmBb30Mx/TsXKHcqBUFD9UEiAga3W+zqfRoY1RojTem6iraXE25yNNqRGpYg+L
-         V72Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUjaKDiptr50cJ6kc0jMf1cW1cDf47QE7h8BRFWBkVo41a7FJsyM8paPh+Px78eCuoXzfJjFYM=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzd/0s3O/S5Nnt7spbGmItqgMnokXaDy8ZxDF0+RaoxoKsRbmLU
-	nA8yhVxT/h3ziC58wJY02JG8cFXOkCTQmEAO9R4FwXqceBF7DS0vR3HoldULeMJCoyNV7R4cfAH
-	lqNMk6LjrVLWekaK5Z3+9NsL3ig==
-X-Received: from iobfj4.prod.google.com ([2002:a05:6602:644:b0:957:6f27:bbe0])
+        bh=/TKm1gU8lTLqEcn/8yRmMV0Zp5pYjSJjWs0bsDB+GUI=;
+        b=PptO31XkI51lybN+zBEbvZ/LBTqu/ydgtY9riab438g7E+Jo0105+PqUOoEygjg2cg
+         5jHdsgBloFHStmlbO7HghulrNcFpgW23tSR6tSz5nkBrf3YTnUBz6/UIQ8HYyEtZ/mdc
+         HbMfj18BS9ZwzaFvyuLy3AR3XMbUV8NKFnQyvhxJ9ROvy9Hru13l6M51bcA7meyeAq9J
+         9qoTLKnogDYdot2fhRU8ZX8d7a6lfV0He7aVEC/dSTpFTItXJM5JKk8LCocbf8jMcnWg
+         v3I1nTmQaUkzrA7sBAFQMUk8YN/jVtmfJViL86k3HY4XzZ+B0wEcF0U7rel4x2pgv4MZ
+         8isg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmwtz8AfkSJlDkm/gcbLGOTjchS7FZiHd8WPwgwCFLTqloVvXiTV8WJl/fnOwX0GqE1OnFJ1E=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyTaPJvo0mCHQpzK26Gc7dNSuVFV36jKAwcFTzjmmzKOxmiO7a6
+	DhIDojUAtriGOgwhrKXGVil9WAXyafadIvpZr59jPYe0Sy58hLPX4iCUS5XcHOIPge5Oz2U0jBn
+	21vOlPCAoOe/tZkq333X9saOi7g==
+X-Received: from jaox17.prod.google.com ([2002:a05:6638:111:b0:5ca:fdfb:2007])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:4b94:b0:662:f452:648f with SMTP id 006d021491bc7-66d09dacae7mr6166360eaf.17.1770676862961;
- Mon, 09 Feb 2026 14:41:02 -0800 (PST)
-Date: Mon,  9 Feb 2026 22:14:12 +0000
+ 2002:a05:6820:f015:b0:663:610:cb67 with SMTP id 006d021491bc7-66d0a477b40mr5663839eaf.28.1770676865086;
+ Mon, 09 Feb 2026 14:41:05 -0800 (PST)
+Date: Mon,  9 Feb 2026 22:14:14 +0000
 In-Reply-To: <20260209221414.2169465-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260209221414.2169465-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.53.0.rc2.204.g2597b5adb4-goog
-Message-ID: <20260209221414.2169465-18-coltonlewis@google.com>
-Subject: [PATCH v6 17/19] KVM: selftests: Add find_bit to KVM library
+Message-ID: <20260209221414.2169465-20-coltonlewis@google.com>
+Subject: [PATCH v6 19/19] KVM: arm64: selftests: Relax testing for exceptions
+ when partitioned
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -75,36 +76,84 @@ Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Some selftests have a dependency on find_bit and weren't compiling
-separately without it, so I've added it to the KVM library here using
-the same method as files like rbtree.c.
+Because the Partitioned PMU must lean heavily on underlying hardware
+support, it can't guarantee an exception occurs when accessing an
+invalid pmc index.
+
+The ARM manual specifies that accessing PMEVCNTR<n>_EL0 where n is
+greater than the number of counters on the system is constrained
+unpredictable when FEAT_FGT is not implemented, and it is desired the
+Partitioned PMU still work without FEAT_FGT.
+
+Though KVM could enforce exceptions here since all PMU accesses
+without FEAT_FGT are trapped, that creates further difficulties. For
+one example, the manual also says that after writing a value to
+PMSELR_EL0 greater than the number of counters on a system, direct
+reads will return an unknown value, meaning KVM could not rely on the
+hardware register to hold the correct value.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- tools/testing/selftests/kvm/Makefile.kvm   | 1 +
- tools/testing/selftests/kvm/lib/find_bit.c | 1 +
- 2 files changed, 2 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/lib/find_bit.c
+ .../selftests/kvm/arm64/vpmu_counter_access.c | 20 ++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-index ba5c2b643efaa..1f7465348e545 100644
---- a/tools/testing/selftests/kvm/Makefile.kvm
-+++ b/tools/testing/selftests/kvm/Makefile.kvm
-@@ -5,6 +5,7 @@ all:
+diff --git a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+index 9702f1d43b832..27b7d7b2a059a 100644
+--- a/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
++++ b/tools/testing/selftests/kvm/arm64/vpmu_counter_access.c
+@@ -38,10 +38,14 @@ const char *pmu_impl_str[] = {
+ struct vpmu_vm {
+ 	struct kvm_vm *vm;
+ 	struct kvm_vcpu *vcpu;
++};
++
++struct guest_context {
+ 	bool pmu_partitioned;
+ };
  
- LIBKVM += lib/assert.c
- LIBKVM += lib/elf.c
-+LIBKVM += lib/find_bit.c
- LIBKVM += lib/guest_modes.c
- LIBKVM += lib/io.c
- LIBKVM += lib/kvm_util.c
-diff --git a/tools/testing/selftests/kvm/lib/find_bit.c b/tools/testing/selftests/kvm/lib/find_bit.c
-new file mode 100644
-index 0000000000000..67d9d9cbca85c
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/find_bit.c
-@@ -0,0 +1 @@
-+#include "../../../../lib/find_bit.c"
+ static struct vpmu_vm vpmu_vm;
++static struct guest_context guest_context;
+ 
+ struct pmreg_sets {
+ 	uint64_t set_reg_id;
+@@ -342,11 +346,16 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+ 	/*
+ 	 * Reading/writing the event count/type registers should cause
+ 	 * an UNDEFINED exception.
++	 *
++	 * If the pmu is partitioned, we can't guarantee it because
++	 * hardware doesn't.
+ 	 */
+-	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
+-	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
+-	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
+-	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
++	if (!guest_context.pmu_partitioned) {
++		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
++		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0));
++		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
++		TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
++	}
+ 	/*
+ 	 * The bit corresponding to the (unimplemented) counter in
+ 	 * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers should be RAZ.
+@@ -459,7 +468,7 @@ static void create_vpmu_vm(void *guest_code, enum pmu_impl impl)
+ 		vpmu_vm.vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION);
+ 	if (!ret) {
+ 		vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &part_attr);
+-		vpmu_vm.pmu_partitioned = partition;
++		guest_context.pmu_partitioned = partition;
+ 		pr_debug("Set PMU partitioning: %d\n", partition);
+ 	}
+ 
+@@ -511,6 +520,7 @@ static void test_create_vpmu_vm_with_nr_counters(
+ 		TEST_ASSERT(!ret, KVM_IOCTL_ERROR(KVM_SET_DEVICE_ATTR, ret));
+ 
+ 	vcpu_device_attr_set(vcpu, KVM_ARM_VCPU_PMU_V3_CTRL, KVM_ARM_VCPU_PMU_V3_INIT, NULL);
++	sync_global_to_guest(vpmu_vm.vm, guest_context);
+ }
+ 
+ /*
 -- 
 2.53.0.rc2.204.g2597b5adb4-goog
 
