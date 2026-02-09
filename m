@@ -1,178 +1,93 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D355295DAC
-	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 15:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E742DCC13;
+	Mon,  9 Feb 2026 15:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770651401; cv=none; b=PcWxy+/B9I/UKjdl39BOutnvuOUNz9NKFxfe8cDnwjPC/dO72ooAoyVduuTCi9eOT4xSynyn8OFMGN//aYvk8g/BxBnaWLvTpYnHO1WT1MDzkIAhtqBjQH8RLYxe2e/yc4RpciYn7HCMAnr95nTycoczXTjD1TqxPbIZ3yAfTyA=
+	t=1770652303; cv=none; b=d1VaZoet3CiEP9UGqs4uRRgSINmi8pbbjH9ek5/Q7/9z/t5Q7hB+reU3raSSyw+/zMw3KvC6lK3mZcSblHUk2mwMlFPL0QqivYPwa8R4XNnD9I5Q2Fy3sXLBNWTvp9EyxCIeNPtuBYmslZbrxLREYUA1MX1YBY9xD/iW7ALwYJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770651401; c=relaxed/simple;
-	bh=HIoSMO9egrZ4A6UCPVzGa9X1jJVWkQH0s0LiFyimx2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qqVE09ykg/3jz2MDGVWHi4ko+i2sUQAgu21jHsBzOK6kfEhw1qHP/zUMPMscfPgCkjc2fiktjgircee/uOdHxXQZOg3CthT6Z1GQsVzbnfpPJAbGVyn5N2pvnZsRRNJmhOiTksx30A3RRIu4Qjgx5Is+TlaCupw+YI2tLYYN61E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 800B8339;
-	Mon,  9 Feb 2026 07:36:33 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 93DFE3F740;
-	Mon,  9 Feb 2026 07:36:34 -0800 (PST)
-Message-ID: <7a0953ff-6475-4311-b34c-47eed9d38cb1@arm.com>
-Date: Mon, 9 Feb 2026 15:36:32 +0000
+	s=arc-20240116; t=1770652303; c=relaxed/simple;
+	bh=4KyBJAD0UaWWubG4V1cG69fxeT1HLs5rxEY/yGjKBsM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N2ZRfjwHkDqlNiA/rvNE48MQ5t0L8N2xDgvNAsEn2LTIecjQBeD0wsOpz5BPHJL0Qi/iCuP81aQDtG1VDWz7LBOeXz/VFH3vDlvY3ZD3I3UEtcAbSnLOPB3s2RJjAGL5qKpw3eTY6U9MBVWgtRwD0qLjYoTSKDZiYeLwLIAvhOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ssdALodG; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ssdALodG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E028C116C6;
+	Mon,  9 Feb 2026 15:51:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770652303;
+	bh=4KyBJAD0UaWWubG4V1cG69fxeT1HLs5rxEY/yGjKBsM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ssdALodGlJWSH+55SO7vbVKQvkUiD/1h+h/CMHkrMwy8/SR6Gjp5qIe2wi8C8aWRm
+	 cMpwVqTz6EUwlrqvlgJbCanxJ3dR9KR9rSyymlSTjVOcsqrNT+dmZf2e0LwVL60puJ
+	 JZiAuA3dO4ILW4ioYMiDt/hqVopxjqhmie8ZvE1ajk7pAukK9n3Q/ve7DzyBdEHMWU
+	 c8/7CypGykPpvZPzFj8wMwi7h3HSEEN0kn/XtfUZxxRYslr9nuU2mG3QyGvCJVe5Fr
+	 2YX1SdtPg5hRY+Om76D2hNToa+u171LquvXD4v4P/ZZe/aRZ4gjMgpicu8jQ/xOG2c
+	 5HU33CtwQmUZA==
+Date: Mon, 9 Feb 2026 15:51:37 +0000
+From: Will Deacon <will@kernel.org>
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, maz@kernel.org,
+	oupton@kernel.org, aneesh.kumar@kernel.org, steven.price@arm.com,
+	linux-kernel@vger.kernel.org, alexandru.elisei@arm.com,
+	tabba@google.com
+Subject: Re: [kvmtool PATCH v5 02/15] update_headers: arm64: Track psci.h for
+ PSCI definitions
+Message-ID: <aYoCiXg8pSC_bwIv@willie-the-truck>
+References: <20260108175753.1292097-1-suzuki.poulose@arm.com>
+ <20260108175753.1292097-3-suzuki.poulose@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 20/41] arm_mpam: resctrl: Add CDP emulation
-To: Fenghua Yu <fenghuay@nvidia.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org,
- Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-21-ben.horgan@arm.com>
- <2271224c-1796-4823-8c2c-6f529814e645@nvidia.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <2271224c-1796-4823-8c2c-6f529814e645@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260108175753.1292097-3-suzuki.poulose@arm.com>
 
-Hi Fenghua,
-
-On 2/9/26 01:16, Fenghua Yu wrote:
-> Hi, Ben,
+On Thu, Jan 08, 2026 at 05:57:40PM +0000, Suzuki K Poulose wrote:
+> Track UAPI psci.h for PSCI definitions
 > 
-> On 2/3/26 13:43, Ben Horgan wrote:
->> From: James Morse <james.morse@arm.com>
->>
->> Intel RDT's CDP feature allows the cache to use a different control value
->> depending on whether the accesses was for instruction fetch or a data
->> access. MPAM's equivalent feature is the other way up: the CPU assigns a
->> different partid label to traffic depending on whether it was instruction
->> fetch or a data access, which causes the cache to use a different control
->> value based solely on the partid.
->>
->> MPAM can emulate CDP, with the side effect that the alternative partid is
->> seen by all MSC, it can't be enabled per-MSC.
->>
->> Add the resctrl hooks to turn this on or off. Add the helpers that
->> match a
->> closid against a task, which need to be aware that the value written to
->> hardware is not the same as the one resctrl is using.
->>
->> Update the 'arm64_mpam_global_default' variable the arch code uses during
->> context switch to know when the per-cpu value should be used instead.
->> Also,
->> update these per-cpu values and sync the resulting mpam partid/pmg
->> configuration to hardware.
->>
->> Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
->> equivalent needs programming twice by the resctrl glue, as resctrl
->> expects
->> the bandwidth controls to be applied independently for both data and
->> instruction-fetch.
->>
->> Tested-by: Gavin Shan <gshan@redhat.com>
->> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Tested-by: Peter Newman <peternewman@google.com>
->> CC: Dave Martin <Dave.Martin@arm.com>
->> CC: Amit Singh Tomar <amitsinght@marvell.com>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since rfc:
->> Fail cdp initialisation if there is only one partid
->> Correct data/code confusion
->>
->> Changes since v2:
->> Don't include unused header
->>
->> Changes since v3:
->> Update the per-cpu values and sync to h/w
->> ---
->>   arch/arm64/include/asm/mpam.h  |   1 +
->>   drivers/resctrl/mpam_resctrl.c | 117 +++++++++++++++++++++++++++++++++
->>   include/linux/arm_mpam.h       |   2 +
->>   3 files changed, 120 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/
->> mpam.h
->> index 05aa71200f61..70d396e7b6da 100644
->> --- a/arch/arm64/include/asm/mpam.h
->> +++ b/arch/arm64/include/asm/mpam.h
->> @@ -4,6 +4,7 @@
->>   #ifndef __ASM__MPAM_H
->>   #define __ASM__MPAM_H
->>   +#include <linux/arm_mpam.h>
->>   #include <linux/bitfield.h>
->>   #include <linux/jump_label.h>
->>   #include <linux/percpu.h>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/
->> mpam_resctrl.c
->> index cd52ca279651..12017264530a 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
->> @@ -38,6 +38,10 @@ static DEFINE_MUTEX(domain_list_lock);
->>   static bool exposed_alloc_capable;
->>   static bool exposed_mon_capable;
->>   +/*
->> + * MPAM emulates CDP by setting different PARTID in the I/D fields of
->> MPAM0_EL1.
->> + * This applies globally to all traffic the CPU generates.
->> + */
->>   static bool cdp_enabled;
->>     bool resctrl_arch_alloc_capable(void)
->> @@ -50,6 +54,72 @@ bool resctrl_arch_mon_capable(void)
->>       return exposed_mon_capable;
->>   }
->>   +bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
->> +{
->> +    switch (rid) {
->> +    case RDT_RESOURCE_L2:
->> +    case RDT_RESOURCE_L3:
->> +        return cdp_enabled;
->> +    case RDT_RESOURCE_MBA:
->> +    default:
->> +        /*
->> +         * x86's MBA control doesn't support CDP, so user-space doesn't
+> Reviewed-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  util/update_headers.sh | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 > 
-> s/x86's/ARM's/
+> diff --git a/util/update_headers.sh b/util/update_headers.sh
+> index af75ca36..9fe782a2 100755
+> --- a/util/update_headers.sh
+> +++ b/util/update_headers.sh
+> @@ -37,13 +37,16 @@ done
+>  
+>  unset KVMTOOL_PATH
+>  
+> -copy_optional_arch () {
+> -	local src="$LINUX_ROOT/arch/$arch/include/uapi/$1"
+> +copy_arm64_headers () {
+> +	local uapi_asm_hdr="$LINUX_ROOT/arch/$arch/include/uapi/asm"
+>  
+> -	if [ -r "$src" ]
+> -	then
+> -		cp -- "$src" "$KVMTOOL_PATH/include/asm/"
+> -	fi
+> +	for f in sve_context.h psci.h
+> +	do
+> +		if [ -r "$uapi_asm_hdr/$f" ]
+> +		then
+> +			cp -- "$uapi_asm_hdr/$f" "$KVMTOOL_PATH/include/asm/"
+> +		fi
+> +	done
 
-In CPUs supporting MPAM the instruction/data distinction is made at the
-CPU so doesn't depend on the specific control. The point this comment is
-trying to make is that as x86 doesn't support CDP on MBA, resctrl, which
-was initially x86 specific, expected CDP not to be supported on MBA and
-hence MPAM/ARM64 has to match this behaviour. Therefore, the MPAM driver
-doesn't support CDP on MBA either. In essence, the MPAM driver emulates
-the x86 CDP behaviour. Having said that, this comment relies on the
-reader knowing this historical context, and so I'll update it to not
-reference x86 and just mention that it is the expectation of the resctrl
-interface.
+This doesn't make sense to me as I don't think we've ever had an
+arm64 uapi/asm/psci.h. You presumably want linux/psci.h (which is what
+the next patch pulls in), but then I don't understand how that worked
+with the change you've got here :/
 
-> 
-> Thanks.
-> 
-> -Fenghua
-> 
-> [SNIP]
+For now, I'll apply the first patch and then update the headers to 6.19
+myself using the current script (as other folks need them updating too).
 
-Thanks,
-
-Ben
-
+Will
