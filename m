@@ -1,279 +1,168 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010001.outbound.protection.outlook.com [52.101.201.1])
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7840172622
-	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 01:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.1
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770599785; cv=fail; b=UmcIl9eCKahiC0eed3YmXAhMa7q2JDXxdrEIm0hBqkgDySdUim+xITxSl3rduHtL928deN6iwuhAGwJsDvwgNacvfhCOK3Dawr38eZkCFW31kU9U3FSNKKRxpODWctwKLPVlNkVDsV6JYrUT2L7VKOadrWSg/g4dTquVC4JGyy0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770599785; c=relaxed/simple;
-	bh=orsCTw+InUCLJzCyWIZG/z+M+V/rPvNHdCx7FK6TBnQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=G9HILKnQYC9LzAc4OopjeyJLOPTqD6f9F8UVKzd3nt9WqkxaVloT85JOfRuLFMr2+slsQcetzj4yFeN467qQ4KkgW+IV8lFq3x6L9S13odCn/+JVfXvZCuLyR+zdEgCNnjY3f79TajeFuxe5qN7HvlABg/CxKMtN/sQRsT0cibs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IEzwBD2A; arc=fail smtp.client-ip=52.101.201.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDD02D46BD
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 02:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770603764; cv=none; b=KAm4R6G+fWDYl52zLzgqp+DVm7v6Ef9xB6sxgdqyvsh3Qax5YJgnNX1xDIgd0OvK5bpXd5fgJFckhPGbYQhzdDi5zBKXLEuzaIkroYWPItWP5bFzTC15+xuEXaxBk51lbCxtf5MJKPNYmhySjTm62zi2IcDg07TMuSsTjYtgBdw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770603764; c=relaxed/simple;
+	bh=uEoAxL7Z0R6R42jyAePfMGOhe3kCV3QDCbGYYM4fPo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=txTkirwdkH/sKNK0qbe1J7CmgSy/l2SFk5VnfY0bxluQk+y717eirad94RPewHK0gyPDZmgIbC2FODGKGf+Yxg1iA5To9Rf1vvKPAI39gZdt/VPMVfFD34HmfrRqbIVMxSfuxvPotfxnSNXLqz8lrI/EccwrTxD5aSNeSQA/me4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=WwIDbQso; arc=none smtp.client-ip=139.138.36.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IEzwBD2A"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pDwlHRAbx16ixATCLBR2m5URsbz0hprGX5lYbtXx1TbGGlMJ3/7Oz+lu/jBBnNLTCGYUevrUVdorjfc7XuYM6rIHFIkfYtIX9HIpSEAimNJL/kNpTC9hV5L8hV99Y4bO9AfFPhuXYuQ8N9wfd3iSrqWW8G53BWMrQnbgkGYONjSWFwcitawcDdEdhhZVuzyEiBolidOTNjTaQ1Ahxz/gkIo9ttAOfIhPuSKCvUygrWxmJfhTvDvGoKqehGb4B8D9R2YYdSc++M+c+eM7VFHzonaOFAtMAwfC9QBxVtHVLSEkgjskAPL4r++7O2NWDbEVsou84nQCcybxFfZlTbUzwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TQcm7AkG6fBDR3h+gb9/oOvwR8AJEnoYlO2+pCwFih4=;
- b=WLKCr4RmLvZRyxaEuU11ugmMQIl0IwhNekZc+DOlGRGSus/K+X040wdmviyiAVzHAYNYkPg8KefnzxiMar5mxvsY4+60RthbEjKPmrizRfL0SMEUW8px0DPamNBRNB3i5YXTW8voLKK9d+CfHQz7jSLtzcMpF5VV3/FkpmO/BGVO0msMesi2A+POFQVJ2qjgxj/Ve2ovEYGw3YruC14y8Fm7OwvlDFUqKfvpzoP7yNS69/GUy+7+YDSv3U76Hs1Oxqz1rUTvxNIK3MTPcXqVuJNwvyWIarQWypKhxJ2wAOlJgeT5EMa3/Hn7YQ9AnUFWNlwH1QhEPP8A4FRBemwaPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TQcm7AkG6fBDR3h+gb9/oOvwR8AJEnoYlO2+pCwFih4=;
- b=IEzwBD2AQxpI9VL1ui+8q/b7C8D0WXmRjW84YkQ3PCbWg6xWKS171s8iguX0x90iaDp0DNNvYENsr8RQknseFHEDhyiQCMSqNgH5tiV2mH9E/nFAgm4KP3+sA+fPEJ4fVHi61V8Xq//thenw6FDQY29/jCthgcli/8lBp0eiCyYgDof07w/zPurP/U11INp17h6AZDIeaiUc7yzZSVGiHoOf0I6rvvuZvxMVjoaGBQAjwa0L6XvMRpkkgwrZjw9pXkLyfdvQx5KZ4qatb2LQG866dePH36KYtIE2cLrulagY6FVyxJSbie/vLAVEZRcG30IGfH2dNT28/Sio7vO1Rw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB2667.namprd12.prod.outlook.com (2603:10b6:5:42::28) by
- DS2PR12MB9639.namprd12.prod.outlook.com (2603:10b6:8:27a::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9587.14; Mon, 9 Feb 2026 01:16:19 +0000
-Received: from DM6PR12MB2667.namprd12.prod.outlook.com
- ([fe80::aa9a:b827:90c6:506b]) by DM6PR12MB2667.namprd12.prod.outlook.com
- ([fe80::aa9a:b827:90c6:506b%7]) with mapi id 15.20.9587.017; Mon, 9 Feb 2026
- 01:16:18 +0000
-Message-ID: <2271224c-1796-4823-8c2c-6f529814e645@nvidia.com>
-Date: Sun, 8 Feb 2026 17:16:15 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 20/41] arm_mpam: resctrl: Add CDP emulation
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org,
- Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-21-ben.horgan@arm.com>
-Content-Language: en-US
-From: Fenghua Yu <fenghuay@nvidia.com>
-In-Reply-To: <20260203214342.584712-21-ben.horgan@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0137.namprd03.prod.outlook.com
- (2603:10b6:a03:33c::22) To DM6PR12MB2667.namprd12.prod.outlook.com
- (2603:10b6:5:42::28)
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="WwIDbQso"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1770603764; x=1802139764;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uEoAxL7Z0R6R42jyAePfMGOhe3kCV3QDCbGYYM4fPo4=;
+  b=WwIDbQsod9VDYLyMKxlYBUb40pSZti09BMFu5DgARc0dnjCZm+ZP1Npz
+   cNKqbnEuXJN8DWdlCzF0UhurtfMxt35gzLnyuOBL/+wawXYGZiCDsGNJ1
+   7h9H7geEY6wet5V+owHRg3fLkBgbAOw7mP5Zgd4AglxXfYCERWyE9HU3d
+   b8U1bteF1+3at2Fwszkf3KzmoL3pF8OIj/hFuuKArtHV8l/9xu3mlPjRX
+   3/GYjCxsKNKlF9vRYv9zgZEVGzNy612EsBDig1ldEQcD5tJLe+uJCmA8z
+   G655r9/lR56nQ3QuAJZINRaCbOt6CHQL0z0AYpMR/IsThYiPy61jjjRzp
+   g==;
+X-CSE-ConnectionGUID: Zac7IUiOSL+kWT3Sscj8rg==
+X-CSE-MsgGUID: engSUfV4Qre3gBiCjFa8Tw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11695"; a="216391492"
+X-IronPort-AV: E=Sophos;i="6.21,281,1763391600"; 
+   d="scan'208";a="216391492"
+Received: from unknown (HELO mail.fujitsu.com) ([20.61.8.234])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2026 11:21:27 +0900
+Received: from az2nlsmgm1.o.css.fujitsu.com (unknown [10.150.26.203])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgr2.fujitsu.com (Postfix) with ESMTPS id 64D6B304E
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 02:21:27 +0000 (UTC)
+Received: from az2nlsmom1.o.css.fujitsu.com (az2nlsmom1.o.css.fujitsu.com [10.150.26.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmgm1.o.css.fujitsu.com (Postfix) with ESMTPS id 1A689C012B4
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 02:21:27 +0000 (UTC)
+Received: from sm-arm-grace07 (sm-x86-stp01.soft.fujitsu.com [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmom1.o.css.fujitsu.com (Postfix) with ESMTPS id 38D95829F2E;
+	Mon,  9 Feb 2026 02:21:22 +0000 (UTC)
+Date: Mon, 9 Feb 2026 11:21:19 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Julien Thierry <julien.thierry.kdev@gmail.com>,
+	Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Sascha Bischoff <sascha.bischoff@arm.com>
+Subject: Re: [PATCH kvmtool v5 0/7] arm64: Nested virtualization support
+Message-ID: <aYlEn74Td8vHSmgJ@sm-arm-grace07>
+References: <20260123142729.604737-1-andre.przywara@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2667:EE_|DS2PR12MB9639:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4cfbbd67-cae3-4e72-94b0-08de6778d401
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?L1FVb0VRRmo0Q2NEbnd1TG1zaFVuamVrcGlJZUlQdUF2ZG9GdlN2US9iUnFs?=
- =?utf-8?B?MnhtL3A5Uld2VjhuT1pFUHMwU3pTK0RHZEFDKy8wMUFPdkJpRnVESXUzNllS?=
- =?utf-8?B?VUtOd1Bnc0djcHhLQTF5U1FMUFM2QXNBazRHcDUzcTZiZWFPMEhYSEZSVWNW?=
- =?utf-8?B?cGZlaTFUUjFpaUJHT2VBaHJLL1dMU1d0bWxER3NxMzlnUWJNdTl6Sm1wOU1N?=
- =?utf-8?B?U2M5bEZvamhYRGJFRDErQURodlp0U3l3bzlFam52b1locSt3cnBUeW8wL2k2?=
- =?utf-8?B?ZXR1ZHM2Z25tb0R6OEM3NkNYU3FPUkdieWJNbXZnK3BNTFNlWXVTYVBUU3lO?=
- =?utf-8?B?bHVzTm94SEx2Tk1LQnZhdS9va1c1ck1KSm1CMUxnYXVsNkp3OWF6MlhwbjZ6?=
- =?utf-8?B?KzlQVnZMM0lvRVhOYUhneFhHTVBtODVXbDdnV1RaY09xdkNCYmVtVit2eW9r?=
- =?utf-8?B?alk0RTBKZWt5NlltNEs2SHREclFzZHNBU0x6MmRvaTlKVW5OT3hwQTVxWDAx?=
- =?utf-8?B?VzVrS242NkdTU2RGWlRJMUVDbXdzUFE5V2xsRzRSQURidGhvWWZrOGZFRWhF?=
- =?utf-8?B?R0hzWnVONnFBdTgxaEM2RlNlR0tVa1FiVktiSWhBZ2xZRjJxY1ZHcC9IU3hB?=
- =?utf-8?B?STFDR1VFSHp4STdsZ2NuaUN3VlpsUjd5OHZydHBJYVJodGt4MEhWQ2w0SVhx?=
- =?utf-8?B?SlBUWkRlcG82aVR2NXU3ODhlL2g2ckJDaUZyQzRVcTh2anlJNGM4RWQ4Ym1m?=
- =?utf-8?B?enppcEpqQXhUd2tSTmtVWjNmNFFVZjZFV0xPWUNHcDBtL29GS1lPeU9aZW51?=
- =?utf-8?B?YjYwbFUzcTBXVzljdm0rcitGa2JwSmc1WU9QdmhGNjdFS2s1dFhmMmJHZThm?=
- =?utf-8?B?N1djYjY5VFRoSHRsSWJaODljaHk1S1lxaWwzNmdBWUpFREpqQ1RJWitBdFJm?=
- =?utf-8?B?aFRhdVRhVVZMNHpiSGdqUFIzMjVnaXZCeFRockZhZVo1c1BYeE14bndUeTNV?=
- =?utf-8?B?Tzk0MXlySCthOExNRjBubVNXT1Y3dzJkTWZYa21QWkNLTzRKWVExVVpmS3BQ?=
- =?utf-8?B?RFVRUlFJbHVTZHJrTVgyempvMmxtVDVabkh3UEpYRjUrS3IrRUNGd3FvUUFC?=
- =?utf-8?B?SkV1N090bkpteGNvVEt4Wm5nSUlUYjlFNXJ1SE5LdXpQeHpENUU3eE82MEJB?=
- =?utf-8?B?Um5NM1ZEci9FaFhwanY2REE0VjFEbVBsbDk3Nm9CM1E5eTVPMWdmdVNnazVD?=
- =?utf-8?B?WUpUWDJFRHFGNXJnT2V0M2VhdHd5cnljU1d6SkhuTmhWWjlKQmc1WXpyenE3?=
- =?utf-8?B?MGdtSW9Ea1ltSXc4WE11MkFQcENPWFNncWMrdXZPc3NZZFVsL050akw5L04r?=
- =?utf-8?B?Rmdud25nT1QyQU9sVTJndUl2VVZhbVRNUjZxbFRwMy9ONGlpV1l1MVo1VVRm?=
- =?utf-8?B?eHBTcFRBSmVZSGJQekExMEhmR1hHaDA0RGg3WnZzVTVtTi9ickxRMXE1Z01I?=
- =?utf-8?B?ZHVTeXFDT1JpeG1JeXVyQVcyc042bCt0QmRWYVBwYmpYdWg0SWpmZnpQdDh2?=
- =?utf-8?B?cUZnaDJoWXpXNzd6bmpZWUxjc3pYdGtPUVhnQnZhaGxkWXRnYkRMdk1NTjVj?=
- =?utf-8?B?aFl2UitLcFdQSytSaTllNmdUTE1DNzUzTTI1T1pQdDBNZ2I5K0s4ZmtqRDBX?=
- =?utf-8?B?YXlkblZyRGdvakxQa1I4MCtDTVg1Q29aMnhkS1BpeXJDRGFNeDhqQXRqeTIx?=
- =?utf-8?B?cWt1OHYzM3BLV0xrRnJLRjdtbmtUQjR1N2trTUo4QWg5UVkzTlNzQUVOY0h5?=
- =?utf-8?B?djU3d1B4eXdoUU5McmFyRC9MSVlGbFR2eEJwaS9tUnBueStINTJlMlNYeDN0?=
- =?utf-8?B?S3hLdTlrZHFRVGhlZGY2RHhva1pMRndjOUhnUHBDa0dOMmNlYjJOVGMrYkZK?=
- =?utf-8?B?R0J5cnVQZnRZZHg3bEorWUsrZUFiN3ovU1cwbUwvRU94NlBxSnNaNjArSHRi?=
- =?utf-8?B?SFNlT0VSMCswYlp1T0hxZ3YyZUZPRVdBYVIrSUcwY21heXpDYURIcXJ0eU9n?=
- =?utf-8?B?YUhmRlFIdGlXY3ptMmJuaUsxZlo2VXVLVnovL0lYMmkrbElQd3luUEtRckVG?=
- =?utf-8?Q?TDnI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dlRsWHNtR2JOSnpNekg2MmpwcFh4Vzlra0oxYURLdWJNNDRtU1NoOGtYQXJO?=
- =?utf-8?B?bDRBNURRMjkvSUtydkRCR1haK3pGVmpadU8walZNbUxMYVNINmdoTGxYVnZE?=
- =?utf-8?B?enBDWEQ2Um5telJpY05TSVc2TFFxUUJWenhaNGxVdXhDQThPVU8rTGhHZkxB?=
- =?utf-8?B?SkNrU3pQaHptSzVPQjVPKzhoS1pMRjduMldQTzZaSjYrT2FiTlpPK3IzQ2hT?=
- =?utf-8?B?bGJnR1dydW5QeTFkbUV5Nk9NTXQ0QmZkMHJ1RlVvcUxnVjExOGRXYlFXKzQ2?=
- =?utf-8?B?ZEI0RWRPcTZxUEFwR1NsUG9Dd1oxWmZrdmhNd3ZXWk84RXBCa2NFWEJwZ1hK?=
- =?utf-8?B?QXlRaHFGREV6NVowM1RPeUhWOE8rYzRIUkR6RUpYblFLc01XOTV5bEYrQWNu?=
- =?utf-8?B?Yjc5byt3bGNqc2I3UmRVamZEMitpblJ2ei82T2Y3YXhkdGcwV2Q4VjYrdlhV?=
- =?utf-8?B?dHFIWEFnK3RsRjBXVjNwemdkUkZDeXZnakpmak84V1VBN3hiYmRuYVBjTFlU?=
- =?utf-8?B?aFI2dWtjNUt6ZGptNTdKNkhHaVREdk1TSDZiN2RJMFZrRjFBSStIYnRxWENa?=
- =?utf-8?B?bEZVL2J1ejVJWE9zeEp4VDBtZmt6THNyR0hRYm9yTGFBeHVJd1hYSG02NS9s?=
- =?utf-8?B?YnRSWXcyeGJkUHNtdGJRTTd3dVhrNnBNUUV2OXFHNVdYcTd1S0d6dmZ2WGNh?=
- =?utf-8?B?aGMza0lDSnBRdThEWkV6aHBtVEpGUVBaZ051bW41MXJGMUN6NzljVW5LN1ZI?=
- =?utf-8?B?aFJ0U05kZnZPb0JjejJ0bE5UTVhtdzlxakRjNDR5bmEzUVlBK1M4UTl0MGM0?=
- =?utf-8?B?c1IzR1lRL25YR2daVFVINGJhYjRndmpIL1VGbHZsQm5GSjZjRVFQNHN2MW5F?=
- =?utf-8?B?SVYxT2NHdlhsaldTcGZlMU9sQXJaTUJ5RkNXdmdqeEljSHlyWTcyWGo3aUVS?=
- =?utf-8?B?bFFYR1lMRmxkdlNIZEZRRFFnQndKYVVWZzJBNjFoUW9oVjF3YXhjMFZoQ013?=
- =?utf-8?B?ZmxPOHhzaHBsU0tySlNiSkRTeVNjR0h3QjZGYUpNMXl6UFEzUFA1TU1wa1JO?=
- =?utf-8?B?by83cUdRNGhiZHRCbmFiRWJVaTFzakNCRzlkYitFK3o4K1V6cUQ1WVVvL0tm?=
- =?utf-8?B?R1JHM2paaDRDczgvbTdVSDJab0hvU2E2T3BSVnZyK0VhWExNaDVCb2NGK1Vu?=
- =?utf-8?B?UjhrOXoyMFpGbS9iWnRmTWtYV3QyNkdmb21qM2phdStmQnVyRVdRUjJ5R2l5?=
- =?utf-8?B?ZGtxcnkvYmN0STBnQnFZNVBaUi9NMCsvRlEzcHdLdU5lZ3J2YXVieEIvRDJm?=
- =?utf-8?B?bCtHemlKUzRRK0R1RGNYRVMxMEJ4enlKdVZIYmNvNXQvWXFXdWFDT21ieDFY?=
- =?utf-8?B?N042SDJMZVFPZEtUY05LU2Z5RUdteFR0RmNsZlZiRFBJa3lidCs2YXA1cUww?=
- =?utf-8?B?QUFrcjlDbW5TZzJ1YitQazcxdTgxck1iN0orbDZCOUVVaVVoS3JUcDFFWFpl?=
- =?utf-8?B?NjJHWHMxOGFVSU94VUlHakVJb1hLTE1YbTdxRkpMYzhSbUh3cjBOYjY0VStk?=
- =?utf-8?B?aFdCaHRYcURxaUhDV3dsT3VkSEhOM1d1TVpGZThaQjhtYXFzaWU1RU5rSHpi?=
- =?utf-8?B?SmpkdkI0RGY1dUpwYUFOYlZCeHdvc1hyYUw4Y0w3bWdXeEsrNHpMWFB5bEQz?=
- =?utf-8?B?QlIrdXdCQUhERlZKbTVWL055RUU1dTJvbGFPVWhjUHFRVDRXRjBheDNzTDg4?=
- =?utf-8?B?YnBtc1ZIa3FPUWpuVXlRUXFMWkZYNGJsd1ZRcVhqVmVsWDV0MU9CZkttQWFQ?=
- =?utf-8?B?WTAySmE0QnZkQlJERDVnQTd3VkNDQzhBd2FVQU5JWlo2U2NZWmtHYXVJYVFw?=
- =?utf-8?B?NW5KTVd1L2d2Sk5IR2d5cU05cTlSQ2Z5MUpRT2hqa1l6MW1UQW1Bc0s2dHdN?=
- =?utf-8?B?SGhHYjlhdkQ1UjJlNjBERkMvNGljTUtSUkF0cjUxUlZ4b1I1UnlrdDhibkto?=
- =?utf-8?B?N0cybk1BM20zKzBlWk9WN1RYQWExdWlQQmYwRmt3bW04ZUdVK0NjTk1xaFZT?=
- =?utf-8?B?YjNWWHJBZmpsT3NLdWNoZDJ0dFFhc0pKeEVrNzZVM2hVU210clJxdjJKR2hz?=
- =?utf-8?B?My9BZ0M1anhDbG1BOWszMXpaTmlzcXBDTGs4a3IrTDI5dDM0bUxCU1IwYlJx?=
- =?utf-8?B?Z1BzQ1VqSnMveU5WWUgyb08yTXJpNmdaQXVzanNEalRwaHZjcjg1NyttSnlW?=
- =?utf-8?B?YzhwSHY3UmlEMVNlWTY3Y3dZdWtIcStKQzdWRlJwSWthSzFUM3plVG5sditP?=
- =?utf-8?B?Z3ExZ3hTSUo4S1BvcTlzVGFwSmdwVkVSMDdzMEJuMlB5NWhlQ2ZnZz09?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cfbbd67-cae3-4e72-94b0-08de6778d401
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2026 01:16:18.6588
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ekPr1FV7oYS21sAjvtT5zwY3ZwiTr8F/iLWivmLqcwyuy94j4FEDGeYT4d+j/LMlGoLeuiVbRf+983cYydUm+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9639
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260123142729.604737-1-andre.przywara@arm.com>
 
-Hi, Ben,
+On Fri, Jan 23, 2026 at 02:27:22PM +0000, Andre Przywara wrote:
+> This is v5 of the nested virt support series, fixing a corner case when
+> some maintenance IRQ setup fails. Also there is now a warning if --e2h0
+> is specified without --nested. Many thanks to Sascha for the review!
+> ========================================================
+> 
+> Thanks to the imperturbable efforts from Marc, arm64 support for nested
+> virtualization has now reached the mainline kernel, which means the
+> respective kvmtool support should now be ready as well.
+> 
+> Patch 1 updates the kernel headers, to get the new EL2 capability, and
+> the VGIC device control to setup the maintenance IRQ.
+> Patch 2 introduces the new "--nested" command line option, to let the
+> VCPUs start in EL2. To allow KVM guests running in such a guest, we also
+> need VGIC support, which patch 3 allows by setting the maintenance IRQ.
+> Patch 4 to 6 are picked from Marc's repo, and allow to set the arch
+> timer offset, enable non-VHE guests (at the cost of losing recursive
+> nested virtualisation), and also advertise the virtual EL2 timer IRQ.
+> 
+> Tested on the FVP (with some good deal of patience), and some commercial
+> (non-fruity) hardware, down to a guest's guest's guest.
 
-On 2/3/26 13:43, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> Intel RDT's CDP feature allows the cache to use a different control value
-> depending on whether the accesses was for instruction fetch or a data
-> access. MPAM's equivalent feature is the other way up: the CPU assigns a
-> different partid label to traffic depending on whether it was instruction
-> fetch or a data access, which causes the cache to use a different control
-> value based solely on the partid.
-> 
-> MPAM can emulate CDP, with the side effect that the alternative partid is
-> seen by all MSC, it can't be enabled per-MSC.
-> 
-> Add the resctrl hooks to turn this on or off. Add the helpers that match a
-> closid against a task, which need to be aware that the value written to
-> hardware is not the same as the one resctrl is using.
-> 
-> Update the 'arm64_mpam_global_default' variable the arch code uses during
-> context switch to know when the per-cpu value should be used instead. Also,
-> update these per-cpu values and sync the resulting mpam partid/pmg
-> configuration to hardware.
-> 
-> Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
-> equivalent needs programming twice by the resctrl glue, as resctrl expects
-> the bandwidth controls to be applied independently for both data and
-> instruction-fetch.
-> 
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Tested-by: Peter Newman <peternewman@google.com>
-> CC: Dave Martin <Dave.Martin@arm.com>
-> CC: Amit Singh Tomar <amitsinght@marvell.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since rfc:
-> Fail cdp initialisation if there is only one partid
-> Correct data/code confusion
-> 
-> Changes since v2:
-> Don't include unused header
-> 
-> Changes since v3:
-> Update the per-cpu values and sync to h/w
-> ---
->   arch/arm64/include/asm/mpam.h  |   1 +
->   drivers/resctrl/mpam_resctrl.c | 117 +++++++++++++++++++++++++++++++++
->   include/linux/arm_mpam.h       |   2 +
->   3 files changed, 120 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
-> index 05aa71200f61..70d396e7b6da 100644
-> --- a/arch/arm64/include/asm/mpam.h
-> +++ b/arch/arm64/include/asm/mpam.h
-> @@ -4,6 +4,7 @@
->   #ifndef __ASM__MPAM_H
->   #define __ASM__MPAM_H
->   
-> +#include <linux/arm_mpam.h>
->   #include <linux/bitfield.h>
->   #include <linux/jump_label.h>
->   #include <linux/percpu.h>
-> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-> index cd52ca279651..12017264530a 100644
-> --- a/drivers/resctrl/mpam_resctrl.c
-> +++ b/drivers/resctrl/mpam_resctrl.c
-> @@ -38,6 +38,10 @@ static DEFINE_MUTEX(domain_list_lock);
->   static bool exposed_alloc_capable;
->   static bool exposed_mon_capable;
->   
-> +/*
-> + * MPAM emulates CDP by setting different PARTID in the I/D fields of MPAM0_EL1.
-> + * This applies globally to all traffic the CPU generates.
-> + */
->   static bool cdp_enabled;
->   
->   bool resctrl_arch_alloc_capable(void)
-> @@ -50,6 +54,72 @@ bool resctrl_arch_mon_capable(void)
->   	return exposed_mon_capable;
->   }
->   
-> +bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
-> +{
-> +	switch (rid) {
-> +	case RDT_RESOURCE_L2:
-> +	case RDT_RESOURCE_L3:
-> +		return cdp_enabled;
-> +	case RDT_RESOURCE_MBA:
-> +	default:
-> +		/*
-> +		 * x86's MBA control doesn't support CDP, so user-space doesn't
+Hi Andre,
+I wonder if you have also tested this series with the latest QEMU which
+has FEAT_NV2 support; I ask because when I tried to create a nested
+guest with (again) lkvm it got stuck forever.
 
-s/x86's/ARM's/
+Thanks,
+Itaru.
 
-Thanks.
-
--Fenghua
-
-[SNIP]
+> 
+> Cheers,
+> Andre
+> 
+> Changelog v4 ... v5:
+> - bump kernel headers to v6.19-rc6
+> - print a warning if --e2h0 is given without --nested
+> - fail if the maintenance IRQ setting attribute is not supported
+> 
+> Changelog v3 ... v4:
+> - pass kvm pointer to gic__generate_fdt_nodes()
+> - use macros for PPI offset and DT type identifier
+> - properly calculate DT interrupt flags value
+> - add patch 7 to fix virtio endianess issues
+> - CAPITALISE verbs in commit message
+> 
+> Changelog v2 ... v3:
+> - adjust^Wreplace commit messages for E2H0 and counter-offset patch
+> - check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
+> - update kernel headers to v6.16 release
+> 
+> Changelog v1 ... 2:
+> - add three patches from Marc:
+>   - add --e2h0 command line option
+>   - add --counter-offset command line option
+>   - advertise all five arch timer interrupts in DT
+> 
+> Andre Przywara (3):
+>   Sync kernel UAPI headers with v6.19-rc6
+>   arm64: Initial nested virt support
+>   arm64: nested: Add support for setting maintenance IRQ
+> 
+> Marc Zyngier (4):
+>   arm64: Add counter offset control
+>   arm64: Add FEAT_E2H0 support
+>   arm64: Generate HYP timer interrupt specifiers
+>   arm64: Handle virtio endianness reset when running nested
+> 
+>  arm64/arm-cpu.c                     |   6 +-
+>  arm64/fdt.c                         |   5 +-
+>  arm64/gic.c                         |  29 ++++++-
+>  arm64/include/asm/kvm.h             |  25 ++++--
+>  arm64/include/kvm/gic.h             |   2 +-
+>  arm64/include/kvm/kvm-config-arch.h |  11 ++-
+>  arm64/include/kvm/kvm-cpu-arch.h    |   5 +-
+>  arm64/include/kvm/timer.h           |   2 +-
+>  arm64/kvm-cpu.c                     |  64 ++++++++++++---
+>  arm64/kvm.c                         |  19 +++++
+>  arm64/timer.c                       |  29 +++----
+>  include/linux/kvm.h                 |  47 +++++++++++
+>  include/linux/virtio_ids.h          |   1 +
+>  include/linux/virtio_net.h          |  49 +++++++++++-
+>  include/linux/virtio_pci.h          |   3 +-
+>  powerpc/include/asm/kvm.h           |  13 ----
+>  riscv/include/asm/kvm.h             |  29 ++++++-
+>  x86/include/asm/kvm.h               | 116 ++++++++++++++++++++++++++++
+>  18 files changed, 394 insertions(+), 61 deletions(-)
+> 
+> -- 
+> 2.43.0
+> 
