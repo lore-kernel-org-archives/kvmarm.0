@@ -1,131 +1,119 @@
-Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4F337475D
-	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 13:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A71125B2;
+	Mon,  9 Feb 2026 14:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770642858; cv=none; b=EZlkcph24Gb93pNGj02QcuxLZrA8FLi5pEOaa/6TqEXm30CevXskqQZEbz6oJYDuZ5/SzQtI8eJTT3yFQuWJutg5BdwgFrYNviOaHn/iwKzeYMiEZ0ELiywlJzD6vWgBNzLoPopDmGJEzY4TBHqicfc67Nft3UcVhQwKd6BNg9A=
+	t=1770647745; cv=none; b=lQz9H7hibveEBNOltLPotqTny9mQl2bgp6eelg2V2QRE/LHrf2+MHFEggaJKD10Ci3qlNLGFKudLg0Zn8EFlEc/AOEEZiyV1+s8iNN/hU2L1bDQazyMk94UW7XME8d6LV88VSTXTqGLkEiY6t3Xfdx1w2DTekIOOtohdBifsCKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770642858; c=relaxed/simple;
-	bh=VVeHnu0VcIme7gG/R+YSmhUW0zmeKKSm2oto95JUOlc=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=KlnUZRV178oOt8pBwg5XD6AoUavJCpPzdp7CN9gHUiPQNO6ff6ulUpyeqN19Hvj0pmBAr71oHJ5F9egQfHmMg4MazFOGrIxJ+/tfSsrJybfEnTcmTX5zE/8lDP97yEKdJtOKm6yLvPHODPL26WDaEZLs6dTPbIeRlWCriDugDOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=NYOZtJiL; arc=none smtp.client-ip=113.46.200.224
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1770647745; c=relaxed/simple;
+	bh=b2yP8tzmgc4hWHflZtaIqwBaGN7tQP02e9esN0bF2gQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EBfDupaNjJAMWpPq8gu6dCoe11qt9UJSKSdIvSi2ODsc0/Cf4S2r7GDg1dx4QOq5oE9R5ZQvRU1aQhvh4Mc2ElWt8tx6tXUlIGmrhAlvhQ/lZDIZ7wHmrFl8HBIzpUcetvOPE0cGqgzak9pdgI7DzgPQ21HCOGCIRYlefyQlUhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gi3ThxqO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="NYOZtJiL"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=opfrnp35dPp83Ydd0CdXth+jzeoQtf0NhQtQp++rgoE=;
-	b=NYOZtJiL6+EKta10OxqGbCO86ppwqOk82YX/vDvIQmWUGWur+16L954RYwLKVuJ9fOyi0g+a2
-	4iVvWA9rugiZqKhNWu9uCqWBaf6QbH1YXgSVNyBLHWdRwqJ3Azev21EFoz0C8Tho90ZRPYI9jJo
-	pZ2nK0nn6ajwDUWhMJFD0HI=
-Received: from mail.maildlp.com (unknown [172.19.163.163])
-	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4f8lQm2hZzz1cyNr;
-	Mon,  9 Feb 2026 21:09:36 +0800 (CST)
-Received: from kwepemg500007.china.huawei.com (unknown [7.202.181.44])
-	by mail.maildlp.com (Postfix) with ESMTPS id 57EBD40565;
-	Mon,  9 Feb 2026 21:14:13 +0800 (CST)
-Received: from kwepemj500003.china.huawei.com (7.202.194.33) by
- kwepemg500007.china.huawei.com (7.202.181.44) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 9 Feb 2026 21:14:13 +0800
-Received: from kwepemj500003.china.huawei.com ([7.202.194.33]) by
- kwepemj500003.china.huawei.com ([7.202.194.33]) with mapi id 15.02.1544.011;
- Mon, 9 Feb 2026 21:14:07 +0800
-From: "yezhenyu (A)" <yezhenyu2@huawei.com>
-To: "rananta@google.com" <rananta@google.com>, "will@kernel.org"
-	<will@kernel.org>, "maz@kernel.org" <maz@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>, "catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>, "dmatlack@google.com" <dmatlack@google.com>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gi3ThxqO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5C3DC116C6;
+	Mon,  9 Feb 2026 14:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770647744;
+	bh=b2yP8tzmgc4hWHflZtaIqwBaGN7tQP02e9esN0bF2gQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gi3ThxqODsLNa4pIvkZRStm9yMuULTTmPti+8nIJOWpNtdopKXf0cAam9XbG+4807
+	 P0RsnHdW41BjfDb9f3cL7MnQENLHglRTQwdnZLldhjgsQqGnr+ZzTv16sJ/reB/0RH
+	 +lxTrA2G1VUL6rKhhaIhZKTrX3AWrcQANe+pTgBq329xoRqdBURxdj6U0y1ykeNCMT
+	 AkoWSJ/MaC8PKR7yaxuo/yTCTSpkAvQ6WIaMvzNLdGtZJ2+4sP4zbetC8yHcyzeVag
+	 IMutp0VnVjWQ1F6U49F9R+ioFvKdb4+f5SR6QF48J4SKbgt95Zv5NShWm4uCgb+OOv
+	 2Zvj7xf7jUb/w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vpSMY-00000009mWm-11Vz;
+	Mon, 09 Feb 2026 14:35:42 +0000
+Date: Mon, 09 Feb 2026 14:35:41 +0000
+Message-ID: <86wm0massi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "yezhenyu (A)" <yezhenyu2@huawei.com>
+Cc: "rananta@google.com" <rananta@google.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>,
+	"dmatlack@google.com" <dmatlack@google.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
 	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
 	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, zhengchuan <zhengchuan@huawei.com>,
-	Xiexiangyou <xiexiangyou@huawei.com>, "guoqixin (A)" <guoqixin2@huawei.com>,
+	<linux-arm-kernel@lists.infradead.org>,
+	zhengchuan <zhengchuan@huawei.com>,
+	Xiexiangyou <xiexiangyou@huawei.com>,
+	"guoqixin (A)" <guoqixin2@huawei.com>,
 	"Mawen (Wayne)" <wayne.ma@huawei.com>
-Subject: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during
- kvm_tlb_flush_vmid_range
-Thread-Topic: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during
- kvm_tlb_flush_vmid_range
-Thread-Index: AdyZxXBD7SmLF28zTvuqoGutV5f5rw==
-Date: Mon, 9 Feb 2026 13:14:07 +0000
-Message-ID: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during kvm_tlb_flush_vmid_range
+In-Reply-To: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
+References: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, rananta@google.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, dmatlack@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zhengchuan@huawei.com, xiexiangyou@huawei.com, guoqixin2@huawei.com, wayne.ma@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From 9982be89f55bd99b3683337223284f0011ed248e Mon Sep 17 00:00:00 2001
-From: eillon <yezhenyu2@huawei.com>
-Date: Mon, 9 Feb 2026 19:48:46 +0800
-Subject: [RFC][PATCH v1] arm64: tlb: call kvm_call_hyp once during
- kvm_tlb_flush_vmid_range
+On Mon, 09 Feb 2026 13:14:07 +0000,
+"yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
+> 
+> From 9982be89f55bd99b3683337223284f0011ed248e Mon Sep 17 00:00:00 2001
+> From: eillon <yezhenyu2@huawei.com>
+> Date: Mon, 9 Feb 2026 19:48:46 +0800
+> Subject: [RFC][PATCH v1] arm64: tlb: call kvm_call_hyp once during
+>  kvm_tlb_flush_vmid_range
+> 
+> The kvm_tlb_flush_vmid_range() function is performance-critical
+> during live migration, but there is a while loop when the system
+> support flush tlb by range when the size is larger than MAX_TLBI_RANGE_PAGES.
+>
+> This results in frequent entry to kvm_call_hyp() and then a large
 
-The kvm_tlb_flush_vmid_range() function is performance-critical
-during live migration, but there is a while loop when the system
-support flush tlb by range when the size is larger than MAX_TLBI_RANGE_PAGE=
-S.
+What is the cost of kvm_call_hyp()?
 
-This results in frequent entry to kvm_call_hyp() and then a large
-amount of time is spent in kvm_clear_dirty_log_protect() during
-migration(more than 50%). So, when the address range is large than
-MAX_TLBI_RANGE_PAGES, directly call __kvm_tlb_flush_vmid to
-optimize performance.
+> amount of time is spent in kvm_clear_dirty_log_protect() during
+> migration(more than 50%).
 
----
- arch/arm64/kvm/hyp/pgtable.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+50% of what time? The guest's run-time? The time spent doing TLBIs
+compared to the time spent in kvm_clear_dirty_log_protect()?
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 874244df7..9da22b882 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -675,21 +675,19 @@ static bool stage2_has_fwb(struct kvm_pgtable *pgt)
- void kvm_tlb_flush_vmid_range(struct kvm_s2_mmu *mmu,
- 				phys_addr_t addr, size_t size)
- {
--	unsigned long pages, inval_pages;
-+	unsigned long pages =3D size >> PAGE_SHIFT;
+> So, when the address range is large than
+> MAX_TLBI_RANGE_PAGES, directly call __kvm_tlb_flush_vmid to
+> optimize performance.
 
--	if (!system_supports_tlb_range()) {
-+	/*
-+	 * This function is performance-critical during live migration;
-+	 * thus, when the address range is large than MAX_TLBI_RANGE_PAGES,
-+	 * directly call __kvm_tlb_flush_vmid to optimize performance.
-+	 */
-+	if (!system_supports_tlb_range() || pages > MAX_TLBI_RANGE_PAGES) {
- 		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
- 		return;
- 	}
+Multiple things here:
 
--	pages =3D size >> PAGE_SHIFT;
--	while (pages > 0) {
--		inval_pages =3D min(pages, MAX_TLBI_RANGE_PAGES);
--		kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, inval_pages);
--
--		addr +=3D inval_pages << PAGE_SHIFT;
--		pages -=3D inval_pages;
--	}
-+	kvm_call_hyp(__kvm_tlb_flush_vmid_range, mmu, addr, pages);
- }
+- there is no SoB, which means that patch cannot be considered for
+  merging
 
- #define KVM_S2_MEMATTR(pgt, attr) PAGE_S2_MEMATTR(attr, stage2_has_fwb(pgt=
-))
---
-2.43.0
+- there is no data showing how this change improves the situation for
+  a large enough set of workloads
 
+- there is no description of a test that could be run on multiple
+  implementations to check whether this change has a positive or
+  negative impact
 
+If you want to progress this sort of things, you will need to address
+these points.
 
+Thanks,
 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
