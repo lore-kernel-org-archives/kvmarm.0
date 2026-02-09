@@ -1,119 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A71125B2;
-	Mon,  9 Feb 2026 14:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770647745; cv=none; b=lQz9H7hibveEBNOltLPotqTny9mQl2bgp6eelg2V2QRE/LHrf2+MHFEggaJKD10Ci3qlNLGFKudLg0Zn8EFlEc/AOEEZiyV1+s8iNN/hU2L1bDQazyMk94UW7XME8d6LV88VSTXTqGLkEiY6t3Xfdx1w2DTekIOOtohdBifsCKE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770647745; c=relaxed/simple;
-	bh=b2yP8tzmgc4hWHflZtaIqwBaGN7tQP02e9esN0bF2gQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EBfDupaNjJAMWpPq8gu6dCoe11qt9UJSKSdIvSi2ODsc0/Cf4S2r7GDg1dx4QOq5oE9R5ZQvRU1aQhvh4Mc2ElWt8tx6tXUlIGmrhAlvhQ/lZDIZ7wHmrFl8HBIzpUcetvOPE0cGqgzak9pdgI7DzgPQ21HCOGCIRYlefyQlUhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gi3ThxqO; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F2837E2E0
+	for <kvmarm@lists.linux.dev>; Mon,  9 Feb 2026 15:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770650337; cv=pass; b=bhndAt/CnAK9NCD/OZzh1R9Uf+AJfyaXC1xxKVUFmuCoF8U84cT2f2pycdBF/VXxyf8jzFZXNQl1ZxkCtcLU7ogZDtwMu3lZjR1tKRm7nolZNlpaBcnZFvYqwGawzBi98CYP6yKBTLZs00SIavZm1BUXi5uDWQvzKISiKKORacY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770650337; c=relaxed/simple;
+	bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sLu5vUwsbyoH+rTqvPQ6N8CuoH9FM4eBR8Kkcm7XC0u94jjtuZ0IHoEYOUpvFXg1cr2LfYfyxdRG0FuBMHGL5KVdXOz/18V8jWlLHaqy09UHkMqmFrCyir8PbSf6V8TJCk3s7DSoWf0oVQi+LrKs+ReoDQ7SRCIDMTlVtJ6urXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HjyZG973; arc=pass smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gi3ThxqO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5C3DC116C6;
-	Mon,  9 Feb 2026 14:35:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770647744;
-	bh=b2yP8tzmgc4hWHflZtaIqwBaGN7tQP02e9esN0bF2gQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gi3ThxqODsLNa4pIvkZRStm9yMuULTTmPti+8nIJOWpNtdopKXf0cAam9XbG+4807
-	 P0RsnHdW41BjfDb9f3cL7MnQENLHglRTQwdnZLldhjgsQqGnr+ZzTv16sJ/reB/0RH
-	 +lxTrA2G1VUL6rKhhaIhZKTrX3AWrcQANe+pTgBq329xoRqdBURxdj6U0y1ykeNCMT
-	 AkoWSJ/MaC8PKR7yaxuo/yTCTSpkAvQ6WIaMvzNLdGtZJ2+4sP4zbetC8yHcyzeVag
-	 IMutp0VnVjWQ1F6U49F9R+ioFvKdb4+f5SR6QF48J4SKbgt95Zv5NShWm4uCgb+OOv
-	 2Zvj7xf7jUb/w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vpSMY-00000009mWm-11Vz;
-	Mon, 09 Feb 2026 14:35:42 +0000
-Date: Mon, 09 Feb 2026 14:35:41 +0000
-Message-ID: <86wm0massi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "yezhenyu (A)" <yezhenyu2@huawei.com>
-Cc: "rananta@google.com" <rananta@google.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"catalin.marinas@arm.com"
-	<catalin.marinas@arm.com>,
-	"dmatlack@google.com" <dmatlack@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	zhengchuan <zhengchuan@huawei.com>,
-	Xiexiangyou <xiexiangyou@huawei.com>,
-	"guoqixin (A)" <guoqixin2@huawei.com>,
-	"Mawen (Wayne)" <wayne.ma@huawei.com>
-Subject: Re: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during kvm_tlb_flush_vmid_range
-In-Reply-To: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
-References: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HjyZG973"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-7963aa14dbbso20831947b3.1
+        for <kvmarm@lists.linux.dev>; Mon, 09 Feb 2026 07:18:57 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770650336; cv=none;
+        d=google.com; s=arc-20240605;
+        b=leawGkkgG0vZyUCcwx4s5xbOjo0QKYCkEB48d8g9HZI68sjwE0FVWeW0yELR35MUT/
+         ExDCYw48qn3aZ3vSmUO7TbmZqmHhsMs9V7Ac1A5SNmTj7SvQDGVIxmIyAlz4riRYKSV7
+         OK3vNrsXZ6X7VkICkSJOuyGKuspnlUU3rFKlaGVOogSyz0VHS7jhPAzDUNlXkNKj7Plz
+         u/LojdUDUKUvr94ZbNSlh6yBM4oy2bYi0Y99fxoZzBNW6y1bJPu3e2NAfb1Rxn/sha5c
+         ByzBzT9L0u1z1fryAAge2nydTQDltHIm4fl5/z/ekT/z4EwmIKPK6O1VcyW2Pb249YIf
+         Gs+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
+        fh=4FVpQOxbhoeUercaKzxu0InetTKxeAT4ZmwimlBlFoU=;
+        b=A5+i9XurZskvDwyGxKWu49nv0TZ1CFyMMUMmGwXNmS0g707nbokTVzqVrL9HDcYbN/
+         ih4uJlDGLXRraIdTdC9e+Jsk2xGElpBve5zocmyOEwj8/Xm4X7n7ArV4pzUONOCYTNum
+         cm1bdxSxCxAaQtVtbsc3AmEpyWAMHnJ46ZoJa9g9OS8Q8io3HQy6664zZqyFLBaFUe9C
+         ExvFD6G6rYNXF5qX2sanh1yPLbvEz778gCdVTbPfuRF/Z2d8KWvxi3H/J2eelhsPFt3+
+         Ek0ruDUH6H1U0gPe7QrqwGBHrsVciEvL3bjHvYsRmTYDlBJj7K1qZLmKhLsUnC7ajb8+
+         5CnQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1770650336; x=1771255136; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
+        b=HjyZG973MvlwwGPvOQartl8xuwhhcZzv4dDSE4cOmiBKnkiYVn9qPrN5dlnZSENJEg
+         BiQNJVcDf29xX39D8OcJF4gzlnlWOLEApgsRFK1uHC+ub2gVhkKKvMNx8wBEnp38Vvzr
+         z4C2hZGgReFNPu0xr0PFuCDLGS5Yr/tYFWT9K7B+5/AOnHxDPwCmz5Q2Qxc0PX9/zYOt
+         AHobyGitRIu5Huu2lS6QhLaAMqBxXzaQg8dYa2dJbmJbwP7tVL6xvK+zHWhvgvMe/yYd
+         YpfyJLrqsUGOZg/+D2xNEkH+sU768sBIQ009ZKTPZHM4RKL1QnZWrBA9d5zZbBrRzVJu
+         55vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770650336; x=1771255136;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e3bUDvDDCERCxLHccqCKh5cXslCrqGzgEb8uS+QsJ98=;
+        b=soUnlq4pRKaCB0BW1Q537wpBF37n6/OxPZTbaVC83xeGtaKZ6c3hkMmrZZO4pniAv+
+         D1HtMcddvz1uDhUnskuAH1/SIt4cWb43BIJQM7GPY99X1+zCm4KXqzo3Ue5Q5rz/rjR8
+         teDMAJsuktQ24nyD4dFYcuNme58tN7VRMRWB52tSpulB4GOhNgimj7PVUXptV6hlUx/V
+         08VzsHFUlKcCeOORmSE8012RIMUJCfAlBJ+cVh8CXT7U/4SrrQChpCkjucfLuaHqE4FW
+         3YQ/3gcURF0KKExKNcnC+49/rLG/+DBCWwYrXK6IM0YMHvvD8uEfhXDJ9arDMIhz5Lrq
+         vveQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVw77+Ow/TV+rXANkVIGuzLhyPZjzDIKlUy/198+ZbjrbmKnMzJrFI7ywTbtkF5K3ukCk0THk4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzMgoc/UFvc8FfwhuCGHYjrL4GZGD3/tg2+fGmXBNOKn4pNeAVX
+	wcKKVNS7HdJejKtEfSPjq6QZIhSPOQjJVkwnqcwrEdlxkRgiQcMyqtkDDGBMZjEEYGqapgengou
+	dkLLTLgTxfDN194Gfas6d7wp4+q5HskK3tnQLvxMfUA==
+X-Gm-Gg: AZuq6aKlNuXnQJn1VHyiL59YYB22tgd3NpLq8U3KoxHLP3i33iUsJwkuH7nQODTThUg
+	04advspNNQT0372EqmvGXANK29s0zi/Bkw1knP+Fk9lpUVQUxf8kvMTUuWPeZU7cM0AY7L2Shzx
+	gKOsnej/EcNpLGahtsgedVtGTjzpvNnlf7HoQm8W3FCO1Ibe+KInONwhaZrEJUeP8tFGJMtHVCC
+	MDxKBX6X8EW73elJgDbFfN+MjhbWty9S8kVhZESUupnVxyzY7/at+2GTpbdN1QJwIFNW6Ro7OhT
+	w9nHxdw/y164FcsSbrqpG8NrXJ0/wGI5uw+t5leLiemjXJTUBjuy/Ac=
+X-Received: by 2002:a05:690c:e08:b0:794:87bf:76ef with SMTP id
+ 00721157ae682-7952a63ec7amr99106367b3.7.1770650335943; Mon, 09 Feb 2026
+ 07:18:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, rananta@google.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, dmatlack@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zhengchuan@huawei.com, xiexiangyou@huawei.com, guoqixin2@huawei.com, wayne.ma@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20251223-kvm-arm64-sme-v9-0-8be3867cb883@kernel.org> <20251223-kvm-arm64-sme-v9-10-8be3867cb883@kernel.org>
+In-Reply-To: <20251223-kvm-arm64-sme-v9-10-8be3867cb883@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Feb 2026 15:18:43 +0000
+X-Gm-Features: AZwV_Qj3JfZxsU8iVNrT9S4IUwlHEkuMD3WG7W3HRrHxULDnwFPH-_uH0mM-meA
+Message-ID: <CAFEAcA-nhHdwuQODmT4-dBCEuiut-jbHsCGVYByoMF77-UWbCg@mail.gmail.com>
+Subject: Re: [PATCH v9 10/30] KVM: arm64: Document the KVM ABI for SME
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Shuah Khan <shuah@kernel.org>, Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>, 
+	Fuad Tabba <tabba@google.com>, Mark Rutland <mark.rutland@arm.com>, Ben Horgan <ben.horgan@arm.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Eric Auger <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 09 Feb 2026 13:14:07 +0000,
-"yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
-> 
-> From 9982be89f55bd99b3683337223284f0011ed248e Mon Sep 17 00:00:00 2001
-> From: eillon <yezhenyu2@huawei.com>
-> Date: Mon, 9 Feb 2026 19:48:46 +0800
-> Subject: [RFC][PATCH v1] arm64: tlb: call kvm_call_hyp once during
->  kvm_tlb_flush_vmid_range
-> 
-> The kvm_tlb_flush_vmid_range() function is performance-critical
-> during live migration, but there is a while loop when the system
-> support flush tlb by range when the size is larger than MAX_TLBI_RANGE_PAGES.
+On Tue, 23 Dec 2025 at 01:22, Mark Brown <broonie@kernel.org> wrote:
 >
-> This results in frequent entry to kvm_call_hyp() and then a large
+> SME, the Scalable Matrix Extension, is an arm64 extension which adds
+> support for matrix operations, with core concepts patterned after SVE.
 
-What is the cost of kvm_call_hyp()?
+A late reply, but I just noticed that the cover letter says:
 
-> amount of time is spent in kvm_clear_dirty_log_protect() during
-> migration(more than 50%).
+> Userspace access to ZA and (if configured) ZT0 is always available, they
+> will be zeroed when the guest runs if disabled in SVCR and the value
+> read will be zero if the guest stops with them disabled. This mirrors
+> the behaviour of the architecture, enabling access causes ZA and ZT0 to
+> be zeroed, while allowing access to SVCR, ZA and ZT0 to be performed in
+> any order.
 
-50% of what time? The guest's run-time? The time spent doing TLBIs
-compared to the time spent in kvm_clear_dirty_log_protect()?
+but the doc patch itself says:
 
-> So, when the address range is large than
-> MAX_TLBI_RANGE_PAGES, directly call __kvm_tlb_flush_vmid to
-> optimize performance.
+> +Access to the ZA and ZT0 registers is only available if SVCR.ZA is set
+> +to 1.
 
-Multiple things here:
+Which one is the intention here ?
 
-- there is no SoB, which means that patch cannot be considered for
-  merging
-
-- there is no data showing how this change improves the situation for
-  a large enough set of workloads
-
-- there is no description of a test that could be run on multiple
-  implementations to check whether this change has a positive or
-  negative impact
-
-If you want to progress this sort of things, you will need to address
-these points.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+thanks
+-- PMM
