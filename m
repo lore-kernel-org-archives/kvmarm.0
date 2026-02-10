@@ -1,73 +1,41 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF8438553D
-	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 15:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FE83859C4
+	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 16:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770739101; cv=none; b=einZtB3lD+z4f3QQywugUMihyO6woAR+j+TZZVS4KRXoZB5YGw/t2u9y2eSPoEiVMmo0rxQPq9Ug0xCR5yWeoQI1N7aMRxWvzjKq/ncxSE3hIpNvvhJMQ1NdEcDozofBcrtHqnz2GHuMhV+MU434R5Ns4uXuE+MWH5aAUmMKp5o=
+	t=1770740103; cv=none; b=l4dPWSQoz74UxmrwuuMWa+oZpX9ATkj3ElUrjEOKT/9GAzznLGIxXtsN5q24/h+4WWmqEJ93TFKwBANoJKzNO8sRURIgcmVqWOCBIKpmYUfzsZbzl5X07+bkMM7HqvEoTcQZiFgyp76SbDOuThFgu/YhHGfNARTMrODiOFUrQ+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770739101; c=relaxed/simple;
-	bh=k066NWiBGjrC32wdnhVRStq7fRb2ByKNr7u/pC3VWKo=;
+	s=arc-20240116; t=1770740103; c=relaxed/simple;
+	bh=9vtbxyiMLrYNdwBoK7qoue5mhebGylj6qkZTJg0n2wo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqLO0s+bX0g5URUD3MyopA9urfjpM0tZk8rybOLjy1dfeLiVD/v681lR85irRPTCdpLX6fPt3ydxrfBaZdOWjWB63VFNH/gfFsjV0DKH7YsVBOEqE5T3i9po+JucHMhGpaq09c0oQe9cqxMEuEmp1/mLt3iS6C2VIaEJC+6fFMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4XNLNdIp; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4XNLNdIp"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-383122fbc9bso49666611fa.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 07:58:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770739098; x=1771343898; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0NBVBPVKCHxe9+RzT9q+YHkvlWYmf8ND5x6dqt+onUw=;
-        b=4XNLNdIp6Z5zWD61ZEjd6blyepV9pvr4wlSmBcPXnpE9l780qb675FCe2KL7VXfvJW
-         x8kEVk18Rdr4YEo3g3qkz+oJB4eUm/geDmkvYUJaLicCaWVB6sAgYQOTvuEse48aaHEG
-         Ont8HLB95WhaXhMZHIAbSTKF50v1e8odVAxjPNoAqVxmMWysA+affwh/aR4Mc+mKOrGe
-         CjRv0eCUpdVYJ9mdS1MpRddtbGnF0Wwu9YryWDHYHtBQL+cgY/xPtKWhB863ZL4jDQi8
-         5jpRBp5wEUhm2BzqAeD8eluX3BPxx7bZIE96TC0sEDv1zYtZ/BgSCz7r7kj2AA3tbBtS
-         URiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770739098; x=1771343898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0NBVBPVKCHxe9+RzT9q+YHkvlWYmf8ND5x6dqt+onUw=;
-        b=Z+7VVIdSZVctQCCkVpwSVQmvBpkm8bCC+DLe2D96qpU1GKvCj2oR/Qq4J5DNtFlRBf
-         A5BMK3OIharHauhwrua1WZZHafJ4I6JL8u65tNvu5GVLWQHGEiJRF9BRxL8p8nw6QfHA
-         PU3c04S9Nwj+zHvtj5RYgQj0CUU14Ohd1DBr37IFufaPOLC5Kv8PcMMnUzUOvQhGKfmK
-         YFsTSKXK2SH6x9LVoewDXfSliZCxiM0wSdTZQFjC56vwYqDjhH3Uzbsi7e8ETFg6GMZ+
-         VDNPQAMZP5CNHoadkojDgNwEVyXK7vL6w6mUtilVhPoV7YRmXWgb9qntwkBwqElwEUd7
-         Cacg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfzNAIAakdJGDaqgMYbTtBMHhhf01yNF3ePLFZU++LSHeYS7vArHUW9mwSynGiWCDLulffcjg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyYC1KW7/OeZUN9RPQi8Rq0xmBitt6QDyjmpS/hcFznZfubgpkx
-	AK3qnIUDbAnCjQU+juYB9b4+IACF6E+YP0BmXI4SR8OSoNYJTtflxS3d2nduS2HYKA==
-X-Gm-Gg: AZuq6aKkN0O1ag/v2sRro8G9/jyZWztm0YlnjmOmyWwApNZITD+kzyOTZE/436luBs4
-	IM2konmmi+P1UlBDLg3zgH/5i27Ia2ZAduYy2F4s7WWxHP3+S5NtaVprisgR9ViuvBBWjDkjaD0
-	kD3RPmXcRGJ1iZrNNnT4f1tFL2r1dMvaXJjhvl2gf0YchQJISH933bmyQQIWxwduAHaR8KGxH4J
-	laINEwPaILLQvIOAH2kIs5xw/ntrgbvYYxCsn3tr2f51QcIuoCgt4HjSyFghoopes6zD4LpJyue
-	IWxcKn+NonkfxxRK80GngkekmVEtN/L94DeIlqXR7x3P2KVLkm9ULCQ4m5m88HRebgdUzWHGXin
-	OffoGWQ9O4EuDYz2WoH9YfmsS3ZeECU3wGcUT87PmIktSmdI8JqvEcAofhaQFkFpWpUC2P1YLDs
-	jC+8HexFmwFodWp0tCufACusJg9V67BRm/tNOj/h5sGlyv++fj1KzHbrWuTY02+UDglWbZ
-X-Received: by 2002:a05:651c:2117:b0:383:2537:f135 with SMTP id 38308e7fff4ca-386eefb4c67mr9602531fa.21.1770739097580;
-        Tue, 10 Feb 2026 07:58:17 -0800 (PST)
-Received: from google.com (133.23.88.34.bc.googleusercontent.com. [34.88.23.133])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-386b62921f6sm30286331fa.22.2026.02.10.07.58.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Feb 2026 07:58:17 -0800 (PST)
-Date: Tue, 10 Feb 2026 15:58:14 +0000
-From: Quentin Perret <qperret@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev, 
-	oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com
-Subject: Re: Broken udelay() on KVM host with a vcpu loaded
-Message-ID: <motrqsddhooajk66sq75dt74huvxmwtreoznwc6yjqirit36bl@2mlt2546mjnp>
-References: <ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od>
- <86qzqsbw1m.wl-maz@kernel.org>
- <aYtP_rgolLfm_UDD@willie-the-truck>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KsL1Yc5RbDcK+idFtIj02MEsicWF/g8nEROpQC/Xm/LKUR0CYsEOsCh2RqzoEFcCkg41d2xXVW1N4tCJIUmfyA3gUuzGMpjIS0q3H4NwvWldo/DGjXI5Z2xfCgtqFO0K4NbovD6qqoHjvOK9vjyL+5VV0rDGfQfLFBUfIyz4PbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AB9B339;
+	Tue, 10 Feb 2026 08:14:53 -0800 (PST)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C179F3F632;
+	Tue, 10 Feb 2026 08:14:56 -0800 (PST)
+Date: Tue, 10 Feb 2026 16:14:54 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
+	broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, scott@os.amperecomputing.com,
+	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
+	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
+Subject: Re: [PATCH v12 2/7] arm64: cpufeature: add FEAT_LSUI
+Message-ID: <aYtZfpWjRJ1r23nw@arm.com>
+References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
+ <20260121190622.2218669-3-yeoreum.yun@arm.com>
+ <aYY2CyHWtplQ-fuS@arm.com>
+ <aYouAv_EjICIN8oA@arm.com>
+ <aYsAaaQgBaLbDSsW@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -76,142 +44,94 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYtP_rgolLfm_UDD@willie-the-truck>
+In-Reply-To: <aYsAaaQgBaLbDSsW@e129823.arm.com>
 
-On Tuesday 10 Feb 2026 at 15:34:22 (+0000), Will Deacon wrote:
-> On Tue, Feb 10, 2026 at 12:52:21PM +0000, Marc Zyngier wrote:
-> > On Tue, 10 Feb 2026 12:27:48 +0000,
-> > Quentin Perret <qperret@google.com> wrote:
-> > > 
-> > > Hi all,
-> > > 
-> > > I have just received a report from a partner of udelay misbehaving when
-> > > running on the host whilst a vCPU is loaded. This hardware has FEAT_WFxT
-> > > and uses the matching implementation of udelay. Interestingly, WFIT
-> > > triggers using CNTVCT_EL0 unconditionally, but with KVM the host/guest
-> > > switch for that happens from the preempt notifiers/vcpu_put which aren't
-> > > invoked when e.g. handling an IRQ. Interestingly, udelay reads the arch
-> > > timer to set the waiting time for WFIT using an absolute value, and that
-> > > gets compared to CNTVCT_EL0 which in the aforementioned
-> > > IRQ-with-vCPU-loaded case uses the _guest's_ CNTVCT_EL0.
-> > 
-> > Well, the underlying issue is that get_cycle(), as used by  __delay(),
-> > is *either* using CNTVCT_EL0 (when booted at EL1) or CNTPCT_EL0 (when
-> > booted at EL2).
-> > 
-> > > 
-> > > I can think of two approaches to address the problem:
-> > >   1. have KVM context switch cntvoff proactively prior to re-enabling
-> > >   preemption when handling a guest exit;
-> > >   2. modify the WFIT-based udelay implementation to read from CNTVCT_EL0
-> > >   instead of the arch_timer to be a bit more self-consitent;
-> > > 
-> > > Other ideas welcome!
+Hi Levi,
+
+On Tue, Feb 10, 2026 at 09:54:49AM +0000, Yeoreum Yun wrote:
+> > On Fri, Feb 06, 2026 at 06:42:19PM +0000, Catalin Marinas wrote:
+> > > On Wed, Jan 21, 2026 at 07:06:17PM +0000, Yeoreum Yun wrote:
+> > > > +#ifdef CONFIG_ARM64_LSUI
+> > > > +static bool has_lsui(const struct arm64_cpu_capabilities *entry, int scope)
+> > > > +{
+> > > > +	if (!has_cpuid_feature(entry, scope))
+> > > > +		return false;
+> > > > +
+> > > > +	/*
+> > > > +	 * A CPU that supports LSUI should also support FEAT_PAN,
+> > > > +	 * so that SW_PAN handling is not required.
+> > > > +	 */
+> > > > +	if (WARN_ON(!__system_matches_cap(ARM64_HAS_PAN)))
+> > > > +		return false;
+> > > > +
+> > > > +	return true;
+> > > > +}
+> > > > +#endif
+> > >
+> > > I still find this artificial dependency a bit strange. Maybe one doesn't
+> > > want any PAN at all (software or hardware) and won't get LSUI either
+> > > (it's unlikely but possible).
+> > > We have the uaccess_ttbr0_*() calls already for !LSUI, so maybe
+> > > structuring the macros in a way that they also take effect with LSUI.
+> > > For futex, we could add some new functions like uaccess_enable_futex()
+> > > which wouldn't do anything if LSUI is enabled with hw PAN.
+> >
+> > Hmm, I forgot that we removed CONFIG_ARM64_PAN for 7.0, so it makes it
+> > harder to disable. Give it a try but if the macros too complicated, we
+> > can live with the additional check in has_lsui().
+> >
+> > However, for completeness, we need to check the equivalent of
+> > !system_uses_ttbr0_pan() but probing early, something like:
+> >
+> > 	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN) &&
+> > 	    !__system_matches_cap(ARM64_HAS_PAN)) {
+> > 		pr_info_once("TTBR0 PAN incompatible with FEAT_LSUI; disabling FEAT_LSUI");
+> > 		return false;
+> > 	}
 > 
-> I suppose a third option would be to avoid WFxT when we're on a CPU
-> with a vCPU loaded on it? The per-cpu state is grotty, mind.
-
-It's one of the rare cases where we could look at that per-cpu data in
-preemptible context, because that per-cpu state would migrate with the
-task if it were migrated to a different CPU thanks to the preempt
-notifiers, so that's nice.
-
-> A bigger hammer would be to use WFxT only when using VHE.
+> TBH, I'm not sure whether it's a artifical dependency or not.
+> AFAIK, FEAT_PAN is mandatory from Armv8.1 and the FEAT_LSUI seems to
+> implements based on the present of "FEAT_PAN".
 > 
-> > (1) is a real nightmare, and would force a complete redesign of the
-> > life cycle of guest timers (switching from load/put to enter/exit for
-> > the context switch, but only on !VHE). I'd rather avoid that, as this
-> > is a pretty large performance penalty.
-> > 
-> > (2) is much more palatable, and easily hacked, see below. Can you
-> > please five it a go?
-> > 
-> > Thanks,
-> > 
-> > 	M.
-> > 
-> > From b1b45d591aed3e5276ff857dbc6cfa3bce181766 Mon Sep 17 00:00:00 2001
-> > From: Marc Zyngier <maz@kernel.org>
-> > Date: Tue, 10 Feb 2026 12:43:07 +0000
-> > Subject: [PATCH] arm64: Force the use of CNTVCT_EL0 in __delay()
-> > 
-> > Quentin reports an interesting problem with the use of WFxT in __delay()
-> > when a vcpu is loaded and that KVM is *not* in VHE mode.
-> > 
-> > In this case, CNTVOFF_EL2 is set to a non-zero value to reflect the
-> > state of the guest virtual counter. At the same time, __delay() is
-> > using get_cycles() to read the counter value, which is indirected to
-> > reading CNTPCT_EL0.
-> > 
-> > The core of the issue is that WFxT is using the *virtual* counter,
-> > while the kernel is using the physical counter, and that the offset
-> > introduces a really bad discrepancy between the two.
-> > 
-> > Fix this by forcing the use of CNTVCT_EL0, making __delay() consistent
-> > irrespective of the value of CNTVOFF_EL2.
-> > 
-> > Reported-by: Quentin Perret <qperret@google.com>
-> > Fixes: 7d26b0516a0df ("arm64: Use WFxT for __delay() when possible")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Link: https://lore.kernel.org/r/ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  arch/arm64/lib/delay.c | 15 +++++++++++----
-> >  1 file changed, 11 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
-> > index cb2062e7e2340..26a39bb301ef6 100644
-> > --- a/arch/arm64/lib/delay.c
-> > +++ b/arch/arm64/lib/delay.c
-> > @@ -23,9 +23,16 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
-> >  	return (xloops * loops_per_jiffy * HZ) >> 32;
-> >  }
-> >  
-> > +/*
-> > + * Force the use of CNTVCT_EL0 in order to have the same base as
-> > + * WFxT. This avoids some annoying issues when CNTVOFF_EL2 is not
-> > + * reset 0 on a KVM host until we do a vcpu_put() on the vcpu.
-> > + */
-> > +#define __delay_cycles()	__arch_counter_get_cntvct_stable()
-> > +
-> >  void __delay(unsigned long cycles)
-> >  {
-> > -	cycles_t start = get_cycles();
-> > +	cycles_t start = __delay_cycles();
-> >  
-> >  	if (alternative_has_cap_unlikely(ARM64_HAS_WFXT)) {
-> >  		u64 end = start + cycles;
-> > @@ -35,17 +42,17 @@ void __delay(unsigned long cycles)
-> >  		 * early, use a WFET loop to complete the delay.
-> >  		 */
-> >  		wfit(end);
-> > -		while ((get_cycles() - start) < cycles)
-> > +		while ((__delay_cycles() - start) < cycles)
-> >  			wfet(end);
-> >  	} else 	if (arch_timer_evtstrm_available()) {
-> >  		const cycles_t timer_evt_period =
-> >  			USECS_TO_CYCLES(ARCH_TIMER_EVT_STREAM_PERIOD_US);
-> >  
-> > -		while ((get_cycles() - start + timer_evt_period) < cycles)
-> > +		while ((__delay_cycles() - start + timer_evt_period) < cycles)
-> >  			wfe();
-> >  	}
-> >  
-> > -	while ((get_cycles() - start) < cycles)
-> > +	while ((__delay_cycles() - start) < cycles)
-> >  		cpu_relax();
-> 
-> I can't put my finger on a specific bug, but it does feel pretty scary
-> to use the virtual counter in the host while running with a guest
-> voffset. Is the offset userspace controllable? If so, can we guarantee
-> that we're ok with overflow and is it ok if we get preempted in the
-> middle of the loop? It's making my head hurt!
+> So, for a hardware which doesn't have FEAT_PAN but has FEAT_LSUI
+> sounds like "wrong" hardware and I'm not sure whether it's right
+> to enable FEAT_LSUI in this case.
 
-Ouch, it does seem that the SET_ONE_REG stuff allows to mess with that
-value _out of vcpu context_, so yeah userspace could change the value
-while a vcpu thread is preempted in the middle of a udelay loop ...
+In principle we shouldn't have such hardware but, as Will pointed out,
+we might have such combination due to other reasons like virtualisation,
+id reg override.
 
-> The smp_cond_load_{relaxed,acquire}_timeout() series from Ankur looks
-> like it has the same issue (it uses arch_timer_read_counter()).
+It's not that FEAT_LSUI requires FEAT_PAN but rather that the way you
+implemented it, the FEAT_LSUI futex code is incompatible with SW_PAN
+because you no longer call uaccess_enable_privileged(). So I suggested a
+small tweak above to make this more obvious. I would also remove the
+WARN_ON, or at least make it WARN_ON_ONCE() if you still want the stack
+dump.
+
+However...
+
+> SW_PAN case is the same problem. Since If system uses SW_PAN,
+> that means this hardware doesn't have a "FEAT_PAN"
+> So this question seems to ultimately boil down to whether
+> it is appropriate to allow the use of FEAT_LSUI
+> even when FEAT_PAN is not supported.
 > 
-> Will
+> That's why I think the purpose of "has_lsui()" is not for artifical
+> dependency but to disable for unlike case which have !FEAT_PAN and FEAT_LSUI
+> and IMHO it's enough to check only check with "ARM64_HAS_PAN" instead of
+> making a new function like uaccess_enable_futex().
+
+Why not keep uaccess_enable_privileged() in
+arch_futex_atomic_op_inuser() and cmpxchg for all cases and make it a
+no-op if FEAT_LSUI is implemented together with FEAT_PAN? A quick grep
+shows a recent addition in __lse_swap_desc() (and the llsc equivalent)
+but this one can also use CAST with FEAT_LSUI.
+
+BTW, with the removal of uaccess_enable_privileged(), we now get MTE tag
+checks for the futex operations. I think that's good as it matches the
+other uaccess ops, though it's a slight ABI change. If we want to
+preserve the old behaviour, we definitely need
+uaccess_enable_privileged() that only does mte_enable_tco().
+
+-- 
+Catalin
