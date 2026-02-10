@@ -1,128 +1,215 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8CC1F03EF
-	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 19:04:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770750263; cv=pass; b=Lx39/mJba/mUB+JZV8xJTjrOza/nYS6MD6G350gap9+m6rwdzavSCokPBDaj4sNoeqloON+u5zNVgfz/ftGW7qbC9mch0gQ3PPRoxKp2A8yUeHYM1uh0Pi73K/9M8CDLQGiq5kiLZQzWqq5Qy+EJMKYdEN5koMaWVuvfUkr4KRI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770750263; c=relaxed/simple;
-	bh=Cg+vuppKBi/qxtrhYUyuaUGpFRMcTtpWku11sjQybv0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZObXEHRlCrD+JxTPzTWDTVR76jvhYXN2DCUi0JlIBW16IuYa1yVWW0IX+KOz6K0x9E/T2OzoMWRtoilfKYH96UIwdeC1Vh9p8xp0rfnN4js1/KLzmoZzH3bkgtFuD9qzDJxcNLhOrxn//EcUYGWNbgeBRYFVXP8CldxkBhfEKG0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TpYL9KoN; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D340202F70
+	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 19:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770752816; cv=none; b=eWEYnk1kI0oOQ84Xd8z8dVp7XnKaqODjwDNVccsDcOSpQG9RcWt3C7sm45s9Uu3QR7QpCZtbxqvP3i7Yxqu785StADLEUVGFmti8bE5aZKtVSdZgjys+L3CWFN6BXloPDHJhSEc58oGOol3DFLsbeZ1XY3qI50mAaFwyisK8DNk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770752816; c=relaxed/simple;
+	bh=Ie/mEymJpOsRtuOa1jq1OLXGfP0zzEyHbjq3/pwgNo0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pFV7Nzr+lXyNKPMe/LC6NM0atFHaQQal4jRJdEEAmDSDyYy9hFAjBqbbIQwHjTJcdpVZwZcXGYmxpvxAjoCFA2xLpW0HgwrbYjOUUjjGLhAcnNwPUXtHJXReIAnp8HKV5paPkCQuGkWaG04/Cac1GVzjMpGjT9O5t48JQ0RO9sA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=geaKjkZS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TpYL9KoN"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50299648ae9so49621cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 11:04:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770750261; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JLDab2rpKUg0AgZGK1WL9VRmyR9JFm54XXuaHoIG4YhTNRU6QSKQN9WCCLA9zArck2
-         TU/IezYXbBEcUU+sy19WuM0X/NN9xlDyVoXtVFcYuAbel7l+B50/pZ0jagxoemi/nJ6Z
-         V3kgQLMGDZ5XjTX1qPSNNwrmqxRjrXR9iy9dR7zW5e65gDaM0nkC0zyCKHpg46/oiQiA
-         zf0N8ZnNZwSl0fwBYc4q/nmhYeyz1NEgoH0vu74LorQVZpLr0mjR6C9NByDfayubfP3t
-         XEJNajwg+Lcxc4Vn/WjIeQIAuFd73vphuxOJabVtzSsP0zMPplggYq7EeE0Aay6rayx9
-         JzyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Cg+vuppKBi/qxtrhYUyuaUGpFRMcTtpWku11sjQybv0=;
-        fh=rC0mXg0k12jx5u0Zz+37sza0TWxaSPQzc0UlcT+Cq/4=;
-        b=LmZZdp5WgSEDEP496ZYBWfgLC2nTXfDaAGQu7MUEpaEfm2dB974txCXwAlVwtcRN3U
-         YLBtgbX7ciGU1iNJffQNUDU5U3ch7+h59wWepL9qlOrEdO3gntiUNZlpLGTvsaqdEPPO
-         PpvfGV3UXOOti+PXO7UzUX6yDLZYr9YvMoOZEJ+4DYPJqVtvCW7ee/ph3AruCczJtbsP
-         RxorzObTNKI6wZ46lVy/4zCXTpJaDvfg7XDNEH0bQUQSYl60T7tyw4b1kkETQqQHJUGl
-         /0oG6nbWJ1PdXkkOSQeGLd8bOTCQL47au2JryT7gxiAUafIHbQEz7MRgF0Dld4/yFzBi
-         qwlw==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770750261; x=1771355061; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cg+vuppKBi/qxtrhYUyuaUGpFRMcTtpWku11sjQybv0=;
-        b=TpYL9KoNhcjggQj5I6iS4FvXUL/lNQoudy/EWikPiaJKnXfUnFvBKlLZiiTm7usuYF
-         9x4ANG85kBEJ/BzHRec/fF057GN8khl/nhgSb7WQ/2FrXAHSdZiDo0ehxWx1Jt+WuEXa
-         Lss5SmMx9JaP9OZCtQLsrfi/gCI1eG7/R6BixaA3wMbdZOzlcJbGUiqYl6UYye5dk5Nz
-         BRsxoCEPaGxOfxPQqtoKTAuPt2G6+Byx/q1T8GOTNTCiWq11CKMRlzoKC+bAKT8DDcw+
-         P7b3anvY2gzqFdXREfY+JXNKIV+fImXIk6oxySVxU/wFBVku0jgoaMY4MVKMMFp279pm
-         ZBMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770750261; x=1771355061;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cg+vuppKBi/qxtrhYUyuaUGpFRMcTtpWku11sjQybv0=;
-        b=qmBTNwc++Hnc7PKVfPTV2XK0kps1pPvDchnF0KFQHjiJf24zdHffCLM3w7TgECN9Fn
-         RBw2iIdfbOSDwlUvj6uAgHTXyUNpsfAKwnEF45WIivFrdMBYzdqfBOFC9xWzqLfoPOy+
-         n3a9JOBNiHi4X6F7aYyfZVPlwOMehjF6lsnCJsOQhKbZHGUbRbZVfp3mNRGqcvrSD4T6
-         8XAFgY98rWSGkqKO7SL5NKjTeFEl6p2CHfIeM4nA4XVjohsO+gDT4zvxp/+9FtfvzJ1r
-         75+6KUR28gH9UpBvbXzBYQ4sOXiRWiKnae11QhYcICmFHdvmZoArJ4feIUJoadMbjCDc
-         DB2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVintokP2e//6Vv4hZgDLnOOvnwzaXgHDLS9zZLvhMJ0MASoSrs3FsimOO4cpvGtfQA5e+v5zo=@lists.linux.dev
-X-Gm-Message-State: AOJu0Ywk8m6deKvtqlKSeZ/jhP6V1ccbFtACtJ0SACAu4YTCF2X5LeqD
-	1ZVJuyajVLE1YQKfAFEYIgGD62pZ7eFclY/t9NoZgwF1Ip5QzQq7uLabKyA2/EoX/MygnL5taPg
-	/UI6HpK3J9FKXAv0glZp9TPsJZDD4RlngOWFoAzB7snw4+eIaGVxkAS5Us0k=
-X-Gm-Gg: AZuq6aI3B96WAagbwBPeGsSQgU5C61gJjyjLS6UZYEsjfcJhCvFuZv2Uvsp3VGv9VZH
-	MhSehJ/+1+AaQBlSCndPRqb05B180sC9kYx/AkNCK/jcD5L5T1o42XRmlb3i8ilRTw3FRfV9JW1
-	XmC01W9zn/6zfUAa111cCvW7FyKxxvSDHYzCX+LCpLbJ7SA57nMNyQT46WWK726zSA3MWoB1Zjy
-	clRX4DQHDtvRoUGLXkYlaUtshDf0YPYkHsHn8HPNs/K2YG+SP7OGBVlwM1oV1Es0TZaDBSWSX5s
-	1ckv+M1P
-X-Received: by 2002:ac8:57d4:0:b0:4f3:5474:3cb9 with SMTP id
- d75a77b69052e-50681649998mr676271cf.14.1770750260223; Tue, 10 Feb 2026
- 11:04:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="geaKjkZS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AE88C116C6;
+	Tue, 10 Feb 2026 19:46:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770752816;
+	bh=Ie/mEymJpOsRtuOa1jq1OLXGfP0zzEyHbjq3/pwgNo0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=geaKjkZS5FrO95u1tiCrmvjosUBTJSjLltl3MY5hz+RQL+kRG16bFj9e3gJKfZwfp
+	 oNBZl5/s6tcy1MTIos27CsQ0HlCdaeOEGpDp44TA8skJXz2HhYZymzF51nZPIEzRll
+	 wPmKfPiI19wSKUIsVzTijGk4pcFcPAZrMAipID6rDk8bsOxIw8geMUdb7acXBqpCwu
+	 qBQ//ToI5IUGbJbqiI9OVB70sX9Aue+lqsbRYuVvoD7Sl03bRl9TbcWO8vlT4iAt7q
+	 MliV4LbQs3CKxz25zcd5qJtb3cblYULJaT9VAchkDKLMLKw7YegQXZjddmJiSVBacH
+	 UM594piJMw/cA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vpthF-0000000A9rt-36I8;
+	Tue, 10 Feb 2026 19:46:53 +0000
+Date: Tue, 10 Feb 2026 19:46:53 +0000
+Message-ID: <86pl6cbcuq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: Quentin Perret <qperret@google.com>,
+	kvmarm@lists.linux.dev,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com
+Subject: Re: Broken udelay() on KVM host with a vcpu loaded
+In-Reply-To: <aYtP_rgolLfm_UDD@willie-the-truck>
+References: <ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od>
+	<86qzqsbw1m.wl-maz@kernel.org>
+	<aYtP_rgolLfm_UDD@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260119124629.2563-1-will@kernel.org> <f151a8ba-b76c-4037-b1aa-b6b52e92b7e1@oss.qualcomm.com>
-In-Reply-To: <f151a8ba-b76c-4037-b1aa-b6b52e92b7e1@oss.qualcomm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 10 Feb 2026 19:03:43 +0000
-X-Gm-Features: AZwV_Qg7DEwIPIYYUoq3HN6VEITAaYrvLGvacgWieQ6FB2D3Scit4MG1Lwsu5qQ
-Message-ID: <CA+EHjTyDy_fw3Vhj+kf9e50He2W_zj=sdmTRhBy0GAx=8HQ0yg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/35] KVM: arm64: Add support for protected guest
- memory with pKVM
-To: Trilok Soni <trilokkumar.soni@oss.qualcomm.com>
-Cc: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, qperret@google.com, kvmarm@lists.linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Trilok,
+On Tue, 10 Feb 2026 15:34:22 +0000,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Tue, Feb 10, 2026 at 12:52:21PM +0000, Marc Zyngier wrote:
+> > On Tue, 10 Feb 2026 12:27:48 +0000,
+> > Quentin Perret <qperret@google.com> wrote:
+> > > 
+> > > Hi all,
+> > > 
+> > > I have just received a report from a partner of udelay misbehaving when
+> > > running on the host whilst a vCPU is loaded. This hardware has FEAT_WFxT
+> > > and uses the matching implementation of udelay. Interestingly, WFIT
+> > > triggers using CNTVCT_EL0 unconditionally, but with KVM the host/guest
+> > > switch for that happens from the preempt notifiers/vcpu_put which aren't
+> > > invoked when e.g. handling an IRQ. Interestingly, udelay reads the arch
+> > > timer to set the waiting time for WFIT using an absolute value, and that
+> > > gets compared to CNTVCT_EL0 which in the aforementioned
+> > > IRQ-with-vCPU-loaded case uses the _guest's_ CNTVCT_EL0.
+> > 
+> > Well, the underlying issue is that get_cycle(), as used by  __delay(),
+> > is *either* using CNTVCT_EL0 (when booted at EL1) or CNTPCT_EL0 (when
+> > booted at EL2).
+> > 
+> > > 
+> > > I can think of two approaches to address the problem:
+> > >   1. have KVM context switch cntvoff proactively prior to re-enabling
+> > >   preemption when handling a guest exit;
+> > >   2. modify the WFIT-based udelay implementation to read from CNTVCT_EL0
+> > >   instead of the arch_timer to be a bit more self-consitent;
+> > > 
+> > > Other ideas welcome!
+> 
+> I suppose a third option would be to avoid WFxT when we're on a CPU
+> with a vCPU loaded on it? The per-cpu state is grotty, mind. A bigger
+> hammer would be to use WFxT only when using VHE.
 
-On Tue, 10 Feb 2026 at 18:58, Trilok Soni
-<trilokkumar.soni@oss.qualcomm.com> wrote:
->
-> On 1/19/2026 4:45 AM, Will Deacon wrote:
-> > Hi folks,
-> >
-> > It's back and it's even bigger than before!
-> >
-> > Although the first patch has been picked up as a fix (thanks, Oliver),
-> > review feedback has resulted in some additional patches being included
-> > in the series. If you'd like to see the first version, it's available
-> > here:
->
-> Is it possible to test this patch series w/ the QEMU or it will require
-> real SOC platform?
+Hmmm. Sure, but that's rather ugly.
 
-QEMU works just fine. Just make sure you use the kvmtool patches [1]
-Will mentioned in v1, and to book the kernel with
-`kvm-arm.mode=protected`.
+> 
+> > (1) is a real nightmare, and would force a complete redesign of the
+> > life cycle of guest timers (switching from load/put to enter/exit for
+> > the context switch, but only on !VHE). I'd rather avoid that, as this
+> > is a pretty large performance penalty.
+> > 
+> > (2) is much more palatable, and easily hacked, see below. Can you
+> > please five it a go?
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+> > From b1b45d591aed3e5276ff857dbc6cfa3bce181766 Mon Sep 17 00:00:00 2001
+> > From: Marc Zyngier <maz@kernel.org>
+> > Date: Tue, 10 Feb 2026 12:43:07 +0000
+> > Subject: [PATCH] arm64: Force the use of CNTVCT_EL0 in __delay()
+> > 
+> > Quentin reports an interesting problem with the use of WFxT in __delay()
+> > when a vcpu is loaded and that KVM is *not* in VHE mode.
+> > 
+> > In this case, CNTVOFF_EL2 is set to a non-zero value to reflect the
+> > state of the guest virtual counter. At the same time, __delay() is
+> > using get_cycles() to read the counter value, which is indirected to
+> > reading CNTPCT_EL0.
+> > 
+> > The core of the issue is that WFxT is using the *virtual* counter,
+> > while the kernel is using the physical counter, and that the offset
+> > introduces a really bad discrepancy between the two.
+> > 
+> > Fix this by forcing the use of CNTVCT_EL0, making __delay() consistent
+> > irrespective of the value of CNTVOFF_EL2.
+> > 
+> > Reported-by: Quentin Perret <qperret@google.com>
+> > Fixes: 7d26b0516a0df ("arm64: Use WFxT for __delay() when possible")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/lib/delay.c | 15 +++++++++++----
+> >  1 file changed, 11 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
+> > index cb2062e7e2340..26a39bb301ef6 100644
+> > --- a/arch/arm64/lib/delay.c
+> > +++ b/arch/arm64/lib/delay.c
+> > @@ -23,9 +23,16 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
+> >  	return (xloops * loops_per_jiffy * HZ) >> 32;
+> >  }
+> >  
+> > +/*
+> > + * Force the use of CNTVCT_EL0 in order to have the same base as
+> > + * WFxT. This avoids some annoying issues when CNTVOFF_EL2 is not
+> > + * reset 0 on a KVM host until we do a vcpu_put() on the vcpu.
+> > + */
+> > +#define __delay_cycles()	__arch_counter_get_cntvct_stable()
+> > +
+> >  void __delay(unsigned long cycles)
+> >  {
+> > -	cycles_t start = get_cycles();
+> > +	cycles_t start = __delay_cycles();
+> >  
+> >  	if (alternative_has_cap_unlikely(ARM64_HAS_WFXT)) {
+> >  		u64 end = start + cycles;
+> > @@ -35,17 +42,17 @@ void __delay(unsigned long cycles)
+> >  		 * early, use a WFET loop to complete the delay.
+> >  		 */
+> >  		wfit(end);
+> > -		while ((get_cycles() - start) < cycles)
+> > +		while ((__delay_cycles() - start) < cycles)
+> >  			wfet(end);
+> >  	} else 	if (arch_timer_evtstrm_available()) {
+> >  		const cycles_t timer_evt_period =
+> >  			USECS_TO_CYCLES(ARCH_TIMER_EVT_STREAM_PERIOD_US);
+> >  
+> > -		while ((get_cycles() - start + timer_evt_period) < cycles)
+> > +		while ((__delay_cycles() - start + timer_evt_period) < cycles)
+> >  			wfe();
+> >  	}
+> >  
+> > -	while ((get_cycles() - start) < cycles)
+> > +	while ((__delay_cycles() - start) < cycles)
+> >  		cpu_relax();
+> 
+> I can't put my finger on a specific bug, but it does feel pretty scary
+> to use the virtual counter in the host while running with a guest
+> voffset. Is the offset userspace controllable?
 
-Cheers,
-/fuad
+It is, but not while the vcpu is loaded. You need a full put/load
+sequence to get there (that's the only way to set CNTVOFF_EL2 from
+EL1).  And since the vcpu is loaded, no other thread can interact with
+the vcpu fd (the vcpu mutex is held).
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git/log/?h=pkvm
+> If so, can we guarantee
+> that we're ok with overflow and is it ok if we get preempted in the
+> middle of the loop? It's making my head hurt!
 
->
-> ---Trilok Soni
+Again, I don't see that it can happen.
+
+> 
+> The smp_cond_load_{relaxed,acquire}_timeout() series from Ankur looks
+> like it has the same issue (it uses arch_timer_read_counter()).
+
+I haven't reviewed it in a long while, but if it using WFxT, it is
+likely broken the same way.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
