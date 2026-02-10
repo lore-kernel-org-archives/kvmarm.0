@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FE83859C4
-	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 16:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38328320A09
+	for <kvmarm@lists.linux.dev>; Tue, 10 Feb 2026 16:45:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770740103; cv=none; b=l4dPWSQoz74UxmrwuuMWa+oZpX9ATkj3ElUrjEOKT/9GAzznLGIxXtsN5q24/h+4WWmqEJ93TFKwBANoJKzNO8sRURIgcmVqWOCBIKpmYUfzsZbzl5X07+bkMM7HqvEoTcQZiFgyp76SbDOuThFgu/YhHGfNARTMrODiOFUrQ+I=
+	t=1770741921; cv=none; b=p4jZndZrO9gxwFZzBYkA/4ijBiLvgeAt8dX+rr1cCrCtq64ox0c/yzr0DX7jtUMMA6IqBudVpPReLWr14uTIUMTZHBB019GHjrRyGFX1r0DygRM9FIGc7EwVKqWJkrHjadArHd857RrMfDtC+v/4vGPKtEPEmrcDAH3iE5QMNXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770740103; c=relaxed/simple;
-	bh=9vtbxyiMLrYNdwBoK7qoue5mhebGylj6qkZTJg0n2wo=;
+	s=arc-20240116; t=1770741921; c=relaxed/simple;
+	bh=dMush2K0571ehpAANLKxDb3nHTfySaTETlhFpRasweE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KsL1Yc5RbDcK+idFtIj02MEsicWF/g8nEROpQC/Xm/LKUR0CYsEOsCh2RqzoEFcCkg41d2xXVW1N4tCJIUmfyA3gUuzGMpjIS0q3H4NwvWldo/DGjXI5Z2xfCgtqFO0K4NbovD6qqoHjvOK9vjyL+5VV0rDGfQfLFBUfIyz4PbE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=qL+UWxsHk9u1Wi/ALWJLqE3faK5nGcuEN6yWSGjLam/B19zn8+jXYmoLC0vcLmJmOYKA6N3NNPlbw0+eCE+Sb4WYgeVtcHIkcRedi9e/tOU+gyktERoaIPoe8HGknovu8bNe/QLJ9l61XNTm9mAajL+xbn24dvIDKED0bsgij9g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9AB9B339;
-	Tue, 10 Feb 2026 08:14:53 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3D6A1339;
+	Tue, 10 Feb 2026 08:45:13 -0800 (PST)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C179F3F632;
-	Tue, 10 Feb 2026 08:14:56 -0800 (PST)
-Date: Tue, 10 Feb 2026 16:14:54 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6423A3F632;
+	Tue, 10 Feb 2026 08:45:16 -0800 (PST)
+Date: Tue, 10 Feb 2026 16:45:13 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -29,13 +29,10 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	lpieralisi@kernel.org, scott@os.amperecomputing.com,
 	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
 	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
-Subject: Re: [PATCH v12 2/7] arm64: cpufeature: add FEAT_LSUI
-Message-ID: <aYtZfpWjRJ1r23nw@arm.com>
+Subject: Re: [PATCH v12 6/7] arm64: futex: support futex with FEAT_LSUI
+Message-ID: <aYtgmZZhAKAvtfaK@arm.com>
 References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
- <20260121190622.2218669-3-yeoreum.yun@arm.com>
- <aYY2CyHWtplQ-fuS@arm.com>
- <aYouAv_EjICIN8oA@arm.com>
- <aYsAaaQgBaLbDSsW@e129823.arm.com>
+ <20260121190622.2218669-7-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,94 +41,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aYsAaaQgBaLbDSsW@e129823.arm.com>
+In-Reply-To: <20260121190622.2218669-7-yeoreum.yun@arm.com>
 
-Hi Levi,
+I wonder whether we can shorten this function a bit. Not sure it would
+be more readable but it would be shorter.
 
-On Tue, Feb 10, 2026 at 09:54:49AM +0000, Yeoreum Yun wrote:
-> > On Fri, Feb 06, 2026 at 06:42:19PM +0000, Catalin Marinas wrote:
-> > > On Wed, Jan 21, 2026 at 07:06:17PM +0000, Yeoreum Yun wrote:
-> > > > +#ifdef CONFIG_ARM64_LSUI
-> > > > +static bool has_lsui(const struct arm64_cpu_capabilities *entry, int scope)
-> > > > +{
-> > > > +	if (!has_cpuid_feature(entry, scope))
-> > > > +		return false;
-> > > > +
-> > > > +	/*
-> > > > +	 * A CPU that supports LSUI should also support FEAT_PAN,
-> > > > +	 * so that SW_PAN handling is not required.
-> > > > +	 */
-> > > > +	if (WARN_ON(!__system_matches_cap(ARM64_HAS_PAN)))
-> > > > +		return false;
-> > > > +
-> > > > +	return true;
-> > > > +}
-> > > > +#endif
-> > >
-> > > I still find this artificial dependency a bit strange. Maybe one doesn't
-> > > want any PAN at all (software or hardware) and won't get LSUI either
-> > > (it's unlikely but possible).
-> > > We have the uaccess_ttbr0_*() calls already for !LSUI, so maybe
-> > > structuring the macros in a way that they also take effect with LSUI.
-> > > For futex, we could add some new functions like uaccess_enable_futex()
-> > > which wouldn't do anything if LSUI is enabled with hw PAN.
-> >
-> > Hmm, I forgot that we removed CONFIG_ARM64_PAN for 7.0, so it makes it
-> > harder to disable. Give it a try but if the macros too complicated, we
-> > can live with the additional check in has_lsui().
-> >
-> > However, for completeness, we need to check the equivalent of
-> > !system_uses_ttbr0_pan() but probing early, something like:
-> >
-> > 	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN) &&
-> > 	    !__system_matches_cap(ARM64_HAS_PAN)) {
-> > 		pr_info_once("TTBR0 PAN incompatible with FEAT_LSUI; disabling FEAT_LSUI");
-> > 		return false;
-> > 	}
-> 
-> TBH, I'm not sure whether it's a artifical dependency or not.
-> AFAIK, FEAT_PAN is mandatory from Armv8.1 and the FEAT_LSUI seems to
-> implements based on the present of "FEAT_PAN".
-> 
-> So, for a hardware which doesn't have FEAT_PAN but has FEAT_LSUI
-> sounds like "wrong" hardware and I'm not sure whether it's right
-> to enable FEAT_LSUI in this case.
+On Wed, Jan 21, 2026 at 07:06:21PM +0000, Yeoreum Yun wrote:
+> +static __always_inline int
+> +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+> +{
+> +	u64 __user *uaddr64;
+> +	bool futex_on_lo;
+> +	int ret, i;
+> +	u32 other, orig_other;
+> +	union {
+> +		struct futex_on_lo {
+> +			u32 val;
+> +			u32 other;
+> +		} lo_futex;
+> +
+> +		struct futex_on_hi {
+> +			u32 other;
+> +			u32 val;
+> +		} hi_futex;
+> +
+> +		u64 raw;
+> +	} oval64, orig64, nval64;
 
-In principle we shouldn't have such hardware but, as Will pointed out,
-we might have such combination due to other reasons like virtualisation,
-id reg override.
+	union {
+		u32 futex[2];
+		u64 raw;
+	}
 
-It's not that FEAT_LSUI requires FEAT_PAN but rather that the way you
-implemented it, the FEAT_LSUI futex code is incompatible with SW_PAN
-because you no longer call uaccess_enable_privileged(). So I suggested a
-small tweak above to make this more obvious. I would also remove the
-WARN_ON, or at least make it WARN_ON_ONCE() if you still want the stack
-dump.
+> +
+> +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
+> +	futex_on_lo = IS_ALIGNED((unsigned long)uaddr, sizeof(u64));
 
-However...
+	futex_pos = (unsigned long)uaddr & 4 ? 1 : 0;
 
-> SW_PAN case is the same problem. Since If system uses SW_PAN,
-> that means this hardware doesn't have a "FEAT_PAN"
-> So this question seems to ultimately boil down to whether
-> it is appropriate to allow the use of FEAT_LSUI
-> even when FEAT_PAN is not supported.
-> 
-> That's why I think the purpose of "has_lsui()" is not for artifical
-> dependency but to disable for unlike case which have !FEAT_PAN and FEAT_LSUI
-> and IMHO it's enough to check only check with "ARM64_HAS_PAN" instead of
-> making a new function like uaccess_enable_futex().
+> +
+> +	if (futex_on_lo) {
+> +		oval64.lo_futex.val = oldval;
+> +		ret = get_user(oval64.lo_futex.other, uaddr + 1);
+> +	} else {
+> +		oval64.hi_futex.val = oldval;
+> +		ret = get_user(oval64.hi_futex.other, uaddr - 1);
+> +	}
 
-Why not keep uaccess_enable_privileged() in
-arch_futex_atomic_op_inuser() and cmpxchg for all cases and make it a
-no-op if FEAT_LSUI is implemented together with FEAT_PAN? A quick grep
-shows a recent addition in __lse_swap_desc() (and the llsc equivalent)
-but this one can also use CAST with FEAT_LSUI.
+and here use
 
-BTW, with the removal of uaccess_enable_privileged(), we now get MTE tag
-checks for the futex operations. I think that's good as it matches the
-other uaccess ops, though it's a slight ABI change. If we want to
-preserve the old behaviour, we definitely need
-uaccess_enable_privileged() that only does mte_enable_tco().
+	get_user(oval64.raw, uaddr64);
+	futex[futex_pos] = oldval;
+
+> +
+> +	if (ret)
+> +		return -EFAULT;
+> +
+> +	ret = -EAGAIN;
+> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+> +		orig64.raw = nval64.raw = oval64.raw;
+> +
+> +		if (futex_on_lo)
+> +			nval64.lo_futex.val = newval;
+> +		else
+> +			nval64.hi_futex.val = newval;
+> +
+> +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
+> +			return -EFAULT;
+> +
+> +		if (futex_on_lo) {
+> +			oldval = oval64.lo_futex.val;
+> +			other = oval64.lo_futex.other;
+> +			orig_other = orig64.lo_futex.other;
+> +		} else {
+> +			oldval = oval64.hi_futex.val;
+> +			other = oval64.hi_futex.other;
+> +			orig_other = orig64.hi_futex.other;
+> +		}
+
+Something similar here to use futex[futex_pos].
+
+We probably also need to check that the user pointer is 32-bit aligned
+and return -EFAULT if not.
 
 -- 
 Catalin
