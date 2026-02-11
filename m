@@ -1,199 +1,134 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D149E2F2910
-	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 10:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF4B3148A8
+	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 11:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770807061; cv=none; b=uJB937BODJhRvMNHkgcG2v5BM6yDPJ1dZu+0cVPDkSXZdxfzOAtsVfgK54IyZ7Ne/kWuiuML7MiLzfT2+4xgYuKuR3xU6Ku7k3GaTLvwx/CriS3NLTPaE8ethSxkEbRHPwllndBYHbs5+0Q3a8gGBd9eYLT8cXEpuwZKS11/SCQ=
+	t=1770807939; cv=none; b=l0nVocELITxCk+7x4+K1GjyGj1TGTt+IF+x4UG7in1LTRhd7vx/zh2LCYmRz6XOFc+xEdCaarZ2EkN/gPP/Aq7tO4ZzdZDI4VDnoTxQWHZF2grP+Kh0DfNfbGS4xSR36IfDrI3rx1cEremrZNnKh6/nhQJCaGA0PdJFG15zbW2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770807061; c=relaxed/simple;
-	bh=Yl2PPkBaVN1AzxBHAty9XACl9vzViOcyOW0heW6L7lc=;
+	s=arc-20240116; t=1770807939; c=relaxed/simple;
+	bh=UiqOSzEdC2LWX2Wl2Prc5W84aWbEMjHQQ3ulcmBk0e8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=noutnayp+F3aP5JHEUUuXB2sParejIhaV7/ju572QjT8VHybxy24nsEyDKWI0gRv1hgxbW7qeX3HzMIHg/DfJ6DA9k/lP8R9mYJ2MPvabiAMX59erFymb8aYVVdixugYxPk76mAcExEyfZBIbMPS9c3A6DLvqTuFrfzB/sSbEBQ=
+	 Content-Type:Content-Disposition:In-Reply-To; b=os3wdjIRLSkklcG6AmQPzCM8Z5u003S1t15mZrefWgTBc3SJDyJitDcxr6qAqY4T5wNmEDynPP6Ru3EPR3GmooXtAll2jVCrhwHmOXYgCfQV9KGRNxIUZ6xRTc02ekbGnWh9q9bejATEOVw1uv6azNC1xFhJ9LNTLC+WZZ5YaZ0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8171339;
-	Wed, 11 Feb 2026 02:50:45 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3EF62339;
+	Wed, 11 Feb 2026 03:05:31 -0800 (PST)
 Received: from e134344.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D668F3F632;
-	Wed, 11 Feb 2026 02:50:46 -0800 (PST)
-Date: Wed, 11 Feb 2026 10:50:38 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2D7573F740;
+	Wed, 11 Feb 2026 03:05:32 -0800 (PST)
+Date: Wed, 11 Feb 2026 11:05:29 +0000
 From: Ben Horgan <ben.horgan@arm.com>
-To: Fenghua Yu <fenghuay@nvidia.com>
+To: Reinette Chatre <reinette.chatre@intel.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
 	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
 	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
-	gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com,
-	kobak@nvidia.com, lcherian@marvell.com,
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com, reinette.chatre@intel.com,
-	rohit.mathew@arm.com, scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org,
-	corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
-	joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+	quic_jiles@quicinc.com, rohit.mathew@arm.com,
+	scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com,
+	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
 	zengheng4@huawei.com, linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: Re: [PATCH v4 20/41] arm_mpam: resctrl: Add CDP emulation
-Message-ID: <aYxe_rFXLSru5p-J@e134344.arm.com>
+Subject: Re: [PATCH v4 15/41] arm_mpam: resctrl: Pick the caches we will use
+ as resctrl resources
+Message-ID: <aYxieS3Pycm5UthH@e134344.arm.com>
 References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-21-ben.horgan@arm.com>
- <2271224c-1796-4823-8c2c-6f529814e645@nvidia.com>
- <7a0953ff-6475-4311-b34c-47eed9d38cb1@arm.com>
+ <20260203214342.584712-16-ben.horgan@arm.com>
+ <c8d53e59-5661-4ac2-bc8f-0661cde59967@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a0953ff-6475-4311-b34c-47eed9d38cb1@arm.com>
+In-Reply-To: <c8d53e59-5661-4ac2-bc8f-0661cde59967@intel.com>
 
-On Mon, Feb 09, 2026 at 03:36:32PM +0000, Ben Horgan wrote:
-> Hi Fenghua,
+Hi Reinette,
+
+On Tue, Feb 10, 2026 at 03:39:51PM -0800, Reinette Chatre wrote:
+> Hi Ben,
 > 
-> On 2/9/26 01:16, Fenghua Yu wrote:
-> > Hi, Ben,
-> > 
-> > On 2/3/26 13:43, Ben Horgan wrote:
-> >> From: James Morse <james.morse@arm.com>
-> >>
-> >> Intel RDT's CDP feature allows the cache to use a different control value
-> >> depending on whether the accesses was for instruction fetch or a data
-> >> access. MPAM's equivalent feature is the other way up: the CPU assigns a
-> >> different partid label to traffic depending on whether it was instruction
-> >> fetch or a data access, which causes the cache to use a different control
-> >> value based solely on the partid.
-> >>
-> >> MPAM can emulate CDP, with the side effect that the alternative partid is
-> >> seen by all MSC, it can't be enabled per-MSC.
-> >>
-> >> Add the resctrl hooks to turn this on or off. Add the helpers that
-> >> match a
-> >> closid against a task, which need to be aware that the value written to
-> >> hardware is not the same as the one resctrl is using.
-> >>
-> >> Update the 'arm64_mpam_global_default' variable the arch code uses during
-> >> context switch to know when the per-cpu value should be used instead.
-> >> Also,
-> >> update these per-cpu values and sync the resulting mpam partid/pmg
-> >> configuration to hardware.
-> >>
-> >> Awkwardly, the MB controls don't implement CDP. To emulate this, the MPAM
-> >> equivalent needs programming twice by the resctrl glue, as resctrl
-> >> expects
-> >> the bandwidth controls to be applied independently for both data and
-> >> instruction-fetch.
-> >>
-> >> Tested-by: Gavin Shan <gshan@redhat.com>
-> >> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> >> Tested-by: Peter Newman <peternewman@google.com>
-> >> CC: Dave Martin <Dave.Martin@arm.com>
-> >> CC: Amit Singh Tomar <amitsinght@marvell.com>
-> >> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> >> Signed-off-by: James Morse <james.morse@arm.com>
-> >> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> >> ---
-> >> Changes since rfc:
-> >> Fail cdp initialisation if there is only one partid
-> >> Correct data/code confusion
-> >>
-> >> Changes since v2:
-> >> Don't include unused header
-> >>
-> >> Changes since v3:
-> >> Update the per-cpu values and sync to h/w
-> >> ---
-> >>   arch/arm64/include/asm/mpam.h  |   1 +
-> >>   drivers/resctrl/mpam_resctrl.c | 117 +++++++++++++++++++++++++++++++++
-> >>   include/linux/arm_mpam.h       |   2 +
-> >>   3 files changed, 120 insertions(+)
-> >>
-> >> diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/
-> >> mpam.h
-> >> index 05aa71200f61..70d396e7b6da 100644
-> >> --- a/arch/arm64/include/asm/mpam.h
-> >> +++ b/arch/arm64/include/asm/mpam.h
-> >> @@ -4,6 +4,7 @@
-> >>   #ifndef __ASM__MPAM_H
-> >>   #define __ASM__MPAM_H
-> >>   +#include <linux/arm_mpam.h>
-> >>   #include <linux/bitfield.h>
-> >>   #include <linux/jump_label.h>
-> >>   #include <linux/percpu.h>
-> >> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/
-> >> mpam_resctrl.c
-> >> index cd52ca279651..12017264530a 100644
-> >> --- a/drivers/resctrl/mpam_resctrl.c
-> >> +++ b/drivers/resctrl/mpam_resctrl.c
-> >> @@ -38,6 +38,10 @@ static DEFINE_MUTEX(domain_list_lock);
-> >>   static bool exposed_alloc_capable;
-> >>   static bool exposed_mon_capable;
-> >>   +/*
-> >> + * MPAM emulates CDP by setting different PARTID in the I/D fields of
-> >> MPAM0_EL1.
-> >> + * This applies globally to all traffic the CPU generates.
-> >> + */
-> >>   static bool cdp_enabled;
-> >>     bool resctrl_arch_alloc_capable(void)
-> >> @@ -50,6 +54,72 @@ bool resctrl_arch_mon_capable(void)
-> >>       return exposed_mon_capable;
-> >>   }
-> >>   +bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
-> >> +{
-> >> +    switch (rid) {
-> >> +    case RDT_RESOURCE_L2:
-> >> +    case RDT_RESOURCE_L3:
-> >> +        return cdp_enabled;
-> >> +    case RDT_RESOURCE_MBA:
-> >> +    default:
-> >> +        /*
-> >> +         * x86's MBA control doesn't support CDP, so user-space doesn't
-> > 
-> > s/x86's/ARM's/
+> On 2/3/26 1:43 PM, Ben Horgan wrote:
+> ...
+> > +
+> >  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
+> >  {
+> > -	/* TODO: initialise the resctrl resources */
+> > +	struct mpam_class *class = res->class;
+> > +	struct rdt_resource *r = &res->resctrl_res;
+> > +
+> > +	switch (r->rid) {
+> > +	case RDT_RESOURCE_L2:
+> > +	case RDT_RESOURCE_L3:
+> > +		r->alloc_capable = true;
+> > +		r->schema_fmt = RESCTRL_SCHEMA_BITMAP;
+> > +		r->cache.arch_has_sparse_bitmasks = true;
+> > +
+> > +		r->cache.cbm_len = class->props.cpbm_wd;
+> > +		/* mpam_devices will reject empty bitmaps */
+> > +		r->cache.min_cbm_bits = 1;
+> > +
+> > +		if (r->rid == RDT_RESOURCE_L2) {
+> > +			r->name = "L2";
 > 
-> In CPUs supporting MPAM the instruction/data distinction is made at the
-> CPU so doesn't depend on the specific control. The point this comment is
-> trying to make is that as x86 doesn't support CDP on MBA, resctrl, which
-> was initially x86 specific, expected CDP not to be supported on MBA and
-> hence MPAM/ARM64 has to match this behaviour. Therefore, the MPAM driver
-> doesn't support CDP on MBA either. In essence, the MPAM driver emulates
-> the x86 CDP behaviour. Having said that, this comment relies on the
-> reader knowing this historical context, and so I'll update it to not
-> reference x86 and just mention that it is the expectation of the resctrl
-> interface.
+> This code is fine but highlights that resctrl fs should not let the
+> arch need to do this since this name is used as part of user interface.
 
-Looking a bit deeper into CDP I notice a couple of issues here that will make
-code change. The resctrl mount options for L2 and L3 cdp are separate and so
-they need to be considered separately here too.  Secondly, as 'CDP' in MPAM is
-controlled at the cpu interface rather than the component it needs to be hidden
-for the resources that it's not enabled for. (In MPAM, when 'CDP' is enabled
-PARTID_D and PARTID_I to different values in MPAMx_ELy and they take the same
-value when disabled.) As mbw_max is a per-partid maximum setting the same
-configuration for 2 partids is not the same as setting the value for a single
-partid. Furthermore, there is no way to pretend convincingly that the 2 partids
-are a a single partid. Hence, in MPAM the MBA resource can't hide CDP and needs
-to be disabled when MBA is enabled.
-
-In the future, a resctrl mount option to enable CDP for the MBA resource could
-be considered. Some more thought is needed here though as it's not obvious how
-this would work with the software controller and would likely not work on other
-architectures.
+Yes, not ideal but I don't think it's urgent to tidy this up.
 
 > 
-> > 
-> > Thanks.
-> > 
-> > -Fenghua
-> > 
-> > [SNIP]
+> > +			r->ctrl_scope = RESCTRL_L2_CACHE;
+> > +		} else {
+> > +			r->name = "L3";
+> > +			r->ctrl_scope = RESCTRL_L3_CACHE;
+> > +		}
+> > +
+> > +		/*
+> > +		 * Which bits are shared with other ...things...
+> > +		 * Unknown devices use partid-0 which uses all the bitmap
+> > +		 * fields. Until we configured the SMMU and GIC not to do this
+> > +		 * 'all the bits' is the correct answer here.
+> > +		 */
+> > +		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
 > 
-> Thanks,
+> I would like to recommend one style change to set r->alloc_capable as the final
+> setting. This is the setting that informs resctrl fs that this resource needs
+> attention. The reason I recommend this to be done last is if/when a future
+> change adds some configuration here that may fail then it should not fail with
+> r->alloc_capable as true while partially initialized.
+
+Makes sense. This will make the code more robust.
+
 > 
-> Ben
+> > +		break;
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> >  
+> >  	return 0;
+> >  }
+> > @@ -324,7 +409,8 @@ int mpam_resctrl_setup(void)
+> >  		res->resctrl_res.rid = rid;
+> >  	}
+> >  
+> > -	/* TODO: pick MPAM classes to map to resctrl resources */
+> > +	/* Find some classes to use for controls */
+> > +	mpam_resctrl_pick_caches();
+> >  
+> >  	/* Initialise the resctrl structures from the classes */
+> >  	for_each_mpam_resctrl_control(res, rid) {
 > 
-> 
+> Reinette
+
+Thanks,
+
+Ben
