@@ -1,134 +1,112 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF4B3148A8
-	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 11:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EAC12C11D0
+	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 13:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770807939; cv=none; b=l0nVocELITxCk+7x4+K1GjyGj1TGTt+IF+x4UG7in1LTRhd7vx/zh2LCYmRz6XOFc+xEdCaarZ2EkN/gPP/Aq7tO4ZzdZDI4VDnoTxQWHZF2grP+Kh0DfNfbGS4xSR36IfDrI3rx1cEremrZNnKh6/nhQJCaGA0PdJFG15zbW2I=
+	t=1770815578; cv=none; b=p2blBviqhUHDPDOhZ3XKtBGF2lMYqd2rvgB5Kf/SaINslL+XRlZs2VrvLDoCiC30KT3m9pdSWxArVOtxqmYDKwAmV5hVFnLm1iB3Rlxl07z7UKdUke3N4usbB79krWXq21442qkUC7UNvWFgQokWJW7qnsYR+w3xKoZ3VaHylM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770807939; c=relaxed/simple;
-	bh=UiqOSzEdC2LWX2Wl2Prc5W84aWbEMjHQQ3ulcmBk0e8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=os3wdjIRLSkklcG6AmQPzCM8Z5u003S1t15mZrefWgTBc3SJDyJitDcxr6qAqY4T5wNmEDynPP6Ru3EPR3GmooXtAll2jVCrhwHmOXYgCfQV9KGRNxIUZ6xRTc02ekbGnWh9q9bejATEOVw1uv6azNC1xFhJ9LNTLC+WZZ5YaZ0=
+	s=arc-20240116; t=1770815578; c=relaxed/simple;
+	bh=GwiFwREw0rCSXyWzYPDQPu4tkpjkebTbj9CPdLLG5AM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CgehKrVxei5mTFy/bEOykimyu7+sZx30ofyWAvBCFjHd+R5q13Vqp7IeudnxoQbHTkI+rKMkJ+/bWeJtqKh5gWkcvn+OmIgtt6jTtWK7zAZNYLLMrlZWosw1aGkQLN9dSmXtxI4k9VlMmwM3Kd6qe94v8EIFZkHXV4N+WoxB/18=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3EF62339;
-	Wed, 11 Feb 2026 03:05:31 -0800 (PST)
-Received: from e134344.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2D7573F740;
-	Wed, 11 Feb 2026 03:05:32 -0800 (PST)
-Date: Wed, 11 Feb 2026 11:05:29 +0000
-From: Ben Horgan <ben.horgan@arm.com>
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
-	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
-	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
-	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com, rohit.mathew@arm.com,
-	scott@os.amperecomputing.com, sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com,
-	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
-	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
-	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
-	zengheng4@huawei.com, linux-doc@vger.kernel.org,
-	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: Re: [PATCH v4 15/41] arm_mpam: resctrl: Pick the caches we will use
- as resctrl resources
-Message-ID: <aYxieS3Pycm5UthH@e134344.arm.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-16-ben.horgan@arm.com>
- <c8d53e59-5661-4ac2-bc8f-0661cde59967@intel.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2718339;
+	Wed, 11 Feb 2026 05:12:49 -0800 (PST)
+Received: from orionap.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6CF583F63F;
+	Wed, 11 Feb 2026 05:12:54 -0800 (PST)
+From: Andre Przywara <andre.przywara@arm.com>
+To: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool v6 0/6] arm64: Nested virtualization support
+Date: Wed, 11 Feb 2026 13:12:43 +0000
+Message-ID: <20260211131249.399019-1-andre.przywara@arm.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c8d53e59-5661-4ac2-bc8f-0661cde59967@intel.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Reinette,
+This is v6 of the nested virt support series, fixing an endianess bug
+in the maintenance IRQ DT code, and rebasing.
+Changelog below.
+========================================================
 
-On Tue, Feb 10, 2026 at 03:39:51PM -0800, Reinette Chatre wrote:
-> Hi Ben,
-> 
-> On 2/3/26 1:43 PM, Ben Horgan wrote:
-> ...
-> > +
-> >  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
-> >  {
-> > -	/* TODO: initialise the resctrl resources */
-> > +	struct mpam_class *class = res->class;
-> > +	struct rdt_resource *r = &res->resctrl_res;
-> > +
-> > +	switch (r->rid) {
-> > +	case RDT_RESOURCE_L2:
-> > +	case RDT_RESOURCE_L3:
-> > +		r->alloc_capable = true;
-> > +		r->schema_fmt = RESCTRL_SCHEMA_BITMAP;
-> > +		r->cache.arch_has_sparse_bitmasks = true;
-> > +
-> > +		r->cache.cbm_len = class->props.cpbm_wd;
-> > +		/* mpam_devices will reject empty bitmaps */
-> > +		r->cache.min_cbm_bits = 1;
-> > +
-> > +		if (r->rid == RDT_RESOURCE_L2) {
-> > +			r->name = "L2";
-> 
-> This code is fine but highlights that resctrl fs should not let the
-> arch need to do this since this name is used as part of user interface.
+Thanks to the imperturbable efforts from Marc, arm64 support for nested
+virtualization has now reached the mainline kernel, which means the
+respective kvmtool support should now be ready as well.
 
-Yes, not ideal but I don't think it's urgent to tidy this up.
+Patch 1 introduces the new "--nested" command line option, to let the
+VCPUs start in EL2. To allow KVM guests running in such a guest, we also
+need VGIC support, which patch 2 allows by setting the maintenance IRQ.
+Patch 3 to 6 are picked from Marc's repo, and allow to set the arch
+timer offset, enable non-VHE guests (at the cost of losing recursive
+nested virtualisation), and also advertise the virtual EL2 timer IRQ.
 
-> 
-> > +			r->ctrl_scope = RESCTRL_L2_CACHE;
-> > +		} else {
-> > +			r->name = "L3";
-> > +			r->ctrl_scope = RESCTRL_L3_CACHE;
-> > +		}
-> > +
-> > +		/*
-> > +		 * Which bits are shared with other ...things...
-> > +		 * Unknown devices use partid-0 which uses all the bitmap
-> > +		 * fields. Until we configured the SMMU and GIC not to do this
-> > +		 * 'all the bits' is the correct answer here.
-> > +		 */
-> > +		r->cache.shareable_bits = resctrl_get_default_ctrl(r);
-> 
-> I would like to recommend one style change to set r->alloc_capable as the final
-> setting. This is the setting that informs resctrl fs that this resource needs
-> attention. The reason I recommend this to be done last is if/when a future
-> change adds some configuration here that may fail then it should not fail with
-> r->alloc_capable as true while partially initialized.
+Tested on the FVP (with some good deal of patience) and QEMU.
 
-Makes sense. This will make the code more robust.
+Cheers,
+Andre
 
-> 
-> > +		break;
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> >  
-> >  	return 0;
-> >  }
-> > @@ -324,7 +409,8 @@ int mpam_resctrl_setup(void)
-> >  		res->resctrl_res.rid = rid;
-> >  	}
-> >  
-> > -	/* TODO: pick MPAM classes to map to resctrl resources */
-> > +	/* Find some classes to use for controls */
-> > +	mpam_resctrl_pick_caches();
-> >  
-> >  	/* Initialise the resctrl structures from the classes */
-> >  	for_each_mpam_resctrl_control(res, rid) {
-> 
-> Reinette
+Changelog v5 ... v6:
+- rebase / drop header update patch (already merged)
+- fix endianness bug in DT maintenance IRQ description
 
-Thanks,
+Changelog v4 ... v5:
+- bump kernel headers to v6.19-rc6
+- print a warning if --e2h0 is given without --nested
+- fail if the maintenance IRQ setting attribute is not supported
+- add tags
 
-Ben
+Changelog v3 ... v4:
+- pass kvm pointer to gic__generate_fdt_nodes()
+- use macros for PPI offset and DT type identifier
+- properly calculate DT interrupt flags value
+- add patch 7 to fix virtio endianess issues
+- CAPITALISE verbs in commit message
+
+Changelog v2 ... v3:
+- adjust^Wreplace commit messages for E2H0 and counter-offset patch
+- check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
+- update kernel headers to v6.16 release
+
+Changelog v1 ... 2:
+- add three patches from Marc:
+  - add --e2h0 command line option
+  - add --counter-offset command line option
+  - advertise all five arch timer interrupts in DT
+
+Andre Przywara (2):
+  arm64: Initial nested virt support
+  arm64: nested: Add support for setting maintenance IRQ
+
+Marc Zyngier (4):
+  arm64: Add counter offset control
+  arm64: Add FEAT_E2H0 support
+  arm64: Generate HYP timer interrupt specifiers
+  arm64: Handle virtio endianness reset when running nested
+
+ arm64/arm-cpu.c                     |  6 +--
+ arm64/fdt.c                         |  5 ++-
+ arm64/gic.c                         | 29 ++++++++++++-
+ arm64/include/kvm/gic.h             |  2 +-
+ arm64/include/kvm/kvm-config-arch.h | 11 ++++-
+ arm64/include/kvm/kvm-cpu-arch.h    |  5 ++-
+ arm64/include/kvm/timer.h           |  2 +-
+ arm64/kvm-cpu.c                     | 64 ++++++++++++++++++++++++-----
+ arm64/kvm.c                         | 20 +++++++++
+ arm64/timer.c                       | 29 ++++++-------
+ 10 files changed, 133 insertions(+), 40 deletions(-)
+
+-- 
+2.47.3
