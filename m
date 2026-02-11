@@ -1,249 +1,313 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033142E7185
-	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 15:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB2B2BDC35
+	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 15:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770823867; cv=none; b=S4m8Cu8Qgp2s3CT5Wxn0bOlFfuCZobNSFVUTDzYi4MdSQ1iwYWwjoAPd/AL2yXuhqpfNYIDbzJ331wB5fDR/jxeIgOh+HYgkezTU/J4Dct5iK0NNqlDl/1YGGPzh/pNLMWq4CsyRXGTjLE+9fF9KWrR4gpfLtfGW1eOrg0nAbVY=
+	t=1770824215; cv=none; b=bA4VeBn3611EP4rkLAL36ZiKmObV8qeAb8Wdb9vOX01JBD2UQqOe0BevhWbIxRLOCar/vv5MiLjtR9l3ADEZ+/y4/jbzC/QKSGICJhkO6w7fsQJbdZ7mS0EX7Jeq43te0xrh7MdgymivpgsIoCd/3yaND0xt3kZfrbX2/GViUlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770823867; c=relaxed/simple;
-	bh=OLUplhZRE4AQJfM2IG+CREOYzwKW/P8zAEDGcgUfHmA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:content-type; b=n/w6Nicy8XNuFOhDtZ6LNBNG5A5TYm3M/UsZfC58jpPo7SeqV3RGCyI0UbUfWVjkKTdGRAWg2y8u7WWN1tgNv5rqPyaEjyP5D1X+Rj0b2uJBxbCQ77UdiqNUEvQ/QG3AvXwaPAMQOAbBQbJQzREmMaAEfEcWKVMbRCapq1qZz0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A+AZNi9i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+AZNi9i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1770823865;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KgZLxYej2+Jm/2mAtMCoJI/wRP+Se5cFtNVR14mJ03o=;
-	b=A+AZNi9iEp8Ej/3qny/MxrVmSfBOqPZk5nGCLQ3jl5vcxLCr/Kjo3oLUpfGSy+YF9N1+vH
-	lAjVBo1b8stjJbCBQLAR1eDpXIAAjLzjw6Qfk9jUxDZv/a4HPq8Mm554dycc4LHIjF9gGY
-	uWBdX0upKhhhh2FBwzmbqtbo36MBwOQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-2RWKXSinMSGko1tm8kgt3Q-1; Wed, 11 Feb 2026 10:31:03 -0500
-X-MC-Unique: 2RWKXSinMSGko1tm8kgt3Q-1
-X-Mimecast-MFC-AGG-ID: 2RWKXSinMSGko1tm8kgt3Q_1770823862
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-482eec44485so15599205e9.3
-        for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 07:31:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770823862; x=1771428662;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=KgZLxYej2+Jm/2mAtMCoJI/wRP+Se5cFtNVR14mJ03o=;
-        b=bAF7ru5I7rNL5h1idW89a4nkecOHfEkozSNgbd4csLSelS7SXk+tCu1nNnn8iiRIIQ
-         1WaAzYktGjEZ0RjjzB+Zh1QODolFl8r6crq0pG2yphE7zOnSg8t+jGlKu3aeo6+eYUuk
-         bmVVPESQ4mK8fKwjHklvOziSf+x4NGAfsgSy/mAgvtC3EkluF7f6fnxYDAwFWBxGJptD
-         8wzy8v+Zk68cvnD1jXV7v8bZbsXIXKfIZSJs/BEoba7f8oEh0j5y2nw1gtEYQyydIjnk
-         YshfGeKr0f7Y4WfUjueqTNpKGPsODo0HMehmIvOappROKp1/fm49gqA6qLrlYHodtCs7
-         aJWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTqbC+M8pYNYGtgci8FfG1UwDpvJgGbL0PUSvQHX1EYazkV8GzN0J2oSsV3mH2bP2Gco4PzdA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwqUQWIoKk9VJZ7GG7+XYIQzejWHhhDzijE4kfeUDsLC6DiQKKu
-	iJEofgY4hy5AeuS4YmZUrnUUEWzfnAEAYHPRHWbpOZikG+hH5gR5zjSP5fOamadctBZZhu+yD6I
-	ldgToSmwNJU1ckPBXdpJc37fupP0GxsV8yN0n2iAqw7Lwps5Join+Xqotog==
-X-Gm-Gg: AZuq6aJnKfL8FW61D5NRit8wYaiLoyR78PjeW76dAduxfYimqXrQ0IovEKbhPS5SNcn
-	BQD+aB5V2JlUgF5U06kzr9oCYjmio2fm6KKnEzWMMKEkyDppK7ig+H96i14W7tj8IdGdgrIv7Ss
-	S+lSKxTWYO4K119zAQRWxqXiSkLtCfHf0J6eVdomreetK21zdVTxcXxuGjvI6w0pH01LmjFBVsf
-	+B111br2eFvuZWUnZj9+1YGyB8cyGxMYfbN6G8piEi0oJXxjJZ/vGRFNF1r6sYLSw8NBppyR+fJ
-	4heOhR0g6xIITl7kzFMqBNzEscnKs5SXpow9xKkhNf1iskCAMp8DLTUTDT9gzfYwLzM1du4gyFv
-	UwOxV8EG7xyOcmw7BVe3m2Ozqgr2mG37QVhdFkaS6LD/qV32xIakiIbS37MkcyOgzdP9e7ZxxUz
-	Y23ONOkNcy
-X-Received: by 2002:a05:600c:c16d:b0:480:4a90:1b00 with SMTP id 5b1f17b1804b1-4832021605bmr226049965e9.20.1770823861890;
-        Wed, 11 Feb 2026 07:31:01 -0800 (PST)
-X-Received: by 2002:a05:600c:c16d:b0:480:4a90:1b00 with SMTP id 5b1f17b1804b1-4832021605bmr226049465e9.20.1770823861415;
-        Wed, 11 Feb 2026 07:31:01 -0800 (PST)
-Received: from rh.fritz.box (p200300f6af2d8700b4c2d356c3fafe63.dip0.t-ipconnect.de. [2003:f6:af2d:8700:b4c2:d356:c3fa:fe63])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43783d34657sm6448511f8f.6.2026.02.11.07.31.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Feb 2026 07:31:00 -0800 (PST)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>
-Cc: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Sebastian Ott <sebott@redhat.com>
-Subject: [PATCH v5 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-Date: Wed, 11 Feb 2026 16:30:32 +0100
-Message-ID: <20260211153032.19327-3-sebott@redhat.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260211153032.19327-1-sebott@redhat.com>
-References: <20260211153032.19327-1-sebott@redhat.com>
+	s=arc-20240116; t=1770824215; c=relaxed/simple;
+	bh=9eodLtiKiUBne97H3ZMFNsvvchRXNaUKeHTqVd37dgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NFMpAAF+SrqIKLSp8hkX2COQj0g6s7JgroImaoDyVHQTBmtrkB/i0n+bOB2BB6TmCEtw9dzjNo2iH3hvUMVspxoq5h83TNU6hVrvy6us9xzXWU7HbVb6Y2WZAxW61YPnnIetvagmgEiw6Io2ZG+bsWXmw7bq34wCWuMMd7f1XvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 34CA2339;
+	Wed, 11 Feb 2026 07:36:47 -0800 (PST)
+Received: from e134344.arm.com (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25FC83F63F;
+	Wed, 11 Feb 2026 07:36:48 -0800 (PST)
+Date: Wed, 11 Feb 2026 15:36:45 +0000
+From: Ben Horgan <ben.horgan@arm.com>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com, rohit.mathew@arm.com,
+	scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com,
+	catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+	zengheng4@huawei.com, linux-doc@vger.kernel.org,
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Subject: Re: [PATCH v4 13/41] arm_mpam: resctrl: Add boilerplate cpuhp and
+ domain allocation
+Message-ID: <aYyiDRD6u6p4a98h@e134344.arm.com>
+References: <20260203214342.584712-1-ben.horgan@arm.com>
+ <20260203214342.584712-14-ben.horgan@arm.com>
+ <f2951303-6fe9-4674-bd16-0dbef39cc1d4@intel.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: zuQLiz4ApjW0crFJWYv0YFErnCskTWzzjPaDb0wSgtM_1770823862
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-content-type: text/plain; charset="US-ASCII"; x-default=true
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2951303-6fe9-4674-bd16-0dbef39cc1d4@intel.com>
 
-Provide a kvm specific vcpu property to override the default
-(as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+Hi Reinette,
 
-Note: in order to support PSCI v0.1 we need to drop vcpu
-initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+On Tue, Feb 10, 2026 at 02:57:29PM -0800, Reinette Chatre wrote:
+> Hi Ben,
+> 
+> On 2/3/26 1:43 PM, Ben Horgan wrote:
+> ...
+> > diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
+> > new file mode 100644
+> > index 000000000000..4c2248c92955
+> > --- /dev/null
+> > +++ b/drivers/resctrl/mpam_resctrl.c
+> > @@ -0,0 +1,343 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +// Copyright (C) 2025 Arm Ltd.
+> > +
+> > +#define pr_fmt(fmt) "%s:%s: " fmt, KBUILD_MODNAME, __func__
+> > +
+> > +#include <linux/arm_mpam.h>
+> > +#include <linux/cacheinfo.h>
+> > +#include <linux/cpu.h>
+> > +#include <linux/cpumask.h>
+> > +#include <linux/errno.h>
+> > +#include <linux/list.h>
+> > +#include <linux/printk.h>
+> > +#include <linux/rculist.h>
+> > +#include <linux/resctrl.h>
+> > +#include <linux/slab.h>
+> > +#include <linux/types.h>
+> > +
+> > +#include <asm/mpam.h>
+> > +
+> > +#include "mpam_internal.h"
+> > +
+> > +/*
+> > + * The classes we've picked to map to resctrl resources, wrapped
+> > + * in with their resctrl structure.
+> > + * Class pointer may be NULL.
+> > + */
+> > +static struct mpam_resctrl_res mpam_resctrl_controls[RDT_NUM_RESOURCES];
+> > +
+> > +#define for_each_mpam_resctrl_control(res, rid)					\
+> > +	for (rid = 0, res = &mpam_resctrl_controls[rid];			\
+> > +	     rid < RDT_NUM_RESOURCES;						\
+> > +	     rid++, res = &mpam_resctrl_controls[rid])
+> > +
+> > +/* The lock for modifying resctrl's domain lists from cpuhp callbacks. */
+> > +static DEFINE_MUTEX(domain_list_lock);
+> > +
+> > +static bool exposed_alloc_capable;
+> > +static bool exposed_mon_capable;
+> > +
+> > +bool resctrl_arch_alloc_capable(void)
+> > +{
+> > +	return exposed_alloc_capable;
+> > +}
+> > +
+> > +bool resctrl_arch_mon_capable(void)
+> > +{
+> > +	return exposed_mon_capable;
+> > +}
+> > +
+> > +/*
+> > + * MSC may raise an error interrupt if it sees an out or range partid/pmg,
+> > + * and go on to truncate the value. Regardless of what the hardware supports,
+> > + * only the system wide safe value is safe to use.
+> > + */
+> > +u32 resctrl_arch_get_num_closid(struct rdt_resource *ignored)
+> > +{
+> > +	return mpam_partid_max + 1;
+> > +}
+> > +
+> > +struct rdt_resource *resctrl_arch_get_resource(enum resctrl_res_level l)
+> > +{
+> > +	if (l >= RDT_NUM_RESOURCES)
+> > +		return NULL;
+> > +
+> > +	return &mpam_resctrl_controls[l].resctrl_res;
+> > +}
+> > +
+> > +static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
+> > +{
+> > +	/* TODO: initialise the resctrl resources */
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+> > +{
+> > +	struct mpam_class *class = comp->class;
+> > +
+> > +	if (class->type == MPAM_CLASS_CACHE)
+> > +		return comp->comp_id;
+> > +
+> > +	/* TODO: repaint domain ids to match the L3 domain ids */
+> > +	/* Otherwise, expose the ID used by the firmware table code. */
+> > +	return comp->comp_id;
+> > +}
+> > +
+> > +static void mpam_resctrl_domain_hdr_init(int cpu, struct mpam_component *comp,
+> > +					 struct rdt_domain_hdr *hdr)
+> > +{
+> > +	lockdep_assert_cpus_held();
+> > +
+> > +	INIT_LIST_HEAD(&hdr->list);
+> > +	hdr->id = mpam_resctrl_pick_domain_id(cpu, comp);
+> > +	cpumask_set_cpu(cpu, &hdr->cpu_mask);
+> 
+> One addition via the resctrl telemetry enabling is a new rdt_domain_hdr::rid
+> used for some additional checks on the header.
+> https://lore.kernel.org/all/20251217172121.12030-2-tony.luck@intel.com/
+> I may be missing something here though since the additional checking that this
+> new field supports should have complained loudly ... unless this was tested with
+> only the L3 resource that happens to be 0.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- docs/system/arm/cpu-features.rst | 11 ++++++
- target/arm/cpu.h                 |  6 +++
- target/arm/kvm.c                 | 65 +++++++++++++++++++++++++++++++-
- 3 files changed, 81 insertions(+), 1 deletion(-)
+Hmmm, thanks for pointing this out. I think I've been getting away with this as
+in the resctrl common code checking for 'rid' only happens for monitors which we
+do keep on the L3 resource and the control checking is only in the x86.  I'll
+look into this a bit more and update for this change.
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 37d5dfd15b..50b106f2eb 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -204,6 +204,17 @@ the list of KVM VCPU features and their descriptions.
-   the guest scheduler behavior and/or be exposed to the guest
-   userspace.
- 
-+``kvm-psci-version``
-+  Set the Power State Coordination Interface (PSCI) firmware ABI version
-+  that KVM provides to the guest. By default KVM will use the newest
-+  version that it knows about (which is PSCI v1.3 in Linux v6.13).
-+
-+  You only need to set this if you want to be able to migrate this
-+  VM to a host machine running an older kernel that does not
-+  recognize the PSCI version that this host's kernel defaults to.
-+
-+  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
-+
- TCG VCPU Features
- =================
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e146f7e6c4..d3cfd444e8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1036,6 +1036,12 @@ struct ArchCPU {
-     bool kvm_vtime_dirty;
-     uint64_t kvm_vtime;
- 
-+    /*
-+     * Intermediate value used during property parsing.
-+     * Once finalized, the value should be read from psci_version.
-+     */
-+    uint32_t kvm_prop_psci_version;
-+
-     /* KVM steal time */
-     OnOffAuto kvm_steal_time;
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index ded582e0da..6d13cb4f3c 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -485,6 +485,46 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
- }
- 
-+typedef struct PSCIVersion {
-+    uint32_t number;
-+    const char *str;
-+} PSCIVersion;
-+
-+static const PSCIVersion psci_versions[] = {
-+    { QEMU_PSCI_VERSION_0_1, "0.1" },
-+    { QEMU_PSCI_VERSION_0_2, "0.2" },
-+    { QEMU_PSCI_VERSION_1_0, "1.0" },
-+    { QEMU_PSCI_VERSION_1_1, "1.1" },
-+    { QEMU_PSCI_VERSION_1_2, "1.2" },
-+    { QEMU_PSCI_VERSION_1_3, "1.3" },
-+};
-+
-+static char *kvm_get_psci_version(Object *obj, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    for (int i = 0; i < ARRAY_SIZE(psci_versions); i++) {
-+        if (psci_versions[i].number == cpu->psci_version)
-+            return g_strdup(psci_versions[i].str);
-+    }
-+
-+    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
-+}
-+
-+static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    for (int i = 0; i < ARRAY_SIZE(psci_versions); i++) {
-+        if (!strcmp(value, psci_versions[i].str)) {
-+            cpu->kvm_prop_psci_version = psci_versions[i].number;
-+            return;
-+        }
-+    }
-+
-+    error_setg(errp, "Invalid PSCI version.");
-+}
-+
- /* KVM VCPU properties should be prefixed with "kvm-". */
- void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
- {
-@@ -506,6 +546,12 @@ void kvm_arm_add_vcpu_properties(ARMCPU *cpu)
-                              kvm_steal_time_set);
-     object_property_set_description(obj, "kvm-steal-time",
-                                     "Set off to disable KVM steal time.");
-+
-+    object_property_add_str(obj, "kvm-psci-version", kvm_get_psci_version,
-+                            kvm_set_psci_version);
-+    object_property_set_description(obj, "kvm-psci-version",
-+                                    "Set PSCI version. "
-+                                    "Valid values are 0.1, 0.2, 1.0, 1.1, 1.2, 1.3");
- }
- 
- bool kvm_arm_pmu_supported(void)
-@@ -1976,7 +2022,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
--    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-+    if (cpu->kvm_prop_psci_version != QEMU_PSCI_VERSION_0_1 &&
-+        kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-+        /*
-+         * Versions >= v0.2 are backward compatible with v0.2
-+         * omit the feature flag for v0.1 .
-+         */
-         cpu->psci_version = QEMU_PSCI_VERSION_0_2;
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PSCI_0_2;
-     }
-@@ -2015,6 +2066,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
-+    if (cpu->kvm_prop_psci_version) {
-+        psciver = cpu->kvm_prop_psci_version;
-+        ret = kvm_set_one_reg(cs, KVM_REG_ARM_PSCI_VERSION, &psciver);
-+        if (ret) {
-+            error_report("KVM in this kernel does not support PSCI version %d.%d",
-+                         (int) PSCI_VERSION_MAJOR(psciver),
-+                         (int) PSCI_VERSION_MINOR(psciver));
-+            error_printf("Consider setting the kvm-psci-version property on the "
-+                         "migration source.\n");
-+            return ret;
-+        }
-+    }
-     /*
-      * KVM reports the exact PSCI version it is implementing via a
-      * special sysreg. If it is present, use its contents to determine
--- 
-2.52.0
+> 
+> ...
+> 
+> > +static struct mpam_resctrl_dom *
+> > +mpam_resctrl_get_domain_from_cpu(int cpu, struct mpam_resctrl_res *res)
+> > +{
+> > +	struct mpam_resctrl_dom *dom;
+> > +	struct rdt_resource *r = &res->resctrl_res;
+> > +
+> > +	lockdep_assert_cpus_held();
+> > +
+> > +	list_for_each_entry_rcu(dom, &r->ctrl_domains, resctrl_ctrl_dom.hdr.list) {
+> > +		if (cpumask_test_cpu(cpu, &dom->ctrl_comp->affinity))
+> > +			return dom;
+> > +	}
+> 
+> I notice here that that only the ctrl_domains list is searched ...
 
+The monitor searching is added in:
+ [PATCH v4 28/41] arm_mpam: resctrl: Pick classes for use as mbm counters
+This does seems like a bad code split. Even more so as csu counters are
+added before the mbm counters.
+
+> 
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +int mpam_resctrl_online_cpu(unsigned int cpu)
+> > +{
+> > +	struct mpam_resctrl_res *res;
+> > +	enum resctrl_res_level rid;
+> > +
+> > +	guard(mutex)(&domain_list_lock);
+> > +	for_each_mpam_resctrl_control(res, rid) {
+> > +		struct mpam_resctrl_dom *dom;
+> > +
+> > +		if (!res->class)
+> > +			continue;	// dummy_resource;
+> > +
+> > +		dom = mpam_resctrl_get_domain_from_cpu(cpu, res);
+> 
+> Consider a system that only supports monitoring (exposed_alloc_capable == false,
+> exposed_mon_capable == true). Since mpam_resctrl_get_domain_from_cpu() only
+> searches control domains then it looks to me as though dom will always be false
+> here?
+> 
+> > +		if (!dom) {
+> > +			dom = mpam_resctrl_alloc_domain(cpu, res);
+> 
+> Would this (on hypothetical exposed_alloc_capable == false, exposed_mon_capable == true system)
+> then cause a new domain to be allocated for each CPU with a single CPU in its cpumask
+> instead of allocating a single monitoring domain with multiple CPUs in its mask?
+> 
+> > +		} else {
+> > +			if (exposed_alloc_capable) {
+> > +				struct rdt_ctrl_domain *ctrl_d = &dom->resctrl_ctrl_dom;
+> > +
+> > +				mpam_resctrl_online_domain_hdr(cpu, &ctrl_d->hdr);
+> > +			}
+> > +			if (exposed_mon_capable) {
+> > +				struct rdt_l3_mon_domain *mon_d = &dom->resctrl_mon_dom;
+> > +
+> > +				mpam_resctrl_online_domain_hdr(cpu, &mon_d->hdr);
+> > +			}
+> > +		}
+> > +		if (IS_ERR(dom))
+> > +			return PTR_ERR(dom);
+> > +	}
+> > +
+> > +	resctrl_online_cpu(cpu);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +void mpam_resctrl_offline_cpu(unsigned int cpu)
+> > +{
+> > +	struct mpam_resctrl_res *res;
+> > +	enum resctrl_res_level rid;
+> > +
+> > +	resctrl_offline_cpu(cpu);
+> > +
+> > +	guard(mutex)(&domain_list_lock);
+> > +	for_each_mpam_resctrl_control(res, rid) {
+> > +		struct mpam_resctrl_dom *dom;
+> > +		struct rdt_l3_mon_domain *mon_d;
+> > +		struct rdt_ctrl_domain *ctrl_d;
+> > +		bool ctrl_dom_empty, mon_dom_empty;
+> > +
+> > +		if (!res->class)
+> > +			continue;	// dummy resource
+> > +
+> > +		dom = mpam_resctrl_get_domain_from_cpu(cpu, res);
+> > +		if (WARN_ON_ONCE(!dom))
+> 
+> Similar to above ... it looks to me as though this WARN may always be
+> encountered on a system that only supports monitoring.
+
+I think monitor only systems, (exposed_alloc_capable == false,
+exposed_mon_capable == true), are handled properly from
+[PATCH v4 28/41] arm_mpam: resctrl: Pick classes for use as mbm counters
+onwards in the series.
+
+I'll look into making the division into commits better.
+
+> 
+> > +			continue;
+> > +
+> > +		if (exposed_alloc_capable) {
+> > +			ctrl_d = &dom->resctrl_ctrl_dom;
+> > +			ctrl_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &ctrl_d->hdr);
+> > +			if (ctrl_dom_empty)
+> > +				resctrl_offline_ctrl_domain(&res->resctrl_res, ctrl_d);
+> > +		} else {
+> > +			ctrl_dom_empty = true;
+> > +		}
+> > +
+> > +		if (exposed_mon_capable) {
+> > +			mon_d = &dom->resctrl_mon_dom;
+> > +			mon_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &mon_d->hdr);
+> > +			if (mon_dom_empty)
+> > +				resctrl_offline_mon_domain(&res->resctrl_res, &mon_d->hdr);
+> > +		} else {
+> > +			mon_dom_empty = true;
+> > +		}
+> > +
+> > +		if (ctrl_dom_empty && mon_dom_empty)
+> > +			kfree(dom);
+> > +	}
+> > +}
+> > +
+> 
+> Reinette
+> 
+> 
+
+Thanks,
+
+Ben
