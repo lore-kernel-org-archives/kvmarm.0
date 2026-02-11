@@ -1,156 +1,165 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06854322B6F
-	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 13:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A743127A927;
+	Wed, 11 Feb 2026 14:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770815590; cv=none; b=pGw96F/tdKeWXAVNiJo4opCv+vVGza58k8LoMVL/ljLfKwYZdeqE7SwKjkfjDsg2U9v9ADTDbK6S8F+KHn4Pziut6XYgUcEl1jFzN0sYw0Ubm4WuKsDQnzsct7nyWS+EY4HXDanMjaB8skyv+tghxj4h/O0LkGlCKvJNNhMTvNk=
+	t=1770818892; cv=none; b=bKMRLI+adIeQUZHJ9Fyyf4HG3wDiFXX4f9rjCxO7r1w2ZuIV6Dcodio6OsvAoj/c7VVER1XW3kKseSEx6+LAKEiDbADCu2mapCo/zwI2wONbLEU7/icOWQnDEdZLHzQ64MwTYtRKRuS7bimpala1DOGlT3WdNGxNljPYM0wWqOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770815590; c=relaxed/simple;
-	bh=alrf6TfuhUPofETleLNrR3lGep1rMhDWTYKqFVhS+1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hui1RVUJ0dmDANKm/qT4bXpDNToymw7UT/XWtnjfwZk9MidXu6yIqhGaByePZl2Szbi2DLdODSnspV1eoJznQpZC9HXGKhvHP8RtaXkvM3oFEKlommlxRX/UcwLzQKNxoCt+gz6aHIj+g+wNasVLWBOmfthQx+wf4ZwSidOzTZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 28167339;
-	Wed, 11 Feb 2026 05:13:02 -0800 (PST)
-Received: from orionap.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C885A3F63F;
-	Wed, 11 Feb 2026 05:13:06 -0800 (PST)
-From: Andre Przywara <andre.przywara@arm.com>
-To: Will Deacon <will@kernel.org>,
-	Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc: Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1770818892; c=relaxed/simple;
+	bh=eX+/ax3+MlCj6Nl0Lwxh/UZl2tU34lOsCu8RxQueZr0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OnZoI2dRtXuycEFkW7SmPiW6JjRi5ThVT/w8LCx+akfLWTJ+Jxxm2bDu6v/NtoYWaQ31W25Bw62WPntibkLLeb43Nhqmx4FkbOLcpZXyQrf8geeRH88qhqDe3J+2w7ZB+GtRoa/W8t9gylAmifi1cEZWbKTnT/grWQ6rIEmatN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RDJXn7Q4; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RDJXn7Q4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39442C4CEF7;
+	Wed, 11 Feb 2026 14:08:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770818892;
+	bh=eX+/ax3+MlCj6Nl0Lwxh/UZl2tU34lOsCu8RxQueZr0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RDJXn7Q46ci9ke8jsN3uttNH1SlS4Q+zbsowN4Nr8d1zwSlrRK54IciYl96OSXhSl
+	 K42HKtnlj5tkkkB29E5IGdoE+CSESQZfJkNERQYL84A9FHIlvFHi7ebVDrKd22i2xy
+	 r1a990m91opQq+XoBdwaA1Ep4XonzWIVAvVwpFGEE7UamCBU/4JjrytMOMbQJL/6ka
+	 cGA1huvLxveDJZ7/f+Hnd72dTHvcqhO6O3OkJnELR5n3fFuHHylQZqzfYkJOKR1pBA
+	 wCXdCynDIGtrkJk1ZWCIzsmehYUixtP54Oz8Z7fzV9wu/G9k8np8AvZ4v9rDcaMkL1
+	 OAfuftNfBrwvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqAsz-0000000AMKg-3vAV;
+	Wed, 11 Feb 2026 14:08:10 +0000
+Date: Wed, 11 Feb 2026 14:08:09 +0000
+Message-ID: <86ms1fbcfq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Will Deacon <will@kernel.org>,
+	Julien Thierry <julien.thierry.kdev@gmail.com>,
 	Sascha Bischoff <Sascha.Bischoff@arm.com>,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v6 6/6] arm64: Handle virtio endianness reset when running nested
-Date: Wed, 11 Feb 2026 13:12:49 +0000
-Message-ID: <20260211131249.399019-7-andre.przywara@arm.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260211131249.399019-1-andre.przywara@arm.com>
+Subject: Re: [PATCH kvmtool v6 6/6] arm64: Handle virtio endianness reset when running nested
+In-Reply-To: <20260211131249.399019-7-andre.przywara@arm.com>
 References: <20260211131249.399019-1-andre.przywara@arm.com>
+	<20260211131249.399019-7-andre.przywara@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, will@kernel.org, julien.thierry.kdev@gmail.com, Sascha.Bischoff@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-From: Marc Zyngier <maz@kernel.org>
+On Wed, 11 Feb 2026 13:12:49 +0000,
+Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> When running an EL2 guest, we need to make sure we don't sample
+> SCTLR_EL1 to work out the virtio endianness, as this is likely
+> to be a bit random.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+>  arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+>  2 files changed, 40 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+> index 1af394a..85646ad 100644
+> --- a/arm64/include/kvm/kvm-cpu-arch.h
+> +++ b/arm64/include/kvm/kvm-cpu-arch.h
+> @@ -10,8 +10,9 @@
+>  #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+>  #define ARM_CPU_ID		3, 0, 0, 0
+>  #define ARM_CPU_ID_MPIDR	5
+> -#define ARM_CPU_CTRL		3, 0, 1, 0
+> -#define ARM_CPU_CTRL_SCTLR_EL1	0
+> +#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
+> +#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
 
-When running an EL2 guest, we need to make sure we don't sample
-SCTLR_EL1 to work out the virtio endianness, as this is likely
-to be a bit random.
+Sascha pointed out this howler of a bug last time: SCTLR_EL1 and EL2
+have the same encoding here, which is obviously wrong.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
- arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
- 2 files changed, 40 insertions(+), 12 deletions(-)
+This is definitely introducing a regression on EL1 guests.
 
-diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
-index 1af394a..85646ad 100644
---- a/arm64/include/kvm/kvm-cpu-arch.h
-+++ b/arm64/include/kvm/kvm-cpu-arch.h
-@@ -10,8 +10,9 @@
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
- #define ARM_CPU_ID		3, 0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
--#define ARM_CPU_CTRL		3, 0, 1, 0
--#define ARM_CPU_CTRL_SCTLR_EL1	0
-+#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
-+#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
-+#define SYS_HCR_EL2		3, 4, 1, 1, 0
- 
- struct kvm_cpu {
- 	pthread_t	thread;
-diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
-index 5e4f3a7..35e1c63 100644
---- a/arm64/kvm-cpu.c
-+++ b/arm64/kvm-cpu.c
-@@ -12,6 +12,7 @@
- 
- #define SCTLR_EL1_E0E_MASK	(1 << 24)
- #define SCTLR_EL1_EE_MASK	(1 << 25)
-+#define HCR_EL2_TGE		(1 << 27)
- 
- static int debug_fd;
- 
-@@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- {
- 	struct kvm_one_reg reg;
- 	u64 psr;
--	u64 sctlr;
-+	u64 sctlr, bit;
-+	u64 hcr = 0;
- 
- 	/*
- 	 * Quoting the definition given by Peter Maydell:
-@@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 	 * We first check for an AArch32 guest: its endianness can
- 	 * change when using SETEND, which affects the CPSR.E bit.
- 	 *
--	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
--	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
-+	 * If we're AArch64, determine which SCTLR register to use,
-+	 * depending on NV being used or not. Then use either the E0E
-+	 * bit for EL0, or the EE bit for EL1/EL2.
- 	 */
- 	reg.id = ARM64_CORE_REG(regs.pstate);
- 	reg.addr = (u64)&psr;
-@@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
- 	if (psr & PSR_MODE32_BIT)
- 		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
- 
--	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
-+	if (vcpu->kvm->cfg.arch.nested_virt) {
-+		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
-+		reg.addr = (u64)&hcr;
-+		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
-+			die("KVM_GET_ONE_REG failed (HCR_EL2)");
-+	}
-+
-+	switch (psr & PSR_MODE_MASK) {
-+	case PSR_MODE_EL0t:
-+		if (hcr & HCR_EL2_TGE)
-+			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-+		else
-+			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
-+		bit = SCTLR_EL1_E0E_MASK;
-+		break;
-+	case PSR_MODE_EL1t:
-+	case PSR_MODE_EL1h:
-+		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
-+		bit = SCTLR_EL1_EE_MASK;
-+		break;
-+	case PSR_MODE_EL2t:
-+	case PSR_MODE_EL2h:
-+		reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
-+		bit = SCTLR_EL1_EE_MASK;
-+		break;
-+	default:
-+		die("What's that mode???\n");
-+	}
-+
- 	reg.addr = (u64)&sctlr;
- 	if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
--		die("KVM_GET_ONE_REG failed (SCTLR_EL1)");
-+		die("KVM_GET_ONE_REG failed (SCTLR_ELx)");
- 
--	if ((psr & PSR_MODE_MASK) == PSR_MODE_EL0t)
--		sctlr &= SCTLR_EL1_E0E_MASK;
--	else
--		sctlr &= SCTLR_EL1_EE_MASK;
--	return sctlr ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
-+	return (sctlr & bit) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
- }
- 
- void kvm_cpu__show_code(struct kvm_cpu *vcpu)
+> +#define SYS_HCR_EL2		3, 4, 1, 1, 0
+>  
+>  struct kvm_cpu {
+>  	pthread_t	thread;
+> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+> index 5e4f3a7..35e1c63 100644
+> --- a/arm64/kvm-cpu.c
+> +++ b/arm64/kvm-cpu.c
+> @@ -12,6 +12,7 @@
+>  
+>  #define SCTLR_EL1_E0E_MASK	(1 << 24)
+>  #define SCTLR_EL1_EE_MASK	(1 << 25)
+> +#define HCR_EL2_TGE		(1 << 27)
+>  
+>  static int debug_fd;
+>  
+> @@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  {
+>  	struct kvm_one_reg reg;
+>  	u64 psr;
+> -	u64 sctlr;
+> +	u64 sctlr, bit;
+> +	u64 hcr = 0;
+>  
+>  	/*
+>  	 * Quoting the definition given by Peter Maydell:
+> @@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	 * We first check for an AArch32 guest: its endianness can
+>  	 * change when using SETEND, which affects the CPSR.E bit.
+>  	 *
+> -	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+> -	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
+> +	 * If we're AArch64, determine which SCTLR register to use,
+> +	 * depending on NV being used or not. Then use either the E0E
+> +	 * bit for EL0, or the EE bit for EL1/EL2.
+>  	 */
+>  	reg.id = ARM64_CORE_REG(regs.pstate);
+>  	reg.addr = (u64)&psr;
+> @@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>  	if (psr & PSR_MODE32_BIT)
+>  		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+>  
+> -	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
+> +	if (vcpu->kvm->cfg.arch.nested_virt) {
+> +		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
+> +		reg.addr = (u64)&hcr;
+> +		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+> +			die("KVM_GET_ONE_REG failed (HCR_EL2)");
+> +	}
+> +
+> +	switch (psr & PSR_MODE_MASK) {
+> +	case PSR_MODE_EL0t:
+> +		if (hcr & HCR_EL2_TGE)
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
+> +		else
+> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
+> +		bit = SCTLR_EL1_E0E_MASK;
+> +		break;
+
+And this is also buggy, as I pointed out in my review of v5 -- I even
+provided a fix for it [1].
+
+	M.
+
+[1] https://lore.kernel.org/all/86jyx8b9l2.wl-maz@kernel.org/
+
 -- 
-2.47.3
-
+Without deviation from the norm, progress is not possible.
