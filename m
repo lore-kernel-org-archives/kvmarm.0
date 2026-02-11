@@ -1,135 +1,139 @@
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2D530BBA9
-	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 15:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770824626; cv=pass; b=V83J/1j1NdX7y4LEVIfHeOlirXAykqaC35s/b0V3FGGInr+DVxmlZc/RcIMWV6U6hZzKmOFxllj+2rL7Wzh0sbQXeulWr9n4v6WGDHAei0Z6nQITqe6OSEEP8lf7iZUbhL3b2dPkcDOquiaL7zBBXiTF1oo885u46FC17UuavIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770824626; c=relaxed/simple;
-	bh=SPvqBAtz64fVd5LeGOVthMVnAayvTVLJhC/f1e85Ey0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P7nt6ePbH/vIrZlKxEkP70JjYbfv88IprwLf0ZFYbLwkJOopVslE75zpJiRjpHZefpnivXRKLsenU6Fgy/RO0MDxa+3ohu1Yfz6keUnOI9bUC39h8fCmKNrvi9o3J2I8urMsVN1C9k/LCxRQDREg+6J21kgqWQED+6/hcLr19C8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TtLJg47E; arc=pass smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BFD332911
+	for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 16:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770825872; cv=none; b=jl9rhgAHifbk3ZPy76M4SGogK+OEgv3spUA1AzIdt28/eI6Yr2FfA+ieQ3b9xR8pw6E1F0bQQ7hbA6WxJbU7GN8uiAcrQrVT3LahFWwSuhtHk6esUcqtmwvICxMRKnCOraeu38CO7KRTpoG2y5PvQi8C0HLavO29xsapgMf+jSY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770825872; c=relaxed/simple;
+	bh=EUVf2wna+dYhtI7Ucp0MB7m/uxN4DU5He2QHJ0gJeQQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=lcM694wiOPEFMu0f6qFoX4fMJ7onY5Y1HOgOH9KP/Y5Tr6RQDTZkIQyTTjMKHEwzcBpGIHHuXdFFMQV8Lzgr6GDriB4+wKM+leRIpluqjUiHp1hOXS4mEPAQw9+nxM+vAWLusNUI8kZI+241oXIeLaWxAsTa3szevKw77ziSeo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FVQus8uq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TtLJg47E"
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-79628fb5c05so37450797b3.2
-        for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 07:43:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770824624; cv=none;
-        d=google.com; s=arc-20240605;
-        b=b9qrCC8SDVahiOuIOSOp0SSmgC/GYUYwhEUZd0AJiWjeBq2h/O/1LB1ebDdKCt+2Nn
-         y0zgT9srBuvzL0eqVIRTtOjLpTmFv04iA8ZiAhV3yGOzeILL5OSkAL1jmT2YyHXvwYjr
-         hXlAYGmWz176V8TDilxbtxXmuFkyyFpqNAhsyR7D6yCEnfDG05tSwCPH1xKsSTXQm7mf
-         4KA8c7+uGEdrniZg5dYgUeToq4HFf/4NsxNRwpd7uNH5DSzY2tSMLQsx8AnCoYe9r00N
-         va3AJdfosRGGeD021s4hQSAYZx1vDbGdccvF6E05d0lRRcD2JndJ3JvLqv+/zgKDFXtj
-         YqHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Cwx4TMtV0+2MBlJylAWyBlGUsmVcRjrhOwzbBX1NFZs=;
-        fh=QSvV0O28bK6+roTWEia5B0ofcXYAkpa7eqYmqQNE8SY=;
-        b=WwE5mJLj/MPbUkOTwYTLmzTARgLpc6n0uPrQ6YWdr1bbztTnPUDeHYYAu+ez0fiOnZ
-         9jiI97FVVExKk4eKDbiRHIocbimoquxCFoqIrdvWr523rmkciBNMhBnYTPAP5hqMA6rZ
-         pLq+dFXiiZX6A8H28RuLAbhdiiQu0IQTs8YsRoZeR2y7OxWAF1Q63SeDbC+b8ZPy3Cej
-         kT6u2tOGbbXchoK4ONKMiuRxZqmbnoSD7U9VZoExvyT04iDg9SqcN53rS2IcVUH4STRa
-         G+1mDb0SgCL5MYjLf/og6uEseMJBiMExIQ+UJqrpbxAzTzdvAYmFtQv14kVU+nWWLBLc
-         5lxg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770824624; x=1771429424; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cwx4TMtV0+2MBlJylAWyBlGUsmVcRjrhOwzbBX1NFZs=;
-        b=TtLJg47ET/tQnIgI6QzazWevBevc2ofRn27ROWh5NRWsF449Nwp9eZVtPc0oDwmuwe
-         8kMIuPx+cd8pf8SKCiVlUeGvTKBXlZ9n52DV+b1KASvGOpR/7WpZN0vXTv9djHL/Hcpb
-         ZmRPZuMIYLk2gqu2rBwVnN5ehwhSBmJ1zC+40snqhzD12e8GGy9ZTFkN/SGDiCVUxVxi
-         L+l5+SdSdfy64mkdccCiYAefTGnGplXEBHnlAeO3SI4oaW+dAkEpndESHNzNP/hgbYE7
-         00dlENVAMJZao3XKN1wYcxAKBVQcVpD4Kg4aXCiqNy+1l28rvBSDFFc8y2v87Vh832Ps
-         VXBQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FVQus8uq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1770825870;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5KpC7yaqnmPgfObvDWEmIArdNjIVjuTr6fFxuFr8Hdk=;
+	b=FVQus8uqgehpxXP2IYKnvBMGDF4XTCcAP8/TKS2qmaaNsAqxKjJys3OxMYn8GQfGduQ4wj
+	uDZn/u7SCVer1Ld4BOfHT5oAr4uVOgeQadZjULcrzblRFtcS45OdIaAcRX+xyANAw7a5ZM
+	qFH6Wl0Jn2UKWr1x/BEQXIv0BNoaGFU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-258-ms2Cv5mLO_KR7gwXGSaknw-1; Wed, 11 Feb 2026 11:04:29 -0500
+X-MC-Unique: ms2Cv5mLO_KR7gwXGSaknw-1
+X-Mimecast-MFC-AGG-ID: ms2Cv5mLO_KR7gwXGSaknw_1770825868
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47ee3dd7fc8so49595245e9.3
+        for <kvmarm@lists.linux.dev>; Wed, 11 Feb 2026 08:04:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770824624; x=1771429424;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cwx4TMtV0+2MBlJylAWyBlGUsmVcRjrhOwzbBX1NFZs=;
-        b=GSXfa53+f+G2Ciwvnds1bX6peNUdE5yoSf8NOSJeSP9DpLhKqT6rFOWdrUBV2BlX2W
-         YPnDJBekANnAIM7V/UA8dXlr7BcNsEUBQ0/uDOWe/UUU+BuZJLAtLRvu4Wt+Mp1uOpXf
-         VOQcfKCuJeiHiaWOBNft4Ov7/kAZ+NKqYsZXMoEJMmT3J0tJPVZQN5dJWcD4VKnx1Ou1
-         fMV5XxbX+5sCy1lCwavgyI65oCBLLbbgZd8j1N8Jo20LV0Pv/rx/I3ytdHL3JBJtJuxj
-         CIICDqDLa/1Z1LjFtkzW9nx1usDgxmZByKtz0nvYMX/4yx/vlTfQOUfQ9M40Fp7s5oAq
-         +a5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5nHFltPH/c+ztQAdPd21mpi6QRvZaJa8L9aRfso9HPkyVGKq3IANzkgCsGFKKMcO8whBDSAc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyLsQLBxHp4PubIg/mxQxUg9ElPRaRA1z5TEdkkmYrGo+oAfeId
-	2I4wIl+z95UHE96R6F1WnZepvi352x7oD8PLW07JPbuATk15OeChj2Ayd/BlM1pndzFvQpPZW11
-	TegkgGoT2ZKIgjfRp8P46BiiPI7yn3EjiORi8TcghGQ==
-X-Gm-Gg: AZuq6aKHgmnDvm9omP4Yzz0rA1dN8SIwrbn1i9uJcKm13ym3FR6C0QyJUUAFVquAeCH
-	R6OP7fxST6flIJ2gLvHAC83eAUuuZd69FZvRrtJp39MrTouwwAB4hNQUeJW576SphkH86gIdEjc
-	gkydo6uRZH8at5ld8S4+NAbYRpSKoZtw431cAJ+09FJKawUIMm5AIVyixUpaJNt7Jp7rA9sovjM
-	mJRBF8z8qnzFxuGi5oDqyAD2v8CJtFbgBS9BLLckVigbOSwKeDtq8/XM+JJcjVHyt/a29ksfQJe
-	OuYTg/rXVaWSOF6WDWXLGx3gc01Y/uCKm85V3S1PPcUtqEN0VUBrEZnJvwq7ekHl9Fg=
-X-Received: by 2002:a05:690c:6006:b0:796:2ee6:3f87 with SMTP id
- 00721157ae682-7965f08a3a8mr55352367b3.67.1770824624573; Wed, 11 Feb 2026
- 07:43:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1770825867; x=1771430667;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5KpC7yaqnmPgfObvDWEmIArdNjIVjuTr6fFxuFr8Hdk=;
+        b=aRFcwTmiRoEeT+OkRuaBBgsRmOmtQXx5jG8x6gA/tBOWQUlXFH/RsCrfDO7/K16OOC
+         SIw9mj3Y58D4RNxXwsS2bL2HPvlEOhQosrjvDwajadQ2PkMXguzZch5AWzk/uIOmb7PS
+         PLPAIiA1SUApzyr9ZQgSu2UnFCpGcLApARTFmUVme1wps+wkQcFFUqmi4ApUoyPpXn0V
+         gJOgU73d4gnbcRZOwbYpgVt+5Tv//SYTWe8xphzECcvbkPrz+WQSJdDH3RkBYha7CVyT
+         jEA2LiAF9MW43rubqYOmyqP+RqeQ1mJZ8kJJz/E85GTjuiuig1NCgA1L/wmjMW4Dz2Tu
+         SgLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQseHPOA3CkiToLKQeiNahTyy61O8h5o83F/dN698tyNE8lHcGVMXcU3QbUactbB5XLqJO/cw=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyFKdL+m7sQplGZrDsh56vngYiXmG0w4+2YVBr/kBc9isw6kXQN
+	jG0S7Q5Sy2RPoXCTqFF6BnPZqDVRCtiwS3uJcUtdOYRVjLq9oD7GcenY6ygo1EK52sHt/51PEQg
+	pHSSi7yi1HQ5MFMupkXIE2MdbKruc0lAdfWwdshJhbkSmNWRofY9I0NYM+psfiT3qKw==
+X-Gm-Gg: AZuq6aKiiizp3S3l9+t8pQWYtupm+vRkYqB4COlhVgFzEMxv4JmnRoQ42rq0VGJg3LT
+	sdt4O4/YpjC/biisdJ50Pnt0gkvhux4Piuf3LThocjpGLV4+U2ASc+cmBZ6tAx04gg2eeR4N9Gb
+	eUdmNMp/vUIc14KDqn/lBhsHLTeNuCgk96L6m+2TMRPFn20hwO71vgDsUNu3U+9gaC1eK7Q6U7Q
+	Bt/4aplnDqZjz995x8Krhoqw1Y3BGVhkYVmS55nEjow0oQ34PVxZ2FVR8HWyZqS5SWdAADAs1Gr
+	Kbb5JdD2eGcSp7CoAx/lQA/tczQ+jvfyjZ3GLjqJIangqzSAFwCCtpv+x6j5iJ6gVNCRJR2xM/w
+	06EQysRlbShUO0R361KfP9W5/BhvH0089/iG28r9KUcCdX6tYtLOPJto8GvtFTOhwe6tCagQ=
+X-Received: by 2002:a05:600c:46d0:b0:45d:f81d:eae7 with SMTP id 5b1f17b1804b1-4835b96ec32mr36898585e9.28.1770825867298;
+        Wed, 11 Feb 2026 08:04:27 -0800 (PST)
+X-Received: by 2002:a05:600c:46d0:b0:45d:f81d:eae7 with SMTP id 5b1f17b1804b1-4835b96ec32mr36897035e9.28.1770825865304;
+        Wed, 11 Feb 2026 08:04:25 -0800 (PST)
+Received: from rh (p200300f6af2d8700b4c2d356c3fafe63.dip0.t-ipconnect.de. [2003:f6:af2d:8700:b4c2:d356:c3fa:fe63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4835d92267bsm70932155e9.0.2026.02.11.08.04.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Feb 2026 08:04:24 -0800 (PST)
+Date: Wed, 11 Feb 2026 17:04:23 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
+    qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
+    kvmarm@lists.linux.dev
+Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu
+ property
+In-Reply-To: <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
+Message-ID: <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com>
+References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com> <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com> <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com>
+ <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com>
- <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com> <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com>
-In-Reply-To: <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 11 Feb 2026 15:43:32 +0000
-X-Gm-Features: AZwV_QhbMQtjgAAFsQMaNKMcmBgssEikN0rK-YFZ8G0l_cRA-hB9h8zVvJqu3SM
-Message-ID: <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu property
-To: Sebastian Ott <sebott@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, 
-	qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: 7FF1W0y17Ohlob7Nhegxl-Br4s-fHGIN0fCT9zE14xE_1770825868
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Wed, 11 Feb 2026 at 15:37, Sebastian Ott <sebott@redhat.com> wrote:
+On Wed, 11 Feb 2026, Peter Maydell wrote:
+> On Wed, 11 Feb 2026 at 15:37, Sebastian Ott <sebott@redhat.com> wrote:
+>>
+>> Hi Peter,
+>>
+>> On Fri, 6 Feb 2026, Peter Maydell wrote:
+>>> On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
 >
-> Hi Peter,
+>>>> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+>>>> +{
+>>>> +    ARMCPU *cpu = ARM_CPU(obj);
+>>>> +    const struct psci_version *ver;
+>>>> +
+>>>> +    for (ver = psci_versions; ver->number != -1; ver++) {
+>> [...]
+>>>> +        if (ver->number == cpu->psci_version)
+>>>> +            return g_strdup(ver->str);
+>>>> +    }
+>>>> +
+>>>> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
+>>>
+>>> Is this ever possible?
+>>
+>> Hm, not sure actually - what if there's a new kernel/qemu implementing
+>> psci version 1.4 and then you migrate to a qemu that doesn't know about
+>> 1.4?
 >
-> On Fri, 6 Feb 2026, Peter Maydell wrote:
-> > On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
-
-> >> +static char *kvm_get_psci_version(Object *obj, Error **errp)
-> >> +{
-> >> +    ARMCPU *cpu = ARM_CPU(obj);
-> >> +    const struct psci_version *ver;
-> >> +
-> >> +    for (ver = psci_versions; ver->number != -1; ver++) {
-> [...]
-> >> +        if (ver->number == cpu->psci_version)
-> >> +            return g_strdup(ver->str);
-> >> +    }
-> >> +
-> >> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
-> >
-> > Is this ever possible?
+> Oh, I see -- we're reporting back cpu->psci_version here, which
+> indeed could be the value set by KVM. I misread and assumed
+> this was just reading back the field that the setter sets,
+> which is kvm_prop_psci_version (and which I think will only
+> be set via the setter and so isn't ever a value the setter
+> doesn't know about).
 >
-> Hm, not sure actually - what if there's a new kernel/qemu implementing
-> psci version 1.4 and then you migrate to a qemu that doesn't know about
-> 1.4?
+> That does flag up a bug in this patch, though: if I set
+> a QOM property via the setter function and then read its
+> value via the getter function I ought to get back what
+> I just wrote.
+>
 
-Oh, I see -- we're reporting back cpu->psci_version here, which
-indeed could be the value set by KVM. I misread and assumed
-this was just reading back the field that the setter sets,
-which is kvm_prop_psci_version (and which I think will only
-be set via the setter and so isn't ever a value the setter
-doesn't know about).
+Meaning this should be something like below?
 
-That does flag up a bug in this patch, though: if I set
-a QOM property via the setter function and then read its
-value via the getter function I ought to get back what
-I just wrote.
+static char *kvm_get_psci_version(Object *obj, Error **errp)
+{
+     ARMCPU *cpu = ARM_CPU(obj);
 
-thanks
--- PMM
+     return g_strdup_printf("%d.%d",
+ 	(int) PSCI_VERSION_MAJOR(cpu->kvm_prop_psci_version),
+ 	(int) PSCI_VERSION_MINOR(cpu->kvm_prop_psci_version));
+}
+
