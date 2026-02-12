@@ -1,252 +1,361 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50927344D88
-	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 16:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770913357; cv=fail; b=lx0l3PKr7q++sPbnzfKixpQWifJhsO4ehOHvzIpZD2D8A3H5yEVb1jh+uM6XcqGV98oPGHcr2ZS2+DCKfY+hxQ/lI2HnCIlWwseAcnfg2/LB0iM+hic6/tnnn09odUtO6wQgB4snCXG3HDIHsMEg7yYEvb3AkgKsFXrx96N2sds=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770913357; c=relaxed/simple;
-	bh=+mf02zxbu6y1a1empjXlu0r+u+P5DmDD9N8ET/6sSyM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=I3j18sWwtnt9ZrNxTsDRqnOga6syi2lxEY+qOMxvVgH93sE9FTF27VkqTQUg1aq1WCNijYWsxCk4HNr5yTLcwl8RRG9mHOp5qdHKrlbeWx0z/5K92PKLgIKJkGBTXBsDPz7DXX65uhmY5RZBHro4V8go7xAL4ASXcFqC5Mp5t80=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xa3HiMKF; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xa3HiMKF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1770913355; x=1802449355;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+mf02zxbu6y1a1empjXlu0r+u+P5DmDD9N8ET/6sSyM=;
-  b=Xa3HiMKFIjz2QHhlZwAveLGFVTUHPVpuNVETgc+4A5iaYPykRYJzpjtQ
-   nH7GuXA2xxMu+K8lz9wvv+Udimsj1qYkC4A5BfhNPUCbJaMuUStbQKEv2
-   RPz4qOfJapJlfLaR0R57l6vdV5njFKo1qPunuZXbbZAqdQiTTTQ67tVVo
-   LVD8e0u149w5+8OEojpSN38fOG5NYvwx+5EwPBWD4YKSbZnzHTFccTHKQ
-   HS4Oig8I/W6zR3Jcg/oHQ+gpRg4P9iNsHow2JuSGFF6TMMur7+qs9YbkG
-   OsyhpYxVVWeWEbu0Mb1DyhDfTaxE4ZEWYgWG8AgYdyqSrQ+J+CFghIabN
-   Q==;
-X-CSE-ConnectionGUID: 1C7PJSHGRT67y4YM4dzTBg==
-X-CSE-MsgGUID: +qCXVzpvRG++8hXMuT8C/g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11699"; a="71990701"
-X-IronPort-AV: E=Sophos;i="6.21,287,1763452800"; 
-   d="scan'208";a="71990701"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 08:22:34 -0800
-X-CSE-ConnectionGUID: 4W3UUazvQi+DKsZ3r9AJTg==
-X-CSE-MsgGUID: KK6sPY5GTkOII+fPN84NLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,287,1763452800"; 
-   d="scan'208";a="212132018"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Feb 2026 08:22:34 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Thu, 12 Feb 2026 08:22:33 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35 via Frontend Transport; Thu, 12 Feb 2026 08:22:33 -0800
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.22) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.35; Thu, 12 Feb 2026 08:22:33 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gmB4Nzcvld5BhA/a1YTasPscmEhCpmxbg0Lbz2WKBjfN2irP/MR+exc9Lny1fPw9QLyuTrTjVrcjcDVH1P1Xk0jmhVzSEHeUjsaEpAMMRe0wnlFcl6RcbtUbCXxX39wqkTwDHwkebeaqQnBFY36bSXKkkVzsHP3jDp5FE7rliDQWP4H3eQ/BdohvXOyyzhzj6w9Q4GzHwXfqgMrRCloBvazchnTV8Yy5H74fQFuJ5n5C9GxN5hRzFzDJPoOqMuZpb3KmyAzMky/FMYcJk+8pxccUvCZI8Cn84f7GEzyqVz80RftV2pMU7iGLHQybx7ilX/HCz81GoMT1K6uVnHWCeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/c11k+A3tuJZAFlWKLVomwyjCyfOG1GWWUK0JvgYF0A=;
- b=lNhL9fVBMkYHcOFeCPte3Z3dkjLiFgIHwxq4L6zFjpVnork78FK1DS7Tm3AsLqFqoJSTpeOPtzBNq+AQ/ITP9c5a/dGN10ZtP9d8QFZtt0V5PUv9nFs8hMFUlm5oEsAhP0rjgk7qffv9YEXsRPc9+F5P3XBzYs0QU2Eogc2PaUzk66wHIAKfFoWxWaayUlb+vMYI29zawVVBMpwPbi8UiUa5/ye9SuU1QW+Xwlu9liqtfn0akCdfxadNL0yCzuJW7/IaoHeS9MGbjks4rkwDLHpTmjEd414StST4bORpsnxccLQVINBgv4sphoocB+9ONi4Qa5P9dvMubThhd+5HIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
- by IA0PR11MB7378.namprd11.prod.outlook.com (2603:10b6:208:432::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9611.10; Thu, 12 Feb
- 2026 16:22:31 +0000
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::bfe:4ce1:556:4a9d]) by SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::bfe:4ce1:556:4a9d%6]) with mapi id 15.20.9587.017; Thu, 12 Feb 2026
- 16:22:31 +0000
-Message-ID: <6cc8f43c-33fa-4ab8-a107-5dc7ddb88b45@intel.com>
-Date: Thu, 12 Feb 2026 08:22:27 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 15/41] arm_mpam: resctrl: Pick the caches we will use
- as resctrl resources
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <rohit.mathew@arm.com>,
-	<scott@os.amperecomputing.com>, <sdonthineni@nvidia.com>,
-	<tan.shaopeng@fujitsu.com>, <xhao@linux.alibaba.com>,
-	<catalin.marinas@arm.com>, <will@kernel.org>, <corbet@lwn.net>,
-	<maz@kernel.org>, <oupton@kernel.org>, <joey.gouly@arm.com>,
-	<suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>, <zengheng4@huawei.com>,
-	<linux-doc@vger.kernel.org>, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-16-ben.horgan@arm.com>
- <c8d53e59-5661-4ac2-bc8f-0661cde59967@intel.com>
- <aYxieS3Pycm5UthH@e134344.arm.com>
-Content-Language: en-US
-From: Reinette Chatre <reinette.chatre@intel.com>
-In-Reply-To: <aYxieS3Pycm5UthH@e134344.arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0110.namprd04.prod.outlook.com
- (2603:10b6:303:83::25) To SJ2PR11MB7573.namprd11.prod.outlook.com
- (2603:10b6:a03:4d2::10)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5921C68F
+	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 17:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770916739; cv=none; b=XLLdxeRx/jOVJfiTQWRQxcqRERuBKnTTiX7k7xEJf/rr+GxLn+bYQR/NAJZzsV38iQr1iS581HekSiwfenbgpbmNNJ+c+lV/Li9KrbQZPNnemrQ5/Jewd+bI5hd8uF8BQZ5IK+ugIo+TyOHJSCE8D+xA5dnC2b6mi86AeXpJ8bU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770916739; c=relaxed/simple;
+	bh=6NFz5MJLpn+E0ga7z4VuziT4KbfjF1VQUXoBWlhwGnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=agBPE9Xjn9HTehYmGGyP+R3ymW22WGBy2HM+KlDxO9wm/yIRydU8xZd5NuYKevIQ5CDdnhtHodvuaGgtn8ERxX03QCp6LxDAMB3tL1AW6e7wtTC5l6iEugz4ZiJAkTGqfx9c3Y4Gy9aWIz2jxt67Modb22XUsWlEZ5r0M4ROkuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B0D71339;
+	Thu, 12 Feb 2026 09:18:45 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 484063F632;
+	Thu, 12 Feb 2026 09:18:47 -0800 (PST)
+Date: Thu, 12 Feb 2026 17:18:42 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v2 24/35] KVM: arm64: Introduce hypercall to force
+ reclaim of a protected page
+Message-ID: <aY4LchRsyTvjIBVb@raptor>
+References: <20260119124629.2563-1-will@kernel.org>
+ <20260119124629.2563-25-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|IA0PR11MB7378:EE_
-X-MS-Office365-Filtering-Correlation-Id: f450e1dd-c70c-4e82-fc9e-08de6a52ebd2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?V1FUQ25RSFNVNkZTcEhuNzZlKzNjV1M4ZytsbDhIQkF0bGlRTXJVSm9qcWhM?=
- =?utf-8?B?UVFCSkhDdXJNS0hqV0ttOFJBdDNBeTNaelRLeHcrMXhzSTQ3MTZzak05dzFu?=
- =?utf-8?B?cVNQc3lsTktMeEw0bVhteGVBT1gzTGdDWWs5TXJ6T293TjhLVjVWa0tZKzg0?=
- =?utf-8?B?THlIZk1XeUltMkhhYkg4T1ZnSHRPOHBvQ2pKSzAvQWQ3Tm9JbjhyVUhiK0FI?=
- =?utf-8?B?K3dpOXVkekdUcStQcmtNcDdyQSt6WFk4ZUxyWmR4aWk2NlFvYWZaOVBPaTF0?=
- =?utf-8?B?VnFXRkRxcTlWZTdocWora3FrZ2YrR1dvM3NVSzlCUXFWcnhvQzlzcDhuQVN6?=
- =?utf-8?B?ZGVkQjFzTDFRZnVDMllYRjRVZXA1OGVSMlBjSE5MMXk1anZqZnBacGdTKzg0?=
- =?utf-8?B?ZURIK2ZIL0c1NEJ4dkxnTXpKQm05MGV1YnBQdFNNcHR0M1cvTEZXcXBGcUlP?=
- =?utf-8?B?eFVVOUNHUjB1ZE4ycFlDeVprWHM1Q2pSbklYUDRiNW9kK1ZLY1R0SG9XcEtR?=
- =?utf-8?B?YlR1RmVEVzMwbnlsZHdQaDY2azEyZzBaejYrajgyNHFwcGFwQlp4QjZJcXpR?=
- =?utf-8?B?SUNXZlRFSGZqcXNFcVBXNkZCUVRWbEZ6Z25yNWFjSm1ERCtJazRpd2VPYXNo?=
- =?utf-8?B?b2hXVmlEWnVTOEtYczRpOVBXNU9vaWpDc0pzb2pCdVhLYWREaEVwaHZLSDdS?=
- =?utf-8?B?TzB5WkZ3VUhXODhRdTJxVzd6YjlzTFBqTzhuaGlOSGZxSVBldUgrUU9idkdF?=
- =?utf-8?B?ODF2blpCMFI2RGVVYlBZcmJiS3hmMElWRVNPaUdPemR0dlYzOGxDSjJTS1VJ?=
- =?utf-8?B?dkxUbGFDeG1WMGN2Mk1ibC9hV1F3RFlCZERSKzBtMzByODlUUHM4bjNmYkFx?=
- =?utf-8?B?Rm5VWWVPQUlCQkdETG91ZllCOEl4anFPTEFaWWdpR0Jwa2JvTU4xa0VnK1Uy?=
- =?utf-8?B?dHkxOEtkWVVKNnplRjZFVVFLVDUwQWdJazVneTNUNERhSHp6NktGY2RUREpw?=
- =?utf-8?B?OGlmY1FpUnFsd2dEVTI3ZCtJTEduNm1hN0c4RnR3ei9SUER0OUNWTGxQTDRI?=
- =?utf-8?B?TzRhRUx6VUgwYzN4Nkg2cEdDeGlyYlJ4dFJlVkRMdU5sSGhQN092Q3ZrczlM?=
- =?utf-8?B?ODdJRytmWnM5VWxQb1g1aGIrY1NRK01qVUZiZDdEN0ZkVGhkcXhEeDZsWVc0?=
- =?utf-8?B?TVhLN0ZmRmtHcjJ5N0ZZdC9WVkk3OTNoTTdLc3lFeDhXUjB4bjgzcDRqUjY4?=
- =?utf-8?B?TUdURTNLT2JYS3pOeWJSMjhvdmowOXFWRHNZOFhuL0tKRUpNM3BOMFlaOHNn?=
- =?utf-8?B?ZG83eTE1bUZjczB2QXdObnZUcnBjUnd0cy9ONXhhMFY0TXhybmtmcFJ2NFcz?=
- =?utf-8?B?cDZUK2k1dGhJZGlqY0ZwSXpWMHNFSXl5SU13cGtqWk92QkoxUEZOWlFNMkg0?=
- =?utf-8?B?NTdaMzA4dklPMXFtdEcwT2hkK0dpK2ljeW91czZIN0xpZEJ1L1Rsd2xJRFY5?=
- =?utf-8?B?MmRXb0NoRlJHZTlPSy9KR0h2WkxTS3orTHd6Mi9pT3dMNEIxeTh5UG16UFhz?=
- =?utf-8?B?S284dk05TWg5WFl1TzdjQ3FtVWlpMGtzSGg1YWllb0tmQlExRkJxelFNRnc2?=
- =?utf-8?B?d1VMcTR6NkNHdFlRbUpFbG5tWHFXUm44TVlKUjFKZGRyOWJFQlpoTmdJU2o3?=
- =?utf-8?B?aWpRdzZreEFWcStWSDdtSjRYKzI5Y3lDY1NYM015REowYzNVWGgvSHBhcGto?=
- =?utf-8?B?Z1ozbTByWGVkNm9VTUNKMFFTeURGQnluK2szZlR2SFNXMGxwb0ZmRGZIZUpp?=
- =?utf-8?B?dFZMSjBtdjdHUTB2eUlQNzJpZ0hReEJTczhvbmNiYTlUK2pNeGc1N0FuQ1Zh?=
- =?utf-8?B?RnYyNzZyeFB6WVd2MnRMVXpyMERacVhIanBDMEtuQ3A4dmdEc3VocVJUVURB?=
- =?utf-8?B?bThZbHd1VDYzYTcrNTl5V1YwSmJrdW1Pb2RiNmEwK2pmdzZTdkI2alNpN2R5?=
- =?utf-8?B?bFZPNmtGNElYVndUWXBsSzdaS2NCRE5NZXFDazVvZElBOUVuRFhCeXF0MWh4?=
- =?utf-8?B?NFE3VWo0RFJyT3dwZnhRLzUveC9VSy8ycmpuRTRUVmpNTHovZHBjZWdYcG12?=
- =?utf-8?Q?VvNE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aFBnVzd4Y3oyTnExNm15WmZieXdVYWFCMjFhTGZ1S2s1dmIxMTI4SjdLTUN5?=
- =?utf-8?B?OXdnS1ZHM2E3azlXbkx5VXNmVUJ4aE91ZXZSUzExeGp1SXVDQ2FTTmlMa2hj?=
- =?utf-8?B?SVI0bCtXWTdiTkRTSnpKNEcvVlU4RGRGa3ZQY2NFaDFXMHZJQis4NmZ0blVi?=
- =?utf-8?B?cmgwWVlOMzk2Vnc3bTIzVWluYkFaakRoK1ZpZTJDdlBoS2FMYXdQY21OMHZQ?=
- =?utf-8?B?WERaNWdJelN4N2ZpOE80QUhhUzZMa1ZvazlTRmcvOFovbVdIRzZaRHZZaTdQ?=
- =?utf-8?B?WHlJODNFR0RkckFRK3dRY0NXR0ZuRUNBbENLZnFpajR4aFk3elVvM0hUaXJX?=
- =?utf-8?B?Y0hNTkhOa211cllhMFFuYmh2Zm5jSEVOVTB5OS8vSXMzRkg4UncvR0NvZFVz?=
- =?utf-8?B?MHJLM0VjWjVpTjZnb2NEOEllSyszQ0YwODZJU1RZZ0YwYlFBbGtIUWZNY2VB?=
- =?utf-8?B?NnJDeHlMWU1OVWMva2Y5RmRGZlFqWHVDbmtMMm9CWmRSNlhZcitsazljTGt0?=
- =?utf-8?B?TzVlaFFKc0pDOHFCT2hMMjRJWm0xMHRVb1VjTFp2cTUxNlkrUmc3ejRQS1Np?=
- =?utf-8?B?K1p2ZyttZXFvL093QXJwT29KMlYwRXpobmEzOUhBNnY3ZVRXdUpubGozK2RS?=
- =?utf-8?B?ZWx3YkVwRVVQdnR2b3Y4aFl4ZVM5dWVvbWN5SkxVdndBUGlnUlFlaHB2bE9W?=
- =?utf-8?B?eC9lRStKOU9CSitWdFdpbUtkYWhSQnJROEtZQWN1dG0xU29WbFFyOWprRDhw?=
- =?utf-8?B?L2M0L3RaVU4xVEEwb0ZUMSs3L3FEdTBoV3lDN3VMMXdxZTF1bEpLRDc0OGxR?=
- =?utf-8?B?bnk5Ny9xSjIxd3JXNm94Y2phZERvc0FXcmx2Ymg5Y3hNR1pvNVg0YnFRN0tJ?=
- =?utf-8?B?TnZGSEgxTHN1TlNRQ1BTMG9tK04wWEdqbTNsYUhpbS9ETFAwdFFDTGsrbTIv?=
- =?utf-8?B?c3JrZmFkeURtVllYbmIvZFI4SHo3Z2tFdHdCSGh6NWVCOG83UUpFL1R3OEdw?=
- =?utf-8?B?dkZZTzZzNWZIMFRjR3hyMzVRQVY2NlhlRkxjMW1rTnlzWnh5b1dNLzdqWVlm?=
- =?utf-8?B?d29ucExKNkhPQyswUytiU2M5UWJXaVN0ZFh4RTd6dEhpRmhHQWlxN0JzMDhE?=
- =?utf-8?B?NiszZ3B0SlIxOGpsRnNqdmVuMUNncS83N0ZlVkFtV2JUbm40aExJZVhoOGZy?=
- =?utf-8?B?dE50TDU4T1MvaFVIUWhaTUlHNk9kaUxmZUd5aEpVYVhRMmVZbjVUa0I4bDdj?=
- =?utf-8?B?VXJ0OVMyN0ZydDArZzhhUHYrNHNUQWtkZGUvZ1MxMmJ6Qi81ZXB4WHNCUDkr?=
- =?utf-8?B?ZVgxNGVxVU1XcTZ4emRtZWdFbXNNQWM2UU1Rc0lEUTJxU3pZNWc3V3FXelFM?=
- =?utf-8?B?ZVZxU2ZoQ3RkSWRleGRVMm1pc081MUdHc0dmelRkQk1zdkNYV1Z3RFJhYlNq?=
- =?utf-8?B?Y0JPWjVWOGcyOWtoYkVCblpZMnBzQlFWaGJwdFB2b01XQ1p0azkybVY0V01Z?=
- =?utf-8?B?RThCdjd0RGVKZ1VYSTBWdk5OdnZpQUcwcDdubEZVS1B5UmxPTU1YQ0NYNTJi?=
- =?utf-8?B?QjQrTWc3TVpYNlRBM1diZVpydG1sS1N0NEtKOFFjck5XdlpZVGVFblNNeWFE?=
- =?utf-8?B?V0ZFU1F4eHlKdXljeEhmcWw3THdXZEtJd0ZpUTBLS3dsNG9MMnAwUGh4b0VQ?=
- =?utf-8?B?L2hIZ0ZtWnhVSTJFNmRxRkdFMFdMRDdNTU1PZHlLYWNRdG40cnRzZm5WaENC?=
- =?utf-8?B?ZXBSVFlxbkFWUi9xcVNrZ3JobU9hWGZLN3h6Q21udDNhNzYyc2JkWi9XdWty?=
- =?utf-8?B?VFhRcHF2ejZWcm1iZVNCQWhidktHUTRWNGxSM0xhMmk1WTloaDdNTEFKU0J4?=
- =?utf-8?B?UmNjL1ZBdVk2dzBzeXhQSHYwNmFETGJXWU1CWWlhNVNSeFVpWUZ3YmU2Q1dQ?=
- =?utf-8?B?Uy9YV2ZjM1NrRU0rU240MzN6RU81T3NNRWJockkrUnVQMGoycFFHM0NTYmF1?=
- =?utf-8?B?TDU1aEw4a2ozdllrRVRhV2dqenIxQlllK0dDSnVaQVlEanBxVkRBZ2NXWVVG?=
- =?utf-8?B?SVZzVG82anM2cnFXRWlLc1Z0cUxyb3RtN2pNSVY2VnloNElVekxhV3lEOFFo?=
- =?utf-8?B?N3NDRVRKS1JyVFZjZVZCclFtMkl4SGJCaXNnTHRJcFlPdFJjMnZjNWh3MUhM?=
- =?utf-8?B?aURIQk9WK1RXSzRvQk56RDNEbU5MQ285azFCVDY3VWRoVlJibVZ1QmovWFdu?=
- =?utf-8?B?cFdJZjQvcmE4YjNTR3JBVGVORmZ0V1hXU295bmM1bnpEcEJ2K1FYcUxDZGlQ?=
- =?utf-8?B?T0tzN0VYR1BSeEJlaEhVZk5VaGtvNmtOR1NIRmp2VjJqMVllK3ZCT2tScXov?=
- =?utf-8?Q?JuJUv6qAOvCe9me4=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f450e1dd-c70c-4e82-fc9e-08de6a52ebd2
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2026 16:22:31.2532
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ajwmBM37/SNj+R45XN7i8ghZGnXp0roChaqtn7UGhvmgktDR4n5t1qW1wbX8hom4Iagl5KB5cVqPX/XIAVs1QKZiZOeUh48HwG5GRHC9f9U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7378
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260119124629.2563-25-will@kernel.org>
 
-Hi Ben,
+Hi Will,
 
-On 2/11/26 3:05 AM, Ben Horgan wrote:
-> Hi Reinette,
+On Mon, Jan 19, 2026 at 12:46:17PM +0000, Will Deacon wrote:
+> Introduce a new hypercall, __pkvm_force_reclaim_guest_page(), to allow
+> the host to forcefully reclaim a physical page that was previous donated
+> to a protected guest. This results in the page being zeroed and the
+> previous guest mapping being poisoned so that new pages cannot be
+> subsequently donated at the same IPA.
 > 
-> On Tue, Feb 10, 2026 at 03:39:51PM -0800, Reinette Chatre wrote:
->> Hi Ben,
->>
->> On 2/3/26 1:43 PM, Ben Horgan wrote:
->> ...
->>> +
->>>  static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
->>>  {
->>> -	/* TODO: initialise the resctrl resources */
->>> +	struct mpam_class *class = res->class;
->>> +	struct rdt_resource *r = &res->resctrl_res;
->>> +
->>> +	switch (r->rid) {
->>> +	case RDT_RESOURCE_L2:
->>> +	case RDT_RESOURCE_L3:
->>> +		r->alloc_capable = true;
->>> +		r->schema_fmt = RESCTRL_SCHEMA_BITMAP;
->>> +		r->cache.arch_has_sparse_bitmasks = true;
->>> +
->>> +		r->cache.cbm_len = class->props.cpbm_wd;
->>> +		/* mpam_devices will reject empty bitmaps */
->>> +		r->cache.min_cbm_bits = 1;
->>> +
->>> +		if (r->rid == RDT_RESOURCE_L2) {
->>> +			r->name = "L2";
->>
->> This code is fine but highlights that resctrl fs should not let the
->> arch need to do this since this name is used as part of user interface.
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h              |   1 +
+>  arch/arm64/include/asm/kvm_pgtable.h          |   6 +
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   1 +
+>  arch/arm64/kvm/hyp/include/nvhe/memory.h      |   6 +
+>  arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |   1 +
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   8 ++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 127 +++++++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/pkvm.c                |   4 +-
+>  8 files changed, 152 insertions(+), 2 deletions(-)
 > 
-> Yes, not ideal but I don't think it's urgent to tidy this up.
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 2e7e8e7771f6..39e4e588ca4f 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -90,6 +90,7 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
+> +	__KVM_HOST_SMCCC_FUNC___pkvm_force_reclaim_guest_page,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_finalize_teardown_vm,
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index eb2a6258d83d..4c069f875a85 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -114,6 +114,12 @@ enum kvm_invalid_pte_type {
+>  	 * ownership.
+>  	 */
+>  	KVM_HOST_INVALID_PTE_TYPE_DONATION,
+> +
+> +	/*
+> +	 * The page has been forcefully reclaimed from the guest by the
+> +	 * host.
+> +	 */
+> +	KVM_GUEST_INVALID_PTE_TYPE_POISONED,
+>  };
+>  
+>  static inline bool kvm_pte_valid(kvm_pte_t pte)
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index cde38a556049..f27b037abaf3 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
+>  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
+> +int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
+>  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
+>  int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
+>  			    enum kvm_pgtable_prot prot);
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> index dee1a406b0c2..4cedb720c75d 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+> @@ -30,6 +30,12 @@ enum pkvm_page_state {
+>  	 * struct hyp_page.
+>  	 */
+>  	PKVM_NOPAGE			= BIT(0) | BIT(1),
+> +
+> +	/*
+> +	 * 'Meta-states' which aren't encoded directly in the PTE's SW bits (or
+> +	 * the hyp_vmemmap entry for the host)
+> +	 */
+> +	PKVM_POISON			= BIT(2),
+>  };
+>  #define PKVM_PAGE_STATE_MASK		(BIT(0) | BIT(1))
 
-I agree. This code is fine. I just shared an observation.
+Looks a bit awkward to me, having the page state encoded using 3 bits, but the
+mask only 2 bits.
 
-Reinette
+Thanks,
+Alex
 
+>  
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> index 506831804f64..a5a7bb453f3e 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+> @@ -78,6 +78,7 @@ int __pkvm_reclaim_dying_guest_page(pkvm_handle_t handle, u64 gfn);
+>  int __pkvm_start_teardown_vm(pkvm_handle_t handle);
+>  int __pkvm_finalize_teardown_vm(pkvm_handle_t handle);
+>  
+> +struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle);
+>  struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
+>  					 unsigned int vcpu_idx);
+>  void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> index f43c50ae2d81..e68b5d24bdad 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> @@ -570,6 +570,13 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
+>  	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
+>  }
+>  
+> +static void handle___pkvm_force_reclaim_guest_page(struct kvm_cpu_context *host_ctxt)
+> +{
+> +	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+> +
+> +	cpu_reg(host_ctxt, 1) = __pkvm_host_force_reclaim_page_guest(phys);
+> +}
+> +
+>  static void handle___pkvm_reclaim_dying_guest_page(struct kvm_cpu_context *host_ctxt)
+>  {
+>  	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
+> @@ -631,6 +638,7 @@ static const hcall_t host_hcall[] = {
+>  	HANDLE_FUNC(__pkvm_unreserve_vm),
+>  	HANDLE_FUNC(__pkvm_init_vm),
+>  	HANDLE_FUNC(__pkvm_init_vcpu),
+> +	HANDLE_FUNC(__pkvm_force_reclaim_guest_page),
+>  	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
+>  	HANDLE_FUNC(__pkvm_start_teardown_vm),
+>  	HANDLE_FUNC(__pkvm_finalize_teardown_vm),
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index f4638fe9d77a..49b309b8d7d2 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -613,6 +613,35 @@ static u64 host_stage2_encode_gfn_meta(struct pkvm_hyp_vm *vm, u64 gfn)
+>  	       FIELD_PREP(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, gfn);
+>  }
+>  
+> +static int host_stage2_decode_gfn_meta(kvm_pte_t pte, struct pkvm_hyp_vm **vm,
+> +				       u64 *gfn)
+> +{
+> +	pkvm_handle_t handle;
+> +	u64 meta;
+> +
+> +	if (WARN_ON(kvm_pte_valid(pte)))
+> +		return -EINVAL;
+> +
+> +	if (FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) !=
+> +	    KVM_HOST_INVALID_PTE_TYPE_DONATION) {
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (FIELD_GET(KVM_HOST_DONATION_PTE_OWNER_MASK, pte) != PKVM_ID_GUEST)
+> +		return -EPERM;
+> +
+> +	meta = FIELD_GET(KVM_HOST_DONATION_PTE_EXTRA_MASK, pte);
+> +	handle = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_HANDLE_MASK, meta);
+> +	*vm = get_vm_by_handle(handle);
+> +	if (!*vm) {
+> +		/* We probably raced with teardown; try again */
+> +		return -EAGAIN;
+> +	}
+> +
+> +	*gfn = FIELD_GET(KVM_HOST_PTE_OWNER_GUEST_GFN_MASK, meta);
+> +	return 0;
+> +}
+> +
+>  static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot prot)
+>  {
+>  	/*
+> @@ -809,8 +838,20 @@ static int __hyp_check_page_state_range(phys_addr_t phys, u64 size, enum pkvm_pa
+>  	return 0;
+>  }
+>  
+> +static bool guest_pte_is_poisoned(kvm_pte_t pte)
+> +{
+> +	if (kvm_pte_valid(pte))
+> +		return false;
+> +
+> +	return FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) ==
+> +	       KVM_GUEST_INVALID_PTE_TYPE_POISONED;
+> +}
+> +
+>  static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte, u64 addr)
+>  {
+> +	if (guest_pte_is_poisoned(pte))
+> +		return PKVM_POISON;
+> +
+>  	if (!kvm_pte_valid(pte))
+>  		return PKVM_NOPAGE;
+>  
+> @@ -839,6 +880,8 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
+>  	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
+>  	if (ret)
+>  		return ret;
+> +	if (guest_pte_is_poisoned(pte))
+> +		return -EHWPOISON;
+>  	if (!kvm_pte_valid(pte))
+>  		return -ENOENT;
+>  	if (level != KVM_PGTABLE_LAST_LEVEL)
+> @@ -1104,6 +1147,84 @@ static void hyp_poison_page(phys_addr_t phys)
+>  	hyp_fixmap_unmap();
+>  }
+>  
+> +static int host_stage2_get_guest_info(phys_addr_t phys, struct pkvm_hyp_vm **vm,
+> +				      u64 *gfn)
+> +{
+> +	enum pkvm_page_state state;
+> +	kvm_pte_t pte;
+> +	s8 level;
+> +	int ret;
+> +
+> +	if (!addr_is_memory(phys))
+> +		return -EFAULT;
+> +
+> +	state = get_host_state(hyp_phys_to_page(phys));
+> +	switch (state) {
+> +	case PKVM_PAGE_OWNED:
+> +	case PKVM_PAGE_SHARED_OWNED:
+> +	case PKVM_PAGE_SHARED_BORROWED:
+> +		/* The access should no longer fault; try again. */
+> +		return -EAGAIN;
+> +	case PKVM_NOPAGE:
+> +		break;
+> +	default:
+> +		return -EPERM;
+> +	}
+> +
+> +	ret = kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, &level);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (WARN_ON(level != KVM_PGTABLE_LAST_LEVEL))
+> +		return -EINVAL;
+> +
+> +	return host_stage2_decode_gfn_meta(pte, vm, gfn);
+> +}
+> +
+> +int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys)
+> +{
+> +	struct pkvm_hyp_vm *vm;
+> +	u64 gfn, ipa, pa;
+> +	kvm_pte_t pte;
+> +	int ret;
+> +
+> +	hyp_spin_lock(&vm_table_lock);
+> +	host_lock_component();
+> +
+> +	ret = host_stage2_get_guest_info(phys, &vm, &gfn);
+> +	if (ret)
+> +		goto unlock_host;
+> +
+> +	ipa = hyp_pfn_to_phys(gfn);
+> +	guest_lock_component(vm);
+> +	ret = get_valid_guest_pte(vm, ipa, &pte, &pa);
+> +	if (ret)
+> +		goto unlock_guest;
+> +
+> +	WARN_ON(pa != phys);
+> +	if (guest_get_page_state(pte, ipa) != PKVM_PAGE_OWNED) {
+> +		ret = -EPERM;
+> +		goto unlock_guest;
+> +	}
+> +
+> +	/* We really shouldn't be allocating, so don't pass a memcache */
+> +	ret = kvm_pgtable_stage2_annotate(&vm->pgt, ipa, PAGE_SIZE, NULL,
+> +					  KVM_GUEST_INVALID_PTE_TYPE_POISONED,
+> +					  0);
+> +	if (ret)
+> +		goto unlock_guest;
+> +
+> +	hyp_poison_page(phys);
+> +	WARN_ON(host_stage2_set_owner_locked(phys, PAGE_SIZE, PKVM_ID_HOST));
+> +unlock_guest:
+> +	guest_unlock_component(vm);
+> +unlock_host:
+> +	host_unlock_component();
+> +	hyp_spin_unlock(&vm_table_lock);
+> +
+> +	return ret;
+> +}
+> +
+>  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
+>  {
+>  	u64 ipa = hyp_pfn_to_phys(gfn);
+> @@ -1138,7 +1259,11 @@ int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm)
+>  	guest_unlock_component(vm);
+>  	host_unlock_component();
+>  
+> -	return ret;
+> +	/*
+> +	 * -EHWPOISON implies that the page was forcefully reclaimed already
+> +	 * so return success for the GUP pin to be dropped.
+> +	 */
+> +	return ret && ret != -EHWPOISON ? ret : 0;
+>  }
+>  
+>  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> index c5772417372d..2836c68c1ea5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+> @@ -231,10 +231,12 @@ void pkvm_hyp_vm_table_init(void *tbl)
+>  /*
+>   * Return the hyp vm structure corresponding to the handle.
+>   */
+> -static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
+> +struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
+>  {
+>  	unsigned int idx = vm_handle_to_idx(handle);
+>  
+> +	hyp_assert_lock_held(&vm_table_lock);
+> +
+>  	if (unlikely(idx >= KVM_MAX_PVMS))
+>  		return NULL;
+>  
+> -- 
+> 2.52.0.457.g6b5491de43-goog
+> 
+> 
