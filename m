@@ -1,148 +1,233 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062E93382F7
-	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 14:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9420318BA2;
+	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770907915; cv=none; b=QX3JZqBvmA6LvAbihIn7JWeJQvlqZgLYH0pVTKTS/jJ/Srz0rMK9SnEnhgAg1AxxrWtz/MwJ+OTCJ/oTii21uq4Fnsj0NdVpH/IYMwE7vDiHbsFhjsnwimWOlSJ6CffuQa76TZzpUczlfiyYrC++ANxS02Y/1hpZvnn3A96Z5+U=
+	t=1770910547; cv=none; b=coH2RFAY+4OaYC+K/636ZsDj4sJG+/f3qPzP8uCqbUh9LgkTpoja7AmHprrhwkaEy4OdWlS3klVPUGAMUosJkz8JFLf7evOOtH9vZHJWG23filXxMvDN6GytsO2mwnFRy0bbc3HEpoQV+n5mbEZ4JgdiumwRqY6zXMnDzM7PZOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770907915; c=relaxed/simple;
-	bh=QvzRlTURbKV/PMDuxEaFKXVCxoUomuiSOFAYKRMnIrs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gUQKCRdhKnOXcjlSblbJS0WOJZaDRPCI41u27spW6Uz9drzn1tIIFAK2tXjk18SknkKSlB1AnenO2TXstsPMfR1Sr6VtPzK/C+AIOzY9waNLiRp2QXY7pxot+9HEiuQQQqjDRBL+3/ThdGl85fmnsvZ9JJOvV78nlZxYjI1c6aY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A72B0339;
-	Thu, 12 Feb 2026 06:51:45 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD4DE3F63F;
-	Thu, 12 Feb 2026 06:51:46 -0800 (PST)
-Message-ID: <962e8fc7-aec9-48bd-aa75-d33f3b068e2a@arm.com>
-Date: Thu, 12 Feb 2026 14:51:45 +0000
+	s=arc-20240116; t=1770910547; c=relaxed/simple;
+	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AjWwt2N/VHszRELSojuLu3kliH0CKM231qtFU0ztZ3L5cKUAyHexyHJLlmngakn+5IgukBi65ZhkdFAFLzE0jIB5ZfzZ9nF6n5x/xI0ta7l8Wn8jsCqSjn+ntm3AXDiL+9RbL253V0RyQSCOiHT3pryJIAFDmdeCVtxtkFKIWvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWegDsBC; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWegDsBC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431CCC4CEF7;
+	Thu, 12 Feb 2026 15:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1770910546;
+	bh=TO37eo+Xgib1YZz+3/bN23epC9tyuhnej0GE/4f9cu0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aWegDsBCbtfgIg9OB2Xop0lxMZQZwqnfB0XxDQ1ueSB7JcgdPabiA42A0ID30+YaT
+	 P/XSETTC7Yp7LAHJn1mdglYBFHY8apMm7aJjIdTv62SFR8OMUfOdbzlnUy2wCzeZ9P
+	 qeitAMtlBa4Dpu0Pld90mQkZsNlQEPhZhE3NsjwBsGOYAXM1Z0jy/tUfs3Uiy7Yzmq
+	 jqUs5QcXBDMLhWVRmFhrg4r6U4qsQmae3wNfbwYcj9s5SjXNuawXvxLGiKOZVh9R7+
+	 QNiq30C+UJ87E8cP7FBFGdAK0wCpMBxagWggHp00At/4AMI4cabCeJx5GC2bp1sUNM
+	 KIvbaqBP5G1gQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vqYjH-0000000AeWS-3lg7;
+	Thu, 12 Feb 2026 15:35:43 +0000
+Date: Thu, 12 Feb 2026 15:35:43 +0000
+Message-ID: <86ikc2asa8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
+In-Reply-To: <CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+References: <20260212090252.158689-1-tabba@google.com>
+	<20260212090252.158689-2-tabba@google.com>
+	<86jywib98e.wl-maz@kernel.org>
+	<CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
-From: Ben Horgan <ben.horgan@arm.com>
-To: "Shaopeng Tan (Fujitsu)" <tan.shaopeng@fujitsu.com>
-Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
- "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
- "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
- "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
- "dave.martin@arm.com" <dave.martin@arm.com>,
- "david@kernel.org" <david@kernel.org>,
- "dfustini@baylibre.com" <dfustini@baylibre.com>,
- "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
- "gshan@redhat.com" <gshan@redhat.com>,
- "james.morse@arm.com" <james.morse@arm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "kobak@nvidia.com" <kobak@nvidia.com>,
- "lcherian@marvell.com" <lcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "peternewman@google.com" <peternewman@google.com>,
- "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
- "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
- "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
- "rohit.mathew@arm.com" <rohit.mathew@arm.com>,
- "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
- "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
- "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
- "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "zengheng4@huawei.com" <zengheng4@huawei.com>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <OSZPR01MB87983A126E58D3FE8A73A98F8B65A@OSZPR01MB8798.jpnprd01.prod.outlook.com>
- <9a8a163e-887a-45fc-aae5-45e564360c8b@arm.com>
-Content-Language: en-US
-In-Reply-To: <9a8a163e-887a-45fc-aae5-45e564360c8b@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Shaopeng,
+On Thu, 12 Feb 2026 09:41:22 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, 12 Feb 2026 at 09:29, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Thu, 12 Feb 2026 09:02:50 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
+> > > However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
+> > > guests whenever the hardware supports it, ignoring the host kernel
+> > > configuration.
+> >
+> > This is the umpteenth time we get caught by this. PAN was the latest
+> > instance until this one. Maybe an approach would be to have a default
+> > override when a config option is not enabled, so that KVM is
+> > consistent with the rest of the kernel?
+> 
+> I spoke to Will about this, and one thing he'll look into is whether
+> this value in `struct arm64_ftr_reg` can be made consistent with the
+> cpu configuration itself (in cpufeature.c itself) . This would avoid
+> the problem altogether if possible. The question is whether the kernel
+> needs to somehow know that a certain feature exists even if it's
+> disabled in the config...
+> 
+> If he thinks it's not doable at that level, I'll look into
+> alternatives to make it correct by construction.
 
-On 2/9/26 10:04, Ben Horgan wrote:
-> Hi Shaopeng,
-> 
-> On 2/9/26 08:25, Shaopeng Tan (Fujitsu) wrote:
->> Hello Ben,
->>
->>> This new version of the mpam missing pieces series has a few significant
->>> changes in the mpam driver part of the series. The heuristics for deciding
->>> if features should be exposed are tightened. This is to fix some
->>> inaccuracies and avoid overcommitting before needed - shout if this changes
->>> anything on your platform. The final patch adds documentation which
->>> explains which features you should expect. The ABMC emulation is dropped
->>> for the moment as it requires resctrl changes to support for MPAM without
->>> breaking the abi. The default 5% gap for min_bw is dropped in favour of a
->>> simple default (kept for grace). The series is based on x86/resctrl [1] as
->>> resctrl has telemetry patches queued which change the arch interface.
->>
->> Could you please elaborate on why fs/resctrl changes are required to support only the counter assignment part of ABMC?
->> Currently, many SoC chips have an insufficient number of memory bandwidth monitors.
-> 
-> Sure. When the counter assignment mode is 'mbm_event; resctrl assumes the mbm events are configurable. 
-> The 'event_filter' files at
->     info/L3_MON/event_configs/<event>/event_filter 
-> are used to display and set this configuration.
-> 
-> In MPAM event configuration is not supported and so showing a read/writable 'event_filter' file is 
-> misleading to the user and needs to be hidden for MPAM support.
-> 
-> Just to give you a flavour of the change, here's a hack to show the correct thing for MPAM:
-> 
-> --- a/fs/resctrl/rdtgroup.c
-> +++ b/fs/resctrl/rdtgroup.c
-> @@ -2338,6 +2338,9 @@ static int resctrl_mkdir_event_configs(struct rdt_resource *r, struct kernfs_nod
->                 if (ret)
->                         goto out;
->  
-> +               if (!resctrl_arch_is_evt_configurable(mevt->evtid))
-> +                       continue;
-> +
-> 
-> 
->> We would be grateful if you could support the counter assignment part of ABMC.
-> 
-> It is not a big change in resctrl but I thought it best to not gate the rest of this series on
-> an additional change in another subsystem. I am current looking into this and hope to get the 
-> patches on the list early in the next cycle.
+What I currently have for that is rather ugly:
 
-There is another small change that will be required in resctrl to
-support ABMC with MPAM. As counter assignment means that it can't be
-guaranteed that each CTRL_MON group has a dedicated memory bandwidth
-counter the software controller (mbaMBps mount option) won't work but
-the mount won't fail. AMD doesn't hit this problem as it's MBA is
-non-linear. I was hoping to repurpose the delay_linear flag to just mean
-the software controller isn't supported but resctrl displays this
-information to the user in the 'delay_linear' file and we don't want to
-mislead.
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 72f39cecce93a..3bde0ad5ea972 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -971,6 +971,7 @@ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
+ extern struct arm64_ftr_override id_aa64mmfr0_override;
+ extern struct arm64_ftr_override id_aa64mmfr1_override;
+ extern struct arm64_ftr_override id_aa64mmfr2_override;
++extern struct arm64_ftr_override id_aa64mmfr3_override;
+ extern struct arm64_ftr_override id_aa64pfr0_override;
+ extern struct arm64_ftr_override id_aa64pfr1_override;
+ extern struct arm64_ftr_override id_aa64zfr0_override;
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 1a7eec542675b..32069da9651bf 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -778,6 +778,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+ struct arm64_ftr_override __read_mostly id_aa64mmfr0_override;
+ struct arm64_ftr_override __read_mostly id_aa64mmfr1_override;
+ struct arm64_ftr_override __read_mostly id_aa64mmfr2_override;
++struct arm64_ftr_override __read_mostly id_aa64mmfr3_override;
+ struct arm64_ftr_override __read_mostly id_aa64pfr0_override;
+ struct arm64_ftr_override __read_mostly id_aa64pfr1_override;
+ struct arm64_ftr_override __read_mostly id_aa64zfr0_override;
+@@ -850,7 +851,8 @@ static const struct __ftr_reg_entry {
+ 			       &id_aa64mmfr1_override),
+ 	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
+ 			       &id_aa64mmfr2_override),
+-	ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
++	ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3,
++			       &id_aa64mmfr3_override),
+ 	ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
+ 
+ 	/* Op1 = 0, CRn = 10, CRm = 4 */
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index 85bc629270bd9..202e165a4680c 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -51,6 +51,7 @@ PI_EXPORT_SYM(id_aa64isar2_override);
+ PI_EXPORT_SYM(id_aa64mmfr0_override);
+ PI_EXPORT_SYM(id_aa64mmfr1_override);
+ PI_EXPORT_SYM(id_aa64mmfr2_override);
++PI_EXPORT_SYM(id_aa64mmfr3_override);
+ PI_EXPORT_SYM(id_aa64pfr0_override);
+ PI_EXPORT_SYM(id_aa64pfr1_override);
+ PI_EXPORT_SYM(id_aa64smfr0_override);
+diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
+index e5ea280452c3b..b8dbe02e53171 100644
+--- a/arch/arm64/kernel/pi/idreg-override.c
++++ b/arch/arm64/kernel/pi/idreg-override.c
+@@ -24,10 +24,12 @@
+ static u64 __boot_status __initdata;
+ 
+ typedef bool filter_t(u64 val);
++typedef void cfg_override_t(struct arm64_ftr_override *);
+ 
+ struct ftr_set_desc {
+ 	char 				name[FTR_DESC_NAME_LEN];
+ 	PREL64(struct arm64_ftr_override, override);
++	PREL64(cfg_override_t,		cfg_override);
+ 	struct {
+ 		char			name[FTR_DESC_FIELD_LEN];
+ 		u8			shift;
+@@ -106,6 +108,22 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
+ 	},
+ };
+ 
++static void __init cfg_mmfr3_override(struct arm64_ftr_override *override)
++{
++#ifndef CONFIG_ARM64_POE
++	override->mask |= ID_AA64MMFR3_EL1_S1POE_MASK;
++#endif
++}
++
++static const struct ftr_set_desc mmfr3 __prel64_initconst = {
++	.name		= "id_aa64mmfr3",
++	.override	= &id_aa64mmfr3_override,
++	.cfg_override	= cfg_mmfr3_override,
++	.fields		= {
++		{}
++	},
++};
++
+ static bool __init pfr0_sve_filter(u64 val)
+ {
+ 	/*
+@@ -221,6 +239,7 @@ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
+ 	{ &mmfr0	},
+ 	{ &mmfr1	},
+ 	{ &mmfr2	},
++	{ &mmfr3	},
+ 	{ &pfr0 	},
+ 	{ &pfr1 	},
+ 	{ &isar1	},
+@@ -398,14 +417,19 @@ void __init init_feature_override(u64 boot_status, const void *fdt,
+ {
+ 	struct arm64_ftr_override *override;
+ 	const struct ftr_set_desc *reg;
++	cfg_override_t *cfg_override;
+ 	int i;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(regs); i++) {
+ 		reg = prel64_pointer(regs[i].reg);
+ 		override = prel64_pointer(reg->override);
++		cfg_override = prel64_pointer(reg->cfg_override);
+ 
+ 		override->val  = 0;
+ 		override->mask = 0;
++
++		if (cfg_override)
++			cfg_override(override);
+ 	}
+ 
+ 	__boot_status = boot_status;
 
-> 
->>
->> Best regards,
->> Shaopeng TAN
->>
->>
-> Thanks,
-> 
-> Ben
-> 
-> 
 
+which works, but is not super friendly.
 
-Thanks,
+Looking at the arm64_ftr_reg structure, this could work if
+FTR_VISIBLE_IF_IS_ENABLED() didn't simply put "HIDDEN" when the
+feature is not present, but forced things to be disabled
+altogether. The problem is that "HIDDEN" means not shown to userspace,
+and that we have plenty of HIDDEN features that must make it into KVM.
 
-Ben
+I'll have a think.
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
