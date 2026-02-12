@@ -1,199 +1,193 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3242DCF7B
-	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 09:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770889322; cv=pass; b=ULtXR77nBxqZCtUv9Dvy/2yzI1YdkyIbJO5ZPBfWabHJK13Ij0d+fWUkQnxPLRlA/8fWqKrxWsXWBpgCt+3+ZEWR7n43Y0yqMmR6PuXpWOkewSaY5CZ93OuM7/pNqLeaNY8EK6t/+DEkdCPX6Ds9qviJu03Hs5UniplZjLsBv94=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770889322; c=relaxed/simple;
-	bh=zmTrhOt5I67WnfOpJVUIewScgn5nhORqAKcL5d/sLMk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dZkCDeGx7ADmsY1bC7q7yJ8Ykg7a3sZIEngINjTPxoZL+B8KuyJAzbxxK9XRfg7uPSV9hDPx92bIW5KwjqJNw+zwwMijmCc35ZP+ghPghzwAK8FMfjSI0Xf9OkVnTbt1hVVne/QJFDzh6AGOwkietuwHduFWRln4OnNyXsolyfo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H0wTSELb; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H0wTSELb"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-505d3baf1a7so315171cf.1
-        for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 01:42:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1770889319; cv=none;
-        d=google.com; s=arc-20240605;
-        b=UQHBNjSVx73y1Jl7H+e43GBqXM7qG5swMnu2sH3i9GtDiOlZbmpSe1v0AKiRul/xHp
-         V4SZVcKYB2TTmEKxleYNXcr7hG8axaeMp2GzIxAmthmKV352x4oCBu7QuHeqGaGGfS6v
-         JhqThl4puKGg1yfQdAlxsw5pwj4Pj4n39SvnwYUwKsrB2sALCOgsOtLwdxWLy74O1qLW
-         0T48bX2GwSHpO26t5+NFvKGdsJbZKnO/Omrm7iSd8p8LvtrBuQYb5If+y0glMySZWfIK
-         SSg7kuJtLr9vp1ZcneL4Dm7RcUj0iu0IfEp2FhC0M6ZVT9Oxwr79A4C9TRwV0mi1o3Uz
-         K/JQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=VcH9GZLlhn0MK8AoO+gKd8YN91XeUHOY861U71nMAN8=;
-        fh=eHCW/NkhluEwAKmi47YtEZ5iXbxUC1WQmRBp1rmh8Bs=;
-        b=BsTjjlnAoDMKzruNadBiCEF1EjB79ms1aC1ZlFBR+PantW3mpAjAFzma5lKSWEwF2I
-         4sEBBOqK3PqNhRgXAPvcAxMyth6WEDspi9dVqrnSq5v675QMTU04W3a1OgVBr/QirMO/
-         MJ84W1pd6a3o/hslU3XwWalq2WiVOwvsfPiI593eUnJIPOiFywlJ9dom0L2XUi5kDKjH
-         ZzL9Tx9O53y593MHj8ur+2NnT5K4ShZSoB/21mMmZAIUOixrp6w8bYcOVDJ3mN9g4T2j
-         MHocBiE0DAlGPC5oI5Opbh8iM4RoEtCHVLdExi/9hXEVAaFYrphS7Q22h6qI+7ScTqBx
-         cKkA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770889319; x=1771494119; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VcH9GZLlhn0MK8AoO+gKd8YN91XeUHOY861U71nMAN8=;
-        b=H0wTSELbI4EKYl4C6ZoLOJ9EDXoJE9wSWXkre6dIb/T/ox4rzbx8EisxyBtP0lGVJX
-         rXnb3B2Kk13/yl04afhxt2izlcoc8c8jb/T71Lytlyv50g6A6cw2TKivBC49nlfDO+uG
-         nmWBIBP8KljWRS5aI4AhJ1xu7wTVHOm6qRV10regmFXBreq7DGtnESJ1fV5uhFFu0QVf
-         lMyhluSHhWxfg2fHXwkiOdAQACgqtOfjY6eF1vZ5kRzKrbpxVuEQIGPaQFY3aXcL4N2N
-         eai5OPzEmppuMHQpjihu2uVK6oPq05Lvf93hCU+gVyU2ASBGVZGX9Gm+fd0+euQyTIDC
-         j8nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770889319; x=1771494119;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VcH9GZLlhn0MK8AoO+gKd8YN91XeUHOY861U71nMAN8=;
-        b=MMjVH/MtCSgpRFDQAn0NFXMkoo4xQ0UMz1UTZeFXT3KsyvQ07R0oAIJQ4+0qbYGd6y
-         4NzIRfE/n5Gxoad0+UqEv7qrFEtkzPafIcKpn5qsCEvau10TJJdLtIPdJnlafAu+ivUi
-         0seehhISe2U8jpm8cdM73dLTf3PkmB0sHTgu/yS5vH5IA24frDsCkk+xRchODyCt12ie
-         MBtf2DIqv3K+QPfAxOuNV6alatBgdiMJq38ykrmgFl26ERSH3+61NqMJfrDtzTZRfbzA
-         GnV3Awriva89OvN91AIOVoQWIueqwIQO3N2Ibjo/FXrNJ5TSzYckEVpXNymljchetqEU
-         abfA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5wFpYqnfhWT6/Fk+8/ukyM0PN3ID5q60t7H9IyrmxFytOwpGl9fzJljRYcVfFmHwhde4TfFk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwX+xsa0SjtqAbfv45g6nJGh4Qhq5k+A6RyXhzpqT9sLNfyiDhN
-	y9p6p40IxcoCZNk2Jy8u8ZMVb26o9s0JplwxCSOm9aNQdiPPHqO9Yf7HYJnIDbY/OobhmmzTiyv
-	O5fAK3Cnp5Y9my4zP3Sz7Ii5VwmC2YOwF7CdDZnz2
-X-Gm-Gg: AZuq6aIGQk8+sRMxqiR7sWld2w+cud5FwEjB0j51sg1r267IgEXHOfeLBy4RIWmt0OI
-	1XhjYH1SeoBTwWHPWdz0nz/9Au7cyQPNwF3L0yrE44kfzo+bA+98t9+god85Z/L49b0fd79gF0U
-	U0MMBK1FHpe3gPZiUGhrlzJ/o8Bq4bQNm4lR6uH3fEhhLAqaJNHExq3hn3e6YgYRUq/QyV3Y/Vh
-	p3noA7+OoxBotqreAXGT+H4cAeQbry1anULZqXrtmBl/kUvCHdfkgn3hAecomU4AU1l+yuatz4D
-	qDSDjyNk
-X-Received: by 2002:a05:622a:4f8e:b0:506:9852:75ec with SMTP id
- d75a77b69052e-506985282abmr2869311cf.9.1770889318777; Thu, 12 Feb 2026
- 01:41:58 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 033872264CA
+	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 10:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770892648; cv=none; b=Yc1V9J2fEDmPXBHJ9J+VkThejzVc4JzEG/P6YwJMRQ3e2SCL20N8rStgw9VRWNFwSuYDb+lbVlIkI5vS24+b92HESGSWLVHBXnKeox6tOjjZpxCw7aK/pYFK0tjVnE8xUOn4QZ27ZlsGV0m1AOImMYWe6nWdlkcy4RSvATwRQQ4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770892648; c=relaxed/simple;
+	bh=4Johd8JfA6XoYWEldlA+wx42tVV46l7P+ou4nWAcVhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nNbUncMAM7BkE5CdZosOiVJRpdTlqYVJ1b/r5u8yB3jNNHpflqGMLMnaUIkMJmmIeLH9FxjMX6W8R7f4mnouix3FS+ywdTqkcDu0WGp5UcIwPGZ20qlnXwKyoFbJGe/ixCB0rdJrQZZLFBQBnN47im76ZzQMZmtVvkPIXZCsYGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3CE8339;
+	Thu, 12 Feb 2026 02:37:19 -0800 (PST)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 286023F632;
+	Thu, 12 Feb 2026 02:37:22 -0800 (PST)
+Date: Thu, 12 Feb 2026 10:37:19 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>
+Subject: Re: [PATCH v2 14/35] KVM: arm64: Handle aborts from protected VMs
+Message-ID: <aY2tX6V0pCqwGth5@raptor>
+References: <20260119124629.2563-1-will@kernel.org>
+ <20260119124629.2563-15-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260212090252.158689-1-tabba@google.com> <20260212090252.158689-2-tabba@google.com>
- <86jywib98e.wl-maz@kernel.org>
-In-Reply-To: <86jywib98e.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 12 Feb 2026 09:41:22 +0000
-X-Gm-Features: AZwV_QiSeFqGPiRC70jpUcnw67INjoq4qSM1niKSMpmtbfB7i8EWB8CCB6Ry2n4
-Message-ID: <CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not
- supported by the host
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260119124629.2563-15-will@kernel.org>
 
-Hi Marc,
+Hi Will,
 
-On Thu, 12 Feb 2026 at 09:29, Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Thu, 12 Feb 2026 09:02:50 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
-> > However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
-> > guests whenever the hardware supports it, ignoring the host kernel
-> > configuration.
->
-> This is the umpteenth time we get caught by this. PAN was the latest
-> instance until this one. Maybe an approach would be to have a default
-> override when a config option is not enabled, so that KVM is
-> consistent with the rest of the kernel?
+On Mon, Jan 19, 2026 at 12:46:07PM +0000, Will Deacon wrote:
+> Introduce a new abort handler for resolving stage-2 page faults from
+> protected VMs by pinning and donating anonymous memory. This is
+> considerably simpler than the infamous user_mem_abort() as we only have
+> to deal with translation faults at the pte level.
+> 
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 89 ++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 81 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a23a4b7f108c..b21a5bf3d104 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1641,6 +1641,74 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	return ret != -EAGAIN ? ret : 0;
+>  }
+>  
+> +static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +		struct kvm_memory_slot *memslot, unsigned long hva)
+> +{
+> +	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
+> +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
+> +	struct mm_struct *mm = current->mm;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	void *hyp_memcache;
+> +	struct page *page;
+> +	int ret;
+> +
+> +	ret = prepare_mmu_memcache(vcpu, true, &hyp_memcache);
+> +	if (ret)
+> +		return -ENOMEM;
+> +
+> +	ret = account_locked_vm(mm, 1, true);
+> +	if (ret)
+> +		return ret;
+> +
+> +	mmap_read_lock(mm);
+> +	ret = pin_user_pages(hva, 1, flags, &page);
+> +	mmap_read_unlock(mm);
 
-I spoke to Will about this, and one thing he'll look into is whether
-this value in `struct arm64_ftr_reg` can be made consistent with the
-cpu configuration itself (in cpufeature.c itself) . This would avoid
-the problem altogether if possible. The question is whether the kernel
-needs to somehow know that a certain feature exists even if it's
-disabled in the config...
+If the page is part of a large folio, the entire folio gets pinned here, not
+just the page returned by pin_user_pages(). Do you reckon that should be
+considered when calling account_locked_vm()?
 
-If he thinks it's not doable at that level, I'll look into
-alternatives to make it correct by construction.
+> +
+> +	if (ret == -EHWPOISON) {
+> +		kvm_send_hwpoison_signal(hva, PAGE_SHIFT);
+> +		ret = 0;
+> +		goto dec_account;
+> +	} else if (ret != 1) {
+> +		ret = -EFAULT;
+> +		goto dec_account;
+> +	} else if (!folio_test_swapbacked(page_folio(page))) {
+> +		/*
+> +		 * We really can't deal with page-cache pages returned by GUP
+> +		 * because (a) we may trigger writeback of a page for which we
+> +		 * no longer have access and (b) page_mkclean() won't find the
+> +		 * stage-2 mapping in the rmap so we can get out-of-whack with
+> +		 * the filesystem when marking the page dirty during unpinning
+> +		 * (see cc5095747edf ("ext4: don't BUG if someone dirty pages
+> +		 * without asking ext4 first")).
 
-> >
-> > If a guest detects this feature and attempts to use it, the host will
-> > fail to context-switch POR_EL1, potentially leading to state corruption.
-> >
-> > Fix this by masking ID_AA64MMFR3_EL1.S1POE and preventing KVM from
-> > advertising the feature when the host does not support it, i.e.,
-> > system_supports_poe() is false.
-> >
-> > Fixes: 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 3 ++-
-> >  arch/arm64/kvm/sys_regs.c         | 3 +++
-> >  2 files changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index ac7f970c7883..7af72ca749a6 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -1592,7 +1592,8 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
-> >       (kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
-> >
-> >  #define kvm_has_s1poe(k)                             \
-> > -     (kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
-> > +     (system_supports_poe() &&                       \
-> > +      kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
->
-> Why do we need to further key this on system_supports_poe()? I can see
-> this is a potential optimisation, but I don't think this is part of
-> the minimal fix.
+I've been trying to wrap my head around this. Would you mind providing a few
+more hints about what the issue is? I'm sure the approach is correct, it's
+likely just me not being familiar with the code.
 
-I did this to be consistent with similar checks, e.g., kvm_has_fpmr().
-I can remove it or put it in a separate patch, whichever you prefer.
+> +		 *
+> +		 * Ideally we'd just restrict ourselves to anonymous pages, but
+> +		 * we also want to allow memfd (i.e. shmem) pages, so check for
+> +		 * pages backed by swap in the knowledge that the GUP pin will
+> +		 * prevent try_to_unmap() from succeeding.
+> +		 */
+> +		ret = -EIO;
+> +		goto unpin;
+> +	}
+> +
+> +	write_lock(&kvm->mmu_lock);
+> +	ret = pkvm_pgtable_stage2_map(pgt, fault_ipa, PAGE_SIZE,
+> +				      page_to_phys(page), KVM_PGTABLE_PROT_RWX,
+> +				      hyp_memcache, 0);
+> +	write_unlock(&kvm->mmu_lock);
+> +	if (ret) {
+> +		if (ret == -EAGAIN)
+> +			ret = 0;
+> +		goto unpin;
+> +	}
 
->
-> >
-> >  #define kvm_has_ras(k)                                       \
-> >       (kvm_has_feat((k), ID_AA64PFR0_EL1, RAS, IMP))
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 88a57ca36d96..237e8bd1cf29 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -1816,6 +1816,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
-> >                      ID_AA64MMFR3_EL1_SCTLRX |
-> >                      ID_AA64MMFR3_EL1_S1POE |
-> >                      ID_AA64MMFR3_EL1_S1PIE;
-> > +
-> > +             if (!system_supports_poe())
-> > +                     val &= ~ID_AA64MMFR3_EL1_S1POE;
->
-> How about S1PIE? It seems to have a similar problem, in the sense that
-> it has extra state. But I guess because we don't put it behind a
-> config option, we context-switch it anyway and all is good?
+This looks correct to me, there's no need to check for the notifier sequence
+number if the MMU notifiers are ignored. And concurrent faults on the same page
+are handled by treating -EAGAIN as success.
 
-Like you said, S1PIE doesn't have a config option. I thought if I were
-to add one to S1PIE, then why not add one to the other features that
-don't have config options... It is conceivable that a config option
-might be added in the future, but like you noted above, I think we
-need a deeper fix that nips this problem in the bud.
+> +
+> +	return 0;
+> +unpin:
+> +	unpin_user_pages(&page, 1);
+> +dec_account:
+> +	account_locked_vm(mm, 1, false);
+> +	return ret;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_s2_trans *nested,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+> @@ -2190,15 +2258,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>  		goto out_unlock;
+>  	}
+>  
+> -	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
+> -			!write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
+> +	if (kvm_vm_is_protected(vcpu->kvm)) {
+> +		ret = pkvm_mem_abort(vcpu, fault_ipa, memslot, hva);
 
-Let's see if Will thinks that we can fix this at the `arm64`
-cpufeature layer, rather than somewhere in KVM.
+I guess the reason this comes after handling an access fault is because you want
+the WARN_ON() to trigger in pkvm_pgtable_stage2_mkyoung().
 
-Cheers,
-/fuad
+Thanks,
+Alex
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> +	} else {
+> +		VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
+> +				!write_fault &&
+> +				!kvm_vcpu_trap_is_exec_fault(vcpu));
+>  
+> -	if (kvm_slot_has_gmem(memslot))
+> -		ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
+> -				 esr_fsc_is_permission_fault(esr));
+> -	else
+> -		ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> -				     esr_fsc_is_permission_fault(esr));
+> +		if (kvm_slot_has_gmem(memslot))
+> +			ret = gmem_abort(vcpu, fault_ipa, nested, memslot,
+> +					 esr_fsc_is_permission_fault(esr));
+> +		else
+> +			ret = user_mem_abort(vcpu, fault_ipa, nested, memslot, hva,
+> +					     esr_fsc_is_permission_fault(esr));
+> +	}
+>  	if (ret == 0)
+>  		ret = 1;
+>  out:
+> -- 
+> 2.52.0.457.g6b5491de43-goog
+> 
+> 
