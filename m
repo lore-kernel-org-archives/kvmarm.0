@@ -1,261 +1,273 @@
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE921F5EA
-	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 17:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770918534; cv=none; b=MbBAhk6tiGcR7y2X+YN2p0TMrHnmgBuOzJPkPw2ZtaQ3uhMDr2Tt/wmO4hVylXrJGECH636Uzuzk+8jE5TTPSU1eSpJHUNejXO6mPEcpzv1c79qXrB4pGSJa7lqMx9Tuiow/u92ujL3UDSz7qs26O+dmsPlt/E1plGX1dCwc9OY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770918534; c=relaxed/simple;
-	bh=Y9YqPnc8BmjwKubmvFSXt3QWfkXvZK4RllFw60PzH/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D1+qoCoJNpezZRmterndZ3z4r/MCTr/9awkA/SXJQrnRlEoqwrkAs6BOajXuBKRV9NkYOeTw0z1APKzc7OZaquRvuhOYyVZLF0LR3I4htRP5phsMbYzTBnzt9jk0UgMr46gu1vrQ9nFy8JXpbvn5rzIEVSjonSF9au4U2u7fB7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ev/+VVqJ; arc=none smtp.client-ip=209.85.210.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85B1BA21
+	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 18:53:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1770922425; cv=pass; b=twbyeZ/Q1WJ5l5CsCWUaopLgn90omKRpUvYKYaofIvWnf/n89KOk8qarL0cKgpWEz52wPbykGpyooK9v9465GxpcZr9CHnRuDbTgWDlyG8u5LrzQIn0q+eh3mijZymwsIC5Ewt6gRqgHit2ZPKS4o0GOMQGBNqoYr3hnQLZv1Rw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1770922425; c=relaxed/simple;
+	bh=XMDd4/Tmzy2G8avag+KjNC0MlH3sj+OcJMh3Za8Ln/k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l5RVESWDAW7QeQqO/6v9LKsH+l5M22TerTyNDXqX32ZX5XPTeTZ2jJqiGP+ji8AwHa1VHQtUvgraQ6Q77JCQxVCTTa/V3DSfFELooZ68j41aSmDG/bxeIHdMt/031R/4fzH9O+ZpJerXNQJgBQYESyV1txbUW1GYrs2JzAMCJS4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wcRgBUmd; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ev/+VVqJ"
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-824484dba4dso112141b3a.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 09:48:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wcRgBUmd"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-5069a785ed2so40031cf.1
+        for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 10:53:43 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1770922423; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Hc858oj3g2phcmKODrS8C+DGKdc8b+aE/viVY4uFRxb85VdGNVCpoPZS11QcuBZuw1
+         bEb0nCDjyJQrWAKcuxqV6ri/pBs0l7h9firx8BGJPPp7il+rleWh3QNmtqehs4W+CYM+
+         dL8dc/xoH0BJYSDXGQrEP/bPf/SQVRAEhcFk1EgsmAkSaTkkTYh0hU3WZ1zTnNzCX18J
+         u2tTWf/QPjiYXkFVCBW6W+ZCHCHuu/1CvFr4q53PymF6ymqPDbUSIYmS7XNA3oZ4yPOw
+         3FJQZSUSL+fXk0M6mbKW0ZIvWy63Sk48mdUod7FdJQ6Al04Ma4r7A5g8LAYbDiSVjWNR
+         DEwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=KxJxh9FSjNvMYBpkVXl2+9DScVhBboCfxSSFZplOIEM=;
+        fh=7zorj+YIBCY6dzB8OMNDgQ+5AHjXNI/e21GgU3pv8+8=;
+        b=ElYHTBk8zomI91pA7WkqnWFydhEaROVB///rma9CHbmJogl+WEDf6MWxQraGYjU1Uk
+         fOaxVTKRo8KesrgyDwwvGq8PeUaOJE1m4t7xs8e4Oq1/jVLtwo9sJICrKzz5aEBjo0q0
+         1OrURw6VMb7CQOK3LIqATFDNVgRHZSBKoiHncw+ctBGtCOg5F4KaJHDnZAMk5lqzvtVL
+         fLNSGDs6PUws0J5Ur8QrxF9SExnMGMLbZLgUs1bM2+4fcEGHnX6tyMR2tGhWsKgQ80D1
+         JFPnPB7rz77z+GSAcMzhrhA/1hL4WAi17q5BuvX1uiNNye6/DW1U9cKHdmy7LFQDZ6HL
+         gndw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1770918531; x=1771523331; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wkYX9/8AMpNKTzDUSgXfqQoLj53MIkWsoktK8rnuztU=;
-        b=ev/+VVqJ6z0diJhADlLnHJyaXjh4fZYJoe3jdmdc24HB0/n7JkLWxdhuCDW44dTxw8
-         JlKC+4uxihINrcgcy6nqq11C6/lCCcIEMIGu9Jh0aw3KjOyAo9mRTTtm3hR0lHoEvt9J
-         dZh2JinU+MTJWI3XfLKba3/66KjDnOoE7hfmlkcdJHQwBhDw1WH81Z0TAJQjN+SernBz
-         Ga+ptNziV0Uh3zoE1EehCQT9zSHEbWt1q+K4LhGjRPm9ilZk6AAj3QHCI2FjTxq/3S15
-         3DaIcGQtORoxVOe1QPGoi1VLOLAvwgHsSkhxDYzfedn3o9oWxH72EN82FpL5KiMQexYp
-         Ub6w==
+        d=google.com; s=20230601; t=1770922423; x=1771527223; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=KxJxh9FSjNvMYBpkVXl2+9DScVhBboCfxSSFZplOIEM=;
+        b=wcRgBUmdOCecu63wCKBfhjfwtW3k4HdpoESXlqeN9zY2HeiNO+z4WfhAMHLguuyfpO
+         hM+hBzRiVQ295Mj9C7gRF8TIdBcgN6GRvpP19F2+FK4I5uNpSKytFiiyrJrS/99uvrh/
+         EttfF48KvNgj4ajrVtJMQkclVeFfza0S3m/TMmogjW4hmFWEo3yCzAzMkcSdVmba/pbb
+         9eBtaIhHj+/4riVAPPuY9nOlH82x1zxrMCM6wkGJlPfi7IVKtRgS43+muycWAgV/Ysc/
+         xegE/C2rphpgUr/3NxqVRKQuJnLKk6TB57SvrwO3jxeZuJWaoZvLDX0N7dhsIMZy+IeI
+         364Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770918531; x=1771523331;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wkYX9/8AMpNKTzDUSgXfqQoLj53MIkWsoktK8rnuztU=;
-        b=O5+oXQzzcn0Qnjd9qsiJx3A+3UTJxQmUlUWAqkXDPxizfpGwlGI7otGjkKWZvzPLdP
-         0h8nqFFQtWAs94dt5cwpBZEFtAowIvUs4bZuJgbbzlo3x1JVgi7dLFwISofnwQlTl1ue
-         JHLKz9wU884GZhf/w1ZIunnnx2YxlNQD523RAxnkUVgmJdRzt/HZhAFLuC6sa+4Khuj8
-         5XwiPtSI/qWN+xd0GDLPPNJ8rGRK/WDkDWGtb6DmT+xHdm8patidc5oHxCze886zwCeP
-         egQhylHmdx0BGUtvNpP+r8DpGIWTWrmOlTMVxzjcg5CCG6NJrVFvEb+zqFQ0lU5Bh7Eq
-         d6/g==
-X-Forwarded-Encrypted: i=1; AJvYcCVEZGSCelsvVlztYpmqb+yhe99U2JWl+nl/ozCymMASJcUBtOdt8aGcASQbajzb70YPTr0YKHQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxmjU7Yria2+lYCVC0orrMCyKH/s2NQ3yEvF7FCl8VLcwjOYUrm
-	o2nJIBWowokgUN+b0ktu+lhjr2WkCt55MDJ9BD/ohPz951eimskPYMnWsQ5myalQyMo=
-X-Gm-Gg: AZuq6aJOSVCaQgjrvfZODbwa7iy2PqBrVXp/MlKSj165SQV/+FBulitxSKCXH4ptqk/
-	whTGceCAO1Hodd8rd1wOe/LU5akXH52O2OfaOoExLxTaDf2DA6UyLatTOtr/hVdsZCK5vFF2xjn
-	iY9Y62pKfF8k6cEsF6ax+FdluvCs/oLCAMhDW2mIk40Qhz7XWKQzcBIbM5TIDp/xx8YuC0/xPfE
-	EUitGNr8XNFOAL4esAsueExZQhsqyrWp/jqLhDzFmK0PrQ4V0mxsNUlxyj2CZnvvsbVgyrkH3KO
-	meosBU4a5dUICVW0yi5oNvoi++vltH5G0pBepGv2gBxBYkIY18rewbwz7ILUBF+jxTX/CeLYHyL
-	bzi121EGti0/FRLthmsOPKruII/tksvuW77SzZBAt+EbXfK4yLVf941KMxSUjcelIkKpbKqjOeL
-	R5Q8oFVoqp2VXntXxCpF9MIgINnec=
-X-Received: by 2002:a05:6a00:17a1:b0:824:a304:e5b7 with SMTP id d2e1a72fcca58-824b302d476mr3194178b3a.51.1770918530788;
-        Thu, 12 Feb 2026 09:48:50 -0800 (PST)
-Received: from p14s ([2604:3d09:148c:c800:b17f:2662:e1ea:5d37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8249e3bd3b2sm6231651b3a.22.2026.02.12.09.48.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Feb 2026 09:48:50 -0800 (PST)
-Date: Thu, 12 Feb 2026 10:48:47 -0700
-From: Mathieu Poirier <mathieu.poirier@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 00/46] arm64: Support for Arm CCA in KVM
-Message-ID: <aY4Sf4lMlWd9LyTo@p14s>
-References: <20251217101125.91098-1-steven.price@arm.com>
+        d=1e100.net; s=20230601; t=1770922423; x=1771527223;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KxJxh9FSjNvMYBpkVXl2+9DScVhBboCfxSSFZplOIEM=;
+        b=k5WxCYOCigLuh5F2PmjXSkHsK+tH3jteNx7mgj9Tuj5diPFW2bNT7alfiE3OlKSeQG
+         AAdi5hmxRkblUfWmFWbIWapG+kKgkGfE0JBZkRB87JjnUx+NAkbc0jaSeiINFj0odS5F
+         kMVouSRSV3SX2CgXrp+IW+yElYcoT4f5Zo36Zy+wLybcHiiFEjWzNJcnbQdL8pSiekmo
+         3C2TFxUnd3XwMn1kmcRfSeS65v+JZ7tKg0c59jyAWEaEnunjU09x2oFe06p0ICMs2uC1
+         S58SataW+Hiwzmi5ezlfVfW8cLNWNkvge/13jbjMjqKvevkFP5Nt8bPFrf9tfKkubJqE
+         F5Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvOYK6gtrSqQIp/+Lr8Zy2fCTcwIsI2B833ij0q0bcqdgUxy9v5cdA6aOPZlWW75napr4zdRE=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxPBp/u6qLJ0uy+2t7G9l5cWXdakjW4uVQ7Sk+U1lhJ7ekT4eqP
+	6hx+U6zoCMmB1d89Sr2pCFFOYXqZhqTUFSDxDwRq7C70IWKZvqa5angg2jR8hfrxk0NLedpRkjb
+	doawaH0ZKC0Mr8jrdn3RWqyvsi3q5sYYTZBpdRNDV
+X-Gm-Gg: AZuq6aIAiIRFOIflK/16OLVUCvWSCbauE/tXENLcrMGXEfmyZs+lRSxbPNFB+k0XR0m
+	cVP/TPnJ6Rd52xOTgITkDPmhs4O2vrAG0AKRBPQt+F0I9JbO1+yG+1pztBzE4eMnEJUJ5FHIo1l
+	A8IiZPZ2BiMfS3aY3Eo1gKmcIvxjIU3EAYyKZpqxmu3vvAJBkptzlLn8YA1XxVTC4YEXLapeeY4
+	kx66ACCdfvsCbdh2d/gcKI3WqtHB+tGR0e4duB96g08nE2p1ntDMldEjBptL6je8VIKx981OaIk
+	o1tvw9xZpcuGpSUXWSM=
+X-Received: by 2002:ac8:5ace:0:b0:503:2e98:7842 with SMTP id
+ d75a77b69052e-506a5089fd7mr798601cf.4.1770922422056; Thu, 12 Feb 2026
+ 10:53:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217101125.91098-1-steven.price@arm.com>
+References: <20260212090252.158689-1-tabba@google.com> <20260212090252.158689-2-tabba@google.com>
+ <86jywib98e.wl-maz@kernel.org> <CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+ <86ikc2asa8.wl-maz@kernel.org>
+In-Reply-To: <86ikc2asa8.wl-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 12 Feb 2026 18:53:05 +0000
+X-Gm-Features: AZwV_QgjHAKlb2oJ6cTtVmiD8glUdVPUVPAc_uYr3UsDjUESaoBBPSZwwkWqYwc
+Message-ID: <CA+EHjTwLcxB1e_FZsw_Semoj8tjMBUKZFM8+Vbo+64+=T4GN-Q@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not
+ supported by the host
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Steven,
+/fuad
 
-On Wed, Dec 17, 2025 at 10:10:37AM +0000, Steven Price wrote:
-> This series adds support for running protected VMs using KVM under the
-> Arm Confidential Compute Architecture (CCA). I've changed the uAPI
-> following feedback from Marc.
-> 
-> The main change is that rather than providing a multiplex CAP and
-> expecting the VMM to drive the different stages of realm construction,
-> there's now just a minimal interface and KVM performs the necessary
-> operations when needed.
-> 
-> This series is lightly tested and is meant as a demonstration of the new
-> uAPI. There are a number of (known) rough corners in the implementation
-> that I haven't dealt with properly.
-> 
-> In particular please note that this series is still targetting RMM v1.0.
-> There is an alpha quality version of RMM v2.0 available[1]. Feedback was
-> that there are a number of blockers for merging with RMM v1.0 and so I
-> expect to rework this series to support RMM v2.0 before it is merged.
-> That will necessarily involve reworking the implementation.
-> 
-> Specifically I'm expecting improvements in:
-> 
->  * GIC handling - passing state in registers, and allowing the host to
->    fully emulate the GIC by allowing trap bits to be set.
-> 
->  * PMU handling - again providing flexibility to the host's emulation.
-> 
->  * Page size/granule size mismatch. RMM v1.0 defines the granule as 4k,
->    RMM v2.0 provide the option for the host to change the granule size.
->    The intention is that Linux would simply set the granule size equal
->    to its page size which will significantly simplify the management of
->    granules.
-> 
->  * Some performance improvement from the use of range-based map/unmap
->    RMI calls.
-> 
-> This series is based on v6.19-rc1. It is also available as a git
-> repository:
-> 
-> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v12
-> 
-> Work in progress changes for kvmtool are available from the git
-> repository below:
-> 
-> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v10
+On Thu, 12 Feb 2026 at 15:35, Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Thu, 12 Feb 2026 09:41:22 +0000,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Thu, 12 Feb 2026 at 09:29, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > Hi Fuad,
+> > >
+> > > On Thu, 12 Feb 2026 09:02:50 +0000,
+> > > Fuad Tabba <tabba@google.com> wrote:
+> > > >
+> > > > When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
+> > > > However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
+> > > > guests whenever the hardware supports it, ignoring the host kernel
+> > > > configuration.
+> > >
+> > > This is the umpteenth time we get caught by this. PAN was the latest
+> > > instance until this one. Maybe an approach would be to have a default
+> > > override when a config option is not enabled, so that KVM is
+> > > consistent with the rest of the kernel?
+> >
+> > I spoke to Will about this, and one thing he'll look into is whether
+> > this value in `struct arm64_ftr_reg` can be made consistent with the
+> > cpu configuration itself (in cpufeature.c itself) . This would avoid
+> > the problem altogether if possible. The question is whether the kernel
+> > needs to somehow know that a certain feature exists even if it's
+> > disabled in the config...
+> >
+> > If he thinks it's not doable at that level, I'll look into
+> > alternatives to make it correct by construction.
+>
+> What I currently have for that is rather ugly:
+>
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 72f39cecce93a..3bde0ad5ea972 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -971,6 +971,7 @@ struct arm64_ftr_reg *get_arm64_ftr_reg(u32 sys_id);
+>  extern struct arm64_ftr_override id_aa64mmfr0_override;
+>  extern struct arm64_ftr_override id_aa64mmfr1_override;
+>  extern struct arm64_ftr_override id_aa64mmfr2_override;
+> +extern struct arm64_ftr_override id_aa64mmfr3_override;
+>  extern struct arm64_ftr_override id_aa64pfr0_override;
+>  extern struct arm64_ftr_override id_aa64pfr1_override;
+>  extern struct arm64_ftr_override id_aa64zfr0_override;
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 1a7eec542675b..32069da9651bf 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -778,6 +778,7 @@ static const struct arm64_ftr_bits ftr_raz[] = {
+>  struct arm64_ftr_override __read_mostly id_aa64mmfr0_override;
+>  struct arm64_ftr_override __read_mostly id_aa64mmfr1_override;
+>  struct arm64_ftr_override __read_mostly id_aa64mmfr2_override;
+> +struct arm64_ftr_override __read_mostly id_aa64mmfr3_override;
+>  struct arm64_ftr_override __read_mostly id_aa64pfr0_override;
+>  struct arm64_ftr_override __read_mostly id_aa64pfr1_override;
+>  struct arm64_ftr_override __read_mostly id_aa64zfr0_override;
+> @@ -850,7 +851,8 @@ static const struct __ftr_reg_entry {
+>                                &id_aa64mmfr1_override),
+>         ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2,
+>                                &id_aa64mmfr2_override),
+> -       ARM64_FTR_REG(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3),
+> +       ARM64_FTR_REG_OVERRIDE(SYS_ID_AA64MMFR3_EL1, ftr_id_aa64mmfr3,
+> +                              &id_aa64mmfr3_override),
+>         ARM64_FTR_REG(SYS_ID_AA64MMFR4_EL1, ftr_id_aa64mmfr4),
+>
+>         /* Op1 = 0, CRn = 10, CRm = 4 */
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index 85bc629270bd9..202e165a4680c 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -51,6 +51,7 @@ PI_EXPORT_SYM(id_aa64isar2_override);
+>  PI_EXPORT_SYM(id_aa64mmfr0_override);
+>  PI_EXPORT_SYM(id_aa64mmfr1_override);
+>  PI_EXPORT_SYM(id_aa64mmfr2_override);
+> +PI_EXPORT_SYM(id_aa64mmfr3_override);
+>  PI_EXPORT_SYM(id_aa64pfr0_override);
+>  PI_EXPORT_SYM(id_aa64pfr1_override);
+>  PI_EXPORT_SYM(id_aa64smfr0_override);
+> diff --git a/arch/arm64/kernel/pi/idreg-override.c b/arch/arm64/kernel/pi/idreg-override.c
+> index e5ea280452c3b..b8dbe02e53171 100644
+> --- a/arch/arm64/kernel/pi/idreg-override.c
+> +++ b/arch/arm64/kernel/pi/idreg-override.c
+> @@ -24,10 +24,12 @@
+>  static u64 __boot_status __initdata;
+>
+>  typedef bool filter_t(u64 val);
+> +typedef void cfg_override_t(struct arm64_ftr_override *);
+>
+>  struct ftr_set_desc {
+>         char                            name[FTR_DESC_NAME_LEN];
+>         PREL64(struct arm64_ftr_override, override);
+> +       PREL64(cfg_override_t,          cfg_override);
+>         struct {
+>                 char                    name[FTR_DESC_FIELD_LEN];
+>                 u8                      shift;
+> @@ -106,6 +108,22 @@ static const struct ftr_set_desc mmfr2 __prel64_initconst = {
+>         },
+>  };
+>
+> +static void __init cfg_mmfr3_override(struct arm64_ftr_override *override)
+> +{
+> +#ifndef CONFIG_ARM64_POE
+> +       override->mask |= ID_AA64MMFR3_EL1_S1POE_MASK;
+> +#endif
+> +}
+> +
+> +static const struct ftr_set_desc mmfr3 __prel64_initconst = {
+> +       .name           = "id_aa64mmfr3",
+> +       .override       = &id_aa64mmfr3_override,
+> +       .cfg_override   = cfg_mmfr3_override,
+> +       .fields         = {
+> +               {}
+> +       },
+> +};
+> +
+>  static bool __init pfr0_sve_filter(u64 val)
+>  {
+>         /*
+> @@ -221,6 +239,7 @@ PREL64(const struct ftr_set_desc, reg) regs[] __prel64_initconst = {
+>         { &mmfr0        },
+>         { &mmfr1        },
+>         { &mmfr2        },
+> +       { &mmfr3        },
+>         { &pfr0         },
+>         { &pfr1         },
+>         { &isar1        },
+> @@ -398,14 +417,19 @@ void __init init_feature_override(u64 boot_status, const void *fdt,
+>  {
+>         struct arm64_ftr_override *override;
+>         const struct ftr_set_desc *reg;
+> +       cfg_override_t *cfg_override;
+>         int i;
+>
+>         for (i = 0; i < ARRAY_SIZE(regs); i++) {
+>                 reg = prel64_pointer(regs[i].reg);
+>                 override = prel64_pointer(reg->override);
+> +               cfg_override = prel64_pointer(reg->cfg_override);
+>
+>                 override->val  = 0;
+>                 override->mask = 0;
+> +
+> +               if (cfg_override)
+> +                       cfg_override(override);
+>         }
+>
+>         __boot_status = boot_status;
+>
+>
+> which works, but is not super friendly.
 
-The first thing to note is that branch cca/v10 does not compile due to function
-realm_configure_parameters() not being called anywhere.  Marking the function as
-[[maybe_unused]] solved the problem on my side.
+Ouch! Yeah, no easy solutions here. For now, as a fix to be able to
+backport, would you like me to respin this without the change to
+kvm_has_s1poe(), or with that change as a separate patch?
 
-Using the FVP emulator, booting a Realm that includes EDK2 in its boot stack
-worked.  If EDK2 is not part of the boot stack and a kernel is booted directly
-from lkvm, mounting the initrd fails.  Looking into this issue further, I see
-that from a Realm kernel's perspective, the content of the initrd is either
-encrypted or has been trampled on.  
-
-I'd be happy to provide more details on the above, just let me know.
-
-Thanks,
-Mathieu
-
-> 
-> [1] https://developer.arm.com/documentation/den0137/latest/
-> 
-> Jean-Philippe Brucker (7):
->   arm64: RMI: Propagate number of breakpoints and watchpoints to
->     userspace
->   arm64: RMI: Set breakpoint parameters through SET_ONE_REG
->   arm64: RMI: Initialize PMCR.N with number counter supported by RMM
->   arm64: RMI: Propagate max SVE vector length from RMM
->   arm64: RMI: Configure max SVE vector length for a Realm
->   arm64: RMI: Provide register list for unfinalized RMI RECs
->   arm64: RMI: Provide accurate register list
-> 
-> Joey Gouly (2):
->   arm64: RMI: allow userspace to inject aborts
->   arm64: RMI: support RSI_HOST_CALL
-> 
-> Steven Price (34):
->   arm64: RME: Handle Granule Protection Faults (GPFs)
->   arm64: RMI: Add SMC definitions for calling the RMM
->   arm64: RMI: Add wrappers for RMI calls
->   arm64: RMI: Check for RMI support at KVM init
->   arm64: RMI: Define the user ABI
->   arm64: RMI: Basic infrastructure for creating a realm.
->   KVM: arm64: Allow passing machine type in KVM creation
->   arm64: RMI: RTT tear down
->   arm64: RMI: Activate realm on first VCPU run
->   arm64: RMI: Allocate/free RECs to match vCPUs
->   KVM: arm64: vgic: Provide helper for number of list registers
->   arm64: RMI: Support for the VGIC in realms
->   KVM: arm64: Support timers in realm RECs
->   arm64: RMI: Handle realm enter/exit
->   arm64: RMI: Handle RMI_EXIT_RIPAS_CHANGE
->   KVM: arm64: Handle realm MMIO emulation
->   KVM: arm64: Expose support for private memory
->   arm64: RMI: Allow populating initial contents
->   arm64: RMI: Set RIPAS of initial memslots
->   arm64: RMI: Create the realm descriptor
->   arm64: RMI: Add a VMID allocator for realms
->   arm64: RMI: Runtime faulting of memory
->   KVM: arm64: Handle realm VCPU load
->   KVM: arm64: Validate register access for a Realm VM
->   KVM: arm64: Handle Realm PSCI requests
->   KVM: arm64: WARN on injected undef exceptions
->   arm64: Don't expose stolen time for realm guests
->   arm64: RMI: Always use 4k pages for realms
->   arm64: RMI: Prevent Device mappings for Realms
->   HACK: Restore per-CPU cpu_armpmu pointer
->   arm_pmu: Provide a mechanism for disabling the physical IRQ
->   arm64: RMI: Enable PMU support with a realm guest
->   KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
->   arm64: RMI: Enable realms to be created
-> 
-> Suzuki K Poulose (3):
->   kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
->   kvm: arm64: Don't expose unsupported capabilities for realm guests
->   arm64: RMI: Allow checking SVE on VM instance
-> 
->  Documentation/virt/kvm/api.rst       |   78 +-
->  arch/arm64/include/asm/kvm_emulate.h |   31 +
->  arch/arm64/include/asm/kvm_host.h    |   13 +-
->  arch/arm64/include/asm/kvm_rmi.h     |  137 +++
->  arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
->  arch/arm64/include/asm/rmi_smc.h     |  269 +++++
->  arch/arm64/include/asm/virt.h        |    1 +
->  arch/arm64/kernel/cpufeature.c       |    1 +
->  arch/arm64/kvm/Kconfig               |    2 +
->  arch/arm64/kvm/Makefile              |    2 +-
->  arch/arm64/kvm/arch_timer.c          |   37 +-
->  arch/arm64/kvm/arm.c                 |  179 ++-
->  arch/arm64/kvm/guest.c               |   95 +-
->  arch/arm64/kvm/hypercalls.c          |    4 +-
->  arch/arm64/kvm/inject_fault.c        |    5 +-
->  arch/arm64/kvm/mmio.c                |   16 +-
->  arch/arm64/kvm/mmu.c                 |  214 +++-
->  arch/arm64/kvm/pmu-emul.c            |    6 +
->  arch/arm64/kvm/psci.c                |   30 +
->  arch/arm64/kvm/reset.c               |   13 +-
->  arch/arm64/kvm/rmi-exit.c            |  207 ++++
->  arch/arm64/kvm/rmi.c                 | 1663 ++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c            |   53 +-
->  arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
->  arch/arm64/kvm/vgic/vgic-v2.c        |    6 +-
->  arch/arm64/kvm/vgic/vgic-v3.c        |   14 +-
->  arch/arm64/kvm/vgic/vgic.c           |   55 +-
->  arch/arm64/kvm/vgic/vgic.h           |   20 +-
->  arch/arm64/mm/fault.c                |   28 +-
->  drivers/perf/arm_pmu.c               |   20 +
->  include/kvm/arm_arch_timer.h         |    2 +
->  include/kvm/arm_pmu.h                |    4 +
->  include/kvm/arm_psci.h               |    2 +
->  include/linux/perf/arm_pmu.h         |    7 +
->  include/uapi/linux/kvm.h             |   42 +-
->  35 files changed, 3650 insertions(+), 116 deletions(-)
->  create mode 100644 arch/arm64/include/asm/kvm_rmi.h
->  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
->  create mode 100644 arch/arm64/include/asm/rmi_smc.h
->  create mode 100644 arch/arm64/kvm/rmi-exit.c
->  create mode 100644 arch/arm64/kvm/rmi.c
-> 
-> -- 
-> 2.43.0
-> 
-> 
+Cheers,
+/fuad
+> Looking at the arm64_ftr_reg structure, this could work if
+> FTR_VISIBLE_IF_IS_ENABLED() didn't simply put "HIDDEN" when the
+> feature is not present, but forced things to be disabled
+> altogether. The problem is that "HIDDEN" means not shown to userspace,
+> and that we have plenty of HIDDEN features that must make it into KVM.
+>
+> I'll have a think.
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
