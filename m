@@ -1,66 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39575F50F;
-	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03F42D8DB9;
+	Thu, 12 Feb 2026 09:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770887274; cv=none; b=USUufp7/MC0mE7gJ5Nj+jnDtC13KLPK7HkrS3PEibZnpoPS+2rb906iceoPSDKU7dR4+M3UWmHdJ7Rs8f2zFjK+ZCMCGAcg9sQ1254mLZspQsw7rHwNGLEDZyTDaMMt77SqhyIgmr4hTD2PDBYcvcpxADJw55QFlkY8UJcuVy9k=
+	t=1770888580; cv=none; b=pGflq2p+JeNUnwO3PMHnJdbFChbgkqfLAvXxS0YhJTwCm9gB2AHBIlZtQXZoQAfAWLP8Dnn5hr9a85hVe3EM20KJ7TsSE8YF0iDMxr/EyGhS5m73VGHWgUEwfiJaUpqnrZaXtC17y0pVGb1S1XcE8mLrlcg9FlrLUGLmUfZsBBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770887274; c=relaxed/simple;
-	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
+	s=arc-20240116; t=1770888580; c=relaxed/simple;
+	bh=iZyfNOwyD37sadNlp31+zwi7lJubFRN6RKclXfibhQU=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CRYqH6osKWZFuXlKUnqfxev2UCZyTQthLX7UK7YTtsqGd2Tqj2AEMx0ya7YCvyARL+3UHvUXbEUo4zK720XJ6qTwW/vHkf0+cy0jJBArRUnyh/yfVtlWu9NPZT/c9eJdQrqSh15Mk2C2lFdzYDLJO4nvgOmj2pHjoMJwLKInlsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRDzJd4y; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=qGdMtlca68fNqFeiqeZhldcW3mE+a83TCQqwTh1azZ1BS8S4CoInkrHraH97gwYfSvw23CSUvQTDfw4VDRhVy+nYVdENwq9MzLnG6udWPf7qcTtiuUFJZizktwtbSIba+dyPiEXhS8LR/b3XMYPx9A/y+MRzE2P8WFyOLVqLjhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMgzjksR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRDzJd4y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1428BC4CEF7;
-	Thu, 12 Feb 2026 09:07:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMgzjksR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59B38C4CEF7;
+	Thu, 12 Feb 2026 09:29:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770887274;
-	bh=7X/ZE+464SFMrcWXG+fw9L92P1t1gtPIejSOE1mm8Sg=;
+	s=k20201202; t=1770888580;
+	bh=iZyfNOwyD37sadNlp31+zwi7lJubFRN6RKclXfibhQU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SRDzJd4y7pdwghuIRwEX+milR/vWqoeZRao4cczsY/oRSB7rXxGuJLbC8pO7iCSw4
-	 /1fHpKlD9QC8Pr36ty9iBxiTNpXaDNYp9kxfY175hoKc70tInFruadKyuacdByotDw
-	 giDuJK9Yv4AbMPDUN5IleiHk09y0vDFg4IFOf1Va0BfXrwqu9s3EcPhdfYle0DOYSg
-	 Po0zabmL17OlVZC5nq6r8y/4vDgWU5l1/ykpkYYbjQp+nF7oNrOcToyCcJwcrWAWRT
-	 TlUDUSJIbuvgS7XUw4PVNj+qOU1x9wo3jckCVZzmRgQeTQjpQnhNQht/dATAuEMT5X
-	 Wv6weRnqIFc7A==
-Received: from [185.219.108.64] (helo=goblin-girl.misterjones.org)
+	b=WMgzjksRKXmhbGYgMOwxiC5W35cIH5gveVPwAbB0ugycGDjtRFyhYm+pVLcLCKNZH
+	 mgYBR18nhaEB09FQmWkgWqRb3Hy6itiCTaZi5xp1oBM/Rz2NUp+yjdNYyTdjpKjXOL
+	 p2KxjU6sUMhkkM+8Xpffp1+3QrDskT6ZTwfJaPDeaI7ylWms4Yn9SwWzds+6AXzAvs
+	 7eZg7YX8rneAfFHB9hNH7El+/LsAx7R+F9sKZMEygrkhH/cWD5ASfMziXEHSMkJUP9
+	 vcGtYql3keB9zjO7TmY1jmMXoiYL5TQuKPD7278uJdB1UgkH/6fXXtUCkotomFtHwn
+	 uxYF3nCaEhGlw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vqSfv-0000000AYzI-2Zos;
-	Thu, 12 Feb 2026 09:07:51 +0000
-Date: Thu, 12 Feb 2026 09:07:33 +0000
-Message-ID: <86ldgyba96.wl-maz@kernel.org>
+	id 1vqT0z-0000000AZEb-3wuv;
+	Thu, 12 Feb 2026 09:29:38 +0000
+Date: Thu, 12 Feb 2026 09:29:37 +0000
+Message-ID: <86jywib98e.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
+To: Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Mingwei Zhang <mizhang@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 09/19] KVM: arm64: Write fast path PMU register handlers
-In-Reply-To: <20260209221414.2169465-10-coltonlewis@google.com>
-References: <20260209221414.2169465-1-coltonlewis@google.com>
-	<20260209221414.2169465-10-coltonlewis@google.com>
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
+In-Reply-To: <20260212090252.158689-2-tabba@google.com>
+References: <20260212090252.158689-1-tabba@google.com>
+	<20260212090252.158689-2-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,28 +61,76 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 09 Feb 2026 22:14:04 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> We may want a partitioned PMU but not have FEAT_FGT to untrap the
-> specific registers that would normally be untrapped. Add a handler for
-> those registers in the fast path so we can still get a performance
-> boost from partitioning.
-> 
-> The idea is to handle traps for all the PMU registers quickly by
-> writing directly to the hardware when possible instead of hooking into
-> the emulated vPMU as the standard handlers in sys_regs.c do.
+Hi Fuad,
 
-This seems extremely premature. My assumption is that PMU traps are
-rare, and that doing a full exit should be acceptable. Until you
-demonstrate the contrary, I don't want this sort of massive bloat in
-the most performance-critical path.
+On Thu, 12 Feb 2026 09:02:50 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
+> However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
+> guests whenever the hardware supports it, ignoring the host kernel
+> configuration.
 
-"Start walking before you try to run".
+This is the umpteenth time we get caught by this. PAN was the latest
+instance until this one. Maybe an approach would be to have a default
+override when a config option is not enabled, so that KVM is
+consistent with the rest of the kernel?
+
+> 
+> If a guest detects this feature and attempts to use it, the host will
+> fail to context-switch POR_EL1, potentially leading to state corruption.
+> 
+> Fix this by masking ID_AA64MMFR3_EL1.S1POE and preventing KVM from
+> advertising the feature when the host does not support it, i.e.,
+> system_supports_poe() is false.
+> 
+> Fixes: 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 ++-
+>  arch/arm64/kvm/sys_regs.c         | 3 +++
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac7f970c7883..7af72ca749a6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1592,7 +1592,8 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+>  	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
+>  
+>  #define kvm_has_s1poe(k)				\
+> -	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+> +	(system_supports_poe() &&			\
+> +	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+
+Why do we need to further key this on system_supports_poe()? I can see
+this is a potential optimisation, but I don't think this is part of
+the minimal fix.
+
+>  
+>  #define kvm_has_ras(k)					\
+>  	(kvm_has_feat((k), ID_AA64PFR0_EL1, RAS, IMP))
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 88a57ca36d96..237e8bd1cf29 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1816,6 +1816,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		       ID_AA64MMFR3_EL1_SCTLRX |
+>  		       ID_AA64MMFR3_EL1_S1POE |
+>  		       ID_AA64MMFR3_EL1_S1PIE;
+> +
+> +		if (!system_supports_poe())
+> +			val &= ~ID_AA64MMFR3_EL1_S1POE;
+
+How about S1PIE? It seems to have a similar problem, in the sense that
+it has extra state. But I guess because we don't put it behind a
+config option, we context-switch it anyway and all is good?
+
+Thanks,
 
 	M.
 
