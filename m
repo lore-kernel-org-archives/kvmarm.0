@@ -1,66 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDFD31985C;
-	Fri, 13 Feb 2026 08:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC27212554;
+	Fri, 13 Feb 2026 10:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770970265; cv=none; b=OF9FY//o9/KonTZND/D1drg9WqADM7l4dRl/Jw2mE0W6UV5cy28EdAVyb36T2X2CmTLnFOENuY5kqOJGUAyZevV3/OPobmhOxqEb8q8CrgYItQWOPoEQjgH0E5mRuBoXDaIKy/B3n2gPHGVXr1+YD7vh5y2tZQBrTt0PhuQ7jUU=
+	t=1770979210; cv=none; b=Eabg9Gk4XXudLOn+h50v8NQDkockKJghu2fjJErp5d4Ez5UOUYXE688Ub+aGp4XY/Qk5tImVPOqadFF0jT4jTXI5doz40z0uUX89ioXOiWNHrCtNV668bGa1If9TedQDyGEHzlXVFebM2XY2nk9JObSHzks3aiJOnplG6RweX3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770970265; c=relaxed/simple;
-	bh=ordfYWUZ3NZZnUjwMBrx0IEFVahF4xoRepQLRc515+I=;
+	s=arc-20240116; t=1770979210; c=relaxed/simple;
+	bh=Xqz6za0FavxiZ7fDMciG090joG/GKFc1LpHoJfcba0w=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I9Z17Nfhdhwesao/k/IfWJHX4hHLcEmvFTdg+ptfOxap9WBJU2zOugjirElU+H25bXvAeF5ol+EGxAhj8JjpMIODNFmvDzzejUsCcydwvOIBEKVSa/IcFCetCTHNeLbJwO+JtRShFlRl1AeaPfdGj/nBm6X5Ow8bFisFfGkFJsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZxlezzd; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=vCctzmvGx+q7dryDHaOHw1AKup99umsbLZ5F7a8NfEyZvtqYh4e3HXBUuaYp0zUpHBTiTBKBLtVmSDzttAD9bAsSLmohYZG92Fy4eCm6l+h1wTDs0yFBDEMH7U4FsLyN+BiRtKhoolgUj0Xku0+If7UdLE2IpG6ipkl8I5jGK+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IpjTBKin; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZxlezzd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D42CC116C6;
-	Fri, 13 Feb 2026 08:11:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IpjTBKin"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA286C116C6;
+	Fri, 13 Feb 2026 10:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770970264;
-	bh=ordfYWUZ3NZZnUjwMBrx0IEFVahF4xoRepQLRc515+I=;
+	s=k20201202; t=1770979209;
+	bh=Xqz6za0FavxiZ7fDMciG090joG/GKFc1LpHoJfcba0w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mZxlezzdNvjH1qxidU7XggLUEDoM/yxCPjvXxNzaIOeH0KjIQE/5lW4YU3ROt4Iep
-	 coZp9FKOS18HwqhltmhVnR/I9UZGq1d1JCklRjWG06sINuOo78HbXvpKBTOmfQKaRj
-	 eIjDXQ2oJhyMZqdJptSC4Y4u9YyBca084S3ZSzWFrtTdMxfR2B/qDhC1uuA2dXVQ9n
-	 n9DLmrIZW7SATj6MK/Oj8VFIrKD22ri1SXZY/se7YJNxuLAxjEQQFX8PHB4uB4VLpy
-	 REMfeXCdKsJx3Sf/DIgeJpUqz7/QsoFghkMcT6hpqqo7Yo1Eo8LmCodQxNDlQGH+rq
-	 pTf2EpwxVJD6g==
+	b=IpjTBKin7B81H+bwSfU+aUQh7ariYE9q67Gk6wzrek0HB0CLhpMF9utWlVFmsSg5a
+	 p+bKzkpCNCbcFFCmTJugmHeb3Gl1kKdW+sX0NiI19crR9kSoOCSN4pB/PRjEv8JWT0
+	 VEHYv3P882F97T0x78MSbCN4EjDymneEqWOW/Zx9/Sk0YU3qrH2aR9oRDW5lDiEdAn
+	 u1eeI6LO8Rtit1nX6T+lURFD2tJziUCldf1gs/GHFkGvRQsNOMRH7xp0UZf2pvZa6B
+	 qbbkDP03/zTHFBnCwK/Q8Ecatv9beYxm9kbFC1G3Fgm6LbZmZMP/krH6Lob9TVDWBT
+	 xMijghpMH5Fgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vqoGT-0000000Ap2s-3Twx;
-	Fri, 13 Feb 2026 08:11:01 +0000
-Date: Fri, 13 Feb 2026 08:11:01 +0000
-Message-ID: <86h5rlawru.wl-maz@kernel.org>
+	id 1vqqal-0000000Ar8t-1BHt;
+	Fri, 13 Feb 2026 10:40:07 +0000
+Date: Fri, 13 Feb 2026 10:40:06 +0000
+Message-ID: <86fr75apvd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Colton Lewis <coltonlewis@google.com>
+To: Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org,
-	alexandru.elisei@arm.com,
-	pbonzini@redhat.com,
-	corbet@lwn.net,
-	linux@armlinux.org.uk,
-	catalin.marinas@arm.com,
-	will@kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	oliver.upton@linux.dev,
-	mizhang@google.com,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com,
 	yuzenghui@huawei.com,
-	mark.rutland@arm.com,
-	shuah@kernel.org,
-	gankulkarni@os.amperecomputing.com,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-perf-users@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v6 00/19] ARM64 PMU Partitioning
-In-Reply-To: <gsnt8qcxhdpn.fsf@coltonlewis-kvm.c.googlers.com>
-References: <86v7g5asp4.wl-maz@kernel.org>
-	<gsnt8qcxhdpn.fsf@coltonlewis-kvm.c.googlers.com>
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] KVM: arm64: Hide S1POE from guests when not supported by the host
+In-Reply-To: <CA+EHjTwLcxB1e_FZsw_Semoj8tjMBUKZFM8+Vbo+64+=T4GN-Q@mail.gmail.com>
+References: <20260212090252.158689-1-tabba@google.com>
+	<20260212090252.158689-2-tabba@google.com>
+	<86jywib98e.wl-maz@kernel.org>
+	<CA+EHjTz-JU2gDfziCY2SguK9=6gGSCL5TN_U_C7FiZ5i0JTZqQ@mail.gmail.com>
+	<86ikc2asa8.wl-maz@kernel.org>
+	<CA+EHjTwLcxB1e_FZsw_Semoj8tjMBUKZFM8+Vbo+64+=T4GN-Q@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,58 +65,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: coltonlewis@google.com, kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 12 Feb 2026 21:08:36 +0000,
-Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> Hey Marc, thanks for the review.
-> 
-> Marc Zyngier <maz@kernel.org> writes:
-> 
-> > On Mon, 09 Feb 2026 22:13:55 +0000,
-> > Colton Lewis <coltonlewis@google.com> wrote:
-> 
-> >> This series creates a new PMU scheme on ARM, a partitioned PMU that
-> >> allows reserving a subset of counters for more direct guest access,
-> >> significantly reducing overhead. More details, including performance
-> >> benchmarks, can be read in the v1 cover letter linked below.
-> 
-> >> An overview of what this series accomplishes was presented at KVM
-> >> Forum 2025. Slides [1] and video [2] are linked below.
-> 
-> >> IMPORTANT: This iteration does not yet implement the dynamic counter
-> >> reservation approach suggested by Will Deacon in January [3]. I am
-> >> working on it, but wanted to send this version first to keep momentum
-> >> going and ensure I've addressed all issues besides that.
-> 
-> > [...]
-> 
-> > As I have asked before, this is missing an example of how userspace is
-> > going to use this. Without it, it is impossible to correctly review
-> > this series.
-> 
-> > Please consider this as a blocker.
-> 
-> Understood. I remember you asking for a QEMU patch specifically.
+On Thu, 12 Feb 2026 18:53:05 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 
-No. *any* VMM. QEMU, kvmtool, crosvm, firecrackpoter, whichever you want.
+> Ouch! Yeah, no easy solutions here. For now, as a fix to be able to
+> backport, would you like me to respin this without the change to
+> kvm_has_s1poe(), or with that change as a separate patch?
 
-> I had hoped that the use in the selftest was sufficient to show how to
-> use the uAPI.
+I'll remove the hunk myself when applying the series, no need to
+resend (unless I find another issue in the rest of the series, but it
+looks good so far).
 
-The selftests are absolutely pointless, like 99% of all selftests.
-They don't demonstrate how the userspace API works, now how
-configuring the PMU is ordered with the rest of the save/restore flow.
+FWIW, I have an alternative set of hacks at [1], which appear to work,
+but we need to collectively convince ourselves that this is the
+correct thing to do (i.e. the required traps are always set,
+irrespective of the configuration).
 
-> If not, I can send out an example QEMU patch to the QEMU ARM mailing
-> list.
+This affects PAuth, SVE, MTE and S1POE. SME and GCS are not supported
+in KVM, and BTI has no additional state, so these shouldn't be
+affected.
 
-Please do.
+Thanks,
 
 	M.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=arm64/ftr_config
 
 -- 
 Without deviation from the norm, progress is not possible.
