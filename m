@@ -1,138 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E49F221F26;
-	Fri, 13 Feb 2026 14:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071423612EC
+	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 14:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770992185; cv=none; b=k+H7MnCy8yF/RNZDqu+0CWiZdN1Pc2YnAgRv4IkfHPJrsuYAiaD9+JI3mnduD3hm77QEOXwrBQCMgR8HdrzglYBuu5IKAChX6kH0j7+IXgCgoR3jyLk9Z16jUEmixfWwmZIcC48t4v6lVqevOgCoYTjYFll7UnBcRYuitJ6r6g4=
+	t=1770993499; cv=none; b=I39eUWkfILmxXTnTRcypAU/OReiQ0U2d+demeoL+q+mkBwRSh0o3G6gqustET9XlbUCG3vXf+ekGSI7U54hwC/Pz5Ks8LXXTE9FyiGbdBjKOHBJzqjqEZlYXYj3Pfv/vQ7lJT6EfcAgQo8Y85tNxtxn6F3aSHhooK8ttU4/6Hz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770992185; c=relaxed/simple;
-	bh=4edQuEePW6yhcvYTSlisOuKCCvknpEatDy/ILAJ726E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h3P1OzfCsxQgVdJ8/CLyY2PhH2SpXE2zjQTY2drfE8vHiH+J28WxcVNuzk1YfXdWrHs/V1i5XWm8WPqc+goJztYo5Kjx0DtmIY06tWnyDy2kHt6DSyXfk9RjI22Vhv+MHtWDvpkLCADaRVxsjHcmMYDNQgisLg5h5TuCat9zJAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VeaChKw6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1770993499; c=relaxed/simple;
+	bh=tgCJ0yXfYRIrO5tRfb5O7+h3Cr2Uakv1/lFQiNz9wC0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SOOSQwZl+yZ3vEtlYvLfork7tvYBv8hwKwqpQ8iQJtR1OimQicIEWVacR33yKYmvm/AXdkMtrVxhYQDuk1gyzO4U1t5D2dZ2lQ1nLKY1l4yvYAa5FrUNun2BpLK6i5MqoEN0MW5kLP2HQvgbczG8VVQ2RQQdwOhiSkVsKS9V0l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NTerOXBo; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VeaChKw6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE35C116C6;
-	Fri, 13 Feb 2026 14:16:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770992184;
-	bh=4edQuEePW6yhcvYTSlisOuKCCvknpEatDy/ILAJ726E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VeaChKw6nltt5Ypc/+SNuu+Jp1k7Y9AOgbYJ6Wd7lspMS8zXmbSrgW3Bjr8Dk6gPa
-	 +HTtlL0t/d8KN0wH45bJdNtivXBryVhDrBLUqAiRs5PN3Guw4mdwdmKulgbin4JA7B
-	 xI+kU4Qeii1VCTdw3AYTIHtDEDTF9DGQq0MEYApCYXc78TPsF+MM/nu1hjw/TmmWBn
-	 3ud7Svd+XXMkWZ5oGjApNj5qugYht/Te15/sMR76D8niVSKymJ1qwbNTjtaVb2iYoH
-	 qMhfpT90u1nNADpoFr/pNbY+TPJvwECle9i5tqdWMwwz+usGQ2bHymwcW2qYeUUftT
-	 nSedNidnzQlQQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vqty2-0000000Ate3-1GZW;
-	Fri, 13 Feb 2026 14:16:22 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Hyesoo Yu <hyesoo.yu@samsung.com>,
-	Quentin Perret <qperret@google.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] arm64: Force the use of CNTVCT_EL0 in __delay()
-Date: Fri, 13 Feb 2026 14:16:19 +0000
-Message-ID: <20260213141619.1791283-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NTerOXBo"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b8faf5f2b38so94087366b.1
+        for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 06:38:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1770993496; x=1771598296; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UUp+ZPHGqL5Ruf8kk7PuU1fhAJIx8L0ts8JU7bSIkH8=;
+        b=NTerOXBotg9sZfPLbISjba52NMXRlyOSwCV3ILnp6+MuHeyED24dEv+bUJy5JWQPWG
+         PH6fNMvCwSXyOCXtPLC94NZIo7HyZpLig8ePcYCHm3yfm9hd6pig6w1icpiBB8w5ilvl
+         9mtxTFuK2CgOfQxezPZFH7is0HOHWiuD3JiisqsWlj+aODB1OYD84kmH8P9f2JnyXFqk
+         17GMVfspN8u0ZtgRxXsDZICxi+he8NVKeyFYWbg9jTQXMiV5/mv9YLyw5wacwpZcK2NO
+         M8cGGrjvu+BCE14Od/k9YIk1MW2EoVWSDd59e+ISzWS4F5IxE8uIzyXN7FOVWpeaI/lF
+         Vm6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1770993496; x=1771598296;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UUp+ZPHGqL5Ruf8kk7PuU1fhAJIx8L0ts8JU7bSIkH8=;
+        b=a+VuTQCfgQfmEWfx3aldugXYKxTdMIydrl1HK6oipjOMOTqnrwaB70F5r1DW2ficGs
+         QRa8HEUDwADw8Z3Hnzi5JZkF/ZnbihhlxjGyAp4VfknIxTzh3tv5F5L9+6FZpqJ2yrqL
+         eisfg7XqCZxO9Cp5MCbV7opXzYYrHMv9l67V70sfT3my0euFMi+UtNHHjsOt4VkG6qlE
+         GH1wepZMCd6RlZLI4TxFJohXKzdbKfoapE9nsEpbODlbIkL48gM3bz0V6Zg/oDlpn/Uu
+         cY58mbfsEwbhmU3cSXu1krc+cYpyf3WFzy2DjQ2NmNs1DGBK1hWCPPcijdFZPm1Ljf7v
+         2svw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFmR+hQ/vS9+4iAoi5wPd9hN+6NurdwhsdedeMaGNxi4CNSmz7kJAd8WnmcJWWW6Q3mUnWBEQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzj6sdGFkoC3O4UOyWlw5KgFFTVvxqg6R/nTd8HCoAyeHhomKZz
+	nXxmAOXB/pkNpOCdd0mOTj4wIpt2EutvKapsqDu0UFdCzJ9tdl3jqLG058XLGZtdtowtAfO1tBv
+	ZrA==
+X-Received: from ejbme9.prod.google.com ([2002:a17:906:aec9:b0:b87:1864:34ed])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:728c:b0:b8f:848b:4456
+ with SMTP id a640c23a62f3a-b8fb41937f6mr98615266b.13.1770993496347; Fri, 13
+ Feb 2026 06:38:16 -0800 (PST)
+Date: Fri, 13 Feb 2026 14:38:11 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, hyesoo.yu@samsung.com, qperret@google.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.273.g2a3d683680-goog
+Message-ID: <20260213143815.1732675-1-tabba@google.com>
+Subject: [PATCH v2 0/4] KVM: arm64: Fix guest feature sanitization and pKVM
+ state synchronization
+From: Fuad Tabba <tabba@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, tabba@google.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Quentin forwards a report from Hyesoo Yu, describing an interesting
-problem with the use of WFxT in __delay() when a vcpu is loaded and
-that KVM is *not* in VHE mode (either nVHE or hVHE).
+This series addresses state management and feature synchronization
+vulnerabilities in both standard KVM and pKVM implementations on arm64.
+The primary focus is ensuring that the hypervisor correctly handles
+architectural extensions during context switches to prevent state
+corruption.
 
-In this case, CNTVOFF_EL2 is set to a non-zero value to reflect the
-state of the guest virtual counter. At the same time, __delay() is
-using get_cycles() to read the counter value, which is indirected to
-reading CNTPCT_EL0.
+Changes since v1 [1]:
+- Moved optimising away S1POE handling when not supported by host to a
+  separate patch.
+- Fixed clearing, checking and setting KVM_ARCH_FLAG_ID_REGS_INITIALIZED
 
-The core of the issue is that WFxT is using the *virtual* counter,
-while the kernel is using the physical counter, and that the offset
-introduces a really bad discrepancy between the two.
+[1] https://lore.kernel.org/all/20260212090252.158689-1-tabba@google.com/
 
-Fix this by forcing the use of CNTVCT_EL0, making __delay() consistent
-irrespective of the value of CNTVOFF_EL2.
+Based on Linux 6.19.
 
-Reported-by: Hyesoo Yu <hyesoo.yu@samsung.com>
-Reported-by: Quentin Perret <qperret@google.com>
-Reviewed-by: Quentin Perret <qperret@google.com>
-Fixes: 7d26b0516a0df ("arm64: Use WFxT for __delay() when possible")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od
+Cheers,
+/fuad
+
 Cc: stable@vger.kernel.org
----
- arch/arm64/lib/delay.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
-index cb2062e7e2340..d02341303899e 100644
---- a/arch/arm64/lib/delay.c
-+++ b/arch/arm64/lib/delay.c
-@@ -23,9 +23,20 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
- 	return (xloops * loops_per_jiffy * HZ) >> 32;
- }
- 
-+/*
-+ * Force the use of CNTVCT_EL0 in order to have the same base as WFxT.
-+ * This avoids some annoying issues when CNTVOFF_EL2 is not reset 0 on a
-+ * KVM host running at EL1 until we do a vcpu_put() on the vcpu. When
-+ * running at EL2, the effective offset is always 0.
-+ *
-+ * Note that userspace cannot change the offset behind our back either,
-+ * as the vcpu mutex is held as long as KVM_RUN is in progress.
-+ */
-+#define __delay_cycles()	__arch_counter_get_cntvct_stable()
-+
- void __delay(unsigned long cycles)
- {
--	cycles_t start = get_cycles();
-+	cycles_t start = __delay_cycles();
- 
- 	if (alternative_has_cap_unlikely(ARM64_HAS_WFXT)) {
- 		u64 end = start + cycles;
-@@ -35,17 +46,17 @@ void __delay(unsigned long cycles)
- 		 * early, use a WFET loop to complete the delay.
- 		 */
- 		wfit(end);
--		while ((get_cycles() - start) < cycles)
-+		while ((__delay_cycles() - start) < cycles)
- 			wfet(end);
- 	} else 	if (arch_timer_evtstrm_available()) {
- 		const cycles_t timer_evt_period =
- 			USECS_TO_CYCLES(ARCH_TIMER_EVT_STREAM_PERIOD_US);
- 
--		while ((get_cycles() - start + timer_evt_period) < cycles)
-+		while ((__delay_cycles() - start + timer_evt_period) < cycles)
- 			wfe();
- 	}
- 
--	while ((get_cycles() - start) < cycles)
-+	while ((__delay_cycles() - start) < cycles)
- 		cpu_relax();
- }
- EXPORT_SYMBOL(__delay);
+Fuad Tabba (4):
+  KVM: arm64: Hide S1POE from guests when not supported by the host
+  KVM: arm64: Optimise away S1POE handling when not supported by host
+  KVM: arm64: Fix ID register initialization for non-protected pKVM
+    guests
+  KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
+
+ arch/arm64/include/asm/kvm_host.h |  3 ++-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c    | 37 ++++++++++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c         |  3 +++
+ 3 files changed, 39 insertions(+), 4 deletions(-)
+
+
+base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
 -- 
-2.47.3
+2.53.0.273.g2a3d683680-goog
 
