@@ -1,55 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9A11C5D44;
-	Fri, 13 Feb 2026 14:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E49D35F8B9;
+	Fri, 13 Feb 2026 15:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770994710; cv=none; b=mSrJjyfPpsICgSwpNKmUXsCcLWKHGacAtB16GONsDdnKtb4cwo+rfeoD08r0mVk9On62GTvS33kRPnSx+LAp1CtEtd26neCxymBBJbk/IuHVZ0E0ntIob8mACJqGaLLnUQI3sLtDRI5DhTJVEN+mGLgJd4Q3ehJORNrUDTo16F8=
+	t=1770995010; cv=none; b=JwjMVzLdmwikSzIDbbmh0TlkkoeZXJPHlNIGk9KN/HOkBFE8TqwLmxVTyLqxgst6hNo9IR4idcr0dhmtRw6XJz7xARLnM/ZCE+BCzaXRBdvV0fi7FR/A3fhl0J+67DUI7ccTz5yrJGM9xSUT7zUNfcXlP9BNZLID6PBap5ydTMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770994710; c=relaxed/simple;
-	bh=a1VABnZngA4STd31yo3YpGNkB/nSTL3k7/EUbnDUuX4=;
+	s=arc-20240116; t=1770995010; c=relaxed/simple;
+	bh=bwBJBP1hyUViZ0rrcDmZcdmQyIs7K+antF4a/1Hue/c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZiZoAiLP/D9Y4A4w3oN1gZoXmyUEvmFbf21FBpaTImhqxGXmOcEtabRLJSNtD32IeAVDD4M6Tmyq5BsnfQ64ufdJCNv+/ZKS7WaG44a5WXfMIOgWsVGivSo52Bhhh3N3QDKrzM12pACz1w+L3sZ2NQ3i1aan09w1Isbn6y0Y+7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BmWDoQfM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=RplCi5G+YFbIwl93T6kL7eZYTbb124hNomYMzgxWH4s6DYyEkA0+o9CM8/Y+pgRjkjGAb+EUae4wBuBcjkZRq6OreNyUZKWQHvJ+sf7SsqUU+TRPHr9ByaAXGoDlFpfWgSNZf2i5XDQGZe84aERUfTyMDx9Xdl9ze9RrOfuBMfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RoZu0Dg2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmWDoQfM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0A7FC116C6;
-	Fri, 13 Feb 2026 14:58:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RoZu0Dg2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20B5FC116C6;
+	Fri, 13 Feb 2026 15:03:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1770994709;
-	bh=a1VABnZngA4STd31yo3YpGNkB/nSTL3k7/EUbnDUuX4=;
+	s=k20201202; t=1770995010;
+	bh=bwBJBP1hyUViZ0rrcDmZcdmQyIs7K+antF4a/1Hue/c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BmWDoQfMXvwoMpDQnT0qo95sgLPwmcQFWK5jRYNRISQh/kuuKyAgtCXKMEOQTO3RG
-	 d5/UL4eSLVcXTxTntoO4Fhi9s4TQVUnv/muUK5AlRx+Em2LpJx8D8camQjQAkxO0H6
-	 MkxBGn6DpyoW343tdRFWLQB/KQ0uFnKq0x999ZX4H6hQN1y0j8FCkXRMZHj5wBVK5p
-	 jF5poC5wR8J3kAI2GCbbkMckPT7YzzbYkjN/lATW7DAs2gmAMdTQ9GaHbagnRD/qOP
-	 hKSumNH4pffUzhWIPG0us74MWcourR8Yt4HeYb+EQYWW998aDGyo8zvCuNmwkuRjlz
-	 QnTCvMQRRWfNA==
+	b=RoZu0Dg2b9XDeXZS54xi7WeNHlr3klAe5otMih7vU5ffwiMrxFvTzBilOtZQWVymj
+	 6re4vKIGISqc/+irVYOCPDegqJNuFx3zC5N5iYoE8WtYg4A5JQP0P4vQzwB2Q6kD1f
+	 Vh8jMUrjl8cmXpOCtpXDOEy81aMjtK2uVZ/7y0GpswQ2sIzqsJGjkehaZjRoRFIskS
+	 vRmb4la70yQFyyYvTvfNT3az92LAqGJ2S46XcdaJmSOMDDF2vmMiCd4Kn3+RR32k0O
+	 P/ave6ETbUhw+bfjhH/UHOQfiNetcAs575UBBmaumAQcQlynIsDnG9ENz1aY5QBoiu
+	 QvQgQY2IfCQng==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vqucl-0000000AuM4-244w;
-	Fri, 13 Feb 2026 14:58:27 +0000
+	id 1vquhb-0000000AuPm-3u3k;
+	Fri, 13 Feb 2026 15:03:28 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
+To: Kees Cook <kees@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
 	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	stable@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Fix guest feature sanitization and pKVM state synchronization
-Date: Fri, 13 Feb 2026 14:58:24 +0000
-Message-ID: <177099469863.1792134.7316507430953466702.b4-ty@kernel.org>
+	kvmarm@lists.linux.dev,
+	Timothy Hayes <timothy.hayes@arm.com>,
+	Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	Keir Fraser <keirf@google.com>,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
+Date: Fri, 13 Feb 2026 15:03:24 +0000
+Message-ID: <177099499992.1792318.9934885934778681296.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260213143815.1732675-1-tabba@google.com>
-References: <20260213143815.1732675-1-tabba@google.com>
+In-Reply-To: <20260206223022.it.052-kees@kernel.org>
+References: <20260206223022.it.052-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -59,34 +63,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, stable@vger.kernel.org, oupton@kernel.org
+X-SA-Exim-Rcpt-To: kees@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, glider@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, timothy.hayes@arm.com, Sascha.Bischoff@arm.com, keirf@google.com, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 13 Feb 2026 14:38:11 +0000, Fuad Tabba wrote:
-> This series addresses state management and feature synchronization
-> vulnerabilities in both standard KVM and pKVM implementations on arm64.
-> The primary focus is ensuring that the hypervisor correctly handles
-> architectural extensions during context switches to prevent state
-> corruption.
+On Fri, 06 Feb 2026 14:30:23 -0800, Kees Cook wrote:
+> In preparation for making the kmalloc family of allocators type aware,
+> we need to make sure that the returned type from the allocation matches
+> the type of the variable being assigned. (Before, the allocator would
+> always return "void *", which can be implicitly cast to any pointer type.)
 > 
-> Changes since v1 [1]:
-> - Moved optimising away S1POE handling when not supported by host to a
->   separate patch.
-> - Fixed clearing, checking and setting KVM_ARCH_FLAG_ID_REGS_INITIALIZED
+> The assigned type is "struct gic_kvm_info", but the returned type,
+> while matching, is const qualified. To get them exactly matching, just
+> use the dereferenced pointer for the sizeof().
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/4] KVM: arm64: Hide S1POE from guests when not supported by the host
-      commit: f66857bafd4f151c5cc6856e47be2e12c1721e43
-[2/4] KVM: arm64: Optimise away S1POE handling when not supported by host
-      commit: 9cb0468d0b335ccf769bd8e161cc96195e82d8b1
-[3/4] KVM: arm64: Fix ID register initialization for non-protected pKVM guests
-      commit: 7e7c2cf0024d89443a7af52e09e47b1fe634ab17
-[4/4] KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
-      commit: 02471a78a052b631204aed051ab718e4d14ae687
+[1/1] KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
+      commit: ee5c38a8d31e5dea52299c43c2ec3213351ab6e1
 
 Cheers,
 
