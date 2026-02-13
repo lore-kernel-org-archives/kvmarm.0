@@ -1,113 +1,100 @@
-Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com [209.85.161.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CAF29AAF3
-	for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 21:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDD6611E
+	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 03:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770930520; cv=none; b=mZ1qLKMsAyg/luK5iHkLXnrA/SJ8EFrsQHdOpm72Ufh5PUV+0TwCtL00MibUnkum+TPVUkf6Tfu35HvH5ieiato/KukQq+tYwcR2sg1jctN6tMJ7UHQNgTVOvYd3BqZx9cmBJ2GxX0nJVl+u1fwhn3soZFx9Q56Si7hJOCMxCB4=
+	t=1770953528; cv=none; b=dx9A2tQzZq82N0mJIiAVrlvQ61+UXd04ajvagDFjDF0DSzHf5dV3jU9bX2ESsbRE9PHr/9nbgoC3K4U/35lYh/cM3x2xlpui3usFQ4dvRiK6YlzBwpEs7iE9QaUJtEVoWzTEqxBZ4S8Z1GX8hUDClcjrfEbnbWL73XbCpMB0z+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770930520; c=relaxed/simple;
-	bh=Si4a3lubEVIsFr5xg//zf0cPvmnb0GNinNu5h5MauAE=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=DGj+YT9ZbGw1yNI5cNSx15z+A95HVXkADzkTsPDhe2BPKrg59tNGztwWWNlks27euaVfZ+DeD4k/DxsOPDWRSOIkOjXjU1+SFQKCwc1DOGfxHMQDDULaHS3iPW0xvLzpcMN7gUUMIOkvREVWXQbFVOXxfy1q+uW4ZuKU/J3Etxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vGP6dFe9; arc=none smtp.client-ip=209.85.161.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1770953528; c=relaxed/simple;
+	bh=hY496p4yfyKaTWbnakLvDFLvspHDFM+Q4po34xBLG6g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GV42VMDZCje3qWW8O6+xFjn7/IIqJiowrJRES4S1aCBcPt2y/vsDVlfCyxnmc3wwHzgmdsgXbq5M7DkKixghdPIXPvW2ardaJOBsS8ryHiMPj3FDY2UHQImTqpOfWc5Wa1JEGFZVAEYdTgyculNjczZ8HAjqtmnv/jy2zZVP3XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=D+vI6+z0; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vGP6dFe9"
-Received: by mail-oo1-f73.google.com with SMTP id 006d021491bc7-6744760f6daso1616798eaf.3
-        for <kvmarm@lists.linux.dev>; Thu, 12 Feb 2026 13:08:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770930518; x=1771535318; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DEi6lE69DtAre9+98et1Td5y86Gv96d2+RPCeTq+27M=;
-        b=vGP6dFe9qw1tlfa80HK5pne38oE8JQfIaHj0P8OW2kCq2xV6qBrvYXj/TVPLHZvDsq
-         lquG62g3xYiTKVW8WZzlVJTxr2gW6BXY0jsv4+Y4Vk3iTzYBMLDKQIcEM+QEhtFUAF11
-         /GcsdO+IAnROHR5p+kRUY9Yd57ijFbBWPgzKvcWlnzapw0Y+TkHA/sdc0I7saxHUMShz
-         Rlf9D0E8h8Psu9GLqO+jndQv1IYJqnymc7IJr7KkitjMNqwodLOXQm8VF9lCgoSdIeCJ
-         bdxfYs30COSMfbdA4XhaW7dPukj2MkeejACo/M5XrVmz54rP8jv1Hy/eqYWRot41BM+/
-         midA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770930518; x=1771535318;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DEi6lE69DtAre9+98et1Td5y86Gv96d2+RPCeTq+27M=;
-        b=NR4yHb7B0wt2kMxR1mmq59uUDtlp5++0SSnOsu9dvOM7bOWABu39OCkFnR3d/ygFB2
-         FZFV0dmdHDnMgVLMCyhD/CEGCooalV+vIR6zJakiGEhRZRBxUF2meOnwgetrzQk/84Fa
-         9xgO2nvY5D1DAwPghclyQq52Sazo9bCsB/QG7gBXY6E8Lof6OzvSJEKaK56dgnH3Pns+
-         h+tyjrqAQZ+CbwQW3oq4pzAg/1YWQFQAbj85/lDYmtCOjelkfmYgm+mvogTYFglr8kic
-         CRrMN1K9TZ2D4UfcTKlkQGxwYkm6PU5jpb5ruHvU61wSdx0stux2ItGnOxlBVWJDbhMf
-         lSLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGUyI2Fh2ZGtRA6aPiBxB7DQjpAGgaQHbjK0w3SMoRPhRyM9BJhLJG8vD/WDw8S1n3DE/VbOk=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxQg7I9lCD53XOuAHPRrS0+I2vXT8PvbCaQOF7VDx8g+0lIlVpe
-	U6EUH8L+TD/sw5INFGalPk5lhJ8Y7ON84XJsHiCrrW8rP0o5uzXhpIRW5QHRLYk2aWGo9jjbYSK
-	I9yDskD27MAQuDe6aY3judMsIMw==
-X-Received: from ilmv6.prod.google.com ([2002:a92:c6c6:0:b0:468:4e21:6fcf])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:61d:b0:663:2b12:14f1 with SMTP id 006d021491bc7-677243b521amr65721eaf.83.1770930517469;
- Thu, 12 Feb 2026 13:08:37 -0800 (PST)
-Date: Thu, 12 Feb 2026 21:08:36 +0000
-In-Reply-To: <86v7g5asp4.wl-maz@kernel.org> (message from Marc Zyngier on Tue,
- 10 Feb 2026 08:49:59 +0000)
+	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="D+vI6+z0"
+dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=2jTLkivBK3JZE2lTS6lR4ksovwt/ATiOOgWVBIF+Ib0=;
+	b=D+vI6+z0tAr2aLzikbeqrI3fmDv2U8aS8V1US5GQS1V44beT0mlsbRdQHE0H/OAwvsh8MiEQS
+	93rBW2wJyPc86+tLeLbCG4ajX7Qh9mC9u/OCIaLXc3WM7lyJgGUxzWkwMn8F54Q0F3HtCOCQxb2
+	ZdqmW6CBrhAoKJcG9F3ErCo=
+Received: from mail.maildlp.com (unknown [172.19.162.92])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4fByK61B9TzmV6s;
+	Fri, 13 Feb 2026 11:27:22 +0800 (CST)
+Received: from kwepemf100008.china.huawei.com (unknown [7.202.181.222])
+	by mail.maildlp.com (Postfix) with ESMTPS id 78F4040562;
+	Fri, 13 Feb 2026 11:32:02 +0800 (CST)
+Received: from [10.174.178.24] (10.174.178.24) by
+ kwepemf100008.china.huawei.com (7.202.181.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 13 Feb 2026 11:32:00 +0800
+Message-ID: <fb50df25-0e0b-6a5f-e186-2997b5ce43f3@huawei.com>
+Date: Fri, 13 Feb 2026 11:32:00 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsnt8qcxhdpn.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v6 00/19] ARM64 PMU Partitioning
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, 
-	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v4 16/41] arm_mpam: resctrl: Implement
+ resctrl_arch_reset_all_ctrls()
+Content-Language: en-US
+To: Ben Horgan <ben.horgan@arm.com>, <james.morse@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <jonathan.cameron@huawei.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
+	<linux-doc@vger.kernel.org>, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+References: <20260203214342.584712-1-ben.horgan@arm.com>
+ <20260203214342.584712-17-ben.horgan@arm.com>
+From: Zeng Heng <zengheng4@huawei.com>
+In-Reply-To: <20260203214342.584712-17-ben.horgan@arm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100008.china.huawei.com (7.202.181.222)
 
-Hey Marc, thanks for the review.
 
-Marc Zyngier <maz@kernel.org> writes:
 
-> On Mon, 09 Feb 2026 22:13:55 +0000,
-> Colton Lewis <coltonlewis@google.com> wrote:
+On 2026/2/4 5:43, Ben Horgan wrote:
+> From: James Morse <james.morse@arm.com>
+> 
+> We already have a helper for resetting an mpam class and component.  Hook
+> it up to resctrl_arch_reset_all_ctrls() and the domain offline path.
+> 
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+> Tested-by: Peter Newman <peternewman@google.com>
+> Cc: Zeng Heng <zengheng4@huawei.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> Changes since v2:
+> Don't expose unlocked reset
+> 
+> Changes since v3:
+> Don't use or expose mpam_reset_component_locked()
 
->> This series creates a new PMU scheme on ARM, a partitioned PMU that
->> allows reserving a subset of counters for more direct guest access,
->> significantly reducing overhead. More details, including performance
->> benchmarks, can be read in the v1 cover letter linked below.
+Already review this v4 patch, and confirm the removal of redundant
+mpam_reset_component_locked() calls.
 
->> An overview of what this series accomplishes was presented at KVM
->> Forum 2025. Slides [1] and video [2] are linked below.
++ Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 
->> IMPORTANT: This iteration does not yet implement the dynamic counter
->> reservation approach suggested by Will Deacon in January [3]. I am
->> working on it, but wanted to send this version first to keep momentum
->> going and ensure I've addressed all issues besides that.
-
-> [...]
-
-> As I have asked before, this is missing an example of how userspace is
-> going to use this. Without it, it is impossible to correctly review
-> this series.
-
-> Please consider this as a blocker.
-
-Understood. I remember you asking for a QEMU patch specifically.
-
-I had hoped that the use in the selftest was sufficient to show how to
-use the uAPI. If not, I can send out an example QEMU patch to the QEMU
-ARM mailing list.
-
-> Thanks,
-
-> 	M.
-
-> --
-> Without deviation from the norm, progress is not possible.
+However, I noticed another existing issue regarding the in_reset_state
+flag setting, which will be discussed in another separate patch.
