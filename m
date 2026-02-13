@@ -1,63 +1,66 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071423612EC
-	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 14:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D84D36166B
+	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 14:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770993499; cv=none; b=I39eUWkfILmxXTnTRcypAU/OReiQ0U2d+demeoL+q+mkBwRSh0o3G6gqustET9XlbUCG3vXf+ekGSI7U54hwC/Pz5Ks8LXXTE9FyiGbdBjKOHBJzqjqEZlYXYj3Pfv/vQ7lJT6EfcAgQo8Y85tNxtxn6F3aSHhooK8ttU4/6Hz4=
+	t=1770993500; cv=none; b=usjDyFNB1lTPdtB2M140E4ONiqI9JF5ftbqKpzqp/iy3ik55jFpSg3L8NQlZWVE5MMfmLBA5sy8lcjHWeAvedAKrC/KbaPnBrQiaCl/EI1NYotmZXLvPovjiMpYVcM2pmAzPmv92uvs7nupA3cLtxDPw/dqgEXX2m/+ugJAcBVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770993499; c=relaxed/simple;
-	bh=tgCJ0yXfYRIrO5tRfb5O7+h3Cr2Uakv1/lFQiNz9wC0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SOOSQwZl+yZ3vEtlYvLfork7tvYBv8hwKwqpQ8iQJtR1OimQicIEWVacR33yKYmvm/AXdkMtrVxhYQDuk1gyzO4U1t5D2dZ2lQ1nLKY1l4yvYAa5FrUNun2BpLK6i5MqoEN0MW5kLP2HQvgbczG8VVQ2RQQdwOhiSkVsKS9V0l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NTerOXBo; arc=none smtp.client-ip=209.85.218.73
+	s=arc-20240116; t=1770993500; c=relaxed/simple;
+	bh=CBGX9joKWS1ZTVo7NrOlT+lG2W3Inq1FjMPAVo9hcsA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=NLAiR36QkWmFHNB63z0vufvJvuf6lOO86rhjdBRWUvq3btLfpUlaOaFOkw3gVzjv42xi0/g/Eo2ki9Ta0cDu4EulisPVsytuRDnvZOXIBOLDmhBHLMkppYv9C9oubGGhiye6bU+iYNzj/wwz4sjG998eSId/SOWn95W+7zxn8ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x+MCGdCs; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NTerOXBo"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b8faf5f2b38so94087366b.1
-        for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 06:38:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x+MCGdCs"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4831192e66aso14713265e9.2
+        for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 06:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770993496; x=1771598296; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UUp+ZPHGqL5Ruf8kk7PuU1fhAJIx8L0ts8JU7bSIkH8=;
-        b=NTerOXBotg9sZfPLbISjba52NMXRlyOSwCV3ILnp6+MuHeyED24dEv+bUJy5JWQPWG
-         PH6fNMvCwSXyOCXtPLC94NZIo7HyZpLig8ePcYCHm3yfm9hd6pig6w1icpiBB8w5ilvl
-         9mtxTFuK2CgOfQxezPZFH7is0HOHWiuD3JiisqsWlj+aODB1OYD84kmH8P9f2JnyXFqk
-         17GMVfspN8u0ZtgRxXsDZICxi+he8NVKeyFYWbg9jTQXMiV5/mv9YLyw5wacwpZcK2NO
-         M8cGGrjvu+BCE14Od/k9YIk1MW2EoVWSDd59e+ISzWS4F5IxE8uIzyXN7FOVWpeaI/lF
-         Vm6A==
+        d=google.com; s=20230601; t=1770993497; x=1771598297; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZI3PiRBCJaOtbE31TrtopwnjhpEV4zI9W7Z3S9kmPS8=;
+        b=x+MCGdCstbD06YoXTJJ8g0z3/Y+1ufb7DlnVxw8tpNCk1ioWPWHq+8ll35pJSSxN++
+         pkun8TrU7WR+G2o4rfRzmo+NaUMJc+ok940IGt2cwGjPs2xJH6iD9TRwgPaLjr2k9CBL
+         lhsJlVBbomA/RpibrUQNyzpdod1KeOcnCzZ2JHnIJU9bsjmo4plyi8hFLl0flpEbdy22
+         QnnbLDukaUJYot6JpbIFgXMtu/leN5N5ELhkZ3FyxG1lL/+yRn/IibhTEgEFjyvhA7jG
+         fQ7AsP/RWdeezz+/V/Er99dPkMoXoxmH1YStZcU3TeFsUZk1mHwfvu4aIXw2wUyWCLW9
+         Djig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770993496; x=1771598296;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UUp+ZPHGqL5Ruf8kk7PuU1fhAJIx8L0ts8JU7bSIkH8=;
-        b=a+VuTQCfgQfmEWfx3aldugXYKxTdMIydrl1HK6oipjOMOTqnrwaB70F5r1DW2ficGs
-         QRa8HEUDwADw8Z3Hnzi5JZkF/ZnbihhlxjGyAp4VfknIxTzh3tv5F5L9+6FZpqJ2yrqL
-         eisfg7XqCZxO9Cp5MCbV7opXzYYrHMv9l67V70sfT3my0euFMi+UtNHHjsOt4VkG6qlE
-         GH1wepZMCd6RlZLI4TxFJohXKzdbKfoapE9nsEpbODlbIkL48gM3bz0V6Zg/oDlpn/Uu
-         cY58mbfsEwbhmU3cSXu1krc+cYpyf3WFzy2DjQ2NmNs1DGBK1hWCPPcijdFZPm1Ljf7v
-         2svw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFmR+hQ/vS9+4iAoi5wPd9hN+6NurdwhsdedeMaGNxi4CNSmz7kJAd8WnmcJWWW6Q3mUnWBEQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzj6sdGFkoC3O4UOyWlw5KgFFTVvxqg6R/nTd8HCoAyeHhomKZz
-	nXxmAOXB/pkNpOCdd0mOTj4wIpt2EutvKapsqDu0UFdCzJ9tdl3jqLG058XLGZtdtowtAfO1tBv
-	ZrA==
-X-Received: from ejbme9.prod.google.com ([2002:a17:906:aec9:b0:b87:1864:34ed])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:907:728c:b0:b8f:848b:4456
- with SMTP id a640c23a62f3a-b8fb41937f6mr98615266b.13.1770993496347; Fri, 13
- Feb 2026 06:38:16 -0800 (PST)
-Date: Fri, 13 Feb 2026 14:38:11 +0000
+        d=1e100.net; s=20230601; t=1770993497; x=1771598297;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZI3PiRBCJaOtbE31TrtopwnjhpEV4zI9W7Z3S9kmPS8=;
+        b=PjXMYmw6Xt/z+/rRmMxFOFdYkn2GsKyYeOwMxmiIpqhYDZR1yxX4ExUBMzujjHmieM
+         k2cjLWolbr0aL4EYM6a16dYrKwQ3SrRm1P2X7YSsSjFZpord2av4M7CO1wUv17+6UuvC
+         jF/cUiGMOZLpUT2f+YwFoh9L116ffHtqLOCx5PHSWQkBdsSTplWEx+jkZeW63dIZlE6X
+         kmGfOXs6ujTXDQvc3pBje/Baw9v9+cZyFQZWvWC9dOq0yax/Si43k59u1IKOCgStkMM2
+         AloTg2GqvW8hEKgr7Tw35Ej4cbc0DHLNyE/88z/F+ycjNep8vcm6YCxpupTQQNCAw7RU
+         N45w==
+X-Forwarded-Encrypted: i=1; AJvYcCWCYoutNr3mRoS9QJvjvmp6Fhyh65xjgUqa1YCOqGoYgBRQj4bCZGo+VTb1zKDYkv2W8D8946I=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyw0Omk86s4V2o3dSj6jy1zKX5F8c1ZOGhhtyfmp6ZOD7/dBsEZ
+	cpN/GCtKVxJouCTG2WF1SxVzfTFTA7X8TKKB4yn9salVbRPkIC5doEdPvrHl1NHAVpu/JquNOmj
+	2vw==
+X-Received: from wmbz20.prod.google.com ([2002:a05:600c:c094:b0:47b:d5ad:dd7f])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:474e:b0:480:4be7:4f53
+ with SMTP id 5b1f17b1804b1-48371095fa6mr56214175e9.31.1770993497276; Fri, 13
+ Feb 2026 06:38:17 -0800 (PST)
+Date: Fri, 13 Feb 2026 14:38:12 +0000
+In-Reply-To: <20260213143815.1732675-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
+References: <20260213143815.1732675-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.273.g2a3d683680-goog
-Message-ID: <20260213143815.1732675-1-tabba@google.com>
-Subject: [PATCH v2 0/4] KVM: arm64: Fix guest feature sanitization and pKVM
- state synchronization
+Message-ID: <20260213143815.1732675-2-tabba@google.com>
+Subject: [PATCH v2 1/4] KVM: arm64: Hide S1POE from guests when not supported
+ by the host
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -66,40 +69,38 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, tabba@google.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-This series addresses state management and feature synchronization
-vulnerabilities in both standard KVM and pKVM implementations on arm64.
-The primary focus is ensuring that the hypervisor correctly handles
-architectural extensions during context switches to prevent state
-corruption.
+When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
+However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
+guests whenever the hardware supports it, ignoring the host kernel
+configuration.
 
-Changes since v1 [1]:
-- Moved optimising away S1POE handling when not supported by host to a
-  separate patch.
-- Fixed clearing, checking and setting KVM_ARCH_FLAG_ID_REGS_INITIALIZED
+If a guest detects this feature and attempts to use it, the host will
+fail to context-switch POR_EL1, potentially leading to state corruption.
 
-[1] https://lore.kernel.org/all/20260212090252.158689-1-tabba@google.com/
+Fix this by masking ID_AA64MMFR3_EL1.S1POE in the sanitised system
+registers, preventing KVM from advertising the feature when the host
+does not support it (i.e. system_supports_poe() is false).
 
-Based on Linux 6.19.
+Fixes: 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Cheers,
-/fuad
-
-Cc: stable@vger.kernel.org
-
-Fuad Tabba (4):
-  KVM: arm64: Hide S1POE from guests when not supported by the host
-  KVM: arm64: Optimise away S1POE handling when not supported by host
-  KVM: arm64: Fix ID register initialization for non-protected pKVM
-    guests
-  KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
-
- arch/arm64/include/asm/kvm_host.h |  3 ++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c    | 37 ++++++++++++++++++++++++++++---
- arch/arm64/kvm/sys_regs.c         |  3 +++
- 3 files changed, 39 insertions(+), 4 deletions(-)
-
-
-base-commit: 05f7e89ab9731565d8a62e3b5d1ec206485eeb0b
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 88a57ca36d96..237e8bd1cf29 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1816,6 +1816,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+ 		       ID_AA64MMFR3_EL1_SCTLRX |
+ 		       ID_AA64MMFR3_EL1_S1POE |
+ 		       ID_AA64MMFR3_EL1_S1PIE;
++
++		if (!system_supports_poe())
++			val &= ~ID_AA64MMFR3_EL1_S1POE;
+ 		break;
+ 	case SYS_ID_MMFR4_EL1:
+ 		val &= ~ID_MMFR4_EL1_CCIDX;
 -- 
 2.53.0.273.g2a3d683680-goog
 
