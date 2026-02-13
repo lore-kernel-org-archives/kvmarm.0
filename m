@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D84D36166B
-	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 14:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700ED361DD6
+	for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 14:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1770993500; cv=none; b=usjDyFNB1lTPdtB2M140E4ONiqI9JF5ftbqKpzqp/iy3ik55jFpSg3L8NQlZWVE5MMfmLBA5sy8lcjHWeAvedAKrC/KbaPnBrQiaCl/EI1NYotmZXLvPovjiMpYVcM2pmAzPmv92uvs7nupA3cLtxDPw/dqgEXX2m/+ugJAcBVk=
+	t=1770993501; cv=none; b=KpjRwliFbnaONIRbYbM1dF+/tfFFXztfDaYWMjYTVRUykOBQQ8ThFJ5qsaOJ/84kIwSEXgLQwSDZVeUQWgIJVGyj9+fVkgckPUUd+6xVwTtKjEEp+zhdwzd8lWac/LTZepn4thA8RJPg5trBO6kICZ4oxrO97rklC04O9M5579k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1770993500; c=relaxed/simple;
-	bh=CBGX9joKWS1ZTVo7NrOlT+lG2W3Inq1FjMPAVo9hcsA=;
+	s=arc-20240116; t=1770993501; c=relaxed/simple;
+	bh=nTibB9VvAnMArBkmdQHWooCRiGNpPUf8nLZ7D5ImAVw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NLAiR36QkWmFHNB63z0vufvJvuf6lOO86rhjdBRWUvq3btLfpUlaOaFOkw3gVzjv42xi0/g/Eo2ki9Ta0cDu4EulisPVsytuRDnvZOXIBOLDmhBHLMkppYv9C9oubGGhiye6bU+iYNzj/wwz4sjG998eSId/SOWn95W+7zxn8ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x+MCGdCs; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=Pd16byTkz3Ay1BK4hueZlNA+IudYD8WK1tJ8aA5yUfsp2YZjoTGNQvefoIpwyXYoBz9IA6TWus23MAvpZ/yEv7QvXvWo2frcybXB0lEFcdfepLnA6fZFF/WFHi5uWaHSjZcUZu56P7ve5h2vxowwuy7pJtwQMZd6M9vNVyYoxZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jMOu4oXf; arc=none smtp.client-ip=209.85.218.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x+MCGdCs"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4831192e66aso14713265e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 06:38:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jMOu4oXf"
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-b8f9599feb8so21047266b.0
+        for <kvmarm@lists.linux.dev>; Fri, 13 Feb 2026 06:38:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1770993497; x=1771598297; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1770993499; x=1771598299; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZI3PiRBCJaOtbE31TrtopwnjhpEV4zI9W7Z3S9kmPS8=;
-        b=x+MCGdCstbD06YoXTJJ8g0z3/Y+1ufb7DlnVxw8tpNCk1ioWPWHq+8ll35pJSSxN++
-         pkun8TrU7WR+G2o4rfRzmo+NaUMJc+ok940IGt2cwGjPs2xJH6iD9TRwgPaLjr2k9CBL
-         lhsJlVBbomA/RpibrUQNyzpdod1KeOcnCzZ2JHnIJU9bsjmo4plyi8hFLl0flpEbdy22
-         QnnbLDukaUJYot6JpbIFgXMtu/leN5N5ELhkZ3FyxG1lL/+yRn/IibhTEgEFjyvhA7jG
-         fQ7AsP/RWdeezz+/V/Er99dPkMoXoxmH1YStZcU3TeFsUZk1mHwfvu4aIXw2wUyWCLW9
-         Djig==
+        bh=iwg8k07MnblHsBD301KLHziw381Y4vRMO8Vvy4eyPOQ=;
+        b=jMOu4oXftLZ70Sq8ZB2OojDKBt5A6t9Hu4nl3mbqoI2m3aVQX4YEAinjTdPRHs72Z0
+         EO5nG77cX6mcmV9M7QoMFdocvnGkUxzuk0xYDx06aW62GhMULLzqRupafb/bA7U7X+C1
+         w+f8xrShBVIMXiuBOIdGHOx6roCt7f166zuVIfk+B2obzxGKdWwn8idxdg1kg/wnjbRp
+         Vviu4oMP24GG8wojDuUnQvXbm54madR+7QqmPntlthiJu43HfIlr9ksY0l6jP5MsNN71
+         gmcVzBhx6P96RizkCT/fJTIM3h+Owozfqa+qb7W/UigxGh4R5IHYxFQE/wEs/VSZXg90
+         FE2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1770993497; x=1771598297;
+        d=1e100.net; s=20230601; t=1770993499; x=1771598299;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZI3PiRBCJaOtbE31TrtopwnjhpEV4zI9W7Z3S9kmPS8=;
-        b=PjXMYmw6Xt/z+/rRmMxFOFdYkn2GsKyYeOwMxmiIpqhYDZR1yxX4ExUBMzujjHmieM
-         k2cjLWolbr0aL4EYM6a16dYrKwQ3SrRm1P2X7YSsSjFZpord2av4M7CO1wUv17+6UuvC
-         jF/cUiGMOZLpUT2f+YwFoh9L116ffHtqLOCx5PHSWQkBdsSTplWEx+jkZeW63dIZlE6X
-         kmGfOXs6ujTXDQvc3pBje/Baw9v9+cZyFQZWvWC9dOq0yax/Si43k59u1IKOCgStkMM2
-         AloTg2GqvW8hEKgr7Tw35Ej4cbc0DHLNyE/88z/F+ycjNep8vcm6YCxpupTQQNCAw7RU
-         N45w==
-X-Forwarded-Encrypted: i=1; AJvYcCWCYoutNr3mRoS9QJvjvmp6Fhyh65xjgUqa1YCOqGoYgBRQj4bCZGo+VTb1zKDYkv2W8D8946I=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyw0Omk86s4V2o3dSj6jy1zKX5F8c1ZOGhhtyfmp6ZOD7/dBsEZ
-	cpN/GCtKVxJouCTG2WF1SxVzfTFTA7X8TKKB4yn9salVbRPkIC5doEdPvrHl1NHAVpu/JquNOmj
-	2vw==
-X-Received: from wmbz20.prod.google.com ([2002:a05:600c:c094:b0:47b:d5ad:dd7f])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:474e:b0:480:4be7:4f53
- with SMTP id 5b1f17b1804b1-48371095fa6mr56214175e9.31.1770993497276; Fri, 13
- Feb 2026 06:38:17 -0800 (PST)
-Date: Fri, 13 Feb 2026 14:38:12 +0000
+        bh=iwg8k07MnblHsBD301KLHziw381Y4vRMO8Vvy4eyPOQ=;
+        b=jyQes4cR4avICtqLoyTZNOFyr9SQFo7TlDIoXCjrqdOGryIdfXISrSACNrMwive6bM
+         rQbBWgjfdAmaG68uTgXIXxCm2wgg4W/UR1QW1fRV1bcKnX6cisINwKbetBtuE9YsyVOH
+         spy3rGE7Hm6niOxfyTST28bNEinjQgxssDhbCsJHFaNr9KXbuk+sQCvLutwOb6sAnHdA
+         FsQA3IoR+BTlMXBzBv2u9IsKpX6fu1l8rfPjgKjEKhGxuSmB88FuQkVeYqlbmS4yx+FL
+         f5d6oyhm7h4nEMuyraT2H0+bpIf/pZCM3sUPYAUYHeH+peAwz4uFdkNcyF6xZrri0ejZ
+         jyxA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyYlcUV4vhwJ2lJIadYKzUyZ1FIIYiZ7VFgVS4mvPCEayRg9cSZheXhTUk+lo2adPp1xAM51U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzmSQyz3zhEVMpLnPbW6clUtO5ct6XuHKgAjFeglGEkHpDxHHBL
+	ij3RbZTGcpI48CSrcse+GFc5Mf4eZfonECTP7KHmxWEfnBf29+eXjTDTjdPvu/TgkzjW+sqEqtR
+	pmg==
+X-Received: from ejdbe22.prod.google.com ([2002:a17:906:f416:b0:b8f:7a4f:842f])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:c104:b0:b8f:7014:48fb
+ with SMTP id a640c23a62f3a-b8fb41ddfdamr117462566b.16.1770993498644; Fri, 13
+ Feb 2026 06:38:18 -0800 (PST)
+Date: Fri, 13 Feb 2026 14:38:13 +0000
 In-Reply-To: <20260213143815.1732675-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,9 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260213143815.1732675-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.273.g2a3d683680-goog
-Message-ID: <20260213143815.1732675-2-tabba@google.com>
-Subject: [PATCH v2 1/4] KVM: arm64: Hide S1POE from guests when not supported
- by the host
+Message-ID: <20260213143815.1732675-3-tabba@google.com>
+Subject: [PATCH v2 2/4] KVM: arm64: Optimise away S1POE handling when not
+ supported by host
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -69,38 +69,35 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, tabba@google.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-When CONFIG_ARM64_POE is disabled, KVM does not save/restore POR_EL1.
-However, ID_AA64MMFR3_EL1 sanitisation currently exposes the feature to
-guests whenever the hardware supports it, ignoring the host kernel
-configuration.
+Although ID register sanitisation prevents guests from seeing the
+feature, adding this check to the helper allows the compiler to entirely
+eliminate S1POE-specific code paths (such as context switching POR_EL1)
+when the host kernel is compiled without support (CONFIG_ARM64_POE is
+disabled).
 
-If a guest detects this feature and attempts to use it, the host will
-fail to context-switch POR_EL1, potentially leading to state corruption.
+This aligns with the pattern used for other optional features like SVE
+(kvm_has_sve()) and FPMR (kvm_has_fpmr()), ensuring no POE logic if the
+host lacks support, regardless of the guest configuration state.
 
-Fix this by masking ID_AA64MMFR3_EL1.S1POE in the sanitised system
-registers, preventing KVM from advertising the feature when the host
-does not support it (i.e. system_supports_poe() is false).
-
-Fixes: 70ed7238297f ("KVM: arm64: Sanitise ID_AA64MMFR3_EL1")
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 88a57ca36d96..237e8bd1cf29 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1816,6 +1816,9 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
- 		       ID_AA64MMFR3_EL1_SCTLRX |
- 		       ID_AA64MMFR3_EL1_S1POE |
- 		       ID_AA64MMFR3_EL1_S1PIE;
-+
-+		if (!system_supports_poe())
-+			val &= ~ID_AA64MMFR3_EL1_S1POE;
- 		break;
- 	case SYS_ID_MMFR4_EL1:
- 		val &= ~ID_MMFR4_EL1_CCIDX;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ac7f970c7883..7af72ca749a6 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1592,7 +1592,8 @@ void kvm_set_vm_id_reg(struct kvm *kvm, u32 reg, u64 val);
+ 	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1PIE, IMP))
+ 
+ #define kvm_has_s1poe(k)				\
+-	(kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
++	(system_supports_poe() &&			\
++	 kvm_has_feat((k), ID_AA64MMFR3_EL1, S1POE, IMP))
+ 
+ #define kvm_has_ras(k)					\
+ 	(kvm_has_feat((k), ID_AA64PFR0_EL1, RAS, IMP))
 -- 
 2.53.0.273.g2a3d683680-goog
 
