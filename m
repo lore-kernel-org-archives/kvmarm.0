@@ -1,248 +1,190 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A3725771;
-	Mon, 16 Feb 2026 12:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D664F2236FA;
+	Mon, 16 Feb 2026 13:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771245220; cv=none; b=rVi7iA8nVCrng5QwA+qpcs7qbDmxs0rWTdZ7s/52jp+fZgypfQojLQrwFS9/uUS9L2YabndzounMoZDrQGy5PEzVlZh6NfOaX0aWRN6wH/1fU345JMqp1C/Jj7/Hemjf9WWhsSBrV/ZE7GTxtPsmtQ5Xo1mw37aIVvfxAxgfGhc=
+	t=1771247111; cv=none; b=FTooyMhMJd1hrgvZQeHMoeS4E0PkzZg++aOKfW7PLnVFLfoGjRDVDiE/ZUiRzyeP+vxgM9v0S7b8cbg/gQ4QbYhMuMeyEjfSiBaXnJN4ltHTITMC7398fgPLoaeuPna7178gRlpvF2ARRVTnQAkk1ZmwDkaqty4JQhI0Kq9cgRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771245220; c=relaxed/simple;
-	bh=oVulCBIAyL2Z3oHyKN1bQey3QNZZKFbQdOzacwJbT6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T8Z2u0rWmk4jZSOws0Z2MW8YJqt14u8AX8iRBSNRKCZfop+FF54gx5F3YR3J5rVFstVhbErA+KSU7MGvr0P8Qc1Me0mwsmAEitubLoHsbzQgyXwvlis3qDsOy7Uvt6dkiYtspuD/s9luWGpURZmxDLIuhD3d592Pg5MZtgtW25U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3CBC5150C;
-	Mon, 16 Feb 2026 04:33:31 -0800 (PST)
-Received: from [10.57.56.155] (unknown [10.57.56.155])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 014843F73F;
-	Mon, 16 Feb 2026 04:33:32 -0800 (PST)
-Message-ID: <55fc4877-666c-4d5f-a167-5692f7cfbd0b@arm.com>
-Date: Mon, 16 Feb 2026 12:33:31 +0000
+	s=arc-20240116; t=1771247111; c=relaxed/simple;
+	bh=q82IcuKBKVPmAGGlfrXASO3H7rLUeonQFbZAWVqZ0iQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oCPqCUf4oDWLhcNuv7XntcngUvt7b1A5OsA3q8FgVsAEAeJmA+bGG0uCLCoiKNk+teUyquVavr7tam8th71Tfx/GhT2P30qH3iKWN0F4ZbMUCANl7bqynmqOwVK80qk8c2gWlKTjPxm6owpLExZnVVtqCodizNfKB3In9mo2Wqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sdPEs1gK; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sdPEs1gK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 713A7C116C6;
+	Mon, 16 Feb 2026 13:05:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771247111;
+	bh=q82IcuKBKVPmAGGlfrXASO3H7rLUeonQFbZAWVqZ0iQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sdPEs1gKpuGSTUahCadmc+TQvDK7e/l8YBbdw/Rz0Il6UfMmmHrygvsAE0Ou9v1iO
+	 Kd2xCetmtM4eibPJ0o9UA3K/KuLaOp+v2GELkCNzk1hY+/25VsoPJwkPeb/x97Zu7F
+	 DujtNXCUhY94PVIL8iqcKI2WH8oOa3/XUDckpXhlnhwk+v2uLjjZsIuSw5CZI4LVCS
+	 xV4Czn2QSisQZOfYqCQt+FStpgZNJZiIdL92JNcOw8Gp0o2t1U65TqnCrH9R4qMZp+
+	 /BGQOrRWIaaJCsTR8Ceh9OQEepaSx8hogK4MLn4ePkQN2RfAa+2GTi4SdffbxBdOek
+	 EpvMuNIcHjmzA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vryHl-0000000BOK2-06in;
+	Mon, 16 Feb 2026 13:05:09 +0000
+Date: Mon, 16 Feb 2026 13:05:08 +0000
+Message-ID: <86cy24bzzv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "yezhenyu (A)" <yezhenyu2@huawei.com>
+Cc: "rananta@google.com" <rananta@google.com>,
+	"will@kernel.org"
+	<will@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"dmatlack@google.com"
+	<dmatlack@google.com>,
+	"linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	zhengchuan <zhengchuan@huawei.com>,
+	Xiexiangyou <xiexiangyou@huawei.com>,
+	"guoqixin (A)" <guoqixin2@huawei.com>,
+	"Mawen (Wayne)" <wayne.ma@huawei.com>
+Subject: Re: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during kvm_tlb_flush_vmid_range
+In-Reply-To: <2b29bbc8-c588-4ce0-b249-5cc544338ec1@huawei.com>
+References: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
+	<86wm0massi.wl-maz@kernel.org>
+	<2b29bbc8-c588-4ce0-b249-5cc544338ec1@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 00/46] arm64: Support for Arm CCA in KVM
-To: Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <aY4Sf4lMlWd9LyTo@p14s>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <aY4Sf4lMlWd9LyTo@p14s>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, rananta@google.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, dmatlack@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zhengchuan@huawei.com, xiexiangyou@huawei.com, guoqixin2@huawei.com, wayne.ma@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 12/02/2026 17:48, Mathieu Poirier wrote:
-> Hi Steven,
+On Thu, 12 Feb 2026 12:02:33 +0000,
+"yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
 > 
-> On Wed, Dec 17, 2025 at 10:10:37AM +0000, Steven Price wrote:
->> This series adds support for running protected VMs using KVM under the
->> Arm Confidential Compute Architecture (CCA). I've changed the uAPI
->> following feedback from Marc.
->>
->> The main change is that rather than providing a multiplex CAP and
->> expecting the VMM to drive the different stages of realm construction,
->> there's now just a minimal interface and KVM performs the necessary
->> operations when needed.
->>
->> This series is lightly tested and is meant as a demonstration of the new
->> uAPI. There are a number of (known) rough corners in the implementation
->> that I haven't dealt with properly.
->>
->> In particular please note that this series is still targetting RMM v1.0.
->> There is an alpha quality version of RMM v2.0 available[1]. Feedback was
->> that there are a number of blockers for merging with RMM v1.0 and so I
->> expect to rework this series to support RMM v2.0 before it is merged.
->> That will necessarily involve reworking the implementation.
->>
->> Specifically I'm expecting improvements in:
->>
->>  * GIC handling - passing state in registers, and allowing the host to
->>    fully emulate the GIC by allowing trap bits to be set.
->>
->>  * PMU handling - again providing flexibility to the host's emulation.
->>
->>  * Page size/granule size mismatch. RMM v1.0 defines the granule as 4k,
->>    RMM v2.0 provide the option for the host to change the granule size.
->>    The intention is that Linux would simply set the granule size equal
->>    to its page size which will significantly simplify the management of
->>    granules.
->>
->>  * Some performance improvement from the use of range-based map/unmap
->>    RMI calls.
->>
->> This series is based on v6.19-rc1. It is also available as a git
->> repository:
->>
->> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v12
->>
->> Work in progress changes for kvmtool are available from the git
->> repository below:
->>
->> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v10
+> Thanks for your review.
 > 
-> The first thing to note is that branch cca/v10 does not compile due to function
-> realm_configure_parameters() not being called anywhere.  Marking the function as
-> [[maybe_unused]] solved the problem on my side.
+> On 2026/2/9 22:35, Marc Zyngier wrote:
+> > On Mon, 09 Feb 2026 13:14:07 +0000,
+> > "yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
+> >> 
+> >>  From 9982be89f55bd99b3683337223284f0011ed248e Mon Sep 17 00:00:00 2001
+> >> From: eillon <yezhenyu2@huawei.com>
+> >> Date: Mon, 9 Feb 2026 19:48:46 +0800
+> >> Subject: [RFC][PATCH v1] arm64: tlb: call kvm_call_hyp once during
+> >>   kvm_tlb_flush_vmid_range
+> >> 
+> >> The kvm_tlb_flush_vmid_range() function is performance-critical
+> >> during live migration, but there is a while loop when the system
+> >> support flush tlb by range when the size is larger than MAX_TLBI_RANGE_PAGES.
+> >> 
+> >> This results in frequent entry to kvm_call_hyp() and then a large
+> > 
+> > What is the cost of kvm_call_hyp()?
+> > 
+> 
+> Most cost of kvm_tlb_flush_vmid_range() is __tlb_switch_to_host(), which
+> is called in every __kvm_tlb_flush_vmid/__kvm_tlb_flush_vmid_range.
 
-This is in the kvmtool code - and yes I agree "work in progress" is a
-bit generous for the current state of that code, "horrid ugly hacks to
-get things working" is probably more accurate ;)
+That was not my question: you indicate that frequent calls to
+kvm_call_hyp() are making things costly. I find this assertion
+surprising, given that on a VHE system, this is exactly *nothing*.
 
-The issue here is that the two things that realm_configure_parameters()
-set up (hash algorithm and RPV) are currently unsupported with the Linux
-changes, but will need to be reintroduced in the future. So the contents
-of the functions which set this up (using the old uAPI) are just #if 0'd
-out.
+> 
+> >> amount of time is spent in kvm_clear_dirty_log_protect() during
+> >> migration(more than 50%).
+> > 
+> > 50% of what time? The guest's run-time? The time spent doing TLBIs
+> > compared to the time spent in kvm_clear_dirty_log_protect()?
+> > 
+> 
+> kvm_clear_dirty_log_protect() cost more than 50% time during
+> ram_find_and_save_block(), but not every time.
+> I captured the flame graph during the live migration, and the
+> distribution of several key functions is as follows(sorry I
+> cannot transfer the SVG files outside my company):
+> 
+>     ram_find_and_save_block(): 84.01%
+>         memory_region_clear_dirty_bitmap(): 33.40%
+>             kvm_clear_dirty_log_protect(): 26.74%
+>                 kvm_arch_flush_remote_tlbs_range(): 9.67%
+>                     __tlb_switch_to_host(): 9.51%
+>                 kvm_arch_mmu_enable_log_dirty_pt_masked(): 9.38%
+>         ram_save_target_page_legacy(): 43.41%
+> 
+> The memory_region_clear_dirty_bitmap() cost about 40% of
+> ram_find_and_save_block(), and the kvm_arch_flush_remote_tlbs_range()
+> cost about 29% of memory_region_clear_dirty_bitmap().
+> 
+> And after the patch apply, the distribution of several key functions is
+> as follows:
+> 
+>     ram_find_and_save_block(): 53.84%
+>         memory_region_clear_dirty_bitmap(): 2.28%
+>             kvm_clear_dirty_log_protect(): 1.75%
+>                 kvm_arch_flush_remote_tlbs_range(): 0.03%
+>                     __tlb_switch_to_host(): 0.03%
+>                 kvm_arch_mmu_enable_log_dirty_pt_masked(): 0.96%
+>         ram_save_target_page_legacy(): 38.97%
+>
+>
+> The memory_region_clear_dirty_bitmap() cost about 4% of
+> ram_find_and_save_block(), and the kvm_arch_flush_remote_tlbs_range()
+> cost about 1% of memory_region_clear_dirty_bitmap().
 
-Depending on the compile flags the code will compile with a warning, but
-using __attribute__((unused)) would at least make this clear. I'd want
-to avoid the "[[maybe_unused]]" as it's not used elsewhere in the code
-base and limits compatibility.
+What is ram_find_and_save_block()? userspace code?
 
-> Using the FVP emulator, booting a Realm that includes EDK2 in its boot stack
-> worked.  If EDK2 is not part of the boot stack and a kernel is booted directly
-> from lkvm, mounting the initrd fails.  Looking into this issue further, I see
-> that from a Realm kernel's perspective, the content of the initrd is either
-> encrypted or has been trampled on.  
+> 
+> >> So, when the address range is large than
+> >> MAX_TLBI_RANGE_PAGES, directly call __kvm_tlb_flush_vmid to
+> >> optimize performance.
+> > 
+> > Multiple things here:
+> > 
+> > - there is no SoB, which means that patch cannot be considered for
+> >    merging
+> > 
+> If there are no other issues with this patch, I can resend it with the
+> SoB (Signed-off-by) tag.
+> 
+> 
+> > - there is no data showing how this change improves the situation for
+> >    a large enough set of workloads
+> > 
+> > - there is no description of a test that could be run on multiple
+> >    implementations to check whether this change has a positive or
+> >    negative impact
+> 
+> This patch affected the migration bandwidth during the live migration.
+> With the same physical bandwidth, the optimization effect of this patch
+> can be observed by monitoring the real live migration bandwidth.
+> 
+> I have test this in an RDMA-like environment, the physical bandwidth is
+> about 100GBps; without this patch, the migration bandwidth is below 10
+> GBps, and after this patch apply, the migration bandwidth can reach 50
+> GBps.
 
-I can reproduce that, a quick fix is to change INITRD_ALIGN:
-
-#define INITRD_ALIGN	SZ_64K
-
-But the code was meant to be able to deal with an unaligned initrd -
-I'll see if I can figure out what's going wrong.
+Again: how can other people reproduce your findings? Please provide a
+test, and its exact configuration. If this truly results in a 5x
+improvement, it shouldn't be hard to reproduce.
 
 Thanks,
-Steve
 
-> I'd be happy to provide more details on the above, just let me know.
-> 
-> Thanks,
-> Mathieu
-> 
->>
->> [1] https://developer.arm.com/documentation/den0137/latest/
->>
->> Jean-Philippe Brucker (7):
->>   arm64: RMI: Propagate number of breakpoints and watchpoints to
->>     userspace
->>   arm64: RMI: Set breakpoint parameters through SET_ONE_REG
->>   arm64: RMI: Initialize PMCR.N with number counter supported by RMM
->>   arm64: RMI: Propagate max SVE vector length from RMM
->>   arm64: RMI: Configure max SVE vector length for a Realm
->>   arm64: RMI: Provide register list for unfinalized RMI RECs
->>   arm64: RMI: Provide accurate register list
->>
->> Joey Gouly (2):
->>   arm64: RMI: allow userspace to inject aborts
->>   arm64: RMI: support RSI_HOST_CALL
->>
->> Steven Price (34):
->>   arm64: RME: Handle Granule Protection Faults (GPFs)
->>   arm64: RMI: Add SMC definitions for calling the RMM
->>   arm64: RMI: Add wrappers for RMI calls
->>   arm64: RMI: Check for RMI support at KVM init
->>   arm64: RMI: Define the user ABI
->>   arm64: RMI: Basic infrastructure for creating a realm.
->>   KVM: arm64: Allow passing machine type in KVM creation
->>   arm64: RMI: RTT tear down
->>   arm64: RMI: Activate realm on first VCPU run
->>   arm64: RMI: Allocate/free RECs to match vCPUs
->>   KVM: arm64: vgic: Provide helper for number of list registers
->>   arm64: RMI: Support for the VGIC in realms
->>   KVM: arm64: Support timers in realm RECs
->>   arm64: RMI: Handle realm enter/exit
->>   arm64: RMI: Handle RMI_EXIT_RIPAS_CHANGE
->>   KVM: arm64: Handle realm MMIO emulation
->>   KVM: arm64: Expose support for private memory
->>   arm64: RMI: Allow populating initial contents
->>   arm64: RMI: Set RIPAS of initial memslots
->>   arm64: RMI: Create the realm descriptor
->>   arm64: RMI: Add a VMID allocator for realms
->>   arm64: RMI: Runtime faulting of memory
->>   KVM: arm64: Handle realm VCPU load
->>   KVM: arm64: Validate register access for a Realm VM
->>   KVM: arm64: Handle Realm PSCI requests
->>   KVM: arm64: WARN on injected undef exceptions
->>   arm64: Don't expose stolen time for realm guests
->>   arm64: RMI: Always use 4k pages for realms
->>   arm64: RMI: Prevent Device mappings for Realms
->>   HACK: Restore per-CPU cpu_armpmu pointer
->>   arm_pmu: Provide a mechanism for disabling the physical IRQ
->>   arm64: RMI: Enable PMU support with a realm guest
->>   KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
->>   arm64: RMI: Enable realms to be created
->>
->> Suzuki K Poulose (3):
->>   kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
->>   kvm: arm64: Don't expose unsupported capabilities for realm guests
->>   arm64: RMI: Allow checking SVE on VM instance
->>
->>  Documentation/virt/kvm/api.rst       |   78 +-
->>  arch/arm64/include/asm/kvm_emulate.h |   31 +
->>  arch/arm64/include/asm/kvm_host.h    |   13 +-
->>  arch/arm64/include/asm/kvm_rmi.h     |  137 +++
->>  arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
->>  arch/arm64/include/asm/rmi_smc.h     |  269 +++++
->>  arch/arm64/include/asm/virt.h        |    1 +
->>  arch/arm64/kernel/cpufeature.c       |    1 +
->>  arch/arm64/kvm/Kconfig               |    2 +
->>  arch/arm64/kvm/Makefile              |    2 +-
->>  arch/arm64/kvm/arch_timer.c          |   37 +-
->>  arch/arm64/kvm/arm.c                 |  179 ++-
->>  arch/arm64/kvm/guest.c               |   95 +-
->>  arch/arm64/kvm/hypercalls.c          |    4 +-
->>  arch/arm64/kvm/inject_fault.c        |    5 +-
->>  arch/arm64/kvm/mmio.c                |   16 +-
->>  arch/arm64/kvm/mmu.c                 |  214 +++-
->>  arch/arm64/kvm/pmu-emul.c            |    6 +
->>  arch/arm64/kvm/psci.c                |   30 +
->>  arch/arm64/kvm/reset.c               |   13 +-
->>  arch/arm64/kvm/rmi-exit.c            |  207 ++++
->>  arch/arm64/kvm/rmi.c                 | 1663 ++++++++++++++++++++++++++
->>  arch/arm64/kvm/sys_regs.c            |   53 +-
->>  arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
->>  arch/arm64/kvm/vgic/vgic-v2.c        |    6 +-
->>  arch/arm64/kvm/vgic/vgic-v3.c        |   14 +-
->>  arch/arm64/kvm/vgic/vgic.c           |   55 +-
->>  arch/arm64/kvm/vgic/vgic.h           |   20 +-
->>  arch/arm64/mm/fault.c                |   28 +-
->>  drivers/perf/arm_pmu.c               |   20 +
->>  include/kvm/arm_arch_timer.h         |    2 +
->>  include/kvm/arm_pmu.h                |    4 +
->>  include/kvm/arm_psci.h               |    2 +
->>  include/linux/perf/arm_pmu.h         |    7 +
->>  include/uapi/linux/kvm.h             |   42 +-
->>  35 files changed, 3650 insertions(+), 116 deletions(-)
->>  create mode 100644 arch/arm64/include/asm/kvm_rmi.h
->>  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
->>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
->>  create mode 100644 arch/arm64/kvm/rmi-exit.c
->>  create mode 100644 arch/arm64/kvm/rmi.c
->>
->> -- 
->> 2.43.0
->>
->>
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
