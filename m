@@ -1,45 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A246B50276
-	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 18:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB41E2737F2;
+	Mon, 16 Feb 2026 18:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771265656; cv=none; b=vGEkqOOiYu92W0WzXoJwiMLix9aMV3ieJ/wNbyIcxgLE7QSWtGhoKQttRbIY+7wzcW4QVnWzpydT26mu5mrPCgWUstWufm5O23Frl0/JNJpd9kOkHqUBCH5TshCv1n+41GnA6HUtzYSbRKOWbYqtAzWE4RqR2RKIvoYli12m+eQ=
+	t=1771266289; cv=none; b=g2FLINoMhEVpSgE+2MZ0edJXCiR71aqOFJNyh6kDxS9GPIVT8p20cfMOnLT8esUJhH3m58/8UKhgtQrVI/7+iBqwRMjaajVMFMLyd3BYZcXI9pzCEPhZQFM5CHMur+Qnk4Gy7dO7R+ty5DvhIIzBfl7qdz7VcjD/BiE7+ehTJWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771265656; c=relaxed/simple;
-	bh=YxgSyIDm9AQ+DZmvuPojtK1Q533/tuFWmV3R30ZqBUE=;
+	s=arc-20240116; t=1771266289; c=relaxed/simple;
+	bh=e4Xv36F6K4gczFWPbbm/HwoIgQOOiINgmW2tJZCr86Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OpggR2fBeFF6m8hOr/WOyLHXACaEPV4vQ8HD+G8t8MbpfkzUjoa3iuaMz7a+zGOAn2fecSe/XqAYqZMfcLuGwEYulPcRkVdw+vsrD/YVx/+iYUmv9XZAaxBfdXDHfg299A55d4hvGSnf/PDHWDIIbuYDFUoNcDdk6KGoxe+m2pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D3yvne0x; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D3yvne0x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70838C116C6;
-	Mon, 16 Feb 2026 18:14:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771265656;
-	bh=YxgSyIDm9AQ+DZmvuPojtK1Q533/tuFWmV3R30ZqBUE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D3yvne0x3LHrXWCYdzoHRqyWySnpaFIm0v5963C8qQkMOsZSShfA3rIKHBMlErv6y
-	 bHsrBFKaDj+zL3bECrf4iXEe3Kq4sIzQLgr+llKsMAMiRaFTJycySWiKH+BSMZ8Y/v
-	 ENoQ7L0ejrOxdRwJrxWlThSNDHihtts/yoWPp9S4qHxeJFalP7bzoMg6pIu/jkp1Tt
-	 +P1X5n8pdf6+5kq1VTkmNT1WLKlB4fNJbdDBvVbnYhzE5ZTglK2T+FFDmOChGEQZsM
-	 PX80t7YPLBjtHN4ShaAK/sIIjS5KcI/CvLJ4pBTS+K5oZzrpJ2qAi6/kpg9BjU3qOX
-	 5aL1pOrUeI7yA==
-Date: Mon, 16 Feb 2026 18:14:11 +0000
-From: Will Deacon <will@kernel.org>
-To: James Clark <james.clark@linaro.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-	mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>, Leo Yan <leo.yan@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
- in guest context
-Message-ID: <aZNec3B0Iou9PYGw@willie-the-truck>
-References: <20260216130959.19317-1-will@kernel.org>
- <86a4x8bw38.wl-maz@kernel.org>
- <d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sRMahjOPPcQaiYOELsA81kZEXxnvHmomZZ27GUD3ZQHV9Gp3L4XByrDAE++yuQ446/ADU88VS1dzp05EaDXowZjnZt4RbUCec8dnKhfdDc2hAQag0vAHC2l9Io4Np4itVaVzaXN6mEfHASGgzZKlZfR1bMYkGV7wexXrQCOjFn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B62C116C6;
+	Mon, 16 Feb 2026 18:24:45 +0000 (UTC)
+Date: Mon, 16 Feb 2026 18:24:42 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
+	broonie@kernel.org, oliver.upton@linux.dev, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, ardb@kernel.org, suzuki.poulose@arm.com,
+	lpieralisi@kernel.org, scott@os.amperecomputing.com,
+	joey.gouly@arm.com, yuzenghui@huawei.com, pbonzini@redhat.com,
+	shuah@kernel.org, mark.rutland@arm.com, arnd@arndb.de
+Subject: Re: [PATCH v12 2/7] arm64: cpufeature: add FEAT_LSUI
+Message-ID: <aZNgR6prm0Exzar0@arm.com>
+References: <20260121190622.2218669-1-yeoreum.yun@arm.com>
+ <20260121190622.2218669-3-yeoreum.yun@arm.com>
+ <aYY2CyHWtplQ-fuS@arm.com>
+ <aYouAv_EjICIN8oA@arm.com>
+ <aYsAaaQgBaLbDSsW@e129823.arm.com>
+ <aYtZfpWjRJ1r23nw@arm.com>
+ <aYtkbezCx9vW8SHz@e129823.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,85 +42,45 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
+In-Reply-To: <aYtkbezCx9vW8SHz@e129823.arm.com>
 
-On Mon, Feb 16, 2026 at 03:05:10PM +0000, James Clark wrote:
-> On 16/02/2026 2:29 pm, Marc Zyngier wrote:
-> > On Mon, 16 Feb 2026 13:09:59 +0000,
-> > Will Deacon <will@kernel.org> wrote:
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> > > index 2a1c0f49792b..fd389a26bc59 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> > > @@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
-> > >   	write_sysreg_el1(new_trfcr, SYS_TRFCR);
-> > >   }
-> > > -static bool __trace_needs_drain(void)
-> > > +static void __trace_drain_and_disable(void)
-> > >   {
-> > > -	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
-> > > -		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
-> > > +	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
-> > > -	return host_data_test_flag(TRBE_ENABLED);
-> > > +	*trblimitr_el1 = 0;
-> > > +
-> > > +	if (is_protected_kvm_enabled()) {
-> > > +		if (!host_data_test_flag(HAS_TRBE))
-> > > +			return;
-> > > +	} else {
-> > > +		if (!host_data_test_flag(TRBE_ENABLED))
-> > > +			return;
-> > > +	}
-> > > +
-> > > +	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
-> > > +	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
-> > > +		isb();
-> > > +		tsb_csync();
-> > > +		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-> > > +		isb();
+On Tue, Feb 10, 2026 at 05:01:33PM +0000, Yeoreum Yun wrote:
+> > Why not keep uaccess_enable_privileged() in
+> > arch_futex_atomic_op_inuser() and cmpxchg for all cases and make it a
+> > no-op if FEAT_LSUI is implemented together with FEAT_PAN?
 > 
-> The TRBE driver might do an extra drain here as a workaround. Hard to tell
-> if it's actually required in this case (seems like probably not) but it
-> might be worth doing it anyway to avoid hitting the issue. Especially if we
-> add guest support later where some of the affected registers might start
-> being used. See:
+> This is because I had a assumption FEAT_PAN must be present
+> when FEAT_LSUI is presented and this was not considering the virtualisation case.
+> and  FEAT_PAN is present uaccess_ttbr0_enable() becomes nop and
+> following feedback you gave - https://lore.kernel.org/all/aJ9oIes7LLF3Nsp1@arm.com/
+> and the reason you mention last, It doesn't need to call mte_enable_tco().
 > 
->     if (trbe_needs_drain_after_disable(cpudata))
->         trbe_drain_buffer();
+> That's why I thought it doesn't need to call uaccess_enable_privileged().
+> 
+> But for a compatibility with SW_PAN, I think we can put only
+> uaccess_ttbr0_enable() in arch_futex_atomic_op_inuser() and cmpxchg simply
+> instead of adding a new APIs uaccess_enable_futex() and
+> by doing this I think has_lsui() can be removed with its WRAN.
 
-Oh great, this thing sucks even more than I realised!
+Yes, I think you can use uaccess_ttbr0_enable() when we take the
+FEAT_LSUI path. What I meant above was for uaccess_enable_privileged()
+to avoid PAN disabling if we have FEAT_LSUI as we know all cases would
+be executed with user privileges.
 
-But thanks for pointing that out... this is presumably erratum #2064142,
-but we probably need to look at #2038923 as well :/
+Either way, we don't need a new uaccess_enable_futex().
 
-I can't find any public documentation for the problems, but based on the
-kconfig text then I think we care about #2064142 so that the TRBE
-register writes when restoring the host context are effective and we
-care about #2038923 to avoid corrupting trace when re-enabling for the
-host.
+> > BTW, with the removal of uaccess_enable_privileged(), we now get MTE tag
+> > checks for the futex operations. I think that's good as it matches the
+> > other uaccess ops, though it's a slight ABI change. If we want to
+> > preserve the old behaviour, we definitely need
+> > uaccess_enable_privileged() that only does mte_enable_tco().
+> 
+> I think we don't need to preserve the old behaviour. so we can skip
+> mte_enable_tco() in case of FEAT_LSUI is presented.
 
-It also looks like we can't rely on the dsb(nsh) in the vcpu_run()
-path if that needs to be before the write to TRBLIMITR_EL1.
+Just spell it out in the commit log that we have a slight ABI change. I
+don't think we'll have a problem but it needs at least checking with
+some user-space (libc, Android) people.
 
-In which case, the host->guest something hideous like:
-
-	isb();
-	tsb_csync();	// Executes twice if ARM64_WORKAROUND_TSB_FLUSH_FAILURE!
-	dsb(nsh);	// I missed this in my patch
-	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-	if (2064142) {
-		tsb_csync();
-		dsb(nsh);
-	}
-	isb();
-
-and then the guest->host part is:
-
-	write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
-	isb();
-	if (2038923)
-		isb();
-
-Does that look right to you?
-
-Will
+-- 
+Catalin
