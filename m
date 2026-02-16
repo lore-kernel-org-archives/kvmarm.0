@@ -1,161 +1,174 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461AA31064B;
-	Mon, 16 Feb 2026 14:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E296311975
+	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 14:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771252030; cv=none; b=KvzHj+9q7B9RPc8WsX9iLhla5EulTJW31ePL4xETxT7MN2grXoKMPE3jtA+u4Kc0BkdleWmnbXz+tappIbuw0/pYWVEI5Nh5m7EFkz4VAApgqM+fvPeSWCDRvJ5WmDnbFjdVWxxPZ1+aCz7c4cKN1K6SoGk2HHdC0b0B3xhK+nE=
+	t=1771252174; cv=none; b=hXUv5rSWKcNQc91ucMBJjA6a/CIOLVKhIQEQLdsOtalsSkx1GTeoI/TxdrvQlb/rOgHnoUg9nMO/WVOW+LEWnjokPf5/hRIq42M0RXaOaijkAIaB8aBCpmNFvye5ocevU6uJgYpW6oD8ogG8AjsP8Z+LTmf/ZWZx1YkyPImrSDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771252030; c=relaxed/simple;
-	bh=7PmC3eevop4sZCyCWXJdsSOZoiGFXkDyNHciwOPaBAQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=agQ0x/i75dQ781rRi/llXatTrTuXXN9NEvvaHmmAGYQsK/ph663MWxPiMMurlWJ8lD4gwt4FNms5Tf94lIPC38aEsid4FwfMrhtOAqNnLIHoVLtzZRum/4GqXtDqubJXAe/EM9CWhov56SeNmdeacetWR1m0W5AqtYN9dU86hGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61A841570;
-	Mon, 16 Feb 2026 06:27:02 -0800 (PST)
-Received: from [10.57.56.155] (unknown [10.57.56.155])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC51A3F6A8;
-	Mon, 16 Feb 2026 06:27:04 -0800 (PST)
-Message-ID: <9140efaa-dc54-4a1b-8936-3ef876ca9121@arm.com>
-Date: Mon, 16 Feb 2026 14:27:02 +0000
+	s=arc-20240116; t=1771252174; c=relaxed/simple;
+	bh=w34XfjwLQx+Rq/nr250KNuDoMKDvt/wvw7EwiB6Gmfc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dP/fLiNfD5Vy9cJnc/rM+JZwCrID82S3Jgsk0c5PWXWiTR9ejLvWhNN59h6JixZmLxPmsV+S0SEWH01D7D22PYmnHMVEHJ9CYC05z9WITRown5cq913nMRCepaWBESQCJdnGlwVTCTj0S04BXQ0Ie8rEjNGA2xrElN94vYRHy7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTUm2ZUB; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTUm2ZUB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9858C116C6;
+	Mon, 16 Feb 2026 14:29:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771252173;
+	bh=w34XfjwLQx+Rq/nr250KNuDoMKDvt/wvw7EwiB6Gmfc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DTUm2ZUBkFqEhk/ET8bqKNSTaz/hfmxYYFtKah1NzrOBlxROT+Fr/u6KarkTH+AK5
+	 gecUPTLOGZyX6ZmclWpSsswMemtN7MFeDiWbV0ZOvIFdRxQ1K3tZYnW+4IMi7XzIfG
+	 NTKVZN2Un2CbpNHBKrXT50ZEfhZQqiF4UDCWq8YWan+fHGmwlPcM67RAVcNI8uM0aK
+	 62z40Wkmv/OkkXgdPQb/fwUhw+ilChqA+kCsITuZPtJfeE1DqiDaIr2b610SOOcEzU
+	 y51ayBBl1GeB8aP4g0Degl1r+ug1JtgIWd9kpYCre2om35OhiHbI+RjWWn0H80TEre
+	 oHhJw+jdxdu8g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vrzbP-0000000BQ0C-1mI6;
+	Mon, 16 Feb 2026 14:29:31 +0000
+Date: Mon, 16 Feb 2026 14:29:31 +0000
+Message-ID: <86a4x8bw38.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	James Clark <james.clark@linaro.org>,
+	Leo Yan <leo.yan@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running in guest context
+In-Reply-To: <20260216130959.19317-1-will@kernel.org>
+References: <20260216130959.19317-1-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 00/46] arm64: Support for Arm CCA in KVM
-From: Steven Price <steven.price@arm.com>
-To: Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <aY4Sf4lMlWd9LyTo@p14s> <55fc4877-666c-4d5f-a167-5692f7cfbd0b@arm.com>
-Content-Language: en-GB
-In-Reply-To: <55fc4877-666c-4d5f-a167-5692f7cfbd0b@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, james.clark@linaro.org, leo.yan@arm.com, suzuki.poulose@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 16/02/2026 12:33, Steven Price wrote:
-> On 12/02/2026 17:48, Mathieu Poirier wrote:
->> Hi Steven,
->>
->> On Wed, Dec 17, 2025 at 10:10:37AM +0000, Steven Price wrote:
->>> This series adds support for running protected VMs using KVM under the
->>> Arm Confidential Compute Architecture (CCA). I've changed the uAPI
->>> following feedback from Marc.
->>>
->>> The main change is that rather than providing a multiplex CAP and
->>> expecting the VMM to drive the different stages of realm construction,
->>> there's now just a minimal interface and KVM performs the necessary
->>> operations when needed.
->>>
->>> This series is lightly tested and is meant as a demonstration of the new
->>> uAPI. There are a number of (known) rough corners in the implementation
->>> that I haven't dealt with properly.
->>>
->>> In particular please note that this series is still targetting RMM v1.0.
->>> There is an alpha quality version of RMM v2.0 available[1]. Feedback was
->>> that there are a number of blockers for merging with RMM v1.0 and so I
->>> expect to rework this series to support RMM v2.0 before it is merged.
->>> That will necessarily involve reworking the implementation.
->>>
->>> Specifically I'm expecting improvements in:
->>>
->>>  * GIC handling - passing state in registers, and allowing the host to
->>>    fully emulate the GIC by allowing trap bits to be set.
->>>
->>>  * PMU handling - again providing flexibility to the host's emulation.
->>>
->>>  * Page size/granule size mismatch. RMM v1.0 defines the granule as 4k,
->>>    RMM v2.0 provide the option for the host to change the granule size.
->>>    The intention is that Linux would simply set the granule size equal
->>>    to its page size which will significantly simplify the management of
->>>    granules.
->>>
->>>  * Some performance improvement from the use of range-based map/unmap
->>>    RMI calls.
->>>
->>> This series is based on v6.19-rc1. It is also available as a git
->>> repository:
->>>
->>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v12
->>>
->>> Work in progress changes for kvmtool are available from the git
->>> repository below:
->>>
->>> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v10
->>
->> The first thing to note is that branch cca/v10 does not compile due to function
->> realm_configure_parameters() not being called anywhere.  Marking the function as
->> [[maybe_unused]] solved the problem on my side.
+On Mon, 16 Feb 2026 13:09:59 +0000,
+Will Deacon <will@kernel.org> wrote:
 > 
-> This is in the kvmtool code - and yes I agree "work in progress" is a
-> bit generous for the current state of that code, "horrid ugly hacks to
-> get things working" is probably more accurate ;)
+> The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
+> generation in guest context when self-hosted TRBE is in use by the host.
 > 
-> The issue here is that the two things that realm_configure_parameters()
-> set up (hash algorithm and RPV) are currently unsupported with the Linux
-> changes, but will need to be reintroduced in the future. So the contents
-> of the functions which set this up (using the old uAPI) are just #if 0'd
-> out.
+> Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
+> TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
+> per R_YCHKJ the Trace Buffer Unit will still be enabled if
+> TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
+> Trace Buffer Unit can perform address translation for the "owning
+> exception level" even when it is out of context.
+
+Great. So TRBE violates all the principles that we hold true in the
+architecture. Does SPE suffer from the same level of brokenness?
+
+> Consequently, we can end up in a state where TRBE performs speculative
+> page-table walks for a host VA/IPA in guest/hypervisor context depending
+> on the value of MDCR_EL2.E2TB, which changes over world-switch. The
+> result appears to be a heady mixture of data corruption and hardware
+> lockups.
+>
+> Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
+> draining the buffer, restoring the register on return to the host.
 > 
-> Depending on the compile flags the code will compile with a warning, but
-> using __attribute__((unused)) would at least make this clear. I'd want
-> to avoid the "[[maybe_unused]]" as it's not used elsewhere in the code
-> base and limits compatibility.
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: James Clark <james.clark@linaro.org>
+> Cc: Leo Yan <leo.yan@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
 > 
->> Using the FVP emulator, booting a Realm that includes EDK2 in its boot stack
->> worked.  If EDK2 is not part of the boot stack and a kernel is booted directly
->> from lkvm, mounting the initrd fails.  Looking into this issue further, I see
->> that from a Realm kernel's perspective, the content of the initrd is either
->> encrypted or has been trampled on.  
+> NOTE: This is *untested* as I don't have a TRBE-capable device that can
+> run upstream but I noticed this by inspection when triaging occasional
+> hardware lockups on systems using a 6.12-based kernel with TRBE running
+> at the same time as a vCPU is loaded. This code has changed quite a bit
+> over time, so stable backports are not entirely straightforward.
+> Hopefully James/Leo/Suzuki can help us test if folks agree with the
+> general approach taken here.
 > 
-> I can reproduce that, a quick fix is to change INITRD_ALIGN:
+>  arch/arm64/include/asm/kvm_host.h  |  1 +
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
+>  2 files changed, 28 insertions(+), 9 deletions(-)
 > 
-> #define INITRD_ALIGN	SZ_64K
-> 
-> But the code was meant to be able to deal with an unaligned initrd -
-> I'll see if I can figure out what's going wrong.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index ac7f970c7883..a932cf043b83 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -746,6 +746,7 @@ struct kvm_host_data {
+>  		u64 pmscr_el1;
+>  		/* Self-hosted trace */
+>  		u64 trfcr_el1;
+> +		u64 trblimitr_el1;
+>  		/* Values of trap registers for the host before guest entry. */
+>  		u64 mdcr_el2;
+>  		u64 brbcr_el1;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 2a1c0f49792b..fd389a26bc59 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+>  	write_sysreg_el1(new_trfcr, SYS_TRFCR);
+>  }
+>  
+> -static bool __trace_needs_drain(void)
+> +static void __trace_drain_and_disable(void)
+>  {
+> -	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
+> -		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
+> +	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
+>  
+> -	return host_data_test_flag(TRBE_ENABLED);
+> +	*trblimitr_el1 = 0;
+> +
+> +	if (is_protected_kvm_enabled()) {
+> +		if (!host_data_test_flag(HAS_TRBE))
+> +			return;
+> +	} else {
+> +		if (!host_data_test_flag(TRBE_ENABLED))
+> +			return;
+> +	}
+> +
+> +	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
+> +	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
+> +		isb();
+> +		tsb_csync();
+> +		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
+> +		isb();
+> +	}
 
-Looks like a simple bug in kvm_arm_realm_populate_ram() - it wasn't
-updating the source address when it had to align the start of the
-region. Simple fix below:
+Doesn't this mean we should be able to get rid of most of the TRFCR
+messing about that litters the entry/exit code and leave that to VHE
+only? And even then, I'm tempted to simply get rid of any sort of
+guest-only tracing, given that TRBE is not capable of representing
+exceptions that are synthesised by the host, making it the resulting
+traces useless.
 
----8<---
-diff --git a/arm/aarch64/realm.c b/arm/aarch64/realm.c
---- a/arm/aarch64/realm.c
-+++ b/arm/aarch64/realm.c
-@@ -104,7 +104,7 @@ void kvm_arm_realm_populate_ram(struct kvm *kvm,
-unsigned long start,
+I'm still trying to get my hands on a TRBE-enabled system that has
+some actual firmware tables (my O6 seems to have the HW, but no
+description of the required coresight infra).
 
-        new_region->start = ALIGN_DOWN(start, SZ_64K);
-        new_region->file_end = ALIGN(start + size, SZ_64K);
--       new_region->source = source;
-+       new_region->source = source - (start - new_region->start);
+Thanks,
 
-        list_add_tail(&new_region->list, &realm_ram_regions);
- }
----8<---
+	M.
 
-Thanks for the pointer, and I'll try to remember to include initrd
-testing in future.
-
-Steve
-
+-- 
+Without deviation from the norm, progress is not possible.
