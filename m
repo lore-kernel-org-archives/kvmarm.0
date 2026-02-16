@@ -1,190 +1,166 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D664F2236FA;
-	Mon, 16 Feb 2026 13:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6F18C2C
+	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 13:11:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771247111; cv=none; b=FTooyMhMJd1hrgvZQeHMoeS4E0PkzZg++aOKfW7PLnVFLfoGjRDVDiE/ZUiRzyeP+vxgM9v0S7b8cbg/gQ4QbYhMuMeyEjfSiBaXnJN4ltHTITMC7398fgPLoaeuPna7178gRlpvF2ARRVTnQAkk1ZmwDkaqty4JQhI0Kq9cgRg=
+	t=1771247467; cv=none; b=g0qr2HgEkLoQPM5WZplnAd8c9k0B2/AikJgkjVnb2Y1zrgTdCAerXVVggbuKhbUs6/yR+BesgPBZ4YgIoGcSwbTGLPECPH/l0X09GoOi8rtYleJoLRuDgh2c4GXXHGcvBP4o1GsTnFE/6BkPc5xbJG8TWCD6U6VLC32rwwprc2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771247111; c=relaxed/simple;
-	bh=q82IcuKBKVPmAGGlfrXASO3H7rLUeonQFbZAWVqZ0iQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oCPqCUf4oDWLhcNuv7XntcngUvt7b1A5OsA3q8FgVsAEAeJmA+bGG0uCLCoiKNk+teUyquVavr7tam8th71Tfx/GhT2P30qH3iKWN0F4ZbMUCANl7bqynmqOwVK80qk8c2gWlKTjPxm6owpLExZnVVtqCodizNfKB3In9mo2Wqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sdPEs1gK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771247467; c=relaxed/simple;
+	bh=TSD9/IFEepdxC1gVVp1H4jqkySJsKvLuQD0t8ridnm4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mwGKs7RGAiQXgMGASbRUJeBMgwi6wrkDia3/sI61BtM26MDxqFQRb+N5IXkPXTpYnS0Fy3BBETCiPLqhkga8QU2d+rUbhPVtWWt2isNYrk+LDuXsL0DQmVFzNUrLulYqqua6ZHnNd/Ethu6LpLjfWhidtWxlHBynw2CiKYP6+kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8ESrVCL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sdPEs1gK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 713A7C116C6;
-	Mon, 16 Feb 2026 13:05:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8ESrVCL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BF42C116C6;
+	Mon, 16 Feb 2026 13:11:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771247111;
-	bh=q82IcuKBKVPmAGGlfrXASO3H7rLUeonQFbZAWVqZ0iQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sdPEs1gKpuGSTUahCadmc+TQvDK7e/l8YBbdw/Rz0Il6UfMmmHrygvsAE0Ou9v1iO
-	 Kd2xCetmtM4eibPJ0o9UA3K/KuLaOp+v2GELkCNzk1hY+/25VsoPJwkPeb/x97Zu7F
-	 DujtNXCUhY94PVIL8iqcKI2WH8oOa3/XUDckpXhlnhwk+v2uLjjZsIuSw5CZI4LVCS
-	 xV4Czn2QSisQZOfYqCQt+FStpgZNJZiIdL92JNcOw8Gp0o2t1U65TqnCrH9R4qMZp+
-	 /BGQOrRWIaaJCsTR8Ceh9OQEepaSx8hogK4MLn4ePkQN2RfAa+2GTi4SdffbxBdOek
-	 EpvMuNIcHjmzA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vryHl-0000000BOK2-06in;
-	Mon, 16 Feb 2026 13:05:09 +0000
-Date: Mon, 16 Feb 2026 13:05:08 +0000
-Message-ID: <86cy24bzzv.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: "yezhenyu (A)" <yezhenyu2@huawei.com>
-Cc: "rananta@google.com" <rananta@google.com>,
-	"will@kernel.org"
-	<will@kernel.org>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"dmatlack@google.com"
-	<dmatlack@google.com>,
-	"linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	zhengchuan <zhengchuan@huawei.com>,
-	Xiexiangyou <xiexiangyou@huawei.com>,
-	"guoqixin (A)" <guoqixin2@huawei.com>,
-	"Mawen (Wayne)" <wayne.ma@huawei.com>
-Subject: Re: [RFC][PATCH] arm64: tlb: call kvm_call_hyp once during kvm_tlb_flush_vmid_range
-In-Reply-To: <2b29bbc8-c588-4ce0-b249-5cc544338ec1@huawei.com>
-References: <42bcdd9100bf4c63b79d2b72bd6db951@huawei.com>
-	<86wm0massi.wl-maz@kernel.org>
-	<2b29bbc8-c588-4ce0-b249-5cc544338ec1@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1771247467;
+	bh=TSD9/IFEepdxC1gVVp1H4jqkySJsKvLuQD0t8ridnm4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=H8ESrVCLCCPeV0Fk5/tlkfiYcrIoZBbLux+546Yt0t2KRWvljgKFUO1+fTx5ekGFW
+	 o0q4hB9z6VpW1HaAJ/8SfvAoNkAbUQ8/4Vt9q2NzSTtc3n1pzR20W3UrUGt9L2LXcP
+	 ELnajc70ct1mh2FjnH7kk0J5Ca/eDCP33jpd2NsCvlBO5MFKDdn0MaBu/+sqOOxQNp
+	 +PoEbA8PQi32cBl9qDCoUI14JCaGpK1yXjVPKxiKdBtHdnJc5ABoU+tqEbxe3tETIG
+	 F/0Pzh7UInE9QfRRBF0Msdam87jH1ESWc9sRk1+iyBfIyZFzYNycKWHCr91XymyHNE
+	 v7jBWG/bDaHUg==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.linux.dev
+Cc: mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	James Clark <james.clark@linaro.org>,
+	Leo Yan <leo.yan@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running in guest context
+Date: Mon, 16 Feb 2026 13:09:59 +0000
+Message-ID: <20260216130959.19317-1-will@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: yezhenyu2@huawei.com, rananta@google.com, will@kernel.org, oliver.upton@linux.dev, catalin.marinas@arm.com, dmatlack@google.com, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zhengchuan@huawei.com, xiexiangyou@huawei.com, guoqixin2@huawei.com, wayne.ma@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 12 Feb 2026 12:02:33 +0000,
-"yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
-> 
-> Thanks for your review.
-> 
-> On 2026/2/9 22:35, Marc Zyngier wrote:
-> > On Mon, 09 Feb 2026 13:14:07 +0000,
-> > "yezhenyu (A)" <yezhenyu2@huawei.com> wrote:
-> >> 
-> >>  From 9982be89f55bd99b3683337223284f0011ed248e Mon Sep 17 00:00:00 2001
-> >> From: eillon <yezhenyu2@huawei.com>
-> >> Date: Mon, 9 Feb 2026 19:48:46 +0800
-> >> Subject: [RFC][PATCH v1] arm64: tlb: call kvm_call_hyp once during
-> >>   kvm_tlb_flush_vmid_range
-> >> 
-> >> The kvm_tlb_flush_vmid_range() function is performance-critical
-> >> during live migration, but there is a while loop when the system
-> >> support flush tlb by range when the size is larger than MAX_TLBI_RANGE_PAGES.
-> >> 
-> >> This results in frequent entry to kvm_call_hyp() and then a large
-> > 
-> > What is the cost of kvm_call_hyp()?
-> > 
-> 
-> Most cost of kvm_tlb_flush_vmid_range() is __tlb_switch_to_host(), which
-> is called in every __kvm_tlb_flush_vmid/__kvm_tlb_flush_vmid_range.
+The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
+generation in guest context when self-hosted TRBE is in use by the host.
 
-That was not my question: you indicate that frequent calls to
-kvm_call_hyp() are making things costly. I find this assertion
-surprising, given that on a VHE system, this is exactly *nothing*.
+Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
+TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
+per R_YCHKJ the Trace Buffer Unit will still be enabled if
+TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
+Trace Buffer Unit can perform address translation for the "owning
+exception level" even when it is out of context.
 
-> 
-> >> amount of time is spent in kvm_clear_dirty_log_protect() during
-> >> migration(more than 50%).
-> > 
-> > 50% of what time? The guest's run-time? The time spent doing TLBIs
-> > compared to the time spent in kvm_clear_dirty_log_protect()?
-> > 
-> 
-> kvm_clear_dirty_log_protect() cost more than 50% time during
-> ram_find_and_save_block(), but not every time.
-> I captured the flame graph during the live migration, and the
-> distribution of several key functions is as follows(sorry I
-> cannot transfer the SVG files outside my company):
-> 
->     ram_find_and_save_block(): 84.01%
->         memory_region_clear_dirty_bitmap(): 33.40%
->             kvm_clear_dirty_log_protect(): 26.74%
->                 kvm_arch_flush_remote_tlbs_range(): 9.67%
->                     __tlb_switch_to_host(): 9.51%
->                 kvm_arch_mmu_enable_log_dirty_pt_masked(): 9.38%
->         ram_save_target_page_legacy(): 43.41%
-> 
-> The memory_region_clear_dirty_bitmap() cost about 40% of
-> ram_find_and_save_block(), and the kvm_arch_flush_remote_tlbs_range()
-> cost about 29% of memory_region_clear_dirty_bitmap().
-> 
-> And after the patch apply, the distribution of several key functions is
-> as follows:
-> 
->     ram_find_and_save_block(): 53.84%
->         memory_region_clear_dirty_bitmap(): 2.28%
->             kvm_clear_dirty_log_protect(): 1.75%
->                 kvm_arch_flush_remote_tlbs_range(): 0.03%
->                     __tlb_switch_to_host(): 0.03%
->                 kvm_arch_mmu_enable_log_dirty_pt_masked(): 0.96%
->         ram_save_target_page_legacy(): 38.97%
->
->
-> The memory_region_clear_dirty_bitmap() cost about 4% of
-> ram_find_and_save_block(), and the kvm_arch_flush_remote_tlbs_range()
-> cost about 1% of memory_region_clear_dirty_bitmap().
+Consequently, we can end up in a state where TRBE performs speculative
+page-table walks for a host VA/IPA in guest/hypervisor context depending
+on the value of MDCR_EL2.E2TB, which changes over world-switch. The
+result appears to be a heady mixture of data corruption and hardware
+lockups.
 
-What is ram_find_and_save_block()? userspace code?
+Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
+draining the buffer, restoring the register on return to the host.
 
-> 
-> >> So, when the address range is large than
-> >> MAX_TLBI_RANGE_PAGES, directly call __kvm_tlb_flush_vmid to
-> >> optimize performance.
-> > 
-> > Multiple things here:
-> > 
-> > - there is no SoB, which means that patch cannot be considered for
-> >    merging
-> > 
-> If there are no other issues with this patch, I can resend it with the
-> SoB (Signed-off-by) tag.
-> 
-> 
-> > - there is no data showing how this change improves the situation for
-> >    a large enough set of workloads
-> > 
-> > - there is no description of a test that could be run on multiple
-> >    implementations to check whether this change has a positive or
-> >    negative impact
-> 
-> This patch affected the migration bandwidth during the live migration.
-> With the same physical bandwidth, the optimization effect of this patch
-> can be observed by monitoring the real live migration bandwidth.
-> 
-> I have test this in an RDMA-like environment, the physical bandwidth is
-> about 100GBps; without this patch, the migration bandwidth is below 10
-> GBps, and after this patch apply, the migration bandwidth can reach 50
-> GBps.
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>
+Cc: James Clark <james.clark@linaro.org>
+Cc: Leo Yan <leo.yan@arm.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: Fuad Tabba <tabba@google.com>
+Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+Signed-off-by: Will Deacon <will@kernel.org>
+---
 
-Again: how can other people reproduce your findings? Please provide a
-test, and its exact configuration. If this truly results in a 5x
-improvement, it shouldn't be hard to reproduce.
+NOTE: This is *untested* as I don't have a TRBE-capable device that can
+run upstream but I noticed this by inspection when triaging occasional
+hardware lockups on systems using a 6.12-based kernel with TRBE running
+at the same time as a vCPU is loaded. This code has changed quite a bit
+over time, so stable backports are not entirely straightforward.
+Hopefully James/Leo/Suzuki can help us test if folks agree with the
+general approach taken here.
 
-Thanks,
+ arch/arm64/include/asm/kvm_host.h  |  1 +
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
+ 2 files changed, 28 insertions(+), 9 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ac7f970c7883..a932cf043b83 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -746,6 +746,7 @@ struct kvm_host_data {
+ 		u64 pmscr_el1;
+ 		/* Self-hosted trace */
+ 		u64 trfcr_el1;
++		u64 trblimitr_el1;
+ 		/* Values of trap registers for the host before guest entry. */
+ 		u64 mdcr_el2;
+ 		u64 brbcr_el1;
+diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+index 2a1c0f49792b..fd389a26bc59 100644
+--- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+@@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+ 	write_sysreg_el1(new_trfcr, SYS_TRFCR);
+ }
+ 
+-static bool __trace_needs_drain(void)
++static void __trace_drain_and_disable(void)
+ {
+-	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
+-		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
++	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
+ 
+-	return host_data_test_flag(TRBE_ENABLED);
++	*trblimitr_el1 = 0;
++
++	if (is_protected_kvm_enabled()) {
++		if (!host_data_test_flag(HAS_TRBE))
++			return;
++	} else {
++		if (!host_data_test_flag(TRBE_ENABLED))
++			return;
++	}
++
++	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
++	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
++		isb();
++		tsb_csync();
++		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
++		isb();
++	}
+ }
+ 
+ static bool __trace_needs_switch(void)
+@@ -79,15 +94,18 @@ static void __trace_switch_to_guest(void)
+ 
+ 	__trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
+ 			  *host_data_ptr(trfcr_while_in_guest));
+-
+-	if (__trace_needs_drain()) {
+-		isb();
+-		tsb_csync();
+-	}
++	__trace_drain_and_disable();
+ }
+ 
+ static void __trace_switch_to_host(void)
+ {
++	u64 trblimitr_el1 = *host_data_ptr(host_debug_state.trblimitr_el1);
++
++	if (trblimitr_el1 & TRBLIMITR_EL1_E) {
++		write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
++		isb();
++	}
++
+ 	__trace_do_switch(host_data_ptr(trfcr_while_in_guest),
+ 			  *host_data_ptr(host_debug_state.trfcr_el1));
+ }
 -- 
-Without deviation from the norm, progress is not possible.
+2.53.0.273.g2a3d683680-goog
+
