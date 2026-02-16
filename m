@@ -1,244 +1,173 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C153FCC
-	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 16:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034DD17A2F6
+	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 17:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771260545; cv=none; b=MAMg+oxcXhWmuCsk75l/DQZ5eG3s3TZcbl5qXV5vkK7nXfv5CPCkYDMudu7hjxHX6zbQO14j19IMl/Oyjq1PfJV3zT6zBnZlVHdv/hnSs7MceunM08EuDfrZhwecDBbclc4FrGVapeYlNfGoVdWGSDVClPSVeeqTQA0zoEUBunM=
+	t=1771261560; cv=none; b=gAzKx9xxqsKWOM+TJW7Qi/rdsK4YSlewg0wDoBAR1IFVMHNyvBXr0yDGjJ7cJCXkr07u9ETfPw4dBET5Or88P7jkepG0t2aLmCa5CrwRbbcMMBBKr4SFwqnRwBdjNXISw1eK7J6uJZ/gymUoSsg6QcgipR2Xsoljmvn+SnwvW98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771260545; c=relaxed/simple;
-	bh=BErrwxXcdvksVWRaNfhl52UAkNtasvnjPSSNTtqEst8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kCQSobyCJbvzqly6TmFDiXhYwaGvUj2R2F3GWA5QrqKXtpDEzHoLFOfJb2SomgojSE6px5fGQ/3ghWzi6/LBqxI7QCk1NGpgCwnmfmdJ9WWTAOZVtAEOELKUYGMGC+wrsqxaNSfPAXaaOyNPkSVjw+lNO+xzbiQqg+CPX1F1ANI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B3CbpGTz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771261560; c=relaxed/simple;
+	bh=WZre1OzmSFXuIxVbmE23zObgowTy0L0he5FkW3BHZ+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VHrjPayR0G0F7Nen24LsSRec4Nm6b80n3bOLfLtA4ohT4qfEeQW84OXEX7TxoCMG1HHCh3nXV5ounLEGyzGy31BebnibIp9dDngNHgaf5TnptSyzOqUzlqXfQJT10auKPi5MlSfGKlv02BDFviWrbKQcymmHSD6k2uywJK+B2Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CquNvMmP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3CbpGTz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 166C3C116C6;
-	Mon, 16 Feb 2026 16:49:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CquNvMmP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6515C116C6;
+	Mon, 16 Feb 2026 17:05:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771260545;
-	bh=BErrwxXcdvksVWRaNfhl52UAkNtasvnjPSSNTtqEst8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=B3CbpGTzFGLvpAOK7os0yuDzLQ5KPUQAwt7Iq52UO9ryWnI8+ZQ8mRx7FT503YI6a
-	 m7syNXZ0xa2PJHJ2cI60n0ByAuZ6WoNuGBToO6snvdXOZ5nbYTnObwsVCVJjNzwI5Z
-	 ihvjxhzdYYO89HvHCaoUCVEavhAL3AdqTJaVCRocIgQ053U9rWkx77qUlqQILlcQBt
-	 2+mtNw7WtjqOh/zTmMyqUVcDZTByneBVNauO/cBqOizP12M8Ko4QYQ3QtoMAEyvh3u
-	 aUacPxo/Xlj4C1VLowHbaq9uTB1HR9w5RPwacItOLcu1QGNA3lIQR23j7Y8eqYwAZD
-	 i8rvXPlDiFGAQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vs1mQ-0000000BSIJ-3TjK;
-	Mon, 16 Feb 2026 16:49:02 +0000
-Date: Mon, 16 Feb 2026 16:49:02 +0000
-Message-ID: <867bscbpmp.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=k20201202; t=1771261559;
+	bh=WZre1OzmSFXuIxVbmE23zObgowTy0L0he5FkW3BHZ+Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CquNvMmPT58a9dWKW9fQVK49sqQQ50xxE8G+FpljgDBX2nOe2pK0ZeKq9l/n+SGFs
+	 fmBPr7RE6gt/aUC52QWWcyhmDnIIPWARJYIpRHjFuddnhqLij/PHg402b7MGpPo3cG
+	 vslqpMRCkXHrgXjGPBWUU2fAm1NsPwoAJvBGEu2cNyXVzLul2lSGy5yGI3aCPN6TB2
+	 yA3bl+gJrXl07XIMHYQD/bUlDZGPkldLzKckc+pyCh+6FfEsbSe6GXGiinazyf84QY
+	 pmtunoIPchbNseshfDc8EZ3ZHwx+25aOqVhFxr3X2+zw0KLe1MwBPvA6pfkn++t3qs
+	 XRJkn/+UpqyJw==
+Date: Mon, 16 Feb 2026 17:05:54 +0000
+From: Will Deacon <will@kernel.org>
 To: James Clark <james.clark@linaro.org>
-Cc: Will Deacon <will@kernel.org>,
-	kvmarm@lists.linux.dev,
-	mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Leo Yan <leo.yan@arm.com>,
+Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Leo Yan <leo.yan@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running in guest context
-In-Reply-To: <076e013a-b66d-4985-9709-734d7184ad72@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
+ in guest context
+Message-ID: <aZNOcv2XxTrrrEnU@willie-the-truck>
 References: <20260216130959.19317-1-will@kernel.org>
-	<86a4x8bw38.wl-maz@kernel.org>
-	<d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
-	<868qcsbsbd.wl-maz@kernel.org>
-	<076e013a-b66d-4985-9709-734d7184ad72@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <878e304e-4162-4981-8125-bd4f67ba9dd5@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: james.clark@linaro.org, will@kernel.org, kvmarm@lists.linux.dev, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, leo.yan@arm.com, suzuki.poulose@arm.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878e304e-4162-4981-8125-bd4f67ba9dd5@linaro.org>
 
-On Mon, 16 Feb 2026 16:10:14 +0000,
-James Clark <james.clark@linaro.org> wrote:
+On Mon, Feb 16, 2026 at 03:13:54PM +0000, James Clark wrote:
 > 
 > 
+> On 16/02/2026 1:09 pm, Will Deacon wrote:
+> > The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
+> > generation in guest context when self-hosted TRBE is in use by the host.
+> > 
+> > Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
+> > TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
+> > per R_YCHKJ the Trace Buffer Unit will still be enabled if
+> > TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
+> > Trace Buffer Unit can perform address translation for the "owning
+> > exception level" even when it is out of context.
+> > 
+> > Consequently, we can end up in a state where TRBE performs speculative
+> > page-table walks for a host VA/IPA in guest/hypervisor context depending
+> > on the value of MDCR_EL2.E2TB, which changes over world-switch. The
+> > result appears to be a heady mixture of data corruption and hardware
+> > lockups.
+> > 
+> > Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
+> > draining the buffer, restoring the register on return to the host.
+> > 
+> > Cc: Marc Zyngier <maz@kernel.org>
+> > Cc: Oliver Upton <oupton@kernel.org>
+> > Cc: James Clark <james.clark@linaro.org>
+> > Cc: Leo Yan <leo.yan@arm.com>
+> > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> > Cc: Fuad Tabba <tabba@google.com>
+> > Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > ---
+> > 
+> > NOTE: This is *untested* as I don't have a TRBE-capable device that can
+> > run upstream but I noticed this by inspection when triaging occasional
+> > hardware lockups on systems using a 6.12-based kernel with TRBE running
+> > at the same time as a vCPU is loaded. This code has changed quite a bit
+> > over time, so stable backports are not entirely straightforward.
+> > Hopefully James/Leo/Suzuki can help us test if folks agree with the
+> > general approach taken here.
+> > 
+> >   arch/arm64/include/asm/kvm_host.h  |  1 +
+> >   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
+> >   2 files changed, 28 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index ac7f970c7883..a932cf043b83 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -746,6 +746,7 @@ struct kvm_host_data {
+> >   		u64 pmscr_el1;
+> >   		/* Self-hosted trace */
+> >   		u64 trfcr_el1;
+> > +		u64 trblimitr_el1;
+> >   		/* Values of trap registers for the host before guest entry. */
+> >   		u64 mdcr_el2;
+> >   		u64 brbcr_el1;
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > index 2a1c0f49792b..fd389a26bc59 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > @@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+> >   	write_sysreg_el1(new_trfcr, SYS_TRFCR);
+> >   }
+> > -static bool __trace_needs_drain(void)
+> > +static void __trace_drain_and_disable(void)
+> >   {
+> > -	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
+> > -		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
+> > +	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
+> > -	return host_data_test_flag(TRBE_ENABLED);
+> > +	*trblimitr_el1 = 0;
+> > +
+> > +	if (is_protected_kvm_enabled()) {
+> > +		if (!host_data_test_flag(HAS_TRBE))
+> > +			return;
+> > +	} else {
+> > +		if (!host_data_test_flag(TRBE_ENABLED))
+> > +			return;
+> > +	}
+> > +
+> > +	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
+> > +	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
+> > +		isb();
+> > +		tsb_csync();
+> > +		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
+> > +		isb();
+> > +	}
+> >   }
+> >   static bool __trace_needs_switch(void)
+> > @@ -79,15 +94,18 @@ static void __trace_switch_to_guest(void)
+> >   	__trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
+> >   			  *host_data_ptr(trfcr_while_in_guest));
+> > -
+> > -	if (__trace_needs_drain()) {
+> > -		isb();
+> > -		tsb_csync();
+> > -	}
+> > +	__trace_drain_and_disable();
+> >   }
+> >   static void __trace_switch_to_host(void)
+> >   {
+> > +	u64 trblimitr_el1 = *host_data_ptr(host_debug_state.trblimitr_el1);
+> > +
+> > +	if (trblimitr_el1 & TRBLIMITR_EL1_E) {
+> > +		write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
 > 
-> On 16/02/2026 3:51 pm, Marc Zyngier wrote:
-> > On Mon, 16 Feb 2026 15:05:10 +0000,
-> > James Clark <james.clark@linaro.org> wrote:
-> >> 
-> >> 
-> >> 
-> >> On 16/02/2026 2:29 pm, Marc Zyngier wrote:
-> >>> On Mon, 16 Feb 2026 13:09:59 +0000,
-> >>> Will Deacon <will@kernel.org> wrote:
-> >>>> 
-> >>>> The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
-> >>>> generation in guest context when self-hosted TRBE is in use by the host.
-> >>>> 
-> >>>> Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
-> >>>> TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
-> >>>> per R_YCHKJ the Trace Buffer Unit will still be enabled if
-> >>>> TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
-> >>>> Trace Buffer Unit can perform address translation for the "owning
-> >>>> exception level" even when it is out of context.
-> >>> 
-> >>> Great. So TRBE violates all the principles that we hold true in the
-> >>> architecture. Does SPE suffer from the same level of brokenness?
-> >>> 
-> >>>> Consequently, we can end up in a state where TRBE performs speculative
-> >>>> page-table walks for a host VA/IPA in guest/hypervisor context depending
-> >>>> on the value of MDCR_EL2.E2TB, which changes over world-switch. The
-> >>>> result appears to be a heady mixture of data corruption and hardware
-> >>>> lockups.
-> >>>> 
-> >>>> Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
-> >>>> draining the buffer, restoring the register on return to the host.
-> >>>> 
-> >>>> Cc: Marc Zyngier <maz@kernel.org>
-> >>>> Cc: Oliver Upton <oupton@kernel.org>
-> >>>> Cc: James Clark <james.clark@linaro.org>
-> >>>> Cc: Leo Yan <leo.yan@arm.com>
-> >>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> >>>> Cc: Fuad Tabba <tabba@google.com>
-> >>>> Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
-> >>>> Signed-off-by: Will Deacon <will@kernel.org>
-> >>>> ---
-> >>>> 
-> >>>> NOTE: This is *untested* as I don't have a TRBE-capable device that can
-> >>>> run upstream but I noticed this by inspection when triaging occasional
-> >>>> hardware lockups on systems using a 6.12-based kernel with TRBE running
-> >>>> at the same time as a vCPU is loaded. This code has changed quite a bit
-> >>>> over time, so stable backports are not entirely straightforward.
-> >>>> Hopefully James/Leo/Suzuki can help us test if folks agree with the
-> >>>> general approach taken here.
-> >>>> 
-> >>>>    arch/arm64/include/asm/kvm_host.h  |  1 +
-> >>>>    arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
-> >>>>    2 files changed, 28 insertions(+), 9 deletions(-)
-> >>>> 
-> >>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >>>> index ac7f970c7883..a932cf043b83 100644
-> >>>> --- a/arch/arm64/include/asm/kvm_host.h
-> >>>> +++ b/arch/arm64/include/asm/kvm_host.h
-> >>>> @@ -746,6 +746,7 @@ struct kvm_host_data {
-> >>>>    		u64 pmscr_el1;
-> >>>>    		/* Self-hosted trace */
-> >>>>    		u64 trfcr_el1;
-> >>>> +		u64 trblimitr_el1;
-> >>>>    		/* Values of trap registers for the host before guest entry. */
-> >>>>    		u64 mdcr_el2;
-> >>>>    		u64 brbcr_el1;
-> >>>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >>>> index 2a1c0f49792b..fd389a26bc59 100644
-> >>>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >>>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> >>>> @@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
-> >>>>    	write_sysreg_el1(new_trfcr, SYS_TRFCR);
-> >>>>    }
-> >>>>    -static bool __trace_needs_drain(void)
-> >>>> +static void __trace_drain_and_disable(void)
-> >>>>    {
-> >>>> -	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
-> >>>> -		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
-> >>>> +	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
-> >>>>    -	return host_data_test_flag(TRBE_ENABLED);
-> >>>> +	*trblimitr_el1 = 0;
-> >>>> +
-> >>>> +	if (is_protected_kvm_enabled()) {
-> >>>> +		if (!host_data_test_flag(HAS_TRBE))
-> >>>> +			return;
-> >>>> +	} else {
-> >>>> +		if (!host_data_test_flag(TRBE_ENABLED))
-> >>>> +			return;
-> >>>> +	}
-> >>>> +
-> >>>> +	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
-> >>>> +	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
-> >>>> +		isb();
-> >>>> +		tsb_csync();
-> >>>> +		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-> >>>> +		isb();
-> >> 
-> >> The TRBE driver might do an extra drain here as a workaround. Hard to
-> >> tell if it's actually required in this case (seems like probably not)
-> >> but it might be worth doing it anyway to avoid hitting the
-> >> issue. Especially if we add guest support later where some of the
-> >> affected registers might start being used.
-> > 
-> > Just to set the expectations: guest TRBE support is not happening
-> > until the architecture is fixed. It cannot reliably give a trace that
-> > includes emulated exceptions, and until then, no TRBE for you.
-> > 
-> >> See:
-> >> 
-> >>      if (trbe_needs_drain_after_disable(cpudata))
-> >>          trbe_drain_buffer();
-> >> 
-> >> 
-> >>>> +	}
-> >>> 
-> >>> Doesn't this mean we should be able to get rid of most of the TRFCR
-> >>> messing about that litters the entry/exit code and leave that to VHE
-> >> 
-> >> Technically you could have ETMs that and are connected to sinks other
-> >> than TRBE. Unless you somehow switch off those sinks you still need to
-> >> do the TRFCR switching stuff.
-> >> 
-> >>> only? And even then, I'm tempted to simply get rid of any sort of
-> >>> guest-only tracing, given that TRBE is not capable of representing
-> >>> exceptions that are synthesised by the host, making it the resulting
-> >>> traces useless.
-> >> 
-> >> I haven't heard of anyone tracing a guest from the host, but until we
-> >> add support for guests to be able to trace themselves it's the only
-> >> way of doing it, so it could be useful.
-> > 
-> > But that's *not* working. If you trace EL1 only, even with a VHE host,
-> > the result is not usable.
-> > 
-> 
-> Do you mean not working because of the missing exceptions? I did a bit
-> of testing before and the trace did seem somewhat usable to me. It had
-> EL1 and EL0 atoms in there.
+> Will this restore a stale value if you do kvm_enable_trbe() then later
+> kvm_disable_trbe()? Looks like the read and save will be skipped unless
+> host_data_test_flag(TRBE_ENABLED) is true, so it will never save a disabled
+> value.
 
-Sure. Now try to look at what that means for NV, where all the
-EL1->EL2 exceptions are emulated, where all the EL2->EL1 exception
-returns are emulated.
+__trace_drain_and_disable() sets the saved limit to 0 if TRBE_ENABLE is
+not set, so this shouldn't do anything in that case. Or did I
+misunderstand your scenario?
 
-What does it give you? A bag of nonsense.
+> kvm_disable_trbe() might need to clear host_debug_state.trblimitr_el1.
 
-Same thing for EL2->EL0, by the way, so you can't even correctly
-profile an EL0 program that performs a syscall, or that gets
-interrupted. And while without NV, these exceptions are rare, having a
-trace that is unreliable has the potential of being worse than no
-trace at all.
+pKVM can't rely on that thing being called, so the context switch still
+needs to be self-contained there.
 
-Until the architecture grows a way for KVM to inject the missing
-information into the trace, TRBE support for guest will stay out.
-
-> All you need is the mmap records from the
-> guest which you can get by running Perf in the guest and it's possible
-> to decode it. Maybe it's not complete but I don't think all use cases
-> require complete trace. AutoFDO for example just needs lots of small
-> snippets of execution history.
-
-I don't think it is OK to feed an FDO with traces that are known to be
-incomplete. Maybe that goes under the radar today, but my crystal ball
-is telling me things could be very different in the future, and I'm
-not going to take any bet.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
