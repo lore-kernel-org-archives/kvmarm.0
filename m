@@ -1,166 +1,176 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE6F18C2C
-	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 13:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771247467; cv=none; b=g0qr2HgEkLoQPM5WZplnAd8c9k0B2/AikJgkjVnb2Y1zrgTdCAerXVVggbuKhbUs6/yR+BesgPBZ4YgIoGcSwbTGLPECPH/l0X09GoOi8rtYleJoLRuDgh2c4GXXHGcvBP4o1GsTnFE/6BkPc5xbJG8TWCD6U6VLC32rwwprc2U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771247467; c=relaxed/simple;
-	bh=TSD9/IFEepdxC1gVVp1H4jqkySJsKvLuQD0t8ridnm4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mwGKs7RGAiQXgMGASbRUJeBMgwi6wrkDia3/sI61BtM26MDxqFQRb+N5IXkPXTpYnS0Fy3BBETCiPLqhkga8QU2d+rUbhPVtWWt2isNYrk+LDuXsL0DQmVFzNUrLulYqqua6ZHnNd/Ethu6LpLjfWhidtWxlHBynw2CiKYP6+kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8ESrVCL; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A78021019C
+	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 13:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771248664; cv=pass; b=Hb/pDxDBipK3upd4jGJQO1H4Fs8IYxbwXxrPOUR9nfXWOxBW0pMiqQwFmKGz+qfObtko8MsUibWPEMZhbnfcHbqjevYoDj0nEI/RvIR6A285a7Kd+opjGD9sNlnRmnv8CwjiER/N1m9TwMyo6J4iCYJAZH5XokgIf1shZzFshmI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771248664; c=relaxed/simple;
+	bh=KYwDyE5sgL5bnvQDKuNcqwkPWVqjsboFUT0Et0w39IE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=haetiJEAMLzanQ0+2c3B4jbMJqKuaMSw8E5sQ7IXn3qj4UzlxGD7Wag31syvJv/E0W/lVrjWBhrCmSHyndlJxNi+eHE5MWU7I2rX6heLd6HReIhW8IjIOwXFaqunI9WzICmf6LDv0BUsPWdPL1CgVNk2yPAAo8LhNMLKB2xjk8g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qJLr4xYW; arc=pass smtp.client-ip=74.125.224.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8ESrVCL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BF42C116C6;
-	Mon, 16 Feb 2026 13:11:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771247467;
-	bh=TSD9/IFEepdxC1gVVp1H4jqkySJsKvLuQD0t8ridnm4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=H8ESrVCLCCPeV0Fk5/tlkfiYcrIoZBbLux+546Yt0t2KRWvljgKFUO1+fTx5ekGFW
-	 o0q4hB9z6VpW1HaAJ/8SfvAoNkAbUQ8/4Vt9q2NzSTtc3n1pzR20W3UrUGt9L2LXcP
-	 ELnajc70ct1mh2FjnH7kk0J5Ca/eDCP33jpd2NsCvlBO5MFKDdn0MaBu/+sqOOxQNp
-	 +PoEbA8PQi32cBl9qDCoUI14JCaGpK1yXjVPKxiKdBtHdnJc5ABoU+tqEbxe3tETIG
-	 F/0Pzh7UInE9QfRRBF0Msdam87jH1ESWc9sRk1+iyBfIyZFzYNycKWHCr91XymyHNE
-	 v7jBWG/bDaHUg==
-From: Will Deacon <will@kernel.org>
-To: kvmarm@lists.linux.dev
-Cc: mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	James Clark <james.clark@linaro.org>,
-	Leo Yan <leo.yan@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running in guest context
-Date: Mon, 16 Feb 2026 13:09:59 +0000
-Message-ID: <20260216130959.19317-1-will@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qJLr4xYW"
+Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-64ad8435f46so2738750d50.1
+        for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 05:31:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1771248662; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ctwlD+n88p7jgyVZiwIx/F6S3v7XeXVPuDAjhqyq4dvO9BuCyltGopqDKmc37RNPgS
+         RLbMjJsgHqql2WTO1MmcGfdzRyzb3tGSpXV4rHOnAu8rig4tz6pGTlYCgh9owkWvJnH0
+         F0ByXg+3835taNxdnsWvY23hQOLNnwMIKdebalondPl54VTs8PqsnnKngQGSInys/T0A
+         lamsKV2/YoVpQU0BltntzySunuyqSABb6KMgKutABYu16kWwksZ27adyLJNKS+Y3KO1c
+         eGoEQyC7Z5NnitPrbGTsBu0ekz8Wdr8lGLo1xkV3evWsmUTXbZq2FVHFfw2AB6ItFk+N
+         lV2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        fh=nR9peNaufbd5g/N7GWDvKOWCiJ0rB6aNFlctZHDikzc=;
+        b=cDV0SrAlSY66D9ZoiDPc56JRnazvgzgXiJc24CTHSWTmw7TkUQ7+yghxdxPBQJgeZK
+         0KFBiyLg0N3i/yuWPzvVGTBCDFUJdQkC9UfoC6h9B2sKNXUqrCzdDu1mfeqmYu9Iq91j
+         KShsZ8eujcZWil8q7BzHQtQbus11iWN/qt77H/UjqVauDA+gf5yhV/4lKbbslZeKyscG
+         MOCMpl5LLPd3mP5ighTBJgrpSg0ehIkw9/2zjgdUjpJbEuaukSM/mxVd+toWK2awet0d
+         RONzjpItljg8t9hmyeqKgKjucD91cHqlobUfCG8UxitKEfIoCY2jQrQvYkn8lHlkRZbH
+         PmBw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1771248662; x=1771853462; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        b=qJLr4xYWIlHwRDyxKGxVSbmah6rgRjsUBGhsbbyT1EbnNCpldujAoqNv0cvqU5q7w+
+         N1cWSdo7lX++eudSLotpIxaBTwdvit/E9IGVpczL0VDZaRwMzzPhoZpvX/Npml1dZtTW
+         rUrXOVWTDIzp1TUdz3lJXs7krrTH1+BOes6Dg5MMUDf019UcznesLzUyuG7yT5/obl/m
+         bNQNx9gqxjyw1Pa7PEhztEE/YQuquaHvlxdnbEtaraOt1v0nj8RhLC2FGaCEbA/6zl8S
+         SaCGuL3sRKuGoL56fNmJ0km2tUzBUuhGw3nuTEyI2MyMswyiopMQ9P3lmGSh7DjXDwP8
+         u4Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1771248662; x=1771853462;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o3wOtoDZJ0p0jz0Xtoq03ZP4KLyE4lMLqKI4YU+J1SA=;
+        b=j6bY5baBg0z059acAXzH3AMzREvnNR3wKl4qzsDO2STEiUxQZPpd89rO38SQobiYhI
+         d+RsN1fNXelfYL0wSld45uxiXPCDuwLqvZSa84BvWgDUvdttKH6PhgdjCjH+QNDj2w7K
+         s48OPbzp0iMhgzmlKAR0a1Rz5yAHKFiRRdhZGIAR5MQyy8qETrjC7GbAKwOOY3ADc1YJ
+         eX0uG5IS9zDK8Sb3Xu3lXv8GFic9DCqjp1wDViRDrvYZpHTrpc8k7YuBo4YXKD4DZyg6
+         Z5ZmW5qSrGMWueQt3uIPvS4u5OcQ+8e+utqCgeGkyn+QYqaX1BRySBTs3AyupI+zirpD
+         MShg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1Zxl0LrONxDebcWjK+f+RhK4n/tum4Vb664uK47XMxyYIEwMnw7vUbzMTYWwqixhJt1CTiNE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yya77IXNCDfHHqrUD19mrDr1H9qb+tDcD+lbNkxxMhH8JRhxUqw
+	ZHS0znO4fSm7TeMTQFJHx8+RtLQgE+WUeSPu1ZjPKGgoMlG5OXrBbpMmP0ukzWWsndfAtihK5Zx
+	9JIleTL9c8WPmkwkXIr6LkFEd5mZX5DRJPM1fWfqANg==
+X-Gm-Gg: AZuq6aI6NWW8HJOtA9zUNqu0X9QBFosjI2hJlNNqUqxlvtlEL2T1SYB0QZVoyZtIupM
+	sqWWNSyCB1DQiQkBA/WQkvLlpSreKdZnqGQGvXAqjXjgFN70eYAHe7jec8pbv43X3ES+Sp5JjzQ
+	f2Gs+kfMvMkvW4NwJ1b5ZcFMoAw6JUR3WjrIE9cPUN61Ilh+Iz3j0sHaYyfM6+77W2S8jXyERjq
+	INZ9wwhETQkMH+OIEGXPigEcwqMUWZcFHtSHXQsDaXrCcaetGPisGGvKdmtFEML8hdAg3QgM60l
+	fJ2i8m1Adz5ySApPQaNY1cZuJIPU38XEQTjk2PE+VBoT/0+ZHF+eR1gEJj2iOM/htK9t0QliOzE
+	YrQ==
+X-Received: by 2002:a53:b20c:0:b0:64a:d720:f259 with SMTP id
+ 956f58d0204a3-64c21b80db0mr4529065d50.85.1771248662214; Mon, 16 Feb 2026
+ 05:31:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com>
+ <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com>
+ <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com> <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
+ <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com>
+In-Reply-To: <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Feb 2026 13:30:51 +0000
+X-Gm-Features: AZwV_QhGoaC3Vnb64FdYsO_8xJx-bd5rBrEQJ8-6M3I7JiVPCm-6tAEOuq08bHQ
+Message-ID: <CAFEAcA8V9bjQUzUYAW7qj5fEn_f9xaPJAYpTRgvdaFq0cY3pRA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu property
+To: Sebastian Ott <sebott@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, 
+	qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
-generation in guest context when self-hosted TRBE is in use by the host.
+On Wed, 11 Feb 2026 at 16:04, Sebastian Ott <sebott@redhat.com> wrote:
+>
+> On Wed, 11 Feb 2026, Peter Maydell wrote:
+> > On Wed, 11 Feb 2026 at 15:37, Sebastian Ott <sebott@redhat.com> wrote:
+> >>
+> >> Hi Peter,
+> >>
+> >> On Fri, 6 Feb 2026, Peter Maydell wrote:
+> >>> On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
+> >
+> >>>> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+> >>>> +{
+> >>>> +    ARMCPU *cpu = ARM_CPU(obj);
+> >>>> +    const struct psci_version *ver;
+> >>>> +
+> >>>> +    for (ver = psci_versions; ver->number != -1; ver++) {
+> >> [...]
+> >>>> +        if (ver->number == cpu->psci_version)
+> >>>> +            return g_strdup(ver->str);
+> >>>> +    }
+> >>>> +
+> >>>> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
+> >>>
+> >>> Is this ever possible?
+> >>
+> >> Hm, not sure actually - what if there's a new kernel/qemu implementing
+> >> psci version 1.4 and then you migrate to a qemu that doesn't know about
+> >> 1.4?
+> >
+> > Oh, I see -- we're reporting back cpu->psci_version here, which
+> > indeed could be the value set by KVM. I misread and assumed
+> > this was just reading back the field that the setter sets,
+> > which is kvm_prop_psci_version (and which I think will only
+> > be set via the setter and so isn't ever a value the setter
+> > doesn't know about).
+> >
+> > That does flag up a bug in this patch, though: if I set
+> > a QOM property via the setter function and then read its
+> > value via the getter function I ought to get back what
+> > I just wrote.
+> >
+>
+> Meaning this should be something like below?
+>
+> static char *kvm_get_psci_version(Object *obj, Error **errp)
+> {
+>      ARMCPU *cpu = ARM_CPU(obj);
+>
+>      return g_strdup_printf("%d.%d",
+>         (int) PSCI_VERSION_MAJOR(cpu->kvm_prop_psci_version),
+>         (int) PSCI_VERSION_MINOR(cpu->kvm_prop_psci_version));
 
-Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
-TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
-per R_YCHKJ the Trace Buffer Unit will still be enabled if
-TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
-Trace Buffer Unit can perform address translation for the "owning
-exception level" even when it is out of context.
+I guess we need to define what we want. Things we need:
 
-Consequently, we can end up in a state where TRBE performs speculative
-page-table walks for a host VA/IPA in guest/hypervisor context depending
-on the value of MDCR_EL2.E2TB, which changes over world-switch. The
-result appears to be a heady mixture of data corruption and hardware
-lockups.
+ - user/QMP/etc setting a value and reading it back should
+   get back what they set
+ - QEMU needs to keep working on a new kernel that defines a
+   new PSCI version in the future
+ - user reading the default value and then writing it back
+   should succeed
 
-Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
-draining the buffer, restoring the register on return to the host.
+Things we might like:
+ - ideally the setter would fail if the user picks a version
+   KVM can't support, but I don't think we can conveniently
+   determine this, so "fail vcpu init" may be as good as we
+   can get without unnecessarily large amounts of effort
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Cc: James Clark <james.clark@linaro.org>
-Cc: Leo Yan <leo.yan@arm.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
-Signed-off-by: Will Deacon <will@kernel.org>
----
+I think this probably adds up to:
+ - setter should accept any a.b value (for a,b fitting in [0,65535])
+ - getter can handle any value and turn it into a.b
+ - make sure that setting it to an invalid value gives a helpful
+   error on vcpu start
 
-NOTE: This is *untested* as I don't have a TRBE-capable device that can
-run upstream but I noticed this by inspection when triaging occasional
-hardware lockups on systems using a 6.12-based kernel with TRBE running
-at the same time as a vCPU is loaded. This code has changed quite a bit
-over time, so stable backports are not entirely straightforward.
-Hopefully James/Leo/Suzuki can help us test if folks agree with the
-general approach taken here.
+Doing it this way, do we need a separate cpu->kvm_prop_psci_version,
+or could we directly read and write cpu_>psci_version ?
 
- arch/arm64/include/asm/kvm_host.h  |  1 +
- arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
- 2 files changed, 28 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ac7f970c7883..a932cf043b83 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -746,6 +746,7 @@ struct kvm_host_data {
- 		u64 pmscr_el1;
- 		/* Self-hosted trace */
- 		u64 trfcr_el1;
-+		u64 trblimitr_el1;
- 		/* Values of trap registers for the host before guest entry. */
- 		u64 mdcr_el2;
- 		u64 brbcr_el1;
-diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-index 2a1c0f49792b..fd389a26bc59 100644
---- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-@@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
- 	write_sysreg_el1(new_trfcr, SYS_TRFCR);
- }
- 
--static bool __trace_needs_drain(void)
-+static void __trace_drain_and_disable(void)
- {
--	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
--		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
-+	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
- 
--	return host_data_test_flag(TRBE_ENABLED);
-+	*trblimitr_el1 = 0;
-+
-+	if (is_protected_kvm_enabled()) {
-+		if (!host_data_test_flag(HAS_TRBE))
-+			return;
-+	} else {
-+		if (!host_data_test_flag(TRBE_ENABLED))
-+			return;
-+	}
-+
-+	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
-+	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
-+		isb();
-+		tsb_csync();
-+		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-+		isb();
-+	}
- }
- 
- static bool __trace_needs_switch(void)
-@@ -79,15 +94,18 @@ static void __trace_switch_to_guest(void)
- 
- 	__trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
- 			  *host_data_ptr(trfcr_while_in_guest));
--
--	if (__trace_needs_drain()) {
--		isb();
--		tsb_csync();
--	}
-+	__trace_drain_and_disable();
- }
- 
- static void __trace_switch_to_host(void)
- {
-+	u64 trblimitr_el1 = *host_data_ptr(host_debug_state.trblimitr_el1);
-+
-+	if (trblimitr_el1 & TRBLIMITR_EL1_E) {
-+		write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
-+		isb();
-+	}
-+
- 	__trace_do_switch(host_data_ptr(trfcr_while_in_guest),
- 			  *host_data_ptr(host_debug_state.trfcr_el1));
- }
--- 
-2.53.0.273.g2a3d683680-goog
-
+thanks
+-- PMM
