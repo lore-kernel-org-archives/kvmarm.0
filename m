@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90E63101BC
-	for <kvmarm@lists.linux.dev>; Mon, 16 Feb 2026 14:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461AA31064B;
+	Mon, 16 Feb 2026 14:27:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771251839; cv=none; b=OTmmy10TMIEdI48S0byrp6a/SiUmVW8o74krCx6PbyWxT0NMP1yVkGQlmpl2pKkyzVgHF7PRzGWN+3H3i3akTh44rOD2j8b0dSJHApjHLTJDmn7Mx9gdU1DvbQd3Ytm2VIaU9XLVUYCpF1yDX1+YDgav3yl99O5cQmf9H6NoZ3s=
+	t=1771252030; cv=none; b=KvzHj+9q7B9RPc8WsX9iLhla5EulTJW31ePL4xETxT7MN2grXoKMPE3jtA+u4Kc0BkdleWmnbXz+tappIbuw0/pYWVEI5Nh5m7EFkz4VAApgqM+fvPeSWCDRvJ5WmDnbFjdVWxxPZ1+aCz7c4cKN1K6SoGk2HHdC0b0B3xhK+nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771251839; c=relaxed/simple;
-	bh=h4EVJb+so6gFAvC6RverNt6a6WKtvFMUD66Iqt4pGvA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TAfqOMEyrAVunB2ioYeQ+6+eyTwjSqA5GCj4rbHwhVZDCqybOZBj1Tiq+QdF/GxioQF8TgDfht0uLSBj49nAgL6Rw/tDiSGauKOqij64ayiHpcDgaxV7+T+dzZ8UpX74civp9ldQC9uN81jDE+Ut813RL0WW/L9glq8u/3FpVuo=
+	s=arc-20240116; t=1771252030; c=relaxed/simple;
+	bh=7PmC3eevop4sZCyCWXJdsSOZoiGFXkDyNHciwOPaBAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=agQ0x/i75dQ781rRi/llXatTrTuXXN9NEvvaHmmAGYQsK/ph663MWxPiMMurlWJ8lD4gwt4FNms5Tf94lIPC38aEsid4FwfMrhtOAqNnLIHoVLtzZRum/4GqXtDqubJXAe/EM9CWhov56SeNmdeacetWR1m0W5AqtYN9dU86hGU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D50EA1570;
-	Mon, 16 Feb 2026 06:23:50 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E4F463F73F;
-	Mon, 16 Feb 2026 06:23:51 -0800 (PST)
-Message-ID: <a5bc5d67-4dab-4699-8a11-5a92ca334159@arm.com>
-Date: Mon, 16 Feb 2026 14:23:50 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61A841570;
+	Mon, 16 Feb 2026 06:27:02 -0800 (PST)
+Received: from [10.57.56.155] (unknown [10.57.56.155])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC51A3F6A8;
+	Mon, 16 Feb 2026 06:27:04 -0800 (PST)
+Message-ID: <9140efaa-dc54-4a1b-8936-3ef876ca9121@arm.com>
+Date: Mon, 16 Feb 2026 14:27:02 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,219 +27,135 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 18/41] arm_mpam: resctrl: Implement helpers to update
- configuration
-To: Zeng Heng <zengheng4@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- linux-doc@vger.kernel.org, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-19-ben.horgan@arm.com>
- <d7de359e-9bf3-e41d-b00d-985ca7263ad8@huawei.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <d7de359e-9bf3-e41d-b00d-985ca7263ad8@huawei.com>
+Subject: Re: [PATCH v12 00/46] arm64: Support for Arm CCA in KVM
+From: Steven Price <steven.price@arm.com>
+To: Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <aY4Sf4lMlWd9LyTo@p14s> <55fc4877-666c-4d5f-a167-5692f7cfbd0b@arm.com>
+Content-Language: en-GB
+In-Reply-To: <55fc4877-666c-4d5f-a167-5692f7cfbd0b@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Zeng,
-
-On 2/14/26 10:39, Zeng Heng wrote:
-> Hi Ben,
-> 
-> On 2026/2/4 5:43, Ben Horgan wrote:
->> From: James Morse <james.morse@arm.com>
+On 16/02/2026 12:33, Steven Price wrote:
+> On 12/02/2026 17:48, Mathieu Poirier wrote:
+>> Hi Steven,
 >>
->> resctrl has two helpers for updating the configuration.
->> resctrl_arch_update_one() updates a single value, and is used by the
->> software-controller to apply feedback to the bandwidth controls, it
->> has to
->> be called on one of the CPUs in the resctrl:domain.
+>> On Wed, Dec 17, 2025 at 10:10:37AM +0000, Steven Price wrote:
+>>> This series adds support for running protected VMs using KVM under the
+>>> Arm Confidential Compute Architecture (CCA). I've changed the uAPI
+>>> following feedback from Marc.
+>>>
+>>> The main change is that rather than providing a multiplex CAP and
+>>> expecting the VMM to drive the different stages of realm construction,
+>>> there's now just a minimal interface and KVM performs the necessary
+>>> operations when needed.
+>>>
+>>> This series is lightly tested and is meant as a demonstration of the new
+>>> uAPI. There are a number of (known) rough corners in the implementation
+>>> that I haven't dealt with properly.
+>>>
+>>> In particular please note that this series is still targetting RMM v1.0.
+>>> There is an alpha quality version of RMM v2.0 available[1]. Feedback was
+>>> that there are a number of blockers for merging with RMM v1.0 and so I
+>>> expect to rework this series to support RMM v2.0 before it is merged.
+>>> That will necessarily involve reworking the implementation.
+>>>
+>>> Specifically I'm expecting improvements in:
+>>>
+>>>  * GIC handling - passing state in registers, and allowing the host to
+>>>    fully emulate the GIC by allowing trap bits to be set.
+>>>
+>>>  * PMU handling - again providing flexibility to the host's emulation.
+>>>
+>>>  * Page size/granule size mismatch. RMM v1.0 defines the granule as 4k,
+>>>    RMM v2.0 provide the option for the host to change the granule size.
+>>>    The intention is that Linux would simply set the granule size equal
+>>>    to its page size which will significantly simplify the management of
+>>>    granules.
+>>>
+>>>  * Some performance improvement from the use of range-based map/unmap
+>>>    RMI calls.
+>>>
+>>> This series is based on v6.19-rc1. It is also available as a git
+>>> repository:
+>>>
+>>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v12
+>>>
+>>> Work in progress changes for kvmtool are available from the git
+>>> repository below:
+>>>
+>>> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v10
 >>
->> resctrl_arch_update_domains() copies multiple staged configurations,
->> it can
->> be called from anywhere.
->>
->> Both helpers should update any changes to the underlying hardware.
->>
->> Implement resctrl_arch_update_domains() to use
->> resctrl_arch_update_one(). Neither need to be called on a specific CPU as
->> the mpam driver will send IPIs as needed.
->>
->> Tested-by: Gavin Shan <gshan@redhat.com>
->> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Tested-by: Peter Newman <peternewman@google.com>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since rfc:
->> list_for_each_entry -> list_for_each_entry_rcu
->> return 0
->> Restrict scope of local variables
->>
->> Changes since v2:
->> whitespace fix
->> ---
->>   drivers/resctrl/mpam_resctrl.c | 70 ++++++++++++++++++++++++++++++++++
->>   1 file changed, 70 insertions(+)
->>
->> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/
->> mpam_resctrl.c
->> index ecf00386edca..48d047510089 100644
->> --- a/drivers/resctrl/mpam_resctrl.c
->> +++ b/drivers/resctrl/mpam_resctrl.c
->> @@ -212,6 +212,76 @@ u32 resctrl_arch_get_config(struct rdt_resource
->> *r, struct rdt_ctrl_domain *d,
->>       }
->>   }
->>   +int resctrl_arch_update_one(struct rdt_resource *r, struct
->> rdt_ctrl_domain *d,
->> +                u32 closid, enum resctrl_conf_type t, u32 cfg_val)
->> +{
->> +    u32 partid;
->> +    struct mpam_config cfg;
->> +    struct mpam_props *cprops;
->> +    struct mpam_resctrl_res *res;
->> +    struct mpam_resctrl_dom *dom;
->> +
->> +    lockdep_assert_cpus_held();
->> +    lockdep_assert_irqs_enabled();
->> +
->> +    /*
->> +     * No need to check the CPU as mpam_apply_config() doesn't care, and
->> +     * resctrl_arch_update_domains() relies on this.
->> +     */
->> +    res = container_of(r, struct mpam_resctrl_res, resctrl_res);
->> +    dom = container_of(d, struct mpam_resctrl_dom, resctrl_ctrl_dom);
->> +    cprops = &res->class->props;
->> +
->> +    partid = resctrl_get_config_index(closid, t);
+>> The first thing to note is that branch cca/v10 does not compile due to function
+>> realm_configure_parameters() not being called anywhere.  Marking the function as
+>> [[maybe_unused]] solved the problem on my side.
 > 
+> This is in the kvmtool code - and yes I agree "work in progress" is a
+> bit generous for the current state of that code, "horrid ugly hacks to
+> get things working" is probably more accurate ;)
 > 
-> As a victim, I must admit I cannot verify this feedback on my local
-> Kunpeng environment since MB functionality is not yet supported by the
-> driver. However, after careful consideration, I believe this is worth
-> bringing up for discussion.
-
-Thank you for thinking and finding problems beyond your platform.
-
+> The issue here is that the two things that realm_configure_parameters()
+> set up (hash algorithm and RPV) are currently unsupported with the Linux
+> changes, but will need to be reintroduced in the future. So the contents
+> of the functions which set this up (using the old uAPI) are just #if 0'd
+> out.
 > 
-> Regarding the MB configuration flow, the partid conversion should
-> include the mpam_resctrl_hide_cdp() condition check. Here's the
-> rationale:
+> Depending on the compile flags the code will compile with a warning, but
+> using __attribute__((unused)) would at least make this clear. I'd want
+> to avoid the "[[maybe_unused]]" as it's not used elsewhere in the code
+> base and limits compatibility.
 > 
-> After resctrl parsing schemata update, MB configuration is set via
-> parse_bw() or rdtgroup_init_mba(), which stores the updated
-> configuration in dom->staged_config[CDP_NONE]. If the MB configuration
-> update directly uses t = CDP_NONE, it would result in MB obtaining the
-> wrong partid and cfg[partid].
+>> Using the FVP emulator, booting a Realm that includes EDK2 in its boot stack
+>> worked.  If EDK2 is not part of the boot stack and a kernel is booted directly
+>> from lkvm, mounting the initrd fails.  Looking into this issue further, I see
+>> that from a Realm kernel's perspective, the content of the initrd is either
+>> encrypted or has been trampled on.  
 > 
-> The specific fix would be like:
+> I can reproduce that, a quick fix is to change INITRD_ALIGN:
 > 
-> -       partid = resctrl_get_config_index(closid, t);
-> +       if (mpam_resctrl_hide_cdp(r->rid))
-> +        /* The configuration of CDP_DATA is same as the CDP_CODE one. */
-> +               partid = resctrl_get_config_index(closid, CDP_DATA);
-> +       else
-> +               partid = resctrl_get_config_index(closid, t);
-
-The CDP emulation support is added later in the series in patch 20, Add
-CDP emulation. However, I think you have spotted an actual problem. With
-hidden CDP the cfg is first found with
-
-resctrl_get_config_index(closid, t) when CDP_NONE
-but then the setting does use CDP_CODE and CDP_DATA.
-
-CDP in general is proving to be quite tricky.
-
+> #define INITRD_ALIGN	SZ_64K
 > 
-> Similarly, in resctrl_arch_get_config() requires the same treatment to
-> ensure consistency.
+> But the code was meant to be able to deal with an unaligned initrd -
+> I'll see if I can figure out what's going wrong.
 
-I don't see the problem here but maybe I'm missing something?
+Looks like a simple bug in kvm_arm_realm_populate_ram() - it wasn't
+updating the source address when it had to align the start of the
+region. Simple fix below:
 
-Isn't this handled by:
+---8<---
+diff --git a/arm/aarch64/realm.c b/arm/aarch64/realm.c
+--- a/arm/aarch64/realm.c
++++ b/arm/aarch64/realm.c
+@@ -104,7 +104,7 @@ void kvm_arm_realm_populate_ram(struct kvm *kvm,
+unsigned long start,
 
-	/*
-	 * When CDP is enabled, but the resource doesn't support it,
-	 * the control is cloned across both partids.
-	 * Pick one at random to read:
-	 */
-	if (mpam_resctrl_hide_cdp(r->rid))
-		type = CDP_DATA;
+        new_region->start = ALIGN_DOWN(start, SZ_64K);
+        new_region->file_end = ALIGN(start + size, SZ_64K);
+-       new_region->source = source;
++       new_region->source = source - (start - new_region->start);
 
-I think we could do similar in resctrl_arch_update_one()
+        list_add_tail(&new_region->list, &realm_ram_regions);
+ }
+---8<---
 
-> 
-> 
-> Best regards,
-> and happy Lunar New Year!
-> 
-> Zeng Heng
-> 
-> 
->> +    if (!r->alloc_capable || partid >= resctrl_arch_get_num_closid(r)) {
->> +        pr_debug("Not alloc capable or computed PARTID out of range\n");
->> +        return -EINVAL;
->> +    }
->> +
->> +    /*
->> +     * Copy the current config to avoid clearing other resources when
->> the
->> +     * same component is exposed multiple times through resctrl.
->> +     */
->> +    cfg = dom->ctrl_comp->cfg[partid]; > +
->> +    switch (r->rid) {
->> +    case RDT_RESOURCE_L2:
->> +    case RDT_RESOURCE_L3:
->> +        cfg.cpbm = cfg_val;
->> +        mpam_set_feature(mpam_feat_cpor_part, &cfg);
->> +        break;
->> +    default:
->> +        return -EINVAL;
->> +    }
->> +
->> +    return mpam_apply_config(dom->ctrl_comp, partid, &cfg);
->> +}
->> +
->> +int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
->> +{
->> +    int err;
->> +    struct rdt_ctrl_domain *d;
->> +
->> +    lockdep_assert_cpus_held();
->> +    lockdep_assert_irqs_enabled();
->> +
->> +    list_for_each_entry_rcu(d, &r->ctrl_domains, hdr.list) {
->> +        for (enum resctrl_conf_type t = 0; t < CDP_NUM_TYPES; t++) {
->> +            struct resctrl_staged_config *cfg = &d->staged_config[t];
->> +
->> +            if (!cfg->have_new_ctrl)
->> +                continue;
->> +
->> +            err = resctrl_arch_update_one(r, d, closid, t,
->> +                              cfg->new_ctrl);
->> +            if (err)
->> +                return err;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
+Thanks for the pointer, and I'll try to remember to include initrd
+testing in future.
 
-
-Thanks,
-
-Ben
+Steve
 
