@@ -1,126 +1,108 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3F5C13B
-	for <kvmarm@lists.linux.dev>; Tue, 17 Feb 2026 13:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506E03164B5
+	for <kvmarm@lists.linux.dev>; Tue, 17 Feb 2026 14:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771336744; cv=none; b=Zl4z4GPg9Zyg3Fg9t7vhXs0LMEVS/h32QXAJOxqumxN463i7SXc13AZQas4oy5cNDcrnsvflxHQ7hV7dlOIwKvLuiXvkzIVsiu0LW9WLUzwWC/KgQLgsXzFkdHQLmQgQJVZ+lLD4wQ+My2Nj84UCP9EkRXHvTqW06jM7DwY8zgA=
+	t=1771337962; cv=none; b=aAQG0x52PcvlbAUzw/G9UENF1o7fBns8oRcsP6QmxMHE6Ox+lkr75lkXxDwu3nM2WkKXkX6ZjOvUPrU4i7i63jHtnTt+Z6ueYjZkk+cpHxzF3pzU8ixHlAIYwe8vbNSWiWO0L7tjd2yVsGnh9cw4HHuanNT/HquiLyAwzJuvl20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771336744; c=relaxed/simple;
-	bh=DJQLEXpOMZ7mJRrJeulgyumNP2K404TBIAfARMlJXsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CEcJH4TSOqNdC64HgxtnYZdb3YfxKgd+tAziQI3Pby+29BmlxvuDLpgJlAU4zevr23kCKOzMEqP9wg+FCWEKWgVzghj8c4t51Qu2kORMkV8EMuqYdT5+Nw0RBuuCNTHepoLgdOjZ0msk9bnLCC7RZKeopVaexKCB9OP5WIpXPGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FMwrHrzt; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FMwrHrzt"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6580dbdb41eso5485056a12.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Feb 2026 05:59:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1771336741; x=1771941541; darn=lists.linux.dev;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B0qm6wSg3YMFqBYaKKYJQYHdgXgOxUBgkA3dGoL/vl0=;
-        b=FMwrHrzt7au6V+71xfPgRRhSBxyO18OkpXKHAV73QEyVN45G8hDwa1ltbZZf35PLPS
-         l1kWRAi/T+AT1rUYhoPVjJZHzbKsWFjfLPbH4GSsTM1rXrOaijJnqxHYEqPLvqKGBLrh
-         H+PgwzYmq4bTTh+Dcnt5BWvVfWXcrAlcQHWpXr7o3iq+toJjlqqGCxbjPsvLiK0J0+PO
-         7wjaovb6aMBtxG9cWJPXwnpSW3n9UYimqbS0xl8mCaaKWRrIwdONNtg8+5BHvDDDE2yk
-         Q6Umay+1YYxTibEKPuykSKvZYzRq6gsDE2Xao/qQ7H5QN+r731sL59Q5/fTOBrcQKoNt
-         OcVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771336741; x=1771941541;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B0qm6wSg3YMFqBYaKKYJQYHdgXgOxUBgkA3dGoL/vl0=;
-        b=nyW8iDoF2IZ7K7Nb4u9cTKbLK/cRLUCjtM9VnWKmBh6VGJB2jNix+geUqwsvCqKuK9
-         6dbocPQOA6JdLt+nHp95aEEtV5n7TcCApL2NY1Nu4h73b+o4zgLKjYnYe7p6jFUyOGLV
-         4r4FTti90hpDlg9MSC7uwAgp1NVhVQhjey8PKXVyo05JyUzqJi4HG9J/Yis1WSZR46Qf
-         3EDKKqfvgEpvN9WMoAFKnrxMttamaDeVA2mpBA+sDiFvhrZjJQhs6Qblvf+u488KCaJ6
-         9G2rRscg7Hf5M9bVPYR4R6/EPjxUyeO4/zaqBKoalvTPjBwRv0md0UJnGwuYGojNqh2y
-         OByA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtFpe1HeC5Ieu8kdrLQAaQB3JvEv6vBuMP7A8C77X5QMUYBY6uOUxw3frEUmewLJhVYZm2e3w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwRHb5Wq9dtm1YIAlRB260PcP7XqOHqDg5nvzBsAffnCmQmVkTd
-	jrffz9xwek4lI9h9pb/YbOY318Ihu/Y8Yd4a5TXynBXy9JYXJRUNQxSduoo8pucqPGo=
-X-Gm-Gg: AZuq6aKjDcjI00kIkbWILiWYm9Wf+XNXHVikrKNkHNLz/pqdGenBAyaRmlm6I+L4ajx
-	TIP9Q5W+W7yqp9B0dq7X7PRDgKRNnmzIw378OTuRdjEkWsYMZdFyvhr0c/Vqd99DN9mFhk16gsq
-	UCIIFsiCjnl6W4e+ziW9JYfxab7UJmWsis20PUapo4oVemj/uQxF5i0ha1ZvaoAn+T/n//jiYJZ
-	Ag/u13JjhiUH6E5dgYXX8+VGpdYAe+JwUAH9Q+bpqJ5lVg3DJkMzk48YKTAErxeeFm1+L7xKzyx
-	C6nLuiZIYANWBd3ugpvU64OtnHMPD00EIZKcH81y7ZlMf+WyVblkwSqsAHdIQfsgxd0WfjFOZVn
-	+i3EQ4/2IPiZGQrN9wceSDEEoSXwZVZSoRIHFkL3nZmCtciWMDNpukrbpyPECwNG/LYtFDsa+0M
-	hdDiB7nDlfmzlC419/r6noVTW/eAhF
-X-Received: by 2002:a17:906:4795:b0:b8e:12f9:5fce with SMTP id a640c23a62f3a-b8fb4574ebamr726740266b.61.1771336741232;
-        Tue, 17 Feb 2026 05:59:01 -0800 (PST)
-Received: from [192.168.1.3] ([185.48.77.170])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8fc7385e60sm350983766b.19.2026.02.17.05.58.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Feb 2026 05:59:00 -0800 (PST)
-Message-ID: <b4421029-54ca-41e0-8055-56f9f525170d@linaro.org>
-Date: Tue, 17 Feb 2026 13:58:58 +0000
+	s=arc-20240116; t=1771337962; c=relaxed/simple;
+	bh=7LihERVTnFJ+dv5oGAXFWMw43T52hHSt0uXf0a8f6os=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SRYoNwmf6eDccFG5zqpMIdcs3Jqc7EQW+o7phpgpB6mdIiAFRWVAlORzU0U8G/sIT2taS14swwbefzVmce8pB1PNqDAIDjKaxJsMzTlFM8ZMNIQOVuDRxiKlx8UtToq505ThjOtm1IBkK9aknnNPSyRdb2IOp3N098jBmxrmaHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AAC21477;
+	Tue, 17 Feb 2026 06:19:14 -0800 (PST)
+Received: from localhost (e132581.arm.com [10.1.196.87])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0E6E73F62B;
+	Tue, 17 Feb 2026 06:19:19 -0800 (PST)
+Date: Tue, 17 Feb 2026 14:19:17 +0000
+From: Leo Yan <leo.yan@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: James Clark <james.clark@linaro.org>, Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
+ in guest context
+Message-ID: <20260217141917.GA136967@e132581.arm.com>
+References: <20260216130959.19317-1-will@kernel.org>
+ <86a4x8bw38.wl-maz@kernel.org>
+ <d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
+ <aZNec3B0Iou9PYGw@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
- in guest context
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
- Oliver Upton <oupton@kernel.org>, Leo Yan <leo.yan@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Fuad Tabba <tabba@google.com>
-References: <20260216130959.19317-1-will@kernel.org>
- <86a4x8bw38.wl-maz@kernel.org> <aZNUqONyOUVd0opW@willie-the-truck>
- <cda4e111-29cc-481c-aee2-811f4178f54b@linaro.org>
- <aZReWRme4InoSa8M@willie-the-truck>
-Content-Language: en-US
-From: James Clark <james.clark@linaro.org>
-In-Reply-To: <aZReWRme4InoSa8M@willie-the-truck>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZNec3B0Iou9PYGw@willie-the-truck>
 
+On Mon, Feb 16, 2026 at 06:14:11PM +0000, Will Deacon wrote:
 
+[...]
 
-On 17/02/2026 12:26 pm, Will Deacon wrote:
-> On Tue, Feb 17, 2026 at 12:20:14PM +0000, James Clark wrote:
->> On 16/02/2026 5:32 pm, Will Deacon wrote:
->>> On Mon, Feb 16, 2026 at 02:29:31PM +0000, Marc Zyngier wrote:
->>>> And even then, I'm tempted to simply get rid of any sort of
->>>> guest-only tracing, given that TRBE is not capable of representing
->>>> exceptions that are synthesised by the host, making it the resulting
->>>> traces useless.
->>>
->>> I think that effectively means reverting the series merged from here:
->>>
->>> https://lore.kernel.org/all/20250106142446.628923-1-james.clark@linaro.org/
->>>
->>> but then we still need to clear TRBLIMITR_EL1.E.
->>>
->>
->> Removing that series would actually have the effect of turning guest trace
->> on in nVHE for non-TRBE sinks. The reason for implementing the filtering was
->> to turn guest trace off because a user didn't want to see it.
+> > The TRBE driver might do an extra drain here as a workaround. Hard to tell
+> > if it's actually required in this case (seems like probably not) but it
+> > might be worth doing it anyway to avoid hitting the issue. Especially if we
+> > add guest support later where some of the affected registers might start
+> > being used. See:
+> > 
+> >     if (trbe_needs_drain_after_disable(cpudata))
+> >         trbe_drain_buffer();
 > 
-> What I meant was, revert that series and then also ensure that both TRFCR
-> and TRBLIMITR are always zero while running in the guest. Is that not
-> sufficient?
+> Oh great, this thing sucks even more than I realised!
 > 
-> Will
+> But thanks for pointing that out... this is presumably erratum #2064142,
+> but we probably need to look at #2038923 as well :/
+> 
+> I can't find any public documentation for the problems, but based on the
+> kconfig text then I think we care about #2064142 so that the TRBE
+> register writes when restoring the host context are effective and we
+> care about #2038923 to avoid corrupting trace when re-enabling for the
+> host.
 
-Yes that would work. Although if someone is currently tracing guests 
-from the host then obviously that will break that. I'm still not 
-convinced that tracing guests from the host is broken enough to be 
-completely useless. But there is a chance nobody is doing it, or waiting 
-for them to scream might help in understanding their use case.
+Seems to me, this is correct.
 
-It doesn't seem like the combination of the TRFCR filtering stuff and 
-zeroing TRBLIMITR is too messy either though. I suppose you could also 
-skip the TRFCR switch if you've disabled TRBE if you wanted to save a 
-register write, but that makes it slightly more complicated.
+> It also looks like we can't rely on the dsb(nsh) in the vcpu_run()
+> path if that needs to be before the write to TRBLIMITR_EL1.
+> 
+> In which case, the host->guest something hideous like:
+> 
+> 	isb();
+> 	tsb_csync();	// Executes twice if ARM64_WORKAROUND_TSB_FLUSH_FAILURE!
+> 	dsb(nsh);	// I missed this in my patch
+> 	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
+> 	if (2064142) {
+> 		tsb_csync();
+> 		dsb(nsh);
+> 	}
+> 	isb();
 
+As I_QXJZX suggests, the section K10.5.10 "Context switching" gives
+the flow.  I'd suggest the VM context switch is also aligned to the
+description in S_VKHHY.
+
+When switching from host to guest, we need to clear TRCPRGCTLR.EN to
+zero.  As the doc states "ETE trace compression logic is stateful,
+and disabling the ETE resets this compression state".
+
+> and then the guest->host part is:
+> 
+> 	write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
+> 	isb();
+> 	if (2038923)
+> 		isb();
+> 
+> Does that look right to you?
+
+S_PKLXF gives the flow for switching in.
+
+Thanks,
+Leo
