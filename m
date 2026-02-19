@@ -1,155 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3ED2F5A1F;
-	Thu, 19 Feb 2026 19:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC582FD7DA
+	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 19:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771529481; cv=none; b=SDCLDGxH6kR9J8mj2Yx8eAFadEEx4REVxRTRAwIro1uUBWSwDwSdZ4TkueVS+8JQL+8egJ6aGyxHAi02DFEJL7TTQFR0ZBweuJnwzEN4KBk8I/zkU/yWqmSMI3ZWqskCGARVpgzsU8qfATVAX/ptesWVptl9zRHx1EimkOTlSv4=
+	t=1771530948; cv=none; b=F/SQ658mPW6V53GbC7/QvSe1vL+oVOHXYSPA4HZT1rSfAiO1ftzlFgIrH8d95hTG1lu9VgfDVhfUrOtaSMEAqQbcGMeuHC/RHfLciRrCPiG0bDdWIiOyTfJoirh+dCrwaM3ObOkdOI8PsL/dg0sVIcOBF6UsfmSheLoWaXsl0Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771529481; c=relaxed/simple;
-	bh=eEbIoo2q1/IW9azGPa53pZmcMQrNecjqCKNKnaoLUAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=anj4Tg8KXq8MKO5t1r+3FJ/fLUiBnafoLmD5HWL0JQbetjaZzPVOKnTjazK+mqTKNJ1vjdeWB7LleIPvoAVRCZLhqRTEHrRElPw6R89mnW2Lu9VMdqVegSTpI4UA+7U9Lejg8H982IsFVNPLPzQb+NQWOsJWjAeYI6HpUxoCvd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFaGOqs/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771530948; c=relaxed/simple;
+	bh=ra6ZXjBUgr5NeCCDN4jJSvWIzYbVtmiPtz2uAL75yMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Fxvj2SxnMjvwBVYK/rloX/pvljjQ7G/3s9iNGFxCWjvok1fgYzwr6xoIUcmlfpQ2nM4wcVA7eO7YJnLUOlutqPZtQkCcLhySIxehRjrU0IZuVrVxkkUsxqmcv29ElsL0/UKfIN3T0pLrAc0g1IMz+SLD4DIaF5HNbVQRcXT+5Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV0aWKGv; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFaGOqs/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0939BC4CEF7;
-	Thu, 19 Feb 2026 19:31:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV0aWKGv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4371C19423;
+	Thu, 19 Feb 2026 19:55:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771529481;
-	bh=eEbIoo2q1/IW9azGPa53pZmcMQrNecjqCKNKnaoLUAY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eFaGOqs/Ut2CksfJcyyCXPz/G+49WQAqARVkkt7s0uuz77lzNCcFABEsPoxLrM/+/
-	 stFVezcwfKsdB5T+uHpWZIfYS+Xkw+9tMLF2j9W7gXqlB2NK2jloyauUQ5R1KtMQ+C
-	 pEy8TliEZzi8KHpeXkl39ilFhF+tz5Z7pFd+wMpggDxJcQxP7N1LWGJ+O+4gytrAnf
-	 FHPVhqTzXarIfMAIh88xDSwQ9dAJ8j2Tyg6iW+wqHVBG+M2S/f7rDdHSvEn10qzOF7
-	 Nt+ju4WrkNa+cagWpaRY3uoJtyitTIw3KEO2S0qTJbt9irBD5+Lm3zpUm4L0Icp1F8
-	 QvqvcyrboX9nA==
-Date: Thu, 19 Feb 2026 11:31:18 -0800
-From: Namhyung Kim <namhyung@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	Mingwei Zhang <mizhang@google.com>,
-	Xudong Hao <xudong.hao@intel.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v6 42/44] KVM: VMX: Dedup code for adding MSR to VMCS's
- auto list
-Message-ID: <aZdlBkLEQyv9q5ll@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-43-seanjc@google.com>
+	s=k20201202; t=1771530947;
+	bh=ra6ZXjBUgr5NeCCDN4jJSvWIzYbVtmiPtz2uAL75yMM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mV0aWKGvtFRgyma7BZGSaAUl80uGyre7Me8PNuPH/HPsmv6O0jvQb9LK0ynrD5S3E
+	 tn/ZbpLhg+jIzHIVp+loChaddMndU0BHOXfPNrGIxEmyHQ2dTSbdN/nVP5cZmjwuK4
+	 /pWbcSZryENnEPvjKPIpPKJ4wq1qdF4y3pK03K0fut3ruP9d5XsBAIrWyPznRVsd2Q
+	 ZmBX5cWy2ur2LsK7aNp3B06Xc2Yl28w41JiIBCnKvATl1bV2G4Ln2fwoPkUwvRxjoS
+	 s/qyu/XMNc2Eo7y9mI5T/ANS5QDm+g3Tn8mh8zwv9Gyr3EmXJq+MVkv6qZBGLTZFr9
+	 MYxi6M3qmMM/g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vtA7l-0000000CGHL-33a7;
+	Thu, 19 Feb 2026 19:55:45 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 2/9] arm64: Convert CONFIG_ARM64_PTR_AUTH to FTR_CONFIG()
+Date: Thu, 19 Feb 2026 19:55:25 +0000
+Message-ID: <20260219195533.2455736-3-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260219195533.2455736-1-maz@kernel.org>
+References: <20260219195533.2455736-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251206001720.468579-43-seanjc@google.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hello,
+While CONFIG_ARM64_PTR_AUTH=n prevents userspace from using PAC,
+the sanitised ID registers still advertise the feature.
 
-On Fri, Dec 05, 2025 at 04:17:18PM -0800, Sean Christopherson wrote:
-> Add a helper to add an MSR to a VMCS's "auto" list to deduplicate the code
-> in add_atomic_switch_msr(), and so that the functionality can be used in
-> the future for managing the MSR auto-store list.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++----------------------
->  1 file changed, 19 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 018e01daab68..3f64d4b1b19c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1093,12 +1093,28 @@ static __always_inline void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
->  	vm_exit_controls_setbit(vmx, exit);
->  }
->  
-> +static void vmx_add_auto_msr(struct vmx_msrs *m, u32 msr, u64 value,
-> +			     unsigned long vmcs_count_field, struct kvm *kvm)
-> +{
-> +	int i;
-> +
-> +	i = vmx_find_loadstore_msr_slot(m, msr);
-> +	if (i < 0) {
-> +		if (KVM_BUG_ON(m->nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> +			return;
-> +
-> +		i = m->nr++;
-> +		m->val[i].index = msr;
-> +		vmcs_write32(vmcs_count_field, m->nr);
-> +	}
-> +	m->val[i].value = value;
-> +}
-> +
->  static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
->  				  u64 guest_val, u64 host_val)
->  {
->  	struct msr_autoload *m = &vmx->msr_autoload;
->  	struct kvm *kvm = vmx->vcpu.kvm;
-> -	int i;
->  
->  	switch (msr) {
->  	case MSR_EFER:
-> @@ -1132,27 +1148,8 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
->  		wrmsrq(MSR_IA32_PEBS_ENABLE, 0);
->  	}
->  
-> -	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
-> -	if (i < 0) {
-> -		if (KVM_BUG_ON(m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> -			return;
-> -
-> -		i = m->guest.nr++;
-> -		m->guest.val[i].index = msr;
-> -		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
-> -	}
-> -	m->guest.val[i].value = guest_val;
-> -
-> -	i = vmx_find_loadstore_msr_slot(&m->host, msr);
-> -	if (i < 0) {
-> -		if (KVM_BUG_ON(m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> -			return;
-> -
-> -		i = m->host.nr++;
-> -		m->host.val[i].index = msr;
-> -		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, m->host.nr);
-> -	}
-> -	m->host.val[i].value = host_val;
-> +	vmx_add_auto_msr(&m->guest, msr, guest_val, VM_ENTRY_MSR_LOAD_COUNT, kvm);
-> +	vmx_add_auto_msr(&m->guest, msr, host_val, VM_EXIT_MSR_LOAD_COUNT, kvm);
+Make it clear that nothing in the kernel should rely on this by
+marking the feature as hidden for all when CONFIG_ARM64_PTR_AUTH=n.
 
-Shouldn't it be &m->host for the host_val?
+This is functionnaly equivalent to using arm64.nopauth on the kernel
+command-line.
 
-Thanks,
-Namhyung
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/cpufeature.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
->  }
->  
->  static bool update_transition_efer(struct vcpu_vmx *vmx)
-> -- 
-> 2.52.0.223.gf5cc29aaa4-goog
-> 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index b34a39967d111..7ad124faae08e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -247,16 +247,16 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SPECRES_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FRINTTS_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPI_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LRCPC_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FCMA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_JSCVT_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_API_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_APA_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DPB_SHIFT, 4, 0),
+ 	ARM64_FTR_END,
+@@ -269,9 +269,9 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_CLRBHB_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_BC_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_MOPS_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR2_EL1_APA3_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_GPA3_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_RPRES_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_WFxT_SHIFT, 4, 0),
+-- 
+2.47.3
+
