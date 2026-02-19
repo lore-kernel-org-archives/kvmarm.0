@@ -1,117 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.hostedemail.com (smtprelay0015.hostedemail.com [216.40.44.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFAC30BF70
-	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 13:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D412A33A9C4
+	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 14:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771509265; cv=none; b=JP0u+wKHyTm7IQa+KoGKz2uxtiVet4Bo+sNnXUHlzfm577q624IaKjRkfjPn4PaSYXBUu3XZQl0602AQt9Y4p6kAxhJiEJdofOtGBPCZ3zXas/coKzguQia9F8ovfr/dd0+XJ0uxF4jaqMOJx9yH7wkfGwI20IN7iVc96bh1Hvk=
+	t=1771511778; cv=none; b=dTiRrBVtinYlcy8IJZwcw5SRsnQVzaILkC56G8Cv27gVMXmLUgKNyUuUO5fep9Ffo92b/mSrtuA2QD3qnIN/r8VfEMvVFPiljNtNucyo6tu9zs5cdr8h/W5GzRblR6Cniq2xC73Fggnl2wdKIcX28R+dbKYGLT7YxDACPL9YLXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771509265; c=relaxed/simple;
-	bh=0QQ4xGrL6De/tHJfVXxAIlwtEBCu7b+nqFPL3Cqzz48=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J7xSFuDKda9k9mhssehtF/5lkGUjZigMLnV8YKap40KvYOq7aF2Fx8KEmcjHwoagL8jDdlaMM6okxS6Zx6OL1iC9e8mXz5zHkJgW21s8gyvMvuuwIwogxo201yUFlUHGwSITE5cC2G3B+MnTdCPGjfAD6nwxt4lJn9WICCyYVYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdCLTfXh; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdCLTfXh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 284C1C4CEF7;
-	Thu, 19 Feb 2026 13:54:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771509265;
-	bh=0QQ4xGrL6De/tHJfVXxAIlwtEBCu7b+nqFPL3Cqzz48=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jdCLTfXht8Wc/rrnBf+SlNxpDgCpjtZIxwlQ5GCjVdRW6kTQpEKp6xpQw3PXMGFj2
-	 VeqLVVPk/ODP7SVlkgNoVtriLnqUkTuEeoJm7fpWQQ0jadxySqr3Qh8CR2YJxGXRL9
-	 iT3tEstrZfY7yjgiOb4/0YfHykepPMi3dmfRnsQfPn6aM1fOzWEpWP9qKYiTgis2ag
-	 2I6pl/KbuTMLOte5U5dxiM98YSJZ/16st3N6XV3Nae8oZdd0GtmH4HpOpbGk7380e1
-	 NwWuY6kGLW9KWDcp60sW1wJ5qU2h/oREKFRxjFhS9Qglm9uSt5/+7DCsbOEQLHLX6U
-	 2OyaIv8RWO5yQ==
-Date: Thu, 19 Feb 2026 13:54:19 +0000
-From: Will Deacon <will@kernel.org>
-To: Leo Yan <leo.yan@arm.com>
-Cc: James Clark <james.clark@linaro.org>, Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev, mark.rutland@arm.com,
-	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
- in guest context
-Message-ID: <aZcWC25GE2iUKsNt@willie-the-truck>
-References: <20260216130959.19317-1-will@kernel.org>
- <86a4x8bw38.wl-maz@kernel.org>
- <d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
- <aZNec3B0Iou9PYGw@willie-the-truck>
- <20260217141917.GA136967@e132581.arm.com>
- <aZSAsC1YI5_lK3e0@willie-the-truck>
- <20260217190121.GB136967@e132581.arm.com>
+	s=arc-20240116; t=1771511778; c=relaxed/simple;
+	bh=8u4LSmIvd/C+3zPJ7zqMd0h+DXRGxy9OI+bxrxyF8gg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=efU3b2wF57oSHvEGC5WdcpI3myTzlUmOPFbJ4xeOwK1++euPk/f7WfbiiwVei1OV2mBPItah1vbP9xzHnhHAyRCR/DLcbdr6AoM90/4LBUOlb520KygKTNX6vClDq5sus8olJRT/rnLIernWVi4R9N2mNgSuVVkmxTQFYvlOSR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf05.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay04.hostedemail.com (Postfix) with ESMTP id 691CA1A056C;
+	Thu, 19 Feb 2026 14:36:08 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf05.hostedemail.com (Postfix) with ESMTPA id 7FEC32000D;
+	Thu, 19 Feb 2026 14:36:04 +0000 (UTC)
+Date: Thu, 19 Feb 2026 09:36:05 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ jstultz@google.com, qperret@google.com, will@kernel.org,
+ aneesh.kumar@kernel.org, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v11 15/30] tracing: selftests: Add trace remote tests
+Message-ID: <20260219093605.192fdb48@gandalf.local.home>
+In-Reply-To: <aYtUqOw8SdX7gqZT@google.com>
+References: <20260131132848.254084-1-vdonnefort@google.com>
+	<20260131132848.254084-16-vdonnefort@google.com>
+	<20260205124208.2ed7cff8@gandalf.local.home>
+	<aYtUqOw8SdX7gqZT@google.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260217190121.GB136967@e132581.arm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 7FEC32000D
+X-Stat-Signature: md7qtgedn665okqptay4z4jimakth6k8
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX19TKj9CWzYjBj2NgmYOuR8HcgsdxJld1Oo=
+X-HE-Tag: 1771511764-166707
+X-HE-Meta: U2FsdGVkX1+y78bFA5Fh2e1MOsjN889PeyB/43QOfqL4DGisxGUCImil6IIXRs8fQJR5JZJFm/Zxf+B5pGcquvp6c8BKMqg0mUGcFRg1SoBJr/iNjYh/y+crvZDam9BCvS4tbHRGLeKyP/YRN78HcJBHPw3uz8tBRwhWhEpM/Ai3txTZW6rmFVeIlOIZ+kqWcmVUkXGJl8v4I3ACJIdwqGqBbNPdp5kDfmgun+cpiGem6Gj9q+/rrCRdF/OBjS2UsquDN+nQBOJe75u1Ftck2a9Pd8tpBvnPXAqeWLzz1eLVyax13XfwG6w0wtoPlB/uC4EdHvC0B4PTi9ocnf7xgSIoCxEqcxKu
 
-On Tue, Feb 17, 2026 at 07:01:21PM +0000, Leo Yan wrote:
-> On Tue, Feb 17, 2026 at 02:52:32PM +0000, Will Deacon wrote:
-> 
-> [...]
-> 
-> > > > It also looks like we can't rely on the dsb(nsh) in the vcpu_run()
-> > > > path if that needs to be before the write to TRBLIMITR_EL1.
-> > > > 
-> > > > In which case, the host->guest something hideous like:
-> > > > 
-> > > > 	isb();
-> > > > 	tsb_csync();	// Executes twice if ARM64_WORKAROUND_TSB_FLUSH_FAILURE!
-> > > > 	dsb(nsh);	// I missed this in my patch
-> > > > 	write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-> > > > 	if (2064142) {
-> > > > 		tsb_csync();
-> > > > 		dsb(nsh);
-> > > > 	}
-> > > > 	isb();
-> > > 
-> > > As I_QXJZX suggests, the section K10.5.10 "Context switching" gives
-> > > the flow.  I'd suggest the VM context switch is also aligned to the
-> > > description in S_VKHHY.
-> > 
-> > I honestly have a hard time believing the sequence in S_VKHHY as the DSB
-> > seems to be in the wrong place which means the TSB CSYNC can float. It
-> > also isn't aligned with what the EL1 driver does...
-> 
-> Sorry for confusion.  I am checking internally for the flow suggested
-> in S_VKHHY.
-> 
-> > > When switching from host to guest, we need to clear TRCPRGCTLR.EN to
-> > > zero.  As the doc states "ETE trace compression logic is stateful,
-> > > and disabling the ETE resets this compression state".
-> > > 
-> > > > and then the guest->host part is:
-> > > > 
-> > > > 	write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
-> > > > 	isb();
-> > > > 	if (2038923)
-> > > > 		isb();
-> > > > 
-> > > > Does that look right to you?
-> > > 
-> > > S_PKLXF gives the flow for switching in.
-> > 
-> > Well, modulo errata, sure. I don't have access to the errata document so
-> > I was more interested in whether I got that right...
-> 
-> Please see the doc:
-> https://developer.arm.com/documentation/SDEN-1873351/1900/?lang=en
+On Tue, 10 Feb 2026 15:54:16 +0000
+Vincent Donnefort <vdonnefort@google.com> wrote:
 
-Aha, thank you, Leo!
+> Hum weird, I have changed it in v11 to 
+> 
+> echo 0 > /sys/devices/system/cpu/cpu$cpu/online || return 0
+> 
+> That doesn't work? Because I would simply stop the test there if we can't
+> offline the CPU.
 
-I swear you used to be able to google the erratum number and get the doc,
-but that doesn't seem to be the case any more. In fact, if you type the
-erratum number into the search box on developer.arm.com it doesn't even
-work, so cheers for pointing me to the right place.
 
-Will
+Yeah, I guess I was running the old tests. With the new tests I now have:
+
+tools/testing/selftests/ftrace# ./ftracetest test.d/remotes/
+=== Ftrace unit tests ===
+[1] Test trace remote buffer size	[PASS]
+[2] Test hypervisor trace buffer size	[UNSUPPORTED]
+[3] Test hypervisor trace buffer reset	[UNSUPPORTED]
+[4] Test hypervisor consuming trace read	[UNSUPPORTED]
+[5] Test hypervisor non-consuming trace read	[UNSUPPORTED]
+[6] Test hypervisor trace buffer unloading	[UNSUPPORTED]
+[7] Test trace remote reset	[PASS]
+[8] Test trace remote consuming read	[PASS]
+[9] Test trace remote non-consuming read	[PASS]
+[10] Test trace remote unloading	[PASS]
+
+
+# of passed:  5
+# of failed:  0
+# of unresolved:  0
+# of untested:  0
+# of unsupported:  5
+# of xfailed:  0
+# of undefined(test bug):  0
+
+-- Steve
