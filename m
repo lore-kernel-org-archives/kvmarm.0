@@ -1,77 +1,119 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E9815C14F
-	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 19:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0573EBF16;
+	Thu, 19 Feb 2026 19:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771528003; cv=none; b=l1ue9qXVgwaEdTcg90nXQI5oy9Tw2xgYREvgMnCnX2Ioq2MDyBNLqVofAx3uKQBVYdR1iworauAuWS/FokmGu32a+aj+Lx/w6XOYh7HlqOKlLBuIarFCve1FZKQ4x/4/fPbryouOHHriPTXuzZyxtKt3Gd0hTPKWLU7HiUKv/tA=
+	t=1771528284; cv=none; b=JgJwUvsYx9Y9zmkhUOh8UPV/Rdz9hIz2wZcLfjdJSJbhjQNpezpM1BS/byxEHdD8GCVNpF3FilEvzIbdruckFWE3CBw64yWyiiXPJP+yZ4Zb4OUytR/xCopcechB/9+1V5UdqmT4bV3r9CiN3u20JLt5/IFFA3ebBKqNLMDtsW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771528003; c=relaxed/simple;
-	bh=x13yHeeUrdj5F3pEhb+Z8Gdbkt/5oT6qJc3ySecld8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=roVN6b9NMAsqvuK0BqE7UlNXX60dNvZnhwky9PUAkvE9mIHU4Gogph0kfp9Yj+ntlZoaXy0hoV97muLqlRGQGeL4xUNJ/ocrwcim/gFAZUi3VLZB7FOWmwf8v94TLCjf6VfAEDJI7LADV1PZihjCTeuyHKke0BpsBme+UTjH8tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F154D339;
-	Thu, 19 Feb 2026 11:06:33 -0800 (PST)
-Received: from localhost (e132581.arm.com [10.1.196.87])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B866A3F7D8;
-	Thu, 19 Feb 2026 11:06:39 -0800 (PST)
-Date: Thu, 19 Feb 2026 19:06:38 +0000
-From: Leo Yan <leo.yan@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: James Clark <james.clark@linaro.org>, Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev, mark.rutland@arm.com,
+	s=arc-20240116; t=1771528284; c=relaxed/simple;
+	bh=9p0DfwiEGsHS8N8lLhDzityaVkttEOvhog9ekktjRc0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JGRQQksXbMgqxY+8C1PyeQR36p4BaAemHwydXkxMgBRu99r3dyVedr70DH0TbS+T3jbM5MpC7jAD4PgyqUmcw4c/v0fp4WZumdLVJBQx+58KGxuIdNn5K2axknk4jTdxfY5XZtxtt6ilOo1ipWHU2+hz0nptiHl3iiNlZD7wxRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iLZa/tdX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iLZa/tdX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A29BFC4CEF7;
+	Thu, 19 Feb 2026 19:11:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771528284;
+	bh=9p0DfwiEGsHS8N8lLhDzityaVkttEOvhog9ekktjRc0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iLZa/tdXSjtY+IhPqpxbOkvU6uy46FeFU74mPUys5QXzxKsoXkOBfNqr48ShSG0w5
+	 /+Ofhedr1cNJ3oFPoDQUmLpoBxP000NdDP6CrN2xt66ZkExL19bY+933OZayflXn+Y
+	 XS2zN8HFCLAqCH/GlmDwm8hS68m5rmsneq+/jlvbwZkuqI1R3uYxjkQF622aaYZr57
+	 YGhylOf1FRe2j3Ehl82WXL6jd4zKN0cDpIwTmlBUWLXoA64zYwfSnRMPpegBICFnHJ
+	 aiJBmIoG3ISn88YHnQLEitUwHJLQ075DETetkxXmN+FUellgKGfKY2ze2NxKsvgyLx
+	 iXaTWxw7wKdYA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vt9Qo-0000000CFY6-0SoG;
+	Thu, 19 Feb 2026 19:11:22 +0000
+Date: Thu, 19 Feb 2026 19:11:21 +0000
+Message-ID: <87cy20eeg6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	linux-trace-kernel@vger.kernel.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running
- in guest context
-Message-ID: <20260219190638.GE136967@e132581.arm.com>
-References: <20260216130959.19317-1-will@kernel.org>
- <86a4x8bw38.wl-maz@kernel.org>
- <d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
- <aZNec3B0Iou9PYGw@willie-the-truck>
- <20260217141917.GA136967@e132581.arm.com>
- <aZSAsC1YI5_lK3e0@willie-the-truck>
- <20260217190121.GB136967@e132581.arm.com>
- <aZcWC25GE2iUKsNt@willie-the-truck>
- <20260219185800.GD136967@e132581.arm.com>
+	jstultz@google.com,
+	qperret@google.com,
+	will@kernel.org,
+	aneesh.kumar@kernel.org,
+	kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 00/30] Tracefs support for pKVM
+In-Reply-To: <20260219130220.063c8db3@gandalf.local.home>
+References: <20260219150307.14538-1-vdonnefort@google.com>
+	<20260219130220.063c8db3@gandalf.local.home>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260219185800.GD136967@e132581.arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rostedt@goodmis.org, vdonnefort@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, jstultz@google.com, qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org, kernel-team@android.com, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 19, 2026 at 06:58:03PM +0000, Leo Yan wrote:
+On Thu, 19 Feb 2026 18:02:20 +0000,
+Steven Rostedt <rostedt@goodmis.org> wrote:
+> 
+> On Thu, 19 Feb 2026 15:02:37 +0000
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
+> > The growing set of features supported by the hypervisor in protected
+> > mode necessitates debugging and profiling tools. Tracefs is the
+> > ideal candidate for this task:
+> > 
+> >   * It is simple to use and to script.
+> > 
+> >   * It is supported by various tools, from the trace-cmd CLI to the
+> >     Android web-based perfetto.
+> > 
+> >   * The ring-buffer, where are stored trace events consists of linked
+> >     pages, making it an ideal structure for sharing between kernel and
+> >     hypervisor.
+> > 
+> > This series first introduces a new generic way of creating remote events and
+> > remote buffers. Then it adds support to the pKVM hypervisor.
+> > 
+> 
+> So I finished my review of all the tracing patches, but I just realized
+> that there's likely going to be some major conflicts with changes in the
+> tracing tree that's going to happen against this series.
+> 
+> To solve that, after -rc2 comes out, I'll apply the tracing portion of this
+> series to a branch in my tree directly on top of -rc2 and I will then use
+> that to base my changes for the next merge window.
+> 
+> Then the arm/kvm folks could start with that branch and add the arm/KVM
+> portion of this series on top of it. This will prevent major merge
+> conflicts in linux-next.
+> 
+> Does that sound OK?
 
-[...]
+That works. Just send us a link to the branch after -rc2 and we'll get
+that sorted.
 
-> The flow for guest->host might be easy one, anyway, I try to summary for
-> review:
-> 
->   Restore TRFCR_EL1;
-> 
->   // Ensure restored sysreg is visible
->   isb();
-> 
->   // Enable trace buffer
->   TRBLIMITR_EL1.E = 0b1
-> 
->   // Enable trace unit
->   TRCPRGCTLR.EN = 0b1
-> 
->   if (2038923)
->      isb();
+Thanks,
 
-To strictly follow the SDEN, this ISB should be moved to immediately
-after enabling the TRBLIMITR_EL1.E bit and before enabling the
-TRCPRGCTLR.EN bit.
+	M.
 
-Sorry for spamming.
+-- 
+Jazz isn't dead. It just smells funny.
