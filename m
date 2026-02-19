@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC582FD7DA
-	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 19:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACD2305057
+	for <kvmarm@lists.linux.dev>; Thu, 19 Feb 2026 19:55:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771530948; cv=none; b=F/SQ658mPW6V53GbC7/QvSe1vL+oVOHXYSPA4HZT1rSfAiO1ftzlFgIrH8d95hTG1lu9VgfDVhfUrOtaSMEAqQbcGMeuHC/RHfLciRrCPiG0bDdWIiOyTfJoirh+dCrwaM3ObOkdOI8PsL/dg0sVIcOBF6UsfmSheLoWaXsl0Bg=
+	t=1771530948; cv=none; b=Ma8iZCh+iaH9uprEt0YmvVZmfVZY7beTxGzN6XFYadkYsUIj5GIz+OowabnvY48XDZMEhhjmXrrdFeK3VolmiBU1o2fqnp5J6PNyw1/A7MzGa/EICjg56SdjeIB/KNCPDYyzuxJX4ynqbbkZ0GEJkIU0qTqc0e8xncy/P3T/IN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1771530948; c=relaxed/simple;
-	bh=ra6ZXjBUgr5NeCCDN4jJSvWIzYbVtmiPtz2uAL75yMM=;
+	bh=R9ddcM0FhxsB3jJnj82FiB15M/HdE+9A3r4mtCkjeXQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fxvj2SxnMjvwBVYK/rloX/pvljjQ7G/3s9iNGFxCWjvok1fgYzwr6xoIUcmlfpQ2nM4wcVA7eO7YJnLUOlutqPZtQkCcLhySIxehRjrU0IZuVrVxkkUsxqmcv29ElsL0/UKfIN3T0pLrAc0g1IMz+SLD4DIaF5HNbVQRcXT+5Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV0aWKGv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bOqL/mkgfmPxKCMWn3KBjnvZTPdLAS1mSM1NKKaoq83WIuUJE2Zt1ocq//IsJ6PCAEvdm4fosuCUXAszbhR54l5vK++TuLU6WAGjV/63pIrAV1C94N3SHXVuiEA5ozaZNu9JFXnLhpLn7rCG7iu8dgkWZPIjOtHwrvsXlh6+Lg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxSJPV4l; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV0aWKGv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4371C19423;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxSJPV4l"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE19CC116D0;
 	Thu, 19 Feb 2026 19:55:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1771530947;
-	bh=ra6ZXjBUgr5NeCCDN4jJSvWIzYbVtmiPtz2uAL75yMM=;
+	bh=R9ddcM0FhxsB3jJnj82FiB15M/HdE+9A3r4mtCkjeXQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mV0aWKGvtFRgyma7BZGSaAUl80uGyre7Me8PNuPH/HPsmv6O0jvQb9LK0ynrD5S3E
-	 tn/ZbpLhg+jIzHIVp+loChaddMndU0BHOXfPNrGIxEmyHQ2dTSbdN/nVP5cZmjwuK4
-	 /pWbcSZryENnEPvjKPIpPKJ4wq1qdF4y3pK03K0fut3ruP9d5XsBAIrWyPznRVsd2Q
-	 ZmBX5cWy2ur2LsK7aNp3B06Xc2Yl28w41JiIBCnKvATl1bV2G4Ln2fwoPkUwvRxjoS
-	 s/qyu/XMNc2Eo7y9mI5T/ANS5QDm+g3Tn8mh8zwv9Gyr3EmXJq+MVkv6qZBGLTZFr9
-	 MYxi6M3qmMM/g==
+	b=AxSJPV4l/7H8ctQ/YCDTG9KodKJUxwse733VCDYM+XHxJDVtE4hx/LQ6AOfZ+JqAR
+	 kh/C/lacOgJGveOdbkfehe4BcpnleS8pPwGzj3shHAyzlt/1tbTJQm+jNRdp+LMuFv
+	 3ejSeNl86v6UPSox+axLpZDtJ6/LlmA3eCyasK0LurRjg9WnjC7BC4izB7TNKXaU0M
+	 8CxvRBEIyskgDdmf2P2T90SlV0wGMvf8ixbNwlR9Iq9G08hdSer07l2NBGk4e6FaJH
+	 dlrfUY3j1r/JyBPvflB8IZzJXBx8fCUPckxd4x1CJ0AVfsNUHn0jqyXpr6AONIybXN
+	 ZBDTuoiWAzCDw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vtA7l-0000000CGHL-33a7;
-	Thu, 19 Feb 2026 19:55:45 +0000
+	id 1vtA7l-0000000CGHL-43J4;
+	Thu, 19 Feb 2026 19:55:46 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Fuad Tabba <tabba@google.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 2/9] arm64: Convert CONFIG_ARM64_PTR_AUTH to FTR_CONFIG()
-Date: Thu, 19 Feb 2026 19:55:25 +0000
-Message-ID: <20260219195533.2455736-3-maz@kernel.org>
+Subject: [PATCH 3/9] arm64: Convert CONFIG_ARM64_SVE to FTR_CONFIG()
+Date: Thu, 19 Feb 2026 19:55:26 +0000
+Message-ID: <20260219195533.2455736-4-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260219195533.2455736-1-maz@kernel.org>
 References: <20260219195533.2455736-1-maz@kernel.org>
@@ -61,57 +61,75 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-While CONFIG_ARM64_PTR_AUTH=n prevents userspace from using PAC,
+While CONFIG_ARM64_SVE=n prevents userspace from using SVE,
 the sanitised ID registers still advertise the feature.
 
 Make it clear that nothing in the kernel should rely on this by
-marking the feature as hidden for all when CONFIG_ARM64_PTR_AUTH=n.
+marking the feature as hidden for all when CONFIG_ARM64_SVE=n.
 
-This is functionnaly equivalent to using arm64.nopauth on the kernel
+This is functionnaly equivalent to using arm64.nosve on the kernel
 command-line.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/kernel/cpufeature.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index b34a39967d111..7ad124faae08e 100644
+index 7ad124faae08e..9f631658de4b3 100644
 --- a/arch/arm64/kernel/cpufeature.c
 +++ b/arch/arm64/kernel/cpufeature.c
-@@ -247,16 +247,16 @@ static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SPECRES_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_SB_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FRINTTS_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPI_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_GPA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_LRCPC_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_FCMA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_JSCVT_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_API_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR1_EL1_APA_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DPB_SHIFT, 4, 0),
+@@ -292,7 +292,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SEL2_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 				   FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_SVE_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_RAS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR0_EL1_GIC_SHIFT, 4, 0),
+@@ -330,29 +330,29 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr2[] = {
+ };
+ 
+ static const struct arm64_ftr_bits ftr_id_aa64zfr0[] = {
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_F64MM_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_F32MM_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_F16MM_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_I8MM_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_SM4_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_SHA3_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_B16B16_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_BF16_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_BitPerm_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_EltPerm_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_AES_SHIFT, 4, 0),
+-	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_SVE),
++	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_SVE, VISIBLE, ALL_HIDDEN),
+ 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ZFR0_EL1_SVEver_SHIFT, 4, 0),
  	ARM64_FTR_END,
-@@ -269,9 +269,9 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
- 	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_CLRBHB_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_BC_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_MOPS_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_EXACT, ID_AA64ISAR2_EL1_APA3_SHIFT, 4, 0),
--	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
-+	ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_PTR_AUTH, VISIBLE, ALL_HIDDEN),
- 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_GPA3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_RPRES_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_EL1_WFxT_SHIFT, 4, 0),
+ };
 -- 
 2.47.3
 
