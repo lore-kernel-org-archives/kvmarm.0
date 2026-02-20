@@ -1,169 +1,135 @@
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F205F1DED4C
-	for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 16:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1310C3176EB
+	for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 19:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771605971; cv=none; b=Gio/FXWdwS58F9XO+hgLBGyENLT7lJutVVGzYzokXV+2MtxJa12BugT7OjxzrkPo7Z6VTlEJo9gmHTay6SBfkbKntoaJyh1YKnnDPcwAD8pbIZ/Gsp+YihEtVm8pUrch66Fvm6rC7Ov7QD8kQiPD99ATpO+HJ43Jv9+6xVL5O0Q=
+	t=1771614545; cv=none; b=o6uOCCD+9toYt73mEFimAgyHVJEDAsWcTX3ZxiJx81b5rFrYdoXPAs2DFmwIm0883VwfiR163IpPGQs6XEABARGYEss7Zgnw5i5S60MOFBIGny639pJ6lKIGLNfban/SgTWL5vnLQgVWX9DVvR7X5nQ2igfdYqUX6lzEBprwWTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771605971; c=relaxed/simple;
-	bh=RdADZ2qvOwFUII0e06TsD4htMLQmUhUg2PjK9uFPPJw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FWDrJqDVqBi2hbqngnpjzukcG671cLsnPE5R32jaIiNQnBrk6elQo0JiTYg1KIFNWYwnJdx2Knrj83x46Eihfb2rkURoJsVnIU3L9TvCJEff421iBbzCT07hy0s4Jd3ZVcKzs4IwHLEbAIZaQs7TzASzIQL63D/GvXrpmMDEjP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKnpSenC; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1771614545; c=relaxed/simple;
+	bh=cficQLvFW1xnbalHv2i28cVFq4nhHX5+c3ubaVEri3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=m7lgcMhIoCVhvRXkTGTJKs6B+bjEwrTXjnUQ2/8m3UfgcmYWgDyElSgknLiNlLHWoJ831Udot1XCz/HSEkumsxSAzMhKsgsEnmMwHCC6EGyjUpODjPwhP+L/SEQgVXqZFq0hao/DgVLvkhrhNWh25Pb91GL5DKboBldgr3xa3gQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a8Bvg4F9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKnpSenC"
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2a77040ede0so27844565ad.2
-        for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 08:46:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1771605969; x=1772210769; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2NjEt0nlzd3sSfAI7ozchxl45oY7orW7xyZnr6QEkg=;
-        b=pKnpSenC7UYZIZPUL7HIisUiJHJcQe7BnGhLTnO3Z0yyilBceuxq2D3Z2h5QFyK6YN
-         W6lwYObYDjabduHNNneCahZnaTxQMRuV1utRnAynSW6u0ifHrIRVVP76ATW7Nq/cTzoT
-         rxqdZG8tp4N37YNjzXfXUUpv0/FM0sOczoSBmxFjlmp5q8XyAqtcNV44C4YbBSI6TocU
-         zzZRDJMYE0LjdM27beJyEIOfPsckzWLDwHTgu2996OwrulodF/byTQNj2sTERpwwm6dY
-         lJW4RIzWf7XpsLzFGtX2pRhbTPq61iw4MTw2EZHshGOhz8uRXCErF/ojSm8Rqu/AudRF
-         TTww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771605969; x=1772210769;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2NjEt0nlzd3sSfAI7ozchxl45oY7orW7xyZnr6QEkg=;
-        b=VHUNJZ8i726OGkVQefMrGp/kYxEXRSdZy7xoeVo/0Zx9jrEyaBSNtL7jcwQXbBp8gG
-         79D+FIGeC8iddQruS+1MmDWtycipZWV2L01NVnHIvoOKZPrXpWv+xdfp3Jof65Z7srTE
-         QlSOiLMKhitcPOffxIfh62WrixLoq/z+4zIfEBcH1LiQxjpJONwrkt4nfSE8JC92r9Dm
-         tr8N5Lz6LQaPpxk0pu6XUH+gKb+nt1XJzIcS06i9rcMZXzYnb3+PqOx7gFOIy2+fOVFa
-         m/E2H4BheyaX2jGA6pjtaLjbAtzZJdyEtjSo8FQvGrc0oDpa2s13GTZR+SrRrEiWIkag
-         DNTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrVfI1hxdoZNqKhQBhShjB8pIlo1LdiEZGxvTKzUwxczxE6Xsmq3W3GVKHFRRBA/OzFM8Hs6o=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwEJ8Q8Ocg5+GtgUp34tnO8sNgyxHFtjsZDZFYrr0EDwHDkCzg+
-	0aSyb9lcO2rZ7Hf4AwZogNTVUXi3cn7zcUnCJRnB7Wn2VNVP5+rs9g8qS158kI+lA7kbTjA6D3Z
-	JJ/ao9w==
-X-Received: from plma6.prod.google.com ([2002:a17:902:7d86:b0:2a9:622c:47d6])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e80c:b0:2a1:388d:8ef3
- with SMTP id d9443c01a7336-2ad7444e7fcmr1749985ad.18.1771605969111; Fri, 20
- Feb 2026 08:46:09 -0800 (PST)
-Date: Fri, 20 Feb 2026 08:46:07 -0800
-In-Reply-To: <aZdlBkLEQyv9q5ll@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a8Bvg4F9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE9CBC116C6;
+	Fri, 20 Feb 2026 19:09:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771614544;
+	bh=cficQLvFW1xnbalHv2i28cVFq4nhHX5+c3ubaVEri3A=;
+	h=Date:From:To:Cc:Subject:From;
+	b=a8Bvg4F92sL1ntiObWb2zc6QaSN0lney+8+qmZvVBq3vzUd9nMZK3DcNyINhs/idA
+	 ouo2knHcjqaBT4vqs7UJBW6UedN3jrAc1jaso3TXpKTC6CPeirg6cYs/cUWo+YWlYT
+	 xI1qx5kUslezdT45KJ14bG8eNJxDhky5a2/JXsyJEryHn2IRkMymgwnfCWTKx6ZZkH
+	 icEXWJ/kcB4eJVEHf7a1YEcwDWr3E9jWK1KIi+q1uhaHgU+Bsz8bER8u/36dsr01Rt
+	 dsgbeur8jr0d5M9WcmaVt88lln7gOcPIUWiLD5k2KnER053G0gm29nKUU4lSvEHFma
+	 TJzDSW6TWnsog==
+Date: Fri, 20 Feb 2026 19:08:59 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: pKVM breakage in mainline on n1sdp
+Message-ID: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20251206001720.468579-1-seanjc@google.com> <20251206001720.468579-43-seanjc@google.com>
- <aZdlBkLEQyv9q5ll@google.com>
-Message-ID: <aZe6UR1EGg0RcB69@google.com>
-Subject: Re: [PATCH v6 42/44] KVM: VMX: Dedup code for adding MSR to VMCS's
- auto list
-From: Sean Christopherson <seanjc@google.com>
-To: Namhyung Kim <namhyung@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Xin Li <xin@zytor.com>, "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
-	Arnaldo Carvalho de Melo <acme@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
-	Xudong Hao <xudong.hao@intel.com>, Sandipan Das <sandipan.das@amd.com>, 
-	Dapeng Mi <dapeng1.mi@linux.intel.com>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, 
-	Manali Shukla <manali.shukla@amd.com>, Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5FRjekU5r0A0GCLv"
+Content-Disposition: inline
+X-Cookie: Booths for two or more.
 
-On Thu, Feb 19, 2026, Namhyung Kim wrote:
-> Hello,
-> 
-> On Fri, Dec 05, 2025 at 04:17:18PM -0800, Sean Christopherson wrote:
-> > Add a helper to add an MSR to a VMCS's "auto" list to deduplicate the code
-> > in add_atomic_switch_msr(), and so that the functionality can be used in
-> > the future for managing the MSR auto-store list.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++----------------------
-> >  1 file changed, 19 insertions(+), 22 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 018e01daab68..3f64d4b1b19c 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -1093,12 +1093,28 @@ static __always_inline void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
-> >  	vm_exit_controls_setbit(vmx, exit);
-> >  }
-> >  
-> > +static void vmx_add_auto_msr(struct vmx_msrs *m, u32 msr, u64 value,
-> > +			     unsigned long vmcs_count_field, struct kvm *kvm)
-> > +{
-> > +	int i;
-> > +
-> > +	i = vmx_find_loadstore_msr_slot(m, msr);
-> > +	if (i < 0) {
-> > +		if (KVM_BUG_ON(m->nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > +			return;
-> > +
-> > +		i = m->nr++;
-> > +		m->val[i].index = msr;
-> > +		vmcs_write32(vmcs_count_field, m->nr);
-> > +	}
-> > +	m->val[i].value = value;
-> > +}
-> > +
-> >  static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
-> >  				  u64 guest_val, u64 host_val)
-> >  {
-> >  	struct msr_autoload *m = &vmx->msr_autoload;
-> >  	struct kvm *kvm = vmx->vcpu.kvm;
-> > -	int i;
-> >  
-> >  	switch (msr) {
-> >  	case MSR_EFER:
-> > @@ -1132,27 +1148,8 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
-> >  		wrmsrq(MSR_IA32_PEBS_ENABLE, 0);
-> >  	}
-> >  
-> > -	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
-> > -	if (i < 0) {
-> > -		if (KVM_BUG_ON(m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > -			return;
-> > -
-> > -		i = m->guest.nr++;
-> > -		m->guest.val[i].index = msr;
-> > -		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
-> > -	}
-> > -	m->guest.val[i].value = guest_val;
-> > -
-> > -	i = vmx_find_loadstore_msr_slot(&m->host, msr);
-> > -	if (i < 0) {
-> > -		if (KVM_BUG_ON(m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > -			return;
-> > -
-> > -		i = m->host.nr++;
-> > -		m->host.val[i].index = msr;
-> > -		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, m->host.nr);
-> > -	}
-> > -	m->host.val[i].value = host_val;
-> > +	vmx_add_auto_msr(&m->guest, msr, guest_val, VM_ENTRY_MSR_LOAD_COUNT, kvm);
-> > +	vmx_add_auto_msr(&m->guest, msr, host_val, VM_EXIT_MSR_LOAD_COUNT, kvm);
-> 
-> Shouldn't it be &m->host for the host_val?
 
-Ouch.  Yes.  How on earth did this escape testing...  Ah, because in practice
-only MSR_IA32_PEBS_ENABLE goes through the load lists, and the VM-Entry load list
-will use the guest's value due to VM_ENTRY_MSR_LOAD_COUNT not covering the bad
-host value.
+--5FRjekU5r0A0GCLv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Did you happen to run into problems when using PEBS events in the host?
+Hi,
 
-Regardless, do you want to send a patch?  Either way, I'll figure out a way to
-verify the bug and the fix.
+At some point since the 30th of January we have started seeing issues=20
+in mainline when running kvm-unit-tests on N1SDP in pKVM mode:
+
+TESTNAME=3Dpmu-mem-access TIMEOUT=3D90s MACHINE=3D ACCEL=3D ./arm/run arm/p=
+mu.flat -smp 1 -append 'pmu-mem-access'
+<4>[  114.487201] ------------[ cut here ]------------
+<4>[  114.487206] WARNING: arch/arm64/kvm/pkvm.c:393 at pkvm_pgtable_stage2=
+_map+0x1ac/0x1c4, CPU#1: qemu-system-aar/1955
+<4>[  114.502672] Modules linked in: stm_p_basic coresight_tpiu coresight_s=
+tm stm_core arm_spe_pmu coresight_funnel coresight_tmc coresight_replicator=
+ coresight arm_cmn sha256 cfg80211 rfkill fuse dm_mod ipv6
+<4>[  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted=
+ 6.19.0 #1 PREEMPT=20
+<4>[  114.529261] pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTY=
+PE=3D--)
+<4>[  114.536469] pc : pkvm_pgtable_stage2_map+0x1ac/0x1c4
+<4>[  114.541681] lr : pkvm_pgtable_stage2_map+0x58/0x1c4
+<4>[  114.546805] sp : ffff80008673b900
+<4>[  114.550366] x29: ffff80008673b900 x28: 0000000000200000 x27: 00000000=
+00200000
+<4>[  114.557748] x26: 0000000000000000 x25: 00000000fffffff4 x24: 00000000=
+0000000f
+<4>[  114.565130] x23: ffff008047b65198 x22: 00000000080cbc00 x21: 00000000=
+00040000
+<4>[  114.572512] x20: ffff008046f65680 x19: 0000000000000200 x18: 00000000=
+00000001
+<4>[  114.579893] x17: 0000000000000000 x16: 0000000000000000 x15: 00000000=
+00000000
+<4>[  114.587275] x14: 0000000000000002 x13: 0000000000000002 x12: 00000000=
+0031bf68
+<4>[  114.594656] x11: 0000000000000000 x10: 0000ffff8be01000 x9 : ffff8000=
+800728b0
+<4>[  114.602037] x8 : ffff80008673bab8 x7 : 0000000000000001 x6 : 00000000=
+00000008
+<4>[  114.609419] x5 : 0000000040200000 x4 : 000000000000000f x3 : 00000000=
+00000200
+<4>[  114.616800] x2 : 0000000000040000 x1 : fffffffffffffff4 x0 : 00000000=
+00000000
+<4>[  114.624182] Call trace:
+<4>[  114.626875]  pkvm_pgtable_stage2_map+0x1ac/0x1c4 (P)
+<4>[  114.632088]  kvm_handle_guest_abort+0xe7c/0x12ec
+<4>[  114.636953]  handle_exit+0x60/0x184
+<4>[  114.640689]  kvm_arch_vcpu_ioctl_run+0x35c/0x968
+<4>[  114.645554]  kvm_vcpu_ioctl+0x254/0xa50
+<4>[  114.649638]  __arm64_sys_ioctl+0xac/0x104
+<4>[  114.653896]  invoke_syscall+0x48/0x110
+<4>[  114.657894]  el0_svc_common.constprop.0+0x40/0xe0
+<4>[  114.662846]  do_el0_svc+0x1c/0x28
+<4>[  114.666409]  el0_svc+0x34/0x10c
+<4>[  114.669798]  el0t_64_sync_handler+0xa0/0xe4
+<4>[  114.674228]  el0t_64_sync+0x198/0x19c
+<4>[  114.678137] ---[ end trace 0000000000000000 ]---
+
+The same tests running on N1SDP in VHE mode seem happy, and I've not
+seen any other platforms showing issues.  Unfortunately due to various
+infrastructure issues I don't have more detail on when this started
+happening or anything, I'll update if I get more.
+
+Thanks
+Mark
+
+--5FRjekU5r0A0GCLv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmYsUsACgkQJNaLcl1U
+h9AfFgf9FSIZD6w3va6f48EUw0OHwlWyQ8KdSDbnx0BsjfCkDLY9YuIXsT3hJ+vN
+YcUMPuLALkY9ZcCS7muEzOgRLb9K6WEowjllVosOLMRWjab/WgOjaGDrI8oUYqPP
+RNhoqwJ0Set3ZkRC4mHfVwPpT8XuzAOI2zEYtSBDbpnnUhj1cYtzjGg0PuYcfrR7
+OMteZZR1cceOY23kRsP2z2ZkWc2rrojtilCBil6YkFYTGVA5tAAyTcyBICzLoLQo
+3bMjZ865WcHgSk2laachCUBDTkTZxzKqdVYkKN/euWTGB02ePMRPNpPISHY6xAnN
+pO1CdNuyd1IFiRSJKo2Sb/G3WnvFTQ==
+=IH/Z
+-----END PGP SIGNATURE-----
+
+--5FRjekU5r0A0GCLv--
