@@ -1,168 +1,162 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9558134216C
-	for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 12:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058F7286415
+	for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 14:52:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771589569; cv=none; b=hHhgRzc3HypN0Fa8zSA/ptiCc4Nw2cubtj7xKXitu+NU2QTjXGKwtRC8wnEm3X/TfTrELFnHXuzPLBqq2s2rWFEkag6d6rnVi/92aw5KjxDs+OmjQmJg2QL0l0eTJXJ7lFB117l7lb7RN+tU1a1wAATiYvIjfB+SSKAU2OwW470=
+	t=1771599131; cv=none; b=EQH0kh4fuTxKlH3IKzYjt+FNWS1lqcVjAf/1o3ozoolUrofEbjM71ZUWTvWj7teoA8wmjA2o6muhMtfhzIJ4E053SgaTRhqMnMSLA2Ky8a2En3HgZk+Rnu4isCwkwdNh5MbdsLVoivY19JS1DpJzj5ry2ZC50eZpW1D478/qnZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771589569; c=relaxed/simple;
-	bh=nCHPyfglxdRriYc9YqLZ0QhFT6ATlTe18O5vbwZW1Rs=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=mWipTuzuXSdSDk8WG27SrMQbYLhWBHFKiiQQp4lYY2C2fZa2BrUbZUPRKGK2iZ5XDnT+1lHCCPb8JecsSn6pE6hHykIq3W6Af12MtiHdhhV57lcKor7J7UGgZBi6gihlx7qt77KGvg7u23GO95wV8YTABrzQ893cywEyABwRc8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQA5LcYi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1771599131; c=relaxed/simple;
+	bh=cKD/AWPnjjeWq0pI84Atiws6ljOTReoU+0PYJxYItcs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gbPWNoAMN+4MpD+k/rnbVy7zZgftjP9b7V9OH4rlBDSQavgyNtL6Pii9iAM5eEw1u69WMBgP1qJMZZ25LLK721I1MgK2nUImqw1Tp5Xcfb6XQjoh+JiUW6CF5yrl1biSvShT3KPH4nTUNevZW5gdjlmGkzmhyJRM4tCnuBcCTA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TV+Vj8GD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQA5LcYi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1771589567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a6WnYkUv+1p2RXUoYer9jX6Ro906Av76rOQTzY8hn48=;
-	b=RQA5LcYiquEiuV3yr6KMg2yaxT3olW/TQ6RsqCFzfL8+/8NESH1zoJHjifMq+hU+k9DBCV
-	mSMA/AMxEz/c+6cSpI6MZRZJZGOcsvHDdfc32nZs53+pNi4dLZwHeSY9ihuBQbriOMOk03
-	Z7ydDns6Sa6ltq0LqGRVpwYJ/BsNrEM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-332-8ERL5jaoPOmUmOpyGJGTZg-1; Fri, 20 Feb 2026 07:12:46 -0500
-X-MC-Unique: 8ERL5jaoPOmUmOpyGJGTZg-1
-X-Mimecast-MFC-AGG-ID: 8ERL5jaoPOmUmOpyGJGTZg_1771589565
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4836cd6dfe6so15838435e9.2
-        for <kvmarm@lists.linux.dev>; Fri, 20 Feb 2026 04:12:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771589565; x=1772194365;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a6WnYkUv+1p2RXUoYer9jX6Ro906Av76rOQTzY8hn48=;
-        b=Dl4zzmm5PJyv+nk9Tz5LJ3mtX3GowHxsGqhsi4JuetTD4qSeR94TXpkcXJwqrlQKYd
-         7KMvBwdG+OO46UtsJuuixEjVs+ycjX09DgttEIpSHr7gktXsgXnDdyt8ZABbfKUAN85J
-         Vmb6zCU0r4jGSW70ffyk/RMJQ5zDjX8mGBu155EOGCsgGqSDBD+5AHMRdKpHpcCJlbXN
-         tgCDcnRJvLdIpIJSUg/PYKLoFgaFLgC5qGsU48XWr63apm8g33yPs+kgfU/BZE+H1EAu
-         4rrRQzH+HBkP36owBfeL5+xMx/ClYLKPb1ReSahvD/D+ExXZvzX6QO6Xq0k43P//XkE5
-         ne/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVqKgdcPk1Wn5CmwbCHbBOVvlDsgyXccmCrEVk4Fo1wQjVJXeMpiCRVpafft3kY3ex3SeZs7Bc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw/sRuwHfQeKsmcO9QgqTK6NT4d/ADlYtpAKrViod4iNc4FKax+
-	FScHrPs8S9kTcAUzqeBiZ6fRhyz+JgBqyKB3MwYbHDmlF3xWwnkPVvONsGSCAdVpa+9B/B9mlIp
-	qOuzgnHIDo+XlCf8bt7KIeeVIjIdnfjpOauRrClmvbUaHI7C2kPEMElGRCw==
-X-Gm-Gg: AZuq6aKwayzENGNnisW4yUdZoVgfrS/dLgNoU8uSPudRkSAc4UTjUHshT9vlLKbEaud
-	R6UPzzPjTUWcWyKQS0sZkRQUEaVI79tPgUZF9s50kQfJIMxe2qD1TOLHkqzYMVnuxxppdBtF3lM
-	P/Y4KUN2LSdsVT5qoGZAaIxDvo5qtb98SdesEbY2rLtUSrH1vFH3KymSSaEXMV1PuSn2G2cAj7d
-	ZEMlSmOHmpK/g+8qm+fQ5erbaTSjAXciNPjDG+EWL6Mx+JYKB76RpHGHrX9NOcKbi7F56yXiFmG
-	o6NZ/91Ch2xahLiS1DHmA+9TkPH1+RSz5NNsHyXg/JET/S4QGuqKSqqYJ6ibpfrBbPYrLkKxcnz
-	qPJg6v2bT9/OsspbGTZOOdPHdGdNImWx49jIdm0+w38khCkKbAv3BgeqI6SaUBibLohKoMTs=
-X-Received: by 2002:a05:600c:5491:b0:480:1c2f:b003 with SMTP id 5b1f17b1804b1-48379bfd732mr370818665e9.20.1771589564988;
-        Fri, 20 Feb 2026 04:12:44 -0800 (PST)
-X-Received: by 2002:a05:600c:5491:b0:480:1c2f:b003 with SMTP id 5b1f17b1804b1-48379bfd732mr370818155e9.20.1771589564568;
-        Fri, 20 Feb 2026 04:12:44 -0800 (PST)
-Received: from rh (p200300f6af2d8700b4c2d356c3fafe63.dip0.t-ipconnect.de. [2003:f6:af2d:8700:b4c2:d356:c3fa:fe63])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483a316eb08sm77575655e9.0.2026.02.20.04.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Feb 2026 04:12:44 -0800 (PST)
-Date: Fri, 20 Feb 2026 13:12:43 +0100 (CET)
-From: Sebastian Ott <sebott@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-cc: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, 
-    qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
-    kvmarm@lists.linux.dev
-Subject: Re: [PATCH v4 2/2] target/arm/kvm: add kvm-psci-version vcpu
- property
-In-Reply-To: <CAFEAcA8V9bjQUzUYAW7qj5fEn_f9xaPJAYpTRgvdaFq0cY3pRA@mail.gmail.com>
-Message-ID: <a4fffa2d-119a-cd78-44b6-b0c53d873833@redhat.com>
-References: <20251202160853.22560-1-sebott@redhat.com> <20251202160853.22560-3-sebott@redhat.com> <CAFEAcA8oi1Xs2kv66dFV9NZore+Q2vHUsgMikveVdN1c+3SBJQ@mail.gmail.com> <9b04a20f-b708-208d-1e4e-466ec30b7bb9@redhat.com> <CAFEAcA-A+zW=QFdCY7z==+Z=xXfhJvPeyHhbG_MpEmpkQfrmaw@mail.gmail.com>
- <4e9470d5-ef3e-cf5c-4117-fb589d56323c@redhat.com> <CAFEAcA8V9bjQUzUYAW7qj5fEn_f9xaPJAYpTRgvdaFq0cY3pRA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TV+Vj8GD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C0DC116D0;
+	Fri, 20 Feb 2026 14:52:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771599130;
+	bh=cKD/AWPnjjeWq0pI84Atiws6ljOTReoU+0PYJxYItcs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TV+Vj8GDWrGz2HdGQNgaKRORsnNRsJ4TtkD1IWFOG1VBtyPjCxEutL4SqXgJTYtT8
+	 425NFcgTEigPlV4wtZ5jugVbc64BHY+fEk7kNG5FbPJjN5NDIHXh4OWm6VJI7LeROn
+	 dyBWBaNYljwszaSMy2pR4kw9WjdTj7iHUS4Y8FoSoCHM0hS9TduFUD8YdxXweJDySq
+	 TIAdq5rlyH7DJReZefkFWpqzCCz89zj8z9lr9g0499nqSS5ld8tdVCYqZPCTz4J7c4
+	 sxRm9LOWJ756ZZjI/PJYWbBDtBsFFEJSOdZDe/2T8Zi+dcHc4Fpt+r1C4yJDcZhUqQ
+	 QGnSqGj56XncA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vtRrU-0000000CSW5-1neS;
+	Fri, 20 Feb 2026 14:52:08 +0000
+Date: Fri, 20 Feb 2026 14:52:07 +0000
+Message-ID: <86tsvba2nc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/9] arm64: Add logic to fully remove features from sanitised id registers
+In-Reply-To: <CA+EHjTzj9wEm7oBKBXF8sYpK60FYeLOJwEapxDiO1HxK5e6Y6g@mail.gmail.com>
+References: <20260219195533.2455736-1-maz@kernel.org>
+	<20260219195533.2455736-2-maz@kernel.org>
+	<CA+EHjTzVRq3r-7UR-MJYvv-Aw4kHQDHEmwtqY9is-fRDm-J06A@mail.gmail.com>
+	<86v7frafpx.wl-maz@kernel.org>
+	<CA+EHjTzj9wEm7oBKBXF8sYpK60FYeLOJwEapxDiO1HxK5e6Y6g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: kKzl9egkgpw3sF90JI4VvEEitFMnfCJQvUgyX2UYE1E_1771589565
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Feb 2026, Peter Maydell wrote:
-> On Wed, 11 Feb 2026 at 16:04, Sebastian Ott <sebott@redhat.com> wrote:
->>
->> On Wed, 11 Feb 2026, Peter Maydell wrote:
->>> On Wed, 11 Feb 2026 at 15:37, Sebastian Ott <sebott@redhat.com> wrote:
->>>>
->>>> On Fri, 6 Feb 2026, Peter Maydell wrote:
->>>>> On Tue, 2 Dec 2025 at 16:09, Sebastian Ott <sebott@redhat.com> wrote:
->>>
->>>>>> +static char *kvm_get_psci_version(Object *obj, Error **errp)
->>>>>> +{
->>>>>> +    ARMCPU *cpu = ARM_CPU(obj);
->>>>>> +    const struct psci_version *ver;
->>>>>> +
->>>>>> +    for (ver = psci_versions; ver->number != -1; ver++) {
->>>> [...]
->>>>>> +        if (ver->number == cpu->psci_version)
->>>>>> +            return g_strdup(ver->str);
->>>>>> +    }
->>>>>> +
->>>>>> +    return g_strdup_printf("Unknown PSCI-version: %x", cpu->psci_version);
->>>>>
->>>>> Is this ever possible?
->>>>
->>>> Hm, not sure actually - what if there's a new kernel/qemu implementing
->>>> psci version 1.4 and then you migrate to a qemu that doesn't know about
->>>> 1.4?
->>>
->>> Oh, I see -- we're reporting back cpu->psci_version here, which
->>> indeed could be the value set by KVM. I misread and assumed
->>> this was just reading back the field that the setter sets,
->>> which is kvm_prop_psci_version (and which I think will only
->>> be set via the setter and so isn't ever a value the setter
->>> doesn't know about).
->>>
->>> That does flag up a bug in this patch, though: if I set
->>> a QOM property via the setter function and then read its
->>> value via the getter function I ought to get back what
->>> I just wrote.
->>>
->>
->> Meaning this should be something like below?
->>
->> static char *kvm_get_psci_version(Object *obj, Error **errp)
->> {
->>      ARMCPU *cpu = ARM_CPU(obj);
->>
->>      return g_strdup_printf("%d.%d",
->>         (int) PSCI_VERSION_MAJOR(cpu->kvm_prop_psci_version),
->>         (int) PSCI_VERSION_MINOR(cpu->kvm_prop_psci_version));
->
-> I guess we need to define what we want. Things we need:
->
-> - user/QMP/etc setting a value and reading it back should
->   get back what they set
-> - QEMU needs to keep working on a new kernel that defines a
->   new PSCI version in the future
-> - user reading the default value and then writing it back
->   should succeed
->
-> Things we might like:
-> - ideally the setter would fail if the user picks a version
->   KVM can't support, but I don't think we can conveniently
->   determine this, so "fail vcpu init" may be as good as we
->   can get without unnecessarily large amounts of effort
->
-> I think this probably adds up to:
-> - setter should accept any a.b value (for a,b fitting in [0,65535])
-> - getter can handle any value and turn it into a.b
-> - make sure that setting it to an invalid value gives a helpful
->   error on vcpu start
->
-> Doing it this way, do we need a separate cpu->kvm_prop_psci_version,
-> or could we directly read and write cpu_>psci_version ?
->
+On Fri, 20 Feb 2026 11:06:03 +0000,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> > > > +               switch (ftrp->visibility) {
+> > > > +               case FTR_VISIBLE:
+> > > > +                       val = arm64_ftr_set_value(ftrp, val, ftr_new);
+> > > >                         user_mask |= ftr_mask;
+> > > > -               else
+> > > > +                       break;
+> > > > +               case FTR_ALL_HIDDEN:
+> > > > +                       val = arm64_ftr_set_value(ftrp, val, ftrp->safe_val);
+> > > > +                       reg->user_val = arm64_ftr_set_value(ftrp,
+> > > > +                                                           reg->user_val,
+> > > > +                                                           ftrp->safe_val);
+> > >
+> > > Should we also take the safe value in update_cpu_ftr_reg() for FTR_ALL_HIDDEN?
+> >
+> > I would expect arm64_ftr_safe_value() to do the right thing at that
+> > stage, given that we have primed the boot CPU with the safe value, and
+> > that we rely on that bootstrap to make the registers converge towards
+> > something safe. This is also what happens for the command-line override.
+> >
+> > Or have you spotted a case where this go wrong?
+> 
+> I think so... What if a future FTR_ALL_HIDDEN feature is defined as
+> FTR_HIGHER_SAFE? Wouldn't that cause problems on secondary CPUs?
+> init_cpu_ftr_reg() primes sys_val with safe_val on the boot CPU,
+> update_cpu_ftr_reg() on secondary CPUs compares the hardware value
+> (ftr_new) against safe_val (ftr_cur). For FTR_HIGHER_SAFE,
+> arm64_ftr_safe_value() returns max(ftr_new, safe_val). Since the
+> hardware value is higher, update_cpu_ftr_reg() overwrites sys_val with
+> the hardware value, resurrecting the hidden feature globally.
 
-Thanks for your suggestions! I've implemented them all and sent out a V6.
+Huh, that's an interesting observation.
 
-Sebastian
+SpecSEI is the only case we currently deal with that is
+HIGHER_SAFE. But look at what this feature describes: bloody
+speculative SErrors! Not taking this into account could be really
+deadly, and the kernel really ought to know about it.
 
+>
+> The features in this patch are FTR_LOWER_SAFE or FTR_EXACT (which
+> happen to sink to safe_val), which is why it's not a problem with
+> these current features.
+
+My conclusion is that it is simply not safe to make such feature
+conditional in any way. Note that's also the case of for an override:
+look at how we will refuse to downgrade a value in init_cpu_ftr_reg():
+
+		if ((ftr_mask & reg->override->mask) == ftr_mask) {
+			s64 tmp = arm64_ftr_safe_value(ftrp, ftr_ovr, ftr_new);
+			char *str = NULL;
+
+			if (ftr_ovr != tmp) {
+				/* Unsafe, remove the override */
+				reg->override->mask &= ~ftr_mask;
+				reg->override->val &= ~ftr_mask;
+				tmp = ftr_ovr;
+				str = "ignoring override";
+		[...]
+
+I think we must prevent this downgrade the same way, meaning that
+ALL_HIDDEN and FTR_HIGHER are mutually exclusive.
+
+How about that:
+
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index d58931e63a0b6..2cae00b4b0c5f 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1067,7 +1067,14 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
+ 			user_mask |= ftr_mask;
+ 			break;
+ 		case FTR_ALL_HIDDEN:
+-			val = arm64_ftr_set_value(ftrp, val, ftrp->safe_val);
++			/*
++			 * ALL_HIDDEN and HIGHER_SAFE are incompatible.
++			 * Only hide from userspace, and log the oddity.
++			 */
++			if (WARN_ON(ftrp->type == FTR_HIGHER_SAFE))
++				val = arm64_ftr_set_value(ftrp, val, ftr_new);
++			else
++				val = arm64_ftr_set_value(ftrp, val, ftrp->safe_val);
+ 			reg->user_val = arm64_ftr_set_value(ftrp,
+ 							    reg->user_val,
+ 							    ftrp->safe_val);
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
