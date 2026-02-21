@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECB4194C98
-	for <kvmarm@lists.linux.dev>; Sat, 21 Feb 2026 10:38:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4111DD877
+	for <kvmarm@lists.linux.dev>; Sat, 21 Feb 2026 12:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771670288; cv=none; b=LWp4NRCCAIpIC9YpOZ31ze12YM2lg7G29ty56fqQC82/vAstM6ZELvCRestsjukHelTyGW+E14rPMIwRsNTE9hBx2aUU3oHPGnLUCJvW8VCjcMhNIhgfJ2OPQ/EfdtvTWM82B5GLOiHIagBJ5kqEuRczPm2AMgwpzJlR7jfjaho=
+	t=1771677314; cv=none; b=baB9+/lnHAObWlpT7fWSfKSi/gKHoAH3qkmVIjp0IXVWs9o4VHwNv0BE8klJt59BxzUyG8JmWLjO1isMCCNH4IJEhOEy8kD2SQsYCcT1fu5WXFeSskCSEQ7Jtod5zZoDqht9r66sNzFjCmLTiO+I/U9NGNTqJb6fDEirTsA2ag8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771670288; c=relaxed/simple;
-	bh=EY0D5QirCKjzBYOQo3n8rfeqwznjrVn20G/qqgpR0no=;
+	s=arc-20240116; t=1771677314; c=relaxed/simple;
+	bh=nVO2+bjOhJYrsoofKUEiTy+IZOwWSzFp1qNe5u8GV9k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r2AEgNXJz0fEMs+sepzlPG4un5/MMNtf+9l6L43p1eCpwYN1lW8D6W/kPEGoP3FVkq5APKy/I+Dxui1hRK5a9rwd7l2+aZoXR+4ebN8DcKcTnn2To3aZwESZWb65Dyy6H44X40BldzWwzC3q2wz7uvqy4UuA1hv2fMuvf/LRa50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/YTbXvh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=e7rjXWl0nzg267294nekrPBgdq1zAdaAqYmGXRDlExEEIK2xD4qsGx88+2C+ejHzCcR1wfqXnJHIG+6pD3cYLfJ9vCJ/hOttrKiIqqL7EtsQkx3mqTe39RQchoxbRnPOL0sOUBmfhl1MY1IEsQ8m+dioF12O9zU/teVpYvcYrzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+2u+EqG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/YTbXvh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9E39C4CEF7;
-	Sat, 21 Feb 2026 10:38:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+2u+EqG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 263B1C4CEF7;
+	Sat, 21 Feb 2026 12:35:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771670288;
-	bh=EY0D5QirCKjzBYOQo3n8rfeqwznjrVn20G/qqgpR0no=;
+	s=k20201202; t=1771677314;
+	bh=nVO2+bjOhJYrsoofKUEiTy+IZOwWSzFp1qNe5u8GV9k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G/YTbXvhK8m1aG4erCIhCnv4AWhaJeot8nGbFgzq806rcCOFIawR+qIkvpc14gnxW
-	 w1xcolvbbDVk838pXLgh1Tqu2vPLW9b3jGH8UuF+AMSC4mjp6TMEOs0iNBeyaFXny2
-	 +GoVVGBPF+HZQ6JZUFujb0HrYbqi0GL52eWt7H3gOEgG+ka6y6ziDav7RAbRpqhSBB
-	 JRB0G+bQ/bh3WZRnf+T3+hRzR2wUbwQD83Y9JOdLP5he8CtrHEsH5bCZGVf6BfAjSA
-	 u2TmRqf0Kr6XeKtI/l/yLCTzEQrSFLqmEw/X1kxLbhL/Y1bM3CybzBcomn2xMveev0
-	 8UM3XxkNT5yGQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	b=s+2u+EqG3cNlIcJRRM66NFNsdFfniERmtfG1yb96Z7PqOmUJdmFr7MVfxyGbInv63
+	 9IBtJ5rTAhUV0k8LpQldhPPIssDJFKgWe1XO25LCrF3d0ZC1bwodcUq6Fq/Emp/VN2
+	 K8VuKHlGpQNp8C16B4CwNE2kZ6URoZDjWVGR6LmFgGJmAkKumCRP6fkHBqSeWzRMq/
+	 eoLth8NlEicPIOkyp3NPq1W5hPSZx3WFLBXaOo4MBalFUge+NE62eWd73JhGGfWVzk
+	 rIV0eaSQje7KFFVar7cjmc0Zb7dfJ9cDZbmZHjlEQZ9KYi5OW968Z71QYhCh1U04y0
+	 HSGt864e8dDIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vtkNB-0000000CcbG-3Tfr;
-	Sat, 21 Feb 2026 10:38:06 +0000
-Date: Sat, 21 Feb 2026 10:38:05 +0000
-Message-ID: <87a4x2e60i.wl-maz@kernel.org>
+	id 1vtmCV-0000000CdLT-457v;
+	Sat, 21 Feb 2026 12:35:12 +0000
+Date: Sat, 21 Feb 2026 12:35:11 +0000
+Message-ID: <86seau9sw0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>,
 	Fuad Tabba <tabba@google.com>
@@ -46,9 +46,10 @@ Cc: Oliver Upton <oupton@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	Mark Rutland <mark.rutland@arm.com>
 Subject: Re: pKVM breakage in mainline on n1sdp
-In-Reply-To: <87bjhie67o.wl-maz@kernel.org>
+In-Reply-To: <87a4x2e60i.wl-maz@kernel.org>
 References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
 	<87bjhie67o.wl-maz@kernel.org>
+	<87a4x2e60i.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,70 +65,85 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, oupton@kernel.org, cata
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 21 Feb 2026 10:33:47 +0000,
+On Sat, 21 Feb 2026 10:38:05 +0000,
 Marc Zyngier <maz@kernel.org> wrote:
 > 
-> [+ Fuad for the protected mode stuff]
+> On Sat, 21 Feb 2026 10:33:47 +0000,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > [+ Fuad for the protected mode stuff]
+> > 
+> > On Fri, 20 Feb 2026 19:08:59 +0000,
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > 
+> > > Hi,
+> > > 
+> > > At some point since the 30th of January we have started seeing issues 
+> > > in mainline when running kvm-unit-tests on N1SDP in pKVM mode:
+> > > 
+> > > TESTNAME=pmu-mem-access TIMEOUT=90s MACHINE= ACCEL= ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'
+> > > <4>[  114.487201] ------------[ cut here ]------------
+> > > <4>[  114.487206] WARNING: arch/arm64/kvm/pkvm.c:393 at pkvm_pgtable_stage2_map+0x1ac/0x1c4, CPU#1: qemu-system-aar/1955
+> > > <4>[  114.502672] Modules linked in: stm_p_basic coresight_tpiu coresight_stm stm_core arm_spe_pmu coresight_funnel coresight_tmc coresight_replicator coresight arm_cmn sha256 cfg80211 rfkill fuse dm_mod ipv6
+> > > <4>[  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT 
+> > > <4>[  114.529261] pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> > > <4>[  114.536469] pc : pkvm_pgtable_stage2_map+0x1ac/0x1c4
+> > > <4>[  114.541681] lr : pkvm_pgtable_stage2_map+0x58/0x1c4
+> > > <4>[  114.546805] sp : ffff80008673b900
+> > > <4>[  114.550366] x29: ffff80008673b900 x28: 0000000000200000 x27: 0000000000200000
+> > > <4>[  114.557748] x26: 0000000000000000 x25: 00000000fffffff4 x24: 000000000000000f
+> > > <4>[  114.565130] x23: ffff008047b65198 x22: 00000000080cbc00 x21: 0000000000040000
+> > > <4>[  114.572512] x20: ffff008046f65680 x19: 0000000000000200 x18: 0000000000000001
+> > > <4>[  114.579893] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> > > <4>[  114.587275] x14: 0000000000000002 x13: 0000000000000002 x12: 000000000031bf68
+> > > <4>[  114.594656] x11: 0000000000000000 x10: 0000ffff8be01000 x9 : ffff8000800728b0
+> > > <4>[  114.602037] x8 : ffff80008673bab8 x7 : 0000000000000001 x6 : 0000000000000008
+> > > <4>[  114.609419] x5 : 0000000040200000 x4 : 000000000000000f x3 : 0000000000000200
+> > > <4>[  114.616800] x2 : 0000000000040000 x1 : fffffffffffffff4 x0 : 0000000000000000
+> > > <4>[  114.624182] Call trace:
+> > > <4>[  114.626875]  pkvm_pgtable_stage2_map+0x1ac/0x1c4 (P)
+> > > <4>[  114.632088]  kvm_handle_guest_abort+0xe7c/0x12ec
+> > > <4>[  114.636953]  handle_exit+0x60/0x184
+> > > <4>[  114.640689]  kvm_arch_vcpu_ioctl_run+0x35c/0x968
+> > > <4>[  114.645554]  kvm_vcpu_ioctl+0x254/0xa50
+> > > <4>[  114.649638]  __arm64_sys_ioctl+0xac/0x104
+> > > <4>[  114.653896]  invoke_syscall+0x48/0x110
+> > > <4>[  114.657894]  el0_svc_common.constprop.0+0x40/0xe0
+> > > <4>[  114.662846]  do_el0_svc+0x1c/0x28
+> > > <4>[  114.666409]  el0_svc+0x34/0x10c
+> > > <4>[  114.669798]  el0t_64_sync_handler+0xa0/0xe4
+> > > <4>[  114.674228]  el0t_64_sync+0x198/0x19c
+> > > <4>[  114.678137] ---[ end trace 0000000000000000 ]---
+> > >
+> > 
+> > The absence of any versioning information is really unhelpful. What
+> > kernel version is that? Upstream? Next? A date really doesn't help
+> > much, specially given how vague it is. Same thing for KUT.
 > 
-> On Fri, 20 Feb 2026 19:08:59 +0000,
-> Mark Brown <broonie@kernel.org> wrote:
-> > 
-> > Hi,
-> > 
-> > At some point since the 30th of January we have started seeing issues 
-> > in mainline when running kvm-unit-tests on N1SDP in pKVM mode:
-> > 
-> > TESTNAME=pmu-mem-access TIMEOUT=90s MACHINE= ACCEL= ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'
-> > <4>[  114.487201] ------------[ cut here ]------------
-> > <4>[  114.487206] WARNING: arch/arm64/kvm/pkvm.c:393 at pkvm_pgtable_stage2_map+0x1ac/0x1c4, CPU#1: qemu-system-aar/1955
-> > <4>[  114.502672] Modules linked in: stm_p_basic coresight_tpiu coresight_stm stm_core arm_spe_pmu coresight_funnel coresight_tmc coresight_replicator coresight arm_cmn sha256 cfg80211 rfkill fuse dm_mod ipv6
-> > <4>[  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT 
-> > <4>[  114.529261] pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> > <4>[  114.536469] pc : pkvm_pgtable_stage2_map+0x1ac/0x1c4
-> > <4>[  114.541681] lr : pkvm_pgtable_stage2_map+0x58/0x1c4
-> > <4>[  114.546805] sp : ffff80008673b900
-> > <4>[  114.550366] x29: ffff80008673b900 x28: 0000000000200000 x27: 0000000000200000
-> > <4>[  114.557748] x26: 0000000000000000 x25: 00000000fffffff4 x24: 000000000000000f
-> > <4>[  114.565130] x23: ffff008047b65198 x22: 00000000080cbc00 x21: 0000000000040000
-> > <4>[  114.572512] x20: ffff008046f65680 x19: 0000000000000200 x18: 0000000000000001
-> > <4>[  114.579893] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-> > <4>[  114.587275] x14: 0000000000000002 x13: 0000000000000002 x12: 000000000031bf68
-> > <4>[  114.594656] x11: 0000000000000000 x10: 0000ffff8be01000 x9 : ffff8000800728b0
-> > <4>[  114.602037] x8 : ffff80008673bab8 x7 : 0000000000000001 x6 : 0000000000000008
-> > <4>[  114.609419] x5 : 0000000040200000 x4 : 000000000000000f x3 : 0000000000000200
-> > <4>[  114.616800] x2 : 0000000000040000 x1 : fffffffffffffff4 x0 : 0000000000000000
-> > <4>[  114.624182] Call trace:
-> > <4>[  114.626875]  pkvm_pgtable_stage2_map+0x1ac/0x1c4 (P)
-> > <4>[  114.632088]  kvm_handle_guest_abort+0xe7c/0x12ec
-> > <4>[  114.636953]  handle_exit+0x60/0x184
-> > <4>[  114.640689]  kvm_arch_vcpu_ioctl_run+0x35c/0x968
-> > <4>[  114.645554]  kvm_vcpu_ioctl+0x254/0xa50
-> > <4>[  114.649638]  __arm64_sys_ioctl+0xac/0x104
-> > <4>[  114.653896]  invoke_syscall+0x48/0x110
-> > <4>[  114.657894]  el0_svc_common.constprop.0+0x40/0xe0
-> > <4>[  114.662846]  do_el0_svc+0x1c/0x28
-> > <4>[  114.666409]  el0_svc+0x34/0x10c
-> > <4>[  114.669798]  el0t_64_sync_handler+0xa0/0xe4
-> > <4>[  114.674228]  el0t_64_sync+0x198/0x19c
-> > <4>[  114.678137] ---[ end trace 0000000000000000 ]---
-> >
+> Ah no, I can't read:
 > 
-> The absence of any versioning information is really unhelpful. What
-> kernel version is that? Upstream? Next? A date really doesn't help
-> much, specially given how vague it is. Same thing for KUT.
+> [  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT
+> 
+> If that's vanilla 6.19, then there is post Feb 8th. Sorry for the
+> unwarranted rant.
+> 
+> Can you share the configuration for this kernel?
 
-Ah no, I can't read:
+Things get super bizarre with a host compiled with 16kB pages and in
+protected mode. I still can't trigger the warning, but tests stop
+making forward progress, and even running a simple Linux kernel guest
+with kvmtool hangs.
 
-[  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT
+A bit of tracing indicates that at least in the last case, we're stuck
+taking an translation fault on instruction fetch at level 3. But
+that's clearly not new, as even 6.18 is affected.
 
-If that's vanilla 6.19, then there is post Feb 8th. Sorry for the
-unwarranted rant.
-
-Can you share the configuration for this kernel?
+Again, not sure the two things are related, but this needs
+investigating.
 
 Thanks,
 
 	M.
 
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
