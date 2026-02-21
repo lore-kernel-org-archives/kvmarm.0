@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A353EBF1E
-	for <kvmarm@lists.linux.dev>; Sat, 21 Feb 2026 13:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C783C83A14
+	for <kvmarm@lists.linux.dev>; Sat, 21 Feb 2026 13:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771679771; cv=none; b=ig9DE04DAWzxMpXlRSqqOmaXCZJe3NGOBgmwJP8EbGnN7ir2SQouS/R/HH9R/l0KHOA6qV2YeJL1KofNpe3i5OHo0rL1ydA5XszMD/zj4xIlVrjosmurgFC3Q4aEBhCLeBV64wKOK6FAALIZbo+2aWRuHmoNbIcBd6fwsHCahsk=
+	t=1771681374; cv=none; b=ULfBPA2eotc+dFuV2OgrHznMmaJhn7pWbkOz08Ynqde7FAleMzAyIvREvjQGhYzTStXEX0HihMXoL3MCgqZKVV6xJlzeYif8SevZuJvwamDUe1MkvlYVV4xyzo6y5HB4D4V6mWjpK2w1Zp9NbRld0vHsEgCo8KgACKz1JoVJbqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771679771; c=relaxed/simple;
-	bh=jE+jSIPFl9zhbWCmJ1qOB1BmOqnJgZSd7hQtLem7r6Q=;
+	s=arc-20240116; t=1771681374; c=relaxed/simple;
+	bh=v6GR3oqYzvfOr2YecJKXRoYn33wFLOk55C03VlCt/gM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G4yvg/j9Td1p7wG/2P4BNYgsYZYkxrw4B6Iv6PBDeIuI1msmp1x1Soxa0ErIjbfbDuvluvCz1vy4Pb1xY0Av5grHzhTVgdF/WjXp8CCNh0GaS4gWqqvVHn1RTrNXw4760l5sLRhmi2AEdZ+EWesmxwwqubK1DlgDeuzFny+Xak0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SV8s+plr; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=f0B6NHCN6sULO5Lsm/1abRv7kG8Fk3Ahl7BLaCYGYnMVhX1/5Kfs33K5NDE1HgYrCHMvCmZstDueGOmeblHWXJjZCOOL5VlXcXo7d5NIOjFkMCySL1WQjdTIJHjaMZbLvlPfQZ/qJi3CCJ1zFAWMqUe8eODKzw81CrDOuQlEPjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ha3UyzOW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SV8s+plr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2418C4CEF7;
-	Sat, 21 Feb 2026 13:16:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ha3UyzOW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45A69C4CEF7;
+	Sat, 21 Feb 2026 13:42:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771679771;
-	bh=jE+jSIPFl9zhbWCmJ1qOB1BmOqnJgZSd7hQtLem7r6Q=;
+	s=k20201202; t=1771681374;
+	bh=v6GR3oqYzvfOr2YecJKXRoYn33wFLOk55C03VlCt/gM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SV8s+plriRy1ZuQ6LM0N5vavFSgU5TiWcY7SSIwMNPPoF1Qmu1apip8TSzrKSXyT9
-	 a0xXRAAA8Z3aRn9wFuQl2cTrMPtYpOb9adte6bg+ZpE3ZkwHfLO97U1mpjyl6tJTaf
-	 /pnUEKFfRPJPlf9F3FPLrYIlCex9DTDpAg7THy716oWar88zAyqBifV4/QkDx1uBFn
-	 5jkKodX+UsDqVQf9xfzReR+qAXzX7RWZhSkDU2tA4n7LJTlPkb5QsyNu/O+s6HPJNe
-	 xyLHCDeedp7C14TdsO1anBflOXyms7apEHQ9BsIJQK/r3vjwzKAfPDRIMDmCYIYGXP
-	 s95CtW17e6j7w==
+	b=ha3UyzOW5Yxid/1siPoBgGy2my03xA0rTjZ2rmRhwTFKFG0AYvLhSEBbwQuTep2ba
+	 E7GZyamfO9Oy5f6DzY4PpFy1fIRZVADMEDPBbypSX2YHxpKOP5Ph7/28mhV73aTWCn
+	 Dspufk4nRKdR/Te1Fl47QYR2OJgTiAdRYlozDyrmHhxpEr0oPyaEzE7UoxuoCcRHNL
+	 GOoTz/5jsK80AAuEU6lfq2ljAypiv2na7TWaZRIFVA5Q7d4oA77TvSR5C/88KkLwEF
+	 m6BrCqVjix5ve7jPOpvqI/tbtDIi4yJO0f1JxH0XWt/XLDjv78pq1V7uZhVqDUlL7P
+	 FvdggvH8JtTzQ==
 Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
-	id 1B3E11AC5849; Sat, 21 Feb 2026 13:16:08 +0000 (GMT)
-Date: Sat, 21 Feb 2026 13:16:08 +0000
+	id 105BC1AC5849; Sat, 21 Feb 2026 13:42:52 +0000 (GMT)
+Date: Sat, 21 Feb 2026 13:42:52 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
 Cc: Fuad Tabba <tabba@google.com>, Oliver Upton <oupton@kernel.org>,
@@ -39,9 +39,10 @@ Cc: Fuad Tabba <tabba@google.com>, Oliver Upton <oupton@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	Mark Rutland <mark.rutland@arm.com>
 Subject: Re: pKVM breakage in mainline on n1sdp
-Message-ID: <aZmwGK_j3YXZmcp1@sirena.co.uk>
+Message-ID: <aZm2XCZLYxgxL99d@sirena.co.uk>
 References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
  <87bjhie67o.wl-maz@kernel.org>
+ <87a4x2e60i.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,82 +50,46 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Ccxbe4iCmwL0gVpk"
+	protocol="application/pgp-signature"; boundary="hQsWoqqfBdjsjULQ"
 Content-Disposition: inline
-In-Reply-To: <87bjhie67o.wl-maz@kernel.org>
+In-Reply-To: <87a4x2e60i.wl-maz@kernel.org>
 X-Cookie: Think big.  Pollute the Mississippi.
 
 
---Ccxbe4iCmwL0gVpk
+--hQsWoqqfBdjsjULQ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 21, 2026 at 10:33:47AM +0000, Marc Zyngier wrote:
-> On Fri, 20 Feb 2026 19:08:59 +0000,
-> Mark Brown <broonie@kernel.org> wrote:
+On Sat, Feb 21, 2026 at 10:38:05AM +0000, Marc Zyngier wrote:
 
-> > At some point since the 30th of January we have started seeing issues=
-=20
-> > in mainline when running kvm-unit-tests on N1SDP in pKVM mode:
+> If that's vanilla 6.19, then there is post Feb 8th. Sorry for the
+> unwarranted rant.
 
-> The absence of any versioning information is really unhelpful. What
-> kernel version is that? Upstream? Next? A date really doesn't help
-> much, specially given how vague it is. Same thing for KUT.
+It won't be vanilla v6.19, that specific log will be tip of Linus' tree
+=66rom yesterday morning UK time which should be 8bf22c33e7a1 ("Merge tag
+'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net"),
+there were a few results for commits over the day prior to that showing
+the same behaviour.
 
-As mentioned above this is with mainline, that is to say with Linus'
-tree.
+> Can you share the configuration for this kernel?
 
-kvm-unit-tests should be at commit 0ed2cdf3c8 ("arm64: Fix sve_vl() for
-build errors"), though it doesn't announce a version at runtime (and we
-should really update from there, especially once the next release
-happens which will hopefully be soon).
+It should be an arm64 defconfig (I'm having trouble connecting to the
+relevant systems right now to double check).
 
-> > The same tests running on N1SDP in VHE mode seem happy, and I've not
-> > seen any other platforms showing issues.  Unfortunately due to various
-> > infrastructure issues I don't have more detail on when this started
-> > happening or anything, I'll update if I get more.
-
-> I've ran that test on an Altra (Neoverse-N1, same as N1SDP), with both
-> v6.19 and linux/master as of d79526b89571 together with KUT as of
-> 86e53277 and nothing caught fire in protected mode, including a
-> 32-parallel VM test.
-
-Indeed, one of the other machines that wasn't showing these issues for
-me was an Altra.
-
-> Most of KUT's PMU tests fail in protected mode though, probably due
-> some issue with the routing of PMU exceptions (see below), but that
-> doesn't seem new. Fuad, could you please have a look and see if
-> something catches your eye?
-
-Yes, there are a bunch of other long standing failures in protected
-mode, like can be seen with this run on i.MX8MP for Linus' tip of tree:
-
-   https://lava.sirena.org.uk/scheduler/job/2478171#L1365
-
-which is a lot less happy than the non-pKVM run for the same commit on
-the same board:
-
-   https://lava.sirena.org.uk/scheduler/job/2478178#L1360
-
-(those runs will have a more recent kvm-unit-tests version, it's
-separate infrastructure).  I don't recall those tests ever working with
-pKVM.
-
---Ccxbe4iCmwL0gVpk
+--hQsWoqqfBdjsjULQ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmZsBcACgkQJNaLcl1U
-h9BGmQf/SvOZp5An2iuc3Gp/of1ewSqWUC3YTerTTiwrzFE7DaB+HfODvS8ZgEuN
-Zy/wsPEXzZCm6vD88HkUN0NZqra+XWd/vM417NSltatCcAWemaLUwBU9x5/FkECa
-V8i9DinKxwxB2RxRrRaJ2wC+/CwZeDIloM9OtBeReeKvp+KAbNPPQVXaNvPxOqqh
-Q4HjnpQJFXUvfWBO4F+qYp2FxMifJzRU8EGVUCwjOj8Xf3hj21D3NAIg0b26RGiA
-OYMvWsCXYaAg4ex1PMnzREQap4bpKZgXdXYApDRgNgOwyK9uzTkOTtDH4xujKRmU
-GmAERPfn6vrvaa2gImHL4KLs/zHqdw==
-=BFzs
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmZtlgACgkQJNaLcl1U
+h9Chpwf+MGnnovVbLurNrKvyiMsVEn2Q2nWU7AGFk4i1H2xVJFxXRQbaIPACI2YR
++b6PG8V+N4gYKg6n4TXW6mv6IaoGzMlEiZfRc9M2TCf8/6GRfejivPaV6avZZ/PS
+BxqFG2kVl55MBI112eCfiDEPYJbAyioLDWvOjvUXi81J+3HgAOTcPd9PxzIwj5Ye
+IF3RV73EMQwfw8cpGViOSzEYmFIoNM+UPqXfxClgLDuw3fqSBIV1KLUSRuGw4Fvk
+WmVm0bz9reUt91btv3NGtngrg2I+eMqej5ecL3b2fUu8BwAgX6cUn+6EUzIRHM5d
+mjm1cr1GOMtYiaKny+rSJdWSo0993A==
+=s/0e
 -----END PGP SIGNATURE-----
 
---Ccxbe4iCmwL0gVpk--
+--hQsWoqqfBdjsjULQ--
