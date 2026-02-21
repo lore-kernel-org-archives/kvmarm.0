@@ -1,168 +1,149 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBE53176EB;
-	Fri, 20 Feb 2026 19:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6421DF742
+	for <kvmarm@lists.linux.dev>; Sat, 21 Feb 2026 10:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771614892; cv=none; b=UsoMjsufmU9U0DM13AgMSwDAjTd6GN8ZcxKGHXPw15Tkg8PYD9qGZKz9LrD+aK9HTrOUeizrf74WHh8WygOodoetwh2A0Ft9q3X5bxdQV/oTgTJrtUIV2fPVQVenGmNpMw9VtyREoU3409LY5Q7XUZAQEz6+0zIUsDCb1/2UTmI=
+	t=1771670031; cv=none; b=c/qOBw03ECkN/TWlMVcJU6nYeLJrrgpoOkJ1QuVEmA0AIklR0btLuP8pde0PK9UZQ0m0xWZ8r70sLu4SmJDT8cSU6J+t7LwcUDPeMwnlRjwF1PLbxkXTJAlXfUsVHyUCbiYjDmhgUH7aOvZptrxaO9Wpr8/b7FGWF5w7god4cVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771614892; c=relaxed/simple;
-	bh=N/dul5YjHzDXPfrduHVCi4Yg6lOyDfk2HzDDWaV+YQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHkru+qcOA7XTY9aTxcw1oOesaN4Qm60W5/mcxnC8ELNN3kZH8e6o4MgHEJm48X7XbYs9yeODMeslRoJ2CXw1BXqyRNqFeQ8XdSeSdCLMalTfK6i7aerg/I9REYCggWvdjrPC5zA3w7hCzDBG/tsTrHEvlf3dpGmBrgjD6EO9Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dl4K9twK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771670031; c=relaxed/simple;
+	bh=9snIQC5gOtrXWI618rDXRUe8IuUkpdJsVIaZXCRFb1c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ULmU6nTId1Slle5YaG6QTxhfjbZ4vzbSMunwP1yvf+0qDK6vJH5dbZOCekFxZHtuQZv5v0gfnCX8jM1+Od8dn4FUSsoIgIOgAM8Jioe/0qWgDTLlY39MrWCf10ZbSLH6E0lt4P5nkTcUwNJfXC2Lhxx5uKuKmy5cE/US0xvJK30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hh/NO0k7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dl4K9twK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA755C116C6;
-	Fri, 20 Feb 2026 19:14:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hh/NO0k7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A49E4C19424;
+	Sat, 21 Feb 2026 10:33:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771614892;
-	bh=N/dul5YjHzDXPfrduHVCi4Yg6lOyDfk2HzDDWaV+YQQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Dl4K9twKTKk+64XuV3tx697p+tSKE4KpQAY+Nm3YF1p4RQ05z2krCL7vET+svQbq5
-	 VG8ENPLrxvLm/+whZxz7wR4sSkpTeUfkYv0ng1u1YVUiDdnp8o8K/ltQpAb0sRhhOy
-	 rXgnEi1fxdVV7wKy6o/+ac2dBU905VE6WwRTURFE2/UJPkevi35wRQJ3wcx8pxvJL3
-	 qH7yoJBL8zTJatIySTsfhPDUB1BBxBRzyo1NKjJzbcnEssXaEJKTQi0Oye1uhAaXPh
-	 P3BILrh7CooTpzS9Xd2cs8bvXzY3zgzfP1rVyzHWfNebJK+Q3V4jNuZh9AQyF9VNxU
-	 mNL8AGmVqa1wA==
-Date: Fri, 20 Feb 2026 11:14:49 -0800
-From: Namhyung Kim <namhyung@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <pjw@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Xin Li <xin@zytor.com>,
-	"H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	Mingwei Zhang <mizhang@google.com>,
-	Xudong Hao <xudong.hao@intel.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v6 42/44] KVM: VMX: Dedup code for adding MSR to VMCS's
- auto list
-Message-ID: <aZiyqcd2V6Ncm6wY@google.com>
-References: <20251206001720.468579-1-seanjc@google.com>
- <20251206001720.468579-43-seanjc@google.com>
- <aZdlBkLEQyv9q5ll@google.com>
- <aZe6UR1EGg0RcB69@google.com>
+	s=k20201202; t=1771670030;
+	bh=9snIQC5gOtrXWI618rDXRUe8IuUkpdJsVIaZXCRFb1c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hh/NO0k7XuaBoh0KVavsZYCQMZF8F5LIHEv6GdfF/CNt9Vk/ROvW6rEql0kETjykA
+	 22ncgHNdpqF74CcHHxTJfnx21WJoeiygNsTGLG2vWvoMe7QN0tsyS5LzvzspjHm8ag
+	 DTq6z+nuDsVHGEtp1JBr/SK6Iecnn36amJUxUGBspOzu9qR+EmN83h+bdQwTNMoCY/
+	 tGM+0gg/5uTeYiy8gIqUQXJ6SXoeOA0POmy17XRrRw37EO/hbykl15foNDe5qvYB0M
+	 VgJRrAYElRiBNzTSHiGzPMVN/ghg6orM56mkgc1m5VWpfYH1hOzgWbd2cGKsr667wU
+	 +WNol40LL6aGw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vtkJ2-0000000CcZ9-1M96;
+	Sat, 21 Feb 2026 10:33:48 +0000
+Date: Sat, 21 Feb 2026 10:33:47 +0000
+Message-ID: <87bjhie67o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>, 	Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>
+Subject: Re: pKVM breakage in mainline on n1sdp
+In-Reply-To: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
+References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aZe6UR1EGg0RcB69@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, tabba@google.com, oupton@kernel.org, catalin.marinas@arm.com, will@kernel.org, suzuki.poulose@arm.com, joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 20, 2026 at 08:46:07AM -0800, Sean Christopherson wrote:
-> On Thu, Feb 19, 2026, Namhyung Kim wrote:
-> > Hello,
-> > 
-> > On Fri, Dec 05, 2025 at 04:17:18PM -0800, Sean Christopherson wrote:
-> > > Add a helper to add an MSR to a VMCS's "auto" list to deduplicate the code
-> > > in add_atomic_switch_msr(), and so that the functionality can be used in
-> > > the future for managing the MSR auto-store list.
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmx.c | 41 +++++++++++++++++++----------------------
-> > >  1 file changed, 19 insertions(+), 22 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 018e01daab68..3f64d4b1b19c 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -1093,12 +1093,28 @@ static __always_inline void add_atomic_switch_msr_special(struct vcpu_vmx *vmx,
-> > >  	vm_exit_controls_setbit(vmx, exit);
-> > >  }
-> > >  
-> > > +static void vmx_add_auto_msr(struct vmx_msrs *m, u32 msr, u64 value,
-> > > +			     unsigned long vmcs_count_field, struct kvm *kvm)
-> > > +{
-> > > +	int i;
-> > > +
-> > > +	i = vmx_find_loadstore_msr_slot(m, msr);
-> > > +	if (i < 0) {
-> > > +		if (KVM_BUG_ON(m->nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > > +			return;
-> > > +
-> > > +		i = m->nr++;
-> > > +		m->val[i].index = msr;
-> > > +		vmcs_write32(vmcs_count_field, m->nr);
-> > > +	}
-> > > +	m->val[i].value = value;
-> > > +}
-> > > +
-> > >  static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
-> > >  				  u64 guest_val, u64 host_val)
-> > >  {
-> > >  	struct msr_autoload *m = &vmx->msr_autoload;
-> > >  	struct kvm *kvm = vmx->vcpu.kvm;
-> > > -	int i;
-> > >  
-> > >  	switch (msr) {
-> > >  	case MSR_EFER:
-> > > @@ -1132,27 +1148,8 @@ static void add_atomic_switch_msr(struct vcpu_vmx *vmx, unsigned msr,
-> > >  		wrmsrq(MSR_IA32_PEBS_ENABLE, 0);
-> > >  	}
-> > >  
-> > > -	i = vmx_find_loadstore_msr_slot(&m->guest, msr);
-> > > -	if (i < 0) {
-> > > -		if (KVM_BUG_ON(m->guest.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > > -			return;
-> > > -
-> > > -		i = m->guest.nr++;
-> > > -		m->guest.val[i].index = msr;
-> > > -		vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT, m->guest.nr);
-> > > -	}
-> > > -	m->guest.val[i].value = guest_val;
-> > > -
-> > > -	i = vmx_find_loadstore_msr_slot(&m->host, msr);
-> > > -	if (i < 0) {
-> > > -		if (KVM_BUG_ON(m->host.nr == MAX_NR_LOADSTORE_MSRS, kvm))
-> > > -			return;
-> > > -
-> > > -		i = m->host.nr++;
-> > > -		m->host.val[i].index = msr;
-> > > -		vmcs_write32(VM_EXIT_MSR_LOAD_COUNT, m->host.nr);
-> > > -	}
-> > > -	m->host.val[i].value = host_val;
-> > > +	vmx_add_auto_msr(&m->guest, msr, guest_val, VM_ENTRY_MSR_LOAD_COUNT, kvm);
-> > > +	vmx_add_auto_msr(&m->guest, msr, host_val, VM_EXIT_MSR_LOAD_COUNT, kvm);
-> > 
-> > Shouldn't it be &m->host for the host_val?
+[+ Fuad for the protected mode stuff]
+
+On Fri, 20 Feb 2026 19:08:59 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> Ouch.  Yes.  How on earth did this escape testing...  Ah, because in practice
-> only MSR_IA32_PEBS_ENABLE goes through the load lists, and the VM-Entry load list
-> will use the guest's value due to VM_ENTRY_MSR_LOAD_COUNT not covering the bad
-> host value.
+> Hi,
 > 
-> Did you happen to run into problems when using PEBS events in the host?
-
-No, I just found it by reading the patch.
-
+> At some point since the 30th of January we have started seeing issues 
+> in mainline when running kvm-unit-tests on N1SDP in pKVM mode:
 > 
-> Regardless, do you want to send a patch?  Either way, I'll figure out a way to
-> verify the bug and the fix.
+> TESTNAME=pmu-mem-access TIMEOUT=90s MACHINE= ACCEL= ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'
+> <4>[  114.487201] ------------[ cut here ]------------
+> <4>[  114.487206] WARNING: arch/arm64/kvm/pkvm.c:393 at pkvm_pgtable_stage2_map+0x1ac/0x1c4, CPU#1: qemu-system-aar/1955
+> <4>[  114.502672] Modules linked in: stm_p_basic coresight_tpiu coresight_stm stm_core arm_spe_pmu coresight_funnel coresight_tmc coresight_replicator coresight arm_cmn sha256 cfg80211 rfkill fuse dm_mod ipv6
+> <4>[  114.520924] CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT 
+> <4>[  114.529261] pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> <4>[  114.536469] pc : pkvm_pgtable_stage2_map+0x1ac/0x1c4
+> <4>[  114.541681] lr : pkvm_pgtable_stage2_map+0x58/0x1c4
+> <4>[  114.546805] sp : ffff80008673b900
+> <4>[  114.550366] x29: ffff80008673b900 x28: 0000000000200000 x27: 0000000000200000
+> <4>[  114.557748] x26: 0000000000000000 x25: 00000000fffffff4 x24: 000000000000000f
+> <4>[  114.565130] x23: ffff008047b65198 x22: 00000000080cbc00 x21: 0000000000040000
+> <4>[  114.572512] x20: ffff008046f65680 x19: 0000000000000200 x18: 0000000000000001
+> <4>[  114.579893] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> <4>[  114.587275] x14: 0000000000000002 x13: 0000000000000002 x12: 000000000031bf68
+> <4>[  114.594656] x11: 0000000000000000 x10: 0000ffff8be01000 x9 : ffff8000800728b0
+> <4>[  114.602037] x8 : ffff80008673bab8 x7 : 0000000000000001 x6 : 0000000000000008
+> <4>[  114.609419] x5 : 0000000040200000 x4 : 000000000000000f x3 : 0000000000000200
+> <4>[  114.616800] x2 : 0000000000040000 x1 : fffffffffffffff4 x0 : 0000000000000000
+> <4>[  114.624182] Call trace:
+> <4>[  114.626875]  pkvm_pgtable_stage2_map+0x1ac/0x1c4 (P)
+> <4>[  114.632088]  kvm_handle_guest_abort+0xe7c/0x12ec
+> <4>[  114.636953]  handle_exit+0x60/0x184
+> <4>[  114.640689]  kvm_arch_vcpu_ioctl_run+0x35c/0x968
+> <4>[  114.645554]  kvm_vcpu_ioctl+0x254/0xa50
+> <4>[  114.649638]  __arm64_sys_ioctl+0xac/0x104
+> <4>[  114.653896]  invoke_syscall+0x48/0x110
+> <4>[  114.657894]  el0_svc_common.constprop.0+0x40/0xe0
+> <4>[  114.662846]  do_el0_svc+0x1c/0x28
+> <4>[  114.666409]  el0_svc+0x34/0x10c
+> <4>[  114.669798]  el0t_64_sync_handler+0xa0/0xe4
+> <4>[  114.674228]  el0t_64_sync+0x198/0x19c
+> <4>[  114.678137] ---[ end trace 0000000000000000 ]---
+>
 
-Sure, will do.
+The absence of any versioning information is really unhelpful. What
+kernel version is that? Upstream? Next? A date really doesn't help
+much, specially given how vague it is. Same thing for KUT.
+
+> The same tests running on N1SDP in VHE mode seem happy, and I've not
+> seen any other platforms showing issues.  Unfortunately due to various
+> infrastructure issues I don't have more detail on when this started
+> happening or anything, I'll update if I get more.
+
+I've ran that test on an Altra (Neoverse-N1, same as N1SDP), with both
+v6.19 and linux/master as of d79526b89571 together with KUT as of
+86e53277 and nothing caught fire in protected mode, including a
+32-parallel VM test.
+
+Most of KUT's PMU tests fail in protected mode though, probably due
+some issue with the routing of PMU exceptions (see below), but that
+doesn't seem new. Fuad, could you please have a look and see if
+something catches your eye?
 
 Thanks,
-Namhyung
 
+	M.
+
+maz@filthy-habits:~/kvm-unit-tests$ ./arm/run arm/pmu.flat -smp 1 -append 'pmu-mem-access'
+/usr/bin/qemu-system-aarch64 -nodefaults -machine virt,gic-version=host -accel kvm -cpu host -device virtio-serial-device -device virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none -serial stdio -kernel arm/pmu.flat -smp 1 -append pmu-mem-access # -initrd /tmp/tmp.S6qLYpNV6X
+INFO: PMU version: 0x4
+INFO: PMU implementer/ID code: 0(" ")/0
+INFO: Implements 6 event counters
+INFO: pmu: pmu-mem-access: 32-bit overflows: counter #0 is 0x0 (MEM_ACCESS)
+INFO: pmu: pmu-mem-access: 32-bit overflows: counter #1 is 0x0 (MEM_ACCESS)
+FAIL: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses
+FAIL: pmu: pmu-mem-access: 32-bit overflows: Ran 20 mem accesses with expected overflows on both counters
+INFO: pmu: pmu-mem-access: 32-bit overflows: cnt#0=0xfffffff0 cnt#1=0xfffffff0 overflow=0x0
+SKIP: pmu: pmu-mem-access: 64-bit overflows: Skip test as 64 overflows need FEAT_PMUv3p5
+SUMMARY: 3 tests, 2 unexpected failures, 1 skipped
+
+EXIT: STATUS=3
+
+-- 
+Jazz isn't dead. It just smells funny.
