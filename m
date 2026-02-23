@@ -1,119 +1,201 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F83155757
-	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 14:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF1A1E51E0;
+	Mon, 23 Feb 2026 14:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771856877; cv=none; b=QqIoC53feaBAoGZOiHgE4pAGVivm7JHs1PEWKF+TNoWOeGbXh4//5SH2jbEkxCwvY3fh4i0JzmVtL3lKDSL84wzXx4/YLYBxZkhDnSMW84N4OeDyr0d+CGlYcylvotgr89fF1wKKOlFs5ALc/tE8fpYKs19dHUstP/l/jCu0WU0=
+	t=1771857108; cv=none; b=GMkbP067Y6qavrFnKy0bwECkpxuJ7QtFglkFxnX+lP/l1fELiwDX/BjBWnOu5B46LAJfbxcTje3jPZgA/NssXS9PG1NWXzcx9EhFcQIG6MonEZU4ozNEYuPjsTFm1svn8hUql8i+2rTj5E1wyn1skjSOXJ6NZVI7QKo4u29KfRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771856877; c=relaxed/simple;
-	bh=Xu/qpZ8MrYMsaZJT4hMSe8XVOwxu0IZGwImZRtSZlP8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HnhsWgAelxWdtSlQayej++kyg2CTt//akkdjf3F1mR8k8pZ6Jr4bhegCv7FMHGJPV9s++dYYNMpzFOTAO37P38OGJJ12idfZkDugPhxWAmGmb3q3ZOkPFmejKH5fxYJbG+SSxfDbpP/suEvt1H+Q9vHuwW6Wg1MQwWw6l5stS/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5Yv5FZQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771857108; c=relaxed/simple;
+	bh=uvxjc3u+eEoVHR5qOt+YwCCEfRQPCFwxaSBSRePagcg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X5S0DThe//1bPL6GIwL56cOnxvtoCQzxhiMJPHr8LsEiAAxwjwn4sCPVLSQwtuQOQhpATa2WwW8pWCF+PJ8d46JYo5mz8/lEN76+TZC/uk7AaT/OeuN5hIGQT7hXjhq+ylgUs49yc+cJuQ0k7loaRM4Ahteje0AFFG5nirX5Q3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FfjS5JM7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5Yv5FZQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62EF9C116C6;
-	Mon, 23 Feb 2026 14:27:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FfjS5JM7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE067C116C6;
+	Mon, 23 Feb 2026 14:31:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771856876;
-	bh=Xu/qpZ8MrYMsaZJT4hMSe8XVOwxu0IZGwImZRtSZlP8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i5Yv5FZQoTig+ho19Y7LTHAo+iOvINI3/BmGjRxJAsnIk+FjoEAAc5aZ9pqoatnoH
-	 yBTmd2ABqtSueuL7cJOv0U+qJJgGkU81jxBdj1Rb9wIqnaqETPolb5iwdpdF0VHM3p
-	 UvpjEuZlzqymZ3deaCin1xLH+WcrFWGeSDqu5obZd8tL6tPaCuyfENveZ3YRoUX0FV
-	 yQT1O88qQ0jyCVR26peI1a4mKDItXqimmNZMxGBXyc408l16EVPgEw6NyqaRHkguWG
-	 uCjmCeExIeDH8BCzSBxqRKMTwsy0Vq6vPaqRA5/+/5tczg7yEz5mKFGo4Sq0+kMjin
-	 9wU4T9en2yE6g==
-Date: Mon, 23 Feb 2026 14:27:51 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
+	s=k20201202; t=1771857107;
+	bh=uvxjc3u+eEoVHR5qOt+YwCCEfRQPCFwxaSBSRePagcg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FfjS5JM7d0Vm1pMm4tIB2CXORmjC64ca4v97ykS0PmAJcHZABjOCX5Dw/hEOxqchI
+	 dfDIoUlBiz1bwmFbHhHRCp93Zd7nPbrhhgpa5mUR14hYCKlXsn5zIO++RjktGGwrnp
+	 hkx3xxB7XQ4pD3gGy+vrtSvw4/5dm/wZEhYoHnDpEkRSfq2S2VmkXUJHuER8ApQxXT
+	 V/OBRd92HpQxoZckxOCTt2SIp24jLlZcNCSAYCQAIS7fzcJqWkkMXD1Qpvc012Rvbl
+	 vShAhJDiU6wuayERxJQtBuvYWCaPj4r8d7vA1uxDxT2NCrP3hcrVY/9MFJDg1wVsXE
+	 jsHPvF53Z4vuA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vuWyP-0000000D1O6-1IPN;
+	Mon, 23 Feb 2026 14:31:45 +0000
+Date: Mon, 23 Feb 2026 14:31:44 +0000
+Message-ID: <86ldgja5v3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: pKVM breakage in mainline on n1sdp
-Message-ID: <fbe627c3-02fd-48e9-84f1-c6587da13d94@sirena.org.uk>
-References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
- <87bjhie67o.wl-maz@kernel.org>
- <87a4x2e60i.wl-maz@kernel.org>
- <aZm2XCZLYxgxL99d@sirena.co.uk>
- <aZwmevKcvW2HxdJ5@J2N7QTR9R3>
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Hyesoo Yu <hyesoo.yu@samsung.com>,
+	Quentin Perret <qperret@google.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] arm64: Force the use of CNTVCT_EL0 in __delay()
+In-Reply-To: <aZw3EGs4rbQvbAzV@e134344.arm.com>
+References: <20260213141619.1791283-1-maz@kernel.org>
+	<aZw3EGs4rbQvbAzV@e134344.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kedVc5uWqaZsu8rh"
-Content-Disposition: inline
-In-Reply-To: <aZwmevKcvW2HxdJ5@J2N7QTR9R3>
-X-Cookie: My LESLIE GORE record is BROKEN ...
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, catalin.marinas@arm.com, hyesoo.yu@samsung.com, qperret@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+Hi Ben,
 
---kedVc5uWqaZsu8rh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 23 Feb 2026 11:16:32 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Feb 13, 2026 at 02:16:19PM +0000, Marc Zyngier wrote:
+> > Quentin forwards a report from Hyesoo Yu, describing an interesting
+> > problem with the use of WFxT in __delay() when a vcpu is loaded and
+> > that KVM is *not* in VHE mode (either nVHE or hVHE).
+> > 
+> > In this case, CNTVOFF_EL2 is set to a non-zero value to reflect the
+> > state of the guest virtual counter. At the same time, __delay() is
+> > using get_cycles() to read the counter value, which is indirected to
+> > reading CNTPCT_EL0.
+> > 
+> > The core of the issue is that WFxT is using the *virtual* counter,
+> > while the kernel is using the physical counter, and that the offset
+> > introduces a really bad discrepancy between the two.
+> > 
+> > Fix this by forcing the use of CNTVCT_EL0, making __delay() consistent
+> > irrespective of the value of CNTVOFF_EL2.
+> > 
+> > Reported-by: Hyesoo Yu <hyesoo.yu@samsung.com>
+> > Reported-by: Quentin Perret <qperret@google.com>
+> > Reviewed-by: Quentin Perret <qperret@google.com>
+> > Fixes: 7d26b0516a0df ("arm64: Use WFxT for __delay() when possible")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/ktosachvft2cgqd5qkukn275ugmhy6xrhxur4zqpdxlfr3qh5h@o3zrfnsq63od
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/lib/delay.c | 19 +++++++++++++++----
+> >  1 file changed, 15 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
+> > index cb2062e7e2340..d02341303899e 100644
+> > --- a/arch/arm64/lib/delay.c
+> > +++ b/arch/arm64/lib/delay.c
+> > @@ -23,9 +23,20 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
+> >  	return (xloops * loops_per_jiffy * HZ) >> 32;
+> >  }
+> >  
+> > +/*
+> > + * Force the use of CNTVCT_EL0 in order to have the same base as WFxT.
+> > + * This avoids some annoying issues when CNTVOFF_EL2 is not reset 0 on a
+> > + * KVM host running at EL1 until we do a vcpu_put() on the vcpu. When
+> > + * running at EL2, the effective offset is always 0.
+> > + *
+> > + * Note that userspace cannot change the offset behind our back either,
+> > + * as the vcpu mutex is held as long as KVM_RUN is in progress.
+> > + */
+> > +#define __delay_cycles()	__arch_counter_get_cntvct_stable()
+> 
+> I'm seeing this CONFIG_DEBUG_PREEMPT warning, see below, when running 7.0-rc1 on
+> FVP Base RevC. I haven't tried bisecting but it looks to be introduced by this
+> change.
+> 
+> The calls are:
+> 
+> __this_cpu_read()
+> erratum_handler()
+> arch_timer_reg_read_stable()
+> __arch_counter_get_cntvct_stable()
+> __delay()
+> 
+> This silences the warning:
+> 
+> diff --git a/arch/arm64/include/asm/arch_timer.h b/arch/arm64/include/asm/arch_timer.h
+> index f5794d50f51d..f07e4efa0d2b 100644
+> --- a/arch/arm64/include/asm/arch_timer.h
+> +++ b/arch/arm64/include/asm/arch_timer.h
+> @@ -24,14 +24,14 @@
+>  #define has_erratum_handler(h)                                         \
+>         ({                                                              \
+>                 const struct arch_timer_erratum_workaround *__wa;       \
+> -               __wa = __this_cpu_read(timer_unstable_counter_workaround); \
+> +               __wa = raw_cpu_read(timer_unstable_counter_workaround); \
+>                 (__wa && __wa->h);                                      \
+>         })
+>  
+>  #define erratum_handler(h)                                             \
+>         ({                                                              \
+>                 const struct arch_timer_erratum_workaround *__wa;       \
+> -               __wa = __this_cpu_read(timer_unstable_counter_workaround); \
+> +               __wa = raw_cpu_read(timer_unstable_counter_workaround); \
+>                 (__wa && __wa->h) ? ({ isb(); __wa->h;}) : arch_timer_##h; \
+>         })
 
-On Mon, Feb 23, 2026 at 10:05:46AM +0000, Mark Rutland wrote:
-> On Sat, Feb 21, 2026 at 01:42:52PM +0000, Mark Brown wrote:
+It does indeed silence it, but that's IMO the wrong thing to do since
+you can end-up calling a workaround helper on the wrong CPU if
+preempted.  If you look at how things were done before this patch, we
+had:
 
-> > It won't be vanilla v6.19, that specific log will be tip of Linus' tree
-> > from yesterday morning UK time which should be 8bf22c33e7a1 ("Merge tag
-> > 'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/n=
-et"),
-> > there were a few results for commits over the day prior to that showing
-> > the same behaviour.
+get_cycles() -> arch_timer_read_counter() -> arch_counter_get_cntvct_stable()
 
-> Are you sure? That log says:
+Crucially, arch_counter_get_cntvct_stable() does disable preemption,
+and we should preserve it. Something like this:
 
->   CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PRE=
-EMPT  =20
+diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
+index d02341303899e..25fb593f95b0c 100644
+--- a/arch/arm64/lib/delay.c
++++ b/arch/arm64/lib/delay.c
+@@ -32,7 +32,16 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
+  * Note that userspace cannot change the offset behind our back either,
+  * as the vcpu mutex is held as long as KVM_RUN is in progress.
+  */
+-#define __delay_cycles()	__arch_counter_get_cntvct_stable()
++static cycles_t __delay_cycles(void)
++{
++	cycles_t val;
++
++	preempt_disable();
++	val = __arch_counter_get_cntvct_stable();
++	preenpt_enable();
++
++	return val;
++}
+ 
+ void __delay(unsigned long cycles)
+ {
 
-> ... where "6.19.0" means that's the 6.19 tag, and "#1" means that's the
-> first build against that.
+The question is whether there is a material benefit in replicating the
+arch_timer_read_counter() indirection for the virtual counter in order
+to not pay the price of preempt_disable() when we're on a non-broken
+system (hopefully the vast majority of implementations).
 
-The UI claims that we're seeing this in 956b9cbd7f156 (Merge tag
-'kbuild-fixes-7.0-1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/kbuild/linux) but
-unfortunately the build logs don't clearly confirm this.
+Thanks,
 
-All the builds are fresh builds in a new container so it would be
-surprising if we reported a build number other than 1.
+	M.
 
-> Is the build system overriding things such that this is misleading?
-
-I believe that to be the case here, the builds are not building from a
-git checkout but rather the build coordination is packing a tarball of
-the source up then handing that off to be built on a separate system
-which means that the magic to figure out the git describe and put that
-into the version number during the build can't do anything and just
-reports whatever is in the Makefile.
-
-> Is there potentially a problem with the build system?
-
-I can't 100% discount that possibility but it does seem to DTRT for
-other commits and has done for a long time.
-
---kedVc5uWqaZsu8rh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmcY+YACgkQJNaLcl1U
-h9ABJAf/bmikUHaa7X45/hwLAckp2UmAK5tgs7Vm7Z/8ttuQZzXQ+73y+8mOT332
-cm7iaTK+2auzw/EBIzzBX2khEjak/35SiZaVa92c7vXpzEAwSV/DypoRgEBADSMq
-2mg1RghdBoCoRkHeVBUeQjL5Q2VOFJQRkefDNtAnBWr4/rEV9UUQRAf+bUTRwFlN
-p+s6HGgx5M+Btx80EJGK7pWkQJf+n8nXHDW3YaDfwDA/DyxWKJ0DxGLT7nrIxXfe
-HS7V6k4+Vd/4j/PnF1tISRTK/ZgKS/TLX6uwu/W9Aft14/D6WFNSpvATa8HgBnfu
-WhvzSJ3gNH2CHkYJYgvq9Sny/6R4Mw==
-=q1pY
------END PGP SIGNATURE-----
-
---kedVc5uWqaZsu8rh--
+-- 
+Without deviation from the norm, progress is not possible.
