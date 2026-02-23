@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9243382F0
-	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 17:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06A433971F
+	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 17:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771868897; cv=none; b=eLsCx+4fB1D1chpSVztzhWGn/SZuDDrUa5zxcPFvdokjPrlYKdp0gAlmiO3zfXIUOOD55eG/U9xiy6m3khq+Ia0HzQexuHr5RPfAKAz1SM14stImGWZvnySKIteOymWi3qaFiGtCeVAf7+ai1KLUfYEzTFxyeJ5fxpGwzL2O54w=
+	t=1771868901; cv=none; b=KQJi4FVFE7P7Ht4eTgDcAOtxPhmosNH7/uhHKsR/aq+YkRMApqjLhzi9cG3ve8WePtlsDAeXuBqwAPVfwBFBP+GK667S/WlpmSuXqavUt2LRZWLdiiSfJqpoaCTwMGUDe1v5I8UN8NBqahU0WTh90D/qiEV8sjoGzsnXOVDx+Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771868897; c=relaxed/simple;
-	bh=vu1YTnurQsdl41tWBjnRNhm7kHGYenI4f+h1W0AsaGE=;
+	s=arc-20240116; t=1771868901; c=relaxed/simple;
+	bh=SNX/D48g9/JuM8Kz40mbQ8gmXd6GXp6lOTES05iEhFc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TCLxMewB1TtgK2uYM30p6vKbHgLXtvviQ4MOCLHQU8k60R/OZPTaQZweE+P7iu1O9pezX0K2+VoRPtWHp1QlZbjN8Pf/brbvnu5kzekGb49Hy4fnkiXQf5Cbu5fIQRf2tvkzC6t5GwkjDpHi4HIvorv+ZdIB/uhC3N3LNWiKHm8=
+	 MIME-Version; b=czky7l6FoyR4wImkW/yXnFZjYuTixAlhX4bE6WXUcWF07CcG4YDA41ZgpKtpow8mwbgCQB0ZeckIzuf6AYEuvvfPXNuqntr2kGlASa0CUX2G1f8G2J0WmUvzzXBJuuRPQWGYtzu/M/NNLTwhjkTSMz7TFcdKs0H573ALstLm3So=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00B4E1596;
-	Mon, 23 Feb 2026 09:48:10 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8EC4339;
+	Mon, 23 Feb 2026 09:48:12 -0800 (PST)
 Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 96B153F59E;
-	Mon, 23 Feb 2026 09:48:13 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 923803F59E;
+	Mon, 23 Feb 2026 09:48:16 -0800 (PST)
 From: Yeoreum Yun <yeoreum.yun@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: catalin.marinas@arm.com,
 	joey.gouly@arm.com,
 	yuzenghui@huawei.com,
 	yeoreum.yun@arm.com
-Subject: [PATCH v13 3/8] KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
-Date: Mon, 23 Feb 2026 17:47:57 +0000
-Message-Id: <20260223174802.458411-4-yeoreum.yun@arm.com>
+Subject: [PATCH v13 4/8] arm64: futex: refactor futex atomic operation
+Date: Mon, 23 Feb 2026 17:47:58 +0000
+Message-Id: <20260223174802.458411-5-yeoreum.yun@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260223174802.458411-1-yeoreum.yun@arm.com>
 References: <20260223174802.458411-1-yeoreum.yun@arm.com>
@@ -52,26 +52,220 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add test coverage for FEAT_LSUI.
+Refactor futex atomic operations using ll/sc method with
+clearing PSTATE.PAN to prepare to apply FEAT_LSUI on them.
 
 Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/futex.h | 137 +++++++++++++++++++++------------
+ 1 file changed, 87 insertions(+), 50 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 73de5be58bab..fa3478a6c914 100644
---- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -124,6 +124,7 @@ static const struct reg_ftr_bits ftr_id_aa64isar2_el1[] = {
+diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+index bc06691d2062..9a0efed50743 100644
+--- a/arch/arm64/include/asm/futex.h
++++ b/arch/arm64/include/asm/futex.h
+@@ -7,21 +7,25 @@
  
- static const struct reg_ftr_bits ftr_id_aa64isar3_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FPRCVT, 0),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSUI, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, LSFE, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64ISAR3_EL1, FAMINMAX, 0),
- 	REG_FTR_END,
+ #include <linux/futex.h>
+ #include <linux/uaccess.h>
++#include <linux/stringify.h>
+ 
+ #include <asm/errno.h>
+ 
+ #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+ 
+-#define __futex_atomic_op(insn, ret, oldval, uaddr, tmp, oparg)		\
+-do {									\
++#define LLSC_FUTEX_ATOMIC_OP(op, insn)					\
++static __always_inline int						\
++__llsc_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
++{									\
+ 	unsigned int loops = FUTEX_MAX_LOOPS;				\
++	int ret, oldval, newval;					\
+ 									\
+ 	uaccess_enable_privileged();					\
+-	asm volatile(							\
++	asm volatile("// __llsc_futex_atomic_" #op "\n"			\
+ "	prfm	pstl1strm, %2\n"					\
+-"1:	ldxr	%w1, %2\n"						\
++"1:	ldxr	%w[oldval], %2\n"					\
+ 	insn "\n"							\
+-"2:	stlxr	%w0, %w3, %2\n"						\
++"2:	stlxr	%w0, %w[newval], %2\n"					\
+ "	cbz	%w0, 3f\n"						\
+ "	sub	%w4, %w4, %w0\n"					\
+ "	cbnz	%w4, 1b\n"						\
+@@ -30,50 +34,109 @@ do {									\
+ "	dmb	ish\n"							\
+ 	_ASM_EXTABLE_UACCESS_ERR(1b, 3b, %w0)				\
+ 	_ASM_EXTABLE_UACCESS_ERR(2b, 3b, %w0)				\
+-	: "=&r" (ret), "=&r" (oldval), "+Q" (*uaddr), "=&r" (tmp),	\
++	: "=&r" (ret), [oldval] "=&r" (oldval), "+Q" (*uaddr),		\
++	  [newval] "=&r" (newval),					\
+ 	  "+r" (loops)							\
+-	: "r" (oparg), "Ir" (-EAGAIN)					\
++	: [oparg] "r" (oparg), "Ir" (-EAGAIN)				\
+ 	: "memory");							\
+ 	uaccess_disable_privileged();					\
+-} while (0)
++									\
++	if (!ret)							\
++		*oval = oldval;						\
++									\
++	return ret;							\
++}
++
++LLSC_FUTEX_ATOMIC_OP(add, "add	%w[newval], %w[oldval], %w[oparg]")
++LLSC_FUTEX_ATOMIC_OP(or,  "orr	%w[newval], %w[oldval], %w[oparg]")
++LLSC_FUTEX_ATOMIC_OP(and, "and	%w[newval], %w[oldval], %w[oparg]")
++LLSC_FUTEX_ATOMIC_OP(eor, "eor	%w[newval], %w[oldval], %w[oparg]")
++LLSC_FUTEX_ATOMIC_OP(set, "mov	%w[newval], %w[oparg]")
++
++static __always_inline int
++__llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
++{
++	int ret = 0;
++	unsigned int loops = FUTEX_MAX_LOOPS;
++	u32 val, tmp;
++
++	uaccess_enable_privileged();
++	asm volatile("//__llsc_futex_cmpxchg\n"
++"	prfm	pstl1strm, %2\n"
++"1:	ldxr	%w1, %2\n"
++"	eor	%w3, %w1, %w5\n"
++"	cbnz	%w3, 4f\n"
++"2:	stlxr	%w3, %w6, %2\n"
++"	cbz	%w3, 3f\n"
++"	sub	%w4, %w4, %w3\n"
++"	cbnz	%w4, 1b\n"
++"	mov	%w0, %w7\n"
++"3:\n"
++"	dmb	ish\n"
++"4:\n"
++	_ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
++	_ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
++	: "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
++	: "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
++	: "memory");
++	uaccess_disable_privileged();
++
++	if (!ret)
++		*oval = val;
++
++	return ret;
++}
++
++#define FUTEX_ATOMIC_OP(op)						\
++static __always_inline int						\
++__futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)		\
++{									\
++	return __llsc_futex_atomic_##op(oparg, uaddr, oval);		\
++}
++
++FUTEX_ATOMIC_OP(add)
++FUTEX_ATOMIC_OP(or)
++FUTEX_ATOMIC_OP(and)
++FUTEX_ATOMIC_OP(eor)
++FUTEX_ATOMIC_OP(set)
++
++static __always_inline int
++__futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
++{
++	return __llsc_futex_cmpxchg(uaddr, oldval, newval, oval);
++}
+ 
+ static inline int
+ arch_futex_atomic_op_inuser(int op, int oparg, int *oval, u32 __user *_uaddr)
+ {
+-	int oldval = 0, ret, tmp;
+-	u32 __user *uaddr = __uaccess_mask_ptr(_uaddr);
++	int ret;
++	u32 __user *uaddr;
+ 
+ 	if (!access_ok(_uaddr, sizeof(u32)))
+ 		return -EFAULT;
+ 
++	uaddr = __uaccess_mask_ptr(_uaddr);
++
+ 	switch (op) {
+ 	case FUTEX_OP_SET:
+-		__futex_atomic_op("mov	%w3, %w5",
+-				  ret, oldval, uaddr, tmp, oparg);
++		ret = __futex_atomic_set(oparg, uaddr, oval);
+ 		break;
+ 	case FUTEX_OP_ADD:
+-		__futex_atomic_op("add	%w3, %w1, %w5",
+-				  ret, oldval, uaddr, tmp, oparg);
++		ret = __futex_atomic_add(oparg, uaddr, oval);
+ 		break;
+ 	case FUTEX_OP_OR:
+-		__futex_atomic_op("orr	%w3, %w1, %w5",
+-				  ret, oldval, uaddr, tmp, oparg);
++		ret = __futex_atomic_or(oparg, uaddr, oval);
+ 		break;
+ 	case FUTEX_OP_ANDN:
+-		__futex_atomic_op("and	%w3, %w1, %w5",
+-				  ret, oldval, uaddr, tmp, ~oparg);
++		ret = __futex_atomic_and(~oparg, uaddr, oval);
+ 		break;
+ 	case FUTEX_OP_XOR:
+-		__futex_atomic_op("eor	%w3, %w1, %w5",
+-				  ret, oldval, uaddr, tmp, oparg);
++		ret = __futex_atomic_eor(oparg, uaddr, oval);
+ 		break;
+ 	default:
+ 		ret = -ENOSYS;
+ 	}
+ 
+-	if (!ret)
+-		*oval = oldval;
+-
+ 	return ret;
+ }
+ 
+@@ -81,40 +144,14 @@ static inline int
+ futex_atomic_cmpxchg_inatomic(u32 *uval, u32 __user *_uaddr,
+ 			      u32 oldval, u32 newval)
+ {
+-	int ret = 0;
+-	unsigned int loops = FUTEX_MAX_LOOPS;
+-	u32 val, tmp;
+ 	u32 __user *uaddr;
+ 
+ 	if (!access_ok(_uaddr, sizeof(u32)))
+ 		return -EFAULT;
+ 
+ 	uaddr = __uaccess_mask_ptr(_uaddr);
+-	uaccess_enable_privileged();
+-	asm volatile("// futex_atomic_cmpxchg_inatomic\n"
+-"	prfm	pstl1strm, %2\n"
+-"1:	ldxr	%w1, %2\n"
+-"	sub	%w3, %w1, %w5\n"
+-"	cbnz	%w3, 4f\n"
+-"2:	stlxr	%w3, %w6, %2\n"
+-"	cbz	%w3, 3f\n"
+-"	sub	%w4, %w4, %w3\n"
+-"	cbnz	%w4, 1b\n"
+-"	mov	%w0, %w7\n"
+-"3:\n"
+-"	dmb	ish\n"
+-"4:\n"
+-	_ASM_EXTABLE_UACCESS_ERR(1b, 4b, %w0)
+-	_ASM_EXTABLE_UACCESS_ERR(2b, 4b, %w0)
+-	: "+r" (ret), "=&r" (val), "+Q" (*uaddr), "=&r" (tmp), "+r" (loops)
+-	: "r" (oldval), "r" (newval), "Ir" (-EAGAIN)
+-	: "memory");
+-	uaccess_disable_privileged();
+-
+-	if (!ret)
+-		*uval = val;
+ 
+-	return ret;
++	return __futex_cmpxchg(uaddr, oldval, newval, uval);
+ }
+ 
+ #endif /* __ASM_FUTEX_H */
 -- 
 LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
