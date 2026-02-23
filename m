@@ -1,86 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA6530FC16
-	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 16:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E6A30BF68;
+	Mon, 23 Feb 2026 16:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771863981; cv=none; b=OzsBecZud1XbJFUM7qIFy3aWbNTRFTOiDewRKjGDL0VVdiiFoQDQIK4rmjcL1Niu4IkXTPMHRk6O6+EicX2BRSzKew3LYWQxXws/r/hfOyETSo8XGhMTkoVmZpVtb0t7yXPdx4wezEnnvaT4g5EXZTKK6Jl2bEi2/UcOWIQFPtw=
+	t=1771864279; cv=none; b=p1bqyDon7YIG2Jmk2rU7MIoPPno9HMzZ4hED3C0YXQ/n41R0Q37LbvL9U71i4OcKpt4pKIhiHJVcePSdY7XGPIIImLOfznsheIomPvI+2bbfg8K3V8YUFoJAJJFhbUbKWYPSPcz7mbSFu+Zt+nQy8No8NCiL/AlQa8eq5rqA5H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771863981; c=relaxed/simple;
-	bh=pjlJTGlsJO1Ix7UMDzBnbBF88dmXRCCbMLYgEcN0bTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DcTuuv+NA666L6EuNYqLesdWbrn31yPgJtgqje3tyLAtJPSHujT7OLv7nGG1203fYIk9HKa5Xv90r4c0rsJj+dux485k/djP+qCYXLQUg80xcTXXTEmdIoy73dHWXC72l5sXILJnGN7EuVFUCQ0D8qfJhqj28yY7i3Z2+AyS8s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQ742djL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1771864279; c=relaxed/simple;
+	bh=HbRaNni9Yhg7DH4GQw6rMyoMLa5GVOltpDIZsyjITfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DSNefCG0nME2o2gcpmKaoRB8wcHCrYNjrPWXJG3T3/M1Yh3JjJ+IFTh6ssozlzDRDEVsX8VnEeqPrqc2tNyLkg3mjeD0yepYEFbKKVUdaoguKtuIxTkwzVJFp2Jcyq5Ns79qlkOulCp8kS11pu49sCpMaPs+CnM/PhFlQzNQVEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asRbb96U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQ742djL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7935AC116C6;
-	Mon, 23 Feb 2026 16:26:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asRbb96U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32B6BC116D0;
+	Mon, 23 Feb 2026 16:31:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771863981;
-	bh=pjlJTGlsJO1Ix7UMDzBnbBF88dmXRCCbMLYgEcN0bTs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UQ742djLUOR9uCTuDgFv1BHjkvtZ0go9om6TRtYF4O5rXsHef1n0FK/FUPv825fTD
-	 AcHpiIJODjOE1wQvN3iA8fkXJThLnxw4ZFOmBufYZ0bskYcZtJIo171bLu2Hvg7iIZ
-	 WqjFdfg4r1694+1lEGzhLW+8OO++fQAcUo0xK9GyQ8XZTVasr3GDl4l/aSRSiDJk4Q
-	 kTxhFCv6HT7na7mf6A9zMUl1jUB9PqT4kS2DberS4v4NiGxOQ8isDK4Ltd/gCgXl64
-	 pxztz5B8IA84M5DY6GY7aK3AJpCZ6qh7IH8ATgJ13v2J3aPBB6d+2OEcd9Gz3pz1kK
-	 kZSox4p/JcmTw==
-Date: Mon, 23 Feb 2026 16:26:16 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+	s=k20201202; t=1771864279;
+	bh=HbRaNni9Yhg7DH4GQw6rMyoMLa5GVOltpDIZsyjITfo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=asRbb96Ua4NG0E2vTwwn45Mp+N9/NnVxIj7wsMXzdKSyCpQSpXNrE1hjQRNEAI/TW
+	 +uQ15DGvP7pjJ9JP4GpSc4l/fOn8I+ViJ8zfCFf/IZDP8bz6g1pjf4hBGdyZTCe2Uy
+	 J1WZYwB+h/CVA/uRUDJQN7Zjo885WSQuNSv2h+eSp206Bkq2q22CN/z/vgD3K+2Use
+	 QPXH4sf5eYMzpFAd7g+mfzVovY7W2tmFhgFegDKY7mKDf3vQkoOh1BhOAwDQcjJN7J
+	 tTJxZny0W0j3M4pwHUFgnwW/yGoX3FFGVBin/iWg/5yD8riSrmd0XbBZYml82QMQtc
+	 07hViK1gOUM+w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vuYq5-0000000D3s7-0ASY;
+	Mon, 23 Feb 2026 16:31:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>
-Subject: Re: pKVM breakage in mainline on n1sdp
-Message-ID: <ba75b3b1-ee6f-4e97-a9ee-8eb848a69807@sirena.org.uk>
-References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
- <87bjhie67o.wl-maz@kernel.org>
- <CA+EHjTwzjjNuZSQExZUsGAXWdaH=Uf=z4ks2XQAXqaU4DcmD9w@mail.gmail.com>
+	Marc Zyngier <maz@kernel.org>
+Cc: Quentin Perret <qperret@google.com>,
+	Will Deacon <will@kernel.org>,
+	Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Fix protected mode handling of pages larger than 4kB
+Date: Mon, 23 Feb 2026 16:31:14 +0000
+Message-ID: <177186426799.3533992.5872404007182314349.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260222141000.3084258-1-maz@kernel.org>
+References: <20260222141000.3084258-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aqb+ut7wXhB5soxA"
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTwzjjNuZSQExZUsGAXWdaH=Uf=z4ks2XQAXqaU4DcmD9w@mail.gmail.com>
-X-Cookie: My LESLIE GORE record is BROKEN ...
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, qperret@google.com, will@kernel.org, tabba@google.com, vdonnefort@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+
+On Sun, 22 Feb 2026 14:10:00 +0000, Marc Zyngier wrote:
+> Since 3669ddd8fa8b5 ("KVM: arm64: Add a range to pkvm_mappings"),
+> pKVM tracks the memory that has been mapped into a guest in a
+> side data structure. Crucially, it uses it to find out whether
+> a page has already been mapped, and therefore refuses to map it
+> twice. So far, so good.
+> 
+> However, this very patch completely breaks non-4kB page support,
+> with guests being unable to boot. The most obvious symptom is that
+> we take the same fault repeatedly, and not making forward progress.
+> A quick investigation shows that this is because of the above
+> rejection code.
+> 
+> [...]
+
+Applied to fixes, thanks!
+
+[1/1] KVM: arm64: Fix protected mode handling of pages larger than 4kB
+      commit: 08f97454b7fa39bfcf82524955c771d2d693d6fe
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
 
 
---aqb+ut7wXhB5soxA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Sun, Feb 22, 2026 at 08:34:57AM +0000, Fuad Tabba wrote:
-> On Sat, 21 Feb 2026 at 10:33, Marc Zyngier <maz@kernel.org> wrote:
-
-> > [+ Fuad for the protected mode stuff]
-
-> I'm unable to reproduce it, but I think the following might be the fix:
-> https://lore.kernel.org/all/20260222083352.89503-1-tabba@google.com/
-
-Followed up there, that looks to be it - thanks again!
-
---aqb+ut7wXhB5soxA
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmmcf6gACgkQJNaLcl1U
-h9D/bgf/ST5dxO+Lyvga154SvVeGOj/YvBqIN3TmsOOB92SbGvjASumzq26G04nR
-9pKbxjRgbAWolw9uU42DBPA5osGkhkAvqRUczhujTUFe01PNwuxoQ4tVrHSVysr/
-4dnN8fGwaQPgMOsV9wShjwV3V8z6Q20UZX6x20iVstA+g6S0dizUqUnperEohvTy
-zhYmy7e9nZOmhCj24OsE/hKj9WBqSQuQ1j8kV40cMfKQ7HJVeBu/jhC2SDk4JDWE
-AO/80iavSUHlKha67qByAVEB2jo9uRhk8KjewYGIt9Bg1Rd896dL1GtO5xGWYM6o
-wJ5Iqf6jSwfhQF6VQgDbVLVeEXIMyw==
-=Ui5B
------END PGP SIGNATURE-----
-
---aqb+ut7wXhB5soxA--
