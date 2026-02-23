@@ -1,133 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F6F34E74B
-	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 09:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A67344056
+	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 10:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771840107; cv=none; b=VmT9dgUKbrrhg14Fz7dzkt5eUMdUpkrv3m4FssQwFCtsjzaHlMWRSzMIjK1qgHIyECU9nqFB7aPJO0qWAve80qIEIjUUqClcSI9V/xLrX48EvZisADetRkfimEblnx1NOPHf2UhiCgPzdg93O25vOXG0WrrUyJ3vzpNbTt5Pah8=
+	t=1771841155; cv=none; b=uVXuonZleHKsCMOUmYOt90HrVFLL/RzNdmRTIbBHvcwgDAwLcFCF4u6QRJZ6nj4TqiSSvVYWuus4FKlY1yktD3WJh4zDjPv1y1yWzt71NZAKL7i6whQbaYgZL65KhNdGwy5Ac5eAzwQCdjtZn5rRxAMYrMJeFGRnve+/WYfSUhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771840107; c=relaxed/simple;
-	bh=CzeKzHgQCT13tu9uja64TWNotu/DdjShptoUdpS5sSo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=szlBDhpA7fi+gzHOlP/gzRrjlWE6EGdNL8fYPfmteUIPwsx/IVE5x3rGJ8hO1LzHd+BbCuelbcbvLuT/j4EV3xg9BeVsWRkdkVP/gk0fAfY4NVwb2CA9tjTgFxgHhGqipF0bejMdoEnXhZaG2tgTYQJ5ysGdMoBJfuB5FkysOD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rGknJGMb; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGknJGMb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39764C116C6;
-	Mon, 23 Feb 2026 09:48:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771840107;
-	bh=CzeKzHgQCT13tu9uja64TWNotu/DdjShptoUdpS5sSo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rGknJGMb/SmGUDeaXFBh2JmHyyxO4/1D04YyD2rbKEVw7MiwLqVmbAwRwd6nqOhY/
-	 CzR7EV+9sCJywrvZiEjzUJOfYDqvPI6NWHSM0aXA4z0NJloej+42SiuD5KUq5mzy6z
-	 OlKcqEPx/ie8bGq8pnzwBzkKTOW8uScknP8wj8wxAz5iao2McHUmZocTBz+uuH44od
-	 LCf16mHa2jGzumr8MtbgbMzY99VGaGKGx7ldZ7y6+sYE38YeFwzjtOwAc4Z0+oTGme
-	 YZ/YCgSSbVa0s3MRBhvIK3N8IEozGLK4eQ7JvskjRSMO/PThbZZ0bO7wDti5oFeZvF
-	 vFa8SP3p2Ykmg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vuSYC-0000000Cvgc-3hhU;
-	Mon, 23 Feb 2026 09:48:25 +0000
-Date: Mon, 23 Feb 2026 09:48:24 +0000
-Message-ID: <86pl5vaizb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	s=arc-20240116; t=1771841155; c=relaxed/simple;
+	bh=hKfrqNACZeW/Mgnr8i4VzDxrr7Z9plrfq6D7ZJM9yLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K3wXFmaKxREJrU0YI8Hl05M+XVnv3ec4CeVcHjO5Hlla8awmLMbu8Kjl2stlVS/XJY0Xf4GlGVARA+Uta/zRfnPT7Hympb+HR5u9sSKFtTdZzt5ax6F2aKVnTnf2oQ3j0mewM4Pu0j2ty+tnIUsTdKlZIYvNzdLoNNy0c04s9rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56CE3497;
+	Mon, 23 Feb 2026 02:05:47 -0800 (PST)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E7AF23F59E;
+	Mon, 23 Feb 2026 02:05:51 -0800 (PST)
+Date: Mon, 23 Feb 2026 10:05:46 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/9] arm64: Add logic to fully remove features from sanitised id registers
-In-Reply-To: <CA+EHjTyiHALTEgA7tuqQZ2ZLW3_vFdTU=vUb7+vn1T4OoMjgsw@mail.gmail.com>
-References: <20260219195533.2455736-1-maz@kernel.org>
-	<20260219195533.2455736-2-maz@kernel.org>
-	<CA+EHjTzVRq3r-7UR-MJYvv-Aw4kHQDHEmwtqY9is-fRDm-J06A@mail.gmail.com>
-	<86v7frafpx.wl-maz@kernel.org>
-	<CA+EHjTzj9wEm7oBKBXF8sYpK60FYeLOJwEapxDiO1HxK5e6Y6g@mail.gmail.com>
-	<86tsvba2nc.wl-maz@kernel.org>
-	<CA+EHjTyiHALTEgA7tuqQZ2ZLW3_vFdTU=vUb7+vn1T4OoMjgsw@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: pKVM breakage in mainline on n1sdp
+Message-ID: <aZwmevKcvW2HxdJ5@J2N7QTR9R3>
+References: <60916cb6-f460-4751-b910-f63c58700ad0@sirena.org.uk>
+ <87bjhie67o.wl-maz@kernel.org>
+ <87a4x2e60i.wl-maz@kernel.org>
+ <aZm2XCZLYxgxL99d@sirena.co.uk>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aZm2XCZLYxgxL99d@sirena.co.uk>
 
-Hi Fuad,
-
-On Fri, 20 Feb 2026 15:36:37 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Sat, Feb 21, 2026 at 01:42:52PM +0000, Mark Brown wrote:
+> On Sat, Feb 21, 2026 at 10:38:05AM +0000, Marc Zyngier wrote:
 > 
-> > I think we must prevent this downgrade the same way, meaning that
-> > ALL_HIDDEN and FTR_HIGHER are mutually exclusive.
-> >
-> > How about that:
-> >
-> > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> > index d58931e63a0b6..2cae00b4b0c5f 100644
-> > --- a/arch/arm64/kernel/cpufeature.c
-> > +++ b/arch/arm64/kernel/cpufeature.c
-> > @@ -1067,7 +1067,14 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
-> >                         user_mask |= ftr_mask;
-> >                         break;
-> >                 case FTR_ALL_HIDDEN:
-> > -                       val = arm64_ftr_set_value(ftrp, val, ftrp->safe_val);
-> > +                       /*
-> > +                        * ALL_HIDDEN and HIGHER_SAFE are incompatible.
-> > +                        * Only hide from userspace, and log the oddity.
-> > +                        */
-> > +                       if (WARN_ON(ftrp->type == FTR_HIGHER_SAFE))
-> > +                               val = arm64_ftr_set_value(ftrp, val, ftr_new);
-> > +                       else
-> > +                               val = arm64_ftr_set_value(ftrp, val, ftrp->safe_val);
-> >                         reg->user_val = arm64_ftr_set_value(ftrp,
-> >                                                             reg->user_val,
-> >                                                             ftrp->safe_val);
-> >
+> > If that's vanilla 6.19, then there is post Feb 8th. Sorry for the
+> > unwarranted rant.
 > 
-> Yes, I think WARN_ON() here is the right call.
-> 
-> That said, I still think you should explicitly short-circuit
-> update_cpu_ftr_reg() for FTR_ALL_HIDDEN features, in addition to the
-> WARN_ON(). Relying on arm64_ftr_safe_value() to naturally preserve the
-> safe_val during secondary CPU boot seems mathematically fragile.
-> 
-> Take MTE_frac as an example. It uses S_ARM64_FTR_BITS and
-> FTR_LOWER_SAFE with a safe_val of 0. If it were marked FTR_ALL_HIDDEN,
-> init_cpu_ftr_reg() would prime sys_val with 0. But if a secondary CPU
-> boots and reports -1 (NI), arm64_ftr_safe_value() will execute min(-1,
-> 0) and return -1. update_cpu_ftr_reg() will then overwrite the primed
-> safe_val (0) with -1. The "hidden" state established by the boot CPU
-> is gone, and the feature's hardware state is now exposed globally.
-> 
-> Note that MTE is currently ALL_HIDDEN when configured out, so it's not
-> totally inconceivable that someone decides to make MTE_frac ALL_HIDDEN
-> as well. Explicitly short-circuiting for FTR_ALL_HIDDEN features in
-> update_cpu_ftr_reg() seems to be the safer bet here.
+> It won't be vanilla v6.19, that specific log will be tip of Linus' tree
+> from yesterday morning UK time which should be 8bf22c33e7a1 ("Merge tag
+> 'net-7.0-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net"),
+> there were a few results for commits over the day prior to that showing
+> the same behaviour.
 
-Right, the signed feature is a pretty compelling argument. And we
-should do the same thing for overrides, probably as a preliminary
-patch.
+Are you sure? That log says:
 
-Thanks,
+  CPU: 1 UID: 0 PID: 1955 Comm: qemu-system-aar Not tainted 6.19.0 #1 PREEMPT   
 
-	M.
+... where "6.19.0" means that's the 6.19 tag, and "#1" means that's the
+first build against that.
 
--- 
-Without deviation from the norm, progress is not possible.
+Is the build system overriding things such that this is misleading?
+
+Is there potentially a problem with the build system?
+
+Mark.
