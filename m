@@ -1,89 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3D031B81C
-	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 16:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3391126D4C7
+	for <kvmarm@lists.linux.dev>; Mon, 23 Feb 2026 17:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771864288; cv=none; b=ZhQmHNmXiz7B/UtYv6MyAkTQ0h8sKY/eM5/oGHTFerLhS0bqRafo1wxgANbpXxH9mRY66BbJ0Z4VxcZxNjIUzfzbOlFK+Iq5gsSnBpDNLSrkg7i7avp49CD7XlDh469LiZB9syn/w/GvWtAHxa/H/uM7oxqX/rnAfQnTk09Rf40=
+	t=1771868891; cv=none; b=ULZQBkdT7Ealt6ybDiYeqf9GWB3RxbclvpyJ82YslImM7yxjF/5FTXOtiUVDwtl4pueM/E5sFuwMGdWGzRKDDanF0uh1yMpGLmkYWrZuPVDgArDAx/Ny2uJGYzuqr23e/FWSWQQL1gBXcgiGG4wJBiI/YrrC2U/fTf5CRkKUYuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771864288; c=relaxed/simple;
-	bh=kPMGu6rpFObsTaxnVjc9U9DSVyONlwHZ5psqc1gbbww=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZR4nfYbjkPzkyBHnxpa0DOkPyP7WTTMSZBo3ZmKJjdbYohEl/CXrDrORzZJiAJbXpps0qc/FFOjTBIKaQi5sxrCz4jLZAtibx1gU56wzG76ZCT1jZpB6GQQ4je3Z7CsoNjHOvMVcztBFJ1hdE9h2EdG5F9Z2meewA8peKUTdBqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qp9hig4I; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qp9hig4I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1B3C2BC87;
-	Mon, 23 Feb 2026 16:31:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771864288;
-	bh=kPMGu6rpFObsTaxnVjc9U9DSVyONlwHZ5psqc1gbbww=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qp9hig4IOzVjzuK0A9mfXAIYpRju/wh6HryxXQNZWDJEVfi+YupmTFToNLjKl9pkh
-	 AhwTT38KNzOjwxaFPLQDZO9WpvBSpqzJZ6ppsi42CLdTsuZPZtFUHvux8SAe1XIPia
-	 mNQkYMkFytwJA6ZMfNCUccvKEcvDZCBijdvOQFqFV7Iq9Iwq2nh+ma4nc6Tbc2ABpI
-	 j6Hc7jLscqK82YrnC7ScaMnWPFNvoja5JWggqKydmzT9kGNQEFyfaB2Y80EfH1VlxQ
-	 1hL5wl5eCBFn0ltlgUh2dwXEYXMoZWkwj6LOvQz4Q5A3yOS+TJbC666Vadc8paRjry
-	 JaZ6NmpUBT1XQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vuYqE-0000000D3sd-0hiq;
-	Mon, 23 Feb 2026 16:31:26 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: broonie@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
+	s=arc-20240116; t=1771868891; c=relaxed/simple;
+	bh=fw4aX5MEt0CprPPFhkJx4Bw+7gIIc8V/hEZAeDcHr7o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DwVqciITrRziWD+RwNxMhhrztnDeAR/UP36ZMyapFsPMd/cE5CMXyOsU9G3X1V+NalpLeg1VGqVrOELwVNpLTK+PzVaCGSSS3vkOZsUMr++uYQ448yQaQILpBvoeVZ0VaMWxMuAvlrgHR+pCcTsLaqjOYfBynYuCV3Al0FZlcYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13ADD339;
+	Mon, 23 Feb 2026 09:48:01 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B2BE43F59E;
+	Mon, 23 Feb 2026 09:48:04 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: catalin.marinas@arm.com,
 	will@kernel.org,
-	qperret@google.com,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1] KVM: arm64: Revert accidental drop of kvm_uninit_stage2_mmu() for non-NV VMs
-Date: Mon, 23 Feb 2026 16:31:23 +0000
-Message-ID: <177186426800.3533992.9302353405604914685.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260222083352.89503-1-tabba@google.com>
-References: <20260222083352.89503-1-tabba@google.com>
+	maz@kernel.org,
+	oupton@kernel.org,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	broonie@kernel.org,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	yangyicong@hisilicon.com,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com,
+	yeoreum.yun@arm.com
+Subject: [PATCH v13 0/8] support FEAT_LSUI
+Date: Mon, 23 Feb 2026 17:47:54 +0000
+Message-Id: <20260223174802.458411-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, broonie@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, oupton@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, 22 Feb 2026 08:33:52 +0000, Fuad Tabba wrote:
-> Commit 0c4762e26879 ("KVM: arm64: nv: Avoid NV stage-2 code when NV is
-> not supported") added an early return to several functions in
-> arch/arm64/kvm/nested.c to prevent a UBSAN shift-out-of-bounds error
-> when accessing the pgt union for non-nested VMs.
-> 
-> However, this early return was inadvertently applied to
-> kvm_arch_flush_shadow_all() as well, causing it to skip the call to
-> kvm_uninit_stage2_mmu(kvm) for all non-nested VMs.
-> 
-> [...]
+Since Armv9.6, FEAT_LSUI supplies the load/store instructions for
+previleged level to access to access user memory without clearing
+PSTATE.PAN bit.
 
-Applied to fixes, thanks!
+This patchset support FEAT_LSUI and applies it mainly in
+futex atomic operation and others.
 
-[1/1] KVM: arm64: Revert accidental drop of kvm_uninit_stage2_mmu() for non-NV VMs
-      commit: ec197dca8735f7627e5cff7e3fa8839b53a28514
+This patch based on v7.0-rc1
 
-Cheers,
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Patch History
+==============
+form v12 to v13:
+  - rebase to v7.0-rc1
+  - apply CASLT for swapping guest descriptor
+  - remove has_lsui() for checking cpu feature.
+  - simplify __lsui_cmpxchg32() according to @Catalin's suggestion.
+  - use uaccess_ttbr0_enable()/disable() for LSUI instructions.
+  - https://lore.kernel.org/all/aYWuqTqM5MvudI5V@e129823.arm.com/
 
+from v11 to v12:
+  - rebase to v6.19-rc6
+  - add CONFIG_ARM64_LSUI
+  - enable LSUI when !CPU_BIG_ENDIAN and PAN presents.
+  - drop the swp emulation with LSUI insns instead, disable it
+    when LSUI presents.
+  - some of small fixes (useless prefix and suffix and etc).
+  - https://lore.kernel.org/all/20251214112248.901769-1-yeoreum.yun@arm.com/
+
+from v10 to v11:
+  - rebase to v6.19-rc1
+  - use cast instruction to emulate deprecated swpb instruction
+  - https://lore.kernel.org/all/20251103163224.818353-1-yeoreum.yun@arm.com/
+
+from v9 to v10:
+  - apply FEAT_LSUI to user_swpX emulation.
+  - add test coverage for LSUI bit in ID_AA64ISAR3_EL1
+  - rebase to v6.18-rc4
+  - https://lore.kernel.org/all/20250922102244.2068414-1-yeoreum.yun@arm.com/
+
+from v8 to v9:
+  - refotoring __lsui_cmpxchg64()
+  - rebase to v6.17-rc7
+  - https://lore.kernel.org/all/20250917110838.917281-1-yeoreum.yun@arm.com/
+
+from v7 to v8:
+  - implements futex_atomic_eor() and futex_atomic_cmpxchg() with casalt
+    with C helper.
+  - Drop the small optimisation on ll/sc futex_atomic_set operation.
+  - modify some commit message.
+  - https://lore.kernel.org/all/20250816151929.197589-1-yeoreum.yun@arm.com/
+
+from v6 to v7:
+  - wrap FEAT_LSUI with CONFIG_AS_HAS_LSUI in cpufeature
+  - remove unnecessary addition of indentation.
+  - remove unnecessary mte_tco_enable()/disable() on LSUI operation.
+  - https://lore.kernel.org/all/20250811163635.1562145-1-yeoreum.yun@arm.com/
+
+from v5 to v6:
+  - rebase to v6.17-rc1
+  - https://lore.kernel.org/all/20250722121956.1509403-1-yeoreum.yun@arm.com/
+
+from v4 to v5:
+  - remove futex_ll_sc.h futext_lsui and lsui.h and move them to futex.h
+  - reorganize the patches.
+  - https://lore.kernel.org/all/20250721083618.2743569-1-yeoreum.yun@arm.com/
+
+from v3 to v4:
+  - rebase to v6.16-rc7
+  - modify some patch's title.
+  - https://lore.kernel.org/all/20250617183635.1266015-1-yeoreum.yun@arm.com/
+
+from v2 to v3:
+  - expose FEAT_LSUI to guest
+  - add help section for LSUI Kconfig
+  - https://lore.kernel.org/all/20250611151154.46362-1-yeoreum.yun@arm.com/
+
+from v1 to v2:
+  - remove empty v9.6 menu entry
+  - locate HAS_LSUI in cpucaps in order
+  - https://lore.kernel.org/all/20250611104916.10636-1-yeoreum.yun@arm.com/
+
+
+Yeoreum Yun (8):
+  arm64: cpufeature: add FEAT_LSUI
+  KVM: arm64: expose FEAT_LSUI to guest
+  KVM: arm64: kselftest: set_id_regs: add test for FEAT_LSUI
+  arm64: futex: refactor futex atomic operation
+  arm64: futex: support futex with FEAT_LSUI
+  arm64: armv8_deprecated: disable swp emulation when FEAT_LSUI present
+  KVM: arm64: use CASLT instruction for swapping guest descriptor
+  arm64: Kconfig: add support for LSUI
+
+ arch/arm64/Kconfig                            |  20 ++
+ arch/arm64/include/asm/futex.h                | 284 +++++++++++++++---
+ arch/arm64/include/asm/lsui.h                 |  27 ++
+ arch/arm64/kernel/armv8_deprecated.c          |  16 +
+ arch/arm64/kernel/cpufeature.c                |  10 +
+ arch/arm64/kvm/at.c                           |  32 +-
+ arch/arm64/kvm/sys_regs.c                     |   3 +-
+ arch/arm64/tools/cpucaps                      |   1 +
+ .../testing/selftests/kvm/arm64/set_id_regs.c |   1 +
+ 9 files changed, 342 insertions(+), 52 deletions(-)
+ create mode 100644 arch/arm64/include/asm/lsui.h
+
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
