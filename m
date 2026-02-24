@@ -1,183 +1,140 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59DD39A80E
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 14:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771943691; cv=pass; b=qDNtQ2G3DWFWIS99Jb5AzMKCKuol74pHRdrbC5FfXqTFv4C0E50kU6+MtQYgfiskb15PQPdbdM/e67i3QxjxFwCF0Hau+YhzCLEsOIXHI7PfxUiMuXbuPreDgMZS4GVBocaczuGymCzXjNHPGpasxKCr4+NtMmBH79pSGL/psDY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771943691; c=relaxed/simple;
-	bh=LQS9s54PGR0RH5bznKavqJ+ILVh4MiTnEjfub296dow=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PFNi3Vc4RwYlmE6j62+LRkbprK9OLCkZgv+drGwbUaHC+vdAMx4HfGy1QvB6+d67RSk4c41AIfdPvwL5Vr8VEadUQ05pxTfrzo0cpQkIlr4ySjjfHVA0QOUKqtITUqzC+kaZ75K+1kMFmBm9FeV72wvVXQGrWaMDDBtAdpdk7fE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qmoRiq+u; arc=pass smtp.client-ip=74.125.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qmoRiq+u"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-64ad79dfb6eso5480326d50.0
-        for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 06:34:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1771943689; cv=none;
-        d=google.com; s=arc-20240605;
-        b=YcoujcvG7tQsnS5oBPj55/91bKfupfIe1mwj9jYwP1iyJ0UURdz9MxLfugsckftQfU
-         /2Jrlj+wl02Z7u+6Jk8ayqhkMGaao8Egk7+rYdNbPGQVWs331KJBEpQNKfbngqG7oGbN
-         ccpAaFsFMceOS5Z72QNfMEOal4KsaG5jxcQSzth9HGoJnmLLiz+vV6MWAgHkQWFl3Spx
-         eJs0lLcgdxQ/m+rNiD55xr4FFCKa4YSceJnE+hZf6CP/8zS5uzNnKOuZIRJub443bvFN
-         j5WA5pbjdlYm/N1HouHx0ckKZv3OeHll65/rKI5sZg94g9wUXcqCEnektV8y1pCBRluQ
-         GPIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
-        fh=LBybSM6JyT8aGWLgk3XFn491F2MRww83vZm2SFQcCV8=;
-        b=jwjvmbXXBBHjYPmWPJbGSCcZ2cq3gG5MhMNKFCg1OMMv1KIsHyzaHMGto6Je/gBoCT
-         J3nVwvmIlf+4b5x4E8O+ahQ0pwqi+UKz/0VHaVvns7i+HcvV+regFqe3Aqufwx8dUsnO
-         4SQDgOHJLGe0XP4/SaZVSEskSR57tngT1fZmIXfzAf4H1HkKPSlQ5lzL8Fw1j0//2rH9
-         DvFRU4wvHQsJS8oLw4Z/W8PCl+ePiy3g+sm+1H/WY9hfT1weSrDXPlNigxqov4G07avl
-         Ta4QsS406GfkZlIL+bcpR6cMBxic8nBwbVTCvVd9ERDHiRFDIN56EBv8gNe8aAmDot3e
-         VWNA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1771943689; x=1772548489; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
-        b=qmoRiq+uNpbLLtNX9bkvWQ+N43cJc5AvX+kXOCWxrw4SquWL4dw7+QlcXJLoC+uLeB
-         3N3eV8gw1oK/jlnLdbqetKOX+qKP6lzIbLxfxGoAF8FhMP5u5fxP26roBoTdM0JC06rg
-         tYVR6t8dcdAVLZrycmStVPbnmhRbKGQP6zzg+kOmXGT3n8WlqOYSpZ8bNM0LSu4Sry3w
-         EUw3denNPJpEcNw1TU6AP9uDwCGceDbspQbFdTS0/7Tru/js6KSPJLB6ZEK4Eabz4byS
-         xxKTTqrL5HhA6lHm92QZU0HL6KWQJJ51ugNSwCG3wotfNg2Pfv/6GQ3gRVO4cvSM8lns
-         HyDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1771943689; x=1772548489;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aflH0qDkgG4fC1sHybb7ibjojgZXGjJ7kgR08XJSBto=;
-        b=DPsTOwJwIevLzdajwz2bglYCTb1GbeAZztSB6FisvL4erN9yCJcl3x9JNkfu9Douo2
-         WEskBSkPWPcqC+qMhxUicGIEiljVWLJH/cZcDpF0TEYguuoWXYOHhbtK8cqv4clMpabS
-         urXzYj1bhST957VADVw8wnmKgP4xTy4iGPoHgbn3QhNUc7UzDVqCP2xrePciDXe/us6l
-         11HB7XepFuz1Bazr84Agc6w6k8ig+hx0V5Syh4Nf+j2jF3q1+4Sfc4lqm9arXywIQUnk
-         tm3Y9QojokGSn7gXU7kfwJ08pN8wljz6QBxvv5+SsGWogDd09WPjzfsFWCFUfkxwJZEi
-         e4jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWrnrjON3ZbFp6Lr20JL+by1vVdPtIecdJS8ff8BKNUMov6EFybzDiHCCvXWuFGGHk6rOPP32w=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzR7NCLQhe+e2mhPno23Zx1/4Celi9YUtswAbx7SviLoM7ZVGr6
-	HKverKjp+/S/451LEF073sqttDO4jrn+hNB8mOkXmW5hd+rB7H1VJITXLcQylrrmIODE+IRMOt3
-	8on0T8I4NOcbRMa+XEjyirkjVQf0sS7d+UENuRFV6Qw==
-X-Gm-Gg: ATEYQzzglCfwT/pJl4oCc2m9MyuLgToBBSTnU0EBdIpMxC6lIHw+FUha02E0TD8Za5n
-	VN8m+hH5On5Br61kcq8eCevwjiaoIIvvjGsncQdG3Vtpa3xyDKffO7JxiBy60lb5sTCymwXJHIQ
-	mszGbLOiYNz95u7vxXBgZMGW9++hU9pDybOvD5wcbahUfLHGhOF1gYrx0ReM3Cjugpgl9YLybR3
-	DXUuSJ6I7bb6Nn9R+5jIjFTS+5kfZpWdri7l7mGJmq1XchvLGTvPkD+3JMgUNZ5oJT9J4Uhzmxs
-	BvwpRMMBwypSNhpllzdOIeGGv96w6a425dP6PI2wBnHK8g8UCx/QmDD7HlI2V0AOTAg=
-X-Received: by 2002:a05:690e:dc2:b0:64a:d9f5:d412 with SMTP id
- 956f58d0204a3-64c78c1054cmr9104750d50.43.1771943688633; Tue, 24 Feb 2026
- 06:34:48 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56A936405F
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 15:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1771946865; cv=none; b=nPtO3oeAHprr5omTX4Eoj0Jt9PT6HDix1EcccAj4e9Xhb83HiSNY1f2IOl5dxaAoGwFgDXcbp3Vq932Bjj1LUWuyqC5d9f4BkW5WdumvDqk/lk5GbpHFFX8FMKVWMcQ06aBtJ7aluX6g7EUWLm33iH/ZgkbF9BcDpfKXfoMD5GA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1771946865; c=relaxed/simple;
+	bh=kCAs/oCGGe3PuDL/CDky+AOuTk5NdR+Ta2wpSay6QFc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=funZ85NjKOePIC116phw/v3eRPtACxawVVvIym7XvZeL727fP3vTzS9EmkS5Ew8nfA7LXAs1KRBdvHhfiLNcrZMzVVFpFs/8ux+OfvQReZtrmrQmtt7kUEbpGyjZ05vuckXu9m6dWKai2hmmJ4yzTO/fqAQ7e6Szy0YVnoiRfOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A80A2339;
+	Tue, 24 Feb 2026 07:27:28 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD7AF3F59E;
+	Tue, 24 Feb 2026 07:27:29 -0800 (PST)
+Message-ID: <78af29ea-772a-4fbb-8a34-dbc2760d6415@arm.com>
+Date: Tue, 24 Feb 2026 15:27:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260220115656.4831-1-sebott@redhat.com> <20260220115656.4831-2-sebott@redhat.com>
-In-Reply-To: <20260220115656.4831-2-sebott@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 24 Feb 2026 14:34:37 +0000
-X-Gm-Features: AaiRm515uOhz39gYNVWQiyM_zHuBmfxeUElFEXao9Pe5eZx0PQvwmWIjvVpaqkY
-Message-ID: <CAFEAcA8O2UEKToJ+zXA6=vvgkRyPKrPwtfHnti7yyGgCGwoJeA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/1] target/arm/kvm: add kvm-psci-version vcpu property
-To: Sebastian Ott <sebott@redhat.com>
-Cc: qemu-devel@nongnu.org, eric.auger@redhat.com, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, pbonzini@redhat.com, qemu-arm@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
+From: Ben Horgan <ben.horgan@arm.com>
+To: Zeng Heng <zengheng4@huawei.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ linux-doc@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
+References: <20260203214342.584712-1-ben.horgan@arm.com>
+ <9945d28e-f1f2-e11a-1481-8d80167d6f89@huawei.com>
+ <b844c632-c8fc-48f1-b347-07f166019b22@arm.com>
+ <28dbde39-5b21-5f2f-59f5-4500c8b0296d@huawei.com>
+ <2f2410a0-69dd-4da5-bd84-d168ba6b0605@arm.com>
+Content-Language: en-US
+In-Reply-To: <2f2410a0-69dd-4da5-bd84-d168ba6b0605@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 20 Feb 2026 at 11:57, Sebastian Ott <sebott@redhat.com> wrote:
->
-> Provide a kvm specific vcpu property to override the default
-> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
-> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
->
-> Note: in order to support PSCI v0.1 we need to drop vcpu
-> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
->
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Tested-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Sebastian Ott <sebott@redhat.com>
-> ---
->  docs/system/arm/cpu-features.rst | 11 ++++++++
->  target/arm/cpu.c                 |  8 +++++-
->  target/arm/kvm.c                 | 48 ++++++++++++++++++++++++++++++--
->  3 files changed, 64 insertions(+), 3 deletions(-)
->
-> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-> index 3db1f19401..ce19ae6a04 100644
-> --- a/docs/system/arm/cpu-features.rst
-> +++ b/docs/system/arm/cpu-features.rst
-> @@ -204,6 +204,17 @@ the list of KVM VCPU features and their descriptions.
->    the guest scheduler behavior and/or be exposed to the guest
->    userspace.
->
-> +``kvm-psci-version``
-> +  Set the Power State Coordination Interface (PSCI) firmware ABI version
-> +  that KVM provides to the guest. By default KVM will use the newest
-> +  version that it knows about (which is PSCI v1.3 in Linux v6.13).
-> +
-> +  You only need to set this if you want to be able to migrate this
-> +  VM to a host machine running an older kernel that does not
-> +  recognize the PSCI version that this host's kernel defaults to.
-> +
-> +  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
-> +
->  TCG VCPU Features
->  =================
->
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 10f8280eef..60f391651d 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1144,7 +1144,13 @@ static void arm_cpu_initfn(Object *obj)
->       * picky DTB consumer will also provide a helpful error message.
->       */
->      cpu->dtb_compatible = "qemu,unknown";
-> -    cpu->psci_version = QEMU_PSCI_VERSION_0_1; /* By default assume PSCI v0.1 */
-> +    if (!kvm_enabled()) {
-> +        /* By default KVM will use the newest PSCI version that it knows about.
-> +         * This can be changed using the kvm-psci-version property.
-> +         * For others assume PSCI v0.1 by default.
-> +         */
-> +        cpu->psci_version = QEMU_PSCI_VERSION_0_1;
-> +    }
->      cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
->
->      if (tcg_enabled() || hvf_enabled()) {
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index ded582e0da..5453460965 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -485,6 +485,28 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
->      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
->  }
->
-> +static char *kvm_get_psci_version(Object *obj, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    return g_strdup_printf("%d.%d",
-> +                           (int) PSCI_VERSION_MAJOR(cpu->psci_version),
-> +                           (int) PSCI_VERSION_MINOR(cpu->psci_version));
-> +}
-> +
-> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    uint16_t maj, min;
-> +
-> +    if (sscanf(value, "%hd.%hd", &maj, &min) != 2) {
+Hi Zeng,
 
-%hd is a signed value, so this will accept "-3.-5" I think ?
-Probably we want %hu.
+On 2/24/26 14:19, Ben Horgan wrote:
+> Hi Zeng,
+> 
+> On 2/24/26 11:03, Zeng Heng wrote:
+>> Hi Ben,
+>>
+>> On 2026/2/16 20:22, Ben Horgan wrote:
+>>> Hi Zeng,
+>>>
+>>> On 2/14/26 09:40, Zeng Heng wrote:
+>>>> Hi Ben,
+>>>>
+>>>> On 2026/2/4 5:43, Ben Horgan wrote:
+>>> [...]
+>>>>>
+>>>>> Based on:
+>>>>> [1] git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/cache
+>>>>> (To include telemetry code which changes the resctrl arch interface)
+>>>>>
+>>>>> The series can be retrieved from:
+>>>>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v4
+>>>>> (Final commit is a fix already in 6.19-rc8)
+[...]
+>>>> [   10.978497] mpam:mpam_resctrl_pick_caches: class 255 is not a cache
+>>>> [   10.980470] mpam:mpam_resctrl_pick_mba: class 2 is before L3
 
-(If you agree I can just make this fix locally, no need for you to respin.)
+This debug message was removed in v4 of the series.
+v3 has it: https://lore.kernel.org/linux-arm-kernel/20260112165914.4086692-28-ben.horgan@arm.com/
+v4 doesn't: https://lore.kernel.org/linux-arm-kernel/20260203214342.584712-27-ben.horgan@arm.com/
 
--- PMM
+Do you know which version of the series you were running?
+
+>>>> [   10.980472] mpam:mpam_resctrl_pick_mba: class 3 has no bandwidth
+>>>> control
+>>>> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
+>>>> Mismatched CPU mask with L3 equivalent
+>>>> [   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
+>>>> match L3
+>>>> [   10.997415] mpam:mpam_resctrl_pick_counters: class 2 is before L3
+>>>> [   11.024109] mpam:topology_matches_l3: class 3 component 276 has
+>>>> Mismatched CPU mask with L3 equivalent
+>>>> [   11.024114] mpam:class_has_usable_mbwu: monitors usable in free-
+>>>> running mode
+>>>
+>>> mbwu enabled?
+>>
+>> The fact that the number of monitors merely satisfies the conditions for
+>> free-running mode does not imply that the MBWU functionality can be
+>> successfully mounted. The specific reasons are explained above.
+> 
+> True
+> 
+>>
+>>>
+>>>> [   11.063882] mpam:topology_matches_l3: class 255 component 0 has
+>>>> Mismatched CPU mask with L3 equivalent
+>>>> [   11.113183] mpam:mpam_resctrl_alloc_domain: Skipped monitor domain
+>>>> online - no monitors
+>>>> [   11.113189] MPAM enabled with 32 PARTIDs and 4 PMGs
+>>>>
+>>>>
+>>
+>> Sorry for the late reply. And this is my first day back from a long
+>> vacation.
+> 
+> No problem. Hope you had a good holiday.
+> 
+>>
+>>
+>> Best regards,
+>> Zeng Heng
+> 
+> Thanks,
+> 
+> Ben
+> 
+> 
+
+
+Thanks,
+
+Ben
+
