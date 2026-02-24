@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56A936405F
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 15:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C81B28F50F
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771946865; cv=none; b=nPtO3oeAHprr5omTX4Eoj0Jt9PT6HDix1EcccAj4e9Xhb83HiSNY1f2IOl5dxaAoGwFgDXcbp3Vq932Bjj1LUWuyqC5d9f4BkW5WdumvDqk/lk5GbpHFFX8FMKVWMcQ06aBtJ7aluX6g7EUWLm33iH/ZgkbF9BcDpfKXfoMD5GA=
+	t=1771955603; cv=none; b=F1lARlnp6RE0QS5bOQQY8h+aYEUFkrBM26QqKRhFnp0j9LDBer5b4q/t/hbEpR827KmqMIhND/P/wETrlge91ZJhKJP7RUUISm68hmwD8HXE1uFyaCC5w/a8vExYXD4QpXOSVkjKbP9o9NxvpG58RvdtzVIXPwGjEho8AYmd8hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771946865; c=relaxed/simple;
-	bh=kCAs/oCGGe3PuDL/CDky+AOuTk5NdR+Ta2wpSay6QFc=;
+	s=arc-20240116; t=1771955603; c=relaxed/simple;
+	bh=ck7lPuA/d1qThB2PwOE2+uUsKyNKotfNBe/QFuvUdqI=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=funZ85NjKOePIC116phw/v3eRPtACxawVVvIym7XvZeL727fP3vTzS9EmkS5Ew8nfA7LXAs1KRBdvHhfiLNcrZMzVVFpFs/8ux+OfvQReZtrmrQmtt7kUEbpGyjZ05vuckXu9m6dWKai2hmmJ4yzTO/fqAQ7e6Szy0YVnoiRfOE=
+	 In-Reply-To:Content-Type; b=ZBiRWoUY+Rd4585V0aYxhmQ1huXziX9UBTecU7YUQXfM2Sgaow0jn4+7S9C/+hIHrrFn/GQJ9EuiG+FJMTJruvwX4JL665K5nCUtHLFUUcapra0iqatckv9qzYcM24KlQQrSIN39RiC0f4HM0uHaOwmDnawmSPMu8X3PvBpNzlc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A80A2339;
-	Tue, 24 Feb 2026 07:27:28 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68E72339;
+	Tue, 24 Feb 2026 09:53:13 -0800 (PST)
 Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AD7AF3F59E;
-	Tue, 24 Feb 2026 07:27:29 -0800 (PST)
-Message-ID: <78af29ea-772a-4fbb-8a34-dbc2760d6415@arm.com>
-Date: Tue, 24 Feb 2026 15:27:28 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B4253F59E;
+	Tue, 24 Feb 2026 09:53:14 -0800 (PST)
+Message-ID: <35bf397e-bf96-4c15-b905-2141020b7627@arm.com>
+Date: Tue, 24 Feb 2026 17:53:13 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -77,16 +77,193 @@ On 2/24/26 14:19, Ben Horgan wrote:
 >>>>> The series can be retrieved from:
 >>>>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v4
 >>>>> (Final commit is a fix already in 6.19-rc8)
-[...]
+>>>>>
+>>> [...]
+>>>>>
+>>>>
+>>>> I've tested the MPAM functionality on my local Kunpeng platform. Here's
+>>>> a summary of the results:
+>>>
+>>> Thank you very much for your testing and detailed report.
+>>>
+>>>>
+>>>> Features enabled and verified:
+>>>>    * L2 and L3 CPBM
+>>>>    * L3 CSU
+>>>>    * L2 and L3 CDP
+>>>> All enabled features passed functional testing as expected.
+>>>>
+>>>> + Tested-by: Zeng Heng <zengheng4@huawei.com>
+>>>>
+>>>> Features not enabled:
+>>>>    1. MATA MBMAX partition and MBWU monitor.
+>>>
+>>> What's MATA here? Just memory allocation or something more specific?
+>>>
+>>
+>> The MATA serves as the agent for the Broadway MESI coherence protocol
+>> among multiple L3 caches or between I/O and L3 caches. It maintains data
+>> coherence among multiple L3 caches or between I/O and L3 caches.
+>>
+>> As the connection module between the SoC and the memory system, the MATA
+>> interfaces with the DMC on the DDR die. It provides the system with DDR
+>> access paths, delivering high-bandwidth, low-latency DDR read/write
+>> access.
+>>
+>> On the Kunpeng chip, the MB related MSC resides in this module rather
+>> than being directly located on the L3 cache controller.
+>>
+>>>>       Reason: These do not meet the driver's current topology>
+>>> expectations for MB support, hence they were not initialized.
+>>>>       This behavior is expected.
+>>>
+>>> Is this because you have more than 1 L3 cache?
+>>
+>> Yes, Kunpeng platform has more than 1 L3 cache.
+>>
+>> However, the reason it is not supported here is that the current driver
+>> does not support MATA recognition, while both Kunpeng MBM and MBA
+>> functionalities reside in the MATA MSC side as mentioned above,
+>> resulting in the inability to provide support.
+>>
+>> Relevant logs are as follows:
+>>
+>> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
+>> Mismatched CPU mask with L3 equivalent
+>> [   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
+>> match L3
+>>
+>>>
+>>>>
+>>>>    2. L2 CSU and MBWU monitors.
+>>>>       Reason: The current MPAM driver does not support L2-related
+>>>>       functionality yet.
+>>>
+>>> Thanks for letting us know you have these. But, yes, unfortunately
+>>> monitoring is only supported on the L3 at the moment.
+>>>
+>>>>
+>>>> + Tested-by: Zeng Heng <zengheng4@huawei.com>
+>>>>
+>>>>
+>>>> Detailed test logs are as follows:
+>>>
+>>> I'm confused by these logs as it looks like you aren't getting any
+>>> monitors but you verified the L3 CSU. Also, it looks like cpor (cbpm) is
+>>> disabled (at least partially) but you verified L2 and L3 CPBM. Is this
+>>> across different machines?
+>>>
+>>
+>> The logs were of course tested on the same machine.
+> 
+> Ok and the same run? Just asking because I can't yet see how this all
+> goes together.
+> 
+>>
+>> Since the L3 CSU/CPBM resides on the L3 cache, it can be correctly
+>> recognized and run smoothly.
+>>
+>> In fact, not only was L2 successfully mounted, but all L2 MSC CPBMs were
+>> also correctly recognized. The suspicion here is that the L2
+>> class->components were incorrectly mounted to an unknown object, which
+>> is believed to be related to the monitoring capabilities (CSU and MBWU)
+>> of Kunpeng L2. The root cause is still being investigated.
+> 
+> I'll try and mock up a system with L2 monitoring and cpbm to see if the
+> driver behaves in the same way.
+> 
+> However, I still can't understand how you get CPOR on L2 after seeing
+> "mpam:mpam_resctrl_pick_caches: class 2 cache misses CPOR" as that
+> should be the only place class is set for the l2 cache which guards the
+> call to mpam_control_init() in mpam_resctrl_setup(). The
+> mpam_monitor_init() comes later so I can't see how that effects.
+> 
+> Is the driver corrupting something or writing to mpam_resctrl_controls
+> with the wrong index? Clutching at straws here.
+> 
+>>
+>> Resctrl mounting status:
+>>
+>> # cat schemata
+>> L2:4=ff;7=ff;10=ff;13=ff;16=ff;19=ff;22=ff;25=ff;29=ff;32=ff;35=ff;
+>> 38=ff;41=ff;44=ff;47=ff;50=ff;54=ff;57=ff;60=ff;63=ff;66=ff;69=ff;72=ff;
+>> 75=ff;79=ff;82=ff;85=ff;88=ff;91=ff;94=ff;97=ff;100=ff;104=ff;107=ff;
+>> 110=ff;113=ff;116=ff;119=ff;122=ff;125=ff;129=ff;132=ff;135=ff;138=ff;
+>> 141=ff;144=ff;147=ff;150=ff;154=ff;157=ff;160=ff;163=ff;166=ff;169=ff;
+>> 172=ff;175=ff;179=ff;182=ff;185=ff;188=ff;191=ff;194=ff;197=ff;200=ff;
+>> 204=ff;207=ff;210=ff;213=ff;216=ff;219=ff;222=ff;225=ff;229=ff;232=ff;
+>> 235=ff;238=ff;241=ff;244=ff;247=ff;250=ff;254=ff;257=ff;260=ff;263=ff;
+>> 266=ff;269=ff;272=ff;275=ff;279=ff;282=ff;285=ff;288=ff;291=ff;294=ff;
+>> 297=ff;300=ff
+>> L3:1=1ffff;26=1ffff;51=1ffff;76=1ffff;101=1ffff;126=1ffff;151=1ffff;
+>> 176=1ffff;201=1ffff;226=1ffff;251=1ffff;276=1ffff
+>>
+>> # ls mon_data/*/*
+>> mon_data/mon_L3_01/llc_occupancy   mon_data/mon_L3_151/llc_occupancy
+>> mon_data/mon_L3_226/llc_occupancy  mon_data/mon_L3_276/llc_occupancy
+>> mon_data/mon_L3_101/llc_occupancy  mon_data/mon_L3_176/llc_occupancy
+>> mon_data/mon_L3_251/llc_occupancy  mon_data/mon_L3_51/llc_occupancy
+>> mon_data/mon_L3_126/llc_occupancy  mon_data/mon_L3_201/llc_occupancy
+>> mon_data/mon_L3_26/llc_occupancy   mon_data/mon_L3_76/llc_occupancy
+> 
+> Thanks for the extra details. These are as expected, right?
+> 
+>>
+>>>>
+>>>> Boot logs:
+>>>> [root@localhost ~]# dmesg | grep -i mpam
+>>>> [    0.000000] ACPI: MPAM 0x000000007FF35018 003024 (v01 HISI   HIP12
+>>>> 00000000 HISI 20151124)
+>>>> [    9.509852] mpam_msc mpam_msc.64: Merging features for
+>>>> vmsc:0xffff0800973cf5a0 |= ris:0xffff08009757ee90
+>>>> [    9.509859] mpam_msc mpam_msc.254: Merging features for
+>>>> class:0xffff08009736fe50 &= vmsc:0xffff080097628520
+>>>> [    9.509860] mpam:__props_mismatch:
+>>>> mpam_has_feature(mpam_feat_cpor_part, parent) = 1
+>>>> [    9.509864] mpam:__props_mismatch:
+>>>> mpam_has_feature(mpam_feat_cpor_part, child) = 0
+>>>> [    9.509866] mpam:__props_mismatch: parent->cpbm_wd = 8
+>>>> [    9.509869] mpam:__props_mismatch: child->cpbm_wd = 0
+>>>> [    9.509871] mpam:__props_mismatch: alias = 0
+>>>> [    9.509873] mpam:__props_mismatch: cleared cpor_part
+> 
+> Do you know where this mismatch is happening? Is it expected?
+
+I have added some of James' debug patches at:
+https://gitlab.arm.com/linux-arm/linux-bh/-/tree/mpam_resctrl_glue_v5_debugfs?ref_type=heads
+
+These are on top of a v5 of the series. They apply to older series
+as well.
+
+The debugfs should then contain details of all the MSC which
+should help debugging.
+
+It would be great if you were able to share that information, either on list or
+privately if needed.
+
+You can snapshot the mpam debugfs using:
+
+find /sys/kernel/debug/mpam -type f -exec sh -c 'echo {}; cat {}' \; > mpam_debugfs.txt
+
+> 
+>>>
+>>> cpor (partially) disabled?
+>>>
+>>>> [    9.509876] mpam:__props_mismatch: took the min num_csu_mon
+>>>> [    9.509878] mpam:__props_mismatch: took the min num_mbwu_mon
+>>>> [    9.509881] mpam_msc mpam_msc.252: Merging features for
+>>
+>> [...]
+>>
+>>>> [   10.978496] mpam:mpam_resctrl_pick_caches: class 2 cache misses CPOR
+>>>
+>>> No L2 cpor?
+> 
+> This particularly confuses me...
+> 
+>>>
 >>>> [   10.978497] mpam:mpam_resctrl_pick_caches: class 255 is not a cache
 >>>> [   10.980470] mpam:mpam_resctrl_pick_mba: class 2 is before L3
-
-This debug message was removed in v4 of the series.
-v3 has it: https://lore.kernel.org/linux-arm-kernel/20260112165914.4086692-28-ben.horgan@arm.com/
-v4 doesn't: https://lore.kernel.org/linux-arm-kernel/20260203214342.584712-27-ben.horgan@arm.com/
-
-Do you know which version of the series you were running?
-
 >>>> [   10.980472] mpam:mpam_resctrl_pick_mba: class 3 has no bandwidth
 >>>> control
 >>>> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
@@ -132,7 +309,6 @@ Do you know which version of the series you were running?
 > Ben
 > 
 > 
-
 
 Thanks,
 
