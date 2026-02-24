@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41893AA1A1
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE643AA1BD
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771955932; cv=none; b=aubsQjQjwD0BwTTu/2HysLqTMBoQhpO/dxfCvFI2+nyNZ5dmBV4wBlim1Ej0eaO4yHLX0FsP4pnqZrMC2J7ShxihgCgoS8wBHKvtvgTJHcEY0szsUXtQsF8zWzX49m1f+GWYreEonOrL04ou9YiYBA/Y7FsvwtXrf3rOOdgoLbA=
+	t=1771955937; cv=none; b=JOcSKiGM3kbInZ1UKopt11rMKPybHeooiNBbwY+GkXjRAdc8+H+6+SEeooqP8/MjKMHpvdOjQCQ9iewGSvT+58cspj6aLspH4Zbs8Pxd21Bgxo8wg8IoEGYmqoHRMNBdd1cynQzbinYxw9G/TDrPfV4xYNvaugeg9wiDFvTovOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771955932; c=relaxed/simple;
-	bh=0tl5LcEClTMt2y6i13SMw28sbB3VLERRiLTK22NM428=;
+	s=arc-20240116; t=1771955937; c=relaxed/simple;
+	bh=X6P01CyoKPuCNJkwpdv/6Jdxg5nLXrW2UT7CbM8CSYs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f3bHMucd7M8JXgDMgfb17uTNhcFWw2evBvuM12YzPge5eGyJhHb2b+uNoN2ZfzPuXQiMiQ7rV1mQP6BMNnKimnYkq5ligPc+Me7coe451fJtZMreYc2EmhogdPJgN/xhuTpVRVKs5jyx7tD9CWefMwsvXhQmRYzPwrM6BRi2amg=
+	 MIME-Version; b=pMFgXav7DoeBYXCEcbQGdlWvXDf/QlXZIjOZn64KhFIViSVkD/xxfOhHTxDyv/E48fPwvHZ1UGfgXibBaoxfJ3qTiUHoRAQXTReapEFJuUC2+uMn2L9VkqaFXl3T9nhYh4vzMtUo6pTOFdmXj7LXnTYFSq51bZJAoXK2Bi8gNv4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 415D0165C;
-	Tue, 24 Feb 2026 09:58:44 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BF251595;
+	Tue, 24 Feb 2026 09:58:49 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A26D53F59E;
-	Tue, 24 Feb 2026 09:58:45 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id AA9273F59E;
+	Tue, 24 Feb 2026 09:58:50 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v5 15/41] arm_mpam: resctrl: Implement resctrl_arch_reset_all_ctrls()
-Date: Tue, 24 Feb 2026 17:56:54 +0000
-Message-ID: <20260224175720.2663924-16-ben.horgan@arm.com>
+Subject: [PATCH v5 16/41] arm_mpam: resctrl: Add resctrl_arch_get_config()
+Date: Tue, 24 Feb 2026 17:56:55 +0000
+Message-ID: <20260224175720.2663924-17-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260224175720.2663924-1-ben.horgan@arm.com>
 References: <20260224175720.2663924-1-ben.horgan@arm.com>
@@ -71,80 +71,75 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-We already have a helper for resetting an mpam class and component.  Hook
-it up to resctrl_arch_reset_all_ctrls() and the domain offline path.
+Implement resctrl_arch_get_config() by testing the live configuration for a
+CPOR bitmap. For any other configuration type return the default.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Tested-by: Peter Newman <peternewman@google.com>
 Tested-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Reviewed-by: Zeng Heng <zengheng4@huawei.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since v2:
-Don't expose unlocked reset
+ drivers/resctrl/mpam_resctrl.c | 43 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-Changes since v3:
-Don't use or expose mpam_reset_component_locked()
----
- drivers/resctrl/mpam_devices.c  |  2 +-
- drivers/resctrl/mpam_internal.h |  3 +++
- drivers/resctrl/mpam_resctrl.c  | 13 +++++++++++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index b45743c5fb46..e4a302a53991 100644
---- a/drivers/resctrl/mpam_devices.c
-+++ b/drivers/resctrl/mpam_devices.c
-@@ -2567,7 +2567,7 @@ static void mpam_reset_component_locked(struct mpam_component *comp)
- 	}
- }
- 
--static void mpam_reset_class_locked(struct mpam_class *class)
-+void mpam_reset_class_locked(struct mpam_class *class)
- {
- 	struct mpam_component *comp;
- 
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 28ac501e1ac3..e2704f678af5 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -392,6 +392,9 @@ extern u8 mpam_pmg_max;
- void mpam_enable(struct work_struct *work);
- void mpam_disable(struct work_struct *work);
- 
-+/* Reset all the RIS in a class under cpus_read_lock() */
-+void mpam_reset_class_locked(struct mpam_class *class);
-+
- int mpam_apply_config(struct mpam_component *comp, u16 partid,
- 		      struct mpam_config *cfg);
- 
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index fe566e39aa4d..5f482c6293e7 100644
+index 5f482c6293e7..d5caab6b8545 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -168,6 +168,19 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
+@@ -168,6 +168,49 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
  	return comp->comp_id;
  }
  
-+void resctrl_arch_reset_all_ctrls(struct rdt_resource *r)
++u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
++			    u32 closid, enum resctrl_conf_type type)
 +{
++	u32 partid;
++	struct mpam_config *cfg;
++	struct mpam_props *cprops;
 +	struct mpam_resctrl_res *res;
++	struct mpam_resctrl_dom *dom;
++	enum mpam_device_features configured_by;
 +
 +	lockdep_assert_cpus_held();
 +
 +	if (!mpam_is_enabled())
-+		return;
++		return resctrl_get_default_ctrl(r);
 +
 +	res = container_of(r, struct mpam_resctrl_res, resctrl_res);
-+	mpam_reset_class_locked(res->class);
++	dom = container_of(d, struct mpam_resctrl_dom, resctrl_ctrl_dom);
++	cprops = &res->class->props;
++
++	partid = resctrl_get_config_index(closid, type);
++	cfg = &dom->ctrl_comp->cfg[partid];
++
++	switch (r->rid) {
++	case RDT_RESOURCE_L2:
++	case RDT_RESOURCE_L3:
++		configured_by = mpam_feat_cpor_part;
++		break;
++	default:
++		return resctrl_get_default_ctrl(r);
++	}
++
++	if (!r->alloc_capable || partid >= resctrl_arch_get_num_closid(r) ||
++	    !mpam_has_feature(configured_by, cfg))
++		return resctrl_get_default_ctrl(r);
++
++	switch (configured_by) {
++	case mpam_feat_cpor_part:
++		return cfg->cpbm;
++	default:
++		return resctrl_get_default_ctrl(r);
++	}
 +}
 +
- static void mpam_resctrl_domain_hdr_init(int cpu, struct mpam_component *comp,
- 					 enum resctrl_res_level rid,
- 					 struct rdt_domain_hdr *hdr)
+ void resctrl_arch_reset_all_ctrls(struct rdt_resource *r)
+ {
+ 	struct mpam_resctrl_res *res;
 -- 
 2.43.0
 
