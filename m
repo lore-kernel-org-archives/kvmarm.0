@@ -1,316 +1,213 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C81B28F50F
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4633A9DAB
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771955603; cv=none; b=F1lARlnp6RE0QS5bOQQY8h+aYEUFkrBM26QqKRhFnp0j9LDBer5b4q/t/hbEpR827KmqMIhND/P/wETrlge91ZJhKJP7RUUISm68hmwD8HXE1uFyaCC5w/a8vExYXD4QpXOSVkjKbP9o9NxvpG58RvdtzVIXPwGjEho8AYmd8hA=
+	t=1771955856; cv=none; b=B8XwuxEzxUhqb6xA9Wu0L4w9hL4VEzccezIE3ruxZC1Js2nC/p2XYn8je4pynCi9v5mt+DLYJZzGw7UZMaY8vk6AcVdkmZJJns+a4c5rl1wJmd2xZKw1MYgIiFKsKesUuFRo/nbxYHuuMUnKsR0OyE8J3r4Kk8GLCA99exsCa/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771955603; c=relaxed/simple;
-	bh=ck7lPuA/d1qThB2PwOE2+uUsKyNKotfNBe/QFuvUdqI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZBiRWoUY+Rd4585V0aYxhmQ1huXziX9UBTecU7YUQXfM2Sgaow0jn4+7S9C/+hIHrrFn/GQJ9EuiG+FJMTJruvwX4JL665K5nCUtHLFUUcapra0iqatckv9qzYcM24KlQQrSIN39RiC0f4HM0uHaOwmDnawmSPMu8X3PvBpNzlc=
+	s=arc-20240116; t=1771955856; c=relaxed/simple;
+	bh=5cORFzk7hNtK+QIGykzpuuNOAdccKkZGLgloyF+z0bU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PBD7ABtYP+iNS6VYzmVfZsibhms4mEbLl/YSzvS3yeK4UaE6onNBI3DuVI3I3uvKsgL5X4AdPbovG9LoTJp9FEbt8Ehs1EN9qd2F8cg2tGfDnsSNCgodiG9M2MVokQEBs/4IekJVTBwmFIDtb3k3a2JUNnFKWx+De4heTK/ANYw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 68E72339;
-	Tue, 24 Feb 2026 09:53:13 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B4253F59E;
-	Tue, 24 Feb 2026 09:53:14 -0800 (PST)
-Message-ID: <35bf397e-bf96-4c15-b905-2141020b7627@arm.com>
-Date: Tue, 24 Feb 2026 17:53:13 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 98061339;
+	Tue, 24 Feb 2026 09:57:28 -0800 (PST)
+Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1DAE23F59E;
+	Tue, 24 Feb 2026 09:57:29 -0800 (PST)
+From: Ben Horgan <ben.horgan@arm.com>
+To: ben.horgan@arm.com
+Cc: amitsinght@marvell.com,
+	baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com,
+	carl@os.amperecomputing.com,
+	dave.martin@arm.com,
+	david@kernel.org,
+	dfustini@baylibre.com,
+	fenghuay@nvidia.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	jonathan.cameron@huawei.com,
+	kobak@nvidia.com,
+	lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peternewman@google.com,
+	punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com,
+	reinette.chatre@intel.com,
+	rohit.mathew@arm.com,
+	scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev,
+	zengheng4@huawei.com,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v5 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
+Date: Tue, 24 Feb 2026 17:56:39 +0000
+Message-ID: <20260224175720.2663924-1-ben.horgan@arm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
-From: Ben Horgan <ben.horgan@arm.com>
-To: Zeng Heng <zengheng4@huawei.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- linux-doc@vger.kernel.org, Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <9945d28e-f1f2-e11a-1481-8d80167d6f89@huawei.com>
- <b844c632-c8fc-48f1-b347-07f166019b22@arm.com>
- <28dbde39-5b21-5f2f-59f5-4500c8b0296d@huawei.com>
- <2f2410a0-69dd-4da5-bd84-d168ba6b0605@arm.com>
-Content-Language: en-US
-In-Reply-To: <2f2410a0-69dd-4da5-bd84-d168ba6b0605@arm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Zeng,
+The main change in this version of the mpam missing pieces series is to
+update the cdp emulation to match the resctrl interface. L2 and L3
+resources can now enable cdp separately. Cdp can't be hidden correctly for
+memory bandwidth allocation, as max per partid can't be emulated with more
+partids, and so we hide this completely when cdp is enabled. There is a little
+restructuring and a few smaller changes.
 
-On 2/24/26 14:19, Ben Horgan wrote:
-> Hi Zeng,
-> 
-> On 2/24/26 11:03, Zeng Heng wrote:
->> Hi Ben,
->>
->> On 2026/2/16 20:22, Ben Horgan wrote:
->>> Hi Zeng,
->>>
->>> On 2/14/26 09:40, Zeng Heng wrote:
->>>> Hi Ben,
->>>>
->>>> On 2026/2/4 5:43, Ben Horgan wrote:
->>> [...]
->>>>>
->>>>> Based on:
->>>>> [1] git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/cache
->>>>> (To include telemetry code which changes the resctrl arch interface)
->>>>>
->>>>> The series can be retrieved from:
->>>>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v4
->>>>> (Final commit is a fix already in 6.19-rc8)
->>>>>
->>> [...]
->>>>>
->>>>
->>>> I've tested the MPAM functionality on my local Kunpeng platform. Here's
->>>> a summary of the results:
->>>
->>> Thank you very much for your testing and detailed report.
->>>
->>>>
->>>> Features enabled and verified:
->>>>    * L2 and L3 CPBM
->>>>    * L3 CSU
->>>>    * L2 and L3 CDP
->>>> All enabled features passed functional testing as expected.
->>>>
->>>> + Tested-by: Zeng Heng <zengheng4@huawei.com>
->>>>
->>>> Features not enabled:
->>>>    1. MATA MBMAX partition and MBWU monitor.
->>>
->>> What's MATA here? Just memory allocation or something more specific?
->>>
->>
->> The MATA serves as the agent for the Broadway MESI coherence protocol
->> among multiple L3 caches or between I/O and L3 caches. It maintains data
->> coherence among multiple L3 caches or between I/O and L3 caches.
->>
->> As the connection module between the SoC and the memory system, the MATA
->> interfaces with the DMC on the DDR die. It provides the system with DDR
->> access paths, delivering high-bandwidth, low-latency DDR read/write
->> access.
->>
->> On the Kunpeng chip, the MB related MSC resides in this module rather
->> than being directly located on the L3 cache controller.
->>
->>>>       Reason: These do not meet the driver's current topology>
->>> expectations for MB support, hence they were not initialized.
->>>>       This behavior is expected.
->>>
->>> Is this because you have more than 1 L3 cache?
->>
->> Yes, Kunpeng platform has more than 1 L3 cache.
->>
->> However, the reason it is not supported here is that the current driver
->> does not support MATA recognition, while both Kunpeng MBM and MBA
->> functionalities reside in the MATA MSC side as mentioned above,
->> resulting in the inability to provide support.
->>
->> Relevant logs are as follows:
->>
->> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
->> Mismatched CPU mask with L3 equivalent
->> [   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
->> match L3
->>
->>>
->>>>
->>>>    2. L2 CSU and MBWU monitors.
->>>>       Reason: The current MPAM driver does not support L2-related
->>>>       functionality yet.
->>>
->>> Thanks for letting us know you have these. But, yes, unfortunately
->>> monitoring is only supported on the L3 at the moment.
->>>
->>>>
->>>> + Tested-by: Zeng Heng <zengheng4@huawei.com>
->>>>
->>>>
->>>> Detailed test logs are as follows:
->>>
->>> I'm confused by these logs as it looks like you aren't getting any
->>> monitors but you verified the L3 CSU. Also, it looks like cpor (cbpm) is
->>> disabled (at least partially) but you verified L2 and L3 CPBM. Is this
->>> across different machines?
->>>
->>
->> The logs were of course tested on the same machine.
-> 
-> Ok and the same run? Just asking because I can't yet see how this all
-> goes together.
-> 
->>
->> Since the L3 CSU/CPBM resides on the L3 cache, it can be correctly
->> recognized and run smoothly.
->>
->> In fact, not only was L2 successfully mounted, but all L2 MSC CPBMs were
->> also correctly recognized. The suspicion here is that the L2
->> class->components were incorrectly mounted to an unknown object, which
->> is believed to be related to the monitoring capabilities (CSU and MBWU)
->> of Kunpeng L2. The root cause is still being investigated.
-> 
-> I'll try and mock up a system with L2 monitoring and cpbm to see if the
-> driver behaves in the same way.
-> 
-> However, I still can't understand how you get CPOR on L2 after seeing
-> "mpam:mpam_resctrl_pick_caches: class 2 cache misses CPOR" as that
-> should be the only place class is set for the l2 cache which guards the
-> call to mpam_control_init() in mpam_resctrl_setup(). The
-> mpam_monitor_init() comes later so I can't see how that effects.
-> 
-> Is the driver corrupting something or writing to mpam_resctrl_controls
-> with the wrong index? Clutching at straws here.
-> 
->>
->> Resctrl mounting status:
->>
->> # cat schemata
->> L2:4=ff;7=ff;10=ff;13=ff;16=ff;19=ff;22=ff;25=ff;29=ff;32=ff;35=ff;
->> 38=ff;41=ff;44=ff;47=ff;50=ff;54=ff;57=ff;60=ff;63=ff;66=ff;69=ff;72=ff;
->> 75=ff;79=ff;82=ff;85=ff;88=ff;91=ff;94=ff;97=ff;100=ff;104=ff;107=ff;
->> 110=ff;113=ff;116=ff;119=ff;122=ff;125=ff;129=ff;132=ff;135=ff;138=ff;
->> 141=ff;144=ff;147=ff;150=ff;154=ff;157=ff;160=ff;163=ff;166=ff;169=ff;
->> 172=ff;175=ff;179=ff;182=ff;185=ff;188=ff;191=ff;194=ff;197=ff;200=ff;
->> 204=ff;207=ff;210=ff;213=ff;216=ff;219=ff;222=ff;225=ff;229=ff;232=ff;
->> 235=ff;238=ff;241=ff;244=ff;247=ff;250=ff;254=ff;257=ff;260=ff;263=ff;
->> 266=ff;269=ff;272=ff;275=ff;279=ff;282=ff;285=ff;288=ff;291=ff;294=ff;
->> 297=ff;300=ff
->> L3:1=1ffff;26=1ffff;51=1ffff;76=1ffff;101=1ffff;126=1ffff;151=1ffff;
->> 176=1ffff;201=1ffff;226=1ffff;251=1ffff;276=1ffff
->>
->> # ls mon_data/*/*
->> mon_data/mon_L3_01/llc_occupancy   mon_data/mon_L3_151/llc_occupancy
->> mon_data/mon_L3_226/llc_occupancy  mon_data/mon_L3_276/llc_occupancy
->> mon_data/mon_L3_101/llc_occupancy  mon_data/mon_L3_176/llc_occupancy
->> mon_data/mon_L3_251/llc_occupancy  mon_data/mon_L3_51/llc_occupancy
->> mon_data/mon_L3_126/llc_occupancy  mon_data/mon_L3_201/llc_occupancy
->> mon_data/mon_L3_26/llc_occupancy   mon_data/mon_L3_76/llc_occupancy
-> 
-> Thanks for the extra details. These are as expected, right?
-> 
->>
->>>>
->>>> Boot logs:
->>>> [root@localhost ~]# dmesg | grep -i mpam
->>>> [    0.000000] ACPI: MPAM 0x000000007FF35018 003024 (v01 HISI   HIP12
->>>> 00000000 HISI 20151124)
->>>> [    9.509852] mpam_msc mpam_msc.64: Merging features for
->>>> vmsc:0xffff0800973cf5a0 |= ris:0xffff08009757ee90
->>>> [    9.509859] mpam_msc mpam_msc.254: Merging features for
->>>> class:0xffff08009736fe50 &= vmsc:0xffff080097628520
->>>> [    9.509860] mpam:__props_mismatch:
->>>> mpam_has_feature(mpam_feat_cpor_part, parent) = 1
->>>> [    9.509864] mpam:__props_mismatch:
->>>> mpam_has_feature(mpam_feat_cpor_part, child) = 0
->>>> [    9.509866] mpam:__props_mismatch: parent->cpbm_wd = 8
->>>> [    9.509869] mpam:__props_mismatch: child->cpbm_wd = 0
->>>> [    9.509871] mpam:__props_mismatch: alias = 0
->>>> [    9.509873] mpam:__props_mismatch: cleared cpor_part
-> 
-> Do you know where this mismatch is happening? Is it expected?
+Changelogs in patches
 
-I have added some of James' debug patches at:
-https://gitlab.arm.com/linux-arm/linux-bh/-/tree/mpam_resctrl_glue_v5_debugfs?ref_type=heads
+It would be great to get this series merged this cycle. For that we'll need
+more testing and reviewing. Thanks!
 
-These are on top of a v5 of the series. They apply to older series
-as well.
+From James' cover letter:
 
-The debugfs should then contain details of all the MSC which
-should help debugging.
+This is the missing piece to make MPAM usable resctrl in user-space. This has
+shed its debugfs code and the read/write 'event configuration' for the monitors
+to make the series smaller.
 
-It would be great if you were able to share that information, either on list or
-privately if needed.
+This adds the arch code and KVM support first. I anticipate the whole thing
+going via arm64, but if goes via tip instead, the an immutable branch with those
+patches should be easy to do.
 
-You can snapshot the mpam debugfs using:
+Generally the resctrl glue code works by picking what MPAM features it can expose
+from the MPAM drive, then configuring the structs that back the resctrl helpers.
+If your platform is sufficiently Xeon shaped, you should be able to get L2/L3 CPOR
+bitmaps exposed via resctrl. CSU counters work if they are on/after the L3. MBWU
+counters are considerably more hairy, and depend on hueristics around the topology,
+and a bunch of stuff trying to emulate ABMC.
+If it didn't pick what you wanted it to, please share the debug messages produced
+when enabling dynamic debug and booting with:
+| dyndbg="file mpam_resctrl.c +pl"
 
-find /sys/kernel/debug/mpam -type f -exec sh -c 'echo {}; cat {}' \; > mpam_debugfs.txt
+I've not found a platform that can test all the behaviours around the monitors,
+so this is where I'd expect the most bugs.
 
-> 
->>>
->>> cpor (partially) disabled?
->>>
->>>> [    9.509876] mpam:__props_mismatch: took the min num_csu_mon
->>>> [    9.509878] mpam:__props_mismatch: took the min num_mbwu_mon
->>>> [    9.509881] mpam_msc mpam_msc.252: Merging features for
->>
->> [...]
->>
->>>> [   10.978496] mpam:mpam_resctrl_pick_caches: class 2 cache misses CPOR
->>>
->>> No L2 cpor?
-> 
-> This particularly confuses me...
-> 
->>>
->>>> [   10.978497] mpam:mpam_resctrl_pick_caches: class 255 is not a cache
->>>> [   10.980470] mpam:mpam_resctrl_pick_mba: class 2 is before L3
->>>> [   10.980472] mpam:mpam_resctrl_pick_mba: class 3 has no bandwidth
->>>> control
->>>> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
->>>> Mismatched CPU mask with L3 equivalent
->>>> [   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
->>>> match L3
->>>> [   10.997415] mpam:mpam_resctrl_pick_counters: class 2 is before L3
->>>> [   11.024109] mpam:topology_matches_l3: class 3 component 276 has
->>>> Mismatched CPU mask with L3 equivalent
->>>> [   11.024114] mpam:class_has_usable_mbwu: monitors usable in free-
->>>> running mode
->>>
->>> mbwu enabled?
->>
->> The fact that the number of monitors merely satisfies the conditions for
->> free-running mode does not imply that the MBWU functionality can be
->> successfully mounted. The specific reasons are explained above.
-> 
-> True
-> 
->>
->>>
->>>> [   11.063882] mpam:topology_matches_l3: class 255 component 0 has
->>>> Mismatched CPU mask with L3 equivalent
->>>> [   11.113183] mpam:mpam_resctrl_alloc_domain: Skipped monitor domain
->>>> online - no monitors
->>>> [   11.113189] MPAM enabled with 32 PARTIDs and 4 PMGs
->>>>
->>>>
->>
->> Sorry for the late reply. And this is my first day back from a long
->> vacation.
-> 
-> No problem. Hope you had a good holiday.
-> 
->>
->>
->> Best regards,
->> Zeng Heng
-> 
-> Thanks,
-> 
-> Ben
-> 
-> 
+The MPAM spec that describes all the system and MMIO registers can be found here:
+https://developer.arm.com/documentation/ddi0598/db/?lang=en
+(Ignored the 'RETIRED' warning - that is just arm moving the documentation around.
+ This document has the best overview)
 
-Thanks,
 
-Ben
+Based on v7.0-rc1
+
+The series can be retrieved from:
+https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v5
+
+v4 can be found at:
+https://lore.kernel.org/linux-arm-kernel/20260203214342.584712-1-ben.horgan@arm.com/
+
+v3 can be found at:
+https://lore.kernel.org/linux-arm-kernel/20260112165914.4086692-1-ben.horgan@arm.com/
+
+v2 can be found at:
+https://lore.kernel.org/linux-arm-kernel/20251219181147.3404071-1-ben.horgan@arm.com/
+
+rfc can be found at:
+https://lore.kernel.org/linux-arm-kernel/20251205215901.17772-1-james.morse@arm.com/
+
+Ben Horgan (11):
+  arm64/sysreg: Add MPAMSM_EL1 register
+  KVM: arm64: Preserve host MPAM configuration when changing traps
+  KVM: arm64: Make MPAMSM_EL1 accesses UNDEF
+  arm64: mpam: Drop the CONFIG_EXPERT restriction
+  arm64: mpam: Initialise and context switch the MPAMSM_EL1 register
+  KVM: arm64: Use kernel-space partid configuration for hypercalls
+  arm_mpam: resctrl: Add rmid index helpers
+  arm_mpam: resctrl: Add kunit test for rmid idx conversions
+  arm_mpam: resctrl: Wait for cacheinfo to be ready
+  arm_mpam: resctrl: Add monitor initialisation and domain boilerplate
+  arm64: mpam: Add initial MPAM documentation
+
+Dave Martin (2):
+  arm_mpam: resctrl: Convert to/from MPAMs fixed-point formats
+  arm_mpam: resctrl: Add kunit test for control format conversions
+
+James Morse (24):
+  arm64: mpam: Context switch the MPAM registers
+  arm64: mpam: Re-initialise MPAM regs when CPU comes online
+  arm64: mpam: Advertise the CPUs MPAM limits to the driver
+  arm64: mpam: Add cpu_pm notifier to restore MPAM sysregs
+  arm64: mpam: Add helpers to change a task or cpu's MPAM PARTID/PMG
+    values
+  KVM: arm64: Force guest EL1 to use user-space's partid configuration
+  arm_mpam: resctrl: Add boilerplate cpuhp and domain allocation
+  arm_mpam: resctrl: Pick the caches we will use as resctrl resources
+  arm_mpam: resctrl: Implement resctrl_arch_reset_all_ctrls()
+  arm_mpam: resctrl: Add resctrl_arch_get_config()
+  arm_mpam: resctrl: Implement helpers to update configuration
+  arm_mpam: resctrl: Add plumbing against arm64 task and cpu hooks
+  arm_mpam: resctrl: Add CDP emulation
+  arm_mpam: resctrl: Add support for 'MB' resource
+  arm_mpam: resctrl: Add support for csu counters
+  arm_mpam: resctrl: Pick classes for use as mbm counters
+  arm_mpam: resctrl: Pre-allocate free running monitors
+  arm_mpam: resctrl: Allow resctrl to allocate monitors
+  arm_mpam: resctrl: Add resctrl_arch_rmid_read() and
+    resctrl_arch_reset_rmid()
+  arm_mpam: resctrl: Update the rmid reallocation limit
+  arm_mpam: resctrl: Add empty definitions for assorted resctrl
+    functions
+  arm64: mpam: Select ARCH_HAS_CPU_RESCTRL
+  arm_mpam: resctrl: Call resctrl_init() on platforms that can support
+    resctrl
+  arm_mpam: Quirk CMN-650's CSU NRDY behaviour
+
+Shanker Donthineni (4):
+  arm_mpam: Add quirk framework
+  arm_mpam: Add workaround for T241-MPAM-1
+  arm_mpam: Add workaround for T241-MPAM-4
+  arm_mpam: Add workaround for T241-MPAM-6
+
+ Documentation/arch/arm64/index.rst          |    1 +
+ Documentation/arch/arm64/mpam.rst           |   94 +
+ Documentation/arch/arm64/silicon-errata.rst |    9 +
+ arch/arm64/Kconfig                          |    6 +-
+ arch/arm64/include/asm/el2_setup.h          |    3 +-
+ arch/arm64/include/asm/mpam.h               |   96 +
+ arch/arm64/include/asm/resctrl.h            |    2 +
+ arch/arm64/include/asm/thread_info.h        |    3 +
+ arch/arm64/kernel/Makefile                  |    1 +
+ arch/arm64/kernel/cpufeature.c              |   21 +-
+ arch/arm64/kernel/mpam.c                    |   62 +
+ arch/arm64/kernel/process.c                 |    7 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h     |   12 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c          |    9 +
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c          |   16 +
+ arch/arm64/kvm/sys_regs.c                   |    2 +
+ arch/arm64/tools/sysreg                     |    8 +
+ drivers/resctrl/Kconfig                     |    9 +-
+ drivers/resctrl/Makefile                    |    1 +
+ drivers/resctrl/mpam_devices.c              |  257 ++-
+ drivers/resctrl/mpam_internal.h             |  105 +-
+ drivers/resctrl/mpam_resctrl.c              | 1875 +++++++++++++++++++
+ drivers/resctrl/test_mpam_resctrl.c         |  364 ++++
+ include/linux/arm_mpam.h                    |   32 +
+ 24 files changed, 2968 insertions(+), 27 deletions(-)
+ create mode 100644 Documentation/arch/arm64/mpam.rst
+ create mode 100644 arch/arm64/include/asm/mpam.h
+ create mode 100644 arch/arm64/include/asm/resctrl.h
+ create mode 100644 arch/arm64/kernel/mpam.c
+ create mode 100644 drivers/resctrl/mpam_resctrl.c
+ create mode 100644 drivers/resctrl/test_mpam_resctrl.c
+
+-- 
+2.43.0
 
