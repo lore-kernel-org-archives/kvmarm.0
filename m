@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602653ACEF3
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7D83ACA6A
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 18:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771955996; cv=none; b=adY//kOxyHpoRrEQBJqy75JN0HcTEOyUdNfxz03Cf/25SAqp7u9ocXK+IwDh5LsALFBQAI87bgSWEm12vRSJrcZwSb8NKOMwA86nWmYXmt9JtzGlTCILgmGYF+N8DlxOMiCCOY/f9LkuL4Cdjop0hWEudpSvs7MCQKjYcRrIF5E=
+	t=1771956002; cv=none; b=NTTp/ZD6tvoNqLDXOIsWF3SCnsBK6V/rhBygE1S4BLrCGo2tI15oziDARRdIxzzlvhI127WyDl4Dk5+JOTCilM3bpaMITDf5kwxtI2ZBAw8+QB4V5Phv+FbMaNjCqE/VFptucslTo3GutnaCbcOfwhmgpswJnIW+bZG95C1X35A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771955996; c=relaxed/simple;
-	bh=QCFmq+r/JI7wlJRn5Cp0w90W+b/FbOSXlGXSn5xZ2lw=;
+	s=arc-20240116; t=1771956002; c=relaxed/simple;
+	bh=VChbK/dzLiFso3bmHaC65LUIXLZMdOZYcam3/rC+C1o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g75y1/9Mf9UfUsQbeq73U9gbf9oYNC06nWMPlitc5Zvli1MRay3NRRyGCCjmce4f6JKUACIpqV8ZVBs3pHq+xBrgSUTr1D4a8IBIgYkJxOFMgejtlfeZoQqEQ+6kXvuXZwV0I94oKbXcs3WM3OH37yen0fLKiopSsaqo/EcNvZo=
+	 MIME-Version; b=WewodGk/jPeOKC16rVdQSGgUqIn8YyK7IZEQbyOkUrjKtNmBVmgYBEKAUzrnbo0Nv4xpfWnJIs3a+hdlJl3SahGNkAItfvXyaK/p5MlbLSLurnpK/Jdh24GJVqIy+oqDVGK3DOrcu0kYi2dzQFL1lyzkYmtaAYsx2uzDBOgHz7g=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA97F1595;
-	Tue, 24 Feb 2026 09:59:48 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A5E6339;
+	Tue, 24 Feb 2026 09:59:54 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 400603F59E;
-	Tue, 24 Feb 2026 09:59:44 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 275143F59E;
+	Tue, 24 Feb 2026 09:59:55 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -53,10 +53,11 @@ Cc: amitsinght@marvell.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev,
 	zengheng4@huawei.com,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v5 26/41] arm_mpam: resctrl: Add monitor initialisation and domain boilerplate
-Date: Tue, 24 Feb 2026 17:57:05 +0000
-Message-ID: <20260224175720.2663924-27-ben.horgan@arm.com>
+	linux-doc@vger.kernel.org,
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Subject: [PATCH v5 27/41] arm_mpam: resctrl: Add support for csu counters
+Date: Tue, 24 Feb 2026 17:57:06 +0000
+Message-ID: <20260224175720.2663924-28-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260224175720.2663924-1-ben.horgan@arm.com>
 References: <20260224175720.2663924-1-ben.horgan@arm.com>
@@ -68,288 +69,163 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the boilerplate that tells resctrl about the mpam monitors that are
-available. resctrl expects all (non-telemetry) monitors to be on the L3 and
-so advertise them there and invent an L3 resctrl resource if required. The
-L3 cache itself has to exist as the cache ids are used as the domain
-ids.
+From: James Morse <james.morse@arm.com>
 
-Bring the resctrl monitor domains online and offline based on the cpus
-they contain.
+resctrl exposes a counter via a file named llc_occupancy. This isn't really
+a counter as its value goes up and down, this is a snapshot of the cache
+storage usage monitor.
 
-Support for specific monitor types is left to later.
+Add some picking code which will only find an L3. The resctrl counter
+file is called llc_occupancy but we don't check it is the last one as
+it is already identified as L3.
 
+Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Tested-by: Zeng Heng <zengheng4@huawei.com>
+Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+Co-developed-by: Dave Martin <dave.martin@arm.com>
+Signed-off-by: Dave Martin <dave.martin@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-New patch but mostly moved from the existing patches to
-separate the monitors from the controls and the boilerplate
-from the specific counters.
-Use l3->mon_capable in resctrl_arch_mon_capable() as
-resctrl_enable_mon_event() now returns a bool.
----
- drivers/resctrl/mpam_internal.h |   7 ++
- drivers/resctrl/mpam_resctrl.c  | 142 +++++++++++++++++++++++++++++---
- 2 files changed, 139 insertions(+), 10 deletions(-)
+Changes since rfc:
+Allow csu counters however many partid or pmg there are
+else if -> if
+reduce scope of local variables
+drop has_csu
 
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 57c3d9b962b9..472bd5d27baa 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -341,6 +341,7 @@ struct mpam_msc_ris {
- struct mpam_resctrl_dom {
- 	struct mpam_component		*ctrl_comp;
- 	struct rdt_ctrl_domain		resctrl_ctrl_dom;
-+	struct rdt_l3_mon_domain	resctrl_mon_dom;
- };
- 
- struct mpam_resctrl_res {
-@@ -349,6 +350,12 @@ struct mpam_resctrl_res {
- 	bool			cdp_enabled;
- };
- 
-+struct mpam_resctrl_mon {
-+	struct mpam_class	*class;
-+
-+	/* per-class data that resctrl needs will live here */
-+};
-+
- static inline int mpam_alloc_csu_mon(struct mpam_class *class)
- {
- 	struct mpam_props *cprops = &class->props;
+Changes since v2:
+return -> break so works for mbwu in later patch
+add for_each_mpam_resctrl_mon
+return error from mpam_resctrl_monitor_init(). It may fail when is abmc
+allocation introduced in a later patch.
+Squashed in patch from Dave Martin:
+https://lore.kernel.org/lkml/20250820131621.54983-1-Dave.Martin@arm.com/
+
+Changes since v3:
+resctrl_enable_mon_event() signature update
+Restrict the events considered
+num-rmid update
+Use raw_smp_processor_id()
+Tighten heuristics:
+ Make sure it is the L3
+ Please shout if this means the counters aren't exposed on any platforms
+Drop tags due to change in policy/rework
+
+Changes since v4:
+Move generic monitor boilerplate to separate patch
+---
+ drivers/resctrl/mpam_resctrl.c | 83 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
+
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 29efcad163e6..c14e59e8586d 100644
+index c14e59e8586d..a570cdf06feb 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -34,6 +34,23 @@ static struct mpam_resctrl_res mpam_resctrl_controls[RDT_NUM_RESOURCES];
- 	     rid < RDT_NUM_RESOURCES;						\
- 	     rid++, res = &mpam_resctrl_controls[rid])
- 
-+/*
-+ * The classes we've picked to map to resctrl events.
-+ * Resctrl believes all the worlds a Xeon, and these are all on the L3. This
-+ * array lets us find the actual class backing the event counters. e.g.
-+ * the only memory bandwidth counters may be on the memory controller, but to
-+ * make use of them, we pretend they are on L3. Restrict the events considered
-+ * to those supported by MPAM.
-+ * Class pointer may be NULL.
-+ */
-+#define MPAM_MAX_EVENT QOS_L3_MBM_TOTAL_EVENT_ID
-+static struct mpam_resctrl_mon mpam_resctrl_counters[MPAM_MAX_EVENT + 1];
-+
-+#define for_each_mpam_resctrl_mon(mon, eventid)					\
-+	for (eventid = QOS_FIRST_EVENT, mon = &mpam_resctrl_counters[eventid];	\
-+	     eventid <= MPAM_MAX_EVENT;						\
-+	     eventid++, mon = &mpam_resctrl_counters[eventid])
-+
- /* The lock for modifying resctrl's domain lists from cpuhp callbacks. */
- static DEFINE_MUTEX(domain_list_lock);
- 
-@@ -63,6 +80,15 @@ bool resctrl_arch_alloc_capable(void)
- 	return false;
+@@ -289,6 +289,28 @@ static bool class_has_usable_mba(struct mpam_props *cprops)
+ 	return mba_class_use_mbw_max(cprops);
  }
  
-+bool resctrl_arch_mon_capable(void)
++static bool cache_has_usable_csu(struct mpam_class *class)
 +{
-+	struct mpam_resctrl_res *res = &mpam_resctrl_controls[RDT_RESOURCE_L3];
-+	struct rdt_resource *l3 = &res->resctrl_res;
++	struct mpam_props *cprops;
 +
-+	/* All monitors are presented as being on the L3 cache */
-+	return l3->mon_capable;
++	if (!class)
++		return false;
++
++	cprops = &class->props;
++
++	if (!mpam_has_feature(mpam_feat_msmon_csu, cprops))
++		return false;
++
++	/*
++	 * CSU counters settle on the value, so we can get away with
++	 * having only one.
++	 */
++	if (!cprops->num_csu_mon)
++		return false;
++
++	return true;
 +}
 +
- bool resctrl_arch_get_cdp_enabled(enum resctrl_res_level rid)
- {
- 	return mpam_resctrl_controls[rid].cdp_enabled;
-@@ -651,6 +677,57 @@ static int mpam_resctrl_pick_domain_id(int cpu, struct mpam_component *comp)
- 	return comp->comp_id;
+ /*
+  * Calculate the worst-case percentage change from each implemented step
+  * in the control.
+@@ -602,6 +624,64 @@ static void mpam_resctrl_pick_mba(void)
+ 	}
  }
  
-+static int mpam_resctrl_monitor_init(struct mpam_resctrl_mon *mon,
-+				     enum resctrl_event_id type)
++static void counter_update_class(enum resctrl_event_id evt_id,
++				 struct mpam_class *class)
 +{
-+	struct mpam_resctrl_res *res = &mpam_resctrl_controls[RDT_RESOURCE_L3];
-+	struct rdt_resource *l3 = &res->resctrl_res;
++	struct mpam_class *existing_class = mpam_resctrl_counters[evt_id].class;
++
++	if (existing_class) {
++		if (class->level == 3) {
++			pr_debug("Existing class is L3 - L3 wins\n");
++			return;
++		}
++
++		if (existing_class->level < class->level) {
++			pr_debug("Existing class is closer to L3, %u versus %u - closer is better\n",
++				 existing_class->level, class->level);
++			return;
++		}
++	}
++
++	mpam_resctrl_counters[evt_id].class = class;
++}
++
++static void mpam_resctrl_pick_counters(void)
++{
++	struct mpam_class *class;
 +
 +	lockdep_assert_cpus_held();
 +
-+	/*
-+	 * There also needs to be an L3 cache present.
-+	 * The check just requires any online CPU and it can't go offline as we
-+	 * hold the cpu lock.
-+	 */
-+	if (get_cpu_cacheinfo_id(raw_smp_processor_id(), 3) == -1)
-+		return 0;
++	guard(srcu)(&mpam_srcu);
++	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
++				 srcu_read_lock_held(&mpam_srcu)) {
++		/* The name of the resource is L3... */
++		if (class->type == MPAM_CLASS_CACHE && class->level != 3) {
++			pr_debug("class %u is a cache but not the L3", class->level);
++			continue;
++		}
 +
-+	/*
-+	 * If there are no MPAM resources on L3, force it into existence.
-+	 * topology_matches_l3() already ensures this looks like the L3.
-+	 * The domain-ids will be fixed up by mpam_resctrl_domain_hdr_init().
-+	 */
-+	if (!res->class) {
-+		pr_warn_once("Faking L3 MSC to enable counters.\n");
-+		res->class = mpam_resctrl_counters[type].class;
++		if (!cpumask_equal(&class->affinity, cpu_possible_mask)) {
++			pr_debug("class %u does not cover all CPUs",
++				 class->level);
++			continue;
++		}
++
++		if (cache_has_usable_csu(class)) {
++			pr_debug("class %u has usable CSU",
++				 class->level);
++
++			/* CSU counters only make sense on a cache. */
++			switch (class->type) {
++			case MPAM_CLASS_CACHE:
++				counter_update_class(QOS_L3_OCCUP_EVENT_ID, class);
++				break;
++			default:
++				break;
++			}
++		}
 +	}
-+
-+	/*
-+	 * Called multiple times!, once per event type that has a
-+	 * monitoring class.
-+	 * Setting name is necessary on monitor only platforms.
-+	 */
-+	l3->name = "L3";
-+	l3->mon_scope = RESCTRL_L3_CACHE;
-+
-+	/*
-+	 * num-rmid is the upper bound for the number of monitoring
-+	 * groups that can exist simultaneously, including the
-+	 * default monitoring group for each control group. Hence,
-+	 * advertise the whole rmid_idx space even though each
-+	 * control group has its own pmg/rmid space. Unfortunately,
-+	 * this does mean userspace needs to know the architecture
-+	 * to correctly interpret this value.
-+	 */
-+	l3->mon.num_rmid = resctrl_arch_system_num_rmid_idx();
-+
-+	if (resctrl_enable_mon_event(type, false, 0, NULL))
-+		l3->mon_capable = true;
-+
-+	return 0;
 +}
 +
- u32 resctrl_arch_get_config(struct rdt_resource *r, struct rdt_ctrl_domain *d,
- 			    u32 closid, enum resctrl_conf_type type)
+ static int mpam_resctrl_control_init(struct mpam_resctrl_res *res)
  {
-@@ -883,6 +960,7 @@ mpam_resctrl_alloc_domain(unsigned int cpu, struct mpam_resctrl_res *res)
- {
- 	int err;
- 	struct mpam_resctrl_dom *dom;
-+	struct rdt_l3_mon_domain *mon_d;
- 	struct rdt_ctrl_domain *ctrl_d;
  	struct mpam_class *class = res->class;
- 	struct mpam_component *comp_iter, *ctrl_comp;
-@@ -922,6 +1000,20 @@ mpam_resctrl_alloc_domain(unsigned int cpu, struct mpam_resctrl_res *res)
- 	} else {
- 		pr_debug("Skipped control domain online - no controls\n");
- 	}
-+
-+	if (resctrl_arch_mon_capable()) {
-+		mon_d = &dom->resctrl_mon_dom;
-+		mpam_resctrl_domain_hdr_init(cpu, any_mon_comp, r->rid, &mon_d->hdr);
-+		mon_d->hdr.type = RESCTRL_MON_DOMAIN;
-+		err = resctrl_online_mon_domain(r, &mon_d->hdr);
-+		if (err)
-+			goto offline_ctrl_domain;
-+
-+		mpam_resctrl_domain_insert(&r->mon_domains, &mon_d->hdr);
-+	} else {
-+		pr_debug("Skipped monitor domain online - no monitors\n");
-+	}
-+
- 	return dom;
- 
- offline_ctrl_domain:
-@@ -973,6 +1065,11 @@ int mpam_resctrl_online_cpu(unsigned int cpu)
- 
- 				mpam_resctrl_online_domain_hdr(cpu, &ctrl_d->hdr);
- 			}
-+			if (resctrl_arch_mon_capable()) {
-+				struct rdt_l3_mon_domain *mon_d = &dom->resctrl_mon_dom;
-+
-+				mpam_resctrl_online_domain_hdr(cpu, &mon_d->hdr);
-+			}
+@@ -1157,6 +1237,9 @@ int mpam_resctrl_setup(void)
  		}
- 		if (IS_ERR(dom))
- 			return PTR_ERR(dom);
-@@ -993,8 +1090,9 @@ void mpam_resctrl_offline_cpu(unsigned int cpu)
- 	guard(mutex)(&domain_list_lock);
- 	for_each_mpam_resctrl_control(res, rid) {
- 		struct mpam_resctrl_dom *dom;
-+		struct rdt_l3_mon_domain *mon_d;
- 		struct rdt_ctrl_domain *ctrl_d;
--		bool ctrl_dom_empty;
-+		bool ctrl_dom_empty, mon_dom_empty;
+ 	}
  
- 		if (!res->class)
++	/* Find some classes to use for monitors */
++	mpam_resctrl_pick_counters();
++
+ 	for_each_mpam_resctrl_mon(mon, eventid) {
+ 		if (!mon->class)
  			continue;	// dummy resource
-@@ -1012,7 +1110,16 @@ void mpam_resctrl_offline_cpu(unsigned int cpu)
- 			ctrl_dom_empty = true;
- 		}
- 
--		if (ctrl_dom_empty)
-+		if (resctrl_arch_mon_capable()) {
-+			mon_d = &dom->resctrl_mon_dom;
-+			mon_dom_empty = mpam_resctrl_offline_domain_hdr(cpu, &mon_d->hdr);
-+			if (mon_dom_empty)
-+				resctrl_offline_mon_domain(&res->resctrl_res, &mon_d->hdr);
-+		} else {
-+			mon_dom_empty = true;
-+		}
-+
-+		if (ctrl_dom_empty && mon_dom_empty)
- 			kfree(dom);
- 	}
- }
-@@ -1022,12 +1129,15 @@ int mpam_resctrl_setup(void)
- 	int err = 0;
- 	struct mpam_resctrl_res *res;
- 	enum resctrl_res_level rid;
-+	struct mpam_resctrl_mon *mon;
-+	enum resctrl_event_id eventid;
- 
- 	wait_event(wait_cacheinfo_ready, cacheinfo_ready);
- 
- 	cpus_read_lock();
- 	for_each_mpam_resctrl_control(res, rid) {
- 		INIT_LIST_HEAD_RCU(&res->resctrl_res.ctrl_domains);
-+		INIT_LIST_HEAD_RCU(&res->resctrl_res.mon_domains);
- 		res->resctrl_res.rid = rid;
- 	}
- 
-@@ -1043,25 +1153,37 @@ int mpam_resctrl_setup(void)
- 		err = mpam_resctrl_control_init(res);
- 		if (err) {
- 			pr_debug("Failed to initialise rid %u\n", rid);
--			break;
-+			goto internal_error;
- 		}
- 	}
--	cpus_read_unlock();
- 
--	if (err) {
--		pr_debug("Internal error %d - resctrl not supported\n", err);
--		return err;
-+	for_each_mpam_resctrl_mon(mon, eventid) {
-+		if (!mon->class)
-+			continue;	// dummy resource
-+
-+		err = mpam_resctrl_monitor_init(mon, eventid);
-+		if (err) {
-+			pr_debug("Failed to initialise event %u\n", eventid);
-+			goto internal_error;
-+		}
- 	}
- 
--	if (!resctrl_arch_alloc_capable()) {
--		pr_debug("No alloc(%u) found - resctrl not supported\n",
--			 resctrl_arch_alloc_capable());
-+	cpus_read_unlock();
-+
-+	if (!resctrl_arch_alloc_capable() && !resctrl_arch_mon_capable()) {
-+		pr_debug("No alloc(%u) or monitor(%u) found - resctrl not supported\n",
-+			 resctrl_arch_alloc_capable(), resctrl_arch_mon_capable());
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* TODO: call resctrl_init() */
- 
- 	return 0;
-+
-+internal_error:
-+	cpus_read_unlock();
-+	pr_debug("Internal error %d - resctrl not supported\n", err);
-+	return err;
- }
- 
- static int __init __cacheinfo_ready(void)
 -- 
 2.43.0
 
