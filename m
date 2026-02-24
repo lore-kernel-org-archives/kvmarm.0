@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DCB83AA183
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849D43AA1AF
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 17:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771955862; cv=none; b=k0YZCGlEnvfOD6/bm+ARwRpShwfZJZ6JwHLiPppsJ0bUGB6WTa/4a+QTANf236ax11ViQsKrFolGwxOit3B9GGHuMjdFead2/JlRjDLGCAXNYkTDcsIOVWoxX97TY7uU04aK5j7cx74PdtW+nxoEOWsJGUtwuHt1pM8J3FX3Dqw=
+	t=1771955867; cv=none; b=tCRN4lgyWH8U7NUzoC1iOgqo7CdH3l6v+sqee/Rc1n3+3mQv7117xlfvUGpE7idMjz8IrQ+LOAm//vr26wfzzLoYuNdpAMH3IaYw8DGQpyMoxt+mkrzlbwJCaJCWmnKLm0+ig/aVybZgfzOazopi/DBDHkdJCgYAqSJhWhs2zY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771955862; c=relaxed/simple;
-	bh=hQYlAxBtf3z2cYrEoizfszJZ4I3rc1ryt9RMyoSxtE8=;
+	s=arc-20240116; t=1771955867; c=relaxed/simple;
+	bh=f1DxKLISpAM0S+vQEQu/JFleluN+ClWUsI4hwK9IAZg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XSiIV/yylDrHjBKjL+aMqJdlnyAARYrDbOTpBTLGJ8Kz2EumzFYyZxrnYBI4GJ1XBqrYf+GwuhHgGx8qPKD45gd3Ntpt0foSmdHwKE8zDZc6+9TghJTWoPsJZZy2rcJA4/v74J3aUWMPZf02d9YR0ftQiFNyod0MNyjp4bfRF9Y=
+	 MIME-Version; b=VEx5uFAb1Ik1M9drqNexHybC/e/ftkiftbgCzGSONjSxjMtOrIdMf1i2Jm03jhZ/h+wOcKSycGho+ZRdPYWXXCCj95hOAtqGly164T+DtEVFKHvrM3iGH//XtK2GDbt9QrLAaM+20Xeeo3eSNdOkeKG55SM8Dl45iZlY1uIJ390=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E846497;
-	Tue, 24 Feb 2026 09:57:33 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A71CE339;
+	Tue, 24 Feb 2026 09:57:38 -0800 (PST)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 08CB53F59E;
-	Tue, 24 Feb 2026 09:57:34 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1114B3F59E;
+	Tue, 24 Feb 2026 09:57:39 -0800 (PST)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v5 01/41] arm64/sysreg: Add MPAMSM_EL1 register
-Date: Tue, 24 Feb 2026 17:56:40 +0000
-Message-ID: <20260224175720.2663924-2-ben.horgan@arm.com>
+Subject: [PATCH v5 02/41] KVM: arm64: Preserve host MPAM configuration when changing traps
+Date: Tue, 24 Feb 2026 17:56:41 +0000
+Message-ID: <20260224175720.2663924-3-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260224175720.2663924-1-ben.horgan@arm.com>
 References: <20260224175720.2663924-1-ben.horgan@arm.com>
@@ -69,8 +69,15 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The MPAMSM_EL1 register determines the MPAM configuration for an SMCU. Add
-the register definition.
+When kvm enables or disables MPAM traps to EL2 it clears all other bits in
+MPAM2_EL2.  Notably, it clears the partition ids (PARTIDs) and performance
+monitoring groups (PMGs). Avoid changing these bits in anticipation of
+adding support for MPAM in the kernel. Otherwise, on a VHE system with the
+host running at EL2 where MPAM2_EL2 and MPAM1_EL1 access the same register,
+any attempt to use MPAM to monitor or partition resources for kernel space
+would be foiled by running a KVM guest. Additionally, MPAM2_EL2.EnMPAMSM is
+always set to 0 which causes MPAMSM_EL1 to always trap. Keep EnMPAMSM set
+to 1 when not in a guest so that the kernel can use MPAMSM_EL1.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
@@ -79,31 +86,50 @@ Tested-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
- arch/arm64/tools/sysreg | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
-index 9d1c21108057..1287cb1de6f3 100644
---- a/arch/arm64/tools/sysreg
-+++ b/arch/arm64/tools/sysreg
-@@ -5172,6 +5172,14 @@ Field	31:16	PARTID_D
- Field	15:0	PARTID_I
- EndSysreg
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 2597e8bda867..0b50ddd530f3 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -267,7 +267,8 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
  
-+Sysreg	MPAMSM_EL1	3	0	10	5	3
-+Res0	63:48
-+Field	47:40	PMG_D
-+Res0	39:32
-+Field	31:16	PARTID_D
-+Res0	15:0
-+EndSysreg
+ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+ {
+-	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
++	u64 clr = MPAM2_EL2_EnMPAMSM;
++	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+ 
+ 	if (!system_supports_mpam())
+ 		return;
+@@ -277,18 +278,21 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+ 		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
+ 	} else {
+ 		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
+-		r |= MPAM2_EL2_TIDR;
++		set |= MPAM2_EL2_TIDR;
+ 	}
+ 
+-	write_sysreg_s(r, SYS_MPAM2_EL2);
++	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+ }
+ 
+ static inline void __deactivate_traps_mpam(void)
+ {
++	u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
++	u64 set = MPAM2_EL2_EnMPAMSM;
 +
- Sysreg	ISR_EL1	3	0	12	1	0
- Res0	63:11
- Field	10	IS
+ 	if (!system_supports_mpam())
+ 		return;
+ 
+-	write_sysreg_s(0, SYS_MPAM2_EL2);
++	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+ 
+ 	if (system_supports_mpam_hcr())
+ 		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
 -- 
 2.43.0
 
