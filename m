@@ -1,266 +1,260 @@
-Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CA437996F
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 11:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961FC37C10D
+	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 11:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771931062; cv=none; b=iHwWrcC1jphpucg1M9bPsrUK9UnrzbT50k1gI7bWuRWhkcsOf/4EQ8C8zyYJ5Ock15KFdWKpZiA6YoPooSDp/l6TvNou8ZExvdVsrrWY3jwQ5eiTOX8hYYV4RkCInn7CWg6as/USrRWmw82oIJ8d4hTwERid3zMNjb4fIeCDkKg=
+	t=1771931971; cv=none; b=irhglRa77hzrdBQ4C9HzYDCxpKWUgS7z0OrOHjjceFiUXtnsoNqezDwBWJ/Kz57oCt5zVqzO28w3wjyWLxb0Uth7yBy3J0rSMtDm2PS4JiJQquCg+cbx3rsz3dkj9Z2GYZj95AFcwgp0c2U4+4r+q6nLyluOBOkeU1XF9VVSv1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771931062; c=relaxed/simple;
-	bh=/gj587vu4yivlc/dgC/D2HvATmJIxeOLhCsWfleA4f4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AO6LtsH2z4rMkmhItc6L4UzXIZN3uCdn0KzWU7Fs6SO6h8f3QXu0a0uWnKEuiqF5dUocpPPJeqA41RKAKzhEmUtOScaLyJKBybc9BCuI90iMQ5qgEwNCvIvWXn7muXIz9xNhej5hqvXWGVoHQ6U2OtYGuF5AtzKc0hjWZY4MeC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=UvWcgOBT; arc=none smtp.client-ip=113.46.200.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+	s=arc-20240116; t=1771931971; c=relaxed/simple;
+	bh=/cqjKX0xZ4V/OSet2LzETOv0Xzk3FLA4xFyvuKUPvQs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZISR6yoZXX6FPx7JnENzgLJFaKSiLvzFZTFm3cOlRM6Wi+6TjbaKJW5XrrP6Lcbtx6AKjce719SYKTV57IHOgLjNXoP8nBSXijohCyVgkxuOir9UatgbVWda5B37RUa2ZgCMkfhzaMu3oxHgL/zvwajqiHpaNWTja3/gjFMEsAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IdZO5PBF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="UvWcgOBT"
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=kCWU2R5MM4gnub93seAceQHbJ4eXvgD83yMMfMA2iD0=;
-	b=UvWcgOBTTLuLZe1zuVYQrxalje5p2e5gIY5EJdEtIm86iOi1wc0ugmAVkD3HZUL1AIwjTBv2w
-	wE//NI8VHeqW6XxqzlfaiVX9Ltbl/NnNN+TAyC3lcxc/7HIjacoR+ybCBwCKjFK5MIeVNwp9VsJ
-	5+M4mwsIkqWP6dq1FyIc8P8=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4fKvqf1mMQz1prKq;
-	Tue, 24 Feb 2026 18:59:26 +0800 (CST)
-Received: from kwepemf100008.china.huawei.com (unknown [7.202.181.222])
-	by mail.maildlp.com (Postfix) with ESMTPS id D87FF4056B;
-	Tue, 24 Feb 2026 19:04:14 +0800 (CST)
-Received: from [10.174.179.37] (10.174.179.37) by
- kwepemf100008.china.huawei.com (7.202.181.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Tue, 24 Feb 2026 19:04:13 +0800
-Message-ID: <28dbde39-5b21-5f2f-59f5-4500c8b0296d@huawei.com>
-Date: Tue, 24 Feb 2026 19:03:28 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IdZO5PBF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 463D1C116D0;
+	Tue, 24 Feb 2026 11:19:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771931971;
+	bh=/cqjKX0xZ4V/OSet2LzETOv0Xzk3FLA4xFyvuKUPvQs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IdZO5PBFlcWJv7wvqZ5ymSvSQdJTS4Iz3DpCndcZeYBAZsGYs8Zb/OyACIH6//Vbj
+	 5h9ke9Jq8rj533O/oT5Adl9G/ZfFxL1H7PFZZkFy4fTalt5mTQ1YyBJs2gwB5oghVg
+	 AEikhxIQ/I7AmxIgIeW8NOyE3iKT/BnUf30ZP7oq4zbXwR97agekO7CHLQMWzc5ezr
+	 Dp0NZKnArq0jmTXUuhoUz8xmjgKNEJ1t5jOSoBrUx4cGR7lLwGzDWJpOowwbyU3KY4
+	 EwkcjB0vX0xqeuMJSIBpCsYWxuIDgJVZkGvVFEKe/VoyE2UT4nvoGVAthJaIwKMF8f
+	 PML73z8CMfqIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vuqRt-0000000DJz4-1FBC;
+	Tue, 24 Feb 2026 11:19:29 +0000
+Date: Tue, 24 Feb 2026 11:19:28 +0000
+Message-ID: <86h5r69ynz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Clark <james.clark@linaro.org>
+Cc: Will Deacon <will@kernel.org>,
+	kvmarm@lists.linux.dev,
+	mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	Leo Yan <leo.yan@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH] KVM: arm64: Disable TRBE Trace Buffer Unit when running in guest context
+In-Reply-To: <22de3d44-b266-4ba3-af3a-67159c9742d1@linaro.org>
+References: <20260216130959.19317-1-will@kernel.org>
+	<86a4x8bw38.wl-maz@kernel.org>
+	<d2f6877a-534d-4862-a61c-fb3cb5b96618@linaro.org>
+	<868qcsbsbd.wl-maz@kernel.org>
+	<076e013a-b66d-4985-9709-734d7184ad72@linaro.org>
+	<867bscbpmp.wl-maz@kernel.org>
+	<22de3d44-b266-4ba3-af3a-67159c9742d1@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
-	<linux-doc@vger.kernel.org>, Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <9945d28e-f1f2-e11a-1481-8d80167d6f89@huawei.com>
- <b844c632-c8fc-48f1-b347-07f166019b22@arm.com>
-Content-Language: en-US
-From: Zeng Heng <zengheng4@huawei.com>
-In-Reply-To: <b844c632-c8fc-48f1-b347-07f166019b22@arm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemf100008.china.huawei.com (7.202.181.222)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.clark@linaro.org, will@kernel.org, kvmarm@lists.linux.dev, mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, leo.yan@arm.com, suzuki.poulose@arm.com, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Ben,
-
-On 2026/2/16 20:22, Ben Horgan wrote:
-> Hi Zeng,
+On Fri, 20 Feb 2026 11:42:11 +0000,
+James Clark <james.clark@linaro.org> wrote:
 > 
-> On 2/14/26 09:40, Zeng Heng wrote:
->> Hi Ben,
->>
->> On 2026/2/4 5:43, Ben Horgan wrote:
-> [...]
->>>
->>> Based on:
->>> [1] git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git x86/cache
->>> (To include telemetry code which changes the resctrl arch interface)
->>>
->>> The series can be retrieved from:
->>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v4
->>> (Final commit is a fix already in 6.19-rc8)
->>>
-> [...]
->>>
->>
->> I've tested the MPAM functionality on my local Kunpeng platform. Here's
->> a summary of the results:
 > 
-> Thank you very much for your testing and detailed report.
 > 
->>
->> Features enabled and verified:
->>    * L2 and L3 CPBM
->>    * L3 CSU
->>    * L2 and L3 CDP
->> All enabled features passed functional testing as expected.
->>
->> + Tested-by: Zeng Heng <zengheng4@huawei.com>
->>
->> Features not enabled:
->>    1. MATA MBMAX partition and MBWU monitor.
+> On 16/02/2026 4:49 pm, Marc Zyngier wrote:
+> > On Mon, 16 Feb 2026 16:10:14 +0000,
+> > James Clark <james.clark@linaro.org> wrote:
+> >> 
+> >> 
+> >> 
+> >> On 16/02/2026 3:51 pm, Marc Zyngier wrote:
+> >>> On Mon, 16 Feb 2026 15:05:10 +0000,
+> >>> James Clark <james.clark@linaro.org> wrote:
+> >>>> 
+> >>>> 
+> >>>> 
+> >>>> On 16/02/2026 2:29 pm, Marc Zyngier wrote:
+> >>>>> On Mon, 16 Feb 2026 13:09:59 +0000,
+> >>>>> Will Deacon <will@kernel.org> wrote:
+> >>>>>> 
+> >>>>>> The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
+> >>>>>> generation in guest context when self-hosted TRBE is in use by the host.
+> >>>>>> 
+> >>>>>> Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
+> >>>>>> TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
+> >>>>>> per R_YCHKJ the Trace Buffer Unit will still be enabled if
+> >>>>>> TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
+> >>>>>> Trace Buffer Unit can perform address translation for the "owning
+> >>>>>> exception level" even when it is out of context.
+> >>>>> 
+> >>>>> Great. So TRBE violates all the principles that we hold true in the
+> >>>>> architecture. Does SPE suffer from the same level of brokenness?
+> >>>>> 
+> >>>>>> Consequently, we can end up in a state where TRBE performs speculative
+> >>>>>> page-table walks for a host VA/IPA in guest/hypervisor context depending
+> >>>>>> on the value of MDCR_EL2.E2TB, which changes over world-switch. The
+> >>>>>> result appears to be a heady mixture of data corruption and hardware
+> >>>>>> lockups.
+> >>>>>> 
+> >>>>>> Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
+> >>>>>> draining the buffer, restoring the register on return to the host.
+> >>>>>> 
+> >>>>>> Cc: Marc Zyngier <maz@kernel.org>
+> >>>>>> Cc: Oliver Upton <oupton@kernel.org>
+> >>>>>> Cc: James Clark <james.clark@linaro.org>
+> >>>>>> Cc: Leo Yan <leo.yan@arm.com>
+> >>>>>> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> >>>>>> Cc: Fuad Tabba <tabba@google.com>
+> >>>>>> Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+> >>>>>> Signed-off-by: Will Deacon <will@kernel.org>
+> >>>>>> ---
+> >>>>>> 
+> >>>>>> NOTE: This is *untested* as I don't have a TRBE-capable device that can
+> >>>>>> run upstream but I noticed this by inspection when triaging occasional
+> >>>>>> hardware lockups on systems using a 6.12-based kernel with TRBE running
+> >>>>>> at the same time as a vCPU is loaded. This code has changed quite a bit
+> >>>>>> over time, so stable backports are not entirely straightforward.
+> >>>>>> Hopefully James/Leo/Suzuki can help us test if folks agree with the
+> >>>>>> general approach taken here.
+> >>>>>> 
+> >>>>>>     arch/arm64/include/asm/kvm_host.h  |  1 +
+> >>>>>>     arch/arm64/kvm/hyp/nvhe/debug-sr.c | 36 ++++++++++++++++++++++--------
+> >>>>>>     2 files changed, 28 insertions(+), 9 deletions(-)
+> >>>>>> 
+> >>>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >>>>>> index ac7f970c7883..a932cf043b83 100644
+> >>>>>> --- a/arch/arm64/include/asm/kvm_host.h
+> >>>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+> >>>>>> @@ -746,6 +746,7 @@ struct kvm_host_data {
+> >>>>>>     		u64 pmscr_el1;
+> >>>>>>     		/* Self-hosted trace */
+> >>>>>>     		u64 trfcr_el1;
+> >>>>>> +		u64 trblimitr_el1;
+> >>>>>>     		/* Values of trap registers for the host before guest entry. */
+> >>>>>>     		u64 mdcr_el2;
+> >>>>>>     		u64 brbcr_el1;
+> >>>>>> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >>>>>> index 2a1c0f49792b..fd389a26bc59 100644
+> >>>>>> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >>>>>> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> >>>>>> @@ -57,12 +57,27 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+> >>>>>>     	write_sysreg_el1(new_trfcr, SYS_TRFCR);
+> >>>>>>     }
+> >>>>>>     -static bool __trace_needs_drain(void)
+> >>>>>> +static void __trace_drain_and_disable(void)
+> >>>>>>     {
+> >>>>>> -	if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
+> >>>>>> -		return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
+> >>>>>> +	u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
+> >>>>>>     -	return host_data_test_flag(TRBE_ENABLED);
+> >>>>>> +	*trblimitr_el1 = 0;
+> >>>>>> +
+> >>>>>> +	if (is_protected_kvm_enabled()) {
+> >>>>>> +		if (!host_data_test_flag(HAS_TRBE))
+> >>>>>> +			return;
+> >>>>>> +	} else {
+> >>>>>> +		if (!host_data_test_flag(TRBE_ENABLED))
+> >>>>>> +			return;
+> >>>>>> +	}
+> >>>>>> +
+> >>>>>> +	*trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
+> >>>>>> +	if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
+> >>>>>> +		isb();
+> >>>>>> +		tsb_csync();
+> >>>>>> +		write_sysreg_s(0, SYS_TRBLIMITR_EL1);
+> >>>>>> +		isb();
+> >>>> 
+> >>>> The TRBE driver might do an extra drain here as a workaround. Hard to
+> >>>> tell if it's actually required in this case (seems like probably not)
+> >>>> but it might be worth doing it anyway to avoid hitting the
+> >>>> issue. Especially if we add guest support later where some of the
+> >>>> affected registers might start being used.
+> >>> 
+> >>> Just to set the expectations: guest TRBE support is not happening
+> >>> until the architecture is fixed. It cannot reliably give a trace that
+> >>> includes emulated exceptions, and until then, no TRBE for you.
+> >>> 
+> >>>> See:
+> >>>> 
+> >>>>       if (trbe_needs_drain_after_disable(cpudata))
+> >>>>           trbe_drain_buffer();
+> >>>> 
+> >>>> 
+> >>>>>> +	}
+> >>>>> 
+> >>>>> Doesn't this mean we should be able to get rid of most of the TRFCR
+> >>>>> messing about that litters the entry/exit code and leave that to VHE
+> >>>> 
+> >>>> Technically you could have ETMs that and are connected to sinks other
+> >>>> than TRBE. Unless you somehow switch off those sinks you still need to
+> >>>> do the TRFCR switching stuff.
+> >>>> 
+> >>>>> only? And even then, I'm tempted to simply get rid of any sort of
+> >>>>> guest-only tracing, given that TRBE is not capable of representing
+> >>>>> exceptions that are synthesised by the host, making it the resulting
+> >>>>> traces useless.
+> >>>> 
+> >>>> I haven't heard of anyone tracing a guest from the host, but until we
+> >>>> add support for guests to be able to trace themselves it's the only
+> >>>> way of doing it, so it could be useful.
+> >>> 
+> >>> But that's *not* working. If you trace EL1 only, even with a VHE host,
+> >>> the result is not usable.
+> >>> 
+> >> 
+> >> Do you mean not working because of the missing exceptions? I did a bit
+> >> of testing before and the trace did seem somewhat usable to me. It had
+> >> EL1 and EL0 atoms in there.
+> > 
+> > Sure. Now try to look at what that means for NV, where all the
+> > EL1->EL2 exceptions are emulated, where all the EL2->EL1 exception
+> > returns are emulated.
+> > 
+> > What does it give you? A bag of nonsense.
+> > 
+> > Same thing for EL2->EL0, by the way, so you can't even correctly
+> > profile an EL0 program that performs a syscall, or that gets
+> > interrupted. And while without NV, these exceptions are rare, having a
+> > trace that is unreliable has the potential of being worse than no
+> > trace at all.
 > 
-> What's MATA here? Just memory allocation or something more specific?
-> 
+> If there are issues with NV perhaps we can skip it for the initial
+> trace virtualisation implementation?
 
-The MATA serves as the agent for the Broadway MESI coherence protocol
-among multiple L3 caches or between I/O and L3 caches. It maintains data
-coherence among multiple L3 caches or between I/O and L3 caches.
+No. This is broken for *any* hypervisor-generated exception.
 
-As the connection module between the SoC and the memory system, the MATA
-interfaces with the DMC on the DDR die. It provides the system with DDR
-access paths, delivering high-bandwidth, low-latency DDR read/write
-access.
+> I'm not familiar with it but isn't NV still an experimental feature
+> anyway?
 
-On the Kunpeng chip, the MB related MSC resides in this module rather
-than being directly located on the L3 cache controller.
+Let me give you a clue: if I have to choose between TRBE and NV, it's
+not TRBE I'm going to pick.
 
->>       Reason: These do not meet the driver's current topology>
-> expectations for MB support, hence they were not initialized.
->>       This behavior is expected.
-> 
-> Is this because you have more than 1 L3 cache?
+> I can't imagine actual users who want to do tracing in guests would
+> accept that they can't do tracing on a non-NV guest because there is
+> something that doesn't work in NV.
 
-Yes, Kunpeng platform has more than 1 L3 cache.
+But that's the thing: they are not getting a trace. They are getting
+nonsense.
 
-However, the reason it is not supported here is that the current driver
-does not support MATA recognition, while both Kunpeng MBM and MBA
-functionalities reside in the MATA MSC side as mentioned above,
-resulting in the inability to provide support.
+> Also do you have an example of these exceptions that you mean without
+> NV so I can have a look?
 
-Relevant logs are as follows:
+Anything that ends up in arch/arm64/kvm/hyp/exception.c, where the
+exception is emulated by changing PC.
 
-[   10.997406] mpam:topology_matches_l3: class 255 component 0 has
-Mismatched CPU mask with L3 equivalent
-[   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
-match L3
+	M.
 
-> 
->>
->>    2. L2 CSU and MBWU monitors.
->>       Reason: The current MPAM driver does not support L2-related
->>       functionality yet.
-> 
-> Thanks for letting us know you have these. But, yes, unfortunately
-> monitoring is only supported on the L3 at the moment.
-> 
->>
->> + Tested-by: Zeng Heng <zengheng4@huawei.com>
->>
->>
->> Detailed test logs are as follows:
-> 
-> I'm confused by these logs as it looks like you aren't getting any
-> monitors but you verified the L3 CSU. Also, it looks like cpor (cbpm) is
-> disabled (at least partially) but you verified L2 and L3 CPBM. Is this
-> across different machines?
-> 
-
-The logs were of course tested on the same machine.
-
-Since the L3 CSU/CPBM resides on the L3 cache, it can be correctly
-recognized and run smoothly.
-
-In fact, not only was L2 successfully mounted, but all L2 MSC CPBMs were
-also correctly recognized. The suspicion here is that the L2
-class->components were incorrectly mounted to an unknown object, which
-is believed to be related to the monitoring capabilities (CSU and MBWU)
-of Kunpeng L2. The root cause is still being investigated.
-
-Resctrl mounting status:
-
-# cat schemata
-L2:4=ff;7=ff;10=ff;13=ff;16=ff;19=ff;22=ff;25=ff;29=ff;32=ff;35=ff;
-38=ff;41=ff;44=ff;47=ff;50=ff;54=ff;57=ff;60=ff;63=ff;66=ff;69=ff;72=ff;
-75=ff;79=ff;82=ff;85=ff;88=ff;91=ff;94=ff;97=ff;100=ff;104=ff;107=ff;
-110=ff;113=ff;116=ff;119=ff;122=ff;125=ff;129=ff;132=ff;135=ff;138=ff;
-141=ff;144=ff;147=ff;150=ff;154=ff;157=ff;160=ff;163=ff;166=ff;169=ff;
-172=ff;175=ff;179=ff;182=ff;185=ff;188=ff;191=ff;194=ff;197=ff;200=ff;
-204=ff;207=ff;210=ff;213=ff;216=ff;219=ff;222=ff;225=ff;229=ff;232=ff;
-235=ff;238=ff;241=ff;244=ff;247=ff;250=ff;254=ff;257=ff;260=ff;263=ff;
-266=ff;269=ff;272=ff;275=ff;279=ff;282=ff;285=ff;288=ff;291=ff;294=ff;
-297=ff;300=ff
-L3:1=1ffff;26=1ffff;51=1ffff;76=1ffff;101=1ffff;126=1ffff;151=1ffff;
-176=1ffff;201=1ffff;226=1ffff;251=1ffff;276=1ffff
-
-# ls mon_data/*/*
-mon_data/mon_L3_01/llc_occupancy   mon_data/mon_L3_151/llc_occupancy
-mon_data/mon_L3_226/llc_occupancy  mon_data/mon_L3_276/llc_occupancy
-mon_data/mon_L3_101/llc_occupancy  mon_data/mon_L3_176/llc_occupancy
-mon_data/mon_L3_251/llc_occupancy  mon_data/mon_L3_51/llc_occupancy
-mon_data/mon_L3_126/llc_occupancy  mon_data/mon_L3_201/llc_occupancy
-mon_data/mon_L3_26/llc_occupancy   mon_data/mon_L3_76/llc_occupancy
-
->>
->> Boot logs:
->> [root@localhost ~]# dmesg | grep -i mpam
->> [    0.000000] ACPI: MPAM 0x000000007FF35018 003024 (v01 HISI   HIP12
->> 00000000 HISI 20151124)
->> [    9.509852] mpam_msc mpam_msc.64: Merging features for
->> vmsc:0xffff0800973cf5a0 |= ris:0xffff08009757ee90
->> [    9.509859] mpam_msc mpam_msc.254: Merging features for
->> class:0xffff08009736fe50 &= vmsc:0xffff080097628520
->> [    9.509860] mpam:__props_mismatch:
->> mpam_has_feature(mpam_feat_cpor_part, parent) = 1
->> [    9.509864] mpam:__props_mismatch:
->> mpam_has_feature(mpam_feat_cpor_part, child) = 0
->> [    9.509866] mpam:__props_mismatch: parent->cpbm_wd = 8
->> [    9.509869] mpam:__props_mismatch: child->cpbm_wd = 0
->> [    9.509871] mpam:__props_mismatch: alias = 0
->> [    9.509873] mpam:__props_mismatch: cleared cpor_part
-> 
-> cpor (partially) disabled?
-> 
->> [    9.509876] mpam:__props_mismatch: took the min num_csu_mon
->> [    9.509878] mpam:__props_mismatch: took the min num_mbwu_mon
->> [    9.509881] mpam_msc mpam_msc.252: Merging features for
-
-[...]
-
->> [   10.978496] mpam:mpam_resctrl_pick_caches: class 2 cache misses CPOR
-> 
-> No L2 cpor?
-> 
->> [   10.978497] mpam:mpam_resctrl_pick_caches: class 255 is not a cache
->> [   10.980470] mpam:mpam_resctrl_pick_mba: class 2 is before L3
->> [   10.980472] mpam:mpam_resctrl_pick_mba: class 3 has no bandwidth control
->> [   10.997406] mpam:topology_matches_l3: class 255 component 0 has
->> Mismatched CPU mask with L3 equivalent
->> [   10.997411] mpam:mpam_resctrl_pick_mba: class 255 topology doesn't
->> match L3
->> [   10.997415] mpam:mpam_resctrl_pick_counters: class 2 is before L3
->> [   11.024109] mpam:topology_matches_l3: class 3 component 276 has
->> Mismatched CPU mask with L3 equivalent
->> [   11.024114] mpam:class_has_usable_mbwu: monitors usable in free-
->> running mode
-> 
-> mbwu enabled?
-
-The fact that the number of monitors merely satisfies the conditions for
-free-running mode does not imply that the MBWU functionality can be
-successfully mounted. The specific reasons are explained above.
-
-> 
->> [   11.063882] mpam:topology_matches_l3: class 255 component 0 has
->> Mismatched CPU mask with L3 equivalent
->> [   11.113183] mpam:mpam_resctrl_alloc_domain: Skipped monitor domain
->> online - no monitors
->> [   11.113189] MPAM enabled with 32 PARTIDs and 4 PMGs
->>
->>
-
-Sorry for the late reply. And this is my first day back from a long
-vacation.
-
-
-Best regards,
-Zeng Heng
+-- 
+Without deviation from the norm, progress is not possible.
