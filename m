@@ -1,205 +1,199 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511C23D2FF7
-	for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 18:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96FF223702;
+	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771956085; cv=none; b=npybH7/hhxi4TMr0pxgxNNeOTdVo3huZfUYrBDm31NMFyYmQIAhJIkLdwZh0ClUAT8aP2ioDWW1TjXfE3f5uEXZNsR8uVVZFsRdGz6i4RtvyI6mT78USMndAMerfdzWSsij3kJuHFqYLQ7Bff/6hPYM1yLN9OpA0COfhF3gedtQ=
+	t=1771966458; cv=none; b=UrnWBL1gfcFxHD4yBnnAz/tsqFruYyYCYy8arFGsY8udGfjxr1VZhY0iDfZ97FT3az4J4UK5UYG3N95hhOBzMCvklGZFO9SYeOa4qHGJsboR9RPZDPDFo6qvlOLp2llmWX1PMeKzfMWkhbj9fyw06/PfDZcUgRfphNmbtvtNbH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771956085; c=relaxed/simple;
-	bh=KkVPWmn1cfNtFr/tvgZUP4HP5cEnp6wvj0AdIYhMh1k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=unJ3VhyXhMwrnE5JuhAb6B9FmKjynT8c+7Fp5VZdzJOM9kbY2icTB6pO/1taPkXXjr54u0oLppGNWfH0NfeZykg1DFUeVRveKxGHChFKpxxmSvNg2QB6jsUeHL81Jajc6UhKYUZI5DIAjTAfXbe76OmgjpqX/KC6JEdJHAJrJrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9D4881595;
-	Tue, 24 Feb 2026 10:01:16 -0800 (PST)
-Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 3B41E3F59E;
-	Tue, 24 Feb 2026 10:01:17 -0800 (PST)
-From: Ben Horgan <ben.horgan@arm.com>
-To: ben.horgan@arm.com
-Cc: amitsinght@marvell.com,
-	baisheng.gao@unisoc.com,
-	baolin.wang@linux.alibaba.com,
-	carl@os.amperecomputing.com,
-	dave.martin@arm.com,
-	david@kernel.org,
-	dfustini@baylibre.com,
-	fenghuay@nvidia.com,
-	gshan@redhat.com,
-	james.morse@arm.com,
-	jonathan.cameron@huawei.com,
-	kobak@nvidia.com,
-	lcherian@marvell.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	peternewman@google.com,
-	punit.agrawal@oss.qualcomm.com,
-	quic_jiles@quicinc.com,
-	reinette.chatre@intel.com,
-	rohit.mathew@arm.com,
-	scott@os.amperecomputing.com,
-	sdonthineni@nvidia.com,
-	tan.shaopeng@fujitsu.com,
-	xhao@linux.alibaba.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	corbet@lwn.net,
-	maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	kvmarm@lists.linux.dev,
-	zengheng4@huawei.com,
-	linux-doc@vger.kernel.org,
-	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v5 41/41] arm64: mpam: Add initial MPAM documentation
-Date: Tue, 24 Feb 2026 17:57:20 +0000
-Message-ID: <20260224175720.2663924-42-ben.horgan@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260224175720.2663924-1-ben.horgan@arm.com>
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
+	s=arc-20240116; t=1771966458; c=relaxed/simple;
+	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYAnzz9U5FxQuc4Rqy2FvOFxvDucL3f8KD4suueeBHMUNoT65/1L3p18QpxlaZMypcuRRyPHwTUsrxUXeKJnCEucpZ+X/dqjB2S4vz9bSufpCdTNTepXugqXrWhR4ZqvrCff0tOy71HcYw/OboNreJlLI4JJdDQ4QZ89hfRDxBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU9VoxpY; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU9VoxpY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279EDC116D0;
+	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1771966458;
+	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fU9VoxpYqnAVrd4t/fIENYWIsMId2KNEP3dfw2h4SjQzeH/MBV/5Cee/wntRTQCP6
+	 8EADR9JKKOK/hSexd/fEomD/ZrU3e+Mo0cAkKAlisOPYRwuKJXzT3MA26tdQTXMvpb
+	 cFKvEXyKAe/X10m3pmNX2H1z0cczPw3iZWdEsiJJoujd4S5bnLIF7pTBSYnWQRgIVb
+	 lO1qmLmIs5NJLzUq5pV5qVfuG1vDdgGb4JylPzxBqN/lvS2sL0Y7jYkwDaBcxLLsMY
+	 M8xREJGMjxcu5uVJY3DLJp8/BXSitkrqLBWUKwurl88mBMEyWsx/eqM0TQ42RGOP4K
+	 O37lVNZp675Mw==
+Date: Tue, 24 Feb 2026 12:54:16 -0800
+From: Oliver Upton <oupton@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
+	will@kernel.org, maz@kernel.org, miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
+	suzuki.poulose@arm.com, lpieralisi@kernel.org,
+	yangyicong@hisilicon.com, joey.gouly@arm.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v13 7/8] KVM: arm64: use CASLT instruction for swapping
+ guest descriptor
+Message-ID: <aZ4P-AcVjxfCFsew@kernel.org>
+References: <20260223174802.458411-1-yeoreum.yun@arm.com>
+ <20260223174802.458411-8-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260223174802.458411-8-yeoreum.yun@arm.com>
 
-MPAM (Memory Partitioning and Monitoring) is now exposed to user-space via
-resctrl. Add some documentation so the user knows what features to expect.
+On Mon, Feb 23, 2026 at 05:48:01PM +0000, Yeoreum Yun wrote:
+> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+> is enabled, avoiding the need to clear the PAN bit.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/futex.h | 17 +----------------
+>  arch/arm64/include/asm/lsui.h  | 27 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/at.c            | 32 +++++++++++++++++++++++++++++++-
+>  3 files changed, 59 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/lsui.h
+> 
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index b579e9d0964d..6779c4ad927f 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -7,11 +7,9 @@
+>  
+>  #include <linux/futex.h>
+>  #include <linux/uaccess.h>
+> -#include <linux/stringify.h>
+>  
+> -#include <asm/alternative.h>
+> -#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+> +#include <asm/lsui.h>
+>  
+>  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+>  
+> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  
+>  #ifdef CONFIG_ARM64_LSUI
+>  
+> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> -
+>  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+>  static __always_inline int						\
+>  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  {
+>  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+>  }
+> -
+> -#define __lsui_llsc_body(op, ...)					\
+> -({									\
+> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> -})
+> -
+> -#else	/* CONFIG_ARM64_LSUI */
+> -
+> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> -
+>  #endif	/* CONFIG_ARM64_LSUI */
+>  
+>  
+> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+> new file mode 100644
+> index 000000000000..4f956188835e
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/lsui.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ASM_LSUI_H
+> +#define __ASM_LSUI_H
+> +
+> +#include <linux/compiler_types.h>
+> +#include <linux/stringify.h>
+> +#include <asm/alternative.h>
+> +#include <asm/alternative-macros.h>
+> +#include <asm/cpucaps.h>
+> +
+> +#ifdef CONFIG_ARM64_LSUI
+> +
+> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> +
+> +#define __lsui_llsc_body(op, ...)					\
+> +({									\
+> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> +})
+> +
+> +#else	/* CONFIG_ARM64_LSUI */
+> +
+> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> +
+> +#endif	/* CONFIG_ARM64_LSUI */
+> +
+> +#endif	/* __ASM_LSUI_H */
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 885bd5bb2f41..1aceeef04567 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -9,6 +9,7 @@
+>  #include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/lsui.h>
+>  
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+>  {
+> @@ -1704,6 +1705,33 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_ARM64_LSUI
+> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp = old;
+> +	int ret = 0;
+> +
+> +	uaccess_ttbr0_enable();
+> +
+> +	asm volatile(__LSUI_PREAMBLE
+> +		     "1: caslt	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_ttbr0_disable();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+> +}
+> +#endif
+> +
+>  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>  {
+>  	u64 tmp = old;
+> @@ -1779,7 +1807,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+>  		return -EPERM;
+>  
+>  	ptep = (u64 __user *)hva + offset;
+> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+> +	if (IS_ENABLED(CONFIG_ARM64_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
 
-Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Signed-off-by: James Morse <james.morse@arm.com>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: Ben Horgan <ben.horgan@arm.com>
----
-Changes by Ben:
-Some tidying, update for current heuristics
+cpucap_is_possible() is where the Kconfig check should go.
 
-Changes from v4:
-Fix unusual indentation
----
- Documentation/arch/arm64/index.rst |  1 +
- Documentation/arch/arm64/mpam.rst  | 94 ++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+)
- create mode 100644 Documentation/arch/arm64/mpam.rst
-
-diff --git a/Documentation/arch/arm64/index.rst b/Documentation/arch/arm64/index.rst
-index af52edc8c0ac..98052b4ef4a1 100644
---- a/Documentation/arch/arm64/index.rst
-+++ b/Documentation/arch/arm64/index.rst
-@@ -23,6 +23,7 @@ ARM64 Architecture
-     memory
-     memory-tagging-extension
-     mops
-+    mpam
-     perf
-     pointer-authentication
-     ptdump
-diff --git a/Documentation/arch/arm64/mpam.rst b/Documentation/arch/arm64/mpam.rst
-new file mode 100644
-index 000000000000..6dc3de54ec9a
---- /dev/null
-+++ b/Documentation/arch/arm64/mpam.rst
-@@ -0,0 +1,94 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+====
-+MPAM
-+====
-+
-+What is MPAM
-+============
-+MPAM (Memory Partitioning and Monitoring) is a feature in the CPUs and memory
-+system components such as the caches or memory controllers that allow memory
-+traffic to be labelled, partitioned and monitored.
-+
-+Traffic is labelled by the CPU, based on the control or monitor group the
-+current task is assigned to using resctrl.  Partitioning policy can be set
-+using the schemata file in resctrl, and monitor values read via resctrl.
-+See Documentation/filesystems/resctrl.rst for more details.
-+
-+This allows tasks that share memory system resources, such as caches, to be
-+isolated from each other according to the partitioning policy (so called noisy
-+neighbours).
-+
-+Supported Platforms
-+===================
-+Use of this feature requires CPU support, support in the memory system
-+components, and a description from firmware of where the MPAM device controls
-+are in the MMIO address space. (e.g. the 'MPAM' ACPI table).
-+
-+The MMIO device that provides MPAM controls/monitors for a memory system
-+component is called a memory system component. (MSC).
-+
-+Because the user interface to MPAM is via resctrl, only MPAM features that are
-+compatible with resctrl can be exposed to user-space.
-+
-+MSC are considered as a group based on the topology. MSC that correspond with
-+the L3 cache are considered together, it is not possible to mix MSC between L2
-+and L3 to 'cover' a resctrl schema.
-+
-+The supported features are:
-+
-+* Cache portion bitmap controls (CPOR) on the L2 or L3 caches.  To expose
-+  CPOR at L2 or L3, every CPU must have a corresponding CPU cache at this
-+  level that also supports the feature.  Mismatched big/little platforms are
-+  not supported as resctrl's controls would then also depend on task
-+  placement.
-+
-+* Memory bandwidth maximum controls (MBW_MAX) on or after the L3 cache.
-+  resctrl uses the L3 cache-id to identify where the memory bandwidth
-+  control is applied. For this reason the platform must have an L3 cache
-+  with cache-id's supplied by firmware. (It doesn't need to support MPAM.)
-+
-+  To be exported as the 'MB' schema, the topology of the group of MSC chosen
-+  must match the topology of the L3 cache so that the cache-id's can be
-+  repainted. For example: Platforms with Memory bandwidth maximum controls
-+  on CPU-less NUMA nodes cannot expose the 'MB' schema to resctrl as these
-+  nodes do not have a corresponding L3 cache. If the memory bandwidth
-+  control is on the memory rather than the L3 then there must be a single
-+  global L3 as otherwise it is unknown which L3 the traffic came from.
-+
-+  When the MPAM driver finds multiple groups of MSC it can use for the 'MB'
-+  schema, it prefers the group closest to the L3 cache.
-+
-+* Cache Storage Usage (CSU) counters can expose the 'llc_occupancy' provided
-+  there is at least one CSU monitor on each MSC that makes up the L3 group.
-+  Exposing CSU counters from other caches or devices is not supported.
-+
-+* Memory Bandwidth Usage (MBWU) on or after the L3 cache.  resctrl uses the
-+  L3 cache-id to identify where the memory bandwidth is measured. For this
-+  reason the platform must have an L3 cache with cache-id's supplied by
-+  firmware. (It doesn't need to support MPAM.)
-+
-+  Memory bandwidth monitoring makes use of MBWU monitors in each MSC that
-+  makes up the L3 group. If there are more monitors than the maximum number
-+  of control and monitor groups, these will be allocated and configured at
-+  boot. Otherwise, the monitors will not be usable as they are required to
-+  be free running. If the memory bandwidth monitoring is on the memory
-+  rather than the L3 then there must be a single global L3 as otherwise it
-+  is unknown which L3 the traffic came from.
-+
-+  To expose 'mbm_total_bytes', the topology of the group of MSC chosen must
-+  match the topology of the L3 cache so that the cache-id's can be
-+  repainted. For example: Platforms with Memory bandwidth monitors on
-+  CPU-less NUMA nodes cannot expose 'mbm_total_bytes' as these nodes do not
-+  have a corresponding L3 cache. 'mbm_local_bytes' is not exposed as MPAM
-+  cannot distinguish local traffic from global traffic.
-+
-+Feature emulation
-+=================
-+MPAM will emulate the Code Data Prioritisation (CDP) feature on all platforms.
-+
-+Reporting Bugs
-+==============
-+If you are not seeing the counters or controls you expect please share the
-+debug messages produced when enabling dynamic debug and booting with:
-+dyndbg="file mpam_resctrl.c +pl"
--- 
-2.43.0
-
+Thanks,
+Oliver
