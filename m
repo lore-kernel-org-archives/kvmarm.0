@@ -1,116 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2DB328B7F;
-	Wed, 25 Feb 2026 10:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FEB393DF2
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 11:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772016653; cv=none; b=cqWMbjObHC1DEiFQplg0oxOQGgLjs5f65zQkGbrLFlaD7IF4Q9h+Bj0KkbEYFAGfJGiwAZaA2PT4Sq9ampal77SNNd5EodRV1kcgvhlzFNZwN/xJ20ObW9tBP0bV6KmvUbIYnwuxfQ6Qg82bkMSAhaFJhjYFLv6QAYV3LgbZYkI=
+	t=1772017272; cv=none; b=nmu98SQlrMCHBahupIP+18XYWmn8ZfxRgYqkFXIk+bSmF+xsh1Okn6IrypuSCMtWc0PpqHzmCj6wbVjgmM+IB7qRAeq0XHcxnWaQYGrBH2Eqm8jxduJu3mkAl7yX8lm3DgllqMwCXLP2aMVaFsOfnGbTh31yueUDumRzklnoFTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772016653; c=relaxed/simple;
-	bh=uCpqAlivjzyXSSWma+8W04QqWwMFXWWGvQmHpnlWFuA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oQe438hmWQzUP8PXVTEqgpIyxWCeDzwK802ztfq54a3y5Wb6jYRmKI3+lI8kbX3tB9zGWmIwC3iNUCPMFYAVHh+Uh6YEGIQ7SC4yPao9GIRFCOSSAe8GmGXMI9Yq4RDjMH6onhot0b+E2e7ejPenHzfiFi2ZOcRKjdIi5VkeQTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjTzUCJN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjTzUCJN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78072C116D0;
-	Wed, 25 Feb 2026 10:50:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772016653;
-	bh=uCpqAlivjzyXSSWma+8W04QqWwMFXWWGvQmHpnlWFuA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UjTzUCJN92DzWT9PTx/kj2plYmFVKQAsYETCKCt8ZbZW90LiwOkWrynu0mjO2VQ9+
-	 56ibgUhe3ZMoONMQ8JIluA93h2IBl4vi6C9KqmKfuMV23JW1Mr0HE0St1FDMkzlfxB
-	 /iPyTEyaodj/WH6R3IUpUeBuIqMzuiOExcwGkEkGX68hQFoKVps1BqHNIZ5bVbCkQv
-	 sGhf5ftg3Lsnb9iwRc/6D+2/rkl8Er7r43YWhxTMy1L6Uo6HDhy7fH7O0yMNTxPQDQ
-	 k+XVFykxmCZO/hAfnM2A09OGIWgKjTSlyHvzvno/3Um/5b+9gtQSm4p5BeLGDEEJPd
-	 qS6wEj1KSc09Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vvCTj-0000000Dfp3-0cSo;
-	Wed, 25 Feb 2026 10:50:51 +0000
-Date: Wed, 25 Feb 2026 10:50:50 +0000
-Message-ID: <86a4wx9jw5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 1/2] arm64/mm: Directly use TTBRx_EL1_ASID_MASK
-In-Reply-To: <86bjhd9nxq.wl-maz@kernel.org>
-References: <20260225035157.1159962-1-anshuman.khandual@arm.com>
-	<20260225035157.1159962-2-anshuman.khandual@arm.com>
-	<86bjhd9nxq.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1772017272; c=relaxed/simple;
+	bh=y+J694IJPrCWA8egBbCcdEL4NfSzEXlsDuCNoDQThlU=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i2cO5L1JPHlOZuDqDfeum58dLDAgTKwP7C/i9JSAMKLPOY7XquPi40XqKbiF7ZOT6yiORuSuNhNORce5ytgnGGxEyv7YyUqGW4NwVVzsK5TZFEEdXXBC9vc7fOT5VoMh7gVXt26zyKAXDFz59b2rIvJtpsuYBNPKRMu6tZaiT6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fLWpK6SZ4zHnGjn;
+	Wed, 25 Feb 2026 19:00:25 +0800 (CST)
+Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
+	by mail.maildlp.com (Postfix) with ESMTPS id A1F4D40570;
+	Wed, 25 Feb 2026 19:01:07 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml500005.china.huawei.com
+ (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 25 Feb
+ 2026 11:01:06 +0000
+Date: Wed, 25 Feb 2026 11:01:04 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Ben Horgan <ben.horgan@arm.com>
+CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
+	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
+	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
+	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
+	<kobak@nvidia.com>, <lcherian@marvell.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
+	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
+	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
+	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
+	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
+	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
+	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
+	<zengheng4@huawei.com>, <linux-doc@vger.kernel.org>, Shaopeng Tan
+	<tan.shaopeng@jp.fujitsu.com>
+Subject: Re: [PATCH v5 41/41] arm64: mpam: Add initial MPAM documentation
+Message-ID: <20260225110104.00003e03@huawei.com>
+In-Reply-To: <20260224175720.2663924-42-ben.horgan@arm.com>
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+	<20260224175720.2663924-42-ben.horgan@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org, ryan.roberts@arm.com, mark.rutland@arm.com, oupton@kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500011.china.huawei.com (7.191.174.215) To
+ dubpeml500005.china.huawei.com (7.214.145.207)
 
-On Wed, 25 Feb 2026 09:23:29 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Tue, 24 Feb 2026 17:57:20 +0000
+Ben Horgan <ben.horgan@arm.com> wrote:
+
+> MPAM (Memory Partitioning and Monitoring) is now exposed to user-space via
+> resctrl. Add some documentation so the user knows what features to expect.
 > 
-> On Wed, 25 Feb 2026 03:51:56 +0000,
-> Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 885bd5bb2f41..d5c342ccf0f9 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -560,7 +560,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> >  			BUG();
-> >  		}
-> >  
-> > -		wr->asid = FIELD_GET(TTBR_ASID_MASK, asid_ttbr);
-> > +		wr->asid = FIELD_GET(TTBRx_EL1_ASID_MASK, asid_ttbr);
-> >  		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
-> >  		    !(tcr & TCR_ASID16))
-> >  			wr->asid &= GENMASK(7, 0);
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 620126d1f0dc..82558fb2685f 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -1343,7 +1343,7 @@ static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vcpu)
-> >  			    vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-> >  		u16 asid;
-> >  
-> > -		asid = FIELD_GET(TTBR_ASID_MASK, ttbr);
-> > +		asid = FIELD_GET(TTBRx_EL1_ASID_MASK, ttbr);
-> >  		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
-> >  		    !(tcr & TCR_ASID16))
-> >  			asid &= GENMASK(7, 0);
-> > @@ -1459,7 +1459,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
-> >  			    vcpu_read_sys_reg(vcpu, TTBR0_EL2));
-> >  		u16 asid;
-> >  
-> > -		asid = FIELD_GET(TTBR_ASID_MASK, ttbr);
-> > +		asid = FIELD_GET(TTBRx_EL1_ASID_MASK, ttbr);
-> >  		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
-> >  		    !(tcr & TCR_ASID16))
-> >  			asid &= GENMASK(7, 0);
-> 
-> Given the 3 hunks above, there is clearly a better approach.
-
-https://lore.kernel.org/r/20260225104718.14209-1-maz@kernel.org
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+> Signed-off-by: James Morse <james.morse@arm.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+LGTM
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
