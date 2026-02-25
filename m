@@ -1,217 +1,184 @@
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BED2F25E4
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 06:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC82296BD5
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 07:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772001557; cv=none; b=Y6uxvhyuMQ2AuFckpVoS+CiodKrR0RjGKDggXki8npNlHTihkw3JL5OG37uiwUkyJzxEr1ghahe8gMyTCCzwUFjtW1LE2y6i7fcNPbjMZrlggOBerNRYd9xixTOKT9ATyL60cx1XpnW2u6AEwNhjJOOdUc+J3aB2aoJozanIqz0=
+	t=1772003787; cv=none; b=CAgqrVCZ4ZgafjpEW/o+S0qI+2jHIvf1BbemrRddni3ULjY11p0VKLE9EPQkEjWZTE0f4zq84RdNe3eboULzrntuwdgF42gYnLEnJKsoaLYvqio12hH2ELy9A0ma3BZWLMqPiNNRouSPQxd+TPaJNtnJtn4c1+B2IFuIbeunRrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772001557; c=relaxed/simple;
-	bh=I6L9820bJhptBXFz0BEuVefwTP8e7M9Z7ZYIwww/ojM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tupN9w9x5U8WM7Zt5FAkZ7mksFyTsdA6Q/Y6SUnYREnTMqAWorGA4SOEddpt0V/brH4chkT3oTIkBLvvsX/7YFxanKDE7zmZaZQ4XSBZIXtqo84YsV1VT/63MPuz3mV8Czl+ERcz3wrysHYJ3OnOHt0RihzLy5k26CKAkLJWBLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=DPQL/Iur; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+	s=arc-20240116; t=1772003787; c=relaxed/simple;
+	bh=xGXEyXsSQzRmxM8FtMy3STvmc4DMp9BHLwqRTciX6BE=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=BiQZicb1sTH+/RIEIN5rKl3l3+nQ3RBo0lIbf84t76L1lTFRXdINyG0GsMgOlSC/AzgT0KkGsNJR/7nmJD/pWstsp5x+8ra/WI3QMgjMPG6PnuKiVPd+oFTH5UFWK6/LMXCRoxlRDkhbWoihINfooF/gVO6ZrveLIHArm35STn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W5EutY1o; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="DPQL/Iur"
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=PSd0bIge3du5q4k1ITIqdipNWSaUEDd+YaQHudv3Gec=;
-	b=DPQL/IurM9+EUBSco39+DIWp20D9Za9zlHjxpKr6vQ6m/YmUSSm3K3pANqIS5kAfvdQlyM1tr
-	CtLgq3AQ9BxuDrp3dFCWh5saGf4UyDXbH/XAY6017jBToLb7V5LirPd7WdZ5T48woRwPK33S+nz
-	DU3+s6Nc+SwTDd339Lj25Kk=
-Received: from mail.maildlp.com (unknown [172.19.163.127])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4fLPvH4xvrz1K97v;
-	Wed, 25 Feb 2026 14:34:19 +0800 (CST)
-Received: from kwepemf100008.china.huawei.com (unknown [7.202.181.222])
-	by mail.maildlp.com (Postfix) with ESMTPS id 234A1402AB;
-	Wed, 25 Feb 2026 14:39:04 +0800 (CST)
-Received: from [10.174.179.37] (10.174.179.37) by
- kwepemf100008.china.huawei.com (7.202.181.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Wed, 25 Feb 2026 14:39:02 +0800
-Message-ID: <7cb6092c-c4b2-46e6-9b32-ef82b694f9b0@huawei.com>
-Date: Wed, 25 Feb 2026 14:39:01 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5EutY1o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1772003784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qL6dea3nPOVHlv2oBcUsVZrWZwNNBBgQt3IQvJSqORw=;
+	b=W5EutY1o0Xw2DKHzrU3GtvbN50aVCikTMLFtp2qQ1nw+N93gBeScg5Z8Xg05gdbZrMpRGA
+	l61wl9/Hf68qhJSM+qhfUewhr4SL7qXolgGz11HZp9li/4fPYHZKnUSchVyZOKo0M/4S2J
+	L+dHI4IxEwSlMdC9+HVjaeYcISsqTFY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-664-GRR2gRE_MOy50BD62Hmrgg-1; Wed, 25 Feb 2026 02:16:22 -0500
+X-MC-Unique: GRR2gRE_MOy50BD62Hmrgg-1
+X-Mimecast-MFC-AGG-ID: GRR2gRE_MOy50BD62Hmrgg_1772003782
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4837b7903f3so76411655e9.2
+        for <kvmarm@lists.linux.dev>; Tue, 24 Feb 2026 23:16:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772003781; x=1772608581;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qL6dea3nPOVHlv2oBcUsVZrWZwNNBBgQt3IQvJSqORw=;
+        b=LebRfTAfdVLUun9FjNWfjPGQx5AoZC5XQG+oHNVsGvVKkg4Yln+B+GF8hq6h28Id2j
+         2WHyz90SmqSpxrgwcYocgCdM0qywg4Rw0IF7bq5dLxyt42qpHUKqg0XnJORvqppHsbrw
+         ozckFm5+VOTCjWevfCAUYpFrcPOY/6ort6aPs+YdP6gHcptB5zUT6+0If28bFLKKmT6U
+         pYeVOu6hhGaTztMK83J8AAerkMeoaOEi5uEVDaU96gT7E63HLlBdkj4jy2fTDyFQn5E7
+         XxgRfKIPW61PeibovsIp4TdzR9Jt7YYvtUJq+ryQ2pfevpu4lAAU3euIbBFuYWckQxYb
+         1Ibg==
+X-Forwarded-Encrypted: i=1; AJvYcCW9t2XzXZzmsrUzwyXZeo7hvP4oKhiqdrBOqytC1EbW0i5yiSQ1exWM2eK5aI5+rd8LownZjLo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyvuqWrXhz0ewpzuz2MomejNAdTS6JU2wrTk+d6MF8xA8Hh1+U8
+	OcmnGsqV2wCMv3bxgjq/fzogkmO5xiBCLUncjTr/3lF+lmrGiQohQmpaWhFwWGUHYUxhdYiSr+T
+	QyyTiTbtWXCcL0r7hbWZqorRcFMl0nv6N27yxHoAbFmeLnBsx/BGG4pIsxw==
+X-Gm-Gg: ATEYQzwN2pT7yLBbm1UqMUVUoU7mCX8LgIaAfKw5RhDQco7r5kZfYg9GkiG59bCLuot
+	t3BnMqGa9FzqOh8P4B0iC7ama/kY+wI/gtfvq+l9/R4IGiRGi+/MdOgrTJi6sxcSvNF43MNvf7x
+	b2snOJztI/6abBA8VYJl+MpCVNGidR+L9OJgxj6SebqWexEACS6VG98vrv/NiI/n1+WtGu2/ojL
+	HL9PNZnjLq242KPK58uEebrd3ViAC9Yc0ktl7K9IJJtZ3eY10YSGx4yU7nXtCn4QoRTFDXk16dp
+	hB8jvLDUaNst7vRQIw2DlfhnE1x6cnuAUv8r9tMDN+dlY/GdlSVHa4T+5Op55U4P6z2U5Ng62TF
+	F1TtNiuTUH2SvtbCHsnPQ2qVcg5ppcqyPLBO0lmBVukTG4B/B2cNVOtVZniyHHYmEcvDjHm8=
+X-Received: by 2002:a05:600c:8708:b0:477:7c7d:d9b2 with SMTP id 5b1f17b1804b1-483a963d62amr213324425e9.32.1772003781523;
+        Tue, 24 Feb 2026 23:16:21 -0800 (PST)
+X-Received: by 2002:a05:600c:8708:b0:477:7c7d:d9b2 with SMTP id 5b1f17b1804b1-483a963d62amr213324075e9.32.1772003781071;
+        Tue, 24 Feb 2026 23:16:21 -0800 (PST)
+Received: from rh (p200300f6af25cc00b2a92b19386de96f.dip0.t-ipconnect.de. [2003:f6:af25:cc00:b2a9:2b19:386d:e96f])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-483bd732eb1sm50579945e9.12.2026.02.24.23.16.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Feb 2026 23:16:20 -0800 (PST)
+Date: Wed, 25 Feb 2026 08:16:19 +0100 (CET)
+From: Sebastian Ott <sebott@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+cc: qemu-devel@nongnu.org, eric.auger@redhat.com, kvm@vger.kernel.org, 
+    kvmarm@lists.linux.dev, pbonzini@redhat.com, qemu-arm@nongnu.org
+Subject: Re: [PATCH v6 1/1] target/arm/kvm: add kvm-psci-version vcpu
+ property
+In-Reply-To: <CAFEAcA8O2UEKToJ+zXA6=vvgkRyPKrPwtfHnti7yyGgCGwoJeA@mail.gmail.com>
+Message-ID: <0616fe7f-96b8-251e-dc0f-9e15ec8298ba@redhat.com>
+References: <20260220115656.4831-1-sebott@redhat.com> <20260220115656.4831-2-sebott@redhat.com> <CAFEAcA8O2UEKToJ+zXA6=vvgkRyPKrPwtfHnti7yyGgCGwoJeA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v4 18/41] arm_mpam: resctrl: Implement helpers to update
- configuration
-Content-Language: en-US
-To: Ben Horgan <ben.horgan@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
-	<linux-doc@vger.kernel.org>, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260203214342.584712-1-ben.horgan@arm.com>
- <20260203214342.584712-19-ben.horgan@arm.com>
- <d7de359e-9bf3-e41d-b00d-985ca7263ad8@huawei.com>
- <a5bc5d67-4dab-4699-8a11-5a92ca334159@arm.com>
-From: Zeng Heng <zengheng4@huawei.com>
-In-Reply-To: <a5bc5d67-4dab-4699-8a11-5a92ca334159@arm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemf100008.china.huawei.com (7.202.181.222)
-
-Hi Ben,
-
-On 2026/2/16 22:23, Ben Horgan wrote:
-> Hi Zeng,
-> 
-> On 2/14/26 10:39, Zeng Heng wrote:
->> Hi Ben,
->>
->> On 2026/2/4 5:43, Ben Horgan wrote:
->>> From: James Morse <james.morse@arm.com>
->>>
->>> resctrl has two helpers for updating the configuration.
->>> resctrl_arch_update_one() updates a single value, and is used by the
->>> software-controller to apply feedback to the bandwidth controls, it
->>> has to
->>> be called on one of the CPUs in the resctrl:domain.
->>>
->>> resctrl_arch_update_domains() copies multiple staged configurations,
->>> it can
->>> be called from anywhere.
->>>
->>> Both helpers should update any changes to the underlying hardware.
->>>
->>> Implement resctrl_arch_update_domains() to use
->>> resctrl_arch_update_one(). Neither need to be called on a specific CPU as
->>> the mpam driver will send IPIs as needed.
->>>
->>> Tested-by: Gavin Shan <gshan@redhat.com>
->>> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->>> Tested-by: Peter Newman <peternewman@google.com>
->>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->>> Signed-off-by: James Morse <james.morse@arm.com>
->>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->>> ---
->>> Changes since rfc:
->>> list_for_each_entry -> list_for_each_entry_rcu
->>> return 0
->>> Restrict scope of local variables
->>>
->>> Changes since v2:
->>> whitespace fix
->>> ---
->>>    drivers/resctrl/mpam_resctrl.c | 70 ++++++++++++++++++++++++++++++++++
->>>    1 file changed, 70 insertions(+)
->>>
->>> diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/
->>> mpam_resctrl.c
->>> index ecf00386edca..48d047510089 100644
->>> --- a/drivers/resctrl/mpam_resctrl.c
->>> +++ b/drivers/resctrl/mpam_resctrl.c
->>> @@ -212,6 +212,76 @@ u32 resctrl_arch_get_config(struct rdt_resource
->>> *r, struct rdt_ctrl_domain *d,
->>>        }
->>>    }
->>>    +int resctrl_arch_update_one(struct rdt_resource *r, struct
->>> rdt_ctrl_domain *d,
->>> +                u32 closid, enum resctrl_conf_type t, u32 cfg_val)
->>> +{
->>> +    u32 partid;
->>> +    struct mpam_config cfg;
->>> +    struct mpam_props *cprops;
->>> +    struct mpam_resctrl_res *res;
->>> +    struct mpam_resctrl_dom *dom;
->>> +
->>> +    lockdep_assert_cpus_held();
->>> +    lockdep_assert_irqs_enabled();
->>> +
->>> +    /*
->>> +     * No need to check the CPU as mpam_apply_config() doesn't care, and
->>> +     * resctrl_arch_update_domains() relies on this.
->>> +     */
->>> +    res = container_of(r, struct mpam_resctrl_res, resctrl_res);
->>> +    dom = container_of(d, struct mpam_resctrl_dom, resctrl_ctrl_dom);
->>> +    cprops = &res->class->props;
->>> +
->>> +    partid = resctrl_get_config_index(closid, t);
->>
->>
->> As a victim, I must admit I cannot verify this feedback on my local
->> Kunpeng environment since MB functionality is not yet supported by the
->> driver. However, after careful consideration, I believe this is worth
->> bringing up for discussion.
-> 
-> Thank you for thinking and finding problems beyond your platform.
-> 
->>
->> Regarding the MB configuration flow, the partid conversion should
->> include the mpam_resctrl_hide_cdp() condition check. Here's the
->> rationale:
->>
->> After resctrl parsing schemata update, MB configuration is set via
->> parse_bw() or rdtgroup_init_mba(), which stores the updated
->> configuration in dom->staged_config[CDP_NONE]. If the MB configuration
->> update directly uses t = CDP_NONE, it would result in MB obtaining the
->> wrong partid and cfg[partid].
->>
->> The specific fix would be like:
->>
->> -       partid = resctrl_get_config_index(closid, t);
->> +       if (mpam_resctrl_hide_cdp(r->rid))
->> +        /* The configuration of CDP_DATA is same as the CDP_CODE one. */
->> +               partid = resctrl_get_config_index(closid, CDP_DATA);
->> +       else
->> +               partid = resctrl_get_config_index(closid, t);
-> 
-> The CDP emulation support is added later in the series in patch 20, Add
-> CDP emulation. However, I think you have spotted an actual problem. With
-> hidden CDP the cfg is first found with
-> 
-> resctrl_get_config_index(closid, t) when CDP_NONE
-> but then the setting does use CDP_CODE and CDP_DATA.
-> 
-> CDP in general is proving to be quite tricky.
-> 
->>
->> Similarly, in resctrl_arch_get_config() requires the same treatment to
->> ensure consistency.
-> 
-> I don't see the problem here but maybe I'm missing something?
-> 
-> Isn't this handled by:
-> 
-> 	/*
-> 	 * When CDP is enabled, but the resource doesn't support it,
-> 	 * the control is cloned across both partids.
-> 	 * Pick one at random to read:
-> 	 */
-> 	if (mpam_resctrl_hide_cdp(r->rid))
-> 		type = CDP_DATA;
-> 
-> I think we could do similar in resctrl_arch_update_one()
-> 
->>
->>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: QqEQnSGke1OAsUaPx45bty2kBopvfYAT162YYyZYRJY_1772003782
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
 
-Yes, I noticed that handling has already been added to
-resctrl_arch_get_config(), and I have updated the comments on v5
-accordingly.
 
+On Tue, 24 Feb 2026, Peter Maydell wrote:
 
-Thanks,
-Zeng Heng
+> On Fri, 20 Feb 2026 at 11:57, Sebastian Ott <sebott@redhat.com> wrote:
+>>
+>> Provide a kvm specific vcpu property to override the default
+>> (as of kernel v6.13 that would be PSCI v1.3) PSCI version emulated
+>> by kvm. Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3
+>>
+>> Note: in order to support PSCI v0.1 we need to drop vcpu
+>> initialization with KVM_CAP_ARM_PSCI_0_2 in that case.
+>>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>> Tested-by: Eric Auger <eric.auger@redhat.com>
+>> Signed-off-by: Sebastian Ott <sebott@redhat.com>
+>> ---
+>>  docs/system/arm/cpu-features.rst | 11 ++++++++
+>>  target/arm/cpu.c                 |  8 +++++-
+>>  target/arm/kvm.c                 | 48 ++++++++++++++++++++++++++++++--
+>>  3 files changed, 64 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+>> index 3db1f19401..ce19ae6a04 100644
+>> --- a/docs/system/arm/cpu-features.rst
+>> +++ b/docs/system/arm/cpu-features.rst
+>> @@ -204,6 +204,17 @@ the list of KVM VCPU features and their descriptions.
+>>    the guest scheduler behavior and/or be exposed to the guest
+>>    userspace.
+>>
+>> +``kvm-psci-version``
+>> +  Set the Power State Coordination Interface (PSCI) firmware ABI version
+>> +  that KVM provides to the guest. By default KVM will use the newest
+>> +  version that it knows about (which is PSCI v1.3 in Linux v6.13).
+>> +
+>> +  You only need to set this if you want to be able to migrate this
+>> +  VM to a host machine running an older kernel that does not
+>> +  recognize the PSCI version that this host's kernel defaults to.
+>> +
+>> +  Current valid values are: 0.1, 0.2, 1.0, 1.1, 1.2, and 1.3.
+>> +
+>>  TCG VCPU Features
+>>  =================
+>>
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 10f8280eef..60f391651d 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1144,7 +1144,13 @@ static void arm_cpu_initfn(Object *obj)
+>>       * picky DTB consumer will also provide a helpful error message.
+>>       */
+>>      cpu->dtb_compatible = "qemu,unknown";
+>> -    cpu->psci_version = QEMU_PSCI_VERSION_0_1; /* By default assume PSCI v0.1 */
+>> +    if (!kvm_enabled()) {
+>> +        /* By default KVM will use the newest PSCI version that it knows about.
+>> +         * This can be changed using the kvm-psci-version property.
+>> +         * For others assume PSCI v0.1 by default.
+>> +         */
+>> +        cpu->psci_version = QEMU_PSCI_VERSION_0_1;
+>> +    }
+>>      cpu->kvm_target = QEMU_KVM_ARM_TARGET_NONE;
+>>
+>>      if (tcg_enabled() || hvf_enabled()) {
+>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>> index ded582e0da..5453460965 100644
+>> --- a/target/arm/kvm.c
+>> +++ b/target/arm/kvm.c
+>> @@ -485,6 +485,28 @@ static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+>>      ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+>>  }
+>>
+>> +static char *kvm_get_psci_version(Object *obj, Error **errp)
+>> +{
+>> +    ARMCPU *cpu = ARM_CPU(obj);
+>> +
+>> +    return g_strdup_printf("%d.%d",
+>> +                           (int) PSCI_VERSION_MAJOR(cpu->psci_version),
+>> +                           (int) PSCI_VERSION_MINOR(cpu->psci_version));
+>> +}
+>> +
+>> +static void kvm_set_psci_version(Object *obj, const char *value, Error **errp)
+>> +{
+>> +    ARMCPU *cpu = ARM_CPU(obj);
+>> +    uint16_t maj, min;
+>> +
+>> +    if (sscanf(value, "%hd.%hd", &maj, &min) != 2) {
+>
+> %hd is a signed value, so this will accept "-3.-5" I think ?
+> Probably we want %hu.
+
+Ugh, right.
+
+> (If you agree I can just make this fix locally, no need for you to respin.)
+
+That'd be great, Thanks!
+
+Sebastian
+
