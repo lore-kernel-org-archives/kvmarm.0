@@ -1,181 +1,122 @@
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com [209.85.210.73])
+Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A5D3B5314
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 17:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DCF3ECBFD
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 17:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772041118; cv=none; b=aPUZtUUHsgl0EpNY0/yus+hyx14KxIEA9UgzlZvgdA4v+NXJ4U+MFME+v3Y6k0b9uocq7kV5c4II/gyIxfWTdjk+QCq5A9idpi6KHyyWnfL9cY/yLmgXPtVec+FtqzQAzKUuGMF9k0aq/wXhktON6nTWTZMiGnh1FmnV+Ly6X4M=
+	t=1772041260; cv=none; b=ubpvkb7BbqcOc61gJlNL2Ibl972sWVs9SyrViGvkpgBpIXOTQuh0dUi68UPvPRHr6AEV64+4HBpJulBRSC9LwXUTwkuxp3iw4raxpkxkjVfCy/7a7drn39cDHiq4F2Zw+pXMXwZ7PKEI0wxPPC5XWiIPqVdUs4AZXbvJ9P8fudo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772041118; c=relaxed/simple;
-	bh=R/R3DcLkOIdIezNwV80BfBol7Z25b9yKegEl4ZzQ0N0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nPcdeT6r7GO1RluE7nxTlFghEkcCyy7txG9NVlEUU3tiwKiRyJTUlO4hgUBHcGNxWELaVfDstuW5+AYSNDcouYVB60P0PzX9Ag2RfJgoOzxvNQ2FLD9lWvYYrIDJ1E8ohr3mSOkbulY7Psp3SuSimkfBHVwtc4qHUIP6xBXvtAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cuq+Gfkl; arc=none smtp.client-ip=209.85.210.73
+	s=arc-20240116; t=1772041260; c=relaxed/simple;
+	bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=psan6Nu9oLLSaOg8cdyaOc3nOrD5nZqJnOWA4bfiH6nePWmJlXAEpoTnz8I5eEjCvvkkGDWlAAYmkPRQPRq4Cu/PmUhjiB2X0ubgjZOcN11SaiIKGd54oTCEH9UC0t/2J9bIphScX8Y0o+gxLGIhEs3tHQFg3WCHxnom7zjzLA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cKzUlBcD; arc=none smtp.client-ip=209.85.161.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cuq+Gfkl"
-Received: by mail-ot1-f73.google.com with SMTP id 46e09a7af769-7d1950b48f3so76601919a34.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 09:38:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cKzUlBcD"
+Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-679e5688b33so197710eaf.3
+        for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 09:40:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772041115; x=1772645915; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FxE+A5J4HGPNO2s3hfVFIukZ/uILKNBM11tjPpp3P/Y=;
-        b=Cuq+GfklBKMyVfSPEtXYJAAb7i4Zd3PbzEGrZrBz9DSUsRb1DMq7tNdseNHJL0kxXR
-         4m58LAZP8yF6bKhi12fFKjx/H5cFXvmd67nxbaJHWLEuk2iNfTwyyoVHxXe/diLU9sNV
-         8+q09Hc6SrsHyC6Xnn/AcZPFELvvRXCDPKshM6KSq8hYE0D/Ri1HDlBbLvwvNdw8Pu22
-         8m+2msZfSv7n0DWEewIbfHxs3v2FPj9xV4JX6KRYQuWF2ewPGaw4v3acFQjfhUy6iho4
-         wDXVBfFJ9A/cyaZ/lvOnjoOZBz5+K/N70KRDnuHUqg944c7kaEAnKJwwecrAKjF/MRyx
-         YcRQ==
+        d=google.com; s=20230601; t=1772041257; x=1772646057; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+        b=cKzUlBcDNTTwRF7Oe6km+WjjnwkSNQ0zNF+JPz4+ekY6l+2pmLJnDh6wQeOfdMD84h
+         UCnWBZHSuJ/YXaSLPXio48ClhQJCiA2ADhx+CSnRYXL9cvOrhPzOTFHVFD1DEdJQdcFd
+         rV4D4Xk2JI3L/rDG9P1X1yvqIs8TiKPOEBLqCtFQOj8ABAr658PKdkT1y5hAYxX0IJiW
+         6e3VQQmgDvxSHGnlHnmF7arDkiJV8ZDTI08NOTOTO1Is5tXcpnVs2NX9IwENY3hkz1jU
+         H0Rpo35dJ5OK4N8+nYMzlSiONrMBwRF1kKLdgX2ErPfjiGigNPYFSzEbwvVmaFEgivye
+         bHNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772041115; x=1772645915;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FxE+A5J4HGPNO2s3hfVFIukZ/uILKNBM11tjPpp3P/Y=;
-        b=tLkoujByVGuiHgN0XhINNuhlfdfwdnM5LpHKLowgRUyA9NuiLeqXymd5jxDG1TcZs6
-         I93f+B23AdH1LSXnIxEI0whPscNk4jEHOA+EfMBu8eJzxk9IR1eSnwp+whs614D2bjdF
-         zfhsZpJWBaC4VLaYzB7IhfRoNzFGhtjF2Z7w0jmmhHmyZk/dEMAoUyi7fLr2iTo83eCy
-         upQ9LKKkDW7lMtCy/B+l4lmkqbubOdWvdLsAkIw1AzXpCz5vag4vgatlaNuMes+4zhyd
-         Huc6o5d08FMnyxJsYyY3mOrrE0cACEhKl8PjNFr77uH2c2hDVnnGP4qY6xCjJNVov6d0
-         qa1w==
-X-Forwarded-Encrypted: i=1; AJvYcCVndR0UVmuykONeOGPaQiVqgpeJ0Be3LpqTWF03k4C23l1ysmTz6v6jKesQ1FOiWtBDMZwCzWc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yzdb4M5xd/51DlwRbd6jWOKRA9GSMUX8NclT0nxKRG80n+bR7gz
-	WBznnpKOWXLl3AAY4n7rL+ayCZCmReiUGKbXW8KDultgwjZY9gPfIKA11WRMYDeJXmAI0N4Zgur
-	Hzg/DbWgTeIJK9SJuQXYf/03QDw==
-X-Received: from ilbcf6.prod.google.com ([2002:a05:6e02:2306:b0:447:81b5:ae34])
+        d=1e100.net; s=20230601; t=1772041257; x=1772646057;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfPVzGsOpxFMqLnHbeOt97S7ASvz/dPPsmfURT55c2c=;
+        b=NF2LE7GwLBoKtsCwTI2Wn/nkutsaBLwUQP/NcD7DtJCFFd3qTz+M33gkhd8stD6q+r
+         o0Ct7r5ka76+Hm43G3FpLO+P1jN6w3CcbjJcIxjGI1XJ9nwHohqLpfIYUkfI0jbafst9
+         K5zkbupxFlzBM8Q6ApclcRX4b7fkwANLqFzrwhUUCQuREiFrBUA12CsxKx3uC4kR/UPu
+         dPHWlDf46blHzNQkVXTFmG0OCbJZOp4iWdbB3UuC6n/YsZeVu3mVFb++N3dmyNet+dPC
+         jWTWLyP3iiemTkbAMlpyOJfCHC0yiiZcSEyV6105zvHn9k8i1l0UM/rs8uS1eIVHAlW3
+         6Swg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPgPqWum/uw9NLreffObpxLKdQ//O+NcX/tmtUXJXdI1bLJuBFzprBL1qrLjG9M1+MzPtR/vA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yxh9MtcJ8lT8RvXIlYBJuabivI4+kcfopCBJ5ISGNTAIuZueTqD
+	irw67qJZLPhP+fQHBxAR+f5qZilcdl4PynrDZfpwgg4EK6GalaTMDFAYOy95uV/B2DKU9kguh0Z
+	GPVUzq0DLxziItPaQiQKX72bROQ==
+X-Received: from iluj15.prod.google.com ([2002:a05:6e02:154f:b0:4d2:8640:5d64])
  (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a4a:b68a:0:b0:679:dcd7:fbe6 with SMTP id 006d021491bc7-679dcd80797mr3115611eaf.31.1772041114890;
- Wed, 25 Feb 2026 09:38:34 -0800 (PST)
-Date: Wed, 25 Feb 2026 17:37:32 +0000
+ 2002:a05:6820:2019:b0:672:e67a:96cf with SMTP id 006d021491bc7-679c4684cbcmr8062877eaf.16.1772041256681;
+ Wed, 25 Feb 2026 09:40:56 -0800 (PST)
+Date: Wed, 25 Feb 2026 17:40:55 +0000
+In-Reply-To: <86h5rlawru.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
+ 13 Feb 2026 08:11:01 +0000)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.53.0.414.gf7e9f6c205-goog
-Message-ID: <20260225173732.3135526-1-coltonlewis@google.com>
-Subject: [RFC PATCH] arm: enable PMU partitioning
+Message-ID: <gsnty0kgoh5k.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 00/19] ARM64 PMU Partitioning
 From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mingwei Zhang <mizhang@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Mark Rutland <mark.rutland@arm.com>, 
-	Shuah Khan <shuah@kernel.org>, Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, 
-	kvmarm@lists.linux.dev, qemu-arm@nongnu.org, 
-	Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, 
+	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
+	will@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
+	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-This sets the vCPU device attribute to unconditionally enable
-partitioning when a PMU is available on an ARM host.
+Marc Zyngier <maz@kernel.org> writes:
 
-Note that this patch is experimental to demonstrate the API. That is
-why it aborts immediately if the call does not succeed.
+> On Thu, 12 Feb 2026 21:08:36 +0000,
+> Colton Lewis <coltonlewis@google.com> wrote:
 
-For the call to succeed, the host must be running a kernel with the
-ARM64 PMU Partitioning feature [1] and set the kernel command line
-arm_pmuv3.reserved_host_counters=n where n is between 0 and the number
-of counters on the system, inclusive.
+>> Hey Marc, thanks for the review.
 
-[1] https://lore.kernel.org/kvmarm/20260209221414.2169465-1-coltonlewis@google.com/
+>> Marc Zyngier <maz@kernel.org> writes:
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- hw/arm/virt.c                 |  1 +
- linux-headers/asm-arm64/kvm.h |  2 ++
- target/arm/kvm-stub.c         |  5 +++++
- target/arm/kvm.c              | 18 ++++++++++++++++++
- target/arm/kvm_arm.h          |  1 +
- 5 files changed, 27 insertions(+)
+>> > On Mon, 09 Feb 2026 22:13:55 +0000,
+>> > Colton Lewis <coltonlewis@google.com> wrote:
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 50865e8115..29082df31c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2234,6 +2234,7 @@ static void virt_post_cpus_gic_realized(VirtMachineState *vms,
-                 if (kvm_irqchip_in_kernel()) {
-                     kvm_arm_pmu_set_irq(ARM_CPU(cpu), VIRTUAL_PMU_IRQ);
-                 }
-+                kvm_arm_pmu_set_partition(ARM_CPU(cpu), true);
-                 kvm_arm_pmu_init(ARM_CPU(cpu));
-             }
-             if (steal_time) {
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 46ffbddab5..69309a182e 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -424,6 +424,8 @@ enum {
- #define   KVM_ARM_VCPU_PMU_V3_FILTER		2
- #define   KVM_ARM_VCPU_PMU_V3_SET_PMU		3
- #define   KVM_ARM_VCPU_PMU_V3_SET_NR_COUNTERS	4
-+#define   KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION	5
-+
- #define KVM_ARM_VCPU_TIMER_CTRL		1
- #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
- #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-diff --git a/target/arm/kvm-stub.c b/target/arm/kvm-stub.c
-index ea67deea52..afbfffe2cd 100644
---- a/target/arm/kvm-stub.c
-+++ b/target/arm/kvm-stub.c
-@@ -80,6 +80,11 @@ void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq)
-     g_assert_not_reached();
- }
- 
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition)
-+{
-+    g_assert_not_reached();
-+}
-+
- void kvm_arm_pmu_init(ARMCPU *cpu)
- {
-     g_assert_not_reached();
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index ded582e0da..db1d564462 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -1817,6 +1817,24 @@ void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq)
-     }
- }
- 
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition)
-+{
-+    struct kvm_device_attr part_attr = {
-+        .group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+        .attr = KVM_ARM_VCPU_PMU_V3_ENABLE_PARTITION,
-+        .addr = (uint64_t)&partition
-+    };
-+
-+    if (!cpu->has_pmu) {
-+        return;
-+    }
-+
-+    if (!kvm_arm_set_device_attr(cpu, &part_attr, "PMU partition")) {
-+        error_report("failed to set PMU partition");
-+        abort();
-+    }
-+}
-+
- void kvm_arm_pvtime_init(ARMCPU *cpu, uint64_t ipa)
- {
-     struct kvm_device_attr attr = {
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index cc0b374254..2b55f2956e 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -248,6 +248,7 @@ int kvm_arm_vgic_probe(void);
- 
- void kvm_arm_pmu_init(ARMCPU *cpu);
- void kvm_arm_pmu_set_irq(ARMCPU *cpu, int irq);
-+void kvm_arm_pmu_set_partition(ARMCPU *cpu, bool partition);
- 
- /**
-  * kvm_arm_pvtime_init:
+>> >> This series creates a new PMU scheme on ARM, a partitioned PMU that
+>> >> allows reserving a subset of counters for more direct guest access,
+>> >> significantly reducing overhead. More details, including performance
+>> >> benchmarks, can be read in the v1 cover letter linked below.
 
-base-commit: afe653676dc6dfd49f0390239ff90b2f0052c2b8
--- 
-2.53.0.414.gf7e9f6c205-goog
+>> >> An overview of what this series accomplishes was presented at KVM
+>> >> Forum 2025. Slides [1] and video [2] are linked below.
 
+>> >> IMPORTANT: This iteration does not yet implement the dynamic counter
+>> >> reservation approach suggested by Will Deacon in January [3]. I am
+>> >> working on it, but wanted to send this version first to keep momentum
+>> >> going and ensure I've addressed all issues besides that.
+
+>> > [...]
+
+>> > As I have asked before, this is missing an example of how userspace is
+>> > going to use this. Without it, it is impossible to correctly review
+>> > this series.
+
+>> > Please consider this as a blocker.
+
+>> Understood. I remember you asking for a QEMU patch specifically.
+
+> No. *any* VMM. QEMU, kvmtool, crosvm, firecrackpoter, whichever you want.
+
+>> I had hoped that the use in the selftest was sufficient to show how to
+>> use the uAPI.
+
+> The selftests are absolutely pointless, like 99% of all selftests.
+> They don't demonstrate how the userspace API works, now how
+> configuring the PMU is ordered with the rest of the save/restore flow.
+
+>> If not, I can send out an example QEMU patch to the QEMU ARM mailing
+>> list.
+
+Okay I sent one to you, qemu-arm, and everyone else I asked to review
+this series.
