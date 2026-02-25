@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590CC1A2C0B
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA762BEC34
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771991530; cv=none; b=AMEakax4kKCZA2NtJd+B8D9bPtCPJqnP/tYzFh1pvyQee/L9X2rSafj68Hn8u3MSBwBb/nYwylIIzcU/pNxbD06iqt+Gill31hHUQLLtSJA7aj22jXti1CTxUHu4KGO26N7797v80hMNRApd1qogEBF8f1AX+pZCEkAf/P8qauk=
+	t=1771991531; cv=none; b=OvHfKmUPG9wKZjsLd6wqS9Li70naZLkcer5J65f7gfywSM5+Tygwq2JKL7qHR0ga2GwsBksMgEUEZmxR7Obg6Zkv1icOXYdWn3+UZNArcu1LBQArRTwT/m5zIP62TUiUeYGP/SCCvik6yLrsFBX9V9L/vt/SGynrlgADw5T/poI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771991530; c=relaxed/simple;
-	bh=/Aos0U+WI3bcMGAKCDIUBTe7/JmFl6MlJJpcL+aaK6Y=;
+	s=arc-20240116; t=1771991531; c=relaxed/simple;
+	bh=UN3pyCCU7wkNfIR0JWZbTPuMXE5bTPcsbWaItp10y4U=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jsremdxRovE0mnXkXdpcvSDIWqDQ1JeptWm0uWo21RNm5BKjksnrStj94bpTtEO/W30E74C47kPC+ffnfqHaf0wupNJJk8g6K09fXh8zsu2QjFhN534MPHg7RqfJpV3FaEPBrUqT7nRi/MUiFiZTlF83PXnoBF5YCJcfEmbpqcE=
+	 MIME-Version; b=kphsQrGaoT22fdH9agvIuGPM2K/Yi9OqduRBpz7xYSkC1Vt14x/A5dB7MA673KNb3Rdv4io+MZh5fIgEXfyN8+N/oGjoR7F2SuDADBzDIwxJkb3bxrUzf+q4yBMOucWDhep1xkIehp8dIxPn7Q1URX5JcehE4eU55MzvexOyHRg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 834C11691;
-	Tue, 24 Feb 2026 19:52:01 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 99531169E;
+	Tue, 24 Feb 2026 19:52:03 -0800 (PST)
 Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1BF7A3F7BD;
-	Tue, 24 Feb 2026 19:52:05 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2D4223F7BD;
+	Tue, 24 Feb 2026 19:52:08 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -29,9 +29,9 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Subject: [PATCH 1/2] arm64/mm: Directly use TTBRx_EL1_ASID_MASK
-Date: Wed, 25 Feb 2026 03:51:56 +0000
-Message-Id: <20260225035157.1159962-2-anshuman.khandual@arm.com>
+Subject: [PATCH 2/2] arm64/mm: Directly use TTBRx_EL1_CnP
+Date: Wed, 25 Feb 2026 03:51:57 +0000
+Message-Id: <20260225035157.1159962-3-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20260225035157.1159962-1-anshuman.khandual@arm.com>
 References: <20260225035157.1159962-1-anshuman.khandual@arm.com>
@@ -43,9 +43,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace all TTBR_ASID_MASK macro instances with TTBRx_EL1_ASID_MASK which
-is a standard field mask from tools sysreg format. Drop the now redundant
-custom macro TTBR_ASID_MASK. No functional change.
+Replace all TTBR_CNP_BIT macro instances with TTBRx_EL1_CNP_BIT which
+is a standard field from tools sysreg format. Drop the now redundant
+custom macro TTBR_CNP_BIT. No functional change.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
@@ -56,145 +56,89 @@ Cc: linux-kernel@vger.kernel.org
 Cc: kvmarm@lists.linux.dev
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/asm-uaccess.h | 2 +-
- arch/arm64/include/asm/mmu.h         | 1 -
- arch/arm64/include/asm/mmu_context.h | 2 +-
- arch/arm64/include/asm/uaccess.h     | 6 +++---
- arch/arm64/kernel/entry.S            | 2 +-
- arch/arm64/kvm/at.c                  | 2 +-
- arch/arm64/kvm/nested.c              | 4 ++--
- arch/arm64/mm/context.c              | 6 +++---
- 8 files changed, 12 insertions(+), 13 deletions(-)
+ arch/arm64/include/asm/pgtable-hwdef.h | 2 --
+ arch/arm64/kernel/mte.c                | 4 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S     | 4 ++--
+ arch/arm64/mm/context.c                | 2 +-
+ arch/arm64/mm/mmu.c                    | 2 +-
+ 5 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/asm-uaccess.h b/arch/arm64/include/asm/asm-uaccess.h
-index 9148f5a31968..12aa6a283249 100644
---- a/arch/arm64/include/asm/asm-uaccess.h
-+++ b/arch/arm64/include/asm/asm-uaccess.h
-@@ -15,7 +15,7 @@
- #ifdef CONFIG_ARM64_SW_TTBR0_PAN
- 	.macro	__uaccess_ttbr0_disable, tmp1
- 	mrs	\tmp1, ttbr1_el1			// swapper_pg_dir
--	bic	\tmp1, \tmp1, #TTBR_ASID_MASK
-+	bic	\tmp1, \tmp1, #TTBRx_EL1_ASID_MASK
- 	sub	\tmp1, \tmp1, #RESERVED_SWAPPER_OFFSET	// reserved_pg_dir
- 	msr	ttbr0_el1, \tmp1			// set reserved TTBR0_EL1
- 	add	\tmp1, \tmp1, #RESERVED_SWAPPER_OFFSET
-diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
-index 137a173df1ff..019b36cda380 100644
---- a/arch/arm64/include/asm/mmu.h
-+++ b/arch/arm64/include/asm/mmu.h
-@@ -10,7 +10,6 @@
- #define MMCF_AARCH32	0x1	/* mm context flag for AArch32 executables */
- #define USER_ASID_BIT	48
- #define USER_ASID_FLAG	(UL(1) << USER_ASID_BIT)
--#define TTBR_ASID_MASK	(UL(0xffff) << 48)
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index d49180bb7cb3..5e6809a462c7 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -223,8 +223,6 @@
+  */
+ #define S1_TABLE_AP		(_AT(pmdval_t, 3) << 61)
  
- #ifndef __ASSEMBLER__
- 
-diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
-index cc80af59c69e..5b1ecde9f14b 100644
---- a/arch/arm64/include/asm/mmu_context.h
-+++ b/arch/arm64/include/asm/mmu_context.h
-@@ -210,7 +210,7 @@ static inline void update_saved_ttbr0(struct task_struct *tsk,
- 	if (mm == &init_mm)
- 		ttbr = phys_to_ttbr(__pa_symbol(reserved_pg_dir));
- 	else
--		ttbr = phys_to_ttbr(virt_to_phys(mm->pgd)) | ASID(mm) << 48;
-+		ttbr = phys_to_ttbr(virt_to_phys(mm->pgd)) | ASID(mm) << TTBRx_EL1_ASID_SHIFT;
- 
- 	WRITE_ONCE(task_thread_info(tsk)->ttbr0, ttbr);
- }
-diff --git a/arch/arm64/include/asm/uaccess.h b/arch/arm64/include/asm/uaccess.h
-index 9810106a3f66..86dfc356ee6e 100644
---- a/arch/arm64/include/asm/uaccess.h
-+++ b/arch/arm64/include/asm/uaccess.h
-@@ -62,7 +62,7 @@ static inline void __uaccess_ttbr0_disable(void)
- 
- 	local_irq_save(flags);
- 	ttbr = read_sysreg(ttbr1_el1);
--	ttbr &= ~TTBR_ASID_MASK;
-+	ttbr &= ~TTBRx_EL1_ASID_MASK;
- 	/* reserved_pg_dir placed before swapper_pg_dir */
- 	write_sysreg(ttbr - RESERVED_SWAPPER_OFFSET, ttbr0_el1);
- 	/* Set reserved ASID */
-@@ -85,8 +85,8 @@ static inline void __uaccess_ttbr0_enable(void)
- 
- 	/* Restore active ASID */
- 	ttbr1 = read_sysreg(ttbr1_el1);
--	ttbr1 &= ~TTBR_ASID_MASK;		/* safety measure */
--	ttbr1 |= ttbr0 & TTBR_ASID_MASK;
-+	ttbr1 &= ~TTBRx_EL1_ASID_MASK;		/* safety measure */
-+	ttbr1 |= ttbr0 & TTBRx_EL1_ASID_MASK;
- 	write_sysreg(ttbr1, ttbr1_el1);
- 
- 	/* Restore user page table */
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index f8018b5c1f9a..9e1bcc821a16 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -473,7 +473,7 @@ alternative_else_nop_endif
+-#define TTBR_CNP_BIT		(UL(1) << 0)
+-
+ /*
+  * TCR flags.
+  */
+diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
+index 32148bf09c1d..eceead1686f2 100644
+--- a/arch/arm64/kernel/mte.c
++++ b/arch/arm64/kernel/mte.c
+@@ -315,8 +315,8 @@ void mte_cpu_setup(void)
+ 	 * CnP is not a boot feature so MTE gets enabled before CnP, but let's
+ 	 * make sure that is the case.
  	 */
- SYM_CODE_START_LOCAL(__swpan_entry_el1)
- 	mrs	x21, ttbr0_el1
--	tst	x21, #TTBR_ASID_MASK		// Check for the reserved ASID
-+	tst	x21, #TTBRx_EL1_ASID_MASK	// Check for the reserved ASID
- 	orr	x23, x23, #PSR_PAN_BIT		// Set the emulated PAN in the saved SPSR
- 	b.eq	1f				// TTBR0 access already disabled
- 	and	x23, x23, #~PSR_PAN_BIT		// Clear the emulated PAN in the saved SPSR
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 885bd5bb2f41..d5c342ccf0f9 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -560,7 +560,7 @@ static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
- 			BUG();
- 		}
+-	BUG_ON(read_sysreg(ttbr0_el1) & TTBR_CNP_BIT);
+-	BUG_ON(read_sysreg(ttbr1_el1) & TTBR_CNP_BIT);
++	BUG_ON(read_sysreg(ttbr0_el1) & TTBRx_EL1_CnP);
++	BUG_ON(read_sysreg(ttbr1_el1) & TTBRx_EL1_CnP);
  
--		wr->asid = FIELD_GET(TTBR_ASID_MASK, asid_ttbr);
-+		wr->asid = FIELD_GET(TTBRx_EL1_ASID_MASK, asid_ttbr);
- 		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
- 		    !(tcr & TCR_ASID16))
- 			wr->asid &= GENMASK(7, 0);
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 620126d1f0dc..82558fb2685f 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -1343,7 +1343,7 @@ static bool kvm_vncr_tlb_lookup(struct kvm_vcpu *vcpu)
- 			    vcpu_read_sys_reg(vcpu, TTBR0_EL2));
- 		u16 asid;
+ 	/* Normal Tagged memory type at the corresponding MAIR index */
+ 	sysreg_clear_set(mair_el1,
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+index 0d42eedc7167..445eb0743af2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+@@ -130,7 +130,7 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
+ 	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
+ 	phys_to_ttbr x2, x1
+ alternative_if ARM64_HAS_CNP
+-	orr	x2, x2, #TTBR_CNP_BIT
++	orr	x2, x2, #TTBRx_EL1_CnP
+ alternative_else_nop_endif
+ 	msr	ttbr0_el2, x2
  
--		asid = FIELD_GET(TTBR_ASID_MASK, ttbr);
-+		asid = FIELD_GET(TTBRx_EL1_ASID_MASK, ttbr);
- 		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
- 		    !(tcr & TCR_ASID16))
- 			asid &= GENMASK(7, 0);
-@@ -1459,7 +1459,7 @@ static void kvm_map_l1_vncr(struct kvm_vcpu *vcpu)
- 			    vcpu_read_sys_reg(vcpu, TTBR0_EL2));
- 		u16 asid;
+@@ -291,7 +291,7 @@ SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+ 	/* Install the new pgtables */
+ 	phys_to_ttbr x5, x0
+ alternative_if ARM64_HAS_CNP
+-	orr	x5, x5, #TTBR_CNP_BIT
++	orr	x5, x5, #TTBRx_EL1_CnP
+ alternative_else_nop_endif
+ 	msr	ttbr0_el2, x5
  
--		asid = FIELD_GET(TTBR_ASID_MASK, ttbr);
-+		asid = FIELD_GET(TTBRx_EL1_ASID_MASK, ttbr);
- 		if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR0_EL1, ASIDBITS, 16) ||
- 		    !(tcr & TCR_ASID16))
- 			asid &= GENMASK(7, 0);
 diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index b2ac06246327..718c495832d0 100644
+index 718c495832d0..0f4a28b87469 100644
 --- a/arch/arm64/mm/context.c
 +++ b/arch/arm64/mm/context.c
-@@ -358,11 +358,11 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
+@@ -354,7 +354,7 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
+ 
+ 	/* Skip CNP for the reserved ASID */
+ 	if (system_supports_cnp() && asid)
+-		ttbr0 |= TTBR_CNP_BIT;
++		ttbr0 |= TTBRx_EL1_CnP;
  
  	/* SW PAN needs a copy of the ASID in TTBR0 for entry */
  	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN))
--		ttbr0 |= FIELD_PREP(TTBR_ASID_MASK, asid);
-+		ttbr0 |= FIELD_PREP(TTBRx_EL1_ASID_MASK, asid);
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index a6a00accf4f9..c22678769c37 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -2188,7 +2188,7 @@ void __cpu_replace_ttbr1(pgd_t *pgdp, bool cnp)
+ 	phys_addr_t ttbr1 = phys_to_ttbr(virt_to_phys(pgdp));
  
- 	/* Set ASID in TTBR1 since TCR.A1 is set */
--	ttbr1 &= ~TTBR_ASID_MASK;
--	ttbr1 |= FIELD_PREP(TTBR_ASID_MASK, asid);
-+	ttbr1 &= ~TTBRx_EL1_ASID_MASK;
-+	ttbr1 |= FIELD_PREP(TTBRx_EL1_ASID_MASK, asid);
+ 	if (cnp)
+-		ttbr1 |= TTBR_CNP_BIT;
++		ttbr1 |= TTBRx_EL1_CnP;
  
- 	cpu_set_reserved_ttbr0_nosync();
- 	write_sysreg(ttbr1, ttbr1_el1);
+ 	replace_phys = (void *)__pa_symbol(idmap_cpu_replace_ttbr1);
+ 
 -- 
 2.30.2
 
