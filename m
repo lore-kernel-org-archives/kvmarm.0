@@ -1,81 +1,98 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CA1303A04
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 21:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FBC33BBB8;
+	Wed, 25 Feb 2026 22:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772053826; cv=none; b=jvzU70BBXdUclkZ9tIFQxC/WNOUrsMC6kUUjtG37lflcHWPOV/9VutxGQduEa09DudNFV0oN+LFlIRU0nMC+uR1w17hEJxkwUH0OeTSX2SqUVFD348VnTwCh7L64h8EWrT/Kf4uko563rtbprcMWum1J/0I9OQl3W/OvJ2gfHig=
+	t=1772058973; cv=none; b=JHlWxB1Ddpv8ujh1ZpRc+Lmyd4e8LMf1w7NkGOMO4M0UA5vjCknzwwVJTKPx1uk/qeNciUslUYUHPKG1ah42LOx+jpDIATbo2E6oqwXcThaqPg+toe4/TwYkdES8qm7imwt7x66Td/vMaaLYy52bPDlx1FQ+IcN0ScvHzaqyJt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772053826; c=relaxed/simple;
-	bh=8XCjqIqgqb+TT5zPv7yUUkOxCIPmrD/tC0tZgAPxfak=;
-	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:To:
-	 In-Reply-To:Content-Type; b=tqzTGo1Kq9wjKgJG6Czw/xIFRtPt3ksRz0tbYAvUfAZ19PH5Jk4tJj2r6cyIFGU/U2hrzpZwCKOkH3I8FTJ54etVpZzud+6QDUEIY2DAuZRISLtBw9k7TqKDBV8bB8GGwB5La+jcRnEM7z/zYu0S1es+uFl5GX9kUPOVD9bhy8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E585515A1;
-	Wed, 25 Feb 2026 13:10:17 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A480F3F62B;
-	Wed, 25 Feb 2026 13:10:19 -0800 (PST)
-Message-ID: <6051a508-1e77-4216-9b41-4b93b21c18c3@arm.com>
-Date: Wed, 25 Feb 2026 21:10:08 +0000
+	s=arc-20240116; t=1772058973; c=relaxed/simple;
+	bh=4dMpk9jZRV2L4OpJP1psz2eDKkvTItd6ZbPD/pD6LcI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BdVRzvdSck3FhNlOKrcSuvdd7HsDf9Y6OCEK6KPLlmE15GFSoT8CtonR3IP3N4+lCr7t4bN2YbqRz00k2QKk/aUOV2xrgqXttFctkYL1rSPFcNvPBkCRKq0jjWY06z8Cy7Y/E91GHNcd66eRuhqZaU05ntOY4/Mo79xk9alw4yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlKTOAOT; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlKTOAOT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D41C19425;
+	Wed, 25 Feb 2026 22:36:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772058973;
+	bh=4dMpk9jZRV2L4OpJP1psz2eDKkvTItd6ZbPD/pD6LcI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qlKTOAOTMAWpDlNCoz3OQq5C7N2ckgTlhUJ7x39fjDvjEA3GXmu3ZlYZ/KwwK78k/
+	 r0D9hwsUzoZ8X6c4q8szO467fCxbRGeC8sHI2EWO1x72TVOqWP5NXxoop59JSF5kcX
+	 fx1RhGbUwshfnUNroAMHi8CfvkDOr58ppCt13v86qgZbT36MYmJ+0HZH8oczEEwmIE
+	 S8DwDuQ/9fGXXyiCsh1DjaltRaBnbR1XY6+H8Pc/ZIllj8i5n1j3ssMNEN6797cknU
+	 w4PR9Ry0jAsOEEzq+Oo1944YjKQwBtq24XHL54CE6u3Fh1TRYDCq2woDuaQDVZvZdg
+	 lxb/0Kv/lp9XA==
+Date: Wed, 25 Feb 2026 22:36:07 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Hyesoo Yu <hyesoo.yu@samsung.com>,
+	Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] arm64: Force the use of CNTVCT_EL0 in __delay()
+Message-ID: <aZ95V8XIYYysd13m@willie-the-truck>
+References: <20260213141619.1791283-1-maz@kernel.org>
+ <aZw3EGs4rbQvbAzV@e134344.arm.com>
+ <86ldgja5v3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-To: ben.horgan@arm.com
-In-Reply-To: <20260224175720.2663924-1-ben.horgan@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ldgja5v3.wl-maz@kernel.org>
 
-
-
-On 2/24/26 17:56, Ben Horgan wrote:
-> The main change in this version of the mpam missing pieces series is to
-> update the cdp emulation to match the resctrl interface. L2 and L3
-> resources can now enable cdp separately. Cdp can't be hidden correctly for
-> memory bandwidth allocation, as max per partid can't be emulated with more
-> partids, and so we hide this completely when cdp is enabled. There is a little
-> restructuring and a few smaller changes.
+On Mon, Feb 23, 2026 at 02:31:44PM +0000, Marc Zyngier wrote:
+> Crucially, arch_counter_get_cntvct_stable() does disable preemption,
+> and we should preserve it. Something like this:
 > 
-> Changelogs in patches
+> diff --git a/arch/arm64/lib/delay.c b/arch/arm64/lib/delay.c
+> index d02341303899e..25fb593f95b0c 100644
+> --- a/arch/arm64/lib/delay.c
+> +++ b/arch/arm64/lib/delay.c
+> @@ -32,7 +32,16 @@ static inline unsigned long xloops_to_cycles(unsigned long xloops)
+>   * Note that userspace cannot change the offset behind our back either,
+>   * as the vcpu mutex is held as long as KVM_RUN is in progress.
+>   */
+> -#define __delay_cycles()	__arch_counter_get_cntvct_stable()
+> +static cycles_t __delay_cycles(void)
+> +{
+> +	cycles_t val;
+> +
+> +	preempt_disable();
+> +	val = __arch_counter_get_cntvct_stable();
+> +	preenpt_enable();
+> +
+> +	return val;
+> +}
+
+(nit: arch_counter_get_cntvct_stable() uses the _notrace() variants of
+ the preempt disable/enable helpers)
+
+>  void __delay(unsigned long cycles)
+>  {
 > 
-> It would be great to get this series merged this cycle. For that we'll need
-> more testing and reviewing. Thanks!
-> 
+> The question is whether there is a material benefit in replicating the
+> arch_timer_read_counter() indirection for the virtual counter in order
+> to not pay the price of preempt_disable() when we're on a non-broken
+> system (hopefully the vast majority of implementations).
 
-There is a small build conflict with resctrl abmc precursors, [1]. The
-last patch of that series applies on top of this series and if the abmc
-precursors go first that patch should go with this series to fix the
-build. Alternatively, if it's obvious ahead of time it can be squashed
-into pathc 33 with the other empty resctrl arch hooks.
+That sounds nice, especially as we can assume (for now) that CPUs
+implementing WFIT don't need the cntvct workarounds. However, I can't
+really figure out how to implement it after reminding myself of all the
+fun we had trying to use a static key for these workarounds in the past.
 
-[1]
-https://lore.kernel.org/lkml/20260225201905.3568624-5-ben.horgan@arm.com/
+If a CPU being onlined has a timer erratum, we wouldn't be able to
+migrate any tasks in the middle of a preempt-enabled delay loop onto
+it. :/
 
-
-Thanks,
-
-Ben
-
+Will
