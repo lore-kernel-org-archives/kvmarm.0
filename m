@@ -1,82 +1,112 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38314239099;
-	Wed, 25 Feb 2026 20:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531C8277026;
+	Wed, 25 Feb 2026 21:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772052060; cv=none; b=QgukqlVrkLtZC7bgML42qr8Kx28pWOmuyAJscnZ3nmNE6i9Nd3gTXqgRkfDn4PF5NQm7LZd/hRwMC9OoaY12WG8t9gAcUZ4NFZiKAKFxGZQs+mLxCTNoLYhQZ2b5TyyzicfHAb5FfYwHv8dows6eGBbVkeAzySlbKC+6h+dwmpU=
+	t=1772053804; cv=none; b=Q+SjpaEzBaLzqKXrgPoFTktTKiZZ0i9X3jzZ29hQp+9LVFARuRR6jR6RC/Wa54WykRLeZl3Ji3laMcgMJfrUGUpIaZ9SX7emVRr6MZP9XjMwIp+aJDFXOoFXjcPRWwm6P8FJTtTtGENo5vRqsLNFBOAgN6cMdauvjoHNXDgjEQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772052060; c=relaxed/simple;
-	bh=z0Y3De4Uk2isfGH9NA9irLH/p0Xi9/d3jhSxem3V0qU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hzORIpMfnrJeGj/vRhFFWenbtZfPYHjYtSxCe+tSYl2fSFGoOLcoP/T3VznYlAsiR0ffJJ1AsfoIDNNXLQDuPtH/jxQemelD2zi0iZn1ZUjy0RIDtBB//lqH0nkGvgZewbn2RSsNAx5bEoPZOIYfw6eMuhAmB94RilxqMOeLG9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g4EsyawR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772053804; c=relaxed/simple;
+	bh=Emi3KkH/jcVD4KyPMdssqmofw4pq2LM2PhoufghVNX4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nPuOSqBkc1b91pn09bTdP/ngMl+wmDTFKc+rhC6sdJOb4GQsiYFSZgDhaMEmM1UFaeX8JvzTEfLTqE5PVkXgv8218Q7f2j5jwKmiG+V3J0Fk49dQ+LsARv1k1U/LJLNlbqkMKD/4lQNtyOUG0rcMnTU181rwukD0A4KViDinZas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GOnoAjVy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g4EsyawR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB8A2C116D0;
-	Wed, 25 Feb 2026 20:40:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GOnoAjVy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7B60C116D0;
+	Wed, 25 Feb 2026 21:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772052059;
-	bh=z0Y3De4Uk2isfGH9NA9irLH/p0Xi9/d3jhSxem3V0qU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g4EsyawRbjvuMG24b6o867TcLWDVI5T2q5/PWvvSNtJ+66Jb7JwoxMEJ7wdzjR316
-	 TGgEFFfHcKDpYRD4T3RL8IuT+FlFuhkzb994WOV2pDGuT4K3CXvyTvVA4pojOAXgbS
-	 va4WC+kD4r+/Tw4SHhbPG9JmEGh83LaefV3Pv1oYTOG2+t4KXnrcSTy3jLodqXrNxb
-	 wZgGhyZRJC5q9eNTuCDWHbHU1tdhNEW28KQyQZtdP2ImAJop1xPf/X5aQQvbc949wq
-	 V+L/MtAG+K6n5z+tsA/Ls2bLsxZLYBq1aCQ6cNBFJQyC2TrfLeRVkzvZ8XFMiJqDSG
-	 fI+fsCmIDNRfw==
-Date: Wed, 25 Feb 2026 12:40:59 -0800
-From: Kees Cook <kees@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	s=k20201202; t=1772053803;
+	bh=Emi3KkH/jcVD4KyPMdssqmofw4pq2LM2PhoufghVNX4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GOnoAjVyoHyYx+YAJwQN8sbbkdW6Y20ns11e7lgNNQrsDnavc1eEJKMj579fKqT7k
+	 E/Hv/a1w4p7n+DtDoJtm9MDkh3tjm0inc7ndTFCwPIBEhITmeKQQlp70mWmDGvVO/D
+	 MCKzyg7KrpN4JHd9E+WuhV/ntqGrl/wjBWZnwxRUpdxPLti69Ta0yLkhahQ4zHYUIR
+	 ToVQtjFCF/bU5cZzVdHEuHytvYxyxEMlRBJqZB5J1RqPB11tQj8/rmaPvuJwg/u1h5
+	 QEn/qvS/Ha/jz8JHmtG7h/6S2ylow0gfZC0XjwUT3KuyAjjznr9AXNilk6eYzQqN4s
+	 7EDkSGYJ3yqWw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vvM8v-0000000DqZl-1xwz;
+	Wed, 25 Feb 2026 21:10:01 +0000
+Date: Wed, 25 Feb 2026 21:10:00 +0000
+Message-ID: <877bs0edhz.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
 	Alexander Potapenko <glider@google.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
 	Timothy Hayes <timothy.hayes@arm.com>,
 	Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	Keir Fraser <keirf@google.com>, linux-kernel@vger.kernel.org,
+	Keir Fraser <keirf@google.com>,
+	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: arm64: vgic: Handle const qualifier from
- gic_kvm_info allocation type
-Message-ID: <202602251238.9850FCB@keescook>
+Subject: Re: [PATCH v2] KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
+In-Reply-To: <202602251238.9850FCB@keescook>
 References: <20260206223022.it.052-kees@kernel.org>
- <177099499992.1792318.9934885934778681296.b4-ty@kernel.org>
+	<177099499992.1792318.9934885934778681296.b4-ty@kernel.org>
+	<202602251238.9850FCB@keescook>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <177099499992.1792318.9934885934778681296.b4-ty@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kees@kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, glider@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, timothy.hayes@arm.com, Sascha.Bischoff@arm.com, keirf@google.com, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Feb 13, 2026 at 03:03:24PM +0000, Marc Zyngier wrote:
-> On Fri, 06 Feb 2026 14:30:23 -0800, Kees Cook wrote:
-> > In preparation for making the kmalloc family of allocators type aware,
-> > we need to make sure that the returned type from the allocation matches
-> > the type of the variable being assigned. (Before, the allocator would
-> > always return "void *", which can be implicitly cast to any pointer type.)
-> > 
-> > The assigned type is "struct gic_kvm_info", but the returned type,
-> > while matching, is const qualified. To get them exactly matching, just
-> > use the dereferenced pointer for the sizeof().
-> > 
-> > [...]
+On Wed, 25 Feb 2026 20:40:59 +0000,
+Kees Cook <kees@kernel.org> wrote:
 > 
-> Applied to fixes, thanks!
+> On Fri, Feb 13, 2026 at 03:03:24PM +0000, Marc Zyngier wrote:
+> > On Fri, 06 Feb 2026 14:30:23 -0800, Kees Cook wrote:
+> > > In preparation for making the kmalloc family of allocators type aware,
+> > > we need to make sure that the returned type from the allocation matches
+> > > the type of the variable being assigned. (Before, the allocator would
+> > > always return "void *", which can be implicitly cast to any pointer type.)
+> > > 
+> > > The assigned type is "struct gic_kvm_info", but the returned type,
+> > > while matching, is const qualified. To get them exactly matching, just
+> > > use the dereferenced pointer for the sizeof().
+> > > 
+> > > [...]
+> > 
+> > Applied to fixes, thanks!
+> > 
+> > [1/1] KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
+> >       commit: ee5c38a8d31e5dea52299c43c2ec3213351ab6e1
 > 
-> [1/1] KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
->       commit: ee5c38a8d31e5dea52299c43c2ec3213351ab6e1
+> Just a heads-up that I ended up sending this patch to Linus for -rc1 as
+> it was a prerequisite for the tree-wide kmalloc_obj refactoring. Sorry
+> for any merge conflicts this might create for your tree! It is now
+> commit c732084c891d there.
 
-Just a heads-up that I ended up sending this patch to Linus for -rc1 as
-it was a prerequisite for the tree-wide kmalloc_obj refactoring. Sorry
-for any merge conflicts this might create for your tree! It is now
-commit c732084c891d there.
+Yup, I noticed it this morning as I was preparing the first batch of
+fixes for KVM/arm64.
+
+I'd appreciate it if in the future you would let me know upfront what
+route you expect a given patch to take -- I'll happily give an ack for
+a patch you want to route directly to Linus, rather than carrying it
+and ending up with conflicts with upstream.
+
+Thanks,
+
+	M.
 
 -- 
-Kees Cook
+Jazz isn't dead. It just smells funny.
