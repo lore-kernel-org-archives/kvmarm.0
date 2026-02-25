@@ -1,199 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96FF223702;
-	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C931A2C0B
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771966458; cv=none; b=UrnWBL1gfcFxHD4yBnnAz/tsqFruYyYCYy8arFGsY8udGfjxr1VZhY0iDfZ97FT3az4J4UK5UYG3N95hhOBzMCvklGZFO9SYeOa4qHGJsboR9RPZDPDFo6qvlOLp2llmWX1PMeKzfMWkhbj9fyw06/PfDZcUgRfphNmbtvtNbH4=
+	t=1771991495; cv=none; b=LiTvZR5IipbH2/FTPOdE0TqBfo3DohZ3ERI6RG/2Z7ejmijm1YBp4WlL7Uv05HRNZmUmKNfF/L5r82cAEpGJvefvN9TwTKLEWG3y1NPGSF3/MrCqfMG8DyaAqjDgWciJBjxMYDaZCUhrRzODFKAj9POAy6elVPrLqgEnkiSx20M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771966458; c=relaxed/simple;
-	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DYAnzz9U5FxQuc4Rqy2FvOFxvDucL3f8KD4suueeBHMUNoT65/1L3p18QpxlaZMypcuRRyPHwTUsrxUXeKJnCEucpZ+X/dqjB2S4vz9bSufpCdTNTepXugqXrWhR4ZqvrCff0tOy71HcYw/OboNreJlLI4JJdDQ4QZ89hfRDxBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fU9VoxpY; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fU9VoxpY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 279EDC116D0;
-	Tue, 24 Feb 2026 20:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1771966458;
-	bh=EgVAY0e5tBoSz6A6iwW5/XO8EvjgmD/hBAtfckjnAIc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fU9VoxpYqnAVrd4t/fIENYWIsMId2KNEP3dfw2h4SjQzeH/MBV/5Cee/wntRTQCP6
-	 8EADR9JKKOK/hSexd/fEomD/ZrU3e+Mo0cAkKAlisOPYRwuKJXzT3MA26tdQTXMvpb
-	 cFKvEXyKAe/X10m3pmNX2H1z0cczPw3iZWdEsiJJoujd4S5bnLIF7pTBSYnWQRgIVb
-	 lO1qmLmIs5NJLzUq5pV5qVfuG1vDdgGb4JylPzxBqN/lvS2sL0Y7jYkwDaBcxLLsMY
-	 M8xREJGMjxcu5uVJY3DLJp8/BXSitkrqLBWUKwurl88mBMEyWsx/eqM0TQ42RGOP4K
-	 O37lVNZp675Mw==
-Date: Tue, 24 Feb 2026 12:54:16 -0800
-From: Oliver Upton <oupton@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org,
-	yangyicong@hisilicon.com, joey.gouly@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v13 7/8] KVM: arm64: use CASLT instruction for swapping
- guest descriptor
-Message-ID: <aZ4P-AcVjxfCFsew@kernel.org>
-References: <20260223174802.458411-1-yeoreum.yun@arm.com>
- <20260223174802.458411-8-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1771991495; c=relaxed/simple;
+	bh=YqZ+a/U970z5ISNf24OAIt0os6GEweMqka6DgV3p/yw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X6znc944gv7kaKh0eyvR3DhC7SoSbxSbsMb5Yl9qxSrlPQGDVrnxtnn4r514ULz/MpEwDqtc7SLrIqAjMsSkedf/YxGcTfFHkzXGaId/EkkTzGhwPvA4ZA7UYqH7wEZSCc3da0qtiR9fdFUTgR3XGS1Ygv1MgGco5rksUttVqvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7AAC165C;
+	Tue, 24 Feb 2026 19:51:26 -0800 (PST)
+Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4F3413F7BD;
+	Tue, 24 Feb 2026 19:51:31 -0800 (PST)
+From: Anshuman Khandual <anshuman.khandual@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Subject: [PATCH 0/2] arm64/mm: Drop TTBR_CNP_BIT and TTBR_ASID_MASK
+Date: Wed, 25 Feb 2026 03:51:23 +0000
+Message-Id: <20260225035125.1159907-1-anshuman.khandual@arm.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260223174802.458411-8-yeoreum.yun@arm.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 23, 2026 at 05:48:01PM +0000, Yeoreum Yun wrote:
-> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
-> is enabled, avoiding the need to clear the PAN bit.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> ---
->  arch/arm64/include/asm/futex.h | 17 +----------------
->  arch/arm64/include/asm/lsui.h  | 27 +++++++++++++++++++++++++++
->  arch/arm64/kvm/at.c            | 32 +++++++++++++++++++++++++++++++-
->  3 files changed, 59 insertions(+), 17 deletions(-)
->  create mode 100644 arch/arm64/include/asm/lsui.h
-> 
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index b579e9d0964d..6779c4ad927f 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -7,11 +7,9 @@
->  
->  #include <linux/futex.h>
->  #include <linux/uaccess.h>
-> -#include <linux/stringify.h>
->  
-> -#include <asm/alternative.h>
-> -#include <asm/alternative-macros.h>
->  #include <asm/errno.h>
-> +#include <asm/lsui.h>
->  
->  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
->  
-> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  
->  #ifdef CONFIG_ARM64_LSUI
->  
-> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> -
->  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
->  static __always_inline int						\
->  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
->  {
->  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
->  }
-> -
-> -#define __lsui_llsc_body(op, ...)					\
-> -({									\
-> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
-> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-> -})
-> -
-> -#else	/* CONFIG_ARM64_LSUI */
-> -
-> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-> -
->  #endif	/* CONFIG_ARM64_LSUI */
->  
->  
-> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
-> new file mode 100644
-> index 000000000000..4f956188835e
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/lsui.h
-> @@ -0,0 +1,27 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __ASM_LSUI_H
-> +#define __ASM_LSUI_H
-> +
-> +#include <linux/compiler_types.h>
-> +#include <linux/stringify.h>
-> +#include <asm/alternative.h>
-> +#include <asm/alternative-macros.h>
-> +#include <asm/cpucaps.h>
-> +
-> +#ifdef CONFIG_ARM64_LSUI
-> +
-> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
-> +
-> +#define __lsui_llsc_body(op, ...)					\
-> +({									\
-> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
-> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
-> +})
-> +
-> +#else	/* CONFIG_ARM64_LSUI */
-> +
-> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
-> +
-> +#endif	/* CONFIG_ARM64_LSUI */
-> +
-> +#endif	/* __ASM_LSUI_H */
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 885bd5bb2f41..1aceeef04567 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -9,6 +9,7 @@
->  #include <asm/esr.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/lsui.h>
->  
->  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
->  {
-> @@ -1704,6 +1705,33 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
->  	}
->  }
->  
-> +#ifdef CONFIG_ARM64_LSUI
-> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
-> +{
-> +	u64 tmp = old;
-> +	int ret = 0;
-> +
-> +	uaccess_ttbr0_enable();
-> +
-> +	asm volatile(__LSUI_PREAMBLE
-> +		     "1: caslt	%[old], %[new], %[addr]\n"
-> +		     "2:\n"
-> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
-> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
-> +		     : [new] "r" (new)
-> +		     : "memory");
-> +
-> +	uaccess_ttbr0_disable();
-> +
-> +	if (ret)
-> +		return ret;
-> +	if (tmp != old)
-> +		return -EAGAIN;
-> +
-> +	return ret;
-> +}
-> +#endif
-> +
->  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
->  {
->  	u64 tmp = old;
-> @@ -1779,7 +1807,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
->  		return -EPERM;
->  
->  	ptep = (u64 __user *)hva + offset;
-> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
-> +	if (IS_ENABLED(CONFIG_ARM64_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
+Directly use existing tools sysreg format field macros TTBRx_EL1_CNP_BIT/
+TTBRx_EL1_ASID_MASK, while also dropping off now redundant custom macros
+TTBR_CNP_BIT and TTBR_ASID_MASK. With this change in place, there are no
+more TTBR_EL1 register based custom macros left in the tree.
 
-cpucap_is_possible() is where the Kconfig check should go.
+This was discussed and suggested earlier.
 
-Thanks,
-Oliver
+https://lore.kernel.org/linux-arm-kernel/aRb8ezhQd0c0jp9G@J2N7QTR9R3/
+
+Series applies on v7.0-rc1.
+
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oupton@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvmarm@lists.linux.dev
+
+Anshuman Khandual (2):
+  arm64/mm: Directly use TTBRx_EL1_ASID_MASK
+  arm64/mm: Directly use TTBRx_EL1_CnP
+
+ arch/arm64/include/asm/asm-uaccess.h   | 2 +-
+ arch/arm64/include/asm/mmu.h           | 1 -
+ arch/arm64/include/asm/mmu_context.h   | 2 +-
+ arch/arm64/include/asm/pgtable-hwdef.h | 2 --
+ arch/arm64/include/asm/uaccess.h       | 6 +++---
+ arch/arm64/kernel/entry.S              | 2 +-
+ arch/arm64/kernel/mte.c                | 4 ++--
+ arch/arm64/kvm/at.c                    | 2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S     | 4 ++--
+ arch/arm64/kvm/nested.c                | 4 ++--
+ arch/arm64/mm/context.c                | 8 ++++----
+ arch/arm64/mm/mmu.c                    | 2 +-
+ 12 files changed, 18 insertions(+), 21 deletions(-)
+
+-- 
+2.30.2
+
