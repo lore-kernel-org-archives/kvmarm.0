@@ -1,22 +1,22 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C931A2C0B
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65192263C7F
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771991495; cv=none; b=LiTvZR5IipbH2/FTPOdE0TqBfo3DohZ3ERI6RG/2Z7ejmijm1YBp4WlL7Uv05HRNZmUmKNfF/L5r82cAEpGJvefvN9TwTKLEWG3y1NPGSF3/MrCqfMG8DyaAqjDgWciJBjxMYDaZCUhrRzODFKAj9POAy6elVPrLqgEnkiSx20M=
+	t=1771991528; cv=none; b=iAYouRe43GLA0+KkpDrTE9WF5m1iRHCnJWwCgHycb26u8Owwa+pWgN5M5+L/pv2V8d0o3nsRNluqCOhcychdOaomwway/lJvnB+mxzSWDpBlmEc0Af0kG2r35ykTQsHVfR5+KPYxZxDPpYKnUBPtfxEzik7XQos8iiTbhyKLky8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771991495; c=relaxed/simple;
+	s=arc-20240116; t=1771991528; c=relaxed/simple;
 	bh=YqZ+a/U970z5ISNf24OAIt0os6GEweMqka6DgV3p/yw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X6znc944gv7kaKh0eyvR3DhC7SoSbxSbsMb5Yl9qxSrlPQGDVrnxtnn4r514ULz/MpEwDqtc7SLrIqAjMsSkedf/YxGcTfFHkzXGaId/EkkTzGhwPvA4ZA7UYqH7wEZSCc3da0qtiR9fdFUTgR3XGS1Ygv1MgGco5rksUttVqvs=
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KkUliib06CeI+Ax0KVOuzG0LoNnLGpoan1O9NeULNtZOj1lUCBk/BRX0By4TyrjoP/Zytlux8t7YXuYUMcuccaDtQ7//8RTCh3OPVE0KR5av5K2xlgcm2CBhonpQjEcWL9TzuXigPfifhUeNBbDQfkAUTSTUPBnCdE7WKYTlfBM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7AAC165C;
-	Tue, 24 Feb 2026 19:51:26 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 753ED165C;
+	Tue, 24 Feb 2026 19:51:59 -0800 (PST)
 Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4F3413F7BD;
-	Tue, 24 Feb 2026 19:51:31 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 0B0543F7BD;
+	Tue, 24 Feb 2026 19:52:03 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
@@ -29,8 +29,8 @@ Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev
 Subject: [PATCH 0/2] arm64/mm: Drop TTBR_CNP_BIT and TTBR_ASID_MASK
-Date: Wed, 25 Feb 2026 03:51:23 +0000
-Message-Id: <20260225035125.1159907-1-anshuman.khandual@arm.com>
+Date: Wed, 25 Feb 2026 03:51:55 +0000
+Message-Id: <20260225035157.1159962-1-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
