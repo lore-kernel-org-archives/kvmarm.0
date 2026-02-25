@@ -1,40 +1,55 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA762BEC34
-	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 03:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640721E834B
+	for <kvmarm@lists.linux.dev>; Wed, 25 Feb 2026 04:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1771991531; cv=none; b=OvHfKmUPG9wKZjsLd6wqS9Li70naZLkcer5J65f7gfywSM5+Tygwq2JKL7qHR0ga2GwsBksMgEUEZmxR7Obg6Zkv1icOXYdWn3+UZNArcu1LBQArRTwT/m5zIP62TUiUeYGP/SCCvik6yLrsFBX9V9L/vt/SGynrlgADw5T/poI=
+	t=1771992269; cv=none; b=hhL9GIKg8moVcxvOcu+r1A0ZR1cYXY70THIAfnxnZK26pjiHYGA9zZgkicvMVd2kmXK1NZvG1Umbvpb6Tx1X82deCw/FHqStpgW+DBZkk6f2TgHubC/SaNb3+F1NwuMYh5CdBvQy2fhZp+UROwJ3dP2YAapIiuL2lRTqVIBO1D0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1771991531; c=relaxed/simple;
-	bh=UN3pyCCU7wkNfIR0JWZbTPuMXE5bTPcsbWaItp10y4U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kphsQrGaoT22fdH9agvIuGPM2K/Yi9OqduRBpz7xYSkC1Vt14x/A5dB7MA673KNb3Rdv4io+MZh5fIgEXfyN8+N/oGjoR7F2SuDADBzDIwxJkb3bxrUzf+q4yBMOucWDhep1xkIehp8dIxPn7Q1URX5JcehE4eU55MzvexOyHRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 99531169E;
-	Tue, 24 Feb 2026 19:52:03 -0800 (PST)
-Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 2D4223F7BD;
-	Tue, 24 Feb 2026 19:52:08 -0800 (PST)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH 2/2] arm64/mm: Directly use TTBRx_EL1_CnP
-Date: Wed, 25 Feb 2026 03:51:57 +0000
-Message-Id: <20260225035157.1159962-3-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20260225035157.1159962-1-anshuman.khandual@arm.com>
-References: <20260225035157.1159962-1-anshuman.khandual@arm.com>
+	s=arc-20240116; t=1771992269; c=relaxed/simple;
+	bh=ENenO/cy/T/hJWbdFyRSqVxSeHMgdjnk3MQXCRXpHX0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mYsx7Xo917Di91C0w9Cs/laXOzS5hOUEbtBepGmlgB1M5nTVJpelgskbpLw8A8vfK6G+uAYK2N0oumT4I7AcV6L3QunD5lbZA9lP1KjjjCiPASz9yBl5/1ZgQZlHaFF4D9bxsFTSRZKEVeWtdKDoamRFE+s4p8rDULSRFuSchKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=iJbwssON; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="iJbwssON"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=lvq/O+R+y6qCmOEUVjR2PUgdD2ilp/5PaX6r9kRJGgc=;
+	b=iJbwssONMnPTRBgo5fw1t6+rLsbPEMOcqvZPDl2ktV9XH7Kf26BtkeotL5os9jUmfXVD/ezk5
+	YwA7byABP7pxRQ9yfdlnqIAlzDD9ze6AwIYfP09dDFKaLIhN6ZECjyvQWl0RtgMlbKV8AhdTkhs
+	CtMZYK070yqV7n0l4XDFoV4=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4fLLSn6sNVzRhRJ;
+	Wed, 25 Feb 2026 11:59:37 +0800 (CST)
+Received: from kwepemr100010.china.huawei.com (unknown [7.202.195.125])
+	by mail.maildlp.com (Postfix) with ESMTPS id 021D640569;
+	Wed, 25 Feb 2026 12:04:24 +0800 (CST)
+Received: from huawei.com (10.50.163.32) by kwepemr100010.china.huawei.com
+ (7.202.195.125) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 25 Feb
+ 2026 12:04:23 +0800
+From: Tian Zheng <zhengtian10@huawei.com>
+To: <maz@kernel.org>, <oupton@kernel.org>, <catalin.marinas@arm.com>,
+	<corbet@lwn.net>, <pbonzini@redhat.com>, <will@kernel.org>,
+	<zhengtian10@huawei.com>
+CC: <yuzenghui@huawei.com>, <wangzhou1@hisilicon.com>,
+	<liuyonglong@huawei.com>, <Jonathan.Cameron@huawei.com>,
+	<yezhenyu2@huawei.com>, <linuxarm@huawei.com>, <joey.gouly@arm.com>,
+	<kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <skhan@linuxfoundation.org>,
+	<suzuki.poulose@arm.com>, <leo.bras@arm.com>
+Subject: [PATCH v3 1/5] arm64/sysreg: Add HDBSS related register information
+Date: Wed, 25 Feb 2026 12:04:17 +0800
+Message-ID: <20260225040421.2683931-2-zhengtian10@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260225040421.2683931-1-zhengtian10@huawei.com>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -42,103 +57,76 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemr100010.china.huawei.com (7.202.195.125)
 
-Replace all TTBR_CNP_BIT macro instances with TTBRx_EL1_CNP_BIT which
-is a standard field from tools sysreg format. Drop the now redundant
-custom macro TTBR_CNP_BIT. No functional change.
+From: eillon <yezhenyu2@huawei.com>
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+The ARM architecture added the HDBSS feature and descriptions of
+related registers (HDBSSBR/HDBSSPROD) in the DDI0601(ID121123) version,
+add them to Linux.
+
+Signed-off-by: eillon <yezhenyu2@huawei.com>
+Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 2 --
- arch/arm64/kernel/mte.c                | 4 ++--
- arch/arm64/kvm/hyp/nvhe/hyp-init.S     | 4 ++--
- arch/arm64/mm/context.c                | 2 +-
- arch/arm64/mm/mmu.c                    | 2 +-
- 5 files changed, 6 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/esr.h |  2 ++
+ arch/arm64/tools/sysreg      | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index d49180bb7cb3..5e6809a462c7 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -223,8 +223,6 @@
-  */
- #define S1_TABLE_AP		(_AT(pmdval_t, 3) << 61)
- 
--#define TTBR_CNP_BIT		(UL(1) << 0)
--
- /*
-  * TCR flags.
-  */
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 32148bf09c1d..eceead1686f2 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -315,8 +315,8 @@ void mte_cpu_setup(void)
- 	 * CnP is not a boot feature so MTE gets enabled before CnP, but let's
- 	 * make sure that is the case.
- 	 */
--	BUG_ON(read_sysreg(ttbr0_el1) & TTBR_CNP_BIT);
--	BUG_ON(read_sysreg(ttbr1_el1) & TTBR_CNP_BIT);
-+	BUG_ON(read_sysreg(ttbr0_el1) & TTBRx_EL1_CnP);
-+	BUG_ON(read_sysreg(ttbr1_el1) & TTBRx_EL1_CnP);
- 
- 	/* Normal Tagged memory type at the corresponding MAIR index */
- 	sysreg_clear_set(mair_el1,
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 0d42eedc7167..445eb0743af2 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -130,7 +130,7 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
- 	phys_to_ttbr x2, x1
- alternative_if ARM64_HAS_CNP
--	orr	x2, x2, #TTBR_CNP_BIT
-+	orr	x2, x2, #TTBRx_EL1_CnP
- alternative_else_nop_endif
- 	msr	ttbr0_el2, x2
- 
-@@ -291,7 +291,7 @@ SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
- 	/* Install the new pgtables */
- 	phys_to_ttbr x5, x0
- alternative_if ARM64_HAS_CNP
--	orr	x5, x5, #TTBR_CNP_BIT
-+	orr	x5, x5, #TTBRx_EL1_CnP
- alternative_else_nop_endif
- 	msr	ttbr0_el2, x5
- 
-diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index 718c495832d0..0f4a28b87469 100644
---- a/arch/arm64/mm/context.c
-+++ b/arch/arm64/mm/context.c
-@@ -354,7 +354,7 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
- 
- 	/* Skip CNP for the reserved ASID */
- 	if (system_supports_cnp() && asid)
--		ttbr0 |= TTBR_CNP_BIT;
-+		ttbr0 |= TTBRx_EL1_CnP;
- 
- 	/* SW PAN needs a copy of the ASID in TTBR0 for entry */
- 	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN))
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index a6a00accf4f9..c22678769c37 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -2188,7 +2188,7 @@ void __cpu_replace_ttbr1(pgd_t *pgdp, bool cnp)
- 	phys_addr_t ttbr1 = phys_to_ttbr(virt_to_phys(pgdp));
- 
- 	if (cnp)
--		ttbr1 |= TTBR_CNP_BIT;
-+		ttbr1 |= TTBRx_EL1_CnP;
- 
- 	replace_phys = (void *)__pa_symbol(idmap_cpu_replace_ttbr1);
- 
--- 
-2.30.2
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 7e86d400864e..81c17320a588 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -160,6 +160,8 @@
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
+
+ /* ISS2 field definitions for Data Aborts */
++#define ESR_ELx_HDBSSF_SHIFT	(11)
++#define ESR_ELx_HDBSSF		(UL(1) << ESR_ELx_HDBSSF_SHIFT)
+ #define ESR_ELx_TnD_SHIFT	(10)
+ #define ESR_ELx_TnD 		(UL(1) << ESR_ELx_TnD_SHIFT)
+ #define ESR_ELx_TagAccess_SHIFT	(9)
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 9d1c21108057..e166ab322de2 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -4528,6 +4528,35 @@ Sysreg	GCSPR_EL2	3	4	2	5	1
+ Fields	GCSPR_ELx
+ EndSysreg
+
++Sysreg	HDBSSBR_EL2	3	4	2	3	2
++Res0	63:56
++Field	55:12	BADDR
++Res0	11:4
++Enum	3:0	SZ
++	0b0000	4KB
++	0b0001	8KB
++	0b0010	16KB
++	0b0011	32KB
++	0b0100	64KB
++	0b0101	128KB
++	0b0110	256KB
++	0b0111	512KB
++	0b1000	1MB
++	0b1001	2MB
++EndEnum
++EndSysreg
++
++Sysreg	HDBSSPROD_EL2	3	4	2	3	3
++Res0	63:32
++Enum	31:26	FSC
++	0b000000	OK
++	0b010000	ExternalAbort
++	0b101000	GPF
++EndEnum
++Res0	25:19
++Field	18:0	INDEX
++EndSysreg
++
+ Sysreg	DACR32_EL2	3	4	3	0	0
+ Res0	63:32
+ Field	31:30	D15
+--
+2.33.0
 
