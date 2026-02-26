@@ -1,39 +1,25 @@
-Received: from www3579.sakura.ne.jp (www3579.sakura.ne.jp [49.212.243.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B935A332902
-	for <kvmarm@lists.linux.dev>; Thu, 26 Feb 2026 14:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.243.89
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916933D9033
+	for <kvmarm@lists.linux.dev>; Thu, 26 Feb 2026 14:52:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772117377; cv=none; b=dwuoU6A2/HdJzwaVX6f6HMtI596/mwyRkAnVI5kjZvVEkYqw2xupEQOGvkwRRAS95aLLRnm8LOq2g0mDDtHnY4WoK9dfj0i3rQePd6Bmswocaj1siqd3eqnVzwU2m/ouR2mqiSDHBFrFDKJpN5ilbA13Bl+HdmQfrNgwMpx49Ls=
+	t=1772117573; cv=none; b=kihBBE3NbbNqAgRU3nj/qf1Ru5S8q8kGDcKNkY9/mfzXq9UcuYNQejDJ0pPOGwaEvE7ICwWmekuQNrMmuUKWHbMKSya++9jjidGGHK4kRp1ZSL4/Dk+uPD7Be52OJe0AI5eJD+5XuBRV0wXQ08sUCamxPCoWnjGsmtzuINjl/Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772117377; c=relaxed/simple;
-	bh=/15qPyBuQ3dXpDw8Gn7bjA123PLklU0X7oz6AxFesOg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=q3iK3dMmQ9zoCX/GL6Yj4vw5YcKzPP8H9nrWyGGucn0027dpNVx1JQy2NUPa4WdXphsXuiLeeTPLl9eIDTtC1t0njEVs7rG3MrH8QyYuDQyVDGcAxh+uB8Z6DCN51xtbrWjBnxViR0DTM7STytPszOq7gd8kmTCQtOnwWk6SQBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp; dkim=fail (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b=rbCWqsHs reason="key not found in DNS"; arc=none smtp.client-ip=49.212.243.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rsg.ci.i.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=rsg.ci.i.u-tokyo.ac.jp header.i=@rsg.ci.i.u-tokyo.ac.jp header.b="rbCWqsHs"
-Received: from [192.168.10.111] (p865013-ipoe.ipoe.ocn.ne.jp [153.242.222.12])
-	(authenticated bits=0)
-	by www3579.sakura.ne.jp (8.16.1/8.16.1) with ESMTPSA id 61QEhMY7067270
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 26 Feb 2026 23:43:40 +0900 (JST)
-	(envelope-from odaki@rsg.ci.i.u-tokyo.ac.jp)
-DKIM-Signature: a=rsa-sha256; bh=8U6yxzdjHPJtMPBuIvp6F14KKaiWFcbdjaF+l9vhFiI=;
-        c=relaxed/relaxed; d=rsg.ci.i.u-tokyo.ac.jp;
-        h=From:Message-ID:To:Subject:Date;
-        s=rs20250326; t=1772117020; v=1;
-        b=rbCWqsHs8qkR6pEdW97cLAFO0Ot06Rag+z/McXKclYvbL+T77+rFesyNtzSiVXvH
-         7jF3qzzM6bnqtpmwPbdKeansx5vJoCirV9AN+Z2gkS14Baf1Vfsz1ihODsx1/43h
-         q/GygGV7h8fymcUC8xP2ah9xzOrzU25GEIt89iWGLpEFXsZ1E4KX4C9G+gtU13aU
-         Wnt/4+y0At3KxDSjC3JmAs0zeqtmf+hF19RVvKsxaZ2Cb5MOOiuYei0/OuHwSGZP
-         O5LyQvp9qqTax+U+eF1HOVuwg/K1KxvT6ZR4xMvb+hoKfRW4bWnvza/8JdWLWE/g
-         poBoZEw7feXAlNJmErX89Q==
-Message-ID: <fbcadab4-676b-44e4-8afa-b8bd095f8981@rsg.ci.i.u-tokyo.ac.jp>
-Date: Thu, 26 Feb 2026 23:43:21 +0900
+	s=arc-20240116; t=1772117573; c=relaxed/simple;
+	bh=22FZM+HRfWrKd5081W115uEyqByOD2yn3rfZTSk65I8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CxhHE9oR0DrbL1E47yE7Ml7djMCl8ahjpvAShApgNHPZY1Q23aITLAenjoD8woAimItXMkNXUvNyx0MMTkjqnifFKf+G+hUqnvqfsUwsbWxbGnkpdHVigblhKh0pjszX49pyqApS21YEdNkEzqjXaotFPbglKUcOCSDkQd5MVWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B8BA497;
+	Thu, 26 Feb 2026 06:52:44 -0800 (PST)
+Received: from [10.57.73.122] (unknown [10.57.73.122])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8A003F73B;
+	Thu, 26 Feb 2026 06:52:48 -0800 (PST)
+Message-ID: <ec3fc327-042a-4672-ab39-88cd1ce41065@arm.com>
+Date: Thu, 26 Feb 2026 14:52:47 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -41,170 +27,209 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
-Subject: Re: [PATCH v3 1/2] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
-To: Oliver Upton <oupton@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu
- <yuzenghui@huawei.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Shuah Khan <shuah@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, devel@daynix.com, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20260225-hybrid-v3-0-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
- <20260225-hybrid-v3-1-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
- <aaA0gn9O8QAf9Gpu@kernel.org>
-Content-Language: en-US
-In-Reply-To: <aaA0gn9O8QAf9Gpu@kernel.org>
+Subject: Re: [PATCH v14 7/8] KVM: arm64: use CASLT instruction for swapping
+ guest descriptor
+Content-Language: en-GB
+To: Yeoreum Yun <yeoreum.yun@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com,
+ broonie@kernel.org, ardb@kernel.org, lpieralisi@kernel.org,
+ joey.gouly@arm.com, yuzenghui@huawei.com
+References: <20260225182708.3225211-1-yeoreum.yun@arm.com>
+ <20260225182708.3225211-8-yeoreum.yun@arm.com> <867brzah6g.wl-maz@kernel.org>
+ <aaBTM3C2MbIvtUn8@e129823.arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <aaBTM3C2MbIvtUn8@e129823.arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2026/02/26 20:54, Oliver Upton wrote:
-> Hi Akihiko,
+On 26/02/2026 14:05, Yeoreum Yun wrote:
+> Hi Marc,
 > 
-> On Wed, Feb 25, 2026 at 01:31:15PM +0900, Akihiko Odaki wrote:
->> @@ -629,6 +629,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>   		kvm_vcpu_load_vhe(vcpu);
->>   	kvm_arch_vcpu_load_fp(vcpu);
->>   	kvm_vcpu_pmu_restore_guest(vcpu);
->> +	if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &vcpu->kvm->arch.flags))
->> +		kvm_make_request(KVM_REQ_CREATE_PMU, vcpu);
+>> On Wed, 25 Feb 2026 18:27:07 +0000,
+>> Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+>>>
+>>> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+>>> is enabled, avoiding the need to clear the PAN bit.
+>>>
+>>> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+>>> ---
+>>>   arch/arm64/include/asm/cpucaps.h |  2 ++
+>>>   arch/arm64/include/asm/futex.h   | 17 +----------------
+>>>   arch/arm64/include/asm/lsui.h    | 27 +++++++++++++++++++++++++++
+>>>   arch/arm64/kvm/at.c              | 30 +++++++++++++++++++++++++++++-
+>>>   4 files changed, 59 insertions(+), 17 deletions(-)
+>>>   create mode 100644 arch/arm64/include/asm/lsui.h
+>>>
+>>> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+>>> index 177c691914f8..6e3da333442e 100644
+>>> --- a/arch/arm64/include/asm/cpucaps.h
+>>> +++ b/arch/arm64/include/asm/cpucaps.h
+>>> @@ -71,6 +71,8 @@ cpucap_is_possible(const unsigned int cap)
+>>>   		return true;
+>>>   	case ARM64_HAS_PMUV3:
+>>>   		return IS_ENABLED(CONFIG_HW_PERF_EVENTS);
+>>> +	case ARM64_HAS_LSUI:
+>>> +		return IS_ENABLED(CONFIG_ARM64_LSUI);
+>>>   	}
+>>>
+>>>   	return true;
+>>
+>> It would make more sense to move this hunk to the first patch, where
+>> you deal with features and capabilities, instead of having this in a
+>> random KVM-specific patch.
 > 
-> We only need to set the request if the vCPU has migrated to a different
-> PMU implementation, no?
-
-Indeed. I was too lazy to implement such a check since it won't affect 
-performance unless the new feature is requested, but having one may be 
-still nice.
-
+> Okay. But as Suzuki mention, I think it seems to be redundant.
+> I'll remove it.
 > 
->>   	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->>   		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
->>   
->> @@ -1056,6 +1058,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
->>   		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
->>   			kvm_vcpu_reload_pmu(vcpu);
->>   
->> +		if (kvm_check_request(KVM_REQ_CREATE_PMU, vcpu))
->> +			kvm_vcpu_create_pmu(vcpu);
->> +
+
+No, this is required and Marc is right. This hunk should be part of the
+original patch that adds the cap. What I am saying is that you don't
+need to explicitly call the cpucap_is_poissible() down, but it is
+implicitly called by cpus_have_final_cap().
+
+Kind regards
+Suzuki
+
+
+>>
+>>> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+>>> index b579e9d0964d..6779c4ad927f 100644
+>>> --- a/arch/arm64/include/asm/futex.h
+>>> +++ b/arch/arm64/include/asm/futex.h
+>>> @@ -7,11 +7,9 @@
+>>>
+>>>   #include <linux/futex.h>
+>>>   #include <linux/uaccess.h>
+>>> -#include <linux/stringify.h>
+>>>
+>>> -#include <asm/alternative.h>
+>>> -#include <asm/alternative-macros.h>
+>>>   #include <asm/errno.h>
+>>> +#include <asm/lsui.h>
+>>>
+>>>   #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+>>>
+>>> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>>>
+>>>   #ifdef CONFIG_ARM64_LSUI
+>>>
+>>> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+>>> -
+>>>   #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+>>>   static __always_inline int						\
+>>>   __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+>>> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>>>   {
+>>>   	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+>>>   }
+>>> -
+>>> -#define __lsui_llsc_body(op, ...)					\
+>>> -({									\
+>>> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+>>> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+>>> -})
+>>> -
+>>> -#else	/* CONFIG_ARM64_LSUI */
+>>> -
+>>> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+>>> -
+>>>   #endif	/* CONFIG_ARM64_LSUI */
+>>>
+>>>
+>>> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+>>> new file mode 100644
+>>> index 000000000000..8f0d81953eb6
+>>> --- /dev/null
+>>> +++ b/arch/arm64/include/asm/lsui.h
+>>> @@ -0,0 +1,27 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>> +#ifndef __ASM_LSUI_H
+>>> +#define __ASM_LSUI_H
+>>> +
+>>> +#include <linux/compiler_types.h>
+>>> +#include <linux/stringify.h>
+>>> +#include <asm/alternative.h>
+>>> +#include <asm/alternative-macros.h>
+>>> +#include <asm/cpucaps.h>
+>>> +
+>>> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+>>> +
+>>> +#ifdef CONFIG_ARM64_LSUI
+>>> +
+>>> +#define __lsui_llsc_body(op, ...)					\
+>>> +({									\
+>>> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+>>> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+>>> +})
+>>> +
+>>> +#else	/* CONFIG_ARM64_LSUI */
+>>> +
+>>> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+>>> +
+>>> +#endif	/* CONFIG_ARM64_LSUI */
+>>> +
+>>> +#endif	/* __ASM_LSUI_H */
+>>
+>> Similarly, fold this into the patch that introduces FEAT_LSUI support
+>> for futexes (#5) so that the code is in its final position from the
+>> beginning. This will avoid churn that makes the patches pointlessly
+>> hard to follow, since this change is unrelated to KVM.
 > 
-> My strong preference would be to squash the migration handling into
-> kvm_vcpu_reload_pmu(). It is already reprogramming PMU events in
-> response to other things.
-
-Can you share a reason for that?
-
-In terms of complexity, I don't think it will help reducing complexity 
-since the only common things between kvm_vcpu_reload_pmu() and 
-kvm_vcpu_create_pmu() are the enumeration of enabled counters, which is 
-simple enough.
-
-In terms of performance, I guess it is better to keep 
-kvm_vcpu_create_pmu() small since it is triggered for each migration.
-
+> Okay. I'll fold it into #5.
 > 
->>   		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
->>   			kvm_vcpu_pmu_restore_guest(vcpu);
->>   
->> @@ -1516,7 +1521,8 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
->>   	 * When the vCPU has a PMU, but no PMU is set for the guest
->>   	 * yet, set the default one.
->>   	 */
->> -	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu)
->> +	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu &&
->> +	    !test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags))
->>   		ret = kvm_arm_set_default_pmu(kvm);
+>>
+>>> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+>>> index 885bd5bb2f41..fd3c5749e853 100644
+>>> --- a/arch/arm64/kvm/at.c
+>>> +++ b/arch/arm64/kvm/at.c
+>>> @@ -9,6 +9,7 @@
+>>>   #include <asm/esr.h>
+>>>   #include <asm/kvm_hyp.h>
+>>>   #include <asm/kvm_mmu.h>
+>>> +#include <asm/lsui.h>
+>>>
+>>>   static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+>>>   {
+>>> @@ -1704,6 +1705,31 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>>>   	}
+>>>   }
+>>>
+>>> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>>> +{
+>>> +	u64 tmp = old;
+>>> +	int ret = 0;
+>>> +
+>>> +	uaccess_ttbr0_enable();
+>>
+>> Why do we need this? If FEAT_LSUI is present, than FEAT_PAN is also
+>> present. And since PAN support not a compilation option anymore, we
+>> should be able to rely on PAN being enabled.
+>>
+>> Or am I missing something? If so, please document why we require it.
 > 
-> I'd rather just initialize it to a default than have to deal with the
-> field being sometimes null.
-
-I agree. I'll change this with the next version.
-
+> That was my origin thought but there was relevant discussion about this:
+>    - https://lore.kernel.org/all/aW5dzb0ldp8u8Rdm@willie-the-truck/
+>    - https://lore.kernel.org/all/aYtZfpWjRJ1r23nw@arm.com/
 > 
->> -static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
->> +static u64 kvm_pmu_enabled_counter_mask(struct kvm_vcpu *vcpu)
->>   {
->> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->> -	unsigned int mdcr = __vcpu_sys_reg(vcpu, MDCR_EL2);
->> +	u64 mask = 0;
->>   
->> -	if (!(__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx)))
->> -		return false;
->> +	if (__vcpu_sys_reg(vcpu, MDCR_EL2) & MDCR_EL2_HPME)
->> +		mask |= kvm_pmu_hyp_counter_mask(vcpu);
->>   
->> -	if (kvm_pmu_counter_is_hyp(vcpu, pmc->idx))
->> -		return mdcr & MDCR_EL2_HPME;
->> +	if (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)
->> +		mask |= ~kvm_pmu_hyp_counter_mask(vcpu);
->>   
->> -	return kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E;
->> +	return __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
->> +}
->> +
->> +static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
->> +{
->> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
->> +
->> +	return kvm_pmu_enabled_counter_mask(vcpu) & BIT(pmc->idx);
->>   }
+> In summary, I couldn't make that assumption --
+> PAN always presents when LSUI presents for :
 > 
-> You're churning a good bit of code, this needs to happen in a separate
-> patch (if at all).
-
-It makes sense. The next version will have a separate patch for this.
-
+>     - CPU bugs happen all the time
+>     - Virtualisation and idreg overrides mean illegal feature combinations
+>      can show up
 > 
->> @@ -689,6 +710,14 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
->>   	int eventsel;
->>   	u64 evtreg;
->>   
->> +	if (!arm_pmu) {
->> +		arm_pmu = kvm_pmu_probe_armpmu(vcpu->cpu);
+> So, uaccess_ttbr0_enable() is for when SW_PAN is enabled.
 > 
-> kvm_pmu_probe_armpmu() takes a global mutex, I'm not sure that's what we
-> want.
+> I'll make a comment for this.
 > 
-> What prevents us from opening a PERF_TYPE_RAW event and allowing perf to
-> work out the right PMU for this CPU?
-
-Unfortunately perf does not seem to have a capability to switch to the 
-right PMU. tools/perf/Documentation/intel-hybrid.txt says the perf tool 
-creates events for each PMU in a hybird configuration, for example.
-
+> [...]
 > 
->> +		if (!arm_pmu) {
->> +			vcpu_set_on_unsupported_cpu(vcpu);
+> Thanks!
 > 
-> At this point it seems pretty late to flag the CPU as unsupported. Maybe
-> instead we can compute the union cpumask for all the PMU implemetations
-> the VM may schedule on.
+> --
+> Sincerely,
+> Yeoreum Yun
 
-This is just a safe guard and it is a responsibility of the userspace to 
-schedule the VCPU properly. It is conceptually same with what 
-kvm_arch_vcpu_load() does when migrating to an unsupported CPU.
-
-> 
->> @@ -1249,6 +1299,10 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
->>   		irq = vcpu->arch.pmu.irq_num;
->>   		return put_user(irq, uaddr);
->>   	}
->> +	case KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY:
->> +		lockdep_assert_held(&vcpu->kvm->arch.config_lock);
->> +		if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &vcpu->kvm->arch.flags))
->> +			return 0;
-> 
-> We don't need a getter for this, userspace should remember how it
-> provisioned the VM.
-
-The getter is useful for debugging and testing. The selftest will use it 
-to query the current state.
-
-Regards,
-Akihiko Odaki
