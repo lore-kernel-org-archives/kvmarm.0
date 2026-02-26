@@ -1,46 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41885A932;
-	Thu, 26 Feb 2026 11:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF5237647B;
+	Thu, 26 Feb 2026 11:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772105912; cv=none; b=NTrWw7essieeowzLJ32h4bdW5driVu4AMIMZL1mPyYlDVkihPndNEYLXrSCUXXEXyK29piX9MeNjE4YWsaLokgTreRp4x0mxtDKwvzHcpjfpQ6aVqfBC6VSOYTphHNpAuBN19c8oEEQ5Jw65mbBA7Ls2pNVtIUged8ZcDN9URfM=
+	t=1772106884; cv=none; b=l1nK3kJX0zawSmLsRkiObiMauUBh/TZPg17592CYEE2Lp4sHhKTV9Cx+Ys84eFdIkJCjQcYQwNLxrmdJByP7w7Gcx94gIm5vcuBjS/Vp6Ofc4U+BV7QlKu30y8OJ8WUqXBfyqtS9qaofNFvS6H2mYMDL5OCJJVA3jvRvrAVhTsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772105912; c=relaxed/simple;
-	bh=h0LXqcIKOrvxUgaaQZFhxxdHYHkQ0+ABx+hsGmP7jz0=;
+	s=arc-20240116; t=1772106884; c=relaxed/simple;
+	bh=OyAr9XFcljdspYg5t17dcELHy4wQhUIdS4b5HT4e440=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s0CutH5i5XhAm2WJh8mDOIaJB5tyG+hMoANDYFfWOIUFmI6IiKZKgB6qx5NcXoMAoUM/cMqjlJxFr8fdlKTnueWQBPnMkbRxuVC9z8n+3/r8yHTAVvt44xYBAdqTexvoghWSRWvmPJqUo9iHVhRZX34cqkCDFFftAQW59pDQNDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBnlrRXs; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ON33VSJ8tRI3V0VI+GqLKh1WdB8vOSoL/OZj/JyJ6Ena7qMUW61K3ONWNbc6khTJywmdHLJBIa5tQLPUMLv/1vHdGp+7VO7hb/ZkbZslF5yYnv+yr6zqIpU/ILqLxRaN1LLOZlqmf1TA1I6N7nYyqZDD7RoeV9dXU3qhJRSsQWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VjOyB6Tk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBnlrRXs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7972BC116C6;
-	Thu, 26 Feb 2026 11:38:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VjOyB6Tk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F171C116C6;
+	Thu, 26 Feb 2026 11:54:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772105911;
-	bh=h0LXqcIKOrvxUgaaQZFhxxdHYHkQ0+ABx+hsGmP7jz0=;
+	s=k20201202; t=1772106884;
+	bh=OyAr9XFcljdspYg5t17dcELHy4wQhUIdS4b5HT4e440=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WBnlrRXsE6ZbQPudY3I0xHS7hZGfQ4B0Ogf5rz6MH/MzklysmhGRoocHOedAKhRSw
-	 Zb9o0R1J4owSQcmJPaAoUxoPXPrJ9L51DXP2Ki820buN+4xv/he7cSfs0Loegg0lWG
-	 k5HUmYffeRYsyfoOcKyrEhPtHYQjAI+3Pz4iWJ++CGqjOVzTpwDPB3sJVzyzo0q8QF
-	 D+lYVWYxk6L1tAfK0zIyHoYOf1uSnEPlo3BUmV3IPkVOxVmWvxrQYmG0m10yztN8el
-	 XdUAtCTmMoAW/8jMWLDx6DOFOdGgbRqD5IQpON49sXYnQF3p0xZkGn5qeIilqrZHpw
-	 s/ByNyn5Zycpg==
-Date: Thu, 26 Feb 2026 03:38:30 -0800
+	b=VjOyB6TkX+EEVepdSNPexvT+s7nDTrYLKVA41GUwq8DTQAD6f3c7ZIkWTjYHwyAk5
+	 bzHTpCvYiK5azhCJvNTYXSBqxhWun4OudCC5gpFxkQLFgAHsg1NknF5MP4qvqv/rrB
+	 HLHysS4LqC/u1qhq0d7tjX1VCgfVaaX2JiIKglFivWhx1X/NMKkxBlx6knYGuWrRoG
+	 Pec22q6Ev86r+TqNbafl03Z/gM9gMCEOgfb0gWOD4zItvoHJx0xEihu4Dv7qgBMz7i
+	 5xznQyEETiC0hzTXlHftorZASsOojgkmiw25lD0U9bjsmMhbRyn3Tfb+yN6tQxYkEF
+	 FQE75YhVWy1Yg==
+Date: Thu, 26 Feb 2026 03:54:42 -0800
 From: Oliver Upton <oupton@kernel.org>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, catalin.marinas@arm.com,
-	will@kernel.org, maz@kernel.org, miko.lenczewski@arm.com,
-	kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org,
-	suzuki.poulose@arm.com, lpieralisi@kernel.org, joey.gouly@arm.com,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v14 7/8] KVM: arm64: use CASLT instruction for swapping
- guest descriptor
-Message-ID: <aaAwtrrJ-qFrqktX@kernel.org>
-References: <20260225182708.3225211-1-yeoreum.yun@arm.com>
- <20260225182708.3225211-8-yeoreum.yun@arm.com>
+To: Akihiko Odaki <odaki@rsg.ci.i.u-tokyo.ac.jp>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	devel@daynix.com, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] KVM: arm64: PMU: Introduce FIXED_COUNTERS_ONLY
+Message-ID: <aaA0gn9O8QAf9Gpu@kernel.org>
+References: <20260225-hybrid-v3-0-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
+ <20260225-hybrid-v3-1-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,14 +53,113 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260225182708.3225211-8-yeoreum.yun@arm.com>
+In-Reply-To: <20260225-hybrid-v3-1-46e8fe220880@rsg.ci.i.u-tokyo.ac.jp>
 
-On Wed, Feb 25, 2026 at 06:27:07PM +0000, Yeoreum Yun wrote:
-> +	asm volatile(__LSUI_PREAMBLE
-> +		     "1: caslt	%[old], %[new], %[addr]\n"
+Hi Akihiko,
 
-The other two flavors of this use relaxed ordering, why can't we do the
-same with LSUI?
+On Wed, Feb 25, 2026 at 01:31:15PM +0900, Akihiko Odaki wrote:
+> @@ -629,6 +629,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		kvm_vcpu_load_vhe(vcpu);
+>  	kvm_arch_vcpu_load_fp(vcpu);
+>  	kvm_vcpu_pmu_restore_guest(vcpu);
+> +	if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &vcpu->kvm->arch.flags))
+> +		kvm_make_request(KVM_REQ_CREATE_PMU, vcpu);
+
+We only need to set the request if the vCPU has migrated to a different
+PMU implementation, no?
+
+>  	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+>  		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+>  
+> @@ -1056,6 +1058,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+>  			kvm_vcpu_reload_pmu(vcpu);
+>  
+> +		if (kvm_check_request(KVM_REQ_CREATE_PMU, vcpu))
+> +			kvm_vcpu_create_pmu(vcpu);
+> +
+
+My strong preference would be to squash the migration handling into
+kvm_vcpu_reload_pmu(). It is already reprogramming PMU events in
+response to other things.
+
+>  		if (kvm_check_request(KVM_REQ_RESYNC_PMU_EL0, vcpu))
+>  			kvm_vcpu_pmu_restore_guest(vcpu);
+>  
+> @@ -1516,7 +1521,8 @@ static int kvm_setup_vcpu(struct kvm_vcpu *vcpu)
+>  	 * When the vCPU has a PMU, but no PMU is set for the guest
+>  	 * yet, set the default one.
+>  	 */
+> -	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu)
+> +	if (kvm_vcpu_has_pmu(vcpu) && !kvm->arch.arm_pmu &&
+> +	    !test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &kvm->arch.flags))
+>  		ret = kvm_arm_set_default_pmu(kvm);
+
+I'd rather just initialize it to a default than have to deal with the
+field being sometimes null.
+
+> -static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
+> +static u64 kvm_pmu_enabled_counter_mask(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> -	unsigned int mdcr = __vcpu_sys_reg(vcpu, MDCR_EL2);
+> +	u64 mask = 0;
+>  
+> -	if (!(__vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & BIT(pmc->idx)))
+> -		return false;
+> +	if (__vcpu_sys_reg(vcpu, MDCR_EL2) & MDCR_EL2_HPME)
+> +		mask |= kvm_pmu_hyp_counter_mask(vcpu);
+>  
+> -	if (kvm_pmu_counter_is_hyp(vcpu, pmc->idx))
+> -		return mdcr & MDCR_EL2_HPME;
+> +	if (kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E)
+> +		mask |= ~kvm_pmu_hyp_counter_mask(vcpu);
+>  
+> -	return kvm_vcpu_read_pmcr(vcpu) & ARMV8_PMU_PMCR_E;
+> +	return __vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
+> +}
+> +
+> +static bool kvm_pmu_counter_is_enabled(struct kvm_pmc *pmc)
+> +{
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +
+> +	return kvm_pmu_enabled_counter_mask(vcpu) & BIT(pmc->idx);
+>  }
+
+You're churning a good bit of code, this needs to happen in a separate
+patch (if at all).
+
+> @@ -689,6 +710,14 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+>  	int eventsel;
+>  	u64 evtreg;
+>  
+> +	if (!arm_pmu) {
+> +		arm_pmu = kvm_pmu_probe_armpmu(vcpu->cpu);
+
+kvm_pmu_probe_armpmu() takes a global mutex, I'm not sure that's what we
+want.
+
+What prevents us from opening a PERF_TYPE_RAW event and allowing perf to
+work out the right PMU for this CPU?
+
+> +		if (!arm_pmu) {
+> +			vcpu_set_on_unsupported_cpu(vcpu);
+
+At this point it seems pretty late to flag the CPU as unsupported. Maybe
+instead we can compute the union cpumask for all the PMU implemetations
+the VM may schedule on.
+
+> @@ -1249,6 +1299,10 @@ int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>  		irq = vcpu->arch.pmu.irq_num;
+>  		return put_user(irq, uaddr);
+>  	}
+> +	case KVM_ARM_VCPU_PMU_V3_FIXED_COUNTERS_ONLY:
+> +		lockdep_assert_held(&vcpu->kvm->arch.config_lock);
+> +		if (test_bit(KVM_ARCH_FLAG_PMU_V3_FIXED_COUNTERS_ONLY, &vcpu->kvm->arch.flags))
+> +			return 0;
+
+We don't need a getter for this, userspace should remember how it
+provisioned the VM.
 
 Thanks,
 Oliver
