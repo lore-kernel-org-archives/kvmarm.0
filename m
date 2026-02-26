@@ -1,142 +1,258 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FD1302750;
-	Thu, 26 Feb 2026 10:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D73624C5;
+	Thu, 26 Feb 2026 11:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772103070; cv=none; b=ItdXLPyFHr6x3KbTRsLQFQtAPWvOxbEu4mqzbPzF4mLYVZsSoBNE3rDowVIHRb2mXqOnyNvx2ScAln6TYaswW2HW6/R821sCYQ/kJPU9n9alPZlSyObIKdOrr06dHpiXeOsZL/sj82T8OJttW1liDD/oHm8cK9isf9DbNy124yY=
+	t=1772104587; cv=none; b=DzkaA3V2Q4Xh+puHeuRtoFYNtFLtLMAgtLxp2GgexkDAOMX37o9vYqpBqYUkG55KnbV5ZJE8HXEhDPVbTD9DRNkaUdlty7z6wvu0cgZjU9qWgmcM8JxhJnHMQ4+JNzffNiLERLyILHv1nNLnHueUIfDW6FSpqYK18cYoB6i38m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772103070; c=relaxed/simple;
-	bh=c2H9Qi49m5+C4KxTW0j8/WB4GcymfvOF1Dx3C8KYFFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SJ8e9T9sIuH/GsrVD+OR0SHQbWjpcjzU7FyigCsVzWxCkJYCESaD+lBRME4hx5sd+562JNIG9NRKrF8Jt5MfZNtVPaxTM1yn9rkhwVePAc4H1WryN5orDQI/IPMVKvn4pHqEY0rNIySyrQVJWVV7H/ahANNQxQlo8iNMQGgUJ7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eq0N/CcV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772104587; c=relaxed/simple;
+	bh=BmiUdp1yjHQOHLzyBPDc/jLay4qxquFXq5fevKQzS1Q=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lBYWJJMIl3LtktTEF9khQGx1SxRhQL9fgWAQHz39yjpXlIsKZA7O7eJ77vuaBx/rCwPIYL1okLtTSupSmsU2MU8eLVRqGfVV0Yu9UOY3cJ/Awwk/u0/nuL6bv7rHU/TOC9PQww085JVuZSfVddBFb5LU2YzSpK7HOZ2wOKv0WOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LioYTfak; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eq0N/CcV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C381FC2BC9E;
-	Thu, 26 Feb 2026 10:51:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LioYTfak"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AD5EC116C6;
+	Thu, 26 Feb 2026 11:16:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772103069;
-	bh=c2H9Qi49m5+C4KxTW0j8/WB4GcymfvOF1Dx3C8KYFFs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Eq0N/CcVRqyeonDZJrXv9xf3VwFC3Mrxsw0GwBo1up49FgA9c+Wv+Vdo0yenwTCM/
-	 c7lUFm8KvlVKebR1w3mheBfxkQ+C9gadmCPvyhJg1KzY+CsACuJjyd7xR90llaFNnW
-	 o/YRAfhqXTXF44ytY4W/xynrOigplzqcDObe8xIgASJc02kex8sdfkwLnrungkIk2A
-	 tuVUBLKBur7cE+h9zRtE+6vzLKx+SHiEr3KtUyfiw2pKnDxyZIWXBNlqdjaQ0Si8aZ
-	 3WTxHdG3WZH9tK/MeC7b1jMxRBLovlNNY1XF+8XHWq7eJByIZ/D3EU5SZUUHppwGEN
-	 T6rX32Xvv4jIQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1772104586;
+	bh=BmiUdp1yjHQOHLzyBPDc/jLay4qxquFXq5fevKQzS1Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LioYTfakd0KydjQVkutzN9SEDqQwxpL+umiVtHwIy1DiM5qkzY+BfcXgzXPK1doXA
+	 7crbXNfrSnjGgbT7bgaosTc8hZJo9DZ17w55LrwsCk8pCvxuQ+aq2F0c+JVIBDfmkN
+	 wQLCIHgIYVm7NN4Mx2s/q1KCTy/Xg6GGig1OQ1tYuNQBjne1wI4GDZjqJHB7N0jiEK
+	 UpZem4RIC8qpP174n0N7Ll9mplFkQIX+VCuaUb8uzD9klyM3Q4bMf/70hzYqHcISlv
+	 R6FHUUrLkb/hdIK8EgkjkBXDtGYQj0zbP4QzL0aPSuzlbgBHOwWhNMORWpvSlz+nwb
+	 L0meo9DUpp1BA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vvYxX-0000000E12u-3VQk;
-	Thu, 26 Feb 2026 10:51:07 +0000
+	id 1vvZLz-0000000E1jC-3klj;
+	Thu, 26 Feb 2026 11:16:24 +0000
+Date: Thu, 26 Feb 2026 11:16:23 +0000
+Message-ID: <867brzah6g.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Kees Cook <kees@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Sascha Bischoff <sascha.bischoff@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 fixes for 7.0, take #1
-Date: Thu, 26 Feb 2026 10:50:47 +0000
-Message-ID: <20260226105048.28066-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+	linux-kselftest@vger.kernel.org,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	oupton@kernel.org,
+	miko.lenczewski@arm.com,
+	kevin.brodsky@arm.com,
+	broonie@kernel.org,
+	ardb@kernel.org,
+	suzuki.poulose@arm.com,
+	lpieralisi@kernel.org,
+	joey.gouly@arm.com,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v14 7/8] KVM: arm64: use CASLT instruction for swapping guest descriptor
+In-Reply-To: <20260225182708.3225211-8-yeoreum.yun@arm.com>
+References: <20260225182708.3225211-1-yeoreum.yun@arm.com>
+	<20260225182708.3225211-8-yeoreum.yun@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, tabba@google.com, joey.gouly@arm.com, jonathan.cameron@huawei.com, kees@kernel.org, broonie@kernel.org, sascha.bischoff@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: yeoreum.yun@arm.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, catalin.marinas@arm.com, will@kernel.org, oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com, broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com, lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+On Wed, 25 Feb 2026 18:27:07 +0000,
+Yeoreum Yun <yeoreum.yun@arm.com> wrote:
+> 
+> Use the CASLT instruction to swap the guest descriptor when FEAT_LSUI
+> is enabled, avoiding the need to clear the PAN bit.
+> 
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+>  arch/arm64/include/asm/cpucaps.h |  2 ++
+>  arch/arm64/include/asm/futex.h   | 17 +----------------
+>  arch/arm64/include/asm/lsui.h    | 27 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/at.c              | 30 +++++++++++++++++++++++++++++-
+>  4 files changed, 59 insertions(+), 17 deletions(-)
+>  create mode 100644 arch/arm64/include/asm/lsui.h
+> 
+> diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+> index 177c691914f8..6e3da333442e 100644
+> --- a/arch/arm64/include/asm/cpucaps.h
+> +++ b/arch/arm64/include/asm/cpucaps.h
+> @@ -71,6 +71,8 @@ cpucap_is_possible(const unsigned int cap)
+>  		return true;
+>  	case ARM64_HAS_PMUV3:
+>  		return IS_ENABLED(CONFIG_HW_PERF_EVENTS);
+> +	case ARM64_HAS_LSUI:
+> +		return IS_ENABLED(CONFIG_ARM64_LSUI);
+>  	}
+>  
+>  	return true;
 
-Here's the first set of KVM/arm64 fixes for 7.0. Most of it affects
-pKVM (feature set, MMU), but we also have a GICv5 fix and a couple of
-small cleanups. Details in the tag below.
+It would make more sense to move this hunk to the first patch, where
+you deal with features and capabilities, instead of having this in a
+random KVM-specific patch.
 
-Note that there is a very minor conflict with Linus' tree due to Kees'
-patch having been applied to both trees. Whatever is in Linus' tree is
-the right thing.
+> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
+> index b579e9d0964d..6779c4ad927f 100644
+> --- a/arch/arm64/include/asm/futex.h
+> +++ b/arch/arm64/include/asm/futex.h
+> @@ -7,11 +7,9 @@
+>  
+>  #include <linux/futex.h>
+>  #include <linux/uaccess.h>
+> -#include <linux/stringify.h>
+>  
+> -#include <asm/alternative.h>
+> -#include <asm/alternative-macros.h>
+>  #include <asm/errno.h>
+> +#include <asm/lsui.h>
+>  
+>  #define FUTEX_MAX_LOOPS	128 /* What's the largest number you can think of? */
+>  
+> @@ -91,8 +89,6 @@ __llsc_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  
+>  #ifdef CONFIG_ARM64_LSUI
+>  
+> -#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> -
+>  #define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
+>  static __always_inline int						\
+>  __lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> @@ -235,17 +231,6 @@ __lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
+>  {
+>  	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
+>  }
+> -
+> -#define __lsui_llsc_body(op, ...)					\
+> -({									\
+> -	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> -		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> -})
+> -
+> -#else	/* CONFIG_ARM64_LSUI */
+> -
+> -#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> -
+>  #endif	/* CONFIG_ARM64_LSUI */
+>  
+>  
+> diff --git a/arch/arm64/include/asm/lsui.h b/arch/arm64/include/asm/lsui.h
+> new file mode 100644
+> index 000000000000..8f0d81953eb6
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/lsui.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ASM_LSUI_H
+> +#define __ASM_LSUI_H
+> +
+> +#include <linux/compiler_types.h>
+> +#include <linux/stringify.h>
+> +#include <asm/alternative.h>
+> +#include <asm/alternative-macros.h>
+> +#include <asm/cpucaps.h>
+> +
+> +#define __LSUI_PREAMBLE	".arch_extension lsui\n"
+> +
+> +#ifdef CONFIG_ARM64_LSUI
+> +
+> +#define __lsui_llsc_body(op, ...)					\
+> +({									\
+> +	alternative_has_cap_unlikely(ARM64_HAS_LSUI) ?			\
+> +		__lsui_##op(__VA_ARGS__) : __llsc_##op(__VA_ARGS__);	\
+> +})
+> +
+> +#else	/* CONFIG_ARM64_LSUI */
+> +
+> +#define __lsui_llsc_body(op, ...)	__llsc_##op(__VA_ARGS__)
+> +
+> +#endif	/* CONFIG_ARM64_LSUI */
+> +
+> +#endif	/* __ASM_LSUI_H */
 
-Please pull,
+Similarly, fold this into the patch that introduces FEAT_LSUI support
+for futexes (#5) so that the code is in its final position from the
+beginning. This will avoid churn that makes the patches pointlessly
+hard to follow, since this change is unrelated to KVM.
+
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 885bd5bb2f41..fd3c5749e853 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -9,6 +9,7 @@
+>  #include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/lsui.h>
+>  
+>  static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool s1ptw)
+>  {
+> @@ -1704,6 +1705,31 @@ int __kvm_find_s1_desc_level(struct kvm_vcpu *vcpu, u64 va, u64 ipa, int *level)
+>  	}
+>  }
+>  
+> +static int __lsui_swap_desc(u64 __user *ptep, u64 old, u64 new)
+> +{
+> +	u64 tmp = old;
+> +	int ret = 0;
+> +
+> +	uaccess_ttbr0_enable();
+
+Why do we need this? If FEAT_LSUI is present, than FEAT_PAN is also
+present. And since PAN support not a compilation option anymore, we
+should be able to rely on PAN being enabled.
+
+Or am I missing something? If so, please document why we require it.
+
+> +
+> +	asm volatile(__LSUI_PREAMBLE
+> +		     "1: caslt	%[old], %[new], %[addr]\n"
+> +		     "2:\n"
+> +		     _ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w[ret])
+> +		     : [old] "+r" (old), [addr] "+Q" (*ptep), [ret] "+r" (ret)
+> +		     : [new] "r" (new)
+> +		     : "memory");
+> +
+> +	uaccess_ttbr0_disable();
+> +
+> +	if (ret)
+> +		return ret;
+> +	if (tmp != old)
+> +		return -EAGAIN;
+> +
+> +	return ret;
+> +}
+> +
+>  static int __lse_swap_desc(u64 __user *ptep, u64 old, u64 new)
+>  {
+>  	u64 tmp = old;
+> @@ -1779,7 +1805,9 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+>  		return -EPERM;
+>  
+>  	ptep = (u64 __user *)hva + offset;
+> -	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+> +	if (cpucap_is_possible(ARM64_HAS_LSUI) && cpus_have_final_cap(ARM64_HAS_LSUI))
+> +		r = __lsui_swap_desc(ptep, old, new);
+> +	else if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+>  		r = __lse_swap_desc(ptep, old, new);
+>  	else
+>  		r = __llsc_swap_desc(ptep, old, new);
+
+Thanks,
 
 	M.
 
-The following changes since commit 6316366129d2885fae07c2774f4b7ae0a45fb55d:
-
-  Merge branch kvm-arm64/misc-6.20 into kvmarm-master/next (2026-02-05 09:17:58 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.0-1
-
-for you to fetch changes up to 54e367cb94d6bef941bbc1132d9959dc73bd4b6f:
-
-  KVM: arm64: Deduplicate ASID retrieval code (2026-02-25 12:19:33 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 7.0, take #1
-
-- Make sure we don't leak any S1POE state from guest to guest when
-  the feature is supported on the HW, but not enabled on the host
-
-- Propagate the ID registers from the host into non-protected VMs
-  managed by pKVM, ensuring that the guest sees the intended feature set
-
-- Drop double kern_hyp_va() from unpin_host_sve_state(), which could
-  bite us if we were to change kern_hyp_va() to not being idempotent
-
-- Don't leak stage-2 mappings in protected mode
-
-- Correctly align the faulting address when dealing with single page
-  stage-2 mappings for PAGE_SIZE > 4kB
-
-- Fix detection of virtualisation-capable GICv5 IRS, due to the
-  maintainer being obviously fat fingered...
-
-- Remove duplication of code retrieving the ASID for the purpose of
-  S1 PT handling
-
-- Fix slightly abusive const-ification in vgic_set_kvm_info()
-
-----------------------------------------------------------------
-Fuad Tabba (5):
-      KVM: arm64: Hide S1POE from guests when not supported by the host
-      KVM: arm64: Optimise away S1POE handling when not supported by host
-      KVM: arm64: Fix ID register initialization for non-protected pKVM guests
-      KVM: arm64: Remove redundant kern_hyp_va() in unpin_host_sve_state()
-      KVM: arm64: Revert accidental drop of kvm_uninit_stage2_mmu() for non-NV VMs
-
-Kees Cook (1):
-      KVM: arm64: vgic: Handle const qualifier from gic_kvm_info allocation type
-
-Marc Zyngier (2):
-      KVM: arm64: Fix protected mode handling of pages larger than 4kB
-      KVM: arm64: Deduplicate ASID retrieval code
-
-Sascha Bischoff (1):
-      irqchip/gic-v5: Fix inversion of IRS_IDR0.virt flag
-
- arch/arm64/include/asm/kvm_host.h   |  3 +-
- arch/arm64/include/asm/kvm_nested.h |  2 ++
- arch/arm64/kvm/at.c                 | 27 ++--------------
- arch/arm64/kvm/hyp/nvhe/pkvm.c      | 37 ++++++++++++++++++++--
- arch/arm64/kvm/mmu.c                | 12 +++----
- arch/arm64/kvm/nested.c             | 63 ++++++++++++++++++-------------------
- arch/arm64/kvm/sys_regs.c           |  3 ++
- arch/arm64/kvm/vgic/vgic-init.c     |  2 +-
- drivers/irqchip/irq-gic-v5-irs.c    |  2 +-
- 9 files changed, 81 insertions(+), 70 deletions(-)
+-- 
+Without deviation from the norm, progress is not possible.
