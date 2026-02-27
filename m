@@ -1,145 +1,85 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC0835CBDD
-	for <kvmarm@lists.linux.dev>; Fri, 27 Feb 2026 17:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C71326952
+	for <kvmarm@lists.linux.dev>; Fri, 27 Feb 2026 17:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772211606; cv=none; b=cMLWWWaUrftkcyBzarFZr0jMBGVYxNPNW0jqEttS3+EgdJcqkHjVNFbjCIjri3wT04bODe8tfUGfGO03pl04QSA5bOPfkaghlYH0fLHBGKfKaBGicMu34UPNfnTqii2ipEzWQylE1b+6Z3mJ4KlewatfqIRjzYxef5jLEOyL9eA=
+	t=1772211850; cv=none; b=IXrJoS4xtTkxFZosu/33N/MiwKXp8SIIdUcw56n1kVWFA9barS8rAcc7Pu+f+wANX3OwdQtQs0W2kBrGDclha44rlXEcB/zg83xLwvYDhFP0T5KRW3IiEXEsK+KnnF04QlI6m1NVuo57BGArQvW69Ks/fYerCxbVQP/zDEo/9Ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772211606; c=relaxed/simple;
-	bh=1qd9jKKkciPMBnCtIYoZky5yLvK/08oE+llkGM6J0zQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ED2Vml5sxO8NEuUcjcaA/tnD1tYAGGEUFfYsnbrDk9vgZJOYXLPmhIeRo3u+oFbKgya3F7XkSOlEkI1otx/7j0ch7wNpyP8dIBEbfww1lNnj4s4j5NnBlG1QN6cm6sxbDTTpXbX8VkTQ9qY0Z8OBVtHdqs1Q10E5b/ll0ons+FA=
+	s=arc-20240116; t=1772211850; c=relaxed/simple;
+	bh=k7qGFv2TnDZxF63BSsh/tQM8hrU5ZueyqeqiDCPZNAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZxcY1xheD5sxLQMrlI1oHVwF8TRRVewIiFwz2vvoe1B1zViaJbeAv0dKe/Poh48Up4bczSOlADwQfbBL5a0dkDAi+7yot96+GgITsi7KQXItee08SYIO0ZnQZay3/nAZle4MF5r0XX4pOIaxhOKSqOAHaw9WufTG43eL9sVz9g8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A50FD1516;
-	Fri, 27 Feb 2026 08:59:58 -0800 (PST)
-Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9AB653F73B;
-	Fri, 27 Feb 2026 09:00:03 -0800 (PST)
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-To: kvm@vger.kernel.org
-Cc: kvmarm@lists.linux.dev,
-	will@kernel.org,
-	maz@kernel.org,
-	tabba@google.com,
-	steven.price@arm.com,
-	aneesh.kumar@kernel.org,
-	alexandru.elisei@arm.com,
-	oupton@kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvmtool PATCH v6 17/17] arm64: smccc: Start sending PSCI to userspace
-Date: Fri, 27 Feb 2026 16:56:24 +0000
-Message-ID: <20260227165624.1519865-18-suzuki.poulose@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260227165624.1519865-1-suzuki.poulose@arm.com>
-References: <20260227165624.1519865-1-suzuki.poulose@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AE9D14BF;
+	Fri, 27 Feb 2026 09:04:02 -0800 (PST)
+Received: from arm.com (arrakis.cambridge.arm.com [10.1.197.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BD8263F73B;
+	Fri, 27 Feb 2026 09:04:03 -0800 (PST)
+Date: Fri, 27 Feb 2026 17:04:01 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+	dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+	fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+	jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com, reinette.chatre@intel.com,
+	rohit.mathew@arm.com, scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com, will@kernel.org, corbet@lwn.net,
+	maz@kernel.org, oupton@kernel.org, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+	zengheng4@huawei.com, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v5 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
+Message-ID: <aaHOgZFWnjMHNirr@arm.com>
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+ <6051a508-1e77-4216-9b41-4b93b21c18c3@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6051a508-1e77-4216-9b41-4b93b21c18c3@arm.com>
 
-From: Oliver Upton <oliver.upton@linux.dev>
+On Wed, Feb 25, 2026 at 09:10:08PM +0000, Ben Horgan wrote:
+> On 2/24/26 17:56, Ben Horgan wrote:
+> > The main change in this version of the mpam missing pieces series is to
+> > update the cdp emulation to match the resctrl interface. L2 and L3
+> > resources can now enable cdp separately. Cdp can't be hidden correctly for
+> > memory bandwidth allocation, as max per partid can't be emulated with more
+> > partids, and so we hide this completely when cdp is enabled. There is a little
+> > restructuring and a few smaller changes.
+> > 
+> > Changelogs in patches
+> > 
+> > It would be great to get this series merged this cycle. For that we'll need
+> > more testing and reviewing. Thanks!
+> > 
+> 
+> There is a small build conflict with resctrl abmc precursors, [1]. The
+> last patch of that series applies on top of this series and if the abmc
+> precursors go first that patch should go with this series to fix the
+> build. Alternatively, if it's obvious ahead of time it can be squashed
+> into pathc 33 with the other empty resctrl arch hooks.
+> 
+> [1]
+> https://lore.kernel.org/lkml/20260225201905.3568624-5-ben.horgan@arm.com/
 
-kvmtool now has a PSCI implementation that complies with v1.0 of the
-specification. Use the SMCCC filter to start sending these calls out to
-userspace for further handling. While at it, shut the door on the
-legacy, KVM-specific v0.1 functions.
+Typically we resolve these by having the first three patches in the
+above series on a stable branch (could be tip as it touches x86) and we
+can base the 41 patches here on top, together with the last one from the
+abmc series.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
-Changes since v4:
- - Switch to default in-kernel PSCI
----
- arm64/include/kvm/kvm-config-arch.h |  8 +++++--
- arm64/smccc.c                       | 37 +++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+), 2 deletions(-)
+Alternatively, happy to take them all via the arm64 tree as long as
+Reinette/Tony are ok with this and ack the abmc patches.
 
-diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
-index ee031f01..f8dd088d 100644
---- a/arm64/include/kvm/kvm-config-arch.h
-+++ b/arm64/include/kvm/kvm-config-arch.h
-@@ -15,6 +15,7 @@ struct kvm_config_arch {
- 	u64		fw_addr;
- 	unsigned int	sve_max_vq;
- 	bool		no_pvtime;
-+	bool		psci;
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
-@@ -52,11 +53,14 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
- 			   "Force virtio devices to use PCI as their default "	\
- 			   "transport (Deprecated: Use --virtio-transport "	\
- 			   "option instead)", virtio_transport_parser, kvm),	\
--        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
-+	OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
- 		     "[gicv2|gicv2m|gicv3|gicv3-its]",				\
- 		     "Type of interrupt controller to emulate in the guest",	\
- 		     irqchip_parser, NULL),					\
- 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
--		"Address where firmware should be loaded"),
-+		"Address where firmware should be loaded"),			\
-+	OPT_BOOLEAN('\0', "psci", &(cfg)->psci,					\
-+			"Request userspace handling of PSCI, instead of"	\
-+			" relying on the in-kernel implementation"),
- 
- #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-diff --git a/arm64/smccc.c b/arm64/smccc.c
-index ef986d8c..47310a04 100644
---- a/arm64/smccc.c
-+++ b/arm64/smccc.c
-@@ -38,7 +38,44 @@ out:
- 	return true;
- }
- 
-+static struct kvm_smccc_filter filter_ranges[] = {
-+	{
-+		.base		= KVM_PSCI_FN_BASE,
-+		.nr_functions	= 4,
-+		.action		= KVM_SMCCC_FILTER_DENY,
-+	},
-+	{
-+		.base		= PSCI_0_2_FN_BASE,
-+		.nr_functions	= 0x20,
-+		.action		= KVM_SMCCC_FILTER_FWD_TO_USER,
-+	},
-+	{
-+		.base		= PSCI_0_2_FN64_BASE,
-+		.nr_functions	= 0x20,
-+		.action		= KVM_SMCCC_FILTER_FWD_TO_USER,
-+	},
-+};
-+
- void kvm__setup_smccc(struct kvm *kvm)
- {
-+	struct kvm_device_attr attr = {
-+		.group	= KVM_ARM_VM_SMCCC_CTRL,
-+		.attr	= KVM_ARM_VM_SMCCC_FILTER,
-+	};
-+	unsigned int i;
- 
-+	if (!kvm->cfg.arch.psci)
-+		return;
-+
-+	if (ioctl(kvm->vm_fd, KVM_HAS_DEVICE_ATTR, &attr)) {
-+		pr_debug("KVM SMCCC filter not supported");
-+		return;
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(filter_ranges); i++) {
-+		attr.addr = (u64)&filter_ranges[i];
-+
-+		if (ioctl(kvm->vm_fd, KVM_SET_DEVICE_ATTR, &attr))
-+			die_perror("KVM_SET_DEVICE_ATTR failed");
-+	}
- }
 -- 
-2.43.0
-
+Catalin
