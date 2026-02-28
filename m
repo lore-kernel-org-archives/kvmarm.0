@@ -1,328 +1,171 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C1720D4E9
-	for <kvmarm@lists.linux.dev>; Sat, 28 Feb 2026 09:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8C81DF980
+	for <kvmarm@lists.linux.dev>; Sat, 28 Feb 2026 11:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772271849; cv=none; b=WZNzDSqhV4EonUcFCKkpe4yj+MN1z1jAG3QsCHDSfO+9YD0btN620Z4XUYdGawI0KBCSTaCnT4TpeZUEgwoEXQSZAGhM3EKhrwOZxQDqlYFaTIBccteS1sFlHTe3/XIB1ceQHyevm3p78YQiqvj/b8e5i/mBBmQEUacIXslovQg=
+	t=1772279183; cv=none; b=JmtSuYUNQ3+cHL261EEfuqB1Cc5ynETYlda6PQ/xvPGBhvL61Tsc510oqHhYGFdYcIzZrteV7bGANXdpQGvTkKfITmN2QZvUFjacdtGR9AHqvKxgq2eFEE0TDvPMvvUsastceC3/kc57Ca5MrRQNkG5xDRavkPifmOk77ZpuQv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772271849; c=relaxed/simple;
-	bh=U5WRADLgmsNiwrDG4dFU/aUg/dShHBO37b4zDOyearE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=boaX+oqFW9RYbJsdF3YJAbFWatHsE13hU0zemR5NQ7IVZjB0CFpBY1mFHZ9jy7JaUK+693aXfcyIBKXMKg6omWlvuGMMeWUoccqG91dpex4/Qqz+GVbBVvBo1Xt7Ti2Ssf00fSjEcFc+Ql7Dgml68E8PMHapyFszlhD0UcfvSLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SLgKRjeR; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SLgKRjeR"
-Message-ID: <b951dcfb-0ad1-4d7b-b6ce-d54b272dd9be@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1772271845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OCLMWkVsU+ulkeuAdY5/iYGTKPWnzE1irJxnFoArRrY=;
-	b=SLgKRjeRmkCEQPqdKloaJQQuXtxuB7sCArvh+NjE1z49mC6LKoYl1NVOnnPcBLCwOwJtNH
-	L+87+eKqogVpu1LXXUyURWngobWmZbxt9c6iTfyrPYHAslZ5JFKeVCANwhfIcm51ZpA2N0
-	1meiiaPRTzOBWUmJyF1DR/GgDcZ6kyE=
-Date: Sat, 28 Feb 2026 17:43:59 +0800
+	s=arc-20240116; t=1772279183; c=relaxed/simple;
+	bh=V5nMKAigv3HCQsTyt/zrxEJeoGfpqosEiJVgKBWl6vc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PbT0pS3XtCbu+sd9O/KGT9zRAA/hmMN6R7yAr525NMhNRQ0ELuwFHtfM5vxGaAbj2MfiqJzoIDd4LXS0dfzlsTPO9I1pPlzr5VsnEaKrHuQd3fav5xb9ueJ8HHx/pesvH12mKqLxMktJBeRNFZD/uU6Ce/x69uJhlHkt4RG76VE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-679deba5e9fso28472165eaf.0
+        for <kvmarm@lists.linux.dev>; Sat, 28 Feb 2026 03:46:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772279181; x=1772883981;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8LuITVldGOlUNrpSliupPOmyqk5VihC4Ea6iAcEmgE=;
+        b=vjKT9UUH3gyOw5V21jhar0B/IyyQo2hEi2+uM8unOxj5ORdYj4MVmpMafH22yMTNx8
+         mt5gDasKgkDWJoSapjSIJWwknIJSPABS7aACCBDDzoPatElkSBzRsry+uyzP+e4RGFyI
+         GzSy3NI9IgRRHh/e6skEEOKrfZDNRN6xTLYLxJH1tzUxAXk5zSNxxA3bKQa2dsehGgKh
+         0eeH2teF0iq5ghVr2jROjMIC1keaEa9N2RPLlqttJ3hu1TihmVIqawXqjdbPYvBb090+
+         tK+sEOYcxBxRWR5w0MHXTSzeeYnjkfIoj8gfczzQKkRrOzWlaLhQ1mEKAElTExXC0wam
+         oTow==
+X-Forwarded-Encrypted: i=1; AJvYcCUOQ+KsgbIDIy1JnX0AtW5KjtWU3qIlG0KFDVZRR8k90wXxVepxNtb9mRFCo/ZNndKkoqTaNEI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyC5+7rs6Qnfhcl+PGeeVU3EkB06G7YX9w48AtsBgQkbas+9eO8
+	tXr38HZB6mEsx5lWyqnvztR1Eo8DdCZqUOXE+5mlWmpMYaQaJEZzN4ZKbUw/l/QP7EZHwS2S/lG
+	8RH9PP7Xe3fzS8LCdIxpI7fUr9rWTTUprlf/fWNOHE+cuFNVZB6g3Q7hOQSA=
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 15/15] KVM: arm64: selftests: Add test for AT emulation
-To: Oliver Upton <oupton@kernel.org>
-Cc: kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
- Zenghui Yu <yuzenghui@huawei.com>
-References: <20251124190158.177318-1-oupton@kernel.org>
- <20251124190158.177318-16-oupton@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20251124190158.177318-16-oupton@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6820:2913:b0:679:e7b2:9fb8 with SMTP id
+ 006d021491bc7-679fadb8af6mr4205368eaf.14.1772279180960; Sat, 28 Feb 2026
+ 03:46:20 -0800 (PST)
+Date: Sat, 28 Feb 2026 03:46:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69a2d58c.050a0220.3a55be.003b.GAE@google.com>
+Subject: [syzbot] [kvmarm?] [kvm?] BUG: unable to handle kernel paging request
+ in kvm_vgic_destroy
+From: syzbot <syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com>
+To: catalin.marinas@arm.com, joey.gouly@arm.com, kvm@vger.kernel.org, 
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, maz@kernel.org, oupton@kernel.org, 
+	suzuki.poulose@arm.com, syzkaller-bugs@googlegroups.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Oliver,
+Hello,
 
-On 11/25/25 3:01 AM, Oliver Upton wrote:
-> Add a basic test for AT emulation in the EL2&0 and EL1&0 translation
-> regimes.
-> 
-> Signed-off-by: Oliver Upton <oupton@kernel.org>
-> ---
->  tools/testing/selftests/kvm/Makefile.kvm      |   1 +
->  tools/testing/selftests/kvm/arm64/at.c        | 166 ++++++++++++++++++
->  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  10 ++
->  4 files changed, 178 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/arm64/at.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 148d427ff24b..81b3aa54678a 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -156,6 +156,7 @@ TEST_GEN_PROGS_EXTENDED_x86 += x86/nx_huge_pages_test
->  TEST_GEN_PROGS_arm64 = $(TEST_GEN_PROGS_COMMON)
->  TEST_GEN_PROGS_arm64 += arm64/aarch32_id_regs
->  TEST_GEN_PROGS_arm64 += arm64/arch_timer_edge_cases
-> +TEST_GEN_PROGS_arm64 += arm64/at
->  TEST_GEN_PROGS_arm64 += arm64/debug-exceptions
->  TEST_GEN_PROGS_arm64 += arm64/hello_el2
->  TEST_GEN_PROGS_arm64 += arm64/host_sve
-> diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
-> new file mode 100644
-> index 000000000000..acecb6ab5071
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/arm64/at.c
-> @@ -0,0 +1,166 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * at - Test for KVM's AT emulation in the EL2&0 and EL1&0 translation regimes.
-> + */
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "test_util.h"
-> +#include "ucall.h"
-> +
-> +#include <asm/sysreg.h>
-> +
-> +#define TEST_ADDR	0x80000000
-> +
-> +enum {
-> +	CLEAR_ACCESS_FLAG,
-> +	TEST_ACCESS_FLAG,
-> +};
-> +
-> +static u64 *ptep_hva;
-> +
-> +#define copy_el2_to_el1(reg)						\
-> +	write_sysreg_s(read_sysreg_s(SYS_##reg##_EL1), SYS_##reg##_EL12)
-> +
-> +/* Yes, this is an ugly hack */
-> +#define __at(op, addr)	write_sysreg_s(addr, op)
-> +
-> +#define test_at_insn(op, expect_fault)							\
-> +do {											\
-> +	u64 par, fsc;									\
-> +	bool fault;									\
-> +											\
-> +	GUEST_SYNC(CLEAR_ACCESS_FLAG);							\
-> +											\
-> +	__at(OP_AT_##op, TEST_ADDR);							\
-> +	isb();										\
-> +	par = read_sysreg(par_el1);							\
-> +											\
-> +	fault = par & SYS_PAR_EL1_F;							\
-> +	fsc = FIELD_GET(SYS_PAR_EL1_FST, par);						\
-> +											\
-> +	__GUEST_ASSERT((expect_fault) == fault,						\
-> +		       "AT "#op": %sexpected fault (par: %lx)1",			\
-> +		       (expect_fault) ? "" : "un", par);				\
-> +	if ((expect_fault)) {								\
-> +		__GUEST_ASSERT(fsc == ESR_ELx_FSC_ACCESS_L(3),				\
-> +			       "AT "#op": expected access flag fault (par: %lx)",	\
-> +			       par);							\
-> +	} else {									\
-> +		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
-> +		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
-> +		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
-> +		GUEST_SYNC(TEST_ACCESS_FLAG);						\
-> +	}										\
-> +} while (0)
-> +
-> +static void test_at(bool expect_fault)
-> +{
-> +	test_at_insn(S1E2R, expect_fault);
-> +	test_at_insn(S1E2W, expect_fault);
-> +
-> +	/* Reuse the stage-1 MMU context from EL2 at EL1 */
-> +	copy_el2_to_el1(SCTLR);
-> +	copy_el2_to_el1(MAIR);
-> +	copy_el2_to_el1(TCR);
-> +	copy_el2_to_el1(TTBR0);
-> +	copy_el2_to_el1(TTBR1);
-> +
-> +	/* Disable stage-2 translation and enter a non-host context */
-> +	write_sysreg(0, vtcr_el2);
-> +	write_sysreg(0, vttbr_el2);
-> +	sysreg_clear_set(hcr_el2, HCR_EL2_TGE | HCR_EL2_VM, 0);
-> +	isb();
-> +
-> +	test_at_insn(S1E1R, expect_fault);
-> +	test_at_insn(S1E1W, expect_fault);
-> +}
-> +
-> +static void guest_code(void)
-> +{
-> +	sysreg_clear_set(tcr_el1, TCR_HA, 0);
-> +	isb();
-> +
-> +	test_at(true);
-> +
-> +	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
-> +		GUEST_DONE();
-> +
-> +	/*
-> +	 * KVM's software PTW makes the implementation choice that the AT
-> +	 * instruction sets the access flag.
-> +	 */
-> +	sysreg_clear_set(tcr_el1, 0, TCR_HA);
-> +	isb();
-> +	test_at(false);
-> +
-> +	GUEST_DONE();
-> +}
-> +
-> +static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
-> +{
-> +	switch (uc->args[1]) {
-> +	case CLEAR_ACCESS_FLAG:
-> +		/*
-> +		 * Delete + reinstall the memslot to invalidate stage-2
-> +		 * mappings of the stage-1 page tables, forcing KVM to
-> +		 * use the 'slow' AT emulation path.
+syzbot found the following issue on:
 
-Once the guest continues executing instructions, we would get a stage 2
-translation fault (on a S1 PTW) immediately and re-build the stage 2
-mappings for the S1 page tables. Depends on how much we have re-built
-for S1 page tables, the "forcing KVM to use the 'slow' AT emulation
-path" may not always be true.
+HEAD commit:    6316366129d2 Merge branch kvm-arm64/misc-6.20 into kvmarm-..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15e59c4a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=148fc9aa8e041d0a
+dashboard link: https://syzkaller.appspot.com/bug?extid=f6a46b038fc243ac0175
+compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13182006580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=173900ba580000
 
-I tested it in a QEMU guest (with "-machine virt,virtualization=on \
--cpu max -accel tcg", so it's essentially a NV2 capable HW!) and it
-failed at the first test_at_insn(S1E2R, expect_fault):
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/fa3fbcfdac58/non_bootable_disk-63163661.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1018400deda3/vmlinux-63163661.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/fb8a8bb5d8a4/Image-63163661.gz.xz
 
-[root@localhost arm64]# getconf PAGESIZE
-65536
-[root@localhost arm64]# ./at
-Random seed: 0x6b8b4567
-__vm_create: mode='PA-bits:40,  VA-bits:48,  4K pages' type='0', pages='672'
-==== Test Assertion Failure ====
-  arm64/at.c:58: (expect_fault) == fault
-  pid=824 tid=824 errno=4 - Interrupted system call
-     1	0x0000000000402d8f: run_test at at.c:137
-     2	0x00000000004020e3: main at at.c:162
-     3	0x0000ffffb07daf3b: ?? ??:0
-     4	0x0000ffffb07db007: ?? ??:0
-     5	0x000000000040222f: _start at ??:?
-  AT S1E2R: expected fault (par: ff00000080000b80)1
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f6a46b038fc243ac0175@syzkaller.appspotmail.com
 
-because in my test, the S1 page tables used to translate TEST_ADDR are
-located at
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x90/0x230 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x120/0x2f4 arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x58/0x74 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x5c/0x238 arch/arm64/kernel/entry-common.c:724
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:743
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+Unable to handle kernel paging request at virtual address ffef800000000000
+KASAN: maybe wild-memory-access in range [0xff00000000000000-0xff0000000000000f]
+Mem abort info:
+  ESR = 0x0000000096000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x04: level 0 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[ffef800000000000] address between user and kernel address ranges
+Internal error: Oops: 0000000096000004 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 3651 Comm: syz.2.17 Not tainted syzkaller #0 PREEMPT 
+Hardware name: linux,dummy-virt (DT)
+pstate: 01402009 (nzcv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+pc : kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:445 [inline]
+pc : kvm_vgic_destroy+0x2d4/0x624 arch/arm64/kvm/vgic/vgic-init.c:518
+lr : kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:444 [inline]
+lr : kvm_vgic_destroy+0x290/0x624 arch/arm64/kvm/vgic/vgic-init.c:518
+sp : ffff80008e647b90
+x29: ffff80008e647ba0 x28: 0000000000000005 x27: cdf00000200a52d8
+x26: cdf00000200a4db0 x25: 00000000000000cd x24: cdf00000200a4d8c
+x23: 00000000000000cd x22: 00000000000000cd x21: cdf00000200a4ad0
+x20: efff800000000000 x19: cdf00000200a4000 x18: 00000000030f4b63
+x17: 0000000000000031 x16: 0000000000000000 x15: ffff800088209a68
+x14: ffffffffffffffff x13: 0000000000000028 x12: 5df000001795c1f0
+x11: ffff800088209a68 x10: 0000000000ff0100 x9 : 0ff0000000000000
+x8 : 0000000000000000 x7 : ffff80008672f958 x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000002
+x2 : 0000000000000008 x1 : 0000000000000000 x0 : 0000000000000007
+Call trace:
+ kvm_vgic_dist_destroy arch/arm64/kvm/vgic/vgic-init.c:445 [inline] (P)
+ kvm_vgic_destroy+0x2d4/0x624 arch/arm64/kvm/vgic/vgic-init.c:518 (P)
+ kvm_arch_destroy_vm+0x88/0x138 arch/arm64/kvm/arm.c:299
+ kvm_destroy_vm virt/kvm/kvm_main.c:1317 [inline]
+ kvm_put_kvm+0x778/0xbe0 virt/kvm/kvm_main.c:1354
+ kvm_vm_release+0x58/0x78 virt/kvm/kvm_main.c:1377
+ __fput+0x4ac/0x978 fs/file_table.c:468
+ ____fput+0x20/0x58 fs/file_table.c:496
+ task_work_run+0x1b8/0x250 kernel/task_work.c:233
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
+ exit_to_user_mode_loop+0x110/0x188 kernel/entry/common.c:75
+ __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
+ exit_to_user_mode_prepare_legacy include/linux/irq-entry-common.h:242 [inline]
+ arm64_exit_to_user_mode arch/arm64/kernel/entry-common.c:81 [inline]
+ el0_svc+0x17c/0x238 arch/arm64/kernel/entry-common.c:725
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:743
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+Code: 54000420 b2481c28 d344fd09 d378fc28 (38696a89) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	54000420 	b.eq	0x84  // b.none
+   4:	b2481c28 	orr	x8, x1, #0xff00000000000000
+   8:	d344fd09 	lsr	x9, x8, #4
+   c:	d378fc28 	lsr	x8, x1, #56
+* 10:	38696a89 	ldrb	w9, [x20, x9] <-- trapping instruction
 
-	level 0: 0x180000
-	level 1: 0x181000
-	level 2: 0x187000
-	level 3: 0x188000
 
-All of them had already been re-mapped in stage 2 [*] (in the same 64KB
-physical page) before KVM started to emulate AT S1E2R. The AT_S1E1R
-(fast path) will successfully get the translation result and it's IMP
-DEF that whether an access flag fault will be triggered (QEMU chooses to
-not fault). Whatever, [*] is out of expect and result in the failure.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I have no idea that if we can actually force the slow emulation path.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Thanks,
-Zenghui
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> +		 *
-> +		 * This and clearing the access flag from host userspace
-> +		 * ensures that the access flag cannot be set speculatively
-> +		 * and is reliably cleared at the time of the AT instruction.
-> +		 */
-> +		clear_bit(__ffs(PTE_AF), ptep_hva);
-> +		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
-> +		break;
-> +	case TEST_ACCESS_FLAG:
-> +		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
-> +			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
-> +		break;
-> +	default:
-> +		TEST_FAIL("Unexpected SYNC arg: %lu", uc->args[1]);
-> +	}
-> +}
-> +
-> +static void run_test(struct kvm_vcpu *vcpu)
-> +{
-> +	struct ucall uc;
-> +
-> +	while (true) {
-> +		vcpu_run(vcpu);
-> +		switch (get_ucall(vcpu, &uc)) {
-> +		case UCALL_DONE:
-> +			return;
-> +		case UCALL_SYNC:
-> +			handle_sync(vcpu, &uc);
-> +			continue;
-> +		case UCALL_ABORT:
-> +			REPORT_GUEST_ASSERT(uc);
-> +			return;
-> +		default:
-> +			TEST_FAIL("Unexpeced ucall: %lu", uc.cmd);
-> +		}
-> +	}
-> +}
-> +
-> +int main(void)
-> +{
-> +	struct kvm_vcpu_init init;
-> +	struct kvm_vcpu *vcpu;
-> +	struct kvm_vm *vm;
-> +
-> +	TEST_REQUIRE(kvm_check_cap(KVM_CAP_ARM_EL2));
-> +
-> +	vm = vm_create(1);
-> +
-> +	kvm_get_default_vcpu_target(vm, &init);
-> +	init.features[0] |= BIT(KVM_ARM_VCPU_HAS_EL2);
-> +	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-> +	kvm_arch_vm_finalize_vcpus(vm);
-> +
-> +	virt_map(vm, TEST_ADDR, TEST_ADDR, 1);
-> +	ptep_hva = virt_get_pte_hva_at_level(vm, TEST_ADDR, 3);
-> +	run_test(vcpu);
-> +
-> +	kvm_vm_free(vm);
-> +	return 0;
-> +}
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index d3f3e455c031..41467dad9178 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -715,6 +715,7 @@ static inline bool vm_arch_has_protected_memory(struct kvm_vm *vm)
->  #endif
->  
->  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> +void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot);
->  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
->  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
->  struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 1a93d6361671..d6538bb17740 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -1201,6 +1201,16 @@ void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags)
->  		ret, errno, slot, flags);
->  }
->  
-> +void vm_mem_region_reload(struct kvm_vm *vm, uint32_t slot)
-> +{
-> +	struct userspace_mem_region *region = memslot2region(vm, slot);
-> +	struct kvm_userspace_memory_region2 tmp = region->region;
-> +
-> +	tmp.memory_size = 0;
-> +	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &tmp);
-> +	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
-> +}
-> +
->  /*
->   * VM Memory Region Move
->   *
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
