@@ -1,40 +1,35 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4B8377016
-	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 06:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C54E33987
+	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 08:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772433894; cv=none; b=OVwBbWeLkaZ0dz5gCTy6Ie4LKJMxCwYfT2VSZNgiZ52ARCBBxucPsrnxEksrsL1+eWylmTcwTh4Q6n6qKCnAdqeIGOdQf3AnoI2oLbnmc4+l/8s+rGCnUkcWfqVaF4ABGgC9iHChi8MpQdPmJwlKwvFLd24J+B886fyRxnskIkg=
+	t=1772439416; cv=none; b=phBQRahlmzYObXaLAYV4FiH1JWovKXU2XWMN//ZVWhQZ7SzwiyjuPXySfgzspF3UeB4arPqTvUjqmpdYVWVykPLJX+63HrN/+6XU3Ot16uplXs/W+quuJBQiyN7UGX9hrxiZHcYnWrVfTl1UkqDZueBYNAssRDiiv/lkm0sZ89w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772433894; c=relaxed/simple;
-	bh=UN3pyCCU7wkNfIR0JWZbTPuMXE5bTPcsbWaItp10y4U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VvnGo34wwoD16pM/Gt64sc9v8wcdS5o4vhDo5dGSdKSTYkssxUEvFvIiYak8RGJl7rJ9tFlu0utGT0XaenamoFeS9cFz/MJuXHa30qVTiUzcCTusJUfG9B0n4cA8hcp16CEjJyIn6c/h2aC/socSVyFvGjvNbVVqK0s3Is5A0qo=
+	s=arc-20240116; t=1772439416; c=relaxed/simple;
+	bh=gvBbCBgEcIFqDVI1QeEmkRwEf9oU0LqaFRQl2eyN+VU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fVn5VDOWQAaKSjq8hoXqndlHUXJh5b4T5tK62+5uX7kB1gvOhPPYBDUC4ZRrzRTXcRUTyhm0tfJrpXnyNxGTWOvCFI40cxvEBhJ02NtqGKvsXQrp1PMK/YYFJPuTD3pb2NR3kXTlJy0morFuwMYvMuQbhD01YnwOu3jViPwZKww=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A1DB1596;
-	Sun,  1 Mar 2026 22:44:45 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4125114BF;
+	Mon,  2 Mar 2026 00:16:47 -0800 (PST)
 Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C2EF63F7BD;
-	Sun,  1 Mar 2026 22:44:49 -0800 (PST)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1C6953F7BD;
+	Mon,  2 Mar 2026 00:16:51 -0800 (PST)
 From: Anshuman Khandual <anshuman.khandual@arm.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Subject: [PATCH V2 2/2] arm64/mm: Directly use TTBRx_EL1_CnP
-Date: Mon,  2 Mar 2026 06:44:37 +0000
-Message-Id: <20260302064437.2791034-3-anshuman.khandual@arm.com>
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Move inside all remaining TCR_XXX macros
+Date: Mon,  2 Mar 2026 08:16:46 +0000
+Message-Id: <20260302081646.2866370-1-anshuman.khandual@arm.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20260302064437.2791034-1-anshuman.khandual@arm.com>
-References: <20260302064437.2791034-1-anshuman.khandual@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -43,102 +38,138 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace all TTBR_CNP_BIT macro instances with TTBRx_EL1_CNP_BIT which
-is a standard field from tools sysreg format. Drop the now redundant
-custom macro TTBR_CNP_BIT. No functional change.
+Move all remaining TCR_XXX macros inside KVM specific header i.e kvm_arm.h
+for their continued usage in KVM, as there are no more stage-1 usage left.
 
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oupton@kernel.org>
+Cc: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
 Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h | 2 --
- arch/arm64/kernel/mte.c                | 4 ++--
- arch/arm64/kvm/hyp/nvhe/hyp-init.S     | 4 ++--
- arch/arm64/mm/context.c                | 2 +-
- arch/arm64/mm/mmu.c                    | 2 +-
- 5 files changed, 6 insertions(+), 8 deletions(-)
+This patch applies on v7.0-rc2
 
+https://lore.kernel.org/all/20251013052945.2197190-4-anshuman.khandual@arm.com/
+
+ arch/arm64/include/asm/kvm_arm.h       | 45 ++++++++++++++++++++++++++
+ arch/arm64/include/asm/pgtable-hwdef.h | 45 --------------------------
+ 2 files changed, 45 insertions(+), 45 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3f9233b5a130..a7bbf853100e 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -107,6 +107,51 @@
+ 
+ #define MPAMHCR_HOST_FLAGS	0
+ 
++#define TCR_T0SZ_MASK		TCR_EL1_T0SZ_MASK
++#define TCR_T1SZ_MASK		TCR_EL1_T1SZ_MASK
++
++#define TCR_EPD0_MASK		TCR_EL1_EPD0_MASK
++#define TCR_EPD1_MASK		TCR_EL1_EPD1_MASK
++
++#define TCR_IRGN0_MASK		TCR_EL1_IRGN0_MASK
++#define TCR_IRGN0_WBWA		(TCR_EL1_IRGN0_WBWA << TCR_EL1_IRGN0_SHIFT)
++
++#define TCR_ORGN0_MASK		TCR_EL1_ORGN0_MASK
++#define TCR_ORGN0_WBWA		(TCR_EL1_ORGN0_WBWA << TCR_EL1_ORGN0_SHIFT)
++
++#define TCR_SH0_MASK		TCR_EL1_SH0_MASK
++#define TCR_SH0_INNER		(TCR_EL1_SH0_INNER << TCR_EL1_SH0_SHIFT)
++
++#define TCR_SH1_MASK		TCR_EL1_SH1_MASK
++
++#define TCR_TG0_SHIFT		TCR_EL1_TG0_SHIFT
++#define TCR_TG0_MASK		TCR_EL1_TG0_MASK
++#define TCR_TG0_4K		(TCR_EL1_TG0_4K << TCR_EL1_TG0_SHIFT)
++#define TCR_TG0_64K		(TCR_EL1_TG0_64K << TCR_EL1_TG0_SHIFT)
++#define TCR_TG0_16K		(TCR_EL1_TG0_16K << TCR_EL1_TG0_SHIFT)
++
++#define TCR_TG1_SHIFT		TCR_EL1_TG1_SHIFT
++#define TCR_TG1_MASK		TCR_EL1_TG1_MASK
++#define TCR_TG1_16K		(TCR_EL1_TG1_16K << TCR_EL1_TG1_SHIFT)
++#define TCR_TG1_4K		(TCR_EL1_TG1_4K << TCR_EL1_TG1_SHIFT)
++#define TCR_TG1_64K		(TCR_EL1_TG1_64K << TCR_EL1_TG1_SHIFT)
++
++#define TCR_IPS_SHIFT		TCR_EL1_IPS_SHIFT
++#define TCR_IPS_MASK		TCR_EL1_IPS_MASK
++#define TCR_A1			TCR_EL1_A1
++#define TCR_ASID16		TCR_EL1_AS
++#define TCR_TBI0		TCR_EL1_TBI0
++#define TCR_TBI1		TCR_EL1_TBI1
++#define TCR_HA			TCR_EL1_HA
++#define TCR_HD			TCR_EL1_HD
++#define TCR_HPD0		TCR_EL1_HPD0
++#define TCR_HPD1		TCR_EL1_HPD1
++#define TCR_TBID0		TCR_EL1_TBID0
++#define TCR_TBID1		TCR_EL1_TBID1
++#define TCR_E0PD0		TCR_EL1_E0PD0
++#define TCR_E0PD1		TCR_EL1_E0PD1
++#define TCR_DS			TCR_EL1_DS
++
+ /* TCR_EL2 Registers bits */
+ #define TCR_EL2_DS		(1UL << 32)
+ #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
 diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index d49180bb7cb3..5e6809a462c7 100644
+index 5e6809a462c7..cd5571afd868 100644
 --- a/arch/arm64/include/asm/pgtable-hwdef.h
 +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -223,8 +223,6 @@
-  */
- #define S1_TABLE_AP		(_AT(pmdval_t, 3) << 61)
+@@ -229,51 +229,6 @@
+ #define TCR_T0SZ(x)		((UL(64) - (x)) << TCR_EL1_T0SZ_SHIFT)
+ #define TCR_T1SZ(x)		((UL(64) - (x)) << TCR_EL1_T1SZ_SHIFT)
  
--#define TTBR_CNP_BIT		(UL(1) << 0)
+-#define TCR_T0SZ_MASK		TCR_EL1_T0SZ_MASK
+-#define TCR_T1SZ_MASK		TCR_EL1_T1SZ_MASK
+-
+-#define TCR_EPD0_MASK		TCR_EL1_EPD0_MASK
+-#define TCR_EPD1_MASK		TCR_EL1_EPD1_MASK
+-
+-#define TCR_IRGN0_MASK		TCR_EL1_IRGN0_MASK
+-#define TCR_IRGN0_WBWA		(TCR_EL1_IRGN0_WBWA << TCR_EL1_IRGN0_SHIFT)
+-
+-#define TCR_ORGN0_MASK		TCR_EL1_ORGN0_MASK
+-#define TCR_ORGN0_WBWA		(TCR_EL1_ORGN0_WBWA << TCR_EL1_ORGN0_SHIFT)
+-
+-#define TCR_SH0_MASK		TCR_EL1_SH0_MASK
+-#define TCR_SH0_INNER		(TCR_EL1_SH0_INNER << TCR_EL1_SH0_SHIFT)
+-
+-#define TCR_SH1_MASK		TCR_EL1_SH1_MASK
+-
+-#define TCR_TG0_SHIFT		TCR_EL1_TG0_SHIFT
+-#define TCR_TG0_MASK		TCR_EL1_TG0_MASK
+-#define TCR_TG0_4K		(TCR_EL1_TG0_4K << TCR_EL1_TG0_SHIFT)
+-#define TCR_TG0_64K		(TCR_EL1_TG0_64K << TCR_EL1_TG0_SHIFT)
+-#define TCR_TG0_16K		(TCR_EL1_TG0_16K << TCR_EL1_TG0_SHIFT)
+-
+-#define TCR_TG1_SHIFT		TCR_EL1_TG1_SHIFT
+-#define TCR_TG1_MASK		TCR_EL1_TG1_MASK
+-#define TCR_TG1_16K		(TCR_EL1_TG1_16K << TCR_EL1_TG1_SHIFT)
+-#define TCR_TG1_4K		(TCR_EL1_TG1_4K << TCR_EL1_TG1_SHIFT)
+-#define TCR_TG1_64K		(TCR_EL1_TG1_64K << TCR_EL1_TG1_SHIFT)
+-
+-#define TCR_IPS_SHIFT		TCR_EL1_IPS_SHIFT
+-#define TCR_IPS_MASK		TCR_EL1_IPS_MASK
+-#define TCR_A1			TCR_EL1_A1
+-#define TCR_ASID16		TCR_EL1_AS
+-#define TCR_TBI0		TCR_EL1_TBI0
+-#define TCR_TBI1		TCR_EL1_TBI1
+-#define TCR_HA			TCR_EL1_HA
+-#define TCR_HD			TCR_EL1_HD
+-#define TCR_HPD0		TCR_EL1_HPD0
+-#define TCR_HPD1		TCR_EL1_HPD1
+-#define TCR_TBID0		TCR_EL1_TBID0
+-#define TCR_TBID1		TCR_EL1_TBID1
+-#define TCR_E0PD0		TCR_EL1_E0PD0
+-#define TCR_E0PD1		TCR_EL1_E0PD1
+-#define TCR_DS			TCR_EL1_DS
 -
  /*
-  * TCR flags.
+  * TTBR.
   */
-diff --git a/arch/arm64/kernel/mte.c b/arch/arm64/kernel/mte.c
-index 32148bf09c1d..eceead1686f2 100644
---- a/arch/arm64/kernel/mte.c
-+++ b/arch/arm64/kernel/mte.c
-@@ -315,8 +315,8 @@ void mte_cpu_setup(void)
- 	 * CnP is not a boot feature so MTE gets enabled before CnP, but let's
- 	 * make sure that is the case.
- 	 */
--	BUG_ON(read_sysreg(ttbr0_el1) & TTBR_CNP_BIT);
--	BUG_ON(read_sysreg(ttbr1_el1) & TTBR_CNP_BIT);
-+	BUG_ON(read_sysreg(ttbr0_el1) & TTBRx_EL1_CnP);
-+	BUG_ON(read_sysreg(ttbr1_el1) & TTBRx_EL1_CnP);
- 
- 	/* Normal Tagged memory type at the corresponding MAIR index */
- 	sysreg_clear_set(mair_el1,
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-index 0d42eedc7167..445eb0743af2 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-@@ -130,7 +130,7 @@ SYM_CODE_START_LOCAL(___kvm_hyp_init)
- 	ldr	x1, [x0, #NVHE_INIT_PGD_PA]
- 	phys_to_ttbr x2, x1
- alternative_if ARM64_HAS_CNP
--	orr	x2, x2, #TTBR_CNP_BIT
-+	orr	x2, x2, #TTBRx_EL1_CnP
- alternative_else_nop_endif
- 	msr	ttbr0_el2, x2
- 
-@@ -291,7 +291,7 @@ SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
- 	/* Install the new pgtables */
- 	phys_to_ttbr x5, x0
- alternative_if ARM64_HAS_CNP
--	orr	x5, x5, #TTBR_CNP_BIT
-+	orr	x5, x5, #TTBRx_EL1_CnP
- alternative_else_nop_endif
- 	msr	ttbr0_el2, x5
- 
-diff --git a/arch/arm64/mm/context.c b/arch/arm64/mm/context.c
-index 718c495832d0..0f4a28b87469 100644
---- a/arch/arm64/mm/context.c
-+++ b/arch/arm64/mm/context.c
-@@ -354,7 +354,7 @@ void cpu_do_switch_mm(phys_addr_t pgd_phys, struct mm_struct *mm)
- 
- 	/* Skip CNP for the reserved ASID */
- 	if (system_supports_cnp() && asid)
--		ttbr0 |= TTBR_CNP_BIT;
-+		ttbr0 |= TTBRx_EL1_CnP;
- 
- 	/* SW PAN needs a copy of the ASID in TTBR0 for entry */
- 	if (IS_ENABLED(CONFIG_ARM64_SW_TTBR0_PAN))
-diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index a6a00accf4f9..c22678769c37 100644
---- a/arch/arm64/mm/mmu.c
-+++ b/arch/arm64/mm/mmu.c
-@@ -2188,7 +2188,7 @@ void __cpu_replace_ttbr1(pgd_t *pgdp, bool cnp)
- 	phys_addr_t ttbr1 = phys_to_ttbr(virt_to_phys(pgdp));
- 
- 	if (cnp)
--		ttbr1 |= TTBR_CNP_BIT;
-+		ttbr1 |= TTBRx_EL1_CnP;
- 
- 	replace_phys = (void *)__pa_symbol(idmap_cpu_replace_ttbr1);
- 
 -- 
 2.30.2
 
