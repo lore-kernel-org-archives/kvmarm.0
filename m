@@ -1,56 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD023B8BD3
-	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 13:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFB03FFAB2;
+	Mon,  2 Mar 2026 14:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772459227; cv=none; b=A+7s7c1aZb/EkG/dMwoQ0qANOnivNRmXoabWIroDO+0CwcFYZPhVHJyZ7tneyN4t4X/AIfTk+mnJPOg+32s8s34ajFb7l0Ccz7dtFm5LKgQJSld73w/vlZWHh7bIxBYv8jec7fiosFtqowl4tZIQoBPhGc/xfQTOnTMRwyD2j9A=
+	t=1772461541; cv=none; b=fZagp3sBuQGS4uU3KetfnYA7h0UJABZLMEc89Ao91DbBPK7CendTr5np73d+FyjVnozILEO+lTIu/Gpsq89/JAUvIXOClFuDuXsO+RkJVCvZ8b7Ggnp4ThYppckmNVFYdtnq56zWj3iozsGJLFzHzHBwU1Jw5I4EPGNXl9xOBsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772459227; c=relaxed/simple;
-	bh=fnrVuWdCxiQ73UQl0XAvQdItKVM2mxC6yCuvV6oynm0=;
+	s=arc-20240116; t=1772461541; c=relaxed/simple;
+	bh=5XDiqS4aSa5oC2UuISF+9AW9hAYh/GZv5E3lc65T4uc=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=juJh1Xjwmg+BaPDgeX2jlwgQjwJGUqvijMjd6eebkRzLtHaZ2urkpjo3gwNWXq3Gj79OqgbwDezw6oTbA/s3tIyOtuB0/B2A3s2KkfUJqfwkPomGzzHShI7OQIp0YkDdSArtDnjZsiDt0eT3SqUXFCANs2WbUX+tlG1kcvP/wwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ft6G2wfY; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ikOUjtwzyKdzE40wTJhL5RxHnMm3XYZrnktJ+w9bMftCvUpinpQvGjQ4FW0TMtHPO+6FIDHu+2t/5xkGyVQGnM2MWoJFaXhV9EKkI+HeqD1TvnaIVSlfIpJYEH/gt1Fiv8Cp7Sve2jSo2Zp/zGZ8aRBlT5Q6fiHmmZV0EeVvA6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOFMmDn8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ft6G2wfY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1F62C19423;
-	Mon,  2 Mar 2026 13:47:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOFMmDn8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB7C0C19423;
+	Mon,  2 Mar 2026 14:25:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772459227;
-	bh=fnrVuWdCxiQ73UQl0XAvQdItKVM2mxC6yCuvV6oynm0=;
+	s=k20201202; t=1772461540;
+	bh=5XDiqS4aSa5oC2UuISF+9AW9hAYh/GZv5E3lc65T4uc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ft6G2wfYSdskF14l0dwOvUhz1/6cInbe/5QeqkwionvHwINWGx4ykj/puuh+ng8Oj
-	 QP/czaYRKio4y0JKiFOQlD4QA8u18c4HOS3KQ6nav1o5p01zDQsy1wjrUI2eFVhmLe
-	 2IEAnmnTYM8ZB2xWK5b/em68nFEuozWjwFov9CLjxdmkGbm+Uh6yhF/+Gh0IswGVX9
-	 nn5F7Vv6rEhSP/YUsQ3XR+HPEdjCkxISl/kN6dT3juZEaUNMpobPrshVOv2CKfIFrH
-	 ZbGy3f4/i3Mx3Q6TBY+gLlQUrmKTDpALFNKQHlZvauC4RqSlgThXelNEm629AdG5sw
-	 PDxgD6sEBnErA==
+	b=oOFMmDn87wu4l7gzys50haVeiBkImmxEMtScj3uKhiIYYZtOnPd5AP8biFi62yFHS
+	 d681BrkYEuw4CE0DQW7uvmFT2ehaO/i4KgCx6LJKN7a5XM93dNqEj2eGTiotJAXruG
+	 J6m2hl+rq7UFPISzpOqDDGCTxnwqiR3ekewREzTGWF4zIX98fpkc+MPgG8+RkclSpe
+	 8sAvMxRNy4ajTIjIb08oh1xYVy/AqJOgll9q9GyvfuOXmPMnJX2DdtfY9wSQpQHdoz
+	 mBgATrDb1vm3H44DFllUC7N/mylvQoi+mchHoZVRNwtZG9B8b0tUUY/mw9lBgkQ8JM
+	 ef9+kMXGFeW+g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vx3c0-0000000FFxs-30fx;
-	Mon, 02 Mar 2026 13:47:04 +0000
-Date: Mon, 02 Mar 2026 13:47:04 +0000
-Message-ID: <86v7fe8ht3.wl-maz@kernel.org>
+	id 1vx4DK-0000000FGwW-21PP;
+	Mon, 02 Mar 2026 14:25:38 +0000
+Date: Mon, 02 Mar 2026 14:25:37 +0000
+Message-ID: <86tsuy8g0u.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: linux-arm-kernel@lists.infradead.org,
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
-	Will Deacon <will@kernel.org>,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 01/11] arm64: Skip update of an idreg field affected by an override
-In-Reply-To: <CA+EHjTw+zpNyAnsJsxFYxH5RiH2f_jNR0E_Zz5hnegzfy9Mh-g@mail.gmail.com>
-References: <20260302115653.1517326-1-maz@kernel.org>
-	<20260302115653.1517326-2-maz@kernel.org>
-	<CA+EHjTwYhdjfmZxyW4yjfOaokNdVGkHB1h6Qb9O-4D_3f1a-Jw@mail.gmail.com>
-	<CA+EHjTw+zpNyAnsJsxFYxH5RiH2f_jNR0E_Zz5hnegzfy9Mh-g@mail.gmail.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+	Gavin Shan <gshan@redhat.com>,
+	Shanker Donthineni <sdonthineni@nvidia.com>,
+	Alper Gun <alpergun@google.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+	Emi Kisanuki <fj0570is@fujitsu.com>,
+	Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
+In-Reply-To: <20251217101125.91098-7-steven.price@arm.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+	<20251217101125.91098-7-steven.price@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -62,40 +73,120 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 02 Mar 2026 13:14:15 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Wed, 17 Dec 2025 10:10:43 +0000,
+Steven Price <steven.price@arm.com> wrote:
 > 
-> On Mon, 2 Mar 2026 at 13:05, Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > On Mon, 2 Mar 2026 at 11:57, Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > When computing the new value od an idreg that contains a field
-> >
-> > nit: od->of
-> >
-> > > affected by an override, do not update that particular field.
-> > >
-> > > The value computed at init-time must be kept as-is, as that's
-> > > what the user has asked for, for better or worse.
-> > >
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> There is one CAP which identified the presence of CCA, and two ioctls.
+> One ioctl is used to populate memory and the other is used when user
+> space is providing the PSCI implementation to identify the target of the
+> operation.
 > 
-> Another nit, should you add a fixes tag, since this flaw is tired to
-> the original override facility? i.e.,
-> 8f266a5d878a ("arm64: cpufeature: Add global feature override facility").
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v11:
+>  * Completely reworked to be more implicit. Rather than having explicit
+>    CAP operations to progress the realm construction these operations
+>    are done when needed (on populating and on first vCPU run).
+>  * Populate and PSCI complete are promoted to proper ioctls.
+> Changes since v10:
+>  * Rename symbols from RME to RMI.
+> Changes since v9:
+>  * Improvements to documentation.
+>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+> Changes since v8:
+>  * Minor improvements to documentation following review.
+>  * Bump the magic numbers to avoid conflicts.
+> Changes since v7:
+>  * Add documentation of new ioctls
+>  * Bump the magic numbers to avoid conflicts
+> Changes since v6:
+>  * Rename some of the symbols to make their usage clearer and avoid
+>    repetition.
+> Changes from v5:
+>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+> ---
+>  Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h       | 23 ++++++++++++++
+>  2 files changed, 80 insertions(+)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 01a3abef8abb..2d5dc7e48954 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6517,6 +6517,54 @@ the capability to be present.
+>  
+>  `flags` must currently be zero.
+>  
+> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
+> +------------------------------------
+> +
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vcpu ioctl
+> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
+> +:Returns: 0 if successful, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmi_psci_complete {
+> +	__u64 target_mpidr;
+> +	__u32 psci_status;
+> +	__u32 padding[3];
+> +  };
+> +
+> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+> +the target of the operation using `target_mpidr`, along with the status
+> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+> +
+> +If the kernel is handling PSCI then this is done automatically and the VMM
+> +doesn't need to call this ioctl.
 
-Yup, good point.
+Shouldn't we make handling of PSCI mandatory for VMMs that deal with
+CCA? I suspect it would simplify the implementation significantly.
 
->
-> > Reviewed-by: Fuad Tabba <tabba@google.com>
+What vcpu fd does this apply to? The vcpu calling the PSCI function?
+Or the target? This is pretty important for PSCI_ON. My guess is that
+this is setting the return value for the caller?
 
-Thanks!
+Assuming this is indeed for the caller, why do we have a different
+flow from anything else that returns a result from a hypercall?
+
+> +
+> +4.145 KVM_ARM_RMI_POPULATE
+> +--------------------------
+> +
+> +:Capability: KVM_CAP_ARM_RMI
+> +:Architectures: arm64
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_arm_rmi_populate (in)
+> +:Returns: number of bytes populated, < 0 on error
+> +
+> +::
+> +
+> +  struct kvm_arm_rmi_populate {
+> +	__u64 base;
+> +	__u64 size;
+> +	__u64 source_uaddr;
+> +	__u32 flags;
+> +	__u32 reserved;
+> +  };
+> +
+> +Populate a region of protected address space by copying the data from the user
+> +space pointer provided. This is only valid before any VCPUs have been run.
+> +The ioctl might not populate the entire region and user space may have to
+> +repeatedly call it (with updated pointers) to populate the entire region.
+
+size as a __u64 is odd, as the return value from the ioctl is a signed
+int. This implies that you can't really report how many bytes you have
+copied.  Some form of consistency wouldn't hurt.
+
+Thanks,
 
 	M.
 
