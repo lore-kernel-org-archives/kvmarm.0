@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D3022157B;
-	Mon,  2 Mar 2026 15:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9886741C0D8;
+	Mon,  2 Mar 2026 16:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772465034; cv=none; b=qN2+JaUeHB4FlpVWZirPNBlakfvse7w4VLAgU+6OtpHLoBnBuBDeTugOwJlUE6i6nL/qQolGGnEYRIUOkOhjVjmuTgAl7aHZNS61FWT6P4dcAt+T3OApVQ0kjjJdGLCl3OB0IPyFZyTSkb67mQTjYRyWvtRBuJtaFsgsqsPUzVo=
+	t=1772469072; cv=none; b=d8kpniTSZuXbs2ggOAGHM+hFZJYHDyN5M30VR0mQRPs5fJ7zOY4wSSqrRNYwaNTHvmo4oDzanpZdje0qskVWNSyiyNKh1vZ8YMcw6R1/6UduIoRR1CEBGY7ybHVlI7aROYDc/yo2wPSzE2VIpQ4Rn5rAfRsr5OKNptdj3is5wVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772465034; c=relaxed/simple;
-	bh=tLCuqa+/nT1cfOuo1J57XX9pR1rNtyqiOT6GDPiNeCM=;
+	s=arc-20240116; t=1772469072; c=relaxed/simple;
+	bh=zErPL7VBbMbbTJrwfpfbSDU6peIxWnzNCPeBJRC+JTQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lae8gMm7ELOTOuF50f2GI8HlZb6CNDL8mFjqQXjjdnFjt6G6HjSTvDzalq0fRbM4061pE8B3FOhgLz3ZVwO5Q7845Pg+G3LYpFI9f4UsM6+OfzY+mlzBdDwU9MKWk8sncPY5gK832QExWZNGTzrbp5wPuhiH7p048uRf3fuH8fU=
+	 In-Reply-To:Content-Type; b=CKsKgGYeiyCzq/ANlnRjl9ajL1PsPRqrxjATJgFozlVvZd0ICuCDAP+lNebBE1q8GwaMw/9JIQSB4lyr1GO5QVLPU/6crU9ejuQpz6P5N4AiL20gDJlxeJbdRL0LvbyRtcA2WwMvv+brG1KEfT2RchR9uT/biQ9jBiW/ITlq59Y=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00BD11477;
-	Mon,  2 Mar 2026 07:23:46 -0800 (PST)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2BB8114BF;
+	Mon,  2 Mar 2026 08:31:01 -0800 (PST)
 Received: from [10.57.55.216] (unknown [10.57.55.216])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6E7F3F73B;
-	Mon,  2 Mar 2026 07:23:46 -0800 (PST)
-Message-ID: <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-Date: Mon, 2 Mar 2026 15:23:44 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5FEBE3F694;
+	Mon,  2 Mar 2026 08:31:03 -0800 (PST)
+Message-ID: <92fe1041-e8fe-4015-8e3b-872cbcce66a2@arm.com>
+Date: Mon, 2 Mar 2026 16:31:00 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,7 +27,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
+Subject: Re: [PATCH v12 11/46] arm64: RMI: Activate realm on first VCPU run
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -44,152 +44,147 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
+ <20251217101125.91098-12-steven.price@arm.com> <86seai8fbd.wl-maz@kernel.org>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <86tsuy8g0u.wl-maz@kernel.org>
+In-Reply-To: <86seai8fbd.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Marc,
-
-On 02/03/2026 14:25, Marc Zyngier wrote:
-> On Wed, 17 Dec 2025 10:10:43 +0000,
+On 02/03/2026 14:40, Marc Zyngier wrote:
+> On Wed, 17 Dec 2025 10:10:48 +0000,
 > Steven Price <steven.price@arm.com> wrote:
 >>
->> There is one CAP which identified the presence of CCA, and two ioctls.
->> One ioctl is used to populate memory and the other is used when user
->> space is providing the PSCI implementation to identify the target of the
->> operation.
+>> When a VCPU migrates to another physical CPU check
+> 
+> To another physical CPU?
+> 
+> That's not what kvm_arch_vcpu_run_pid_change() tracks. It really is
+> limited to a new PID being associated to the vpcu thread. Which is
+> indeed the case when the vpcu runs for the first time, but that's
+> about it.
+> 
+> If you need to track the physical CPU, we have some tracking for it in
+> vcpu_load(), but that'd need some rework.
+
+Sorry that was just a complete brainfart when I wrote that commit
+message. We don't care about physical CPUs - this is just catching the
+first VCPU run. Thanks for catching that.
+
+>> if this is the first
+>> time the guest has run, and if so activate the realm.
+>>
+>> Before the realm can be activated it must first be created, this is a
+>> stub in this patch and will be filled in by a later patch.
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> Changes since v11:
->>  * Completely reworked to be more implicit. Rather than having explicit
->>    CAP operations to progress the realm construction these operations
->>    are done when needed (on populating and on first vCPU run).
->>  * Populate and PSCI complete are promoted to proper ioctls.
->> Changes since v10:
->>  * Rename symbols from RME to RMI.
->> Changes since v9:
->>  * Improvements to documentation.
->>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->> Changes since v8:
->>  * Minor improvements to documentation following review.
->>  * Bump the magic numbers to avoid conflicts.
->> Changes since v7:
->>  * Add documentation of new ioctls
->>  * Bump the magic numbers to avoid conflicts
->> Changes since v6:
->>  * Rename some of the symbols to make their usage clearer and avoid
->>    repetition.
->> Changes from v5:
->>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>> New patch for v12
 >> ---
->>  Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
->>  include/uapi/linux/kvm.h       | 23 ++++++++++++++
->>  2 files changed, 80 insertions(+)
+>>  arch/arm64/include/asm/kvm_rmi.h |  1 +
+>>  arch/arm64/kvm/arm.c             |  6 +++++
+>>  arch/arm64/kvm/rmi.c             | 42 ++++++++++++++++++++++++++++++++
+>>  3 files changed, 49 insertions(+)
 >>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 01a3abef8abb..2d5dc7e48954 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6517,6 +6517,54 @@ the capability to be present.
+>> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+>> index cb7350f8a01a..e4534af06d96 100644
+>> --- a/arch/arm64/include/asm/kvm_rmi.h
+>> +++ b/arch/arm64/include/asm/kvm_rmi.h
+>> @@ -69,6 +69,7 @@ void kvm_init_rmi(void);
+>>  u32 kvm_realm_ipa_limit(void);
 >>  
->>  `flags` must currently be zero.
+>>  int kvm_init_realm_vm(struct kvm *kvm);
+>> +int kvm_activate_realm(struct kvm *kvm);
+>>  void kvm_destroy_realm(struct kvm *kvm);
+>>  void kvm_realm_destroy_rtts(struct kvm *kvm);
 >>  
->> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
->> +------------------------------------
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 941d1bec8e77..542df37b9e82 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -951,6 +951,12 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>>  			return ret;
+>>  	}
+>>  
+>> +	if (kvm_is_realm(vcpu->kvm)) {
+>> +		ret = kvm_activate_realm(kvm);
+>> +		if (ret)
+>> +			return ret;
+>> +	}
 >> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vcpu ioctl
->> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
->> +:Returns: 0 if successful, < 0 on error
+>>  	mutex_lock(&kvm->arch.config_lock);
+>>  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+>>  	mutex_unlock(&kvm->arch.config_lock);
+>> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+>> index e57e8b7eafa9..98929382c365 100644
+>> --- a/arch/arm64/kvm/rmi.c
+>> +++ b/arch/arm64/kvm/rmi.c
+>> @@ -223,6 +223,48 @@ void kvm_realm_destroy_rtts(struct kvm *kvm)
+>>  	WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
+>>  }
+>>  
+>> +static int realm_ensure_created(struct kvm *kvm)
+>> +{
+>> +	/* Provided in later patch */
+>> +	return -ENXIO;
+>> +}
 >> +
->> +::
+>> +int kvm_activate_realm(struct kvm *kvm)
+>> +{
+>> +	struct realm *realm = &kvm->arch.realm;
+>> +	int ret;
 >> +
->> +  struct kvm_arm_rmi_psci_complete {
->> +	__u64 target_mpidr;
->> +	__u32 psci_status;
->> +	__u32 padding[3];
->> +  };
->> +
->> +Where PSCI functions are handled by user space, the RMM needs to be informed of
->> +the target of the operation using `target_mpidr`, along with the status
->> +(`psci_status`). The RMM v1.0 specification defines two functions that require
->> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
->> +
->> +If the kernel is handling PSCI then this is done automatically and the VMM
->> +doesn't need to call this ioctl.
+>> +	if (!kvm_is_realm(kvm))
+>> +		return -ENXIO;
 > 
-> Shouldn't we make handling of PSCI mandatory for VMMs that deal with
-> CCA? I suspect it would simplify the implementation significantly.
+> nit: you already checked for this in caller.
 
-What do you mean by making it "mandatory for VMMs"? If you mean PSCI is
-always forwarded to user space then I don't think it's going to make
-much difference. Patch 27 handles the PSCI changes (72 lines added), and
-some of that is adding this uAPI for the VMM to handle it.
-
-Removing the functionality to allow the VMM to handle it would obviously
-simplify things a bit (we can drop this uAPI), but I think the desire is
-to push this onto user space.
-
-> What vcpu fd does this apply to? The vcpu calling the PSCI function?
-> Or the target? This is pretty important for PSCI_ON. My guess is that
-> this is setting the return value for the caller?
-
-Yes the fd is the vcpu calling PSCI. As you say, this is for the return
-value to be set correctly.
-
-> Assuming this is indeed for the caller, why do we have a different
-> flow from anything else that returns a result from a hypercall?
-
-I'm not entirely sure what you are suggesting. Do you mean why are we
-not just writing to the GPRS that would contain the result? The issue
-here is that the RMM needs to know the PA of the target REC structure -
-this isn't a return to the guest, but information for the RMM itself to
-complete the PSCI call.
-
-Ultimately even in the case where the VMM is handling PSCI, it's
-actually a combination of the VMM and the RMM - with the RMM validating
-the responses.
+Ack
 
 >> +
->> +4.145 KVM_ARM_RMI_POPULATE
->> +--------------------------
->> +
->> +:Capability: KVM_CAP_ARM_RMI
->> +:Architectures: arm64
->> +:Type: vm ioctl
->> +:Parameters: struct kvm_arm_rmi_populate (in)
->> +:Returns: number of bytes populated, < 0 on error
->> +
->> +::
->> +
->> +  struct kvm_arm_rmi_populate {
->> +	__u64 base;
->> +	__u64 size;
->> +	__u64 source_uaddr;
->> +	__u32 flags;
->> +	__u32 reserved;
->> +  };
->> +
->> +Populate a region of protected address space by copying the data from the user
->> +space pointer provided. This is only valid before any VCPUs have been run.
->> +The ioctl might not populate the entire region and user space may have to
->> +repeatedly call it (with updated pointers) to populate the entire region.
+>> +	if (kvm_realm_state(kvm) == REALM_STATE_ACTIVE)
+>> +		return 0;
 > 
-> size as a __u64 is odd, as the return value from the ioctl is a signed
-> int. This implies that you can't really report how many bytes you have
-> copied.  Some form of consistency wouldn't hurt.
+> You probably also want to return early once the realm has been marked
+> as dead -- it shouldn't be able to be a zombie and die twice.
 
-Good spot. In practice this works because >2GB in one operation is
-highly unlikely to be processed in one go. But I guess I'll change this
-to have an output size argument. I guess I could make the kernel update
-all of base,size,source_uaddr which would simplify user space.
+Indeed, >= would be a better check.
 
 Thanks,
 Steve
+
+>> +
+>> +	guard(mutex)(&kvm->arch.config_lock);
+>> +	/* Check again with the lock held */
+>> +	if (kvm_realm_state(kvm) == REALM_STATE_ACTIVE)
+>> +		return 0;
+>> +
+>> +	ret = realm_ensure_created(kvm);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* Mark state as dead in case we fail */
+>> +	WRITE_ONCE(realm->state, REALM_STATE_DEAD);
+>> +
+>> +	if (!irqchip_in_kernel(kvm)) {
+>> +		/* Userspace irqchip not yet supported with realms */
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +
+>> +	ret = rmi_realm_activate(virt_to_phys(realm->rd));
+>> +	if (ret)
+>> +		return -ENXIO;
+>> +
+>> +	WRITE_ONCE(realm->state, REALM_STATE_ACTIVE);
+>> +	return 0;
+>> +}
+>> +
+>>  void kvm_destroy_realm(struct kvm *kvm)
+>>  {
+>>  	struct realm *realm = &kvm->arch.realm;
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
