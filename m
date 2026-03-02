@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401B123BD1D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4013B1E98FF
 	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 11:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772452635; cv=none; b=uldVRX8aKW1nqB7yD76imSNI57t9i5jkfV4jLMf+JiVogID3to8loSGbs6upQzrN9sQPSaS119DyjpSvUU7SA8NxBoRPMLHTAhtSkWPb3JLSS8dKw+OP4Kkf4DCTtb0OI7SeBdFaMvaj8ZdxTdZSgMZGDNf5rPZzLDXD19ihs5I=
+	t=1772452635; cv=none; b=IDKTnLw0xkazfNbCemPH5/h6Y//if4Ht96h7orV1heysAzZEqldzYbK6vjymq5exO9HODhhwejhK5W1QT+0kvQ2v0SdJllffkfZpm3NzlPHvBq6ffuE/+xIOEBP247iZlWUnxrb+YFe3UiGxgTwgzqn9M/5oS76zdztYlosv+qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1772452635; c=relaxed/simple;
-	bh=c49Vj6dYxBjCUX5m63Z1mVVfVLMWdQ22PCQzSa8wfQ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KJyIjlwxXzYHI4CbtKiGBfa/+OpIgiPwRC/vffcgWJv70nK3Vt2+nl4VnpGWNRlG2jWdVP5cM7tSYbamhU9Ub6cd40/o+mwg2aHfHhPW2CsVZiqcmYJ2nEfl2RpkwrADqyx+gtj1p22JToXYYQaMpxl5v+9xGANEbCDSDsXo+/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVmCX3Io; arc=none smtp.client-ip=10.30.226.201
+	bh=XYv2uFoCScsWY4QYL23fib7a+k78PtSH2Bqah2U4qNs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rcnhmI/i697l9SJZYummd9UKwfKzKIcbYWQPqgn1BRPcP1CRVAj159Z+pY79WRID/IwvllIpyvf1kgbeEo915uOOKXW/e5fZEgfGWRVd6tn1wVGn82hnWh5nBPmiBHHUvWmJAq/lBwF4P4KPzT1KGDQLwmckuEzEw7w/ROrw6k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+oRTm/3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVmCX3Io"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7764C19423;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+oRTm/3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEFA4C2BC86;
 	Mon,  2 Mar 2026 11:57:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772452634;
-	bh=c49Vj6dYxBjCUX5m63Z1mVVfVLMWdQ22PCQzSa8wfQ8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UVmCX3IoDgCmqpqpmjBui/OrryISQMxnOSAkik4i17ixpSSw2tiNjZ1t/gsIRzcCb
-	 84gB8YdIaCncB9PIEo23HzIKTvZiPKuSqGlZRpjvSmWVrQC6edK6rNp1mUknBpcf2o
-	 8kcovZ+SSoYDGq6EksYR4DOc22uQMWubcoKpFTOAqcHpOkQyDp0hBSGtr8bNbDApKM
-	 Aqjn6BtI7I9NFiTAniRhnaaYqBVKYZ0NktGpjF5Oj7sQ+/K+rPauDr9PDFEaR4Nrpu
-	 3URiicXMHyeWxv9rR6XQuq8PFOnsNlvpsms8DOzfNH/MordQ5MxNduJ3qpwfT3bowo
-	 Bp6hVzQUfoa1Q==
+	s=k20201202; t=1772452635;
+	bh=XYv2uFoCScsWY4QYL23fib7a+k78PtSH2Bqah2U4qNs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s+oRTm/38BZES5QNRLH3fG9evg+VNxa5AvoUru8iuxu2hhxUFF6AWHo0x1LmMpel7
+	 I5lQ4sQs5Veyh+uSJVkOW4vdnpKuytDq7NoZwH+FBiT46IYv32SDyEEPGsJ1+AP/24
+	 FooeLWS5Mu2X9ZaJf5oG/+boZt32AT87z0TbWogRe18lwKRihnE5Lsk+GSmuVB3Dat
+	 h/3AQ2AQiPN2oEj1BAUg0liT/cf5g2ElDse/w7cbXAr8ZUfZHlOV0e+6eRHTVOieRP
+	 riJ+K+d48O9FQi/+GWGgGoKcndRRyQzwu/+s28KXHuxRP8yCR+VsLQ07XLcKFlJ1K6
+	 gwoSsD38w5vbQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vx1tg-0000000FDFJ-3ap5;
-	Mon, 02 Mar 2026 11:57:12 +0000
+	id 1vx1th-0000000FDFJ-0OkR;
+	Mon, 02 Mar 2026 11:57:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev
@@ -42,10 +43,12 @@ Cc: Fuad Tabba <tabba@google.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v2 00/11] arm64: Fully disable configured-out features
-Date: Mon,  2 Mar 2026 11:56:41 +0000
-Message-ID: <20260302115653.1517326-1-maz@kernel.org>
+Subject: [PATCH v2 01/11] arm64: Skip update of an idreg field affected by an override
+Date: Mon,  2 Mar 2026 11:56:42 +0000
+Message-ID: <20260302115653.1517326-2-maz@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260302115653.1517326-1-maz@kernel.org>
+References: <20260302115653.1517326-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -58,43 +61,35 @@ X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This is v2 of this series attempting at making the handling of
-features that are disabled at compile time a bit less awkward for
-non-userspace consumers of the sanitised feature bits.
+When computing the new value od an idreg that contains a field
+affected by an override, do not update that particular field.
 
-A few things have changed, thanks to Fuad and Suzuki spending time on
-reviewing this, but the overall behaviour is the same.
+The value computed at init-time must be kept as-is, as that's
+what the user has asked for, for better or worse.
 
-* From v1 [1]:
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/cpufeature.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-  - Mark ALL_HIDDEN and HIGHER_SAFE as incompatible
-
-  - Don't update a feature that is ALL_HIDDEN (or overridden) on the
-    secondary boot path
-
-  - Reduce the size of struct arm64_ftr_bits
-
-  - Add a helper for setting a field to its safe value
-
-[1] https://lore.kernel.org/r/20260219195533.2455736-1-maz@kernel.org
-
-Marc Zyngier (11):
-  arm64: Skip update of an idreg field affected by an override
-  arm64: Add a helper setting a feature field to its safe value
-  arm64: Add logic to fully remove features from sanitised id registers
-  arm64: Convert CONFIG_ARM64_PTR_AUTH to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_SVE to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_SME to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_GCS to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_MTE to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_POE to FTR_CONFIG()
-  arm64: Convert CONFIG_ARM64_BTI to FTR_CONFIG()
-  arm64: Remove FTR_VISIBLE_IF_IS_ENABLED()
-
- arch/arm64/include/asm/cpufeature.h |  15 +--
- arch/arm64/kernel/cpufeature.c      | 141 +++++++++++++++++-----------
- 2 files changed, 94 insertions(+), 62 deletions(-)
-
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index c31f8e17732a3..28fc77443ccd3 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1224,6 +1224,13 @@ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+ 		s64 ftr_cur = arm64_ftr_value(ftrp, reg->sys_val);
+ 		s64 ftr_new = arm64_ftr_value(ftrp, new);
+ 
++		/*
++		 * Don't alter the initial value that has been forced
++		 * by an override.
++		 */
++		if ((reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
++			continue;
++
+ 		if (ftr_cur == ftr_new)
+ 			continue;
+ 		/* Find a safe value */
 -- 
 2.47.3
 
