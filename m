@@ -1,140 +1,195 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19364430B80
-	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 15:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772464523; cv=pass; b=uGy3NWpR9ih+a2zImW7QDBRPsR12VanEJe9IrK63eFiJY43q9gf7ihPU1TS5FGaEovJDjIcEipQrmKYjx8iqCMMJfqdW20ylmY/MNi7HW+3BEQftMmboD0cHsaEF3CVv3yxUVZrWk3/Kzqy71F7IcVS2LOHeAyhXf1mAj1Hr2aQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772464523; c=relaxed/simple;
-	bh=zeTY1NdsVGYIT2vQ8NBlQAWWArF7FJ4q8Bx3XfXzfic=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ISzvSjfmsCm5KvRNUrCmjJZGf2oyt4ceENGHRB7Dqk7GmzGzBuy+PyN8NrkrO58yW+eIzKMUPjRmLbQNjOIHlzXiplh+pg6Ff2WKL8CzcXaFHV2SjUQBW1qc1uSczLXD4boo8mrxiOstayaHgqE9jqKDmgtBpxhXY4P4/bPxDKk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MFIH8RhF; arc=pass smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MFIH8RhF"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-5033b64256dso1052121cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 02 Mar 2026 07:15:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772464521; cv=none;
-        d=google.com; s=arc-20240605;
-        b=NykqYiNQqkDfQcQuuM2ttGtgDO/cctUUEOdx5bcxjIVtGoTHZf+UHqbgxsb+Xqsn4P
-         z5cz6otuKWot6fKJ1e2Z5iCAWzkx62T0yT0jUTNzbhwFNycWQ8pEr+mJQoTskUKN8OxJ
-         sj9DNoII0dz4WOJGXIdh/uDbpkzyad7dqZKAMurXsB+fetuNvM5kxRG6nDXZH51+jQpt
-         xQRCo8Opkg6Q+XTfUww4ELbpM87SRS7y9Lp24bUDrjXCm0b22ZiwmWeqQCSCC1Q39Hjj
-         ALuKnfbKMemRh1DIM9LKUXu6K1byIvlMD2CESi/feIMKzTQ4MDaqBvi0GNwIR/fWq0wl
-         jnew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=XLhMi12c9hilSx0fJ9MNNmOkG5ZaJ8A8J3vzxrBi+l8=;
-        fh=msM4GJ8GVq02FkV37u7Pte8TO9+owyvbTqmnmF+rfwE=;
-        b=Rkp3XUxC4XiJUHPWL4IeNl1sV2kUIkebfyUF168SWIgwAwbIck6tHljCAOIyPK2o58
-         TJ85IkuTemBZ/XOy3p0c68kvPDpu9DfRM3Q7Bhhuqk2SpnXkq+IW6pm51ou9WYSejcFn
-         95s/ohqh3ErpuxVCYaqbzrKD2EHGZeCYVqDUGQJyJCE2Za5mdVQpXLIjMBJ4Lu9Lfnn1
-         U+AadtqP2SK3ditYOte31Sl4gpFMoEjS3e3jJb92nlVXqhXeeUCsEk69shaFWq/BhR1E
-         OxOVKSU6lc7B8lOZjkpyC+Z1mWrZtXglp64M04yZ+eZYYfYuHJqgJ4+m+xSRbu0syjf3
-         SYlg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772464521; x=1773069321; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XLhMi12c9hilSx0fJ9MNNmOkG5ZaJ8A8J3vzxrBi+l8=;
-        b=MFIH8RhF5reyghCGqLcs+nt6TAC26KlGdFAbEC84h+QsSTsNAN+qgBCxHmt/Ey8YgB
-         JWgPN7XPWQwAqxsr+8qUejGKbkMPsJXE7j4xc2QfH4aK8dBm2bH6rNkfcbagtnqjqNmB
-         vDELprlpSWLndm+Jc0wvnBWjCKGbUJLwxb+7JmO2gmEgszE0drYelGybQ+au3lhdJyAd
-         8CykMezxtklh1HBp9ofkdtsVc/HP+oMzqOdjHrm0gBXyudS+sJGBLlIOT0BlfNuPBUBm
-         gj/uvgADplksbpN1MgNihOxcRxFlmqWhaWyT4sX6Gay+fXd2OmUs0JV6QRH7T+ATiCqc
-         4F+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772464521; x=1773069321;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XLhMi12c9hilSx0fJ9MNNmOkG5ZaJ8A8J3vzxrBi+l8=;
-        b=Es86kHMNOCX1m2yg2KVwP1QiJLfda89YE4NQadP2SsSKyBhALmOxTEwQN07hF4zfTh
-         EDuGhTKQQb6LkCYdBZyI4EBQZy17u7gqM45IxFd2WIGiLxWKV5dHhy4uFm7vo4scgkCa
-         GQRuW09LzKrDIPSM2O3m9h+oXeJ9WLXs/FE8vFK5YzRYmO47o2koLyBiZe9zfq+3Avfz
-         u8No7izpvwUc2zl53M3OyzzJWC3aG+0c9gCMX7hpn4RloiyBxI8ShbMfBtKy+Jo8fHvA
-         RGBdEbfVDARz4x5bOnyMTzbGvk0fHZWfTWKjiaJauNilsiJxs2w7DHhEOJa1gdu2zRYp
-         +96g==
-X-Forwarded-Encrypted: i=1; AJvYcCUNXESaaWtjtrglkAYzgZnaF1pwiNgTH1MWnWvztDGNQ6YO7BPtPZo9SNgeDu707Ai5aBdpStI=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyKy5/7v/UyHslCoygLFh64nFjJXo+HMclU5TN1S1Etk03eHQBM
-	BpYqpvuBmmdVY4UyP5xc1r6HWSjFgyHmTOHkripBPLMKYhLB0EDj95jUuJKOCcgGY78FjqyY5Bp
-	LsZBDL5AM3GcMTauzz4xDntwyw5MElQTC6IyHQnYM
-X-Gm-Gg: ATEYQzzb5c8rfCAoF29pJnU1s0nd21lBvgH/FgaAQg5uT93UpqXYT3goCE788OKVXa0
-	AzNbWLwh/4+xzVgWJyvT0UW+wM8sXRvPfIinyK+Wp4ykYLyq5Oz9zBnUNTBN4fst6JWHJL/i4Lo
-	BMRPWK0G/eBTZqBfELYhnBqgevqg5Yq6IOIaTFWAofrevYhfJg3Frm3P5UOgUCdWh2RFb0id6W4
-	C2yEbrONUiMrw3u5lMd5y0VAVcZ5AeCtfw25BN6a1V/vUOSsLPnG/oufRazA9OYDESz2MpsRd78
-	kUaOMg5o
-X-Received: by 2002:ac8:5995:0:b0:4ff:cb72:7c03 with SMTP id
- d75a77b69052e-507617532dcmr21739891cf.3.1772464518402; Mon, 02 Mar 2026
- 07:15:18 -0800 (PST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D3022157B;
+	Mon,  2 Mar 2026 15:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772465034; cv=none; b=qN2+JaUeHB4FlpVWZirPNBlakfvse7w4VLAgU+6OtpHLoBnBuBDeTugOwJlUE6i6nL/qQolGGnEYRIUOkOhjVjmuTgAl7aHZNS61FWT6P4dcAt+T3OApVQ0kjjJdGLCl3OB0IPyFZyTSkb67mQTjYRyWvtRBuJtaFsgsqsPUzVo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772465034; c=relaxed/simple;
+	bh=tLCuqa+/nT1cfOuo1J57XX9pR1rNtyqiOT6GDPiNeCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lae8gMm7ELOTOuF50f2GI8HlZb6CNDL8mFjqQXjjdnFjt6G6HjSTvDzalq0fRbM4061pE8B3FOhgLz3ZVwO5Q7845Pg+G3LYpFI9f4UsM6+OfzY+mlzBdDwU9MKWk8sncPY5gK832QExWZNGTzrbp5wPuhiH7p048uRf3fuH8fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 00BD11477;
+	Mon,  2 Mar 2026 07:23:46 -0800 (PST)
+Received: from [10.57.55.216] (unknown [10.57.55.216])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D6E7F3F73B;
+	Mon,  2 Mar 2026 07:23:46 -0800 (PST)
+Message-ID: <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
+Date: Mon, 2 Mar 2026 15:23:44 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260302115653.1517326-1-maz@kernel.org> <20260302115653.1517326-9-maz@kernel.org>
-In-Reply-To: <20260302115653.1517326-9-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 2 Mar 2026 15:14:41 +0000
-X-Gm-Features: AaiRm53AeNzBUqCcvwVmtTfW3IVhaSW812eJdmucfptOpXaPRrJTjtj_9ytMZMk
-Message-ID: <CA+EHjTzhciLDu145E+iCLr+ej9Xi9etkk2uigpBgpHH5NBE6rQ@mail.gmail.com>
-Subject: Re: [PATCH v2 08/11] arm64: Convert CONFIG_ARM64_MTE to FTR_CONFIG()
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
 To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86tsuy8g0u.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 Hi Marc,
 
-On Mon, 2 Mar 2026 at 11:57, Marc Zyngier <maz@kernel.org> wrote:
->
-> While CONFIG_ARM64_MTE=n prevents userspace from using MTE,
-> the sanitised ID registers still advertise the feature.
->
-> Make it clear that nothing in the kernel should rely on this by
-> marking the feature as hidden for all when CONFIG_ARM64_MTE=n.
->
-> This is functionnaly equivalent to using arm64.nomte on the kernel
-> command-line.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kernel/cpufeature.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index ab0a7d72608d4..a56d242fe1489 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -315,7 +315,7 @@ static const struct arm64_ftr_bits ftr_id_aa64pfr1[] = {
->                        FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SME_SHIFT, 4, 0),
->         ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MPAM_frac_SHIFT, 4, 0),
->         ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_RAS_frac_SHIFT, 4, 0),
-> -       ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_MTE),
-> +       ARM64_FTR_BITS(FTR_CONFIG(CONFIG_ARM64_MTE, VISIBLE, ALL_HIDDEN),
->                        FTR_STRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_MTE_SHIFT, 4, ID_AA64PFR1_EL1_MTE_NI),
->         ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64PFR1_EL1_SSBS_SHIFT, 4, ID_AA64PFR1_EL1_SSBS_NI),
->         ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_BTI),
+On 02/03/2026 14:25, Marc Zyngier wrote:
+> On Wed, 17 Dec 2025 10:10:43 +0000,
+> Steven Price <steven.price@arm.com> wrote:
+>>
+>> There is one CAP which identified the presence of CCA, and two ioctls.
+>> One ioctl is used to populate memory and the other is used when user
+>> space is providing the PSCI implementation to identify the target of the
+>> operation.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v11:
+>>  * Completely reworked to be more implicit. Rather than having explicit
+>>    CAP operations to progress the realm construction these operations
+>>    are done when needed (on populating and on first vCPU run).
+>>  * Populate and PSCI complete are promoted to proper ioctls.
+>> Changes since v10:
+>>  * Rename symbols from RME to RMI.
+>> Changes since v9:
+>>  * Improvements to documentation.
+>>  * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>> Changes since v8:
+>>  * Minor improvements to documentation following review.
+>>  * Bump the magic numbers to avoid conflicts.
+>> Changes since v7:
+>>  * Add documentation of new ioctls
+>>  * Bump the magic numbers to avoid conflicts
+>> Changes since v6:
+>>  * Rename some of the symbols to make their usage clearer and avoid
+>>    repetition.
+>> Changes from v5:
+>>  * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>>    KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>> ---
+>>  Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
+>>  include/uapi/linux/kvm.h       | 23 ++++++++++++++
+>>  2 files changed, 80 insertions(+)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 01a3abef8abb..2d5dc7e48954 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -6517,6 +6517,54 @@ the capability to be present.
+>>  
+>>  `flags` must currently be zero.
+>>  
+>> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
+>> +------------------------------------
+>> +
+>> +:Capability: KVM_CAP_ARM_RMI
+>> +:Architectures: arm64
+>> +:Type: vcpu ioctl
+>> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
+>> +:Returns: 0 if successful, < 0 on error
+>> +
+>> +::
+>> +
+>> +  struct kvm_arm_rmi_psci_complete {
+>> +	__u64 target_mpidr;
+>> +	__u32 psci_status;
+>> +	__u32 padding[3];
+>> +  };
+>> +
+>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+>> +the target of the operation using `target_mpidr`, along with the status
+>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>> +
+>> +If the kernel is handling PSCI then this is done automatically and the VMM
+>> +doesn't need to call this ioctl.
+> 
+> Shouldn't we make handling of PSCI mandatory for VMMs that deal with
+> CCA? I suspect it would simplify the implementation significantly.
 
-Although it wouldn't really be for the scope of this patch, but what
-about gating the other MTE fields? e.g., MTE_frac here,
-ID_AA64PFR2_EL1.MTEFAR and MTESTOREONLY?
+What do you mean by making it "mandatory for VMMs"? If you mean PSCI is
+always forwarded to user space then I don't think it's going to make
+much difference. Patch 27 handles the PSCI changes (72 lines added), and
+some of that is adding this uAPI for the VMM to handle it.
 
-Cheers,
-/fuad
+Removing the functionality to allow the VMM to handle it would obviously
+simplify things a bit (we can drop this uAPI), but I think the desire is
+to push this onto user space.
 
-> --
-> 2.47.3
->
->
+> What vcpu fd does this apply to? The vcpu calling the PSCI function?
+> Or the target? This is pretty important for PSCI_ON. My guess is that
+> this is setting the return value for the caller?
+
+Yes the fd is the vcpu calling PSCI. As you say, this is for the return
+value to be set correctly.
+
+> Assuming this is indeed for the caller, why do we have a different
+> flow from anything else that returns a result from a hypercall?
+
+I'm not entirely sure what you are suggesting. Do you mean why are we
+not just writing to the GPRS that would contain the result? The issue
+here is that the RMM needs to know the PA of the target REC structure -
+this isn't a return to the guest, but information for the RMM itself to
+complete the PSCI call.
+
+Ultimately even in the case where the VMM is handling PSCI, it's
+actually a combination of the VMM and the RMM - with the RMM validating
+the responses.
+
+>> +
+>> +4.145 KVM_ARM_RMI_POPULATE
+>> +--------------------------
+>> +
+>> +:Capability: KVM_CAP_ARM_RMI
+>> +:Architectures: arm64
+>> +:Type: vm ioctl
+>> +:Parameters: struct kvm_arm_rmi_populate (in)
+>> +:Returns: number of bytes populated, < 0 on error
+>> +
+>> +::
+>> +
+>> +  struct kvm_arm_rmi_populate {
+>> +	__u64 base;
+>> +	__u64 size;
+>> +	__u64 source_uaddr;
+>> +	__u32 flags;
+>> +	__u32 reserved;
+>> +  };
+>> +
+>> +Populate a region of protected address space by copying the data from the user
+>> +space pointer provided. This is only valid before any VCPUs have been run.
+>> +The ioctl might not populate the entire region and user space may have to
+>> +repeatedly call it (with updated pointers) to populate the entire region.
+> 
+> size as a __u64 is odd, as the return value from the ioctl is a signed
+> int. This implies that you can't really report how many bytes you have
+> copied.  Some form of consistency wouldn't hurt.
+
+Good spot. In practice this works because >2GB in one operation is
+highly unlikely to be processed in one go. But I guess I'll change this
+to have an output size argument. I guess I could make the kernel update
+all of base,size,source_uaddr which would simplify user space.
+
+Thanks,
+Steve
+
