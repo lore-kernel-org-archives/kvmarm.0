@@ -1,209 +1,165 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC1142981A;
-	Mon,  2 Mar 2026 17:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E5B3FFAAD;
+	Mon,  2 Mar 2026 17:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772471630; cv=none; b=fNse0OWLX3C/yHEMlou0VCtzPPFCQQvaFW1FRUaI0RFJqr9baIWSPFbsGfjzhTJuZmlueoSQE+KcOXnJ+EvhQHAwmpJPTUC1fwsS6yEDYQ93P+LrNIAoplDIbYpV7ub4bVb4Qi6kxmHm0kXDykSFWVQZJaixB+yHMQ89kSeOmCM=
+	t=1772473934; cv=none; b=EOPRzZfaak6uqbsu5BgTDFTDpI6QJax37ktGWAmwACuaTLpUvF1EggThtSLMhWr3Y+Nh2vrCzaKbN7Y9boOUscX4lVIubn6zXwEboc9PI9t3R1A3LWHhG7KlSRLBubchu97GJkwHFCPkObsZmvEjCU3UtAXDQH00bqfl85guXow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772471630; c=relaxed/simple;
-	bh=LVqvSRjP7ZSJ1Lm3BhqTGs047xn5H2PMA0XEi+nJoAI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qXyvH4UokeTzMexWVgS7RJ8TIeaiygMpqDARMT6ss4iqxK3gktHdQi9oXGOJjt/V9kPNQJNGtY4JYhN9E0WjUq9n6ARMUrOcIOi+lxuGYy+4mAlxA0iFP85HG3FEeCF0yC7YVSFn2EK8urqiEVItURMp/8KzAMSK9qC3lf4PEnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F4BC14BF;
-	Mon,  2 Mar 2026 09:13:41 -0800 (PST)
-Received: from [10.57.73.151] (unknown [10.57.73.151])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D56E03F73B;
-	Mon,  2 Mar 2026 09:13:43 -0800 (PST)
-Message-ID: <9d702666-72a8-43e4-8ab3-548d8154a529@arm.com>
-Date: Mon, 2 Mar 2026 17:13:41 +0000
+	s=arc-20240116; t=1772473934; c=relaxed/simple;
+	bh=K8AbHsz72TSgP2bdOzk1adrzjtFHygOozSMVIl4YU5E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VkQV630eNowbKeswbdCgj4QHFXecKLTlYylcqJUQshoOZzXIUzS4/4sTMv9phSiGArk6i2LbMHXOH2U6Go18iz7SqxgskTu9ncNMFWFIBEex6WjP8MmeZFkmvQEG5vwh3wXogMBBLzhqNlFPkWZYsFLNkPRrFbIw4YbS7wrqSpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Un2wc4Gc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Un2wc4Gc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF105C2BC87;
+	Mon,  2 Mar 2026 17:52:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772473934;
+	bh=K8AbHsz72TSgP2bdOzk1adrzjtFHygOozSMVIl4YU5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Un2wc4GcAn+A+x3q/r96Cd4A2DUNx1rVQJVZ2ThgSQ4ele3Q9GCq9n2yPBQgMjdRs
+	 KNqvXv29i8kqjRUSapwR3pMNdMBMGqS9p7St3M0Xr8q2X4xfo47AbBbhtzvjg/sNrY
+	 9O+aRTGPuPasBqklO2yQhGZkyyYjeWNEsNPkv2tSIH2lJ5T91wlFFc/Uf4y2WXY4m7
+	 +Piw1dCw0Y7GeKY1Dsun4X3febHf6UndTUb8wOdxOmzXLQsOLqy3Rci6UmlYPSwgD+
+	 PUrPluICHRDEjcFM/eHAtK7+h0HgFKvvWgXerpuFQI9FnH56ZRdD8TWrU3BfIyYyEH
+	 slyajjKYbk0ig==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vx7RD-0000000FLem-1iil;
+	Mon, 02 Mar 2026 17:52:11 +0000
+Date: Mon, 02 Mar 2026 17:52:10 +0000
+Message-ID: <86o6l686gl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com,
+	baisheng.gao@unisoc.com,
+	baolin.wang@linux.alibaba.com,
+	carl@os.amperecomputing.com,
+	dave.martin@arm.com,
+	david@kernel.org,
+	dfustini@baylibre.com,
+	fenghuay@nvidia.com,
+	gshan@redhat.com,
+	james.morse@arm.com,
+	jonathan.cameron@huawei.com,
+	kobak@nvidia.com,
+	lcherian@marvell.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peternewman@google.com,
+	punit.agrawal@oss.qualcomm.com,
+	quic_jiles@quicinc.com,
+	reinette.chatre@intel.com,
+	rohit.mathew@arm.com,
+	scott@os.amperecomputing.com,
+	sdonthineni@nvidia.com,
+	tan.shaopeng@fujitsu.com,
+	xhao@linux.alibaba.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	corbet@lwn.net,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	kvmarm@lists.linux.dev,
+	zengheng4@huawei.com,
+	linux-doc@vger.kernel.org,
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Subject: Re: [PATCH v5 02/41] KVM: arm64: Preserve host MPAM configuration when changing traps
+In-Reply-To: <20260224175720.2663924-3-ben.horgan@arm.com>
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+	<20260224175720.2663924-3-ben.horgan@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-Content-Language: en-GB
-To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
- <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ben.horgan@arm.com, amitsinght@marvell.com, baisheng.gao@unisoc.com, baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com, dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com, fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, peternewman@google.com, punit.agrawal@oss.qualcomm.com, quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com, tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com, will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, zengheng4@huawei.com, linux-doc@vger.kernel.org, tan.shaopeng@jp.fujitsu.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 02/03/2026 15:23, Steven Price wrote:
-> Hi Marc,
+On Tue, 24 Feb 2026 17:56:41 +0000,
+Ben Horgan <ben.horgan@arm.com> wrote:
 > 
-> On 02/03/2026 14:25, Marc Zyngier wrote:
->> On Wed, 17 Dec 2025 10:10:43 +0000,
->> Steven Price <steven.price@arm.com> wrote:
->>>
->>> There is one CAP which identified the presence of CCA, and two ioctls.
->>> One ioctl is used to populate memory and the other is used when user
->>> space is providing the PSCI implementation to identify the target of the
->>> operation.
->>>
->>> Signed-off-by: Steven Price <steven.price@arm.com>
->>> ---
->>> Changes since v11:
->>>   * Completely reworked to be more implicit. Rather than having explicit
->>>     CAP operations to progress the realm construction these operations
->>>     are done when needed (on populating and on first vCPU run).
->>>   * Populate and PSCI complete are promoted to proper ioctls.
->>> Changes since v10:
->>>   * Rename symbols from RME to RMI.
->>> Changes since v9:
->>>   * Improvements to documentation.
->>>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
->>> Changes since v8:
->>>   * Minor improvements to documentation following review.
->>>   * Bump the magic numbers to avoid conflicts.
->>> Changes since v7:
->>>   * Add documentation of new ioctls
->>>   * Bump the magic numbers to avoid conflicts
->>> Changes since v6:
->>>   * Rename some of the symbols to make their usage clearer and avoid
->>>     repetition.
->>> Changes from v5:
->>>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
->>>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
->>> ---
->>>   Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
->>>   include/uapi/linux/kvm.h       | 23 ++++++++++++++
->>>   2 files changed, 80 insertions(+)
->>>
->>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>> index 01a3abef8abb..2d5dc7e48954 100644
->>> --- a/Documentation/virt/kvm/api.rst
->>> +++ b/Documentation/virt/kvm/api.rst
->>> @@ -6517,6 +6517,54 @@ the capability to be present.
->>>   
->>>   `flags` must currently be zero.
->>>   
->>> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
->>> +------------------------------------
->>> +
->>> +:Capability: KVM_CAP_ARM_RMI
->>> +:Architectures: arm64
->>> +:Type: vcpu ioctl
->>> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
->>> +:Returns: 0 if successful, < 0 on error
->>> +
->>> +::
->>> +
->>> +  struct kvm_arm_rmi_psci_complete {
->>> +	__u64 target_mpidr;
->>> +	__u32 psci_status;
->>> +	__u32 padding[3];
->>> +  };
->>> +
->>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
->>> +the target of the operation using `target_mpidr`, along with the status
->>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
->>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
->>> +
->>> +If the kernel is handling PSCI then this is done automatically and the VMM
->>> +doesn't need to call this ioctl.
->>
->> Shouldn't we make handling of PSCI mandatory for VMMs that deal with
->> CCA? I suspect it would simplify the implementation significantly.
-> 
-> What do you mean by making it "mandatory for VMMs"? If you mean PSCI is
-> always forwarded to user space then I don't think it's going to make
-> much difference. Patch 27 handles the PSCI changes (72 lines added), and
-> some of that is adding this uAPI for the VMM to handle it.
-> 
-> Removing the functionality to allow the VMM to handle it would obviously
-> simplify things a bit (we can drop this uAPI), but I think the desire is
-> to push this onto user space.
-> 
->> What vcpu fd does this apply to? The vcpu calling the PSCI function?
->> Or the target? This is pretty important for PSCI_ON. My guess is that
->> this is setting the return value for the caller?
-> 
-> Yes the fd is the vcpu calling PSCI. As you say, this is for the return
-> value to be set correctly.
-> 
->> Assuming this is indeed for the caller, why do we have a different
->> flow from anything else that returns a result from a hypercall?
-> 
-> I'm not entirely sure what you are suggesting. Do you mean why are we
-> not just writing to the GPRS that would contain the result? The issue
-> here is that the RMM needs to know the PA of the target REC structure -
-> this isn't a return to the guest, but information for the RMM itself to
-> complete the PSCI call.
-> 
-> Ultimately even in the case where the VMM is handling PSCI, it's
-> actually a combination of the VMM and the RMM - with the RMM validating
-> the responses.
-> 
+> When kvm enables or disables MPAM traps to EL2 it clears all other bits in
 
-More importantly, we have to make sure that the "RMI_PSCI_COMPLETE" is
-invoked before both of the following:
-   1. The "source" vCPU is run again
-   2. More importantly the "target" vCPU is run.
+nit: s/kvm/KVM/g
 
-The latter part makes it difficult to issue this RMI_PSCI_COMPLETE on
-the way back from servicing the SMCCC call.
-
-Suzuki
-
-
->>> +
->>> +4.145 KVM_ARM_RMI_POPULATE
->>> +--------------------------
->>> +
->>> +:Capability: KVM_CAP_ARM_RMI
->>> +:Architectures: arm64
->>> +:Type: vm ioctl
->>> +:Parameters: struct kvm_arm_rmi_populate (in)
->>> +:Returns: number of bytes populated, < 0 on error
->>> +
->>> +::
->>> +
->>> +  struct kvm_arm_rmi_populate {
->>> +	__u64 base;
->>> +	__u64 size;
->>> +	__u64 source_uaddr;
->>> +	__u32 flags;
->>> +	__u32 reserved;
->>> +  };
->>> +
->>> +Populate a region of protected address space by copying the data from the user
->>> +space pointer provided. This is only valid before any VCPUs have been run.
->>> +The ioctl might not populate the entire region and user space may have to
->>> +repeatedly call it (with updated pointers) to populate the entire region.
->>
->> size as a __u64 is odd, as the return value from the ioctl is a signed
->> int. This implies that you can't really report how many bytes you have
->> copied.  Some form of consistency wouldn't hurt.
+> MPAM2_EL2.  Notably, it clears the partition ids (PARTIDs) and performance
+> monitoring groups (PMGs). Avoid changing these bits in anticipation of
+> adding support for MPAM in the kernel. Otherwise, on a VHE system with the
+> host running at EL2 where MPAM2_EL2 and MPAM1_EL1 access the same register,
+> any attempt to use MPAM to monitor or partition resources for kernel space
+> would be foiled by running a KVM guest. Additionally, MPAM2_EL2.EnMPAMSM is
+> always set to 0 which causes MPAMSM_EL1 to always trap. Keep EnMPAMSM set
+> to 1 when not in a guest so that the kernel can use MPAMSM_EL1.
 > 
-> Good spot. In practice this works because >2GB in one operation is
-> highly unlikely to be processed in one go. But I guess I'll change this
-> to have an output size argument. I guess I could make the kernel update
-> all of base,size,source_uaddr which would simplify user space.
+> Tested-by: Gavin Shan <gshan@redhat.com>
+> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+> Tested-by: Peter Newman <peternewman@google.com>
+> Tested-by: Zeng Heng <zengheng4@huawei.com>
+> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 > 
-> Thanks,
-> Steve
-> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 2597e8bda867..0b50ddd530f3 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -267,7 +267,8 @@ static inline void __deactivate_traps_hfgxtr(struct kvm_vcpu *vcpu)
+>  
+>  static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 r = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+> +	u64 clr = MPAM2_EL2_EnMPAMSM;
+> +	u64 set = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+>  
+>  	if (!system_supports_mpam())
+>  		return;
+> @@ -277,18 +278,21 @@ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+>  		write_sysreg_s(MPAMHCR_EL2_TRAP_MPAMIDR_EL1, SYS_MPAMHCR_EL2);
+>  	} else {
+>  		/* From v1.1 TIDR can trap MPAMIDR, set it unconditionally */
+> -		r |= MPAM2_EL2_TIDR;
+> +		set |= MPAM2_EL2_TIDR;
+>  	}
+>  
+> -	write_sysreg_s(r, SYS_MPAM2_EL2);
+> +	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+>  }
+>  
+>  static inline void __deactivate_traps_mpam(void)
+>  {
+> +	u64 clr = MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1 | MPAM2_EL2_TIDR;
+> +	u64 set = MPAM2_EL2_EnMPAMSM;
+> +
+>  	if (!system_supports_mpam())
+>  		return;
+>  
+> -	write_sysreg_s(0, SYS_MPAM2_EL2);
+> +	sysreg_clear_set_s(SYS_MPAM2_EL2, clr, set);
+>  
+>  	if (system_supports_mpam_hcr())
+>  		write_sysreg_s(MPAMHCR_HOST_FLAGS, SYS_MPAMHCR_EL2);
 
+Acked-by: Marc Zyngier <maz@kernel.org>
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
