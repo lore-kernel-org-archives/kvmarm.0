@@ -1,373 +1,246 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A8332EC1;
-	Mon,  2 Mar 2026 14:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772463387; cv=none; b=hTOTntLpLa2ZfpJdeFii0pAFdk+k9+DUEf5/P21yQJro870TzEGZtDgZcovMaO2VvbZ/YVOagEliVFLQ5L7rHe2lXWsOM4vzlClSDiE3fR31UQ+Ng9kTjQVvj3th/ZeP4XkWtmtf+fxqKi27FIvM4fu0zmXx6MbJFMgaBNMGUX0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772463387; c=relaxed/simple;
-	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vv6Q8IyuWKKWcfPj/eIRGHjn4i6E3RyZWdxDPM5sFGiFD/3NIl6zi2l1LsUHq1zq27TzeyIqWtvNbZdgWbFtXf0/cUeHnK1+HB3zHszIC0MLlnZTOttiSUrnZwd3sjADLNhhDPSmYgcPbkeE4G3GskzRf4T6U6vliAquqP1taYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOqaPuFx; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3333FB051
+	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 14:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772463483; cv=pass; b=OKhQWxjU1oMoSaeTw3RuAJDPo9ns6ZsMAvCxPpOAqw6HgKCIsXi16T3v5gtrepARZHX2YXVxPQbgdGd4wwG35rQHOH5xlBLU8Y43q8mc04+JzBZH1ufU0kl62c2CWCoXLoMMKxvypALLW//lnp8xxnMfDAcZVdiV5o1qfIjH3GY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772463483; c=relaxed/simple;
+	bh=EsJDW3XfosU6J7GHFKy6ZO0oS3/mc8CmVcJ6ya+a+Xk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=coBjF/7rgOPizq1vVTW8USqjJcrK+fFT8ry+HYqlTPJ13OJWznwtU6xnGdNTf6d4noarLYbtJyTATCIAmyLUpZ0ysrt0fsX+4l6U9v4fLTdCFJ99vSzG8SlanYhDbgciBxt5fj56GalxbIxexrOxluWGjMkN03QtsNuhne3a00U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4eI8yev8; arc=pass smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOqaPuFx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F10F4C19423;
-	Mon,  2 Mar 2026 14:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772463387;
-	bh=oU0GLS1+U0aFHGSu270A22eis8d+o92JaCiSGmMvS24=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WOqaPuFxs1WNSBVnJVs+xQ78aogVXY35SDYjXMhv134i3GflGPX8NXP0w0efq8mZp
-	 zi9knDrh4WhE8yqZTmPNiBnF8s2Fgecef/h2o3GZde7B2QwOMR25Xt+Vf3oMX7di9F
-	 ZImPHmuzLv04/JA8K3Qb4FUA2151t88+D2P4rr6j7qAJqCEIPxsBnm7TF1rPwZzODe
-	 XTTQ9A8PPtQN7cSGghlNLFSJWSUYhePiG2eYW0nH0t2iyr5I/tVv/XGKG0iemy4g3/
-	 u/ETusTUkU3kScjMhu8E1/7SE+QlY5P1/jGmgW6Z2qXUiwTMC5i3lIBNs7ALQhlxt7
-	 u5+cr7FDVMs4g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vx4h6-0000000FHdF-3Ieo;
-	Mon, 02 Mar 2026 14:56:24 +0000
-Date: Mon, 02 Mar 2026 14:56:24 +0000
-Message-ID: <86qzq28elj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 20/46] arm64: RMI: Allow populating initial contents
-In-Reply-To: <20251217101125.91098-21-steven.price@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-21-steven.price@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4eI8yev8"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-505d3baf1a7so984831cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 02 Mar 2026 06:58:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772463481; cv=none;
+        d=google.com; s=arc-20240605;
+        b=TnkHpCx88IyZbEpndne8apUC86ZhpwhavfW9lF14zSeWGTEzGJ/vJECB6YZGJ6gUff
+         QUwPG/QQE/3P7XaBzckaNzd6Xrga7rDeuA87emQz3X4PFf6DuCwo6sr8x5ic+GMIPQyl
+         I5KTPqAHSgrVlG2AoVg3fe47NJIbi0fz18HuE98A0nt5etzLl+LjJrZEjYZpX84VX2be
+         4kbcnxFmQB1l7DLcGK4D6waMLAkHFSPHOM6hDDBXZ3XqAvHj5jNVeMkby2kvFbeZhg/S
+         XoPTTaEzKbnCgITkpZ4F97V9vzB6P5b5gtEsGg11arXzdGDb+r7idRV6v7tizLCJU/vk
+         Xx7w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=G2tiCQAM7J3nKBvqatqhx2IcyXGt7NEO8HpnjOvw5gU=;
+        fh=t0dKqXtIISObm4fdkYe8dgHolTbh8mMDQGo0HKszF54=;
+        b=hpeHXPz1SBAbh5Ubr6+H3YgnjYk/lPy3uwkxX+PE+8jl+iUkUcBSCiM5bo82r35EK5
+         DNR9wZzv6BTnsD+f8+hvZukfntcO2KanNsNao65UaA3sbN2J1W17Ey/fis86EgmPIhnz
+         EepHblN8EPW/Jad3cQDfLQNQAmJhVaCo61Vg7MKgHy0sGSPDBSNu50pd91O6q/3s1HIH
+         1oYy7dCUnNO9xVJ8QMPKZrxpSZh+WufLi967MrQHXRm6cLywWHS0NaY9fIej2UIQLb7A
+         GI8LtrtUdqqBk7F7OeY6UQb3ZUNcVCf7DarLniCMOxECoNHMTrQbdFoj4yGFtj50QQdc
+         GzzQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772463481; x=1773068281; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=G2tiCQAM7J3nKBvqatqhx2IcyXGt7NEO8HpnjOvw5gU=;
+        b=4eI8yev8VULgwHFGk/rIpOAvmPtEbVSCy/RhAeywom2C7AerAvuUQndHJEELQ2rQsm
+         Tqzo+sakyGLxk1bLjpPmezb3gyLqE5Hh5r15CeieO6782IWstJAmiT72K0rd4++QyjJG
+         7JTk2r3n2saR70+1zrHjYVzZwn24U8LAOpE8M3m5A/ub3Uny7nikIAkpta8kUAzSvFt1
+         zQY2VzUxeoEqaTut6OGyCewuWfBSh5+4BhfSMmzG6yHMrPF5oNyKsKdw7r/qi8rXboyB
+         TPuBDcVCoT/CR8hRqSSs8MnUizFXmyYiEtXOen7wK0Hngs3M7ncDkZfnvAyZpcdhws3j
+         dD1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772463481; x=1773068281;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G2tiCQAM7J3nKBvqatqhx2IcyXGt7NEO8HpnjOvw5gU=;
+        b=t4wpJ4Mh0AFS+CEIyZXIzMptvFdWW+lGK/eG39D1ZmmjonIIon5pcFP0IBLtJErwB7
+         vVDZlUOSdyvVMy1NK0cLcM77l5z3J2tszhb1NBCzZUi1CiVBolNRzKczhcr7+SCi02jx
+         2hY42mq47IIuTFXxKt3usrU5KZNtZYCd8CMrqqHErNZTXiU9KohUvLvxFlZWFMCryU7X
+         GjZa/KoBRFN01eohAB1LBygEfKRa9DGbTsLss/hqEGw5wCfUXalZ6ZaLl/Tu6KTwUf5d
+         70pW2PjxtBvh1ga0GRI1b6krShgkqltex5o5/lKDWjtVsmx+7CoQNSQcOosAMp0iTn1h
+         m4Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCXlaRyT6TUeGVu7Aj8FHv54Nb7CQSpucpMutWpXsFwbP+0b9/wAt6mZKgizbE2HWFHoyKY2/9c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxNy78YgdkDRxqiVwjrdoO+fVH4d2WawxKcZ2F4dNhu5s4lwX3g
+	nlEdmAWhSvOZHLpcH1od31CXwsaGzUomu7dJS+6473F+WRQpijvfaR+S8POO97a7TW2M3Ah+m6O
+	E+BSqO/UmhRzsFHXbkzPyHMKFqI81TeN78ojJjQU+
+X-Gm-Gg: ATEYQzx6kMJBz8SQv3lsjgCPVSA9UURRygfXB864Rq7V/AI75Fx5jKcBQx80HyA826B
+	XBMQleGKlf0TshcGNzhramW1sqm0qpNiwap4tzhb9nlmGMHobdfr2aEnDOfvItnUlIMd5G55g+M
+	OCXgAmqhsjYUglWBuP1fl70dYT80lUwalqjqv91NgBxg7gb4vyT+bioTRdNm0JuAIAiZFaoDnbb
+	yEWKFzWbrvXXzsGBBmVaUIj0oTfXSTi4pMbLrKA/rC3RwW+k68+gtus7xWPl7VjkyCJu1eKlYHu
+	MaWwjTyR
+X-Received: by 2002:ac8:5995:0:b0:4ff:cb72:7c03 with SMTP id
+ d75a77b69052e-507617532dcmr21520541cf.3.1772463478513; Mon, 02 Mar 2026
+ 06:57:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260302115653.1517326-1-maz@kernel.org> <20260302115653.1517326-4-maz@kernel.org>
+In-Reply-To: <20260302115653.1517326-4-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 2 Mar 2026 14:57:21 +0000
+X-Gm-Features: AaiRm52cau_CBAybC8R8xab889bgpS_fXwwQzlJ-E-bLfbHFOruGTzIX5vD_ueY
+Message-ID: <CA+EHjTxuZfiA77sckm=96x_0JoUpmqDUVrB9WX+TgomQjWyMkw@mail.gmail.com>
+Subject: Re: [PATCH v2 03/11] arm64: Add logic to fully remove features from
+ sanitised id registers
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Mark Rutland <mark.rutland@arm.com>, Joey Gouly <joey.gouly@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 17 Dec 2025 10:10:57 +0000,
-Steven Price <steven.price@arm.com> wrote:
-> 
-> The VMM needs to populate the realm with some data before starting (e.g.
-> a kernel and initrd). This is measured by the RMM and used as part of
-> the attestation later on.
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+Hi Marc,
+
+On Mon, 2 Mar 2026 at 11:57, Marc Zyngier <maz@kernel.org> wrote:
+>
+> We currently make support for some features such as Pointer Auth,
+> SVE or S1POE a compile time decision.
+>
+> However, while we hide that feature from userspace when such support
+> is disabled, we still leave the value provided by the HW visible to
+> the rest of the kernel, including KVM.
+>
+> This has the potential to result in ugly state leakage, as half of
+> the kernel knows about the feature, and the other doesn't.
+>
+> Short of completely banning such compilation options and restore
+> universal knowledge, introduce the possibility to fully remove such
+> knowledge from the sanitised id registers.
+>
+> This has more or less the same effect as the idreg override that
+> a user can pass on the command-line, only defined at build-time.
+>
+> For that purpose, we provide a new macro (FTR_CONFIG()) that defines
+> the behaviour of a feature, both when enabled and disabled.
+>
+> At this stage, nothing is making use of this anti-feature.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
-> Changes since v11:
->  * The multiplex CAP is gone and there's a new ioctl which makes use of
->    the generic kvm_gmem_populate() functionality.
-> Changes since v7:
->  * Improve the error codes.
->  * Other minor changes from review.
-> Changes since v6:
->  * Handle host potentially having a larger page size than the RMM
->    granule.
->  * Drop historic "par" (protected address range) from
->    populate_par_region() - it doesn't exist within the current
->    architecture.
->  * Add a cond_resched() call in kvm_populate_realm().
-> Changes since v5:
->  * Refactor to use PFNs rather than tracking struct page in
->    realm_create_protected_data_page().
->  * Pull changes from a later patch (in the v5 series) for accessing
->    pages from a guest memfd.
->  * Do the populate in chunks to avoid holding locks for too long and
->    triggering RCU stall warnings.
-> ---
->  arch/arm64/include/asm/kvm_rmi.h |   4 +
->  arch/arm64/kvm/Kconfig           |   1 +
->  arch/arm64/kvm/arm.c             |   9 ++
->  arch/arm64/kvm/rmi.c             | 175 +++++++++++++++++++++++++++++++
->  4 files changed, 189 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 8a862fc1a99d..b5e36344975c 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -99,6 +99,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->  int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->  int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
->  
-> +struct kvm_arm_rmi_populate;
+>  arch/arm64/include/asm/cpufeature.h | 17 +++++++++------
+>  arch/arm64/kernel/cpufeature.c      | 32 ++++++++++++++++++++++-------
+>  2 files changed, 36 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index 4de51f8d92cba..e853a0ac7db38 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -53,17 +53,22 @@ enum ftr_type {
+>  #define FTR_SIGNED     true    /* Value should be treated as signed */
+>  #define FTR_UNSIGNED   false   /* Value should be treated as unsigned */
+>
+> -#define FTR_VISIBLE    true    /* Feature visible to the user space */
+> -#define FTR_HIDDEN     false   /* Feature is hidden from the user */
+> +enum ftr_visibility {
+> +       FTR_HIDDEN,             /* Feature hidden from the user */
+> +       FTR_ALL_HIDDEN,         /* Feature hidden from kernel, user and KVM */
+> +       FTR_VISIBLE,            /* Feature visible to all observers */
+> +};
 > +
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *arg);
->  void kvm_realm_unmap_range(struct kvm *kvm,
->  			   unsigned long ipa,
->  			   unsigned long size,
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 1cac6dfc0972..b495dfd3a8b4 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ menuconfig KVM
->  	select GUEST_PERF_EVENTS if PERF_EVENTS
->  	select KVM_GUEST_MEMFD
->  	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->  	help
->  	  Support hosting virtualized guest machines.
->  
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 7927181887cf..0a06ed9d1a64 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2037,6 +2037,15 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->  			return -EFAULT;
->  		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
->  	}
-> +	case KVM_ARM_RMI_POPULATE: {
-> +		struct kvm_arm_rmi_populate req;
+> +#define FTR_CONFIG(c, e, d)                            \
+> +       (IS_ENABLED(c) ? FTR_ ## e : FTR_ ## d)
+>
+> -#define FTR_VISIBLE_IF_IS_ENABLED(config)              \
+> -       (IS_ENABLED(config) ? FTR_VISIBLE : FTR_HIDDEN)
+> +#define FTR_VISIBLE_IF_IS_ENABLED(c)   FTR_CONFIG(c, VISIBLE, HIDDEN)
+>
+>  struct arm64_ftr_bits {
+>         bool            sign;   /* Value is signed ? */
+> -       bool            visible;
+> +       enum ftr_visibility visibility:8;
+>         bool            strict; /* CPU Sanity check: strict matching required ? */
+> -       enum ftr_type   type;
+> +       enum ftr_type   type:8;
+>         u8              shift;
+>         u8              width;
+>         s64             safe_val; /* safe value for FTR_EXACT features */
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 102c5bac4d502..965dd2acf0640 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -192,7 +192,7 @@ void dump_cpu_features(void)
+>  #define __ARM64_FTR_BITS(SIGNED, VISIBLE, STRICT, TYPE, SHIFT, WIDTH, SAFE_VAL) \
+>         {                                               \
+>                 .sign = SIGNED,                         \
+> -               .visible = VISIBLE,                     \
+> +               .visibility = VISIBLE,                  \
+>                 .strict = STRICT,                       \
+>                 .type = TYPE,                           \
+>                 .shift = SHIFT,                         \
+> @@ -1063,16 +1063,33 @@ static void init_cpu_ftr_reg(u32 sys_reg, u64 new)
+>                                 ftrp->shift);
+>                 }
+>
+> -               val = arm64_ftr_set_value(ftrp, val, ftr_new);
+> -
+>                 valid_mask |= ftr_mask;
+>                 if (!ftrp->strict)
+>                         strict_mask &= ~ftr_mask;
+> -               if (ftrp->visible)
 > +
-> +		if (!kvm_is_realm(kvm))
-> +			return -EPERM;
+> +               switch (ftrp->visibility) {
+> +               case FTR_VISIBLE:
+> +                       val = arm64_ftr_set_value(ftrp, val, ftr_new);
+>                         user_mask |= ftr_mask;
+> -               else
+> +                       break;
+> +               case FTR_ALL_HIDDEN:
+> +                       /*
+> +                        * ALL_HIDDEN and HIGHER_SAFE are incompatible.
+> +                        * Only hide from userspace, and log the oddity.
+> +                        */
+> +                       if (WARN_ON(ftrp->type == FTR_HIGHER_SAFE))
 
-EPERM is odd. It isn't that the VMM doesn't have the right to do it,
-it is that it shouldn't have called that, because the ioctl doesn't
-exist for a normal VM. -ENOSYS?
+What about FTR_HIGHER_OR_ZERO_SAFE? It's not actually being used for
+any feature id register, only for CTR_EL0. Even there, it's a
+(theoretical at this point) performance issue, not a correctness one,
+as 0 assumes the largest possible size. I still think that it's safer
+to include it here.
 
-> +		if (copy_from_user(&req, argp, sizeof(req)))
-> +			return -EFAULT;
-> +		return kvm_arm_rmi_populate(kvm, &req);
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index fe15b400091c..39577e956a59 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -558,6 +558,150 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->  		realm_unmap_private_range(kvm, start, end, may_block);
->  }
->  
-> +static int realm_create_protected_data_granule(struct realm *realm,
-> +					       unsigned long ipa,
-> +					       phys_addr_t dst_phys,
-> +					       phys_addr_t src_phys,
-> +					       unsigned long flags)
-> +{
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	int ret;
-> +
-> +	if (rmi_granule_delegate(dst_phys))
-> +		return -ENXIO;
-> +
-> +	ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
-> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +		/* Create missing RTTs and retry */
-> +		int level = RMI_RETURN_INDEX(ret);
-> +
-> +		WARN_ON(level == RMM_RTT_MAX_LEVEL);
+That said:
 
-If this is unexpected, why do we still try to handle it? We should
-abort hard on anything that doesn't seem 100% correct, and mark the
-realm dead.
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-> +
-> +		ret = realm_create_rtt_levels(realm, ipa, level,
-> +					      RMM_RTT_MAX_LEVEL, NULL);
-> +		if (ret)
-> +			return -EIO;
-> +
-> +		ret = rmi_data_create(rd, dst_phys, ipa, src_phys, flags);
-> +	}
-> +	if (ret)
-> +		return -EIO;
-> +
-> +	return 0;
-> +}
-> +
-> +static int realm_create_protected_data_page(struct realm *realm,
-> +					    unsigned long ipa,
-> +					    kvm_pfn_t dst_pfn,
-> +					    kvm_pfn_t src_pfn,
-> +					    unsigned long flags)
-> +{
-> +	unsigned long rd = virt_to_phys(realm->rd);
-> +	phys_addr_t dst_phys, src_phys;
-> +	bool undelegate_failed = false;
-> +	int ret, offset;
-> +
-> +	dst_phys = __pfn_to_phys(dst_pfn);
-> +	src_phys = __pfn_to_phys(src_pfn);
-> +
-> +	for (offset = 0; offset < PAGE_SIZE; offset += RMM_PAGE_SIZE) {
-> +		ret = realm_create_protected_data_granule(realm,
-> +							  ipa,
-> +							  dst_phys,
-> +							  src_phys,
-> +							  flags);
-> +		if (ret)
-> +			goto err;
-> +
-> +		ipa += RMM_PAGE_SIZE;
-> +		dst_phys += RMM_PAGE_SIZE;
-> +		src_phys += RMM_PAGE_SIZE;
-> +	}
-> +
-> +	return 0;
-> +
-> +err:
-> +	if (ret == -EIO) {
-> +		/* current offset needs undelegating */
-> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> +			undelegate_failed = true;
-> +	}
-> +	while (offset > 0) {
-> +		ipa -= RMM_PAGE_SIZE;
-> +		offset -= RMM_PAGE_SIZE;
-> +		dst_phys -= RMM_PAGE_SIZE;
-> +
-> +		rmi_data_destroy(rd, ipa, NULL, NULL);
-> +
-> +		if (WARN_ON(rmi_granule_undelegate(dst_phys)))
-> +			undelegate_failed = true;
-> +	}
-> +
-> +	if (undelegate_failed) {
-> +		/*
-> +		 * A granule could not be undelegated,
-> +		 * so the page has to be leaked
-> +		 */
-> +		get_page(pfn_to_page(dst_pfn));
-> +	}
-> +
-> +	return -ENXIO;
-> +}
-> +
-> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-> +			      void __user *src, int order, void *opaque)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	unsigned long data_flags = *(unsigned long *)opaque;
-> +	phys_addr_t ipa = gfn_to_gpa(gfn);
-> +	int npages = (1 << order);
-> +	int i;
-> +
-> +	for (i = 0; i < npages; i++) {
-> +		struct page *src_page;
-> +		int ret;
-> +
-> +		ret = get_user_pages((unsigned long)src, 1, 0, &src_page);
-> +		if (ret < 0)
-> +			return ret;
-> +		if (ret != 1)
-> +			return -ENOMEM;
-> +
-> +		ret = realm_create_protected_data_page(realm, ipa, pfn,
-> +						       page_to_pfn(src_page),
-> +						       data_flags);
-> +
-> +		put_page(src_page);
-> +
-> +		if (ret)
-> +			return ret;
-> +
-> +		ipa += PAGE_SIZE;
-> +		pfn++;
-> +		src += PAGE_SIZE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static long populate_region(struct kvm *kvm,
-> +			    gfn_t base_gfn,
-> +			    unsigned long pages,
-> +			    u64 uaddr,
-> +			    unsigned long data_flags)
-> +{
-> +	long ret = 0;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	mmap_read_lock(current->mm);
-> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
-> +				populate_region_cb, &data_flags);
-> +	mmap_read_unlock(current->mm);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
->  enum ripas_action {
->  	RIPAS_INIT,
->  	RIPAS_SET,
-> @@ -655,6 +799,37 @@ static int realm_ensure_created(struct kvm *kvm)
->  	return -ENXIO;
->  }
->  
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *args)
-> +{
-> +	unsigned long data_flags = 0;
-> +	unsigned long ipa_start = args->base;
-> +	unsigned long ipa_end = ipa_start + args->size;
-> +	int ret;
-> +
-> +	if (args->reserved ||
-> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
-> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	ret = realm_ensure_created(kvm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
+Cheers,
+/fuad
 
-This flag isn't documented.
 
-> +		data_flags |= RMI_MEASURE_CONTENT;
-> +
-> +	ret = populate_region(kvm, gpa_to_gfn(ipa_start),
-> +			      args->size >> PAGE_SHIFT,
-> +			      args->source_uaddr, args->flags);
-> +
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return ret * PAGE_SIZE;
 
-Bits of the code works on PAGE_SIZE, other bits on RMM_PAGE_SIZE. It
-is pretty confusing. Are you in the middle of reworking this?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> +                               val = arm64_ftr_set_value(ftrp, val, ftr_new);
+> +                       else
+> +                               val = arm64_ftr_set_safe_value(ftrp, val);
+>                         reg->user_val = arm64_ftr_set_safe_value(ftrp,
+>                                                                  reg->user_val);
+> +                       break;
+> +               case FTR_HIDDEN:
+> +                       val = arm64_ftr_set_value(ftrp, val, ftr_new);
+> +                       reg->user_val = arm64_ftr_set_safe_value(ftrp,
+> +                                                                reg->user_val);
+> +                       break;
+> +               }
+>         }
+>
+>         val &= valid_mask;
+> @@ -1230,9 +1247,10 @@ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+>
+>                 /*
+>                  * Don't alter the initial value that has been forced
+> -                * by an override.
+> +                * by an override or a disabled feature.
+>                  */
+> -               if ((reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
+> +               if (ftrp->visibility == FTR_ALL_HIDDEN ||
+> +                   (reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
+>                         continue;
+>
+>                 if (ftr_cur == ftr_new)
+> --
+> 2.47.3
+>
