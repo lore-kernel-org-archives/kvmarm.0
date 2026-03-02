@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD97B423151
-	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 17:11:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC1142981A;
+	Mon,  2 Mar 2026 17:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772471473; cv=none; b=pjqSMHRA5dRisja2Z5RcIS/m1VAcgUsN9G3qvIRq1MJTZDMf4e4De8w039vU2aRp8yY1PGT2TgJ0QD2X31sE49uBTdscksweKD3PiPq48LLALOdOYAiLCgWmp5GQkRg6TH+BXEHSsfLSACS2cFYsTh3oVaic7w39ZoFKu2Fa8yw=
+	t=1772471630; cv=none; b=fNse0OWLX3C/yHEMlou0VCtzPPFCQQvaFW1FRUaI0RFJqr9baIWSPFbsGfjzhTJuZmlueoSQE+KcOXnJ+EvhQHAwmpJPTUC1fwsS6yEDYQ93P+LrNIAoplDIbYpV7ub4bVb4Qi6kxmHm0kXDykSFWVQZJaixB+yHMQ89kSeOmCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772471473; c=relaxed/simple;
-	bh=OysS6MYWEkNU8zxLdG2eyvnoKelJ2DPhBSdDdfl7k54=;
+	s=arc-20240116; t=1772471630; c=relaxed/simple;
+	bh=LVqvSRjP7ZSJ1Lm3BhqTGs047xn5H2PMA0XEi+nJoAI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TKRmAp6+O84ro0kkAImGHGAKEpKmheHusvt0CsPmQ31XIIpz/le4gd/yE3UahahiDTmuYLm6lYz2ABX+NU5/bT0BPU6297BBc5fEazAbssDrMGDdiZcpLYhUBAMaIwAosJsZ56RGhLWAEeD4lVSz8uw0RTtt7NiIkAdRQ5GnbGY=
+	 In-Reply-To:Content-Type; b=qXyvH4UokeTzMexWVgS7RJ8TIeaiygMpqDARMT6ss4iqxK3gktHdQi9oXGOJjt/V9kPNQJNGtY4JYhN9E0WjUq9n6ARMUrOcIOi+lxuGYy+4mAlxA0iFP85HG3FEeCF0yC7YVSFn2EK8urqiEVItURMp/8KzAMSK9qC3lf4PEnk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD58014BF;
-	Mon,  2 Mar 2026 09:11:04 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7859C3F73B;
-	Mon,  2 Mar 2026 09:11:06 -0800 (PST)
-Message-ID: <3e26371d-21b5-435e-9f31-7187466c57a2@arm.com>
-Date: Mon, 2 Mar 2026 17:11:05 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F4BC14BF;
+	Mon,  2 Mar 2026 09:13:41 -0800 (PST)
+Received: from [10.57.73.151] (unknown [10.57.73.151])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D56E03F73B;
+	Mon,  2 Mar 2026 09:13:43 -0800 (PST)
+Message-ID: <9d702666-72a8-43e4-8ab3-548d8154a529@arm.com>
+Date: Mon, 2 Mar 2026 17:13:41 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,241 +27,183 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 38/41] arm_mpam: Add workaround for T241-MPAM-4
-To: Fenghua Yu <fenghuay@nvidia.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- gshan@redhat.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org,
- Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
- <20260224175720.2663924-39-ben.horgan@arm.com>
- <7e496cb6-ab31-4a89-9630-0fa2e6b3607b@nvidia.com>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <7e496cb6-ab31-4a89-9630-0fa2e6b3607b@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
+ <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Fenghua,
-
-On 3/1/26 17:28, Fenghua Yu wrote:
-> Hi, Ben,
+On 02/03/2026 15:23, Steven Price wrote:
+> Hi Marc,
 > 
-> On 2/24/26 09:57, Ben Horgan wrote:
->> From: Shanker Donthineni <sdonthineni@nvidia.com>
+> On 02/03/2026 14:25, Marc Zyngier wrote:
+>> On Wed, 17 Dec 2025 10:10:43 +0000,
+>> Steven Price <steven.price@arm.com> wrote:
+>>>
+>>> There is one CAP which identified the presence of CCA, and two ioctls.
+>>> One ioctl is used to populate memory and the other is used when user
+>>> space is providing the PSCI implementation to identify the target of the
+>>> operation.
+>>>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>> Changes since v11:
+>>>   * Completely reworked to be more implicit. Rather than having explicit
+>>>     CAP operations to progress the realm construction these operations
+>>>     are done when needed (on populating and on first vCPU run).
+>>>   * Populate and PSCI complete are promoted to proper ioctls.
+>>> Changes since v10:
+>>>   * Rename symbols from RME to RMI.
+>>> Changes since v9:
+>>>   * Improvements to documentation.
+>>>   * Bump the magic number for KVM_CAP_ARM_RME to avoid conflicts.
+>>> Changes since v8:
+>>>   * Minor improvements to documentation following review.
+>>>   * Bump the magic numbers to avoid conflicts.
+>>> Changes since v7:
+>>>   * Add documentation of new ioctls
+>>>   * Bump the magic numbers to avoid conflicts
+>>> Changes since v6:
+>>>   * Rename some of the symbols to make their usage clearer and avoid
+>>>     repetition.
+>>> Changes from v5:
+>>>   * Actually expose the new VCPU capability (KVM_ARM_VCPU_REC) by bumping
+>>>     KVM_VCPU_MAX_FEATURES - note this also exposes KVM_ARM_VCPU_HAS_EL2!
+>>> ---
+>>>   Documentation/virt/kvm/api.rst | 57 ++++++++++++++++++++++++++++++++++
+>>>   include/uapi/linux/kvm.h       | 23 ++++++++++++++
+>>>   2 files changed, 80 insertions(+)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index 01a3abef8abb..2d5dc7e48954 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -6517,6 +6517,54 @@ the capability to be present.
+>>>   
+>>>   `flags` must currently be zero.
+>>>   
+>>> +4.144 KVM_ARM_VCPU_RMI_PSCI_COMPLETE
+>>> +------------------------------------
+>>> +
+>>> +:Capability: KVM_CAP_ARM_RMI
+>>> +:Architectures: arm64
+>>> +:Type: vcpu ioctl
+>>> +:Parameters: struct kvm_arm_rmi_psci_complete (in)
+>>> +:Returns: 0 if successful, < 0 on error
+>>> +
+>>> +::
+>>> +
+>>> +  struct kvm_arm_rmi_psci_complete {
+>>> +	__u64 target_mpidr;
+>>> +	__u32 psci_status;
+>>> +	__u32 padding[3];
+>>> +  };
+>>> +
+>>> +Where PSCI functions are handled by user space, the RMM needs to be informed of
+>>> +the target of the operation using `target_mpidr`, along with the status
+>>> +(`psci_status`). The RMM v1.0 specification defines two functions that require
+>>> +this call: PSCI_CPU_ON and PSCI_AFFINITY_INFO.
+>>> +
+>>> +If the kernel is handling PSCI then this is done automatically and the VMM
+>>> +doesn't need to call this ioctl.
 >>
->> In the T241 implementation of memory-bandwidth partitioning, in the
->> absence
->> of contention for bandwidth, the minimum bandwidth setting can affect the
->> amount of achieved bandwidth. Specifically, the achieved bandwidth in the
->> absence of contention can settle to any value between the values of
->> MPAMCFG_MBW_MIN and MPAMCFG_MBW_MAX.  Also, if MPAMCFG_MBW_MIN is set
->> zero (below 0.78125%), once a core enters a throttled state, it will
->> never
->> leave that state.
+>> Shouldn't we make handling of PSCI mandatory for VMMs that deal with
+>> CCA? I suspect it would simplify the implementation significantly.
+> 
+> What do you mean by making it "mandatory for VMMs"? If you mean PSCI is
+> always forwarded to user space then I don't think it's going to make
+> much difference. Patch 27 handles the PSCI changes (72 lines added), and
+> some of that is adding this uAPI for the VMM to handle it.
+> 
+> Removing the functionality to allow the VMM to handle it would obviously
+> simplify things a bit (we can drop this uAPI), but I think the desire is
+> to push this onto user space.
+> 
+>> What vcpu fd does this apply to? The vcpu calling the PSCI function?
+>> Or the target? This is pretty important for PSCI_ON. My guess is that
+>> this is setting the return value for the caller?
+> 
+> Yes the fd is the vcpu calling PSCI. As you say, this is for the return
+> value to be set correctly.
+> 
+>> Assuming this is indeed for the caller, why do we have a different
+>> flow from anything else that returns a result from a hypercall?
+> 
+> I'm not entirely sure what you are suggesting. Do you mean why are we
+> not just writing to the GPRS that would contain the result? The issue
+> here is that the RMM needs to know the PA of the target REC structure -
+> this isn't a return to the guest, but information for the RMM itself to
+> complete the PSCI call.
+> 
+> Ultimately even in the case where the VMM is handling PSCI, it's
+> actually a combination of the VMM and the RMM - with the RMM validating
+> the responses.
+> 
+
+More importantly, we have to make sure that the "RMI_PSCI_COMPLETE" is
+invoked before both of the following:
+   1. The "source" vCPU is run again
+   2. More importantly the "target" vCPU is run.
+
+The latter part makes it difficult to issue this RMI_PSCI_COMPLETE on
+the way back from servicing the SMCCC call.
+
+Suzuki
+
+
+>>> +
+>>> +4.145 KVM_ARM_RMI_POPULATE
+>>> +--------------------------
+>>> +
+>>> +:Capability: KVM_CAP_ARM_RMI
+>>> +:Architectures: arm64
+>>> +:Type: vm ioctl
+>>> +:Parameters: struct kvm_arm_rmi_populate (in)
+>>> +:Returns: number of bytes populated, < 0 on error
+>>> +
+>>> +::
+>>> +
+>>> +  struct kvm_arm_rmi_populate {
+>>> +	__u64 base;
+>>> +	__u64 size;
+>>> +	__u64 source_uaddr;
+>>> +	__u32 flags;
+>>> +	__u32 reserved;
+>>> +  };
+>>> +
+>>> +Populate a region of protected address space by copying the data from the user
+>>> +space pointer provided. This is only valid before any VCPUs have been run.
+>>> +The ioctl might not populate the entire region and user space may have to
+>>> +repeatedly call it (with updated pointers) to populate the entire region.
 >>
->> The first issue is not a concern if the MPAM software allows to program
->> MPAMCFG_MBW_MIN through the sysfs interface. This patch ensures program
->> MBW_MIN=1 (0.78125%) whenever MPAMCFG_MBW_MIN=0 is programmed.
->>
->> In the scenario where the resctrl doesn't support the MBW_MIN
->> interface via
->> sysfs, to achieve bandwidth closer to MBW_MAX in the absence of
->> contention,
->> software should configure a relatively narrow gap between MBW_MIN and
->> MBW_MAX. The recommendation is to use a 5% gap to mitigate the problem.
->>
->> Clear the feature MBW_MIN feature from the class to ensure we don't
->> accidentally change behaviour when resctrl adds support for a MBW_MIN
->> interface.
->>
->> Tested-by: Gavin Shan <gshan@redhat.com>
->> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
->> Signed-off-by: James Morse <james.morse@arm.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> size as a __u64 is odd, as the return value from the ioctl is a signed
+>> int. This implies that you can't really report how many bytes you have
+>> copied.  Some form of consistency wouldn't hurt.
 > 
-> Reviewed-by: Fenghua Yu <fenghuay@nvidia.com>
+> Good spot. In practice this works because >2GB in one operation is
+> highly unlikely to be processed in one go. But I guess I'll change this
+> to have an output size argument. I guess I could make the kernel update
+> all of base,size,source_uaddr which would simplify user space.
 > 
-> This patch itself is good.
+> Thanks,
+> Steve
 > 
-> Please check the following comments.
-> 
->> ---
->> [ morse: Added as second quirk, adapted to use the new intermediate
->> values
->> in mpam_extend_config() ]
->>
->> Changes since rfc:
->> MPAM_IIDR_NVIDIA_T421 -> MPAM_IIDR_NVIDIA_T241
->> Handling when reset_mbw_min is set
->>
->> Changes since v3:
->> Move the 5% gap policy back here
->> Clear mbw_min feature in class
->> ---
->>   Documentation/arch/arm64/silicon-errata.rst |  2 +
->>   drivers/resctrl/mpam_devices.c              | 50 +++++++++++++++++++--
->>   drivers/resctrl/mpam_internal.h             |  1 +
->>   3 files changed, 50 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/arch/arm64/silicon-errata.rst b/
->> Documentation/arch/arm64/silicon-errata.rst
->> index a65620f98e3a..a4b246655e37 100644
->> --- a/Documentation/arch/arm64/silicon-errata.rst
->> +++ b/Documentation/arch/arm64/silicon-errata.rst
->> @@ -249,6 +249,8 @@ stable kernels.
->>   +----------------+-----------------+-----------------
->> +-----------------------------+
->>   | NVIDIA         | T241 MPAM       | T241-MPAM-1     | N/
->> A                         |
->>   +----------------+-----------------+-----------------
->> +-----------------------------+
->> +| NVIDIA         | T241 MPAM       | T241-MPAM-4     | N/
->> A                         |
->> ++----------------+-----------------+-----------------
->> +-----------------------------+
->>   +----------------+-----------------+-----------------
->> +-----------------------------+
->>   | Freescale/NXP  | LS2080A/LS1043A | A-008585        |
->> FSL_ERRATUM_A008585         |
->>   +----------------+-----------------+-----------------
->> +-----------------------------+
->> diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/
->> mpam_devices.c
->> index 08cb080592d9..8f44e9dee207 100644
->> --- a/drivers/resctrl/mpam_devices.c
->> +++ b/drivers/resctrl/mpam_devices.c
->> @@ -679,6 +679,12 @@ static const struct mpam_quirk mpam_quirks[] = {
->>       .iidr_mask  = MPAM_IIDR_MATCH_ONE,
->>       .workaround = T241_SCRUB_SHADOW_REGS,
->>       },
->> +    {
->> +    /* NVIDIA t241 erratum T241-MPAM-4 */
->> +    .iidr       = MPAM_IIDR_NVIDIA_T241,
->> +    .iidr_mask  = MPAM_IIDR_MATCH_ONE,
->> +    .workaround = T241_FORCE_MBW_MIN_TO_ONE,
->> +    },
->>       { NULL } /* Sentinel */
->>   };
->>   @@ -1464,6 +1470,31 @@ static void
->> mpam_quirk_post_config_change(struct mpam_msc_ris *ris, u16 partid,
->>           mpam_apply_t241_erratum(ris, partid);
->>   }
->>   +static u16 mpam_wa_t241_force_mbw_min_to_one(struct mpam_props *props)
->> +{
->> +    u16 max_hw_value, min_hw_granule, res0_bits;
->> +
->> +    res0_bits = 16 - props->bwa_wd;
->> +    max_hw_value = ((1 << props->bwa_wd) - 1) << res0_bits;
->> +    min_hw_granule = ~max_hw_value;
->> +
->> +    return min_hw_granule + 1;
->> +}
->> +
->> +static u16 mpam_wa_t241_calc_min_from_max(struct mpam_config *cfg)
->> +{
->> +    u16 val = 0;
->> +
->> +    if (mpam_has_feature(mpam_feat_mbw_max, cfg)) {
-> 
-> But the problem is mpam_feat_mbw_max feature is NOT set in cfg.
-> 
->> +        u16 delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
->> +
->> +        if (cfg->mbw_max > delta)
->> +            val = cfg->mbw_max - delta;
->> +    }
->> +
->> +    return val;
-> 
-> So 0 is always returned.
-> 
-> The workaround will set mbw_min as 1% which is too small and will cause
-> performance degradation, e.g. about 20% degradation on some benchmarks.
-> 
-> This patch itself doesn't have any issue.
-> 
-> The issue is the mbw_max feature bit in cfg is not set.
-
-This is intended behaviour as the reset is done independently
-from the value set in the config. The value is there so that 
-resctrl can display the expected values.
-
-> This is a legacy issue, not introduced by this patch set.
-> > Here is a fix patch for the issue:
-> https://lore.kernel.org/lkml/20260301171829.1357886-1-
-> fenghuay@nvidia.com/T/#u
-
-I've commented on that patch. I think it's best to fix it in the context
-of the erratum.
-
-Does the below solve your performance problems?
-
-diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index 236f78ab9163..60d3d3e2193f 100644
---- a/drivers/resctrl/mpam_devices.c
-+++ b/drivers/resctrl/mpam_devices.c
-@@ -1515,16 +1515,20 @@ static u16 mpam_wa_t241_force_mbw_min_to_one(struct mpam_props *props)
-        return min_hw_granule + 1;
- }
- 
--static u16 mpam_wa_t241_calc_min_from_max(struct mpam_config *cfg)
-+static u16 mpam_wa_t241_calc_min_from_max(struct mpam_props *props,
-+                                         struct mpam_config *cfg)
- {
-        u16 val = 0;
-+       u16 max;
-+       u16 delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
- 
--       if (mpam_has_feature(mpam_feat_mbw_max, cfg)) {
--               u16 delta = ((5 * MPAMCFG_MBW_MAX_MAX) / 100) - 1;
-+       if (mpam_has_feature(mpam_feat_mbw_max, cfg))
-+               max = cfg->mbw_max;
-+       else
-+               max = GENMASK(15, 16 - cprops->bwa_wd);
- 
--               if (cfg->mbw_max > delta)
--                       val = cfg->mbw_max - delta;
--       }
-+       if (max > delta)
-+               val = max - delta;
- 
-        return val;
- }
-@@ -1577,9 +1581,8 @@ static void mpam_reprogram_ris_partid(struct mpam_msc_ris *ris, u16 partid,
-                if (mpam_has_quirk(T241_FORCE_MBW_MIN_TO_ONE, msc)) {
-                        u16 min = mpam_wa_t241_force_mbw_min_to_one(rprops);
- 
--                       val = mpam_wa_t241_calc_min_from_max(cfg);
--                       if (val < min)
--                               val = min;
-+                       val = mpam_wa_t241_calc_min_from_max(rprops, cfg);
-+                       val = max(val, min);
-                }
- 
-                mpam_write_partsel_reg(msc, MBW_MIN, val);
-
-> 
-> If the fix patch is good, could you please add it into the next version
-> of this series?
-> 
-> Thanks.
-> 
-> -Fenghua
-
-Thanks,
-
-Ben
 
