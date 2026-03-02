@@ -1,35 +1,51 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C54E33987
-	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 08:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401B123BD1D
+	for <kvmarm@lists.linux.dev>; Mon,  2 Mar 2026 11:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772439416; cv=none; b=phBQRahlmzYObXaLAYV4FiH1JWovKXU2XWMN//ZVWhQZ7SzwiyjuPXySfgzspF3UeB4arPqTvUjqmpdYVWVykPLJX+63HrN/+6XU3Ot16uplXs/W+quuJBQiyN7UGX9hrxiZHcYnWrVfTl1UkqDZueBYNAssRDiiv/lkm0sZ89w=
+	t=1772452635; cv=none; b=uldVRX8aKW1nqB7yD76imSNI57t9i5jkfV4jLMf+JiVogID3to8loSGbs6upQzrN9sQPSaS119DyjpSvUU7SA8NxBoRPMLHTAhtSkWPb3JLSS8dKw+OP4Kkf4DCTtb0OI7SeBdFaMvaj8ZdxTdZSgMZGDNf5rPZzLDXD19ihs5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772439416; c=relaxed/simple;
-	bh=gvBbCBgEcIFqDVI1QeEmkRwEf9oU0LqaFRQl2eyN+VU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fVn5VDOWQAaKSjq8hoXqndlHUXJh5b4T5tK62+5uX7kB1gvOhPPYBDUC4ZRrzRTXcRUTyhm0tfJrpXnyNxGTWOvCFI40cxvEBhJ02NtqGKvsXQrp1PMK/YYFJPuTD3pb2NR3kXTlJy0morFuwMYvMuQbhD01YnwOu3jViPwZKww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4125114BF;
-	Mon,  2 Mar 2026 00:16:47 -0800 (PST)
-Received: from ergosum.cambridge.arm.com (ergosum.cambridge.arm.com [10.1.196.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1C6953F7BD;
-	Mon,  2 Mar 2026 00:16:51 -0800 (PST)
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
+	s=arc-20240116; t=1772452635; c=relaxed/simple;
+	bh=c49Vj6dYxBjCUX5m63Z1mVVfVLMWdQ22PCQzSa8wfQ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KJyIjlwxXzYHI4CbtKiGBfa/+OpIgiPwRC/vffcgWJv70nK3Vt2+nl4VnpGWNRlG2jWdVP5cM7tSYbamhU9Ub6cd40/o+mwg2aHfHhPW2CsVZiqcmYJ2nEfl2RpkwrADqyx+gtj1p22JToXYYQaMpxl5v+9xGANEbCDSDsXo+/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVmCX3Io; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVmCX3Io"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7764C19423;
+	Mon,  2 Mar 2026 11:57:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772452634;
+	bh=c49Vj6dYxBjCUX5m63Z1mVVfVLMWdQ22PCQzSa8wfQ8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UVmCX3IoDgCmqpqpmjBui/OrryISQMxnOSAkik4i17ixpSSw2tiNjZ1t/gsIRzcCb
+	 84gB8YdIaCncB9PIEo23HzIKTvZiPKuSqGlZRpjvSmWVrQC6edK6rNp1mUknBpcf2o
+	 8kcovZ+SSoYDGq6EksYR4DOc22uQMWubcoKpFTOAqcHpOkQyDp0hBSGtr8bNbDApKM
+	 Aqjn6BtI7I9NFiTAniRhnaaYqBVKYZ0NktGpjF5Oj7sQ+/K+rPauDr9PDFEaR4Nrpu
+	 3URiicXMHyeWxv9rR6XQuq8PFOnsNlvpsms8DOzfNH/MordQ5MxNduJ3qpwfT3bowo
+	 Bp6hVzQUfoa1Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vx1tg-0000000FDFJ-3ap5;
+	Mon, 02 Mar 2026 11:57:12 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: Fuad Tabba <tabba@google.com>,
 	Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Move inside all remaining TCR_XXX macros
-Date: Mon,  2 Mar 2026 08:16:46 +0000
-Message-Id: <20260302081646.2866370-1-anshuman.khandual@arm.com>
-X-Mailer: git-send-email 2.30.2
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v2 00/11] arm64: Fully disable configured-out features
+Date: Mon,  2 Mar 2026 11:56:41 +0000
+Message-ID: <20260302115653.1517326-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,139 +53,48 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, tabba@google.com, will@kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Move all remaining TCR_XXX macros inside KVM specific header i.e kvm_arm.h
-for their continued usage in KVM, as there are no more stage-1 usage left.
+This is v2 of this series attempting at making the handling of
+features that are disabled at compile time a bit less awkward for
+non-userspace consumers of the sanitised feature bits.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
----
-This patch applies on v7.0-rc2
+A few things have changed, thanks to Fuad and Suzuki spending time on
+reviewing this, but the overall behaviour is the same.
 
-https://lore.kernel.org/all/20251013052945.2197190-4-anshuman.khandual@arm.com/
+* From v1 [1]:
 
- arch/arm64/include/asm/kvm_arm.h       | 45 ++++++++++++++++++++++++++
- arch/arm64/include/asm/pgtable-hwdef.h | 45 --------------------------
- 2 files changed, 45 insertions(+), 45 deletions(-)
+  - Mark ALL_HIDDEN and HIGHER_SAFE as incompatible
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 3f9233b5a130..a7bbf853100e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -107,6 +107,51 @@
- 
- #define MPAMHCR_HOST_FLAGS	0
- 
-+#define TCR_T0SZ_MASK		TCR_EL1_T0SZ_MASK
-+#define TCR_T1SZ_MASK		TCR_EL1_T1SZ_MASK
-+
-+#define TCR_EPD0_MASK		TCR_EL1_EPD0_MASK
-+#define TCR_EPD1_MASK		TCR_EL1_EPD1_MASK
-+
-+#define TCR_IRGN0_MASK		TCR_EL1_IRGN0_MASK
-+#define TCR_IRGN0_WBWA		(TCR_EL1_IRGN0_WBWA << TCR_EL1_IRGN0_SHIFT)
-+
-+#define TCR_ORGN0_MASK		TCR_EL1_ORGN0_MASK
-+#define TCR_ORGN0_WBWA		(TCR_EL1_ORGN0_WBWA << TCR_EL1_ORGN0_SHIFT)
-+
-+#define TCR_SH0_MASK		TCR_EL1_SH0_MASK
-+#define TCR_SH0_INNER		(TCR_EL1_SH0_INNER << TCR_EL1_SH0_SHIFT)
-+
-+#define TCR_SH1_MASK		TCR_EL1_SH1_MASK
-+
-+#define TCR_TG0_SHIFT		TCR_EL1_TG0_SHIFT
-+#define TCR_TG0_MASK		TCR_EL1_TG0_MASK
-+#define TCR_TG0_4K		(TCR_EL1_TG0_4K << TCR_EL1_TG0_SHIFT)
-+#define TCR_TG0_64K		(TCR_EL1_TG0_64K << TCR_EL1_TG0_SHIFT)
-+#define TCR_TG0_16K		(TCR_EL1_TG0_16K << TCR_EL1_TG0_SHIFT)
-+
-+#define TCR_TG1_SHIFT		TCR_EL1_TG1_SHIFT
-+#define TCR_TG1_MASK		TCR_EL1_TG1_MASK
-+#define TCR_TG1_16K		(TCR_EL1_TG1_16K << TCR_EL1_TG1_SHIFT)
-+#define TCR_TG1_4K		(TCR_EL1_TG1_4K << TCR_EL1_TG1_SHIFT)
-+#define TCR_TG1_64K		(TCR_EL1_TG1_64K << TCR_EL1_TG1_SHIFT)
-+
-+#define TCR_IPS_SHIFT		TCR_EL1_IPS_SHIFT
-+#define TCR_IPS_MASK		TCR_EL1_IPS_MASK
-+#define TCR_A1			TCR_EL1_A1
-+#define TCR_ASID16		TCR_EL1_AS
-+#define TCR_TBI0		TCR_EL1_TBI0
-+#define TCR_TBI1		TCR_EL1_TBI1
-+#define TCR_HA			TCR_EL1_HA
-+#define TCR_HD			TCR_EL1_HD
-+#define TCR_HPD0		TCR_EL1_HPD0
-+#define TCR_HPD1		TCR_EL1_HPD1
-+#define TCR_TBID0		TCR_EL1_TBID0
-+#define TCR_TBID1		TCR_EL1_TBID1
-+#define TCR_E0PD0		TCR_EL1_E0PD0
-+#define TCR_E0PD1		TCR_EL1_E0PD1
-+#define TCR_DS			TCR_EL1_DS
-+
- /* TCR_EL2 Registers bits */
- #define TCR_EL2_DS		(1UL << 32)
- #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 5e6809a462c7..cd5571afd868 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -229,51 +229,6 @@
- #define TCR_T0SZ(x)		((UL(64) - (x)) << TCR_EL1_T0SZ_SHIFT)
- #define TCR_T1SZ(x)		((UL(64) - (x)) << TCR_EL1_T1SZ_SHIFT)
- 
--#define TCR_T0SZ_MASK		TCR_EL1_T0SZ_MASK
--#define TCR_T1SZ_MASK		TCR_EL1_T1SZ_MASK
--
--#define TCR_EPD0_MASK		TCR_EL1_EPD0_MASK
--#define TCR_EPD1_MASK		TCR_EL1_EPD1_MASK
--
--#define TCR_IRGN0_MASK		TCR_EL1_IRGN0_MASK
--#define TCR_IRGN0_WBWA		(TCR_EL1_IRGN0_WBWA << TCR_EL1_IRGN0_SHIFT)
--
--#define TCR_ORGN0_MASK		TCR_EL1_ORGN0_MASK
--#define TCR_ORGN0_WBWA		(TCR_EL1_ORGN0_WBWA << TCR_EL1_ORGN0_SHIFT)
--
--#define TCR_SH0_MASK		TCR_EL1_SH0_MASK
--#define TCR_SH0_INNER		(TCR_EL1_SH0_INNER << TCR_EL1_SH0_SHIFT)
--
--#define TCR_SH1_MASK		TCR_EL1_SH1_MASK
--
--#define TCR_TG0_SHIFT		TCR_EL1_TG0_SHIFT
--#define TCR_TG0_MASK		TCR_EL1_TG0_MASK
--#define TCR_TG0_4K		(TCR_EL1_TG0_4K << TCR_EL1_TG0_SHIFT)
--#define TCR_TG0_64K		(TCR_EL1_TG0_64K << TCR_EL1_TG0_SHIFT)
--#define TCR_TG0_16K		(TCR_EL1_TG0_16K << TCR_EL1_TG0_SHIFT)
--
--#define TCR_TG1_SHIFT		TCR_EL1_TG1_SHIFT
--#define TCR_TG1_MASK		TCR_EL1_TG1_MASK
--#define TCR_TG1_16K		(TCR_EL1_TG1_16K << TCR_EL1_TG1_SHIFT)
--#define TCR_TG1_4K		(TCR_EL1_TG1_4K << TCR_EL1_TG1_SHIFT)
--#define TCR_TG1_64K		(TCR_EL1_TG1_64K << TCR_EL1_TG1_SHIFT)
--
--#define TCR_IPS_SHIFT		TCR_EL1_IPS_SHIFT
--#define TCR_IPS_MASK		TCR_EL1_IPS_MASK
--#define TCR_A1			TCR_EL1_A1
--#define TCR_ASID16		TCR_EL1_AS
--#define TCR_TBI0		TCR_EL1_TBI0
--#define TCR_TBI1		TCR_EL1_TBI1
--#define TCR_HA			TCR_EL1_HA
--#define TCR_HD			TCR_EL1_HD
--#define TCR_HPD0		TCR_EL1_HPD0
--#define TCR_HPD1		TCR_EL1_HPD1
--#define TCR_TBID0		TCR_EL1_TBID0
--#define TCR_TBID1		TCR_EL1_TBID1
--#define TCR_E0PD0		TCR_EL1_E0PD0
--#define TCR_E0PD1		TCR_EL1_E0PD1
--#define TCR_DS			TCR_EL1_DS
--
- /*
-  * TTBR.
-  */
+  - Don't update a feature that is ALL_HIDDEN (or overridden) on the
+    secondary boot path
+
+  - Reduce the size of struct arm64_ftr_bits
+
+  - Add a helper for setting a field to its safe value
+
+[1] https://lore.kernel.org/r/20260219195533.2455736-1-maz@kernel.org
+
+Marc Zyngier (11):
+  arm64: Skip update of an idreg field affected by an override
+  arm64: Add a helper setting a feature field to its safe value
+  arm64: Add logic to fully remove features from sanitised id registers
+  arm64: Convert CONFIG_ARM64_PTR_AUTH to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_SVE to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_SME to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_GCS to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_MTE to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_POE to FTR_CONFIG()
+  arm64: Convert CONFIG_ARM64_BTI to FTR_CONFIG()
+  arm64: Remove FTR_VISIBLE_IF_IS_ENABLED()
+
+ arch/arm64/include/asm/cpufeature.h |  15 +--
+ arch/arm64/kernel/cpufeature.c      | 141 +++++++++++++++++-----------
+ 2 files changed, 94 insertions(+), 62 deletions(-)
+
 -- 
-2.30.2
+2.47.3
 
