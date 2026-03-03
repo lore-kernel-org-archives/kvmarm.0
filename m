@@ -1,29 +1,29 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013046.outbound.protection.outlook.com [52.101.72.46])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010070.outbound.protection.outlook.com [52.101.84.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB020382F04;
-	Tue,  3 Mar 2026 09:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F27D369206
+	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 09:49:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.70
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772530071; cv=fail; b=R9q0iLZ0N8+X0x1CvXLyvo/yhexercIIl3uGqR3MwQWsFyKIK0wuHjWwS75KtUOQCsb9PjVNBX/YR47HLhqBQ/lWrO9QdueYnYqaBujcJdVUMX38Ma9uE3rhdtNk01xF0Ax5/U2mngCBxmHJQXWd/BzGuL8DuULh0Xzqh4ZFjRE=
+	t=1772531359; cv=fail; b=HDkbADH3yVf1urb/VNXwO8I0rUtYLwKi8W9df5Aef5OS6tJwZMXBadB0KLxqyhxlcRN3Gl+sjgFDc9lb/mBdwmbBnRfWjV/sVVjmejGsLzv8ATU1FwoyhOYUo+K7Nf7gz0d5ZxDHMvd+Y8vSG540yMSomvYw5k405aYXeDBRGdo=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772530071; c=relaxed/simple;
-	bh=HWfLiAFz9zcZ1kyyt454sGPabLYAfx6SKrQwIAF6SuI=;
+	s=arc-20240116; t=1772531359; c=relaxed/simple;
+	bh=GU8wDRmKNIVFRzsVV+IEYBg72bdsvLzvj52X2iSoNh0=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mxWKdmmV6TBzg7+2GvS1sElQMr8SJKwr3TOA4Urs/4s8j6EmF3+l6ARjIdC0MPV4FZzyC1jF+OZv6j9+THoJk+ttoBQKzecivqS/INCObhfvN0uvUl66VkyqoiP16068ZP6Fdetho+hMrCp/FoQv2iqkZKIpHhPu99PhexbmfnA=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sCJXW1tR; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=sCJXW1tR; arc=fail smtp.client-ip=52.101.72.46
+	 Content-Type:MIME-Version; b=GoI4Swa9r9lGtVy/wUKCPUiY5Z13gxL/v5SBgYkwOD5l+z0qo7PlEkPmugJf95p2z4m1vBmB9USaz3cbdM2sDHSHWsdkF+9BbiMSCVwVNLlhgKrBo6H+C+CXa9hZmrmi9Qr+FUBbaq3Nuw6wNl6A8Y3usDQkuVPArQrGUExBRXY=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i9Mts7Di; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i9Mts7Di; arc=fail smtp.client-ip=52.101.84.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sCJXW1tR";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="sCJXW1tR"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i9Mts7Di";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i9Mts7Di"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=RKkHh1zn/wWQzvY6S8Tl4+mu8+q4oyVSsHPtRexIjEJvnNi5oxMKESPVFrflWtc4So53BGIQLddoe1u23Pia5hDwYBjFxNcxR2dmR3ac7N97Krten2M68r9FwVaDrXrZJyiNmDVaoWUZNxC824vzhKEDWJ67MFU7jwMMjlxHhtSrtqF1JgXClQFQz7AIYXLZwG3zLfNPqdXoPO9b/PxAe7N9sCQRC7Ns0gKEJWo0/KUS9j8wj5DKd75ejcXs4Bbl2TmQF3vNlrr7OyeDehRYi1Tj/Ktnrtzc6jBzWMONBHF59AGx+ql5iKQsMKbhm9JQtTSaXVJfgQqp5GJSYdm+Sw==
+ b=euVcBIo1DEEIGylwaKNn09wA2QjNVdsLt9CMRrBEBVUYHcCyvVYPINvYucdxYWhAyWt/bsY/ADhgSOspCfL3nIkx7sZTZbIxxM/KYx5GOH2z3E2VmIOK/tuOVvktHNdYa9ymm0xiEi0JX4F1ko1e6m4nEd/wU27DvKpYO6XXtuIYk9ZyDMc6Sv67F8mJ/gd1odBbZv3Qp/4tQvaEv0gnfNfBzqwZUjqhzhJl+ceZ9bQauz7KTfWqeeD45cjyz3wZPxi3DY5x5WO/CKZufkD2PVznJ+zw7V79OJP5Lr1uCwcJObZ3K1BNEzIEzNi6Cn+LCDhna14YtHDXn4Hgmq1iFQ==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=E2MQ3/WLz3IQGnKlRpicjEwz095ir+DGsm05kgBDmjqAyBgyKM7DLYP+k73Zj1AmBRLBXgsTRIBpQkyIij5q4LXFqBiG2ruFFhAI213hWxcNo+pMF0yemy8JF4JeCOPmiunkbVURcwhPtMiJASQ2PYu8obuGiVda0V6knqLLO/xt+bS6K7T+cTwEaFBLzo2nxiv0L+aIgmNiOSNNEtd9WEbKruCP3k2Hjswg30QiOM9qgIoC0rTSiPutdSyuQRzo0lDQMez6R+8eHUgLyM9sf5CEsDFCbuL9QbqZ3zvyonWg1jiKN1p02+anWamFgdTlu+oFIjl2GUwV74tW0B24vA==
+ bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
+ b=i9e3Y8vDP/SiAH+0+fIEECdbGW3qpkQSpfoxJTL8z7f27xpnc+Z8Zs27hVlZM6GuqD8z7ov4/aZrPyBCcMZ+4Idh7bZclB0bhEiWH5EbfMjNWKuxA99KdyK8QkCVEQIv1TDiOhBgdEpuHsvVkyEP3WvqIldKA6IJh/u4Rgsa97LsUOu4uBlvoGadHEWkc0IuqmH5b0auYIubGTdW3TeMWXQYX9PX3ItNFg9H3oWTW3Jcsa5erbnwb2x9lhL6zKhQmstVt6ZY6MBlhYhJn4fvy+1LUqrbpyLQgpuJREn8HTQVHeMStjHRg1WfaY2dNH02BzJ7xjnqbQ6W0hglwa8Cxg==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=sCJXW1tRL4FfQD0r6BNuIZL+hZo50pkLKXXSNNxRCV23/13/RoW/6GeqpypmWCjv4Ips0hGJQ4TT3wIEKuffhnUaD/msYsjb1Wj9VSHyatOVthqH5p2MHCj4CAtW6yjmYFkE6D2yMEk+KwvzsjWyb2RkRD0lvvjiyBT3hxF7UMg=
-Received: from DUZPR01CA0162.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4bd::10) by PAWPR08MB9805.eurprd08.prod.outlook.com
- (2603:10a6:102:2e6::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Tue, 3 Mar
- 2026 09:27:39 +0000
-Received: from DB1PEPF000509FB.eurprd03.prod.outlook.com
- (2603:10a6:10:4bd:cafe::12) by DUZPR01CA0162.outlook.office365.com
- (2603:10a6:10:4bd::10) with Microsoft SMTP Server (version=TLS1_3,
+ bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
+ b=i9Mts7DiC8HiXpN78xlJgVnZB+G7RfkrzrCNJaX3wfbTdLRoYTtIsEIgH21bil99cHWgmmFlLbUfssdBC0oSJM+t0iGrI9k7fGFNozzZ7Xo7/DTG/1jySBHZ2AnASj6+VcApvnkVFx3rS7zr9QEwGyZTKV7W3jcVQrgLk3tQhUg=
+Received: from AS4P251CA0005.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:5d2::10)
+ by PAWPR08MB11511.eurprd08.prod.outlook.com (2603:10a6:102:50b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
+ 2026 09:49:12 +0000
+Received: from AM4PEPF00027A69.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5d2:cafe::92) by AS4P251CA0005.outlook.office365.com
+ (2603:10a6:20b:5d2::10) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 09:27:39 +0000
+ 3 Mar 2026 09:49:11 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,61 +51,54 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509FB.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9632.12
- via Frontend Transport; Tue, 3 Mar 2026 09:27:39 +0000
+ AM4PEPF00027A69.mail.protection.outlook.com (10.167.16.87) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.16
+ via Frontend Transport; Tue, 3 Mar 2026 09:49:11 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HKJt69QIBgLhV+GmZCNxwdfC/SM47fpsWBz/9S93albAgfTzT3/tEWCRAsV1fPzJrpewen1wL7i20r5Xu3UyNy1t4O3mT/ELhmdtGr31hxw8pDpxxNfNX5hvi/2huR9YeLnqVX9X4ZsvYU3tqRezHtamYsl5kek2UEgdGyX5Np8my/G1TgkhJ1KFOvS2doMTNeNlBfvaS0tvg5fvjJI45UnyaF3NCjFPFU+TdCodOdrzDU5GMfPu3Yzt+hkChAVTyNMdh/J/kZmB81UrX5Bv+K54fyN8eSP+tAqrFCzeiwmfP0AXmpp3h1vdP15UrtgkmFuryIa08K80EO/JpyfpLg==
+ b=u61wZDjT4ZxNfSM4atv2LnUequ/uNZjgU0N+XvWBSAIS4qgCskl6Eyu2nPMXW3jFF/SOea9se6nWOiiiINkRqavizv73QC70rUK1SKMLF7LT4wFRzkKwBMkb1DLe2iPNoeaYrzCAw/dnV9cvvfXN4hGdp//4CLaUis0PTa3ZVgUrB3iBIiqDP+XET/w1ldWZ0rBEtT3dXQmM2NRMNwmcQJ1PbeFsIpUOPFRZqSBiBrDZ3gXm+g7YwR8eu2uWO0HMtvGtqeW6//5EfSxWuNRzBt+fkWW5Ov0ICzJ1BEk0/ylgVqVJIKn2SoXHImIr0y72kOIbrndQjX6JC4zrbU1jYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=rNV78euD9JpoSntL2kRnq4KAAeaTeqxc8RLRaiT4HHZkv4vAHGbEBO0r7CfRfhaAQIziBJnSKumqlaLFM1lyMI4+xrhT5EYfL0raJvZCB+/lNMMR5HCD68TBcx9cfDh/df2DeyjBZep50bzGBqqtepWGv6h6ud66r0/Az93cpULaXeRdqNZqHm7RtkMvnSkFNe2cm/PUommAoYczS51VH3DuhxvGrth7gdZHdVajN2I3/lcsVUnZEop2G6YP3TQIifflaXlntzwtlxJEDKzMxwNwlgI6OFAd/4mabQWc/fXFog8vBaDchdUyH2cgWPXfW6dqSrFpOpl9woxtyFpTKQ==
+ bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
+ b=CZa7xoN/Z02+wmg6AIJHW0oIm65Fw2aTgYLcOKRDPGvvNkE/yF7EDZsA85K3oeis5ZdUl+AcKzpvgq2l77AsrnAVW4cbxA/09k3LNn4IXbZWQkNI3xbmwp9orQLbUqUoCfmw9Fcj6/rXciNAUuamf7HXmFtfrIDP8EIv/NZlz03WsHoM086wfr8J6KV6zvNsRHuml/K7X4D70Acy58zkUt3g974SvUSOo+uCRDlw34REcdSoh2kudTBUpYeFWEZrwePIzbatSS6+s80V8j+coX3fLvWNgGRFt0cW466BUBW+93+GQKkOtQrikfLers6e/0NPQ/ZC/+uxOdZviMZGjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p2W3F7AANwfXVDP1pQXJZrXkVatr0nzlXFJJ8dLa0uU=;
- b=sCJXW1tRL4FfQD0r6BNuIZL+hZo50pkLKXXSNNxRCV23/13/RoW/6GeqpypmWCjv4Ips0hGJQ4TT3wIEKuffhnUaD/msYsjb1Wj9VSHyatOVthqH5p2MHCj4CAtW6yjmYFkE6D2yMEk+KwvzsjWyb2RkRD0lvvjiyBT3hxF7UMg=
+ bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
+ b=i9Mts7DiC8HiXpN78xlJgVnZB+G7RfkrzrCNJaX3wfbTdLRoYTtIsEIgH21bil99cHWgmmFlLbUfssdBC0oSJM+t0iGrI9k7fGFNozzZ7Xo7/DTG/1jySBHZ2AnASj6+VcApvnkVFx3rS7zr9QEwGyZTKV7W3jcVQrgLk3tQhUg=
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 Received: from DU4PR08MB11769.eurprd08.prod.outlook.com (2603:10a6:10:644::21)
- by PA6PR08MB10782.eurprd08.prod.outlook.com (2603:10a6:102:3d0::12) with
+ by AS8PR08MB7943.eurprd08.prod.outlook.com (2603:10a6:20b:53b::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.18; Tue, 3 Mar
- 2026 09:26:33 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Tue, 3 Mar
+ 2026 09:48:07 +0000
 Received: from DU4PR08MB11769.eurprd08.prod.outlook.com
  ([fe80::d424:cd62:81a8:490f]) by DU4PR08MB11769.eurprd08.prod.outlook.com
  ([fe80::d424:cd62:81a8:490f%6]) with mapi id 15.20.9654.020; Tue, 3 Mar 2026
- 09:26:32 +0000
-Message-ID: <ec27e294-0bee-474a-a15b-6be20ee10cd4@arm.com>
-Date: Tue, 3 Mar 2026 09:26:31 +0000
+ 09:48:07 +0000
+Message-ID: <b6f0b0c8-c2a6-4b61-a0cc-482450c092f5@arm.com>
+Date: Tue, 3 Mar 2026 09:48:06 +0000
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 27/46] KVM: arm64: Handle Realm PSCI requests
-To: Marc Zyngier <maz@kernel.org>, Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-28-steven.price@arm.com> <86pl5m89ub.wl-maz@kernel.org>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Disable SPE Profiling Buffer when
+ running in guest context
+To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
+Cc: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
+ James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
+ Fuad Tabba <tabba@google.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Yabin Cui <yabinc@google.com>
+References: <20260227212136.7660-1-will@kernel.org>
+ <20260227212136.7660-3-will@kernel.org>
 Content-Language: en-US
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86pl5m89ub.wl-maz@kernel.org>
+In-Reply-To: <20260227212136.7660-3-will@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PA7P264CA0458.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:398::15) To DU4PR08MB11769.eurprd08.prod.outlook.com
+X-ClientProxiedBy: LNXP265CA0040.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:5c::28) To DU4PR08MB11769.eurprd08.prod.outlook.com
  (2603:10a6:10:644::21)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -114,164 +107,200 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-TrafficTypeDiagnostic:
-	DU4PR08MB11769:EE_|PA6PR08MB10782:EE_|DB1PEPF000509FB:EE_|PAWPR08MB9805:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65fc0ce4-d296-4eeb-720e-08de79071d0f
+	DU4PR08MB11769:EE_|AS8PR08MB7943:EE_|AM4PEPF00027A69:EE_|PAWPR08MB11511:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7480d260-b9e1-4ecd-2b61-08de790a1f61
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+ BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
 X-Microsoft-Antispam-Message-Info-Original:
- ySJ4q5Na58OiWjXasI0Kt+HJEW81x3fs2qB+g3v94XtUPvWCd4bhGLKbU51WpZeSAPGLCvNC4xLL5rxivWhWEAcMyqiWKOpbgge4H5WxkoNdEZgl7FOiE/l+2v3cLDSN1Cc+hywmSyhq3F0vGsrJSz5rRyVKhxfbVgxPh5aGr0HgbGHx7YSynpRzr59PLhGlzuGHwg+4vlG/Xh44WGD7q8fLT9Y7Jo8oCvZg2m1mw9E8y5UlBjp0bGZO2PWA8sT6LVR5RetQIeoDhw8upl4meFNoxjAUdUWoyzRky5pnjYYN8EUDolmLOzm0ThZQ0TEfAQTF/INrw5s3RaJSrhA7b+DM1O6/02TIxejHdcanTLX/yOuJDqz4UjhJi8JECJEYS0lie3pxPARCQKTs44I1iqzBJWi6DRjXTTyKJbHQ69XJ5fgBwCFeiE/4aMTTnzvqJx8L/0kiHTlShoQw/Ef2SJPTQlmsPL2hBNbxcK5puqM+LSyHIW1hXJU5hILaoTdAVVN2j4Bt0VCCjFAc29nBddsuhlubQqdW4uRs7s0PTpnkduRIJuWSKChfNMlMacvOxDd17t9xkfwD7Uzsrs6qE/P2os+Vve38MN56j7LP/53FSQDDJEBmxO80AZofZE9Fy6ryqg4bQk5qL+YCBHP21f1YiqIObdsIDWPQdMA2iZcQvJDCLMSX2VkF9Lj/Yu7uAdZ3RrQ7RXTMc0LF974zbJQrWSVqN5F6AWTKEIIQ3yw=
+ fxLUwy4mdlfpGs9Ll0aHtEnWQfWzTuzkD24phbVH0cjbEFzuURCKmVXI4qzLV5mKePx3kZkK0oHJM98ybamfIkTCaAwAhcbU+E7zaeMAKV4yvCOi3IposUmDsREQ3ITACn8a7gC2lFux2PhFdfsTXKibqD31Yg+OC8oW69MuzJ4t/I6cF5ugBogqY6uC5XWHHSjtPniNphAtbBoFO4ZEr6RiY2aDEgeaoA8iYxtZyY41lgxKMnS5fy1eFF/TNSLwuhPPkW/Gnw16scpJZPsNgO9zMUzRVdT0hxM4mZlt4BSpNkGCtwz3gmriZFJzmQK1B7ZWb+PUe3i7+pgx5YdphVTHY8+y4QUGgwX8kqgun5p41dI4JQxMw8JM13qs7BZ/43EWVA1xNOIM0t2uw250Bt9Aw3X6U7ZFuCASRcoWdHunyWEp8DDKcuW14/THrS3Nox/0A/aurRZlOhOHdvOke2MalooBLNmz9LImAGTQ6f7V6pWfWCWo/h3KBgjmIznP4r6oqQLVCYNnJo2qJIiPOXEPTw5bcYrXIQMqTnwgLoel5lO1b4YeKpyD9s4tvDc1etUTrlRpmtd4nMfw3xJOna8QJCPf09SCnZPLlN/VDRrIq8hjztcg4pzYLcS0MhCB/dkWMrdxeEH3dcDvJlJJUdx/XWB2wwTtcVSY/eWIj4AEteXmgGkXwj2GeFbw4qew6KzQzBbiRN3EOdi0vLaY/Woc+9X6iI7LKOAprSgl+0A=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10782
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB7943
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509FB.eurprd03.prod.outlook.com
+ AM4PEPF00027A69.eurprd04.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	0946886e-2ca1-4197-b886-08de7906f572
+	4566fb2f-8fb7-483a-8d15-08de7909f923
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|14060799003|35042699022|376014|1800799024|7416014|36860700013;
+	BCL:0;ARA:13230040|376014|35042699022|14060799003|1800799024|36860700013|82310400026|7053199007;
 X-Microsoft-Antispam-Message-Info:
-	C4EpFPcgBMK4BNup9Nllkdmno1WMOvpsKX3Z5p1vShQmvaViz6Rt6hf4m6uuBKc7+5obrcE7MhlPRhHVsxFXNJ5APZYjDmC7/quhR/XZ4ncq4mZdBb2pYW54L1M6pguEv3UkmLU7dSLd8E/XDFbNdta+weVgRBvVv0oeziOPst6bVXsglFVgBCgQZvEiXe0irTwaeyTAh5RK+BC4r/Z7hQXI7CslZtX8L/7X2GhF6gMb51ib/Z7GZOLQOgpZG5x6jdzs+fGowbbd3zdu984drbPWHW7gkrA07Pn3ZtWZW8mIvgnX8CAtkseTRxgM0RQAjWjRWojT2eBMnwVwo4NvDDYuhl7g/Ms8M3YfPBdbVeAPG9QwNiOVc29d6Pz5xnbzDuxOPukBKydQUfckISEAUB2Xtp57E8ofm721KXTWGoFi32rx7X94/5CNugcf5x5+lzVXlx2a/KVZhLzEyUKQLAF4DchlU6IpamZ5pZuN+rfuVjHqfXZAPoKxuX3C8twvR+qTES+JJFRnamxXYIGIO5daF2hJw1En8ZSk3EsNKeTpNimizEx8+Z6CHam9J8SRadQb7siouI+JSmsqVwKUz3OL4rR6UNfd705QU8XLzSUT89iipWRRkOIIOyNbYJmY4t7Krkt3Dh4QF0Dtlbf+3p6IbY56MnpRBqwWG7Pp19owN6ZnTQawjNqtkQXv1UgzB9fNIDYGcZLQf4QpQjPZPUQd0o+bp0hkQjLP6T0a+qk8X1TU8hK3REmReNnJm8CWtqlaLbaksrB0kdh20/MHtIdpbTFoYieRsz4PME5a4h7cIGigTRQ6TNs92GucULRSILJIK4X4zE40RD+dokH9vw==
+	yOxCXjwwXCmAvRBykNAX1vc0MnOaUvidoyLZJ4h4b9TqHreey/ad2G9gaZC8Lvn4E4YSaTMmb+qVq2BT3GLHcTrzyYViAcWBNIjojDB6looAg2Wbmbp/V8E13jbCg0HqQMSSlS/yHxHNfNtBNIYUJ/e4LM2o3KxPhbpCMaLjx+NfBidhXFZHnTmHf0wxyr2y8JCePsUyi5Y/HkX9567FmqqOOCuCzYWP2Swwwi/95yMZFGCpJuwWpoDLHnSHYSB9ZjH0OCYTJ4EohtXyLo0NSUbdjlXIYkGhHLbc5rG+1DIZIjT4NsR+u6wZoB1ketHbCHFMMHASEiq6I7gCjFtv/9dcwPwgnmuqo74SN7SfSRphsoLEwr28150dCGMzg0rY58eBhHhyWEUV579zygsx1rl44Fq5vBkkkJ6KocM4ql+7kXr67fpGnzJOa7C/N3j8FJ3PsCVbhK8xHXml0mWSptG/8PdJxqBT2TJW4aMf5AgA32RHhqyBxa067mdNJTZSvHbdnF9bouLMFhdeeQcOSIk3GNi4M0NWN7hDlniMToQ1D46iRcMmaCfzjbBTNroQa0qjmAhV916ylnWn9U6dfRp/NlMdeXIN/H22t1XAPbCOs639abuRCQhwAr+ddw7AZ9a/W47JkMQtUqOgYdTUvh5aFY1WTIhjvIiYn/p8F1SmyNFcY3sJz6B2paCFndliLsQs3B19BLggmZRUBZ9vAtyziWoVtCCqhjBWOyQrHPSajsWWP3Ui/PFzgkNJTOoXWhUS2DgJQaIVJVhjsXXu7yGp6Rnix11TRxpC/OFChz7h/aM404DlbGSyDiCvYadsvKoiYHl2qsH5tO7SLFb+/w==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(14060799003)(35042699022)(376014)(1800799024)(7416014)(36860700013);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(35042699022)(14060799003)(1800799024)(36860700013)(82310400026)(7053199007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	/RL5KmztYlq/om9cK2U7lzorDsmg3CqyKnnEeQ225ijHeiNbJU0zu15QQfDxRY+ExGbMsH9BIen7h9gPyrb+S3aVPHXqs9H866ook6HyyoZGx32FqmO52AoWZxDMrhf4Z0RLxbKhYTvdXmh1baXWqDij/hCInU4agoCqL3QiYCWVtOxP4mnYj09TgrFMZsVSsTYvlL2E39a7bb+lQF6ZELq/Auhjqr11Op7nno/B4cGhNVptqD/CH2oDJVaa8lqbWQKYGThwMz3g/nwiXRx063N+eNBYIY5/xQX0z6ZnVSRDRUy21OnhgZXFlmUIVriNI5pppb8iMVzFfRvrgzMniLHWsJcazznt2vJJUG7lD5YdEdxIQLEBBcCx3kfeUXUc9HHO4u+AK8owqWjUpf3TK0ZVUjOjbuAbUFu8CBHzX3NhAEI3KORe72sUxI6RJKcD
+	TT2SKs931JEYPjjvbrDFE0jsvVp5GUrIPJ6vtMd6hbpc/ug98MjEXAWCNneYfsUESAT1c1IbAqmxwQ4pE4kTO7dbVdKJZg8Tv0uNCTEdDMwa7EoWeJ6xLvWHRl3eitCskOwqQZtjaa3fiOZ8mqFMc5krbsDS30SZN0RL5jYOfz7vq8huGFppefgVWasTZft8XtVPqLgekpmQfS3ODgYFrmXIJHZNnyn+NuO7nEkjSxE2mRG5A2HYYXBpVcHB1tOJ9SoQM2NFzo9JW3UFIrusfgT6LASVmv1YPdkRQSWG7gyEfFrOoGr7WaejzF7fCROOXXfbGCjD6DTvijZO1M7NOyfsLZRh+AMgmigMfLxQb1YRT+nDGypTIju9b4dwdfJnj6GPc74XvOqon+EtEaJZ179AccAOv9K1/G8ZWi0gsBa3niD/HVJWdHd+p3N+E6Y5
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 09:27:39.1395
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 09:49:11.5255
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65fc0ce4-d296-4eeb-720e-08de79071d0f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7480d260-b9e1-4ecd-2b61-08de790a1f61
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509FB.eurprd03.prod.outlook.com
+	AM4PEPF00027A69.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB9805
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB11511
 
-On 02/03/2026 16:39, Marc Zyngier wrote:
-> On Wed, 17 Dec 2025 10:11:04 +0000,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> The RMM needs to be informed of the target REC when a PSCI call is made
->> with an MPIDR argument. Expose an ioctl to the userspace in case the PSCI
->> is handled by it.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->> ---
->> Changes since v11:
->>   * RMM->RMI renaming.
->> Changes since v6:
->>   * Use vcpu_is_rec() rather than kvm_is_realm(vcpu->kvm).
->>   * Minor renaming/formatting fixes.
->> ---
->>   arch/arm64/include/asm/kvm_rmi.h |  3 +++
->>   arch/arm64/kvm/arm.c             | 25 +++++++++++++++++++++++++
->>   arch/arm64/kvm/psci.c            | 30 ++++++++++++++++++++++++++++++
->>   arch/arm64/kvm/rmi.c             | 14 ++++++++++++++
->>   4 files changed, 72 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
->> index bfe6428eaf16..77da297ca09d 100644
->> --- a/arch/arm64/include/asm/kvm_rmi.h
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -118,6 +118,9 @@ int realm_map_non_secure(struct realm *realm,
->>   			 kvm_pfn_t pfn,
->>   			 unsigned long size,
->>   			 struct kvm_mmu_memory_cache *memcache);
->> +int realm_psci_complete(struct kvm_vcpu *source,
->> +			struct kvm_vcpu *target,
->> +			unsigned long status);
->>   
->>   static inline bool kvm_realm_is_private_address(struct realm *realm,
->>   						unsigned long addr)
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 06070bc47ee3..fb04d032504e 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -1797,6 +1797,22 @@ static int kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
->>   	return __kvm_arm_vcpu_set_events(vcpu, events);
->>   }
->>   
->> +static int kvm_arm_vcpu_rmi_psci_complete(struct kvm_vcpu *vcpu,
->> +					  struct kvm_arm_rmi_psci_complete *arg)
->> +{
->> +	struct kvm_vcpu *target = kvm_mpidr_to_vcpu(vcpu->kvm, arg->target_mpidr);
->> +
->> +	if (!target)
->> +		return -EINVAL;
->> +
->> +	/*
->> +	 * RMM v1.0 only supports PSCI_RET_SUCCESS or PSCI_RET_DENIED
->> +	 * for the status. But, let us leave it to the RMM to filter
->> +	 * for making this future proof.
->> +	 */
->> +	return realm_psci_complete(vcpu, target, arg->psci_status);
->> +}
->> +
->>   long kvm_arch_vcpu_ioctl(struct file *filp,
->>   			 unsigned int ioctl, unsigned long arg)
->>   {
->> @@ -1925,6 +1941,15 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->>   
->>   		return kvm_arm_vcpu_finalize(vcpu, what);
->>   	}
->> +	case KVM_ARM_VCPU_RMI_PSCI_COMPLETE: {
->> +		struct kvm_arm_rmi_psci_complete req;
->> +
->> +		if (!vcpu_is_rec(vcpu))
->> +			return -EPERM;
+On 27/02/2026 21:21, Will Deacon wrote:
+> The nVHE world-switch code relies on zeroing PMSCR_EL1 to disable
+> profiling data generation in guest context when SPE is in use by the
+> host.
 > 
-> Same remark as for the other ioctl: EPERM is not quite describing the
-> problem.
+> Unfortunately, this may leave PMBLIMITR_EL1.E set and consequently we
+> can end up running in guest/hypervisor context with the Profiling Buffer
+> enabled. The current "known issues" document for Rev M.a of the Arm ARM
+> states that this can lead to speculative, out-of-context translations:
 > 
->> +		if (copy_from_user(&req, argp, sizeof(req)))
->> +			return -EFAULT;
->> +		return kvm_arm_vcpu_rmi_psci_complete(vcpu, &req);
->> +	}
->>   	default:
->>   		r = -EINVAL;
->>   	}
->> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
->> index 3b5dbe9a0a0e..a68f3c1878a5 100644
->> --- a/arch/arm64/kvm/psci.c
->> +++ b/arch/arm64/kvm/psci.c
->> @@ -103,6 +103,12 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->>   
->>   	reset_state->reset = true;
->>   	kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
->> +	/*
->> +	 * Make sure we issue PSCI_COMPLETE before the VCPU can be
->> +	 * scheduled.
->> +	 */
->> +	if (vcpu_is_rec(vcpu))
->> +		realm_psci_complete(source_vcpu, vcpu, PSCI_RET_SUCCESS);
->>
+>    | 2.18 D23136:
+>    |
+>    | When the Profiling Buffer is enabled, profiling is not stopped, and
+>    | Discard mode is not enabled, the Statistical Profiling Unit might
+>    | cause speculative translations for the owning translation regime,
+>    | including when the owning translation regime is out-of-context.
 > 
-> I really think in-kernel PSCI should be for NS VMs only. The whole
-> reason for moving to userspace support was to stop adding features to
-> an already complex infrastructure, and CCA is exactly the sort of
-> things we want userspace to deal with.
+> In a similar fashion to TRBE, ensure that the Profiling Buffer is
+> disabled during the nVHE world switch before we start messing with the
+> stage-2 MMU and trap configuration.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: James Clark <james.clark@linaro.org>
+> Cc: Leo Yan <leo.yan@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Fixes: f85279b4bd48 ("arm64: KVM: Save/restore the host SPE state when entering/leaving a VM")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_host.h  |  1 +
+>   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++----------
+>   arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+>   3 files changed, 24 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1532ad2b2ec2..d527c77977dd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -768,6 +768,7 @@ struct kvm_host_data {
+>   		struct kvm_guest_debug_arch regs;
+>   		/* Statistical profiling extension */
+>   		u64 pmscr_el1;
+> +		u64 pmblimitr_el1;
+>   		/* Self-hosted trace */
+>   		u64 trfcr_el1;
+>   		u64 trblimitr_el1;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 3dbdee1148d3..75158a9cd06a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -14,20 +14,20 @@
+>   #include <asm/kvm_hyp.h>
+>   #include <asm/kvm_mmu.h>
+>   
+> -static void __debug_save_spe(u64 *pmscr_el1)
+> +static void __debug_save_spe(void)
+>   {
+> -	u64 reg;
+> +	u64 *pmscr_el1, *pmblimitr_el1;
+>   
+> -	/* Clear pmscr in case of early return */
+> -	*pmscr_el1 = 0;
+> +	pmscr_el1 = host_data_ptr(host_debug_state.pmscr_el1);
+> +	pmblimitr_el1 = host_data_ptr(host_debug_state.pmblimitr_el1);
+>   
+>   	/*
+>   	 * At this point, we know that this CPU implements
+>   	 * SPE and is available to the host.
+>   	 * Check if the host is actually using it ?
+>   	 */
+> -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> -	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> +	*pmblimitr_el1 = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> +	if (!(*pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>   		return;
+>   
+>   	/* Yes; save the control register and disable data generation */
+> @@ -37,18 +37,29 @@ static void __debug_save_spe(u64 *pmscr_el1)
+>   
+>   	/* Now drain all buffered data to memory */
+>   	psb_csync();
+> +	dsb(nsh);
+> +
+> +	/* And disable the profiling buffer */
+> +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
+> +	isb();
+>   }
+>   
+> -static void __debug_restore_spe(u64 pmscr_el1)
+> +static void __debug_restore_spe(void)
+>   {
+> -	if (!pmscr_el1)
+> +	u64 pmblimitr_el1 = *host_data_ptr(host_debug_state.pmblimitr_el1);
+> +
+> +	if (!(pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>   		return;
+>   
+>   	/* The host page table is installed, but not yet synchronised */
+>   	isb();
+>   
 
-Agreed. How would you like us to enforce this ? Should we always exit
-to the VMM, even if it hasn't requested the handling ? (I guess it is
-fine and in the worst case VMM could exit, it being buggy)
+minor nit: This seems buried deep down in a helper (with no context of 
+what else could have happened since the host context has been restored)
+and for now it looks correct,  but is prone to inadvertent changes
+causing issues or making this obsolete. With the isb() following LIMITR, 
+wouldn't that be  sufficient ?
 
-Cheers
+
+Otherwise, looks good to me
+
 Suzuki
 
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+> +	/* Re-enable the profiling buffer. */
+> +	write_sysreg_s(pmblimitr_el1, SYS_PMBLIMITR_EL1);
+> +	isb();
+> +
+>   	/* Re-enable data generation */
+> -	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
+> +	write_sysreg_el1(*host_data_ptr(host_debug_state.pmscr_el1), SYS_PMSCR);
+>   }
+>   
+>   static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+> @@ -177,7 +188,7 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	/* Disable and flush SPE data generation */
+>   	if (host_data_test_flag(HAS_SPE))
+> -		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
+> +		__debug_save_spe();
+>   
+>   	/* Disable BRBE branch records */
+>   	if (host_data_test_flag(HAS_BRBE))
+> @@ -195,7 +206,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>   void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>   {
+>   	if (host_data_test_flag(HAS_SPE))
+> -		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
+> +		__debug_restore_spe();
+>   	if (host_data_test_flag(HAS_BRBE))
+>   		__debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
+>   	if (__trace_needs_switch())
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index f00688e69d88..9b6e87dac3b9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -278,7 +278,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>   	 * We're about to restore some new MMU state. Make sure
+>   	 * ongoing page-table walks that have started before we
+>   	 * trapped to EL2 have completed. This also synchronises the
+> -	 * above disabling of BRBE and SPE.
+> +	 * above disabling of BRBE.
+>   	 *
+>   	 * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
+>   	 * rule R_LFHQG and subsequent information statements.
 
