@@ -1,306 +1,245 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010070.outbound.protection.outlook.com [52.101.84.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F27D369206
-	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 09:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.70
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772531359; cv=fail; b=HDkbADH3yVf1urb/VNXwO8I0rUtYLwKi8W9df5Aef5OS6tJwZMXBadB0KLxqyhxlcRN3Gl+sjgFDc9lb/mBdwmbBnRfWjV/sVVjmejGsLzv8ATU1FwoyhOYUo+K7Nf7gz0d5ZxDHMvd+Y8vSG540yMSomvYw5k405aYXeDBRGdo=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772531359; c=relaxed/simple;
-	bh=GU8wDRmKNIVFRzsVV+IEYBg72bdsvLzvj52X2iSoNh0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GoI4Swa9r9lGtVy/wUKCPUiY5Z13gxL/v5SBgYkwOD5l+z0qo7PlEkPmugJf95p2z4m1vBmB9USaz3cbdM2sDHSHWsdkF+9BbiMSCVwVNLlhgKrBo6H+C+CXa9hZmrmi9Qr+FUBbaq3Nuw6wNl6A8Y3usDQkuVPArQrGUExBRXY=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i9Mts7Di; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=i9Mts7Di; arc=fail smtp.client-ip=52.101.84.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C291B3947B3
+	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 10:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772532392; cv=none; b=BNpiH30JUHTR+1M9VW9rUWHTyxlnqNVTThvYYWkSP4EZP8/MMMew3jv4dFSAd/jEWKdDM2Mi8M+6IsliTeqCMK7uxse4vBN8pYanmpvIx5t1eX24PFq5BkG2rcwiUafpzieX8cWQTOyMkF4bLUaw/dJEsCY5bOBDpiMbku2gN9Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772532392; c=relaxed/simple;
+	bh=Av6u6btJD8+jQWYCeDNUAFulpZzXi0zl5Rs5VlxxWtI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Dk4cU8PZaJGC7h06ZcF3rQLt6DyWl18CEk3TEN9L2oYL19mNWFPCHkBQYFvHjNjPGqwU7l4CTAMew8/dzaOaXxNwX7NaklSLnkl3eMlXLCWu1i4xb5JV40Ns/owbPYJhEduJ2EsVEWh5JgV9LMli7xV19DC0ifp2ekZHlZSbDRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ELuZYJaE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i9Mts7Di";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="i9Mts7Di"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=euVcBIo1DEEIGylwaKNn09wA2QjNVdsLt9CMRrBEBVUYHcCyvVYPINvYucdxYWhAyWt/bsY/ADhgSOspCfL3nIkx7sZTZbIxxM/KYx5GOH2z3E2VmIOK/tuOVvktHNdYa9ymm0xiEi0JX4F1ko1e6m4nEd/wU27DvKpYO6XXtuIYk9ZyDMc6Sv67F8mJ/gd1odBbZv3Qp/4tQvaEv0gnfNfBzqwZUjqhzhJl+ceZ9bQauz7KTfWqeeD45cjyz3wZPxi3DY5x5WO/CKZufkD2PVznJ+zw7V79OJP5Lr1uCwcJObZ3K1BNEzIEzNi6Cn+LCDhna14YtHDXn4Hgmq1iFQ==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
- b=i9e3Y8vDP/SiAH+0+fIEECdbGW3qpkQSpfoxJTL8z7f27xpnc+Z8Zs27hVlZM6GuqD8z7ov4/aZrPyBCcMZ+4Idh7bZclB0bhEiWH5EbfMjNWKuxA99KdyK8QkCVEQIv1TDiOhBgdEpuHsvVkyEP3WvqIldKA6IJh/u4Rgsa97LsUOu4uBlvoGadHEWkc0IuqmH5b0auYIubGTdW3TeMWXQYX9PX3ItNFg9H3oWTW3Jcsa5erbnwb2x9lhL6zKhQmstVt6ZY6MBlhYhJn4fvy+1LUqrbpyLQgpuJREn8HTQVHeMStjHRg1WfaY2dNH02BzJ7xjnqbQ6W0hglwa8Cxg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
- b=i9Mts7DiC8HiXpN78xlJgVnZB+G7RfkrzrCNJaX3wfbTdLRoYTtIsEIgH21bil99cHWgmmFlLbUfssdBC0oSJM+t0iGrI9k7fGFNozzZ7Xo7/DTG/1jySBHZ2AnASj6+VcApvnkVFx3rS7zr9QEwGyZTKV7W3jcVQrgLk3tQhUg=
-Received: from AS4P251CA0005.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:5d2::10)
- by PAWPR08MB11511.eurprd08.prod.outlook.com (2603:10a6:102:50b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.21; Tue, 3 Mar
- 2026 09:49:12 +0000
-Received: from AM4PEPF00027A69.eurprd04.prod.outlook.com
- (2603:10a6:20b:5d2:cafe::92) by AS4P251CA0005.outlook.office365.com
- (2603:10a6:20b:5d2::10) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.22 via Frontend Transport; Tue,
- 3 Mar 2026 09:49:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM4PEPF00027A69.mail.protection.outlook.com (10.167.16.87) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.16
- via Frontend Transport; Tue, 3 Mar 2026 09:49:11 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u61wZDjT4ZxNfSM4atv2LnUequ/uNZjgU0N+XvWBSAIS4qgCskl6Eyu2nPMXW3jFF/SOea9se6nWOiiiINkRqavizv73QC70rUK1SKMLF7LT4wFRzkKwBMkb1DLe2iPNoeaYrzCAw/dnV9cvvfXN4hGdp//4CLaUis0PTa3ZVgUrB3iBIiqDP+XET/w1ldWZ0rBEtT3dXQmM2NRMNwmcQJ1PbeFsIpUOPFRZqSBiBrDZ3gXm+g7YwR8eu2uWO0HMtvGtqeW6//5EfSxWuNRzBt+fkWW5Ov0ICzJ1BEk0/ylgVqVJIKn2SoXHImIr0y72kOIbrndQjX6JC4zrbU1jYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
- b=CZa7xoN/Z02+wmg6AIJHW0oIm65Fw2aTgYLcOKRDPGvvNkE/yF7EDZsA85K3oeis5ZdUl+AcKzpvgq2l77AsrnAVW4cbxA/09k3LNn4IXbZWQkNI3xbmwp9orQLbUqUoCfmw9Fcj6/rXciNAUuamf7HXmFtfrIDP8EIv/NZlz03WsHoM086wfr8J6KV6zvNsRHuml/K7X4D70Acy58zkUt3g974SvUSOo+uCRDlw34REcdSoh2kudTBUpYeFWEZrwePIzbatSS6+s80V8j+coX3fLvWNgGRFt0cW466BUBW+93+GQKkOtQrikfLers6e/0NPQ/ZC/+uxOdZviMZGjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lziis5e1fFvAu3+/xER+Xl+vPJkoeFaSj2B1kA81urc=;
- b=i9Mts7DiC8HiXpN78xlJgVnZB+G7RfkrzrCNJaX3wfbTdLRoYTtIsEIgH21bil99cHWgmmFlLbUfssdBC0oSJM+t0iGrI9k7fGFNozzZ7Xo7/DTG/1jySBHZ2AnASj6+VcApvnkVFx3rS7zr9QEwGyZTKV7W3jcVQrgLk3tQhUg=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DU4PR08MB11769.eurprd08.prod.outlook.com (2603:10a6:10:644::21)
- by AS8PR08MB7943.eurprd08.prod.outlook.com (2603:10a6:20b:53b::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Tue, 3 Mar
- 2026 09:48:07 +0000
-Received: from DU4PR08MB11769.eurprd08.prod.outlook.com
- ([fe80::d424:cd62:81a8:490f]) by DU4PR08MB11769.eurprd08.prod.outlook.com
- ([fe80::d424:cd62:81a8:490f%6]) with mapi id 15.20.9654.020; Tue, 3 Mar 2026
- 09:48:07 +0000
-Message-ID: <b6f0b0c8-c2a6-4b61-a0cc-482450c092f5@arm.com>
-Date: Tue, 3 Mar 2026 09:48:06 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] KVM: arm64: Disable SPE Profiling Buffer when
- running in guest context
-To: Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
-Cc: mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
- James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
- Fuad Tabba <tabba@google.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Yabin Cui <yabinc@google.com>
-References: <20260227212136.7660-1-will@kernel.org>
- <20260227212136.7660-3-will@kernel.org>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260227212136.7660-3-will@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LNXP265CA0040.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:5c::28) To DU4PR08MB11769.eurprd08.prod.outlook.com
- (2603:10a6:10:644::21)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELuZYJaE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0904FC2BCAF;
+	Tue,  3 Mar 2026 10:06:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772532392;
+	bh=Av6u6btJD8+jQWYCeDNUAFulpZzXi0zl5Rs5VlxxWtI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ELuZYJaEIZb+5FqIPc54jh2cALV2s6QygkvaWTSmWxCwMnUmZRX79HX0Ny0yB3e7W
+	 QLK33t7bNtFWIZM5zxK2Dkxc9MnoHjAatxkZ6tkRXJlM42NZ0AXtXySA8A8Cc6T28K
+	 iXrJMafG/UldZFfuwUcX9l/hVXhkmW2sYvU6kAHM9huBUUqYrvMLFTbf674yh5KfZR
+	 cmTYC1C6jMvzxt2W3Uf7/aqQ0SU448huNWZyF8r/FZaaoAg96G16/5p/E3KjpYsnnS
+	 SA8blkaqfQRYE7aBa5wPLr6UfFfx/MuzAM3KmiUryW0Csh5/4/DAizB3XFTDbJgeiD
+	 idgEnABvuDmPg==
+From: Linus Walleij <linusw@kernel.org>
+Date: Tue, 03 Mar 2026 11:06:13 +0100
+Subject: [PATCH] arm64: Implement clear_pages()
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	DU4PR08MB11769:EE_|AS8PR08MB7943:EE_|AM4PEPF00027A69:EE_|PAWPR08MB11511:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7480d260-b9e1-4ecd-2b61-08de790a1f61
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info-Original:
- fxLUwy4mdlfpGs9Ll0aHtEnWQfWzTuzkD24phbVH0cjbEFzuURCKmVXI4qzLV5mKePx3kZkK0oHJM98ybamfIkTCaAwAhcbU+E7zaeMAKV4yvCOi3IposUmDsREQ3ITACn8a7gC2lFux2PhFdfsTXKibqD31Yg+OC8oW69MuzJ4t/I6cF5ugBogqY6uC5XWHHSjtPniNphAtbBoFO4ZEr6RiY2aDEgeaoA8iYxtZyY41lgxKMnS5fy1eFF/TNSLwuhPPkW/Gnw16scpJZPsNgO9zMUzRVdT0hxM4mZlt4BSpNkGCtwz3gmriZFJzmQK1B7ZWb+PUe3i7+pgx5YdphVTHY8+y4QUGgwX8kqgun5p41dI4JQxMw8JM13qs7BZ/43EWVA1xNOIM0t2uw250Bt9Aw3X6U7ZFuCASRcoWdHunyWEp8DDKcuW14/THrS3Nox/0A/aurRZlOhOHdvOke2MalooBLNmz9LImAGTQ6f7V6pWfWCWo/h3KBgjmIznP4r6oqQLVCYNnJo2qJIiPOXEPTw5bcYrXIQMqTnwgLoel5lO1b4YeKpyD9s4tvDc1etUTrlRpmtd4nMfw3xJOna8QJCPf09SCnZPLlN/VDRrIq8hjztcg4pzYLcS0MhCB/dkWMrdxeEH3dcDvJlJJUdx/XWB2wwTtcVSY/eWIj4AEteXmgGkXwj2GeFbw4qew6KzQzBbiRN3EOdi0vLaY/Woc+9X6iI7LKOAprSgl+0A=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB7943
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM4PEPF00027A69.eurprd04.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	4566fb2f-8fb7-483a-8d15-08de7909f923
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|35042699022|14060799003|1800799024|36860700013|82310400026|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	yOxCXjwwXCmAvRBykNAX1vc0MnOaUvidoyLZJ4h4b9TqHreey/ad2G9gaZC8Lvn4E4YSaTMmb+qVq2BT3GLHcTrzyYViAcWBNIjojDB6looAg2Wbmbp/V8E13jbCg0HqQMSSlS/yHxHNfNtBNIYUJ/e4LM2o3KxPhbpCMaLjx+NfBidhXFZHnTmHf0wxyr2y8JCePsUyi5Y/HkX9567FmqqOOCuCzYWP2Swwwi/95yMZFGCpJuwWpoDLHnSHYSB9ZjH0OCYTJ4EohtXyLo0NSUbdjlXIYkGhHLbc5rG+1DIZIjT4NsR+u6wZoB1ketHbCHFMMHASEiq6I7gCjFtv/9dcwPwgnmuqo74SN7SfSRphsoLEwr28150dCGMzg0rY58eBhHhyWEUV579zygsx1rl44Fq5vBkkkJ6KocM4ql+7kXr67fpGnzJOa7C/N3j8FJ3PsCVbhK8xHXml0mWSptG/8PdJxqBT2TJW4aMf5AgA32RHhqyBxa067mdNJTZSvHbdnF9bouLMFhdeeQcOSIk3GNi4M0NWN7hDlniMToQ1D46iRcMmaCfzjbBTNroQa0qjmAhV916ylnWn9U6dfRp/NlMdeXIN/H22t1XAPbCOs639abuRCQhwAr+ddw7AZ9a/W47JkMQtUqOgYdTUvh5aFY1WTIhjvIiYn/p8F1SmyNFcY3sJz6B2paCFndliLsQs3B19BLggmZRUBZ9vAtyziWoVtCCqhjBWOyQrHPSajsWWP3Ui/PFzgkNJTOoXWhUS2DgJQaIVJVhjsXXu7yGp6Rnix11TRxpC/OFChz7h/aM404DlbGSyDiCvYadsvKoiYHl2qsH5tO7SLFb+/w==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(35042699022)(14060799003)(1800799024)(36860700013)(82310400026)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	TT2SKs931JEYPjjvbrDFE0jsvVp5GUrIPJ6vtMd6hbpc/ug98MjEXAWCNneYfsUESAT1c1IbAqmxwQ4pE4kTO7dbVdKJZg8Tv0uNCTEdDMwa7EoWeJ6xLvWHRl3eitCskOwqQZtjaa3fiOZ8mqFMc5krbsDS30SZN0RL5jYOfz7vq8huGFppefgVWasTZft8XtVPqLgekpmQfS3ODgYFrmXIJHZNnyn+NuO7nEkjSxE2mRG5A2HYYXBpVcHB1tOJ9SoQM2NFzo9JW3UFIrusfgT6LASVmv1YPdkRQSWG7gyEfFrOoGr7WaejzF7fCROOXXfbGCjD6DTvijZO1M7NOyfsLZRh+AMgmigMfLxQb1YRT+nDGypTIju9b4dwdfJnj6GPc74XvOqon+EtEaJZ179AccAOv9K1/G8ZWi0gsBa3niD/HVJWdHd+p3N+E6Y5
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2026 09:49:11.5255
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7480d260-b9e1-4ecd-2b61-08de790a1f61
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00027A69.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR08MB11511
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260303-aarch64-clear-pages-v1-1-ad0c3ee9a555@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MzQpAUBBA4VfRrE0xfopXkcUYgymhuSV18+5ul
+ t/inAhB3TRAn0VwvS3YeSSUeQay8bEq2pwMVFBbUEnI7LK1Ncqu7HjxqgG5rjohaRqaJkjl5br
+ Y81+H8X0/tR9XmGUAAAA=
+X-Change-ID: 20260212-aarch64-clear-pages-a439c2c552bb
+To: Catalin Marinas <catalin.marinas@arm.com>, 
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Zenghui Yu <yuzenghui@huawei.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+ Ankur Arora <ankur.a.arora@oracle.com>, 
+ David Hildenbrand <david@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+ James Clark <james.clark2@arm.com>, Linus Walleij <linusw@kernel.org>
+X-Mailer: b4 0.14.3
 
-On 27/02/2026 21:21, Will Deacon wrote:
-> The nVHE world-switch code relies on zeroing PMSCR_EL1 to disable
-> profiling data generation in guest context when SPE is in use by the
-> host.
-> 
-> Unfortunately, this may leave PMBLIMITR_EL1.E set and consequently we
-> can end up running in guest/hypervisor context with the Profiling Buffer
-> enabled. The current "known issues" document for Rev M.a of the Arm ARM
-> states that this can lead to speculative, out-of-context translations:
-> 
->    | 2.18 D23136:
->    |
->    | When the Profiling Buffer is enabled, profiling is not stopped, and
->    | Discard mode is not enabled, the Statistical Profiling Unit might
->    | cause speculative translations for the owning translation regime,
->    | including when the owning translation regime is out-of-context.
-> 
-> In a similar fashion to TRBE, ensure that the Profiling Buffer is
-> disabled during the nVHE world switch before we start messing with the
-> stage-2 MMU and trap configuration.
-> 
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
-> Cc: James Clark <james.clark@linaro.org>
-> Cc: Leo Yan <leo.yan@arm.com>
-> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Cc: Fuad Tabba <tabba@google.com>
-> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Fixes: f85279b4bd48 ("arm64: KVM: Save/restore the host SPE state when entering/leaving a VM")
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_host.h  |  1 +
->   arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++----------
->   arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
->   3 files changed, 24 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 1532ad2b2ec2..d527c77977dd 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -768,6 +768,7 @@ struct kvm_host_data {
->   		struct kvm_guest_debug_arch regs;
->   		/* Statistical profiling extension */
->   		u64 pmscr_el1;
-> +		u64 pmblimitr_el1;
->   		/* Self-hosted trace */
->   		u64 trfcr_el1;
->   		u64 trblimitr_el1;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 3dbdee1148d3..75158a9cd06a 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -14,20 +14,20 @@
->   #include <asm/kvm_hyp.h>
->   #include <asm/kvm_mmu.h>
->   
-> -static void __debug_save_spe(u64 *pmscr_el1)
-> +static void __debug_save_spe(void)
->   {
-> -	u64 reg;
-> +	u64 *pmscr_el1, *pmblimitr_el1;
->   
-> -	/* Clear pmscr in case of early return */
-> -	*pmscr_el1 = 0;
-> +	pmscr_el1 = host_data_ptr(host_debug_state.pmscr_el1);
-> +	pmblimitr_el1 = host_data_ptr(host_debug_state.pmblimitr_el1);
->   
->   	/*
->   	 * At this point, we know that this CPU implements
->   	 * SPE and is available to the host.
->   	 * Check if the host is actually using it ?
->   	 */
-> -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> -	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
-> +	*pmblimitr_el1 = read_sysreg_s(SYS_PMBLIMITR_EL1);
-> +	if (!(*pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
->   		return;
->   
->   	/* Yes; save the control register and disable data generation */
-> @@ -37,18 +37,29 @@ static void __debug_save_spe(u64 *pmscr_el1)
->   
->   	/* Now drain all buffered data to memory */
->   	psb_csync();
-> +	dsb(nsh);
-> +
-> +	/* And disable the profiling buffer */
-> +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
-> +	isb();
->   }
->   
-> -static void __debug_restore_spe(u64 pmscr_el1)
-> +static void __debug_restore_spe(void)
->   {
-> -	if (!pmscr_el1)
-> +	u64 pmblimitr_el1 = *host_data_ptr(host_debug_state.pmblimitr_el1);
-> +
-> +	if (!(pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
->   		return;
->   
->   	/* The host page table is installed, but not yet synchronised */
->   	isb();
->   
+A recent patch introduced clear_pages() and made it possible to
+provide assembly optimizations like for clear_page().
 
-minor nit: This seems buried deep down in a helper (with no context of 
-what else could have happened since the host context has been restored)
-and for now it looks correct,  but is prone to inadvertent changes
-causing issues or making this obsolete. With the isb() following LIMITR, 
-wouldn't that be  sufficient ?
+This augments the existing clear_page() optimization in arm64
+to accept any number of pages the following way:
 
+- Make clear_page() a static inline special case of clear_pages()
 
-Otherwise, looks good to me
+- Implement clear_pages() as a static inline that just calculate
+  the number of total bytes in the page set and passes this number
+  to the assembly routine clear_pages_asm.
 
-Suzuki
+- The old clear_pages assembly is rewritten to clear_pages_asm
+  which will take a start address (at an even page) and a number
+  of bytes to clear from that address.
 
+This is similar to the optimization provided for x86.
 
-> +	/* Re-enable the profiling buffer. */
-> +	write_sysreg_s(pmblimitr_el1, SYS_PMBLIMITR_EL1);
-> +	isb();
-> +
->   	/* Re-enable data generation */
-> -	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
-> +	write_sysreg_el1(*host_data_ptr(host_debug_state.pmscr_el1), SYS_PMSCR);
->   }
->   
->   static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
-> @@ -177,7 +188,7 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   {
->   	/* Disable and flush SPE data generation */
->   	if (host_data_test_flag(HAS_SPE))
-> -		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
-> +		__debug_save_spe();
->   
->   	/* Disable BRBE branch records */
->   	if (host_data_test_flag(HAS_BRBE))
-> @@ -195,7 +206,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
->   void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
->   {
->   	if (host_data_test_flag(HAS_SPE))
-> -		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
-> +		__debug_restore_spe();
->   	if (host_data_test_flag(HAS_BRBE))
->   		__debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
->   	if (__trace_needs_switch())
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index f00688e69d88..9b6e87dac3b9 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -278,7 +278,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->   	 * We're about to restore some new MMU state. Make sure
->   	 * ongoing page-table walks that have started before we
->   	 * trapped to EL2 have completed. This also synchronises the
-> -	 * above disabling of BRBE and SPE.
-> +	 * above disabling of BRBE.
->   	 *
->   	 * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
->   	 * rule R_LFHQG and subsequent information statements.
+Performance improvements:
+
+The baseline is the current v7.0-rc1 which calls the existing
+clear_page() assembly optimization in a loop, see <linux/mm.h>.
+Any improvements are about avoiding the outer loop, in most cases
+the clearing will be linear and the savings will be small and
+only noticeable on really big clearing operations.
+
+We boot the kernel with cmdline like this:
+"default_hugepagesz=1G hugepagesz=1G hugepages=32" to make sure
+we have ample hugepages. This was then tested with the same
+cmdline as the original series:
+
+perf bench mem mmap -p 1GB -f demand -s 32GB -l 5
+
+The first run was discarded as the memory hierarchy is cold on
+the first run. Then I ran the above command 5 times and averaged
+the throughput, which sees a small but consistent improvement in
+the throughput:
+
+On QEMU:
+
+Before this patch:     After this patch:
+2.38 GB/s              2.41 GB/s
+
+On hardware Radxa Orion O6 we see this on *some* cores and no
+change on others:
+
+Before this patch:     After this patch:
+43.3 GB/s              45.3 GB/s
+
+There is a small but consistent improvement in throughput, as
+expected.
+
+Tested-by: James Clark <james.clark2@arm.com>
+Signed-off-by: Linus Walleij <linusw@kernel.org>
+---
+ arch/arm64/include/asm/page.h                  | 13 ++++++++++++-
+ arch/arm64/kernel/image-vars.h                 |  2 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile               |  2 +-
+ arch/arm64/lib/Makefile                        |  2 +-
+ arch/arm64/lib/{clear_page.S => clear_pages.S} | 18 +++++++++---------
+ 5 files changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+index b39cc1127e1f..916a3e7c9a19 100644
+--- a/arch/arm64/include/asm/page.h
++++ b/arch/arm64/include/asm/page.h
+@@ -20,7 +20,18 @@ struct page;
+ struct vm_area_struct;
+ 
+ extern void copy_page(void *to, const void *from);
+-extern void clear_page(void *to);
++extern void clear_pages_asm(void *addr, unsigned int nbytes);
++
++static inline void clear_pages(void *addr, unsigned int npages)
++{
++	clear_pages_asm(addr, npages * PAGE_SIZE);
++}
++#define clear_pages clear_pages
++
++static inline void clear_page(void *addr)
++{
++	clear_pages(addr, 1);
++}
+ 
+ void copy_user_highpage(struct page *to, struct page *from,
+ 			unsigned long vaddr, struct vm_area_struct *vma);
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index d7b0d12b1015..61232f9e1e68 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -117,7 +117,7 @@ KVM_NVHE_ALIAS(__start___kvm_ex_table);
+ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
+ 
+ /* Position-independent library routines */
+-KVM_NVHE_ALIAS_HYP(clear_page, __pi_clear_page);
++KVM_NVHE_ALIAS_HYP(clear_pages, __pi_clear_pages);
+ KVM_NVHE_ALIAS_HYP(copy_page, __pi_copy_page);
+ KVM_NVHE_ALIAS_HYP(memcpy, __pi_memcpy);
+ KVM_NVHE_ALIAS_HYP(memset, __pi_memset);
+diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
+index a244ec25f8c5..f857dac82a88 100644
+--- a/arch/arm64/kvm/hyp/nvhe/Makefile
++++ b/arch/arm64/kvm/hyp/nvhe/Makefile
+@@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
+ hostprogs := gen-hyprel
+ HOST_EXTRACFLAGS += -I$(objtree)/include
+ 
+-lib-objs := clear_page.o copy_page.o memcpy.o memset.o
++lib-objs := clear_pages.o copy_page.o memcpy.o memset.o
+ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+ 
+ CFLAGS_switch.nvhe.o += -Wno-override-init
+diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
+index 633e5223d944..86995e2e0807 100644
+--- a/arch/arm64/lib/Makefile
++++ b/arch/arm64/lib/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ lib-y		:= clear_user.o delay.o copy_from_user.o		\
+ 		   copy_to_user.o copy_page.o				\
+-		   clear_page.o csum.o insn.o memchr.o memcpy.o		\
++		   clear_pages.o csum.o insn.o memchr.o memcpy.o	\
+ 		   memset.o memcmp.o strcmp.o strncmp.o strlen.o	\
+ 		   strnlen.o strchr.o strrchr.o tishift.o
+ 
+diff --git a/arch/arm64/lib/clear_page.S b/arch/arm64/lib/clear_pages.S
+similarity index 70%
+rename from arch/arm64/lib/clear_page.S
+rename to arch/arm64/lib/clear_pages.S
+index bd6f7d5eb6eb..2d3043c13791 100644
+--- a/arch/arm64/lib/clear_page.S
++++ b/arch/arm64/lib/clear_pages.S
+@@ -12,22 +12,22 @@
+  * Clear page @dest
+  *
+  * Parameters:
+- *	x0 - dest
++ *	x0 - dest - should be start of a page
++ *	x1 - number of bytes to clear, should be a multiple of PAGE_SIZE
+  */
+-SYM_FUNC_START(__pi_clear_page)
++SYM_FUNC_START(__pi_clear_pages)
+ #ifdef CONFIG_AS_HAS_MOPS
+ 	.arch_extension mops
+ alternative_if_not ARM64_HAS_MOPS
+ 	b	.Lno_mops
+ alternative_else_nop_endif
+-
+-	mov	x1, #PAGE_SIZE
+ 	setpn	[x0]!, x1!, xzr
+ 	setmn	[x0]!, x1!, xzr
+ 	seten	[x0]!, x1!, xzr
+ 	ret
+ .Lno_mops:
+ #endif
++	add	x4, x0, x1	/* Find the end */
+ 	mrs	x1, dczid_el0
+ 	tbnz	x1, #4, 2f	/* Branch if DC ZVA is prohibited */
+ 	and	w1, w1, #0xf
+@@ -36,7 +36,7 @@ alternative_else_nop_endif
+ 
+ 1:	dc	zva, x0
+ 	add	x0, x0, x1
+-	tst	x0, #(PAGE_SIZE - 1)
++	cmp	x0, x4
+ 	b.ne	1b
+ 	ret
+ 
+@@ -45,9 +45,9 @@ alternative_else_nop_endif
+ 	stnp	xzr, xzr, [x0, #32]
+ 	stnp	xzr, xzr, [x0, #48]
+ 	add	x0, x0, #64
+-	tst	x0, #(PAGE_SIZE - 1)
++	cmp	x0, x4
+ 	b.ne	2b
+ 	ret
+-SYM_FUNC_END(__pi_clear_page)
+-SYM_FUNC_ALIAS(clear_page, __pi_clear_page)
+-EXPORT_SYMBOL(clear_page)
++SYM_FUNC_END(__pi_clear_pages)
++SYM_FUNC_ALIAS(clear_pages_asm, __pi_clear_pages)
++EXPORT_SYMBOL(clear_pages_asm)
+
+---
+base-commit: dbe60c40b86ec4a1168552398b3b64c14c38b2d7
+change-id: 20260212-aarch64-clear-pages-a439c2c552bb
+
+Best regards,
+-- 
+Linus Walleij <linusw@kernel.org>
 
