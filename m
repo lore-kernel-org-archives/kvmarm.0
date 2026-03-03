@@ -1,173 +1,338 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 800704921BB
-	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 15:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F18382388;
+	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772552723; cv=none; b=gXI+gRq3raPxfgXZ0rtbRmaN9Gw+LRe1gu/OU4C9F3IB6iUrvMxle3Fc5a6QNhZ04ATQIupm62v8wioQ1mBZOhsj4E+/ucmE97I/LpB4zW1k2sJSMNRT6Smc2BOyNLwxyhwZKmjKgh5Kq1rbT+QiTppRd2CditB2JXLEwlpYiXY=
+	t=1772553276; cv=none; b=QXcx2K9fys3XIL2SG82Pz/QUdmOs7WBaxs7D2DngR/l8tHlfPWjZqZrdR0mKXBTYQbeHJVSPJn27lx/8DwBXsRUiTKV2+lboM0r0XvB/m4SaPP8u5JnHZi8d6OgVtP+/WoDblxEpAWayaBaVcziV6R+2ATuonUYEHuyn2o2GXMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772552723; c=relaxed/simple;
-	bh=NUOXljTmyEDWmFoNWuqeCGEceTr+9T1FfZUnN2JoicQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iOZGd5wG9Xv3XaVMJwkSXsr/OdHTLug+Tocoo5aA44djgsqxXcjahdqXhLe+uOJDOcn6F4ZsjE/ljU286egBmWABF8TcTR5+ROqob6LEDPOssqNKrLFqp4GOKK/YBtYceajDXCB3d8IPu6WMpYw/9dnKxvGCFvNiQqlHvF07XZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inPxIq+4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772553276; c=relaxed/simple;
+	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mA75F2r7P1HKCa8wDFwtq9QIvDK9uc5j0V8JHdR8/1w/JxwnUVSboepJML/Dvj9rAkCfgqynnGteuBrXXVlY7koG2NarE/oChNQsZ8QKG3rC6jNd+BFgj02iKDjLjb417zpuohhCU6q0jDPD4wmaCI2pBC1gWPPKmiCI4EeKJgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGdXA+Ii; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inPxIq+4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D603C116C6;
-	Tue,  3 Mar 2026 15:45:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGdXA+Ii"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD3EC116C6;
+	Tue,  3 Mar 2026 15:54:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772552723;
-	bh=NUOXljTmyEDWmFoNWuqeCGEceTr+9T1FfZUnN2JoicQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=inPxIq+4LXTnLQcAVhY1kUwBow604IPD6/gzLaYafeWUMzEc+5rjaTvs7wwxzw/K/
-	 sWeyKo8hHuXaE0K05ZHO1PBj7S8eFKNnpX3t9ttA/HqDFu0GqHdSNoaT+Q7r8MzWbU
-	 MKAyyVPoIPSBR9NOhs+iBqIbZDH3ir95p2/Fb/KezvNYWWjUMOXtyjNwBAQdW0kxdi
-	 pXvnbxWoK6pWg9KigG7uHSDom3kJvrDHf68hVVbcaNizQ89jq9wk9j2ln3bAxBql8x
-	 SKRTj0LfQNMSpZvWv3+qeY+TLtRgs+gzkkA0yNwBUpWPx5+4PdAIyB/aLdRfvIY9qP
-	 7ButtyUJ4xZoA==
-Date: Tue, 3 Mar 2026 15:45:16 +0000
-From: Will Deacon <will@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v2 07/35] KVM: arm64: Remove is_protected_kvm_enabled()
- checks from hypercalls
-Message-ID: <aacCDMhYJLMWVaIQ@willie-the-truck>
-References: <20260119124629.2563-1-will@kernel.org>
- <20260119124629.2563-8-will@kernel.org>
- <aYtGWwcVrDQeGCma@raptor>
+	s=k20201202; t=1772553276;
+	bh=TGmZI4OHu6X3hdFVkQgFuNn6YSaOlqILJxc5Y6vn/8M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UGdXA+IiU/6rlC3VdfBfeBXwJZoYYNW/MTSviqSHhYi4ZUVnPBFFtXUiIflqHsXoh
+	 fa0ZRJ4H11e55Y1FeG7Fh6Bv5LOzjIGKP39KroO7K2tsDy9OzsslGicgz8+9hHQ4f+
+	 3/ORLbifRPB7fMILBLkO1oXUs7wF65WHmyXamUUeDkPsIaRNasw9KuRFtHoBtL0mQb
+	 ATPixK1K1QSzCqd2/TQhX6C0tAo0tkdQqwGm1Kw2hEsr1rhdDFvTM/3N0ZVbkOum1b
+	 Qptztcg8WpJpO1avNuBNmToPoPA04qDTB871hODjymfp4IA5NhJDY9kEf8cIr1RY6R
+	 0ZdiUjfyl3rXw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxS4v-0000000FhF6-3588;
+	Tue, 03 Mar 2026 15:54:33 +0000
+Date: Tue, 03 Mar 2026 15:54:33 +0000
+Message-ID: <86a4wo9adi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 10/36] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
+In-Reply-To: <20260226155515.1164292-11-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-11-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aYtGWwcVrDQeGCma@raptor>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Alex,
-
-Thanks for having a look.
-
-On Tue, Feb 10, 2026 at 02:53:15PM +0000, Alexandru Elisei wrote:
-> On Mon, Jan 19, 2026 at 12:46:00PM +0000, Will Deacon wrote:
-> > When pKVM is not enabled, the host shouldn't issue pKVM-specific
-> > hypercalls and so there's no point checking for this in the pKVM
-> > hypercall handlers.
-> > 
-> > Remove the redundant is_protected_kvm_enabled() checks from each
-> > hypercall and instead rejig the hypercall table so that the
-> > pKVM-specific hypercalls are unreachable when pKVM is not being used.
-> > 
-> > Reviewed-by: Quentin Perret <qperret@google.com>
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h   | 20 ++++++----
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 63 ++++++++++--------------------
-> >  2 files changed, 32 insertions(+), 51 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index a1ad12c72ebf..2076005e9253 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -60,16 +60,9 @@ enum __kvm_host_smccc_func {
-> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
-> >  	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
-> >  	__KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-> > +	__KVM_HOST_SMCCC_FUNC_MIN_PKVM = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-> >  
-> >  	/* Hypercalls available after pKVM finalisation */
+On Thu, 26 Feb 2026 15:58:00 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> This comment should be removed, I think the functions that follow, up to
-> and including __KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM, are also available with
-> kvm-arm.mode=nvhe.
->
-> If you agree that the comment should be removed, maybe a different name for
-> the define above would be more appropriate, one that does not imply pkvm?
-
-I'd rather keep the comment, as it delimits the blocks of hypercalls and
-is informative for the case when pKVM is enabled.
-
-I suppose we could reword it like:
-
-
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index c4246c34509a..6c79f7504d80 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -51,7 +51,7 @@
- #include <linux/mm.h>
- 
- enum __kvm_host_smccc_func {
--       /* Hypercalls available only prior to pKVM finalisation */
-+       /* Hypercalls that are unavailable once pKVM has finalised. */
-        /* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
-        __KVM_HOST_SMCCC_FUNC___pkvm_init = __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
-        __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
-@@ -62,7 +62,7 @@ enum __kvm_host_smccc_func {
-        __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-        __KVM_HOST_SMCCC_FUNC_MIN_PKVM = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
- 
--       /* Hypercalls available after pKVM finalisation */
-+       /* Hypercalls that are always available and common to [nh]VHE/pKVM. */
-        __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
-        __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
-        __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
-@@ -76,7 +76,7 @@ enum __kvm_host_smccc_func {
-        __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
-        __KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM = __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
- 
--       /* Hypercalls available only when pKVM has finalised */
-+       /* Hypercalls that are available only when pKVM has finalised. */
-        __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
-        __KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
-        __KVM_HOST_SMCCC_FUNC___pkvm_host_donate_guest,
-
-
-WDYT?
-
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index a7c689152f68..eb5cfe32b2c9 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -169,9 +169,6 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
-> >  	DECLARE_REG(u64, hcr_el2, host_ctxt, 3);
-> >  	struct pkvm_hyp_vcpu *hyp_vcpu;
-> >  
-> > -	if (!is_protected_kvm_enabled())
-> > -		return;
-> > -
-> >  	hyp_vcpu = pkvm_load_hyp_vcpu(handle, vcpu_idx);
-> >  	if (!hyp_vcpu)
-> >  		return;
+> Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
+> already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
+> fields. Add sanitisation for the GCIE field, which is set to IMP if
+> the host supports a GICv5 guest and NI, otherwise.
 > 
-> I've always wondered about this. For some hypercalls, all the handler does is
-> marshal the arguments for the actual function (for example,
-> handle___kvm_adjust_pc() -> __kvm_adjust_pc()), but for others, like this one,
-> the handler also has extra checks before calling the actual function.  Would you
-> mind explaining what the rationale is?
+> Extend the sanitisation that takes place in kvm_vgic_create() to zero
+> the ID_AA64PFR2.GCIE field when a non-GICv5 GIC is created. More
+> importantly, move this sanitisation to a separate function,
+> kvm_vgic_finalize_sysregs(), and call it from kvm_finalize_sys_regs().
+> 
+> We are required to finalize the GIC and GCIE fields a second time in
+> kvm_finalize_sys_regs() due to how QEMU blindly reads out then
+> verbatim restores the system register state. This avoids the issue
+> where both the GCIE and GIC features are marked as present (an
+> architecturally invalid combination), and hence guests fall over. See
+> the comment in kvm_finalize_sys_regs() for more details.
+> 
+> Overall, the following happens:
+> 
+> * Before an irqchip is created, FEAT_GCIE is presented if the host
+>   supports GICv5-based guests.
+> * Once an irqchip is created, all other supported irqchips are hidden
+>   from the guest; system register state reflects the guest's irqchip.
+> * Userspace is allowed to set invalid irqchip feature combinations in
+>   the system registers, but...
+> * ...invalid combinations are removed a second time prior to the first
+>   run of the guest, and things hopefully just work.
+> 
+> All of this extra work is required to make sure that "legacy" GICv3
+> guests based on QEMU transparently work on compatible GICv5 hosts
+> without modification.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c       | 70 +++++++++++++++++++++++++++++----
+>  arch/arm64/kvm/vgic/vgic-init.c | 43 +++++++++++++-------
+>  include/kvm/arm_vgic.h          |  1 +
+>  3 files changed, 92 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 11e75f2522f95..1039150716d43 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+>  
+>  static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
+> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+>  
+>  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> @@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct kvm_vcpu *vcpu,
+>  		val = sanitise_id_aa64pfr1_el1(vcpu, val);
+>  		break;
+>  	case SYS_ID_AA64PFR2_EL1:
+> -		val &= ID_AA64PFR2_EL1_FPMR |
+> -			(kvm_has_mte(vcpu->kvm) ?
+> -			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
+> -			 0);
+> +		val = sanitise_id_aa64pfr2_el1(vcpu, val);
+>  		break;
+>  	case SYS_ID_AA64ISAR1_EL1:
+>  		if (!vcpu_has_ptrauth(vcpu))
+> @@ -2024,6 +2022,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  	return val;
+>  }
+>  
+> +static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	val &= ID_AA64PFR2_EL1_FPMR |
+> +	       ID_AA64PFR2_EL1_MTEFAR |
+> +	       ID_AA64PFR2_EL1_MTESTOREONLY;
+> +
+> +	if (!kvm_has_mte(vcpu->kvm)) {
+> +		val &= ~ID_AA64PFR2_EL1_MTEFAR;
+> +		val &= ~ID_AA64PFR2_EL1_MTESTOREONLY;
+> +	}
+> +
+> +	if (vgic_host_has_gicv5())
+> +		val |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+> +
+> +	return val;
+> +}
+> +
+>  static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+>  {
+>  	val = ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
+> @@ -2213,6 +2228,12 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu,
+>  	return set_id_reg(vcpu, rd, user_val);
+>  }
+>  
+> +static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
+> +			       const struct sys_reg_desc *rd, u64 user_val)
+> +{
+> +	return set_id_reg(vcpu, rd, user_val);
+> +}
+> +
+>  /*
+>   * Allow userspace to de-feature a stage-2 translation granule but prevent it
+>   * from claiming the impossible.
+> @@ -3194,10 +3215,11 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  				       ID_AA64PFR1_EL1_RES0 |
+>  				       ID_AA64PFR1_EL1_MPAM_frac |
+>  				       ID_AA64PFR1_EL1_MTE)),
+> -	ID_WRITABLE(ID_AA64PFR2_EL1,
+> -		    ID_AA64PFR2_EL1_FPMR |
+> -		    ID_AA64PFR2_EL1_MTEFAR |
+> -		    ID_AA64PFR2_EL1_MTESTOREONLY),
+> +	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
+> +		    ~(ID_AA64PFR2_EL1_FPMR |
+> +		      ID_AA64PFR2_EL1_MTEFAR |
+> +		      ID_AA64PFR2_EL1_MTESTOREONLY |
+> +		      ID_AA64PFR2_EL1_GCIE)),
+>  	ID_UNALLOCATED(4,3),
+>  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+>  	ID_HIDDEN(ID_AA64SMFR0_EL1),
+> @@ -5668,8 +5690,40 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+>  
+>  		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+>  		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, val);
+> +		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+> +		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, val);
+>  		val = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+>  		kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, val);
+> +	} else {
+> +		/*
+> +		 * Certain userspace software - QEMU - samples the system
+> +		 * register state without creating an irqchip, then blindly
+> +		 * restores the state prior to running the final guest. This
+> +		 * means that it restores the virtualization & emulation
+> +		 * capabilities of the host system, rather than something that
+> +		 * reflects the final guest state. Moreover, it checks that the
+> +		 * state was "correctly" restored (i.e., verbatim), bailing if
+> +		 * it isn't, so masking off invalid state isn't an option.
+> +		 *
+> +		 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
+> +		 * both GICv3- and GICv5-based guests. Therefore, we initially
+> +		 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
+> +		 * reflect that userspace can create EITHER a vGICv3 or a
+> +		 * vGICv5. This is an architecturally invalid combination, of
+> +		 * course. Once an in-kernel GIC is created, the sysreg state is
+> +		 * updated to reflect the actual, valid configuration.
+> +		 *
+> +		 * Setting both the GIC and GCIE features to IMP unsurprisingly
+> +		 * results in guests falling over, and hence we need to fix up
+> +		 * this mess in KVM. Before running for the first time we yet
+> +		 * again ensure that the GIC and GCIE fields accurately reflect
+> +		 * the actual hardware the guest should see.
+> +		 *
+> +		 * This hack allows legacy QEMU-based GICv3 guests to run
+> +		 * unmodified on compatible GICv5 hosts, and avoids the inverse
+> +		 * problem for GICv5-based guests in the future.
+> +		 */
+> +		kvm_vgic_finalize_sysregs(kvm);
 
-Basically, any hypercall available post-pKVM finalisation needs to check
-all pointer arguments that it takes. It's best to do this in the early
-handler so that the backend code can just operate on a safe pointer
-(either because the underlying memory has been pinned or because it's
-been repainted to point at a hypervisor-managed data structure). That
-also allows us to share a bunch of code (e.g. __kvm_vcpu_run()) with
-nVHE.
+An alternative to this sorry hack would be to have a separate view of
+the idregs for luserspace to get whatever expected. But you then need
+to invalidate that copy at some point so that you can migrate the
+guest safely, and you'd probably end-up doing a similar thing.
 
-The reason handle___kvm_adjust_pc() doesn't do this is simply because
-this series focusses purely on the guest memory side of things; once
-we've got that, then we can work on hardening the vCPU/VM structures and
-these hypercalls will get tightened up by that work. In fact, that
-specific hypercall will do _nothing_ for a protected VM!
+I appreciate that you are doing this for the sake of preserving SW
+compatibility, but do you foresee a way out of this mess that does not
+involve asking the QEMU folks to fix their stuff? I don't think we can
+paper over their over-simplistic design forever.
 
-Will
+>  	}
+>  
+>  	if (vcpu_has_nv(vcpu)) {
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 9b3091ad868cf..d1db384698238 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -71,7 +71,6 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type);
+>  int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  {
+>  	struct kvm_vcpu *vcpu;
+> -	u64 aa64pfr0, pfr1;
+>  	unsigned long i;
+>  	int ret;
+>  
+> @@ -162,19 +161,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  
+>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>  
+> -	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+> -	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+> -
+> -	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
+> -		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> -	} else {
+> -		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+> -		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+> -		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+> -	}
+> -
+> -	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
+> -	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
+> +	/*
+> +	 * We've now created the GIC. Update the system register state
+> +	 * to accurately reflect what we've created.
+> +	 */
+> +	kvm_vgic_finalize_sysregs(kvm);
+
+As pointed out f2f, this will conflict with the patch posted at
+https://patch.msgid.link/20260228164559.936268-1-maz@kernel.org
+
+>  
+>  	if (type == KVM_DEV_TYPE_ARM_VGIC_V3)
+>  		kvm->arch.vgic.nassgicap = system_supports_direct_sgis();
+> @@ -617,6 +608,30 @@ int kvm_vgic_map_resources(struct kvm *kvm)
+>  	return ret;
+>  }
+>  
+> +void kvm_vgic_finalize_sysregs(struct kvm *kvm)
+
+nit: could you rename this to kvm_vgic_finalize_idregs()?
+
+> +{
+> +	u32 type = kvm->arch.vgic.vgic_model;
+> +	u64 aa64pfr0, aa64pfr2, pfr1;
+> +
+> +	aa64pfr0 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+> +	aa64pfr2 = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_GCIE;
+> +	pfr1 = kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
+> +
+> +	if (type == KVM_DEV_TYPE_ARM_VGIC_V2) {
+> +		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> +	} else if (type == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> +		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+> +		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+> +		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+> +	} else {
+> +		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+> +	}
+
+I'd rather see this written as:
+
+	switch (kvm->arch.vgic.vgic_model) {
+	case KVM_DEV_TYPE_ARM_VGIC_V2:
+		kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V3:
+		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+		aa64pfr0 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
+		pfr1 |= SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V5:
+		aa64pfr2 |= SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
+		break;
+	default:
+		WARN_ONCE(1, "WTF???\n");
+	}
+
+which I find more readable than the if/else cascade.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
