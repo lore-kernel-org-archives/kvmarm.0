@@ -1,153 +1,196 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECA14DC54A
-	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 16:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E921370D5D;
+	Tue,  3 Mar 2026 17:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772555617; cv=none; b=lmFINYZuMjiim5MUulX22T//RHJSkVYZzz8oH7viOvP2C3dHg9L6Qr+VuouLhDDQb8+YWQdTff/ULlQyaGaUm7nmgMTCbWsDGa9UQsXAcd6owyYnhPkGAY7m6oCTnwcSQ2klXt9RDxKGdlN+UtREO7HN52Slf7amwXCAJr5r5H4=
+	t=1772557829; cv=none; b=m7sH3bdM1ozhK86yP2nQzq5mzxn1DB6cDqaA0Mg2juGqu/xyYjqoS0irS11Hhpk2Fq42C1BAz46PVE/E4y46cAk/QVyQ7a5iGFJKoY83y014ns+MB7AxQeUlknfEImVUQ+ZWGRmlt6UZtqWJXaUD7PjrZS2HHWqzHZNJRo+U08g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772555617; c=relaxed/simple;
-	bh=FdbJz+2GnMDWrCreI2X/cWqA3lnADEjuc8bvbU9/Iek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tNbqHWYqU9+dhB3/a3/xYa4yYOFbdszSunpHByLxFhl4YXPK6CYy06ZU3DUECsfW4jRbI9qrN+O4GMDyjL1cZQbbpsY/Y7c1uaTNZ2P9pk+AYBimbgrVxnA5NUIIZ65o9u8iZ/MW68XIGfuSZ0bPfwhR5RjEDqgoHNo4jEgRPuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91B8A339;
-	Tue,  3 Mar 2026 08:33:28 -0800 (PST)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5702B3F694;
-	Tue,  3 Mar 2026 08:33:30 -0800 (PST)
-Message-ID: <fd0cf579-77c4-4a76-bc8e-b19bb7988155@arm.com>
-Date: Tue, 3 Mar 2026 16:33:23 +0000
+	s=arc-20240116; t=1772557829; c=relaxed/simple;
+	bh=08QfekEPDjtRvdxfle7tsdiE74TRsVmF4S5TJdJQ/OM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=twCwZKnnK1WSMSqUKyQ9X/+LevA3m2CmdE+Fb+MQNCKi1hHrXim7kls0Z6K0hhbmg365O6irVy6F34AYIxflEFL++inStoHCU7toNZcfpql5x1vVaHzIK22Tico401ESM7r5Qn7sqKsnbrWldvn28ijibkUahSzyPHo7LFNfBxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvcf5t4I; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvcf5t4I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36805C116C6;
+	Tue,  3 Mar 2026 17:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772557829;
+	bh=08QfekEPDjtRvdxfle7tsdiE74TRsVmF4S5TJdJQ/OM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uvcf5t4IKmPp0VcPuqFTEG+Uc4H75lubjehjsFIUsudqZmaM3cqqMzO0AxLE6/xfr
+	 Yvomx7YeHmN0umTZZUvFzktLOpLitniN/AfiBJKlwWsIbmdLjc6BvT63onKSri3ytI
+	 3sem/hoP5go9GpzrF4YPfTI8W9x7L6d2e3fB+3ky9y2poRe5tZu0goA/rXbwiPC2cm
+	 aeFpPBsxzaPfNYrVYwa35c2beGT8QqYQGJ9SrdgM4RODfR9bf46qOqE0QwO+X9Dj0n
+	 W+aUfvwOEOsPo09STsLStvCDiPRb938yci1+559EnYsWlfqEHgX7EZzcEV8WJ1xT2u
+	 TgMM+6QXzAMPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxTGM-0000000Fiue-3SjT;
+	Tue, 03 Mar 2026 17:10:26 +0000
+Date: Tue, 03 Mar 2026 17:10:26 +0000
+Message-ID: <867brs96v1.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 14/36] KVM: arm64: gic-v5: Add vgic-v5 save/restore hyp interface
+In-Reply-To: <20260226155515.1164292-15-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-15-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 12/41] KVM: arm64: Use kernel-space partid
- configuration for hypercalls
-To: Marc Zyngier <maz@kernel.org>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.linux.dev, zengheng4@huawei.com,
- linux-doc@vger.kernel.org, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
- <20260224175720.2663924-13-ben.horgan@arm.com> <86jyvu85dj.wl-maz@kernel.org>
-From: Ben Horgan <ben.horgan@arm.com>
-Content-Language: en-US
-In-Reply-To: <86jyvu85dj.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Marc,
-
-On 3/2/26 18:15, Marc Zyngier wrote:
-> On Tue, 24 Feb 2026 17:56:51 +0000,
-> Ben Horgan <ben.horgan@arm.com> wrote:
->>
->> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
->> partid-0 for hypercalls, even when the host may have configured its kernel
->> threads to use a different partid. 0 may have been assigned to another
->> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
->> same partid as the kernel thread does on the host.
->>
->> Tested-by: Gavin Shan <gshan@redhat.com>
->> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Tested-by: Peter Newman <peternewman@google.com>
->> Tested-by: Zeng Heng <zengheng4@huawei.com>
->> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->> ---
->> Changes since v2:
->> Use mask
->> Use read_sysreg_el1 to cope with hvhe
->>
->> Changes since v3:
->> Set MPAM2_EL2.MPAMEN to 1 as we rely on that before and after
->> ---
->>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> index e7790097db93..80e71eeddc03 100644
->> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->> @@ -638,6 +638,15 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->>  	unsigned long hcall_min = 0;
->>  	hcall_t hfn;
->>  
->> +	if (system_supports_mpam()) {
->> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
->> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
->> +		u64 val = MPAM2_EL2_MPAMEN | (read_sysreg_el1(SYS_MPAM1) & mask);
->> +
->> +		write_sysreg_s(val, SYS_MPAM2_EL2);
->> +		isb();
->> +	}
->> +
->>  	/*
->>  	 * If pKVM has been initialised then reject any calls to the
->>  	 * early "privileged" hypercalls. Note that we cannot reject
+On Thu, 26 Feb 2026 15:59:02 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> It is extremely debatable whether this is desirable:
+> Introduce hyp functions to save/restore the following GICv5 state:
 > 
-> - pKVM really shouldn't be influenced by what the host does, which
->   means reserving PARTIDs and indirecting what the host sees. This can
->   be deferred until pKVM is actually useful upstream.
+> * ICC_ICSR_EL1
+> * ICH_APR_EL2
+> * ICH_PPI_ACTIVERx_EL2
+> * ICH_PPI_DVIRx_EL2
+> * ICH_PPI_ENABLERx_EL2
+> * ICH_PPI_PENDRRx_EL2
+> * ICH_PPI_PRIORITYRx_EL2
+> * ICH_VMCR_EL2
 > 
-> - repeatedly hammering that register plus an ISB on the hot path of a
->   hypercall is a sure way to make things worse than they should be,
->   and that should be fixed now.
-
-Would a read modify write be preferable?
-
+> All of these are saved/restored to/from the KVM vgic_v5 CPUIF shadow
+> state, with the exception of the active, pending, and enable
+> state. The pending state is saved and restored from kvm_host_data as
+> any changes here need to be tracked and propagated back to the
+> vgic_irq shadow structures (coming in a future commit). Therefore, an
+> entry and an exit copy is required. The active and enable state is
+> restored from the vgic_v5 CPUIF, but is saved to kvm_host_data. Again,
+> this needs to by synced back into the shadow data structures.
 > 
-> Do you really expect the EL1 settings to change on a regular basis? If
-
-The MPAM EL1 partid/pmg configuration is kept in sync with the MPAM EL0
-partid/pmg configuration (see mpam_thread_switch() in patch 4) which
-means that the EL1 configuration will change whenever the user changes
-the EL0 configuration.
-
-> so, I'd rather you use a specific host hypercall, or even a trap to
-> propagate the EL1 configuration. If not, just set it as part of the
-
-I think this ends up trapping context switch which doesn't seem any more
-desirable.
-
-> KVM init and be done with it.
-
-If we just forego this patch then the MPAM configuration for el2 as
-initially configured, partid=0, pmg=0 would be used. This is also the
-default for requestors that aren't MPAM aware or unconfigured, like
-trusted firmware, its, gpu. VHE mode (required from 8.1?) should be
-available in any platform that has MPAM (introduced in 8.4, back
-portable to 8.3) and so using nvhe with MPAM seems unlikely and the
-amount of data should be small enough. That leaves pKVM for which,
-perhaps, doing nothing is also the correct answer.
-
-What do you think? Drop, read modify write, or something else?
-
+> The ICSR must be save/restored as this register is shared between host
+> and guest. Therefore, to avoid leaking host state to the guest, this
+> must be saved and restored. Moreover, as this can by used by the host
+> at any time, it must be save/restored eagerly. Note: the host state is
+> not preserved as the host should only use this register when
+> preemption is disabled.
 > 
-> Thanks,
+> As part of restoring the ICH_VMCR_EL2 and ICH_APR_EL2, GICv3-compat
+> mode is also disabled by setting the ICH_VCTLR_EL2.V3 bit to 0. The
+> correspoinding GICv3-compat mode enable is part of the VMCR & APR
+> restore for a GICv3 guest as it only takes effect when actually
+> running a guest.
 > 
-> 	M.
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   |   4 +
+>  arch/arm64/include/asm/kvm_host.h  |  16 ++++
+>  arch/arm64/include/asm/kvm_hyp.h   |   8 ++
+>  arch/arm64/kvm/hyp/nvhe/Makefile   |   2 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  32 ++++++++
+>  arch/arm64/kvm/hyp/vgic-v5-sr.c    | 123 +++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/Makefile    |   2 +-
+>  include/kvm/arm_vgic.h             |  21 +++++
+>  8 files changed, 206 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/vgic-v5-sr.c
 > 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index a1ad12c72ebf1..fe8d4adfc281d 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -89,6 +89,10 @@ enum __kvm_host_smccc_func {
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_load,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_put,
+>  	__KVM_HOST_SMCCC_FUNC___pkvm_tlb_flush_vmid,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_apr,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_vmcr_apr,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_save_ppi_state,
+> +	__KVM_HOST_SMCCC_FUNC___vgic_v5_restore_ppi_state,
+>  };
+>  
+>  #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 332114bd44d2a..60da84071c86e 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -797,6 +797,22 @@ struct kvm_host_data {
+>  	/* Number of debug breakpoints/watchpoints for this CPU (minus 1) */
+>  	unsigned int debug_brps;
+>  	unsigned int debug_wrps;
+> +
+> +	/* PPI state tracking for GICv5-based guests */
+> +	struct {
+> +		/*
+> +		 * For tracking the PPI pending state, we need both
+> +		 * the entry state and exit state to correctly detect
+> +		 * edges as it is possible that an interrupt has been
+> +		 * injected in software in the interim.
+> +		 */
+> +		u64 pendr_entry[2];
+> +		u64 pendr_exit[2];
+> +
+> +		/* The saved state of the regs when leaving the guest */
+> +		u64 activer_exit[2];
+> +		u64 enabler_exit[2];
+> +	} vgic_v5_ppi_state;
+>  };
+>  
+>  struct kvm_host_psci_config {
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 76ce2b94bd97e..3dcec1df87e9e 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -87,6 +87,14 @@ void __vgic_v3_save_aprs(struct vgic_v3_cpu_if *cpu_if);
+>  void __vgic_v3_restore_vmcr_aprs(struct vgic_v3_cpu_if *cpu_if);
+>  int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu);
+>  
+> +/* GICv5 */
+> +void __vgic_v5_save_apr(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_vmcr_apr(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_save_ppi_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_ppi_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_save_state(struct vgic_v5_cpu_if *cpu_if);
+> +void __vgic_v5_restore_state(struct vgic_v5_cpu_if *cpu_if);
+
+The last two are not plugged as hypercalls? How do they get called?
+
+Overall, it would be good to describe what gets saved/restored when.
+I'm sure there is a logic behind it all, and maybe it is very close to
+what v3 requires, but that's not completely apparent in this patch (we
+don't see the call sites).
 
 Thanks,
 
-Ben
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
