@@ -1,131 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F933C278E;
-	Tue,  3 Mar 2026 14:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916F83D565F
+	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 14:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772548623; cv=none; b=YDr1Hvj87EtSZV1mlE/cBsIYKoWZsKbLt8s2nBEkOMKxVhdTn0TkO6sPkfQLL6EM63ZguqXBUzIP3goKm1NKW/W/dBIFGkONbiO9h5vyc0OBM4GzDXC6M7clq0rfVwj2lE8U6uTPg7PqIn7ecT+nL2RLCmsTtHmv0NvNC7pkXa0=
+	t=1772548764; cv=none; b=AnUs6+uO5lX4a23aPZPqlcfTWowCuJJi/gWfUjz8D9bFOIR4wrVv8rRVCc3uAbmRmZo5qpvTFwsRpfLYcPOAaYFBmpLkRkIv5TqhIEgbhvuiSrjtLrXNX7s9GEKbRuPAeEghC+f27RmEtHhg8RMc8oi2tBcPhujWIzeN0o4mTEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772548623; c=relaxed/simple;
-	bh=m/46LDof3LqadCUxR8EzTO5Nf7CZ0A3+ar1RNvzBB9o=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VcvGeWaVlRgyrffGl9iQRSfkLiYPbsEjCUn6i77jZWqU8qyxc7Dy9JNgUMbo1UvbzLB0xSxcj7VA9s7uvmVOHqiB6XBBrxK9x+2m0OH+RKX9nIl3LnuHt7U4sbCLPxYc0qISt7DfsFlwOBxqlWEzi7UFN2mlH42MiAFNjbtPBL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RhIGlnEx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772548764; c=relaxed/simple;
+	bh=dBHrFQSk7Rk6asGJP5iligD6SmHOO6Xhw2TblL/B79c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P1Io8WP27W0p1HdKwWeBqMLPDW2drLRerECVtdInMb1mpijyiK7wzdSpdYTiapAjQBoB0qIF+UFlF3DQFJ2yqjOjXJgVfsVyYrEu9uVXBhMLibRn8SkzLkkiNpi9tlpdwYzBdUI4DrU5/bXGRXuKzk4oHqokTR/MdE34tKW0UiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBQqp4Eh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RhIGlnEx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62312C116C6;
-	Tue,  3 Mar 2026 14:37:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBQqp4Eh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AF39C116C6;
+	Tue,  3 Mar 2026 14:39:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772548623;
-	bh=m/46LDof3LqadCUxR8EzTO5Nf7CZ0A3+ar1RNvzBB9o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RhIGlnExbvHqjrKvCOMAYKyPDILck1mHKuxKeTG/9P6sPpSNVQ6cVGSbL7lVk0eE2
-	 9UBoGOLIEh5qWL6s/JISGlQp4mz2iB1ITIS/uvl3pIwQGYg5ONc4wXsEBwsSEjDkaf
-	 HiozHmY/lH7MsUI5MKc3IsX58h9FjCaE+SHWEu7RxOJ7OYKS+ZT2t+QKfnIbgpP1mi
-	 Z6PxJHzw0gydgaJntW4yn9TDSF7osodkzkreMS3Hwm87DShNUjUQGxPNJEoNYQmCKg
-	 DutUnLfDX3IAkSu/QqMQWjQxTmao9OnlpFNO4lH+y/+Py6hImTNQ1TZaVemn0rovDS
-	 KiNaUBc0WC6sQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vxQrs-0000000FfAT-4AND;
-	Tue, 03 Mar 2026 14:37:01 +0000
-Date: Tue, 03 Mar 2026 14:37:00 +0000
-Message-ID: <86ecm17zeb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
+	s=k20201202; t=1772548764;
+	bh=dBHrFQSk7Rk6asGJP5iligD6SmHOO6Xhw2TblL/B79c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MBQqp4EhSe5SXnHFzg7VJrtyBReJOXhWPuZrHbNgUsz42KbIJd7dEyBpfHmj6s7ro
+	 /UZhqt5gYCI4u+TUKYIBFUNCE8VYYcYm6EOebMike7aEv9+d5JTdWT3VFGRPvQGq/o
+	 S8Ch0yuIvb8+73GXvtE/oNHRYTdPm73NEic7PgoB5kzipm6OTgSrSjiUpN+XOYOqt4
+	 gGKcowhSBmWuy0YFNTuaJCgM8n5vtD/pyLogaRL3U8BoECmiZmTzqRCpgeU1SO88j1
+	 e7A/hTRm0GpkhY9Hl8yIHNznwDSxPKa6SCrzJaQwJa3XQvMwuK4LPFb/ugv+QHzRGv
+	 koD/jtFwF+8yw==
+Date: Tue, 3 Mar 2026 14:39:18 +0000
+From: Will Deacon <will@kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei
- <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
+Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
 	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-In-Reply-To: <d87ee902-3b5e-4cf9-8b97-d83f8da02a5a@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-7-steven.price@arm.com>
-	<86tsuy8g0u.wl-maz@kernel.org>
-	<33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-	<9d702666-72a8-43e4-8ab3-548d8154a529@arm.com>
-	<86fr6h838s.wl-maz@kernel.org>
-	<d87ee902-3b5e-4cf9-8b97-d83f8da02a5a@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Yabin Cui <yabinc@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Disable SPE Profiling Buffer when
+ running in guest context
+Message-ID: <aabylhEFnTUR0WTy@willie-the-truck>
+References: <20260227212136.7660-1-will@kernel.org>
+ <20260227212136.7660-3-will@kernel.org>
+ <b6f0b0c8-c2a6-4b61-a0cc-482450c092f5@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6f0b0c8-c2a6-4b61-a0cc-482450c092f5@arm.com>
 
-On Tue, 03 Mar 2026 14:23:08 +0000,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On Tue, Mar 03, 2026 at 09:48:06AM +0000, Suzuki K Poulose wrote:
+> On 27/02/2026 21:21, Will Deacon wrote:
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > index 3dbdee1148d3..75158a9cd06a 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> > @@ -14,20 +14,20 @@
+> >   #include <asm/kvm_hyp.h>
+> >   #include <asm/kvm_mmu.h>
+> > -static void __debug_save_spe(u64 *pmscr_el1)
+> > +static void __debug_save_spe(void)
+> >   {
+> > -	u64 reg;
+> > +	u64 *pmscr_el1, *pmblimitr_el1;
+> > -	/* Clear pmscr in case of early return */
+> > -	*pmscr_el1 = 0;
+> > +	pmscr_el1 = host_data_ptr(host_debug_state.pmscr_el1);
+> > +	pmblimitr_el1 = host_data_ptr(host_debug_state.pmblimitr_el1);
+> >   	/*
+> >   	 * At this point, we know that this CPU implements
+> >   	 * SPE and is available to the host.
+> >   	 * Check if the host is actually using it ?
+> >   	 */
+> > -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> > -	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> > +	*pmblimitr_el1 = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> > +	if (!(*pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> >   		return;
+> >   	/* Yes; save the control register and disable data generation */
+> > @@ -37,18 +37,29 @@ static void __debug_save_spe(u64 *pmscr_el1)
+> >   	/* Now drain all buffered data to memory */
+> >   	psb_csync();
+> > +	dsb(nsh);
+> > +
+> > +	/* And disable the profiling buffer */
+> > +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
+> > +	isb();
+> >   }
+> > -static void __debug_restore_spe(u64 pmscr_el1)
+> > +static void __debug_restore_spe(void)
+> >   {
+> > -	if (!pmscr_el1)
+> > +	u64 pmblimitr_el1 = *host_data_ptr(host_debug_state.pmblimitr_el1);
+> > +
+> > +	if (!(pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> >   		return;
+> >   	/* The host page table is installed, but not yet synchronised */
+> >   	isb();
 > 
-> On 03/03/2026 13:13, Marc Zyngier wrote:
-> > On Mon, 02 Mar 2026 17:13:41 +0000,
-> > Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
-> >> 
-> >> More importantly, we have to make sure that the "RMI_PSCI_COMPLETE" is
-> >> invoked before both of the following:
-> >>    1. The "source" vCPU is run again
-> >>    2. More importantly the "target" vCPU is run.
-> > 
-> > I don't understand why (1) is required. Once the VMM gets the request,
-> 
-> The underlying issue is, the RMM doesn't have the VCPU object for the
-> "target" VCPU, to make the book keeping. Also, please note that for  a
-> Realm, PSCI is emulated by the "RMM". Host is obviously notified of the
-> "PSCI" changes via EXIT_PSCI (note, it is not SMCCC exit)
->  so that it can be in sync with the real state. And does have a say in
->  CPU_ON. So, before we return to running the "source" CPU,
-> Host must provide the target VCPU object and its consent (via
-> psci_status) to the RMM. This allows the RMM to emulate the PSCI
-> request correctly and also at the same time keep its book keeping
-> in tact (i.e., marking the Target VCPU as runnable or not).
-> 
-> When a "source" VCPU exits to the host with a PSCI_EXIT, the RMM
-> marks the source VCPU has a pending PSCI operation, and
-> RMI_PSCI_COMPLETE request ticks that off, making it runnable again.
+> minor nit: This seems buried deep down in a helper (with no context of what
+> else could have happened since the host context has been restored)
+> and for now it looks correct,  but is prone to inadvertent changes
+> causing issues or making this obsolete. With the isb() following LIMITR,
+> wouldn't that be  sufficient ?
 
-Sure. What I don't get is what this has to happen on the source vcpu
-thread. The RMM has absolutely no clue about that, and there should be
-no impediment to letting the target vcpu do it as it starts.
+I'm just inherting this from the existing upstream code -- see the isb()
+in the existing implementation of __debug_restore_spe().
 
-Even better, you should be able to do that on the first thread that
-reenters the guest, completely removing any RMM knowledge from the
-PSCI handling in userspace.
+The isb() is needed to ensure that SPE can't start making out-of-context
+translation table walks (which can occur once PMBLIMITR_EL1.E is set)
+before the stage-2 MMU is restored back to the host configuration (e.g.
+by clearing HCR_EL2.VM for nVHE or by restoring VTCR and VTTBR for
+pKVM). We want to predicate it on SPE being enabled, otherwise it's
+unconditional overhead, so I don't think we can move it.
 
-If you can't do that, then please consider fixing the RMM to allow it.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
