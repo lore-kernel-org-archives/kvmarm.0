@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6535739D6F1;
-	Tue,  3 Mar 2026 16:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AECA14DC54A
+	for <kvmarm@lists.linux.dev>; Tue,  3 Mar 2026 16:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772553780; cv=none; b=J4ZqEhuWMX6HFM2c82qOXTZ0p+w9yjL656RKn+DbxOkC6J4coE9gf93XM/N3Gbwe3qYspPGcPCEpb7jGx30EVmPePsMJSNPZ6rp5REsuut14LBY60sjwJBv2VcB1yHyPJVdXZUr8a1YNnFW3/9ERwjY22ny43ljxiv2UC3VChJs=
+	t=1772555617; cv=none; b=lmFINYZuMjiim5MUulX22T//RHJSkVYZzz8oH7viOvP2C3dHg9L6Qr+VuouLhDDQb8+YWQdTff/ULlQyaGaUm7nmgMTCbWsDGa9UQsXAcd6owyYnhPkGAY7m6oCTnwcSQ2klXt9RDxKGdlN+UtREO7HN52Slf7amwXCAJr5r5H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772553780; c=relaxed/simple;
-	bh=nybrefJvY4I/b5tGu5aw4kr9AmUjRGgpr4KA3jcPp2o=;
+	s=arc-20240116; t=1772555617; c=relaxed/simple;
+	bh=FdbJz+2GnMDWrCreI2X/cWqA3lnADEjuc8bvbU9/Iek=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DbdOx5dwQ5eYG8LYoLyDDMBM2NyQ6Ik1u/d51hv5NSioBnnmyJoKwwGJKp5pj6MrNApb+ao7Xo2KrXNrk36EJrrL5krmmHQ+J/5HNvVEM5jUWDgT1XkQVYcONlTLTNcP1dqZYjNdpS86h05y7DpwrPeQzCYgs/iafSHhHLhRZXA=
+	 In-Reply-To:Content-Type; b=tNbqHWYqU9+dhB3/a3/xYa4yYOFbdszSunpHByLxFhl4YXPK6CYy06ZU3DUECsfW4jRbI9qrN+O4GMDyjL1cZQbbpsY/Y7c1uaTNZ2P9pk+AYBimbgrVxnA5NUIIZ65o9u8iZ/MW68XIGfuSZ0bPfwhR5RjEDqgoHNo4jEgRPuA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C1FF339;
-	Tue,  3 Mar 2026 08:02:52 -0800 (PST)
-Received: from [10.57.66.27] (unknown [10.57.66.27])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67C6E3F694;
-	Tue,  3 Mar 2026 08:02:55 -0800 (PST)
-Message-ID: <37b79d98-10e5-4beb-b95c-783d41050eae@arm.com>
-Date: Tue, 3 Mar 2026 16:02:53 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 91B8A339;
+	Tue,  3 Mar 2026 08:33:28 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5702B3F694;
+	Tue,  3 Mar 2026 08:33:30 -0800 (PST)
+Message-ID: <fd0cf579-77c4-4a76-bc8e-b19bb7988155@arm.com>
+Date: Tue, 3 Mar 2026 16:33:23 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,95 +27,127 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-Content-Language: en-GB
+Subject: Re: [PATCH v5 12/41] KVM: arm64: Use kernel-space partid
+ configuration for hypercalls
 To: Marc Zyngier <maz@kernel.org>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
- <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
- <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
- <9d702666-72a8-43e4-8ab3-548d8154a529@arm.com> <86fr6h838s.wl-maz@kernel.org>
- <d87ee902-3b5e-4cf9-8b97-d83f8da02a5a@arm.com> <86ecm17zeb.wl-maz@kernel.org>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <86ecm17zeb.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.linux.dev, zengheng4@huawei.com,
+ linux-doc@vger.kernel.org, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+ <20260224175720.2663924-13-ben.horgan@arm.com> <86jyvu85dj.wl-maz@kernel.org>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <86jyvu85dj.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 03/03/2026 14:37, Marc Zyngier wrote:
-> On Tue, 03 Mar 2026 14:23:08 +0000,
-> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+Hi Marc,
+
+On 3/2/26 18:15, Marc Zyngier wrote:
+> On Tue, 24 Feb 2026 17:56:51 +0000,
+> Ben Horgan <ben.horgan@arm.com> wrote:
 >>
->> On 03/03/2026 13:13, Marc Zyngier wrote:
->>> On Mon, 02 Mar 2026 17:13:41 +0000,
->>> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
->>>>
->>>> More importantly, we have to make sure that the "RMI_PSCI_COMPLETE" is
->>>> invoked before both of the following:
->>>>     1. The "source" vCPU is run again
->>>>     2. More importantly the "target" vCPU is run.
->>>
->>> I don't understand why (1) is required. Once the VMM gets the request,
+>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
+>> partid-0 for hypercalls, even when the host may have configured its kernel
+>> threads to use a different partid. 0 may have been assigned to another
+>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
+>> same partid as the kernel thread does on the host.
 >>
->> The underlying issue is, the RMM doesn't have the VCPU object for the
->> "target" VCPU, to make the book keeping. Also, please note that for  a
->> Realm, PSCI is emulated by the "RMM". Host is obviously notified of the
->> "PSCI" changes via EXIT_PSCI (note, it is not SMCCC exit)
->>   so that it can be in sync with the real state. And does have a say in
->>   CPU_ON. So, before we return to running the "source" CPU,
->> Host must provide the target VCPU object and its consent (via
->> psci_status) to the RMM. This allows the RMM to emulate the PSCI
->> request correctly and also at the same time keep its book keeping
->> in tact (i.e., marking the Target VCPU as runnable or not).
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+>> Tested-by: Peter Newman <peternewman@google.com>
+>> Tested-by: Zeng Heng <zengheng4@huawei.com>
+>> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> ---
+>> Changes since v2:
+>> Use mask
+>> Use read_sysreg_el1 to cope with hvhe
 >>
->> When a "source" VCPU exits to the host with a PSCI_EXIT, the RMM
->> marks the source VCPU has a pending PSCI operation, and
->> RMI_PSCI_COMPLETE request ticks that off, making it runnable again.
+>> Changes since v3:
+>> Set MPAM2_EL2.MPAMEN to 1 as we rely on that before and after
+>> ---
+>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> index e7790097db93..80e71eeddc03 100644
+>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+>> @@ -638,6 +638,15 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
+>>  	unsigned long hcall_min = 0;
+>>  	hcall_t hfn;
+>>  
+>> +	if (system_supports_mpam()) {
+>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
+>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
+>> +		u64 val = MPAM2_EL2_MPAMEN | (read_sysreg_el1(SYS_MPAM1) & mask);
+>> +
+>> +		write_sysreg_s(val, SYS_MPAM2_EL2);
+>> +		isb();
+>> +	}
+>> +
+>>  	/*
+>>  	 * If pKVM has been initialised then reject any calls to the
+>>  	 * early "privileged" hypercalls. Note that we cannot reject
 > 
-> Sure. What I don't get is what this has to happen on the source vcpu
-> thread. The RMM has absolutely no clue about that, and there should be
-> no impediment to letting the target vcpu do it as it starts.
+> It is extremely debatable whether this is desirable:
+> 
+> - pKVM really shouldn't be influenced by what the host does, which
+>   means reserving PARTIDs and indirecting what the host sees. This can
+>   be deferred until pKVM is actually useful upstream.
+> 
+> - repeatedly hammering that register plus an ISB on the hot path of a
+>   hypercall is a sure way to make things worse than they should be,
+>   and that should be fixed now.
 
-Because, the RMM wants to make that the state is consistent. i.e,
-Host cannot lie to the "source" VCPU and RMM (e.g., CPU_ON denied) and
-then run the "target" VCPU.
-
-In other words, the response to the CPU_ON must be recorded by the RMM
-in the target VCPU state, to make sure the target VCPU state is
-consistent with the response.
-
-The only way to fix this would be RMM keeping track of "mpidr" to REC
-object mapping (VCPU object), which impacts the scalability. With that
-in place, RMM can update the target VCPU state from the return of the
-REC_ENTER after a PSCI_EXIT.
-
-That said, will explore the options to address this
-
-Thanks
-Suzuki
+Would a read modify write be preferable?
 
 > 
-> Even better, you should be able to do that on the first thread that
-> reenters the guest, completely removing any RMM knowledge from the
-> PSCI handling in userspace.
-> 
-> If you can't do that, then please consider fixing the RMM to allow it.
+> Do you really expect the EL1 settings to change on a regular basis? If
+
+The MPAM EL1 partid/pmg configuration is kept in sync with the MPAM EL0
+partid/pmg configuration (see mpam_thread_switch() in patch 4) which
+means that the EL1 configuration will change whenever the user changes
+the EL0 configuration.
+
+> so, I'd rather you use a specific host hypercall, or even a trap to
+> propagate the EL1 configuration. If not, just set it as part of the
+
+I think this ends up trapping context switch which doesn't seem any more
+desirable.
+
+> KVM init and be done with it.
+
+If we just forego this patch then the MPAM configuration for el2 as
+initially configured, partid=0, pmg=0 would be used. This is also the
+default for requestors that aren't MPAM aware or unconfigured, like
+trusted firmware, its, gpu. VHE mode (required from 8.1?) should be
+available in any platform that has MPAM (introduced in 8.4, back
+portable to 8.3) and so using nvhe with MPAM seems unlikely and the
+amount of data should be small enough. That leaves pKVM for which,
+perhaps, doing nothing is also the correct answer.
+
+What do you think? Drop, read modify write, or something else?
+
 > 
 > Thanks,
 > 
 > 	M.
 > 
 
+Thanks,
 
+Ben
 
