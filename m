@@ -1,194 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307781ACEDE;
-	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41BD34F461
+	for <kvmarm@lists.linux.dev>; Wed,  4 Mar 2026 09:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616933; cv=none; b=NNodN0M2/+8jgVN2MlIE8Q7oyDwUxQKncHm/Diycvb3JxXNwYPn7v+MnNuuj1clJ/2H1Q+IPA48LXcncqfVou53pXspnYDoLxu8v1EmZYOdVWREpAa7AuMCB0XdPvaiGu1Gkv3WoAVRMjdbix3D1lWDby3mIb5ykIrcwU+3Ogw4=
+	t=1772617353; cv=none; b=YBEYuCTFXr82lh8WmAthu3AcqB7Ccd0ddd96fsNfl/+9+2HRyiNbHHwJNO42tLSzyTipXBiFu/B90FcXE4WW6VfXmFfRkZCsC1ewCrxFmJ3j2WIPzR4QzO70D4lNAbQzmthH7KQnJMlym33yi0cETjHZnHObRK87s1POxi8zwBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616933; c=relaxed/simple;
-	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K1K73O1ZtW8X0M86LcwYpGEwz8YWNrSsAsTW4FNcDwIMEBjhMP3jJ21eg/JhZGr9U81ct8Tj29djM3DyUljkouCD9h5QqEm1jh1LZUeAQskslikj8klEdtrYawOv16auSnwPaDut5+WoyYaxGBfFC5Z6640W4xYSOX6yY7v29oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAAAOGE3; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAAAOGE3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3771C19423;
-	Wed,  4 Mar 2026 09:35:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772616933;
-	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jAAAOGE3yEaLrrLntuxDP4H0mebq4t+SmQ5VHnBBo3slVvJte1dhqls/6yLwgccPj
-	 JGhp+O05g7UxK+18O7ErIEpLcfmVlKe3YaD2LSycrMQs/h8/FGkJSL/uC25dYkS1hd
-	 0mEB9FT6J1C/tStohhvhX07snjfQp79h8RsKwhD+J2EJ9bX+E6jaAojpDX0ayG+j24
-	 94Bg4T+9U1Tt+NXm8oRxArfvm/PXDREZWT02eOEpUU361uHOF3TF9eTLKMMBtO8dDD
-	 AvOc3HHq3RJ4nUW5QtJrnV/sfO+AU+2XzFeLUHzUDeed9X83iE9epPg8dJfI+xX75K
-	 W6qVuInzp8ABg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vxide-0000000FyTI-31HL;
-	Wed, 04 Mar 2026 09:35:30 +0000
-Date: Wed, 04 Mar 2026 09:35:30 +0000
-Message-ID: <864imw7x99.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 16/36] KVM: arm64: gic-v5: Implement direct injection of PPIs
-In-Reply-To: <20260226155515.1164292-17-sascha.bischoff@arm.com>
-References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-17-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1772617353; c=relaxed/simple;
+	bh=9mhfdJo0bDUC45KIo47E4QnPpQe8tEohErhoklbBl8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RpkMs5ASxjBTJJEjqWPXsyBxZLGY8Gkk62kmiv166k02kSAAFIHLAgfz8aRuVUvJS9R6MeN/fMx2MWojKN6mCh7kcX8IkO/JN+/tyEOmSYjZM9B3Svnhjz1hIM81WuDio6qy5Ehw8hF0O76E6nLRUlbO+pw27ADuGfbUudnIvCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05F4A339;
+	Wed,  4 Mar 2026 01:42:25 -0800 (PST)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D9E153F694;
+	Wed,  4 Mar 2026 01:42:26 -0800 (PST)
+Message-ID: <6259fddb-62f3-4874-8188-6ca82e3586a8@arm.com>
+Date: Wed, 4 Mar 2026 09:42:25 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
+To: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, quic_jiles@quicinc.com, reinette.chatre@intel.com,
+ rohit.mathew@arm.com, scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ zengheng4@huawei.com, linux-doc@vger.kernel.org
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+ <87y0k8r7j1.fsf@stealth>
+From: Ben Horgan <ben.horgan@arm.com>
+Content-Language: en-US
+In-Reply-To: <87y0k8r7j1.fsf@stealth>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 26 Feb 2026 15:59:33 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> GICv5 is able to directly inject PPI pending state into a guest using
-> a mechanism called DVI whereby the pending bit for a paticular PPI is
-> driven directly by the physically-connected hardware. This mechanism
-> itself doesn't allow for any ID translation, so the host interrupt is
-> directly mapped into a guest with the same interrupt ID.
-> 
-> When mapping a virtual interrupt to a physical interrupt via
-> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
-> PPI or not. If it is, and the host's interrupt ID matches that used
-> for the guest DVI is enabled, and the interrupt itself is marked as
-> directly_injected.
-> 
-> When the interrupt is unmapped again, this process is reversed, and
-> DVI is disabled for the interrupt again.
-> 
-> Note: the expectation is that a directly injected PPI is disabled on
-> the host while the guest state is loaded. The reason is that although
-> DVI is enabled to drive the guest's pending state directly, the host
-> pending state also remains driven. In order to avoid the same PPI
-> firing on both the host and the guest, the host's interrupt must be
-> disabled (masked). This is left up to the code that owns the device
-> generating the PPI as this needs to be handled on a per-VM basis. One
-> VM might use DVI, while another might not, in which case the physical
-> PPI should be enabled for the latter.
-> 
-> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-v5.c | 15 +++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c    | 10 ++++++++++
->  arch/arm64/kvm/vgic/vgic.h    |  1 +
->  include/kvm/arm_vgic.h        |  1 +
->  4 files changed, 27 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 5b35c756887a9..f5cd9decfc26e 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v5.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -86,6 +86,21 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  	return 0;
->  }
->  
-> +/*
-> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
-> + */
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
-> +	unsigned long *p;
-> +
-> +	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
-> +	__assign_bit(ppi % 64, p, dvi);
-> +
-> +	return 0;
-> +}
-> +
->  void vgic_v5_load(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 1005ff5f36235..62e58fdf611d3 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -577,12 +577,22 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
->  	irq->host_irq = host_irq;
->  	irq->hwintid = data->hwirq;
->  	irq->ops = ops;
-> +
-> +	if (vgic_is_v5(vcpu->kvm) &&
-> +	    __irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
-> +		irq->directly_injected = !vgic_v5_set_ppi_dvi(vcpu, irq->hwintid,
-> +							      true);
-> +
+Hi Punit,
 
-Huh. A couple of things here:
+On 3/3/26 20:18, Punit Agrawal wrote:
+> Hi Ben,
+> 
+> Ben Horgan <ben.horgan@arm.com> writes:
+> 
+>> The main change in this version of the mpam missing pieces series is to
+>> update the cdp emulation to match the resctrl interface. L2 and L3
+>> resources can now enable cdp separately. Cdp can't be hidden correctly for
+>> memory bandwidth allocation, as max per partid can't be emulated with more
+>> partids, and so we hide this completely when cdp is enabled. There is a little
+>> restructuring and a few smaller changes.
+>>
+>> Changelogs in patches
+>>
+>> It would be great to get this series merged this cycle. For that we'll need
+>> more testing and reviewing. Thanks!
+>>
+>> From James' cover letter:
+>>
+>> This is the missing piece to make MPAM usable resctrl in user-space. This has
+>> shed its debugfs code and the read/write 'event configuration' for the monitors
+>> to make the series smaller.
+>>
+>> This adds the arch code and KVM support first. I anticipate the whole thing
+>> going via arm64, but if goes via tip instead, the an immutable branch with those
+>> patches should be easy to do.
+>>
+>> Generally the resctrl glue code works by picking what MPAM features it can expose
+>> from the MPAM drive, then configuring the structs that back the resctrl helpers.
+>> If your platform is sufficiently Xeon shaped, you should be able to get L2/L3 CPOR
+>> bitmaps exposed via resctrl. CSU counters work if they are on/after the L3. MBWU
+>> counters are considerably more hairy, and depend on hueristics around the topology,
+>> and a bunch of stuff trying to emulate ABMC.
+>> If it didn't pick what you wanted it to, please share the debug messages produced
+>> when enabling dynamic debug and booting with:
+>> | dyndbg="file mpam_resctrl.c +pl"
+>>
+>> I've not found a platform that can test all the behaviours around the monitors,
+>> so this is where I'd expect the most bugs.
+>>
+>> The MPAM spec that describes all the system and MMIO registers can be found here:
+>> https://developer.arm.com/documentation/ddi0598/db/?lang=en
+>> (Ignored the 'RETIRED' warning - that is just arm moving the documentation around.
+>>  This document has the best overview)
+>>
+>>
+>> Based on v7.0-rc1
+>>
+>> The series can be retrieved from:
+>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v5
+> 
+> I booted with the series applied on an MPAM capable platform. The driver
+> is able to probe the L2 attached MSCs.
+> 
+> In terms of features, bit-mapped based cache portion partitioning works
+> as expected. The platform also supports additional controls (cache
+> capacity and priority partitioning) and monitors (memory bandwidth and
+> cache storage). The ones supported in MPAM driver probe OK but don't
+> seem to be exposed. E.g.,
+> 
+>     mpam:mpam_resctrl_pick_counters: class 2 is a cache but not the L3
+>     
+> 
+> It looks like some of it is due to an impedance mismatch with resctrl
 
-- under what conditions would irq->directly_injected not be set to
-  true for a PPI? That can never happen here AFAICT.
+Yes, what you describe is expected behaviour. There is no support yet
+for cache capacity (CMAX) or bandwidth priority partitioning and
+monitors are only exposed on the L3.
 
-- we have per-IRQ operations, and PPIs do have such ops attached to
-  them. Why can't this be moved to such a callback?
+> expectations but hopefully we can get to it with the basics in-place.
 
->  	return 0;
->  }
->  
->  /* @irq->irq_lock must be held */
->  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
->  {
-> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
-> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
-> +
-> +	irq->directly_injected = false;
->  	irq->hw = false;
->  	irq->hwintid = 0;
->  	irq->ops = NULL;
-> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-> index 81d464d26534f..d7fe867a27b64 100644
-> --- a/arch/arm64/kvm/vgic/vgic.h
-> +++ b/arch/arm64/kvm/vgic/vgic.h
-> @@ -364,6 +364,7 @@ void vgic_debug_init(struct kvm *kvm);
->  void vgic_debug_destroy(struct kvm *kvm);
->  
->  int vgic_v5_probe(const struct gic_kvm_info *info);
-> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
+I hope so. The CMAX and the bandwidth priority partitioning should be
+easy to add once there is a generic way of adding new schema. There is a
+plan/discussion here [1] and I don't expect adding monitoring on L2 to
+be hard.
 
-Doing the above would keep these things private to the vgic-v5
-implementation.
+[1] https://lore.kernel.org/lkml/aPtfMFfLV1l%2FRB0L@e133380.arm.com/
+
+> 
+> Feel free to add
+> 
+> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+
+Thanks for testing!
+
+> 
+> Thanks,
+> Punit
+> 
 
 Thanks,
 
-	M.
+Ben
 
--- 
-Without deviation from the norm, progress is not possible.
