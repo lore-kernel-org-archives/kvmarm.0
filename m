@@ -1,375 +1,553 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011055.outbound.protection.outlook.com [40.107.130.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DF55478D
-	for <kvmarm@lists.linux.dev>; Wed,  4 Mar 2026 14:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.55
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772634165; cv=fail; b=ruL9yHYleR7ndFg5azpr818hX3GrWTB1WIcZwVlMD2xb/kYB1K7VUF+RLmaKe3oE9YAAyqvOfyHrGXuphq7g/o0jMiM0y5cCJbrPcqoepb54DVfj2JoiPpsfpCem/dA8q4Pn3cLUsoGD6lQ9JOobtXhrQLmsP94cCMmz8Mykbek=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772634165; c=relaxed/simple;
-	bh=BUS5oMaVDRwFlv1c+YJ8ErdYT+xNMT/gFQJUgYF6Ar0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=U3gzorpG9QZOJaCbCJbp94Xqn6jtAX8O2O9RilrAOMNbJ9wdlGSBtd/2b0HRMym8prYyOw1IpBtJSh1qhFNBmq9Hx808gatmOg+QG+x2UEVSd+3GLr9A7Xeut8aYpmRoOqQYRZieSqMLWXUUQO6ehT06fAnEIzJFFBzL7+TXumU=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=X8C1fcFh; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=X8C1fcFh; arc=fail smtp.client-ip=40.107.130.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6109359A81
+	for <kvmarm@lists.linux.dev>; Wed,  4 Mar 2026 15:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772638851; cv=none; b=skypvZ8ap6IZh3guhf7buqNIkInMUFRHRbKrN2aCdDEJjrJEPz3qT6J7RULszxuvIZAv6Pg84IcsRIdLAvXBxqKMx8MrMswHqi/4as5sB+GEjbUoc8a/IAzJUkqvUWzqf6hh/mNnfEr97ioII//v3c3C2iXXJbKIzASQCkaB/XY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772638851; c=relaxed/simple;
+	bh=zZnz8z0rkSo0t8fugxAX56cTe/ekQCyM3y6DrnzzpDw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=chPgB2Naf/E/JIncJtsEg3HYTJYfD6A7IeBrur+9eCCHiLSGL2SzBvT6O00CsA9wmus1DkFwXsqNZ9NA3YvtYeb9Gf7fdZ8Xn11uPZwAs9V7f2Xi5bTyfo7U/d1mZNdSuWFrCwvIuUQwe//ZTR/0Z/OVJlbJgeJE0FlVYXb7VNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="X8C1fcFh";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="X8C1fcFh"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=dE+udDZKR91jWSPqXeMvDpkYsRfd1jl9e1NxhijLMa961FCeFTtLLW4gkX43ii4heFwVax5UX8zoUr3ZFpiPKelYDyiG1+6YZkor1wbRBYa4nOGq44baKe2KOJNrKgt1INFDCayXf/hawKu4jcq2HzFl8RDuNZa37gNyg+GOCrNGWbghpeVO1YCGsL4hPHzXh3K/qmn2lDCNEf8mDq7TdCLClKzVRmTnvMZ9dBv34fN3nALZ9IOO85RokhNYQs5H4zokw2dYbPKJn9bmtOv5OZ6YkIPHPhdgnkFCxylPggI+nLDY+vwPFl5aAWHRsrMRg0yzqINcf6nBP5cFQ93cAA==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BUS5oMaVDRwFlv1c+YJ8ErdYT+xNMT/gFQJUgYF6Ar0=;
- b=qPxOpWuwR6PuplCSBQFiKAS45QTalCdO6VAsAOhImRZjRYYjInqa6aJsNb/85I/wqmyfTpuuA2SseUAHokTaKng3DZYepP1TviYWpQ8HN9LrVeRiSk+qtC68zyJCQiOdKMaMFiKK+Qo3pFpMbAhI7g7iMMgAR8NkCBJFjc89jQfPVVgxA3FgfNh+p8A6z5H6MPPgyGo+d7UZt7KpyI7+l1kKvFGF+3nI2wZN/O7xhscM3+PHYzpQ+H5ZlLG1qHYjFqRpc5AkzF2pJNVQl6gsLPBIxPwOFQ3wCiGPXHF9Ac1CWOmrAvjNjByYxvXQDoZZKP4mGHrOPvI/DuIvnhuGiA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=kernel.org smtp.mailfrom=arm.com; dmarc=pass
- (p=none sp=none pct=100) action=none header.from=arm.com; dkim=pass
- (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BUS5oMaVDRwFlv1c+YJ8ErdYT+xNMT/gFQJUgYF6Ar0=;
- b=X8C1fcFhUghLsCYykZth+UN16lyzoB+YDTWNmmsONae5ZWgdxOl9rZEDMP+GUH9tq52twY2n2BMAes8QEyNM09LM5w6b1UhVTnH4GYW5ckTqpWrs+yLSTWvqTzODx7pcJJA6jaPK7ecdfWJ8f7yHx1ctIfqlAjBl9zb2kctkk5k=
-Received: from DU2PR04CA0050.eurprd04.prod.outlook.com (2603:10a6:10:234::25)
- by PA6PR08MB10469.eurprd08.prod.outlook.com (2603:10a6:102:3d4::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Wed, 4 Mar
- 2026 14:22:35 +0000
-Received: from DB1PEPF000509F2.eurprd02.prod.outlook.com
- (2603:10a6:10:234:cafe::3a) by DU2PR04CA0050.outlook.office365.com
- (2603:10a6:10:234::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9654.20 via Frontend Transport; Wed,
- 4 Mar 2026 14:22:29 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF000509F2.mail.protection.outlook.com (10.167.242.148) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.18
- via Frontend Transport; Wed, 4 Mar 2026 14:22:34 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pwHD27jgBPWlAitshkE+aMDyRdz/xBzb7Tfksd/S0kHl5mYHyNRbz7CcNOJ/juJWbFArvrguAfffADEQbwSPXfLDdTc2IQMa2GCibe4VPAy6fnJdtJ8vp4+M2i0h3jeUpQVp37DXCmezBLDGNR/biP74ZzMx+UTfu/pCHbJEQXSv36VXxC8Qesz7PkdxiNF1AXx/NYd03ebbDKPK1t86pDh4dv8vOuEqUtF/Da75umsZ4HG7YYNEQDzQNhaNkYYsjF3J8Mq2lX4IB7alpRvFqy+nT7cnTmoHhnnlOgHjSRCMw8hd5Jz7D6lZJcRDrV7uWT/R0owxQv6ToZHahmWDSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BUS5oMaVDRwFlv1c+YJ8ErdYT+xNMT/gFQJUgYF6Ar0=;
- b=oTjOEmCUvUfq5TAU3GG4erwExif2mm/LyNAozi4cM1LkOnfjInlNvuOqcLPbf0aQcAAh3oHj8/+FaBFc029d0k3DmV6ZWyV4inPEnTRmMTu6yyqZnk/Zb+iQRZ7r5ZhiMQnesC/qbcEyyECJCwTaZ6dECkVyO3E13byF61DB22fc5B/U5mSyRp3bG8pIvKDJOG6cYriREzAytyeGdMoZFZty+bR+Gqi+FmvgqZX+oDKtHkDMZFIjsjC/4+Q0PI06VuDVGdxwOKsuIMw33uqPWvdL6G7YmCyXufUXwBoMsOl9r49DZpyYAt2GBtHgPID22BdrE5TsON7k8kyr1myMLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BUS5oMaVDRwFlv1c+YJ8ErdYT+xNMT/gFQJUgYF6Ar0=;
- b=X8C1fcFhUghLsCYykZth+UN16lyzoB+YDTWNmmsONae5ZWgdxOl9rZEDMP+GUH9tq52twY2n2BMAes8QEyNM09LM5w6b1UhVTnH4GYW5ckTqpWrs+yLSTWvqTzODx7pcJJA6jaPK7ecdfWJ8f7yHx1ctIfqlAjBl9zb2kctkk5k=
-Received: from DBAPR08MB5687.eurprd08.prod.outlook.com (2603:10a6:10:1b1::17)
- by AS8PR08MB8181.eurprd08.prod.outlook.com (2603:10a6:20b:54e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9654.22; Wed, 4 Mar
- 2026 14:21:31 +0000
-Received: from DBAPR08MB5687.eurprd08.prod.outlook.com
- ([fe80::7d4a:f17a:4cb0:9793]) by DBAPR08MB5687.eurprd08.prod.outlook.com
- ([fe80::7d4a:f17a:4cb0:9793%4]) with mapi id 15.20.9678.016; Wed, 4 Mar 2026
- 14:21:31 +0000
-From: Sascha Bischoff <Sascha.Bischoff@arm.com>
-To: "maz@kernel.org" <maz@kernel.org>
-CC: "yuzenghui@huawei.com" <yuzenghui@huawei.com>, Timothy Hayes
-	<Timothy.Hayes@arm.com>, Suzuki Poulose <Suzuki.Poulose@arm.com>, nd
-	<nd@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, Joey Gouly <Joey.Gouly@arm.com>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, "oliver.upton@linux.dev"
-	<oliver.upton@linux.dev>
-Subject: Re: [PATCH v5 15/36] KVM: arm64: gic-v5: Implement GICv5 load/put and
- save/restore
-Thread-Topic: [PATCH v5 15/36] KVM: arm64: gic-v5: Implement GICv5 load/put
- and save/restore
-Thread-Index: AQHcpzjcwC8br2vVhUybONFHVD5cTrWeI58AgABSUgA=
-Date: Wed, 4 Mar 2026 14:21:30 +0000
-Message-ID: <d123494cd8ba65aaad5a937ecfc6c28eb7d0ce79.camel@arm.com>
-References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	 <20260226155515.1164292-16-sascha.bischoff@arm.com>
-	 <865x7c7xnn.wl-maz@kernel.org>
-In-Reply-To: <865x7c7xnn.wl-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.52.3-0ubuntu1.1 
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-x-ms-traffictypediagnostic:
-	DBAPR08MB5687:EE_|AS8PR08MB8181:EE_|DB1PEPF000509F2:EE_|PA6PR08MB10469:EE_
-X-MS-Office365-Filtering-Correlation-Id: 19468461-8371-41ee-1ac1-08de79f97ac9
-x-checkrecipientrouted: true
-nodisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
-X-Microsoft-Antispam-Message-Info-Original:
- B41rI+1oLZCCr2FiWKmRbKVFSGQyysu2tSFw1f1T8XUucIj8ZHD9eYsa/Q8d29jdPOsQFwjzH3voZvcwpTBoixb+tjAVy9d++ANSK2VXW/e2vgXsys3f2cicW9XPFsQ2bWoSyxb2DMolvG/gxqteo0A3J4xiSu7L83AVu4v1Ymrhj/acw91VGIYg3ErHMPzQTkdjGLjPq+yL7mCFqwDbyLisndMKnOiwoeSDab9DikK+vb6ap8jvhts7WhZm3dBP6jYcDj7SKMtP+BlpJguMVSMGge21/yrEcRvwpPuBqkJvinFxrGA7pcQbEcABnWAbVZOGCH/AUQQUjEEgAxrpsozoZF1JJ1lHp1soDQHAorP447huX/nXpvOZWYLOTyRgiZruLphXVMx+Nw+eLRuT5ypoOs8yRfLh2AkJh66zH8DK2mGDdZuvp0oH3qigbescO1g9YHUAee8q4TEze/T/e35Z1m0TfW48W4+5B50PyTOTBNyz+K/ZR4vhahqxVF32lCD6I9ElHMhogzLgipOzBqC8qJK0saaVIK4+fYH8Yu2sUlOp1okA/Gbv2glIDJq9N/ibexQZS6q2HAfbydcgT+OM8cyPD3NRKzMFbygZPlFN3EIEYzq49cG7AR+LzkKWbjHQkOt+aJVwPAamfkr0Tzig5771QYpX/zMLph03zUCpNFFYWZCLcgw1SEUE0x7FpZ839N2q0IzKpDs3ITGGd00XggkLHlDITQ3eFbRvVu7HjngAM2kfhmaz2iLuZvWYaD2LoN+Pip/pgw/zQkEcw7Ttw6rQ4F8j943gCT3mWAg=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBAPR08MB5687.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0274236778D8644594644B45B07674A7@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DC8E1339;
+	Wed,  4 Mar 2026 07:40:40 -0800 (PST)
+Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 064FB3F73B;
+	Wed,  4 Mar 2026 07:40:43 -0800 (PST)
+From: Leonardo Bras <leo.bras@arm.com>
+To: Tian Zheng <zhengtian10@huawei.com>
+Cc: Leonardo Bras <leo.bras@arm.com>,
+	maz@kernel.org,
+	oupton@kernel.org,
+	catalin.marinas@arm.com,
+	corbet@lwn.net,
+	pbonzini@redhat.com,
+	will@kernel.org,
+	yuzenghui@huawei.com,
+	wangzhou1@hisilicon.com,
+	liuyonglong@huawei.com,
+	Jonathan.Cameron@huawei.com,
+	yezhenyu2@huawei.com,
+	linuxarm@huawei.com,
+	joey.gouly@arm.com,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH v3 4/5] KVM: arm64: Enable HDBSS support and handle HDBSSF events
+Date: Wed,  4 Mar 2026 15:40:24 +0000
+Message-ID: <aahSaJTVeMBoRbUE@devkitleo>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260225040421.2683931-5-zhengtian10@huawei.com>
+References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8181
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF000509F2.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	ace5eca2-76a6-4732-99b3-08de79f954d1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|35042699022|14060799003|36860700016|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	PXdM0jBLxxVZrqlfRflUzT3rNIbjkw3qKU8sty1VSufr2lR7nUXTDEgG4928Ip3l2D6hnsbIWyX3jmgOiafd4Zy4ZKj84hoRI+jZrM1qP27q0oPCCi8wWNDIc7fdPu2SoRyud9U4W+Ik+ulKdhQOqW25Cn1c3MiBoxTfSKGKuABrIxibm5mCAg1sK8G9kOjLFdQBtsj77jZER/eDK5YM2HMC6oU5IFSSKkINryLu6wKzfuttAYUrwPS6uw33cs7UohuW3polm8wLsI6hIYD3xqzQj8oCKyTSiNbir1vI0L440n9k1iONrarNHIi0gGk9hrreuwOcqAGkgGaQXyd9qMQIi87lc+U0OvYSx22XJkErI5uNS+ELxHJ0ZDGNQQ8pAS3mT6Zl8treuddBpTwwMm/FrvgkXlgHa2it1IewTtmBan1ZzBEWcAHIe4Fd+XmY7l7EtS8SJY8qaNwA0Nx4GDAV/AbP0UP99lalOi1nDXp11lB1H3rhoIT5Jp8vdLjetIJeksZrbdvFidIdvDICtbasnY261cJv3YUqVbbB3zqKMtIj1WrB+ZDbpSevQ2xk6QEtp81BjWp7YAUHMhs/xPsiX6oSghpT7ips19cooH9RBlGsOCgJXtbcqkoQCAbSuWtdh50qwsKeIufKWAa75bn42kThPq6kdJ6S+uWGLohJ5W7wJvtkE8jVaydbEHKCPqqWuwuOsZG2ckAmbGExXvcURyEa2VH495z1IxIMztBG3Aws2ghsJJ3sp+Mf2CZpZ4qiuDOrssncDosG4f8c8A==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(14060799003)(36860700016)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	GDHaakrFvIYcDiVQFbuBofRxYqlprvRFhxMH8rUzQq8E1CzrPmDRTUtWO2CWDFJqjCzH5ZDXX9wa3AAvDCmpunD4yfAQtUSwXu8qO8uF0y7jWVadObu8lXfxm9k89M9tJRwAQCEuhsUPol3hxN/bLWBz6fg4oz5MfFbD/+jADpUiwtbzyVY/83mILhQznxJvizrOZIIosxtmpD2zbw3OMtjmj4EQ0FuxYI1IaDomWMxBltlhgGt2nJdPHh3Yuih9H0OPBT0caPLsqtZ1H4UfLWDTUCkiDS1Hf+x4+3q7sh5n+sLemccyhnekh61ItO/Pp4F9pcWp4Zwzns/wcJO9wGYLMZySaZSuvguUDu8byHg8Hm6LWEBlzcLPsOIYPpuYVwDp6WI/72/RdhFMQHcBM3VPx+6E6dlmBlAhtlLCe1vgwHYQtkaohzktdtwRYvYz
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2026 14:22:34.5908
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19468461-8371-41ee-1ac1-08de79f97ac9
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509F2.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10469
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-T24gV2VkLCAyMDI2LTAzLTA0IGF0IDA5OjI2ICswMDAwLCBNYXJjIFp5bmdpZXIgd3JvdGU6DQo+
-IE9uIFRodSwgMjYgRmViIDIwMjYgMTU6NTk6MTggKzAwMDAsDQo+IFNhc2NoYSBCaXNjaG9mZiA8
-U2FzY2hhLkJpc2Nob2ZmQGFybS5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IFRoaXMgY2hhbmdlIGlu
-dHJvZHVjZXMgR0lDdjUgbG9hZC9wdXQuIEFkZGl0aW9uYWxseSwgaXQgcGx1bWJzIGluDQo+ID4g
-c2F2ZS9yZXN0b3JlIGZvcjoNCj4gPiANCj4gPiAqIFBQSXMgKElDSF9QUElfeF9FTDIgcmVncykN
-Cj4gPiAqIElDSF9WTUNSX0VMMg0KPiA+ICogSUNIX0FQUl9FTDINCj4gPiAqIElDQ19JQ1NSX0VM
-MQ0KPiA+IA0KPiA+IEEgR0lDdjUtc3BlY2lmaWMgZW5hYmxlIGJpdCBpcyBhZGRlZCB0byBzdHJ1
-Y3QgdmdpY192bWNyIGFzIHRoaXMNCj4gPiBkaWZmZXJzIGZyb20gcHJldmlvdXMgR0lDcy4gT24g
-R0lDdjUtbmF0aXZlIHN5c3RlbXMsIHRoZSBWTUNSIG9ubHkNCj4gPiBjb250YWlucyB0aGUgZW5h
-YmxlIGJpdCAoZHJpdmVuIGJ5IHRoZSBndWVzdCB2aWEgSUNDX0NSMF9FTDEuRU4pDQo+ID4gYW5k
-DQo+ID4gdGhlIHByaW9yaXR5IG1hc2sgKFBDUikuDQo+ID4gDQo+ID4gQSBzdHJ1Y3QgZ2ljdjVf
-dnBlIGlzIGFsc28gaW50cm9kdWNlZC4gVGhpcyBjdXJyZW50bHkgb25seSBjb250YWlucw0KPiA+
-IGENCj4gPiBzaW5nbGUgZmllbGQgLSBib29sIHJlc2lkZW50IC0gd2hpY2ggaXMgdXNlZCB0byB0
-cmFjayBpZiBhIFZQRSBpcw0KPiA+IGN1cnJlbnRseSBydW5uaW5nIG9yIG5vdCwgYW5kIGlzIHVz
-ZWQgdG8gYXZvaWQgYSBjYXNlIG9mIGRvdWJsZQ0KPiA+IGxvYWQNCj4gPiBvciBkb3VibGUgcHV0
-IG9uIHRoZSBXRkkgcGF0aCBmb3IgYSB2Q1BVLiBUaGlzIHN0cnVjdCB3aWxsIGJlDQo+ID4gZXh0
-ZW5kZWQNCj4gPiBhcyBhZGRpdGlvbmFsIEdJQ3Y1IHN1cHBvcnQgaXMgbWVyZ2VkLCBzcGVjaWZp
-Y2FsbHkgZm9yIFZQRQ0KPiA+IGRvb3JiZWxscy4NCj4gPiANCj4gPiBDby1hdXRob3JlZC1ieTog
-VGltb3RoeSBIYXllcyA8dGltb3RoeS5oYXllc0Bhcm0uY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6
-IFRpbW90aHkgSGF5ZXMgPHRpbW90aHkuaGF5ZXNAYXJtLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5
-OiBTYXNjaGEgQmlzY2hvZmYgPHNhc2NoYS5iaXNjaG9mZkBhcm0uY29tPg0KPiA+IFJldmlld2Vk
-LWJ5OiBKb25hdGhhbiBDYW1lcm9uIDxqb25hdGhhbi5jYW1lcm9uQGh1YXdlaS5jb20+DQo+ID4g
-LS0tDQo+ID4gwqBhcmNoL2FybTY0L2t2bS9oeXAvbnZoZS9zd2l0Y2guY8KgwqAgfCAxMiArKysr
-Kw0KPiA+IMKgYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLW1taW8uY8KgwqDCoCB8IDI4ICsrKysr
-KystLS0tDQo+ID4gwqBhcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjUuY8KgwqDCoMKgwqAgfCA3
-NA0KPiA+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+IMKgYXJjaC9hcm02NC9r
-dm0vdmdpYy92Z2ljLmPCoMKgwqDCoMKgwqDCoMKgIHwgMzIgKysrKysrKystLS0tLQ0KPiA+IMKg
-YXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLmjCoMKgwqDCoMKgwqDCoMKgIHzCoCA3ICsrKw0KPiA+
-IMKgaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8wqAgMiAr
-DQo+ID4gwqBpbmNsdWRlL2xpbnV4L2lycWNoaXAvYXJtLWdpYy12NS5oIHzCoCA1ICsrDQo+ID4g
-wqA3IGZpbGVzIGNoYW5nZWQsIDE0MSBpbnNlcnRpb25zKCspLCAxOSBkZWxldGlvbnMoLSkNCj4g
-PiANCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL252aGUvc3dpdGNoLmMNCj4g
-PiBiL2FyY2gvYXJtNjQva3ZtL2h5cC9udmhlL3N3aXRjaC5jDQo+ID4gaW5kZXggYjQxNDg1Y2Uy
-OTVhYi4uYTg4ZGEzMDJiNmQwOCAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAv
-bnZoZS9zd2l0Y2guYw0KPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9udmhlL3N3aXRjaC5j
-DQo+ID4gQEAgLTExMyw2ICsxMTMsMTIgQEAgc3RhdGljIHZvaWQgX19kZWFjdGl2YXRlX3RyYXBz
-KHN0cnVjdCBrdm1fdmNwdQ0KPiA+ICp2Y3B1KQ0KPiA+IMKgLyogU2F2ZSBWR0lDdjMgc3RhdGUg
-b24gbm9uLVZIRSBzeXN0ZW1zICovDQo+ID4gwqBzdGF0aWMgdm9pZCBfX2h5cF92Z2ljX3NhdmVf
-c3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IMKgew0KPiA+ICsJaWYgKHZnaWNfaXNf
-djUoa2Vybl9oeXBfdmEodmNwdS0+a3ZtKSkpIHsNCj4gPiArCQlfX3ZnaWNfdjVfc2F2ZV9zdGF0
-ZSgmdmNwdS0NCj4gPiA+YXJjaC52Z2ljX2NwdS52Z2ljX3Y1KTsNCj4gPiArCQlfX3ZnaWNfdjVf
-c2F2ZV9wcGlfc3RhdGUoJnZjcHUtDQo+ID4gPmFyY2gudmdpY19jcHUudmdpY192NSk7DQo+ID4g
-KwkJcmV0dXJuOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiDCoAlpZg0KPiA+IChzdGF0aWNfYnJhbmNo
-X3VubGlrZWx5KCZrdm1fdmdpY19nbG9iYWxfc3RhdGUuZ2ljdjNfY3B1aWYpKSB7DQo+ID4gwqAJ
-CV9fdmdpY192M19zYXZlX3N0YXRlKCZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1LnZnaWNfdjMp
-Ow0KPiA+IMKgCQlfX3ZnaWNfdjNfZGVhY3RpdmF0ZV90cmFwcygmdmNwdS0NCj4gPiA+YXJjaC52
-Z2ljX2NwdS52Z2ljX3YzKTsNCj4gPiBAQCAtMTIyLDYgKzEyOCwxMiBAQCBzdGF0aWMgdm9pZCBf
-X2h5cF92Z2ljX3NhdmVfc3RhdGUoc3RydWN0DQo+ID4ga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gwqAv
-KiBSZXN0b3JlIFZHSUN2MyBzdGF0ZSBvbiBub24tVkhFIHN5c3RlbXMgKi8NCj4gPiDCoHN0YXRp
-YyB2b2lkIF9faHlwX3ZnaWNfcmVzdG9yZV9zdGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+
-ID4gwqB7DQo+ID4gKwlpZiAodmdpY19pc192NShrZXJuX2h5cF92YSh2Y3B1LT5rdm0pKSkgew0K
-PiA+ICsJCV9fdmdpY192NV9yZXN0b3JlX3N0YXRlKCZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1
-LnZnaWNfdjUpOw0KPiA+ICsJCV9fdmdpY192NV9yZXN0b3JlX3BwaV9zdGF0ZSgmdmNwdS0NCj4g
-PiA+YXJjaC52Z2ljX2NwdS52Z2ljX3Y1KTsNCj4gPiArCQlyZXR1cm47DQo+ID4gKwl9DQo+ID4g
-Kw0KPiA+IMKgCWlmDQo+ID4gKHN0YXRpY19icmFuY2hfdW5saWtlbHkoJmt2bV92Z2ljX2dsb2Jh
-bF9zdGF0ZS5naWN2M19jcHVpZikpIHsNCj4gPiDCoAkJX192Z2ljX3YzX2FjdGl2YXRlX3RyYXBz
-KCZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1LnZnaWNfdjMpOw0KPiA+IMKgCQlfX3ZnaWNfdjNf
-cmVzdG9yZV9zdGF0ZSgmdmNwdS0NCj4gPiA+YXJjaC52Z2ljX2NwdS52Z2ljX3YzKTsNCj4gPiBk
-aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLW1taW8uYw0KPiA+IGIvYXJjaC9h
-cm02NC9rdm0vdmdpYy92Z2ljLW1taW8uYw0KPiA+IGluZGV4IGE1NzNiMWYwYzZjYmUuLjY3NWMy
-ODQ0ZjVlNWMgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLW1taW8u
-Yw0KPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1tbWlvLmMNCj4gPiBAQCAtODQy
-LDE4ICs4NDIsMzAgQEAgdmdpY19maW5kX21taW9fcmVnaW9uKGNvbnN0IHN0cnVjdA0KPiA+IHZn
-aWNfcmVnaXN0ZXJfcmVnaW9uICpyZWdpb25zLA0KPiA+IMKgDQo+ID4gwqB2b2lkIHZnaWNfc2V0
-X3ZtY3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3QgdmdpY192bWNyICp2bWNyKQ0KPiA+
-IMKgew0KPiA+IC0JaWYgKGt2bV92Z2ljX2dsb2JhbF9zdGF0ZS50eXBlID09IFZHSUNfVjIpDQo+
-ID4gLQkJdmdpY192Ml9zZXRfdm1jcih2Y3B1LCB2bWNyKTsNCj4gPiAtCWVsc2UNCj4gPiAtCQl2
-Z2ljX3YzX3NldF92bWNyKHZjcHUsIHZtY3IpOw0KPiA+ICsJY29uc3Qgc3RydWN0IHZnaWNfZGlz
-dCAqZGlzdCA9ICZ2Y3B1LT5rdm0tPmFyY2gudmdpYzsNCj4gPiArDQo+ID4gKwlpZiAoZGlzdC0+
-dmdpY19tb2RlbCA9PSBLVk1fREVWX1RZUEVfQVJNX1ZHSUNfVjUpIHsNCj4gPiArCQl2Z2ljX3Y1
-X3NldF92bWNyKHZjcHUsIHZtY3IpOw0KPiA+ICsJfSBlbHNlIHsNCj4gPiArCQlpZiAoa3ZtX3Zn
-aWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJQ19WMikNCj4gPiArCQkJdmdpY192Ml9zZXRfdm1j
-cih2Y3B1LCB2bWNyKTsNCj4gPiArCQllbHNlDQo+ID4gKwkJCXZnaWNfdjNfc2V0X3ZtY3IodmNw
-dSwgdm1jcik7DQo+ID4gKwl9DQo+IA0KPiBUaGlzIGxvb2tzIHJhdGhlciB1Z2x5LCBhbmQgZG9l
-c24ndCBtYWtlIHVzZSBvZiB0aGUgaGVscGVycyB5b3UNCj4gaW50cm9kdWNlZCBpbiBwYXRjaCAj
-MS4gSG93IGFib3V0Og0KPiANCj4gCXN3aXRjaCAoZGlzdC0+dmdpY19tb2RlbCkgew0KPiAJY2Fz
-ZSBLVk1fREVWX1RZUEVfQVJNX1ZHSUNfVjU6DQo+IAkJdmdpY192NV9zZXRfdm1jcih2Y3B1LCB2
-bWNyKTsNCj4gCQlicmVhazsNCj4gCWNhc2UgS1ZNX0RFVl9UWVBFX0FSTV9WR0lDX1YzOg0KPiAJ
-CXZnaWNfdjNfc2V0X3ZtY3IodmNwdSwgdm1jcik7DQo+IAkJYnJlYWs7DQo+IAljYXNlIEtWTV9E
-RVZfVFlQRV9BUk1fVkdJQ19WMjoNCj4gCQlpZg0KPiAoc3RhdGljX2JyYW5jaF9saWtlbHkoJmt2
-bV92Z2ljX2dsb2JhbF9zdGF0ZS5naWN2M19jcHVpZikpDQo+IAkJCXZnaWNfdjNfc2V0X3ZtY3Io
-dmNwdSwgdm1jcik7DQo+IAkJZWxzZQ0KPiAJCQl2Z2ljX3YyX3NldF92bWNyKHZjcHUsIHZtY3Ip
-Ow0KPiAJCWJyZWFrOw0KPiAJZGVmYXVsdDoNCj4gCQlCVUcoKTsNCj4gCX0NCj4gDQo+IFllcywg
-dGhlIGhhbmRsaW5nIG9mIHYzIGlzIGEgYml0IHJlZHVuZGFudCwgYnV0IEkgZmluZCBpdCBvdmVy
-YWxsDQo+IG1vcmUgcmVhZGFibGUuDQoNCkkndmUgZ29uZSBhbmQgbWFkZSB0aGlzIGNoYW5nZSB3
-aGVyZXZlciBhcHBsaWNhYmxlLiBUaGUgZXhjZXB0aW9uIGlzDQpmb3IgdmdpY19zYXZlX3N0YXRl
-KCkgYW5kIHZnaWNfcmVzdG9yZV9zdGF0ZSgpLiBUaGVzZSBhcmUgc3RpbGwgY2FsbGVkDQppbiB0
-aGUgY2FzZSB3aGVyZSB3ZSBkb24ndCBoYXZlIGFuIGluLWtlcm5lbCBpcnFjaGlwIChzbyB0aGUg
-QlVHKCkNCndvdWxkIGJlIGEgYmFkIGlkZWEgdGhlcmUgYW55aG93KSwgd2hpY2ggY29tcGxpY2F0
-ZXMgdGhlIGxvZ2ljIHF1aXRlIGENCmJpdC4NCg0KVGhlIF9fdmdpY192M19yZXN0b3JlX3N0YXRl
-KCkgY29kZSAoYW5kIHRoZSBzYXZlIGNvdW50ZXJwYXJ0KSBpcyBkb2luZw0KcXVpdGUgYSBsb3Qg
-b2YgaGVhdnkgbGlmdGluZy4gSXQgYXBwbGllcyBpbiB0aGUgR0lDdjMtb24tR0lDdjMsIEdJQ3Yy
-LQ0Kb24tR0lDdjMsIEdJQ3YzLW9uLUdJQ3Y1LCBhbmQgbm8taW4ta2VybmVsLWlycWNoaXAgY2Fz
-ZXMsIGFuZCBpcw0KcmVzcG9uc2libGUgZm9yIGNvbmZpZ3VyaW5nIHRoZSBhcHByb3ByaWF0ZSB0
-cmFwIGhhbmRsaW5nIGluIGFsbCBvZg0KdGhlc2UgY2FzZXMuIFRoaXMgcXVpY2tseSBtYWtlcyB0
-aGUgbG9naWMgcmF0aGVyIGNvbXBsZXgsIGFzIHdlIG5lZWQgdG8NCmNhbGwgaXQgaW4gdGhlIGRl
-ZmF1bHQgY2FzZSB0b28sIGFzc3VtaW5nIHdlJ3JlIG9uIEdJQ3YzLWJhc2VkDQpoYXJkd2FyZS4N
-Cg0KSSd2ZSBhZGRlZCBpbiBhIGNvbW1lbnQgZXhwbGFpbmluZyB0aGUgbG9naWMgYW5kIHdoeSB3
-ZSBkb24ndCBoYXZlIGENCnN3aXRjaCBmb3IgdGhlc2UgdHdvLg0KDQo+IA0KPiA+IMKgfQ0KPiA+
-IMKgDQo+ID4gwqB2b2lkIHZnaWNfZ2V0X3ZtY3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1
-Y3QgdmdpY192bWNyICp2bWNyKQ0KPiA+IMKgew0KPiA+IC0JaWYgKGt2bV92Z2ljX2dsb2JhbF9z
-dGF0ZS50eXBlID09IFZHSUNfVjIpDQo+ID4gLQkJdmdpY192Ml9nZXRfdm1jcih2Y3B1LCB2bWNy
-KTsNCj4gPiAtCWVsc2UNCj4gPiAtCQl2Z2ljX3YzX2dldF92bWNyKHZjcHUsIHZtY3IpOw0KPiA+
-ICsJY29uc3Qgc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5rdm0tPmFyY2gudmdpYzsN
-Cj4gPiArDQo+ID4gKwlpZiAoZGlzdC0+dmdpY19tb2RlbCA9PSBLVk1fREVWX1RZUEVfQVJNX1ZH
-SUNfVjUpIHsNCj4gPiArCQl2Z2ljX3Y1X2dldF92bWNyKHZjcHUsIHZtY3IpOw0KPiA+ICsJfSBl
-bHNlIHsNCj4gPiArCQlpZiAoa3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLnR5cGUgPT0gVkdJQ19WMikN
-Cj4gPiArCQkJdmdpY192Ml9nZXRfdm1jcih2Y3B1LCB2bWNyKTsNCj4gPiArCQllbHNlDQo+ID4g
-KwkJCXZnaWNfdjNfZ2V0X3ZtY3IodmNwdSwgdm1jcik7DQo+ID4gKwl9DQo+ID4gwqB9DQo+ID4g
-wqANCj4gPiDCoC8qDQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy12
-NS5jDQo+ID4gYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjUuYw0KPiA+IGluZGV4IDJjNTFi
-OWJhNGYxMTguLjViMzVjNzU2ODg3YTkgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9hcm02NC9rdm0v
-dmdpYy92Z2ljLXY1LmMNCj4gPiArKysgYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtdjUuYw0K
-PiA+IEBAIC04NSwzICs4NSw3NyBAQCBpbnQgdmdpY192NV9wcm9iZShjb25zdCBzdHJ1Y3QgZ2lj
-X2t2bV9pbmZvDQo+ID4gKmluZm8pDQo+ID4gwqANCj4gPiDCoAlyZXR1cm4gMDsNCj4gPiDCoH0N
-Cj4gPiArDQo+ID4gK3ZvaWQgdmdpY192NV9sb2FkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4g
-PiArew0KPiA+ICsJc3RydWN0IHZnaWNfdjVfY3B1X2lmICpjcHVfaWYgPSAmdmNwdS0NCj4gPiA+
-YXJjaC52Z2ljX2NwdS52Z2ljX3Y1Ow0KPiA+ICsNCj4gPiArCS8qDQo+ID4gKwkgKiBPbiB0aGUg
-V0ZJIHBhdGgsIHZnaWNfbG9hZCBpcyBjYWxsZWQgYSBzZWNvbmQgdGltZS4gVGhlDQo+ID4gZmly
-c3QgaXMgd2hlbg0KPiA+ICsJICogc2NoZWR1bGluZyBpbiB0aGUgdmNwdSB0aHJlYWQgYWdhaW4s
-IGFuZCB0aGUgc2Vjb25kIGlzDQo+ID4gd2hlbiBsZWF2aW5nDQo+ID4gKwkgKiBXRkkuIFNraXAg
-dGhlIHNlY29uZCBpbnN0YW5jZSBhcyBpdCBzZXJ2ZXMgbm8gcHVycG9zZQ0KPiA+IGFuZCBqdXN0
-DQo+ID4gKwkgKiByZXN0b3JlcyB0aGUgc2FtZSBzdGF0ZSBhZ2Fpbi4NCj4gPiArCSAqLw0KPiA+
-ICsJaWYgKFJFQURfT05DRShjcHVfaWYtPmdpY3Y1X3ZwZS5yZXNpZGVudCkpDQo+ID4gKwkJcmV0
-dXJuOw0KPiANCj4gSSdtIHBlcnBsZXguIFdoYXQgaXMgUkVBRF9PTkNFKCkvV1JJVEVfT05DRSgp
-IGd1YXJhbnRlZWluZz8NCg0KTm90aGluZyBhbnltb3JlLiBJbiB0aGUgb3JpZ2luYWwgY29kZSAo
-YmVmb3JlIGl0IGdvdCBjbGVhbmVkIHVwLCBhbmQNCmJlZm9yZSB0aGUgUFBJIHN1cHBvcnQgZ290
-IHNwbGl0IG91dCBmb3IgcmV2aWV3KSB3ZSBoYWQgYSByYWNlIHdpdGggYQ0KVlBFIGdvaW5nIG5v
-bi1yZXNpZGVudCBhbmQgZG9vcmJlbGxzIGFycml2aW5nIHdoaWNoIHJlc3VsdGVkIGluIHVzDQpp
-bmNvcnJlY3RseSBub3QgbWFraW5nIHRoZSBWUEUgcmVzaWRlbnQgYWdhaW4uIFRoaXMgd2FzIGFk
-ZHJlc3NlZCB1c2luZw0KUkVBRF9PTkNFKCkvV1JJVEVfT05DRSgpLg0KDQpGb3IgdGhlIFBQSSBj
-b2RlIHVuZGVyIHJldmlldywgaXQgY2VydGFpbmx5IGlzbid0IG5lY2Vzc2FyeSBhcyB3ZSBkb24n
-dA0KaGF2ZSBhbnkgb2YgdGhlIGNvZGUgaW4gcGxhY2UgdG8gbWFrZSB0aGluZ3MgcmVzaWRlbnQv
-bm9uLXJlc2lkZW50LCBzbw0KSSd2ZSByZW1vdmVkIGl0LiBJIGFsc28gZG9uJ3QgdGhpbmsgaXQg
-aXMgcmVxdWlyZWQgYW55bW9yZSBpbiB0aGUNCm9yaWdpbmFsIGNhc2UsIGJ1dCB3aWxsIGdvIGFu
-ZCBjaGVjayB0aGF0IG9uZSBiZWZvcmUgZHJvcHBpbmcgaXQgdGhlcmUNCnRvby4NCg0KPiANCj4g
-PiArDQo+ID4gKwlrdm1fY2FsbF9oeXAoX192Z2ljX3Y1X3Jlc3RvcmVfdm1jcl9hcHIsIGNwdV9p
-Zik7DQo+ID4gKw0KPiA+ICsJV1JJVEVfT05DRShjcHVfaWYtPmdpY3Y1X3ZwZS5yZXNpZGVudCwg
-dHJ1ZSk7DQo+ID4gK30NCj4gPiArDQo+ID4gK3ZvaWQgdmdpY192NV9wdXQoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1KQ0KPiA+ICt7DQo+ID4gKwlzdHJ1Y3QgdmdpY192NV9jcHVfaWYgKmNwdV9pZiA9
-ICZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1LnZnaWNfdjU7DQo+ID4gKw0KPiA+ICsJLyoNCj4g
-PiArCSAqIERvIG5vdGhpbmcgaWYgd2UncmUgbm90IHJlc2lkZW50LiBUaGlzIGNhbiBoYXBwZW4g
-aW4NCj4gPiB0aGUgV0ZJIHBhdGgNCj4gPiArCSAqIHdoZXJlIHdlIGRvIGEgdmdpY19wdXQgaW4g
-dGhlIFdGSSBwYXRoIGFuZCBhZ2FpbiBsYXRlcg0KPiA+IHdoZW4NCj4gPiArCSAqIGRlc2NoZWR1
-bGluZyB0aGUgdGhyZWFkLiBXZSByaXNrIGxvc2luZyBWTUNSIHN0YXRlIGlmDQo+ID4gd2Ugc3lu
-YyBpdA0KPiA+ICsJICogdHdpY2UsIHNvIGluc3RlYWQgcmV0dXJuIGVhcmx5IGluIHRoaXMgY2Fz
-ZS4NCj4gPiArCSAqLw0KPiA+ICsJaWYgKCFSRUFEX09OQ0UoY3B1X2lmLT5naWN2NV92cGUucmVz
-aWRlbnQpKQ0KPiA+ICsJCXJldHVybjsNCj4gPiArDQo+ID4gKwlrdm1fY2FsbF9oeXAoX192Z2lj
-X3Y1X3NhdmVfYXByLCBjcHVfaWYpOw0KPiA+ICsNCj4gPiArCVdSSVRFX09OQ0UoY3B1X2lmLT5n
-aWN2NV92cGUucmVzaWRlbnQsIGZhbHNlKTsNCj4gPiArfQ0KPiA+ICsNCj4gPiArdm9pZCB2Z2lj
-X3Y1X2dldF92bWNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IHZnaWNfdm1jcg0KPiA+
-ICp2bWNycCkNCj4gPiArew0KPiA+ICsJc3RydWN0IHZnaWNfdjVfY3B1X2lmICpjcHVfaWYgPSAm
-dmNwdS0NCj4gPiA+YXJjaC52Z2ljX2NwdS52Z2ljX3Y1Ow0KPiA+ICsJdTY0IHZtY3IgPSBjcHVf
-aWYtPnZnaWNfdm1jcjsNCj4gPiArDQo+ID4gKwl2bWNycC0+ZW4gPSBGSUVMRF9HRVQoRkVBVF9H
-Q0lFX0lDSF9WTUNSX0VMMl9FTiwgdm1jcik7DQo+ID4gKwl2bWNycC0+cG1yID0gRklFTERfR0VU
-KEZFQVRfR0NJRV9JQ0hfVk1DUl9FTDJfVlBNUiwgdm1jcik7DQo+ID4gK30NCj4gPiArDQo+ID4g
-K3ZvaWQgdmdpY192NV9zZXRfdm1jcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCB2Z2lj
-X3ZtY3INCj4gPiAqdm1jcnApDQo+ID4gK3sNCj4gPiArCXN0cnVjdCB2Z2ljX3Y1X2NwdV9pZiAq
-Y3B1X2lmID0gJnZjcHUtDQo+ID4gPmFyY2gudmdpY19jcHUudmdpY192NTsNCj4gPiArCXU2NCB2
-bWNyOw0KPiA+ICsNCj4gPiArCXZtY3IgPSBGSUVMRF9QUkVQKEZFQVRfR0NJRV9JQ0hfVk1DUl9F
-TDJfVlBNUiwgdm1jcnAtPnBtcikNCj4gPiB8DQo+ID4gKwnCoMKgwqDCoMKgwqAgRklFTERfUFJF
-UChGRUFUX0dDSUVfSUNIX1ZNQ1JfRUwyX0VOLCB2bWNycC0+ZW4pOw0KPiA+ICsNCj4gPiArCWNw
-dV9pZi0+dmdpY192bWNyID0gdm1jcjsNCj4gPiArfQ0KPiA+ICsNCj4gPiArdm9pZCB2Z2ljX3Y1
-X3Jlc3RvcmVfc3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+ICt7DQo+ID4gKwlzdHJ1
-Y3QgdmdpY192NV9jcHVfaWYgKmNwdV9pZiA9ICZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1LnZn
-aWNfdjU7DQo+ID4gKw0KPiA+ICsJX192Z2ljX3Y1X3Jlc3RvcmVfc3RhdGUoY3B1X2lmKTsNCj4g
-PiArCWt2bV9jYWxsX2h5cChfX3ZnaWNfdjVfcmVzdG9yZV9wcGlfc3RhdGUsIGNwdV9pZik7DQo+
-ID4gKwlkc2Ioc3kpOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICt2b2lkIHZnaWNfdjVfc2F2ZV9zdGF0
-ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gK3sNCj4gPiArCXN0cnVjdCB2Z2ljX3Y1X2Nw
-dV9pZiAqY3B1X2lmID0gJnZjcHUtDQo+ID4gPmFyY2gudmdpY19jcHUudmdpY192NTsNCj4gPiAr
-DQo+ID4gKwlfX3ZnaWNfdjVfc2F2ZV9zdGF0ZShjcHVfaWYpOw0KPiA+ICsJa3ZtX2NhbGxfaHlw
-KF9fdmdpY192NV9zYXZlX3BwaV9zdGF0ZSwgY3B1X2lmKTsNCj4gPiArCWRzYihzeSk7DQo+ID4g
-K30NCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vdmdpYy92Z2ljLmMNCj4gPiBiL2Fy
-Y2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jDQo+ID4gaW5kZXggMmMwZTg4MDMzNDJlMi4uMTAwNWZm
-NWYzNjIzNSAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMuYw0KPiA+
-ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy5jDQo+ID4gQEAgLTk5Niw3ICs5OTYsOSBA
-QCBzdGF0aWMgaW5saW5lIGJvb2wNCj4gPiBjYW5fYWNjZXNzX3ZnaWNfZnJvbV9rZXJuZWwodm9p
-ZCkNCj4gPiDCoA0KPiA+IMKgc3RhdGljIGlubGluZSB2b2lkIHZnaWNfc2F2ZV9zdGF0ZShzdHJ1
-Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gwqB7DQo+ID4gLQlpZg0KPiA+ICghc3RhdGljX2JyYW5j
-aF91bmxpa2VseSgma3ZtX3ZnaWNfZ2xvYmFsX3N0YXRlLmdpY3YzX2NwdWlmKSkNCj4gPiArCWlm
-ICh2Z2ljX2lzX3Y1KHZjcHUtPmt2bSkpDQo+ID4gKwkJdmdpY192NV9zYXZlX3N0YXRlKHZjcHUp
-Ow0KPiA+ICsJZWxzZSBpZg0KPiA+ICghc3RhdGljX2JyYW5jaF91bmxpa2VseSgma3ZtX3ZnaWNf
-Z2xvYmFsX3N0YXRlLmdpY3YzX2NwdWlmKSkNCj4gPiDCoAkJdmdpY192Ml9zYXZlX3N0YXRlKHZj
-cHUpOw0KPiA+IMKgCWVsc2UNCj4gPiDCoAkJX192Z2ljX3YzX3NhdmVfc3RhdGUoJnZjcHUtDQo+
-ID4gPmFyY2gudmdpY19jcHUudmdpY192Myk7DQo+ID4gQEAgLTEwMDUsMTQgKzEwMDcsMTYgQEAg
-c3RhdGljIGlubGluZSB2b2lkIHZnaWNfc2F2ZV9zdGF0ZShzdHJ1Y3QNCj4gPiBrdm1fdmNwdSAq
-dmNwdSkNCj4gPiDCoC8qIFN5bmMgYmFjayB0aGUgaGFyZHdhcmUgVkdJQyBzdGF0ZSBpbnRvIG91
-ciBlbXVsYXRpb24gYWZ0ZXIgYQ0KPiA+IGd1ZXN0J3MgcnVuLiAqLw0KPiA+IMKgdm9pZCBrdm1f
-dmdpY19zeW5jX2h3c3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IMKgew0KPiA+IC0J
-LyogSWYgbmVzdGluZywgZW11bGF0ZSB0aGUgSFcgZWZmZWN0IGZyb20gTDAgdG8gTDEgKi8NCj4g
-PiAtCWlmICh2Z2ljX3N0YXRlX2lzX25lc3RlZCh2Y3B1KSkgew0KPiA+IC0JCXZnaWNfdjNfc3lu
-Y19uZXN0ZWQodmNwdSk7DQo+ID4gLQkJcmV0dXJuOw0KPiA+IC0JfQ0KPiA+ICsJaWYgKCF2Z2lj
-X2lzX3Y1KHZjcHUtPmt2bSkpIHsNCj4gDQo+IFRoaXMgc2hvdWxkIGRpcmVjdGx5IGNoZWNrIGZv
-ciB2My4gRXZlbiBvbmNlIHdlIGFkZCB2NSBzdXBwb3J0IHRvIE5WLA0KPiBJIGRvbid0IGV4cGVj
-dCB0aGUgY29kZSB0byBiZSBjb21tb24gYXQgYWxsLg0KDQpEb25lLiBXaWxsIGRvIHRoZSBzYW1l
-IGZvciBvdGhlciBjYXNlIEkgY29tZSBhY3Jvc3MuDQoNCj4gDQo+ID4gKwkJLyogSWYgbmVzdGlu
-ZywgZW11bGF0ZSB0aGUgSFcgZWZmZWN0IGZyb20gTDAgdG8gTDENCj4gPiAqLw0KPiA+ICsJCWlm
-ICh2Z2ljX3N0YXRlX2lzX25lc3RlZCh2Y3B1KSkgew0KPiA+ICsJCQl2Z2ljX3YzX3N5bmNfbmVz
-dGVkKHZjcHUpOw0KPiA+ICsJCQlyZXR1cm47DQo+ID4gKwkJfQ0KPiA+IMKgDQo+ID4gLQlpZiAo
-dmNwdV9oYXNfbnYodmNwdSkpDQo+ID4gLQkJdmdpY192M19uZXN0ZWRfdXBkYXRlX21pKHZjcHUp
-Ow0KPiA+ICsJCWlmICh2Y3B1X2hhc19udih2Y3B1KSkNCj4gPiArCQkJdmdpY192M19uZXN0ZWRf
-dXBkYXRlX21pKHZjcHUpOw0KPiA+ICsJfQ0KPiA+IMKgDQo+ID4gwqAJaWYgKGNhbl9hY2Nlc3Nf
-dmdpY19mcm9tX2tlcm5lbCgpKQ0KPiA+IMKgCQl2Z2ljX3NhdmVfc3RhdGUodmNwdSk7DQo+ID4g
-QEAgLTEwMzQsNyArMTAzOCw5IEBAIHZvaWQga3ZtX3ZnaWNfcHJvY2Vzc19hc3luY191cGRhdGUo
-c3RydWN0DQo+ID4ga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gwqANCj4gPiDCoHN0YXRpYyBpbmxpbmUg
-dm9pZCB2Z2ljX3Jlc3RvcmVfc3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+IMKgew0K
-PiA+IC0JaWYNCj4gPiAoIXN0YXRpY19icmFuY2hfdW5saWtlbHkoJmt2bV92Z2ljX2dsb2JhbF9z
-dGF0ZS5naWN2M19jcHVpZikpDQo+ID4gKwlpZiAodmdpY19pc192NSh2Y3B1LT5rdm0pKQ0KPiA+
-ICsJCXZnaWNfdjVfcmVzdG9yZV9zdGF0ZSh2Y3B1KTsNCj4gPiArCWVsc2UgaWYNCj4gPiAoIXN0
-YXRpY19icmFuY2hfdW5saWtlbHkoJmt2bV92Z2ljX2dsb2JhbF9zdGF0ZS5naWN2M19jcHVpZikp
-DQo+ID4gwqAJCXZnaWNfdjJfcmVzdG9yZV9zdGF0ZSh2Y3B1KTsNCj4gPiDCoAllbHNlDQo+ID4g
-wqAJCV9fdmdpY192M19yZXN0b3JlX3N0YXRlKCZ2Y3B1LQ0KPiA+ID5hcmNoLnZnaWNfY3B1LnZn
-aWNfdjMpOw0KPiANCj4gSSBoYXZlIHNpbWlsYXIgY29tbWVudHMgYXMgc29tZSB0aGUgcHJldmlv
-dXMgaHVua3MuIFVzaW5nIHN3aXRjaC9jYXNlDQo+IHN0YXRlbWVudHMgd291bGQgYmUgbW9yZSBy
-ZWFkYWJsZSBJTU8uDQoNCkRvbmUgd2hlcmUgYXBwcm9wcmlhdGUgKHNlZSBjb21tZW50IGFib3Zl
-KS4NCg0KVGhhbmtzLA0KU2FzY2hhDQoNCj4gDQo+IFRoYW5rcywNCj4gDQo+IAlNLg0KPiANCg0K
+Hi Tian, 
+
+Few extra notes/questions below
+
+On Wed, Feb 25, 2026 at 12:04:20PM +0800, Tian Zheng wrote:
+> From: eillon <yezhenyu2@huawei.com>
+> 
+> HDBSS is enabled via an ioctl from userspace (e.g. QEMU) at the start of
+> migration. This feature is only supported in VHE mode.
+> 
+> Initially, S2 PTEs doesn't contain the DBM attribute. During migration,
+> write faults are handled by user_mem_abort, which relaxes permissions
+> and adds the DBM bit when HDBSS is active. Once DBM is set, subsequent
+> writes no longer trap, as the hardware automatically transitions the page
+> from writable-clean to writable-dirty.
+> 
+> KVM does not scan S2 page tables to consume DBM. Instead, when HDBSS is
+> enabled, the hardware observes the clean->dirty transition and records
+> the corresponding page into the HDBSS buffer.
+> 
+> During sync_dirty_log, KVM kicks all vCPUs to force VM-Exit, ensuring
+> that check_vcpu_requests flushes the HDBSS buffer and propagates the
+> accumulated dirty information into the userspace-visible dirty bitmap.
+> 
+> Add fault handling for HDBSS including buffer full, external abort, and
+> general protection fault (GPF).
+> 
+> Signed-off-by: eillon <yezhenyu2@huawei.com>
+> Signed-off-by: Tian Zheng <zhengtian10@huawei.com>
+> ---
+>  arch/arm64/include/asm/esr.h      |   5 ++
+>  arch/arm64/include/asm/kvm_host.h |  17 +++++
+>  arch/arm64/include/asm/kvm_mmu.h  |   1 +
+>  arch/arm64/include/asm/sysreg.h   |  11 ++++
+>  arch/arm64/kvm/arm.c              | 102 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/vhe/switch.c   |  19 ++++++
+>  arch/arm64/kvm/mmu.c              |  70 ++++++++++++++++++++
+>  arch/arm64/kvm/reset.c            |   3 +
+>  8 files changed, 228 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+> index 81c17320a588..2e6b679b5908 100644
+> --- a/arch/arm64/include/asm/esr.h
+> +++ b/arch/arm64/include/asm/esr.h
+> @@ -437,6 +437,11 @@
+>  #ifndef __ASSEMBLER__
+>  #include <asm/types.h>
+> 
+> +static inline bool esr_iss2_is_hdbssf(unsigned long esr)
+> +{
+> +	return ESR_ELx_ISS2(esr) & ESR_ELx_HDBSSF;
+> +}
+> +
+>  static inline unsigned long esr_brk_comment(unsigned long esr)
+>  {
+>  	return esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 5d5a3bbdb95e..57ee6b53e061 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -55,12 +55,17 @@
+>  #define KVM_REQ_GUEST_HYP_IRQ_PENDING	KVM_ARCH_REQ(9)
+>  #define KVM_REQ_MAP_L1_VNCR_EL2		KVM_ARCH_REQ(10)
+>  #define KVM_REQ_VGIC_PROCESS_UPDATE	KVM_ARCH_REQ(11)
+> +#define KVM_REQ_FLUSH_HDBSS			KVM_ARCH_REQ(12)
+> 
+>  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+>  				     KVM_DIRTY_LOG_INITIALLY_SET)
+> 
+>  #define KVM_HAVE_MMU_RWLOCK
+> 
+> +/* HDBSS entry field definitions */
+> +#define HDBSS_ENTRY_VALID BIT(0)
+> +#define HDBSS_ENTRY_IPA GENMASK_ULL(55, 12)
+> +
+>  /*
+>   * Mode of operation configurable with kvm-arm.mode early param.
+>   * See Documentation/admin-guide/kernel-parameters.txt for more information.
+> @@ -84,6 +89,7 @@ int __init kvm_arm_init_sve(void);
+>  u32 __attribute_const__ kvm_target_cpu(void);
+>  void kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+>  void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu);
+> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu);
+> 
+>  struct kvm_hyp_memcache {
+>  	phys_addr_t head;
+> @@ -405,6 +411,8 @@ struct kvm_arch {
+>  	 * the associated pKVM instance in the hypervisor.
+>  	 */
+>  	struct kvm_protected_vm pkvm;
+> +
+> +	bool enable_hdbss;
+>  };
+> 
+>  struct kvm_vcpu_fault_info {
+> @@ -816,6 +824,12 @@ struct vcpu_reset_state {
+>  	bool		reset;
+>  };
+> 
+> +struct vcpu_hdbss_state {
+> +	phys_addr_t base_phys;
+> +	u32 size;
+> +	u32 next_index;
+> +};
+> +
+
+IIUC this is used once both on enable/disable and massively on 
+vcpu_put/get.
+
+What if we actually save just HDBSSBR_EL2 and HDBSSPROD_EL2 instead?
+That way we avoid having masking operations in put/get as well as any 
+possible error we may have formatting those.
+
+The cost is doing those operations once for enable and once for disable, 
+which should be fine.
+
+>  struct vncr_tlb;
+> 
+>  struct kvm_vcpu_arch {
+> @@ -920,6 +934,9 @@ struct kvm_vcpu_arch {
+> 
+>  	/* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
+>  	struct vncr_tlb	*vncr_tlb;
+> +
+> +	/* HDBSS registers info */
+> +	struct vcpu_hdbss_state hdbss;
+>  };
+> 
+>  /*
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index d968aca0461a..3fea8cfe8869 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -183,6 +183,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> 
+>  int kvm_handle_guest_sea(struct kvm_vcpu *vcpu);
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu);
+> 
+>  phys_addr_t kvm_mmu_get_httbr(void);
+>  phys_addr_t kvm_get_idmap_vector(void);
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index f4436ecc630c..d11f4d0dd4e7 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1039,6 +1039,17 @@
+> 
+>  #define GCS_CAP(x)	((((unsigned long)x) & GCS_CAP_ADDR_MASK) | \
+>  					       GCS_CAP_VALID_TOKEN)
+> +
+> +/*
+> + * Definitions for the HDBSS feature
+> + */
+> +#define HDBSS_MAX_SIZE		HDBSSBR_EL2_SZ_2MB
+> +
+> +#define HDBSSBR_EL2(baddr, sz)	(((baddr) & GENMASK(55, 12 + sz)) | \
+> +				 FIELD_PREP(HDBSSBR_EL2_SZ_MASK, sz))
+> +
+> +#define HDBSSPROD_IDX(prod)	FIELD_GET(HDBSSPROD_EL2_INDEX_MASK, prod)
+> +
+>  /*
+>   * Definitions for GICv5 instructions
+>   */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 29f0326f7e00..d64da05e25c4 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -125,6 +125,87 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+>  	return kvm_vcpu_exiting_guest_mode(vcpu) == IN_GUEST_MODE;
+>  }
+> 
+> +void kvm_arm_vcpu_free_hdbss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct page *hdbss_pg;
+> +
+> +	hdbss_pg = phys_to_page(vcpu->arch.hdbss.base_phys);
+> +	if (hdbss_pg)
+> +		__free_pages(hdbss_pg, vcpu->arch.hdbss.size);
+> +
+> +	vcpu->arch.hdbss.size = 0;
+> +}
+> +
+> +static int kvm_cap_arm_enable_hdbss(struct kvm *kvm,
+> +				    struct kvm_enable_cap *cap)
+> +{
+> +	unsigned long i;
+> +	struct kvm_vcpu *vcpu;
+> +	struct page *hdbss_pg = NULL;
+> +	__u64 size = cap->args[0];
+> +	bool enable = cap->args[1] ? true : false;
+> +
+> +	if (!system_supports_hdbss())
+> +		return -EINVAL;
+> +
+> +	if (size > HDBSS_MAX_SIZE)
+> +		return -EINVAL;
+> +
+> +	if (!enable && !kvm->arch.enable_hdbss) /* Already Off */
+> +		return 0;
+> +
+> +	if (enable && kvm->arch.enable_hdbss) /* Already On, can't set size */
+> +		return -EINVAL;
+> +
+> +	if (!enable) { /* Turn it off */
+> +		kvm->arch.mmu.vtcr &= ~(VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA);
+> +
+> +		kvm_for_each_vcpu(i, vcpu, kvm) {
+> +			/* Kick vcpus to flush hdbss buffer. */
+> +			kvm_vcpu_kick(vcpu);
+> +
+> +			kvm_arm_vcpu_free_hdbss(vcpu);
+> +		}
+> +
+> +		kvm->arch.enable_hdbss = false;
+> +
+> +		return 0;
+> +	}
+> +
+> +	/* Turn it on */
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		hdbss_pg = alloc_pages(GFP_KERNEL_ACCOUNT, size);
+> +		if (!hdbss_pg)
+> +			goto error_alloc;
+> +
+> +		vcpu->arch.hdbss = (struct vcpu_hdbss_state) {
+> +			.base_phys = page_to_phys(hdbss_pg),
+> +			.size = size,
+> +			.next_index = 0,
+> +		};
+> +	}
+> +
+> +	kvm->arch.enable_hdbss = true;
+> +	kvm->arch.mmu.vtcr |= VTCR_EL2_HD | VTCR_EL2_HDBSS | VTCR_EL2_HA;
+> +
+> +	/*
+> +	 * We should kick vcpus out of guest mode here to load new
+> +	 * vtcr value to vtcr_el2 register when re-enter guest mode.
+> +	 */
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		kvm_vcpu_kick(vcpu);
+> +
+> +	return 0;
+> +
+> +error_alloc:
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (vcpu->arch.hdbss.base_phys)
+> +			kvm_arm_vcpu_free_hdbss(vcpu);
+> +	}
+> +
+> +	return -ENOMEM;
+> +}
+> +
+>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  			    struct kvm_enable_cap *cap)
+>  {
+> @@ -182,6 +263,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		r = 0;
+>  		set_bit(KVM_ARCH_FLAG_EXIT_SEA, &kvm->arch.flags);
+>  		break;
+> +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
+> +		mutex_lock(&kvm->lock);
+> +		r = kvm_cap_arm_enable_hdbss(kvm, cap);
+> +		mutex_unlock(&kvm->lock);
+> +		break;
+>  	default:
+>  		break;
+>  	}
+> @@ -471,6 +557,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  			r = kvm_supports_cacheable_pfnmap();
+>  		break;
+> 
+> +	case KVM_CAP_ARM_HW_DIRTY_STATE_TRACK:
+> +		r = system_supports_hdbss();
+> +		break;
+>  	default:
+>  		r = 0;
+>  	}
+> @@ -1120,6 +1209,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  		if (kvm_dirty_ring_check_request(vcpu))
+>  			return 0;
+> 
+> +		if (kvm_check_request(KVM_REQ_FLUSH_HDBSS, vcpu))
+> +			kvm_flush_hdbss_buffer(vcpu);
+
+I am curious on why we need a flush-hdbss request,
+Don't we have the flush function happening every time we run vcpu_put?
+
+Oh, I see, you want to check if there is anything needed inside the inner 
+loop of vcpu_run, without having to vcpu_put. I think it makes sense.
+
+But instead of having this on guest entry, does not it make more sense to 
+have it in guest exit? This way we flush every time (if needed) we exit the 
+guest, and instead of having a vcpu request, we just require a vcpu kick 
+and it should flush if needed.
+
+Maybe have vcpu_put just save the registers, and add a the flush before 
+handle_exit.
+
+What do you think?
+
+
+> +
+>  		check_nested_vcpu_requests(vcpu);
+>  	}
+> 
+> @@ -1898,7 +1990,17 @@ long kvm_arch_vcpu_unlocked_ioctl(struct file *filp, unsigned int ioctl,
+> 
+>  void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
+>  {
+> +	/*
+> +	 * Flush all CPUs' dirty log buffers to the dirty_bitmap.  Called
+> +	 * before reporting dirty_bitmap to userspace. Send a request with
+> +	 * KVM_REQUEST_WAIT to flush buffer synchronously.
+> +	 */
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	if (!kvm->arch.enable_hdbss)
+> +		return;
+> 
+> +	kvm_make_all_cpus_request(kvm, KVM_REQ_FLUSH_HDBSS);
+>  }
+> 
+>  static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index 9db3f11a4754..600cbc4f8ae9 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -213,6 +213,23 @@ static void __vcpu_put_deactivate_traps(struct kvm_vcpu *vcpu)
+>  	local_irq_restore(flags);
+>  }
+> 
+> +static void __load_hdbss(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +	u64 br_el2, prod_el2;
+> +
+> +	if (!kvm->arch.enable_hdbss)
+> +		return;
+> +
+> +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
+> +	prod_el2 = vcpu->arch.hdbss.next_index;
+> +
+> +	write_sysreg_s(br_el2, SYS_HDBSSBR_EL2);
+> +	write_sysreg_s(prod_el2, SYS_HDBSSPROD_EL2);
+> +
+> +	isb();
+> +}
+> +
+>  void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+>  {
+>  	host_data_ptr(host_ctxt)->__hyp_running_vcpu = vcpu;
+> @@ -220,10 +237,12 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+>  	__vcpu_load_switch_sysregs(vcpu);
+>  	__vcpu_load_activate_traps(vcpu);
+>  	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
+> +	__load_hdbss(vcpu);
+>  }
+> 
+>  void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+>  {
+> +	kvm_flush_hdbss_buffer(vcpu);
+>  	__vcpu_put_deactivate_traps(vcpu);
+>  	__vcpu_put_switch_sysregs(vcpu);
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 070a01e53fcb..42b0710a16ce 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1896,6 +1896,9 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	if (writable)
+>  		prot |= KVM_PGTABLE_PROT_W;
+> 
+> +	if (writable && kvm->arch.enable_hdbss && logging_active)
+> +		prot |= KVM_PGTABLE_PROT_DBM;
+> +
+>  	if (exec_fault)
+>  		prot |= KVM_PGTABLE_PROT_X;
+> 
+> @@ -2033,6 +2036,70 @@ int kvm_handle_guest_sea(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+> 
+> +void kvm_flush_hdbss_buffer(struct kvm_vcpu *vcpu)
+> +{
+> +	int idx, curr_idx;
+> +	u64 br_el2;
+> +	u64 *hdbss_buf;
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	if (!kvm->arch.enable_hdbss)
+> +		return;
+> +
+> +	curr_idx = HDBSSPROD_IDX(read_sysreg_s(SYS_HDBSSPROD_EL2));
+> +	br_el2 = HDBSSBR_EL2(vcpu->arch.hdbss.base_phys, vcpu->arch.hdbss.size);
+> +
+> +	/* Do nothing if HDBSS buffer is empty or br_el2 is NULL */
+> +	if (curr_idx == 0 || br_el2 == 0)
+> +		return;
+> +
+> +	hdbss_buf = page_address(phys_to_page(vcpu->arch.hdbss.base_phys));
+> +	if (!hdbss_buf)
+> +		return;
+> +
+> +	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
+> +	for (idx = 0; idx < curr_idx; idx++) {
+> +		u64 gpa;
+> +
+> +		gpa = hdbss_buf[idx];
+> +		if (!(gpa & HDBSS_ENTRY_VALID))
+> +			continue;
+> +
+> +		gpa &= HDBSS_ENTRY_IPA;
+> +		kvm_vcpu_mark_page_dirty(vcpu, gpa >> PAGE_SHIFT);
+> +	}
+
+This will mark a page dirty for both dirty_bitmap or dirty_ring, depending 
+on what is in use. 
+
+Out of plain curiosity, have you planned / tested for the dirty-ring as 
+well, or just for dirty-bitmap?
+
+> +
+> +	/* reset HDBSS index */
+> +	write_sysreg_s(0, SYS_HDBSSPROD_EL2);
+> +	vcpu->arch.hdbss.next_index = 0;
+> +	isb();
+> +}
+> +
+> +static int kvm_handle_hdbss_fault(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 prod;
+> +	u64 fsc;
+> +
+> +	prod = read_sysreg_s(SYS_HDBSSPROD_EL2);
+> +	fsc = FIELD_GET(HDBSSPROD_EL2_FSC_MASK, prod);
+> +
+> +	switch (fsc) {
+> +	case HDBSSPROD_EL2_FSC_OK:
+> +		/* Buffer full, which is reported as permission fault. */
+> +		kvm_flush_hdbss_buffer(vcpu);
+> +		return 1;
+
+Humm, flushing in a fault handler means hanging there, in IRQ context, for 
+a while.
+
+Since we already deal with this on guest_exit (vcpu_put IIUC), why not just 
+return in a way the vcpu has to exit the inner loop and let it flush there 
+instead?
+
+Thanks!
+Leo
+
+> +	case HDBSSPROD_EL2_FSC_ExternalAbort:
+> +	case HDBSSPROD_EL2_FSC_GPF:
+> +		return -EFAULT;
+> +	default:
+> +		/* Unknown fault. */
+> +		WARN_ONCE(1,
+> +				"Unexpected HDBSS fault type, FSC: 0x%llx (prod=0x%llx, vcpu=%d)\n",
+> +				fsc, prod, vcpu->vcpu_id);
+> +		return -EFAULT;
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+> @@ -2071,6 +2138,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> 
+>  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> 
+> +	if (esr_iss2_is_hdbssf(esr))
+> +		return kvm_handle_hdbss_fault(vcpu);
+> +
+>  	if (esr_fsc_is_translation_fault(esr)) {
+>  		/* Beyond sanitised PARange (which is the IPA limit) */
+>  		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 959532422d3a..c03a4b310b53 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -161,6 +161,9 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+>  	kfree(vcpu->arch.vncr_tlb);
+>  	kfree(vcpu->arch.ccsidr);
+> +
+> +	if (vcpu->kvm->arch.enable_hdbss)
+> +		kvm_arm_vcpu_free_hdbss(vcpu);
+>  }
+> 
+>  static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> --
+> 2.33.0
+> 
