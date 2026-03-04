@@ -1,100 +1,356 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73887386C1A
-	for <kvmarm@lists.linux.dev>; Wed,  4 Mar 2026 08:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3DA370D5C;
+	Wed,  4 Mar 2026 09:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772614165; cv=none; b=ZwGE9dXiKOh4F6WIaQTXDBD3cWNfMUL3d608bXWj5bWjX2V48UIZ7H7SAKmRlSV5Vfs2aMqAuGbyaQiWk0TDmUPdsU4Kp4w8ohpFDXNrV8PtN/vrh5Q3wIJciG5r2YlwOhnr0Ci4cql0PEuhAh1wgs1JGwZjYqDpK+i0zv+VRno=
+	t=1772616416; cv=none; b=KLHjsvX5DX9eFhnanjFhhGCvTlm1k3HZHuFp9MvhxoeJmjrBXDk4L5qnavZJBwJbGR1YfrDqCLCU86Kn0ATY7xRWhwoSnNQI1mi8o5JQDTJ7Y6qw0bpiZgTJ9eBToic+plV6O7kqIowCaitNT9zYB04qR7iikTzn8+2tONq2usk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772614165; c=relaxed/simple;
-	bh=5SMJ1R7Er2L+59VYFAl6rbBXfy6Oo4tSMMsf8oF3Az4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ipJm4O+ZpUBFXldkpqo3H/rEMHGsDdVcKxOaqIPUufH1bTbK7NPMwR4jx820KY5Tz07ta1MGIGgtmYSWtvCHLELJjr0Xsphd2fJoEbbyIl347VHR8Bd4CGuurXmmlJAn7dC9Q2jtl2fM7u73GPZ9plLnySFhdHBGZGJXMp2jrFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 77349339;
-	Wed,  4 Mar 2026 00:49:17 -0800 (PST)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C377C3F7BD;
-	Wed,  4 Mar 2026 00:49:21 -0800 (PST)
-Date: Wed, 4 Mar 2026 08:49:19 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Ankur Arora <ankur.a.arora@oracle.com>
-Cc: Linus Walleij <linusw@kernel.org>, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Hildenbrand <david@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	James Clark <james.clark2@arm.com>
-Subject: Re: [PATCH] arm64: Implement clear_pages()
-Message-ID: <aafyD6G_Moz8tg1A@arm.com>
-References: <20260303-aarch64-clear-pages-v1-1-ad0c3ee9a555@kernel.org>
- <aab0SvA0dU0R0pnl@willie-the-truck>
- <CAD++jLnhe_k1-eU90KjOi_Aj57S53a9GJoCZ-LTE0fz-TVSqvg@mail.gmail.com>
- <87v7fcuij3.fsf@oracle.com>
+	s=arc-20240116; t=1772616416; c=relaxed/simple;
+	bh=r5XZvzIPpyYXkEV2po6dhRbXD9dHV321uOyolq8w6BA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OzxZ6lXAMeyi38AniNTN8hgzQ5m4/pFowcG7vc7kTT9SUxldIW3Svaqc2DlIKMeNbxlXef6geovhe0yMk/XbrB67C0s7J4VyiRGuho/rB2GzZVt8B+sMYTbAOED19BexLCM9FvLWN5/t7E/xQfkGBSBApOV9k8QE74Bt1MYh+Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIx6dNbX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIx6dNbX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB71AC19423;
+	Wed,  4 Mar 2026 09:26:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772616415;
+	bh=r5XZvzIPpyYXkEV2po6dhRbXD9dHV321uOyolq8w6BA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hIx6dNbXR044yUGqo4HHlPUb+doojWePbMcO2pndaPnhXZ9btiIPdxxQSR8bp0zHR
+	 /x0zOx1xtqcaOpDPFBcmEU4OXsdP5VbCVjaHEFr/iWyfKPR+IZRoOQQT5QS1RQRxUm
+	 7zDfDqYLpOGYLTTee+tMF+SXr/YIwr+SdW7rw0MA3t72g7SnnOR/JC1/i4wXk7ReuE
+	 g28COv670yD/kTEsmurVrdLjg66lSJz6l1XPKbjgFVAr2OGk0+QBCLmoF543PNnP/1
+	 iZnMNknEXVvHookiFSH1uCNinkYW0JJZ45yj9BYNr2nyrfKITlK8TpHwgzzgP16IWo
+	 sSqXZjhPJ1VTQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxiVJ-0000000FyG1-1Tdg;
+	Wed, 04 Mar 2026 09:26:53 +0000
+Date: Wed, 04 Mar 2026 09:26:52 +0000
+Message-ID: <865x7c7xnn.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 15/36] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
+In-Reply-To: <20260226155515.1164292-16-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-16-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87v7fcuij3.fsf@oracle.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 04, 2026 at 12:05:04AM -0800, Ankur Arora wrote:
-> Linus Walleij <linusw@kernel.org> writes:
-> > On Tue, Mar 3, 2026 at 3:46 PM Will Deacon <will@kernel.org> wrote:
-> >> If we have CPUs that are this sensitive to branches, perhaps we'd be
-> >> better off taking the opposite approach and moving more code into C
-> >> so that the compiler can optimise the control flow for us?
-> >
-> > Hm! That would be to create a default clear_page() in
-> > <linux/mm.h> and simply delete the existing lib/clear_page.S
-> > and let the default kick in.
-> >
-> > Right now every arch is implementing it custom.
-> > Maybe for no reason in some cases, I could try it!
-> >
-> > I doubt the compiler would emit this part though:
-> >
-> > #ifdef CONFIG_AS_HAS_MOPS
-> > (...)
-> > alternative_else_nop_endif
-> >         setpn   [x0]!, x1!, xzr
-> >         setmn   [x0]!, x1!, xzr
-> >         seten   [x0]!, x1!, xzr
-> >         ret
-
-It won't generate it. It wouldn't be a pure C but have some inline asm.
-
-Anyway, I'm fine with the .S file, I just wonder whether the DCZID_EL0
-read inside the inner loop is causing problems (not the FEAT_MOPS
-variant).
-
-> > Three instructions to clear all pages. But maybe that is not good
-> > if this is a gigabyte, and the per-page loop provides a good breather
-> > preemption point in that case, and then we just shouldn't touch
-> > anything.
+On Thu, 26 Feb 2026 15:59:18 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> The code in folio_zero_user (clear_contig_highpages()) takes care of
-> chunking up the clearing based on preemption model.
-> The idea being that if you are running with preempt=none or voluntary
-> then you might want to call cond_resched(), say every 32MB or so.
+> This change introduces GICv5 load/put. Additionally, it plumbs in
+> save/restore for:
 > 
-> If you are running with preempt=full or preempt=lazy, then it would
-> just clear a full GB page.
+> * PPIs (ICH_PPI_x_EL2 regs)
+> * ICH_VMCR_EL2
+> * ICH_APR_EL2
+> * ICC_ICSR_EL1
 > 
-> That would need the set[mpe]n instructions to be interruptible though.
-> (Seems to me that that is true but maybe someone could confirm.)
+> A GICv5-specific enable bit is added to struct vgic_vmcr as this
+> differs from previous GICs. On GICv5-native systems, the VMCR only
+> contains the enable bit (driven by the guest via ICC_CR0_EL1.EN) and
+> the priority mask (PCR).
+> 
+> A struct gicv5_vpe is also introduced. This currently only contains a
+> single field - bool resident - which is used to track if a VPE is
+> currently running or not, and is used to avoid a case of double load
+> or double put on the WFI path for a vCPU. This struct will be extended
+> as additional GICv5 support is merged, specifically for VPE doorbells.
+> 
+> Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/switch.c   | 12 +++++
+>  arch/arm64/kvm/vgic/vgic-mmio.c    | 28 +++++++----
+>  arch/arm64/kvm/vgic/vgic-v5.c      | 74 ++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c         | 32 ++++++++-----
+>  arch/arm64/kvm/vgic/vgic.h         |  7 +++
+>  include/kvm/arm_vgic.h             |  2 +
+>  include/linux/irqchip/arm-gic-v5.h |  5 ++
+>  7 files changed, 141 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index b41485ce295ab..a88da302b6d08 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -113,6 +113,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
+>  /* Save VGICv3 state on non-VHE systems */
+>  static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+> +	if (vgic_is_v5(kern_hyp_va(vcpu->kvm))) {
+> +		__vgic_v5_save_state(&vcpu->arch.vgic_cpu.vgic_v5);
+> +		__vgic_v5_save_ppi_state(&vcpu->arch.vgic_cpu.vgic_v5);
+> +		return;
+> +	}
+> +
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+>  		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
+>  		__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+> @@ -122,6 +128,12 @@ static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+>  /* Restore VGICv3 state on non-VHE systems */
+>  static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+>  {
+> +	if (vgic_is_v5(kern_hyp_va(vcpu->kvm))) {
+> +		__vgic_v5_restore_state(&vcpu->arch.vgic_cpu.vgic_v5);
+> +		__vgic_v5_restore_ppi_state(&vcpu->arch.vgic_cpu.vgic_v5);
+> +		return;
+> +	}
+> +
+>  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+>  		__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
+>  		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+> index a573b1f0c6cbe..675c2844f5e5c 100644
+> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
+> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+> @@ -842,18 +842,30 @@ vgic_find_mmio_region(const struct vgic_register_region *regions,
+>  
+>  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+>  {
+> -	if (kvm_vgic_global_state.type == VGIC_V2)
+> -		vgic_v2_set_vmcr(vcpu, vmcr);
+> -	else
+> -		vgic_v3_set_vmcr(vcpu, vmcr);
+> +	const struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +
+> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
+> +		vgic_v5_set_vmcr(vcpu, vmcr);
+> +	} else {
+> +		if (kvm_vgic_global_state.type == VGIC_V2)
+> +			vgic_v2_set_vmcr(vcpu, vmcr);
+> +		else
+> +			vgic_v3_set_vmcr(vcpu, vmcr);
+> +	}
 
-Yes, they are interruptible (the SETM). The x0, x1 register are left in
-a state that the SETM can be restarted from where it was interrupted.
+This looks rather ugly, and doesn't make use of the helpers you
+introduced in patch #1. How about:
+
+	switch (dist->vgic_model) {
+	case KVM_DEV_TYPE_ARM_VGIC_V5:
+		vgic_v5_set_vmcr(vcpu, vmcr);
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V3:
+		vgic_v3_set_vmcr(vcpu, vmcr);
+		break;
+	case KVM_DEV_TYPE_ARM_VGIC_V2:
+		if (static_branch_likely(&kvm_vgic_global_state.gicv3_cpuif))
+			vgic_v3_set_vmcr(vcpu, vmcr);
+		else
+			vgic_v2_set_vmcr(vcpu, vmcr);
+		break;
+	default:
+		BUG();
+	}
+
+Yes, the handling of v3 is a bit redundant, but I find it overall more
+readable.
+
+>  }
+>  
+>  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
+>  {
+> -	if (kvm_vgic_global_state.type == VGIC_V2)
+> -		vgic_v2_get_vmcr(vcpu, vmcr);
+> -	else
+> -		vgic_v3_get_vmcr(vcpu, vmcr);
+> +	const struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +
+> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
+> +		vgic_v5_get_vmcr(vcpu, vmcr);
+> +	} else {
+> +		if (kvm_vgic_global_state.type == VGIC_V2)
+> +			vgic_v2_get_vmcr(vcpu, vmcr);
+> +		else
+> +			vgic_v3_get_vmcr(vcpu, vmcr);
+> +	}
+>  }
+>  
+>  /*
+> diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
+> index 2c51b9ba4f118..5b35c756887a9 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v5.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v5.c
+> @@ -85,3 +85,77 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
+>  
+>  	return 0;
+>  }
+> +
+> +void vgic_v5_load(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	/*
+> +	 * On the WFI path, vgic_load is called a second time. The first is when
+> +	 * scheduling in the vcpu thread again, and the second is when leaving
+> +	 * WFI. Skip the second instance as it serves no purpose and just
+> +	 * restores the same state again.
+> +	 */
+> +	if (READ_ONCE(cpu_if->gicv5_vpe.resident))
+> +		return;
+
+I'm perplex. What is READ_ONCE()/WRITE_ONCE() guaranteeing?
+
+> +
+> +	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
+> +
+> +	WRITE_ONCE(cpu_if->gicv5_vpe.resident, true);
+> +}
+> +
+> +void vgic_v5_put(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	/*
+> +	 * Do nothing if we're not resident. This can happen in the WFI path
+> +	 * where we do a vgic_put in the WFI path and again later when
+> +	 * descheduling the thread. We risk losing VMCR state if we sync it
+> +	 * twice, so instead return early in this case.
+> +	 */
+> +	if (!READ_ONCE(cpu_if->gicv5_vpe.resident))
+> +		return;
+> +
+> +	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
+> +
+> +	WRITE_ONCE(cpu_if->gicv5_vpe.resident, false);
+> +}
+> +
+> +void vgic_v5_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u64 vmcr = cpu_if->vgic_vmcr;
+> +
+> +	vmcrp->en = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_EN, vmcr);
+> +	vmcrp->pmr = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, vmcr);
+> +}
+> +
+> +void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u64 vmcr;
+> +
+> +	vmcr = FIELD_PREP(FEAT_GCIE_ICH_VMCR_EL2_VPMR, vmcrp->pmr) |
+> +	       FIELD_PREP(FEAT_GCIE_ICH_VMCR_EL2_EN, vmcrp->en);
+> +
+> +	cpu_if->vgic_vmcr = vmcr;
+> +}
+> +
+> +void vgic_v5_restore_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	__vgic_v5_restore_state(cpu_if);
+> +	kvm_call_hyp(__vgic_v5_restore_ppi_state, cpu_if);
+> +	dsb(sy);
+> +}
+> +
+> +void vgic_v5_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +
+> +	__vgic_v5_save_state(cpu_if);
+> +	kvm_call_hyp(__vgic_v5_save_ppi_state, cpu_if);
+> +	dsb(sy);
+> +}
+> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+> index 2c0e8803342e2..1005ff5f36235 100644
+> --- a/arch/arm64/kvm/vgic/vgic.c
+> +++ b/arch/arm64/kvm/vgic/vgic.c
+> @@ -996,7 +996,9 @@ static inline bool can_access_vgic_from_kernel(void)
+>  
+>  static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+> +	if (vgic_is_v5(vcpu->kvm))
+> +		vgic_v5_save_state(vcpu);
+> +	else if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		vgic_v2_save_state(vcpu);
+>  	else
+>  		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
+> @@ -1005,14 +1007,16 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
+>  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+> -	/* If nesting, emulate the HW effect from L0 to L1 */
+> -	if (vgic_state_is_nested(vcpu)) {
+> -		vgic_v3_sync_nested(vcpu);
+> -		return;
+> -	}
+> +	if (!vgic_is_v5(vcpu->kvm)) {
+
+This should directly check for v3. Even once we add v5 support to NV,
+I don't expect the code to be common at all.
+
+> +		/* If nesting, emulate the HW effect from L0 to L1 */
+> +		if (vgic_state_is_nested(vcpu)) {
+> +			vgic_v3_sync_nested(vcpu);
+> +			return;
+> +		}
+>  
+> -	if (vcpu_has_nv(vcpu))
+> -		vgic_v3_nested_update_mi(vcpu);
+> +		if (vcpu_has_nv(vcpu))
+> +			vgic_v3_nested_update_mi(vcpu);
+> +	}
+>  
+>  	if (can_access_vgic_from_kernel())
+>  		vgic_save_state(vcpu);
+> @@ -1034,7 +1038,9 @@ void kvm_vgic_process_async_update(struct kvm_vcpu *vcpu)
+>  
+>  static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+> +	if (vgic_is_v5(vcpu->kvm))
+> +		vgic_v5_restore_state(vcpu);
+> +	else if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
+>  		vgic_v2_restore_state(vcpu);
+>  	else
+>  		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+
+I have similar comments as some the previous hunks. Using switch/case
+statements would be more readable IMO.
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
+Without deviation from the norm, progress is not possible.
