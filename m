@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3DA370D5C;
-	Wed,  4 Mar 2026 09:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307781ACEDE;
+	Wed,  4 Mar 2026 09:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772616416; cv=none; b=KLHjsvX5DX9eFhnanjFhhGCvTlm1k3HZHuFp9MvhxoeJmjrBXDk4L5qnavZJBwJbGR1YfrDqCLCU86Kn0ATY7xRWhwoSnNQI1mi8o5JQDTJ7Y6qw0bpiZgTJ9eBToic+plV6O7kqIowCaitNT9zYB04qR7iikTzn8+2tONq2usk=
+	t=1772616933; cv=none; b=NNodN0M2/+8jgVN2MlIE8Q7oyDwUxQKncHm/Diycvb3JxXNwYPn7v+MnNuuj1clJ/2H1Q+IPA48LXcncqfVou53pXspnYDoLxu8v1EmZYOdVWREpAa7AuMCB0XdPvaiGu1Gkv3WoAVRMjdbix3D1lWDby3mIb5ykIrcwU+3Ogw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772616416; c=relaxed/simple;
-	bh=r5XZvzIPpyYXkEV2po6dhRbXD9dHV321uOyolq8w6BA=;
+	s=arc-20240116; t=1772616933; c=relaxed/simple;
+	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OzxZ6lXAMeyi38AniNTN8hgzQ5m4/pFowcG7vc7kTT9SUxldIW3Svaqc2DlIKMeNbxlXef6geovhe0yMk/XbrB67C0s7J4VyiRGuho/rB2GzZVt8B+sMYTbAOED19BexLCM9FvLWN5/t7E/xQfkGBSBApOV9k8QE74Bt1MYh+Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIx6dNbX; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=K1K73O1ZtW8X0M86LcwYpGEwz8YWNrSsAsTW4FNcDwIMEBjhMP3jJ21eg/JhZGr9U81ct8Tj29djM3DyUljkouCD9h5QqEm1jh1LZUeAQskslikj8klEdtrYawOv16auSnwPaDut5+WoyYaxGBfFC5Z6640W4xYSOX6yY7v29oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jAAAOGE3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIx6dNbX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB71AC19423;
-	Wed,  4 Mar 2026 09:26:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jAAAOGE3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3771C19423;
+	Wed,  4 Mar 2026 09:35:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772616415;
-	bh=r5XZvzIPpyYXkEV2po6dhRbXD9dHV321uOyolq8w6BA=;
+	s=k20201202; t=1772616933;
+	bh=fcQPpx8aXl/bNZmJJr4UNqNuegofLcCcrPHmWDmwHeM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hIx6dNbXR044yUGqo4HHlPUb+doojWePbMcO2pndaPnhXZ9btiIPdxxQSR8bp0zHR
-	 /x0zOx1xtqcaOpDPFBcmEU4OXsdP5VbCVjaHEFr/iWyfKPR+IZRoOQQT5QS1RQRxUm
-	 7zDfDqYLpOGYLTTee+tMF+SXr/YIwr+SdW7rw0MA3t72g7SnnOR/JC1/i4wXk7ReuE
-	 g28COv670yD/kTEsmurVrdLjg66lSJz6l1XPKbjgFVAr2OGk0+QBCLmoF543PNnP/1
-	 iZnMNknEXVvHookiFSH1uCNinkYW0JJZ45yj9BYNr2nyrfKITlK8TpHwgzzgP16IWo
-	 sSqXZjhPJ1VTQ==
+	b=jAAAOGE3yEaLrrLntuxDP4H0mebq4t+SmQ5VHnBBo3slVvJte1dhqls/6yLwgccPj
+	 JGhp+O05g7UxK+18O7ErIEpLcfmVlKe3YaD2LSycrMQs/h8/FGkJSL/uC25dYkS1hd
+	 0mEB9FT6J1C/tStohhvhX07snjfQp79h8RsKwhD+J2EJ9bX+E6jaAojpDX0ayG+j24
+	 94Bg4T+9U1Tt+NXm8oRxArfvm/PXDREZWT02eOEpUU361uHOF3TF9eTLKMMBtO8dDD
+	 AvOc3HHq3RJ4nUW5QtJrnV/sfO+AU+2XzFeLUHzUDeed9X83iE9epPg8dJfI+xX75K
+	 W6qVuInzp8ABg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vxiVJ-0000000FyG1-1Tdg;
-	Wed, 04 Mar 2026 09:26:53 +0000
-Date: Wed, 04 Mar 2026 09:26:52 +0000
-Message-ID: <865x7c7xnn.wl-maz@kernel.org>
+	id 1vxide-0000000FyTI-31HL;
+	Wed, 04 Mar 2026 09:35:30 +0000
+Date: Wed, 04 Mar 2026 09:35:30 +0000
+Message-ID: <864imw7x99.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sascha Bischoff <Sascha.Bischoff@arm.com>
 Cc: "linux-arm-kernel@lists.infradead.org"
@@ -53,10 +53,10 @@ Cc: "linux-arm-kernel@lists.infradead.org"
 	Timothy Hayes <Timothy.Hayes@arm.com>,
 	"jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v5 15/36] KVM: arm64: gic-v5: Implement GICv5 load/put and save/restore
-In-Reply-To: <20260226155515.1164292-16-sascha.bischoff@arm.com>
+Subject: Re: [PATCH v5 16/36] KVM: arm64: gic-v5: Implement direct injection of PPIs
+In-Reply-To: <20260226155515.1164292-17-sascha.bischoff@arm.com>
 References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
-	<20260226155515.1164292-16-sascha.bischoff@arm.com>
+	<20260226155515.1164292-17-sascha.bischoff@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -72,281 +72,119 @@ X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 26 Feb 2026 15:59:18 +0000,
+On Thu, 26 Feb 2026 15:59:33 +0000,
 Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> This change introduces GICv5 load/put. Additionally, it plumbs in
-> save/restore for:
+> GICv5 is able to directly inject PPI pending state into a guest using
+> a mechanism called DVI whereby the pending bit for a paticular PPI is
+> driven directly by the physically-connected hardware. This mechanism
+> itself doesn't allow for any ID translation, so the host interrupt is
+> directly mapped into a guest with the same interrupt ID.
 > 
-> * PPIs (ICH_PPI_x_EL2 regs)
-> * ICH_VMCR_EL2
-> * ICH_APR_EL2
-> * ICC_ICSR_EL1
+> When mapping a virtual interrupt to a physical interrupt via
+> kvm_vgic_map_irq for a GICv5 guest, check if the interrupt itself is a
+> PPI or not. If it is, and the host's interrupt ID matches that used
+> for the guest DVI is enabled, and the interrupt itself is marked as
+> directly_injected.
 > 
-> A GICv5-specific enable bit is added to struct vgic_vmcr as this
-> differs from previous GICs. On GICv5-native systems, the VMCR only
-> contains the enable bit (driven by the guest via ICC_CR0_EL1.EN) and
-> the priority mask (PCR).
+> When the interrupt is unmapped again, this process is reversed, and
+> DVI is disabled for the interrupt again.
 > 
-> A struct gicv5_vpe is also introduced. This currently only contains a
-> single field - bool resident - which is used to track if a VPE is
-> currently running or not, and is used to avoid a case of double load
-> or double put on the WFI path for a vCPU. This struct will be extended
-> as additional GICv5 support is merged, specifically for VPE doorbells.
+> Note: the expectation is that a directly injected PPI is disabled on
+> the host while the guest state is loaded. The reason is that although
+> DVI is enabled to drive the guest's pending state directly, the host
+> pending state also remains driven. In order to avoid the same PPI
+> firing on both the host and the guest, the host's interrupt must be
+> disabled (masked). This is left up to the code that owns the device
+> generating the PPI as this needs to be handled on a per-VM basis. One
+> VM might use DVI, while another might not, in which case the physical
+> PPI should be enabled for the latter.
 > 
 > Co-authored-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Timothy Hayes <timothy.hayes@arm.com>
 > Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > ---
->  arch/arm64/kvm/hyp/nvhe/switch.c   | 12 +++++
->  arch/arm64/kvm/vgic/vgic-mmio.c    | 28 +++++++----
->  arch/arm64/kvm/vgic/vgic-v5.c      | 74 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/vgic/vgic.c         | 32 ++++++++-----
->  arch/arm64/kvm/vgic/vgic.h         |  7 +++
->  include/kvm/arm_vgic.h             |  2 +
->  include/linux/irqchip/arm-gic-v5.h |  5 ++
->  7 files changed, 141 insertions(+), 19 deletions(-)
+>  arch/arm64/kvm/vgic/vgic-v5.c | 15 +++++++++++++++
+>  arch/arm64/kvm/vgic/vgic.c    | 10 ++++++++++
+>  arch/arm64/kvm/vgic/vgic.h    |  1 +
+>  include/kvm/arm_vgic.h        |  1 +
+>  4 files changed, 27 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index b41485ce295ab..a88da302b6d08 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -113,6 +113,12 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
->  /* Save VGICv3 state on non-VHE systems */
->  static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
->  {
-> +	if (vgic_is_v5(kern_hyp_va(vcpu->kvm))) {
-> +		__vgic_v5_save_state(&vcpu->arch.vgic_cpu.vgic_v5);
-> +		__vgic_v5_save_ppi_state(&vcpu->arch.vgic_cpu.vgic_v5);
-> +		return;
-> +	}
-> +
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
->  		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
->  		__vgic_v3_deactivate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
-> @@ -122,6 +128,12 @@ static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
->  /* Restore VGICv3 state on non-VHE systems */
->  static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
->  {
-> +	if (vgic_is_v5(kern_hyp_va(vcpu->kvm))) {
-> +		__vgic_v5_restore_state(&vcpu->arch.vgic_cpu.vgic_v5);
-> +		__vgic_v5_restore_ppi_state(&vcpu->arch.vgic_cpu.vgic_v5);
-> +		return;
-> +	}
-> +
->  	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
->  		__vgic_v3_activate_traps(&vcpu->arch.vgic_cpu.vgic_v3);
->  		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
-> index a573b1f0c6cbe..675c2844f5e5c 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
-> @@ -842,18 +842,30 @@ vgic_find_mmio_region(const struct vgic_register_region *regions,
->  
->  void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->  {
-> -	if (kvm_vgic_global_state.type == VGIC_V2)
-> -		vgic_v2_set_vmcr(vcpu, vmcr);
-> -	else
-> -		vgic_v3_set_vmcr(vcpu, vmcr);
-> +	const struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
-> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
-> +		vgic_v5_set_vmcr(vcpu, vmcr);
-> +	} else {
-> +		if (kvm_vgic_global_state.type == VGIC_V2)
-> +			vgic_v2_set_vmcr(vcpu, vmcr);
-> +		else
-> +			vgic_v3_set_vmcr(vcpu, vmcr);
-> +	}
-
-This looks rather ugly, and doesn't make use of the helpers you
-introduced in patch #1. How about:
-
-	switch (dist->vgic_model) {
-	case KVM_DEV_TYPE_ARM_VGIC_V5:
-		vgic_v5_set_vmcr(vcpu, vmcr);
-		break;
-	case KVM_DEV_TYPE_ARM_VGIC_V3:
-		vgic_v3_set_vmcr(vcpu, vmcr);
-		break;
-	case KVM_DEV_TYPE_ARM_VGIC_V2:
-		if (static_branch_likely(&kvm_vgic_global_state.gicv3_cpuif))
-			vgic_v3_set_vmcr(vcpu, vmcr);
-		else
-			vgic_v2_set_vmcr(vcpu, vmcr);
-		break;
-	default:
-		BUG();
-	}
-
-Yes, the handling of v3 is a bit redundant, but I find it overall more
-readable.
-
->  }
->  
->  void vgic_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
->  {
-> -	if (kvm_vgic_global_state.type == VGIC_V2)
-> -		vgic_v2_get_vmcr(vcpu, vmcr);
-> -	else
-> -		vgic_v3_get_vmcr(vcpu, vmcr);
-> +	const struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
-> +	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V5) {
-> +		vgic_v5_get_vmcr(vcpu, vmcr);
-> +	} else {
-> +		if (kvm_vgic_global_state.type == VGIC_V2)
-> +			vgic_v2_get_vmcr(vcpu, vmcr);
-> +		else
-> +			vgic_v3_get_vmcr(vcpu, vmcr);
-> +	}
->  }
->  
->  /*
 > diff --git a/arch/arm64/kvm/vgic/vgic-v5.c b/arch/arm64/kvm/vgic/vgic-v5.c
-> index 2c51b9ba4f118..5b35c756887a9 100644
+> index 5b35c756887a9..f5cd9decfc26e 100644
 > --- a/arch/arm64/kvm/vgic/vgic-v5.c
 > +++ b/arch/arm64/kvm/vgic/vgic-v5.c
-> @@ -85,3 +85,77 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
->  
+> @@ -86,6 +86,21 @@ int vgic_v5_probe(const struct gic_kvm_info *info)
 >  	return 0;
 >  }
-> +
-> +void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  
+> +/*
+> + * Sets/clears the corresponding bit in the ICH_PPI_DVIR register.
+> + */
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi)
 > +{
 > +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
+> +	u32 ppi = FIELD_GET(GICV5_HWIRQ_ID, irq);
+> +	unsigned long *p;
 > +
-> +	/*
-> +	 * On the WFI path, vgic_load is called a second time. The first is when
-> +	 * scheduling in the vcpu thread again, and the second is when leaving
-> +	 * WFI. Skip the second instance as it serves no purpose and just
-> +	 * restores the same state again.
-> +	 */
-> +	if (READ_ONCE(cpu_if->gicv5_vpe.resident))
-> +		return;
-
-I'm perplex. What is READ_ONCE()/WRITE_ONCE() guaranteeing?
-
+> +	p = (unsigned long *)&cpu_if->vgic_ppi_dvir[ppi / 64];
+> +	__assign_bit(ppi % 64, p, dvi);
 > +
-> +	kvm_call_hyp(__vgic_v5_restore_vmcr_apr, cpu_if);
-> +
-> +	WRITE_ONCE(cpu_if->gicv5_vpe.resident, true);
+> +	return 0;
 > +}
 > +
-> +void vgic_v5_put(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	/*
-> +	 * Do nothing if we're not resident. This can happen in the WFI path
-> +	 * where we do a vgic_put in the WFI path and again later when
-> +	 * descheduling the thread. We risk losing VMCR state if we sync it
-> +	 * twice, so instead return early in this case.
-> +	 */
-> +	if (!READ_ONCE(cpu_if->gicv5_vpe.resident))
-> +		return;
-> +
-> +	kvm_call_hyp(__vgic_v5_save_apr, cpu_if);
-> +
-> +	WRITE_ONCE(cpu_if->gicv5_vpe.resident, false);
-> +}
-> +
-> +void vgic_v5_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u64 vmcr = cpu_if->vgic_vmcr;
-> +
-> +	vmcrp->en = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_EN, vmcr);
-> +	vmcrp->pmr = FIELD_GET(FEAT_GCIE_ICH_VMCR_EL2_VPMR, vmcr);
-> +}
-> +
-> +void vgic_v5_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +	u64 vmcr;
-> +
-> +	vmcr = FIELD_PREP(FEAT_GCIE_ICH_VMCR_EL2_VPMR, vmcrp->pmr) |
-> +	       FIELD_PREP(FEAT_GCIE_ICH_VMCR_EL2_EN, vmcrp->en);
-> +
-> +	cpu_if->vgic_vmcr = vmcr;
-> +}
-> +
-> +void vgic_v5_restore_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	__vgic_v5_restore_state(cpu_if);
-> +	kvm_call_hyp(__vgic_v5_restore_ppi_state, cpu_if);
-> +	dsb(sy);
-> +}
-> +
-> +void vgic_v5_save_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
-> +
-> +	__vgic_v5_save_state(cpu_if);
-> +	kvm_call_hyp(__vgic_v5_save_ppi_state, cpu_if);
-> +	dsb(sy);
-> +}
+>  void vgic_v5_load(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_v5_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v5;
 > diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index 2c0e8803342e2..1005ff5f36235 100644
+> index 1005ff5f36235..62e58fdf611d3 100644
 > --- a/arch/arm64/kvm/vgic/vgic.c
 > +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -996,7 +996,9 @@ static inline bool can_access_vgic_from_kernel(void)
->  
->  static inline void vgic_save_state(struct kvm_vcpu *vcpu)
->  {
-> -	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> +	if (vgic_is_v5(vcpu->kvm))
-> +		vgic_v5_save_state(vcpu);
-> +	else if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		vgic_v2_save_state(vcpu);
->  	else
->  		__vgic_v3_save_state(&vcpu->arch.vgic_cpu.vgic_v3);
-> @@ -1005,14 +1007,16 @@ static inline void vgic_save_state(struct kvm_vcpu *vcpu)
->  /* Sync back the hardware VGIC state into our emulation after a guest's run. */
->  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  {
-> -	/* If nesting, emulate the HW effect from L0 to L1 */
-> -	if (vgic_state_is_nested(vcpu)) {
-> -		vgic_v3_sync_nested(vcpu);
-> -		return;
-> -	}
-> +	if (!vgic_is_v5(vcpu->kvm)) {
+> @@ -577,12 +577,22 @@ static int kvm_vgic_map_irq(struct kvm_vcpu *vcpu, struct vgic_irq *irq,
+>  	irq->host_irq = host_irq;
+>  	irq->hwintid = data->hwirq;
+>  	irq->ops = ops;
+> +
+> +	if (vgic_is_v5(vcpu->kvm) &&
+> +	    __irq_is_ppi(KVM_DEV_TYPE_ARM_VGIC_V5, irq->intid))
+> +		irq->directly_injected = !vgic_v5_set_ppi_dvi(vcpu, irq->hwintid,
+> +							      true);
+> +
 
-This should directly check for v3. Even once we add v5 support to NV,
-I don't expect the code to be common at all.
+Huh. A couple of things here:
 
-> +		/* If nesting, emulate the HW effect from L0 to L1 */
-> +		if (vgic_state_is_nested(vcpu)) {
-> +			vgic_v3_sync_nested(vcpu);
-> +			return;
-> +		}
+- under what conditions would irq->directly_injected not be set to
+  true for a PPI? That can never happen here AFAICT.
+
+- we have per-IRQ operations, and PPIs do have such ops attached to
+  them. Why can't this be moved to such a callback?
+
+>  	return 0;
+>  }
 >  
-> -	if (vcpu_has_nv(vcpu))
-> -		vgic_v3_nested_update_mi(vcpu);
-> +		if (vcpu_has_nv(vcpu))
-> +			vgic_v3_nested_update_mi(vcpu);
-> +	}
->  
->  	if (can_access_vgic_from_kernel())
->  		vgic_save_state(vcpu);
-> @@ -1034,7 +1038,9 @@ void kvm_vgic_process_async_update(struct kvm_vcpu *vcpu)
->  
->  static inline void vgic_restore_state(struct kvm_vcpu *vcpu)
+>  /* @irq->irq_lock must be held */
+>  static inline void kvm_vgic_unmap_irq(struct vgic_irq *irq)
 >  {
-> -	if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
-> +	if (vgic_is_v5(vcpu->kvm))
-> +		vgic_v5_restore_state(vcpu);
-> +	else if (!static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif))
->  		vgic_v2_restore_state(vcpu);
->  	else
->  		__vgic_v3_restore_state(&vcpu->arch.vgic_cpu.vgic_v3);
+> +	if (irq->directly_injected && vgic_is_v5(irq->target_vcpu->kvm))
+> +		WARN_ON(vgic_v5_set_ppi_dvi(irq->target_vcpu, irq->hwintid, false));
+> +
+> +	irq->directly_injected = false;
+>  	irq->hw = false;
+>  	irq->hwintid = 0;
+>  	irq->ops = NULL;
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 81d464d26534f..d7fe867a27b64 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -364,6 +364,7 @@ void vgic_debug_init(struct kvm *kvm);
+>  void vgic_debug_destroy(struct kvm *kvm);
+>  
+>  int vgic_v5_probe(const struct gic_kvm_info *info);
+> +int vgic_v5_set_ppi_dvi(struct kvm_vcpu *vcpu, u32 irq, bool dvi);
 
-I have similar comments as some the previous hunks. Using switch/case
-statements would be more readable IMO.
+Doing the above would keep these things private to the vgic-v5
+implementation.
 
 Thanks,
 
