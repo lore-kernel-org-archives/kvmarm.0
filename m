@@ -1,95 +1,314 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D318E3BA248
-	for <kvmarm@lists.linux.dev>; Wed,  4 Mar 2026 14:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8250B5478D;
+	Wed,  4 Mar 2026 14:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772633299; cv=none; b=nDatXFLgC5Y+Nqsb4fMgdUmh0bH6JbX3i66GFRIoG/NeJppfy+aO6pGhidFVB+OagWLKjrJ/hvRcTWIzHSMY6CMKVmXtTKv8allHMBcwJcWPaIHCGzo9n+Wt44jjEfRCRFEXEgBQraxj2ZeR58+3VFheGt9mW/nL4odFqaXczqI=
+	t=1772634068; cv=none; b=VifzJt6T4o0n9Cz/8B5p4s62V5Nv9FXNhfzgUbuEMCWzlDr95lC1wDuDB3QPFpRRN/C7wgLNVOrEbBVJeSYXgSGS/dCi/fPwpJgX0/syGSBWRylpTOxhhRL+xbpPTpyJYr/YDFb4S8zHcos2QweDiNc7zTGpMnHSVaOv/xDH1P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772633299; c=relaxed/simple;
-	bh=RlN6e8YUqUZvBpyKIk+jEAHmPAFSy30sIJkU6Fd/PU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GhONMQJlEvPzlsouK5rh30wZEWCjCqSmQE9Mv4hflVUb1YuCn2YK35IJP4lcP99BEPX2kDBv1WnrZGkTQduuJcSgeQALISiA+FgESDJz6Vn+C9iTaBPKZPhz8LMWrnk0IXVrYwCofHczOiDssasEj9AgC6xZIkWrZUwVcjSlpF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxBcEsGN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772634068; c=relaxed/simple;
+	bh=boCSUpadjNJNnBd+r191VSM+8Ky/O0cRPsC0IO4saYU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rnR17cGXdvpZQgASh8dANKphjXl9Cc1SZYmSZtNzfMZn+l8ocve4dAr6W4p2Qgrnw4FFPjakpEm523xNI4BShCteH/oT3qFPLVfohGCZEIneRGDrx0aT054KT0YnrX9sT41JaXc46JvlN3/tZeOWC1WtnepM66NZkxOUKjOpWmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R20nAC0y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxBcEsGN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7AAC4CEF7;
-	Wed,  4 Mar 2026 14:08:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R20nAC0y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CDD0C4CEF7;
+	Wed,  4 Mar 2026 14:21:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772633299;
-	bh=RlN6e8YUqUZvBpyKIk+jEAHmPAFSy30sIJkU6Fd/PU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AxBcEsGN1Hc+DNF0l3YqqsIZNXxDWnVXVmaGrsijnSWngNh5Yc3LMljz9COhNTMfX
-	 0ZIn6H18WgoNJEwgb77rsb9y6fxxqr2oWfRMN5glvUrDD4Q70ecICIDxPdzpxvdl03
-	 jJSoORO7Mzd+AU+RAeGBy54YDanpBtL8zBjbQAgFi5mgjDyljY934S3o9VDXuHzTOH
-	 ZFzQg0QIxrX/dX2JyXOO9r3QvX7JivHxxwahIhk/GbgsgSAN2TYC+NEFoe4fbNW09b
-	 JMoe+gnRcTXrD02hUkCwWnVY+dyGsATzLpPUiSGaQqM8xIUjntSwSBRRSxIFu4Lf1q
-	 ZwOSDUdM3/pNA==
-Date: Wed, 4 Mar 2026 14:08:13 +0000
-From: Will Deacon <will@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v2 24/35] KVM: arm64: Introduce hypercall to force
- reclaim of a protected page
-Message-ID: <aag8zZpi_r5hduQJ@willie-the-truck>
-References: <20260119124629.2563-1-will@kernel.org>
- <20260119124629.2563-25-will@kernel.org>
- <aY4LchRsyTvjIBVb@raptor>
+	s=k20201202; t=1772634068;
+	bh=boCSUpadjNJNnBd+r191VSM+8Ky/O0cRPsC0IO4saYU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R20nAC0yeVJzK9Guh6BogLMj/jwXHQFDlA9yPMyfnX1q/UtumpUMYU2CF01AjRPGP
+	 2U3vEx0+vXRyw69akcUz2Flrf3hI7xKBzyWb+VG6fvKz20YbRUTIvF3kQsN0baG48t
+	 VXmsFdEesMZ6nbfGd/xoo/GYdwWk9FtdxGH4jTi3DgeC/O53SVbCj6bB2uelyITdlH
+	 ySN+qWm6MwpUTykI3u8L9wEmqdtvKf+4KPoiSGqdcvTzFLYSb/osf7jnBkfWdO6nMd
+	 irCDsozjCSQE+lf2aNjIe54MbadcGZUVoPhgBrkpIJqVCmwJ/+isE3tHVrEWmP8VF9
+	 s1H4D1lQIBZjg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vxn61-0000000G4PP-2uwK;
+	Wed, 04 Mar 2026 14:21:05 +0000
+Date: Wed, 04 Mar 2026 14:21:05 +0000
+Message-ID: <86zf4n7k1a.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v5 20/36] KVM: arm64: gic-v5: Init Private IRQs (PPIs) for GICv5
+In-Reply-To: <20260226155515.1164292-21-sascha.bischoff@arm.com>
+References: <20260226155515.1164292-1-sascha.bischoff@arm.com>
+	<20260226155515.1164292-21-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aY4LchRsyTvjIBVb@raptor>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Feb 12, 2026 at 05:18:42PM +0000, Alexandru Elisei wrote:
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > index dee1a406b0c2..4cedb720c75d 100644
-> > --- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
-> > @@ -30,6 +30,12 @@ enum pkvm_page_state {
-> >  	 * struct hyp_page.
-> >  	 */
-> >  	PKVM_NOPAGE			= BIT(0) | BIT(1),
-> > +
-> > +	/*
-> > +	 * 'Meta-states' which aren't encoded directly in the PTE's SW bits (or
-> > +	 * the hyp_vmemmap entry for the host)
-> > +	 */
-> > +	PKVM_POISON			= BIT(2),
-> >  };
-> >  #define PKVM_PAGE_STATE_MASK		(BIT(0) | BIT(1))
+On Thu, 26 Feb 2026 16:00:36 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Looks a bit awkward to me, having the page state encoded using 3 bits, but the
-> mask only 2 bits.
+> Initialise the private interrupts (PPIs, only) for GICv5. This means
+> that a GICv5-style intid is generated (which encodes the PPI type in
+> the top bits) instead of the 0-based index that is used for older
+> GICs.
+> 
+> Additionally, set all of the GICv5 PPIs to use Level for the handling
+> mode, with the exception of the SW_PPI which uses Edge. This matches
+> the architecturally-defined set in the GICv5 specification (the CTIIRQ
+> handling mode is IMPDEF, so Level has been picked for that).
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-init.c | 39 +++++++++++++++++++++++++--------
+>  1 file changed, 30 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index d1db384698238..e4a230c3857ff 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -254,14 +254,20 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>  	int i;
+> +	u32 num_private_irqs;
 
-It's a little fiddly because we have three ways to track the page state:
+uber-nit: things look better like this:
 
-1. In the two software bits of the pte mapping the page. This uses
-   PKVM_PAGE_STATE_PROT_MASK.
+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+	u32 num_private_irqs;
+	int i;
 
-2. In the four bits of each 'struct hyp_page' entry in the
-   'hyp_vmemmap'. This means we can avoid fragmenting the host stage-2
-   page-table for pages that are shared. These use PKVM_PAGE_STATE_MASK.
+I know, that's silly. I'll take my pills shortly.
 
-3. States derived from an invalid pte that are never stored explicitly.
+>  
+>  	lockdep_assert_held(&vcpu->kvm->arch.config_lock);
+>  
+>  	if (vgic_cpu->private_irqs)
+>  		return 0;
+>  
+> +	if (vgic_is_v5(vcpu->kvm))
+> +		num_private_irqs = VGIC_V5_NR_PRIVATE_IRQS;
+> +	else
+> +		num_private_irqs = VGIC_NR_PRIVATE_IRQS;
+> +
+>  	vgic_cpu->private_irqs = kzalloc_objs(struct vgic_irq,
+> -					      VGIC_NR_PRIVATE_IRQS,
+> +					      num_private_irqs,
+>  					      GFP_KERNEL_ACCOUNT);
+>  
+>  	if (!vgic_cpu->private_irqs)
+> @@ -271,22 +277,37 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
+>  	 * Enable and configure all SGIs to be edge-triggered and
+>  	 * configure all PPIs as level-triggered.
+>  	 */
+> -	for (i = 0; i < VGIC_NR_PRIVATE_IRQS; i++) {
+> +	for (i = 0; i < num_private_irqs; i++) {
+>  		struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+>  
+>  		INIT_LIST_HEAD(&irq->ap_list);
+>  		raw_spin_lock_init(&irq->irq_lock);
+> -		irq->intid = i;
+>  		irq->vcpu = NULL;
+>  		irq->target_vcpu = vcpu;
+>  		refcount_set(&irq->refcount, 0);
+> -		if (vgic_irq_is_sgi(i)) {
+> -			/* SGIs */
+> -			irq->enabled = 1;
+> -			irq->config = VGIC_CONFIG_EDGE;
+> +		if (!vgic_is_v5(vcpu->kvm)) {
+> +			irq->intid = i;
+> +			if (vgic_irq_is_sgi(i)) {
+> +				/* SGIs */
+> +				irq->enabled = 1;
+> +				irq->config = VGIC_CONFIG_EDGE;
+> +			} else {
+> +				/* PPIs */
+> +				irq->config = VGIC_CONFIG_LEVEL;
+> +			}
+>  		} else {
+> -			/* PPIs */
+> -			irq->config = VGIC_CONFIG_LEVEL;
+> +			irq->intid = FIELD_PREP(GICV5_HWIRQ_ID, i) |
+> +				     FIELD_PREP(GICV5_HWIRQ_TYPE,
+> +						GICV5_HWIRQ_TYPE_PPI);
+> +
+> +			/* The only Edge architected PPI is the SW_PPI */
+> +			if (i == GICV5_ARCH_PPI_SW_PPI)
+> +				irq->config = VGIC_CONFIG_EDGE;
+> +			else
+> +				irq->config = VGIC_CONFIG_LEVEL;
+> +
+> +			/* Register the GICv5-specific PPI ops */
+> +			vgic_v5_set_ppi_ops(irq);
+>  		}
+>  
+>  		switch (type) {
 
-PKVM_POISON fits into the last category, and so isn't constrained by the
-masks.
+That's another point where I'd rather have structural changes to the
+code, moving the SGI/PPI init to their own helper:
 
-Perhaps I should rename PKVM_PAGE_STATE_MASK to something like
-PKVM_PAGE_STATE_VMEMMAP_MASK to make it clearer?
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 7df7b8aa77a69..0a2468fef86c6 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -262,6 +262,66 @@ int kvm_vgic_vcpu_nv_init(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
+ 
++static void vgic_init_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
++{
++	struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
++
++	INIT_LIST_HEAD(&irq->ap_list);
++	raw_spin_lock_init(&irq->irq_lock);
++	irq->vcpu = NULL;
++	irq->target_vcpu = vcpu;
++	refcount_set(&irq->refcount, 0);
++	irq->intid = i;
++
++	/*
++	 * Enable and configure all SGIs to be edge-triggered and
++	 * configure all PPIs as level-triggered.
++	 */
++	if (vgic_irq_is_sgi(i)) {
++		/* SGIs */
++		irq->enabled = 1;
++		irq->config = VGIC_CONFIG_EDGE;
++	} else {
++		/* PPIs */
++		irq->config = VGIC_CONFIG_LEVEL;
++	}
++
++	switch (type) {
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		irq->group = 1;
++		irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
++		break;
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++		irq->group = 0;
++		irq->targets = BIT(vcpu->vcpu_id);
++		break;
++	}
++}
++
++static void vgic_v5_init_private_irq(struct kvm_vcpu *vcpu, int i, u32 type)
++{
++	struct vgic_irq *irq = &vcpu->arch.vgic_cpu.private_irqs[i];
++
++	INIT_LIST_HEAD(&irq->ap_list);
++	raw_spin_lock_init(&irq->irq_lock);
++	irq->vcpu = NULL;
++	irq->target_vcpu = vcpu;
++	refcount_set(&irq->refcount, 0);
++
++	irq->intid = FIELD_PREP(GICV5_HWIRQ_ID, i) |
++		FIELD_PREP(GICV5_HWIRQ_TYPE,
++			   GICV5_HWIRQ_TYPE_PPI);
++
++	/* The only Edge architected PPI is the SW_PPI */
++	if (i == GICV5_ARCH_PPI_SW_PPI)
++		irq->config = VGIC_CONFIG_EDGE;
++	else
++		irq->config = VGIC_CONFIG_LEVEL;
++
++	/* Register the GICv5-specific PPI ops */
++	vgic_v5_set_ppi_ops(irq);
++}
++
+ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+@@ -285,53 +345,11 @@ static int vgic_allocate_private_irqs_locked(struct kvm_vcpu *vcpu, u32 type)
+ 	if (!vgic_cpu->private_irqs)
+ 		return -ENOMEM;
+ 
+-	/*
+-	 * Enable and configure all SGIs to be edge-triggered and
+-	 * configure all PPIs as level-triggered.
+-	 */
+ 	for (i = 0; i < num_private_irqs; i++) {
+-		struct vgic_irq *irq = &vgic_cpu->private_irqs[i];
+-
+-		INIT_LIST_HEAD(&irq->ap_list);
+-		raw_spin_lock_init(&irq->irq_lock);
+-		irq->vcpu = NULL;
+-		irq->target_vcpu = vcpu;
+-		refcount_set(&irq->refcount, 0);
+-		if (!vgic_is_v5(vcpu->kvm)) {
+-			irq->intid = i;
+-			if (vgic_irq_is_sgi(i)) {
+-				/* SGIs */
+-				irq->enabled = 1;
+-				irq->config = VGIC_CONFIG_EDGE;
+-			} else {
+-				/* PPIs */
+-				irq->config = VGIC_CONFIG_LEVEL;
+-			}
+-		} else {
+-			irq->intid = FIELD_PREP(GICV5_HWIRQ_ID, i) |
+-				     FIELD_PREP(GICV5_HWIRQ_TYPE,
+-						GICV5_HWIRQ_TYPE_PPI);
+-
+-			/* The only Edge architected PPI is the SW_PPI */
+-			if (i == GICV5_ARCH_PPI_SW_PPI)
+-				irq->config = VGIC_CONFIG_EDGE;
+-			else
+-				irq->config = VGIC_CONFIG_LEVEL;
+-
+-			/* Register the GICv5-specific PPI ops */
+-			vgic_v5_set_ppi_ops(irq);
+-		}
+-
+-		switch (type) {
+-		case KVM_DEV_TYPE_ARM_VGIC_V3:
+-			irq->group = 1;
+-			irq->mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
+-			break;
+-		case KVM_DEV_TYPE_ARM_VGIC_V2:
+-			irq->group = 0;
+-			irq->targets = BIT(vcpu->vcpu_id);
+-			break;
+-		}
++		if (type == KVM_DEV_TYPE_ARM_VGIC_V5)
++			vgic_v5_init_private_irq(vcpu, i, type);
++		else
++			vgic_init_private_irq(vcpu, i, type);
+ 	}
+ 
+ 	return 0;
 
-Will
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
