@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62925390C96
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB181A8F84
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721920; cv=none; b=G1H4rCQMhHdswqnlpNTlJS8YmVEC+AZQZLRu7F95dSAIEioeopZQ8V6FxlA7cnr645YZ3LZ8/ZOMhuILwZcAtkdGLhNaLsLLcvn7zmfCakQO3QmWhz6qjLKZb6tmQ064Y0kZkN1/kPJznRW850ZmPK5gsee/rIGDI2G+ZeKqPkw=
+	t=1772721924; cv=none; b=L3ivENXCYJhZopCTU/hn3qtDtgQJWhhSqdSjJ3ZM0LJ9DbMRAP2mOjo5fAh5E4M/uf4zHO/AswMhBLHJqa819cKnwzfrqGQSFCoU9aQHdfMrIhjUhzmbvnno1gbqintoVs9zLmrvVv+AlxkjHe5Scins6C12CTc6vGIVy92ZDtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721920; c=relaxed/simple;
-	bh=jo5H0E6SH6O/fs3rBJfbJtuNYHItTaG2D4uvmYjzhL4=;
+	s=arc-20240116; t=1772721924; c=relaxed/simple;
+	bh=5tzTDA/7up9FIAkii32jSMaz9AezpyfrV8bQYy76e9Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bSh+K0TtMr/1jCONaxM4LTm4QEE6CMrRxXKTi3zhWkzhLSTt/5yqUBBLfKRiTrzOe27fT6u8BRSjcM1xuFBD8Ggm3irOXtH9IyrUO5/9pLVIuuH7KepomAztZTqiRMBcOum8l2X9XG9cOIxIP/KUcBdKoW8KBz38MIYJG64LUSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtGyGCU8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=f7wcezcTiQWNjBAP45PiGpug2jpB+cHn3iHWARoHHPUCha8XguSu4cn0fdEg0l/7e2w4BFLA6zRi99BCKvY4AkDOpZUrGUFGei9vS35h8vo8KwPQnAHK2e3bfrt+kJx9EEbeXrzg2D9aCUsVdGsoJBJAcR9TJW1o64UtzJ4ksKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQNUEXtC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtGyGCU8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61620C116C6;
-	Thu,  5 Mar 2026 14:45:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQNUEXtC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBEA1C116C6;
+	Thu,  5 Mar 2026 14:45:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772721920;
-	bh=jo5H0E6SH6O/fs3rBJfbJtuNYHItTaG2D4uvmYjzhL4=;
+	s=k20201202; t=1772721923;
+	bh=5tzTDA/7up9FIAkii32jSMaz9AezpyfrV8bQYy76e9Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WtGyGCU83QD/IvGuaWl1dRNo1ASTL5d7zLsjQjmleQv+ruzgaveq/KxSaurPHqEC+
-	 HR6CH5BBmp9XZ+cpsRbcqZtmZlsDUSg/Zonl9USXdmrLKKJtcdADM3wudACHQcTVOK
-	 M8KwIQRUkSF3MGakgvMVcbuxXyrkPBto4H/XnoocmlagM6JG68yMUnDuLflZVp4nFO
-	 j61MNIQX1qpwEgsCDIvFupGfaxbkXQ4ozOl7j5osjEi2bRUBJ0DccRfpIPvKobkk9z
-	 Fbpix77s+bcwR6xjk5K0+Rs65IouAGElKhMQZY47y/LyuYOSg7EJfzFFS+/HyMj/pt
-	 +DHvP/Dwhd8Mw==
+	b=AQNUEXtCdZiSexapGSw48oKE4vGuoH70v7ReBRq90gAao0OdDJ/+8LsQmfo49pAk0
+	 7hJ7AusrTiC3nLuK+qKs+hGdDvgm7iB/T67Fy3QrJD/OZ8x396UP6qukjxzZCMxFdd
+	 bTnAbO2bf/7fXZNAweakQCheN9ldrwcvCOb1PImwfDmI1FfRdiyY8wveybAt383Vyk
+	 XpMUtMWvafJVl9D+Ys8r9dL7kqy8SpSVeuaT92hljsbFsspzuPTfzV3oCd7vpOPIBo
+	 ++i+c3QjQd9Bx4hszQYN1VUvG2yUcyj/HNNzc+H4iOOUY8o8hIIqiPLz+N0VzZUUk7
+	 aY41z5fqSRGfw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v3 20/36] KVM: arm64: Generalise kvm_pgtable_stage2_set_owner()
-Date: Thu,  5 Mar 2026 14:43:33 +0000
-Message-ID: <20260305144351.17071-21-will@kernel.org>
+Subject: [PATCH v3 21/36] KVM: arm64: Introduce host_stage2_set_owner_metadata_locked()
+Date: Thu,  5 Mar 2026 14:43:34 +0000
+Message-ID: <20260305144351.17071-22-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260305144351.17071-1-will@kernel.org>
 References: <20260305144351.17071-1-will@kernel.org>
@@ -55,134 +55,36 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-kvm_pgtable_stage2_set_owner() can be generalised into a way to store
-up to 59 bits in the page tables alongside a 4-bit 'type' identifier
-specific to the format of the 59-bit payload.
-
-Introduce kvm_pgtable_stage2_annotate() and move the existing invalid
-ptes (for locked ptes and donated pages) over to the new scheme.
+Rework host_stage2_set_owner_locked() to add a new helper function,
+host_stage2_set_owner_metadata_locked(), which will allow us to store
+additional metadata alongside a 3-bit owner ID for invalid host stage-2
+entries.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_pgtable.h  | 39 +++++++++++++++++++--------
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 16 +++++++++--
- arch/arm64/kvm/hyp/pgtable.c          | 33 ++++++++++++++---------
- 3 files changed, 62 insertions(+), 26 deletions(-)
+ arch/arm64/include/asm/kvm_pgtable.h  |  2 --
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 47 ++++++++++++++++++---------
+ 2 files changed, 32 insertions(+), 17 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index b6f7595c4979..e36c2908bdb2 100644
+index e36c2908bdb2..2df22640833c 100644
 --- a/arch/arm64/include/asm/kvm_pgtable.h
 +++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -100,13 +100,25 @@ typedef u64 kvm_pte_t;
+@@ -99,8 +99,6 @@ typedef u64 kvm_pte_t;
+ 					 KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W | \
  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
  
- #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
--#define KVM_MAX_OWNER_ID		3
- 
--/*
-- * Used to indicate a pte for which a 'break-before-make' sequence is in
-- * progress.
-- */
--#define KVM_INVALID_PTE_LOCKED		BIT(10)
-+/* pKVM invalid pte encodings */
-+#define KVM_INVALID_PTE_TYPE_MASK	GENMASK(63, 60)
-+#define KVM_INVALID_PTE_ANNOT_MASK	~(KVM_PTE_VALID | \
-+					  KVM_INVALID_PTE_TYPE_MASK)
-+
-+enum kvm_invalid_pte_type {
-+	/*
-+	 * Used to indicate a pte for which a 'break-before-make'
-+	 * sequence is in progress.
-+	 */
-+	KVM_INVALID_PTE_TYPE_LOCKED	= 1,
-+
-+	/*
-+	 * pKVM has unmapped the page from the host due to a change of
-+	 * ownership.
-+	 */
-+	KVM_HOST_INVALID_PTE_TYPE_DONATION,
-+};
- 
- static inline bool kvm_pte_valid(kvm_pte_t pte)
- {
-@@ -658,14 +670,18 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   void *mc, enum kvm_pgtable_walk_flags flags);
- 
- /**
-- * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-- *				    track ownership.
-+ * kvm_pgtable_stage2_annotate() - Unmap and annotate pages in the IPA space
-+ *				   to track ownership (and more).
-  * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-  * @addr:	Base intermediate physical address to annotate.
-  * @size:	Size of the annotated range.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-- * @owner_id:	Unique identifier for the owner of the page.
-+ * @type:	The type of the annotation, determining its meaning and format.
-+ * @annotation:	A 59-bit value that will be stored in the page tables.
-+ *		@annotation[0] and @annotation[63:60] must be 0.
-+ * 		@annotation[59:1] is stored in the page tables, along
-+ *		with @type.
-  *
-  * By default, all page-tables are owned by identifier 0. This function can be
-  * used to mark portions of the IPA space as owned by other entities. When a
-@@ -674,8 +690,9 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-  *
-  * Return: 0 on success, negative error code on failure.
-  */
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id);
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, enum kvm_invalid_pte_type type,
-+				kvm_pte_t annotation);
- 
- /**
-  * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
+-#define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
+-
+ /* pKVM invalid pte encodings */
+ #define KVM_INVALID_PTE_TYPE_MASK	GENMASK(63, 60)
+ #define KVM_INVALID_PTE_ANNOT_MASK	~(KVM_PTE_VALID | \
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index f673ebe7c888..b4c2ca86e5b3 100644
+index b4c2ca86e5b3..ed540ccd1595 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -549,10 +549,19 @@ static void __host_update_page_state(phys_addr_t addr, u64 size, enum pkvm_page_
+@@ -549,37 +549,54 @@ static void __host_update_page_state(phys_addr_t addr, u64 size, enum pkvm_page_
  		set_host_state(page, state);
- }
- 
-+static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
-+{
-+	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
-+}
-+
- int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
- {
-+	kvm_pte_t annotation;
- 	int ret = -EINVAL;
- 
-+	if (!FIELD_FIT(KVM_INVALID_PTE_OWNER_MASK, owner_id))
-+		return -EINVAL;
-+
- 	if (!range_is_memory(addr, addr + size))
- 		return -EPERM;
- 
-@@ -564,8 +573,11 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
- 		break;
- 	case PKVM_ID_GUEST:
- 	case PKVM_ID_HYP:
--		ret = host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.pgt,
--				      addr, size, &host_s2_pool, owner_id);
-+		annotation = kvm_init_invalid_leaf_owner(owner_id);
-+		ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
-+				      addr, size, &host_s2_pool,
-+				      KVM_HOST_INVALID_PTE_TYPE_DONATION,
-+				      annotation);
- 		if (!ret)
- 			__host_update_page_state(addr, size, PKVM_NOPAGE);
- 		break;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 9b480f947da2..84c7a1df845d 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -114,11 +114,6 @@ static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, s8 level)
- 	return pte;
  }
  
 -static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
@@ -190,93 +92,67 @@ index 9b480f947da2..84c7a1df845d 100644
 -	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
 -}
 -
- static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
- 				  const struct kvm_pgtable_visit_ctx *ctx,
- 				  enum kvm_pgtable_walk_flags visit)
-@@ -581,7 +576,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
- struct stage2_map_data {
- 	const u64			phys;
- 	kvm_pte_t			attr;
--	u8				owner_id;
-+	kvm_pte_t			pte_annot;
- 
- 	kvm_pte_t			*anchor;
- 	kvm_pte_t			*childp;
-@@ -798,7 +793,11 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
- 
- static bool stage2_pte_is_locked(kvm_pte_t pte)
+-int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
++#define KVM_HOST_DONATION_PTE_OWNER_MASK	GENMASK(3, 1)
++#define KVM_HOST_DONATION_PTE_EXTRA_MASK	GENMASK(59, 4)
++static int host_stage2_set_owner_metadata_locked(phys_addr_t addr, u64 size,
++						 u8 owner_id, u64 meta)
  {
--	return !kvm_pte_valid(pte) && (pte & KVM_INVALID_PTE_LOCKED);
-+	if (kvm_pte_valid(pte))
-+		return false;
-+
-+	return FIELD_GET(KVM_INVALID_PTE_TYPE_MASK, pte) ==
-+	       KVM_INVALID_PTE_TYPE_LOCKED;
- }
+ 	kvm_pte_t annotation;
+-	int ret = -EINVAL;
++	int ret;
  
- static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_t new)
-@@ -829,6 +828,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 				 struct kvm_s2_mmu *mmu)
- {
- 	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-+	kvm_pte_t locked_pte;
- 
- 	if (stage2_pte_is_locked(ctx->old)) {
- 		/*
-@@ -839,7 +839,9 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
- 		return false;
- 	}
- 
--	if (!stage2_try_set_pte(ctx, KVM_INVALID_PTE_LOCKED))
-+	locked_pte = FIELD_PREP(KVM_INVALID_PTE_TYPE_MASK,
-+				KVM_INVALID_PTE_TYPE_LOCKED);
-+	if (!stage2_try_set_pte(ctx, locked_pte))
- 		return false;
- 
- 	if (!kvm_pgtable_walk_skip_bbm_tlbi(ctx)) {
-@@ -964,7 +966,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (!data->annotation)
- 		new = kvm_init_valid_leaf_pte(phys, data->attr, ctx->level);
- 	else
--		new = kvm_init_invalid_leaf_owner(data->owner_id);
-+		new = data->pte_annot;
- 
- 	/*
- 	 * Skip updating the PTE if we are trying to recreate the exact
-@@ -1118,16 +1120,18 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	return ret;
- }
- 
--int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
--				 void *mc, u8 owner_id)
-+int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-+				void *mc, enum kvm_invalid_pte_type type,
-+				kvm_pte_t pte_annot)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
- 		.mmu		= pgt->mmu,
- 		.memcache	= mc,
--		.owner_id	= owner_id,
- 		.force_pte	= true,
- 		.annotation	= true,
-+		.pte_annot	= pte_annot |
-+				  FIELD_PREP(KVM_INVALID_PTE_TYPE_MASK, type),
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
-@@ -1136,7 +1140,10 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.arg		= &map_data,
- 	};
- 
--	if (owner_id > KVM_MAX_OWNER_ID)
-+	if (pte_annot & ~KVM_INVALID_PTE_ANNOT_MASK)
-+		return -EINVAL;
-+
-+	if (!type || type == KVM_INVALID_PTE_TYPE_LOCKED)
+-	if (!FIELD_FIT(KVM_INVALID_PTE_OWNER_MASK, owner_id))
++	if (owner_id == PKVM_ID_HOST)
  		return -EINVAL;
  
- 	ret = kvm_pgtable_walk(pgt, addr, size, &walker);
+ 	if (!range_is_memory(addr, addr + size))
+ 		return -EPERM;
+ 
++	if (!FIELD_FIT(KVM_HOST_DONATION_PTE_OWNER_MASK, owner_id))
++		return -EINVAL;
++
++	if (!FIELD_FIT(KVM_HOST_DONATION_PTE_EXTRA_MASK, meta))
++		return -EINVAL;
++
++	annotation = FIELD_PREP(KVM_HOST_DONATION_PTE_OWNER_MASK, owner_id) |
++		     FIELD_PREP(KVM_HOST_DONATION_PTE_EXTRA_MASK, meta);
++	ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
++			      addr, size, &host_s2_pool,
++			      KVM_HOST_INVALID_PTE_TYPE_DONATION, annotation);
++	if (!ret)
++		__host_update_page_state(addr, size, PKVM_NOPAGE);
++
++	return ret;
++}
++
++int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
++{
++	int ret = -EINVAL;
++
+ 	switch (owner_id) {
+ 	case PKVM_ID_HOST:
++		if (!range_is_memory(addr, addr + size))
++			return -EPERM;
++
+ 		ret = host_stage2_idmap_locked(addr, size, PKVM_HOST_MEM_PROT);
+ 		if (!ret)
+ 			__host_update_page_state(addr, size, PKVM_PAGE_OWNED);
+ 		break;
+ 	case PKVM_ID_GUEST:
+ 	case PKVM_ID_HYP:
+-		annotation = kvm_init_invalid_leaf_owner(owner_id);
+-		ret = host_stage2_try(kvm_pgtable_stage2_annotate, &host_mmu.pgt,
+-				      addr, size, &host_s2_pool,
+-				      KVM_HOST_INVALID_PTE_TYPE_DONATION,
+-				      annotation);
+-		if (!ret)
+-			__host_update_page_state(addr, size, PKVM_NOPAGE);
++		ret = host_stage2_set_owner_metadata_locked(addr, size,
++							    owner_id, 0);
+ 		break;
+ 	}
+ 
 -- 
 2.53.0.473.g4a7958ca14-goog
 
