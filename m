@@ -1,151 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EA2235063;
-	Thu,  5 Mar 2026 13:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB0D3A4520;
+	Thu,  5 Mar 2026 13:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772716957; cv=none; b=iiYH+RK7Do5sf5LqyP4KJtlM78XW7KAgi+5d8t103zcgt43KLcZ/u6ISrZYUvWBfWEN52fMyLHKeeHPwSc6M/ZOPbbjMkXRmkaccyYWj7UUt228rAgEZjVEmUeZC1pqJWdZrGN5uZz6ZJALr3it9Fh5PHvi4QibVBYIt8TQgnAo=
+	t=1772717281; cv=none; b=IY5usXfTaQeGc0oxDs3JBVmL2Vhr8HJz5DTSaGvDsmLLjS4SgtTBJwS1Uz4m/2Si8n1iFGNfG3IBm0ojC1gUf0XB46b5iPiebqeN0UfZ/fvnxBeMbIL91797PEeEuF91wVE5H76wMJJPeHkMGnOJiG7Jrolifn2PRPJswc9e7B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772716957; c=relaxed/simple;
-	bh=HoeOEnJJ3rV6xiUN02dBgGjyaUSeSVtm+8KWX9i/zkQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RIqncEKA/s2cOOaqXWtDQ2ThoOfklqaB+qxZUOJxzfA2yPVXkLeF9T9uzX7kATgUZpJ0uk5iGBHeU/IPvmEU2/a3GYudc9fE0990lWRZG2m/xl2qnNUNrpA0lnqps6PF9D0kte4b2blHWR++ZBAXsbmIzlrgMCvVWYpWxLcuZfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UMWQAHqt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772717281; c=relaxed/simple;
+	bh=lnBSHxmNphnGNCi22PlaGFKdvnE9IXS9939YI+0IHf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gSKXPVlmR4ETq+P45jVWtSZ1Pisw7jyfu4wNvw1SbYINmGkcTycII2FBRAkTuP6uH0TEeflSQnw+rkvW36eMhOm8In0FeXnHdjijpk3cN5Os0V1mk8cFgkRcaOTdCalEUMMMUMR0X0WvEJx0PGBXxFEPzPMkz2IRxgFVL80bXV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LetMebQD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UMWQAHqt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B1EBC116C6;
-	Thu,  5 Mar 2026 13:22:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LetMebQD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12A6CC116C6;
+	Thu,  5 Mar 2026 13:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772716956;
-	bh=HoeOEnJJ3rV6xiUN02dBgGjyaUSeSVtm+8KWX9i/zkQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UMWQAHqtL6hz0qbk7PAyTnVidzD6kRo8NpzuAuCNGwv7oe2iMZb2M171Oora0L3uD
-	 edcSPXQ2OU/YUlS65eAxfUkWg6kZwp538Hjb1HBZBaO9GqtDhqB/Y3wbxez0gf9rAm
-	 2XfqDs7k2ijLpuolP2cu2ec5yM/DVVQNvsrFwOCzrWwaJpx0ZhuVJCL1ktM/PK4MrX
-	 QZ6HyZxeoR5FRvBuL4EWKx7U1GzjmRX/MEzc27Hj5CK5V837UG0eTWsO+7I35za2cO
-	 QBLwp1KBEBJl4Fe1qr2ztrHisJgVSjcBmlWe28VEnPt/CVF1jjGlW6FYF37Uwti/6G
-	 sqIJxcosn+XZg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1772717281;
+	bh=lnBSHxmNphnGNCi22PlaGFKdvnE9IXS9939YI+0IHf0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LetMebQDnbnkvkpZ77o4DJegqdAtRxcSwn2e975//5D15F2wztxAf6ue0O1wcByQz
+	 uJ+bbLHmbT0GAE6/l3QQlflrP9/sgfSRgoQbPZmTZTynD/FwJHR5RGSygFhtIn2SkM
+	 a5n1U5V0UGJmuLYe6m4KE+u6MEetsu3ELvKiz3axzLeagbC+DOMKoqDS6J5DaPKAOT
+	 QT8o0BGvLvl13qZYSPoDt4uq47vSpvg8qYu3VWDi39nrPlMYkPn7dwHqVbOLpMlWc7
+	 9yps8TnTd2J0Xk82h14cyL9endiFGiz4W/MCnMWx7ELXvcVQMe1tDRgYGTzDi9zchQ
+	 ydHvonROTXS7w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vy8ew-0000000GSPP-0YCu;
-	Thu, 05 Mar 2026 13:22:34 +0000
-Date: Thu, 05 Mar 2026 13:22:33 +0000
-Message-ID: <86o6l276na.wl-maz@kernel.org>
+	id 1vy8kA-0000000GST7-3TSz;
+	Thu, 05 Mar 2026 13:27:58 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	Joey Gouly <joey.gouly@arm.com>,
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Leo Yan <leo.yan@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Adjust range correctly during host stage-2 faults
-In-Reply-To: <fdqyxxlu2n4hngowq2ksllhwew33swrsj6mqpeyzb7vaofzuzf@ks7z6dnatyoo>
-References: <20250625105548.984572-1-qperret@google.com>
-	<86wlzr77cn.wl-maz@kernel.org>
-	<86seae7dg1.wl-maz@kernel.org>
-	<fdqyxxlu2n4hngowq2ksllhwew33swrsj6mqpeyzb7vaofzuzf@ks7z6dnatyoo>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Fuad Tabba <tabba@google.com>,
+	Quentin Perret <qperret@google.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] KVM: arm64: pkvm: Fallback to level-3 mapping on host stage-2 fault
+Date: Thu,  5 Mar 2026 13:27:51 +0000
+Message-ID: <20260305132751.2928138-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, leo.yan@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, tabba@google.com, qperret@google.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 05 Mar 2026 13:13:40 +0000,
-Quentin Perret <qperret@google.com> wrote:
-> 
-> On Thursday 05 Mar 2026 at 10:55:42 (+0000), Marc Zyngier wrote:
-> > On Wed, 04 Mar 2026 18:55:04 +0000,
-> > Marc Zyngier <maz@kernel.org> wrote:
-> > > 
-> > > On Wed, 25 Jun 2025 11:55:48 +0100,
-> > > Quentin Perret <qperret@google.com> wrote:
-> > > > 
-> > > > host_stage2_adjust_range() tries to find the largest block mapping that
-> > > > fits within a memory or mmio region (represented by a kvm_mem_range in
-> > > > this function) during host stage-2 faults under pKVM. To do so, it walks
-> > > > the host stage-2 page-table, finds the faulting PTE and its level, and
-> > > > then progressively increments the level until it finds a granule of the
-> > > > appropriate size. However, the condition in the loop implementing the
-> > > > above is broken as it checks kvm_level_supports_block_mapping() for the
-> > > > next level instead of the current, so pKVM may attempt to map a region
-> > > > larger than can be covered with a single block.
-> > > > 
-> > > > This is not a security problem and is quite rare in practice (the
-> > > > kvm_mem_range check usually forces host_stage2_adjust_range() to choose a
-> > > > smaller granule), but this is clearly not the expected behaviour.
-> > > > 
-> > > > Refactor the loop to fix the bug and improve readability.
-> > > > 
-> > > > Fixes: c4f0935e4d95 ("KVM: arm64: Optimize host memory aborts")
-> > > > Signed-off-by: Quentin Perret <qperret@google.com>
-> > > 
-> > > This patch prevents my O6 board from booting in protected mode as of
-> > > e728e705802fe. Reverting it on top of 7.0-rc2 make the box work again.
-> > > 
-> > > I haven't quite worked out why though. The hack below makes it work,
-> > > but implies that we can get ranges that are smaller than a page.  That
-> > > feels unlikely, but I'm not sure we can rule it out (the kernel page
-> > > size could be pretty large anyway).
-> > 
-> > Having spent a bit of time on this, I'm pretty sure this is the cause
-> > of the issue. The memblock tables are as such:
-> > 
-> > maz@cosmic-debris:~/vminstall$ sudo cat /sys/kernel/debug/memblock/memory
-> >    0: 0x0000000080000000..0x00000000843fffff    0 NOMAP
-> >    1: 0x0000000084400000..0x00000000845fffff    0 NONE
-> >    2: 0x0000000085000000..0x000000009fffffff    0 NONE
-> >    3: 0x00000000a0000000..0x00000000a7ffffff    0 NOMAP
-> >    4: 0x00000000a8000000..0x00000000fffbffff    0 NONE
-> >    5: 0x00000000fffc0000..0x00000000fffeffff    0 NOMAP
-> >    6: 0x00000000ffff0000..0x00000000ffffdfff    0 NONE
-> >    7: 0x00000000ffffe000..0x00000000ffffffff    0 NOMAP
-> >    8: 0x0000000100000000..0x00000007fe4effff    0 NONE
-> >    9: 0x00000007fe4f0000..0x00000007fedeffff    0 NOMAP
-> >   10: 0x00000007fedf0000..0x00000007ffffffff    0 NONE
-> >   11: 0x0000008000000000..0x000000807a290fff    0 NONE
-> >   12: 0x000000807a291000..0x000000807a2927b2    0 NOMAP
-> >   13: 0x000000807a2927b3..0x000000807fffffff    0 NONE
-> 
-> Ouch, these last few are 'interesting', oh well :-)
-> 
-> > Any access to page 0x000000807a292000 is going to blow up in your
-> > face, because there is no way you can map this and still respect the
-> > memblock boundary. Same thing for any region that is smaller than
-> > PAGE_SIZE, or not aligned on PAGE_SIZE. Which is even more annoying.
-> > 
-> > I'm starting to think that my hack is not that idiotic in the end...
-> 
-> Yes, I can't think of anything better TBH. We've already asserted that
-> we don't have an annotated PTE here, and at the last level we're
-> guaranteed not to accidentally map a neighbouring private region, so yes
-> we should just proceed with a page-aligned mapping there.
-> 
-> Want me to post a proper patch or do you already have one in stock?
+If, for any odd reason, we cannot converge to mapping size that is
+completely contained in a memblock region, we fail to install a S2
+mapping and go back to the faulting instruction. Rince, repeat.
 
-I have that ready, but I wanted your feedback on it before posting it.
+This happens when faulting in regions that are smaller than a page
+or that do not have PAGE_SIZE-aligned boundaries (as witnessed on
+an O6 board that refuses to boot in protected mode).
 
-I'll send that now.
+In this situation, fallback to using a PAGE_SIZE mapping anyway --
+it isn't like we can go any lower.
 
-Thanks,
+Fixes: e728e705802fe ("KVM: arm64: Adjust range correctly during host stage-2 faults")
+Link: https://lore.kernel.org/r/86wlzr77cn.wl-maz@kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Cc: stable@vger.kernel.org
+Cc: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	M.
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 38f66a56a7665..d815265bd374f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -518,7 +518,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
+ 		granule = kvm_granule_size(level);
+ 		cur.start = ALIGN_DOWN(addr, granule);
+ 		cur.end = cur.start + granule;
+-		if (!range_included(&cur, range))
++		if (!range_included(&cur, range) && level < KVM_PGTABLE_LAST_LEVEL)
+ 			continue;
+ 		*range = cur;
+ 		return 0;
 -- 
-Without deviation from the norm, progress is not possible.
+2.47.3
+
