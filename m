@@ -1,94 +1,94 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F5F3E120F
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 17:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AB83AE703
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 17:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731614; cv=pass; b=YGfnmzWziqoqg6chwBq1HvW4ReITpW1ChJuSh5f4QP885EUksvRxm/MnmUMA9buil3EYWHk0WHZREKGztjYUQbxZ+4NN+8NXDZjyk6CTARNcKcxNzVf7aoxhGLu5Yvb+JSqix/yOfOuy3hcZu/PpoLEbdMlZ3in50W+PiRdWcns=
+	t=1772731648; cv=pass; b=Uo8tpOu+1Hn07Ts2ViY8vujx6rGQbk3E6TOmIknfCbAoL5BeTjxf7Ux9FpjwJDJRp6JNZuC0dTe4DsXRHOIG4UH2tWKSsVoBDKw9x/SCJ2mD34YAS2ph6sJRHlaUbwaEL8SRzQVSldEoHWv8SlEdYVVxgHHi/RS/83kgkuVwUTw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731614; c=relaxed/simple;
-	bh=XOVsdktOF6nyNimRfFhPjPXph4/eizuY/zAJWFeEW6o=;
+	s=arc-20240116; t=1772731648; c=relaxed/simple;
+	bh=9xcoW1uuOqJuCGhLK0+3X+GsY8ZmUZ0iw8x7VjTHzj4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pTIizKZK0WeRGTtCOkkfMvYcbpvDxx4hVpv1uIPNOxfqZKXAJFoum2DxhLBhRmYRrT163SWXVVo/Af7qKghUK85bDC3Z/U0dH1oMsUY7L3Rq+SaQx92HyzHTH7S7+0ukSCPK+xZjXhGf8zNf/HlJRU5BAy8mCcDxcZkA5WUPSa8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sFg6rVr; arc=pass smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=po7dnPOYQUDl24TJsKT+Te8DGJjbfhjDIlO5d++PGCs/b8uvd+omkMd8eGrPQnd50dO0Y6LqzTaNZh7nmj3EexG9WO+tYY3pbD5VqNgMna3F0YpWsFgGkPIvwBWEbYa4FFEFe175idjs0BVqkPLSWC8Lx3ggICspKYoK/XXitFA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FgGSxSio; arc=pass smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sFg6rVr"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59e4a04f059so2677007e87.2
-        for <kvmarm@lists.linux.dev>; Thu, 05 Mar 2026 09:26:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772731611; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FgGSxSio"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3870df2331aso69217991fa.1
+        for <kvmarm@lists.linux.dev>; Thu, 05 Mar 2026 09:27:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772731646; cv=none;
         d=google.com; s=arc-20240605;
-        b=e3V2An2clGEKcpOPjNJE8xVPJsdUY+F1GN5qPYH8yTbH/m8zNE26j6nUR8wKCuJc+T
-         u0wKk7y1rjJQV3t2tVhea6cnESO6Oubm3uldTWPe6QGH5ULpRMrJ65FptqnCmWNPZvMs
-         gIlSjZ1x2TWGhq1JGk/il1gK3Kcx8A1L+sB4cIUbXjLv58QdvRTJjWAHhomfP9DVgZZ+
-         JztST/eswtBNXW6uEICJ3Doa7asAd8q2yoef/BsCmMs/kpvBhhrsNAoEQMay+gD0uoNB
-         3IWWtYXpAJP0J2ROrXeMfB3/IrHlJve5NfZHn8jILFrIN3Z5/AmGh1qz4uBNIP3VngPC
-         ORog==
+        b=eLwbLVXWHP6qCyt58vEmtLdz1ndk50pjgpiczL58OMxNt1FmcDWADTuOnQdCkXHZpE
+         UwIVyvNfzvMwm3sJZT0J5vD2oQC6ebroQ7sfK4Ft4tiCFg98O8EKSEjgon/hbjpmPAcY
+         LJNw1A7Jp+Iunjnxs7ZqpUYotc5ljt6thFWxMtT4GlfVTccD1pBvoDRF8d5PXngoBtVA
+         DsS+sX/J9DwN/nA/ZDA5cSoLGkcGj8H72laxZtiJ+NKxRlthEnOs7B5DsgXW+FE+FBx0
+         Md4lLi3kVkB9kV9AcaUJR/WD9BD8BqIT4p+Or5VwaVfSarO32O4rdd+qeEPMR11CYoCA
+         ji7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
-        fh=nuxjztxEMR81PqZ/zuTM5Ipl3HI1MiSjszbNOc31oDw=;
-        b=Nvz7SnehTZQxbpUB1ui447az5dhnQp2Tjzx1xSaaok36lhZBMSXcTE++Z/3zmtI7D8
-         E2P8sglmJtrkeai7VnzTLvRJphWQzROpmCnInMcaXNUVxRXmYVVigQeMts5BYAjntip/
-         6pbEyg/WqCYGL3iqlSxp7zfVoYi7TGn4UtZRMgShF0M0lYN3OopehQz2d+Eahnb063R1
-         bBv/glGMNXlrMeJQPnjy/ST+Kqs4jh8m/oXw5cSRfgdhnZrWSYiTsNHT3ZLOONmHhz+h
-         t9ezMBEs5TAzaBHaakHANV8gTe3orLKdjbtWG1u+Otarh+TlcqG9DABXWnHgZCdtcjGB
-         90QQ==;
+        bh=9xcoW1uuOqJuCGhLK0+3X+GsY8ZmUZ0iw8x7VjTHzj4=;
+        fh=zIGJ8VzhJZ6j13NsWgQlo2Qk+juCwhy0xpCP9yyJElQ=;
+        b=I7mYeNUBjFF0FJSsuRb0NH1A4aMcSyHb0bT7aSHzGrSwPVUxHn3uCSjA/cIj8v9M5L
+         FveIDIyy9RmBkMU3ZLetarpm18z9raHzf84jncsaTCzsaBnWAwisyGpu2jkGTANVSsgf
+         D+PCv46c7EJSt/YJqKHeyknUQIFdUZsQK3raGb12IGeX+C6YUxexzmKWBRU+cNAGqOYv
+         r7SQPKb54dzviJoh272daOftZn7K6oSM0v4d5VTRFc49a0F6U7jENLVKoh7o2yT7Nesl
+         R5OziWuL+KERcbGmIdjd8So98Ygk9yCq3T5zqfZv761CjgZqLkewF3xl0e5ykzDVAJWA
+         0nbg==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772731611; x=1773336411; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1772731646; x=1773336446; darn=lists.linux.dev;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
-        b=1sFg6rVr610kMpiCOyxBF5yQC4uz7Pw5dCsfWirB5URLASZ4E5xoUGkTl/EIQXGsq/
-         tvnh9T033QauoXrfG7YmUJ0thDtITHTkJ6oEqhS/nvf60kaEm89zOTXfPDE6CT+v2hiS
-         kA/lCXtO/t2N5am0oQf+XT5GJEeAA8E+DIw/1RflRrEr/jPmm9O92TlGnynEe95pX8+W
-         lXqhuPoi9C344Ezo6V84uBCsqZHQlNwnMtpX15HAKtXC+GncUSSzWIwZQUXaJXku5Qii
-         ViaOjLO9RVxiLAKNPSqGCXXuWvkONBbbEaEtveEgH6gpD5xYbH0LxEGvd5Ce/e1hWjB3
-         zepw==
+        bh=9xcoW1uuOqJuCGhLK0+3X+GsY8ZmUZ0iw8x7VjTHzj4=;
+        b=FgGSxSioHSGBCB2Y3UHDg4eLGv0j7nnkKFSO100nQqEKYJQITkiclTj20shr3nULab
+         lBk+gcbn+PzeEI7wOGKCWwJj8X4EtFq5Wz7bSB6onqiWlZynycUe8tUgwEp7GMRfzXjV
+         KHhdRMknVNfxf7Q5AJvd84dyhrKjrofjJOwdAXe7Xq2L/XIgr0ltrlT/8rlWTiOp86gT
+         hNw5xhDkefhSlKJD1w+HkRpg7SZP/cQx6TH1E/EUA+7Vimw2N4CAGmZDrUToxXKXspYv
+         Q/q0KF68Cr9b++D5leEOPEi2YRRRzmMBipTdimN7gcpWWiB6Dx/1nreL/OX9RXmGYQGC
+         49Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772731611; x=1773336411;
+        d=1e100.net; s=20230601; t=1772731646; x=1773336446;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
-        b=j7bp2LIJ1S9zcrPZMyRh/9waw5KNAX1vfAbBdmAqVCDtAvZvV12XZkuMBZWcIqmhDe
-         dpRc3fT2l0vjAz37n5phAmFiMNJAHgHGx8ExOTovNKQRR+YAfHP6CQr4a2WyWrO/ky0B
-         Lr40pwfLUKqs8MTdxsXNuidcLfJu63ZCZ/fAgxlWKr/4UvqZf4b47GOtqeJlVIyxk5cS
-         5uUZ/uhxllDL4gBB5Av3VPmp0TyPOsTf2EQ5V0+ELnBAsOrAKQzW2iHmz+BMS9/VSlUm
-         OfE3p6UEepJksghd4c7Qoui3WGeKgI53NfL8w6ekiV6MTGjGLvTepSRchexT5akQCILR
-         mW0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWtcAImFFVA3df7ZRTbsyE1ab+4UInoCIPVogR++G/77cC0ONXR9PX4IGtbrxDNCEJwrrc0cbo=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwxYgBqROtRNW6Hf2QIg29dPPkiIC+IyAqcwBTMyaA+MXnomiGy
-	Pgz551SBCsxe3SGDYGooX7btIeVqjiAKNldEIa8Z87CxaH23CkgbNc6d1CxM8C/u9bl3KYrEty9
-	7ePia5kTzofjKcmiy5ZwJ7+PSTd3vNUkDoaleBeTu
-X-Gm-Gg: ATEYQzzDbd3v+QTQcJdbeEnUTImrCYFHrea880H73EcNAONSlThwHBgDKbVVOM1u9UY
-	vMJ6u/Tws+L3V/lfYKkhbFhTqQTjYdJt5g+RkIZbv2EEuFklvMaNhNRQBwq9usDsLWB5D3IFxvV
-	r/qhDSi+oq+naGEoar+Iz3tadKRhCgnVJWzBZYl/fcVtEk73dADLkAueNrKg+sPc+DROr+3ZuUC
-	0+w6vN0Ijbs5wPy5ZYn3UnUkVuRMAbC1PaUIAZB5yVsiRcUXSU0DvNjUAgfHDhan+oC4maXxgtL
-	H0ztCFfB
-X-Received: by 2002:a05:6512:696:b0:5a1:2f18:5e19 with SMTP id
- 2adb3069b0e04-5a12f185e8bmr1324271e87.22.1772731610293; Thu, 05 Mar 2026
- 09:26:50 -0800 (PST)
+        bh=9xcoW1uuOqJuCGhLK0+3X+GsY8ZmUZ0iw8x7VjTHzj4=;
+        b=eg4J+cWbuO+bj9R6mn8tCxNAkJZdqS1LyBvjy9izTCQxJOApwDeU2uNnwrhiXvUCl3
+         1fag6u5enlEJ5LwP1enkEPEzTgj5RF3aZZbnyB9YefAgNzUcz9eipwBLDbmm3vsJ/74t
+         KZqVPCelbIRfjk8wRPYNz7Jn/iFQioISuVImBY0ZJrt61kOjIWFEexxuKQIo+9dyNxV0
+         mBfCtiS0VMskJt6jBN/kd+fktGdwXwULMCf+WCNHIfynpt3SdsFWp43FtbuFMFQQm6B3
+         LMawDugymVgurV4D8h/BgNLVgv6N6SCnZt015RV5TKuWIpCiHTh8bu8SsjeyBIgLTXNq
+         vDVg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/PNObCIM2ul9Zh0pWfWG5Jt2UNlRRXUHF9KjbKVeh+BwkZJggxudN4CWqe6VuMPz/TEHLcNQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzC1s2GBxLFp+SIJG2U87n7YnXpv6oOlMIemM4PP4J1PgUpMRuy
+	dgoj2RJtXit4upxlbxjHbZ5/EV49/b/k91EXH6DGlQ9gwrtnuPTPg5Z8hFToNIyxvJ3kY71zvgx
+	RBJouUTKwDCJwMuALKym8STnHNy9zy8jg/SB5k1mM
+X-Gm-Gg: ATEYQzwrEWYWNqP4sgPJqAcDie29XDSKR/BBXJHWRm1tqpOi7/kxJVUfY2srLAb8Gi7
+	QFB6zLC4C3XoLuQejXfIQp6h/a8iFYrwL/Dxb7FDWm94Vcr4YL0bmSEIgfEbDis46cf9ppndHf7
+	hi+3Mw0EBO7/qhob8T+1ozb2JslCugaEQU6HAW4t15yz1U00YrvY/ZbcLofoX9AtB4Fdn3NOQaG
+	LO4tBdAsu6kfKlajruDkD25m/1uwED8ZT8GA7AJbIOLhYpVGNxVN84JUtvOoOvRj0oPTHgMfNcP
+	DGmkPDpY
+X-Received: by 2002:a2e:9797:0:b0:387:5ea:e298 with SMTP id
+ 38308e7fff4ca-38a35158513mr8005261fa.8.1772731645158; Thu, 05 Mar 2026
+ 09:27:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260220004223.4168331-1-dmatlack@google.com> <aam77t8fe5RKSr2Q@google.com>
-In-Reply-To: <aam77t8fe5RKSr2Q@google.com>
+References: <20260220004223.4168331-1-dmatlack@google.com> <20260220004223.4168331-5-dmatlack@google.com>
+ <aam7JsCyQ5Oacvl5@google.com>
+In-Reply-To: <aam7JsCyQ5Oacvl5@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Thu, 5 Mar 2026 09:26:22 -0800
-X-Gm-Features: AaiRm52LsX1aPJ2JM5xqUBPHr_QH0uBSIJaRMA7nyUfm3apWkfHV7m2i8095U3w
-Message-ID: <CALzav=etzo9A7FNQrbLCmj=pNLN5fO-a5isP1k6MuTDkJw1bqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] KVM: selftests: Use kernel-style integer and
- g[vp]a_t types
+Date: Thu, 5 Mar 2026 09:26:57 -0800
+X-Gm-Features: AaiRm51o6Q3ZTz6ECMDT5TdlqFdcggDf0j5vT0TJnm45bgTm8VbA0ynEnVZFATE
+Message-ID: <CALzav=fV4NX=pxKfX7hH+tO3FBNcSF1KstXsKqprpCj64Ndx2Q@mail.gmail.com>
+Subject: Re: [PATCH v2 04/10] KVM: selftests: Use u64 instead of uint64_t
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
 	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
@@ -111,42 +111,14 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Ackerley Tng <ackerleytng@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 5, 2026 at 9:22=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+On Thu, Mar 5, 2026 at 9:19=E2=80=AFAM Sean Christopherson <seanjc@google.c=
 om> wrote:
 >
 > On Fri, Feb 20, 2026, David Matlack wrote:
-> > This series renames types across all KVM selftests to more align with
-> > types used in the kernel:
-> >
-> >   vm_vaddr_t -> gva_t
-> >   vm_paddr_t -> gpa_t
-> >
-> >   uint64_t -> u64
-> >   uint32_t -> u32
-> >   uint16_t -> u16
-> >   uint8_t  -> u8
-> >
-> >   int64_t -> s64
-> >   int32_t -> s32
-> >   int16_t -> s16
-> >   int8_t  -> s8
-> >
-> > The goal of this series is to make the KVM selftests code more concise
-> > (the new type names are shorter) and more similar to the kernel, since
-> > selftests are developed by kernel developers.
-> >
-> > v2:
-> >  - Reapply the series on top of kvm/queue
-> >
-> > v1: https://lore.kernel.org/kvm/20250501183304.2433192-1-dmatlack@googl=
-e.com
+> > -static uint64_t pread_uint64(int fd, const char *filename, uint64_t in=
+dex)
+> > +static u64 pread_uint64(int fd, const char *filename, u64 index)
 >
-> Sorry, I was too slow and missed the window to get this into kvm/next wit=
-hout
-> causing a disaster of merge conflicts.
->
-> I don't think you need to send a v3 though.  I'll prep a v3, a branch, an=
-d send
-> Paolo a pull request during the next merge window.
+> I think it's also worth converting the function to pread_u64().
 
-Sounds good, thanks Sean.
+Good eye :). Yes agreed.
