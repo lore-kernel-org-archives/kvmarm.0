@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A0013C918
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364A73A1A59
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721180; cv=none; b=SUrM7nr1kBqL3JSvpRMN4zIZiaPdQ5HiLcRmoFPtS6v49dMuHfeLgNQKE17XeouIWz55G2zHfLNUdO32CX7WevhdKkq3RtpJIU0x8NOmjdibyXchAUwj3reEYkh3qFKfotCgmqSFAPtbXgtGukiEeFlHXZhAIzRIPLoUd96gw4Q=
+	t=1772721204; cv=none; b=hvoosJ7w2EmIBtygYEshWcilxP+2RIbJR9/x6FXcRWTL/s/Jr/yyRHapnLg2GGJzqXY/l54FDNsJwo8r3F7LqlenZhkkE4x7NpoBtf9TZn/ybPfCoued0fnAa5Nm6TTkYgdfmboFwoBhhPvA427jTxYSEaAjiAIQ09NgZ6stlJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721180; c=relaxed/simple;
-	bh=cZO6dCpt0PwPwyFlyqp9lDdewbXDrNxzC0E2dFssjr8=;
+	s=arc-20240116; t=1772721204; c=relaxed/simple;
+	bh=OySpI3JAnSwg1LMlIlUl9oekpXMcX1pam0E670cUMlI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ez9kLxJ8Es8+xFqB1y+BF9EbiLqqkQ8vief4T5kirfPt/m+94C3EimYmZN7p/SFG+wiy9sk3J7sHVGNOCClZdIt0Lzx3kJqfCjylotbnooWiQC3WscZo4TlmHbbyK8xXC9yBESwaeg6ZxOzk9m47xzpRTdZXoIuVw+RrV6sjX5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VeGUumLJ; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=OmhJNiJlLSznC7Sk7ha7NgaO/bVNMgEHwCEQ0RKd58iQlqgH4B8t0ArvpLg3QmRhDD9eO/UZZXNlgdqWW/H2ttumgGwy+k5nVRDHQABqP7oohxR1u7/adicKbIxpQEt+FKlMt8QhWH1Dh7PasZCkQmUFXmFOOZQYlHI4xsl65KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UcLlkiAZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VeGUumLJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D156C116C6;
-	Thu,  5 Mar 2026 14:32:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcLlkiAZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C03C116C6;
+	Thu,  5 Mar 2026 14:33:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772721179;
-	bh=cZO6dCpt0PwPwyFlyqp9lDdewbXDrNxzC0E2dFssjr8=;
+	s=k20201202; t=1772721203;
+	bh=OySpI3JAnSwg1LMlIlUl9oekpXMcX1pam0E670cUMlI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VeGUumLJg9Ecgb1G2OIvzx5YPaE355YP/2d4ad0wJ7yPFkxosRZoOx1nZVJay0ZJN
-	 wVOh/lC8yMSk/rD7p4Rawv/ccKouRzfC8wO438uQzXDjIRW0WDOvJU/BqhtwurVcfc
-	 +ZvX/DkJtaXxwDubC9+Bw9RVTrHxoo/IRsxjC5VBPqHRq+rqjHjfYqTwGea6WHe8LP
-	 Bvj55rHbqfiN+pV0OQTsec9boA+LpvgaAQ6c5dI0BJdtK8mWmlHWtwY3oBbrJn/7Yu
-	 ZRIbFZ99aTHTeGxtN3gLjUg+mhhwHLww3RZMHXPLxODGThYSuZGXGaSFTAR0OxJJdU
-	 qVGWmFk1WNjUQ==
-Date: Thu, 5 Mar 2026 14:32:54 +0000
+	b=UcLlkiAZydHSIkmBx6iTHRlXL4y3Xwh715dQq62HjfdsJBtNkTt6iw1gg1roh8eeR
+	 zG0m0Bo5DOXFm6l/PcEXfObxLrqSkfIeSBHINfFi3zyEvsItPVAgyPqS6oY+z9HMff
+	 nvEjSQ/TCsNopnVGNEEOfJI79ulhjopHRontWqiU0CNB4bJpIdoU0V/hsA1uUO3weA
+	 lW9VteU9+InuEjGwo0G5K2zNr9qg+Kf1WSSzAdcfKvbeEcX1qmMWD3R8rxqJdRTcJm
+	 1w3tD6Ce5WdXCils/R0lC1EE21biRLhnOhjyy5gNzb0yHPNWqacJPN0+o8LXSDX/F3
+	 4W1uzIwAT9OOg==
+Date: Thu, 5 Mar 2026 14:33:18 +0000
 From: Will Deacon <will@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
@@ -36,10 +36,11 @@ Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
 	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 4/4] KVM: arm64: Add SMC hook for SME dvmsync erratum
-Message-ID: <aamUFoQV74t4okXx@willie-the-truck>
+Subject: Re: [PATCH 2/4] arm64: tlb: Pass the corresponding mm to
+ __tlbi_sync_s1ish()
+Message-ID: <aamULrOkm8jd_9UY@willie-the-truck>
 References: <20260302165801.3014607-1-catalin.marinas@arm.com>
- <20260302165801.3014607-5-catalin.marinas@arm.com>
+ <20260302165801.3014607-3-catalin.marinas@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -48,81 +49,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260302165801.3014607-5-catalin.marinas@arm.com>
+In-Reply-To: <20260302165801.3014607-3-catalin.marinas@arm.com>
 
-On Mon, Mar 02, 2026 at 04:57:57PM +0000, Catalin Marinas wrote:
-> From: James Morse <james.morse@arm.com>
+On Mon, Mar 02, 2026 at 04:57:55PM +0000, Catalin Marinas wrote:
+> The mm structure will be used for workarounds that need limiting to
+> specific tasks.
 > 
-> C1-Pro cores with SME have an erratum where TLBI+DSB does not complete
-> all outstanding SME accesses. Instead a DSB needs to be executed on the
-> affecteed CPUs. The implication is pages cannot be unmapped from the
-> host stage2 then provided to the guest. Host SME accesses may occur
-> after this point.
-> 
-> This erratum breaks pKVM's guarantees, and the workaround is hard to
-> implement as EL2 and EL1 share a security state meaning EL1 can mask
-> IPI sent by EL2, leading to interrupt blackouts.
-> 
-> Instead, do this in EL3. This has the advantage of a separate security
-> state, meaning lower EL cannot mask the IPI. It is also simpler for EL3
-> to know about CPUs that are off or in PSCI's CPU_SUSPEND.
-> 
-> Add the needed hook.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Marc Zyngier <maz@kernel.org>
-> Cc: Oliver Upton <oupton@kernel.org>
 > Cc: Will Deacon <will@kernel.org>
 > Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>
-> Cc: Sudeep Holla <sudeep.holla@kernel.org>
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 17 +++++++++++++++++
->  include/linux/arm-smccc.h             |  5 +++++
->  2 files changed, 22 insertions(+)
+>  arch/arm64/include/asm/tlbflush.h | 10 +++++-----
+>  arch/arm64/kernel/sys_compat.c    |  2 +-
+>  2 files changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 38f66a56a766..ab7f9273fddf 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -5,6 +5,8 @@
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index 19be0f7bfca5..14f116bfec73 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -185,7 +185,7 @@ do {										\
+>   * Complete broadcast TLB maintenance issued by the host which invalidates
+>   * stage 1 information in the host's own translation regime.
 >   */
->  
->  #include <linux/kvm_host.h>
-> +#include <linux/arm-smccc.h>
-> +
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> @@ -28,6 +30,15 @@ static struct hyp_pool host_s2_pool;
->  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
->  #define current_vm (*this_cpu_ptr(&__current_vm))
->  
-> +static void pkvm_sme_dvmsync_fw_call(void)
-> +{
-> +	if (cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC)) {
-> +		struct arm_smccc_res res;
-> +
-> +		arm_smccc_1_1_smc(ARM_SMCCC_CPU_SME_DVMSYNC_WORKAROUND, &res);
-> +	}
-> +}
-> +
->  static void guest_lock_component(struct pkvm_hyp_vm *vm)
+> -static inline void __tlbi_sync_s1ish(void)
+> +static inline void __tlbi_sync_s1ish(struct mm_struct *mm)
 >  {
->  	hyp_spin_lock(&vm->lock);
-> @@ -553,6 +564,12 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
->  	if (ret)
->  		return ret;
+>  	dsb(ish);
+>  	__repeat_tlbi_sync(vale1is, 0);
+> @@ -317,7 +317,7 @@ static inline void flush_tlb_mm(struct mm_struct *mm)
+>  	asid = __TLBI_VADDR(0, ASID(mm));
+>  	__tlbi(aside1is, asid);
+>  	__tlbi_user(aside1is, asid);
+> -	__tlbi_sync_s1ish();
+> +	__tlbi_sync_s1ish(mm);
+>  	mmu_notifier_arch_invalidate_secondary_tlbs(mm, 0, -1UL);
+>  }
 >  
-> +	/*
-> +	 * After stage2 maintenance has happened, but before the page owner has
-> +	 * changed.
-> +	 */
-> +	pkvm_sme_dvmsync_fw_call();
+> @@ -371,7 +371,7 @@ static inline void flush_tlb_page(struct vm_area_struct *vma,
+>  				  unsigned long uaddr)
+>  {
+>  	flush_tlb_page_nosync(vma, uaddr);
+> -	__tlbi_sync_s1ish();
+> +	__tlbi_sync_s1ish(vma->vm_mm);
+>  }
+>  
+>  static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
+> @@ -391,7 +391,7 @@ static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
+>   */
+>  static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+>  {
+> -	__tlbi_sync_s1ish();
+> +	__tlbi_sync_s1ish(NULL);
 
-Please note that this will conflict with my patch series adding support
-for protected memory with pkvm. I _think_ the right answer is to
-move this call into host_stage2_set_owner_metadata_locked().
+Hmm, it seems a bit rubbish to pass NULL here as that means that we'll
+deploy the mitigation regardless of the mm flags when finishing the
+batch.
+
+It also looks like we could end up doing the workaround multiple times
+if arch_tlbbatch_add_pending() is passed a large enough region that we
+call __flush_tlb_range_limit_excess() fires.
+
+So perhaps we should stash the mm in 'struct arch_tlbflush_unmap_batch'
+alongside some state to track whether or not we have uncompleted TLB
+maintenance in flight?
 
 Will
