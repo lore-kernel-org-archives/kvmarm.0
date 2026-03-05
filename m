@@ -1,72 +1,46 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC4624886A
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5C53A451C
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772720419; cv=none; b=sAIdBblNpIMdzhfztEpvgnq+1Xr03ceNWPSFMweTvETW/iVFkSfnXwQTeim9S8gYlULCklL5lL9zGI3YGXlN/UmLhVUn0cTTCnMP41DKrnARYKn8dS0k3GA6eaOCfM4GZy8027wrQEQ9FUiqVNbalAnzEV49KgcoEMYwfaEz7+Q=
+	t=1772721138; cv=none; b=de3F+ZtujV2ULeiydzVq/AlTUZHgkcak68yzvFwNKhghFR3pfD5z//s/OsPcWxTnwTMhjs60TSrVGOUKyQ9VQcZ1B3JT/kO8GSoeXP19D4XXMGZYZKrRK1+dHneDI0m5Z0r6OlFa7JLAxKTwk1I2vH/gh96gbyP68GqQ+B9AyAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772720419; c=relaxed/simple;
-	bh=PwCYRuwsKmQUe+2zlK2nZChMpzwmoFOf29G9MiF8OBI=;
+	s=arc-20240116; t=1772721138; c=relaxed/simple;
+	bh=BDxRqGoVPIAZP5jThA2TA1n7z0JYbMMJCM69Dd0B96Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pv5K8aOW9+UB/l2ifmxSXBNGY6R9RWyToZbUiNBdO+QoYH9IYYSag9b3rVST+Wsj0M+g4wNQEY6MUKbqUyWroMhwSBP4FkNCF7Z9YE2OR9hpB67ISUCmHwrhHVwH6gan6aqI7kC1peeX7Qi9L+HLrKM2o8HjK+H95znlFkAecc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BwsKdZt0; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=uWWlQlfpsVMcjU8LVABAR/rOi0LP+AW33PWv8VEME2P0/CBbBrNkr79tNpUQSv68H6XX41Oc7dfCMcE3D1VC8zS0cRR42snqaJtJZy2XQ6yRNwa2bgRw0f57unU+dZMRft7RWLx5mTrHaNzT8bFs20HhAMM/UKKvzmChTz51GbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6BMuB0L; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BwsKdZt0"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-59e4989dacdso2636561e87.1
-        for <kvmarm@lists.linux.dev>; Thu, 05 Mar 2026 06:20:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772720416; x=1773325216; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KAuFRx7gtOPZDHLYd8gki/p+Ss0pYYeA/wECrBUdLlE=;
-        b=BwsKdZt0SnsBfERx+tDBOK6wbWAgx8CKrS5KMAlcCrF6LLkmg2mOOcUNZWlZ0KAgE4
-         9aQ5Ja6Rp4MK1d6mWvc7ibbcT5NTAhE/rE19zlbSnQSJ+qeg7sKdfOFeThsGiSRLIk5V
-         BAOGlZcNp34dZdQpgUEvt60eTht6ghUeQM1UeojpkWEBR04dIciWerOBmoNFepViA538
-         RU6Ma8hwD79u/LvNu7GSfqJ8Mb51+OIOhuGc1KlR/+2n1sNtWfQjAtB0jP7hKoIfBIn/
-         IgWM0w4b653k8ipLgeEXzJjp6Kgd4k8mXqF7fV29D1i6ynV9qzsSFwDcfKgc1ML6sVbn
-         C5wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772720416; x=1773325216;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KAuFRx7gtOPZDHLYd8gki/p+Ss0pYYeA/wECrBUdLlE=;
-        b=O535dEJozdpumZlr9WdqaG6b+5LGpJdrOJ/sd+cYZKF91NAMScM+djFnjFCTILtd98
-         VXWIePoLqqbgtnYmppvSdXaUrNz774Ao2NbvaFr0JEiuxNiDR7pssS56eQHgLsdFxT3x
-         3fDyJ/2mV5TYCqhBDEs6hCpLv0hBBhWrJ6Wk20OYcpTLC/fhcefIfX1JRcpFXbs4Ms+8
-         QA0+NbDxl4Wx2mPci8DMy81YVJ1nWJgixzYT87o0POCHvpkSnbmN7Hcji2fCoy5gTEyD
-         4tWXA9WNJAZVFo8/4TPgI8RgeV22wzlhmHoJVdEAv7OyeEsCcRgvefYy/6luvZ3dodEV
-         5hHQ==
-X-Gm-Message-State: AOJu0YyOi6wLGaBNWIJzuYfsXonbvMX0ZQcEYqClAJb4OIkZRY/N9FJs
-	alUOAiniGtIgBrh6GUliYl03vcHNfSUOys9sIVM4nLrAebIYn9k6StYftxSx7mc5ew==
-X-Gm-Gg: ATEYQzzItfGre1SRDFx9M16cRUD0Qtd/z6sgr/c/GHFf0XcHwVrZWNF6LSeU970jtOx
-	oNqTpD6lcHN0XYLc1+22q8KOv5vTeV0yvlaO9TCgJ7Yf9Qndtir4u8bDk6vDC05ceUHD9cVqhvQ
-	kPhsvvlJTGNVVMrQ7lqFIFVY1YxZ++S0j8o0Fr6Pw6nVi74e3X+3A3CJmzyMyW9+JQ+vZUt+iQU
-	dZCHZaRUDoc9iIhY+8npEozPp2VTGMISoGevVsZPvTlgHJuU4X9ZFCAKtLuxSxp75Dxb1I9vX3t
-	c+wFKgB9hTfx1I0NQmxsjqTI+B2KufePvUaiHv1oLqdUR1r2nEVGqalt+AYgzZWzOXRroOZQ2gM
-	H03ALz9dHB3GxCBsamqQt+6OE4TwkmbbxAxQYZlzJ5CrnjdMtzd6UfIQNFAKeMmSv1RyqFYOsvR
-	nR3iEQDTLZjDKSVrncGADUedQ8/qrDhRnqwvzR8D9sVAJ6bF/wxqyCkqQ=
-X-Received: by 2002:a05:6512:145a:20b0:5a1:378c:11e8 with SMTP id 2adb3069b0e04-5a1378c1480mr17473e87.14.1772720415482;
-        Thu, 05 Mar 2026 06:20:15 -0800 (PST)
-Received: from google.com (27.69.88.34.bc.googleusercontent.com. [34.88.69.27])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a13555df8csm249863e87.25.2026.03.05.06.20.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Mar 2026 06:20:14 -0800 (PST)
-Date: Thu, 5 Mar 2026 14:20:13 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Fuad Tabba <tabba@google.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: pkvm: Fallback to level-3 mapping on host
- stage-2 fault
-Message-ID: <frvqntoya3r5by3vx75eicvggmjnkrhqkxn62ealjjiuuuiwyw@rkngsfqxkxbn>
-References: <20260305132751.2928138-1-maz@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6BMuB0L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9A87C116C6;
+	Thu,  5 Mar 2026 14:32:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772721137;
+	bh=BDxRqGoVPIAZP5jThA2TA1n7z0JYbMMJCM69Dd0B96Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f6BMuB0LQdQojB3SzJVF9cI/GNdjZ45yhkZv+0JndOxbsgW6Vl/hDYpq0QPcMKtYZ
+	 SY9Q4MyF0P76suZ/AszzmZNjB3ZXonECq1868uUCyaw9UvQ+b2JL2ytjyiliWXUr0c
+	 F69z9IR4flhpaVv7sz5fsNLsttVVpefU+nUnlB+2I6v0tWq5YQBT668+Yb+v1VWxuC
+	 1gV+MRpdNXgdgZGIDOHHMQC/dVJZkI/dBQtEjEzrro4Q9jiMHyS3+waWrW4FtDhqWe
+	 h4cM2WIlOqd+ScCMfHaahf7CsHuKlMbiqLva0QDQcxzbPH5MODVf3X3+mjXp/nNtK3
+	 EC0FX8Hsh+S9Q==
+Date: Thu, 5 Mar 2026 14:32:11 +0000
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
+ acknowledgement
+Message-ID: <aamT6-Mvr9nI1unq@willie-the-truck>
+References: <20260302165801.3014607-1-catalin.marinas@arm.com>
+ <20260302165801.3014607-4-catalin.marinas@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -75,48 +49,125 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260305132751.2928138-1-maz@kernel.org>
+In-Reply-To: <20260302165801.3014607-4-catalin.marinas@arm.com>
 
-On Thursday 05 Mar 2026 at 13:27:51 (+0000), Marc Zyngier wrote:
-> If, for any odd reason, we cannot converge to mapping size that is
-> completely contained in a memblock region, we fail to install a S2
-> mapping and go back to the faulting instruction. Rince, repeat.
-> 
-> This happens when faulting in regions that are smaller than a page
-> or that do not have PAGE_SIZE-aligned boundaries (as witnessed on
-> an O6 board that refuses to boot in protected mode).
-> 
-> In this situation, fallback to using a PAGE_SIZE mapping anyway --
-> it isn't like we can go any lower.
-> 
-> Fixes: e728e705802fe ("KVM: arm64: Adjust range correctly during host stage-2 faults")
-> Link: https://lore.kernel.org/r/86wlzr77cn.wl-maz@kernel.org
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
-> Cc: Quentin Perret <qperret@google.com>
+On Mon, Mar 02, 2026 at 04:57:56PM +0000, Catalin Marinas wrote:
+> C1-Pro acknowledges DVMSync messages before completing the SME/CME
+> memory accesses. Work around this by issuing an IPI+DSB to the affected
+> CPUs if they are running in EL0 with SME enabled.
+
+Just to make sure I understand the implications, but this _only_ applies
+to explicit memory accesses from the SME unit and not, for example, to
+page-table walks initiated by SME instructions?
+
+> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Mark Brown <broonie@kernel.org>
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 38f66a56a7665..d815265bd374f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -518,7 +518,7 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
->  		granule = kvm_granule_size(level);
->  		cur.start = ALIGN_DOWN(addr, granule);
->  		cur.end = cur.start + granule;
-> -		if (!range_included(&cur, range))
-> +		if (!range_included(&cur, range) && level < KVM_PGTABLE_LAST_LEVEL)
->  			continue;
->  		*range = cur;
->  		return 0;
-> -- 
-> 2.47.3
-> 
+>  arch/arm64/Kconfig                | 12 +++++
+>  arch/arm64/include/asm/cpucaps.h  |  2 +
+>  arch/arm64/include/asm/cputype.h  |  2 +
+>  arch/arm64/include/asm/fpsimd.h   | 29 +++++++++++
+>  arch/arm64/include/asm/mmu.h      |  1 +
+>  arch/arm64/include/asm/tlbflush.h | 17 +++++++
+>  arch/arm64/kernel/cpu_errata.c    | 19 ++++++++
+>  arch/arm64/kernel/entry-common.c  |  3 ++
+>  arch/arm64/kernel/fpsimd.c        | 81 +++++++++++++++++++++++++++++++
+>  arch/arm64/kernel/process.c       |  7 +++
+>  arch/arm64/tools/cpucaps          |  1 +
+>  11 files changed, 174 insertions(+)
 
+[...]
 
-Reviewed-by: Quentin Perret <qperret@google.com>
+> @@ -575,6 +576,14 @@ static const struct midr_range erratum_spec_ssbs_list[] = {
+>  };
+>  #endif
+>  
+> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> +static void cpu_enable_sme_dvmsync(const struct arm64_cpu_capabilities *__unused)
+> +{
+> +	if (this_cpu_has_cap(ARM64_WORKAROUND_SME_DVMSYNC))
+> +		sme_enable_dvmsync();
+> +}
+> +#endif
+> +
+>  #ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_38
+>  static const struct midr_range erratum_ac03_cpu_38_list[] = {
+>  	MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+> @@ -901,6 +910,16 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+>  		.matches = need_arm_si_l1_workaround_4311569,
+>  	},
+>  #endif
+> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> +	{
+> +		.desc = "C1-Pro SME DVMSync early acknowledgement",
+> +		.capability = ARM64_WORKAROUND_SME_DVMSYNC,
+> +		.cpu_enable = cpu_enable_sme_dvmsync,
+> +		/* C1-Pro r0p0 - r1p2 (the latter only when REVIDR_EL1[0]==0 */
+> +		ERRATA_MIDR_RANGE(MIDR_C1_PRO, 0, 0, 1, 2),
+> +		MIDR_FIXED(MIDR_CPU_VAR_REV(1, 2), BIT(0)),
+> +	},
+> +#endif
 
-Thanks,
-Quentin
+An alternative to this workaround is just to disable SME entirely, perhaps
+by passing 'arm64.nosme' on the cmdline. Maybe we should disable the
+workaround in that case?
+
+> @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
+>  	put_cpu_fpsimd_context();
+>  }
+>  
+> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> +
+> +/*
+> + * SME/CME erratum handling
+> + */
+> +static cpumask_var_t sme_dvmsync_cpus;
+> +static cpumask_var_t sme_active_cpus;
+> +
+> +void sme_set_active(unsigned int cpu)
+> +{
+> +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
+> +		return;
+> +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
+> +		return;
+> +
+> +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
+> +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
+> +
+> +	cpumask_set_cpu(cpu, sme_active_cpus);
+> +
+> +	/*
+> +	 * Ensure subsequent (SME) memory accesses are observed after the
+> +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
+> +	 */
+> +	smp_mb();
+
+I can't convince myself that a DMB is enough here, as the whole issue
+is that the SME memory accesses can be observed _after_ the TLB
+invalidation. I'd have thought we'd need a DSB to ensure that the flag
+updates are visible before the exception return.
+
+> +void sme_do_dvmsync(void)
+> +{
+> +	/*
+> +	 * This is called from the TLB maintenance functions after the DSB ISH
+> +	 * to send hardware DVMSync message. If this CPU sees the mask as
+> +	 * empty, the remote CPU executing sme_set_active() would have seen
+> +	 * the DVMSync and no IPI required.
+> +	 */
+> +	if (cpumask_empty(sme_active_cpus))
+> +		return;
+> +
+> +	preempt_disable();
+> +	smp_call_function_many(sme_active_cpus, sme_dvmsync_ipi, NULL, true);
+> +	preempt_enable();
+> +}
+
+Why do we care about all CPUs using SME, rather than limiting it to the
+set of CPUs using SME with the mm we've invalidated? This looks like it
+will result in unnecessary cross-calls when multiple tasks are using SME
+(especially as the mm flag is only cleared on fork).
+
+Will
