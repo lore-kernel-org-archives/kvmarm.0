@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D203368AA
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:45:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CA43A7F72
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721948; cv=none; b=ta5Hlt982/1M1KDPKq19xLN//7fwDa4jbjYEMjlfAqvNBFBg5ycb3ovQUfkPkHl8lJvCF8XBx6tXReJT+YnrwZpy58WNjh/gOdbFu87fLNzJ8AyZlsPu3JptzF14oL0Tq68C2vIZrpImRRe06qTb5V4Mgdk/Iu4fuQFmKzvxun0=
+	t=1772721951; cv=none; b=uyt88Mnjaab5fITAMevcDoWmAyYYvM9+inommtJxUWuQyoxSi9WmSZDl4mJap2uFzRyLjCG/Ho04EBWtret6G18jFalCQV4aTv8W1lW8aVaIl1ZNYc0SXtkCIuuN0hbVxu5JnhPmszr5vsV21k1Til4UjHq25SMAXt/p0YiJiU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721948; c=relaxed/simple;
-	bh=SxVupkR9lrmKBLtRq5DSHfmprnSZ/st/c8udRURmZPU=;
+	s=arc-20240116; t=1772721951; c=relaxed/simple;
+	bh=v3KVb0ei2XKe7JH4mQ0tL3ZhknFGX3kJj3Ixv2atPic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=glUgOphkMtUX/89tKnfiVjpwE9MV7q/W7Mzh9lCbSqSmXnHLl5GcUG94jZk/VfFrMipJM5qCBFr5s6oy+fIXIgxt3YiSO5sQbvEJ++y8wsouuOy9k7RsNT6VOCzp1KWYKRD3eI4ak+AYW1ogHE/JGZY9Sii+DsVyn3QnZyb27QM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUJTMpa2; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VB8GPPEWFMeI4zGdV/tq+hM9Okw758b3EAL3hZ6QjRAR/9fgX28eGW4l9/QFO14dj/FBfdTBh0YBALsqiAsd83vJk5QIwFW1+W3FFsu/2EpzGsOp3P/D4+fsclmmB9foFNCl+7M0X8i8DvYKQZh2e+0BQSaRJhwZUZJb0PNZy24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ELDBMzL+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUJTMpa2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C988C116C6;
-	Thu,  5 Mar 2026 14:45:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELDBMzL+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C73C116C6;
+	Thu,  5 Mar 2026 14:45:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772721947;
-	bh=SxVupkR9lrmKBLtRq5DSHfmprnSZ/st/c8udRURmZPU=;
+	s=k20201202; t=1772721951;
+	bh=v3KVb0ei2XKe7JH4mQ0tL3ZhknFGX3kJj3Ixv2atPic=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BUJTMpa2GUW0BmuxG1CzdUcaHm/z6aXvExy+PVGencu385IhPXvqxm6cmfDt2UWoV
-	 5Gszf8D4zoAfAjzqrEE3WjdhkUCq5PXawaXrcaGBLIi6rFRBxiqsmXsnRmll6Dm52N
-	 ohqbg/T7RPT3LcxwlaOxOEBq89IHXiCU7rqpFMkvon00Vouleh0w7qLHtyDLqV+oVT
-	 3sHUnMb7R2IZge+x9gq9h7C1VqH5rQBrbzoUFGS/4uOQkpUyWSWZtKHjyvsImLg2A/
-	 H+JaM1+z1Dy8lm7aBRToM4AZAurPc7PIgHWOI5XYmeT+0t7GbrlwrZQ0h3MhQVNiPw
-	 v6P0Ey4n+pQbA==
+	b=ELDBMzL+5yewdZ8eTaRHY/0NCdHbmhFT7Xs7YJozcKml/YJ06vvg5QvZmdJXC3yru
+	 Mx78ooyba6FkO5U3rymr9mgEEyB89nX8LZYvt5IzUDTCvZdYj4qT3Edbt5dD6GsMdl
+	 IWLcmosBlBlarwAG9c1yQ7HQyWbNpvHku+mq8Dn4nmgT+/vlSaPWT8e/HXdEy2CmQK
+	 ZsexCB3Qvm1ie2NavWdvrevDQRDQ3MqqYBv5oDM6bsRU/TxCBw4uPHZRj4antrOkYK
+	 8Bgu8f3CvzYZBOOLSt6Mb8A77MTcHDA864vRUfAc07YzGoTaKGxQcZbwYClvU2lBPC
+	 2EWsOOMMsxskQ==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v3 28/36] KVM: arm64: Implement the MEM_SHARE hypercall for protected VMs
-Date: Thu,  5 Mar 2026 14:43:41 +0000
-Message-ID: <20260305144351.17071-29-will@kernel.org>
+Subject: [PATCH v3 29/36] KVM: arm64: Implement the MEM_UNSHARE hypercall for protected VMs
+Date: Thu,  5 Mar 2026 14:43:42 +0000
+Message-ID: <20260305144351.17071-30-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260305144351.17071-1-will@kernel.org>
 References: <20260305144351.17071-1-will@kernel.org>
@@ -55,41 +55,42 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the ARM_SMCCC_KVM_FUNC_MEM_SHARE hypercall to allow protected
-VMs to share memory (e.g. the swiotlb bounce buffers) back to the host.
+Implement the ARM_SMCCC_KVM_FUNC_MEM_UNSHARE hypercall to allow
+protected VMs to unshare memory that was previously shared with the host
+using the ARM_SMCCC_KVM_FUNC_MEM_SHARE hypercall.
 
 Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 32 ++++++++++
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 61 +++++++++++++++++++
- 3 files changed, 94 insertions(+)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 34 +++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 22 ++++++++++++
+ 3 files changed, 57 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 5e6cdafcdd69..42fd60c5cfc9 100644
+index 42fd60c5cfc9..e41a128b0854 100644
 --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
 +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -35,6 +35,7 @@ extern unsigned long hyp_nr_cpus;
- 
+@@ -36,6 +36,7 @@ extern unsigned long hyp_nr_cpus;
  int __pkvm_prot_finalize(void);
  int __pkvm_host_share_hyp(u64 pfn);
-+int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
+ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
++int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn);
  int __pkvm_host_unshare_hyp(u64 pfn);
  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
  int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 7f705f662c40..22d456ab15a6 100644
+index 22d456ab15a6..4451955ac767 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -959,6 +959,38 @@ int __pkvm_host_share_hyp(u64 pfn)
+@@ -991,6 +991,40 @@ int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
  	return ret;
  }
  
-+int __pkvm_guest_share_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
++int __pkvm_guest_unshare_host(struct pkvm_hyp_vcpu *vcpu, u64 gfn)
 +{
 +	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(vcpu);
-+	u64 phys, ipa = hyp_pfn_to_phys(gfn);
++	u64 meta, phys, ipa = hyp_pfn_to_phys(gfn);
 +	kvm_pte_t pte;
 +	int ret;
 +
@@ -101,16 +102,18 @@ index 7f705f662c40..22d456ab15a6 100644
 +		goto unlock;
 +
 +	ret = -EPERM;
-+	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) != PKVM_PAGE_OWNED)
++	if (pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte)) != PKVM_PAGE_SHARED_OWNED)
 +		goto unlock;
-+	if (__host_check_page_state_range(phys, PAGE_SIZE, PKVM_NOPAGE))
++	if (__host_check_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED))
 +		goto unlock;
 +
 +	ret = 0;
++	meta = host_stage2_encode_gfn_meta(vm, gfn);
++	WARN_ON(host_stage2_set_owner_metadata_locked(phys, PAGE_SIZE,
++						      PKVM_ID_GUEST, meta));
 +	WARN_ON(kvm_pgtable_stage2_map(&vm->pgt, ipa, PAGE_SIZE, phys,
-+				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_SHARED_OWNED),
++				       pkvm_mkstate(KVM_PGTABLE_PROT_RWX, PKVM_PAGE_OWNED),
 +				       &vcpu->vcpu.arch.pkvm_memcache, 0));
-+	WARN_ON(__host_set_page_state_range(phys, PAGE_SIZE, PKVM_PAGE_SHARED_BORROWED));
 +unlock:
 +	guest_unlock_component(vm);
 +	host_unlock_component();
@@ -122,87 +125,48 @@ index 7f705f662c40..22d456ab15a6 100644
  {
  	u64 phys = hyp_pfn_to_phys(pfn);
 diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 8b32bf37acc3..1dc9225073c4 100644
+index 1dc9225073c4..ebfd9904ede6 100644
 --- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
 +++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -967,6 +967,58 @@ int __pkvm_finalize_teardown_vm(pkvm_handle_t handle)
- 	hyp_spin_unlock(&vm_table_lock);
- 	return err;
+@@ -1019,6 +1019,19 @@ static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
  }
-+
-+static u64 __pkvm_memshare_page_req(struct kvm_vcpu *vcpu, u64 ipa)
-+{
-+	u64 elr;
-+
-+	/* Fake up a data abort (level 3 translation fault on write) */
-+	vcpu->arch.fault.esr_el2 = (ESR_ELx_EC_DABT_LOW << ESR_ELx_EC_SHIFT) |
-+				   ESR_ELx_WNR | ESR_ELx_FSC_FAULT |
-+				   FIELD_PREP(ESR_ELx_FSC_LEVEL, 3);
-+
-+	/* Shuffle the IPA around into the HPFAR */
-+	vcpu->arch.fault.hpfar_el2 = (HPFAR_EL2_NS | (ipa >> 8)) & HPFAR_MASK;
-+
-+	/* This is a virtual address. 0's good. Let's go with 0. */
-+	vcpu->arch.fault.far_el2 = 0;
-+
-+	/* Rewind the ELR so we return to the HVC once the IPA is mapped */
-+	elr = read_sysreg(elr_el2);
-+	elr -= 4;
-+	write_sysreg(elr, elr_el2);
-+
-+	return ARM_EXCEPTION_TRAP;
-+}
-+
-+static bool pkvm_memshare_call(u64 *ret, struct kvm_vcpu *vcpu, u64 *exit_code)
+ 
++static void pkvm_memunshare_call(u64 *ret, struct kvm_vcpu *vcpu)
 +{
 +	struct pkvm_hyp_vcpu *hyp_vcpu;
 +	u64 ipa = smccc_get_arg1(vcpu);
 +
 +	if (!PAGE_ALIGNED(ipa))
-+		goto out_guest;
++		return;
 +
 +	hyp_vcpu = container_of(vcpu, struct pkvm_hyp_vcpu, vcpu);
-+	switch (__pkvm_guest_share_host(hyp_vcpu, hyp_phys_to_pfn(ipa))) {
-+	case 0:
++	if (!__pkvm_guest_unshare_host(hyp_vcpu, hyp_phys_to_pfn(ipa)))
 +		ret[0] = SMCCC_RET_SUCCESS;
-+		goto out_guest;
-+	case -ENOENT:
-+		/*
-+		 * Convert the exception into a data abort so that the page
-+		 * being shared is mapped into the guest next time.
-+		 */
-+		*exit_code = __pkvm_memshare_page_req(vcpu, ipa);
-+		goto out_host;
-+	}
-+
-+out_guest:
-+	return true;
-+out_host:
-+	return false;
 +}
 +
  /*
   * Handler for protected VM HVC calls.
   *
-@@ -983,6 +1035,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+@@ -1036,6 +1049,7 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_HYP_MEMINFO);
-+		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE);
+ 		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_SHARE);
++		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MEM_UNSHARE);
  		break;
  	case ARM_SMCCC_VENDOR_HYP_KVM_HYP_MEMINFO_FUNC_ID:
  		if (smccc_get_arg1(vcpu) ||
-@@ -993,6 +1046,14 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
+@@ -1054,6 +1068,14 @@ bool kvm_handle_pvm_hvc64(struct kvm_vcpu *vcpu, u64 *exit_code)
  
- 		val[0] = PAGE_SIZE;
+ 		handled = pkvm_memshare_call(val, vcpu, exit_code);
  		break;
-+	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_SHARE_FUNC_ID:
++	case ARM_SMCCC_VENDOR_HYP_KVM_MEM_UNSHARE_FUNC_ID:
 +		if (smccc_get_arg2(vcpu) ||
 +		    smccc_get_arg3(vcpu)) {
 +			break;
 +		}
 +
-+		handled = pkvm_memshare_call(val, vcpu, exit_code);
++		pkvm_memunshare_call(val, vcpu);
 +		break;
  	default:
  		/* Punt everything else back to the host, for now. */
