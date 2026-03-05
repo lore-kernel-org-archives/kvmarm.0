@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4F93AE191
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9387E3A9D9E
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 14:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772721872; cv=none; b=miVAU6LGKkz/+cGCfzHT2lQdOBfojq/BYVWBKPHvY1akT2SqzzauC4P4KYaCJl9wT6TdJhSEAZ2MwYV0PapWc49n2rznsJxWAKsQVeaeiwYGcCItjg7KBXjkz1GotHHSLoUuMD7t8PkENoW6YtdOeAt24nDxX5lEfg5LKruSOt4=
+	t=1772721875; cv=none; b=dCwZ1SOTcrdwqcUVFgu0pWaWpcZ0VQ+ZS2Bs2jZzq4Avxrtui3/GI4vq4xSjSiqdeWyGdwuNnLeVAtNbYuEhgG1K43hBXS7C9cft8qYnXS28LK/4PUEHKa3TMntWIdRRjEddYZ+XrriIsv+piUwdBdg2h++hmyn7jbOGacKALVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772721872; c=relaxed/simple;
-	bh=dkkW4W3jInGYYbzC9r+ReWyl1oPl/9mOi3ZQTQ20xdk=;
+	s=arc-20240116; t=1772721875; c=relaxed/simple;
+	bh=zUfNG20++qm+IFIOEeFiT7GAONrck8zwiKUguq1Xulc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FKU024QdMQmYD3MG06YLjf6t3S9eAJAf9U2hgxlTAAxCwZ71AkEsTE9AxgT64akHRtJVfc/xYIflvTIGjg47gWwkPX4uVXaSMEe8QkWQbkydrRTKF4vIJqMxzVPjZjYPU3ekYa/2Xh0ZqHNnx9T+/tPzEJWTsHrbX5y5OtlP7Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQvlSl6G; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=t/Sxh1wA8LGab8jkbHsYPkpBU+c67Gx/8A0UnxYw6yrHTO1Y1P1EFiEP6n6GSJfkiV63Oelx2CwqUljs6Lo7FAxdmWGq6QIg78ANNQupFo4hsNDfOVyBHmDdin05G+Nu/tCIiobgxl2vfQYNXQnLBI/Ur1DneHNIt0UcCFWZgBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YD/uOZQT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQvlSl6G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E82B9C19423;
-	Thu,  5 Mar 2026 14:44:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YD/uOZQT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF23C2BC9E;
+	Thu,  5 Mar 2026 14:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772721871;
-	bh=dkkW4W3jInGYYbzC9r+ReWyl1oPl/9mOi3ZQTQ20xdk=;
+	s=k20201202; t=1772721875;
+	bh=zUfNG20++qm+IFIOEeFiT7GAONrck8zwiKUguq1Xulc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HQvlSl6G6SGJzcGJmvQPFmwu/mBEOJ+YLxmMSzTU9RYqEgbQ8IySbCBWy3PoPc3Wy
-	 n7LUApiCqCf8wV+jTzOE3vQVQjWpv6xoks4C/7iUPwg6NM8xJir7wMQCCUzC/wCwxx
-	 PiySTWC5GrAoEfqyMgweJba4oD1fQ6iC00Fy7aM1JCaW00NIy2jKBaVmbgPkmnaWbM
-	 qoZtsX0+JGrOQBhw5+8SuXe2H1J9ftyNH+oEQ8f6XfRMt+qOqtRPfDRCbXP4JHXDJa
-	 LKgYFpU/SC8EZD352nNcT6PpFrSfJpalAGjAWjLNl5woo1qPl08MSsxxsACD2edDvv
-	 T7mIdCMDNkR3w==
+	b=YD/uOZQTw8OQvc819D20Y+KlXM/gX8Lpa76QvBLXLkiMEyKJ9oW88sxNqNXSjPCW/
+	 RLk5zdIi2LnMC/f5py8fsZKGSp4TwPLWGRUw0UdmWfuBpS5veQkUMy2P+sFvy4PXSh
+	 ECzOrxTsBkMEOWHN7G7X98seR+NT7eHdUhse493DVs+C5fjQMLk6TByf2GaKPcwDLb
+	 Vmu/hl4HIyGJV6S4ZfUeTxIPskFQ1749Z+fY4ZzRase0DhTm8MCSosrel9ysJUPyGp
+	 S18kg2ej3Gh36zkjxivMo1cvvGkO6EJf4VxLgQwOYjX6VDEb+npgVtK6q+/8OctItw
+	 olTmFUstljQbw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.linux.dev
 Cc: linux-arm-kernel@lists.infradead.org,
@@ -41,9 +41,9 @@ Cc: linux-arm-kernel@lists.infradead.org,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH v3 06/36] KVM: arm64: Remove is_protected_kvm_enabled() checks from hypercalls
-Date: Thu,  5 Mar 2026 14:43:19 +0000
-Message-ID: <20260305144351.17071-7-will@kernel.org>
+Subject: [PATCH v3 07/36] KVM: arm64: Ignore MMU notifier callbacks for protected VMs
+Date: Thu,  5 Mar 2026 14:43:20 +0000
+Message-ID: <20260305144351.17071-8-will@kernel.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260305144351.17071-1-will@kernel.org>
 References: <20260305144351.17071-1-will@kernel.org>
@@ -55,236 +55,114 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When pKVM is not enabled, the host shouldn't issue pKVM-specific
-hypercalls and so there's no point checking for this in the pKVM
-hypercall handlers.
+In preparation for supporting the donation of pinned pages to protected
+VMs, return early from the MMU notifiers when called for a protected VM,
+as the necessary hypercalls are exposed only for non-protected guests.
 
-Remove the redundant is_protected_kvm_enabled() checks from each
-hypercall and instead rejig the hypercall table so that the
-pKVM-specific hypercalls are unreachable when pKVM is not being used.
-
-Reviewed-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h   | 24 +++++++-----
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 63 ++++++++++--------------------
- 2 files changed, 34 insertions(+), 53 deletions(-)
+ arch/arm64/kvm/mmu.c  |  9 ++++++---
+ arch/arm64/kvm/pkvm.c | 19 ++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index a1ad12c72ebf..7b72aac4730d 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -51,7 +51,7 @@
- #include <linux/mm.h>
- 
- enum __kvm_host_smccc_func {
--	/* Hypercalls available only prior to pKVM finalisation */
-+	/* Hypercalls that are unavailable once pKVM has finalised. */
- 	/* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init = __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
-@@ -60,16 +60,9 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-+	__KVM_HOST_SMCCC_FUNC_MIN_PKVM = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
- 
--	/* Hypercalls available after pKVM finalisation */
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_wrprotect_guest,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_test_clear_young_guest,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_mkyoung_guest,
-+	/* Hypercalls that are always available and common to [nh]VHE/pKVM. */
- 	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
-@@ -81,6 +74,17 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
-+	__KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM = __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_vmcr_aprs,
-+
-+	/* Hypercalls that are available only when pKVM has finalised. */
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_wrprotect_guest,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_test_clear_young_guest,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_mkyoung_guest,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_reserve_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
- 	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index e7790097db93..127decc2dd2b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -169,9 +169,6 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- 	DECLARE_REG(u64, hcr_el2, host_ctxt, 3);
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 
--	if (!is_protected_kvm_enabled())
--		return;
--
- 	hyp_vcpu = pkvm_load_hyp_vcpu(handle, vcpu_idx);
- 	if (!hyp_vcpu)
- 		return;
-@@ -188,12 +185,8 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- 
- static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index ec2eee857208..43632c69adaf 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -340,6 +340,9 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
+ void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+ 			    u64 size, bool may_block)
  {
--	struct pkvm_hyp_vcpu *hyp_vcpu;
-+	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 
--	if (!is_protected_kvm_enabled())
--		return;
--
--	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 	if (hyp_vcpu)
- 		pkvm_put_hyp_vcpu(hyp_vcpu);
++	if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
++		return;
++
+ 	__unmap_stage2_range(mmu, start, size, may_block);
  }
-@@ -257,9 +250,6 @@ static void handle___pkvm_host_share_guest(struct kvm_cpu_context *host_ctxt)
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	int ret = -EINVAL;
  
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
- 		goto out;
-@@ -281,9 +271,6 @@ static void handle___pkvm_host_unshare_guest(struct kvm_cpu_context *host_ctxt)
- 	struct pkvm_hyp_vm *hyp_vm;
- 	int ret = -EINVAL;
+@@ -2219,7 +2222,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
  
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vm = get_np_pkvm_hyp_vm(handle);
- 	if (!hyp_vm)
- 		goto out;
-@@ -301,9 +288,6 @@ static void handle___pkvm_host_relax_perms_guest(struct kvm_cpu_context *host_ct
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	int ret = -EINVAL;
- 
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
- 		goto out;
-@@ -321,9 +305,6 @@ static void handle___pkvm_host_wrprotect_guest(struct kvm_cpu_context *host_ctxt
- 	struct pkvm_hyp_vm *hyp_vm;
- 	int ret = -EINVAL;
- 
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vm = get_np_pkvm_hyp_vm(handle);
- 	if (!hyp_vm)
- 		goto out;
-@@ -343,9 +324,6 @@ static void handle___pkvm_host_test_clear_young_guest(struct kvm_cpu_context *ho
- 	struct pkvm_hyp_vm *hyp_vm;
- 	int ret = -EINVAL;
- 
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vm = get_np_pkvm_hyp_vm(handle);
- 	if (!hyp_vm)
- 		goto out;
-@@ -362,9 +340,6 @@ static void handle___pkvm_host_mkyoung_guest(struct kvm_cpu_context *host_ctxt)
- 	struct pkvm_hyp_vcpu *hyp_vcpu;
- 	int ret = -EINVAL;
- 
--	if (!is_protected_kvm_enabled())
--		goto out;
--
- 	hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
- 	if (!hyp_vcpu || pkvm_hyp_vcpu_is_protected(hyp_vcpu))
- 		goto out;
-@@ -424,12 +399,8 @@ static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- static void handle___pkvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	DECLARE_REG(pkvm_handle_t, handle, host_ctxt, 1);
--	struct pkvm_hyp_vm *hyp_vm;
-+	struct pkvm_hyp_vm *hyp_vm = get_np_pkvm_hyp_vm(handle);
+-	if (!kvm->arch.mmu.pgt)
++	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+ 		return false;
  
--	if (!is_protected_kvm_enabled())
--		return;
--
--	hyp_vm = get_np_pkvm_hyp_vm(handle);
- 	if (!hyp_vm)
- 		return;
+ 	__unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+@@ -2234,7 +2237,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
  
-@@ -603,14 +574,6 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__vgic_v3_get_gic_config),
- 	HANDLE_FUNC(__pkvm_prot_finalize),
+-	if (!kvm->arch.mmu.pgt)
++	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+ 		return false;
  
--	HANDLE_FUNC(__pkvm_host_share_hyp),
--	HANDLE_FUNC(__pkvm_host_unshare_hyp),
--	HANDLE_FUNC(__pkvm_host_share_guest),
--	HANDLE_FUNC(__pkvm_host_unshare_guest),
--	HANDLE_FUNC(__pkvm_host_relax_perms_guest),
--	HANDLE_FUNC(__pkvm_host_wrprotect_guest),
--	HANDLE_FUNC(__pkvm_host_test_clear_young_guest),
--	HANDLE_FUNC(__pkvm_host_mkyoung_guest),
- 	HANDLE_FUNC(__kvm_adjust_pc),
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
-@@ -622,6 +585,15 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
- 	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_vmcr_aprs),
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+@@ -2250,7 +2253,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	u64 size = (range->end - range->start) << PAGE_SHIFT;
+ 
+-	if (!kvm->arch.mmu.pgt)
++	if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+ 		return false;
+ 
+ 	return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 42f6e50825ac..20d50abb3b94 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -407,7 +407,12 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+ 
+ int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+-	lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
++	struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
 +
-+	HANDLE_FUNC(__pkvm_host_share_hyp),
-+	HANDLE_FUNC(__pkvm_host_unshare_hyp),
-+	HANDLE_FUNC(__pkvm_host_share_guest),
-+	HANDLE_FUNC(__pkvm_host_unshare_guest),
-+	HANDLE_FUNC(__pkvm_host_relax_perms_guest),
-+	HANDLE_FUNC(__pkvm_host_wrprotect_guest),
-+	HANDLE_FUNC(__pkvm_host_test_clear_young_guest),
-+	HANDLE_FUNC(__pkvm_host_mkyoung_guest),
- 	HANDLE_FUNC(__pkvm_reserve_vm),
- 	HANDLE_FUNC(__pkvm_unreserve_vm),
- 	HANDLE_FUNC(__pkvm_init_vm),
-@@ -635,7 +607,7 @@ static const hcall_t host_hcall[] = {
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
++	if (WARN_ON(kvm_vm_is_protected(kvm)))
++		return -EPERM;
++
++	lockdep_assert_held_write(&kvm->mmu_lock);
+ 
+ 	return __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+ }
+@@ -419,6 +424,9 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ 	struct pkvm_mapping *mapping;
+ 	int ret = 0;
+ 
++	if (WARN_ON(kvm_vm_is_protected(kvm)))
++		return -EPERM;
++
+ 	lockdep_assert_held(&kvm->mmu_lock);
+ 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+ 		ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+@@ -450,6 +458,9 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+ 	struct pkvm_mapping *mapping;
+ 	bool young = false;
+ 
++	if (WARN_ON(kvm_vm_is_protected(kvm)))
++		return -EPERM;
++
+ 	lockdep_assert_held(&kvm->mmu_lock);
+ 	for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+ 		young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+@@ -461,12 +472,18 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+ int pkvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
+ 				    enum kvm_pgtable_walk_flags flags)
  {
- 	DECLARE_REG(unsigned long, id, host_ctxt, 0);
--	unsigned long hcall_min = 0;
-+	unsigned long hcall_min = 0, hcall_max = -1;
- 	hcall_t hfn;
++	if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
++		return -EPERM;
++
+ 	return kvm_call_hyp_nvhe(__pkvm_host_relax_perms_guest, addr >> PAGE_SHIFT, prot);
+ }
  
- 	/*
-@@ -647,14 +619,19 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- 	 * basis. This is all fine, however, since __pkvm_prot_finalize
- 	 * returns -EPERM after the first call for a given CPU.
- 	 */
--	if (static_branch_unlikely(&kvm_protected_mode_initialized))
--		hcall_min = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize;
-+	if (static_branch_unlikely(&kvm_protected_mode_initialized)) {
-+		hcall_min = __KVM_HOST_SMCCC_FUNC_MIN_PKVM;
-+	} else {
-+		hcall_max = __KVM_HOST_SMCCC_FUNC_MAX_NO_PKVM;
-+	}
+ void pkvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
+ 				 enum kvm_pgtable_walk_flags flags)
+ {
++	if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
++		return;
++
+ 	WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_mkyoung_guest, addr >> PAGE_SHIFT));
+ }
  
- 	id &= ~ARM_SMCCC_CALL_HINTS;
- 	id -= KVM_HOST_SMCCC_ID(0);
- 
--	if (unlikely(id < hcall_min || id >= ARRAY_SIZE(host_hcall)))
-+	if (unlikely(id < hcall_min || id > hcall_max ||
-+		     id >= ARRAY_SIZE(host_hcall))) {
- 		goto inval;
-+	}
- 
- 	hfn = host_hcall[id];
- 	if (unlikely(!hfn))
 -- 
 2.53.0.473.g4a7958ca14-goog
 
