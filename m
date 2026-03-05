@@ -1,267 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649F73E51C3;
-	Thu,  5 Mar 2026 17:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772731432; cv=none; b=kl8aBoarTOSajN799v4esKYj3fJQErtUUJsx2Wbkkg8J0cF2ArwxN30uhgfEl316T+5Js5rc61ZC1437VEH+TVH7N8Gu7rIQl+BbJFDZ85opy1TUI3e1NURVz6Y1k+E08590zdKseAzl3XI31U/hc7JbDOusu2u3kuubk9k02cc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772731432; c=relaxed/simple;
-	bh=nWVIE+EcOlng0HrFjPyZg3oytXG4qO8Zesx2+80/tV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LxwTll/1lrf/N+jduMtFi0qb9wQmQSYcMOW6/Bv8rdaime777E5nKlGTPfpRI1myDEB6jqlNcrwqYWQJHP0bV5G6greeXyWDyVdBUVVPuuAUTdzEXUMo8cMTV2Tn+zS8lmz68/YUPxgEhwlFi9mCqvq7aUHGed+vcCL/1clpxKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=liGHR+qS; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F5F3E120F
+	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 17:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772731614; cv=pass; b=YGfnmzWziqoqg6chwBq1HvW4ReITpW1ChJuSh5f4QP885EUksvRxm/MnmUMA9buil3EYWHk0WHZREKGztjYUQbxZ+4NN+8NXDZjyk6CTARNcKcxNzVf7aoxhGLu5Yvb+JSqix/yOfOuy3hcZu/PpoLEbdMlZ3in50W+PiRdWcns=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772731614; c=relaxed/simple;
+	bh=XOVsdktOF6nyNimRfFhPjPXph4/eizuY/zAJWFeEW6o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pTIizKZK0WeRGTtCOkkfMvYcbpvDxx4hVpv1uIPNOxfqZKXAJFoum2DxhLBhRmYRrT163SWXVVo/Af7qKghUK85bDC3Z/U0dH1oMsUY7L3Rq+SaQx92HyzHTH7S7+0ukSCPK+xZjXhGf8zNf/HlJRU5BAy8mCcDxcZkA5WUPSa8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1sFg6rVr; arc=pass smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="liGHR+qS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 666F9C116C6;
-	Thu,  5 Mar 2026 17:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772731432;
-	bh=nWVIE+EcOlng0HrFjPyZg3oytXG4qO8Zesx2+80/tV4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=liGHR+qS+rFsKhFEQN3jyTl6XqDh5yQD/UWppvFiK/lQIT5Qb6Q0aBhzH71MPQcAv
-	 LrSPhZmx7K86W/kFvmue9PeQWAExuvDdObhyXSts6NPTlvWFjcgxKfygwmork60M+g
-	 dBIy7Yy576mBRn2IuAN9ySZ2RQcePi/Ke5pUfyvnm/XAG++/Tq7VvtFZmshaVtEVc3
-	 FR9aDcCnN/h4gaeAs+uGaX1Xu4WhdCdbdAqPgUIJq/uvJAOWN8AsM0hWbC57YGzYZi
-	 sKOjUhNJrCLiR9L/LwRrMishVebJnDW2/j2UczveIPT34F40cZjxym7eUdJiU9GBfa
-	 tD3oPKelTfPcg==
-Message-ID: <90058ff2-9dea-4090-b2e6-da4c3cdba81b@kernel.org>
-Date: Thu, 5 Mar 2026 18:23:25 +0100
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sFg6rVr"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-59e4a04f059so2677007e87.2
+        for <kvmarm@lists.linux.dev>; Thu, 05 Mar 2026 09:26:52 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1772731611; cv=none;
+        d=google.com; s=arc-20240605;
+        b=e3V2An2clGEKcpOPjNJE8xVPJsdUY+F1GN5qPYH8yTbH/m8zNE26j6nUR8wKCuJc+T
+         u0wKk7y1rjJQV3t2tVhea6cnESO6Oubm3uldTWPe6QGH5ULpRMrJ65FptqnCmWNPZvMs
+         gIlSjZ1x2TWGhq1JGk/il1gK3Kcx8A1L+sB4cIUbXjLv58QdvRTJjWAHhomfP9DVgZZ+
+         JztST/eswtBNXW6uEICJ3Doa7asAd8q2yoef/BsCmMs/kpvBhhrsNAoEQMay+gD0uoNB
+         3IWWtYXpAJP0J2ROrXeMfB3/IrHlJve5NfZHn8jILFrIN3Z5/AmGh1qz4uBNIP3VngPC
+         ORog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
+        fh=nuxjztxEMR81PqZ/zuTM5Ipl3HI1MiSjszbNOc31oDw=;
+        b=Nvz7SnehTZQxbpUB1ui447az5dhnQp2Tjzx1xSaaok36lhZBMSXcTE++Z/3zmtI7D8
+         E2P8sglmJtrkeai7VnzTLvRJphWQzROpmCnInMcaXNUVxRXmYVVigQeMts5BYAjntip/
+         6pbEyg/WqCYGL3iqlSxp7zfVoYi7TGn4UtZRMgShF0M0lYN3OopehQz2d+Eahnb063R1
+         bBv/glGMNXlrMeJQPnjy/ST+Kqs4jh8m/oXw5cSRfgdhnZrWSYiTsNHT3ZLOONmHhz+h
+         t9ezMBEs5TAzaBHaakHANV8gTe3orLKdjbtWG1u+Otarh+TlcqG9DABXWnHgZCdtcjGB
+         90QQ==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772731611; x=1773336411; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
+        b=1sFg6rVr610kMpiCOyxBF5yQC4uz7Pw5dCsfWirB5URLASZ4E5xoUGkTl/EIQXGsq/
+         tvnh9T033QauoXrfG7YmUJ0thDtITHTkJ6oEqhS/nvf60kaEm89zOTXfPDE6CT+v2hiS
+         kA/lCXtO/t2N5am0oQf+XT5GJEeAA8E+DIw/1RflRrEr/jPmm9O92TlGnynEe95pX8+W
+         lXqhuPoi9C344Ezo6V84uBCsqZHQlNwnMtpX15HAKtXC+GncUSSzWIwZQUXaJXku5Qii
+         ViaOjLO9RVxiLAKNPSqGCXXuWvkONBbbEaEtveEgH6gpD5xYbH0LxEGvd5Ce/e1hWjB3
+         zepw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772731611; x=1773336411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6jfkQGEN2Pma+dwki2mI0eTQpR2nMlH81M8JJrATtW4=;
+        b=j7bp2LIJ1S9zcrPZMyRh/9waw5KNAX1vfAbBdmAqVCDtAvZvV12XZkuMBZWcIqmhDe
+         dpRc3fT2l0vjAz37n5phAmFiMNJAHgHGx8ExOTovNKQRR+YAfHP6CQr4a2WyWrO/ky0B
+         Lr40pwfLUKqs8MTdxsXNuidcLfJu63ZCZ/fAgxlWKr/4UvqZf4b47GOtqeJlVIyxk5cS
+         5uUZ/uhxllDL4gBB5Av3VPmp0TyPOsTf2EQ5V0+ELnBAsOrAKQzW2iHmz+BMS9/VSlUm
+         OfE3p6UEepJksghd4c7Qoui3WGeKgI53NfL8w6ekiV6MTGjGLvTepSRchexT5akQCILR
+         mW0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWtcAImFFVA3df7ZRTbsyE1ab+4UInoCIPVogR++G/77cC0ONXR9PX4IGtbrxDNCEJwrrc0cbo=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwxYgBqROtRNW6Hf2QIg29dPPkiIC+IyAqcwBTMyaA+MXnomiGy
+	Pgz551SBCsxe3SGDYGooX7btIeVqjiAKNldEIa8Z87CxaH23CkgbNc6d1CxM8C/u9bl3KYrEty9
+	7ePia5kTzofjKcmiy5ZwJ7+PSTd3vNUkDoaleBeTu
+X-Gm-Gg: ATEYQzzDbd3v+QTQcJdbeEnUTImrCYFHrea880H73EcNAONSlThwHBgDKbVVOM1u9UY
+	vMJ6u/Tws+L3V/lfYKkhbFhTqQTjYdJt5g+RkIZbv2EEuFklvMaNhNRQBwq9usDsLWB5D3IFxvV
+	r/qhDSi+oq+naGEoar+Iz3tadKRhCgnVJWzBZYl/fcVtEk73dADLkAueNrKg+sPc+DROr+3ZuUC
+	0+w6vN0Ijbs5wPy5ZYn3UnUkVuRMAbC1PaUIAZB5yVsiRcUXSU0DvNjUAgfHDhan+oC4maXxgtL
+	H0ztCFfB
+X-Received: by 2002:a05:6512:696:b0:5a1:2f18:5e19 with SMTP id
+ 2adb3069b0e04-5a12f185e8bmr1324271e87.22.1772731610293; Thu, 05 Mar 2026
+ 09:26:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 01/15] set_memory: set_direct_map_* to take address
-To: "Kalyazin, Nikita" <kalyazin@amazon.co.uk>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "kernel@xen0n.name" <kernel@xen0n.name>,
- "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
- "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
- "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>,
- "oupton@kernel.org" <oupton@kernel.org>,
- "joey.gouly@arm.com" <joey.gouly@arm.com>,
- "suzuki.poulose@arm.com" <suzuki.poulose@arm.com>,
- "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "will@kernel.org" <will@kernel.org>, "seanjc@google.com"
- <seanjc@google.com>, "tglx@kernel.org" <tglx@kernel.org>,
- "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
- "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>,
- "willy@infradead.org" <willy@infradead.org>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "lorenzo.stoakes@oracle.com" <lorenzo.stoakes@oracle.com>,
- "vbabka@suse.cz" <vbabka@suse.cz>, "rppt@kernel.org" <rppt@kernel.org>,
- "surenb@google.com" <surenb@google.com>, "mhocko@suse.com"
- <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- "andrii@kernel.org" <andrii@kernel.org>,
- "martin.lau@linux.dev" <martin.lau@linux.dev>,
- "eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org"
- <song@kernel.org>, "yonghong.song@linux.dev" <yonghong.song@linux.dev>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "kpsingh@kernel.org" <kpsingh@kernel.org>, "sdf@fomichev.me"
- <sdf@fomichev.me>, "haoluo@google.com" <haoluo@google.com>,
- "jolsa@kernel.org" <jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
- "jhubbard@nvidia.com" <jhubbard@nvidia.com>,
- "peterx@redhat.com" <peterx@redhat.com>, "jannh@google.com"
- <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
- "shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com"
- <riel@surriel.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
- "jgross@suse.com" <jgross@suse.com>,
- "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
- "kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
- "kevin.brodsky@arm.com" <kevin.brodsky@arm.com>,
- "ackerleytng@google.com" <ackerleytng@google.com>,
- "maobibo@loongson.cn" <maobibo@loongson.cn>,
- "prsampat@amd.com" <prsampat@amd.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "jmattson@google.com" <jmattson@google.com>,
- "jthoughton@google.com" <jthoughton@google.com>,
- "agordeev@linux.ibm.com" <agordeev@linux.ibm.com>,
- "alex@ghiti.fr" <alex@ghiti.fr>,
- "aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>,
- "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
- "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
- "dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
- <gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org"
- <pjw@kernel.org>,
- "shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
- "svens@linux.ibm.com" <svens@linux.ibm.com>,
- "thuth@redhat.com" <thuth@redhat.com>, "wyihan@google.com"
- <wyihan@google.com>,
- "yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
- "Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
- "Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
- "urezki@gmail.com" <urezki@gmail.com>,
- "zhengqi.arch@bytedance.com" <zhengqi.arch@bytedance.com>,
- "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
- "jiayuan.chen@shopee.com" <jiayuan.chen@shopee.com>,
- "lenb@kernel.org" <lenb@kernel.org>, "osalvador@suse.de"
- <osalvador@suse.de>, "pavel@kernel.org" <pavel@kernel.org>,
- "rafael@kernel.org" <rafael@kernel.org>,
- "vannapurve@google.com" <vannapurve@google.com>,
- "jackmanb@google.com" <jackmanb@google.com>,
- "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
- "patrick.roy@linux.dev" <patrick.roy@linux.dev>,
- "Thomson, Jack" <jackabt@amazon.co.uk>,
- "Itazuri, Takahiro" <itazur@amazon.co.uk>,
- "Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
- <xmarcalx@amazon.co.uk>
-References: <20260126164445.11867-1-kalyazin@amazon.com>
- <20260126164445.11867-2-kalyazin@amazon.com>
-From: "David Hildenbrand (Arm)" <david@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=david@kernel.org; keydata=
- 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
- qIws/H2t
-In-Reply-To: <20260126164445.11867-2-kalyazin@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260220004223.4168331-1-dmatlack@google.com> <aam77t8fe5RKSr2Q@google.com>
+In-Reply-To: <aam77t8fe5RKSr2Q@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 5 Mar 2026 09:26:22 -0800
+X-Gm-Features: AaiRm52LsX1aPJ2JM5xqUBPHr_QH0uBSIJaRMA7nyUfm3apWkfHV7m2i8095U3w
+Message-ID: <CALzav=etzo9A7FNQrbLCmj=pNLN5fO-a5isP1k6MuTDkJw1bqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] KVM: selftests: Use kernel-style integer and
+ g[vp]a_t types
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ackerley Tng <ackerleytng@google.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Andrew Jones <ajones@ventanamicro.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atish.patra@linux.dev>, Bibo Mao <maobibo@loongson.cn>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Colin Ian King <colin.i.king@gmail.com>, David Hildenbrand <david@kernel.org>, Fuad Tabba <tabba@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, James Houghton <jthoughton@google.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Lisa Wang <wyihan@google.com>, loongarch@lists.linux.dev, 
+	Marc Zyngier <maz@kernel.org>, Maxim Levitsky <mlevitsk@redhat.com>, Nutty Liu <nutty.liu@hotmail.com>, 
+	Oliver Upton <oupton@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, 
+	"Pratik R. Sampat" <prsampat@amd.com>, Rahul Kumar <rk0006818@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Wu Fei <wu.fei9@sanechips.com.cn>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
+	Zenghui Yu <yuzenghui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/26/26 17:46, Kalyazin, Nikita wrote:
-> From: Nikita Kalyazin <kalyazin@amazon.com>
-> 
-> This is to avoid excessive conversions folio->page->address when adding
-> helpers on top of set_direct_map_valid_noflush() in the next patch.
-> 
-> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
-> ---
->  arch/arm64/include/asm/set_memory.h     |  7 ++++---
->  arch/arm64/mm/pageattr.c                | 19 +++++++++----------
->  arch/loongarch/include/asm/set_memory.h |  7 ++++---
->  arch/loongarch/mm/pageattr.c            | 25 ++++++++++++-------------
->  arch/riscv/include/asm/set_memory.h     |  7 ++++---
->  arch/riscv/mm/pageattr.c                | 17 +++++++++--------
->  arch/s390/include/asm/set_memory.h      |  7 ++++---
->  arch/s390/mm/pageattr.c                 | 13 +++++++------
->  arch/x86/include/asm/set_memory.h       |  7 ++++---
->  arch/x86/mm/pat/set_memory.c            | 23 ++++++++++++-----------
->  include/linux/set_memory.h              |  9 +++++----
->  kernel/power/snapshot.c                 |  4 ++--
->  mm/execmem.c                            |  6 ++++--
->  mm/secretmem.c                          |  6 +++---
->  mm/vmalloc.c                            | 11 +++++++----
->  15 files changed, 90 insertions(+), 78 deletions(-)
+On Thu, Mar 5, 2026 at 9:22=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Fri, Feb 20, 2026, David Matlack wrote:
+> > This series renames types across all KVM selftests to more align with
+> > types used in the kernel:
+> >
+> >   vm_vaddr_t -> gva_t
+> >   vm_paddr_t -> gpa_t
+> >
+> >   uint64_t -> u64
+> >   uint32_t -> u32
+> >   uint16_t -> u16
+> >   uint8_t  -> u8
+> >
+> >   int64_t -> s64
+> >   int32_t -> s32
+> >   int16_t -> s16
+> >   int8_t  -> s8
+> >
+> > The goal of this series is to make the KVM selftests code more concise
+> > (the new type names are shorter) and more similar to the kernel, since
+> > selftests are developed by kernel developers.
+> >
+> > v2:
+> >  - Reapply the series on top of kvm/queue
+> >
+> > v1: https://lore.kernel.org/kvm/20250501183304.2433192-1-dmatlack@googl=
+e.com
+>
+> Sorry, I was too slow and missed the window to get this into kvm/next wit=
+hout
+> causing a disaster of merge conflicts.
+>
+> I don't think you need to send a v3 though.  I'll prep a v3, a branch, an=
+d send
+> Paolo a pull request during the next merge window.
 
-[...]
-
-> --- a/arch/loongarch/mm/pageattr.c
-> +++ b/arch/loongarch/mm/pageattr.c
-> @@ -198,32 +198,31 @@ bool kernel_page_present(struct page *page)
->  	return pte_present(ptep_get(pte));
->  }
->  
-> -int set_direct_map_default_noflush(struct page *page)
-> +int set_direct_map_default_noflush(const void *addr)
->  {
-> -	unsigned long addr = (unsigned long)page_address(page);
-> -
-> -	if (addr < vm_map_base)
-> +	if ((unsigned long)addr < vm_map_base)
->  		return 0;
->  
-> -	return __set_memory(addr, 1, PAGE_KERNEL, __pgprot(0));
-> +	return __set_memory((unsigned long)addr, 1, PAGE_KERNEL, __pgprot(0));
->  }
->  
-> -int set_direct_map_invalid_noflush(struct page *page)
-> +int set_direct_map_invalid_noflush(const void *addr)
->  {
-> -	unsigned long addr = (unsigned long)page_address(page);
-> +	unsigned long addr = (unsigned long)addr;
-
-Are you sure you want a local variable with the exact same name
-
-...
-
->  
-> -	if (addr < vm_map_base)
-> +	if ((unsigned long)addr < vm_map_base)
->  		return 0;
->  
-> -	return __set_memory(addr, 1, __pgprot(0), __pgprot(_PAGE_PRESENT | _PAGE_VALID));
-> +	return __set_memory((unsigned long)addr, 1, __pgprot(0),
-> +			    __pgprot(_PAGE_PRESENT | _PAGE_VALID));
-
-And cast it to (unsigned long) even though not required two times? :)
-
-I assume you wanted to get rid of the local varable.
-
->  }
->  
-> -int set_direct_map_valid_noflush(struct page *page, unsigned nr, bool valid)
-> +int set_direct_map_valid_noflush(const void *addr, unsigned long numpages,
-> +				 bool valid)
-
-
-
-Nothing else jumped at me.
-
-Acked-by: David Hildenbrand (Arm) <david@kernel.org>
-
-It would be good to get some ACK from some arch people that are CCed :)
-
--- 
-Cheers,
-
-David
+Sounds good, thanks Sean.
