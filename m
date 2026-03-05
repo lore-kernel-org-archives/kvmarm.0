@@ -1,75 +1,128 @@
-Received: from relay.hostedemail.com (smtprelay0016.hostedemail.com [216.40.44.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A0C3CE4A2
-	for <kvmarm@lists.linux.dev>; Thu,  5 Mar 2026 16:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40973CE49F;
+	Thu,  5 Mar 2026 16:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772727392; cv=none; b=N2NRJUBQ7s4wtQhaEwDW6TgyD4MdhN0J8lVjSfPcBzyMZTZV9ySYkbpO4mNma6YvId6pmo/2Wjk/SWwLz8BWRtg5NEgbajsjVroxpkR9KHg4zIIs0UkQC/3xwehBiTaLsv1pqYxmYZc3JZFjGXLz/vZqjoN4zY2ZBdp2sZp/ozY=
+	t=1772727725; cv=none; b=rYj6JHrpFtCX1gOX3CZ+ChwyUW0c97ut2NYAHVFIuz9ZEjEw7yBLaCNSHFlyW4UsOQXnRMfHv70JPLYLRZIbF7C6FLirCcEUtm8a6aYaZ65UpXq0zVsnVmhkmxDABLn3uA+CoRyGwKOL22hxCqQom5GQpXWWIKTDnO4xVajWb1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772727392; c=relaxed/simple;
-	bh=REZCD/bjwXQD9ItoixE5zLBBAo2tTupKDiF2S6yhHPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PiOR0p1iEi0Paza10FeYY/yZIYwScJwRkECVuMrQzLKoSUUPivsJq5THMfbIUalRt5s8HV4BcI5cgUUFyhhB/brFcwZpbxk5eX9WvRYhhhAxHgFyTYPxa8InngHqEsWPMecfAdseioht3nQNrAeaL/4+tAqSdx74JJQt69YYtzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
-Received: from omf12.hostedemail.com (a10.router.float.18 [10.200.18.1])
-	by unirelay03.hostedemail.com (Postfix) with ESMTP id 7F1AFB6D06;
-	Thu,  5 Mar 2026 16:16:28 +0000 (UTC)
-Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf12.hostedemail.com (Postfix) with ESMTPA id 06AAC17;
-	Thu,  5 Mar 2026 16:16:24 +0000 (UTC)
-Date: Thu, 5 Mar 2026 11:17:03 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
- oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com,
- yuzenghui@huawei.com, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, jstultz@google.com,
- qperret@google.com, will@kernel.org, aneesh.kumar@kernel.org,
- kernel-team@android.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 00/30] Tracefs support for pKVM
-Message-ID: <20260305111703.6346b243@gandalf.local.home>
-In-Reply-To: <87cy20eeg6.wl-maz@kernel.org>
-References: <20260219150307.14538-1-vdonnefort@google.com>
-	<20260219130220.063c8db3@gandalf.local.home>
-	<87cy20eeg6.wl-maz@kernel.org>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1772727725; c=relaxed/simple;
+	bh=hPWaiZQkURcBYGdXokPMW62Jof8BcCJ3U+PevWfi8YI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XdeqLxDC4Nlq+wb2J3L1AFX4skr/5gNdVr6p+p7L4L4ncNO8hrGjwbUmUP2p6rkOQildmZqK4XmLV/IbasWB0Natb71sz1F4mGQKgtI3d4uvsYlX6tnxyrl/IlW2R9365TkxqRtvfdXMcRDEBIFbacE446fMzqsJCFksXV3HEGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lD47VTeb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lD47VTeb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12DE0C116C6;
+	Thu,  5 Mar 2026 16:22:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772727724;
+	bh=hPWaiZQkURcBYGdXokPMW62Jof8BcCJ3U+PevWfi8YI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lD47VTeb7TSWq2q5RNFtPI6pyRXzBVaysvoruNmv/SpVgCv/AGontBHZzPEMOvXcW
+	 6ER/u+nCtsmjHkIMLIuOuonom9ZYkIeKw3tBQ1EcM+s92RdieejufkVLnJGTpiuW0i
+	 CH7uB7fhI66QHkHdeOPU6xZJbYjcVBe/E4NiSwfPGBsCYc/xeS0Gnj/uWClkbDwsrT
+	 pVosvYPHLOy5CSBT69VvItUQSIuMrhVM+8/IysadP2GszaudA5xRx5lYHg4rSyPIr7
+	 z65HpRlPOOr0Iln3j3Q6Qutd1O/oZalVeRflsNkwaywlYz5eoAapKKfdTS9MxBFF6Z
+	 LcTiK5tdno7jg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vyBSb-0000000GWk5-3BHT;
+	Thu, 05 Mar 2026 16:22:01 +0000
+Date: Thu, 05 Mar 2026 16:22:01 +0000
+Message-ID: <86ldg66yc6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	oliver.upton@linux.dev,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yangyicong@hisilicon.com,
+	wangzhou1@hisilicon.com
+Subject: Re: [PATCH v1 2/2] KVM: arm64: Fix vma_shift staleness on nested hwpoison path
+In-Reply-To: <CA+EHjTwQP=sXJ=SJE3OqByHKm7Si3S41BfuFO827_ZVwaygC9g@mail.gmail.com>
+References: <20260304162222.836152-1-tabba@google.com>
+	<20260304162222.836152-3-tabba@google.com>
+	<86ms0m6yzk.wl-maz@kernel.org>
+	<CA+EHjTwQP=sXJ=SJE3OqByHKm7Si3S41BfuFO827_ZVwaygC9g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Stat-Signature: hjpmqngd9ddfjxdxzzo1w4jhxdng6wmr
-X-Rspamd-Server: rspamout08
-X-Rspamd-Queue-Id: 06AAC17
-X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
-X-Session-ID: U2FsdGVkX18CZlcLb/ptcfAuAKzvUKSGTao+9oqfTCI=
-X-HE-Tag: 1772727384-772492
-X-HE-Meta: U2FsdGVkX195vWpGBKWyqUWB3sgYzypwSlcv/h9gmg0TBmzfLJ+iJuAAW7JoYt01B0eByBfm80sD9DsxCpM5Ex95OHexPsc0qFg16Hge7QLPHlxS+CQvGowxN47UNGBfUGBYJAeypKYP61yfPCSTq57dgAktN2PQfGNpmNcjcxvNgvSLjaZSXDBiZXfmjSlbmObRDIyv7zNs6C/sXoU8ONKtSpvgWKfR9FBm6yGPlDmT0QM9iMzDIaOkSFBm0/8rPcd5RZ3lAfWOEw7woBi4TGjkhIBBHHU14acjwV/t5MLjLqx9u72DWZm7uc0EJZDjZkniDWeZDYruIAyHW8+voCjfsUJJEiDQ
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, wangzhou1@hisilicon.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 19 Feb 2026 19:11:21 +0000
-Marc Zyngier <maz@kernel.org> wrote:
-
-> > 
-> > Then the arm/kvm folks could start with that branch and add the arm/KVM
-> > portion of this series on top of it. This will prevent major merge
-> > conflicts in linux-next.
-> > 
-> > Does that sound OK?  
+On Thu, 05 Mar 2026 16:13:43 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> That works. Just send us a link to the branch after -rc2 and we'll get
-> that sorted.
+> On Thu, 5 Mar 2026 at 16:08, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Fuad,
+> >
+> > On Wed, 04 Mar 2026 16:22:22 +0000,
+> > Fuad Tabba <tabba@google.com> wrote:
+> > >
+> > > When user_mem_abort() handles a nested stage-2 fault, it truncates
+> > > vma_pagesize to respect the guest's mapping size. However, the local
+> > > variable vma_shift is never updated to match this new size.
+> > >
+> > > If the underlying host page turns out to be hardware poisoned,
+> > > kvm_send_hwpoison_signal() is called with the original, larger
+> > > vma_shift instead of the actual mapping size. This signals incorrect
+> > > poison boundaries to userspace and breaks hugepage memory poison
+> > > containment for nested VMs.
+> > >
+> > > Update vma_shift to match the truncated vma_pagesize when operating
+> > > on behalf of a nested hypervisor.
+> > >
+> > > Fixes: fd276e71d1e7 ("KVM: arm64: nv: Handle shadow stage 2 page faults")
+> > > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > > ---
+> > >  arch/arm64/kvm/mmu.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index e1d6a4f591a9..b08240e0cab1 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1751,6 +1751,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >
+> > >               force_pte = (max_map_size == PAGE_SIZE);
+> > >               vma_pagesize = min_t(long, vma_pagesize, max_map_size);
+> > > +             vma_shift = force_pte ? PAGE_SHIFT : __ffs(vma_pagesize);
+> >
+> > If force_pte is set, then we know that max_map_size == PAGE_SIZE. From
+> > there, vma_pagesize == PAGE_SIZE, since nothing can be smaller.
+> >
+> > Is there anything preventing us from having:
+> >
+> >                 vma_shift = __ffs(vma_pagesize);
+> >
+> > and be done with it?
+> 
+> Nope, nothing prevents that. Even simpler and better.
+> 
+> Would you like me to respin it?
 
-Vincent,
+Nah, I'll fix that locally. Thanks for having given it a look.
 
-There's a few minor conflicts with this series and v7.0-rc2, can you rebase
-and send again?
+	M.
 
-Thanks,
-
--- Steve
+-- 
+Without deviation from the norm, progress is not possible.
