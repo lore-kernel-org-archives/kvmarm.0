@@ -1,423 +1,86 @@
-Received: from fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com [18.199.210.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD77386C1B;
-	Fri,  6 Mar 2026 12:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.199.210.3
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD3338F255
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 12:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772801395; cv=none; b=FildJ6ICXx6LXUrQ+uRhhWH4LQD+JpCo6SligBalGjVNfmVD/pcLAKK8fDWl0Zw4ax71CNOLMk+jUI7PCmTWilmc978mJUuMUJQrJ9geEKnf93Th8Dv2jrBrfgrrv+g2dpULoF8wy/EkEbGWrwvyAni6cK/1ar+M12vlD/nwFRU=
+	t=1772801565; cv=none; b=IAwZkjcwrFEI043vWkcX8wRVKGn3SdHNMkjSdQUtXjdEJaCwDhkFYBM2qgSYsRsDbXwe/vTgdoY5QoG6vnxTr98/QgBQDc6r3QUXF4Wvzup6NJCw446OA2DoFedKMA11t4ZA5bVFT8gM7i1VXdYbhDLidVndd6Whj8JLwRWqcpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772801395; c=relaxed/simple;
-	bh=pEk2FSDtL/QjsxPmzXHQgrpNF+TgzDhM8PWDYE4p8Kk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NwHVwzZFw1LvQw9XvdvMV/YOT/EV1J/ahGBFdYPtSqmFcNx6x/MScUvJFq8ybyTHM+wUqzEpN0JLqBM4hWxnSyj96/K0mWKl2RuhTKvKjwtDYjiWaAzfpkIClpkvvwQwbdRFEQyIo+ugz6EZSdXraNyivrnAF8Fk7kDvx05Ef0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=XgESEcMP; arc=none smtp.client-ip=18.199.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="XgESEcMP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1772801393; x=1804337393;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=ZsNM+LWlhCLdso8cveAQj+8sSJJHKrqUIk0XEUUGml0=;
-  b=XgESEcMPaGYSRE+700HzOJqRouN/sHqOtTdbLEHzar2u93Z63pqbfrps
-   tGfMMoTMslqqw9JiNz7+y4fBBisSsRvafXpwSlszxhSMkP9w3uzx1noLD
-   1++84MfIawmQNtykMXfVawr9L+znnwTJlZJLq3QFMw3k+pMgR3KBLYCy5
-   ua3q+D/zUvRRa9Ghwq9yLKxmAEiI02u69pKPsZPZB9MeaMgtAMYrxTnW+
-   oyC5dlEAkmHLdb+ygnKgEG7CCT4/PDVMD6azFV6MkJrFLBBn8TlOdXlHw
-   k5QkcTzdktw+c/tkJ/NKP38jODNbbuReBJxJTcTWWsmWZwl2AkLSFXVUt
-   g==;
-X-CSE-ConnectionGUID: Y4sz6pdzTp+XqctERZWOJg==
-X-CSE-MsgGUID: JDyPSNQrRVitsjENXrw1AA==
-X-IronPort-AV: E=Sophos;i="6.23,104,1770595200"; 
-   d="scan'208";a="10315608"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-014.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 12:49:49 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:8094]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.24.155:2525] with esmtp (Farcaster)
- id 62873006-8db1-4bbe-a713-761efcd5b5c0; Fri, 6 Mar 2026 12:49:49 +0000 (UTC)
-X-Farcaster-Flow-ID: 62873006-8db1-4bbe-a713-761efcd5b5c0
-Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Fri, 6 Mar 2026 12:49:36 +0000
-Received: from [192.168.2.180] (10.106.83.26) by EX19D005EUB003.ant.amazon.com
- (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 6 Mar 2026
- 12:49:31 +0000
-Message-ID: <690c22f9-b71a-4f14-9857-008c7c858373@amazon.com>
-Date: Fri, 6 Mar 2026 12:49:30 +0000
+	s=arc-20240116; t=1772801565; c=relaxed/simple;
+	bh=I5s6cYwpy8ERQx3eisWdKRv+K50LZpGHEK6uTNeq9rs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JZBizIOI3xvZ3m7XWODckN7WjuC/5H+zcSunv/d5wWT41PO5cUghb/kM+RZEjBsoMMjZbKNX1NfxDGPGkfyqF90pmB4e3XSkrpuQKkQzcc/it3DNVeRVx1V8/28/fMGrDmgcNqfzAmnYMZQ7XrJ6Yux4Ro4nohL4AgKpAn86TMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 44E80497;
+	Fri,  6 Mar 2026 04:52:37 -0800 (PST)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 367FF3F694;
+	Fri,  6 Mar 2026 04:52:42 -0800 (PST)
+Date: Fri, 6 Mar 2026 12:52:39 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 4/4] KVM: arm64: Add SMC hook for SME dvmsync erratum
+Message-ID: <aarOF-2I9gr6az4W@arm.com>
+References: <20260302165801.3014607-1-catalin.marinas@arm.com>
+ <20260302165801.3014607-5-catalin.marinas@arm.com>
+ <aamUFoQV74t4okXx@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [PATCH v10 09/15] KVM: guest_memfd: Add flag to remove from
- direct map
-To: "David Hildenbrand (Arm)" <david@kernel.org>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
-	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
-	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
-	<loongarch@lists.linux.dev>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
-	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
-	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
-	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
-	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
-	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
-	"tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
-	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
-	<willy@infradead.org>, "akpm@linux-foundation.org"
-	<akpm@linux-foundation.org>, "lorenzo.stoakes@oracle.com"
-	<lorenzo.stoakes@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
-	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
-	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
-	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
-	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
-	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
-	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
-	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
-	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
-	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
-	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
-	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
-	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
-	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
-	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
-	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
-	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
-	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
-	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
-	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
-	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
-	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
-	<gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
-	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org" <pjw@kernel.org>,
-	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
-	"svens@linux.ibm.com" <svens@linux.ibm.com>, "thuth@redhat.com"
-	<thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>,
-	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
-	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
-	<urezki@gmail.com>, "zhengqi.arch@bytedance.com"
-	<zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
-	<gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
-	<jiayuan.chen@shopee.com>, "lenb@kernel.org" <lenb@kernel.org>,
-	"osalvador@suse.de" <osalvador@suse.de>, "pavel@kernel.org"
-	<pavel@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
-	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
-	<jackmanb@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
-	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
-	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
-	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>
-References: <20260126164445.11867-1-kalyazin@amazon.com>
- <20260126164445.11867-10-kalyazin@amazon.com>
- <13ed00e1-f0db-4326-a800-2ba306833921@kernel.org>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-In-Reply-To: <13ed00e1-f0db-4326-a800-2ba306833921@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D015EUB002.ant.amazon.com (10.252.51.123) To
- EX19D005EUB003.ant.amazon.com (10.252.51.31)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aamUFoQV74t4okXx@willie-the-truck>
 
-
-
-On 05/03/2026 19:18, David Hildenbrand (Arm) wrote:
-> On 1/26/26 17:50, Kalyazin, Nikita wrote:
->> From: Patrick Roy <patrick.roy@linux.dev>
->>
->> Add GUEST_MEMFD_FLAG_NO_DIRECT_MAP flag for KVM_CREATE_GUEST_MEMFD()
->> ioctl. When set, guest_memfd folios will be removed from the direct map
->> after preparation, with direct map entries only restored when the folios
->> are freed.
->>
->> To ensure these folios do not end up in places where the kernel cannot
->> deal with them, set AS_NO_DIRECT_MAP on the guest_memfd's struct
->> address_space if GUEST_MEMFD_FLAG_NO_DIRECT_MAP is requested.
->>
->> Note that this flag causes removal of direct map entries for all
->> guest_memfd folios independent of whether they are "shared" or "private"
->> (although current guest_memfd only supports either all folios in the
->> "shared" state, or all folios in the "private" state if
->> GUEST_MEMFD_FLAG_MMAP is not set). The usecase for removing direct map
->> entries of also the shared parts of guest_memfd are a special type of
->> non-CoCo VM where, host userspace is trusted to have access to all of
->> guest memory, but where Spectre-style transient execution attacks
->> through the host kernel's direct map should still be mitigated.  In this
->> setup, KVM retains access to guest memory via userspace mappings of
->> guest_memfd, which are reflected back into KVM's memslots via
->> userspace_addr. This is needed for things like MMIO emulation on x86_64
->> to work.
->>
->> Direct map entries are zapped right before guest or userspace mappings
->> of gmem folios are set up, e.g. in kvm_gmem_fault_user_mapping() or
->> kvm_gmem_get_pfn() [called from the KVM MMU code]. The only place where
->> a gmem folio can be allocated without being mapped anywhere is
->> kvm_gmem_populate(), where handling potential failures of direct map
->> removal is not possible (by the time direct map removal is attempted,
->> the folio is already marked as prepared, meaning attempting to re-try
->> kvm_gmem_populate() would just result in -EEXIST without fixing up the
->> direct map state). These folios are then removed form the direct map
->> upon kvm_gmem_get_pfn(), e.g. when they are mapped into the guest later.
->>
->> Signed-off-by: Patrick Roy <patrick.roy@linux.dev>
->> Signed-off-by: Nikita Kalyazin <kalyazin@amazon.com>
->> ---
->>   Documentation/virt/kvm/api.rst  | 21 +++++----
->>   arch/x86/include/asm/kvm_host.h |  5 +--
->>   arch/x86/kvm/x86.c              |  5 +++
->>   include/linux/kvm_host.h        | 12 +++++
->>   include/uapi/linux/kvm.h        |  1 +
->>   virt/kvm/guest_memfd.c          | 80 ++++++++++++++++++++++++++++++---
->>   6 files changed, 106 insertions(+), 18 deletions(-)
->>
->> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->> index 01a3abef8abb..c5ee43904bca 100644
->> --- a/Documentation/virt/kvm/api.rst
->> +++ b/Documentation/virt/kvm/api.rst
->> @@ -6440,15 +6440,18 @@ a single guest_memfd file, but the bound ranges must not overlap).
->>   The capability KVM_CAP_GUEST_MEMFD_FLAGS enumerates the `flags` that can be
->>   specified via KVM_CREATE_GUEST_MEMFD.  Currently defined flags:
->>
->> -  ============================ ================================================
->> -  GUEST_MEMFD_FLAG_MMAP        Enable using mmap() on the guest_memfd file
->> -                               descriptor.
->> -  GUEST_MEMFD_FLAG_INIT_SHARED Make all memory in the file shared during
->> -                               KVM_CREATE_GUEST_MEMFD (memory files created
->> -                               without INIT_SHARED will be marked private).
->> -                               Shared memory can be faulted into host userspace
->> -                               page tables. Private memory cannot.
->> -  ============================ ================================================
->> +  ============================== ================================================
->> +  GUEST_MEMFD_FLAG_MMAP          Enable using mmap() on the guest_memfd file
->> +                                 descriptor.
->> +  GUEST_MEMFD_FLAG_INIT_SHARED   Make all memory in the file shared during
->> +                                 KVM_CREATE_GUEST_MEMFD (memory files created
->> +                                 without INIT_SHARED will be marked private).
->> +                                 Shared memory can be faulted into host userspace
->> +                                 page tables. Private memory cannot.
->> +  GUEST_MEMFD_FLAG_NO_DIRECT_MAP The guest_memfd instance will unmap the memory
->> +                                 backing it from the kernel's address space
->> +                                 before passing it off to userspace or the guest.
->> +  ============================== ================================================
->>
->>   When the KVM MMU performs a PFN lookup to service a guest fault and the backing
->>   guest_memfd has the GUEST_MEMFD_FLAG_MMAP set, then the fault will always be
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
->> index 68bd29a52f24..6de1c3a6344f 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -2483,10 +2483,7 @@ static inline bool kvm_arch_has_irq_bypass(void)
->>   }
->>
->>   #ifdef CONFIG_KVM_GUEST_MEMFD
->> -static inline bool kvm_arch_gmem_supports_no_direct_map(void)
->> -{
->> -     return can_set_direct_map();
->> -}
->> +bool kvm_arch_gmem_supports_no_direct_map(struct kvm *kvm);
+On Thu, Mar 05, 2026 at 02:32:54PM +0000, Will Deacon wrote:
+> On Mon, Mar 02, 2026 at 04:57:57PM +0000, Catalin Marinas wrote:
+> > @@ -28,6 +30,15 @@ static struct hyp_pool host_s2_pool;
+> >  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
+> >  #define current_vm (*this_cpu_ptr(&__current_vm))
+> >  
+> > +static void pkvm_sme_dvmsync_fw_call(void)
+> > +{
+> > +	if (cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC)) {
+> > +		struct arm_smccc_res res;
+> > +
+> > +		arm_smccc_1_1_smc(ARM_SMCCC_CPU_SME_DVMSYNC_WORKAROUND, &res);
+> > +	}
+> > +}
+> > +
+> >  static void guest_lock_component(struct pkvm_hyp_vm *vm)
+> >  {
+> >  	hyp_spin_lock(&vm->lock);
+> > @@ -553,6 +564,12 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
+> >  	if (ret)
+> >  		return ret;
+> >  
+> > +	/*
+> > +	 * After stage2 maintenance has happened, but before the page owner has
+> > +	 * changed.
+> > +	 */
+> > +	pkvm_sme_dvmsync_fw_call();
 > 
-> It's odd given that you introduced that code two patches previously. Can
-> these changes directly be squashed into the earlier patch?
-> [...]
+> Please note that this will conflict with my patch series adding support
+> for protected memory with pkvm. I _think_ the right answer is to
+> move this call into host_stage2_set_owner_metadata_locked().
 
-You're right, I'll pull it in the "KVM: x86: define 
-kvm_arch_gmem_supports_no_direct_map()".
+Yes, it needs to be after host_stage2_try(), so it makes sense to move
+it to host_stage2_set_owner_metadata_locked(). Let's see which order the
+patches go in or we may have to fix the conflict during merge.
 
-> 
->>
->> +#define KVM_GMEM_FOLIO_NO_DIRECT_MAP BIT(0)
->> +
->> +static bool kvm_gmem_folio_no_direct_map(struct folio *folio)
->> +{
->> +     return ((u64)folio->private) & KVM_GMEM_FOLIO_NO_DIRECT_MAP;
->> +}
->> +
->> +static int kvm_gmem_folio_zap_direct_map(struct folio *folio)
->> +{
->> +     u64 gmem_flags = GMEM_I(folio_inode(folio))->flags;
->> +     int r = 0;
->> +
->> +     if (kvm_gmem_folio_no_direct_map(folio) || !(gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP))
->> +             goto out;
->> +
->> +     folio->private = (void *)((u64)folio->private | KVM_GMEM_FOLIO_NO_DIRECT_MAP);
->> +     r = folio_zap_direct_map(folio);
-> 
-> And if it fails, you'd leave KVM_GMEM_FOLIO_NO_DIRECT_MAP set.
-> 
-> What about modifying ->private only if it really worked?
+We can also leave the pKVM workaround for later once your rework goes
+in.
 
-True. I'll do
-
-	r = folio_zap_direct_map(folio);
-	if (!r)
-		folio->private = (void *)((u64)folio->private | 
-KVM_GMEM_FOLIO_NO_DIRECT_MAP);
-
-> 
->> +
->> +out:
->> +     return r;
->> +}
->> +
->> +static void kvm_gmem_folio_restore_direct_map(struct folio *folio)
->> +{
->> +     /*
->> +      * Direct map restoration cannot fail, as the only error condition
->> +      * for direct map manipulation is failure to allocate page tables
->> +      * when splitting huge pages, but this split would have already
->> +      * happened in folio_zap_direct_map() in kvm_gmem_folio_zap_direct_map().
->> +      * Note that the splitting occurs always because guest_memfd
->> +      * currently supports only base pages.
->> +      * Thus folio_restore_direct_map() here only updates prot bits.
->> +      */
->> +     WARN_ON_ONCE(folio_restore_direct_map(folio));
-> 
-> Which raised the question: why should this function then even return an
-> error?
-
-Dave pointed earlier that the failures were possible [1].  Do you think 
-we can document it better?
-
-[1] 
-https://lore.kernel.org/kvm/51a059a1-f03a-4b43-8df6-d31fca09cce7@intel.com/
-
-> 
-> 
->> +     folio->private = (void *)((u64)folio->private & ~KVM_GMEM_FOLIO_NO_DIRECT_MAP);
->> +}
->> +
->>   static inline void kvm_gmem_mark_prepared(struct folio *folio)
->>   {
->>        folio_mark_uptodate(folio);
->> @@ -393,11 +433,17 @@ static bool kvm_gmem_supports_mmap(struct inode *inode)
->>        return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_MMAP;
->>   }
->>
->> +static bool kvm_gmem_no_direct_map(struct inode *inode)
->> +{
->> +     return GMEM_I(inode)->flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP;
->> +}
->> +
->>   static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>   {
->>        struct inode *inode = file_inode(vmf->vma->vm_file);
->>        struct folio *folio;
->>        vm_fault_t ret = VM_FAULT_LOCKED;
->> +     int err;
->>
->>        if (((loff_t)vmf->pgoff << PAGE_SHIFT) >= i_size_read(inode))
->>                return VM_FAULT_SIGBUS;
->> @@ -423,6 +469,14 @@ static vm_fault_t kvm_gmem_fault_user_mapping(struct vm_fault *vmf)
->>                kvm_gmem_mark_prepared(folio);
->>        }
->>
->> +     if (kvm_gmem_no_direct_map(folio_inode(folio))) {
->> +             err = kvm_gmem_folio_zap_direct_map(folio);
->> +             if (err) {
->> +                     ret = vmf_error(err);
->> +                     goto out_folio;
->> +             }
->> +     }
->> +
->>        vmf->page = folio_file_page(folio, vmf->pgoff);
->>
->>   out_folio:
->> @@ -533,6 +587,9 @@ static void kvm_gmem_free_folio(struct folio *folio)
->>        kvm_pfn_t pfn = page_to_pfn(page);
->>        int order = folio_order(folio);
->>
->> +     if (kvm_gmem_folio_no_direct_map(folio))
->> +             kvm_gmem_folio_restore_direct_map(folio);
->> +
->>        kvm_arch_gmem_invalidate(pfn, pfn + (1ul << order));
->>   }
->>
->> @@ -596,6 +653,9 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->>        /* Unmovable mappings are supposed to be marked unevictable as well. */
->>        WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
->>
->> +     if (flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
->> +             mapping_set_no_direct_map(inode->i_mapping);
->> +
->>        GMEM_I(inode)->flags = flags;
->>
->>        file = alloc_file_pseudo(inode, kvm_gmem_mnt, name, O_RDWR, &kvm_gmem_fops);
->> @@ -804,15 +864,25 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->>        if (IS_ERR(folio))
->>                return PTR_ERR(folio);
->>
->> -     if (!is_prepared)
->> +     if (!is_prepared) {
->>                r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
->> +             if (r)
->> +                     goto out_unlock;
->> +     }
->> +
->> +     if (kvm_gmem_no_direct_map(folio_inode(folio))) {
->> +             r = kvm_gmem_folio_zap_direct_map(folio);
->> +             if (r)
->> +                     goto out_unlock;
->> +     }
-> 
-> 
-> It's a bit nasty that we have two different places where we have to call
-> this. Smells error prone.
-
-We will actually have 2 more: for the write() syscall and UFFDIO_COPY, 
-and 0 once we have [2]
-
-[2] 
-https://lore.kernel.org/linux-mm/20260225-page_alloc-unmapped-v1-0-e8808a03cd66@google.com/
-
-> 
-> I was wondering why kvm_gmem_get_folio() cannot handle that?
-
-Most of the call sites follow the pattern alloc -> write -> zap so 
-they'll need direct map for some time after the allocation.
-
-> 
-> Then also fallocate() would directly be handled directly, instead of
-> later at fault time etc.
-
-Good question about fallocate().  It's not apparent to me that it needs 
-to remove pages from direct map because we may not be able to 
-initisalise them later on if we do.
-
-> 
-> Is it because __kvm_gmem_populate() etc need to write to this page?
-
-I think it also applies to write(), UFFDIO_COPY and 
-kvm_gmem_fault_user_mapping().
-
-> 
-> 
-> --
-> Cheers,
-> 
-> David
-
+-- 
+Catalin
