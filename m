@@ -1,54 +1,54 @@
-Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60FCA3AE718
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7EB3AEF3A
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772805770; cv=none; b=WD+lCRRSWkLVfMqgOCftgtC7dGKLA1Qoq8Z+b+XscspyJPcUj3euMbekijQubxewI6SU2UK1GVJAA9RGC/pbeziDDteBNPBk9FX01awFi9gwTJTRwg1RFCyBXaDrmsujriJhGLbOjZJwIbtIeJ39E6uniyUnxvSJe/zO4foALDM=
+	t=1772805773; cv=none; b=GeK2YnYgIrVohzADmizg+28K7oHVd+OZNoJ1uHfBeGoG/rMG58ACe2OCWB7rqz2YjIJyS+qOzAINEqVhake2DMnxFlLZLblu+mi7wFxJZaN8KqDt2+/r2K9oFAldkr9/KHhVpJRhAO/sVe4kJxLzKupIVAim54LV0hkG27Gfj5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772805770; c=relaxed/simple;
-	bh=dssjA3u+VFXpsFKHFhYOAlR5Hr1cip10VgtJuYqdW38=;
+	s=arc-20240116; t=1772805773; c=relaxed/simple;
+	bh=3OQfV3w/2qk9lemOSyqAInJWfA1kcX3/Dpbr8AywQL8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZhTEAvf0WjusAjZCh6P67h7pHz90hNskWtBcg/wQvTj+4T6ZXsoQnDFNeUDejp2iU8HWY+ZY4QOe4ZGappAhk+j7FRXgul6TtmyGqZlTIqkhNXbNOSVfovkFw+GkqUSw/CgFBehj6OsY6T3oipZPUuND7vki4gRM2bobj1GJPh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2KalVPCR; arc=none smtp.client-ip=209.85.208.73
+	 To:Cc:Content-Type; b=fx22aVxF82X8vbofesPwPXCCX1z0iQPOCTCcQUm6J2067HYZEMd9SW6+wHg7Nvl7wLa1undyjtDnA7tGip8KqueXXu95KqAZCbMuP9fd4HqloFGCPBSOiI1gHzGP5t3K571m7H9gvFKWoZ7LHV4lE6SkHX6XCrcNCAMDn2mFRyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bw96xhFR; arc=none smtp.client-ip=209.85.208.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2KalVPCR"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-66184f62c28so1859352a12.2
-        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:02:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bw96xhFR"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-661aae3a881so1286284a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:02:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772805768; x=1773410568; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1772805769; x=1773410569; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nrle6LcPHnpw57JFxD6jZW7nwqfyHVVEsUa7FBi+veg=;
-        b=2KalVPCRei0H2s9+Lkyu0h4ngw4rzAdL1glTAE7xave1Ns4atEF6pOnTux4UP7UgLD
-         iR6rpBqr7RQx0HU/a4o/uZ7+SLQ+T9rTzCjpgNbOUM4FWOnY69MtpnHkza4oJt1as0Hs
-         gXIZ9TfZGVcr3h7/o3IntEgsivrLFVjm5iDJyxdXWL9R+SYcQztK7UL0Cp3duhmBBJ5u
-         FDYCrq9AT6kpIN7wHM10no6ixAr1AWz6Sad55+kybNIJzfcLLNVc7JhMsfFUdD2VSZOM
-         2d1NcTLcFAIsYimbBIYv40ttEQMtiz21/pEUP+2BKSyRjL+fpVhOCmdNVV1JAqcZzVsc
-         krhA==
+        bh=CtHGmGW+kuNXfpqkwV8R0QzbahP6BhHBAQuRE9dnG2k=;
+        b=bw96xhFR9gQNYi9r/HVp15X5ctZoW2fDJU3/p6vZIwoKnG41t40XTIGJwcG49kgxpZ
+         i3vusuOMz6rhzWAe3N6JoeMiLjKq5EDR29GTo8/hOj9LeySxKDI0w9mj98w55Oozy4pb
+         I+ugz6hJnuBNR6dpCeQo0fHBW7TTNrj1tMSkW8+gr0mlbpw6fuzRwSOHAVijDEzfPCZC
+         4UFKL89MMK/oGs2/o7d1e2ZGxieapmNWJOqwIPdSUj/uHFzrzT5gkmd8/Cj2t5Hd+ytc
+         EkvvqI0g8gCQxWJYNk94yMJEnApttabmGtPRDnZNK9dL6YvqaUrniycuaqOSC+wX3eop
+         DF7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772805768; x=1773410568;
+        d=1e100.net; s=20230601; t=1772805769; x=1773410569;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nrle6LcPHnpw57JFxD6jZW7nwqfyHVVEsUa7FBi+veg=;
-        b=c4jMtV27UdZB9JnxoLzgoJMwQeNZR6lW57jc4Jti9RpktwoGq+uPxa+8W/06fOisGs
-         HFPKjQI8vVt9Zyd+kPplCdIwIrWqSQ6mkcEdKFjmd9U2G9i6UtrQ/+ITzXK0seqi+CnS
-         hYCEDXVNFOpv7gTUrknEYjrlnrcuiXi8Zi6HEJPr5Q3qMWQX17J0eurmSkmIFSJh33uv
-         tfg0XgIn8x93cJt5FJfWvB+0wHvNNh1CmqkSzI+9BVW7BpZEEknetMFfKbV99B+koJlz
-         jJbDt7mxLj+nYnfJPKlaoze9xUlTXYjX2pOaef+H8Olpar/M179Up5+tbMbk/EHbUfep
-         R+ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXY8gG5633a9bdNPY8QZKly5uG10NH3K2lfmSJf3rn1ZGRbvtwdWndINwgHOwSzznoUVquvbLg=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx84bp7K8i+f03E7EITiKNLr4aazIIkMcTzJR4/Aydlo6Ts3PsL
-	9fmk6rSG1a8JbPnb+O6xbZroSV5fHHZbYt2O7CUnxNhr7XByHCPMEjwGZZ24mxkZWxbCdFF3UL5
-	QLw==
-X-Received: from edn26-n2.prod.google.com ([2002:a05:6402:a0da:20b0:661:18d5:ee37])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:1d48:b0:65f:9c21:e68e
- with SMTP id 4fb4d7f45d1cf-6619d45a9f3mr1338158a12.5.1772805767541; Fri, 06
- Mar 2026 06:02:47 -0800 (PST)
-Date: Fri,  6 Mar 2026 14:02:30 +0000
+        bh=CtHGmGW+kuNXfpqkwV8R0QzbahP6BhHBAQuRE9dnG2k=;
+        b=SqwenC0McRPGwoPU4Wp9tFgX5dv9qbLumKCxbXSuMGe5/4r2NfDi8NdkxmAgrEhFzb
+         mDlp2qLspHvCVyR7XKnu6h/tUDqO9d7jlKJZdLr1y4qqBDeYSQzo0KQoqZ5TLQmqmktF
+         ok0OK4nWv+t4sR2cV/f+zAsWPwjt8hlsleAc4iCzj09naqxzCLxP/0fjCGWcbkU9CY26
+         vZso9SM8DwBv+QV5/lQ9rgCgaE+ykt5fJ1IpxH/gYl493I0O2owRVdxjNrg20o1MJzwb
+         QEcZPhdZZita/LoEZJvWs8pTnNSQYaPAbUuixjbaQizodf4eY5Y4SyGc4MVl3LPaWmGK
+         ddCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyGzsBZ84Y/EdQejO6N05MhG0uazFJNR+r1B50jNbR0i6BT2u3tvjZJLCEYUdzkzsXggVg6qg=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyAK9YtN8F9X1Uh8ND0IDAI7X86gkQ3TbLRNFpL4Ey+OtiG+E+Q
+	wn1ERMJjO1m4qN3bzvzhEbhXHF8n8LxLGGcpP1cdpQxXSaNl0Sc9P8fqPoGOBJfNxtU0D4M2piw
+	EUA==
+X-Received: from edoy18.prod.google.com ([2002:aa7:c252:0:b0:660:e9bd:31af])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:2807:b0:658:1304:b699
+ with SMTP id 4fb4d7f45d1cf-6619d50626dmr1271444a12.31.1772805768583; Fri, 06
+ Mar 2026 06:02:48 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:02:31 +0000
 In-Reply-To: <20260306140232.2193802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260306140232.2193802-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306140232.2193802-12-tabba@google.com>
-Subject: [PATCH v1 11/13] KVM: arm64: Optimize early exit checks in kvm_s2_fault_pin_pfn()
+Message-ID: <20260306140232.2193802-13-tabba@google.com>
+Subject: [PATCH v1 12/13] KVM: arm64: Hoist MTE validation check out of MMU
+ lock path
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -68,38 +69,68 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Optimize the early exit checks in kvm_s2_fault_pin_pfn by grouping all
-error responses under the generic is_error_noslot_pfn check first,
-avoiding unnecessary branches in the hot path.
+Simplify the non-cacheable attributes assignment by using a ternary
+operator. Additionally, hoist the MTE validation check (mte_allowed) out
+of kvm_s2_fault_map() and into kvm_s2_fault_compute_prot(). This allows
+us to fail faster and avoid acquiring the KVM MMU lock unnecessarily
+when the VMM introduces a disallowed VMA for an MTE-enabled guest.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/mmu.c | 28 ++++++++++++----------------
+ 1 file changed, 12 insertions(+), 16 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 2d6e749c1756..9265a7fc43f7 100644
+index 9265a7fc43f7..cc6b35efcee5 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1791,12 +1791,13 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
- 	fault->pfn = __kvm_faultin_pfn(fault->memslot, fault->gfn,
- 				       fault->write_fault ? FOLL_WRITE : 0,
- 				       &fault->writable, &fault->page);
--	if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
--		kvm_send_hwpoison_signal(fault->hva, __ffs(fault->vma_pagesize));
--		return 0;
--	}
--	if (is_error_noslot_pfn(fault->pfn))
-+	if (unlikely(is_error_noslot_pfn(fault->pfn))) {
-+		if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
-+			kvm_send_hwpoison_signal(fault->hva, __ffs(fault->vma_pagesize));
-+			return 0;
-+		}
- 		return -EFAULT;
-+	}
+@@ -1870,18 +1870,21 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
+ 	if (fault->exec_fault)
+ 		fault->prot |= KVM_PGTABLE_PROT_X;
  
- 	return 1;
+-	if (fault->s2_force_noncacheable) {
+-		if (fault->vm_flags & VM_ALLOW_ANY_UNCACHED)
+-			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+-		else
+-			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
+-	} else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC)) {
++	if (fault->s2_force_noncacheable)
++		fault->prot |= (fault->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
++			       KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
++	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+ 		fault->prot |= KVM_PGTABLE_PROT_X;
+-	}
+ 
+ 	if (fault->nested)
+ 		adjust_nested_exec_perms(kvm, fault->nested, &fault->prot);
+ 
++	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
++		/* Check the VMM hasn't introduced a new disallowed VMA */
++		if (!fault->mte_allowed)
++			return -EFAULT;
++	}
++
+ 	return 0;
  }
+ 
+@@ -1918,15 +1921,8 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+ 		}
+ 	}
+ 
+-	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
+-		/* Check the VMM hasn't introduced a new disallowed VMA */
+-		if (fault->mte_allowed) {
+-			sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
+-		} else {
+-			ret = -EFAULT;
+-			goto out_unlock;
+-		}
+-	}
++	if (!fault->fault_is_perm && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
++		sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
+ 
+ 	/*
+ 	 * Under the premise of getting a FSC_PERM fault, we just need to relax
 -- 
 2.53.0.473.g4a7958ca14-goog
 
