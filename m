@@ -1,54 +1,54 @@
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C96F3A9D8C
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F359D3A9D8A
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772805767; cv=none; b=aKER3b2IXitu62tPELKodVSlVookUXKy85eVLeON6eYlnc62yRMBYSc92ihQRfb+2iCCxPM+AUExQ288uNU/ik0IQa0KmZ/G/oowSpcxydaefEflGNJpn3WOA+y4kj7x4n6BDf3WUM6R0s864a+9Awd2nfDoGOSPYngFRitTDK4=
+	t=1772805768; cv=none; b=tXBWHWRSIfBK+1TNiE/PRHLyJ40tZ2Bmcb25zjcOaEKle85hF1D9JFPyjpRnZdKgakiUiGeD/Fx/Vj3viAqJMJ30+WhD4Aq3FCJzXvI3IMGjS2W9xtShVLE9tfOByrHXBuvO3laTA+5sFhUk32e6Nfqk0RiFNW6+P4anZlWTiB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772805767; c=relaxed/simple;
-	bh=BMbVT7miz8KQ7+AZQDsGiqCWygy7M90I6XCpAU+izv0=;
+	s=arc-20240116; t=1772805768; c=relaxed/simple;
+	bh=h1PHct1x/stm5rxYiib9C8v7vw/FQ3/w8rGWdwn8hBc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nlkLN4mHAzVAUGsUC4T0T6aeB+Lys+XprgkTQXI01iTXhZ6y2zOfnD/oNV86W4PGTmkTAtX/x4NtyJJxhehk/cvpTe7XbIXQIhNTUWplra8tCaJQJ96nlj2re8JJuzPTeAvOLukc1a5nw840g2VMY5d6k6Q69Xrog1e5GJpqZNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2v2eTynn; arc=none smtp.client-ip=209.85.218.74
+	 To:Cc:Content-Type; b=A/JOrlAHJbNdIDZfDoXumdNWVmh01UU7Awr+7FC5Zmctglcld7BaXx4NaI8JgCLHigNlB6pE3nkHWyLYcM6Tg2fmNv/5qJeWwoRBvYBEeLOo/5i3lHTU6QNpEqwegsEJ9kyRfps6TsXoyaoOoxib2etTEVynBfXYItMPk6GtNj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YNk5NNff; arc=none smtp.client-ip=209.85.208.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2v2eTynn"
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-b90bb54d034so1024774366b.0
-        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:02:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YNk5NNff"
+Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-661420734b7so3068339a12.1
+        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:02:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772805763; x=1773410563; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1772805764; x=1773410564; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KT44YeiLTJyOwAcprGitUZ5uZxYG91k2apEts1OjnSo=;
-        b=2v2eTynnP/HgBLBP8xZGDq0rP1ga+8pwsUraPXJQINvTjYQcYrEbBc4n2lz2bfuILZ
-         mHYoU8mUsQ/asDH4j73lvl/xG/OfgTaDaXNHtScPTkXJsArrJwpPrnvhnVv3dheTVRcv
-         Ruf+SiUv76RXkfWu4VzBErjWsVUnodGnksqDtCE40Tr5A7DazhnJfjLpZ7gu/QOliFAh
-         HWLdTvd/w0w2h9znNiR3RaypWRyLGTBd4Oa57LnJH2dQ7d6Om2iqX+1YKIWGye5E8/BH
-         pOTn+QE/dU+Mps4FsLUDefgAANPCCRtaz01q+AcOHRXIeSDzB7SD/dyfZqCfXHFLCC6H
-         hy6g==
+        bh=qBDvUPOUvZlIighyaRp+5oG5fBA2IhyoxKOHVs/vQh8=;
+        b=YNk5NNffg4KQQ6MV32q5pi+2A3V5RKdEzimG9S4fES0lGTTxioCmK/eKkpD3ZieK1B
+         plrrjhuy4h5B+UmAffO4kGf9MU9uvLkXp+y2MvNzlenrB14u+PxGnT0qlnfgds9FWTXI
+         WzVAjcguK22miz0fYpCVaph/ysX7ap4qEURYXshu7o3ZpE5RIKlg9rxq2z5ptArsX5Rf
+         9HpfuOufxkGm3PNJZK67CoYfq8pfrpuBsxXmuUdCgkBAWj1ezTZZrC7Lk4bwq67Jzwl8
+         2DIYaHINKIWcPD/SvVg5MbgjwSOw0CyfB/NY/u29AmMwR3CiQs5iA45Cbb34rWCeAz1C
+         0hUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772805763; x=1773410563;
+        d=1e100.net; s=20230601; t=1772805764; x=1773410564;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KT44YeiLTJyOwAcprGitUZ5uZxYG91k2apEts1OjnSo=;
-        b=ZFFH/vL43aTOZkbSXuitsSgrvgmcK8Khszq2JFqGfaLJ25Vj4Q08N0O4jS/RfEJc8W
-         EgRbZpPnk5TvYLeOLKIRJsOXGh80+yHf3R0N9Bozcw0GjCTZHYW7fE+12KKDPL6/IA/H
-         u+9aKM3s6PSXJM32Bb63i5zpf3Cl4t0fZ1mqzqTi/TTB2yRpf19vfqezeig5/qFL2Rrp
-         XUf4b/dAhHuIH+eNm/wj45DxASa0nwl+9O57/yHG/3GVI+417fNYhDDXo0ON6IkMuUJ1
-         1zstZD8Zs4W+kFnKhO0PkGaaObKEVS23zAcOhJ6jp7lmSaL6OB2Pn/x451VOM5P5e2yf
-         dLYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWurK5pA8sEEZp5WcJqgoW6xe1YvzPc/jpqEVp0Ukm1ejkmKSrx4F1g3TyaEkTj79/6+H20LhA=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzVtVs/3UMpleKMpfmnP+k+beNbuDodb7kglLwIIylpDHcqDOk/
-	72wxsllihKH7gm/VGc3O5P3i0q01Idx7C70DO20mMmziU74cLIrFgCRT7JLC0akN7mgN5bS3vG8
-	Zhg==
-X-Received: from ejfw12.prod.google.com ([2002:a17:906:a0c:b0:b94:f06:dc6e])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:d54b:b0:b93:5ef5:904f
- with SMTP id a640c23a62f3a-b942d1b1bebmr143967466b.26.1772805762935; Fri, 06
- Mar 2026 06:02:42 -0800 (PST)
-Date: Fri,  6 Mar 2026 14:02:26 +0000
+        bh=qBDvUPOUvZlIighyaRp+5oG5fBA2IhyoxKOHVs/vQh8=;
+        b=t+Qjlw5Kow+GAbnC/Y/3G88obqRZVjdsMfGM1g17E0l0bkh7AjTpbMDRep33lh6qh+
+         mgGoOEeFultA2Fz1Xl2fK2YkAdOLVmAB7dZCUGyx1jVTErGBEdzrAVHdW6+yz9v68HiZ
+         NVGCahq/OgaXK0EgiURsS9ypmi7R3x4dqWIG8A3JKOB/Z3z5AXoKyIkLcCllYfW9XrJT
+         3txKpnVns9NeH7DHNke+EOrl2tk2l+NjoHl5v207qc5si72LB4YhBZN5qt4L3gj0noFG
+         jAwihBg6iyVkFnIfKEyRk6VE81JOBgiHt4WmXt8FW4AqsIJlu5h03PSPpFU2JqzktUUY
+         GWGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJgc9UuMjlW1nU2y+CmPEgoSxWV2+2aL6EAjagsQCOCb4qg5fw1aKgkl8baO16pOOQDH1G5fM=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yzttn3xLchGkmnI8bddlijuYz+w6h6u47zFAeUEjVMqMBdE8Z1C
+	mKHu7eDAoy9jwrMhdlVt43bELvj+XspjcBqe8cTn5xbWLd42rJItcdzN+N9JabXmYbsQl53z2yI
+	p0w==
+X-Received: from edev7-n2.prod.google.com ([2002:a05:6402:a2c7:20b0:660:afb7:89d6])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:1d4c:b0:658:e665:766c
+ with SMTP id 4fb4d7f45d1cf-6619d46826dmr1250580a12.8.1772805763972; Fri, 06
+ Mar 2026 06:02:43 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:02:27 +0000
 In-Reply-To: <20260306140232.2193802-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,9 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260306140232.2193802-1-tabba@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306140232.2193802-8-tabba@google.com>
-Subject: [PATCH v1 07/13] KVM: arm64: Simplify nested VMA shift calculation
+Message-ID: <20260306140232.2193802-9-tabba@google.com>
+Subject: [PATCH v1 08/13] KVM: arm64: Remove redundant state variables from
+ struct kvm_s2_fault
 From: Fuad Tabba <tabba@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org
@@ -68,52 +69,77 @@ Cc: maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
 	will@kernel.org, qperret@google.com, vdonnefort@google.com, tabba@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-In the kvm_s2_resolve_vma_size() helper, the local variable vma_pagesize
-is calculated from vma_shift, only to be used to bound the vma_pagesize
-by max_map_size and subsequently convert it back to a shift via __ffs().
-
-Because vma_pagesize and max_map_size are both powers of two, we can
-simplify the logic by omitting vma_pagesize entirely and bounding the
-vma_shift directly using the shift of max_map_size. This achieves the
-same result while keeping the size-to-shift conversion out of the helper
-logic.
+Remove redundant variables vma_shift and vfio_allow_any_uc from struct
+kvm_s2_fault as they are easily derived or checked when needed.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/mmu.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ arch/arm64/kvm/mmu.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 833a7f769467..090a906d3a12 100644
+index 090a906d3a12..01f4f4bee155 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1646,7 +1646,6 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
- 				     bool *force_pte, phys_addr_t *ipa)
- {
- 	short vma_shift;
--	long vma_pagesize;
- 
- 	if (*force_pte)
- 		vma_shift = PAGE_SHIFT;
-@@ -1677,8 +1676,6 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
- 		WARN_ONCE(1, "Unknown vma_shift %d", vma_shift);
+@@ -1721,10 +1721,8 @@ struct kvm_s2_fault {
+ 	bool mte_allowed;
+ 	bool is_vma_cacheable;
+ 	bool s2_force_noncacheable;
+-	bool vfio_allow_any_uc;
+ 	unsigned long mmu_seq;
+ 	phys_addr_t ipa;
+-	short vma_shift;
+ 	gfn_t gfn;
+ 	kvm_pfn_t pfn;
+ 	bool logging_active;
+@@ -1749,9 +1747,9 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+ 		return -EFAULT;
  	}
  
--	vma_pagesize = 1UL << vma_shift;
+-	fault->vma_shift = kvm_s2_resolve_vma_size(vma, fault->hva, fault->memslot, fault->nested,
+-						   &fault->force_pte, &fault->ipa);
+-	fault->vma_pagesize = 1UL << fault->vma_shift;
++	fault->vma_pagesize = 1UL << kvm_s2_resolve_vma_size(vma, fault->hva, fault->memslot,
++							     fault->nested, &fault->force_pte,
++							     &fault->ipa);
+ 
+ 	/*
+ 	 * Both the canonical IPA and fault IPA must be aligned to the
+@@ -1764,8 +1762,6 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+ 	fault->gfn = fault->ipa >> PAGE_SHIFT;
+ 	fault->mte_allowed = kvm_vma_mte_allowed(vma);
+ 
+-	fault->vfio_allow_any_uc = vma->vm_flags & VM_ALLOW_ANY_UNCACHED;
 -
- 	if (nested) {
- 		unsigned long max_map_size;
+ 	fault->vm_flags = vma->vm_flags;
  
-@@ -1703,8 +1700,7 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
- 			max_map_size = PAGE_SIZE;
- 
- 		*force_pte = (max_map_size == PAGE_SIZE);
--		vma_pagesize = min_t(long, vma_pagesize, max_map_size);
--		vma_shift = __ffs(vma_pagesize);
-+		vma_shift = min_t(short, vma_shift, __ffs(max_map_size));
+ 	fault->is_vma_cacheable = kvm_vma_is_cacheable(vma);
+@@ -1796,7 +1792,7 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+ 				       fault->write_fault ? FOLL_WRITE : 0,
+ 				       &fault->writable, &fault->page);
+ 	if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
+-		kvm_send_hwpoison_signal(fault->hva, fault->vma_shift);
++		kvm_send_hwpoison_signal(fault->hva, __ffs(fault->vma_pagesize));
+ 		return 0;
  	}
+ 	if (is_error_noslot_pfn(fault->pfn))
+@@ -1874,7 +1870,7 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
+ 		fault->prot |= KVM_PGTABLE_PROT_X;
  
- 	return vma_shift;
+ 	if (fault->s2_force_noncacheable) {
+-		if (fault->vfio_allow_any_uc)
++		if (fault->vm_flags & VM_ALLOW_ANY_UNCACHED)
+ 			fault->prot |= KVM_PGTABLE_PROT_NORMAL_NC;
+ 		else
+ 			fault->prot |= KVM_PGTABLE_PROT_DEVICE;
+@@ -1978,7 +1974,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		.logging_active = memslot_is_logging(memslot),
+ 		.force_pte = memslot_is_logging(memslot),
+ 		.s2_force_noncacheable = false,
+-		.vfio_allow_any_uc = false,
+ 		.prot = KVM_PGTABLE_PROT_R,
+ 	};
+ 	struct kvm_s2_fault *fault = &fault_data;
 -- 
 2.53.0.473.g4a7958ca14-goog
 
