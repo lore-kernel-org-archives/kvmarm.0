@@ -1,218 +1,179 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.17.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B033C30EF65
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 15:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772811924; cv=pass; b=AAJJ/fzmzMZC9lUDhvHuAh/4WGcjmayMHMgB3ATrf3y19s9NH4YG1tZav7KshF/YAeKVf4oOZ/I0EaTKIBX3P/FhOmFUuAkMLTmK+YKgYYjq1q+5EEDqGNPfy2jtMBL9kkPzo6FCUQysKIyGG2ene4RV42OhBlvF22Pg7rVml+4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772811924; c=relaxed/simple;
-	bh=hsriqer5Wp7EhxGKavjbKgHNP6RubiuMiTVAUlMf2cc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B7u5YcRj8596eLVkqffPVtWw41lHv87liPDUSRzbAschMlhktIRT5MxL6ByEDdAHV0nEj3O272LyQUUw/Xk/TMqMUe6kcowA1JPWcMSc9RzqpnJCQtI9HXmCHSIRQIXtQGXL+wYa1CHSu8cdPolIRF1UEfDUy91tbaLAdf4Qx0s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3gAakK0G; arc=pass smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558073A4F3E
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 16:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1772815068; cv=none; b=pVhmdMXH/YrhdveZ6sGuFhsTbQjaFnVNbZDTHkKJmUq5n/czUG0fhLU0IUerGqsZTmBXNAUFXYPLm29SE0yBBJtq3+nOlBV6SqiHPxz6ofJoOpe3Im8dkFToSVh0UOgron0wSCiuee4DltJq/ciMkD7846s2nugLMcII/8QoHzs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1772815068; c=relaxed/simple;
+	bh=mGQAm165RgJQnpaCtmjRXUyFonFh4yiQd8/8lb1ELDI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=CgMUSJO8Cx1ofrMigrIkFkXNGDjn/+awlS5A/XXeM6CRxdDoQ0EgXa5cu5HJa8ClvWiujj1NhC3seEdUo2EDc6yvJHRUiONq2fHLYWmlKN/5Ri39UV/C9VY1BQN+h9WCeYP9YknJ1GxO9WGTyeiRRqynzIEZVoqyggBUIEYy5To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Sleaeb31; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3gAakK0G"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5069a785ed2so439451cf.1
-        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 07:45:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1772811922; cv=none;
-        d=google.com; s=arc-20240605;
-        b=h6xXqWwDMtxP7UPpnCFjlO9fdIObfEbpyttnO9XYRnv6NSVgDnmqID877bCDj2MyI1
-         +IQ6iZMvSqTWpoN4jgTVJXXX/5BwQjtqDGynovQpAmwpL89TK1yHgtJH7MIxsTc7K0Sx
-         RGqfIX+TbPS8zg27isDv6Qj+WNMEK6wa2iqFLXLcdmzgwjtrgr8W9xxItx74hXAxt/ac
-         HQSTsoHslBP2Q29QLzCk7wWrihEphloFXUXKoUZk6MyKS7k8fJadw4EGjtXVsfOWorFo
-         Eohot/WmTx9jpr1+JfP2Yf8DfN3XR1w817l/hG2hl+a6xvbGsOQ2uOjrNurmi/trd3DH
-         8PFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
-        fh=r35nXO34ckQkreQSZm7PGABGrVloDMECuLYvrO9w5bk=;
-        b=dbKvf+gmIuXWIHTWjj9flAaBk61xsiMiZi7u+4KTdrstv+7UK5V3YimVEWddrTJYTi
-         yQWuKndZ1OrM1jZCQiL5+rhLcKvuOhEgTY81TvsvH7bvfxVR4723RTUHfO+QhYEOkT8D
-         +CDfCNsN3Kn0Kqp3LEJQBOixyFU7QJs8cwQb4HYYe8mAHeRMIuc3DRoBz16JrPsmGvDr
-         YxJ6HG/rDzHdsPTO1CH6v60avya08wabdPyPdQRYKeG6WjMh8SYGzhuiGfBO9eqHdoRE
-         Cll5xGUIovvxYvZiJjDjM0WR3mZT+Rg/0lSYOeIJEeouwJ4obQa1dCEiJmm57ZL0ysqt
-         O2DA==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772811922; x=1773416722; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
-        b=3gAakK0GXlpI7sPVk+MyAk0TkLO1j8A1hk4kiWBoVsBVMns3H68fTPxjCR3kyeZTmY
-         t+LBzRGhbRCDGul8/aRPu0SIWyDZmIavCmpABRt2YhqF2Mnisaz+I+Mp9S54kuxHHjMo
-         1z6eCKFPG8zK+UO867P4E8tflk2ECGlKPkltERBLvMjTdv9yPQCUK4DleyFaZVFqk+Ic
-         BmGQRCG9DcChfDfDyeSFlfSLwGnGsWYtcU4Strms/DNBSFDftUKGeiVkj+lHpfi3n+mU
-         Gub/Iru/wrt4qsf4tIzYUJ1fgD5n/rNftvjNJCri95VuijSAqbslRKCVY+cjm1SzYpRR
-         srMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772811922; x=1773416722;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=unhg1T2qCPKxpfY/PSePUJ4/CJHWOdFGonXXRJegCXU=;
-        b=ONh4CvIWbqO+/UR2Qslg/oITj8cagt0S3SRFk+2U5b12RLvmZwev0EC3KxrfWFubsP
-         1W7xHOPPaoprwxXdI0A4yCdtjjidUr69HzJz4TZOFdw5r9VTVTNsRr3nN1FeEUfloV/k
-         JNabOc0IQylGnlwKf7wxArttUa84O3ZhsL7CFOpReu8lBOnblohTBrylRWsN2oGbXaml
-         UUOYGbX5NWFN/jIUCsfeIlcxB5A/goHIIt/Se9p77hg9MlYgOGuh8OUYDVWfYdX5gbrt
-         7W8nCvSgSvsWsYaMmCQQzdZ/58wkjpVh//WXcIiFYeWTmUzzn2XKu2r5Bt6xEQUL908K
-         l6ag==
-X-Forwarded-Encrypted: i=1; AJvYcCVYDfBJWS72FTp+wvIrH3CJk140NpyzC36s1q3JlHUHCo8QzFKlVfsbiaubWxrR7KsNdDlj8O4=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxPRU1QPzRnnxvhCVI02KZ0s3sEybexmMAXznV/Jvz+GesOfGV1
-	UAwvKs2UBHwBeEATWAKOYLgtiQWfWIUYrizszeLOjm6UiQJqJ+2hsxzL0FPzb0JDQvmad8Vj9S4
-	boZ95NumX8rQZmL3NolDcVVEOFExkuITGXXTp/mkn
-X-Gm-Gg: ATEYQzz/lWF7LlobAbeevdEe91O4Nyj3iy5JMVk9Izco7K3a4971P+AkQfM8MXHfnZB
-	BbfiT859+7wiINab6CxapW6aRs1piEjgnQfS7B/M88w7BNua5DybqlAdNSLwojgJfjIVkUSIShH
-	ezCxx2t4Dc364L5wmi0ZlAd4HfoQiIIzZvs01Vn84kfykUXPq7qIh4NW5U1rhXEJsf1SdK8Dhm4
-	VqHoUY/KfeaPb+qPfMLwbL5GK+WqmTcMvpldTXH9/MdaVaiHZRztIveFFyERwLH38QTw55ARpbC
-	9em6k/Nu
-X-Received: by 2002:a05:622a:1825:b0:501:5180:3c90 with SMTP id
- d75a77b69052e-508fa666c57mr3491241cf.15.1772811920943; Fri, 06 Mar 2026
- 07:45:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Sleaeb31"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1772815061; x=1773419861; i=markus.elfring@web.de;
+	bh=TCfMqLlrkbRKYgYFYGoOVPOZ3mtq4LlpJAeymSRod98=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=Sleaeb31xkUheefJ/t933ARsjiKjsbTwmSAYzI2NboDhCl7SFZN1blIgoF8JDyPK
+	 KAYBLazflj5kbUDkWuse/HUnOWrc1LAP5pdzUw2qdMGJPomCnUQQIUrcZw7fWHG/e
+	 gSglkP5c2tScGPeHZOhh0Y8iY0gvh09keE5bjJkj0zzH7HSx5xW0AYk5RAJskFRrL
+	 ALTdIK7nWCFDAt3gIJEATOnfG9tJNVJkIIF2b1KBM0DnjZ0ilt40kiDwaeRh2bhWG
+	 HJ8eoESw0Wgc1o+VupLSFSD1NpAsKP1+D3Aovd6L01WZAgXgAPccNpkcUJwtSnf4M
+	 y1mdZ9Mqws/mzVJPLA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M8C09-1w28oQ2Yhn-000iAs; Fri, 06
+ Mar 2026 17:37:41 +0100
+Message-ID: <677c7ad6-6e67-4011-b2d0-03d0d58547ce@web.de>
+Date: Fri, 6 Mar 2026 17:37:35 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260306140232.2193802-1-tabba@google.com> <86ikb96kg8.wl-maz@kernel.org>
-In-Reply-To: <86ikb96kg8.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 6 Mar 2026 15:44:44 +0000
-X-Gm-Features: AaiRm52XLBmqNfW9v8Obow2Zg0ILvEXXBAF6YDgU2FBbzIjxzMdGtwXjVc2CnoU
-Message-ID: <CA+EHjTzenq_xFwe8K_g1KFbETqndS3FnxPiwBRKrMvrxH4Z1qg@mail.gmail.com>
-Subject: Re: [PATCH v1 00/13] KVM: arm64: Refactor user_mem_abort() into a
- state-object model
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, qperret@google.com, 
-	vdonnefort@google.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+To: Vincent Donnefort <vdonnefort@google.com>,
+ linux-trace-kernel@vger.kernel.org, kernel-team@android.com,
+ kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ Joey Gouly <joey.gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Steven Rostedt <rostedt@goodmis.org>,
+ Suzuki Poulouse <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ John Stultz <jstultz@google.com>, Quentin Perret <qperret@google.com>,
+ Will Deacon <will@kernel.org>
+References: <20260306143536.339777-4-vdonnefort@google.com>
+Subject: Re: [PATCH v13 03/32] ring-buffer: Introduce ring-buffer remotes
+Content-Language: en-GB, de-DE
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20260306143536.339777-4-vdonnefort@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/7M96EMDdymY+btShE19XvuqDjcyQNoA88jOa7lXVK9lidCIu9B
+ 19mAqvnB/VTl3sYqz8/10ku0BD6XiZD3H6O2tHNK2GOIk/hDfrOjfS7GmXU69FMGL8Rr0oi
+ UzoMwPc095HwOs2OphD7g7r1mQNLXv/sOjaDiZZHtgYyXepez8oBU28OxnEikvG7l35P6Yi
+ 3oHtX+2xWUFPDZ3JfT1wQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:G6Dq01SMV3k=;waooZldAIodUPIcbwT2ijRSgjK/
+ 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
 
-On Fri, 6 Mar 2026 at 15:34, Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Fuad,
->
-> On Fri, 06 Mar 2026 14:02:19 +0000,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > As promised in my recent patch series fixing a couple of urgent bugs in
-> > user_mem_abort() [1], here is the actual refactoring to finally clean up this
-> > monolith.
-> >
-> > If you look through the Fixes: history of user_mem_abort(), you will start to
-> > see a very clear pattern of whack-a-mole caused by the sheer size and
-> > complexity of the function. For example:
-> > - We keep leaking struct page references on early error returns because the
-> >   cleanup logic is hard to track (e.g., 5f9466b50c1b and the atomic fault leak
-> >   I just fixed in the previous series).
-> > - We have had uninitialized memcache pointers (157dbc4a321f) because the
-> >   initialization flow jumps around unpredictably.
-> > - We have had subtle TOCTOU and locking boundary bugs (like 13ec9308a857 and
-> >   f587661f21eb) because we drop the mmap_read_lock midway through the function
-> >   but leave the vma pointer and mmu_seq floating around in the same lexical
-> >   scope, tempting people to use them.
-> >
-> > The bulk of the work is in the first 6 patches, which perform a strict,
-> > no-logic-change structural refactoring of user_mem_abort() into a clean,
-> > sequential dispatcher.
-> >
-> > We introduce a state object, struct kvm_s2_fault, which encapsulates
-> > both the input parameters and the intermediate state. Then,
-> > user_mem_abort() is broken down into focused, standalone helpers:
-> > - kvm_s2_resolve_vma_size(): Determines the VMA shift and page size.
-> > - kvm_s2_fault_pin_pfn(): Handles faulting in the physical page.
-> >   - kvm_s2_fault_get_vma_info(): A tightly-scoped sub-helper that isolates the
-> >     mmap_read_lock, VMA lookup, and metadata snapshotting.
-> > - kvm_s2_fault_compute_prot(): Computes stage-2 protections and evaluates
-> >   permission/execution constraints.
-> > - kvm_s2_fault_map(): Manages the KVM MMU lock, mmu_seq retry loops, MTE, and
-> >   the final stage-2 mapping.
-> >
-> > This structural change makes the "danger zone" foolproof. By isolating
-> > the mmap_read_lock region inside a tightly-scoped sub-helper
-> > (kvm_s2_fault_get_vma_info), the vma pointer is confined. It snapshots
-> > the required metadata into the kvm_s2_fault structure before dropping
-> > the lock. Because the pointers scope ends when the sub-helper returns,
-> > accessing a stale VMA in the mapping phase is not possible by design.
-> >
-> > The remaining patches in are localized cleanup patches. With the logic
-> > finally extracted into digestible helpers, these patches take the
-> > opportunity to streamline struct initialization, drop redundant struct
-> > variables, simplify nested math, and hoist validation checks (like MTE)
-> > out of the lock-heavy mapping phase.
-> >
-> > I think that there are still more opportunities to tidy things up some
-> > more, but I'll stop here to see what you think.
->
-> Thanks a lot for going through this, this looks like a very valuable
-> starting point. From a high-level perspective, the end result is even
-> more shocking:
->
-> <quote>
-> static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->                           struct kvm_s2_trans *nested,
->                           struct kvm_memory_slot *memslot, unsigned long hva,
->                           bool fault_is_perm)
-> {
->         bool write_fault = kvm_is_write_fault(vcpu);
->         bool logging_active = memslot_is_logging(memslot);
->         struct kvm_s2_fault fault = {
->                 .vcpu = vcpu,
->                 .fault_ipa = fault_ipa,
->                 .nested = nested,
->                 .memslot = memslot,
->                 .hva = hva,
->                 .fault_is_perm = fault_is_perm,
->                 .ipa = fault_ipa,
->                 .logging_active = logging_active,
->                 .force_pte = logging_active,
->                 .prot = KVM_PGTABLE_PROT_R,
->                 .fault_granule = fault_is_perm ? kvm_vcpu_trap_get_perm_fault_granule(vcpu) : 0,
->                 .write_fault = write_fault,
->                 .exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu),
->                 .topup_memcache = !fault_is_perm || (logging_active && write_fault),
->         };
-> </quote>
->
-> This kvm_s2_fault structure is a mess of architectural state (the
-> fault itself), hypervisor context (logging_active, force_pte...), and
-> implementation details (topup_memcache...). Effectively, that's the
-> container for *everything* that was a variable in u_m_a() is now part
-> of the structure that is passed around.
->
-> The task at hand is now to completely nuke this monster. The
-> architectural fault information should be further split, and directly
-> passed as a parameter to user_mem_abort(). We have a lot of redundant
-> state that is computed, recomputed, derived, and that should probably
-> moved into the exact place where it matters.
+=E2=80=A6
+> It is expected from the remote to keep the meta-page updated.
 
-Thanks Marc! Like I said, I stopped after 13 patches to see what you
-think, and if this is the right approach. But yes, more can be done
-here.
+See also once more:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv7.0-rc2#n94
 
->
-> I'll have a play with it,
 
-Sounds good, and if you'd like me to tackle any particular part of
-this, let me know.
+=E2=80=A6
+> +++ b/kernel/trace/ring_buffer.c
+=E2=80=A6
+> +int ring_buffer_poll_remote(struct trace_buffer *buffer, int cpu)
+> +{
+=E2=80=A6
+> +	cpus_read_lock();
+> +
+> +	/*
+> +	 * Make sure all the ring buffers are up to date before we start readi=
+ng
+> +	 * them.
+> +	 */
+> +	for_each_buffer_cpu(buffer, cpu) {
+=E2=80=A6
+> +	}
+> +
+> +	cpus_read_unlock();
+> +
+> +	return 0;
+> +}
+=E2=80=A6
 
-I have to admit, breaking this down into pieces and seeing how much
-tidier and easier to understand it became felt oddly satisfying.
+How do you think about to use another lock guard here?
+https://elixir.bootlin.com/linux/v7.0-rc1/source/include/linux/cpuhplock.h=
+#L48
 
-Cheers,
-/fuad
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Regards,
+Markus
