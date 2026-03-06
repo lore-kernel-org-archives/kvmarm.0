@@ -1,79 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F81371D0D
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 10:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F40C365A1E
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 11:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772794112; cv=none; b=BE7OmEMxDEeWAcb9Jk/7YRopOuMxEAWE3++Z48yb+71pnjDfPxUM/C1y/qbbDVvPjTlYmcrwUTFYujWFeJ78XwjGTfBqsbP6CbisioutNaTkCGv0a2+r5fOKxR/+8Zew+rxvdw3D0Rn06a/84CBuHJ4PJuh+Q7ArZfFUhRDV8YU=
+	t=1772795740; cv=none; b=E9/JkwKy91b1cLTrRAkM5AEq6t+/BSlQdH5n9zXd19J6jar+OkdUHexPREGSPHNl8j3/22aqQ0tvFdDCdmmwF/7TiyF+LP/rMqfdX+0KLDcTmw9iuPhEI1IbJzyFlZ5GJa7Tv2QNslUf6CUbipFZJUxiAEYQvcONHcKzofhnvCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772794112; c=relaxed/simple;
-	bh=I4BLXGkdfGb0t5nzy1NgItpRVyXjbFiNT2NMk6LuQMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kF5ZGjZfq6ZQW9vJGLrbMP/rBLzJS1KE80LKt84ezNsOoL+ti5bG13YXHeCCjDI3REFpfn2x2u8ecgLRbdeavvUHsdwhv2fA6BKIsZBF7tUxmrFm4QXPpFFR3wJfpZjqLc3N8OCg936xwdQpQGYqgwW6Yc3MHODcapNnLRBJWDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGIqvlDC; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGIqvlDC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5877BC4CEF7;
-	Fri,  6 Mar 2026 10:48:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772794112;
-	bh=I4BLXGkdfGb0t5nzy1NgItpRVyXjbFiNT2NMk6LuQMg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cGIqvlDCiMEIfv7619WJJnEtIEznXnhubTs1Nbk1HfhkBuT8kb4XUYEK9UCTrGeIx
-	 X3smIfUc0MNSq0O6S/h6OLaQGYrBarrWzisG3jyKJKUljlRdDJb2Y1CS/DgIPvn1wB
-	 HJfSY6l22Lyu5FbGvcELkBnpk8BXpiM0DSpHwVwYlaIC95BDgo9KqezZ+9gI3Xk1Em
-	 SmrBdnAu3sE/cubujhz6y/ZvGd9CTBJnc2sx4KxLdlURcTES/Z2XYNIb7gVQ0X8J5B
-	 jYlJ9hZwgQimxCdr4/H/6l71G0xaI2O3bouTF96oMe+CG7aub5mYy+uM+z0DKZYk5i
-	 diYhSt3M0D3Vw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vySjO-0000000Gnnr-2AE3;
-	Fri, 06 Mar 2026 10:48:30 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH] KVM: arm64: Remove the redundant ISB in __kvm_at_s1e2()
-Date: Fri,  6 Mar 2026 10:48:27 +0000
-Message-ID: <177279406015.3200749.13428414885597289.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260306074422.47694-1-zenghui.yu@linux.dev>
-References: <20260306074422.47694-1-zenghui.yu@linux.dev>
+	s=arc-20240116; t=1772795740; c=relaxed/simple;
+	bh=qnF3zT9yVbh5XNCyJc0W7dzO9SINg69qu6Umi0BJ6Js=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g4zYoFFwLkpj/iZwlTTuxvs+x31G5NaaRt2Wc27dZjs4Hrc9wzcDKRQm1dZrdh/HRBWzrwpAW6TXAb9Im3kdEeO+Uu2HvuCzxcrzQgx5/DILGBmDzzCx8p4OrLae1NeCEKPN4KPdbKfdHZf9U1JFuZ8OcBTodc81a0eS3KR630Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1D08F497;
+	Fri,  6 Mar 2026 03:15:32 -0800 (PST)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C5E403F836;
+	Fri,  6 Mar 2026 03:15:36 -0800 (PST)
+Date: Fri, 6 Mar 2026 11:15:34 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 2/4] arm64: tlb: Pass the corresponding mm to
+ __tlbi_sync_s1ish()
+Message-ID: <aaq3Vun0ZSSdXyXV@arm.com>
+References: <20260302165801.3014607-1-catalin.marinas@arm.com>
+ <20260302165801.3014607-3-catalin.marinas@arm.com>
+ <aamULrOkm8jd_9UY@willie-the-truck>
+ <aanXM7YWMAJW6qk7@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aanXM7YWMAJW6qk7@arm.com>
 
-On Fri, 06 Mar 2026 15:44:22 +0800, Zenghui Yu wrote:
-> We already have an ISB in __kvm_at() to make the address translation result
-> visible to subsequent reads of PAR_EL1. Remove the redundant one right
-> after it.
+On Thu, Mar 05, 2026 at 07:19:15PM +0000, Catalin Marinas wrote:
+> On Thu, Mar 05, 2026 at 02:33:18PM +0000, Will Deacon wrote:
+> > On Mon, Mar 02, 2026 at 04:57:55PM +0000, Catalin Marinas wrote:
+> > > @@ -391,7 +391,7 @@ static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
+> > >   */
+> > >  static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+> > >  {
+> > > -	__tlbi_sync_s1ish();
+> > > +	__tlbi_sync_s1ish(NULL);
+> > 
+> > Hmm, it seems a bit rubbish to pass NULL here as that means that we'll
+> > deploy the mitigation regardless of the mm flags when finishing the
+> > batch.
+> > 
+> > It also looks like we could end up doing the workaround multiple times
+> > if arch_tlbbatch_add_pending() is passed a large enough region that we
+> > call __flush_tlb_range_limit_excess() fires.
+> > 
+> > So perhaps we should stash the mm in 'struct arch_tlbflush_unmap_batch'
+> > alongside some state to track whether or not we have uncompleted TLB
+> > maintenance in flight?
 > 
+> The problem is that arch_tlbbatch_flush() can be called to synchronise
+> multiple mm structures that were touched by TTU. We can't have the mm in
+> arch_tlbflush_unmap_batch. But we can track if any of the mms had
+> MMCF_SME_DVMSYNC flag set, something like below (needs testing, tidying
+> up). TBH, I did not notice any problem in benchmarking as I guess we
+> haven't exercised the TTU path much, so did not bother to optimise it.
 > 
+> For the TTU case, I don't think we need to worry about the excess limit
+> and doing the IPI twice. But I'll double check the code paths tomorrow.
+> 
+> diff --git a/arch/arm64/include/asm/tlbbatch.h b/arch/arm64/include/asm/tlbbatch.h
+> index fedb0b87b8db..e756eaca6cb8 100644
+> --- a/arch/arm64/include/asm/tlbbatch.h
+> +++ b/arch/arm64/include/asm/tlbbatch.h
+> @@ -7,6 +7,8 @@ struct arch_tlbflush_unmap_batch {
+>  	 * For arm64, HW can do tlb shootdown, so we don't
+>  	 * need to record cpumask for sending IPI
+>  	 */
+> +
+> +	bool sme_dvmsync;
+>  };
+> 
+>  #endif /* _ARCH_ARM64_TLBBATCH_H */
+> diff --git a/arch/arm64/include/asm/tlbflush.h b/arch/arm64/include/asm/tlbflush.h
+> index e3ea0246a4f4..c1141a684854 100644
+> --- a/arch/arm64/include/asm/tlbflush.h
+> +++ b/arch/arm64/include/asm/tlbflush.h
+> @@ -201,10 +201,15 @@ do {										\
+>   * Complete broadcast TLB maintenance issued by the host which invalidates
+>   * stage 1 information in the host's own translation regime.
+>   */
+> -static inline void __tlbi_sync_s1ish(struct mm_struct *mm)
+> +static inline void __tlbi_sync_s1ish_no_sme_dvmsync(void)
+>  {
+>  	dsb(ish);
+>  	__repeat_tlbi_sync(vale1is, 0);
+> +}
+> +
+> +static inline void __tlbi_sync_s1ish(struct mm_struct *mm)
+> +{
+> +	__tlbi_sync_s1ish_no_sme_dvmsync();
+>  	sme_dvmsync(mm);
+>  }
+> 
+> @@ -408,7 +413,11 @@ static inline bool arch_tlbbatch_should_defer(struct mm_struct *mm)
+>   */
+>  static inline void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
+>  {
+> -	__tlbi_sync_s1ish(NULL);
+> +	__tlbi_sync_s1ish_no_sme_dvmsync();
+> +	if (batch->sme_dvmsync) {
+> +		batch->sme_dvmsync = false;
+> +		sme_dvmsync(NULL);
+> +	}
+>  }
+> 
+>  /*
+> @@ -613,6 +622,8 @@ static inline void arch_tlbbatch_add_pending(struct arch_tlbflush_unmap_batch *b
+>  		struct mm_struct *mm, unsigned long start, unsigned long end)
+>  {
+>  	__flush_tlb_range_nosync(mm, start, end, PAGE_SIZE, true, 3);
+> +	if (test_bit(ilog2(MMCF_SME_DVMSYNC), &mm->context.flags))
+> +		batch->sme_dvmsync = true;
+>  }
 
-Applied to fixes, thanks!
+While writing a reply to your other comments, I realised why this
+wouldn't work (I had something similar but dropped it) - we can have the
+flag cleared here (or mm_cpumask() if we are to track per-mm) but we
+have not issued the DVMSync yet. The task may start using SME before
+arch_tlbbatch_flush() and we just missed it. Any checks on whether to
+issue the IPI like reading flags needs to be after the DVMSync.
 
-[1/1] KVM: arm64: Remove the redundant ISB in __kvm_at_s1e2()
-      commit: 3599c714c08c324f0fcfa392bfb857c92c575400
+Anyway, more on the next patch where you asked about the DMB.
 
-Cheers,
-
-	M.
 -- 
-Without deviation from the norm, progress is not possible.
-
-
+Catalin
