@@ -1,50 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2271A371D0D
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 10:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F637F8B6;
+	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772794093; cv=none; b=D4A3CmYkEA5dyyYS8NPqf8dVUOivOb4G6laY0cWupg2g65LUQK7b+OUORyMFMVkPLTu9mzMVpIxdPaDzxRPaHI/apAsraUAy1G5GoqDw/2FM7tE0eiehE6BHSypj0l1jYkwKHX2ovOt3vuzUEAISJKrWld3tJ8K5v+Y7wes3iK4=
+	t=1772794103; cv=none; b=krOxU0KhkSbGnoeroRPj/EuhL6oqkC3/o3wzWGgURs4jgTJbs65UeXgfc0TFhoTNxYaw1lrqukkz7E4JtfsDYzFYhIqlhaLZjY+G1GIF9S64QtULZLg34hdBOK8n0Fct3v7E3xSkOVgtYFKg370EDCU/i6GAv9PnuQX0YiEu/HA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772794093; c=relaxed/simple;
-	bh=ERAZRUQR3DiAvO4NrHYp9EIuWfTi8S/tNjbzNXo7NQs=;
+	s=arc-20240116; t=1772794103; c=relaxed/simple;
+	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iCXN+DwKhyamloNtBLlDwcGs7DT3VTDry2kY0y2x9n37a/fe7XBT78dDAwy8UZxRYoOa5unkaBspUu9i3uzt0cJxgZb0kvdRKnPYYP+Um1aIu5a4l40EwtvSKkl0epN7ocK2plD+1t4u0Q9x/mMF6Za66qRg7YWwLkoVpKcRJ7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KorhbY71; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=CRmZcdG2QeB+AcUbO4FO/pitB/GV0nEUw1SOv2oz+O3Fquev8wa9nCJVftG2HppmG5h124jp8cohTg+cL+Fb8CsqaxQbQ+YpaqOoUYJj5ByeT/pnuH2/JhvEDtpEmrqjZKbdYM5cFaZvgZ4mK423oq1513dhBA1hxObA00aOrYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWkIXjPn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KorhbY71"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9380C4CEF7;
-	Fri,  6 Mar 2026 10:48:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWkIXjPn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01699C4CEF7;
+	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772794093;
-	bh=ERAZRUQR3DiAvO4NrHYp9EIuWfTi8S/tNjbzNXo7NQs=;
+	s=k20201202; t=1772794103;
+	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KorhbY71VkWRYlWHJ0bqBTP3k1Nc3XBr2JQMNk++RnNl9Wb/l80DJPngzMhEN0pW9
-	 fvrlk4bnL36N/al5kz/ThRR8RZDfEApesCGHFutoVFUBsOAnkDI/hPN18ZLTf3fJ56
-	 clxAcO6QXhVL/XB6rjQgV/Xn+FHubKcAqCyaQa0kbHN/RG4s7Xv68Uye3NyqOaQJCL
-	 UPD/EwHRfnUOoLo1HOk6Lnq+BClF5BsBKx/G48TbAMRlwiihmKBomemGKSjYwKWHHW
-	 joM1uAZBiOYy1eQJKp5ZAV38bAl/VSPE5MFJIqLTm+I3wzcSFESrgLNrhugZLAweCG
-	 iDh/wdumyu/xw==
+	b=uWkIXjPnPdH0SHTldhJPXKsQaMYFRSs2jegGWAt3uSTgeuKRbS8jDJ1Xl8nk7pinr
+	 2tz2JYIx2x8S5YFGD23PAsbtIwO0RNDqeAJm9COClpgJc3nofEb4A5AboftsVa0LK3
+	 /FkA9iFDmhccA30lxN+BKUJJAtWkmAvear8dtPeJyoMKN89DzX/0PA2kmaW3uZmoYU
+	 h+6cxqmpWVRd0OlDLyywMCcu2M7kPxLpZnx08yFYwlXzGO/N34CwPQo848PslGtHGh
+	 MQPddDCPoqMrjtkpprvuw097Rt2x3Ib8D/R40S20VrhDSS4bkq7kOl0DkuxA6P6axG
+	 isOFuqI1hLCKw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vySj4-0000000Gnnf-2Nzq;
-	Fri, 06 Mar 2026 10:48:10 +0000
+	id 1vySjE-0000000Gnnk-2qan;
+	Fri, 06 Mar 2026 10:48:20 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Zenghui Yu <zenghui.yu@linux.dev>
-Cc: oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com
-Subject: Re: [PATCH 0/3] KVM: arm64: minor fixes about S2 page table walker
-Date: Fri,  6 Mar 2026 10:48:07 +0000
-Message-ID: <177279406008.3200749.11694453799460270287.b4-ty@kernel.org>
+	Fuad Tabba <tabba@google.com>
+Cc: joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	yangyicong@hisilicon.com,
+	wangzhou1@hisilicon.com,
+	Oliver Upton <oupton@kernel.org>
+Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix a couple of latent bugs in user_mem_abort()
+Date: Fri,  6 Mar 2026 10:48:17 +0000
+Message-ID: <177279406014.3200749.4050138870760336994.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260225173515.20490-1-zenghui.yu@linux.dev>
-References: <20260225173515.20490-1-zenghui.yu@linux.dev>
+In-Reply-To: <20260304162222.836152-1-tabba@google.com>
+References: <20260304162222.836152-1-tabba@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,31 +60,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, wangzhou1@hisilicon.com, oupton@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 26 Feb 2026 01:35:12 +0800, Zenghui Yu wrote:
-> From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+On Wed, 04 Mar 2026 16:22:20 +0000, Fuad Tabba wrote:
+> While digging into arch/arm64/kvm/mmu.c with the intention of finally
+> refactoring user_mem_abort(), I ran into a couple of latent bugs that
+> we should probably fix right now before attempting any major plumbing.
 > 
-> A small step towards fixing the issues discussed in
-> https://lore.kernel.org/all/3f88cd49-68f1-4276-a067-b7c6beadb27c@linux.dev .
-> 
-> Zenghui Yu (Huawei) (3):
->   KVM: arm64: nv: Check S2 limits based on implemented PA size
->   KVM: arm64: nv: Report addrsz fault at level 0 with a bad VTTBR.BADDR
->   KVM: arm64: nv: Inject a SEA if failed to read the descriptor
+> You might experience some deja-vu looking at the first patch. A while
+> back (in 5f9466b50c1b), I fixed a struct page reference leak on an
+> early error return in this exact same block. It turns out that another
+> early exit was introduced later on (for exclusive/atomic faults), and it
+> fell into the exact same trap of leaking the page.
 > 
 > [...]
 
 Applied to fixes, thanks!
 
-[1/3] KVM: arm64: nv: Check S2 limits based on implemented PA size
-      commit: 4c2264ecdf39ddbdb62e37b156015aacf05d0dcb
-[2/3] KVM: arm64: nv: Report addrsz fault at level 0 with a bad VTTBR.BADDR
-      commit: 99a339377f3c1bdf6edd5614d36893ab1806f9e6
-[3/3] KVM: arm64: nv: Inject a SEA if failed to read the descriptor
-      commit: eb54fa1025f8b520f0e83a807d76e35e4587c5ff
+[1/2] KVM: arm64: Fix page leak in user_mem_abort() on atomic fault
+      commit: e07fc9e2da91f6d9eeafa2961be9dc09d65ed633
+[2/2] KVM: arm64: Fix vma_shift staleness on nested hwpoison path
+      commit: 244acf1976b889b80b234982a70e9550c6f0bab7
 
 Cheers,
 
