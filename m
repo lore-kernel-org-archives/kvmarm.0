@@ -1,171 +1,237 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.28.197.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C634285C91;
-	Fri,  6 Mar 2026 15:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523EF7E0E4;
+	Fri,  6 Mar 2026 15:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.28.197.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772811258; cv=none; b=kitROFtR9bWIGOkgDkWPy5Qr8YHKzuxFTyzDGFgGHtNEbD99W4dLp+FC+/3XBEom0s7ZsQ5+gbVwFA3gA/OjZN/iGIMUYDwlHsNPYw4aGzVyNdFekiHFNhMeTm/bpwZi3qdgdCvE55t+atkM7riomE5J5CyYhQBciqwtUn+lFMQ=
+	t=1772811718; cv=none; b=TUzjDtKa+w6koirt2cRGQ+iYqYAXc0iZ93CQ+2mdOJP4qioqDHYVUdqMqenVkXoT04bCt/QYSKzo3O5LyhIJq4Acdhmnhsnw+T57Z8txmMDHt+zoPrQ/njrCZBbpiWhYzJ/iW1tULO84leg6OEDuPOoQ5XEUDnXGxuUf38+vCHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772811258; c=relaxed/simple;
-	bh=8uvPh2HpjMCl9fCTBfKM7y2fpeBlB+HBuTT9XIIMrOc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l/obc2jSvAH+fiQr7FgZC/YX5+F8DnV6Ixf4qqUI+qNV99c+nu2kbMPfZAY9iTxh3cp4GXoGYZxo1yyugYFdj7Vv9rd5SFuZb2etu/30NjIQBLew4niyGcB2/1d0h0YQafKF8bJm4e822ZT2YJG1MSj+9jykjOhyd5Fmp138x0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AouAY/n6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1772811718; c=relaxed/simple;
+	bh=C+TIi3OVTHeU4/YpXmPN6ChBPTVFEYpeWN7RdHrTOB0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SAvzZ8OcWsGF8JYYqBkSw8QPFBPIvaXPQaXxJ9ez8frlcC49sADJzDw4kjDUsnjAa3cX/IbfEYWliC0RUnlnuLXUtEMeZ5FDi0jFsgnjW0NuU+G3PPdRmuibScAuoD48GvwSlWZt1nrrYQJYlLsuRBSGJD7NzYa6Jj2Qagb8n3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=X4utk3my; arc=none smtp.client-ip=52.28.197.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AouAY/n6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A33AAC4CEF7;
-	Fri,  6 Mar 2026 15:34:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772811257;
-	bh=8uvPh2HpjMCl9fCTBfKM7y2fpeBlB+HBuTT9XIIMrOc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AouAY/n6tG1Ud6aCgEJZbMhjAIEiHJvq35rA9cVJQdp6nlHD0C6VYHlzdIJIiMlHN
-	 6REVfZRIP7au3oXKOKlwsP71Tmpz/WVK+f5OSRXKpG1nbYaS6qJfKZ5O9c8zJoLJpl
-	 CWujP3D/+JoiRtVDT87ywoEvatSNdgPcBQc/Kt2/JAsQ+l7tTl5AaSIIQUgGPgl2kk
-	 qgx87kmMc3ai65mn0juYCYyAMByo/wLfnrFM5H+iPTBpEIsXdvK/B0BGYSiE6tJMTy
-	 mEW/zkieqflspSe14t6uUCyvwHDsdQt/4YTkBeZ/f9gor41MVqoBLyHvUn6XkXUvjF
-	 kgYppsJFIN9Pw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1vyXBv-0000000Guzf-215X;
-	Fri, 06 Mar 2026 15:34:15 +0000
-Date: Fri, 06 Mar 2026 15:34:15 +0000
-Message-ID: <86ikb96kg8.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	oliver.upton@linux.dev,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	qperret@google.com,
-	vdonnefort@google.com
-Subject: Re: [PATCH v1 00/13] KVM: arm64: Refactor user_mem_abort() into a state-object model
-In-Reply-To: <20260306140232.2193802-1-tabba@google.com>
-References: <20260306140232.2193802-1-tabba@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="X4utk3my"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1772811716; x=1804347716;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=YnCR77bPkSJ3r6eLW+FO2o4FnCnPBwwukZtKN2qmask=;
+  b=X4utk3my0nrXJ7V+xNGa7E7shFGSGv0LocFCK2I0V93Tyv/cEvY6Us80
+   C0rA1RFQx/RwMB6yd97XmK8H2S7I0uOFLjWn6uSeu1f6GtOFeeufmj1xb
+   XticrJity1/xbjTBEzCSbYLucPQq0wAoaxKifnNFo0TuMM6ycPc33GlhR
+   qexscSmcB9l0Ur1CI8/dMcSevbKXeZvwq0w32VjwUtYT/cFZi/q1/f8AP
+   SlZMhqntKcnezIkIzJkT1eNpDxm3kfi8RgF2Wbp0+6W4pzKRViICvy5LZ
+   Px/sbEqLFj1soyu5+TxTohwwA/cwdwdWV5NwlFW3VnuygxuZqev1wq7fv
+   Q==;
+X-CSE-ConnectionGUID: GwEkaMEOTMKbobqyy3yX9A==
+X-CSE-MsgGUID: di4IC+oOQpGwVPpG+YbSbA==
+X-IronPort-AV: E=Sophos;i="6.23,105,1770595200"; 
+   d="scan'208";a="10322839"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-011.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2026 15:41:52 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [54.240.197.232:9370]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.46.96:2525] with esmtp (Farcaster)
+ id 5185657e-5145-4540-97b1-c86cd60d47dd; Fri, 6 Mar 2026 15:41:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 5185657e-5145-4540-97b1-c86cd60d47dd
+Received: from EX19D005EUB003.ant.amazon.com (10.252.51.31) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
+ Fri, 6 Mar 2026 15:41:52 +0000
+Received: from [192.168.2.180] (10.106.83.26) by EX19D005EUB003.ant.amazon.com
+ (10.252.51.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37; Fri, 6 Mar 2026
+ 15:41:47 +0000
+Message-ID: <5c322be7-ea81-4e6a-9689-978c35e93af6@amazon.com>
+Date: Fri, 6 Mar 2026 15:41:45 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oliver.upton@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, vdonnefort@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v10 02/15] set_memory: add folio_{zap, restore}_direct_map
+ helpers
+To: "David Hildenbrand (Arm)" <david@kernel.org>, "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel@xen0n.name" <kernel@xen0n.name>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>
+CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
+	<corbet@lwn.net>, "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org"
+	<oupton@kernel.org>, "joey.gouly@arm.com" <joey.gouly@arm.com>,
+	"suzuki.poulose@arm.com" <suzuki.poulose@arm.com>, "yuzenghui@huawei.com"
+	<yuzenghui@huawei.com>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+	"will@kernel.org" <will@kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"tglx@kernel.org" <tglx@kernel.org>, "mingo@redhat.com" <mingo@redhat.com>,
+	"bp@alien8.de" <bp@alien8.de>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>,
+	"hpa@zytor.com" <hpa@zytor.com>, "luto@kernel.org" <luto@kernel.org>,
+	"peterz@infradead.org" <peterz@infradead.org>, "willy@infradead.org"
+	<willy@infradead.org>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "lorenzo.stoakes@oracle.com"
+	<lorenzo.stoakes@oracle.com>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"rppt@kernel.org" <rppt@kernel.org>, "surenb@google.com" <surenb@google.com>,
+	"mhocko@suse.com" <mhocko@suse.com>, "ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "andrii@kernel.org"
+	<andrii@kernel.org>, "martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>, "song@kernel.org" <song@kernel.org>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "kpsingh@kernel.org"
+	<kpsingh@kernel.org>, "sdf@fomichev.me" <sdf@fomichev.me>,
+	"haoluo@google.com" <haoluo@google.com>, "jolsa@kernel.org"
+	<jolsa@kernel.org>, "jgg@ziepe.ca" <jgg@ziepe.ca>, "jhubbard@nvidia.com"
+	<jhubbard@nvidia.com>, "peterx@redhat.com" <peterx@redhat.com>,
+	"jannh@google.com" <jannh@google.com>, "pfalcato@suse.de" <pfalcato@suse.de>,
+	"shuah@kernel.org" <shuah@kernel.org>, "riel@surriel.com" <riel@surriel.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "jgross@suse.com"
+	<jgross@suse.com>, "yu-cheng.yu@intel.com" <yu-cheng.yu@intel.com>,
+	"kas@kernel.org" <kas@kernel.org>, "coxu@redhat.com" <coxu@redhat.com>,
+	"kevin.brodsky@arm.com" <kevin.brodsky@arm.com>, "ackerleytng@google.com"
+	<ackerleytng@google.com>, "maobibo@loongson.cn" <maobibo@loongson.cn>,
+	"prsampat@amd.com" <prsampat@amd.com>, "mlevitsk@redhat.com"
+	<mlevitsk@redhat.com>, "jmattson@google.com" <jmattson@google.com>,
+	"jthoughton@google.com" <jthoughton@google.com>, "agordeev@linux.ibm.com"
+	<agordeev@linux.ibm.com>, "alex@ghiti.fr" <alex@ghiti.fr>,
+	"aou@eecs.berkeley.edu" <aou@eecs.berkeley.edu>, "borntraeger@linux.ibm.com"
+	<borntraeger@linux.ibm.com>, "chenhuacai@kernel.org" <chenhuacai@kernel.org>,
+	"dev.jain@arm.com" <dev.jain@arm.com>, "gor@linux.ibm.com"
+	<gor@linux.ibm.com>, "hca@linux.ibm.com" <hca@linux.ibm.com>,
+	"palmer@dabbelt.com" <palmer@dabbelt.com>, "pjw@kernel.org" <pjw@kernel.org>,
+	"shijie@os.amperecomputing.com" <shijie@os.amperecomputing.com>,
+	"svens@linux.ibm.com" <svens@linux.ibm.com>, "thuth@redhat.com"
+	<thuth@redhat.com>, "wyihan@google.com" <wyihan@google.com>,
+	"yang@os.amperecomputing.com" <yang@os.amperecomputing.com>,
+	"Jonathan.Cameron@huawei.com" <Jonathan.Cameron@huawei.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, "urezki@gmail.com"
+	<urezki@gmail.com>, "zhengqi.arch@bytedance.com"
+	<zhengqi.arch@bytedance.com>, "gerald.schaefer@linux.ibm.com"
+	<gerald.schaefer@linux.ibm.com>, "jiayuan.chen@shopee.com"
+	<jiayuan.chen@shopee.com>, "lenb@kernel.org" <lenb@kernel.org>,
+	"osalvador@suse.de" <osalvador@suse.de>, "pavel@kernel.org"
+	<pavel@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
+	"vannapurve@google.com" <vannapurve@google.com>, "jackmanb@google.com"
+	<jackmanb@google.com>, "aneesh.kumar@kernel.org" <aneesh.kumar@kernel.org>,
+	"patrick.roy@linux.dev" <patrick.roy@linux.dev>, "Thomson, Jack"
+	<jackabt@amazon.co.uk>, "Itazuri, Takahiro" <itazur@amazon.co.uk>,
+	"Manwaring, Derek" <derekmn@amazon.com>, "Cali, Marco"
+	<xmarcalx@amazon.co.uk>
+References: <20260126164445.11867-1-kalyazin@amazon.com>
+ <20260126164445.11867-3-kalyazin@amazon.com>
+ <af2d4dcd-60a8-4a5a-b508-d9600b1f2275@kernel.org>
+ <e2834fd9-e4ec-473c-90cd-6c3a5049747f@amazon.com>
+ <40bd6f9b-d5c0-4844-81bc-d221cd9b058f@kernel.org>
+ <38deb26a-918c-4743-b35f-92a1330dbf40@amazon.com>
+ <efc1c39c-7eb5-488f-819c-0ca2149898c3@kernel.org>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+In-Reply-To: <efc1c39c-7eb5-488f-819c-0ca2149898c3@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D007EUB003.ant.amazon.com (10.252.51.43) To
+ EX19D005EUB003.ant.amazon.com (10.252.51.31)
 
-Hi Fuad,
 
-On Fri, 06 Mar 2026 14:02:19 +0000,
-Fuad Tabba <tabba@google.com> wrote:
-> 
-> As promised in my recent patch series fixing a couple of urgent bugs in
-> user_mem_abort() [1], here is the actual refactoring to finally clean up this
-> monolith.
-> 
-> If you look through the Fixes: history of user_mem_abort(), you will start to
-> see a very clear pattern of whack-a-mole caused by the sheer size and
-> complexity of the function. For example:
-> - We keep leaking struct page references on early error returns because the
->   cleanup logic is hard to track (e.g., 5f9466b50c1b and the atomic fault leak
->   I just fixed in the previous series).
-> - We have had uninitialized memcache pointers (157dbc4a321f) because the
->   initialization flow jumps around unpredictably.
-> - We have had subtle TOCTOU and locking boundary bugs (like 13ec9308a857 and
->   f587661f21eb) because we drop the mmap_read_lock midway through the function
->   but leave the vma pointer and mmu_seq floating around in the same lexical
->   scope, tempting people to use them.
-> 
-> The bulk of the work is in the first 6 patches, which perform a strict,
-> no-logic-change structural refactoring of user_mem_abort() into a clean,
-> sequential dispatcher.
-> 
-> We introduce a state object, struct kvm_s2_fault, which encapsulates
-> both the input parameters and the intermediate state. Then,
-> user_mem_abort() is broken down into focused, standalone helpers:
-> - kvm_s2_resolve_vma_size(): Determines the VMA shift and page size.
-> - kvm_s2_fault_pin_pfn(): Handles faulting in the physical page.
->   - kvm_s2_fault_get_vma_info(): A tightly-scoped sub-helper that isolates the
->     mmap_read_lock, VMA lookup, and metadata snapshotting.
-> - kvm_s2_fault_compute_prot(): Computes stage-2 protections and evaluates
->   permission/execution constraints.
-> - kvm_s2_fault_map(): Manages the KVM MMU lock, mmu_seq retry loops, MTE, and
->   the final stage-2 mapping.
-> 
-> This structural change makes the "danger zone" foolproof. By isolating
-> the mmap_read_lock region inside a tightly-scoped sub-helper
-> (kvm_s2_fault_get_vma_info), the vma pointer is confined. It snapshots
-> the required metadata into the kvm_s2_fault structure before dropping
-> the lock. Because the pointers scope ends when the sub-helper returns,
-> accessing a stale VMA in the mapping phase is not possible by design.
-> 
-> The remaining patches in are localized cleanup patches. With the logic
-> finally extracted into digestible helpers, these patches take the
-> opportunity to streamline struct initialization, drop redundant struct
-> variables, simplify nested math, and hoist validation checks (like MTE)
-> out of the lock-heavy mapping phase.
-> 
-> I think that there are still more opportunities to tidy things up some
-> more, but I'll stop here to see what you think.
 
-Thanks a lot for going through this, this looks like a very valuable
-starting point. From a high-level perspective, the end result is even
-more shocking:
+On 06/03/2026 15:17, David Hildenbrand (Arm) wrote:
+> On 3/6/26 15:48, Nikita Kalyazin wrote:
+>>
+>>
+>> On 06/03/2026 14:17, David Hildenbrand (Arm) wrote:
+>>> On 3/6/26 13:48, Nikita Kalyazin wrote:
+>>>>
+>>>>
+>>>>
+>>>> Will update, thanks.
+>>>>
+>>>>
+>>>> Absolutely!
+>>>>
+>>>>
+>>>> Yes, on x86 we need an explicit flush.  Other architectures deal with it
+>>>> internally.
+>>>
+>>> So, we call a _noflush function and it performs a ... flush. What.
+>>
+>> Yeah, that's unfortunately the status quo as pointed by Aneesh [1]
+>>
+>> [1] https://lore.kernel.org/kvm/yq5ajz07czvz.fsf@kernel.org/
+>>
+>>>
+>>> Take a look at secretmem_fault(), where we do an unconditional
+>>> flush_tlb_kernel_range().
+>>>
+>>> Do we end up double-flushing in that case?
+>>
+>> Yes, looks like that.  I'll remove the explicit flush and rely on
+>> folio_zap_direct_map().
+>>
+>>>
+>>>> Do you propose a bespoke implementation for x86 and a
+>>>> "generic" one for others?
+>>>
+>>> We have to find a way to have a single set of functions for all archs
+>>> that support directmap removal.
+>>
+>> I believe Dave meant to address that with folio_{zap,restore}
+>> _direct_map() [2].
+>>
+>> [2] https://lore.kernel.org/kvm/9409531b-589b-4a54-
+>> b122-06a3cf0846f3@intel.com/
+>>
+>>>
+>>> One option might be to have some indication from the architecture that
+>>> no flush_tlb_kernel_range() is required.
+>>>
+>>> Could be a config option or some simple helper function.
+>>
+>> I'd be inclined to know what arch maintainers think because I don't have
+>> a strong opinion on that.
+> 
+> You could also just perform a double flush, and let people that
+> implemented a _noflush() to perform a flush optimize that later.
 
-<quote>
-static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-			  struct kvm_s2_trans *nested,
-			  struct kvm_memory_slot *memslot, unsigned long hva,
-			  bool fault_is_perm)
+Do you propose to just universalise the one from x86?
+
+int folio_zap_direct_map(struct folio *folio)
 {
-	bool write_fault = kvm_is_write_fault(vcpu);
-	bool logging_active = memslot_is_logging(memslot);
-	struct kvm_s2_fault fault = {
-		.vcpu = vcpu,
-		.fault_ipa = fault_ipa,
-		.nested = nested,
-		.memslot = memslot,
-		.hva = hva,
-		.fault_is_perm = fault_is_perm,
-		.ipa = fault_ipa,
-		.logging_active = logging_active,
-		.force_pte = logging_active,
-		.prot = KVM_PGTABLE_PROT_R,
-		.fault_granule = fault_is_perm ? kvm_vcpu_trap_get_perm_fault_granule(vcpu) : 0,
-		.write_fault = write_fault,
-		.exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu),
-		.topup_memcache = !fault_is_perm || (logging_active && write_fault),
-	};
-</quote>
+	const void *addr = folio_address(folio);
+	int ret;
 
-This kvm_s2_fault structure is a mess of architectural state (the
-fault itself), hypervisor context (logging_active, force_pte...), and
-implementation details (topup_memcache...). Effectively, that's the
-container for *everything* that was a variable in u_m_a() is now part
-of the structure that is passed around.
+	ret = set_direct_map_valid_noflush(addr, folio_nr_pages(folio), false);
+	flush_tlb_kernel_range((unsigned long)addr,
+			       (unsigned long)addr + folio_size(folio));
 
-The task at hand is now to completely nuke this monster. The
-architectural fault information should be further split, and directly
-passed as a parameter to user_mem_abort(). We have a lot of redundant
-state that is computed, recomputed, derived, and that should probably
-moved into the exact place where it matters.
+	return ret;
+}
 
-I'll have a play with it,
+I'm fine with that too.
 
-Thanks,
+> 
+> I mean, that's what secretmem did :)
 
-	M.
+With the solution above, secretmem stays where it was: no optimisation 
+so far :)
 
--- 
-Without deviation from the norm, progress is not possible.
+> 
+> --
+> Cheers,
+> 
+> David
+
