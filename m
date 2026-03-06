@@ -1,53 +1,53 @@
 Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734723BED23
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3DB3BED46
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772807776; cv=none; b=JPM5gNPCt3PPjn6vp8LyyCSYKDjW841l1t8BbrP9cFKQ447LiM/WC9nidEhbaGWVuQTFvHo2kf7QseqHpe7bJvWQLHvlcZ74Np9NQOMYInN89haYHcUKn47WzN3+rxocKs50KBEUPm+rtxwuslvjMjVyjvIlARCrIfv/US86GCw=
+	t=1772807777; cv=none; b=UJyD/p60sP6G8H030YrSEvhexXsHRs/Gw/8+WxHF8sNEYBXpOMdHEOQ+3+V5AapwNBpe+o6dbqqhVM4FuCplW7AVERDQqsK9LIBbi4lh5fzZTO2pR4dcbd6AuEs6eBqHQsD9hlgEpm8GbIfCrDR6OP+Qdo1iCGebGDe9I58m+q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772807776; c=relaxed/simple;
-	bh=h2rVCYiv2RErJ8J/DPs4R6liat0vq1OWoPSAfx6DS2s=;
+	s=arc-20240116; t=1772807777; c=relaxed/simple;
+	bh=Qjw69/BBWT9BSPH1lQiEuT1/lOOedls+e1TJNd0iMvs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ec3ms5IkSvjrjUuF+u0pdqXBcuJkHOhmt9n9tz5mDMAxL9pBionX3qVXSjitme+ydy0R/pE37p6vP3UrgECm0Ak3fOIGSw9n6D/MFpg2z8FwZfC0nCDZsTGmcNxj3EAxv3RXWgJbs8Nv0iw8dd7Y4to9kzUCAgWrp+J6fRJ22kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IvQkgtuF; arc=none smtp.client-ip=209.85.208.73
+	 To:Cc:Content-Type; b=Gz+gDXtjNcAnZIzY8Gtf6S+/4HHST3h/hPEHzCF5/IB5lTRsA6qlbsWo3fcsrzVy3ExtDGXuXnSAfmcUyj39sHkuioSYbq783YeQzbdgr5CpLN4PCftC0xSBSH7iG/msiejdn0hA1MxNGE6qgBccunKBxC01n51dFB2sydDX5C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B9hA5ynN; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IvQkgtuF"
-Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-661aae3a881so1356213a12.1
-        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:36:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B9hA5ynN"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-660fc3f2f90so2859124a12.2
+        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:36:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1772807773; x=1773412573; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1772807774; x=1773412574; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xnACahr8ULD6CcAQo9gjmAw66hUMbPmLgQ2wO/RqDz0=;
-        b=IvQkgtuFQA/jZXRAsp0+0kaNglhLx95JW7tlfWtMf1NN0iHspjhRFDEdgahQtd7hid
-         hlaeo/IcuCeiWJJjRyN/pN5xTXQdSGZ04TNlTsTvoA7FWWWGmaeKNEidNPAM6ZaG6nsQ
-         wiH1DZXim6e0wg4kmxNHr06G1IbdHrGFLyV1ZPQ/rBMD2Q0yoVo+TMLy05Yb/R3ktocQ
-         sraeanyPU4+YB/ea7mGBieVEVi1VPKOnS04wc/6EihpVL+/B+QRFlhfMnCtlgrF9R3JY
-         Y/XR2GrgOIQo0qrHPm7g7mkVkP5TpDy0PbUSTXqulGDp5/X4bO3nMhmJqQWYUMymB1/A
-         s3qQ==
+        bh=2KM8z/si7HcTp05zjHIB0T7h5Dhh3bTdr1CGW99HQcs=;
+        b=B9hA5ynNz7JMczC7KopCD7hX0c9eqvuB8cJwFU4pEeLpF+/VnSkE8Zq21YIR75dD9a
+         Rzjc+0S0EpieqbB76yMOt/zKwUQKcuCwT6ivlXYqg2S3HxEqSetNHjGTzd6osxsksBwt
+         Kc0Mkludekjb4P5R6thv0cj6hyiUKIASPOyo6hS4ZDwfo7hy7CYP6cnArc8n3t4z5xiW
+         qwst1hVvrgXxQKRNQMdxnIDofk66h1GSzu5PCX2oRgt2kEgYgS+ZrQUlM0bKPvwNBfID
+         GeI6zT93l+PaRZhT6zrcd6B6RUUPa13x7w4b/qPGtavhmzI6DpOffsb83Q1alWUezyXy
+         GjLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1772807773; x=1773412573;
+        d=1e100.net; s=20230601; t=1772807774; x=1773412574;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xnACahr8ULD6CcAQo9gjmAw66hUMbPmLgQ2wO/RqDz0=;
-        b=n9Qs6SFSWzVhVysAHvPBLkznZKXjhpdMdHT7+VG35NUtfJ/CCfK6XbL5RlEiqR0Yby
-         zLV0pDjJ888hTsMXD1FrMYfdFTzUrpRB38HUn584FxvIcXVN7Gx3im8yHV3WCymDPGlP
-         4LnAs1FjdmIApCkEo4UWszSAA03FG5bOemQPCF8rC2Qta69BjmUmZi7jcE9xOIfN/D2W
-         +pNhXkE/PebipTCrfzagUONntoBXlxq2993BaYXO57twP9tmMXlwzmb7XUIFXgctdB8B
-         uleL7VGDcf2kT61mHIG9edmKUn3sk1ZCh/2KBpyrc9/XDnV8oRwkns4nI6WhexFVv37S
-         b9/A==
-X-Gm-Message-State: AOJu0YxoeLHVXSWWIvD9M0px/6QKFzlxEsGfmcVKkMkEZQG0fYXgt8iP
-	/esMqbeQnNe/HcdWQjNEdi6MkLucojKZfpc89AWGYiYNbr5SCmGyah+C/+t8k8VirBtFLWeq5eg
-	7FcvidNJgQA4c+EWM8yVAlQ==
-X-Received: from edrs15.prod.google.com ([2002:aa7:c54f:0:b0:660:a4e3:2ed2])
+        bh=2KM8z/si7HcTp05zjHIB0T7h5Dhh3bTdr1CGW99HQcs=;
+        b=f5hTIbz01MO48qQbmAUS9EeioXnH6tRMV8u0GS9N/A8QNxnBvoFS4lelsd5LwNtxCP
+         i2PHFJ1nphposKMJgLtIWp25fbIPW4n3420kA+/T6zcnnzVDNPODCGaIZ21BMIoRO9Oq
+         ilpH42sTdczT9YetszDdCt6lpMNe5Sijwhbe/ksxnXxQldHfD4hW6bXvLgMyPfG7JuAz
+         NT9jsGOW0C3E97tr6TCpG6Ft/YcE5lmr0zIfG/v2rwrLEiV9/kAEOG7XOB+MEKYCN0n5
+         S2eoOK5V36xCeMoqH2gxJMxf2KJ0mGPzmTh8bBSEDPpSSndgRjn0gSgL5xNaSdpT/syT
+         I/ow==
+X-Gm-Message-State: AOJu0YwxteQlCywCLmX30Nr3gbccvh8SHYIoa0ThM11IVev7HQnFTpIA
+	upP9sPiQzaOqCwmf4YHLNUHzh+KlCWXl9fayq1HCK9epfkQOvoNc/9mLi+XqM48pOjGhAUkcUPm
+	cTZcRXPqVM6+mOw6TdAHLVg==
+X-Received: from edbio12-n2.prod.google.com ([2002:a05:6402:218c:20b0:661:1191:6d3a])
  (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6402:430c:b0:65a:2ec5:99c0 with SMTP id 4fb4d7f45d1cf-6619d4565b4mr1408474a12.3.1772807772463;
- Fri, 06 Mar 2026 06:36:12 -0800 (PST)
-Date: Fri,  6 Mar 2026 14:35:24 +0000
+ 2002:a05:6402:51ce:b0:660:ce49:f6b3 with SMTP id 4fb4d7f45d1cf-6619d52e969mr1236686a12.30.1772807773593;
+ Fri, 06 Mar 2026 06:36:13 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:35:25 +0000
 In-Reply-To: <20260306143536.339777-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -57,8 +57,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260306143536.339777-1-vdonnefort@google.com>
 X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260306143536.339777-21-vdonnefort@google.com>
-Subject: [PATCH v13 20/32] KVM: arm64: Add clock support to nVHE/pKVM hyp
+Message-ID: <20260306143536.339777-22-vdonnefort@google.com>
+Subject: [PATCH v13 21/32] KVM: arm64: Initialise hyp_nr_cpus for nVHE hyp
 From: Vincent Donnefort <vdonnefort@google.com>
 To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
 	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
@@ -69,130 +69,127 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In preparation for supporting tracing from the nVHE hyp, add support to
-generate timestamps with a clock fed by the CNTCVT counter. The clock
-can be kept in sync with the kernel's by updating the slope values. This
-will be done later.
+Knowing the number of CPUs is necessary for determining the boundaries
+of per-cpu variables, which will be used for upcoming hypervisor
+tracing. hyp_nr_cpus which stores this value, is only initialised for
+the pKVM hypervisor. Make it accessible for the nVHE hypervisor as well.
 
-As current we do only create a trace clock, make the whole support
-dependent on the upcoming CONFIG_NVHE_EL2_TRACING.
+With the kernel now responsible for initialising hyp_nr_cpus, the
+nr_cpus parameter is no longer needed in __pkvm_init.
 
 Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/clock.h b/arch/arm64/kvm/hyp/include/nvhe/clock.h
-new file mode 100644
-index 000000000000..9f429f5c0664
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/nvhe/clock.h
-@@ -0,0 +1,16 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __ARM64_KVM_HYP_NVHE_CLOCK_H
-+#define __ARM64_KVM_HYP_NVHE_CLOCK_H
-+#include <linux/types.h>
-+
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 76ce2b94bd97..4bf63025061e 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -129,8 +129,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
+ #ifdef __KVM_NVHE_HYPERVISOR__
+ void __pkvm_init_switch_pgd(phys_addr_t pgd, unsigned long sp,
+ 		void (*fn)(void));
+-int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+-		unsigned long *per_cpu_base, u32 hyp_va_bits);
++int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_base, u32 hyp_va_bits);
+ void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+ #endif
+ 
+@@ -147,5 +146,6 @@ extern u64 kvm_nvhe_sym(id_aa64smfr0_el1_sys_val);
+ extern unsigned long kvm_nvhe_sym(__icache_flags);
+ extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
+ extern unsigned int kvm_nvhe_sym(kvm_host_sve_max_vl);
++extern unsigned long kvm_nvhe_sym(hyp_nr_cpus);
+ 
+ #endif /* __ARM64_KVM_HYP_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 410ffd41fd73..1371f9b3ecea 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -35,6 +35,7 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
 +#include <asm/kvm_hyp.h>
-+
-+#ifdef CONFIG_NVHE_EL2_TRACING
-+void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc);
-+u64 trace_clock(void);
-+#else
-+static inline void
-+trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc) { }
-+static inline u64 trace_clock(void) { return 0; }
-+#endif
-+#endif
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index a244ec25f8c5..8dc95257c291 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -17,7 +17,7 @@ ccflags-y += -fno-stack-protector	\
- hostprogs := gen-hyprel
- HOST_EXTRACFLAGS += -I$(objtree)/include
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_nested.h>
+ #include <asm/kvm_pkvm.h>
+@@ -2465,7 +2466,7 @@ static int __init do_pkvm_init(u32 hyp_va_bits)
+ 	preempt_disable();
+ 	cpu_hyp_init_context();
+ 	ret = kvm_call_hyp_nvhe(__pkvm_init, hyp_mem_base, hyp_mem_size,
+-				num_possible_cpus(), kern_hyp_va(per_cpu_base),
++				kern_hyp_va(per_cpu_base),
+ 				hyp_va_bits);
+ 	cpu_hyp_init_features();
  
--lib-objs := clear_page.o copy_page.o memcpy.o memset.o
-+lib-objs := clear_page.o copy_page.o memcpy.o memset.o tishift.o
- lib-objs := $(addprefix ../../../lib/, $(lib-objs))
+@@ -2674,6 +2675,8 @@ static int __init init_hyp_mode(void)
+ 		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] = (unsigned long)page_addr;
+ 	}
  
- CFLAGS_switch.nvhe.o += -Wno-override-init
-@@ -29,6 +29,7 @@ hyp-obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
- hyp-obj-y += ../../../kernel/smccc-call.o
- hyp-obj-$(CONFIG_LIST_HARDENED) += list_debug.o
-+hyp-obj-$(CONFIG_NVHE_EL2_TRACING) += clock.o
- hyp-obj-y += $(lib-objs)
++	kvm_nvhe_sym(hyp_nr_cpus) = num_possible_cpus();
++
+ 	/*
+ 	 * Map the Hyp-code called directly from the host
+ 	 */
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 5f9d56754e39..f8a7b8c04c49 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -30,8 +30,6 @@ enum pkvm_component_id {
+ 	PKVM_ID_FFA,
+ };
  
- ##
-diff --git a/arch/arm64/kvm/hyp/nvhe/clock.c b/arch/arm64/kvm/hyp/nvhe/clock.c
-new file mode 100644
-index 000000000000..32fc4313fe43
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/nvhe/clock.c
-@@ -0,0 +1,65 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2025 Google LLC
-+ * Author: Vincent Donnefort <vdonnefort@google.com>
-+ */
-+
-+#include <nvhe/clock.h>
-+
-+#include <asm/arch_timer.h>
-+#include <asm/div64.h>
-+
-+static struct clock_data {
-+	struct {
-+		u32 mult;
-+		u32 shift;
-+		u64 epoch_ns;
-+		u64 epoch_cyc;
-+		u64 cyc_overflow64;
-+	} data[2];
-+	u64 cur;
-+} trace_clock_data;
-+
-+static u64 __clock_mult_uint128(u64 cyc, u32 mult, u32 shift)
-+{
-+	__uint128_t ns = (__uint128_t)cyc * mult;
-+
-+	ns >>= shift;
-+
-+	return (u64)ns;
-+}
-+
-+/* Does not guarantee no reader on the modified bank. */
-+void trace_clock_update(u32 mult, u32 shift, u64 epoch_ns, u64 epoch_cyc)
-+{
-+	struct clock_data *clock = &trace_clock_data;
-+	u64 bank = clock->cur ^ 1;
-+
-+	clock->data[bank].mult			= mult;
-+	clock->data[bank].shift			= shift;
-+	clock->data[bank].epoch_ns		= epoch_ns;
-+	clock->data[bank].epoch_cyc		= epoch_cyc;
-+	clock->data[bank].cyc_overflow64	= ULONG_MAX / mult;
-+
-+	smp_store_release(&clock->cur, bank);
-+}
-+
-+/* Use untrusted host data */
-+u64 trace_clock(void)
-+{
-+	struct clock_data *clock = &trace_clock_data;
-+	u64 bank = smp_load_acquire(&clock->cur);
-+	u64 cyc, ns;
-+
-+	cyc = __arch_counter_get_cntvct() - clock->data[bank].epoch_cyc;
-+
-+	if (likely(cyc < clock->data[bank].cyc_overflow64)) {
-+		ns = cyc * clock->data[bank].mult;
-+		ns >>= clock->data[bank].shift;
-+	} else {
-+		ns = __clock_mult_uint128(cyc, clock->data[bank].mult,
-+					  clock->data[bank].shift);
-+	}
-+
-+	return (u64)ns + clock->data[bank].epoch_ns;
-+}
+-extern unsigned long hyp_nr_cpus;
+-
+ int __pkvm_prot_finalize(void);
+ int __pkvm_host_share_hyp(u64 pfn);
+ int __pkvm_host_unshare_hyp(u64 pfn);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index e7790097db93..8ae3c348ed81 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -486,17 +486,15 @@ static void handle___pkvm_init(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+ 	DECLARE_REG(unsigned long, size, host_ctxt, 2);
+-	DECLARE_REG(unsigned long, nr_cpus, host_ctxt, 3);
+-	DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 4);
+-	DECLARE_REG(u32, hyp_va_bits, host_ctxt, 5);
++	DECLARE_REG(unsigned long *, per_cpu_base, host_ctxt, 3);
++	DECLARE_REG(u32, hyp_va_bits, host_ctxt, 4);
+ 
+ 	/*
+ 	 * __pkvm_init() will return only if an error occurred, otherwise it
+ 	 * will tail-call in __pkvm_init_finalise() which will have to deal
+ 	 * with the host context directly.
+ 	 */
+-	cpu_reg(host_ctxt, 1) = __pkvm_init(phys, size, nr_cpus, per_cpu_base,
+-					    hyp_va_bits);
++	cpu_reg(host_ctxt, 1) = __pkvm_init(phys, size, per_cpu_base, hyp_va_bits);
+ }
+ 
+ static void handle___pkvm_cpu_set_vector(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 90bd014e952f..d8e5b563fd3d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -341,8 +341,7 @@ void __noreturn __pkvm_init_finalise(void)
+ 	__host_enter(host_ctxt);
+ }
+ 
+-int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+-		unsigned long *per_cpu_base, u32 hyp_va_bits)
++int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long *per_cpu_base, u32 hyp_va_bits)
+ {
+ 	struct kvm_nvhe_init_params *params;
+ 	void *virt = hyp_phys_to_virt(phys);
+@@ -355,7 +354,6 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+ 		return -EINVAL;
+ 
+ 	hyp_spin_lock_init(&pkvm_pgd_lock);
+-	hyp_nr_cpus = nr_cpus;
+ 
+ 	ret = divide_memory_pool(virt, size);
+ 	if (ret)
 -- 
 2.53.0.473.g4a7958ca14-goog
 
