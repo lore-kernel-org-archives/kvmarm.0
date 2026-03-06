@@ -1,56 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F637F8B6;
-	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F81371D0D
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 10:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772794103; cv=none; b=krOxU0KhkSbGnoeroRPj/EuhL6oqkC3/o3wzWGgURs4jgTJbs65UeXgfc0TFhoTNxYaw1lrqukkz7E4JtfsDYzFYhIqlhaLZjY+G1GIF9S64QtULZLg34hdBOK8n0Fct3v7E3xSkOVgtYFKg370EDCU/i6GAv9PnuQX0YiEu/HA=
+	t=1772794112; cv=none; b=BE7OmEMxDEeWAcb9Jk/7YRopOuMxEAWE3++Z48yb+71pnjDfPxUM/C1y/qbbDVvPjTlYmcrwUTFYujWFeJ78XwjGTfBqsbP6CbisioutNaTkCGv0a2+r5fOKxR/+8Zew+rxvdw3D0Rn06a/84CBuHJ4PJuh+Q7ArZfFUhRDV8YU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772794103; c=relaxed/simple;
-	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
+	s=arc-20240116; t=1772794112; c=relaxed/simple;
+	bh=I4BLXGkdfGb0t5nzy1NgItpRVyXjbFiNT2NMk6LuQMg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CRmZcdG2QeB+AcUbO4FO/pitB/GV0nEUw1SOv2oz+O3Fquev8wa9nCJVftG2HppmG5h124jp8cohTg+cL+Fb8CsqaxQbQ+YpaqOoUYJj5ByeT/pnuH2/JhvEDtpEmrqjZKbdYM5cFaZvgZ4mK423oq1513dhBA1hxObA00aOrYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uWkIXjPn; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=kF5ZGjZfq6ZQW9vJGLrbMP/rBLzJS1KE80LKt84ezNsOoL+ti5bG13YXHeCCjDI3REFpfn2x2u8ecgLRbdeavvUHsdwhv2fA6BKIsZBF7tUxmrFm4QXPpFFR3wJfpZjqLc3N8OCg936xwdQpQGYqgwW6Yc3MHODcapNnLRBJWDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGIqvlDC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uWkIXjPn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01699C4CEF7;
-	Fri,  6 Mar 2026 10:48:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGIqvlDC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5877BC4CEF7;
+	Fri,  6 Mar 2026 10:48:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1772794103;
-	bh=MdElHuWuXCJux7zqmegpUP2Qfg6BCPRGxfz5Oung5eA=;
+	s=k20201202; t=1772794112;
+	bh=I4BLXGkdfGb0t5nzy1NgItpRVyXjbFiNT2NMk6LuQMg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uWkIXjPnPdH0SHTldhJPXKsQaMYFRSs2jegGWAt3uSTgeuKRbS8jDJ1Xl8nk7pinr
-	 2tz2JYIx2x8S5YFGD23PAsbtIwO0RNDqeAJm9COClpgJc3nofEb4A5AboftsVa0LK3
-	 /FkA9iFDmhccA30lxN+BKUJJAtWkmAvear8dtPeJyoMKN89DzX/0PA2kmaW3uZmoYU
-	 h+6cxqmpWVRd0OlDLyywMCcu2M7kPxLpZnx08yFYwlXzGO/N34CwPQo848PslGtHGh
-	 MQPddDCPoqMrjtkpprvuw097Rt2x3Ib8D/R40S20VrhDSS4bkq7kOl0DkuxA6P6axG
-	 isOFuqI1hLCKw==
+	b=cGIqvlDCiMEIfv7619WJJnEtIEznXnhubTs1Nbk1HfhkBuT8kb4XUYEK9UCTrGeIx
+	 X3smIfUc0MNSq0O6S/h6OLaQGYrBarrWzisG3jyKJKUljlRdDJb2Y1CS/DgIPvn1wB
+	 HJfSY6l22Lyu5FbGvcELkBnpk8BXpiM0DSpHwVwYlaIC95BDgo9KqezZ+9gI3Xk1Em
+	 SmrBdnAu3sE/cubujhz6y/ZvGd9CTBJnc2sx4KxLdlURcTES/Z2XYNIb7gVQ0X8J5B
+	 jYlJ9hZwgQimxCdr4/H/6l71G0xaI2O3bouTF96oMe+CG7aub5mYy+uM+z0DKZYk5i
+	 diYhSt3M0D3Vw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1vySjE-0000000Gnnk-2qan;
-	Fri, 06 Mar 2026 10:48:20 +0000
+	id 1vySjO-0000000Gnnr-2AE3;
+	Fri, 06 Mar 2026 10:48:30 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Fuad Tabba <tabba@google.com>
-Cc: joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	yuzenghui@huawei.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	yangyicong@hisilicon.com,
-	wangzhou1@hisilicon.com,
-	Oliver Upton <oupton@kernel.org>
-Subject: Re: [PATCH v1 0/2] KVM: arm64: Fix a couple of latent bugs in user_mem_abort()
-Date: Fri,  6 Mar 2026 10:48:17 +0000
-Message-ID: <177279406014.3200749.4050138870760336994.b4-ty@kernel.org>
+	Zenghui Yu <zenghui.yu@linux.dev>
+Cc: oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH] KVM: arm64: Remove the redundant ISB in __kvm_at_s1e2()
+Date: Fri,  6 Mar 2026 10:48:27 +0000
+Message-ID: <177279406015.3200749.13428414885597289.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260304162222.836152-1-tabba@google.com>
-References: <20260304162222.836152-1-tabba@google.com>
+In-Reply-To: <20260306074422.47694-1-zenghui.yu@linux.dev>
+References: <20260306074422.47694-1-zenghui.yu@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -60,29 +54,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, tabba@google.com, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, yangyicong@hisilicon.com, wangzhou1@hisilicon.com, oupton@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 04 Mar 2026 16:22:20 +0000, Fuad Tabba wrote:
-> While digging into arch/arm64/kvm/mmu.c with the intention of finally
-> refactoring user_mem_abort(), I ran into a couple of latent bugs that
-> we should probably fix right now before attempting any major plumbing.
+On Fri, 06 Mar 2026 15:44:22 +0800, Zenghui Yu wrote:
+> We already have an ISB in __kvm_at() to make the address translation result
+> visible to subsequent reads of PAR_EL1. Remove the redundant one right
+> after it.
 > 
-> You might experience some deja-vu looking at the first patch. A while
-> back (in 5f9466b50c1b), I fixed a struct page reference leak on an
-> early error return in this exact same block. It turns out that another
-> early exit was introduced later on (for exclusive/atomic faults), and it
-> fell into the exact same trap of leaking the page.
 > 
-> [...]
 
 Applied to fixes, thanks!
 
-[1/2] KVM: arm64: Fix page leak in user_mem_abort() on atomic fault
-      commit: e07fc9e2da91f6d9eeafa2961be9dc09d65ed633
-[2/2] KVM: arm64: Fix vma_shift staleness on nested hwpoison path
-      commit: 244acf1976b889b80b234982a70e9550c6f0bab7
+[1/1] KVM: arm64: Remove the redundant ISB in __kvm_at_s1e2()
+      commit: 3599c714c08c324f0fcfa392bfb857c92c575400
 
 Cheers,
 
