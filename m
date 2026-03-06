@@ -1,41 +1,39 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9B82264C0
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 11:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE79E35F160
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 12:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772796886; cv=none; b=MM4iIM54uv08eC4U4wJE9Skwj0Ta/K0O2k/RTsm1O5Ixs7y3GldtdL0smD5FWTxBJfOmHXcBYGBvxKhe23Z2qVjQMCQIT3NCp1V1eBXSxNL71BvJgSNEwIYG+M1LZmjDNDPxEW7WCkLx/9u6W8YTSBrPe83fFnxBX2e3diBu0RI=
+	t=1772798436; cv=none; b=oRanKVdZ2dEC5R7bDt2uIeHPJ/uDSdirHYwaqScHIuAX5HwgEVXWvEPqSAHWw5a8Smw349cAnH6IplMCRsWc+Cx/aU7xFzwE2MM9XCgHfcSVt261IHfC23HB5ejBSXsIL15vA/hcZALuMa5pB0hG3eNSGZNg+ZTrtCOlN3p25cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772796886; c=relaxed/simple;
-	bh=SEgo0oNm9+EBdDsr7op47y6u/C6FIuuj7ASCZrlSzJ8=;
+	s=arc-20240116; t=1772798436; c=relaxed/simple;
+	bh=4I6zSgTurPfSiAJqdPmkFwFesmMAvdtlCKVqTkH0f+Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NQ5Dah8wTs1ydZtae6+Ceudr4olRt9EKRwAzpUSvY7oVbWNsDWjchY74qH72lw2DgrmsTWjTev5WGNtgXjs5nMbr+j1rETJs0Ugea4208AEhRyH9MH3+Lv1xnzZkIBY93F6mdvfVFTYX8Yz+5GDizWwjQ6lG4Fsz02mECWW+Mjk=
+	 Content-Type:Content-Disposition:In-Reply-To; b=lHxKKy2z9TfmsTXStL5LDqEkqlLCG62deUqPjjsX1cE7v/8Veg/c/6auvI0y0jPEV1SIypNK/QfpC6hHxYQq3zNnPEuoGTjgf/+w4boDhSJYSz8hIBhxJ1v33eAMZXtAIfbnN6eiowxqH/pElVJh/Y/hibTqYC8sg9n7W3HhweU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F2ADD497;
-	Fri,  6 Mar 2026 03:34:37 -0800 (PST)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 173053F836;
-	Fri,  6 Mar 2026 03:34:40 -0800 (PST)
-Date: Fri, 6 Mar 2026 11:34:37 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A71B1655;
+	Fri,  6 Mar 2026 04:00:28 -0800 (PST)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B16D53F836;
+	Fri,  6 Mar 2026 04:00:32 -0800 (PST)
+Date: Fri, 6 Mar 2026 12:00:30 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
 To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>
-Subject: Re: [PATCH v2 14/35] KVM: arm64: Handle aborts from protected VMs
-Message-ID: <aaq7zdxyyphiXhRG@raptor>
-References: <20260119124629.2563-1-will@kernel.org>
- <20260119124629.2563-15-will@kernel.org>
- <aY2tX6V0pCqwGth5@raptor>
- <aag8edDkKgfTr_hD@willie-the-truck>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
+ acknowledgement
+Message-ID: <aarB3iv8963UDn5E@arm.com>
+References: <20260302165801.3014607-1-catalin.marinas@arm.com>
+ <20260302165801.3014607-4-catalin.marinas@arm.com>
+ <aamT6-Mvr9nI1unq@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -44,137 +42,160 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aag8edDkKgfTr_hD@willie-the-truck>
+In-Reply-To: <aamT6-Mvr9nI1unq@willie-the-truck>
 
-Hi Will,
-
-On Wed, Mar 04, 2026 at 02:06:49PM +0000, Will Deacon wrote:
-> On Thu, Feb 12, 2026 at 10:37:19AM +0000, Alexandru Elisei wrote:
-> > On Mon, Jan 19, 2026 at 12:46:07PM +0000, Will Deacon wrote:
-> > > Introduce a new abort handler for resolving stage-2 page faults from
-> > > protected VMs by pinning and donating anonymous memory. This is
-> > > considerably simpler than the infamous user_mem_abort() as we only have
-> > > to deal with translation faults at the pte level.
-> > > 
-> > > Signed-off-by: Will Deacon <will@kernel.org>
-> > > ---
-> > >  arch/arm64/kvm/mmu.c | 89 ++++++++++++++++++++++++++++++++++++++++----
-> > >  1 file changed, 81 insertions(+), 8 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index a23a4b7f108c..b21a5bf3d104 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -1641,6 +1641,74 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > >  	return ret != -EAGAIN ? ret : 0;
-> > >  }
-> > >  
-> > > +static int pkvm_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> > > +		struct kvm_memory_slot *memslot, unsigned long hva)
-> > > +{
-> > > +	unsigned int flags = FOLL_HWPOISON | FOLL_LONGTERM | FOLL_WRITE;
-> > > +	struct kvm_pgtable *pgt = vcpu->arch.hw_mmu->pgt;
-> > > +	struct mm_struct *mm = current->mm;
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	void *hyp_memcache;
-> > > +	struct page *page;
-> > > +	int ret;
-> > > +
-> > > +	ret = prepare_mmu_memcache(vcpu, true, &hyp_memcache);
-> > > +	if (ret)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	ret = account_locked_vm(mm, 1, true);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	mmap_read_lock(mm);
-> > > +	ret = pin_user_pages(hva, 1, flags, &page);
-> > > +	mmap_read_unlock(mm);
-> > 
-> > If the page is part of a large folio, the entire folio gets pinned here, not
-> > just the page returned by pin_user_pages(). Do you reckon that should be
-> > considered when calling account_locked_vm()?
+On Thu, Mar 05, 2026 at 02:32:11PM +0000, Will Deacon wrote:
+> On Mon, Mar 02, 2026 at 04:57:56PM +0000, Catalin Marinas wrote:
+> > C1-Pro acknowledges DVMSync messages before completing the SME/CME
+> > memory accesses. Work around this by issuing an IPI+DSB to the affected
+> > CPUs if they are running in EL0 with SME enabled.
 > 
-> I don't _think_ so.
+> Just to make sure I understand the implications, but this _only_ applies
+> to explicit memory accesses from the SME unit and not, for example, to
+> page-table walks initiated by SME instructions?
+
+Yes, only explicit accesses from the SME unit (CME).
+
+> > @@ -575,6 +576,14 @@ static const struct midr_range erratum_spec_ssbs_list[] = {
+> >  };
+> >  #endif
+> >  
+> > +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> > +static void cpu_enable_sme_dvmsync(const struct arm64_cpu_capabilities *__unused)
+> > +{
+> > +	if (this_cpu_has_cap(ARM64_WORKAROUND_SME_DVMSYNC))
+> > +		sme_enable_dvmsync();
+> > +}
+> > +#endif
+> > +
+> >  #ifdef CONFIG_AMPERE_ERRATUM_AC03_CPU_38
+> >  static const struct midr_range erratum_ac03_cpu_38_list[] = {
+> >  	MIDR_ALL_VERSIONS(MIDR_AMPERE1),
+> > @@ -901,6 +910,16 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+> >  		.matches = need_arm_si_l1_workaround_4311569,
+> >  	},
+> >  #endif
+> > +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> > +	{
+> > +		.desc = "C1-Pro SME DVMSync early acknowledgement",
+> > +		.capability = ARM64_WORKAROUND_SME_DVMSYNC,
+> > +		.cpu_enable = cpu_enable_sme_dvmsync,
+> > +		/* C1-Pro r0p0 - r1p2 (the latter only when REVIDR_EL1[0]==0 */
+> > +		ERRATA_MIDR_RANGE(MIDR_C1_PRO, 0, 0, 1, 2),
+> > +		MIDR_FIXED(MIDR_CPU_VAR_REV(1, 2), BIT(0)),
+> > +	},
+> > +#endif
 > 
-> Since we only ask for a single page when we call pin_user_pages(), the
-> folio refcount will be adjusted by 1, even for large folios. Trying to
+> An alternative to this workaround is just to disable SME entirely, perhaps
+> by passing 'arm64.nosme' on the cmdline. Maybe we should disable the
+> workaround in that case?
 
-The large folios, **_pincount** is adjusted by 1 with FOLL_LONGTERM. For
-non-large folio, the refcount is increased by GUP_PIN_COUNTING_BIAS == 1024
-(try_grab_folio() is where the magic happens).
+Good point, the workaround isn't necessary if the SME is off. I can add
+an extra check, though given that no-one would run in user-space with
+TIF_SME, the overhead is only in the sme_active_cpus mask checking.
 
-> adjust the accounting based on whether the pinned page forms part of a
-> large folio feels error-prone, not least because the migration triggered
-> by the longterm pin could actually end up splitting the folio but also
-
-Hmm.. as far as I can tell pin_user_pages() uses MIGRATE_SYNC to migrate folios
-not suitable for longterm pinning, and after migration has completed it attemps
-to pin the userspace address again.
-
-Also, split_folio() and friends cannot split folio_maybe_dma_pinned_folio(),
-according to the comments for the various functions.
-
-> because we'd have to avoid double accounting on subsequent faults to the
-> same folio. It also feels fragile if the mm code is able to split
-> partially pinned folios in future (like it appears to be able to for
-> partially mapped folios).
-
-I'm not sure why mm would want to split a folio_maybe_dma_pinned_folio(). But
-I'm far from being a mm expert, so I do understand why relying on this might
-feel fragile.
-
+> > @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
+> >  	put_cpu_fpsimd_context();
+> >  }
+> >  
+> > +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> > +
+> > +/*
+> > + * SME/CME erratum handling
+> > + */
+> > +static cpumask_var_t sme_dvmsync_cpus;
+> > +static cpumask_var_t sme_active_cpus;
+> > +
+> > +void sme_set_active(unsigned int cpu)
+> > +{
+> > +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
+> > +		return;
+> > +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
+> > +		return;
+> > +
+> > +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
+> > +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
+> > +
+> > +	cpumask_set_cpu(cpu, sme_active_cpus);
+> > +
+> > +	/*
+> > +	 * Ensure subsequent (SME) memory accesses are observed after the
+> > +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
+> > +	 */
+> > +	smp_mb();
 > 
-> > > +	if (ret == -EHWPOISON) {
-> > > +		kvm_send_hwpoison_signal(hva, PAGE_SHIFT);
-> > > +		ret = 0;
-> > > +		goto dec_account;
-> > > +	} else if (ret != 1) {
-> > > +		ret = -EFAULT;
-> > > +		goto dec_account;
-> > > +	} else if (!folio_test_swapbacked(page_folio(page))) {
-> > > +		/*
-> > > +		 * We really can't deal with page-cache pages returned by GUP
-> > > +		 * because (a) we may trigger writeback of a page for which we
-> > > +		 * no longer have access and (b) page_mkclean() won't find the
-> > > +		 * stage-2 mapping in the rmap so we can get out-of-whack with
-> > > +		 * the filesystem when marking the page dirty during unpinning
-> > > +		 * (see cc5095747edf ("ext4: don't BUG if someone dirty pages
-> > > +		 * without asking ext4 first")).
-> > 
-> > I've been trying to wrap my head around this. Would you mind providing a few
-> > more hints about what the issue is? I'm sure the approach is correct, it's
-> > likely just me not being familiar with the code.
-> 
-> The fundamental problem is that unmapping page-cache pages from the host
-> stage-2 can confuse filesystems who don't know that either the page is
-> now inaccessible (and so may attempt to access it) or that the page can
-> be accessed concurrently by the guest without updating the page state.
-> 
-> To fix those issues, we would need to support MMU notifiers for protected
-> memory but that would allow the host to mess with the guest stage-2
-> page-table, which breaks the security model that we're trying to uphold.
+> I can't convince myself that a DMB is enough here, as the whole issue
+> is that the SME memory accesses can be observed _after_ the TLB
+> invalidation. I'd have thought we'd need a DSB to ensure that the flag
+> updates are visible before the exception return.
 
-Aha, got it, thanks for the explanation!
+This is only to ensure that the sme_active_cpus mask is observed before
+any SME accesses. The mask is later used to decide whether to send the
+IPI. We have something like this:
 
-Alex
+P0
+	STSET	[sme_active_cpus]
+	DMB
+	SME access to [addr]
 
+P1
+	TLBI	[addr]
+	DSB
+	LDR	[sme_active_cpus]
+	CBZ	out
+	Do IPI
+out:
+
+If P1 did not observe the STSET to [sme_active_cpus], P0 should have
+received and acknowledged the DVMSync before the STSET. Is your concern
+that P1 can observe the subsequent SME access but not the STSET?
+
+No idea whether herd can model this (I only put this in TLA+ for the
+main logic check but it doesn't do subtle memory ordering).
+
+> > +void sme_do_dvmsync(void)
+> > +{
+> > +	/*
+> > +	 * This is called from the TLB maintenance functions after the DSB ISH
+> > +	 * to send hardware DVMSync message. If this CPU sees the mask as
+> > +	 * empty, the remote CPU executing sme_set_active() would have seen
+> > +	 * the DVMSync and no IPI required.
+> > +	 */
+> > +	if (cpumask_empty(sme_active_cpus))
+> > +		return;
+> > +
+> > +	preempt_disable();
+> > +	smp_call_function_many(sme_active_cpus, sme_dvmsync_ipi, NULL, true);
+> > +	preempt_enable();
+> > +}
 > 
-> > > @@ -2190,15 +2258,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> > >  		goto out_unlock;
-> > >  	}
-> > >  
-> > > -	VM_WARN_ON_ONCE(kvm_vcpu_trap_is_permission_fault(vcpu) &&
-> > > -			!write_fault && !kvm_vcpu_trap_is_exec_fault(vcpu));
-> > > +	if (kvm_vm_is_protected(vcpu->kvm)) {
-> > > +		ret = pkvm_mem_abort(vcpu, fault_ipa, memslot, hva);
-> > 
-> > I guess the reason this comes after handling an access fault is because you want
-> > the WARN_ON() to trigger in pkvm_pgtable_stage2_mkyoung().
-> 
-> Right, we should only ever see translation faults for protected guests
-> and that's all that pkvm_mem_abort() is prepared to handle, so we call
-> it last.
-> 
-> Will
+> Why do we care about all CPUs using SME, rather than limiting it to the
+> set of CPUs using SME with the mm we've invalidated? This looks like it
+> will result in unnecessary cross-calls when multiple tasks are using SME
+> (especially as the mm flag is only cleared on fork).
+
+Yes, it's a possibility but I traded it for simplicity. We also have the
+TTU case where we don't have an mm and we don't want to broadcast to all
+CPUs either, hence an sme_active_cpus mask. As I just replied on patch
+2, for the TLB batching we wouldn't be able to use a cpumask in the
+batching structure since, per the ordering above, we need the DVMSync
+before checking if/where to send the IPI to.
+
+For the typical TLBI (not TTU), we can track a per-mm mask passed down
+to this function (I have patches doing this but it didn't make a
+significant difference in benchmarks). However, for upstream we may want
+to use mm_cpumask() for something else in the future (FEAT_TLBID; work
+in progress), so we should probably add a different mask. Well, C1-Pro
+doesn't support FEAT_TLBID, so we could disable the workaround and use
+the same mm_cpumask(); it just gets messier.
+
+We can keep the sme_active_cpus for the TTU case and easily add a
+cpumask for the other TLBI cases where we have the mm. Is it worth it? I
+don't think so if the only SME apps are some benchmarks ;).
+
+(for the Android backports I did not want to break KMI by expanding
+kernel data structures; of course, not a concern for mainline but the
+only users of this workaround are likely to be using GKI than upstream)
+
+-- 
+Catalin
