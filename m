@@ -1,236 +1,455 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBCF1A6821
-	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4643A963D
+	for <kvmarm@lists.linux.dev>; Fri,  6 Mar 2026 14:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772807234; cv=none; b=RJ+rfbMh5biRri2Djn4tg05omzrkNEss0ovZrNU9oNBXeEZFm6vReYc1zmKCFOcnYK0Y4ymfvV/8HnqG1pVGr2vD1Ye33u0twWBa8o9WEKCqBljX5ObVomf7389Y/ru4fjIz3vesCo9tMPJ3ZJMPFxddtdDf410hXblWWyj46MQ=
+	t=1772807755; cv=none; b=KeK0Ob9lQmCe4rIeTWuQGwRIxwXSOQ9W9KBTZI/JCH26LVJ/x8OFYGXerLpEdv6NdX1hem+pJeXZVySDNHF97322n0CGEnre4P5c8eC/4RExo0FEhCaps2PJaNbKxuk+BXDc66BU8jwgKWBoH+Ml1itS01JwU8XyEfYEM/BtDUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772807234; c=relaxed/simple;
-	bh=Wa5dhYFKm2UfeGSK3LTa6FzLHIuQpVctkjMTKT0JyCc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=biTLotF6t+ylggghyRruGTaaIyi39GjIPuxJBgDhj+3oAvNifa+RUhRJ1ktHjEP5UjuB4G6xLnwnrlSB9b4157u6DBbJSjol4v5m9WFAVoYiCrvSJmMmr9qVVpaqlCiunPlhipn72UrrYdBsfJZ7xQN0krOb6jl8anDMqA4xgKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E60D1688;
-	Fri,  6 Mar 2026 06:27:04 -0800 (PST)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09B6B3F73B;
-	Fri,  6 Mar 2026 06:27:09 -0800 (PST)
-From: Joey Gouly <joey.gouly@arm.com>
-To: kvmarm@lists.linux.dev
-Cc: joey.gouly@arm.com,
-	andrew.jones@linux.dev,
-	alexandru.elisei@arm.com,
-	Marc Zyngier <maz@kernel.org>
-Subject: [kvm-unit-tests PATCH v1 5/5] arm64: add hypervisor trapping test
-Date: Fri,  6 Mar 2026 14:26:56 +0000
-Message-Id: <20260306142656.2775185-6-joey.gouly@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260306142656.2775185-1-joey.gouly@arm.com>
-References: <20260306142656.2775185-1-joey.gouly@arm.com>
+	s=arc-20240116; t=1772807755; c=relaxed/simple;
+	bh=/3vjsq+16Q8Mz4rQeZxTwkW7U6oKDKrhAGDdZZbE+TA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=XBF2roP8SOBRkHlyAd8O6MKfd5l+M0a0MJ8C2jEsGrzUyZumoCu+oz5MNcx5LdtZTAv6Jhre5WtKlspaaoegtpoNBlqg2VsAqYwjR0XXpqWXEwsgAv+TWQIgjgy8Z82iD6AgcYcUFiyw34jJ0wif3eUHbNX4JSYPK6c8j3SMRHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEQ+Hi2p; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEQ+Hi2p"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4837246211bso120963415e9.0
+        for <kvmarm@lists.linux.dev>; Fri, 06 Mar 2026 06:35:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1772807751; x=1773412551; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=AMIiJQZ348ZQk2WYA/GFbFpUw93cZFDJ+0zaJnlozW4=;
+        b=KEQ+Hi2pdLIvQZF70M0o9eZacCVTBQ6ADY+Y8o/7FPpejPWdFbVvLcnnTxSASVrCJr
+         EEkzFQdkuiKeUKZQ4Wyp8i71K9H0ZXFy8DfzdRa28W+v8ShscvmBr6ZLcbFYELiv7uGg
+         5YlIEeDjxkdqHCdspRsPXoWDjOGFd9cdCJW2a9u+iyZInNLtso1T4LIG/I8EtymZVCUt
+         RcySVUoxGQCAwNm8QjCkdgTEkONTlk3nrn9OWYtxZh6stOzeYQ0NQijdCSFV8JDmQ5Va
+         Vk7sLYYREUaBObXlE7Deg4427WJn7DazrK0yPWvWs+Mh0CGyJwCSd2y6Nbbhibwcxu45
+         oWNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1772807751; x=1773412551;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AMIiJQZ348ZQk2WYA/GFbFpUw93cZFDJ+0zaJnlozW4=;
+        b=E2ux/Vl81CAnvEq3Rd8zUmFERLJpuS8k+90EC8OrY/JBLvK3XngasJocN1zKW6QMmY
+         OdYjFfR8YliEwN4drlRN5s9siy6H4Aal27Le58gss1UsfILg5HpmReVcuV0vz9A9znQy
+         6lTuIrnGqAXK0i6KIgNRdxiZkM4z2s6nSDOq9ITPdUpPoWqiV35dUrglwhcfgYhaGTOP
+         qOvwVqnWqQnMubZKBtAOGdRMOFpRZW6PQozmmhk/9gtgBepiDCoBRCJFThV7Sp/QStZM
+         HUuOHLHzvdSWIS6YKPWw15oZeVgilSkSvc7GPirRqZpY0QH06vPSL6dqy6yKcvLzbnz0
+         IbAA==
+X-Gm-Message-State: AOJu0YzH4p55PZHtwo17A1idvaZrp571Ay9zc5EMMk844OxKRTxbF4RS
+	7T3nml641V3Yc2JGk/yDVvkI879JN+KW4iXldxu/Prd24tGqAD0e0OY72KzFi6KIA3foso9vwRX
+	wdOBASKxPyyaiPJ42TUUVag==
+X-Received: from wmri26-n1.prod.google.com ([2002:a05:600c:8a1a:10b0:47e:e414:b8fa])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:888a:b0:47e:e91d:73c0 with SMTP id 5b1f17b1804b1-485269581bfmr30937505e9.19.1772807751457;
+ Fri, 06 Mar 2026 06:35:51 -0800 (PST)
+Date: Fri,  6 Mar 2026 14:35:04 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
+Message-ID: <20260306143536.339777-1-vdonnefort@google.com>
+Subject: [PATCH v13 00/32] Tracefs support for pKVM
+From: Vincent Donnefort <vdonnefort@google.com>
+To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
+	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	jstultz@google.com, qperret@google.com, will@kernel.org, 
+	aneesh.kumar@kernel.org, kernel-team@android.com, 
+	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add a test that sets various EL2 and EL1 trapping bits, and accesses CTR_EL0
-from EL1 and EL0.
+The growing set of features supported by the hypervisor in protected
+mode necessitates debugging and profiling tools. Tracefs is the
+ideal candidate for this task:
 
-There are two test that will run at EL1, to ensure the guest code is not too
-EL2 specific.
+  * It is simple to use and to script.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
----
- arm/Makefile.arm64     |   1 +
- arm/hyp-test.c         | 139 +++++++++++++++++++++++++++++++++++++++++
- lib/arm64/asm/sysreg.h |   4 ++
- 3 files changed, 144 insertions(+)
- create mode 100644 arm/hyp-test.c
+  * It is supported by various tools, from the trace-cmd CLI to the
+    Android web-based perfetto.
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index c7a39945..7582dad5 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -65,6 +65,7 @@ tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
- tests += $(TEST_DIR)/fpu.$(exe)
- tests += $(TEST_DIR)/mte.$(exe)
-+tests += $(TEST_DIR)/hyp-test.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/hyp-test.c b/arm/hyp-test.c
-new file mode 100644
-index 00000000..17af29ee
---- /dev/null
-+++ b/arm/hyp-test.c
-@@ -0,0 +1,139 @@
-+#include <asm/processor.h>
-+#include <asm/guest.h>
-+
-+bool current_el_undef_taken = false;
-+
-+static void elx_und(struct pt_regs *regs, unsigned int esr)
-+{
-+	current_el_undef_taken = true;
-+	step_trapped_instruction(regs);
-+	return;
-+}
-+
-+static int read_current_el(void) {
-+	return (int)current_level();
-+}
-+
-+static int current_el0_at_el0(void) {
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN, elx_und);
-+	current_el_undef_taken = false;
-+	run_in_el0(read_current_el);
-+	report(current_el_undef_taken == true, "CurrentEL undef taken at EL0");
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN, NULL);
-+
-+	return 0;
-+}
-+
-+static void current_el_trap(void) {
-+	if (current_level() == CurrentEL_EL2) {
-+		write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-+		run_in_el1(current_el0_at_el0);
-+	} else {
-+		current_el0_at_el0();
-+	}
-+}
-+
-+bool ctr_trap_taken = false;
-+int ctr_trap_el = 0;
-+
-+static void ctr_elx_sys(struct pt_regs *regs, unsigned int esr)
-+{
-+	ctr_trap_taken = true;
-+	ctr_trap_el = current_level() >> 2;
-+	step_trapped_instruction(regs);
-+	return;
-+}
-+
-+static int read_ctr_el0(void) {
-+	asm volatile("mrs x0, ctr_el0");
-+	return 0;
-+}
-+
-+static int ctr_el0_trap_el1_el0(void) {
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, ctr_elx_sys);
-+	run_in_el0(read_ctr_el0);
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, NULL);
-+
-+	return 0;
-+}
-+
-+static void ctr_el0_trap_el1_only(void)
-+{
-+     u64 sctlr_el1 = read_sysreg(sctlr_el1);
-+
-+     ctr_trap_taken = 0;
-+     ctr_trap_el = 0;
-+     write_sysreg(sctlr_el1 & ~SCTLR_EL1_UCT, sctlr_el1);
-+     ctr_el0_trap_el1_el0();
-+     report(ctr_trap_taken && ctr_trap_el == 1,
-+            "CTR_EL0 trap taken to EL1, UCT=0");
-+
-+     ctr_trap_taken = 0;
-+     ctr_trap_el = 0;
-+     write_sysreg(sctlr_el1 | SCTLR_EL1_UCT, sctlr_el1);
-+     ctr_el0_trap_el1_el0();
-+     report(!ctr_trap_taken && ctr_trap_el == 0,
-+            "CTR_EL0 trap not taken, UCT=1");
-+
-+     write_sysreg(sctlr_el1, sctlr_el1);
-+     isb();
-+}
-+
-+static void ctr_el0_trap(void) {
-+	ctr_trap_taken = 0;
-+	ctr_trap_el = 0;
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TID2, HCR_EL2);
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-+	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-+	run_in_el1(ctr_el0_trap_el1_el0);
-+	assert(current_level() == CurrentEL_EL2);
-+	report(ctr_trap_taken && ctr_trap_el == 1, "CTR_EL0 trap taken to EL1, TID2=0, UCT=0");
-+
-+	ctr_trap_taken = 0;
-+	ctr_trap_el = 0;
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TID2, HCR_EL2);
-+	write_sysreg(read_sysreg(SCTLR_EL2) | SCTLR_EL2_UCT, SCTLR_EL2);
-+	run_in_el1(ctr_el0_trap_el1_el0);
-+	report(!ctr_trap_taken && ctr_trap_el == 0, "CTR_EL0 trap not taken, TID2=0, UCT=1");
-+
-+	ctr_trap_taken = 0;
-+	ctr_trap_el = 0;
-+	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-+	write_sysreg(read_sysreg(SCTLR_EL2) | SCTLR_EL2_UCT, SCTLR_EL2);
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, ctr_elx_sys);
-+	run_in_el1(ctr_el0_trap_el1_el0);
-+	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, NULL);
-+	report(ctr_trap_taken && ctr_trap_el == 2, "CTR_EL0 trap taken to EL2, TID2=1, UCT=1");
-+
-+	ctr_trap_taken = 0;
-+	ctr_trap_el = 0;
-+	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-+	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-+	run_in_el1(ctr_el0_trap_el1_el0);
-+	report(ctr_trap_taken && ctr_trap_el == 1, "CTR_EL0 trap taken to EL2, TID2=1, UCT=0");
-+
-+	ctr_trap_taken = 0;
-+	ctr_trap_el = 0;
-+	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-+	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-+	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2 | HCR_EL2_TGE, HCR_EL2);
-+	ctr_el0_trap_el1_el0();
-+	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-+	report(ctr_trap_taken && ctr_trap_el == 2, "CTR_EL0 trap taken (VHE), EL2, TID2=1, UCT=0");
-+}
-+
-+int main(void) {
-+	current_el_trap();
-+
-+	if (current_level() != CurrentEL_EL2) {
-+		ctr_el0_trap_el1_only();
-+		report_skip("EL2-only trap routing tests skipped at EL1");
-+		return report_summary();
-+	}
-+
-+	ctr_el0_trap();
-+
-+	return report_summary();
-+}
-diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-index 498eef4e..298e8b7a 100644
---- a/lib/arm64/asm/sysreg.h
-+++ b/lib/arm64/asm/sysreg.h
-@@ -102,6 +102,7 @@ asm(
- #define SCTLR_EL1_EIS		_BITULL(22)
- #define SCTLR_EL1_TSCXT		_BITULL(20)
- #define SCTLR_EL1_WXN		_BITULL(19)
-+#define SCTLR_EL1_UCT		_BITULL(15)
- #define SCTLR_EL1_I		_BITULL(12)
- #define SCTLR_EL1_EOS		_BITULL(11)
- #define SCTLR_EL1_SED		_BITULL(8)
-@@ -118,6 +119,9 @@ asm(
- #define SCTLR_EL1_TCF0_SHIFT	38
- #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
- 
-+#define SCTLR_EL2_UCT _BITULL(15)
-+
-+#define HCR_EL2_TID2		_BITULL(17)
- #define HCR_EL2_TGE		_BITULL(27)
- #define HCR_EL2_RW		_BITULL(31)
- #define HCR_EL2_E2H		_BITULL(34)
+  * The ring-buffer, where are stored trace events consists of linked
+    pages, making it an ideal structure for sharing between kernel and
+    hypervisor.
+
+This series first introduces a new generic way of creating remote events and
+remote buffers. Then it adds support to the pKVM hypervisor.
+
+1. ring-buffer
+--------------
+
+To setup the per-cpu ring-buffers, a new interface is created:
+
+  ring_buffer_remote:	Describes what the kernel needs to know about the
+			remote writer, that is, the set of pages forming the
+			ring-buffer and a callback for the reader/head
+			swapping (enables consuming read)
+
+  ring_buffer_remote():	Creates a read-only ring-buffer from a
+			ring_buffer_remote.
+
+To keep the internals of `struct ring_buffer` in sync with the remote,
+the meta-page is used. It was originally introduced to enable user-space
+mapping of the ring-buffer [1]. In this case, the kernel is not the
+producer anymore but the reader. The function to read that meta-page is:
+
+  ring_buffer_poll_remote():
+			Update `struct ring_buffer` based on the remote
+			meta-page. Wake-up readers if necessary.
+
+The kernel has to poll the meta-page to be notified of newly written
+events.
+
+2. Tracefs
+----------
+
+This series introduce a new trace_remote that does the link between
+tracefs and the remote ring-buffer.
+
+The interface is found in the remotes/ directory at the root of the
+tracefs mount point. Each remote is like an instance and you'll find
+there a subset of the regular Tracefs user-space interface:
+
+   remotes/test
+	|-- buffer_size_kb
+	|-- events
+	|   |-- enable
+	|   |-- header_event
+	|   |-- header_page
+	|   `-- test
+	|       `-- selftest
+	|           |-- enable
+	|           |-- format
+	|           `-- id
+	|-- per_cpu
+	|   `-- cpu0
+	|       |-- trace
+	|       `-- trace_pipe
+	|-- trace
+	|-- trace_pipe
+	|-- tracing_on
+
+Behind the scenes, kernel/trace/trace_remote.c creates this tracefs
+hierarchy without relying on kernel/trace/trace.c. This is due to
+fundamental differences:
+
+  * Remote tracing doesn't support trace_array's system-specific
+    features (snapshots, tracers, etc.).
+
+  * Logged event formats differ (e.g., no PID for remote events).
+
+  * Buffer operations require specific remote interactions.
+
+3. Simple Ring-Buffer
+---------------------
+
+As the current ring-buffer.c implementation has too many dependencies to
+be used directly by the pKVM hypervisor. A new simple implementation is
+created and can be found in kernel/trace/simple-ring-buffer.c.
+
+This implementation is write-only and is used by both the pKVM
+hypervisor and a trace_remote test module.
+
+4. Events
+---------
+
+A new REMOTE_EVENT() macro is added to simplify the creation of events
+on the kernel side. As remote tracing buffer are read only, only the
+event structure and a way of printing must be declared. The prototype of
+the macro is very similar to the well-known TRACE_EVENT()
+
+ REMOTE_EVENT(my_event, id,
+     RE_STRUCT(
+         re_field(u64, foobar)
+     ),
+     RE_PRINTK("foobar=%lld", __entry->foobar)
+     )
+  )
+
+5. pKVM
+-------
+
+The pKVM support simply creates a "hypervisor" trace_remote on the
+kernel side and inherits from simple-ring-buffer.c on the hypervisor
+side.
+
+A new event macro is created HYP_EVENT() that is under the hood re-using
+REMOTE_EVENT() (defined in the previous paragaph) as well as generate
+hypervisor specific struct and trace_<event>() functions.
+
+5. Limitations:
+---------------
+
+Non-consuming reading of the buffer isn't supported (i.e. cat trace ->
+-EPERM) due to current the lack of support in the ring-buffer meta-page.
+
+[1] https://tracingsummit.org/ts/2022/hypervisortracing/
+[2] https://lore.kernel.org/all/20240510140435.3550353-1-vdonnefort@google.com/
+
+Changes since v12 (https://lore.kernel.org/all/20260219150307.14538-1-vdonnefort@google.com/)
+
+  - Rebase on v7.0-rc2
+  - use kzalloc_obj() in trace_remote.c and remote_test.c
+
+changes since v11 (https://lore.kernel.org/all/20260131132848.254084-1-vdonnefort@google.com/)
+
+  - Fix kerneldoc (Steven)
+  - Remove useless ring_buffer_event_data type cast (Steven)
+  - Fix __free_ring_buffer_iter() (Steven)
+  - Move trace seq locking into start/stop (Steven)
+
+changes since v10 (https://lore.kernel.org/all/20260126104419.1649811-1-vdonnefort@google.com/)
+
+  - Move kerneldoc to .c files (Steven)
+  - Return EBUSY on buffer_size_kb write if buffer is loaded (Steven)
+  - Remove rb_iter/rb_iters union in trace_remote_iterator (Steven)
+  - Rename a refactor trace file seq_operations (Steven)
+  - Make trace_get_cpu() accessible to trace_remote.c (Steven)
+  - Remove unnecessary cpus_read_unlock() (Steven)
+  - !preempt on remote_test driver buffer writing (Steven)
+  - Do not fail selftest if cpu/online is unavailable (Steven)
+  - Add rational for trace_remote into documentation (Steven)
+
+changes since v9 (https://lore.kernel.org/all/20251202093623.2337860-1-vdonnefort@google.com/)
+
+  - Add vCPU PID to hyp_enter/hyp_exit (Marc)
+  - Remove useless X1 setting for tracing HVCs (Marc)
+  - Fix REMOTE_PRINTK_COUNT_ARGS()
+  - Rebase on 6.19-rc7
+
+Changes since v8 (https://lore.kernel.org/all/20251107093840.3779150-1-vdonnefort@google.com/)
+
+  - Do not enable tracing if unstable cnvct (Marc)
+  - Add support for nVHE (Marc)
+  - Add PKVM_DISABLE_STAGE2_ON_PANIC (Marc)
+  - NVHE_EL2_TRACING depends on NVHE_EL2_DEBUG (Marc)
+  - Add a reason for hyp_enter/hyp_exit events (Marc)
+  - Remove PKVM_SELFTESTS in favour of NVHE_EL2_DEBUG
+  - Add wrapper for arm_smccc_1_2, now used in nvhe/ffa.c
+
+Changes since v7 (https://lore.kernel.org/all/20251003133825.2068970-1-vdonnefort@google.com/)
+
+  - Add missing EXPORT_SYMBOL_GPL for remote_test.ko
+  - Rebase on 6.18-rc4
+
+Changes since v6 (https://lore.kernel.org/all/20250821081412.1008261-1-vdonnefort@google.com/)
+
+  - Add requires field to the selftest (Masami)
+  - Use guard() for ring_buffer_poll_remote (Steven)
+  - Rename ring_buffer_remote() to ring_buffer_alloc_remote() (Steven)
+  - kerneldoc for trace_buffer_remote and simple_ring_buffer (Steven)
+  - Validate trace_buffer_desc size in trace_remote_alloc_buffer
+    (Steven)
+  - Add non-consuming ring-buffer read (Steven)
+  - Add spinning failsafe in simple_ring_buffer (Steven)
+  - Range check for hyp_trace_desc::bpages_backing_* in hyp_trace_desc_validate()
+  - unsigned int cpu in hyp_trace_desc_validate()
+  - Fix event/format file
+  - Add tests with an offline CPU
+  - Add tests for non-consuming read
+  - Add documentation
+  - Rebase on 6.17
+
+Changes since v5 (https://lore.kernel.org/all/20250516134031.661124-1-vdonnefort@google.com/)
+
+  - Add tishift lib to the hyp (Aneesh)
+  - Rebase on 6.17-rc2
+
+Changes since v4 (https://lore.kernel.org/all/20250506164820.515876-1-vdonnefort@google.com/)
+
+  - Extend meta-page with pages_touched and pages_lost
+  - Create ring_buffer_types.h
+  - Fix simple_ring_buffer build for 32-bits arch and x86
+  - Try unload buffer on reset (+ test)
+  - Minor renaming and comments
+
+Changes since v3 (https://lore.kernel.org/all/20250224121353.98697-1-vdonnefort@google.com/)
+
+  - Move tracefs support from kvm/hyp_trace.c into a generic trace_remote.c.
+  - Move ring-buffer implementation from nvhe/trace.c into  a generic
+    simple-ring-buffer.c
+  - Rebase on 6.15-rc4.
+
+Changes since v2 (https://lore.kernel.org/all/20250108114536.627715-1-vdonnefort@google.com/)
+
+  - Fix ring-buffer remote reset
+  - Fix fast-forward in rb_page_desc()
+  - Refactor nvhe/trace.c
+  - struct hyp_buffer_page more compact
+  - Add a struct_len to trace_page_desc
+  - Extend reset testing
+  - Rebase on 6.14-rc3
+
+Changes since v1 (https://lore.kernel.org/all/20240911093029.3279154-1-vdonnefort@google.com/)
+
+  - Add 128-bits mult fallback in the unlikely event of an overflow. (John)
+  - Fix ELF section sort.
+  - __always_inline trace_* event macros.
+  - Fix events/<event>/enable permissions.
+  - Rename ring-buffer "writer" to "remote".
+  - Rename CONFIG_PROTECTED_NVHE_TESTING to PKVM_SELFTEST to align with
+    Quentin's upcoming selftest
+  - Rebase on 6.13-rc3.
+
+Changes since RFC (https://lore.kernel.org/all/20240805173234.3542917-1-vdonnefort@google.com/)
+
+  - hypervisor trace clock:
+     - mult/shift computed in hyp_trace.c. (John)
+     - Update clock when it deviates from kernel boot clock. (John)
+     - Add trace_clock file.
+     - Separate patch for better readability.
+  - Add a proper reset interface which does not need to teardown the
+    tracing buffers. (Steven)
+  - Return -EPERM on trace access. (Steven)
+  - Add per-cpu trace file.
+  - Automatically teardown and free the tracing buffer when it is empty,
+    without readers and not currently tracing.
+  - Show in buffer_size_kb if the buffer is loaded in the hypervisor or
+    not.
+  - Extend tests to cover reset and unload.
+  - CC timekeeping folks on relevant patches (Marc)
+
+Vincent Donnefort (32):
+  ring-buffer: Add page statistics to the meta-page
+  ring-buffer: Store bpage pointers into subbuf_ids
+  ring-buffer: Introduce ring-buffer remotes
+  ring-buffer: Add non-consuming read for ring-buffer remotes
+  tracing: Introduce trace remotes
+  tracing: Add reset to trace remotes
+  tracing: Add non-consuming read to trace remotes
+  tracing: Add init callback to trace remotes
+  tracing: Add events to trace remotes
+  tracing: Add events/ root files to trace remotes
+  tracing: Add helpers to create trace remote events
+  ring-buffer: Export buffer_data_page and macros
+  tracing: Introduce simple_ring_buffer
+  tracing: Add a trace remote module for testing
+  tracing: selftests: Add trace remote tests
+  Documentation: tracing: Add tracing remotes
+  tracing: load/unload page callbacks for simple_ring_buffer
+  tracing: Check for undefined symbols in simple_ring_buffer
+  KVM: arm64: Add PKVM_DISABLE_STAGE2_ON_PANIC
+  KVM: arm64: Add clock support to nVHE/pKVM hyp
+  KVM: arm64: Initialise hyp_nr_cpus for nVHE hyp
+  KVM: arm64: Support unaligned fixmap in the pKVM hyp
+  KVM: arm64: Add tracing capability for the nVHE/pKVM hyp
+  KVM: arm64: Add trace remote for the nVHE/pKVM hyp
+  KVM: arm64: Sync boot clock with the nVHE/pKVM hyp
+  KVM: arm64: Add trace reset to the nVHE/pKVM hyp
+  KVM: arm64: Add event support to the nVHE/pKVM hyp and trace remote
+  KVM: arm64: Add hyp_enter/hyp_exit events to nVHE/pKVM hyp
+  KVM: arm64: Add selftest event support to nVHE/pKVM hyp
+  tracing: selftests: Add hypervisor trace remote tests
+  fixup! tracing: Add a trace remote module for testing
+  fixup! tracing: Add a trace remote module for testing
+
+ Documentation/trace/index.rst                 |   11 +
+ Documentation/trace/remotes.rst               |   66 +
+ arch/arm64/include/asm/kvm_asm.h              |    8 +
+ arch/arm64/include/asm/kvm_define_hypevents.h |   16 +
+ arch/arm64/include/asm/kvm_host.h             |    3 +
+ arch/arm64/include/asm/kvm_hyp.h              |    4 +-
+ arch/arm64/include/asm/kvm_hypevents.h        |   60 +
+ arch/arm64/include/asm/kvm_hyptrace.h         |   26 +
+ arch/arm64/kernel/image-vars.h                |    4 +
+ arch/arm64/kernel/vmlinux.lds.S               |   18 +
+ arch/arm64/kvm/Kconfig                        |   64 +-
+ arch/arm64/kvm/Makefile                       |    2 +
+ arch/arm64/kvm/arm.c                          |   12 +-
+ arch/arm64/kvm/handle_exit.c                  |    2 +-
+ arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h   |   23 +
+ arch/arm64/kvm/hyp/include/nvhe/clock.h       |   16 +
+ .../kvm/hyp/include/nvhe/define_events.h      |   14 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |    2 -
+ arch/arm64/kvm/hyp/include/nvhe/trace.h       |   70 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |    6 +-
+ arch/arm64/kvm/hyp/nvhe/clock.c               |   65 +
+ arch/arm64/kvm/hyp/nvhe/events.c              |   25 +
+ arch/arm64/kvm/hyp/nvhe/ffa.c                 |   28 +-
+ arch/arm64/kvm/hyp/nvhe/host.S                |    2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |   87 +-
+ arch/arm64/kvm/hyp/nvhe/hyp.lds.S             |    6 +
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |    4 +-
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c          |    7 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |    4 +-
+ arch/arm64/kvm/hyp/nvhe/stacktrace.c          |    6 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |    5 +-
+ arch/arm64/kvm/hyp/nvhe/trace.c               |  306 ++++
+ arch/arm64/kvm/hyp_trace.c                    |  443 ++++++
+ arch/arm64/kvm/hyp_trace.h                    |   11 +
+ arch/arm64/kvm/stacktrace.c                   |    8 +-
+ fs/tracefs/inode.c                            |    1 +
+ include/linux/ring_buffer.h                   |   58 +
+ include/linux/ring_buffer_types.h             |   41 +
+ include/linux/simple_ring_buffer.h            |   65 +
+ include/linux/trace_remote.h                  |   48 +
+ include/linux/trace_remote_event.h            |   33 +
+ include/trace/define_remote_events.h          |   73 +
+ include/uapi/linux/trace_mmap.h               |    8 +-
+ kernel/trace/Kconfig                          |   14 +
+ kernel/trace/Makefile                         |   20 +
+ kernel/trace/remote_test.c                    |  261 ++++
+ kernel/trace/remote_test_events.h             |   10 +
+ kernel/trace/ring_buffer.c                    |  356 ++++-
+ kernel/trace/simple_ring_buffer.c             |  517 +++++++
+ kernel/trace/trace.c                          |    4 +-
+ kernel/trace/trace.h                          |    7 +
+ kernel/trace/trace_remote.c                   | 1368 +++++++++++++++++
+ .../ftrace/test.d/remotes/buffer_size.tc      |   25 +
+ .../selftests/ftrace/test.d/remotes/functions |   88 ++
+ .../test.d/remotes/hypervisor/buffer_size.tc  |   11 +
+ .../ftrace/test.d/remotes/hypervisor/reset.tc |   11 +
+ .../ftrace/test.d/remotes/hypervisor/trace.tc |   11 +
+ .../test.d/remotes/hypervisor/trace_pipe.tc   |   11 +
+ .../test.d/remotes/hypervisor/unloading.tc    |   11 +
+ .../selftests/ftrace/test.d/remotes/reset.tc  |   90 ++
+ .../selftests/ftrace/test.d/remotes/trace.tc  |  127 ++
+ .../ftrace/test.d/remotes/trace_pipe.tc       |  127 ++
+ .../ftrace/test.d/remotes/unloading.tc        |   41 +
+ 63 files changed, 4751 insertions(+), 120 deletions(-)
+ create mode 100644 Documentation/trace/remotes.rst
+ create mode 100644 arch/arm64/include/asm/kvm_define_hypevents.h
+ create mode 100644 arch/arm64/include/asm/kvm_hypevents.h
+ create mode 100644 arch/arm64/include/asm/kvm_hyptrace.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/arm-smccc.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/clock.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/define_events.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/trace.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/clock.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/events.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/trace.c
+ create mode 100644 arch/arm64/kvm/hyp_trace.c
+ create mode 100644 arch/arm64/kvm/hyp_trace.h
+ create mode 100644 include/linux/ring_buffer_types.h
+ create mode 100644 include/linux/simple_ring_buffer.h
+ create mode 100644 include/linux/trace_remote.h
+ create mode 100644 include/linux/trace_remote_event.h
+ create mode 100644 include/trace/define_remote_events.h
+ create mode 100644 kernel/trace/remote_test.c
+ create mode 100644 kernel/trace/remote_test_events.h
+ create mode 100644 kernel/trace/simple_ring_buffer.c
+ create mode 100644 kernel/trace/trace_remote.c
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/buffer_size.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/functions
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/reset.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/trace.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/trace_pipe.tc
+ create mode 100644 tools/testing/selftests/ftrace/test.d/remotes/unloading.tc
+
+
+base-commit: 11439c4635edd669ae435eec308f4ab8a0804808
 -- 
-2.25.1
+2.53.0.473.g4a7958ca14-goog
 
