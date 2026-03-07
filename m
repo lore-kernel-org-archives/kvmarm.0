@@ -1,42 +1,43 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462E156661
-	for <kvmarm@lists.linux.dev>; Sat,  7 Mar 2026 12:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBA319AD8B;
+	Sat,  7 Mar 2026 16:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772884954; cv=none; b=mjWMlWitjgEfbg8Jm55Pe0ZKKFQxpgKBsMFQialmbb+pzmSE/U1yoeof12rDqzR+A0aRBc+pfVOeFJPeqQ81oHZ0fehjNzBPas6PztXW+XF95GwRkayUuCunm8HaFvZUW7gio9J3Y5JbmKz5XkxRCFjuLSnVPoAWJ3nFmiSCeFU=
+	t=1772901192; cv=none; b=K2487Vwr/kRSi6IXczq3W/IuVRQVgKfQY+je3ELwMwB3CrkDUd9fFh2UK7INJ9ZV6qXbUHTfKAHqOX8IROTkFK7EGySWV2jzGFt80V8RFudB7J4PtbVqgJFkxgux+523SX5C7MepMNI1ey94SwdDEywQkNSFWhG28V3nusD9qBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772884954; c=relaxed/simple;
-	bh=ZMGMoK71DW20ifGmPRAf0tsM9kerlbBDYGNdYE6Seuk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oExvUutxNPqItdrHBCNd1DjES50eM9ncgfngyaQA+qeP2y8hDclALpU5oWgpvbaFH5m5Yv7FDjCd4tFLCeCmZ7DZFWjkE+caJ57+seWSal8TshjmF98IGshKS8enM+8Pi7bAWzDvYreubG2fCywkGErvCnZ0HzdDcBVD0MIUWzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UJB3qnuX; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1772901192; c=relaxed/simple;
+	bh=4fnZR2p2P5M3Dvp1elHmn8KhFecY1dX96A45ET2b6P8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n59LBw5W6Sm091utUg2paANthkrbIBg0YJUGM9k4ISJNYri07QutcaWnl74/1SZiNbdaTQGbW6AsLj73HOL0rEbb8cGfNTS3nX6H1CL6ukNgafcW1vdkWts2JiVeY7PGJJR+kO0ZvNXrnDBt3yilOTJV5j7uCoNEp1sfjlErNcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uueAoazZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UJB3qnuX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1772884951;
-	bh=ZMGMoK71DW20ifGmPRAf0tsM9kerlbBDYGNdYE6Seuk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UJB3qnuXI42oSBRk7xI1SOpFfXw381UJW+gSgAWuqkwXiXKeDrKfy5IB533dkr+xb
-	 62gAw8gDof7m7vhVQLFudvWzXLXOqXc/QneNxxxnBN01O/nD+0f0rtkOA5lA1R3fA8
-	 AHj+714VMoBUtxPXPMThbMrbPThEFnBqQG/uJMb3ZCaJMohZADOEWa+n5dLKXHOaqo
-	 C+mnP80vwN0VOXMsQcOA2bFPVBoljmJW4UFsRFqQDZfpUJj9Mo5rPx6Q3ld1lhzvfO
-	 5+1BXaZYyy4NMSYHggb5dNNimDURXiVkkB3sWqAeSFY+5RQGICdNM/glOw/YgAd+xg
-	 GBD0YtA9JMjFQ==
-Received: from thinkpad (20014C4E2782E40079F207E35B989CE7.dsl.pool.telekom.hu [IPv6:2001:4c4e:2782:e400:79f2:7e3:5b98:9ce7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: valentine)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 33A4317E12A2;
-	Sat,  7 Mar 2026 13:02:31 +0100 (CET)
-From: Valentine Burley <valentine.burley@collabora.com>
-To: maz@kernel.org
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uueAoazZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F5DC19422;
+	Sat,  7 Mar 2026 16:33:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1772901191;
+	bh=4fnZR2p2P5M3Dvp1elHmn8KhFecY1dX96A45ET2b6P8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uueAoazZokMBYO6Ru0I1eUwurGTi1HHCDyTBHM6G6wRS4adaGQrSUt9xOsQ5NsT3T
+	 wrUawdyMccErvfQjxAVE7Xee64GXltnrZv1PwJRkMO75sygTMj5MESmNGYup3qzMwX
+	 n+k867TDtkx60jAauPkJBC3KziaR74KM4DcrZvqVBuDiyHhS34m+ppH5D1Z637f0tK
+	 2Sd4n7r2k6LyCL1IvviZoiXoW0OmT5SqJWAUCt5/DsnEivtYL9vZZqooDVXdTIWZt1
+	 0Nn3VyG7MaNVB0PpYgrHIY6PUozuwXA60WaN/pMsUETlSOqLb9ZiWEhQZZvw0L32RC
+	 FQzFk8rkOd/eA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1vyuaS-0000000HCFG-3eyu;
+	Sat, 07 Mar 2026 16:33:09 +0000
+Date: Sat, 07 Mar 2026 16:33:08 +0000
+Message-ID: <871phveh17.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Valentine Burley <valentine.burley@collabora.com>
 Cc: tabba@google.com,
 	broonie@kernel.org,
-	Valentine Burley <valentine.burley@collabora.com>,
 	stable@vger.kernel.org,
 	oupton@kernel.org,
 	joey.gouly@arm.com,
@@ -49,98 +50,202 @@ Cc: tabba@google.com,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: arm64: Skip interrupts in LRs during EOIcount replay
-Date: Sat,  7 Mar 2026 12:59:50 +0100
-Message-ID: <20260307115955.369455-1-valentine.burley@collabora.com>
-X-Mailer: git-send-email 2.51.0
+Subject: Re: [PATCH] KVM: arm64: Skip interrupts in LRs during EOIcount replay
+In-Reply-To: <20260307115955.369455-1-valentine.burley@collabora.com>
+References: <20260307115955.369455-1-valentine.burley@collabora.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: valentine.burley@collabora.com, tabba@google.com, broonie@kernel.org, stable@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, Sascha.Bischoff@arm.com, sebott@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Commit 05984ba67eb6 ("KVM: arm64: Invert ap_list sorting to push active
-interrupts out") allowed active interrupts to be evicted from LRs to
-make room for pending ones.
+Hi Valentine,
 
-When an evicted interrupt is deactivated by the guest, the GIC
-increments EOIcount. KVM replays this by finding an active interrupt
-in the ap_list to deactivate. However, the replay logic may pick an
-interrupt that is currently residing in an LR, leading to a spurious
-deactivation and leaving the actually finished interrupt active.
-This results in interrupt storms and boot failures (seen in Cuttlefish
-guests on Qualcomm SC7180).
+Thanks for this.
 
-Fix this by skipping interrupts that are currently assigned to an LR
-during EOIcount replay.
+On Sat, 07 Mar 2026 11:59:50 +0000,
+Valentine Burley <valentine.burley@collabora.com> wrote:
+> 
+> Commit 05984ba67eb6 ("KVM: arm64: Invert ap_list sorting to push active
+> interrupts out") allowed active interrupts to be evicted from LRs to
+> make room for pending ones.
+> 
+> When an evicted interrupt is deactivated by the guest, the GIC
+> increments EOIcount. KVM replays this by finding an active interrupt
+> in the ap_list to deactivate. However, the replay logic may pick an
+> interrupt that is currently residing in an LR, leading to a spurious
+> deactivation and leaving the actually finished interrupt active.
 
-This allows booting Android VMs in Cuttlefish again.
+Well, the interrupt is not in an LR anymore. It has been sync'd
+("folded") back into the vgic_irq structure, and the lr copy is now
+stale.
 
-Fixes: 05984ba67eb6 ("KVM: arm64: Invert ap_list sorting to push active interrupts out")
-Cc: stable@vger.kernel.org
-Signed-off-by: Valentine Burley <valentine.burley@collabora.com>
----
- arch/arm64/kvm/vgic/vgic-v2.c | 14 ++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++++++
- 2 files changed, 33 insertions(+)
+But the observation is key: if in EOImode==0, and if we don't trap
+ICC_EOIRx_EL1 with ICH_HCR_EL2.TC, we can race against the maintenance
+interrupt that signals a non-zero EOIcount, leaving the guest a chance
+to Ack more interrupts. Since we don't have the interrupt number, we
+pick the first active interrupt in the AP list, with prejudice. Boo.
+
+I can't reproduce it locally, but in a crap integration, where the GIC
+is clocked at a few dozen MHz, this is far more likely to happen. I
+should dig that Lazor out of the bin and put it back in the test rig.
+
+In retrospect, it is obvious. I just couldn't see it until then. Many
+thanks for going the extra mile and pointing out the core issue.
+
+[skip v2 stuff]
+
+> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> index 1d6dd1b545bd..00d9bc39bffb 100644
+> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> @@ -179,6 +179,25 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+>  			      irq->active))
+>  				continue;
+>  
+> +			bool was_in_lr = false;
+> +
+> +			for (int i = 0; i < cpuif->used_lrs; i++) {
+> +				u32 intid;
+> +
+> +				if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +					intid = cpuif->vgic_lr[i] & ICH_LR_VIRTUAL_ID_MASK;
+> +				else
+> +					intid = cpuif->vgic_lr[i] & GICH_LR_VIRTUALID;
+> +
+> +				if (intid == irq->intid) {
+> +					was_in_lr = true;
+> +					break;
+> +				}
+> +			}
+> +
+> +			if (was_in_lr)
+> +				continue;
+> +
+
+I'm afraid we can't afford this sort of quadratic behaviour, and I
+really don't want to go back rummaging in what was in the LRs -- this
+data is notionally stale. But we can rely on some properties of the AP
+list, of which the interrupts in the LRs are guaranteed to be a strict
+prefix.
+
+We just need to keep track of what point we have reached in the AP
+list at flush time, and use that as the starting point for the
+EOIcount search. It's a tiny bit of extra state, but I'd rather have
+that than what you are suggesting here.
+
+Could you please give the hack below a go on your setup? It seems to
+work for me, but given that I never observed the issue the first
+place...
+
+Thanks again,
+
+	M.
 
 diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 585491fbda80..821cf5bc30da 100644
+index 585491fbda807..e5b49274a6683 100644
 --- a/arch/arm64/kvm/vgic/vgic-v2.c
 +++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -135,6 +135,20 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
- 			      irq->active))
- 				continue;
+@@ -115,7 +115,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_v2_cpu_if *cpuif = &vgic_cpu->vgic_v2;
+ 	u32 eoicount = FIELD_GET(GICH_HCR_EOICOUNT, cpuif->vgic_hcr);
+-	struct vgic_irq *irq;
++	struct vgic_irq *irq = vgic_cpu->last_lr_irq;
  
-+			bool was_in_lr = false;
-+
-+			for (int i = 0; i < cpuif->used_lrs; i++) {
-+				u32 intid = cpuif->vgic_lr[i] & GICH_LR_VIRTUALID;
-+
-+				if (intid == irq->intid) {
-+					was_in_lr = true;
-+					break;
-+				}
-+			}
-+
-+			if (was_in_lr)
-+				continue;
-+
- 			lr = vgic_v2_compute_lr(vcpu, irq) & ~GICH_LR_ACTIVE_BIT;
- 		}
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
  
+@@ -123,7 +123,7 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 		vgic_v2_fold_lr(vcpu, cpuif->vgic_lr[lr]);
+ 
+ 	/* See the GICv3 equivalent for the EOIcount handling rationale */
+-	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++	list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		u32 lr;
+ 
+ 		if (!eoicount) {
 diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 1d6dd1b545bd..00d9bc39bffb 100644
+index 386ddf69a9c51..457fb4cd3fc63 100644
 --- a/arch/arm64/kvm/vgic/vgic-v3.c
 +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -179,6 +179,25 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 			      irq->active))
- 				continue;
+@@ -148,7 +148,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_v3_cpu_if *cpuif = &vgic_cpu->vgic_v3;
+ 	u32 eoicount = FIELD_GET(ICH_HCR_EL2_EOIcount, cpuif->vgic_hcr);
+-	struct vgic_irq *irq;
++	struct vgic_irq *irq = vgic_cpu->last_lr_irq;
  
-+			bool was_in_lr = false;
+ 	DEBUG_SPINLOCK_BUG_ON(!irqs_disabled());
+ 
+@@ -158,12 +158,12 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 	/*
+ 	 * EOIMode=0: use EOIcount to emulate deactivation. We are
+ 	 * guaranteed to deactivate in reverse order of the activation, so
+-	 * just pick one active interrupt after the other in the ap_list,
+-	 * and replay the deactivation as if the CPU was doing it. We also
+-	 * rely on priority drop to have taken place, and the list to be
+-	 * sorted by priority.
++	 * just pick one active interrupt after the other in the tail part
++	 * of the ap_list, past the LRs, and replay the deactivation as if
++	 * the CPU was doing it. We also rely on priority drop to have taken
++	 * place, and the list to be sorted by priority.
+ 	 */
+-	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++	list_for_each_entry_continue(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		u64 lr;
+ 
+ 		/*
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 430aa98888fda..4a641a12d026b 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -814,6 +814,9 @@ static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+ 
+ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+ {
++	if (!vcpu->arch.vgic_cpu.last_lr_irq)
++		return;
 +
-+			for (int i = 0; i < cpuif->used_lrs; i++) {
-+				u32 intid;
+ 	if (kvm_vgic_global_state.type == VGIC_V2)
+ 		vgic_v2_fold_lr_state(vcpu);
+ 	else
+@@ -960,10 +963,13 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
+ 	if (irqs_outside_lrs(&als))
+ 		vgic_sort_ap_list(vcpu);
+ 
++	vgic_cpu->last_lr_irq = NULL;
 +
-+				if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+					intid = cpuif->vgic_lr[i] & ICH_LR_VIRTUAL_ID_MASK;
-+				else
-+					intid = cpuif->vgic_lr[i] & GICH_LR_VIRTUALID;
-+
-+				if (intid == irq->intid) {
-+					was_in_lr = true;
-+					break;
-+				}
-+			}
-+
-+			if (was_in_lr)
-+				continue;
-+
- 			lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		scoped_guard(raw_spinlock,  &irq->irq_lock) {
+ 			if (likely(vgic_target_oracle(irq) == vcpu)) {
+ 				vgic_populate_lr(vcpu, irq, count++);
++				vgic_cpu->last_lr_irq = irq;
+ 			}
  		}
  
--- 
-2.51.0
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index f2eafc65bbf4c..61040a14cb388 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -359,6 +359,9 @@ struct vgic_cpu {
+ 	 */
+ 	struct list_head ap_list_head;
+ 
++	/* Last vgic_irq part of the AP list recorded in an LR */
++	struct vgic_irq *last_lr_irq;
++
+ 	/*
+ 	 * Members below are used with GICv3 emulation only and represent
+ 	 * parts of the redistributor.
 
+-- 
+Jazz isn't dead. It just smells funny.
