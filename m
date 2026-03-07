@@ -1,186 +1,146 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2E71F4634
-	for <kvmarm@lists.linux.dev>; Sat,  7 Mar 2026 09:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8462E156661
+	for <kvmarm@lists.linux.dev>; Sat,  7 Mar 2026 12:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1772875761; cv=none; b=qEpK3gs4NT3OUH6zqbJKOJIfK1x7EGocskqZms9ObDphCT1fOrOV34BmTRJsFUYVhaTeUN4CSAkVOt1k7NGHLm78Qv7cM9c+aOZ/A+/Dj7MyY6C8FLcIW+/pcC52wJ+/gP0UixkmPhFXJCOIVfxTQyp7crb0+C+esZ0XsBpqm3U=
+	t=1772884954; cv=none; b=mjWMlWitjgEfbg8Jm55Pe0ZKKFQxpgKBsMFQialmbb+pzmSE/U1yoeof12rDqzR+A0aRBc+pfVOeFJPeqQ81oHZ0fehjNzBPas6PztXW+XF95GwRkayUuCunm8HaFvZUW7gio9J3Y5JbmKz5XkxRCFjuLSnVPoAWJ3nFmiSCeFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1772875761; c=relaxed/simple;
-	bh=FTFaF964VuEEZyY/+Up2UNacEAMIhe96dGfInsY5dUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MAEqrsIITSBjGOuj/HypruzuIb2Wg9C0U9EcCqJnV1ZromqJ4IroJjNvaBqZdfW3ffPtEGIcLwGY6IILvqyRGKaP0GtMx/wYDlMQLtwGFZS0MpxooYDJF2ctcjUn87wW94s9Qh3BPj7Fime50xSkcNWBgsoZd/rGNN3J3wPCreg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=h-partners.com; dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b=Fs11xKyQ; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=h-partners.com
+	s=arc-20240116; t=1772884954; c=relaxed/simple;
+	bh=ZMGMoK71DW20ifGmPRAf0tsM9kerlbBDYGNdYE6Seuk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oExvUutxNPqItdrHBCNd1DjES50eM9ncgfngyaQA+qeP2y8hDclALpU5oWgpvbaFH5m5Yv7FDjCd4tFLCeCmZ7DZFWjkE+caJ57+seWSal8TshjmF98IGshKS8enM+8Pi7bAWzDvYreubG2fCywkGErvCnZ0HzdDcBVD0MIUWzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=UJB3qnuX; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=h-partners.com header.i=@h-partners.com header.b="Fs11xKyQ"
-dkim-signature: v=1; a=rsa-sha256; d=h-partners.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=Itfyi6buFhW0nHsJ4qojlX1bMfsgLsC91Ah779lyCrk=;
-	b=Fs11xKyQ7nYIUgH7UvxH6gth0KfIDoXe3uaHwUa+hP2mJzVZJigFyib1O/8y8bMWZ9PynqOJq
-	LeDP3LD9iI2HZWoHuWR/+AH7FhJ+VYRsBva+lTGdx7OXB8Qp3JRCwAsF1AfzAwAczndgMMb+Si9
-	peMQSuEjhf5GAUkAIcxM3i4=
-Received: from mail.maildlp.com (unknown [172.19.163.0])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4fSdCD6B2Rz12LCy;
-	Sat,  7 Mar 2026 17:24:40 +0800 (CST)
-Received: from kwepemf100008.china.huawei.com (unknown [7.202.181.222])
-	by mail.maildlp.com (Postfix) with ESMTPS id 971AB40561;
-	Sat,  7 Mar 2026 17:29:15 +0800 (CST)
-Received: from [10.174.179.37] (10.174.179.37) by
- kwepemf100008.china.huawei.com (7.202.181.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Sat, 7 Mar 2026 17:29:13 +0800
-Message-ID: <96ffc81d-3f37-7f48-f9f4-6a58da3e0f99@huawei.com>
-Date: Sat, 7 Mar 2026 17:29:13 +0800
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UJB3qnuX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1772884951;
+	bh=ZMGMoK71DW20ifGmPRAf0tsM9kerlbBDYGNdYE6Seuk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UJB3qnuXI42oSBRk7xI1SOpFfXw381UJW+gSgAWuqkwXiXKeDrKfy5IB533dkr+xb
+	 62gAw8gDof7m7vhVQLFudvWzXLXOqXc/QneNxxxnBN01O/nD+0f0rtkOA5lA1R3fA8
+	 AHj+714VMoBUtxPXPMThbMrbPThEFnBqQG/uJMb3ZCaJMohZADOEWa+n5dLKXHOaqo
+	 C+mnP80vwN0VOXMsQcOA2bFPVBoljmJW4UFsRFqQDZfpUJj9Mo5rPx6Q3ld1lhzvfO
+	 5+1BXaZYyy4NMSYHggb5dNNimDURXiVkkB3sWqAeSFY+5RQGICdNM/glOw/YgAd+xg
+	 GBD0YtA9JMjFQ==
+Received: from thinkpad (20014C4E2782E40079F207E35B989CE7.dsl.pool.telekom.hu [IPv6:2001:4c4e:2782:e400:79f2:7e3:5b98:9ce7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: valentine)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 33A4317E12A2;
+	Sat,  7 Mar 2026 13:02:31 +0100 (CET)
+From: Valentine Burley <valentine.burley@collabora.com>
+To: maz@kernel.org
+Cc: tabba@google.com,
+	broonie@kernel.org,
+	Valentine Burley <valentine.burley@collabora.com>,
+	stable@vger.kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	yuzenghui@huawei.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	Sascha.Bischoff@arm.com,
+	sebott@redhat.com,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: Skip interrupts in LRs during EOIcount replay
+Date: Sat,  7 Mar 2026 12:59:50 +0100
+Message-ID: <20260307115955.369455-1-valentine.burley@collabora.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v5 31/41] arm_mpam: resctrl: Add resctrl_arch_rmid_read()
- and resctrl_arch_reset_rmid()
-Content-Language: en-US
-To: Ben Horgan <ben.horgan@arm.com>, James Morse <james.morse@arm.com>
-CC: <amitsinght@marvell.com>, <baisheng.gao@unisoc.com>,
-	<baolin.wang@linux.alibaba.com>, <carl@os.amperecomputing.com>,
-	<dave.martin@arm.com>, <david@kernel.org>, <dfustini@baylibre.com>,
-	<fenghuay@nvidia.com>, <gshan@redhat.com>, <james.morse@arm.com>,
-	<jonathan.cameron@huawei.com>, <kobak@nvidia.com>, <lcherian@marvell.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<peternewman@google.com>, <punit.agrawal@oss.qualcomm.com>,
-	<quic_jiles@quicinc.com>, <reinette.chatre@intel.com>,
-	<rohit.mathew@arm.com>, <scott@os.amperecomputing.com>,
-	<sdonthineni@nvidia.com>, <tan.shaopeng@fujitsu.com>,
-	<xhao@linux.alibaba.com>, <catalin.marinas@arm.com>, <will@kernel.org>,
-	<corbet@lwn.net>, <maz@kernel.org>, <oupton@kernel.org>,
-	<joey.gouly@arm.com>, <suzuki.poulose@arm.com>, <kvmarm@lists.linux.dev>,
-	<linux-doc@vger.kernel.org>, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>,
-	Kefeng Wang <wangkefeng.wang@huawei.com>
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
- <20260224175720.2663924-32-ben.horgan@arm.com>
-From: Zeng Heng <zengheng4@huawei.com>
-In-Reply-To: <20260224175720.2663924-32-ben.horgan@arm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
- kwepemf100008.china.huawei.com (7.202.181.222)
+Content-Transfer-Encoding: 8bit
 
-Hi Ben,
+Commit 05984ba67eb6 ("KVM: arm64: Invert ap_list sorting to push active
+interrupts out") allowed active interrupts to be evicted from LRs to
+make room for pending ones.
 
-On 2026/2/25 1:57, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> resctrl uses resctrl_arch_rmid_read() to read counters. CDP emulation means
-> the counter may need reading in three different ways. The same goes for
-> reset.
-> 
-> The helpers behind the resctrl_arch_ functions will be re-used for the ABMC
-> equivalent functions.
-> 
-> Add the rounding helper for checking monitor values while we're here.
-> 
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Tested-by: Peter Newman <peternewman@google.com>
-> Tested-by: Zeng Heng <zengheng4@huawei.com>
-> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
+When an evicted interrupt is deactivated by the guest, the GIC
+increments EOIcount. KVM replays this by finding an active interrupt
+in the ap_list to deactivate. However, the replay logic may pick an
+interrupt that is currently residing in an LR, leading to a spurious
+deactivation and leaving the actually finished interrupt active.
+This results in interrupt storms and boot failures (seen in Cuttlefish
+guests on Qualcomm SC7180).
 
-[...]
+Fix this by skipping interrupts that are currently assigned to an LR
+during EOIcount replay.
 
-> +
-> +static int read_mon_cdp_safe(struct mpam_resctrl_mon *mon, struct mpam_component *mon_comp,
-> +			     enum mpam_device_features mon_type,
-> +			     int mon_idx, u32 closid, u32 rmid, u64 *val)
-> +{
-> +	if (cdp_enabled) {
+This allows booting Android VMs in Cuttlefish again.
 
-While reviewing the resctrl limbo handling code, I noticed a issue in
-__check_limbo() that could lead to premature RMID release when CDP is
-enabled.
+Fixes: 05984ba67eb6 ("KVM: arm64: Invert ap_list sorting to push active interrupts out")
+Cc: stable@vger.kernel.org
+Signed-off-by: Valentine Burley <valentine.burley@collabora.com>
+---
+ arch/arm64/kvm/vgic/vgic-v2.c | 14 ++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3.c | 19 +++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-In __check_limbo(), RMIDs in limbo state undergo L3 occupancy checks
-before being released. This check is performed via
-resctrl_arch_rmid_read(), on arm64 MPAM, which relies on the cdp_enabled
-state to determine to check which PARTID.
+diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
+index 585491fbda80..821cf5bc30da 100644
+--- a/arch/arm64/kvm/vgic/vgic-v2.c
++++ b/arch/arm64/kvm/vgic/vgic-v2.c
+@@ -135,6 +135,20 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+ 			      irq->active))
+ 				continue;
+ 
++			bool was_in_lr = false;
++
++			for (int i = 0; i < cpuif->used_lrs; i++) {
++				u32 intid = cpuif->vgic_lr[i] & GICH_LR_VIRTUALID;
++
++				if (intid == irq->intid) {
++					was_in_lr = true;
++					break;
++				}
++			}
++
++			if (was_in_lr)
++				continue;
++
+ 			lr = vgic_v2_compute_lr(vcpu, irq) & ~GICH_LR_ACTIVE_BIT;
+ 		}
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 1d6dd1b545bd..00d9bc39bffb 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -179,6 +179,25 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
+ 			      irq->active))
+ 				continue;
+ 
++			bool was_in_lr = false;
++
++			for (int i = 0; i < cpuif->used_lrs; i++) {
++				u32 intid;
++
++				if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
++					intid = cpuif->vgic_lr[i] & ICH_LR_VIRTUAL_ID_MASK;
++				else
++					intid = cpuif->vgic_lr[i] & GICH_LR_VIRTUALID;
++
++				if (intid == irq->intid) {
++					was_in_lr = true;
++					break;
++				}
++			}
++
++			if (was_in_lr)
++				continue;
++
+ 			lr = vgic_v3_compute_lr(vcpu, irq) & ~ICH_LR_ACTIVE_BIT;
+ 		}
+ 
+-- 
+2.51.0
 
-The concern arises in the following scenario: Filesystem is mounted with
-CDP enabled. During normal operation, some RMIDs enter limbo. On umount,
-cdp_enabled is reset to false. __check_limbo() may then run and perform
-L3 checks with cdp_enabled = false. This could cause RMIDs to be
-incorrectly released from limbo while still effectively busy after
-remount.
-
-Apologies for not providing a ready-made fix in this email. However,
-I would appreciate to hear the community's thoughts on this issue.
-
-
-> +		u64 code_val = 0, data_val = 0;
-> +		int err;
-> +
-> +		err = __read_mon(mon, mon_comp, mon_type, mon_idx,
-> +				 CDP_CODE, closid, rmid, &code_val);
-> +		if (err)
-> +			return err;
-> +
-> +		err = __read_mon(mon, mon_comp, mon_type, mon_idx,
-> +				 CDP_DATA, closid, rmid, &data_val);
-> +		if (err)
-> +			return err;
-> +
-> +		*val += code_val + data_val;
-> +		return 0;
-> +	}
-> +
-> +	return __read_mon(mon, mon_comp, mon_type, mon_idx,
-> +			  CDP_NONE, closid, rmid, val);
-> +}
-> +
-> +/* MBWU when not in ABMC mode, and CSU counters. */
-> +int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_domain_hdr *hdr,
-> +			   u32 closid, u32 rmid, enum resctrl_event_id eventid,
-> +			   void *arch_priv, u64 *val, void *arch_mon_ctx)
-> +{
-> +	struct mpam_resctrl_dom *l3_dom;
-> +	struct mpam_component *mon_comp;
-> +	u32 mon_idx = *(u32 *)arch_mon_ctx;
-> +	enum mpam_device_features mon_type;
-> +	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[eventid];
-> +
-> +	resctrl_arch_rmid_read_context_check();
-> +
-> +	if (eventid >= QOS_NUM_EVENTS || !mon->class)
-> +		return -EINVAL;
-> +
-> +	l3_dom = container_of(hdr, struct mpam_resctrl_dom, resctrl_mon_dom.hdr);
-> +	mon_comp = l3_dom->mon_comp[eventid];
-> +
-> +	switch (eventid) {
-> +	case QOS_L3_OCCUP_EVENT_ID:
-> +		mon_type = mpam_feat_msmon_csu;
-> +		break;
-> +	case QOS_L3_MBM_LOCAL_EVENT_ID:
-> +	case QOS_L3_MBM_TOTAL_EVENT_ID:
-> +		mon_type = mpam_feat_msmon_mbwu;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return read_mon_cdp_safe(mon, mon_comp, mon_type, mon_idx,
-> +				 closid, rmid, val);
-> +}
-> +
-
-
-Best regards,
-Zeng Heng
