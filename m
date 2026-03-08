@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D898231195A
-	for <kvmarm@lists.linux.dev>; Sun,  8 Mar 2026 22:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2AC355F4B
+	for <kvmarm@lists.linux.dev>; Sun,  8 Mar 2026 22:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773010696; cv=none; b=t7lyJno9gMElhT6qhBxsLeo4gUYjha/JYS2Ohszx7mVNujfsw4LadL8Nrlds6djsLIj+202itE80vGoXdYrV37udID3vzCl351kxutlCHgEcWxcDzzaZ+EVQT9jPvfjeATHHJPdbpFJB8mbYCHI3LNlnZneSD4yiCCdXaVz4p64=
+	t=1773010699; cv=none; b=RZ0Fnjct5e8BsFiNR7OkC5VfiIw9RipthldWpAeuAZCTtWZ6kUc+kMmWRmW+VczWI0xKxOaGmWAxs47ucpxbppn7pFrpvHTEaBpB52JISFPmI/HYiVEvfv3gumJwlyn+jd7ICpnsfMU1b/oldD8jR5q7ihp+ksrs3Ubor7bSoK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773010696; c=relaxed/simple;
-	bh=PKLzSjHdsr85DIWF9Z3dPB8MLO6XnjzBexVFM2uaYO4=;
+	s=arc-20240116; t=1773010699; c=relaxed/simple;
+	bh=6SG8zWhAjmWv94wBg9BIJnpXoJPBwW2JCuKRFVTdU9Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SN5eyl4IKSLVYSSFueUWOThNwgH1RJcjtwN5cIuwbALAKMpNavCJRhl4JKoc17uX4CGJJ3xgcQd3Zf8hkcUqQlQ2x8dqmhLwtSqUgK2vQTR1W1/fGNYLrdm0MZtDDsU0N4/2toOdJKrWi9qL98fCoBL026BY75jR6HpdFFCp40k=
+	 MIME-Version; b=unCZZiCeGPvGK+CAtHQA8j9eu4mXyH9j+9O9LhhpvtvjetduyhriCbd6kytjgcjYyIb0JgOGsiCCzeJhUhj0WyLqwCVsRl/b9G55rxy/T7ikgRsN2ZI/6OVs7QompRBPbaKlUdlFoHuPTXR3upT/MrTWguf6GEpyAurJnk/S0pA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 211E11D13;
-	Sun,  8 Mar 2026 15:58:06 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0034D3F694;
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 548861D15;
 	Sun,  8 Mar 2026 15:58:10 -0700 (PDT)
+Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 336303F694;
+	Sun,  8 Mar 2026 15:58:15 -0700 (PDT)
 From: Wei-Lin Chang <weilin.chang@arm.com>
 To: linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
@@ -29,9 +29,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: [PATCH 1/2] KVM: arm64: ptdump: Make KVM ptdump code s2 mmu aware
-Date: Sun,  8 Mar 2026 22:57:00 +0000
-Message-ID: <20260308225701.863369-2-weilin.chang@arm.com>
+Subject: [PATCH 2/2] KVM: arm64: nv: Expose shadow page tables in debugfs
+Date: Sun,  8 Mar 2026 22:57:01 +0000
+Message-ID: <20260308225701.863369-3-weilin.chang@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260308225701.863369-1-weilin.chang@arm.com>
 References: <20260308225701.863369-1-weilin.chang@arm.com>
@@ -43,127 +43,142 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To reuse the ptdump code for shadow page table dumping later, let's pass
-s2 mmu as the private data, so we have the freedom to select which page
-table to print.
+Exposing shadow page tables in debugfs improves the debugability and
+testability of NV. With this patch a new directory "nested" is created
+for each VM created if the host is NV capable. Within the directory each
+valid s2 mmu will have its shadow page table exposed as a readable file
+with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
+creation and removal of the files happen at the points when an s2 mmu
+becomes valid, or the context it represents change. In the future the
+"nested" directory can also hold other NV related information.
 
+This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
+
+Suggested-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 ---
- arch/arm64/kvm/ptdump.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  7 +++++++
+ arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
+ arch/arm64/kvm/nested.c           |  6 +++++-
+ arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
+ 4 files changed, 43 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 5d5a3bbdb95e..f88f6c4d646e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+ 	 */
+ 	bool	nested_stage2_enabled;
+ 
++#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
++	struct dentry *shadow_pt_debugfs_dentry;
++#endif
++
+ 	/*
+ 	 * true when this MMU needs to be unmapped before being used for a new
+ 	 * purpose.
+@@ -405,6 +409,9 @@ struct kvm_arch {
+ 	 * the associated pKVM instance in the hypervisor.
+ 	 */
+ 	struct kvm_protected_vm pkvm;
++
++	/* Nested virtualization info */
++	struct dentry *debugfs_nv_dentry;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index d968aca0461a..01e9c72d6aa7 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
+ 
+ #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
++void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
++void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
+ #else
+ static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
++static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
++static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
+ #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+ 
+ #endif /* __ASSEMBLER__ */
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index eeea5e692370..31d74ed8449e 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
+ 
+ 	/* Make sure we don't forget to do the laundry */
+-	if (kvm_s2_mmu_valid(s2_mmu))
++	if (kvm_s2_mmu_valid(s2_mmu)) {
++		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
+ 		s2_mmu->pending_unmap = true;
++	}
+ 
+ 	/*
+ 	 * The virtual VMID (modulo CnP) will be used as a key when matching
+@@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+ 	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+ 	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
+ 
++	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
++
+ out:
+ 	atomic_inc(&s2_mmu->refcnt);
+ 
 diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 6cbe018fd6fd..98763b291956 100644
+index 98763b291956..3a70f633fc8b 100644
 --- a/arch/arm64/kvm/ptdump.c
 +++ b/arch/arm64/kvm/ptdump.c
-@@ -18,7 +18,7 @@
- #define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
+@@ -10,6 +10,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/seq_file.h>
  
- struct kvm_ptdump_guest_state {
--	struct kvm		*kvm;
-+	struct kvm_s2_mmu	*mmu;
- 	struct ptdump_pg_state	parser_state;
- 	struct addr_marker	ipa_marker[MARKERS_LEN];
- 	struct ptdump_pg_level	level[KVM_PGTABLE_MAX_LEVELS];
-@@ -112,10 +112,9 @@ static int kvm_ptdump_build_levels(struct ptdump_pg_level *level, u32 start_lvl)
- 	return 0;
- }
++#include <asm/cpufeature.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_pgtable.h>
+ #include <asm/ptdump.h>
+@@ -277,6 +278,29 @@ static const struct file_operations kvm_pgtable_levels_fops = {
+ 	.release	= kvm_pgtable_debugfs_close,
+ };
  
--static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
-+static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm_s2_mmu *mmu)
- {
- 	struct kvm_ptdump_guest_state *st;
--	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
- 	struct kvm_pgtable *pgtable = mmu->pgt;
- 	int ret;
- 
-@@ -133,7 +132,7 @@ static struct kvm_ptdump_guest_state *kvm_ptdump_parser_create(struct kvm *kvm)
- 	st->ipa_marker[1].start_address = BIT(pgtable->ia_bits);
- 	st->range[0].end		= BIT(pgtable->ia_bits);
- 
--	st->kvm				= kvm;
-+	st->mmu				= mmu;
- 	st->parser_state = (struct ptdump_pg_state) {
- 		.marker		= &st->ipa_marker[0],
- 		.level		= -1,
-@@ -149,8 +148,8 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- {
- 	int ret;
- 	struct kvm_ptdump_guest_state *st = m->private;
--	struct kvm *kvm = st->kvm;
--	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
-+	struct kvm_s2_mmu *mmu = st->mmu;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct ptdump_pg_state *parser_state = &st->parser_state;
- 	struct kvm_pgtable_walker walker = (struct kvm_pgtable_walker) {
- 		.cb	= kvm_ptdump_visitor,
-@@ -169,14 +168,15 @@ static int kvm_ptdump_guest_show(struct seq_file *m, void *unused)
- 
- static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
- {
--	struct kvm *kvm = m->i_private;
-+	struct kvm_s2_mmu *mmu = m->i_private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_ptdump_guest_state *st;
- 	int ret;
- 
- 	if (!kvm_get_kvm_safe(kvm))
- 		return -ENOENT;
- 
--	st = kvm_ptdump_parser_create(kvm);
-+	st = kvm_ptdump_parser_create(mmu);
- 	if (IS_ERR(st)) {
- 		ret = PTR_ERR(st);
- 		goto err_with_kvm_ref;
-@@ -194,7 +194,7 @@ static int kvm_ptdump_guest_open(struct inode *m, struct file *file)
- 
- static int kvm_ptdump_guest_close(struct inode *m, struct file *file)
- {
--	struct kvm *kvm = m->i_private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(m->i_private);
- 	void *st = ((struct seq_file *)file->private_data)->private;
- 
- 	kfree(st);
-@@ -229,14 +229,15 @@ static int kvm_pgtable_levels_show(struct seq_file *m, void *unused)
- static int kvm_pgtable_debugfs_open(struct inode *m, struct file *file,
- 				    int (*show)(struct seq_file *, void *))
- {
--	struct kvm *kvm = m->i_private;
-+	struct kvm_s2_mmu *mmu = m->i_private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_pgtable *pgtable;
- 	int ret;
- 
- 	if (!kvm_get_kvm_safe(kvm))
- 		return -ENOENT;
- 
--	pgtable = kvm->arch.mmu.pgt;
-+	pgtable = mmu->pgt;
- 
- 	ret = single_open(file, show, pgtable);
- 	if (ret < 0)
-@@ -256,7 +257,7 @@ static int kvm_pgtable_levels_open(struct inode *m, struct file *file)
- 
- static int kvm_pgtable_debugfs_close(struct inode *m, struct file *file)
- {
--	struct kvm *kvm = m->i_private;
-+	struct kvm *kvm = kvm_s2_mmu_to_kvm(m->i_private);
- 
- 	kvm_put_kvm(kvm);
- 	return single_release(m, file);
-@@ -279,9 +280,9 @@ static const struct file_operations kvm_pgtable_levels_fops = {
++void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
++{
++	struct dentry *dent;
++	/* format: 0x<vttbr>-0x<vtcr>-s2-{en, dis}abled\0 */
++	char file_name[2 + 16 + 1 + 2 + 16 + 4 + 3 + 6];
++
++	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
++		 mmu->tlb_vttbr,
++		 mmu->tlb_vtcr,
++		 mmu->nested_stage2_enabled ? "en" : "dis");
++
++	dent = debugfs_create_file(file_name, 0400,
++				   mmu->arch->debugfs_nv_dentry, mmu,
++				   &kvm_ptdump_guest_fops);
++
++	mmu->shadow_pt_debugfs_dentry = dent;
++}
++
++void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu)
++{
++	debugfs_remove(mmu->shadow_pt_debugfs_dentry);
++}
++
  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
  {
  	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
--			    kvm, &kvm_ptdump_guest_fops);
--	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry, kvm,
--			    &kvm_pgtable_range_fops);
-+			    &kvm->arch.mmu, &kvm_ptdump_guest_fops);
-+	debugfs_create_file("ipa_range", 0400, kvm->debugfs_dentry,
-+			    &kvm->arch.mmu, &kvm_pgtable_range_fops);
+@@ -285,4 +309,7 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
+ 			    &kvm->arch.mmu, &kvm_pgtable_range_fops);
  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
--			    kvm, &kvm_pgtable_levels_fops);
-+			    &kvm->arch.mmu, &kvm_pgtable_levels_fops);
+ 			    &kvm->arch.mmu, &kvm_pgtable_levels_fops);
++	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
++		kvm->arch.debugfs_nv_dentry =
++			debugfs_create_dir("nested", kvm->debugfs_dentry);
  }
 -- 
 2.43.0
