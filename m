@@ -1,72 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6614A23B63E
-	for <kvmarm@lists.linux.dev>; Mon,  9 Mar 2026 06:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CFF31077A
+	for <kvmarm@lists.linux.dev>; Mon,  9 Mar 2026 06:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773038622; cv=none; b=slnD+TMCnSWjiUxJyEsjOLRmnU8c9r7pZPZ72Nynmu1kWKAkoyb7iK8JX7BFvz3d6gCviPS27zxT8jRV0WdJMYIVOgx+23GirIbnWyVP6GWzRfwic6gf76Es088gddvXa8ZznwTH2jqRAOo/SsR+r58tjC73C6i5TMwhl9JwGjY=
+	t=1773038688; cv=none; b=Wl0hyzclLQMbA7DedVfacOUk+2j9mc4Ghc8wW3QDxaSXKmNbG0suEGR4MCipmoub30uOndB4oUp2yfSK3gahaQEIboNorTNFzHp4PjFb9YzKvQG5xoZyDj7pd4pq104j7F/5bPy97gh4BWn9OJ0IgQZPilasqnlIlJP9plE0mig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773038622; c=relaxed/simple;
-	bh=oU0Bm7/iu4lAhhhD/58bCyH0Zl053YpXS3ZortaUj74=;
+	s=arc-20240116; t=1773038688; c=relaxed/simple;
+	bh=m1GxzCYPJ7MlXMmB7qD2xXmMcNVIEdbrk/Y+tXCyqw4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kxfaFjGv6vuYEvEHtZDGq3AUQcfA/cedtczCe/AUNGc/yzP52FzkSAaqd8jLOzP4pCNMm5njc35odvbhv8kgerfiQHAcNVUBbeW31WO8cuzXnyBYOxfqvNPywvl60ULJ6vqGVw6h4lcdPpzOCPRS1TQ6taZCr+e7ke9jE2RHFaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aPfWJ6fO; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=EZ+xFLqLZFrFOqkDjsTQ5GqKJhZBZxV6hIFq34gk20t3TS3VBHZuJ6UyycHMjsfkhXW83oZstb5HDgzHKbv3gECOqrzuqxf4HUqyEz1lTE8MxFLV1JYKHimrmdEL5j6Cx7N/7sUP2gAG6FHBdqkwykMt4BXX9eqZNB8ZrTX5sOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZkLM4e5J; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPfWJ6fO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZkLM4e5J"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1773038620;
+	s=mimecast20190719; t=1773038684;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=g/VoQtoxtMjinR0wQxRIglh5sEAwoToR0YD9sANGcxY=;
-	b=aPfWJ6fOaLvfeGGYI7eJ0pGKXLerFZHnm4HzlAAQNtPbTvAasm95d55YpLjJt8CnmVZ0vp
-	oZj4vKZq9M4MyrMH1HtNxAPugKK/fKjQqV0nCvzlGTLPkJqHNzJ3wj4OxeRQT+vqVCuTMB
-	aT5d0R/MwbzgPNOYS28CgBxOjrAFsLE=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FmyjTIiffZpRJPT+RQ+3fTrkf/WN2/enrX5xBacS+iI=;
+	b=ZkLM4e5JDJLjYWy1ts0h2zutzP8R/tXDHt4vOjr9ZSXTsMCtC4xmKbWZMv4umZKnoXA1c6
+	OTWPz/Iyz4BrdxOpA+jXNclrCnJaGvah+DGKlQjO1+PQd5beFEQ2xJl4e0RefHa+zHvoJk
+	WXVqGJoBxjofGySfFsMgnIpUveZu3sI=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-169-9x5tnB5cO2S8x2_TX653vg-1; Mon, 09 Mar 2026 02:43:39 -0400
-X-MC-Unique: 9x5tnB5cO2S8x2_TX653vg-1
-X-Mimecast-MFC-AGG-ID: 9x5tnB5cO2S8x2_TX653vg_1773038618
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-c73887d0297so2300434a12.0
-        for <kvmarm@lists.linux.dev>; Sun, 08 Mar 2026 23:43:39 -0700 (PDT)
+ us-mta-56-FrxM1WzUOeyKR5Bjy3wNTg-1; Mon, 09 Mar 2026 02:44:43 -0400
+X-MC-Unique: FrxM1WzUOeyKR5Bjy3wNTg-1
+X-Mimecast-MFC-AGG-ID: FrxM1WzUOeyKR5Bjy3wNTg_1773038682
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-359887aece0so8365931a91.1
+        for <kvmarm@lists.linux.dev>; Sun, 08 Mar 2026 23:44:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773038618; x=1773643418;
+        d=1e100.net; s=20230601; t=1773038682; x=1773643482;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g/VoQtoxtMjinR0wQxRIglh5sEAwoToR0YD9sANGcxY=;
-        b=JByYAHopBUgnb1idQQBlYWqCA50hGHKn1SZNjHNNFDj1JC1w7nO/NJS4IyzQFQeA8+
-         x+JjzBZj8KhOGJG2IBldBY3Sh5PWruzFFAB3aPFJOrw1WXlob7HNbpksdXEKTC6Xly2p
-         oGSeXGxF7dWoYj9Q9XQPLZn1591/qtDGAlPF/YGKedvfWjcTAUo1hHM4mMsbhbmVZVym
-         d9gIOUiRdlPdsNi7usqoDBtOKUSz55JR5D/Kc7R6ZNLSrK3PWuaORHqExZoEhN4A9FYr
-         UoFolp9ezvEmoniVYkqcmOf4I4r70FBjlGTFTE7crVE+jAJH7wmHK87N9QDwRGyPOu8j
-         nNxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXEC+Y+1dkVqvT3XOBGuiN3orRFbvpypgrY5mtZwHSdak9CMKbIE+yK9QrRaEndO9dwxTVSRcc=@lists.linux.dev
-X-Gm-Message-State: AOJu0YxulmAIXvv6GMpDyVzHVGMWn4SK5Z7GxWvnDIx0RCCvAijUi9yV
-	1pJlZbAeestJ8mZVkKVJacv386AaR7xTg/ey/xxrV4za3SUWyMx9b6I04G0NjXIlD35yxFDOSrK
-	3LTqU+AF37B87OkkU6oWwDyl+EYoT1N39bzw6MGSaKsw3Q/+m5VZyepunPw==
-X-Gm-Gg: ATEYQzyg0YB0wWEoZdpkWWkyes6axOFt8Key2wKEId3rCthTWkQClwye6ylZTiHqXRO
-	WJzptv54I+eS2mSg2IxPcY0Xodt0vH17mEewItD87uVrkXn0V+lBqBaLBA9d7ZNZM1LiPixVCsc
-	LxYnT5VdPm82JRS/GvbFloHF1+nxBrMP/yDOcejG2soR2gjnbkCU9fCYEdi7pqVCdrQ7ndMP4jJ
-	VBF3Oo6oNE2ztmiLX/yYBQKermsto0PUkHf6XwuhfWLc2EtwtWPQBIUCi1tr87XCj3rQuk9CGjW
-	f4SYMAUBY++O5UP2+/ukQhDL/Pw0o1ghGWR2t9XPEmNk1A43e6tA84Xfodo0aWt63W7wLRH0M4e
-	1jkMq5srzFoMjnWNhQCEjwY2krtUGrb4JcMA6NXBe5GursuwVrENDaxbEQiwb2sIq
-X-Received: by 2002:a05:6a00:3e14:b0:827:2995:3ba0 with SMTP id d2e1a72fcca58-829a2f67981mr8453014b3a.32.1773038618138;
-        Sun, 08 Mar 2026 23:43:38 -0700 (PDT)
-X-Received: by 2002:a05:6a00:3e14:b0:827:2995:3ba0 with SMTP id d2e1a72fcca58-829a2f67981mr8452979b3a.32.1773038617730;
-        Sun, 08 Mar 2026 23:43:37 -0700 (PDT)
+        bh=FmyjTIiffZpRJPT+RQ+3fTrkf/WN2/enrX5xBacS+iI=;
+        b=s7foFWxqDvbFrEnjeHujRixu7H/Jeja4RiLUxjjL6oCjzt1y/MS9klnWPGpL4gsozk
+         BBDYSE3xeMr13lGBdsROnX3+w8whowrpaSVNMy27mZvrHpgDDtn5YTmV+oih2KEuWazj
+         6x++QX9h9iixPWIR7O/nk/MB73frJ3lT22zYpgcoJDO8BgT7JwQX4dq9zXMy05iEjswQ
+         SFeUifs9zRbvb+ys5aY+5l0UWb1NGHI6AKqPxjuLNCA8QsSQAu/fm0P9P5YeW3SDD0M3
+         s8opMYI86jZMvV0cbztJL8FK3sB4rfKkeAzWwoE4MfAhFtvedZKgekPSso4dC8quKp3K
+         Nhlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSUEqQP1YxliaEpJmykMW861422GKGJMerSvcIPq+XRWBJCNnFp5HTEaWbvLNbgZydSWlEbvE=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yw/1EEzUWYlvdTTGY4RnBXw8N8aK5dkbXE5ek+AEz6c3YgKcgF0
+	7Vk/MYrTwv6nUYUZmX+Dlr9V2NzxHoGSQJgg+Dfo5O0LUtn/FLUDecrXanQDi0tbydwFMtfkZ1W
+	FFaoOukx+rjDtTXBnU8wo8Gzmok6+/2Gz13SVnxGQxoGj9robieGvahJAAw==
+X-Gm-Gg: ATEYQzzBnXmRwQis4V8clOGvktf5G5Uh0/EIg3bgf7FHFfjwmA53lBE6ZmRsNglt2CK
+	gZPKEsmIEYX3/nZPfw4DDuOqwedDHFfia0W8KUEa0JwxLnE6Oa3q3kggseSjvRC+B4UFvch2N5s
+	c6Dt9157Y8tcM/sb1LujYPJBlipzmQXAD//oh1FoHSzLBmim4X9ZNClN32ilyOMp43xWDr2DmHq
+	uNQhj4B8by/Rx8nbGHEiI4Lsdy4Y4jll9eILEC7b0/vzv3aLxf1iVNqGfhrL6fEyd5IW79PnahH
+	l7ZKkMjeBIwzeqUd8V9/tn1p3v7QcXPs+51kOs1FcPGpmA4x5NTCuHLSZkbNAUZvYv9fy3OsF6W
+	LeekzwU+knbSfguxAYToYBgtbGvilKCyEw2H08ktlmrr4/4xGc7kHQPk0Kk0/Zwc8
+X-Received: by 2002:a17:90b:4c09:b0:359:8632:5e39 with SMTP id 98e67ed59e1d1-359be233b87mr8593327a91.5.1773038682491;
+        Sun, 08 Mar 2026 23:44:42 -0700 (PDT)
+X-Received: by 2002:a17:90b:4c09:b0:359:8632:5e39 with SMTP id 98e67ed59e1d1-359be233b87mr8593284a91.5.1773038682083;
+        Sun, 08 Mar 2026 23:44:42 -0700 (PDT)
 Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-829a48d3871sm9235407b3a.60.2026.03.08.23.43.21
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-359b2d50ebdsm12993555a91.5.2026.03.08.23.44.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 08 Mar 2026 23:43:37 -0700 (PDT)
-Message-ID: <57dbec80-4cfe-468e-b32d-7dc0f872ed67@redhat.com>
-Date: Mon, 9 Mar 2026 16:43:19 +1000
+        Sun, 08 Mar 2026 23:44:40 -0700 (PDT)
+Message-ID: <c9a544ef-5c12-4ad5-8503-39c28375b419@redhat.com>
+Date: Mon, 9 Mar 2026 16:44:23 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,8 +74,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/41] arm64: mpam: Advertise the CPUs MPAM limits to
- the driver
+Subject: Re: [PATCH v5 10/41] arm64: mpam: Add helpers to change a task or
+ cpu's MPAM PARTID/PMG values
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -92,11 +92,11 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  zengheng4@huawei.com, linux-doc@vger.kernel.org,
  Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 References: <20260224175720.2663924-1-ben.horgan@arm.com>
- <20260224175720.2663924-8-ben.horgan@arm.com>
+ <20260224175720.2663924-11-ben.horgan@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260224175720.2663924-8-ben.horgan@arm.com>
+In-Reply-To: <20260224175720.2663924-11-ben.horgan@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: MlmJp-Trf6k8yf0CpN-yRnvl-gfNP-XGhj0_oEagt_w_1773038618
+X-Mimecast-MFC-PROC-ID: c7oVMRPWcfAXoNoRJkt6tPTZzzQqe__Q7cmoEiFfAC0_1773038682
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -105,32 +105,35 @@ Content-Transfer-Encoding: 7bit
 On 2/25/26 3:56 AM, Ben Horgan wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> Requestors need to populate the MPAM fields for any traffic they send on
-> the interconnect. For the CPUs these values are taken from the
-> corresponding MPAMy_ELx register. Each requestor may have a limit on the
-> largest PARTID or PMG value that can be used. The MPAM driver has to
-> determine the system-wide minimum supported PARTID and PMG values.
+> Care must be taken when modifying the PARTID and PMG of a task in any
+> per-task structure as writing these values may race with the task being
+> scheduled in, and reading the modified values.
 > 
-> To do this, the driver needs to be told what each requestor's limit is.
-> 
-> CPUs are special, but this infrastructure is also needed for the SMMU and
-> GIC ITS. Call the helper to tell the MPAM driver what the CPUs can do.
-> 
-> The return value can be ignored by the arch code as it runs well before the
-> MPAM driver starts probing.
+> Add helpers to set the task properties, and the CPU default value.  These
+> use WRITE_ONCE() that pairs with the READ_ONCE() in mpam_get_regval() to
+> avoid causing torn values.
 > 
 > Tested-by: Gavin Shan <gshan@redhat.com>
 > Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 > Tested-by: Peter Newman <peternewman@google.com>
 > Tested-by: Zeng Heng <zengheng4@huawei.com>
+> CC: Dave Martin <Dave.Martin@arm.com>
 > Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
->   arch/arm64/kernel/mpam.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
+> Changes since rfc:
+> Keep comment attached to mpam_get_regval()
+> Add internal helper, __mpam_regval() (Jonathan)
+> 
+> Changes since v3:
+> Remove extra CONFIG_ARM64_MPAM guarding
+> Extend CONFIG_ARM64_MPAM guarding
+> ---
+>   arch/arm64/include/asm/mpam.h | 28 +++++++++++++++++++++++++++-
+>   1 file changed, 27 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
