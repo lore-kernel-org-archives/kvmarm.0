@@ -1,144 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11CB38BF75
-	for <kvmarm@lists.linux.dev>; Mon,  9 Mar 2026 10:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AD119E97B;
+	Mon,  9 Mar 2026 10:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773051206; cv=none; b=umohDUWEdFhwGSRKFAUwn5VmA2sHM7+FZppm20bY72FbiXWTPOFnfIMrGJcofFaCvD7B+JtzElySvpQF7Z/nqROhMcKZFyvtLIBbFCR7Kr5cCf7ETIcaUdYwEiHbTYZ5loLVoQFjPZ8YvLWmFgmQf2RKFV0HSSoJh7kgwoD3E4o=
+	t=1773052025; cv=none; b=I7BSDMRHSzCZeJQkYmcDUlg+AEppX+ecijYq6IU28Q8kyc+t5B7QzfBm0Nk0/pZ/Vnfx2HZNw3sIBaApjyIy82LL+8a1DriGVv2A23SiAZjdTJLgbi7o0EQi47ZbPlBJhlqvS4K+vXi/QqRM/cEKVcjhkF8PqDoIceOSRrEw/II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773051206; c=relaxed/simple;
-	bh=+jNVahrpvvsjEoVfph6lTH5iz6wQ2qM4ilFl5eMAQ7o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A+l0g0vkWM5n2fwYRT2X90dgfTvnDiDmcSU89zDxdcSwigjF9FWjh5MzvfeANRsXT5rDbTNKMKQK82zJZmvM+39+Z1vu9DEXB0zhlqIuMoi87j69kbAq530+hPURV+Pc6kc/FNrucdIjlCXkSrA8lv/nbl+aTDk0Ih/mBarCTD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E8231570;
-	Mon,  9 Mar 2026 03:13:18 -0700 (PDT)
-Received: from [10.1.30.140] (e121487-lin.cambridge.arm.com [10.1.30.140])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBD2A3F7BD;
-	Mon,  9 Mar 2026 03:13:22 -0700 (PDT)
-Message-ID: <c4a302df-511b-40b2-97f2-06576748c999@arm.com>
-Date: Mon, 9 Mar 2026 10:13:20 +0000
+	s=arc-20240116; t=1773052025; c=relaxed/simple;
+	bh=9j2Aki75Xq2R0K0rBVeN5S4byHjjWMPEXb1/HloQCQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Tca3nRtTDdQfiuL4u+2ZIkg4t58kFPC0liM5IC1yNZ5ZTEeeiAOKlfa1l/JCPorCnFEBIAuRQCv3wPWrAwpz0EGUOzPuijwpUq01qFoQuyBFZpxg39LQ3L+GOmyTPu2ycwGXPhWJ6gBV+iagEkt4hi5CRw0seQv55mL0HkjAvlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AA83fQ8h; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AA83fQ8h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80696C4CEF7;
+	Mon,  9 Mar 2026 10:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773052025;
+	bh=9j2Aki75Xq2R0K0rBVeN5S4byHjjWMPEXb1/HloQCQs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AA83fQ8hiRPciaUr/DFWygfHqj8E3x0dtQ/9sVgM13e+mIYj42DD0U9diKz4o++tA
+	 q1KJM+ndJp6VwxBmYnENEkqRF7kyOTUJLunktj3qzQZPJTgJgjmC61CU39N3uUcJ0z
+	 CKNEqoLvAwXnWbVWSjQNTL8shgk1FTOU5p5FoClcFl/UtAHmqfIw6PU8c5JLwLtilk
+	 vQ5azLpihR3rqDo9gPPhf9rj398sGGk9t1GB39iLoQXaDnFDkb8kIp0oGArxkqZLAo
+	 0pxtzbIALdm9KxIUoQBIbnpCWp+jyQMOeaZEAMmiFp4+7pzvv4rxZ7PioI2bVQ9P/s
+	 qGAQ5d4jy1oEQ==
+From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-coco@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev
+Cc: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Subject: [PATCH v3 0/3] Enforce host page-size alignment for shared buffers
+Date: Mon,  9 Mar 2026 15:56:22 +0530
+Message-ID: <20260309102625.2315725-1-aneesh.kumar@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
- acknowledgement
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oupton@kernel.org>, Lorenzo Pieralisi <lpieralisi@kernel.org>,
- Sudeep Holla <sudeep.holla@kernel.org>, James Morse <james.morse@arm.com>,
- Mark Rutland <mark.rutland@arm.com>, Mark Brown <broonie@kernel.org>,
- kvmarm@lists.linux.dev
-References: <20260302165801.3014607-1-catalin.marinas@arm.com>
- <20260302165801.3014607-4-catalin.marinas@arm.com>
- <aamT6-Mvr9nI1unq@willie-the-truck> <aarB3iv8963UDn5E@arm.com>
-Content-Language: en-GB
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-In-Reply-To: <aarB3iv8963UDn5E@arm.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi All,
 
-On 3/6/26 12:00, Catalin Marinas wrote:
->>> @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
->>>  	put_cpu_fpsimd_context();
->>>  }
->>>  
->>> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
->>> +
->>> +/*
->>> + * SME/CME erratum handling
->>> + */
->>> +static cpumask_var_t sme_dvmsync_cpus;
->>> +static cpumask_var_t sme_active_cpus;
->>> +
->>> +void sme_set_active(unsigned int cpu)
->>> +{
->>> +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
->>> +		return;
->>> +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
->>> +		return;
->>> +
->>> +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
->>> +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
->>> +
->>> +	cpumask_set_cpu(cpu, sme_active_cpus);
->>> +
->>> +	/*
->>> +	 * Ensure subsequent (SME) memory accesses are observed after the
->>> +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
->>> +	 */
->>> +	smp_mb();
->> I can't convince myself that a DMB is enough here, as the whole issue
->> is that the SME memory accesses can be observed _after_ the TLB
->> invalidation. I'd have thought we'd need a DSB to ensure that the flag
->> updates are visible before the exception return.
-> This is only to ensure that the sme_active_cpus mask is observed before
-> any SME accesses. The mask is later used to decide whether to send the
-> IPI. We have something like this:
-> 
-> P0
-> 	STSET	[sme_active_cpus]
-> 	DMB
-> 	SME access to [addr]
-> 
-> P1
-> 	TLBI	[addr]
-> 	DSB
-> 	LDR	[sme_active_cpus]
-> 	CBZ	out
-> 	Do IPI
-> out:
-> 
-> If P1 did not observe the STSET to [sme_active_cpus], P0 should have
-> received and acknowledged the DVMSync before the STSET. Is your concern
-> that P1 can observe the subsequent SME access but not the STSET?
-> 
-> No idea whether herd can model this (I only put this in TLA+ for the
-> main logic check but it doesn't do subtle memory ordering).
+Hi all,
 
-JFYI, herd support for SME is still work-in-progress (specifically it misses
-updates in cat), yet it can model VMSA.
+This patch series addresses alignment requirements for buffers shared between
+private-memory guests and the host.
 
-IIUC, expectation here is that either
-- P1 observes sme_active_cpus, so we have to do_IPI or
-- P0 observes TLBI (say shutdown, so it must fault)
+When running private-memory guests, the guest kernel must apply additional
+constraints when allocating buffers that are shared with the hypervisor. These
+shared buffers are also accessed by the host kernel and therefore must be
+aligned to the host’s page size.
 
-anything else is unexpected/forbidden.
+Architectures such as Arm can tolerate realm physical address space PFNs being
+mapped as shared memory, as incorrect accesses are detected and reported as GPC
+faults. However, relying on this mechanism alone is unsafe and can still lead to
+kernel crashes.
 
-AArch64 A
-variant=vmsa
-{
- int x=0;
- int active=0;
+This is particularly likely when guest_memfd allocations are mmapped and
+accessed from userspace. Once exposed to userspace, it is not possible to
+guarantee that applications will only access the intended 4K shared region
+rather than the full 64K page mapped into their address space. Such userspace
+addresses may also be passed back into the kernel and accessed via the linear
+map, potentially resulting in a GPC fault and a kernel crash.
 
- 0:X1=active;
- 0:X3=x;
+To address this, the series introduces a new helpers,
+mem_decrypt_granule_size() and mem_decrypt_align(), which allows callers to
+enforce the required alignment for shared buffers.
 
- 1:X0=(valid:0);
- 1:X1=PTE(x);
- 1:X2=x;
- 1:X3=active;
- 
-}
- P0                                 | P1                                            ;
- MOV W0,#1                          | STR X0,[X1]                                   ;
- STR W0,[X1] (* sme_active_cpus  *) | DSB ISH                                       ;
- DMB SY                             | LSR X9,X2,#12                                 ;
- LDR W2,[X3] (* access to [addr] *) | TLBI VAAE1IS,X9 (* [addr] *)                  ;
-                                    | DSB ISH                                       ;
-                                    | LDR W4,[X3]     (* sme_active_cpus *)         ;
 
-exists ~(1:X4=1 \/ fault(P0,x))
+Changes from v2:
+* Rebase to latest kernel
+* Consider swiotlb always decrypted and don't align when allocating from swiotlb.
 
-Is that correct understanding? Have I missed anything?
+Changes from v1:
+* Rename the helper to mem_encrypt_align
+* Improve the commit message
+* Handle DMA allocations from contiguous memory
+* Handle DMA allocations from the pool
+* swiotlb is still considered unencrypted. Support for an encrypted swiotlb pool
+  is left as TODO and is independent of this series.
 
-Cheers
-Vladimir
+
+Aneesh Kumar K.V (Arm) (3):
+  dma-direct: swiotlb: handle swiotlb alloc/free outside
+    __dma_direct_alloc_pages
+  swiotlb: dma: its: Enforce host page-size alignment for shared buffers
+  coco: guest: arm64: Add Realm Host Interface and hostconf RHI
+
+ arch/arm64/include/asm/mem_encrypt.h |  3 ++
+ arch/arm64/include/asm/rhi.h         | 24 ++++++++++++
+ arch/arm64/include/asm/rsi.h         |  2 +
+ arch/arm64/include/asm/rsi_cmds.h    | 10 +++++
+ arch/arm64/include/asm/rsi_smc.h     |  7 ++++
+ arch/arm64/kernel/Makefile           |  2 +-
+ arch/arm64/kernel/rhi.c              | 53 +++++++++++++++++++++++++
+ arch/arm64/kernel/rsi.c              | 13 +++++++
+ arch/arm64/mm/mem_encrypt.c          | 27 +++++++++++--
+ drivers/irqchip/irq-gic-v3-its.c     | 20 ++++++----
+ include/linux/mem_encrypt.h          | 12 ++++++
+ kernel/dma/contiguous.c              | 10 +++++
+ kernel/dma/direct.c                  | 58 ++++++++++++++++++++++++----
+ kernel/dma/pool.c                    |  4 +-
+ kernel/dma/swiotlb.c                 | 21 ++++++----
+ 15 files changed, 237 insertions(+), 29 deletions(-)
+ create mode 100644 arch/arm64/include/asm/rhi.h
+ create mode 100644 arch/arm64/kernel/rhi.c
+
+-- 
+2.43.0
+
