@@ -1,168 +1,194 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7943E9F75
-	for <kvmarm@lists.linux.dev>; Mon,  9 Mar 2026 16:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A373D1CAC
+	for <kvmarm@lists.linux.dev>; Mon,  9 Mar 2026 16:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773073595; cv=none; b=agEqdjWnacAER/8wgD/IMNaTeAq9qrk4yikk7YEqwDIea+gWm7JsanMGkgGTK/N8PUytT4wqZWqrTzV1uxOL9qrFASmJTskYnPjkDN/eLsjh779E8MKCahFHUlb90TuA69yYUJzFApnm6gz9ZGC2OtbICQQNJ90vTKCEFEdtqf8=
+	t=1773073818; cv=none; b=bJaVtYdTR9zkbOq2Oj/YLGXxUJN3DXy/1CPCX43rhOM6+k9Xa7MpgXOBEndSFNUR4tTot34t5JCvMTMZeiZ6N+qCyBQA9y8vnOk0QzYA4oELElEV+bvkox2Yky3laIeVBLmO8AzEz8bb3B+baIIcVzDIcfiumVVvKIQX3bgi4fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773073595; c=relaxed/simple;
-	bh=dn97yqhM5JULZE/7AhmPFYcp2Ky9Bl52SQiCDggGIbs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nfqs6JB8RiHzDPwyv3CudPbSUFKUcL3B0qfO4t2wvQbaLzxJvc8HfCi+jGhoGGvvl/5TcmeGq5YMT9CZ9JRZhF+N60aLU7usrDOD6az7AubqG5mCmeESpliNhKml0gxQwXnd8CYnMbB5xiZUbru0Ltjv7yJ/VO/QWImOO/v/qJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qI+6X/p0; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qI+6X/p0"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853efceaddso6562055e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 09 Mar 2026 09:26:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773073591; x=1773678391; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsVePr8Brwc4uqDNMxUsa63z10B8xk0sNAC+har7PuE=;
-        b=qI+6X/p0nBBAIOUwkDtfPYfxKS/AjrmsAru5Vb6ZuWiE5ukbqzeO2VftQeaQ5n0R+S
-         YmmD4Lp3JkuOaa1pIl7ymHPOLDb8P5+uR6x7tJX/eADZ0mDnavtxNbz7i/7uBy+efoGm
-         g0EECFFxYQASJcnFFk5+usxMHDyycPaPXLcF9IfQSMq0yQoGis2cfX3fe/ryV7wfTr6m
-         PCwpeeJXMnvU1nijv1aZXIi2jDisKxwwvcAa8gCaU3eK2lWksgkYKj2mPKqMNmP1c4bQ
-         z1OhZBD+5MtYcvw8vzXFVGxZWPtZ/i6oFh5dbje1as1VCoNOJQmqbqxFjN1gRKEWC4Sc
-         yHCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773073591; x=1773678391;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsVePr8Brwc4uqDNMxUsa63z10B8xk0sNAC+har7PuE=;
-        b=GQx2fQehy6M0V+JA6+9aEES1oIoU1BdfdJJvofYJSYz+jWcuHP5QDDm3isMR36vEyG
-         Y/Ql3CqKmdNUjA6g/zsuq4NS+qwnRrt0uqE8SrppNu9d2JGuosMGQOo/LZ5HgUHDUWJE
-         pswrNmd+8HChPO7rwi1e++/UYgpMdJ2/U9OXii8efe/9x9KQRfLQ1JjN41tV2Vu4oJqk
-         IfgbZMLiJYJhmW+mg9PA1gY7E1/MACKode3Vrm0l1c5K6FiVcMan7RCEVraQrYJOm+Ek
-         jRWmUOzoegunUWUuid0aF49RxulxprRaP+cpKDfKrZiCQBYNphmyHDKT+qcHOXNoo+Po
-         85YA==
-X-Gm-Message-State: AOJu0YweFfpzcJU0wn5ea10yVMplJFsv15UFpPr2UHyMsB5mBfJx7iiu
-	JoeISL6olMru0hzY4AaL59yuA76c/co5eTSZUhdfCOwCBldaRd3Ep2TaSNf3x8ed9AzZSwa6S1v
-	kWBKEQ3LW0h0eA3tRxyS7ig==
-X-Received: from wmfq22.prod.google.com ([2002:a05:600c:2e56:b0:485:318b:96c6])
- (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:600c:3b13:b0:47f:f952:d207 with SMTP id 5b1f17b1804b1-48526969359mr225784865e9.19.1773073591541;
- Mon, 09 Mar 2026 09:26:31 -0700 (PDT)
-Date: Mon,  9 Mar 2026 16:25:16 +0000
-In-Reply-To: <20260309162516.2623589-1-vdonnefort@google.com>
+	s=arc-20240116; t=1773073818; c=relaxed/simple;
+	bh=c73/rd98H48SI3tKu0F5b6+OqHhKEttcj0DvMlxkoFc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mxmdvWUcZffE8HDu0IArxjM/G9wLwUmVAlUezVgG6UFYSBUMCvaY67x1rkZE76tsjkSI/3LBPnIGkN3M8hD8oScMtG22o9xZ4LwCQipLqV6dtoTC3xenmiWH/FDZLs2BSg+6hKnKcIh4MZ/sG8lKbyoNLDv7AYNCedX2i6b/pUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D250D1570;
+	Mon,  9 Mar 2026 09:30:08 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5744C3F7BD;
+	Mon,  9 Mar 2026 09:30:10 -0700 (PDT)
+Message-ID: <b95077d7-c036-4a8f-8e42-8f1dc0288075@arm.com>
+Date: Mon, 9 Mar 2026 16:30:08 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260309162516.2623589-1-vdonnefort@google.com>
-X-Mailer: git-send-email 2.53.0.473.g4a7958ca14-goog
-Message-ID: <20260309162516.2623589-31-vdonnefort@google.com>
-Subject: [PATCH v14 30/30] tracing: selftests: Add hypervisor trace remote tests
-From: Vincent Donnefort <vdonnefort@google.com>
-To: rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	linux-trace-kernel@vger.kernel.org, maz@kernel.org, oliver.upton@linux.dev, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	jstultz@google.com, qperret@google.com, will@kernel.org, 
-	aneesh.kumar@kernel.org, kernel-team@android.com, 
-	linux-kernel@vger.kernel.org, Vincent Donnefort <vdonnefort@google.com>, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Thunderbird Daily
+Subject: Re: [PATCH v5 31/41] arm_mpam: resctrl: Add resctrl_arch_rmid_read()
+ and resctrl_arch_reset_rmid()
+To: Zeng Heng <zengheng4@huawei.com>, James Morse <james.morse@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, jonathan.cameron@huawei.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ linux-doc@vger.kernel.org, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>,
+ Kefeng Wang <wangkefeng.wang@huawei.com>
+References: <20260224175720.2663924-1-ben.horgan@arm.com>
+ <20260224175720.2663924-32-ben.horgan@arm.com>
+ <96ffc81d-3f37-7f48-f9f4-6a58da3e0f99@huawei.com>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <96ffc81d-3f37-7f48-f9f4-6a58da3e0f99@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Run the trace remote selftests with the trace remote 'hypervisor', This
-trace remote is most likely created when the arm64 KVM nVHE/pKVM
-hypervisor is in use.
+Hi Zeng,
 
-Cc: Shuah Khan <skhan@linuxfoundation.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+On 3/7/26 09:29, Zeng Heng wrote:
+> Hi Ben,
+> 
+> On 2026/2/25 1:57, Ben Horgan wrote:
+>> From: James Morse <james.morse@arm.com>
+>>
+>> resctrl uses resctrl_arch_rmid_read() to read counters. CDP emulation
+>> means
+>> the counter may need reading in three different ways. The same goes for
+>> reset.
+>>
+>> The helpers behind the resctrl_arch_ functions will be re-used for the
+>> ABMC
+>> equivalent functions.
+>>
+>> Add the rounding helper for checking monitor values while we're here.
+>>
+>> Tested-by: Gavin Shan <gshan@redhat.com>
+>> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+>> Tested-by: Peter Newman <peternewman@google.com>
+>> Tested-by: Zeng Heng <zengheng4@huawei.com>
+>> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+>> Signed-off-by: James Morse <james.morse@arm.com>
+>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+>> ---
+> 
+> [...]
+> 
+>> +
+>> +static int read_mon_cdp_safe(struct mpam_resctrl_mon *mon, struct
+>> mpam_component *mon_comp,
+>> +                 enum mpam_device_features mon_type,
+>> +                 int mon_idx, u32 closid, u32 rmid, u64 *val)
+>> +{
+>> +    if (cdp_enabled) {
+> 
+> While reviewing the resctrl limbo handling code, I noticed a issue in
+> __check_limbo() that could lead to premature RMID release when CDP is
+> enabled.
+> 
+> In __check_limbo(), RMIDs in limbo state undergo L3 occupancy checks
+> before being released. This check is performed via
+> resctrl_arch_rmid_read(), on arm64 MPAM, which relies on the cdp_enabled
+> state to determine to check which PARTID.
+> 
+> The concern arises in the following scenario: Filesystem is mounted with
+> CDP enabled. During normal operation, some RMIDs enter limbo. On umount,
+> cdp_enabled is reset to false. __check_limbo() may then run and perform
+> L3 checks with cdp_enabled = false. This could cause RMIDs to be
+> incorrectly released from limbo while still effectively busy after
+> remount.
 
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc
-new file mode 100644
-index 000000000000..64bf859d6406
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/buffer_size.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer size
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/buffer_size.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_buffer_size
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc
-new file mode 100644
-index 000000000000..7fe3b09b34e3
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/reset.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer reset
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/reset.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_reset
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc
-new file mode 100644
-index 000000000000..b937c19ca7f9
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor non-consuming trace read
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/trace.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_trace
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc
-new file mode 100644
-index 000000000000..66aa1b76c147
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/trace_pipe.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor consuming trace read
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/trace_pipe.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_trace_pipe
-diff --git a/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc
-new file mode 100644
-index 000000000000..1dafde3414ab
---- /dev/null
-+++ b/tools/testing/selftests/ftrace/test.d/remotes/hypervisor/unloading.tc
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+# SPDX-License-Identifier: GPL-2.0
-+# description: Test hypervisor trace buffer unloading
-+# requires: remotes/hypervisor/write_event
-+
-+SOURCE_REMOTE_TEST=1
-+. $TEST_DIR/remotes/unloading.tc
-+
-+set -e
-+setup_remote "hypervisor"
-+test_unloading
--- 
-2.53.0.473.g4a7958ca14-goog
+I think a stale limbo list cause more problems than that. If you mount
+with cdp disabled, cause some rmids to be dirty, unmount and then
+remount with cdp enabled then you may have some of the entries in upper
+half marked as busy but when the limbo code checks them it ends up using
+an out of range partid and may trigger an mpam error interrupt.
+
+To avoid a stale list we could disable the limbo checking at unmount and
+at remount remake the bitmap. This would involve some resctrl changes
+which I will have a further look into. For now, to avoid the dependency
+without a lot of patch churn in this series I think we can hide the cdp
+enablement behind CONFIG_EXPERT. Does that sound ok to you?
+
+Thanks,
+
+Ben
+
+> 
+> Apologies for not providing a ready-made fix in this email. However,
+> I would appreciate to hear the community's thoughts on this issue.
+> 
+> 
+>> +        u64 code_val = 0, data_val = 0;
+>> +        int err;
+>> +
+>> +        err = __read_mon(mon, mon_comp, mon_type, mon_idx,
+>> +                 CDP_CODE, closid, rmid, &code_val);
+>> +        if (err)
+>> +            return err;
+>> +
+>> +        err = __read_mon(mon, mon_comp, mon_type, mon_idx,
+>> +                 CDP_DATA, closid, rmid, &data_val);
+>> +        if (err)
+>> +            return err;
+>> +
+>> +        *val += code_val + data_val;
+>> +        return 0;
+>> +    }
+>> +
+>> +    return __read_mon(mon, mon_comp, mon_type, mon_idx,
+>> +              CDP_NONE, closid, rmid, val);
+>> +}
+>> +
+>> +/* MBWU when not in ABMC mode, and CSU counters. */
+>> +int resctrl_arch_rmid_read(struct rdt_resource *r, struct
+>> rdt_domain_hdr *hdr,
+>> +               u32 closid, u32 rmid, enum resctrl_event_id eventid,
+>> +               void *arch_priv, u64 *val, void *arch_mon_ctx)
+>> +{
+>> +    struct mpam_resctrl_dom *l3_dom;
+>> +    struct mpam_component *mon_comp;
+>> +    u32 mon_idx = *(u32 *)arch_mon_ctx;
+>> +    enum mpam_device_features mon_type;
+>> +    struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[eventid];
+>> +
+>> +    resctrl_arch_rmid_read_context_check();
+>> +
+>> +    if (eventid >= QOS_NUM_EVENTS || !mon->class)
+>> +        return -EINVAL;
+>> +
+>> +    l3_dom = container_of(hdr, struct mpam_resctrl_dom,
+>> resctrl_mon_dom.hdr);
+>> +    mon_comp = l3_dom->mon_comp[eventid];
+>> +
+>> +    switch (eventid) {
+>> +    case QOS_L3_OCCUP_EVENT_ID:
+>> +        mon_type = mpam_feat_msmon_csu;
+>> +        break;
+>> +    case QOS_L3_MBM_LOCAL_EVENT_ID:
+>> +    case QOS_L3_MBM_TOTAL_EVENT_ID:
+>> +        mon_type = mpam_feat_msmon_mbwu;
+>> +        break;
+>> +    default:
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    return read_mon_cdp_safe(mon, mon_comp, mon_type, mon_idx,
+>> +                 closid, rmid, val);
+>> +}
+>> +
+> 
+> 
+> Best regards,
+> Zeng Heng
 
