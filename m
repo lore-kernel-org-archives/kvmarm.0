@@ -1,32 +1,36 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7EA3A6B6F
-	for <kvmarm@lists.linux.dev>; Tue, 10 Mar 2026 16:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBBE2D8DCA
+	for <kvmarm@lists.linux.dev>; Tue, 10 Mar 2026 16:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773158922; cv=none; b=lu47jD7rynYDLTpud11K/SmsZWgbhb72A9jMeflg3kRS9c+1u17w9FFjoktfIYVAgV5dyorQ7Dp+5oy8aVGGOpupn1Q+zP9KTxXDymm3PJ9auGXbjxO+jqo5OUqOg6agGSLUfYQpt8FttAOx71GZE848Tsg0X8BFrVTdzq2h5Qs=
+	t=1773159440; cv=none; b=IlB5eaKiklM+7hA7FjNQKxo/UGA5Bnop37XzDwbCrV/6oemCG2o4225QAp/ZEn7CzkgTUv+QFLnVVpUeEhr57CFJ217Cdl1wmeJgC61G2h6gsZA965e/rbCRrSqDPVXxTlgW380nFO3bIdq2XwqYvu9Tm7nHhTUj+Iv1yyPtoSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773158922; c=relaxed/simple;
-	bh=ImTi4vHGQu1Zr9WBTXLoa4IyqwJkiSHUGFAKhP6eL3Q=;
+	s=arc-20240116; t=1773159440; c=relaxed/simple;
+	bh=4HejKFlKtpeaYbkOKp0WdQIWsk5vLdO7g0e1rD4heoo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3bnEjCnOqW3lQfEPaNlLSFkS2XjRv2l056vNJPoaCwXG2SEZrMlg+O62uU33/E4p6IpIekSCG+SUQxRRufDUCbjNRdBxfwaGF1ozzKgtKuL2dy4d530X2t8lfEAiCFy6FY/G4FXuGF3M7XKHt64pXuKSxSLk5P6/1a0/sR90qw=
+	 Content-Type:Content-Disposition:In-Reply-To; b=r0lb9UtFrtTWTne3aCb57gWKZWliNWb0dWgO1SopiTggDktRGzD7bMXQjzSek0oS7kD/RmtIQ1N/ohjpjDMl+fzED2YayyDAkgyt8lfaxvlndqLUG/y1Yame5j1qPa7Q+TnGPuvAOfqri5ega+cJq8zbWzWKmxZRnwpEW5rySK4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0A45C1596;
-	Tue, 10 Mar 2026 09:08:34 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E0F31596;
+	Tue, 10 Mar 2026 09:17:12 -0700 (PDT)
 Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C6F563F73B;
-	Tue, 10 Mar 2026 09:08:38 -0700 (PDT)
-Date: Tue, 10 Mar 2026 16:08:26 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E6C13F694;
+	Tue, 10 Mar 2026 09:17:16 -0700 (PDT)
+Date: Tue, 10 Mar 2026 16:17:07 +0000
 From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev
-Cc: andrew.jones@linux.dev, alexandru.elisei@arm.com, 
-	Marc Zyngier <maz@kernel.org>
-Subject: Re: [kvm-unit-tests PATCH v1 5/5] arm64: add hypervisor trapping test
-Message-ID: <focbteiop6htrljl3al2364x6sxeigrjfdcczemgvlfrubohfj@bsypzbn6562l>
-References: <20260306142656.2775185-1-joey.gouly@arm.com>
- <20260306142656.2775185-6-joey.gouly@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH RESEND 2/2] KVM: arm64: nv: Expose shadow page tables in
+ debugfs
+Message-ID: <thetpwxswabflbntrrxfsxpej4scwq25qpviv2svmbj7br3w3d@mdrrhsuexsf4>
+References: <20260308231829.864983-1-weilin.chang@arm.com>
+ <20260308231829.864983-3-weilin.chang@arm.com>
+ <20260310152604.GA3093715@e124191.cambridge.arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -35,227 +39,162 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260306142656.2775185-6-joey.gouly@arm.com>
+In-Reply-To: <20260310152604.GA3093715@e124191.cambridge.arm.com>
 
-Hi Joey,
-
-I only have some suggestions on the function names:
-
-On Fri, Mar 06, 2026 at 02:26:56PM +0000, Joey Gouly wrote:
-> Add a test that sets various EL2 and EL1 trapping bits, and accesses CTR_EL0
-> from EL1 and EL0.
+On Tue, Mar 10, 2026 at 03:26:04PM +0000, Joey Gouly wrote:
+> On Sun, Mar 08, 2026 at 11:18:29PM +0000, Wei-Lin Chang wrote:
+> > Exposing shadow page tables in debugfs improves the debugability and
+> > testability of NV. With this patch a new directory "nested" is created
+> > for each VM created if the host is NV capable. Within the directory each
+> > valid s2 mmu will have its shadow page table exposed as a readable file
+> > with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
+> > creation and removal of the files happen at the points when an s2 mmu
+> > becomes valid, or the context it represents change. In the future the
+> > "nested" directory can also hold other NV related information.
+> > 
+> > This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
+> > 
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  7 +++++++
+> >  arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
+> >  arch/arm64/kvm/nested.c           |  6 +++++-
+> >  arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
+> >  4 files changed, 43 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 5d5a3bbdb95e..f88f6c4d646e 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
+> >  	 */
+> >  	bool	nested_stage2_enabled;
+> >  
+> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> > +	struct dentry *shadow_pt_debugfs_dentry;
+> > +#endif
+> > +
+> >  	/*
+> >  	 * true when this MMU needs to be unmapped before being used for a new
+> >  	 * purpose.
+> > @@ -405,6 +409,9 @@ struct kvm_arch {
+> >  	 * the associated pKVM instance in the hypervisor.
+> >  	 */
+> >  	struct kvm_protected_vm pkvm;
+> > +
+> > +	/* Nested virtualization info */
+> > +	struct dentry *debugfs_nv_dentry;
 > 
-> There are two test that will run at EL1, to ensure the guest code is not too
-> EL2 specific.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> ---
->  arm/Makefile.arm64     |   1 +
->  arm/hyp-test.c         | 139 +++++++++++++++++++++++++++++++++++++++++
->  lib/arm64/asm/sysreg.h |   4 ++
->  3 files changed, 144 insertions(+)
->  create mode 100644 arm/hyp-test.c
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index c7a39945..7582dad5 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -65,6 +65,7 @@ tests += $(TEST_DIR)/cache.$(exe)
->  tests += $(TEST_DIR)/debug.$(exe)
->  tests += $(TEST_DIR)/fpu.$(exe)
->  tests += $(TEST_DIR)/mte.$(exe)
-> +tests += $(TEST_DIR)/hyp-test.$(exe)
->  
->  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
->  
-> diff --git a/arm/hyp-test.c b/arm/hyp-test.c
-> new file mode 100644
-> index 00000000..17af29ee
-> --- /dev/null
-> +++ b/arm/hyp-test.c
-> @@ -0,0 +1,139 @@
-> +#include <asm/processor.h>
-> +#include <asm/guest.h>
-> +
-> +bool current_el_undef_taken = false;
-> +
-> +static void elx_und(struct pt_regs *regs, unsigned int esr)
+> Seems like this could be guarded with CONFIG_PTDUMP_STAGE2_DEBUGFS too, or is
+> there a reason you didn't?
 
-Do you think undef_handler() is better?
-
-> +{
-> +	current_el_undef_taken = true;
-> +	step_trapped_instruction(regs);
-> +	return;
-> +}
-> +
-> +static int read_current_el(void) {
-> +	return (int)current_level();
-> +}
-> +
-> +static int current_el0_at_el0(void) {
-
-Did you mean to say current_el_at_el0()?
-
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN, elx_und);
-> +	current_el_undef_taken = false;
-> +	run_in_el0(read_current_el);
-> +	report(current_el_undef_taken == true, "CurrentEL undef taken at EL0");
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_UNKNOWN, NULL);
-> +
-> +	return 0;
-> +}
-> +
-> +static void current_el_trap(void) {
-> +	if (current_level() == CurrentEL_EL2) {
-> +		write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-> +		run_in_el1(current_el0_at_el0);
-> +	} else {
-> +		current_el0_at_el0();
-> +	}
-> +}
-> +
-> +bool ctr_trap_taken = false;
-> +int ctr_trap_el = 0;
-> +
-> +static void ctr_elx_sys(struct pt_regs *regs, unsigned int esr)
-
-sys64_handler()?
-
-> +{
-> +	ctr_trap_taken = true;
-> +	ctr_trap_el = current_level() >> 2;
-> +	step_trapped_instruction(regs);
-> +	return;
-> +}
-> +
-> +static int read_ctr_el0(void) {
-> +	asm volatile("mrs x0, ctr_el0");
-> +	return 0;
-> +}
-> +
-> +static int ctr_el0_trap_el1_el0(void) {
-
-read_ctr_el0_and_trap()?
-
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, ctr_elx_sys);
-> +	run_in_el0(read_ctr_el0);
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, NULL);
-> +
-> +	return 0;
-> +}
-> +
-> +static void ctr_el0_trap_el1_only(void)
-> +{
-> +     u64 sctlr_el1 = read_sysreg(sctlr_el1);
-> +
-> +     ctr_trap_taken = 0;
-> +     ctr_trap_el = 0;
-> +     write_sysreg(sctlr_el1 & ~SCTLR_EL1_UCT, sctlr_el1);
-> +     ctr_el0_trap_el1_el0();
-> +     report(ctr_trap_taken && ctr_trap_el == 1,
-> +            "CTR_EL0 trap taken to EL1, UCT=0");
-> +
-> +     ctr_trap_taken = 0;
-> +     ctr_trap_el = 0;
-> +     write_sysreg(sctlr_el1 | SCTLR_EL1_UCT, sctlr_el1);
-> +     ctr_el0_trap_el1_el0();
-> +     report(!ctr_trap_taken && ctr_trap_el == 0,
-> +            "CTR_EL0 trap not taken, UCT=1");
-> +
-> +     write_sysreg(sctlr_el1, sctlr_el1);
-> +     isb();
-> +}
-> +
-> +static void ctr_el0_trap(void) {
-> +	ctr_trap_taken = 0;
-> +	ctr_trap_el = 0;
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TID2, HCR_EL2);
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-> +	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-> +	run_in_el1(ctr_el0_trap_el1_el0);
-> +	assert(current_level() == CurrentEL_EL2);
-> +	report(ctr_trap_taken && ctr_trap_el == 1, "CTR_EL0 trap taken to EL1, TID2=0, UCT=0");
-> +
-> +	ctr_trap_taken = 0;
-> +	ctr_trap_el = 0;
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TID2, HCR_EL2);
-> +	write_sysreg(read_sysreg(SCTLR_EL2) | SCTLR_EL2_UCT, SCTLR_EL2);
-> +	run_in_el1(ctr_el0_trap_el1_el0);
-> +	report(!ctr_trap_taken && ctr_trap_el == 0, "CTR_EL0 trap not taken, TID2=0, UCT=1");
-> +
-> +	ctr_trap_taken = 0;
-> +	ctr_trap_el = 0;
-> +	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-> +	write_sysreg(read_sysreg(SCTLR_EL2) | SCTLR_EL2_UCT, SCTLR_EL2);
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, ctr_elx_sys);
-> +	run_in_el1(ctr_el0_trap_el1_el0);
-> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SYS64, NULL);
-> +	report(ctr_trap_taken && ctr_trap_el == 2, "CTR_EL0 trap taken to EL2, TID2=1, UCT=1");
-> +
-> +	ctr_trap_taken = 0;
-> +	ctr_trap_el = 0;
-> +	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-> +	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-> +	run_in_el1(ctr_el0_trap_el1_el0);
-> +	report(ctr_trap_taken && ctr_trap_el == 1, "CTR_EL0 trap taken to EL2, TID2=1, UCT=0");
-> +
-> +	ctr_trap_taken = 0;
-> +	ctr_trap_el = 0;
-> +	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2, HCR_EL2);
-> +	write_sysreg(read_sysreg(SCTLR_EL2) & ~SCTLR_EL2_UCT, SCTLR_EL2);
-> +	write_sysreg(read_sysreg(HCR_EL2) | HCR_EL2_TID2 | HCR_EL2_TGE, HCR_EL2);
-> +	ctr_el0_trap_el1_el0();
-> +	write_sysreg(read_sysreg(HCR_EL2) & ~HCR_EL2_TGE, HCR_EL2);
-> +	report(ctr_trap_taken && ctr_trap_el == 2, "CTR_EL0 trap taken (VHE), EL2, TID2=1, UCT=0");
-> +}
-> +
-> +int main(void) {
-> +	current_el_trap();
-> +
-> +	if (current_level() != CurrentEL_EL2) {
-> +		ctr_el0_trap_el1_only();
-> +		report_skip("EL2-only trap routing tests skipped at EL1");
-> +		return report_summary();
-> +	}
-> +
-> +	ctr_el0_trap();
-
-I also suggest adding a test_ prefix to these top level test functions.
-
-Sorry if this sounds nitpicky! I didn't have the easiest time getting
-the rough purpose of these functions while reading their names.
+Right, I was thinking this "nested" directory can also hold other NV
+related information in the future, that's why I didn't keep it behind
+the option.
 
 Thanks,
 Wei-Lin Chang
 
-> +
-> +	return report_summary();
-> +}
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> index 498eef4e..298e8b7a 100644
-> --- a/lib/arm64/asm/sysreg.h
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -102,6 +102,7 @@ asm(
->  #define SCTLR_EL1_EIS		_BITULL(22)
->  #define SCTLR_EL1_TSCXT		_BITULL(20)
->  #define SCTLR_EL1_WXN		_BITULL(19)
-> +#define SCTLR_EL1_UCT		_BITULL(15)
->  #define SCTLR_EL1_I		_BITULL(12)
->  #define SCTLR_EL1_EOS		_BITULL(11)
->  #define SCTLR_EL1_SED		_BITULL(8)
-> @@ -118,6 +119,9 @@ asm(
->  #define SCTLR_EL1_TCF0_SHIFT	38
->  #define SCTLR_EL1_TCF0_MASK	GENMASK_ULL(39, 38)
->  
-> +#define SCTLR_EL2_UCT _BITULL(15)
-> +
-> +#define HCR_EL2_TID2		_BITULL(17)
->  #define HCR_EL2_TGE		_BITULL(27)
->  #define HCR_EL2_RW		_BITULL(31)
->  #define HCR_EL2_E2H		_BITULL(34)
-> -- 
-> 2.25.1
 > 
+> Thanks,
+> Joey
+> 
+> >  };
+> >  
+> >  struct kvm_vcpu_fault_info {
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index d968aca0461a..01e9c72d6aa7 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
+> >  
+> >  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
+> >  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
+> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
+> > +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
+> >  #else
+> >  static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
+> > +static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
+> > +static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
+> >  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
+> >  
+> >  #endif /* __ASSEMBLER__ */
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index eeea5e692370..31d74ed8449e 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> >  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
+> >  
+> >  	/* Make sure we don't forget to do the laundry */
+> > -	if (kvm_s2_mmu_valid(s2_mmu))
+> > +	if (kvm_s2_mmu_valid(s2_mmu)) {
+> > +		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
+> >  		s2_mmu->pending_unmap = true;
+> > +	}
+> >  
+> >  	/*
+> >  	 * The virtual VMID (modulo CnP) will be used as a key when matching
+> > @@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
+> >  	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+> >  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
+> >  
+> > +	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
+> > +
+> >  out:
+> >  	atomic_inc(&s2_mmu->refcnt);
+> >  
+> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
+> > index 98763b291956..3a70f633fc8b 100644
+> > --- a/arch/arm64/kvm/ptdump.c
+> > +++ b/arch/arm64/kvm/ptdump.c
+> > @@ -10,6 +10,7 @@
+> >  #include <linux/kvm_host.h>
+> >  #include <linux/seq_file.h>
+> >  
+> > +#include <asm/cpufeature.h>
+> >  #include <asm/kvm_mmu.h>
+> >  #include <asm/kvm_pgtable.h>
+> >  #include <asm/ptdump.h>
+> > @@ -277,6 +278,29 @@ static const struct file_operations kvm_pgtable_levels_fops = {
+> >  	.release	= kvm_pgtable_debugfs_close,
+> >  };
+> >  
+> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	struct dentry *dent;
+> > +	/* format: 0x<vttbr>-0x<vtcr>-s2-{en, dis}abled\0 */
+> > +	char file_name[2 + 16 + 1 + 2 + 16 + 4 + 3 + 6];
+> > +
+> > +	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
+> > +		 mmu->tlb_vttbr,
+> > +		 mmu->tlb_vtcr,
+> > +		 mmu->nested_stage2_enabled ? "en" : "dis");
+> > +
+> > +	dent = debugfs_create_file(file_name, 0400,
+> > +				   mmu->arch->debugfs_nv_dentry, mmu,
+> > +				   &kvm_ptdump_guest_fops);
+> > +
+> > +	mmu->shadow_pt_debugfs_dentry = dent;
+> > +}
+> > +
+> > +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu)
+> > +{
+> > +	debugfs_remove(mmu->shadow_pt_debugfs_dentry);
+> > +}
+> > +
+> >  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
+> >  {
+> >  	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
+> > @@ -285,4 +309,7 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
+> >  			    &kvm->arch.mmu, &kvm_pgtable_range_fops);
+> >  	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
+> >  			    &kvm->arch.mmu, &kvm_pgtable_levels_fops);
+> > +	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
+> > +		kvm->arch.debugfs_nv_dentry =
+> > +			debugfs_create_dir("nested", kvm->debugfs_dentry);
+> >  }
+> > -- 
+> > 2.43.0
+> > 
