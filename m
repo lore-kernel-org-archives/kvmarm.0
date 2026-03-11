@@ -1,92 +1,91 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886E285056
-	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B169D3B7B7E
+	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:13:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773223991; cv=pass; b=H9hohkt0oXgmV2E3K/rPqCXkOvwsT40/fLSEaj49U7o2u13L+qggNp9DQrziuc7lnpALoKrmlUB987WE0zEGWw7OsdL2ZdmOaD93Nn4sg1q4NrY2T0FO/7ea/VvahwMm9FLC6JhMzlIRckxVj4FLE9FltUVRO9zGncRBkgQj8Rw=
+	t=1773224006; cv=pass; b=jUtY4VL89uWMBRjiQKUnJxpQY6pW6InhEY/ibXAEktv9auW3f1nPfUOmr8mhFcLoJs9vrIlW5pk2rzLyi1yQULGaj1NyHE49WJj3QIyuyMlR80RmxTmq5hgNGY9Czp875ZlkTzd7XLQ6EMLR1gMp2dkxaR7d8YqJvIoauAFgxaw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773223991; c=relaxed/simple;
-	bh=tHXTVmPjfb8SwpaBCgniIIPSIuJscopMM/vhQ4tMBcs=;
+	s=arc-20240116; t=1773224006; c=relaxed/simple;
+	bh=a57CWQUeFv9OIki4SmySICTS4iOKncvmiIkIL1vhPhQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bjXVZGjwFtsZzs9130HmtFfv0+vbOaRI7F3qtmEXu70zmr6dD/33+MxzPi0iGZBEa8Zf1K0gC/GChRVA6Mk2pavAzEn+X4uWLZd/sNDe2jwplZHJAmKFqYJgR6OzYD/iCWeIMh7ZNE6MD8zuHJqJted4wx3tWUdUwfkfbPvYddA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0hcX400g; arc=pass smtp.client-ip=209.85.160.178
+	 To:Cc:Content-Type; b=LlE/7JADMXNaw/HBgsGlhtmTH6mSZwQDc2G6TFvv4WT8vMT8/YSwnlJRN4ESpAoNIwFeloCvXJX4eXvuDMW66Dmh3GLurZMY9723JdZdcecS9Byt4WpqE248xEEWZTi0HtgY0H9nY13zUhwHPmdujOguBEI9hQ3sYQsf/mpETxI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dz6iqOMq; arc=pass smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0hcX400g"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-509062d829dso409051cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:13:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773223989; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dz6iqOMq"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-509062d829dso409191cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:13:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773224005; cv=none;
         d=google.com; s=arc-20240605;
-        b=KrAQJe7dE1siKaGbufBEy+oAcuVVmb7sN6bzKxmdelgqYZTo7kR7ZmGwYcFXSmZG9k
-         ZRDq266fbBjNvjt+R8DW/JmukMGKVxCgueod1eC17RdInodr0cej+6FlMY/CxAFjXqo4
-         gqzLaX/QtgEt64BEfhT9vAPwLU9R5U1bfcqaQAkgzjEfZWyeIpON0f6VqjoTa8RCZc6B
-         OZkWG1dDZrqZ6KG332kxzHpgFhlQqIpv6PSkuSoo7NVGbT508WoFLmrIa+wtzxQUBM4x
-         6K+mKgZbQGGAyIZCC5m5OgINuDXiBdnVfbbUMZLIFO19n1ypTbHPnTpeLU77g2it47ox
-         hfkg==
+        b=Cbn9yHQkXyl6A2qGjSHzhimLCb6MM2KR8KFi/KGpiKt+nw8sFbcAjrag7isQi60KFZ
+         nLTPJFsMiF8+Mbm66e6E6WyDB++NO/WsvredA/azYm3OVeSWXgljY/ntUgnkQ3YW3P8R
+         BHJYmeqoN/stXFvcx4G3g5qeW2NUfsuPX8FMFrAV+WNudqUEG76/N/SZTW9U8rWAnTQl
+         7CGn0KmWix0lfszoTGBZttP0qgLwurU6yXEMjEMN58FxEB3Zo5qoFMgIhsJ9rglKZJho
+         G/x18vcVryTqJ6gjMLfoX/wGGNVCwHU5DJ//WF48ZCdjgz4AYlbOHouydxIrWvkqAO7C
+         W2LA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=9TkgZeRelUotLX6uWoOokmh+4cw4NVRqqCq/SOcEowE=;
+        bh=EJUK1c7uh2qWa/PUs7/Gela8m5sgz/NTTAmffjVN7aY=;
         fh=Jxzwzg3laewSUvCA2a09gOOd6H1o1mMdzeS5XgaaAVk=;
-        b=VDQNK+Q7Ag/bV1MVy8SFmJpYJ8WKj9gemLuGCjMQwoF/qf++ruCuO1wVUA9RgFUqqj
-         eIoMmRNB+BtpSPGPDa9zT0QBdLZMA2Gg/1GC4s+KEBcf7t8nXwH8HzJIjIWl2IYvwzvF
-         Px6mPMWZqexIzpD9zYDCzYp7tkJ5vGDezVzUWAOml9IlcnucWyTF03sB745w0lkdwptH
-         px1tK4qX4t2EaXIicuiLbNbJvPuYxh8mZpye7CFamEcEbzmBVdkv5nYRLQZRuhQeQ0YP
-         kynt8OsokG5U/bKE8NCeAiwrwB0J2TasAhheVjlslowJqQ79MzBi1xH3uy0WA7kBOy5V
-         YBGA==;
+        b=gpg/Hnxr7aOOQhBzASV/32KAciNtCr/VrrSjyxSZZ6AV41McLaOvBSwR0h3Mji9Qyj
+         dysygc6k160NiTdBdHdslaRhkHU5pBhjgyOOOE1UQryPmoeatyqwLHpZCLpjeFzokTDp
+         5nVabKCTdsj+2iqn884Vi/YQX5Wrbs1P/fdpIOejOmaU4t000ElLTWoYvUhNLj4mB8P4
+         Pkta/VNj6m6r7A7N8Jak/K1e0Ql3/FMNVF8MpbYBDJnbL9MjkjIbDXlX4P2LeYU4UXVF
+         kYzyx/fJtVz7JD8cg4ryyGkJOoEZN5orj+8lbUdx2zQCNc64PrBP3WRiV0WUJGiILiv4
+         tvdA==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773223989; x=1773828789; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1773224005; x=1773828805; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9TkgZeRelUotLX6uWoOokmh+4cw4NVRqqCq/SOcEowE=;
-        b=0hcX400gOi/h8Gs/niw8vUxJ8MPUqXtj1n6FMM46mwSe7VuzI/d1KVJqNKPw721GhO
-         4YXviEEd92Mg/+/p5rmPokz8+/sMfZSS2lBbeijzOZRnJjodTrAkbVcBvRppiU+XjdIJ
-         Xf5/deu1h/5tj0rIqwi0uA+z2cYFVO4VbGEoUOe3EyMIfwzP2aKRYhHKH3NRq2GhgvP5
-         hntiYLIV1SLi4L5pIaE64CUx9w4IO1g8f8GGi29YiXbcwKWnd7wEotamYP3hhzCOVYVi
-         Vw7ZBZyNex5jqHcp8qIOiN0Z7aoQb3R/QjDcOXGoGyAVSPprkGhqsT7iqoJm8gZOr4dK
-         mAxw==
+        bh=EJUK1c7uh2qWa/PUs7/Gela8m5sgz/NTTAmffjVN7aY=;
+        b=Dz6iqOMqAxsYX9Ay1UXJMCJuJAmuTB0gijICw2YiiqahxeRwUtA6F63DbebUcq/lCG
+         CtD8G67xvrVY2TDwqcRuKFQLOoYcZ/6XNkF+gP16Cz1YqC7o3TXe4q5Dlej2ZqQTRALM
+         Mo73sGTMHGMXqFB4Dzsh8usiCT/Ft+fiGl+/UmXhdWPefibH60wNHOHYDBi30qS5JA4c
+         Mmb6JyfK2OJ55Vgyw+SjKYXS2hMTn8k5gZ2/Ad2ud89r7X4ve6G+nXb9FDdpK2mgvj9G
+         go63O8ll65k2lpOczFvFOrKFSNh5gHp24GXOd5SiJQErkkM6JjEnBqS0tHYYAEWXu3Tg
+         N1wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773223989; x=1773828789;
+        d=1e100.net; s=20230601; t=1773224005; x=1773828805;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9TkgZeRelUotLX6uWoOokmh+4cw4NVRqqCq/SOcEowE=;
-        b=tyo8O3op0m9lLL8VfrgpfvE0kkF0iMeELypdY6ZTBq/Ff58F/JccDl4ZTKqti3fD+O
-         PU3/KjspY3HPt84jGherieX2E0zlud7otKMIyvS1mrUme6N71rXXK9W6v1drqvnR5jN7
-         sxRSVzpW+8y8MafQDbnLfuDsVHXBvCcLDp77KO1R7iJJA1N7LSvZ6q0ISCQv7HlufFWc
-         W0eaLg1VcpXj1oRoG0RyghTf+08ncUv2p8dAyqim86w/120jlk/2qZtkp/gTL1qXZxqS
-         YHa5MgHuoiSoenwpJha4xcl1MxbMg3nPYZRBnAAIB4asFZQbmudRF51dXR7HZGyXvXZr
-         j7gg==
-X-Gm-Message-State: AOJu0YzuvcAZ/UjM9lcbaTBMMmfRFzAvf5p8GfOo3wFRuucvrXDgGRQS
-	VfilmNWdyaPUgEZNyVvZkZc9AFSrRqDZei8/y4FK/cgIxsQtkpWZ1x5vi64JnnaXsHstCsdj6rC
-	eYdL5fSwWUgBX85e8li2OsIJT2bQsBYn1qODuzBu4
-X-Gm-Gg: ATEYQzyIMDCZtlWsGWmKBWmNBttzddGNSairJX5Bh2l5JclXJxU/YAUQvvvaawRKewt
-	BCx6uCMgWisfP98kr+Rh+66+XUxw9sE7CXAkjkME+AP82MNI1+g726NWWJEP522siCfKVYT8sDC
-	f/f62lWO1ghJmMo7JybrS0AvTS7ENr91v19A4LJVl7iWXTobwmo5jyAQkCkdNpxizG8C57mQdun
-	gjdJjvI2n76dSOjviZABQ7UQ++z3nsIcmV2XuKivksuHnELPACrbNUCvwi6KSPAeoLYZ4xeX61T
-	Qb23v1Gu7H132bFYE6siNN1WiIQ1yx/5amuuVA==
-X-Received: by 2002:ac8:598f:0:b0:506:9852:75ec with SMTP id
- d75a77b69052e-50939a0b6d8mr9160861cf.9.1773223988258; Wed, 11 Mar 2026
- 03:13:08 -0700 (PDT)
+        bh=EJUK1c7uh2qWa/PUs7/Gela8m5sgz/NTTAmffjVN7aY=;
+        b=VMjoct7Ti+8e+qNkaiI+3M0AIWH0Vv+Rz0v81coicRYZy4qJ23P80xV6mNJRrfWwue
+         jO5zSs4JgZiny0L2zfbkABl8QPPHhBcJAVdXfYAwjz34TTav9ehCENb1ZTdKEyH4NkLe
+         bew7AqtYMbd5VM3BJCwqBDZkMvYjh8JD056PNe7jYdVuo65y85MIxeWkg3lja6396YHT
+         OchfuirdN714JWP7c031xfjDAPVNcgGB1g0xjBu7cdhYPZ7i8X8b5AiHd7gxuigaFwCF
+         Mry2Q9vZvs+htKPbVO/7tR1kpMiMfWsYZc9V6V4ldzzEjyxHQrtTQjD4TuK1i7PyOeBT
+         oxFA==
+X-Gm-Message-State: AOJu0YxSVJW4Fr0bSrJO6S/8aW9RKVjgP0/y+pVlRZF5YcEEUkR4dWny
+	lioT9uDIju/l2yq7v7KkboWI0pJzvjDG4IhGb7ColEKFEIe7MGqsTmywuCuI2isSKaDF7LUGrHD
+	zSGeiZ6mkYi/+ocCCHeO7oNsEDQUVkgKzh8ve5ifs
+X-Gm-Gg: ATEYQzwJAZmyhmiBsGXFrUdXdVptoEUe7GuY1ghzrfDMbWGGBZMhxu4fbw4BLTdzl9e
+	gSZ0H9yXHTAh7B8U1erIN4ygzszAEHzwEUjPCtgi66gghFQgkqRWe9rWTB7U768IokWHzAntVcd
+	lCuDa3dLtsdsQkW2tsO3IYa2egYa7af98H6+Ic36iqgqojxPUDzLgyP7N5e2LrQRCl3meXm1e4O
+	9sQ8QBzQECP9nJRjUncILAkfTqhJq0UyAIZXD9d34vKgd8XcFb1i6T5YEqr6Iw4WEkm6BrnHDYP
+	ZJ5Dw3jwhjW0E7ksq28V8DdmVc2a2v+b0oSa8Q==
+X-Received: by 2002:a05:622a:1449:b0:509:105c:74a9 with SMTP id
+ d75a77b69052e-509382ae1camr11927581cf.18.1773224004181; Wed, 11 Mar 2026
+ 03:13:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-17-will@kernel.org>
-In-Reply-To: <20260305144351.17071-17-will@kernel.org>
+References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-18-will@kernel.org>
+In-Reply-To: <20260305144351.17071-18-will@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Mar 2026 10:12:31 +0000
-X-Gm-Features: AaiRm51aS31a_T0ouebXqMpmAi9skAmUrSnNLq5fU1cJFuBu21k0UjxGpqvwTDw
-Message-ID: <CA+EHjTxwfCDoRmV+17iYkyaY4bxVLK-ikiuvwPP=vLyttOUGBw@mail.gmail.com>
-Subject: Re: [PATCH v3 16/36] KVM: arm64: Factor out pKVM host exception
- injection logic
+Date: Wed, 11 Mar 2026 10:12:47 +0000
+X-Gm-Features: AaiRm50tqIjNQKfWSBmDN7C0OQpW0WkI6OuSdjJkK9RHrz0ZGsHlr6SsTi2slmE
+Message-ID: <CA+EHjTxwPPDeDoW7krEpH5NMWHgp8dFZ+Q3RrAGZd=fJAaqx8A@mail.gmail.com>
+Subject: Re: [PATCH v3 17/36] KVM: arm64: Support translation faults in inject_host_exception()
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -98,11 +97,10 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Thu, 5 Mar 2026 at 14:45, Will Deacon <will@kernel.org> wrote:
 >
-> inject_undef64() open-codes the logic to inject an exception into the
-> pKVM host. In preparation for reusing this logic to inject a data abort
-> on an unhandled stage-2 fault from the host, factor out the meat and
-> potatoes of the function into a new inject_host_exception() function
-> which takes the ESR as a parameter.
+> Extend inject_host_exception() to support the injection of translation
+> faults on both the data and instruction side to 32-bit and 64-bit EL0
+> as well as 64-bit EL1. This will be used in a subsequent patch when
+> resolving an unhandled host stage-2 abort.
 >
 > Cc: Fuad Tabba <tabba@google.com>
 
@@ -113,88 +111,63 @@ Cheers,
 
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 49 ++++++++++++++----------------
->  1 file changed, 23 insertions(+), 26 deletions(-)
+>  arch/arm64/kvm/hyp/include/nvhe/trap_handler.h |  2 ++
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c             | 18 +++++++++++++++---
+>  2 files changed, 17 insertions(+), 3 deletions(-)
 >
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
+> index ba5382c12787..32d7b7746e8e 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/trap_handler.h
+> @@ -16,4 +16,6 @@
+>                                 __always_unused int ___check_reg_ ## reg;       \
+>                                 type name = (type)cpu_reg(ctxt, (reg))
+>
+> +void inject_host_exception(u64 esr);
+> +
+>  #endif /* __ARM64_KVM_NVHE_TRAP_HANDLER_H__ */
 > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 7294c94f9296..adfc0bc15398 100644
+> index adfc0bc15398..6db5aebd92dc 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -705,43 +705,40 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
+> @@ -705,15 +705,24 @@ static void handle_host_smc(struct kvm_cpu_context *host_ctxt)
 >         kvm_skip_host_instr();
 >  }
 >
-> -/*
-> - * Inject an Undefined Instruction exception into the host.
-> - *
-> - * This is open-coded to allow control over PSTATE construction without
-> - * complicating the generic exception entry helpers.
-> - */
-> -static void inject_undef64(void)
-> +static void inject_host_exception(u64 esr)
+> -static void inject_host_exception(u64 esr)
+> +void inject_host_exception(u64 esr)
 >  {
-> -       u64 spsr_mask, vbar, sctlr, old_spsr, new_spsr, esr, offset;
-> +       u64 sctlr, spsr_el1, spsr_el2, exc_offset = except_type_sync;
-> +       const u64 spsr_mask = PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT |
-> +                             PSR_V_BIT | PSR_DIT_BIT | PSR_PAN_BIT;
+>         u64 sctlr, spsr_el1, spsr_el2, exc_offset = except_type_sync;
+>         const u64 spsr_mask = PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT |
+>                               PSR_V_BIT | PSR_DIT_BIT | PSR_PAN_BIT;
 >
-> -       spsr_mask = PSR_N_BIT | PSR_Z_BIT | PSR_C_BIT | PSR_V_BIT | PSR_DIT_BIT | PSR_PAN_BIT;
-> +       exc_offset += CURRENT_EL_SP_ELx_VECTOR;
+> -       exc_offset += CURRENT_EL_SP_ELx_VECTOR;
+> -
+>         spsr_el1 = spsr_el2 = read_sysreg_el2(SYS_SPSR);
+> +       switch (spsr_el1 & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+> +       case PSR_MODE_EL0t:
+> +               exc_offset += LOWER_EL_AArch64_VECTOR;
+> +               break;
+> +       case PSR_MODE_EL0t | PSR_MODE32_BIT:
+> +               exc_offset += LOWER_EL_AArch32_VECTOR;
+> +               break;
+> +       default:
+> +               exc_offset += CURRENT_EL_SP_ELx_VECTOR;
+> +       }
 > +
-> +       spsr_el1 = spsr_el2 = read_sysreg_el2(SYS_SPSR);
-> +       spsr_el2 &= spsr_mask;
-> +       spsr_el2 |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
-> +                   PSR_MODE_EL1h;
->
-> -       vbar = read_sysreg_el1(SYS_VBAR);
->         sctlr = read_sysreg_el1(SYS_SCTLR);
-> -       old_spsr = read_sysreg_el2(SYS_SPSR);
-> -
-> -       new_spsr = old_spsr & spsr_mask;
-> -       new_spsr |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-> -       new_spsr |= PSR_MODE_EL1h;
-> -
->         if (!(sctlr & SCTLR_EL1_SPAN))
-> -               new_spsr |= PSR_PAN_BIT;
-> +               spsr_el2 |= PSR_PAN_BIT;
->
->         if (sctlr & SCTLR_ELx_DSSBS)
-> -               new_spsr |= PSR_SSBS_BIT;
-> +               spsr_el2 |= PSR_SSBS_BIT;
->
+>         spsr_el2 &= spsr_mask;
+>         spsr_el2 |= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT |
+>                     PSR_MODE_EL1h;
+> @@ -728,6 +737,9 @@ static void inject_host_exception(u64 esr)
 >         if (system_supports_mte())
-> -               new_spsr |= PSR_TCO_BIT;
-> -
-> -       esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) | ESR_ELx_IL;
-> -       offset = CURRENT_EL_SP_ELx_VECTOR + except_type_sync;
-> +               spsr_el2 |= PSR_TCO_BIT;
+>                 spsr_el2 |= PSR_TCO_BIT;
 >
+> +       if (esr_fsc_is_translation_fault(esr))
+> +               write_sysreg_el1(read_sysreg_el2(SYS_FAR), SYS_FAR);
+> +
 >         write_sysreg_el1(esr, SYS_ESR);
 >         write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-> -       write_sysreg_el1(old_spsr, SYS_SPSR);
-> -       write_sysreg_el2(vbar + offset, SYS_ELR);
-> -       write_sysreg_el2(new_spsr, SYS_SPSR);
-> +       write_sysreg_el1(spsr_el1, SYS_SPSR);
-> +       write_sysreg_el2(read_sysreg_el1(SYS_VBAR) + exc_offset, SYS_ELR);
-> +       write_sysreg_el2(spsr_el2, SYS_SPSR);
-> +}
-> +
-> +static void inject_host_undef64(void)
-> +{
-> +       inject_host_exception((ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT) |
-> +                              ESR_ELx_IL);
->  }
->
->  static bool handle_host_mte(u64 esr)
-> @@ -764,7 +761,7 @@ static bool handle_host_mte(u64 esr)
->                 return false;
->         }
->
-> -       inject_undef64();
-> +       inject_host_undef64();
->         return true;
->  }
->
+>         write_sysreg_el1(spsr_el1, SYS_SPSR);
 > --
 > 2.53.0.473.g4a7958ca14-goog
 >
