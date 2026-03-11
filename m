@@ -1,91 +1,92 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5E9282F2C
-	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 12:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C704C78F39
+	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 12:50:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773233404; cv=pass; b=ecmwLeEHwh8uddtkdOsTzX4BCeb4cnsSRFpxsZl98bwMylme8D3MlmaSEMSKu8nDN3VpG9LwR7CJHOf0fJBFAeRNIsEZBNaKSUWf+8Ui+Uisthe9y0sPoppg2NyUKg2yEhBhlnlRZln20LagUUmkPaTeyXWCDpc8J5z3TfNJWx8=
+	t=1773233442; cv=pass; b=aP9ZK07OPLcV7GJVZtqH7GBQb7QPrrjHRdBBNIpdyeHEbdreXsyIZ6WNYMOMg/7G14q4noamNWkYxLHBpNsthIy3BvDspyQBKrhQ/JoteltAryVK6iezsrLE9Z47yFB3E3s4JZn/w5uFM0PbXOYmcEmQ1qRt3NsbVmdhdFVkz2w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773233404; c=relaxed/simple;
-	bh=0hh7rCZjvdGitv9p8epAfcnaEGtqwqWbNOA+Hfpo9ck=;
+	s=arc-20240116; t=1773233442; c=relaxed/simple;
+	bh=eQ3Yvb/8+DN/bXkMqzEgl6YVFXfWUD7sGyfSQXgZC78=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G59ypX7A+dQ08FFUXCNpmn5iyaCrzDdXb/s8O1WTs3D980QiKFcENAhuKkniuPfx7NuaG0Sv2Dn2fGNfqnrS4ynVUBtoKp28Dj0PjHnRdL8DZV2uTVvv7vqeJKAy2C9vhDStq4tRbtKpz/bscXYS0r/1nvcWtZdJ41ivoAXQ4pc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kYyjuPX5; arc=pass smtp.client-ip=209.85.160.178
+	 To:Cc:Content-Type; b=dF1m+kejwYR/xq24woQy7aWoC1bchpkKsfmzySV3q4wJe225H9TzPU8xoJC/aZnr2QanE4hlLE27Ry8ibwNPHo9l0LGX57JFy54VgB4jju3qhrqRyEXpQP3ZbuOs53ESvPhbwhbj5tn52W1o/lilA+N9RAEL4iHN5CAlPlqOqG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sye7jGKa; arc=pass smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kYyjuPX5"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-509062d829dso474071cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 05:50:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773233402; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sye7jGKa"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-509062d829dso474381cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 05:50:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773233440; cv=none;
         d=google.com; s=arc-20240605;
-        b=WIu0tNyQqnlGH36aoRjszOFH+RAuU5yKdzs3ybnNClJvqX3FOI3y8WAJf/i4JVH5UR
-         QhMSjGR5/s5kZclvGX0QlFcylwCdK9E/96QVdaMHSU9DVdDZKSF4GCfzvDZ7+GT1M8gF
-         ms6igLusXoWGS/3HHnLNewmj8Ma64Skz7VjbuCOJ7UW3TW+8gap7TmP0WV2WPFCpqGoq
-         ctfJEe5a+MHiUOtgbwgRr4zELEkD+XlS05om9q3158srWifHTFk9R9rYUBztC+2kmr/Y
-         6SrM+yEwZGPIukAvS7/gsoBLtQPntoPhxZPLEKTGd0YNBFbbVcJ5L7IwbcPIVZH2Q52n
-         5jyg==
+        b=S930X+zwQd+c6gpK9vd5o0wk6hr7wXAWIxu16uMHKGDWhDkI75HlXEPBC/w5oZVX2p
+         a7+2MdfUz85sM+B/a3OXKtd5b/yd+A0LIK41mHGXYORI1fcYYEMaBkqe7JhviaygGGfS
+         ISpSiIYEmTO6EmRQu77z0L3opkN9V7P8Lmn7Eawt14HZ0kEMbT+eljA7Riq0TqN4j0iA
+         Hml/im44qJNDKOIYeX7OL9ZiXZLSiGUJmv1ooVlhOHjBrcv/z3D/+PlfC6ghmR7UrFxC
+         bRbJvjzLkywjrlIuXaUWv1W1h3+y1e/b8nT9/I7n0fpLAtuGg2UmpCM3nWphJycJi0pD
+         1kTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=y2MGgBYTaEO28Ct4I8jS2apA/t/hDq2a42kL+JCrbEY=;
+        bh=qxN2TuBJpKCWoW6nl/QePmQRR2LS3Y0rV9eV5GatiMo=;
         fh=Jxzwzg3laewSUvCA2a09gOOd6H1o1mMdzeS5XgaaAVk=;
-        b=SsLjox+uRye47eDoOBtQYev7mgumPcDA2+GGMJuz4TPXzID2eDBR6cvfMdj14aCWyC
-         JdrOIPMkKt0K+ungS178t1zFQQeP7T/yss7ZpVXjmRhEz8fceUUU5Wx+Kwt9v3r5B00l
-         9kNcubLEtAG/3OJvDURPL9eG66tWLEGkDkCIFvNKltITb5vyFQzX0ltlrBTjVtTqY+JO
-         s/RThwizSTZ49XF6kiGJiubiUJSJ+Hh5VMWZdHHnoX9OZMk0dKeNYoVDb+IiKSneih6R
-         ykylvX4SJajmFYH0gAimX9YhfC4lr/1AZwl6yxHujMOpsQe5jPpI1w4RQQ8TPCWv6O7O
-         nA6g==;
+        b=llObKMJ1+JaFRttVfzm0yVCtthsZ4OJwdFolN1PjMesVc8hWJiUOTi51QOk6YBlkng
+         71hOwooIIO4JrXNOtD0ggzyNgjFRbA3Nrqt1zAT/WAN8cPy5tvDwya+vy9Rb7GxYxkCk
+         f234PF4bUM5GmVOIezD45M0KPlEdrk7DHJv0WMIDvR7nEPPIG5IeIfKJJg+caQ9cVc04
+         QgfPfuH6ZnZcR/KWKYiN0Br2Kp2GzbQilEKEKvCYCKyWj1fQ4BcANBUl45sCfIJvWM5G
+         gRyFUSl74jwHnyC9rX7+MAOGmLTrESHxJ+SIcYc/ri8BBrIlaYyjnii7r5e9cqLREaVb
+         qdlQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773233402; x=1773838202; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1773233440; x=1773838240; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=y2MGgBYTaEO28Ct4I8jS2apA/t/hDq2a42kL+JCrbEY=;
-        b=kYyjuPX5PC2bSTFbcBGq+/GNm7i2dioZPm1O8UaxDdICzM28GO9fUzn+I3e7xTYolq
-         FgsKtR8338LvSvERGwM9Wb2Fzgp2qoA7qE/2xfARY92K1+UxCzk0NoXoFdqyJuI7VWki
-         YJ+2t6M23rZNntY7aB1qf96SIPfx8Z7q5tswL/73JKS0oi60TRwNzkGsAThZajlgzEFp
-         bwXEtZpfiT0zc8e169UjKyVbPqrZVk1zkdYp4idFW3i7pohFCinYp+myZJP6vwSttTZL
-         HN/BsT3aSWCA/3+JEUOFRP5eppxxCVkCC8vLkRA3gGmytB9KTqWU1q4pE2GXAqgPYXhe
-         HLZA==
+        bh=qxN2TuBJpKCWoW6nl/QePmQRR2LS3Y0rV9eV5GatiMo=;
+        b=Sye7jGKaPvOhbm+HcFWDhWxQU+Lcsxa5JyjEcqPR3jtutFzhSkDpX0qK3eAVtoPYwQ
+         IY9gTk6y848klGbiRaxldxdOF4+sUlYawZgol91BgbxyzVuRdMQHzH413vD0FEzduWPr
+         4tmPHSHBM5qB+Vy3+OedURUdL8+EJVtCSBcLjhKmlyZg8V74QYyTA4ZdC4F2kC86Jeet
+         GWnLcy1DHd3qVbiFCUUsV34HB71sIlhxTcH3DcG3gYl4HDkGAh5pT47gf/EIciPD7v7i
+         2IW94t21H/2TRKP+gvUHExjp6aBlGR8RI3Tg7BetJBwj/ODJIab/NTS+UVP6Y4NcUB2W
+         bjUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773233402; x=1773838202;
+        d=1e100.net; s=20230601; t=1773233440; x=1773838240;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y2MGgBYTaEO28Ct4I8jS2apA/t/hDq2a42kL+JCrbEY=;
-        b=oj6/CfuVjYdnMXT12ugpm5WFRLl9M46zgGP/KuCpqJGNIzGH5af2NhwciCkXeSEZMP
-         ymO0MVPeOLJDICId0y+goBD4PduYs2xov8PIl1IsXc80SopDBBE8WXkFPtiuwieG+7R6
-         5d9iElVm2a6iBj2UWchobKbPtFB4v5SMipbAs8omneqkldfLFdVWYyq3kQCeGR4HRSsW
-         vVVZW6NOD65pHbjLivnEYzxLs+1rVXxh5vHk1D7i1DEzvZ8X0h0lMdPdsfIvC2hkouLe
-         tmFb4ZbDTtnPZHCq2kgtQvKizTf7pDUnKpXwc+GE/mRTcXbgPiK1DWW4qS3VKTs/ux16
-         Fp8g==
-X-Gm-Message-State: AOJu0Yyhz8S1qAdE4WdKKUxbqxDxSIiHtzGbFLaMKEQ4giNUuDm25KbH
-	Yfovo0mV14Vy8R5TC5rraUCICNiP1CN5K1E0QSVodjE4uieJIFWQ6g+coIOQrE81MXbpDp4hkLh
-	tKPUo1wlGTO3UFD9gmv6c8yedxXABRMATY1BDp37F
-X-Gm-Gg: ATEYQzzwanYhSfabsOp6vqcisR/D0GmkjLi3kuCFiqij33cNsl/vwVTXhR4K1hdJG78
-	nzvDq0PTy5VK6ZO3pi5r7zektPsRHglRxPMAMt+DDq2PzPZHctN2TUVCMD/Mun7ClUMhvJHvhLk
-	ujrAAGMY3kEAR8IWak3TwWZrke3tiXf6oUkQ5iS/Z68rDNlf2InF436NRODncdHDnbtxBrzw+26
-	+RTb6/agk1mxCdaS5lq6G+eITvvRCVEV8oABR5QKqRw58BPokXQKstPRYIP3cFtX2DWiWhdBWtZ
-	AYlW+tjW3soAcHOzwoU75VOnxKvE6B4Il9V4YA==
-X-Received: by 2002:a05:622a:285:b0:509:15b6:f69f with SMTP id
- d75a77b69052e-509381899c3mr12930681cf.2.1773233401760; Wed, 11 Mar 2026
- 05:50:01 -0700 (PDT)
+        bh=qxN2TuBJpKCWoW6nl/QePmQRR2LS3Y0rV9eV5GatiMo=;
+        b=D7s/MltpcWREWz+jS/1QdoipimuO/W8YPs5ypvJY3H7Hu49KXoPx3ysZjLeb6EA2Hq
+         FJyE3iLbjyMTqQlgz0hkkfeRWjPzYEHWfEhe/xz0BrucfOgIsCNF3mFn/cYuGu0GyI/f
+         +CXWgPEtZw66x9geTquqX8ZPDN4nDfP8nyfCKYib6WGWN52N8ZoG5RI6jJpKlbHAUggt
+         v94NjAUeV4mjF+Wpm4upJkUphjh5BJpzMGNzFTFcV9gvdsmQLv0G7OyCZiHpyV/TX2vx
+         NgERTZ8jbVDpflLd5lkzOu3EGOVHskQfOXtZhRhsn4yWx7V9BIF2uLp+3WzZS3ZoCzRU
+         tdUg==
+X-Gm-Message-State: AOJu0YzKneSnxjv8+tAE1u4gsDFqZQaBLDZ3om3IP4AlTF3wkPptQlzJ
+	T7sz10QW/8uyrxFftcERe2n5HYE/U0GT5xpd446LBrjFaB8Cfj6JTYG90R8gBEPJuTv00NsiDHm
+	AmbfDwBlPS3tdkMp8pCkWZR3w7eUbSHnTg3BlpxAi
+X-Gm-Gg: ATEYQzy/Gqb4rUin7rLP3qQCZuZTRRbL8drZIZk7iSkoXUWSSjI+yyuV5Xg0izRHPzn
+	yZkKpMjFzQS7XDUFtkeZUScL3GsvLu72s8xmnsn+foPdTOvwP8MavEgUrhYyLMrdqVW3z0ukz+I
+	L/SS5lDG5hfCjbaXPUhVa0XbJ4b+v+P32xqXjDB6+il88rIZPJ/V3OsN13epVaoVQxeIrGAXjer
+	FeDxZBqwFOibdn6zHRcjJvYQROJrvuHF0Y0TSQYvcfpxulGtRpgVfNdk7R6U79DSe/wUHmmRVxV
+	cB3tpfP/enNVsnFEEVyjCjT2+CwkpS92KmnRng==
+X-Received: by 2002:a05:622a:1350:b0:508:fd42:fd05 with SMTP id
+ d75a77b69052e-50939a71860mr10578861cf.15.1773233439313; Wed, 11 Mar 2026
+ 05:50:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-4-will@kernel.org>
-In-Reply-To: <20260305144351.17071-4-will@kernel.org>
+References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-8-will@kernel.org>
+In-Reply-To: <20260305144351.17071-8-will@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Mar 2026 12:49:23 +0000
-X-Gm-Features: AaiRm50zL21Iu6bgO6eh5nslf62hR-XP381uJXsn-8C7zkK1BYfoGCC_CzNKrWU
-Message-ID: <CA+EHjTy3ipkQ+h2h5acbJSJHMe-aPw=Ai+g74vgRi3mRSK_Jvg@mail.gmail.com>
-Subject: Re: [PATCH v3 03/36] KVM: arm64: Rename __pkvm_pgtable_stage2_unmap()
+Date: Wed, 11 Mar 2026 12:50:01 +0000
+X-Gm-Features: AaiRm51sTqxrySh9KC3XT21S-_vQhCPKCeyE6B5vcg193qR82nHh14nvlAF10uY
+Message-ID: <CA+EHjTxRNVTGM67RfwaVmPUkPmtqhyn5cA8jqKBrUgos9Sp65Q@mail.gmail.com>
+Subject: Re: [PATCH v3 07/36] KVM: arm64: Ignore MMU notifier callbacks for
+ protected VMs
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -97,10 +98,9 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Thu, 5 Mar 2026 at 14:44, Will Deacon <will@kernel.org> wrote:
 >
-> In preparation for adding support for protected VMs, where pages are
-> donated rather than shared, rename __pkvm_pgtable_stage2_unmap() to
-> __pkvm_pgtable_stage2_unshare() to make it clearer about what is going
-> on.
+> In preparation for supporting the donation of pinned pages to protected
+> VMs, return early from the MMU notifiers when called for a protected VM,
+> as the necessary hypercalls are exposed only for non-protected guests.
 >
 > Signed-off-by: Will Deacon <will@kernel.org>
 
@@ -110,49 +110,108 @@ Cheers,
 /fuad
 
 > ---
->  arch/arm64/kvm/pkvm.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/mmu.c  |  9 ++++++---
+>  arch/arm64/kvm/pkvm.c | 19 ++++++++++++++++++-
+>  2 files changed, 24 insertions(+), 4 deletions(-)
 >
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index ec2eee857208..43632c69adaf 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -340,6 +340,9 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
+>  void kvm_stage2_unmap_range(struct kvm_s2_mmu *mmu, phys_addr_t start,
+>                             u64 size, bool may_block)
+>  {
+> +       if (kvm_vm_is_protected(kvm_s2_mmu_to_kvm(mmu)))
+> +               return;
+> +
+>         __unmap_stage2_range(mmu, start, size, may_block);
+>  }
+>
+> @@ -2219,7 +2222,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+>
+>  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+> -       if (!kvm->arch.mmu.pgt)
+> +       if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+>                 return false;
+>
+>         __unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
+> @@ -2234,7 +2237,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>         u64 size = (range->end - range->start) << PAGE_SHIFT;
+>
+> -       if (!kvm->arch.mmu.pgt)
+> +       if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+>                 return false;
+>
+>         return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
+> @@ -2250,7 +2253,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+>         u64 size = (range->end - range->start) << PAGE_SHIFT;
+>
+> -       if (!kvm->arch.mmu.pgt)
+> +       if (!kvm->arch.mmu.pgt || kvm_vm_is_protected(kvm))
+>                 return false;
+>
+>         return KVM_PGT_FN(kvm_pgtable_stage2_test_clear_young)(kvm->arch.mmu.pgt,
 > diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 7797813f4dbe..42f6e50825ac 100644
+> index 42f6e50825ac..20d50abb3b94 100644
 > --- a/arch/arm64/kvm/pkvm.c
 > +++ b/arch/arm64/kvm/pkvm.c
-> @@ -322,7 +322,7 @@ int pkvm_pgtable_stage2_init(struct kvm_pgtable *pgt, struct kvm_s2_mmu *mmu,
->         return 0;
->  }
+> @@ -407,7 +407,12 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
 >
-> -static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 end)
-> +static int __pkvm_pgtable_stage2_unshare(struct kvm_pgtable *pgt, u64 start, u64 end)
+>  int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
 >  {
->         struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
->         pkvm_handle_t handle = kvm->arch.pkvm.handle;
-> @@ -350,7 +350,7 @@ void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
->         if (!handle)
->                 return;
+> -       lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
+> +       struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+> +
+> +       if (WARN_ON(kvm_vm_is_protected(kvm)))
+> +               return -EPERM;
+> +
+> +       lockdep_assert_held_write(&kvm->mmu_lock);
 >
-> -       __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
-> +       __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+>         return __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
 >  }
+> @@ -419,6 +424,9 @@ int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>         struct pkvm_mapping *mapping;
+>         int ret = 0;
 >
->  void pkvm_pgtable_stage2_destroy_pgd(struct kvm_pgtable *pgt)
-> @@ -386,7 +386,7 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->                         return -EAGAIN;
+> +       if (WARN_ON(kvm_vm_is_protected(kvm)))
+> +               return -EPERM;
+> +
+>         lockdep_assert_held(&kvm->mmu_lock);
+>         for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping) {
+>                 ret = kvm_call_hyp_nvhe(__pkvm_host_wrprotect_guest, handle, mapping->gfn,
+> @@ -450,6 +458,9 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+>         struct pkvm_mapping *mapping;
+>         bool young = false;
 >
->                 /* Remove _any_ pkvm_mapping overlapping with the range, bigger or smaller. */
-> -               ret = __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
-> +               ret = __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
->                 if (ret)
->                         return ret;
->                 mapping = NULL;
-> @@ -409,7 +409,7 @@ int pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 addr, u64 size)
+> +       if (WARN_ON(kvm_vm_is_protected(kvm)))
+> +               return -EPERM;
+> +
+>         lockdep_assert_held(&kvm->mmu_lock);
+>         for_each_mapping_in_range_safe(pgt, addr, addr + size, mapping)
+>                 young |= kvm_call_hyp_nvhe(__pkvm_host_test_clear_young_guest, handle, mapping->gfn,
+> @@ -461,12 +472,18 @@ bool pkvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr, u64
+>  int pkvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr, enum kvm_pgtable_prot prot,
+>                                     enum kvm_pgtable_walk_flags flags)
 >  {
->         lockdep_assert_held_write(&kvm_s2_mmu_to_kvm(pgt->mmu)->mmu_lock);
->
-> -       return __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
-> +       return __pkvm_pgtable_stage2_unshare(pgt, addr, addr + size);
+> +       if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
+> +               return -EPERM;
+> +
+>         return kvm_call_hyp_nvhe(__pkvm_host_relax_perms_guest, addr >> PAGE_SHIFT, prot);
 >  }
 >
->  int pkvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+>  void pkvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr,
+>                                  enum kvm_pgtable_walk_flags flags)
+>  {
+> +       if (WARN_ON(kvm_vm_is_protected(kvm_s2_mmu_to_kvm(pgt->mmu))))
+> +               return;
+> +
+>         WARN_ON(kvm_call_hyp_nvhe(__pkvm_host_mkyoung_guest, addr >> PAGE_SHIFT));
+>  }
+>
 > --
 > 2.53.0.473.g4a7958ca14-goog
 >
