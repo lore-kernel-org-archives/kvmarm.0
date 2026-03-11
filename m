@@ -1,91 +1,91 @@
 Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFAA3B6340
-	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC461DC9B3
+	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224068; cv=pass; b=C5b6tx8KkOMe9J6qllKM4XrUONbRLat9/Xo1kdpPKAnp2ldGYhZb864pUDoL/ViowPopQ+lq8Qk2fKHqhB9ZKXZJkjGgFInGK7OE1PZfPERal5dINxMAmkVWHJ3CXUOe9PF1rE8dkBJxB7BcdP1d6mqaoJUw+01r1dpOnr3MujU=
+	t=1773224179; cv=pass; b=iD8/MJKpF2Zj9/w8IxUm90LJRAgtU1H1h+74Bcyxw2Z69d7wOmKPBeA0TTjY18UeuHMy0JYJ8VTFsHAqaJbwtRGc0ounHIipmhEeTgfo93ty4TidqGc+IjgLLaoRo6sCIn0VKB+WL7kFo8HG7HjGzo1r9LKiwGMFPf31+fVaXZY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224068; c=relaxed/simple;
-	bh=Tf+TEAcCigm0U/4W+bgn9sPQByO6ra0E5peNwDeSDuo=;
+	s=arc-20240116; t=1773224179; c=relaxed/simple;
+	bh=9g2SmQiGEfNTClEi280mbk6rYgekPcWB1kNKSCZa1cc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZuhSFf8kf62egG3+9rFoRIquJKn+BqP75XKOSMd1LztQvLox7VyfjCOgkoghe91uBxlKtmZ/OkE3ieQwNhJXrY6CgKL+EFSlg7rHdjbzl7PKh25Af0P6pD8X9ZpMqeojCvxa4b8eSiytHQeZg9K5j1aXi//LPAmGEapX/YfyuTU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ubBQqkvj; arc=pass smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=hBodKPXz4S5hk/Jty8NFDcTGKNcuXcrILvRE3QNwf2/S5sNQi5x9F/uUE89oEOvwZwZja2j2Kd6tvXifm0K6QGsyN7wgGFfD891Y3SFVV3zgsuqMXNIzRpbo+OHUYeQX219BT1KmdxbAdStgFur/kQioniQSAUkArtcSUd8LWnY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T5QVGb/j; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ubBQqkvj"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-509062d829dso409731cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:14:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773224064; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T5QVGb/j"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-509069a7a7fso507461cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:16:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773224177; cv=none;
         d=google.com; s=arc-20240605;
-        b=gHdA0IcRpaZn2Y6qeeeiassqL1h0QzlHA9Y799rcr1HaKnKk0b5NbR/MWsMP4VIq88
-         tc5zd0hQMg1r3anVrszeNzZXD092zVcqhg20ulfy84Sbl6WZZkhDswmd3XYqCqkqe1bA
-         IyB48jXRpzgx/JHPJPAenKOU5KydAkE4/ZQctzDVGt3kbjYfI4lh6efzZsv5l52STTqE
-         1DInYyXLPssA7/1vfaGFTNrs77uFlHdRxT4NxOEhx4cNWyuxRG49VmNevQCwosEZri/q
-         LfufNnFmSnajj+ToYjnt1Dqxc2MRmcgqo8ZrTtie6rEEzDQFL6UgPpcQtrX6oPgMjW6u
-         Cfnw==
+        b=dsmNqmSxpRQ1UY5uhk9KowxJmRmEU0hFups4ycmbyuldirx7oZh1YCMvQhW5YW1pZb
+         48A6Yq4rQTDiCQMeOvMn1wwZxHLZO9ssnP5d5m33cBGD+w81194J5F1nq6lIei8YhMqE
+         6O1ZUKrQ/ewDoDbBCYfTh0u/Rb4tcHm4eIWoLsFrcVF1gvwfj0noxVHggCrqvoFCSs2+
+         raw2sowTktu7rH+68Nsea29DK6rn22XcO0ITq3NEY4ZaG3tTYuKSF3SFQG9DtIskQXyp
+         al2enMG65J+t/OGbcc9n3DikBv9BfgVCcvFpe4E3qk/smj40WUo4tcU9SWdcioYDXPWA
+         JA+w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=lfLV59o4o1tglwLSOeFGWvFMCd8yTLZw+74FUNPihEs=;
+        bh=oX0osco4zt+YO7jQlRuz/PukjnHOmVE7FLgSU6O4vqQ=;
         fh=Jxzwzg3laewSUvCA2a09gOOd6H1o1mMdzeS5XgaaAVk=;
-        b=EkDbRmwWPylLOIRc+GSVum5yCWx5IIvRtRPD0x07LkI1Vrk7Vg8WJpOFnonoEsI1zm
-         j26E+q39VAEJFmtZFl9M2zEdGOxU6g2xG+J3ifyKg0ZRE4CFHTewJQqPZ9Dpke/VvY9s
-         bStLZ2fDfm5y7DnXnDEtdzpCq1Uk+3C8ZotI76nYjryMTBqEXnR2/zaWLc1ohX8sZdi3
-         DcfjBqY6yWxpgeQPXEngzAftM6PxLeGM4Ax515QMZVhdBA/PzvISH4NqO5bEhYzNhcan
-         /E5V8raQKsYKBKRAPAi7egP0BAF9LIeqyuaHzbc1+lWtPwzXuRn5o1HeeI6iwn69GKCj
-         3/Lg==;
+        b=kYk7kql4bSWdwarbeldmy/5rR5VW6Ml/OZAspsTCnCeuIO0u+sqlNwfpZMpScYzFsd
+         XaPm5brjmzE6Q4UlHRkUonS5Cd6o5RPeQ+c5rGJMA8RM8IQg5nx7vHrblGVTkm/HrEcY
+         nrgFjvH1iNodaNnZhUJlVsUFGEicF+kTusKAMH1X5Bb8Bx4DR3NllhvKvQRHnLL2E6rP
+         Ch4rX0Q3uRucctZBU0OCaMfakF31puokJ23xePUngmfb2fxqzHhqpR/G8/8aSF7iLII7
+         c7dl/dQMOhZD1+ELfkXua56b9KlnURZZbzN7GqcicXsaImg8Klq1qBoHFk9ExMDOdu2+
+         kVeQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773224064; x=1773828864; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1773224177; x=1773828977; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lfLV59o4o1tglwLSOeFGWvFMCd8yTLZw+74FUNPihEs=;
-        b=ubBQqkvjp2UOgtBU9yTebvHnuZbHTd2ZLwltAKWSh1mZhcGz69nVF8//vbmmikVxHt
-         ofH/KfLjSPqItSCifPKhSjNNp/ymZn6r11M89I4rooYVPV+QQswsEhqPHYcVIgBcId50
-         54deeHWTPsBqGA+PhrtRL6GCqiSalAOW8OpDvNkXuuhN8taUGpB1kyzPlo4AveVsHS1C
-         +ecYgnlA9mLzw6KN3ueeJYHmTusgH7klyRPQNZHNDhjG5fa1st0XZP5nSKQzQZg2CfIW
-         0Np0GB7FbAcbCxyzE5rRLZG3pVcJbIZsBw1Q1dnEeQy5OWWJ7iQKGIvIRI9Rrmmpwu8C
-         PiXQ==
+        bh=oX0osco4zt+YO7jQlRuz/PukjnHOmVE7FLgSU6O4vqQ=;
+        b=T5QVGb/jCxxtv/fxqChok4x6lbdACvFaZwYTVVO88fwefIGTpEhrHO3zaIGJq4o9Sa
+         fpNSS+kjq8d2G4sEcjs4X906231BUAoMCIZ4myHpGYlYXOHtnIHJzr/TpPmxGMomhSQO
+         Hq3MAo//WVYDYHaWoTDmS6QJV0ey43yGUDqdCjqQzVS9Pz44YgfRLF4y/i/ZwSGwXzgS
+         maLeabTHy4MU4msf9gpfWiGgkqUG1s97Sv64jevZbeQA+RHyg+yvJVBfrcPgcRUGS3e/
+         iCq0C06vCsXa9maTY1roS7rTpZaFTrsg5oVjAIH4DJ3t1TxTVjHjcEd5HzJx9zZF5gh/
+         8SIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773224064; x=1773828864;
+        d=1e100.net; s=20230601; t=1773224177; x=1773828977;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lfLV59o4o1tglwLSOeFGWvFMCd8yTLZw+74FUNPihEs=;
-        b=n58Vfm0XLNJoFKBDIqglx8ufFKPBRadm9vbUFA9L2fcm248NYUmFw0WlM9Ww4+cRyX
-         LUg9bTPshJz/MW/PpF2Me7GmBWdbG0yCiCNdeQKPgp5b0UtIt0bTCvyHxS+thdv5vjMC
-         Zqyigb8q6q3tbJrC58799SSzMJ1+Cij/iMw5u0dyhal1qivt2EfTQScR2j2keOTCBjO0
-         pzoUyXj+XiFfjoUY8vve+KgTaIej/V+Q54BGPshlcQxtRiLBVUGz1QKpbwHEGP03Q9tR
-         NLPQDJow2VGM804/MWSYk/Z7xGO7m6vvM2AA+xISWrdlQVSotIdZYsD0RNhd9YqoU6D0
-         owIA==
-X-Gm-Message-State: AOJu0Yyc595I/46UBqwSDJXo4LdLqxsZxrQwsO+RSY5Di1EBSQ17fa3L
-	DpALiqYJJ00r6UMq6eaHAuqv2bs77TeUAEoyv5uybwe0CYz9FkkYkc9yzZQPYq30C3SgCro9355
-	K/4/bGjzo+C1/OQ6h383pvT9yDogETl9XTnjqrBnZ
-X-Gm-Gg: ATEYQzz4qM8J7pEJiqW+76FtB5nQWPKOMVcRcetRlD2X4XAppZ2QEPpI2hOP+EwqHSA
-	TGaECr6tmJfIqkLJabSBbIVTYhGIPbrJdy21+pyhezl481s70qA+R82X9dC2jrEaVK3lC30QF47
-	d4j0haaqOeATMAQac8hiQPiMuNyGufYbOAxGdao0Bq3ykAkt46vyis5x3vunuWuF3h5FS06yEaM
-	uff9+VCB3FJso4RFVc/tHmTAeK2L9/SoYvFPDwu0ApiS+d/ce9VDYiO45j89w44FXYugT5zGGdy
-	4dhCrcdcD0CeyqscHo2PtgyAkcSCv0VsVarc/Y0JRScZ5VEN
-X-Received: by 2002:ac8:7c53:0:b0:503:4bc:c925 with SMTP id
- d75a77b69052e-50939a5cc4bmr8975271cf.13.1773224063283; Wed, 11 Mar 2026
- 03:14:23 -0700 (PDT)
+        bh=oX0osco4zt+YO7jQlRuz/PukjnHOmVE7FLgSU6O4vqQ=;
+        b=OiAMlk219+NYl6+JlGb3xlphjQ0SFt/XUbe5/wg1JRbMDYefwqSLbV/QrhweKklXV7
+         kEWn+jdgQz/roWIoc4tNhEnXl3oUx3BybcB2sO7GImcHcpwTlbDDWTAlpHQ0VW0mbpp5
+         4MoutYfELwattcXWf0HEk7MGCTo6CkbUG8b2IvLzQGfiQetAdpyz2+rYHtzaPijuVRKe
+         X38JDVr+Jbzax7fwV8B4AgUqmbMqUytsWxrKDeQ0PbGRBsFAwkZB7RmMPZSVvegw/1dY
+         uqzDqjIw0Q5e93Y84FLkOZgTlHUaoOunJfogSueb0iZ2vrvflIHMgVg/ZAxpPJsZoRQH
+         +8/w==
+X-Gm-Message-State: AOJu0YxOS9nil41EHRdxRQ3QAI25y5NAyI7ogodGqy6sbHK78y/pnaPO
+	NsZZGXHL5k9WN7xp7kZPXMTSCbPZ5Bg2TamFA0oIVxfAB4K/EiknAixtYJDXNx8mrrp+A1+h441
+	7wdxnRhtZCYa3Qh2vTTILqer2+KNGx3AXHKE5LZA9
+X-Gm-Gg: ATEYQzzACsvcNMvOKqXjxRQ3LLKV66St80V5U06KfaOZXCt0nDeMyrjbkqGrRk/Qisn
+	DpIDJEdb/PoPmsCEHGwvuDjN3BS7s351cMIXiNl+NH22USSLde22WqaXc5vYSD6ezyuxBVdscgb
+	g4bvVqsG1mO2+zzepLI1TtiFbMvEPQstdaIWfMUnssjUtz2j++hfAqNx/p66Isdilr+gf+C9hig
+	iU8H1N47MB54AKcXFKwyoSbH+bf8vX67f4UoOT8SY54JOZ/9fOFNFyMZGzMO6sYvGWeeSZhZDyQ
+	7tXzvo1au9U3KsWPXbvbhecdmVNJhNmg29GbQw==
+X-Received: by 2002:a05:622a:190d:b0:509:2cd4:b705 with SMTP id
+ d75a77b69052e-50938183523mr11750721cf.4.1773224176634; Wed, 11 Mar 2026
+ 03:16:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-19-will@kernel.org>
-In-Reply-To: <20260305144351.17071-19-will@kernel.org>
+References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-3-will@kernel.org>
+In-Reply-To: <20260305144351.17071-3-will@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Mar 2026 10:13:46 +0000
-X-Gm-Features: AaiRm52JOrlHxk-wEWSReaveEiUCp-2PTv-VngEIYEq9CUZ8OT8VXU4ZwIjWCks
-Message-ID: <CA+EHjTwORdwR2QRQ16CmJGuGSOdjnRXoP53C5mBt_Rn0R6aH_A@mail.gmail.com>
-Subject: Re: [PATCH v3 18/36] KVM: arm64: Inject SIGSEGV on illegal accesses
+Date: Wed, 11 Mar 2026 10:15:39 +0000
+X-Gm-Features: AaiRm522OYTO4Z5oXSIsWNgqKROWgEipfiQnlhS80N_B-LAEswBJVDHD3G64CEI
+Message-ID: <CA+EHjTx4T9AZkvBkJbdsqkw=joNuj1vGQ+d4xqGLsMNpKzXuLw@mail.gmail.com>
+Subject: Re: [PATCH v3 02/36] KVM: arm64: Move handle check into pkvm_pgtable_stage2_destroy_range()
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -95,20 +95,19 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 5 Mar 2026 at 14:45, Will Deacon <will@kernel.org> wrote:
+On Thu, 5 Mar 2026 at 14:44, Will Deacon <will@kernel.org> wrote:
 >
-> From: Quentin Perret <qperret@google.com>
+> When pKVM is enabled, a VM has a 'handle' allocated by the hypervisor
+> in kvm_arch_init_vm() and released later by kvm_arch_destroy_vm().
 >
-> The pKVM hypervisor will currently panic if the host tries to access
-> memory that it doesn't own (e.g. protected guest memory). Sadly, as
-> guest memory can still be mapped into the VMM's address space, userspace
-> can trivially crash the kernel/hypervisor by poking into guest memory.
+> Consequently, the only time __pkvm_pgtable_stage2_unmap() can run into
+> an uninitialised 'handle' is on the kvm_arch_init_vm() failure path,
+> where we destroy the empty stage-2 page-table if we fail to allocate a
+> handle.
 >
-> To prevent this, inject the abort back in the host with S1PTW set in the
-> ESR, hence allowing the host to differentiate this abort from normal
-> userspace faults and inject a SIGSEGV cleanly.
+> Move the handle check into pkvm_pgtable_stage2_destroy_range(), which
+> will additionally handle protected VMs in subsequent patches.
 >
-> Signed-off-by: Quentin Perret <qperret@google.com>
 > Signed-off-by: Will Deacon <will@kernel.org>
 
 Reviewed-by: Fuad Tabba <tabba@google.com>
@@ -117,133 +116,36 @@ Cheers,
 /fuad
 
 > ---
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 37 +++++++++++++++++++++++++++
->  arch/arm64/mm/fault.c                 | 22 ++++++++++++++++
->  2 files changed, 59 insertions(+)
+>  arch/arm64/kvm/pkvm.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 31b6a52e5e4c..0dc1d6fc546c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -18,6 +18,7 @@
->  #include <nvhe/memory.h>
->  #include <nvhe/mem_protect.h>
->  #include <nvhe/mm.h>
-> +#include <nvhe/trap_handler.h>
+> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+> index d7a0f69a9982..7797813f4dbe 100644
+> --- a/arch/arm64/kvm/pkvm.c
+> +++ b/arch/arm64/kvm/pkvm.c
+> @@ -329,9 +329,6 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+>         struct pkvm_mapping *mapping;
+>         int ret;
 >
->  #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_AS_S1 | KVM_PGTABLE_S2_IDMAP)
->
-> @@ -612,6 +613,39 @@ static int host_stage2_idmap(u64 addr)
->         return ret;
->  }
->
-> +static void host_inject_mem_abort(struct kvm_cpu_context *host_ctxt)
-> +{
-> +       u64 ec, esr, spsr;
-> +
-> +       esr = read_sysreg_el2(SYS_ESR);
-> +       spsr = read_sysreg_el2(SYS_SPSR);
-> +
-> +       /* Repaint the ESR to report a same-level fault if taken from EL1 */
-> +       if ((spsr & PSR_MODE_MASK) != PSR_MODE_EL0t) {
-> +               ec = ESR_ELx_EC(esr);
-> +               if (ec == ESR_ELx_EC_DABT_LOW)
-> +                       ec = ESR_ELx_EC_DABT_CUR;
-> +               else if (ec == ESR_ELx_EC_IABT_LOW)
-> +                       ec = ESR_ELx_EC_IABT_CUR;
-> +               else
-> +                       WARN_ON(1);
-> +               esr &= ~ESR_ELx_EC_MASK;
-> +               esr |= ec << ESR_ELx_EC_SHIFT;
-> +       }
-> +
-> +       /*
-> +        * Since S1PTW should only ever be set for stage-2 faults, we're pretty
-> +        * much guaranteed that it won't be set in ESR_EL1 by the hardware. So,
-> +        * let's use that bit to allow the host abort handler to differentiate
-> +        * this abort from normal userspace faults.
-> +        *
-> +        * Note: although S1PTW is RES0 at EL1, it is guaranteed by the
-> +        * architecture to be backed by flops, so it should be safe to use.
-> +        */
-> +       esr |= ESR_ELx_S1PTW;
-> +       inject_host_exception(esr);
-> +}
-> +
->  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+> -       if (!handle)
+> -               return 0;
+> -
+>         for_each_mapping_in_range_safe(pgt, start, end, mapping) {
+>                 ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_guest, handle, mapping->gfn,
+>                                         mapping->nr_pages);
+> @@ -347,6 +344,12 @@ static int __pkvm_pgtable_stage2_unmap(struct kvm_pgtable *pgt, u64 start, u64 e
+>  void pkvm_pgtable_stage2_destroy_range(struct kvm_pgtable *pgt,
+>                                         u64 addr, u64 size)
 >  {
->         struct kvm_vcpu_fault_info fault;
-> @@ -635,6 +669,9 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
->         addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
->
->         switch (host_stage2_idmap(addr)) {
-> +       case -EPERM:
-> +               host_inject_mem_abort(host_ctxt);
-> +               fallthrough;
->         case -EEXIST:
->         case 0:
->                 break;
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index be9dab2c7d6a..3abfc7272d63 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -43,6 +43,7 @@
->  #include <asm/system_misc.h>
->  #include <asm/tlbflush.h>
->  #include <asm/traps.h>
-> +#include <asm/virt.h>
->
->  struct fault_info {
->         int     (*fn)(unsigned long far, unsigned long esr,
-> @@ -269,6 +270,15 @@ static inline bool is_el1_permission_fault(unsigned long addr, unsigned long esr
->         return false;
+> +       struct kvm *kvm = kvm_s2_mmu_to_kvm(pgt->mmu);
+> +       pkvm_handle_t handle = kvm->arch.pkvm.handle;
+> +
+> +       if (!handle)
+> +               return;
+> +
+>         __pkvm_pgtable_stage2_unmap(pgt, addr, addr + size);
 >  }
 >
-> +static bool is_pkvm_stage2_abort(unsigned int esr)
-> +{
-> +       /*
-> +        * S1PTW should only ever be set in ESR_EL1 if the pkvm hypervisor
-> +        * injected a stage-2 abort -- see host_inject_mem_abort().
-> +        */
-> +       return is_pkvm_initialized() && (esr & ESR_ELx_S1PTW);
-> +}
-> +
->  static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
->                                                         unsigned long esr,
->                                                         struct pt_regs *regs)
-> @@ -279,6 +289,9 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
->         if (!is_el1_data_abort(esr) || !esr_fsc_is_translation_fault(esr))
->                 return false;
->
-> +       if (is_pkvm_stage2_abort(esr))
-> +               return false;
-> +
->         local_irq_save(flags);
->         asm volatile("at s1e1r, %0" :: "r" (addr));
->         isb();
-> @@ -395,6 +408,8 @@ static void __do_kernel_fault(unsigned long addr, unsigned long esr,
->                         msg = "read from unreadable memory";
->         } else if (addr < PAGE_SIZE) {
->                 msg = "NULL pointer dereference";
-> +       } else if (is_pkvm_stage2_abort(esr)) {
-> +               msg = "access to hypervisor-protected memory";
->         } else {
->                 if (esr_fsc_is_translation_fault(esr) &&
->                     kfence_handle_page_fault(addr, esr & ESR_ELx_WNR, regs))
-> @@ -621,6 +636,13 @@ static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
->                                          addr, esr, regs);
->         }
->
-> +       if (is_pkvm_stage2_abort(esr)) {
-> +               if (!user_mode(regs))
-> +                       goto no_context;
-> +               arm64_force_sig_fault(SIGSEGV, SEGV_ACCERR, far, "stage-2 fault");
-> +               return 0;
-> +       }
-> +
->         perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, addr);
->
->         if (!(mm_flags & FAULT_FLAG_USER))
 > --
 > 2.53.0.473.g4a7958ca14-goog
 >
