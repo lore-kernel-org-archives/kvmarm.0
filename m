@@ -1,101 +1,100 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D49A3C8721
-	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CBD3C9EF8
+	for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 10:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773224618; cv=pass; b=W1lw+fuX//PM77uO8taquEzdyJcs8WBtXc/U/Puh00oW9bCiKt8FYK3kv4tga2RYmRBLhjuzyIb+P6Rl4Kh4tkCMkqoX0sclUqUb4UKAGpN/ZiZL/a2PM7BWuLP94YFJOEBqrxW0xp3VUtx2fzVwOBuxePA3uQ5VLS2bt3CjwBk=
+	t=1773224709; cv=pass; b=DmiyawCj8xVYKfev6n4dZEWuoWTPrG0rGXqCflszkmvxGatQN9r8E13JVoKLhbsYrR498tgSGqwI3sTyVRR4Jgz0x1TiFC1kA+yqI5EXsB4rOE4nYJITCtB7gLMqrsXaC3Ex3/SwaGMIarNIXsGRRk7wo/ermPuPNwzWnuyXpeI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773224618; c=relaxed/simple;
-	bh=VniXpK2aiKyWZVqxqzJ5X0KEnwOMGLPMtyB1HOVv4zw=;
+	s=arc-20240116; t=1773224709; c=relaxed/simple;
+	bh=CKTkOMIFtbddXQCTKzYVtHgeJeHxZRulbVviTlZ0tQo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PT/5gcdlNPp0ABez7hDP1WkoDdn7uuh0y2mBIDAVZHWXguybXbUIPZ+KQwh+PmFTkPakE3tBLVWZJPRhMyxsAVf4z/NyZd8i9xckmcyS8wcPI5+0fnUcnpL91egEvyK0k9yHp0XqxAb+mqT41NbJo5sEjsJxfiii1KSN0XLE0ns=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4JdDKu29; arc=pass smtp.client-ip=209.85.160.172
+	 To:Cc:Content-Type; b=fVDVQnM+iqLqOQGpgaHFYADsGw5Sem8S4MxDxe850qABMz5ZOku6zbdX/aSygvXffr28f47tGYiRpItMVzhztB7QKh5k7plYMD49IPa5a+SOUh33WczWwH/FDY2vjNjhX9L8VTmd5/4N4hCzPYrCDgD6pPop2DYyM5CAcrUHyC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lzfMr/VU; arc=pass smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4JdDKu29"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5091ed02c54so404131cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:23:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773224616; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lzfMr/VU"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-50906a98ffeso521871cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 11 Mar 2026 03:25:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773224707; cv=none;
         d=google.com; s=arc-20240605;
-        b=F6rW+FW/6ftyIYpYNZ1l8HmoeffBVQADdtJi7ftH2p0TzulL8/VB/9elyLjEO22oSi
-         9B72Za1OZ//kbj9X1bUkP6G9sogXEetIwGRIdrXEG7qvFxYiwP9SvvTQMz8o2ewmHzzs
-         M9yiq9gRhRncBIoGhDKmvBXihYL/hAfkqyM0eLHmlnJYjRaCt0mMMQRpWKmCzE+/gVBD
-         l4zuZxo6Xu9uM2o6MDjcVX/5Eu0BzZl20YF3Pg4tlVZF2AodXLgGd4trVhroxsINwiMt
-         dR82oXKhLGzCZ4FW6jcnz2nxaYie81aUgJQCHcwzLdBBREwhLN70jzsxPiPiS6FaZjLF
-         jwtw==
+        b=URSGynqHECBkLWtHTg/+BxNgjmYwV+XkVlh7OKeLLcjtxsGaLXQP+XiGJ7gQQRT7A2
+         7vFhPR0as9Qt3qcDxWdEt0TKlahda763y6qZBAKGBeDkdZpuhNmovErO2YmxICqmrzpx
+         jzAgRBoW4Ym4yXXyCrp8YoAsr+S2GmaldiYzB9EOhKbRO1xGOfYujy6rBED65i46dGRl
+         v04sNb+MMVVnl+jpaPf3fcf+xwyXqkHQue/Ujt9m35eObRI9GIY5VXd1QRmwg+nzgkI4
+         gF7JcEUe64Ey58KnTBhELQZ1af7YJwiTC9FfU6DO7FaVsu46lGFEDowmBl0XDBRhXptV
+         99HQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=Znk/o3FTTjA1o6iiBb0OLOctvOKJgNWplDqjz3yVrX4=;
-        fh=Jxzwzg3laewSUvCA2a09gOOd6H1o1mMdzeS5XgaaAVk=;
-        b=jxVmYNpT4xplnF5exMJC7/5a8H+xaDDemasV0tyFj0htK07XVKnqJEs0gip/Eic7sq
-         tzsliDnxwWA6JIsrgtFXlna+3vhbOZ+IJd+q+rQBwP2ZRXrsTkBrmYKT6ptZ3ItlrmfS
-         2hLbnx126aPZDtL+kY3vky/hviZRN6AeTjRB9e2+Y0xfX/uQbTeuFy5VUKaki/SG9iuS
-         M16MrIwH/TRM+aq/Z/HcQx82eOPVj/wfkpmGVwA2737rCHxzleBTFl4N5GRBBhzun7tG
-         G/RYes/UgdRqz6HLsLWinAXrWT55tcPg6U0P1CKoxvF2KtVR1c1GI9TM+WTkPjbOUft5
-         zG7A==;
+        bh=bX+mY2WVrmnpJpn2taxiXuV/3B4F/EocZyWSHgahxE8=;
+        fh=OsVEnhpHfDtKQejlv1Bgs/tZPAfr3IJ2Ck5WUUi92Sc=;
+        b=ZVry5jAE22yWmkUX6AwAotgwGVeU2yFpWVFwDWhzwQyvAEbvzqtgd3+U17m3ODphXY
+         6cQsHF3KITtJRyKtkHhNoYCHF47DBY62LT/fvT7o3L3nMh0sEiM4iaJacMAOzVqb4hja
+         5N4dHEOi9cjOqFzxxTEY8ybqPtjNVexbyn/+CBfUmk3bIr7EOj1+EXTAcuIsKNcfG/B1
+         49BC26hpoF17DgGh7aIFxoGHfd6wSuj7R9tImMowcuj7jlvmzW8T+UVBKGJh0qgUHZPg
+         qoOxR6gFVsOUfFc7h87yop7QEWqPTCCUeAOa/LvYq/vgdQp8xumddeYEhz05BkNj7PNM
+         zsKw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773224616; x=1773829416; darn=lists.linux.dev;
+        d=google.com; s=20230601; t=1773224707; x=1773829507; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znk/o3FTTjA1o6iiBb0OLOctvOKJgNWplDqjz3yVrX4=;
-        b=4JdDKu295di4sj+LSjYD2fFn5cbncK6SPHYakLH5PWZd3ve4ZLhCG/fxTfJWohSpVQ
-         e6/5jxy6F7gKw0ixpIi+i12gQNusJjWemNyu6GHaHpsQcY/pcnKXuhoNGW+0CfjVGOLJ
-         3ER0ek7u2J70zz4f23X4efyjZh3eSUdYqsUjY/03oil9O060TaVUIYERg0/BX7PlX+K0
-         QvjK1axg1lzut8e4tSOI1mSeiJx2UJtFD/zTru/YxyDtBRaaEybvHzunRTPnlb86ClIB
-         thvukWIbY/R7lTPKmScavxBm3VRaKo5G0H60xJoMZoCT+4TS9Vnud61y6MSxZRHvCm/S
-         QL2g==
+        bh=bX+mY2WVrmnpJpn2taxiXuV/3B4F/EocZyWSHgahxE8=;
+        b=lzfMr/VUALRTydrJ+tdA5YRcGJzfAfkYJrTHyIk97frsR1foyDwHAaXDpnOw6FmEND
+         eneN45Kc94vISpAqFVTMjAyZC7B3frM8TUCXffVvRSUpEu0yb3/WAwhx3Cf4FiR2QoHf
+         neVruEm6j/NrvpV/H93u5uCAHrM1+FbQ65yabAkKbR613GJeRTarGM5PJJI+Mjw3ZzDS
+         fTuOJSdCp/I2woyNYPNWczPnZUsx5yxNWqr27PXsWx/IzLtOdbnW/kGqoWRb5xu4i3O2
+         GwEhqLGWtJaTwqnVaolOUguQUhDH3XxTWSUvVI3419mgDl28okMOXVjSoOyXdWFTYjp1
+         Mziw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773224616; x=1773829416;
+        d=1e100.net; s=20230601; t=1773224707; x=1773829507;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Znk/o3FTTjA1o6iiBb0OLOctvOKJgNWplDqjz3yVrX4=;
-        b=ezs3FqkyYnqyKGnXwt8ehagqUyUwcKj8FMn12DJ+KTa1ehvy3qbDPFEaNqbWz/eteX
-         1Nhk+y0UgwbOpjxPrOlqdxBLzJrQNN4fFs0t7Ge7bbvcqdN5/YdRLIEssfyPe9XE5lO7
-         qLCSN3Jn0llWaLTf7n+bHkXm23Lym+fslPOm6WVIxDSmEfa5aaJYEBRcH4nxDxtnvg42
-         +wG/EkwJCWY+41EpUTylSeqoh9JV9LuxBxb4NKuhxCTenV41DHeQuo/ia5Bovj7Fumvw
-         K+fqWoT8ey9IUf2vOU6JoXmO8pv5OZHk89XkONyYSnApDH3LvKxWVH1eHJ9lB0cKONFa
-         KHtA==
-X-Gm-Message-State: AOJu0Yztn56XUSpz90i2QPmDzAmKNwsbLwhnW3tbeGf4M9NsuVEm4u04
-	Io/eACkJH4BmtM1Jlxac0EtqeGtxu4kSWTmEmSgA4GPEqUM7wlOGXsls75/8AE5zSL4PDNO7iEd
-	Ox+n7PZFYTAfOx8TG+bw4DTmJtbIQzrcrmIUX4Kz5
-X-Gm-Gg: ATEYQzwHX6yRUpLOiG2+NPovODgtDpfyksN/P3GP5oqSGR+7OZbu9TeqqDt2g0d83OV
-	nCuYd+vIZTwWyggmZB5wkMlDGwuXDf7P/mCGHhz2ILEnKKCJcuSk+pj83G5r8RHYvHxX4AJrfA2
-	NTVrGTy+6zOKzLyMX1v6ADg5WCWNY1Dk+wwf4Mli+t6p/a49lyEGpxoCnR88pCJcjCqI/Saeo8t
-	U0iGp0gtAYhkIPke3v1mll304KvAdiSKllpK6BZ+SjYkdgeOE2qoQ/O4C3tjTRxRNc6XAYy63wa
-	jqEGznn4A8ucvK8gnyRCJ3INo19H+HbeqboDyg==
-X-Received: by 2002:a05:622a:14cb:b0:509:1eca:6d24 with SMTP id
- d75a77b69052e-5093818c817mr10979211cf.2.1773224615864; Wed, 11 Mar 2026
- 03:23:35 -0700 (PDT)
+        bh=bX+mY2WVrmnpJpn2taxiXuV/3B4F/EocZyWSHgahxE8=;
+        b=EGVEGAOZq4TB5K3g9t7YDJd/lNRqJRuFsBu0LiD8Crlk9nXSytoxP+Z08NCB/HeSPq
+         4bkGAEAHLJYQ7HYdkqNUR8ss9nkctYQuYNG8PwfmDOIcZviaAEKTrKEYoBiUWYr8iI9+
+         85yRqDkPgfNY7d1UCZqvgC0B12oGQoJjHEQ38ugcoccwZEq3s7+C+E8eTDpY1a/m6maC
+         JMDMvXdUOq2eHWI0WA8P7NNPIG5qDbhduQZB1VPS5Q1xVRRG49lek8Vb5Isiddri8nDN
+         8Hsy2qJHLbuAChs0Gx5MYM/wPoeFYTmC9BHp3jNqmGi5x8ED5aj7K2y3e8OnGQq/jNYA
+         PTgA==
+X-Gm-Message-State: AOJu0YymDDPnOhdWbuqWzYxbe9XKI6/fSnrvniDicFp8SOrPvxKzl/AQ
+	mmpSTK3XYMjbUq2ES/5+fBiZwHx1ufHA7qFyUin2yV2RayyRH1VRad/3B61ghBgKIcTDsxsD0VI
+	6mjUUDM3AnbG4LdrwKOc2jkXGYBm9JbDzblNhQZQz
+X-Gm-Gg: ATEYQzxxVZ2dXSXK9OX5sowisOH7f63saYkRzQTKVJxxFLUNqy/5orNxodjpfWU27EL
+	d4e3QpuDk86MvNdLXbSqFCx8Q9HMhhFwLsui4Zi/H1xuTiuRwZAJKEGRTg04orowI4NQ6FhGcx1
+	/SK8SHQVw2EXs/HSBXQvLpV2eEIPrP4/SmGIJHVEqQwsQNbfx3cieEcnVrzxENaFpPb9MrN83w1
+	ZrAnRFmdJbklVAkpNb6byU63tDPkmJaDuVKecWM52V7pWyviLysY0zea7XUrxy5KcY/sYj7W7la
+	KSN0dFxnQQFeso8om7PzQHig6L5UsIf6gzDtRA==
+X-Received: by 2002:a05:622a:11d5:b0:509:174d:3224 with SMTP id
+ d75a77b69052e-50939a12f0amr9025571cf.11.1773224706917; Wed, 11 Mar 2026
+ 03:25:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260305144351.17071-1-will@kernel.org> <20260305144351.17071-14-will@kernel.org>
-In-Reply-To: <20260305144351.17071-14-will@kernel.org>
+References: <20260119124629.2563-1-will@kernel.org> <20260119124629.2563-15-will@kernel.org>
+In-Reply-To: <20260119124629.2563-15-will@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 11 Mar 2026 10:22:58 +0000
-X-Gm-Features: AaiRm51nPsb7tNbmy2Jyecx_WTDjL9A5ByE7o_zgvxGOIXmo2XmEdSMXGPWCjcc
-Message-ID: <CA+EHjTzCzgMRF7uirWtd7GjXqjTvUf8sootS5yzj2nfQxMZMVg@mail.gmail.com>
-Subject: Re: [PATCH v3 13/36] KVM: arm64: Handle aborts from protected VMs
+Date: Wed, 11 Mar 2026 10:24:30 +0000
+X-Gm-Features: AaiRm53g6mmzRXB6NETrMopC8OxkyI8MPN0iN1tfTmOqJxXbfxGb6_DHFLuJIms
+Message-ID: <CA+EHjTzst-FLQ=6Zn=ERDHpeKWd=3w3WeAhZ9PUEjqw5a1vPtA@mail.gmail.com>
+Subject: Re: [PATCH v2 14/35] KVM: arm64: Handle aborts from protected VMs
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
 	Catalin Marinas <catalin.marinas@arm.com>, Quentin Perret <qperret@google.com>, 
-	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>
+	Vincent Donnefort <vdonnefort@google.com>, Mostafa Saleh <smostafa@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 5 Mar 2026 at 14:44, Will Deacon <will@kernel.org> wrote:
+On Mon, 19 Jan 2026 at 12:47, Will Deacon <will@kernel.org> wrote:
 >
 > Introduce a new abort handler for resolving stage-2 page faults from
 > protected VMs by pinning and donating anonymous memory. This is
@@ -108,15 +107,16 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 
 Cheers,
 /fuad
+
 > ---
 >  arch/arm64/kvm/mmu.c | 89 ++++++++++++++++++++++++++++++++++++++++----
 >  1 file changed, 81 insertions(+), 8 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 9d183df0b0ac..4e64528d86a6 100644
+> index a23a4b7f108c..b21a5bf3d104 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1642,6 +1642,74 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> @@ -1641,6 +1641,74 @@ static int gmem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >         return ret != -EAGAIN ? ret : 0;
 >  }
 >
@@ -191,7 +191,7 @@ Cheers,
 >  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >                           struct kvm_s2_trans *nested,
 >                           struct kvm_memory_slot *memslot, unsigned long hva,
-> @@ -2201,15 +2269,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> @@ -2190,15 +2258,20 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
 >                 goto out_unlock;
 >         }
 >
@@ -221,5 +221,5 @@ Cheers,
 >                 ret = 1;
 >  out:
 > --
-> 2.53.0.473.g4a7958ca14-goog
+> 2.52.0.457.g6b5491de43-goog
 >
