@@ -1,123 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFB131E85C;
-	Wed, 11 Mar 2026 17:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D153345757;
+	Wed, 11 Mar 2026 17:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773250748; cv=none; b=u0pYxEVj7aEzNGlKWjjgeiDGxB+QEaexfvIOSGikcYKdETVrWuxLrmFCLGYDt3N+YF9dUF8ExBX2jwVk6xqcWw8wuNrkzHRLgqYqtuI41ETCWIurYSUMJ6FLpAockRpbXrcjyHjTXwFGMnA6EwKllMF65Hqt8I0HRsrcK5uDlGM=
+	t=1773250903; cv=none; b=bEZJ2yN5MTLx4ZiU6V/Izj27Ek8OZ7WeTveVXvqDPVV/r5gKwD9zN4ROKQr4eytsmAbcZ71lvBSrbOgIpWAOYDf09XUJm+4Uh8oB+S5paM1T/Gcigcy69zlJPWgJbEVeg58lNYVdwtG8FvUQeqx9pB4wHA0peOyaZBedxMGuhBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773250748; c=relaxed/simple;
-	bh=fP9knvWB809mP95QO2qmeNhA8WW80ekwnk7WzqZ8LtU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nEUdK5FqPnu966eYSuz+2bQwl/QgOPMkk5LRQKuRUOyg3O3MxbvcGR3ECbgaR6oDplL7r4ZI7SJrFOALaG62Ioy+pXKj3Ta5QrFUjJyOuG3ufGdUI8SFoNdjOtDMK08dovLKkr8AWwiImJmDglBtj88YRchLIXVZvQm9J3eRW70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUTiNV1y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773250903; c=relaxed/simple;
+	bh=gP4gRhmS3cvLvRIZkEGmfYYOSIKE8FUA6HXqm+5tQXo=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ks1rKU4HFD6ajCIe9wgpi7J1kD2DN0cB1mv1Kl9+a6rGfBueNsBwtj2LJMakyICEU9BOmR2qRvVPypzl9wzbuyGjU1PmuGupwjY3+79tDRyvO9WfLq0J33vSLEXE0cm3TP5EsdvHw5xV4YvC4iTHNZlyxbz2WLt8OVJzGM9qU+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XshCqUTe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUTiNV1y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0BCBC4CEF7;
-	Wed, 11 Mar 2026 17:39:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XshCqUTe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB003C4CEF7;
+	Wed, 11 Mar 2026 17:41:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773250747;
-	bh=fP9knvWB809mP95QO2qmeNhA8WW80ekwnk7WzqZ8LtU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HUTiNV1yR9BPpa9FYPJ75orhiMDMoTljqgdkwThDZKRRKhTn2V8Z2e7cterG3IR2B
-	 s7BNvftfWlxiKIq7GyJeqjsGPU6KBXz86yfJBKnR0gW88sMPVG1eMTBiPUeXQXMCSD
-	 EPJ/QyG2d4HAs+d0tJIWB0QV8tOtKml0w9W4zSkUVQlTF3vhoS74FZTYlVDYoLuSTQ
-	 F3FcCE4Ov7jdOXUQjl7U8tekYhbAqrDp2d52k1/Uh48CijbYiZbtMSanYRqIDehN4l
-	 5BsH/El1yj7xkhLHdQhGk1MmYnUdmL7PIOSKzjci1RdKgB64+7k1EUhY3wCoo2N47t
-	 BpAdEDpBFy5Cg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	s=k20201202; t=1773250902;
+	bh=gP4gRhmS3cvLvRIZkEGmfYYOSIKE8FUA6HXqm+5tQXo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XshCqUTegp+e6birKbPNCEQbSXiWMLxmOxyHdUyGGRuyW7CmE58AUPQcm65pFbnM2
+	 G/rVi26Lmi1vRFW2oH+xoTd0aLNbEzY5wGRGTpb4242FT1ecDAPq3lDFiEsXNcj3Cb
+	 ojisbqw2bBi/Uje82fUsCdtl7WopzPao3nuC/ohSfIsK1Nv8b5rYvJ7si0Ic1DNGNo
+	 7Viw8icrXKXt1NeF6LOUqzr/gCRGYTTHThL1IEV4pAF9e6lhy/XmTUyKpvlSzqVuwH
+	 iT++MqSAwSfSdqdHLhWuPBET5yec83M+pCJZmycsJL/ocQqyr7ACbZ/ePGD5hQfUgh
+	 WI8ZNojZQrAyg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w0NWT-00000000yNN-1L8K;
-	Wed, 11 Mar 2026 17:39:05 +0000
+	id 1w0NYy-00000000yRf-1wQn;
+	Wed, 11 Mar 2026 17:41:40 +0000
+Date: Wed, 11 Mar 2026 17:41:39 +0000
+Message-ID: <865x726z70.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Valentine Burley <valentine.burley@collabora.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
+Cc: Fuad Tabba <tabba@google.com>,
+	Quentin Perret <qperret@google.com>,
+	Yuan Yao <yaoyuan@linux.alibaba.com>,
+	Zenghui Yu <zenghui.yu@linux.dev>,
 	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM/arm64 fixes for 7.0, take #3
-Date: Wed, 11 Mar 2026 17:39:02 +0000
-Message-ID: <20260311173902.329537-1-maz@kernel.org>
-X-Mailer: git-send-email 2.47.3
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 7.0, take #2
+In-Reply-To: <CABgObfYjQaTiC7ng3rY1FveMqgzgWvKk1ER6rymfbWNSo74jtQ@mail.gmail.com>
+References: <20260306112231.3201502-1-maz@kernel.org>
+	<CABgObfYJqhj3xiM4_+7gCE1x5v5JQhyS0ox4+obrsZwA2W4GYg@mail.gmail.com>
+	<867bri70xo.wl-maz@kernel.org>
+	<CABgObfYjQaTiC7ng3rY1FveMqgzgWvKk1ER6rymfbWNSo74jtQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, suzuki.poulose@arm.com, valentine.burley@collabora.com, vdonnefort@google.com, joey.gouly@arm.com, oupton@kernel.org, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, tabba@google.com, qperret@google.com, yaoyuan@linux.alibaba.com, zenghui.yu@linux.dev, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Paolo,
+On Wed, 11 Mar 2026 17:05:40 +0000,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On Wed, Mar 11, 2026 at 6:04=E2=80=AFPM Marc Zyngier <maz@kernel.org> wro=
+te:
+> > As a heads up, I'm about to send another one with a couple of annoying
+> > fixes, either today or tomorrow morning. Would be great if you could
+> > stash that one as well.
+>=20
+> Thanks for the notice, I will wait and send everything together.
 
-Here's the third set of fixes for 7.0. Two fixes, both related to the
-pretty large vgic rewrite that went into 6.19. One is affecting
-interrupt deactivation, and therefore leading to guests locking
-up. The other is affecting CPU hotplug with pKVM, leading to the
-onlined CPU not booting at all.
+On its way[1].
 
-Please pull,
+Thanks,
 
 	M.
 
-Marc Zyngier (2):
-  KVM: arm64: vgic: Pick EOIcount deactivations from AP-list tail
-  KVM: arm64: pkvm: Don't reprobe for ICH_VTR_EL2.TDS on CPU hotplug
+[1] https://lore.kernel.org/all/20260311173902.329537-1-maz@kernel.org/
 
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kernel/cpufeature.c    |  9 +++++++++
- arch/arm64/kvm/vgic/vgic-v2.c     |  4 ++--
- arch/arm64/kvm/vgic/vgic-v3.c     | 12 ++++++------
- arch/arm64/kvm/vgic/vgic.c        |  6 ++++++
- 5 files changed, 26 insertions(+), 8 deletions(-)
-
--- 
-2.47.3
-
-The following changes since commit 3599c714c08c324f0fcfa392bfb857c92c575400:
-
-  KVM: arm64: Remove the redundant ISB in __kvm_at_s1e2() (2026-03-06 10:42:21 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-7.0-3
-
-for you to fetch changes up to a79f7b4aeb8e7562cd6dbf9c223e2c2a04b1a85f:
-
-  KVM: arm64: pkvm: Don't reprobe for ICH_VTR_EL2.TDS on CPU hotplug (2026-03-10 09:48:45 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 7.0, take #3
-
-- Correctly handle deeactivation of out-of-LRs interrupts by
-  starting the EOIcount deactivation walk *after* the last irq
-  that made it into an LR. This avoids deactivating irqs that
-  are in the LRs and that the vcpu hasn't deactivated yet.
-
-- Avoid calling into the stubs to probe for ICH_VTR_EL2.TDS when
-  pKVM is already enabled -- not only thhis isn't possible (pKVM
-  will reject the call), but it is also useless: this can only
-  happen for a CPU that has already booted once, and the capability
-  will not change.
-
-----------------------------------------------------------------
-Marc Zyngier (2):
-      KVM: arm64: vgic: Pick EOIcount deactivations from AP-list tail
-      KVM: arm64: pkvm: Don't reprobe for ICH_VTR_EL2.TDS on CPU hotplug
-
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kernel/cpufeature.c    |  9 +++++++++
- arch/arm64/kvm/vgic/vgic-v2.c     |  4 ++--
- arch/arm64/kvm/vgic/vgic-v3.c     | 12 ++++++------
- arch/arm64/kvm/vgic/vgic.c        |  6 ++++++
- 5 files changed, 26 insertions(+), 8 deletions(-)
+--=20
+Without deviation from the norm, progress is not possible.
