@@ -1,120 +1,185 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18653DBA0;
-	Wed, 11 Mar 2026 19:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9225F38F656;
+	Wed, 11 Mar 2026 22:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773256209; cv=none; b=uoCtkOcY9wbblawNte6pOBzvGJ6gE+ehibyEVJgvP78qh9phqROVN4bEdgJ41p6XVqPFrYKbeM4XTT1c6bcUADyce8HZu2L9gUlD2ObvxghGYCfBHdg/jRRY6cKp+2NwVSqpOZOJv58zj89sbJPj2NG8cn9teVIYi6vHLp5+dKs=
+	t=1773267503; cv=none; b=WlZ7YScgKGl4ErutLt49psV+o1KhO+6ZKbR3/mIC5gH0UX572P1U4Ta2w0zlaj5tRGKfkTI7EAArzVvL+sk97YUc33QNHMoIJIO/hgSHfTBk5BEL8ol4g0qb2qp/Y6OctH//i0etOH0m2e6dyRpNnM2xpf4CtsgmsF8jPWfYsFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773256209; c=relaxed/simple;
-	bh=7ZsLa1T0BFC5juw0defQQ33UROr06FSoMCJDyDGnxkk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NjuoK2X127ShkulUqgWB8UtSZpig5av4vv35FcWnudr+RWVu30Gjh//W2GVQbWoJex75buQ4tX+DHtTVAoMEDbbEqVfeoa4TT8rY1kPHCzLjg++djRdlhFeE1uoMSdYqUOv+ewrKMtWRiqjH8dSRKltcaiJevi0ISeLwBR6A4HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYWA2VhG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773267503; c=relaxed/simple;
+	bh=UkcWuDDKFCtOzPMcaQPRi4iOunlDeFvQXT87qyfDCmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YUNPSnhOObjdoNf//tdmnYLXO8O/ik05STcVVtgL8omu7A7OfcM45NTJIilyebHnziCsBcyp93bITg9iQi2yc5ZGIGLxuIRfqsFIQmvJQKBFd7/r8hYwUrnqzVS/fAGyCX/PEm5CY8lOgp8izucTqAP+vITNO12WQe3CrRVgaG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9J3sgLA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYWA2VhG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F338C4CEF7;
-	Wed, 11 Mar 2026 19:10:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9J3sgLA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89708C4CEF7;
+	Wed, 11 Mar 2026 22:18:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773256209;
-	bh=7ZsLa1T0BFC5juw0defQQ33UROr06FSoMCJDyDGnxkk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KYWA2VhGx6UU+p+ftz/FLsZ6Y//y8DzdvF0OtJLJjUIItwyyqnxvb13nvzBekRUbk
-	 l6PPgewl9tiij8yTpONZ5At9kTHAM41zo587Uj60R8h2WUyMqdOOlhOdA4y8CCN8WL
-	 dgmEVkRh0RMZ9LbZIIyn+MRzpcTbo6RuR7sKztz300/cIvetlzPYsIUKtsuFQsmozq
-	 4BTNpU/bnfB/96i3xYhwwmJl/DiiXOYWcuRr/0Z04lnhvpImOiHsULnE9KVekm7XAi
-	 UeoJ3bt78awoa9Aq19eizM7McbOzoUtwf9eJvPZe02gj4yDfV+TRvGH+P9M1dewLlt
-	 h0KFekkAVkdFQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w0OwY-0000000103e-3vLG;
-	Wed, 11 Mar 2026 19:10:07 +0000
-Date: Wed, 11 Mar 2026 19:10:05 +0000
-Message-ID: <87v7f2chde.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu
- <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-In-Reply-To: <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-7-steven.price@arm.com>
-	<86tsuy8g0u.wl-maz@kernel.org>
-	<33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1773267502;
+	bh=UkcWuDDKFCtOzPMcaQPRi4iOunlDeFvQXT87qyfDCmY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s9J3sgLA9S//wXI5sCKh7YLMqn41GDJmYfc598b7ndkFh8SDdWL+zRt5FfHTApL1t
+	 eFw4mxiTQ52uHOiZnwnfhQkLZZ69FGf+Omdav3EFSFZvGLzDVaBr6C3Rjwngxabxwz
+	 d+0JasLxpFrmuqlAqg/17icDaUayGe59gigm4h+zHWLCUCAAoz9z33wVCRN3oC28+B
+	 I4sw7mxR8qx/+1CrghYdwu7qyQ4Nhd5ot4eqj1gDAOhg3ejLRDXDKaDXhl85fG3i4o
+	 mrUjtO5XPJyLmYaTqf1esEqls3WQjEw/BgecuDmQ9+r0WBP4atyMefSKeR4bZ5orPU
+	 G2ybt0con6eMw==
+Date: Wed, 11 Mar 2026 15:18:16 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com, linux-trace-kernel@vger.kernel.org,
+	maz@kernel.org, oliver.upton@linux.dev, joey.gouly@arm.com,
+	suzuki.poulose@arm.com, yuzenghui@huawei.com,
+	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	jstultz@google.com, qperret@google.com, will@kernel.org,
+	aneesh.kumar@kernel.org, kernel-team@android.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v14 18/30] tracing: Check for undefined symbols in
+ simple_ring_buffer
+Message-ID: <20260311221816.GA316631@ax162>
+References: <20260309162516.2623589-1-vdonnefort@google.com>
+ <20260309162516.2623589-19-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260309162516.2623589-19-vdonnefort@google.com>
 
-On Mon, 02 Mar 2026 15:23:44 +0000,
-Steven Price <steven.price@arm.com> wrote:
+Hi Vincent,
+
+On Mon, Mar 09, 2026 at 04:25:04PM +0000, Vincent Donnefort wrote:
+> The simple_ring_buffer implementation must remain simple enough to be
+> used by the pKVM hypervisor. Prevent the object build if unresolved
+> symbols are found.
 > 
-> >> +  struct kvm_arm_rmi_populate {
-> >> +	__u64 base;
-> >> +	__u64 size;
-> >> +	__u64 source_uaddr;
-> >> +	__u32 flags;
-> >> +	__u32 reserved;
-> >> +  };
-> >> +
-> >> +Populate a region of protected address space by copying the data from the user
-> >> +space pointer provided. This is only valid before any VCPUs have been run.
-> >> +The ioctl might not populate the entire region and user space may have to
-> >> +repeatedly call it (with updated pointers) to populate the entire region.
-> > 
-> > size as a __u64 is odd, as the return value from the ioctl is a signed
-> > int. This implies that you can't really report how many bytes you have
-> > copied.  Some form of consistency wouldn't hurt.
+> Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 > 
-> Good spot. In practice this works because >2GB in one operation is
-> highly unlikely to be processed in one go. But I guess I'll change this
-> to have an output size argument. I guess I could make the kernel update
-> all of base,size,source_uaddr which would simplify user space.
+> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> index d106beca8d7f..3182e1bc1cf7 100644
+> --- a/kernel/trace/Makefile
+> +++ b/kernel/trace/Makefile
+> @@ -132,4 +132,20 @@ obj-$(CONFIG_TRACE_REMOTE) += trace_remote.o
+>  obj-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o
+>  obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+>  
+> +#
+> +# simple_ring_buffer is used by the pKVM hypervisor which does not have access
+> +# to all kernel symbols. Fail the build if forbidden symbols are found.
+> +#
+> +UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
+> +UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer
+> +UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+> +
+> +quiet_cmd_check_undefined = NM      $<
+> +      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
 
-In a conversation with Suzuki, I suggested that splice(2) could be a
-nicer way to express this, and allow asynchronous use with io-uring.
+This check triggers when building allmodconfig targeting arm, arm64,
+powerpc, and x86_64 (at least, I did not test more at the moment) with
+clang. If this is a hard failure, this really needs to print something
+out to the developer/user to help them debug off the bat, versus having
+to manually dig the $(NM) command out from the .cmd file or V=1. I came
+up with
 
-After all, having a guestmem backend for CCA is not exactly
-outlandish, and having a splice implementation realistic enough.
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index 3182e1bc1cf7..c725b06876bc 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -141,7 +141,13 @@ UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sani
+ UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+ 
+ quiet_cmd_check_undefined = NM      $<
+-      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
++      cmd_check_undefined = \
++          undefsyms=$$($(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST) || true); \
++          if [ -n "$$undefsyms" ]; then \
++              echo "Unexpected symbols in $<:" >&2; \
++              echo "$$undefsyms" >&2; \
++              false; \
++          fi
+ 
+ $(obj)/%.o.checked: $(obj)/%.o FORCE
+ 	$(call if_changed,check_undefined)
+--
 
-Thoughts?
+which prints
 
-	M.
+  Unexpected symbols in kernel/trace/simple_ring_buffer.o:
+                   U llvm_gcda_emit_arcs
+                   U llvm_gcda_emit_function
+                   U llvm_gcda_end_file
+                   U llvm_gcda_start_file
+                   U llvm_gcda_summary_info
+                   U llvm_gcov_init
 
--- 
-Jazz isn't dead. It just smells funny.
+for arm64, which makes sense since these are LLVM specific GCOV symbols,
+so they should probably get the same treatment as the other ones:
+
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index c725b06876bc..d464e3aa5bdd 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -136,8 +136,8 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+ # simple_ring_buffer is used by the pKVM hypervisor which does not have access
+ # to all kernel symbols. Fail the build if forbidden symbols are found.
+ #
+-UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
+-UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer
++UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov llvm_gcda llvm_gcov
++UNDEFINED_ALLOWLIST += __aeabi_unwind __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer
+ UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+ 
+ quiet_cmd_check_undefined = NM      $<
+--
+
+For x86_64, I see
+
+  Unexpected symbols in kernel/trace/simple_ring_buffer.o:
+                   U __clear_pages_unrolled
+                   U __memmove
+                   U copy_page
+
+which comes from the use of KCFI_ADDRESSABLE(), since allmodconfig has
+CONFIG_CFI=y.
+
+For powerpc (with both clang and GCC), I see
+
+  Unexpected symbols in kernel/trace/simple_ring_buffer.o:
+                   U .TOC.
+
+For arm (with both clang and GCC), I see
+
+  Unexpected symbols in kernel/trace/simple_ring_buffer.o:
+           U __stack_chk_guard
+           U warn_slowpath_fmt
+
+Presumably adding all of those should be fine as well?
+
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index d464e3aa5bdd..4f120cb8c79c 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -137,7 +137,8 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+ # to all kernel symbols. Fail the build if forbidden symbols are found.
+ #
+ UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov llvm_gcda llvm_gcov
+-UNDEFINED_ALLOWLIST += __aeabi_unwind __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer
++UNDEFINED_ALLOWLIST += __aeabi_unwind __stack_chk_fail __stack_chk_guard stackleak_track_stack __ref_stack __sanitizer
++UNDEFINED_ALLOWLIST += \.TOC\. __clear_pages_unrolled __memmove copy_page warn_slowpath_fmt
+ UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+ 
+ quiet_cmd_check_undefined = NM      $<
+--
+
+I don't mind sending a series for these, I just wanted to make sure I
+was reasoning about everything correctly.
+
+Cheers,
+Nathan
