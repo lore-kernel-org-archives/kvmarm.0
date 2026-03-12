@@ -1,159 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183DC2D8DDB;
-	Thu, 12 Mar 2026 08:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18C93382F1;
+	Thu, 12 Mar 2026 08:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773302761; cv=none; b=q+mgb185zCtjfMzWenQFMRgnhQRupxiJ9rKG2V0xLNRzaff6MIrOhE7c8FnPYjcGccdCcL+BGa8pJJ29SGwBAyIaaxUSheagZAw26Bj/4Rp/cD3OfKrubDHj3xVQ+3dJz52uobFec+dt5Z2txUVYCGK4h61sXx2Eqx/WMW9eUN0=
+	t=1773302872; cv=none; b=NgKBD/bgLe0gxx9BeLmQH/gi649jW5nYvIs3UAJ7jrOc52viaO98DznVXzS6PhJwfVWOdD6zMpJrRq0gy5ToLBh3lxMkcOVg0blNCUxuG98yV83wGzOH/LslOB0HW/UGwKwFSu4PqAIp4pR/u1rE5W3w6EpIZ23D4e2nJhsqlpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773302761; c=relaxed/simple;
-	bh=GrsKvOZ6VufbBgYbhrd6xHH3pkcwgPsCkJfdzsv8h80=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S600ZwuXJLjzou02K/S4jN7dZa7lugcII3NwBYztdBL547rqcwDomVXgKipp4lJ5mLDSl/swi/8Pj05ZD5tnae2sH6AHkX5/vvNUUxVNBD14VH4o/+xdOqlaBfSP1n4eY8P35dyPItJFAAzuiHZXzMVQnPhHSL4GgTOpoMeeleE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+xYzgEz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773302872; c=relaxed/simple;
+	bh=Y/1Whbrpqe5xP9R8AZ4x/rJ+9WQsWAAbYunVt7RHi6s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UOoIOndvJ8UaTSAPED7xa4DvYWVYJT2btba3bMgReOAKevSPyBE+IbqL5xOZZfVsNL2KtY9d1c+KTnaFFx+QGjXgr2gfRBuiGuVp2G0TWlEv14RWpcfkRjvBS6skosYvV0zwgpcyvHUEYmBeEzLZklLMRub4Z8nIOS4LVKfM2MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KoEjvD2n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+xYzgEz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7F92C4CEF7;
-	Thu, 12 Mar 2026 08:05:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KoEjvD2n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65394C4CEF7;
+	Thu, 12 Mar 2026 08:07:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773302760;
-	bh=GrsKvOZ6VufbBgYbhrd6xHH3pkcwgPsCkJfdzsv8h80=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L+xYzgEzmUqSoms73n0IBLxp2/AjrTR5NE6GxICk3JjchloFho4SdZODXCqLkLDt2
-	 V/8ra8nSHv2A7KbfblknEAe8f0/tWRV9PjcGfLU6FZwZ7RfI+1M59Qvszk7qh8bv5+
-	 RsvqPRmp+AWYmCe2BM/8G2vNbZghAF5QPRFKM2TCW/MaY4AbB6KcfDO3/GUQIcRXoV
-	 7HzAmy+zsSBWAH3cBIOQVRfxGwBU9b3qCUt7SU944LyB1pVM7aQySy4uKxq+tr6z3k
-	 QUoTN/QeLHDxPK+w855b770kNjB8P0x1uJxsSx7rrn74HwIzTn/UwgF4GIWH8HgKTH
-	 rWL49xyQTaHww==
+	s=k20201202; t=1773302872;
+	bh=Y/1Whbrpqe5xP9R8AZ4x/rJ+9WQsWAAbYunVt7RHi6s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KoEjvD2n+R057NTZ/XFXUQkwaogi3fe6wn37ZZ9o7HDbBsastJsa92LJvS/ycobIl
+	 Ju9166/E7IZx3vnJ1Myou5psme4rebxr50y8ooeLWaWzISm+j/LivFKiejky7MdvZB
+	 eFVmg6ZrbkdoS2M1COsWdjj8lbSQwrBWIifbSkRPz1zyOXGYO/Ija/9Q6TljnqPRwd
+	 hl94e3oqRo2Fs1yabsBNacS3OXTrvuU8j4Yh0hpS9plHuJ26eBQIo5UoyhCpPQRmHZ
+	 F4YQ7h94RYYLPg+p7psl7lX0MTs6oxISLrZDe0q99IjAlG0lUYS/x7Powid0Y4E8CP
+	 EyAb9hKMOnd5A==
 From: "Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
 To: linux-coco@lists.linux.dev,
 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org
 Cc: linux-kernel@vger.kernel.org,
-	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Samuel Ortiz <sameo@rivosinc.com>,
-	Xu Yilun <yilun.xu@linux.intel.com>,
-	Suzuki K Poulose <Suzuki.Poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	Jonathan Cameron <jonathan.cameron@huawei.com>
-Subject: [RFC PATCH v3 11/11] coco: guest: arm64: Enable vdev DMA after attestation
-Date: Thu, 12 Mar 2026 13:34:42 +0530
-Message-ID: <20260312080442.3485633-12-aneesh.kumar@kernel.org>
+	"Aneesh Kumar K.V (Arm)" <aneesh.kumar@kernel.org>
+Subject: [RFC PATCH v3 00/12] coco/TSM: Implement host-side support for Arm CCA TDISP setup
+Date: Thu, 12 Mar 2026 13:37:31 +0530
+Message-ID: <20260312080743.3487326-1-aneesh.kumar@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260312080442.3485633-1-aneesh.kumar@kernel.org>
-References: <20260312080442.3485633-1-aneesh.kumar@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-- define SMC_RSI_VDEV_DMA_ENABLE and add wrapper in rsi_cmds.h
-- invoke the new helper from the guest accept path once the device
-  passes attestation, rolling back to TDI_LOCKED on failure
+This patch series implements the host-side changes needed for end-to-end
+Arm CCA TDISP setup. It adds the RMI/RHI plumbing required to create and
+manage Realm vdev objects, service device-attestation object requests, and
+complete the KVM/RMM flows needed for device run-time transitions.
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>
-Cc: Samuel Ortiz <sameo@rivosinc.com>
-Cc: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>
-Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-Signed-off-by: Aneesh Kumar K.V (Arm) <aneesh.kumar@kernel.org>
----
- arch/arm64/include/asm/rsi_cmds.h        | 16 ++++++++++++++++
- arch/arm64/include/asm/rsi_smc.h         |  2 ++
- drivers/virt/coco/arm-cca-guest/rsi-da.c | 14 ++++++++++++++
- 3 files changed, 32 insertions(+)
+The series is based on the RMM ALP17 specification [1] and the
+RHI v1.0 BET1 specification [5].
 
-diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
-index f72d8e0cd422..1e0d1cd8841a 100644
---- a/arch/arm64/include/asm/rsi_cmds.h
-+++ b/arch/arm64/include/asm/rsi_cmds.h
-@@ -226,4 +226,20 @@ static inline unsigned long rsi_vdev_get_info(unsigned long vdev_id,
- 	return res.a0;
- }
- 
-+static inline unsigned long __rsi_vdev_dma_enable(unsigned long vdev_id,
-+						  unsigned long flags,
-+						  unsigned long non_ats_plane,
-+						  unsigned long lock_nonce,
-+						  unsigned long meas_nonce,
-+						  unsigned long report_nonce)
-+{
-+	struct arm_smccc_res res;
-+
-+	arm_smccc_1_1_invoke(SMC_RSI_VDEV_DMA_ENABLE, vdev_id, flags,
-+			     non_ats_plane, lock_nonce,
-+			     meas_nonce, report_nonce, &res);
-+
-+	return res.a0;
-+}
-+
- #endif /* __ASM_RSI_CMDS_H */
-diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm/rsi_smc.h
-index 5f1837282237..d2ea3656ea8f 100644
---- a/arch/arm64/include/asm/rsi_smc.h
-+++ b/arch/arm64/include/asm/rsi_smc.h
-@@ -186,6 +186,8 @@ struct realm_config {
-  */
- #define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
- 
-+#define SMC_RSI_VDEV_DMA_ENABLE			SMC_RSI_FID(0x19C)
-+
- struct rsi_vdevice_info {
- 	union {
- 		struct {
-diff --git a/drivers/virt/coco/arm-cca-guest/rsi-da.c b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-index 4030fa213ff4..74594066f46c 100644
---- a/drivers/virt/coco/arm-cca-guest/rsi-da.c
-+++ b/drivers/virt/coco/arm-cca-guest/rsi-da.c
-@@ -231,9 +231,17 @@ int cca_verify_digests(u64 hash_algo,
- 	return 0;
- }
- 
-+static inline int rsi_vdev_enable_dma(int vdev_id, struct dsm_device_info *dev_info)
-+{
-+	/* No ATS support */
-+	return __rsi_vdev_dma_enable(vdev_id, 0, 0, dev_info->lock_nonce,
-+				     dev_info->meas_nonce, dev_info->report_nonce);
-+}
-+
- int cca_device_accept(struct pci_dev *pdev, unsigned long lock_nonce)
- {
- 	int ret;
-+	int vdev_id = rsi_vdev_id(pdev);
- 	struct cca_guest_dsc *dsc = to_cca_guest_dsc(pdev);
- 
- 	if (lock_nonce != dsc->dev_info.lock_nonce) {
-@@ -270,6 +278,12 @@ int cca_device_accept(struct pci_dev *pdev, unsigned long lock_nonce)
- 		return ret;
- 	}
- 
-+	if (rsi_vdev_enable_dma(vdev_id, &dsc->dev_info)) {
-+		rhi_vdev_set_tdi_state(pdev, RHI_DA_TDI_CONFIG_LOCKED);
-+		pci_err(pdev, "failed to enable DMA from the device\n");
-+		return -EIO;
-+	}
-+
- 	dsc->pci.mmio = no_free_ptr(tsm_mmio);
- 	return 0;
- }
+At a high level, the series adds support for:
+- host-side vdev communication and lifecycle management
+- host handling of RHI DA object read/size requests
+- host-side fetching and caching of interface reports and measurements
+- KVM handling of vdev request/complete exits
+- KVM handling of map/validation exits and teardown on granule destroy
+- vdev transition to TDISP RUN state
+- enabling DA in Realm create parameters
+
+The series builds upon the TSM framework patches posted at [2] and depends on
+the KVM CCA patchset [3]. A git repository containing all related changes is
+available at [4].
+
+Previous posting:
+rfc-v1: https://lore.kernel.org/all/20250728135216.48084-1-aneesh.kumar@kernel.org
+There is no rfc-v2 posting. This series is marked rfc-v3 to stay aligned
+with the rest of the CCA patchsets that are being posted as v3.
+
+Changes from v1:
+- rebase to latest kernel and core TSM changes
+- address review feedback
+
+[1] https://developer.arm.com/-/cdn-downloads/permalink/Architectures/Armv9/DEN0137_1.1-alp17.zip
+[2] https://lore.kernel.org/all/20260303000207.1836586-1-dan.j.williams@intel.com
+[3] https://lore.kernel.org/all/461fa23f-9add-40e5-a0d0-759030e7c70b@arm.com
+[4] https://gitlab.arm.com/linux-arm/linux-cca.git cca/topics/cca-tdisp-upstream-rfc-v3
+[5] https://developer.arm.com/documentation/den0148/latest/ RHI
+
+Aneesh Kumar K.V (Arm) (12):
+  coco: host: arm64: Add support for virtual device communication
+  coco: host: arm64: Add support for RMM vdev objects
+  coco: host: arm64: Add helpers to unlock and destroy RMM vdev
+  coco: host: arm64: Add support for da object read RHI handling
+  coco: host: arm64: Add helper for cached object fetches
+  coco: host: arm64: Fetch interface report via RMI
+  coco: host: arm64: Fetch device measurements via RMI
+  coco: host: KVM: arm64: Handle vdev request exits and completion
+  coco: host: KVM: arm64: Handle vdev map/validation exits
+  KVM: arm64: Unmap device mappings when a private granule is destroyed
+  coco: host: arm64: Transition vdevs to TDISP RUN state
+  KVM: arm64: CCA: enable DA in realm create parameters
+
+ Documentation/virt/kvm/api.rst           |  22 +
+ arch/arm64/include/asm/kvm_rmi.h         |   4 +
+ arch/arm64/include/asm/rhi.h             |   9 +
+ arch/arm64/include/asm/rmi_cmds.h        | 163 +++++++
+ arch/arm64/include/asm/rmi_smc.h         |  75 +++-
+ arch/arm64/include/uapi/asm/rmi-da.h     |  43 ++
+ arch/arm64/kvm/rmi-exit.c                |  55 +++
+ arch/arm64/kvm/rmi.c                     | 183 +++++++-
+ drivers/virt/coco/arm-cca-host/arm-cca.c | 200 +++++++++
+ drivers/virt/coco/arm-cca-host/rmi-da.c  | 544 ++++++++++++++++++++++-
+ drivers/virt/coco/arm-cca-host/rmi-da.h  |  39 ++
+ include/linux/kvm_host.h                 |   1 +
+ include/uapi/linux/kvm.h                 |  10 +
+ virt/kvm/kvm_main.c                      |   6 +
+ 14 files changed, 1337 insertions(+), 17 deletions(-)
+ create mode 100644 arch/arm64/include/uapi/asm/rmi-da.h
+
 -- 
 2.43.0
 
