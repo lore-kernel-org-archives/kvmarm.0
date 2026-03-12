@@ -1,92 +1,93 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DA73FE66B
-	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 17:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6DF33F390
+	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 17:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773338223; cv=pass; b=AOGqATlese9wzyeidCkNnzDPy12u1dw2cWalDxHvPAJNSw4NPdebJIo+xCwheTbPtrF2ewZY/NcheOSLtEcOEOHO9ORd44/2khRq/p7xJzoPLecx0IJ3W0qeUpYGNPXeEekSTFVdkRJ6RW0Zn0jFipuY/kQDwUDzSkuZdSHAXo8=
+	t=1773338267; cv=pass; b=JnREKVrmi+d8PjsQZ3Na/FrPCHxaYjf4F7TqoGCu/w16FrDebYIIL+p2H3sra80aD//phMz85wGih93e79JHuKvAckNplhjhmMVbJQFBWTAfoTddGYa9tpI71TywHv0nOimPEyJ28kc4f/Rg7IGqA3N8GHNj3bzTPGFQYXYGjkE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773338223; c=relaxed/simple;
-	bh=otr96St+pr69820FnroIlMpOY5+VoVMXnrzkuc9SYs0=;
+	s=arc-20240116; t=1773338267; c=relaxed/simple;
+	bh=7JLVE47jKFSPedfhmxxS98Op8it4T0TV0xIFGIW+fPE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JYo8VSfNWHZW01rWCaP3TpING8QZxatmks2PSDc/KT71UjC18pUkj52unOu8qFTdZhC6w5YJg6qOzv9ll76Alzk47n5R5HdnixhmNSAoY0v8B60mIM/2jedg8O1Sws2ZP7S2LTiml2yPzygVBk4I2f4nJJbOEr8usM1tPIeIYOQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tmk1lmng; arc=pass smtp.client-ip=209.85.160.182
+	 To:Cc:Content-Type; b=Q+BE8AoAbwDOTGeDZEn+hEbppF1gWfvYz0RnV3tzG+ZOMgRCmejsRxdSrbPRhU6osXnzvbM1Zzxsc4AbtLp1jYLKiqoIXPEcJ81BuArb7n8jD9N8eWdIgHvWz/8xkEFXIMAtSJOXb2Kl3rcQfL65dadEj3Lt0ZHs29GpcIVp0XQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QNM5YXhH; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tmk1lmng"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-509069a7a7fso61451cf.0
-        for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 10:57:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773338221; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QNM5YXhH"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50906a98ffeso59441cf.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 10:57:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773338265; cv=none;
         d=google.com; s=arc-20240605;
-        b=c/vwQT9AoaAqfoF35CHoFVkEAiE6H9m+ct/2xotpvfM2BasVlHQI43esiJoNri8rxH
-         mwrzmKMDaPr/7ZC84PdWCFOr2qBGKr9ebT7+vxewUvdWGOcvmRZIbf6/gCVGYlobOFdV
-         ZKjLP0HLap0qyu/9AYWuZP9tvJ0qa+HGCJ0x7TyU6hKkwMXlXGP3Ig8Wg37/YMuPfU/8
-         a2xcLtUQhctuBrXFHycccn/jmswbdMyXy2MKLf0bYuuG3XGlGgXHv02WFFw9/yL3JjoY
-         qegCyTfyodsdMAEbundiunA+3h+QfmJr/7Ok+iRHsDbJjmcosq698dadM3fkH/ERdhwT
-         abSg==
+        b=AUmlyIU4i8Iwrg0iy0THLUtsJNpIuVOFGqpVaUqxOHDcrHdfcO4JNvb2lnQoJzI6ph
+         cscL9neUglN9hUFWJWzIAcKZJPgMX0yhgi8MC0YlOUoQvuHKjXHUjpeynvzYx8mLoBco
+         EjORXuM5Is0NnuTura5pmKcspuT8U1UWKv0DOT3nHDrzOFLL+IjTynBNCo9jci998Dvd
+         xDJUOjcnyDCVrtf3TeNR2LPvW/LuiDhGf5GEDsv069eJVNt4SvVvtbP843Z/EbFrsHAt
+         EUeSWjFA4IeDr4GSQ8fnEqlvvyovx5outputDVFsyu7z0DMWhdj6fEPL2OBMYnvpX3u7
+         p1bQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=0mvUG/Z2/uZ5c2fN5XPa/W3Zus8cUWVYIvf3QqsJFUI=;
-        fh=fOnopmH+DpMtMnjO/YE2EsrIcYbxzkA2YJt+k/AJxZY=;
-        b=Z0NKuCKS0nZRK9tkaXnRQoZvMwc024GAyArjKL3gQJ9RBYBclGbrBu6RSlHCU+K7rS
-         TwyxJHuGMAkH0lZL6LG7xBDluDD5hp6Mep/HNx0PTHNMhh3GyfWEg4s9BbpfMHk183JF
-         /+3ZrvMBLefWfVQeIer8bq33tNy2FuKPdnh9VdTAKSiGKU70LhMy8rhII1YsKi1htygN
-         Tj/RTg3/CTfi+T9cqo0yxcZmdG7QLGSPMKc4640nglwhsVhKrgq2aUhaLLAk14MQY8df
-         /i2pvoKWIkAp98l/lBTYAW0Zl4Q4C47d//u9fLwUp5AUweNBIe34plUg7wDvMbmR8DgG
-         kZOg==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=zvAML1TXhwJrNBapt3bY/fy2P/HQmzT8RWNB/11cH/k=;
+        fh=99RKD11IZjkreBS7j5nDp/emRLRFimR/3i4ZfFvLG28=;
+        b=jDqxBvEuPcNywP93qYC8rcigjBNyrDkNziAU7gjYkZFzxWjLV3++BUOUG2fdGFNwbM
+         dIww3rf3JDWiWjqbuPejFjubhphvvV4sgFSfPP1kZ6hsXX8/pD9Da4DwU5YD7cBvxzDx
+         E2ZaE7lPiksilUg9pbCWGT2wKZcWC4mnu0rKN3rG3EtXZeYY8VyMhGmbk3Ux+aGeTEFd
+         e7CLzA3cOUhl4q7LuofBupIw7j2Iu/JN6HBCit9ID8m1dMVCQGU/emIVtxVjDFvhI4fW
+         u9Pb6zw+7SMB49w+y0wDepUXhroV+G5QaswxhXKkEFbQ9mhhj2EdWxWhVvOaydCPbKyB
+         hVUA==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773338221; x=1773943021; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0mvUG/Z2/uZ5c2fN5XPa/W3Zus8cUWVYIvf3QqsJFUI=;
-        b=tmk1lmngZtP5MbVsosR0rfNN1AM91VF1WPGEoQqOMWF7ioy1Mhf74di6pMqL3LFGo/
-         jQ/PQ6ikVECO4tarfgJtFoLJ5qcgnlL1fMY0k4fQAxiXzXT/+68DKuCJul9ErHGYx97K
-         vTVn6uVgeRzOFlliIdvDPE7ylxa2r8BKhAGGQ2IYHrBMeC1PVQjSe4szNpSM06GG2GZc
-         Qd3CT5O8ptn577IUX4dmgEgYj4Ogg5uvSVLSXr4QzQfIV+LjAlxEhbeOAuYKTQ8dsYKG
-         QHBZv6CiPCXT0csGKKqNrLEz/PmaxUySK1T56qA9FsfVTcaRHlghT5/0E6Jl6z4NXHG2
-         jYfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1773338221; x=1773943021;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1773338265; x=1773943065; darn=lists.linux.dev;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0mvUG/Z2/uZ5c2fN5XPa/W3Zus8cUWVYIvf3QqsJFUI=;
-        b=sQd8STGY4gTA1vf3pUIJSVuKPK/yB/1nCp7vhtLC1QiJjqRxYRj9PNHaeRGSvkCdFL
-         d9NizXHWOQ99S4bByO/dm2U4fsYh5HzcRNTMAVrMXXY1lwANmu14ZQ5IXLmZX13wfSRG
-         Rr85zpmyKM84GK9RpjBrGBxe0yg64ivDgpeOEpjZlKdJje7BTlroWleb4zObbJKBAucm
-         KZAO7ww7SMJcYBz7ITSjHEY2dSuoAlmCSazpZRKJ9MrvvXNYdrTuros5G16rRczumeP4
-         V91P882THjPGvqqr3Gs27JLl60zFm4mXJxZn7K/GmmWjXeGkGRgmMS8kbxn5j/iSC0UC
-         g+gg==
-X-Forwarded-Encrypted: i=1; AJvYcCVruRZmLuZFBsSSCxuUuRYIRQH8M1SEbS2bimeY2z3Vyr0/FxRVYvT74wwQA2KPCzv9bkLKYO0=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz8YR/7FZyAAZZFy07eTwVjWOeWfzobvrOjSWjmwFa9MX2BE2VT
-	+cMqqEPTedkkgkp0xXoAA0J8qCpKUd0husErT/TjgzsKciS7W1ssZBIHX3jnUN53t5tbPE9kzMJ
-	25ndF8qRh6QbDJnE2EbMLtucZpDpkuN3FgT21oIHm
-X-Gm-Gg: ATEYQzwxhcdrt5NdqBIdbsBC9iZ7wXGRPFvx6qwdTvrfUSDPz2uDOiN76eE3qBi8ZmB
-	UBwldmIN022ljD/CawfzBHr8XMeL2bVtIuOAmKD+ng/Zx792dd/9bNeuB3TlSZLMFIykCMVysX2
-	YBa/OBXfEHwPSuAesCqqsirW0W1dgFyfLqGc/F163gHdFJFp0oWE1sEY/rpNbIA+WN6op+vykHg
-	hEEqKsOaj+EU4vlulsoX6aIyqmqFSQ7vMOL5ktLRka+8JeO/wPZFZjq2XTJvSP1E6feow1N2dh4
-	L/t5u7u59a9rfO+QIhI=
-X-Received: by 2002:a05:622a:1988:b0:509:25d8:9991 with SMTP id
- d75a77b69052e-509584f4fdcmr880951cf.16.1773338219853; Thu, 12 Mar 2026
- 10:56:59 -0700 (PDT)
+        bh=zvAML1TXhwJrNBapt3bY/fy2P/HQmzT8RWNB/11cH/k=;
+        b=QNM5YXhHu4pFPQ3BmnuBepLVxnyWVOdpD9uTCaUNYzwVDj5BC1kMrr3IbmBq/cTJU7
+         Sn4Xt/GCXnmoIMpY0mdz7Z/+6pvNDU8hZWeJrYoQntNhBMpkOSkv+I81AlTclLVHSouO
+         bSDQzjUlgUKEJqhGjWLR5o1Sgnt6nn9jflQcubFYzpNOQddpUOeBl4+tQSr6BPxPxdTR
+         5kTobZnhXiXOIqQDHemnN5LNtxb6fTFsY/M11W5YYTeHCZBgdusr61UX/f7wisI/0uOd
+         i50c6e5gpPjJEaJ/GKFrjzF6Lq49yXJYmuEGYSKv8sbMBzFI/b706O1dVIVQP8WqnC2O
+         ybzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773338265; x=1773943065;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=zvAML1TXhwJrNBapt3bY/fy2P/HQmzT8RWNB/11cH/k=;
+        b=cO3w7GGCZ2URgBMkfYO19Bh6RYgVZpUXCI7XuGoT4KKlNdGbZ/hDoYtBed9GD0ad6e
+         dMfuKX3wyHITRKCSxTp1DIQHlAYHD6kvKz693iRbFnz+RYLLgEIVx4N3ffWVLTySwAVC
+         XPnJdzevu5fkXO/FF8urlcYCdGw3ZKsQHxeFOK6aVgcfDoIa3/3a4O7wzCg4DxbCDchK
+         BR6v7wfNUgbo6pHAEO8TOWHlYBJxVAqsdIIl/AypOgoApMhTXKfrAvFqPJ53xjGMEL8i
+         qrrUEEdmnftS3iAfG2zO5ekY+JlS1l4vYoIUe5zhZisFJxfU/ytK1S9Z82uH9MxjnLZs
+         pxTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVNdbjLkV87Ljil33w1gLn8k21gvKiKtmpJGay7GjYcgw7CN2FC/onG6bCCNCllidbqjpYr/iI=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yy2fQJe77CzzgHGhRNrVghPYLyD3Syb56JwEB+WKlP5P0UXq/fn
+	EFFdbZsVUUYT8sJKbhXc3upuX9C7k83O1pPw0JAAP1sDJ6HLQpfd17Y84dxbSaflac4mdz6GIJ2
+	ywbJ4fMKMO/KYi6q0hRS949FmLvUkrGAxNzYBuu/i
+X-Gm-Gg: ATEYQzysoSWrSyaEMUsXnDkgreg8HYHtXTNrPyBoYws3Cx31tEdQJpo3/PEMQo9JECO
+	yOLT7WR2w8MkpO0fuBAiy6imHBdd7/yR9sxogsl0Zq02k3ZCe+6fVYbGmn764env3KngUzXFgdp
+	WEhgZdpG04NqTUjwO5wrC30hFrSclRNLzBEgLGh0AxNGBKmEDg//Rdr8cQ/uli6XO89s641J3WP
+	OUv9YCxHkJL4X35Q1T7FSk+Y+bIZCiQbeiqsw0dxrBGymWmk5dsQaGNuAdgxGsFrbfefI3hEMTD
+	IgJ27++hw+ofGGTjbV8=
+X-Received: by 2002:a05:622a:54f:b0:509:174d:3224 with SMTP id
+ d75a77b69052e-509585fc0dfmr794461cf.11.1773338263919; Thu, 12 Mar 2026
+ 10:57:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260310124933.830025-1-sebastianene@google.com>
-In-Reply-To: <20260310124933.830025-1-sebastianene@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com> <20260310124933.830025-2-sebastianene@google.com>
+In-Reply-To: <20260310124933.830025-2-sebastianene@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Thu, 12 Mar 2026 17:56:22 +0000
-X-Gm-Features: AaiRm53G1nU7Kj2nfUNM3RM8KCK0SKWeGFwz4CDwwTgLZgN0Ex1zKGhkAGVfKhA
-Message-ID: <CA+EHjTw3iQnTjKhMn6NP=R9JszitP9KAt0qU=Gdg0kwdcDvYsA@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/14] KVM: ITS hardening for pKVM
+Date: Thu, 12 Mar 2026 17:57:06 +0000
+X-Gm-Features: AaiRm50UHS0HJHwYvTvytsFBXYKCFdJYIPpWhfhpkM3kMBPTBsr_hCDbfbubjhg
+Message-ID: <CA+EHjTxSgAbak_j+emSHNk9Em-m=gU44w_S2DtFovz5Q_Ci=Wg@mail.gmail.com>
+Subject: Re: [PATCH 01/14] KVM: arm64: Donate MMIO to the hypervisor
 To: Sebastian Ene <sebastianene@google.com>
 Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
@@ -97,299 +98,226 @@ Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
 	tglx@kernel.org, vdonnefort@google.com, bgrzesik@google.com, will@kernel.org, 
 	yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sebastian,
+Hi Sebastian (and Mostafa),
 
-On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
+On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote=
+:
 >
-> This series introduces the necessary machinery to perform trap & emulate
-> on device access in pKVM. Furthermore, it hardens the GIC/ITS controller to
-> prevent an attacker from tampering with the hypervisor protected memory
-> through this device.
+> From: Mostafa Saleh <smostafa@google.com>
 >
-> In pKVM, the host kernel is initially trusted to manage the boot process but
-> its permissions are revoked once KVM initializes. The GIC/ITS device is
-> configured before the kernel deprivileges itself. Once the hypervisor
-> becomes available, sanitize the accesses to the ITS controller by
-> trapping and emulating certain registers and by shadowing some memory
-> structures used by the ITS.
+> Add a function to donate MMIO to the hypervisor so IOMMU hypervisor
+> drivers can use that to protect the MMIO of IOMMU.
+> The initial attempt to implement this was to have a new flag to
+> "___pkvm_host_donate_hyp" to accept MMIO. However that had many problems,
+> it was quite intrusive for host/hyp to check/set page state to make it
+> aware of MMIO and to encode the state in the page table in that case.
+> Which is called in paths that can be sensitive to performance (FFA, VMs..=
+)
 >
-> This is required because the ITS can issue transactions on the memory
-> bus *directly*, without having an SMMU in front of it, which makes it
-> an interesting target for crossing the hypervisor-established privilege
-> boundary.
+> As donating MMIO is very rare, and we don=E2=80=99t need to encode the fu=
+ll
+> state, it=E2=80=99s reasonable to have a separate function to do this.
+> It will init the host s2 page table with an invalid leaf with the owner I=
+D
+> to prevent the host from mapping the page on faults.
 >
+> Also, prevent kvm_pgtable_stage2_unmap() from removing owner ID from
+> stage-2 PTEs, as this can be triggered from recycle logic under memory
+> pressure. There is no code relying on this, as all ownership changes is
+> done via kvm_pgtable_stage2_set_owner()
 >
-> Patch overview
-> ==============
+> For error path in IOMMU drivers, add a function to donate MMIO back
+> from hyp to host.
 >
-> The first patch is re-used from Mostafa's series[1] which brings SMMU-v3
-> support to pKVM.
+> Signed-off-by: Mostafa Saleh <smostafa@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 90 +++++++++++++++++++
+>  arch/arm64/kvm/hyp/pgtable.c                  |  9 +-
+>  3 files changed, 94 insertions(+), 7 deletions(-)
 >
-> [1] https://lore.kernel.org/linux-iommu/20251117184815.1027271-1-smostafa@google.com/#r
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/k=
+vm/hyp/include/nvhe/mem_protect.h
+> index 5f9d56754e39..8b617e6fc0e0 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -31,6 +31,8 @@ enum pkvm_component_id {
+>  };
 >
-> Some of the infrastructure built in that series might intersect and we
-> agreed to converge on some changes. The patches [1 - 3] allow unmapping
-> devices from the host address space and installing a handler to trap
-> accesses from the host. While executing in the handler, enough context
-> has to be given from mem-abort to perform the emulation of the device
-> such as: the offset, the access size, direction of the write and private
-> related data specific to the device.
-> The unmapping of the device from the host address space is performed
-> after the host deprivilege (during _kvm_host_prot_finalize call).
+>  extern unsigned long hyp_nr_cpus;
+> +int __pkvm_host_donate_hyp_mmio(u64 pfn);
+> +int __pkvm_hyp_donate_host_mmio(u64 pfn);
 >
-> The 4th patch looks up the ITS node from the device tree and adds it to
-> an array of unmapped devices. It install a handler that forwards all the
-> MMIO request to mediate the host access inside the emulation layer and
-> to prevent breaking ITS functionality.
+>  int __pkvm_prot_finalize(void);
+>  int __pkvm_host_share_hyp(u64 pfn);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/n=
+vhe/mem_protect.c
+> index 38f66a56a766..0808367c52e5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -784,6 +784,96 @@ int __pkvm_host_unshare_hyp(u64 pfn)
+>         return ret;
+>  }
 >
-> The 5th patch changes the GIC/ITS driver to exposes two new methods
-> which will be called from the KVM layer to setup the shadow state and
-> to take the appropriate locks. This one is the most intrusive as it
-> changes the current GIC/ITS driver. I tried to avoid creating a
-> dependency with KVM to keep the GIC driver agnostic of the virtualization
-> layer but I am happy to explore other options as well.
-> To avoid re-programming the ITS device with new shadow structures after
-> pKVM is ready, I exposed two functions to change the
-> pointers inside the driver for the following structures:
-> - the command queue points to a newly allocated queue
-> - the GITS_BASER<n> tables configured with an indirect layout have the
->   first layer shadowed and they point to a new memory region
+> +int __pkvm_host_donate_hyp_mmio(u64 pfn)
+> +{
+> +       u64 phys =3D hyp_pfn_to_phys(pfn);
+> +       void *virt =3D __hyp_va(phys);
+> +       int ret;
+> +       kvm_pte_t pte;
 
-We used the term shadow for the hyp version of structs in an early
-pKVM patch series, but after a bit of discussion, we refer to it as
-the hypervisor state [1]. So please use this terminology instead of
-shadow.
+nit: prefer reverse-christmas tree ordering for declarations.
 
-[1] https://lore.kernel.org/all/YthwzIS18mutjGhN@google.com/
 
-> Patch 6 adds the entry point into the emulation setup and sets up the
-> shadow command queue. It adds some helper macros to define the offset
-> register and the associate action that we want to execute in the
-> emulation. It also unmaps the state passed from the host kernel
-> to prevent it from playing nasty games later on. The patch
-> traps accesses to CWRITER register and copies the commands from the
-> host command queue to the shadow command queue.
->
-> Patch 7 prevents the host from directly accessing the first layer of the
-> indirect tables held in GITS_BASER<n>. It also prevents the host from
-> directly accesssing the last layer of the Device Table (since the entries
-> in this table hold the address of the ITT table) and of the vPE Table
-> (since the vPE table entries hold the address of the virtual LPI pending
-> table.
->
-> Patches [8-10] sanitize the commands sent to the ITS and their
-> arguments.
->
-> Patches [11-13] restrict the access of the host to certain registers
-> and prevent undefined behaviour. Prevent the host from re-programming
-> the tables held in the GITS_BASER register.
->
-> The last patch introduces an hvc to setup the ITS emulation and calls
-> into the ITS driver to setup the shadow state.
->
->
-> Design
-> ======
->
->
-> 1. Command queue shadowing
->
-> The ITS hardware supports a command queue which is programmed by the driver
-> in the GITS_CBASER register. To inform the hardware that a new command
-> has been added, the driver updates an index into the GITS_CWRITER
+> +
+> +       if (addr_is_memory(phys))
+> +               return -EINVAL;
+> +
+> +       host_lock_component();
+> +       hyp_lock_component();
+> +
+> +       ret =3D kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
+> +       if (ret)
+> +               goto unlock;
+> +
+> +       if (pte && !kvm_pte_valid(pte)) {
+> +               ret =3D -EPERM;
+> +               goto unlock;
+> +       }
+> +
+> +       ret =3D kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL=
+);
+> +       if (ret)
+> +               goto unlock;
+> +       if (pte) {
+> +               ret =3D -EBUSY;
+> +               goto unlock;
+> +       }
+> +
+> +       ret =3D pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, PAGE_=
+HYP_DEVICE);
+> +       if (ret)
+> +               goto unlock;
+> +       /*
+> +        * We set HYP as the owner of the MMIO pages in the host stage-2,=
+ for:
+> +        * - host aborts: host_stage2_adjust_range() would fail for inval=
+id non zero PTEs.
+> +        * - recycle under memory pressure: host_stage2_unmap_dev_all() w=
+ould call
+> +        *   kvm_pgtable_stage2_unmap() which will not clear non zero inv=
+alid ptes (counted).
+> +        * - other MMIO donation: Would fail as we check that the PTE is =
+valid or empty.
+> +        */
 
-It updates a base address offset, but that's probably what you meant.
+Rephrasing this to see if I got this right. Because MMIO pages are not
+tracked in the hyp_vmemmap, the host's stage-2 PTE serves as the sole
+record of ownership. We encode PKVM_ID_HYP into an invalid PTE (a
+"counted" PTE) to ensure:
+- Fault Handling: host_stage2_adjust_range() will explicitly fail if
+the host attempts to legitimately map or adjust the protected range.
+- Reclaim Protection: Under memory pressure,
+host_stage2_unmap_dev_all() will not erase this ownership marker,
+because you changed stage2_unmap_walker() to preserve counted PTEs.
+- Exclusive Ownership: Subsequent donation attempts (to HYP or a
+guest) will safely fail, as donation requires the host PTE to be
+either valid (host-owned) or completely empty.
 
-> register. The driver then reads the GITS_CREADR register to see if the
-> command was processed or if the queue is stalled.
->
-> To create a new command, the emulation layer mirrors the behavior
-> as following:
->  (i) The host ITS driver creates a command in the shadow queue:
->         its_allocate_entry() -> builder()
->  (ii) Notifies the hardware that a new command is available:
->         its_post_commands()
->  (iii) Hypervisor traps the write to GITS_CWRITER:
->         handle_host_mem_abort() -> handle_host_mmio_trap() ->
->             pkvm_handle_gic_emulation()
->  (iv) Hypervisor copies the command from the host command queue
->       to the original queue which is not accessible to the host.
->       It parses the command and updates the hardware write.
->
-> The driver allocates space for the original command queue and programs
-> the hardware (GITS_CWRITER). When pKVM becomes available, the driver
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-You mean GITS_CBASER, right?
-
-> allocates a new (shadow) queue and replaces its original pointer to
-> the queue with this new one. This is to prevent a malicious host from
-> tampering with the commands sent to the ITS hardware.
->
-> The entry point of our emulation shares the memory of the newly
-> allocated queue with the hypervisor and donates the memory of the
-> original queue to make it inaccesible to the host.
->
->
-> 2. Indirect tables first level shadowing
->
-> The ITS hardware supports indirection to minimize the space required to
-> accommodate large tables (eg. deviceId space used to index the Device Table
-> is quite sparse). This is a 2-level indirection, with entries from the
-> first table pointing to a second table.
->
-> An attacker in control of the host can insert an address that points to
-> the hypervisor protected memory in the first level table and then use
-> subsequent ITS commands to write to this memory (MAPD).
->
-> To shadow this tables, we rely on the driver to allocate space for it
-> and we copy the original content from the table into the copy. When
-> pKVM becomes available we switch the pointers that hold the orginal
-> tables to point to the copy.
-> To keep the tables from the hypervisor in sync with what the host
-> has, we update the tables when commands are sent to the ITS.
->
->
-> 3. Hiding the last layer of the Device Table and vPE Table from the host
->
-> An attacker in control of the host kernel can alter the content of these
-> tables directly (the Arm IHI 0069H.b spec says that is undefined behavior
-> if entries are created by software). Normally these entries are created in
-> response of commands sent to the ITS.
-
-nit: unpredictable behavior. Undefined usually refers to instructions.
-
->
-> A Device Table entry that has the following structure:
->
-> type DeviceTableEntry is (
->         boolean Valid,
->         Address ITT_base,
->         bits(5) ITT_size
-> )
-
-Be careful, this might be true for a specific GIC implementation,
-e.g., Arm CoreLink GIC-600, but according to the spec (5.2) the
-formats of the tables in system memory are IMPLEMENTATION DEFINED. If
-the format is relevant to us, then we verify specific GIC
-implementation via GITS_IIDR. If the series depends on this, then we
-must decide what to do in case the specific implementation does not
-match what we expect.
-
-> This can be maliciously created by an attacker and the ITT_base can be
-> pointed to hypervisor protected memory. The MAPTI command can then be
-> used to write over the ITT_base with an ITE entry.
-
-You mean it writes to the memory addressed by ITT_base, rather than
-writes over the ITT_base itself.
-
-> Similarly a vCPU Table entry has the following structure:
->
-> type VCPUTableEntry is (
->         boolean Valid,
->         bits(32) RDbase,
->         Address VPT_base,
->         bits(5) VPT_size
-> )
->
-> VPT_base can be pointed to hypervisor protected memory and then a
-> command can be used to raise interrupts and set the corresponding
-> bit. This would give a 1-bit write primitive so is not "as generous"
-> as the others.
->
->
-> Notes
-> =====
->
->
-> Performance impact is expected with this as the emulation dance is not
-> cost free.
-> I haven't implemented any ITS quirks in the emulation and I don't know
-> whether we will need it ? (some hardware needs explicit dcache flushing
-> ITS_FLAGS_CMDQ_NEEDS_FLUSHING).
-
-It's not a quirk. We should handle this in the next respin, because
-cache maintenance of the command queue is an explicit architectural
-requirement depending on how the hardware is integrated and
-configured.
-
-According to the spec, the cacheability attributes of the ITS command
-queue are strictly governed by the InnerCache and OuterCache fields of
-the GITS_CBASER register. These fields can be configured for various
-memory types, including Device-nGnRnE or Normal Non-cacheable.
-
-Because pKVM now takes responsibility for physically writing the
-command packets into the true hardware queue, the hypervisor must obey
-the cacheability attributes programmed into the physical GITS_CBASER.
-
-If the software provisions GITS_CBASER as Non-cacheable, the
-hypervisor must perform explicit data cache maintenance (such as DC
-CVAU or DC CVAC) after copying the commands to the shadow queue. If
-you don't implement this, the physical ITS hardware (acting as a
-non-coherent bus master) will read stale memory, which will inevitably
-lead to queue stalls or the ITS executing garbage commands.
-
-Since we are shielding the physical queue from the host, we inherit
-the host's responsibility to manage its cache coherency based on the
-GITS_CBASER configuration.
-
-> Please note that Redistributors trapping hasn't been addressed at all in
-> this series and the solution is not sufficient but this can be extended
-> afterwards.
-> The current series has been tested with Qemu (-machine
-> virt,virtualization=true,gic-version=4) and with Pixel 10.
-
-It would be helpful to mention that this is based on Linux 7.0-rc3
-(applied cleanly, and confirmed with you offline).
-
-Also, it would be helpful if you could share how to tested this
-series, and how we could reproduce your tests.
-
-Thanks,
+Cheers,
 /fuad
 
 
+
+
+
+
+
+
+
+> +       WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.p=
+gt, phys,
+> +                               PAGE_SIZE, &host_s2_pool, PKVM_ID_HYP));
+> +unlock:
+> +       hyp_unlock_component();
+> +       host_unlock_component();
+> +
+> +       return ret;
+> +}
+> +
+> +int __pkvm_hyp_donate_host_mmio(u64 pfn)
+> +{
+> +       u64 phys =3D hyp_pfn_to_phys(pfn);
+> +       u64 virt =3D (u64)__hyp_va(phys);
+> +       size_t size =3D PAGE_SIZE;
+> +       int ret;
+> +       kvm_pte_t pte;
+> +
+> +       if (addr_is_memory(phys))
+> +               return -EINVAL;
+> +
+> +       host_lock_component();
+> +       hyp_lock_component();
+> +
+> +       ret =3D kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL=
+);
+> +       if (ret)
+> +               goto unlock;
+> +       if (!kvm_pte_valid(pte)) {
+> +               ret =3D -ENOENT;
+> +               goto unlock;
+> +       }
+> +
+> +       ret =3D kvm_pgtable_get_leaf(&host_mmu.pgt, phys, &pte, NULL);
+> +       if (ret)
+> +               goto unlock;
+> +
+> +       if (FIELD_GET(KVM_INVALID_PTE_OWNER_MASK, pte) !=3D PKVM_ID_HYP) =
+{
+> +               ret =3D -EPERM;
+> +               goto unlock;
+> +       }
+> +
+> +       WARN_ON(kvm_pgtable_hyp_unmap(&pkvm_pgtable, virt, size) !=3D siz=
+e);
+> +       WARN_ON(host_stage2_try(kvm_pgtable_stage2_set_owner, &host_mmu.p=
+gt, phys,
+> +                               PAGE_SIZE, &host_s2_pool, PKVM_ID_HOST));
+> +unlock:
+> +       hyp_unlock_component();
+> +       host_unlock_component();
+> +
+> +       return ret;
+> +}
+> +
+>  int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages)
+>  {
+>         u64 phys =3D hyp_pfn_to_phys(pfn);
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 9b480f947da2..d954058e63ff 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1152,13 +1152,8 @@ static int stage2_unmap_walker(const struct kvm_pg=
+table_visit_ctx *ctx,
+>         kvm_pte_t *childp =3D NULL;
+>         bool need_flush =3D false;
 >
+> -       if (!kvm_pte_valid(ctx->old)) {
+> -               if (stage2_pte_is_counted(ctx->old)) {
+> -                       kvm_clear_pte(ctx->ptep);
+> -                       mm_ops->put_page(ctx->ptep);
+> -               }
+> -               return 0;
+> -       }
+> +       if (!kvm_pte_valid(ctx->old))
+> +               return stage2_pte_is_counted(ctx->old) ? -EPERM : 0;
 >
-> Thanks,
-> Sebastian E.
->
-> Mostafa Saleh (1):
->   KVM: arm64: Donate MMIO to the hypervisor
->
-> Sebastian Ene (13):
->   KVM: arm64: Track host-unmapped MMIO regions in a static array
->   KVM: arm64: Support host MMIO trap handlers for unmapped devices
->   KVM: arm64: Mediate host access to GIC/ITS MMIO via unmapping
->   irqchip/gic-v3-its: Prepare shadow structures for KVM host deprivilege
->   KVM: arm64: Add infrastructure for ITS emulation setup
->   KVM: arm64: Restrict host access to the ITS tables
->   KVM: arm64: Trap & emulate the ITS MAPD command
->   KVM: arm64: Trap & emulate the ITS VMAPP command
->   KVM: arm64: Trap & emulate the ITS MAPC command
->   KVM: arm64: Restrict host updates to GITS_CTLR
->   KVM: arm64: Restrict host updates to GITS_CBASER
->   KVM: arm64 Restrict host updates to GITS_BASER
->   KVM: arm64: Implement HVC interface for ITS emulation setup
->
->  arch/arm64/include/asm/kvm_arm.h              |   3 +
->  arch/arm64/include/asm/kvm_asm.h              |   1 +
->  arch/arm64/include/asm/kvm_pkvm.h             |  20 +
->  arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  17 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
->  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  14 +
->  arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 653 ++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 134 ++++
->  arch/arm64/kvm/hyp/nvhe/setup.c               |  28 +
->  arch/arm64/kvm/hyp/pgtable.c                  |   9 +-
->  arch/arm64/kvm/pkvm.c                         |  60 ++
->  drivers/irqchip/irq-gic-v3-its.c              | 177 ++++-
->  include/linux/irqchip/arm-gic-v3.h            |  36 +
->  14 files changed, 1126 insertions(+), 31 deletions(-)
->  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
->  create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
->
+>         if (kvm_pte_table(ctx->old, ctx->level)) {
+>                 childp =3D kvm_pte_follow(ctx->old, mm_ops);
 > --
 > 2.53.0.473.g4a7958ca14-goog
 >
