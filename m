@@ -1,195 +1,252 @@
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com [209.85.161.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7FC3368AD
-	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 22:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8413D9DAF;
+	Thu, 12 Mar 2026 23:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773355173; cv=none; b=KIclUNOEPzu+CBaID+PwIcYJnIl7Pkr9tsLcarB0v3Lqmv5Ka3gkzUKGtTNncMvZSm7n+f/u8COaxpmK3uj9CW1L7B8/Hy6UvFlDKj/Hn+fMd/p7WBicfJH7iVyOR5C1SEbEBaAraxFDmM2juDywQySjHDsdyRBc1TK2npbEO+A=
+	t=1773359518; cv=none; b=fNk1DU3h9ZSUpFEgu4EgQaXIwht5hupHpqskzyjeN00MnCbgYHsjTqseHBsQMwpLLym2HEEo/zIhFORLD9MnNMwQftc3ZubXKXwlNZ4eUwTGAfotsRJW1gBZHISW22T+D8ZLrEnx0btLMLYVtC09QK15TzQns3CpAAwrzxxG6B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773355173; c=relaxed/simple;
-	bh=uK5x8e36cBtKTp4Zgmsqull9lgG1uXg1oR7aeNNQMMc=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=dKvDFZrfsmHQT2rNFKQcX1kwo7fXN9mwZ9s8VTiuTdmA/HGerxMmOb5qO3KIewb571KvS5P99rBhKvzLnyfFRIHgJFroc0UW00nXgLVYNs16KV6X12ep7/73cX2JhTVWxyU8jWsJao2UQvY42njx85NmzgXwXINl8/BahTHKYFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oEkBJrNn; arc=none smtp.client-ip=209.85.161.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+	s=arc-20240116; t=1773359518; c=relaxed/simple;
+	bh=qD/7CdUR0FWQsy1MPlTTxVBHiQ9FN1ndBxO1HK0Fr3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hfcfSCj1UhOujdFWMiz4WxlK8uTa/cFmu39kBKV16EhdrhfTyM5b6v6hufoLxaPG5Z4+ZcJ+iPNaINn8CnGan9MPaXXV60zPPyZ/mxwPrefK6/gwpfkz5XvA0aAhhK76UsZgQByZN0tfztX+MZopv0FffVratixXAm7cVDm6DQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZNspkYo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oEkBJrNn"
-Received: by mail-oo1-f74.google.com with SMTP id 006d021491bc7-67bd1b317dfso22016915eaf.1
-        for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 15:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1773355172; x=1773959972; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ze4zxD1+bgXLnmCcgE7F5EkAVz6+P8Y6KbhF09qoxxs=;
-        b=oEkBJrNnrh6Xir4XnbYLDOr2zpHWznW2tZIFVknhe33NeGSjF3w2ASdqhok5lSQb4s
-         1UHlXgYKZLHzh3U7fgdyP5FFlKMOnd6UrqLLgHjxu9wNE4cPGWPNxFp5sGhpUziyfMKN
-         g+yXsuckJNBdFIjYhQ9RS5fGihP5E7v7cjmcu+8YgeHqHndsPtxxuxtPlQPzd6X5tFtY
-         fHDPV0OrAVDIUxcBQqqBARuEm2J850AdWRlU7fUfJvQy0e6Io8Q01Rh1FONAmg6gOgG/
-         b9LHM7706m6YDBAnz5m41+kTNBDQW9SjFbC/1Htuy+NSSAOTcE9fQ2e/JZ85iX7fpTgE
-         jZ3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773355172; x=1773959972;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ze4zxD1+bgXLnmCcgE7F5EkAVz6+P8Y6KbhF09qoxxs=;
-        b=I4ZMi0bG11KcKaibjsD2nh4kDGn2ZTUgH+x3zWqzN6YFUl8VbQQKWD/soQwk19vkYh
-         LCHZuhqRKtgBvMT41tHPOapH19TzFkXXjwaKOMrGsw76HA9UgijpKFGKeiKjUegYcsZb
-         q96rKn2xH8Eyp4O3U2JeUzBX1lQFwgR+XdCke77zsapqO182QyYNiip1tlGGRWCTr+Ax
-         6CvUChBJbsZtpyfbUkfLLpWZNT1tfGVLwI12aQYfvSuS3xQzm2DmtV7qCfxFT2s1agQ6
-         aNFQJykxDsbYkjx4qG5PpP3JfUrub/AvZxtn4ka6BuuWO7+3WpVj8C10o40CA6AuYGz4
-         5PTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFzERRpLAD3Hv1NN40c1FGGEWT1zLDvP2mKWe06nJa1tc095F8mBa+ucMwx58wPYCk/m5Qfqw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwTdVeEEjBmerk6o2KXmTcfFIjRAJfsUiAnPiopgZzZ9T2i+CnE
-	e/EUNzeYOar+L0jpky0iJQtjB8IWhZ3rkbD55uqfEQ9ZF4bbz4I5wuDdQAcKfTKZ+DpNJ6iv/g3
-	0briU937jgmRbN1Qy5xjc2vPIhQ==
-X-Received: from iobdo19.prod.google.com ([2002:a05:6602:4613:b0:95a:608d:8cf8])
- (user=coltonlewis job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6820:210b:b0:674:911:98fa with SMTP id 006d021491bc7-67bdaa85b4dmr742343eaf.64.1773355171523;
- Thu, 12 Mar 2026 15:39:31 -0700 (PDT)
-Date: Thu, 12 Mar 2026 22:39:30 +0000
-In-Reply-To: <68a93eb5-24df-4b73-bd1e-798dc32b7e86@linaro.org> (message from
- James Clark on Wed, 11 Mar 2026 12:01:26 +0000)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZNspkYo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C61CC4CEF7;
+	Thu, 12 Mar 2026 23:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773359517;
+	bh=qD/7CdUR0FWQsy1MPlTTxVBHiQ9FN1ndBxO1HK0Fr3c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UZNspkYoKLw42etkuga7S8rATF+lLguXC6ojsSBBDb7AiOYPywY2WrZZELLNLK3cR
+	 /h4I4hFjhAb/UxzqOG7/2xC7OQM6O59c3PyIEWUU2qvYpc5L8xWeTj/hiywgG9xISD
+	 /nqtFoA0no+2aN12rv+vIj3SneQQ7F159NWyl1dtdj1M/FdxUwQJOFFVJp22NV2Lxd
+	 r5BDMhsilc/woqZa02OEzGTEiuiGBfJFo9g1ha945FZwNKa1wWt2oTvYMefHI/kXNW
+	 8bQHdHrVdmEq2VzG2XpoMX2t8pEjzpx2Pt0geuU2ygArByrT1NSBlGWLk90diJCo5M
+	 mJqL7A9jzz3hw==
+Date: Thu, 12 Mar 2026 16:51:53 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Vincent Donnefort <vdonnefort@google.com>
+Cc: maz@kernel.org, rostedt@goodmis.org, arnd@arndb.de,
+	linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
+	kernel-team@android.com
+Subject: Re: [PATCH] tracing: Generate undef symbols allowlist for
+ simple_ring_buffer
+Message-ID: <20260312235153.GA1147071@ax162>
+References: <20260312182010.111013-1-vdonnefort@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-Message-ID: <gsntbjgsoeot.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v6 11/19] KVM: arm64: Context swap Partitioned PMU guest registers
-From: Colton Lewis <coltonlewis@google.com>
-To: James Clark <james.clark@linaro.org>
-Cc: kvm@vger.kernel.org, alexandru.elisei@arm.com, pbonzini@redhat.com, 
-	corbet@lwn.net, linux@armlinux.org.uk, catalin.marinas@arm.com, 
-	will@kernel.org, maz@kernel.org, oliver.upton@linux.dev, mizhang@google.com, 
-	joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	mark.rutland@arm.com, shuah@kernel.org, gankulkarni@os.amperecomputing.com, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-perf-users@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260312182010.111013-1-vdonnefort@google.com>
 
-James Clark <james.clark@linaro.org> writes:
+Hi Vincent,
 
-> On 09/02/2026 10:14 pm, Colton Lewis wrote:
->> Save and restore newly untrapped registers that can be directly
->> accessed by the guest when the PMU is partitioned.
+On Thu, Mar 12, 2026 at 06:20:10PM +0000, Vincent Donnefort wrote:
+> Compiler and tooling-generated symbols are difficult to maintain
+> across all supported architectures. Make the allowlist more robust by
+> replacing the harcoded list with a mechanism that automatically detects
+> these symbols.
+> 
+> This mechanism generates a C function designed to trigger common
+> compiler-inserted symbols.
 
->> * PMEVCNTRn_EL0
->> * PMCCNTR_EL0
->> * PMSELR_EL0
->> * PMCR_EL0
->> * PMCNTEN_EL0
->> * PMINTEN_EL1
+This certainly seems more robust.
 
->> If we know we are not partitioned (that is, using the emulated vPMU),
->> then return immediately. A later patch will make this lazy so the
->> context swaps don't happen unless the guest has accessed the PMU.
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> 
+> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> index beb15936829d..3b427b76434a 100644
+> --- a/kernel/trace/Makefile
+> +++ b/kernel/trace/Makefile
+> @@ -136,17 +136,37 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+>  # simple_ring_buffer is used by the pKVM hypervisor which does not have access
+>  # to all kernel symbols. Fail the build if forbidden symbols are found.
+>  #
+> -UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
+> -UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer llvm_gcda llvm_gcov
+> -UNDEFINED_ALLOWLIST += .TOC\. __clear_pages_unrolled __memmove copy_page warn_slowpath_fmt
+> -UNDEFINED_ALLOWLIST += ftrace_likely_update __hwasan_load __hwasan_store __hwasan_tag_memory
+> -UNDEFINED_ALLOWLIST += warn_bogus_irq_restore __stack_chk_guard
+> -UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
+> +# undefsyms_base generates a set of compiler and tooling-generated symbols that can
+> +# safely be ignored for simple_ring_buffer.
+> +#
+> +$(obj)/undefsyms_base.c: FORCE
+> +	$(Q)echo '#include <asm/page.h>' > $@
+> +	$(Q)echo '#include <asm/local.h>' >> $@
+> +	$(Q)echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);' >> $@
+> +	$(Q)echo 'void undefsyms_base(int n);' >> $@
+> +	$(Q)echo 'void undefsyms_base(int n) {' >> $@
+> +	$(Q)echo '	char buffer[256] = { 0 };' >> $@
+> +	$(Q)echo '	u32 u = 0;' >> $@
+> +	$(Q)echo '	memset((char * volatile)page, 8, PAGE_SIZE);' >> $@
+> +	$(Q)echo '	memset((char * volatile)buffer, 8, sizeof(buffer));' >> $@
+> +	$(Q)echo '	cmpxchg((u32 * volatile)&u, 0, 8);' >> $@
+> +	$(Q)echo '	WARN_ON(n == 0xdeadbeef);' >> $@
+> +	$(Q)echo '}' >> $@
 
->> PMEVTYPER is handled in a following patch since we must apply the KVM
->> event filter before writing values to hardware.
+This should use filechk, otherwise undefsyms_base.c will be regenerated
+every build, resulting in undefsyms_base.o being rebuilt every time.
 
->> PMOVS guest counters are cleared to avoid the possibility of
->> generating spurious interrupts when PMINTEN is written. This is fine
->> because the virtual register for PMOVS is always the canonical value.
+  $ make -skj"$(nproc)" ARCH=x86_64 mrproper allmodconfig kernel/trace/
 
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->> ---
->>    arch/arm64/kvm/arm.c        |   2 +
->>    arch/arm64/kvm/pmu-direct.c | 123 ++++++++++++++++++++++++++++++++++++
->>    include/kvm/arm_pmu.h       |   4 ++
->>    3 files changed, 129 insertions(+)
+  $ make -skj"$(nproc)" ARCH=x86_64 V=2 kernel/trace/
+  ...
+    CC      kernel/trace/undefsyms_base.o - due to: kernel/trace/undefsyms_base.c
+    NM      kernel/trace/simple_ring_buffer.o - due to target missing
 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 620a465248d1b..adbe79264c032 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -635,6 +635,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int  
->> cpu)
->>    		kvm_vcpu_load_vhe(vcpu);
->>    	kvm_arch_vcpu_load_fp(vcpu);
->>    	kvm_vcpu_pmu_restore_guest(vcpu);
->> +	kvm_pmu_load(vcpu);
->>    	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
->>    		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+filechk_undefsyms_base = {                                              \
+	echo '$(pound)include <asm/page.h>';                            \
+	echo '$(pound)include <asm/local.h>';                           \
+	echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);';       \
+	echo 'void undefsyms_base(int n);';                             \
+	echo 'void undefsyms_base(int n) {';                            \
+	echo '	char buffer[256] = { 0 };';                             \
+	echo '	u32 u = 0;';                                            \
+	echo '	memset((char * volatile)page, 8, PAGE_SIZE);';          \
+	echo '	memset((char * volatile)buffer, 8, sizeof(buffer));';   \
+	echo '	cmpxchg((u32 * volatile)&u, 0, 8);';                    \
+	echo '	WARN_ON(n == 0xdeadbeef);';                             \
+	echo '}';                                                       \
+	}
 
->> @@ -676,6 +677,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->>    	kvm_timer_vcpu_put(vcpu);
->>    	kvm_vgic_put(vcpu);
->>    	kvm_vcpu_pmu_restore_host(vcpu);
->> +	kvm_pmu_put(vcpu);
->>    	if (vcpu_has_nv(vcpu))
->>    		kvm_vcpu_put_hw_mmu(vcpu);
->>    	kvm_arm_vmid_clear_active();
->> diff --git a/arch/arm64/kvm/pmu-direct.c b/arch/arm64/kvm/pmu-direct.c
->> index f2e6b1eea8bd6..b07b521543478 100644
->> --- a/arch/arm64/kvm/pmu-direct.c
->> +++ b/arch/arm64/kvm/pmu-direct.c
->> @@ -9,6 +9,7 @@
->>    #include <linux/perf/arm_pmuv3.h>
+$(obj)/undefsyms_base.c: FORCE
+	$(call filechk,undefsyms_base)
 
->>    #include <asm/arm_pmuv3.h>
->> +#include <asm/kvm_emulate.h>
+  $ make -skj"$(nproc)" ARCH=x86_64 mrproper allmodconfig kernel/trace/
 
->>    /**
->>     * has_host_pmu_partition_support() - Determine if partitioning is  
->> possible
->> @@ -163,3 +164,125 @@ u8 kvm_pmu_hpmn(struct kvm_vcpu *vcpu)
+  $ make -skj"$(nproc)" ARCH=x86_64 V=2 kernel/trace/
+    GEN     Makefile - due to target is PHONY
+    DESCEND objtool
+    CALL    scripts/checksyscalls.sh - due to target is PHONY
+    INSTALL libsubcmd_headers
+    NM      kernel/trace/simple_ring_buffer.o - due to target missing
 
->>    	return *host_data_ptr(nr_event_counters);
->>    }
->> +
->> +/**
->> + * kvm_pmu_load() - Load untrapped PMU registers
->> + * @vcpu: Pointer to struct kvm_vcpu
->> + *
->> + * Load all untrapped PMU registers from the VCPU into the PCPU. Mask
->> + * to only bits belonging to guest-reserved counters and leave
->> + * host-reserved counters alone in bitmask registers.
->> + */
->> +void kvm_pmu_load(struct kvm_vcpu *vcpu)
->> +{
->> +	struct arm_pmu *pmu;
->> +	unsigned long guest_counters;
->> +	u64 mask;
->> +	u8 i;
->> +	u64 val;
->> +
->> +	/*
->> +	 * If we aren't guest-owned then we know the guest isn't using
->> +	 * the PMU anyway, so no need to bother with the swap.
->> +	 */
->> +	if (!kvm_vcpu_pmu_is_partitioned(vcpu))
->> +		return;
->> +
->> +	preempt_disable();
->> +
->> +	pmu = vcpu->kvm->arch.arm_pmu;
->> +	guest_counters = kvm_pmu_guest_counter_mask(pmu);
->> +
->> +	for_each_set_bit(i, &guest_counters, ARMPMU_MAX_HWEVENTS) {
->> +		val = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i);
->> +
->> +		write_sysreg(i, pmselr_el0);
->> +		write_sysreg(val, pmxevcntr_el0);
+> +clean-files += undefsyms_base.c
+> +targets += undefsyms_base.c
 
-> This needs to have a special case for ARMV8_PMU_CYCLE_IDX because you
-> can't use pmxevcntr_el0 to read or write PMCCNTR_EL0:
+I don't think this targets addition is necessary.
 
-> D24.5.22:
+> +$(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
+> +
+> +extra-y += undefsyms_base.o
 
->     SEL 0b11111      Select the cycle counter, PMCCNTR_EL0:
+I think this should be
 
->                      MRS and MSR of PMXEVCNTR_EL0 are CONSTRAINED
->                      UNPREDICTABLE.
+  targets += undefsyms_base.o
 
-> There are 3 separate instances of the same thing in the patches. I was
-> getting undefined instruction errors on my Radxa O6 board until they
-> were all fixed.
+as extra-y is deprecated per Documentation/kbuild/makefiles.rst.
 
-Looks like it. I had a special case on a previous iteration but someone
-suggested I could get rid of it by iterating the mask.
+> +UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sanitizer __tsan __ubsan __x86_indirect_thunk \
+> +		       $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
 
-I missed that the cycle counter was CONSTRAINED UNPREDICTABLE.
+With an allmodconfig + ThinLTO build, I still see:
+
+  $ cat allmod.config
+  CONFIG_GCOV_KERNEL=n
+  CONFIG_KASAN=n
+  CONFIG_LTO_CLANG_THIN=y
+
+  $ make -skj"$(nproc)" ARCH=x86_64 KCONFIG_ALLCONFIG=1 LLVM=1 mrproper allmodconfig kernel/trace/
+  Unexpected symbols in kernel/trace/simple_ring_buffer.o:
+                   U __fortify_panic
+                   U __write_overflow_field
+                   U simple_ring_buffer_commit
+                   U simple_ring_buffer_enable_tracing
+                   U simple_ring_buffer_init
+                   U simple_ring_buffer_reserve
+                   U simple_ring_buffer_reset
+                   U simple_ring_buffer_swap_reader_page
+                   U simple_ring_buffer_unload
+
+Something like:
+
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index 48c415a0c7e4..0f9a6ce9abd9 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -142,13 +142,15 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+ filechk_undefsyms_base = {                                              \
+ 	echo '$(pound)include <asm/page.h>';                            \
+ 	echo '$(pound)include <asm/local.h>';                           \
++	echo '$(pound)include <linux/string.h>';                        \
+ 	echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);';       \
+-	echo 'void undefsyms_base(int n);';                             \
+-	echo 'void undefsyms_base(int n) {';                            \
++	echo 'void undefsyms_base(int n, void *ptr);';                  \
++	echo 'void undefsyms_base(int n, void *ptr) {';                 \
+ 	echo '	char buffer[256] = { 0 };';                             \
+ 	echo '	u32 u = 0;';                                            \
+ 	echo '	memset((char * volatile)page, 8, PAGE_SIZE);';          \
+ 	echo '	memset((char * volatile)buffer, 8, sizeof(buffer));';   \
++	echo '	memcpy((void* volatile)ptr, buffer, sizeof(buffer));';  \
+ 	echo '	cmpxchg((u32 * volatile)&u, 0, 8);';                    \
+ 	echo '	WARN_ON(n == 0xdeadbeef);';                             \
+ 	echo '}';                                                       \
+--
+
+cures the first two. The simple_ring_buffer symbols are very odd...
+
+  $ llvm-nm kernel/trace/simple_ring_buffer.o | grep simple_ring_buffer
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_commit_845
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_enable_tracing_849
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_init_847
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_reserve_841
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_reset_846
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_swap_reader_page_837
+  ---------------- d __UNIQUE_ID_addressable_simple_ring_buffer_unload_848
+  ---------------- t __export_symbol_simple_ring_buffer_commit
+  ---------------- t __export_symbol_simple_ring_buffer_enable_tracing
+  ---------------- t __export_symbol_simple_ring_buffer_init
+  ---------------- t __export_symbol_simple_ring_buffer_reserve
+  ---------------- t __export_symbol_simple_ring_buffer_reset
+  ---------------- t __export_symbol_simple_ring_buffer_swap_reader_page
+  ---------------- t __export_symbol_simple_ring_buffer_unload
+  ---------------- T simple_ring_buffer_commit
+                   U simple_ring_buffer_commit
+  ---------------- T simple_ring_buffer_enable_tracing
+                   U simple_ring_buffer_enable_tracing
+                   U simple_ring_buffer_init
+  ---------------- T simple_ring_buffer_init
+  ---------------- T simple_ring_buffer_init_mm
+  ---------------- T simple_ring_buffer_reserve
+                   U simple_ring_buffer_reserve
+  ---------------- T simple_ring_buffer_reset
+                   U simple_ring_buffer_reset
+                   U simple_ring_buffer_swap_reader_page
+  ---------------- T simple_ring_buffer_swap_reader_page
+                   U simple_ring_buffer_unload
+  ---------------- T simple_ring_buffer_unload
+  ---------------- T simple_ring_buffer_unload_mm
+
+This is LLVM IR bitcode at this stage, which could be messing things up.
+
+  $ file kernel/trace/simple_ring_buffer.o
+  kernel/trace/simple_ring_buffer.o: LLVM IR bitcode
+
+Maybe not worth thinking about too much and just adding it to the
+allowlist manually?
+
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index 0f9a6ce9abd9..cb1ec50a8386 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -166,6 +166,7 @@ $(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
+ targets += undefsyms_base.o
+ 
+ UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sanitizer __tsan __ubsan __x86_indirect_thunk \
++		       simple_ring_buffer \
+ 		       $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
+ 
+ quiet_cmd_check_undefined = NM      $<
+--
+
+Cheers,
+Nathan
