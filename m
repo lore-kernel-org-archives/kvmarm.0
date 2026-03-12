@@ -1,257 +1,131 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4323E3FEB04
-	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 18:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D503EF0A0
+	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 18:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773339456; cv=none; b=NbmDJpRHUyHeW7D9bpu5ZRuvnSpDuc/xoKr+k3KDY+AU+D4easM8XxUZw1XH0l8c9a5pQStzhHBu637tzmLjIPN0eRMyseEXoTDMzT2PufTfbb+nt3nc0xlRnVcp4ODOviPtpnu+WUyrCbgWY/UaNKyLddl/0GvqAgCndD+AU/Y=
+	t=1773339628; cv=none; b=OsopWada9lSCHB6xxmpQYMVidZO853mO+zsszlqYi+Kk6y8mRzchNqJOQIYNKKEOvFsQYCP+aaqPlB57o2CIjcin4K9tQ/JkJo6vm3c2fR8uDnDs0eaEp3337AQicsi5NIAn5EO7fUN2Nhe8ZWVBTbIyckTSkZpHd88kfSFtrg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773339456; c=relaxed/simple;
-	bh=oseE2rbEt6AvnSSYQiq+1Dcp8V/0TQwolE8LQt7EC+4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tByBQODuvM4sooflSIXLSG91uRfS3mEDZR1cTt5jDoi0/CG7jJRVa2BnXGh2MqGwqOGOQwQfVYvmUvr1TDhf7h5Trk3yMKu0o14PX+N6hrAq320NPibHwSqkzpmFYpilYUHHa9F0Ec3vEnY9uH+5GiTpe3uUSA1b1gF4Qxq6HaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 75E22165C;
-	Thu, 12 Mar 2026 11:17:26 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B4223F73B;
-	Thu, 12 Mar 2026 11:17:30 -0700 (PDT)
-Date: Thu, 12 Mar 2026 18:17:28 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Yeoreum Yun <yeoreum.yun@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
-	oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com,
-	broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v15 5/8] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <abMDOC5DYEm74And@arm.com>
-References: <20260227151705.1275328-1-yeoreum.yun@arm.com>
- <20260227151705.1275328-6-yeoreum.yun@arm.com>
+	s=arc-20240116; t=1773339628; c=relaxed/simple;
+	bh=A+A+tratlevD3a3rMI2wmVXp/n07E7eNLHxYMsuqPio=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PtmZl+x7FvmLwtIb4mTrYGstXS69iX1qDTTlmlb7TW5Y/1RRGgVqNH3youQvWXAX902qpRCXsc/Jgzvyl0bU5iHaLbwYSLZtCFyrbfRVuZKjN/jSqgq88ydVnvMzRk03mE4O4aUXXa3stnaNqrAcEQfQwF7Kk1WwIyK5uOaiDOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dY+VzPPY; arc=none smtp.client-ip=209.85.128.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--vdonnefort.bounces.google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dY+VzPPY"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853b0af42aso19104885e9.0
+        for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 11:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1773339623; x=1773944423; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dK9k5DTKgk7wxx2+4cg6YZWZrym/c7pdTbONfQY+9AY=;
+        b=dY+VzPPYVM4ad8j5Y/NTf5VCYuggXf4SzNNorrM6J3KL3d+1g2ayg/QsHnmR2PUFzp
+         osztXyXAzkEStN+ArBoD0VGaFWmfRVVctqy6kVL5F7ZWJGY5G+BPdoYyNrHrEe+9oiFB
+         ztlYGcZK/90MVRabZEcLmhuKGY1bS9jIEoVNegO4cMuELtAA9znlsUnDHfEA+gv1giA+
+         6Cj5JTGHvqgvdtgs2pn6TO4TL6b4kAzGa7Npz/Iytg7fVgBrJN4yikro4TNiXGuxDvqD
+         kLOPbCZdbkKMuSuKfKIJWxzuuFGiiauaHxV4T87qzxrEwAMcDYNS71gU2EHDC9GriaCk
+         lp1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1773339623; x=1773944423;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dK9k5DTKgk7wxx2+4cg6YZWZrym/c7pdTbONfQY+9AY=;
+        b=kjZks+ub6WygKEN6tE5CYSGgA3q2fWpJTLZ2cewhMeFMayipTxTcGqEgT+kHGBJ0FX
+         uhauSPuplTM0UnXHhAPwpudLhreW16SwvETXZVoSJJAjY92Dd5B8wbsSkFSr05N8s970
+         8Uk+JsxtBm6h0C37Z5u7aPF76zGqDPW1NCD3mPOi7aQaIoH0dFAr5s16HyNYvtRBrSva
+         J78lk+5grliDdeimDz5lqLMS9WkI+9CZoXjTTzQAuq/nq2cCpEDn6HYEHKMd4u/KnxAZ
+         MOKaN709DoWV1UZLjTZKO524M/ODsgtYlyJ4b6ljZVUQuC2bL3SDChz8JLBpfLtRn2jY
+         v3VA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHnTINZX9iByxDDnkTelGnHMuAh81LteV8xzY58+pfgTSQQGUIraEFSODr0Cql1lVN4XA/vEU=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx8tZT7JRJWuzu93cYxHlxJtBkDUH6q2AsQeBEysQyHT2FkRYRu
+	K63xDAq2IbGJhjTeTY4wHTxY/PYoq+bfOK+Zib1jQjEQdVFi9pYmYPk0nkA3H0DR+nq1vsTiexp
+	svZN3ZwnCLXI+y/XwUELrow==
+X-Received: from wmcu23.prod.google.com ([2002:a7b:c057:0:b0:485:385e:a8c1])
+ (user=vdonnefort job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600d:644a:20b0:485:3bb0:194 with SMTP id 5b1f17b1804b1-48556714b41mr3819805e9.35.1773339622932;
+ Thu, 12 Mar 2026 11:20:22 -0700 (PDT)
+Date: Thu, 12 Mar 2026 18:20:10 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260227151705.1275328-6-yeoreum.yun@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
+Message-ID: <20260312182010.111013-1-vdonnefort@google.com>
+Subject: [PATCH] tracing: Generate undef symbols allowlist for simple_ring_buffer
+From: Vincent Donnefort <vdonnefort@google.com>
+To: maz@kernel.org
+Cc: rostedt@goodmis.org, arnd@arndb.de, nathan@kernel.org, 
+	linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
+	kernel-team@android.com, Vincent Donnefort <vdonnefort@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Feb 27, 2026 at 03:17:02PM +0000, Yeoreum Yun wrote:
-> +#ifdef CONFIG_ARM64_LSUI
-> +
-> +/*
-> + * FEAT_LSUI is supported since Armv9.6, where FEAT_PAN is mandatory.
-> + * However, this assumption may not always hold:
-> + *
-> + *   - Some CPUs advertise FEAT_LSUI but lack FEAT_PAN.
-> + *   - Virtualisation or ID register overrides may expose invalid
-> + *     feature combinations.
-> + *
-> + * Rather than disabling FEAT_LSUI when FEAT_PAN is absent, wrap LSUI
-> + * instructions with uaccess_ttbr0_enable()/disable() when
-> + * ARM64_SW_TTBR0_PAN is enabled.
-> + */
+Compiler and tooling-generated symbols are difficult to maintain
+across all supported architectures. Make the allowlist more robust by
+replacing the harcoded list with a mechanism that automatically detects
+these symbols.
 
-I'd just keep this comment in the commit log. Here you could simply say
-that user access instructions don't require (hardware) PAN toggling. It
-should be obvious why we use ttbr0 toggling like for other uaccess
-routines.
+This mechanism generates a C function designed to trigger common
+compiler-inserted symbols.
 
-> +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
-> +static __always_inline int						\
-> +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> +{									\
-> +	int ret = 0;							\
-> +	int oldval;							\
-> +									\
-> +	uaccess_ttbr0_enable();						\
-> +									\
-> +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-> +	__LSUI_PREAMBLE							\
-> +"1:	" #asm_op "al	%w3, %w2, %1\n"					\
+Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
 
-As I mentioned on a previous patch, can we not use named operators here?
+diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+index beb15936829d..3b427b76434a 100644
+--- a/kernel/trace/Makefile
++++ b/kernel/trace/Makefile
+@@ -136,17 +136,37 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
+ # simple_ring_buffer is used by the pKVM hypervisor which does not have access
+ # to all kernel symbols. Fail the build if forbidden symbols are found.
+ #
+-UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
+-UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer llvm_gcda llvm_gcov
+-UNDEFINED_ALLOWLIST += .TOC\. __clear_pages_unrolled __memmove copy_page warn_slowpath_fmt
+-UNDEFINED_ALLOWLIST += ftrace_likely_update __hwasan_load __hwasan_store __hwasan_tag_memory
+-UNDEFINED_ALLOWLIST += warn_bogus_irq_restore __stack_chk_guard
+-UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
++# undefsyms_base generates a set of compiler and tooling-generated symbols that can
++# safely be ignored for simple_ring_buffer.
++#
++$(obj)/undefsyms_base.c: FORCE
++	$(Q)echo '#include <asm/page.h>' > $@
++	$(Q)echo '#include <asm/local.h>' >> $@
++	$(Q)echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);' >> $@
++	$(Q)echo 'void undefsyms_base(int n);' >> $@
++	$(Q)echo 'void undefsyms_base(int n) {' >> $@
++	$(Q)echo '	char buffer[256] = { 0 };' >> $@
++	$(Q)echo '	u32 u = 0;' >> $@
++	$(Q)echo '	memset((char * volatile)page, 8, PAGE_SIZE);' >> $@
++	$(Q)echo '	memset((char * volatile)buffer, 8, sizeof(buffer));' >> $@
++	$(Q)echo '	cmpxchg((u32 * volatile)&u, 0, 8);' >> $@
++	$(Q)echo '	WARN_ON(n == 0xdeadbeef);' >> $@
++	$(Q)echo '}' >> $@
++
++clean-files += undefsyms_base.c
++targets += undefsyms_base.c
++
++$(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
++
++extra-y += undefsyms_base.o
++
++UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sanitizer __tsan __ubsan __x86_indirect_thunk \
++		       $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
+ 
+ quiet_cmd_check_undefined = NM      $<
+-      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
++      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(addprefix -e ,$(UNDEFINED_ALLOWLIST))`"
+ 
+-$(obj)/%.o.checked: $(obj)/%.o FORCE
++$(obj)/%.o.checked: $(obj)/%.o $(obj)/undefsyms_base.o FORCE
+ 	$(call if_changed,check_undefined)
+ 
+ always-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o.checked
 
-> +"2:\n"									\
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)				\
-> +	: "+r" (ret), "+Q" (*uaddr), "=r" (oldval)			\
-> +	: "r" (oparg)							\
-> +	: "memory");							\
-> +									\
-> +	uaccess_ttbr0_disable();					\
-> +									\
-> +	if (!ret)							\
-> +		*oval = oldval;						\
-> +	return ret;							\
-> +}
-> +
-> +LSUI_FUTEX_ATOMIC_OP(add, ldtadd)
-> +LSUI_FUTEX_ATOMIC_OP(or, ldtset)
-> +LSUI_FUTEX_ATOMIC_OP(andnot, ldtclr)
-> +LSUI_FUTEX_ATOMIC_OP(set, swpt)
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg64(u64 __user *uaddr, u64 *oldval, u64 newval)
-> +{
-> +	int ret = 0;
-> +
-> +	uaccess_ttbr0_enable();
-> +
-> +	asm volatile("// __lsui_cmpxchg64\n"
-> +	__LSUI_PREAMBLE
-> +"1:	casalt	%2, %3, %1\n"
-> +"2:\n"
-> +	_ASM_EXTABLE_UACCESS_ERR(1b, 2b, %w0)
-> +	: "+r" (ret), "+Q" (*uaddr), "+r" (*oldval)
-> +	: "r" (newval)
-> +	: "memory");
-> +
-> +	uaccess_ttbr0_disable();
-> +
-> +	return ret;
-
-So here it returns EFAULT only if the check failed. The EAGAIN is only
-possible in cmpxchg32. That's fine but I have more comments below.
-
-> +}
-> +
-> +static __always_inline int
-> +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	u64 __user *uaddr64;
-> +	bool futex_pos, other_pos;
-> +	int ret, i;
-> +	u32 other, orig_other;
-> +	union {
-> +		u32 futex[2];
-> +		u64 raw;
-> +	} oval64, orig64, nval64;
-> +
-> +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
-
-Nit: we don't use space after the type cast.
-
-> +	futex_pos = !IS_ALIGNED((unsigned long)uaddr, sizeof(u64));
-> +	other_pos = !futex_pos;
-> +
-> +	oval64.futex[futex_pos] = oldval;
-> +	ret = get_user(oval64.futex[other_pos], (u32 __user *)uaddr64 + other_pos);
-> +	if (ret)
-> +		return -EFAULT;
-> +
-> +	ret = -EAGAIN;
-> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-
-I was wondering if we still need the FUTEX_MAX_LOOPS bound with LSUI. I
-guess with CAS we can have some malicious user that keeps updating the
-futex location or the adjacent one on another CPU. However, I think we'd
-need to differentiate between futex_atomic_cmpxchg_inatomic() use and
-the eor case.
-
-> +		orig64.raw = nval64.raw = oval64.raw;
-> +
-> +		nval64.futex[futex_pos] = newval;
-
-I'd keep orig64.raw = oval64.raw and set the nval64 separately (I find
-it clearer, not sure the compiler cares much):
-
-		nval64.futex[futex_pos] = newval;
-		nval64.futex[other_pos] = oval64.futex[other_pos];
-
-> +
-> +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
-> +			return -EFAULT;
-> +
-> +		oldval = oval64.futex[futex_pos];
-> +		other = oval64.futex[other_pos];
-> +		orig_other = orig64.futex[other_pos];
-> +
-> +		if (other == orig_other) {
-> +			ret = 0;
-> +			break;
-> +		}
-
-Is this check correct? What if the cmpxchg64 failed because futex_pos
-was changed but other_pos remained the same, it will just report success
-here. You need to compare the full 64-bit value to ensure the cmpxchg64
-succeeded.
-
-> +	}
-> +
-> +	if (!ret)
-> +		*oval = oldval;
-> +
-> +	return ret;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	/*
-> +	 * Undo the bitwise negation applied to the oparg passed from
-> +	 * arch_futex_atomic_op_inuser() with FUTEX_OP_ANDN.
-> +	 */
-> +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-> +{
-> +	u32 oldval, newval, val;
-> +	int ret, i;
-> +
-> +	if (get_user(oldval, uaddr))
-> +		return -EFAULT;
-> +
-> +	/*
-> +	 * there are no ldteor/stteor instructions...
-> +	 */
-> +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-> +		newval = oldval ^ oparg;
-> +
-> +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
-
-Since we have a FUTEX_MAX_LOOPS here, do we need it in cmpxchg32 as
-well?
-
-For eor, we need a loop irrespective of whether futex_pos or other_pos
-have changed. For cmpxchg, we need the loop only if other_pos has
-changed and return -EAGAIN if futex_pos has changed since the caller
-needs to update oldval and call again.
-
-So try to differentiate these cases, maybe only keep the loop outside
-cmpxchg32 (I haven't put much though into it).
-
-> +		if (ret)
-> +			return ret;
-> +
-> +		if (val == oldval) {
-> +			*oval = val;
-> +			return 0;
-> +		}
-
-I can see you are adding another check here for the actual value which
-solves the other_pos comparison earlier but that's only for eor and not
-the __lsui_futex_cmpxchg() case.
-
-> +
-> +		oldval = val;
-> +	}
-> +
-> +	return -EAGAIN;
-> +}
-> +
-> +static __always_inline int
-> +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> +{
-> +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
-> +}
-> +#endif	/* CONFIG_ARM64_LSUI */
-
+base-commit: 33f2e266515717c4b2df585dadefa0525557726c
 -- 
-Catalin
+2.53.0.851.ga537e3e6e9-goog
+
