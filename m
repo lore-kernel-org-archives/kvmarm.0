@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F9F319858;
-	Thu, 12 Mar 2026 12:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A6D3090DE;
+	Thu, 12 Mar 2026 12:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773318969; cv=none; b=jE+AMmP1DN0HSTSbDqbmfCr5wOj2syFMFJJwaBAVmX+HXIxf3dHDz4PQUl2HE0nwgrOEhLgsKnG8Fe7sveHVYsTFnVDStD652YWtkyV+YdCnLnIh+/98hv0RJLNpdcyvSRXI+H8DuO0t73JJJZZEtBFb580Vp7OpmgJ0Wm1Jjv8=
+	t=1773318998; cv=none; b=rjhu1KKlX3SzkxM/wV3tSvzxpu9VvqlRjz6TIsbAdM5bIXXTOL5BtKdfSZzD92CAvcT7CfBV+PvTfB6dRV0UXNMl9ossdBYWrOXLlz9FZDOzMsEANF8qpvz6xRt/yYN1i0qMyoavKVVI1Q6vMtf3Lki7/ODVGe6cjQZfYhch6Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773318969; c=relaxed/simple;
-	bh=X83G1zyfy7cCirzYpJUDZb4XiY3Tr2OOZB5qt2lkQcw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=acNubcax9ZniO7hQ+x/9XLuABHGL7HefabkaRp8yBfhTb2P7GmA3bfjt+90crbD+RTUrxKwGW6PWT6lQ0IvujHOla/4I6IvQ3TDXOiGEW1dTe8jJLcOIOpJCSi3ye67ugg/neFsoTtQxoB+Qs59x0nCNCohankH4HA2Nllsgqjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/tPI1nq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773318998; c=relaxed/simple;
+	bh=+K0U+39fI6wepOOuuwvoFFE12C+9HDXiqtjIeKJef6M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=bYB+Aj91iAMN5RDoPcAVSj6fy+rYmXWOJy2uMdVI1oR/bbRk7nF2f83ppeZ6DiyJvXmx52T05PUuO9AxxwXvQWZfD+r7SWg5cJNScb2fMf5KYQmMTJsWEXecKWs8vC0t2lt3KeWGR3t6WmrlMwWRRyFejlAGer+TKEPWAkqIAjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mm7RTqcw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/tPI1nq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B69C1C4AF0B;
-	Thu, 12 Mar 2026 12:36:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mm7RTqcw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37831C4CEF7;
+	Thu, 12 Mar 2026 12:36:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773318968;
-	bh=X83G1zyfy7cCirzYpJUDZb4XiY3Tr2OOZB5qt2lkQcw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=M/tPI1nqzSIdTEGcEnQl+bRkII7/fPTgtXqWHhtBdSEj2/BAXMr6mTTqUYHEKkgzQ
-	 /JPYboBSFs7yn2XYewKQQKaUmmisMmRKo0StMypYjsZzAIYhcK1HKx4BNw3TTGVZiS
-	 GaT63BCnmHa6CepfmE/AxgU53csICkZ5MEv4qRjz1DzsDdDh9ghCRfUFKVfIAJGmkl
-	 06a4eps2HGzqzQpfglGH5HUECN2A88xWHZMDPgcMqJYJOqStSI8DeCAJjdFvTCsWcZ
-	 CDmgPPv5pacMD678JdR4CYmwr4egXDDtX/s6ThPtj+79CUOslzVZHZ/Rk+bMvUP7ma
-	 716EUl0l2mKcA==
+	s=k20201202; t=1773318997;
+	bh=+K0U+39fI6wepOOuuwvoFFE12C+9HDXiqtjIeKJef6M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mm7RTqcw1KSrwUNMR0dCj+/GC69aa573HNd2XeT90H5+nPXEcDbtZc7IH2Cdkavbd
+	 1OPjRffOohUaPZoL3b9pWsXAJL1dpkSHzBa5WeUNh8dZWdhd/XSl/BcEYsk6oFv3iF
+	 Y88BQDoAdlJWczl60f5IRplcLYkJDwXNg/rOR8XAExLvFt8Ir0q3A2KbKk1+xZNhh8
+	 KYhGQnDYZJZOD+m3FzR0yNi36m7aVvpHItRLGMxGaemBvBe2/Ad7zHNYgiOxq3f06j
+	 175YOv8ovz54havhpEi1aMV7NoCDwsMvnHRdehy48S9K4qwRzRjNvM1VFKe8P+UCqp
+	 DxaT9+ZkOcrFg==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Vincent Donnefort <vdonnefort@google.com>,
 	Marc Zyngier <maz@kernel.org>
@@ -36,13 +37,18 @@ Cc: Steven Rostedt <rostedt@goodmis.org>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
 	linux-arm-kernel@lists.infradead.org,
 	kvmarm@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: arm64: fix include path for ring buffer implementation
-Date: Thu, 12 Mar 2026 13:35:42 +0100
-Message-Id: <20260312123601.625063-1-arnd@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: tracing: add ftrace dependency
+Date: Thu, 12 Mar 2026 13:35:44 +0100
+Message-Id: <20260312123601.625063-3-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260312123601.625063-1-arnd@kernel.org>
+References: <20260312123601.625063-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -53,34 +59,35 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The simple_ring_buffer.c file is in the source tree rather than
-generated at build time, so the include path is wrong when using
-separate object trees:
+Selecting CONFIG_TRACE_REMOTE causes a build time warning when FTRACE
+is disabled:
 
-arch/arm64/kvm/hyp/nvhe/trace.c:16:10: fatal error: simple_ring_buffer.c: No such file or directory
-   16 | #include "simple_ring_buffer.c"
+WARNING: unmet direct dependencies detected for TRACE_REMOTE
+  Depends on [n]: FTRACE [=n]
+  Selected by [y]:
+  - NVHE_EL2_TRACING [=y] && VIRTUALIZATION [=y] && KVM [=y] && NVHE_EL2_DEBUG [=y] && TRACING [=y]
 
-Include it from the source tree instead.
+Add this as another dependency to ensure a clean build.
 
-Fixes: 680a04c333fa ("KVM: arm64: Add tracing capability for the nVHE/pKVM hyp")
+Fixes: 3aed038aac8d ("KVM: arm64: Add trace remote for the nVHE/pKVM hyp")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
+ arch/arm64/kvm/Kconfig | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 143d55ec7298..3d33fbefdfc1 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -33,7 +33,7 @@ hyp-obj-$(CONFIG_NVHE_EL2_TRACING) += clock.o trace.o events.o
- hyp-obj-y += $(lib-objs)
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 32c7a4f85e75..bcc87f9dad33 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -78,7 +78,7 @@ if NVHE_EL2_DEBUG
  
- # Path to simple_ring_buffer.c
--CFLAGS_trace.nvhe.o += -I$(objtree)/kernel/trace/
-+CFLAGS_trace.nvhe.o += -I$(srctree)/kernel/trace/
+ config NVHE_EL2_TRACING
+ 	bool
+-	depends on TRACING
++	depends on TRACING && FTRACE
+ 	select TRACE_REMOTE
+ 	default y
  
- ##
- ## Build rules for compiling nVHE hyp code
 -- 
 2.39.5
 
