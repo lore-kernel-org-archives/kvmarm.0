@@ -1,132 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC24383C92;
-	Thu, 12 Mar 2026 09:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D9E23C4F2;
+	Thu, 12 Mar 2026 10:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773308380; cv=none; b=XCmwZlhBwkZDgaOWom4VbfcAMWkhdOKF1BzknLwZUcn6fPUzSW8UfPaw6P5BcjURycTJ6ThJ2iW7wGXtmAUKcW7B743ZXpMwTmoKcBMpwo6LxFmgfu4UZAjARqtHL72leKTZdSi0bROJ8Qkxo88MK+8FiL7i5JWF39q9/76PNUk=
+	t=1773312327; cv=none; b=kh0srF7+AvCWYFgnJCW7wwcxhSjVAmqAfn05pyJ5uNZp5v9D4ODJullOUqvXGmhHKn4N1FZvS5hX2Jm9dOmS86f8MBoODWwAZBy7/tQ4/zBJELcQiXzZO6py00Mkq44il0frKAMe+4yAjnmkf6HvBfQL421GKAaR5c5cSxW7XDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773308380; c=relaxed/simple;
-	bh=UAk43NccrQPWgbH1hCQpxC1aL/SVilMfAUwhDR2PNQ4=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BsaW/5CWiSovFxchgZCZRBCo0vSJhtonIxE/SXo8tph+CGCXh80aqBtZnUXVGMBeh45YeHOpzZMh6ivw4qMaRUm940LZyFFZMtLQvo2okyd67P0JwG+auyfkihHm8tkpsK6CxzS1QYvQsaN+afDWgXbJ8ilwboQX0CIUDhE/MR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X77W/luM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X77W/luM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E54A0C116C6;
-	Thu, 12 Mar 2026 09:39:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773308380;
-	bh=UAk43NccrQPWgbH1hCQpxC1aL/SVilMfAUwhDR2PNQ4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X77W/luMGxn5rnJvKDveNysjMQI0AFl+bwO7xgb29XxpB0CWy/BimckvNIwrRw2C2
-	 yDfn16LCaPnobMcdqiTG1S0ccaualO+FKkyILLROZhIxpUn3l8RpQyQoOppexOQ81d
-	 2eDORczRtYNVVQCmqcv8tn2ckwVNvcrgj3tBYF5Tsrhkn+x86RupwplsiRKnXcgOKW
-	 hgJ4JHv2FNQg9NZVFgYpU3r6/Z5hz/d9DL4gUE4n552wTez+B3DVskBUsQM6fVvjHx
-	 gR+P+PyPZfvp3CvY+n0kg5gZyiNd/MdpBo3ZngdGwgEvUy0o1SmPcZCCVEwPUXh/Fx
-	 DdZ3SIm4Oou4Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w0cW1-00000001CjM-1BME;
-	Thu, 12 Mar 2026 09:39:37 +0000
-Date: Thu, 12 Mar 2026 09:39:36 +0000
-Message-ID: <86342575ev.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>,
-	kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
-In-Reply-To: <dd6f4715-e8be-41d1-af60-00f068e9d730@arm.com>
-References: <20251217101125.91098-1-steven.price@arm.com>
-	<20251217101125.91098-7-steven.price@arm.com>
-	<86tsuy8g0u.wl-maz@kernel.org>
-	<33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com>
-	<87v7f2chde.wl-maz@kernel.org>
-	<dd6f4715-e8be-41d1-af60-00f068e9d730@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1773312327; c=relaxed/simple;
+	bh=l08jxwdCYCfpzqBDE5vY1CxLuVpa9caXm3o6QBAP73c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=raXvFbDkqucdotqY014BIeUit+yREZaXuquJ5+AUyO8v6fDxV0UXnMVLWTzgpcXesQPLwXjgFxPbjBDpEDfEbAq95RfXJDtImh0I6gAUvETq3MTS24rENX/qrtfZ6fEIqdM43IlegDX4TGjxjeSz8QNhFtrEI+ZuZuXUxCJhyh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC80E165C;
+	Thu, 12 Mar 2026 03:45:18 -0700 (PDT)
+Received: from [10.1.26.37] (e122027.cambridge.arm.com [10.1.26.37])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5B85C3F694;
+	Thu, 12 Mar 2026 03:45:21 -0700 (PDT)
+Message-ID: <45798b53-e18b-4e7b-a49c-37d1783f3444@arm.com>
+Date: Thu, 12 Mar 2026 10:45:19 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com, gshan@redhat.com, sdonthineni@nvidia.com, alpergun@google.com, aneesh.kumar@kernel.org, fj0570is@fujitsu.com, vannapurve@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 06/46] arm64: RMI: Define the user ABI
+To: Marc Zyngier <maz@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20251217101125.91098-1-steven.price@arm.com>
+ <20251217101125.91098-7-steven.price@arm.com> <86tsuy8g0u.wl-maz@kernel.org>
+ <33053e22-6cc6-4d55-bc7f-01f873a15d28@arm.com> <87v7f2chde.wl-maz@kernel.org>
+ <dd6f4715-e8be-41d1-af60-00f068e9d730@arm.com> <86342575ev.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86342575ev.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Mar 2026 09:28:16 +0000,
-Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+On 12/03/2026 09:39, Marc Zyngier wrote:
+> On Thu, 12 Mar 2026 09:28:16 +0000,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> On 11/03/2026 19:10, Marc Zyngier wrote:
+>>> On Mon, 02 Mar 2026 15:23:44 +0000,
+>>> Steven Price <steven.price@arm.com> wrote:
+>>>>
+>>>>>> +  struct kvm_arm_rmi_populate {
+>>>>>> +	__u64 base;
+>>>>>> +	__u64 size;
+>>>>>> +	__u64 source_uaddr;
+>>>>>> +	__u32 flags;
+>>>>>> +	__u32 reserved;
+>>>>>> +  };
+>>>>>> +
+>>>>>> +Populate a region of protected address space by copying the data from the user
+>>>>>> +space pointer provided. This is only valid before any VCPUs have been run.
+>>>>>> +The ioctl might not populate the entire region and user space may have to
+>>>>>> +repeatedly call it (with updated pointers) to populate the entire region.
+>>>>>
+>>>>> size as a __u64 is odd, as the return value from the ioctl is a signed
+>>>>> int. This implies that you can't really report how many bytes you have
+>>>>> copied.  Some form of consistency wouldn't hurt.
+>>>>
+>>>> Good spot. In practice this works because >2GB in one operation is
+>>>> highly unlikely to be processed in one go. But I guess I'll change this
+>>>> to have an output size argument. I guess I could make the kernel update
+>>>> all of base,size,source_uaddr which would simplify user space.
+>>>
+>>> In a conversation with Suzuki, I suggested that splice(2) could be a
+>>> nicer way to express this, and allow asynchronous use with io-uring.
+>>>
+>>> After all, having a guestmem backend for CCA is not exactly
+>>> outlandish, and having a splice implementation realistic enough.
+>>>
+>>> Thoughts?
+>>
+>> One issue that I realised, is about the "flags" for the populate.
+>> Data can be loaded as measured vs unmeasured in CCA (and in TDX
+>> and SNP). I don't see a way to convey this with splice.
 > 
-> On 11/03/2026 19:10, Marc Zyngier wrote:
-> > On Mon, 02 Mar 2026 15:23:44 +0000,
-> > Steven Price <steven.price@arm.com> wrote:
-> >> 
-> >>>> +  struct kvm_arm_rmi_populate {
-> >>>> +	__u64 base;
-> >>>> +	__u64 size;
-> >>>> +	__u64 source_uaddr;
-> >>>> +	__u32 flags;
-> >>>> +	__u32 reserved;
-> >>>> +  };
-> >>>> +
-> >>>> +Populate a region of protected address space by copying the data from the user
-> >>>> +space pointer provided. This is only valid before any VCPUs have been run.
-> >>>> +The ioctl might not populate the entire region and user space may have to
-> >>>> +repeatedly call it (with updated pointers) to populate the entire region.
-> >>> 
-> >>> size as a __u64 is odd, as the return value from the ioctl is a signed
-> >>> int. This implies that you can't really report how many bytes you have
-> >>> copied.  Some form of consistency wouldn't hurt.
-> >> 
-> >> Good spot. In practice this works because >2GB in one operation is
-> >> highly unlikely to be processed in one go. But I guess I'll change this
-> >> to have an output size argument. I guess I could make the kernel update
-> >> all of base,size,source_uaddr which would simplify user space.
-> > 
-> > In a conversation with Suzuki, I suggested that splice(2) could be a
-> > nicer way to express this, and allow asynchronous use with io-uring.
-> > 
-> > After all, having a guestmem backend for CCA is not exactly
-> > outlandish, and having a splice implementation realistic enough.
-> > 
-> > Thoughts?
-> 
-> One issue that I realised, is about the "flags" for the populate.
-> Data can be loaded as measured vs unmeasured in CCA (and in TDX
-> and SNP). I don't see a way to convey this with splice.
+> Surely that should me a property of the memory region, and not the way
+> it is copied, right?
 
-Surely that should me a property of the memory region, and not the way
-it is copied, right?
+I'm not sure what the current thoughts on the matter are, but there was
+an intention in the past that some data could be measured and some not
+within a region which is logically the same. E.g. the DT might be
+deliberately unmeasured so that the same measurement would cover a
+selection of different configurations (with the guest obviously
+validating that it was sane before continuing). Forcing the memory to be
+split into multiple memslots just so a measurement flag can be set
+correctly seems like a poor uAPI.
 
-	M.
+While splice(2) certainly looks similar to what we want, it does
+(according to the man page at least) have the requirement that "one of
+the file descriptors must refer to a pipe" which seems less than ideal
+for the DT case where it's likely to be generated in memory by the VMM.
+Or is my man page out of date and the pipe restriction isn't there in
+the kernel?
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Steve
+
