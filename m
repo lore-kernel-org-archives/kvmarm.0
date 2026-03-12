@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4333C4576
-	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 14:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF7037B00E
+	for <kvmarm@lists.linux.dev>; Thu, 12 Mar 2026 14:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773326528; cv=none; b=OMLPXEFKoIDS15q1LnKESoXb3LVkqRIyRlXlWDE0Y6QAxAG0gzcPUvG6vXOV8GwREMLGpBMjrApQHYEo5nJYw1yzQ8lqoQeKdh/DHpIudzrWl3sCDkQ67cYLB6UmPjE9RVQK4aMPkND9aZMmGUZ4wS6+BIjyK3e0KrvA4b6s6+w=
+	t=1773327254; cv=none; b=SZA5HW+/Yqgx4daRZyxthoaJW7gf32iCuUsGCPrQL+dKM+iqpRJR7WM/XhDozkppRiFGjW8Ci4ek5lc9yEwvL7Z0YVH+XytWF6Hnjq1tC5ujytrFQRPRjkFFBXI98dhSdJ0ytY6Uj4TJjRZwLWlEvQmcHGcd6q+YypkrU8FK1jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773326528; c=relaxed/simple;
-	bh=sNP0bK+hPdXgYqMGGdNC15eIC/I9ohCbielxEYspqow=;
+	s=arc-20240116; t=1773327254; c=relaxed/simple;
+	bh=xxLOrONxRT3JGVLsmcC6b0ejVRt0gBwgcDzh78cwGXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sfoLtmOtNkb7YYi23ZaY+DQUBqXTzsSeMVa5TYigmTfHkhQVIM6IQZ41vU2VR9hZLewDyEnM85duWJ1mpu/vMVORlAVIjpa2Cno4wmF5R5ny+DsCfE2BS9XMa2oBxuaFICeXMZAFEKOqw5KQZVFK0n0Vap7FahMecF7yslTZtSs=
+	 Content-Type:Content-Disposition:In-Reply-To; b=tkqQ8ubR3pGavBoDLpOzq18eUQKpOuLxdxAs3dEDyneasSIXxTzWVHqTegolMgkBezKLbyVAHw9onur+IMt8Cn21ZH16JJzY+SE9o/8Ob8POaakOLWQNN0OFtJS/v3nIrQ+N+YhHhL+N2J6MKj9KP8mdZH+KFWygCVNc6qrPkZA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 587F2165C;
-	Thu, 12 Mar 2026 07:41:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96F68165C;
+	Thu, 12 Mar 2026 07:54:05 -0700 (PDT)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6134B3F7BD;
-	Thu, 12 Mar 2026 07:41:59 -0700 (PDT)
-Date: Thu, 12 Mar 2026 14:41:57 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4AFE73F7BD;
+	Thu, 12 Mar 2026 07:54:09 -0700 (PDT)
+Date: Thu, 12 Mar 2026 14:54:06 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Yeoreum Yun <yeoreum.yun@arm.com>
 Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
@@ -28,7 +28,7 @@ Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com,
 	lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
 Subject: Re: [PATCH v15 4/8] arm64: futex: refactor futex atomic operation
-Message-ID: <abLQtbbYidcmPg-7@arm.com>
+Message-ID: <abLTji8bbO3b3i3r@arm.com>
 References: <20260227151705.1275328-1-yeoreum.yun@arm.com>
  <20260227151705.1275328-5-yeoreum.yun@arm.com>
 Precedence: bulk
@@ -42,27 +42,30 @@ Content-Disposition: inline
 In-Reply-To: <20260227151705.1275328-5-yeoreum.yun@arm.com>
 
 On Fri, Feb 27, 2026 at 03:17:01PM +0000, Yeoreum Yun wrote:
-> Refactor futex atomic operations using ll/sc method with
-> clearing PSTATE.PAN to prepare to apply FEAT_LSUI on them.
-> 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-> ---
->  arch/arm64/include/asm/futex.h | 137 +++++++++++++++++++++------------
->  1 file changed, 87 insertions(+), 50 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/futex.h b/arch/arm64/include/asm/futex.h
-> index bc06691d2062..9a0efed50743 100644
-> --- a/arch/arm64/include/asm/futex.h
-> +++ b/arch/arm64/include/asm/futex.h
-> @@ -7,21 +7,25 @@
->  
->  #include <linux/futex.h>
->  #include <linux/uaccess.h>
-> +#include <linux/stringify.h>
+> -#define __futex_atomic_op(insn, ret, oldval, uaddr, tmp, oparg)		\
+> -do {									\
+> +#define LLSC_FUTEX_ATOMIC_OP(op, insn)					\
+> +static __always_inline int						\
+> +__llsc_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
+> +{									\
+>  	unsigned int loops = FUTEX_MAX_LOOPS;				\
+> +	int ret, oldval, newval;					\
+>  									\
+>  	uaccess_enable_privileged();					\
+> -	asm volatile(							\
+> +	asm volatile("// __llsc_futex_atomic_" #op "\n"			\
+>  "	prfm	pstl1strm, %2\n"					\
+> -"1:	ldxr	%w1, %2\n"						\
+> +"1:	ldxr	%w[oldval], %2\n"					\
+>  	insn "\n"							\
+> -"2:	stlxr	%w0, %w3, %2\n"						\
+> +"2:	stlxr	%w0, %w[newval], %2\n"					\
 
-Nit: what needs stringify.h in this file? It get removed (or rather
-moved to lsui.h) in the next patch.
+Looking again at this as I originally reviewed the series without the
+positional operands.
+
+Can you not use only named operands instead of mixing them? The same
+comment for all other asm changes in this file.
 
 -- 
 Catalin
