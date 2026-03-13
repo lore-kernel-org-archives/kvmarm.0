@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA68A3A7595
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3303A7F74
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413321; cv=none; b=SkETKVK0ZY1YMAp1AFxIBkILKX+u3+YA0AmXiz7CAmp0nKEO8tm6xUnjVIwWF+qWO0og1RL/xFuXiRn+jta7kGUvIWEQNlpxPnCXusglg0BrSRF7ylqcOrDxt1XqTWkdxFICQyHXYGMDz7IZABmLjx3EooiTQTB9IE/6akLZEjI=
+	t=1773413324; cv=none; b=s8vo8Xx6CF+zEmVlANArT6nUU3Ptt+lZ+wvy5bH52b0NEOSJvU6T8BgAnJWRaTqbzzSuUuWJhvHuxUrPFHYI4eoS/tRLu2li4cw1PWD+cqJrcp5lP7T4s24EAbutYsbQkVzw3IC6jBMdoKVXpb8QSpFs64YsXIcSN/smMR9Yvhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413321; c=relaxed/simple;
-	bh=pEXeVMWoA1B/k97S0gEBpBr/We7LA9+prjJqcvBemHY=;
+	s=arc-20240116; t=1773413324; c=relaxed/simple;
+	bh=DQWiqXmvHCyZytT+Myk6lqO8u9lOnLILZTNCmyVo670=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QuKcuZsc4pcq1brx3UTL9amIyYtNSL2+xAFkOBh+gNITFkAbm6pOZ/+1+iRpvSnSSmsOPhPX/J9o/qDFIi5v7e4KXrd9LOjIoQZmmya+ZuINgUZtcLVD52tZgDRUxwcCc/R+1DAVkWnXjrQrbxxgNBk1hEIIUIicSCkGseS3ryc=
+	 MIME-Version; b=R9iIK8sMliOG3cjnGtif9Vd2Qy/4oE0DKokFt6Tv+L497jTENwibmTwa1iJQECv1BkCdYy/w7ntsw/EHvnSB6YBugRcoQzWuV0AKgUVGwqCjZB7DSAr20UwmTq3nfOE5I9kw/ZMISJJuu9AVgbxFtf1JkGRtKWeJq+nXW0tD27k=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D133244B;
-	Fri, 13 Mar 2026 07:48:32 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9BD872454;
+	Fri, 13 Mar 2026 07:48:36 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9D15D3F7BD;
-	Fri, 13 Mar 2026 07:48:34 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CFFA43F7BD;
+	Fri, 13 Mar 2026 07:48:38 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v6 30/40] arm_mpam: resctrl: Add resctrl_arch_rmid_read()
-Date: Fri, 13 Mar 2026 14:46:07 +0000
-Message-ID: <20260313144617.3420416-31-ben.horgan@arm.com>
+Subject: [PATCH v6 31/40] arm_mpam: resctrl: Update the rmid reallocation limit
+Date: Fri, 13 Mar 2026 14:46:08 +0000
+Message-ID: <20260313144617.3420416-32-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -71,151 +71,94 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-resctrl uses resctrl_arch_rmid_read() to read counters. CDP emulation means
-the counter may need reading in three different ways.
+resctrl's limbo code needs to be told when the data left in a cache is
+small enough for the partid+pmg value to be re-allocated.
 
-The helpers behind the resctrl_arch_ functions will be re-used for the ABMC
-equivalent functions.
-
-Add the rounding helper for checking monitor values while we're here.
+x86 uses the cache size divided by the number of rmid users the cache may
+have. Do the same, but for the smallest cache, and with the number of
+partid-and-pmg users.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Tested-by: Peter Newman <peternewman@google.com>
 Tested-by: Zeng Heng <zengheng4@huawei.com>
+Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-cfg initialisation style
-code flow at end of read_mon_cdp_safe()
-
 Changes since v2:
-Whitespace changes
+Move waiting for cache info into it's own patch
 
 Changes since v3:
-Update function signatures
-Remove abmc check
+Move check class is csu higher (just kept to document intent)
+continue -> break
 
-Changes since v5:
-don't read mbwu
-remove reset code as only needed for mbwu
+to squash update rmid limits
+use raw_smp_processor_id()
 ---
- drivers/resctrl/mpam_resctrl.c | 82 ++++++++++++++++++++++++++++++++++
- include/linux/arm_mpam.h       |  5 +++
- 2 files changed, 87 insertions(+)
+ drivers/resctrl/mpam_resctrl.c | 39 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 383f67948a82..4f6a53d1bd4f 100644
+index 4f6a53d1bd4f..3979808f7253 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -356,6 +356,88 @@ void resctrl_arch_mon_ctx_free(struct rdt_resource *r,
- 	resctrl_arch_mon_ctx_free_no_wait(evtid, mon_idx);
+@@ -438,6 +438,42 @@ int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_domain_hdr *hdr,
+ 				 closid, rmid, val);
  }
  
-+static int __read_mon(struct mpam_resctrl_mon *mon, struct mpam_component *mon_comp,
-+		      enum mpam_device_features mon_type,
-+		      int mon_idx,
-+		      enum resctrl_conf_type cdp_type, u32 closid, u32 rmid, u64 *val)
++/*
++ * The rmid realloc threshold should be for the smallest cache exposed to
++ * resctrl.
++ */
++static int update_rmid_limits(struct mpam_class *class)
 +{
-+	struct mon_cfg cfg;
++	u32 num_unique_pmg = resctrl_arch_system_num_rmid_idx();
++	struct mpam_props *cprops = &class->props;
++	struct cacheinfo *ci;
 +
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
++	lockdep_assert_cpus_held();
 +
-+	/* Shift closid to account for CDP */
-+	closid = resctrl_get_config_index(closid, cdp_type);
-+
-+	if (irqs_disabled()) {
-+		/* Check if we can access this domain without an IPI */
-+		return -EIO;
-+	}
-+
-+	cfg = (struct mon_cfg) {
-+		.mon = mon_idx,
-+		.match_pmg = true,
-+		.partid = closid,
-+		.pmg = rmid,
-+	};
-+
-+	return mpam_msmon_read(mon_comp, &cfg, mon_type, val);
-+}
-+
-+static int read_mon_cdp_safe(struct mpam_resctrl_mon *mon, struct mpam_component *mon_comp,
-+			     enum mpam_device_features mon_type,
-+			     int mon_idx, u32 closid, u32 rmid, u64 *val)
-+{
-+	if (cdp_enabled) {
-+		u64 code_val = 0, data_val = 0;
-+		int err;
-+
-+		err = __read_mon(mon, mon_comp, mon_type, mon_idx,
-+				 CDP_CODE, closid, rmid, &code_val);
-+		if (err)
-+			return err;
-+
-+		err = __read_mon(mon, mon_comp, mon_type, mon_idx,
-+				 CDP_DATA, closid, rmid, &data_val);
-+		if (err)
-+			return err;
-+
-+		*val += code_val + data_val;
++	if (!mpam_has_feature(mpam_feat_msmon_csu, cprops))
 +		return 0;
++
++	/*
++	 * Assume cache levels are the same size for all CPUs...
++	 * The check just requires any online CPU and it can't go offline as we
++	 * hold the cpu lock.
++	 */
++	ci = get_cpu_cacheinfo_level(raw_smp_processor_id(), class->level);
++	if (!ci || ci->size == 0) {
++		pr_debug("Could not read cache size for class %u\n",
++			 class->level);
++		return -EINVAL;
 +	}
 +
-+	return __read_mon(mon, mon_comp, mon_type, mon_idx,
-+			  CDP_NONE, closid, rmid, val);
-+}
++	if (!resctrl_rmid_realloc_limit ||
++	    ci->size < resctrl_rmid_realloc_limit) {
++		resctrl_rmid_realloc_limit = ci->size;
++		resctrl_rmid_realloc_threshold = ci->size / num_unique_pmg;
++	}
 +
-+/* MBWU when not in ABMC mode (not supported), and CSU counters. */
-+int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_domain_hdr *hdr,
-+			   u32 closid, u32 rmid, enum resctrl_event_id eventid,
-+			   void *arch_priv, u64 *val, void *arch_mon_ctx)
-+{
-+	struct mpam_resctrl_dom *l3_dom;
-+	struct mpam_component *mon_comp;
-+	u32 mon_idx = *(u32 *)arch_mon_ctx;
-+	enum mpam_device_features mon_type;
-+	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[eventid];
-+
-+	resctrl_arch_rmid_read_context_check();
-+
-+	if (eventid >= QOS_NUM_EVENTS || !mon->class)
-+		return -EINVAL;
-+
-+	l3_dom = container_of(hdr, struct mpam_resctrl_dom, resctrl_mon_dom.hdr);
-+	mon_comp = l3_dom->mon_comp[eventid];
-+
-+	if (eventid != QOS_L3_OCCUP_EVENT_ID)
-+		return -EINVAL;
-+
-+	mon_type = mpam_feat_msmon_csu;
-+
-+	return read_mon_cdp_safe(mon, mon_comp, mon_type, mon_idx,
-+				 closid, rmid, val);
++	return 0;
 +}
 +
  static bool cache_has_usable_cpor(struct mpam_class *class)
  {
  	struct mpam_props *cprops = &class->props;
-diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
-index e1461e32af75..86d5e326d2bd 100644
---- a/include/linux/arm_mpam.h
-+++ b/include/linux/arm_mpam.h
-@@ -67,6 +67,11 @@ struct rdt_resource;
- void *resctrl_arch_mon_ctx_alloc(struct rdt_resource *r, enum resctrl_event_id evtid);
- void resctrl_arch_mon_ctx_free(struct rdt_resource *r, enum resctrl_event_id evtid, void *ctx);
- 
-+static inline unsigned int resctrl_arch_round_mon_val(unsigned int val)
-+{
-+	return val;
-+}
+@@ -856,6 +892,9 @@ static void mpam_resctrl_pick_counters(void)
+ 			/* CSU counters only make sense on a cache. */
+ 			switch (class->type) {
+ 			case MPAM_CLASS_CACHE:
++				if (update_rmid_limits(class))
++					break;
 +
- /**
-  * mpam_register_requestor() - Register a requestor with the MPAM driver
-  * @partid_max:		The maximum PARTID value the requestor can generate.
+ 				counter_update_class(QOS_L3_OCCUP_EVENT_ID, class);
+ 				break;
+ 			default:
 -- 
 2.43.0
 
