@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BDD3B27CD
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F5B3B3BE5
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413292; cv=none; b=sCyAQOnEPzFVHOvs5Th9FBY2fgnFCS2n/I8l5WAfCoEksyDwzjzLmg5n8P98SXrk+Jb1Eb7gFz0sSiBYu+8KMQiUbC4YiViKwcDxR/f2mnxMNqk6PQ4RxtXDV2Xw0JMfxJ62FJI2D6uysPt2m0Th9k6BbSO+Z5x3Uf2fNvbs+Ao=
+	t=1773413297; cv=none; b=Wqr5gulCAckhW2j1iOPgDYArOuaxyDjAmjya5DsKV3kAYfCrtI/J0HzReQC4NOcIDFkdEDrfgLqJGQsa0xFnC0u+tXr7hmJvygvLhBr/dxZGBom7r8CLhgh1aCUlPaTF9nPKYxigcguvSk7wzjTQCRPwDKL01aeaAOBLZ2cLOzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413292; c=relaxed/simple;
-	bh=JJd/KguIqCInLWHdcq+znKsGevMGEIUpt/XDZ9JvAvE=;
+	s=arc-20240116; t=1773413297; c=relaxed/simple;
+	bh=8yZMv2aBuiNZxeLtLWo/CDd2K4CMwg23KgP5rMMEeWM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jun+BsFAfXQ3uBrcIP4WV3lGQ2Wf5ZdXFSaYg/f4B5GKXql4R6GyMDNg4OrW/QXJdfr1Oq4otIBfHRoidvYL3Vmg86CxdrXSnTMerujBguXhgDKPdUAqEuGUZiAte4LZwEYSjb9rIC+HggKZuXYzumymwkLpeOC2LmVVUkZoofQ=
+	 MIME-Version; b=NStuk2141C5ZYA0hPJiE18DLWzDadkewxEgHi97MHjjfhANeiaP/5QKVxAu8IwIEzzN4QVDwhrRR3qBB7Qd4R6IvnF8styuQiAM1FH36A3EAQefxxiAEOXalvKAqE3rjbfKBomsUEOjMiqI+ApNvoklNx9b5c2sSI6/PwVoOJj4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFA791E7D;
-	Fri, 13 Mar 2026 07:48:02 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E5E21CC4;
+	Fri, 13 Mar 2026 07:48:07 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1A1323F7BD;
-	Fri, 13 Mar 2026 07:48:05 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4D9503F7BD;
+	Fri, 13 Mar 2026 07:48:09 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v6 23/40] arm_mpam: resctrl: Add rmid index helpers
-Date: Fri, 13 Mar 2026 14:46:00 +0000
-Message-ID: <20260313144617.3420416-24-ben.horgan@arm.com>
+Subject: [PATCH v6 24/40] arm_mpam: resctrl: Wait for cacheinfo to be ready
+Date: Fri, 13 Mar 2026 14:46:01 +0000
+Message-ID: <20260313144617.3420416-25-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -69,11 +69,11 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Because MPAM's pmg aren't identical to RDT's rmid, resctrl handles some
-data structures by index. This allows x86 to map indexes to RMID, and MPAM
-to map them to partid-and-pmg.
-
-Add the helpers to do this.
+In order to calculate the rmid realloc threshold the size of the cache
+needs to be known. Cache domains will also be named after the cache id. So
+that this information can be extracted from cacheinfo we need to wait for
+it to be ready. The cacheinfo information is populated in device_initcall()
+so we wait for that.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
@@ -82,62 +82,65 @@ Tested-by: Zeng Heng <zengheng4@huawei.com>
 Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
 Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Suggested-by: James Morse <james.morse@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+Signed-off-by: James Morse <james.morse@arm.com>
+[horgan: split out from another patch]
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-Use ~0U instead of ~0 in lhs of left shift
-
-Changes since v2:
-Drop changes signed-off-by as reworked patch
-Use multiply and add rather than shift to avoid holes
+This is moved into it's own patch to allow all uses of cacheinfo to be
+valid when they are introduced.
 ---
- drivers/resctrl/mpam_resctrl.c | 16 ++++++++++++++++
- include/linux/arm_mpam.h       |  3 +++
- 2 files changed, 19 insertions(+)
+ drivers/resctrl/mpam_resctrl.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index adaec522c1a1..940446395ae1 100644
+index 940446395ae1..93c8a9608ed4 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -145,6 +145,22 @@ u32 resctrl_arch_get_num_closid(struct rdt_resource *ignored)
- 	return mpam_partid_max + 1;
- }
+@@ -16,6 +16,7 @@
+ #include <linux/resctrl.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
++#include <linux/wait.h>
  
-+u32 resctrl_arch_system_num_rmid_idx(void)
-+{
-+	return (mpam_pmg_max + 1) * (mpam_partid_max + 1);
-+}
+ #include <asm/mpam.h>
+ 
+@@ -42,6 +43,13 @@ static DEFINE_MUTEX(domain_list_lock);
+  */
+ static bool cdp_enabled;
+ 
++/*
++ * We use cacheinfo to discover the size of the caches and their id. cacheinfo
++ * populates this from a device_initcall(). mpam_resctrl_setup() must wait.
++ */
++static bool cacheinfo_ready;
++static DECLARE_WAIT_QUEUE_HEAD(wait_cacheinfo_ready);
 +
-+u32 resctrl_arch_rmid_idx_encode(u32 closid, u32 rmid)
-+{
-+	return closid * (mpam_pmg_max + 1) + rmid;
-+}
-+
-+void resctrl_arch_rmid_idx_decode(u32 idx, u32 *closid, u32 *rmid)
-+{
-+	*closid = idx / (mpam_pmg_max + 1);
-+	*rmid = idx % (mpam_pmg_max + 1);
-+}
-+
- void resctrl_arch_sched_in(struct task_struct *tsk)
+ bool resctrl_arch_alloc_capable(void)
  {
- 	lockdep_assert_preemption_disabled();
-diff --git a/include/linux/arm_mpam.h b/include/linux/arm_mpam.h
-index d329b1dc148b..7d23c90f077d 100644
---- a/include/linux/arm_mpam.h
-+++ b/include/linux/arm_mpam.h
-@@ -58,6 +58,9 @@ void resctrl_arch_set_cpu_default_closid_rmid(int cpu, u32 closid, u32 rmid);
- void resctrl_arch_sched_in(struct task_struct *tsk);
- bool resctrl_arch_match_closid(struct task_struct *tsk, u32 closid);
- bool resctrl_arch_match_rmid(struct task_struct *tsk, u32 closid, u32 rmid);
-+u32 resctrl_arch_rmid_idx_encode(u32 closid, u32 rmid);
-+void resctrl_arch_rmid_idx_decode(u32 idx, u32 *closid, u32 *rmid);
-+u32 resctrl_arch_system_num_rmid_idx(void);
+ 	struct mpam_resctrl_res *res;
+@@ -757,6 +765,8 @@ int mpam_resctrl_setup(void)
+ 	struct mpam_resctrl_res *res;
+ 	enum resctrl_res_level rid;
  
- /**
-  * mpam_register_requestor() - Register a requestor with the MPAM driver
++	wait_event(wait_cacheinfo_ready, cacheinfo_ready);
++
+ 	cpus_read_lock();
+ 	for_each_mpam_resctrl_control(res, rid) {
+ 		INIT_LIST_HEAD_RCU(&res->resctrl_res.ctrl_domains);
+@@ -794,3 +804,12 @@ int mpam_resctrl_setup(void)
+ 
+ 	return 0;
+ }
++
++static int __init __cacheinfo_ready(void)
++{
++	cacheinfo_ready = true;
++	wake_up(&wait_cacheinfo_ready);
++
++	return 0;
++}
++device_initcall_sync(__cacheinfo_ready);
 -- 
 2.43.0
 
