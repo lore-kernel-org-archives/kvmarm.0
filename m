@@ -1,369 +1,277 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010000.outbound.protection.outlook.com [52.101.84.0])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822A6379EFC
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 09:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.0
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773393913; cv=fail; b=fMcImyVo70b8EkVXwcwqfIwm2NtMzq1M0cPeF7SdrVuO5dFe8K76j7YVPDHotF5pV8ltEQWchpOQwMb+YYe/uS+HU0oBr5V4LRBOPNZ91WGBG5MYtsmTenW+2d4DAR4bbeXHlQsPDkxm9zZywyjxDOVkuacnGy8b2M1f+ZeRp/o=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773393913; c=relaxed/simple;
-	bh=sbqLF6TYzWQdnDBvbf+4T5t+NkMtZqrRdtRLLejx/x8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=BwpJNtsZhSR1d50eeVmZ0L4i833gVYHMtSnf7LT9Zd6FOqJYV32Y+CYWjTgdHBo6vC9blIuZJ4OVfKNqoi2zgO0rRYpeuk9/oxmJjrSOnqZcqoAK5j6vAIh7B3EzuqtCuCfVAcTbGyTkBiD90mRwn9hu55lUgiKz15/QWIMG1Zg=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=T+BKdRmI; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=T+BKdRmI; arc=fail smtp.client-ip=52.101.84.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571492DECD3
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 09:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773394326; cv=pass; b=q3bKXsMy/utk5GKi+ySV383QliQo1jnrYghVyFdMLK0993sxDjqN2oxoJuhz5cgTNcoqqQhzI09hmhrbXhPRdQ92rmqvvzQFX08IuNJYfRHUay8D0YIT+OXL6xygbuk4eIjfF2fTyBsubkJA+MsL5WwXocMzAOzesyM3/FMfdiw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773394326; c=relaxed/simple;
+	bh=LQf2QA/BSWJizXKvAd8/HyhQI4p1EMcNKWkvU7rKsrE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qg7ZHYl8FHaepzAYvXIH08Wory8QUcLD8jvkPLnFLo8ePrcv7mjmBOC9WxzF8GpgvuY9fj4JQCeZ7CU+7IveR7bR2GobdGQt3GZAfHRMv+lLFB7yKOcIGAkraHOL2fjyOWaKN/oYYWuQWpudrIrQbLGOZVnXDwiXmy1DryrPfgQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y/QXkFr4; arc=pass smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="T+BKdRmI";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="T+BKdRmI"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=d2IqhmY3lFUB/Xr8irspiJgTxpTjgAIpFdJ88P6TsSsdqsraVsqvbD2Fo5R5ZSI88pE98Tn9JXZpDrswuIUC65ZbxYEA2sMUSn3jKvjgnc4uFPgQupNZoAE6ETyzrBxjp2pL8h5G59EMLG2n2HEhAuv0T7D/5UOHv1+hBP+X8Wz9LtAAl/GcSQ9d5peHGfPtq5kNSGvH1gXR7TKkwE1ZGy7E5NJkgQiQCl5vrSgz/QwE64oJ0QjnqH3zuPc/M6Fqekc3WONEWiu0lTz29Ew8wwUQpyP+krwl1cZcasEoKu3mXwm05A/Q6W3cYvVaVLCOEnSbPM+avqybE31U3FSw6w==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CEJePSUEyvyBgFeN1ueNf92eHxC4oP3TXKLRDKWNTRs=;
- b=BvgtH1TFzVML/LOtSbtiYZYhjlhuDoX6XoUbzlNfOlZBUcAyQxYX1JyXPMmEoFoG2Y5Wbf6G8YCBscf8msW7qruyIBmUfY5045rkNjpesjVRQ+GakNPpFeVCH5DTE0tSwu/ndK+cdYmMazkQt90Z31KCLfVqHSF2ZzKpB3MkYw43hocZnuhCbgYKOvNpO6hmetZyhIELQ/gBlhCJ+JDpZ+HC3AxgEVZRLYuORnRK7i+vojs3uoUL3fS4d2Gbai/adDaJE9YtTF2Fw2yLCAcRGrMMiY4C90u+k9NUxk3xlPz4rE2yBe1g2UlncmnZPf2473Zdu3aqVpQmLOM+Ai2bOg==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CEJePSUEyvyBgFeN1ueNf92eHxC4oP3TXKLRDKWNTRs=;
- b=T+BKdRmIZAVC5PX+HaCPXp0Pr9nrRh4QZYlMn/AZ/KNV37dGcsf1LyYfz9w3lbDo3plibMIjabC4zLlt1+Uollz80FCY3PhO9hA9NMJJCN1m87kqiTVYy7rGAo7737fTlt1AocfOPMeEVVE5T495yb0f4x6aAzy9tTfmC0gpafs=
-Received: from DU7P190CA0023.EURP190.PROD.OUTLOOK.COM (2603:10a6:10:550::25)
- by DU0PR08MB8232.eurprd08.prod.outlook.com (2603:10a6:10:3b2::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.12; Fri, 13 Mar
- 2026 09:25:04 +0000
-Received: from DU6PEPF0000B621.eurprd02.prod.outlook.com
- (2603:10a6:10:550:cafe::3c) by DU7P190CA0023.outlook.office365.com
- (2603:10a6:10:550::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.16 via Frontend Transport; Fri,
- 13 Mar 2026 09:25:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DU6PEPF0000B621.mail.protection.outlook.com (10.167.8.138) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.17
- via Frontend Transport; Fri, 13 Mar 2026 09:25:04 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DHlWCv+x4zNvqV9UW29H4JBsPJUzvP2rP2kmpk7udqw3uZc6BNHEkdfHLL7IjoCIzo76Stp4dEHd6WUQLYUr1TCga3vxA/yA/Gu0GthdgoRfWqHP6ehVYjdnCAN0mNnRCsHapWASVI2qL9dbict0nW9k/3f7MYiNaH7QCxN2nytQPBiJ47fjSOXqG1tqLGnsV8VX085Q1LSLeBEub4ITu4u5Sox5UUIOOZExEYAYy67pYGFYSSzK4GeDJ1yDeep/JXIpOoqjmKbmUSfXUhhe6vjmzQPzojj8ksiegzZ/J+HPQuAIn6JglmA0OFufkYl7zcI8RZ58BEhZY4CEmmnLcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CEJePSUEyvyBgFeN1ueNf92eHxC4oP3TXKLRDKWNTRs=;
- b=U83UDVgMVCO42FJQMaSBKcGzM4Gxh/VK6gQ9ToaJVLPyrQX9yaVWNbCmrAzIXneVEnxws88v97rfjUpWhdgRHxgN9TDN8GQ2GStIcT4yv3wQbp5csi6xRRev4VaEEH33M76hBjQqguopbs5BKh7GHfFBReVzUjYfwMRH0odPVNDa2cqdKWzpzk74obX4M1M2CSDpfLJSq40t+j3wSbwdCGMcCMJZExFiSiyvZrSLe613re/IuiohvNEqxr/+Y3wWYasCnQAg4DYEAemyhF2Qa2I1e6sTCjBTARYaeJ/0/6TmOp/QdAaGPgrsO9o6UhRpgElgaRGvsMFNvmbrPjHRNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CEJePSUEyvyBgFeN1ueNf92eHxC4oP3TXKLRDKWNTRs=;
- b=T+BKdRmIZAVC5PX+HaCPXp0Pr9nrRh4QZYlMn/AZ/KNV37dGcsf1LyYfz9w3lbDo3plibMIjabC4zLlt1+Uollz80FCY3PhO9hA9NMJJCN1m87kqiTVYy7rGAo7737fTlt1AocfOPMeEVVE5T495yb0f4x6aAzy9tTfmC0gpafs=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by FRZPR08MB11875.eurprd08.prod.outlook.com
- (2603:10a6:d10:1cb::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Fri, 13 Mar
- 2026 09:24:02 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98%4]) with mapi id 15.20.9700.010; Fri, 13 Mar 2026
- 09:24:02 +0000
-Date: Fri, 13 Mar 2026 09:23:58 +0000
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
-	oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com,
-	broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v15 5/8] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <abPXrvl9tC+nv6q9@e129823.arm.com>
-References: <20260227151705.1275328-1-yeoreum.yun@arm.com>
- <20260227151705.1275328-6-yeoreum.yun@arm.com>
- <abMDOC5DYEm74And@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abMDOC5DYEm74And@arm.com>
-X-ClientProxiedBy: PR1P264CA0053.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:2ca::10) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y/QXkFr4"
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509069a7a7fso409641cf.0
+        for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 02:32:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773394324; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Pp6YjOklVQHgwy09EXUjcpvcMF67vFefk4ajRiaoFg57AUV7AYuMSOscfg7eikU5Vf
+         fpBf67JhlxSe703kk2kzGDwDzFhkYmMvZYowmOrZ0lPdBk+NJFO3Xbb5wM97DEt6nXD6
+         cp16ZB1iGAUbbMB2QoQ/FErzoMT3Y+N4RoJFdmmdr7WSF7Xjkl9AkUokj6PTdCpS6pD2
+         YYlQJZ/1ZKspxO0VDP01bIAWZJcOrUhH5eJQc7n4X5sjg8z7boyEo/Uh94cCmAIzImG1
+         CNSLa4fvGvYHldZw04wx8r5RB6y+67WPU5TdsMdaGQ075f7pcprHdxTeqQ32/pXkJvsP
+         x2vQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=UOSC1f3aHBzCl3KK3hWG1+INGM76umo/dTgcpAX5870=;
+        fh=jWN2LjK4DYUlNWdcdZH1SVz+LeBOuNTb3FqQBllqf10=;
+        b=j//VOMIupspX8n+hggWJ4/dhL2o1md290V75FW5vj6w9fTDU2JQ3gAzTm2Qe9jabhD
+         VPDR8+Uc3/3u4yavfQCxW2s51TiajCcB0c8uQXqTX0MCLOAzIASgTVaahWoXSwu7sRkJ
+         6vtmgHGvCLSsdcwC1Vva+4kHRHvnKHkp0TtzaJG4fLGG6DVY7vF/ZGfL33NlUXmUrbzd
+         VQOoAbdPKYloNBX/7RLOijsqNIAB22oCiSXOSo5ApykTb+vom/hR/b9UglZd/jGunZQG
+         2l+BexDZUZaAq+dqfn/1FA5ih5G0PalXbJBGl+/peFbrX0y69l9vzVzS4PUkNgBDxJST
+         QvFw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773394324; x=1773999124; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UOSC1f3aHBzCl3KK3hWG1+INGM76umo/dTgcpAX5870=;
+        b=Y/QXkFr4F1KuzqRnTmTWvO5mTJiOw46xeKyq+sZ5Xq2dldPHsQL9tClN6cwqdH/n+A
+         6agHFyKf8McqfW0ijQ60+66u0ZoMKeRnhBEmIiHDnBFvq/7/8ykrramMX3vmI2+CBuVj
+         bU+QJlm4n809rLS2j21fe2H3SQX8MW6+CMAdbJI1W99NmUm6RF+PlAHpSIPKAJVHWQ0J
+         0dE7vA0mtRS42ZJOvqidC2K2n8RxHpDc70qRnXnFEE81Lm3A/Yv9D5POAuoCpT8HXAIb
+         s3txf+iBprp/OxGE1NCTJ52ngADE91sJQAhTLLJ7pXdkqUb7vN3LRQpTeqYYg0K8etlq
+         rFZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773394324; x=1773999124;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOSC1f3aHBzCl3KK3hWG1+INGM76umo/dTgcpAX5870=;
+        b=nS02hJa0yTejQvVS5tvwGFlbu7jXXXYD5bH2Cc9l/Int2g2d6ZQPrgan9i038ZC2AQ
+         JkTqsaCW0WKiz6qBMuN70bEZStJu4nyR9Le8S5HZ6zbwNKD7nOtYneBHqjrDu+wYTqHn
+         74nBSbZqP8cLDr+o9w4emb1pkzVA5hiFVj5cBxBVBz/gzmc0sjgMpNq5uMOxKqzcqAHL
+         ssEjYFhKum0StO8tf6eSNJ7B9A86YNri26X2+wm8UKilsNWB9ADym2tn9L/totfLNVEC
+         Nx/fdbvs+QefNd7rdIAJzOoIjHw7tdsUx5azFEOvEoAsjiuTKODIjFop0mwhuEkGoX6b
+         SE9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUqulWtB6CaTtChStIGhZjsi5m5w1EzXqqSlGl94iuMUNd/xgQlsKXxqDvIH6HWlkWYLz21ykQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxKs7hER6tibLWtCxeQ4QKxqZTcL04T+jriMZ6AfQfxQ1w9kNAH
+	mKhKuGedu5067gmdXi4ri2H/uj8dxWaQPD1foA1vhjPGJfAwyw+2f1VAjUfsLytcLGGBtMeJoAD
+	ir8VRlrbiyDdMCA9bXQCuBIo+DerhW0YGFlIYeNbRpHwRS6ERJt4Hia7ZpXU=
+X-Gm-Gg: ATEYQzzQiy8m3nqmb/UT3SnAas+PZbzW/GS8XfMhGRJ9TytQ9hw5npnf2mK7wwbUg3f
+	PqV932ACaQ6GVvjhO9bHtWCxYtdmQkublLOkk7QMM8KNqSRd7bo+X+FkQdxy+3HcaYfi3zcI8wS
+	mXba4gKpcSmYonUiXwPInbpg6E+MAh35d4cELenPwBXqyp5c+MUWM4Sepq+SI9YRUlvfA8WN8FF
+	EJB6aosF9Cd9UW7waZKJl9ghLNatGEM9DR3zTbJa+NWTvOLdIvkV6LQleJazr85sGVQ9N3gaIP3
+	sWpdBEVw
+X-Received: by 2002:a05:622a:58c:b0:506:9852:75ec with SMTP id
+ d75a77b69052e-50959e1d20cmr8802451cf.9.1773394323400; Fri, 13 Mar 2026
+ 02:32:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|FRZPR08MB11875:EE_|DU6PEPF0000B621:EE_|DU0PR08MB8232:EE_
-X-MS-Office365-Filtering-Correlation-Id: 888eadb7-d46e-46f4-5b9c-08de80e268fc
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info-Original:
- xl251Pd/EKbOhX8GNX3CKtzy4DlDmkGIkXQHNsSeR8t0+zrc2m9xdusk1f6E94wI4fvR/ORq5TCux+K5/O8E4owS9OxDGrO9EY9azdcLso1NaLyIf0pLwC7piIAdH5QW+pNt/3rJHeSdIBKbDrv/H/PCMMw5vcbwk7z9e1AnOZ0fZzOdf1fPOgDWLLRBQD+KBG6NNdvLLLLI1MusmDaIEseMeQwrfj/4tXkJAQ55oGTFhrpTaXwD+HmVWehMJIb3Sf7lk/mx/5deneiSdf/8mZ408u2R8gEiRApgjR49IHcJTE71tMSrHvvM/sVJ9RJSQJ90uxdU0d03T0P5oyN9OI/ysFuPh4CvaHitA49JP8IVbWQzsc6MJcEU+WTqlHevP8botBOH0ryMcO/ceR523HBlS78gOl6ew++VtiUF8r1F+trXu9/N+tI4Wyo5mEj+pyZMm8Wasrhw2MQf7Zc6TXVZEglpCoei04s8d0k6RuM9koGlUreayz4WxbaqOA0PD4rv4U8KKC/fjGcefjnOtCsKc9DUmYhBMc37rD8RBJ/ztwlM/FWW7E5oiQG05Yr1ylgG1JyosAo6O0AoBvgFzX2ConibDlARW+CKz73noVmeSXfI7AzrHPMeTNiqTTPRMG9Pie2oo+EgMHDcBZ9N7qMhQiukbjKgoOlfqkh53z+Spn9mnjMS11SFn4RtRmCkDZ7nSZdDRZ4nvFmkzsLlVlaIxoSydZyozPk+/kHhfOQ=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- B5kb0jM6oEcDURXcqmP1b7DWKJmswCwtNNKiMGtBEm3NqzGjeKCp3pWYzMZyjRh6YTslsqEcTV0M5FSvJfG7kB6w8AYIMjBKD0XjbfQ4Stdyi4Nn2COeJTOVHP7ygS/80Arfn7FvK1n801umoOaT/mD9TTKROZKqdJKM7Gfe6CnHK5fwOQ7Zpx8yHv8gZrdtF2STM9hmU7I+NolictlEVuahDcLdVFzsyeAqXPfjP9u096um9uXt5nOgHTLi3KODJRmm7nf1aXaUaTZjGayI2RsyUNLmCab+VUTmx70aIRvakb4OFSFQcompFQm6JDNFSwwEJzNqCaZTQqpw39ZKyQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FRZPR08MB11875
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DU6PEPF0000B621.eurprd02.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	9296e83a-338c-490d-7ae8-08de80e243a8
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|14060799003|376014|1800799024|7416014|36860700016|35042699022|22082099003|56012099003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	GLar6mjse2EhG6fCoyNLFrdqhJcQ6khg7aQhu165a6gszjfd0fT9GxM6FM1HUTCyn46IrXZc8wxrn16ISbr7oPIeznuk2NTUfUvvAo25JPf/YijTyYCUlx6Ao/0qCUz6DDrN3c6qnJxSI3xsewECfKtqkYodiuomG9CuZbhGmMpCwIvbwsPVbYvhlQXLizrDoQJQN+BhYAxdCJimzXW6mf6Wb/G8LAxy2o4pxIU9Io9HpwKFNnb2HSTdsnnG711ReRsFQcZSyl+iEVc2X8ltxk+7xqtWKHU4Ks7R2DW1kuztWs9n43BFpS0M//z2D/Pr17GOICwof53Yb9iaSBdeFTOax18iHjunRZjp+PcN0QX5UBk2YBXru1nqdnG/PIvblQecXjGnTUK/wPW4eauuKroE3LvkH3+w/RZzaDcDKrAnwfbNBalyxu4+IsU+bWS/sAfmh7d6WFolFTIONFhZCjDX0fBqVFoTOX3yCU+j1e/iwDK8H+Y5cw2caIe0373vAsCjap3JZGSj6MwUGKrB26wQTaI1+PWNkncYRCKfxt/9yB7GwCODlOiin6IQjKMBqCmlqAq09Gr//1TJXMLsIQc59q5v1Fl63zomtHG9EehjO22V3q+FC5wsb9qMjw3Od0ioJI/I7xSSGt1laAt0cdxnu7LAZF3r8oRRUdxEUss+cY6yfswIu7K/LmceLcoxN+bsUmkt+5D8uj0cZfbgIrO50e8c1WFyjYMYWhzFt2X6iBGvCC805x9raZxs0b/rB8v2XsOGuvxy8VRrC0CJqg==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(14060799003)(376014)(1800799024)(7416014)(36860700016)(35042699022)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	qRCb6wQJ9oPBRUi+SeJJuWpyfLAHHmky+H90jQEPBHfCd4UQ5xhDD6Tlb7/ydOKa2F7Jwv6tvouz3BSPxGJPlgahIzupavrRnBO3PHOAjW9+Q8YD9Whdqor3ExQFSrEtb+GyXhJqDo6VYrMuf4NE2xhm61+mNYmcowDDqkNp9radMCmvq4iVvGetH0jK1NDiXs26R10V/Rzu1tS0ejzUd/WFHo0DwLliFRC5ERVNWfMgo+3geBS4Vx6XH3GfnJNmMtyQsFxyphA57DoRz2ivwoLqFJl9utN2QepNtIslYwzk44mWDdkJSL+BuP6OzVjyojga1PcttyoXx+7s3HzZa3KpyI0+MY8dkPTky8Ohu7ZWFs4uaH/0haEik4bsc0ZXuG31b1S0l1IgFhcNc6f2lzWNbKLKbkUARXXGHkw332nwsCW91kgC/nLM0ESvaEou
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 09:25:04.4396
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 888eadb7-d46e-46f4-5b9c-08de80e268fc
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DU6PEPF0000B621.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB8232
+References: <20260310124933.830025-1-sebastianene@google.com> <20260310124933.830025-4-sebastianene@google.com>
+In-Reply-To: <20260310124933.830025-4-sebastianene@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 13 Mar 2026 09:31:26 +0000
+X-Gm-Features: AaiRm52JQRQHUrF8B2xDdFYmIZIopGCFBBCbq9bfvHcEIXMaU79zPtGVGBpWS1U
+Message-ID: <CA+EHjTysM_02QHLOwKAnAA-uOFwC2GKezaMxyHyt365j8FR_ig@mail.gmail.com>
+Subject: Re: [PATCH 03/14] KVM: arm64: Support host MMIO trap handlers for
+ unmapped devices
+To: Sebastian Ene <sebastianene@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com, catalin.marinas@arm.com, dbrazdil@google.com, 
+	joey.gouly@arm.com, kees@kernel.org, mark.rutland@arm.com, maz@kernel.org, 
+	oupton@kernel.org, perlarsen@google.com, qperret@google.com, 
+	rananta@google.com, smostafa@google.com, suzuki.poulose@arm.com, 
+	tglx@kernel.org, vdonnefort@google.com, bgrzesik@google.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Catalin,
+Hi Sebastian,
 
-Thanks for your review :D
-
-> On Fri, Feb 27, 2026 at 03:17:02PM +0000, Yeoreum Yun wrote:
-> > +#ifdef CONFIG_ARM64_LSUI
-> > +
-> > +/*
-> > + * FEAT_LSUI is supported since Armv9.6, where FEAT_PAN is mandatory.
-> > + * However, this assumption may not always hold:
-> > + *
-> > + *   - Some CPUs advertise FEAT_LSUI but lack FEAT_PAN.
-> > + *   - Virtualisation or ID register overrides may expose invalid
-> > + *     feature combinations.
-> > + *
-> > + * Rather than disabling FEAT_LSUI when FEAT_PAN is absent, wrap LSUI
-> > + * instructions with uaccess_ttbr0_enable()/disable() when
-> > + * ARM64_SW_TTBR0_PAN is enabled.
-> > + */
+On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
 >
-> I'd just keep this comment in the commit log. Here you could simply say
-> that user access instructions don't require (hardware) PAN toggling. It
-> should be obvious why we use ttbr0 toggling like for other uaccess
-> routines.
-
-Okay. I'll move this into commit log. Thanks!
-
+> Introduce a mechanism to register callbacks for MMIO accesses to regions
+> unmapped from the host Stage-2 page tables.
 >
-> > +#define LSUI_FUTEX_ATOMIC_OP(op, asm_op)				\
-> > +static __always_inline int						\
-> > +__lsui_futex_atomic_##op(int oparg, u32 __user *uaddr, int *oval)	\
-> > +{									\
-> > +	int ret = 0;							\
-> > +	int oldval;							\
-> > +									\
-> > +	uaccess_ttbr0_enable();						\
-> > +									\
-> > +	asm volatile("// __lsui_futex_atomic_" #op "\n"			\
-> > +	__LSUI_PREAMBLE							\
-> > +"1:	" #asm_op "al	%w3, %w2, %1\n"					\
+> This infrastructure allows the hypervisor to intercept host accesses to
+> protected or emulated devices. When a Stage-2 fault occurs on a
+> registered device region, the hypervisor will invoke the associated
+> callback to emulate the access.
 >
-> As I mentioned on a previous patch, can we not use named operators here?
-
-I missed your message before I sent to v16, But v16 already make them
-with named operands. Thanks!
-
-[...]
-
-> > +}
-> > +
-> > +static __always_inline int
-> > +__lsui_cmpxchg32(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> > +{
-> > +	u64 __user *uaddr64;
-> > +	bool futex_pos, other_pos;
-> > +	int ret, i;
-> > +	u32 other, orig_other;
-> > +	union {
-> > +		u32 futex[2];
-> > +		u64 raw;
-> > +	} oval64, orig64, nval64;
-> > +
-> > +	uaddr64 = (u64 __user *) PTR_ALIGN_DOWN(uaddr, sizeof(u64));
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h      |  3 ++
+>  arch/arm64/include/asm/kvm_pkvm.h     |  6 ++++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 41 +++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c       |  3 ++
+>  4 files changed, 53 insertions(+)
 >
-> Nit: we don't use space after the type cast.
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 3f9233b5a130..8fe1e80ab3f4 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -304,6 +304,9 @@
+>
+>  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+>  #define HPFAR_MASK     (~UL(0xf))
+> +
+> +#define FAR_MASK       GENMASK_ULL(11, 0)
+> +
+>  /*
+>   * We have
+>   *     PAR     [PA_Shift - 1   : 12] = PA      [PA_Shift - 1 : 12]
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 48ec7d519399..5321ced2f50a 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -19,9 +19,15 @@
+>
+>  #define PKVM_PROTECTED_REGS_NUM        8
+>
+> +struct pkvm_protected_reg;
+> +
+> +typedef void (pkvm_emulate_handler)(struct pkvm_protected_reg *region, u64 offset, bool write,
+> +                                   u64 *reg, u8 reg_size);
+> +
+>  struct pkvm_protected_reg {
+>         u64 start_pfn;
+>         size_t num_pages;
+> +       pkvm_emulate_handler *cb;
+>  };
+>
+>  extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 7c125836b533..f405d2fbd88f 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -13,6 +13,7 @@
+>  #include <asm/stage2_pgtable.h>
+>
+>  #include <hyp/fault.h>
+> +#include <hyp/adjust_pc.h>
 
-Oops. I'll remove space.
+Please sort includes alphabetically.
 
 >
-> > +	futex_pos = !IS_ALIGNED((unsigned long)uaddr, sizeof(u64));
-> > +	other_pos = !futex_pos;
-> > +
-> > +	oval64.futex[futex_pos] = oldval;
-> > +	ret = get_user(oval64.futex[other_pos], (u32 __user *)uaddr64 + other_pos);
-> > +	if (ret)
-> > +		return -EFAULT;
-> > +
-> > +	ret = -EAGAIN;
-> > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
+>  #include <nvhe/gfp.h>
+>  #include <nvhe/memory.h>
+> @@ -608,6 +609,41 @@ static int host_stage2_idmap(u64 addr)
+>         return ret;
+>  }
 >
-> I was wondering if we still need the FUTEX_MAX_LOOPS bound with LSUI. I
-> guess with CAS we can have some malicious user that keeps updating the
-> futex location or the adjacent one on another CPU. However, I think we'd
-> need to differentiate between futex_atomic_cmpxchg_inatomic() use and
-> the eor case.
+> +static bool handle_host_mmio_trap(struct kvm_cpu_context *host_ctxt, u64 esr, u64 addr)
+> +{
+> +       u64 offset, reg_value = 0, start, end;
+> +       u8 reg_size, reg_index;
+> +       bool write;
+> +       int i;
 
-Hmm. I'll comment below together in eor..
+What do you plan to do if there is no valid syndrome, i.e.,
+ESR_EL2.ISV == 0? I am still reviewing, so maybe this is solved in a
+future patch, or maybe you know that, in practice, all instructions
+would have a valid syndrome. Regardless of which it is, you should
+definitely add the following check to _this_ patch (or reconsider the
+approach if it is possible to get legit accesses with ESR_EL2.ISV ==
+0):
 
->
-> > +		orig64.raw = nval64.raw = oval64.raw;
-> > +
-> > +		nval64.futex[futex_pos] = newval;
->
-> I'd keep orig64.raw = oval64.raw and set the nval64 separately (I find
-> it clearer, not sure the compiler cares much):
->
-> 		nval64.futex[futex_pos] = newval;
-> 		nval64.futex[other_pos] = oval64.futex[other_pos];
->
-> > +
-> > +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
-> > +			return -EFAULT;
-> > +
-> > +		oldval = oval64.futex[futex_pos];
-> > +		other = oval64.futex[other_pos];
-> > +		orig_other = orig64.futex[other_pos];
-> > +
-> > +		if (other == orig_other) {
-> > +			ret = 0;
-> > +			break;
-> > +		}
->
-> Is this check correct? What if the cmpxchg64 failed because futex_pos
-> was changed but other_pos remained the same, it will just report success
-> here. You need to compare the full 64-bit value to ensure the cmpxchg64
-> succeeded.
++      if (!(esr & ESR_ELx_ISV))
++              return false;
 
-This is not matter since "futex_cmpxchg_value_locked()" checks
-the "curval" and "oldval" IOW, though it returns success,
-caller of this function always checks the "curval" and "oldval"
-and when it's different, It handles to change return as -EAGAIN.
+> +
+> +       for (i = 0; i < num_protected_reg; i++) {
+> +               start = pkvm_protected_regs[i].start_pfn << PAGE_SHIFT;
+> +               end = start + (pkvm_protected_regs[i].num_pages << PAGE_SHIFT);
+> +
+> +               if (start > addr || addr > end)
 
->
-> > +	}
-> > +
-> > +	if (!ret)
-> > +		*oval = oldval;
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static __always_inline int
-> > +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> > +{
-> > +	/*
-> > +	 * Undo the bitwise negation applied to the oparg passed from
-> > +	 * arch_futex_atomic_op_inuser() with FUTEX_OP_ANDN.
-> > +	 */
-> > +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-> > +}
-> > +
-> > +static __always_inline int
-> > +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-> > +{
-> > +	u32 oldval, newval, val;
-> > +	int ret, i;
-> > +
-> > +	if (get_user(oldval, uaddr))
-> > +		return -EFAULT;
-> > +
-> > +	/*
-> > +	 * there are no ldteor/stteor instructions...
-> > +	 */
-> > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-> > +		newval = oldval ^ oparg;
-> > +
-> > +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
->
-> Since we have a FUTEX_MAX_LOOPS here, do we need it in cmpxchg32 as
-> well?
->
-> For eor, we need a loop irrespective of whether futex_pos or other_pos
-> have changed. For cmpxchg, we need the loop only if other_pos has
-> changed and return -EAGAIN if futex_pos has changed since the caller
-> needs to update oldval and call again.
->
-> So try to differentiate these cases, maybe only keep the loop outside
-> cmpxchg32 (I haven't put much though into it).
+Because end is calculated by adding the size, it represents the first
+byte after the region, so this should be:
++               if (start > addr || addr >= end)
+> +                       continue;
 
-I think we can remove loops on __lsui_cmpxchg32() and return -EAGAIN
-when other_pos is different. the __lsui_cmpxchg32() will be called
-"futex_cmpxchg_value_locked()" and as I said, this always checks
-whether curval & oldval when it successed.
+You also need to make sure that the entire access fits within the
+protected region, to avoid a malicious or misaligned cross-boundary
+access, i.e.:
 
-But in "eor" when it receive "-EAGAIN" from __lsui_cmxchg32()
-we can simply continue the loop.
++                if (addr + reg_size > end)
++                        return false;
 
+
+> +               reg_size = BIT((esr & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+> +               reg_index = (esr & ESR_ELx_SRT_MASK) >> ESR_ELx_SRT_SHIFT;
+> +               write = (esr & ESR_ELx_WNR) == ESR_ELx_WNR;
+> +               offset = addr - start;
+> +
+> +               if (write)
+> +                       reg_value = host_ctxt->regs.regs[reg_index];
+
+You need to handle the zero register (index 31) for writes, e.g.:
++                       reg_value = (reg_index == 31) ? 0 :
+host_ctxt->regs.regs[reg_index];
+
+> +
+> +               pkvm_protected_regs[i].cb(&pkvm_protected_regs[i], offset, write,
+> +                                         &reg_value, reg_size);
+> +
+> +               if (!write)
+> +                       host_ctxt->regs.regs[reg_index] = reg_value;
+
+and for reads:
++               if (!write & reg_index != 31)
+
+Cheers,
+/fuad
+
+> +
+> +               kvm_skip_host_instr();
+> +               return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+>  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+>  {
+>         struct kvm_vcpu_fault_info fault;
+> @@ -630,6 +666,11 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
+>          */
+>         BUG_ON(!(fault.hpfar_el2 & HPFAR_EL2_NS));
+>         addr = FIELD_GET(HPFAR_EL2_FIPA, fault.hpfar_el2) << 12;
+> +       addr |= fault.far_el2 & FAR_MASK;
+> +
+> +       if (ESR_ELx_EC(esr) == ESR_ELx_EC_DABT_LOW && !addr_is_memory(addr) &&
+> +           handle_host_mmio_trap(host_ctxt, esr, addr))
+> +               return;
 >
-> > +		if (ret)
-> > +			return ret;
-> > +
-> > +		if (val == oldval) {
-> > +			*oval = val;
-> > +			return 0;
-> > +		}
+>         ret = host_stage2_idmap(addr);
+>         BUG_ON(ret && ret != -EAGAIN);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index ad5b96085e1b..f91dfebe9980 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -296,6 +296,9 @@ static int unmap_protected_regions(void)
+>                         if (ret)
+>                                 goto err_setup;
+>                 }
+> +
+> +               if (reg->cb)
+> +                       reg->cb = kern_hyp_va(reg->cb);
+>         }
 >
-> I can see you are adding another check here for the actual value which
-> solves the other_pos comparison earlier but that's only for eor and not
-> the __lsui_futex_cmpxchg() case.
-
-As I mention above, though it success, caller of futex who calls
-__lsui_futex_cmpxchg() via "futex_cmpxchg_value_locked()" checks
-curval and oldval is the same even on the success.
-
-So it's not a matter.
-
->
-> > +
-> > +		oldval = val;
-> > +	}
-> > +
-> > +	return -EAGAIN;
-> > +}
-> > +
-> > +static __always_inline int
-> > +__lsui_futex_cmpxchg(u32 __user *uaddr, u32 oldval, u32 newval, u32 *oval)
-> > +{
-> > +	return __lsui_cmpxchg32(uaddr, oldval, newval, oval);
-> > +}
-> > +#endif	/* CONFIG_ARM64_LSUI */
->
+>         return 0;
 > --
-> Catalin
-
-Thanks!
-
---
-Sincerely,
-Yeoreum Yun
+> 2.53.0.473.g4a7958ca14-goog
+>
