@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63AE3AE19E
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84513B7B81
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413337; cv=none; b=iluzfm68ylHHBwDcoB43imkux3LMvONL8xrYPf2Vm7rI7/ljuJtyrf+TF5dywrZI6k2NVkFomY5VM1Q6PgIn3pGNnCte+SLM3HvFr2SRSMmiFhOPTQBUr+Iu9hYKs0ihaep6TH1ISHK8BgSjzjU4kjHsb3NVyM033me6Rk3CFrs=
+	t=1773413341; cv=none; b=Q52VrIcp74fpRU+6/13WH3G4asmY+lSUJIP6xDet2H6Gg/3vauOgs3RF7K2pFSD6+6/VNBRI4iMt1A/Jw00jLaalz/8HcF2KTbSMeo7xLDygzo0DOHBFGQYiWPcLNECvlQy5APaeTWWfuj7KbErJcg4l+CEeYjlYE2RbMBqrgko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413337; c=relaxed/simple;
-	bh=yFfvy9UErwSJb4phOzGy51MjnzOcAeoM5vjLd3ij5uY=;
+	s=arc-20240116; t=1773413341; c=relaxed/simple;
+	bh=8X6aiDNLOKPJSfBIGGapRj8burIUXgF823f4l6kSeg8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hVh1EFy4dfgsze+aACPTSojDCiOTxEwIAAuVSAj8SsvWSa8KL1tw4YLKOfV6Gam1lYuVGu4btbWY1s2xMRAcEydozIfeQk6146yTUQPyvt1kNieMnXHFlDcTk7cSDOy6QBbi+l7LxejBjZ13OQRC8Rj5e5gdtJhQK0Axb5lMzN4=
+	 MIME-Version; b=R35bJoGqW+w9/dP+E8FvZMlHWSmP4w9FTI6Jofs1SKjBeh1LbseT4/glzCbGZUOF9LjK2Ra5MfeYxjSf5QxEcAwLGRXmWjFyHRG8KeGg0tV/T8SbeCiKYA3xOnhZfKIF5+62VyfRhFtPB+akkc7qW211BB2BK58g4fIG/BbWM0M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3F8C22573;
-	Fri, 13 Mar 2026 07:48:49 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 727882576;
+	Fri, 13 Mar 2026 07:48:53 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 70CAC3F7BD;
-	Fri, 13 Mar 2026 07:48:51 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A30EA3F7BD;
+	Fri, 13 Mar 2026 07:48:55 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v6 34/40] arm_mpam: resctrl: Call resctrl_init() on platforms that can support resctrl
-Date: Fri, 13 Mar 2026 14:46:11 +0000
-Message-ID: <20260313144617.3420416-35-ben.horgan@arm.com>
+Subject: [PATCH v6 35/40] arm_mpam: Add quirk framework
+Date: Fri, 13 Mar 2026 14:46:12 +0000
+Message-ID: <20260313144617.3420416-36-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -69,265 +69,169 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: James Morse <james.morse@arm.com>
+From: Shanker Donthineni <sdonthineni@nvidia.com>
 
-Now that MPAM links against resctrl, call resctrl_init() to register the
-filesystem and setup resctrl's structures.
+The MPAM specification includes the MPAMF_IIDR, which serves to uniquely
+identify the MSC implementation through a combination of implementer
+details, product ID, variant, and revision. Certain hardware issues/errata
+can be resolved using software workarounds.
+
+Introduce a quirk framework to allow workarounds to be enabled based on the
+MPAMF_IIDR value.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Tested-by: Peter Newman <peternewman@google.com>
 Tested-by: Zeng Heng <zengheng4@huawei.com>
 Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
 Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+Signed-off-by: Shanker Donthineni <sdonthineni@nvidia.com>
+Co-developed-by: James Morse <james.morse@arm.com>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since v2:
-Use for_each_mpam...
-error path tidying
+Changes by James:
+Stash the IIDR so this doesn't need an IPI, enable quirks only
+once, move the description to the callback so it can be pr_once()d, add an
+enum of workarounds for popular errata. Add macros for making lists of
+product/revision/vendor half readable
+
+Changes since rfc:
+remove trailing commas in last element of enums
+Make mpam_enable_quirks() in charge of mpam_set_quirk() even if there
+is an enable.
 
 Changes since v3:
-Don't consider abmc/mbwu in teardown
+Brackets in macro
 ---
- drivers/resctrl/mpam_devices.c  | 32 ++++++++++++++---
- drivers/resctrl/mpam_internal.h |  4 +++
- drivers/resctrl/mpam_resctrl.c  | 63 ++++++++++++++++++++++++++++++++-
- 3 files changed, 94 insertions(+), 5 deletions(-)
+ drivers/resctrl/mpam_devices.c  | 32 ++++++++++++++++++++++++++++++++
+ drivers/resctrl/mpam_internal.h | 25 +++++++++++++++++++++++++
+ 2 files changed, 57 insertions(+)
 
 diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
-index 0c97f7708722..37b31a1cf376 100644
+index 37b31a1cf376..e66631f3f732 100644
 --- a/drivers/resctrl/mpam_devices.c
 +++ b/drivers/resctrl/mpam_devices.c
-@@ -73,6 +73,14 @@ static DECLARE_WORK(mpam_broken_work, &mpam_disable);
- /* When mpam is disabled, the printed reason to aid debugging */
- static char *mpam_disable_reason;
- 
-+/*
-+ * Whether resctrl has been setup. Used by cpuhp in preference to
-+ * mpam_is_enabled(). The disable call after an error interrupt makes
-+ * mpam_is_enabled() false before the cpuhp callbacks are made.
-+ * Reads/writes should hold mpam_cpuhp_state_lock, (or be cpuhp callbacks).
-+ */
-+static bool mpam_resctrl_enabled;
-+
- /*
-  * An MSC is a physical container for controls and monitors, each identified by
-  * their RIS index. These share a base-address, interrupts and some MMIO
-@@ -1619,7 +1627,7 @@ static int mpam_cpu_online(unsigned int cpu)
- 			mpam_reprogram_msc(msc);
- 	}
- 
--	if (mpam_is_enabled())
-+	if (mpam_resctrl_enabled)
- 		return mpam_resctrl_online_cpu(cpu);
- 
- 	return 0;
-@@ -1665,7 +1673,7 @@ static int mpam_cpu_offline(unsigned int cpu)
- {
- 	struct mpam_msc *msc;
- 
--	if (mpam_is_enabled())
-+	if (mpam_resctrl_enabled)
- 		mpam_resctrl_offline_cpu(cpu);
- 
- 	guard(srcu)(&mpam_srcu);
-@@ -2526,6 +2534,7 @@ static void mpam_enable_once(void)
- 	}
- 
- 	static_branch_enable(&mpam_enabled);
-+	mpam_resctrl_enabled = true;
- 	mpam_register_cpuhp_callbacks(mpam_cpu_online, mpam_cpu_offline,
- 				      "mpam:online");
- 
-@@ -2585,24 +2594,39 @@ static void mpam_reset_class(struct mpam_class *class)
- void mpam_disable(struct work_struct *ignored)
- {
- 	int idx;
-+	bool do_resctrl_exit;
- 	struct mpam_class *class;
- 	struct mpam_msc *msc, *tmp;
- 
-+	if (mpam_is_enabled())
-+		static_branch_disable(&mpam_enabled);
-+
- 	mutex_lock(&mpam_cpuhp_state_lock);
- 	if (mpam_cpuhp_state) {
- 		cpuhp_remove_state(mpam_cpuhp_state);
- 		mpam_cpuhp_state = 0;
- 	}
-+
-+	/*
-+	 * Removing the cpuhp state called mpam_cpu_offline() and told resctrl
-+	 * all the CPUs are offline.
-+	 */
-+	do_resctrl_exit = mpam_resctrl_enabled;
-+	mpam_resctrl_enabled = false;
- 	mutex_unlock(&mpam_cpuhp_state_lock);
- 
--	static_branch_disable(&mpam_enabled);
-+	if (do_resctrl_exit)
-+		mpam_resctrl_exit();
- 
- 	mpam_unregister_irqs();
- 
- 	idx = srcu_read_lock(&mpam_srcu);
- 	list_for_each_entry_srcu(class, &mpam_classes, classes_list,
--				 srcu_read_lock_held(&mpam_srcu))
-+				 srcu_read_lock_held(&mpam_srcu)) {
- 		mpam_reset_class(class);
-+		if (do_resctrl_exit)
-+			mpam_resctrl_teardown_class(class);
-+	}
- 	srcu_read_unlock(&mpam_srcu, idx);
- 
- 	mutex_lock(&mpam_list_lock);
-diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
-index 5ebbd6322597..ce9e0e0483fb 100644
---- a/drivers/resctrl/mpam_internal.h
-+++ b/drivers/resctrl/mpam_internal.h
-@@ -435,12 +435,16 @@ int mpam_get_cpumask_from_cache_id(unsigned long cache_id, u32 cache_level,
- 
- #ifdef CONFIG_RESCTRL_FS
- int mpam_resctrl_setup(void);
-+void mpam_resctrl_exit(void);
- int mpam_resctrl_online_cpu(unsigned int cpu);
- void mpam_resctrl_offline_cpu(unsigned int cpu);
-+void mpam_resctrl_teardown_class(struct mpam_class *class);
- #else
- static inline int mpam_resctrl_setup(void) { return 0; }
-+static inline void mpam_resctrl_exit(void) { }
- static inline int mpam_resctrl_online_cpu(unsigned int cpu) { return 0; }
- static inline void mpam_resctrl_offline_cpu(unsigned int cpu) { }
-+static inline void mpam_resctrl_teardown_class(struct mpam_class *class) { }
- #endif /* CONFIG_RESCTRL_FS */
- 
- /*
-diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 0db147271b0c..a7691c66553a 100644
---- a/drivers/resctrl/mpam_resctrl.c
-+++ b/drivers/resctrl/mpam_resctrl.c
-@@ -69,6 +69,12 @@ static bool cdp_enabled;
- static bool cacheinfo_ready;
- static DECLARE_WAIT_QUEUE_HEAD(wait_cacheinfo_ready);
- 
-+/*
-+ * If resctrl_init() succeeded, resctrl_exit() can be used to remove support
-+ * for the filesystem in the event of an error.
-+ */
-+static bool resctrl_enabled;
-+
- bool resctrl_arch_alloc_capable(void)
- {
- 	struct mpam_resctrl_res *res;
-@@ -360,6 +366,9 @@ static int resctrl_arch_mon_ctx_alloc_no_wait(enum resctrl_event_id evtid)
- {
- 	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	if (!mon->class)
- 		return -EINVAL;
- 
-@@ -402,6 +411,9 @@ static void resctrl_arch_mon_ctx_free_no_wait(enum resctrl_event_id evtid,
- {
- 	struct mpam_resctrl_mon *mon = &mpam_resctrl_counters[evtid];
- 
-+	if (!mpam_is_enabled())
-+		return;
-+
- 	if (!mon->class)
- 		return;
- 
-@@ -488,6 +500,9 @@ int resctrl_arch_rmid_read(struct rdt_resource *r, struct rdt_domain_hdr *hdr,
- 
- 	resctrl_arch_rmid_read_context_check();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	if (eventid >= QOS_NUM_EVENTS || !mon->class)
- 		return -EINVAL;
- 
-@@ -1168,6 +1183,9 @@ int resctrl_arch_update_one(struct rdt_resource *r, struct rdt_ctrl_domain *d,
- 	lockdep_assert_cpus_held();
- 	lockdep_assert_irqs_enabled();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	/*
- 	 * No need to check the CPU as mpam_apply_config() doesn't care, and
- 	 * resctrl_arch_update_domains() relies on this.
-@@ -1233,6 +1251,9 @@ int resctrl_arch_update_domains(struct rdt_resource *r, u32 closid)
- 	lockdep_assert_cpus_held();
- 	lockdep_assert_irqs_enabled();
- 
-+	if (!mpam_is_enabled())
-+		return -EINVAL;
-+
- 	list_for_each_entry_rcu(d, &r->ctrl_domains, hdr.list) {
- 		for (enum resctrl_conf_type t = 0; t < CDP_NUM_TYPES; t++) {
- 			struct resctrl_staged_config *cfg = &d->staged_config[t];
-@@ -1625,7 +1646,11 @@ int mpam_resctrl_setup(void)
- 		return -EOPNOTSUPP;
- 	}
- 
--	/* TODO: call resctrl_init() */
-+	err = resctrl_init();
-+	if (err)
-+		return err;
-+
-+	WRITE_ONCE(resctrl_enabled, true);
- 
- 	return 0;
- 
-@@ -1635,6 +1660,42 @@ int mpam_resctrl_setup(void)
- 	return err;
+@@ -630,6 +630,30 @@ static struct mpam_msc_ris *mpam_get_or_create_ris(struct mpam_msc *msc,
+ 	return ERR_PTR(-ENOENT);
  }
  
-+void mpam_resctrl_exit(void)
++static const struct mpam_quirk mpam_quirks[] = {
++	{ NULL } /* Sentinel */
++};
++
++static void mpam_enable_quirks(struct mpam_msc *msc)
 +{
-+	if (!READ_ONCE(resctrl_enabled))
-+		return;
++	const struct mpam_quirk *quirk;
 +
-+	WRITE_ONCE(resctrl_enabled, false);
-+	resctrl_exit();
-+}
++	for (quirk = &mpam_quirks[0]; quirk->iidr_mask; quirk++) {
++		int err = 0;
 +
-+/*
-+ * The driver is detaching an MSC from this class, if resctrl was using it,
-+ * pull on resctrl_exit().
-+ */
-+void mpam_resctrl_teardown_class(struct mpam_class *class)
-+{
-+	struct mpam_resctrl_res *res;
-+	enum resctrl_res_level rid;
-+	struct mpam_resctrl_mon *mon;
-+	enum resctrl_event_id eventid;
++		if (quirk->iidr != (msc->iidr & quirk->iidr_mask))
++			continue;
 +
-+	might_sleep();
++		if (quirk->init)
++			err = quirk->init(msc, quirk);
 +
-+	for_each_mpam_resctrl_control(res, rid) {
-+		if (res->class == class) {
-+			res->class = NULL;
-+			break;
-+		}
-+	}
-+	for_each_mpam_resctrl_mon(mon, eventid) {
-+		if (mon->class == class) {
-+			mon->class = NULL;
-+			break;
-+		}
++		if (err)
++			continue;
++
++		mpam_set_quirk(quirk->workaround, msc);
 +	}
 +}
 +
- static int __init __cacheinfo_ready(void)
- {
- 	cacheinfo_ready = true;
+ /*
+  * IHI009A.a has this nugget: "If a monitor does not support automatic behaviour
+  * of NRDY, software can use this bit for any purpose" - so hardware might not
+@@ -864,8 +888,11 @@ static int mpam_msc_hw_probe(struct mpam_msc *msc)
+ 	/* Grab an IDR value to find out how many RIS there are */
+ 	mutex_lock(&msc->part_sel_lock);
+ 	idr = mpam_msc_read_idr(msc);
++	msc->iidr = mpam_read_partsel_reg(msc, IIDR);
+ 	mutex_unlock(&msc->part_sel_lock);
+ 
++	mpam_enable_quirks(msc);
++
+ 	msc->ris_max = FIELD_GET(MPAMF_IDR_RIS_MAX, idr);
+ 
+ 	/* Use these values so partid/pmg always starts with a valid value */
+@@ -1972,6 +1999,7 @@ static bool mpam_has_cmax_wd_feature(struct mpam_props *props)
+  * resulting safe value must be compatible with both. When merging values in
+  * the tree, all the aliasing resources must be handled first.
+  * On mismatch, parent is modified.
++ * Quirks on an MSC will apply to all MSC in that class.
+  */
+ static void __props_mismatch(struct mpam_props *parent,
+ 			     struct mpam_props *child, bool alias)
+@@ -2091,6 +2119,7 @@ static void __props_mismatch(struct mpam_props *parent,
+  * nobble the class feature, as we can't configure all the resources.
+  * e.g. The L3 cache is composed of two resources with 13 and 17 portion
+  * bitmaps respectively.
++ * Quirks on an MSC will apply to all MSC in that class.
+  */
+ static void
+ __class_props_mismatch(struct mpam_class *class, struct mpam_vmsc *vmsc)
+@@ -2104,6 +2133,9 @@ __class_props_mismatch(struct mpam_class *class, struct mpam_vmsc *vmsc)
+ 	dev_dbg(dev, "Merging features for class:0x%lx &= vmsc:0x%lx\n",
+ 		(long)cprops->features, (long)vprops->features);
+ 
++	/* Merge quirks */
++	class->quirks |= vmsc->msc->quirks;
++
+ 	/* Take the safe value for any common features */
+ 	__props_mismatch(cprops, vprops, false);
+ }
+diff --git a/drivers/resctrl/mpam_internal.h b/drivers/resctrl/mpam_internal.h
+index ce9e0e0483fb..e28a168419d4 100644
+--- a/drivers/resctrl/mpam_internal.h
++++ b/drivers/resctrl/mpam_internal.h
+@@ -85,6 +85,8 @@ struct mpam_msc {
+ 	u8			pmg_max;
+ 	unsigned long		ris_idxs;
+ 	u32			ris_max;
++	u32			iidr;
++	u16			quirks;
+ 
+ 	/*
+ 	 * error_irq_lock is taken when registering/unregistering the error
+@@ -216,6 +218,28 @@ struct mpam_props {
+ #define mpam_set_feature(_feat, x)	__set_bit(_feat, (x)->features)
+ #define mpam_clear_feature(_feat, x)	__clear_bit(_feat, (x)->features)
+ 
++/* Workaround bits for msc->quirks */
++enum mpam_device_quirks {
++	MPAM_QUIRK_LAST
++};
++
++#define mpam_has_quirk(_quirk, x)	((1 << (_quirk) & (x)->quirks))
++#define mpam_set_quirk(_quirk, x)	((x)->quirks |= (1 << (_quirk)))
++
++struct mpam_quirk {
++	int (*init)(struct mpam_msc *msc, const struct mpam_quirk *quirk);
++
++	u32 iidr;
++	u32 iidr_mask;
++
++	enum mpam_device_quirks workaround;
++};
++
++#define MPAM_IIDR_MATCH_ONE	(FIELD_PREP_CONST(MPAMF_IIDR_PRODUCTID,   0xfff) | \
++				 FIELD_PREP_CONST(MPAMF_IIDR_VARIANT,     0xf)	 | \
++				 FIELD_PREP_CONST(MPAMF_IIDR_REVISION,    0xf)	 | \
++				 FIELD_PREP_CONST(MPAMF_IIDR_IMPLEMENTER, 0xfff))
++
+ /* The values for MSMON_CFG_MBWU_FLT.RWBW */
+ enum mon_filter_options {
+ 	COUNT_BOTH	= 0,
+@@ -259,6 +283,7 @@ struct mpam_class {
+ 
+ 	struct mpam_props	props;
+ 	u32			nrdy_usec;
++	u16			quirks;
+ 	u8			level;
+ 	enum mpam_class_types	type;
+ 
 -- 
 2.43.0
 
