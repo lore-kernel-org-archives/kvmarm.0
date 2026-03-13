@@ -1,198 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55351A681C
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 15:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7E03C345D
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 16:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773417486; cv=none; b=LvZGMk7c5SOiO+Xz0WXTClYggkeuSCVdQa8MZTgaYBrnqCubPH0N+Of5ojFKwFHwaXrfjILl8eoLSm/t8jpNgNGVlfvl/AJ7dYrCD5vb2OluntcC+K8NlHmHMrxEFfLpgE6N253CqSoFCe4VcXUy/aX4kxqTNniTQ9I3Iw2yYyk=
+	t=1773418580; cv=none; b=dlLhsAMg4FNELut3dQ4JiseG+NrsgRtnLF0dsiMBRpwxcVDbtfBBQ3yeL2n9KLtfgEDfmIpHAmC6nzZ+r+YhhD/iia8tjmSx5wrI1zR4md+fgFLkNwPaFgoTie8eOJxxLvRrvXSojFu/hZELYeH6oEy98papCqg73JhvosGTuVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773417486; c=relaxed/simple;
-	bh=D5PZYTno7wOL/03mIkv0E+olwq3141aLAIhD7Irlnrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P1MEcTdRUCz+i2Gv9qN7siryxjJsNt9GvpX1VeGtw7TyRcTm5G0VsqDrne5TCa+hfG094z7I8sWOj8PeZHWJTq8J2rr/SsQCGfXqGOM2gb+uc30u2yMhcBgGB119gwVvJ2xYPhWiGlPBkllBeOYR0GQd0OJepF9A1NehNMQmVWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbwkpZr2; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbwkpZr2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1672CC19421;
-	Fri, 13 Mar 2026 15:58:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773417486;
-	bh=D5PZYTno7wOL/03mIkv0E+olwq3141aLAIhD7Irlnrs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XbwkpZr23ptn7RjEE1ds5M5eycyiQfArVY32wh34TPy0ZCw0IknmU11KovTOclJaq
-	 mmEiJMMzLrCZ2+9CJU6qaEe8bCRtuH0KYq9IwADrH+0+bZLGMGpWW9E3y0OWvG1KnJ
-	 f1orJ+SeoI1hJpAnLijhT39gszxlOYhtrCt00F3xNNZutL0b95lFJdvv/3KEdI+NGA
-	 HTMKN7Oep24UfQJPVifqg20cEEQAXqU4vfQthysWK6URuyAe/pQLuYn9hNF2yOklGC
-	 vFJj/2Czq6st4ipiOdasgaJtXALdXU32VNODpgVJ283iFEMPbcORYUeHFxtTZI0fmE
-	 3Q3B/h9jm6whQ==
-Date: Fri, 13 Mar 2026 15:58:00 +0000
-From: Will Deacon <will@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
- acknowledgement
-Message-ID: <abQ0CKop8Sy3hqhC@willie-the-truck>
-References: <20260302165801.3014607-1-catalin.marinas@arm.com>
- <20260302165801.3014607-4-catalin.marinas@arm.com>
- <aamT6-Mvr9nI1unq@willie-the-truck>
- <aarB3iv8963UDn5E@arm.com>
- <c4a302df-511b-40b2-97f2-06576748c999@arm.com>
- <abA6N6ctPoscIbBe@arm.com>
- <abLT05Nq-9J-uBEY@willie-the-truck>
- <abQx6Q_FJH92cjXj@arm.com>
+	s=arc-20240116; t=1773418580; c=relaxed/simple;
+	bh=xpb+sAZZFW4cZzQqktbvtQyTfq7nsxB6lk9Mqo8D8Mc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PHSi+YPu8JhomPs4ulBWf8N56LtiBvyeqrZNGssswRNyQ3muOPRsW5PpL8woBe3s6twrVH7yGkdVhB5Tq1HAD+ZmmvE/xvN6kBBTaSzDwP45q9RDaqunmICGN9NFXKWVzQokzRvAsWmEJpvVL6fl5abnuPoeUArJUMZnZ6RJSvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B102176A;
+	Fri, 13 Mar 2026 09:16:11 -0700 (PDT)
+Received: from [10.57.18.169] (unknown [10.57.18.169])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9780F3F7BD;
+	Fri, 13 Mar 2026 09:16:16 -0700 (PDT)
+Message-ID: <10f5de0b-1fdc-4867-8ccb-e9362fc553fe@arm.com>
+Date: Fri, 13 Mar 2026 16:16:15 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abQx6Q_FJH92cjXj@arm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: arm64: Discard PC update state on vcpu reset
+Content-Language: en-GB
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>, Oliver Upton <oupton@kernel.org>,
+ Zenghui Yu <yuzenghui@huawei.com>, stable@vger.kernel.org
+References: <20260312140850.822968-1-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20260312140850.822968-1-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 13, 2026 at 03:48:57PM +0000, Catalin Marinas wrote:
-> On Thu, Mar 12, 2026 at 02:55:15PM +0000, Will Deacon wrote:
-> > On Tue, Mar 10, 2026 at 03:35:19PM +0000, Catalin Marinas wrote:
-> > > On Mon, Mar 09, 2026 at 10:13:20AM +0000, Vladimir Murzin wrote:
-> > > > On 3/6/26 12:00, Catalin Marinas wrote:
-> > > > >>> @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
-> > > > >>>  	put_cpu_fpsimd_context();
-> > > > >>>  }
-> > > > >>>  
-> > > > >>> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
-> > > > >>> +
-> > > > >>> +/*
-> > > > >>> + * SME/CME erratum handling
-> > > > >>> + */
-> > > > >>> +static cpumask_var_t sme_dvmsync_cpus;
-> > > > >>> +static cpumask_var_t sme_active_cpus;
-> > > > >>> +
-> > > > >>> +void sme_set_active(unsigned int cpu)
-> > > > >>> +{
-> > > > >>> +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
-> > > > >>> +		return;
-> > > > >>> +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
-> > > > >>> +		return;
-> > > > >>> +
-> > > > >>> +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
-> > > > >>> +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
-> > > > >>> +
-> > > > >>> +	cpumask_set_cpu(cpu, sme_active_cpus);
-> > > > >>> +
-> > > > >>> +	/*
-> > > > >>> +	 * Ensure subsequent (SME) memory accesses are observed after the
-> > > > >>> +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
-> > > > >>> +	 */
-> > > > >>> +	smp_mb();
-> > > > >>
-> > > > >> I can't convince myself that a DMB is enough here, as the whole issue
-> > > > >> is that the SME memory accesses can be observed _after_ the TLB
-> > > > >> invalidation. I'd have thought we'd need a DSB to ensure that the flag
-> > > > >> updates are visible before the exception return.
-> > > > > 
-> > > > > This is only to ensure that the sme_active_cpus mask is observed before
-> > > > > any SME accesses. The mask is later used to decide whether to send the
-> > > > > IPI. We have something like this:
-> > > > > 
-> > > > > P0
-> > > > > 	STSET	[sme_active_cpus]
-> > > > > 	DMB
-> > > > > 	SME access to [addr]
-> > > > > 
-> > > > > P1
-> > > > > 	TLBI	[addr]
-> > > > > 	DSB
-> > > > > 	LDR	[sme_active_cpus]
-> > > > > 	CBZ	out
-> > > > > 	Do IPI
-> > > > > out:
-> > > > > 
-> > > > > If P1 did not observe the STSET to [sme_active_cpus], P0 should have
-> > > > > received and acknowledged the DVMSync before the STSET. Is your concern
-> > > > > that P1 can observe the subsequent SME access but not the STSET?
-> > > > > 
-> > > > > No idea whether herd can model this (I only put this in TLA+ for the
-> > > > > main logic check but it doesn't do subtle memory ordering).
-> > > > 
-> > > > JFYI, herd support for SME is still work-in-progress (specifically it misses
-> > > > updates in cat), yet it can model VMSA.
-> > > > 
-> > > > IIUC, expectation here is that either
-> > > > - P1 observes sme_active_cpus, so we have to do_IPI or
-> > > > - P0 observes TLBI (say shutdown, so it must fault)
-> > > > 
-> > > > anything else is unexpected/forbidden.
-> > > > 
-> > > > AArch64 A
-> > > > variant=vmsa
-> > > > {
-> > > >  int x=0;
-> > > >  int active=0;
-> > > > 
-> > > >  0:X1=active;
-> > > >  0:X3=x;
-> > > > 
-> > > >  1:X0=(valid:0);
-> > > >  1:X1=PTE(x);
-> > > >  1:X2=x;
-> > > >  1:X3=active;
-> > > >  
-> > > > }
-> > > >  P0                                 | P1                                            ;
-> > > >  MOV W0,#1                          | STR X0,[X1]                                   ;
-> > > >  STR W0,[X1] (* sme_active_cpus  *) | DSB ISH                                       ;
-> > > >  DMB SY                             | LSR X9,X2,#12                                 ;
-> > > >  LDR W2,[X3] (* access to [addr] *) | TLBI VAAE1IS,X9 (* [addr] *)                  ;
-> > > >                                     | DSB ISH                                       ;
-> > > >                                     | LDR W4,[X3]     (* sme_active_cpus *)         ;
-> > > > 
-> > > > exists ~(1:X4=1 \/ fault(P0,x))
-> > > > 
-> > > > Is that correct understanding? Have I missed anything?
-> > > 
-> > > Yes, I think that's correct. Another tweak specific to this erratum
-> > > would be for P1 to do a store to x via another mapping after the
-> > > TLBI+DSB and the P0 load should not see it.
-> > > 
-> > > Even with the CPU erratum, if the P1 DVMSync is received/acknowledged by
-> > > P0 before its STR to sme_active_cpus, I don't see how the subsequent SME
-> > > load would overtake the STR given the DMB. The erratum messed up the
-> > > DVMSync acknowledgement, not the barriers.
-> > 
-> > I'm still finding this hard to reason about.
-> > 
-> > Why can't:
-> > 
-> > 1. P0 translates its SME load and puts the valid translation into its TLB
-> > 2. P1 runs to completion, sees sme_active_cpus as 0 and so doesn't IPI
-> > 3. P0 writes to sme_active_cpus and then does the SME load using the
-> >    translation from (1)
-> > 
-> > I guess it's diving into ugly corners of what the erratum actually is...
+On 12/03/2026 14:08, Marc Zyngier wrote:
+> Our vcpu reset suffers from a particularly interesting flaw, as it
+> does not correctly deal with state that will have an effect on the
+> execution flow out of reset.
 > 
-> From discussing with the microarchitects at the time, a DMB ISH was
-> sufficient on the ERET path. Whether they thought about your scenario,
-> not sure. Memory ordering isn't broken by this bug, only the DVMSync
-> acknowledgement not waiting for the CME unit (shared by multiple CPUs)
-> to complete an in-flight memory access. My assumption is that step (1)
-> won't actually start until the STR in (3) is issued and this would
-> include the TLB lookup.
+> Take the following completely random example, never seen in the wild
+> and that never resulted in a couple of sleepless nights: /s
+> 
+> - vcpu-A issues a PSCI_CPU_OFF using the SMC conduit
+> 
+> - SMC being a trapped instruction (as opposed to HVC which is always
+>    normally executed), we annotate the vcpu as needing to skip the
+>    next instruction, which is the SMC itself
+> 
+> - vcpu-A is now safely off
+> 
+> - vcpu-B issues a PSCI_CPU_ON for vcpu-A, providing a starting PC
+> 
+> - vcpu-A gets reset, get the new PC, and is sent on its merry way
+> 
+> - right at the point of entering the guest, we notice that a PC
+>    increment is pending (remember the earlier SMC?)
+> 
+> - vcpu-A skips its first instruction...
+> 
+> What could possibly go wrong?
+> 
+> Well, I'm glad you asked. For pKVM as a NV guest, that first instruction
+> is extremely significant, as it indicates whether the CPU is booting
+> or resuming. Having skipped that instruction, nothing makes any sense
+> anymore, and CPU hotplugging fails.
+> 
+> This is all caused by the decoupling of PC update from the handling
+> of an exception that triggers such update, making it non-obvious
+> what affects what when.
+> 
+> Fix this train wreck by discarding all the PC-affecting state on
+> vcpu reset.
+> 
+> Fixes: f5e30680616ab ("KVM: arm64: Move __adjust_pc out of line")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>   arch/arm64/kvm/reset.c | 14 ++++++++++++++
+>   1 file changed, 14 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 959532422d3a3..b963fd975aaca 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -247,6 +247,20 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>   			kvm_vcpu_set_be(vcpu);
+>   
+>   		*vcpu_pc(vcpu) = target_pc;
+> +
+> +		/*
+> +		 * We may come from a state where either a PC update was
+> +		 * pending (SMC call resulting in PC being increpented to
+> +		 * skip the SMC) or a pending exception. Make sure we get
+> +		 * rid of all that, as this cannot be valid out of reset.
+> +		 *
+> +		 * Note that clearing the exception mask also clears PC
+> +		 * updates, but that's an implementation detail, and we
+> +		 * really want to make it explicit.
+> +		 */
+> +		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
+> +		vcpu_clear_flag(vcpu, EXCEPT_MASK);
+> +		vcpu_clear_flag(vcpu, INCREMENT_PC);
+>   		vcpu_set_reg(vcpu, 0, reset_state.r0);
+>   	}
 
-Maybe, but that sounds slow...
+Wow! Thats it finally !! Glad you found the root cause.
 
-> Anyway, I'll ask them again to be sure.
 
-Thanks.
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-If you're speaking to them, it might also be worth asking whether or not
-the exception return alone is sufficient (given that we run with IESB=1).
 
-Will
