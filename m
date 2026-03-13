@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB1F3A875F
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8528D3A9D95
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413244; cv=none; b=f2o1ASR3Q+Yy3LffKB40i/GWqmB5QrjtMGamMoQ2o6O8PCiCfbMaxYmmRHU0tVDCXzRThWQfxwSLsOTv9ll5QhlFyU6KH+bp4JBRw3W418V79fugyFZShS1l8b/wSd7BB1odvt59Z5C97WfaumATCcuHnf+JBRIUjm3yYPCe7aw=
+	t=1773413250; cv=none; b=Wset0TvkIHHFCKgweUC2VXwKsfxrECIFVtrdPUTV7E7RAUjfq7hG/DqFRy3X3sjgy/pQNKQhpO4PJz9rcWE1iC3nRqzf5IkbzsNX0bH6j701BZ7Why8zL5flLddD5nqnbn3yFecQa4eTyi0vUqvoXm7aAP91zZwkoRNGDz9KDFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413244; c=relaxed/simple;
-	bh=M2zEaXmf7MAEoSwHu0M+QohjDnM51bK+2sk19iwWi8c=;
+	s=arc-20240116; t=1773413250; c=relaxed/simple;
+	bh=SD63g99Ca3L42Dw1MVQ6RRVNI5XcvBaUhb+bOm1b9uA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qsFEoPy/pS/bK/c4UzTM6461WZafVw686zDzbbewuq8hI8DpotpFwHN2U3yONO9aThY5Rgf36aY4Ek/bdYx9ESvV+900J0r9RdppHpFdFDYXhHHXb9CTq6Zot7LVT59qc+DkE/W4prZYLL+sJkcCYsyW/wB/my7zcOp/ixrFsms=
+	 MIME-Version; b=EjadASTRXoWS6o/1/ZP/+3s4Jwgz4ug2vKkeZTJUycxX1/ZE/GoGCJqDXk1gVn/8xAuDplfz1OWcj5npaDq9XrzZBc573lw4L2DHTo+ZyORxd3QaKDxGmIqsSCGxSabvEz0JO15wIDMaYRgxgEFhuvxlcMsuOVk0yorOActfztU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 88F531CC4;
-	Fri, 13 Mar 2026 07:47:16 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B9C141E7D;
+	Fri, 13 Mar 2026 07:47:20 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9FED73F7BD;
-	Fri, 13 Mar 2026 07:47:18 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id EAE403F7BD;
+	Fri, 13 Mar 2026 07:47:22 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -54,11 +54,10 @@ Cc: amitsinght@marvell.com,
 	kvmarm@lists.linux.dev,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
-	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>,
-	Dave Martin <Dave.Martin@arm.com>
-Subject: [PATCH v6 12/40] arm64: mpam: Add helpers to change a task or cpu's MPAM PARTID/PMG values
-Date: Fri, 13 Mar 2026 14:45:49 +0000
-Message-ID: <20260313144617.3420416-13-ben.horgan@arm.com>
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Subject: [PATCH v6 13/40] KVM: arm64: Force guest EL1 to use user-space's partid configuration
+Date: Fri, 13 Mar 2026 14:45:50 +0000
+Message-ID: <20260313144617.3420416-14-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -72,97 +71,78 @@ Content-Transfer-Encoding: 8bit
 
 From: James Morse <james.morse@arm.com>
 
-Care must be taken when modifying the PARTID and PMG of a task in any
-per-task structure as writing these values may race with the task being
-scheduled in, and reading the modified values.
+While we trap the guest's attempts to read/write the MPAM control
+registers, the hardware continues to use them. Guest-EL0 uses KVM's
+user-space's configuration, as the value is left in the register, and
+guest-EL1 uses either the host kernel's configuration, or in the case of
+VHE, the UNKNOWN reset value of MPAM1_EL1.
 
-Add helpers to set the task properties, and the CPU default value.  These
-use WRITE_ONCE() that pairs with the READ_ONCE() in mpam_get_regval() to
-avoid causing torn values.
+We want to force the guest-EL1 to use KVM's user-space's MPAM
+configuration. On nVHE rely on MPAM0_EL1 and MPAM1_EL1 always being
+programmed the same and on VHE copy MPAM0_EL1 into the guest's
+MPAM1_EL1. There is no need to restore as this is out of context once TGE
+is set.
 
 Tested-by: Gavin Shan <gshan@redhat.com>
 Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Tested-by: Peter Newman <peternewman@google.com>
 Tested-by: Zeng Heng <zengheng4@huawei.com>
 Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
-Cc: Dave Martin <Dave.Martin@arm.com>
 Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
 Changes since rfc:
-Keep comment attached to mpam_get_regval()
-Add internal helper, __mpam_regval() (Jonathan)
+Drop the unneeded __mpam_guest_load() in nvhre and the MPAM1_EL1 save restore
+Defer EL2 handling until next patch
 
-Changes since v3:
-Remove extra CONFIG_ARM64_MPAM guarding
-Extend CONFIG_ARM64_MPAM guarding
+Changes since v2:
+Use mask (Oliver)
+
+Changes since v4:
+Explicitly set the mpam enable bit
 ---
- arch/arm64/include/asm/mpam.h | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/arch/arm64/include/asm/mpam.h b/arch/arm64/include/asm/mpam.h
-index 6bccbfdccb87..05aa71200f61 100644
---- a/arch/arm64/include/asm/mpam.h
-+++ b/arch/arm64/include/asm/mpam.h
-@@ -4,6 +4,7 @@
- #ifndef __ASM__MPAM_H
- #define __ASM__MPAM_H
- 
-+#include <linux/bitfield.h>
- #include <linux/jump_label.h>
- #include <linux/percpu.h>
- #include <linux/sched.h>
-@@ -22,6 +23,23 @@ DECLARE_PER_CPU(u64, arm64_mpam_current);
-  */
- extern u64 arm64_mpam_global_default;
- 
-+#ifdef CONFIG_ARM64_MPAM
-+static inline u64 __mpam_regval(u16 partid_d, u16 partid_i, u8 pmg_d, u8 pmg_i)
-+{
-+	return FIELD_PREP(MPAM0_EL1_PARTID_D, partid_d) |
-+	       FIELD_PREP(MPAM0_EL1_PARTID_I, partid_i) |
-+	       FIELD_PREP(MPAM0_EL1_PMG_D, pmg_d) |
-+	       FIELD_PREP(MPAM0_EL1_PMG_I, pmg_i);
-+}
-+
-+static inline void mpam_set_cpu_defaults(int cpu, u16 partid_d, u16 partid_i,
-+					 u8 pmg_d, u8 pmg_i)
-+{
-+	u64 default_val = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
-+
-+	WRITE_ONCE(per_cpu(arm64_mpam_default, cpu), default_val);
-+}
-+
- /*
-  * The resctrl filesystem writes to the partid/pmg values for threads and CPUs,
-  * which may race with reads in mpam_thread_switch(). Ensure only one of the old
-@@ -30,12 +48,20 @@ extern u64 arm64_mpam_global_default;
-  * value to be stored with cache allocations, despite being considered 'free' by
-  * resctrl.
-  */
--#ifdef CONFIG_ARM64_MPAM
- static inline u64 mpam_get_regval(struct task_struct *tsk)
- {
- 	return READ_ONCE(task_thread_info(tsk)->mpam_partid_pmg);
+diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+index b254d442e54e..be685b63e8cf 100644
+--- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
+@@ -183,6 +183,21 @@ void sysreg_restore_guest_state_vhe(struct kvm_cpu_context *ctxt)
  }
+ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
  
-+static inline void mpam_set_task_partid_pmg(struct task_struct *tsk,
-+					    u16 partid_d, u16 partid_i,
-+					    u8 pmg_d, u8 pmg_i)
++/*
++ * The _EL0 value was written by the host's context switch and belongs to the
++ * VMM. Copy this into the guest's _EL1 register.
++ */
++static inline void __mpam_guest_load(void)
 +{
-+	u64 regval = __mpam_regval(partid_d, partid_i, pmg_d, pmg_i);
++	u64 mask = MPAM0_EL1_PARTID_D | MPAM0_EL1_PARTID_I | MPAM0_EL1_PMG_D | MPAM0_EL1_PMG_I;
 +
-+	WRITE_ONCE(task_thread_info(tsk)->mpam_partid_pmg, regval);
++	if (system_supports_mpam()) {
++		u64 val = (read_sysreg_s(SYS_MPAM0_EL1) & mask) | MPAM1_EL1_MPAMEN;
++
++		write_sysreg_el1(val, SYS_MPAM1);
++	}
 +}
 +
- static inline void mpam_thread_switch(struct task_struct *tsk)
- {
- 	u64 oldregval;
+ /**
+  * __vcpu_load_switch_sysregs - Load guest system registers to the physical CPU
+  *
+@@ -222,6 +237,7 @@ void __vcpu_load_switch_sysregs(struct kvm_vcpu *vcpu)
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+ 	__sysreg_restore_user_state(guest_ctxt);
++	__mpam_guest_load();
+ 
+ 	if (unlikely(is_hyp_ctxt(vcpu))) {
+ 		__sysreg_restore_vel2_state(vcpu);
 -- 
 2.43.0
 
