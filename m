@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313BF3A963A
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C3F3A7F74
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413223; cv=none; b=ChZkzpfzIc1uOLVILU+pdAN/tP3Nym9HNWfZoSCR49mEINqxNN2Lfv5CeE0XeiEqyKyf/gMQt2KHHEh9BFgn0K57Z+Xl6PPq8xKwfDXLZiBZ3GkBdJgr8E0Vc6ijA1wgfC6uObWdcKl6q4+zYUCWrR/NRUDWAbcHVmzRDYBqj/c=
+	t=1773413227; cv=none; b=kKa/KVyOwTRNxp/8zO4Ah3P0LHCu7wMRTOYblotUZ6mO+2BQvml3L6A0hOM3KZzV3ey3SShViUW81JDxIPlOxLul1iMR/gH12f4WkuE2L3PEiFXGV4Czz/wyW6xZxOmP9O2wGlADD/pKfMZOf0VvYIdmcC6kzowR8R3ydC6jGNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413223; c=relaxed/simple;
-	bh=s33mhE/ceA2bgjMWjPaX34TjQrQjX0xOaW9+OPVxsAE=;
+	s=arc-20240116; t=1773413227; c=relaxed/simple;
+	bh=pyUTSmlc09KzVeNHkS3ebB3Bnif8iba8ZbFHhFpW9ZM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eX0BAMFv89jF4C8J6z6eo6UCDgAP3oyW84m7/rAwSqhA7sQDifD0Wplkooqa3wwHT0mcSS7Z+BLCAEE2u0PG/jNbngVrN5pQlM+/j9I5Q4Iesx2EDx65qThqpHWZb89yXQdrPv455DLnWdH7J5N59r8LVR0CQ14pzcKJNSBCyjA=
+	 MIME-Version; b=poX4okkKz7OSrvHAG1flQkd88H9lYw25hfmN1ReztY+VP7T7tMLtNc9R4KchUpErbok4Ea//c6VylFmS+VFy07tOWeDJ2U3XfZgrZUl5S2dpn+hdXhNE+S5/EhTNC1lKBHJnWk6GE70maGx/hvutWEuw49ffZyy2M6oL82rXCl8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A32B244B;
-	Fri, 13 Mar 2026 07:46:55 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 993B42308;
+	Fri, 13 Mar 2026 07:46:59 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9BBB03F7BD;
-	Fri, 13 Mar 2026 07:46:57 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id CD26E3F7BD;
+	Fri, 13 Mar 2026 07:47:01 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -55,9 +55,9 @@ Cc: amitsinght@marvell.com,
 	zengheng4@huawei.com,
 	linux-doc@vger.kernel.org,
 	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Subject: [PATCH v6 07/40] arm64: mpam: Re-initialise MPAM regs when CPU comes online
-Date: Fri, 13 Mar 2026 14:45:44 +0000
-Message-ID: <20260313144617.3420416-8-ben.horgan@arm.com>
+Subject: [PATCH v6 08/40] arm64: mpam: Drop the CONFIG_EXPERT restriction
+Date: Fri, 13 Mar 2026 14:45:45 +0000
+Message-ID: <20260313144617.3420416-9-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -69,81 +69,46 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: James Morse <james.morse@arm.com>
+In anticipation of MPAM being useful remove the CONFIG_EXPERT restriction.
 
-Now that the MPAM system registers are expected to have values that change,
-reprogram them based on the previous value when a CPU is brought online.
-
-Previously MPAM's 'default PARTID' of 0 was always used for MPAM in
-kernel-space as this is the PARTID that hardware guarantees to
-reset. Because there are a limited number of PARTID, this value is exposed
-to user-space, meaning resctrl changes to the resctrl default group would
-also affect kernel threads.  Instead, use the task's PARTID value for
-kernel work on behalf of user-space too. The default of 0 is kept for both
-user-space and kernel-space when MPAM is not enabled.
-
-Tested-by: Gavin Shan <gshan@redhat.com>
-Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-Tested-by: Peter Newman <peternewman@google.com>
 Tested-by: Zeng Heng <zengheng4@huawei.com>
 Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
 Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
-Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
-Signed-off-by: James Morse <james.morse@arm.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Changes since rfc:
-CONFIG_MPAM -> CONFIG_ARM64_MPAM
-Check mpam_enabled
-Comment about relying on ERET for synchronisation
-Update commit message
+ arch/arm64/Kconfig      | 2 +-
+ drivers/resctrl/Kconfig | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Changes since v3:
-Always set MPAM1_EL1.MPAMEN rather than relying on it being read only
----
- arch/arm64/kernel/cpufeature.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index c31f8e17732a..c3f900f81653 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -86,6 +86,7 @@
- #include <asm/kvm_host.h>
- #include <asm/mmu.h>
- #include <asm/mmu_context.h>
-+#include <asm/mpam.h>
- #include <asm/mte.h>
- #include <asm/hypervisor.h>
- #include <asm/processor.h>
-@@ -2492,13 +2493,17 @@ test_has_mpam(const struct arm64_cpu_capabilities *entry, int scope)
- static void
- cpu_enable_mpam(const struct arm64_cpu_capabilities *entry)
- {
--	/*
--	 * Access by the kernel (at EL1) should use the reserved PARTID
--	 * which is configured unrestricted. This avoids priority-inversion
--	 * where latency sensitive tasks have to wait for a task that has
--	 * been throttled to release the lock.
--	 */
--	write_sysreg_s(0, SYS_MPAM1_EL1);
-+	int cpu = smp_processor_id();
-+	u64 regval = 0;
-+
-+	if (IS_ENABLED(CONFIG_ARM64_MPAM) && static_branch_likely(&mpam_enabled))
-+		regval = READ_ONCE(per_cpu(arm64_mpam_current, cpu));
-+
-+	write_sysreg_s(regval | MPAM1_EL1_MPAMEN, SYS_MPAM1_EL1);
-+	isb();
-+
-+	/* Synchronising the EL0 write is left until the ERET to EL0 */
-+	write_sysreg_s(regval, SYS_MPAM0_EL1);
- }
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index ecaaca13a969..3170c67464fb 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -2016,7 +2016,7 @@ config ARM64_TLB_RANGE
  
- static bool
+ config ARM64_MPAM
+ 	bool "Enable support for MPAM"
+-	select ARM64_MPAM_DRIVER if EXPERT	# does nothing yet
++	select ARM64_MPAM_DRIVER
+ 	select ACPI_MPAM if ACPI
+ 	help
+ 	  Memory System Resource Partitioning and Monitoring (MPAM) is an
+diff --git a/drivers/resctrl/Kconfig b/drivers/resctrl/Kconfig
+index c808e0470394..c34e059c6e41 100644
+--- a/drivers/resctrl/Kconfig
++++ b/drivers/resctrl/Kconfig
+@@ -1,6 +1,6 @@
+ menuconfig ARM64_MPAM_DRIVER
+ 	bool "MPAM driver"
+-	depends on ARM64 && ARM64_MPAM && EXPERT
++	depends on ARM64 && ARM64_MPAM
+ 	help
+ 	  Memory System Resource Partitioning and Monitoring (MPAM) driver for
+ 	  System IP, e.g. caches and memory controllers.
 -- 
 2.43.0
 
