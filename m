@@ -1,255 +1,334 @@
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011069.outbound.protection.outlook.com [40.107.130.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A261E282F02
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.69
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413839; cv=fail; b=PCedXJO7jR3XWEpr5mFSO1LkpcyvlpRZo9Ma0usUgDFC/lFcuGApuWhRZ/FFizOqhTI8txdPyhj7fq2n3Rm6Xryb6kcQ6LKsbsbY2GVEppCymu+rkf+LiEhA9cMgGdxDbhfMVDdGOH3clBefcaNQy+YimeXy50c5EvdDaWmw2cI=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413839; c=relaxed/simple;
-	bh=Ko3pvx2A+x177WlyEn7IHNs46dZIMPM2TdS7O+yBeyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZpEHebK5NQep3BjbBhkwtocHrJ1lHsbM0aQPTbSWxKFsdjoO2w1ggolvO9bcJMP0SznbG1QTHm8mlTaNmQY+24bpQkD7yJaEPlo/uHKR+1udmOo6ptSN9HX8faqsEmCPtUWIwyuq147dV3ujRbccfVyurh9JmXzXxcKPoU1EJS4=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SVpfGtvn; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=SVpfGtvn; arc=fail smtp.client-ip=40.107.130.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CCD3126D7
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773415089; cv=none; b=eEpVbK+FZ4zOOwknwHaf6oXuHMogtBIICLUGy1z1MWewBa9tc1g7166DucONaFlt3pUMJVqKpsFlCb0f+y0JcSYRSzM1yGynAHJvvHCh3L9pCQ8vLoKwU57EYGz13jAy9ERU9B/d5+FYpQazcj8QWdw4JAcM+e5WQ/tRRjuyZIo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773415089; c=relaxed/simple;
+	bh=mt7YK9R/kzlK44x0oqR4iKfajWUb2HIKjQ1ASuTrSHY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bvwd3n8k5hj6X80s6VdC+vRMy+c4fOKZDsAw4/rvEiIcRcmBkhLc+ettBIHujtVuAqRin7+DA+RDAypST1Ryl9yLwOPpCNZd4RHo6aqytiUib53iQFELL3AGNw3XwCVlTRUyBdwlRvfOQ0EB9xYs0tqC8VAXcACoYbZ4D9fRBIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fEHFRsad; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SVpfGtvn";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="SVpfGtvn"
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=d7q3GoA4p/VhjbD1M5d7w18vJURTH4vaPE8w6WYy3PN9S9FSTHPcuBTKgzx3DlPZV5sBeYwlZIIO+/K8UiBKasvPU+BRlRe6ypTeMg2iPRPau39GotuDP6+wUegJ0TOzNUZJkXhFebpvoCxPelKdbMFQVhiTa79rla0Efh8UBUmYL3cWXZBxlQB2u+CcBVITeoTkozzTrv1iZj4OWrOoYO03IclTIkd3ut+vdnK/opQS+QLTNrCRI+1+H4oN2amY8UZAkumxuKtEPnwAX+q7Kfff39FnwXKZbvzNE75rgfHtBc4Szvs5Uf/LCWgbP+SYjRY5xA3JhiTqwhxSOJeiWw==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=39RzhhJo+1gj6LF54QxHTXc3uvluMPKcd5thGlqO5a0=;
- b=x8u+DC499UofwJ/tr6ajWZDiFA2IIcbyluqyDZbeHAwa4RfeXIjwGZM6psjNvACQAN/SSpb9hfvx86MDE8hechTroKjGTeo1JrGg8RAL8WoKM9JsaxMtUBjC9ud4dBVLGTXA45siuZnsx1rMuYrHV5EafpoqOtGGlnuHhH8LRXD/4S5q7A8Or2e63SmybeVTaWdMBtRVpLX6HKY+j8/XL2MSGn7OrpS3ibusx7HXZbWerI8V5loD/sSvw5jp5AwKszevUHqUV+cuzk2k33T3DipEM4d4anHUw3+sp8RTtp6fX+yvVKzFHzDKF86EJ2hFFFhmirkV1bQPxb7fEmhpvA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=arm.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=39RzhhJo+1gj6LF54QxHTXc3uvluMPKcd5thGlqO5a0=;
- b=SVpfGtvngTlb6+BC8BzOnQxOxGueSZw3wgvPMxFkG9BVyTX/XYZNdQjRtkJMBrIuiVwUSmBkySQnFbDfFaT+EPhdxPa+GchkQY0lJvfkS549b0kjFnrPFKWX6YN5SMOacn5cGH5+teHfTVUF/P1o3vbDZY8nVbFvLW867A2AMyw=
-Received: from DUZPR01CA0216.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b4::14) by AM7PR08MB5318.eurprd08.prod.outlook.com
- (2603:10a6:20b:104::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Fri, 13 Mar
- 2026 14:57:13 +0000
-Received: from DB1PEPF0003922E.eurprd03.prod.outlook.com
- (2603:10a6:10:4b4:cafe::1f) by DUZPR01CA0216.outlook.office365.com
- (2603:10a6:10:4b4::14) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9678.29 via Frontend Transport; Fri,
- 13 Mar 2026 14:57:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=arm.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 4.158.2.129 as permitted sender) receiver=protection.outlook.com;
- client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
-Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF0003922E.mail.protection.outlook.com (10.167.8.101) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9700.17
- via Frontend Transport; Fri, 13 Mar 2026 14:57:12 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O9e8PbyuzXKGrdN/2q/uTNqpzuGDDR89ylUyyUde24jYWbzez1OsZ0OsFFvTA3L5BEiL6c4WBS3Mk1l6KAmpqvuZaERyXTKwIEgtnduDZ29agCFp2IuuePmHZy3enMHrtr7wetzNtAbC6+4o6SM51M7U/QpB2hkqsJ1f9aO8eoXcFfU0W4UDttuBOJZzAFJYUA7VTqnanYSxy6Asn2ytNcV7txzQRd7tEAzJR3U/I3bM8YfyegDLERiJmRt0q/JZL0ObGTRrrBDy9f6ePniiAz38+KOD0xX1j2X16X6gXvp/u/gvpJG3th79WYlnT3JOQTHDpRYipDv3jC87X8ADXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=39RzhhJo+1gj6LF54QxHTXc3uvluMPKcd5thGlqO5a0=;
- b=tAmmfWXgZfQGsI211kRGnSOOojCancxptbRNJpCua26wmuSnFdXniqODuRBWWbE094/Q7i2N/AZsBdflFW66KsaglB0qyrc8CYQ9B0gK0jTIkzuvPQHQTQT411NOcvWQ2PMh7cOETNxOxn5eYIpEDdJvI+N8ZhQpF/iAkP+GgVCYdCKgmtsxDe5D+k+0jgJbmSrcwoHL/L0aouLR9hw/X8PVuw+usVr94hJKTtA3RBTqJMsAWmwO5wHZAlmgW78KeLlqE7DRZmLQml/CenBk12Gf8m5PJ4AYvAITGhw00X9Zcx7T8SukhhMa2YhLC0RbbTIbg48fVmlBNNPGNMEt1g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=39RzhhJo+1gj6LF54QxHTXc3uvluMPKcd5thGlqO5a0=;
- b=SVpfGtvngTlb6+BC8BzOnQxOxGueSZw3wgvPMxFkG9BVyTX/XYZNdQjRtkJMBrIuiVwUSmBkySQnFbDfFaT+EPhdxPa+GchkQY0lJvfkS549b0kjFnrPFKWX6YN5SMOacn5cGH5+teHfTVUF/P1o3vbDZY8nVbFvLW867A2AMyw=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20) by DU4PR08MB11792.eurprd08.prod.outlook.com
- (2603:10a6:10:642::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.12; Fri, 13 Mar
- 2026 14:56:09 +0000
-Received: from GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98]) by GV1PR08MB10521.eurprd08.prod.outlook.com
- ([fe80::8c9b:58d2:2080:eb98%4]) with mapi id 15.20.9700.010; Fri, 13 Mar 2026
- 14:56:09 +0000
-Date: Fri, 13 Mar 2026 14:56:06 +0000
-From: Yeoreum Yun <yeoreum.yun@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, will@kernel.org, maz@kernel.org,
-	oupton@kernel.org, miko.lenczewski@arm.com, kevin.brodsky@arm.com,
-	broonie@kernel.org, ardb@kernel.org, suzuki.poulose@arm.com,
-	lpieralisi@kernel.org, joey.gouly@arm.com, yuzenghui@huawei.com
-Subject: Re: [PATCH v15 5/8] arm64: futex: support futex with FEAT_LSUI
-Message-ID: <abQlhhSDkmzUugMW@e129823.arm.com>
-References: <20260227151705.1275328-1-yeoreum.yun@arm.com>
- <20260227151705.1275328-6-yeoreum.yun@arm.com>
- <abMDOC5DYEm74And@arm.com>
- <abPXrvl9tC+nv6q9@e129823.arm.com>
- <abQiSiX_xxjSY96-@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abQiSiX_xxjSY96-@arm.com>
-X-ClientProxiedBy: LO4P123CA0378.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:18e::23) To GV1PR08MB10521.eurprd08.prod.outlook.com
- (2603:10a6:150:163::20)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fEHFRsad"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-485317b6bd0so66505e9.1
+        for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 08:18:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773415086; x=1774019886; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ta2Ou5gCtU/aepAMrwAyagN15663lqpJZVH28HIpAIg=;
+        b=fEHFRsad5+uBlrHE7NFr2OjkV5l0eC6GF5+ukfNHc/ebARZGdIB+WsUBFH/eGgQyH7
+         OZCGm06N9ONIFKTeIX+LhxplJASJBhEBtcuCWAM+2lkJzOBmMsm1wYdGxGaI8KxZfQVQ
+         Z9e1M18gurgfRLtSLRhZLZmIgzxyUS5VcAt3g7dTQuJsFIQVVJ2T9/l/fPg/KnecMqmh
+         3l+HYYtTjLR/cCOo8DPwVo2z6e3Tx+vM3ppQcBXKsNs7ixFw17nBsbudDq0mHD+k8o04
+         Mk9BeAex4oq0NJezsccfFqP2B8XSExfKYrJ0wk4Dgh8yC+sUOCETRXi2giHIv7wUhLCg
+         Qh0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773415086; x=1774019886;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ta2Ou5gCtU/aepAMrwAyagN15663lqpJZVH28HIpAIg=;
+        b=a9ZX4RkTZwI5aPxcKDZYvT9gCgh7++EV9A9vz0z9oBKiawwaFjbfn5Q/XKqg0JmLdV
+         CMQAB1LNPpYm6l37KOoaZYgHSzyq1NQHnQdha1V/li3moN5EL4iNZeDvQnQEaVXUPTbl
+         ukg6bNPxPj1nK2vplWE9dmMP+cZ1rqBGqAmYHzcaBbo55XpicVPLm2BNGnlonXuYS2/U
+         UtfvNNmu+du13mMnUVPFx+/F9AnRbTprF2sSAbGPahcf4KyQpUrZ3lnA3CZ5DlJWnYr8
+         S/tcw5zVtFDb/3xeLVfdHjB0W03AyMr2VpLFQnCaNh5vowOr5kRGQkNRZQrXcOVNs/Av
+         Zg1A==
+X-Forwarded-Encrypted: i=1; AJvYcCW0gUXQFvClzybGPu12NIz/eMQEeV7I5Z4q3OkhWb2OHzLqmwWEGj8XzyPByx565UXIFSHBV5U=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyXqT6i2TIFlQ1HBjQ+tprrVnbj8WnnjFhE6FT7XBgKJ8L5tncY
+	q7NSU/7A4QKjm6RqMGPrgeXlUQXCoh9uqKJaA895oDaHG1xb9rFMveylT5vHvq0ZaqNBg8dIZBH
+	g1P96qw==
+X-Gm-Gg: ATEYQzzfV0cI1A8qYMnYFlNQ+VWIMSkAgOwupnCV5G1CA48W7+sj/Q+jnhlzrTLPk+5
+	zmjd+S7xhbEgBQR5NJEgCNokg+gkG9hwkCi5HuJJFx8+UShYvH4Luxaq+7m62zSYfVsjBHkx7kQ
+	1+qxZb6iLL1BgGFv1vkg32Ew1JB/U7j174q4p8t2aNj3EH4e/Ii8PxO3sSBGQWpb8szrR2VpeR5
+	9Vdd6yZEWaDx5wgnRSpyK5+Oo3+IdbaLPzrFBqD/YwgP8w3Tfn6VGh578ulUYykC/cv+9BWBBlK
+	OYu5KTKhXYAXmpJK7ezi0uoboGgCMBQuiPyri2dU7Q4XlOOyp77yYfpqMC8ArmyJClAlum9oZe8
+	7NjxJywlNSkdVYxCnTuMPrWgUCgplg55GUQMO8krMLt2p1lqQYY6M7CK2usLZLmR/ZfTydnY8PT
+	oWJiEP6mFGl2Dy34lhXWci49N71Wf6phRvqw/0R1OtCJoHBwqnDBsqCSZW
+X-Received: by 2002:a05:600c:2148:b0:483:1093:f29b with SMTP id 5b1f17b1804b1-4855670e644mr774745e9.8.1773415084951;
+        Fri, 13 Mar 2026 08:18:04 -0700 (PDT)
+Received: from google.com (54.95.38.34.bc.googleusercontent.com. [34.38.95.54])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48541b6f708sm455930345e9.11.2026.03.13.08.18.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Mar 2026 08:18:04 -0700 (PDT)
+Date: Fri, 13 Mar 2026 15:18:01 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: Sebastian Ene <sebastianene@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com,
+	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
+	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
+	perlarsen@google.com, qperret@google.com, rananta@google.com,
+	suzuki.poulose@arm.com, tabba@google.com, tglx@kernel.org,
+	vdonnefort@google.com, bgrzesik@google.com, will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [RFC PATCH 00/14] KVM: ITS hardening for pKVM
+Message-ID: <abQqqTYvmrtGp9l7@google.com>
+References: <20260310124933.830025-1-sebastianene@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	GV1PR08MB10521:EE_|DU4PR08MB11792:EE_|DB1PEPF0003922E:EE_|AM7PR08MB5318:EE_
-X-MS-Office365-Filtering-Correlation-Id: 237f5e9b-5134-4caf-f1e1-08de8110cf2d
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info-Original:
- CZxkb6pQ5di5xgmS7LhaBooKIClAXqNSKEu1QiVw2KxpqE5rNB9ZBkCGrmPjR8k5QYDOjH5Dt2zE5lZDjvxOyUdllj8R1+7521VUjiGxKplnvEaDwy9rlY9RP/w6OgoSMcinvPnLWCyxon219OJFWHwD7QBmGYKV8Y5dVCWzAQCR3fRq4b8A436UiUnSbTBscWRs2fhJtxwuwlq2glPCtAkxLbTGqu9unRArryaHgswSpv/oczlFxgVZPi7HBHRkK3OB6fvqsN7nqbGsMIbZ2a+3VxRU6Vt4iOtonMGzELaKW71tdYbIzlQrWqki4m1/7SQEzPF8q8IbBdWNHePfbq/bsdHQtcTDlbsSDpeQUhsE9V7T5v4qBuT0xpJ2pn09VoXuj4TMLD3qZzbroZBZ4Y4O6HTaXm1L5xWVoX4jxGtZzPKgWbwHusKsQ7iXb5TNi53vnIviXqAcJVn/T1yt34YJdlY6h882p6eITUXqCPNpNXp3Mx0YNaGRUlu9D7IZbmV+t3dkXoRXWvy9OTxrxDUm9AGmtCw5Pb3hrgdb14kDrPpEfJTBeQKDJPLESmatR92TT0K/zRsgzrsXMaVudfbG1iEuIADotQq02vNYaqEptdXMB8UIj3Qt2eKhasz0f6qoqN66YGkqECqxEk0Z9YjzCLYnl9L8swAC79bWeVjoWvkQbtNOv2DlHxbxzAe2rqTTmftiPXO1VzjcYR+cRX0m6QrqWcPqQFhAq3nfncs=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR08MB10521.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-Exchange-RoutingPolicyChecked:
- pjp/522ZQjDThWOzDZFarVEAnSE5uo/hByO37QaPkATdpuDNmjviUMjd1VtyXqjAGhHV6OcCQbLuEsER73eGIJh4SptkD65Jut/vrDSc9B29PPkkWR6OJ4dd+34zvMzjq1pchBrfTIR8ke82QOlzzHtu2kSCnAMNwPhoRTaIhy7E+/EaLV4zcYGslxHGitf9eZNZN8QKWcpiaoYWqhxEVOTYMp4K2AAbQ0WS05T6rGDotn9ZjnnHiT9OU2pqrp7F/Wyqi5YOIvomhJHKZIrSl4gx16eVDTPsfs2GBuVjl2x2WNjGLy9rooulYzCjNRdgcEtrCr0YyXohBE+z/CIiYA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR08MB11792
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF0003922E.eurprd03.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	ab57a7f4-94af-4207-f0eb-08de8110a96b
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|35042699022|82310400026|36860700016|376014|7416014|14060799003|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	q+PfbHD76HDPylnEuR0BBRgzGVKSnJyYfDMG2KGKAtyTdc21YCi13TO/Hgycqc2I92k3RcsG6egx4+dujjwv+HYtdkXAFFgVgLMyv1H07D9EHWUHhceiX/6FquNVNWyynLkoaF8QuswMOQKhmMj66mYnZS0sBDei5mxBo1dK6Du5s/m2nI737Nm0eUwv9q3cxSKyU6Ed+5YRChTsPj4UkiVHaReAbbDxEkWIJFZ0AlMunfVeJgoGbocq6i22GYJ/cF/0qiz1ra/zVZ3R1ICpIhKBrlV2Hb1fT090ALIaVG1P4UnvyhEQdddMgLZwNFnCB3XDhq46BaOIpVTl4IrYC0vIuBheo2Wc8U0I3d6JX0XJ+BgBJ036bQsA+Ixjva+bmbPaWqMik1ot4glN8qlpHvgH1OFoD1LQgXO/ar6LZLCm45izMsljJ/hPh7qUSR6UEVCJBcBY+F5YkAHJ+6USjYkTvnRIGSEfiLwDONR8yBHNDWwN85JqNqKltooEaUKNdAjk8Idl97aIPBR64KvRDQxoiTFM9bcHSXMTKmvj18gBOavq8syCQ5HRyYcoFRYHFWXuQIkdZQDG7EFMgHV8u+ZA7Uc4P1fFuUeZBCG7CiJ1/v3hs22HFZmozxzNALy/lCngZ9kQgAQhF/jeXuqAfXBYJThAFCpICox8klmQcHvhP7rEMgQrleF745AzvVazO/KtfSabzOwb+W21jBCWd9CNnYB33Oiv7CZC1+CV5gFaJSQiL89yuSEMMESlhgcGD7wp9oyYIhB6KLUdckbpvg==
-X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(35042699022)(82310400026)(36860700016)(376014)(7416014)(14060799003)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	uq3Y1awlSUMldDrILCo+5xY9w8Akye/By0h9SLKuSirYvINupPLo1SyE8ipq4pPEScOR6cte6deKXdbjro4fPOnyOfqTLRiySjv80xZJqlbmXUa2wavTqbHXYIby69NuZcWKBDOgnNX85jzdQTQbDOkgKlmpN36KAVPq07sts05PrXM/ftGdD79d4W2EhIbt7vNZEXmyK1bS527qc5IxaCoHoVEXl2+Bz3psoAxpPP64ezObv8Y/+ng4t/PEgb7W1aGBsBAfKmqCVHfJDTlJZ+FtmKGcNkn/PybK478N/MBq8Z6GhU3KKFULWhXHQyMz5FueZPWkQn5MgGKEimZVEsRColChOp/9JwNYnfcd2CePpQ3v9AIatZDHtRyzx52iE4OccJjze0R8qNdvvx0VnGirBLBQpcZ1TACStYgq3/2OGvJRIHUaz4hweBspizF1
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2026 14:57:12.7566
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 237f5e9b-5134-4caf-f1e1-08de8110cf2d
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF0003922E.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5318
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260310124933.830025-1-sebastianene@google.com>
 
-Hi Catalin,
+Hi Seb,
 
-> On Fri, Mar 13, 2026 at 09:23:58AM +0000, Yeoreum Yun wrote:
-> > > On Fri, Feb 27, 2026 at 03:17:02PM +0000, Yeoreum Yun wrote:
-> > > > +
-> > > > +		if (__lsui_cmpxchg64(uaddr64, &oval64.raw, nval64.raw))
-> > > > +			return -EFAULT;
-> > > > +
-> > > > +		oldval = oval64.futex[futex_pos];
-> > > > +		other = oval64.futex[other_pos];
-> > > > +		orig_other = orig64.futex[other_pos];
-> > > > +
-> > > > +		if (other == orig_other) {
-> > > > +			ret = 0;
-> > > > +			break;
-> > > > +		}
-> > >
-> > > Is this check correct? What if the cmpxchg64 failed because futex_pos
-> > > was changed but other_pos remained the same, it will just report success
-> > > here. You need to compare the full 64-bit value to ensure the cmpxchg64
-> > > succeeded.
-> >
-> > This is not matter since "futex_cmpxchg_value_locked()" checks
-> > the "curval" and "oldval" IOW, though it returns success,
-> > caller of this function always checks the "curval" and "oldval"
-> > and when it's different, It handles to change return as -EAGAIN.
->
-> Ah, ok, it makes sense (I did not check the callers).
->
-> > > > +	}
-> > > > +
-> > > > +	if (!ret)
-> > > > +		*oval = oldval;
-> > > > +
-> > > > +	return ret;
-> > > > +}
-> > > > +
-> > > > +static __always_inline int
-> > > > +__lsui_futex_atomic_and(int oparg, u32 __user *uaddr, int *oval)
-> > > > +{
-> > > > +	/*
-> > > > +	 * Undo the bitwise negation applied to the oparg passed from
-> > > > +	 * arch_futex_atomic_op_inuser() with FUTEX_OP_ANDN.
-> > > > +	 */
-> > > > +	return __lsui_futex_atomic_andnot(~oparg, uaddr, oval);
-> > > > +}
-> > > > +
-> > > > +static __always_inline int
-> > > > +__lsui_futex_atomic_eor(int oparg, u32 __user *uaddr, int *oval)
-> > > > +{
-> > > > +	u32 oldval, newval, val;
-> > > > +	int ret, i;
-> > > > +
-> > > > +	if (get_user(oldval, uaddr))
-> > > > +		return -EFAULT;
-> > > > +
-> > > > +	/*
-> > > > +	 * there are no ldteor/stteor instructions...
-> > > > +	 */
-> > > > +	for (i = 0; i < FUTEX_MAX_LOOPS; i++) {
-> > > > +		newval = oldval ^ oparg;
-> > > > +
-> > > > +		ret = __lsui_cmpxchg32(uaddr, oldval, newval, &val);
-> > >
-> > > Since we have a FUTEX_MAX_LOOPS here, do we need it in cmpxchg32 as
-> > > well?
-> > >
-> > > For eor, we need a loop irrespective of whether futex_pos or other_pos
-> > > have changed. For cmpxchg, we need the loop only if other_pos has
-> > > changed and return -EAGAIN if futex_pos has changed since the caller
-> > > needs to update oldval and call again.
-> > >
-> > > So try to differentiate these cases, maybe only keep the loop outside
-> > > cmpxchg32 (I haven't put much though into it).
-> >
-> > I think we can remove loops on __lsui_cmpxchg32() and return -EAGAIN
-> > when other_pos is different. the __lsui_cmpxchg32() will be called
-> > "futex_cmpxchg_value_locked()" and as I said, this always checks
-> > whether curval & oldval when it successed.
->
-> Yes, I think for the futex_cmpxchg_value_locked(), the bounded loop
-> doesn't matter since the core would invoke it back on -EAGAIN. It's nice
-> not to fail if the actual futex did not change but in practice it
-> doesn't make any difference and I'd rather keep the code simple.
->
-> > But in "eor" when it receive "-EAGAIN" from __lsui_cmxchg32()
-> > we can simply continue the loop.
->
-> Yes, for eor we need the bounded loop. Only return -EAGAIN to the user
-> if we finished the loop and either __lsui_cmpxchg32() returned -EAGAIN
-> or the updated on futex_pos failed.
->
-> Thanks.
->
+On Tue, Mar 10, 2026 at 12:49:19PM +0000, Sebastian Ene wrote:
+> This series introduces the necessary machinery to perform trap & emulate
+> on device access in pKVM. Furthermore, it hardens the GIC/ITS controller to
+> prevent an attacker from tampering with the hypervisor protected memory
+> through this device. 
+> 
+> In pKVM, the host kernel is initially trusted to manage the boot process but
+> its permissions are revoked once KVM initializes. The GIC/ITS device is
+> configured before the kernel deprivileges itself. Once the hypervisor
+> becomes available, sanitize the accesses to the ITS controller by
+> trapping and emulating certain registers and by shadowing some memory
+> structures used by the ITS.
+> 
+> This is required because the ITS can issue transactions on the memory
+> bus *directly*, without having an SMMU in front of it, which makes it
+> an interesting target for crossing the hypervisor-established privilege
+> boundary.
+> 
+> 
+> Patch overview
+> ==============
+> 
+> The first patch is re-used from Mostafa's series[1] which brings SMMU-v3
+> support to pKVM.
+> 
+> [1] https://lore.kernel.org/linux-iommu/20251117184815.1027271-1-smostafa@google.com/#r
+> 
+> Some of the infrastructure built in that series might intersect and we
+> agreed to converge on some changes. The patches [1 - 3] allow unmapping
+> devices from the host address space and installing a handler to trap
+> accesses from the host. While executing in the handler, enough context
+> has to be given from mem-abort to perform the emulation of the device
+> such as: the offset, the access size, direction of the write and private
+> related data specific to the device. 
+> The unmapping of the device from the host address space is performed
+> after the host deprivilege (during _kvm_host_prot_finalize call).
+> 
+> The 4th patch looks up the ITS node from the device tree and adds it to
+> an array of unmapped devices. It install a handler that forwards all the
+> MMIO request to mediate the host access inside the emulation layer and
+> to prevent breaking ITS functionality. 
+> 
+> The 5th patch changes the GIC/ITS driver to exposes two new methods
+> which will be called from the KVM layer to setup the shadow state and
+> to take the appropriate locks. This one is the most intrusive as it
+> changes the current GIC/ITS driver. I tried to avoid creating a
+> dependency with KVM to keep the GIC driver agnostic of the virtualization
+> layer but I am happy to explore other options as well. 
+> To avoid re-programming the ITS device with new shadow structures after
+> pKVM is ready, I exposed two functions to change the
+> pointers inside the driver for the following structures:
+> - the command queue points to a newly allocated queue
+> - the GITS_BASER<n> tables configured with an indirect layout have the
+>   first layer shadowed and they point to a new memory region
+> 
+> Patch 6 adds the entry point into the emulation setup and sets up the
+> shadow command queue. It adds some helper macros to define the offset
+> register and the associate action that we want to execute in the
+> emulation. It also unmaps the state passed from the host kernel
+> to prevent it from playing nasty games later on. The patch
+> traps accesses to CWRITER register and copies the commands from the
+> host command queue to the shadow command queue. 
+> 
+> Patch 7 prevents the host from directly accessing the first layer of the
+> indirect tables held in GITS_BASER<n>. It also prevents the host from
+> directly accesssing the last layer of the Device Table (since the entries
+> in this table hold the address of the ITT table) and of the vPE Table
+> (since the vPE table entries hold the address of the virtual LPI pending
+> table.
+> 
+> Patches [8-10] sanitize the commands sent to the ITS and their
+> arguments.
+> 
+> Patches [11-13] restrict the access of the host to certain registers
+> and prevent undefined behaviour. Prevent the host from re-programming
+> the tables held in the GITS_BASER register.
+> 
+> The last patch introduces an hvc to setup the ITS emulation and calls
+> into the ITS driver to setup the shadow state. 
+> 
+> 
+> Design
+> ======
+> 
+> 
+> 1. Command queue shadowing
+> 
+> The ITS hardware supports a command queue which is programmed by the driver
+> in the GITS_CBASER register. To inform the hardware that a new command
+> has been added, the driver updates an index into the GITS_CWRITER
+> register. The driver then reads the GITS_CREADR register to see if the
+> command was processed or if the queue is stalled.
+>  
+> To create a new command, the emulation layer mirrors the behavior
+> as following:
+>  (i) The host ITS driver creates a command in the shadow queue:
+> 	its_allocate_entry() -> builder()
+>  (ii) Notifies the hardware that a new command is available:
+> 	its_post_commands()
+>  (iii) Hypervisor traps the write to GITS_CWRITER:
+> 	handle_host_mem_abort() -> handle_host_mmio_trap() ->
+>             pkvm_handle_gic_emulation()
+>  (iv) Hypervisor copies the command from the host command queue
+>       to the original queue which is not accessible to the host.
+>       It parses the command and updates the hardware write.
+> 
+> The driver allocates space for the original command queue and programs
+> the hardware (GITS_CWRITER). When pKVM becomes available, the driver
+> allocates a new (shadow) queue and replaces its original pointer to
+> the queue with this new one. This is to prevent a malicious host from
+> tampering with the commands sent to the ITS hardware.
+> 
+> The entry point of our emulation shares the memory of the newly
+> allocated queue with the hypervisor and donates the memory of the
+> original queue to make it inaccesible to the host.
+> 
+> 
+> 2. Indirect tables first level shadowing
+> 
+> The ITS hardware supports indirection to minimize the space required to
+> accommodate large tables (eg. deviceId space used to index the Device Table
+> is quite sparse). This is a 2-level indirection, with entries from the
+> first table pointing to a second table.
+> 
+> An attacker in control of the host can insert an address that points to
+> the hypervisor protected memory in the first level table and then use
+> subsequent ITS commands to write to this memory (MAPD).
+> 
+> To shadow this tables, we rely on the driver to allocate space for it
+> and we copy the original content from the table into the copy. When
+> pKVM becomes available we switch the pointers that hold the orginal
+> tables to point to the copy.
+> To keep the tables from the hypervisor in sync with what the host
+> has, we update the tables when commands are sent to the ITS.
+> 
+> 
+> 3. Hiding the last layer of the Device Table and vPE Table from the host
+> 
+> An attacker in control of the host kernel can alter the content of these
+> tables directly (the Arm IHI 0069H.b spec says that is undefined behavior
+> if entries are created by software). Normally these entries are created in
+> response of commands sent to the ITS.
+> 
+> A Device Table entry that has the following structure:
+> 
+> type DeviceTableEntry is (
+> 	boolean Valid,
+> 	Address ITT_base,
+> 	bits(5) ITT_size
+> ) 
+> 
+> This can be maliciously created by an attacker and the ITT_base can be
+> pointed to hypervisor protected memory. The MAPTI command can then be
+> used to write over the ITT_base with an ITE entry.
+> 
+> Similarly a vCPU Table entry has the following structure:
+> 
+> type VCPUTableEntry is (
+> 	boolean Valid,
+> 	bits(32) RDbase,
+> 	Address VPT_base,
+> 	bits(5) VPT_size
+> )
+> 
+> VPT_base can be pointed to hypervisor protected memory and then a
+> command can be used to raise interrupts and set the corresponding
+> bit. This would give a 1-bit write primitive so is not "as generous"
+> as the others.
+> 
+> 
+> Notes
+> =====
+> 
+> 
+> Performance impact is expected with this as the emulation dance is not
+> cost free.
+> I haven't implemented any ITS quirks in the emulation and I don't know
+> whether we will need it ? (some hardware needs explicit dcache flushing
+> ITS_FLAGS_CMDQ_NEEDS_FLUSHING). 
+> 
+> Please note that Redistributors trapping hasn't been addressed at all in
+> this series and the solution is not sufficient but this can be extended
+> afterwards. 
+> The current series has been tested with Qemu (-machine
+> virt,virtualization=true,gic-version=4) and with Pixel 10.
+> 
+> 
+> Thanks,
+> Sebastian E.
+> 
+> Mostafa Saleh (1):
+>   KVM: arm64: Donate MMIO to the hypervisor
+> 
+> Sebastian Ene (13):
+>   KVM: arm64: Track host-unmapped MMIO regions in a static array
+>   KVM: arm64: Support host MMIO trap handlers for unmapped devices
+>   KVM: arm64: Mediate host access to GIC/ITS MMIO via unmapping
+>   irqchip/gic-v3-its: Prepare shadow structures for KVM host deprivilege
+>   KVM: arm64: Add infrastructure for ITS emulation setup
+>   KVM: arm64: Restrict host access to the ITS tables
+>   KVM: arm64: Trap & emulate the ITS MAPD command
+>   KVM: arm64: Trap & emulate the ITS VMAPP command
+>   KVM: arm64: Trap & emulate the ITS MAPC command
+>   KVM: arm64: Restrict host updates to GITS_CTLR
+>   KVM: arm64: Restrict host updates to GITS_CBASER
+>   KVM: arm64 Restrict host updates to GITS_BASER
+>   KVM: arm64: Implement HVC interface for ITS emulation setup
 
-Thanks for confirmation, I've changed them as we discussed.
-But let me sent it on v7.0-rc4 based with v17.
-(Unfortunately, I sent v16 yesterday with missing of those review in
-this thread).
+I tested the patches on Lenovo ideacenter Mini X Gen 10 Snapdragon,
+and the kernel hangs at boot for me with messags the following log:
 
---
-Sincerely,
-Yeoreum Yun
+[    2.735838] ITS queue timeout (1056 1024)
+[    2.739969] ITS cmd its_build_mapd_cmd failed
+[    4.776344] ITS queue timeout (1120 1024)
+[    4.780472] ITS cmd its_build_mapti_cmd failed
+[    6.816677] ITS queue timeout (1184 1024)
+[    6.820806] ITS cmd its_build_mapti_cmd failed
+[    8.857009] ITS queue timeout (1248 1024)
+[    8.861129] ITS cmd its_build_mapti_cmd failed
+
+I am happy to do more debugging, let me know if I can try anything.
+
+Thanks,
+Mostafa
+
+> 
+>  arch/arm64/include/asm/kvm_arm.h              |   3 +
+>  arch/arm64/include/asm/kvm_asm.h              |   1 +
+>  arch/arm64/include/asm/kvm_pkvm.h             |  20 +
+>  arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  17 +
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
+>  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  14 +
+>  arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 653 ++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 134 ++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c               |  28 +
+>  arch/arm64/kvm/hyp/pgtable.c                  |   9 +-
+>  arch/arm64/kvm/pkvm.c                         |  60 ++
+>  drivers/irqchip/irq-gic-v3-its.c              | 177 ++++-
+>  include/linux/irqchip/arm-gic-v3.h            |  36 +
+>  14 files changed, 1126 insertions(+), 31 deletions(-)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+>  create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> 
+> -- 
+> 2.53.0.473.g4a7958ca14-goog
+> 
