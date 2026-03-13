@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292233AC0D2
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E8E3B0AD8
+	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 14:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773413284; cv=none; b=iNq45pnJQdRnnAg4JWrjuAWI8Vx2HxY3vSKv84T6gMTihcIMhi8r0a1GZkvx5r7jVEfu8LhF5hbWf7kQtQ5TqxTKucTglUCjFuhTU5VU+rbPHWUJfRkOmZIQCMb+K5Vs2Rv0MpG5eQN5PV8AWfCY7ewsBPUvLMi/wzYB2bLa1fU=
+	t=1773413289; cv=none; b=UrlzG+NqpB6RvieML4E0vqXe6NQJAhJXosXpq95yTilODmdDmxVmYT4ge9M6aeb1SgtMs4A4GtfG0bBLiwVlFdyosjxR4OA59zxU2TBls+DWp2eNIPEmajb1gQ+zf8+cKOU6XyF5kwRfqfJp7LM5MUjjpJzwQIQYpErDN/P2TS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773413284; c=relaxed/simple;
-	bh=xl4VKzlCqaYsEzZcwZF3Z0Mq6i0OlJzFlqYJJLr30Ms=;
+	s=arc-20240116; t=1773413289; c=relaxed/simple;
+	bh=qFO3SEX9+/pa5NMlxT2jlw5aF6PjUoWP7/PiryOyjJY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nInbH4HoV8Slq2Ppt9ZitikxHG9Oemj4sR25BdYDsbp5wOWesgeSlBYtOtyPKjuobjNzYn3jlsNvgzbfjJObbj2B8asC0dD36NvNPkbDZdsDv6vet/TfOHCFsZJ/kBrSlsye/F3xysHs68MljRn3PN/8rE1JCAqu8cz1piUP3gk=
+	 MIME-Version; b=TTLTxRFZ1+KWz374q6RqjgWszgEl7CFh28eAK7FxViwwoT7wyV4+GbFGB80EKLtABq1UGoB9ho78Juw8sufAzqPS5b0M66BOZM3fapFAu1R912AEloLbNHipehi8hdGI46kRJwEZwrq/Vq1YLbhOakNl07uljdr3WbUc53gSgYY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AB3822C7;
-	Fri, 13 Mar 2026 07:47:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A813B2308;
+	Fri, 13 Mar 2026 07:47:58 -0700 (PDT)
 Received: from e134344.cambridge.arm.com (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id A88F33F7BD;
-	Fri, 13 Mar 2026 07:47:56 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C120B3F7BD;
+	Fri, 13 Mar 2026 07:48:00 -0700 (PDT)
 From: Ben Horgan <ben.horgan@arm.com>
 To: ben.horgan@arm.com
 Cc: amitsinght@marvell.com,
@@ -53,10 +53,12 @@ Cc: amitsinght@marvell.com,
 	suzuki.poulose@arm.com,
 	kvmarm@lists.linux.dev,
 	zengheng4@huawei.com,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v6 21/40] arm_mpam: resctrl: Hide CDP emulation behind CONFIG_EXPERT
-Date: Fri, 13 Mar 2026 14:45:58 +0000
-Message-ID: <20260313144617.3420416-22-ben.horgan@arm.com>
+	linux-doc@vger.kernel.org,
+	Dave Martin <Dave.Martin@arm.com>,
+	Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Subject: [PATCH v6 22/40] arm_mpam: resctrl: Convert to/from MPAMs fixed-point formats
+Date: Fri, 13 Mar 2026 14:45:59 +0000
+Message-ID: <20260313144617.3420416-23-ben.horgan@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
@@ -68,49 +70,122 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When CDP is not enabled, the 'rmid_entry's in the limbo list,
-rmid_busy_llc, map directly to a (PARTID,PMG) pair and when CDP is enabled
-the mapping is to two different pairs. As the limbo list is reused between
-mounts and CDP disabled on unmount this can lead to stale mapping and the
-limbo handler will then make monitor reads with potentially out of range
-PARTID. This may then cause an MPAM error interrupt and the driver will
-disable MPAM.
+From: Dave Martin <Dave.Martin@arm.com>
 
-No problems are expected if you just mount the resctrl file system
-once with CDP enabled and never unmount it. Hide CDP emulation behind
-CONFIG_EXPERT to protect the unwary.
+MPAM uses a fixed-point formats for some hardware controls.  Resctrl
+provides the bandwidth controls as a percentage. Add helpers to convert
+between these.
 
+Ensure bwa_wd is at most 16 to make it clear higher values have no meaning.
+
+Tested-by: Gavin Shan <gshan@redhat.com>
+Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Tested-by: Peter Newman <peternewman@google.com>
+Tested-by: Zeng Heng <zengheng4@huawei.com>
+Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+Reviewed-by: Zeng Heng <zengheng4@huawei.com>
+Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: James Morse <james.morse@arm.com>
 Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 ---
-Adding this ugliness in the hope of avoiding patch churn and extra
-reviewer work. I am looking into the resctrl changes needed to fix this.
+Changes since v2:
+Ensure bwa_wd is at most 16 (moved from patch 40: arm_mpam: Generate a
+configuration for min controls)
+Expand comments
 ---
- drivers/resctrl/mpam_resctrl.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/resctrl/mpam_devices.c |  7 +++++
+ drivers/resctrl/mpam_resctrl.c | 51 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
 
+diff --git a/drivers/resctrl/mpam_devices.c b/drivers/resctrl/mpam_devices.c
+index 0e5e24ef60fe..0c97f7708722 100644
+--- a/drivers/resctrl/mpam_devices.c
++++ b/drivers/resctrl/mpam_devices.c
+@@ -713,6 +713,13 @@ static void mpam_ris_hw_probe(struct mpam_msc_ris *ris)
+ 			mpam_set_feature(mpam_feat_mbw_part, props);
+ 
+ 		props->bwa_wd = FIELD_GET(MPAMF_MBW_IDR_BWA_WD, mbw_features);
++
++		/*
++		 * The BWA_WD field can represent 0-63, but the control fields it
++		 * describes have a maximum of 16 bits.
++		 */
++		props->bwa_wd = min(props->bwa_wd, 16);
++
+ 		if (props->bwa_wd && FIELD_GET(MPAMF_MBW_IDR_HAS_MAX, mbw_features))
+ 			mpam_set_feature(mpam_feat_mbw_max, props);
+ 
 diff --git a/drivers/resctrl/mpam_resctrl.c b/drivers/resctrl/mpam_resctrl.c
-index 903d1a0f564f..cab3e9ccb5c7 100644
+index cab3e9ccb5c7..adaec522c1a1 100644
 --- a/drivers/resctrl/mpam_resctrl.c
 +++ b/drivers/resctrl/mpam_resctrl.c
-@@ -82,6 +82,18 @@ int resctrl_arch_set_cdp_enabled(enum resctrl_res_level rid, bool enable)
- 	u32 partid_i = RESCTRL_RESERVED_CLOSID, partid_d = RESCTRL_RESERVED_CLOSID;
- 	int cpu;
+@@ -10,6 +10,7 @@
+ #include <linux/errno.h>
+ #include <linux/limits.h>
+ #include <linux/list.h>
++#include <linux/math.h>
+ #include <linux/printk.h>
+ #include <linux/rculist.h>
+ #include <linux/resctrl.h>
+@@ -242,6 +243,56 @@ static bool cache_has_usable_cpor(struct mpam_class *class)
+ 	return class->props.cpbm_wd <= 32;
+ }
  
-+	if (!IS_ENABLED(CONFIG_EXPERT) && enable) {
-+		/*
-+		 * If the resctrl fs is mounted more than once, sequentially,
-+		 * then CDP can lead to the use of out of range PARTIDs.
-+		 */
-+		pr_warn("CDP not supported\n");
-+		return -EOPNOTSUPP;
-+	}
++/*
++ * Each fixed-point hardware value architecturally represents a range
++ * of values: the full range 0% - 100% is split contiguously into
++ * (1 << cprops->bwa_wd) equal bands.
++ *
++ * Although the bwa_bwd fields have 6 bits the maximum valid value is 16
++ * as it reports the width of fields that are at most 16 bits. When
++ * fewer than 16 bits are valid the least significant bits are
++ * ignored. The implied binary point is kept between bits 15 and 16 and
++ * so the valid bits are leftmost.
++ *
++ * See ARM IHI0099B.a "MPAM system component specification", Section 9.3,
++ * "The fixed-point fractional format" for more information.
++ *
++ * Find the nearest percentage value to the upper bound of the selected band:
++ */
++static u32 mbw_max_to_percent(u16 mbw_max, struct mpam_props *cprops)
++{
++	u32 val = mbw_max;
 +
-+	if (enable)
-+		pr_warn("CDP is an expert feature and may cause MPAM to malfunction.\n");
++	val >>= 16 - cprops->bwa_wd;
++	val += 1;
++	val *= MAX_MBA_BW;
++	val = DIV_ROUND_CLOSEST(val, 1 << cprops->bwa_wd);
 +
- 	/*
- 	 * resctrl_arch_set_cdp_enabled() is only called with enable set to
- 	 * false on error and unmount.
++	return val;
++}
++
++/*
++ * Find the band whose upper bound is closest to the specified percentage.
++ *
++ * A round-to-nearest policy is followed here as a balanced compromise
++ * between unexpected under-commit of the resource (where the total of
++ * a set of resource allocations after conversion is less than the
++ * expected total, due to rounding of the individual converted
++ * percentages) and over-commit (where the total of the converted
++ * allocations is greater than expected).
++ */
++static u16 percent_to_mbw_max(u8 pc, struct mpam_props *cprops)
++{
++	u32 val = pc;
++
++	val <<= cprops->bwa_wd;
++	val = DIV_ROUND_CLOSEST(val, MAX_MBA_BW);
++	val = max(val, 1) - 1;
++	val <<= 16 - cprops->bwa_wd;
++
++	return val;
++}
++
+ /* Test whether we can export MPAM_CLASS_CACHE:{2,3}? */
+ static void mpam_resctrl_pick_caches(void)
+ {
 -- 
 2.43.0
 
