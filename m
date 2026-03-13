@@ -1,152 +1,98 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CBC282F26
-	for <kvmarm@lists.linux.dev>; Fri, 13 Mar 2026 09:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A9B3890F2;
+	Fri, 13 Mar 2026 09:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773395020; cv=none; b=dZW4u43Ul9Z4LCaHq4ikqZBEF3Csx0BIBZoJuu1DKd02knKabUdnjGl64qx4iwD+hcYQUzuv7gT/x3IWnY852fN0Z8HgaY+qDtTHXwnj7f6+PjqVWY3HrDoY3AytfW0gGrDeAjn+iDKaboeH3VbDAVwgmHmSjEsUnTCMKNAQgSo=
+	t=1773395371; cv=none; b=f5Ao80/DFF7IbQHCGT5GZpdeXZidwwjX0bii5QQhiw2ERS+ytjEsPQm1cuG0vM/t1jYwvn/3+6oqZmCLbcA5+48G6Rff2KgAnez9PNWINDg5N5gZervcF0Y7XLtZYh4ZUiTBoqcLf6fHkbA695UBfcwObl9OSMNIln7w5Lry7WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773395020; c=relaxed/simple;
-	bh=nl0ZgB8jD/JEsAyqYDkUHGobWyb28KPB1atld8FgVLU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qASZbZCsTjOA5diMz5urlWkdZMnZ9xrbSo9sU5Zq4Kt16uwOOyezXJmStKCXFFQFJIw7uPI/XTnRDiRnvdVzEI+D3JR67r+nnQ1/+I02huXON5H8vRu7b802f8W6mxPiafGyEV8Bw+6XU/Og6q5m7JQd2e3EORLTjN7CmJyVS6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 80F48165C;
-	Fri, 13 Mar 2026 02:43:24 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 31A7B3F73B;
-	Fri, 13 Mar 2026 02:43:26 -0700 (PDT)
-Message-ID: <ff0df614-1b3f-4df5-90a7-39918ae31dec@arm.com>
-Date: Fri, 13 Mar 2026 09:43:24 +0000
+	s=arc-20240116; t=1773395371; c=relaxed/simple;
+	bh=rUQb+Z8XCOJJahxSZ1DbE4oOFCh6UGrqUYNgYHqSvAc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LQzl8OFV1Mj4S/HnvzUUSFwyHjXiKhEo9hLZSURqmPHKaxm/R0HglagWjYRaNNIQatkqavbOsH1jGlnnAUUD0tQIRaECeBtwGD1WiBCDymx3hPYHq0fgxYzYl5s0iAY44NLIeU1NDgOm0iIuBjkM5W7W9CDtW8lSCiFLjluidAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FOFe69m1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOFe69m1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F6D0C2BC87;
+	Fri, 13 Mar 2026 09:49:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773395371;
+	bh=rUQb+Z8XCOJJahxSZ1DbE4oOFCh6UGrqUYNgYHqSvAc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FOFe69m1WQfLhVow/0Ckx8JOq7W24G+NglJ4NKzNaolAFffFHSiFOHMKX1KnAOyp2
+	 DPiVvZfYC9fp7NYsn+Rg0wFPY89hoJv0M8r7kc64yKHjP+gVS/mf6qr6jtezqWSoCX
+	 gUGxAz8O7vTGBLzXDzlfas+C1Hsg0t4fTaTQ+zJLtn0YMTNh4yWau+TgDeZv92ZUsQ
+	 ugT/wNX90RTDc64tOcq3B51ufIG7syS7EigPbQnZaME0q5IIoehOuWiKlda494jEml
+	 X3tAAumWhc7XYRxSkIiJY8sR54prjDVQeXZwe2YvyiylIw0gNJpcPT4f3QNa5y9F/5
+	 kfev1hEH9EBOw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Vincent Donnefort <vdonnefort@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: arm64: avoid unused-variable warning
+Date: Fri, 13 Mar 2026 10:49:16 +0100
+Message-Id: <20260313094925.3749287-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Subject: Re: [PATCH v5 12/41] KVM: arm64: Use kernel-space partid
- configuration for hypercalls
-From: Ben Horgan <ben.horgan@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, oupton@kernel.org, joey.gouly@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.linux.dev, zengheng4@huawei.com,
- linux-doc@vger.kernel.org, Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260224175720.2663924-1-ben.horgan@arm.com>
- <20260224175720.2663924-13-ben.horgan@arm.com> <86jyvu85dj.wl-maz@kernel.org>
- <fd0cf579-77c4-4a76-bc8e-b19bb7988155@arm.com>
-Content-Language: en-US
-In-Reply-To: <fd0cf579-77c4-4a76-bc8e-b19bb7988155@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+From: Arnd Bergmann <arnd@arndb.de>
 
+The 'cpu' variable is only used inside of an #ifdef block and causes
+a warning if there is no user:
 
-On 3/3/26 16:33, Ben Horgan wrote:
-> Hi Marc,
-> 
-> On 3/2/26 18:15, Marc Zyngier wrote:
->> On Tue, 24 Feb 2026 17:56:51 +0000,
->> Ben Horgan <ben.horgan@arm.com> wrote:
->>>
->>> On nVHE systems whether or not MPAM is enabled, EL2 continues to use
->>> partid-0 for hypercalls, even when the host may have configured its kernel
->>> threads to use a different partid. 0 may have been assigned to another
->>> task. Copy the EL1 MPAM register to EL2. This ensures hypercalls use the
->>> same partid as the kernel thread does on the host.
->>>
->>> Tested-by: Gavin Shan <gshan@redhat.com>
->>> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->>> Tested-by: Peter Newman <peternewman@google.com>
->>> Tested-by: Zeng Heng <zengheng4@huawei.com>
->>> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
->>> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
->>> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
->>> ---
->>> Changes since v2:
->>> Use mask
->>> Use read_sysreg_el1 to cope with hvhe
->>>
->>> Changes since v3:
->>> Set MPAM2_EL2.MPAMEN to 1 as we rely on that before and after
->>> ---
->>>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 9 +++++++++
->>>  1 file changed, 9 insertions(+)
->>>
->>> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> index e7790097db93..80e71eeddc03 100644
->>> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
->>> @@ -638,6 +638,15 @@ static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->>>  	unsigned long hcall_min = 0;
->>>  	hcall_t hfn;
->>>  
->>> +	if (system_supports_mpam()) {
->>> +		u64 mask = MPAM1_EL1_PARTID_D | MPAM1_EL1_PARTID_I |
->>> +			MPAM1_EL1_PMG_D | MPAM1_EL1_PMG_I;
->>> +		u64 val = MPAM2_EL2_MPAMEN | (read_sysreg_el1(SYS_MPAM1) & mask);
->>> +
->>> +		write_sysreg_s(val, SYS_MPAM2_EL2);
->>> +		isb();
->>> +	}
->>> +
->>>  	/*
->>>  	 * If pKVM has been initialised then reject any calls to the
->>>  	 * early "privileged" hypercalls. Note that we cannot reject
->>
->> It is extremely debatable whether this is desirable:
->>
->> - pKVM really shouldn't be influenced by what the host does, which
->>   means reserving PARTIDs and indirecting what the host sees. This can
->>   be deferred until pKVM is actually useful upstream.
->>
->> - repeatedly hammering that register plus an ISB on the hot path of a
->>   hypercall is a sure way to make things worse than they should be,
->>   and that should be fixed now.
-> 
-> Would a read modify write be preferable?
-> 
->>
->> Do you really expect the EL1 settings to change on a regular basis? If
-> 
-> The MPAM EL1 partid/pmg configuration is kept in sync with the MPAM EL0
-> partid/pmg configuration (see mpam_thread_switch() in patch 4) which
-> means that the EL1 configuration will change whenever the user changes
-> the EL0 configuration.
-> 
->> so, I'd rather you use a specific host hypercall, or even a trap to
->> propagate the EL1 configuration. If not, just set it as part of the
-> 
-> I think this ends up trapping context switch which doesn't seem any more
-> desirable.
-> 
->> KVM init and be done with it.
-> 
-> If we just forego this patch then the MPAM configuration for el2 as
-> initially configured, partid=0, pmg=0 would be used. This is also the
-> default for requestors that aren't MPAM aware or unconfigured, like
-> trusted firmware, its, gpu. VHE mode (required from 8.1?) should be
-> available in any platform that has MPAM (introduced in 8.4, back
-> portable to 8.3) and so using nvhe with MPAM seems unlikely and the
-> amount of data should be small enough. That leaves pKVM for which,
-> perhaps, doing nothing is also the correct answer.
-> 
-> What do you think? Drop, read modify write, or something else?
+arch/arm64/kvm/hyp_trace.c: In function 'kvm_hyp_trace_init':
+arch/arm64/kvm/hyp_trace.c:422:13: error: unused variable 'cpu' [-Werror=unused-variable]
+  422 |         int cpu;
+      |             ^~~
 
-As discussed offline, I'll drop this patch.
+Change the #ifdef to an equivalent IS_ENABLED() check to avoid
+the warning.
 
-Thanks,
+Fixes: b22888917fa4 ("KVM: arm64: Sync boot clock with the nVHE/pKVM hyp")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ arch/arm64/kvm/hyp_trace.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Ben
+diff --git a/arch/arm64/kvm/hyp_trace.c b/arch/arm64/kvm/hyp_trace.c
+index c1e28f6581ab..8b7f2bf2fba8 100644
+--- a/arch/arm64/kvm/hyp_trace.c
++++ b/arch/arm64/kvm/hyp_trace.c
+@@ -424,17 +424,16 @@ int __init kvm_hyp_trace_init(void)
+ 	if (is_kernel_in_hyp_mode())
+ 		return 0;
+ 
+-#ifdef CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND
+ 	for_each_possible_cpu(cpu) {
+ 		const struct arch_timer_erratum_workaround *wa =
+ 			per_cpu(timer_unstable_counter_workaround, cpu);
+ 
+-		if (wa && wa->read_cntvct_el0) {
++		if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_OOL_WORKAROUND) &&
++		    wa && wa->read_cntvct_el0) {
+ 			pr_warn("hyp trace can't handle CNTVCT workaround '%s'\n", wa->desc);
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
+-#endif
+ 
+ 	hyp_trace_init_events();
+ 
+-- 
+2.39.5
+
