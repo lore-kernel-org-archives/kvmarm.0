@@ -1,160 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6AC4207A;
-	Sun, 15 Mar 2026 15:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AD5366541;
+	Sun, 15 Mar 2026 15:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773587315; cv=none; b=DLY3aPC1rdMGRP2l3JidumaAKhBi3vnhlRaxMsg5lWhEwSvTTUvaXL3Rykc2n1kPsVvYQiM6/m4wKaNG+aE/9YkrEoiWlJesU2Jdp3cMqbyq7OKa5fFGqkE9/qdMPIPpDxEN3BE5Jnp3/WEGAzu8FKnC7m8krRDgEXjIDkcqUkI=
+	t=1773587520; cv=none; b=g2tm3x7wprqc+x/Lyavz0PUQ3vyXyUfofk2AOxgDX4tZmsdnvwHU2hbOZphQCmatERNxbn2c7gfHpN7V+Hmz0KlfShwnVq3FaK7FyzDVd6Wkdo5RVrdLIrFzsTzaZoB2u9PX873lf9wwaYc5QexJwUQ/+irymh4eZtq1YKGzwN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773587315; c=relaxed/simple;
-	bh=8KQhjICoFEf0w5+Izp6hbsaiHtKKbVXNf0fBaoajEeU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TMHEzB6TuNYmcaJElSEdZCgtQ9Myh4oiYlC92KIQ8RbbWkdupcAFmj409W0peLBVcJw4jULYWLEBp5/xZgtqIHz4TdRGb4Ass1Xsvu4+SJzbgaihqO9ex3Qalwk63Rya4V2v24++uQNYNelcNWZtOCnrVYZy8Cn15xqxMLNCFzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqIJZT2D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773587520; c=relaxed/simple;
+	bh=6jQp4ea3K3hRb3fhb0FEeSzMJUsm3BVSJ/Pao5wNtNI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qf8lGGX6+LBOHja4palxvfdqSmAmhCOJ1ReT9muQ+nOJF/ct/hiBIAES+rozB61//7nPWosaoYxJUw9YaWoJTPFEnAkugfoZ0RIperxFAXQdxKCnF286+Ui6hEA7USC8pHW7ACFGe6h4wNZz6DPMJwxJHqV7RCOeoItMe9QkYGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuC6Tv/Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqIJZT2D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EF03C4CEF7;
-	Sun, 15 Mar 2026 15:08:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuC6Tv/Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54BC0C4CEF7;
+	Sun, 15 Mar 2026 15:11:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773587314;
-	bh=8KQhjICoFEf0w5+Izp6hbsaiHtKKbVXNf0fBaoajEeU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YqIJZT2DaQRUqO8YzwaNrdzJpmg7wk6PLGRDIt1eDj87qq3URLdQMkCR1ENler+lC
-	 bUifCapND1G9yx6MfwUWXTOdCoPPLL8AeoqfLTrJ0T+ivMtrQFb+lz3FJwQM4tG8yE
-	 o/gUNej05xgaIONtRyjmM7xyzX2TpYFqi8PyisiW049jGUqD8s5CYiPC2fUj0AChju
-	 zqaoyMhRdXOl/1lOUTNie93rkSDULcjZOdNERFzKBzfS9QRor+s+XVK4uFRnU27r17
-	 rOx4hDmo1iz43Guhh2ORdPTXNWKXbW3a3L4sH/qkJUCJr04mN7f2tJwvZukYL25lrD
-	 8saov9JEoBY6A==
-Received: from [185.201.63.253] (helo=lobster-girl.misterjones.org)
+	s=k20201202; t=1773587519;
+	bh=6jQp4ea3K3hRb3fhb0FEeSzMJUsm3BVSJ/Pao5wNtNI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=TuC6Tv/YRav5hWMQVY1n8ds6PVQRaEXmkqV5HnkMb8QUdDkq8pmhJCsS1yCSlufRT
+	 eIpjCx/DsXjz+/a+3iO4DTVBbCj7zLlfS6zFzTYlicEiggh0w+615rb7lN2IaIPGl/
+	 J2C2UqI2urx+SSaflRQI8y+g7nPPEu3cbi516dR3e+afM7vuRZfRzK5AwP7O5LqdfK
+	 RjbaITlZ6qeFaboki++hc9GIYW1fCOImjAc3u7y5oBTdqH7XL8VGvEMb80f/I8eIkV
+	 zR9UlU2386mCiJEfdxA1auuauhuGuQ4iI1qAnEQChOglz6dY/6IXwBm01ksLjmYaQm
+	 1Tsaq+ByWMYLg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w1n4x-00000002ATG-46M7;
-	Sun, 15 Mar 2026 15:08:32 +0000
-Date: Sun, 15 Mar 2026 15:08:29 +0000
-Message-ID: <87ikaxceqa.wl-maz@kernel.org>
+	id 1w1n8H-00000002AWr-0hpc;
+	Sun, 15 Mar 2026 15:11:57 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	stable@vger.kernel.org
 Subject: Re: [PATCH] KVM: arm64: Discard PC update state on vcpu reset
-In-Reply-To: <20260313143019.GA3369094@e124191.cambridge.arm.com>
+Date: Sun, 15 Mar 2026 15:11:53 +0000
+Message-ID: <177358750718.974845.17608338527108220660.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260312140850.822968-1-maz@kernel.org>
 References: <20260312140850.822968-1-maz@kernel.org>
-	<20260313143019.GA3369094@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.201.63.253
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, stable@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 13 Mar 2026 14:30:19 +0000,
-Joey Gouly <joey.gouly@arm.com> wrote:
+On Thu, 12 Mar 2026 14:08:50 +0000, Marc Zyngier wrote:
+> Our vcpu reset suffers from a particularly interesting flaw, as it
+> does not correctly deal with state that will have an effect on the
+> execution flow out of reset.
 > 
-> On Thu, Mar 12, 2026 at 02:08:50PM +0000, Marc Zyngier wrote:
-> > Our vcpu reset suffers from a particularly interesting flaw, as it
-> > does not correctly deal with state that will have an effect on the
-> > execution flow out of reset.
-> > 
-> > Take the following completely random example, never seen in the wild
-> > and that never resulted in a couple of sleepless nights: /s
-> > 
-> > - vcpu-A issues a PSCI_CPU_OFF using the SMC conduit
-> > 
-> > - SMC being a trapped instruction (as opposed to HVC which is always
-> >   normally executed), we annotate the vcpu as needing to skip the
-> >   next instruction, which is the SMC itself
-> > 
-> > - vcpu-A is now safely off
-> > 
-> > - vcpu-B issues a PSCI_CPU_ON for vcpu-A, providing a starting PC
-> > 
-> > - vcpu-A gets reset, get the new PC, and is sent on its merry way
-> > 
-> > - right at the point of entering the guest, we notice that a PC
-> >   increment is pending (remember the earlier SMC?)
-> > 
-> > - vcpu-A skips its first instruction...
-> > 
-> > What could possibly go wrong?
-> > 
-> > Well, I'm glad you asked. For pKVM as a NV guest, that first instruction
-> > is extremely significant, as it indicates whether the CPU is booting
-> > or resuming. Having skipped that instruction, nothing makes any sense
-> > anymore, and CPU hotplugging fails.
+> Take the following completely random example, never seen in the wild
+> and that never resulted in a couple of sleepless nights: /s
 > 
-> Would the normal method of offlining/onlining via sysfs also be affected?
+> [...]
 
-I'm not sure there's any other. That's how I tested it, anyway, since
-you can't do a late onlining with pKVM.
+Applied to fixes, thanks!
 
-> > 
-> > This is all caused by the decoupling of PC update from the handling
-> > of an exception that triggers such update, making it non-obvious
-> > what affects what when.
-> > 
-> > Fix this train wreck by discarding all the PC-affecting state on
-> > vcpu reset.
-> 
-> Good job on tracking it down.. makes you wonder why the DSB "fixed" things!
+[1/1] KVM: arm64: Discard PC update state on vcpu reset
+      commit: 1744a6ef48b9a48f017e3e1a0d05de0a6978396e
 
-Because it was exactly at the correct spot to hide the crap. But NOP,
-or even UDF would have had the same effect.
-
->
-> > 
-> > Fixes: f5e30680616ab ("KVM: arm64: Move __adjust_pc out of line")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  arch/arm64/kvm/reset.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > index 959532422d3a3..b963fd975aaca 100644
-> > --- a/arch/arm64/kvm/reset.c
-> > +++ b/arch/arm64/kvm/reset.c
-> > @@ -247,6 +247,20 @@ void kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >  			kvm_vcpu_set_be(vcpu);
-> >  
-> >  		*vcpu_pc(vcpu) = target_pc;
-> > +
-> > +		/*
-> > +		 * We may come from a state where either a PC update was
-> > +		 * pending (SMC call resulting in PC being increpented to
->                                                            incremented
-> > +		 * skip the SMC) or a pending exception. Make sure we get
-> > +		 * rid of all that, as this cannot be valid out of reset.
-> > +		 *
-> > +		 * Note that clearing the exception mask also clears PC
-> > +		 * updates, but that's an implementation detail, and we
-> > +		 * really want to make it explicit.
-> > +		 */
-> > +		vcpu_clear_flag(vcpu, PENDING_EXCEPTION);
-> > +		vcpu_clear_flag(vcpu, EXCEPT_MASK);
-> > +		vcpu_clear_flag(vcpu, INCREMENT_PC);
-> >  		vcpu_set_reg(vcpu, 0, reset_state.r0);
-> >  	}
-> >  
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thanks!
+Cheers,
 
 	M.
-
 -- 
-Jazz isn't dead. It just smells funny.
+Without deviation from the norm, progress is not possible.
+
+
