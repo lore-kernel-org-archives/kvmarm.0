@@ -1,54 +1,54 @@
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA793D3305
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DC23D301E
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773682541; cv=none; b=m+yflS2SxdYmLtnOPOxfFMOYFdgObsrCrfhCQApHkZ5L1SCgDYDL25s92k3W5HbfO15HibYf6/R8JJF7ckWilh3cDP72gCqfx+ot5mwnee8JqKrXGRC2rWP6xXl+CW8MoWBOa4ApE6sXnBPqkiQsIdGzn+A3aFo1lgxs533iOUA=
+	t=1773682541; cv=none; b=NUKmMLofYJMvmxDOHtXDccqvgjRi6l2Is3nj/tpw7WtK9v4Wrb+eHLmR0Mcn1mQKVOwdNHtY54nW8Rfqx+m9rbtrSF6dyBBdqStew/w4Aane4luUSJJ7TphVFxed7z/ZOGGSoUj5ZU6W2NGbIc7X9xPv6DojRS7d1djirG4eUyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773682541; c=relaxed/simple;
-	bh=yNUIHO2NMw8B5EFVSRGekqdFjiqxXTiNYvgnQBnltj4=;
+	bh=iv21fNrm1yVCcrQj6JMF7U6IPCudWrvUh7tyZZVzSWQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rcg9VmU7IdnpdWc9WCES3oEOJyQnXb9PNxdp7lfApGjueq6pq0bBhkofvAaxKSjREMjJi5g5Ba1Qxz89FMk2XshypUBnAeQswekUUmSO/SnUgZZCdBgNs8P5R8v25s6LLJ79n/K1Vh+uyzdRi9H9sJPoxOW8z5dYyGgVOPgpb3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cJL7sqbl; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=kDq6ePaoPFHw+X3eGBWujm8i0y3bxDFU00L7rSOXKuJjCG5ZSXndsutAOdbexT15GN7VdMXQyFPEmGqkNzKNJWaZH0XX23teLaiXCvSHLDAJlBniTcXaqofZg1cjQiUChlX3bqRpk8NSZ8ziNffZl/CN2JT7OlfEmqkl3/L/C8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Asp26Dy0; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cJL7sqbl"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-485350666bfso39198275e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Asp26Dy0"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853b5b0fafso59890045e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773682537; x=1774287337; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773682535; x=1774287335; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfzLIsn2Q20JghpCHqLQPcreo5Zv/pRgRX5lZKoPSE8=;
-        b=cJL7sqblowVMXJVe5tHDgxY5uccMH+tzcdN/LEZ07p7ZRASByn+UgbHa9XXQlUJlRm
-         HoLDOo0v2hEaeCbl4n/5lcfPPsF15KI8SDfzBAIkffjdLckNTvWlLRlQJ8hrELhLQ1/x
-         A2HqFTy6J3MwaJ+16ustVjTsuAC/hZC//SWfdcSE7jKbccH9SMfrNVa74e8qw862OKqi
-         EHPaf2h9HiFfxZAwdDGCk4M1ACg5leap0b3Aou/XUJO6DOGk7RxVaRz7x3ljPrqdcPba
-         bGswZcu/e0XqeEyeth1bkjgB1GEkvNKZBvn0CZdpI5KTIhBZfUBVBg6GZEHFWh0y3Ka5
-         25eg==
+        bh=CpR3ACqU07aVtibziRIGQBdLLRT1jdd+Sta0uM61LtQ=;
+        b=Asp26Dy0M89rW9KHrCLO9GaXzIqsW0YIukcoJv+RHzX2pitZcrjrW+ERmdqP5uQkW8
+         J5n3NB7BJ92I2cOk4aAbA4k/l+Ze//k7AmiEXZ7pd5q3HEZ3e2Wq/v/yJaxkmzU9V4q+
+         lUMTolFNjTbdJIaj/D/lgQNAYfJLSQ3t260zK1s90gL8OO8mcMXASaz2OfuGsjbB8HxT
+         IbGY8LzEJYFxGKb4PhYNVnujZoshLzYQBLd8uqAxloXeKywWPDfqf+28AMEGhRbkRr3i
+         //UGyQdfr7tEk/MT+jTSnFixcrsf3cd12FM6AYS2Kv2wEOoQu27ENTRQeWypBwg8cJxK
+         tUaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773682537; x=1774287337;
+        d=1e100.net; s=20251104; t=1773682535; x=1774287335;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfzLIsn2Q20JghpCHqLQPcreo5Zv/pRgRX5lZKoPSE8=;
-        b=fFtANtvCvR7ckxYGPaTja0VzrESxGR7R23QTHbahCsL/quWI1Pqspp3G4G7r+yapIU
-         xtEgmkjlHxjYtzTT4ReBZy/+Hk9rPvu3P6+RxJx5ARUBpOp2kU/2Ysk252OOeJR3AGIK
-         SUVXdJ3epvpWqyRNHMda7eHRw/SG5pa2pryqGZ5TZH6ClPRQaKhbnB45VeCrCYaKZQgH
-         YGRWTtfwwwMTakVwCfrNrrjM9h9a2gE6r8JMd6y8VNAJDtgUUblQXRXFe3uOO5PC9wfd
-         Tw+BKC/VLFd25542EDkTAK7CQF9SolYQIN9KxTUaAogdpr9fWic+akOr4F2BZSLsJ+Jp
-         VFYw==
-X-Forwarded-Encrypted: i=1; AJvYcCX76xhnOBjHCiYSYMF8galPK3RwQI/e73/l0b1vego7HTMQA2ljned3lj18bX+VeRIONJyrLQ8=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyGyckdcjf6wj8lQO4izbeOaYl0+pZXgLbR9cJ3O7haTZqSEiCG
-	FtZ5aqEqQ56NARQv04lFVeo/JLKLui2RWuuhDEpFtzyrdh0L/6fmdWdHXdsHUOd+VS7medyFSz3
-	AwQ==
-X-Received: from wmbh3.prod.google.com ([2002:a05:600c:a103:b0:485:343f:9fb3])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f54:b0:485:49c5:8eb7
- with SMTP id 5b1f17b1804b1-485566fd0eamr230387435e9.22.1773682537346; Mon, 16
- Mar 2026 10:35:37 -0700 (PDT)
-Date: Mon, 16 Mar 2026 17:35:29 +0000
+        bh=CpR3ACqU07aVtibziRIGQBdLLRT1jdd+Sta0uM61LtQ=;
+        b=TTTxVy6Q+s8uvl5R/lVg1Ks+WCyuSvUVypT/n/zTwxswBBSH1pMHdBW1vRCu2ziiSJ
+         BuREIzscm0Hx7HBzgDkpDAkrfjV5vcE0pMJ77TorpwxltPdkv/mESwfTie0j1ZOtiZ/E
+         2/G5kIJQTfI4bLUmxDSh61pPAMF6RUO+VVVFSQQ+wdYpfQEKYgCA2EtrItzzbp4zjrey
+         3wF1pNf9+TBLVSogho6WAjeg9N/SkuOBqRi6FTJaKE2SmTv+ylpkIYSfSZh6vF9d2rsL
+         YHQRhK/lSQuTUkVeQ6cfOsHDTiXvoVu2FUGg9NYlbuHNB5HjfJBtebwV3I5FdwVmXj10
+         bcXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvno31ZVeATewY2h/7WbpbPN1aszAzSAo95ADT5r5NerAfTy9/KMQSlMgBglQK8DpQTd82/+c=@lists.linux.dev
+X-Gm-Message-State: AOJu0YwnIzGuFqu+/eymRmiNn9k6JAafxBOb3dG3L4XBawOBfzx44Fev
+	hmPXk54pR7sS+m4KVnp/tOgu9MguvmXdvnpqnkGsT6TBkh8WWm05kohICB8Y+xMDbRIhaWoKABu
+	LrA==
+X-Received: from wmsl29.prod.google.com ([2002:a05:600c:1d1d:b0:485:3659:1508])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:a45:b0:485:4006:960c
+ with SMTP id 5b1f17b1804b1-48556702a7dmr250396775e9.16.1773682534732; Mon, 16
+ Mar 2026 10:35:34 -0700 (PDT)
+Date: Mon, 16 Mar 2026 17:35:27 +0000
 In-Reply-To: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 X-Mailer: b4 0.14.3
-Message-ID: <20260316-tabba-el2_guard-v1-8-456875a2c6db@google.com>
-Subject: [PATCH 08/10] KVM: arm64: Use guard(spinlock) in psci.c
+Message-ID: <20260316-tabba-el2_guard-v1-6-456875a2c6db@google.com>
+Subject: [PATCH 06/10] KVM: arm64: Use guard(mutex) in mmu.c
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -69,73 +69,190 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly 
 Cc: Fuad Tabba <tabba@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-Migrate manual spin_lock() and spin_unlock() calls managing
-the vcpu->arch.mp_state_lock to use the guard(spinlock) macro.
+Migrate manual mutex_lock() and mutex_unlock() calls managing
+kvm_hyp_pgd_mutex and hyp_shared_pfns_lock to use the
+guard(mutex) macro.
 
 This eliminates manual unlock calls on return paths and simplifies
-error handling during PSCI calls by replacing unlock goto labels
-with direct returns.
+error handling by replacing unlock goto labels with direct returns.
+Centralized cleanup goto paths are preserved with manual unlocks
+removed.
 
-Change-Id: Iaf72da18b18aaec8edff91bc30379bed9dd04b2b
+Change-Id: Ib0f33a474eb84f19da4de0858c77751bbe55dfbb
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/psci.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ arch/arm64/kvm/mmu.c | 95 ++++++++++++++++++++--------------------------------
+ 1 file changed, 36 insertions(+), 59 deletions(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3b5dbe9a0a0e..04801f8b596a 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -62,7 +62,6 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	struct vcpu_reset_state *reset_state;
- 	struct kvm *kvm = source_vcpu->kvm;
- 	struct kvm_vcpu *vcpu = NULL;
--	int ret = PSCI_RET_SUCCESS;
- 	unsigned long cpu_id;
- 
- 	cpu_id = smccc_get_arg1(source_vcpu);
-@@ -78,14 +77,13 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	if (!vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
- 
--	spin_lock(&vcpu->arch.mp_state_lock);
-+	guard(spinlock)(&vcpu->arch.mp_state_lock);
-+
- 	if (!kvm_arm_vcpu_stopped(vcpu)) {
- 		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
--			ret = PSCI_RET_ALREADY_ON;
-+			return PSCI_RET_ALREADY_ON;
- 		else
--			ret = PSCI_RET_INVALID_PARAMS;
--
--		goto out_unlock;
-+			return PSCI_RET_INVALID_PARAMS;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index ec2eee857208..05f1cf839c9e 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -388,13 +388,12 @@ static void stage2_flush_vm(struct kvm *kvm)
+  */
+ void __init free_hyp_pgds(void)
+ {
+-	mutex_lock(&kvm_hyp_pgd_mutex);
++	guard(mutex)(&kvm_hyp_pgd_mutex);
+ 	if (hyp_pgtable) {
+ 		kvm_pgtable_hyp_destroy(hyp_pgtable);
+ 		kfree(hyp_pgtable);
+ 		hyp_pgtable = NULL;
  	}
- 
- 	reset_state = &vcpu->arch.reset_state;
-@@ -113,9 +111,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
- 	kvm_vcpu_wake_up(vcpu);
- 
--out_unlock:
--	spin_unlock(&vcpu->arch.mp_state_lock);
--	return ret;
-+	return PSCI_RET_SUCCESS;
+-	mutex_unlock(&kvm_hyp_pgd_mutex);
  }
  
- static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
-@@ -176,9 +172,8 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
- 	 * re-initialized.
- 	 */
- 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
--		spin_lock(&tmp->arch.mp_state_lock);
--		WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
--		spin_unlock(&tmp->arch.mp_state_lock);
-+		scoped_guard(spinlock, &tmp->arch.mp_state_lock)
-+			WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
- 	}
- 	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+ static bool kvm_host_owns_hyp_mappings(void)
+@@ -421,16 +420,11 @@ static bool kvm_host_owns_hyp_mappings(void)
+ int __create_hyp_mappings(unsigned long start, unsigned long size,
+ 			  unsigned long phys, enum kvm_pgtable_prot prot)
+ {
+-	int err;
+-
+ 	if (WARN_ON(!kvm_host_owns_hyp_mappings()))
+ 		return -EINVAL;
  
+-	mutex_lock(&kvm_hyp_pgd_mutex);
+-	err = kvm_pgtable_hyp_map(hyp_pgtable, start, size, phys, prot);
+-	mutex_unlock(&kvm_hyp_pgd_mutex);
+-
+-	return err;
++	guard(mutex)(&kvm_hyp_pgd_mutex);
++	return kvm_pgtable_hyp_map(hyp_pgtable, start, size, phys, prot);
+ }
+ 
+ static phys_addr_t kvm_kaddr_to_phys(void *kaddr)
+@@ -478,56 +472,42 @@ static int share_pfn_hyp(u64 pfn)
+ {
+ 	struct rb_node **node, *parent;
+ 	struct hyp_shared_pfn *this;
+-	int ret = 0;
+ 
+-	mutex_lock(&hyp_shared_pfns_lock);
++	guard(mutex)(&hyp_shared_pfns_lock);
+ 	this = find_shared_pfn(pfn, &node, &parent);
+ 	if (this) {
+ 		this->count++;
+-		goto unlock;
++		return 0;
+ 	}
+ 
+ 	this = kzalloc_obj(*this);
+-	if (!this) {
+-		ret = -ENOMEM;
+-		goto unlock;
+-	}
++	if (!this)
++		return -ENOMEM;
+ 
+ 	this->pfn = pfn;
+ 	this->count = 1;
+ 	rb_link_node(&this->node, parent, node);
+ 	rb_insert_color(&this->node, &hyp_shared_pfns);
+-	ret = kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+-unlock:
+-	mutex_unlock(&hyp_shared_pfns_lock);
+-
+-	return ret;
++	return kvm_call_hyp_nvhe(__pkvm_host_share_hyp, pfn);
+ }
+ 
+ static int unshare_pfn_hyp(u64 pfn)
+ {
+ 	struct rb_node **node, *parent;
+ 	struct hyp_shared_pfn *this;
+-	int ret = 0;
+ 
+-	mutex_lock(&hyp_shared_pfns_lock);
++	guard(mutex)(&hyp_shared_pfns_lock);
+ 	this = find_shared_pfn(pfn, &node, &parent);
+-	if (WARN_ON(!this)) {
+-		ret = -ENOENT;
+-		goto unlock;
+-	}
++	if (WARN_ON(!this))
++		return -ENOENT;
+ 
+ 	this->count--;
+ 	if (this->count)
+-		goto unlock;
++		return 0;
+ 
+ 	rb_erase(&this->node, &hyp_shared_pfns);
+ 	kfree(this);
+-	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+-unlock:
+-	mutex_unlock(&hyp_shared_pfns_lock);
+-
+-	return ret;
++	return kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn);
+ }
+ 
+ int kvm_share_hyp(void *from, void *to)
+@@ -652,22 +632,20 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+ 	unsigned long base;
+ 	int ret = 0;
+ 
+-	mutex_lock(&kvm_hyp_pgd_mutex);
+-
+-	/*
+-	 * This assumes that we have enough space below the idmap
+-	 * page to allocate our VAs. If not, the check in
+-	 * __hyp_alloc_private_va_range() will kick. A potential
+-	 * alternative would be to detect that overflow and switch
+-	 * to an allocation above the idmap.
+-	 *
+-	 * The allocated size is always a multiple of PAGE_SIZE.
+-	 */
+-	size = PAGE_ALIGN(size);
+-	base = io_map_base - size;
+-	ret = __hyp_alloc_private_va_range(base);
+-
+-	mutex_unlock(&kvm_hyp_pgd_mutex);
++	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
++		/*
++		 * This assumes that we have enough space below the idmap
++		 * page to allocate our VAs. If not, the check in
++		 * __hyp_alloc_private_va_range() will kick. A potential
++		 * alternative would be to detect that overflow and switch
++		 * to an allocation above the idmap.
++		 *
++		 * The allocated size is always a multiple of PAGE_SIZE.
++		 */
++		size = PAGE_ALIGN(size);
++		base = io_map_base - size;
++		ret = __hyp_alloc_private_va_range(base);
++	}
+ 
+ 	if (!ret)
+ 		*haddr = base;
+@@ -711,17 +689,16 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
+ 	size_t size;
+ 	int ret;
+ 
+-	mutex_lock(&kvm_hyp_pgd_mutex);
+-	/*
+-	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
+-	 * an alignment of our allocation on the order of the size.
+-	 */
+-	size = NVHE_STACK_SIZE * 2;
+-	base = ALIGN_DOWN(io_map_base - size, size);
++	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
++		/*
++		 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
++		 * an alignment of our allocation on the order of the size.
++		 */
++		size = NVHE_STACK_SIZE * 2;
++		base = ALIGN_DOWN(io_map_base - size, size);
+ 
+-	ret = __hyp_alloc_private_va_range(base);
+-
+-	mutex_unlock(&kvm_hyp_pgd_mutex);
++		ret = __hyp_alloc_private_va_range(base);
++	}
+ 
+ 	if (ret) {
+ 		kvm_err("Cannot allocate hyp stack guard page\n");
 
 -- 
 2.53.0.851.ga537e3e6e9-goog
