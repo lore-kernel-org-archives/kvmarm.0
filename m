@@ -1,103 +1,111 @@
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A2E175A8B
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 20:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3AE372EF9
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 22:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773694112; cv=none; b=OBCehvLrevWDvQeeT9sXOpEQ6AYn0fgyXkFa4BLi8ghA4rPYX1AE/bAoq7A0xtsJECgRh0uHJjYUfP0reouHWv5OgAVFNsg4fCsqCP7u4e3phEYtoN9R+Qe85UXcATA+QhBcIjuJCKwZlaHu70pqu9g+BZivK5AVE5Bx9pFCNSQ=
+	t=1773701048; cv=none; b=Hf2xhx7GArKkk9ABRhbvzWHmEU6UXL82SlkfIMLcB9/rojKezCamLg3iv0n943SvE44RuKa+1PSzl5W2kO5Y8ppNtycy5oVYtNcouKqyQjUcAP3xhzXvXSe5SjPI24wFgR8M7Qb1+GUkbfWZeCN4t3J/fg2sfymqgiwkJGCGzSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773694112; c=relaxed/simple;
-	bh=x8NNm0rddGrZ7s85S7W2N+d9fX6iL3lbEEnK5hkjNKo=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tiR3Qy10od2gu3Cmlki5UuC2s/krZs98B0uI8nhaiwCIaZReX51Qvi/ljewPs+KeV+5ncHRxEcyekqH1yPpBlcPCQ9nXrTbVg7y/4QT1o2PxIKpvb4dIlboAGRP66XV0rcHu+55TivNXdeTr4tv9wX3gic+lR8zLyjIy0FRv1fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=uIiIp6zO; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AwEHKZXD; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1773701048; c=relaxed/simple;
+	bh=T02mPnop+VlOHthIvn/hMI0Uo2ghqBUATVUzggRzrNo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=V31/v6V1T9N1d7fAsmHDVdL1XI9qWWmchWzZNwrK4LUe/AhiCU0W9NGQ+ZvjuEYSx0pNCO8HkAcxltR83HdcwQ5Tt4mcMitm3PEloDqU9G3fXSK9b8/y1cDdVL2wQTZqTFx9TS19QdKYRwK4U8Hqw+vOSTqvmJR0ut4tg9ZJ3Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QNcxPo0u; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="uIiIp6zO";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AwEHKZXD"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id 512941D002B8;
-	Mon, 16 Mar 2026 16:48:30 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 16 Mar 2026 16:48:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1773694110;
-	 x=1773780510; bh=x8NNm0rddGrZ7s85S7W2N+d9fX6iL3lbEEnK5hkjNKo=; b=
-	uIiIp6zO9qCGMBGibtesO0gim8ZrdBCuce4UVGOO1Uz6pFoASjFvq+5mp/t0QkXg
-	a75Q+9/lJ0uURpvFqWscMf+WqLy5ebANf9hPEF8kixrFXgMANRuEhDz46cstwouL
-	j6850J+wlv4r93VY6mzTfoVb5aXSpqs1nsePu8Ms0WhBBEOBDEJGiLv4YstDu67E
-	yJ4pQpp37OT0bzH/pHDKc/0pKOpM66AVhybHQZigOOrf0rPmEC9TBkgMsyeTpXT6
-	wDQkfeciIchTW0s1KevaCF8KiQGn9znhaZLd/BCCjsr/vIj7TrRBe2sOGecjhPf4
-	Chwcu+F9DwKslxNRTDMNRQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773694110; x=
-	1773780510; bh=x8NNm0rddGrZ7s85S7W2N+d9fX6iL3lbEEnK5hkjNKo=; b=A
-	wEHKZXDZhmFUWNp9h2jdIMena7uSg4atmB9h/QStHrkdJVaJrUCXrbaWKaVfS+zg
-	f8lTZZC57u/axrWxKI8y+wbwn6kPDaYXA4wtiJ0oLQBsDlA7NudPAtt3zzVom/T2
-	UA6JldIOHpXDgKUoLCzMSRSrh+sJO8U8VJsYKpdJvFLpFXvtzBCIsZ3qA1dY0/Yq
-	sXrxbIYnOBT8zfaazNVyD9tgO/b/GnGkNy8qDaAd80BD5iKAGUBKkJ+axFxPpCQu
-	NVOFH10s7PefMorJaNy6jhMqES0WcEQ6A5PauLiTRTGeia/S0tq3WzK7vjuXJ226
-	EZjLWdo95ijqu2+EIVtDg==
-X-ME-Sender: <xms:nWy4aR7VccMPdS1ykxqNdp5D41VdLK2V-Tm2OU1Cd98VR8EWrmsB7Q>
-    <xme:nWy4aZuFJ9RIseAEiiHwRGC7omhGZqyH4QJZ5vdkVOnFgB_VpX02qyNF_Fy8wdTQP
-    Z7boMBwdUnfYJ6qtjN7p3d44_vKloXwbxWcao4hDU3XZAyy_BolgK8b>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvleelfeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhesrghnughrohhiugdrtghomhdprhgtph
-    htthhopehrohhsthgvughtsehgohhoughmihhsrdhorhhgpdhrtghpthhtohepvhguohhn
-    nhgvfhhorhhtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehmrgiisehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepkhhvmhgrrhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinh
-    hugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:nWy4afjBi4j62K6R8olGevV4cKPgJ9I6_9NXW0Guse9dtQogPcXjjw>
-    <xmx:nmy4aWHGs-Z-gQIJFqR1rrSdnJBRpK5I-Ikh_HCjNx01qAiEPrKnwA>
-    <xmx:nmy4ae_4DDKGk7rsTuo7j-kpGO7eGlCuN2WtTXwXxw2_Hsdk-WG92Q>
-    <xmx:nmy4adyy6UPCRZKtJuzIstISSjmNq3AuznXtU00X-ocad3NjD7hlQQ>
-    <xmx:nmy4aaR1HVn9WAg9E3SnMIB9e8LeEj0sXwPzEqytMe-M47oBbdx7mg8F>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id DF26470006D; Mon, 16 Mar 2026 16:48:29 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QNcxPo0u"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-829b6b22dabso2248850b3a.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 15:44:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773701046; x=1774305846; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=A6pTrTiGUfN/I2rSuI/vU8zcoVY/NvupDuQnP/ABsAw=;
+        b=QNcxPo0uxB7sfaHIVWwR9kpp17usmiq2fbdi8QxINujRwgjo635+GZjMOoht87PEww
+         r0Sw0T/t35xVyiR3sfV8OAv8hFWTIKDinktr5/5EWPFcLOulEHtA5GCRs4tG/JbFyq5B
+         uyarTIA5sz1ExGvX82YJOT26UMVHCsVkH2v398I0I/8pwtVU30U/FIeUunwZsHidvqwj
+         UfHWCQtdWf+a5bQcEFhWacnO6nLSZxhWHvrSx+J+dAavv/Xt9w3rHIbwN9glBD80li1z
+         oBxMtHr7rR6Q+JBm/ceMm1BjQEupMh9bkJVQWbHCWj+pn7mmaJhpu3AcctWZ2JBjCHzE
+         ZCdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773701046; x=1774305846;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A6pTrTiGUfN/I2rSuI/vU8zcoVY/NvupDuQnP/ABsAw=;
+        b=Je2w/2gTDiiN9hECvD0ZCAm4dStqJZh2b8MulDv2hhleHTIlc1b55QZVVK+/taZI1N
+         AcyzP/GEjwmp1Bs0NKuIVCX9+wPaaWahgvTNZaPZQJnNpmZzmTMSqfsoRo1mRz+IajxT
+         1YhBKCIBCgjRoWv/MHdFSnlY8JDhIlNwS6UDp2/EO5zWu3p46iCpq8uaY/j/FKKu0E4e
+         p0auliKPqsIxYOPakotkNLEHrYknSSa2IiPFKzJ88n236g92M0cN1k1P9/CJpHRM4iUe
+         Gsp+TDULmB4nDgiwWRd7DDu5ipd6yK9sdENmDo8ODXHdt1YQUwvp4lovITUFnRT08q/L
+         5zCw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkAj89a4vyb375qsIc7FI9Jn6kIrtYhbaOeSPN3dtXm8puGx3/aoRuNU2pBf4L7tTfQEYHFxA=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yyj5rTcD9E2TbBu1m1R7MmULdwoMkMgh6CWBstKY/AnRnitMJxr
+	rfyfw4COQXxs6BixiQdewy7b63xNh+XmkkO7YZKDW1giu7yVZaBrHz4gjrM+1sGR8BLYvnlnMIM
+	+U6dWWSHxFIsNOCQqv9hLb2/CiA==
+X-Received: from pfbgc11.prod.google.com ([2002:a05:6a00:62cb:b0:82a:128b:1da0])
+ (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:1143:b0:829:809e:8978 with SMTP id d2e1a72fcca58-82a198ac2eamr13166611b3a.31.1773701045869;
+ Mon, 16 Mar 2026 15:44:05 -0700 (PDT)
+Date: Mon, 16 Mar 2026 15:43:46 -0700
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ThreadId: AI8tLlWNtG-B
-Date: Mon, 16 Mar 2026 21:48:09 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Vincent Donnefort" <vdonnefort@google.com>,
- "Marc Zyngier" <maz@kernel.org>
-Cc: "Steven Rostedt" <rostedt@goodmis.org>,
- "Nathan Chancellor" <nathan@kernel.org>, linux-trace-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev, kernel-team@android.com
-Message-Id: <501b2810-db63-4aa2-ac22-d3f1a99e9bfa@app.fastmail.com>
-In-Reply-To: <6d40c8c0-f00a-4031-bd94-7c0a417eb0cf@app.fastmail.com>
-References: <20260316092845.3367411-1-vdonnefort@google.com>
- <6d40c8c0-f00a-4031-bd94-7c0a417eb0cf@app.fastmail.com>
-Subject: Re: [PATCH v3] tracing: Generate undef symbols allowlist for
- simple_ring_buffer
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
+Message-ID: <20260316224349.2360482-1-jingzhangos@google.com>
+Subject: [kvm-unit-tests PATCH v1 0/3] arm64: Add Stage-2 MMU and Nested Guest Framework
+From: Jing Zhang <jingzhangos@google.com>
+To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+	Andrew Jones <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Jing Zhang <jingzhangos@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 16, 2026, at 21:47, Arnd Bergmann wrote:
->
-> This needs "__kmsan" as well, for these symbols:
->
+This patch series introduces a lightweight infrastructure for managing ARM64
+Stage-2 translation tables and executing nested guests. These components are
+essential for testing advanced virtualization features such as nested
+virtualization (NV) and GICv4 direct interrupt injection.
 
-"__msan" of course, not "__kmsan".
+The series provides a generic Stage-2 MMU library supporting multiple
+translation granules (4K, 16K, 64K) and dynamic page table management.
+Building on this, it adds a guest execution framework that handles guest
+lifecycle management, context switching and guest exit routing. A new test
+case for Stage-2 MMU demand paging to verify fault handling.
+
+Please note that this is a very preliminary implementation intended as a
+startup baseline for future work in virtualization testing. Users should be
+aware that because this is an early-stage baseline, some portions of the code
+may just happen to work in its current state. There might be critical
+architectural elements or edge-case handling missing that will need to be
+addressed as the framework matures.
+
+---
+
+Jing Zhang (3):
+  lib: arm64: Add stage2 page table management library
+  lib: arm64: Add bare-metal guest execution framework
+  arm64: Add Stage-2 MMU demand paging test
+
+ arm/Makefile.arm64         |   4 +
+ arm/stage2-mmu-test.c      | 100 +++++++++
+ lib/arm64/asm/guest.h      | 156 ++++++++++++++
+ lib/arm64/asm/stage2_mmu.h |  74 +++++++
+ lib/arm64/guest.c          | 197 ++++++++++++++++++
+ lib/arm64/guest_arch.S     | 263 ++++++++++++++++++++++++
+ lib/arm64/stage2_mmu.c     | 402 +++++++++++++++++++++++++++++++++++++
+ 7 files changed, 1196 insertions(+)
+ create mode 100644 arm/stage2-mmu-test.c
+ create mode 100644 lib/arm64/asm/guest.h
+ create mode 100644 lib/arm64/asm/stage2_mmu.h
+ create mode 100644 lib/arm64/guest.c
+ create mode 100644 lib/arm64/guest_arch.S
+ create mode 100644 lib/arm64/stage2_mmu.c
+
+
+base-commit: 86e53277ac80dabb04f4fa5fa6a6cc7649392bdc
+-- 
+2.53.0.851.ga537e3e6e9-goog
+
