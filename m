@@ -1,54 +1,54 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735383CF67E
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEEC3D0926
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773682538; cv=none; b=SUPfGcWeSxeMHDyHiQO8zVPv+2abYB5PCIppzx06zBYtRe/jsY38Erm9FKKH2fKgOiJbtJtq604U1mB0LCrspstTtg2Jy5DFP3Bh9Z9sT0QNrpXi5MoKb/APObKuTioONwv2X2YPbnIYw7yrKNqTiCVd/vd6AWCy1o5eauCyukI=
+	t=1773682539; cv=none; b=Yj4cNVh9HERGxSUD4VnxKYN8xc50MZ3v2RHK1pr5/ItlWOMovTEcHG0Gudap8QJN5Cru9YYAJo75PxtGWbp69YCI95PSgKg5jf3jwqdc6OCCUZ3d7gzRUJ5hNKfYuQeZEqB254j9uy+jqk1bTw16n+7WfgAEMzpo6Nf+iAL9Es8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773682538; c=relaxed/simple;
-	bh=KKz9fbZcZR1mjkh27Sdq1u2YhVQ1XtsFBQXXVHQrNX0=;
+	s=arc-20240116; t=1773682539; c=relaxed/simple;
+	bh=iChkBxKJtcFVZgyq0ui0SMkPSn7JUQJQi+VMec4bY8M=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BmlTtLYEoow+s/Rqou7Ctv79TCt/qNLYZ3Yo9mqwGAmt5urQsfZjKi6RFASWx/u2gKfuqAIyzhT5N/brPAcbJi1MT1paZUPTLmZlWN+rER9xFSUvj3hQcYrnyNVm9XnNx/83BPBykrBjIeql/znBLFRj9TFWAV5ebPfSHB3DJWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RIiezaG5; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=nWHsKoAep3t8D7YrE5YqqDGk0S7Rv40w+MGOQJRv+OzMW6WAPpSOBqKDT4nhvbou0hy56YJvU2Fj9SGAzNJjCH6QHOAG93pkJ/HleOX/uCkFOZ1VwqqQ023RfVJV4/EB+tETzZYDSCrfdKJj//sfLdddSTB2SnOxkArD76F4QaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCJ9/qbe; arc=none smtp.client-ip=209.85.221.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RIiezaG5"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-4853efceaddso42649645e9.3
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCJ9/qbe"
+Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-43b42cd4becso1005668f8f.1
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773682534; x=1774287334; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773682536; x=1774287336; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OL7t7B6X78PqYAbrBfjg/doY6RGS0yWRoav+K4LS08=;
-        b=RIiezaG5auJhSBKSPCtMPgY+MRXhH4IaxWUjDKnTRkCQgWprYovntx/buYKnBRkuP5
-         grEb66TLjQC248Yg4mg8gnjVlnFcMcooDDycs6RZPBTbPxJmFQaOLkVf3OwSnlkLnp7x
-         2EilRpQBUSzb5zyDKZW/Yq0WNZCSzpn9O9ct1wu7mLwhx2CKHRq70WYMbCGcm70j7s4H
-         rfISOvW2UTiK6dKcMKpRBQaSoauWFfsG+iR//CLtcm0ZAVstTTUBqgTFB6Bc+jHNK5sw
-         juYAmwaOSWMfOX/uAq9HaMHfukdhg21aTKpZ4yRJTlOcIStxW2H9GislrPZP+gDxeVgt
-         ASiQ==
+        bh=2aVMNYqgbLtglfFJK2IfbXVz92dSXKpE2nwANbOIprc=;
+        b=GCJ9/qbeQ9HDaFxqCQkD6EIu4ELwgUsqQOFpM3yBBT3LwjyLrc3b+iTT/B1oIiPzHt
+         /kxFqIyE/UO1118IqiPL21bELoRRzG0jhrF9MZ442MLwjfjS2AxVFSKbevNsm7Xpg6OM
+         s3hX48vEefCgrrxnRYeROJCHqfJ4H+lxcxHqpJJds7bEQkE6i88Cj+dqlVBr0pqfhCqg
+         ecfNz+seGIeGamCnSC2ZfDZIZd0X2u0AE5D2Yt1saaXMHT5BcQGJRW247u/OI75bKXG+
+         gW9nLbDlQ5SvrWFEsIW7Dw0oM/T35nBKhVeiVtHECFPD1VyIKNOsl1QO5ucceEHcIfSN
+         bIxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773682534; x=1774287334;
+        d=1e100.net; s=20251104; t=1773682536; x=1774287336;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8OL7t7B6X78PqYAbrBfjg/doY6RGS0yWRoav+K4LS08=;
-        b=XUtO0bvRX08CL94Ez/YycW09uybsD2pzG/BFyGjPJAuxlIcuRwZKuFy3e2oIDFeZYj
-         C+vfnREMm8ZGXB/y4yOLmM4o4zi2D+uOs61oYKxdILVuEOA23ROdSVPnLTWhZYRRv3Zd
-         Cb1WahXHufzABRxTNUE+16yW6Osa54LlO17vYPZbvUavzFEZdbuGYt1APCOv2CM7Kv4d
-         5RH4N+s9CjIuNLzJOXu+282zgSSBUGV3u5LKCpmznhXWdFBPcw+Crq/HaY6DejD8KeNE
-         +4vIJTaNpq+NzhbbUlB4noftK2m+9Za8ACyIDa3TC1xx1BaA40hDkZ6fnNjC3AjDDu22
-         dDyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzmsbB1eTdXUgvp87KgKHmamCYBU6ayRN5qvi1twF4GtvNzixZvkvSNKSm5XsufVGOOF+tUWo=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yw0gDTFa/zhKYrrUML8rTECxW47aFeQ9SOinGZy4EKqVnfNgOE1
-	xDvPZJUF+8rayghEGNSZluPIV/2dXsS3nLk+Dbe5/R3MOM2kYzyIdG0y1yd7L08w8GL4xC4HZ96
-	DTQ==
-X-Received: from wmbf24.prod.google.com ([2002:a05:600c:5958:b0:47e:e922:b080])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:45d3:b0:480:1e40:3d2
- with SMTP id 5b1f17b1804b1-48556705301mr238355675e9.29.1773682533729; Mon, 16
- Mar 2026 10:35:33 -0700 (PDT)
-Date: Mon, 16 Mar 2026 17:35:26 +0000
+        bh=2aVMNYqgbLtglfFJK2IfbXVz92dSXKpE2nwANbOIprc=;
+        b=h8pEJkgqZ8mXVz2uOkZ+QmKMnB7FF/46BDIkbT52jlCEazq0ha4szSOCUzIAkVS3he
+         NOH6tyQIR/ggUbpulklSeMyZ9RSqz/HjVqvlhVTlnC6woazAX/xJ9XIKq9cWGBo19dc8
+         mJdmSxoMoc/PH3VyS5keJeDtr6FphbZvbzgL9sE4fmkoPMrRKhxFPzv5WhJ2yGCo20Ka
+         By5LodubaJ8TI/IkXtbZXCnne4kvpX5J9w+/QXw1Yav9UhqHhbBftyLS/I6GQe74E2S+
+         vd4Q6apZxAST+MAwBKVGlAQ49oo198+8FAQqyWaKsgEJAfrd37p7ekG+tui9KOvj3LVc
+         +c4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXhwNciEOlG1qgF9hQLSZoNXnhcK4bsqwjFpjYN7Uvdh059O2XhrYOg54LQ15MXEMkmN/bXGsQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0YzRvbClULVsz/ex3VzsGcUisHgIOhahXahOlPf/QEgtlM0SRF42
+	a5ObNFd/8AmIEyovCLpHUh71LXbeLx0vy4wmXglqhSD20N+SMot+Y2/Acn/K+7Kq2mvP+vSKh1e
+	SlQ==
+X-Received: from wrbfu19.prod.google.com ([2002:a05:6000:25f3:b0:43b:458d:a311])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5d09:0:b0:439:c153:ae3d
+ with SMTP id ffacd0b85a97d-43b498127f3mr1058497f8f.6.1773682536058; Mon, 16
+ Mar 2026 10:35:36 -0700 (PDT)
+Date: Mon, 16 Mar 2026 17:35:28 +0000
 In-Reply-To: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 X-Mailer: b4 0.14.3
-Message-ID: <20260316-tabba-el2_guard-v1-5-456875a2c6db@google.com>
-Subject: [PATCH 05/10] KVM: arm64: Use guard(hyp_spinlock) in pkvm.c
+Message-ID: <20260316-tabba-el2_guard-v1-7-456875a2c6db@google.com>
+Subject: [PATCH 07/10] KVM: arm64: Use scoped resource management in arm.c
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -69,240 +69,173 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly 
 Cc: Fuad Tabba <tabba@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-Migrate manual hyp_spin_lock() and hyp_spin_unlock() calls managing
-the global vm_table_lock to use the guard(hyp_spinlock) macro.
+Migrate manual spin_lock() calls managing mp_state_lock and manual
+mutex_lock() calls managing kvm->arch.config_lock to use the
+guard(spinlock) and guard(mutex) macros.
 
-This significantly cleans up validation and error paths during VM
-creation and manipulation by eliminating the need for goto labels
-and manual unlock procedures on early returns.
+This eliminates manual unlock calls on early return paths and
+simplifies the vCPU suspend/resume control flow.
 
-Change-Id: I894df69b3cfe053a77dd660dfb70c95640c6d70c
+Change-Id: Ifcd8455d08afa5d00fc200daaa3fb13f6736e6ed
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/pkvm.c | 122 +++++++++++++++++------------------------
- 1 file changed, 51 insertions(+), 71 deletions(-)
+ arch/arm64/kvm/arm.c | 53 ++++++++++++++++++++--------------------------------
+ 1 file changed, 20 insertions(+), 33 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 2f029bfe4755..8f901fdead89 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -253,28 +253,23 @@ struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
- 	if (__this_cpu_read(loaded_hyp_vcpu))
- 		return NULL;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 410ffd41fd73..017f5bfabe19 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -274,17 +274,15 @@ static void kvm_destroy_mpidr_data(struct kvm *kvm)
+ {
+ 	struct kvm_mpidr_data *data;
  
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	hyp_vm = get_vm_by_handle(handle);
- 	if (!hyp_vm || hyp_vm->kvm.created_vcpus <= vcpu_idx)
--		goto unlock;
-+		return NULL;
- 
- 	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
- 	if (!hyp_vcpu)
--		goto unlock;
-+		return NULL;
- 
- 	/* Ensure vcpu isn't loaded on more than one cpu simultaneously. */
--	if (unlikely(hyp_vcpu->loaded_hyp_vcpu)) {
--		hyp_vcpu = NULL;
--		goto unlock;
--	}
-+	if (unlikely(hyp_vcpu->loaded_hyp_vcpu))
-+		return NULL;
- 
- 	hyp_vcpu->loaded_hyp_vcpu = this_cpu_ptr(&loaded_hyp_vcpu);
- 	hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
--unlock:
--	hyp_spin_unlock(&vm_table_lock);
- 
--	if (hyp_vcpu)
--		__this_cpu_write(loaded_hyp_vcpu, hyp_vcpu);
-+	__this_cpu_write(loaded_hyp_vcpu, hyp_vcpu);
- 	return hyp_vcpu;
+-	mutex_lock(&kvm->arch.config_lock);
+-
+-	data = rcu_dereference_protected(kvm->arch.mpidr_data,
+-					 lockdep_is_held(&kvm->arch.config_lock));
+-	if (data) {
+-		rcu_assign_pointer(kvm->arch.mpidr_data, NULL);
+-		synchronize_rcu();
+-		kfree(data);
++	scoped_guard(mutex, &kvm->arch.config_lock) {
++		data = rcu_dereference_protected(kvm->arch.mpidr_data,
++						 lockdep_is_held(&kvm->arch.config_lock));
++		if (data) {
++			rcu_assign_pointer(kvm->arch.mpidr_data, NULL);
++			synchronize_rcu();
++			kfree(data);
++		}
+ 	}
+-
+-	mutex_unlock(&kvm->arch.config_lock);
  }
  
-@@ -282,11 +277,10 @@ void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
- {
- 	struct pkvm_hyp_vm *hyp_vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
+ /**
+@@ -738,9 +736,8 @@ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
  
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	hyp_vcpu->loaded_hyp_vcpu = NULL;
- 	__this_cpu_write(loaded_hyp_vcpu, NULL);
- 	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
--	hyp_spin_unlock(&vm_table_lock);
+ void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+ {
+-	spin_lock(&vcpu->arch.mp_state_lock);
++	guard(spinlock)(&vcpu->arch.mp_state_lock);
+ 	__kvm_arm_vcpu_power_off(vcpu);
+-	spin_unlock(&vcpu->arch.mp_state_lock);
  }
  
- struct pkvm_hyp_vcpu *pkvm_get_loaded_hyp_vcpu(void)
-@@ -299,20 +293,18 @@ struct pkvm_hyp_vm *get_pkvm_hyp_vm(pkvm_handle_t handle)
+ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+@@ -773,7 +770,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
  {
- 	struct pkvm_hyp_vm *hyp_vm;
+ 	int ret = 0;
  
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	hyp_vm = get_vm_by_handle(handle);
- 	if (hyp_vm)
- 		hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
--	hyp_spin_unlock(&vm_table_lock);
+-	spin_lock(&vcpu->arch.mp_state_lock);
++	guard(spinlock)(&vcpu->arch.mp_state_lock);
  
- 	return hyp_vm;
- }
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+@@ -789,8 +786,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ 		ret = -EINVAL;
+ 	}
  
- void put_pkvm_hyp_vm(struct pkvm_hyp_vm *hyp_vm)
- {
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
--	hyp_spin_unlock(&vm_table_lock);
- }
- 
- struct pkvm_hyp_vm *get_np_pkvm_hyp_vm(pkvm_handle_t handle)
-@@ -613,9 +605,8 @@ static int insert_vm_table_entry(pkvm_handle_t handle,
- {
- 	int ret;
- 
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	ret = __insert_vm_table_entry(handle, hyp_vm);
--	hyp_spin_unlock(&vm_table_lock);
- 
+-	spin_unlock(&vcpu->arch.mp_state_lock);
+-
  	return ret;
  }
-@@ -692,9 +683,8 @@ int __pkvm_reserve_vm(void)
- {
- 	int ret;
  
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	ret = allocate_vm_table_entry();
--	hyp_spin_unlock(&vm_table_lock);
+@@ -828,11 +823,11 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 	u64 aff_set = 0, aff_clr = ~0UL;
+ 	struct kvm_vcpu *vcpu;
  
- 	if (ret < 0)
- 		return ret;
-@@ -713,10 +703,9 @@ void __pkvm_unreserve_vm(pkvm_handle_t handle)
- 	if (unlikely(!vm_table))
- 		return;
+-	mutex_lock(&kvm->arch.config_lock);
++	guard(mutex)(&kvm->arch.config_lock);
  
--	hyp_spin_lock(&vm_table_lock);
-+	guard(hyp_spinlock)(&vm_table_lock);
- 	if (likely(idx < KVM_MAX_PVMS && vm_table[idx] == RESERVED_ENTRY))
- 		remove_vm_table_entry(handle);
--	hyp_spin_unlock(&vm_table_lock);
+ 	if (rcu_access_pointer(kvm->arch.mpidr_data) ||
+ 	    atomic_read(&kvm->online_vcpus) == 1)
+-		goto out;
++		return;
+ 
+ 	kvm_for_each_vcpu(c, vcpu, kvm) {
+ 		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
+@@ -857,7 +852,7 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 				    GFP_KERNEL_ACCOUNT);
+ 
+ 	if (!data)
+-		goto out;
++		return;
+ 
+ 	data->mpidr_mask = mask;
+ 
+@@ -869,8 +864,6 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+ 	}
+ 
+ 	rcu_assign_pointer(kvm->arch.mpidr_data, data);
+-out:
+-	mutex_unlock(&kvm->arch.config_lock);
  }
  
  /*
-@@ -815,35 +804,35 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 	if (!hyp_vcpu)
- 		return -ENOMEM;
- 
--	hyp_spin_lock(&vm_table_lock);
-+	scoped_guard(hyp_spinlock, &vm_table_lock) {
-+		hyp_vm = get_vm_by_handle(handle);
-+		if (!hyp_vm) {
-+			ret = -ENOENT;
-+			goto err_unmap;
-+		}
- 
--	hyp_vm = get_vm_by_handle(handle);
--	if (!hyp_vm) {
--		ret = -ENOENT;
--		goto unlock;
-+		ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu);
-+		if (ret)
-+			goto err_unmap;
-+
-+		idx = hyp_vcpu->vcpu.vcpu_idx;
-+		if (idx >= hyp_vm->kvm.created_vcpus) {
-+			ret = -EINVAL;
-+			goto err_unmap;
-+		}
-+
-+		if (hyp_vm->vcpus[idx]) {
-+			ret = -EINVAL;
-+			goto err_unmap;
-+		}
-+
-+		hyp_vm->vcpus[idx] = hyp_vcpu;
-+
-+		return 0;
+@@ -944,9 +937,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 			return ret;
  	}
  
--	ret = init_pkvm_hyp_vcpu(hyp_vcpu, hyp_vm, host_vcpu);
--	if (ret)
--		goto unlock;
--
--	idx = hyp_vcpu->vcpu.vcpu_idx;
--	if (idx >= hyp_vm->kvm.created_vcpus) {
--		ret = -EINVAL;
--		goto unlock;
--	}
--
--	if (hyp_vm->vcpus[idx]) {
--		ret = -EINVAL;
--		goto unlock;
--	}
--
--	hyp_vm->vcpus[idx] = hyp_vcpu;
--unlock:
--	hyp_spin_unlock(&vm_table_lock);
--
--	if (ret)
--		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
-+err_unmap:
-+	unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
+-	mutex_lock(&kvm->arch.config_lock);
++	guard(mutex)(&kvm->arch.config_lock);
+ 	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+-	mutex_unlock(&kvm->arch.config_lock);
+ 
  	return ret;
  }
+@@ -1585,29 +1577,26 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+ {
+ 	unsigned long features = init->features[0];
+ 	struct kvm *kvm = vcpu->kvm;
+-	int ret = -EINVAL;
++	int ret;
  
-@@ -866,27 +855,22 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
- 	struct kvm *host_kvm;
- 	unsigned int idx;
- 	size_t vm_size;
--	int err;
+-	mutex_lock(&kvm->arch.config_lock);
++	guard(mutex)(&kvm->arch.config_lock);
  
--	hyp_spin_lock(&vm_table_lock);
--	hyp_vm = get_vm_by_handle(handle);
--	if (!hyp_vm) {
--		err = -ENOENT;
--		goto err_unlock;
-+	scoped_guard(hyp_spinlock, &vm_table_lock) {
-+		hyp_vm = get_vm_by_handle(handle);
-+		if (!hyp_vm)
-+			return -ENOENT;
-+
-+		if (WARN_ON(hyp_page_count(hyp_vm)))
-+			return -EBUSY;
-+
-+		host_kvm = hyp_vm->host_kvm;
-+
-+		/* Ensure the VMID is clean before it can be reallocated */
-+		__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
-+		remove_vm_table_entry(handle);
- 	}
+ 	if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) &&
+ 	    kvm_vcpu_init_changed(vcpu, init))
+-		goto out_unlock;
++		return -EINVAL;
  
--	if (WARN_ON(hyp_page_count(hyp_vm))) {
--		err = -EBUSY;
--		goto err_unlock;
--	}
--
--	host_kvm = hyp_vm->host_kvm;
--
--	/* Ensure the VMID is clean before it can be reallocated */
--	__kvm_tlb_flush_vmid(&hyp_vm->kvm.arch.mmu);
--	remove_vm_table_entry(handle);
--	hyp_spin_unlock(&vm_table_lock);
--
- 	/* Reclaim guest pages (including page-table pages) */
- 	mc = &host_kvm->arch.pkvm.teardown_mc;
- 	stage2_mc = &host_kvm->arch.pkvm.stage2_teardown_mc;
-@@ -917,8 +901,4 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
- 	teardown_donated_memory(mc, hyp_vm, vm_size);
- 	hyp_unpin_shared_mem(host_kvm, host_kvm + 1);
- 	return 0;
--
--err_unlock:
--	hyp_spin_unlock(&vm_table_lock);
--	return err;
+ 	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
+ 
+ 	ret = kvm_setup_vcpu(vcpu);
+ 	if (ret)
+-		goto out_unlock;
++		return ret;
+ 
+ 	/* Now we know what it is, we can reset it. */
+ 	kvm_reset_vcpu(vcpu);
+ 
+ 	set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
+ 	vcpu_set_flag(vcpu, VCPU_INITIALIZED);
+-	ret = 0;
+-out_unlock:
+-	mutex_unlock(&kvm->arch.config_lock);
+-	return ret;
++	return 0;
  }
+ 
+ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+@@ -1674,15 +1663,13 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	/*
+ 	 * Handle the "start in power-off" case.
+ 	 */
+-	spin_lock(&vcpu->arch.mp_state_lock);
++	guard(spinlock)(&vcpu->arch.mp_state_lock);
+ 
+ 	if (power_off)
+ 		__kvm_arm_vcpu_power_off(vcpu);
+ 	else
+ 		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+ 
+-	spin_unlock(&vcpu->arch.mp_state_lock);
+-
+ 	return 0;
+ }
+ 
 
 -- 
 2.53.0.851.ga537e3e6e9-goog
