@@ -1,219 +1,510 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F96038A71D
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 09:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773653481; cv=none; b=VrRwHTfIVaDkKmlILZkRCdesN3J5VNcjJoC4gAkWoNQ264znhixyvCFJR3t/VrHbOFf7NY8R+8w3G85+18hzorkRBcD5zh1JjVoDNHgqRE1aKfA9haco4kKg7YvMainQctpQ2ZKV5tHVLQAHdivNnkkD7x5CMeg1ZF3Woaosv44=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773653481; c=relaxed/simple;
-	bh=NuPazOIPt/eiJl0d8nf/kqY0HIF3mB+qFDMIiVADh+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OUFfEvLin4SHX9+7jdfGC6XpSxKuJSv7MctJL4p7RYgWI6HjcNebHq6Ld8OXAEgW1dF5gq5Q0ZMfKsCAhJFLQMrDFoWpV0hJcH9e/4zG5YgVm1XyBOS6BzASz3VkAwDXWj9nEmDidYg8r1VcaXerXwD69Uz8xZ1/LPgyn50latM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ca2CFYCn; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD7A38BF74
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:47:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773658031; cv=pass; b=kPtGGmadEF7m0T1oPB/a82H2Va3W6cwkHx5mD2/L4PPBEZrZ9pDRMx6DkRx8NOy6MG2QyE4/yecQraEyBdfshVUSlx+T++Ogr9b1UF5vUfJE++b19BSQ3JQlsLLA9tPj95ZcarRDVRTdsLobE4PHUXYyN5Osnyll8BhoRZ2qA50=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773658031; c=relaxed/simple;
+	bh=rmZcnb4joIPbgcMe7s70/kHZFT7lZASd+ypqkLB1SYs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bO30l51TVN/5F2zskMIQaJyWRAmXxUkoMrkrbsW+0hprXqvtDQra3k07LL6M8S6KeZJMRmNXY5R6eW207eT2p4qIHmqZvmnzdRB+O5ZwPkOtLlhWqeMdm1HMvED42g/BL0LK5SN+IzXBV28Sk/AU+kxjWIAndDnedkAf75BdVsA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vQCdSwLE; arc=pass smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ca2CFYCn"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-43b41b545d9so1268263f8f.2
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 02:31:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vQCdSwLE"
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-5091ed02c54so960051cf.1
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 03:47:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773658029; cv=none;
+        d=google.com; s=arc-20240605;
+        b=RdmR3y3G1IYw+u4igkLVizq+lGvUk+1Q5Upitaa1IeiCKIainVYflqMBDYSu2TOCXt
+         V/LRjEptk8JfHzyViVMzsGcUPy8vw+7g9ISCYfUWS5gG7auL3uSKbovU6q6lZwzlQY7K
+         ewo5TIVQhbY82pjNZEqfI8ecDDI2CCn9AN41aIjanpZumHpSl1rMEKWFiS6AD79hILRp
+         lwb6L2U43upRDUe1TiHrWmC0fLjO/u7o/H7uG4SQYeClmdEccjfzkgO1wFXVHtQn4fBZ
+         2ZHnQd38soH0aPVv1JlxhEj8OcsBJ15gf8xOHOkLp5/kIJKOJZsAEQrHAquyQQBWbMJ6
+         FJzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=aRRRs4qimCTCE8Va18dDnA4j+s5nPgtPWnWIVGfsSG4=;
+        fh=ALjfXgr45VgkLSJe9INqpVvRkYr3YVALgwgRX0W2P04=;
+        b=KPVC5MXtaJvLCY3fkIbrtXp9qmQq/whU4q7ikh2L9l+5j/qP9JhW2qYtax2+wzdj2T
+         ygE7tfb6A/Q/X8N002xX39nsLDFVJzg7Jnjbov0fVMpCiz4N6BJhO9uJXznbgbVDxnut
+         meIfwPIp31fNrs6XStPnzMPj55YmGgxDSlceMN8dTjIF/prKNSaydCCQWx+TVUs89bzU
+         PQKRGkPPYhrhMSPuJFnYttviGtiWxOw08mJ/+5t4o5CNtOoRbjLJxyZCdoHoeLRS8gZX
+         AyIj3+6moCilmNcojFeleDbR1ndcSP/fJ4HxY41YRoEUw7AOwsokAVLOHfiNhaxQ4zLP
+         rbnA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773653478; x=1774258278; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9+2cEm3LgZQtQuvqQDE8BJ8R3spEdGYM2Icfc1B4dcM=;
-        b=ca2CFYCnXvFOVXAV33Eay2+sq+cc0BU8tuArAPBtse1FRnfcee8BVzOAEAFb+z0e6s
-         iL0FX5JqYJTNT4r5kVIHJEf4Fh/TLth9aAsbh30YnWEfisKYAAet7A/5bSp3lAsYTIcn
-         PUo/avFdqdzFkuQI2o4AazEcivPfSbXIuM3W0pmKc5W4Uwj3g4W5hX3sGAgTM9/lHKJW
-         f5vvyO4a+/sRnYiWW51HSFQHIcoa9Obe8j45SY9NxhYHtqUbHrutZMaMtOqw69IKKvUl
-         tTKS4uSBEXb+zzcTv4jaFYoPn3ghk4or2MQNLzhXfarhgTO876C430bN6Eyd+vOTwpg4
-         4+kw==
+        d=google.com; s=20251104; t=1773658029; x=1774262829; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aRRRs4qimCTCE8Va18dDnA4j+s5nPgtPWnWIVGfsSG4=;
+        b=vQCdSwLEP8UjVTAXvcb+3WPR/NPAt2nHMPbO8slBNoif8qxa2zwxAGERSU5n1Cq743
+         O9rzG/+Q1zhLdACGL3bcIr3RwFsNwPd2QdcZEAZPrM6pXhz8pIRzLVfA/TEs5Ad4qkst
+         0dZpl7mGTIAdafnN2iD+TyQmwdrzs2EEquWibJQnEJTHHsl5Gr8h8nq5P+L3yi6HOt4Q
+         WyNn8JTpTaLXuu/CHP6pT3qcT123X/LNFSRlYPEnX9RMiIjUwe7BaCyE5vJdKmLs3Q/h
+         fCHXP+Hp+nxjjX2VIAW3G3j/RmZvic9zf9/FRvTVLmFWaOnmOgei3phY9vC1vVbshC8l
+         tPMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773653478; x=1774258278;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9+2cEm3LgZQtQuvqQDE8BJ8R3spEdGYM2Icfc1B4dcM=;
-        b=J5Tsvqq0PnclnY13OQs6t0zcEQX/LZUa0DhCxVLRaM1zrRpS6/iInxYblWFRPQR1rn
-         QOGRK4P89qYp28Ajio7ZU3Sl2NbDjF7+C6QJMoo0EoEy69yDsvZdrx9K2OqMzUe9FTHT
-         CNavizzjLBLDPDYPnksNZA9fVt2ptZJRW/UL/rr5VMTznTD8EDxVOJ8simEHCj+N1pwK
-         kY/pHiw0oEGVEDQ0ah3i99st0cnR0nZCqeHvlAQnJlfDs76eTMesqy1M3n/C1f6+MT3Z
-         09eCX7+r9mA/1GoGdOi5fkExIiqLfU/BManvl/n5F5ICEY3XSpmlgXCEpmhzsMUplAFa
-         z7Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUeo7ofeGtilwXHZEMUnohxzpjreYWwbmf2SWdTgYH20AwTZQAdvYIJNWWGa9Z89E5CHrhwQ8c=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yz5/T6s62eAI2k2hN6ZZEqGw3CodJy6J5v+ICYxkAYdH55OUkPU
-	2ihjmMpE8MrMGj+0+gAVEgQZ4ndtoTNdfCKaztBmHiiB/UOMZaJ7gT7VDzHYVrkK1A==
-X-Gm-Gg: ATEYQzz1KDU3l1HTuCye0ibJUZiAc5FIZnck7TQmTKqfujRB2T3C35yfSoq6OKKYIWm
-	epuoDxGDX+JyqGjVMYNDGt5tArgtTk3q4bmGeIUbVqvoKp7ZXk7Rp1FPiPHTSxymUX9f2npMyaN
-	WUDngpglpZqFHgWJDhrsbKEpnu4imuEm9haTwnSnW6RoiYFjTXGZy+vxPAPA2C8EdQ42nLHUMou
-	YaXLByVQyqODVD86szbxNjbezrxt7ezUDL993ToLo8c5TdviJfpFXeYIZWtpWTv+uj9IsL7g46v
-	TvMYOWZWYq3d365S3qmRso7zfOGIlq4M0UcVBFAg56dwXs706b1+qcnnj1IWqV4uClsCcp0U8Df
-	fwCL2bmLp4vw2l84R0GYgYFU9jNGU4XsLZ9Zqw1D/GuUzi0O1q1MOC9DvccyD0xUKfIt3G81dWX
-	US80OkmOGSMpa7+73qwBgwpjI3rNVqCn0Gd/rZ1mfVcaazw5NtWtkQNFuOPCj+YGel7wAopJyJW
-	BsC3w==
-X-Received: by 2002:a05:600c:8489:b0:482:eec4:76d with SMTP id 5b1f17b1804b1-485566f7a2amr213257395e9.17.1773653477134;
-        Mon, 16 Mar 2026 02:31:17 -0700 (PDT)
-Received: from google.com (198.115.140.34.bc.googleusercontent.com. [34.140.115.198])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48557a74266sm84270715e9.17.2026.03.16.02.31.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2026 02:31:16 -0700 (PDT)
-Date: Mon, 16 Mar 2026 09:31:12 +0000
-From: Vincent Donnefort <vdonnefort@google.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: maz@kernel.org, rostedt@goodmis.org, arnd@arndb.de,
-	linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev,
-	kernel-team@android.com
-Subject: Re: [PATCH v2] tracing: Generate undef symbols allowlist for
- simple_ring_buffer
-Message-ID: <abfN4OEbYVe5h-6H@google.com>
-References: <20260313105829.1214123-1-vdonnefort@google.com>
- <20260313163724.GA2573924@ax162>
+        d=1e100.net; s=20251104; t=1773658029; x=1774262829;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aRRRs4qimCTCE8Va18dDnA4j+s5nPgtPWnWIVGfsSG4=;
+        b=JjBF1mFhZ/Ftf5m46aPnEUx5MasbBVkKxRsrdd2Pyzv/F1wV0JICQermPX/5LtkWDP
+         oWDFG31WKr2wRobu1dAb5LGj2xVCYLnXvPX9RJLNKapKLeb2f8ySf20ozVZ5pa5UT6pW
+         Du/gc8R1AxTmrzlk9JzMwVlpQdNNKkOBYOKrBHrHmA6qxq5oWtUPQdFP+yefMU306OD7
+         V5BG1YSiIej/DnQQWFVLhF9KeCvOf84hQ3QA7D20mxsMtFgFbZQEJZ57riRwjnaQE7Aq
+         jTvNooXwWSjEzuLpe1W9nvu+OiyRMOhpowHYrY2v/moQnxs2xZiFz8OTPJ/t6NYM2GDa
+         1P6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXi/0lT8aqYatz8M0/St300m9xyx0DAulLnxwjcKhNwc57ArIXexV4nulhoeilDl6/GNgtBEUU=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyWZ9G9X2FrNFJX4OmV/KB1Nqc4lJiv0t6RcphfW0wRxLKNlAkS
+	fIY5ecVWep0idAht6ML/jd3cO3+dLzE+xRq/G2eI8aV3SPRQ2y68pGHjHVoBiRaZQWSzN4OxcYh
+	+cmp4bToAVa5EJhHL5k3ZuNOYANe0W/JIQnwu3n4k
+X-Gm-Gg: ATEYQzxns2HpjkNQZQDywCx9DJ/DnThmmD6mHzkR5QdGag2//HvntSaN9+CGoUvGXvp
+	Z2BQfdJA69VgqSAhWbFx6SeqEc8vyC5ufgytw72CI1jpdMlSu/nKDgKpe6YV4VzWRagoJidN9U0
+	druowff3nUV8g8bXFFoXuFiMp/SmMd2722zF9g2jGLyg5BU5AtUWhTu6R0e6Zn7CvHyxIj0qTab
+	T80O8wOuEIHpRlEYvwr/TSvq0i7uthUjDTQHt+iHxTCUgfFAbM4KfXdYqr8YbdWxlGSdDrqeM/K
+	P7lUeFrK
+X-Received: by 2002:ac8:5f0a:0:b0:509:25c5:42b4 with SMTP id
+ d75a77b69052e-5096aa55530mr23893861cf.13.1773658027808; Mon, 16 Mar 2026
+ 03:47:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260313163724.GA2573924@ax162>
+References: <20260310124933.830025-1-sebastianene@google.com> <20260310124933.830025-7-sebastianene@google.com>
+In-Reply-To: <20260310124933.830025-7-sebastianene@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Mon, 16 Mar 2026 10:46:30 +0000
+X-Gm-Features: AaiRm53ElvHYKjfLrl7nWl4xmBUKgFzAjMTvGSFCPR2uvvRXE46QBT-Rj-OBovQ
+Message-ID: <CA+EHjTy051kjdReuESmk3HpMsBEW=s3DxhJXa8vQJFHz--wG2Q@mail.gmail.com>
+Subject: Re: [PATCH 06/14] KVM: arm64: Add infrastructure for ITS emulation setup
+To: Sebastian Ene <sebastianene@google.com>
+Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	android-kvm@google.com, catalin.marinas@arm.com, dbrazdil@google.com, 
+	joey.gouly@arm.com, kees@kernel.org, mark.rutland@arm.com, maz@kernel.org, 
+	oupton@kernel.org, perlarsen@google.com, qperret@google.com, 
+	rananta@google.com, smostafa@google.com, suzuki.poulose@arm.com, 
+	tglx@kernel.org, vdonnefort@google.com, bgrzesik@google.com, will@kernel.org, 
+	yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 13, 2026 at 09:37:24AM -0700, Nathan Chancellor wrote:
-> On Fri, Mar 13, 2026 at 10:58:29AM +0000, Vincent Donnefort wrote:
-> > Compiler and tooling-generated symbols are difficult to maintain
-> > across all supported architectures. Make the allowlist more robust by
-> > replacing the harcoded list with a mechanism that automatically detects
-> > these symbols.
-> > 
-> > This mechanism generates a C function designed to trigger common
-> > compiler-inserted symbols.
-> > 
-> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
-> > 
-> > ---
-> > 
-> > Changes in v2:
-> > 
-> >   - Use filechk (Nathan)
-> >   - Removed deprecated extra-y (Nathan)
-> >   - Added simple_ring_buffer in allowlist (Nathan)
-> >   - Added memcpy() to generate more symbols (Nathan)
-> >   - Added __sancov 
-> > 
-> > diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-> > index beb15936829d..96627a909ecc 100644
-> > --- a/kernel/trace/Makefile
-> > +++ b/kernel/trace/Makefile
-> > @@ -136,17 +136,42 @@ obj-$(CONFIG_TRACE_REMOTE_TEST) += remote_test.o
-> >  # simple_ring_buffer is used by the pKVM hypervisor which does not have access
-> >  # to all kernel symbols. Fail the build if forbidden symbols are found.
-> >  #
-> > -UNDEFINED_ALLOWLIST := memset alt_cb_patch_nops __x86 __ubsan __asan __kasan __gcov __aeabi_unwind
-> > -UNDEFINED_ALLOWLIST += __stack_chk_fail stackleak_track_stack __ref_stack __sanitizer llvm_gcda llvm_gcov
-> > -UNDEFINED_ALLOWLIST += .TOC\. __clear_pages_unrolled __memmove copy_page warn_slowpath_fmt
-> > -UNDEFINED_ALLOWLIST += ftrace_likely_update __hwasan_load __hwasan_store __hwasan_tag_memory
-> > -UNDEFINED_ALLOWLIST += warn_bogus_irq_restore __stack_chk_guard
-> > -UNDEFINED_ALLOWLIST := $(addprefix -e , $(UNDEFINED_ALLOWLIST))
-> > +# undefsyms_base generates a set of compiler and tooling-generated symbols that can
-> > +# safely be ignored for simple_ring_buffer.
-> > +#
-> > +filechk_undefsyms_base = \
-> > +	echo '$(pound)include <linux/atomic.h>'; \
-> > +	echo '$(pound)include <linux/string.h>'; \
-> > +	echo '$(pound)include <asm/page.h>'; \
-> > +	echo 'static char page[PAGE_SIZE] __aligned(PAGE_SIZE);'; \
-> > +	echo 'void undefsyms_base(void *p, int n);'; \
-> > +	echo 'void undefsyms_base(void *p, int n) {'; \
-> > +	echo '	char buffer[256] = { 0 };'; \
-> > +	echo '	u32 u = 0;'; \
-> > +	echo '	memset((char * volatile)page, 8, PAGE_SIZE);'; \
-> > +	echo '	memset((char * volatile)buffer, 8, sizeof(buffer));'; \
-> > +	echo '	memcpy((void * volatile)p, buffer, sizeof(buffer));'; \
-> > +	echo '	cmpxchg((u32 * volatile)&u, 0, 8);'; \
-> > +	echo '	WARN_ON(n == 0xdeadbeef);'; \
-> > +	echo '}'
-> > +
-> > +$(obj)/undefsyms_base.c: FORCE
-> > +	$(call filechk,undefsyms_base)
-> > +
-> > +clean-files += undefsyms_base.c
-> > +
-> > +$(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
-> > +
-> > +targets += undefsyms_base.o
-> > +
-> > +UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sancov __sanitizer __tsan __ubsan __x86_indirect_thunk \
-> > +		      simple_ring_buffer \
-> > +		      $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
-> >  
-> >  quiet_cmd_check_undefined = NM      $<
-> > -      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(UNDEFINED_ALLOWLIST)`"
-> > +      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(addprefix -e , $(UNDEFINED_ALLOWLIST))`"
-> >  
-> > -$(obj)/%.o.checked: $(obj)/%.o FORCE
-> > +$(obj)/%.o.checked: $(obj)/%.o $(obj)/undefsyms_base.o FORCE
-> >  	$(call if_changed,check_undefined)
-> >  
-> >  always-$(CONFIG_SIMPLE_RING_BUFFER) += simple_ring_buffer.o.checked
-> > 
-> > base-commit: 33f2e266515717c4b2df585dadefa0525557726c
-> > -- 
-> > 2.53.0.851.ga537e3e6e9-goog
-> > 
-> 
-> Thanks! This is almost perfect for my tests, one final thing that I
-> noticed as a result of my full overnight builds. For ARCH=riscv (and
-> some other architectures from a quick grep), there is some logic in
-> their include/asm/string.h files to avoid FORTIFY_SOURCE when KASAN is
-> enabled for the entire build but not enabled for the particular file. As
-> undefsyms_base.o is not linked into vmlinux or modules, it does not
-> automatically have KASAN enabled.
-> 
->   $ cat allmod.config
->   CONFIG_GCOV_KERNEL=n
->   CONFIG_LTO_CLANG_THIN=y
->   CONFIG_WERROR=n
-> 
->   $ make -skj"$(nproc)" ARCH=riscv KCONFIG_ALLCONFIG=1 LLVM=1 mrproper allmodconfig kernel/trace/
->   Unexpected symbols in kernel/trace/simple_ring_buffer.o:
->                    U __fortify_panic
->                    U __write_overflow_field
->   ...
-> 
-> This cures that for me.
-> 
-> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-> index 260382f62dbf..55af887a90e2 100644
-> --- a/kernel/trace/Makefile
-> +++ b/kernel/trace/Makefile
-> @@ -164,6 +164,11 @@ $(obj)/undefsyms_base.o: $(obj)/undefsyms_base.c
->  
->  targets += undefsyms_base.o
->  
-> +# ensure KASAN is enabled to avoid logic that may disable FORTIFY_SOURCE when
-> +# KASAN is not enabled. undefsyms_base.o does not automatically get KASAN flags
-> +# because it is not linked into vmlinux.
-> +KASAN_SANITIZE_undefsyms_base.o := y
+Hi Sebastian,
+
+On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
+>
+> Share the host command queue with the hypervisor. Donate
+> the original command queue memory to the hypervisor to ensure
+> host exclusion and trap accesses on GITS_CWRITE register.
+
+GITS_CWRITE -> GITS_CWRITER
+
+> On a CWRITER write, the hypervisor copies commands from the
+> host's queue to the protected queue before updating the
+> hardware register.
+> This ensures the hypervisor mediates all commands sent to
+> the physical ITS.
+
+This commit message demonstrates why we should be careful about
+naming. This patch series is pretty complex, and having clear and
+consistent naming would help. What I mean is, here you're referring to
+protected vs host queue, earlier you were referring to shadow (which
+now I am not clear if it meant the host version or the hyp version).
+Maybe we could have a discussion about naming, but the most important
+part is consistency.
+
+>
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_pkvm.h             |   1 +
+>  arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  17 ++
+>  arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 203 ++++++++++++++++++
+>  3 files changed, 221 insertions(+)
+>  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+>
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index ef00c1bf7d00..dc5ef2f9ac49 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -28,6 +28,7 @@ struct pkvm_protected_reg {
+>         u64 start_pfn;
+>         size_t num_pages;
+>         pkvm_emulate_handler *cb;
+> +       void *priv;
+>  };
+>
+>  extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+> new file mode 100644
+> index 000000000000..6be24c723658
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
+> @@ -0,0 +1,17 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
 > +
->  UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sancov __sanitizer __tsan __ubsan __x86_indirect_thunk \
->  		      simple_ring_buffer \
->  		      $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
+> +#ifndef __NVHE_ITS_EMULATE_H
+> +#define __NVHE_ITS_EMULATE_H
+> +
+> +
+> +#include <asm/kvm_pkvm.h>
+> +
+> +
+> +struct its_shadow_tables;
+> +
+> +int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *priv_state,
+> +                               struct its_shadow_tables *shadow);
+> +
+> +void pkvm_handle_gic_emulation(struct pkvm_protected_reg *region, u64 offset, bool write,
+> +                              u64 *reg, u8 reg_size);
+> +#endif /* __NVHE_ITS_EMULATE_H */
+> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> index 0eecbb011898..4a3ccc90a1a9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> @@ -1,8 +1,75 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>
+>  #include <asm/kvm_pkvm.h>
+> +#include <linux/irqchip/arm-gic-v3.h>
+> +#include <nvhe/its_emulate.h>
+>  #include <nvhe/mem_protect.h>
+>
+> +struct its_priv_state {
+> +       void *base;
+> +       void *cmd_hyp_base;
+> +       void *cmd_host_base;
+> +       void *cmd_host_cwriter;
+> +       struct its_shadow_tables *shadow;
+> +       hyp_spinlock_t its_lock;
+> +};
+> +
+> +struct its_handler {
+> +       u64 offset;
+> +       u8 access_size;
+> +       void (*write)(struct its_priv_state *its, u64 offset, u64 value);
+> +       void (*read)(struct its_priv_state *its, u64 offset, u64 *read);
+> +};
+> +
+> +DEFINE_HYP_SPINLOCK(its_setup_lock);
+> +
+> +static void cwriter_write(struct its_priv_state *its, u64 offset, u64 value)
+> +{
+> +       u64 cwriter_offset = value & GENMASK(19, 5);
+> +       int cmd_len, cmd_offset;
+> +       size_t cmdq_sz = its->shadow->cmdq_len;
+
+Prefer RCT declaration order.
+
+> +
+> +       if (cwriter_offset > cmdq_sz)
+> +               return;
+
+Off-by-one:
++       if (cwriter_offset >= cmdq_sz)
+
+> +
+> +       cmd_offset = its->cmd_host_cwriter - its->cmd_host_base;
+> +       cmd_len = cwriter_offset - cmd_offset;
+> +       if (cmd_len < 0)
+> +               cmd_len = cmdq_sz - cmd_offset;
+
+This relies on unsigned underflow. cwriter_offset is u64. If
+cmd_offset > cwriter_offset, the result is a massive positive u64
+(e.g., 0xFFFFFFF...). This works but relies on implementation-defined
+behavior and is fragile. UBSAN might flag this, and if someone comes
+along and "cleans up" the variables by changing cmd_len and cmd_offset
+to size_t (unsigned 64-bit), which is the correct type for buffer
+lengths, cmd_len < 0 will never be true. It's better to explicitly
+handle the wrap-around using safe unsigned logic (which is the
+idiomatic way of doing it):
+
++       size_t cwriter_offset = value & GENMASK(19, 5);
++       size_t cmd_len, cmd_offset;
+...
++       if (cwriter_offset >= cmd_offset)
++              cmd_len = cwriter_offset - cmd_offset;
++       else
++              cmd_len = cmdq_sz - cmd_offset;
+
+Also, cwriter_offset should be validated to ensure it is 32-byte
+aligned, as the ITS commands are fixed-size packets.
+
+> +
+> +       if (cmd_offset + cmd_len > cmdq_sz)
+> +               return;
+> +
+> +       memcpy(its->cmd_hyp_base + cmd_offset, its->cmd_host_cwriter, cmd_len);
+
+I think we need a memory barrier (e.g., dsb(ishst)) after the memcpy
+to ensure the writes are visible to the hardware before ringing the
+GITS_CWRITER doorbell.
+
+> +
+> +       its->cmd_host_cwriter = its->cmd_host_base +
+> +               (cmd_offset + cmd_len) % cmdq_sz;
+> +       if (its->cmd_host_cwriter == its->cmd_host_base) {
+> +               memcpy(its->cmd_hyp_base, its->cmd_host_base, cwriter_offset);
+> +
+> +               its->cmd_host_cwriter = its->cmd_host_base + cwriter_offset;
+> +       }
+> +
+> +       writeq_relaxed(value, its->base + GITS_CWRITER);
+
+You should sanitize this to
+
+ +       writeq_relaxed(value & GENMASK(19, 5), its->base + GITS_CWRITER);
+
+because value contains the raw 64-bit value written by the host. While
+you extracted the offset correctly using GENMASK(19, 5), you are
+forwarding the raw value (including any garbage in the RES0 bits) to
+the physical hardware.
+
+> +}
+> +
+> +static void cwriter_read(struct its_priv_state *its, u64 offset, u64 *read)
+> +{
+> +       *read = readq_relaxed(its->base + GITS_CWRITER);
+> +}
+> +
+> +#define ITS_HANDLER(off, sz, write_cb, read_cb)        \
+> +{                                                      \
+> +       .offset = (off),                                \
+> +       .access_size = (sz),                            \
+> +       .write = (write_cb),                            \
+> +       .read = (read_cb),                              \
+> +}
+> +
+> +static struct its_handler its_handlers[] = {
+> +       ITS_HANDLER(GITS_CWRITER, sizeof(u64), cwriter_write, cwriter_read),
+> +       {},
+> +};
+>
+>  void pkvm_handle_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write,
+>                              u64 *reg, u8 reg_size)
+> @@ -21,3 +88,139 @@ void pkvm_handle_forward_req(struct pkvm_protected_reg *region, u64 offset, bool
+>                         writeq_relaxed(*reg, addr);
+>         }
+>  }
+> +
+> +void pkvm_handle_gic_emulation(struct pkvm_protected_reg *region, u64 offset, bool write,
+> +                              u64 *reg, u8 reg_size)
+> +{
+> +       struct its_priv_state *its_priv = region->priv;
+
+Due to arm64's  memory model, you must use
+smp_load_acquire(&region->priv) here to guarantee the struct fields
+(base, shadow, etc.) are fully visible before dereferencing them.
+
+(and a similar issue later on below... I'll point it out)
+
+> +       void __iomem *addr;
+> +       struct its_handler *reg_handler;
+
+Prefer RCT declaration order.
+
+
+> +
+> +       if (!its_priv)
+> +               return;
+
+This breaks bisectability. In this patch, you redirect the MMIO trap
+to pkvm_handle_gic_emulation, but the setup HVC
+(pkvm_init_gic_its_emulation) isn't called until a later patch.
+Therefore, its_priv is always NULL here, causing all host ITS accesses
+to be silently dropped. The device appears dead.
+
+ You must fall back to the passthrough handler if emulation is not yet
+initialized:
++       if (!its_priv) {
++               pkvm_handle_forward_req(region, offset, write, reg, reg_size);
++               return;
++       }
+
+at least until you setup the hvc...
+
+> +
+> +       addr = its_priv->base + offset;
+> +       for (reg_handler = its_handlers; reg_handler->access_size; reg_handler++) {
+> +               if (reg_handler->offset > offset ||
+> +                   reg_handler->offset + reg_handler->access_size <= offset)
+> +                       continue;
+> +
+> +               if (reg_handler->access_size & (reg_size - 1))
+> +                       continue;
+
+Is this deliberate? If access_size is 8 and reg_size is 4, 8 & 3 == 0,
+so it continues and allows the 8-byte handler to process a 4-byte
+write. Use explicit length matching (reg_handler->access_size !=
+reg_size), but there's more later...
+
+> +
+> +               if (write && reg_handler->write) {
+> +                       hyp_spin_lock(&its_priv->its_lock);
+> +                       reg_handler->write(its_priv, offset, *reg);
+
+The GIC specification requires support for 32-bit accesses to all
+GITS_* registers. If the host executes a 32-bit write, *reg contains
+only the 32-bit value. However, you do not pass reg_size to
+cwriter_write. The handler assumes it is a full 64-bit value, which
+will corrupt the other half of the emulated register with zeros. You
+need to implement Read-Modify-Write logic for sub-register accesses.
+
+> +                       hyp_spin_unlock(&its_priv->its_lock);
+> +                       return;
+> +               }
+> +
+> +               if (!write && reg_handler->read) {
+> +                       hyp_spin_lock(&its_priv->its_lock);
+> +                       reg_handler->read(its_priv, offset, reg);
+> +                       hyp_spin_unlock(&its_priv->its_lock);
+> +                       return;
+> +               }
+> +
+> +               return;
+> +       }
+> +
+> +       pkvm_handle_forward_req(region, offset, write, reg, reg_size);
+> +}
+> +
+> +static struct pkvm_protected_reg *get_region(phys_addr_t dev_addr)
+> +{
+> +       int i;
+> +       u64 dev_pfn = dev_addr >> PAGE_SHIFT;
+
+Please prefer RCT.
+
+> +
+> +       for (i = 0; i < PKVM_PROTECTED_REGS_NUM; i++) {
+> +               if (pkvm_protected_regs[i].start_pfn == dev_pfn)
+> +                       return &pkvm_protected_regs[i];
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static int pkvm_setup_its_shadow_cmdq(struct its_shadow_tables *shadow)
+> +{
+> +       int ret, i, num_pages;
+> +       u64 shadow_start_pfn, original_start_pfn;
+> +       void *cmd_shadow_va = kern_hyp_va(shadow->cmd_shadow);
+
+Please prefer RCT. There are multiple variables declared on a single
+line (int ret, i, num_pages;). Please untangle.
+
+> +
+> +       shadow_start_pfn = hyp_virt_to_pfn(cmd_shadow_va);
+> +       original_start_pfn = hyp_virt_to_pfn(kern_hyp_va(shadow->cmd_original));
+> +       num_pages = shadow->cmdq_len >> PAGE_SHIFT;
+> +
+> +       for (i = 0; i < num_pages; i++) {
+> +               ret = __pkvm_host_share_hyp(shadow_start_pfn + i);
+> +               if (ret)
+> +                       goto unshare_shadow;
+> +       }
+> +
+> +       ret = hyp_pin_shared_mem(cmd_shadow_va, cmd_shadow_va + shadow->cmdq_len);
+> +       if (ret)
+> +               goto unshare_shadow;
+> +
+> +       ret = __pkvm_host_donate_hyp(original_start_pfn, num_pages);
+> +       if (ret)
+> +               goto unpin_shadow;
+> +
+> +       return ret;
+> +
+> +unpin_shadow:
+> +       hyp_unpin_shared_mem(cmd_shadow_va, cmd_shadow_va + shadow->cmdq_len);
+> +
+> +unshare_shadow:
+> +       for (i = i - 1; i >= 0; i--)
+
+Please use the standard while (i--) idiom for cleaner rollback loops.
+
+> +               __pkvm_host_unshare_hyp(shadow_start_pfn + i);
+> +
+> +       return ret;
+> +}
+> +
+> +int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *host_priv_state,
+> +                               struct its_shadow_tables *host_shadow)
+> +{
+> +       int ret;
+> +       struct its_priv_state *priv_state = kern_hyp_va(host_priv_state);
+> +       struct its_shadow_tables *shadow = kern_hyp_va(host_shadow);
+> +       struct pkvm_protected_reg *its_reg;
+> +
+> +       hyp_spin_lock(&its_setup_lock);
+
+You're not releasing this lock on any of the error paths. Please add
+err_unlock and goto err_unlock to release the spinlock.
+
+> +       its_reg = get_region(dev_addr);
+> +       if (!its_reg)
+> +               return -ENODEV;
+> +
+> +       if (its_reg->priv)
+> +               return -EOPNOTSUPP;
+
+I think you need to add a check:
+
++       if (!PAGE_ALIGNED(priv_state) || !PAGE_ALIGNED(shadow))
++              return -EINVAL;
+
+since __pkvm_host_donate_hyp() expects page-aligned addresses.
+
+> +       ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn(priv_state), 1);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn(shadow), 1);
+> +       if (ret)
+> +               goto err_with_state;
+> +
+> +       ret = pkvm_setup_its_shadow_cmdq(shadow);
+> +       if (ret)
+> +               goto err_with_shadow;
+> +
+> +       its_reg->priv = priv_state;
+
+Related to above, please use smp_store_release(&its_reg->priv,
+priv_state); to prevent the compiler and CPU from reordering the
+struct initialization below this pointer assignment, which would
+expose uninitialized memory to the lockless reader in the trap
+handler.
+
+Cheers,
+/fuad
+
+
+
+
+> +
+> +       hyp_spin_lock_init(&priv_state->its_lock);
+> +       priv_state->shadow = shadow;
+> +       priv_state->base = __hyp_va(dev_addr);
+> +
+> +       priv_state->cmd_hyp_base = kern_hyp_va(shadow->cmd_original);
+> +       priv_state->cmd_host_base = kern_hyp_va(shadow->cmd_shadow);
+> +       priv_state->cmd_host_cwriter = priv_state->cmd_host_base;
+> +
+> +       hyp_spin_unlock(&its_setup_lock);
+> +
+> +       return 0;
+> +err_with_shadow:
+> +       __pkvm_hyp_donate_host(hyp_virt_to_pfn(shadow), 1);
+> +err_with_state:
+> +       __pkvm_hyp_donate_host(hyp_virt_to_pfn(priv_state), 1);
+> +       return ret;
+> +}
 > --
-> 
-> With that addressed:
-> 
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> Tested-by: Nathan Chancellor <nathan@kernel.org>
-
-I've just sent a v3 with all that. I have tested locally with allmodconfig and
-many architectures with both clang and gcc.
-
-Thanks a lot for your help!
-
---
-Vincent
-
-> 
-> Cheers,
-> Nathan
+> 2.53.0.473.g4a7958ca14-goog
+>
