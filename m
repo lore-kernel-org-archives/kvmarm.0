@@ -1,54 +1,54 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEEC3D0926
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA793D3305
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 17:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773682539; cv=none; b=Yj4cNVh9HERGxSUD4VnxKYN8xc50MZ3v2RHK1pr5/ItlWOMovTEcHG0Gudap8QJN5Cru9YYAJo75PxtGWbp69YCI95PSgKg5jf3jwqdc6OCCUZ3d7gzRUJ5hNKfYuQeZEqB254j9uy+jqk1bTw16n+7WfgAEMzpo6Nf+iAL9Es8=
+	t=1773682541; cv=none; b=m+yflS2SxdYmLtnOPOxfFMOYFdgObsrCrfhCQApHkZ5L1SCgDYDL25s92k3W5HbfO15HibYf6/R8JJF7ckWilh3cDP72gCqfx+ot5mwnee8JqKrXGRC2rWP6xXl+CW8MoWBOa4ApE6sXnBPqkiQsIdGzn+A3aFo1lgxs533iOUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773682539; c=relaxed/simple;
-	bh=iChkBxKJtcFVZgyq0ui0SMkPSn7JUQJQi+VMec4bY8M=;
+	s=arc-20240116; t=1773682541; c=relaxed/simple;
+	bh=yNUIHO2NMw8B5EFVSRGekqdFjiqxXTiNYvgnQBnltj4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nWHsKoAep3t8D7YrE5YqqDGk0S7Rv40w+MGOQJRv+OzMW6WAPpSOBqKDT4nhvbou0hy56YJvU2Fj9SGAzNJjCH6QHOAG93pkJ/HleOX/uCkFOZ1VwqqQ023RfVJV4/EB+tETzZYDSCrfdKJj//sfLdddSTB2SnOxkArD76F4QaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCJ9/qbe; arc=none smtp.client-ip=209.85.221.73
+	 To:Cc:Content-Type; b=Rcg9VmU7IdnpdWc9WCES3oEOJyQnXb9PNxdp7lfApGjueq6pq0bBhkofvAaxKSjREMjJi5g5Ba1Qxz89FMk2XshypUBnAeQswekUUmSO/SnUgZZCdBgNs8P5R8v25s6LLJ79n/K1Vh+uyzdRi9H9sJPoxOW8z5dYyGgVOPgpb3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cJL7sqbl; arc=none smtp.client-ip=209.85.128.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tabba.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCJ9/qbe"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-43b42cd4becso1005668f8f.1
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cJL7sqbl"
+Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-485350666bfso39198275e9.3
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 10:35:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773682536; x=1774287336; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773682537; x=1774287337; darn=lists.linux.dev;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aVMNYqgbLtglfFJK2IfbXVz92dSXKpE2nwANbOIprc=;
-        b=GCJ9/qbeQ9HDaFxqCQkD6EIu4ELwgUsqQOFpM3yBBT3LwjyLrc3b+iTT/B1oIiPzHt
-         /kxFqIyE/UO1118IqiPL21bELoRRzG0jhrF9MZ442MLwjfjS2AxVFSKbevNsm7Xpg6OM
-         s3hX48vEefCgrrxnRYeROJCHqfJ4H+lxcxHqpJJds7bEQkE6i88Cj+dqlVBr0pqfhCqg
-         ecfNz+seGIeGamCnSC2ZfDZIZd0X2u0AE5D2Yt1saaXMHT5BcQGJRW247u/OI75bKXG+
-         gW9nLbDlQ5SvrWFEsIW7Dw0oM/T35nBKhVeiVtHECFPD1VyIKNOsl1QO5ucceEHcIfSN
-         bIxA==
+        bh=cfzLIsn2Q20JghpCHqLQPcreo5Zv/pRgRX5lZKoPSE8=;
+        b=cJL7sqblowVMXJVe5tHDgxY5uccMH+tzcdN/LEZ07p7ZRASByn+UgbHa9XXQlUJlRm
+         HoLDOo0v2hEaeCbl4n/5lcfPPsF15KI8SDfzBAIkffjdLckNTvWlLRlQJ8hrELhLQ1/x
+         A2HqFTy6J3MwaJ+16ustVjTsuAC/hZC//SWfdcSE7jKbccH9SMfrNVa74e8qw862OKqi
+         EHPaf2h9HiFfxZAwdDGCk4M1ACg5leap0b3Aou/XUJO6DOGk7RxVaRz7x3ljPrqdcPba
+         bGswZcu/e0XqeEyeth1bkjgB1GEkvNKZBvn0CZdpI5KTIhBZfUBVBg6GZEHFWh0y3Ka5
+         25eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773682536; x=1774287336;
+        d=1e100.net; s=20251104; t=1773682537; x=1774287337;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2aVMNYqgbLtglfFJK2IfbXVz92dSXKpE2nwANbOIprc=;
-        b=h8pEJkgqZ8mXVz2uOkZ+QmKMnB7FF/46BDIkbT52jlCEazq0ha4szSOCUzIAkVS3he
-         NOH6tyQIR/ggUbpulklSeMyZ9RSqz/HjVqvlhVTlnC6woazAX/xJ9XIKq9cWGBo19dc8
-         mJdmSxoMoc/PH3VyS5keJeDtr6FphbZvbzgL9sE4fmkoPMrRKhxFPzv5WhJ2yGCo20Ka
-         By5LodubaJ8TI/IkXtbZXCnne4kvpX5J9w+/QXw1Yav9UhqHhbBftyLS/I6GQe74E2S+
-         vd4Q6apZxAST+MAwBKVGlAQ49oo198+8FAQqyWaKsgEJAfrd37p7ekG+tui9KOvj3LVc
-         +c4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXhwNciEOlG1qgF9hQLSZoNXnhcK4bsqwjFpjYN7Uvdh059O2XhrYOg54LQ15MXEMkmN/bXGsQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzRvbClULVsz/ex3VzsGcUisHgIOhahXahOlPf/QEgtlM0SRF42
-	a5ObNFd/8AmIEyovCLpHUh71LXbeLx0vy4wmXglqhSD20N+SMot+Y2/Acn/K+7Kq2mvP+vSKh1e
-	SlQ==
-X-Received: from wrbfu19.prod.google.com ([2002:a05:6000:25f3:b0:43b:458d:a311])
- (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5d09:0:b0:439:c153:ae3d
- with SMTP id ffacd0b85a97d-43b498127f3mr1058497f8f.6.1773682536058; Mon, 16
- Mar 2026 10:35:36 -0700 (PDT)
-Date: Mon, 16 Mar 2026 17:35:28 +0000
+        bh=cfzLIsn2Q20JghpCHqLQPcreo5Zv/pRgRX5lZKoPSE8=;
+        b=fFtANtvCvR7ckxYGPaTja0VzrESxGR7R23QTHbahCsL/quWI1Pqspp3G4G7r+yapIU
+         xtEgmkjlHxjYtzTT4ReBZy/+Hk9rPvu3P6+RxJx5ARUBpOp2kU/2Ysk252OOeJR3AGIK
+         SUVXdJ3epvpWqyRNHMda7eHRw/SG5pa2pryqGZ5TZH6ClPRQaKhbnB45VeCrCYaKZQgH
+         YGRWTtfwwwMTakVwCfrNrrjM9h9a2gE6r8JMd6y8VNAJDtgUUblQXRXFe3uOO5PC9wfd
+         Tw+BKC/VLFd25542EDkTAK7CQF9SolYQIN9KxTUaAogdpr9fWic+akOr4F2BZSLsJ+Jp
+         VFYw==
+X-Forwarded-Encrypted: i=1; AJvYcCX76xhnOBjHCiYSYMF8galPK3RwQI/e73/l0b1vego7HTMQA2ljned3lj18bX+VeRIONJyrLQ8=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyGyckdcjf6wj8lQO4izbeOaYl0+pZXgLbR9cJ3O7haTZqSEiCG
+	FtZ5aqEqQ56NARQv04lFVeo/JLKLui2RWuuhDEpFtzyrdh0L/6fmdWdHXdsHUOd+VS7medyFSz3
+	AwQ==
+X-Received: from wmbh3.prod.google.com ([2002:a05:600c:a103:b0:485:343f:9fb3])
+ (user=tabba job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4f54:b0:485:49c5:8eb7
+ with SMTP id 5b1f17b1804b1-485566fd0eamr230387435e9.22.1773682537346; Mon, 16
+ Mar 2026 10:35:37 -0700 (PDT)
+Date: Mon, 16 Mar 2026 17:35:29 +0000
 In-Reply-To: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -58,8 +58,8 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 Mime-Version: 1.0
 References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 X-Mailer: b4 0.14.3
-Message-ID: <20260316-tabba-el2_guard-v1-7-456875a2c6db@google.com>
-Subject: [PATCH 07/10] KVM: arm64: Use scoped resource management in arm.c
+Message-ID: <20260316-tabba-el2_guard-v1-8-456875a2c6db@google.com>
+Subject: [PATCH 08/10] KVM: arm64: Use guard(spinlock) in psci.c
 From: Fuad Tabba <tabba@google.com>
 To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
@@ -69,172 +69,72 @@ To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly 
 Cc: Fuad Tabba <tabba@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-Migrate manual spin_lock() calls managing mp_state_lock and manual
-mutex_lock() calls managing kvm->arch.config_lock to use the
-guard(spinlock) and guard(mutex) macros.
+Migrate manual spin_lock() and spin_unlock() calls managing
+the vcpu->arch.mp_state_lock to use the guard(spinlock) macro.
 
-This eliminates manual unlock calls on early return paths and
-simplifies the vCPU suspend/resume control flow.
+This eliminates manual unlock calls on return paths and simplifies
+error handling during PSCI calls by replacing unlock goto labels
+with direct returns.
 
-Change-Id: Ifcd8455d08afa5d00fc200daaa3fb13f6736e6ed
+Change-Id: Iaf72da18b18aaec8edff91bc30379bed9dd04b2b
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/arm.c | 53 ++++++++++++++++++++--------------------------------
- 1 file changed, 20 insertions(+), 33 deletions(-)
+ arch/arm64/kvm/psci.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 410ffd41fd73..017f5bfabe19 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -274,17 +274,15 @@ static void kvm_destroy_mpidr_data(struct kvm *kvm)
- {
- 	struct kvm_mpidr_data *data;
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index 3b5dbe9a0a0e..04801f8b596a 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -62,7 +62,6 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	struct vcpu_reset_state *reset_state;
+ 	struct kvm *kvm = source_vcpu->kvm;
+ 	struct kvm_vcpu *vcpu = NULL;
+-	int ret = PSCI_RET_SUCCESS;
+ 	unsigned long cpu_id;
  
--	mutex_lock(&kvm->arch.config_lock);
--
--	data = rcu_dereference_protected(kvm->arch.mpidr_data,
--					 lockdep_is_held(&kvm->arch.config_lock));
--	if (data) {
--		rcu_assign_pointer(kvm->arch.mpidr_data, NULL);
--		synchronize_rcu();
--		kfree(data);
-+	scoped_guard(mutex, &kvm->arch.config_lock) {
-+		data = rcu_dereference_protected(kvm->arch.mpidr_data,
-+						 lockdep_is_held(&kvm->arch.config_lock));
-+		if (data) {
-+			rcu_assign_pointer(kvm->arch.mpidr_data, NULL);
-+			synchronize_rcu();
-+			kfree(data);
-+		}
- 	}
--
--	mutex_unlock(&kvm->arch.config_lock);
- }
- 
- /**
-@@ -738,9 +736,8 @@ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
- 
- void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
- {
--	spin_lock(&vcpu->arch.mp_state_lock);
-+	guard(spinlock)(&vcpu->arch.mp_state_lock);
- 	__kvm_arm_vcpu_power_off(vcpu);
--	spin_unlock(&vcpu->arch.mp_state_lock);
- }
- 
- bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
-@@ -773,7 +770,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- {
- 	int ret = 0;
+ 	cpu_id = smccc_get_arg1(source_vcpu);
+@@ -78,14 +77,13 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	if (!vcpu)
+ 		return PSCI_RET_INVALID_PARAMS;
  
 -	spin_lock(&vcpu->arch.mp_state_lock);
 +	guard(spinlock)(&vcpu->arch.mp_state_lock);
- 
- 	switch (mp_state->mp_state) {
- 	case KVM_MP_STATE_RUNNABLE:
-@@ -789,8 +786,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 		ret = -EINVAL;
- 	}
- 
--	spin_unlock(&vcpu->arch.mp_state_lock);
++
+ 	if (!kvm_arm_vcpu_stopped(vcpu)) {
+ 		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+-			ret = PSCI_RET_ALREADY_ON;
++			return PSCI_RET_ALREADY_ON;
+ 		else
+-			ret = PSCI_RET_INVALID_PARAMS;
 -
- 	return ret;
- }
- 
-@@ -828,11 +823,11 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
- 	u64 aff_set = 0, aff_clr = ~0UL;
- 	struct kvm_vcpu *vcpu;
- 
--	mutex_lock(&kvm->arch.config_lock);
-+	guard(mutex)(&kvm->arch.config_lock);
- 
- 	if (rcu_access_pointer(kvm->arch.mpidr_data) ||
- 	    atomic_read(&kvm->online_vcpus) == 1)
--		goto out;
-+		return;
- 
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		u64 aff = kvm_vcpu_get_mpidr_aff(vcpu);
-@@ -857,7 +852,7 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
- 				    GFP_KERNEL_ACCOUNT);
- 
- 	if (!data)
--		goto out;
-+		return;
- 
- 	data->mpidr_mask = mask;
- 
-@@ -869,8 +864,6 @@ static void kvm_init_mpidr_data(struct kvm *kvm)
+-		goto out_unlock;
++			return PSCI_RET_INVALID_PARAMS;
  	}
  
- 	rcu_assign_pointer(kvm->arch.mpidr_data, data);
--out:
--	mutex_unlock(&kvm->arch.config_lock);
- }
+ 	reset_state = &vcpu->arch.reset_state;
+@@ -113,9 +111,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
+ 	kvm_vcpu_wake_up(vcpu);
  
- /*
-@@ -944,9 +937,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
- 			return ret;
- 	}
- 
--	mutex_lock(&kvm->arch.config_lock);
-+	guard(mutex)(&kvm->arch.config_lock);
- 	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
--	mutex_unlock(&kvm->arch.config_lock);
- 
- 	return ret;
- }
-@@ -1585,29 +1577,26 @@ static int __kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- {
- 	unsigned long features = init->features[0];
- 	struct kvm *kvm = vcpu->kvm;
--	int ret = -EINVAL;
-+	int ret;
- 
--	mutex_lock(&kvm->arch.config_lock);
-+	guard(mutex)(&kvm->arch.config_lock);
- 
- 	if (test_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags) &&
- 	    kvm_vcpu_init_changed(vcpu, init))
--		goto out_unlock;
-+		return -EINVAL;
- 
- 	bitmap_copy(kvm->arch.vcpu_features, &features, KVM_VCPU_MAX_FEATURES);
- 
- 	ret = kvm_setup_vcpu(vcpu);
- 	if (ret)
--		goto out_unlock;
-+		return ret;
- 
- 	/* Now we know what it is, we can reset it. */
- 	kvm_reset_vcpu(vcpu);
- 
- 	set_bit(KVM_ARCH_FLAG_VCPU_FEATURES_CONFIGURED, &kvm->arch.flags);
- 	vcpu_set_flag(vcpu, VCPU_INITIALIZED);
--	ret = 0;
 -out_unlock:
--	mutex_unlock(&kvm->arch.config_lock);
--	return ret;
-+	return 0;
- }
- 
- static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-@@ -1674,15 +1663,13 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	/*
- 	 * Handle the "start in power-off" case.
- 	 */
--	spin_lock(&vcpu->arch.mp_state_lock);
-+	guard(spinlock)(&vcpu->arch.mp_state_lock);
- 
- 	if (power_off)
- 		__kvm_arm_vcpu_power_off(vcpu);
- 	else
- 		WRITE_ONCE(vcpu->arch.mp_state.mp_state, KVM_MP_STATE_RUNNABLE);
- 
 -	spin_unlock(&vcpu->arch.mp_state_lock);
--
- 	return 0;
+-	return ret;
++	return PSCI_RET_SUCCESS;
  }
+ 
+ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+@@ -176,9 +172,8 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type, u64 flags)
+ 	 * re-initialized.
+ 	 */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+-		spin_lock(&tmp->arch.mp_state_lock);
+-		WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
+-		spin_unlock(&tmp->arch.mp_state_lock);
++		scoped_guard(spinlock, &tmp->arch.mp_state_lock)
++			WRITE_ONCE(tmp->arch.mp_state.mp_state, KVM_MP_STATE_STOPPED);
+ 	}
+ 	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
  
 
 -- 
