@@ -1,171 +1,130 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA1B2874FA
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 20:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773693223; cv=pass; b=YX0RpUhLKZBsC52bzIhRhji/PKS2tXD779LKt6/PRWzjKVdQKcPDCUOP4X98gqKVBOWV+mGfQ5Ng59u+3v+Hfshc9z6ggr/TWr9gSoLCClzfzO9sYRkUSUuPOe71gvmZ+8A4jmm5we6UbvAmgzXAccAVH4cAQHMUfy1fQveYRLQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773693223; c=relaxed/simple;
-	bh=B8A+2MGbRQPZNOJ0F8ZpYPwo8bEsDV7aM2jQ2oYcmPA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hc6uqQYHNlay4Qh2h3wIIKvEUTlW7d80LENXNsN6qGUkfOrDpqVwaKZig4RcvM9irPBtLwV/lHqXGw25S8fVJiqWApKaddPNjWr06wWyJnAnwBmfyiZiBQd2kGRCMwBRzbWv3pCnT1GX3vY+H8pRZw89unaVpSEURpaVCSCGpzM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gyd1iJzr; arc=pass smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BA72264AB
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 20:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773694067; cv=none; b=nhRlDuKf6BOJTr+vjGqAGQypu6OmjvB1a4UHJ6AVjeWuV22vusyGCt8/lEBB/n1bHVZMELXXqiPMORIFhyPKIWHAS1uGL8Qbvp5n3HgnPbIzqIiALeT+uLRjjnqBSdm6LVQtwjsCxoae8IQht9F3U+e7fLdc69p2TURtwokzKR0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773694067; c=relaxed/simple;
+	bh=AX9fT2oSg517IceT/q8HDTzyQi5c1ne+n3RBp9mWc7Q=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=eRWJHaHsZLAbaFsDg0w2AXGRqLz5Xd+z4yLZVuPdP5/1HmR8QK3CfTpQ/fuGPNwAmkJJargfHRuxCOfDLJGhey4aeNvPHsQFLTLi3ZM/QYlj7FUo8cDZIGomjiegRNyJXsrgMKiftZNY58fLmhIvSG2UvQxNv6/7cR25pfJtnGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=MNxTpFZ/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ITAA7F2f; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gyd1iJzr"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-509062d829dso43341cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 13:33:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773693221; cv=none;
-        d=google.com; s=arc-20240605;
-        b=hVHbfU0ItAxKE+CxsKj6NGsSqddvsbNKGIrga2FkdT5/fxGxnBvUD/ibhZln8J0SC0
-         rxq14NzUwDsJ6Co/Uxe8+5offIOuSW/UTx0Vi03k7I8tYgz5J9IRpukDA/6q3iqK/f1f
-         uCxgIVcuA2IIj04t7sTY8v1VD4RJdgHgMeab67tSBbUS3ASlpxPqqE3mHdFPkOKI9QO2
-         VPosvWnI6dAh2mZaupFIdBSmxe/RbP3KIlUbBXb98MIUYQjQ2smXvpiaVZDXZHSU4Dc6
-         aUchsSNQmFblX9ngYV9MBL7q5Yy528gs4yJsmEst9U18ol/z8CEDZM41Eip8XtTJKSs7
-         4sOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=XCP75YBSVNyiC0SMnuy0JEeD8LPAxxpS81/985sICXA=;
-        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
-        b=cyPB5esuDT/rTBmRuuY7naR7Ah3SEyuhN8gdnju4i5hzq3x2KJK5CfcwMIKbdacK5F
-         LjyCFlP+0VYtTKshm7gy2n6T21f5UwhgcaZkKRVYu8/FML6bCDJnKPJdnVn8KIs2gwsT
-         qzh46/0Pkj2AxSuVT0zClrQ7lWt1SGWWNCx4PzyjZH+6ECf1dlwkZLtdIOt1Hdbu6sZX
-         pKtmShugM7h5qlxwP7rgZS/Dkyih7Y2ZZHn2U0HE7GlJ6ZXAWWQHcSnE38pUeaylTOcX
-         rseMppJ4KBpknWkHXJBCQ4bP1M74T4BupE3jix/lxyodi4eKOo21RylG98oDYQp5Si2A
-         tUGg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773693221; x=1774298021; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCP75YBSVNyiC0SMnuy0JEeD8LPAxxpS81/985sICXA=;
-        b=gyd1iJzrE7vEKhjE0ECNOKkFKsLEK4FhBpc3jnXd5+xzWzf6fNsDAZ/qEHdJzuYcbN
-         hzAlI1Tfj6lfGAu/+B41oVkGjS0BlDBP4AugIh8V71dpma8mdFgoGKKjKwi4uFfCiNJa
-         fP6HbTvhWNItw84Y5z2c1tYSQtL6t/MRWh9pvyfr9I9+KBCK5M0jlRC+KscvmKnrWWNd
-         o76kJDNnR/zXohpI3atdQgRorMJRKbXfWC/5G7mLwDY6vFMnJNp0MfpQdBskrqPQ6D2r
-         ggMWtfuojYeiv9D7VFIc7z/Ytn+0jMXRPW+vCGwUQDK8SkS3iq4QOs5SeLbBGjpPLdRk
-         Dj9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773693221; x=1774298021;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCP75YBSVNyiC0SMnuy0JEeD8LPAxxpS81/985sICXA=;
-        b=hzjCLuSbNrrhXqdcS8OJLpoV1unK1GKjEZApRG1MjPva58ovfijGK7Y1IH8ZZLTwXD
-         CUad09rtrQ/Tyc9LTNgV8TeaJhIT01cW7NdCJreSBJiGRH5Dth0A4q8IH5oHGt4g9Sl2
-         ThTtj2ueR2oVMim/aM3AhTlH8mmnaZT3Xm2q2XsXE8A7sPLF6TgYzdrCeZAISPADu2TR
-         sm1KJnY4G+pLg454GGSicHurrKXMwhHCZrjgiPqGBAgQEd9B9geGUNZJr2dmeV3PKTQg
-         1zX2cYr7a/jn8yZPA2qjlV7SScteBmpplHM2zpCMb/csrxbsnx9NOHiYWF0l6cbc3iee
-         xsUw==
-X-Gm-Message-State: AOJu0YxIdaoT/6haBF+s697J/LOWYADjxdabAHTaYyLlybm9+5xFuLPt
-	s0OpwzdppRYIIgk0Q7WDXAL6JndHxPLwpue/yWy2/1TFGI2kyXUb8w1hJkW+LA5L1Faoz8StCJ3
-	veKJ63M1NSif2TxSz+P6LpbM0+v63xBva5D5KAa7V
-X-Gm-Gg: ATEYQzxbvXQvbbJiK0MKG3CASap9YQiPK9kfAtT/LnxoD3jwyIOK0vBfW5DOwOe7inD
-	Ig5QZeNUROl5B24AL54RavFBjYhvjS3K6a3gs8MGecE1j6ifk8NVXukJBBBO1jSxgdqB3bOs4Y/
-	yGmgYzGUy8mxnIeQoFEWL0pbrWe8Ck4Eunqb/M+OEBBXYqwlwrWw6Yp24xFOXlIt9jR310OB4Je
-	N7Ht+yMJnGW9TiVgjI3qo+VDPifqg/r9zTJ3E+IzE+ejE3SPna0S7bPMZZRIcj12jkdalqRqFsA
-	WVji8L+i
-X-Received: by 2002:a05:622a:144f:b0:501:4eae:dbfc with SMTP id
- d75a77b69052e-5099ae2a155mr787131cf.5.1773693220799; Mon, 16 Mar 2026
- 13:33:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="MNxTpFZ/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ITAA7F2f"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id A03757A025C;
+	Mon, 16 Mar 2026 16:47:44 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Mon, 16 Mar 2026 16:47:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1773694064;
+	 x=1773780464; bh=FNSB0OmNCsHutd2/rm2/wsbBMecbJTrq7L6nBbt+bSg=; b=
+	MNxTpFZ/UsS4p60QstXXz9zhL8tXiMjXrrxYCIMNv5qSjOh2HAZXpMTBs0HPKwt3
+	rsgS0VwcWWz+3KK3oidoh8zRjROIqsjcJgHT0FeQE9pgulX2OckHJo60LO+nUvbn
+	N2X0hNfDXiI51Gt+gPGFbJcoSUg87uf3minDBK2tfjgDWhnS1lJXR2LatR5L96xE
+	XW8alxaUrjQ6sAZ4CXD94/X2roVpLKqn3RW1p56VUQ1hxACbAyhSaYY2Mt2uilnJ
+	5Ng+TDXOockgtc5vDAZa3RdHMqhZoZYG/Mn5zF9E37QqK+pdxA2L+2FkMWhKFVz8
+	TE2vm1D0TYak0Sd5d7nVEg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1773694064; x=
+	1773780464; bh=FNSB0OmNCsHutd2/rm2/wsbBMecbJTrq7L6nBbt+bSg=; b=I
+	TAA7F2flc7KsEeUFMlwUgq5CgMkC76f6G5WPOOafPAfewHR440o2gqjWfjPP/Ii8
+	/7mCEsfOtYo6z3lWdDp78fRi3P6j3B5L1DZzLwk+8VNhZPkMY/SKwKdsJAiHOHH/
+	KK3aK+fBYczeSQHIB0jvSbkcOarQBv+aDzsYuFgL3l+7So+GoIXSApUW6K/6audK
+	OByJ4zdhanbRLj0NDxkhL5FkqRepyUg09QBStVIeOGWkL9WpSN9tTrzhvChk6Y0b
+	pvr6WZtgGP2xJP8vJCVg/ZIng12BbwyxiB8KFAOGwgvtGLC2YXx/+yTM7aFutoUr
+	9+RCh/zvJ/HfS/YGi2V5Q==
+X-ME-Sender: <xms:cGy4afv8Gogyadhbv7Envm_s5pL2rIflRDoyFVAzVSJahJUVbOummA>
+    <xme:cGy4abQMuu_imXhut-goANbNaoLU9TP_yJ4u78QfivKYhgPDnIDiCIJEs9hWotuGN
+    nfJ4uudQ8U1PtC9A0axJBkSDoq5mfh5Tx1BMNrpH28AJqu-GHKfzZQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvleelfeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhesrghnughrohhiugdrtghomhdprhgtph
+    htthhopehrohhsthgvughtsehgohhoughmihhsrdhorhhgpdhrtghpthhtohepvhguohhn
+    nhgvfhhorhhtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehmrgiisehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepkhhvmhgrrhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinh
+    hugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:cGy4aZVtLlik54fOeczX4BXl1Dm-yBv9WsmWlhllthZLp4n0xX5ZVA>
+    <xmx:cGy4aTrm4c-dBFmUXp8Iv_Xzg9Az5z0N6URDfHAdOfTSUHc2F0qy1w>
+    <xmx:cGy4aVR-WXV3HJL_mDHyIRLqDDeT4psDWxcstcImxuUjiQb5MHY4Lg>
+    <xmx:cGy4ad08czohvKFatwdo7CzH-18aElXO5peJTL98E542jFFzqy-fjA>
+    <xmx:cGy4adHirsLuOzt9gGs5gYgN8oJWJR44hYSIpJSZ1Gr6VGI1YWynnm3T>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id EF49670006A; Mon, 16 Mar 2026 16:47:43 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260316175451.1866175-1-maz@kernel.org> <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
-In-Reply-To: <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 16 Mar 2026 20:33:03 +0000
-X-Gm-Features: AaiRm52rszfavVOV2FIeKmV442WE5Yr4f6pDh3yfG162HvC0brQIKx6ADDRQdIk
-Message-ID: <CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com>
-Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+X-ThreadId: AI8tLlWNtG-B
+Date: Mon, 16 Mar 2026 21:47:23 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Vincent Donnefort" <vdonnefort@google.com>,
+ "Marc Zyngier" <maz@kernel.org>
+Cc: "Steven Rostedt" <rostedt@goodmis.org>,
+ "Nathan Chancellor" <nathan@kernel.org>, linux-trace-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev, kernel-team@android.com
+Message-Id: <6d40c8c0-f00a-4031-bd94-7c0a417eb0cf@app.fastmail.com>
+In-Reply-To: <20260316092845.3367411-1-vdonnefort@google.com>
+References: <20260316092845.3367411-1-vdonnefort@google.com>
+Subject: Re: [PATCH v3] tracing: Generate undef symbols allowlist for
+ simple_ring_buffer
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Mon, 16 Mar 2026 at 20:26, Fuad Tabba <tabba@google.com> wrote:
+On Mon, Mar 16, 2026, at 10:28, Vincent Donnefort wrote:
+> Compiler and tooling-generated symbols are difficult to maintain
+> across all supported architectures. Make the allowlist more robust by
+> replacing the harcoded list with a mechanism that automatically detects
+> these symbols.
 >
-> Hi Marc,
+> This mechanism generates a C function designed to trigger common
+> compiler-inserted symbols.
 >
-> On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Piqued by Fuad's initial set of patches[1] splitting user_mem_abort()
-> > into more "edible" functions, I've added my on take on top of it with
-> > a few goals in mind:
-> >
-> > - contextualise the state by splitting kvm_s2_fault into more granular
-> >   structures
-> >
-> > - reduce the amount of state that is visible and/or mutable by any
-> >   single function
-> >
-> > - reduce the number of variable that simply cache state that is
-> >   already implicitly available (and often only a helper away)
-> >
-> > I find the result reasonably attractive, and throwing it at a couple
-> > of machines didn't result in anything out of the ordinary.
-> >
-> > For those interested, I have stashed a branch at [2], and I'd
-> > appreciate some feedback on the outcome.
-> >
-> > [1] https://lore.kernel.org/all/20260306140232.2193802-1-tabba@google.com/
-> > [2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=hack/user_mem_abort-rework
->
-> The series in hack/user_mem_abort-rework is different from this one.
-> Here are the first few patches:
+> Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> Tested-by: Nathan Chancellor <nathan@kernel.org>
 
-And I just realized it's because they're based on _my_ patches ... doh! :D
+Tested-by: Arnd Bergmann <arnd@arndb.de>
 
-Sorry for the noise.
+A few hundred randconfig builds in, I came across a single build failure
+that you missed:
 
-Cheers,
-/fuad
+> +UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sancov 
+> __sanitizer __tsan __ubsan __x86_indirect_thunk \
+> +		      simple_ring_buffer \
 
-> 7243471061be KVM: arm64: Extract VMA size resolution in user_mem_abort()
-> 3a8557ce6025 KVM: arm64: Introduce struct kvm_s2_fault to user_mem_abort()
-> 9f3c0a14bbcb KVM: arm64: Extract PFN resolution in user_mem_abort()
-> 98740dc5cf2b KVM: arm64: Isolate mmap_read_lock inside new
-> kvm_s2_fault_get_vma_info() helper
-> ea364906b626 KVM: arm64: Extract stage-2 permission logic in user_mem_abort()
->
-> The first patch here doesn't appear until quite later.
->
-> Cheers,
-> /fuad
->
-> >
-> > Marc Zyngier (17):
-> >   KVM: arm64: Kill fault->ipa
-> >   KVM: arm64: Make fault_ipa immutable
-> >   KVM: arm64: Move fault context to const structure
-> >   KVM: arm64: Replace fault_is_perm with a helper
-> >   KVM: arm64: Constrain fault_granule to kvm_s2_fault_map()
-> >   KVM: arm64: Kill write_fault from kvm_s2_fault
-> >   KVM: arm64: Kill exec_fault from kvm_s2_fault
-> >   KVM: arm64: Kill topup_memcache from kvm_s2_fault
-> >   KVM: arm64: Move VMA-related information to kvm_s2_fault_vma_info
-> >   KVM: arm64: Kill logging_active from kvm_s2_fault
-> >   KVM: arm64: Restrict the scope of the 'writable' attribute
-> >   KVM: arm64: Move kvm_s2_fault.{pfn,page} to kvm_s2_vma_info
-> >   KVM: arm64: Replace force_pte with a max_map_size attribute
-> >   KVM: arm64: Move device mapping management into kvm_s2_fault_pin_pfn()
-> >   KVM: arm64: Directly expose mapping prot and kill kvm_s2_fault
-> >   KVM: arm64: Simplify integration of adjust_nested_*_perms()
-> >   KVM: arm64: Convert gmem_abort() to struct kvm_s2_fault_desc
-> >
-> >  arch/arm64/kvm/mmu.c | 428 ++++++++++++++++++++++---------------------
-> >  1 file changed, 223 insertions(+), 205 deletions(-)
-> >
-> > --
-> > 2.47.3
-> >
+This needs "__kmsan" as well, for these symbols:
+
+                 U __msan_chain_origin
+                 U __msan_get_context_state
+                 U __msan_instrument_asm_store
+                 U __msan_metadata_ptr_for_load_4
+                 U __msan_metadata_ptr_for_load_8
+                 U __msan_metadata_ptr_for_store_4
+                 U __msan_metadata_ptr_for_store_8
+                 U __msan_warning
+
+     Arnd
