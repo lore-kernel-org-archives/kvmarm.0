@@ -1,78 +1,78 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87BD2F872
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 19:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04BF391838
+	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 20:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773690361; cv=pass; b=BRtbhDjAUUjE4UMyUovFsuEitHcSKZVbnM0tfwdiVRtbrHdECuJhlUKXRNh3oUG0QMo92zQMKFa8dKWE9FKMTrc8xpwlhXPjSTcIPUzbS4YevaEtt6IEOOablz2JHzMgw9dLKh0Ddf9N/h840SLnoJ04MeM5v4Sq4/HDn5Jeuls=
+	t=1773692826; cv=pass; b=DH4IpGbXZSt5kPYP18Caf6CoSeymGB9V75JBEtTf6q/6jW4/ubmbOtrSN0bjcYaaSFOkEctrUaWv1s5Yi8Xvl642TAIBU859rj7TR5JTJ7Qs7bUCQ79ZJkseXpHMPTi3Hi3O3NnZIQ3nSJMZ4LXZ4xW7sm2WRXovlVAklPVOSbc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773690361; c=relaxed/simple;
-	bh=YKUoL6gMzoXcPPEHwWAlRR25PiaOdj8yEfWHQWJxGb0=;
+	s=arc-20240116; t=1773692826; c=relaxed/simple;
+	bh=w3aEjEuUjeQXqeLoYDJOMLWyLHdOjvQ9XxM8JKxDsBc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JCaJudr2Ywrik3rmO2+EfzrESSkA12DBYdy81+nZCKlMLmzOhCEmFea5BQiH2qEIeaqBDrGfXJi2d+DlpXtPt9GP8SLEjtyEMGiYtI8M3BSQCxBbWc1ij2F2uCma5b3u8zgN6T4qRFNkObBdHQEY/uJe/2RIkEfl77CyJ57joQ4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hedewemO; arc=pass smtp.client-ip=209.85.160.176
+	 To:Cc:Content-Type; b=YHYTSjKbWhM4xICc2mAk+u5HZ4TIJeL1zlPJiRKMetPJeRrRq3dHDintfiBib2ziPDfmJ679uY2h37Oii/rWQGFwVPtL5kHAEvd/0d97SLVuDOrj79dD/FVso5lmdIKqpAmuoy1M47sghmOxZo2VjW0U0h2TUMk16g+QvSJNBIg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FLwjL7rK; arc=pass smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hedewemO"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-509069a7a7fso147121cf.0
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 12:45:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773690359; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FLwjL7rK"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50906a98ffeso171901cf.0
+        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 13:27:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773692823; cv=none;
         d=google.com; s=arc-20240605;
-        b=BCgBkxpcevzYdJCOH+bkCOsrgsJe7EszJy1/cj5JLSxukEolv0V7GAnglMl3yiLi4B
-         Xkr2BEi2qNg6Mf2XALPo9i+opcDG7jg/ThXRBudoLiQ+aQrffFLDCH+gmxUI5MMgADKP
-         PR9thUkFUR5uYMnXWMkuup1JK1E0bwSy19Bt5hOunFlmCo62dbaICCPgLzBaqGNggOK8
-         3U/MiuBkMa0vQxL1UvGgsEB6l9ZJCTT4GVUrkn5S0DCGg2Jvzlqyb3p/swEwrYSUDYgW
-         IAnMiPN0RE9dK9ruhQlqI1eb9UAlKZeexfAM9G1ILMgLuUp8fG4Hxr7TsGCDODhsspZt
-         mgog==
+        b=NKcAwXwMSPzd8KAUsfpCiVZf/A1ebMKkRJilHGRMYwrA/kOkCF55zDQ4jW7Q5SE0QJ
+         678y75sDkSVksYogD3CC97fdzjTNDVMyZID1FURqDJOLSNsG/hgurUY6oC2Ew3L3BFMy
+         jtaZLZ46WfDr8IQC2UeABbLioh74v8VVIkSQ+tvLKQLuIsa2fwLhav72gOQedH4zYtWI
+         7s4yJgLXY/GHwmRL7qcfuMhPC+Ya63qfD+EMqu06sBPl2wAIoBjkX2bpvsCUEu8Wq5K4
+         SbukV2z4WgHHII103qVobLdeIOQ01hIN3+SereCLLdhYr2Ryl3K4NhRUqpgDwmXz+xvN
+         C8ng==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=K/XljB+DzgWrRFl21SQKsmodBlgq6W2fULdZ4nu2KB4=;
+        bh=TbszYKJSUQZ+CFv0gEYGu37cZ2puJInffZF8dV4znTc=;
         fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
-        b=XibWFJ0FHI8+rgG4BODoDfPcBpfMhNH1EraFYGKA38d7vPrrO5FmR9E6EmH3ZVHG7C
-         ZfhHCBbY34KONGWGKrTyc7bfKelteE4ubOIYJF5ZUUDh5UVf7ac0KxqSCKVoufMrttV7
-         DtOnfpkrxquJMRPfOU+TP0UUorbygZHgmYmPLNyRdpXGlY9sqtdlgAMVnIHShuFoOteG
-         xN9QTS2OSZeUd0ZxpyKBxdGcQPFAHXZEnCpVduRRe/UXb3OsLkp4hYIjFfJhq3SbWGXf
-         x8JDvCJb+I1DSLu+q6pBu1N49ya562WdngEIV0cNlMkdKL5/lq85gWz+mi16Gq55BzTg
-         if+Q==;
+        b=N0pCsW/+OZXPDwaxsaFxlOom/qoNWsmLy/Ki+55e3FyvmKC/yHem1Q/t1+APlyBgXi
+         dtXvy/xwwp/vGC9hhhnH+P+ttKMQMe/PyjV/Ql+0U9xFXl+UTE8dca535nc8kBJCNNt8
+         qzNsiC8cDPFf+V+C/ID1UwtJEmAsChYy3F/VMuzIVjBqBhBk4zsXmem/6tE3sEsl0gXK
+         BLlkpKQD6F/VMTSF8HNYEvjX0ZWK1Gd8PP/Mue9HX+4MRwTc+DQeDHgBe71cvcxln3e6
+         +zMPNIBxl4ngMCuculsNWvACbnuJkqSkSBGRHLnuyFhdlAtKnaYsuQiO/vendNVhNi1l
+         Wzqw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773690359; x=1774295159; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773692823; x=1774297623; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=K/XljB+DzgWrRFl21SQKsmodBlgq6W2fULdZ4nu2KB4=;
-        b=hedewemObGRHaKcQ7cTEIixJdDuJxhkn3GiAGMBVJQOqZtkHLRy6V6LTB1a4/3BHvk
-         y1/Hi/wvhhXZyxMazbNCZHIjJw1LogHVi5U1gQiUuU2VlCPR5Gx0nRZ2oxGR00cMyT8S
-         4dnUYHabYQkKB7/UMWUnZ4rYFrr0kktamxbo5pz/DOAsqcI7Hdu3vLoNWsMCt2CooXQb
-         gv817chL9qGX7XODBj77MmF4ZLWNYsyI3LOSOIJXgoBCuaCyLIc9KTyG7pWzBLdVEwqY
-         z6sRJ0djIv2ogrl/jfXdXZp9EePYteMxid7u79JFtKwDKghLR6jHLIhGOKRfTty8wk/4
-         Im3Q==
+        bh=TbszYKJSUQZ+CFv0gEYGu37cZ2puJInffZF8dV4znTc=;
+        b=FLwjL7rKzYDVTbTF/vvA8n66+8n3oO5d8S7wynDeiU6nNEQ1Kt4sciXToPLZqlKmiR
+         KdBIJZWX9Br3GmeygKSGYukSjUpnPWqcHEUTlcY0agbB4VsWfzYy1XqGDdM3NJ3Prnwj
+         PnkGCnq/8JFUgDdJo5JYk8ZwYRCCz9tQCQsZaQH/RDtoxws9f9ipmH/SfNQh/NKBG4i0
+         qgPF45mT4H4ztRHRGO3CxAgSTjPJIJL5cWOzV716mIAl/u80VeBwLrqNqHgDq6LwGN/6
+         fUazOiynGOCtr5qRCM5XQmdKaH1dax92knMyTFLXHHwa3Hs7s1LuG/Z8lFywDQc/A64h
+         Batw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773690359; x=1774295159;
+        d=1e100.net; s=20251104; t=1773692823; x=1774297623;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K/XljB+DzgWrRFl21SQKsmodBlgq6W2fULdZ4nu2KB4=;
-        b=jJeYgTRqpmdTstx1hqvY07uAsZam7gwp69ydVQygee7WlrmvGnvcYANa33eKRE20qs
-         iaTcJtDVhroDPc7z11TgSqBzesqvjf/xEz/UJ013bnvHsuKaUacPipCz5c8ydCG2ApFA
-         gl1D9KRabyJiE81GoSyPfpUMvJRnydGOaFBQFuAtzrN6Px4/XAKJYrRQVv8vDLJMTynI
-         jEmH8EsDU7Pa7pD43EOdY0fSN9+EPw1L6fLlrGBVZV6O1P4v+PucbCNsJDD/EIgiYG0j
-         6UFCuHdRo/2GCeuXaryGa3y2qpcgtR09QaKsBMMVMohOU8am0M9E+Bdn9gV0NrcCzT2q
-         1fEQ==
-X-Gm-Message-State: AOJu0YyVDFDdauT2wAJcbfhLUWIkMtGEhiqFQTBOlADBhQJKq50vT/5D
-	mD/KWdcN0kQUfwHwtRscOvbbm98bi8RIYXqoNNUFTUTYfBrPRF+OMrsvBTt/biptzhbqktA8yg3
-	N6Y4brsTjjJw7mDXydyVvDhmrBHG8ucnn3azdmI9L
-X-Gm-Gg: ATEYQzxR4KMDCn3bg8VQC7J6oJHOe0KKA+Wj2pSTZ/kDoCFj0odjwLuUmLIDWSzbAP6
-	jw9PNxzHRn562oHAWCk5p25CyX/y6xH+4l/o4/XBUToaJ7uqmBbsR+7E2oxIh1dDa2yTHAztyCd
-	JTd0bQKZiBvFjR7dkx7eV8vTI3dJY6DOCCF1KjfpTZ14/+esfOWEwJDaoXLUuFDtCtMapC7P/rR
-	21HeIDk6dmUxSe4Nm2DrT7ZItFOVqyw7/xoQrLFSBjSRKssyVQCgPULwRQlGlu2RRmIgqIuznZa
-	N0zYrDOX
-X-Received: by 2002:ac8:5acd:0:b0:506:1f23:e22c with SMTP id
- d75a77b69052e-50998d3ad15mr456311cf.6.1773690358263; Mon, 16 Mar 2026
- 12:45:58 -0700 (PDT)
+        bh=TbszYKJSUQZ+CFv0gEYGu37cZ2puJInffZF8dV4znTc=;
+        b=NVquk0I6EnyfWjxjI8h0tMDFOnR1ahzgjYfCYMtLTP0LmsIjpNawBo7GNXixHYdN4Z
+         SfR4bzdjydwX2MJ3wsPKRMI4lKQDdpRVEVTSVHdRZzv+z6cqiNAEHvf6ZC+YUg05M0CT
+         JLt1/bm835lzq+kn3kuQoOB/bUaKPZQQDxmZ6BLVOnp5lu77AqPkwaC8uuZkZQbgcd8e
+         S4cr0JG3EwBqyF09jpW3WD6qWS5FCBEO9WJBS2vqJ8ePXq0BrwMPZ2RAJA8Mzp1irVLR
+         PoPFGv9rvhX/mZp4Z8zacKMm96tuPRgZKtdyojaQvPVjt0PD6hmsBJkgPi7T0U2Si0BC
+         c9Kw==
+X-Gm-Message-State: AOJu0YyAUsgOuJPFl3aaagxPv7L7rfKpcUyQk5Cye4PhimAnqs9cD3u3
+	zHrdii/8L9M+SW8eNE6kGKLrlUyhSdjRPbGFjQ57l9kr6HFVaoNiDNxV8U6/BbTvnQpjZhK4+Ej
+	fVJPqKjAUpGG0PCNge06HfvYgchKNZXRiKkJzU1qS
+X-Gm-Gg: ATEYQzxDlmKAWZnO1zU6H23RpEO/rvR/3c2QOuXqoh7ddR8U68SvqhMPMnqO2J/Dirv
+	wK6Scv4UzKWQkM7+lLwqw91uC3VeKcYVDC5ZiINUMOT1ULyYWrf9R89eCb/riRsGnI5Jf4+KNHE
+	IaJhxPjaSnYG8z62WcH0e8EPAhsKgsZXKMJU2LJ+punf6myxilDk5XCNKmW7B82uYRkldcWrbxS
+	S7S+05/Xk0qRRtiAC9kVPzWnEOdepCgE2kWQb73Odpde22GVcQA2UNSQgZ2K7lBO+wFdZXtUPAG
+	R3qV6vDs
+X-Received: by 2002:a05:622a:10:b0:4ff:cb75:2a22 with SMTP id
+ d75a77b69052e-5099ac7560bmr742881cf.3.1773692823019; Mon, 16 Mar 2026
+ 13:27:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -82,9 +82,9 @@ MIME-Version: 1.0
 References: <20260316175451.1866175-1-maz@kernel.org>
 In-Reply-To: <20260316175451.1866175-1-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Mon, 16 Mar 2026 19:45:20 +0000
-X-Gm-Features: AaiRm53vnZJxjvhwHPVI4NgCZVcmbKDWdM_VkB7D1-YURQfFQInZ6ytFCm9YQso
-Message-ID: <CA+EHjTxysP-uBzpW1mg=6i8KnmgdDsymn=t2a6hgGho=sf74sA@mail.gmail.com>
+Date: Mon, 16 Mar 2026 20:26:25 +0000
+X-Gm-Features: AaiRm510Pj5izIGMuhDvumE4HdikBCeLOgGx-bwidhVdMD7QfZGqbR37I1-sWLI
+Message-ID: <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
 Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
@@ -100,14 +100,7 @@ On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
 > Piqued by Fuad's initial set of patches[1] splitting user_mem_abort()
 > into more "edible" functions, I've added my on take on top of it with
 > a few goals in mind:
-
-I'm glad I piqued your interest with these patches. I had a look at
-the final result, and it looks good. I will start reviewing this
-series in detail soon!
-
-Thanks,
-/fuad
-
+>
 > - contextualise the state by splitting kvm_s2_fault into more granular
 >   structures
 >
@@ -125,6 +118,22 @@ Thanks,
 >
 > [1] https://lore.kernel.org/all/20260306140232.2193802-1-tabba@google.com/
 > [2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=hack/user_mem_abort-rework
+
+The series in hack/user_mem_abort-rework is different from this one.
+Here are the first few patches:
+
+7243471061be KVM: arm64: Extract VMA size resolution in user_mem_abort()
+3a8557ce6025 KVM: arm64: Introduce struct kvm_s2_fault to user_mem_abort()
+9f3c0a14bbcb KVM: arm64: Extract PFN resolution in user_mem_abort()
+98740dc5cf2b KVM: arm64: Isolate mmap_read_lock inside new
+kvm_s2_fault_get_vma_info() helper
+ea364906b626 KVM: arm64: Extract stage-2 permission logic in user_mem_abort()
+
+The first patch here doesn't appear until quite later.
+
+Cheers,
+/fuad
+
 >
 > Marc Zyngier (17):
 >   KVM: arm64: Kill fault->ipa
