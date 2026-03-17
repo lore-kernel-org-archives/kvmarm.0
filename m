@@ -1,210 +1,175 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020098.outbound.protection.outlook.com [52.101.46.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383383783A1
-	for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 22:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773701053; cv=none; b=ROwNYeORfrwCgjrkAUZlM5g3RodVm2iC7+izaoYyaTz3z2iPGJMQu+i4CR04PWyITUDK6Hd9C4OHz10Ha/1LK7t++thjMaadHFB7No+clKEo1LRPddRx81T3ls7o7ddqPY74CgBsqyk0bp0coWZ2gPfzzNsHxlVFS4af3e4Ifss=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773701053; c=relaxed/simple;
-	bh=CRZaBcVT4Nccd9wr2yksdpHezTrKvIKkYwQqtZlwzaU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QhuCFP1S2DSNqADlE/6UUNPFy/YUI95anRFMeNOeWaB+fg1zJO8LdgwyVfao4Soot35CzdwTbN9RcpZFFPqar4/xSTX3YQTLfeg2+iudxBNFieFhAbjkqqpEyBnFY5Qdqwj+08UPdyvFktNHUWvr3Jx5CNXHOv/+c1xcGw61UdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X+qH/WQr; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jingzhangos.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7858D35972
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 00:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.98
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773707113; cv=fail; b=QEiKKhX75wuuT0ptnC9Y83VA6Nkhniqk/6DOLK0ot4G6WQnfa2bbKq8FSGfE5e/o2TwdYnSSggdwzo8MobU3PyVLGjc5Jz6wZVD5BzmknsY2v89dZZgeWMb9xLiCfJ8qURKm1LNYgFUvYxmDpKMNdPNCMV3kfmao+1XhBoUVLBI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773707113; c=relaxed/simple;
+	bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=C5ikVWJ8zxQ2PI7qpoMJK3u4dMrAHkDuY1KIGa0KxhK1DOKPAHxCxt+2ohz4oAF03bqBuXqYQe0rwXZ065OBJgHSeJLw2KUw2OLE+qg3+IV9Y3bFKIONgPzQYiWKnAfNdtj11mLuo4tIKzsAxSk59zb+E60jvb9MgHTV3WdMHvM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=YivAd6nw; arc=fail smtp.client-ip=52.101.46.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X+qH/WQr"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-829a535ad7fso19307165b3a.1
-        for <kvmarm@lists.linux.dev>; Mon, 16 Mar 2026 15:44:12 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="YivAd6nw"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hSDz4MTyxPeParvZvE3YPAU9B8xnTFCrdnxVqZWwh3wpFnra18z6sgXIRQkMG1ogVnUX2Pm0DzPyu4ZXiMgSJZy8U80J/9XWYDLFM96YtLxKiWi4Id4stFnIKOCOK0Z4La0XtKZrT8od5KHqgH3jwxHHRH9MPlwr2VHR0MpfCK0pWUwbohhXanul1aulfYF4eLG5qHEfmRE8Jv1SjhzRRsDtZt400wXrCJr8Qh+L7ia7+aP/KG6Pvzw8BD7oWjYkCK61ByGVT2NvPXR8065mZ1ge/J6F+ApzUp1RL6C+pKiGJDxwmU8aX3/CyZ+yNvumizAf6tgA/vIjB+DTsx5Esw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
+ b=fQK/hW3Eu8Gn9RO0IIat289VDpxDzwmLRgXlPBhVPtynA0yvpb1oUExbxAvQuXMJP9/dMsKLpLeC2LRia+KQKoCCmr6y6GP00IBeplN6WoFxDCxGU6zd4LtHBSd+hKMti78PEFt0vY6xdG5zHFGBEnexrK3cQqg1WpBhYlmjGkbE5ImZoFTJhVznfpsvwdu6i4ngo3WTxeMCPGem+YLlgCZPbzS+ElgwABGBJDcCcCtvaeA3/G8nClYy6h/8ZuqP3g1uR7JQjIxdGin+3PdqbZcHHwgcFzXd86R6I3QjiXdasXlRyuMLvSgBPWbaAGIZzrZAvJahDWV6k751LDzzSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773701051; x=1774305851; darn=lists.linux.dev;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ft9HYj5yB7NMR4Js2O0wNzazbO+Nfd7jWsn5KEAvFFc=;
-        b=X+qH/WQrymH/d4lszERmoGInefDvib/dcBI2gPa6RS8b0RfwXhG1YZQozDjgzAB6Ya
-         TzI02+zz9LBw74u4ZfjGZC6UrEHmd2oz1vAxfh+yghPIuDvljluyqkbwgZCfh57f/I3z
-         0z7iVgnzCZKjNhlLrxsPQrYaZKGZZOQ/EYOyXgP+M7dmhjNY3ALEGt6YHC0fOVMStlqR
-         0C1RCUXGwcl4TNDwzQsinByhJxafqN9RU9khIA0F3vcI+FtHO75PnvcMn+26HJ1g6/bV
-         FhXaFHNVCNrkyNmDNr1sWO6ZLWGbU6DRECzIUkZnv0kJ3JcJFZTxTOB6pmTes5AdjIP+
-         l84g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773701051; x=1774305851;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ft9HYj5yB7NMR4Js2O0wNzazbO+Nfd7jWsn5KEAvFFc=;
-        b=q7ClaMIrbvG8YWV7x5fSZx0s8pBg4UWo+sOL/hDeb5dPvhyQKQoXh3TiqdmqvOy36f
-         FmVKMVV4R14ToMznJzzaQgRIcwniLWjR/yeqSotl03UEpf77+QmfRA+uRSDyaw/gulIR
-         mWY7t3vdJzg1A9evk3ZDt3u4hvqpunf3NH2D+lRfSQ1+2aYXauJmkuDb2jLs3Q7jqz0z
-         8HYIvF6UvQC0x1p/STMogJGtiaJ3qS6H1t3ABseNV0KG54zCwtyMR5Z0OVKhm1uDmxE1
-         vVe9Uon5oMWG2d/sBCycPbooXBh3qJf0djJHabUDdGZWAwxgNof/4RLXiADC0XIvWG46
-         l1qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0d0yQKfEF1mxZqJlvEnxfkUHt9XC79rB4fbfA9RYX1MrSGscyXNA6TdY8sKbX0GjLDO0/sv4=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yycn7M8L5yX7e4CwOZ7fSqICiQjiFhD2sOCuZyCMwYOAdqqXMSH
-	KZGijXN1LY003FxFKF9tQU/NIH30zzhD0+iol9C65yHWWRkELuSKmhmkyICHQ4NqSnD7AC30E9T
-	A2yW5UxDpaYhi5WlVpHrkEouu0w==
-X-Received: from pfbho21.prod.google.com ([2002:a05:6a00:8815:b0:824:b235:888c])
- (user=jingzhangos job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:130f:b0:824:a182:1dd4 with SMTP id d2e1a72fcca58-82a19928c35mr13559051b3a.54.1773701051395;
- Mon, 16 Mar 2026 15:44:11 -0700 (PDT)
-Date: Mon, 16 Mar 2026 15:43:49 -0700
-In-Reply-To: <20260316224349.2360482-1-jingzhangos@google.com>
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
+ b=YivAd6nwsYtqnI8jzkWwq4eqASuVzSjQ1hzg/ra8oo6JyPHH9aR6XMA76MzWMBsIwZr13uYLRQw5posPjNuQtryjkwCFBX989RxP+Yiy8XqRLfACymhLA5zsEOukGdC5W+MKXPTnQy2RRRDiAkxViTAgM91wPc0gyRyMVrfKzVo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DSWPR01MB994496.prod.exchangelabs.com (2603:10b6:8:35f::23) by
+ CO1PR01MB9084.prod.exchangelabs.com (2603:10b6:303:271::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9700.24; Tue, 17 Mar 2026 00:24:41 +0000
+Received: from DSWPR01MB994496.prod.exchangelabs.com
+ ([fe80::893b:904a:d102:9f95]) by DSWPR01MB994496.prod.exchangelabs.com
+ ([fe80::893b:904a:d102:9f95%7]) with mapi id 15.20.9700.022; Tue, 17 Mar 2026
+ 00:24:58 +0000
+Message-ID: <a8d31059-f821-48ac-b6bb-7e8d38fac7b6@os.amperecomputing.com>
+Date: Mon, 16 Mar 2026 17:25:01 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
+ jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ zengheng4@huawei.com, linux-doc@vger.kernel.org
+References: <20260313144617.3420416-1-ben.horgan@arm.com>
+Content-Language: en-US
+From: Jesse Chick <jessechick@os.amperecomputing.com>
+In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P221CA0028.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:303:8b::33) To DSWPR01MB994496.prod.exchangelabs.com
+ (2603:10b6:8:35f::23)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-Mime-Version: 1.0
-References: <20260316224349.2360482-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.53.0.851.ga537e3e6e9-goog
-Message-ID: <20260316224349.2360482-4-jingzhangos@google.com>
-Subject: [kvm-unit-tests PATCH v1 3/3] arm64: Add Stage-2 MMU demand paging test
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Andrew Jones <andrew.jones@linux.dev>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Jing Zhang <jingzhangos@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DSWPR01MB994496:EE_|CO1PR01MB9084:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3687e2d0-0f6a-4a75-071a-08de83bb9f0e
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|18002099003|22082099003|55112099003;
+X-Microsoft-Antispam-Message-Info:
+	01z9w3u/q8oett/qSj3fm5KPhjk3V2VQ29c4gpGGvHCp529c06VShsaX9GXl7KrFqcNzk1JKZDDcWDQT6NeNrG5Zd67/BL77Tms9QdEpZATXT5nYXqH6j/sGS2+hpbcnEPjR/UM+jhNZiGc3eTTMSFIzz+mzUZ6OEhlCQEY9MdzyhjWbJw9KtdFe7ZS/9+zE9et83TJI0VfikKEHBj6dGuonSRVoBwkeES8AZ/Wgeyksz1WHtPXpFvyfsPZbs4M7s/a6SLBAPZa/uZdbFQxFZTz3f6mXF58sQ+RGA4usFR9pz7JLMJJqc4Qjc9wfLWv1sQYGFSVXaAr/lUpBwHfvbOzeuL82ao3SYjZOdJEFDUDtg7SU4LREubBZN2YZjhYdCl78OR6Dp0W2VwRBrE7NVkgxK1Z0cVnEIVcsGUrY7A1EvgoVCGHW8MA6EW9JNWuKcrFe3ZiLjjzQiNV8U8noCnIuUKumb50m/5D3sSTVgGNHx54RQVbjjQ/LcqvxLiPB+yLWUnFTB1wcYXAnGDBh/hWFMTAtXWK0ST5LCHQJFSjg6R6yIU+IErsGpTPd21GN4POL78HNH14/xG9lobgzx7pYKrW/HvDbSEzCL1Yeq/h8suur5FUrTlkc8s/nZ42GKfEYbW4B/ipvfyN0UTFUqxm6j0IgtcdiLgXfXR+GyHGN8UWQhap0rk8P53qZZxKP2Z+QOAw2wB314okU4uGMEPHERqpbj+p2IG6yaik48Y8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR01MB994496.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R2k1T0d5WjA0SURxTEoyakRXVHlzTHRTM09Oakh6Q1pyR2xnUnc1cXIycGhI?=
+ =?utf-8?B?aUwrUnlrcHBiNmI3c2ZTYWZURXRoaVFVcTBjQTREMWVNK3dhL01VTXRVODEr?=
+ =?utf-8?B?Kzh4dTFFRXphSHk5ODhGRzlNdXpvZ1ZDSnRFYlpHNzB6ejFjZW04V1VkRHoy?=
+ =?utf-8?B?OCs5Y1B3TEc4bjBTcWxXbkVFaGpQTjh5b25hd0RGRzIzT20zVE9SNEtGbUt3?=
+ =?utf-8?B?K1E5YjkyT3B2L1hxSFBpekNjdU03NHVJYXJBMTlnenJVT05YZFpBNUdkejFy?=
+ =?utf-8?B?RDZoZ0NOMnJpamtPNVkxUFd2bGZXK2lxNm5YblJyN1VDc2FwcWhkZGszNUtr?=
+ =?utf-8?B?cVRxQXJCYk9QS2NNM1FHUXk5MEpySWs3enphWFAwcUtFK09QUHgwSXJDZCtt?=
+ =?utf-8?B?ZWZWZzVWdVpWUjZEdXNESVZ6bm4vajVzMkVEWk1FTFZSN0J1SHBzUjQ4Q0xL?=
+ =?utf-8?B?VGovZTdsMmNXNnROVjJvcGFtRlpDdE13dTNSc2FMRTRuUlJWd0VLcXFmMXgw?=
+ =?utf-8?B?b3BtWHBlZHFlczYrK0kvVVp4bnk2T2h1VENzMmhCRTdGTTlMckdHZkFNMUc0?=
+ =?utf-8?B?VGdXeC9ZWEJyLzE2dHVsdE1wazFGR2dwQXc2bHFTdHcvQkc0S01yT20waVlZ?=
+ =?utf-8?B?d3E1T3FuNXkyTTVKb1piQ082WFhyL2k1TVZhS3ZWY0V3WE9yRWpaRWhtaVgr?=
+ =?utf-8?B?dmdCVktyLzlFNU9hWnAzZ1owcGFWaUJtdk14ZUNtRyt5Z0dGWndocmpJbElS?=
+ =?utf-8?B?bEZPRktoNGxvL3JFcEpmcjNCTGFCeHU3WTI5R0NnZ3NINVFBOTFHeTQvTTd6?=
+ =?utf-8?B?TG55OE5wRE1SYlY5MC8wZ3g2Mk9VWEJUakdUYVJvd3ZGV1NQdUhKTGpNTmUr?=
+ =?utf-8?B?Z1F2MHpReFNaNHNoYzJLenl1ZEdGNzJkcWwrVkttakJEdkwrdVVoRHFSWENG?=
+ =?utf-8?B?Kzk1eXFLSU8wem1nNld0emhYUXdjRXRsNW5uWXF3NzBPbE9uckRXT0xTLzI1?=
+ =?utf-8?B?N1c3U2srQUR1L1F2SXpPYko5dWJBbXZ4MitWS0FmUUQ5ekVRZUhiLzVNMEJx?=
+ =?utf-8?B?MG1FTGtEMnByU0pJZG5YTktqM2ZoUmMwYmlFb3lsQ0dwNnh5NmRyVXlScm5z?=
+ =?utf-8?B?cXFHcjdQWUliVkZ1c2xjUU9ZbG9EVHZYaG12RU1NcjFNUUNldG1DZU9FNEFp?=
+ =?utf-8?B?ak1rTklhaktVdEVxUnNzZGtEbE1rdWx6c3R6N0RJVkFaVkpPVi90d295UFhs?=
+ =?utf-8?B?MlJVa1psdytaOUg1d2RLNHB3bUdxZFByVGhiQ2hEL1ZGTGtXMDJwYnFBZlZG?=
+ =?utf-8?B?SW5iOG9iekdRc3NxWWtmR3BXemFYVTNHSk95b1FVRU9sNkhaRjVhTDRHcDlD?=
+ =?utf-8?B?bGFLVHFUWVJYWWpGZzFVZ1FKOHBCWnVPNFpuWnVUYnA2bW1BSGVrcmphcE1i?=
+ =?utf-8?B?TWticU9UL29kanRDbm85c0padTZuNXZSUW9zcHBBL2pKc0dwU2YvZFFvWmFN?=
+ =?utf-8?B?OU9TSXBKZG5DeGRWWDVZUFF5UlFTYU9RejRJVG5hQkNnaFZ0L2lVZ256QXU1?=
+ =?utf-8?B?UDViTnF6YTVsbThIY0duOWhWTlcwcFR2bG84MUNkbmtjV2NFZ0FibTJKTVBi?=
+ =?utf-8?B?aVNHZDMzTFBRQ0IxUC9yNElZMkU3bk43YzY2MWlmOWNsdGtFWTRMMjRlZld0?=
+ =?utf-8?B?bC9LU2ZYWk5JbURSMC9EWEhld1J6NkdQcFFtc2tGUnlUMmxwZTRFOFUwc25M?=
+ =?utf-8?B?Sk0vRXRoMnJkTlpCTmVGbVNjd2doU3d4SXN1aExpWGpPS0JNcHh6YmJMNUVU?=
+ =?utf-8?B?T1VtbDMwQTJXczQzbmZoOFpQUTg5K1ltNDA2b3NJRzhTdXFZQ3ZadkRlY2dt?=
+ =?utf-8?B?Z05CWWl6STQvOHdXODZ0S3J6eFZFSzBQNWpvRVdJNHRFb3BiU21QUlhteVJR?=
+ =?utf-8?B?ZXJlZ0l2NEg5VHVjUnhIN1grNzl5ajdKR0NtWDJWSEhWamdla3ZtLzRlcVdH?=
+ =?utf-8?B?TVdwUUE0K0dSYU80NGI2Ym1sUVpyZG5DT3N0VFdzem4xVHFkTUhRYXhpZEhy?=
+ =?utf-8?B?TzVHaTlBZWcxWjlFTytBbEdBYW1PclUycTJlWVh3Yk1SMzdUMGhESjc5b3lh?=
+ =?utf-8?B?NGZHR0J6QzVDbi9LZUZPa29Zb0NtbytwOXJuaEpKNm9kU1ZrQmRQVDBFUHli?=
+ =?utf-8?B?RW13OUZ6OVlBakQ4MnBpR1F1ZzltTzFibFl4NUJCaEx5cGJjSmdSUTB2cmky?=
+ =?utf-8?B?eHUvc3ZTcG1rQlJLZ1ZKeTFPdUIybVZwOG8ycm1GRkZoL1FBYlNyS1FvejUw?=
+ =?utf-8?B?eXhNR0FDc1U0aENxY3VhcXZRaUM4ZkZJOWxralV2UjJSRERmcGJtN3pNc0ly?=
+ =?utf-8?Q?/4Q8BJKAzDiEzUK92g2qOBPVK6OuHez7oCUKj?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3687e2d0-0f6a-4a75-071a-08de83bb9f0e
+X-MS-Exchange-CrossTenant-AuthSource: DSWPR01MB994496.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2026 00:24:58.4603
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9xPJCLN+D1vEBbyvZKtKiT/9rzl1y+WgzdZPJDDfS8n+djt+0Vr2zJasshdUvExWnlwJHgrPVwjxZv0+dqueUjRs6j3/5q6BKQXLnRiNN2lCi3gbrg0xFH7Qvl77PgdG
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB9084
 
-Introduce a new test case to validate Stage-2 MMU fault handling. The
-test verifies that the hypervisor correctly identifies and handles
-Stage-2 data aborts triggered by a guest accessing unmapped memory.
+Hi Ben,
 
-The test performs the following:
-- Sets up a guest with Stage-1 disabled, using identity-mapped host
-   code and shared data in the Stage-2 page tables.
-- Triggers a Stage-2 data abort by accessing a specific unmapped IPA.
-- Catches the exception in the host, verifies the fault address,
-   and dynamically maps a new page to resolve the fault.
-- Resumes the guest to confirm the memory access completes successfully
-   and the fault handler functioned as expected.
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arm/Makefile.arm64    |   1 +
- arm/stage2-mmu-test.c | 100 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 101 insertions(+)
- create mode 100644 arm/stage2-mmu-test.c
+> Thanks for all the reviewing and testing so far. Just a bit more to get this
+> over the line.
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 9026fd71..e547f92d 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -67,6 +67,7 @@ tests += $(TEST_DIR)/cache.$(exe)
- tests += $(TEST_DIR)/debug.$(exe)
- tests += $(TEST_DIR)/fpu.$(exe)
- tests += $(TEST_DIR)/mte.$(exe)
-+tests += $(TEST_DIR)/stage2-mmu-test.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/stage2-mmu-test.c b/arm/stage2-mmu-test.c
-new file mode 100644
-index 00000000..391c28f0
---- /dev/null
-+++ b/arm/stage2-mmu-test.c
-@@ -0,0 +1,100 @@
-+/*
-+ * ARM64 Stage-2 MMU Demand Paging Test
-+ *
-+ * This test validates stage-2 data abort handling by purposefully
-+ * accessing unmapped memory in the guest and verifying that the
-+ * host correctly handles the fault by mapping the page.
-+ *
-+ * Copyright (C) 2026 Google LLC.
-+ * Author: Jing Zhang <jingzhangos@google.com>
-+ *
-+ * SPDX-License-Identifier: LGPL-2.0-or-later
-+ */
-+#include <libcflat.h>
-+#include <alloc_page.h>
-+#include <asm/io.h>
-+#include <asm/smp.h>
-+#include <asm/guest.h>
-+#include <asm/stage2_mmu.h>
-+
-+#define TEST_PAGE_IPA		0x40000000UL
-+#define FAULT_ADDR_IPA		0x50000000UL
-+#define TEST_DATA		0xBEEFCAFEUL
-+
-+static volatile bool handled = false;
-+
-+static void guest_code(void)
-+{
-+	volatile unsigned long *test_va = (void *)TEST_PAGE_IPA;
-+	volatile unsigned long *fault_va = (void *)FAULT_ADDR_IPA;
-+
-+	*fault_va = *test_va;
-+
-+	if (*fault_va == *test_va)
-+		handled = true;
-+
-+	asm("hvc #0");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct guest *guest;
-+	unsigned long *test_page, *fixup_page;
-+	unsigned long code_va_base, code_pa_base, data_base, far, ec;
-+
-+	report_prefix_push("stage2-mmu");
-+
-+	guest = guest_create(smp_processor_id(), guest_code, S2_PAGE_4K);
-+
-+	/* Map host code: IPA(VA) -> PA */
-+	/* We use the host VA as the Guest IPA because guest stage 1 is disabled. */
-+	code_va_base = (unsigned long)guest_code;
-+	code_pa_base = virt_to_phys((void *)guest_code);
-+
-+	/* Align to 2MB to use block descriptors where possible */
-+	code_va_base = code_va_base & ~(SZ_2M - 1);
-+	code_pa_base = code_pa_base & ~(SZ_2M - 1);
-+	s2mmu_map(guest->s2mmu, code_va_base, code_pa_base, SZ_2M, S2_MAP_RW);
-+
-+	/* Identity map the shared variable */
-+	data_base = virt_to_phys((void *)&handled) & PAGE_MASK;
-+	s2mmu_map(guest->s2mmu, data_base, data_base, PAGE_SIZE, S2_MAP_RW);
-+
-+	/* Map test data page */
-+	test_page = alloc_page();
-+	*test_page = TEST_DATA;
-+	s2mmu_map(guest->s2mmu, TEST_PAGE_IPA, virt_to_phys(test_page), PAGE_SIZE, S2_MAP_RW);
-+
-+	report_info("CPU%d: entering guest...", smp_processor_id());
-+
-+	while (1) {
-+		guest_run(guest);
-+
-+		if (guest->exit_code == GUEST_VECTOR_SYNC) {
-+			ec = guest->esr_el2 >> ESR_ELx_EC_SHIFT;
-+			if (ec == ESR_ELx_EC_HVC64) {
-+				report_info("CPU%d: Guest exited via HVC.", smp_processor_id());
-+				break;
-+			} else if (ec == ESR_ELx_EC_DABT_LOW) {
-+				far = guest->far_el2;
-+				if (far == FAULT_ADDR_IPA) {
-+					fixup_page = alloc_page();
-+					s2mmu_map(guest->s2mmu, FAULT_ADDR_IPA,
-+						  virt_to_phys(fixup_page), PAGE_SIZE, S2_MAP_RW);
-+					report(true, "Caught stage-2 fault at 0x%lx", far);
-+				} else {
-+					report(false, "Unexpected fault address: 0x%lx", far);
-+					break;
-+				}
-+			} else {
-+				report(false, "Unexpected exception class: 0x%lx", ec);
-+				break;
-+			}
-+		}
-+	}
-+
-+	report(handled, "Stage-2 fault handling test completed");
-+	guest_destroy(guest);
-+
-+	return report_summary();
-+}
--- 
-2.53.0.851.ga537e3e6e9-goog
 
+I tested this patch series, specifically L3 CPOR, on an Ampere
+implementation with common benchmarking tools (lmbench, multichase).
+
+
+> Generally the resctrl glue code works by picking what MPAM features it can expose
+> from the MPAM drive, then configuring the structs that back the resctrl helpers.
+> If your platform is sufficiently Xeon shaped, you should be able to get L2/L3 CPOR
+> bitmaps exposed via resctrl. CSU counters work if they are on/after the L3. MBWU
+> counters are considerably more hairy, and depend on hueristics around the topology,
+> and a bunch of stuff trying to emulate ABMC.
+
+
+The observed latency in increasingly large R/W operations scaled as
+expected across various numbers of competing processes and cache
+portions. The distinct jumps in latency as successive cache level
+capacities were exceeded indicates that (a) L3 CPOR is configurable from
+user space via the resctrl interface as described in this series and (b)
+that the feature itself is working correctly.
+
+For the series:
+
+Tested-by: Jesse Chick <jessechick@os.amperecomputing.com>
+
+Thanks,
+Jesse
