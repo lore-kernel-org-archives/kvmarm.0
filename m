@@ -1,77 +1,218 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BB13B6BE1
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 11:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6943B6C0F
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 12:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773748688; cv=none; b=EAWKsMUVPe+Nw/cusJJEycnMRhBpk+9p2fFwnKJR1Ezf/HgN8lxc+dCgGowkFjY0XxbazsV4aBc7gUVfmE671M0c2+YAPgLVhDlsS6OG5J0gcIO714f8y3B84zMYbDmNkvI9T6QsZF2KcF0EZO41dCPPQLMTtVYVSUDEy14czHc=
+	t=1773749349; cv=none; b=Doj6B1/UOkjIwTqmQGDu8rTccz5jxWtun8dZn2gDaXEFtLnHwLwKPN59spn1zQs7B6DBezuq2ZvqQedumen+LLYQwwyO3ymzs8EedobcX3o9JJZfUZWfG5KQEtakKatJ3cTd0Km8FbX/4garVLuTgk62UneI8dP/cNvwIMDP4B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773748688; c=relaxed/simple;
-	bh=2gctEw+ccsSJpqJdhH2NraKuCJmspR5Yf70y6A1ymLY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gZL6qxZfUqGGqxWdpnpaT9cS+ZxzXPPwRpeBJC1xrCdCHNfKNQD7GmlXfvrPi7PO2hw3eN66tcZt/o/HrT88ecxDnzkCuAH9gHBHSyhj1WVH2mo8qIXJ3OeQsh/D9dCfXtftM0KQSq9Y3Zyed4hQ4oa1Bnr+vl1fjqfZpH2ai2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P7tZbnZg; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P7tZbnZg"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773748684;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Zjwds4Z8n6IYLF5dnZmswgQEZ5qdvju6jCMsGxe61A0=;
-	b=P7tZbnZgAX34zDtFfW6SJ+K0yhL/vqFP9y3FtcmkUwyTpewIbSrqEeSYyREQlCsbYYiLWI
-	U52SrhG4Tn25UEvyxnCeDgNgdeT161flSX+StZfHSSTKd+wOwF1N0STkpTJDOVDt5FAZry
-	0cCuE4GKRnp0q7kxwyzbIJQzCyZ+fEU=
-From: Zenghui Yu <zenghui.yu@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
-Subject: [PATCH] KVM: arm64: Fix the descriptor address in __kvm_at_swap_desc()
-Date: Tue, 17 Mar 2026 19:57:48 +0800
-Message-ID: <20260317115748.47332-1-zenghui.yu@linux.dev>
+	s=arc-20240116; t=1773749349; c=relaxed/simple;
+	bh=SHUp5RexaU0dHAJG2TBMafc9aMmZA9jCgFpHSzBftSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRgUodxZ6Tx/PL8EhGaikj88Kht4hHZqWZya83JfycNNyYVkfYvmvGHHU5ghwneH5vGSUQ7CaYqkZlOv7Q8pTLED7vs4Ns4fMHgDDPZn2MlKWigtCeMVfqOPPAXjkLbLwe8Rs3iHqbcsUJXOXSF+fqpQYgswBeGGM8afycZ9rzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E32AE1477;
+	Tue, 17 Mar 2026 05:09:00 -0700 (PDT)
+Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DCC93F7BD;
+	Tue, 17 Mar 2026 05:09:05 -0700 (PDT)
+Date: Tue, 17 Mar 2026 12:09:03 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Vladimir Murzin <vladimir.murzin@arm.com>,
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>, Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
+ acknowledgement
+Message-ID: <ablEXwhfKyJW1i7l@J2N7QTR9R3>
+References: <20260302165801.3014607-1-catalin.marinas@arm.com>
+ <20260302165801.3014607-4-catalin.marinas@arm.com>
+ <aamT6-Mvr9nI1unq@willie-the-truck>
+ <aarB3iv8963UDn5E@arm.com>
+ <c4a302df-511b-40b2-97f2-06576748c999@arm.com>
+ <abA6N6ctPoscIbBe@arm.com>
+ <abLT05Nq-9J-uBEY@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abLT05Nq-9J-uBEY@willie-the-truck>
 
-From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+On Thu, Mar 12, 2026 at 02:55:15PM +0000, Will Deacon wrote:
+> On Tue, Mar 10, 2026 at 03:35:19PM +0000, Catalin Marinas wrote:
+> > Thanks Vladimir,
+> > 
+> > On Mon, Mar 09, 2026 at 10:13:20AM +0000, Vladimir Murzin wrote:
+> > > On 3/6/26 12:00, Catalin Marinas wrote:
+> > > >>> @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
+> > > >>>  	put_cpu_fpsimd_context();
+> > > >>>  }
+> > > >>>  
+> > > >>> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
+> > > >>> +
+> > > >>> +/*
+> > > >>> + * SME/CME erratum handling
+> > > >>> + */
+> > > >>> +static cpumask_var_t sme_dvmsync_cpus;
+> > > >>> +static cpumask_var_t sme_active_cpus;
+> > > >>> +
+> > > >>> +void sme_set_active(unsigned int cpu)
+> > > >>> +{
+> > > >>> +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
+> > > >>> +		return;
+> > > >>> +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
+> > > >>> +		return;
+> > > >>> +
+> > > >>> +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
+> > > >>> +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
+> > > >>> +
+> > > >>> +	cpumask_set_cpu(cpu, sme_active_cpus);
+> > > >>> +
+> > > >>> +	/*
+> > > >>> +	 * Ensure subsequent (SME) memory accesses are observed after the
+> > > >>> +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
+> > > >>> +	 */
+> > > >>> +	smp_mb();
+> > > >>
+> > > >> I can't convince myself that a DMB is enough here, as the whole issue
+> > > >> is that the SME memory accesses can be observed _after_ the TLB
+> > > >> invalidation. I'd have thought we'd need a DSB to ensure that the flag
+> > > >> updates are visible before the exception return.
+> > > > 
+> > > > This is only to ensure that the sme_active_cpus mask is observed before
+> > > > any SME accesses. The mask is later used to decide whether to send the
+> > > > IPI. We have something like this:
+> > > > 
+> > > > P0
+> > > > 	STSET	[sme_active_cpus]
+> > > > 	DMB
+> > > > 	SME access to [addr]
+> > > > 
+> > > > P1
+> > > > 	TLBI	[addr]
+> > > > 	DSB
+> > > > 	LDR	[sme_active_cpus]
+> > > > 	CBZ	out
+> > > > 	Do IPI
+> > > > out:
+> > > > 
+> > > > If P1 did not observe the STSET to [sme_active_cpus], P0 should have
+> > > > received and acknowledged the DVMSync before the STSET. Is your concern
+> > > > that P1 can observe the subsequent SME access but not the STSET?
+> > > > 
+> > > > No idea whether herd can model this (I only put this in TLA+ for the
+> > > > main logic check but it doesn't do subtle memory ordering).
+> > > 
+> > > JFYI, herd support for SME is still work-in-progress (specifically it misses
+> > > updates in cat), yet it can model VMSA.
+> > > 
+> > > IIUC, expectation here is that either
+> > > - P1 observes sme_active_cpus, so we have to do_IPI or
+> > > - P0 observes TLBI (say shutdown, so it must fault)
+> > > 
+> > > anything else is unexpected/forbidden.
+> > > 
+> > > AArch64 A
+> > > variant=vmsa
+> > > {
+> > >  int x=0;
+> > >  int active=0;
+> > > 
+> > >  0:X1=active;
+> > >  0:X3=x;
+> > > 
+> > >  1:X0=(valid:0);
+> > >  1:X1=PTE(x);
+> > >  1:X2=x;
+> > >  1:X3=active;
+> > >  
+> > > }
+> > >  P0                                 | P1                                            ;
+> > >  MOV W0,#1                          | STR X0,[X1]                                   ;
+> > >  STR W0,[X1] (* sme_active_cpus  *) | DSB ISH                                       ;
+> > >  DMB SY                             | LSR X9,X2,#12                                 ;
+> > >  LDR W2,[X3] (* access to [addr] *) | TLBI VAAE1IS,X9 (* [addr] *)                  ;
+> > >                                     | DSB ISH                                       ;
+> > >                                     | LDR W4,[X3]     (* sme_active_cpus *)         ;
+> > > 
+> > > exists ~(1:X4=1 \/ fault(P0,x))
+> > > 
+> > > Is that correct understanding? Have I missed anything?
+> > 
+> > Yes, I think that's correct. Another tweak specific to this erratum
+> > would be for P1 to do a store to x via another mapping after the
+> > TLBI+DSB and the P0 load should not see it.
+> > 
+> > Even with the CPU erratum, if the P1 DVMSync is received/acknowledged by
+> > P0 before its STR to sme_active_cpus, I don't see how the subsequent SME
+> > load would overtake the STR given the DMB. The erratum messed up the
+> > DVMSync acknowledgement, not the barriers.
+> 
+> I'm still finding this hard to reason about.
+> 
+> Why can't:
+> 
+> 1. P0 translates its SME load and puts the valid translation into its TLB
+> 2. P1 runs to completion, sees sme_active_cpus as 0 and so doesn't IPI
+> 3. P0 writes to sme_active_cpus and then does the SME load using the
+>    translation from (1)
 
-Using "(u64 __user *)hva + offset" to get the virtual addresses of S1/S2
-descriptors looks really wrong, if offset is not zero. What we want to get
-for swapping is hva + offset, not hva + offset*8. ;-)
+The key thing is that for micro-architectural reasons, C1-Pro provides
+stronger than architectural properties for TLB invalidation (aside from
+*completion* of SME accesses specifically). The DMB is not material to
+this example, but could matter if we wanted ordering in the absence of a
+TLBI.
 
-Fix it.
+Specifically, where C1-Pro receives a broadcast TLBI, and that TLBI
+architecturally affects the translation of an explicit memory effect of
+some instruction INSN (which may be an SME instruction), C1-Pro will
+also complete the explicit memory effects of all earlier (non-SME)
+instructions *in program order* before INSN. This happens regardless of
+out-of-order execution, etc.
 
-Fixes: f6927b41d573 ("KVM: arm64: Add helper for swapping guest descriptor")
-Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
----
- arch/arm64/kvm/at.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+When C1-Pro executes a sequence:
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index c5c5644b1878..a024d9a770dc 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -1753,7 +1753,7 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
- 	if (!writable)
- 		return -EPERM;
- 
--	ptep = (u64 __user *)hva + offset;
-+	ptep = (void __user *)hva + offset;
- 	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
- 		r = __lse_swap_desc(ptep, old, new);
- 	else
--- 
-2.53.0
+	STR		<1>, [<flag_addr>]
+	SME_LDR		<dst>, [<sme_addr>]
+	
+... if a broadcast TLBI is received which affects sme_addr, either:
 
+(a) The TLBI is received before any of SME_LDR's accesses to sme_addr
+    are translated. The SME_LDR instruction WILL NOT use the stale
+    translation for sme_addr.
+
+(b) The TLBI is received after any of SME_LDR's accesses to sme_addr are
+    translated. The SME_LDR instruction MIGHT use the stale translation
+    for sme_addr. Completion of the TLBI WILL ensure that the STR to
+    flag_addr has been globally observed. Until completion of the TLBI,
+    the STR to flag_addr and the SME_LDR to sme_addr could become
+    observed in any order.
+
+... and so IF the SME_LDR consumes a stale translation for sme_addr, the
+store to flag_addr WILL be globally observed before completion of the
+TLBI.
+
+When the STR and SME_LDR are either side of an ERET, the ERET itself is
+immaterial, and the scenario decays to the example above:
+
+	STR	<1>, [<flag_addr>]
+	ERET				// immaterial
+	SME_LDR	<dst>, [<sme_addr>]
+
+However, when clearing the flag *after* executing SME loads/stores, we
+still need to complete those SME loads/stores before clearing the flag.
+Either a DSB (or IESB as part of exception entry) are sufficient to
+complete those earlier SME accesses.
+
+Mark.
