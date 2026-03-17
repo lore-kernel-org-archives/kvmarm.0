@@ -1,54 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE5A25BEF8
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:31:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883702874E0
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773754296; cv=none; b=rklVe+icb4Kcr+vQyQJaPxaZiIsUtTT80OBo0GeOal1p2V8XmpwwA9j0eI3FwQHuQvT1QtEvL0aftXwtmeU/E+8ErdgfzpTmSCmWrF1ELd5e1fwCmxoOVUFFtpBG+MRqSI3JZEEBfD0jisCnR7aWrCghDgKpmJyGZm5UdKXzZpk=
+	t=1773754680; cv=none; b=WxPXk90el+TeJh+EOTjhWR7nuVGvfEV8OpgVOvrVHEWi/7HgbYQZSEuVkunimwM8/XhgY36NNC463QjqYpmmX2ei4+btWyUlai8xyJo3Q6agJPpPJEEz3jMV9YEkRTvihHYsO20aInE+FVH7exmMaGoSimygsI+eJnUA0lE2Xvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773754296; c=relaxed/simple;
-	bh=DSTFlNqodCcOj9M1rB8mRwfLqMQnLFCVkyLnYpbsHPY=;
+	s=arc-20240116; t=1773754680; c=relaxed/simple;
+	bh=XiXn41pL2mt6VJb+KOB6yO3Ib6UpJH/uxeyyDCOxJyA=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lQuwChmDbuAl1HFbrCAksW5p6mHXOgq1Ye0QJdQgW2qA2pwKPSIcoglPf1pcHkuOULmDLfbM8EyqAc1f2v0tRjI51+12vKRUw7C+YA4QovWFLPtwcoVyWUxVddx3EupO3HzlvWoMVY412huC8lNWPaKxAFchY/+jNs7ncAnveSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Krl/nvhw; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=I/7WsuMGQjP3sehGNejVghkkEt1raPjJNL3kZkXn5RSxtf8e319ER9KEcWMDC83/mJ1oPKXYWbi3donEhpS8Z6AIIBEcIfZtOBeTAic1XqozN85XNYsIZV1gFt3tDB09kpBH3QbEEchhqbIbcC3xufzkYcj55UH0Vl9EdVxA/LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuE6DjED; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Krl/nvhw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452FBC2BC86;
-	Tue, 17 Mar 2026 13:31:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuE6DjED"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21517C4CEF7;
+	Tue, 17 Mar 2026 13:38:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773754296;
-	bh=DSTFlNqodCcOj9M1rB8mRwfLqMQnLFCVkyLnYpbsHPY=;
+	s=k20201202; t=1773754680;
+	bh=XiXn41pL2mt6VJb+KOB6yO3Ib6UpJH/uxeyyDCOxJyA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Krl/nvhw1qEbpC3x8UIqixcxdStCjxc64yt0yK+9/fdhHGNulj+hvdzwSB+/YKFiq
-	 CfQaYXMbhXWRMTldnI/e5rvFhpBrNJ0SNKcJXpD3S6UCd9jfg1oOVXDLQttmfrXmbI
-	 HZxbgOCbXcjteXvOA+Rd2ibNa2i8yqsX7lIUCqRg3Osb0/yUxbxb3RvLk39vX7ZQbQ
-	 5oJTqjE8YfTqR1Pg4X3dbn+kj6i10APUbBIM3k/8LqnBBgx8UkkwpC/c+9ca/AzGIZ
-	 Ge7ynaCGBb4tPxu+HxO1zdn5ZcmPSnml0wySO4SWUzpuCEITMjD1bWEJFygERKiIJh
-	 cCsH75bLQ8tnQ==
+	b=fuE6DjED9CTPH8f9EXRTnRTf+rL+QXqdh0zK/bCJDqNAYrUxe4dNcEF2shjsFq5iV
+	 vTM0nQdqhRnTTFP9Ja4W4treexcNeA/7O9w1OhLmS+4oeeMehhvP3qxPrJJ+hiDrMC
+	 /MQbI/XOs50gqNUzauoTyiGTGViQRMUaLdprVMnyJ+6Qx3hprQ8qg+JthEE+AOq9Ke
+	 kI3HFyN48wY0HqBwVkS4sIe1t+XsmmrZiwMuD3lwRXxD32Dsb3nyZrZCvgXHBSbmYe
+	 QiicapWWTa8oXvF0jX+DBKCH9HqUYp9JRNSdpZFRODJN7HYyezisCb0px9zcEWOOgn
+	 7HckbnmP4F6jA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w2UWE-00000002rFQ-0ULt;
-	Tue, 17 Mar 2026 13:31:34 +0000
-Date: Tue, 17 Mar 2026 13:31:33 +0000
-Message-ID: <86ms0660qy.wl-maz@kernel.org>
+	id 1w2UcQ-00000002rPw-0DDo;
+	Tue, 17 Mar 2026 13:37:58 +0000
+Date: Tue, 17 Mar 2026 13:37:57 +0000
+Message-ID: <86ldfq60ga.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
+To: Zenghui Yu <zenghui.yu@linux.dev>
 Cc: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 08/17] KVM: arm64: Kill topup_memcache from kvm_s2_fault
-In-Reply-To: <CA+EHjTwHGkTjB1vgY3UdC2OpbAS3i5yCH=cbLNu38uBSmOxarQ@mail.gmail.com>
-References: <20260316175451.1866175-1-maz@kernel.org>
-	<20260316175451.1866175-9-maz@kernel.org>
-	<CA+EHjTwHGkTjB1vgY3UdC2OpbAS3i5yCH=cbLNu38uBSmOxarQ@mail.gmail.com>
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com
+Subject: Re: [PATCH] KVM: arm64: Fix the descriptor address in __kvm_at_swap_desc()
+In-Reply-To: <20260317115748.47332-1-zenghui.yu@linux.dev>
+References: <20260317115748.47332-1-zenghui.yu@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -60,72 +55,44 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com
+X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Mar 2026 12:12:57 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Tue, 17 Mar 2026 11:57:48 +0000,
+Zenghui Yu <zenghui.yu@linux.dev> wrote:
 > 
-> Hi Marc,
+> From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
 > 
-> On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > The topup_memcache field can be easily replaced by the equivalent
-> > conditions, and the resulting code is not much worse.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 11820e39ad8e1..abe239752c696 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1712,7 +1712,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
-> >
-> >  struct kvm_s2_fault {
-> >         bool writable;
-> > -       bool topup_memcache;
-> >         bool mte_allowed;
-> >         bool is_vma_cacheable;
-> >         bool s2_force_noncacheable;
-> > @@ -1983,7 +1982,6 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >                 .logging_active = logging_active,
-> >                 .force_pte = logging_active,
-> >                 .prot = KVM_PGTABLE_PROT_R,
-> > -               .topup_memcache = !perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu)),
-> >         };
-> >         void *memcache;
-> >         int ret;
-> > @@ -1994,9 +1992,11 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
-> >          * only exception to this is when dirty logging is enabled at runtime
-> >          * and a write fault needs to collapse a block entry into a table.
-> >          */
-> > -       ret = prepare_mmu_memcache(s2fd->vcpu, fault.topup_memcache, &memcache);
-> > -       if (ret)
-> > -               return ret;
-> > +       if (!perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu))) {
-> > +               ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
-> > +               if (ret)
-> > +                       return ret;
-> > +       }
+> Using "(u64 __user *)hva + offset" to get the virtual addresses of S1/S2
+> descriptors looks really wrong, if offset is not zero. What we want to get
+> for swapping is hva + offset, not hva + offset*8. ;-)
 > 
-> Further up in user_mem_abort(), when memcache is declared it should be
-> initialized to NULL, since prepare_mmu_memcache() isn't called if this
-> evaluates to false.
+> Fix it.
+> 
+> Fixes: f6927b41d573 ("KVM: arm64: Add helper for swapping guest descriptor")
+> Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
+> ---
+>  arch/arm64/kvm/at.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index c5c5644b1878..a024d9a770dc 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -1753,7 +1753,7 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
+>  	if (!writable)
+>  		return -EPERM;
+>  
+> -	ptep = (u64 __user *)hva + offset;
+> +	ptep = (void __user *)hva + offset;
+>  	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
+>  		r = __lse_swap_desc(ptep, old, new);
+>  	else
 
-I had that at some point, but then realised that there was no case
-where memcache could be used and yet not be initialised via
-prepare_mmu_memcache(). But given that this is still a bit fragile,
-I'll add it back.
+Holy crap! How did we miss that???
 
-> 
-> With that fixed:
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Thanks!
+Thanks a lot for spotting it, I'll queue that now.
 
 	M.
 
