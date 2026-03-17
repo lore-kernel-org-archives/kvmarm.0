@@ -1,51 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D843B347534;
-	Tue, 17 Mar 2026 08:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027C639B4AF;
+	Tue, 17 Mar 2026 08:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773734946; cv=none; b=JO5wUmL6FPJlKkUaUsTMbPJkBXnhIgnJLSwVT2eiJdiYaErycGUI2DFgjIoZU+s5uH4Vt4NJS9vbCbxL3RotB0TaAZSlissNAvzBinTVFAmZgkTkxWZbkQiRUDxLTi5jTEEw390Ds6yZplh9ibyXC5Wu0jt5+1v5K7rRvEjxBLk=
+	t=1773735638; cv=none; b=Co0nARFpAYBuH5+FSiidJ7H8eC6hVOZD+S9QnFsk+UAB0zxH805lQP+ik8Hv5Gy7tsndMTkNfggVMA51WXPKC7mU5uclGICw1Xq3ORMH2IZMQ2JaY+2HpchiLDg9AsV+tjTpMBfrc7c//1Fi1eTQXMGH/6DyOv43lPd2u+pf/bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773734946; c=relaxed/simple;
-	bh=pZLoz5lEIGgdAJhNIyXH77h5lEV+4eOUvYS/fzXElpw=;
+	s=arc-20240116; t=1773735638; c=relaxed/simple;
+	bh=VQNGXk1va0JojLCa5FTgduK6/uhqV70yDcBBQE/5J40=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ao6jRT7tpVbEjOkaZK+IYlf9vFrTZaCR/Wv4qXnr89lnkVJB9ucOXd63Hseca49meRfoBqR2yDAm4kcccKO1GTvVFNOmX+xkI7o0VNMD0y7WjLxH9gQ9rmr0TN3dmlV42bus0s7q9UkaIu/LUZdW2r01jwQWd6zKYVd7NNmD4SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSydQOL/; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=cJRWw8IhzAZ5T5qYVNZmbH3S4ur47jgR/gD/lHcX/MCr1sD0YDVd9+XAmEmOYVIOTi/I5trtF/LWkidY0YgfSX9fhQFD5BuKjvJlWUWgG+tWmc04GjwyZQRQJpWzw7qPMvcXiBjTd18JF80iR1owiiFT6cPGB26qyCldJ+sjgdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2kTCLKJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSydQOL/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8653AC4CEF7;
-	Tue, 17 Mar 2026 08:09:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2kTCLKJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 852C1C2BC9E;
+	Tue, 17 Mar 2026 08:20:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773734946;
-	bh=pZLoz5lEIGgdAJhNIyXH77h5lEV+4eOUvYS/fzXElpw=;
+	s=k20201202; t=1773735637;
+	bh=VQNGXk1va0JojLCa5FTgduK6/uhqV70yDcBBQE/5J40=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dSydQOL//5sJBllGkJbVbhnN+f9/wJqlCuZqvfuEoEb243KW62M2Ww8+P8cH1QOt8
-	 8Pb7DTalXEX/TPQGQNtyC5eWTrmMjzMC2wa4u2LPXYky4y+BoMA1B5GPLv0+oP//G7
-	 v9HGA1AbvC6eAhcyoglrBqUfUUI4t3zSD8A3TmPfr0Tny/j2cAd1eVdlAtWTMX+Y9z
-	 BApcPI9Cq5VjNwkb9iqKggvhwiAX44xP+cXFTxb/qsZjqImnnhG1uxZ6DKFKgEwAun
-	 8AMk778zukYaKc/k0gtJPFkky72QVP8N/j2qFhQ3tQztEQCohut686gJXRI+WmoBoz
-	 4qa2jDVd8Ok9g==
+	b=L2kTCLKJqOS5HvcFUgK480t6dsocDP43k7dp9YZ4h3bO+TaOUQ6TxqzWDPQSy9sAg
+	 cgc6Vxu2E2kx/JdVdZNzd7o8fJ5MU/DyPHfI7J8H188DI4B8Fi568eGIrIPWsEAcn1
+	 ir9C2S5TKU6Bo8nUHWwEnSkI52KvNSLf/ws0gqR81LBB4+tIjiRKCIzNvpTrYf6N1w
+	 ZbCFYayAtr1aW5t6CQBLNeMTLQFNk14XqoLUelLRdytMfYZeWGCtB02ZalIGu/fnJe
+	 43EW4CDNsVsoYFwUdcUs9TDhGBT1D9uT3l3O8v0tnLXHgH1GXXK0Ur2uLaCvacoo7k
+	 U4HFMjgCFGFxA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w2PU8-00000002j3y-0u33;
-	Tue, 17 Mar 2026 08:09:04 +0000
-Date: Tue, 17 Mar 2026 08:09:03 +0000
-Message-ID: <86wlza6fog.wl-maz@kernel.org>
+	id 1w2PfG-00000002jEv-3Wqu;
+	Tue, 17 Mar 2026 08:20:34 +0000
+Date: Tue, 17 Mar 2026 08:20:34 +0000
+Message-ID: <86v7eu6f59.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jing Zhang <jingzhangos@google.com>
-Cc: KVM <kvm@vger.kernel.org>,
-	KVMARM <kvmarm@lists.linux.dev>,
+To: Fuad Tabba <tabba@google.com>
+Cc: Oliver Upton <oupton@kernel.org>,
 	Joey Gouly <joey.gouly@arm.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 2/3] lib: arm64: Add bare-metal guest execution framework
-In-Reply-To: <20260316224349.2360482-3-jingzhangos@google.com>
-References: <20260316224349.2360482-1-jingzhangos@google.com>
-	<20260316224349.2360482-3-jingzhangos@google.com>
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <linux-arm-kernel@lists.infradead.org>,
+	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <kvmarm@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/10] KVM: arm64: Adopt scoped resource management (guard) for EL1 and EL2
+In-Reply-To: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
+References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -57,118 +59,40 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, joey.gouly@arm.com, andrew.jones@linux.dev, alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Mar 2026 22:43:48 +0000,
-Jing Zhang <jingzhangos@google.com> wrote:
+On Mon, 16 Mar 2026 17:35:21 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> To test advanced KVM features such as nested virtualization (NV) and
-> GICv4 direct interrupt injection, kvm-unit-tests needs the ability to
-> act as an L1 hypervisor running at EL2 and manage its own L2 guests.
+> Hi everyone,
 > 
-> Introduce a lightweight guest management library that provides the
-> infrastructure to create, configure, and execute nested guests.
-> 
-> This framework includes:
-> - Guest lifecycle management: `guest_create()` and `guest_destroy()`
->   APIs to allocate guest context and setup Stage-2 identity mappings
->   for code and stack using the s2mmu library.
-> - Context switching: The `guest_run()` assembly routine handles
->   saving the host (L1) callee-saved registers and loading the guest
->   (L2) GPRs and EL1 system registers.
-> - VM-Exit handling: Installs an EL2 trap handler (`guest_hyp_vectors`)
->   to intercept guest exits and route them to `guest_c_exception_handler`
->   to determine whether to return to the host test logic or resume.
-> - Guest-internal exceptions: Provides `guest_el1_vectors` to catch
->   Sync, IRQ, FIQ, and SError exceptions occurring entirely within the
->   guest (EL1) without trapping to the host.
-> 
-> Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> ---
->  arm/Makefile.arm64     |   2 +
->  lib/arm64/asm/guest.h  | 156 ++++++++++++++++++++++++
->  lib/arm64/guest.c      | 197 ++++++++++++++++++++++++++++++
->  lib/arm64/guest_arch.S | 263 +++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 618 insertions(+)
->  create mode 100644 lib/arm64/asm/guest.h
->  create mode 100644 lib/arm64/guest.c
->  create mode 100644 lib/arm64/guest_arch.S
-> 
-> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-> index 5e50f5ba..9026fd71 100644
-> --- a/arm/Makefile.arm64
-> +++ b/arm/Makefile.arm64
-> @@ -41,6 +41,8 @@ cflatobjs += lib/arm64/processor.o
->  cflatobjs += lib/arm64/spinlock.o
->  cflatobjs += lib/arm64/gic-v3-its.o lib/arm64/gic-v3-its-cmd.o
->  cflatobjs += lib/arm64/stage2_mmu.o
-> +cflatobjs += lib/arm64/guest.o
-> +cflatobjs += lib/arm64/guest_arch.o
->  
->  ifeq ($(CONFIG_EFI),y)
->  cflatobjs += lib/acpi.o
-> diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
-> new file mode 100644
-> index 00000000..1d70873d
-> --- /dev/null
-> +++ b/lib/arm64/asm/guest.h
-> @@ -0,0 +1,156 @@
-> +/*
-> + * Copyright (C) 2026, Google LLC.
-> + * Author: Jing Zhang <jingzhangos@google.com>
-> + *
-> + * SPDX-License-Identifier: LGPL-2.0-or-later
-> + */
-> +#ifndef _ASMARM64_GUEST_H_
-> +#define _ASMARM64_GUEST_H_
-> +
-> +/* Offsets for assembly (Must match struct guest) */
-> +#define GUEST_X_OFFSET			0
-> +#define GUEST_ELR_OFFSET		248
-> +#define GUEST_SPSR_OFFSET		256
-> +#define GUEST_HCR_OFFSET		264
-> +#define GUEST_VTTBR_OFFSET		272
-> +#define GUEST_SCTLR_OFFSET		280
-> +#define GUEST_VBAR_OFFSET		288
-> +#define GUEST_SP_EL1_OFFSET		296
-> +#define GUEST_ESR_OFFSET		304
-> +#define GUEST_FAR_OFFSET		312
-> +#define GUEST_HPFAR_OFFSET		320
-> +#define GUEST_EXIT_CODE_OFFSET		328
-> +#define GUEST_TPIDR_EL1_OFFSET		336
-> +#define GUEST_ICH_VMCR_EL2_OFFSET	344
+> I stumbled upon a lock leak while reviewing Sebastien's recent GIC Hardening
+> series [1] on an early error path. It reminded me that we've run into this exact
+> kind of bug pretty often while working on pKVM. Since we're going to be
+> hopefully upstream even more pKVM code soon, I'd like to try and fix this
+> pattern once and for all.
 
-Don't hardcode offsets. Generate them.
+I'm of the opposite opinion. I'd rather convert things as code gets
+modified, because this otherwise makes backporting patches a real pain
+(we have been through that exercise with the irq stack, and it wasn't
+an enjoyable experience).
 
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +#include <libcflat.h>
-> +#include <asm/stage2_mmu.h>
-> +
-> +/* HCR_EL2 Definitions */
-> +#define HCR_VM		(1UL << 0)	/* Virtualization Enable */
-> +#define HCR_FMO		(1UL << 3)	/* Physical FIQ Routing */
-> +#define HCR_IMO		(1UL << 4)	/* Physical IRQ Routing */
-> +#define HCR_AMO		(1UL << 5)	/* Physical SError Interrupt Routing */
-> +#define HCR_RW		(1UL << 31)	/* Execution State: AArch64 */
-> +#define HCR_DC		(1UL << 12)	/* Default Cacheable */
-> +#define HCR_E2H		(1UL << 34)	/* EL2 Host */
+So while I'm not opposed to this in general, I'd rather see it as a
+prefix for new features, instead of a standalone series.
 
-Please consider importing the kernel's sysreg definition, or generate
-them from an official source (the architecture JSON file, for
-example).
+[...]
 
-> +
-> +#define HCR_GUEST_FLAGS (HCR_VM | HCR_FMO | HCR_IMO | HCR_AMO | HCR_RW | \
-> +			 HCR_DC | HCR_E2H)
+> There are definitely other parts of the KVM codebase that could benefit from
+> this (especially the vGIC), but I'm stopping here for now to see what everyone
+> thinks of the approach before touching anything else.
 
-Just to set expectations: HCR_EL2.DC is not supported by KVM, and
-likely never will. I'm hopeful that this bit (and a few others) will
-eventually be deprecated because it serves no purpose. If you need a
-1:1 S1 mapping, create it using (surprise!) page tables.
+The vgic is specially difficult to convert because of some of the
+constructs that take a lock in a function and release it in another,
+defeating the scope-based locking.
+
+I'll have a look at the series anyway.
 
 Thanks,
 
