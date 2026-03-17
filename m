@@ -1,218 +1,156 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6943B6C0F
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 12:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773749349; cv=none; b=Doj6B1/UOkjIwTqmQGDu8rTccz5jxWtun8dZn2gDaXEFtLnHwLwKPN59spn1zQs7B6DBezuq2ZvqQedumen+LLYQwwyO3ymzs8EedobcX3o9JJZfUZWfG5KQEtakKatJ3cTd0Km8FbX/4garVLuTgk62UneI8dP/cNvwIMDP4B8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773749349; c=relaxed/simple;
-	bh=SHUp5RexaU0dHAJG2TBMafc9aMmZA9jCgFpHSzBftSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BRgUodxZ6Tx/PL8EhGaikj88Kht4hHZqWZya83JfycNNyYVkfYvmvGHHU5ghwneH5vGSUQ7CaYqkZlOv7Q8pTLED7vs4Ns4fMHgDDPZn2MlKWigtCeMVfqOPPAXjkLbLwe8Rs3iHqbcsUJXOXSF+fqpQYgswBeGGM8afycZ9rzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E32AE1477;
-	Tue, 17 Mar 2026 05:09:00 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6DCC93F7BD;
-	Tue, 17 Mar 2026 05:09:05 -0700 (PDT)
-Date: Tue, 17 Mar 2026 12:09:03 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	Vladimir Murzin <vladimir.murzin@arm.com>,
-	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	James Morse <james.morse@arm.com>, Mark Brown <broonie@kernel.org>,
-	kvmarm@lists.linux.dev
-Subject: Re: [PATCH 3/4] arm64: errata: Work around early CME DVMSync
- acknowledgement
-Message-ID: <ablEXwhfKyJW1i7l@J2N7QTR9R3>
-References: <20260302165801.3014607-1-catalin.marinas@arm.com>
- <20260302165801.3014607-4-catalin.marinas@arm.com>
- <aamT6-Mvr9nI1unq@willie-the-truck>
- <aarB3iv8963UDn5E@arm.com>
- <c4a302df-511b-40b2-97f2-06576748c999@arm.com>
- <abA6N6ctPoscIbBe@arm.com>
- <abLT05Nq-9J-uBEY@willie-the-truck>
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162313BD24D
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 12:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773749617; cv=pass; b=bb5/K4YqRA0DkZHxs7qCOqzfONlkKcC+sG2dDvxHzX2Y5In+0N6b/cepf1cGx5kBN4swNj8V546hJIozzp97Tfb/Yplw5XtKm2ALktzZRyTwdrOO3XoNcY9SNy7FJY23+wHJ+vd9NolF108+esP50FVX1QhjEP9DrcStcp+MItk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773749617; c=relaxed/simple;
+	bh=lOndnAaLoKMyJ7IGOo4C/9q1yyeh4731Ys2b0OKEX+s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Nzo+NEXcf4Lrwfs+5hW49HnXNO2PCNnw1qUsJXlx6AtlvtxyM8EVJhOchrETUVRTS8yp1YiZcRVymuK1zmPNL3rh0gfYkoZJjGKyPdX2NA73Ny8shjAuBb5BMOLKeFYZDf9smEiJCLTj+sOQwEkrS64XOqJP3dmIzgiFlhQi+yY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kv2y4XWD; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kv2y4XWD"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-50906a98ffeso585781cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 05:13:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773749615; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Z8neVaNCrI9uNW4zFf3CDmISLIOT7NeM5IuaM9Dc4zUxf9nFjJRe8L6lOSlZ5SbHlw
+         bKyfPGMhfSe171jj9r8B6HK/j2d7jgxYOB1WbkMo9xHXxCmfjCKxyzjhuH9k6IHXRChc
+         NtqtOKzv8lOXHZLfjVlVeFqXIubZIRrva8Ie/oC/2q2BJuWqgtzKJACUyWZYfVAuS1S8
+         O7KqjMVXig4FzS5rpCuPR54iEOLwhCT4rYAFEzDTanzQVWGychqig2I8TWA6gvWMKPxi
+         vHc083y60PagQ/EcLPr73UIte47mEBrgcSO1wp0yj0HidDuanPR1NqKK8+xCePaqZ62k
+         Pd/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=hwWNJTID6ZXpzh92DfTBNJePUIEHrZBNUiZwgIap8M4=;
+        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
+        b=EcmhJZFkcLJc0/deHJjIFb9ddZgCeVo5nvjg/oURAaqoObhH2eQdsO5MxEL1J4b7wU
+         U7GuEOQW1CoZ6jkvWI4ZVk0RimVBs1cSK82sgCHPw4bHGCeVRCHRnGjhywiAQ0UY/9qY
+         Uwjp7cfpX2b1SfBM33upAUKnyu6QgbUMKZBGOY39xJQksQziAVMMZTtRa6h8VoPe5m2S
+         r2Z8m8Slap+lfhm3fcczV+XktIpTZBn9uQ9llNST1g4VFeFvqIzyfTPkuOr0khlp73Ki
+         IAdbnNkLznQz7b+J8vqQ95rSNpuEFXsefJTJp+P30MaZ7yvbzItasMLBBlzYXmeXDCgS
+         /wFw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773749615; x=1774354415; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hwWNJTID6ZXpzh92DfTBNJePUIEHrZBNUiZwgIap8M4=;
+        b=kv2y4XWDHRZgCBK/TDV2CNg3Rp8pVnBa1MdKVWtciKlfHiOnjyCNbbT4HwqIv08d/G
+         QcXqrvW/H6okx5QEYOqHKcpgAcpXV833mFxySJqqSdvCC1cFDEfWXKM0TKf+5KhXLOA9
+         sapLdkKNHMsmKr9yt1RawSwVWa3tNIqKWShq7yEK03ZjlLzcdup9qdhN/+w045H20KLA
+         GgXPDcBxzk3+/Q1zZvEo4FqjmNDJRLGq+JSM0Q/DtC0+Chqkrnputnm1ps4BTvOmJ5Ot
+         ICzFXYMz1VLgUD2Jk8muszyO6HIZjonG5rE/WaiT7W50ln5hWob9iBfUI6NKvOZ3Kv7W
+         skCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773749615; x=1774354415;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hwWNJTID6ZXpzh92DfTBNJePUIEHrZBNUiZwgIap8M4=;
+        b=Xp8c9vR1HbGwrzHaszSW4ETuS38HvagYZLalXERfpq2Ybx1uJqtDac4ZgP9QN5uMWU
+         IyJ5IsCbYJHjnbE8RVgBtmqkkC7dsmIsLaN1YD4MMftmfqDIOc+CXsAtImE2gnJQGZzG
+         4YKmTMu8+ffXAn5gaXqdcpRbpEl4NbAbBCqgf2VW7V7tUf9UKRMoRI8nqwxXntIM5teO
+         H6F7VGtzN7HFGdw7xtsrlNW+HFcJB8reUGNF46aIVcR58BM8dXudY4Ec76mTVqI9MqOR
+         tMuIN5VQ43MKBd66PxjhYRAlrL9Z94PG6zWdESJHhujDHBG9wR9Y7PWs7BVM+eb+RSNf
+         CLaw==
+X-Gm-Message-State: AOJu0Yz9S2M4CG60GKRSJ1Ru0S5tjRn0kLIB3/pT8xx0CRH4KMtwCrpV
+	wfyAnBh5XxJevLk5mvAFZIiWmWWI1IIenVCmu1BGbT0c+hwcr6gvv1YUKxcIs/RVc6s/VGkdWa/
+	8JdpTiRL0rkz312J3pyH1MYHl1V6uq+fwSCz2OW4r
+X-Gm-Gg: ATEYQzxe9FGORxlMjgkZI8JgPx+2RhMjaudaORWku4ZRUiw7lyA2/0qGK01CFsV+Cgn
+	fH5YGzzFsZvjp4PCWkPTlrid7QbmnyOXT+3QT2jSYsbQrPEupSR3njEwZnRCwUQaVDkZQ2TAv5n
+	qI+himYMo1QiM1+TIWEicTXCvMVpQr7lnblaqw2yI0I4lcjWiITHD1a9KyMFDSBjoasKtD4cF5E
+	DO5TUKidZW/2SxOjKKODc54pyregMQVpcyNKbzSbb5JOxRSlO1Ya3zByekOmNkFBRAI87bUIkfW
+	PTt+Wbd3qqkhYUR8lp7Q9M4t8uADU4AkTUw4
+X-Received: by 2002:ac8:598c:0:b0:509:25c5:42b4 with SMTP id
+ d75a77b69052e-5099ae752a3mr11728141cf.13.1773749614349; Tue, 17 Mar 2026
+ 05:13:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abLT05Nq-9J-uBEY@willie-the-truck>
+References: <20260316175451.1866175-1-maz@kernel.org> <20260316175451.1866175-9-maz@kernel.org>
+In-Reply-To: <20260316175451.1866175-9-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 17 Mar 2026 12:12:57 +0000
+X-Gm-Features: AaiRm52d-_Ix5WYeihZWEM26ba847CqKWtem_pAtFTeh0W9v9Uwl5qcj1eW1Z_k
+Message-ID: <CA+EHjTwHGkTjB1vgY3UdC2OpbAS3i5yCH=cbLNu38uBSmOxarQ@mail.gmail.com>
+Subject: Re: [PATCH 08/17] KVM: arm64: Kill topup_memcache from kvm_s2_fault
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Mar 12, 2026 at 02:55:15PM +0000, Will Deacon wrote:
-> On Tue, Mar 10, 2026 at 03:35:19PM +0000, Catalin Marinas wrote:
-> > Thanks Vladimir,
-> > 
-> > On Mon, Mar 09, 2026 at 10:13:20AM +0000, Vladimir Murzin wrote:
-> > > On 3/6/26 12:00, Catalin Marinas wrote:
-> > > >>> @@ -1358,6 +1360,85 @@ void do_sve_acc(unsigned long esr, struct pt_regs *regs)
-> > > >>>  	put_cpu_fpsimd_context();
-> > > >>>  }
-> > > >>>  
-> > > >>> +#ifdef CONFIG_ARM64_ERRATUM_SME_DVMSYNC
-> > > >>> +
-> > > >>> +/*
-> > > >>> + * SME/CME erratum handling
-> > > >>> + */
-> > > >>> +static cpumask_var_t sme_dvmsync_cpus;
-> > > >>> +static cpumask_var_t sme_active_cpus;
-> > > >>> +
-> > > >>> +void sme_set_active(unsigned int cpu)
-> > > >>> +{
-> > > >>> +	if (!cpus_have_final_cap(ARM64_WORKAROUND_SME_DVMSYNC))
-> > > >>> +		return;
-> > > >>> +	if (!cpumask_test_cpu(cpu, sme_dvmsync_cpus))
-> > > >>> +		return;
-> > > >>> +
-> > > >>> +	if (!test_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags))
-> > > >>> +		set_bit(ilog2(MMCF_SME_DVMSYNC), &current->mm->context.flags);
-> > > >>> +
-> > > >>> +	cpumask_set_cpu(cpu, sme_active_cpus);
-> > > >>> +
-> > > >>> +	/*
-> > > >>> +	 * Ensure subsequent (SME) memory accesses are observed after the
-> > > >>> +	 * cpumask and the MMCF_SME_DVMSYNC flag setting.
-> > > >>> +	 */
-> > > >>> +	smp_mb();
-> > > >>
-> > > >> I can't convince myself that a DMB is enough here, as the whole issue
-> > > >> is that the SME memory accesses can be observed _after_ the TLB
-> > > >> invalidation. I'd have thought we'd need a DSB to ensure that the flag
-> > > >> updates are visible before the exception return.
-> > > > 
-> > > > This is only to ensure that the sme_active_cpus mask is observed before
-> > > > any SME accesses. The mask is later used to decide whether to send the
-> > > > IPI. We have something like this:
-> > > > 
-> > > > P0
-> > > > 	STSET	[sme_active_cpus]
-> > > > 	DMB
-> > > > 	SME access to [addr]
-> > > > 
-> > > > P1
-> > > > 	TLBI	[addr]
-> > > > 	DSB
-> > > > 	LDR	[sme_active_cpus]
-> > > > 	CBZ	out
-> > > > 	Do IPI
-> > > > out:
-> > > > 
-> > > > If P1 did not observe the STSET to [sme_active_cpus], P0 should have
-> > > > received and acknowledged the DVMSync before the STSET. Is your concern
-> > > > that P1 can observe the subsequent SME access but not the STSET?
-> > > > 
-> > > > No idea whether herd can model this (I only put this in TLA+ for the
-> > > > main logic check but it doesn't do subtle memory ordering).
-> > > 
-> > > JFYI, herd support for SME is still work-in-progress (specifically it misses
-> > > updates in cat), yet it can model VMSA.
-> > > 
-> > > IIUC, expectation here is that either
-> > > - P1 observes sme_active_cpus, so we have to do_IPI or
-> > > - P0 observes TLBI (say shutdown, so it must fault)
-> > > 
-> > > anything else is unexpected/forbidden.
-> > > 
-> > > AArch64 A
-> > > variant=vmsa
-> > > {
-> > >  int x=0;
-> > >  int active=0;
-> > > 
-> > >  0:X1=active;
-> > >  0:X3=x;
-> > > 
-> > >  1:X0=(valid:0);
-> > >  1:X1=PTE(x);
-> > >  1:X2=x;
-> > >  1:X3=active;
-> > >  
-> > > }
-> > >  P0                                 | P1                                            ;
-> > >  MOV W0,#1                          | STR X0,[X1]                                   ;
-> > >  STR W0,[X1] (* sme_active_cpus  *) | DSB ISH                                       ;
-> > >  DMB SY                             | LSR X9,X2,#12                                 ;
-> > >  LDR W2,[X3] (* access to [addr] *) | TLBI VAAE1IS,X9 (* [addr] *)                  ;
-> > >                                     | DSB ISH                                       ;
-> > >                                     | LDR W4,[X3]     (* sme_active_cpus *)         ;
-> > > 
-> > > exists ~(1:X4=1 \/ fault(P0,x))
-> > > 
-> > > Is that correct understanding? Have I missed anything?
-> > 
-> > Yes, I think that's correct. Another tweak specific to this erratum
-> > would be for P1 to do a store to x via another mapping after the
-> > TLBI+DSB and the P0 load should not see it.
-> > 
-> > Even with the CPU erratum, if the P1 DVMSync is received/acknowledged by
-> > P0 before its STR to sme_active_cpus, I don't see how the subsequent SME
-> > load would overtake the STR given the DMB. The erratum messed up the
-> > DVMSync acknowledgement, not the barriers.
-> 
-> I'm still finding this hard to reason about.
-> 
-> Why can't:
-> 
-> 1. P0 translates its SME load and puts the valid translation into its TLB
-> 2. P1 runs to completion, sees sme_active_cpus as 0 and so doesn't IPI
-> 3. P0 writes to sme_active_cpus and then does the SME load using the
->    translation from (1)
+Hi Marc,
 
-The key thing is that for micro-architectural reasons, C1-Pro provides
-stronger than architectural properties for TLB invalidation (aside from
-*completion* of SME accesses specifically). The DMB is not material to
-this example, but could matter if we wanted ordering in the absence of a
-TLBI.
+On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
+>
+> The topup_memcache field can be easily replaced by the equivalent
+> conditions, and the resulting code is not much worse.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/mmu.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 11820e39ad8e1..abe239752c696 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1712,7 +1712,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+>
+>  struct kvm_s2_fault {
+>         bool writable;
+> -       bool topup_memcache;
+>         bool mte_allowed;
+>         bool is_vma_cacheable;
+>         bool s2_force_noncacheable;
+> @@ -1983,7 +1982,6 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>                 .logging_active = logging_active,
+>                 .force_pte = logging_active,
+>                 .prot = KVM_PGTABLE_PROT_R,
+> -               .topup_memcache = !perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu)),
+>         };
+>         void *memcache;
+>         int ret;
+> @@ -1994,9 +1992,11 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>          * only exception to this is when dirty logging is enabled at runtime
+>          * and a write fault needs to collapse a block entry into a table.
+>          */
+> -       ret = prepare_mmu_memcache(s2fd->vcpu, fault.topup_memcache, &memcache);
+> -       if (ret)
+> -               return ret;
+> +       if (!perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu))) {
+> +               ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
+> +               if (ret)
+> +                       return ret;
+> +       }
 
-Specifically, where C1-Pro receives a broadcast TLBI, and that TLBI
-architecturally affects the translation of an explicit memory effect of
-some instruction INSN (which may be an SME instruction), C1-Pro will
-also complete the explicit memory effects of all earlier (non-SME)
-instructions *in program order* before INSN. This happens regardless of
-out-of-order execution, etc.
+Further up in user_mem_abort(), when memcache is declared it should be
+initialized to NULL, since prepare_mmu_memcache() isn't called if this
+evaluates to false.
 
-When C1-Pro executes a sequence:
+With that fixed:
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-	STR		<1>, [<flag_addr>]
-	SME_LDR		<dst>, [<sme_addr>]
-	
-... if a broadcast TLBI is received which affects sme_addr, either:
+Cheers,
+/fuad
 
-(a) The TLBI is received before any of SME_LDR's accesses to sme_addr
-    are translated. The SME_LDR instruction WILL NOT use the stale
-    translation for sme_addr.
-
-(b) The TLBI is received after any of SME_LDR's accesses to sme_addr are
-    translated. The SME_LDR instruction MIGHT use the stale translation
-    for sme_addr. Completion of the TLBI WILL ensure that the STR to
-    flag_addr has been globally observed. Until completion of the TLBI,
-    the STR to flag_addr and the SME_LDR to sme_addr could become
-    observed in any order.
-
-... and so IF the SME_LDR consumes a stale translation for sme_addr, the
-store to flag_addr WILL be globally observed before completion of the
-TLBI.
-
-When the STR and SME_LDR are either side of an ERET, the ERET itself is
-immaterial, and the scenario decays to the example above:
-
-	STR	<1>, [<flag_addr>]
-	ERET				// immaterial
-	SME_LDR	<dst>, [<sme_addr>]
-
-However, when clearing the flag *after* executing SME loads/stores, we
-still need to complete those SME loads/stores before clearing the flag.
-Either a DSB (or IESB as part of exception entry) are sufficient to
-complete those earlier SME accesses.
-
-Mark.
+>
+>         /*
+>          * Let's check if we will get back a huge fault->page backed by hugetlbfs, or
+> --
+> 2.47.3
+>
