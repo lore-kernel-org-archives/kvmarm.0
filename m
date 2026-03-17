@@ -1,100 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883702874E0
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4132773CA
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773754680; cv=none; b=WxPXk90el+TeJh+EOTjhWR7nuVGvfEV8OpgVOvrVHEWi/7HgbYQZSEuVkunimwM8/XhgY36NNC463QjqYpmmX2ei4+btWyUlai8xyJo3Q6agJPpPJEEz3jMV9YEkRTvihHYsO20aInE+FVH7exmMaGoSimygsI+eJnUA0lE2Xvo=
+	t=1773755071; cv=none; b=j04rJjapcDWSHVr5jhv59Li4mKNHpKXTDHbb1deQ4C6qVmf16VP3c/UZBJ/vTDzxtPigYqp4Wqsw1Q4Il5yMLYvhs9VS06Fc+QA1FPsqqdmHFmEPxJTmkiXPkgBsOYO0pN9XglK0GJ+2XMXyPvRi9mv5ExEsyPJ61K2QkqjZ9aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773754680; c=relaxed/simple;
-	bh=XiXn41pL2mt6VJb+KOB6yO3Ib6UpJH/uxeyyDCOxJyA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I/7WsuMGQjP3sehGNejVghkkEt1raPjJNL3kZkXn5RSxtf8e319ER9KEcWMDC83/mJ1oPKXYWbi3donEhpS8Z6AIIBEcIfZtOBeTAic1XqozN85XNYsIZV1gFt3tDB09kpBH3QbEEchhqbIbcC3xufzkYcj55UH0Vl9EdVxA/LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fuE6DjED; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773755071; c=relaxed/simple;
+	bh=xDYlTj5oh0PNIz4gI3ATDUGTOj/ofdzKUm3Eoj3jiWM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WsYkrcTh9fXq7XrnvEid6SHySSOxa8PZ8/zzup6Kl/7EvjDjhSkTleTwOntOWkPRZ4Tn9pgWoh78EaAbQOg3PiwubVRPuMcVBH3Zd9AROklVuXKKXTCpstqJ8gdI0NtiJQ7mBjBfBq1aMLVzE1avxYpZ2nWaMjwFHyrL8UTG++c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mNl9nDdH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fuE6DjED"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21517C4CEF7;
-	Tue, 17 Mar 2026 13:38:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mNl9nDdH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86322C4CEF7;
+	Tue, 17 Mar 2026 13:44:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773754680;
-	bh=XiXn41pL2mt6VJb+KOB6yO3Ib6UpJH/uxeyyDCOxJyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fuE6DjED9CTPH8f9EXRTnRTf+rL+QXqdh0zK/bCJDqNAYrUxe4dNcEF2shjsFq5iV
-	 vTM0nQdqhRnTTFP9Ja4W4treexcNeA/7O9w1OhLmS+4oeeMehhvP3qxPrJJ+hiDrMC
-	 /MQbI/XOs50gqNUzauoTyiGTGViQRMUaLdprVMnyJ+6Qx3hprQ8qg+JthEE+AOq9Ke
-	 kI3HFyN48wY0HqBwVkS4sIe1t+XsmmrZiwMuD3lwRXxD32Dsb3nyZrZCvgXHBSbmYe
-	 QiicapWWTa8oXvF0jX+DBKCH9HqUYp9JRNSdpZFRODJN7HYyezisCb0px9zcEWOOgn
-	 7HckbnmP4F6jA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1773755071;
+	bh=xDYlTj5oh0PNIz4gI3ATDUGTOj/ofdzKUm3Eoj3jiWM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mNl9nDdHF+cPk2NZzCOwLbeBfSxKTlIZGn4PRwFOpGQVfpyQKL+Yu+q4vrpzwKRgE
+	 kVghIMBF3ho71K4mtfHZCiOtYdODBZxDgfUhvZXdOOTd6wpbfwU6JzBPPqa8zlu+aV
+	 lkJKS+9O3fTrc1FlAYLO15FcfPDaMfyvuEPjDjzXFiHQAhYXUzDW4XwJJ1vtll0yka
+	 HFoSofEz+hLXqsELs0iL7fpBSYgUZUOQriBT9ct9hn1+In4Oxz6Eh0Y32qqY2iXfWC
+	 kcGdObCRNLsqxYk6uP1K8bzPfkHCCkVas1yGeKLR/9PcgFZTRH9AHBzzT+eHvKtN5a
+	 S++9KdjkTEXvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w2UcQ-00000002rPw-0DDo;
-	Tue, 17 Mar 2026 13:37:58 +0000
-Date: Tue, 17 Mar 2026 13:37:57 +0000
-Message-ID: <86ldfq60ga.wl-maz@kernel.org>
+	id 1w2Uij-00000002raI-1Bu6;
+	Tue, 17 Mar 2026 13:44:29 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Zenghui Yu <zenghui.yu@linux.dev>
-Cc: kvmarm@lists.linux.dev,
+To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	oupton@kernel.org,
+	Zenghui Yu <zenghui.yu@linux.dev>
+Cc: oupton@kernel.org,
 	joey.gouly@arm.com,
 	suzuki.poulose@arm.com
 Subject: Re: [PATCH] KVM: arm64: Fix the descriptor address in __kvm_at_swap_desc()
+Date: Tue, 17 Mar 2026 13:44:25 +0000
+Message-ID: <177375505490.1884461.5958230825865756810.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260317115748.47332-1-zenghui.yu@linux.dev>
 References: <20260317115748.47332-1-zenghui.yu@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: zenghui.yu@linux.dev, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, zenghui.yu@linux.dev, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Mar 2026 11:57:48 +0000,
-Zenghui Yu <zenghui.yu@linux.dev> wrote:
-> 
-> From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
-> 
+On Tue, 17 Mar 2026 19:57:48 +0800, Zenghui Yu wrote:
 > Using "(u64 __user *)hva + offset" to get the virtual addresses of S1/S2
 > descriptors looks really wrong, if offset is not zero. What we want to get
 > for swapping is hva + offset, not hva + offset*8. ;-)
 > 
 > Fix it.
 > 
-> Fixes: f6927b41d573 ("KVM: arm64: Add helper for swapping guest descriptor")
-> Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
-> ---
->  arch/arm64/kvm/at.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index c5c5644b1878..a024d9a770dc 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -1753,7 +1753,7 @@ int __kvm_at_swap_desc(struct kvm *kvm, gpa_t ipa, u64 old, u64 new)
->  	if (!writable)
->  		return -EPERM;
->  
-> -	ptep = (u64 __user *)hva + offset;
-> +	ptep = (void __user *)hva + offset;
->  	if (cpus_have_final_cap(ARM64_HAS_LSE_ATOMICS))
->  		r = __lse_swap_desc(ptep, old, new);
->  	else
+> [...]
 
-Holy crap! How did we miss that???
+Applied to fixes, thanks!
 
-Thanks a lot for spotting it, I'll queue that now.
+[1/1] KVM: arm64: Fix the descriptor address in __kvm_at_swap_desc()
+      commit: 0496acc42fb51eee040b5170cec05cec41385540
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
