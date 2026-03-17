@@ -1,119 +1,157 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746BA3CBE82
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773753384; cv=none; b=cZQTAtddc/OVGHMz6EAkIdTd4eiz0QvUx65czXeIyfzycuYFuArvZdF77fnCXX3ImQyYiB+YC+QdcBiKBuV66Dle4twJuN4yOywxWmQumdtJ5xZlqN2CWrxsCKsitvhaGzl1wEeGd07/87BNee/6qnYe358/WDSMFwpKhq1jto8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773753384; c=relaxed/simple;
-	bh=smfiajjb19NeBIh75ht9LTElolmSzi3K6Y95Ae5Bx2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BZZ83I+im/eJE66jDbAy5QmcHG8Dvl5HmobyRLtA3ch/2tfWVtEkQO1nLBZP+g38gSx6xXH0+2naT++GBZy7yGVaf9qNKkKjpcabs98nfvj/KnEFmm5zY/WY6apt9iV6V8zepL25uSOgRmFxfDhR++poNYrxU+Y8O5QLPSKkggI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vmq4KMb4; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECDF3C3BF0
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 13:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773753853; cv=pass; b=E+yoA6RT+Swt+H4FI6o5OsfJmHyLw51yHZal/BnnS0O0MJ5FQlnWInB7yo8IhWIZJVMzbk8CPkiEGf3FioDpLvWsM2BenANl8E+eUAfe28xmfb4ekm+oxh/epZaSbKMpzi8D4SjQr/Ad7Prfqg3wQVZUjqVOsFv3sFCAapB82IE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773753853; c=relaxed/simple;
+	bh=brmkxukjELQ39QmpOAJrmSRpWsSOTggY5AT6Vr9no9s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UmzLQ+m3pf1Q4qNx49m2mr+zOLdhnx1cZDKBc1AfjtauvFV7rwz8DuC1x5uL2YELNJZUmYPl/7STTiz44rVR1dTxkw9vRzBF8d9uO/6p444MbTgZgmI5lgtF8B6APwqIvfjf0deUQ9FSH4wX/WP+pTjORJRuoVD3joxAuXBvKEM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E56P9hCL; arc=pass smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vmq4KMb4"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1773753380;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9oQqV+RX8x9mTT15DeOPQvLmrB9KGgQzFv8SO038oUc=;
-	b=vmq4KMb4KSzFmj/OfzyizXiwqJq2DLV0RQJwJ/B/p2gFvajS76MJbamDhUTWIut9Wso1b/
-	J0W2633uPICOl+Nx+imbwysMvlLot9bQS7bZO37W2koMM3P8+CUvKcywmeKhsEgfK36//5
-	9sGRcnSHtHi7z9NXPasv8MmDdSTM3U4=
-From: Zenghui Yu <zenghui.yu@linux.dev>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org
-Cc: maz@kernel.org,
-	oupton@kernel.org,
-	joey.gouly@arm.com,
-	suzuki.poulose@arm.com,
-	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
-Subject: [PATCH] KVM: arm64: selftests: Avoid testing the IMPDEF behavior
-Date: Tue, 17 Mar 2026 21:15:58 +0800
-Message-ID: <20260317131558.52751-1-zenghui.yu@linux.dev>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E56P9hCL"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-509062d829dso493761cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 06:24:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773753851; cv=none;
+        d=google.com; s=arc-20240605;
+        b=VF7jdlKlLP4+M85tQDbewizQXWXmp34cYOYzzDLO3l4UaaKlrj0lKUM5wrqIxhBPdh
+         uFORyfvFbeDA7PtOArjZYSyJuLAuP8f2R5Nq7fkJh8N6X35o70bMV+QBqAKwsINgwkkA
+         wMAvGXTA51RVCffzWsIto7HITqvbblTOGkQbnoY4ZaZXLXwN1Ompf1/Wa+djWJJOTVw8
+         0jxNMXmXI25tiaBPV8UjUyorsQas6CHD2vi4NDiNo9nezkWDmoe/oqQKvQay8ZiK2PM/
+         3+RHu2fzugnNMq6v6qCHSMRYXpX69AaxAjVJz+Ej2HYS43oYy3f3n2GI360f0GPYp0f2
+         uEfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=pX31OwUIyuVCce6a2uEpCU7DTCt/xoQQWL99r13ot9g=;
+        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
+        b=daFP0YHEd+7GP2HAP5tV9FLdPj8wXNFLLj4fU3oWXFklhJWCPWX4nAyA7pz6jz53FU
+         rVRlUU2D/hezoP6UfY2+OBBoSId+aQWRTzefMXv/t+7wZriru048hIPawH3fe2lO1KAl
+         Rm0XNEyy+D3en5DHqShumgcQ6s7SOL9gNYZ/L2F3TjMixzyEKG040UfMEIRQL1668q3K
+         QoQYxeTpNH6iLs/w2pa7iZ6eooVGxydv0ED1sNjXdE3p6CpJRPVlhD7S3nQ2+tKKUabB
+         SWqxUWjdJEU4zs/FXXjuSwyZY6rb2O1tbYYypwfRYDBGYbk0Rt6xgYcVNA0dq+2j9asC
+         VZ0A==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773753851; x=1774358651; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pX31OwUIyuVCce6a2uEpCU7DTCt/xoQQWL99r13ot9g=;
+        b=E56P9hCLxhXj80Wxx8CTl1p1vcbab+/dAgd8Fc4yEiiIXFr9NxNsmLMANm5VcJ6hhw
+         sPAAADs92kFTohc9vA/5CuXvs8OEykd+TwYJrFlrPFO3q0NoG5xIAsTX5XjdXIWGgCfK
+         2BkorDuiJVdWqBQ9pNfoGfWCPf/tFy1UaLqIVOlAO27oxSXA8j+HxHCzc0f0v75plENu
+         FfBBGb0vsuDVI/S14Iya8s4nMZvqn+73ADTXE4VS353m6ZKthSv9QLn55hNNUkX3INFP
+         NZd+9iOibua4K7C2bx8FLBujbnyBHtEtTVHPtzQmIRJJmNDyIlFqrV0gJrZfLUaaChem
+         pzwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773753851; x=1774358651;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pX31OwUIyuVCce6a2uEpCU7DTCt/xoQQWL99r13ot9g=;
+        b=hMZn5Le9AgbYg43O9aZpeEs96rOwGuihU2eag1oDpf3+X4FGLTrqqW9gcjIYl+jE70
+         qGz9N4iuUNoDJzH3nAImIxluoDrCxOL66KmnWVFNpLFY0B7Lj9OUuuCAYuVItntzRF1/
+         LYZIJ7yURG7sP9md2sHn5gvTrz4YSKJBs+gAQpmkTaRe6S4w7LCjiBipx2BZWMjrhYkg
+         gauJ/tyefULu7HX7GUE1yoSmwCHPM/oWf5b3MznLQQy3rQBfvIRYoHSK71kkMaowix3x
+         WybjDhcIdss1XKU3NTOe0aY+S0J6chIhX7l1kn8D7W8Ltgn4lzB5KZZViMUX2aVKlJaV
+         DlTg==
+X-Gm-Message-State: AOJu0YybM2VM0lxzgK7op2tJQO9wVlrQra0iy4kGHZzwWN8TqXd9TCSG
+	GbEEmluy64dUh3Mq2nz1g+OlpSAzaf2K/AjJ8bvVd5nSvJ+3HtokDsQU0/Om30FyJdYnLJTEmnP
+	y5iwBN+5LGHXgD2p9sbIfZK5j7anuxqpVUnr3ywpq
+X-Gm-Gg: ATEYQzx1tVTRq8XyYXne8cs0S1+u/b8DICMqE4qtzRYyjnJDr8nj+yEMkIXjSD5OeP/
+	jbW+PlyqZsQnZMAd0x2S8YIpaRZnK5obPkCczqrd8nfvasLr7MuFmaYasXnxLx0ra1uVBxCiTv3
+	Yd3M90Jq5+4dA9ytDiOcZ8nfH/dBmROtTXqk0Bo6kO0Bf5Bd5bopYc5ZOna1nUYrm3U2bBPSuy0
+	Ix1L3yIBJcp6E1snJo0z9VH3Dg7FpJHXZyHA/N0WgoiX+4hHl70pyu+TY/klg3zrQmv+BVI6bvz
+	0jP83CkaeSohw1iGXXvlBTTPqT+yTtPb2ob6
+X-Received: by 2002:a05:622a:24c:b0:506:9852:75ec with SMTP id
+ d75a77b69052e-5099ae29b28mr12044891cf.9.1773753850487; Tue, 17 Mar 2026
+ 06:24:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260316175451.1866175-1-maz@kernel.org> <20260316175451.1866175-11-maz@kernel.org>
+In-Reply-To: <20260316175451.1866175-11-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 17 Mar 2026 13:23:33 +0000
+X-Gm-Features: AaiRm50svmLd2fOL3HEMdNHFWE1EGdezYZCVO4BVpI417FT7gO8t2CTdtHg6I-k
+Message-ID: <CA+EHjTzO4GNzoHM-t9PhpX+4TgFqis4gqnDXrKyu_q=DUiL8Pw@mail.gmail.com>
+Subject: Re: [PATCH 10/17] KVM: arm64: Kill logging_active from kvm_s2_fault
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
+>
+> There are only two spots where we evaluate whether logging is
+> active. Replace the boolean with calls to the relevant helper.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-It turned out that we can't really force KVM to use the "slow" path when
-emulating AT instructions [1]. We should therefore avoid testing the IMPDEF
-behavior (i.e., TEST_ACCESS_FLAG - address translation instructions are
-permitted to update AF but not required).
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
-Remove it and improve the comment a bit.
-
-[1] https://lore.kernel.org/r/b951dcfb-0ad1-4d7b-b6ce-d54b272dd9be@linux.dev
-
-Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
----
- tools/testing/selftests/kvm/arm64/at.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/arm64/at.c b/tools/testing/selftests/kvm/arm64/at.c
-index c8ee6f520734..ce5d312ef6ba 100644
---- a/tools/testing/selftests/kvm/arm64/at.c
-+++ b/tools/testing/selftests/kvm/arm64/at.c
-@@ -13,7 +13,6 @@
- 
- enum {
- 	CLEAR_ACCESS_FLAG,
--	TEST_ACCESS_FLAG,
- };
- 
- static u64 *ptep_hva;
-@@ -49,7 +48,6 @@ do {											\
- 		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_ATTR, par), MAIR_ATTR_NORMAL);	\
- 		GUEST_ASSERT_EQ(FIELD_GET(SYS_PAR_EL1_SH, par), PTE_SHARED >> 8);	\
- 		GUEST_ASSERT_EQ(par & SYS_PAR_EL1_PA, TEST_ADDR);			\
--		GUEST_SYNC(TEST_ACCESS_FLAG);						\
- 	}										\
- } while (0)
- 
-@@ -85,10 +83,6 @@ static void guest_code(void)
- 	if (!SYS_FIELD_GET(ID_AA64MMFR1_EL1, HAFDBS, read_sysreg(id_aa64mmfr1_el1)))
- 		GUEST_DONE();
- 
--	/*
--	 * KVM's software PTW makes the implementation choice that the AT
--	 * instruction sets the access flag.
--	 */
- 	sysreg_clear_set(tcr_el1, 0, TCR_HA);
- 	isb();
- 	test_at(false);
-@@ -102,8 +96,8 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
- 	case CLEAR_ACCESS_FLAG:
- 		/*
- 		 * Delete + reinstall the memslot to invalidate stage-2
--		 * mappings of the stage-1 page tables, forcing KVM to
--		 * use the 'slow' AT emulation path.
-+		 * mappings of the stage-1 page tables, allowing KVM to
-+		 * potentially use the 'slow' AT emulation path.
- 		 *
- 		 * This and clearing the access flag from host userspace
- 		 * ensures that the access flag cannot be set speculatively
-@@ -112,10 +106,6 @@ static void handle_sync(struct kvm_vcpu *vcpu, struct ucall *uc)
- 		clear_bit(__ffs(PTE_AF), ptep_hva);
- 		vm_mem_region_reload(vcpu->vm, vcpu->vm->memslots[MEM_REGION_PT]);
- 		break;
--	case TEST_ACCESS_FLAG:
--		TEST_ASSERT(test_bit(__ffs(PTE_AF), ptep_hva),
--			    "Expected access flag to be set (desc: %lu)", *ptep_hva);
--		break;
- 	default:
- 		TEST_FAIL("Unexpected SYNC arg: %lu", uc->args[1]);
- 	}
--- 
-2.53.0
-
+Cheers,
+/fuad
+> ---
+>  arch/arm64/kvm/mmu.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index a5b0dd41560f6..caa5bedc79e19 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1723,7 +1723,6 @@ struct kvm_s2_fault {
+>         bool writable;
+>         bool s2_force_noncacheable;
+>         kvm_pfn_t pfn;
+> -       bool logging_active;
+>         bool force_pte;
+>         enum kvm_pgtable_prot prot;
+>         struct page *page;
+> @@ -1853,7 +1852,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>                          */
+>                         fault->s2_force_noncacheable = true;
+>                 }
+> -       } else if (fault->logging_active && !kvm_is_write_fault(s2fd->vcpu)) {
+> +       } else if (memslot_is_logging(s2fd->memslot) && !kvm_is_write_fault(s2fd->vcpu)) {
+>                 /*
+>                  * Only actually map the page as writable if this was a write
+>                  * fault.
+> @@ -1985,11 +1984,9 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>  static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>         bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+> -       bool logging_active = memslot_is_logging(s2fd->memslot);
+>         struct kvm_s2_fault_vma_info s2vi = {};
+>         struct kvm_s2_fault fault = {
+> -               .logging_active = logging_active,
+> -               .force_pte = logging_active,
+> +               .force_pte = memslot_is_logging(s2fd->memslot),
+>                 .prot = KVM_PGTABLE_PROT_R,
+>         };
+>         void *memcache;
+> @@ -2001,7 +1998,8 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>          * only exception to this is when dirty logging is enabled at runtime
+>          * and a write fault needs to collapse a block entry into a table.
+>          */
+> -       if (!perm_fault || (logging_active && kvm_is_write_fault(s2fd->vcpu))) {
+> +       if (!perm_fault || (memslot_is_logging(s2fd->memslot) &&
+> +                           kvm_is_write_fault(s2fd->vcpu))) {
+>                 ret = prepare_mmu_memcache(s2fd->vcpu, true, &memcache);
+>                 if (ret)
+>                         return ret;
+> --
+> 2.47.3
+>
