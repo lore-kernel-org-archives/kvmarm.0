@@ -1,132 +1,149 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5334D1D61B7
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 17:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773769850; cv=pass; b=cU8KxeulRks1VCD2td6nj6y05dkAUYrzLjRC6Tw/OnsUE7ZLK3w5HyRetua5F/cIAR9MbliXXhYWXYOU2Rc2Ifghx9U/JS/hv3XwIjp0uzp8tn1j7V09ps4Nc4ftk+AbZ6REWYya+2NAM/emfZ2CQWfhumLa6c3+uSXyATqG80k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773769850; c=relaxed/simple;
-	bh=HQ4Y3SNAjkSdp1o4EWGkyGe3hFuIuuTJjcqZJPi3rqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SrNauFsvuXR8x5516rmBMSbdZmLcLCKZuRVQ0vH9MkfR0KuLa8mD22V2NsTmUqVGlYoAzzC86mQta5zpi5fikV2Y9je5Ti0yY3j64pJIszQ6+aXb5k62kSZqyry67KIO6vzEP4fNIQaNCAiGHcUjbIeKyO1rqGMuxOYXqtUxUGc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YhgLdg6e; arc=pass smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YhgLdg6e"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-509062d829dso52741cf.1
-        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 10:50:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773769848; cv=none;
-        d=google.com; s=arc-20240605;
-        b=e0hJcq2cYdvGoqMUtpfisMfcMGH6FuzfeC2sTLRLsULOM0lulFyT+3drzBS/fjnUtx
-         vYEIazzzs1CMUh2jp73X+V5Hfq+LasR2QhiBdufzOoj83+Yzw45zGpyCiJ9K4KVdBWSj
-         Q0cp90VhWfdavysJaGa5jH1I5qYieMHsPx4QeSs27hiiHbIa0Z7mZvvj3+/E+pUUcGHv
-         2yqAImh6vJYw9rJkRu/e9MEgKZkKLBKoU1J6atwWSU/nHw/cT50KM7eoczpyItu3N3I7
-         MPqiAK4qKAWZ9rc1ausP3asrZmKezfJjURI0gdZqJYOVsqtM0rke/Dl22GMJ99bFd6pb
-         Ie7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=sswj2hGPn7hACbzJu1C3kS5DGnqFPqoGYHrtWz1tGw0=;
-        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
-        b=TnEiN8CppErpQpS7JYjvMAV6GI6jBlbO1etSqeeEq4WxXAsECDU7U6PaTSciiK2TPw
-         DhRCndxgYzRFRIHn83e6WxghkofeXqcY/4L+DgDHjtTwgSJJzgNyaEEZpDuJKxI6BYyK
-         9UVFiJSTd8pAu3QMORQ/NyDz4rOZnHVGI3RSeg4QQ/LdHvwaXK2yUIACsIuhutGF3VRv
-         qNeE735IaBklC2t0zRxRmMB3vMchA+5kj54OZp1y5KGgkvDEKyvZYxd4wrFGM5U01eGB
-         Q9GSnj1krkgiBDDStYugEyOanvPyM+awe+e3zeTdVsQjx2sWYRKwJJVeiu3EbxIzMGds
-         5MUQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773769848; x=1774374648; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sswj2hGPn7hACbzJu1C3kS5DGnqFPqoGYHrtWz1tGw0=;
-        b=YhgLdg6eAh0UWtAimDk73usOF0bmtr3SO7KFo82ZSagT+f52b45Be6suz7bze1Fgj7
-         M97hEYNyv9WLjwSoagZz8pA/mRL+Z3tGldhnIR7Dfb5m/oTPQrAgpOk1+2OcdTK/6C+W
-         h8tM7q76nGQmNgVDMfEZgfs5Njxu1E27s5Rg1bpEGq7u3EWRTPQoMxrESygC9akypl9K
-         5n6nM5DxXunwEQJ9cTCp8rvFhU6zF3PcvegW/LwDn5GYzKHRTeXFqodeKvKIJNxVXNhT
-         ZRAX7h/6Vz89FTh9fdxxg/C8DRsJSICk3rGsWnDzVZGQQ6bj9w6dtxa1bgnIr6gwIO7U
-         8Kew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773769848; x=1774374648;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sswj2hGPn7hACbzJu1C3kS5DGnqFPqoGYHrtWz1tGw0=;
-        b=jHon11hfhGEaaaYo5vU7DOCx0g+521ddoIN21JSaeC4AINAJ3do+MA9e75TRVn1bXX
-         G7EsMzLNGjTmE/sRkHFeoxHhWE8/60LxD658bpXWkUYqvbfQuwkVlCyyva8yyJFRrkGT
-         U/LVqdTLouD0PYM/WYlRopagAa45SNTZA0Kyx06w8GMEnSU+yH/b2gVFvO4yGSmxQo06
-         Wh+8r1ifDnRTTh2eQXKqv7O7eOpC1jHpsKf6jCyVbiG5ZUJrmQxvrXWsUr6+nRpg/j8t
-         QqarVPPeWskz9oABghzSJygYzlNhrIJKDysH98TxaBdmANG5rZA6ZE3OSnmPR8nYEne/
-         pHkw==
-X-Gm-Message-State: AOJu0YzR2IcBx8VC/gM+5KlV0CUDw8cTuX84SFEw4wW7YnNyjJ2Xqgu0
-	Xfi1kTxhJ0dsPkn5zAqhz6QYE4vc/yehSDOeEumT0iwDN23OjapHc0rjmJqy6YqY8n7zjg2FM5L
-	vmGzDZqthSZEIPbUNOrkXYU73U2+kUgHg0F9+oiEe
-X-Gm-Gg: ATEYQzysPLcA1pjhIdvJyLmi5TRIqMRdXL3FqT//OkPGuDF0EZ45rt1K3YHdMKBQLh9
-	ineq3RdAzEdnNMO4q3NmUrNKo/pen5JkhlVGf4cRQfKcKkdfWox5byYuahif5fHAkXOo1eIfyqm
-	6y8Q9MC+2ZOvdsADWOrt0a1fytAwNMOPkWOppcO5TKsqHjK900qUoo+x5x+Vjsf55M3XKgsPgGn
-	yXirVk1Pg+j8cca5go4r+YIuLT/gbX+RJbdvTTxmzvgvjF/XYTwOl/SShO/UPNzMpIZsVVVEBcV
-	dV7ojYiX
-X-Received: by 2002:a05:622a:150:b0:509:1c2c:866 with SMTP id
- d75a77b69052e-50b149575bcmr639391cf.11.1773769847627; Tue, 17 Mar 2026
- 10:50:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83B533CE88
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 17:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773769856; cv=none; b=QQKgoCcpftqVTtkw9/MiurKtObo79eoA+OuRpnewWMeHCAd6TYv3d9bKXdlmN3MbEQegG1R9QRnyOwB8YRqKn+TXHx1vrAgSG9y6R1qBin+0MzySgWNrzzGsrzyL4B5m6oPOzhAV621SRgRJh1LtgBqtkJGgbDTQGW4MA12EPds=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773769856; c=relaxed/simple;
+	bh=yiyoMaFHy9lzPuRoFxSqRk4KEu9ZNcoxBKMkiH5Ib3M=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NL2dCnekeNkKowqT2Led5VWrY8qj28SfGNOmxS459INpoCHCBal6mPT+xn+d7wApuXB/IRDYs786xAmku0OzTF+QROuo0P/VYBi0XTFv3nQC/vu9y6ZGRXf7YX2IYKDAyVFHzWhxZ4rFlViA+cWCD7aAXFXvBxk7kokkkqXcawM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.224.150])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fZzxb2PjmzJ4687;
+	Wed, 18 Mar 2026 01:49:55 +0800 (CST)
+Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
+	by mail.maildlp.com (Postfix) with ESMTPS id BDBBA4056A;
+	Wed, 18 Mar 2026 01:50:51 +0800 (CST)
+Received: from localhost (10.48.149.62) by dubpeml500005.china.huawei.com
+ (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Mar
+ 2026 17:50:50 +0000
+Date: Tue, 17 Mar 2026 17:50:47 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Fuad Tabba <tabba@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, "Joey
+ Gouly" <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, "KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64"
+	<linux-arm-kernel@lists.infradead.org>, KERNEL VIRTUAL MACHINE FOR ARM64
+ KVM/arm64 <kvmarm@lists.linux.dev>, "open list"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 06/10] KVM: arm64: Use guard(mutex) in mmu.c
+Message-ID: <20260317175047.00000b6e@huawei.com>
+In-Reply-To: <20260316-tabba-el2_guard-v1-6-456875a2c6db@google.com>
+References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
+	<20260316-tabba-el2_guard-v1-6-456875a2c6db@google.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260316175451.1866175-1-maz@kernel.org> <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
- <CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com> <86tsue6ezy.wl-maz@kernel.org>
-In-Reply-To: <86tsue6ezy.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Mar 2026 17:50:10 +0000
-X-Gm-Features: AaiRm52IK_m_asWK40sjcdDbExP97mzvrGS5v04I-bgwMBnhcMwSUWouKHa66FU
-Message-ID: <CA+EHjTxF9fLtjdTtJontFuziRsgGMeE0bvEjHYqr64hDK3wLVg@mail.gmail.com>
-Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
+ dubpeml500005.china.huawei.com (7.214.145.207)
 
-<snip>
+On Mon, 16 Mar 2026 17:35:27 +0000
+Fuad Tabba <tabba@google.com> wrote:
 
-> > > The series in hack/user_mem_abort-rework is different from this one.
-> > > Here are the first few patches:
-> >
-> > And I just realized it's because they're based on _my_ patches ... doh! :D
->
-> I thought I was clear when I wrote "I've added my on take on top of
-> it", but maybe not. In any case, I didn't feel the need to redo what
-> you had already done -- I don't think I'd have come up with something
-> better.
+> Migrate manual mutex_lock() and mutex_unlock() calls managing
+> kvm_hyp_pgd_mutex and hyp_shared_pfns_lock to use the
+> guard(mutex) macro.
+> 
+> This eliminates manual unlock calls on return paths and simplifies
+> error handling by replacing unlock goto labels with direct returns.
+> Centralized cleanup goto paths are preserved with manual unlocks
+> removed.
+> 
+> Change-Id: Ib0f33a474eb84f19da4de0858c77751bbe55dfbb
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-You were clear. It's the reader's fault, not the author's.
+> @@ -652,22 +632,20 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+>  	unsigned long base;
+>  	int ret = 0;
+>  
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> -
+> -	/*
+> -	 * This assumes that we have enough space below the idmap
+> -	 * page to allocate our VAs. If not, the check in
+> -	 * __hyp_alloc_private_va_range() will kick. A potential
+> -	 * alternative would be to detect that overflow and switch
+> -	 * to an allocation above the idmap.
+> -	 *
+> -	 * The allocated size is always a multiple of PAGE_SIZE.
+> -	 */
+> -	size = PAGE_ALIGN(size);
+> -	base = io_map_base - size;
+> -	ret = __hyp_alloc_private_va_range(base);
+> -
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> +	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
+> +		/*
+> +		 * This assumes that we have enough space below the idmap
+> +		 * page to allocate our VAs. If not, the check in
+> +		 * __hyp_alloc_private_va_range() will kick. A potential
+> +		 * alternative would be to detect that overflow and switch
+> +		 * to an allocation above the idmap.
+> +		 *
+> +		 * The allocated size is always a multiple of PAGE_SIZE.
+> +		 */
+> +		size = PAGE_ALIGN(size);
+> +		base = io_map_base - size;
+> +		ret = __hyp_alloc_private_va_range(base);
+Minor one and matter of taste, but I'd do
+		if (ret)
+			return ret;
+	}
+	*hwaddr = base;
 
-I'll send you one more patch that might be worth adding, but this
-looks great! Much easier to reason about. Thanks.
+	return 0;
 
-For the series:
-Tested-by: Fuad Tabba <tabba@google.com>
+> +	}
+>  
+>  	if (!ret)
+>  		*haddr = base;
+> @@ -711,17 +689,16 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
+>  	size_t size;
+>  	int ret;
+>  
+> -	mutex_lock(&kvm_hyp_pgd_mutex);
+> -	/*
+> -	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
+> -	 * an alignment of our allocation on the order of the size.
+> -	 */
+> -	size = NVHE_STACK_SIZE * 2;
+> -	base = ALIGN_DOWN(io_map_base - size, size);
+> +	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
+> +		/*
+> +		 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
+> +		 * an alignment of our allocation on the order of the size.
+> +		 */
+> +		size = NVHE_STACK_SIZE * 2;
+> +		base = ALIGN_DOWN(io_map_base - size, size);
+>  
+> -	ret = __hyp_alloc_private_va_range(base);
+> -
+> -	mutex_unlock(&kvm_hyp_pgd_mutex);
+> +		ret = __hyp_alloc_private_va_range(base);
+> +	}
+>  
+>  	if (ret) {
+>  		kvm_err("Cannot allocate hyp stack guard page\n");
+Maybe move this under the guard just to keep the error check nearer the code
+in question.
 
-(might as well repeat it here)
-Reviwed-by: Fuad Tabba <tabba@google.com>
+Thanks,
 
-Cheers,
-/fuad
+Jonathan
 
+> 
 
->
-> In any case, I'd appreciate your feedback!
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
