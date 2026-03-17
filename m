@@ -1,175 +1,273 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11020098.outbound.protection.outlook.com [52.101.46.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7858D35972
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 00:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.98
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773707113; cv=fail; b=QEiKKhX75wuuT0ptnC9Y83VA6Nkhniqk/6DOLK0ot4G6WQnfa2bbKq8FSGfE5e/o2TwdYnSSggdwzo8MobU3PyVLGjc5Jz6wZVD5BzmknsY2v89dZZgeWMb9xLiCfJ8qURKm1LNYgFUvYxmDpKMNdPNCMV3kfmao+1XhBoUVLBI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773707113; c=relaxed/simple;
-	bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=C5ikVWJ8zxQ2PI7qpoMJK3u4dMrAHkDuY1KIGa0KxhK1DOKPAHxCxt+2ohz4oAF03bqBuXqYQe0rwXZ065OBJgHSeJLw2KUw2OLE+qg3+IV9Y3bFKIONgPzQYiWKnAfNdtj11mLuo4tIKzsAxSk59zb+E60jvb9MgHTV3WdMHvM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b=YivAd6nw; arc=fail smtp.client-ip=52.101.46.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="YivAd6nw"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hSDz4MTyxPeParvZvE3YPAU9B8xnTFCrdnxVqZWwh3wpFnra18z6sgXIRQkMG1ogVnUX2Pm0DzPyu4ZXiMgSJZy8U80J/9XWYDLFM96YtLxKiWi4Id4stFnIKOCOK0Z4La0XtKZrT8od5KHqgH3jwxHHRH9MPlwr2VHR0MpfCK0pWUwbohhXanul1aulfYF4eLG5qHEfmRE8Jv1SjhzRRsDtZt400wXrCJr8Qh+L7ia7+aP/KG6Pvzw8BD7oWjYkCK61ByGVT2NvPXR8065mZ1ge/J6F+ApzUp1RL6C+pKiGJDxwmU8aX3/CyZ+yNvumizAf6tgA/vIjB+DTsx5Esw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
- b=fQK/hW3Eu8Gn9RO0IIat289VDpxDzwmLRgXlPBhVPtynA0yvpb1oUExbxAvQuXMJP9/dMsKLpLeC2LRia+KQKoCCmr6y6GP00IBeplN6WoFxDCxGU6zd4LtHBSd+hKMti78PEFt0vY6xdG5zHFGBEnexrK3cQqg1WpBhYlmjGkbE5ImZoFTJhVznfpsvwdu6i4ngo3WTxeMCPGem+YLlgCZPbzS+ElgwABGBJDcCcCtvaeA3/G8nClYy6h/8ZuqP3g1uR7JQjIxdGin+3PdqbZcHHwgcFzXd86R6I3QjiXdasXlRyuMLvSgBPWbaAGIZzrZAvJahDWV6k751LDzzSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5zZfIgMbeUAyXyAGudgEwXImWafVjINen6NKx1XkgRI=;
- b=YivAd6nwsYtqnI8jzkWwq4eqASuVzSjQ1hzg/ra8oo6JyPHH9aR6XMA76MzWMBsIwZr13uYLRQw5posPjNuQtryjkwCFBX989RxP+Yiy8XqRLfACymhLA5zsEOukGdC5W+MKXPTnQy2RRRDiAkxViTAgM91wPc0gyRyMVrfKzVo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DSWPR01MB994496.prod.exchangelabs.com (2603:10b6:8:35f::23) by
- CO1PR01MB9084.prod.exchangelabs.com (2603:10b6:303:271::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9700.24; Tue, 17 Mar 2026 00:24:41 +0000
-Received: from DSWPR01MB994496.prod.exchangelabs.com
- ([fe80::893b:904a:d102:9f95]) by DSWPR01MB994496.prod.exchangelabs.com
- ([fe80::893b:904a:d102:9f95%7]) with mapi id 15.20.9700.022; Tue, 17 Mar 2026
- 00:24:58 +0000
-Message-ID: <a8d31059-f821-48ac-b6bb-7e8d38fac7b6@os.amperecomputing.com>
-Date: Mon, 16 Mar 2026 17:25:01 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, gshan@redhat.com, james.morse@arm.com,
- jonathan.cameron@huawei.com, kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
-Content-Language: en-US
-From: Jesse Chick <jessechick@os.amperecomputing.com>
-In-Reply-To: <20260313144617.3420416-1-ben.horgan@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P221CA0028.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::33) To DSWPR01MB994496.prod.exchangelabs.com
- (2603:10b6:8:35f::23)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A041E89C
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 00:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773708090; cv=none; b=akM0s3tjpAygJY5ADDwMqUkjOqdbZEllbTJJTV+fE99yPI406cU5RLTrGvF7E3owlE+6VV+12m+70MYuB/kxbHkAxwUYQDUfnFN0utQBe/vpQJf/SoINHtpnPaCQJY/0FKFOXEo5sjPQjD/TbZden0p2k+SLZHrIc6e7EHJR24E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773708090; c=relaxed/simple;
+	bh=Z58KA//kXdmedo/aJ5NyHGDDRx9f+h/VITzcuOmD4ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rnS8MOUfzrV4w9QgZKl2CPNJSPv3zRsfwSaGpkvHcy+cbRoNKZKUy4gbCNu4mk42hzAsTRis/Nep9HUoEs4d4su+OBbc98XxI+JPBqOq+yTkZi6OlsltKcxc+HpQJ86nvMWzSGfKtdIvPd+V92R52NTa3bHdVT5kZJWoECfjcZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5584B1476;
+	Mon, 16 Mar 2026 17:41:14 -0700 (PDT)
+Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BA2C3F7BD;
+	Mon, 16 Mar 2026 17:41:19 -0700 (PDT)
+Date: Tue, 17 Mar 2026 00:41:11 +0000
+From: Wei-Lin Chang <weilin.chang@arm.com>
+To: Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.linux.dev
+Cc: andrew.jones@linux.dev, alexandru.elisei@arm.com, 
+	Marc Zyngier <maz@kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v1 4/5] arm64: add EL0/EL1 guest
+ functionality
+Message-ID: <hpdhcv2p2hemyxpitey4hbchkpfvrbaavzfmrzjmjodbveq3ua@qyzlznrqorev>
+References: <20260306142656.2775185-1-joey.gouly@arm.com>
+ <20260306142656.2775185-5-joey.gouly@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DSWPR01MB994496:EE_|CO1PR01MB9084:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3687e2d0-0f6a-4a75-071a-08de83bb9f0e
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|56012099003|18002099003|22082099003|55112099003;
-X-Microsoft-Antispam-Message-Info:
-	01z9w3u/q8oett/qSj3fm5KPhjk3V2VQ29c4gpGGvHCp529c06VShsaX9GXl7KrFqcNzk1JKZDDcWDQT6NeNrG5Zd67/BL77Tms9QdEpZATXT5nYXqH6j/sGS2+hpbcnEPjR/UM+jhNZiGc3eTTMSFIzz+mzUZ6OEhlCQEY9MdzyhjWbJw9KtdFe7ZS/9+zE9et83TJI0VfikKEHBj6dGuonSRVoBwkeES8AZ/Wgeyksz1WHtPXpFvyfsPZbs4M7s/a6SLBAPZa/uZdbFQxFZTz3f6mXF58sQ+RGA4usFR9pz7JLMJJqc4Qjc9wfLWv1sQYGFSVXaAr/lUpBwHfvbOzeuL82ao3SYjZOdJEFDUDtg7SU4LREubBZN2YZjhYdCl78OR6Dp0W2VwRBrE7NVkgxK1Z0cVnEIVcsGUrY7A1EvgoVCGHW8MA6EW9JNWuKcrFe3ZiLjjzQiNV8U8noCnIuUKumb50m/5D3sSTVgGNHx54RQVbjjQ/LcqvxLiPB+yLWUnFTB1wcYXAnGDBh/hWFMTAtXWK0ST5LCHQJFSjg6R6yIU+IErsGpTPd21GN4POL78HNH14/xG9lobgzx7pYKrW/HvDbSEzCL1Yeq/h8suur5FUrTlkc8s/nZ42GKfEYbW4B/ipvfyN0UTFUqxm6j0IgtcdiLgXfXR+GyHGN8UWQhap0rk8P53qZZxKP2Z+QOAw2wB314okU4uGMEPHERqpbj+p2IG6yaik48Y8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DSWPR01MB994496.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(56012099003)(18002099003)(22082099003)(55112099003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?R2k1T0d5WjA0SURxTEoyakRXVHlzTHRTM09Oakh6Q1pyR2xnUnc1cXIycGhI?=
- =?utf-8?B?aUwrUnlrcHBiNmI3c2ZTYWZURXRoaVFVcTBjQTREMWVNK3dhL01VTXRVODEr?=
- =?utf-8?B?Kzh4dTFFRXphSHk5ODhGRzlNdXpvZ1ZDSnRFYlpHNzB6ejFjZW04V1VkRHoy?=
- =?utf-8?B?OCs5Y1B3TEc4bjBTcWxXbkVFaGpQTjh5b25hd0RGRzIzT20zVE9SNEtGbUt3?=
- =?utf-8?B?K1E5YjkyT3B2L1hxSFBpekNjdU03NHVJYXJBMTlnenJVT05YZFpBNUdkejFy?=
- =?utf-8?B?RDZoZ0NOMnJpamtPNVkxUFd2bGZXK2lxNm5YblJyN1VDc2FwcWhkZGszNUtr?=
- =?utf-8?B?cVRxQXJCYk9QS2NNM1FHUXk5MEpySWs3enphWFAwcUtFK09QUHgwSXJDZCtt?=
- =?utf-8?B?ZWZWZzVWdVpWUjZEdXNESVZ6bm4vajVzMkVEWk1FTFZSN0J1SHBzUjQ4Q0xL?=
- =?utf-8?B?VGovZTdsMmNXNnROVjJvcGFtRlpDdE13dTNSc2FMRTRuUlJWd0VLcXFmMXgw?=
- =?utf-8?B?b3BtWHBlZHFlczYrK0kvVVp4bnk2T2h1VENzMmhCRTdGTTlMckdHZkFNMUc0?=
- =?utf-8?B?VGdXeC9ZWEJyLzE2dHVsdE1wazFGR2dwQXc2bHFTdHcvQkc0S01yT20waVlZ?=
- =?utf-8?B?d3E1T3FuNXkyTTVKb1piQ082WFhyL2k1TVZhS3ZWY0V3WE9yRWpaRWhtaVgr?=
- =?utf-8?B?dmdCVktyLzlFNU9hWnAzZ1owcGFWaUJtdk14ZUNtRyt5Z0dGWndocmpJbElS?=
- =?utf-8?B?bEZPRktoNGxvL3JFcEpmcjNCTGFCeHU3WTI5R0NnZ3NINVFBOTFHeTQvTTd6?=
- =?utf-8?B?TG55OE5wRE1SYlY5MC8wZ3g2Mk9VWEJUakdUYVJvd3ZGV1NQdUhKTGpNTmUr?=
- =?utf-8?B?Z1F2MHpReFNaNHNoYzJLenl1ZEdGNzJkcWwrVkttakJEdkwrdVVoRHFSWENG?=
- =?utf-8?B?Kzk1eXFLSU8wem1nNld0emhYUXdjRXRsNW5uWXF3NzBPbE9uckRXT0xTLzI1?=
- =?utf-8?B?N1c3U2srQUR1L1F2SXpPYko5dWJBbXZ4MitWS0FmUUQ5ekVRZUhiLzVNMEJx?=
- =?utf-8?B?MG1FTGtEMnByU0pJZG5YTktqM2ZoUmMwYmlFb3lsQ0dwNnh5NmRyVXlScm5z?=
- =?utf-8?B?cXFHcjdQWUliVkZ1c2xjUU9ZbG9EVHZYaG12RU1NcjFNUUNldG1DZU9FNEFp?=
- =?utf-8?B?ak1rTklhaktVdEVxUnNzZGtEbE1rdWx6c3R6N0RJVkFaVkpPVi90d295UFhs?=
- =?utf-8?B?MlJVa1psdytaOUg1d2RLNHB3bUdxZFByVGhiQ2hEL1ZGTGtXMDJwYnFBZlZG?=
- =?utf-8?B?SW5iOG9iekdRc3NxWWtmR3BXemFYVTNHSk95b1FVRU9sNkhaRjVhTDRHcDlD?=
- =?utf-8?B?bGFLVHFUWVJYWWpGZzFVZ1FKOHBCWnVPNFpuWnVUYnA2bW1BSGVrcmphcE1i?=
- =?utf-8?B?TWticU9UL29kanRDbm85c0padTZuNXZSUW9zcHBBL2pKc0dwU2YvZFFvWmFN?=
- =?utf-8?B?OU9TSXBKZG5DeGRWWDVZUFF5UlFTYU9RejRJVG5hQkNnaFZ0L2lVZ256QXU1?=
- =?utf-8?B?UDViTnF6YTVsbThIY0duOWhWTlcwcFR2bG84MUNkbmtjV2NFZ0FibTJKTVBi?=
- =?utf-8?B?aVNHZDMzTFBRQ0IxUC9yNElZMkU3bk43YzY2MWlmOWNsdGtFWTRMMjRlZld0?=
- =?utf-8?B?bC9LU2ZYWk5JbURSMC9EWEhld1J6NkdQcFFtc2tGUnlUMmxwZTRFOFUwc25M?=
- =?utf-8?B?Sk0vRXRoMnJkTlpCTmVGbVNjd2doU3d4SXN1aExpWGpPS0JNcHh6YmJMNUVU?=
- =?utf-8?B?T1VtbDMwQTJXczQzbmZoOFpQUTg5K1ltNDA2b3NJRzhTdXFZQ3ZadkRlY2dt?=
- =?utf-8?B?Z05CWWl6STQvOHdXODZ0S3J6eFZFSzBQNWpvRVdJNHRFb3BiU21QUlhteVJR?=
- =?utf-8?B?ZXJlZ0l2NEg5VHVjUnhIN1grNzl5ajdKR0NtWDJWSEhWamdla3ZtLzRlcVdH?=
- =?utf-8?B?TVdwUUE0K0dSYU80NGI2Ym1sUVpyZG5DT3N0VFdzem4xVHFkTUhRYXhpZEhy?=
- =?utf-8?B?TzVHaTlBZWcxWjlFTytBbEdBYW1PclUycTJlWVh3Yk1SMzdUMGhESjc5b3lh?=
- =?utf-8?B?NGZHR0J6QzVDbi9LZUZPa29Zb0NtbytwOXJuaEpKNm9kU1ZrQmRQVDBFUHli?=
- =?utf-8?B?RW13OUZ6OVlBakQ4MnBpR1F1ZzltTzFibFl4NUJCaEx5cGJjSmdSUTB2cmky?=
- =?utf-8?B?eHUvc3ZTcG1rQlJLZ1ZKeTFPdUIybVZwOG8ycm1GRkZoL1FBYlNyS1FvejUw?=
- =?utf-8?B?eXhNR0FDc1U0aENxY3VhcXZRaUM4ZkZJOWxralV2UjJSRERmcGJtN3pNc0ly?=
- =?utf-8?Q?/4Q8BJKAzDiEzUK92g2qOBPVK6OuHez7oCUKj?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3687e2d0-0f6a-4a75-071a-08de83bb9f0e
-X-MS-Exchange-CrossTenant-AuthSource: DSWPR01MB994496.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2026 00:24:58.4603
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9xPJCLN+D1vEBbyvZKtKiT/9rzl1y+WgzdZPJDDfS8n+djt+0Vr2zJasshdUvExWnlwJHgrPVwjxZv0+dqueUjRs6j3/5q6BKQXLnRiNN2lCi3gbrg0xFH7Qvl77PgdG
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB9084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260306142656.2775185-5-joey.gouly@arm.com>
 
-Hi Ben,
+Hi Joey,
 
+On Fri, Mar 06, 2026 at 02:26:55PM +0000, Joey Gouly wrote:
+> Add functions run_in_el1() and run_in_el0(), these take a function pointer
+> argument to run in EL1/EL0 respectively.
+> 
+> For EL1 the TTBRs are copied from EL2 to EL1, so they share the same address
+> space. This could be extended in the future to support more complicated cases
+> where a separate address space / Stage-2 is needed.
+> 
+> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+> ---
+>  arm/Makefile.arm64     |  1 +
+>  arm/cstart64.S         | 38 ++++++++++++++++++++++++
+>  lib/arm64/asm/esr.h    |  2 ++
+>  lib/arm64/asm/guest.h  | 14 +++++++++
+>  lib/arm64/asm/sysreg.h |  6 ++++
+>  lib/arm64/guest.c      | 67 ++++++++++++++++++++++++++++++++++++++++++
+>  lib/arm64/processor.c  |  2 ++
+>  7 files changed, 130 insertions(+)
+>  create mode 100644 lib/arm64/asm/guest.h
+>  create mode 100644 lib/arm64/guest.c
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index a40c830d..c7a39945 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -36,6 +36,7 @@ define arch_elf_check =
+>  endef
+>  
+>  cstart.o = $(TEST_DIR)/cstart64.o
+> +cflatobjs += lib/arm64/guest.o
+>  cflatobjs += lib/arm64/stack.o
+>  cflatobjs += lib/arm64/processor.o
+>  cflatobjs += lib/arm64/spinlock.o
+> diff --git a/arm/cstart64.S b/arm/cstart64.S
+> index d95a8245..05303149 100644
+> --- a/arm/cstart64.S
+> +++ b/arm/cstart64.S
+> @@ -370,6 +370,44 @@ asm_mmu_disable:
+>  
+>  	ret
+>  
+> +.globl __run_in_el1
+> +__run_in_el1:
+> +	stp	x29, x30, [sp, #-16]!
+> +	mov	x5, PSR_MODE_EL1h
+> +	msr	spsr_el2, x5
+> +	adrp	x5, el1_mode
+> +	add	x5, x5, :lo12:el1_mode
+> +	msr	elr_el2, x5
+> +	msr	sp_el1, x1
+> +	isb
+> +	eret
 
-> Thanks for all the reviewing and testing so far. Just a bit more to get this
-> over the line.
+Do we need this isb before the eret?
+eret is already a context synchronization event (modulo FEAT_ExS).
 
+> +el1_mode:
+> +	blr x0
+> +	/* This HVC is executed from EL1, and returns back to EL2 */
+> +	hvc #0
+> +	ldp	x29, x30, [sp], #16
+> +	ret
+> +
+> +.globl __run_in_el0
+> +__run_in_el0:
+> +	stp	x29, x30, [sp, #-16]!
+> +	mov	x5, PSR_MODE_EL0t
+> +	msr	spsr_el1, x5
+> +	adrp	x5, el0_mode
+> +	add	x5, x5, :lo12:el0_mode
+> +	msr	elr_el1, x5
+> +	msr	sp_el0, x1
+> +	isb
+> +	eret
 
-I tested this patch series, specifically L3 CPOR, on an Ampere
-implementation with common benchmarking tools (lmbench, multichase).
-
-
-> Generally the resctrl glue code works by picking what MPAM features it can expose
-> from the MPAM drive, then configuring the structs that back the resctrl helpers.
-> If your platform is sufficiently Xeon shaped, you should be able to get L2/L3 CPOR
-> bitmaps exposed via resctrl. CSU counters work if they are on/after the L3. MBWU
-> counters are considerably more hairy, and depend on hueristics around the topology,
-> and a bunch of stuff trying to emulate ABMC.
-
-
-The observed latency in increasingly large R/W operations scaled as
-expected across various numbers of competing processes and cache
-portions. The distinct jumps in latency as successive cache level
-capacities were exceeded indicates that (a) L3 CPOR is configurable from
-user space via the resctrl interface as described in this series and (b)
-that the feature itself is working correctly.
-
-For the series:
-
-Tested-by: Jesse Chick <jessechick@os.amperecomputing.com>
+Same as the above.
 
 Thanks,
-Jesse
+Wei-Lin Chang
+
+> +el0_mode:
+> +	blr x0
+> +	/* This SVC is executed from EL0, and returns back to EL1, or EL2 for
+> +	 * EL2&0 regime */
+> +	svc #0
+> +	ldp	x29, x30, [sp], #16
+> +	ret
+> +
+> +
+>  /*
+>   * Vectors
+>   */
+> diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
+> index 335343c5..12bb0efe 100644
+> --- a/lib/arm64/asm/esr.h
+> +++ b/lib/arm64/asm/esr.h
+> @@ -25,6 +25,8 @@
+>  #define ESR_EL1_EC_ILL_ISS	(0x0E)
+>  #define ESR_EL1_EC_SVC32	(0x11)
+>  #define ESR_EL1_EC_SVC64	(0x15)
+> +#define ESR_EL2_EC_HVC64       (0x16)
+> +#define ESR_EL2_EC_SMC64       (0x17)
+>  #define ESR_EL1_EC_SYS64	(0x18)
+>  #define ESR_EL1_EC_SVE		(0x19)
+>  #define ESR_EL1_EC_IABT_EL0	(0x20)
+> diff --git a/lib/arm64/asm/guest.h b/lib/arm64/asm/guest.h
+> new file mode 100644
+> index 00000000..82d1f2ae
+> --- /dev/null
+> +++ b/lib/arm64/asm/guest.h
+> @@ -0,0 +1,14 @@
+> +#ifndef GUEST_H
+> +#define GUEST_H
+> +
+> +#include <asm/ptrace.h>
+> +
+> +u64 run_in_el1(int (*func)(void));
+> +u64 run_in_el0(int (*func)(void));
+> +
+> +static inline void step_trapped_instruction(struct pt_regs *regs)
+> +{
+> +     regs->pc += 4;
+> +}
+> +
+> +#endif
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index ba33fcd9..498eef4e 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -132,6 +132,12 @@ asm(
+>  #define SYS_HFGWTR2_EL2		sys_reg(3, 4, 3, 1, 3)
+>  #define SYS_HFGITR2_EL2		sys_reg(3, 4, 3, 1, 7)
+>  
+> +#define SYS_SCTLR_EL12		sys_reg(3, 5, 1, 0, 0)
+> +#define SYS_TCR_EL12		sys_reg(3, 5, 2, 0, 2)
+> +#define SYS_TTBR0_EL12		sys_reg(3, 5, 2, 0, 0)
+> +#define SYS_TTBR1_EL12		sys_reg(3, 5, 2, 0, 1)
+> +#define SYS_VBAR_EL12		sys_reg(3, 5, 12, 0, 0)
+> +
+>  #define SPSR_EL2_M	0xf
+>  
+>  #define INIT_SCTLR_EL1_MMU_OFF	\
+> diff --git a/lib/arm64/guest.c b/lib/arm64/guest.c
+> new file mode 100644
+> index 00000000..410c6bb0
+> --- /dev/null
+> +++ b/lib/arm64/guest.c
+> @@ -0,0 +1,67 @@
+> +#include <asm/guest.h>
+> +#include <asm/processor.h>
+> +#include <asm/thread_info.h>
+> +
+> +u64 __run_in_el1(int (*func)(void), void*);
+> +u64 __run_in_el0(int (*func)(void), void*);
+> +
+> +static void ret_to_el1(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	regs->pstate = PSR_MODE_EL1h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
+> +}
+> +
+> +static void ret_to_el2(struct pt_regs *regs, unsigned int esr)
+> +{
+> +	regs->pstate = PSR_MODE_EL2h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
+> +}
+> +
+> +static void copy_el2_sysregs_to_el1(void) {
+> +	write_sysreg_s(read_sysreg(VBAR_EL1), SYS_VBAR_EL12);
+> +	write_sysreg_s(read_sysreg(TTBR1_EL1), SYS_TTBR1_EL12);
+> +	write_sysreg_s(read_sysreg(TTBR0_EL1), SYS_TTBR0_EL12);
+> +	write_sysreg_s(read_sysreg(TCR_EL1), SYS_TCR_EL12);
+> +	write_sysreg_s(read_sysreg(SCTLR_EL1), SYS_SCTLR_EL12);
+> +}
+> +
+> +static struct thread_info* new_thread(void) {
+> +	u64 stack_start = (uint64_t) thread_stack_alloc();
+> +
+> +	struct thread_info* ti = thread_info_sp(stack_start);
+> +
+> +	thread_info_init(ti, TIF_USER_MODE);
+> +	ti->pgtable = current_thread_info()->pgtable;
+> +
+> +	return ti;
+> +}
+> +
+> +u64 run_in_el1(int (*func)(void)) {
+> +	u64 ret;
+> +	struct thread_info* ti;
+> +
+> +	copy_el2_sysregs_to_el1();
+> +
+> +	// HVC is used to exit EL1 guests.
+> +	install_exception_handler(EL0_SYNC_64, ESR_EL2_EC_HVC64, ret_to_el2);
+> +	ti = new_thread();
+> +	ret = __run_in_el1(func, thread_info_stack_start(ti));
+> +	install_exception_handler(EL0_SYNC_64, ESR_EL2_EC_HVC64, NULL);
+> +	thread_info_free(ti);
+> +
+> +	return ret;
+> +}
+> +
+> +u64 run_in_el0(int (*func)(void)) {
+> +	u64 ret;
+> +	struct thread_info* ti;
+> +
+> +	// SVC is used to exit EL0 guests.
+> +	// For the EL1&0 regime it returns to EL1, for EL2&0 it returns to EL2.
+> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SVC64,
+> +		current_level() == CurrentEL_EL1 ? ret_to_el1 : ret_to_el2);
+> +	ti = new_thread();
+> +	ret = __run_in_el0(func, thread_info_stack_start(ti));
+> +	install_exception_handler(EL0_SYNC_64, ESR_EL1_EC_SVC64, NULL);
+> +	thread_info_free(ti);
+> +
+> +	return ret;
+> +}
+> diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
+> index 7d3d93bf..e074ba96 100644
+> --- a/lib/arm64/processor.c
+> +++ b/lib/arm64/processor.c
+> @@ -43,6 +43,8 @@ static const char *ec_names[EC_MAX] = {
+>  	[ESR_EL1_EC_ILL_ISS]		= "ILL_ISS",
+>  	[ESR_EL1_EC_SVC32]		= "SVC32",
+>  	[ESR_EL1_EC_SVC64]		= "SVC64",
+> +	[ESR_EL2_EC_HVC64]              = "HVC64",
+> +	[ESR_EL2_EC_SMC64]		= "SMC64",
+>  	[ESR_EL1_EC_SYS64]		= "SYS64",
+>  	[ESR_EL1_EC_SVE]		= "SVE",
+>  	[ESR_EL1_EC_IABT_EL0]		= "IABT_EL0",
+> -- 
+> 2.25.1
+> 
