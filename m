@@ -1,93 +1,92 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB8837186D
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 09:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44833A4F29
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 10:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.178
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773740471; cv=pass; b=a4boc7bPVtTJjA4lcd8UlzZ4QYxrsYW3smDcjn9CAyiBlmNTCgKFHNBgxxDBvUECFCHH0bCymcrjrcR75TlCwL1E8uioZxelW9qIhsY+dKVC1sj/wliq/Rml1dgWKCtPv1/XqnJBLXF1i8FLvePGW1tLBo8BVLxMqMgo+dtwlIM=
+	t=1773742854; cv=pass; b=fc90DEx1DS2Fhybp6jDI2jujTTbxYlyKwZcsUyqjXl1tst2A2V428s3vn0lDbNDCuJiF0GxZAbZDhTcb2Wgojcm9KFnLHORXy+1d1H2quJ2GJ7gUTpruj+ZC/6flmrIk6SxIK8PO3F0S4ytS/8DAkDDbHqHEDvbiPDD5sAyu8Q0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773740471; c=relaxed/simple;
-	bh=PFc+rTykPMkrv9A8jrXiuBq/3V+EkryA3AmXGTl+Ij4=;
+	s=arc-20240116; t=1773742854; c=relaxed/simple;
+	bh=kjgUmSSqXdyFVjMPW4NPWY42E2uhu/ZjmUwRawGx3XU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qIZpEhxGIYTGUsfkrY2BP+TgqoOr2divU40DSPc3ivCOtq0Rvp4k+L4viC3XLMePXbyFrXv9QyVE9S1FQkznRqVetLaziHJnHD7DJ7zrRuksrloBS9E5F7Y3tmAzEbzoVcPTWtznI/Wgvs0skReu3P2j8lt9ldCaZneYfVfBGls=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Sab1/Llh; arc=pass smtp.client-ip=209.85.160.171
+	 To:Cc:Content-Type; b=OmV5HDZ1F3d08+nQDd6Fkw3DXq9dPT1c2eDaYwegu79fSHpZpZmvKWm7kEtyti0m0qy9SvJgJEHtaHX2uMezDJ7IGseALv5+N5vlmVSwO2eiBpnHM7l6fsrTrDyTT5HfVZP5ck+lWmHoleG3TDRM0uT5WA5hkHWRSdg++nTzgBM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQe3m1zj; arc=pass smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Sab1/Llh"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-509069a7a7fso453111cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 02:41:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773740469; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQe3m1zj"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-509069a7a7fso464921cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 03:20:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773742852; cv=none;
         d=google.com; s=arc-20240605;
-        b=HcEARyItZVH1MsDjSBfoS6/C+BTE43vfxa9GpxsZcTrnc+70XelNp7+h39wPm7Qet7
-         ysb85HZNRvSe8WUsmSUy9s+TirovSOWK6UmK7PVhPL251jKnsoVlmPXevWxOMxE2kjt1
-         /93G6V1ewv2yumn6EAaqXc3CKl1eh1SV8RxEOKr9MWE6OBYycdxQDeQlVIoFfhuQiGWt
-         LIFlARpgtYdqOThCdQ2cl6dwqZXTaHt5HQIcXHINnsXGqnEV/6CNHv0zph1YYw5lW24/
-         jkY104SGAF3WiR3JyQNDEARe34gXsRLUo9taG2kF4Lxl9lX22asmCfSpCnp6E75yuH4Z
-         ltzQ==
+        b=bMD688cnNC/Vr9qgTglDoGVIyXgnsuWKA9H5dk8kK/tk3M4tYMIam53tiQtFXJTV0D
+         Wg7zFU2CKoNBEyRvD3u1xoHZ7Ivwh+ZodQaYAhwk9mLhkf0hB25VjErYDUncdO7y0ioD
+         h+TEfAhevt5YWqloMK8PlYlUjpdgQUredysBUJtSM1OI2rFTrNKoK2ugKXZFUXY5xytg
+         Cgk7KeAg8TASRxJ2pCNNZA1sweEmV12+Ku5knSKQuQy4r7hJ4YgEpN+evdIWIlhZxTWZ
+         5/rLNEMjalko53zTqifGr2d/g7LYp5BiawYtzbdwp05QIg+2hjCxZVj5IHfHgomlNyOe
+         8QEw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=bS9PfKBXOW6fmCX329/wY4OzoCDVjo1e2iZiSr+iZ4Y=;
-        fh=LS/kqkAGp7gJmw6SJIshm3EyZy8ObcWzn7KQlQx/Zko=;
-        b=kn5iSsPqvLmkPK56opCXyo0Dh07k/f5R/O5vLXmu3Fg9r9edTE011Phbln8fwDSe+8
-         rOB9hZKReA6P9S5u71VaLI3kO5KUqTx4F+RQZ/sy9wbt2pe6fVYRl566v7ZD/7LZb4p1
-         7jwyD94aKkq1fkra5sg/x3FDzQTJdTXKDs7QrbJeEt9ptlAyzVg8Y8eMfpAQtPE1exVv
-         4t553kb8FoUR9icxRWdGTWPqB8Kv8IYuJ5eEOgUqiGSdFtd3ebYPWmTxfczRK3/YJx0U
-         FKzkOkHMH9AqE9RJpof9sdACm/VbMSa8EgsUE1f5zDPxIrt0JeLXnh9mfPnY89Q7RvBq
-         /gDQ==;
+        bh=f+G3k2rqZ2vXMSBMpnYGO0MAWxRn6Tt+kQK5k1SVAz4=;
+        fh=ocX+70nkZbHRM5Q84Vre7Ykwy1gRlFLLieVqQTETzeU=;
+        b=lKLC82VVRzhzsyrahMsLp8GYJAu8oFS/Y6HpCmf9Upz0Nn6Bi1HAEcFO1mpzzG5ntH
+         ykxcslyJaLBQ1rmDoTEzqx7O/gZPcGNoYP0gmKzz68qiTIhRZb7mcXKaaTbqS/WX6oya
+         5GnRt2vGWuKe9JeHJxzuy8l3hrbu6j5FVfjL0Nat4319A8kfH5LfEoplfB39KPF3MTVQ
+         Ao+kvQVAxbnRY3D1BFzfSUlR3VyGnpnVtBmhf/bNJJ4uBTXX9ptzkFnajMOoCtIxiGz5
+         6FmCtxAacyGKFdFBCvZYW0EsTv0f1rgXvXm3ZoqKaIWQ4PBq83mbhdldxiClq1hTGnWl
+         wRBQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773740469; x=1774345269; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773742852; x=1774347652; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bS9PfKBXOW6fmCX329/wY4OzoCDVjo1e2iZiSr+iZ4Y=;
-        b=Sab1/LlhD3rvXZ/L2yO5qbVC7ZC30eboERshDTHJBhYCM1WpFsUkC2e+Sfc7qwy6cE
-         O7Eg1I0tVFfj6cz95yyDnbtUujUaAjJ1uSSWnlWgqu9FcBPupHcGlG1U7kb2g9Vo3AMC
-         MxHIJ+ZlZ+EWyXaLFgOioMfmiHo0sBRP/pVU8bbM3x5hbWqZPIOzkpGP4fG26X/DaN6H
-         ubGQML7PgcyqQkMk7frU4i1QgB/JlQid/MCr/kGPY13O4GAmPrI/a2VsSJEp2MnKpB8W
-         kao8YcDEPbjmrILF1eDOzR4bBD9Ba1n9XbkhBXk8Ox0qBvFCCYpPZxv70bIVavC7fp3u
-         1/Yw==
+        bh=f+G3k2rqZ2vXMSBMpnYGO0MAWxRn6Tt+kQK5k1SVAz4=;
+        b=SQe3m1zjEgenACmybs0hWQ0XAjGjc2Zs7bOJ/kAAsvNg02x4bAkEI2eOYNkVMpWeGR
+         s4tCor2j5lAxkoFnn+pKI4P84uaw3r0B4qutJEmvjmKF5XLZk7I3T8ARj3hPNxhrmHKE
+         0TIGn6WyakcXlsk6LFoaQcjAGnnjww6mIW3OZ880/XdnWmkjjPdXyS6ezwS4I02PQCvZ
+         vOTXf6S3vuQCA2cmuAzkcR2NnHXEpUEzsaES9+VZSZNyPmQP48eW74NSDOVOX58cLq7r
+         q19JbrOhA2C+mZ//1I1Jn3Bebj3j862SBGiZ0UOKjH8NlN7ALCIq5J8ZrRuolZjtsFBR
+         L+Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773740469; x=1774345269;
+        d=1e100.net; s=20251104; t=1773742852; x=1774347652;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bS9PfKBXOW6fmCX329/wY4OzoCDVjo1e2iZiSr+iZ4Y=;
-        b=h9IrV863MFkHIL15SnP2Zb+xI/xoQK1OFvVogIOYjmgG/CVnhZhlVMQUV7Nwn0BsJ0
-         tp2rxJbnP6HBq7nuVlSkWEEgXdK3TgRAux7U+ALEbVKsxMVNjzIgub6kWElTlzKipyHb
-         lBEkfD6zl40AZQl0D9w3061KxyDzlDok/AwroG7Pw6gZ60flJ94EbPR5B4+q/Cy5CEHU
-         XmmD0hoMEa/K/P0a4tGUW+dA6SaedSHfjEUSA35IFlXLA+9TJaiOP3KdNcXmaLt8Dh0/
-         LbIfOK1im5gZxSlKwJyDVh5rXKdLSYleKqNLgdQBip7mk5vpS63sUQnD60mCoyhwDneT
-         8rBA==
-X-Forwarded-Encrypted: i=1; AJvYcCXn+q2TX+eEcHwGmhnUJiYWaobGn3Iliax2wmUMlCkbpND5XY5W1yBKXKUOrcQrOJOQJHv4wTQ=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyUHwem5M+Q5UIwxqleOff4XB7QeANlx0xlUT5Ddrinkzev/Juk
-	RUA52RcK6DfSmpmLCN+vMxjn9vPIqIXpzPwjdz6P1xXKfxizZjQryaulGY9t7wGlR6LLpqVxGVX
-	u6x8sWHkvsG/VShvpL9Bq1jHqOtHdpVNpqMxiWAtZ
-X-Gm-Gg: ATEYQzxIbAA+mqwy0bERDiKem+3S2UxTPd5S2SjnwVgUg61w7FPlnmeN6UVVa8xdrSP
-	grwe/xzoJzSo62AtSHL8w7amMnPmXgdTWyn0ebB01V96E+2DmdsP6ohGQYSMjZAM7beY5AeVLEz
-	o5+VH+dxHBo2BT4vGV2Fi8e+Kk9ztJ0xvv86AVL+BPOAEOLwyHpqe7d2B5Kb/eI76/0cveDzD+a
-	DX7bOllO+xUYnUnMoSUNalEOMcxxa6pLIvHTPQiybkRqsuq54SktwvF20ayHY5175pMQK9eNaIV
-	8N3gnTfS6wDySZS7vcemX1ViyfD9kAwdgHVz
-X-Received: by 2002:a05:622a:144f:b0:501:4eae:dbfc with SMTP id
- d75a77b69052e-5099ae2a155mr9844921cf.5.1773740468577; Tue, 17 Mar 2026
- 02:41:08 -0700 (PDT)
+        bh=f+G3k2rqZ2vXMSBMpnYGO0MAWxRn6Tt+kQK5k1SVAz4=;
+        b=UfrDp7juVaqYZu62ECW2IDV1lJ0Is9KkBnajVJbCmqpPjW9RN8k2g0bA/jqzo3fJhU
+         liXAoR43xmF15+/w17hn2ecOAmFbDkQEt8zwIOIgizRNKOYnb9nqE5txmKizwL3YOVXu
+         HS3wEUO3NsuV10emC2GG/iIDy53LmF04Jjk5YwfJB55brCEUUlYmKCFOROZzGnKASJrw
+         KBEedOfleA2+D/KPLbMXorg7QaEaSSJy6J6IEkbMICDmmXmIGM9qSQ4HCHXcU+mRnyBO
+         FdEn3JtvJ91r/rpvENI0JKOvWCvhj3kQp4I6N0H8TOWn5ZJO5d0HNXkdPZj3WSpMMeqc
+         nKZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXijarrdXX/Eo5iKX+6Ce5ZK3hyN1cs1/Pr4vTLk7TAauNTcRMgFB6RlRP4GiZtfsTq+b0rZ+A=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyRnpsD4MNI9t0rK7hn4v/PCt+FWG/iuEupSBKpeFaMHdFxD+Qu
+	B6mW+TORLhKdkkTeFRvnMVbX6gjl04CICk2QyrwgOJu6gG1f5xkK9ESJDwC8SgTuZIz7qm8uMbG
+	JNxpf2e7K+fN/fPei6bXh5rBcfru3ZDexpSWyCEVA
+X-Gm-Gg: ATEYQzymhTQszYYUC/JhmEMl9CJs4ipjwMkG8eXClu5LVeuj9RtVv8SdAqXlUpGmT+C
+	DaySTmr6bP41+RdF4UzTVhjcLvrFB5uADGojZt04Mbt0ANUZ2+niFR+CKYStMuy4/n7sYo/+FKe
+	fbcSOHOPT+yToGMEJsoVFNnI5Wxig2jZwSyIpphdaRCfnNaIkXHlV/d3IVQnPt/yRy/f2ILqqin
+	9feZN1PcZqzqm0CZiY/XOtlwasCixsdoX59gC6hZ6tmwTZWV4NrWrMPKIYWTy2Q7A/YJ4tbpbAN
+	UOjfHgBgLixv6oZkRdg/lXSDz8m2C3uq+JTmrvq1rM4nUFg=
+X-Received: by 2002:a05:622a:1ba7:b0:4ff:cb72:7c03 with SMTP id
+ d75a77b69052e-5099ac6cce6mr10382591cf.3.1773742851259; Tue, 17 Mar 2026
+ 03:20:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260310124933.830025-1-sebastianene@google.com>
- <20260310124933.830025-7-sebastianene@google.com> <CA+EHjTy051kjdReuESmk3HpMsBEW=s3DxhJXa8vQJFHz--wG2Q@mail.gmail.com>
-In-Reply-To: <CA+EHjTy051kjdReuESmk3HpMsBEW=s3DxhJXa8vQJFHz--wG2Q@mail.gmail.com>
+References: <20260310124933.830025-1-sebastianene@google.com> <20260310124933.830025-9-sebastianene@google.com>
+In-Reply-To: <20260310124933.830025-9-sebastianene@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Mar 2026 09:40:31 +0000
-X-Gm-Features: AaiRm53KBgHC5d-Zqr_jX-4sHKW6VtW6A9pR3Ss9SaBCLcjNk9OzLbJJ4fUt1VA
-Message-ID: <CA+EHjTxLAvMQR_6eiPRA-8HuoOHmEpY99TFf6TheUf0hYf1uhQ@mail.gmail.com>
-Subject: Re: [PATCH 06/14] KVM: arm64: Add infrastructure for ITS emulation setup
+Date: Tue, 17 Mar 2026 10:20:14 +0000
+X-Gm-Features: AaiRm50TPE0FIw-7TUW05xg8zVnIiwfm0n7O_Lk2IR6hWpuMOCIItnRIP8yL7co
+Message-ID: <CA+EHjTzfoRPvfe-SNW_e=-p+3Yy2UPu90y0bsvSJ9OOgnc7C6g@mail.gmail.com>
+Subject: Re: [PATCH 08/14] KVM: arm64: Trap & emulate the ITS MAPD command
 To: Sebastian Ene <sebastianene@google.com>
 Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, 
 	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
@@ -99,425 +98,351 @@ Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
 	yuzenghui@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 16 Mar 2026 at 10:46, Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Sebastian,
->
-> On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
-> >
-> > Share the host command queue with the hypervisor. Donate
-> > the original command queue memory to the hypervisor to ensure
-> > host exclusion and trap accesses on GITS_CWRITE register.
->
-> GITS_CWRITE -> GITS_CWRITER
->
-> > On a CWRITER write, the hypervisor copies commands from the
-> > host's queue to the protected queue before updating the
-> > hardware register.
-> > This ensures the hypervisor mediates all commands sent to
-> > the physical ITS.
->
-> This commit message demonstrates why we should be careful about
-> naming. This patch series is pretty complex, and having clear and
-> consistent naming would help. What I mean is, here you're referring to
-> protected vs host queue, earlier you were referring to shadow (which
-> now I am not clear if it meant the host version or the hyp version).
-> Maybe we could have a discussion about naming, but the most important
-> part is consistency.
->
-> >
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h             |   1 +
-> >  arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  17 ++
-> >  arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 203 ++++++++++++++++++
-> >  3 files changed, 221 insertions(+)
-> >  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index ef00c1bf7d00..dc5ef2f9ac49 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -28,6 +28,7 @@ struct pkvm_protected_reg {
-> >         u64 start_pfn;
-> >         size_t num_pages;
-> >         pkvm_emulate_handler *cb;
-> > +       void *priv;
-> >  };
-> >
-> >  extern struct pkvm_protected_reg kvm_nvhe_sym(pkvm_protected_regs)[];
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-> > new file mode 100644
-> > index 000000000000..6be24c723658
-> > --- /dev/null
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-> > @@ -0,0 +1,17 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +
-> > +#ifndef __NVHE_ITS_EMULATE_H
-> > +#define __NVHE_ITS_EMULATE_H
-> > +
-> > +
-> > +#include <asm/kvm_pkvm.h>
-> > +
-> > +
-> > +struct its_shadow_tables;
-> > +
-> > +int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *priv_state,
-> > +                               struct its_shadow_tables *shadow);
-> > +
-> > +void pkvm_handle_gic_emulation(struct pkvm_protected_reg *region, u64 offset, bool write,
-> > +                              u64 *reg, u8 reg_size);
-> > +#endif /* __NVHE_ITS_EMULATE_H */
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> > index 0eecbb011898..4a3ccc90a1a9 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> > @@ -1,8 +1,75 @@
-> >  // SPDX-License-Identifier: GPL-2.0-only
-> >
-> >  #include <asm/kvm_pkvm.h>
-> > +#include <linux/irqchip/arm-gic-v3.h>
-> > +#include <nvhe/its_emulate.h>
-> >  #include <nvhe/mem_protect.h>
-> >
-> > +struct its_priv_state {
-> > +       void *base;
-> > +       void *cmd_hyp_base;
-> > +       void *cmd_host_base;
-> > +       void *cmd_host_cwriter;
-> > +       struct its_shadow_tables *shadow;
-> > +       hyp_spinlock_t its_lock;
-> > +};
-> > +
-> > +struct its_handler {
-> > +       u64 offset;
-> > +       u8 access_size;
-> > +       void (*write)(struct its_priv_state *its, u64 offset, u64 value);
-> > +       void (*read)(struct its_priv_state *its, u64 offset, u64 *read);
-> > +};
-> > +
-> > +DEFINE_HYP_SPINLOCK(its_setup_lock);
-> > +
-> > +static void cwriter_write(struct its_priv_state *its, u64 offset, u64 value)
-> > +{
-> > +       u64 cwriter_offset = value & GENMASK(19, 5);
-> > +       int cmd_len, cmd_offset;
-> > +       size_t cmdq_sz = its->shadow->cmdq_len;
->
-> Prefer RCT declaration order.
->
-> > +
-> > +       if (cwriter_offset > cmdq_sz)
-> > +               return;
->
-> Off-by-one:
-> +       if (cwriter_offset >= cmdq_sz)
->
-> > +
-> > +       cmd_offset = its->cmd_host_cwriter - its->cmd_host_base;
-> > +       cmd_len = cwriter_offset - cmd_offset;
-> > +       if (cmd_len < 0)
-> > +               cmd_len = cmdq_sz - cmd_offset;
->
-> This relies on unsigned underflow. cwriter_offset is u64. If
-> cmd_offset > cwriter_offset, the result is a massive positive u64
-> (e.g., 0xFFFFFFF...). This works but relies on implementation-defined
-> behavior and is fragile. UBSAN might flag this, and if someone comes
-> along and "cleans up" the variables by changing cmd_len and cmd_offset
-> to size_t (unsigned 64-bit), which is the correct type for buffer
-> lengths, cmd_len < 0 will never be true. It's better to explicitly
-> handle the wrap-around using safe unsigned logic (which is the
-> idiomatic way of doing it):
->
-> +       size_t cwriter_offset = value & GENMASK(19, 5);
-> +       size_t cmd_len, cmd_offset;
-> ...
-> +       if (cwriter_offset >= cmd_offset)
-> +              cmd_len = cwriter_offset - cmd_offset;
-> +       else
-> +              cmd_len = cmdq_sz - cmd_offset;
+Hi Sebastian,
 
-Will Deacon pointed out that I'm wrong about this (offline): the Linux
-kernel relies on compiler guarantees for 2's complement architectures:
-the value is truncated to the lower 32 bits. That said, the code I
-suggested above is clearer and more idiomatic.
+On Tue, 10 Mar 2026 at 12:49, Sebastian Ene <sebastianene@google.com> wrote:
+>
+> Parse the MAPD command and extract the ITT address to
+> sanitize it. When the command has the valid bit set,
+> share the memory that holds the ITT table
+> with the hypervisor to prevent it from being used
+> by someone else and track the pages in an array.
+> When the valid bit is cleared, check if the pages
+> are tracked and then remove the sharing with the
+> hypervisor.
+> Check if we need to do any shadow table updates
+> in case the device table is configured with an
+> indirect layout.
+
+Same as the previous commit message, could you please clarify the
+"why" rather than only the "how"?
+
+For someone without deep context of the pKVM ITS isolation model, this
+message does not explain the threat vector.
+
+>
+> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/its_emulate.c | 182 ++++++++++++++++++++++++++
+>  drivers/irqchip/irq-gic-v3-its.c      |  12 --
+>  include/linux/irqchip/arm-gic-v3.h    |  12 ++
+>  3 files changed, 194 insertions(+), 12 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/its_emulate.c b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> index 865a5d6353ed..722fe80dc2e5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/its_emulate.c
+> @@ -12,8 +12,13 @@ struct its_priv_state {
+>         void *cmd_host_cwriter;
+>         struct its_shadow_tables *shadow;
+>         hyp_spinlock_t its_lock;
+> +       u16 empty_idx;
+> +       u64 tracked_pfns[];
+>  };
+>
+> +#define MAX_TRACKED_PFNS       ((PAGE_SIZE - offsetof(struct its_priv_state, \
+> +                                 tracked_pfns)) / sizeof(u64))
+> +
+>  struct its_handler {
+>         u64 offset;
+>         u8 access_size;
+> @@ -23,6 +28,178 @@ struct its_handler {
+>
+>  DEFINE_HYP_SPINLOCK(its_setup_lock);
+>
+> +static int track_pfn_add(struct its_priv_state *its, u64 pfn)
+> +{
+> +       int ret, i;
+> +
+> +       if (its->empty_idx + 1 >= MAX_TRACKED_PFNS)
+> +               return -ENOSPC;
+
+Why +1? This wastes the final slot in the array. It should just be: if
+(its->empty_idx >= MAX_TRACKED_PFNS).
+
+More importantly, doing an O(N) linear array scan to manage empty_idx
+inside track_pfn_add and track_pfn_remove while holding the raw
+its_priv->its_lock needlessly inflates host IRQ latency. Please
+replace this array with a  BITMAP.
+
+> +
+> +       ret = __pkvm_host_share_hyp(pfn);
+> +       if (ret)
+> +               return ret;
+> +
+> +       its->tracked_pfns[its->empty_idx] = pfn;
+> +       for (i = 0; i < MAX_TRACKED_PFNS; i++) {
+> +               if (!its->tracked_pfns[i])
+> +                       break;
+> +       }
+> +
+> +       its->empty_idx = i;
+> +       return 0;
+> +}
+> +
+> +static int track_pfn_remove(struct its_priv_state *its, u64 pfn)
+> +{
+> +       int i, ret;
+> +
+> +       for (i = 0; i < MAX_TRACKED_PFNS; i++) {
+> +               if (its->tracked_pfns[i] != pfn)
+> +                       continue;
+> +
+> +               ret = __pkvm_host_unshare_hyp(pfn);
+> +               if (ret)
+> +                       return ret;
+> +
+> +               its->tracked_pfns[i] = 0;
+> +               its->empty_idx = i;
+> +       }
+> +
+> +       return 0;
+> +}
+
+If the PFN isn't found in the array, this silently returns 0 (success).
+
+> +
+> +static int get_num_itt_pages(struct its_priv_state *its, u8 num_bits)
+> +{
+> +       int nr_ites = 1 << (num_bits + 1);
+> +       u64 size, gits_typer = readq_relaxed(its->base + GITS_TYPER);
+> +
+> +       size = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, gits_typer) + 1);
+> +       size = max(size, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+> +
+> +       return PAGE_ALIGN(size) >> PAGE_SHIFT;
+> +}
+> +
+> +static int track_pfn(struct its_priv_state *its, u64 start_pfn, int num_pages, bool remove)
+> +{
+> +       int i, ret;
+> +
+> +       for (i = 0; i < num_pages; i++) {
+> +               if (remove)
+> +                       ret = track_pfn_remove(its, start_pfn + i);
+> +               else
+> +                       ret = track_pfn_add(its, start_pfn + i);
+> +
+> +               if (ret)
+> +                       goto err_track;
+> +       }
+> +
+> +       return 0;
+> +err_track:
+> +       for (i = i - 1; i >= 0; i--) {
+> +               if (remove)
+> +                       track_pfn_add(its, start_pfn + i);
+> +               else
+> +                       track_pfn_remove(its, start_pfn + i);
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static struct its_baser *get_table(struct its_priv_state *its, u64 type)
+> +{
+> +       int i;
+> +       struct its_shadow_tables *shadow = its->shadow;
+> +
+> +       for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +               if (GITS_BASER_TYPE(shadow->tables[i].val) == type)
+> +                       return &shadow->tables[i];
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static int check_table_update(struct its_priv_state *its, u32 id, u64 type)
+> +{
+> +       u32 lvl1_idx;
+> +       u64 esz, *host_table, *hyp_table, new_entry, update;
+> +       struct its_baser *table = get_table(its, type);
+> +       int ret;
+> +       phys_addr_t new_lvl2_table, lvl2_table;
+> +
+> +       if (!table)
+> +               return -EINVAL;
+> +
+> +       if (!(table->val & GITS_BASER_INDIRECT))
+> +               return 0;
+> +
+> +       esz = GITS_BASER_ENTRY_SIZE(table->val);
+> +       lvl1_idx = id / (table->psz / esz);
+> +
+> +       host_table = kern_hyp_va(table->shadow);
+> +       hyp_table = kern_hyp_va(table->base);
+> +
+> +       new_entry = host_table[id];
+
+This accesses the entry based on id, which isn't sanitized.
+
+> +       update = new_entry ^ hyp_table[id];
+> +       if (!update || !(update & GITS_BASER_VALID))
+> +               return 0;
+
+This assumes any meaningful update must toggle the Valid bit. If the
+host issues a MAPD that changes the Level 2 table pointer but keeps
+Valid=1, update & GITS_BASER_VALID is 0.
+
+> +
+> +       new_lvl2_table = hyp_phys_to_pfn(new_entry & PHYS_MASK_SHIFT);
+> +       lvl2_table = hyp_phys_to_pfn(hyp_table[id] & PHYS_MASK_SHIFT);
+
+Should this be PHYS_MASK?
+
+> +       if (new_entry & GITS_BASER_VALID)
+> +               ret = __pkvm_host_donate_hyp(new_lvl2_table, table->psz >> PAGE_SHIFT);
+> +       else
+> +               ret = __pkvm_hyp_donate_host(lvl2_table, table->psz >> PAGE_SHIFT);
+
+Similar issue to the one I mentioned in a previous patch regarding ITS
+page size vs host page size.
+
+
+> +       if (ret)
+> +               return ret;
+> +
+> +       hyp_table[id] = new_entry;
+> +       return 0;
+> +}
+> +
+> +static int process_its_mapd(struct its_priv_state *its, struct its_cmd_block *cmd)
+> +{
+> +       phys_addr_t itt_addr = cmd->raw_cmd[2] & GENMASK(51, 8);
+> +       u8 size = cmd->raw_cmd[1] & GENMASK(4, 0);
+> +       bool remove = !(cmd->raw_cmd[2] & BIT(63));
+> +       u32 device_id = cmd->raw_cmd[0] >> 32;
+> +       int num_pages, ret;
+> +       u64 base_pfn;
+> +
+> +       if (PAGE_ALIGNED(itt_addr))
+> +               return -EINVAL;
+
+This is inverted, right?
 
 Cheers,
 /fuad
 
-
->
-> Also, cwriter_offset should be validated to ensure it is 32-byte
-> aligned, as the ITS commands are fixed-size packets.
->
-> > +
-> > +       if (cmd_offset + cmd_len > cmdq_sz)
-> > +               return;
-> > +
-> > +       memcpy(its->cmd_hyp_base + cmd_offset, its->cmd_host_cwriter, cmd_len);
->
-> I think we need a memory barrier (e.g., dsb(ishst)) after the memcpy
-> to ensure the writes are visible to the hardware before ringing the
-> GITS_CWRITER doorbell.
->
-> > +
-> > +       its->cmd_host_cwriter = its->cmd_host_base +
-> > +               (cmd_offset + cmd_len) % cmdq_sz;
-> > +       if (its->cmd_host_cwriter == its->cmd_host_base) {
-> > +               memcpy(its->cmd_hyp_base, its->cmd_host_base, cwriter_offset);
-> > +
-> > +               its->cmd_host_cwriter = its->cmd_host_base + cwriter_offset;
-> > +       }
-> > +
-> > +       writeq_relaxed(value, its->base + GITS_CWRITER);
->
-> You should sanitize this to
->
->  +       writeq_relaxed(value & GENMASK(19, 5), its->base + GITS_CWRITER);
->
-> because value contains the raw 64-bit value written by the host. While
-> you extracted the offset correctly using GENMASK(19, 5), you are
-> forwarding the raw value (including any garbage in the RES0 bits) to
-> the physical hardware.
->
-> > +}
-> > +
-> > +static void cwriter_read(struct its_priv_state *its, u64 offset, u64 *read)
-> > +{
-> > +       *read = readq_relaxed(its->base + GITS_CWRITER);
-> > +}
-> > +
-> > +#define ITS_HANDLER(off, sz, write_cb, read_cb)        \
-> > +{                                                      \
-> > +       .offset = (off),                                \
-> > +       .access_size = (sz),                            \
-> > +       .write = (write_cb),                            \
-> > +       .read = (read_cb),                              \
-> > +}
-> > +
-> > +static struct its_handler its_handlers[] = {
-> > +       ITS_HANDLER(GITS_CWRITER, sizeof(u64), cwriter_write, cwriter_read),
-> > +       {},
-> > +};
-> >
-> >  void pkvm_handle_forward_req(struct pkvm_protected_reg *region, u64 offset, bool write,
-> >                              u64 *reg, u8 reg_size)
-> > @@ -21,3 +88,139 @@ void pkvm_handle_forward_req(struct pkvm_protected_reg *region, u64 offset, bool
-> >                         writeq_relaxed(*reg, addr);
-> >         }
-> >  }
-> > +
-> > +void pkvm_handle_gic_emulation(struct pkvm_protected_reg *region, u64 offset, bool write,
-> > +                              u64 *reg, u8 reg_size)
-> > +{
-> > +       struct its_priv_state *its_priv = region->priv;
->
-> Due to arm64's  memory model, you must use
-> smp_load_acquire(&region->priv) here to guarantee the struct fields
-> (base, shadow, etc.) are fully visible before dereferencing them.
->
-> (and a similar issue later on below... I'll point it out)
->
-> > +       void __iomem *addr;
-> > +       struct its_handler *reg_handler;
->
-> Prefer RCT declaration order.
->
->
-> > +
-> > +       if (!its_priv)
-> > +               return;
->
-> This breaks bisectability. In this patch, you redirect the MMIO trap
-> to pkvm_handle_gic_emulation, but the setup HVC
-> (pkvm_init_gic_its_emulation) isn't called until a later patch.
-> Therefore, its_priv is always NULL here, causing all host ITS accesses
-> to be silently dropped. The device appears dead.
->
->  You must fall back to the passthrough handler if emulation is not yet
-> initialized:
-> +       if (!its_priv) {
-> +               pkvm_handle_forward_req(region, offset, write, reg, reg_size);
-> +               return;
+> +
+> +       base_pfn = hyp_phys_to_pfn(itt_addr);
+> +       num_pages = get_num_itt_pages(its, size);
+> +
+> +       ret = check_table_update(its, device_id, GITS_BASER_TYPE_DEVICE);
+> +       if (ret)
+> +               return ret;
+> +
+> +       return track_pfn(its, base_pfn, num_pages, remove);
+> +}
+> +
+> +static int parse_its_cmdq(struct its_priv_state *its, int offset, ssize_t len)
+> +{
+> +       struct its_cmd_block *cmd = its->cmd_hyp_base + offset;
+> +       u8 req_type;
+> +       int ret = 0;
+> +
+> +       while (len > 0 && !ret) {
+> +               req_type = cmd->raw_cmd[0] & GENMASK(7, 0);
+> +
+> +               switch (req_type) {
+> +               case GITS_CMD_MAPD:
+> +                       ret = process_its_mapd(its, cmd);
+> +                       break;
+> +               }
+> +
+> +               cmd++;
+> +               len -= sizeof(struct its_cmd_block);
 > +       }
+> +
+> +       return ret;
+> +}
+> +
+>  static void cwriter_write(struct its_priv_state *its, u64 offset, u64 value)
+>  {
+>         u64 cwriter_offset = value & GENMASK(19, 5);
+> @@ -41,11 +218,15 @@ static void cwriter_write(struct its_priv_state *its, u64 offset, u64 value)
+>                 return;
 >
-> at least until you setup the hvc...
+>         memcpy(its->cmd_hyp_base + cmd_offset, its->cmd_host_cwriter, cmd_len);
+> +       if (parse_its_cmdq(its, cmd_offset, cmd_len))
+> +               return;
 >
-> > +
-> > +       addr = its_priv->base + offset;
-> > +       for (reg_handler = its_handlers; reg_handler->access_size; reg_handler++) {
-> > +               if (reg_handler->offset > offset ||
-> > +                   reg_handler->offset + reg_handler->access_size <= offset)
-> > +                       continue;
-> > +
-> > +               if (reg_handler->access_size & (reg_size - 1))
-> > +                       continue;
+>         its->cmd_host_cwriter = its->cmd_host_base +
+>                 (cmd_offset + cmd_len) % cmdq_sz;
+>         if (its->cmd_host_cwriter == its->cmd_host_base) {
+>                 memcpy(its->cmd_hyp_base, its->cmd_host_base, cwriter_offset);
+> +               if (parse_its_cmdq(its, cmd_offset, cmd_len))
+> +                       return;
 >
-> Is this deliberate? If access_size is 8 and reg_size is 4, 8 & 3 == 0,
-> so it continues and allows the 8-byte handler to process a 4-byte
-> write. Use explicit length matching (reg_handler->access_size !=
-> reg_size), but there's more later...
+>                 its->cmd_host_cwriter = its->cmd_host_base + cwriter_offset;
+>         }
+> @@ -357,6 +538,7 @@ int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *host_priv_state,
+>         priv_state->cmd_hyp_base = kern_hyp_va(shadow->cmd_original);
+>         priv_state->cmd_host_base = kern_hyp_va(shadow->cmd_shadow);
+>         priv_state->cmd_host_cwriter = priv_state->cmd_host_base;
+> +       priv_state->empty_idx = 0;
 >
-> > +
-> > +               if (write && reg_handler->write) {
-> > +                       hyp_spin_lock(&its_priv->its_lock);
-> > +                       reg_handler->write(its_priv, offset, *reg);
+>         hyp_spin_unlock(&its_setup_lock);
 >
-> The GIC specification requires support for 32-bit accesses to all
-> GITS_* registers. If the host executes a 32-bit write, *reg contains
-> only the 32-bit value. However, you do not pass reg_size to
-> cwriter_write. The handler assumes it is a full 64-bit value, which
-> will corrupt the other half of the emulated register with zeros. You
-> need to implement Read-Modify-Write logic for sub-register accesses.
+> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+> index 278dbc56f962..be78f7dccb9f 100644
+> --- a/drivers/irqchip/irq-gic-v3-its.c
+> +++ b/drivers/irqchip/irq-gic-v3-its.c
+> @@ -121,8 +121,6 @@ static DEFINE_PER_CPU(struct its_node *, local_4_1_its);
+>  #define is_v4_1(its)           (!!((its)->typer & GITS_TYPER_VMAPP))
+>  #define device_ids(its)                (FIELD_GET(GITS_TYPER_DEVBITS, (its)->typer) + 1)
 >
-> > +                       hyp_spin_unlock(&its_priv->its_lock);
-> > +                       return;
-> > +               }
-> > +
-> > +               if (!write && reg_handler->read) {
-> > +                       hyp_spin_lock(&its_priv->its_lock);
-> > +                       reg_handler->read(its_priv, offset, reg);
-> > +                       hyp_spin_unlock(&its_priv->its_lock);
-> > +                       return;
-> > +               }
-> > +
-> > +               return;
-> > +       }
-> > +
-> > +       pkvm_handle_forward_req(region, offset, write, reg, reg_size);
-> > +}
-> > +
-> > +static struct pkvm_protected_reg *get_region(phys_addr_t dev_addr)
-> > +{
-> > +       int i;
-> > +       u64 dev_pfn = dev_addr >> PAGE_SHIFT;
+> -#define ITS_ITT_ALIGN          SZ_256
+> -
+>  /* The maximum number of VPEID bits supported by VLPI commands */
+>  #define ITS_MAX_VPEID_BITS                                             \
+>         ({                                                              \
+> @@ -515,16 +513,6 @@ struct its_cmd_desc {
+>         };
+>  };
 >
-> Please prefer RCT.
+> -/*
+> - * The ITS command block, which is what the ITS actually parses.
+> - */
+> -struct its_cmd_block {
+> -       union {
+> -               u64     raw_cmd[4];
+> -               __le64  raw_cmd_le[4];
+> -       };
+> -};
+> -
+>  #define ITS_CMD_QUEUE_SZ               SZ_64K
+>  #define ITS_CMD_QUEUE_NR_ENTRIES       (ITS_CMD_QUEUE_SZ / sizeof(struct its_cmd_block))
 >
-> > +
-> > +       for (i = 0; i < PKVM_PROTECTED_REGS_NUM; i++) {
-> > +               if (pkvm_protected_regs[i].start_pfn == dev_pfn)
-> > +                       return &pkvm_protected_regs[i];
-> > +       }
-> > +
-> > +       return NULL;
-> > +}
-> > +
-> > +static int pkvm_setup_its_shadow_cmdq(struct its_shadow_tables *shadow)
-> > +{
-> > +       int ret, i, num_pages;
-> > +       u64 shadow_start_pfn, original_start_pfn;
-> > +       void *cmd_shadow_va = kern_hyp_va(shadow->cmd_shadow);
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index 40457a4375d4..4f7d47f3d970 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -612,6 +612,8 @@
+>   */
+>  #define GIC_IRQ_TYPE_LPI               0xa110c8ed
 >
-> Please prefer RCT. There are multiple variables declared on a single
-> line (int ret, i, num_pages;). Please untangle.
+> +#define ITS_ITT_ALIGN                  SZ_256
+> +
+>  struct rdists {
+>         struct {
+>                 raw_spinlock_t  rd_lock;
+> @@ -634,6 +636,16 @@ struct rdists {
+>         bool                    has_vpend_valid_dirty;
+>  };
 >
-> > +
-> > +       shadow_start_pfn = hyp_virt_to_pfn(cmd_shadow_va);
-> > +       original_start_pfn = hyp_virt_to_pfn(kern_hyp_va(shadow->cmd_original));
-> > +       num_pages = shadow->cmdq_len >> PAGE_SHIFT;
-> > +
-> > +       for (i = 0; i < num_pages; i++) {
-> > +               ret = __pkvm_host_share_hyp(shadow_start_pfn + i);
-> > +               if (ret)
-> > +                       goto unshare_shadow;
-> > +       }
-> > +
-> > +       ret = hyp_pin_shared_mem(cmd_shadow_va, cmd_shadow_va + shadow->cmdq_len);
-> > +       if (ret)
-> > +               goto unshare_shadow;
-> > +
-> > +       ret = __pkvm_host_donate_hyp(original_start_pfn, num_pages);
-> > +       if (ret)
-> > +               goto unpin_shadow;
-> > +
-> > +       return ret;
-> > +
-> > +unpin_shadow:
-> > +       hyp_unpin_shared_mem(cmd_shadow_va, cmd_shadow_va + shadow->cmdq_len);
-> > +
-> > +unshare_shadow:
-> > +       for (i = i - 1; i >= 0; i--)
+> +/*
+> + * The ITS command block, which is what the ITS actually parses.
+> + */
+> +struct its_cmd_block {
+> +       union {
+> +               u64     raw_cmd[4];
+> +               __le64  raw_cmd_le[4];
+> +       };
+> +};
+> +
+>  struct irq_domain;
+>  struct fwnode_handle;
+>  int __init its_lpi_memreserve_init(void);
+> --
+> 2.53.0.473.g4a7958ca14-goog
 >
-> Please use the standard while (i--) idiom for cleaner rollback loops.
->
-> > +               __pkvm_host_unshare_hyp(shadow_start_pfn + i);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> > +int pkvm_init_gic_its_emulation(phys_addr_t dev_addr, void *host_priv_state,
-> > +                               struct its_shadow_tables *host_shadow)
-> > +{
-> > +       int ret;
-> > +       struct its_priv_state *priv_state = kern_hyp_va(host_priv_state);
-> > +       struct its_shadow_tables *shadow = kern_hyp_va(host_shadow);
-> > +       struct pkvm_protected_reg *its_reg;
-> > +
-> > +       hyp_spin_lock(&its_setup_lock);
->
-> You're not releasing this lock on any of the error paths. Please add
-> err_unlock and goto err_unlock to release the spinlock.
->
-> > +       its_reg = get_region(dev_addr);
-> > +       if (!its_reg)
-> > +               return -ENODEV;
-> > +
-> > +       if (its_reg->priv)
-> > +               return -EOPNOTSUPP;
->
-> I think you need to add a check:
->
-> +       if (!PAGE_ALIGNED(priv_state) || !PAGE_ALIGNED(shadow))
-> +              return -EINVAL;
->
-> since __pkvm_host_donate_hyp() expects page-aligned addresses.
->
-> > +       ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn(priv_state), 1);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       ret = __pkvm_host_donate_hyp(hyp_virt_to_pfn(shadow), 1);
-> > +       if (ret)
-> > +               goto err_with_state;
-> > +
-> > +       ret = pkvm_setup_its_shadow_cmdq(shadow);
-> > +       if (ret)
-> > +               goto err_with_shadow;
-> > +
-> > +       its_reg->priv = priv_state;
->
-> Related to above, please use smp_store_release(&its_reg->priv,
-> priv_state); to prevent the compiler and CPU from reordering the
-> struct initialization below this pointer assignment, which would
-> expose uninitialized memory to the lockless reader in the trap
-> handler.
->
-> Cheers,
-> /fuad
->
->
->
->
-> > +
-> > +       hyp_spin_lock_init(&priv_state->its_lock);
-> > +       priv_state->shadow = shadow;
-> > +       priv_state->base = __hyp_va(dev_addr);
-> > +
-> > +       priv_state->cmd_hyp_base = kern_hyp_va(shadow->cmd_original);
-> > +       priv_state->cmd_host_base = kern_hyp_va(shadow->cmd_shadow);
-> > +       priv_state->cmd_host_cwriter = priv_state->cmd_host_base;
-> > +
-> > +       hyp_spin_unlock(&its_setup_lock);
-> > +
-> > +       return 0;
-> > +err_with_shadow:
-> > +       __pkvm_hyp_donate_host(hyp_virt_to_pfn(shadow), 1);
-> > +err_with_state:
-> > +       __pkvm_hyp_donate_host(hyp_virt_to_pfn(priv_state), 1);
-> > +       return ret;
-> > +}
-> > --
-> > 2.53.0.473.g4a7958ca14-goog
-> >
