@@ -1,91 +1,91 @@
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C9835C195
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 09:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1D0330648
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 09:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773739370; cv=pass; b=YiNHJcj43dPxLgyIgRn/Z+OZHIcH2h4ptMGWASNiC4GgYPBwG4N+ozq7sIt8PVUrAnwyCxCp610r6OOnIThc6ihius66AgTC2viVuonjjNxCXfQSwQkg/qPXJ4ef2ANSRCNMcdOPv0to4gTJ93N9kg+zx9Cgi1wsXebJPq/1dcg=
+	t=1773740376; cv=pass; b=CNVWLYHIeLAxmlZ0zI7AJcT/SlcPSsM5jbiGnIpzGy1Ljc2/THEQVoX64+Bq1FByuVUm4M8e5kMhfVDqZIsrr/LG2hc4vHTUafk1194e5whEly12PpTt0y85HAQycugnNtuoT+q38tsL+5MEt/YLX+ipD5S85olLxlZysXfya98=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773739370; c=relaxed/simple;
-	bh=2jA7Qi0M29gmCAImT+RlfChtJmHWyNoUHY6cVa7s2RI=;
+	s=arc-20240116; t=1773740376; c=relaxed/simple;
+	bh=NmEWj53uBRTRD3rmTBUblDiOcLhr9FvWoYZY5y5uIpg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PY0arOZpPABOoVdwOGiycj0vywHCbqI7YrAi67LfvDFeQyEiUVz0mYK80g/3Wm6AkxknZep1BM42P0ZitTWUbmkZS+zCvvgJ6ZgETn5YyhiYEAFofOoCxEi+V7BHpOcYIq9XJqjA7LkzVU7MWGe2GDtqsa9i8xLeQA7FhuYeT2g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eAqM+6rh; arc=pass smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=aAQnKBzQbFZxTGGxFwcSvCjZfkL5SGaP3SEL7HJ9EA5D1JHXcRZVoK8kCAC21apM6CsMvF6AVlq3hbJoyJLPl2SD0EUyX53ezMZfjj3tcrZANY11c65lk6owWpYRc9rDZpTERtzeosZ67EoV2R3mFx3aHWTaJjhiZ1Pbmn/6lSs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H4MYka4n; arc=pass smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eAqM+6rh"
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-509069a7a7fso447631cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 02:22:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773739367; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H4MYka4n"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-509062d829dso379551cf.1
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 02:39:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773740374; cv=none;
         d=google.com; s=arc-20240605;
-        b=L2SpjIaGj5aRIG4SLvsvBOG6CPkr1X9SkEpNyvcn/0S0UaP1f+iHDGe+V8aHToxquL
-         h1ODpdqcxT+FhYzcq+aOXUPbl0hLkWRS+FOUhe3Nq5km9NaPg2fG8x/RvF2ocJcRDwbj
-         RB09Yja/Vgon2ovt+HlsY1gIeSEOKYxcw00ap96lof6aPT8piY4JsLlg0RDswwR4AiVu
-         YR+ZnBJUyNWM2PHNF0q35P/o+JNBIjsGehX5HNhED8TeOe5vuy3SQVvvWHki50e1szZG
-         gPkisebw+UI+QtkBCZ4QUG6xV90MNaxqsjHBn1iC4l5Y1pH/wDGRWLz4sDNpR79Bk2uz
-         1yvw==
+        b=dYS/BRC0qVBKniiI4Aa2C8B655AfiBW+cKbyAQmYOFiivcqy7bJL2o5/vk23VotYBg
+         JVRVY661cv9om8lzkjPBEBmpfdqxE6Pj/Ogjg1Zt/fvKMCdHlyLuKiPEfAZ1oYveMqf7
+         P0CWv5YuiFjgfxYzrIkYpTnJbRf8nTmhBGV86d2FVOw7fs2MWQUMWU/rrgn8VVo3yin/
+         A9QLBWwJXGwVgWwlvaZrF+1jJ8BJ0yR1983amo+vkOYfyp3DJKHNDTV7zrrXJFoxbsLW
+         iyVvdR5UPmr2makWdMvyxHDvWbU/gpdSnujmq1hqgdegLkWKDMK3TUkwdO1IuMeLnPpO
+         QlaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=Mf/9giwzKIydxXGiboXiv6gCzPB39R05aoyKnuoj2ko=;
+        bh=nl8+CRYT4AqYzj6TfeAkgV0uZq+82OmQ6U8LucFBjLc=;
         fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
-        b=Dvwis0X+kGfJim8MGcLrtKvq3GRlZixpShMaJrmK/dXP/eAZSyUjiyvC1FndGe7+Ab
-         17XxBQZy+wslib4oBWdysRspV6ZiZxchzuduibi6dP7C+LCBkzWTl8VkbT7nwe/fLXlW
-         f3MmHphJjQNFkJfv/pD2mDHiigw1FEoB0xXmqS4Zy27iemvEFiK4CNJNQ7rGP8mntYAQ
-         VWR3BmaWwiPvSBntRp1efKMblvkvBbRAE9enikYjStY3HIcnTTTi0b36nl2yQ28Hk6Ci
-         Y4uRflwEXa7o02WacSTzGBhhOqhHCtexe701iBcUQFmF48h1pO8TufrcXRyU1108n9mk
-         UyUw==;
+        b=Ll0AoFGf7M8R3bvzAqK+ogAOp0fuwyuOQrUDrZXOgdz5wtzGZhH4Kw8hJyT9xQ87tW
+         9cuwSWggCEO84E1ZaX6Mm9HqGWVd4pRBPeeIg4UxVIIijKsrh2demp9XQLC/JVJJopyZ
+         5vNKmdZ0EIGxkWAph0/VJOp0kyDeuL7lwRAtopjN3AXHG/P0V09BWqfj3WVJ2/uRnyp/
+         ybYsFG2NRSlZMekiAe4CtRjbB3ETZZaQNk9OCfQbdchEu+Pc8T4Hj6n5bAKbdqIfoLWZ
+         xQGq1YVP9PMvfnuz80UaWnqNvmhezeInLw5FvyZv04N2kNP1vltwCFLF9f6bKy7e9XIJ
+         cSQw==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773739367; x=1774344167; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773740374; x=1774345174; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mf/9giwzKIydxXGiboXiv6gCzPB39R05aoyKnuoj2ko=;
-        b=eAqM+6rhVUavU4BAH9vFxHr0lfwgTWLz82FbJbRvvbNrIjbHAskouZS7RxIoWkVdDc
-         3JmBBK4e1W7bz4pURzgClnI75dd7u8rBa8uD6UwKD6Hvj5FDr1HrS3x26Fgi7d3vkgVq
-         z9XQzB5aUu+uCBq9+8H7pQjsZZUFj1eqsJasq3QrbArMivTLxitJ+uS0yJ7U6qvEfZzv
-         nFLZGIgHBtpjwwPe5s/jx00qRKtMBfCsmTZ9QwvFDqwv7or68j4570VvuYlbvYBW5M9r
-         IPGvy6LVs4O+UdxxCWFbddcg9VTP37PB6PkbGtsz3fWTkZbepznj4JT4+HZMuqWVA2mN
-         QJQg==
+        bh=nl8+CRYT4AqYzj6TfeAkgV0uZq+82OmQ6U8LucFBjLc=;
+        b=H4MYka4nzissVUJwqnhs2NhC6QZTZscqPkgKEZPd5PAPAdr7zFdsHz9691W/1E1FQM
+         kB+s/cftAhYdJ5Z+2TD06qdg6zD7/Na+FU4TmzcE1GHHNsfpYHhlkxz4U1S9HLe9lwQa
+         x6A4mklsztKokW/N+k0/r3ZHDrXlLBBU60Nw6cDYxiGLXGGquD0grB2HhCQhgARsiyKO
+         v346UJzZQ5TPIiCBog7+yajU5+bzCy56rZwU6q6b+mp4TkLdYrmuPrnGE4KSOPb+sFkw
+         LUY7fvzrDfvNN6YaN44rjOmvsb1qOWzEN2dRg0bhGjMuxWH5Qd6V8EoiS4bSk8a3wvi3
+         CLaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773739367; x=1774344167;
+        d=1e100.net; s=20251104; t=1773740374; x=1774345174;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mf/9giwzKIydxXGiboXiv6gCzPB39R05aoyKnuoj2ko=;
-        b=d9WkxGLl2ExKJBSJ2kEHaodUUSnfQQ+VRpR3gX+if2v65Oi9I0MotvZoTgTNmVfqW7
-         3MePbJOKSxC3I15wCakSViWCQ5kwMTkZYQeXh5htEAq8X6IDvLzF06DGxQvV73Owqj8j
-         jsg+hSBjRr15iBbzb56YHvh6MSxZ1bPGqHa5ao4GINDDtziAEiXTp7d3huWBNohpJtMk
-         QEeLCsKrnvkuM3WhcArwZQ+c7ZNciTGJJE306LCGmlwfJjH0hJC99P5FrFnz/FUrSGma
-         ZHOjHqyhVVIKyclRxT/NMIuaVoj0T0pzHIrvfYKpMMGOjVWskAq7Gtdaj4HpcTII+Qoc
-         Nylg==
-X-Gm-Message-State: AOJu0YzpM6WOn+jm1SwOZywqFnXU0V0k3ncVdF7CL9qeutRrwjb2Oual
-	uV8S22RkGDbLSbneyD+EpUtGNujLE9HROtj2xOGNRvFWuErn37AulUz60vZNdcY1QX1rXziCDnE
-	bLdXRVgRIbU9+yyI/RoX6LCr4VR1n8oXdQCtv7Hrw
-X-Gm-Gg: ATEYQzxBUxDT4rELOHd2EXpX4/jZf0lMwze2P062sIB+OqtpYlc5E3RIpM38a/SQkYi
-	2waq6zZCcAZyHgwFQ9/eXjfMGkEiDztE+0hDcx8oEQodqqZSAAdH7bKpfdNdonwBWAiJgSd185h
-	Nv3djwOtzN2Os9lSSoCxsSgCBX31tNashtOVp4XYQ8SaNKJ7gfVfoSwkd/HCNa///6Rd4sbc3jd
-	M3mgrYCjptKxMtBEcrEc0T5uPMHppXiRclmLfAru86n8/KMSJF2Tn3vH30keTC3NI3I8VshjkCV
-	WVjjW9HctDrGvlrrh0xt0wF9/I6K7b+hi7GY
-X-Received: by 2002:a05:622a:1987:b0:509:1c2c:866 with SMTP id
- d75a77b69052e-5099ae2a4ccmr10103971cf.11.1773739367111; Tue, 17 Mar 2026
- 02:22:47 -0700 (PDT)
+        bh=nl8+CRYT4AqYzj6TfeAkgV0uZq+82OmQ6U8LucFBjLc=;
+        b=RUXDQ+Yx1zgsUzjeoEXTYi8QXnOj6ThKFikYpVgOoxwjrrkLEBcUGakP4IMt3/AtJr
+         GA45OGZuOdAvk2lvdm6TSMr+yE0mMJGSyJmVKwD2PrLhq58bbkbqASz0/rxJibHryixk
+         0I49z94lC1sF21wl0o15icvSfrYxHt0eRxfYHoOjorMTWgQAcIFXsKwAh9Nq767oSsaZ
+         aNHwNdt5YRaIdCOOMY3EceR0gayMcsbP8/9PbLQQukPZFIrjIpZPUfv1Ox99n+jGP1fe
+         vDai015MJsz98I4Lh3ZJ4dtSARimMBRWZw6kNLX1qhxG5ywGfIUwL3xDv2aaysBWS4n3
+         Xt8A==
+X-Gm-Message-State: AOJu0YxXS0DASgWg1wgWMHCMeaIYgdQsfQtl0jqE9vDwdcvcabSptUvg
+	w+QdITEJ1oBM859HuaUq1TABl37IpV6HLW+YTpWOsZZrp6gtQ7NNdn9cFuLXMoJaMtkldCssFzy
+	mWZCtYnLPDwGBdMM36ZoUWsHcmJ1sIKPLsAife21r
+X-Gm-Gg: ATEYQzwbgMhnuDX0aMAZ6Y0iallWUwEznCuST3uv6zJDyBF+UJjp6Wdb7+0AUoibA8l
+	SM6juaWWLkQqaWcti4HHoHoocZwe2fCF9U1nizxxw3VZhhDcxZhvZOqm/vDCXywfen+3y4ySy8l
+	Kya5fdLioy81GkfImfwSuSgexzL91tl1V6Mc8pys9xorYHEj/c+HGoP6PC2tEW9ZY3x/i1gg3ja
+	mwnuuLj3yw2ubXqSVIrI5vkLdNE78Xqc2XNKn1SAG9oZXR4a0HxjAiOB5y64Fxyt6QEj0312la0
+	waGZl9L3ItFp29vqSySSaczmgpI5F7r3EfzWafh3EqM90O0=
+X-Received: by 2002:a05:622a:4c9:b0:507:35b2:6b9 with SMTP id
+ d75a77b69052e-5099ae2ae24mr10556781cf.7.1773740373177; Tue, 17 Mar 2026
+ 02:39:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260316175451.1866175-1-maz@kernel.org> <20260316175451.1866175-2-maz@kernel.org>
-In-Reply-To: <20260316175451.1866175-2-maz@kernel.org>
+References: <20260316175451.1866175-1-maz@kernel.org> <20260316175451.1866175-3-maz@kernel.org>
+In-Reply-To: <20260316175451.1866175-3-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Mar 2026 09:22:09 +0000
-X-Gm-Features: AaiRm520Hrh5Ypw764LiCNNkyKgzWy3z6aTOtfYZcmCicvIDTF_qmCHiaIPTc1s
-Message-ID: <CA+EHjTwqQ_0Tj8jq8hDnhJTT18abrkL5OqJukpZr24vNk5Zo1A@mail.gmail.com>
-Subject: Re: [PATCH 01/17] KVM: arm64: Kill fault->ipa
+Date: Tue, 17 Mar 2026 09:38:55 +0000
+X-Gm-Features: AaiRm50ulOtZPjDdImqlxYz51RCxyAEIHQJXJIULb8YzYDGnqaOlaLRa9XRiilY
+Message-ID: <CA+EHjTwC_TNj9Ggb7P3z+EwJ0cp6eS=NCx0NqDa1=E4FWP50ow@mail.gmail.com>
+Subject: Re: [PATCH 02/17] KVM: arm64: Make fault_ipa immutable
 To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
@@ -95,13 +95,15 @@ Content-Type: text/plain; charset="UTF-8"
 
 On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
 >
-> fault->ipa, in a nested contest, represents the output of the guest's
-> S2 translation for the fault->fault_ipa input, and is equal to
-> fault->fault_ipa otherwise,
+> Updating fault_ipa is conceptually annoying, as it changes something
+> that is a property of the fault itself.
 >
-> Given that this is readily available from kvm_s2_trans_output(),
-> drop fault->ipa and directly compute fault->gfn instead, which
-> is really what we want.
+> Stop doing so and instead use fault->gfn as the sole piece of state
+> that can be used to represent the faulting IPA.
+>
+> At the same time, introduce get_canonical_gfn() for the couple of case
+> we're we are concerned with the memslot-related IPA and not the faulting
+> one.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 
@@ -110,79 +112,126 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
-
 > ---
->  arch/arm64/kvm/mmu.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
+>  arch/arm64/kvm/mmu.c | 38 ++++++++++++++++++++++++++------------
+>  1 file changed, 26 insertions(+), 12 deletions(-)
 >
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 5542a50dc8a65..fe8f8057cf412 100644
+> index fe8f8057cf412..ab8a269d4366d 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1643,7 +1643,7 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
->                                      unsigned long hva,
->                                      struct kvm_memory_slot *memslot,
->                                      struct kvm_s2_trans *nested,
-> -                                    bool *force_pte, phys_addr_t *ipa)
-> +                                    bool *force_pte)
+> @@ -1400,10 +1400,10 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+>   */
+>  static long
+>  transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> -                           unsigned long hva, kvm_pfn_t *pfnp,
+> -                           phys_addr_t *ipap)
+> +                           unsigned long hva, kvm_pfn_t *pfnp, gfn_t *gfnp)
 >  {
->         short vma_shift;
+>         kvm_pfn_t pfn = *pfnp;
+> +       gfn_t gfn = *gfnp;
 >
-> @@ -1681,8 +1681,6 @@ static short kvm_s2_resolve_vma_size(struct vm_area_struct *vma,
+>         /*
+>          * Make sure the adjustment is done only for THP pages. Also make
+> @@ -1419,7 +1419,8 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
+>                 if (sz < PMD_SIZE)
+>                         return PAGE_SIZE;
 >
->                 max_map_size = *force_pte ? PAGE_SIZE : PUD_SIZE;
+> -               *ipap &= PMD_MASK;
+> +               gfn &= ~(PTRS_PER_PMD - 1);
+> +               *gfnp = gfn;
+>                 pfn &= ~(PTRS_PER_PMD - 1);
+>                 *pfnp = pfn;
 >
-> -               *ipa = kvm_s2_trans_output(nested);
-> -
->                 /*
->                  * If we're about to create a shadow stage 2 entry, then we
->                  * can only create a block mapping if the guest stage 2 page
-> @@ -1722,7 +1720,6 @@ struct kvm_s2_fault {
->         bool is_vma_cacheable;
->         bool s2_force_noncacheable;
->         unsigned long mmu_seq;
-> -       phys_addr_t ipa;
->         gfn_t gfn;
->         kvm_pfn_t pfn;
->         bool logging_active;
-> @@ -1738,6 +1735,7 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+> @@ -1735,7 +1736,6 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
 >  {
 >         struct vm_area_struct *vma;
 >         struct kvm *kvm = fault->vcpu->kvm;
-> +       phys_addr_t ipa;
+> -       phys_addr_t ipa;
 >
 >         mmap_read_lock(current->mm);
 >         vma = vma_lookup(current->mm, fault->hva);
-> @@ -1748,8 +1746,7 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
->         }
->
->         fault->vma_pagesize = 1UL << kvm_s2_resolve_vma_size(vma, fault->hva, fault->memslot,
-> -                                                            fault->nested, &fault->force_pte,
-> -                                                            &fault->ipa);
-> +                                                            fault->nested, &fault->force_pte);
->
->         /*
->          * Both the canonical IPA and fault IPA must be aligned to the
-> @@ -1757,9 +1754,9 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+> @@ -1753,9 +1753,7 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+>          * mapping size to ensure we find the right PFN and lay down the
 >          * mapping in the right place.
 >          */
->         fault->fault_ipa = ALIGN_DOWN(fault->fault_ipa, fault->vma_pagesize);
-> -       fault->ipa = ALIGN_DOWN(fault->ipa, fault->vma_pagesize);
-> +       ipa = fault->nested ? kvm_s2_trans_output(fault->nested) : fault->fault_ipa;
-> +       fault->gfn = ALIGN_DOWN(ipa, fault->vma_pagesize) >> PAGE_SHIFT;
+> -       fault->fault_ipa = ALIGN_DOWN(fault->fault_ipa, fault->vma_pagesize);
+> -       ipa = fault->nested ? kvm_s2_trans_output(fault->nested) : fault->fault_ipa;
+> -       fault->gfn = ALIGN_DOWN(ipa, fault->vma_pagesize) >> PAGE_SHIFT;
+> +       fault->gfn = ALIGN_DOWN(fault->fault_ipa, fault->vma_pagesize) >> PAGE_SHIFT;
 >
-> -       fault->gfn = fault->ipa >> PAGE_SHIFT;
 >         fault->mte_allowed = kvm_vma_mte_allowed(vma);
 >
->         fault->vm_flags = vma->vm_flags;
-> @@ -1970,7 +1967,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->                 .memslot = memslot,
->                 .hva = hva,
->                 .fault_is_perm = fault_is_perm,
-> -               .ipa = fault_ipa,
->                 .logging_active = logging_active,
->                 .force_pte = logging_active,
->                 .prot = KVM_PGTABLE_PROT_R,
+> @@ -1777,6 +1775,17 @@ static int kvm_s2_fault_get_vma_info(struct kvm_s2_fault *fault)
+>         return 0;
+>  }
+>
+> +static gfn_t get_canonical_gfn(struct kvm_s2_fault *fault)
+> +{
+> +       phys_addr_t ipa;
+> +
+> +       if (!fault->nested)
+> +               return fault->gfn;
+> +
+> +       ipa = kvm_s2_trans_output(fault->nested);
+> +       return ALIGN_DOWN(ipa, fault->vma_pagesize) >> PAGE_SHIFT;
+> +}
+> +
+>  static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+>  {
+>         int ret;
+> @@ -1785,7 +1794,7 @@ static int kvm_s2_fault_pin_pfn(struct kvm_s2_fault *fault)
+>         if (ret)
+>                 return ret;
+>
+> -       fault->pfn = __kvm_faultin_pfn(fault->memslot, fault->gfn,
+> +       fault->pfn = __kvm_faultin_pfn(fault->memslot, get_canonical_gfn(fault),
+>                                        fault->write_fault ? FOLL_WRITE : 0,
+>                                        &fault->writable, &fault->page);
+>         if (unlikely(is_error_noslot_pfn(fault->pfn))) {
+> @@ -1885,6 +1894,11 @@ static int kvm_s2_fault_compute_prot(struct kvm_s2_fault *fault)
+>         return 0;
+>  }
+>
+> +static phys_addr_t get_ipa(const struct kvm_s2_fault *fault)
+> +{
+> +       return gfn_to_gpa(fault->gfn);
+> +}
+> +
+>  static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>  {
+>         struct kvm *kvm = fault->vcpu->kvm;
+> @@ -1909,7 +1923,7 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>                 } else {
+>                         fault->vma_pagesize = transparent_hugepage_adjust(kvm, fault->memslot,
+>                                                                           fault->hva, &fault->pfn,
+> -                                                                         &fault->fault_ipa);
+> +                                                                         &fault->gfn);
+>
+>                         if (fault->vma_pagesize < 0) {
+>                                 ret = fault->vma_pagesize;
+> @@ -1932,10 +1946,10 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>                  * PTE, which will be preserved.
+>                  */
+>                 fault->prot &= ~KVM_NV_GUEST_MAP_SZ;
+> -               ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, fault->fault_ipa,
+> +               ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, get_ipa(fault),
+>                                                                  fault->prot, flags);
+>         } else {
+> -               ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, fault->fault_ipa, fault->vma_pagesize,
+> +               ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, get_ipa(fault), fault->vma_pagesize,
+>                                                          __pfn_to_phys(fault->pfn), fault->prot,
+>                                                          memcache, flags);
+>         }
+> @@ -1946,7 +1960,7 @@ static int kvm_s2_fault_map(struct kvm_s2_fault *fault, void *memcache)
+>
+>         /* Mark the fault->page dirty only if the fault is handled successfully */
+>         if (fault->writable && !ret)
+> -               mark_page_dirty_in_slot(kvm, fault->memslot, fault->gfn);
+> +               mark_page_dirty_in_slot(kvm, fault->memslot, get_canonical_gfn(fault));
+>
+>         if (ret != -EAGAIN)
+>                 return ret;
 > --
 > 2.47.3
 >
