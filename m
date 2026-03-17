@@ -1,142 +1,251 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869A37CD5A
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 18:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773770585; cv=pass; b=Bd1pIH5crWCz06Yv8YL01LQN1oKWuMUE9KfgbXvEjAdXBBrWZajtgRsgUglvosQTFU+MQGKV5/tJNzNFVb/jLoyYB+keLT5Oibn24oH3Ky3kqs/3HOFJSxMe9h8iGCaFF7oq3I1zAwGeNaoNXF4Z0vIITjGXxwuXi71uQn6vWdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773770585; c=relaxed/simple;
-	bh=bD7vMP1uxdtIIi1MxBEapxPw33V0WN5HHK2qHHZHQ64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MaIvUA3M7ox7G+iG9ujwHCgKSxWQvzgWAI7szZeXTeJrwVUTtEFKF5Ue3gEQlix580TYPdnwljVkoqqtr8Ef8HGaHP1/zEhxeehefxDpOJX6+ilz+Y931GnajjJJBcPPrL5zif4KK2VaLdID+zGWwuy5I19PYapZ2ZLWUn+HFGw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FRy6PXAk; arc=pass smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802B537EFE9;
+	Tue, 17 Mar 2026 18:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773770744; cv=none; b=Bb1FCKFJU25qFIM7baz4K0sIvTnvPloL4eSRIMRajmgNXG1pREiNOGpk6TDIeG9BYysh9yKX4sC0e/gdTOht9FrZueiRRoHeioVa4IAUvG4RxmkQ2uXQHg8bOXb5jGDUqsrb58GZgY5IB8zlTa88tpRY6DgMlldzWDV4SsPNSQc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773770744; c=relaxed/simple;
+	bh=ESmVPCa9igCBCv1hcJ5QEA7fejdWLwcrCD3qXAO15o8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D24CPp0XIGw09l2ehwRbt1Ie5H8QY5b72okUuabhIvFqOIII3TMSadigU226mbBjqZ+XVJdCketn8MAXJbOP3y9fNSMPq1/JySSzyntn5GviDFF5pWv/5kp2CYF9snFoCY+7sVDrxbpMxLO3mzGGiEzDpmkgJEseBoOVjb7nQeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJCgPO37; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FRy6PXAk"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50906a98ffeso66571cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 11:03:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773770582; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IfUrnBoJuvBnl8xATcJglb4ALBrrySuI7mmAKubSUnAYwUP0FAk4oqcV6eXV9Oic7i
-         YIwdsMRsCw6P2bGpay+Mmotz9XtrSAWlAosWZjPz1AsjFeh67cQ23rn5fykYtPRY5x0F
-         dUiUkpMXpmdcS1Qvyt4C9TfEAbpUhx+zyWvdR+J0pP0uyzDtdLAUftnSN7sSWLWQXVAu
-         4GndP8N/py+nHn5GSUTxJV3bhrsV/Ti7saUSjy+f3c6O3c4r2vgHZKzw+XD1HusQX0qi
-         SuK7rHdg2RU6ZZzvNvUNEEp4AY6knd0kt7wSLyn83784f0GuckRv+khqCufb3VxPVmyU
-         9WAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
-        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
-        b=cqH1Azcw8Wx/PhFr/lHMA9TZNcVobC19/bk8mgrB0ez96w8f7EeYsQ6F6fvp91ehFC
-         AumdvW18CsONACda2YiPjyJFDDMaLyN2AVetpQNrxyB4fJzFUQ1C0MLXiRbZAmff5/qZ
-         Tkss7wzeqe8jcsiIiLvzlKAfJ7uMSev9YtYHVR1LPbu3FFVGq6IgNldSD7poJeiwwvVI
-         Q8BZJZ7XPlIeB7U+r4z6iERetb7V0zc9fsG/4piqZDwtkbWpTR90SH4Il1Jf9um1yjh5
-         NF6Wvs0itvsuo/FwqSbIkRTQ2KMjWRy7mXRgRGJgE18FtxSU9MukQGCPf1p6pMhyf+Lu
-         fudQ==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773770582; x=1774375382; darn=lists.linux.dev;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
-        b=FRy6PXAkdebY3RlZlqM8E1lu00zZWKeL5YGiH2K9aSyotXzuayIjHDhxjTkim9Qw2d
-         BhcIpOnfKiC2pTI3ggM0aMD7q59CujFRYcBrRKmwCBb5hGl98Vctm1AWccnQ/uJpsxj2
-         VrGbNMZvcoIhNU8PT0tH3Z2oHEIAE5s2r1SNF7UQd1d3vvliEZlTUufrP8llIQ78k+05
-         SrkV4pT63OVRIxw2OYIC70Sw8Zw7HlvByYr7vz8wA+6EIyf1OpBDDvtoJ9uHsW4HHzrl
-         UZq7WXo0O1bDeWAsygTCEGPC1huAtT/tUqD+nVkKK2b5mzSffZyVpvjKlI/I/ZXOsxor
-         NwxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773770582; x=1774375382;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
-        b=o0qQtMRKsDZbS7v+HcpDghc8rgb34Rxk51i9d7cfnJ65u04FrnbFDWAptP2E23t8SB
-         OnRUXfA1miS/+atTIFArr+jppwB8Q4WVIUxZSJi9R+45Islc6il+LCPJzOg+pF0ijp9P
-         r4cQeo/hXNGqqlNiBQe8ogvGMPcn0GWi9ifWeChboJs3PLOopTrY+Twj4KLJC5tvbuDZ
-         i9+GBR+EtCBKhkFMQxP5GRgQJHs/kiQtmJ8XqdkkpxCtPC39wvlEnu7I8dvE9V2FfAYP
-         nFFMAukxD5rE/dKAM+Bg2B57vSfbGf4C96l+ITOTtqBvMZ4gn/RNE7xYQ4e1XsBm7sfr
-         F7xA==
-X-Gm-Message-State: AOJu0YzyDRwWHX+wEP5ZPfJl3+e60OXSCW5CWwPwP6Gocuh1KtGxpeWP
-	HTgQy9J1uKT5jR9pygH20OyHaHzjTUwbgeJpImd6SFaNeVjNVeGtix7Kt9wqSkzyw+mUmz3jeT1
-	rF96Oe+Lj5FaH4DyNPVvr72uJCdI7ToaLdJ6vSfow
-X-Gm-Gg: ATEYQzwqZZsOAmTFXFsxaScWcLF6vnNpWbeJeJAiR0YemKfqmWQHFbYXy3yQ2VMUNyO
-	BgwUhcWnB2cM6wSiX/kzz2blFWxn0WNh2j9vl5C/6h0X7LxVBU524hAp4/8ryC2x3zFR6DnVUx0
-	xP6rd8vRdj08Fh6Gjvyl3w5sJ0eY2Zio0O5SOaJ4yZsc7rfBITQN03rqSUSQGiSbHvLhDa3LRoB
-	JXiyBOyDlUWUFFwlENyWZlM71iED4ws+qvBpC2klOQCOdoJ180uTuNojl9XU18rTEElDZPyE9Ax
-	2hDGRxHv
-X-Received: by 2002:a05:622a:178f:b0:509:14f0:bff2 with SMTP id
- d75a77b69052e-50b148054aamr1140381cf.12.1773770581019; Tue, 17 Mar 2026
- 11:03:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJCgPO37"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0921EC4CEF7;
+	Tue, 17 Mar 2026 18:05:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773770744;
+	bh=ESmVPCa9igCBCv1hcJ5QEA7fejdWLwcrCD3qXAO15o8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QJCgPO37xtZtU0y3XW18rX/Cmsmwx4/gto75ctS4CHkACMaj6lGUG6OJHCe6k/542
+	 DLVq1TnOwg6bGZyAVOndcwHrocPF3bdlSNNaaKXivwDVaJTGFIA9My8OjaHnc9D9mo
+	 b6MA/vxH65raRpZccY4KiN3Nd1D4IHF2bjugmW4Kyw9hpHrLmOSOgq8J/BBP6VzqUu
+	 xHN6lAuMRmO6c1yK5s0pNxDXQ8peEeRrU+iL5J0xW8l1TYqB5XhyFEhO1D8qxZaXdg
+	 XE+zX+P1trck0GEpEcpjchOCwfZxp2g8O98ZNhMmnCpGI9kkV6BB7vCmav7pbzxZC+
+	 S8xuoncNvQYLw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w2YnT-00000002xnV-3WJV;
+	Tue, 17 Mar 2026 18:05:39 +0000
+Date: Tue, 17 Mar 2026 18:05:39 +0000
+Message-ID: <86ecli5o24.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v6 29/39] KVM: arm64: gic-v5: Enlighten arch timer for GICv5
+In-Reply-To: <20260317113949.2548118-30-sascha.bischoff@arm.com>
+References: <20260317113949.2548118-1-sascha.bischoff@arm.com>
+	<20260317113949.2548118-30-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-References: <20260316175451.1866175-1-maz@kernel.org> <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
- <CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com>
- <86tsue6ezy.wl-maz@kernel.org> <CA+EHjTxF9fLtjdTtJontFuziRsgGMeE0bvEjHYqr64hDK3wLVg@mail.gmail.com>
-In-Reply-To: <CA+EHjTxF9fLtjdTtJontFuziRsgGMeE0bvEjHYqr64hDK3wLVg@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Mar 2026 18:02:23 +0000
-X-Gm-Features: AaiRm53dTl6Qirg4e0url9XntUW8jOUcL89COPt1hC5dsOyIpA9_l2n6qMF9Tr8
-Message-ID: <CA+EHjTxUmBOK6fMmYcw3QR8V5rb-KM9vCN-deCeeB2QvDAOO2w@mail.gmail.com>
-Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
-	Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 17 Mar 2026 at 17:50, Fuad Tabba <tabba@google.com> wrote:
->
-> <snip>
->
-> > > > The series in hack/user_mem_abort-rework is different from this one.
-> > > > Here are the first few patches:
-> > >
-> > > And I just realized it's because they're based on _my_ patches ... doh! :D
-> >
-> > I thought I was clear when I wrote "I've added my on take on top of
-> > it", but maybe not. In any case, I didn't feel the need to redo what
-> > you had already done -- I don't think I'd have come up with something
-> > better.
->
-> You were clear. It's the reader's fault, not the author's.
->
-> I'll send you one more patch that might be worth adding, but this
-> looks great! Much easier to reason about. Thanks.
+On Tue, 17 Mar 2026 11:47:29 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
+> 
+> Now that GICv5 has arrived, the arch timer requires some TLC to
+> address some of the key differences introduced with GICv5.
+> 
+> For PPIs on GICv5, the queue_irq_unlock irq_op is used as AP lists are
+> not required at all for GICv5. The arch timer also introduces an
+> irq_op - get_input_level. Extend the arch-timer-provided irq_ops to
+> include the PPI op for vgic_v5 guests.
+> 
+> When possible, DVI (Direct Virtual Interrupt) is set for PPIs when
+> using a vgic_v5, which directly inject the pending state into the
+> guest. This means that the host never sees the interrupt for the guest
+> for these interrupts. This has three impacts.
+> 
+> * First of all, the kvm_cpu_has_pending_timer check is updated to
+>   explicitly check if the timers are expected to fire.
+> 
+> * Secondly, for mapped timers (which use DVI) they must be masked on
+>   the host prior to entering a GICv5 guest, and unmasked on the return
+>   path. This is handled in set_timer_irq_phys_masked.
+> 
+> * Thirdly, it makes zero sense to attempt to inject state for a DVI'd
+>   interrupt. Track which timers are direct, and skip the call to
+>   kvm_vgic_inject_irq() for these.
+> 
+> The final, but rather important, change is that the architected PPIs
+> for the timers are made mandatory for a GICv5 guest. Attempts to set
+> them to anything else are actively rejected. Once a vgic_v5 is
+> initialised, the arch timer PPIs are also explicitly reinitialised to
+> ensure the correct GICv5-compatible PPIs are used - this also adds in
+> the GICv5 PPI type to the intid.
+> 
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c     | 110 ++++++++++++++++++++++++++------
+>  arch/arm64/kvm/vgic/vgic-init.c |   9 +++
+>  arch/arm64/kvm/vgic/vgic-v5.c   |   7 +-
+>  include/kvm/arm_arch_timer.h    |  11 +++-
+>  include/kvm/arm_vgic.h          |   3 +
+>  5 files changed, 115 insertions(+), 25 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 53312b88c342d..4575c36cae537 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -56,6 +56,12 @@ static struct irq_ops arch_timer_irq_ops = {
+>  	.get_input_level = kvm_arch_timer_get_input_level,
+>  };
+>  
+> +static struct irq_ops arch_timer_irq_ops_vgic_v5 = {
+> +	.get_input_level = kvm_arch_timer_get_input_level,
+> +	.queue_irq_unlock = vgic_v5_ppi_queue_irq_unlock,
+> +	.set_direct_injection = vgic_v5_set_ppi_dvi,
+> +};
+> +
+>  static int nr_timers(struct kvm_vcpu *vcpu)
+>  {
+>  	if (!vcpu_has_nv(vcpu))
+> @@ -177,6 +183,10 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
+>  		map->emul_ptimer = vcpu_ptimer(vcpu);
+>  	}
+>  
+> +	map->direct_vtimer->direct = true;
+> +	if (map->direct_ptimer)
+> +		map->direct_ptimer->direct = true;
+> +
+>  	trace_kvm_get_timer_map(vcpu->vcpu_id, map);
+>  }
+>  
+> @@ -396,7 +406,11 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
+>  
+>  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>  {
+> -	return vcpu_has_wfit_active(vcpu) && wfit_delay_ns(vcpu) == 0;
+> +	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
+> +	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
+> +
+> +	return kvm_timer_should_fire(vtimer) || kvm_timer_should_fire(ptimer) ||
+> +	       (vcpu_has_wfit_active(vcpu) && wfit_delay_ns(vcpu) == 0);
+>  }
+>  
+>  /*
+> @@ -447,6 +461,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+>  	if (userspace_irqchip(vcpu->kvm))
+>  		return;
+>  
+> +	/* Skip injecting on GICv5 for directly injected (DVI'd) timers */
+> +	if (vgic_is_v5(vcpu->kvm) && timer_ctx->direct)
+> +		return;
+> +
+>  	kvm_vgic_inject_irq(vcpu->kvm, vcpu,
+>  			    timer_irq(timer_ctx),
+>  			    timer_ctx->irq.level,
+> @@ -657,6 +675,24 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
+>  	WARN_ON(r);
+>  }
+>  
+> +/*
+> + * On GICv5 we use DVI for the arch timer PPIs. This is restored later
+> + * on as part of vgic_load. Therefore, in order to avoid the guest's
+> + * interrupt making it to the host we mask it before entering the
+> + * guest and unmask it again when we return.
+> + */
+> +static inline void set_timer_irq_phys_masked(struct arch_timer_context *ctx, bool masked)
+> +{
+> +	if (masked) {
+> +		disable_percpu_irq(ctx->host_timer_irq);
+> +	} else {
+> +		if (ctx->host_timer_irq == host_vtimer_irq)
+> +			enable_percpu_irq(ctx->host_timer_irq, host_vtimer_irq_flags);
+> +		else
+> +			enable_percpu_irq(ctx->host_timer_irq, host_ptimer_irq_flags);
+> +	}
+> +}
 
-On a second thought, let's stop here. I was thinking of going ahead
-with guest_memfd abort, but let's see how this one goes and take it
-from there.
+I think this is missing a trick, which is to reuse the mask/unmask
+infrastructure we use for the fruity crap. How about this following
+untested hack?
 
-Thanks again for this!
-/fuad
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 600f250753b45..b29bea800e2ab 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -660,7 +660,7 @@ static inline void set_timer_irq_phys_active(struct arch_timer_context *ctx, boo
+ static void kvm_timer_vcpu_load_gic(struct arch_timer_context *ctx)
+ {
+ 	struct kvm_vcpu *vcpu = timer_context_to_vcpu(ctx);
+-	bool phys_active = false;
++	bool phys_active = vgic_is_v5(vcpu->kvm);
+ 
+ 	/*
+ 	 * Update the timer output so that it is likely to match the
+@@ -934,6 +934,12 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm_vcpu_is_blocking(vcpu))
+ 		kvm_timer_blocking(vcpu);
++
++	if (vgic_is_v5(vcpu)) {
++		set_timer_irq_phys_active(map.direct_vtimer, false);
++		if (map.direct_ptimer)
++			set_timer_irq_phys_active(map.direct_ptimer, false);
++	}
+ }
+ 
+ void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
+@@ -1333,7 +1339,8 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
+ 	host_vtimer_irq = info->virtual_irq;
+ 	kvm_irq_fixup_flags(host_vtimer_irq, &host_vtimer_irq_flags);
+ 
+-	if (kvm_vgic_global_state.no_hw_deactivation) {
++	if (kvm_vgic_global_state.no_hw_deactivation ||
++	    kvm_vgic_global_state.type == VGIC_V5) {
+ 		struct fwnode_handle *fwnode;
+ 		struct irq_data *data;
+ 
+@@ -1351,7 +1358,8 @@ static int kvm_irq_init(struct arch_timer_kvm_info *info)
+ 			return -ENOMEM;
+ 		}
+ 
+-		arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
++		if (kvm_vgic_global_state.no_hw_deactivation)
++			arch_timer_irq_ops.flags |= VGIC_IRQ_SW_RESAMPLE;
+ 		WARN_ON(irq_domain_push_irq(domain, host_vtimer_irq,
+ 					    (void *)TIMER_VTIMER));
+ 	}
 
-> For the series:
-> Tested-by: Fuad Tabba <tabba@google.com>
->
-> (might as well repeat it here)
-> Reviwed-by: Fuad Tabba <tabba@google.com>
->
-> Cheers,
-> /fuad
->
->
-> >
-> > In any case, I'd appreciate your feedback!
-> >
-> > Thanks,
-> >
-> >         M.
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
+which should avoid adding some new masking stuff.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
