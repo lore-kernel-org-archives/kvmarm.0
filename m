@@ -1,211 +1,142 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDF437DEBE
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 18:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869A37CD5A
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 18:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773770517; cv=pass; b=TO5ud7tmmRa4sqbOrb5zsrcqnLWRnpu4bJtY82L77gNbJuzoehWlv8pPnZVX/Xa5h6QEIFdRNIj1J9dYQ/WuN0gcDRSspuYZC6pdRFHHXDyQjNkYe0CMLNZgiuPnt4GmoPNI0Ppbs2bwvtrbqYbWsz4pqe2cG4s6kjCz925DF0U=
+	t=1773770585; cv=pass; b=Bd1pIH5crWCz06Yv8YL01LQN1oKWuMUE9KfgbXvEjAdXBBrWZajtgRsgUglvosQTFU+MQGKV5/tJNzNFVb/jLoyYB+keLT5Oibn24oH3Ky3kqs/3HOFJSxMe9h8iGCaFF7oq3I1zAwGeNaoNXF4Z0vIITjGXxwuXi71uQn6vWdQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773770517; c=relaxed/simple;
-	bh=btI93VIfdRIIOn3aJCp2bjHj3jLELmWN9lEdzaaCIOw=;
+	s=arc-20240116; t=1773770585; c=relaxed/simple;
+	bh=bD7vMP1uxdtIIi1MxBEapxPw33V0WN5HHK2qHHZHQ64=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q8FkdkxUJu5CV0zuOocE8J8UBZ0NhsfhqsvR9JZXVhypLzPygpjx0o96OQiyLhUugP0d5swghwB+w6bf0d1rvae3eR04ZuAfE90h3L6MgXFsGOUrobJT3Q+KknrcGsc0mDghOubmVhSbdlrUty6eOOhctX3W5DbRVRvnBWtGUl0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qntoIoKt; arc=pass smtp.client-ip=209.85.160.170
+	 To:Cc:Content-Type; b=MaIvUA3M7ox7G+iG9ujwHCgKSxWQvzgWAI7szZeXTeJrwVUTtEFKF5Ue3gEQlix580TYPdnwljVkoqqtr8Ef8HGaHP1/zEhxeehefxDpOJX6+ilz+Y931GnajjJJBcPPrL5zif4KK2VaLdID+zGWwuy5I19PYapZ2ZLWUn+HFGw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FRy6PXAk; arc=pass smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qntoIoKt"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-50906a98ffeso65991cf.0
-        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 11:01:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1773770515; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FRy6PXAk"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-50906a98ffeso66571cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 11:03:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773770582; cv=none;
         d=google.com; s=arc-20240605;
-        b=iwcksnIb/A0lXNPanOv/PINuqTZUWRvXLicpxS2Ege0IB5MpH9n2UJY5S2w+eRN/lA
-         JyJSzSwnSO72fCZUup06RVyl8x3gQgIGFmDNeoi1M8GFFm2xJ5ruwALWelr/hSPUnynm
-         G5dHgswm1tAnqx043pt/qDjWubwKx5p0ua0ueXqDM0yQcLNQU4Nqv3R+20PQ5f7/qUEH
-         qvT6O59fyZU5Fw0Y3Zhe1fMcBRN+LcSLs7JCdqlvCxF4Qk9I4DnA0Dg52lIkqF72C78z
-         riNOG2M8gSypt4km1bJnB3t+EtZnPd5kibVTy6WFGgPY2m66OscfnPSmburf98zc/GE1
-         0VDQ==
+        b=IfUrnBoJuvBnl8xATcJglb4ALBrrySuI7mmAKubSUnAYwUP0FAk4oqcV6eXV9Oic7i
+         YIwdsMRsCw6P2bGpay+Mmotz9XtrSAWlAosWZjPz1AsjFeh67cQ23rn5fykYtPRY5x0F
+         dUiUkpMXpmdcS1Qvyt4C9TfEAbpUhx+zyWvdR+J0pP0uyzDtdLAUftnSN7sSWLWQXVAu
+         4GndP8N/py+nHn5GSUTxJV3bhrsV/Ti7saUSjy+f3c6O3c4r2vgHZKzw+XD1HusQX0qi
+         SuK7rHdg2RU6ZZzvNvUNEEp4AY6knd0kt7wSLyn83784f0GuckRv+khqCufb3VxPVmyU
+         9WAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=3njzSf0GHZnU+vfRoNiucsFc5a4L5o10JyQzwrcZWQ0=;
-        fh=pgrYwAs0s/mclnjeShYKPspuriW1/hjTjUuD2vzoWXc=;
-        b=Xmvk8XMfqpVgeJ42VxchSqP0ZmL1C7LP8UJmhyi0wHOnusdCPpzwUHMuvE+gW9bLed
-         yl2mKLMHM3e7ZXVFpMy/7feKqth1Jb8MBi5aJwzLDBEuUS6nAjYA4pWj/sw5ccL96ub0
-         UKeq74WVgdzLzz127JkARlHB8yFF3yBkw0cYBP1qdvAMjcsI5phqw0AZq+0Id8Ak+59d
-         EL7mit1w0+gn6XgrZjE/3QzgBDot5q6TNBRHbggyu3uN9pGaH9aQ0+9ouYKdHWVmQ7jc
-         IcrlY0oKxkE4dd7e/4YCzXvJbCVWkvpsVCoFg3oPxy9m4cdDGNUrGvL0imo0RIJ8/DZy
-         hVfw==;
+        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
+        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
+        b=cqH1Azcw8Wx/PhFr/lHMA9TZNcVobC19/bk8mgrB0ez96w8f7EeYsQ6F6fvp91ehFC
+         AumdvW18CsONACda2YiPjyJFDDMaLyN2AVetpQNrxyB4fJzFUQ1C0MLXiRbZAmff5/qZ
+         Tkss7wzeqe8jcsiIiLvzlKAfJ7uMSev9YtYHVR1LPbu3FFVGq6IgNldSD7poJeiwwvVI
+         Q8BZJZ7XPlIeB7U+r4z6iERetb7V0zc9fsG/4piqZDwtkbWpTR90SH4Il1Jf9um1yjh5
+         NF6Wvs0itvsuo/FwqSbIkRTQ2KMjWRy7mXRgRGJgE18FtxSU9MukQGCPf1p6pMhyf+Lu
+         fudQ==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1773770515; x=1774375315; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1773770582; x=1774375382; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3njzSf0GHZnU+vfRoNiucsFc5a4L5o10JyQzwrcZWQ0=;
-        b=qntoIoKtsuYtwkcnUKUaBiKJYl65+JcbN5vb52GCpZUGPwTb+Z3F9CwqeTKJIVc/63
-         hdibdws5+CIXqgz15BFV76jBH+mYFby+vYnuoaIWhdLUDBpT8JfJozUvQJh4iILQNfzW
-         YBV5t/++A3JXlvCoYsDVNSAFIuh5EGAF1Gs5wvRocKgewtVC0ZJeAxinZ/Bz12xWoX7v
-         YcPIvTatx+pWI09dhfPw6QW4/a1ucPWqShBNF0BBJvn6M+IueCuXU3nSdGZqqNy4hq48
-         VfrXKAX1g6CZu+bL6AlxhH/koNulRsUVCqBW+2rxavAllj6hJMjv6UJJBmJN7xnifHLb
-         TQRQ==
+        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
+        b=FRy6PXAkdebY3RlZlqM8E1lu00zZWKeL5YGiH2K9aSyotXzuayIjHDhxjTkim9Qw2d
+         BhcIpOnfKiC2pTI3ggM0aMD7q59CujFRYcBrRKmwCBb5hGl98Vctm1AWccnQ/uJpsxj2
+         VrGbNMZvcoIhNU8PT0tH3Z2oHEIAE5s2r1SNF7UQd1d3vvliEZlTUufrP8llIQ78k+05
+         SrkV4pT63OVRIxw2OYIC70Sw8Zw7HlvByYr7vz8wA+6EIyf1OpBDDvtoJ9uHsW4HHzrl
+         UZq7WXo0O1bDeWAsygTCEGPC1huAtT/tUqD+nVkKK2b5mzSffZyVpvjKlI/I/ZXOsxor
+         NwxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1773770515; x=1774375315;
+        d=1e100.net; s=20251104; t=1773770582; x=1774375382;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3njzSf0GHZnU+vfRoNiucsFc5a4L5o10JyQzwrcZWQ0=;
-        b=QRoSEHfzHQ+BMwbpwOLgRkJAIfO8DltshuC+m1KDEnlRHtsc5nQiSCOi5pV94VMEvK
-         S9X5Wgx+QyoOb53FxC6afgz7V6MglvzrR8Zp1dTU6Zulutys/Fo/NnZTZlOsBdHKh0KU
-         TgqXU2M48cKtyk8cRSBUAuGb5QFWdb1lLFbOtZZJqt1ZpRnKNC2SflvKA4tU0P7EpZK3
-         VBW5UvUiIRaq3i2JcoSKAjSPwpkx6sGDYklvm7P8xS9SvKI0MaGs4wTipGwuauZzHQ4A
-         hY/8Tm/jhyrczB8TRQPrs9oeEeYMLnGftrFN61NVl5z+y37oP0no54530MfHVu2t0vF3
-         R9Rw==
-X-Forwarded-Encrypted: i=1; AJvYcCVseBF0vZ245J2vViRWSMLkdQTxiipIP3yhT1aRozOrN1/l0QWZB6BKQ8Z3dJAtmc2cSYU7mJw=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yy6lU/6QAs45UfL55eo7yn2yGOTVKqZOXVt5eSIg+0ik+rEFwjm
-	zoKYF/VAI9wAJs8k86XPUBlelSupbOxdau3c9Tp9CtBVe1otzEN2sUd3u7gtKj0/GMestmhdbeN
-	//9rRqkMm13mIaEQRQ4QkSp7G/jCC2ILD9rumGUKe
-X-Gm-Gg: ATEYQzyUuV+NIonjmwZ+EqypoYTttXK9it0OfI0+h9goSyqvEzxPr+nt+MFLOq20cAR
-	DNyYFrdULKbwuM+EeP9u+MF0o/gGW9HYaMGEeMwKsQENzwj63E7weQbNBLjNoC7PKo4Cd5TsIMI
-	fgd/j5RQWdJjlm9hnc99LfBcEtXO4N9Rl61swrYujXHFW6nrD4bSaXQGaLywgqbd2LQF4EHyK+p
-	DhvE0GNVfHmH5CqBVDeyKknLQdvr+WBtp2oc+mKMiI2BdsYdx14L0ySKrTT1sv4RTfvqEMKfMk+
-	e+c7n4DG
-X-Received: by 2002:ac8:5750:0:b0:509:21ff:cd49 with SMTP id
- d75a77b69052e-50b1470d02fmr1266501cf.4.1773770513528; Tue, 17 Mar 2026
- 11:01:53 -0700 (PDT)
+        bh=1V79m/qtPd2CPkeGy9ve7l8GZ9xh9SScmUR42+dIKPU=;
+        b=o0qQtMRKsDZbS7v+HcpDghc8rgb34Rxk51i9d7cfnJ65u04FrnbFDWAptP2E23t8SB
+         OnRUXfA1miS/+atTIFArr+jppwB8Q4WVIUxZSJi9R+45Islc6il+LCPJzOg+pF0ijp9P
+         r4cQeo/hXNGqqlNiBQe8ogvGMPcn0GWi9ifWeChboJs3PLOopTrY+Twj4KLJC5tvbuDZ
+         i9+GBR+EtCBKhkFMQxP5GRgQJHs/kiQtmJ8XqdkkpxCtPC39wvlEnu7I8dvE9V2FfAYP
+         nFFMAukxD5rE/dKAM+Bg2B57vSfbGf4C96l+ITOTtqBvMZ4gn/RNE7xYQ4e1XsBm7sfr
+         F7xA==
+X-Gm-Message-State: AOJu0YzyDRwWHX+wEP5ZPfJl3+e60OXSCW5CWwPwP6Gocuh1KtGxpeWP
+	HTgQy9J1uKT5jR9pygH20OyHaHzjTUwbgeJpImd6SFaNeVjNVeGtix7Kt9wqSkzyw+mUmz3jeT1
+	rF96Oe+Lj5FaH4DyNPVvr72uJCdI7ToaLdJ6vSfow
+X-Gm-Gg: ATEYQzwqZZsOAmTFXFsxaScWcLF6vnNpWbeJeJAiR0YemKfqmWQHFbYXy3yQ2VMUNyO
+	BgwUhcWnB2cM6wSiX/kzz2blFWxn0WNh2j9vl5C/6h0X7LxVBU524hAp4/8ryC2x3zFR6DnVUx0
+	xP6rd8vRdj08Fh6Gjvyl3w5sJ0eY2Zio0O5SOaJ4yZsc7rfBITQN03rqSUSQGiSbHvLhDa3LRoB
+	JXiyBOyDlUWUFFwlENyWZlM71iED4ws+qvBpC2klOQCOdoJ180uTuNojl9XU18rTEElDZPyE9Ax
+	2hDGRxHv
+X-Received: by 2002:a05:622a:178f:b0:509:14f0:bff2 with SMTP id
+ d75a77b69052e-50b148054aamr1140381cf.12.1773770581019; Tue, 17 Mar 2026
+ 11:03:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
- <20260316-tabba-el2_guard-v1-3-456875a2c6db@google.com> <20260317174013.00007622@huawei.com>
-In-Reply-To: <20260317174013.00007622@huawei.com>
+References: <20260316175451.1866175-1-maz@kernel.org> <CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
+ <CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com>
+ <86tsue6ezy.wl-maz@kernel.org> <CA+EHjTxF9fLtjdTtJontFuziRsgGMeE0bvEjHYqr64hDK3wLVg@mail.gmail.com>
+In-Reply-To: <CA+EHjTxF9fLtjdTtJontFuziRsgGMeE0bvEjHYqr64hDK3wLVg@mail.gmail.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 17 Mar 2026 18:01:15 +0000
-X-Gm-Features: AaiRm52Ar1iyiv4x-nvNKaVG0bbkheBEtDjmXY2f_mDcbzvUm2a4Jch_nfn93sc
-Message-ID: <CA+EHjTwShV8cEtKdva5Ony0=oOhoaj6uQ3SP7tAia08P4pYkhA@mail.gmail.com>
-Subject: Re: [PATCH 03/10] KVM: arm64: Use guard(hyp_spinlock) in ffa.c
-To: Jonathan Cameron <jonathan.cameron@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <linux-arm-kernel@lists.infradead.org>, 
-	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <kvmarm@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
+Date: Tue, 17 Mar 2026 18:02:23 +0000
+X-Gm-Features: AaiRm53dTl6Qirg4e0url9XntUW8jOUcL89COPt1hC5dsOyIpA9_l2n6qMF9Tr8
+Message-ID: <CA+EHjTxUmBOK6fMmYcw3QR8V5rb-KM9vCN-deCeeB2QvDAOO2w@mail.gmail.com>
+Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Jonathan,
-
-On Tue, 17 Mar 2026 at 17:40, Jonathan Cameron
-<jonathan.cameron@huawei.com> wrote:
+On Tue, 17 Mar 2026 at 17:50, Fuad Tabba <tabba@google.com> wrote:
 >
-> On Mon, 16 Mar 2026 17:35:24 +0000
-> Fuad Tabba <tabba@google.com> wrote:
+> <snip>
 >
-> > Migrate manual hyp_spin_lock() and hyp_spin_unlock() calls managing
-> > host_buffers.lock and version_lock to use the guard(hyp_spinlock)
-> > macro.
+> > > > The series in hack/user_mem_abort-rework is different from this one.
+> > > > Here are the first few patches:
+> > >
+> > > And I just realized it's because they're based on _my_ patches ... doh! :D
 > >
-> > This eliminates manual unlock calls on return paths and simplifies
-> > error handling by replacing goto labels with direct returns.
-> >
-> > Change-Id: I52e31c0bed3d2772c800a535af8abdabd81a178b
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
+> > I thought I was clear when I wrote "I've added my on take on top of
+> > it", but maybe not. In any case, I didn't feel the need to redo what
+> > you had already done -- I don't think I'd have come up with something
+> > better.
 >
-> See below and read the cleanup.h guidance notes on usage at the top.
-> Specifically:
+> You were clear. It's the reader's fault, not the author's.
 >
->  * Lastly, given that the benefit of cleanup helpers is removal of
->  * "goto", and that the "goto" statement can jump between scopes, the
->  * expectation is that usage of "goto" and cleanup helpers is never
->  * mixed in the same function. I.e. for a given routine, convert all
->  * resources that need a "goto" cleanup to scope-based cleanup, or
->  * convert none of them.
->
-> Doing otherwise might mean an encounter with a grumpy Linus :)
+> I'll send you one more patch that might be worth adding, but this
+> looks great! Much easier to reason about. Thanks.
 
-I should have read the cleanup.h guidance more closely, thanks for
-pointing this out.
+On a second thought, let's stop here. I was thinking of going ahead
+with guest_memfd abort, but let's see how this one goes and take it
+from there.
 
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/ffa.c | 86 +++++++++++++++++++------------------------
-> >  1 file changed, 38 insertions(+), 48 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/ffa.c b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > index 94161ea1cd60..0c772501c3ba 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/ffa.c
-> > @@ -239,6 +239,8 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
-> >       int ret = 0;
-> >       void *rx_virt, *tx_virt;
-> >
-> > +     guard(hyp_spinlock)(&host_buffers.lock);
-> > +
-> >       if (npages != (KVM_FFA_MBOX_NR_PAGES * PAGE_SIZE) / FFA_PAGE_SIZE) {
-> >               ret = FFA_RET_INVALID_PARAMETERS;
-> >               goto out;
-> > @@ -249,10 +251,9 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
-> >               goto out;
-> >       }
-> >
-> > -     hyp_spin_lock(&host_buffers.lock);
-> >       if (host_buffers.tx) {
-> >               ret = FFA_RET_DENIED;
-> > -             goto out_unlock;
-> > +             goto out;
-> Whilst it isn't a bug as such because you increased the scope to avoid it,
-> there is some pretty strong guidance in cleanup.h about not using guard() or
-> any of the other magic if a function that also contains gotos.  That came from
-> some views Linus expressed pretty clearly about the dangers that brings (the
-> problem is a goto that crosses a guard() being defined and the risk of
-> refactors that happen to end up with that + general view that cleanup.h
-> stuff is about removing gotos, so if you still have them, why bother!
->
-> You can usually end up with the best of all worlds via some refactors
-> to pull out helper functions, but that's a lot of churn.
-
-If I respin this series (depending on whether the maintainers think
-it's worth the hassle), I'll remove all changes that just add churn.
-
-Thanks for having a look at this and the other ones.
-
-Cheers,
+Thanks again for this!
 /fuad
 
-
+> For the series:
+> Tested-by: Fuad Tabba <tabba@google.com>
 >
-> Jonathan
+> (might as well repeat it here)
+> Reviwed-by: Fuad Tabba <tabba@google.com>
+>
+> Cheers,
+> /fuad
 >
 >
-> >       }
 > >
-> >       /*
-> > @@ -261,7 +262,7 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
-> >        */
-> >       ret = ffa_map_hyp_buffers(npages);
-> >       if (ret)
-> > -             goto out_unlock;
-> > +             goto out;
+> > In any case, I'd appreciate your feedback!
 > >
-> >       ret = __pkvm_host_share_hyp(hyp_phys_to_pfn(tx));
-> >       if (ret) {
-> > @@ -292,8 +293,6 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
-> >       host_buffers.tx = tx_virt;
-> >       host_buffers.rx = rx_virt;
+> > Thanks,
 > >
-> > -out_unlock:
-> > -     hyp_spin_unlock(&host_buffers.lock);
-> >  out:
-> >       ffa_to_smccc_res(res, ret);
-> >       return;
-> > @@ -306,7 +305,7 @@ static void do_ffa_rxtx_map(struct arm_smccc_1_2_regs *res,
-> >       __pkvm_host_unshare_hyp(hyp_phys_to_pfn(tx));
-> >  err_unmap:
-> >       ffa_unmap_hyp_buffers();
-> > -     goto out_unlock;
-> > +     goto out;
-> >  }
+> >         M.
 > >
->
+> > --
+> > Without deviation from the norm, progress is not possible.
