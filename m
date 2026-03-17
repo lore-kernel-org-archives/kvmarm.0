@@ -1,230 +1,236 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302942DA769;
-	Tue, 17 Mar 2026 16:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773763259; cv=none; b=MW8KqeOPvfTPW+osbqbKzjZBaX/uX6kf16D6Ev3nQF+14XveHuG6rk6EDHatRDfvH0Zr4pEmyrn6MVBUpCIoco3vVFeDucRpC2DF3Id2nqmMyWnA9iSajYi5zFj6boG5A8S2rUgTI/ftnqdjgdVxktTMiZ9sKioQG3dtcjVFp+Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773763259; c=relaxed/simple;
-	bh=hYQB7kxgtcAFzHnO6k8Bt+4hdNwcS/IVmj13gIrk1Sc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HMxLqqeozvthUa9V6u52pZi/eYciKqlIkNWaJTCcB+XvAeSDopf1vCr0jLSaLUr0700k8Wo34fNBwE3xNw0GcGp2hLJbbxwV3zBi1a2LK76oUijQHiVZreSk9fkVzo7R8O68GBu+uUovYtZhTnpNm2crZ4PWbL13lMp7gTeQ2yA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTpwxKgU; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5684E19006B
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 16:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773764119; cv=pass; b=OcqW44cZRgAtXB9zO8ax00wvSjqiTr0pV6WNsxc/h3+LjQHyAl5TqF60Mxk0FgEFQ7mM3w0HqvsK4V/usS94gTXXHUPSMjgMAy7QdJ4w2VThgXT1wQFww8wZ7ZvKY2UChI6smvUKajTWCY42mU7Qemo7Qqwws4cDWanhG6/55FU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773764119; c=relaxed/simple;
+	bh=DRy/Xkusvad3uZDBF2QZAue7tuHTUVGQdW96AY0q2eI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TAUwr0Xr6iGwMR868qW2z6eV7VGJ0L9Ye6StuCtnbg3eMmPiliQrgRJ5z+i++qSpq54asumGamKHpezBPqXqlpyj84B+768yJ6WBz7B4fSTSqH0l2GG0eilP5vXJpaoyGuIGgXahNBMMgtsnd6cQKFSsoLQcbfvCJwdoVcnSkXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OyXT3V2/; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTpwxKgU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D728EC4CEF7;
-	Tue, 17 Mar 2026 16:00:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773763258;
-	bh=hYQB7kxgtcAFzHnO6k8Bt+4hdNwcS/IVmj13gIrk1Sc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JTpwxKgURNnVQEuq7lcInV4Wm0r0o966+aMr5qmS3xb2j8l1L2Qn+1JnoqRLUjLgD
-	 fFAvQOCVRavuFc78RchLiLJ/gMjl8KL+CVWystf9X+GH7Ricgnyq0j964o9vI+0Zme
-	 t/Rfz0TJuhLk1BQf9AEuukjfyU4YJA8eSVFcH6HJNNAs53Y6JArKAv/mlqFhoa1cmf
-	 P5q6aZsHXulYIWqOid8Eftb+uieIxEFiTzcmwW4MtI1c3Qeg214oPEKwI6usCcu+gK
-	 DQlNVLMI+9uEohUBuOprIM+fTuhdD0//MENegAVeCx9cQ+J4LatTR++UymsJ7GQUBS
-	 PHMXsBPFoAHSw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w2Wqm-00000002uyW-2APM;
-	Tue, 17 Mar 2026 16:00:56 +0000
-Date: Tue, 17 Mar 2026 16:00:56 +0000
-Message-ID: <86jyva5ttz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sascha Bischoff <Sascha.Bischoff@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly
-	<Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org"
-	<peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com"
-	<jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v6 04/39] KVM: arm64: vgic: Split out mapping IRQs and setting irq_ops
-In-Reply-To: <20260317113949.2548118-5-sascha.bischoff@arm.com>
-References: <20260317113949.2548118-1-sascha.bischoff@arm.com>
-	<20260317113949.2548118-5-sascha.bischoff@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OyXT3V2/"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-50906a98ffeso753611cf.0
+        for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 09:15:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1773764117; cv=none;
+        d=google.com; s=arc-20240605;
+        b=F9bFf+OPMslsgLx35PDVjGEnwzP1N675jiuUcgaxRoYg+kxvIOE6jAS1daYX35XTme
+         wAWiIiXFH47rWCbInCXWtrXOn/wrTm/xAiq2oi4XBkumi8G8ozq0MxxvjaWdjCpz0/aR
+         +dg0OdAuu//bLU408MxT9cfx0Mp+zp8wGgANs15wg55axt65c+5pqDO1iJpfaQP6xPHb
+         d8g1JDz4RMpFF9DgG08YtS9p9Kur1pKyeDSgJ8XRm9B5hqOi0pY1CXXSP3BUzsl8tEG+
+         3FUEDq+CxWxTmT4lnjd6vN6sGLXwIu+9tmYcwr3XfzYqV6d45n2uFVU9TfBSw2JXfHR4
+         r1SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=etlYVXNvY0jwdMjflLRbzx8XEtV3TCYbBQva0N1eERE=;
+        fh=clnHTzAvt4aYOa2Pra7MMfnGJgWCg3sy4xV9cvJ65Tc=;
+        b=egKYK+gPQfevHTEcoxtJC3KcTn44xXGnH6RO9PlYIKJdS1DmB7Vx1nV9HE9qH5jfmO
+         zryW6YxLRlZ2etYy2BsSQgATTz3NpVbCJjKs4QCMFmQkhe0YskqyNLELEW3HeSW5RQXP
+         AaTv7UHxY9tzxmcGG86h1p662+e5BruyhOVERvRJORH2g2js3UAn1trEHXMe6bC3IyuL
+         bns6jCzUviNIRbFyHPfjqIP+DWhdUiDbBSSQ3JMauNd8KyiAzHPwy98xKSLIuLfwYUVM
+         TqJOMsKDOdIFpAQsiZZ2prWZcrYA/sUFF7VrV0YjT1RyMfudyBk2U5tPcb3nzcFnm/MX
+         A3hA==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1773764117; x=1774368917; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=etlYVXNvY0jwdMjflLRbzx8XEtV3TCYbBQva0N1eERE=;
+        b=OyXT3V2/Nb9c5Zgek8UHfP6K/ffQdiHasb7bXSOVSR1JBurrUyIOv9mB+vEP74Qzca
+         BE5b3ytNmkfXWYZLVOJqpKTvIJ+BaLX9bENZu1M2ZfCgyPnD0o6NwAXqKqO4ykA3nq+J
+         scD2eSUd3Huh626G/J5XgdkZagmtIvLpJKyarvz8krMjy5h6sR3qKjV5APJVY+2PIRaJ
+         oEvpk1b4gZ3PBowaNp4PHj/b1KkVna+d2MihIoazE1k8xczwblBYObiaCyliItzZoALX
+         PdpvLgNJoTd5IVWac6EQGoKGuFOFjU/O8jIP5W0e1ZCPXt4Bn8DGsKSdwqQZO8BIrQbM
+         rdFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773764117; x=1774368917;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=etlYVXNvY0jwdMjflLRbzx8XEtV3TCYbBQva0N1eERE=;
+        b=R+Q0QKpU+iE6QGh6mXWzOO/E64B3GbLyVB7S/5ZcMM8ZqF+7Hg+vwpzximkSRI+0gs
+         MEr3dEELRy/M+xR/LWpMTPUPKnbVYy0kku/dFsWprExmyIump7M7Iq2kdHzsDg0XT+pu
+         mX9GwgvGFrOAfIIwJHPcHNeTNxZMP1G+M2YR90DynZ0AjoT0qhp/1rSjp4Ub2qj+AchV
+         WYshz2IePCPr/RzcMTRwdQK+4Uhn3hRlBbC5QNVbQbAWF8S1rJt7y7251o7KLqBnRNqp
+         K652ezj92IsqA6XQvCOS+xnoQj2oMDNv6nn0e/MrvQqgGwYXMokgEXXKpJ1RtRleFIJs
+         aSvg==
+X-Gm-Message-State: AOJu0YxWIjcORXBItrwPT90hGXjWlGAmPZzXt1B2GfDxKmKzDPszdI7y
+	icBPFGRvHTxfkHsoq/3C7BkgJrCg5Hp/nAS2ldGGAyPuTDalNDBM2gVo/DNbRDvgzyPrzyvASkx
+	faTDom8TNNM2aZWVzePSqXqWE6hn1ddUDCxyi86Jq
+X-Gm-Gg: ATEYQzyL+g4gdUb7u7a5grhGRY4deItwCgvqQSKUOIkKcFRaWiixl2+Ml9IwbKr8nkY
+	A2JxGW528Yf5zPyNRFgoZUVVa1kRZ/WWqD4A5b7jJR4+b6EJzjVnHO/+oBJU6LzQz17KZex9awc
+	HqpdSjMD9reK0vMCYXP8tEEjH/Ar3Yb8MvWb5JU1bjPIRG1PbCf7xxHRnPYUsCZdFZ47s4gAhnp
+	yF6ke3AH00982SitTOxYvCGrAiTMoS033k6Ef85bElVZqGoPMQDJ+aPnCvtAXyrqunPeiYHBDjm
+	HSivpbEu732JiS2mTi4VGTRbc4vnVwm/yet1
+X-Received: by 2002:a05:622a:1101:b0:509:371:f2ab with SMTP id
+ d75a77b69052e-50998d570b3mr16752381cf.16.1773764116289; Tue, 17 Mar 2026
+ 09:15:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20260316175451.1866175-1-maz@kernel.org> <20260316175451.1866175-16-maz@kernel.org>
+In-Reply-To: <20260316175451.1866175-16-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 17 Mar 2026 16:14:38 +0000
+X-Gm-Features: AaiRm51dtBuZjVM3yg5vE22x6fvA5zeYPFHcjLNbulKXj0wAV_GwlAkFIood97o
+Message-ID: <CA+EHjTx=vPSei-csjGorTg-=eXpW_uKG2dK4FjKT+xk_pYRLNA@mail.gmail.com>
+Subject: Re: [PATCH 15/17] KVM: arm64: Directly expose mapping prot and kill kvm_s2_fault
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, Will Deacon <will@kernel.org>, 
+	Quentin Perret <qperret@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 17 Mar 2026 11:40:59 +0000,
-Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
-> 
-> Prior to this change, the act of mapping a virtual IRQ to a physical
-> one also set the irq_ops. Unmapping then reset the irq_ops to NULL. So
-> far, this has been fine and hasn't caused any major issues.
-> 
-> Now, however, as GICv5 support is being added to KVM, it has become
-> apparent that conflating mapping/unmapping IRQs and setting/clearing
-> irq_ops can cause issues. The reason is that the upcoming GICv5
-> support introduces a set of default irq_ops for PPIs, and removing
-> this when unmapping will cause things to break rather horribly.
-> 
-> Split out the mapping/unmapping of IRQs from the setting/clearing of
-> irq_ops. The arch timer code is updated to set the irq_ops following a
-> successful map. The irq_ops are intentionally not removed again on an
-> unmap as the only irq_op introduced by the arch timer only takes
-> effect if the hw bit in struct vgic_irq is set. Therefore, it is safe
-> to leave this in place, and it avoids additional complexity when GICv5
-> support is introduced.
-> 
-> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
+On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
+>
+> The 'prot' field is the only one left in kvm_s2_fault. Expose it
+> directly to the functions needing it, and get rid of kvm_s2_fault.
+>
+> It has served us well during this refactoring, but it is now no
+> longer needed.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
 > ---
->  arch/arm64/kvm/arch_timer.c | 32 ++++++++++++++++++-------------
->  arch/arm64/kvm/vgic/vgic.c  | 38 +++++++++++++++++++++++++++++++------
->  include/kvm/arm_vgic.h      |  5 ++++-
->  3 files changed, 55 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 600f250753b45..1f536dd5978d4 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -740,14 +740,17 @@ static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
->  
->  		ret = kvm_vgic_map_phys_irq(vcpu,
->  					    map->direct_vtimer->host_timer_irq,
-> -					    timer_irq(map->direct_vtimer),
-> -					    &arch_timer_irq_ops);
-> -		WARN_ON_ONCE(ret);
-> +					    timer_irq(map->direct_vtimer));
-> +		if (!WARN_ON_ONCE(ret))
-> +			kvm_vgic_set_irq_ops(vcpu, timer_irq(map->direct_vtimer),
-> +					     &arch_timer_irq_ops);
-> +
->  		ret = kvm_vgic_map_phys_irq(vcpu,
->  					    map->direct_ptimer->host_timer_irq,
-> -					    timer_irq(map->direct_ptimer),
-> -					    &arch_timer_irq_ops);
-> -		WARN_ON_ONCE(ret);
-> +					    timer_irq(map->direct_ptimer));
-> +		if (!WARN_ON_ONCE(ret))
-> +			kvm_vgic_set_irq_ops(vcpu, timer_irq(map->direct_ptimer),
-> +					     &arch_timer_irq_ops);
-
-Do we really need this eager setting of ops? Given that nothing seems
-to clear them, why can't we just set the ops at vcpu init time? Given
-that this is a pretty hot path (on each exception/exception return
-between L2 and L1), the least we do here, the better.
-
->  	}
+>  arch/arm64/kvm/mmu.c | 45 +++++++++++++++++++++-----------------------
+>  1 file changed, 21 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 97cb3585eba03..9b5df70807875 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1729,10 +1729,6 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
+>         return vma_shift;
 >  }
->  
-> @@ -1565,20 +1568,23 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
->  
->  	ret = kvm_vgic_map_phys_irq(vcpu,
->  				    map.direct_vtimer->host_timer_irq,
-> -				    timer_irq(map.direct_vtimer),
-> -				    &arch_timer_irq_ops);
-> +				    timer_irq(map.direct_vtimer));
->  	if (ret)
->  		return ret;
->  
-> +	kvm_vgic_set_irq_ops(vcpu, timer_irq(map.direct_vtimer),
-> +			     &arch_timer_irq_ops);
-> +
->  	if (map.direct_ptimer) {
->  		ret = kvm_vgic_map_phys_irq(vcpu,
->  					    map.direct_ptimer->host_timer_irq,
-> -					    timer_irq(map.direct_ptimer),
-> -					    &arch_timer_irq_ops);
-> -	}
-> +					    timer_irq(map.direct_ptimer));
-> +		if (ret)
-> +			return ret;
->  
-> -	if (ret)
-> -		return ret;
-> +		kvm_vgic_set_irq_ops(vcpu, timer_irq(map.direct_ptimer),
-> +				     &arch_timer_irq_ops);
-> +	}
-
-which would mean moving this to kvm_timer_vcpu_init().
-
->  
->  no_vgic:
->  	timer->enabled = 1;
-> diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-> index e22b79cfff965..e37c640d74bcf 100644
-> --- a/arch/arm64/kvm/vgic/vgic.c
-> +++ b/arch/arm64/kvm/vgic/vgic.c
-> @@ -553,10 +553,38 @@ int kvm_vgic_inject_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  	return 0;
+>
+> -struct kvm_s2_fault {
+> -       enum kvm_pgtable_prot prot;
+> -};
+> -
+>  static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>         return kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+> @@ -1856,8 +1852,8 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
 >  }
->  
-> +void kvm_vgic_set_irq_ops(struct kvm_vcpu *vcpu, u32 vintid,
-> +			 struct irq_ops *ops)
-> +{
-> +	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
+>
+>  static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+> -                                    struct kvm_s2_fault *fault,
+> -                                    const struct kvm_s2_fault_vma_info *s2vi)
+> +                                    const struct kvm_s2_fault_vma_info *s2vi,
+> +                                    enum kvm_pgtable_prot *prot)
+>  {
+>         struct kvm *kvm = s2fd->vcpu->kvm;
+>         bool writable = s2vi->map_writable;
+> @@ -1885,23 +1881,25 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>                 return 1;
+>         }
+>
+> +       *prot = KVM_PGTABLE_PROT_R;
 > +
-> +	BUG_ON(!irq);
-> +
-> +	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-> +	{
-> +		irq->ops = ops;
-> +	}
-
-nit: opening brace in the wrong spot, and overall not useful. This
-could simply be written as:
-
-	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-		irq->ops = ops;
-
-> +
-> +	vgic_put_irq(vcpu->kvm, irq);
-> +}
-> +
-> +void kvm_vgic_clear_irq_ops(struct kvm_vcpu *vcpu, u32 vintid)
-> +{
-> +	struct vgic_irq *irq = vgic_get_vcpu_irq(vcpu, vintid);
-> +
-> +	BUG_ON(!irq);
-> +
-> +	scoped_guard(raw_spinlock_irqsave, &irq->irq_lock)
-> +	{
-> +		irq->ops = NULL;
-> +	}
-> +
-> +	vgic_put_irq(vcpu->kvm, irq);
-> +}
-> +
-
-nit: that could also be written as:
-
-void kvm_vgic_clear_irq_ops(struct kvm_vcpu *vcpu, u32 vintid)
-{
-	kvm_vgic_set_irq_ops(vcpu, vintid, NULL);
-}
-
-I can fix all of it when applying if that works for you.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+>         if (s2fd->nested)
+> -               adjust_nested_fault_perms(s2fd->nested, &fault->prot, &writable);
+> +               adjust_nested_fault_perms(s2fd->nested, prot, &writable);
+>
+>         if (writable)
+> -               fault->prot |= KVM_PGTABLE_PROT_W;
+> +               *prot |= KVM_PGTABLE_PROT_W;
+>
+>         if (kvm_vcpu_trap_is_exec_fault(s2fd->vcpu))
+> -               fault->prot |= KVM_PGTABLE_PROT_X;
+> +               *prot |= KVM_PGTABLE_PROT_X;
+>
+>         if (s2vi->map_non_cacheable)
+> -               fault->prot |= (s2vi->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
+> -                              KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
+> +               *prot |= (s2vi->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
+> +                       KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
+>         else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
+> -               fault->prot |= KVM_PGTABLE_PROT_X;
+> +               *prot |= KVM_PGTABLE_PROT_X;
+>
+>         if (s2fd->nested)
+> -               adjust_nested_exec_perms(kvm, s2fd->nested, &fault->prot);
+> +               adjust_nested_exec_perms(kvm, s2fd->nested, prot);
+>
+>         if (!kvm_s2_fault_is_perm(s2fd) && !s2vi->map_non_cacheable && kvm_has_mte(kvm)) {
+>                 /* Check the VMM hasn't introduced a new disallowed VMA */
+> @@ -1913,11 +1911,12 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
+>  }
+>
+>  static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+> -                           struct kvm_s2_fault *fault,
+> -                           const struct kvm_s2_fault_vma_info *s2vi, void *memcache)
+> +                           const struct kvm_s2_fault_vma_info *s2vi,
+> +                           enum kvm_pgtable_prot prot,
+> +                           void *memcache)
+>  {
+>         enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
+> -       bool writable = fault->prot & KVM_PGTABLE_PROT_W;
+> +       bool writable = prot & KVM_PGTABLE_PROT_W;
+>         struct kvm *kvm = s2fd->vcpu->kvm;
+>         struct kvm_pgtable *pgt;
+>         long perm_fault_granule;
+> @@ -1970,12 +1969,12 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
+>                  * Drop the SW bits in favour of those stored in the
+>                  * PTE, which will be preserved.
+>                  */
+> -               fault->prot &= ~KVM_NV_GUEST_MAP_SZ;
+> +               prot &= ~KVM_NV_GUEST_MAP_SZ;
+>                 ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
+> -                                                                fault->prot, flags);
+> +                                                                prot, flags);
+>         } else {
+>                 ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
+> -                                                        __pfn_to_phys(pfn), fault->prot,
+> +                                                        __pfn_to_phys(pfn), prot,
+>                                                          memcache, flags);
+>         }
+>
+> @@ -1999,9 +1998,7 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>  {
+>         bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
+>         struct kvm_s2_fault_vma_info s2vi = {};
+> -       struct kvm_s2_fault fault = {
+> -               .prot = KVM_PGTABLE_PROT_R,
+> -       };
+> +       enum kvm_pgtable_prot prot;
+>         void *memcache;
+>         int ret;
+>
+> @@ -2026,13 +2023,13 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
+>         if (ret != 1)
+>                 return ret;
+>
+> -       ret = kvm_s2_fault_compute_prot(s2fd, &fault, &s2vi);
+> +       ret = kvm_s2_fault_compute_prot(s2fd, &s2vi, &prot);
+>         if (ret) {
+>                 kvm_release_page_unused(s2vi.page);
+>                 return ret;
+>         }
+>
+> -       return kvm_s2_fault_map(s2fd, &fault, &s2vi, memcache);
+> +       return kvm_s2_fault_map(s2fd, &s2vi, prot, memcache);
+>  }
+>
+>  /* Resolve the access fault by making the page young again. */
+> --
+> 2.47.3
+>
