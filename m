@@ -1,30 +1,30 @@
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83B533CE88
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 17:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1836D332628
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 17:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773769856; cv=none; b=QQKgoCcpftqVTtkw9/MiurKtObo79eoA+OuRpnewWMeHCAd6TYv3d9bKXdlmN3MbEQegG1R9QRnyOwB8YRqKn+TXHx1vrAgSG9y6R1qBin+0MzySgWNrzzGsrzyL4B5m6oPOzhAV621SRgRJh1LtgBqtkJGgbDTQGW4MA12EPds=
+	t=1773770015; cv=none; b=qv7gMRauPLKDmAM5rRFcLp+8mthp4uLu1pPs+/rHDCyMKzpOO9RqfgkIVilnhR5fOWImL5fK+DcH4a1LkjjKoslz3NaLtg0DA18ECTn5m7AYQvrhL/cZmiLhIA5z3I6a0U1nyVutBYuiV2aXI77QyaNZcjepIcGou+iAObZ7F14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773769856; c=relaxed/simple;
-	bh=yiyoMaFHy9lzPuRoFxSqRk4KEu9ZNcoxBKMkiH5Ib3M=;
+	s=arc-20240116; t=1773770015; c=relaxed/simple;
+	bh=JZoWwvwmBlGT4+GRNq7uIUdHPKbTnuOOMcvemPtlZdI=;
 	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NL2dCnekeNkKowqT2Led5VWrY8qj28SfGNOmxS459INpoCHCBal6mPT+xn+d7wApuXB/IRDYs786xAmku0OzTF+QROuo0P/VYBi0XTFv3nQC/vu9y6ZGRXf7YX2IYKDAyVFHzWhxZ4rFlViA+cWCD7aAXFXvBxk7kokkkqXcawM=
+	 MIME-Version:Content-Type; b=HduPZCz4PZsYVHm/NRm4nASTosAJuF5bFm2Zf9jSY69DqKr4P8ZUcOh7EIyoQDZzwoi6nqUeTyl+qeHYuVX55Xhwwyg0qydFbTCIRYSaK++ASxGNLBgyGzWLaBYYJ/HuKg9yCgGhsnn+M6U38VoGgbUaLL3up04/HBLcY+isKUs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fZzxb2PjmzJ4687;
-	Wed, 18 Mar 2026 01:49:55 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fb00b4Bj3zJ46DJ;
+	Wed, 18 Mar 2026 01:52:31 +0800 (CST)
 Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
-	by mail.maildlp.com (Postfix) with ESMTPS id BDBBA4056A;
-	Wed, 18 Mar 2026 01:50:51 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 0833040584;
+	Wed, 18 Mar 2026 01:53:28 +0800 (CST)
 Received: from localhost (10.48.149.62) by dubpeml500005.china.huawei.com
  (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Mar
- 2026 17:50:50 +0000
-Date: Tue, 17 Mar 2026 17:50:47 +0000
+ 2026 17:53:27 +0000
+Date: Tue, 17 Mar 2026 17:53:26 +0000
 From: Jonathan Cameron <jonathan.cameron@huawei.com>
 To: Fuad Tabba <tabba@google.com>
 CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, "Joey
@@ -34,11 +34,12 @@ CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>, "Joey
 	<linux-arm-kernel@lists.infradead.org>, KERNEL VIRTUAL MACHINE FOR ARM64
  KVM/arm64 <kvmarm@lists.linux.dev>, "open list"
 	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 06/10] KVM: arm64: Use guard(mutex) in mmu.c
-Message-ID: <20260317175047.00000b6e@huawei.com>
-In-Reply-To: <20260316-tabba-el2_guard-v1-6-456875a2c6db@google.com>
+Subject: Re: [PATCH 07/10] KVM: arm64: Use scoped resource management in
+ arm.c
+Message-ID: <20260317175326.000074be@huawei.com>
+In-Reply-To: <20260316-tabba-el2_guard-v1-7-456875a2c6db@google.com>
 References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
-	<20260316-tabba-el2_guard-v1-6-456875a2c6db@google.com>
+	<20260316-tabba-el2_guard-v1-7-456875a2c6db@google.com>
 X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -51,99 +52,81 @@ Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
  dubpeml500005.china.huawei.com (7.214.145.207)
 
-On Mon, 16 Mar 2026 17:35:27 +0000
+On Mon, 16 Mar 2026 17:35:28 +0000
 Fuad Tabba <tabba@google.com> wrote:
 
-> Migrate manual mutex_lock() and mutex_unlock() calls managing
-> kvm_hyp_pgd_mutex and hyp_shared_pfns_lock to use the
-> guard(mutex) macro.
+> Migrate manual spin_lock() calls managing mp_state_lock and manual
+> mutex_lock() calls managing kvm->arch.config_lock to use the
+> guard(spinlock) and guard(mutex) macros.
 > 
-> This eliminates manual unlock calls on return paths and simplifies
-> error handling by replacing unlock goto labels with direct returns.
-> Centralized cleanup goto paths are preserved with manual unlocks
-> removed.
+> This eliminates manual unlock calls on early return paths and
+> simplifies the vCPU suspend/resume control flow.
 > 
-> Change-Id: Ib0f33a474eb84f19da4de0858c77751bbe55dfbb
+> Change-Id: Ifcd8455d08afa5d00fc200daaa3fb13f6736e6ed
 > Signed-off-by: Fuad Tabba <tabba@google.com>
+Trivial stuff.
+> ---
+>  arch/arm64/kvm/arm.c | 53 ++++++++++++++++++++--------------------------------
+>  1 file changed, 20 insertions(+), 33 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 410ffd41fd73..017f5bfabe19 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
 
-> @@ -652,22 +632,20 @@ int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
->  	unsigned long base;
+>  
+>  /**
+> @@ -738,9 +736,8 @@ static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> +	guard(spinlock)(&vcpu->arch.mp_state_lock);
+>  	__kvm_arm_vcpu_power_off(vcpu);
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
+>  }
+>  
+>  bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+> @@ -773,7 +770,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  {
 >  	int ret = 0;
 >  
-> -	mutex_lock(&kvm_hyp_pgd_mutex);
-> -
-> -	/*
-> -	 * This assumes that we have enough space below the idmap
-> -	 * page to allocate our VAs. If not, the check in
-> -	 * __hyp_alloc_private_va_range() will kick. A potential
-> -	 * alternative would be to detect that overflow and switch
-> -	 * to an allocation above the idmap.
-> -	 *
-> -	 * The allocated size is always a multiple of PAGE_SIZE.
-> -	 */
-> -	size = PAGE_ALIGN(size);
-> -	base = io_map_base - size;
-> -	ret = __hyp_alloc_private_va_range(base);
-> -
-> -	mutex_unlock(&kvm_hyp_pgd_mutex);
-> +	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
-> +		/*
-> +		 * This assumes that we have enough space below the idmap
-> +		 * page to allocate our VAs. If not, the check in
-> +		 * __hyp_alloc_private_va_range() will kick. A potential
-> +		 * alternative would be to detect that overflow and switch
-> +		 * to an allocation above the idmap.
-> +		 *
-> +		 * The allocated size is always a multiple of PAGE_SIZE.
-> +		 */
-> +		size = PAGE_ALIGN(size);
-> +		base = io_map_base - size;
-> +		ret = __hyp_alloc_private_va_range(base);
-Minor one and matter of taste, but I'd do
-		if (ret)
-			return ret;
+> -	spin_lock(&vcpu->arch.mp_state_lock);
+> +	guard(spinlock)(&vcpu->arch.mp_state_lock);
+>  
+>  	switch (mp_state->mp_state) {
+>  	case KVM_MP_STATE_RUNNABLE:
+> @@ -789,8 +786,6 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  		ret = -EINVAL;
+		return -EINVAL;
 	}
-	*hwaddr = base;
 
 	return 0;
 
-> +	}
+Or even return in the switch legs instead of breaking out.
+
+>  	}
 >  
->  	if (!ret)
->  		*haddr = base;
-> @@ -711,17 +689,16 @@ int create_hyp_stack(phys_addr_t phys_addr, unsigned long *haddr)
->  	size_t size;
->  	int ret;
->  
-> -	mutex_lock(&kvm_hyp_pgd_mutex);
-> -	/*
-> -	 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
-> -	 * an alignment of our allocation on the order of the size.
-> -	 */
-> -	size = NVHE_STACK_SIZE * 2;
-> -	base = ALIGN_DOWN(io_map_base - size, size);
-> +	scoped_guard(mutex, &kvm_hyp_pgd_mutex) {
-> +		/*
-> +		 * Efficient stack verification using the NVHE_STACK_SHIFT bit implies
-> +		 * an alignment of our allocation on the order of the size.
-> +		 */
-> +		size = NVHE_STACK_SIZE * 2;
-> +		base = ALIGN_DOWN(io_map_base - size, size);
->  
-> -	ret = __hyp_alloc_private_va_range(base);
+> -	spin_unlock(&vcpu->arch.mp_state_lock);
 > -
-> -	mutex_unlock(&kvm_hyp_pgd_mutex);
-> +		ret = __hyp_alloc_private_va_range(base);
-> +	}
+>  	return ret;
+>  }
+
+>  /*
+> @@ -944,9 +937,8 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+>  			return ret;
+>  	}
 >  
->  	if (ret) {
->  		kvm_err("Cannot allocate hyp stack guard page\n");
-Maybe move this under the guard just to keep the error check nearer the code
-in question.
+> -	mutex_lock(&kvm->arch.config_lock);
+> +	guard(mutex)(&kvm->arch.config_lock);
+>  	set_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags);
+> -	mutex_unlock(&kvm->arch.config_lock);
+>  
+>  	return ret;
 
-Thanks,
+Personally I'd make this return 0 whilst you are here so it's obvious this
+path only ever returns success.
 
-Jonathan
+>  }
 
-> 
 
