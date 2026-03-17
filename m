@@ -1,35 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735AB37C0FD;
-	Tue, 17 Mar 2026 20:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61BF63644BF;
+	Tue, 17 Mar 2026 20:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773778256; cv=none; b=XXcnCfT0TQhmrfz5PowZrHBFr7YdvZQFGIxy1w2WSI99Jx/mikMykGpq1ZMpGXbo1sTHfWciNh3kBluwlEo4EewY57fttXrhpzKE6u1q3RVkIFfHGbJuDC+YGqkkPUtGIdB79NxS99V+p7VAwi5dmz8U0Ncuj8IdlVtpQwkXH+k=
+	t=1773778259; cv=none; b=Pr3W01DZNT3HG2DogkYLKTz6tHYgb72s6GJUdMjyIppvh3FceEuSr+KkdQ0nHY4n/1nuMkNHTFrJCEOp+WInnJCKkXsHcIlWsKYiTy/8ZUXJ6mD13dJDuvzhHpeddCPpkRUVAk3OymlQ2dLy7kxss4ZDgACWDB98eSlffIOzyr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773778256; c=relaxed/simple;
-	bh=6dDHuW+3JnPVTu+x6wcXrghvQBtRlj+/DG5vIrcHhF0=;
+	s=arc-20240116; t=1773778259; c=relaxed/simple;
+	bh=qjkFp7iedLQabJArWZg6nyU9Z143fBvz+MFdJAqkGlM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OvkBvKUdMvCYHZb+PV/v+lVrmXSCISFf97hfy3upYQ205uB+zCkwVoxKE4AXPUunw5zYH90RWl+VGd6RNrv7+eyY0AyoZm73NwutIEajqQ+NkdLg+1wloGE2duCv34xnAtbqETiliS3Tlkaq3bxR0Xfskkv9/lBhQZuv+0urTq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8zwYHlW; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=qVMwqmo7oglnR2gGPMx4mD7ChkQ/YOjHyopcj6uh1dEqUTbdBxRqjmRE5p6FFXpw5JmJPiZAzXZ8GVY/djPHYQamJMagC+DV6S8kZzyKm9eoDf0hsL4bTHbIwkbJ0WlWac8bEmRpef+rhUnkkxNGk7ea/KO6ic1Q2/v8Ynhi5T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqJUDj6r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8zwYHlW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB3DBC19425;
-	Tue, 17 Mar 2026 20:10:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqJUDj6r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E2CCC19425;
+	Tue, 17 Mar 2026 20:10:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773778256;
-	bh=6dDHuW+3JnPVTu+x6wcXrghvQBtRlj+/DG5vIrcHhF0=;
+	s=k20201202; t=1773778259;
+	bh=qjkFp7iedLQabJArWZg6nyU9Z143fBvz+MFdJAqkGlM=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=r8zwYHlWLq50rhjhW4gRhHpvC6j9uoEMuetvW66QuY4uJhw+oQWzarWgow6TdIKkp
-	 47q7DWk71OZbur8024d0l/r+XwDQj6nMqe4FF+DjT4eWJhA3qdj/591fVYADMNhoGZ
-	 CXX0VriJnH8TS2JtmJ7afjQ9Td671HpV6TGxw0WZpPi/lQGOhLbCVhXVB3AiNhPYR1
-	 cD2sFvGb+/vfWRAMG8ROkOlMa60WFFpMil116pMHUlx0PF8x5WU+vMfzX2S2VkUQAZ
-	 0bFJp4/bQRiTOgb+0BlTgnz4mE+QgDcDexuSjTDm4ES41LeAFFQoTZWdgFwmjrTgKA
-	 obcv1SlDudtjg==
+	b=tqJUDj6rO/LGK7GVYF+91XYOBql5Ztf6MyAdEfZQHE2CfI4D8sdlJIj5mYnyIg2Gl
+	 +Mc98qAmeEIC8uuVLY0C19YePAD4n+MlZdbgLLaiZG9TqsZHoB/fwkuQNlxvVcD+gO
+	 Ms5EOxgQd70CnBg3b+eSsrMP1MJXwQD+0DfywB8DRiPKJzJ8bnAcnI4c2AIo9246TR
+	 oYL4u0FK3FvoIfYMpHb/OotVImaavNY7vcD11+a05se7TGmGgHwwv0TktDaN0+q/9K
+	 xfX7HNZy1xd+g+9eQBe7o7EfZiB4p0b5FYp9lViMqIfaIo8q2FiPkwzbfyLNIS3h/f
+	 1YXRJkpJ90nRw==
 From: Mark Brown <broonie@kernel.org>
-Date: Tue, 17 Mar 2026 20:10:36 +0000
-Subject: [PATCH v5 3/5] KVM: selftests: arm64: Make set_id_regs bitfield
- validatity checks non-fatal
+Date: Tue, 17 Mar 2026 20:10:37 +0000
+Subject: [PATCH v5 4/5] KVM: selftests: arm64: Skip all 32 bit IDs when
+ set_id_regs is aarch64 only
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -38,7 +38,7 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260317-kvm-arm64-set-id-regs-aarch64-v5-3-a60f2b956e22@kernel.org>
+Message-Id: <20260317-kvm-arm64-set-id-regs-aarch64-v5-4-a60f2b956e22@kernel.org>
 References: <20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org>
 In-Reply-To: <20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org>
 To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
@@ -50,108 +50,143 @@ Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Mark Brown <broonie@kernel.org>
 X-Mailer: b4 0.15-dev-e1b5b
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3569; i=broonie@kernel.org;
- h=from:subject:message-id; bh=6dDHuW+3JnPVTu+x6wcXrghvQBtRlj+/DG5vIrcHhF0=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpubVCSsYWqCVjfFXLy7wmXi50Yj6eGPMcyp20C
- ireXYfKlqeJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCabm1QgAKCRAk1otyXVSH
- 0NrGB/0cfYW+8CKzBzLbLRFTdwiSb6WRYo46e0wJg5AslfCe5ynXSkB8QYazMrCWwf8+iCY8N6x
- BGd56olXlpcaOV1JPaw+rV8qU3G+tueMAtQ/tVyeEuBy4aobYh+3lD4zWOXlx13tED4hAly7qZh
- M5H7e5r8hnNZlCqA6VwmbqBZvBNOEjXF9m9QA/UTnG1QJ9S69D4F+xAXqM9RdSaiAqKW0Y+tYkP
- aIksmpENsuUO2Mo9+tXOHvYqlGbRtC3ucGauYZqIeDX8IyqGBJ40uQqU+Zrrn7FVbwURZad2mKN
- nS4+IdzIqws37C0NOfgWv0gqMg35DxYSSeSj0jJOBp40HPv4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4946; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=qjkFp7iedLQabJArWZg6nyU9Z143fBvz+MFdJAqkGlM=;
+ b=owEBbAGT/pANAwAKASTWi3JdVIfQAcsmYgBpubVDktHRSlwlVT903e0/pOLpvx0ys9JhXg47v
+ QuIf/MPKsyJATIEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCabm1QwAKCRAk1otyXVSH
+ 0M11B/iz341VPB5PCi1SkyWMy1du5Nzj1+xuY1MbAO3o/MONJUl3IYIhre4IAW3FhH4kxe4SDzk
+ iFATSQ9Ofau1hWnSFoudpMr5CrFmvj4Srume0rj66N32aGKHjUqQSrBEc06HDv1Jrfkf8jZM+tY
+ g44gZnXuP5PDlMcpz0r1ddVpYrNDxXKoCuKPxKV1wAETKGRW7X039LirzhM+yPsU6LIOmE7R0cG
+ GJ6cwou0h8OjHEbnDqXUU+tfWOitz/BSfw02hU5tOJQnpbF5+wl2W4ylz8ceohER70A0hWkOG2L
+ Hf4T2uCCvDe1MaXiYT1KwXrIR+YOr2Iq58SNmz8okW47X78=
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Currently when set_id_regs encounters a problem checking validation of
-writes to feature registers it uses an immediately fatal assert to report
-the problem. This is not idiomatic for kselftest, and it is also not great
-for usability. The affected bitfield is not clearly reported and further
-tests do not have their results reported.
+On an aarch64 only system the 32 bit ID registers have UNDEFINED values.
+As a result set_id_regs skips tests for setting fields in these registers
+when testing an aarch64 only guest. This has the side effect of meaning
+that we don't record an expected value for these registers, meaning that
+when the subsequent tests for values being visible in guests and preserved
+over reset check the value they can spuriously fail. This can be seen by
+running on an emulated system with both NV and 32 bit enabled, NV will
+result in the guests created by the test program being 64 bit only but
+the 32 bit ID registers will have values.
 
-Switch to using standard kselftest result reporting for the two asserts
-we do, these are non-fatal asserts so allow the program to continue and the
-test names include the affected field.
+Also skip those tests that use the values set in the field setting tests
+for aarch64 only guests in order to avoid these spurious failures.
 
-Reviewed-by: Ben Horgan <ben.horgan@arm.com>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/kvm/arm64/set_id_regs.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 49 ++++++++++++++++++-------
+ 1 file changed, 36 insertions(+), 13 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/arm64/set_id_regs.c b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-index 1072ee125b05..60e7f0c1bc26 100644
+index 60e7f0c1bc26..127defebb35a 100644
 --- a/tools/testing/selftests/kvm/arm64/set_id_regs.c
 +++ b/tools/testing/selftests/kvm/arm64/set_id_regs.c
-@@ -408,6 +408,7 @@ static uint64_t test_reg_set_success(struct kvm_vcpu *vcpu, uint64_t reg,
- 	uint8_t shift = ftr_bits->shift;
- 	uint64_t mask = ftr_bits->mask;
- 	uint64_t val, new_val, ftr;
-+	bool match;
- 
- 	val = vcpu_get_reg(vcpu, reg);
- 	ftr = (val & mask) >> shift;
-@@ -420,7 +421,10 @@ static uint64_t test_reg_set_success(struct kvm_vcpu *vcpu, uint64_t reg,
- 
- 	vcpu_set_reg(vcpu, reg, val);
- 	new_val = vcpu_get_reg(vcpu, reg);
--	TEST_ASSERT_EQ(new_val, val);
-+	match = new_val == val;
-+	if (!match)
-+		ksft_print_msg("%lx != %lx\n", new_val, val);
-+	ksft_test_result(match, "%s valid write succeeded\n", ftr_bits->name);
- 
- 	return new_val;
- }
-@@ -432,6 +436,7 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, uint64_t reg,
- 	uint64_t mask = ftr_bits->mask;
- 	uint64_t val, old_val, ftr;
- 	int r;
-+	bool match;
- 
- 	val = vcpu_get_reg(vcpu, reg);
- 	ftr = (val & mask) >> shift;
-@@ -448,7 +453,10 @@ static void test_reg_set_fail(struct kvm_vcpu *vcpu, uint64_t reg,
- 		    "Unexpected KVM_SET_ONE_REG error: r=%d, errno=%d", r, errno);
- 
- 	val = vcpu_get_reg(vcpu, reg);
--	TEST_ASSERT_EQ(val, old_val);
-+	match = val == old_val;
-+	if (!match)
-+		ksft_print_msg("%lx != %lx\n", val, old_val);
-+	ksft_test_result(match, "%s invalid write rejected\n", ftr_bits->name);
- }
- 
- static uint64_t test_reg_vals[KVM_ARM_FEATURE_ID_RANGE_SIZE];
-@@ -488,7 +496,11 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 		for (int j = 0;  ftr_bits[j].type != FTR_END; j++) {
- 			/* Skip aarch32 reg on aarch64 only system, since they are RAZ/WI. */
- 			if (aarch64_only && sys_reg_CRm(reg_id) < 4) {
--				ksft_test_result_skip("%s on AARCH64 only system\n",
-+				ksft_print_msg("%s on AARCH64 only system\n",
-+					       ftr_bits[j].name);
-+				ksft_test_result_skip("%s invalid write rejected\n",
-+						      ftr_bits[j].name);
-+				ksft_test_result_skip("%s valid write succeeded\n",
- 						      ftr_bits[j].name);
- 				continue;
- 			}
-@@ -500,8 +512,6 @@ static void test_vm_ftr_id_regs(struct kvm_vcpu *vcpu, bool aarch64_only)
- 
- 			test_reg_vals[idx] = test_reg_set_success(vcpu, reg,
- 								  &ftr_bits[j]);
--
--			ksft_test_result_pass("%s\n", ftr_bits[j].name);
- 		}
+@@ -294,6 +294,13 @@ static const char *get_reg_name(u64 id)
  	}
  }
-@@ -838,7 +848,7 @@ int main(void)
- 		ID_REG_RESET_UNCHANGED_TEST;
- 	for (i = 0; i < ARRAY_SIZE(test_regs); i++)
- 		for (j = 0; test_regs[i].ftr_bits[j].type != FTR_END; j++)
--			test_cnt++;
-+			test_cnt += 2;
  
- 	ksft_set_plan(test_cnt);
++static inline bool is_aarch32_id_reg(u64 id)
++{
++	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
++		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
++		sys_reg_CRm(id) <= 3);
++}
++
+ /* Return a safe value to a given ftr_bits an ftr value */
+ uint64_t get_safe_value(const struct reg_ftr_bits *ftr_bits, uint64_t ftr)
+ {
+@@ -674,7 +681,7 @@ static void test_user_set_mte_reg(struct kvm_vcpu *vcpu)
+ 		ksft_test_result_pass("ID_AA64PFR1_EL1.MTE_frac no longer 0xF\n");
+ }
+ 
+-static void test_guest_reg_read(struct kvm_vcpu *vcpu)
++static void test_guest_reg_read(struct kvm_vcpu *vcpu, bool aarch64_only)
+ {
+ 	bool done = false;
+ 	struct ucall uc;
+@@ -693,6 +700,13 @@ static void test_guest_reg_read(struct kvm_vcpu *vcpu)
+ 			reg_id = uc.args[2];
+ 			guest_val = uc.args[3];
+ 			expected_val = test_reg_vals[encoding_to_range_idx(reg_id)];
++
++			if (aarch64_only && is_aarch32_id_reg(reg_id)) {
++				ksft_test_result_skip("%s value seen in guest\n",
++						      get_reg_name(reg_id));
++				break;
++			}
++
+ 			match = expected_val == guest_val;
+ 			if (!match)
+ 				ksft_print_msg("%lx != %lx\n",
+@@ -784,12 +798,19 @@ static void test_vcpu_non_ftr_id_regs(struct kvm_vcpu *vcpu)
+ 	ksft_test_result_pass("%s\n", __func__);
+ }
+ 
+-static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, uint32_t encoding)
++static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, uint32_t encoding,
++					 bool aarch64_only)
+ {
+ 	size_t idx = encoding_to_range_idx(encoding);
+ 	uint64_t observed;
+ 	bool pass;
+ 
++	if (aarch64_only && is_aarch32_id_reg(encoding)) {
++		ksft_test_result_skip("%s unchanged by reset\n",
++				      get_reg_name(encoding));
++		return;
++	}
++
+ 	observed = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(encoding));
+ 	pass = test_reg_vals[idx] == observed;
+ 	if (!pass)
+@@ -800,7 +821,8 @@ static void test_assert_id_reg_unchanged(struct kvm_vcpu *vcpu, uint32_t encodin
+ 
+ #define ID_REG_RESET_UNCHANGED_TEST (ARRAY_SIZE(test_regs) + 6)
+ 
+-static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
++static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu,
++					 bool aarch64_only)
+ {
+ 	/*
+ 	 * Calls KVM_ARM_VCPU_INIT behind the scenes, which will do an
+@@ -809,14 +831,15 @@ static void test_reset_preserves_id_regs(struct kvm_vcpu *vcpu)
+ 	aarch64_vcpu_setup(vcpu, NULL);
+ 
+ 	for (int i = 0; i < ARRAY_SIZE(test_regs); i++)
+-		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg);
+-
+-	test_assert_id_reg_unchanged(vcpu, SYS_MPIDR_EL1);
+-	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1);
+-	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0);
+-	test_assert_id_reg_unchanged(vcpu, SYS_MIDR_EL1);
+-	test_assert_id_reg_unchanged(vcpu, SYS_REVIDR_EL1);
+-	test_assert_id_reg_unchanged(vcpu, SYS_AIDR_EL1);
++		test_assert_id_reg_unchanged(vcpu, test_regs[i].reg,
++					     aarch64_only);
++
++	test_assert_id_reg_unchanged(vcpu, SYS_MPIDR_EL1, aarch64_only);
++	test_assert_id_reg_unchanged(vcpu, SYS_CLIDR_EL1, aarch64_only);
++	test_assert_id_reg_unchanged(vcpu, SYS_CTR_EL0, aarch64_only);
++	test_assert_id_reg_unchanged(vcpu, SYS_MIDR_EL1, aarch64_only);
++	test_assert_id_reg_unchanged(vcpu, SYS_REVIDR_EL1, aarch64_only);
++	test_assert_id_reg_unchanged(vcpu, SYS_AIDR_EL1, aarch64_only);
+ }
+ 
+ int main(void)
+@@ -858,9 +881,9 @@ int main(void)
+ 	test_user_set_mpam_reg(vcpu);
+ 	test_user_set_mte_reg(vcpu);
+ 
+-	test_guest_reg_read(vcpu);
++	test_guest_reg_read(vcpu, aarch64_only);
+ 
+-	test_reset_preserves_id_regs(vcpu);
++	test_reset_preserves_id_regs(vcpu, aarch64_only);
+ 
+ 	kvm_vm_free(vm);
  
 
 -- 
