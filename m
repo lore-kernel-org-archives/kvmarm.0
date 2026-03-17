@@ -1,52 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775B0330330;
-	Tue, 17 Mar 2026 09:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0185B331A5E;
+	Tue, 17 Mar 2026 09:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773738248; cv=none; b=aPXgLegRrIBpijNKCa2omWW7fkaeZqLOJ/O7fOvfNOVcMnhIGDmLtEXw4mgUGitxJaztmbsai+BBM8dBUKxTu2d8f5r7/eRAyXh9BX4Ne9XsvYWVsmohpLQ9QMtNJl6BQtUjxB3i/QmqeHWIvyfmHMaO3FsL/BvmbFPKoE25C5U=
+	t=1773738270; cv=none; b=KV5Xb7XG2Tvaceu0CXYLo8LACu2+5IkNQ7MoWu/thuXWZ3dj4Pt9pP8PVwG9x4gQ8cWrNJpsGcnfFXxtu95yN+9w5/kE28e/8MXVh5s6C70r19aloPuUCdSMpP8yr+OKqW7BKD/fkU5d+LXPJ4L8JyCDr+Su+sTzsONU0uvFtks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773738248; c=relaxed/simple;
-	bh=m5HgYoftBG0ijJF7JWYmyFv+uNLekjur0DF9b2Jpy8s=;
+	s=arc-20240116; t=1773738270; c=relaxed/simple;
+	bh=w492lbPZJ2Gu7Yvm34YT9uTKSyNcaRjWlLbuRFwhjt8=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C51b0bua+Bu592qHyx+raWmCbRfm0WFb5fhsR2nj9pmlvTvUIn97bPDpEmp5ykw5Rz46NNWf66os2DiK6AXLbR/OUqvGhJegIxX6PzP/eHxZOffHQZ9RqFtQ5bTe9u39lcM48qisPu54iFkKDuT02DLmmQTtpwUDyIbC9DnkP/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpU4s+mj; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ZRKWgB9XDJGmM+xM4mGJ66Up4JioFB5EdpUKogR0ZsC7qM5e3cPB/kx/w99V3Yrf5+//zDFAM5nax4XhqxKBA1mBWNZQGkjchETNnfK6vGduC1yiB7eTS6BUrelmwoybUXVZtLx+ToAgIRTGKSLFfs2RDu+31eMgoaMVug7pg7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lJ6JIJZc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpU4s+mj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE7FC4CEF7;
-	Tue, 17 Mar 2026 09:04:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lJ6JIJZc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962F4C4CEF7;
+	Tue, 17 Mar 2026 09:04:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773738248;
-	bh=m5HgYoftBG0ijJF7JWYmyFv+uNLekjur0DF9b2Jpy8s=;
+	s=k20201202; t=1773738269;
+	bh=w492lbPZJ2Gu7Yvm34YT9uTKSyNcaRjWlLbuRFwhjt8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SpU4s+mjNUKQ1LsDTA29lFmsAsBHVDu4kqwxXpiBgvjUWMPeoZ4VkzOc2IlsNSKWW
-	 gB11JcYK5AXExolfBXmXuul97wMEWqNyzEw6lOJ84OgqCEvPigSHo6xm2AuIh8q872
-	 bilIbJnjXB2Y95wfF75srf/TPZjO8Rr0eyXAtX4V3YDOY6xrnTvWFK/KDm69mZlovb
-	 gj1fXbf0abGBYNS40dWa0t6pP5ZsY04C6aLy65MVEy+nxNYMLeH2n2P3Jmt/JCqZM6
-	 nj6GdNPSPv9OBYNGHz0KlIMSDcVEMmCYhW68h6eeGC3RFinBzrfJfsyBtge3dJgA1i
-	 AEBaCzGrh6Flg==
+	b=lJ6JIJZcOA7lH/7Y0zZyChalvcOPQyVMnh69KB5DwNNn8KgfBlaP1zMHV2GnjrAcq
+	 Ft/ANWPO5tT+sJP881ykZ+SLAjGZSMyVHAA0h/pJXfQ4AGtkhr8ObOZxmoVXVKahY5
+	 XNUV5U7HllD0//dFtM7adjlsURRxKDu7jISMlsGp7MF8L0GfmJp0RHPM+337AmNNI4
+	 kv3PPLgST4Flu7/ZWkPsgRrYrJcNghfgglWt/uW+g1y5f1RwiKfneZ8wt/OHDeYd+R
+	 Nknct1pdgJukeYAO45d3eqHrmmeMeGstyIF2DuXk09Q3OHbnTOl0W4bLYk4BFuIGjf
+	 y1+fY8ib3QNdg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w2QLN-00000002kPU-1aFq;
-	Tue, 17 Mar 2026 09:04:05 +0000
-Date: Tue, 17 Mar 2026 09:04:04 +0000
-Message-ID: <86se9y6d4r.wl-maz@kernel.org>
+	id 1w2QLj-00000002kPy-1jb2;
+	Tue, 17 Mar 2026 09:04:27 +0000
+Date: Tue, 17 Mar 2026 09:04:27 +0000
+Message-ID: <86qzpi6d44.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Vincent Donnefort" <vdonnefort@google.com>,
-	"Steven Rostedt" <rostedt@goodmis.org>,
-	"Nathan Chancellor" <nathan@kernel.org>,
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	arnd@arndb.de,
+	nathan@kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	kernel-team@android.com
 Subject: Re: [PATCH v3] tracing: Generate undef symbols allowlist for simple_ring_buffer
-In-Reply-To: <501b2810-db63-4aa2-ac22-d3f1a99e9bfa@app.fastmail.com>
+In-Reply-To: <20260316100929.5402a335@gandalf.local.home>
 References: <20260316092845.3367411-1-vdonnefort@google.com>
-	<6d40c8c0-f00a-4031-bd94-7c0a417eb0cf@app.fastmail.com>
-	<501b2810-db63-4aa2-ac22-d3f1a99e9bfa@app.fastmail.com>
+	<20260316100929.5402a335@gandalf.local.home>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -58,21 +57,31 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: arnd@arndb.de, vdonnefort@google.com, rostedt@goodmis.org, nathan@kernel.org, linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kernel-team@android.com
+X-SA-Exim-Rcpt-To: rostedt@goodmis.org, vdonnefort@google.com, arnd@arndb.de, nathan@kernel.org, linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Mar 2026 20:48:09 +0000,
-"Arnd Bergmann" <arnd@arndb.de> wrote:
+On Mon, 16 Mar 2026 14:09:29 +0000,
+Steven Rostedt <rostedt@goodmis.org> wrote:
 > 
-> On Mon, Mar 16, 2026, at 21:47, Arnd Bergmann wrote:
-> >
-> > This needs "__kmsan" as well, for these symbols:
-> >
+> On Mon, 16 Mar 2026 09:28:45 +0000
+> Vincent Donnefort <vdonnefort@google.com> wrote:
 > 
-> "__msan" of course, not "__kmsan".
+> > Compiler and tooling-generated symbols are difficult to maintain
+> > across all supported architectures. Make the allowlist more robust by
+> > replacing the harcoded list with a mechanism that automatically detects
+> > these symbols.
+> > 
+> > This mechanism generates a C function designed to trigger common
+> > compiler-inserted symbols.
+> > 
+> > Signed-off-by: Vincent Donnefort <vdonnefort@google.com>
+> > Reviewed-by: Nathan Chancellor <nathan@kernel.org>
+> > Tested-by: Nathan Chancellor <nathan@kernel.org>
+> 
+> I take it that Marc will take this?
 
-Folded that in the patch.
+Yup, now merged.
 
 Thanks,
 
