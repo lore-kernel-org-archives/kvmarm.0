@@ -1,194 +1,116 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966DB3803C4
-	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 18:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3522E377547;
+	Tue, 17 Mar 2026 20:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773772060; cv=none; b=IVPKSVRvP7/UHRzEf/zfhjzwv1ngWF0MXYl3c8gHl40rjrTcZeC+kMYx5PE1BcSCEa2Wew7kFIYxdnC+ONxxhMiel0eOChGP3ZmE2dX7T5QEtvMgEZDXyscNL9RyuO0r6FrPNt3DcbeIYOVP77YSj6O1SdQ2+hcq++/6e8L+Zl8=
+	t=1773778248; cv=none; b=KrURkwca28NzfqvavofrwQU/S6vSvB2seDEyjLrSNjMBxeGFfCRkUSJA25mVGoa6q6KYMc9T5tpY2hREsm2uCxjdbSaSMddWrQDtLoMDJFWAPCAZ9LHEECp9I9j54+HHR46a8DQazvlxRfHF6bfyQfv5eTYlBPU0uAqaeibCzS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773772060; c=relaxed/simple;
-	bh=KLoXmtiChwV85zt+st7WXwM0XYrxNAFXvQYAjOH5sg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DCxqlxn4HxFjYgoH+i9gSQ3D+kmcl0i5eQbYKXUyt8/qCUsZOYjuFJ+qGfcOPhEBaSUe+dgKKZ6r9f9zI3Cj4f5iIbQHRCvWARP6UUY9rFQDuMSdBcJeeOmG1yGN8ZAZThlai8WxnkFZLmI1xr9KTtr/eSuGZLHCuOh5XQlYHJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E30A01477;
-	Tue, 17 Mar 2026 11:27:31 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 64E173F7BD;
-	Tue, 17 Mar 2026 11:27:36 -0700 (PDT)
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH v2 2/2] KVM: arm64: nv: Expose shadow page tables in debugfs
-Date: Tue, 17 Mar 2026 18:26:38 +0000
-Message-ID: <20260317182638.1592507-3-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260317182638.1592507-1-weilin.chang@arm.com>
-References: <20260317182638.1592507-1-weilin.chang@arm.com>
+	s=arc-20240116; t=1773778248; c=relaxed/simple;
+	bh=+6Zxzezsh4eCjXwLVVqESoM+xpbSNtskzunvjvtmVS4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=oR5PBVXtNFh6xXOIuhY00bgupYsjs+XhFW5zdKDwSHmuRzCbzdoG9qL9oUD5MIryfo+hKu0p+Iix4QI29orfWGXjOmcQB9MWPyJ0GYNI+sj5NddHD4UuDeqDby4WbELaHi0opsrHNqYUMpjD66fEfx6STZhdCNjNNnqt3zYkCAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fm/OFvb3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fm/OFvb3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4581BC4CEF7;
+	Tue, 17 Mar 2026 20:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773778247;
+	bh=+6Zxzezsh4eCjXwLVVqESoM+xpbSNtskzunvjvtmVS4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Fm/OFvb3kneo1FQvzjrbM4a29y8Lg6tV6bE4YdXaD63RF6j7QB+x0VPQ4/xEWpMh7
+	 JJ3+JQkyuZTMErWYP8zrav6hdAXr8N2pCNW5RlxQsk3ungAe3t3KafvcdJFnnOfKcY
+	 UQ6Q9pb6UVLb+epNlNHNiezabsbl+cYxCnHy+7eETshs0vvAhetFeWh/qEm6bqM7yj
+	 /tqYm5ck0gzJgeDyPaaNiylQmV0eGjzAuC1XvWviz7t3YBVC772cVm6JLYcDCPSZ7U
+	 4X9U62OSJ5NxoEu8SPanJpuTYo1UugiqmDn2L4GncY4B+fXKdjyhMurhwhEDLhqJAK
+	 2dQDZzOZ7MKbg==
+From: Mark Brown <broonie@kernel.org>
+Subject: [PATCH v5 0/5] KVM: selftests: arm64: Improve diagnostics from
+ set_id_regs
+Date: Tue, 17 Mar 2026 20:10:33 +0000
+Message-Id: <20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADm1uWkC/4XNQW7DIBCF4atErEvFDGOwu+o9qiyADDZKY1cQo
+ VSR714StYqqLLz830jfXEXhnLiIt91VZK6ppGVu0b3sRJjcPLJMh9YCFXagsJfHepIunwzJwud
+ 2lJnHIp3LYWobe2/tYAZSEEQzvjLHdLn7H/vWUyrnJX/f31W4rb+yVhtyBankYCKrA3qwPb8fO
+ c/8+brkUdzoig8OgLY4bJyxGBEoEvj4xOkHhzBscbpxPjqyxEEj9E8c/XFGgTJbHDUuWI7UdeC
+ i1/+4dV1/AB+u2XC4AQAA
+X-Change-ID: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+To: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+ Oliver Upton <oupton@kernel.org>
+Cc: Ben Horgan <ben.horgan@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.15-dev-e1b5b
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2142; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=+6Zxzezsh4eCjXwLVVqESoM+xpbSNtskzunvjvtmVS4=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBpubVAnYutCrQRjOp77R0NgCeHPxRanQHwdmOwR
+ DrpStOs5AuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCabm1QAAKCRAk1otyXVSH
+ 0PX9B/sGWR9wpk5wsfDy2EW7SUKuf4HTffxuwpV9fXjDTWM4uQToawjfHjXJwKnxT94X8XhkSX7
+ pGM6H32UKO79M0fHBlG9jpLZOJiIcfYoaf5uEhniMfMEDD/z8W1y0+OuXtJ23Pd09RV7Fsu22wU
+ mBfwfeUfOSWflXWTER4r1cOz/HwrCGhLepDoBs3n2948rEwuS1qhnVEHsXWEBaFAVpUvnflt3vH
+ xFYzdvhAZYAN5ve8fRtBBj/wsykdzWZZ3Atpg4sAABcsyznXc21GLPs1OOheOTt//HIKEGWMYWt
+ ONNzPxUYc/rS3FDwcdNYHivyRcr6Nsk5hbO1Sj7SaBO2Q4bf
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 
-Exposing shadow page tables in debugfs improves the debugability and
-testability of NV. With this patch a new directory "nested" is created
-for each VM created if the host is NV capable. Within the directory each
-valid s2 mmu will have its shadow page table exposed as a readable file
-with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
-creation and removal of the files happen at the points when an s2 mmu
-becomes valid, or the context it represents change. In the future the
-"nested" directory can also hold other NV related information.
+While debugging issues related to aarch64 only systems I ran into
+speedbumps due to the lack of detail in the results reported when the
+guest register read and reset value preservation tests were run, they
+generated an immediately fatal assert without indicating which register
+was being tested. Update these tests to report a result per register,
+making it much easier to see what the problem being reported is.
 
-This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
+A similar, though less severe, issue exists with the validation of the
+individual bitfields in registers due to the use of immediately fatal
+asserts. Update those asserts to be standard kselftest reports.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Reviewed-by: Sebastian Ene <sebastianene@google.com>
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
+Finally we have a fix for spurious errors on some NV systems.
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  9 +++++++++
- arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
- arch/arm64/kvm/nested.c           |  6 +++++-
- arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
- 4 files changed, 45 insertions(+), 1 deletion(-)
+Changes in v5:
+- Rebase onto v7.0-rc1.
+- Link to v4: https://patch.msgid.link/20260106-kvm-arm64-set-id-regs-aarch64-v4-0-c7ef4551afb3@kernel.org
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5d5a3bbdb95e..52977c9a11c3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -217,6 +217,10 @@ struct kvm_s2_mmu {
- 	 */
- 	bool	nested_stage2_enabled;
- 
-+#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-+	struct dentry *shadow_pt_debugfs_dentry;
-+#endif
-+
- 	/*
- 	 * true when this MMU needs to be unmapped before being used for a new
- 	 * purpose.
-@@ -405,6 +409,11 @@ struct kvm_arch {
- 	 * the associated pKVM instance in the hypervisor.
- 	 */
- 	struct kvm_protected_vm pkvm;
-+
-+#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-+	/* Nested virtualization info */
-+	struct dentry *debugfs_nv_dentry;
-+#endif
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index d968aca0461a..01e9c72d6aa7 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
- 
- #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
- void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
-+void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
-+void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
- #else
- static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
-+static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
-+static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
- #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
- 
- #endif /* __ASSEMBLER__ */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index eeea5e692370..31d74ed8449e 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
- 
- 	/* Make sure we don't forget to do the laundry */
--	if (kvm_s2_mmu_valid(s2_mmu))
-+	if (kvm_s2_mmu_valid(s2_mmu)) {
-+		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
- 		s2_mmu->pending_unmap = true;
-+	}
- 
- 	/*
- 	 * The virtual VMID (modulo CnP) will be used as a key when matching
-@@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
- 	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
- 	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
- 
-+	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
-+
- out:
- 	atomic_inc(&s2_mmu->refcnt);
- 
-diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-index 98763b291956..aebbbad85d38 100644
---- a/arch/arm64/kvm/ptdump.c
-+++ b/arch/arm64/kvm/ptdump.c
-@@ -10,12 +10,14 @@
- #include <linux/kvm_host.h>
- #include <linux/seq_file.h>
- 
-+#include <asm/cpufeature.h>
- #include <asm/kvm_mmu.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/ptdump.h>
- 
- #define MARKERS_LEN		2
- #define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-+#define S2FNAMESZ	sizeof("0x0123456789abcdef-0x0123456789abcdef-s2-disabled")
- 
- struct kvm_ptdump_guest_state {
- 	struct kvm_s2_mmu	*mmu;
-@@ -277,6 +279,28 @@ static const struct file_operations kvm_pgtable_levels_fops = {
- 	.release	= kvm_pgtable_debugfs_close,
- };
- 
-+void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
-+{
-+	struct dentry *dent;
-+	char file_name[S2FNAMESZ];
-+
-+	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
-+		 mmu->tlb_vttbr,
-+		 mmu->tlb_vtcr,
-+		 mmu->nested_stage2_enabled ? "en" : "dis");
-+
-+	dent = debugfs_create_file(file_name, 0400,
-+				   mmu->arch->debugfs_nv_dentry, mmu,
-+				   &kvm_ptdump_guest_fops);
-+
-+	mmu->shadow_pt_debugfs_dentry = dent;
-+}
-+
-+void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu)
-+{
-+	debugfs_remove(mmu->shadow_pt_debugfs_dentry);
-+}
-+
- void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
- {
- 	debugfs_create_file("stage2_page_tables", 0400, kvm->debugfs_dentry,
-@@ -285,4 +309,7 @@ void kvm_s2_ptdump_create_debugfs(struct kvm *kvm)
- 			    &kvm->arch.mmu, &kvm_pgtable_range_fops);
- 	debugfs_create_file("stage2_levels", 0400, kvm->debugfs_dentry,
- 			    &kvm->arch.mmu, &kvm_pgtable_levels_fops);
-+	if (cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-+		kvm->arch.debugfs_nv_dentry =
-+			debugfs_create_dir("nested", kvm->debugfs_dentry);
- }
--- 
-2.43.0
+Changes in v4:
+- Correct check for 32 bit ID registers.
+- Link to v3: https://patch.msgid.link/20251219-kvm-arm64-set-id-regs-aarch64-v3-0-bfa474ec3218@kernel.org
+
+Changes in v3:
+- Rebase onto v6.19-rc1.
+- Link to v2: https://patch.msgid.link/20251114-kvm-arm64-set-id-regs-aarch64-v2-0-672f214f41bf@kernel.org
+
+Changes in v2:
+- Add a fix for spurious failures with 64 bit only guests.
+- Link to v1: https://patch.msgid.link/20251030-kvm-arm64-set-id-regs-aarch64-v1-0-96fe0d2b178e@kernel.org
+
+---
+Mark Brown (5):
+      KVM: selftests: arm64: Report set_id_reg reads of test registers as tests
+      KVM: selftests: arm64: Report register reset tests individually
+      KVM: selftests: arm64: Make set_id_regs bitfield validatity checks non-fatal
+      KVM: selftests: arm64: Skip all 32 bit IDs when set_id_regs is aarch64 only
+      KVM: selftests: arm64: Use is_aarch32_id_reg() in test_vm_ftr_id_regs()
+
+ tools/testing/selftests/kvm/arm64/set_id_regs.c | 159 ++++++++++++++++++------
+ 1 file changed, 119 insertions(+), 40 deletions(-)
+---
+base-commit: 6de23f81a5e08be8fbf5e8d7e9febc72a5b5f27f
+change-id: 20251028-kvm-arm64-set-id-regs-aarch64-ebb77969401c
+
+Best regards,
+--  
+Mark Brown <broonie@kernel.org>
 
