@@ -1,53 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027C639B4AF;
-	Tue, 17 Mar 2026 08:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B930398916
+	for <kvmarm@lists.linux.dev>; Tue, 17 Mar 2026 08:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773735638; cv=none; b=Co0nARFpAYBuH5+FSiidJ7H8eC6hVOZD+S9QnFsk+UAB0zxH805lQP+ik8Hv5Gy7tsndMTkNfggVMA51WXPKC7mU5uclGICw1Xq3ORMH2IZMQ2JaY+2HpchiLDg9AsV+tjTpMBfrc7c//1Fi1eTQXMGH/6DyOv43lPd2u+pf/bs=
+	t=1773735828; cv=none; b=nr3Ulo9qiNEu2zK5f5//tDDiXYF+nXxN+/45CIqWP0RqicvwNwIN0TVjI392gumtWYAAyHfmvm5UHLFvT0oUe2YSZRe/u+NPhnihXLk28Dgm+CPJLO0OPOnSCOq9cmX6nPRV+TH9yN5RrCDyu15WC3DjpSMYJy/4RikIEfS5GwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773735638; c=relaxed/simple;
-	bh=VQNGXk1va0JojLCa5FTgduK6/uhqV70yDcBBQE/5J40=;
+	s=arc-20240116; t=1773735828; c=relaxed/simple;
+	bh=a29QAEXIGssouyozNOpQMVvz8FzM/vNaQNbQJrxfEYk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cJRWw8IhzAZ5T5qYVNZmbH3S4ur47jgR/gD/lHcX/MCr1sD0YDVd9+XAmEmOYVIOTi/I5trtF/LWkidY0YgfSX9fhQFD5BuKjvJlWUWgG+tWmc04GjwyZQRQJpWzw7qPMvcXiBjTd18JF80iR1owiiFT6cPGB26qyCldJ+sjgdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L2kTCLKJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=ROGIvhH4T7dtKKse+SJ0Uu535/6+vQn68eIZjSMIs93Fbdrf8iEysozlxge+9pY/nMgf6DjvnRoBw7kBnhzbHP5yWXiQr6uGZviaYx9CcZP/G39injXNe6/NajGpQD0JjHVSNlXlNTdn/ABUC2y3LPfC/csE4MPyU+XhhD431Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKrBrRlg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L2kTCLKJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 852C1C2BC9E;
-	Tue, 17 Mar 2026 08:20:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKrBrRlg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9501C2BCB0;
+	Tue, 17 Mar 2026 08:23:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773735637;
-	bh=VQNGXk1va0JojLCa5FTgduK6/uhqV70yDcBBQE/5J40=;
+	s=k20201202; t=1773735827;
+	bh=a29QAEXIGssouyozNOpQMVvz8FzM/vNaQNbQJrxfEYk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L2kTCLKJqOS5HvcFUgK480t6dsocDP43k7dp9YZ4h3bO+TaOUQ6TxqzWDPQSy9sAg
-	 cgc6Vxu2E2kx/JdVdZNzd7o8fJ5MU/DyPHfI7J8H188DI4B8Fi568eGIrIPWsEAcn1
-	 ir9C2S5TKU6Bo8nUHWwEnSkI52KvNSLf/ws0gqR81LBB4+tIjiRKCIzNvpTrYf6N1w
-	 ZbCFYayAtr1aW5t6CQBLNeMTLQFNk14XqoLUelLRdytMfYZeWGCtB02ZalIGu/fnJe
-	 43EW4CDNsVsoYFwUdcUs9TDhGBT1D9uT3l3O8v0tnLXHgH1GXXK0Ur2uLaCvacoo7k
-	 U4HFMjgCFGFxA==
+	b=kKrBrRlg2nhfZpCWNy1iNa2WlY9Wtv1i55T8nPtDy8VCdv4zNkVTSPPhgp1DfuhqH
+	 6M+u0hHC8fjox1sArJoq4PuEvh3rksh7Kc+0uUDF6wnjJSVeDWDRIIzZOkJoH9APcL
+	 JHjlaTPYECqXJGRiSgFCSrTfJJug2/tfwnfD8DJrfIS14MqejoJOBlSRs+L+bcYk2H
+	 icxg3DzfUIuC2fq4ALW7Mi8ea0Y35UEY8NSRjp2I4G+bEU/a75kl+15tFp/R9ut6fC
+	 GLol39g7ByGK6oQcOcY8X4iosNTV34oIAC4+RUcdhmpz4cTp5K6PPC7XsBlLfgoR+Z
+	 NsHoC3xrTfciQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w2PfG-00000002jEv-3Wqu;
-	Tue, 17 Mar 2026 08:20:34 +0000
-Date: Tue, 17 Mar 2026 08:20:34 +0000
-Message-ID: <86v7eu6f59.wl-maz@kernel.org>
+	id 1w2PiL-00000002jJL-3pGs;
+	Tue, 17 Mar 2026 08:23:46 +0000
+Date: Tue, 17 Mar 2026 08:23:45 +0000
+Message-ID: <86tsue6ezy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oupton@kernel.org>,
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
 	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>,
-	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <linux-arm-kernel@lists.infradead.org>,
-	"KERNEL VIRTUAL MACHINE FOR ARM64 KVM/arm64" <kvmarm@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/10] KVM: arm64: Adopt scoped resource management (guard) for EL1 and EL2
-In-Reply-To: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
-References: <20260316-tabba-el2_guard-v1-0-456875a2c6db@google.com>
+	Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 00/17] KVM: arm64: More user_mem_abort() rework
+In-Reply-To: <CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com>
+References: <20260316175451.1866175-1-maz@kernel.org>
+	<CA+EHjTyBtM5idopKisJf_e10aRifubtKEpbkjkEnmrOqa9-SPw@mail.gmail.com>
+	<CA+EHjTy=MCgeKoi9sA_eDuiODucOdMP5m4CAciUW=rStgJggmQ@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -59,40 +60,52 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 16 Mar 2026 17:35:21 +0000,
+On Mon, 16 Mar 2026 20:33:03 +0000,
 Fuad Tabba <tabba@google.com> wrote:
 > 
-> Hi everyone,
+> On Mon, 16 Mar 2026 at 20:26, Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Mon, 16 Mar 2026 at 17:55, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > Piqued by Fuad's initial set of patches[1] splitting user_mem_abort()
+> > > into more "edible" functions, I've added my on take on top of it with
+> > > a few goals in mind:
+> > >
+> > > - contextualise the state by splitting kvm_s2_fault into more granular
+> > >   structures
+> > >
+> > > - reduce the amount of state that is visible and/or mutable by any
+> > >   single function
+> > >
+> > > - reduce the number of variable that simply cache state that is
+> > >   already implicitly available (and often only a helper away)
+> > >
+> > > I find the result reasonably attractive, and throwing it at a couple
+> > > of machines didn't result in anything out of the ordinary.
+> > >
+> > > For those interested, I have stashed a branch at [2], and I'd
+> > > appreciate some feedback on the outcome.
+> > >
+> > > [1] https://lore.kernel.org/all/20260306140232.2193802-1-tabba@google.com/
+> > > [2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=hack/user_mem_abort-rework
+> >
+> > The series in hack/user_mem_abort-rework is different from this one.
+> > Here are the first few patches:
 > 
-> I stumbled upon a lock leak while reviewing Sebastien's recent GIC Hardening
-> series [1] on an early error path. It reminded me that we've run into this exact
-> kind of bug pretty often while working on pKVM. Since we're going to be
-> hopefully upstream even more pKVM code soon, I'd like to try and fix this
-> pattern once and for all.
+> And I just realized it's because they're based on _my_ patches ... doh! :D
 
-I'm of the opposite opinion. I'd rather convert things as code gets
-modified, because this otherwise makes backporting patches a real pain
-(we have been through that exercise with the irq stack, and it wasn't
-an enjoyable experience).
+I thought I was clear when I wrote "I've added my on take on top of
+it", but maybe not. In any case, I didn't feel the need to redo what
+you had already done -- I don't think I'd have come up with something
+better.
 
-So while I'm not opposed to this in general, I'd rather see it as a
-prefix for new features, instead of a standalone series.
-
-[...]
-
-> There are definitely other parts of the KVM codebase that could benefit from
-> this (especially the vGIC), but I'm stopping here for now to see what everyone
-> thinks of the approach before touching anything else.
-
-The vgic is specially difficult to convert because of some of the
-constructs that take a lock in a function and release it in another,
-defeating the scope-based locking.
-
-I'll have a look at the series anyway.
+In any case, I'd appreciate your feedback!
 
 Thanks,
 
