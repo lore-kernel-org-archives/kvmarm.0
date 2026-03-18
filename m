@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016364035B1;
-	Wed, 18 Mar 2026 15:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F65405ACF;
+	Wed, 18 Mar 2026 15:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849383; cv=none; b=TvXeRZH9sTE0cic1Wz4wYywSu0OW1nxpMb6cqIxTKKsQtl0HKbHyLLfvcFqqxH4yqBanhk6ZEc3J/rG5j3Lgynk7yhxX+GdP5nnCuuqzgNRLgaUs8jt5aJzcliYmOlj2pnO6BThXqQtH8sbvB/hA++0PbZULckjO87qLO7MDL74=
+	t=1773849386; cv=none; b=GjqEk64I8U9vxAet80e/+iBQ/ri5RUCLMiXs8tbLy6HJKuA2CfXUJV0gR1UYwj+2Mv5+jA/pzYiNxDjo5hSJAnDot7Lw32RAu0OHQUoDIxoMmT687E+zPqxY1Hu9YMBOruH5BLQvHNQBsPC5y0MXSpIVqTwbkKr5qWxZcxG9xFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849383; c=relaxed/simple;
-	bh=sjyt2KfEy18ERyFrbFm8s72J91ttAOYjtkGSXkj0DTQ=;
+	s=arc-20240116; t=1773849386; c=relaxed/simple;
+	bh=Ai7XUWFGWwONd9zlpqRkFLNX67JxfNFg4Qa/qHT3lKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q/K0SQCg6wO9+8Rh5AOYV8CCAufoT4ZcweuXImq8hA33V8Nm8qKxaq6gxA1ZVl1Wjnyc8uJ3RpwugAb2eAVFzEKzq5BWKduB5U3CAbs4z49KxlsyVo1SOLUkpqnq9XWmU9dBYquEY8r/1xfQxiVNfC3HloIObXXeDqpVjroqIDg=
+	 MIME-Version; b=IEGK+fBM1CTp5MoXHMBPtjiQC47YxoI1zJ0NH5poE+z0JQoOIEPhUXg68lb3xqiqT255HegOTYPUaUGsUTO+KzEcSJp01HfsiFLzA/3PDCHM2GcBfWxlt8NKy+RhmY+HEnODV03eEF72Hc+5OgWQr2HRoX5i0rQjgE4LrEKINNM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 204DA2008;
-	Wed, 18 Mar 2026 08:56:12 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87C17201B;
+	Wed, 18 Mar 2026 08:56:15 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DC2553F73B;
-	Wed, 18 Mar 2026 08:56:14 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 809DF3F73B;
+	Wed, 18 Mar 2026 08:56:18 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 31/48] KVM: arm64: WARN on injected undef exceptions
-Date: Wed, 18 Mar 2026 15:53:55 +0000
-Message-ID: <20260318155413.793430-32-steven.price@arm.com>
+Subject: [PATCH v13 32/48] arm64: Don't expose stolen time for realm guests
+Date: Wed, 18 Mar 2026 15:53:56 +0000
+Message-ID: <20260318155413.793430-33-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,30 +57,53 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM doesn't allow injection of a undefined exception into a realm
-guest. Add a WARN to catch if this ever happens.
+It doesn't make much sense as a realm guest wouldn't want to trust the
+host. It will also need some extra work to ensure that KVM will only
+attempt to write into a shared memory region. So for now just disable
+it.
 
-Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changes since v6:
- * if (x) WARN(1, ...) makes no sense, just WARN(x, ...)!
+Changes since v7:
+ * Update the documentation to add a note about stolen time being
+   unavailable in a realm.
 ---
- arch/arm64/kvm/inject_fault.c | 1 +
- 1 file changed, 1 insertion(+)
+ Documentation/virt/kvm/api.rst | 3 +++
+ arch/arm64/kvm/arm.c           | 5 ++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 6492397b73d7..613f223bc7a3 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -327,6 +327,7 @@ void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
-+	WARN(vcpu_is_rec(vcpu), "Unexpected undefined exception injection to REC");
- 	if (vcpu_el1_is_32bit(vcpu))
- 		inject_undef32(vcpu);
- 	else
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index bc180c853faf..70911fe6d435 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -9240,6 +9240,9 @@ is supported, than the other should as well and vice versa.  For arm64
+ see Documentation/virt/kvm/devices/vcpu.rst "KVM_ARM_VCPU_PVTIME_CTRL".
+ For x86 see Documentation/virt/kvm/x86/msr.rst "MSR_KVM_STEAL_TIME".
+ 
++Note that steal time accounting is not available when a guest is running
++within a Arm CCA realm (machine type KVM_VM_TYPE_ARM_REALM).
++
+ 8.25 KVM_CAP_S390_DIAG318
+ -------------------------
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 61182eb0cf70..7d92ddb06460 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -469,7 +469,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = system_supports_mte();
+ 		break;
+ 	case KVM_CAP_STEAL_TIME:
+-		r = kvm_arm_pvtime_supported();
++		if (kvm_is_realm(kvm))
++			r = 0;
++		else
++			r = kvm_arm_pvtime_supported();
+ 		break;
+ 	case KVM_CAP_ARM_EL1_32BIT:
+ 		r = cpus_have_final_cap(ARM64_HAS_32BIT_EL1);
 -- 
 2.43.0
 
