@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9533AEF56;
-	Wed, 18 Mar 2026 15:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828C53FD13F;
+	Wed, 18 Mar 2026 15:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849336; cv=none; b=Ed9f9VyEwH+wVwMZqKRNqlSedxKg8NrudfyE+CUHpncKDUCbP0IggwhzoXVebrddBIzTGgDFHzbsszlWouvTB0lAXpCAFJsH8WtndmnNIywmXS6H61AgJOcmPGArJMLXbl3tsn3mMpkbkZvpaog9gziPN0ptOq2xccHcklyPxF0=
+	t=1773849342; cv=none; b=WP1736Z670W5dGhDbBMAyddiU5xK51kHjJfi57fUAAO7MzsUe6/2q89L/LlwA/i8cEXFy9fdehnA/kqOQpvIk8iTF5/AixwPaOgOFhEhh6snF+SjRhQkGpgcyzwcfEZfl5Cc/1A+w1YJBY3bnYhTL59yhQlEcSYGP8K8EmB0/0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849336; c=relaxed/simple;
-	bh=FnUTZKKEgfABEhUpKb0BJ5Dy2I1TbM9ijO68dNQ4Rvs=;
+	s=arc-20240116; t=1773849342; c=relaxed/simple;
+	bh=IgxguDRZIt/vJ7+F1A73/Iq0uuGrubZAU+ESrJHOYcA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UuzYn46rrlKLWP6k0zFkxTItXKRdiCWVzr8vhCAorQQUCef3IXX7YJRsJuU5m9ROFqatVuVyFJ1R0wM4VesEdP1sa5y6znsFK7edh9Qighy40j7/0+gbS3aOZkGCOOPfDfpqSWZor2B3P/bSN39qhmVa9tB+Mgz7Gp6vjLQxDuQ=
+	 MIME-Version; b=XVI1/s1/gs1kwR3+b9NC1fvlVSXnjLqYrvEgzFh5SlF285K6CQ/9mROtMNZZ3GS0PhJ5iMxURN+PZICRohOVul7Iz9Xkx/R67ilUYLrCYJyS4GeTxcdr/qX+4eBSc4I8e13cYbRJvL4cYqnXixGg+jSvBD4u0ACZzv+4eihLXGo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EEC711C2B;
-	Wed, 18 Mar 2026 08:55:25 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7D9C02050;
+	Wed, 18 Mar 2026 08:55:29 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E6E83F73B;
-	Wed, 18 Mar 2026 08:55:28 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 536EA3F73B;
+	Wed, 18 Mar 2026 08:55:32 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 18/48] arm64: RMI: Support for the VGIC in realms
-Date: Wed, 18 Mar 2026 15:53:42 +0000
-Message-ID: <20260318155413.793430-19-steven.price@arm.com>
+Subject: [PATCH v13 19/48] KVM: arm64: Support timers in realm RECs
+Date: Wed, 18 Mar 2026 15:53:43 +0000
+Message-ID: <20260318155413.793430-20-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,79 +57,111 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The RMM provides emulation of a VGIC to the realm guest. With RMM v2.0
-the registers are passed in the system registers so this works similar
-to a normal guest, but kvm_arch_vcpu_put() need reordering to early out,
-and realm guests don't support GICv2 even if the host does.
+The RMM keeps track of the timer while the realm REC is running, but on
+exit to the normal world KVM is responsible for handling the timers.
+
+A later patch adds the support for propagating the timer values from the
+exit data structure and calling kvm_realm_timers_update().
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-Changes from v12:
- * GIC registers are now passed in the system registers rather than via
-   rec_entry/rec_exit which removes most of the changes.
-Changes from v11:
- * Minor changes to align with the previous patches. Note that the VGIC
-   handling will change with RMM v2.0.
-Changes from v10:
- * Make sure we sync the VGIC v4 state, and only populate valid lrs from
-   the list.
-Changes from v9:
- * Copy gicv3_vmcr from the RMM at the same time as gicv3_hcr rather
-   than having to handle that as a special case.
-Changes from v8:
- * Propagate gicv3_hcr to from the RMM.
-Changes from v5:
- * Handle RMM providing fewer GIC LRs than the hardware supports.
+Changes since v12:
+ * Adapt to upstream changes.
+Changes since v11:
+ * Drop the kvm_is_realm() check from timer_set_offset(). We already
+   ensure that the offset is 0 when calling the function.
+Changes since v10:
+ * KVM_CAP_COUNTER_OFFSET is now already hidden by a previous patch.
+Changes since v9:
+ * No need to move the call to kvm_timer_unblocking() in
+   kvm_timer_vcpu_load().
+Changes since v7:
+ * Hide KVM_CAP_COUNTER_OFFSET for realm guests.
 ---
- arch/arm64/kvm/arm.c            | 11 ++++++++---
- arch/arm64/kvm/vgic/vgic-init.c |  2 +-
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/arch_timer.c  | 28 +++++++++++++++++++++++++---
+ include/kvm/arm_arch_timer.h |  2 ++
+ 2 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 8c50ebd9fba0..45eff4c41cde 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -770,19 +770,24 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_put);
- 	}
- 
-+	kvm_timer_vcpu_put(vcpu);
-+	kvm_vgic_put(vcpu);
-+
-+	vcpu->cpu = -1;
-+
-+	if (vcpu_is_rec(vcpu))
-+		return;
-+
- 	kvm_vcpu_put_debug(vcpu);
- 	kvm_arch_vcpu_put_fp(vcpu);
- 	if (has_vhe())
- 		kvm_vcpu_put_vhe(vcpu);
--	kvm_timer_vcpu_put(vcpu);
--	kvm_vgic_put(vcpu);
- 	kvm_vcpu_pmu_restore_host(vcpu);
- 	if (vcpu_has_nv(vcpu))
- 		kvm_vcpu_put_hw_mmu(vcpu);
- 	kvm_arm_vmid_clear_active();
- 
- 	vcpu_clear_on_unsupported_cpu(vcpu);
--	vcpu->cpu = -1;
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 600f250753b4..2f2b4befb448 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -453,6 +453,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ 			    timer_ctx);
  }
  
- static void __kvm_arm_vcpu_power_off(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index 9b3091ad868c..9050e556d11f 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -82,7 +82,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	 * the proper checks already.
- 	 */
- 	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
--		!kvm_vgic_global_state.can_emulate_gicv2)
-+	    (!kvm_vgic_global_state.can_emulate_gicv2 || kvm_is_realm(kvm)))
- 		return -ENODEV;
++void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
++	int i;
++
++	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
++		struct arch_timer_context *timer = &arch_timer->timers[i];
++		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
++		bool level = kvm_timer_irq_can_fire(timer) && status;
++
++		if (level != timer->irq.level)
++			kvm_timer_update_irq(vcpu, level, timer);
++	}
++}
++
+ /* Only called for a fully emulated timer */
+ static void timer_emulate(struct arch_timer_context *ctx)
+ {
+@@ -1056,7 +1071,7 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
  
- 	/*
+ 	ctxt->timer_id = timerid;
+ 
+-	if (!kvm_vm_is_protected(vcpu->kvm)) {
++	if (!kvm_vm_is_protected(vcpu->kvm) && !kvm_is_realm(vcpu->kvm)) {
+ 		if (timerid == TIMER_VTIMER)
+ 			ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+ 		else
+@@ -1087,7 +1102,7 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 		timer_context_init(vcpu, i);
+ 
+ 	/* Synchronize offsets across timers of a VM if not already provided */
+-	if (!vcpu_is_protected(vcpu) &&
++	if (!vcpu_is_protected(vcpu) && !kvm_is_realm(vcpu->kvm) &&
+ 	    !test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+ 		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+ 		timer_set_offset(vcpu_ptimer(vcpu), 0);
+@@ -1561,6 +1576,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 		return -EINVAL;
+ 	}
+ 
++	/*
++	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
++	 * us setting the LR.HW bit in the VGIC.
++	 */
++	if (vcpu_is_rec(vcpu))
++		return 0;
++
+ 	get_timer_map(vcpu, &map);
+ 
+ 	ret = kvm_vgic_map_phys_irq(vcpu,
+@@ -1692,7 +1714,7 @@ int kvm_vm_ioctl_set_counter_offset(struct kvm *kvm,
+ 	if (offset->reserved)
+ 		return -EINVAL;
+ 
+-	if (kvm_vm_is_protected(kvm))
++	if (kvm_vm_is_protected(kvm) || kvm_is_realm(kvm))
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm->lock);
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index 7310841f4512..bab0daafc6b1 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -111,6 +111,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ 
++void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
++
+ u64 kvm_phys_timer_read(void);
+ 
+ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
 -- 
 2.43.0
 
