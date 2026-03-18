@@ -1,360 +1,191 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48EFF3DA7C9
-	for <kvmarm@lists.linux.dev>; Wed, 18 Mar 2026 14:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076083DE42D
+	for <kvmarm@lists.linux.dev>; Wed, 18 Mar 2026 14:43:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773843742; cv=none; b=WAn5Mcx2rWIjarQt8IZWPu4FvxWvdnSlzw/lrmEfRtckljtsS0trb951V1juYMfI0EDPJ1cDmUO+WoSUzZP4ibWy/6+Ab2N6orzLlr8/N1yvB/bDpaACt2qgkafk8eHHNIaEvqLT6jyLmx42X2gTHhVoHXtT5zSCHpP4DJlNBzY=
+	t=1773845009; cv=none; b=L2o29pvPorcTCWQ9tTwVC+Ry+61fzpTLD1haAKQOAtOdSHgZfj7+0wKqE1yURMGhJwK+JH6bVhMVvORd7g8IglihW8Br8pxZGrSTdiQlkAiohlS64exNTGADI6LHF6PxNMiqffTREZ2aSjPX/Wsy3d45CZ2ixwfzjwfhBs2AWMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773843742; c=relaxed/simple;
-	bh=BDGDdezlUPAhmGAIs/sF+7LbCPt4PMPz11e+6k1Cixw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ecfGQAlp6W1TN8l3i4VrX+wOZijv9TRkC9gr0S94USCzTgTqD9oXSo7ek6l325c33zHybOrw3jzC/xZbRZiVnLvWQlbhBV24vLVBKBvNEOZM1pTpJsyk4dKH5o+0TMysScFqaVqEteQcKFbfxyQccxlkAV8PbyFJ7b5oCIdzhbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 809D11BF7;
-	Wed, 18 Mar 2026 07:22:12 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 71AB83F778;
-	Wed, 18 Mar 2026 07:22:17 -0700 (PDT)
-Date: Wed, 18 Mar 2026 14:22:15 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 09/17] KVM: arm64: Move VMA-related information to
- kvm_s2_fault_vma_info
-Message-ID: <20260318142215.GB3915656@e124191.cambridge.arm.com>
-References: <20260316175451.1866175-1-maz@kernel.org>
- <20260316175451.1866175-10-maz@kernel.org>
+	s=arc-20240116; t=1773845009; c=relaxed/simple;
+	bh=DbR+zohV4iQi/RXbRDYT6/mRRdP2EnN/6PpEIDt2Vds=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oNBinRD863Lfqd4sTChxRW77VaXLCuTb0ERf2aiDRhpRbR+z2uRYu3+oRNAFvOcrIpy46N8XneoFwExfLNg3OSOgD7OhHT+aB4vAb2BvbUjkIQbXQYFkKkvSSTFod7YKzHtvijXWpOlYgrSRyRgcsO+FmqelufOUY9Ny6O8wVKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bZkg58T9; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bZkg58T9"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773845002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+aEDVNqb9xxPM5wo/zpqSuDIPCsG6efM35ChSAziaog=;
+	b=bZkg58T9gxZLUS9ENazMqngeY9Fv3/bvzoFx7bf51D2TXlL8USBJT94QDac+cv9WEKXe0j
+	bOo+MoYM5hK823uh8VZcpz+IZaJgJPXE2ujUT9e0bS6fLqiGuiFDmM9lMLHzI8zmuOMHen
+	2bx57rLRl8h1V28/ePuldSwDyNyXeT0=
+From: Zenghui Yu <zenghui.yu@linux.dev>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Cc: maz@kernel.org,
+	oupton@kernel.org,
+	joey.gouly@arm.com,
+	suzuki.poulose@arm.com,
+	"Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
+Subject: [PATCH] KVM: arm64: Remove @arch from __load_stage2()
+Date: Wed, 18 Mar 2026 22:43:05 +0800
+Message-ID: <20260318144305.56831-1-zenghui.yu@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260316175451.1866175-10-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 16, 2026 at 05:54:42PM +0000, Marc Zyngier wrote:
-> Mecanically extract a bunch of VMA-related fields from kvm_s2_fault
-Mechanically
-> and move them to a new kvm_s2_fault_vma_info structure.
-> 
-> This is not much, but it already allows us to define which functions
-> can update this structure, and which ones are pure consumers of the
-> data. Those in the latter camp are updated to take a const pointer
-> to that structure.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/mmu.c | 113 +++++++++++++++++++++++--------------------
->  1 file changed, 61 insertions(+), 52 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index abe239752c696..a5b0dd41560f6 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1710,20 +1710,23 @@ static short kvm_s2_resolve_vma_size(const struct kvm_s2_fault_desc *s2fd,
->  	return vma_shift;
->  }
->  
-> +struct kvm_s2_fault_vma_info {
-> +	unsigned long	mmu_seq;
-> +	long		vma_pagesize;
-> +	vm_flags_t	vm_flags;
-> +	gfn_t		gfn;
-> +	bool		mte_allowed;
-> +	bool		is_vma_cacheable;
-> +};
-> +
->  struct kvm_s2_fault {
->  	bool writable;
-> -	bool mte_allowed;
-> -	bool is_vma_cacheable;
->  	bool s2_force_noncacheable;
-> -	unsigned long mmu_seq;
-> -	gfn_t gfn;
->  	kvm_pfn_t pfn;
->  	bool logging_active;
->  	bool force_pte;
-> -	long vma_pagesize;
->  	enum kvm_pgtable_prot prot;
->  	struct page *page;
-> -	vm_flags_t vm_flags;
->  };
->  
->  static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
-> @@ -1732,7 +1735,8 @@ static bool kvm_s2_fault_is_perm(const struct kvm_s2_fault_desc *s2fd)
->  }
->  
->  static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
-> -				     struct kvm_s2_fault *fault)
-> +				     struct kvm_s2_fault *fault,
-> +				     struct kvm_s2_fault_vma_info *s2vi)
->  {
->  	struct vm_area_struct *vma;
->  	struct kvm *kvm = s2fd->vcpu->kvm;
-> @@ -1745,20 +1749,20 @@ static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
->  		return -EFAULT;
->  	}
->  
-> -	fault->vma_pagesize = BIT(kvm_s2_resolve_vma_size(s2fd, vma, &fault->force_pte));
-> +	s2vi->vma_pagesize = BIT(kvm_s2_resolve_vma_size(s2fd, vma, &fault->force_pte));
->  
->  	/*
->  	 * Both the canonical IPA and fault IPA must be aligned to the
->  	 * mapping size to ensure we find the right PFN and lay down the
->  	 * mapping in the right place.
->  	 */
-> -	fault->gfn = ALIGN_DOWN(s2fd->fault_ipa, fault->vma_pagesize) >> PAGE_SHIFT;
-> +	s2vi->gfn = ALIGN_DOWN(s2fd->fault_ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
->  
-> -	fault->mte_allowed = kvm_vma_mte_allowed(vma);
-> +	s2vi->mte_allowed = kvm_vma_mte_allowed(vma);
->  
-> -	fault->vm_flags = vma->vm_flags;
-> +	s2vi->vm_flags = vma->vm_flags;
->  
-> -	fault->is_vma_cacheable = kvm_vma_is_cacheable(vma);
-> +	s2vi->is_vma_cacheable = kvm_vma_is_cacheable(vma);
->  
->  	/*
->  	 * Read mmu_invalidate_seq so that KVM can detect if the results of
-> @@ -1768,39 +1772,40 @@ static int kvm_s2_fault_get_vma_info(const struct kvm_s2_fault_desc *s2fd,
->  	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
->  	 * with the smp_wmb() in kvm_mmu_invalidate_end().
->  	 */
-> -	fault->mmu_seq = kvm->mmu_invalidate_seq;
-> +	s2vi->mmu_seq = kvm->mmu_invalidate_seq;
->  	mmap_read_unlock(current->mm);
->  
->  	return 0;
->  }
->  
->  static gfn_t get_canonical_gfn(const struct kvm_s2_fault_desc *s2fd,
-> -			       const struct kvm_s2_fault *fault)
-> +			       const struct kvm_s2_fault_vma_info *s2vi)
->  {
->  	phys_addr_t ipa;
->  
->  	if (!s2fd->nested)
-> -		return fault->gfn;
-> +		return s2vi->gfn;
->  
->  	ipa = kvm_s2_trans_output(s2fd->nested);
-> -	return ALIGN_DOWN(ipa, fault->vma_pagesize) >> PAGE_SHIFT;
-> +	return ALIGN_DOWN(ipa, s2vi->vma_pagesize) >> PAGE_SHIFT;
->  }
->  
->  static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
-> -				struct kvm_s2_fault *fault)
-> +				struct kvm_s2_fault *fault,
-> +				struct kvm_s2_fault_vma_info *s2vi)
->  {
->  	int ret;
->  
-> -	ret = kvm_s2_fault_get_vma_info(s2fd, fault);
-> +	ret = kvm_s2_fault_get_vma_info(s2fd, fault, s2vi);
->  	if (ret)
->  		return ret;
->  
-> -	fault->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, fault),
-> +	fault->pfn = __kvm_faultin_pfn(s2fd->memslot, get_canonical_gfn(s2fd, s2vi),
->  				       kvm_is_write_fault(s2fd->vcpu) ? FOLL_WRITE : 0,
->  				       &fault->writable, &fault->page);
->  	if (unlikely(is_error_noslot_pfn(fault->pfn))) {
->  		if (fault->pfn == KVM_PFN_ERR_HWPOISON) {
-> -			kvm_send_hwpoison_signal(s2fd->hva, __ffs(fault->vma_pagesize));
-> +			kvm_send_hwpoison_signal(s2fd->hva, __ffs(s2vi->vma_pagesize));
->  			return 0;
->  		}
->  		return -EFAULT;
-> @@ -1810,7 +1815,8 @@ static int kvm_s2_fault_pin_pfn(const struct kvm_s2_fault_desc *s2fd,
->  }
->  
->  static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
-> -				     struct kvm_s2_fault *fault)
-> +				     struct kvm_s2_fault *fault,
-> +				     const struct kvm_s2_fault_vma_info *s2vi)
->  {
->  	struct kvm *kvm = s2fd->vcpu->kvm;
->  
-> @@ -1818,8 +1824,8 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
->  	 * Check if this is non-struct page memory PFN, and cannot support
->  	 * CMOs. It could potentially be unsafe to access as cacheable.
->  	 */
-> -	if (fault->vm_flags & (VM_PFNMAP | VM_MIXEDMAP) && !pfn_is_map_memory(fault->pfn)) {
-> -		if (fault->is_vma_cacheable) {
-> +	if (s2vi->vm_flags & (VM_PFNMAP | VM_MIXEDMAP) && !pfn_is_map_memory(fault->pfn)) {
-> +		if (s2vi->is_vma_cacheable) {
->  			/*
->  			 * Whilst the VMA owner expects cacheable mapping to this
->  			 * PFN, hardware also has to support the FWB and CACHE DIC
-> @@ -1879,7 +1885,7 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
->  		fault->prot |= KVM_PGTABLE_PROT_X;
->  
->  	if (fault->s2_force_noncacheable)
-> -		fault->prot |= (fault->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
-> +		fault->prot |= (s2vi->vm_flags & VM_ALLOW_ANY_UNCACHED) ?
->  			       KVM_PGTABLE_PROT_NORMAL_NC : KVM_PGTABLE_PROT_DEVICE;
->  	else if (cpus_have_final_cap(ARM64_HAS_CACHE_DIC))
->  		fault->prot |= KVM_PGTABLE_PROT_X;
-> @@ -1889,74 +1895,73 @@ static int kvm_s2_fault_compute_prot(const struct kvm_s2_fault_desc *s2fd,
->  
->  	if (!kvm_s2_fault_is_perm(s2fd) && !fault->s2_force_noncacheable && kvm_has_mte(kvm)) {
->  		/* Check the VMM hasn't introduced a new disallowed VMA */
-> -		if (!fault->mte_allowed)
-> +		if (!s2vi->mte_allowed)
->  			return -EFAULT;
->  	}
->  
->  	return 0;
->  }
->  
-> -static phys_addr_t get_ipa(const struct kvm_s2_fault *fault)
-> -{
-> -	return gfn_to_gpa(fault->gfn);
-> -}
-> -
->  static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
-> -			    struct kvm_s2_fault *fault, void *memcache)
-> +			    struct kvm_s2_fault *fault,
-> +			    const struct kvm_s2_fault_vma_info *s2vi, void *memcache)
->  {
-> +	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
->  	struct kvm *kvm = s2fd->vcpu->kvm;
->  	struct kvm_pgtable *pgt;
->  	long perm_fault_granule;
-> +	long mapping_size;
-> +	gfn_t gfn;
->  	int ret;
-> -	enum kvm_pgtable_walk_flags flags = KVM_PGTABLE_WALK_SHARED;
->  
->  	kvm_fault_lock(kvm);
->  	pgt = s2fd->vcpu->arch.hw_mmu->pgt;
->  	ret = -EAGAIN;
-> -	if (mmu_invalidate_retry(kvm, fault->mmu_seq))
-> +	if (mmu_invalidate_retry(kvm, s2vi->mmu_seq))
->  		goto out_unlock;
->  
->  	perm_fault_granule = (kvm_s2_fault_is_perm(s2fd) ?
->  			      kvm_vcpu_trap_get_perm_fault_granule(s2fd->vcpu) : 0);
-> +	mapping_size = s2vi->vma_pagesize;
-> +	gfn = s2vi->gfn;
->  
->  	/*
->  	 * If we are not forced to use fault->page mapping, check if we are
+From: "Zenghui Yu (Huawei)" <zenghui.yu@linux.dev>
 
-This find/replace mistake is from Fuad's patches, but maybe it can be fixed
-here or in one of the earlier commits touching kvm_s2_fault_map().
+Since commit fe49fd940e22 ("KVM: arm64: Move VTCR_EL2 into struct s2_mmu"),
+@arch is no longer required to obtain the per-kvm_s2_mmu vtcr and can be
+removed from __load_stage2().
 
-  * If we are not forced to use page mapping, check if we are
+Signed-off-by: Zenghui Yu (Huawei) <zenghui.yu@linux.dev>
+---
+ arch/arm64/include/asm/kvm_mmu.h              | 3 +--
+ arch/arm64/kvm/at.c                           | 2 +-
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 2 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              | 2 +-
+ arch/arm64/kvm/hyp/nvhe/tlb.c                 | 4 ++--
+ arch/arm64/kvm/hyp/vhe/switch.c               | 2 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c                  | 4 ++--
+ 8 files changed, 10 insertions(+), 11 deletions(-)
 
->  	 * backed by a THP and thus use block mapping if possible.
->  	 */
-> -	if (fault->vma_pagesize == PAGE_SIZE &&
-> +	if (mapping_size == PAGE_SIZE &&
->  	    !(fault->force_pte || fault->s2_force_noncacheable)) {
->  		if (perm_fault_granule > PAGE_SIZE) {
-> -			fault->vma_pagesize = perm_fault_granule;
-> +			mapping_size = perm_fault_granule;
->  		} else {
-> -			fault->vma_pagesize = transparent_hugepage_adjust(kvm, s2fd->memslot,
-> -									  s2fd->hva, &fault->pfn,
-> -									  &fault->gfn);
-> -
-> -			if (fault->vma_pagesize < 0) {
-> -				ret = fault->vma_pagesize;
-> +			mapping_size = transparent_hugepage_adjust(kvm, s2fd->memslot,
-> +								   s2fd->hva, &fault->pfn,
-> +								   &gfn);
-> +			if (mapping_size < 0) {
-> +				ret = mapping_size;
->  				goto out_unlock;
->  			}
->  		}
->  	}
->  
->  	if (!perm_fault_granule && !fault->s2_force_noncacheable && kvm_has_mte(kvm))
-> -		sanitise_mte_tags(kvm, fault->pfn, fault->vma_pagesize);
-> +		sanitise_mte_tags(kvm, fault->pfn, mapping_size);
->  
->  	/*
->  	 * Under the premise of getting a FSC_PERM fault, we just need to relax
-> -	 * permissions only if vma_pagesize equals perm_fault_granule. Otherwise,
-> +	 * permissions only if mapping_size equals perm_fault_granule. Otherwise,
->  	 * kvm_pgtable_stage2_map() should be called to change block size.
->  	 */
-> -	if (fault->vma_pagesize == perm_fault_granule) {
-> +	if (mapping_size == perm_fault_granule) {
->  		/*
->  		 * Drop the SW bits in favour of those stored in the
->  		 * PTE, which will be preserved.
->  		 */
->  		fault->prot &= ~KVM_NV_GUEST_MAP_SZ;
-> -		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, get_ipa(fault),
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_relax_perms)(pgt, gfn_to_gpa(gfn),
->  								 fault->prot, flags);
->  	} else {
-> -		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, get_ipa(fault), fault->vma_pagesize,
-> +		ret = KVM_PGT_FN(kvm_pgtable_stage2_map)(pgt, gfn_to_gpa(gfn), mapping_size,
->  							 __pfn_to_phys(fault->pfn), fault->prot,
->  							 memcache, flags);
->  	}
-> @@ -1965,9 +1970,12 @@ static int kvm_s2_fault_map(const struct kvm_s2_fault_desc *s2fd,
->  	kvm_release_faultin_page(kvm, fault->page, !!ret, fault->writable);
->  	kvm_fault_unlock(kvm);
->  
-> -	/* Mark the fault->page dirty only if the fault is handled successfully */
-> -	if (fault->writable && !ret)
-> -		mark_page_dirty_in_slot(kvm, s2fd->memslot, get_canonical_gfn(s2fd, fault));
-> +	/* Mark the page dirty only if the fault is handled successfully */
-> +	if (fault->writable && !ret) {
-> +		phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
-> +		ipa &= ~(mapping_size - 1);
-> +		mark_page_dirty_in_slot(kvm, s2fd->memslot, gpa_to_gfn(ipa));
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index d968aca0461a..c1e535e3d931 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -318,8 +318,7 @@ static __always_inline u64 kvm_get_vttbr(struct kvm_s2_mmu *mmu)
+  * Must be called from hyp code running at EL2 with an updated VTTBR
+  * and interrupts disabled.
+  */
+-static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu,
+-					  struct kvm_arch *arch)
++static __always_inline void __load_stage2(struct kvm_s2_mmu *mmu)
+ {
+ 	write_sysreg(mmu->vtcr, vtcr_el2);
+ 	write_sysreg(kvm_get_vttbr(mmu), vttbr_el2);
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index a024d9a770dc..3b61da0a24d8 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -1379,7 +1379,7 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 		}
+ 	}
+ 	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
+-	__load_stage2(mmu, mmu->arch);
++	__load_stage2(mmu);
+ 
+ skip_mmu_switch:
+ 	/* Temporarily switch back to guest context */
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 5f9d56754e39..803961cdd39e 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -63,7 +63,7 @@ int refill_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages,
+ static __always_inline void __load_host_stage2(void)
+ {
+ 	if (static_branch_likely(&kvm_protected_mode_initialized))
+-		__load_stage2(&host_mmu.arch.mmu, &host_mmu.arch);
++		__load_stage2(&host_mmu.arch.mmu);
+ 	else
+ 		write_sysreg(0, vttbr_el2);
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index d815265bd374..87a169838481 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -336,7 +336,7 @@ int __pkvm_prot_finalize(void)
+ 	kvm_flush_dcache_to_poc(params, sizeof(*params));
+ 
+ 	write_sysreg_hcr(params->hcr_el2);
+-	__load_stage2(&host_mmu.arch.mmu, &host_mmu.arch);
++	__load_stage2(&host_mmu.arch.mmu);
+ 
+ 	/*
+ 	 * Make sure to have an ISB before the TLB maintenance below but only
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 779089e42681..3938997e7963 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -299,7 +299,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	__sysreg_restore_state_nvhe(guest_ctxt);
+ 
+ 	mmu = kern_hyp_va(vcpu->arch.hw_mmu);
+-	__load_stage2(mmu, kern_hyp_va(mmu->arch));
++	__load_stage2(mmu);
+ 	__activate_traps(vcpu);
+ 
+ 	__hyp_vgic_restore_state(vcpu);
+diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
+index 3dc1ce0d27fe..01226a5168d2 100644
+--- a/arch/arm64/kvm/hyp/nvhe/tlb.c
++++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
+@@ -110,7 +110,7 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
+ 	if (vcpu)
+ 		__load_host_stage2();
+ 	else
+-		__load_stage2(mmu, kern_hyp_va(mmu->arch));
++		__load_stage2(mmu);
+ 
+ 	asm(ALTERNATIVE("isb", "nop", ARM64_WORKAROUND_SPECULATIVE_AT));
+ }
+@@ -128,7 +128,7 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
+ 		return;
+ 
+ 	if (vcpu)
+-		__load_stage2(mmu, kern_hyp_va(mmu->arch));
++		__load_stage2(mmu);
+ 	else
+ 		__load_host_stage2();
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 9db3f11a4754..bc8090d915bf 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -219,7 +219,7 @@ void kvm_vcpu_load_vhe(struct kvm_vcpu *vcpu)
+ 
+ 	__vcpu_load_switch_sysregs(vcpu);
+ 	__vcpu_load_activate_traps(vcpu);
+-	__load_stage2(vcpu->arch.hw_mmu, vcpu->arch.hw_mmu->arch);
++	__load_stage2(vcpu->arch.hw_mmu);
+ }
+ 
+ void kvm_vcpu_put_vhe(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
+index 35855dadfb1b..539e44d09f17 100644
+--- a/arch/arm64/kvm/hyp/vhe/tlb.c
++++ b/arch/arm64/kvm/hyp/vhe/tlb.c
+@@ -60,7 +60,7 @@ static void enter_vmid_context(struct kvm_s2_mmu *mmu,
+ 	 * place before clearing TGE. __load_stage2() already
+ 	 * has an ISB in order to deal with this.
+ 	 */
+-	__load_stage2(mmu, mmu->arch);
++	__load_stage2(mmu);
+ 	val = read_sysreg(hcr_el2);
+ 	val &= ~HCR_TGE;
+ 	write_sysreg_hcr(val);
+@@ -78,7 +78,7 @@ static void exit_vmid_context(struct tlb_inv_context *cxt)
+ 
+ 	/* ... and the stage-2 MMU context that we switched away from */
+ 	if (cxt->mmu)
+-		__load_stage2(cxt->mmu, cxt->mmu->arch);
++		__load_stage2(cxt->mmu);
+ 
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT)) {
+ 		/* Restore the registers to what they were */
+-- 
+2.53.0
 
-I don't understand this change, why do we need to mask stuff now?
-
-> +	}
->  
->  	if (ret != -EAGAIN)
->  		return ret;
-> @@ -1978,6 +1986,7 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
->  {
->  	bool perm_fault = kvm_vcpu_trap_is_permission_fault(s2fd->vcpu);
->  	bool logging_active = memslot_is_logging(s2fd->memslot);
-> +	struct kvm_s2_fault_vma_info s2vi = {};
->  	struct kvm_s2_fault fault = {
->  		.logging_active = logging_active,
->  		.force_pte = logging_active,
-> @@ -2002,17 +2011,17 @@ static int user_mem_abort(const struct kvm_s2_fault_desc *s2fd)
->  	 * Let's check if we will get back a huge fault->page backed by hugetlbfs, or
->  	 * get block mapping for device MMIO region.
->  	 */
-> -	ret = kvm_s2_fault_pin_pfn(s2fd, &fault);
-> +	ret = kvm_s2_fault_pin_pfn(s2fd, &fault, &s2vi);
->  	if (ret != 1)
->  		return ret;
->  
-> -	ret = kvm_s2_fault_compute_prot(s2fd, &fault);
-> +	ret = kvm_s2_fault_compute_prot(s2fd, &fault, &s2vi);
->  	if (ret) {
->  		kvm_release_page_unused(fault.page);
->  		return ret;
->  	}
->  
-> -	return kvm_s2_fault_map(s2fd, &fault, memcache);
-> +	return kvm_s2_fault_map(s2fd, &fault, &s2vi, memcache);
->  }
->  
->  /* Resolve the access fault by making the page young again. */
-
-Thanks,
-Joey
