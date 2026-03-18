@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CDA355F2E;
-	Wed, 18 Mar 2026 17:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BA3306D3F;
+	Wed, 18 Mar 2026 17:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856174; cv=none; b=PGvsrWmTL/SmZkSM9IwjUzUKUHUpRpMdispCHMXQC+i4mN/ZLmr9dj9XJ1yrMuuHMYdqjCnjNS2olPymQN9QX3hwtSLlsslcqVIcpRWVx3k7gXy3i5NuQBVd51GDK99WQ7zDfA/oLXbXrlXbkLcXrsXIhXgv84OeI3mmbprSV5k=
+	t=1773856235; cv=none; b=qV13YfpubHhMgcPMkuWQ5sBQ+L5DeqayUJUQNeXxeRsMALnf0WysuD1respL6cJXEm3jfBrKSCNVu8SHTqQ4dxP/Syf2GTi6/sgFWOvsDsoVxnca+FZJCZ4Bqr3H6blhwjnjxP0EnIrY9vhHBry9mPWIMudNcYzwWszhZqK4MWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856174; c=relaxed/simple;
-	bh=wT/iYNzCm2V9NPLbTEHHOe/QpojvcSnk86PQ+66AEt4=;
+	s=arc-20240116; t=1773856235; c=relaxed/simple;
+	bh=yY5/7b9upughYC3SjZivmgk/LeNfjtglZwOe0Pmiuss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LrSRj2KKDV7wl7YKeH3zXVBakutM+UbzFiVU1zF5QhTmM0O2Bs6j5H6K6uMfxPVi7SFzPjtvK9PU0+uiQJJ1Yj0rsJS6fxQ0znFVEU+7kRu3+xoLi0ntnh0UOQ6xicULshGUItB8BxbAgiNBSjFrd47w0S87+LPHuOsUPxEVKfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkSQV6tw; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=r/lhag5TR3BWR3aQtpLMvfWy2wNiD2IasVXQZzAgBhw5bYVCt57gq1wZdPXIT28PHDWH3Q/gdk1z9PoBZsjdhQbS5qk5t6G+tBW4XPKUBQ7H5COeyQAK6kNS5UXgw5N/CiiRygnNT6sTA7hE9O5n0YRtduN4FvP77uUafNxuaCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFzHOehq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkSQV6tw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF2CC2BCAF;
-	Wed, 18 Mar 2026 17:49:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFzHOehq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FF59C19421;
+	Wed, 18 Mar 2026 17:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773856173;
-	bh=wT/iYNzCm2V9NPLbTEHHOe/QpojvcSnk86PQ+66AEt4=;
+	s=k20201202; t=1773856235;
+	bh=yY5/7b9upughYC3SjZivmgk/LeNfjtglZwOe0Pmiuss=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jkSQV6twayNsM864uyXHJbD3Bz09Zv3RgGje9V3ZbME8R/H1Wh1obgiGhENM+mggW
-	 D5ABCcEiuY5rZeHWUNjiyLOpjfOczS0ca6yNrSRX1Rr0r4vL4Ya/GVwnTxaB09HX3Y
-	 EV0u7knDwunWhKyXhLzFTXZ4MPZOFTT5szpZn0dgZHQeJXD72GZhwujl8G3tbxZlo1
-	 lgnHzLej7fBKuQKZZ8br9V3tdiJRm5POUPxOJvnqXb//ozruODKZ+3iFXOb7rRed4w
-	 IffUWkwA6iRO/DW2NQihZNs7JzfIcHAZ6Zb87phBm9GB52j3cSNwRiLQkQZtRDAADg
-	 dqnhkjtDLNflA==
-Date: Wed, 18 Mar 2026 17:49:46 +0000
-From: Jean-Philippe Brucker <jpb@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+	b=oFzHOehqxPUBE7i33A7/NP22cW2clKfq9HsIUn7W7o4UHr7O9Lz9Wmkw/PPf2wkHI
+	 ctC2BWjwX8axh8JicFZcyV9D2zPPPewV92QGVgApK71nEBzHnSzVhqy5SyaEanAh/O
+	 bJULBoZWTqa8HIoOjsslsg4nFfniEa4ws77JYIoBhQvx2lVojRQOCfL5bDv9mQFzqq
+	 6qv/h0sSEjO0+6M9lbDW3+Jocwxh4Ql5eBhtCdOtvdVaWuHUOMoiUOaTkVPHFsYE2w
+	 XZjZisZ+6yJKDaDv9yzd0hbYe/9omcj4qQBJmjYPH7uBxxJvrrI8U0JZ8QjkU5JvNB
+	 SeJTkOn/TCowQ==
+Date: Wed, 18 Mar 2026 17:50:27 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Jean-Philippe Brucker <jpb@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -42,107 +42,56 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v10 12/30] KVM: arm64: Factor SVE code out of
- fpsimd_lazy_switch_to_host()
-Message-ID: <20260318174946.GJ2390801@myrica>
+Subject: Re: [PATCH v10 09/30] KVM: arm64: Define internal features for SME
+Message-ID: <4403381b-c4a0-43d4-8b24-b0d0c1e75d24@sirena.org.uk>
 References: <20260306-kvm-arm64-sme-v10-0-43f7683a0fb7@kernel.org>
- <20260306-kvm-arm64-sme-v10-12-43f7683a0fb7@kernel.org>
+ <20260306-kvm-arm64-sme-v10-9-43f7683a0fb7@kernel.org>
+ <20260318174410.GG2390801@myrica>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="VvvcpSFxAc69oYKR"
+Content-Disposition: inline
+In-Reply-To: <20260318174410.GG2390801@myrica>
+X-Cookie: The coast was clear.
+
+
+--VvvcpSFxAc69oYKR
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260306-kvm-arm64-sme-v10-12-43f7683a0fb7@kernel.org>
 
-On Fri, Mar 06, 2026 at 05:01:04PM +0000, Mark Brown wrote:
-> Since the function will grow as a result of adding SME support move the
-> SVE code out of fpsimd_lazy_switch_to_host(). No functional change, just
-> code motion.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+On Wed, Mar 18, 2026 at 05:44:10PM +0000, Jean-Philippe Brucker wrote:
+> On Fri, Mar 06, 2026 at 05:01:01PM +0000, Mark Brown wrote:
 
-Reviewed-by: Jean-Philippe Brucker <jpb@kernel.org>
+> > +#define kvm_has_sme(kvm)	(system_supports_sme() &&		\
+> > +				 test_bit(KVM_ARCH_FLAG_GUEST_HAS_SME, &(kvm)->arch.flags))
 
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 46 +++++++++++++++++++--------------
->  1 file changed, 26 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 4e38610be19a..5b99aa479c59 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -483,11 +483,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
->  	}
->  }
->  
-> -static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
-> +static inline void sve_lazy_switch_to_host(struct kvm_vcpu *vcpu)
->  {
->  	u64 zcr_el1, zcr_el2;
->  
-> -	if (!guest_owns_fp_regs())
-> +	if (!vcpu_has_sve(vcpu))
->  		return;
->  
->  	/*
-> @@ -498,29 +498,35 @@ static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
->  	 * synchronization event, we don't need an ISB here to avoid taking
->  	 * traps for anything that was exposed to the guest.
->  	 */
-> -	if (vcpu_has_sve(vcpu)) {
-> -		zcr_el1 = read_sysreg_el1(SYS_ZCR);
-> -		__vcpu_assign_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu), zcr_el1);
-> +	zcr_el1 = read_sysreg_el1(SYS_ZCR);
-> +	__vcpu_assign_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu), zcr_el1);
->  
-> -		/*
-> -		 * The guest's state is always saved using the guest's max VL.
-> -		 * Ensure that the host has the guest's max VL active such that
-> -		 * the host can save the guest's state lazily, but don't
-> -		 * artificially restrict the host to the guest's max VL.
-> -		 */
-> -		if (has_vhe()) {
-> -			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> -			write_sysreg_el2(zcr_el2, SYS_ZCR);
-> -		} else {
-> -			zcr_el2 = sve_vq_from_vl(kvm_host_max_vl[ARM64_VEC_SVE]) - 1;
-> -			write_sysreg_el2(zcr_el2, SYS_ZCR);
-> +	/*
-> +	 * The guest's state is always saved using the guest's max VL.
-> +	 * Ensure that the host has the guest's max VL active such
-> +	 * that the host can save the guest's state lazily, but don't
-> +	 * artificially restrict the host to the guest's max VL.
-> +	 */
-> +	if (has_vhe()) {
-> +		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
-> +		write_sysreg_el2(zcr_el2, SYS_ZCR);
-> +	} else {
-> +		zcr_el2 = sve_vq_from_vl(kvm_host_max_vl[ARM64_VEC_SVE]) - 1;
-> +		write_sysreg_el2(zcr_el2, SYS_ZCR);
->  
-> -			zcr_el1 = vcpu_sve_max_vq(vcpu) - 1;
-> -			write_sysreg_el1(zcr_el1, SYS_ZCR);
-> -		}
-> +		zcr_el1 = vcpu_sve_max_vq(vcpu) - 1;
-> +		write_sysreg_el1(zcr_el1, SYS_ZCR);
->  	}
->  }
->  
-> +static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!guest_owns_fp_regs())
-> +		return;
-> +
-> +	sve_lazy_switch_to_host(vcpu);
-> +}
-> +
->  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
->  {
->  	/*
-> 
-> -- 
-> 2.47.3
-> 
-> 
+> Can the GUEST_HAS_SME flag ever be set if !system_supports_sme()?  Seems
+> like it depends on KVM_ARM_VCPU_SME feature which can't be set if the
+> system doesn't support it, so the system_supports_sme() check is redundant
+
+It can't be, the reason for the system_supports_sme() check is that SME
+is a build time option as well as a runtime one.  If the kernel is built
+without SME support then the compiler can remove the code at build time,
+the existing code does the same thing for at least SVE.
+
+--VvvcpSFxAc69oYKR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmm65eIACgkQJNaLcl1U
+h9C7Xgf/buA9UbqSWGotQIhCCZi2M8eucZopqvd2y+Yz8RG3CGGJcgD210T2RV24
+2IbAutf88VUJrFR05vpgpG9gonNcjRjEvn2/eV3H8+WdYm4Ux9/TZJqkwuJaS0Jf
+39osJNAabwFqCXDqefCQim9F3CLM2T3uw9wqnJfUtYtQw8GHF6s1W1H8aQDwTtkv
+kjWYT4mxAx42Ta5pmQdK1oIm01baX1EdxIoN1IGi9wDGb+snfdVos4ncMJzpeX7R
+S8lhOFeaJBjRWmF8MP9AGE42bI39DrkJmWx5PySdEQaOZn4NHuwezaggAA+hiI35
+x6P1xYKFo3bdSU5DNoh79SXWEfgziw==
+=4AVX
+-----END PGP SIGNATURE-----
+
+--VvvcpSFxAc69oYKR--
