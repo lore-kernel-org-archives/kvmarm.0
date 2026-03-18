@@ -1,157 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4F30FC12;
-	Wed, 18 Mar 2026 17:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE26311C2A
+	for <kvmarm@lists.linux.dev>; Wed, 18 Mar 2026 19:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856521; cv=none; b=roioAG7GAb1MYS/X098UZrSj29Ge4nDxh6vy0T+kOdDVjQxoHwgR3PzGuIO/83E4XaSE91iQa8tm0+KUS9nlCcdHxh8H+FqZcTCjpLrNXjCoYb+raRX3DBPBXzW8AE5VQuOi33cN9Mz0xxSDm3onVUKyoynV5G3C5Ji+TuvFAfk=
+	t=1773861565; cv=none; b=LwxEm4u7AIv++K6FODDMBXQbnbVUXLIhy0ZTplTdyr34ouKwO9ppJ6o3+dmFQMjw1BCKygPLujiz+l60YQMRPsZ1VTcrb3xdzFAoS1xj/Fsk48xAOyiKK0AZwUqW6E6wyshIsQME50mPfJUqWaYnt4C+E1x4Ywsjf9GQp8c1gME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856521; c=relaxed/simple;
-	bh=P7kc8uMgiIZ6+hoGNZb7Lk8njJKNoXVRMLqykWqJoGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zm0IwgZHgZv0TGcZQ1lx11LEPgke9cK2Q/fSeOPQdAlvk/iU1V/u39saeCwQ7SGe/ZCVI5TIMM1C9s79kbLLzg7Wv2FkCcMy04COKOScRa3H+HiY6nlMHKdsH8kYhIX0u2+oUxyG+pOohnLuMgpMgwSTgRL3qibccw1P5sUTi74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EiKdhGp6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EiKdhGp6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A08CC19421;
-	Wed, 18 Mar 2026 17:55:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773856521;
-	bh=P7kc8uMgiIZ6+hoGNZb7Lk8njJKNoXVRMLqykWqJoGk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EiKdhGp6pdH65RIGYoSzbzMf8ER0a1QHMKbgVNC7S8zStXsscXtq7PQbte82l2Tqg
-	 +WtCvx/g5Q5O/WCLTI+Szz0cAJGQpCbK467KwxsAMJOz+W3Y6THn1N6Bpo1+7hbPN1
-	 PGL+UUQUudWs2KZ5ZYFNskog3b7S5KQ1hJaoiZi7rTaK/2UB6Do89Mcw2qYnPt7KEo
-	 hoVqp7yZg39DZfMY1Dl0qY3PFub6rgRwYvu0mKzzEgcYkdiE8U5A6Z0S/75h+Ewlix
-	 wRjjgkfsSlrmIinJhYWiXXRkj30qXUQ64JQiz2lKyT16nVfr/fcjV1GB2vaTK02sLa
-	 SFPy2O2pbJp+g==
-Date: Wed, 18 Mar 2026 17:55:34 +0000
-From: Jean-Philippe Brucker <jpb@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Dave Martin <Dave.Martin@arm.com>,
-	Fuad Tabba <tabba@google.com>, Mark Rutland <mark.rutland@arm.com>,
-	Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v10 16/30] KVM: arm64: Support TPIDR2_EL0
-Message-ID: <20260318175534.GN2390801@myrica>
-References: <20260306-kvm-arm64-sme-v10-0-43f7683a0fb7@kernel.org>
- <20260306-kvm-arm64-sme-v10-16-43f7683a0fb7@kernel.org>
+	s=arc-20240116; t=1773861565; c=relaxed/simple;
+	bh=iOiYMYWdvapsqU9gHuWUDcqRMVlMEgNDCc6GEEiP8Mg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tClhjOgzYCnkl0IrrrkWulvma2Inat8uL20VxYv9rvM+1nStdoCmM7W3EahXrkVKLFENofi+VTUbCN3IKy93f/5eT2cQLq8FR0DlgxyUB4C98jAbZ3xITurYQcgD7+7G66HurH/M+GR70HqFC5QYdoSziljovcyQLKVJDXUGgdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 819CF1BF7;
+	Wed, 18 Mar 2026 12:19:15 -0700 (PDT)
+Received: from gaia.lan (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB4863F73B;
+	Wed, 18 Mar 2026 12:19:19 -0700 (PDT)
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mark Brown <broonie@kernel.org>,
+	kvmarm@lists.linux.dev
+Subject: [PATCH v2 0/4] arm64: Work around C1-Pro erratum 4193714 (CVE-2026-0995)
+Date: Wed, 18 Mar 2026 19:19:12 +0000
+Message-ID: <20260318191918.2653160-1-catalin.marinas@arm.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260306-kvm-arm64-sme-v10-16-43f7683a0fb7@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 06, 2026 at 05:01:08PM +0000, Mark Brown wrote:
-> SME adds a new thread ID register, TPIDR2_EL0. This is used in userspace
-> for delayed saving of the ZA state but in terms of the architecture is
-> not really connected to SME other than being part of FEAT_SME. It has an
-> independent fine grained trap and the runtime connection with the rest
-> of SME is purely software defined.
-> 
-> Expose the register as a system register if the guest supports SME,
-> context switching it along with the other EL0 TPIDRs.
+That's version 2 of the workaround for C1-Pro erratum 4193714. Version 1
+was posted here:
 
-I guess the register also needs to be added to locate_register(),
-read_sr_from_cpu and write_sr_to_cpu now
+https://lore.kernel.org/r/20260302165801.3014607-1-catalin.marinas@arm.com/
 
-> 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h          |  1 +
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 15 +++++++++++++++
->  arch/arm64/kvm/sys_regs.c                  |  3 ++-
->  3 files changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e5194ffc40a7..ec1ede0c3c12 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -445,6 +445,7 @@ enum vcpu_sysreg {
->  	CSSELR_EL1,	/* Cache Size Selection Register */
->  	TPIDR_EL0,	/* Thread ID, User R/W */
->  	TPIDRRO_EL0,	/* Thread ID, User R/O */
-> +	TPIDR2_EL0,	/* Thread ID, Register 2 */
->  	TPIDR_EL1,	/* Thread ID, Privileged */
->  	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
->  	PAR_EL1,	/* Physical Address Register */
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index 5624fd705ae3..8c3b3d6df99f 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -88,6 +88,17 @@ static inline bool ctxt_has_sctlr2(struct kvm_cpu_context *ctxt)
->  	return kvm_has_sctlr2(kern_hyp_va(vcpu->kvm));
->  }
->  
-> +static inline bool ctxt_has_sme(struct kvm_cpu_context *ctxt)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	if (!system_supports_sme())
-> +		return false;
+The logic is pretty much the same, we use a global sme_active_cpus mask
+to track which CPUs run in user-space with SME enabled and an IPI is
+sent to those CPUs to synchronise the TLB maintenance.
 
-kvm_has_sme() already checks this
+Main changes since v1:
 
-Thanks,
-Jean
+- The workaround won't be enabled if SME is disabled
 
-> +
-> +	vcpu = ctxt_to_vcpu(ctxt);
-> +	return kvm_has_sme(kern_hyp_va(vcpu->kvm));
-> +}
-> +
->  static inline bool ctxt_is_guest(struct kvm_cpu_context *ctxt)
->  {
->  	return host_data_ptr(host_ctxt) != ctxt;
-> @@ -127,6 +138,8 @@ static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
->  	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
-> +	if (ctxt_has_sme(ctxt))
-> +		ctxt_sys_reg(ctxt, TPIDR2_EL0)	= read_sysreg_s(SYS_TPIDR2_EL0);
->  }
->  
->  static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
-> @@ -204,6 +217,8 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
->  {
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
->  	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-> +	if (ctxt_has_sme(ctxt))
-> +		write_sysreg_s(ctxt_sys_reg(ctxt, TPIDR2_EL0), SYS_TPIDR2_EL0);
->  }
->  
->  static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index f13ff8e630f2..66248fd48a7d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -3511,7 +3511,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  .visibility = s1poe_visibility },
->  	{ SYS_DESC(SYS_TPIDR_EL0), NULL, reset_unknown, TPIDR_EL0 },
->  	{ SYS_DESC(SYS_TPIDRRO_EL0), NULL, reset_unknown, TPIDRRO_EL0 },
-> -	{ SYS_DESC(SYS_TPIDR2_EL0), undef_access },
-> +	{ SYS_DESC(SYS_TPIDR2_EL0), NULL, reset_unknown, TPIDR2_EL0,
-> +	  .visibility = sme_visibility},
->  
->  	{ SYS_DESC(SYS_SCXTNUM_EL0), undef_access },
->  
-> 
-> -- 
-> 2.47.3
-> 
-> 
+- Replace the __tlbi_sync_s1ish(NULL) calls from arch_tlbbatch_flush()
+  with a dedicated __tlbi_sync_s1ish_batch() function
+
+- Dropped the DMB in sme_set_active() before returning to user, replaced
+  it with a comment and a link to the list discussion on why it is not
+  necessary
+
+- Use alternative_has_cap_unlikely() instead of cpus_have_final_cap()
+  since it's a local CPU erratum feature and only used after the
+  capabilities have been finalised
+
+I'll post a separate RFC patch (linked here) showing how using a per-mm
+cpumask looks like. The downside of that approach is that
+arch_tlbbatch_add_pending() will require a DSB, practically cancelling
+any TLBI batching for unaffected CPUs. Yet another option would be to
+add a struct mm and some flag in struct arch_tlbflush_unmap_batch and
+use full global broadcast if more than one mm is targeted or
+mm_cpumask() otherwise. Given that this is used on the TTU path, it's
+possible to have more than one owner of an unmapped page. I haven't done
+any assessment how of this would happen.
+
+Erratum description:
+
+Arm C1-Pro prior to r1p3 has an erratum (4193714) where a TLBI+DSB
+sequence might fail to ensure the completion of all outstanding SME
+(Scalable Matrix Extension) memory accesses. The DVMSync message is
+acknowledged before the SME accesses have fully completed, potentially
+allowing pages to be reused before all in-flight accesses are done.
+
+The workaround consists of executing a DSB locally (via IPI)
+on all affected CPUs running with SME enabled, after the TLB
+invalidation. This ensures the SME accesses have completed before the
+IPI is acknowledged.
+
+This has been assigned CVE-2026-0995:
+
+https://developer.arm.com/documentation/111823/latest/
+
+Thanks.
+
+Catalin Marinas (3):
+  arm64: tlb: Introduce __tlbi_sync_s1ish_{kernel,batch}() for TLB
+    maintenance
+  arm64: tlb: Pass the corresponding mm to __tlbi_sync_s1ish()
+  arm64: errata: Work around early CME DVMSync acknowledgement
+
+James Morse (1):
+  KVM: arm64: Add SMC hook for SME dvmsync erratum
+
+ arch/arm64/Kconfig                    | 12 ++++
+ arch/arm64/include/asm/cpucaps.h      |  2 +
+ arch/arm64/include/asm/cputype.h      |  2 +
+ arch/arm64/include/asm/fpsimd.h       | 21 +++++++
+ arch/arm64/include/asm/mmu.h          |  1 +
+ arch/arm64/include/asm/tlbflush.h     | 50 ++++++++++++++---
+ arch/arm64/kernel/cpu_errata.c        | 30 ++++++++++
+ arch/arm64/kernel/entry-common.c      |  3 +
+ arch/arm64/kernel/fpsimd.c            | 81 +++++++++++++++++++++++++++
+ arch/arm64/kernel/process.c           |  7 +++
+ arch/arm64/kernel/sys_compat.c        |  2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 17 ++++++
+ arch/arm64/tools/cpucaps              |  1 +
+ include/linux/arm-smccc.h             |  5 ++
+ 14 files changed, 225 insertions(+), 9 deletions(-)
+
