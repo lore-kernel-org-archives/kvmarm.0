@@ -1,36 +1,36 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2A62F0685;
-	Wed, 18 Mar 2026 15:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9A4320A0E;
+	Wed, 18 Mar 2026 15:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849392; cv=none; b=Ea130IEKkAhxnxba4Uuvq0gctfYPC5tTzwqwN6dWMbVO8AFqVDd9JPpkbaM2vageSRs/jtsLrTA5jKm/97ZrW8xBOtIf2EHVCMjHRQ/ejgU+2YneRJcAlHTDKBURzothri7VQw5Gj+Ce4ng3bUbef45AHibaq+wqUdPCfu+ptBY=
+	t=1773849396; cv=none; b=EdZjQKecU44xzdkaT0BTi/hjIrM/iOImwvYkg5A5INSzqE56+0neugt14qSODJsPQBNCfaNZhu3k1wnYKtfn73Dpm2CgXkYVEOlyjyz8yQ+zi9pDYDTHzsG5vHxCO6TaN739RXzgPwmppx1iqqOwcXKaGcJQZT3s1xqTVJuLj9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849392; c=relaxed/simple;
-	bh=XdMhdL5+HSw7jPMzdY9ChFWc/FA1kfirxCDN9/AkECE=;
+	s=arc-20240116; t=1773849396; c=relaxed/simple;
+	bh=nwD5+pUYCEmaAYkiT9V7YGERXs3gHR5ON1uhKjnhK1g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gM2Yry6riu8//4c+8/HxTYOWP5sLYKfGZY3nHjowTEnZJMQnMyQSp1wTzzleNjFDUpealtipz2iy6+uRdv81JtIGVJHZ0CoJXdCa8FWsFPL55ZCFMOXeJBseyFUDpeyh1arwS0H5/2G85GEXo+iPHg8lhmgf6v37OISWwsCQ/z8=
+	 MIME-Version; b=hl9V8jvtcSsudgyytt0m897FVtHBZIaAHLWHLhXeZ+zjsDHk3w84fJOY4OGl7REO/ANqYfdDJ++9CZwOTivsKPB26prWPjeNV2xsZDcZ9a367WHJiYt87QvUcxDRzYaF5yc4lLoKh2UAEEpgquVRr+vetLUX888GZVUTId+9tNc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF7592050;
-	Wed, 18 Mar 2026 08:56:22 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7ACC1201B;
+	Wed, 18 Mar 2026 08:56:26 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A8053F73B;
-	Wed, 18 Mar 2026 08:56:25 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 333BE3F73B;
+	Wed, 18 Mar 2026 08:56:29 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
-Cc: Joey Gouly <joey.gouly@arm.com>,
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>,
@@ -43,9 +43,9 @@ Cc: Joey Gouly <joey.gouly@arm.com>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v13 34/48] arm64: RMI: support RSI_HOST_CALL
-Date: Wed, 18 Mar 2026 15:53:58 +0000
-Message-ID: <20260318155413.793430-35-steven.price@arm.com>
+Subject: [PATCH v13 35/48] arm64: RMI: Allow checking SVE on VM instance
+Date: Wed, 18 Mar 2026 15:53:59 +0000
+Message-ID: <20260318155413.793430-36-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,60 +57,68 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Joey Gouly <joey.gouly@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Forward RSI_HOST_CALLS to KVM's HVC handler.
+Given we have different types of VMs supported, check the
+support for SVE for the given instance of the VM to accurately
+report the status.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 Reviewed-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 ---
-Changes since v7:
- * Avoid turning a negative return from kvm_smccc_call_handler() into a
-   error response to the guest. Instead propogate the error back to user
-   space.
-Changes since v4:
- * Setting GPRS is now done by kvm_rec_enter() rather than
-   rec_exit_host_call() (see previous patch - arm64: RME: Handle realm
-   enter/exit). This fixes a bug where the registers set by user space
-   were being ignored.
+Changes since v10:
+ * RME->RMI renaming.
+ * Adapt to move CAP check to kvm_realm_ext_allowed().
 ---
- arch/arm64/kvm/rmi-exit.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ arch/arm64/include/asm/kvm_rmi.h | 2 ++
+ arch/arm64/kvm/arm.c             | 2 ++
+ arch/arm64/kvm/rmi.c             | 5 +++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/rmi-exit.c b/arch/arm64/kvm/rmi-exit.c
-index b4843f094615..7eff6967530c 100644
---- a/arch/arm64/kvm/rmi-exit.c
-+++ b/arch/arm64/kvm/rmi-exit.c
-@@ -116,6 +116,19 @@ static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
- 	return -EFAULT;
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+index 1ee5ed0f5ab2..d6cf87de099b 100644
+--- a/arch/arm64/include/asm/kvm_rmi.h
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -87,6 +87,8 @@ struct realm_rec {
+ void kvm_init_rmi(void);
+ u32 kvm_realm_ipa_limit(void);
+ 
++bool kvm_rmi_supports_sve(void);
++
+ int kvm_init_realm_vm(struct kvm *kvm);
+ int kvm_activate_realm(struct kvm *kvm);
+ void kvm_destroy_realm(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 7d92ddb06460..3e6f1e810921 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -388,6 +388,8 @@ static bool kvm_realm_ext_allowed(long ext)
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+ 	case KVM_CAP_ARM_RMI:
+ 		return true;
++	case KVM_CAP_ARM_SVE:
++		return kvm_rmi_supports_sve();
+ 	}
+ 	return false;
+ }
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index e56c8af2ad61..7cc6dc14d325 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -33,6 +33,11 @@ static bool rmi_has_feature(unsigned long feature)
+ 	return !!u64_get_bits(rmm_feat_reg0, feature);
  }
  
-+static int rec_exit_host_call(struct kvm_vcpu *vcpu)
++bool kvm_rmi_supports_sve(void)
 +{
-+	int i;
-+	struct realm_rec *rec = &vcpu->arch.rec;
-+
-+	vcpu->stat.hvc_exit_stat++;
-+
-+	for (i = 0; i < REC_RUN_GPRS; i++)
-+		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
-+
-+	return kvm_smccc_call_handler(vcpu);
++	return rmi_has_feature(RMI_FEATURE_REGISTER_0_SVE);
 +}
 +
- static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
+ static int rmi_check_version(void)
  {
- 	struct realm_rec *rec = &vcpu->arch.rec;
-@@ -183,6 +196,8 @@ int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
- 		return rec_exit_psci(vcpu);
- 	case RMI_EXIT_RIPAS_CHANGE:
- 		return rec_exit_ripas_change(vcpu);
-+	case RMI_EXIT_HOST_CALL:
-+		return rec_exit_host_call(vcpu);
- 	}
- 
- 	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+ 	struct arm_smccc_res res;
 -- 
 2.43.0
 
