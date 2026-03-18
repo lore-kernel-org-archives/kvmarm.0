@@ -1,41 +1,37 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB74A413249;
-	Wed, 18 Mar 2026 15:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E653DD501;
+	Wed, 18 Mar 2026 16:07:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849443; cv=none; b=CL+5vuq3w4xHoFmaHs0myj1brQqHWlTDXNnfQYZdAgy6niMH7cfXleCl4MAXdO+ghWWl0ie+8yOACUf2epvIaD689SUkaHZT7RGkhAVA23Jk8NQh7s8PWmX8XcMTY0bdEjWjRl0/I+qRGioF6sHPZX+N5jNSsw058CquBc6Oj6U=
+	t=1773850082; cv=none; b=rKmyVTfN3t/31OlwKptiw7ylCVNHEmCxwRcNCCLXcplCod4Tu/OUOakhLoPni/ddeFTAqzT7ZtuWVUmdo8UWL0Nc42Wh4BPqqAgxk2PO4yluZPJb26ShVIz1v3EVatPw45gUoYH5RpmREtK+c7jzAn6zsZ/gOmDgK4xFJz12hdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849443; c=relaxed/simple;
-	bh=fZtPYshS4jt9m5V6dNmRy6ebCHivCSGGwPHPUhVpHh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dWbf0km03EBrl6eGZ3FIGI221+/C5BnimrTDU1QP5q9DjJutpJ5JSwPVOumZDKDKEHM5jKVwG74fIPMDYOE02qtgQK9ewKnoC9A+bt/O7AS8tSwPTZPM1N/+HmIWZHDqGNlOWNodOZKzejst7yJm/fK3+oXYd+D+3/yJczgsWQM=
+	s=arc-20240116; t=1773850082; c=relaxed/simple;
+	bh=QmkFKyFDc3mYEceaW1FYJZSrwhmjFSafESBkFog3w8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HLaaAqKzh79JF+GawHs1DoyCmDvJ7jrVwlsFNfWMD+mSuvLs63afu5jjvdfPaVYpuvYGJ236DMrssSfrLqhsl2KUv4iiJ3/ynmAOnARhrtqCZXTOPUn5K6GstZEfA3nMGXRqMCcxHKmxDsWcopdkFLrPQja+djxbaqsEiW6phmA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2A38922BE;
-	Wed, 18 Mar 2026 08:57:12 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E6043F73B;
-	Wed, 18 Mar 2026 08:57:15 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Steven Price <steven.price@arm.com>,
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B75EB1A25;
+	Wed, 18 Mar 2026 09:07:46 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85C753F778;
+	Wed, 18 Mar 2026 09:07:49 -0700 (PDT)
+Date: Wed, 18 Mar 2026 16:07:44 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
 	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
@@ -43,701 +39,509 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 48/48] [WIP] arm64: RMI: Add support for SRO
-Date: Wed, 18 Mar 2026 15:54:12 +0000
-Message-ID: <20260318155413.793430-49-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
+Subject: Re: [PATCH v13 04/48] arm64: RMI: Add SMC definitions for calling
+ the RMM
+Message-ID: <20260318160744.GA3942350@e124191.cambridge.arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
+ <20260318155413.793430-5-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260318155413.793430-5-steven.price@arm.com>
 
-RMM v2.0 introduces the concept of "Stateful RMI Operations" (SRO).
-This means that an SMC can return with an operation still in progress.
-The host is expected to continue the operation until it reaches a
-conclusion (either success or failure). During this process the RMM can
-request addition memory ('donate') or hand memory back to the host
-('reclaim'). The host can request an operation is cancelled, but must
-still continue the operation until it has completed (otherwise the
-incomplete operation may cause future RMM operations to fail).
+On Wed, Mar 18, 2026 at 03:53:28PM +0000, Steven Price wrote:
+> The RMM (Realm Management Monitor) provides functionality that can be
+> accessed by SMC calls from the host.
+> 
+> The SMC definitions are based on DEN0137[1] version 2.0-bet0
+> 
+> [1] https://developer.arm.com/documentation/den0137/2-0bet0/
+> 
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+> Changes since v12:
+>  * Updated to RMM spec v2.0-bet0
+> Changes since v9:
+>  * Corrected size of 'ripas_value' in struct rec_exit. The spec states
+>    this is an 8-bit type with padding afterwards (rather than a u64).
+> Changes since v8:
+>  * Added RMI_PERMITTED_GICV3_HCR_BITS to define which bits the RMM
+>    permits to be modified.
+> Changes since v6:
+>  * Renamed REC_ENTER_xxx defines to include 'FLAG' to make it obvious
+>    these are flag values.
+> Changes since v5:
+>  * Sorted the SMC #defines by value.
+>  * Renamed SMI_RxI_CALL to SMI_RMI_CALL since the macro is only used for
+>    RMI calls.
+>  * Renamed REC_GIC_NUM_LRS to REC_MAX_GIC_NUM_LRS since the actual
+>    number of available list registers could be lower.
+>  * Provided a define for the reserved fields of FeatureRegister0.
+>  * Fix inconsistent names for padding fields.
+> Changes since v4:
+>  * Update to point to final released RMM spec.
+>  * Minor rearrangements.
+> Changes since v3:
+>  * Update to match RMM spec v1.0-rel0-rc1.
+> Changes since v2:
+>  * Fix specification link.
+>  * Rename rec_entry->rec_enter to match spec.
+>  * Fix size of pmu_ovf_status to match spec.
+> ---
+>  arch/arm64/include/asm/rmi_smc.h | 432 +++++++++++++++++++++++++++++++
+>  1 file changed, 432 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+> 
+> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
+> new file mode 100644
+> index 000000000000..8a42b83218f8
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rmi_smc.h
+> @@ -0,0 +1,432 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (C) 2023-2024 ARM Ltd.
+> + *
+> + * The values and structures in this file are from the Realm Management Monitor
+> + * specification (DEN0137) version 1.0-rel0:
+> + * https://developer.arm.com/documentation/den0137/1-0rel0/
+> + */
 
-SROs may request memory and these operations sometimes have to be
-performed in places where memory allocation may not be possible. To deal
-with this a SRO may be started, but then cancelled when the memory
-allocation cannot be completed. The reclaimed memory will then be stored
-in a struct rmi_sro_state object with the intention that once Linux has
-returned to a state where memory allocation is possible, the failed
-allocation can be reattempted (with GFP flags enabling sleeping and/or
-direct reclaim) and the SRO operation reattempted (after acquiring the
-necessary locks). In the worst case this may require several attempts
-(if the RMM makes several memory requests) but should always make
-forward progress.
+Both copyright and version (2.0 now) need updating.
 
-This patch is currently a work-in-progress showing the general structure
-of how this should work and implementing SROs for two operations
-(RMI_REC_CREATE and RMI_REC_DESTROY). I'm aware there is missing
-error-checking and there are some details in the specification that need
-clarifying. These operations are also 'easy' in that we don't have
-restrictions on memory allocation in these contexts.
+Thanks,
+Joey
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_rmi.h  |   8 -
- arch/arm64/include/asm/rmi_cmds.h |  71 +++---
- arch/arm64/include/asm/rmi_smc.h  |  27 +--
- arch/arm64/kvm/rmi.c              | 385 +++++++++++++++++++++++-------
- 4 files changed, 347 insertions(+), 144 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-index b914b9a84bd8..e1f5523c2dfa 100644
---- a/arch/arm64/include/asm/kvm_rmi.h
-+++ b/arch/arm64/include/asm/kvm_rmi.h
-@@ -51,7 +51,6 @@ enum realm_state {
-  * @state: The lifetime state machine for the realm
-  * @rd: Kernel mapping of the Realm Descriptor (RD)
-  * @params: Parameters for the RMI_REALM_CREATE command
-- * @num_aux: The number of auxiliary pages required by the RMM
-  * @ia_bits: Number of valid Input Address bits in the IPA
-  */
- struct realm {
-@@ -60,7 +59,6 @@ struct realm {
- 	void *rd;
- 	struct realm_params *params;
- 
--	unsigned long num_aux;
- 	unsigned int ia_bits;
- };
- 
-@@ -75,12 +73,6 @@ struct realm {
- struct realm_rec {
- 	unsigned long mpidr;
- 	void *rec_page;
--	/*
--	 * REC_PARAMS_AUX_GRANULES is the maximum number of 4K granules that
--	 * the RMM can require. The array is sized to be large enough for the
--	 * maximum number of host sized pages that could be required.
--	 */
--	struct page *aux_pages[(REC_PARAMS_AUX_GRANULES * SZ_4K) >> PAGE_SHIFT];
- 	struct rec_run *run;
- };
- 
-diff --git a/arch/arm64/include/asm/rmi_cmds.h b/arch/arm64/include/asm/rmi_cmds.h
-index 9c4f83644a61..b761d74e1273 100644
---- a/arch/arm64/include/asm/rmi_cmds.h
-+++ b/arch/arm64/include/asm/rmi_cmds.h
-@@ -17,6 +17,27 @@ struct rtt_entry {
- 	int ripas;
- };
- 
-+#define RMI_MAX_ADDR_LIST 256
-+
-+struct rmi_sro_state {
-+	struct arm_smccc_1_2_regs regs;
-+
-+	unsigned long addr_count;
-+	unsigned long addr_list[RMI_MAX_ADDR_LIST];
-+};
-+
-+#define rmi_init_sro(...) ({						\
-+	struct rmi_sro_state *sro = kmalloc_obj(*sro);			\
-+	if (sro)							\
-+		*sro = (struct rmi_sro_state){.regs = {__VA_ARGS__}};	\
-+	sro;								\
-+})
-+
-+#define rmi_smccc(...) do { \
-+	arm_smccc_1_1_invoke(__VA_ARGS__); \
-+} while (RMI_RETURN_STATUS(res.a0) == RMI_BUSY || \
-+	 RMI_RETURN_STATUS(res.a0) == RMI_BLOCKED)
-+
- /**
-  * rmi_rmm_config_get() - Get the system configuration
-  * @cfg_ptr: PA of a struct rmm_config
-@@ -410,29 +431,7 @@ static inline int rmi_realm_destroy(unsigned long rd)
- }
- 
- /**
-- * rmi_rec_aux_count() - Get number of auxiliary granules required
-- * @rd: PA of the RD
-- * @aux_count: Number of granules written to this pointer
-- *
-- * A REC may require extra auxiliary granules to be delegated for the RMM to
-- * store metadata (not visible to the normal world) in. This function provides
-- * the number of granules that are required.
-- *
-- * Return: RMI return code
-- */
--static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
--{
--	struct arm_smccc_res res;
--
--	arm_smccc_1_1_invoke(SMC_RMI_REC_AUX_COUNT, rd, &res);
--
--	if (aux_count)
--		*aux_count = res.a1;
--	return res.a0;
--}
--
--/**
-- * rmi_rec_create() - Create a REC
-+ * rmi_rec_create_sro_init() - Init an SRO to create a REC
-  * @rd: PA of the RD
-  * @rec: PA of the target REC
-  * @params: PA of REC parameters
-@@ -440,33 +439,27 @@ static inline int rmi_rec_aux_count(unsigned long rd, unsigned long *aux_count)
-  * Create a REC using the parameters specified in the struct rec_params pointed
-  * to by @params.
-  *
-- * Return: RMI return code
-+ * Returns: Allocated SRO object
-  */
--static inline int rmi_rec_create(unsigned long rd, unsigned long rec,
--				 unsigned long params)
-+static inline struct rmi_sro_state *
-+rmi_rec_create_sro_init(unsigned long rd,
-+			unsigned long rec,
-+			unsigned long params)
- {
--	struct arm_smccc_res res;
--
--	arm_smccc_1_1_invoke(SMC_RMI_REC_CREATE, rd, rec, params, &res);
--
--	return res.a0;
-+	return rmi_init_sro(SMC_RMI_REC_CREATE, rd, rec, params);
- }
- 
- /**
-- * rmi_rec_destroy() - Destroy a REC
-+ * rmi_rec_destroy_sro_init() - Init an SRO to destroy a REC
-  * @rec: PA of the target REC
-  *
-  * Destroys a REC. The REC must not be running.
-  *
-- * Return: RMI return code
-+ * Return: Allocated SRO object
-  */
--static inline int rmi_rec_destroy(unsigned long rec)
-+static inline struct rmi_sro_state *rmi_rec_destroy_sro_init(unsigned long rec)
- {
--	struct arm_smccc_res res;
--
--	arm_smccc_1_1_invoke(SMC_RMI_REC_DESTROY, rec, &res);
--
--	return res.a0;
-+	return rmi_init_sro(SMC_RMI_REC_DESTROY, rec);
- }
- 
- /**
-diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-index 049d71470486..fa23818e1b4c 100644
---- a/arch/arm64/include/asm/rmi_smc.h
-+++ b/arch/arm64/include/asm/rmi_smc.h
-@@ -38,7 +38,6 @@
- #define SMC_RMI_PSCI_COMPLETE			SMC_RMI_CALL(0x0164)
- #define SMC_RMI_FEATURES			SMC_RMI_CALL(0x0165)
- #define SMC_RMI_RTT_FOLD			SMC_RMI_CALL(0x0166)
--#define SMC_RMI_REC_AUX_COUNT			SMC_RMI_CALL(0x0167) //
- #define SMC_RMI_RTT_INIT_RIPAS			SMC_RMI_CALL(0x0168)
- #define SMC_RMI_RTT_SET_RIPAS			SMC_RMI_CALL(0x0169)
- #define SMC_RMI_VSMMU_CREATE			SMC_RMI_CALL(0x016a)
-@@ -180,11 +179,18 @@
- #define RMI_ADDR_TYPE_SINGLE		1
- #define RMI_ADDR_TYPE_LIST		2
- 
--#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(GENMASK(1, 0), (ar)))
--#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(GENMASK(PAGE_SHIFT - 1, 2), \
-+#define RMI_ADDR_RANGE_SIZE_MASK	GENMASK(1, 0)
-+#define RMI_ADDR_RANGE_COUNT_MASK	GENMASK(PAGE_SHIFT - 1, 2)
-+#define RMI_ADDR_RANGE_ADDR_MASK	(PAGE_MASK & GENMASK(51, 0))
-+#define RMI_ADDR_RANGE_STATE_MASK	BIT(63)
-+
-+#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(RMI_ADDR_RANGE_SIZE_MASK, \
-+						   (ar)))
-+#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(RMI_ADDR_RANGE_COUNT_MASK, \
-+						   (ar)))
-+#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & RMI_ADDR_RANGE_ADDR_MASK)
-+#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(RMI_ADDR_RANGE_STATE_MASK, \
- 						   (ar)))
--#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & PAGE_MASK & GENMASK(51, 0))
--#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(BIT(63), (ar)))
- 
- enum rmi_ripas {
- 	RMI_EMPTY = 0,
-@@ -295,8 +301,6 @@ struct realm_params {
- 
- #define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
- 
--#define REC_PARAMS_AUX_GRANULES		16
--
- struct rec_params {
- 	union { /* 0x0 */
- 		u64 flags;
-@@ -312,14 +316,7 @@ struct rec_params {
- 	};
- 	union { /* 0x300 */
- 		u64 gprs[REC_CREATE_NR_GPRS];
--		u8 padding3[0x500];
--	};
--	union { /* 0x800 */
--		struct {
--			u64 num_rec_aux;
--			u64 aux[REC_PARAMS_AUX_GRANULES];
--		};
--		u8 padding4[0x800];
-+		u8 padding3[0xd00];
- 	};
- };
- 
-diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index e76e58762f55..10ff1c3bddaf 100644
---- a/arch/arm64/kvm/rmi.c
-+++ b/arch/arm64/kvm/rmi.c
-@@ -20,6 +20,295 @@ static unsigned long rmm_feat_reg1;
- 
- #define RMM_L2_BLOCK_SIZE	PMD_SIZE
- 
-+static int delegate_range(phys_addr_t phys, unsigned long size);
-+static int undelegate_range(phys_addr_t phys, unsigned long size);
-+
-+static unsigned long donate_req_to_size(unsigned long donatereq)
-+{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
-+
-+	switch (unit_size) {
-+	case 0:
-+		return PAGE_SIZE;
-+	case 1:
-+		return PMD_SIZE;
-+	case 2:
-+		return PUD_SIZE;
-+	case 3:
-+		return P4D_SIZE;
-+	}
-+	unreachable();
-+}
-+
-+static void rmi_smccc_invoke(struct arm_smccc_1_2_regs *regs_in,
-+			     struct arm_smccc_1_2_regs *regs_out)
-+{
-+	struct arm_smccc_1_2_regs regs = *regs_in;
-+	unsigned long status;
-+
-+	do {
-+		arm_smccc_1_2_invoke(&regs, regs_out);
-+		status = RMI_RETURN_STATUS(regs_out->a0);
-+	} while (status == RMI_BUSY || status == RMI_BLOCKED);
-+}
-+
-+static int rmi_sro_donate_contig(struct rmi_sro_state *sro,
-+				 unsigned long sro_handle,
-+				 unsigned long donatereq,
-+				 struct arm_smccc_1_2_regs *out_regs,
-+				 gfp_t gfp)
-+{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+	unsigned long state = RMI_DONATE_STATE(donatereq);
-+	unsigned long size;
-+	unsigned long addr_range;
-+	struct page *pages;
-+	phys_addr_t phys;
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_OP_MEM_DONATE,
-+		sro_handle
-+	};
-+
-+	for (int i = 0; i < sro->addr_count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+
-+		if (RMI_ADDR_RANGE_SIZE(entry) == unit_size &&
-+		    RMI_ADDR_RANGE_COUNT(entry) == count &&
-+		    RMI_ADDR_RANGE_STATE(entry) == state) {
-+			sro->addr_count--;
-+			swap(sro->addr_list[sro->addr_count],
-+			     sro->addr_list[i]);
-+
-+			goto out;
-+		}
-+	}
-+
-+	size = donate_req_to_size(donatereq) * count;
-+
-+	pages = alloc_pages(gfp, get_order(size));
-+	if (!pages)
-+		return -ENOMEM;
-+	phys = page_to_phys(pages);
-+
-+	if (state == RMI_OP_MEM_DELEGATED) {
-+		if (delegate_range(phys, size)) {
-+			__free_pages(pages, get_order(size));
-+			return -ENXIO;
-+		}
-+	}
-+
-+	addr_range = phys & RMI_ADDR_RANGE_ADDR_MASK;
-+	FIELD_MODIFY(RMI_ADDR_RANGE_SIZE_MASK, &addr_range, unit_size);
-+	FIELD_MODIFY(RMI_ADDR_RANGE_COUNT_MASK, &addr_range, count);
-+	FIELD_MODIFY(RMI_ADDR_RANGE_STATE_MASK, &addr_range, state);
-+
-+	sro->addr_list[sro->addr_count] = addr_range;
-+
-+out:
-+	regs.a2 = virt_to_phys(&sro->addr_list[sro->addr_count]);
-+	regs.a3 = 1;
-+	rmi_smccc_invoke(&regs, out_regs);
-+
-+	unsigned long donated_granules = out_regs->a1;
-+
-+	WARN_ON(donated_granules > 1);
-+	if (WARN_ON(donated_granules == 0)) {
-+		sro->addr_count++;
-+		return 0;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_donate_noncontig(struct rmi_sro_state *sro,
-+				    unsigned long sro_handle,
-+				    unsigned long donatereq,
-+				    struct arm_smccc_1_2_regs *out_regs,
-+				    gfp_t gfp)
-+{
-+	unsigned long unit_size = RMI_DONATE_SIZE(donatereq);
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+	unsigned long state = RMI_DONATE_STATE(donatereq);
-+	unsigned long found = 0;
-+	unsigned long addr_list_start = sro->addr_count;
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_OP_MEM_DONATE,
-+		sro_handle
-+	};
-+
-+	for (int i = 0; i < addr_list_start && found < count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+
-+		if (RMI_ADDR_RANGE_SIZE(entry) == unit_size &&
-+		    RMI_ADDR_RANGE_COUNT(entry) == 1 &&
-+		    RMI_ADDR_RANGE_STATE(entry) == state) {
-+			addr_list_start--;
-+			swap(sro->addr_list[addr_list_start],
-+			     sro->addr_list[i]);
-+			found++;
-+			i--;
-+		}
-+	}
-+
-+	while (found < count) {
-+		unsigned long addr_range;
-+		unsigned long size = donate_req_to_size(donatereq);
-+
-+		struct page *pages = alloc_pages(gfp, get_order(size));
-+		phys_addr_t phys;
-+
-+		if (!pages)
-+			return -ENOMEM;
-+
-+		phys = page_to_phys(pages);
-+
-+		if (state == RMI_OP_MEM_DELEGATED) {
-+			if (delegate_range(phys, size)) {
-+				__free_pages(pages, get_order(size));
-+				return -ENXIO;
-+			}
-+		}
-+
-+		addr_range = phys & RMI_ADDR_RANGE_ADDR_MASK;
-+		FIELD_MODIFY(RMI_ADDR_RANGE_SIZE_MASK, &addr_range, unit_size);
-+		FIELD_MODIFY(RMI_ADDR_RANGE_COUNT_MASK, &addr_range, 1);
-+		FIELD_MODIFY(RMI_ADDR_RANGE_STATE_MASK, &addr_range, state);
-+
-+		sro->addr_list[sro->addr_count++] = addr_range;
-+		found++;
-+	}
-+
-+	regs.a2 = virt_to_phys(&sro->addr_list[addr_list_start]);
-+	regs.a3 = found;
-+	rmi_smccc_invoke(&regs, out_regs);
-+
-+	unsigned long donated_granules = out_regs->a1;
-+
-+	while (donated_granules < found) {
-+		swap(sro->addr_list[addr_list_start++],
-+		     sro->addr_list[--sro->addr_count]);
-+		found--;
-+	}
-+	sro->addr_count -= donated_granules;
-+
-+	return 0;
-+}
-+
-+static int rmi_sro_donate(struct rmi_sro_state *sro,
-+			  unsigned long sro_handle,
-+			  unsigned long donatereq,
-+			  struct arm_smccc_1_2_regs *regs,
-+			  gfp_t gfp)
-+{
-+	unsigned long count = RMI_DONATE_COUNT(donatereq);
-+
-+	if (WARN_ON(!count))
-+		return 0;
-+
-+	if (RMI_DONATE_CONTIG(donatereq)) {
-+		return rmi_sro_donate_contig(sro, sro_handle, donatereq,
-+					     regs, gfp);
-+	} else {
-+		return rmi_sro_donate_noncontig(sro, sro_handle, donatereq,
-+						regs, gfp);
-+	}
-+}
-+
-+static int rmi_sro_reclaim(struct rmi_sro_state *sro,
-+			   unsigned long sro_handle,
-+			   struct arm_smccc_1_2_regs *out_regs)
-+{
-+	struct arm_smccc_1_2_regs regs = {
-+		SMC_RMI_OP_MEM_RECLAIM,
-+		sro_handle,
-+		virt_to_phys(&sro->addr_list[sro->addr_count]),
-+		RMI_MAX_ADDR_LIST - sro->addr_count
-+	};
-+	rmi_smccc_invoke(&regs, out_regs);
-+	sro->addr_count += out_regs->a1;
-+
-+	return 0;
-+}
-+
-+static void rmi_sro_free(struct rmi_sro_state *sro)
-+{
-+	for (int i = 0; i < sro->addr_count; i++) {
-+		unsigned long entry = sro->addr_list[i];
-+		unsigned long addr = RMI_ADDR_RANGE_ADDR(entry);
-+		unsigned long unit_size = RMI_ADDR_RANGE_SIZE(entry);
-+		unsigned long count = RMI_ADDR_RANGE_COUNT(entry);
-+		unsigned long state = RMI_ADDR_RANGE_STATE(entry);
-+		unsigned long size = donate_req_to_size(unit_size) * count;
-+
-+		if (state == RMI_OP_MEM_DELEGATED) {
-+			if (WARN_ON(undelegate_range(addr, size))) {
-+				/* Leak the pages */
-+				continue;
-+			}
-+		}
-+		__free_pages(phys_to_page(addr), get_order(size));
-+	}
-+
-+	sro->addr_count = 0;
-+}
-+
-+DEFINE_FREE(sro, struct rmi_sro_state *, if (_T) rmi_sro_free(_T))
-+
-+static unsigned long rmi_sro_execute(struct rmi_sro_state *sro)
-+{
-+	unsigned long sro_handle;
-+	struct arm_smccc_1_2_regs regs;
-+	struct arm_smccc_1_2_regs *regs_in = &sro->regs;
-+
-+	rmi_smccc_invoke(regs_in, &regs);
-+
-+	sro_handle = regs.a1;
-+
-+	while (RMI_RETURN_STATUS(regs.a0) == RMI_INCOMPLETE) {
-+		bool can_cancel = RMI_RETURN_CANCANCEL(regs.a0);
-+		int ret;
-+
-+		switch (RMI_RETURN_MEMREQ(regs.a0)) {
-+		case RMI_OP_MEM_REQ_NONE:
-+			regs = (struct arm_smccc_1_2_regs){
-+				SMC_RMI_OP_CONTINUE, sro_handle, 0
-+			};
-+			rmi_smccc_invoke(&regs, &regs);
-+			break;
-+		case RMI_OP_MEM_REQ_DONATE:
-+			ret = rmi_sro_donate(sro, sro_handle, regs.a2, &regs,
-+					     GFP_KERNEL);
-+			break;
-+		case RMI_OP_MEM_REQ_RECLAIM:
-+			ret = rmi_sro_reclaim(sro, sro_handle, &regs);
-+			break;
-+		default:
-+			ret = WARN_ON(1);
-+			break;
-+		}
-+
-+		if (ret) {
-+			if (can_cancel) {
-+				/*
-+				 * FIXME: Handle cancelling properly!
-+				 *
-+				 * If the operation has failed due to memory
-+				 * allocation failure then the information on
-+				 * the memory allocation should be saved, so
-+				 * that the allocation can be repeated outside
-+				 * of any context which prevented the
-+				 * allocation.
-+				 */
-+			}
-+			if (WARN_ON(ret))
-+				return ret;
-+		}
-+	}
-+
-+	return regs.a0;
-+}
-+
- static inline unsigned long rmi_rtt_level_mapsize(int level)
- {
- 	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
-@@ -795,12 +1084,6 @@ static int realm_create_rd(struct kvm *kvm)
- 		goto out_undelegate_tables;
- 	}
- 
--	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
--		WARN_ON(rmi_realm_destroy(rd_phys));
--		r = -ENXIO;
--		goto out_undelegate_tables;
--	}
--
- 	realm->rd = rd;
- 	WRITE_ONCE(realm->state, REALM_STATE_NEW);
- 	/* The realm is up, free the parameters.  */
-@@ -1432,65 +1715,9 @@ int noinstr kvm_rec_enter(struct kvm_vcpu *vcpu)
- 	return ret;
- }
- 
--static void free_rec_aux(struct page **aux_pages,
--			 unsigned int num_aux)
--{
--	unsigned int i;
--	unsigned int page_count = 0;
--
--	for (i = 0; i < num_aux; i++) {
--		struct page *aux_page = aux_pages[page_count++];
--		phys_addr_t aux_page_phys = page_to_phys(aux_page);
--
--		if (!WARN_ON(undelegate_page(aux_page_phys)))
--			__free_page(aux_page);
--		aux_page_phys += PAGE_SIZE;
--	}
--}
--
--static int alloc_rec_aux(struct page **aux_pages,
--			 u64 *aux_phys_pages,
--			 unsigned int num_aux)
--{
--	struct page *aux_page;
--	unsigned int i;
--	int ret;
--
--	for (i = 0; i < num_aux; i++) {
--		phys_addr_t aux_page_phys;
--
--		aux_page = alloc_page(GFP_KERNEL);
--		if (!aux_page) {
--			ret = -ENOMEM;
--			goto out_err;
--		}
--
--		aux_page_phys = page_to_phys(aux_page);
--		if (delegate_page(aux_page_phys)) {
--			ret = -ENXIO;
--			goto err_undelegate;
--		}
--		aux_phys_pages[i] = aux_page_phys;
--		aux_pages[i] = aux_page;
--	}
--
--	return 0;
--err_undelegate:
--	while (i > 0) {
--		i--;
--		if (WARN_ON(undelegate_page(aux_phys_pages[i]))) {
--			/* Leak the page if the undelegate fails */
--			goto out_err;
--		}
--	}
--	__free_page(aux_page);
--out_err:
--	free_rec_aux(aux_pages, i);
--	return ret;
--}
--
- static int kvm_create_rec(struct kvm_vcpu *vcpu)
- {
-+	struct rmi_sro_state *sro __free(sro) = NULL;
- 	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
- 	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
- 	struct realm *realm = &vcpu->kvm->arch.realm;
-@@ -1538,18 +1765,17 @@ static int kvm_create_rec(struct kvm_vcpu *vcpu)
- 		goto out_free_pages;
- 	}
- 
--	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
--	if (r)
--		goto out_undelegate_rmm_rec;
--
--	params->num_rec_aux = realm->num_aux;
- 	params->mpidr = mpidr;
- 
--	if (rmi_rec_create(virt_to_phys(realm->rd),
--			   rec_page_phys,
--			   virt_to_phys(params))) {
-+	sro = rmi_rec_create_sro_init(virt_to_phys(realm->rd),
-+				      rec_page_phys, virt_to_phys(params));
-+	if (!sro) {
-+		r = -ENOMEM;
-+		goto out_undelegate_rmm_rec;
-+	}
-+	if (rmi_sro_execute(sro)) {
- 		r = -ENXIO;
--		goto out_free_rec_aux;
-+		goto out_undelegate_rmm_rec;
- 	}
- 
- 	rec->mpidr = mpidr;
-@@ -1557,8 +1783,6 @@ static int kvm_create_rec(struct kvm_vcpu *vcpu)
- 	free_page((unsigned long)params);
- 	return 0;
- 
--out_free_rec_aux:
--	free_rec_aux(rec->aux_pages, realm->num_aux);
- out_undelegate_rmm_rec:
- 	if (WARN_ON(undelegate_page(rec_page_phys)))
- 		rec->rec_page = NULL;
-@@ -1572,7 +1796,7 @@ static int kvm_create_rec(struct kvm_vcpu *vcpu)
- 
- void kvm_destroy_rec(struct kvm_vcpu *vcpu)
- {
--	struct realm *realm = &vcpu->kvm->arch.realm;
-+	struct rmi_sro_state *sro __free(sro) = NULL;
- 	struct realm_rec *rec = &vcpu->arch.rec;
- 	unsigned long rec_page_phys;
- 
-@@ -1588,15 +1812,12 @@ void kvm_destroy_rec(struct kvm_vcpu *vcpu)
- 
- 	rec_page_phys = virt_to_phys(rec->rec_page);
- 
--	/*
--	 * The REC and any AUX pages cannot be reclaimed until the REC is
--	 * destroyed. So if the REC destroy fails then the REC page and any AUX
--	 * pages will be leaked.
--	 */
--	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
-+	sro = rmi_rec_destroy_sro_init(rec_page_phys);
-+	if (WARN_ON(!sro))
- 		return;
- 
--	free_rec_aux(rec->aux_pages, realm->num_aux);
-+	if (WARN_ON(rmi_sro_execute(sro)))
-+		return;
- 
- 	free_delegated_page(rec_page_phys);
- }
--- 
-2.43.0
-
+> +
+> +#ifndef __ASM_RMI_SMC_H
+> +#define __ASM_RMI_SMC_H
+> +
+> +#include <linux/arm-smccc.h>
+> +
+> +#define SMC_RMI_CALL(func)				\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
+> +			   ARM_SMCCC_SMC_64,		\
+> +			   ARM_SMCCC_OWNER_STANDARD,	\
+> +			   (func))
+> +
+> +#define SMC_RMI_VERSION				SMC_RMI_CALL(0x0150)
+> +
+> +#define SMC_RMI_RTT_DATA_MAP_INIT		SMC_RMI_CALL(0x0153)
+> +
+> +#define SMC_RMI_REALM_ACTIVATE			SMC_RMI_CALL(0x0157)
+> +#define SMC_RMI_REALM_CREATE			SMC_RMI_CALL(0x0158)
+> +#define SMC_RMI_REALM_DESTROY			SMC_RMI_CALL(0x0159)
+> +#define SMC_RMI_REC_CREATE			SMC_RMI_CALL(0x015a)
+> +#define SMC_RMI_REC_DESTROY			SMC_RMI_CALL(0x015b)
+> +#define SMC_RMI_REC_ENTER			SMC_RMI_CALL(0x015c)
+> +#define SMC_RMI_RTT_CREATE			SMC_RMI_CALL(0x015d)
+> +#define SMC_RMI_RTT_DESTROY			SMC_RMI_CALL(0x015e)
+> +
+> +#define SMC_RMI_RTT_READ_ENTRY			SMC_RMI_CALL(0x0161)
+> +
+> +#define SMC_RMI_RTT_DEV_VALIDATE		SMC_RMI_CALL(0x0163)
+> +#define SMC_RMI_PSCI_COMPLETE			SMC_RMI_CALL(0x0164)
+> +#define SMC_RMI_FEATURES			SMC_RMI_CALL(0x0165)
+> +#define SMC_RMI_RTT_FOLD			SMC_RMI_CALL(0x0166)
+> +
+> +#define SMC_RMI_RTT_INIT_RIPAS			SMC_RMI_CALL(0x0168)
+> +#define SMC_RMI_RTT_SET_RIPAS			SMC_RMI_CALL(0x0169)
+> +#define SMC_RMI_VSMMU_CREATE			SMC_RMI_CALL(0x016a)
+> +#define SMC_RMI_VSMMU_DESTROY			SMC_RMI_CALL(0x016b)
+> +#define SMC_RMI_RMM_CONFIG_SET			SMC_RMI_CALL(0x016e)
+> +#define SMC_RMI_PSMMU_IRQ_NOTIFY		SMC_RMI_CALL(0x016f)
+> +#define SMC_RMI_ATTEST_PLAT_TOKEN_REFRESH	SMC_RMI_CALL(0x0170)
+> +
+> +#define SMC_RMI_PDEV_ABORT			SMC_RMI_CALL(0x0174)
+> +#define SMC_RMI_PDEV_COMMUNICATE		SMC_RMI_CALL(0x0175)
+> +#define SMC_RMI_PDEV_CREATE			SMC_RMI_CALL(0x0176)
+> +#define SMC_RMI_PDEV_DESTROY			SMC_RMI_CALL(0x0177)
+> +#define SMC_RMI_PDEV_GET_STATE			SMC_RMI_CALL(0x0178)
+> +
+> +#define SMC_RMI_PDEV_STREAM_KEY_REFRESH		SMC_RMI_CALL(0x017a)
+> +#define SMC_RMI_PDEV_SET_PUBKEY			SMC_RMI_CALL(0x017b)
+> +#define SMC_RMI_PDEV_STOP			SMC_RMI_CALL(0x017c)
+> +#define SMC_RMI_RTT_AUX_CREATE			SMC_RMI_CALL(0x017d)
+> +#define SMC_RMI_RTT_AUX_DESTROY			SMC_RMI_CALL(0x017e)
+> +#define SMC_RMI_RTT_AUX_FOLD			SMC_RMI_CALL(0x017f)
+> +
+> +#define SMC_RMI_VDEV_ABORT			SMC_RMI_CALL(0x0185)
+> +#define SMC_RMI_VDEV_COMMUNICATE		SMC_RMI_CALL(0x0186)
+> +#define SMC_RMI_VDEV_CREATE			SMC_RMI_CALL(0x0187)
+> +#define SMC_RMI_VDEV_DESTROY			SMC_RMI_CALL(0x0188)
+> +#define SMC_RMI_VDEV_GET_STATE			SMC_RMI_CALL(0x0189)
+> +#define SMC_RMI_VDEV_UNLOCK			SMC_RMI_CALL(0x018a)
+> +#define SMC_RMI_RTT_SET_S2AP			SMC_RMI_CALL(0x018b)
+> +#define SMC_RMI_VDEV_COMPLETE			SMC_RMI_CALL(0x018e)
+> +
+> +#define SMC_RMI_VDEV_GET_INTERFACE_REPORT	SMC_RMI_CALL(0x01d0)
+> +#define SMC_RMI_VDEV_GET_MEASUREMENTS		SMC_RMI_CALL(0x01d1)
+> +#define SMC_RMI_VDEV_LOCK			SMC_RMI_CALL(0x01d2)
+> +#define SMC_RMI_VDEV_START			SMC_RMI_CALL(0x01d3)
+> +#define SMC_RMI_VDEV_P2P_BIND			SMC_RMI_CALL(0x01d4)
+> +#define SMC_RMI_VDEV_P2P_UNBIND			SMC_RMI_CALL(0x01d5)
+> +#define SMC_RMI_VSMMU_EVENT_NOTIFY		SMC_RMI_CALL(0x01d6)
+> +#define SMC_RMI_PSMMU_ACTIVATE			SMC_RMI_CALL(0x01d7)
+> +#define SMC_RMI_PSMMU_DEACTIVATE		SMC_RMI_CALL(0x01d8)
+> +
+> +#define SMC_RMI_PSMMU_ST_L2_CREATE		SMC_RMI_CALL(0x01db)
+> +#define SMC_RMI_PSMMU_ST_L2_DESTROY		SMC_RMI_CALL(0x01dc)
+> +#define SMC_RMI_DPT_L0_CREATE			SMC_RMI_CALL(0x01dd)
+> +#define SMC_RMI_DPT_L0_DESTROY			SMC_RMI_CALL(0x01de)
+> +#define SMC_RMI_DPT_L1_CREATE			SMC_RMI_CALL(0x01df)
+> +#define SMC_RMI_DPT_L1_DESTROY			SMC_RMI_CALL(0x01e0)
+> +#define SMC_RMI_GRANULE_TRACKING_GET		SMC_RMI_CALL(0x01e1)
+> +
+> +#define SMC_RMI_GRANULE_TRACKING_SET		SMC_RMI_CALL(0x01e3)
+> +#define SMC_RMI_CMEM_ADD_PDEV			SMC_RMI_CALL(0x01e4)
+> +#define SMC_RMI_CMEM_CREATE			SMC_RMI_CALL(0x01e5)
+> +#define SMC_RMI_CMEM_DESTROY			SMC_RMI_CALL(0x01e6)
+> +#define SMC_RMI_CMEM_POPULATE			SMC_RMI_CALL(0x01e7)
+> +#define SMC_RMI_CMEM_REMOTE_PDEV		SMC_RMI_CALL(0x01e8)
+> +#define SMC_RMI_CMEM_START			SMC_RMI_CALL(0x01e9)
+> +#define SMC_RMI_CMEM_STOP			SMC_RMI_CALL(0x01ea)
+> +#define SMC_RMI_CMEM_UNPOPULATE			SMC_RMI_CALL(0x01eb)
+> +#define SMC_RMI_RMM_CONFIG_GET			SMC_RMI_CALL(0x01ec)
+> +#define SMC_RMI_PDEV_MEC_UPDATE			SMC_RMI_CALL(0x01ed)
+> +#define SMC_RMI_VSMMU_EVENT_COMPLETE		SMC_RMI_CALL(0x01ee)
+> +
+> +#define SMC_RMI_PSMMU_EVENT_DISCARD		SMC_RMI_CALL(0x01f0)
+> +#define SMC_RMI_GRANULE_RANGE_DELEGATE		SMC_RMI_CALL(0x01f1)
+> +#define SMC_RMI_GRANULE_RANGE_UNDELEGATE	SMC_RMI_CALL(0x01f2)
+> +#define SMC_RMI_GPT_L1_CREATE			SMC_RMI_CALL(0x01f3)
+> +#define SMC_RMI_GPT_L1_DESTROY			SMC_RMI_CALL(0x01f4)
+> +#define SMC_RMI_RTT_DATA_MAP			SMC_RMI_CALL(0x01f5)
+> +#define SMC_RMI_RTT_DATA_UNMAP			SMC_RMI_CALL(0x01f6)
+> +#define SMC_RMI_RTT_DEV_MAP			SMC_RMI_CALL(0x01f7)
+> +#define SMC_RMI_RTT_DEV_UNMAP			SMC_RMI_CALL(0x01f8)
+> +#define SMC_RMI_RTT_ARCH_DEV_MAP		SMC_RMI_CALL(0x01f9)
+> +#define SMC_RMI_RTT_ARCH_DEV_UNMAP		SMC_RMI_CALL(0x01fa)
+> +#define SMC_RMI_RTT_UNPROT_MAP			SMC_RMI_CALL(0x01fb)
+> +#define SMC_RMI_RTT_UNPROT_UNMAP		SMC_RMI_CALL(0x01fc)
+> +#define SMC_RMI_RTT_AUX_PROT_MAP		SMC_RMI_CALL(0x01fd)
+> +#define SMC_RMI_RTT_AUX_PROT_UNMAP		SMC_RMI_CALL(0x01fe)
+> +#define SMC_RMI_RTT_AUX_UNPROT_MAP		SMC_RMI_CALL(0x01ff)
+> +#define SMC_RMI_RTT_AUX_UNMAP_UNMAP		SMC_RMI_CALL(0x0200)
+> +#define SMC_RMI_REALM_TERMINATE			SMC_RMI_CALL(0x0201)
+> +#define SMC_RMI_RMM_ACTIVATE			SMC_RMI_CALL(0x0202)
+> +#define SMC_RMI_OP_CONTINUE			SMC_RMI_CALL(0x0203)
+> +#define SMC_RMI_PDEV_STREAM_CONNECT		SMC_RMI_CALL(0x0204)
+> +#define SMC_RMI_PDEV_STREAM_DISCONNECT		SMC_RMI_CALL(0x0205)
+> +#define SMC_RMI_PDEV_STREAM_COMPLETE		SMC_RMI_CALL(0x0206)
+> +#define SMC_RMI_PDEV_STREAM_KEY_PURGE		SMC_RMI_CALL(0x0207)
+> +#define SMC_RMI_OP_MEM_DONATE			SMC_RMI_CALL(0x0208)
+> +#define SMC_RMI_OP_MEM_RECLAIM			SMC_RMI_CALL(0x0209)
+> +#define SMC_RMI_OP_CANCEL			SMC_RMI_CALL(0x020a)
+> +#define SMC_RMI_PDEV_SET_PROT			SMC_RMI_CALL(0x020b)
+> +
+> +#define RMI_ABI_MAJOR_VERSION	2
+> +#define RMI_ABI_MINOR_VERSION	0
+> +
+> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
+> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
+> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
+> +
+> +#define RMI_UNASSIGNED			0
+> +#define RMI_ASSIGNED			1
+> +#define RMI_TABLE			2
+> +
+> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
+> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
+> +#define RMI_RETURN_MEMREQ(ret)		(((ret) >> 8) & 0x3)
+> +#define RMI_RETURN_CANCANCEL(ret)	(((ret) >> 10) & 0x1)
+> +
+> +#define RMI_SUCCESS			0
+> +#define RMI_ERROR_INPUT			1
+> +#define RMI_ERROR_REALM			2
+> +#define RMI_ERROR_REC			3
+> +#define RMI_ERROR_RTT			4
+> +#define RMI_ERROR_NOT_SUPPORTED		5
+> +#define RMI_ERROR_DEVICE		6
+> +#define RMI_ERROR_RTT_AUX		7
+> +#define RMI_ERROR_PSMMU_ST		8
+> +#define RMI_ERROR_DPT			9
+> +#define RMI_BUSY			10
+> +#define RMI_ERROR_GLOBAL		11
+> +#define RMI_ERROR_TRACKING		12
+> +#define RMI_INCOMPLETE			13
+> +#define RMI_BLOCKED			14
+> +#define RMI_ERROR_GPT			15
+> +#define RMI_ERROR_GRANULE		16
+> +
+> +#define RMI_OP_MEM_REQ_NONE		0
+> +#define RMI_OP_MEM_REQ_DONATE		1
+> +#define RMI_OP_MEM_REQ_RECLAIM		2
+> +
+> +#define RMI_DONATE_SIZE(req)		((req) & 0x3)
+> +#define RMI_DONATE_COUNT_MASK		GENMASK(15, 2)
+> +#define RMI_DONATE_COUNT(req)		(((req) & RMI_DONATE_COUNT_MASK) >> 2)
+> +#define RMI_DONATE_CONTIG(req)		(!!((req) & BIT(16)))
+> +#define RMI_DONATE_STATE(req)		(!!((req) & BIT(17)))
+> +
+> +#define RMI_OP_MEM_DELEGATED		0
+> +#define RMI_OP_MEM_UNDELEGATED		1
+> +
+> +#define RMI_ADDR_TYPE_NONE		0
+> +#define RMI_ADDR_TYPE_SINGLE		1
+> +#define RMI_ADDR_TYPE_LIST		2
+> +
+> +#define RMI_ADDR_RANGE_SIZE(ar)		(FIELD_GET(GENMASK(1, 0), (ar)))
+> +#define RMI_ADDR_RANGE_COUNT(ar)	(FIELD_GET(GENMASK(PAGE_SHIFT - 1, 2), \
+> +						   (ar)))
+> +#define RMI_ADDR_RANGE_ADDR(ar)		((ar) & PAGE_MASK & GENMASK(51, 0))
+> +#define RMI_ADDR_RANGE_STATE(ar)	(FIELD_GET(BIT(63), (ar)))
+> +
+> +enum rmi_ripas {
+> +	RMI_EMPTY = 0,
+> +	RMI_RAM = 1,
+> +	RMI_DESTROYED = 2,
+> +};
+> +
+> +#define RMI_NO_MEASURE_CONTENT	0
+> +#define RMI_MEASURE_CONTENT	1
+> +
+> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
+> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
+> +#define RMI_FEATURE_REGISTER_0_SVE		BIT(9)
+> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
+> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(19, 14)
+> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(25, 20)
+> +#define RMI_FEATURE_REGISTER_0_PMU		BIT(26)
+> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(31, 27)
+> +
+> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_4KB	BIT(0)
+> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_16KB	BIT(1)
+> +#define RMI_FEATURE_REGISTER_1_RMI_GRAN_SZ_64KB	BIT(2)
+> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_256	BIT(3)
+> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_384	BIT(4)
+> +#define RMI_FEATURE_REGISTER_1_HASH_SHA_512	BIT(5)
+> +#define RMI_FEATURE_REGISTER_1_MAX_RECS_ORDER	GENMASK(9, 6)
+> +#define RMI_FEATURE_REGISTER_1_L0GPTSZ		GENMASK(13, 10)
+> +#define RMI_FEATURE_REGISTER_1_PPS		GENMASK(16, 14)
+> +
+> +#define RMI_FEATURE_REGISTER_2_DA		BIT(0)
+> +#define RMI_FEATURE_REGISTER_2_DA_COH		BIT(1)
+> +#define RMI_FEATURE_REGISTER_2_VSMMU		BIT(2)
+> +#define RMI_FEATURE_REGISTER_2_ATS		BIT(3)
+> +#define RMI_FEATURE_REGISTER_2_MAX_VDEVS_ORDER	GEN_MASK(7, 4)
+> +#define RMI_FEATURE_REGISTER_2_VDEV_KROU	BIT(8)
+> +#define RMI_FEATURE_REGISTER_2_NON_TEE_STREAM	BIT(9)
+> +
+> +#define RMI_FEATURE_REGISTER_3_MAX_NUM_AUX_PLANES	GENMASK(3, 0)
+> +#define RMI_FEATURE_REGISTER_3_RTT_PLAN			GENMASK(5, 4)
+> +#define RMI_FEATURE_REGISTER_3_RTT_S2AP_INDIRECT	BIT(6)
+> +
+> +#define RMI_FEATURE_REGISTER_4_MEC_COUNT		GENMASK(63, 0)
+> +
+> +#define RMI_MEM_CATEGORY_CONVENTIONAL		0
+> +#define RMI_MEM_CATEGORY_DEV_NCOH		1
+> +#define RMI_MEM_CATEGORY_DEV_COH		2
+> +
+> +#define RMI_TRACKING_RESERVED			0
+> +#define RMI_TRACKING_NONE			1
+> +#define RMI_TRACKING_FINE			2
+> +#define RMI_TRACKING_COARSE			3
+> +
+> +#define RMI_GRANULE_SIZE_4KB	0
+> +#define RMI_GRANULE_SIZE_16KB	1
+> +#define RMI_GRANULE_SIZE_64KB	2
+> +
+> +/*
+> + * Note many of these fields are smaller than u64 but all fields have u64
+> + * alignment, so use u64 to ensure correct alignment.
+> + */
+> +struct rmm_config {
+> +	union { /* 0x0 */
+> +		struct {
+> +			u64 tracking_region_size;
+> +			u64 rmi_granule_size;
+> +		};
+> +		u8 sizer[0x1000];
+> +	};
+> +};
+> +
+> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
+> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
+> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
+> +
+> +struct realm_params {
+> +	union { /* 0x0 */
+> +		struct {
+> +			u64 flags;
+> +			u64 s2sz;
+> +			u64 sve_vl;
+> +			u64 num_bps;
+> +			u64 num_wps;
+> +			u64 pmu_num_ctrs;
+> +			u64 hash_algo;
+> +		};
+> +		u8 padding0[0x400];
+> +	};
+> +	union { /* 0x400 */
+> +		u8 rpv[64];
+> +		u8 padding1[0x400];
+> +	};
+> +	union { /* 0x800 */
+> +		struct {
+> +			u64 padding;
+> +			u64 rtt_base;
+> +			s64 rtt_level_start;
+> +			u64 rtt_num_start;
+> +		};
+> +		u8 padding2[0x800];
+> +	};
+> +};
+> +
+> +/*
+> + * The number of GPRs (starting from X0) that are
+> + * configured by the host when a REC is created.
+> + */
+> +#define REC_CREATE_NR_GPRS		8
+> +
+> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
+> +
+> +#define REC_PARAMS_AUX_GRANULES		16
+> +
+> +struct rec_params {
+> +	union { /* 0x0 */
+> +		u64 flags;
+> +		u8 padding0[0x100];
+> +	};
+> +	union { /* 0x100 */
+> +		u64 mpidr;
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 pc;
+> +		u8 padding2[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		u64 gprs[REC_CREATE_NR_GPRS];
+> +		u8 padding3[0x500];
+> +	};
+> +	union { /* 0x800 */
+> +		struct {
+> +			u64 num_rec_aux;
+> +			u64 aux[REC_PARAMS_AUX_GRANULES];
+> +		};
+> +		u8 padding4[0x800];
+> +	};
+> +};
+> +
+> +#define REC_ENTER_FLAG_EMULATED_MMIO	BIT(0)
+> +#define REC_ENTER_FLAG_INJECT_SEA	BIT(1)
+> +#define REC_ENTER_FLAG_TRAP_WFI		BIT(2)
+> +#define REC_ENTER_FLAG_TRAP_WFE		BIT(3)
+> +#define REC_ENTER_FLAG_RIPAS_RESPONSE	BIT(4)
+> +
+> +#define REC_RUN_GPRS			31
+> +#define REC_MAX_GIC_NUM_LRS		16
+> +
+> +#define RMI_PERMITTED_GICV3_HCR_BITS	(ICH_HCR_EL2_UIE |		\
+> +					 ICH_HCR_EL2_LRENPIE |		\
+> +					 ICH_HCR_EL2_NPIE |		\
+> +					 ICH_HCR_EL2_VGrp0EIE |		\
+> +					 ICH_HCR_EL2_VGrp0DIE |		\
+> +					 ICH_HCR_EL2_VGrp1EIE |		\
+> +					 ICH_HCR_EL2_VGrp1DIE |		\
+> +					 ICH_HCR_EL2_TDIR)
+> +
+> +struct rec_enter {
+> +	union { /* 0x000 */
+> +		u64 flags;
+> +		u8 padding0[0x200];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding1[0x100];
+> +	};
+> +	u8 padding3[0x500];
+> +};
+> +
+> +#define RMI_EXIT_SYNC			0x00
+> +#define RMI_EXIT_IRQ			0x01
+> +#define RMI_EXIT_FIQ			0x02
+> +#define RMI_EXIT_PSCI			0x03
+> +#define RMI_EXIT_RIPAS_CHANGE		0x04
+> +#define RMI_EXIT_HOST_CALL		0x05
+> +#define RMI_EXIT_SERROR			0x06
+> +
+> +struct rec_exit {
+> +	union { /* 0x000 */
+> +		u8 exit_reason;
+> +		u8 padding0[0x100];
+> +	};
+> +	union { /* 0x100 */
+> +		struct {
+> +			u64 esr;
+> +			u64 far;
+> +			u64 hpfar;
+> +			u64 rtt_tree;
+> +		};
+> +		u8 padding1[0x100];
+> +	};
+> +	union { /* 0x200 */
+> +		u64 gprs[REC_RUN_GPRS];
+> +		u8 padding2[0x100];
+> +	};
+> +	union { /* 0x300 */
+> +		u8 padding3[0x100];
+> +	};
+> +	union { /* 0x400 */
+> +		struct {
+> +			u64 cntp_ctl;
+> +			u64 cntp_cval;
+> +			u64 cntv_ctl;
+> +			u64 cntv_cval;
+> +		};
+> +		u8 padding4[0x100];
+> +	};
+> +	union { /* 0x500 */
+> +		struct {
+> +			u64 ripas_base;
+> +			u64 ripas_top;
+> +			u8 ripas_value;
+> +			u8 padding8[15];
+> +			u64 s2ap_base;
+> +			u64 s2ap_top;
+> +			u64 vdev_id_1;
+> +			u64 vdev_id_2;
+> +			u64 dev_mem_base;
+> +			u64 dev_mem_top;
+> +			u64 dev_mem_pa;
+> +		};
+> +		u8 padding5[0x100];
+> +	};
+> +	union { /* 0x600 */
+> +		struct {
+> +			u16 imm;
+> +			u16 padding9;
+> +			u64 plane;
+> +		};
+> +		u8 padding6[0x100];
+> +	};
+> +	union { /* 0x700 */
+> +		struct {
+> +			u8 pmu_ovf_status;
+> +			u8 padding10[15];
+> +			u64 vsmmu;
+> +		};
+> +		u8 padding7[0x100];
+> +	};
+> +};
+> +
+> +struct rec_run {
+> +	struct rec_enter enter;
+> +	struct rec_exit exit;
+> +};
+> +
+> +#endif /* __ASM_RMI_SMC_H */
+> -- 
+> 2.43.0
+> 
+> 
