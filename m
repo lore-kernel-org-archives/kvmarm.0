@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93763E5EC1;
-	Wed, 18 Mar 2026 15:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9453E5598;
+	Wed, 18 Mar 2026 15:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849278; cv=none; b=TAnyIH7GZb+6Kk4vZzo0jvkp0E76S8Og4QhEgg/fGFAtL4IMDlCF9EAF+cgIdVL6gRGZFOuoB6a66aNxcEIkK/DJS3G4pwbMgOiQ3XagMGYKsTU+vcN4OOa085ejIb7+hd1pHaj94QsfqzD5rCGfvw5+NtUZUX7ZSQc8+Gbs28w=
+	t=1773849281; cv=none; b=P8E0hnog9jSVNwe3cNEWpEURzGE0j1DiNDeDIFCrMQ/AL7XE45+e6Maj0vsohCALGIIW1B6bWzz7Br7mgO/9dC5M0SETRagu3Sevf2AVNB2vS3J5GeGV/DLaxT/6Ia4R7HSSRwfRjheW1Ea4ZzbNjAtpk0CCgsoRqgMbhTErntk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849278; c=relaxed/simple;
-	bh=ekAdScc9uXggAUeMl/XH95bPsDC+vlYb2oiZz+RRwS8=;
+	s=arc-20240116; t=1773849281; c=relaxed/simple;
+	bh=BuB8PuAz9jtQsiMwqHfML4ZmX/JN0b0i3RcQpBNGgyw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f9pjh9Hnzz1gXSDRCWIyOeJhEnwxcQrF8xUuP24v3X188JftKk2N1BCu6fz6GFMaPVekPb/YHD96AFs8sg6jCBC+x97VaNn/SwvrFQhvSyfMkPbyFB6XDKBjUEwRlXBxuBFfuD5ggB6764+TORfZJo7hFJntK1Wx0TPNpSFeQGI=
+	 MIME-Version; b=Sg3Cq2qJZgZWPmZo4DAc3v0YmPmGM6ohXaAfLZDZmvXe1IMsLv5LOvPb8/555z8G3wXe0rQVNBXB5uSnm0nw9sl0rQbiuU+RKujZiMGpn4yshUvI89DRn/sEd9gaHnqSbaw5HCrxAWK4QtSFBLWVusHfdJQOgBixwuI6U5ltkmM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0C3C1FCD;
-	Wed, 18 Mar 2026 08:54:26 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 55AD62008;
+	Wed, 18 Mar 2026 08:54:30 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BB2A13F73B;
-	Wed, 18 Mar 2026 08:54:29 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55DBA3F73B;
+	Wed, 18 Mar 2026 08:54:33 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 02/48] kvm: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
-Date: Wed, 18 Mar 2026 15:53:26 +0000
-Message-ID: <20260318155413.793430-3-steven.price@arm.com>
+Subject: [PATCH v13 03/48] arm64: RME: Handle Granule Protection Faults (GPFs)
+Date: Wed, 18 Mar 2026 15:53:27 +0000
+Message-ID: <20260318155413.793430-4-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,66 +57,74 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To avoid future include cycles, drop the linux/kvm_host.h include in
-kvm_pgtable.h and include two _types.h headers for the types that are
-actually used. Additionally provide a forward declaration for struct
-kvm_s2_mmu as it's only used as a pointer in this file.
+If the host attempts to access granules that have been delegated for use
+in a realm these accesses will be caught and will trigger a Granule
+Protection Fault (GPF).
 
-Both pgtable.c and kvm_pkvm.h relied on the indirect inclusion of
-kvm_host.h, so make that explicit.
+A fault during a page walk signals a bug in the kernel and is handled by
+oopsing the kernel. A non-page walk fault could be caused by user space
+having access to a page which has been delegated to the kernel and will
+trigger a SIGBUS to allow debugging why user space is trying to access a
+delegated page.
 
+Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-New patch in v13
+Changes since v10:
+ * Don't call arm64_notify_die() in do_gpf() but simply return 1.
+Changes since v2:
+ * Include missing "Granule Protection Fault at level -1"
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 5 ++++-
- arch/arm64/include/asm/kvm_pkvm.h    | 2 +-
- arch/arm64/kvm/hyp/pgtable.c         | 1 +
- 3 files changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/mm/fault.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index c201168f2857..f3fe85cebdf1 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -8,9 +8,12 @@
- #define __ARM64_KVM_PGTABLE_H__
+diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+index be9dab2c7d6a..13b1d5de6d77 100644
+--- a/arch/arm64/mm/fault.c
++++ b/arch/arm64/mm/fault.c
+@@ -858,6 +858,22 @@ static int do_tag_check_fault(unsigned long far, unsigned long esr,
+ 	return 0;
+ }
  
- #include <linux/bits.h>
--#include <linux/kvm_host.h>
-+#include <linux/kvm_types.h>
-+#include <linux/rbtree_types.h>
- #include <linux/types.h>
- 
-+struct kvm_s2_mmu;
++static int do_gpf_ptw(unsigned long far, unsigned long esr, struct pt_regs *regs)
++{
++	const struct fault_info *inf = esr_to_fault_info(esr);
 +
- #define KVM_PGTABLE_FIRST_LEVEL		-1
- #define KVM_PGTABLE_LAST_LEVEL		3
- 
-diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-index 757076ad4ec9..3a2480e269e6 100644
---- a/arch/arm64/include/asm/kvm_pkvm.h
-+++ b/arch/arm64/include/asm/kvm_pkvm.h
-@@ -9,7 +9,7 @@
- #include <linux/arm_ffa.h>
- #include <linux/memblock.h>
- #include <linux/scatterlist.h>
--#include <asm/kvm_host.h>
-+#include <linux/kvm_host.h>
- #include <asm/kvm_pgtable.h>
- 
- /* Maximum number of VMs that can co-exist under pKVM. */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 0e4ddd28ef5d..e2a3a52b163e 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/bitfield.h>
-+#include <linux/kvm_host.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
- 
++	die_kernel_fault(inf->name, far, esr, regs);
++	return 0;
++}
++
++static int do_gpf(unsigned long far, unsigned long esr, struct pt_regs *regs)
++{
++	if (!is_el1_instruction_abort(esr) && fixup_exception(regs, esr))
++		return 0;
++
++	return 1;
++}
++
+ static const struct fault_info fault_info[] = {
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"ttbr address size fault"	},
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"level 1 address size fault"	},
+@@ -894,12 +910,12 @@ static const struct fault_info fault_info[] = {
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 32"			},
+ 	{ do_alignment_fault,	SIGBUS,  BUS_ADRALN,	"alignment fault"		},
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 34"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 35"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 36"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 37"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 38"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 39"			},
+-	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 40"			},
++	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level -1" },
++	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 0" },
++	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 1" },
++	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 2" },
++	{ do_gpf_ptw,		SIGKILL, SI_KERNEL,	"Granule Protection Fault at level 3" },
++	{ do_gpf,		SIGBUS,  SI_KERNEL,	"Granule Protection Fault not on table walk" },
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"level -1 address size fault"	},
+ 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 42"			},
+ 	{ do_translation_fault,	SIGSEGV, SEGV_MAPERR,	"level -1 translation fault"	},
 -- 
 2.43.0
 
