@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3CD3FADF5;
-	Wed, 18 Mar 2026 15:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3283FB075;
+	Wed, 18 Mar 2026 15:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849322; cv=none; b=mEMAALxJVwsEYrDBxjRFnJ5SAOcr2WIEU+O2ES7Yg6AwrEv6BDHm85DRgVzb4Aevis6pELPVu9PulQ4gQbUPsRSXt1NvMAGTjZmgNt3YrTvIxOb/VS/TCxMprWBE9zz/uhgL6ymBfZ1N9MAQW6LsMPm+MWj6gP/4HrCQV0i9sdA=
+	t=1773849327; cv=none; b=C4SOG2PgOUYDO+PJfz2NsMKTAliGWtK5T2zBQx70zC8t6rlaRSm2VUwaFVNrRwXHUx1v12o3qHBJ8HmtubrH8Yoe4KfGFTR5wUsZz7n+OGS7p6dN9Ahp+QushQtnnVlZutcdX5UTtDVXbtmuMgOCDvoacDRBgC7ojU7N+nZA+6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849322; c=relaxed/simple;
-	bh=e90kpXoG73uyQWUPH82mNGphA53b6Ovsob4mepTqnOQ=;
+	s=arc-20240116; t=1773849327; c=relaxed/simple;
+	bh=Azy2K1BaGA6RduBH7BCam+KbHkx2EL2bV4YK104+7po=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qzhmfS/pXOUAs9bPltYqfecKReLXX55WPOe9mEqQJP+Ez0+F4yp9Vd0ImflmY49q/p3lxVUY1ahFVjvPkFsPJCR02iNavG9teopy+EoQVcGQqkGNwUfHEOOuz+BFglE70G4wkHEIucb7y3hIN+drHlijpoIYB5MeDUWMc8DbXdA=
+	 MIME-Version; b=nKocx8u2u5SH1UTTLO4cnqTsPNaXAldQhPZ8m7nfPpdMuoRTcetYJJENZ3wxylLzXPWUIguOreBSHyWapxq7NkPVFAnAZu2SJOKe9+C9EspxsTOYk+QDHr0D28ikjeaz0dnh1WZaA7QV3o2g5CHfT2OJFd+cZSQEsYm5RV3NsTM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 587511C2B;
-	Wed, 18 Mar 2026 08:55:11 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1933A204C;
+	Wed, 18 Mar 2026 08:55:15 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E62323F73B;
-	Wed, 18 Mar 2026 08:55:13 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6F393F73B;
+	Wed, 18 Mar 2026 08:55:17 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 14/48] KVM: arm64: Allow passing machine type in KVM creation
-Date: Wed, 18 Mar 2026 15:53:38 +0000
-Message-ID: <20260318155413.793430-15-steven.price@arm.com>
+Subject: [PATCH v13 15/48] arm64: RMI: RTT tear down
+Date: Wed, 18 Mar 2026 15:53:39 +0000
+Message-ID: <20260318155413.793430-16-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,133 +57,276 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Previously machine type was used purely for specifying the physical
-address size of the guest. Reserve the higher bits to specify an ARM
-specific machine type and declare a new type 'KVM_VM_TYPE_ARM_REALM'
-used to create a realm guest.
+The RMM owns the stage 2 page tables for a realm, and KVM must request
+that the RMM creates/destroys entries as necessary. The physical pages
+to store the page tables are delegated to the realm as required, and can
+be undelegated when no longer used.
 
-Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Creating new RTTs is the easy part, tearing down is a little more
+tricky. The result of realm_rtt_destroy() can be used to effectively
+walk the tree and destroy the entries (undelegating pages that were
+given to the realm).
+
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
+Changes since v12:
+ * Simplify some functions now we know RMM page size is the same as the
+   host's.
+Changes since v11:
+ * Moved some code from earlier in the series to this one so that it's
+   added when it's first used.
+Changes since v10:
+ * RME->RMI rename.
+ * Some code to handle freeing stage 2 PGD moved into this patch where
+   it belongs.
 Changes since v9:
- * Explictly set realm.state to REALM_STATE_NONE rather than rely on the
-   zeroing of the structure.
-Changes since v7:
- * Add some documentation explaining the new machine type.
+ * Add a comment clarifying that root level RTTs are not destroyed until
+   after the RD is destroyed.
+Changes since v8:
+ * Introduce free_rtt() wrapper which calls free_delegated_granule()
+   followed by kvm_account_pgtable_pages(). This makes it clear where an
+   RTT is being freed rather than just a delegated granule.
 Changes since v6:
- * Make the check for kvm_rme_is_available more visible and report an
-   error code of -EPERM (instead of -EINVAL) to make it explicit that
-   the kernel supports RME, but the platform doesn't.
+ * Move rme_rtt_level_mapsize() and supporting defines from kvm_rme.h
+   into rme.c as they are only used in that file.
+Changes since v5:
+ * Rename some RME_xxx defines to do with page sizes as RMM_xxx - they are
+   a property of the RMM specification not the RME architecture.
+Changes since v2:
+ * Moved {alloc,free}_delegated_page() and ensure_spare_page() to a
+   later patch when they are actually used.
+ * Some simplifications now rmi_xxx() functions allow NULL as an output
+   parameter.
+ * Improved comments and code layout.
 ---
- Documentation/virt/kvm/api.rst | 16 ++++++++++++++--
- arch/arm64/kvm/arm.c           | 16 ++++++++++++++++
- arch/arm64/kvm/mmu.c           |  3 ---
- include/uapi/linux/kvm.h       | 19 +++++++++++++++----
- 4 files changed, 45 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_rmi.h |   7 ++
+ arch/arm64/kvm/mmu.c             |  15 +++-
+ arch/arm64/kvm/rmi.c             | 145 +++++++++++++++++++++++++++++++
+ 3 files changed, 166 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 72a2ce96d1ba..bc180c853faf 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -181,8 +181,20 @@ flag KVM_VM_MIPS_VZ.
- ARM64:
- ^^^^^^
+diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+index 0ada525af18f..16a297f3091a 100644
+--- a/arch/arm64/include/asm/kvm_rmi.h
++++ b/arch/arm64/include/asm/kvm_rmi.h
+@@ -68,5 +68,12 @@ u32 kvm_realm_ipa_limit(void);
  
--On arm64, the physical address size for a VM (IPA Size limit) is limited
--to 40bits by default. The limit can be configured if the host supports the
-+On arm64, the machine type identifier is used to encode a type and the
-+physical address size for the VM. The lower byte (bits[7-0]) encode the
-+address size and the upper bits[11-8] encode a machine type. The machine
-+types that might be available are:
+ int kvm_init_realm_vm(struct kvm *kvm);
+ void kvm_destroy_realm(struct kvm *kvm);
++void kvm_realm_destroy_rtts(struct kvm *kvm);
 +
-+ ======================   ============================================
-+ KVM_VM_TYPE_ARM_NORMAL   A standard VM
-+ KVM_VM_TYPE_ARM_REALM    A "Realm" VM using the Arm Confidential
-+                          Compute extensions, the VM's memory is
-+                          protected from the host.
-+ ======================   ============================================
-+
-+The physical address size for a VM (IPA Size limit) is limited to 40bits
-+by default. The limit can be configured if the host supports the
- extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
- KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
- identifier, where IPA_Bits is the maximum width of any physical
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ddbf080e4f55..b79b58802b33 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -216,6 +216,22 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	mutex_unlock(&kvm->lock);
- #endif
++static inline bool kvm_realm_is_private_address(struct realm *realm,
++						unsigned long addr)
++{
++	return !(addr & BIT(realm->ia_bits - 1));
++}
  
-+	if (type & ~(KVM_VM_TYPE_ARM_MASK | KVM_VM_TYPE_ARM_IPA_SIZE_MASK))
-+		return -EINVAL;
-+
-+	switch (type & KVM_VM_TYPE_ARM_MASK) {
-+	case KVM_VM_TYPE_ARM_NORMAL:
-+		break;
-+	case KVM_VM_TYPE_ARM_REALM:
-+		if (!static_branch_unlikely(&kvm_rmi_is_available))
-+			return -EINVAL;
-+		WRITE_ONCE(kvm->arch.realm.state, REALM_STATE_NONE);
-+		kvm->arch.is_realm = true;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
- 	kvm_init_nested(kvm);
- 
- 	ret = kvm_share_hyp(kvm, kvm + 1);
+ #endif /* __ASM_KVM_RMI_H */
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index d6094b60c4ce..9dc242c3b9c8 100644
+index 9dc242c3b9c8..41152abf55b2 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -882,9 +882,6 @@ static int kvm_init_ipa_range(struct kvm *kvm,
- 	if (kvm_is_realm(kvm))
- 		kvm_ipa_limit = kvm_realm_ipa_limit();
+@@ -1098,10 +1098,23 @@ void stage2_unmap_vm(struct kvm *kvm)
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+-	struct kvm_pgtable *pgt = NULL;
++	struct kvm_pgtable *pgt;
  
--	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
--		return -EINVAL;
--
- 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
- 	if (is_protected_kvm_enabled()) {
- 		phys_shift = kvm_ipa_limit;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 6ec140ab0ed1..efd054cfbd07 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -691,14 +691,25 @@ struct kvm_enable_cap {
- #define KVM_S390_SIE_PAGE_OFFSET 1
+ 	write_lock(&kvm->mmu_lock);
+ 	pgt = mmu->pgt;
++	if (kvm_is_realm(kvm) &&
++	    (kvm_realm_state(kvm) != REALM_STATE_DEAD &&
++	     kvm_realm_state(kvm) != REALM_STATE_NONE)) {
++		write_unlock(&kvm->mmu_lock);
++		kvm_realm_destroy_rtts(kvm);
++
++		/*
++		 * The PGD pages can be reclaimed only after the realm (RD) is
++		 * destroyed. We call this again from kvm_destroy_realm() after
++		 * the RD is destroyed.
++		 */
++		return;
++	}
+ 	if (pgt) {
+ 		mmu->pgd_phys = 0;
+ 		mmu->pgt = NULL;
+diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+index 700b8c935d29..1fd2c18f7381 100644
+--- a/arch/arm64/kvm/rmi.c
++++ b/arch/arm64/kvm/rmi.c
+@@ -15,6 +15,19 @@
+ static unsigned long rmm_feat_reg0;
+ static unsigned long rmm_feat_reg1;
  
- /*
-- * On arm64, machine type can be used to request the physical
-- * address size for the VM. Bits[7-0] are reserved for the guest
-- * PA size shift (i.e, log2(PA_Size)). For backward compatibility,
-- * value 0 implies the default IPA size, 40bits.
-+ * On arm64, machine type can be used to request both the machine type and
-+ * the physical address size for the VM.
-+ *
-+ * Bits[11-8] are reserved for the ARM specific machine type.
-+ *
-+ * Bits[7-0] are reserved for the guest PA size shift (i.e, log2(PA_Size)).
-+ * For backward compatibility, value 0 implies the default IPA size, 40bits.
-  */
-+#define KVM_VM_TYPE_ARM_SHIFT		8
-+#define KVM_VM_TYPE_ARM_MASK		(0xfULL << KVM_VM_TYPE_ARM_SHIFT)
-+#define KVM_VM_TYPE_ARM(_type)		\
-+	(((_type) << KVM_VM_TYPE_ARM_SHIFT) & KVM_VM_TYPE_ARM_MASK)
-+#define KVM_VM_TYPE_ARM_NORMAL		KVM_VM_TYPE_ARM(0)
-+#define KVM_VM_TYPE_ARM_REALM		KVM_VM_TYPE_ARM(1)
++#define RMM_RTT_BLOCK_LEVEL	2
++#define RMM_RTT_MAX_LEVEL	3
 +
- #define KVM_VM_TYPE_ARM_IPA_SIZE_MASK	0xffULL
- #define KVM_VM_TYPE_ARM_IPA_SIZE(x)		\
- 	((x) & KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
++#define RMM_L2_BLOCK_SIZE	PMD_SIZE
 +
- /*
-  * ioctls for /dev/kvm fds:
-  */
++static inline unsigned long rmi_rtt_level_mapsize(int level)
++{
++	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
++		return PAGE_SIZE;
++
++	return (1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(level));
++}
++
+ static bool rmi_has_feature(unsigned long feature)
+ {
+ 	return !!u64_get_bits(rmm_feat_reg0, feature);
+@@ -189,6 +202,11 @@ u32 kvm_realm_ipa_limit(void)
+ 	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
+ }
+ 
++static int get_start_level(struct realm *realm)
++{
++	return 4 - stage2_pgtable_levels(realm->ia_bits);
++}
++
+ static int undelegate_range(phys_addr_t phys, unsigned long size)
+ {
+ 	unsigned long ret;
+@@ -223,6 +241,131 @@ static int free_delegated_page(phys_addr_t phys)
+ 	return 0;
+ }
+ 
++static void free_rtt(phys_addr_t phys)
++{
++	if (free_delegated_page(phys))
++		return;
++
++	kvm_account_pgtable_pages(phys_to_virt(phys), -1);
++}
++
++static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
++			     int level, phys_addr_t *rtt_granule,
++			     unsigned long *next_addr)
++{
++	unsigned long out_rtt;
++	int ret;
++
++	ret = rmi_rtt_destroy(virt_to_phys(realm->rd), addr, level,
++			      &out_rtt, next_addr);
++
++	*rtt_granule = out_rtt;
++
++	return ret;
++}
++
++static int realm_tear_down_rtt_level(struct realm *realm, int level,
++				     unsigned long start, unsigned long end)
++{
++	ssize_t map_size;
++	unsigned long addr, next_addr;
++
++	if (WARN_ON(level > RMM_RTT_MAX_LEVEL))
++		return -EINVAL;
++
++	map_size = rmi_rtt_level_mapsize(level - 1);
++
++	for (addr = start; addr < end; addr = next_addr) {
++		phys_addr_t rtt_granule;
++		int ret;
++		unsigned long align_addr = ALIGN(addr, map_size);
++
++		next_addr = ALIGN(addr + 1, map_size);
++
++		if (next_addr > end || align_addr != addr) {
++			/*
++			 * The target range is smaller than what this level
++			 * covers, recurse deeper.
++			 */
++			ret = realm_tear_down_rtt_level(realm,
++							level + 1,
++							addr,
++							min(next_addr, end));
++			if (ret)
++				return ret;
++			continue;
++		}
++
++		ret = realm_rtt_destroy(realm, addr, level,
++					&rtt_granule, &next_addr);
++
++		switch (RMI_RETURN_STATUS(ret)) {
++		case RMI_SUCCESS:
++			free_rtt(rtt_granule);
++			break;
++		case RMI_ERROR_RTT:
++			if (next_addr > addr) {
++				/* Missing RTT, skip */
++				break;
++			}
++			/*
++			 * We tear down the RTT range for the full IPA
++			 * space, after everything is unmapped. Also we
++			 * descend down only if we cannot tear down a
++			 * top level RTT. Thus RMM must be able to walk
++			 * to the requested level. e.g., a block mapping
++			 * exists at L1 or L2.
++			 */
++			if (WARN_ON(RMI_RETURN_INDEX(ret) != level))
++				return -EBUSY;
++			if (WARN_ON(level == RMM_RTT_MAX_LEVEL))
++				return -EBUSY;
++
++			/*
++			 * The table has active entries in it, recurse deeper
++			 * and tear down the RTTs.
++			 */
++			next_addr = ALIGN(addr + 1, map_size);
++			ret = realm_tear_down_rtt_level(realm,
++							level + 1,
++							addr,
++							next_addr);
++			if (ret)
++				return ret;
++			/*
++			 * Now that the child RTTs are destroyed,
++			 * retry at this level.
++			 */
++			next_addr = addr;
++			break;
++		default:
++			WARN_ON(1);
++			return -ENXIO;
++		}
++	}
++
++	return 0;
++}
++
++static int realm_tear_down_rtt_range(struct realm *realm,
++				     unsigned long start, unsigned long end)
++{
++	/*
++	 * Root level RTTs can only be destroyed after the RD is destroyed. So
++	 * tear down everything below the root level
++	 */
++	return realm_tear_down_rtt_level(realm, get_start_level(realm) + 1,
++					 start, end);
++}
++
++void kvm_realm_destroy_rtts(struct kvm *kvm)
++{
++	struct realm *realm = &kvm->arch.realm;
++	unsigned int ia_bits = realm->ia_bits;
++
++	WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
++}
++
+ void kvm_destroy_realm(struct kvm *kvm)
+ {
+ 	struct realm *realm = &kvm->arch.realm;
+@@ -246,6 +389,8 @@ void kvm_destroy_realm(struct kvm *kvm)
+ 	if (realm->rd) {
+ 		phys_addr_t rd_phys = virt_to_phys(realm->rd);
+ 
++		kvm_realm_destroy_rtts(kvm);
++
+ 		if (WARN_ON(rmi_realm_destroy(rd_phys)))
+ 			return;
+ 		free_delegated_page(rd_phys);
 -- 
 2.43.0
 
