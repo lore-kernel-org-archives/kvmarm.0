@@ -1,93 +1,73 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E320372EF1
-	for <kvmarm@lists.linux.dev>; Wed, 18 Mar 2026 11:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034923CEBA8
+	for <kvmarm@lists.linux.dev>; Wed, 18 Mar 2026 11:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773832597; cv=none; b=l1al/sZR1I7M8KggY7/vD0aH5TporO/Z6WGEPlgQbbQToWwgZADZ8VnsldsdtQaDyGde413M4cv9PTUlAXn5QNPQFtENKwaFGaTBeJyEdIfCIYyE6F1BMqKjy6xskqPndmmpYrrc/jkQOTqVI29cam/QsOCyCkWSw7aNQ5MAvy4=
+	t=1773834131; cv=none; b=vFXYX5LaJGHyLLuGjFRwMhu2+lORox6Dek5Uhvqh2RH7AMBk0Qt6BEJAz0nK0l7SNi95YRCR3T56yw8j/0vaAuPqRm5vB91Is+IFYapiQsfctBPzUrEB9oNCnMegXDsrzItq0+BAyVdFIh8shbGLOOxU5VC86rVYqsouo3VQBQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773832597; c=relaxed/simple;
-	bh=yHF5z9WeHp6mIoOEgq2tupUKg1OMJm89pGwBRBf02aE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=okqNTBBUQ+UmIfCeEgRjTEzHXxa5NIMNrmbGuOwkFqofWGNGXUFjEIOQVE5GJkL7RWmbvCOINGBEgF76VwS3+hk8BLnKtuy+lAzw25ub1fzAtRrqU97DMeHTtICrFyzdBl356WL3GwIjAXsqvjnQwiIAgtXdPvEeEfwv4FskYoQ=
+	s=arc-20240116; t=1773834131; c=relaxed/simple;
+	bh=hFjPVeUOB2eTISa5tGSFNav9l/LGlqJi7qnJChZEK+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FN+0TsO9/dGZ5tVeFAmim1U29jkCa6AOUdHceP04EnIhPfARNoAvjbQlG/qagBqf6Kzykqj+j6TXwfdqE+qMHCnkUtvM3atfRM4Td02LHBnb7EfkKo+4rqwoH4g6LOWxZ9hAoaS5j7WrAPwJo2bsvpJH9qQV4XgM9bFGYYoibGA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 872DA1E2F;
-	Wed, 18 Mar 2026 04:16:29 -0700 (PDT)
-Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17CF93F73B;
-	Wed, 18 Mar 2026 04:16:30 -0700 (PDT)
-Message-ID: <8dc8eb43-9bc5-46d3-8ce8-06d25fd5eeb7@arm.com>
-Date: Wed, 18 Mar 2026 11:16:29 +0000
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AD721E2F;
+	Wed, 18 Mar 2026 04:42:01 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA6013F73B;
+	Wed, 18 Mar 2026 04:42:05 -0700 (PDT)
+Date: Wed, 18 Mar 2026 11:42:00 +0000
+From: Joey Gouly <joey.gouly@arm.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 0/2] KVM: arm64: nv: Expose shadow page tables in
+ debugfs
+Message-ID: <20260318114200.GA3905508@e124191.cambridge.arm.com>
+References: <20260317182638.1592507-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Subject: Re: [PATCH v5 00/41] arm_mpam: Add KVM/arm64 and resctrl glue code
-To: Howard Zhang <Howard.Zhang@arm.com>, James Morse <James.Morse@arm.com>
-Cc: "amitsinght@marvell.com" <amitsinght@marvell.com>,
- "baisheng.gao@unisoc.com" <baisheng.gao@unisoc.com>,
- "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
- "carl@os.amperecomputing.com" <carl@os.amperecomputing.com>,
- Catalin Marinas <Catalin.Marinas@arm.com>, "corbet@lwn.net"
- <corbet@lwn.net>, Dave Martin <Dave.Martin@arm.com>,
- "david@kernel.org" <david@kernel.org>,
- "dfustini@baylibre.com" <dfustini@baylibre.com>,
- "fenghuay@nvidia.com" <fenghuay@nvidia.com>,
- "gshan@redhat.com" <gshan@redhat.com>, Joey Gouly <Joey.Gouly@arm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "kobak@nvidia.com" <kobak@nvidia.com>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- "lcherian@marvell.com" <lcherian@marvell.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "maz@kernel.org" <maz@kernel.org>, "oupton@kernel.org" <oupton@kernel.org>,
- "peternewman@google.com" <peternewman@google.com>,
- "punit.agrawal@oss.qualcomm.com" <punit.agrawal@oss.qualcomm.com>,
- "quic_jiles@quicinc.com" <quic_jiles@quicinc.com>,
- "reinette.chatre@intel.com" <reinette.chatre@intel.com>,
- Rohit Mathew <Rohit.Mathew@arm.com>,
- "scott@os.amperecomputing.com" <scott@os.amperecomputing.com>,
- "sdonthineni@nvidia.com" <sdonthineni@nvidia.com>,
- Suzuki Poulose <Suzuki.Poulose@arm.com>,
- "tan.shaopeng@fujitsu.com" <tan.shaopeng@fujitsu.com>,
- "will@kernel.org" <will@kernel.org>,
- "xhao@linux.alibaba.com" <xhao@linux.alibaba.com>,
- "zengheng4@huawei.com" <zengheng4@huawei.com>
-References: <A76F5D3E-4AB1-4418-B250-2ED9DD1BBE56@arm.com>
-Content-Language: en-US
-From: Ben Horgan <ben.horgan@arm.com>
-In-Reply-To: <A76F5D3E-4AB1-4418-B250-2ED9DD1BBE56@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260317182638.1592507-1-weilin.chang@arm.com>
 
-Hi Howard,
-
-On 3/18/26 09:52, Howard Zhang wrote:
-> Hi Ben, James,
+On Tue, Mar 17, 2026 at 06:26:36PM +0000, Wei-Lin Chang wrote:
+> Hi,
 > 
-> I have a few questions regarding MPAM support in the kernel:
+> This is v2 of exposing shadow page tables in debugfs, there are a few
+> small improvements, please see below.
 > 
-> Are there any plans to upstream L3 partitioning with capacity-based allocation (in addition to the existing way-based partitioning)?
+> Changes in v2:
+>  - move debugfs_nv_dentry also behind CONFIG_PTDUMP_STAGE2_DEBUGFS
+>  - use a macro to define the file names of shadow ptdumps, also
+>    explicitly spell out the string to get its maximum size
+>  - add Reviewed-by tag from Sebastian (thanks!)
+>  - Link to v1: https://lore.kernel.org/kvmarm/20260308231829.864983-1-weilin.chang@arm.com/
+> 
+> Wei-Lin Chang (2):
+>   KVM: arm64: ptdump: Make KVM ptdump code s2 mmu aware
+>   KVM: arm64: nv: Expose shadow page tables in debugfs
 
-Yes, there is some preliminary work required to establish how new schema will be added to
-resctrl but I expect cache capacity, CMIN/CMAX, to be some of the first features to use it.
-[1] has some discussion on now to introduce new schema.
-
-[1] https://lore.kernel.org/lkml/aPtfMFfLV1l%2FRB0L@e133380.arm.com/
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
 > 
-> Thanks for your time.
+>  arch/arm64/include/asm/kvm_host.h |  9 +++++
+>  arch/arm64/include/asm/kvm_mmu.h  |  4 +++
+>  arch/arm64/kvm/nested.c           |  6 +++-
+>  arch/arm64/kvm/ptdump.c           | 60 ++++++++++++++++++++++---------
+>  4 files changed, 62 insertions(+), 17 deletions(-)
 > 
-> Best regards,
-> Howard
-
-Thanks,
-
-Ben
+> -- 
+> 2.43.0
+> 
