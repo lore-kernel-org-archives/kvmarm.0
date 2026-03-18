@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F4E356A08;
-	Wed, 18 Mar 2026 17:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CDA355F2E;
+	Wed, 18 Mar 2026 17:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773856126; cv=none; b=Vo0llAQTmfbXgNJSIswES2wqoqJoKSY+Kh/tel0Gp7D0GS3akvVbtu8y1Vwsaqg1VLkGP/C5yweUfyRFwuknvaa9vx5DLB5ZyE7t1m4598n3PRCqxCiGbZVqLWK2qrTG/CmASyL/q8XsPc4+/tG79K2shTznzWlJM1q6AOrBTSo=
+	t=1773856174; cv=none; b=PGvsrWmTL/SmZkSM9IwjUzUKUHUpRpMdispCHMXQC+i4mN/ZLmr9dj9XJ1yrMuuHMYdqjCnjNS2olPymQN9QX3hwtSLlsslcqVIcpRWVx3k7gXy3i5NuQBVd51GDK99WQ7zDfA/oLXbXrlXbkLcXrsXIhXgv84OeI3mmbprSV5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773856126; c=relaxed/simple;
-	bh=n0MnqJl2TOeHEpAg4OVfr0lxtUkQnytUwf9VSMN6vPY=;
+	s=arc-20240116; t=1773856174; c=relaxed/simple;
+	bh=wT/iYNzCm2V9NPLbTEHHOe/QpojvcSnk86PQ+66AEt4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gf9FKAwuslq5rydqOpETjBmeXHLqbcFjV9EKdUFV5XfofysopRZNJ9F6MXBmjPWEGuIlm73/aDfJWQV3Q6JZ+k+kmDvMJJppk+bHnLEcMyikUdxLAY2vYifda/JBLnq9E0FZN+AWa6E3riS9IBtTH9h3C22RhZgET+JDApVV5Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LOgv1+2m; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=LrSRj2KKDV7wl7YKeH3zXVBakutM+UbzFiVU1zF5QhTmM0O2Bs6j5H6K6uMfxPVi7SFzPjtvK9PU0+uiQJJ1Yj0rsJS6fxQ0znFVEU+7kRu3+xoLi0ntnh0UOQ6xicULshGUItB8BxbAgiNBSjFrd47w0S87+LPHuOsUPxEVKfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkSQV6tw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LOgv1+2m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EAB6C19421;
-	Wed, 18 Mar 2026 17:48:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkSQV6tw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BF2CC2BCAF;
+	Wed, 18 Mar 2026 17:49:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773856125;
-	bh=n0MnqJl2TOeHEpAg4OVfr0lxtUkQnytUwf9VSMN6vPY=;
+	s=k20201202; t=1773856173;
+	bh=wT/iYNzCm2V9NPLbTEHHOe/QpojvcSnk86PQ+66AEt4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LOgv1+2mwpavGPO2QlnbCxclonKXFB+AxWUsJ01xE2+V1JtCkdsmGshS45GkRQh9u
-	 2onntOOl8y4ZGEgr8OWwunDZjjHOQCYviLUb8rxV+ku/0xxTlsZKwIlxeyJ7px12Mu
-	 86Xx/KDpcj4jMK0Ad+eAad6UyNB+GGaJyzn2FDDJxMd6jVUgIlYZTtM270S7PSSGYi
-	 kWXd4e5jqIWXmza/mPZOj5lKKU7KimXD2JFJVD/NXdWvgbpko28vf/s+QdyuTnkIiR
-	 G+gN0Zi9dVfhR/megVQkY4HRAtwPvz4Zw3IGRBL1tEeiAb0yOC/YQZj021qQ4eYBbF
-	 N4HApQJcXAZ2g==
-Date: Wed, 18 Mar 2026 17:48:57 +0000
+	b=jkSQV6twayNsM864uyXHJbD3Bz09Zv3RgGje9V3ZbME8R/H1Wh1obgiGhENM+mggW
+	 D5ABCcEiuY5rZeHWUNjiyLOpjfOczS0ca6yNrSRX1Rr0r4vL4Ya/GVwnTxaB09HX3Y
+	 EV0u7knDwunWhKyXhLzFTXZ4MPZOFTT5szpZn0dgZHQeJXD72GZhwujl8G3tbxZlo1
+	 lgnHzLej7fBKuQKZZ8br9V3tdiJRm5POUPxOJvnqXb//ozruODKZ+3iFXOb7rRed4w
+	 IffUWkwA6iRO/DW2NQihZNs7JzfIcHAZ6Zb87phBm9GB52j3cSNwRiLQkQZtRDAADg
+	 dqnhkjtDLNflA==
+Date: Wed, 18 Mar 2026 17:49:46 +0000
 From: Jean-Philippe Brucker <jpb@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
@@ -42,10 +42,11 @@ Cc: Marc Zyngier <maz@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
 	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	Peter Maydell <peter.maydell@linaro.org>,
 	Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v10 11/30] KVM: arm64: Store vector lengths in an array
-Message-ID: <20260318174857.GI2390801@myrica>
+Subject: Re: [PATCH v10 12/30] KVM: arm64: Factor SVE code out of
+ fpsimd_lazy_switch_to_host()
+Message-ID: <20260318174946.GJ2390801@myrica>
 References: <20260306-kvm-arm64-sme-v10-0-43f7683a0fb7@kernel.org>
- <20260306-kvm-arm64-sme-v10-11-43f7683a0fb7@kernel.org>
+ <20260306-kvm-arm64-sme-v10-12-43f7683a0fb7@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -54,47 +55,94 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260306-kvm-arm64-sme-v10-11-43f7683a0fb7@kernel.org>
+In-Reply-To: <20260306-kvm-arm64-sme-v10-12-43f7683a0fb7@kernel.org>
 
-On Fri, Mar 06, 2026 at 05:01:03PM +0000, Mark Brown wrote:
-> SME adds a second vector length configured in a very similar way to the
-> SVE vector length, in order to facilitate future code sharing for SME
-> refactor our storage of vector lengths to use an array like the host does.
-> We do not yet take much advantage of this so the intermediate code is not
-> as clean as might be.
+On Fri, Mar 06, 2026 at 05:01:04PM +0000, Mark Brown wrote:
+> Since the function will grow as a result of adding SME support move the
+> SVE code out of fpsimd_lazy_switch_to_host(). No functional change, just
+> code motion.
 > 
-> No functional change.
-> 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
 > Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h       | 17 +++++++++++------
->  arch/arm64/include/asm/kvm_hyp.h        |  2 +-
->  arch/arm64/include/asm/kvm_pkvm.h       |  2 +-
->  arch/arm64/kvm/fpsimd.c                 |  2 +-
->  arch/arm64/kvm/guest.c                  |  6 +++---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  6 +++---
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  6 +++---
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          |  7 ++++---
->  arch/arm64/kvm/reset.c                  | 22 +++++++++++-----------
->  9 files changed, 38 insertions(+), 32 deletions(-)
+
+Reviewed-by: Jean-Philippe Brucker <jpb@kernel.org>
+
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 46 +++++++++++++++++++--------------
+>  1 file changed, 26 insertions(+), 20 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 906dbefc5b33..3c30c1a70429 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -77,8 +77,10 @@ enum kvm_mode kvm_get_mode(void);
->  static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
->  #endif
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 4e38610be19a..5b99aa479c59 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -483,11 +483,11 @@ static inline void fpsimd_lazy_switch_to_guest(struct kvm_vcpu *vcpu)
+>  	}
+>  }
 >  
-> -extern unsigned int __ro_after_init kvm_sve_max_vl;
-> -extern unsigned int __ro_after_init kvm_host_sve_max_vl;
-> +extern unsigned int __ro_after_init kvm_max_vl[ARM64_VEC_MAX];
-> +extern unsigned int __ro_after_init kvm_host_max_vl[ARM64_VEC_MAX];
-> +DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
-
-A rebase issue here, rest looks good
-
-Thanks,
-Jean
-
+> -static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
+> +static inline void sve_lazy_switch_to_host(struct kvm_vcpu *vcpu)
+>  {
+>  	u64 zcr_el1, zcr_el2;
+>  
+> -	if (!guest_owns_fp_regs())
+> +	if (!vcpu_has_sve(vcpu))
+>  		return;
+>  
+>  	/*
+> @@ -498,29 +498,35 @@ static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
+>  	 * synchronization event, we don't need an ISB here to avoid taking
+>  	 * traps for anything that was exposed to the guest.
+>  	 */
+> -	if (vcpu_has_sve(vcpu)) {
+> -		zcr_el1 = read_sysreg_el1(SYS_ZCR);
+> -		__vcpu_assign_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu), zcr_el1);
+> +	zcr_el1 = read_sysreg_el1(SYS_ZCR);
+> +	__vcpu_assign_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu), zcr_el1);
+>  
+> -		/*
+> -		 * The guest's state is always saved using the guest's max VL.
+> -		 * Ensure that the host has the guest's max VL active such that
+> -		 * the host can save the guest's state lazily, but don't
+> -		 * artificially restrict the host to the guest's max VL.
+> -		 */
+> -		if (has_vhe()) {
+> -			zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
+> -			write_sysreg_el2(zcr_el2, SYS_ZCR);
+> -		} else {
+> -			zcr_el2 = sve_vq_from_vl(kvm_host_max_vl[ARM64_VEC_SVE]) - 1;
+> -			write_sysreg_el2(zcr_el2, SYS_ZCR);
+> +	/*
+> +	 * The guest's state is always saved using the guest's max VL.
+> +	 * Ensure that the host has the guest's max VL active such
+> +	 * that the host can save the guest's state lazily, but don't
+> +	 * artificially restrict the host to the guest's max VL.
+> +	 */
+> +	if (has_vhe()) {
+> +		zcr_el2 = vcpu_sve_max_vq(vcpu) - 1;
+> +		write_sysreg_el2(zcr_el2, SYS_ZCR);
+> +	} else {
+> +		zcr_el2 = sve_vq_from_vl(kvm_host_max_vl[ARM64_VEC_SVE]) - 1;
+> +		write_sysreg_el2(zcr_el2, SYS_ZCR);
+>  
+> -			zcr_el1 = vcpu_sve_max_vq(vcpu) - 1;
+> -			write_sysreg_el1(zcr_el1, SYS_ZCR);
+> -		}
+> +		zcr_el1 = vcpu_sve_max_vq(vcpu) - 1;
+> +		write_sysreg_el1(zcr_el1, SYS_ZCR);
+>  	}
+>  }
+>  
+> +static inline void fpsimd_lazy_switch_to_host(struct kvm_vcpu *vcpu)
+> +{
+> +	if (!guest_owns_fp_regs())
+> +		return;
+> +
+> +	sve_lazy_switch_to_host(vcpu);
+> +}
+> +
+>  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+>  {
+>  	/*
+> 
+> -- 
+> 2.47.3
+> 
+> 
