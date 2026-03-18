@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCBD726158B;
-	Wed, 18 Mar 2026 15:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654BB3F99D8;
+	Wed, 18 Mar 2026 15:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773849301; cv=none; b=YftmF87cgS4XZFX83aKqzYqneuxA2x29qMk4h1g5LQfskdk76dTXl8g7QokSMzBcfTo06J6KQAwN/HsCwZmT202C943iyMHC4cD76EGvsslgrf7NonNYjT9r+QPqimpkSWP9Izav3TD420LcC/e7Q1gdmswc5VKDvAubFM/qs60=
+	t=1773849307; cv=none; b=Z8cGRvlW++WsY4VWhHUsnIruBZ+zh9OdrGkNKfVpkk15y/O6KCRsPZXQA+46QBmJHxKfgMsYfIxJTs42J9d4cTGXDeSPLlp8ZK4hSRmVbDMNATIbs3mBQtxxosinRTM1w3QC4BnUf+wbO7XEK0r2XUbeuSVSbu6wAJZHim3NZMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773849301; c=relaxed/simple;
-	bh=/ioKEmdEMjgsjCaeDYeWkBQVD3DtELc+u+if79p20oU=;
+	s=arc-20240116; t=1773849307; c=relaxed/simple;
+	bh=zmasPG6DQ2loXbkV1wddmPSj7t5k/TR+hC1JQMh4biI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H4OiTVNC5WucWTUySuNrYHJSvbnXWDg08SbvTTvoKzmm6f1Sjw9carFBnmCrnU1YRJZDCPtTv+60EDWpoyCuaB6vbrvN7C72vBZJMKHaQsyOopfngMNKTHe5wrASNPgntvhwqhUlAbMi9nF0Wu3lQ2q0MzfxvjX8upTNC6hJfKw=
+	 MIME-Version; b=PzW6bzRr1Ggw8L3o4VJuK05BB5s1LU6/ssKvsD/seVkgGZI98SrycUaneWCtFzHC9D1x6zF3NzxqzN0uRv9aFuuQkGLVQLzQrXO1Wc1c8fOHklUO1GuMgBshzzPwCeABzSUhn75Ao16t2RTOI19SYjB1uVCC0bRKtFuVpHdOIl8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4514F201B;
-	Wed, 18 Mar 2026 08:54:52 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C2A45202C;
+	Wed, 18 Mar 2026 08:54:55 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.61.122])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DB9CF3F73B;
-	Wed, 18 Mar 2026 08:54:54 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98C983F73B;
+	Wed, 18 Mar 2026 08:54:58 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -43,9 +43,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: [PATCH v13 09/48] arm64: RMI: Check for LPA2 support
-Date: Wed, 18 Mar 2026 15:53:33 +0000
-Message-ID: <20260318155413.793430-10-steven.price@arm.com>
+Subject: [PATCH v13 10/48] arm64: RMI: Ensure that the RMM has GPT entries for memory
+Date: Wed, 18 Mar 2026 15:53:34 +0000
+Message-ID: <20260318155413.793430-11-steven.price@arm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
@@ -57,66 +57,141 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If KVM has enabled LPA2 support then check that the RMM also supports
-it. If there is a mismatch then disable support for realm guests as the
-VMM may attempt to create a guest which is incompatible with the RMM.
+The RMM may not be tracking all the memory of the system at boot. Create
+the necessary tracking state and GPTs within the RMM so that all boot
+memory can be delegated to the RMM as needed during runtime.
+
+Note: support is currently missing for SROs which means that if the RMM
+needs memory donating this will fail (and render CCA unusable in Linux).
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
 New patch for v13
 ---
- arch/arm64/kvm/rmi.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ arch/arm64/kvm/rmi.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
 
 diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-index 482dc542451a..9590dff9a2c1 100644
+index 9590dff9a2c1..80aedc85e94a 100644
 --- a/arch/arm64/kvm/rmi.c
 +++ b/arch/arm64/kvm/rmi.c
-@@ -5,12 +5,18 @@
+@@ -4,6 +4,7 @@
+  */
  
  #include <linux/kvm_host.h>
++#include <linux/memblock.h>
  
-+#include <asm/kvm_pgtable.h>
+ #include <asm/kvm_pgtable.h>
  #include <asm/rmi_cmds.h>
- #include <asm/virt.h>
- 
- static unsigned long rmm_feat_reg0;
- static unsigned long rmm_feat_reg1;
- 
-+static bool rmi_has_feature(unsigned long feature)
-+{
-+	return !!u64_get_bits(rmm_feat_reg0, feature);
-+}
-+
- static int rmi_check_version(void)
- {
- 	struct arm_smccc_res res;
-@@ -89,6 +95,16 @@ static int rmi_configure(void)
+@@ -56,6 +57,18 @@ static int rmi_check_version(void)
  	return 0;
  }
  
-+static int rmm_check_features(void)
++/*
++ * These are the 'default' sizes when passing 0 as the tracking_region_size.
++ * TODO: Support other granule sizes
++ */
++#ifdef CONFIG_PAGE_SIZE_4KB
++#define RMM_GRANULE_TRACKING_SIZE	SZ_1G
++#elif defined(CONFIG_PAGE_SIZE_16KB)
++#define RMM_GRANULE_TRACKING_SIZE	SZ_32M
++#elif defined(CONFIG_PAGE_SIZE_64KB)
++#define RMM_GRANULE_TRACKING_SIZE	SZ_512M
++#endif
++
+ static int rmi_configure(void)
+ {
+ 	struct rmm_config *config __free(free_page) = NULL;
+@@ -95,6 +108,80 @@ static int rmi_configure(void)
+ 	return 0;
+ }
+ 
++static int rmi_verify_memory_tracking(phys_addr_t start, phys_addr_t end)
 +{
-+	if (kvm_lpa2_is_enabled() && !rmi_has_feature(RMI_FEATURE_REGISTER_0_LPA2)) {
-+		kvm_err("RMM doesn't support LPA2");
-+		return -ENXIO;
++	start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
++	end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
++
++	while (start < end) {
++		unsigned long ret, category, state;
++
++		ret = rmi_granule_tracking_get(start, &category, &state);
++		if (ret != RMI_SUCCESS ||
++		    state != RMI_TRACKING_FINE ||
++		    category != RMI_MEM_CATEGORY_CONVENTIONAL) {
++			/* TODO: Set granule tracking in this case */
++			kvm_err("Granule tracking for region isn't fine/conventional: %llx",
++				start);
++			return -ENODEV;
++		}
++		start += RMM_GRANULE_TRACKING_SIZE;
 +	}
 +
 +	return 0;
 +}
 +
- void kvm_init_rmi(void)
++static unsigned long rmi_l0gpt_size(void)
++{
++	return 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
++				      rmm_feat_reg1));
++}
++
++static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
++{
++	unsigned long l0gpt_sz = rmi_l0gpt_size();
++
++	start = ALIGN_DOWN(start, l0gpt_sz);
++	end = ALIGN(end, l0gpt_sz);
++
++	while (start < end) {
++		int ret = rmi_gpt_l1_create(start);
++
++		if (ret && ret != RMI_ERROR_GPT) {
++			/*
++			 * FIXME: Handle SRO so that memory can be donated for
++			 * the tables.
++			 */
++			kvm_err("GPT Level1 table missing for %llx\n", start);
++			return -ENOMEM;
++		}
++		start += l0gpt_sz;
++	}
++
++	return 0;
++}
++
++static int rmi_init_metadata(void)
++{
++	phys_addr_t start, end;
++	const struct memblock_region *r;
++
++	for_each_mem_region(r) {
++		int ret;
++
++		start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
++		end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
++		ret = rmi_verify_memory_tracking(start, end);
++		if (ret)
++			return ret;
++		ret = rmi_create_gpts(start, end);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
+ static int rmm_check_features(void)
  {
- 	/* Continue without realm support if we can't agree on a version */
-@@ -100,6 +116,8 @@ void kvm_init_rmi(void)
- 	if (WARN_ON(rmi_features(1, &rmm_feat_reg1)))
+ 	if (kvm_lpa2_is_enabled() && !rmi_has_feature(RMI_FEATURE_REGISTER_0_LPA2)) {
+@@ -120,6 +207,8 @@ void kvm_init_rmi(void)
  		return;
- 
-+	if (rmm_check_features())
-+		return;
  	if (rmi_configure())
  		return;
++	if (rmi_init_metadata())
++		return;
  
+ 	/* Future patch will enable static branch kvm_rmi_is_available */
+ }
 -- 
 2.43.0
 
