@@ -1,29 +1,29 @@
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012007.outbound.protection.outlook.com [52.101.66.7])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013041.outbound.protection.outlook.com [40.107.162.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295E73E9580
-	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 15:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE6E3E9288
+	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 15:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.41
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773935644; cv=fail; b=scksQWzTf8SnGsLsHyEzvXNr+9VD+ZwKJqRx/5AnA0BC2wFMTCS9B+S/C0K7caPhGqhifRDn5gLogzzYz2i0TUlXBrydZFsfNrLzSlM9Jb5ypIgZy+0h2ZNStngXe9UJVITpgWYr+bPaX69Tc3GH3eHgyfJT8Cowpz/PV/2aqEA=
+	t=1773935657; cv=fail; b=niBq0epaFsrx+Jgmo8c+kdKgX1pf1+VBFuaznAqKnCjkzdNeQbcfVFIaVNqFpuvP8ZAzRWd7jW8QiT3cSXdRY2LcxbKnBQltZUMZ5jtosU+aUzRsx/zrxQc4Ir7HcvkJvWB9oBAdQQmz2/lSM6Ba/90Hun2LMtRdSCy3Okh2/Q0=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773935644; c=relaxed/simple;
-	bh=rVQEetLyQLhTb8tWIZ3v03i1oT79KC6XJnztAlAhd/o=;
+	s=arc-20240116; t=1773935657; c=relaxed/simple;
+	bh=E6Cekd1mFq9yXbDM/tdLdbMksIvDQrFncfPfweCXXZk=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ntR2b//5QSG8bClzW6EGhl28KWBe/X42zuqdoMRAcD2e954N+3RXsGLf7YwUCoELyYQNl3tLwyTqZwYudVfNp4k2ZjmvkB32RJnC2FoUtFXXrFkKCVPFcXPS7SrbRcCFOLYw0r1Pl10A7PbgCWvZC1c6Cqof63cS25r7IKjZxCk=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PBdaHwiM; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=PBdaHwiM; arc=fail smtp.client-ip=52.101.66.7
+	 Content-Type:MIME-Version; b=iKDyrJKhaLWRmhgQAfkTJZ5q5NkGGkil3OpDOMDIWNBEc+8fS8op50Ksd60QyutwHgx3rnpolXg3LJiZYsMHZU0arZnjuGYFgkQwmhFP37ixBo2Hh0l6sbZXcAEvMakFqgciy82JzMY9WEXkl7P01DpgllAA/M5ED35bed8gPvY=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Y21OqeO/; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Y21OqeO/; arc=fail smtp.client-ip=40.107.162.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PBdaHwiM";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="PBdaHwiM"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Y21OqeO/";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Y21OqeO/"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=dTAXnRt4sRYMZcIZ1sTjEoxX1dd+SQW3H3Ry5RJV2V54+59MQVEXW+xPkCBAVDk9XlPBQ2/LtwRa4uF1qWwwM5rxEVrPD5ADbizVrkRBcEuFiqv/45Ydwi+ue1GfHqejvf75rhlvUTLmyEtJyE7gCAuFNxIhKHEomAYZpO2Jpy6/j1m2WFAPkFCfbz26zLmX1SK9ozG4bIFhW+rQUCoaR5wdybspb7Tx+FRNzrz7w7bsolNYQBGxfsF7DciPlUXdwodJKUmRkW9EjG5bKzJYxnU2NNUO516mrBQJlYdE/4jd+Au7YKyc0I9G+EY0Z+viLQFQojTH/HH196Jx0yhOaQ==
+ b=xDr9/SMpLQoHiKPJwAnMfEKZDASiUtOcptU2Omp+UTTLKbtyPhK9DnfHg9LOMOnA8Y0ikf6XIYYD+OoIccpgWl0HIF7vcbIKZ3h+YyRjoJlt09qUFQ/4RhjVddUwOqlZCIsmE5BjOo/yeaL6jxRuPn+ZNulGrOE+2sHG63XgffsgqPRirRTBLBZkYEFdg/KQK93IxBJJgxIgqJnKMRTH8UjTkyvFupdhjl5ojp97bb4XB85mWHfcyjK0FC+Z7GW+2+6IWJWZMWWoPzXRjJxsYpgNusbnzcFoMpWxvXmzjs9uxME0rUI1IYgIMUKPkE3S3Pq2kORM3y1LmPlwrAJr2w==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hlHfzMTgcI/hHuaTDHtB95wiVf99CmBUXGQZO8V4tfU=;
- b=bLtj4ITwcsp8WOunKwpssdmbf4gT3CAlmLuNYEvAVg6fyAwyoRxzp9pobTSD0qZgSNRIjQcor2UyF7PpduSHoMmKRdVK663bKPrMCGZU2uRrq2jMh3J0oc/tW7GyZpOehqcBqRfNVCaxbkOSGVID3FOL4lxPCTcmJfWU7iPG3VibJxqJPhv/up6NNrZ6LrL8a1RQlOC5lGGRfU5Z3PPo168TL5kHam6QO4/ioTHWVkoTqjiFq8H44kh9uJ3PFJito8efrXAbFSUtXWpA8TSqREbkmPqXufua1fQXytGt4XQmUl0RQbwcj6wA9F3c+x2LYhnF22GSftAhzMjGmsjtXA==
+ bh=n/kRsz7ejfEfUsS6mGDjv0iX2YNtLpaByMScrUGSOIY=;
+ b=g88RJCJzKAWdebWa5RfPdAPdSy1yo6yheoXI6pTtzsykp6N4lSUxJM+kustxVP8mK/WkfnJGg7KUcwBTLbXIQ/pCG87SmwltniteILauCxC/38LnlEenasCqhFIZkiYaRsU09yFn0USEQQwDomjFCg7CmLvFCEbdSjZ83OZj9KH9lVRYBwFJDqnWPbM3gqxta5emSlVTCgZaB7M1QpDVpJTgD2Ci6+LieizTrhXkf9OofrB0/NfU/mEiPjsRRa86K+/1KXNcQBjRsdQ4ZhSWnPruVJVRMW7kRu9AtOWatb7C3PMX0ysgrNtPUrJywVHjBdWd8sGyp20oJ97WEsAgGA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=lists.infradead.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hlHfzMTgcI/hHuaTDHtB95wiVf99CmBUXGQZO8V4tfU=;
- b=PBdaHwiMF6QwY3dtdcbvsBaKlOWckm8u89zbOqSVpJ8syFjRo66XFwA/RnmG2eOgLSXudwwxstHjx/XL1w1gvZ+MNoOrHd5gnTdM+Z6OGv3rtXs+aIZieVfTmqVPfRk/Rm3T1pCRUCkOXn6UK+4KQw20PAmEEJOO/NHjk3VBqOQ=
-Received: from DU2PR04CA0012.eurprd04.prod.outlook.com (2603:10a6:10:3b::17)
- by DU0PR08MB8068.eurprd08.prod.outlook.com (2603:10a6:10:3eb::8) with
+ bh=n/kRsz7ejfEfUsS6mGDjv0iX2YNtLpaByMScrUGSOIY=;
+ b=Y21OqeO/Si7ehmMDckGHa9cO4mUwx6yi5AuZV1tUxHdLmS0OD0NTuUpEK05EwPRIFXdK9aqyGvjKPzscrp/cidq6E/jBQ42mOxczMnzF7Xn9SjawKSaHLe5HJmp/sJFamzxU7m1q8/i+XbAWbrK1/wYvKQDcIEKmDn3nsX5887Y=
+Received: from DU7P251CA0005.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:551::32)
+ by DBBPR08MB6186.eurprd08.prod.outlook.com (2603:10a6:10:204::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9700.16; Thu, 19 Mar
- 2026 15:53:54 +0000
-Received: from DB1PEPF0003922D.eurprd03.prod.outlook.com
- (2603:10a6:10:3b:cafe::fc) by DU2PR04CA0012.outlook.office365.com
- (2603:10a6:10:3b::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
+ 2026 15:54:08 +0000
+Received: from DU6PEPF0000B61F.eurprd02.prod.outlook.com
+ (2603:10a6:10:551:cafe::c9) by DU7P251CA0005.outlook.office365.com
+ (2603:10a6:10:551::32) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.19 via Frontend Transport; Thu,
- 19 Mar 2026 15:53:54 +0000
+ 19 Mar 2026 15:54:08 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,32 +51,32 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- DB1PEPF0003922D.mail.protection.outlook.com (10.167.8.100) with Microsoft
+ DU6PEPF0000B61F.mail.protection.outlook.com (10.167.8.134) with Microsoft
  SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.19
- via Frontend Transport; Thu, 19 Mar 2026 15:53:53 +0000
+ via Frontend Transport; Thu, 19 Mar 2026 15:54:08 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=v+MDteuvgPVSJCunOBqmuc8twqAM6vIpnQJvV8GdmYA/KZQqIeAf3hNj+ZVNg1JRnI3vEUZMfycSr1bFWkXh0JVoFsIPGxj9PcQecrgSdQvB4hWZCGBT8MhpNYQW8yQIQzKy4nqwTxNe8JGFWJt6DgL4N383vOm0R1T8qi0gpvgCQHxB9WGk1TjKvXxKuSPZxiD483fQce8dxNz/xaKiwRziRtpNN/VnonCOAwBE6csR9eqN7fF4xaNcnt7oLpgQhOhZHskp90C+gcc4zuPwfkYCxsJwzyNdE/gINSF84Xv4G3yWgE7uwRGrcYayfS2qdD3EmnpXweno1BNvgDPG6A==
+ b=vsllDrUqXoysQSM1ySF11CHbncw8DTVm1Te4R2c6zSonzI/dpHbcemHv5pppv/mzdWeckwJuTepd4a99riizadVFY0S0MrYpM6GableG4uWK8MO1AMGMeKC8xqjSQ32jXHtRFJi4DVGzkC/N3AoTmeuhXlES8LUX3Ej2ivDV8TANBuXaErs5h8RZl69rLB8nJnvUOPEgzzU24oaROQ/QLpgGp3rQ0vaizZMhy6DMwK4On2MoYhUn0Dn7SpU32wOjKXWyOo/Nzvc+BeHwgWVEy8JyOsPECyHLn2PXEP+Kz8xPk5PHJuMOpUQ7cfa6xt6FlrA3RY62zZ6qwMcZj/gtGA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hlHfzMTgcI/hHuaTDHtB95wiVf99CmBUXGQZO8V4tfU=;
- b=mzk+kAJdJJrdAt7V2O60ZrTyG+wuZgyMEIGoMHql22Xjd4/qrRFgcwZDcqLXGFe81VIS1DqB53LkHyFteiaUMEcjq/K/06qGTKyCUC/JgjOJrss6ZvW8G4AyWyIXVbm0LSX/DSSy/ZEahTK+p6OgWnhuK1xBiYIk6mW0i1qpjWHWveO+NW4vKmkMt9kDkI0I9ZJ0gpVS8SZdEMJd15NIH47H2QO23AzY2SglUJzB2kqezYvvE4NJNWIct1N9aleDFRLUTQ0Aq90OGgESYxu6WrYyj3nRn7uOBTxLyZK6L9juqq9Tpyc93fcAgFPq71RPJ6pwz0gEp7LbLZDY3mu30g==
+ bh=n/kRsz7ejfEfUsS6mGDjv0iX2YNtLpaByMScrUGSOIY=;
+ b=VsNesfsFW4hWBFhtc2uBSlFSEdvmskS7djuOS6J8EP+Bj6DrhBdS4CwUBXR7E4LcycQnSwvGwwL3JoySySWlHcfPNkT4dOjBTXHrtcO89VVey2lazeiHcQDkFGXDRV4Tmo8qtgH92gQZLcYxHxlRK+kmUoMYEs9AqUHhxKRXrEiaA5w5IqM/nIqGl6CdHuSndxewhueLODxx4vG6NbkscjPpOJUQ9IQW7nXQB3spKJ3tkSS/Siv2qGTOzw1HjG5BgI7Y73LEWCLdWyYGktZkIwaGx9ShmcITnVtHQKN+pjROnEEI6wD+49oUTf412rhxT36z7S9B0gEH2RdD4WE/nQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hlHfzMTgcI/hHuaTDHtB95wiVf99CmBUXGQZO8V4tfU=;
- b=PBdaHwiMF6QwY3dtdcbvsBaKlOWckm8u89zbOqSVpJ8syFjRo66XFwA/RnmG2eOgLSXudwwxstHjx/XL1w1gvZ+MNoOrHd5gnTdM+Z6OGv3rtXs+aIZieVfTmqVPfRk/Rm3T1pCRUCkOXn6UK+4KQw20PAmEEJOO/NHjk3VBqOQ=
+ bh=n/kRsz7ejfEfUsS6mGDjv0iX2YNtLpaByMScrUGSOIY=;
+ b=Y21OqeO/Si7ehmMDckGHa9cO4mUwx6yi5AuZV1tUxHdLmS0OD0NTuUpEK05EwPRIFXdK9aqyGvjKPzscrp/cidq6E/jBQ42mOxczMnzF7Xn9SjawKSaHLe5HJmp/sJFamzxU7m1q8/i+XbAWbrK1/wYvKQDcIEKmDn3nsX5887Y=
 Received: from AS4PR08MB8241.eurprd08.prod.outlook.com (2603:10a6:20b:504::10)
  by PA4PR08MB6191.eurprd08.prod.outlook.com (2603:10a6:102:f3::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.19; Thu, 19 Mar
- 2026 15:52:50 +0000
+ 2026 15:53:06 +0000
 Received: from AS4PR08MB8241.eurprd08.prod.outlook.com
  ([fe80::dde1:493a:db27:de27]) by AS4PR08MB8241.eurprd08.prod.outlook.com
  ([fe80::dde1:493a:db27:de27%6]) with mapi id 15.20.9723.018; Thu, 19 Mar 2026
- 15:52:50 +0000
+ 15:53:06 +0000
 From: Sascha Bischoff <Sascha.Bischoff@arm.com>
 To: "linux-arm-kernel@lists.infradead.org"
 	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
@@ -88,12 +88,11 @@ CC: nd <nd@arm.com>, "maz@kernel.org" <maz@kernel.org>,
 	<peter.maydell@linaro.org>, "lpieralisi@kernel.org" <lpieralisi@kernel.org>,
 	Timothy Hayes <Timothy.Hayes@arm.com>, "jonathan.cameron@huawei.com"
 	<jonathan.cameron@huawei.com>
-Subject: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
-Thread-Topic: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize
- ID_AA64PFR2_EL1.GCIE
-Thread-Index: AQHct7hwdS7MT+FM+EyiBmp8zzKLmA==
-Date: Thu, 19 Mar 2026 15:52:50 +0000
-Message-ID: <20260319154937.3619520-13-sascha.bischoff@arm.com>
+Subject: [PATCH v7 13/41] KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs
+Thread-Topic: [PATCH v7 13/41] KVM: arm64: gic-v5: Support GICv5 FGTs & FGUs
+Thread-Index: AQHct7h5zXndN4kgbU+1byjikhgJtw==
+Date: Thu, 19 Mar 2026 15:53:05 +0000
+Message-ID: <20260319154937.3619520-14-sascha.bischoff@arm.com>
 References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
 In-Reply-To: <20260319154937.3619520-1-sascha.bischoff@arm.com>
 Accept-Language: en-GB, en-US
@@ -104,8 +103,8 @@ x-mailer: git-send-email 2.34.1
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 x-ms-traffictypediagnostic:
-	AS4PR08MB8241:EE_|PA4PR08MB6191:EE_|DB1PEPF0003922D:EE_|DU0PR08MB8068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f32bf2c-15a6-4151-69b2-08de85cfb8dd
+	AS4PR08MB8241:EE_|PA4PR08MB6191:EE_|DU6PEPF0000B61F:EE_|DBBPR08MB6186:EE_
+X-MS-Office365-Filtering-Correlation-Id: dfbaec07-a57e-4dce-d5e7-08de85cfc181
 x-checkrecipientrouted: true
 nodisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
@@ -113,7 +112,7 @@ X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
  BCL:0;ARA:13230040|366016|376014|1800799024|18002099003|22082099003|56012099003|38070700021;
 X-Microsoft-Antispam-Message-Info-Original:
- 86Z8eRNDGMHvjBsJgrU+aS5uYOxGad6RZqAeT9taBNuD88VHXK+tkrbH7nyKFHUHE2fG3+ErZG3v8wBwNyie0jS7je/iVp8wbTTXSCsk14eEAhYxrvHyzU4Ke+4WT6gHqhpfg40hQYm7w4AI3It1EXLsARWoOXtdMupWnFMSvHWOLyzFqwtJ5nWMg7nWot0ofwQSqxLyOjP43E8b6KEWVGn7DYWmSBa8WEiKCSCFa9ucZvqga7ffr6VR16CrUNfzzMbJ2rIOgFPCLPPXsIONUFGKhy1QV9KNfkcwTPAxu+YbvZXDDxhNw7SAfF9dsoGAb3QtJGdeLES3noujJJDygV1pITWc3A29+98rwuHSsDa9VyCD3Dl56Txwvj0BgRorMD6dZD1RIvC0BSqra7RPmhDwwkZyf39mUkfdd71/kWC2dtjhInNpXE6+T9o/MnB3SDzb74DgyR/zxUnoQkSRnNZM4NQCBJd0wMONSx8I0khcl9dqN6/3H/sBI5z6Y8JwOOhsfXfuLicuwxaZYh81WdBjSrV9vw087qeb0SjwN/hyqLno/xtaGyzxCf896P5ZYC+0x3UzwWklY5hHnhdm6sA215C/ySAG3F2jPmAK2up/4fKfpdmtjczJULq8goKC1zfK/tREyx2NtEioBMB4vFPNxR/QCHvmaG/18IBThCBwQ80Ov6OcGKH+MdaSMWVmfpXYORn7C6+7WROwfYZPw9Dn42TkyJBWPCL2o84HxeZoEp4rCRSH2dMKnkKCAxM+Wh8hGNV2CUI3wgG4adxeaIjOPJpqWNApkp+ilY76N4I=
+ wWDrkhs6tSERVmtC0/Ad/uG38aXs5QlNR/9GyDjv7dj7ftIjYkq9OAWdXZiKojJ55STgLUBxHUp+1eSl3wJINmnw+9SOODXjsQEkWzGddMz7rtvs55vv71dxNrcv0Bn1KsnQV4Z94uNc6YCDK0UI/IEiGbi59tfRWQjfODdkwBpUfubUtaXJu5yGLkettUAwocveLq88nUQyd4QWZOkehkj9GOoBcTS3iFRU/xypyyV5xxtoMcF3KeK5+bsOQuypMiAIfL+6PP4kbDJztvD6REEY5TFBN6awah1iURtkk1bu6wDgmYW96qBrBZGelMCjFZNFZi9hwWWA24S1UJfp6+oMkm9qvxBSwRUO/gGRj9UUWJxRENEdEZ1i5DQJEplz1/AESyogvUIVyoRItWR+l+FNQ2h0ZFFDipA8mPxShE9okLhJI9iQ1hDP5bwmqW+wj5SkIxYq47UU4V1o2CncPR3A9jacxrJ7n+hpRC7dX15qmtNwTJ5CLch0vZZR+9sLDJ4hTvsKtYAyTppS8Cj9J4t2JgcfMfWCkT3y+c0WqwQWrrO3MfVQ8KQ1HwrR+JA7LKSIhODjjgp6tA4BT3+XJWfnpakmPj0E3p8RycvUkqBW99SJrEuqVi/K/oaZn67NOOuw2hNOYHIfeBpyMNHB9uBlj3uOfRsgaCQ/6+2kf4U9K6gko85JF+wJuhk9+VxjqGYYcyH+0K2cPA1s9lQBITb7WHQBTQC6NHha/jB9G/aZaVgwgkbYWp2VS7kGpMCBC19Legsd3CL946Vqq+t87BCSx9AnG6mws8fPYU9/NlU=
 X-Forefront-Antispam-Report-Untrusted:
  CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR08MB8241.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(18002099003)(22082099003)(56012099003)(38070700021);DIR:OUT;SFP:1101;
 Content-Type: text/plain; charset="iso-8859-1"
@@ -125,290 +124,520 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-Exchange-RoutingPolicyChecked:
- F2nus0uFrM8LKCT4oXp+2fZNGsmNQnVqPAaLyUM91+YS1uhDHAY4eHiccXN7FOGp3is29Y66D4aU/gzq4y3iRbtzqQXcsVPMod/MCnpvZLH2TIhGGxNOK8dV5bB+mjy2bePVk2L2Sy+1esYYUDTSZxtOYJPtfBYFwuSQ2DYYhP+IDmPBuk4tJNmplDLTMDsKbiIvOIxiW6jdhNIuyDj63iUjYi1MWAjCNI8mzwEOzZO/F5u024iyfQxf0Pz+PgcuN50cDF4DNm9zACTAlH95nHQJ+yLn0TUp7N3sDa3DxAqBm6HD3qu9nIBLGsx9qBs55lqzzyAECEa3NJHXPCgKAw==
+ SABHi2C2YlEgbgmWIBI+WNGCgQjF723mClqnJyULy7c8b6acXPxD9+8S3swi+XCLg47lZbgwHP4tYb1Bz3Ug0X7nj0AkHFnJwPAl8bbEWnckDc0cWFFOynGl9QWOp4GpRmUqlWjzIdkPpd6mkBlTdJdthkI55e9kqASIHzlpBCbLCUsU1JU7DQ5cc2/TSeJUSX7AmoS3yc/uojBOeOEEB/j2O+q+Qe0y6olTvhQofwlzmoQWM35kA0RLGIkGsiFXXUjT55COYr1SqVU5YR5DECBCKu8wa3Zksb2e1yKlg7fvj+hwJFiueWs2U3SGTXzUSvtmssWsLpPenR6XA6E7aA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR08MB6191
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- DB1PEPF0003922D.eurprd03.prod.outlook.com
+ DU6PEPF0000B61F.eurprd02.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	8e41610f-c8fe-4b37-3106-08de85cf9303
+	1a1fba61-3735-4a53-86b5-08de85cf9c46
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|14060799003|82310400026|35042699022|376014|1800799024|56012099003|18002099003|22082099003;
+	BCL:0;ARA:13230040|35042699022|36860700016|1800799024|82310400026|14060799003|376014|18002099003|22082099003|56012099003;
 X-Microsoft-Antispam-Message-Info:
-	3KhCT2+s8lipU47krHJYM/tx0DfwuCt1jepsDhSuKx2EVUIcsu1uv9ffC3gLIUpJ+IzavLMSrgpu1sCToHYhRpBCTSL4JU9oPkjv3iWc5OU3Krea0D5UFVG8SnPppPCckdo0XBGk7L8Pa5IKnMWAKOWk0z75901oAc3ex7bvCAijDWPZx1LhS/3kuhWhuHP3fiKN0sWp+MamgMirv9X+LGkD+oeIiPcV6qI9AKp3QbdY9sd0kN/2x3VWPtYUMacu0dprv0Y7gq0vSQEuUVrPC6AbzTnxfe614PKqg61Rh7suj2fuKp7wp648mKP3m7NtGfuY25JEzM7oqinnRDNo/vr0wDvxefs4N4//EzlSyFCtC1ayFgK98Ammj7FAsvaHydfgwGiA8BLX3EJaeMf3bUIeUw5juKraLWr6F2mE/4dXEjwwBEg7bm9AEYyM6pDNt1uSOUkHjlYFfJ+7Cq0xSAXtZUpuGXANMZfTaN31xzoBEfRt196f2VN+jCiY3X21EwGFN3berVuz1yphhp4ZGmIdkjjIFmh4dqMUc/kvi2RvQEnBgGsE43uNAk1KxkyTKs605veQYE2CdfMwQ/5IggQ5gLWFFPdFG4PiPojJ2WLqWfMEc9fJt6GmPtevwKMajp3jqCNFSF1QUByoC1Pb8uRdAamd1XVZHtfSUGt4JP294pUoUSjOfUSvQq9cP1bsNcbM6mV4ijSgacQX0jiyMY4IckrvylHuRTP10RACikpDocviOCY8IzPGEZnQ4mrbOVkStvLhjoQl0N3yJK4rAg==
+	RVk2wh9eJodv4eK8cZxKwgpWbftL6gdUCmpX+EVOghFsnfT6NpfV4P8nqag0avnLi/5hO9dlKXBhshuCLtP82ZB/Vhabwja5e5n9A/AoZH5zmfVXpywyHvKJP74Up9EoZ7AbGDauwLJBL/vA9/yo0bKElNXRYWr3LqeinSoobR+ikTNH4M0/Im1Y8N1lUiYdYly4LgfduvfDDg2upuE526xdqDfQ0ylOkXj/O5l+W+un6c9x3zaRnCFiIwR4zXumVHCNxcOw8hYEtG8394SlIienL0Eqfq3MVTeCZDyz57q3AfVWZfg3FHpcLOKhRPJ0nviPMih8PDj1wo67muUuVYW9bf9eKDigdvNOOxFmmBbCH2TsGnvSwjAM/3C/SGfjx+vFfde//by3CDWkWEo61dlPCVxlIZpU4hRnkfWZUCcwLo4haKCuyhwcB26dKEHoGgESa/lkK/k+6nuSbH6khArooszTdY/DdkaIDh9VeQ8Vf9nfvGQRCd7HM2/Ao1oFnBnVxJxQ+pjPaanDt3TSFJyn5aRNQvbQj04Fk6bpndjF9atmycyDUdpVRHvszr6Yo+qqW0430Nljt4sddcs8NCC820079EzHf2vSVGLVBJQ67DEajK/SsPyo6hjAWOZI0VTnZJhGbpYSFsF0hyQrulm5Tb+T6Ac6t3jshFiHDsSASLC+m7nu4Q8LPw6Uz9rhHB7IB/lcHqGKzAn6I3pI+hkvAXajyBgm0aD0Ns+P5iSasnE1s1Gzxd/fqPH6kDXv99HI00BFiCtocCPbEWt7Wg==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(14060799003)(82310400026)(35042699022)(376014)(1800799024)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(36860700016)(1800799024)(82310400026)(14060799003)(376014)(18002099003)(22082099003)(56012099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	tn1kONAaObuivp6Dt+5GGa44znX/a79RkWyY0dQhY1uZpAQdntz0BC0JG4ftxVagrTXRvYKjmj+oB3vzEDwHup53xa3x008lr+wyGmtTNXY9c8nwY226MMgO+6qWYkRZjiVKDQGg+d0G+j8Uqkds4j6hUSA3ovEWpGPWb7p3oz2NCGkh9JOPUyhtvBX3COSgC0H4An3dQvRbI8Yk7WACg968p12YPucgZdnX0nzD0mRfLK5frq0yaIWx/OjQjFEovKEwkreRkJgHcRYwRHUgJSQoaGXu2+XgYhwkRf+ZZmtLN+mD7MEP59J0sUjYvjZtYaZetdAn5R5hZOKE6rj6WC5k/uixLBiCedkFfLZcO0J+xwvz5ETAIdiG2Lx2Zl4Gk40ZONkmWaRS+ziGloiA5Gkb6TOcS7d3ChiI5bwabNPD+RuetE5+f18pm8SjOno4
+	9X04+qkLE1aPRe+1fENv3R4xfLq9f1vXkrF2pdtoxdMyL3B1avj3ETNsumdYnD+yeMqZCs1Nk/pKsXmXUtPajs4NERAdwrBV/4nrsFrda083AOuehR6kqQkWI4raNXmVKd23uTq+eGlH3Ubh35/P09gY36y2aNylZ4YSWFTlBnBwG9/unkIVKKwSs8k2xJGc9pCoLG+8t1u2YMFnlV4asX7cJrF6trOB3T8kaU5ygB92O7u691tbomZkGxtJjdM1zyIcH8GNDj1o/PiFV04DVeiwkAqf7IYJvALBvxqt8yhixXfoP7ahxD9WLEVuXO91xfeHccsM9M1f4Cj8PiSwdOFyxjhpzxbQuD/KSjohJ9kt5fDbrLbWSbMY9j5mI2MP4cSUtk3rg9FUOx21BzjMdXDiHbDyJrZTuXFK2GI+q/NLaaNZB51I3k/MLBWxO6fi
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 15:53:53.8364
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 15:54:08.3350
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f32bf2c-15a6-4151-69b2-08de85cfb8dd
+X-MS-Exchange-CrossTenant-Network-Message-Id: dfbaec07-a57e-4dce-d5e7-08de85cfc181
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF0003922D.eurprd03.prod.outlook.com
+	DU6PEPF0000B61F.eurprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB8068
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB6186
 
-Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
-already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
-fields. Add sanitisation for the GCIE field, which is set to IMP if
-the host supports a GICv5 guest and NI, otherwise.
+Extend the existing FGT/FGU infrastructure to include the GICv5 trap
+registers (ICH_HFGRTR_EL2, ICH_HFGWTR_EL2, ICH_HFGITR_EL2). This
+involves mapping the trap registers and their bits to the
+corresponding feature that introduces them (FEAT_GCIE for all, in this
+case), and mapping each trap bit to the system register/instruction
+controlled by it.
 
-Extend the sanitisation that takes place in kvm_vgic_create() to zero
-the ID_AA64PFR2.GCIE field when a non-GICv5 GIC is created. More
-importantly, move this sanitisation to a separate function,
-kvm_vgic_finalize_sysregs(), and call it from kvm_finalize_sys_regs().
-
-We are required to finalize the GIC and GCIE fields a second time in
-kvm_finalize_sys_regs() due to how QEMU blindly reads out then
-verbatim restores the system register state. This avoids the issue
-where both the GCIE and GIC features are marked as present (an
-architecturally invalid combination), and hence guests fall over. See
-the comment in kvm_finalize_sys_regs() for more details.
-
-Overall, the following happens:
-
-* Before an irqchip is created, FEAT_GCIE is presented if the host
-  supports GICv5-based guests.
-* Once an irqchip is created, all other supported irqchips are hidden
-  from the guest; system register state reflects the guest's irqchip.
-* Userspace is allowed to set invalid irqchip feature combinations in
-  the system registers, but...
-* ...invalid combinations are removed a second time prior to the first
-  run of the guest, and things hopefully just work.
-
-All of this extra work is required to make sure that "legacy" GICv3
-guests based on QEMU transparently work on compatible GICv5 hosts
-without modification.
+As of this change, none of the GICv5 instructions or register accesses
+are being trapped.
 
 Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 ---
- arch/arm64/kvm/sys_regs.c       | 70 +++++++++++++++++++++++++++++----
- arch/arm64/kvm/vgic/vgic-init.c | 49 ++++++++++++++++-------
- include/kvm/arm_vgic.h          |  1 +
- 3 files changed, 98 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/kvm_host.h       | 19 +++++
+ arch/arm64/include/asm/vncr_mapping.h   |  3 +
+ arch/arm64/kvm/arm.c                    |  3 +
+ arch/arm64/kvm/config.c                 | 97 +++++++++++++++++++++++--
+ arch/arm64/kvm/emulate-nested.c         | 68 +++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 27 +++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  3 +
+ arch/arm64/kvm/sys_regs.c               |  2 +
+ 8 files changed, 215 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 42c84b7900ff5..140cf35f4eeb4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1758,6 +1758,7 @@ static u8 pmuver_to_perfmon(u8 pmuver)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm=
+_host.h
+index 70cb9cfd760a3..64a1ee6c442f0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -287,6 +287,9 @@ enum fgt_group_id {
+ 	HDFGRTR2_GROUP,
+ 	HDFGWTR2_GROUP =3D HDFGRTR2_GROUP,
+ 	HFGITR2_GROUP,
++	ICH_HFGRTR_GROUP,
++	ICH_HFGWTR_GROUP =3D ICH_HFGRTR_GROUP,
++	ICH_HFGITR_GROUP,
 =20
- static u64 sanitise_id_aa64pfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
- static u64 sanitise_id_aa64pfr1_el1(const struct kvm_vcpu *vcpu, u64 val);
-+static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val);
- static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val);
+ 	/* Must be last */
+ 	__NR_FGT_GROUP_IDS__
+@@ -620,6 +623,10 @@ enum vcpu_sysreg {
+ 	VNCR(ICH_HCR_EL2),
+ 	VNCR(ICH_VMCR_EL2),
 =20
- /* Read a sanitised cpufeature ID register by sys_reg_desc */
-@@ -1783,10 +1784,7 @@ static u64 __kvm_read_sanitised_id_reg(const struct =
-kvm_vcpu *vcpu,
- 		val =3D sanitise_id_aa64pfr1_el1(vcpu, val);
- 		break;
- 	case SYS_ID_AA64PFR2_EL1:
--		val &=3D ID_AA64PFR2_EL1_FPMR |
--			(kvm_has_mte(vcpu->kvm) ?
--			 ID_AA64PFR2_EL1_MTEFAR | ID_AA64PFR2_EL1_MTESTOREONLY :
--			 0);
-+		val =3D sanitise_id_aa64pfr2_el1(vcpu, val);
- 		break;
- 	case SYS_ID_AA64ISAR1_EL1:
- 		if (!vcpu_has_ptrauth(vcpu))
-@@ -2027,6 +2025,23 @@ static u64 sanitise_id_aa64pfr1_el1(const struct kvm=
-_vcpu *vcpu, u64 val)
- 	return val;
- }
++	VNCR(ICH_HFGRTR_EL2),
++	VNCR(ICH_HFGWTR_EL2),
++	VNCR(ICH_HFGITR_EL2),
++
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
 =20
-+static u64 sanitise_id_aa64pfr2_el1(const struct kvm_vcpu *vcpu, u64 val)
-+{
-+	val &=3D ID_AA64PFR2_EL1_FPMR |
-+	       ID_AA64PFR2_EL1_MTEFAR |
-+	       ID_AA64PFR2_EL1_MTESTOREONLY;
-+
-+	if (!kvm_has_mte(vcpu->kvm)) {
-+		val &=3D ~ID_AA64PFR2_EL1_MTEFAR;
-+		val &=3D ~ID_AA64PFR2_EL1_MTESTOREONLY;
-+	}
-+
-+	if (vgic_host_has_gicv5())
-+		val |=3D SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
-+
-+	return val;
-+}
-+
- static u64 sanitise_id_aa64dfr0_el1(const struct kvm_vcpu *vcpu, u64 val)
+@@ -675,6 +682,9 @@ extern struct fgt_masks hfgwtr2_masks;
+ extern struct fgt_masks hfgitr2_masks;
+ extern struct fgt_masks hdfgrtr2_masks;
+ extern struct fgt_masks hdfgwtr2_masks;
++extern struct fgt_masks ich_hfgrtr_masks;
++extern struct fgt_masks ich_hfgwtr_masks;
++extern struct fgt_masks ich_hfgitr_masks;
+=20
+ extern struct fgt_masks kvm_nvhe_sym(hfgrtr_masks);
+ extern struct fgt_masks kvm_nvhe_sym(hfgwtr_masks);
+@@ -687,6 +697,9 @@ extern struct fgt_masks kvm_nvhe_sym(hfgwtr2_masks);
+ extern struct fgt_masks kvm_nvhe_sym(hfgitr2_masks);
+ extern struct fgt_masks kvm_nvhe_sym(hdfgrtr2_masks);
+ extern struct fgt_masks kvm_nvhe_sym(hdfgwtr2_masks);
++extern struct fgt_masks kvm_nvhe_sym(ich_hfgrtr_masks);
++extern struct fgt_masks kvm_nvhe_sym(ich_hfgwtr_masks);
++extern struct fgt_masks kvm_nvhe_sym(ich_hfgitr_masks);
+=20
+ struct kvm_cpu_context {
+ 	struct user_pt_regs regs;	/* sp =3D sp_el0 */
+@@ -1659,6 +1672,11 @@ static __always_inline enum fgt_group_id __fgt_reg_t=
+o_group_id(enum vcpu_sysreg
+ 	case HDFGRTR2_EL2:
+ 	case HDFGWTR2_EL2:
+ 		return HDFGRTR2_GROUP;
++	case ICH_HFGRTR_EL2:
++	case ICH_HFGWTR_EL2:
++		return ICH_HFGRTR_GROUP;
++	case ICH_HFGITR_EL2:
++		return ICH_HFGITR_GROUP;
+ 	default:
+ 		BUILD_BUG_ON(1);
+ 	}
+@@ -1673,6 +1691,7 @@ static __always_inline enum fgt_group_id __fgt_reg_to=
+_group_id(enum vcpu_sysreg
+ 		case HDFGWTR_EL2:					\
+ 		case HFGWTR2_EL2:					\
+ 		case HDFGWTR2_EL2:					\
++		case ICH_HFGWTR_EL2:					\
+ 			p =3D &(vcpu)->arch.fgt[id].w;			\
+ 			break;						\
+ 		default:						\
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm=
+/vncr_mapping.h
+index c2485a862e690..14366d35ce82f 100644
+--- a/arch/arm64/include/asm/vncr_mapping.h
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -108,5 +108,8 @@
+ #define VNCR_MPAMVPM5_EL2       0x968
+ #define VNCR_MPAMVPM6_EL2       0x970
+ #define VNCR_MPAMVPM7_EL2       0x978
++#define VNCR_ICH_HFGITR_EL2	0xB10
++#define VNCR_ICH_HFGRTR_EL2	0xB18
++#define VNCR_ICH_HFGWTR_EL2	0xB20
+=20
+ #endif /* __ARM64_VNCR_MAPPING_H__ */
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4e46336798946..0b27e2c437be7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2529,6 +2529,9 @@ static void kvm_hyp_init_symbols(void)
+ 	kvm_nvhe_sym(hfgitr2_masks) =3D hfgitr2_masks;
+ 	kvm_nvhe_sym(hdfgrtr2_masks)=3D hdfgrtr2_masks;
+ 	kvm_nvhe_sym(hdfgwtr2_masks)=3D hdfgwtr2_masks;
++	kvm_nvhe_sym(ich_hfgrtr_masks) =3D ich_hfgrtr_masks;
++	kvm_nvhe_sym(ich_hfgwtr_masks) =3D ich_hfgwtr_masks;
++	kvm_nvhe_sym(ich_hfgitr_masks) =3D ich_hfgitr_masks;
+=20
+ 	/*
+ 	 * Flush entire BSS since part of its data containing init symbols is rea=
+d
+diff --git a/arch/arm64/kvm/config.c b/arch/arm64/kvm/config.c
+index d9f553cbf9dfd..e4ec1bda8dfcb 100644
+--- a/arch/arm64/kvm/config.c
++++ b/arch/arm64/kvm/config.c
+@@ -225,6 +225,7 @@ struct reg_feat_map_desc {
+ #define FEAT_MTPMU		ID_AA64DFR0_EL1, MTPMU, IMP
+ #define FEAT_HCX		ID_AA64MMFR1_EL1, HCX, IMP
+ #define FEAT_S2PIE		ID_AA64MMFR3_EL1, S2PIE, IMP
++#define FEAT_GCIE		ID_AA64PFR2_EL1, GCIE, IMP
+=20
+ static bool not_feat_aa64el3(struct kvm *kvm)
  {
- 	val =3D ID_REG_LIMIT_FIELD_ENUM(val, ID_AA64DFR0_EL1, DebugVer, V8P8);
-@@ -2216,6 +2231,12 @@ static int set_id_aa64pfr1_el1(struct kvm_vcpu *vcpu=
-,
- 	return set_id_reg(vcpu, rd, user_val);
+@@ -1277,6 +1278,58 @@ static const struct reg_bits_to_feat_map vtcr_el2_fe=
+at_map[] =3D {
+ static const DECLARE_FEAT_MAP(vtcr_el2_desc, VTCR_EL2,
+ 			      vtcr_el2_feat_map, FEAT_AA64EL2);
+=20
++static const struct reg_bits_to_feat_map ich_hfgrtr_feat_map[] =3D {
++	NEEDS_FEAT(ICH_HFGRTR_EL2_ICC_APR_EL1 |
++		   ICH_HFGRTR_EL2_ICC_IDRn_EL1 |
++		   ICH_HFGRTR_EL2_ICC_CR0_EL1 |
++		   ICH_HFGRTR_EL2_ICC_HPPIR_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PCR_EL1 |
++		   ICH_HFGRTR_EL2_ICC_ICSR_EL1 |
++		   ICH_HFGRTR_EL2_ICC_IAFFIDR_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PPI_HMRn_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PPI_ENABLERn_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PPI_PENDRn_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PPI_PRIORITYRn_EL1 |
++		   ICH_HFGRTR_EL2_ICC_PPI_ACTIVERn_EL1,
++		   FEAT_GCIE),
++};
++
++static const DECLARE_FEAT_MAP_FGT(ich_hfgrtr_desc, ich_hfgrtr_masks,
++				  ich_hfgrtr_feat_map, FEAT_GCIE);
++
++static const struct reg_bits_to_feat_map ich_hfgwtr_feat_map[] =3D {
++	NEEDS_FEAT(ICH_HFGWTR_EL2_ICC_APR_EL1 |
++		   ICH_HFGWTR_EL2_ICC_CR0_EL1 |
++		   ICH_HFGWTR_EL2_ICC_PCR_EL1 |
++		   ICH_HFGWTR_EL2_ICC_ICSR_EL1 |
++		   ICH_HFGWTR_EL2_ICC_PPI_ENABLERn_EL1 |
++		   ICH_HFGWTR_EL2_ICC_PPI_PENDRn_EL1 |
++		   ICH_HFGWTR_EL2_ICC_PPI_PRIORITYRn_EL1 |
++		   ICH_HFGWTR_EL2_ICC_PPI_ACTIVERn_EL1,
++		   FEAT_GCIE),
++};
++
++static const DECLARE_FEAT_MAP_FGT(ich_hfgwtr_desc, ich_hfgwtr_masks,
++				  ich_hfgwtr_feat_map, FEAT_GCIE);
++
++static const struct reg_bits_to_feat_map ich_hfgitr_feat_map[] =3D {
++	NEEDS_FEAT(ICH_HFGITR_EL2_GICCDEN |
++		   ICH_HFGITR_EL2_GICCDDIS |
++		   ICH_HFGITR_EL2_GICCDPRI |
++		   ICH_HFGITR_EL2_GICCDAFF |
++		   ICH_HFGITR_EL2_GICCDPEND |
++		   ICH_HFGITR_EL2_GICCDRCFG |
++		   ICH_HFGITR_EL2_GICCDHM |
++		   ICH_HFGITR_EL2_GICCDEOI |
++		   ICH_HFGITR_EL2_GICCDDI |
++		   ICH_HFGITR_EL2_GICRCDIA |
++		   ICH_HFGITR_EL2_GICRCDNMIA,
++		   FEAT_GCIE),
++};
++
++static const DECLARE_FEAT_MAP_FGT(ich_hfgitr_desc, ich_hfgitr_masks,
++				  ich_hfgitr_feat_map, FEAT_GCIE);
++
+ static void __init check_feat_map(const struct reg_bits_to_feat_map *map,
+ 				  int map_size, u64 resx, const char *str)
+ {
+@@ -1328,6 +1381,9 @@ void __init check_feature_map(void)
+ 	check_reg_desc(&sctlr_el2_desc);
+ 	check_reg_desc(&mdcr_el2_desc);
+ 	check_reg_desc(&vtcr_el2_desc);
++	check_reg_desc(&ich_hfgrtr_desc);
++	check_reg_desc(&ich_hfgwtr_desc);
++	check_reg_desc(&ich_hfgitr_desc);
  }
 =20
-+static int set_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-+			       const struct sys_reg_desc *rd, u64 user_val)
-+{
-+	return set_id_reg(vcpu, rd, user_val);
-+}
-+
- /*
-  * Allow userspace to de-feature a stage-2 translation granule but prevent=
- it
-  * from claiming the impossible.
-@@ -3197,10 +3218,11 @@ static const struct sys_reg_desc sys_reg_descs[] =
-=3D {
- 				       ID_AA64PFR1_EL1_RES0 |
- 				       ID_AA64PFR1_EL1_MPAM_frac |
- 				       ID_AA64PFR1_EL1_MTE)),
--	ID_WRITABLE(ID_AA64PFR2_EL1,
--		    ID_AA64PFR2_EL1_FPMR |
--		    ID_AA64PFR2_EL1_MTEFAR |
--		    ID_AA64PFR2_EL1_MTESTOREONLY),
-+	ID_FILTERED(ID_AA64PFR2_EL1, id_aa64pfr2_el1,
-+		    ~(ID_AA64PFR2_EL1_FPMR |
-+		      ID_AA64PFR2_EL1_MTEFAR |
-+		      ID_AA64PFR2_EL1_MTESTOREONLY |
-+		      ID_AA64PFR2_EL1_GCIE)),
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
-@@ -5671,8 +5693,40 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
+ static bool idreg_feat_match(struct kvm *kvm, const struct reg_bits_to_fea=
+t_map *map)
+@@ -1460,6 +1516,13 @@ void compute_fgu(struct kvm *kvm, enum fgt_group_id =
+fgt)
+ 		val |=3D compute_fgu_bits(kvm, &hdfgrtr2_desc);
+ 		val |=3D compute_fgu_bits(kvm, &hdfgwtr2_desc);
+ 		break;
++	case ICH_HFGRTR_GROUP:
++		val |=3D compute_fgu_bits(kvm, &ich_hfgrtr_desc);
++		val |=3D compute_fgu_bits(kvm, &ich_hfgwtr_desc);
++		break;
++	case ICH_HFGITR_GROUP:
++		val |=3D compute_fgu_bits(kvm, &ich_hfgitr_desc);
++		break;
+ 	default:
+ 		BUG();
+ 	}
+@@ -1531,6 +1594,15 @@ struct resx get_reg_fixed_bits(struct kvm *kvm, enum=
+ vcpu_sysreg reg)
+ 	case VTCR_EL2:
+ 		resx =3D compute_reg_resx_bits(kvm, &vtcr_el2_desc, 0, 0);
+ 		break;
++	case ICH_HFGRTR_EL2:
++		resx =3D compute_reg_resx_bits(kvm, &ich_hfgrtr_desc, 0, 0);
++		break;
++	case ICH_HFGWTR_EL2:
++		resx =3D compute_reg_resx_bits(kvm, &ich_hfgwtr_desc, 0, 0);
++		break;
++	case ICH_HFGITR_EL2:
++		resx =3D compute_reg_resx_bits(kvm, &ich_hfgitr_desc, 0, 0);
++		break;
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		resx =3D (typeof(resx)){};
+@@ -1565,6 +1637,12 @@ static __always_inline struct fgt_masks *__fgt_reg_t=
+o_masks(enum vcpu_sysreg reg
+ 		return &hdfgrtr2_masks;
+ 	case HDFGWTR2_EL2:
+ 		return &hdfgwtr2_masks;
++	case ICH_HFGRTR_EL2:
++		return &ich_hfgrtr_masks;
++	case ICH_HFGWTR_EL2:
++		return &ich_hfgwtr_masks;
++	case ICH_HFGITR_EL2:
++		return &ich_hfgitr_masks;
+ 	default:
+ 		BUILD_BUG_ON(1);
+ 	}
+@@ -1618,12 +1696,17 @@ void kvm_vcpu_load_fgt(struct kvm_vcpu *vcpu)
+ 	__compute_hdfgwtr(vcpu);
+ 	__compute_fgt(vcpu, HAFGRTR_EL2);
 =20
- 		val =3D kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_=
-GIC;
- 		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, val);
-+		val =3D kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_EL1_=
-GCIE;
-+		kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, val);
- 		val =3D kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
- 		kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, val);
-+	} else {
-+		/*
-+		 * Certain userspace software - QEMU - samples the system
-+		 * register state without creating an irqchip, then blindly
-+		 * restores the state prior to running the final guest. This
-+		 * means that it restores the virtualization & emulation
-+		 * capabilities of the host system, rather than something that
-+		 * reflects the final guest state. Moreover, it checks that the
-+		 * state was "correctly" restored (i.e., verbatim), bailing if
-+		 * it isn't, so masking off invalid state isn't an option.
-+		 *
-+		 * On GICv5 hardware that supports FEAT_GCIE_LEGACY we can run
-+		 * both GICv3- and GICv5-based guests. Therefore, we initially
-+		 * present both ID_AA64PFR0.GIC and ID_AA64PFR2.GCIE as IMP to
-+		 * reflect that userspace can create EITHER a vGICv3 or a
-+		 * vGICv5. This is an architecturally invalid combination, of
-+		 * course. Once an in-kernel GIC is created, the sysreg state is
-+		 * updated to reflect the actual, valid configuration.
-+		 *
-+		 * Setting both the GIC and GCIE features to IMP unsurprisingly
-+		 * results in guests falling over, and hence we need to fix up
-+		 * this mess in KVM. Before running for the first time we yet
-+		 * again ensure that the GIC and GCIE fields accurately reflect
-+		 * the actual hardware the guest should see.
-+		 *
-+		 * This hack allows legacy QEMU-based GICv3 guests to run
-+		 * unmodified on compatible GICv5 hosts, and avoids the inverse
-+		 * problem for GICv5-based guests in the future.
-+		 */
-+		kvm_vgic_finalize_idregs(kvm);
+-	if (!cpus_have_final_cap(ARM64_HAS_FGT2))
+-		return;
++	if (cpus_have_final_cap(ARM64_HAS_FGT2)) {
++		__compute_fgt(vcpu, HFGRTR2_EL2);
++		__compute_fgt(vcpu, HFGWTR2_EL2);
++		__compute_fgt(vcpu, HFGITR2_EL2);
++		__compute_fgt(vcpu, HDFGRTR2_EL2);
++		__compute_fgt(vcpu, HDFGWTR2_EL2);
++	}
+=20
+-	__compute_fgt(vcpu, HFGRTR2_EL2);
+-	__compute_fgt(vcpu, HFGWTR2_EL2);
+-	__compute_fgt(vcpu, HFGITR2_EL2);
+-	__compute_fgt(vcpu, HDFGRTR2_EL2);
+-	__compute_fgt(vcpu, HDFGWTR2_EL2);
++	if (cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF)) {
++		__compute_fgt(vcpu, ICH_HFGRTR_EL2);
++		__compute_fgt(vcpu, ICH_HFGWTR_EL2);
++		__compute_fgt(vcpu, ICH_HFGITR_EL2);
++	}
+ }
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-neste=
+d.c
+index 22d497554c949..dba7ced74ca5e 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2053,6 +2053,60 @@ static const struct encoding_to_trap_config encoding=
+_to_fgt[] __initconst =3D {
+ 	SR_FGT(SYS_AMEVCNTR0_EL0(2),	HAFGRTR, AMEVCNTR02_EL0, 1),
+ 	SR_FGT(SYS_AMEVCNTR0_EL0(1),	HAFGRTR, AMEVCNTR01_EL0, 1),
+ 	SR_FGT(SYS_AMEVCNTR0_EL0(0),	HAFGRTR, AMEVCNTR00_EL0, 1),
++
++	/*
++	 * ICH_HFGRTR_EL2 & ICH_HFGWTR_EL2
++	 */
++	SR_FGT(SYS_ICC_APR_EL1,			ICH_HFGRTR, ICC_APR_EL1, 0),
++	SR_FGT(SYS_ICC_IDR0_EL1,		ICH_HFGRTR, ICC_IDRn_EL1, 0),
++	SR_FGT(SYS_ICC_CR0_EL1,			ICH_HFGRTR, ICC_CR0_EL1, 0),
++	SR_FGT(SYS_ICC_HPPIR_EL1,		ICH_HFGRTR, ICC_HPPIR_EL1, 0),
++	SR_FGT(SYS_ICC_PCR_EL1,			ICH_HFGRTR, ICC_PCR_EL1, 0),
++	SR_FGT(SYS_ICC_ICSR_EL1,		ICH_HFGRTR, ICC_ICSR_EL1, 0),
++	SR_FGT(SYS_ICC_IAFFIDR_EL1,		ICH_HFGRTR, ICC_IAFFIDR_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_HMR0_EL1,		ICH_HFGRTR, ICC_PPI_HMRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_HMR1_EL1,		ICH_HFGRTR, ICC_PPI_HMRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_ENABLER0_EL1,	ICH_HFGRTR, ICC_PPI_ENABLERn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_ENABLER1_EL1,	ICH_HFGRTR, ICC_PPI_ENABLERn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_CPENDR0_EL1,		ICH_HFGRTR, ICC_PPI_PENDRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_CPENDR1_EL1,		ICH_HFGRTR, ICC_PPI_PENDRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_SPENDR0_EL1,		ICH_HFGRTR, ICC_PPI_PENDRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_SPENDR1_EL1,		ICH_HFGRTR, ICC_PPI_PENDRn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR0_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR1_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR2_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR3_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR4_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR5_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR6_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR7_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR8_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR9_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0)=
+,
++	SR_FGT(SYS_ICC_PPI_PRIORITYR10_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR11_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR12_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR13_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR14_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_PRIORITYR15_EL1,	ICH_HFGRTR, ICC_PPI_PRIORITYRn_EL1, 0=
+),
++	SR_FGT(SYS_ICC_PPI_CACTIVER0_EL1,	ICH_HFGRTR, ICC_PPI_ACTIVERn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_CACTIVER1_EL1,	ICH_HFGRTR, ICC_PPI_ACTIVERn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_SACTIVER0_EL1,	ICH_HFGRTR, ICC_PPI_ACTIVERn_EL1, 0),
++	SR_FGT(SYS_ICC_PPI_SACTIVER1_EL1,	ICH_HFGRTR, ICC_PPI_ACTIVERn_EL1, 0),
++
++	/*
++	 * ICH_HFGITR_EL2
++	 */
++	SR_FGT(GICV5_OP_GIC_CDEN,	ICH_HFGITR, GICCDEN, 0),
++	SR_FGT(GICV5_OP_GIC_CDDIS,	ICH_HFGITR, GICCDDIS, 0),
++	SR_FGT(GICV5_OP_GIC_CDPRI,	ICH_HFGITR, GICCDPRI, 0),
++	SR_FGT(GICV5_OP_GIC_CDAFF,	ICH_HFGITR, GICCDAFF, 0),
++	SR_FGT(GICV5_OP_GIC_CDPEND,	ICH_HFGITR, GICCDPEND, 0),
++	SR_FGT(GICV5_OP_GIC_CDRCFG,	ICH_HFGITR, GICCDRCFG, 0),
++	SR_FGT(GICV5_OP_GIC_CDHM,	ICH_HFGITR, GICCDHM, 0),
++	SR_FGT(GICV5_OP_GIC_CDEOI,	ICH_HFGITR, GICCDEOI, 0),
++	SR_FGT(GICV5_OP_GIC_CDDI,	ICH_HFGITR, GICCDDI, 0),
++	SR_FGT(GICV5_OP_GICR_CDIA,	ICH_HFGITR, GICRCDIA, 0),
++	SR_FGT(GICV5_OP_GICR_CDNMIA,	ICH_HFGITR, GICRCDNMIA, 0),
+ };
+=20
+ /*
+@@ -2127,6 +2181,9 @@ FGT_MASKS(hfgwtr2_masks, HFGWTR2_EL2);
+ FGT_MASKS(hfgitr2_masks, HFGITR2_EL2);
+ FGT_MASKS(hdfgrtr2_masks, HDFGRTR2_EL2);
+ FGT_MASKS(hdfgwtr2_masks, HDFGWTR2_EL2);
++FGT_MASKS(ich_hfgrtr_masks, ICH_HFGRTR_EL2);
++FGT_MASKS(ich_hfgwtr_masks, ICH_HFGWTR_EL2);
++FGT_MASKS(ich_hfgitr_masks, ICH_HFGITR_EL2);
+=20
+ static __init bool aggregate_fgt(union trap_config tc)
+ {
+@@ -2162,6 +2219,14 @@ static __init bool aggregate_fgt(union trap_config t=
+c)
+ 		rmasks =3D &hfgitr2_masks;
+ 		wmasks =3D NULL;
+ 		break;
++	case ICH_HFGRTR_GROUP:
++		rmasks =3D &ich_hfgrtr_masks;
++		wmasks =3D &ich_hfgwtr_masks;
++		break;
++	case ICH_HFGITR_GROUP:
++		rmasks =3D &ich_hfgitr_masks;
++		wmasks =3D NULL;
++		break;
  	}
 =20
- 	if (vcpu_has_nv(vcpu)) {
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-ini=
-t.c
-index e9b8b5fc480c7..e1be9c5ada7b3 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -71,7 +71,6 @@ static int vgic_allocate_private_irqs_locked(struct kvm_v=
-cpu *vcpu, u32 type);
- int kvm_vgic_create(struct kvm *kvm, u32 type)
- {
- 	struct kvm_vcpu *vcpu;
--	u64 aa64pfr0, pfr1;
- 	unsigned long i;
- 	int ret;
+ 	rresx =3D rmasks->res0 | rmasks->res1;
+@@ -2232,6 +2297,9 @@ static __init int check_all_fgt_masks(int ret)
+ 		&hfgitr2_masks,
+ 		&hdfgrtr2_masks,
+ 		&hdfgwtr2_masks,
++		&ich_hfgrtr_masks,
++		&ich_hfgwtr_masks,
++		&ich_hfgitr_masks,
+ 	};
+ 	int err =3D 0;
 =20
-@@ -145,19 +144,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	kvm->arch.vgic.implementation_rev =3D KVM_VGIC_IMP_REV_LATEST;
- 	kvm->arch.vgic.vgic_dist_base =3D VGIC_ADDR_UNDEF;
-=20
--	aa64pfr0 =3D kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_=
-EL1_GIC;
--	pfr1 =3D kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
--
--	if (type =3D=3D KVM_DEV_TYPE_ARM_VGIC_V2) {
--		kvm->arch.vgic.vgic_cpu_base =3D VGIC_ADDR_UNDEF;
--	} else {
--		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
--		aa64pfr0 |=3D SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
--		pfr1 |=3D SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
--	}
--
--	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
--	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
-+	/*
-+	 * We've now created the GIC. Update the system register state
-+	 * to accurately reflect what we've created.
-+	 */
-+	kvm_vgic_finalize_idregs(kvm);
-=20
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		ret =3D vgic_allocate_private_irqs_locked(vcpu, type);
-@@ -617,6 +608,36 @@ int kvm_vgic_map_resources(struct kvm *kvm)
- 	return ret;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/i=
+nclude/hyp/switch.h
+index 2597e8bda8672..ae04fd680d1e2 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -233,6 +233,18 @@ static inline void __activate_traps_hfgxtr(struct kvm_=
+vcpu *vcpu)
+ 	__activate_fgt(hctxt, vcpu, HDFGWTR2_EL2);
  }
 =20
-+void kvm_vgic_finalize_idregs(struct kvm *kvm)
++static inline void __activate_traps_ich_hfgxtr(struct kvm_vcpu *vcpu)
 +{
-+	u32 type =3D kvm->arch.vgic.vgic_model;
-+	u64 aa64pfr0, aa64pfr2, pfr1;
++	struct kvm_cpu_context *hctxt =3D host_data_ptr(host_ctxt);
 +
-+	aa64pfr0 =3D kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_=
-EL1_GIC;
-+	aa64pfr2 =3D kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1) & ~ID_AA64PFR2_=
-EL1_GCIE;
-+	pfr1 =3D kvm_read_vm_id_reg(kvm, SYS_ID_PFR1_EL1) & ~ID_PFR1_EL1_GIC;
++	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
++		return;
 +
-+	switch (type) {
-+	case KVM_DEV_TYPE_ARM_VGIC_V2:
-+		kvm->arch.vgic.vgic_cpu_base =3D VGIC_ADDR_UNDEF;
-+		break;
-+	case KVM_DEV_TYPE_ARM_VGIC_V3:
-+		INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-+		aa64pfr0 |=3D SYS_FIELD_PREP_ENUM(ID_AA64PFR0_EL1, GIC, IMP);
-+		pfr1 |=3D SYS_FIELD_PREP_ENUM(ID_PFR1_EL1, GIC, GICv3);
-+		break;
-+	case KVM_DEV_TYPE_ARM_VGIC_V5:
-+		aa64pfr2 |=3D SYS_FIELD_PREP_ENUM(ID_AA64PFR2_EL1, GCIE, IMP);
-+		break;
-+	default:
-+		WARN_ONCE(1, "Unknown VGIC type!!!\n");
-+	}
-+
-+	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1, aa64pfr0);
-+	kvm_set_vm_id_reg(kvm, SYS_ID_AA64PFR2_EL1, aa64pfr2);
-+	kvm_set_vm_id_reg(kvm, SYS_ID_PFR1_EL1, pfr1);
++	__activate_fgt(hctxt, vcpu, ICH_HFGRTR_EL2);
++	__activate_fgt(hctxt, vcpu, ICH_HFGWTR_EL2);
++	__activate_fgt(hctxt, vcpu, ICH_HFGITR_EL2);
 +}
 +
- /* GENERIC PROBE */
+ #define __deactivate_fgt(htcxt, vcpu, reg)				\
+ 	do {								\
+ 		write_sysreg_s(ctxt_sys_reg(hctxt, reg),		\
+@@ -265,6 +277,19 @@ static inline void __deactivate_traps_hfgxtr(struct kv=
+m_vcpu *vcpu)
+ 	__deactivate_fgt(hctxt, vcpu, HDFGWTR2_EL2);
+ }
 =20
- void kvm_vgic_cpu_up(void)
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 0fabeabedd6d7..24969fa8d02d6 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -485,6 +485,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type);
- void kvm_vgic_destroy(struct kvm *kvm);
- void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
- int kvm_vgic_map_resources(struct kvm *kvm);
-+void kvm_vgic_finalize_idregs(struct kvm *kvm);
- int kvm_vgic_hyp_init(void);
- void kvm_vgic_init_cpu_hardware(void);
++static inline void __deactivate_traps_ich_hfgxtr(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *hctxt =3D host_data_ptr(host_ctxt);
++
++	if (!cpus_have_final_cap(ARM64_HAS_GICV5_CPUIF))
++		return;
++
++	__deactivate_fgt(hctxt, vcpu, ICH_HFGRTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, ICH_HFGWTR_EL2);
++	__deactivate_fgt(hctxt, vcpu, ICH_HFGITR_EL2);
++
++}
++
+ static inline void  __activate_traps_mpam(struct kvm_vcpu *vcpu)
+ {
+ 	u64 r =3D MPAM2_EL2_TRAPMPAM0EL1 | MPAM2_EL2_TRAPMPAM1EL1;
+@@ -328,6 +353,7 @@ static inline void __activate_traps_common(struct kvm_v=
+cpu *vcpu)
+ 	}
 =20
+ 	__activate_traps_hfgxtr(vcpu);
++	__activate_traps_ich_hfgxtr(vcpu);
+ 	__activate_traps_mpam(vcpu);
+ }
+=20
+@@ -345,6 +371,7 @@ static inline void __deactivate_traps_common(struct kvm=
+_vcpu *vcpu)
+ 		write_sysreg_s(ctxt_sys_reg(hctxt, HCRX_EL2), SYS_HCRX_EL2);
+=20
+ 	__deactivate_traps_hfgxtr(vcpu);
++	__deactivate_traps_ich_hfgxtr(vcpu);
+ 	__deactivate_traps_mpam();
+ }
+=20
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/swi=
+tch.c
+index 779089e42681e..b41485ce295ab 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -44,6 +44,9 @@ struct fgt_masks hfgwtr2_masks;
+ struct fgt_masks hfgitr2_masks;
+ struct fgt_masks hdfgrtr2_masks;
+ struct fgt_masks hdfgwtr2_masks;
++struct fgt_masks ich_hfgrtr_masks;
++struct fgt_masks ich_hfgwtr_masks;
++struct fgt_masks ich_hfgitr_masks;
+=20
+ extern void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc)=
+;
+=20
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 140cf35f4eeb4..cd6deaf473159 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -5661,6 +5661,8 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 	compute_fgu(kvm, HFGRTR2_GROUP);
+ 	compute_fgu(kvm, HFGITR2_GROUP);
+ 	compute_fgu(kvm, HDFGRTR2_GROUP);
++	compute_fgu(kvm, ICH_HFGRTR_GROUP);
++	compute_fgu(kvm, ICH_HFGITR_GROUP);
+=20
+ 	set_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags);
+ out:
 --=20
 2.34.1
