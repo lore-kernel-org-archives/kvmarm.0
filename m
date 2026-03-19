@@ -1,177 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086C936C0D1;
-	Thu, 19 Mar 2026 15:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18054376483
+	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 15:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933964; cv=none; b=DK7BrPTn01FBCWHxNLyrJ0xsxDEv35OAvp/dkLeJYaMLE1e80xxDrEnb0oeDihNVQe7Ebs3UR5Eni3oaYeOogrh2MRWiScbqDcKYLqEbwUv8MLo4PQoWZz7Zh26ivySdcanK3RQlHFSwmRc5HAMDLjco52XtTifbatTBJXK/A7c=
+	t=1773934493; cv=none; b=EXxPKsYz+QchBHeCxJRnmZ7/pufqFSuP1hM5TPU8i358pMAsk80+82ODHe5H3/dAzXh6Wqe6Qd0mJ0bjejTeM/Z+K66IdSCrCJYtYzdorWnpmlfYnk8qe0gKYkLzfwKqQshqUkQ4pfVFUjRTgn2gaRj20pzaB5wrzN0Xt2veuwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933964; c=relaxed/simple;
-	bh=lIpOgdBbvM16P5tqFEIjnPNTwcU0BKLvZn4WJTVz8wc=;
+	s=arc-20240116; t=1773934493; c=relaxed/simple;
+	bh=d+7Rp9uPvrCnRUQM9SWXYjajsmLqKol28+AsIto0qXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpWoLBheDMwUl+XrKnP4IKLtObitXNfRkox3DvgXO1yB1FytET+24gUPUP+FXozoQ0gcb29yxy0q4R0I4zZWoKqSRWbgHXrTc/TQ8VH7p4TExsq8HTNHQtvviyqgpUpndSUwMtgY2NcF3ID4+mG5FH3h0k/NF9Bd4HrnTFvj/Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A3sWSMu0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A3sWSMu0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7570C19425;
-	Thu, 19 Mar 2026 15:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773933963;
-	bh=lIpOgdBbvM16P5tqFEIjnPNTwcU0BKLvZn4WJTVz8wc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A3sWSMu0+JZlGQjS8+vacR9jy9R7vSv3KGrAB0VJ+FB7yj2ujcLfiweUTAUISebtd
-	 Nm1k2oZKGvBqvA6Oz7RvdZl7HwTKgnhh6rfp6GMfasISJX933AlLpI5oIvUxX1Wx39
-	 ct3V9ezIeu75k3SrxiwgVOgkhcKYXMQ5UC9ECA5WtS2F0r/jgLYt1tjfc8dSKVpi0y
-	 yfQ5CHPW4059sGzFNy8tlqfObnZz+f+JoP3aA8+Mn9WQyaLn3+LxRGW2hixAr0hufC
-	 ZQJFdYAMV7IdObi4zFeyP2IxgglWpJuV8MqUDyJVFYg8ZTkxV/2aTi5aNBZkV+SXY/
-	 YhtMCFpg15Egg==
-Date: Thu, 19 Mar 2026 15:25:58 +0000
-From: Will Deacon <will@kernel.org>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, maz@kernel.org,
-	tabba@google.com, steven.price@arm.com, aneesh.kumar@kernel.org,
-	alexandru.elisei@arm.com, oupton@kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: Re: [kvmtool PATCH v6 01/17] util/update_headers: Update
- linux/const.h from linux sources
-Message-ID: <abwVhsU06OQOEdoD@willie-the-truck>
-References: <20260227165624.1519865-1-suzuki.poulose@arm.com>
- <20260227165624.1519865-2-suzuki.poulose@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tbH2m0G2J1h7KG7aMYkG+t30lbKKoPATIWuKVz3mnvGjwleNxySGpVk/d4+hut/pDlOfJXqHwM9e/4POsPLpopBoPpEMgfAwNg40HX1IBv9RjbzGQgqazCXeFfcyDuXFXgMNrZZ+8jgAV9/0K4YmKKspwtCgcKWZs3D0V2HBypE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5CCEC1A25;
+	Thu, 19 Mar 2026 08:34:45 -0700 (PDT)
+Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 204EA3F778;
+	Thu, 19 Mar 2026 08:34:50 -0700 (PDT)
+Date: Thu, 19 Mar 2026 15:34:47 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v2 01/11] arm64: Skip update of an idreg field affected
+ by an override
+Message-ID: <abwXl35xQ2ze1XwJ@arm.com>
+References: <20260302115653.1517326-1-maz@kernel.org>
+ <20260302115653.1517326-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260227165624.1519865-2-suzuki.poulose@arm.com>
+In-Reply-To: <20260302115653.1517326-2-maz@kernel.org>
 
-On Fri, Feb 27, 2026 at 04:56:08PM +0000, Suzuki K Poulose wrote:
-> Building kvmtool from scratch gives me the following errors with buildroot:
+On Mon, Mar 02, 2026 at 11:56:42AM +0000, Marc Zyngier wrote:
+> When computing the new value od an idreg that contains a field
+> affected by an override, do not update that particular field.
 > 
-> In file included from include/kvm/pci.h:7,
->                  from include/kvm/vfio.h:6,
->                  from include/kvm/kvm-config.h:5,
->                  from include/kvm/kvm.h:6,
->                  from builtin-version.c:4:
-> include/linux/virtio_pci.h:323:20: warning: implicit declaration of function ‘__KERNEL_DIV_ROUND_UP’ [-Wimplicit-function-declaration]
->   323 | #define MAX_CAP_ID __KERNEL_DIV_ROUND_UP(VIRTIO_DEV_PARTS_CAP + 1, 64)
->       |                    ^~~~~~~~~~~~~~~~~~~~~
-> include/linux/virtio_pci.h:326:24: note: in expansion of macro ‘MAX_CAP_ID’
->   326 |  __le64 supported_caps[MAX_CAP_ID];
->       |                        ^~~~~~~~~~
-> include/linux/virtio_pci.h:326:9: error: variably modified ‘supported_caps’ at file scope
->   326 |  __le64 supported_caps[MAX_CAP_ID];
+> The value computed at init-time must be kept as-is, as that's
+> what the user has asked for, for better or worse.
 > 
-> We inherit linux/virtio_pci.h from the kernel sources and won't be good to fix
-> it by including linux/kernel.h. Instead, pick up up uapi/linux/const.h from the
-> kernel tree. This also removes the ifdefery linux/kernel.h
-> 
-> To prevent a build warning for redefinition, update the headers from v6.19,
-> remove the hack from linux.kernel.h in one shot. This was also discussed in
-> the Link, in another context.
-> 
-> Cc: Anup Patel <apatel@ventanamicro.com>
-> Cc: Will Deacon <will@kernel.org>
-> Link: https://lore.kernel.org/all/20250211114018.GB8965@willie-the-truck/
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  include/linux/const.h  | 53 ++++++++++++++++++++++++++++++++++++++++++
->  include/linux/kernel.h |  3 ---
->  util/update_headers.sh |  1 +
->  3 files changed, 54 insertions(+), 3 deletions(-)
->  create mode 100644 include/linux/const.h
+>  arch/arm64/kernel/cpufeature.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/include/linux/const.h b/include/linux/const.h
-> new file mode 100644
-> index 00000000..b8f629ef
-> --- /dev/null
-> +++ b/include/linux/const.h
-> @@ -0,0 +1,53 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/* const.h: Macros for dealing with constants.  */
-> +
-> +#ifndef _UAPI_LINUX_CONST_H
-> +#define _UAPI_LINUX_CONST_H
-> +
-> +/* Some constant macros are used in both assembler and
-> + * C code.  Therefore we cannot annotate them always with
-> + * 'UL' and other type specifiers unilaterally.  We
-> + * use the following macros to deal with this.
-> + *
-> + * Similarly, _AT() will cast an expression with a type in C, but
-> + * leave it unchanged in asm.
-> + */
-> +
-> +#ifdef __ASSEMBLY__
-> +#define _AC(X,Y)	X
-> +#define _AT(T,X)	X
-> +#else
-> +#define __AC(X,Y)	(X##Y)
-> +#define _AC(X,Y)	__AC(X,Y)
-> +#define _AT(T,X)	((T)(X))
-> +#endif
-> +
-> +#define _UL(x)		(_AC(x, UL))
-> +#define _ULL(x)		(_AC(x, ULL))
-> +
-> +#define _BITUL(x)	(_UL(1) << (x))
-> +#define _BITULL(x)	(_ULL(1) << (x))
-> +
-> +#if !defined(__ASSEMBLY__)
-> +/*
-> + * Missing asm support
-> + *
-> + * __BIT128() would not work in the asm code, as it shifts an
-> + * 'unsigned __int128' data type as direct representation of
-> + * 128 bit constants is not supported in the gcc compiler, as
-> + * they get silently truncated.
-> + *
-> + * TODO: Please revisit this implementation when gcc compiler
-> + * starts representing 128 bit constants directly like long
-> + * and unsigned long etc. Subsequently drop the comment for
-> + * GENMASK_U128() which would then start supporting asm code.
-> + */
-> +#define _BIT128(x)	((unsigned __int128)(1) << (x))
-> +#endif
-> +
-> +#define __ALIGN_KERNEL(x, a)		__ALIGN_KERNEL_MASK(x, (__typeof__(x))(a) - 1)
-> +#define __ALIGN_KERNEL_MASK(x, mask)	(((x) + (mask)) & ~(mask))
-> +
-> +#define __KERNEL_DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
-> +
-> +#endif /* _UAPI_LINUX_CONST_H */
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-> index df42d63a..6c22f1c0 100644
-> --- a/include/linux/kernel.h
-> +++ b/include/linux/kernel.h
-> @@ -8,9 +8,6 @@
->  #define round_down(x, y)	((x) & ~__round_mask(x, y))
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index c31f8e17732a3..28fc77443ccd3 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -1224,6 +1224,13 @@ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
+>  		s64 ftr_cur = arm64_ftr_value(ftrp, reg->sys_val);
+>  		s64 ftr_new = arm64_ftr_value(ftrp, new);
 >  
->  #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
-> -#ifndef __KERNEL_DIV_ROUND_UP
-> -#define __KERNEL_DIV_ROUND_UP(n,d)	DIV_ROUND_UP(n,d)
-> -#endif
->  
->  #define ALIGN(x,a)		__ALIGN_MASK(x,(typeof(x))(a)-1)
->  #define __ALIGN_MASK(x,mask)	(((x)+(mask))&~(mask))
-> diff --git a/util/update_headers.sh b/util/update_headers.sh
-> index af75ca36..105bfc1d 100755
-> --- a/util/update_headers.sh
-> +++ b/util/update_headers.sh
-> @@ -29,6 +29,7 @@ then
->  fi
->  
->  cp -- "$LINUX_ROOT/include/uapi/linux/kvm.h" include/linux
-> +cp -- "$LINUX_ROOT/include/uap/linux/const.h" include/linux
+> +		/*
+> +		 * Don't alter the initial value that has been forced
+> +		 * by an override.
+> +		 */
+> +		if ((reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
+> +			continue;
 
-Typo ^^^
+I got lost in the in the cpufeature framework, so I may be missing
+something.
 
-but, tbh, I don't think we need to add const.h to this list. Unlike
-the virtio and kvm headers, we're probably fine sticking with a static
-version. So you can just drop this hunk imo.
+Let's say the primary CPU has a feature field with value 2 and we want
+to override it to value 1. For e.g. a LOWER_SAFE feature, boot_cpu_data
+will stored the overridden value of 1.
 
-Will
+A secondary CPU comes online with the same feature missing, so value 0.
+With the above change, we no longer update the system-wide feature
+value, leave it as 1. Later on, for a system feature we may turn it on
+even though the secondary CPU does not support it.
+
+In summary, this makes the overridden field sticky for secondary CPUs
+even if they don't support it.
+
+Unrelated to your patch, I think we can similarly fail to reject
+secondary CPUs in check_early_cpu_features() -> verify_local_cpu_caps()
+because of __read_sysreg_by_encoding() which uses the override value
+unconditionally. From this perspective, we are now consistent with your
+patch above.
+
+In all cases we taint the kernel for FTR_STRICT features but that may go
+unnoticed or if we had FTR_NONSTRICT (does it even matter in this
+case?).
+
+Maybe that's the intended use and blame the user for passing the wrong
+override. We are still slightly inconsistent depending on what the boot
+CPU supports where we still decide whether accept or reject an override.
+We don't do this for secondaries.
+
+Anyway, I'm not opposing to this patch if that's what's intended. I'm
+sure I'll forget everything about this framework in a couple of weeks.
+
+-- 
+Catalin
