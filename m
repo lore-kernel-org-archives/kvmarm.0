@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6978A3E51F4;
-	Thu, 19 Mar 2026 15:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A52336606C;
+	Thu, 19 Mar 2026 15:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773933625; cv=none; b=oV+wX8Chcs0vfixj8DMgnvdh635vdZ5Pb/lB3PJj2lBeDGjVrTjn14pzY+9ilpSpydhi1Vm2ZIkUe3zYntg0NOCRTrsPYdDXzTBP0Lwfcr8DZXF485OU2qO56nBiEW+a0bl1EAPfggY5/NMIM8AjEkwJIVGfbpQNvLYkx2qZ0xc=
+	t=1773933914; cv=none; b=P3xxM+PFzG7IpMsoPxPMcoyYZWD3sf7B3VQjpVXFeSbPAAuVQ43SglDFpjbIPyuJndr5TcYvNjw0NGvIFj3lBcwz1lj3xfM46/B1LWzNY6gzV9w05sp2H8FmdCAIxrizGCV4cc8BE7McODdMWUoT6hlaD9fqWyjDJDh31LOn8sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773933625; c=relaxed/simple;
-	bh=+3sQrpjOuKdIAlirdE28mVLzCO8eM4+rqElVdhsuQ4A=;
+	s=arc-20240116; t=1773933914; c=relaxed/simple;
+	bh=RLooZ/HR5p7i0bDi8RKkEWym+5uMbalmbtBpRnRXpMw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fk/xqlQfBPUrl95vOp3Qs9wJLzfhqCHbTNVNubknv9FLhp2y3aEWR4kP1u9dmcEjpNCxaTwqU9xVz7WhKVGv706oEaPwffbVwCoVm7eLZGpsksgacPL3wtNcupvdBYfUHAku1EzDuR0iAGUkWEMCxbfCEfBYlHQKCGC6P6zStDs=
+	 In-Reply-To:Content-Type; b=JqDPS/itmpVSp05lNj7KIT6pEPLi5K/9UkVdR2GODeeiQBwEPhlv7en8YS1YVZ7ZtZO2vCc8ocktuDzowmz2P7WsVR6EoblV7siCxcj92xm/AY7OqKZkXWhs4J54FeKagKjZ6ZFoYlH5gPcL2tQLT/zx98G9HJ1UHRQDdXbFyIk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CA131A25;
-	Thu, 19 Mar 2026 08:20:15 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C3161A25;
+	Thu, 19 Mar 2026 08:25:06 -0700 (PDT)
 Received: from [10.1.35.24] (e122027.cambridge.arm.com [10.1.35.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 557F43F778;
-	Thu, 19 Mar 2026 08:20:17 -0700 (PDT)
-Message-ID: <a1779d7a-1680-483f-be6c-791ac4d219e1@arm.com>
-Date: Thu, 19 Mar 2026 15:20:15 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8108A3F778;
+	Thu, 19 Mar 2026 08:25:08 -0700 (PDT)
+Message-ID: <3e917733-0272-4f2c-aa10-36364604fcbd@arm.com>
+Date: Thu, 19 Mar 2026 15:25:06 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,8 +27,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 10/48] arm64: RMI: Ensure that the RMM has GPT entries
- for memory
+Subject: Re: [PATCH v13 13/48] kvm: arm64: Don't expose unsupported
+ capabilities for realm guests
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -44,211 +44,86 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-11-steven.price@arm.com>
- <b83d601c-c4a0-4e6b-aae0-e49f02e67e30@arm.com>
+ <20260318155413.793430-14-steven.price@arm.com>
+ <56fb42ad-eada-40df-8c81-53cb7c0c310e@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <b83d601c-c4a0-4e6b-aae0-e49f02e67e30@arm.com>
+In-Reply-To: <56fb42ad-eada-40df-8c81-53cb7c0c310e@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 19/03/2026 10:31, Suzuki K Poulose wrote:
-> Hi Steven
-> 
+On 19/03/2026 14:09, Suzuki K Poulose wrote:
 > On 18/03/2026 15:53, Steven Price wrote:
->> The RMM may not be tracking all the memory of the system at boot. Create
-> 
-> Looks good to me. Please find some suggestions below.
-> 
-> 
-> May be add a bit more context here :
-> 
-> RMM maintains the state of all the granules in the System to make sure
-> that the host is abiding by the rules. This state can be maintained at
-> different granularity - per PAGE (TRACKING_FINE) or per region (COARSE),
-> where the "region size" depends on the underlying "RMI_GRANULE_SIZE".
-> The state of the "tracked area" must be the same. This implies, we may
-> need to have "FINE" tracking for DRAM, so that we can start delegating
-> PAGEs. For now, we only support RMM with statically carved out memory
-> for tracking FINE granularity for the tracking regions. We will extend
-> the support for modifying the TRACKING region in the future.
-> 
-> Similarly, the firmware may create L0 GPT entries describing the total
-> address space (think of this as Block mappings in the page tables). But
-> if we change the "PAS" of a granule in the block mapping, we may need
-> to create L1 tables to track the PAS at the finer granularity. For now
-> we only support a system where the L1 GPTs are created at boot time
-> and dynamic GPT support will be added later.
-
-Thanks for the wording - that does indeed make things clearer. SRO
-support will effectively enable the "future" items.
-
->> the necessary tracking state and GPTs within the RMM so that all boot
->> memory can be delegated to the RMM as needed during runtime.
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
 >>
->> Note: support is currently missing for SROs which means that if the RMM
->> needs memory donating this will fail (and render CCA unusable in Linux).
+>> RMM v1.0 provides no mechanism for the host to perform debug operations
+>> on the guest. So limit the extensions that are visible to an allowlist
+>> so that only those capabilities we can support are advertised.
 >>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->> New patch for v13
+>> Changes since v10:
+>>   * Add a kvm_realm_ext_allowed() function which limits which extensions
+>>     are exposed to an allowlist. This removes the need for special casing
+>>     various extensions.
+>> Changes since v7:
+>>   * Remove the helper functions and inline the kvm_is_realm() check with
+>>     a ternary operator.
+>>   * Rewrite the commit message to explain this patch.
 >> ---
->>   arch/arm64/kvm/rmi.c | 89 ++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 89 insertions(+)
+>>   arch/arm64/kvm/arm.c | 22 ++++++++++++++++++++++
+>>   1 file changed, 22 insertions(+)
 >>
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> index 9590dff9a2c1..80aedc85e94a 100644
->> --- a/arch/arm64/kvm/rmi.c
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -4,6 +4,7 @@
->>    */
->>     #include <linux/kvm_host.h>
->> +#include <linux/memblock.h>
->>     #include <asm/kvm_pgtable.h>
->>   #include <asm/rmi_cmds.h>
->> @@ -56,6 +57,18 @@ static int rmi_check_version(void)
->>       return 0;
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 9b17bdfaf0c2..ddbf080e4f55 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -357,6 +357,25 @@ static bool kvm_has_full_ptr_auth(void)
+>>           (apa + api + apa3) == 1);
 >>   }
->>   +/*
->> + * These are the 'default' sizes when passing 0 as the
->> tracking_region_size.
->> + * TODO: Support other granule sizes
->> + */
->> +#ifdef CONFIG_PAGE_SIZE_4KB
->> +#define RMM_GRANULE_TRACKING_SIZE    SZ_1G
->> +#elif defined(CONFIG_PAGE_SIZE_16KB)
->> +#define RMM_GRANULE_TRACKING_SIZE    SZ_32M
->> +#elif defined(CONFIG_PAGE_SIZE_64KB)
->> +#define RMM_GRANULE_TRACKING_SIZE    SZ_512M
->> +#endif
+>>   +static bool kvm_realm_ext_allowed(long ext)
+>> +{
+>> +    switch (ext) {
+>> +    case KVM_CAP_IRQCHIP:
+>> +    case KVM_CAP_ARM_PSCI:
+>> +    case KVM_CAP_ARM_PSCI_0_2:
+>> +    case KVM_CAP_NR_VCPUS:
+>> +    case KVM_CAP_MAX_VCPUS:
+>> +    case KVM_CAP_MAX_VCPU_ID:
+>> +    case KVM_CAP_MSI_DEVID:
+>> +    case KVM_CAP_ARM_VM_IPA_SIZE:
+>> +    case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+>> +    case KVM_CAP_ARM_PTRAUTH_GENERIC:
+>> +    case KVM_CAP_ARM_RMI:
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
+>> +
+>>   int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>   {
+>>       int r;
+>> @@ -364,6 +383,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,
+>> long ext)
+>>       if (is_protected_kvm_enabled() && !kvm_pkvm_ext_allowed(kvm, ext))
+>>           return 0;
+>>   +    if (kvm && kvm_is_realm(kvm) && !kvm_realm_ext_allowed(ext))
+>> +        return 0;
 >> +
 > 
-> Probably this should be made a Kconfig option, like the VA_BITS we have
-> today for each page size.
+> We need a similar check in in kvm_vm_ioctl_enable_cap() to prevent
+> enabling the filtered caps ? Otherwise looks good to me.
 
-Yes that's probably a good option - note that for 4k page size there is
-only the one option in the spec. So this is only relevant for 16K/64K.
-
-Thanks for the other comment suggestions below (and in the other email)
-- all good points.
+Indeed - thanks for spotting.
 
 Thanks,
 Steve
 
->>   static int rmi_configure(void)
->>   {
->>       struct rmm_config *config __free(free_page) = NULL;
->> @@ -95,6 +108,80 @@ static int rmi_configure(void)
->>       return 0;
->>   }
->>   +static int rmi_verify_memory_tracking(phys_addr_t start,
->> phys_addr_t end)
+> Suzuki
 > 
-> Could we add a comment what we are trying to do here ?
-> 
-> /*
->  * Make sure the area is tracked by RMM at FINE granularity.
->  * We do not support changing the TRACKING yet. This will
->  * be added in the future.
->  */
-> 
-> 
->> +{
->> +    start = ALIGN_DOWN(start, RMM_GRANULE_TRACKING_SIZE);
->> +    end = ALIGN(end, RMM_GRANULE_TRACKING_SIZE);
->> +
->> +    while (start < end) {
->> +        unsigned long ret, category, state;
->> +
->> +        ret = rmi_granule_tracking_get(start, &category, &state);
->> +        if (ret != RMI_SUCCESS ||
->> +            state != RMI_TRACKING_FINE ||
->> +            category != RMI_MEM_CATEGORY_CONVENTIONAL) {
->> +            /* TODO: Set granule tracking in this case */
->> +            kvm_err("Granule tracking for region isn't fine/
->> conventional: %llx",
->> +                start);
->> +            return -ENODEV;
->> +        }
->> +        start += RMM_GRANULE_TRACKING_SIZE;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static unsigned long rmi_l0gpt_size(void)
->> +{
->> +    return 1UL << (30 + FIELD_GET(RMI_FEATURE_REGISTER_1_L0GPTSZ,
->> +                      rmm_feat_reg1));
->> +}
->> +
->> +static int rmi_create_gpts(phys_addr_t start, phys_addr_t end)
->> +{
->> +    unsigned long l0gpt_sz = rmi_l0gpt_size();
->> +
->> +    start = ALIGN_DOWN(start, l0gpt_sz);
->> +    end = ALIGN(end, l0gpt_sz);
->> +
->> +    while (start < end) {
->> +        int ret = rmi_gpt_l1_create(start);
-> 
-> How about adding a comment here explaining why we look for RMI_ERROR_GPT ?
-> 
-> 
->>
->         /*
->          * Make sure the L1 GPT tables are created for the region.
->          * RMI_ERROR_GPT indicates the L1 table exists.
->          */
->  +
->> +        if (ret && ret != RMI_ERROR_GPT) {
-> 
-> 
->> +            /*
->> +             * FIXME: Handle SRO so that memory can be donated for
->> +             * the tables.
->> +             */
->> +            kvm_err("GPT Level1 table missing for %llx\n", start);
->> +            return -ENOMEM;
->> +        }
->> +        start += l0gpt_sz;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static int rmi_init_metadata(void)
->> +{
->> +    phys_addr_t start, end;
->> +    const struct memblock_region *r;
->> +
->> +    for_each_mem_region(r) {
->> +        int ret;
->> +
->> +        start = memblock_region_memory_base_pfn(r) << PAGE_SHIFT;
->> +        end = memblock_region_memory_end_pfn(r) << PAGE_SHIFT;
->> +        ret = rmi_verify_memory_tracking(start, end);
->> +        if (ret)
->> +            return ret;
->> +        ret = rmi_create_gpts(start, end);
->> +        if (ret)
->> +            return ret;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static int rmm_check_features(void)
->>   {
->>       if (kvm_lpa2_is_enabled() && !
->> rmi_has_feature(RMI_FEATURE_REGISTER_0_LPA2)) {
->> @@ -120,6 +207,8 @@ void kvm_init_rmi(void)
->>           return;
->>       if (rmi_configure())
->>           return;
->> +    if (rmi_init_metadata())
->> +        return;
->>         /* Future patch will enable static branch kvm_rmi_is_available */
->>   }
+>>       switch (ext) {
+>>       case KVM_CAP_IRQCHIP:
+>>           r = vgic_present;
 > 
 
