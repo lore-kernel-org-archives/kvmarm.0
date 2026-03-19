@@ -1,371 +1,96 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E276202F71;
-	Thu, 19 Mar 2026 12:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from canpmsgout04.his.huawei.com (canpmsgout04.his.huawei.com [113.46.200.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DD73C3C01
+	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 12:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773924456; cv=none; b=Zn3MIf38TunPeShTYLCcpJ+ZV8pYVV+UuVIOs18LlmM2SBbB7mfJ0CgRFA2Cn7gidpP2NLujjJY603TNWFaUcN1kZomBOJ0eQDWXbSRUIASB4zUm6hLhCA+WJkxipP+kZ8XcqfT2ZvF2jMSJlbxFHBz30t922EbllUOwr8W66xQ=
+	t=1773924912; cv=none; b=P4BLtcS9wjCx9s2JVvF67q24mBmVPnMCTlrp9ufzndHXMVSExQ9RiVNsFM2d4qNuJ6R/P9cWlcEXOJdsEm4AhRz5Dx5A9YnCktFXVo+HvZBUGEKiJ6kQZphQB9ZRqO4hDvcnJ41/lJLeBHsjcwI6c6pFR0vWGEFJ9hFosYi0diM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773924456; c=relaxed/simple;
-	bh=GH/G0ccTNjt1Y88BQUjQJ0auMvjf45R1jJ/G5o0e7Yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=COOVY767urume3JVZhgfXMfHxdGUA7pTrJWz4YGt3iN//nkkpuRgqeK7BjX5CTJeVfH+fBoWjAwBrGZ6+jIs88grHpYZ378CUfx7SGjPYV2cJF7EIBePR/CFE2aqe5BRNjeSJ0curcUMMfC8/akD3S1uffyoRF56MvZJRRfX3Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7BEB1A25;
-	Thu, 19 Mar 2026 05:47:27 -0700 (PDT)
-Received: from [10.1.35.24] (e122027.cambridge.arm.com [10.1.35.24])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3A32F3F778;
-	Thu, 19 Mar 2026 05:47:29 -0700 (PDT)
-Message-ID: <36870a54-63d3-43bd-bc66-945e56b4689d@arm.com>
-Date: Thu, 19 Mar 2026 12:47:08 +0000
+	s=arc-20240116; t=1773924912; c=relaxed/simple;
+	bh=ACwPpgwUlwEwnD5R0IprMNE/Bv72ilDjglXKZ7NQR2Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=K42zJMpkX9PXDw18R831M+89APMu5YTzeKlr3uSPI3berPoyhV1XH0d9fcRPUm9jn1fUeljVi4YL++50yg8URjz+BN2mLHaYGmBHU/gG/fYgdo4z84nI7BjRLq9xXaVQdJGVRot7/pInF6PEJRivrjiKV3H58T94uqqSV9fBHxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com; spf=pass smtp.mailfrom=hisilicon.com; arc=none smtp.client-ip=113.46.200.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=hisilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hisilicon.com
+Received: from mail.maildlp.com (unknown [172.19.163.0])
+	by canpmsgout04.his.huawei.com (SkyGuard) with ESMTPS id 4fc5Bg0c56z1prjs;
+	Thu, 19 Mar 2026 20:50:03 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 950754056B;
+	Thu, 19 Mar 2026 20:55:05 +0800 (CST)
+Received: from kwepemq200004.china.huawei.com (7.202.195.237) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 19 Mar 2026 20:55:05 +0800
+Received: from [10.67.121.115] (10.67.121.115) by
+ kwepemq200004.china.huawei.com (7.202.195.237) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 19 Mar 2026 20:55:04 +0800
+Message-ID: <4bbf64ef-e629-3908-b37f-d99c6639be2c@hisilicon.com>
+Date: Thu, 19 Mar 2026 20:54:51 +0800
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 07/48] arm64: RMI: Check for RMI support at KVM init
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
- Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
- <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
- Vishal Annapurve <vannapurve@google.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-8-steven.price@arm.com>
- <8fd56e84-821a-47c7-8735-928057a7a653@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <8fd56e84-821a-47c7-8735-928057a7a653@arm.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Question about ARM KVM stage2 contiguous bit support for
+ contiguous hugetlb
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.linux.dev>,
+	<tangnianyao@huawei.com>, jiangkunkun <jiangkunkun@huawei.com>, "xuwei (O)"
+	<xuwei5@huawei.com>, "Zengtao (B)" <prime.zeng@hisilicon.com>
+References: <704b6126-f1ad-4d8a-5709-a12e4c8c79ca@hisilicon.com>
+ <87qzpocgol.wl-maz@kernel.org>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+In-Reply-To: <87qzpocgol.wl-maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemq200004.china.huawei.com (7.202.195.237)
 
-On 19/03/2026 10:38, Suzuki K Poulose wrote:
-> On 18/03/2026 15:53, Steven Price wrote:
->> Query the RMI version number and check if it is a compatible version. A
->> static key is also provided to signal that a supported RMM is available.
+On 2026/3/13 15:49, Marc Zyngier wrote:
+> On Fri, 13 Mar 2026 07:09:40 +0000,
+> Zhou Wang <wangzhou1@hisilicon.com> wrote:
 >>
->> Functions are provided to query if a VM or VCPU is a realm (or rec)
->> which currently will always return false.
->>
->> Later patches make use of struct realm and the states as the ioctls
->> interfaces are added to support realm and REC creation and destruction.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v12:
->>   * Drop check for 4k page size.
->> Changes since v11:
->>   * Reword slightly the comments on the realm states.
->> Changes since v10:
->>   * kvm_is_realm() no longer has a NULL check.
->>   * Rename from "rme" to "rmi" when referring to the RMM interface.
->>   * Check for RME (hardware) support before probing for RMI support.
->> Changes since v8:
->>   * No need to guard kvm_init_rme() behind 'in_hyp_mode'.
->> Changes since v6:
->>   * Improved message for an unsupported RMI ABI version.
->> Changes since v5:
->>   * Reword "unsupported" message from "host supports" to "we want" to
->>     clarify that 'we' are the 'host'.
->> Changes since v2:
->>   * Drop return value from kvm_init_rme(), it was always 0.
->>   * Rely on the RMM return value to identify whether the RSI ABI is
->>     compatible.
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->>   arch/arm64/include/asm/kvm_host.h    |  4 ++
->>   arch/arm64/include/asm/kvm_rmi.h     | 56 +++++++++++++++++++++++++++
->>   arch/arm64/include/asm/virt.h        |  1 +
->>   arch/arm64/kernel/cpufeature.c       |  1 +
->>   arch/arm64/kvm/Makefile              |  2 +-
->>   arch/arm64/kvm/arm.c                 |  5 +++
->>   arch/arm64/kvm/rmi.c                 | 57 ++++++++++++++++++++++++++++
->>   8 files changed, 143 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_rmi.h
->>   create mode 100644 arch/arm64/kvm/rmi.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/
->> include/asm/kvm_emulate.h
->> index 5bf3d7e1d92c..f38b50151ce8 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -688,4 +688,22 @@ static inline void vcpu_set_hcrx(struct kvm_vcpu
->> *vcpu)
->>               vcpu->arch.hcrx_el2 |= HCRX_EL2_EnASR;
->>       }
->>   }
+>> And do we have any plan to support this?
 > 
+> Not really.
 > 
-> --8>---
-> 
->> +
->> +static inline bool kvm_is_realm(struct kvm *kvm)
->> +{
->> +    if (static_branch_unlikely(&kvm_rmi_is_available))
->> +        return kvm->arch.is_realm;
->> +    return false;
->> +}
->> +
->> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->> +{
->> +    return READ_ONCE(kvm->arch.realm.state);
->> +}
->> +
->> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->> +{
->> +    return false;
->> +}
->> +
->>   #endif /* __ARM64_KVM_EMULATE_H__ */
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/
->> asm/kvm_host.h
->> index 5d5a3bbdb95e..9267a2f2d65b 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -27,6 +27,7 @@
->>   #include <asm/fpsimd.h>
->>   #include <asm/kvm.h>
->>   #include <asm/kvm_asm.h>
->> +#include <asm/kvm_rmi.h>
->>   #include <asm/vncr_mapping.h>
->>     #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->> @@ -405,6 +406,9 @@ struct kvm_arch {
->>        * the associated pKVM instance in the hypervisor.
->>        */
->>       struct kvm_protected_vm pkvm;
->> +
->> +    bool is_realm;
->> +    struct realm realm;
->>   };
->>     struct kvm_vcpu_fault_info {
->> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/
->> asm/kvm_rmi.h
->> new file mode 100644
->> index 000000000000..3506f50b05cd
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/kvm_rmi.h
->> @@ -0,0 +1,56 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023-2025 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_KVM_RMI_H
->> +#define __ASM_KVM_RMI_H
->> +
->> +/**
->> + * enum realm_state - State of a Realm
->> + */
->> +enum realm_state {
->> +    /**
->> +     * @REALM_STATE_NONE:
->> +     *      Realm has not yet been created. rmi_realm_create() has not
->> +     *      yet been called.
->> +     */
->> +    REALM_STATE_NONE,
->> +    /**
->> +     * @REALM_STATE_NEW:
->> +     *      Realm is under construction, rmi_realm_create() has been
->> +     *      called, but it is not yet activated. Pages may be populated.
->> +     */
->> +    REALM_STATE_NEW,
->> +    /**
->> +     * @REALM_STATE_ACTIVE:
->> +     *      Realm has been created and is eligible for execution with
->> +     *      rmi_rec_enter(). Pages may no longer be populated with
->> +     *      rmi_data_create().
->> +     */
->> +    REALM_STATE_ACTIVE,
->> +    /**
->> +     * @REALM_STATE_DYING:
->> +     *      Realm is in the process of being destroyed or has already
->> been
->> +     *      destroyed.
->> +     */
->> +    REALM_STATE_DYING,
->> +    /**
->> +     * @REALM_STATE_DEAD:
->> +     *      Realm has been destroyed.
->> +     */
->> +    REALM_STATE_DEAD
->> +};
->> +
->> +/**
->> + * struct realm - Additional per VM data for a Realm
->> + *
->> + * @state: The lifetime state machine for the realm
->> + */
->> +struct realm {
->> +    enum realm_state state;
->> +};
->> +
-> 
-> 
-> --8<---
-> 
-> Minor nit: The above looks out of place in this patch. Could we
-> move it to where this may be actually used ?
+> Configurations that are looking at extracting the best possible
+> performance use large mappings at S2 (hugetlbfs). I'm not convinced
+> that there is a strong use-case for dealing with the contiguous hint
+> at S2 when backed by anonymous memory. If you're not under memory
 
-Yes, good point. This can be moved to patch 12 quite easily. I think
-originally I'd needed this earlier on, but the code's moved on.
+We want use 64KB basic page, in this case we have 2M cont PTE and 512M
+block page. However, the latter may waste more memory.
 
-Thanks,
-Steve
+> pressure, THP already gives you the uplift you want. If you are under
+> memory pressure, you're unlikely to get the contiguity you want.
+> 
+> Additionally, dealing with the contiguous hint is a real pain.
+> 
+> If you are undertaking this work, please make sure to provide
+> reproducible benchmarks and results that show a definite improvement
+> on the majority of workloads.
 
-> Rest looks good to me.
-> 
-> 
->> +void kvm_init_rmi(void);
->> +
->> +#endif /* __ASM_KVM_RMI_H */
->> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/
->> virt.h
->> index b51ab6840f9c..dc9b2899e0b2 100644
->> --- a/arch/arm64/include/asm/virt.h
->> +++ b/arch/arm64/include/asm/virt.h
->> @@ -87,6 +87,7 @@ void __hyp_reset_vectors(void);
->>   bool is_kvm_arm_initialised(void);
->>     DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
->> +DECLARE_STATIC_KEY_FALSE(kvm_rmi_is_available);
->>     static inline bool is_pkvm_initialized(void)
->>   {
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/
->> cpufeature.c
->> index c31f8e17732a..ddf7e57f23e8 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -289,6 +289,7 @@ static const struct arm64_ftr_bits
->> ftr_id_aa64isar3[] = {
->>   static const struct arm64_ftr_bits ftr_id_aa64pfr0[] = {
->>       ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_CSV3_SHIFT, 4, 0),
->>       ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_CSV2_SHIFT, 4, 0),
->> +    ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_RME_SHIFT, 4, 0),
->>       ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_DIT_SHIFT, 4, 0),
->>       ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_AMU_SHIFT, 4, 0),
->>       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE,
->> ID_AA64PFR0_EL1_MPAM_SHIFT, 4, 0),
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 3ebc0570345c..e17c4077d8e7 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -16,7 +16,7 @@ CFLAGS_handle_exit.o += -Wno-override-init
->>   kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->>        inject_fault.o va_layout.o handle_exit.o config.o \
->>        guest.o debug.o reset.o sys_regs.o stacktrace.o \
->> -     vgic-sys-reg-v3.o fpsimd.o pkvm.o \
->> +     vgic-sys-reg-v3.o fpsimd.o pkvm.o rmi.o \
->>        arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
->>        vgic/vgic.o vgic/vgic-init.o \
->>        vgic/vgic-irqfd.o vgic/vgic-v2.o \
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 29f0326f7e00..274d7866efdc 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -39,6 +39,7 @@
->>   #include <asm/kvm_nested.h>
->>   #include <asm/kvm_pkvm.h>
->>   #include <asm/kvm_ptrauth.h>
->> +#include <asm/kvm_rmi.h>
->>   #include <asm/sections.h>
->>   #include <asm/stacktrace/nvhe.h>
->>   @@ -104,6 +105,8 @@ long kvm_get_cap_for_kvm_ioctl(unsigned int
->> ioctl, long *ext)
->>       return -EINVAL;
->>   }
->>   +DEFINE_STATIC_KEY_FALSE(kvm_rmi_is_available);
->> +
->>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_base);
->> @@ -2921,6 +2924,8 @@ static __init int kvm_arm_init(void)
->>         in_hyp_mode = is_kernel_in_hyp_mode();
->>   +    kvm_init_rmi();
->> +
->>       if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->>           cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->>           kvm_info("Guests without required CPU erratum workarounds
->> can deadlock system!\n" \
->> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
->> new file mode 100644
->> index 000000000000..fac151580c01
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rmi.c
->> @@ -0,0 +1,57 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) 2023-2025 ARM Ltd.
->> + */
->> +
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/rmi_cmds.h>
->> +#include <asm/virt.h>
->> +
->> +static int rmi_check_version(void)
->> +{
->> +    struct arm_smccc_res res;
->> +    unsigned short version_major, version_minor;
->> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
->> +                             RMI_ABI_MINOR_VERSION);
->> +    unsigned long aa64pfr0 =
->> read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
->> +
->> +    /* If RME isn't supported, then RMI can't be */
->> +    if (cpuid_feature_extract_unsigned_field(aa64pfr0,
->> ID_AA64PFR0_EL1_RME_SHIFT) == 0)
->> +        return -ENXIO;
->> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
->> +
->> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
->> +        return -ENXIO;
->> +
->> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
->> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
->> +
->> +    if (res.a0 != RMI_SUCCESS) {
->> +        unsigned short high_version_major, high_version_minor;
->> +
->> +        high_version_major = RMI_ABI_VERSION_GET_MAJOR(res.a2);
->> +        high_version_minor = RMI_ABI_VERSION_GET_MINOR(res.a2);
->> +
->> +        kvm_err("Unsupported RMI ABI (v%d.%d - v%d.%d) we want v%d.
->> %d\n",
->> +            version_major, version_minor,
->> +            high_version_major, high_version_minor,
->> +            RMI_ABI_MAJOR_VERSION,
->> +            RMI_ABI_MINOR_VERSION);
->> +        return -ENXIO;
->> +    }
->> +
->> +    kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
->> +
->> +    return 0;
->> +}
->> +
->> +void kvm_init_rmi(void)
->> +{
->> +    /* Continue without realm support if we can't agree on a version */
->> +    if (rmi_check_version())
->> +        return;
->> +
->> +    /* Future patch will enable static branch kvm_rmi_is_available */
->> +}
-> 
+We have a initial test in hardware emulator, for lmbench lat_mem_rd 1G
+256 stride，the cost of virtualization will change from 17% -> 3%, we do
+the test using a VM with 4 vCPU / 8GB memory in 64KB basic page / 2M
+contiguous hugetlb system.
 
+Will do more tests in the real chip.
+
+Best,
+Zhou
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
