@@ -1,24 +1,24 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8F23C198F;
-	Thu, 19 Mar 2026 10:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2E91EF091;
+	Thu, 19 Mar 2026 10:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773915904; cv=none; b=oWRHd95riIi2ll3mkT9xr4R3aIVU91C4g2RTy1rWEIu7I2ZULc0txOKBCPkrcNGzAc0aNjLOF3D0CQi7D3mHVeF6GxrnWgNiqCskpUaAL6/YKOBi6pX0oixbja529aiSXqshTt45W0UyPCqNDw4g8mMayQolMFIkafdR14Del9U=
+	t=1773916062; cv=none; b=FXhBNjWGiTlYUS5cDF1rkkBAC8rzQVOvKtcuK0poXeLrnvJktPypItYB4Meo/p/1JcREaHkIqrrbmnoSIWA4m5OHyn5JFmAd2cpnxcxdiaMefeSGBa7h++ptmjSSX3C1KluACqNSdLTYQE4DpdPrEyFcy5Mr+6FsYsiEaFCBSq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773915904; c=relaxed/simple;
-	bh=nW+lajELyIzczDuFqFcmvv4hFoLRASF+UCvYQKEvjDI=;
+	s=arc-20240116; t=1773916062; c=relaxed/simple;
+	bh=0mV14+MUUxzZzEb4gnex+TfSxY4bUwiL47SG3shkISo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rA9gIJWYayGOg32HiVUFkw36LfHtX/+6K6C+8obI/XbN0V/Fu5aovjNn+5LBNOEAjk/YL6P5j2xwJxXSVnOrybhMZblbjbD9QbLdJMvAsai9IAyoOtpJelQZgpz97cr/GnnTyGhDDbmfYGI/nLApAgKQ5u2t/30yk0TKXyw0rDE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=MSQxLPE4akMwbekn4VHNuSKMxUSjatXGaZXluGBD+3Jc4PFATuf7+TuSvxjgYRSgXJKObVWcTj7TaHaWNOXlqKBvFAtXsidDF9x9AcGlbr1duKLqHTTBgRHbwllgIm8VkKeTSbU9dVbqt2n8X5QvKcwSL4SfShXAe64jZfGRzKE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E789F1BD0;
-	Thu, 19 Mar 2026 03:24:52 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79DA21A25;
+	Thu, 19 Mar 2026 03:27:34 -0700 (PDT)
 Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 655DB3F7BD;
-	Thu, 19 Mar 2026 03:24:56 -0700 (PDT)
-Date: Thu, 19 Mar 2026 10:24:54 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46C7D3F7BD;
+	Thu, 19 Mar 2026 03:27:37 -0700 (PDT)
+Date: Thu, 19 Mar 2026 10:27:34 +0000
 From: Joey Gouly <joey.gouly@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -39,10 +39,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
 	Emi Kisanuki <fj0570is@fujitsu.com>,
 	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v13 36/48] arm64: RMI: Always use 4k pages for realms
-Message-ID: <20260319102454.GB3942350@e124191.cambridge.arm.com>
+Subject: Re: [PATCH v13 37/48] arm64: RMI: Prevent Device mappings for Realms
+Message-ID: <20260319102734.GC3942350@e124191.cambridge.arm.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-37-steven.price@arm.com>
+ <20260318155413.793430-38-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -51,71 +51,63 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260318155413.793430-37-steven.price@arm.com>
+In-Reply-To: <20260318155413.793430-38-steven.price@arm.com>
 
-Hi,
+On Wed, Mar 18, 2026 at 03:54:01PM +0000, Steven Price wrote:
+> Physical device assignment is not supported by RMM v1.0, so it
 
-On Wed, Mar 18, 2026 at 03:54:00PM +0000, Steven Price wrote:
-> Guest_memfd doesn't yet natively support huge pages, and there are
-> currently difficulties for a VMM to manage huge pages efficiently so for
-> now always split up mappings to PTE (4k).
-> 
-> The two issues that need progressing before supporting huge pages for
-> realms are:
-> 
->  1. guest_memfd needs to be able to allocate from an appropriate
->     allocator which can provide huge pages.
-> 
->  2. The VMM needs to be able to repurpose private memory for a shared
->     mapping when the guest VM requests memory is transitioned. Because
->     this can happen at a 4k granularity it isn't possible to
->     free/reallocate while huge pages are in use. Allowing the VMM to
->     mmap() the shared portion of a huge page would allow the huge page
->     to be recreated when the memory is unshared and made protected again.
-> 
-> These two issues are not specific to realms and don't affect the realm
-> API, so for now just break everything down to 4k pages in the RMM
-> controlled stage 2. Future work can add huge page support without
-> changing the uAPI.
+But we're targetting 2.0 now!
 
-The commit title/message mention 4K, but should probably say PAGE_SIZE or
-something now that RMM isn't fixed to 4K.
+I guess just change it to something about device support being a later feature.
 
 Thanks,
 Joey
 
+> doesn't make much sense to allow device mappings within the realm.
+> Prevent them when the guest is a realm.
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
-> Reviewed-by: Gavin Shan <gshan@redhat.com>
-> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> Changes since v7:
->  * Rewritten commit message
+> Changes from v6:
+>  * Fix the check in user_mem_abort() to prevent all pages that are not
+>    guest_memfd() from being mapped into the protected half of the IPA.
+> Changes from v5:
+>  * Also prevent accesses in user_mem_abort()
 > ---
->  arch/arm64/kvm/mmu.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/mmu.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 73c18c2861a2..ad1300f366df 100644
+> index ad1300f366df..7d7caab8f573 100644
 > --- a/arch/arm64/kvm/mmu.c
 > +++ b/arch/arm64/kvm/mmu.c
-> @@ -1761,11 +1761,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	write_fault = kvm_is_write_fault(vcpu);
+> @@ -1222,6 +1222,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  	if (is_protected_kvm_enabled())
+>  		return -EPERM;
 >  
->  	/*
-> -	 * Realms cannot map protected pages read-only
-> +	 * Realms cannot map protected pages read-only, also force PTE mappings
-> +	 * for Realms.
->  	 * FIXME: It should be possible to map unprotected pages read-only
->  	 */
-> -	if (vcpu_is_rec(vcpu))
-> +	if (vcpu_is_rec(vcpu)) {
->  		write_fault = true;
-> +		force_pte = true;
-> +	}
+> +	/* We don't support mapping special pages into a Realm */
+> +	if (kvm_is_realm(kvm))
+> +		return -EPERM;
+> +
+>  	size += offset_in_page(guest_ipa);
+>  	guest_ipa &= PAGE_MASK;
 >  
->  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
->  	VM_WARN_ON_ONCE(write_fault && exec_fault);
+> @@ -1965,6 +1969,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  		return 1;
+>  	}
+>  
+> +	/*
+> +	 * For now we shouldn't be hitting protected addresses because they are
+> +	 * handled in private_memslot_fault(). In the future this check may be
+> +	 * relaxed to support e.g. protected devices.
+> +	 */
+> +	if (vcpu_is_rec(vcpu) &&
+> +	    kvm_gpa_from_fault(kvm, fault_ipa) == fault_ipa)
+> +		return -EINVAL;
+> +
+>  	if (nested)
+>  		adjust_nested_fault_perms(nested, &prot, &writable);
+>  
 > -- 
 > 2.43.0
 > 
