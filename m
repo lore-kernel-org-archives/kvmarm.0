@@ -1,210 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE963EAC87;
-	Thu, 19 Mar 2026 16:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7463E958C;
+	Thu, 19 Mar 2026 16:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773936114; cv=none; b=oI/VXZd4G8fM9Jxl46atSfT20enwcqpDt8lR7EDnCAsj7VRcV+KCHo8cJNTwqOFqE76OcPKQauM8NLNKK46VYvBwevP0ic6tgmKI3nB9uOxky431v9cIpff1ISbrpZKO0HaiU406xWYVmlMJMnd7a6tUIsGGfTaHk42DoWYwdhY=
+	t=1773936147; cv=none; b=SbeveFUq46ZFg+eC4w0n/ySMB14bGgZyEY4c1lzQtJBV/2UIrHOeEFKk/Gv9bNEvXutwi2oxYcTjNf2GIlXp/ADq8cowFem2F0J0VIGcQw7X7icjPs8Ow9gdLeBfO6ZLQXfeGZB3w70Xwz61umfxifGnL7bbfMIsmQV/8JfYAP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773936114; c=relaxed/simple;
-	bh=N/p8hW+nirUgjIR1XBn+Q8QSshZoHwheSk4tGYv0gjw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LG4e2lI+XWQyK3Im7t2iH3Ynl4UqRwuSiZfvfptdY/HYN9pSB0GLevTL0LAkFHSdDOoMpBeIpCCElWNXKYYndTh8OTeNue12vnoQd4KngUfIXN9A5igWbIjxyz8wMr0IeWqAtVm1/UbvdZwRUop/6j9K8kxemeJsDVVx3zFAvHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Do4CV1fP; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Do4CV1fP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 008B3C2BCB0;
-	Thu, 19 Mar 2026 16:01:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773936114;
-	bh=N/p8hW+nirUgjIR1XBn+Q8QSshZoHwheSk4tGYv0gjw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Do4CV1fPxn0Pcv3+KCLgCbTpdLcYnxIv3stpXg7E82XUPWW3JMdiJnB3fxwnbIyzd
-	 6kX0AETi8JWEftRQiK3zR4Gy1Kth8GZbqF/0QF2ueBOlLKTQsUDuH4kGvggqzlW4GL
-	 f1oeQbboeVT3cm6TDTg0EklF/abjeZ0z/boMRBMP6pFaa5yZDFurlOre0qWy0rcC/k
-	 xyCecAq0QoWpO/Q4LWdqVEEvJ8uWcQ4ZqLkZCcvjWIv33ad16h1ap7XpNkRWB0JTff
-	 63JzjVKUaKBIpMzw8KmrWslOYtOJYlnqQf2OdScDsXFe4gpBe6GZs6GvLyUxrf3DOv
-	 nf7b1f1h28Wgg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w3Fol-00000003hx6-2bnD;
-	Thu, 19 Mar 2026 16:01:51 +0000
-Date: Thu, 19 Mar 2026 16:01:51 +0000
-Message-ID: <86bjgj6c5s.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Wei-Lin Chang <weilin.chang@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Expose shadow page tables in debugfs
-In-Reply-To: <20260317182638.1592507-3-weilin.chang@arm.com>
-References: <20260317182638.1592507-1-weilin.chang@arm.com>
-	<20260317182638.1592507-3-weilin.chang@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1773936147; c=relaxed/simple;
+	bh=m/gjQlYB+hLSfdVp59u4Wyf2AMcQ/gjJRogO5vmkwIE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OIAxfes4C7FSmKrCCSKXxYJc5WJl+9myXwgqnOMox8IxNuAMk01VN73yz5YhLZub00e08uBM3gqNviRTBrxYt0CgAPB/DCEVuO7IAe0c6mUIUWVgADQ/wmhNJ5pDZvfxFP2LLGQmSLSSVYz2Y7Be0mDlcm+6/XunUdNWBiNhnDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA1BB1477;
+	Thu, 19 Mar 2026 09:02:19 -0700 (PDT)
+Received: from [10.1.35.24] (e122027.cambridge.arm.com [10.1.35.24])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AA213F778;
+	Thu, 19 Mar 2026 09:02:20 -0700 (PDT)
+Message-ID: <a4a822dd-8b77-4a42-a366-230324d0585f@arm.com>
+Date: Thu, 19 Mar 2026 16:02:18 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: weilin.chang@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, linux-kernel@vger.kernel.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 36/48] arm64: RMI: Always use 4k pages for realms
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+ <20260318155413.793430-37-steven.price@arm.com>
+ <20260319102454.GB3942350@e124191.cambridge.arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20260319102454.GB3942350@e124191.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 17 Mar 2026 18:26:38 +0000,
-Wei-Lin Chang <weilin.chang@arm.com> wrote:
+On 19/03/2026 10:24, Joey Gouly wrote:
+> Hi,
 > 
-> Exposing shadow page tables in debugfs improves the debugability and
-> testability of NV. With this patch a new directory "nested" is created
-> for each VM created if the host is NV capable. Within the directory each
-> valid s2 mmu will have its shadow page table exposed as a readable file
-> with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
-> creation and removal of the files happen at the points when an s2 mmu
-> becomes valid, or the context it represents change. In the future the
-> "nested" directory can also hold other NV related information.
+> On Wed, Mar 18, 2026 at 03:54:00PM +0000, Steven Price wrote:
+>> Guest_memfd doesn't yet natively support huge pages, and there are
+>> currently difficulties for a VMM to manage huge pages efficiently so for
+>> now always split up mappings to PTE (4k).
+>>
+>> The two issues that need progressing before supporting huge pages for
+>> realms are:
+>>
+>>  1. guest_memfd needs to be able to allocate from an appropriate
+>>     allocator which can provide huge pages.
+>>
+>>  2. The VMM needs to be able to repurpose private memory for a shared
+>>     mapping when the guest VM requests memory is transitioned. Because
+>>     this can happen at a 4k granularity it isn't possible to
+>>     free/reallocate while huge pages are in use. Allowing the VMM to
+>>     mmap() the shared portion of a huge page would allow the huge page
+>>     to be recreated when the memory is unshared and made protected again.
+>>
+>> These two issues are not specific to realms and don't affect the realm
+>> API, so for now just break everything down to 4k pages in the RMM
+>> controlled stage 2. Future work can add huge page support without
+>> changing the uAPI.
 > 
-> This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
+> The commit title/message mention 4K, but should probably say PAGE_SIZE or
+> something now that RMM isn't fixed to 4K.
+
+Indeed - this is all PAGE_SIZE not 4k any more. Also hopefully the
+reasons for this patch are also going to disappear soon. (2) above isn't
+really very true any more (we do support mmap() from guest_memfd).
+
+Thanks,
+Steve
+
+> Thanks,
+> Joey
 > 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Sebastian Ene <sebastianene@google.com>
-> Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  9 +++++++++
->  arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
->  arch/arm64/kvm/nested.c           |  6 +++++-
->  arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
->  4 files changed, 45 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 5d5a3bbdb95e..52977c9a11c3 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
->  	 */
->  	bool	nested_stage2_enabled;
->  
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +	struct dentry *shadow_pt_debugfs_dentry;
-> +#endif
-> +
->  	/*
->  	 * true when this MMU needs to be unmapped before being used for a new
->  	 * purpose.
-> @@ -405,6 +409,11 @@ struct kvm_arch {
->  	 * the associated pKVM instance in the hypervisor.
->  	 */
->  	struct kvm_protected_vm pkvm;
-> +
-> +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> +	/* Nested virtualization info */
-> +	struct dentry *debugfs_nv_dentry;
-> +#endif
->  };
->  
->  struct kvm_vcpu_fault_info {
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index d968aca0461a..01e9c72d6aa7 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
->  
->  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
->  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
-> +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
-> +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
->  #else
->  static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
-> +static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
-> +static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
->  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
->  
->  #endif /* __ASSEMBLER__ */
-> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> index eeea5e692370..31d74ed8449e 100644
-> --- a/arch/arm64/kvm/nested.c
-> +++ b/arch/arm64/kvm/nested.c
-> @@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
->  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
->  
->  	/* Make sure we don't forget to do the laundry */
-> -	if (kvm_s2_mmu_valid(s2_mmu))
-> +	if (kvm_s2_mmu_valid(s2_mmu)) {
-> +		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
->  		s2_mmu->pending_unmap = true;
-> +	}
->  
->  	/*
->  	 * The virtual VMID (modulo CnP) will be used as a key when matching
-> @@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
->  	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
->  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
->  
-> +	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
-> +
->  out:
->  	atomic_inc(&s2_mmu->refcnt);
->  
-> diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> index 98763b291956..aebbbad85d38 100644
-> --- a/arch/arm64/kvm/ptdump.c
-> +++ b/arch/arm64/kvm/ptdump.c
-> @@ -10,12 +10,14 @@
->  #include <linux/kvm_host.h>
->  #include <linux/seq_file.h>
->  
-> +#include <asm/cpufeature.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_pgtable.h>
->  #include <asm/ptdump.h>
->  
->  #define MARKERS_LEN		2
->  #define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> +#define S2FNAMESZ	sizeof("0x0123456789abcdef-0x0123456789abcdef-s2-disabled")
->  
->  struct kvm_ptdump_guest_state {
->  	struct kvm_s2_mmu	*mmu;
-> @@ -277,6 +279,28 @@ static const struct file_operations kvm_pgtable_levels_fops = {
->  	.release	= kvm_pgtable_debugfs_close,
->  };
->  
-> +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
-> +{
-> +	struct dentry *dent;
-> +	char file_name[S2FNAMESZ];
-> +
-> +	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
-> +		 mmu->tlb_vttbr,
-> +		 mmu->tlb_vtcr,
-> +		 mmu->nested_stage2_enabled ? "en" : "dis");
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> ---
+>> Changes since v7:
+>>  * Rewritten commit message
+>> ---
+>>  arch/arm64/kvm/mmu.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 73c18c2861a2..ad1300f366df 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1761,11 +1761,14 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>  	write_fault = kvm_is_write_fault(vcpu);
+>>  
+>>  	/*
+>> -	 * Realms cannot map protected pages read-only
+>> +	 * Realms cannot map protected pages read-only, also force PTE mappings
+>> +	 * for Realms.
+>>  	 * FIXME: It should be possible to map unprotected pages read-only
+>>  	 */
+>> -	if (vcpu_is_rec(vcpu))
+>> +	if (vcpu_is_rec(vcpu)) {
+>>  		write_fault = true;
+>> +		force_pte = true;
+>> +	}
+>>  
+>>  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
+>>  	VM_WARN_ON_ONCE(write_fault && exec_fault);
+>> -- 
+>> 2.43.0
+>>
+>>
 
-Here's an example of this code in action:
-
-root@semi-fraudulent:/home/maz/vminstall# ls -l /sys/kernel/debug/kvm/932-4/nested/
-total 0
--r-------- 1 root root 0 Mar 19 11:58 0x0-0x80000000-s2-disabled
--r-------- 1 root root 0 Mar 19 12:01 0x100010124c000-0x800c3558-s2-enabled
--r-------- 1 root root 0 Mar 19 15:06 0x200010d916000-0x800c3558-s2-enabled
--r-------- 1 root root 0 Mar 19 15:16 0x30001027ec000-0x800c3558-s2-enabled
-
-I think these hex values should always be padded with leading zeroes,
-making them more readable.
-
-I can hack that in as I queue the patches.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
