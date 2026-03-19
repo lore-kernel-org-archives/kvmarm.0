@@ -1,37 +1,39 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18054376483
-	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 15:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743C43E5EF9
+	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 15:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773934493; cv=none; b=EXxPKsYz+QchBHeCxJRnmZ7/pufqFSuP1hM5TPU8i358pMAsk80+82ODHe5H3/dAzXh6Wqe6Qd0mJ0bjejTeM/Z+K66IdSCrCJYtYzdorWnpmlfYnk8qe0gKYkLzfwKqQshqUkQ4pfVFUjRTgn2gaRj20pzaB5wrzN0Xt2veuwY=
+	t=1773935151; cv=none; b=Bo4fGPUDCyGp5tPSqot4zVMR77TGCHncWdGrUG+E+5izyA3P+FUh1p+uWIHIWe3o/UjIbY2NaOt6IcQQOxD9ECCuZnxloMTfBT+dsFyl+YGazNvFB3467M2VQTIiO/iyn1dS4Dpf2W2K192iHI9eYpIKx0jAiKdHV6jeYJZWb/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773934493; c=relaxed/simple;
-	bh=d+7Rp9uPvrCnRUQM9SWXYjajsmLqKol28+AsIto0qXs=;
+	s=arc-20240116; t=1773935151; c=relaxed/simple;
+	bh=ZtKfn+KZ0/qFdWOP6ItpZvjUveLtMULge3Jphw4QCRM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tbH2m0G2J1h7KG7aMYkG+t30lbKKoPATIWuKVz3mnvGjwleNxySGpVk/d4+hut/pDlOfJXqHwM9e/4POsPLpopBoPpEMgfAwNg40HX1IBv9RjbzGQgqazCXeFfcyDuXFXgMNrZZ+8jgAV9/0K4YmKKspwtCgcKWZs3D0V2HBypE=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nef1tfb950CXp9EHBVZS8uAkTLiBim9X39KSxlax7zlN8G61BN96CNXpRepVaU7h+KjWRFVRG/Iixt5pjT9zJlyT5yhEgomlSj+ua3kVWBi152UTS3XRmubbwYFnR+0RMnAthJY8syXKDMqBGuRhEiule76e/yfnc1U6/AXIr0c=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5CCEC1A25;
-	Thu, 19 Mar 2026 08:34:45 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C8DE81A25;
+	Thu, 19 Mar 2026 08:45:43 -0700 (PDT)
 Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 204EA3F778;
-	Thu, 19 Mar 2026 08:34:50 -0700 (PDT)
-Date: Thu, 19 Mar 2026 15:34:47 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8954C3F778;
+	Thu, 19 Mar 2026 08:45:48 -0700 (PDT)
+Date: Thu, 19 Mar 2026 15:45:45 +0000
 From: Catalin Marinas <catalin.marinas@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
+To: Will Deacon <will@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Mark Rutland <mark.rutland@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v2 01/11] arm64: Skip update of an idreg field affected
- by an override
-Message-ID: <abwXl35xQ2ze1XwJ@arm.com>
-References: <20260302115653.1517326-1-maz@kernel.org>
- <20260302115653.1517326-2-maz@kernel.org>
+	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 3/4] arm64: errata: Work around early CME DVMSync
+ acknowledgement
+Message-ID: <abwaKf3F0Ya3wyxl@arm.com>
+References: <20260318191918.2653160-1-catalin.marinas@arm.com>
+ <20260318191918.2653160-4-catalin.marinas@arm.com>
+ <abv65n3fhvYDEez0@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -40,67 +42,95 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260302115653.1517326-2-maz@kernel.org>
+In-Reply-To: <abv65n3fhvYDEez0@willie-the-truck>
 
-On Mon, Mar 02, 2026 at 11:56:42AM +0000, Marc Zyngier wrote:
-> When computing the new value od an idreg that contains a field
-> affected by an override, do not update that particular field.
+Hi Will,
+
+Thanks for the review.
+
+On Thu, Mar 19, 2026 at 01:32:22PM +0000, Will Deacon wrote:
+> Are you planning to take this for 7.1 or would you like me to take it
+> via for-next/fixes? I'm leaning towards the former so it can simmer in
+> -next for a bit...
+
+Yes, it makes sense.
+
+> On Wed, Mar 18, 2026 at 07:19:15PM +0000, Catalin Marinas wrote:
+> > C1-Pro acknowledges DVMSync messages before completing the SME/CME
+> > memory accesses. Work around this by issuing an IPI to the affected CPUs
+> > if they are running in EL0 with SME enabled.
+> > 
+> > Note that we avoid the local DSB in the IPI handler as the kernel runs
+> > with SCTLR_EL1.IESB=1 This is sufficient to complete SME memory accesses
+> > at EL0 on taking an exception to EL1. On the return to user path, no
+> > barrier is necessary either. See the comment in sme_set_active() and the
+> > more detailed explanation in the link below.
 > 
-> The value computed at init-time must be kept as-is, as that's
-> what the user has asked for, for better or worse.
+> Missing link?
+
+Ah, I eventually moved it to a comment in the code directly. I'll add it
+here as well.
+
+> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> > index 38dba5f7e4d2..f07cdb6ada08 100644
+> > --- a/arch/arm64/Kconfig
+> > +++ b/arch/arm64/Kconfig
+> > @@ -1175,6 +1175,18 @@ config ARM64_ERRATUM_4311569
+> >  
+> >  	  If unsure, say Y.
+> >  
+> > +config ARM64_ERRATUM_SME_DVMSYNC
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kernel/cpufeature.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Any reason not to call this ARM64_ERRATUM_4193714 like we do for other
+> hardware bugs?
+
+Future-proofing, in case it becomes a feature ;).
+
+I'll change it. I think when I started I didn't have the number (or did
+not know where to look for it). I was too lazy to change it afterwards.
+
+> > diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+> > index 1d2e33559bd5..129c29aa0fc4 100644
+> > --- a/arch/arm64/include/asm/fpsimd.h
+> > +++ b/arch/arm64/include/asm/fpsimd.h
+> > @@ -428,6 +428,24 @@ static inline size_t sme_state_size(struct task_struct const *task)
+> >  	return __sme_state_size(task_get_sme_vl(task));
+> >  }
+> >  
+> > +void sme_enable_dvmsync(void);
+> > +void sme_set_active(unsigned int cpu);
+> > +void sme_clear_active(unsigned int cpu);
+> > +
+> > +static inline void sme_enter_from_user_mode(void)
+> > +{
+> > +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_SME_DVMSYNC) &&
+> > +	    test_thread_flag(TIF_SME))
+> > +		sme_clear_active(smp_processor_id());
+> > +}
+> > +
+> > +static inline void sme_exit_to_user_mode(void)
+> > +{
+> > +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_SME_DVMSYNC) &&
+> > +	    test_thread_flag(TIF_SME))
+> > +		sme_set_active(smp_processor_id());
+> > +}
 > 
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index c31f8e17732a3..28fc77443ccd3 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -1224,6 +1224,13 @@ static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
->  		s64 ftr_cur = arm64_ftr_value(ftrp, reg->sys_val);
->  		s64 ftr_new = arm64_ftr_value(ftrp, new);
->  
-> +		/*
-> +		 * Don't alter the initial value that has been forced
-> +		 * by an override.
-> +		 */
-> +		if ((reg->override->mask & arm64_ftr_mask(ftrp)) == arm64_ftr_mask(ftrp))
-> +			continue;
+> nit: You could push smp_processor_id() down into sme_{set,clear}_active()
+> since they are always called for the running CPU.
 
-I got lost in the in the cpufeature framework, so I may be missing
-something.
+Yes, I can. What I had in mind from an API perspective was that the
+caller knows preemption is disabled while the callee may not. But it's
+only this caller, so fine by me with moving the smp_processor_id() to
+those function.
 
-Let's say the primary CPU has a feature field with value 2 and we want
-to override it to value 1. For e.g. a LOWER_SAFE feature, boot_cpu_data
-will stored the overridden value of 1.
+If we ever add support for SME in guests with this erratum, we may
+call the same function (not sure yet), just need to make sure preemption
+is disabled or add a check. OTOH, I'd rather disable SME in guests
+altogether for these CPUs.
 
-A secondary CPU comes online with the same feature missing, so value 0.
-With the above change, we no longer update the system-wide feature
-value, leave it as 1. Later on, for a system feature we may turn it on
-even though the secondary CPU does not support it.
+I'll address the other points and repost next week.
 
-In summary, this makes the overridden field sticky for secondary CPUs
-even if they don't support it.
-
-Unrelated to your patch, I think we can similarly fail to reject
-secondary CPUs in check_early_cpu_features() -> verify_local_cpu_caps()
-because of __read_sysreg_by_encoding() which uses the override value
-unconditionally. From this perspective, we are now consistent with your
-patch above.
-
-In all cases we taint the kernel for FTR_STRICT features but that may go
-unnoticed or if we had FTR_NONSTRICT (does it even matter in this
-case?).
-
-Maybe that's the intended use and blame the user for passing the wrong
-override. We are still slightly inconsistent depending on what the boot
-CPU supports where we still decide whether accept or reject an override.
-We don't do this for secondaries.
-
-Anyway, I'm not opposing to this patch if that's what's intended. I'm
-sure I'll forget everything about this framework in a couple of weeks.
+Thanks.
 
 -- 
 Catalin
