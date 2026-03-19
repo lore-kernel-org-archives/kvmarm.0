@@ -1,192 +1,189 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B363F7AAD;
-	Thu, 19 Mar 2026 18:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF173F787B;
+	Thu, 19 Mar 2026 18:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773944716; cv=none; b=LpziAVrhNzv7uLITraAorSojVg6H0CPEnnjEwYeImiwwxmSyyALfvoah4dru300Eqn4jn5Mdo+IUeAC1QkuKQQA3d+6u+X/JWzEcT9pmAaPufvImWWAjIblmPhq2wm5iUsCqPauq0SEPC3LRIQeDdZ/fPKOmYSgDNHxWc3ItZxk=
+	t=1773944780; cv=none; b=vGEpGo8D86h+TVbI1Z7T/tKFB38pR05synUQjk6grkXoDRaafHncCR6L2kiED8NrRV+scDubXUZ2w7FaL1fiNCPVf8Q7cMz9dD9RIcpkLcAtxxh+LmgRctWnb79DfD+2tB/PnpXciXgete7NybJbufeosJNi8t6JPOM4Mzbqvv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773944716; c=relaxed/simple;
-	bh=RchZDguRGOh3IAzbXIq7kuQwhInrsct2EVW80aEey/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D7pl248jZ4jT4Vm1770/PVPFTvOy01KVoN/IMWn27CA7ZrngsDtquKlZpqlbz3iJt8F/BZFcTrXFOvuGRfEUmCE4EoVw3s/NrymTSt2whator1XtCPoQXbTiEoe5ARN0Q9HWbsDTZvVfNCE//4FDFjpu7hAPH7mrPnvuWP6TJNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9E08E2247;
-	Thu, 19 Mar 2026 11:25:07 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1AD523F7BD;
-	Thu, 19 Mar 2026 11:25:08 -0700 (PDT)
-Date: Thu, 19 Mar 2026 18:25:02 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>, 
-	Alexandru Elisei <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, 
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>, Gavin Shan <gshan@redhat.com>, 
-	Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun <alpergun@google.com>, 
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>, 
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v13 26/48] arm64: RMI: Create the realm descriptor
-Message-ID: <oukw53xfroe32rb26jy365nqsuttlakkjgpmh6sszdprx6nqfc@qfmwsob2ewa4>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-27-steven.price@arm.com>
+	s=arc-20240116; t=1773944780; c=relaxed/simple;
+	bh=GBQQbLO2a4zuF3uSSSHniBNg4oXiGd3KKh0MkAh+ZLI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GRU69P6mi7ltT2XK9CISH1qfsHXKaHoY24h6WELj85U6GdgsgSWbS4xnnM2sx1cRfU/5kDvWr1d/M1fSfuk24ezxYjytwXLVzmBQ1e4iDV6l8Y4DCJ//iAJfRdP3F1oAYUWLT4vSKRuPbbqvQFQhkhaPPSSm+jf401QtZ4XT1Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+90WUPO; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+90WUPO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EB2DC19424;
+	Thu, 19 Mar 2026 18:26:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1773944780;
+	bh=GBQQbLO2a4zuF3uSSSHniBNg4oXiGd3KKh0MkAh+ZLI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f+90WUPOSqYqST8rwA0x76yqe7boMwbsDN7P3SAgdK6wvuKz8G0R/nS/vx9mCEVMJ
+	 HQ+5KfrAjjtBHBGgV7hCS3OFBJJyO2GrcZAff70lc/01Y44GHeFgR/95eqcCbBh32f
+	 MFQsQ7/EZstr0l8AWY2uiJ3c/7vBQFejqBGzlrb4sWpQcv5j6O0yAeokdQsq97XRFc
+	 TFcTHEn/2tzeABskVo5j1INGQ8p9GcRaIeGsD36BT/QBZul/xN3U/QrqWIDj69Ja+r
+	 uipBwdbAoOMBkapNIQYCpH6jWi6HFuqh1lwChiXfGN307VF7cBw2EB+2NcIT6lZigh
+	 KsKTZWy6XthNA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w3I4X-00000003lWw-3Nvm;
+	Thu, 19 Mar 2026 18:26:17 +0000
+Date: Thu, 19 Mar 2026 18:26:17 +0000
+Message-ID: <868qbn65h2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly
+	<Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org"
+	<peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com"
+	<jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v7 00/41] KVM: arm64: Introduce vGIC-v5 with PPI support
+In-Reply-To: <20260319154937.3619520-1-sascha.bischoff@arm.com>
+References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318155413.793430-27-steven.price@arm.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 18, 2026 at 03:53:50PM +0000, Steven Price wrote:
-> Creating a realm involves first creating a realm descriptor (RD). This
-> involves passing the configuration information to the RMM. Do this as
-> part of realm_ensure_created() so that the realm is created when it is
-> first needed.
+On Thu, 19 Mar 2026 15:49:42 +0000,
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v12:
->  * Since RMM page size is now equal to the host's page size various
->    calculations are simplified.
->  * Switch to using range based APIs to delegate/undelegate.
->  * VMID handling is now handled entirely by the RMM.
-> ---
->  arch/arm64/kvm/rmi.c | 94 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 92 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 38349c7b34f4..d5fee203824b 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -649,6 +649,83 @@ static void realm_unmap_shared_range(struct kvm *kvm,
->  			     start, end);
->  }
->  
-> +static int realm_create_rd(struct kvm *kvm)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	struct realm_params *params = realm->params;
-> +	void *rd = NULL;
-> +	phys_addr_t rd_phys, params_phys;
-> +	size_t pgd_size = kvm_pgtable_stage2_pgd_size(kvm->arch.mmu.vtcr);
-> +	int i, r;
-> +
-> +	realm->ia_bits = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +
-> +	if (WARN_ON(realm->rd || !realm->params))
-> +		return -EEXIST;
-> +
-> +	rd = (void *)__get_free_page(GFP_KERNEL);
+> This is v7 of the patch series to add the virtual GICv5 [1] device
+> (vgic_v5). Only PPIs are supported by this initial series, and the
+> vgic_v5 implementation is restricted to the CPU interface,
+> only. Further patch series are to follow in due course, and will add
+> support for SPIs, LPIs, the GICv5 IRS, and the GICv5 ITS.
 
-Hi,
+[...]
 
-Should this be GFP_KERNEL_ACCOUNT?
+I have queued this, but it didn't go as planned. QEMU guests end-up
+with a NULL pointer dereference, because we are now setting ops pretty
+early in the game, while QEMU creates an irqchip very late.
 
-> +	if (!rd)
-> +		return -ENOMEM;
-> +
-> +	rd_phys = virt_to_phys(rd);
-> +	if (delegate_page(rd_phys)) {
-> +		r = -ENXIO;
-> +		goto free_rd;
-> +	}
-> +
-> +	if (delegate_range(kvm->arch.mmu.pgd_phys, pgd_size)) {
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	params->s2sz = VTCR_EL2_IPA(kvm->arch.mmu.vtcr);
-> +	params->rtt_level_start = get_start_level(realm);
-> +	params->rtt_num_start = pgd_size / PAGE_SIZE;
-> +	params->rtt_base = kvm->arch.mmu.pgd_phys;
-> +
-> +	if (kvm->arch.arm_pmu) {
-> +		params->pmu_num_ctrs = kvm->arch.nr_pmu_counters;
-> +		params->flags |= RMI_REALM_PARAM_FLAG_PMU;
-> +	}
-> +
-> +	if (kvm_lpa2_is_enabled())
-> +		params->flags |= RMI_REALM_PARAM_FLAG_LPA2;
-> +
-> +	params_phys = virt_to_phys(params);
-> +
-> +	if (rmi_realm_create(rd_phys, params_phys)) {
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	if (WARN_ON(rmi_rec_aux_count(rd_phys, &realm->num_aux))) {
-> +		WARN_ON(rmi_realm_destroy(rd_phys));
-> +		r = -ENXIO;
-> +		goto out_undelegate_tables;
-> +	}
-> +
-> +	realm->rd = rd;
-> +	WRITE_ONCE(realm->state, REALM_STATE_NEW);
-> +	/* The realm is up, free the parameters.  */
-> +	free_page((unsigned long)realm->params);
-> +	realm->params = NULL;
-> +
-> +	return 0;
-> +
-> +out_undelegate_tables:
-> +	if (WARN_ON(undelegate_range(kvm->arch.mmu.pgd_phys, i))) {
-> +		/* Leak the pages if they cannot be returned */
-> +		kvm->arch.mmu.pgt = NULL;
+The obvious solution is what you originally had in your v6, which is
+to set the ops in kvm_timer_enable(), but to do it over *all* the
+timer interrupts in order not to break NV is a fairly subtle way(we
+still want to use the .get_input_level() callback on all timers.
 
-Did you mean kvm->arch.mmu.pgd_phys = NULL; ?
+I ended up with the following diff, which I folded in the respective
+patches, meaning that patch 4 can be dropped altogether.
 
 Thanks,
-Wei-Lin Chang
 
-> +	}
-> +	if (WARN_ON(undelegate_page(rd_phys))) {
-> +		/* Leak the page if it isn't returned */
-> +		return r;
-> +	}
-> +free_rd:
-> +	free_page((unsigned long)rd);
-> +	return r;
-> +}
-> +
->  static void realm_unmap_private_range(struct kvm *kvm,
->  				      unsigned long start,
->  				      unsigned long end,
-> @@ -893,8 +970,21 @@ static int realm_init_ipa_state(struct kvm *kvm,
->  
->  static int realm_ensure_created(struct kvm *kvm)
->  {
-> -	/* Provided in later patch */
-> -	return -ENXIO;
-> +	int ret;
-> +
-> +	switch (kvm_realm_state(kvm)) {
-> +	case REALM_STATE_NONE:
-> +		break;
-> +	case REALM_STATE_NEW:
-> +		return 0;
-> +	case REALM_STATE_DEAD:
-> +		return -ENXIO;
-> +	default:
-> +		return -EBUSY;
-> +	}
-> +
-> +	ret = realm_create_rd(kvm);
-> +	return ret;
->  }
->  
->  static int set_ripas_of_protected_regions(struct kvm *kvm)
-> -- 
-> 2.43.0
-> 
+	M.
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index f6d2f0246d057..67b989671b410 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -1106,8 +1106,6 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+-	struct timer_map map;
+-	struct irq_ops *ops;
+ 
+ 	for (int i = 0; i < NR_KVM_TIMERS; i++)
+ 		timer_context_init(vcpu, i);
+@@ -1121,15 +1119,6 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+ 
+ 	hrtimer_setup(&timer->bg_timer, kvm_bg_timer_expire, CLOCK_MONOTONIC,
+ 		      HRTIMER_MODE_ABS_HARD);
+-
+-	get_timer_map(vcpu, &map);
+-
+-	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
+-				      &arch_timer_irq_ops;
+-
+-	kvm_vgic_set_irq_ops(vcpu, timer_irq(map.direct_vtimer), ops);
+-	if (map.direct_ptimer)
+-		kvm_vgic_set_irq_ops(vcpu, timer_irq(map.direct_ptimer), ops);
+ }
+ 
+ /*
+@@ -1600,6 +1589,7 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+ 	struct timer_map map;
++	struct irq_ops *ops;
+ 	int ret;
+ 
+ 	if (timer->enabled)
+@@ -1620,6 +1610,12 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+ 
+ 	get_timer_map(vcpu, &map);
+ 
++	ops = vgic_is_v5(vcpu->kvm) ? &arch_timer_irq_ops_vgic_v5 :
++				      &arch_timer_irq_ops;
++
++	for (int i = 0; i < nr_timers(vcpu); i++)
++		kvm_vgic_set_irq_ops(vcpu, timer_irq(vcpu_get_timer(vcpu, i)), ops);
++
+ 	ret = kvm_vgic_map_phys_irq(vcpu,
+ 				    map.direct_vtimer->host_timer_irq,
+ 				    timer_irq(map.direct_vtimer));
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index e7d07752143be..36410f7cd2ad3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -526,6 +526,15 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+ 
++	/* Set up the timer */
++	kvm_timer_vcpu_init(vcpu);
++
++	kvm_pmu_vcpu_init(vcpu);
++
++	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
++
++	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
++
+ 	/*
+ 	 * This vCPU may have been created after mpidr_data was initialized.
+ 	 * Throw out the pre-computed mappings if that is the case which forces
+@@ -537,15 +546,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	if (err)
+ 		return err;
+ 
+-	/* Set up the timer */
+-	kvm_timer_vcpu_init(vcpu);
+-
+-	kvm_pmu_vcpu_init(vcpu);
+-
+-	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
+-
+-	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
+-
+ 	err = kvm_share_hyp(vcpu, vcpu + 1);
+ 	if (err)
+ 		kvm_vgic_vcpu_destroy(vcpu);
+
+-- 
+Without deviation from the norm, progress is not possible.
