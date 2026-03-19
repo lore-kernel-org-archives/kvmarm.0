@@ -1,114 +1,109 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2E91EF091;
-	Thu, 19 Mar 2026 10:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from sinmsgout01.his.huawei.com (sinmsgout01.his.huawei.com [119.8.177.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ABC37DEAB
+	for <kvmarm@lists.linux.dev>; Thu, 19 Mar 2026 10:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=119.8.177.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773916062; cv=none; b=FXhBNjWGiTlYUS5cDF1rkkBAC8rzQVOvKtcuK0poXeLrnvJktPypItYB4Meo/p/1JcREaHkIqrrbmnoSIWA4m5OHyn5JFmAd2cpnxcxdiaMefeSGBa7h++ptmjSSX3C1KluACqNSdLTYQE4DpdPrEyFcy5Mr+6FsYsiEaFCBSq4=
+	t=1773916281; cv=none; b=rM8VBRFnN7iv+6blyVRCTTS0F66u+2MW+WYCC2CxXmuu7O+6udrLFBWP4sEMhsj7VAT5jrGjSDZqqHH4ba7u2T27MUlDNhpkEOOZ8yF5W34pwpAkk7B3svvgZVE4v9Krvs0yQ3pFs/F6L9Up1pvezRVLn9HHGb6ngWZI+gd7eKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773916062; c=relaxed/simple;
-	bh=0mV14+MUUxzZzEb4gnex+TfSxY4bUwiL47SG3shkISo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MSQxLPE4akMwbekn4VHNuSKMxUSjatXGaZXluGBD+3Jc4PFATuf7+TuSvxjgYRSgXJKObVWcTj7TaHaWNOXlqKBvFAtXsidDF9x9AcGlbr1duKLqHTTBgRHbwllgIm8VkKeTSbU9dVbqt2n8X5QvKcwSL4SfShXAe64jZfGRzKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79DA21A25;
-	Thu, 19 Mar 2026 03:27:34 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46C7D3F7BD;
-	Thu, 19 Mar 2026 03:27:37 -0700 (PDT)
-Date: Thu, 19 Mar 2026 10:27:34 +0000
-From: Joey Gouly <joey.gouly@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Gavin Shan <gshan@redhat.com>,
-	Shanker Donthineni <sdonthineni@nvidia.com>,
-	Alper Gun <alpergun@google.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
-	Emi Kisanuki <fj0570is@fujitsu.com>,
-	Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH v13 37/48] arm64: RMI: Prevent Device mappings for Realms
-Message-ID: <20260319102734.GC3942350@e124191.cambridge.arm.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-38-steven.price@arm.com>
+	s=arc-20240116; t=1773916281; c=relaxed/simple;
+	bh=zzJ/+/Zt8I4VMdJ+OaYyb5chrAl8wtc7VvHKdwdZJt4=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QS9CfzTAkYfyyuSrHuqUeiPdsFY8kBA7dDRmVQUL72pp58o39GhKO+gySB7mE0cpbIPvhd624Cu4pRJjBn3GDejbIOzbkbdhOVFypxYzR44AqSXes7H0sklM33Ujk2UXZVFabmH176L8EJzRI6guWVgtQd29R0FvfIPU3HsUwbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kaQtoDyQ; arc=none smtp.client-ip=119.8.177.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kaQtoDyQ"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=zL/2+nC1pt2yK9os/cDSownjGgGlQCInSM2J/Abjd1A=;
+	b=kaQtoDyQgL8zwwRTe7UtyLV1VIEdHhi8GRYlnFMy4Qf4sab0lDmc8pgAFRuUJ6LsyfYurp/Dk
+	vLcbEZcR87lAhU91bHA+wlysubWF2L8Gll0MjrA4ox3FPfDsXwTImonW9elnWLqV7vhBFIwJMtc
+	OHKdPAuIRnpAquKhTc2/spI=
+Received: from frasgout.his.huawei.com (unknown [172.18.146.32])
+	by sinmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4fc1cj2R84z1P6gQ;
+	Thu, 19 Mar 2026 18:08:53 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.224.107])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4fc1hS2qwyzHnH7b;
+	Thu, 19 Mar 2026 18:12:08 +0800 (CST)
+Received: from dubpeml500005.china.huawei.com (unknown [7.214.145.207])
+	by mail.maildlp.com (Postfix) with ESMTPS id A99B440589;
+	Thu, 19 Mar 2026 18:12:31 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml500005.china.huawei.com
+ (7.214.145.207) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 19 Mar
+ 2026 10:12:30 +0000
+Date: Thu, 19 Mar 2026 10:12:29 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+CC: "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
+	<kvmarm@lists.linux.dev>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd
+	<nd@arm.com>, "maz@kernel.org" <maz@kernel.org>, "oliver.upton@linux.dev"
+	<oliver.upton@linux.dev>, Joey Gouly <Joey.Gouly@arm.com>, Suzuki Poulose
+	<Suzuki.Poulose@arm.com>, "yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>, Timothy Hayes
+	<Timothy.Hayes@arm.com>
+Subject: Re: [PATCH v6 03/39] KVM: arm64: Return early from
+ kvm_finalize_sys_regs() if guest has run
+Message-ID: <20260319101229.000040f2@huawei.com>
+In-Reply-To: <20260317113949.2548118-4-sascha.bischoff@arm.com>
+References: <20260317113949.2548118-1-sascha.bischoff@arm.com>
+	<20260317113949.2548118-4-sascha.bischoff@arm.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260318155413.793430-38-steven.price@arm.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+ dubpeml500005.china.huawei.com (7.214.145.207)
 
-On Wed, Mar 18, 2026 at 03:54:01PM +0000, Steven Price wrote:
-> Physical device assignment is not supported by RMM v1.0, so it
+On Tue, 17 Mar 2026 11:40:44 +0000
+Sascha Bischoff <Sascha.Bischoff@arm.com> wrote:
 
-But we're targetting 2.0 now!
+> If the guest has already run, we have no business finalizing the
+> system register state - it is too late. Therefore, check early and
+> bail if the VM has already run.
+Given it isn't in the scope below, might be worth calling out that
+this is skipping kvm_init_nv_sysregs()  So on non NV setups isn't
+changing anything but on those it's indeed skipping setup of system
+registers.
 
-I guess just change it to something about device support being a later feature.
+Seems correct to me, but is this a fix?  So should it have a fixes tag?
 
-Thanks,
-Joey
 
-> doesn't make much sense to allow device mappings within the realm.
-> Prevent them when the guest is a realm.
 > 
-> Signed-off-by: Steven Price <steven.price@arm.com>
+> Signed-off-by: Sascha Bischoff <sascha.bischoff@arm.com>
 > ---
-> Changes from v6:
->  * Fix the check in user_mem_abort() to prevent all pages that are not
->    guest_memfd() from being mapped into the protected half of the IPA.
-> Changes from v5:
->  * Also prevent accesses in user_mem_abort()
-> ---
->  arch/arm64/kvm/mmu.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  arch/arm64/kvm/sys_regs.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index ad1300f366df..7d7caab8f573 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1222,6 +1222,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  	if (is_protected_kvm_enabled())
->  		return -EPERM;
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 0acd10e50aaba..42c84b7900ff5 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -5659,11 +5659,14 @@ int kvm_finalize_sys_regs(struct kvm_vcpu *vcpu)
 >  
-> +	/* We don't support mapping special pages into a Realm */
-> +	if (kvm_is_realm(kvm))
-> +		return -EPERM;
+>  	guard(mutex)(&kvm->arch.config_lock);
+>  
+> +	if (kvm_vm_has_ran_once(kvm))
+> +		return 0;
 > +
->  	size += offset_in_page(guest_ipa);
->  	guest_ipa &= PAGE_MASK;
+>  	/*
+>  	 * This hacks into the ID registers, so only perform it when the
+>  	 * first vcpu runs, or the kvm_set_vm_id_reg() helper will scream.
+>  	 */
+> -	if (!irqchip_in_kernel(kvm) && !kvm_vm_has_ran_once(kvm)) {
+> +	if (!irqchip_in_kernel(kvm)) {
+>  		u64 val;
 >  
-> @@ -1965,6 +1969,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		return 1;
->  	}
->  
-> +	/*
-> +	 * For now we shouldn't be hitting protected addresses because they are
-> +	 * handled in private_memslot_fault(). In the future this check may be
-> +	 * relaxed to support e.g. protected devices.
-> +	 */
-> +	if (vcpu_is_rec(vcpu) &&
-> +	    kvm_gpa_from_fault(kvm, fault_ipa) == fault_ipa)
-> +		return -EINVAL;
-> +
->  	if (nested)
->  		adjust_nested_fault_perms(nested, &prot, &writable);
->  
-> -- 
-> 2.43.0
-> 
-> 
+>  		val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1) & ~ID_AA64PFR0_EL1_GIC;
+
