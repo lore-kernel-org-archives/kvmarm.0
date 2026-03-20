@@ -1,228 +1,178 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0B51A0BF1
-	for <kvmarm@lists.linux.dev>; Fri, 20 Mar 2026 16:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5B12DC791;
+	Fri, 20 Mar 2026 16:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774024548; cv=none; b=LxJgMjW0CkClLredHnzabQSnOg1xvMah1NY35KhdrCplnlM3QzUVLEs86BfcbK8RMNW4OhXlQnk57WLCw4gyHcv5AXaFzHo7WNyszbca2pPmFErkIlL+WhdY4mfYEt8dOMEW7xYeCVBKFnaHSqtfLWJYETA5Er89YCoLnisJRpQ=
+	t=1774024765; cv=none; b=Pm5AeNuZgGKsBV4+HbB67/Dup8vPO5BZ4G3kvRPne8EOPU+p23/KZA2kdHTdPtvSs8F81/5ch+YAev9BByYdP4Va4ijnu1BIyvAL93Ldy1PZMYOstgZqbO6Tq6V+oPUH4cZvyiyaWoZiRZY6NAWbKcqRkyEQRgfP+0Mnx/1c4hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774024548; c=relaxed/simple;
-	bh=Vhr1ZOzaTuRxK1NbGPvVPF/qRGgb9xTzt4pPvJnK5n8=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HewLGs+fl/pSvh3y1DBLqNnrpziRa/NI7kutm/rBF+1bNHh1AHI0dYpwUFybfGXz5RUrxpdWHVTDj+BVg5McxYcfE/c9t06rYIdBn9DLDpsuCB1yySmHRk6dFHysBEkaysnNMMnAv26JV9do9C0+ClaWYD7sOPptZ7Xm9DdXbds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gh5ClOau; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gh5ClOau"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C64BBC4CEF7;
-	Fri, 20 Mar 2026 16:35:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774024547;
-	bh=Vhr1ZOzaTuRxK1NbGPvVPF/qRGgb9xTzt4pPvJnK5n8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gh5ClOauJ0jxeRyHXWR+gNa1lGiTB/sZ8r0Lu9T5G8U57tvS/GTqhzXb4Gk1p/IRF
-	 nGeJvcha/Si8OkZ8r2qvMvXYbie9Gz9YZ3VCpyLxPCgcl9d1Dzq1RvYpA/YmqSK2Q0
-	 tCtAP7I7Oyc0rNBWiU6ok2AErGSl8H7MRU1xALyW1mdepKOM+3KvKgIliYEpUvzcbK
-	 Md5c17v9JkZt4EKvUW686OF5ilU7KUawQ5eHrLonbBhD+1FrjD7V8iLegvn26gjY5p
-	 D9b6sgR1pr3dWE37n+Pc3CtWQM7dGNrz4T3TF9osKSPNjyVb2dV/Kg1r1JJLhgJZJ+
-	 DKmaUQhFdjdcg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w3cp7-000000045Ud-1Vqh;
-	Fri, 20 Mar 2026 16:35:45 +0000
-Date: Fri, 20 Mar 2026 16:35:44 +0000
-Message-ID: <86341u5uhr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 26/36] KVM: arm64: Return -EFAULT from VCPU_RUN on access to a poisoned pte
-In-Reply-To: <20260305144351.17071-27-will@kernel.org>
-References: <20260305144351.17071-1-will@kernel.org>
-	<20260305144351.17071-27-will@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1774024765; c=relaxed/simple;
+	bh=E3dCiClnQemoe20ySw2frD7EM1AeKLqJmvTYJV/veJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJsWqrKYxTnqlf9Kn++aWBT/JuRpT2sx7yshIxAfnqTfVO1CzbG4Uy32ufCnDoAKSRE0kSz5kplcc2R5c7WJAgHsFytMOEyXRlTNOoDicTvbCLlknNxCn02OOpoH8rTass6Qw6IxRMsazBUaZ6xxt3VNqpvbxJvj18OYXHHqKO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 46592165C;
+	Fri, 20 Mar 2026 09:39:17 -0700 (PDT)
+Received: from [10.1.29.20] (e122027.cambridge.arm.com [10.1.29.20])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 415983F7BD;
+	Fri, 20 Mar 2026 09:39:19 -0700 (PDT)
+Message-ID: <33150925-095a-485f-83a9-34b6fb9fbd6a@arm.com>
+Date: Fri, 20 Mar 2026 16:39:16 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, qperret@google.com, tabba@google.com, vdonnefort@google.com, smostafa@google.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 23/48] KVM: arm64: Expose support for private memory
+To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Gavin Shan <gshan@redhat.com>, Shanker Donthineni <sdonthineni@nvidia.com>,
+ Alper Gun <alpergun@google.com>, "Aneesh Kumar K . V"
+ <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
+ Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+ <20260318155413.793430-24-steven.price@arm.com>
+ <ea5hsyyhitiemen6hsacrig3g72igi3rgms3ja2n7jlhumsjjh@mkkk65t4to2p>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ea5hsyyhitiemen6hsacrig3g72igi3rgms3ja2n7jlhumsjjh@mkkk65t4to2p>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 05 Mar 2026 14:43:39 +0000,
-Will Deacon <will@kernel.org> wrote:
+On 19/03/2026 19:01, Wei-Lin Chang wrote:
+> On Wed, Mar 18, 2026 at 03:53:47PM +0000, Steven Price wrote:
+>> Select KVM_GENERIC_MEMORY_ATTRIBUTES and provide the necessary support
+>> functions.
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v12:
+>>  * Only define kvm_arch_has_private_mem() when
+>>    CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES is set to avoid build issues
+>>    when KVM is disabled.
+>> Changes since v10:
+>>  * KVM_GENERIC_PRIVATE_MEM replacd with KVM_GENERIC_MEMORY_ATTRIBUTES.
+>> Changes since v9:
+>>  * Drop the #ifdef CONFIG_KVM_PRIVATE_MEM guard from the definition of
+>>    kvm_arch_has_private_mem()
+>> Changes since v2:
+>>  * Switch kvm_arch_has_private_mem() to a macro to avoid overhead of a
+>>    function call.
+>>  * Guard definitions of kvm_arch_{pre,post}_set_memory_attributes() with
+>>    #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES.
+>>  * Early out in kvm_arch_post_set_memory_attributes() if the WARN_ON
+>>    should trigger.
+>> ---
+>>  arch/arm64/include/asm/kvm_host.h |  4 ++++
+>>  arch/arm64/kvm/Kconfig            |  1 +
+>>  arch/arm64/kvm/mmu.c              | 24 ++++++++++++++++++++++++
+>>  3 files changed, 29 insertions(+)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 64304848aad4..1efea996f474 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -1486,6 +1486,10 @@ struct kvm *kvm_arch_alloc_vm(void);
+>>  
+>>  #define vcpu_is_protected(vcpu)		kvm_vm_is_protected((vcpu)->kvm)
+>>  
+>> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>> +#define kvm_arch_has_private_mem(kvm) ((kvm)->arch.is_realm)
+>> +#endif
+>> +
+>>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>>  
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 4f803fd1c99a..1cac6dfc0972 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -38,6 +38,7 @@ menuconfig KVM
+>>  	select SCHED_INFO
+>>  	select GUEST_PERF_EVENTS if PERF_EVENTS
+>>  	select KVM_GUEST_MEMFD
+>> +	select KVM_GENERIC_MEMORY_ATTRIBUTES
 > 
-> If a protected vCPU faults on an IPA which appears to be mapped, query
-> the hypervisor to determine whether or not the faulting pte has been
-> poisoned by a forceful reclaim. If the pte has been poisoned, return
-> -EFAULT back to userspace rather than retrying the instruction forever.
+> Hi,
 > 
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_asm.h              |  1 +
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 10 +++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 43 +++++++++++++++++++
->  arch/arm64/kvm/pkvm.c                         |  9 ++--
->  5 files changed, 61 insertions(+), 3 deletions(-)
+> I believe we should also add this:
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 04a230e906a7..6c79f7504d80 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -90,6 +90,7 @@ enum __kvm_host_smccc_func {
->  	__KVM_HOST_SMCCC_FUNC___pkvm_unreserve_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vm,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_init_vcpu,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_vcpu_in_poison_fault,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_force_reclaim_guest_page,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_reclaim_dying_guest_page,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_start_teardown_vm,
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index f27b037abaf3..5e6cdafcdd69 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -41,6 +41,7 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
->  int __pkvm_host_share_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_unshare_ffa(u64 pfn, u64 nr_pages);
->  int __pkvm_host_donate_guest(u64 pfn, u64 gfn, struct pkvm_hyp_vcpu *vcpu);
-> +int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu);
->  int __pkvm_host_force_reclaim_page_guest(phys_addr_t phys);
->  int __pkvm_host_reclaim_page_guest(u64 gfn, struct pkvm_hyp_vm *vm);
->  int __pkvm_host_share_guest(u64 pfn, u64 gfn, u64 nr_pages, struct pkvm_hyp_vcpu *vcpu,
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> index 456c83207717..90e3b14fe287 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> @@ -573,6 +573,15 @@ static void handle___pkvm_init_vcpu(struct kvm_cpu_context *host_ctxt)
->  	cpu_reg(host_ctxt, 1) = __pkvm_init_vcpu(handle, host_vcpu, vcpu_hva);
->  }
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index bfa0ab343081..13722f876dcd 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6365,7 +6365,7 @@ Returns -EINVAL if called on a protected VM.
+>  -------------------------------
 >  
-> +static void handle___pkvm_vcpu_in_poison_fault(struct kvm_cpu_context *host_ctxt)
-> +{
-> +	int ret;
-> +	struct pkvm_hyp_vcpu *hyp_vcpu = pkvm_get_loaded_hyp_vcpu();
-> +
-> +	ret = hyp_vcpu ? __pkvm_vcpu_in_poison_fault(hyp_vcpu) : -EINVAL;
-> +	cpu_reg(host_ctxt, 1) = ret;
-> +}
-> +
->  static void handle___pkvm_force_reclaim_guest_page(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
-> @@ -641,6 +650,7 @@ static const hcall_t host_hcall[] = {
->  	HANDLE_FUNC(__pkvm_unreserve_vm),
->  	HANDLE_FUNC(__pkvm_init_vm),
->  	HANDLE_FUNC(__pkvm_init_vcpu),
-> +	HANDLE_FUNC(__pkvm_vcpu_in_poison_fault),
->  	HANDLE_FUNC(__pkvm_force_reclaim_guest_page),
->  	HANDLE_FUNC(__pkvm_reclaim_dying_guest_page),
->  	HANDLE_FUNC(__pkvm_start_teardown_vm),
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 4ff31947579b..7f705f662c40 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -890,6 +890,49 @@ static int get_valid_guest_pte(struct pkvm_hyp_vm *vm, u64 ipa, kvm_pte_t *ptep,
->  	return 0;
->  }
->  
-> +int __pkvm_vcpu_in_poison_fault(struct pkvm_hyp_vcpu *hyp_vcpu)
-> +{
-> +	struct pkvm_hyp_vm *vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-> +	kvm_pte_t pte;
-> +	s8 level;
-> +	u64 ipa;
-> +	int ret;
-> +
-> +	switch (kvm_vcpu_trap_get_class(&hyp_vcpu->vcpu)) {
-> +	case ESR_ELx_EC_DABT_LOW:
-> +	case ESR_ELx_EC_IABT_LOW:
-> +		if (kvm_vcpu_trap_is_translation_fault(&hyp_vcpu->vcpu))
-> +			break;
-> +		fallthrough;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	/*
-> +	 * The host has the faulting IPA when it calls us from the guest
-> +	 * fault handler but we retrieve it ourselves from the FAR so as
-> +	 * to avoid exposing an "oracle" that could reveal data access
-> +	 * patterns of the guest after initial donation of its pages.
-> +	 */
-> +	ipa = kvm_vcpu_get_fault_ipa(&hyp_vcpu->vcpu);
-> +	ipa |= kvm_vcpu_get_hfar(&hyp_vcpu->vcpu) & GENMASK(11, 0);
+>  :Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Type: vm ioctl
+>  :Parameters: struct kvm_memory_attributes (in)
+>  :Returns: 0 on success, <0 on error
 
-nit: we now have FAR_TO_FIPA_OFFSET() for this.
+Good spot.
 
-> +
-> +	guest_lock_component(vm);
-> +	ret = kvm_pgtable_get_leaf(&vm->pgt, ipa, &pte, &level);
-> +	if (ret)
-> +		goto unlock;
-> +
-> +	if (level != KVM_PGTABLE_LAST_LEVEL) {
-> +		ret = -EINVAL;
-> +		goto unlock;
-> +	}
-> +
-> +	ret = guest_pte_is_poisoned(pte);
-> +unlock:
-> +	guest_unlock_component(vm);
-> +	return ret;
-> +}
-> +
->  int __pkvm_host_share_hyp(u64 pfn)
->  {
->  	u64 phys = hyp_pfn_to_phys(pfn);
-> diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
-> index 32294bd21dde..da0a45dab203 100644
-> --- a/arch/arm64/kvm/pkvm.c
-> +++ b/arch/arm64/kvm/pkvm.c
-> @@ -417,10 +417,13 @@ int pkvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  			return -EINVAL;
->  
->  		/*
-> -		 * We raced with another vCPU.
-> +		 * We either raced with another vCPU or the guest PTE
-> +		 * has been poisoned by an erroneous host access.
->  		 */
-> -		if (mapping)
-> -			return -EAGAIN;
-> +		if (mapping) {
-> +			ret = kvm_call_hyp_nvhe(__pkvm_vcpu_in_poison_fault);
-> +			return ret ? -EFAULT : -EAGAIN;
-> +		}
+Thanks,
+Steve
 
-I guess this considers that racing against another vcpu is an unlikely
-situation, because calling back into EL2 and walking the PTs isn't
-exactly cheap.
+> 
+> Thanks,
+> Wei-Lin Chang
+> 
+>>  	help
+>>  	  Support hosting virtualized guest machines.
+>>  
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index b705ad6c6c8b..bad93938acdb 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -2494,6 +2494,30 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>>  	return ret;
+>>  }
+>>  
+>> +#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+>> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+>> +					struct kvm_gfn_range *range)
+>> +{
+>> +	WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
+>> +	return false;
+>> +}
+>> +
+>> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+>> +					 struct kvm_gfn_range *range)
+>> +{
+>> +	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+>> +		return false;
+>> +
+>> +	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
+>> +		range->attr_filter = KVM_FILTER_SHARED;
+>> +	else
+>> +		range->attr_filter = KVM_FILTER_PRIVATE;
+>> +	kvm_unmap_gfn_range(kvm, range);
+>> +
+>> +	return false;
+>> +}
+>> +#endif
+>> +
+>>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>>  {
+>>  }
+>> -- 
+>> 2.43.0
+>>
 
-I wonder if there is a mechanism we could use to directly return this
-information to the host at the point of the guest fault. The only
-things I can figure out would require the PTE to be valid (access or
-permission faults, for example), and that'd break the "full PTE
-dedicated to annotations"...
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
