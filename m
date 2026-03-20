@@ -1,108 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF4B536EAA8;
-	Fri, 20 Mar 2026 21:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D093CEB99
+	for <kvmarm@lists.linux.dev>; Fri, 20 Mar 2026 21:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774042181; cv=none; b=Ttajjw3Sy6sTwpzoHypnE1ZMB6A1NNua46+OeqdIJQJrRYiexm9GV2i49GchReG+E51HKepDsCTyzJz5gIGr5zUsVi8CoWYvP7w3HOW98AB8KQWoc8Za6RLqa6d8fK80918aRzk0EuGvls6nzMTtwrS8IJbt+817Cm8VEZCyLAY=
+	t=1774042525; cv=none; b=rICq0bYE2EjkRWH2ju9ZBJYSHHT9//AoN/U0AZd0FMLn1ns4N2GyQrNU1aBYfcv7ACeu/N1aX4FS3x0stg6g+jF3Ywit0Bsn/vvIHhhgroclkqoan6GjaLETpQ6Z5om6vgDhU3p+cWCbOhYwZmIoCCZBbmsqQgJBAo5Bhx1lHYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774042181; c=relaxed/simple;
-	bh=XOXr5QvcaVf4iLyQhdg9jMkDSOx+EETplOSbicfRIaI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=FYYN1HHpfydGru/Ev1vlwyBOFiqAvREmQ2ae7kbkSZ3x0+5WgUdFqLJrOeWCSUxDJj1ZiK03bzw6KX70HAm+RcYQl0aMik/Hy8qbOGg3XfDJPlimAFDbJ5Tbxar3zEggynj6MEzFyzwJAJ9NBuZ1eJxDt04nXbSAYN3df8VO5Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vtt3VWXt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774042525; c=relaxed/simple;
+	bh=7189zS5dpJfB8Los9vO7b+qB+0wrKw/q6U2uwYpZZI8=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ExGbilDzYJWrvOq7nSkKLnJcNdCX/vXHiqArsR/H80/7xLPh2kDrYvzxIke5WirddyfANUo3NNm0rygBNmsM9TgXhl8x2KHXspmPJXA7bBp9+ekEYAXDX2n/XXLZQIchV7vyTy43asqY2w+sIvNIRGnwnS7p0n8QepddsDmqvq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Nl9eK5mA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=smb87YM6; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vtt3VWXt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35337C4CEF7;
-	Fri, 20 Mar 2026 21:29:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774042181;
-	bh=XOXr5QvcaVf4iLyQhdg9jMkDSOx+EETplOSbicfRIaI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Vtt3VWXtC13b2cGnkkGQ+YNOXvkLuK0B/8v/hZpKxxwkaNKrXlDujWtmfYAPBAo2f
-	 oB6MhVBmVwAujXWs/BfNJSiqghOelEXe9EjU7sPceTKutrFh9Qq9H0J4/nN6WqackL
-	 NU+zqreCKM8Uiwp77gUmBXDjWDWFFcH5N42qJortgGiJvCFcsWGQy96jqr3PrhqELS
-	 A2UfdQgbHx4h7E8+2Q176v5O2ywH2U7/ldmH+kE7/jZwy4YcVz65oUxURkZnZ5Mc3e
-	 aNhUko8LIEJgiL/tEN0pOMChSYT/LaiFJMB164WVsGGFPRKLHIGVe3alTGrP3Eh2z3
-	 iWVqkKOt7aarQ==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Fri, 20 Mar 2026 14:29:33 -0700
-Subject: [PATCH] tracing: Adjust cmd_check_undefined to show unexpected
- undefined symbols
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Nl9eK5mA";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="smb87YM6"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 8DB5D7A01E7;
+	Fri, 20 Mar 2026 17:35:17 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-04.internal (MEProxy); Fri, 20 Mar 2026 17:35:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1774042517;
+	 x=1774128917; bh=2SsK19OUByypsE17X7dt/87hHDWrIntrNYCgrJUL+X4=; b=
+	Nl9eK5mAVijz2vJZb0sCU97H81dYg5DEnuvKtTjSzOMbdhLYI+Wvv67ahZDgYf1D
+	529izzKKE7pVl3zZaJXrUVO0ouYJ/oFYOnUZ2UN7x2VS+IOSwgFLZhY4m/W+SsLG
+	mYkhEL3OnbZCRXYd4j2GaVt6NwKr7yovVCrL27xC0x7TxIDxvyqguoB5kJn1JuHo
+	LycZb5BLre8u+vqmv9vfHDraBK2ONv/7LWXM6wD2NlZ8r5X/ZL0nKpu/fwRlXCxj
+	FE5os2jWJGFqLLRUwd3D0LSj2ToH7UaBOmZE9xWD4dIpAeJK7WVFqRf/6liXaeSX
+	HJWz2YlAkEw9eOgWIMxEYQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774042517; x=
+	1774128917; bh=2SsK19OUByypsE17X7dt/87hHDWrIntrNYCgrJUL+X4=; b=s
+	mb87YM6fyI10a3Y7yBYcYfwwQDBNmtQ+BYbtj/J3Ld8QutjRZ2C1/UPWHegbvpTS
+	cCzs+CTi3jrvEBBAvjgEIubnOXQFh99MkjQQvafxT9mL6/jVsflGw9UOAjzlfcms
+	jwP6NajADbfh6fp6I3eCWnmCkB6Y1/mh+G8rHzQyezMZvDlLvU2oOg/ae5iZTIc1
+	bzIW/EBzgzIJoBgFryy1+RoU9jgXudP/rennEIsiHjgvgdVwUd/Fb6n8BuBt0Hch
+	m4rlxLk8Opc9B+mW97k3nf9OFihqieL3asJNSqREUemZe1e9y5xITDdQTRWJYnpL
+	CyXB3lMBYy2leQs3wX7bQ==
+X-ME-Sender: <xms:lb29aZ6bVFeQzttGaWekGac12x8tig8SAPy3fZmQoBDPROCn81kwAg>
+    <xme:lb29aRsKDYjQ_9d4i4571ALZr2r1kpGZ2bG3apQsr4pdFjIeh93lbCdBcCSFeCqNV
+    _RgShKjl1419oOSRoBBe8bcnR1UHZenXzMsY8cBVE2xOE-3FiFzOjih>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefuddutddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
+    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
+    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhht
+    pdhrtghpthhtohepmhgrthhhihgvuhdruggvshhnohihvghrshesvghffhhitghiohhsrd
+    gtohhmpdhrtghpthhtoheprhhoshhtvgguthesghhoohgumhhishdrohhrghdprhgtphht
+    thhopehvughonhhnvghfohhrthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepmhgrii
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhhihhrrghmrghtsehkvghrnhgvlhdr
+    ohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epkhhvmhgrrhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinhhu
+    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:lb29aWY0KYp0-A02zSee3c-DQZ0MYoaWwM65kp2W8LA0GdegaJCMcA>
+    <xmx:lb29aV_achL0Av7ZVkWGk7fgl46q-7oMi_78RHaqp_rR_kEfQ8Q_Ow>
+    <xmx:lb29aVaNUjBD8tX32gsa-WLmuLRJWo5Lo6JeHY_ANwJmo7yGgVDaKQ>
+    <xmx:lb29afdy3s0q_BS2lLQIbW4rmZHUtdvMmTuE28OthRftmWPppThr2A>
+    <xmx:lb29aeIZiB01jBxYahkEcpHKo1goXiwW_C7qTVv0IRJUVuJSvpaQyXY8>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id F00BB700069; Fri, 20 Mar 2026 17:35:16 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-ThreadId: AdhqlxVOGV4g
+Date: Fri, 20 Mar 2026 22:34:55 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Nathan Chancellor" <nathan@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
+ "Vincent Donnefort" <vdonnefort@google.com>
+Cc: "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Message-Id: <ebce4cd9-4101-4f6d-bbb7-e03991e5644c@app.fastmail.com>
+In-Reply-To: 
+ <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
+References: 
+ <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
+Subject: Re: [PATCH] tracing: Adjust cmd_check_undefined to show unexpected undefined
+ symbols
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXM4QqCMBSG4VuR87vBNtGgW4mQPOdbnqIZm0og3
- ntLfz7w8q6UkRSZLtVKCYtmHWOBO1XEwz0+YFSKyVvf2tpbw2/peAC/ujkKgkaIWZD6McOcxTX
- B1aF1jVA5fFIJvvv9ejuc5/4Jnv5L2rYfmioA+38AAAA=
-X-Change-ID: 20260320-cmd_check_undefined-verbose-7d15f13f615d
-To: Marc Zyngier <maz@kernel.org>, 
- Vincent Donnefort <vdonnefort@google.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1884; i=nathan@kernel.org;
- h=from:subject:message-id; bh=XOXr5QvcaVf4iLyQhdg9jMkDSOx+EETplOSbicfRIaI=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDJl79zjl3rN6+zfBad+X6Kk5V2Uy6l7Ghh7+8fIu2/W9j
- vHuPnGzO0pZGMS4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEKhgY/gcoxWVEWP5IerB9
- c8ThbVea3nzhFIuuesT/ZFeuftgnVmFGhrdvfs+7cKN5G/uR+lTnkiy5SBev4P8XGM6w/7/P8lf
- djhkA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-When the check_undefined command in kernel/trace/Makefile fails, there
-is no output, making it hard to understand why the build failed. Capture
-the output of the $(NM) + grep command and print it when failing to make
-it clearer what the problem is.
+On Fri, Mar 20, 2026, at 22:29, Nathan Chancellor wrote:
+> When the check_undefined command in kernel/trace/Makefile fails, there
+> is no output, making it hard to understand why the build failed. Capture
+> the output of the $(NM) + grep command and print it when failing to make
+> it clearer what the problem is.
+>
+> Fixes: a717943d8ecc ("tracing: Check for undefined symbols in 
+> simple_ring_buffer")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-Fixes: a717943d8ecc ("tracing: Check for undefined symbols in simple_ring_buffer")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-Commit a717943d8ecc ("tracing: Check for undefined symbols in
-simple_ring_buffer") and its follow up fixes are in the kvmarm tree so
-this should go there as well. This is the rebased version of my
-suggestion in the original thread:
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-https://lore.kernel.org/20260311221816.GA316631@ax162/
----
- kernel/trace/Makefile | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+This does seem very helpful, as I still expect this to come up regularly.
 
-diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
-index c5e14ffd36ee..d662c1a64cd5 100644
---- a/kernel/trace/Makefile
-+++ b/kernel/trace/Makefile
-@@ -174,7 +174,13 @@ UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sancov __sanitize
- 		      $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
- 
- quiet_cmd_check_undefined = NM      $<
--      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(addprefix -e , $(UNDEFINED_ALLOWLIST))`"
-+      cmd_check_undefined = \
-+          undefsyms=$$($(NM) -u $< | grep -v $(addprefix -e , $(UNDEFINED_ALLOWLIST)) || true); \
-+          if [ -n "$$undefsyms" ]; then \
-+              echo "Unexpected symbols in $<:" >&2; \
-+              echo "$$undefsyms" >&2; \
-+              false; \
-+          fi
- 
- $(obj)/%.o.checked: $(obj)/%.o $(obj)/undefsyms_base.o FORCE
- 	$(call if_changed,check_undefined)
-
----
-base-commit: e3d585ed3ff891a00c2284fef4be9cf8581735ab
-change-id: 20260320-cmd_check_undefined-verbose-7d15f13f615d
-
-Best regards,
---  
-Nathan Chancellor <nathan@kernel.org>
-
+      Arnd
