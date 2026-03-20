@@ -1,25 +1,25 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECB93DEFE7;
-	Fri, 20 Mar 2026 16:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDE5A3E0222;
+	Fri, 20 Mar 2026 16:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774025152; cv=none; b=cIYjlHkCziHvQMGXx60Gpn2ZEPiNesR+KZiXdn7jLxxP/Ius4vjkXNXE+4I/tacblXLQAq+kM5LVgf0xyZjXWj+f93feG7T8v1Do6WqDHQ6gwmOKdeFLmbu1FBPdYkG0GhrVX6QyoB5QYJHl8I1iQSH/FAHG58XK6x9cb/ey6uU=
+	t=1774025157; cv=none; b=Aa9ryzWD6AONR6bIebyy4Z3p7krarXpnnVXdbweB8vGi4UPv5JDz89LkEyqwvBLoSI8os2L2J/eXCi6TCU8P+3yHnMHihUBgkW5gU5VRgIaDIyJlbXf9UrDoRg4bUVThni6nVO3Gc4tKvA0rEcvJa5PbRPDLs5ptTp9SxnybX+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774025152; c=relaxed/simple;
-	bh=wSTJyq7SJedh76KDbDAq/uCbLAx5ABhYEcwjfiSoOyI=;
+	s=arc-20240116; t=1774025157; c=relaxed/simple;
+	bh=zr8nJtXHS0iDlj76Vfpz3ThJRI5Z/BmongwILGENzv4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NqF8K6zGdmfvqOXrSz/AuWdqdsIc3a7MLNdFuaBwWleMsAmM9A9dv6gEZPzhAWngJArhirmYe6M0i+ntYyllX5HPqQ8uhjs5jOWqbzyi0sUMkDV1zq5WOCOzyUlXVIE0XonDhM8ASv/J5GJvXMIdyRAIbgWO8XoFqWdFTKG3q+c=
+	 In-Reply-To:Content-Type; b=B1XCCi/PULcCYz11v/eaQr8WZaFAQXtILmqDVAouiA4CBYpgLfcIJRVHl676bkBcUG91kQd8vTxNpkkipLmhK70WQzNFDdUf84/ydDaw42ewkP66Sr3SBSUiztYW9Y+k/r2ZksIbo8he3ZCsaID/YpxeOwbn8TeP66Me2o5uNVI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD5A6165C;
-	Fri, 20 Mar 2026 09:45:43 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 364681682;
+	Fri, 20 Mar 2026 09:45:48 -0700 (PDT)
 Received: from [10.1.29.20] (e122027.cambridge.arm.com [10.1.29.20])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B9053F7BD;
-	Fri, 20 Mar 2026 09:45:44 -0700 (PDT)
-Message-ID: <362fada6-2b5d-4360-9f5e-7ffadeb66d47@arm.com>
-Date: Fri, 20 Mar 2026 16:45:42 +0000
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C48C3F7BD;
+	Fri, 20 Mar 2026 09:45:49 -0700 (PDT)
+Message-ID: <37bc1222-6fc7-48f0-94d3-6eaac420aa55@arm.com>
+Date: Fri, 20 Mar 2026 16:45:49 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -27,10 +27,9 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 45/48] arm64: RMI: Provide accurate register list
-To: Wei-Lin Chang <weilin.chang@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+To: Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
  Oliver Upton <oliver.upton@linux.dev>,
@@ -46,172 +45,220 @@ Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-46-steven.price@arm.com>
- <iiyaphsgpo2f3wrrywggsten6c6lb4gxhiztah6jurtt25xepf@gpzdhw77oa4a>
+ <abyAbPIkDn2bGZwd@p14s>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <iiyaphsgpo2f3wrrywggsten6c6lb4gxhiztah6jurtt25xepf@gpzdhw77oa4a>
+In-Reply-To: <abyAbPIkDn2bGZwd@p14s>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 19/03/2026 18:53, Wei-Lin Chang wrote:
-> On Wed, Mar 18, 2026 at 03:54:09PM +0000, Steven Price wrote:
->> From: Jean-Philippe Brucker <jean-philippe@linaro.org>
->>
->> Userspace can set a few registers with KVM_SET_ONE_REG (9 GP registers
->> at runtime, and 3 system registers during initialization). Update the
->> register list returned by KVM_GET_REG_LIST.
->>
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v11:
->>  * Reworked due to upstream changes.
->> Changes since v8:
->>  * Minor type changes following review.
->> Changes since v7:
->>  * Reworked on upstream changes.
->> ---
->>  arch/arm64/kvm/guest.c      |  6 ++++++
->>  arch/arm64/kvm/hypercalls.c |  4 ++--
->>  arch/arm64/kvm/sys_regs.c   | 29 +++++++++++++++++++++++------
->>  3 files changed, 31 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index 2c4db2d1a6ca..23fdb2ee8a61 100644
->> --- a/arch/arm64/kvm/guest.c
->> +++ b/arch/arm64/kvm/guest.c
->> @@ -620,6 +620,9 @@ static unsigned long num_sve_regs(const struct kvm_vcpu *vcpu)
->>  	if (!kvm_arm_vcpu_sve_finalized(vcpu))
->>  		return 1; /* KVM_REG_ARM64_SVE_VLS */
->>  
->> +	if (kvm_is_realm(vcpu->kvm))
->> +		return 1; /* KVM_REG_ARM64_SVE_VLS */
->> +
->>  	return slices * (SVE_NUM_PREGS + SVE_NUM_ZREGS + 1 /* FFR */)
->>  		+ 1; /* KVM_REG_ARM64_SVE_VLS */
->>  }
->> @@ -647,6 +650,9 @@ static int copy_sve_reg_indices(const struct kvm_vcpu *vcpu,
->>  	if (!kvm_arm_vcpu_sve_finalized(vcpu))
->>  		return num_regs;
->>  
->> +	if (kvm_is_realm(vcpu->kvm))
->> +		return num_regs;
->> +
->>  	for (i = 0; i < slices; i++) {
->>  		for (n = 0; n < SVE_NUM_ZREGS; n++) {
->>  			reg = KVM_REG_ARM64_SVE_ZREG(n, i);
->> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
->> index 58c5fe7d7572..70ac7971416c 100644
->> --- a/arch/arm64/kvm/hypercalls.c
->> +++ b/arch/arm64/kvm/hypercalls.c
->> @@ -414,14 +414,14 @@ void kvm_arm_teardown_hypercalls(struct kvm *kvm)
->>  
->>  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
->>  {
->> -	return ARRAY_SIZE(kvm_arm_fw_reg_ids);
->> +	return kvm_is_realm(vcpu->kvm) ? 0 : ARRAY_SIZE(kvm_arm_fw_reg_ids);
->>  }
->>  
->>  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>  {
->>  	int i;
->>  
->> -	for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
->> +	for (i = 0; i < kvm_arm_get_fw_num_regs(vcpu); i++) {
->>  		if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
->>  			return -EFAULT;
->>  	}
->> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->> index ebb428b861f5..088d900b9c3a 100644
->> --- a/arch/arm64/kvm/sys_regs.c
->> +++ b/arch/arm64/kvm/sys_regs.c
->> @@ -5436,18 +5436,18 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg
->>  				    sys_reg_descs, ARRAY_SIZE(sys_reg_descs));
->>  }
->>  
->> -static unsigned int num_demux_regs(void)
->> +static inline unsigned int num_demux_regs(struct kvm_vcpu *vcpu)
->>  {
->> -	return CSSELR_MAX;
->> +	return kvm_is_realm(vcpu->kvm) ? 0 : CSSELR_MAX;
->>  }
->>  
->> -static int write_demux_regids(u64 __user *uindices)
->> +static int write_demux_regids(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>  {
->>  	u64 val = KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_DEMUX;
->>  	unsigned int i;
->>  
->>  	val |= KVM_REG_ARM_DEMUX_ID_CCSIDR;
->> -	for (i = 0; i < CSSELR_MAX; i++) {
->> +	for (i = 0; i < num_demux_regs(vcpu); i++) {
->>  		if (put_user(val | i, uindices))
->>  			return -EFAULT;
->>  		uindices++;
->> @@ -5491,11 +5491,28 @@ static bool copy_reg_to_user(const struct sys_reg_desc *reg, u64 __user **uind)
->>  	return true;
->>  }
->>  
->> +static inline bool kvm_realm_sys_reg_hidden_user(const struct kvm_vcpu *vcpu,
->> +						 u64 reg)
->> +{
->> +	if (!kvm_is_realm(vcpu->kvm))
->> +		return false;
->> +
->> +	switch (reg) {
->> +	case SYS_ID_AA64DFR0_EL1:
->> +	case SYS_PMCR_EL0:
->> +		return false;
->> +	}
->> +	return true;
->> +}
->> +
->>  static int walk_one_sys_reg(const struct kvm_vcpu *vcpu,
->>  			    const struct sys_reg_desc *rd,
->>  			    u64 __user **uind,
->>  			    unsigned int *total)
->>  {
->> +	if (kvm_realm_sys_reg_hidden_user(vcpu, reg_to_encoding(rd)))
+On 19/03/2026 23:02, Mathieu Poirier wrote:
+> Good day,
 > 
-> Hi,
+> On Wed, Mar 18, 2026 at 03:53:24PM +0000, Steven Price wrote:
+>> This series adds support for running protected VMs using KVM under the
+>> Arm Confidential Compute Architecture (CCA).
+>>
+>> New major version number! This now targets RMM v2.0-bet0[1]. And unlike
+>> for Linux this represents a significant change.
+>>
+>> RMM v2.0 brings with it the ability to configure the RMM to have the
+>> same page size as the host (so no more RMM_PAGE_SIZE and dealing with
+>> granules being different from host pages). It also introduces range
+>> based APIs for many operations which should be more efficient and
+>> simplifies the code in places.
+>>
+>> The handling of the GIC has changed, so the system registers are used to
+>> pass the GIC state rather than memory. This means fewer changes to the
+>> KVM code as it looks much like a normal VM in this respect.
+>>
+>> And of course the new uAPI introduced in the previous v12 posting is
+>> retained so that also remains simplified compared to earlier postings.
+>>
+>> The RMM support for v2.0 is still early and so this series includes a
+>> few hacks to ease the integration. Of note are that there are some RMM
+>> v1.0 SMCs added to paper over areas where the RMM implementation isn't
+>> quite ready for v2.0, and "SROs" (see below) are deferred to the final
+>> patch in the series.
+>>
+>> The PMU in RMM v2.0 requires more handling on the RMM-side (and
+>> therefore simplifies the implementation on Linux), but this isn't quite
+>> ready yet. The Linux side is implemented (but untested).
+>>
+>> PSCI still requires the VMM to provide the "target" REC for operations
+>> that affect another vCPU. This is likely to change in a future version
+>> of the specification. There's also a desire to force PSCI to be handled
+>> in the VMM for realm guests - this isn't implemented yet as I'm waiting
+>> for the dust to settle on the RMM interface first.
+>>
+>> Stateful RMI Operations
+>> -----------------------
+>>
+>> The RMM v2.0 spec brings a new concept of Stateful RMI Operations (SROs)
+>> which allow the RMM to complete an operation over several SMC calls and
+>> requesting/returning memory to the host. This has the benefit of
+>> allowing interrupts to be handled in the middle of an operation (by
+>> returning to the host to handle the interrupt without completing the
+>> operation) and enables the RMM to dynamically allocate memory for
+>> internal tracking purposes. One example of this is RMI_REC_CREATE no
+>> longer needs "auxiliary granules" provided upfront but can request the
+>> memory needed during the RMI_REC_CREATE operation.
+>>
+>> There are a fairly large number of operations that are defined as SROs
+>> in the specification, but current both Linux and RMM only have support
+>> for RMI_REC_CREATE and RMI_REC_DESTROY. There a number of TODOs/FIXMEs
+>> in the code where support is missing.
+>>
+>> Given the early stage support for this, the SRO handling is all confined
+>> to the final patch. This patch can be dropped to return to a pre-SRO
+>> state (albeit a mixture of RMM v1.0 and v2.0 APIs) for testing purposes.
+>>
+>> A future posting will reorder the series to move the generic SRO support
+>> to an early patch and will implement the proper support for this in all
+>> RMI SMCs.
+>>
+>> One aspect of SROs which is not yet well captured is that in some
+>> circumstances the Linux kernel will need to call an SRO call in a
+>> context where memory allocation is restricted (e.g. because a spinlock
+>> is held). In this case the intention is that the SRO will be cancelled,
+>> the spinlock dropped so the memory allocation can be completed, and then
+>> the SRO restarted (obviously after rechecking the state that the
+>> spinlock was protecting). For this reason the code stores the memory
+>> allocations within a struct rmi_sro_state object - see the final patch
+>> for more details.
+>>
+>> This series is based on v7.0-rc1. It is also available as a git
+>> repository:
+>>
+>> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
+>>
+>> Work in progress changes for kvmtool are available from the git
+>> repository below:
+>>
+>> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v11
+>>
+>> Note that the kvmtool code has been tidied up (thanks to Suzuki) and
+>> this involves a minor change in flags. The "--restricted_mem" flag is no
+>> longer recognised (or necessary).
+>>
+>> The TF-RMM has not yet merged the RMMv2.0 support, so you will need to
+>> use the following branch:
+>>
+>> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc
 > 
-> Same as my comment for patch 39, I would suggest moving the
-> kvm_is_realm() check out of this function.
+> This RMM version is expecting a RMM EL3 interface version of at least 2.0.  Do
+> you have a TF-A to use with it?
 
-Sure, although at least this time the functions were right next to each
-other ;)
+You should be able to use the 'master' branch of the TF-A repository.
+For now you need to set RMM_V1_COMPAT=0 to enable 2.0 support.
 
 Thanks,
 Steve
 
 > Thanks,
-> Wei-Lin Chang
+> Mathieu
 > 
->> +		return 0;
->> +
->>  	/*
->>  	 * Ignore registers we trap but don't save,
->>  	 * and for which no custom user accessor is provided.
->> @@ -5533,7 +5550,7 @@ static int walk_sys_regs(struct kvm_vcpu *vcpu, u64 __user *uind)
->>  
->>  unsigned long kvm_arm_num_sys_reg_descs(struct kvm_vcpu *vcpu)
->>  {
->> -	return num_demux_regs()
->> +	return num_demux_regs(vcpu)
->>  		+ walk_sys_regs(vcpu, (u64 __user *)NULL);
->>  }
->>  
->> @@ -5546,7 +5563,7 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->>  		return err;
->>  	uindices += err;
->>  
->> -	return write_demux_regids(uindices);
->> +	return write_demux_regids(vcpu, uindices);
->>  }
->>  
->>  #define KVM_ARM_FEATURE_ID_RANGE_INDEX(r)			\
+>>
+>> [1] https://developer.arm.com/documentation/den0137/2-0bet0/
+>>
+>> Jean-Philippe Brucker (7):
+>>   arm64: RMI: Propagate number of breakpoints and watchpoints to
+>>     userspace
+>>   arm64: RMI: Set breakpoint parameters through SET_ONE_REG
+>>   arm64: RMI: Initialize PMCR.N with number counter supported by RMM
+>>   arm64: RMI: Propagate max SVE vector length from RMM
+>>   arm64: RMI: Configure max SVE vector length for a Realm
+>>   arm64: RMI: Provide register list for unfinalized RMI RECs
+>>   arm64: RMI: Provide accurate register list
+>>
+>> Joey Gouly (2):
+>>   arm64: RMI: allow userspace to inject aborts
+>>   arm64: RMI: support RSI_HOST_CALL
+>>
+>> Steven Price (36):
+>>   kvm: arm64: Avoid including linux/kvm_host.h in kvm_pgtable.h
+>>   arm64: RME: Handle Granule Protection Faults (GPFs)
+>>   arm64: RMI: Add SMC definitions for calling the RMM
+>>   arm64: RMI: Temporarily add SMCs from RMM v1.0 spec
+>>   arm64: RMI: Add wrappers for RMI calls
+>>   arm64: RMI: Check for RMI support at KVM init
+>>   arm64: RMI: Configure the RMM with the host's page size
+>>   arm64: RMI: Check for LPA2 support
+>>   arm64: RMI: Ensure that the RMM has GPT entries for memory
+>>   arm64: RMI: Define the user ABI
+>>   arm64: RMI: Basic infrastructure for creating a realm.
+>>   KVM: arm64: Allow passing machine type in KVM creation
+>>   arm64: RMI: RTT tear down
+>>   arm64: RMI: Activate realm on first VCPU run
+>>   arm64: RMI: Allocate/free RECs to match vCPUs
+>>   arm64: RMI: Support for the VGIC in realms
+>>   KVM: arm64: Support timers in realm RECs
+>>   arm64: RMI: Handle realm enter/exit
+>>   arm64: RMI: Handle RMI_EXIT_RIPAS_CHANGE
+>>   KVM: arm64: Handle realm MMIO emulation
+>>   KVM: arm64: Expose support for private memory
+>>   arm64: RMI: Allow populating initial contents
+>>   arm64: RMI: Set RIPAS of initial memslots
+>>   arm64: RMI: Create the realm descriptor
+>>   arm64: RMI: Runtime faulting of memory
+>>   KVM: arm64: Handle realm VCPU load
+>>   KVM: arm64: Validate register access for a Realm VM
+>>   KVM: arm64: Handle Realm PSCI requests
+>>   KVM: arm64: WARN on injected undef exceptions
+>>   arm64: Don't expose stolen time for realm guests
+>>   arm64: RMI: Always use 4k pages for realms
+>>   arm64: RMI: Prevent Device mappings for Realms
+>>   arm64: RMI: Enable PMU support with a realm guest
+>>   KVM: arm64: Expose KVM_ARM_VCPU_REC to user space
+>>   arm64: RMI: Enable realms to be created
+>>   [WIP] arm64: RMI: Add support for SRO
+>>
+>> Suzuki K Poulose (3):
+>>   kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+>>   kvm: arm64: Don't expose unsupported capabilities for realm guests
+>>   arm64: RMI: Allow checking SVE on VM instance
+>>
+>>  Documentation/virt/kvm/api.rst       |   86 +-
+>>  arch/arm64/include/asm/kvm_emulate.h |   31 +
+>>  arch/arm64/include/asm/kvm_host.h    |   15 +-
+>>  arch/arm64/include/asm/kvm_pgtable.h |    5 +-
+>>  arch/arm64/include/asm/kvm_pkvm.h    |    2 +-
+>>  arch/arm64/include/asm/kvm_rmi.h     |  129 ++
+>>  arch/arm64/include/asm/rmi_cmds.h    |  692 +++++++++
+>>  arch/arm64/include/asm/rmi_smc.h     |  430 ++++++
+>>  arch/arm64/include/asm/virt.h        |    1 +
+>>  arch/arm64/kernel/cpufeature.c       |    1 +
+>>  arch/arm64/kvm/Kconfig               |    2 +
+>>  arch/arm64/kvm/Makefile              |    2 +-
+>>  arch/arm64/kvm/arch_timer.c          |   28 +-
+>>  arch/arm64/kvm/arm.c                 |  178 ++-
+>>  arch/arm64/kvm/guest.c               |   95 +-
+>>  arch/arm64/kvm/hyp/pgtable.c         |    1 +
+>>  arch/arm64/kvm/hypercalls.c          |    4 +-
+>>  arch/arm64/kvm/inject_fault.c        |    5 +-
+>>  arch/arm64/kvm/mmio.c                |   16 +-
+>>  arch/arm64/kvm/mmu.c                 |  214 ++-
+>>  arch/arm64/kvm/pmu-emul.c            |    6 +
+>>  arch/arm64/kvm/psci.c                |   30 +
+>>  arch/arm64/kvm/reset.c               |   13 +-
+>>  arch/arm64/kvm/rmi-exit.c            |  207 +++
+>>  arch/arm64/kvm/rmi.c                 | 1948 ++++++++++++++++++++++++++
+>>  arch/arm64/kvm/sys_regs.c            |   53 +-
+>>  arch/arm64/kvm/vgic/vgic-init.c      |    2 +-
+>>  arch/arm64/mm/fault.c                |   28 +-
+>>  include/kvm/arm_arch_timer.h         |    2 +
+>>  include/kvm/arm_pmu.h                |    4 +
+>>  include/kvm/arm_psci.h               |    2 +
+>>  include/uapi/linux/kvm.h             |   41 +-
+>>  32 files changed, 4176 insertions(+), 97 deletions(-)
+>>  create mode 100644 arch/arm64/include/asm/kvm_rmi.h
+>>  create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+>>  create mode 100644 arch/arm64/include/asm/rmi_smc.h
+>>  create mode 100644 arch/arm64/kvm/rmi-exit.c
+>>  create mode 100644 arch/arm64/kvm/rmi.c
+>>
 >> -- 
 >> 2.43.0
+>>
 >>
 
