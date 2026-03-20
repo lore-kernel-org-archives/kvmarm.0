@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E49175A9B
-	for <kvmarm@lists.linux.dev>; Fri, 20 Mar 2026 12:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F023BA259
+	for <kvmarm@lists.linux.dev>; Fri, 20 Mar 2026 13:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774010291; cv=none; b=NQTUnS2ObniTB7brRXGT8zZ+zn/t0jOb/AeVHjMgSIDZDTg8eVdAnqEP1HWcSM626NqNLUqHOmt9x0bdikayqTlwnHop9YSq4Bk3T5fUmnrlrdWtogPzBMY2/xXg4is2zhSNYDNzcHdo2ObXd+k+ngODTUCR4Tn50smeUnN0BjI=
+	t=1774012952; cv=none; b=NSqH6uxbj362tgcTSwEnh5ycEoGqW7HEU5Z+TBcvjnbwEYDShik7b2FbCoEvUOxYt9IlXjyjRTht5YtSOfER0aEblRqlQb06GY5PKL/BNGGj3uXqzKfz44tH1G2sDc2ltVH0M1UaGR7/EiOdbJKNqaEhZvPzHdIQmx/Hb8/ZnQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774010291; c=relaxed/simple;
-	bh=XhWi8VwgsfjjRoCMiPUJUQrZvTCDyjHFM7V9NE2mOAE=;
+	s=arc-20240116; t=1774012952; c=relaxed/simple;
+	bh=BcV3og0I5CJQeCvxPF/A1gWhnvr/YTgHtENHeDqrmAY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TVDth1aaKCz7uU42Wch3xNbxCDpQf1gKT3cYKoC9X7X5AsxRy+oVXDwbo6jo0F7t2Ud+Q/Ic6MiUqxdMCZU0UFiwKCJCU08pHu0HlQvzqokIKuO5egp60eoNsRByHMNnccJcI0qNV+1HZg78ye/Oer1+lR9OlVRqX+wIlGegn9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGYp3Ykq; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=eOo+PAE1dLS2BuhXnCM09Cm7cC42uhsPHos+VG1L69PbsHFZ7j609+c6Z0N0OKvmcWr0KyMKgoSAXtRV5ww8DcNs/poVUyvNtRmFhLffBEEmZQCr50AU3qDnpR4P/ZfA9q/Y+AektU/kLsyUokDq+a/Ubrm2V2M+gtQqdnR+ggA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqqzvMIB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGYp3Ykq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F4B4C4CEF7;
-	Fri, 20 Mar 2026 12:38:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqqzvMIB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08D15C2BCAF;
+	Fri, 20 Mar 2026 13:22:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774010290;
-	bh=XhWi8VwgsfjjRoCMiPUJUQrZvTCDyjHFM7V9NE2mOAE=;
+	s=k20201202; t=1774012952;
+	bh=BcV3og0I5CJQeCvxPF/A1gWhnvr/YTgHtENHeDqrmAY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gGYp3YkqT9C4A8gq+qoKdAp5ixgpz8FkIXi+Lt8mxoCqhR3BTxO48vCsMGiwkzTFC
-	 2teTyIKIHYC8zd2ZKHSurN6WEaWED5IPGIowV+mmxlxI3VJUjKzNBe7ZFw6na0G7qX
-	 1ZtJYmQ3bcogbrVfAUmy7xI+osUMru930dMtKMcFPB2CHIHXfCaKwqxWRq9cqdcMKx
-	 Jr3nL+xzul2CgabW3ZqfG8CTPpDS6ftSrDRwGPoCZX4/ANIt+EWdGVS4WtcqpvVvAe
-	 3rOF/A0uHonQfkyUXzC2OXSxaJU1Mjdwa1QHDH/5s4Z8ja2uBVzeLWiIvBbAuiPluw
-	 T0j/sllAsF0Hg==
+	b=aqqzvMIBR67EuO+KJZzRQKjkSMJDrKADavZhu1382snD9UMxRz/UKBWw6Q5vDawUJ
+	 tKhQleY0V1ptRCu8o03/3m4kI4D2lWCIkRfPZs3azyiJds1ysbd2ml8O1a9rCG5lF3
+	 1v96W5UZz91rWvuxgYLjiiq9K/kP92U8Zb7Ytz4hmK3jdm5AvKZzWlaauCswSGLAdL
+	 U0MQDyh4lI7D8+HfHlNhacEJ6aqSIakCqr/+BplCn64iF0qKjXsjM0uZthjI6URBii
+	 /INN9FZVO+oTNLzip5O8PyzJ8bAM1s0UglbWRqb6PViPRdsUREhcGxANQ79L+NPooi
+	 W669C4JqUnbJg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w3Z7A-000000040pr-1FCf;
-	Fri, 20 Mar 2026 12:38:08 +0000
-Date: Fri, 20 Mar 2026 12:38:07 +0000
-Message-ID: <867br665hs.wl-maz@kernel.org>
+	id 1w3Zo5-000000041g9-3lAx;
+	Fri, 20 Mar 2026 13:22:30 +0000
+Date: Fri, 20 Mar 2026 13:22:29 +0000
+Message-ID: <865x6q63fu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev,
@@ -48,10 +48,10 @@ Cc: kvmarm@lists.linux.dev,
 	Vincent Donnefort <vdonnefort@google.com>,
 	Mostafa Saleh <smostafa@google.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 11/36] KVM: arm64: Introduce __pkvm_host_donate_guest()
-In-Reply-To: <20260305144351.17071-12-will@kernel.org>
+Subject: Re: [PATCH v3 30/36] KVM: arm64: Allow userspace to create protected VMs when pKVM is enabled
+In-Reply-To: <20260305144351.17071-31-will@kernel.org>
 References: <20260305144351.17071-1-will@kernel.org>
-	<20260305144351.17071-12-will@kernel.org>
+	<20260305144351.17071-31-will@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,63 +67,67 @@ X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lis
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 05 Mar 2026 14:43:24 +0000,
+On Thu, 05 Mar 2026 14:43:43 +0000,
 Will Deacon <will@kernel.org> wrote:
 > 
-> In preparation for supporting protected VMs, whose memory pages are
-> isolated from the host, introduce a new pKVM hypercall to allow the
-> donation of pages to a guest.
+> Introduce a new VM type for KVM/arm64 to allow userspace to request the
+> creation of a "protected VM" when the host has booted with pKVM enabled.
+> 
+> For now, this depends on CONFIG_EXPERT and results in a taint on first
+> use as many aspects of a protected VM are not yet protected!
 > 
 > Signed-off-by: Will Deacon <will@kernel.org>
 > ---
->  arch/arm64/include/asm/kvm_asm.h              |  1 +
->  arch/arm64/include/asm/kvm_pgtable.h          |  2 +-
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 ++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 21 +++++++++++++
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 30 +++++++++++++++++++
->  5 files changed, 55 insertions(+), 1 deletion(-)
+>  arch/arm64/include/asm/kvm_pkvm.h |  2 +-
+>  arch/arm64/kvm/Kconfig            | 10 ++++++++++
+>  arch/arm64/kvm/arm.c              |  8 +++++++-
+>  arch/arm64/kvm/mmu.c              |  3 ---
+>  arch/arm64/kvm/pkvm.c             | 11 ++++++++++-
+>  include/uapi/linux/kvm.h          |  5 +++++
+>  6 files changed, 33 insertions(+), 6 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index df6b661701b6..dfc6625c8269 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
->  	/* Hypercalls that are available only when pKVM has finalised. */
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
-> +	__KVM_HOST_SMCCC_FUNC___pkvm_host_donate_guest,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
->  	__KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index c201168f2857..b6f7595c4979 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -100,7 +100,7 @@ typedef u64 kvm_pte_t;
->  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+> diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
+> index 7041e398fb4c..2954b311128c 100644
+> --- a/arch/arm64/include/asm/kvm_pkvm.h
+> +++ b/arch/arm64/include/asm/kvm_pkvm.h
+> @@ -17,7 +17,7 @@
 >  
->  #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
-> -#define KVM_MAX_OWNER_ID		1
-> +#define KVM_MAX_OWNER_ID		3
+>  #define HYP_MEMBLOCK_REGIONS 128
 >  
->  /*
->   * Used to indicate a pte for which a 'break-before-make' sequence is in
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index 5f9d56754e39..9c0cc53d1dc9 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -28,6 +28,7 @@ enum pkvm_component_id {
->  	PKVM_ID_HOST,
->  	PKVM_ID_HYP,
->  	PKVM_ID_FFA,
-> +	PKVM_ID_GUEST,
+> -int pkvm_init_host_vm(struct kvm *kvm);
+> +int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
+>  int pkvm_create_hyp_vm(struct kvm *kvm);
+>  bool pkvm_hyp_vm_is_created(struct kvm *kvm);
+>  void pkvm_destroy_hyp_vm(struct kvm *kvm);
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 7d1f22fd490b..e71f7fb6e89a 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -82,4 +82,14 @@ config PTDUMP_STAGE2_DEBUGFS
+>  
+>  	  If in doubt, say N.
+>  
+> +config PROTECTED_VM_UAPI
+> +	bool "Expose protected VMs to userspace (experimental)"
+> +	depends on KVM && EXPERT
+> +	help
+> +	  Say Y here to enable experimental (i.e. in development)
+> +	  support for creating protected virtual machines using KVM's
+> +	  KVM_CREATE_VM ioctl() when booted with pKVM enabled.
+> +
+> +	  Unless you are a KVM developer, say N.
+> +
 
-Is KVM_MAX_OWNER_ID being set to 3 related to PKVM_ID_GUEST being
-introduced? If so, wouldn't it be better to define one in terms of the
-other?
+Let me once more express my lack of appetite for config options.
+Protected more is already gated by a command-line option, and requires
+active buy-in from the user.
 
-Also, this includes PKVM_ID_FFA as a valid ID, while it wasn't
-included until now. Is that expected?
+Nested support is in the same "not quite finished" state, and yet
+isn't hidden behind a configuration symbol.
+
+Taint the kernel if you want, but I'd rather we don't add extra config
+options for this. Documenting the "experimental" aspect of upstream
+pKVM should be enough.
 
 Thanks,
 
