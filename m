@@ -1,58 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F397F2E63C
-	for <kvmarm@lists.linux.dev>; Sat, 21 Mar 2026 09:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D2A29B8D3
+	for <kvmarm@lists.linux.dev>; Sat, 21 Mar 2026 09:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774085957; cv=none; b=MRH90QNLPPPvT0DKwj7n+xt4/2stFlgtINTQX9gSY5cdAs8Qg6R7mMeHlQLZcHBO4PNeQHDTjkKiC72YWUAAh1skDj5/wLbxtsC4AVdmeyQ+p8C+Mig3if8hF0Q+rpsyc/JGGB4fObbNOWajLhACV61Rt8sICVnWkYMVeJ34PSk=
+	t=1774086644; cv=none; b=MuzcFYTLKGkS1pMlRgQZEXP3J3T+ctMUJaznlz+HpPytMV8JE6DZEqricS5Boo21Y96Wn9I+rM2A2esceUb6DTtHyGzvpUwwlOAhWs4cJirSOGBkl3jbR2f+id3N3x+xfwSHRfA6acgYq0ORxSuQ6BiuTcWRE07k6nIAdVZQASI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774085957; c=relaxed/simple;
-	bh=YleNNae8eogG4HxU4906z9SPmXMwZWM8S1qJzHGepA8=;
+	s=arc-20240116; t=1774086644; c=relaxed/simple;
+	bh=qs3TCWGvQruI/5DUYonWWgyA8ES0ViDDBusaYu/KPF0=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cVw4XWbi7Akg9JWYGSrbyUBG3aR6zFWTYYUg344mKlU39np03EaaRZrjhZkbiwXcaaHa57wACAr5TewL3KGmkhfY42AOQrlbQi+QhVAmNtZWwjtoQGVwBVBnViSMzPXNsbBN5HCOqkuT9XCU4r2rVsDmZ5EoVDtOB+T8x/8enlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQeaQ+0j; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=Uj8yq2Pd1WG2z9IjD7/4wnK48ENnwLVNFeyWl83SOKATSeWuoBmA6Rx2rzMFn+SbngENkp/F6BuwNErzuNhwfsN/Wesh6tnAF1DmvO5N1VP1WAIxxs+ljwtKPHfA07YVei1WhXGLiS0he8JwdRyaCauMRCuQPS0o7RMj2HI8mbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mk3qGu5V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQeaQ+0j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A26C19421;
-	Sat, 21 Mar 2026 09:39:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mk3qGu5V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BA18C19421;
+	Sat, 21 Mar 2026 09:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774085956;
-	bh=YleNNae8eogG4HxU4906z9SPmXMwZWM8S1qJzHGepA8=;
+	s=k20201202; t=1774086643;
+	bh=qs3TCWGvQruI/5DUYonWWgyA8ES0ViDDBusaYu/KPF0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LQeaQ+0jp33hxuGxNMh6vzDgUd2h4ZPsdKCn5JaL/YAprQkReWi0J0MHPMqssSxe9
-	 pscKJQ85gLhvKZSBqBi41l4RI36t2SoSEmluF120xAyv5coxyR07/4UrYIg/L26Uxj
-	 qJOlCDF0LZDE729AQd6xJeqeJO6MMFMFowDmvUK1TMKZCv+l5FoAONYxgQHI2/i+5P
-	 p5hoz6EUXRRwZXCZ2bgfSy1zH5pJ8JzWUoiUY38ulrBlJO38RAFNY3UEhIpfdpd22O
-	 w/8UXAF3/ABbUk/iCdgSRV2CC1WdZtuamh8jfYWl3wzBVRhwg5lY/ojftoidhVqWQk
-	 sVwkafbFuGpiw==
+	b=mk3qGu5VzNe0jJLvSMTRmS9VuJULgrEjY7K0D3bidu2+2FOeQgBLzV0iYZEyrMBId
+	 e/618FMhe2KlLY9WkPoOw2OrYUsWi5R1rTec6wRE4dZlL7iQIblOy+f07Lg8yLq0Ug
+	 3KRuK2bEH6qFfABkT/bNKl+e661byoFOegc07Jdo7YsWvsy7fyVdl+7lP8O54Y2wFV
+	 8PwMxQHBxrI/T/4gQRv1VPVgT17zxAv7jv5+yyFGcpbd0/8wFxpXtNBpdaJP4xb+b8
+	 oANOM4bzVS97uoLJiCRpkSlZCo7IXuq7FErZp6dqkD9K+aD8038F+Aj9aQp6CY/DFE
+	 AqesgyyUHjmrQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w3sna-00000004HLO-0QZd;
-	Sat, 21 Mar 2026 09:39:14 +0000
-Date: Sat, 21 Mar 2026 09:39:13 +0000
-Message-ID: <87fr5tcyim.wl-maz@kernel.org>
+	id 1w3syf-00000004HQy-0BIw;
+	Sat, 21 Mar 2026 09:50:41 +0000
+Date: Sat, 21 Mar 2026 09:50:40 +0000
+Message-ID: <87ecldcxzj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
-Cc: kvmarm@lists.linux.dev,
+To: Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <tabba@google.com>
+Cc: 	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>,
-	Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 25/36] KVM: arm64: Reclaim faulting page from pKVM in spurious fault handler
-In-Reply-To: <864ima5v6c.wl-maz@kernel.org>
-References: <20260305144351.17071-1-will@kernel.org>
-	<20260305144351.17071-26-will@kernel.org>
-	<864ima5v6c.wl-maz@kernel.org>
+	Will Deacon <will@kernel.org>,
+	Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 09/17] KVM: arm64: Move VMA-related information to kvm_s2_fault_vma_info
+In-Reply-To: <CA+EHjTwbxTHr_fzSFD38cG4ZMj6XKr3L=o+=8T13XDQF0n6Raw@mail.gmail.com>
+References: <20260316175451.1866175-1-maz@kernel.org>
+	<20260316175451.1866175-10-maz@kernel.org>
+	<20260318142215.GB3915656@e124191.cambridge.arm.com>
+	<CA+EHjTwbxTHr_fzSFD38cG4ZMj6XKr3L=o+=8T13XDQF0n6Raw@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -64,47 +60,70 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, qperret@google.com, tabba@google.com, vdonnefort@google.com, smostafa@google.com, alexandru.elisei@arm.com
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, tabba@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, qperret@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 20 Mar 2026 16:20:59 +0000,
-Marc Zyngier <maz@kernel.org> wrote:
+On Wed, 18 Mar 2026 16:14:19 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> On Thu, 05 Mar 2026 14:43:38 +0000,
-> Will Deacon <will@kernel.org> wrote:
-> > 
-> > Host kernel accesses to pages that are inaccessible at stage-2 result in
-> > the injection of a translation fault, which is fatal unless an exception
-> > table fixup is registered for the faulting PC (e.g. for user access
-> > routines). This is undesirable, since a get_user_pages() call could be
-> > used to obtain a reference to a donated page and then a subsequent
-> > access via a kernel mapping would lead to a panic().
-> > 
-> > Rework the spurious fault handler so that stage-2 faults injected back
-> > into the host result in the target page being forcefully reclaimed when
-> > no exception table fixup handler is registered.
+> Hi Joey,
 > 
-> Is there any reason why you prefer the 'inject fault' followed by
-> 'gimme that page' dance over a more direct 'unconditionally reclaim
-> the page on the back of the fault'?
+> First, thanks for the reviews and the comments on my series. You're
+> right about my changes wrongly editing "page". I wanted it to be as
+> mechanical as possible to make it easy to review, but it ended up
+> being too mechanical.
 > 
-> I can't figure out what would go wrong in the latter approach, as you
-> always have an opportunity to inject a (fatal) fault if you can't
-> safely reclaim the page.
+> <snip>
+> 
+> > > -     /* Mark the fault->page dirty only if the fault is handled successfully */
+> > > -     if (fault->writable && !ret)
+> > > -             mark_page_dirty_in_slot(kvm, s2fd->memslot, get_canonical_gfn(s2fd, fault));
+> > > +     /* Mark the page dirty only if the fault is handled successfully */
+> > > +     if (fault->writable && !ret) {
+> > > +             phys_addr_t ipa = gfn_to_gpa(get_canonical_gfn(s2fd, s2vi));
+> > > +             ipa &= ~(mapping_size - 1);
+> > > +             mark_page_dirty_in_slot(kvm, s2fd->memslot, gpa_to_gfn(ipa));
+> >
+> > I don't understand this change, why do we need to mask stuff now?
+> 
+> Let me see if _I_ understand it (Marc, please correct me if I'm wrong).
+> 
+> Before this patch, fault->gfn and fault->vma_pagesize were mutable,
+> and transparent_hugepage_adjust() modified both directly. In addition
+> to this being confusing (which gfn is this: the host /canonical or the
+> nested one?), it made it more difficult to separate the logic.
+> 
+> So, to mark a dirty page, it did this:
+> -             mark_page_dirty_in_slot(kvm, s2fd->memslot,
+> get_canonical_gfn(s2fd, fault));
+> 
+> which relied on the old struct fault to calculate the canonical gfn
+> using the (magically) THP adjusted fault->vma_pagesize.
+> 
+> Now that fault (or s2vi, its successor in this case) isn't mutable, we
+> need to get the canonical gfn using the host mapping size.
 
-To be clear, the reason I'm asking this is that with RME (whether
-that's with the dreaded CCA or something else), injecting a fault into
-the host would involve EL3, and I don't trust EL3 to do that. There is
-also the small detail that the fault syndrome is not strictly
-architectural, meaning that EL3 would have to learn a pKVM-specific
-behaviour.
+It's exactly that, and it is slightly clearer if you look at how
+mapping_size is updated:
 
-But EL3 should be able to report a GPC fault to RL-EL2, which then
-could act the exact same way as pKVM, unmapping, clearing and
-releasing the page.
+	mapping_size = transparent_hugepage_adjust(kvm, s2fd->memslot,
+						   s2fd->hva, &fault->pfn,
+						   &gfn);
 
-Thoughts?
+The faulting IPA is represented by 'gfn', and gets correctly updated
+by the helper. But that doesn't adjust the 'canonical' IPA, which is
+used for any memslot related update.
+
+So if we need to call into mark_page_dirty_in_slot(), we really need
+to pick the base of the region we are actually marking dirty, hence
+the masking of the bottom bits.
+
+Does this make sense? This is one of the area where the constification
+results in slightly more complicated code, as we can't update things
+in place anymore.
+
+Thanks,
 
 	M.
 
