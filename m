@@ -1,195 +1,89 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84CF2BDC2A
-	for <kvmarm@lists.linux.dev>; Sat, 21 Mar 2026 16:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85770282F0B;
+	Sat, 21 Mar 2026 21:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774111022; cv=none; b=goucGMom/JYPOjpJVlVHXR7G4dT2YXfv3d92kDE8Hy1lmzpYHF/XbHZ3NNZP2LADctpoS/cMbKYRb70oE2bXGgQnryNbYNLCPsLXnNQpCr0S7iW56VXoc7Y8+Oe3tBK507Xt//Z/x7AHRP/nDyYDAShLAxb+z0yQeb71SBpazKc=
+	t=1774128278; cv=none; b=JsClRNiGYhP7/CEz49eELMy+60YHmRKcf7IGA4IESfojA7C0fJ8euFjdzmhlcssP1WBh/QNh7i0NUeEwZcfqg5wHbyG+KGrAaQ0dSF+dWoA237dWqJRaywnNpzX/5VznRIZtr/Npy2hAmEmkLkyAs+3eXUhxX8qQqY7ExECm1gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774111022; c=relaxed/simple;
-	bh=smw3duiw3HLZnHVY1cSpk4wlobxyDP1aZsvgRk9KBBQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnAbLr5YFxjCjnWsTkAoNE2r29pyXj3Rl5yB4VLqGB9uPdy1mPgWDb6mqK7jPJTcqkQO/KzHiw/4h7o7XviX5AQvePjLOEKP00I7gtIZiwSdyazyU6noCNHmoA2Y8wFpB8HG9uXa6qQ3/T3vOtn/azGuuy/Uh3J9ZNUvEQDc5ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 499BA1595;
-	Sat, 21 Mar 2026 09:36:52 -0700 (PDT)
-Received: from thinkpad-e142931.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2E96A3F73B;
-	Sat, 21 Mar 2026 09:36:56 -0700 (PDT)
-Date: Sat, 21 Mar 2026 16:36:46 +0000
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Oliver Upton <oupton@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: nv: Expose shadow page tables in
- debugfs
-Message-ID: <iqpnht3m3kjpndbqvolokdgtdek7rdfv3ronc6omrmwz5oxrfc@l464rbgvnjxe>
-References: <20260317182638.1592507-1-weilin.chang@arm.com>
- <20260317182638.1592507-3-weilin.chang@arm.com>
- <86bjgj6c5s.wl-maz@kernel.org>
+	s=arc-20240116; t=1774128278; c=relaxed/simple;
+	bh=nRoaLuGwYpbMvsPMsvVjX2A8kmDi7xUzyfUclf9j2sI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lKSqysC4Uz6um2gGxAKniTjMJSMr+fIAjLd0DHJ2KW9MDlp1XH3JjHA3q50LY8pZRjOmvz4n++LAoI74qndfEiVUWQQpuvwyDMyl8fDmu08ElA3aw2jKKUhaekVO7385G63vfxekoppJhIao0S16Z1zAGugsY5iaKPx+89rZrwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxHgA9b0; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxHgA9b0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18AABC19421;
+	Sat, 21 Mar 2026 21:24:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774128278;
+	bh=nRoaLuGwYpbMvsPMsvVjX2A8kmDi7xUzyfUclf9j2sI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=kxHgA9b0ymDLPEMZUXO1eGE1UH8fHQHKuNn4TK80XUw7V13PyyCrq/exXa+enbE3O
+	 cyWBS7Gp+PmdL/f0u/4S2PMakkepZE91N0UeoUIt1rrZwRf0kkH9XiB4tHkSdQctP0
+	 E8vCHmr0GrXszj9mGI1yBPQNVFD7OjU2r7LGBi319XEO7oweZBxLgt30Y0SJSgDsCV
+	 MC94O/Dg1Mp0f9B45oyfZ4VtV0e8gksS5wBRZ1IwEPbgW/3jqj5jO0LB9rOz55aLk/
+	 4SVwrijbWuDaNWY5xJhHDozZ/yr1bs8A2B194wadkF95+0F9UbsjXPkyCV+iF/jqG+
+	 CO4TdJAQgEhkg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w43oB-00000004NPB-38Z0;
+	Sat, 21 Mar 2026 21:24:35 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Will Deacon <will@kernel.org>,
+	Mostafa Saleh <smostafa@google.com>,
+	Quentin Perret <qperret@google.com>
+Subject: [PATCH 0/5] KVM: arm64: pkvm; Rework aspects of the PSCI relay
+Date: Sat, 21 Mar 2026 21:24:14 +0000
+Message-ID: <20260321212419.2803972-1-maz@kernel.org>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86bjgj6c5s.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, tabba@google.com, will@kernel.org, smostafa@google.com, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Mar 19, 2026 at 04:01:51PM +0000, Marc Zyngier wrote:
-> On Tue, 17 Mar 2026 18:26:38 +0000,
-> Wei-Lin Chang <weilin.chang@arm.com> wrote:
-> > 
-> > Exposing shadow page tables in debugfs improves the debugability and
-> > testability of NV. With this patch a new directory "nested" is created
-> > for each VM created if the host is NV capable. Within the directory each
-> > valid s2 mmu will have its shadow page table exposed as a readable file
-> > with the file name formatted as 0x<vttbr>-0x<vtcr>-s2-{en,dis}abled. The
-> > creation and removal of the files happen at the points when an s2 mmu
-> > becomes valid, or the context it represents change. In the future the
-> > "nested" directory can also hold other NV related information.
-> > 
-> > This is gated behind CONFIG_PTDUMP_STAGE2_DEBUGFS.
-> > 
-> > Suggested-by: Marc Zyngier <maz@kernel.org>
-> > Reviewed-by: Sebastian Ene <sebastianene@google.com>
-> > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  9 +++++++++
-> >  arch/arm64/include/asm/kvm_mmu.h  |  4 ++++
-> >  arch/arm64/kvm/nested.c           |  6 +++++-
-> >  arch/arm64/kvm/ptdump.c           | 27 +++++++++++++++++++++++++++
-> >  4 files changed, 45 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 5d5a3bbdb95e..52977c9a11c3 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -217,6 +217,10 @@ struct kvm_s2_mmu {
-> >  	 */
-> >  	bool	nested_stage2_enabled;
-> >  
-> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> > +	struct dentry *shadow_pt_debugfs_dentry;
-> > +#endif
-> > +
-> >  	/*
-> >  	 * true when this MMU needs to be unmapped before being used for a new
-> >  	 * purpose.
-> > @@ -405,6 +409,11 @@ struct kvm_arch {
-> >  	 * the associated pKVM instance in the hypervisor.
-> >  	 */
-> >  	struct kvm_protected_vm pkvm;
-> > +
-> > +#ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> > +	/* Nested virtualization info */
-> > +	struct dentry *debugfs_nv_dentry;
-> > +#endif
-> >  };
-> >  
-> >  struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > index d968aca0461a..01e9c72d6aa7 100644
-> > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > @@ -393,8 +393,12 @@ static inline bool kvm_supports_cacheable_pfnmap(void)
-> >  
-> >  #ifdef CONFIG_PTDUMP_STAGE2_DEBUGFS
-> >  void kvm_s2_ptdump_create_debugfs(struct kvm *kvm);
-> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu);
-> > +void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu);
-> >  #else
-> >  static inline void kvm_s2_ptdump_create_debugfs(struct kvm *kvm) {}
-> > +static inline void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu) {}
-> > +static inline void kvm_nested_s2_ptdump_remove_debugfs(struct kvm_s2_mmu *mmu) {}
-> >  #endif /* CONFIG_PTDUMP_STAGE2_DEBUGFS */
-> >  
-> >  #endif /* __ASSEMBLER__ */
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index eeea5e692370..31d74ed8449e 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -730,8 +730,10 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-> >  	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
-> >  
-> >  	/* Make sure we don't forget to do the laundry */
-> > -	if (kvm_s2_mmu_valid(s2_mmu))
-> > +	if (kvm_s2_mmu_valid(s2_mmu)) {
-> > +		kvm_nested_s2_ptdump_remove_debugfs(s2_mmu);
-> >  		s2_mmu->pending_unmap = true;
-> > +	}
-> >  
-> >  	/*
-> >  	 * The virtual VMID (modulo CnP) will be used as a key when matching
-> > @@ -745,6 +747,8 @@ static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-> >  	s2_mmu->tlb_vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-> >  	s2_mmu->nested_stage2_enabled = vcpu_read_sys_reg(vcpu, HCR_EL2) & HCR_VM;
-> >  
-> > +	kvm_nested_s2_ptdump_create_debugfs(s2_mmu);
-> > +
-> >  out:
-> >  	atomic_inc(&s2_mmu->refcnt);
-> >  
-> > diff --git a/arch/arm64/kvm/ptdump.c b/arch/arm64/kvm/ptdump.c
-> > index 98763b291956..aebbbad85d38 100644
-> > --- a/arch/arm64/kvm/ptdump.c
-> > +++ b/arch/arm64/kvm/ptdump.c
-> > @@ -10,12 +10,14 @@
-> >  #include <linux/kvm_host.h>
-> >  #include <linux/seq_file.h>
-> >  
-> > +#include <asm/cpufeature.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/kvm_pgtable.h>
-> >  #include <asm/ptdump.h>
-> >  
-> >  #define MARKERS_LEN		2
-> >  #define KVM_PGTABLE_MAX_LEVELS	(KVM_PGTABLE_LAST_LEVEL + 1)
-> > +#define S2FNAMESZ	sizeof("0x0123456789abcdef-0x0123456789abcdef-s2-disabled")
-> >  
-> >  struct kvm_ptdump_guest_state {
-> >  	struct kvm_s2_mmu	*mmu;
-> > @@ -277,6 +279,28 @@ static const struct file_operations kvm_pgtable_levels_fops = {
-> >  	.release	= kvm_pgtable_debugfs_close,
-> >  };
-> >  
-> > +void kvm_nested_s2_ptdump_create_debugfs(struct kvm_s2_mmu *mmu)
-> > +{
-> > +	struct dentry *dent;
-> > +	char file_name[S2FNAMESZ];
-> > +
-> > +	snprintf(file_name, sizeof(file_name), "0x%llx-0x%llx-s2-%sabled",
-> > +		 mmu->tlb_vttbr,
-> > +		 mmu->tlb_vtcr,
-> > +		 mmu->nested_stage2_enabled ? "en" : "dis");
-> 
-> Here's an example of this code in action:
-> 
-> root@semi-fraudulent:/home/maz/vminstall# ls -l /sys/kernel/debug/kvm/932-4/nested/
-> total 0
-> -r-------- 1 root root 0 Mar 19 11:58 0x0-0x80000000-s2-disabled
-> -r-------- 1 root root 0 Mar 19 12:01 0x100010124c000-0x800c3558-s2-enabled
-> -r-------- 1 root root 0 Mar 19 15:06 0x200010d916000-0x800c3558-s2-enabled
-> -r-------- 1 root root 0 Mar 19 15:16 0x30001027ec000-0x800c3558-s2-enabled
-> 
-> I think these hex values should always be padded with leading zeroes,
-> making them more readable.
-> 
-> I can hack that in as I queue the patches.
+Having recently spent some quality time debugging [1], I ended up
+reading too much of the PSCI relay code and felt that it could do with
+a bit of spring cleaning.
 
-Ack, thank you so much!
+To be clear, this series doesn't really fix anything. It simply adjust
+things to my own taste, which may or may not be everyone's.
 
-Thanks,
-Wei-Lin Chang
+Comments appreciated,
 
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+Marc Zyngier (5):
+  KVM: arm64: pkvm: Move error handling to the end of kvm_hyp_cpu_entry
+  KVM: arm64: pkvm: Simplify BTI handling on CPU boot
+  KVM: arm64: pkvm: Turn __kvm_hyp_init_cpu into an inner label
+  KVM: arm64: pkvm: Use direct function pointers for cpu_{on,resume}
+  KVM: arm64: Remove extra ISBs when using msr_hcr_el2
+
+ arch/arm64/include/asm/el2_setup.h   |  2 --
+ arch/arm64/include/asm/kvm_asm.h     |  3 +-
+ arch/arm64/include/asm/sysreg.h      |  6 ++--
+ arch/arm64/kernel/hyp-stub.S         |  1 -
+ arch/arm64/kvm/hyp/nvhe/host.S       | 11 --------
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S   | 41 ++++++++++------------------
+ arch/arm64/kvm/hyp/nvhe/psci-relay.c | 39 ++++++++++++++++----------
+ 7 files changed, 43 insertions(+), 60 deletions(-)
+
+-- 
+2.47.3
+
