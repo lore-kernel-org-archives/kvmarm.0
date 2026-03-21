@@ -1,117 +1,112 @@
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D093CEB99
-	for <kvmarm@lists.linux.dev>; Fri, 20 Mar 2026 21:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F397F2E63C
+	for <kvmarm@lists.linux.dev>; Sat, 21 Mar 2026 09:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774042525; cv=none; b=rICq0bYE2EjkRWH2ju9ZBJYSHHT9//AoN/U0AZd0FMLn1ns4N2GyQrNU1aBYfcv7ACeu/N1aX4FS3x0stg6g+jF3Ywit0Bsn/vvIHhhgroclkqoan6GjaLETpQ6Z5om6vgDhU3p+cWCbOhYwZmIoCCZBbmsqQgJBAo5Bhx1lHYI=
+	t=1774085957; cv=none; b=MRH90QNLPPPvT0DKwj7n+xt4/2stFlgtINTQX9gSY5cdAs8Qg6R7mMeHlQLZcHBO4PNeQHDTjkKiC72YWUAAh1skDj5/wLbxtsC4AVdmeyQ+p8C+Mig3if8hF0Q+rpsyc/JGGB4fObbNOWajLhACV61Rt8sICVnWkYMVeJ34PSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774042525; c=relaxed/simple;
-	bh=7189zS5dpJfB8Los9vO7b+qB+0wrKw/q6U2uwYpZZI8=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=ExGbilDzYJWrvOq7nSkKLnJcNdCX/vXHiqArsR/H80/7xLPh2kDrYvzxIke5WirddyfANUo3NNm0rygBNmsM9TgXhl8x2KHXspmPJXA7bBp9+ekEYAXDX2n/XXLZQIchV7vyTy43asqY2w+sIvNIRGnwnS7p0n8QepddsDmqvq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Nl9eK5mA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=smb87YM6; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1774085957; c=relaxed/simple;
+	bh=YleNNae8eogG4HxU4906z9SPmXMwZWM8S1qJzHGepA8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cVw4XWbi7Akg9JWYGSrbyUBG3aR6zFWTYYUg344mKlU39np03EaaRZrjhZkbiwXcaaHa57wACAr5TewL3KGmkhfY42AOQrlbQi+QhVAmNtZWwjtoQGVwBVBnViSMzPXNsbBN5HCOqkuT9XCU4r2rVsDmZ5EoVDtOB+T8x/8enlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQeaQ+0j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Nl9eK5mA";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="smb87YM6"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 8DB5D7A01E7;
-	Fri, 20 Mar 2026 17:35:17 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Fri, 20 Mar 2026 17:35:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1774042517;
-	 x=1774128917; bh=2SsK19OUByypsE17X7dt/87hHDWrIntrNYCgrJUL+X4=; b=
-	Nl9eK5mAVijz2vJZb0sCU97H81dYg5DEnuvKtTjSzOMbdhLYI+Wvv67ahZDgYf1D
-	529izzKKE7pVl3zZaJXrUVO0ouYJ/oFYOnUZ2UN7x2VS+IOSwgFLZhY4m/W+SsLG
-	mYkhEL3OnbZCRXYd4j2GaVt6NwKr7yovVCrL27xC0x7TxIDxvyqguoB5kJn1JuHo
-	LycZb5BLre8u+vqmv9vfHDraBK2ONv/7LWXM6wD2NlZ8r5X/ZL0nKpu/fwRlXCxj
-	FE5os2jWJGFqLLRUwd3D0LSj2ToH7UaBOmZE9xWD4dIpAeJK7WVFqRf/6liXaeSX
-	HJWz2YlAkEw9eOgWIMxEYQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1774042517; x=
-	1774128917; bh=2SsK19OUByypsE17X7dt/87hHDWrIntrNYCgrJUL+X4=; b=s
-	mb87YM6fyI10a3Y7yBYcYfwwQDBNmtQ+BYbtj/J3Ld8QutjRZ2C1/UPWHegbvpTS
-	cCzs+CTi3jrvEBBAvjgEIubnOXQFh99MkjQQvafxT9mL6/jVsflGw9UOAjzlfcms
-	jwP6NajADbfh6fp6I3eCWnmCkB6Y1/mh+G8rHzQyezMZvDlLvU2oOg/ae5iZTIc1
-	bzIW/EBzgzIJoBgFryy1+RoU9jgXudP/rennEIsiHjgvgdVwUd/Fb6n8BuBt0Hch
-	m4rlxLk8Opc9B+mW97k3nf9OFihqieL3asJNSqREUemZe1e9y5xITDdQTRWJYnpL
-	CyXB3lMBYy2leQs3wX7bQ==
-X-ME-Sender: <xms:lb29aZ6bVFeQzttGaWekGac12x8tig8SAPy3fZmQoBDPROCn81kwAg>
-    <xme:lb29aRsKDYjQ_9d4i4571ALZr2r1kpGZ2bG3apQsr4pdFjIeh93lbCdBcCSFeCqNV
-    _RgShKjl1419oOSRoBBe8bcnR1UHZenXzMsY8cBVE2xOE-3FiFzOjih>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefuddutddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrnhgu
-    uceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrthhtvg
-    hrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefggfevudegudevledvkefhvdei
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnh
-    gusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepmhgrthhhihgvuhdruggvshhnohihvghrshesvghffhhitghiohhsrd
-    gtohhmpdhrtghpthhtoheprhhoshhtvgguthesghhoohgumhhishdrohhrghdprhgtphht
-    thhopehvughonhhnvghfohhrthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepmhgrii
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhhihhrrghmrghtsehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehnrghthhgrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epkhhvmhgrrhhmsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtoheplhhinhhu
-    gidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
-    hugidqthhrrggtvgdqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:lb29aWY0KYp0-A02zSee3c-DQZ0MYoaWwM65kp2W8LA0GdegaJCMcA>
-    <xmx:lb29aV_achL0Av7ZVkWGk7fgl46q-7oMi_78RHaqp_rR_kEfQ8Q_Ow>
-    <xmx:lb29aVaNUjBD8tX32gsa-WLmuLRJWo5Lo6JeHY_ANwJmo7yGgVDaKQ>
-    <xmx:lb29afdy3s0q_BS2lLQIbW4rmZHUtdvMmTuE28OthRftmWPppThr2A>
-    <xmx:lb29aeIZiB01jBxYahkEcpHKo1goXiwW_C7qTVv0IRJUVuJSvpaQyXY8>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id F00BB700069; Fri, 20 Mar 2026 17:35:16 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQeaQ+0j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A26C19421;
+	Sat, 21 Mar 2026 09:39:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774085956;
+	bh=YleNNae8eogG4HxU4906z9SPmXMwZWM8S1qJzHGepA8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LQeaQ+0jp33hxuGxNMh6vzDgUd2h4ZPsdKCn5JaL/YAprQkReWi0J0MHPMqssSxe9
+	 pscKJQ85gLhvKZSBqBi41l4RI36t2SoSEmluF120xAyv5coxyR07/4UrYIg/L26Uxj
+	 qJOlCDF0LZDE729AQd6xJeqeJO6MMFMFowDmvUK1TMKZCv+l5FoAONYxgQHI2/i+5P
+	 p5hoz6EUXRRwZXCZ2bgfSy1zH5pJ8JzWUoiUY38ulrBlJO38RAFNY3UEhIpfdpd22O
+	 w/8UXAF3/ABbUk/iCdgSRV2CC1WdZtuamh8jfYWl3wzBVRhwg5lY/ojftoidhVqWQk
+	 sVwkafbFuGpiw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=lobster-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w3sna-00000004HLO-0QZd;
+	Sat, 21 Mar 2026 09:39:14 +0000
+Date: Sat, 21 Mar 2026 09:39:13 +0000
+Message-ID: <87fr5tcyim.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>,
+	Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 25/36] KVM: arm64: Reclaim faulting page from pKVM in spurious fault handler
+In-Reply-To: <864ima5v6c.wl-maz@kernel.org>
+References: <20260305144351.17071-1-will@kernel.org>
+	<20260305144351.17071-26-will@kernel.org>
+	<864ima5v6c.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-X-ThreadId: AdhqlxVOGV4g
-Date: Fri, 20 Mar 2026 22:34:55 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nathan Chancellor" <nathan@kernel.org>, "Marc Zyngier" <maz@kernel.org>,
- "Vincent Donnefort" <vdonnefort@google.com>
-Cc: "Steven Rostedt" <rostedt@goodmis.org>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mathieu Desnoyers" <mathieu.desnoyers@efficios.com>,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kvmarm@lists.linux.dev
-Message-Id: <ebce4cd9-4101-4f6d-bbb7-e03991e5644c@app.fastmail.com>
-In-Reply-To: 
- <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
-References: 
- <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
-Subject: Re: [PATCH] tracing: Adjust cmd_check_undefined to show unexpected undefined
- symbols
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, oupton@kernel.org, joey.gouly@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, qperret@google.com, tabba@google.com, vdonnefort@google.com, smostafa@google.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Mar 20, 2026, at 22:29, Nathan Chancellor wrote:
-> When the check_undefined command in kernel/trace/Makefile fails, there
-> is no output, making it hard to understand why the build failed. Capture
-> the output of the $(NM) + grep command and print it when failing to make
-> it clearer what the problem is.
->
-> Fixes: a717943d8ecc ("tracing: Check for undefined symbols in 
-> simple_ring_buffer")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+On Fri, 20 Mar 2026 16:20:59 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Thu, 05 Mar 2026 14:43:38 +0000,
+> Will Deacon <will@kernel.org> wrote:
+> > 
+> > Host kernel accesses to pages that are inaccessible at stage-2 result in
+> > the injection of a translation fault, which is fatal unless an exception
+> > table fixup is registered for the faulting PC (e.g. for user access
+> > routines). This is undesirable, since a get_user_pages() call could be
+> > used to obtain a reference to a donated page and then a subsequent
+> > access via a kernel mapping would lead to a panic().
+> > 
+> > Rework the spurious fault handler so that stage-2 faults injected back
+> > into the host result in the target page being forcefully reclaimed when
+> > no exception table fixup handler is registered.
+> 
+> Is there any reason why you prefer the 'inject fault' followed by
+> 'gimme that page' dance over a more direct 'unconditionally reclaim
+> the page on the back of the fault'?
+> 
+> I can't figure out what would go wrong in the latter approach, as you
+> always have an opportunity to inject a (fatal) fault if you can't
+> safely reclaim the page.
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+To be clear, the reason I'm asking this is that with RME (whether
+that's with the dreaded CCA or something else), injecting a fault into
+the host would involve EL3, and I don't trust EL3 to do that. There is
+also the small detail that the fault syndrome is not strictly
+architectural, meaning that EL3 would have to learn a pKVM-specific
+behaviour.
 
-This does seem very helpful, as I still expect this to come up regularly.
+But EL3 should be able to report a GPC fault to RL-EL2, which then
+could act the exact same way as pKVM, unmapping, clearing and
+releasing the page.
 
-      Arnd
+Thoughts?
+
+	M.
+
+-- 
+Jazz isn't dead. It just smells funny.
