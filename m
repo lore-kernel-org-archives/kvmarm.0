@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E443BE64A
-	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 16:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373A63C1978
+	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 16:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774284446; cv=none; b=DraFlLKhUEX2zm0bXKqH4HvFCCN4y1b/v8tALba6el2FuDNHZGnY4vkbhug04TaUh6QogeJKGSKWiPZyHJQ3O9yfuHHWNY+V1+fiyZn0PBuxjyyNYPjpW75FKV767pNsR5X28Y8IR3qZOrDD5ci5oNVDCbZK+R0x8hmtZgos5Oc=
+	t=1774284448; cv=none; b=DZlO9TqKqpM79sUnj5Bz0S6R5qqovnB5qF3d4VsbLG5Oq5Yr2M4aS2p2mc7t0YyEFO9LLXPGXKAt1dvPxjLAEEjvI9ez7gHKfz7vYcC+Zxh1eWGhX6h/5auY0/Ho4yVPpJAGYShHnBZoZd5yPaYbfO+DXgQrd4qs6UiHMatgOLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774284446; c=relaxed/simple;
-	bh=JUe3wxokoI7mo1TrvniYCDJF1j7ZUQbdy2NQbw6F9Es=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M7QR5BsEm0xOdC7GrDF3dHG3hq8GcvdWwGgVWcBZxGiLc+L783AAXftZfiaubFPfo2JFBI5d8+q685ofTnenQYqH8gDDnB+59jeTpXsw/s0JFnY7We7wIj1/pigivjUDokJ9ASGuulrcfosYB9oAfxSlcW0zjV5ELEY8QogtJIo=
+	s=arc-20240116; t=1774284448; c=relaxed/simple;
+	bh=+RVmRVYl4kI3++rQeV2EFDPMx5C/SqRFt9n33cpNVEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l9lDa/Oa9btOL77KcZHn44CX1mA0uT43aojADNnSvS8QnjoszZXD/08Etcyk99G6YoqfKhSQfc1oSznbUvbJpN2ZjU9Ob80q706lfCz9K044mVx98ywf2evlF6SoR5eSo1Z3A4ozgBooRCZvwmQ01R6l3ino/FLtU6g5vfag+sM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B3BC114BF;
-	Mon, 23 Mar 2026 09:47:18 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B1D821516;
+	Mon, 23 Mar 2026 09:47:20 -0700 (PDT)
 Received: from e142021.fritz.box (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 00CBF3F73B;
-	Mon, 23 Mar 2026 09:47:22 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 17DEE3F73B;
+	Mon, 23 Mar 2026 09:47:24 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Will Deacon <will@kernel.org>,
 	Julien Thierry <julien.thierry.kdev@gmail.com>
@@ -25,10 +26,12 @@ Cc: maz@kernel.org,
 	kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH kvmtool v7 0/6] arm64: Nested virtualization support
-Date: Mon, 23 Mar 2026 17:47:11 +0100
-Message-ID: <20260323164717.2571585-1-andre.przywara@arm.com>
+Subject: [PATCH kvmtool v7 1/6] arm64: Initial nested virt support
+Date: Mon, 23 Mar 2026 17:47:12 +0100
+Message-ID: <20260323164717.2571585-2-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260323164717.2571585-1-andre.przywara@arm.com>
+References: <20260323164717.2571585-1-andre.przywara@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -37,83 +40,88 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is v7 of the nested virt support series, correcting a previously
-reported, but unfixed issue with endianess. Other than that just
-rebased. Changelog below.
-========================================================
+The ARMv8.3 architecture update includes support for nested
+virtualization. Allow the user to specify "--nested" to start a guest in
+(virtual) EL2 instead of EL1.
+This will also change the PSCI conduit from HVC to SMC in the device
+tree.
 
-Thanks to the imperturbable efforts from Marc, arm64 support for nested
-virtualization has now reached the mainline kernel, which means the
-respective kvmtool support should now be ready as well.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Sascha Bischoff <sascha.bischoff@arm.com>
+---
+ arm64/fdt.c                         |  5 ++++-
+ arm64/include/kvm/kvm-config-arch.h |  5 ++++-
+ arm64/kvm-cpu.c                     | 12 +++++++++++-
+ 3 files changed, 19 insertions(+), 3 deletions(-)
 
-Patch 1 introduces the new "--nested" command line option, to let the
-VCPUs start in EL2. To allow KVM guests running in such a guest, we also
-need VGIC support, which patch 2 allows by setting the maintenance IRQ.
-Patch 3 to 6 are picked from Marc's repo, and allow to set the arch
-timer offset, enable non-VHE guests (at the cost of losing recursive
-nested virtualisation), advertise the virtual EL2 timer IRQ, and consider
-the right system registers when detecting a guest's endianess.
-
-Tested on the FVP (with some good deal of patience), some commercial
-hardware and QEMU.
-
-Cheers,
-Andre
-
-Changelog v6 ... v7:
-- fix SYS_SCTLR_EL1 definition
-- consider E2H bit when determining the guest's current endianess
-
-Changelog v5 ... v6:
-- rebase / drop header update patch (already merged)
-- fix endianness bug in DT maintenance IRQ description
-
-Changelog v4 ... v5:
-- bump kernel headers to v6.19-rc6
-- print a warning if --e2h0 is given without --nested
-- fail if the maintenance IRQ setting attribute is not supported
-- add tags
-
-Changelog v3 ... v4:
-- pass kvm pointer to gic__generate_fdt_nodes()
-- use macros for PPI offset and DT type identifier
-- properly calculate DT interrupt flags value
-- add patch 7 to fix virtio endianess issues
-- CAPITALISE verbs in commit message
-
-Changelog v2 ... v3:
-- adjust^Wreplace commit messages for E2H0 and counter-offset patch
-- check for KVM_CAP_ARM_EL2_E2H0 when --e2h0 is requested
-- update kernel headers to v6.16 release
-
-Changelog v1 ... 2:
-- add three patches from Marc:
-  - add --e2h0 command line option
-  - add --counter-offset command line option
-  - advertise all five arch timer interrupts in DT
-
-Andre Przywara (2):
-  arm64: Initial nested virt support
-  arm64: nested: Add support for setting maintenance IRQ
-
-Marc Zyngier (4):
-  arm64: Add counter offset control
-  arm64: Add FEAT_E2H0 support
-  arm64: Generate HYP timer interrupt specifiers
-  arm64: Handle virtio endianness reset when running nested
-
- arm64/arm-cpu.c                     |  6 +--
- arm64/fdt.c                         |  5 +-
- arm64/gic.c                         | 29 ++++++++++-
- arm64/include/kvm/gic.h             |  2 +-
- arm64/include/kvm/kvm-config-arch.h | 11 ++++-
- arm64/include/kvm/kvm-cpu-arch.h    |  5 +-
- arm64/include/kvm/timer.h           |  2 +-
- arm64/kvm-cpu.c                     | 75 ++++++++++++++++++++++++-----
- arm64/kvm.c                         | 20 ++++++++
- arm64/timer.c                       | 29 +++++------
- 10 files changed, 144 insertions(+), 40 deletions(-)
-
+diff --git a/arm64/fdt.c b/arm64/fdt.c
+index df777587..98f1dd9d 100644
+--- a/arm64/fdt.c
++++ b/arm64/fdt.c
+@@ -205,7 +205,10 @@ static int setup_fdt(struct kvm *kvm)
+ 		_FDT(fdt_property_string(fdt, "compatible", "arm,psci"));
+ 		fns = &psci_0_1_fns;
+ 	}
+-	_FDT(fdt_property_string(fdt, "method", "hvc"));
++	if (kvm->cfg.arch.nested_virt)
++		_FDT(fdt_property_string(fdt, "method", "smc"));
++	else
++		_FDT(fdt_property_string(fdt, "method", "hvc"));
+ 	_FDT(fdt_property_cell(fdt, "cpu_suspend", fns->cpu_suspend));
+ 	_FDT(fdt_property_cell(fdt, "cpu_off", fns->cpu_off));
+ 	_FDT(fdt_property_cell(fdt, "cpu_on", fns->cpu_on));
+diff --git a/arm64/include/kvm/kvm-config-arch.h b/arm64/include/kvm/kvm-config-arch.h
+index ee031f01..a1dac28e 100644
+--- a/arm64/include/kvm/kvm-config-arch.h
++++ b/arm64/include/kvm/kvm-config-arch.h
+@@ -10,6 +10,7 @@ struct kvm_config_arch {
+ 	bool		aarch32_guest;
+ 	bool		has_pmuv3;
+ 	bool		mte_disabled;
++	bool		nested_virt;
+ 	u64		kaslr_seed;
+ 	enum irqchip_type irqchip;
+ 	u64		fw_addr;
+@@ -57,6 +58,8 @@ int sve_vl_parser(const struct option *opt, const char *arg, int unset);
+ 		     "Type of interrupt controller to emulate in the guest",	\
+ 		     irqchip_parser, NULL),					\
+ 	OPT_U64('\0', "firmware-address", &(cfg)->fw_addr,			\
+-		"Address where firmware should be loaded"),
++		"Address where firmware should be loaded"),			\
++	OPT_BOOLEAN('\0', "nested", &(cfg)->nested_virt,			\
++		    "Start VCPUs in EL2 (for nested virt)"),
+ 
+ #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
+diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+index 94c08a4d..42dc11da 100644
+--- a/arm64/kvm-cpu.c
++++ b/arm64/kvm-cpu.c
+@@ -71,6 +71,12 @@ static void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init
+ 	/* Enable SVE if available */
+ 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
+ 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
++
++	if (kvm->cfg.arch.nested_virt) {
++		if (!kvm__supports_extension(kvm, KVM_CAP_ARM_EL2))
++			die("EL2 (nested virt) is not supported");
++		init->features[0] |= 1UL << KVM_ARM_VCPU_HAS_EL2;
++	}
+ }
+ 
+ static int vcpu_configure_sve(struct kvm_cpu *vcpu)
+@@ -313,7 +319,11 @@ static void reset_vcpu_aarch64(struct kvm_cpu *vcpu)
+ 	reg.addr = (u64)&data;
+ 
+ 	/* pstate = all interrupts masked */
+-	data	= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT | PSR_MODE_EL1h;
++	data	= PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
++	if (vcpu->kvm->cfg.arch.nested_virt)
++		data |= PSR_MODE_EL2h;
++	else
++		data |= PSR_MODE_EL1h;
+ 	reg.id	= ARM64_CORE_REG(regs.pstate);
+ 	if (ioctl(vcpu->vcpu_fd, KVM_SET_ONE_REG, &reg) < 0)
+ 		die_perror("KVM_SET_ONE_REG failed (spsr[EL1])");
 -- 
 2.43.0
 
