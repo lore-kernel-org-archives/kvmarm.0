@@ -1,129 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D074A242D70
-	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 15:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6893F3BB9EE
+	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 15:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774278016; cv=none; b=JHPjlqForuOWQhi3lLwMhGEGMxyYFMQlvysBOubluLH5cKKrWB+iwIlfRde/KBbr8Yej4KYdPMn4HmVd/5NlYqm3SawMrqRtkS5okvW3yxIEIXdlpntFKhEWa51u+nuT3LwYReID101l8szWcUdCkmH8AZpHK1UCYGjy04j/Bz0=
+	t=1774279892; cv=none; b=LRO/nwWM9Mp53xSfOUkCE65LLD9N4egOxi0TAD8Evl3l9QhTik/noZoZ4iGfUdJ74sPSi5WWw1rrr6les53JFG9bx1JKAhmrY/XLYjVZ+Nzh3nZeKSt6KUXU47E68OX2L3ub/f1fdeqgQlpBlaGFLy9o4nEAI8KbXd7htSaEHSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774278016; c=relaxed/simple;
-	bh=Hv3zAbS8DeLMrQDrPh89cAimDkr9XNvit+xdTh3RoWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RlTCvnBrYbT4lu2PmkNh0wkYynG0MrTb+vPTWljMlcFW9pGCCGFz73Sh5bwygyMR4HoMLYKOctoKQz4/XQbXDPnKMR6kAuSax7SLn6COJPtzkKhqd8W4y14kH+ZpSlYUMUCi/Sj0pGITymNaku2xHoVeH+55Io2igSy6fOhnWfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNdHEjiH; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNdHEjiH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CB2C2BC9E;
-	Mon, 23 Mar 2026 15:00:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774278016;
-	bh=Hv3zAbS8DeLMrQDrPh89cAimDkr9XNvit+xdTh3RoWc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nNdHEjiH4fJldE6ROcEUbFfZ/8o4o/PbBAg79CJYMBezd9MApZMfyHLKMsZeJBjC5
-	 caClkZxB4r3aJixckNrChXGwRsYb4oLgv7JWkNP/L/RbS88nwRUmuG5Yqco0HmSvuq
-	 1vDt1eWOU3h2dQ+ENhu6aMw+2V2lwUYw84LnvRMtUO6NaMh/C4L/v1kgTmOqoa9/59
-	 4m+Ias2QxYpnF63YN7mJjO54WU9JJ69CLFprmJyEas83nDu5jt5V4waXoJ7BnpWHGq
-	 jNOPScYypraXrpEE/8RNXMVuijUX6xBUCJw3y3EeyoJAM9wkT2fX+KwHl4g5ysDlD0
-	 PPcv880wANmig==
-Date: Mon, 23 Mar 2026 15:00:10 +0000
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 30/36] KVM: arm64: Allow userspace to create protected
- VMs when pKVM is enabled
-Message-ID: <acFVeqB2P0rKqvBu@willie-the-truck>
-References: <20260305144351.17071-1-will@kernel.org>
- <20260305144351.17071-31-will@kernel.org>
- <865x6q63fu.wl-maz@kernel.org>
+	s=arc-20240116; t=1774279892; c=relaxed/simple;
+	bh=So4tW2iTltCRNMM/xapQFRULY+mcrXmEfStcZS1JCPQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iy2kc8es9ZdWLez3ajCelOAds6iqE5u0vldo/Tyh+9XVelYr7i1/VD4MFcojgy7MLT57OGVnFcQkiSgPoVSB/X1s+ETwYdSE6/LeWKMkXnwZolC0Cbe6HO5V0iNbXBejQgeALLkU5M6EvirAD+lKO5Dm/8pyFsalh9iGd/Be7mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C4D6214BF;
+	Mon, 23 Mar 2026 08:31:24 -0700 (PDT)
+Received: from [192.168.178.23] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7AF243F694;
+	Mon, 23 Mar 2026 08:31:29 -0700 (PDT)
+Message-ID: <703ba291-aa21-46ec-8ba1-6b18a133bf9e@arm.com>
+Date: Mon, 23 Mar 2026 16:31:27 +0100
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <865x6q63fu.wl-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH kvmtool v6 6/6] arm64: Handle virtio endianness reset when
+ running nested
+To: Marc Zyngier <maz@kernel.org>
+Cc: Will Deacon <will@kernel.org>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Sascha Bischoff <Sascha.Bischoff@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev, Alexandru Elisei <alexandru.elisei@arm.com>
+References: <20260211131249.399019-1-andre.przywara@arm.com>
+ <20260211131249.399019-7-andre.przywara@arm.com>
+ <86ms1fbcfq.wl-maz@kernel.org>
+Content-Language: en-US
+From: Andre Przywara <andre.przywara@arm.com>
+In-Reply-To: <86ms1fbcfq.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 20, 2026 at 01:22:29PM +0000, Marc Zyngier wrote:
-> On Thu, 05 Mar 2026 14:43:43 +0000,
-> Will Deacon <will@kernel.org> wrote:
-> > 
-> > Introduce a new VM type for KVM/arm64 to allow userspace to request the
-> > creation of a "protected VM" when the host has booted with pKVM enabled.
-> > 
-> > For now, this depends on CONFIG_EXPERT and results in a taint on first
-> > use as many aspects of a protected VM are not yet protected!
-> > 
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_pkvm.h |  2 +-
-> >  arch/arm64/kvm/Kconfig            | 10 ++++++++++
-> >  arch/arm64/kvm/arm.c              |  8 +++++++-
-> >  arch/arm64/kvm/mmu.c              |  3 ---
-> >  arch/arm64/kvm/pkvm.c             | 11 ++++++++++-
-> >  include/uapi/linux/kvm.h          |  5 +++++
-> >  6 files changed, 33 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
-> > index 7041e398fb4c..2954b311128c 100644
-> > --- a/arch/arm64/include/asm/kvm_pkvm.h
-> > +++ b/arch/arm64/include/asm/kvm_pkvm.h
-> > @@ -17,7 +17,7 @@
-> >  
-> >  #define HYP_MEMBLOCK_REGIONS 128
-> >  
-> > -int pkvm_init_host_vm(struct kvm *kvm);
-> > +int pkvm_init_host_vm(struct kvm *kvm, unsigned long type);
-> >  int pkvm_create_hyp_vm(struct kvm *kvm);
-> >  bool pkvm_hyp_vm_is_created(struct kvm *kvm);
-> >  void pkvm_destroy_hyp_vm(struct kvm *kvm);
-> > diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> > index 7d1f22fd490b..e71f7fb6e89a 100644
-> > --- a/arch/arm64/kvm/Kconfig
-> > +++ b/arch/arm64/kvm/Kconfig
-> > @@ -82,4 +82,14 @@ config PTDUMP_STAGE2_DEBUGFS
-> >  
-> >  	  If in doubt, say N.
-> >  
-> > +config PROTECTED_VM_UAPI
-> > +	bool "Expose protected VMs to userspace (experimental)"
-> > +	depends on KVM && EXPERT
-> > +	help
-> > +	  Say Y here to enable experimental (i.e. in development)
-> > +	  support for creating protected virtual machines using KVM's
-> > +	  KVM_CREATE_VM ioctl() when booted with pKVM enabled.
-> > +
-> > +	  Unless you are a KVM developer, say N.
-> > +
+Hi Marc,
+
+On 2/11/26 15:08, Marc Zyngier wrote:
+> On Wed, 11 Feb 2026 13:12:49 +0000,
+> Andre Przywara <andre.przywara@arm.com> wrote:
+>>
+>> From: Marc Zyngier <maz@kernel.org>
+>>
+>> When running an EL2 guest, we need to make sure we don't sample
+>> SCTLR_EL1 to work out the virtio endianness, as this is likely
+>> to be a bit random.
+>>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>   arm64/include/kvm/kvm-cpu-arch.h |  5 ++--
+>>   arm64/kvm-cpu.c                  | 47 +++++++++++++++++++++++++-------
+>>   2 files changed, 40 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/arm64/include/kvm/kvm-cpu-arch.h b/arm64/include/kvm/kvm-cpu-arch.h
+>> index 1af394a..85646ad 100644
+>> --- a/arm64/include/kvm/kvm-cpu-arch.h
+>> +++ b/arm64/include/kvm/kvm-cpu-arch.h
+>> @@ -10,8 +10,9 @@
+>>   #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
+>>   #define ARM_CPU_ID		3, 0, 0, 0
+>>   #define ARM_CPU_ID_MPIDR	5
+>> -#define ARM_CPU_CTRL		3, 0, 1, 0
+>> -#define ARM_CPU_CTRL_SCTLR_EL1	0
+>> +#define SYS_SCTLR_EL1		3, 4, 1, 0, 0
+>> +#define SYS_SCTLR_EL2		3, 4, 1, 0, 0
 > 
-> Let me once more express my lack of appetite for config options.
-> Protected more is already gated by a command-line option, and requires
-> active buy-in from the user.
+> Sascha pointed out this howler of a bug last time: SCTLR_EL1 and EL2
+> have the same encoding here, which is obviously wrong.
+
+Argh, indeed, I now remember, this was probably in the category of 
+"that's a no brainer, what's next ..." so I missed actually fixing it.
+Done now, apologies for that.
+
 > 
-> Nested support is in the same "not quite finished" state, and yet
-> isn't hidden behind a configuration symbol.
+> This is definitely introducing a regression on EL1 guests.
 > 
-> Taint the kernel if you want, but I'd rather we don't add extra config
-> options for this. Documenting the "experimental" aspect of upstream
-> pKVM should be enough.
+>> +#define SYS_HCR_EL2		3, 4, 1, 1, 0
+>>   
+>>   struct kvm_cpu {
+>>   	pthread_t	thread;
+>> diff --git a/arm64/kvm-cpu.c b/arm64/kvm-cpu.c
+>> index 5e4f3a7..35e1c63 100644
+>> --- a/arm64/kvm-cpu.c
+>> +++ b/arm64/kvm-cpu.c
+>> @@ -12,6 +12,7 @@
+>>   
+>>   #define SCTLR_EL1_E0E_MASK	(1 << 24)
+>>   #define SCTLR_EL1_EE_MASK	(1 << 25)
+>> +#define HCR_EL2_TGE		(1 << 27)
+>>   
+>>   static int debug_fd;
+>>   
+>> @@ -408,7 +409,8 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>>   {
+>>   	struct kvm_one_reg reg;
+>>   	u64 psr;
+>> -	u64 sctlr;
+>> +	u64 sctlr, bit;
+>> +	u64 hcr = 0;
+>>   
+>>   	/*
+>>   	 * Quoting the definition given by Peter Maydell:
+>> @@ -419,8 +421,9 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>>   	 * We first check for an AArch32 guest: its endianness can
+>>   	 * change when using SETEND, which affects the CPSR.E bit.
+>>   	 *
+>> -	 * If we're AArch64, use SCTLR_EL1.E0E if access comes from
+>> -	 * EL0, and SCTLR_EL1.EE if access comes from EL1.
+>> +	 * If we're AArch64, determine which SCTLR register to use,
+>> +	 * depending on NV being used or not. Then use either the E0E
+>> +	 * bit for EL0, or the EE bit for EL1/EL2.
+>>   	 */
+>>   	reg.id = ARM64_CORE_REG(regs.pstate);
+>>   	reg.addr = (u64)&psr;
+>> @@ -430,16 +433,40 @@ int kvm_cpu__get_endianness(struct kvm_cpu *vcpu)
+>>   	if (psr & PSR_MODE32_BIT)
+>>   		return (psr & COMPAT_PSR_E_BIT) ? VIRTIO_ENDIAN_BE : VIRTIO_ENDIAN_LE;
+>>   
+>> -	reg.id = ARM64_SYS_REG(ARM_CPU_CTRL, ARM_CPU_CTRL_SCTLR_EL1);
+>> +	if (vcpu->kvm->cfg.arch.nested_virt) {
+>> +		reg.id = ARM64_SYS_REG(SYS_HCR_EL2);
+>> +		reg.addr = (u64)&hcr;
+>> +		if (ioctl(vcpu->vcpu_fd, KVM_GET_ONE_REG, &reg) < 0)
+>> +			die("KVM_GET_ONE_REG failed (HCR_EL2)");
+>> +	}
+>> +
+>> +	switch (psr & PSR_MODE_MASK) {
+>> +	case PSR_MODE_EL0t:
+>> +		if (hcr & HCR_EL2_TGE)
+>> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL2);
+>> +		else
+>> +			reg.id = ARM64_SYS_REG(SYS_SCTLR_EL1);
+>> +		bit = SCTLR_EL1_E0E_MASK;
+>> +		break;
+> 
+> And this is also buggy, as I pointed out in my review of v5 -- I even
+> provided a fix for it [1].
 
-Since I _do_ expect the user ABI to evolve (probably becoming stricter)
-as we introduce additional protection to parts of the protected VM
-state, I just went for the full shebang: CONFIG option, cmdline option
-and taint.
+Right, applied now.
+v7 incoming.
 
-I tend to agree that having *all* of that is overkill, so if you're
-happy for me to drop the CONFIG option, despite the user ABI not being
-stable, then I'm fine with that.
+Cheers,
+Andre
 
-Will
+> 
+> 	M.
+> 
+> [1] https://lore.kernel.org/all/86jyx8b9l2.wl-maz@kernel.org/
+> 
+
