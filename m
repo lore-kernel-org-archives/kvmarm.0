@@ -1,207 +1,134 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42A1382F1F;
-	Mon, 23 Mar 2026 08:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92F5386545
+	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 09:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774255397; cv=none; b=Ss8zkkZBBS6XAL/3IFewJ45gyCkndBuv3ywV+g1DqnR6XRhbKLP6Q4jcS7b/8HCFveK6EvR1IvR3ubGqx+5AfmrdQxEhdqG2u3a3tcEBRFpAHiyHZpWpsCVgv4VpM6n6zxuSaKFBIPk6msSDMKNUlHqkrGBiN780brUZl3l+2sk=
+	t=1774257356; cv=none; b=jeO4jQOyp7GpIx+AlFe3mZcn6OjzaaK0cKhSIrsIT2ZNiIcc81Xfpg/9O+3AxvitEXftvFfeEmsYFFSbyEnG/WruTsV2JGlzW+VFpthdGjg+MCJbBKU5Yq8Jm0h5fpce1ZmL1Twxb+F034h8nBfPDe7761yxJsjhI/IoMnS403w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774255397; c=relaxed/simple;
-	bh=hI/WjybrpXzNAFHT59gckSTLPeS76ZpD3rBAeQW1h9c=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CktP0oFPlBN/uj8pi0R44gulh95DL1bh0Mcsk+E2gNjf9VleS3xxVOfZ3HHlPP5Jku/vvzS0/hZbupjwGX8TVZ9BLis/QCGXPA46q6lWpPWm9sxDx5YMny43LULX43n/Th427Yq9/tQI2bdkZwL2wtgtNPdBlE//gp8G0Ty4lzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DfFJTb2M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774257356; c=relaxed/simple;
+	bh=j0lRr4uQumusVhShbHT3x45ZVIVLWydOil2E35eDUjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ptpq1f6yWyGSWto7/bwYhoMDl4b5xfrujjTlpqYziiKO1giv5Q3IBke7kjBQ0L+TJux0rEmuBVX2mr7oeCg4NmBBammIcsYLFTeH5qR6afFPqz7Ano/J5iecHmzftsPr4flGoIf/ETdTTkb5tcS8za8LYKLBOc3SUkl7lPkEhEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W+MWTH6m; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DfFJTb2M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3FF9C4CEF7;
-	Mon, 23 Mar 2026 08:43:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774255396;
-	bh=hI/WjybrpXzNAFHT59gckSTLPeS76ZpD3rBAeQW1h9c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DfFJTb2MjyLWtiPK7zTRtKLsbcec9JdUoHG8fssvfSEbZmJXK651jyHFUwT6PvcTH
-	 7B0BYGTKAIC+IxfHSxE2bRmrhGgjxI5P7DKV9cuUaWv3lMSyfm00yqpzBY9EWxldLC
-	 fDW6h6IUy8dCb2Q+X5U96pMm6VGUdXeBDFhxRHTGPrzyYl4ijDoHKkYIRHmcg7Sz0L
-	 rGK348RJoQxwGZqLyVZcOCB0PYyHN3p1O8tGHCvG0E2Fdf4Mk2pL2Z9vS98nBFyy7Y
-	 PfOmkIIn4zSnRjKZHUIryr18QsBRNBI8G3A/VdI4Nv1yXDi+o36A+xG9zkszu+C9Zx
-	 USFEaMiEBXiXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w4asU-00000004da4-0iGU;
-	Mon, 23 Mar 2026 08:43:14 +0000
-Date: Mon, 23 Mar 2026 08:43:13 +0000
-Message-ID: <861phb542m.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Will Deacon <will@kernel.org>,
-	Mostafa Saleh <smostafa@google.com>,
-	Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 4/5] KVM: arm64: pkvm: Use direct function pointers for cpu_{on,resume}
-In-Reply-To: <CA+EHjTyeuE3aqqmx8Fe4REOM7WstEAp_A0tvMNygPJCLT7V7wQ@mail.gmail.com>
-References: <20260321212419.2803972-1-maz@kernel.org>
-	<20260321212419.2803972-5-maz@kernel.org>
-	<CA+EHjTyeuE3aqqmx8Fe4REOM7WstEAp_A0tvMNygPJCLT7V7wQ@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+MWTH6m"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-487012ce896so12573115e9.0
+        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 02:15:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774257353; x=1774862153; darn=lists.linux.dev;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YU6TG7BhEYw/Kb5KtuLrMQYWwx5oDAgZWzaduafFFDk=;
+        b=W+MWTH6mwvl61PkvScWieRzW/9oghXA8FbAbOARgTjwYbiS5i30gCdD2i6KGjBlvy5
+         p6BUTUEysrQFW9MWj6Gs7XdGC3ZvtOKJCLknjGwO/tiLBM5jY89OQ9gmGghfP2RQ/5+u
+         C/ZmtsNepkeoAfIibLLcGiZlimPlKPT6kOZYseHHgZpORMLea9EX3NwOIDUFWikNsWN5
+         yY2DXlRCmv4OV4ZddKE7G4oChxAY0h5bDoYhGx+oU+1noYrKdKyEAWaElc7RoavobWSr
+         l2Qi5ceDwvS9apuOhEyvjRSTJGjH0F95BlQYfxVNccBIKn+R6yh86EvsDBRad7chct5f
+         5VCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774257353; x=1774862153;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YU6TG7BhEYw/Kb5KtuLrMQYWwx5oDAgZWzaduafFFDk=;
+        b=rQMa2AQ9/GnrZ8n9IYM6ytk395MhnsYdiaEk4efpHkvUgCjZ/BSm5auMJGEcNfYe6L
+         H6mwap6OgBRicIMQQ3EztD5DkGT9/rxyTV8VE3Uc0qh8Yhgv6/P4BYnagutur3Dayhx8
+         daq2LrDu0My+sDpwZS0vv07VeD3WqZQt9KoWBtQ6zUytgLfPSTSNz5m0SwSWaH4PmhRT
+         HIkmXy7ORryByMcx+/UUOKo6dl8QGFftPkSjL89fqDwHjesh10el5OlLIdrebb5Kgwmm
+         cfNi8OZc8tNTJMfWITsryoeL1Mmsh9GAwrUmUaiifOLXqSpAL3E19RLzinhq+BAz0xDb
+         hRkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUU8AMQKewH2qo1ZCvkmblGypPUKlrvAVPcZciiDiZb/9+EPkT//bl8GvhEDawbvzzSFiYpY5w=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxRTsXAc37o4JZPT/sU+7YZ64UU3adLK0Ghc09WC0VWKzcwWIYU
+	HkslgZ5abk2aAUhd1uBXhsTWIcAWR5bw0zGP8ZKKdwBrqQOPxrNmsy/xxHvsyEVFvA==
+X-Gm-Gg: ATEYQzwZNZd/XHji9TrNLsDIV8gbqvcEdr4mfrdwL2YRvZBjUYFxnyoVkq9U46oTE7g
+	ZuJzs2IzlRvRPTcoYyK886odvfPR3N4qt1sffj/1PAIBj7Q3jwFvbb8AdjwibOxm/x8ETx+F3pk
+	1bCEDmPLS1wQHlWnuBgS7gXCNk9/AYo2bo9uCFJMFtJo8KLcZAw0Gf3Ud1syilhl9E+L0vjm3np
+	IYAcnlbK6ce1OVqyRc8Uy6SZSnPRnR0ABZ30ZZKiwy84o2pRvl+yCqCQkDeAzvWU/YCexzKmAWZ
+	hKE9oFhFHopFS4qUqx7B1LL8W4bciDyzJEiE8Jl0aeIr8qOR36Y2LSB3Y9X5P5a2GYl7V1Q0+GR
+	hf+l8XvMxoY5fHOroxMKIJZDeqdcdtKY/D/mZwj2EcN0+P6lLjQWegchoCZRsjTxPnoFj4GjAwn
+	WoW+lxEAyYqzJBET6hS9GH7qWAHqv9JamTEKBlWRA6JG41eEXNEThsKDacqf70TEYjaa0=
+X-Received: by 2002:a05:600c:3f1b:b0:487:59c:2bb8 with SMTP id 5b1f17b1804b1-487059c2eb3mr76504415e9.27.1774257352602;
+        Mon, 23 Mar 2026 02:15:52 -0700 (PDT)
+Received: from google.com (198.115.140.34.bc.googleusercontent.com. [34.140.115.198])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48703e26408sm277752545e9.11.2026.03.23.02.15.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 02:15:52 -0700 (PDT)
+Date: Mon, 23 Mar 2026 09:15:48 +0000
+From: Vincent Donnefort <vdonnefort@google.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] tracing: Adjust cmd_check_undefined to show unexpected
+ undefined symbols
+Message-ID: <acEExHx9GPrhxHzk@google.com>
+References: <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, smostafa@google.com, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320-cmd_check_undefined-verbose-v1-1-54fc5b061f94@kernel.org>
 
-On Sun, 22 Mar 2026 15:49:50 +0000,
-Fuad Tabba <tabba@google.com> wrote:
+On Fri, Mar 20, 2026 at 02:29:33PM -0700, Nathan Chancellor wrote:
+> When the check_undefined command in kernel/trace/Makefile fails, there
+> is no output, making it hard to understand why the build failed. Capture
+> the output of the $(NM) + grep command and print it when failing to make
+> it clearer what the problem is.
 > 
-> Hi Marc,
+> Fixes: a717943d8ecc ("tracing: Check for undefined symbols in simple_ring_buffer")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+
+Thanks!
+
+Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+
+> ---
+> Commit a717943d8ecc ("tracing: Check for undefined symbols in
+> simple_ring_buffer") and its follow up fixes are in the kvmarm tree so
+> this should go there as well. This is the rebased version of my
+> suggestion in the original thread:
 > 
-> On Sat, 21 Mar 2026 at 21:24, Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > Instead of using a boolean to decide whether a CPU is booting or
-> > resuming, just pass an actual function pointer around.
-> >
-> > This makes the code a bit more straightforward to understand.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_asm.h     |  3 ++-
-> >  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  9 +++----
-> >  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 39 +++++++++++++++++-----------
-> >  3 files changed, 29 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index a1ad12c72ebf1..f4c769857fdfc 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -291,7 +291,8 @@ asmlinkage void __noreturn hyp_panic_bad_stack(void);
-> >  asmlinkage void kvm_unexpected_el2_exception(void);
-> >  struct kvm_cpu_context;
-> >  void handle_trap(struct kvm_cpu_context *host_ctxt);
-> > -asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on);
-> > +asmlinkage void __noreturn __kvm_host_psci_cpu_on_entry(void);
-> > +asmlinkage void __noreturn __kvm_host_psci_cpu_resume_entry(void);
-> >  void __noreturn __pkvm_init_finalise(void);
-> >  void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
-> >  void kvm_patch_vector_branch(struct alt_instr *alt,
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > index 2e80fcbff2dff..64296b31da73d 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > @@ -173,7 +173,7 @@ SYM_CODE_END(___kvm_hyp_init)
-> >   * x0: struct kvm_nvhe_init_params PA
-> >   */
-> >  SYM_CODE_START(kvm_hyp_cpu_entry)
-> > -       mov     x1, #1                          // is_cpu_on = true
-> > +       ldr     x29, =__kvm_host_psci_cpu_on_entry
-> >         b       __kvm_hyp_init_cpu
-> >
-> >  /*
-> > @@ -182,11 +182,10 @@ SYM_CODE_START(kvm_hyp_cpu_entry)
-> >   * x0: struct kvm_nvhe_init_params PA
-> >   */
-> >  SYM_CODE_START(kvm_hyp_cpu_resume)
-> > -       mov     x1, #0                          // is_cpu_on = false
-> > +       ldr     x29, =__kvm_host_psci_cpu_resume_entry
-> >
-> >  SYM_INNER_LABEL(__kvm_hyp_init_cpu, SYM_L_LOCAL)
-> >         mov     x28, x0                         // Stash arguments
-> > -       mov     x29, x1
-> >
-> >         /* Check that the core was booted in EL2. */
-> >         mrs     x0, CurrentEL
-> > @@ -204,9 +203,7 @@ SYM_INNER_LABEL(__kvm_hyp_init_cpu, SYM_L_LOCAL)
-> >         bl      ___kvm_hyp_init                 // Clobbers x0..x2
-> >
-> >         /* Leave idmap -- using BLR is OK, LR is restored from host context */
-> > -       mov     x0, x29
-> > -       ldr     x1, =__kvm_host_psci_cpu_entry
-> > -       blr     x1
-> > +       blr     x29
-> >
-> >         // The core booted in EL1, or the C code unexpectedly returned.
-> >         // Either way, KVM cannot be initialized on it.
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> > index c3e196fb8b18f..cc698ceee9c8c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
-> > @@ -200,23 +200,12 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
-> >                          __hyp_pa(init_params), 0);
-> >  }
-> >
-> > -asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
-> > +static void __noreturn __kvm_host_psci_cpu_entry(unsigned long pc, unsigned long r0)
-> >  {
-> > -       struct psci_boot_args *boot_args;
-> > -       struct kvm_cpu_context *host_ctxt;
-> > -
-> > -       host_ctxt = host_data_ptr(host_ctxt);
-> > -
-> > -       if (is_cpu_on)
-> > -               boot_args = this_cpu_ptr(&cpu_on_args);
-> > -       else
-> > -               boot_args = this_cpu_ptr(&suspend_args);
-> > -
-> > -       cpu_reg(host_ctxt, 0) = boot_args->r0;
-> > -       write_sysreg_el2(boot_args->pc, SYS_ELR);
-> > +       struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
-> >
-> > -       if (is_cpu_on)
-> > -               release_boot_args(boot_args);
-> > +       cpu_reg(host_ctxt, 0) = r0;
-> > +       write_sysreg_el2(pc, SYS_ELR);
-> >
-> >         write_sysreg_el1(INIT_SCTLR_EL1_MMU_OFF, SYS_SCTLR);
-> >         write_sysreg(INIT_PSTATE_EL1, SPSR_EL2);
-> > @@ -224,6 +213,26 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
-> >         __host_enter(host_ctxt);
-> >  }
-> >
-> > +asmlinkage void __noreturn __kvm_host_psci_cpu_on_entry(void)
-> > +{
-> > +       struct psci_boot_args *boot_args = this_cpu_ptr(&cpu_on_args);
-> > +       unsigned long pc, r0;
-> > +
-> > +       pc = READ_ONCE(boot_args->pc);
-> > +       r0 = READ_ONCE(boot_args->r0);
-> > +
-> > +       release_boot_args(boot_args);
-> > +
-> > +       __kvm_host_psci_cpu_entry(pc, r0);
-> > +}
-> > +
-> > +asmlinkage void __noreturn __kvm_host_psci_cpu_resume_entry(void)
-> > +{
-> > +       struct psci_boot_args *boot_args = this_cpu_ptr(&cpu_on_args);
+> https://lore.kernel.org/20260311221816.GA316631@ax162/
+> ---
+>  kernel/trace/Makefile | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> This should be suspend_args:
-> +     struct psci_boot_args *boot_args = this_cpu_ptr(&suspend_args);
+> diff --git a/kernel/trace/Makefile b/kernel/trace/Makefile
+> index c5e14ffd36ee..d662c1a64cd5 100644
+> --- a/kernel/trace/Makefile
+> +++ b/kernel/trace/Makefile
+> @@ -174,7 +174,13 @@ UNDEFINED_ALLOWLIST = __asan __gcov __kasan __kcsan __hwasan __sancov __sanitize
+>  		      $(shell $(NM) -u $(obj)/undefsyms_base.o 2>/dev/null | awk '{print $$2}')
+>  
+>  quiet_cmd_check_undefined = NM      $<
+> -      cmd_check_undefined = test -z "`$(NM) -u $< | grep -v $(addprefix -e , $(UNDEFINED_ALLOWLIST))`"
+> +      cmd_check_undefined = \
+> +          undefsyms=$$($(NM) -u $< | grep -v $(addprefix -e , $(UNDEFINED_ALLOWLIST)) || true); \
+> +          if [ -n "$$undefsyms" ]; then \
+> +              echo "Unexpected symbols in $<:" >&2; \
+> +              echo "$$undefsyms" >&2; \
+> +              false; \
+> +          fi
+>  
+>  $(obj)/%.o.checked: $(obj)/%.o $(obj)/undefsyms_base.o FORCE
+>  	$(call if_changed,check_undefined)
+> 
+> ---
+> base-commit: e3d585ed3ff891a00c2284fef4be9cf8581735ab
+> change-id: 20260320-cmd_check_undefined-verbose-7d15f13f615d
+> 
+> Best regards,
+> --  
+> Nathan Chancellor <nathan@kernel.org>
 >
 
-Arghhh! How did I miss that??? Thanks a bunch for spotting it!
-
-> With this fixed:
-> 
-> Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Thanks again,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
