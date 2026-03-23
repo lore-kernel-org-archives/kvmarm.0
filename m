@@ -1,141 +1,154 @@
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17BD3A6F16
-	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 12:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774269256; cv=pass; b=MppYyMT6dJJGHBfyRLQ0GCVUHp8f4pNwMe1IFhm1ZSeqggUJl1Yzg0MA+1C/YGHhugv2Wq/lERxup4c1FvflfJN4GbrnhbhD4hqwrzFhWI+LDBYImF4BAvkumQReGuIzcTDheDOs7S/tP2tui70rYXLwr0xJbiCGHMcI9Butn4E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774269256; c=relaxed/simple;
-	bh=qP9YpmLhqJ7iKLUEJKEs2FdAVP2Ma0eNZKoPVjwl8pc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KGdlnfEdM9ng7zIDFun1FvQ+IUPUxQjSqD1L7l9i2ZSXG9tlsQhZJyCrK4T9KMLg0Tmw6naRqHpisoG0ujA6ggFL2gE4YCAVrgkhD+HuHv967R4ZHFCfnrWGNnicp3GTBiOCFW2838TMf4ZM0RXPYXzEerdBPH8bKZy++OdZTTs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iLkdMBOp; arc=pass smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D8B18FC80;
+	Mon, 23 Mar 2026 13:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774273084; cv=none; b=LTDICnhKOQGT8CFeS/ywWhyfO+FgKn/+V8pWfesEGSKb9xmtYOYREDqXO1WJJ0k1vnRCxQjikzls0MI+OFqEPWsNKlSccg8zC2rcLMzs1+02nPEn8PCa5O8l5r+lP8qb88CzPcBEQdv7LN9HgfIlMjVlZekp6U5OdvUMfzMCf6Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774273084; c=relaxed/simple;
+	bh=USMzPIu1/1gwLcFqDyGpJPU6fyEk3mOxUeH0qtfA7+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fCWtBI+lFxmIVJqgUmUj3ILKtR6QxVKA8m9e+LAdYphF7IM+izBFmXB2GXdEHkD10SnCqq2wvLVIFut+uz5spGpLiUlx9B8APXzWgaTRnjZJQkNc0Z09pjOIJgJuNotSJWRKMcrFGkGpWTAgFH6weP6sGdQa3fsIuaYTmcQGulk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OU6XHM0U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iLkdMBOp"
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-5091ed02c54so1073381cf.1
-        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 05:34:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774269249; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XxC89j6YwpYI2d2B6aR7d2u2onZPurFLa8VVCvwuV2lxCWxiLq25+fRPZtz1ysef1f
-         jYQEguTkd4sDmOUKkF1rx781/K0OAZDE/8ACK6SNmjrqWGALKbGqIEOw42jVn2MQxtSS
-         n7xAwn7+n0RDZccqhcqEOQ57Y4etT9adcxOgQfQVPw1Qk30wbNjMDRrRrtqMhwmdDNfl
-         vjXjsJfHqlX2h8EIISL4b58EfKA2RaIVOt8Q5y6PhP+gz0Wgr77HAgzP90RdxR4rf/EY
-         w7CHRM2Q4l3xYXOruMlCq+KIMWW9VmUfcMLqAOOVi7CPYD/WGwi1ThCecZAHAvQ9Pxe/
-         e70w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=YDciruzs8Ey3qf1jOS+c7GPDS8nO7KcVc/iFzTYFC6w=;
-        fh=hMJbWRXRkCMKjwl9zYyvoRK5X0mK5MHV2a71AU/VznY=;
-        b=b1bTGViqBB82Q3amppX/mWyY/DuTCGcp1NmpWuPJtnGpFzJjGNNn0rmRY7GraVbHIh
-         Eti+hWbYu01EeLIFOZOfwYyftfLfjpudeGJSIilTiiRIPqUAXTkJl34K/fwT6nl7AfHN
-         G8PMIQsa6B54rPbMWLARoET7P7vWXjFDsnbSHDyB03NOfmhIrwJaTLCUOA9z4HfBjY7j
-         8Bhm1tsVDXjvsUrCS5BuFpQWDyz+d/jEViBrhSKsA6hhWzyizX3R+Hpoi1EYyWP2VhLM
-         PM+yF9xGU9zJreDytk4GbOLfMBXZSoxiwDBmLiR2iGlqxJ1DAlVmA5BJdUPb+req9oZ/
-         9rQg==;
-        darn=lists.linux.dev
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774269249; x=1774874049; darn=lists.linux.dev;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YDciruzs8Ey3qf1jOS+c7GPDS8nO7KcVc/iFzTYFC6w=;
-        b=iLkdMBOp/Ku/0IcLA9dRjJ7OfSWz7w5quFd/LQevfMNhEY3z+hlQc/cKsOgZj/lt2k
-         p7mlRkxucKVz9wc/TzOgkucd7DvEPuz5bAYJ5XBb+/m+/Mxd5fGBWDb31AugdMlNanbu
-         6shQ+RBUU0PwZvGSjbYwIjXgWfJIjWCbB1e7UqI3m+e227QmfUGHPd93YheqB49Fxr3g
-         r6wGXAoEYV0KGztzrB3V7WeXbaNxWEtvLaqiUODUNjgHg2dq42Wpjj82QSO2kArLrPqu
-         W9/lC49ccB21Zj788Y7E+/HaG2qXVmW0Lc4jUXQR0mKx1QF+VeQfQ35HLUbeWG1UWI/I
-         oH+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774269249; x=1774874049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YDciruzs8Ey3qf1jOS+c7GPDS8nO7KcVc/iFzTYFC6w=;
-        b=gP0rqFl30xyQHDrEQLw3XPpOIm6+YB7Cy/NDMxdDV8de74yURfBuYn7SUL2wJfuUka
-         hkNH0MlvYikk5mngcxbP8H9VHzWbPn1Jmoqy/kxFyfj4xploOgquG6gSSRPjSrBS3QYu
-         IoUcdkb4f9+K5Jb/l6vLTI2lHKpW/C0dZqJYb6zce3QLH2M/2AINxcqvwFNLXAHqltGc
-         ZKrGbXthYb2wZcbrZgd3s8qqZYib6YidjEA7qU1mPVyiDcsUReuTicRIxiLpKCrM0mCq
-         sLuU8OyfquhyOSK8Ts0bXT62zKb0VmqDfsfxv7hxfLILTIBiBM4+U7N1xoAXPZQmaZS5
-         hl2Q==
-X-Gm-Message-State: AOJu0YzrlGamVRxWyy54gvFpC8fqxAO0ZnxsXocc1oLEFAGmSRoSfXtF
-	Mh8WhWOqQE1JJGzfbULVepHuf4L/1iRN3MZhsycO5fnE4yV1+ZHNDcR7yZ5Wqh5wCaoiLD+SYCV
-	efCPPQWifAfYObHNoek0DJaRJAxCy6o6iJGz7PkqT
-X-Gm-Gg: ATEYQzwj2XqGuhf515P8Tjx1FAf91wDq609AgQ4dQO5abBfFoTs9VR8mGDM1woAg6c8
-	oZ1FeioSV+MXnreYCcq4eG72v2n0Abj2U3ztNz1NKzWEcxpgnvwi2wXxo24eHFBH8Uh4N43UMS+
-	6Vhp97DEruLPHgP2XWRUCP6snOLoJcJQ4Vi7n6j+A1Lnz+mL8adg8OAMgA/TwP0n8KWOGCKTcrx
-	9DSGRAOsp0r1M09V5KhVBGvMCRUwUOvYWgKFXUsKJZghH9wOvdKrMY28KnTZFuYFN56J5EkJ1Lf
-	+oLU0yc7YPz/xmS41iRE6aKvIdC67yuOigHPbvnHpw==
-X-Received: by 2002:ac8:574b:0:b0:509:25c5:42b4 with SMTP id
- d75a77b69052e-50b480c27a5mr24589311cf.13.1774269248302; Mon, 23 Mar 2026
- 05:34:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OU6XHM0U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D04FC4CEF7;
+	Mon, 23 Mar 2026 13:38:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774273084;
+	bh=USMzPIu1/1gwLcFqDyGpJPU6fyEk3mOxUeH0qtfA7+4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OU6XHM0UffNDTEB4SvGp5qtXj77lQnim9j70B1Ao/FtqQGkpL+JILHVyU1MoPJY5a
+	 gfpBJjq2mBHAPZq74NqdSN+wdgGM/f56FnhflLgMyj2EcFrPWRtCBQ7su1v/gh231I
+	 9tfs/46j/7w1TUsxkZCCgEUXLBaWWHSBY5OSi6j1Y1v+D00Es5+/h29/vGfRvG5+U1
+	 M+kpRsaJo6ZOmGg+X5uD+a2fXCSK69WJraAal7nkqdX+smv4l6dWcSQ37W+UoVqBrz
+	 3kCBsVmPfJ5bGAOqihh/B0q9cWA9qaCxrfbs0dcySWU/bytIDRnhH7SLTgPn7Jgtdu
+	 Enppi209j2aIQ==
+Date: Mon, 23 Mar 2026 13:37:59 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Sascha Bischoff <Sascha.Bischoff@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"maz@kernel.org" <maz@kernel.org>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize
+ ID_AA64PFR2_EL1.GCIE
+Message-ID: <3be4971e-31a4-4033-9583-88d7fc96104f@sirena.org.uk>
+References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
+ <20260319154937.3619520-13-sascha.bischoff@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260321212419.2803972-1-maz@kernel.org> <177426391593.2932170.8726976984414575226.b4-ty@kernel.org>
-In-Reply-To: <177426391593.2932170.8726976984414575226.b4-ty@kernel.org>
-From: Mostafa Saleh <smostafa@google.com>
-Date: Mon, 23 Mar 2026 12:33:55 +0000
-X-Gm-Features: AQROBzA3qYHe3s8BaZ2dHYM9ZdaRsKXyWNR-mfM5AIq5nZXyLzrP-udG8vd73pg
-Message-ID: <CAFgf54rsCocMTaP=OPfFq7BCwoxQKcEkcyad16BtnZ11XxyKxg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] KVM: arm64: pkvm; Rework aspects of the PSCI relay
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Joey Gouly <joey.gouly@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver Upton <oupton@kernel.org>, 
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>, 
-	Quentin Perret <qperret@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="MlKsc4YS4+0PkdYN"
+Content-Disposition: inline
+In-Reply-To: <20260319154937.3619520-13-sascha.bischoff@arm.com>
+X-Cookie: You will triumph over your enemy.
 
-On Mon, Mar 23, 2026 at 11:05=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> On Sat, 21 Mar 2026 21:24:14 +0000, Marc Zyngier wrote:
-> > Having recently spent some quality time debugging [1], I ended up
-> > reading too much of the PSCI relay code and felt that it could do with
-> > a bit of spring cleaning.
-> >
-> > To be clear, this series doesn't really fix anything. It simply adjust
-> > things to my own taste, which may or may not be everyone's.
-> >
-> > [...]
->
-> Applied to next, thanks!
->
-> [1/5] KVM: arm64: pkvm: Move error handling to the end of kvm_hyp_cpu_ent=
-ry
->       commit: 4ebfa3230b40728638a6acceb709f900f920f921
-> [2/5] KVM: arm64: pkvm: Simplify BTI handling on CPU boot
->       commit: 1536a0b1386850b67a9ea840e57b7b475e895fed
-> [3/5] KVM: arm64: pkvm: Turn __kvm_hyp_init_cpu into an inner label
->       commit: ba64e273eac3d7ec4a2b621b3620c4d3b0399858
-> [4/5] KVM: arm64: pkvm: Use direct function pointers for cpu_{on,resume}
->       commit: 59c6e12d40a5b05038b68bcdb4690456fee68e8a
-> [5/5] KVM: arm64: Remove extra ISBs when using msr_hcr_el2
->       commit: 54a3cc145456272b10c1452fe89e1dcf933d5c39
->
 
-Maybe a bit late, but I tested with pKVM(nvhe and hvhe) that it
-boots/powers off + hotplug through sysfs
+--MlKsc4YS4+0PkdYN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Tested-by: Mostafa Saleh <smostafa@google.com>
+On Thu, Mar 19, 2026 at 03:52:50PM +0000, Sascha Bischoff wrote:
+> Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
+> already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
+> fields. Add sanitisation for the GCIE field, which is set to IMP if
+> the host supports a GICv5 guest and NI, otherwise.
 
-Thanks,
-Mostafa
+...
 
-> Cheers,
->
->         M.
-> --
-> Without deviation from the norm, progress is not possible.
->
->
+> All of this extra work is required to make sure that "legacy" GICv3
+> guests based on QEMU transparently work on compatible GICv5 hosts
+> without modification.
+
+I'm seeing a regression in -next in set_id_regs on a range of platforms,
+including physical ones like the Toradex Verdin AM62 and i.MX8MP-EVK,
+with a GICv3:
+
+# ok 105 # SKIP MTE capability not supported, nothing to test
+# ==== Test Assertion Failure ====
+#   arm64/set_id_regs.c:651: test_reg_vals[encoding_to_range_idx(uc.args[2])] == uc.args[3]
+#   pid=3573 tid=3573 errno=4 - Interrupted system call
+#      1	0x0000000000403047: test_guest_reg_read at set_id_regs.c:651
+#      2	0x00000000004024cb: main at set_id_regs.c:805
+#      3	0x0000ffff9e85251b: ?? ??:0
+#      4	0x0000ffff9e8525fb: ?? ??:0
+#      5	0x00000000004027af: _start at ??:?
+#   0x1111 != 0x1001111 (test_reg_vals[encoding_to_range_idx(uc.args[2])] != uc.args[3])
+not ok 20 selftests: kvm: set_id_regs # exit=254
+
+Platforms without a GICv3 appear unaffected.
+
+Full log:
+
+   https://lava.sirena.org.uk/scheduler/job/2584795#L4111
+
+bisect log:
+
+# bad: [0ec822710d040a1e4a13be04494dc9f0462f8ba7] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+# good: [0e4f8f1a3d081e834be5fd0a62bdb2554fadd307] Merge tag 'parisc-for-7.0-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
+# good: [09e70e4f119ff650d24c96161fd2f62ac7e424b0] regmap: Synchronize cache for the page selector
+git bisect start '0ec822710d040a1e4a13be04494dc9f0462f8ba7' '0e4f8f1a3d081e834be5fd0a62bdb2554fadd307' '09e70e4f119ff650d24c96161fd2f62ac7e424b0'
+# test job: [09e70e4f119ff650d24c96161fd2f62ac7e424b0] https://lava.sirena.org.uk/scheduler/job/2565604
+# test job: [0ec822710d040a1e4a13be04494dc9f0462f8ba7] https://lava.sirena.org.uk/scheduler/job/2584795
+# bad: [0ec822710d040a1e4a13be04494dc9f0462f8ba7] Merge branch 'for-linux-next-fixes' of https://gitlab.freedesktop.org/drm/misc/kernel.git
+git bisect bad 0ec822710d040a1e4a13be04494dc9f0462f8ba7
+# test job: [a5d4dfaac4b2810ec2be80d2a9a1facce7dc554d] https://lava.sirena.org.uk/scheduler/job/2584889
+# good: [a5d4dfaac4b2810ec2be80d2a9a1facce7dc554d] Merge branch 'mtd/fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/mtd/linux.git
+git bisect good a5d4dfaac4b2810ec2be80d2a9a1facce7dc554d
+# test job: [d04c0e637ff3323b010804dbfe349fb9c1309253] https://lava.sirena.org.uk/scheduler/job/2585075
+# bad: [d04c0e637ff3323b010804dbfe349fb9c1309253] Merge branch 'dma-mapping-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/mszyprowski/linux.git
+git bisect bad d04c0e637ff3323b010804dbfe349fb9c1309253
+# test job: [e3d585ed3ff891a00c2284fef4be9cf8581735ab] https://lava.sirena.org.uk/scheduler/job/2585150
+# bad: [e3d585ed3ff891a00c2284fef4be9cf8581735ab] Merge branch kvm-arm64/vgic-v5-ppi into kvmarm-master/next
+git bisect bad e3d585ed3ff891a00c2284fef4be9cf8581735ab
+# test job: [0a9f38bf612b195e04236d366ed9f769ce14cc27] https://lava.sirena.org.uk/scheduler/job/2585330
+# bad: [0a9f38bf612b195e04236d366ed9f769ce14cc27] KVM: arm64: selftests: Introduce a minimal GICv5 PPI selftest
+git bisect bad 0a9f38bf612b195e04236d366ed9f769ce14cc27
+# test job: [4d591252bacb2d004b7c7f5db439bfa23b552ee7] https://lava.sirena.org.uk/scheduler/job/2585661
+# bad: [4d591252bacb2d004b7c7f5db439bfa23b552ee7] KVM: arm64: gic-v5: Implement PPI interrupt injection
+git bisect bad 4d591252bacb2d004b7c7f5db439bfa23b552ee7
+# test job: [da92ff15ca4c5b0f75ec1cb3d2e275db2ff2c810] https://lava.sirena.org.uk/scheduler/job/2585906
+# good: [da92ff15ca4c5b0f75ec1cb3d2e275db2ff2c810] KVM: arm64: gic-v5: Add Arm copyright header
+git bisect good da92ff15ca4c5b0f75ec1cb3d2e275db2ff2c810
+# test job: [070543a85adce329672012a1fe35fa48c76e02d5] https://lava.sirena.org.uk/scheduler/job/2586294
+# bad: [070543a85adce329672012a1fe35fa48c76e02d5] KVM: arm64: gic-v5: Trap and emulate ICC_IDR0_EL1 accesses
+git bisect bad 070543a85adce329672012a1fe35fa48c76e02d5
+# test job: [a258a383b91774ac646517ec1003a442964d8946] https://lava.sirena.org.uk/scheduler/job/2586455
+# bad: [a258a383b91774ac646517ec1003a442964d8946] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
+git bisect bad a258a383b91774ac646517ec1003a442964d8946
+# test job: [f656807150e3e1c6f76cab918e5adfad6d881d58] https://lava.sirena.org.uk/scheduler/job/2586592
+# good: [f656807150e3e1c6f76cab918e5adfad6d881d58] KVM: arm64: gic-v5: Detect implemented PPIs on boot
+git bisect good f656807150e3e1c6f76cab918e5adfad6d881d58
+# first bad commit: [a258a383b91774ac646517ec1003a442964d8946] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
+
+--MlKsc4YS4+0PkdYN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnBQjYACgkQJNaLcl1U
+h9DTIwf/W12+7bv3l6vdsZYzXz9UkyBV+fFwNob5fA9ESs077+n5J/rLY2sDZ9f4
+5q9rL8PMztjFc01LhDZ20SS96O1fHDMG3zlM5cqT71ydvqYbXxDjeUGDJ2q04mM3
+EpSZWfAePSmWXtfrKNpPyvv/tUixTjBx8L8njZN76ub+6j/G1/JmQLZPzK/p9HMZ
+04F7t6TyjzyTc66+9MWhnOT0YuCoeW0F40l0DGmsCkS4UvUo4ZGWCOgH7dhxB7Sa
+bIwBBg1uQ3slkJSZt4SDENiBbDKVvMrsKD5im8ne4vsZSlzhmxI2YX0RiKRdFtwq
+Qv3jM/t8g0tmkeezGlCcrKRdh+1U4w==
+=ZAl7
+-----END PGP SIGNATURE-----
+
+--MlKsc4YS4+0PkdYN--
