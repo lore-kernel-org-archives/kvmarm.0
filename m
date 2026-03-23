@@ -1,29 +1,29 @@
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013027.outbound.protection.outlook.com [52.101.72.27])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011013.outbound.protection.outlook.com [40.107.130.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93691386435;
-	Mon, 23 Mar 2026 11:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E1B399359;
+	Mon, 23 Mar 2026 11:58:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.13
 ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774265598; cv=fail; b=bBfDDOy7FzRYfVYeSXlj5LBTWaDji0/Me9ewnJFBLWOokIV0BEeb8tFKYmpB0ldhZLYevuGZ1vmtUbsCllLw38YLNlmuqXAwn+irK0GFX/8LweoESEUvfrhVjex+2PjIeFkEOMwDGH1U8BAlcvm64077pPfwIR3KejbTYrsnjvQ=
+	t=1774267089; cv=fail; b=T3z1hXABlP5NyCo8jgS7YDOmthag0VmPdCy40hoKrwKytnlJrmZCd9u/MHxwYW13xervXs63rpKlg1SOaaa9HP7m56zyMDHooqtA8P3ghWR77VEr5A9I5TObwP4haSILsw82KsIbWybRb0KziWGQrGjHB9CuF/VxrlNBpDg2PyE=
 ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774265598; c=relaxed/simple;
-	bh=ZGmV2Tq45H4kgKqpVt9Gh1v0CSebZIu/as874i6bnNU=;
+	s=arc-20240116; t=1774267089; c=relaxed/simple;
+	bh=EFqA2lRUN5tma2U/d1g57qdCkBE7RB6hxW9z33vPCuA=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ns75tQpCVOxDKNQhrsUcvLxYLXLy/q9z4+Tt0EucYvJGdKNWxMro2qFXmpC8fgIsIMU0jgElwMYxYY5HRjgSJQuJAw5a70gpHtnoPrrBHfEqgKklXrcv/s3DJX8oIod4rk8CocY/65ssUUhJCn4aDA5FpumMNa0qW8rorCHlSRQ=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=j5iC2pwM; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=j5iC2pwM; arc=fail smtp.client-ip=52.101.72.27
+	 Content-Type:MIME-Version; b=G/uiU8sAd6ll5DCipusppjRXk2InuqtQ2ioueyQHMG4HQu3AhDRb1B030yh/Vt7ARsfmz9Mo8+ol16f4Tlqq6RZZbBpH7bYplPnHezkze8vCqQRY+lOp1tfQQmguB1C8Lrd1PKonN1pyQ+WriO+VP9kXxmFuTVxWzpDvoeJgps4=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I3rvDY6H; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=I3rvDY6H; arc=fail smtp.client-ip=40.107.130.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="j5iC2pwM";
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="j5iC2pwM"
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I3rvDY6H";
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="I3rvDY6H"
 ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=hhk1Dx6xDDjm1ND5cmvz5OaIpCJFuWbNgveiVpseziIrlH/nPEZWbsgTui2zIGhoOSM0ZuYcSHbFwalsPUTS7Nbn9Jyv+SzRq2Comxm0pLvwc7u9cNvpkD12Mw0LKeGG5EqC0Auq01vtykmEscYimL3WvLoBpbCA3x+MxIMHb5481i7XC6eHN9bQhtV+N/dTUrPOrY43QnjXq+pTrB7FhFEWSv/6MnzCDEYPnjcEazCOGFDdihp4FFBprVJzv53P8C/IiSOZ5tAZqT3xFPMZ+4WpGYjIRExpVUDdB0WzrZsAmfvaDRZ4Lq3dx59fS7WMb4JbMJDglD94TDs3dAaFjg==
+ b=wz6WJZ5dty4DEFeG7JM/cwpilpMmHnNYsm5bogoFV7uy7WK/25g+vI8QarRtOAPLjzvvaMkNfIgd7NkwTUieimAMusEm6dK9XG74ZEJ5TMq4QSgyp63mHjxayjlLBYN79Q9/JlR4+RhIwPCpYpGESYcTXMqo6jk4aTWCwMq815czkdyRyztCZ4pCqqfKxF6bKl+OoX3QRVuhFcGSf51b4U2+ky2sVT87OeNENKdXtNni6FKhVt2Cf8b3pArJ9aJRCYstooUZ3jAVK0vyI7efQaRJxcLe0ZqNBFMiU7dUq0OOUADvIPGg7O5GqSxR+EIzWHsA4PUxdSy/AhlttxADow==
 ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5iIGlhP1GxmWBISCr6xbm2BLgW/acl79hHZ+o+ZLILM=;
- b=rpwmzMbboPUw731a+jlu+MNRGA4QGtUbZAPbZI4e1RTQX759/SotbD4cBM80f2rY27eOIJE7ICYCVdQUrgHOt8DXWzA5MQ/Zno/uOrY81SNbt1kzF14WZRzsekFQvbDJH1tr72In3QuuhqBklr6mIasAS0TSvPYJLeKA86dCQqNDDJiDnMQoK76uyJ9vdTW7ZmbewigRuFo3FF65R2QONrVmKL+NH99NQ0mYZk+AO0lWeMrBZawwKm4o06R3tvsoxrROzCEQynJyWFW9chwT98D7IuWknlT2Q/8egkudJTqwGrzpCmd2RKbNNcHachGmp+U9TGVbAs3B8o/gVJgmBA==
+ bh=YLDohBEinYpX5m0/m7PVDrTeAwbT5Vj2BiEWaOfbYq0=;
+ b=Gcxutsz4/tGCBF9+Lty2BLKakJZ6rVHU1qurwDmMo9ugz/oWhZnpYW/o2JfrHDsTemxbzeA+FrF+kA9UydDXiYH9i0Na9K64oDoXrlo9XyBtBYoCr1MFvIfnkQlm4rjY7FbnL/5nsYqr1N2o/ZXEgZSjjZxkA3WOkfE2svuDRG7SxY86ljYYkIdnKjoL0PouHBBIRFA9mWtafYsGtiKz1qQMpi//SvhFWRFST+uP/iZgx0VWABR4cP9j7G9u59w2L8wRSb6I9fu4OPOM2oCXoKAn890DbABuGKji7DcHjvFhRAaNkWsv8o/9RQtFZfA6vXZpR3aj+/SxCQcm6xaUZA==
 ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  4.158.2.129) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arm.com;
  dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
  dmarc=[1,1,header.from=arm.com])
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5iIGlhP1GxmWBISCr6xbm2BLgW/acl79hHZ+o+ZLILM=;
- b=j5iC2pwM/Q6ODeYUIt27WHoX8M9ppVCzpdqPbcPQBL5U3AH3FDvF6Askp0rlsX8PbcfPSQsjoHKkf7UAig5F9+BDyX9O2Uk7tvq/vW1Y1i3/1k0Zj7GOwxtsXnJRx890k5v9csxZS2c2rbdjnxPIUSsTTCOExiR0XxYeK6+fwAU=
-Received: from AM7PR03CA0003.eurprd03.prod.outlook.com (2603:10a6:20b:130::13)
- by DU0PR08MB8688.eurprd08.prod.outlook.com (2603:10a6:10:400::13) with
+ bh=YLDohBEinYpX5m0/m7PVDrTeAwbT5Vj2BiEWaOfbYq0=;
+ b=I3rvDY6Hy6hFCE2ZxnJ2M1oe0C56Dn+3CVFMYJP5GryBYoXju5LQOj4/HEEyCTvRgmxPLWOwKGkI6I2ch29CBhRdVtTG7i2GyL/ozv7VEieahb2ARLbv634CyzQUNmYZOqS3Vfif3wo24SfRrzNIRiD1rnGk8EgRQ6vEmYYft30=
+Received: from AM8P190CA0003.EURP190.PROD.OUTLOOK.COM (2603:10a6:20b:219::8)
+ by DB3PR08MB9900.eurprd08.prod.outlook.com (2603:10a6:10:43e::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Mon, 23 Mar
- 2026 11:33:10 +0000
-Received: from AM3PEPF0000A793.eurprd04.prod.outlook.com
- (2603:10a6:20b:130:cafe::eb) by AM7PR03CA0003.outlook.office365.com
- (2603:10a6:20b:130::13) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.29 via Frontend Transport; Mon,
- 23 Mar 2026 11:33:09 +0000
+ 2026 11:57:57 +0000
+Received: from AM4PEPF00025F98.EURPRD83.prod.outlook.com
+ (2603:10a6:20b:219:cafe::21) by AM8P190CA0003.outlook.office365.com
+ (2603:10a6:20b:219::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.31 via Frontend Transport; Mon,
+ 23 Mar 2026 11:57:56 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 4.158.2.129)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=arm.com;dmarc=pass action=none header.from=arm.com;
@@ -51,38 +51,38 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  4.158.2.129 as permitted sender) receiver=protection.outlook.com;
  client-ip=4.158.2.129; helo=outbound-uk1.az.dlp.m.darktrace.com; pr=C
 Received: from outbound-uk1.az.dlp.m.darktrace.com (4.158.2.129) by
- AM3PEPF0000A793.mail.protection.outlook.com (10.167.16.122) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9723.19
- via Frontend Transport; Mon, 23 Mar 2026 11:33:09 +0000
+ AM4PEPF00025F98.mail.protection.outlook.com (10.167.16.7) with Microsoft SMTP
+ Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.0 via
+ Frontend Transport; Mon, 23 Mar 2026 11:57:57 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tB8z3TP+fLItEoKHHoZqLRQynr6gTdrZGHL2byHuPYVyL1NmJ4kI5ns1iCeW8Lkht/xl1e1fvfWS6PfgItmxiZUj2GPoptsnSsevsaMBSl8T1Khos4vmXSkWxOm1KHzZTkVHlydseaWlY8Lm/DfFbfqYc1HPydqfdTqaVtnjlo9PdZOHbrKEobRky4EdY5xdAya/LJz9d5Et/yjFsJ2JTjPwIk6TtGdGcs5u6R6T8xrrS7gcB6SRYjAf0VvBoCvqSqy3KwP0ct+QBmEbHh12SqE4fhQfu1ZcBXd9qAJIu71XS8jEdmstQ4c7j4WFnK3PvJSKcBzQXM6aNm/0f6STtQ==
+ b=RpRO4tzsgCBDUoGDOWk3qZIM5QM757QN7TQSKJsT9yHQp9NiSg5UKV2KlMvCpcbMzN80X320q579MsKcNwFODb2J07LNQjyfBzparcuASu/ocIL5kS8pbSB1YI42HNQZ8T5wQseMmP07j2js5h/HatLg5xRlvdXHZly9ZcZzPcCbATUl+dSSZQR3b+PPkdQX2DLA2CjFq6xKnKCdnnp+32Aru8DwBgC+oi6MyZZDvJGg9qQTWj2SFwIWg61hkCkVDE1nLi9ZVvgBaDGaMxV4TbB8ZF64Ww8KGNRpKSJkcPvhyYp32LkbWxJQ7JKTGgLxnSQLoaM4dVJ0nNY6m7n85Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5iIGlhP1GxmWBISCr6xbm2BLgW/acl79hHZ+o+ZLILM=;
- b=wrIayNxN+NWphAKLtVi/kN0M9zJ7ZfBIr1kqwZ5PZIWhpalNPIcfyUnQ7GqV/0MwpYUGXWgEz6Mdl++FNJV2nXwyioy+EL/t48osvoiHtFgASEohKEw90N3xKi0IiHNJ9VpZbK6S87dNEvrDBuEiNrdwjLsnVtVfKyc6lZZrRvIFDvOeD6k3xBAlmN5YZ5h+hsKbkuxTXZ2VrbZXNXQVbw3ZLkoieaSR2zeN/VXJBq491kpl6tZXIDb3ZtYQAUbiSTN+yuDaQwXtfqrFPop7EYXjFFRlQxXqhxj8kXT/UC6ctF1LwTndzz1yQ/nOc7F/qOynLdGacsSUMgMPV9G/PA==
+ bh=YLDohBEinYpX5m0/m7PVDrTeAwbT5Vj2BiEWaOfbYq0=;
+ b=M/7JajxNIi3YIbOtE4t58la9JAcczIu1Aa3uI6t4L6uWkHElGzAM/MmGJ9aSQo+6LfqKPZ9XjGZofMaIYteECvD+Gu1StvxQm8el80GXeadS4wsEw18V58TGZCXdzP7DDgSM6iMENKTj8skMTpT7IOy0A1orXPqhoZnUCV052KcJbgIUaBQ3V1xJ6Yx/apS+SzHIQRpmhenqoHfV/ZDZy44fh9t+m+rbKiZHGUrQYxGVnrkV2rkVhiuStUwryG8nHa93smSiwMYxG5byYh2rkELVv74Se/l8TQqf8sIwjYhqVfLez1cRkynYneV6YEF+7Ke2RsgztaSB+HOD0YTFiQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
  header.d=arm.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arm.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5iIGlhP1GxmWBISCr6xbm2BLgW/acl79hHZ+o+ZLILM=;
- b=j5iC2pwM/Q6ODeYUIt27WHoX8M9ppVCzpdqPbcPQBL5U3AH3FDvF6Askp0rlsX8PbcfPSQsjoHKkf7UAig5F9+BDyX9O2Uk7tvq/vW1Y1i3/1k0Zj7GOwxtsXnJRx890k5v9csxZS2c2rbdjnxPIUSsTTCOExiR0XxYeK6+fwAU=
+ bh=YLDohBEinYpX5m0/m7PVDrTeAwbT5Vj2BiEWaOfbYq0=;
+ b=I3rvDY6Hy6hFCE2ZxnJ2M1oe0C56Dn+3CVFMYJP5GryBYoXju5LQOj4/HEEyCTvRgmxPLWOwKGkI6I2ch29CBhRdVtTG7i2GyL/ozv7VEieahb2ARLbv634CyzQUNmYZOqS3Vfif3wo24SfRrzNIRiD1rnGk8EgRQ6vEmYYft30=
 Authentication-Results-Original: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=arm.com;
 Received: from DU4PR08MB11769.eurprd08.prod.outlook.com (2603:10a6:10:644::21)
- by AS8PR08MB8804.eurprd08.prod.outlook.com (2603:10a6:20b:5ba::5) with
+ by PA6PR08MB10420.eurprd08.prod.outlook.com (2603:10a6:102:3d2::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.31; Mon, 23 Mar
- 2026 11:32:06 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9723.25; Mon, 23 Mar
+ 2026 11:56:53 +0000
 Received: from DU4PR08MB11769.eurprd08.prod.outlook.com
  ([fe80::d424:cd62:81a8:490f]) by DU4PR08MB11769.eurprd08.prod.outlook.com
  ([fe80::d424:cd62:81a8:490f%5]) with mapi id 15.20.9723.022; Mon, 23 Mar 2026
- 11:32:06 +0000
-Message-ID: <7ab3dcd2-23b9-45a6-84ef-9617c4614c0a@arm.com>
-Date: Mon, 23 Mar 2026 11:32:04 +0000
+ 11:56:53 +0000
+Message-ID: <bf4ad5b2-7bbe-49b2-86be-cbbead1a3d29@arm.com>
+Date: Mon, 23 Mar 2026 11:56:52 +0000
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 24/48] arm64: RMI: Allow populating initial contents
+Subject: Re: [PATCH v13 17/48] arm64: RMI: Allocate/free RECs to match vCPUs
 To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -98,14 +98,14 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  <aneesh.kumar@kernel.org>, Emi Kisanuki <fj0570is@fujitsu.com>,
  Vishal Annapurve <vannapurve@google.com>
 References: <20260318155413.793430-1-steven.price@arm.com>
- <20260318155413.793430-25-steven.price@arm.com>
+ <20260318155413.793430-18-steven.price@arm.com>
 Content-Language: en-US
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20260318155413.793430-25-steven.price@arm.com>
+In-Reply-To: <20260318155413.793430-18-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0667.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:316::20) To DU4PR08MB11769.eurprd08.prod.outlook.com
+X-ClientProxiedBy: LO4P123CA0210.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a5::17) To DU4PR08MB11769.eurprd08.prod.outlook.com
  (2603:10a6:10:644::21)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
@@ -114,281 +114,441 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 X-MS-TrafficTypeDiagnostic:
-	DU4PR08MB11769:EE_|AS8PR08MB8804:EE_|AM3PEPF0000A793:EE_|DU0PR08MB8688:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0ba26419-59f6-4cf6-cc31-08de88cff5c4
+	DU4PR08MB11769:EE_|PA6PR08MB10420:EE_|AM4PEPF00025F98:EE_|DB3PR08MB9900:EE_
+X-MS-Office365-Filtering-Correlation-Id: e0e948b5-cd1c-4c28-8506-08de88d36c66
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|56012099003|18002099003|22082099003;
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|22082099003|18002099003|56012099003;
 X-Microsoft-Antispam-Message-Info-Original:
- z5/3Jiw3fiOPAgtvcj0LPCRAWjz/R93g5TGLA+R72XGOevGFOdRh+mhoz7hTp3loLOZEmZ1VLfI8nboe8Ms2/A8Xtf7G0LltDAsEUsZL3pIeggTYVZF/cSCcU3RdcIjXN1lGWnWMvbO5LZb13mW2inwBWFHHR9QK3w+u2ELpXDLDe34XHh0cywoXG4M3cmMJPkfFJV7LuPXXPMGChC95b0ITzlZc+PUb7sS4X00W7wB4JgjYh3Kerj9SGKBKCHXZXPrWBN66dnGZuSue+tAWIdbSrH0rQtw7I8ezHkR3a/0Ue/p1IJIGPuR2wBTKiiGQjhATvBaa1efS0XGD3gC62jbqq6ZJbTqDUUvHRq6xJWZ+SK9w0Vcb0Ox7XE0y//m5Y/cCpoj0YbP1o0HYDarge8MmwxUnEXK8D+d1kHMXEur/aP0d1mkv/v7vW3nfaI1vmKB1Z5WK8nQaMDYUQ1gxqGtFoiraDhPNejGHejFUl6Hg/NGqcCITnwRkvIo4U1ZtnYvECT2X+FvV/XqOd2AlEmGWDu25Ywh+zq+8giNPyVHqqvgZqoz0TtN8QgCTAR5UKgf/lmM1nzNTZaTJJYxklHhbaoGLL+OA164Ef/fAYfqYZBv6TwUcziaC1YpF1aRIUEMFrLmAiXfqy+KxqK0ut4Gfku9614UQXxNemj2TxHesp4KWJjXNDw7A6kjPpXxeEGRlNYpix1rmVIDIFn2yoK3f0219IM/O1wF4sV6547I=
+ IfzW3ueN9YfORzAklE0kKul5wrq3FF/61ckRgcmponNHCvyF5S2ezmxIO3lQdqIVRA11NaZRxvaeB0Cz645Q5KWIffzhFCyUxJ3f7ttYxhcOMZkuT/OMKP2+agQoa5W+WQ+vT33rCOaGpjUvEQ4yW898giPng5KgzjQOIBdaX0TyEBFmtCRGh2uAiGU+fA0sXVkoTUhREsCud09zwKdkg4Qyl12qUu9YujkmYdPOPfrsMkiHnNTUcYNWDJe7P0LQSuvO7erEviS/kdr2zZnxRWRRd3EQ7u6mDdassXvOx4+IyimXsCulx4w28j1z2A4NBvT7nVbidYXOJLvjy+q/VwwdKYvMnXn57iOuvVW4EsnY5zZ6+1gNLrphqm1YgNyB9A4Z3czkGqd7AFo3et/s5exu78+whOBY+YkQNRTihj7mBdEZUZagxtYYtjFyHi18INL/545mozveU+GmWSgBF8OAHA+HNCy41WWdr/AMVYslkP84iLxzckQiVZ+TGJZHBqMZSveTRnNJ2DvULfYs69aaqDXYysfi9qed2XudoYnwre2NVr2jWUpDfS7FCjbQ8IcLmMsSyGGaeX00k/U6IIZnwl/sHvLgnLm6NJ5YEJqB+C06ZwoxP3Z8GsLMmDqlPpY2G69u0goRvM+PnTpipNbgDXcF90Da0EplNKJx954uvbuaYEBIPKqGp5IJB0CdsVTBY/is5QaAu71RRa7oKRj4d9io2LaGuPAEDKukrPQ=
 X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU4PR08MB11769.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(22082099003)(18002099003)(56012099003);DIR:OUT;SFP:1101;
 X-Exchange-RoutingPolicyChecked:
- kj17I6nd/AeRoO1ugztcrnpjLluhmhbzsbzDbLCAmpzfAyXTaWZ3DJcaYJCYIIGnR21j6m7WlHShgj7mZW6hjk1UDykgFkkTnDY+bMbaocnqQ7XVeqWCocVlv3mYxULDVa2bLtzrWs6ueeMDZvvqaKZ9Ox1yypceTDbntqLVcuSRn5SGFwX/32XVKs5talb9wOmtagyzUdkFXbDKhwQ1pj6T4anENmIswxLwuGOQ4W4BrPpFlXH3hA6iXXC2JDA4+BsBmzT2jYW46Syv+ycQTks0HAOIbBA345qt8o5vZrtLpVA/PqtHHqTwGTmn1lmHG8lMksBuKi4fgbVqxsUavw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8804
+ DtkeF6l67icx+3P8tTs16mYjmgnc8o/9xJYlRztgFJYRntVHnKrNKOCCzNWxXVu2omPc18trw+c/98j3qr2HZqynJf4NtH++Qk307qewGPHHaRXUWZ48Ih3x09MIXDBMRn8oZck9hyj9nhfMhr238OwL4/PDwZBl9aruNr4Rrh0FwtBKlJ7BnRI4siWX7YszvGZnzaDzC1Bnp2YxLKjBJApGvJHyqK3C2nqMcQQgg5JWnr+7XRn5kW9oW/GwLWTlYFEShbFy9+zVtsVBl1y+vFCURHVR31wjaeFQcp0j49PMJ2Ye5Fx5upxr2EhAzI9EEF284wixDPXib8P+VmmIKg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR08MB10420
 X-EOPAttributedMessage: 0
 X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM3PEPF0000A793.eurprd04.prod.outlook.com
+ AM4PEPF00025F98.EURPRD83.prod.outlook.com
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	d721d023-4e25-4fe7-62fc-08de88cfcfc4
+	6fc192a5-5070-4c84-53ca-08de88d34662
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|35042699022|36860700016|1800799024|82310400026|7416014|376014|14060799003|56012099003|18002099003|22082099003;
+	BCL:0;ARA:13230040|14060799003|35042699022|36860700016|7416014|376014|1800799024|82310400026|56012099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	5JOqZ6SP+LzShPPN5YtU7QAXFk6cjMEp9Ght0WgMpXlIXgEp8pdqVBPK0SCxsWFdpHvRpNi3wJvcoHLzuynaMCpzjnGTYUKGEbjJVu/WruPd8klfcde9YobEXtRmYIECvEDGjPLM6bKgyFCR4GAPYJrLrNEnR720Aae35XkPtBTTlrnnLwsCzg/PbDCTOhxaCzhueNZinOeIVGLCxjN3pe+2LJ4smSns7eKZxyaLXmFG6w4dP6qMCsgdffcihBxkedtnSxbuBURzIXPOzI2k1HO7zEv9oJft9GwNQRPHmzXQb3e/0NgDyrMwLu5cnQmPGs1mifH7iwKoRy00j3tx/XBq5F+4saXhyQ7qIxVHhEhjOaKPSjcE4Xz3D9jVBgcriaaVmWBU9RX9cEn9Kvz1xS/C7rRj1Ndj3XtlGvyVjXiK2W5irlhvl6mNJGS5pq0h7WzSHIBxlvR9DyqgN/cgPYD/3DWBvkU3GdZPvpLszoArKoOkE5j/HOks2NKFAsw/WCBpvGD6Ogt/e5eun5Zflq9iUmnAIh6mbKEw2cmP7LzpoLH2YjA+1T2EGEIQO9nVfMIvUg+6LoH9JtxLGgMvDkeQ5fYycgcJ3cBdeBSXNVSOZGtokY7H6qlefD/UjVw7zCRatKbw/qynJWqo6TQicqTU8BhZ2IlkO2F/SYfjB9thRKWwO7jneqr3nxuv2eaU6mHsnfpf3BkNEeeZQ1rEgbpnrrrb/U8n6A1Yee9IPC6D3MoofXNi4EFAPMWc8u4yd8998bGQfKhYL9SPEbw6WA==
+	RmMZwRzCWyO+cI3zXhRMUl4E4gV9cW4ufXktnsdqNcfJj3V5MEXLPGLGj1hWzr7GIUudknTti4NDfzdHyGHVmtLYhzjHH1FM6c5uCfLHOu6SqCpr5BxOfAP7V2pFtm2KUI3HthB1FicOFQHI1XZwo9R+ffhiMlGlvQIVEmtluUGLQJjNcl2iYAZ/mHSOWKwW6JbA+GiCpCaFDcOT9GRlr31QaUQUJZs/9id5nsAUVTONy5iIW/lnyvIaSufTHmP17ovtOQfP7ZUs/LAusFPIyubBGTOK1ArsqQDtXWDEdmPrs+YptuVKAOwTJWdxQQKAYD0Go0W4RcWisRkFB/CB/RX/W3rauH6WkYyr8Wr0z2Z9FP2kzYLOoV8VFf3lItqM6Xb3x0YWzyeriZqfddCewBwcrp+0aroYDsXOHf7Uez9FuOXX21t0cT/oE9kI7A8xrQUpUx6cqeuSSmQtT44rKEX365Ub61t9xWxGMNGyZDMqfeiZQWABHRstb6BcPPOTmn4DllCMC9AxdAfNdYrg6oRSIyCVckhUnggmgzHOVwSiYufLvCcbvO6yIPYIvqrPJ1NuGFQtIR0h0osWbryRdIdN37IsSCiPSbsw5RWgSLCeTD0T5DtujWTmm1CCtP+Idc7pYeQvcd3Y8oEwm9M6+HgI2fblEC+yyhSxfWAGs+YqL+cnyxTzjYlpIKd7bKfIQFD5qtus5JEMqfAVF28siSmEkT6UjKxRon7L6Ik/GGrQdyRBtH81syyquFyd8myrpoGPWbCOO7AknLv45GICcQ==
 X-Forefront-Antispam-Report:
-	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(35042699022)(36860700016)(1800799024)(82310400026)(7416014)(376014)(14060799003)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+	CIP:4.158.2.129;CTRY:GB;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:outbound-uk1.az.dlp.m.darktrace.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(14060799003)(35042699022)(36860700016)(7416014)(376014)(1800799024)(82310400026)(56012099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	s5/aysC7IW34jLALM/orQqdVKUJrYve6z5xgzJTzdXJlOzsegs1bRzjA7p3hMzOukKGGHsca1o3S76yHR81BJq6jIL0i3GRVtuGlWpu7FWyn0e1fsUtXbjF1luabtyVghqHvONQVJlJznZuFNRwbYO1sS5Whsk2TMwDegx2Uvsbz6dN55TNfC6cD9ybAuutBbp6oriR2qXNhhGIIdBMAY5fldLliFLmxQRPsKLr9GFtAwGPKwE1jxKa0y4siP/Ydmd9uZTJ15yK2dDr3onxkMMgijBhCkW0lw9p0l6L1cMF5anwIYYsPr4qAWXts5qWye3e0h3oExYPGWisLI/dpCzpn/5eIOxRd2FhJKKI2iNomlNmUx3JtmYRWU+7169PN4aXbqwNhhbZxrskJ13OSup/P47duBmdiUPZX08FUKaiEU5SGwd0YlPOO+sV3WZnC
+	6xb9hu6CArTc68PBg+BxOhBFCoXP9ateLwEuZLXVrQtojNkZk3xn2TM8SXkq023Fe+6gV0cYOeKFzGJLamo47sVS7BKBML6fSiNJT8BaSFvuFkAS4ccspOX/ofUBOsKMSaizPrL/B7FrDU8ET/VGf/cptuHOZr1oc0v8RmgeioUjMxh9362s2tznL6ej3fUr91TfejSrh9QvV5OGodOroBRcTt67vPdM4VhrLHsneufv0E/4vxNhMnwTswuSvPrvOHWy9hsKx+dknMHIZ4RGBqRCvfpcxqsZmbgqsTCeibPhspyTcSVRm6aP3Vozd1Waa68dUbQAopMfARY+2GWZoZEDGoAT03WiswhI6iWZLFH9TSGJ6zmIJipdN1Tp/tBxr558+aHIU3WIMLQc8BGDG+tSo7bsNuokG5ew+5nL/qtyHjzXVcpzMlZMv7OROKGt
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 11:33:09.5056
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2026 11:57:57.0113
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ba26419-59f6-4cf6-cc31-08de88cff5c4
+X-MS-Exchange-CrossTenant-Network-Message-Id: e0e948b5-cd1c-4c28-8506-08de88d36c66
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[4.158.2.129];Helo=[outbound-uk1.az.dlp.m.darktrace.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	AM3PEPF0000A793.eurprd04.prod.outlook.com
+	AM4PEPF00025F98.EURPRD83.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR08MB8688
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB3PR08MB9900
+
+
+Hi,
+
+This is a NOTE for the fellow reviewers. This patch will undergo some
+changes to handle how the AUX granules (metadata storage for RMM) for
+the REC (aka vCPU) will be donated/reclaimed with RMM-v2.0.
+
+
+Please see PATCH 48/48 for the changes with the new Stateful RMI
+Operations (SRO), for REC create and destory.
+
+I have tried to mark the areas affected below.
+
 
 On 18/03/2026 15:53, Steven Price wrote:
-> The VMM needs to populate the realm with some data before starting (e.g.
-> a kernel and initrd). This is measured by the RMM and used as part of
-> the attestation later on.
+> The RMM maintains a data structure known as the Realm Execution Context
+> (or REC). It is similar to struct kvm_vcpu and tracks the state of the
+> virtual CPUs. KVM must delegate memory and request the structures are
+> created when vCPUs are created, and suitably tear down on destruction.
+> 
+> RECs must also be supplied with addition pages - auxiliary (or AUX)
+> granules - for storing the larger registers state (e.g. for SVE). The
+> number of AUX granules for a REC depends on the parameters with which
+> the Realm was created - the RMM makes this information available via the
+> RMI_REC_AUX_COUNT call performed after creating the Realm Descriptor (RD).
+> 
+> Note that only some of register state for the REC can be set by KVM, the
+> rest is defined by the RMM (zeroed). The register state then cannot be
+> changed by KVM after the REC is created (except when the guest
+> explicitly requests this e.g. by performing a PSCI call).
 > 
 > Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
 > Changes since v12:
->   * The ioctl now updates the structure with the amount populated rather
->     than returning this through the ioctl return code.
->   * Use the new RMM v2.0 range based RMI calls.
->   * Adapt to upstream changes in kvm_gmem_populate().
+>   * Use the new range-based delegation RMI.
 > Changes since v11:
->   * The multiplex CAP is gone and there's a new ioctl which makes use of
->     the generic kvm_gmem_populate() functionality.
+>   * Remove the KVM_ARM_VCPU_REC feature. User space no longer needs to
+>     configure each VCPU separately, RECs are created on the first VCPU
+>     run of the guest.
+> Changes since v9:
+>   * Size the aux_pages array according to the PAGE_SIZE of the host.
 > Changes since v7:
->   * Improve the error codes.
->   * Other minor changes from review.
+>   * Add comment explaining the aux_pages array.
+>   * Rename "undeleted_failed" variable to "should_free" to avoid a
+>     confusing double negative.
 > Changes since v6:
->   * Handle host potentially having a larger page size than the RMM
->     granule.
->   * Drop historic "par" (protected address range) from
->     populate_par_region() - it doesn't exist within the current
->     architecture.
->   * Add a cond_resched() call in kvm_populate_realm().
+>   * Avoid reporting the KVM_ARM_VCPU_REC feature if the guest isn't a
+>     realm guest.
+>   * Support host page size being larger than RMM's granule size when
+>     allocating/freeing aux granules.
 > Changes since v5:
->   * Refactor to use PFNs rather than tracking struct page in
->     realm_create_protected_data_page().
->   * Pull changes from a later patch (in the v5 series) for accessing
->     pages from a guest memfd.
->   * Do the populate in chunks to avoid holding locks for too long and
->     triggering RCU stall warnings.
+>   * Separate the concept of vcpu_is_rec() and
+>     kvm_arm_vcpu_rec_finalized() by using the KVM_ARM_VCPU_REC feature as
+>     the indication that the VCPU is a REC.
+> Changes since v2:
+>   * Free rec->run earlier in kvm_destroy_realm() and adapt to previous patches.
 > ---
->   arch/arm64/include/asm/kvm_rmi.h |   4 ++
->   arch/arm64/kvm/Kconfig           |   1 +
->   arch/arm64/kvm/arm.c             |  13 ++++
->   arch/arm64/kvm/rmi.c             | 111 +++++++++++++++++++++++++++++++
->   4 files changed, 129 insertions(+)
+>   arch/arm64/include/asm/kvm_emulate.h |   2 +-
+>   arch/arm64/include/asm/kvm_host.h    |   3 +
+>   arch/arm64/include/asm/kvm_rmi.h     |  21 +++
+>   arch/arm64/kvm/arm.c                 |  10 +-
+>   arch/arm64/kvm/reset.c               |   1 +
+>   arch/arm64/kvm/rmi.c                 | 196 +++++++++++++++++++++++++++
+>   6 files changed, 230 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
-> index 46b0cbe6c202..bf663bb240c4 100644
-> --- a/arch/arm64/include/asm/kvm_rmi.h
-> +++ b/arch/arm64/include/asm/kvm_rmi.h
-> @@ -96,6 +96,10 @@ int kvm_rec_enter(struct kvm_vcpu *vcpu);
->   int kvm_rec_pre_enter(struct kvm_vcpu *vcpu);
->   int handle_rec_exit(struct kvm_vcpu *vcpu, int rec_run_status);
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 39310d9b4e16..d194d91fbc2a 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -708,7 +708,7 @@ static inline bool kvm_realm_is_created(struct kvm *kvm)
 >   
-> +struct kvm_arm_rmi_populate;
-> +
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *arg);
->   void kvm_realm_unmap_range(struct kvm *kvm,
->   			   unsigned long ipa,
->   			   unsigned long size,
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 1cac6dfc0972..b495dfd3a8b4 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -39,6 +39,7 @@ menuconfig KVM
->   	select GUEST_PERF_EVENTS if PERF_EVENTS
->   	select KVM_GUEST_MEMFD
->   	select KVM_GENERIC_MEMORY_ATTRIBUTES
-> +	select HAVE_KVM_ARCH_GMEM_POPULATE
->   	help
->   	  Support hosting virtualized guest machines.
->   
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index badb94b398bc..43d05da7e694 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -2089,6 +2089,19 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
->   			return -EFAULT;
->   		return kvm_vm_ioctl_get_reg_writable_masks(kvm, &range);
->   	}
-> +	case KVM_ARM_RMI_POPULATE: {
-> +		struct kvm_arm_rmi_populate req;
-> +		int ret;
-> +
-> +		if (!kvm_is_realm(kvm))
-> +			return -ENXIO;
-> +		if (copy_from_user(&req, argp, sizeof(req)))
-> +			return -EFAULT;
-> +		ret = kvm_arm_rmi_populate(kvm, &req);
-> +		if (copy_to_user(argp, &req, sizeof(req)))
-> +			return -EFAULT;
-> +		return ret;
-> +	}
->   	default:
->   		return -EINVAL;
->   	}
-> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
-> index 13eed6f0b9eb..b48f4e12e4e0 100644
-> --- a/arch/arm64/kvm/rmi.c
-> +++ b/arch/arm64/kvm/rmi.c
-> @@ -718,6 +718,80 @@ void kvm_realm_unmap_range(struct kvm *kvm, unsigned long start,
->   		realm_unmap_private_range(kvm, start, end, may_block);
+>   static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+>   {
+> -	return false;
+> +	return kvm_is_realm(vcpu->kvm);
 >   }
 >   
-> +static int realm_create_protected_data_page(struct kvm *kvm,
-
-minor nit: To align with the RMM ABI, could we rename this to :
-
-	realm_data_map_init() ?
-
-> +					    unsigned long ipa,
-> +					    kvm_pfn_t dst_pfn,
-> +					    kvm_pfn_t src_pfn,
-> +					    unsigned long flags)
+>   #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 9267a2f2d65b..64304848aad4 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -924,6 +924,9 @@ struct kvm_vcpu_arch {
+>   
+>   	/* Per-vcpu TLB for VNCR_EL2 -- NULL when !NV */
+>   	struct vncr_tlb	*vncr_tlb;
+> +
+> +	/* Realm meta data */
+> +	struct realm_rec rec;
+>   };
+>   
+>   /*
+> diff --git a/arch/arm64/include/asm/kvm_rmi.h b/arch/arm64/include/asm/kvm_rmi.h
+> index 6c13847480f7..4e2c61e71a38 100644
+> --- a/arch/arm64/include/asm/kvm_rmi.h
+> +++ b/arch/arm64/include/asm/kvm_rmi.h
+> @@ -63,6 +63,26 @@ struct realm {
+>   	unsigned int ia_bits;
+>   };
+>   
+> +/**
+> + * struct realm_rec - Additional per VCPU data for a Realm
+> + *
+> + * @mpidr: MPIDR (Multiprocessor Affinity Register) value to identify this VCPU
+> + * @rec_page: Kernel VA of the RMM's private page for this REC
+> + * @aux_pages: Additional pages private to the RMM for this REC
+> + * @run: Kernel VA of the RmiRecRun structure shared with the RMM
+> + */
+> +struct realm_rec {
+> +	unsigned long mpidr;
+> +	void *rec_page;
+> +	/*
+> +	 * REC_PARAMS_AUX_GRANULES is the maximum number of 4K granules that
+> +	 * the RMM can require. The array is sized to be large enough for the
+> +	 * maximum number of host sized pages that could be required.
+> +	 */
+> +	struct page *aux_pages[(REC_PARAMS_AUX_GRANULES * SZ_4K) >> PAGE_SHIFT];
+> +	struct rec_run *run;
+> +};
+> +
+>   void kvm_init_rmi(void);
+>   u32 kvm_realm_ipa_limit(void);
+>   
+> @@ -70,6 +90,7 @@ int kvm_init_realm_vm(struct kvm *kvm);
+>   int kvm_activate_realm(struct kvm *kvm);
+>   void kvm_destroy_realm(struct kvm *kvm);
+>   void kvm_realm_destroy_rtts(struct kvm *kvm);
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu);
+>   
+>   static inline bool kvm_realm_is_private_address(struct realm *realm,
+>   						unsigned long addr)
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c8e51ed009c0..8c50ebd9fba0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -575,6 +575,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   	/* Force users to call KVM_ARM_VCPU_INIT */
+>   	vcpu_clear_flag(vcpu, VCPU_INITIALIZED);
+>   
+> +	vcpu->arch.rec.mpidr = INVALID_HWID;
+> +
+>   	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>   
+>   	/* Set up the timer */
+> @@ -1549,7 +1551,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+>   	return -EINVAL;
+>   }
+>   
+> -static unsigned long system_supported_vcpu_features(void)
+> +static unsigned long system_supported_vcpu_features(struct kvm *kvm)
+>   {
+>   	unsigned long features = KVM_VCPU_VALID_FEATURES;
+>   
+> @@ -1587,7 +1589,7 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>   			return -ENOENT;
+>   	}
+>   
+> -	if (features & ~system_supported_vcpu_features())
+> +	if (features & ~system_supported_vcpu_features(vcpu->kvm))
+>   		return -EINVAL;
+>   
+>   	/*
+> @@ -1609,6 +1611,10 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+>   	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features))
+>   		return -EINVAL;
+>   
+> +	/* Realms are incompatible with AArch32 */
+> +	if (vcpu_is_rec(vcpu))
+> +		return -EINVAL;
+> +
+>   	return 0;
+>   }
+>   
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index 959532422d3a..4bbf58892928 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -161,6 +161,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+>   	free_page((unsigned long)vcpu->arch.ctxt.vncr_array);
+>   	kfree(vcpu->arch.vncr_tlb);
+>   	kfree(vcpu->arch.ccsidr);
+> +	kvm_destroy_rec(vcpu);
+>   }
+>   
+>   static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/kvm/rmi.c b/arch/arm64/kvm/rmi.c
+> index 937fababf960..6daf14c4b413 100644
+> --- a/arch/arm64/kvm/rmi.c
+> +++ b/arch/arm64/kvm/rmi.c
+> @@ -207,6 +207,28 @@ static int get_start_level(struct realm *realm)
+>   	return 4 - stage2_pgtable_levels(realm->ia_bits);
+>   }
+>   
+> +static int delegate_range(phys_addr_t phys, unsigned long size)
 > +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	phys_addr_t rd = virt_to_phys(realm->rd);
-> +	phys_addr_t dst_phys, src_phys;
+> +	unsigned long ret;
+> +	unsigned long top = phys + size;
+> +	unsigned long out_top;
+> +
+> +	while (phys < top) {
+> +		ret = rmi_granule_range_delegate(phys, top, &out_top);
+> +		if (ret == RMI_SUCCESS)
+> +			phys = out_top;
+> +		else if (ret != RMI_BUSY && ret != RMI_BLOCKED)
+> +			return ret;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int delegate_page(phys_addr_t phys)
+> +{
+> +	return delegate_range(phys, PAGE_SIZE);
+> +}
+> +
+>   static int undelegate_range(phys_addr_t phys, unsigned long size)
+>   {
+>   	unsigned long ret;
+> @@ -372,9 +394,177 @@ static int realm_ensure_created(struct kvm *kvm)
+>   	return -ENXIO;
+>   }
+>   
+
+--->8--- Cut here
+
+> +static void free_rec_aux(struct page **aux_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	unsigned int i;
+> +	unsigned int page_count = 0;
+> +
+> +	for (i = 0; i < num_aux; i++) {
+> +		struct page *aux_page = aux_pages[page_count++];
+> +		phys_addr_t aux_page_phys = page_to_phys(aux_page);
+> +
+> +		if (!WARN_ON(undelegate_page(aux_page_phys)))
+> +			__free_page(aux_page);
+> +		aux_page_phys += PAGE_SIZE;
+> +	}
+> +}
+> +
+> +static int alloc_rec_aux(struct page **aux_pages,
+> +			 u64 *aux_phys_pages,
+> +			 unsigned int num_aux)
+> +{
+> +	struct page *aux_page;
+> +	unsigned int i;
 > +	int ret;
 > +
-> +	dst_phys = __pfn_to_phys(dst_pfn);
-> +	src_phys = __pfn_to_phys(src_pfn);
+> +	for (i = 0; i < num_aux; i++) {
+> +		phys_addr_t aux_page_phys;
 > +
-> +	if (delegate_page(dst_phys))
-> +		return -ENXIO;
+> +		aux_page = alloc_page(GFP_KERNEL);
+> +		if (!aux_page) {
+> +			ret = -ENOMEM;
+> +			goto out_err;
+> +		}
 > +
-> +	ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys, flags);
-> +	if (RMI_RETURN_STATUS(ret) == RMI_ERROR_RTT) {
-> +		/* Create missing RTTs and retry */
-> +		int level = RMI_RETURN_INDEX(ret);
+> +		aux_page_phys = page_to_phys(aux_page);
+> +		if (delegate_page(aux_page_phys)) {
+> +			ret = -ENXIO;
+> +			goto err_undelegate;
+> +		}
+> +		aux_phys_pages[i] = aux_page_phys;
+> +		aux_pages[i] = aux_page;
+> +	}
 > +
-> +		KVM_BUG_ON(level == RMM_RTT_MAX_LEVEL, kvm);
+> +	return 0;
+> +err_undelegate:
+> +	while (i > 0) {
+> +		i--;
+> +		if (WARN_ON(undelegate_page(aux_phys_pages[i]))) {
+> +			/* Leak the page if the undelegate fails */
+> +			goto out_err;
+> +		}
+> +	}
+> +	__free_page(aux_page);
+> +out_err:
+> +	free_rec_aux(aux_pages, i);
+> +	return ret;
+> +}
+> +
 
-A buggy VMM can trigger this by calling RMI_POPULATE twice ? Should we
-return -ENXIO here rather ? The delegate_page() above could prevent
-normal cases, but is the VMM allowed to somehow trigger a "pfn" change
-backing the KVM ? Either way, this need not be Fatal ?
+---8<---
 
-Otherwise looks good to me.
+
+
+
+> +static int kvm_create_rec(struct kvm_vcpu *vcpu)
+> +{
+
+...
+
+---8>--- CUT here
+
+> +	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
+> +	if (r)
+> +		goto out_undelegate_rmm_rec;
+> +
+> +	params->num_rec_aux = realm->num_aux;
+
+---8<---
+
+> +	params->mpidr = mpidr;
+> +
+> +	if (rmi_rec_create(virt_to_phys(realm->rd),
+> +			   rec_page_phys,
+> +			   virt_to_phys(params))) {
+> +		r = -ENXIO;
+> +		goto out_free_rec_aux;
+> +	}
+
+
+> +
+> +	rec->mpidr = mpidr;
+> +
+> +	free_page((unsigned long)params);
+> +	return 0;
+> +
+> +out_free_rec_aux:
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+> +out_undelegate_rmm_rec:
+> +	if (WARN_ON(undelegate_page(rec_page_phys)))
+> +		rec->rec_page = NULL;
+> +out_free_pages:
+> +	free_page((unsigned long)rec->run);
+> +	free_page((unsigned long)rec->rec_page);
+> +	free_page((unsigned long)params);
+> +	rec->run = NULL;
+> +	return r;
+> +}
+> +
+> +void kvm_destroy_rec(struct kvm_vcpu *vcpu)
+> +{
+> +	struct realm *realm = &vcpu->kvm->arch.realm;
+> +	struct realm_rec *rec = &vcpu->arch.rec;
+> +	unsigned long rec_page_phys;
+> +
+> +	if (!vcpu_is_rec(vcpu))
+> +		return;
+> +
+> +	if (!rec->run) {
+> +		/* Nothing to do if the VCPU hasn't been finalized */
+> +		return;
+> +	}
+> +
+> +	free_page((unsigned long)rec->run);
+> +
+> +	rec_page_phys = virt_to_phys(rec->rec_page);
+> +
+
+--8>-- Cut here
+
+> +	/*
+> +	 * The REC and any AUX pages cannot be reclaimed until the REC is
+> +	 * destroyed. So if the REC destroy fails then the REC page and any AUX
+> +	 * pages will be leaked.
+> +	 */
+> +	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
+> +		return;
+> +
+> +	free_rec_aux(rec->aux_pages, realm->num_aux);
+
+---8<---
+
 
 Suzuki
 
 
+
 > +
-> +		ret = realm_create_rtt_levels(realm, ipa, level,
-> +					      RMM_RTT_MAX_LEVEL, NULL);
-> +		if (!ret) {
-> +			ret = rmi_rtt_data_map_init(rd, dst_phys, ipa, src_phys,
-> +						    flags);
-> +		}
-> +	}
-> +
-> +	if (ret) {
-> +		if (WARN_ON(undelegate_page(dst_phys))) {
-> +			/* Undelegate failed, so we leak the page */
-> +			get_page(pfn_to_page(dst_pfn));
-> +		}
-> +	}
-> +
-> +	return ret;
+> +	free_delegated_page(rec_page_phys);
 > +}
 > +
-> +static int populate_region_cb(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-> +			      struct page *src_page, void *opaque)
-> +{
-> +	unsigned long data_flags = *(unsigned long *)opaque;
-> +	phys_addr_t ipa = gfn_to_gpa(gfn);
-> +
-> +	if (!src_page)
-> +		return -EOPNOTSUPP;
-> +
-> +	return realm_create_protected_data_page(kvm, ipa, pfn,
-> +						page_to_pfn(src_page),
-> +						data_flags);
-> +}
-> +
-> +static long populate_region(struct kvm *kvm,
-> +			    gfn_t base_gfn,
-> +			    unsigned long pages,
-> +			    u64 uaddr,
-> +			    unsigned long data_flags)
-> +{
-> +	long ret = 0;
-> +
-> +	mutex_lock(&kvm->slots_lock);
-> +	mmap_read_lock(current->mm);
-> +	ret = kvm_gmem_populate(kvm, base_gfn, u64_to_user_ptr(uaddr), pages,
-> +				populate_region_cb, &data_flags);
-> +	mmap_read_unlock(current->mm);
-> +	mutex_unlock(&kvm->slots_lock);
-> +
-> +	return ret;
-> +}
-> +
->   enum ripas_action {
->   	RIPAS_INIT,
->   	RIPAS_SET,
-> @@ -815,6 +889,43 @@ static int realm_ensure_created(struct kvm *kvm)
->   	return -ENXIO;
->   }
->   
-> +int kvm_arm_rmi_populate(struct kvm *kvm,
-> +			 struct kvm_arm_rmi_populate *args)
-> +{
-> +	unsigned long data_flags = 0;
-> +	unsigned long ipa_start = args->base;
-> +	unsigned long ipa_end = ipa_start + args->size;
-> +	long pages_populated;
-> +	int ret;
-> +
-> +	if (args->reserved ||
-> +	    (args->flags & ~KVM_ARM_RMI_POPULATE_FLAGS_MEASURE) ||
-> +	    !IS_ALIGNED(ipa_start, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(ipa_end, PAGE_SIZE) ||
-> +	    !IS_ALIGNED(args->source_uaddr, PAGE_SIZE))
-> +		return -EINVAL;
-> +
-> +	ret = realm_ensure_created(kvm);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (args->flags & KVM_ARM_RMI_POPULATE_FLAGS_MEASURE)
-> +		data_flags |= RMI_MEASURE_CONTENT;
-> +
-> +	pages_populated = populate_region(kvm, gpa_to_gfn(ipa_start),
-> +					  args->size >> PAGE_SHIFT,
-> +					  args->source_uaddr, data_flags);
-> +
-> +	if (pages_populated < 0)
-> +		return pages_populated;
-> +
-> +	args->size -= pages_populated << PAGE_SHIFT;
-> +	args->source_uaddr += pages_populated << PAGE_SHIFT;
-> +	args->base += pages_populated << PAGE_SHIFT;
-> +
-> +	return 0;
-> +}
-> +
->   static void kvm_complete_ripas_change(struct kvm_vcpu *vcpu)
+>   int kvm_activate_realm(struct kvm *kvm)
 >   {
->   	struct kvm *kvm = vcpu->kvm;
+>   	struct realm *realm = &kvm->arch.realm;
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+>   	int ret;
+>   
+>   	if (kvm_realm_state(kvm) >= REALM_STATE_ACTIVE)
+> @@ -397,6 +587,12 @@ int kvm_activate_realm(struct kvm *kvm)
+>   	/* Mark state as dead in case we fail */
+>   	WRITE_ONCE(realm->state, REALM_STATE_DEAD);
+>   
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		ret = kvm_create_rec(vcpu);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+>   	ret = rmi_realm_activate(virt_to_phys(realm->rd));
+>   	if (ret)
+>   		return -ENXIO;
 
