@@ -1,94 +1,134 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E7F3AB295;
-	Mon, 23 Mar 2026 14:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483FA36C59E
+	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 14:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774274934; cv=none; b=ZlYKR1By2/qcN3+98Uy5mY2D+41dzXNDrE1iS65T9WlcPZ3mBkKmzfflNyUlW/ZuYj9B8AkrmPnXaXSW+6PFdJO/YyTK/eRhl5p88ko01H0Ty55dnTU1PWcUle8LpfIY/yahHju+C+3G7heQno4xoopGaDPW5Qnsikj0A8FG+yQ=
+	t=1774277726; cv=none; b=J+wc7Lt7t4EJ2CzDz2dWv9yLl08qkSU4s+nUTmo9isn+50ubd/R6hNA3eIxTSsg/0a4JImMkHNdtknmZ1jh7HzlPmxsK3SuHY0hG79wi1DlJaQkTCtWnYsF5BK2SumfbAuc0kia18sgGFP0LIV0vQ36kNeW25zqlG/J5wyRqpwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774274934; c=relaxed/simple;
-	bh=ibUEYe4GutvPEuyapGFe2ws3ChvH52UKKu92kP5Juwg=;
+	s=arc-20240116; t=1774277726; c=relaxed/simple;
+	bh=zvxnB3acCyC1+MiM8cMTcK7zo1Dl/uxCRo0/MtOdDdc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lVexq6TH6elWPjwyxXnxqP86hHwxSe70Xozu34cyaz2VqrZxIKRsiKiHRDahTej6hzRu7MBbpM1S0xJlkHF3q7apW3AMZMb3SUy31WHiVFeyX2obw7kg3X4ydvAHwnV7+yoFa1YKVOH8CawoHE5sn6uCe8LPl2/4KegvodVOiDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YXO0PCmw; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=o/iFlNJDPAWx5+OdUWMhYFmw5ppyYtYvpC2VPXfTMds0W9+nAIN4d00LhJ96g9sxAMOwoZolqobc4Sv4yOWbHzoBwfgo1WTUmXXH5QueJwzW3iYBGuTnzN14cBKM4dqZq0jsIf3otXsr4bWboWup+Ek5Xvab8a9SGxIc+gehzdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bh1qMlzo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YXO0PCmw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 316AEC2BCB1;
-	Mon, 23 Mar 2026 14:08:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bh1qMlzo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EB3AC2BC9E;
+	Mon, 23 Mar 2026 14:55:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774274933;
-	bh=ibUEYe4GutvPEuyapGFe2ws3ChvH52UKKu92kP5Juwg=;
+	s=k20201202; t=1774277726;
+	bh=zvxnB3acCyC1+MiM8cMTcK7zo1Dl/uxCRo0/MtOdDdc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YXO0PCmwrRlPmNBfdqj+2xY1tZ8lfmetGhg534KH/K5FERePA+ZTQGECkMUmKsePd
-	 KfSbiLUlfWmtRkU0Oekn2bqZavw3y9uvwwqwaiW5Qlj9u+euHwMV/AQT1yJbfZ9lFv
-	 tgeGj9D+RcLHfJnX2mnMwP41/AxcYi/SDEr878+iziQff9Wvi+L5XJ3GFcdfzRSuGd
-	 e4maIyyjnFFISi7jL2BFppVjuidaQeZJ1amNUNtHuaiccZnpIxawfhwn6sLdMe7sSo
-	 28EQRgmvkwKBy1ZSwPV8tIjvDfow/lP6RcGPrKDsfP6jwFEQPjStc1ZeY7YEJEat5g
-	 /ddfhR4bHEpnw==
-Date: Mon, 23 Mar 2026 14:08:48 +0000
-From: Mark Brown <broonie@kernel.org>
+	b=bh1qMlzoJmJq9BGAis9XPwgrygSchAV0TSmclnBl2dan9xfUjMtxbf+Hwe2DqCFJs
+	 7nXwKUaQNQ7PqR1lp/cXRc3Js5ANd4hplBCIgWUhbOu1f+M+lz8mtXd7aJ4ouvwyu7
+	 sC8NfwpgwTvkJxaJwFlbZkPCxh4kwVn6WhAE1aOXKxf4HAyyVxhMX0CXUkAyYCcjQq
+	 e6B6GxAk14e8HqTqk4dqjOMTaAIuEI20yXu6mehTzP6eHdtXek5fglFQglNoHZAzY6
+	 m8vf1a3JFRU6sfRghM9fKgpiGvl/Q7MkM1JrQCzZ7nXlroPW6wp/6fXD/wM52j5j23
+	 VSG874U1nEDhA==
+Date: Mon, 23 Mar 2026 14:55:20 +0000
+From: Will Deacon <will@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
-	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
-	Joey Gouly <Joey.Gouly@arm.com>,
-	Suzuki Poulose <Suzuki.Poulose@arm.com>,
-	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
-	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
-	Timothy Hayes <Timothy.Hayes@arm.com>,
-	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
-Subject: Re: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize
- ID_AA64PFR2_EL1.GCIE
-Message-ID: <aa0085c6-6b5c-45ed-91af-55fc68939fe9@sirena.org.uk>
-References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
- <20260319154937.3619520-13-sascha.bischoff@arm.com>
- <3be4971e-31a4-4033-9583-88d7fc96104f@sirena.org.uk>
- <86y0ji4pu5.wl-maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>,
+	Mostafa Saleh <smostafa@google.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 11/36] KVM: arm64: Introduce __pkvm_host_donate_guest()
+Message-ID: <acFUWC5JULmGQv4B@willie-the-truck>
+References: <20260305144351.17071-1-will@kernel.org>
+ <20260305144351.17071-12-will@kernel.org>
+ <867br665hs.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vd+FgqXVSRBWfKWZ"
-Content-Disposition: inline
-In-Reply-To: <86y0ji4pu5.wl-maz@kernel.org>
-X-Cookie: Avoid gunfire in the bathroom tonight.
-
-
---vd+FgqXVSRBWfKWZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <867br665hs.wl-maz@kernel.org>
 
-On Mon, Mar 23, 2026 at 01:50:42PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+Hi Marc,
 
-> > I'm seeing a regression in -next in set_id_regs on a range of platforms,
-> > including physical ones like the Toradex Verdin AM62 and i.MX8MP-EVK,
-> > with a GICv3:
+Thanks for going through all of this!
 
-> What CPUs do these machines have?
+On Fri, Mar 20, 2026 at 12:38:07PM +0000, Marc Zyngier wrote:
+> On Thu, 05 Mar 2026 14:43:24 +0000,
+> Will Deacon <will@kernel.org> wrote:
+> > 
+> > In preparation for supporting protected VMs, whose memory pages are
+> > isolated from the host, introduce a new pKVM hypercall to allow the
+> > donation of pages to a guest.
+> > 
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h              |  1 +
+> >  arch/arm64/include/asm/kvm_pgtable.h          |  2 +-
+> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 ++
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 21 +++++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 30 +++++++++++++++++++
+> >  5 files changed, 55 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index df6b661701b6..dfc6625c8269 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -79,6 +79,7 @@ enum __kvm_host_smccc_func {
+> >  	/* Hypercalls that are available only when pKVM has finalised. */
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
+> > +	__KVM_HOST_SMCCC_FUNC___pkvm_host_donate_guest,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_guest,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_guest,
+> >  	__KVM_HOST_SMCCC_FUNC___pkvm_host_relax_perms_guest,
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index c201168f2857..b6f7595c4979 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -100,7 +100,7 @@ typedef u64 kvm_pte_t;
+> >  					 KVM_PTE_LEAF_ATTR_HI_S2_XN)
+> >  
+> >  #define KVM_INVALID_PTE_OWNER_MASK	GENMASK(9, 2)
+> > -#define KVM_MAX_OWNER_ID		1
+> > +#define KVM_MAX_OWNER_ID		3
+> >  
+> >  /*
+> >   * Used to indicate a pte for which a 'break-before-make' sequence is in
+> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > index 5f9d56754e39..9c0cc53d1dc9 100644
+> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> > @@ -28,6 +28,7 @@ enum pkvm_component_id {
+> >  	PKVM_ID_HOST,
+> >  	PKVM_ID_HYP,
+> >  	PKVM_ID_FFA,
+> > +	PKVM_ID_GUEST,
+> 
+> Is KVM_MAX_OWNER_ID being set to 3 related to PKVM_ID_GUEST being
+> introduced?
 
-The physical boards are all running shiny new A53s.
+Yes. At this point, kvm_pgtable_stage2_set_owner() rejects an 'owner_id'
+parameter that is '> KVM_MAX_OWNER_ID', so we bump the value so that
+PKVM_ID_GUEST isn't rejected outright.
 
---vd+FgqXVSRBWfKWZ
-Content-Type: application/pgp-signature; name="signature.asc"
+> If so, wouldn't it be better to define one in terms of the other?
 
------BEGIN PGP SIGNATURE-----
+I can rework the existing #define if you like, but it actually gets
+removed entirely later in the series by "KVM: arm64: Generalise
+kvm_pgtable_stage2_set_owner()", so it's less churn just to leave it
+in place before nuking it.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnBSW8ACgkQJNaLcl1U
-h9DZtQf+OZCVNVbOqhkxeUB5zWWSOVy3pZGFgtFTYQydWn2Z6+S6Nyzwc4TPcN1u
-SoeQ/qHxWFQnl84KR3Ponu6jdImw/2WYjmhHCe3vhg6cFmxXbILMahCjTf14wQs6
-j4iwRDBaXHuh0+8D553n0BMKY0CmXsmJH3Fvb0lD+74m+HvxtgxFBR8FDhQTFD7R
-4w9hUlxiPpYT3iyRf0oUZeZi9UTl7xXizHN/uiVxLrUdFU7lzlCkqncX/c4IB48l
-lSdUd9MiwXY7IQYCeb+qD4F7X+BpSAk0dEBOn0YxH/8xa37HDRoiSDF1q+ye3Uz7
-6X4yALlwL5PlkjlzgEGsel1UaD9T6g==
-=7vYS
------END PGP SIGNATURE-----
+> Also, this includes PKVM_ID_FFA as a valid ID, while it wasn't
+> included until now. Is that expected?
 
---vd+FgqXVSRBWfKWZ--
+Huh, so it turns out that this doesn't actually matter, as PKVM_ID_FFA
+has been unused since 7cbf7c37718e ("KVM: arm64: Drop pkvm_mem_transition
+for host/hyp sharing")! I'll just add a patch to the start of the series
+which removes it altogether.
+
+Will
