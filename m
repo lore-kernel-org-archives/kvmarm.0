@@ -1,135 +1,207 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4F935CBCB
-	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 06:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42A1382F1F;
+	Mon, 23 Mar 2026 08:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774248940; cv=none; b=d97v9wHYqivBoRrclSOUPX2FRPj+estPXJ6VEh5r1ex3WEGk3AzSam8agPGWfudvX7C9FKpxA/fTgBmV0v11zHUk0dLdojh7pjiS+5o4sPkIekgKJrUP758z671TzAAp222vl+MHDJqu1I/nDdlD641DMfqC0FclcvjhHkoUQJY=
+	t=1774255397; cv=none; b=Ss8zkkZBBS6XAL/3IFewJ45gyCkndBuv3ywV+g1DqnR6XRhbKLP6Q4jcS7b/8HCFveK6EvR1IvR3ubGqx+5AfmrdQxEhdqG2u3a3tcEBRFpAHiyHZpWpsCVgv4VpM6n6zxuSaKFBIPk6msSDMKNUlHqkrGBiN780brUZl3l+2sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774248940; c=relaxed/simple;
-	bh=vZrXsbPeGeCkiMIqLDbuiKx8v3tlHBlMlQKRAhMixBw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ubDaAdALvEoQtPlhK9VcqylL3mQUQWN9GRuOxWXCP+jQfBUNARpgXMcdoSoiWjwdMFzh2ySiTpbu15Url2wrFgAoYcttYDjb7+NjXjI6lbWrTDNWKq3lMekhiRGdHSmwGkgdeZWDaD74no2yiIdNEKU0oSu8Ulg+DclMmEgLneI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B6urIHW/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1774255397; c=relaxed/simple;
+	bh=hI/WjybrpXzNAFHT59gckSTLPeS76ZpD3rBAeQW1h9c=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CktP0oFPlBN/uj8pi0R44gulh95DL1bh0Mcsk+E2gNjf9VleS3xxVOfZ3HHlPP5Jku/vvzS0/hZbupjwGX8TVZ9BLis/QCGXPA46q6lWpPWm9sxDx5YMny43LULX43n/Th427Yq9/tQI2bdkZwL2wtgtNPdBlE//gp8G0Ty4lzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DfFJTb2M; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B6urIHW/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774248937;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cUFvGhq55JONPygTQtBYsqFeVViX1eQUM3HJHzaMYXs=;
-	b=B6urIHW/+3iflRmXEt7qyAVYPs2w5Vkxp/0N2gI0r/kve83auUGe9hPYePS8sNRBa/sIGi
-	+vgjHSexoDdZp3ChMbmMWqtCcKDrjcP2ya3psNbgEf9u56jJQyaBRSu53up+Du6h25RWgM
-	KdCI3TLHYBqwoh+QAGBiKZg+KVfmvTY=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-373-nyYFgp23PYCRVxVygrRK4w-1; Mon, 23 Mar 2026 02:55:36 -0400
-X-MC-Unique: nyYFgp23PYCRVxVygrRK4w-1
-X-Mimecast-MFC-AGG-ID: nyYFgp23PYCRVxVygrRK4w_1774248936
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c7385a1476aso2851177a12.2
-        for <kvmarm@lists.linux.dev>; Sun, 22 Mar 2026 23:55:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774248935; x=1774853735;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cUFvGhq55JONPygTQtBYsqFeVViX1eQUM3HJHzaMYXs=;
-        b=WsSYVAr9pP0ALmqIdicqvp1pW8egjRu8676iL80YcxZHt/Cm01QWkwONGEEY+i8Kja
-         Q+Cdlu59aERHkRVTwpWpFreFIl9yQwTjR7cJXX35b6AJz3mD7szcaIf7MHVBgVZevHvP
-         uAzTR+6wzM0tkEtNoXMM7ZyF2c0EvXpxxF+Ym99hGIYC+V7X4dy2sg3GGyYvceFuMCrd
-         rhzR2ywUSeF1w9krAAJOeeTlL+YgzQakC5gZTAmsuBrqKnRgzuvbQqdrcTRqS2lfJ98b
-         eXYI+wVu3pihfAO1SwHpOlouZWmRpH4CAeaoWsgxmHBiOVkrmvdRE6xZ/8z3U9pXXUam
-         fVIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXD1K6+zAqLTsYEGepRGL/SGJVdJLT6fbk7pcy5JSWsrWSB/jpFHaIU7TDFNyRv+sQGfiQnlRc=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yx+GUP1+fILYKrfTF6M2ag+07eerehOb7A6KT82tU/g7SMkQFjZ
-	gS9PbZwTV2m0hGDXGmghAd4bX6kH73wmmzDzrnT0ytjde78fUelV3d4Vi4mqNQ5KbywCIn7ym3O
-	7/xdmFqAQUaPLQumMe1ylDfR44OhMBnO3T7FjgLrDOSfsTkY4y216+/xt6A==
-X-Gm-Gg: ATEYQzxhrDI7qVsz3Mjo2+Lwar2gbmSd+WIsC7CJE1cBEqQC+VZ2R5IE7Pf6/0+3OWL
-	NXPO9dj9KCmbOUsHSVGIiB3S6KPq7F4t9cSPCmA9fmSlX26EthlExfVa/p/J0f3WYXk0ki+HzHB
-	MmbTOOdRpCrG6P6GBuWKXVdH6RjW107XOAoWL3iLDYaWGqTYyl6AMivUJS2iu9H8rWgSgFCiK9u
-	5OJrf5VQTKv3++zRCSdYi27r7spY6eRH3mpTPTDeMdb+SXEra6seve5c7NV3tBNdFYw1Qu4O7+2
-	j5Enmn6V5j0jfnA0quI8bqf1q38YckOlOjkTNBpIN3jHeLVh0TYiUbqI5idFyQr/qekIaOcqP2I
-	jYOV8zdtvLxYrueI0dsu9zuayllbFKyEESfnCbIuvjxIbUdFi3otJPJ2daunwiZTd
-X-Received: by 2002:a05:6a21:3286:b0:398:7e12:c03b with SMTP id adf61e73a8af0-39bceb41272mr9670981637.44.1774248935566;
-        Sun, 22 Mar 2026 23:55:35 -0700 (PDT)
-X-Received: by 2002:a05:6a21:3286:b0:398:7e12:c03b with SMTP id adf61e73a8af0-39bceb41272mr9670964637.44.1774248935151;
-        Sun, 22 Mar 2026 23:55:35 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c743a7ff529sm6924198a12.2.2026.03.22.23.55.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Mar 2026 23:55:34 -0700 (PDT)
-Message-ID: <670cca31-ef2b-4fd8-89ad-221526a07f7e@redhat.com>
-Date: Mon, 23 Mar 2026 16:55:17 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DfFJTb2M"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3FF9C4CEF7;
+	Mon, 23 Mar 2026 08:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774255396;
+	bh=hI/WjybrpXzNAFHT59gckSTLPeS76ZpD3rBAeQW1h9c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DfFJTb2MjyLWtiPK7zTRtKLsbcec9JdUoHG8fssvfSEbZmJXK651jyHFUwT6PvcTH
+	 7B0BYGTKAIC+IxfHSxE2bRmrhGgjxI5P7DKV9cuUaWv3lMSyfm00yqpzBY9EWxldLC
+	 fDW6h6IUy8dCb2Q+X5U96pMm6VGUdXeBDFhxRHTGPrzyYl4ijDoHKkYIRHmcg7Sz0L
+	 rGK348RJoQxwGZqLyVZcOCB0PYyHN3p1O8tGHCvG0E2Fdf4Mk2pL2Z9vS98nBFyy7Y
+	 PfOmkIIn4zSnRjKZHUIryr18QsBRNBI8G3A/VdI4Nv1yXDi+o36A+xG9zkszu+C9Zx
+	 USFEaMiEBXiXA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w4asU-00000004da4-0iGU;
+	Mon, 23 Mar 2026 08:43:14 +0000
+Date: Mon, 23 Mar 2026 08:43:13 +0000
+Message-ID: <861phb542m.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Will Deacon <will@kernel.org>,
+	Mostafa Saleh <smostafa@google.com>,
+	Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 4/5] KVM: arm64: pkvm: Use direct function pointers for cpu_{on,resume}
+In-Reply-To: <CA+EHjTyeuE3aqqmx8Fe4REOM7WstEAp_A0tvMNygPJCLT7V7wQ@mail.gmail.com>
+References: <20260321212419.2803972-1-maz@kernel.org>
+	<20260321212419.2803972-5-maz@kernel.org>
+	<CA+EHjTyeuE3aqqmx8Fe4REOM7WstEAp_A0tvMNygPJCLT7V7wQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 19/40] arm_mpam: resctrl: Add plumbing against arm64
- task and cpu hooks
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org,
- Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
- <20260313144617.3420416-20-ben.horgan@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260313144617.3420416-20-ben.horgan@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: jb-F5sNoBz_M-2HEBMwKWovSib1LJKNM-_XuspvPGLQ_1774248936
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, joey.gouly@arm.com, suzuki.poulose@arm.com, oupton@kernel.org, yuzenghui@huawei.com, will@kernel.org, smostafa@google.com, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 3/14/26 12:45 AM, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
+On Sun, 22 Mar 2026 15:49:50 +0000,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> arm64 provides helpers for changing a task's and a cpu's mpam partid/pmg
-> values.
+> Hi Marc,
 > 
-> These are used to back a number of resctrl_arch_ functions. Connect them
-> up.
+> On Sat, 21 Mar 2026 at 21:24, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Instead of using a boolean to decide whether a CPU is booting or
+> > resuming, just pass an actual function pointer around.
+> >
+> > This makes the code a bit more straightforward to understand.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_asm.h     |  3 ++-
+> >  arch/arm64/kvm/hyp/nvhe/hyp-init.S   |  9 +++----
+> >  arch/arm64/kvm/hyp/nvhe/psci-relay.c | 39 +++++++++++++++++-----------
+> >  3 files changed, 29 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index a1ad12c72ebf1..f4c769857fdfc 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -291,7 +291,8 @@ asmlinkage void __noreturn hyp_panic_bad_stack(void);
+> >  asmlinkage void kvm_unexpected_el2_exception(void);
+> >  struct kvm_cpu_context;
+> >  void handle_trap(struct kvm_cpu_context *host_ctxt);
+> > -asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on);
+> > +asmlinkage void __noreturn __kvm_host_psci_cpu_on_entry(void);
+> > +asmlinkage void __noreturn __kvm_host_psci_cpu_resume_entry(void);
+> >  void __noreturn __pkvm_init_finalise(void);
+> >  void kvm_nvhe_prepare_backtrace(unsigned long fp, unsigned long pc);
+> >  void kvm_patch_vector_branch(struct alt_instr *alt,
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > index 2e80fcbff2dff..64296b31da73d 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > @@ -173,7 +173,7 @@ SYM_CODE_END(___kvm_hyp_init)
+> >   * x0: struct kvm_nvhe_init_params PA
+> >   */
+> >  SYM_CODE_START(kvm_hyp_cpu_entry)
+> > -       mov     x1, #1                          // is_cpu_on = true
+> > +       ldr     x29, =__kvm_host_psci_cpu_on_entry
+> >         b       __kvm_hyp_init_cpu
+> >
+> >  /*
+> > @@ -182,11 +182,10 @@ SYM_CODE_START(kvm_hyp_cpu_entry)
+> >   * x0: struct kvm_nvhe_init_params PA
+> >   */
+> >  SYM_CODE_START(kvm_hyp_cpu_resume)
+> > -       mov     x1, #0                          // is_cpu_on = false
+> > +       ldr     x29, =__kvm_host_psci_cpu_resume_entry
+> >
+> >  SYM_INNER_LABEL(__kvm_hyp_init_cpu, SYM_L_LOCAL)
+> >         mov     x28, x0                         // Stash arguments
+> > -       mov     x29, x1
+> >
+> >         /* Check that the core was booted in EL2. */
+> >         mrs     x0, CurrentEL
+> > @@ -204,9 +203,7 @@ SYM_INNER_LABEL(__kvm_hyp_init_cpu, SYM_L_LOCAL)
+> >         bl      ___kvm_hyp_init                 // Clobbers x0..x2
+> >
+> >         /* Leave idmap -- using BLR is OK, LR is restored from host context */
+> > -       mov     x0, x29
+> > -       ldr     x1, =__kvm_host_psci_cpu_entry
+> > -       blr     x1
+> > +       blr     x29
+> >
+> >         // The core booted in EL1, or the C code unexpectedly returned.
+> >         // Either way, KVM cannot be initialized on it.
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/psci-relay.c b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> > index c3e196fb8b18f..cc698ceee9c8c 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/psci-relay.c
+> > @@ -200,23 +200,12 @@ static int psci_system_suspend(u64 func_id, struct kvm_cpu_context *host_ctxt)
+> >                          __hyp_pa(init_params), 0);
+> >  }
+> >
+> > -asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
+> > +static void __noreturn __kvm_host_psci_cpu_entry(unsigned long pc, unsigned long r0)
+> >  {
+> > -       struct psci_boot_args *boot_args;
+> > -       struct kvm_cpu_context *host_ctxt;
+> > -
+> > -       host_ctxt = host_data_ptr(host_ctxt);
+> > -
+> > -       if (is_cpu_on)
+> > -               boot_args = this_cpu_ptr(&cpu_on_args);
+> > -       else
+> > -               boot_args = this_cpu_ptr(&suspend_args);
+> > -
+> > -       cpu_reg(host_ctxt, 0) = boot_args->r0;
+> > -       write_sysreg_el2(boot_args->pc, SYS_ELR);
+> > +       struct kvm_cpu_context *host_ctxt = host_data_ptr(host_ctxt);
+> >
+> > -       if (is_cpu_on)
+> > -               release_boot_args(boot_args);
+> > +       cpu_reg(host_ctxt, 0) = r0;
+> > +       write_sysreg_el2(pc, SYS_ELR);
+> >
+> >         write_sysreg_el1(INIT_SCTLR_EL1_MMU_OFF, SYS_SCTLR);
+> >         write_sysreg(INIT_PSTATE_EL1, SPSR_EL2);
+> > @@ -224,6 +213,26 @@ asmlinkage void __noreturn __kvm_host_psci_cpu_entry(bool is_cpu_on)
+> >         __host_enter(host_ctxt);
+> >  }
+> >
+> > +asmlinkage void __noreturn __kvm_host_psci_cpu_on_entry(void)
+> > +{
+> > +       struct psci_boot_args *boot_args = this_cpu_ptr(&cpu_on_args);
+> > +       unsigned long pc, r0;
+> > +
+> > +       pc = READ_ONCE(boot_args->pc);
+> > +       r0 = READ_ONCE(boot_args->r0);
+> > +
+> > +       release_boot_args(boot_args);
+> > +
+> > +       __kvm_host_psci_cpu_entry(pc, r0);
+> > +}
+> > +
+> > +asmlinkage void __noreturn __kvm_host_psci_cpu_resume_entry(void)
+> > +{
+> > +       struct psci_boot_args *boot_args = this_cpu_ptr(&cpu_on_args);
 > 
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Tested-by: Peter Newman <peternewman@google.com>
-> Tested-by: Zeng Heng <zengheng4@huawei.com>
-> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
-> Reviewed-by: Zeng Heng <zengheng4@huawei.com>
-> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since v2:
-> apostrophes in commit message
-> ---
->   drivers/resctrl/mpam_resctrl.c | 58 ++++++++++++++++++++++++++++++++++
->   include/linux/arm_mpam.h       |  5 +++
->   2 files changed, 63 insertions(+)
-> 
+> This should be suspend_args:
+> +     struct psci_boot_args *boot_args = this_cpu_ptr(&suspend_args);
+>
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+Arghhh! How did I miss that??? Thanks a bunch for spotting it!
 
+> With this fixed:
+> 
+> Reviewed-by: Fuad Tabba <tabba@google.com>
 
+Thanks again,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
