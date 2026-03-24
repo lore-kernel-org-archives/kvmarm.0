@@ -1,82 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F713B2FF0;
-	Tue, 24 Mar 2026 06:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7935335AC16
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 10:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774332461; cv=none; b=gHEP55UnV3oORaYZDJLhG/5d+UoihlrQVGaaOPsyUACdty9SMEP2yTh+IO5ubyrUOpYUh453MQTUS5E+HTRXER5Z1Rr0OVeC5sx9mc/WwPXuL02VDRUVVaU0nFVWm73CoRRmzNsFV95sGDNLtACx1uQs2gLOYGH2Iv0500XVUzg=
+	t=1774346994; cv=none; b=KUEzRsUi+D2ToiFGlykNSVaimr6C3nUEqo8rHaEnwkSevECuMKDEP6XyInQEAO0AhP72KXeS9VZ6olGJTEr94pGtPozKuPZYfGSPPU/T8F71zbxVsLbbIi4Un/GQRgDpjsvNMD9OOI15XXBNSV+YWfguhyMPb3dHIq3QmQ3iWE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774332461; c=relaxed/simple;
-	bh=JP9ahby6Ly1VVw7RxM4srHWXaEIozlGHAWmdpUP2jJ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m+4gFOrew4vBmSjtAcjnjx9sI6nQMgNZDx9zLxXWjYcHaPGyqkkX4Dq43X7dqAAoDdJj4vg/5pB4RlApiwCAkxdy9IFHVo9erlCfojnGRb9Po6AeiEteL5ZRn/zodCQv8dP2F9BQk0EtPObjuhLVJzKF2JXiMT1sbBtjhV5SwOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbNGnKO/; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbNGnKO/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E10D0C2BCB2;
-	Tue, 24 Mar 2026 06:07:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774332460;
-	bh=JP9ahby6Ly1VVw7RxM4srHWXaEIozlGHAWmdpUP2jJ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UbNGnKO/tp6ai6834ydA1lQ5PukSdo9guTKRu0aT7uQ94/PBq34Vo08i3GzwU1a7R
-	 Cjj86a0rKtbPKnF+oVKFGyOV87WahqlGOu4eDV+h+S5j7x4aPhqGuz+E/DJGQoXOGA
-	 wBe47f8pbr/WXEHhTZzzJBCJP9XHj+6UqfGOLICI3RcjHw+35Cz5SRZZcw7k7C/zYj
-	 XUieDNECgaPKML2nc7pDk7PgesQln2TdJXIciFo+QXEQm2NonZFnC2+3B6gKw1+DHm
-	 Z40BPILv5vYzesqn1zNeeb326JjYakJK+jDAuKVLcvEKgQfH7daPPDxWve9mnoaYbH
-	 fSR6hO6kwysDw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FE5D3808200;
-	Tue, 24 Mar 2026 06:07:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774346994; c=relaxed/simple;
+	bh=hbR/9TAYrlIND1OK66BlXU5nb6AlyxM23Kr3q9lcyfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d0bJdfifAGnFO5FBbGvZHNYns7Wqwg4mVqfFq73BSv74USpS/uESJxHKucU/IAhXf/c9xGTAIRkJAYBgzVO56+dmR+WicuMjKnDLPTzNap7ph09oenxLfIyc7ntVd+LakanGas6WLlHUCBS/l+NFINN3aEkxqpGAUGoTLDpVSfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5AFF1476;
+	Tue, 24 Mar 2026 03:09:45 -0700 (PDT)
+Received: from [10.1.196.46] (e134344.arm.com [10.1.196.46])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 733453F63F;
+	Tue, 24 Mar 2026 03:09:47 -0700 (PDT)
+Message-ID: <745ed151-949a-47cf-a987-b811c98cf251@arm.com>
+Date: Tue, 24 Mar 2026 10:09:46 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
+User-Agent: Thunderbird Daily
+Subject: Re: [PATCH v6 00/40] arm_mpam: Add KVM/arm64 and resctrl glue code
+To: Gavin Shan <gshan@redhat.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ zengheng4@huawei.com, linux-doc@vger.kernel.org
+References: <20260313144617.3420416-1-ben.horgan@arm.com>
+ <71f9ac1e-9f5a-4f12-807b-bbe0803f99e7@redhat.com>
+Content-Language: en-US
+From: Ben Horgan <ben.horgan@arm.com>
+In-Reply-To: <71f9ac1e-9f5a-4f12-807b-bbe0803f99e7@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] KVM: Remove subtle "struct kvm_stats_desc" pseudo-overlay
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <177433244873.469836.2501898935183219197.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Mar 2026 06:07:28 +0000
-References: <20251205232655.445294-1-seanjc@google.com>
-In-Reply-To: <20251205232655.445294-1-seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-riscv@lists.infradead.org, maz@kernel.org, oupton@kernel.org,
- zhaotianrui@loongson.cn, maobibo@loongson.cn, chenhuacai@kernel.org,
- maddy@linux.ibm.com, anup@brainfault.org, pjw@kernel.org, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, frankja@linux.ibm.com,
- imbrenda@linux.ibm.com, pbonzini@redhat.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, gustavoars@kernel.org
 
-Hello:
+Hi Gavin,
 
-This patch was applied to riscv/linux.git (for-next)
-by Sean Christopherson <seanjc@google.com>:
-
-On Fri,  5 Dec 2025 15:26:55 -0800 you wrote:
-> Remove KVM's internal pseudo-overlay of kvm_stats_desc, which subtly
-> aliases the flexible name[] in the uAPI definition with a fixed-size array
-> of the same name.  The unusual embedded structure results in compiler
-> warnings due to -Wflex-array-member-not-at-end, and also necessitates an
-> extra level of dereferencing in KVM.  To avoid the "overlay", define the
-> uAPI structure to have a fixed-size name when building for the kernel.
+On 3/23/26 04:41, Gavin Shan wrote:
+> * # Be careful, this email looks suspicious; * Out of Character: The sender is exhibiting a significant deviation from
+> their usual behavior, this may indicate that their account has been compromised. Be extra cautious before opening links
+> or attachments. *
+> On 3/14/26 12:45 AM, Ben Horgan wrote:
+>> This version of the mpam missing pieces series sees a couple of things
+>> dropped or hidden. Memory bandwith utilization with free-running counters
+>> is dropped in preference of just always using 'mbm_event' mode (ABMC
+>> emulation) which simplifies the code and allows for, in the future,
+>> filtering by read/write traffic. So, for the interim, there is no memory
+>> bandwidth utilization support. CDP is hidden behind config expert as
+>> remount of resctrl fs could potentially lead to out of range PARTIDs being
+>> used and the fix requires a change in fs/resctrl. The setting of MPAM2_EL2
+>> (for pkvm/nvhe) is dropped as too expensive a write for not much value.
+>>
+>> There are a couple of 'fixes' at the start of the series which address
+>> problems in the base driver but are only user visible due to this series.
+>>
+>> Changelogs in patches
+>>
+>> Thanks for all the reviewing and testing so far. Just a bit more to get this
+>> over the line.
+>>
+>> There is a small build conflict with the MPAM abmc precursors series [1], which
+>> alters some of the resctrl arch hooks. I will shortly be posting a respin
+>> of that too.
+>>
+>> [1] https://lore.kernel.org/lkml/20260225201905.3568624-1-ben.horgan@arm.com/
+>>
+>>  From James' cover letter:
+>>
+>> This is the missing piece to make MPAM usable resctrl in user-space. This has
+>> shed its debugfs code and the read/write 'event configuration' for the monitors
+>> to make the series smaller.
+>>
+>> This adds the arch code and KVM support first. I anticipate the whole thing
+>> going via arm64, but if goes via tip instead, the an immutable branch with those
+>> patches should be easy to do.
+>>
+>> Generally the resctrl glue code works by picking what MPAM features it can expose
+>> from the MPAM drive, then configuring the structs that back the resctrl helpers.
+>> If your platform is sufficiently Xeon shaped, you should be able to get L2/L3 CPOR
+>> bitmaps exposed via resctrl. CSU counters work if they are on/after the L3. MBWU
+>> counters are considerably more hairy, and depend on hueristics around the topology,
+>> and a bunch of stuff trying to emulate ABMC.
+>> If it didn't pick what you wanted it to, please share the debug messages produced
+>> when enabling dynamic debug and booting with:
+>> | dyndbg="file mpam_resctrl.c +pl"
+>>
+>> I've not found a platform that can test all the behaviours around the monitors,
+>> so this is where I'd expect the most bugs.
+>>
+>> The MPAM spec that describes all the system and MMIO registers can be found here:
+>> https://developer.arm.com/documentation/ddi0598/db/?lang=en
+>> (Ignored the 'RETIRED' warning - that is just arm moving the documentation around.
+>>   This document has the best overview)
+>>
+>>
+>> Based on v7.0-rc3
+>>
+>> The series can be retrieved from:
+>> https://gitlab.arm.com/linux-arm/linux-bh.git mpam_resctrl_glue_v6
+>>
 > 
 > [...]
+> 
+> Retested this series on NVidia's grace-hopper machine where L3 cache partitioning
+> and MBW (soft) limiting worked as expected. Besides, The L3 cache monitor counters
+> are increased as more cache usage is observed.
+> 
+> Tested-by: Gavin Shan <gshan@redhat.com>
 
-Here is the summary with links:
-  - KVM: Remove subtle "struct kvm_stats_desc" pseudo-overlay
-    https://git.kernel.org/riscv/c/da142f3d373a
+Thanks for testing and all the reviews.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ben
 
+> 
+> Thanks,
+> Gavin
+> 
+> 
 
