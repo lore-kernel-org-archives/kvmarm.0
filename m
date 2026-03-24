@@ -1,136 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56986238D52
-	for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 23:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA551185B48
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 02:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774307456; cv=none; b=p5oN2cjIi2/IDdmn1PcDepM9IDUKfYUxjIvEWRlbrYh3zFaV/eE2YE3A1CHPFLdv57vKuPYCRpIOiEbVOug/ZLDh0xrqKP2wqiDU6C+SB5gIEVwnElPxnCH9jP1kRKZiu4RE/b307JKR6Tq+DXds6xIzS+0k4rVWFOzS4XunP1s=
+	t=1774318486; cv=none; b=WOcKJJmX31ocqhxPWS3MHEXGAqnHfCv7PWAL8ApgDjbMiOWVuYEOPlpipgZtNuZdTTwCtZIeZKvlkc4KcZZ3w3CyYd0tyLUeagpzNQq5NsNXgQiwby6Efh6eDpOrLGkbcY9uLT0xN3maWm6bFdwsa0Zx/asW9D7tVRFqr3f5qrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774307456; c=relaxed/simple;
-	bh=AZ9TpcvA7JbHmddDEEW46nc8M9aYhe0GaeJO6Vw0r3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jW42uKXvtfWy5q5egEghik6xANB/mQujSe6BL5N2xZPD2n5TllAmo8MW8uxTYH8p7ogK4UYEuq8vH75o+brgLUDJYhxE2a8JuC8VAWR5oI2un9XC1fQx/We54W3SvX9b8QyxhkEBBM8DkD4tg9TMA5Dhuliy+g5TwDTtt1iiZR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aaIAPh/M; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1774318486; c=relaxed/simple;
+	bh=TO2RzNGl3QaEmDTI2VDfAcOvLdhOrGE8ero57x/6NBU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VrM13fuhqGAr/wuxtaJbQ9KT4K1NofVWjW5srGsbta4Zft3rw0DTxI1C5VNCijw7k4p19T3vP6/E17iere/FHS421zMA8L5HnjFEmSQ3cfTo5PmiqGJhijKfpiR4D1A/wySeUUWx3V0g4EGfmB2qQyqtoszgXBijWsWM73RwWmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTek9b8C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aaIAPh/M"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774307454;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NL7u0uXFVbBow0LkO2mREfC0sqBnGNJGi0Yb4KYOjHE=;
-	b=aaIAPh/MELGyimEx+iqcfohCqM8zV+bSFNacE4HX3hMrOuFwKq96qIfArXwHEjmkSZjw1c
-	/LIM3epZBAbEt8UuzxJJ99e1SU3eN8rbX08giBTGOcmARigN6EW8WaGN5Qlo7QK6iASdz0
-	/Y5sKOLOGllBszHBV6U9vxyYdwuNeXc=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-395-ykQGwYKvNjmng3IUuLr7Ow-1; Mon, 23 Mar 2026 19:10:53 -0400
-X-MC-Unique: ykQGwYKvNjmng3IUuLr7Ow-1
-X-Mimecast-MFC-AGG-ID: ykQGwYKvNjmng3IUuLr7Ow_1774307452
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2b0554888cfso9181575ad.3
-        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 16:10:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774307452; x=1774912252;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NL7u0uXFVbBow0LkO2mREfC0sqBnGNJGi0Yb4KYOjHE=;
-        b=cF607XY9Z5egVjKVZwFZnK1UP7oDHQ1omawkaSWqbh2PTPXWZyMdqjqJfyou103lue
-         fjhERGb0kaLubNHryUVYRggpQwQOkWDgNpOhqf264EhnuXX7aouy8epEMfY7Y7yYxQJs
-         5UWdpWfMqLBfsw21dtQ7WaMkFrEmeEbYVxK7RbYG+vqvuoFX1ru4FnucZbU7/688grkO
-         xv8efc++0V0m3HPe4FzpMjmav4QX0Wrrcnb9A6nNQN2/pkq042WjIDt396vmgdLbxPhZ
-         UoT2zFv3vv83H4gsTRDpRvgkO8qarhEX3QNcAZfqF4KnFXWXkmtQFR43l/J2xUaR4MAs
-         a2DA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhWCayvN26MjYqL1e0DAiHIDuEXgybibq2VTZ+SljBDv9juufx/eZbXjUO7heZvD5B+Xu2iNw=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwddhQiiPjpMcgT4kbotoluo4t84GDge+YmDIKP3y3Ug5HjRf+Z
-	yd1BryLZz/OgTsiZ4vFkXNPoA/JKCOTIKmyv85oQtJnuMHixjj6zZffBgLdFXghQJfATs5wCE8v
-	wGsu+RV5Po5JHluVIGlIW594FnIQjkNlZNZruoUQxD/Z/XQwQU1qte9DcdA==
-X-Gm-Gg: ATEYQzx7Wi0ZJJ1YpKKSAKnm8CGKOTRdi7FQ3mDSg/P+2wk1HeO3a1fRV5rOCBC4Jed
-	ibzV7Pv8iuXnHmUzVCVHLufQeKsL6x9ro5NoFQJuSNS1OFJziEBWpszqCHB0k73P1/m7+q1Iw/X
-	+myuEbJRH9lF43M7oqY2m2kM4Y0ny1EebfOOmhuku/Ct9w/Lzkqxhwaeg4gQ6MZtl9g3euu1+lp
-	JSVeB5Q0MqZ+d3YUcvBnEF6l27A58wS8RsCsX2K+6Cv7U6lq0K/dDZV/UM+23PC8P66YKQuU93C
-	6jKKOKwW1uXyXpqFIS58IqOmfATykL+sVJK/XNCAIVOshj65LBRcA+6QlgzFUZ9AinAOTGhixAq
-	SBuMjw2z/xwAmQwNQtzwrI0GdGcZD8RcFIfsyrXBdEbffIrHGouPOF5/2/B8yhSpQ
-X-Received: by 2002:a17:903:41cf:b0:2b0:6d56:8d29 with SMTP id d9443c01a7336-2b08278b258mr140241765ad.32.1774307452084;
-        Mon, 23 Mar 2026 16:10:52 -0700 (PDT)
-X-Received: by 2002:a17:903:41cf:b0:2b0:6d56:8d29 with SMTP id d9443c01a7336-2b08278b258mr140241545ad.32.1774307451710;
-        Mon, 23 Mar 2026 16:10:51 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b083656b51sm152188685ad.54.2026.03.23.16.10.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2026 16:10:51 -0700 (PDT)
-Message-ID: <ea39c13c-56d2-4f9e-b427-085b32720e40@redhat.com>
-Date: Tue, 24 Mar 2026 09:10:34 +1000
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTek9b8C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E374C4CEF7;
+	Tue, 24 Mar 2026 02:14:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774318485;
+	bh=TO2RzNGl3QaEmDTI2VDfAcOvLdhOrGE8ero57x/6NBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eTek9b8CkkhrzvSimQb+Reep8rVSxPw5Og9X7W1B96JNpCSbpPdnsHl307dm0kxFS
+	 8RTR2+TR32GuCCo63iMbGEvnNTOfUT1rED4pvLMc6OnP/jDG5AlZLu7CbSy3YOl62A
+	 B46kxQ6R0pRyDubvl5y/JEhA88DEUAxIG7SjQsQoHlbpYZh2fIE1BDhtwyusldXUw3
+	 xniGdIkcqhqqVxPyryWJhbhZS6bVCg2NO/F/aDGzlbw5RZEMNXoS4Ow9OZiO7/de9J
+	 X1tf4yCO3MUwYmWvNzjomaPsb3/9mUT6SbIvlEBTH0sbsraNJJAXdf45+QB05Rsrkr
+	 Mm3EipOy5DD9A==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id 096101AC52D3; Tue, 24 Mar 2026 02:14:42 +0000 (GMT)
+Date: Tue, 24 Mar 2026 02:14:42 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: set_id_regs: Allow GICv3 support to be set
+ at runtime
+Message-ID: <acHzkoowEHXZ5BJv@sirena.co.uk>
+References: <20260323174642.3183075-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 26/40] arm_mpam: resctrl: Add kunit test for control
- format conversions
-To: Ben Horgan <ben.horgan@arm.com>
-Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
- baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
- dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
- fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
- kobak@nvidia.com, lcherian@marvell.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- peternewman@google.com, punit.agrawal@oss.qualcomm.com,
- quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
- scott@os.amperecomputing.com, sdonthineni@nvidia.com,
- tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
- will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
- joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org,
- Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-References: <20260313144617.3420416-1-ben.horgan@arm.com>
- <20260313144617.3420416-27-ben.horgan@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260313144617.3420416-27-ben.horgan@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: GRLl8zd5LzWl9WMXYKUHvLXP7beAOuiSjt2s4T-7w9Y_1774307452
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kvTKe6LgctCn4IwY"
+Content-Disposition: inline
+In-Reply-To: <20260323174642.3183075-1-maz@kernel.org>
+X-Cookie: Identify your visitor.
 
-On 3/14/26 12:46 AM, Ben Horgan wrote:
-> From: Dave Martin <Dave.Martin@arm.com>
-> 
-> resctrl specifies the format of the control schemes, and these don't match
-> the hardware.
-> 
-> Some of the conversions are a bit hairy - add some kunit tests.
-> 
-> Tested-by: Gavin Shan <gshan@redhat.com>
-> Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Tested-by: Peter Newman <peternewman@google.com>
-> Tested-by: Zeng Heng <zengheng4@huawei.com>
-> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
-> Reviewed-by: Zeng Heng <zengheng4@huawei.com>
-> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> [morse: squashed enough of Dave's fixes in here that it's his patch now!]
-> Signed-off-by: James Morse <james.morse@arm.com>
-> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
-> ---
-> Changes since v2:
-> Include additional values from the latest spec
-> ---
->   drivers/resctrl/mpam_resctrl.c      |   4 +
->   drivers/resctrl/test_mpam_resctrl.c | 315 ++++++++++++++++++++++++++++
->   2 files changed, 319 insertions(+)
->   create mode 100644 drivers/resctrl/test_mpam_resctrl.c
-> 
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+--kvTKe6LgctCn4IwY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Mon, Mar 23, 2026 at 05:46:42PM +0000, Marc Zyngier wrote:
+
+> set_id_regs creates a GIC3 guest when possible, and then proceeds
+> to write the ID registers as if they were not affected by the presence
+> of a GIC. As it turns out, ID_AA64PFR1_EL1 is the proof of the
+> contrary.
+
+Thanks, this fixes the issues I was seeing in -next:
+
+Tested-by: Mark Brown <broonie@kernel.org>
+
+--kvTKe6LgctCn4IwY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnB85IACgkQJNaLcl1U
+h9CCowf4yEm4L6SEBrzHzfDEPo9zYZqteeOj1r7q+vba6HHLd3YAtNDdsghS8r2A
+8ByiqvccyeAcNpQsyESaNL2S85Qfqbx1KvT3rfzOAJBdAvOrobFrOfokpTkpT5oi
+fa6236lfJvFSNA24Os69/yqWmUiCNY9zuvEtmMxt715t6qE6x89QU5X2spvqFz/g
+pfXMb+CZ5wDrSCogJ2PJqOYaRKca1MlbqRaKPaivgfykCQ8XyXdBpHQgu7Uk5tWn
+smq0Go6mkdJvqW8JEH83LDB04EaEyB8rGJzYV+wLdt/W9uGn8AnP80jhGeTvC2ck
+WnEAHwf+gph6u6i0VWm1/rg+6otU
+=PO86
+-----END PGP SIGNATURE-----
+
+--kvTKe6LgctCn4IwY--
