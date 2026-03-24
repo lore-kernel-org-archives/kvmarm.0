@@ -1,72 +1,72 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D2739EF0C
-	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 03:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BED3A1CF3
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 03:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774323712; cv=none; b=qhJLkRCfP5uMb5bN7igmgcscuw4TkyEr5W0ID+vgdWCtpOrlF47mpVJDuZ5ljeAMT14ratMyV/MIru7Etwv2Cr91wSyEJ1rhK2HEGdUFfNvfW2qqzjCRYGA9pYtyNqpkUPTz/FLKgNJjx2fLJ0S/Zbk2ZsE5OeekH7rgkX+Zk3A=
+	t=1774323748; cv=none; b=kGw1DWjmUWPbaNyWNG5Li7ug/hUtUJ3Sxa8rauIq2+hm6ycfQercDkawcNoYt+aJuTenN+GAUatyM72d9AP0aeNtavO0CqGF4tNCPgSfGnaXbYx3D5AA6ymcDroeaEnjpaqwnXsS117iVpOfAHjccfkPPrpBNySfvmSLrQaDAsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774323712; c=relaxed/simple;
-	bh=W/iUkryvG3ueViuRMSEVaFw1WJyUIdLkdTezJQ1QMJs=;
+	s=arc-20240116; t=1774323748; c=relaxed/simple;
+	bh=8/USL8mWGPHghXDUqxrg0+CHaM95YmkwRKfFmCfxl80=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pLmac/5a++4IqUTIRnyXeqzRR55Q+n9cJ53TJue/HZFKCcti2ERXxTvB+KgiWbSIkNlN5SEz5tq3EbUawrW66bHXBUL2lmotX4Ev/8VkuZ2Lshq+vrb1FO8PCDNYs+shsg+o0Lg7IEiaNybX+YUyHy48iLoZFCKw4+Ur9526eYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fxtOY5Ca; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=aej1dlb9doQaIEax4lVKJIOorI81tQDjok+HKCwsUD4NB6NZg1lsygubi1hoARKdntmxNI+z48VmU2RbXDwHfS7FZ0Dxiuu6IkWvakpk83Nkj0jFHRJDA7R2BmAFFynB2DgmqNTBSqoLlHR7b1uQjs98mmo+k7JRkSxT+9a+pN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VMclFvxL; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fxtOY5Ca"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VMclFvxL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774323710;
+	s=mimecast20190719; t=1774323739;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rUeLGoeTwPTz7/suB9ZfTfJ1UEygTswX0AuYIezqldY=;
-	b=fxtOY5CahERjaV8uVFfcKsrj3FoOZzBIZ3yQof/aj8EksMU0oDf/MstGvQ67VAlXm/+AXM
-	1FawIJCc4FiFuqw5n4Z7Ny3LcViv5r7wDN0VJtBl3RJwQ/fFsq6iy+5vFdQGbk8qL6zUn0
-	WWFIWUF6y2DFtNz7k1s084KwwpPquoo=
+	bh=SrY75ExbEGwLC6e6b4hm5qIxC9Qaxczyg7KXVZhCcHs=;
+	b=VMclFvxL8GlFT4RJJBQoPoo3wXQI7izBAt2msEO2Wdk9IF8Z1wUkPm3p5nx5bcVmRogzqj
+	zyfMeo2y/HszsRqnd7MhlMG9/N1cOBEPsU0W7HS0Y+t2RHO4NB3o3m2nqPVsTSLxeTMAvj
+	6K4FNVeScRqFoueTMwPxmZDeK9pvKKw=
 Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
  [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-s8n5QyfmNByL6YV6DfTzVA-1; Mon, 23 Mar 2026 23:41:48 -0400
-X-MC-Unique: s8n5QyfmNByL6YV6DfTzVA-1
-X-Mimecast-MFC-AGG-ID: s8n5QyfmNByL6YV6DfTzVA_1774323707
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c7381a9a932so2207783a12.3
-        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 20:41:48 -0700 (PDT)
+ us-mta-633-3v2a5Or0PjmG5w45sld47w-1; Mon, 23 Mar 2026 23:42:17 -0400
+X-MC-Unique: 3v2a5Or0PjmG5w45sld47w-1
+X-Mimecast-MFC-AGG-ID: 3v2a5Or0PjmG5w45sld47w_1774323737
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c74217894d9so1965082a12.2
+        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 20:42:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774323707; x=1774928507;
+        d=1e100.net; s=20251104; t=1774323737; x=1774928537;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rUeLGoeTwPTz7/suB9ZfTfJ1UEygTswX0AuYIezqldY=;
-        b=l4sneB1WI5tKsEGxjLSsp10tJ+jJbUoWurjzJKZBPCxeYVFa/CGVwKlPUc0bDMNa59
-         ekiHxCGeBVyUXJXlw4bXJ6mkbRsvnxc2ziDzL+ErlxN3cBU06BKRIgunui/eIvxtjz1g
-         GsZl72LKH/Is0KfWDAnXaQTLXnetBbvYPHJGaOr/xyuSCgFKGElM1zFD7cFPkOIZf4iJ
-         sRZ5lUmacEh1vfwZZ+8cXyRLvGZ04MVtWj+SN9fFDYNAFmAdEqDHEcc2PYisghTubAbz
-         KKMomoE9O9aH2T2axqM77z03ReWRi3AJKkE4z9lEMuF7/T8nLsiqRKgU9cmuYtxtVqXL
-         bR+A==
-X-Forwarded-Encrypted: i=1; AJvYcCU+GEn9kzyqZ82T1Ql8v4xDJN43r+kyIFg8fz5UN1AYDKxoxcDtwrl4r6sC09nyl8PZSoVKNmg=@lists.linux.dev
-X-Gm-Message-State: AOJu0YzdTyJiBgX6JglsjrGHWeBFo3ZpslY2gZYjrwbZgZ566m64fKl5
-	EYM5Ypa4W7LT0v2ewY9/ylorzmzJnVXdHyefXJ5A6Oo97KlTwhGvbuSuP3ANlVU4vEax04fdPcl
-	76eGbx+r/hhYHdpMF7o+HXYPcem77gqatWhoy5Iq3p0hhNvVJN8fmBhvq/g==
-X-Gm-Gg: ATEYQzxkSUmNZ+a8LaLjbcy1X1+yzTDd8dO2FNKoQvayKcvFUovNMIrA6eG8G1KdWQp
-	p79agfT2liizd+TJ4lTw3djT9GJMX3Nj+2w9nNguMSDbEv1qk1k8h1ePkS8tRnTSsJjwRNtWtR8
-	BreUlhxq8UMDAP+/UucAFAA7NSEOXW24J0cu8IkxVJYvqCMKHnfQbTg/PvSJYmSjHTjXvAWgwp5
-	R2DXY+eYNRExE4LHg8S76pYHbtDfHMBm3ewXVqQL/bQUKiifjlFjSSSNbLIu8G97HEv8Oh4XyoM
-	adwIDjMh8RnUmSuzTHDXGHGZ1hKPFegn6tvjwyaDEFxLoccVdtYX5jH4wWdRaL6+JoP1xcxZhB1
-	84/hbm4oHf0B4VGPCOm/BtS5UmUtAPTysHlMr8vAQ3EsoICWSaZoue8pFRwfqbic3
-X-Received: by 2002:a05:6a21:4ed2:10b0:39b:f292:d7c0 with SMTP id adf61e73a8af0-39bf292e04dmr5956818637.58.1774323707470;
-        Mon, 23 Mar 2026 20:41:47 -0700 (PDT)
-X-Received: by 2002:a05:6a21:4ed2:10b0:39b:f292:d7c0 with SMTP id adf61e73a8af0-39bf292e04dmr5956795637.58.1774323707126;
-        Mon, 23 Mar 2026 20:41:47 -0700 (PDT)
+        bh=SrY75ExbEGwLC6e6b4hm5qIxC9Qaxczyg7KXVZhCcHs=;
+        b=mJp74QNI7RVC5brtRR/HL8gNyG+OE0veelPDjVxJ5dbZM3CdZmSvqPo4XGK9d01N7m
+         Leq+lVhb8K0hciIdKTKGZENJ4Ak0Q25Cd+5aPVrscezKQhCfR3YfV1wU/3d+348Y2LHw
+         611511qjG52uKmoLXDiSc25gbkRhCIpT00raRIKmYMUoHsEzIywAmyAC9En0aXReRaOm
+         o9u9epycLKq1VpyzCEEuge95Sk3gVH4H9fTgPwvsQd8tMmcS47wLLTzA6VIhKzDj8daT
+         9N8H+dPLgDWvC4G3s9AxlbiGysuNM+Pvxy3PpW/nE8wzcNvfJo0iK2pWXesQDSbvpdkz
+         49Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYF88MT6zMDMbv0wlrsgKJCNMGJcS8mYUYJactZaQxfMBfjgv1lqEjoI3LgOCRBSNQC7isVNI=@lists.linux.dev
+X-Gm-Message-State: AOJu0YyrvgCG4Gdh/SqqJzdYau4d3Ik0kKEQ0pqH55v9b/FYc4QZnu3o
+	zKqgSp0cZELb9HgUzeWcQos6mq+GhUVz+JBiO5ioXGhTtqm3QNNDMEfTS76ZMqR8AdliwCLNJpk
+	v7YaIcpLAHzAIHkE4Piv8QTvEAmGThgzASrfh5VZKOUYe91A/fVvZqnJsXw==
+X-Gm-Gg: ATEYQzxNxcUeTg8KrV/wLMuxA5ZN+rzREBz21vdbs7nAvm28GmpPeW4LMga9VSXrHcj
+	fDR9AuOLX0jDdZVNGdr1YnmrwD1hlBb66ZurS/bnK+IMzPjDQdjLOYFlUkUwx4j88/3+WfBmEko
+	6OGXDQpbXMgdRQ39dHNl9Mu3auAizg54uqWzen6mHadYEnHUvawDwzp2odNQp1zmSXBkBjRkPPU
+	oE5eEv7/tDPrhMAdLuUfVKFsnHcSEa2N8lzhBQaLw69xZELkFsb5uz4ss11aU28gLP0H01cfutL
+	iFhcf074r4c+N7CpbV99FYwFZxQW2D5zuHHoH0Ha3kbCzjtr9Sdg1jMu/KPNyk1JDqFG04wNlgA
+	O1NkgcaLCew1VkFq+Tl1+TWYCMHWbE3enCg05Zk2ipMleb5gj4n2SOzBTg4mkTBg6
+X-Received: by 2002:a05:6a00:9082:b0:822:682d:2c5f with SMTP id d2e1a72fcca58-82a8c351e8fmr11844799b3a.28.1774323736534;
+        Mon, 23 Mar 2026 20:42:16 -0700 (PDT)
+X-Received: by 2002:a05:6a00:9082:b0:822:682d:2c5f with SMTP id d2e1a72fcca58-82a8c351e8fmr11844744b3a.28.1774323736109;
+        Mon, 23 Mar 2026 20:42:16 -0700 (PDT)
 Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c74487b5b8csm9108581a12.31.2026.03.23.20.41.32
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b03bc1ddasm11266861b3a.19.2026.03.23.20.42.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2026 20:41:46 -0700 (PDT)
-Message-ID: <1ab278d0-59b4-4fcf-b72f-ddcdb4fc96b4@redhat.com>
-Date: Tue, 24 Mar 2026 13:41:32 +1000
+        Mon, 23 Mar 2026 20:42:15 -0700 (PDT)
+Message-ID: <2821b930-3cee-4358-bcfa-1374c5cb2055@redhat.com>
+Date: Tue, 24 Mar 2026 13:42:01 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,7 +74,8 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 30/40] arm_mpam: resctrl: Add resctrl_arch_rmid_read()
+Subject: Re: [PATCH v6 31/40] arm_mpam: resctrl: Update the rmid reallocation
+ limit
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -91,11 +92,11 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  zengheng4@huawei.com, linux-doc@vger.kernel.org,
  Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
- <20260313144617.3420416-31-ben.horgan@arm.com>
+ <20260313144617.3420416-32-ben.horgan@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260313144617.3420416-31-ben.horgan@arm.com>
+In-Reply-To: <20260313144617.3420416-32-ben.horgan@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: VloHm2ATapolq92OS1gEkHyIMxNHZLxUfnd0g5hVzC4_1774323707
+X-Mimecast-MFC-PROC-ID: wA_2ALBvr5cQWyxXtVQkiP1XmBCgYUdLjxTkn05pF8A_1774323737
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -104,41 +105,37 @@ Content-Transfer-Encoding: 7bit
 On 3/14/26 12:46 AM, Ben Horgan wrote:
 > From: James Morse <james.morse@arm.com>
 > 
-> resctrl uses resctrl_arch_rmid_read() to read counters. CDP emulation means
-> the counter may need reading in three different ways.
+> resctrl's limbo code needs to be told when the data left in a cache is
+> small enough for the partid+pmg value to be re-allocated.
 > 
-> The helpers behind the resctrl_arch_ functions will be re-used for the ABMC
-> equivalent functions.
-> 
-> Add the rounding helper for checking monitor values while we're here.
+> x86 uses the cache size divided by the number of rmid users the cache may
+> have. Do the same, but for the smallest cache, and with the number of
+> partid-and-pmg users.
 > 
 > Tested-by: Gavin Shan <gshan@redhat.com>
 > Tested-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 > Tested-by: Peter Newman <peternewman@google.com>
 > Tested-by: Zeng Heng <zengheng4@huawei.com>
+> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+> Reviewed-by: Zeng Heng <zengheng4@huawei.com>
 > Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 > Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > Signed-off-by: James Morse <james.morse@arm.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
-> Changes since rfc:
-> cfg initialisation style
-> code flow at end of read_mon_cdp_safe()
-> 
 > Changes since v2:
-> Whitespace changes
+> Move waiting for cache info into it's own patch
 > 
 > Changes since v3:
-> Update function signatures
-> Remove abmc check
+> Move check class is csu higher (just kept to document intent)
+> continue -> break
 > 
-> Changes since v5:
-> don't read mbwu
-> remove reset code as only needed for mbwu
+> to squash update rmid limits
+> use raw_smp_processor_id()
 > ---
->   drivers/resctrl/mpam_resctrl.c | 82 ++++++++++++++++++++++++++++++++++
->   include/linux/arm_mpam.h       |  5 +++
->   2 files changed, 87 insertions(+)
+>   drivers/resctrl/mpam_resctrl.c | 39 ++++++++++++++++++++++++++++++++++
+>   1 file changed, 39 insertions(+)
 > 
+
 Reviewed-by: Gavin Shan <gshan@redhat.com>
 
