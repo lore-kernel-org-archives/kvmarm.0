@@ -1,121 +1,110 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0020138F628
-	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 12:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1B93FE37A
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 13:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774357032; cv=none; b=CNkKKFieVeDWi0SX/AGVyAb0XKmUyPEgTTqb/2lohH+CuR+Ge/crvdPshI6pgsUD+aOCh4CJqXOp60n41G1GY/OyRjgYr890eGDaGwQLLYS00v3eSc7oF+pgBXT8NHohMgEnz6Ck69Zu2pLl8VuF3uCsgd7MKu+ydp5jpQgGuDY=
+	t=1774360654; cv=none; b=giPEndhZyN4P5iqXNHURH2r2ivtO+SW1Fan5XArAhfMj5Wrv+MbHF4IbmFCxz8aMh6cb0m6xGlrpl9pPR8TaOBDZMEcT6j1Mz8zpoY9YcMZ9VUH6KKtptgt2o7RvhoM/Uz6HPjAaVK/ZQIDEtEuU4omIWo9mHRsJXXDOj253YLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774357032; c=relaxed/simple;
-	bh=cbQdQbNvEjdIsfIpzc+tru+4caZBQorrCrsoyo8asdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ff/Y7Nl4jPYTTGrVDKOGtpUYqI/C4c+tY7UxWl/idBbSxSeH4GpURvJjIzVZJ0FC20C/8ucRvzSBcWWvDZGaMRFjB+bSSTryFMBJEMYH/oLlQYDFwlz8du7qtB4J4rSESoJ4ePcowOAgO22bUK+Sk7cg1Z2K2hIVzgxFXlB0ueU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=roaqIxhv; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1774360654; c=relaxed/simple;
+	bh=zGEeROof9gA0W9ZhmvfGBhkwy5T1SiUSisxKNgVng0M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=e4w+FnW7KMyqykK9AcKEX6OPwbe0Mp08HP4jUAaHvD1tFkPmyCmdgQmK25Rqc2hvv8SRC/S30CQ/ApCxPtu7IgaZUBul+UOH1MpjDkYaSjlkAM4c1XHGWcEBEF6bkshPBM7pWkARoc236XYFwmnN4BKkz2kLAQzWN5bU+Vt2V/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KXsf5c9N; arc=none smtp.client-ip=209.85.128.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sebastianene.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="roaqIxhv"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 315DA1476;
-	Tue, 24 Mar 2026 05:57:03 -0700 (PDT)
-Received: from arm.com (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 782DF3FAF5;
-	Tue, 24 Mar 2026 05:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774357029; bh=cbQdQbNvEjdIsfIpzc+tru+4caZBQorrCrsoyo8asdM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=roaqIxhv41RmoMelSoBtZ+5Kn4t7Tu0gWq6OFEOOCOsmoUfL0FsoV/kbE0tFhFFe8
-	 UEkk5hLW69Hp43KhFev3lmo8PiMr1t7QdbFOqGQXCkH6Dym8FxYSCxqlF17cNT7CGv
-	 NhWkXrWFbybl2dJS/M9RltJlX5xXSOqsjXALGq+0=
-Date: Tue, 24 Mar 2026 12:56:56 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>,
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oupton@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Sudeep Holla <sudeep.holla@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mark Brown <broonie@kernel.org>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v3 5/5] KVM: arm64: Add SMC hook for SME dvmsync erratum
-Message-ID: <acKKGJG-MUm6TxOm@arm.com>
-References: <20260323162408.4163113-1-catalin.marinas@arm.com>
- <20260323162408.4163113-6-catalin.marinas@arm.com>
- <acJkEEXKt_GunFLQ@google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXsf5c9N"
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-486fcc05b20so24893035e9.3
+        for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 06:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774360651; x=1774965451; darn=lists.linux.dev;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=as56aPNtWm44s9wE7zPwXim0QPC6mmk0ed7R9T8xyHw=;
+        b=KXsf5c9NTQZ3EJpBAq3HXpO5nwW1uLQHkqXwXeQolpcZiWkvLBZv3C+Ui5Qc0d1rTg
+         yEhTzX0llgzoNDIjQflxZvuW6VHM/KX+VJFM59dztVVCknhiHMES5CLKv1XbHX5N/4la
+         8SFWwDnXpVsu/kYpzltoqDEU0WTeZxsYBOKV28PjoTTUXBVh9daW/ETkkC/kgDQ9OHkN
+         E4WSnwzfEUYlwF+wkhr7I7J/IO5JA/eExhGItjbgYK3flA3XVYcXsVQzCNuUkJPNGyxN
+         tQshOVpz1R89zzcOYSRPj21UAHxVJB9ifV2cslJnL7lK7GBTwWqAQrYtRy0XF/Gt5T/7
+         AHXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774360651; x=1774965451;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=as56aPNtWm44s9wE7zPwXim0QPC6mmk0ed7R9T8xyHw=;
+        b=qd9InJWBXVrqypDmu62Z9MrNw3XfSW0n/ajyxP4m5w5bLYTXg51S3fGAxBfWeF5uUT
+         5sI+8Q0NdtSnw4d4alVYte46hJC11P6i5jl3tsvZvzGtEScUJ0/n2Nt6G8mh6F48dYmm
+         VoxSwXmaw7bNtIMN8iuejkA0dp4TpLiOQUADC3Ch9sGOyoWD86aw5JSrArEAktRig+VD
+         k5zCOk2b9W4BYrXXTIH8n0udwLxYr4ZRs5S1z/l/X/B4HvAxWYPL7RxWcR8rdyKwfCf9
+         yY8Bm37lSPORY/u8ZZimHIbP8i2JWUkjlGvAYBMLDdpHhU+/QNcDaezbYE7uniMauveD
+         9Zmw==
+X-Gm-Message-State: AOJu0YyodDY44AZ7Up8dZf3wPaJE4+Uz0IVfp9RKLfKD7pabVsb0nsM3
+	vMXvVZxubkZjVqkU3ljABSBkTTdG9Y82EU0oBr72Zue3+9yvCNwOCSFo0Mz5uNAXM6Kg8/nArB8
+	yI6+opi4Spn6whafgMdyTONXYUV1qC81UU3AEF5Im976tW1XWaf2ICScDYKctIYGGmhItH2ZrAR
+	FOu8k5FkVY5Ror4Yw5IU6fTPEbfFRHyrOEo4ZMH4eunb6BOHPKnvw/HonjeAWOVIUxmNjD
+X-Received: from wmbjx8.prod.google.com ([2002:a05:600c:5788:b0:485:3ddc:f26b])
+ (user=sebastianene job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:600c:33a3:b0:486:ffa3:584 with SMTP id 5b1f17b1804b1-486ffa30b40mr104955515e9.15.1774360651034;
+ Tue, 24 Mar 2026 06:57:31 -0700 (PDT)
+Date: Tue, 24 Mar 2026 13:57:28 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acJkEEXKt_GunFLQ@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.53.0.983.g0bb29b3bc5-goog
+Message-ID: <20260324135728.3532400-1-sebastianene@google.com>
+Subject: [PATCH] KVM: arm64: Inject UNDEF when host is executing an smc with
+ imm16 != 0
+From: Sebastian Ene <sebastianene@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, android-kvm@google.com
+Cc: catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, 
+	maz@kernel.org, oupton@kernel.org, sebastianene@google.com, 
+	suzuki.poulose@arm.com, tabba@google.com, vdonnefort@google.com, 
+	will@kernel.org, yuzenghui@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 24, 2026 at 10:14:40AM +0000, Vincent Donnefort wrote:
-> On Mon, Mar 23, 2026 at 04:24:05PM +0000, Catalin Marinas wrote:
-> > From: James Morse <james.morse@arm.com>
-> > 
-> > C1-Pro cores with SME have an erratum where TLBI+DSB does not complete
-> > all outstanding SME accesses. Instead a DSB needs to be executed on the
-> > affecteed CPUs. The implication is pages cannot be unmapped from the
-> > host stage2 then provided to the guest. Host SME accesses may occur
-> > after this point.
-> > 
-> > This erratum breaks pKVM's guarantees, and the workaround is hard to
-> > implement as EL2 and EL1 share a security state meaning EL1 can mask
-> > IPI sent by EL2, leading to interrupt blackouts.
-> > 
-> > Instead, do this in EL3. This has the advantage of a separate security
-> > state, meaning lower EL cannot mask the IPI. It is also simpler for EL3
-> > to know about CPUs that are off or in PSCI's CPU_SUSPEND.
-> > 
-> > Add the needed hook.
-> > 
-> > Signed-off-by: James Morse <james.morse@arm.com>
-> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Cc: Oliver Upton <oupton@kernel.org>
-> > Cc: Will Deacon <will@kernel.org>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>
-> > Cc: Sudeep Holla <sudeep.holla@kernel.org>
-> 
-> In case this goes in before Will's p-guest series and with just a small comment
-> below:
-> 
-> Reviewed-by: Vincent Donnefort <vdonnefort@google.com>
+The ARM Service Calling Convention (SMCCC) specifies that the function
+identifier and parameters should be passed in registers, leaving the
+16-bit immediate field of the SMC instruction un-handled.
+Currently, our pKVM handler ignores the immediate value, which could lead
+to non-compliant software relying on implementation-defined behavior.
+Enforce the host kernel running under pKVM to use an immediate value
+of 0 by decoding the ISS from the ESR_EL2 and inject an undefined
+instruction exception back to the caller.
 
-Thanks.
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-I can leave this patch for later, maybe merge it after -rc1.
-
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index 38f66a56a766..ef8afbdd421b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -5,6 +5,8 @@
-> >   */
-> >  
-> >  #include <linux/kvm_host.h>
-> > +#include <linux/arm-smccc.h>
-> > +
-> >  #include <asm/kvm_emulate.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> > @@ -28,6 +30,15 @@ static struct hyp_pool host_s2_pool;
-> >  static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
-> >  #define current_vm (*this_cpu_ptr(&__current_vm))
-> >  
-> > +static void pkvm_sme_dvmsync_fw_call(void)
-> > +{
-> > +	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_4193714)) {
-> > +		struct arm_smccc_res res;
-> > +
-> > +		arm_smccc_1_1_smc(ARM_SMCCC_CPU_WORKAROUND_4193714, &res);
-> 
-> With hyp tracing in kvmarm/next, this should be hyp_smccc_1_1_smc().
-
-One more reason to leave it after -rc1.
-
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index e7790097db93..ff6a90a4a4c7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -756,13 +756,18 @@ static bool handle_host_mte(u64 esr)
+ void handle_trap(struct kvm_cpu_context *host_ctxt)
+ {
+ 	u64 esr = read_sysreg_el2(SYS_ESR);
++	u16 imm16;
+ 
+ 	switch (ESR_ELx_EC(esr)) {
+ 	case ESR_ELx_EC_HVC64:
+ 		handle_host_hcall(host_ctxt);
+ 		break;
+ 	case ESR_ELx_EC_SMC64:
+-		handle_host_smc(host_ctxt);
++		imm16 = esr & U16_MAX;
++		if (!imm16)
++			handle_host_smc(host_ctxt);
++		else
++			inject_undef64();
+ 		break;
+ 	case ESR_ELx_EC_IABT_LOW:
+ 	case ESR_ELx_EC_DABT_LOW:
 -- 
-Catalin
+2.53.0.983.g0bb29b3bc5-goog
+
