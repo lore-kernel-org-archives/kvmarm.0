@@ -1,47 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183F1391E55;
-	Tue, 24 Mar 2026 17:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0AC35959;
+	Tue, 24 Mar 2026 18:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774373977; cv=none; b=GocLAR4s4m1YMMj/FLQpgtq1G9Gysora5lGpq3WIU0e8NFOjKfIP3R+Dr0t/IQdBN65bRnrp+AwdHz6a8bI9SUyt/wrhRXUyyiRM6iYqKuU+gpKDAhLFdF2U90Y/8y2ivP7ScmKGGIKlOXpGeJB8nfxDJNTUK/mrThPfKgoBHnQ=
+	t=1774376190; cv=none; b=oDHzEejuCezYFJGNKHYf1AH2Mt3Sk+KkiY/v2/d2mXOe6vD7tdvt76fr7mxKTGbM24VC0jL2vCDG2AoJYoBv6OM/BprqUuUqX6sqPWegkJervrlJTA3MIzD5pCuBmKMwjix39750X2HZxOJ7QlyVLWk3BbiiiGxRWNqxmUdvuQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774373977; c=relaxed/simple;
-	bh=ZaI9P4HdmB3KMrbR4xZJNOkfWyry+qYtmIIIXLbqdhI=;
+	s=arc-20240116; t=1774376190; c=relaxed/simple;
+	bh=/ypStTJ7CiAGmDRziRUG/EYQwZPTjlxVm5e6SeBw5M8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YVAN+c8iFjNvTX5PplC0NVGGTklWVBQqtLce2wMwD5wPBG6fZhwe5x8r2jhg7vsB+sjH+tuJFqLXdNbUXn8Ymd3iZSglxXOv51KHlqy7Yb/bqyOHffQWjSaG0Gb5B2DIW28ii51Nf7rflzhr4ZvuYIdfBXT5KRgUnHD1ZL5unVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vdxmtj4F; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ul3NScTg9p+BP6AZqMUPbtjTvzYP/uR4mQ2IH3AhEg66uMY4HExfLcuWToGwMB9x4v960n1/RuB7EeQjMRufUOE6bDSjeLHLsd6LoTfRIEHUb0IN45ASfQ0vai5fvSgv7S4k4E4Qqt7G/uG2DNB47UE2s+JKXqEBmB7I4vGY9nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbqXfTDd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vdxmtj4F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DD3C2BC87;
-	Tue, 24 Mar 2026 17:39:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbqXfTDd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4209FC2BC87;
+	Tue, 24 Mar 2026 18:16:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774373976;
-	bh=ZaI9P4HdmB3KMrbR4xZJNOkfWyry+qYtmIIIXLbqdhI=;
+	s=k20201202; t=1774376189;
+	bh=/ypStTJ7CiAGmDRziRUG/EYQwZPTjlxVm5e6SeBw5M8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Vdxmtj4Fccv1fMIcMIq7MCmAm1ig+TX/gx3la5VFAMBYZLsELxlJqtDnhi8s0B4fZ
-	 FLtzNrkiYwLvR/VlBNRdm2g4ZrtmG0X0TZr2TyVuxc8x6k76h5ZsOIUyEILG7t+znD
-	 HsssQ29vRLe6cli6lWTOv6jdQ1HJqAj1DZnBHNcQkAKIKL+LKRwHPk0VvTdxe3r1dy
-	 LEVtjW6e7jllH/rriv3XSz9sPLVUaGTznEFwLuTrrX2lRLBtxHH9g9PTDJ/Yi9h+jS
-	 q0bGnG85JuFtt7z9RHDVdsl+TNuDQqI503+4QYEqi63536yH4BA3zYFqgfTGF5gQ57
-	 BJwrDkjNYBm8w==
-Date: Tue, 24 Mar 2026 17:39:31 +0000
+	b=tbqXfTDdnLGmbaxrDp1vSCXsAKADjs+oRPf/RyU4V8803jSuLAGriWNCpc2ejpyIY
+	 LjkahALqhZOvS14r4BPdBpNasv2znuWoA0xyslMOhThP8DmKScpf2+bxpQ5p/K+JZq
+	 ysmETT0UKUMHpJj0nMBOnQTIbHx5kGVn1mNVCNMU/KoPw8TCEfU98ga3GZvsiHlkNR
+	 h9A8tTzpn87Bv3eqalAkyQCy0wrWCW38nYwvEv3L0y6pF2sMt3rO7Ym8DrgXbBYvXt
+	 Gk9R5v2tYcRiqEoXnEDxsxc0P+CZLQ/bzffeAa/yLvM320CnkKoMjJLr3z+MAfL054
+	 L7+sd4W/j+ovw==
+Date: Tue, 24 Mar 2026 18:16:23 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Oliver Upton <oupton@kernel.org>, Ben Horgan <ben.horgan@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 4/5] KVM: selftests: arm64: Skip all 32 bit IDs when
- set_id_regs is aarch64 only
-Message-ID: <d5759443-ffc2-43b3-93f5-99ec55492a81@sirena.org.uk>
-References: <20260317-kvm-arm64-set-id-regs-aarch64-v5-0-a60f2b956e22@kernel.org>
- <20260317-kvm-arm64-set-id-regs-aarch64-v5-4-a60f2b956e22@kernel.org>
- <86pl4t41kc.wl-maz@kernel.org>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize
+ ID_AA64PFR2_EL1.GCIE
+Message-ID: <b3f9e10d-75f6-4da9-858c-3f85d2d7db57@sirena.org.uk>
+References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
+ <20260319154937.3619520-13-sascha.bischoff@arm.com>
+ <638a3453-91c9-4a76-8241-25d5c27ca518@sirena.org.uk>
+ <86se9p472z.wl-maz@kernel.org>
+ <ebd9ebb4-06ac-41a1-af16-664a4eedf3fd@sirena.org.uk>
+ <86qzp945d1.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -49,61 +57,42 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="H1nc6A8dHTsws8fc"
+	protocol="application/pgp-signature"; boundary="GbtyFO5MUSHSk1Kb"
 Content-Disposition: inline
-In-Reply-To: <86pl4t41kc.wl-maz@kernel.org>
+In-Reply-To: <86qzp945d1.wl-maz@kernel.org>
 X-Cookie: Forest fires cause Smokey Bears.
 
 
---H1nc6A8dHTsws8fc
+--GbtyFO5MUSHSk1Kb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Mar 24, 2026 at 04:47:15PM +0000, Marc Zyngier wrote:
+On Tue, Mar 24, 2026 at 03:25:14PM +0000, Marc Zyngier wrote:
 > Mark Brown <broonie@kernel.org> wrote:
 
-> > On an aarch64 only system the 32 bit ID registers have UNDEFINED values.
-> > As a result set_id_regs skips tests for setting fields in these registers
-> > when testing an aarch64 only guest. This has the side effect of meaning
-> > that we don't record an expected value for these registers, meaning that
-> > when the subsequent tests for values being visible in guests and preserved
-> > over reset check the value they can spuriously fail. This can be seen by
-> > running on an emulated system with both NV and 32 bit enabled, NV will
-> > result in the guests created by the test program being 64 bit only but
-> > the 32 bit ID registers will have values.
+> > > Is your TX2 the only machine you have that is AArch64 only at all ELs?
 
-> I don't think papering over this problem is the right thing to do.
+> > Yes, that should be the case.
 
-> If the issue is that you have HW that has both NV and AArch32, then
-> KVM needs to be fixed to make the 32bit IDregs RAZ when NV is present
-> because that's not a configuration we support.
+> The hack below fixes it on my favourite Qualcomm box.
 
-Yes, I'm seeing this in practice - it hits by default with qemu which is
-rather more readily accessible than actual hardware with NV at this
-point and I was concerned that since these registers are explicitly
-UNKNOWN (sorry, a mistake in the commit log above there) rather than RAZ
-if FEAT_AA32 is not implemented there might be gotchas.  I do see that
-there's some forcing for the case where the host doesn't support
-FEAT_AA32, I figured there must be some reason why it wasn't done based
-on the guest configuration.
+Confirmed on TX2:
 
-I'll add something to kvm_finalize_sys_regs(), it'll still need updates
-in set_id_regs since that'd make the 32 bit ID registers change value
-when the guest is run.
+Tested-by: Mark Brown <broonie@kernel.org>
 
---H1nc6A8dHTsws8fc
+--GbtyFO5MUSHSk1Kb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnCzFIACgkQJNaLcl1U
-h9DDYwf9Em0WcSM2aylb1zHYADTr7YnIzBQqP/o86zuktEp0HrunQTiCzDnl3NMQ
-14RDXaHemX5VrVrYw29JutWLjEl1YI96rmMC8p6qBGSbo3V4DuV6pgoNwDta713e
-EJot0soFFT+bQk/N89VCWySOmyeWQKOBG93JVNiVBQ95+dcEFst5EmnfCGrpIan4
-yolB+GbbZ3SO3T6e3qg/ySgwrREbwCHLb+WAdKfV7NsT3AhXVrbaomdmlxIN056L
-foTiPS0xYSRj34dNUUnAamoZkgH/W+8+1J+sfufT4xjezwviTr4WlkHTxIsL0UPx
-2UJZqwfH8yGafVp75qoAFoGBj/kXZQ==
-=krAn
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnC1PYACgkQJNaLcl1U
+h9BYzgf+LFxJQeWg+73NmCmRJGV5mrNVAhnE6ndhSgdZo7SUugOdDP+kU1SyiQEl
+PTmurB4rqTx512siq0ZuVjIeLhpVEEbBfMN+P7dASp5lswwGKACS5bursUDkXOpk
+Ekn64HC1i6qb0dXH1sKM31khPXtc+j+HZUHpYJqkxCCzAPqGtFYhs9h9z+nqIsQD
+73KAjEEunUGxVqecRCqTbtrh1iYHdQuNURbdidA+alFGXFJLlnVN7n1PRO3wJhnj
+BYsqhwJExjwN2sd/84ucRtHSwF2If3xiwqcPLPBi7liYlcvWBApEQ5jyBlP8hdLk
+IFoTX2g5bU15Cnql1zjDJGKfiM1NNg==
+=A7dD
 -----END PGP SIGNATURE-----
 
---H1nc6A8dHTsws8fc--
+--GbtyFO5MUSHSk1Kb--
