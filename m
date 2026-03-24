@@ -1,85 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA551185B48
-	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 02:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC75B386559
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 03:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774318486; cv=none; b=WOcKJJmX31ocqhxPWS3MHEXGAqnHfCv7PWAL8ApgDjbMiOWVuYEOPlpipgZtNuZdTTwCtZIeZKvlkc4KcZZ3w3CyYd0tyLUeagpzNQq5NsNXgQiwby6Efh6eDpOrLGkbcY9uLT0xN3maWm6bFdwsa0Zx/asW9D7tVRFqr3f5qrk=
+	t=1774323638; cv=none; b=Q4f88m8VAN1DkHkl8z7WnIHttKh8h1rK9DuGiIUCH9W4mOVUasIRjwKqC3XK+UIoB6zumQgCpxlIab1vE5po2m0AqqCcxMNlBdGvp1ZPYhcLMg8TkrWHKo/tF6b9upAojifB6SRLcykgPsPddyH4cPcJMQ5m1Pv8J8SwEpqFZEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774318486; c=relaxed/simple;
-	bh=TO2RzNGl3QaEmDTI2VDfAcOvLdhOrGE8ero57x/6NBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VrM13fuhqGAr/wuxtaJbQ9KT4K1NofVWjW5srGsbta4Zft3rw0DTxI1C5VNCijw7k4p19T3vP6/E17iere/FHS421zMA8L5HnjFEmSQ3cfTo5PmiqGJhijKfpiR4D1A/wySeUUWx3V0g4EGfmB2qQyqtoszgXBijWsWM73RwWmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTek9b8C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774323638; c=relaxed/simple;
+	bh=GbWo3xlFo3+yW/y2PBN4nF0sITZI0vr2UyqlXDwEu3g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fDtt5p4xqX/D/ggZZKTIIDaG+Y104rTcG/ImnXDo+TB2oJH1aMjQrX4pWbsVltTe9k2ey2tuM8wzULayfEYfXd93hbcSDQaF6FtmnRw4Aj7fSqNcCOKILlMQ2cydvx/TgTaGvLR5dNhPOwOvZg6v/pRPvkTaEsYeSnEZYjDTwqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1tjqR3U; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTek9b8C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E374C4CEF7;
-	Tue, 24 Mar 2026 02:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774318485;
-	bh=TO2RzNGl3QaEmDTI2VDfAcOvLdhOrGE8ero57x/6NBU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eTek9b8CkkhrzvSimQb+Reep8rVSxPw5Og9X7W1B96JNpCSbpPdnsHl307dm0kxFS
-	 8RTR2+TR32GuCCo63iMbGEvnNTOfUT1rED4pvLMc6OnP/jDG5AlZLu7CbSy3YOl62A
-	 B46kxQ6R0pRyDubvl5y/JEhA88DEUAxIG7SjQsQoHlbpYZh2fIE1BDhtwyusldXUw3
-	 xniGdIkcqhqqVxPyryWJhbhZS6bVCg2NO/F/aDGzlbw5RZEMNXoS4Ow9OZiO7/de9J
-	 X1tf4yCO3MUwYmWvNzjomaPsb3/9mUT6SbIvlEBTH0sbsraNJJAXdf45+QB05Rsrkr
-	 Mm3EipOy5DD9A==
-Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
-	id 096101AC52D3; Tue, 24 Mar 2026 02:14:42 +0000 (GMT)
-Date: Tue, 24 Mar 2026 02:14:42 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oupton@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: set_id_regs: Allow GICv3 support to be set
- at runtime
-Message-ID: <acHzkoowEHXZ5BJv@sirena.co.uk>
-References: <20260323174642.3183075-1-maz@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1tjqR3U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774323637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XblcNM6KU7hXW8KSNBudspXcLZs2xKbcalCmzhtiVUo=;
+	b=b1tjqR3Ua/bpCSc9KphGdhIsNRJu7YirrqiBWalEdX3LNIRrA8irqkGITzifxGXgY98Jdr
+	PqOOyY3rhJ9taaabcDKXFWSXtouajexgYQKqnrMTDwVAEs+XZaY+EY7gqA1iV09X8wk38i
+	xzinQ35KhPH1inkovi+ug5cnwYrec0o=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-VScbRN4aMji8MJu_XCPKJQ-1; Mon, 23 Mar 2026 23:40:33 -0400
+X-MC-Unique: VScbRN4aMji8MJu_XCPKJQ-1
+X-Mimecast-MFC-AGG-ID: VScbRN4aMji8MJu_XCPKJQ_1774323633
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2b07bd30b5eso54956195ad.1
+        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 20:40:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774323632; x=1774928432;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XblcNM6KU7hXW8KSNBudspXcLZs2xKbcalCmzhtiVUo=;
+        b=XBfM1URJh1y0NqeBR7hJNdkcivX7PHL/5uEyXZ0i3lBpm6SEaNMQ/ZF9jjyG4l6nbe
+         6lTGKKAT4+MchSWKwzpep/i+S6py2nrFPH38BDMfBvf4CPfXBrCtr9BLIza/llw7fDPe
+         h6mWCDhqWzRy5h5WjU/sO0GmUqerMcuv/jOTkbBGJ2G6vB0+6LfPjEFYHfGlfrh/EcsW
+         2VeROtKuUvLbFwS3ofw/eZhTRidWXI2qYJxeI14BZBfFGOEID6G9cKLTgxkPiuCbKMJ5
+         ymE3gnkXzBJ608XGvx+LkZYC4A9BRigpmnMZh6EmQCWb4GI4Cq/2yb6evnlj3iajQ4+t
+         d8xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWupm0PINZ0Y9odIgrflTGAtuBGj1JBTLykw/Us7yWjTXNedKJR++tQ4JERaWIugW9LRmWwXww=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxeIUhsbuMSOUIidZMX31wl3MeRuhXijHF4pDEGYhgtyHIyEGX1
+	Kg2/17aHwNTMrRAvM91zGVt76wPWHo087IedOzA105ItgqKjGcKJAqHAWPv2wVWcQeK9aailHgQ
+	t+qtixy2RUqsi0iiXDlJXL1BjzqG10ECXxvnTokYqydhJ4CdFEAU5kf15LQ==
+X-Gm-Gg: ATEYQzynRvl56T8LVkU7LaFYYgUnnIBLxL+AkHAzXXzW2l9TON8pxSWxxuisjMIyRHe
+	4gWkDV8sc5BTXsDKDyrpRVyKInx2svsjqRTRKcokOiNql4/XxL/7DCBLUpZRoUEM48Bm2z2Che4
+	0CHB+DR57KJwMcW1xWZhPENElQrNflaBfXEXBMI3gPZviqfqcIajSb8lF9dbn1J/NVsJvFZOK84
+	tJq73oVViuvfgy9gSRTYC44i45lTw1CQbjTtLUXXrbxiPup9zofZDgJv77Fu8agAr08CIH1geSA
+	lz9fo44xjYOS4uLT42mjHiEoBM4okLOTtU+osbHN854Y/pW2ZPsVbwZtgW0ITRb/yNCoXu5z0ZA
+	c7EiSaKK8PXhXd7Sukf1gwOgIM64PlNchVN7RjjIla+xfyeSb6bqRYbHrvrSlvql6
+X-Received: by 2002:a17:902:e847:b0:2b0:5306:5f20 with SMTP id d9443c01a7336-2b0a4e16ca1mr16086535ad.18.1774323632658;
+        Mon, 23 Mar 2026 20:40:32 -0700 (PDT)
+X-Received: by 2002:a17:902:e847:b0:2b0:5306:5f20 with SMTP id d9443c01a7336-2b0a4e16ca1mr16086135ad.18.1774323632220;
+        Mon, 23 Mar 2026 20:40:32 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08366c443sm162024795ad.56.2026.03.23.20.40.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2026 20:40:31 -0700 (PDT)
+Message-ID: <2825ca38-44c5-4649-8a1c-40cf98905c44@redhat.com>
+Date: Tue, 24 Mar 2026 13:40:17 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kvTKe6LgctCn4IwY"
-Content-Disposition: inline
-In-Reply-To: <20260323174642.3183075-1-maz@kernel.org>
-X-Cookie: Identify your visitor.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 27/40] arm_mpam: resctrl: Add monitor initialisation
+ and domain boilerplate
+To: Ben Horgan <ben.horgan@arm.com>
+Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
+ baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
+ dave.martin@arm.com, david@kernel.org, dfustini@baylibre.com,
+ fenghuay@nvidia.com, james.morse@arm.com, jonathan.cameron@huawei.com,
+ kobak@nvidia.com, lcherian@marvell.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ peternewman@google.com, punit.agrawal@oss.qualcomm.com,
+ quic_jiles@quicinc.com, reinette.chatre@intel.com, rohit.mathew@arm.com,
+ scott@os.amperecomputing.com, sdonthineni@nvidia.com,
+ tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
+ will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
+ joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
+ zengheng4@huawei.com, linux-doc@vger.kernel.org
+References: <20260313144617.3420416-1-ben.horgan@arm.com>
+ <20260313144617.3420416-28-ben.horgan@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20260313144617.3420416-28-ben.horgan@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: g_Fn4CVX2eUA8CRnONSehtP5j5WG0agE1kg8eJAL_FQ_1774323633
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 3/14/26 12:46 AM, Ben Horgan wrote:
+> Add the boilerplate that tells resctrl about the mpam monitors that are
+> available. resctrl expects all (non-telemetry) monitors to be on the L3 and
+> so advertise them there and invent an L3 resctrl resource if required. The
+> L3 cache itself has to exist as the cache ids are used as the domain
+> ids.
+> 
+> Bring the resctrl monitor domains online and offline based on the cpus
+> they contain.
+> 
+> Support for specific monitor types is left to later.
+> 
+> Tested-by: Punit Agrawal <punit.agrawal@oss.qualcomm.com>
+> Reviewed-by: Zeng Heng <zengheng4@huawei.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
+> Signed-off-by: Ben Horgan <ben.horgan@arm.com>
+> ---
+> New patch but mostly moved from the existing patches to
+> separate the monitors from the controls and the boilerplate
+> from the specific counters.
+> Use l3->mon_capable in resctrl_arch_mon_capable() as
+> resctrl_enable_mon_event() now returns a bool.
+> 
+> Changes since v5:
+> Use r->mon_capable instead of resctrl_arch_mon_capable() as specific
+> to the resource
+> Comment line wrap
+> Include offline_ctrl_domain cleanup from controls boilerplate patch
+> Include any_mon_comp finding and
+> Halve num_rmid when cdp_enabled
+> Move mpam_resctrl_get_mon_domain_from_cpu() from boilerplate patch
+> ---
+>   drivers/resctrl/mpam_internal.h |  15 +++
+>   drivers/resctrl/mpam_resctrl.c  | 231 ++++++++++++++++++++++++++++++--
+>   2 files changed, 235 insertions(+), 11 deletions(-)
+> 
 
---kvTKe6LgctCn4IwY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reviewed-by: Gavin Shan <gshan@redhat.com>
 
-On Mon, Mar 23, 2026 at 05:46:42PM +0000, Marc Zyngier wrote:
-
-> set_id_regs creates a GIC3 guest when possible, and then proceeds
-> to write the ID registers as if they were not affected by the presence
-> of a GIC. As it turns out, ID_AA64PFR1_EL1 is the proof of the
-> contrary.
-
-Thanks, this fixes the issues I was seeing in -next:
-
-Tested-by: Mark Brown <broonie@kernel.org>
-
---kvTKe6LgctCn4IwY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmnB85IACgkQJNaLcl1U
-h9CCowf4yEm4L6SEBrzHzfDEPo9zYZqteeOj1r7q+vba6HHLd3YAtNDdsghS8r2A
-8ByiqvccyeAcNpQsyESaNL2S85Qfqbx1KvT3rfzOAJBdAvOrobFrOfokpTkpT5oi
-fa6236lfJvFSNA24Os69/yqWmUiCNY9zuvEtmMxt715t6qE6x89QU5X2spvqFz/g
-pfXMb+CZ5wDrSCogJ2PJqOYaRKca1MlbqRaKPaivgfykCQ8XyXdBpHQgu7Uk5tWn
-smq0Go6mkdJvqW8JEH83LDB04EaEyB8rGJzYV+wLdt/W9uGn8AnP80jhGeTvC2ck
-WnEAHwf+gph6u6i0VWm1/rg+6otU
-=PO86
------END PGP SIGNATURE-----
-
---kvTKe6LgctCn4IwY--
