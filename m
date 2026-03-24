@@ -1,72 +1,72 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA4424113D
-	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 04:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AAB3B0AE2
+	for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 06:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774326096; cv=none; b=rYlavkHC0jqDCmUSLocJ76Uf0YWQDAdtFQ01e3m2HBlNe5GeRK/oi5jYGyuWBWNzgwhD/7uqaXMayHNt4/yeO1nQT+8+eiht88EVWQCMTQW5kbe8ijV5s/gRTkyE5N8NAgDTrtcr1PXDVJJkPnALnuxZ4ZcYAOMeN8wsZbhx1/k=
+	t=1774332319; cv=none; b=fltG5zLZc7L8QuRLXt9fJJET1Cdn+h4WO3ae99D3M6Cf5uKmF/KuYRPl6yjNV1PLLs5O8ilg2TaXpH3mnTsaMzCbKP1HP36/xpl0GNZVTCnvksfXpufq2Gtt9CbtfKiQQKKYHKhxmlpImD8zcinU/TVdnPWj2StLzfFMteZbHUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774326096; c=relaxed/simple;
-	bh=Q9J8EZ7KakpOEdBx6xv3rMsDRoJWbyFh7BbfJZNgiME=;
+	s=arc-20240116; t=1774332319; c=relaxed/simple;
+	bh=9kKEAqIsofsf9j9eZKJ2uLxM6sd+kjyOhrgvEs4OXX4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DST7kRHUww1Ga49sj3GfMNkIurHRmJT9HjJ83vwFbLpJy9hQCy9Zh0im9IYBbmpfI4cIvHTpvoOPyD7rDCYy7YRSEa0sLPJko/pY7fiL/peFdzzicq0LKf3skJc6h3s5wKvy8vaLV54DdaubEro2/6iXotsw7hnKugOgtE3YHJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y4T0eo3r; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=E5+J6q4qlCH4co13k2ftj8n38qwVBwDtyhA2OJV0NdcpI97cQTTz0P8PoJgGnwh2EDTwATcffRkpDcD0C84fRYGvrCyCAv7eM/MybM6RFY+IQkIbhYTNocysfBGCHRg4jYtf8j8f8/fANS+dbSfr8Mih31uv7ePL+TkRFp/kLS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bg+I6ODz; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y4T0eo3r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bg+I6ODz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774326094;
+	s=mimecast20190719; t=1774332315;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=as1oD5ZP7ir6ec+9vRMPKCBQFoPmXvB2fXhjUdsVMTM=;
-	b=Y4T0eo3r2O1PO9biZccfs+rLF6boTotXzzpHT5s47b9pWI2ghibmlNRilSWr5MtQBtSUB1
-	DsPvnFI+wA9KkNgmiYRoRt0D3y2Hd/Rj+0z/5hLX2a2mzAihjuG7RH3E0nAbS/zUVpoX5R
-	YHmcrlcbKH0T8xkcp6/2MjuNDKkM/k0=
+	bh=xw85OR1VT86W5/UYlwDEouH2+FNxd6th+BcXCbo6xiM=;
+	b=Bg+I6ODzXzn2SKU0tt+vxyVTPCtTfLRPtPfa+CdGFnuQkotIaXWmfxsDxn4ZP7nxYwXbag
+	o7ZThcAu3ns+8iQnpJC5GNQ8uCnR2AgFBs/a3OS9rsTDhKS7jIO2EXxyO3oRA7evIOdZ3Q
+	tmpfTFXCOQ2gVXnZJh6gOW4VWrlKduM=
 Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
  [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-rZFs4ssmNB-e22CnjVYLvQ-1; Tue, 24 Mar 2026 00:21:30 -0400
-X-MC-Unique: rZFs4ssmNB-e22CnjVYLvQ-1
-X-Mimecast-MFC-AGG-ID: rZFs4ssmNB-e22CnjVYLvQ_1774326090
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2adef9d486bso34813175ad.2
-        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 21:21:30 -0700 (PDT)
+ us-mta-656-0qEL5COhOr6KbVcgSqdVsA-1; Tue, 24 Mar 2026 02:05:13 -0400
+X-MC-Unique: 0qEL5COhOr6KbVcgSqdVsA-1
+X-Mimecast-MFC-AGG-ID: 0qEL5COhOr6KbVcgSqdVsA_1774332313
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2b061868724so24411135ad.1
+        for <kvmarm@lists.linux.dev>; Mon, 23 Mar 2026 23:05:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774326090; x=1774930890;
+        d=1e100.net; s=20251104; t=1774332313; x=1774937113;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=as1oD5ZP7ir6ec+9vRMPKCBQFoPmXvB2fXhjUdsVMTM=;
-        b=lvmYUHlnTjmPuJE2pDZqAp6yRG09zgN2Ahp2Z7Dr5TciT6JgGxRS2lmeJFo4MYBBVZ
-         Uy4hYegM+aURcxSKeukff3GYxLdOkgy9q9zXbA6OWcQppwgqt0lBp9y86V6vin5TD+Sj
-         DZAfyrnTTeSbCoh7q0M+01VLDJWOy+t+MwRFpXuOv+/r+DYjtg1ekTEeiUO5mqeefO6+
-         KmTFVc2PwHv2hICVUY4Lv1zsPFYPzxpE9SjTYpIhbq1mftqGJh+I72Vh3rcon8i3B8sd
-         C2Xs7PwYFZ3HfwE6Dkm0NXSY1uv2szctwPThFMmreh3jWGPJRM/jdYF2ccSUmLmZkPl1
-         +PQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyhL5VBFGggVIZigvq6mF5GP+0qt8ksDlQbxhz3fkvkJFd0IS00V1e8ieklA4XEkGF1X84DMs=@lists.linux.dev
-X-Gm-Message-State: AOJu0YyTQd0Ug12S2OCZCGd5Z42YRLejXOD5ApgXoBkkkzlZX8AyowmK
-	1uP0rs/0BknpPAXqSPCumrx9d40jttAZY4fiv3F1BbqW8KNQJdvenLmXOhwszdR+6W+DoDT7+jR
-	CBPDxsZl5ruvTu7KRm3gIsZK5uOX6ieq7SxUblRLLPU8el3qdkcIIESRbUA==
-X-Gm-Gg: ATEYQzxGc6klq0ul4afznPZOE5x/KVzoPS0d9+5Wt6VvUBEBnmW713/tDOV+TPjVIxp
-	09fNSYqHE8XSjmwg6PmwW2p8oPH9sCAM77zbaGqsAnSKsc0Ig5tYl2Xu9OmyhUvHqgG+D3miWTm
-	5QNwAjmg61QYJzCC13uNnnuJUgifOFyvJVPQbZLDvjRXYgL9sVCRGd14JVCjP/K7SLtxtIly2l3
-	Hucrn1owH5YKLwOIy9Bj+U9bWvKWw6okGtVVjABekPFPrQDGXTVUh40jV4BPUpwVDev9FMVO7BL
-	ehqDJ/isOwCIHlDriTb/Hlqg/mxUjgC9ha2eKCK2Uzjr7r1fN+daN7B6mE5pxc61aBaM0rhVKEV
-	Ahc+YQSxCZmbcweDbG3QkXyctS75FtM5fJ4vCdYOztzS2j/vlB1s4UULOvZFH5AZs
-X-Received: by 2002:a17:903:1a67:b0:2b0:694d:f5db with SMTP id d9443c01a7336-2b0828238d5mr130410665ad.52.1774326089749;
-        Mon, 23 Mar 2026 21:21:29 -0700 (PDT)
-X-Received: by 2002:a17:903:1a67:b0:2b0:694d:f5db with SMTP id d9443c01a7336-2b0828238d5mr130410275ad.52.1774326089350;
-        Mon, 23 Mar 2026 21:21:29 -0700 (PDT)
+        bh=xw85OR1VT86W5/UYlwDEouH2+FNxd6th+BcXCbo6xiM=;
+        b=WlbTfnlLQUal82brzNf+XN1iIEXsEIApUb2DHoNw+KN6jds6IsNfBBzXezdXJBV61Y
+         PoODrs5uVX3vUOMomw0V/JUvOei9byHxStsXesTFPbfC44uZuNK39IbAOSrzoSnJqceW
+         We3R2IINs4oo5hCujtYEX7i7BrCyXOaEozCJRxMJfNEzVVipcDO2opIO/abUPDWbNNRb
+         KYgzyWAgc/uF5EimpbPifEOHfL+iBxeSttk8FupHqs2qm9F4BvNYx72UoW//tGr3RVnd
+         YbjgeU1uH9KigZh/UCOJY3RCUU5RPm4aVRaEqbIfF8v75nNNVRE5DyMX4KEN9wPo0fJT
+         /80w==
+X-Forwarded-Encrypted: i=1; AJvYcCUnt/SATJ3uHqnPb8xDV6uF0hKOKjkcjRAgJLVONZz6i34y6oFax0ubEAxlbmuRDMfRR3xLkUQ=@lists.linux.dev
+X-Gm-Message-State: AOJu0Yx53CKtE64HJ5Yx6KIs41d0c79Bs+WlMO2mvrpXZPzLo5bjzKhk
+	pA6Cq126laL6Lldv63NbmdniMIx9J9c3sy23FLr0tvTn6OirjtQSp3NzQYqLCQjDhyhvbuOKkKq
+	aDWm2AjuaS87DZyoeByN+sxdkcHXozqYQSAdUny2qsVjclB+9dkiwYrlpDQ==
+X-Gm-Gg: ATEYQzyHKO50ZmnMqOWECx6uaIE4aFNtKa8yn8O22eMzaZiqi55qAhQvD8N4W2Ow+QB
+	wDctb8cs0muw+6i4hNIPrS7GUVaVihhwfTmsSoK1/vxLTL7mbPQAmtqz9V4RQVL6MqAdyhWHmaE
+	UKmKkaQNsNf+S5OU6VuvlyPVtFVXlVFyFfyHnRiXJbHwvufhI747kLVQs7LU4osbLeOgzIR3Faw
+	7POo/vJIlTuSMjUcAWG0p1/mey0DFTNEYUrppvu04Uj+NeVJ8GZAjiRe4fHv0adrLmJQzutA96R
+	puUqFkcUeUTLCNwAfk5JXktapGcMpcCZbGHHM6uUnKvaoJv3V5R3eq9zrYsgFyHJPbXPjRV+fqL
+	nzai9o4AxHj38Q+S7rD0+9Y6L75euJjxZdiTN4f6UOlF3fv/ntiv9mKALvcbwkMeQ
+X-Received: by 2002:a17:903:288:b0:2b0:4554:9c24 with SMTP id d9443c01a7336-2b082797405mr140735085ad.32.1774332312854;
+        Mon, 23 Mar 2026 23:05:12 -0700 (PDT)
+X-Received: by 2002:a17:903:288:b0:2b0:4554:9c24 with SMTP id d9443c01a7336-2b082797405mr140734575ad.32.1774332312435;
+        Mon, 23 Mar 2026 23:05:12 -0700 (PDT)
 Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b08366c74dsm171510225ad.62.2026.03.23.21.21.15
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b0836556desm174549575ad.47.2026.03.23.23.04.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2026 21:21:28 -0700 (PDT)
-Message-ID: <d82f9434-ec90-4872-b779-2b20aa8e700d@redhat.com>
-Date: Tue, 24 Mar 2026 14:21:12 +1000
+        Mon, 23 Mar 2026 23:05:11 -0700 (PDT)
+Message-ID: <6373e449-6bbb-4fe3-b140-6cf452255558@redhat.com>
+Date: Tue, 24 Mar 2026 16:04:54 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -74,7 +74,7 @@ List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 39/40] arm_mpam: Quirk CMN-650's CSU NRDY behaviour
+Subject: Re: [PATCH v6 40/40] arm64: mpam: Add initial MPAM documentation
 To: Ben Horgan <ben.horgan@arm.com>
 Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  baolin.wang@linux.alibaba.com, carl@os.amperecomputing.com,
@@ -88,46 +88,43 @@ Cc: amitsinght@marvell.com, baisheng.gao@unisoc.com,
  tan.shaopeng@fujitsu.com, xhao@linux.alibaba.com, catalin.marinas@arm.com,
  will@kernel.org, corbet@lwn.net, maz@kernel.org, oupton@kernel.org,
  joey.gouly@arm.com, suzuki.poulose@arm.com, kvmarm@lists.linux.dev,
- zengheng4@huawei.com, linux-doc@vger.kernel.org
+ zengheng4@huawei.com, linux-doc@vger.kernel.org,
+ Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
 References: <20260313144617.3420416-1-ben.horgan@arm.com>
- <20260313144617.3420416-40-ben.horgan@arm.com>
+ <20260313144617.3420416-41-ben.horgan@arm.com>
 From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <20260313144617.3420416-40-ben.horgan@arm.com>
+In-Reply-To: <20260313144617.3420416-41-ben.horgan@arm.com>
 X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: v6y-w3RLkOKiQDUdKZnhhIxbhcQBFee8__P6ATZa278_1774326090
+X-Mimecast-MFC-PROC-ID: emshs2AhEIRdcHVXwt081VCHsi6-RaW5sspD1BvcMKk_1774332313
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/14/26 12:46 AM, Ben Horgan wrote:
-> From: James Morse <james.morse@arm.com>
-> 
-> CMN-650 is afflicted with an erratum where the CSU NRDY bit never clears.
-> This tells us the monitor never finishes scanning the cache. The erratum
-> document says to wait the maximum time, then ignore the field.
-> 
-> Add a flag to indicate whether this is the final attempt to read the
-> counter, and when this quirk is applied, ignore the NRDY field.
-> 
-> This means accesses to this counter will always retry, even if the counter
-> was previously programmed to the same values.
-> 
-> The counter value is not expected to be stable, it drifts up and down with
-> each allocation and eviction. The CSU register provides the value for a
-> point in time.
+> MPAM (Memory Partitioning and Monitoring) is now exposed to user-space via
+> resctrl. Add some documentation so the user knows what features to expect.
 > 
 > Reviewed-by: Zeng Heng <zengheng4@huawei.com>
+> Reviewed-by: Shaopeng Tan <tan.shaopeng@jp.fujitsu.com>
+> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 > Signed-off-by: James Morse <james.morse@arm.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 > Signed-off-by: Ben Horgan <ben.horgan@arm.com>
 > ---
-> Changes since v3:
-> parentheses in macro
+> Changes by Ben:
+> Some tidying, update for current heuristics
+> 
+> Changes from v4:
+> Fix unusual indentation
+> 
+> Changes from v5:
+> Drop cdp (under CONFIG_EXPERT) and mbwu (back with abmc)
 > ---
->   Documentation/arch/arm64/silicon-errata.rst |  3 +++
->   drivers/resctrl/mpam_devices.c              | 12 ++++++++++++
->   drivers/resctrl/mpam_internal.h             |  6 ++++++
->   3 files changed, 21 insertions(+)
+>   Documentation/arch/arm64/index.rst |  1 +
+>   Documentation/arch/arm64/mpam.rst  | 72 ++++++++++++++++++++++++++++++
+>   2 files changed, 73 insertions(+)
+>   create mode 100644 Documentation/arch/arm64/mpam.rst
 > 
 
 Reviewed-by: Gavin Shan <gshan@redhat.com>
