@@ -1,57 +1,59 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A585E3E3DBE;
-	Tue, 24 Mar 2026 14:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383E33876A3;
+	Tue, 24 Mar 2026 14:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774363410; cv=none; b=tBT7Ofz7OYfOCqikjc8abQPpE9/iivzlQvGcPp/oyuGDpyC2XQx7XCSB2T7VJyGdemtFdXgdOp0+s3FdOkrdqQy9rYaEV2VTvjBbxRXP5gCizZyCQyPz/7wDvHoFOEgZxRrFaxT1mKZFBVhVxaJsh4uqFORBT/nhVHoAjUn93AY=
+	t=1774363687; cv=none; b=B454t6pLWGjxHGhB1qL6IJNqK89hPj+W+I2siUGk0Lk+ifWAE38lCxfwGf+vy81qtvT56CWQMYhDT5D89ZpPIC+pKph8GPIiQDEnIYhqWVnhG86aNhGMCJ0AZ/Heb1n2S25LGqkQqdTJBA+sBpKVVbBWvxC49z3Ybu2CCKS9uCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774363410; c=relaxed/simple;
-	bh=dTzqwHUwJjx23yBT/T2PZMHiFC+SFcUAQiUhmXgvGUU=;
+	s=arc-20240116; t=1774363687; c=relaxed/simple;
+	bh=LLkl0SEenQDONMwzC9Hwo+1SXPja8lNluf74zP/HNRI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A97wE5MdkbXlZ6oyjiQD2I4toPc6IMPqNZ9QExqiMzoQKV85JgdwXAXGxAEcYyDdFh/JBnYSVFmAqNMYMJLmp5UpRehjTtZELsolksRFZMsG3RmewEbRoEHL/ew2Bsu/IlGMNrArSuubEb9U4dlGehXItQdMW4kpg7wlcVUntQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bvOspPMZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=pc/raFN9oqVFn3nIwVyg+F7OmLnPs+4EOCc/Z8oIqkLbxelvu8QGOOsWjVFNyOOq6OhPIi9V0Uv1GG2E8uoNBOPwqdBx8sZurYtBQP1r77UcgfiH9vhiHcKwcPt3wAWtf1noBxFfHnL+oIeWCNpzu9RT3dRVQyhkr+5vh0kBfWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XV0yrAPi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bvOspPMZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39051C2BC87;
-	Tue, 24 Mar 2026 14:43:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XV0yrAPi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7720C2BC87;
+	Tue, 24 Mar 2026 14:48:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774363410;
-	bh=dTzqwHUwJjx23yBT/T2PZMHiFC+SFcUAQiUhmXgvGUU=;
+	s=k20201202; t=1774363686;
+	bh=LLkl0SEenQDONMwzC9Hwo+1SXPja8lNluf74zP/HNRI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bvOspPMZsQjbmvms/frf9JCzh8WBrN8Pa4xVrl6TVCrAL/lK9kaKzBcMpHk5lJNmO
-	 B5SMWSbtuOyJYeI+KV/Xh3p66/GVHMnm1W2lt9K0MphR/dvJiTcFtK60D93juHNLZD
-	 jk383JxcOO8nFC1O31+xWLLI6q6mLD+ZrygJiHWUwqj2cblGkAyc8SqKNyQH5+4Aoy
-	 eskez4cFmyN3Lpm67cZKXQYSB3wfwG9yMJ8qb60d/dUSCUYjaRo856mCGu1Xnzd8hY
-	 Qv0oZ/umTlePQgofbsKZESaviN9oSvhE/UF4h7WPTfmyg5R5cB+tihEmhsv6xy78Gs
-	 QZO/StQieIyaQ==
+	b=XV0yrAPiKeR2IFREU0+MhZd6ZQdm2ue2C0d9ATUwbZ3RUJUibOOZpnOFzFAk9VmX2
+	 wxGNPm63UzqBva9OVlOVz8hKekh6GMfn+0IO9d28vvxjGuCvPQ1q8yItV5ASf2r4HJ
+	 poj+HtN+/LP6duzU5LKFCotEu/4uhU1Q4dCVXdWIeV1NJIaaLb9BucHDNgTYVwT5xT
+	 vcmVYXKEfEEnEmGlD0NzTJwWWTzJXBkRYdXqO5+cLgbZWprLvmf0FSowRyfCU8pQ0L
+	 krRq+O6GXwkf5ncolYArUpU9oyxhtvHrs9T5WuPG1r1eGPJDGve7jWw0vtMxfAJjQv
+	 d55A3grAPgVnQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w52yd-00000005Cna-3lE9;
-	Tue, 24 Mar 2026 14:43:28 +0000
-Date: Tue, 24 Mar 2026 14:43:27 +0000
-Message-ID: <86tsu547ao.wl-maz@kernel.org>
+	id 1w5336-00000005CvI-3n1B;
+	Tue, 24 Mar 2026 14:48:04 +0000
+Date: Tue, 24 Mar 2026 14:48:04 +0000
+Message-ID: <86se9p472z.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	android-kvm@google.com,
-	catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	mark.rutland@arm.com,
-	oupton@kernel.org,
-	suzuki.poulose@arm.com,
-	tabba@google.com,
-	vdonnefort@google.com,
-	will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH] KVM: arm64: Inject UNDEF when host is executing an smc with imm16 != 0
-In-Reply-To: <20260324135728.3532400-1-sebastianene@google.com>
-References: <20260324135728.3532400-1-sebastianene@google.com>
+To: Mark Brown <broonie@kernel.org>
+Cc: Sascha Bischoff <Sascha.Bischoff@arm.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	nd <nd@arm.com>,
+	"oliver.upton@linux.dev" <oliver.upton@linux.dev>,
+	Joey Gouly <Joey.Gouly@arm.com>,
+	Suzuki Poulose <Suzuki.Poulose@arm.com>,
+	"yuzenghui@huawei.com" <yuzenghui@huawei.com>,
+	"peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+	"lpieralisi@kernel.org" <lpieralisi@kernel.org>,
+	Timothy Hayes <Timothy.Hayes@arm.com>,
+	"jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Subject: Re: [PATCH v7 12/41] KVM: arm64: gic-v5: Sanitize ID_AA64PFR2_EL1.GCIE
+In-Reply-To: <638a3453-91c9-4a76-8241-25d5c27ca518@sirena.org.uk>
+References: <20260319154937.3619520-1-sascha.bischoff@arm.com>
+	<20260319154937.3619520-13-sascha.bischoff@arm.com>
+	<638a3453-91c9-4a76-8241-25d5c27ca518@sirena.org.uk>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -63,29 +65,35 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, tabba@google.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: broonie@kernel.org, Sascha.Bischoff@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, nd@arm.com, oliver.upton@linux.dev, Joey.Gouly@arm.com, Suzuki.Poulose@arm.com, yuzenghui@huawei.com, peter.maydell@linaro.org, lpieralisi@kernel.org, Timothy.Hayes@arm.com, jonathan.cameron@huawei.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, 24 Mar 2026 13:57:28 +0000,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Tue, 24 Mar 2026 12:47:24 +0000,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> The ARM Service Calling Convention (SMCCC) specifies that the function
-> identifier and parameters should be passed in registers, leaving the
-> 16-bit immediate field of the SMC instruction un-handled.
-> Currently, our pKVM handler ignores the immediate value, which could lead
-> to non-compliant software relying on implementation-defined behavior.
-> Enforce the host kernel running under pKVM to use an immediate value
-> of 0 by decoding the ISS from the ESR_EL2 and inject an undefined
-> instruction exception back to the caller.
+> [1  <text/plain; us-ascii (7bit)>]
+> On Thu, Mar 19, 2026 at 03:52:50PM +0000, Sascha Bischoff wrote:
+> > Add in a sanitization function for ID_AA64PFR2_EL1, preserving the
+> > already-present behaviour for the FPMR, MTEFAR, and MTESTOREONLY
+> > fields. Add sanitisation for the GCIE field, which is set to IMP if
+> > the host supports a GICv5 guest and NI, otherwise.
+> 
+> We're also seeing an issue with this in the aarch32_id_regs test:
+> 
+> # selftests: kvm: aarch32_id_regs
+> # Random seed: 0x6b8b4567
+> # ==== Test Assertion Failure ====
+> #   arm64/aarch32_id_regs.c:25: read_sysreg_s((((3) << 19) | ((0) << 16) | ((0) << 12) | ((1) << 8) | ((1) << 5))) == 0
+> #   pid=3111 tid=3111 errno=4 - Interrupted system call
+> # sh: 1: addr2line: not found
+> #   0x10000000 != 0x0 (read_sysreg_s((((3) << 19) | ((0) << 16) | ((0) << 12) | ((1) << 8) | ((1) << 5))) != 0)
+> not ok 9 selftests: kvm: aarch32_id_regs # exit=254
+> 
+> which for some reason only manifests on TX2 of the platforms I've
+> seen.
 
-No, that's completely wrong. SMC never UNDEFs, unless EL3 isn't
-implemented. You can't just decide to generate an UNDEF because you
-don't like the immediate.
-
-All you are allowed to do is to return an error code.
-
-Thanks,
+Is your TX2 the only machine you have that is AArch64 only at all ELs?
 
 	M.
 
