@@ -1,78 +1,45 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A763F7872
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 16:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2B6318140
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 16:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774456015; cv=none; b=h0fOs/dlVhxFI2/Hwu/Ko9bt9bcxfYrK5jYJMkmHXyk/BIxAJ3RSIVhzNZhNxdbqLf0Mb0jtnAUcq9VH0wcoBXUiuuzvPto8r3FKwYqwl0chyElpTwBqmPt1Rx2Bzp6/DJcvZqusr4wtTy9TEFCh8JaRj400KeG9K5dmse4aLU8=
+	t=1774456460; cv=none; b=q0EzIfEmESgo7YPqQY2QUcwA8WeyPVrQp4DF5/cp02vwyhpsjztk1MSsQsFRnTZ8tDYZ+Cs6QZcMhUnuWB9IYeSsK0SYUhlFsD4FdNcJ9tMSTVX2GPb8uvLEp4IndhAuOFADdfFCFfJ+XyI8GgpJEJSiKgGK9BqdiEt39tI7akA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774456015; c=relaxed/simple;
-	bh=TOk2JwR1ghzWN3+hsOG03i7KAAvI4/RzVNzUzbIJ6LE=;
+	s=arc-20240116; t=1774456460; c=relaxed/simple;
+	bh=Uzh2VRzviP7yTPZpv9Thn4meE6ETj/ysuIr/VejhzOM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SQsvyHz/305QW7zuc6hyTdcwHc0Vitj7I+qUhzDAdKSQv3wcnqO0Bdtlmm+GPwycbt/6t/YeI9ZGNuIjvZ5T4Gf0vUCdDwAEwbgLCOCKh95GoiorZ3WJR5XBviDO5t25yd0ucSm3uNZNW5SMrfyHjGdqikFgBWFVz7z3oZPK4hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kJKRQbt6; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMO3mn5ZTggM+sIGPaDtxVK8hmyZdnJEcDCrkfx2TxtdDEPVpzFedFDH/3D41xE32OouSsnOC/opyH2sHg/s+EHiTNo9P9ZC82XEx68Sv9WYgC6TamTdyZ0ym6B5VETGDYWaYAAN5VW9DESa7VrRs1+9AeFFJc6xd4uDGdH4ug8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=veRuyfiN; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kJKRQbt6"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4852ef20fe8so73225e9.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 09:26:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774456009; x=1775060809; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0bBkY1eP+Ct3GuF+0/JrP6geka8T7n6XtITHRDXyqFk=;
-        b=kJKRQbt6PvKkY3F4+FEJ5BzU4+6i63JsCxA3OELOBTaWCK6PNxY4uJMok6PgU41WgT
-         BEL/OOv44PkRIbeUibckWcUUHuZCUMWy7Y0xgrK72Yq8rY5LvAMVHTAv93Mt1A7Khcc5
-         G09//RT+9mScNo8z9NzJa/D5DcNpOK6UDQsbY/TqVK06M+cMxcNSmSvSB7spAwmoXiME
-         omesvaecNdP72DEnfuGOD25zeUu54B8odwICMNwJE9WDo/4syRit4gi1RmXApNg97gcm
-         wN+RLaH0F99M29uapkgBy8qMPwZTnc1nNSeXK8u0CEScw9TYdid0Uz1TflQ7bDOAuN80
-         9P9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774456009; x=1775060809;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0bBkY1eP+Ct3GuF+0/JrP6geka8T7n6XtITHRDXyqFk=;
-        b=SaOB+d4P/dokFMRRMQxMq6bG58QNpme7NuA6IPIMEzpIFmOjotJqn1le1G0Kwdwfcj
-         aIKXfXVzr3lAgsuaq7ra2fIUq4nB8CasXXcuihEdNwsFm+zfT0CAUk3S0v5N3kt3BOoN
-         rIBCcFumVocSoxcu5FcqzzxTK+QL26i3ru4JwPy+ELJMqWnRvLu3oEL32bF2O1OPv/ob
-         uAxZK5zBuxchysU90wanGSo3iOrVBOw4ANHH3wzd7jgd7qzrU+rvWuODreN5QrYfAipB
-         izoxLk3xz0Nkp5yegBiosSUPPPFFGwWlC6ZIm/k/VXTpVWjl4peJNiZ6c9hqNcDU2JSJ
-         L/jA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvjE54K3ARh1NibqAlW2glB9DJZxtA39bCoItAniCpbD22YmgM7ly6eigE8T61QWkg3F+IDOI=@lists.linux.dev
-X-Gm-Message-State: AOJu0Yyik3QnHmBjpz6TydHrvDZvyeyTLwuBMfarKlqrumvZvIwNjo5A
-	He7mVIm7bf+C6NKbgmjmW3PP8CT8uMA6d5gvIYftyKm7niKttIdqZqmzLkIBub9Zwg==
-X-Gm-Gg: ATEYQzynlaatJIjK338vwv9NY7zeJjHr2pr1eX+cYZAhASBQIfsXoCkIFwYFjJw/lVS
-	MJQ7+0Q4Lg6lzXg3zN0kXB3/c+K7JlOwrNkRkKArEJsI47UXt2nIls/pjMVoXpd9964lIyso6Pu
-	48jxassHQjEV/ZF2mcfItgiNExyMh96Zw0crqUolY89Uvg7i5eJ1GcnbDEw9lz5+2iPQdoL3lsx
-	v74wIra9AI9CMQSmATp1m+7Ibwyfpc9Pv0IN3JRyFOq/U2a1AetcQCHSIfRP7ccKIAnfv2Ra6g3
-	wk1r92MoPmDbUpjf1C+wmEWNk29HrPNhbmpdmZQiWTwcLQWqa8LiCIAzom9GAN/hE9KfdeNyxmx
-	AYe3B2yopYYsz54CWhRvUOWIJMctF6Gr+b531gdfmhxQC0NIgaGZad9JhptM0QeiCrRhi1ORP2S
-	CpUOpFAlV298eVkw2PyIp8WxbsCuSgs0acijKpi6yMl9UmDQamMXu33WVGKYXKXkZ4exw=
-X-Received: by 2002:a05:600c:2251:b0:477:255c:bea8 with SMTP id 5b1f17b1804b1-4871787d822mr759325e9.7.1774456008193;
-        Wed, 25 Mar 2026 09:26:48 -0700 (PDT)
-Received: from google.com (209.13.205.35.bc.googleusercontent.com. [35.205.13.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b919588e6sm814549f8f.16.2026.03.25.09.26.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 09:26:47 -0700 (PDT)
-Date: Wed, 25 Mar 2026 16:26:43 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Mostafa Saleh <smostafa@google.com>
-Cc: alexandru.elisei@arm.com, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, catalin.marinas@arm.com,
-	dbrazdil@google.com, joey.gouly@arm.com, kees@kernel.org,
-	mark.rutland@arm.com, maz@kernel.org, oupton@kernel.org,
-	perlarsen@google.com, qperret@google.com, rananta@google.com,
-	suzuki.poulose@arm.com, tabba@google.com, tglx@kernel.org,
-	vdonnefort@google.com, bgrzesik@google.com, will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [RFC PATCH 00/14] KVM: ITS hardening for pKVM
-Message-ID: <acQMwzA-cLAtHsvU@google.com>
-References: <20260310124933.830025-1-sebastianene@google.com>
- <abQqqTYvmrtGp9l7@google.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="veRuyfiN"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1F9C71F02;
+	Wed, 25 Mar 2026 09:34:02 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B4F923F915;
+	Wed, 25 Mar 2026 09:34:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774456448; bh=Uzh2VRzviP7yTPZpv9Thn4meE6ETj/ysuIr/VejhzOM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=veRuyfiNHKtiJfNHSrxSI0R4IJgwC7Rpr3qLlHzXYbTxAkJM7dF4ySwn/3AlT1Q8M
+	 UyjGD63OXuacn+Xn10VVWof9ySUcrelMANe07EuqguASnXKa5wpprVkdO7esea0gRo
+	 fCI0ggXcu/dmKP4759MGhcSi4F6WIdoboFm7WYLU=
+Date: Wed, 25 Mar 2026 16:34:02 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com,
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>,
+	James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Fuad Tabba <tabba@google.com>, Yabin Cui <yabinc@google.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Disable SPE Profiling Buffer when
+ running in guest context
+Message-ID: <acQOekvkIUxj3jYU@raptor>
+References: <20260227212136.7660-1-will@kernel.org>
+ <20260227212136.7660-3-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
@@ -81,267 +48,167 @@ List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <abQqqTYvmrtGp9l7@google.com>
+In-Reply-To: <20260227212136.7660-3-will@kernel.org>
 
-On Fri, Mar 13, 2026 at 03:18:01PM +0000, Mostafa Saleh wrote:
+Hi Will,
 
-Hi Mostafa,
+The patch looks good to me:
 
-> Hi Seb,
-> 
-> On Tue, Mar 10, 2026 at 12:49:19PM +0000, Sebastian Ene wrote:
-> > This series introduces the necessary machinery to perform trap & emulate
-> > on device access in pKVM. Furthermore, it hardens the GIC/ITS controller to
-> > prevent an attacker from tampering with the hypervisor protected memory
-> > through this device. 
-> > 
-> > In pKVM, the host kernel is initially trusted to manage the boot process but
-> > its permissions are revoked once KVM initializes. The GIC/ITS device is
-> > configured before the kernel deprivileges itself. Once the hypervisor
-> > becomes available, sanitize the accesses to the ITS controller by
-> > trapping and emulating certain registers and by shadowing some memory
-> > structures used by the ITS.
-> > 
-> > This is required because the ITS can issue transactions on the memory
-> > bus *directly*, without having an SMMU in front of it, which makes it
-> > an interesting target for crossing the hypervisor-established privilege
-> > boundary.
-> > 
-> > 
-> > Patch overview
-> > ==============
-> > 
-> > The first patch is re-used from Mostafa's series[1] which brings SMMU-v3
-> > support to pKVM.
-> > 
-> > [1] https://lore.kernel.org/linux-iommu/20251117184815.1027271-1-smostafa@google.com/#r
-> > 
-> > Some of the infrastructure built in that series might intersect and we
-> > agreed to converge on some changes. The patches [1 - 3] allow unmapping
-> > devices from the host address space and installing a handler to trap
-> > accesses from the host. While executing in the handler, enough context
-> > has to be given from mem-abort to perform the emulation of the device
-> > such as: the offset, the access size, direction of the write and private
-> > related data specific to the device. 
-> > The unmapping of the device from the host address space is performed
-> > after the host deprivilege (during _kvm_host_prot_finalize call).
-> > 
-> > The 4th patch looks up the ITS node from the device tree and adds it to
-> > an array of unmapped devices. It install a handler that forwards all the
-> > MMIO request to mediate the host access inside the emulation layer and
-> > to prevent breaking ITS functionality. 
-> > 
-> > The 5th patch changes the GIC/ITS driver to exposes two new methods
-> > which will be called from the KVM layer to setup the shadow state and
-> > to take the appropriate locks. This one is the most intrusive as it
-> > changes the current GIC/ITS driver. I tried to avoid creating a
-> > dependency with KVM to keep the GIC driver agnostic of the virtualization
-> > layer but I am happy to explore other options as well. 
-> > To avoid re-programming the ITS device with new shadow structures after
-> > pKVM is ready, I exposed two functions to change the
-> > pointers inside the driver for the following structures:
-> > - the command queue points to a newly allocated queue
-> > - the GITS_BASER<n> tables configured with an indirect layout have the
-> >   first layer shadowed and they point to a new memory region
-> > 
-> > Patch 6 adds the entry point into the emulation setup and sets up the
-> > shadow command queue. It adds some helper macros to define the offset
-> > register and the associate action that we want to execute in the
-> > emulation. It also unmaps the state passed from the host kernel
-> > to prevent it from playing nasty games later on. The patch
-> > traps accesses to CWRITER register and copies the commands from the
-> > host command queue to the shadow command queue. 
-> > 
-> > Patch 7 prevents the host from directly accessing the first layer of the
-> > indirect tables held in GITS_BASER<n>. It also prevents the host from
-> > directly accesssing the last layer of the Device Table (since the entries
-> > in this table hold the address of the ITT table) and of the vPE Table
-> > (since the vPE table entries hold the address of the virtual LPI pending
-> > table.
-> > 
-> > Patches [8-10] sanitize the commands sent to the ITS and their
-> > arguments.
-> > 
-> > Patches [11-13] restrict the access of the host to certain registers
-> > and prevent undefined behaviour. Prevent the host from re-programming
-> > the tables held in the GITS_BASER register.
-> > 
-> > The last patch introduces an hvc to setup the ITS emulation and calls
-> > into the ITS driver to setup the shadow state. 
-> > 
-> > 
-> > Design
-> > ======
-> > 
-> > 
-> > 1. Command queue shadowing
-> > 
-> > The ITS hardware supports a command queue which is programmed by the driver
-> > in the GITS_CBASER register. To inform the hardware that a new command
-> > has been added, the driver updates an index into the GITS_CWRITER
-> > register. The driver then reads the GITS_CREADR register to see if the
-> > command was processed or if the queue is stalled.
-> >  
-> > To create a new command, the emulation layer mirrors the behavior
-> > as following:
-> >  (i) The host ITS driver creates a command in the shadow queue:
-> > 	its_allocate_entry() -> builder()
-> >  (ii) Notifies the hardware that a new command is available:
-> > 	its_post_commands()
-> >  (iii) Hypervisor traps the write to GITS_CWRITER:
-> > 	handle_host_mem_abort() -> handle_host_mmio_trap() ->
-> >             pkvm_handle_gic_emulation()
-> >  (iv) Hypervisor copies the command from the host command queue
-> >       to the original queue which is not accessible to the host.
-> >       It parses the command and updates the hardware write.
-> > 
-> > The driver allocates space for the original command queue and programs
-> > the hardware (GITS_CWRITER). When pKVM becomes available, the driver
-> > allocates a new (shadow) queue and replaces its original pointer to
-> > the queue with this new one. This is to prevent a malicious host from
-> > tampering with the commands sent to the ITS hardware.
-> > 
-> > The entry point of our emulation shares the memory of the newly
-> > allocated queue with the hypervisor and donates the memory of the
-> > original queue to make it inaccesible to the host.
-> > 
-> > 
-> > 2. Indirect tables first level shadowing
-> > 
-> > The ITS hardware supports indirection to minimize the space required to
-> > accommodate large tables (eg. deviceId space used to index the Device Table
-> > is quite sparse). This is a 2-level indirection, with entries from the
-> > first table pointing to a second table.
-> > 
-> > An attacker in control of the host can insert an address that points to
-> > the hypervisor protected memory in the first level table and then use
-> > subsequent ITS commands to write to this memory (MAPD).
-> > 
-> > To shadow this tables, we rely on the driver to allocate space for it
-> > and we copy the original content from the table into the copy. When
-> > pKVM becomes available we switch the pointers that hold the orginal
-> > tables to point to the copy.
-> > To keep the tables from the hypervisor in sync with what the host
-> > has, we update the tables when commands are sent to the ITS.
-> > 
-> > 
-> > 3. Hiding the last layer of the Device Table and vPE Table from the host
-> > 
-> > An attacker in control of the host kernel can alter the content of these
-> > tables directly (the Arm IHI 0069H.b spec says that is undefined behavior
-> > if entries are created by software). Normally these entries are created in
-> > response of commands sent to the ITS.
-> > 
-> > A Device Table entry that has the following structure:
-> > 
-> > type DeviceTableEntry is (
-> > 	boolean Valid,
-> > 	Address ITT_base,
-> > 	bits(5) ITT_size
-> > ) 
-> > 
-> > This can be maliciously created by an attacker and the ITT_base can be
-> > pointed to hypervisor protected memory. The MAPTI command can then be
-> > used to write over the ITT_base with an ITE entry.
-> > 
-> > Similarly a vCPU Table entry has the following structure:
-> > 
-> > type VCPUTableEntry is (
-> > 	boolean Valid,
-> > 	bits(32) RDbase,
-> > 	Address VPT_base,
-> > 	bits(5) VPT_size
-> > )
-> > 
-> > VPT_base can be pointed to hypervisor protected memory and then a
-> > command can be used to raise interrupts and set the corresponding
-> > bit. This would give a 1-bit write primitive so is not "as generous"
-> > as the others.
-> > 
-> > 
-> > Notes
-> > =====
-> > 
-> > 
-> > Performance impact is expected with this as the emulation dance is not
-> > cost free.
-> > I haven't implemented any ITS quirks in the emulation and I don't know
-> > whether we will need it ? (some hardware needs explicit dcache flushing
-> > ITS_FLAGS_CMDQ_NEEDS_FLUSHING). 
-> > 
-> > Please note that Redistributors trapping hasn't been addressed at all in
-> > this series and the solution is not sufficient but this can be extended
-> > afterwards. 
-> > The current series has been tested with Qemu (-machine
-> > virt,virtualization=true,gic-version=4) and with Pixel 10.
-> > 
-> > 
-> > Thanks,
-> > Sebastian E.
-> > 
-> > Mostafa Saleh (1):
-> >   KVM: arm64: Donate MMIO to the hypervisor
-> > 
-> > Sebastian Ene (13):
-> >   KVM: arm64: Track host-unmapped MMIO regions in a static array
-> >   KVM: arm64: Support host MMIO trap handlers for unmapped devices
-> >   KVM: arm64: Mediate host access to GIC/ITS MMIO via unmapping
-> >   irqchip/gic-v3-its: Prepare shadow structures for KVM host deprivilege
-> >   KVM: arm64: Add infrastructure for ITS emulation setup
-> >   KVM: arm64: Restrict host access to the ITS tables
-> >   KVM: arm64: Trap & emulate the ITS MAPD command
-> >   KVM: arm64: Trap & emulate the ITS VMAPP command
-> >   KVM: arm64: Trap & emulate the ITS MAPC command
-> >   KVM: arm64: Restrict host updates to GITS_CTLR
-> >   KVM: arm64: Restrict host updates to GITS_CBASER
-> >   KVM: arm64 Restrict host updates to GITS_BASER
-> >   KVM: arm64: Implement HVC interface for ITS emulation setup
-> 
-> I tested the patches on Lenovo ideacenter Mini X Gen 10 Snapdragon,
-> and the kernel hangs at boot for me with messags the following log:
-> 
-> [    2.735838] ITS queue timeout (1056 1024)
-> [    2.739969] ITS cmd its_build_mapd_cmd failed
-> [    4.776344] ITS queue timeout (1120 1024)
-> [    4.780472] ITS cmd its_build_mapti_cmd failed
-> [    6.816677] ITS queue timeout (1184 1024)
-> [    6.820806] ITS cmd its_build_mapti_cmd failed
-> [    8.857009] ITS queue timeout (1248 1024)
-> [    8.861129] ITS cmd its_build_mapti_cmd failed
-> 
-> I am happy to do more debugging, let me know if I can try anything.
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-I managed to reproduce it on this Lenovo machine. I will have to dig a bit more
-because I am not seeing this under Qemu. As a quick try I used
-gic_flush_dcache_to_poc after adding commands to the ITS queue but it
-didn't make any difference.
+Also tested the series for about 24h on an Orion O6 board with SPE enabled by
+profiling two host processes spread across all CPUs with SPE, and at the same
+time profiling a virtual machine with the VCPUs simiarly spread across the CPUs
+with SPE:
 
-> 
-> Thanks,
-> Mostafa
-> 
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Thanks for trying it,
-Sebastian
-> > 
-> >  arch/arm64/include/asm/kvm_arm.h              |   3 +
-> >  arch/arm64/include/asm/kvm_asm.h              |   1 +
-> >  arch/arm64/include/asm/kvm_pkvm.h             |  20 +
-> >  arch/arm64/kvm/hyp/include/nvhe/its_emulate.h |  17 +
-> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
-> >  arch/arm64/kvm/hyp/nvhe/Makefile              |   3 +-
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  14 +
-> >  arch/arm64/kvm/hyp/nvhe/its_emulate.c         | 653 ++++++++++++++++++
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 134 ++++
-> >  arch/arm64/kvm/hyp/nvhe/setup.c               |  28 +
-> >  arch/arm64/kvm/hyp/pgtable.c                  |   9 +-
-> >  arch/arm64/kvm/pkvm.c                         |  60 ++
-> >  drivers/irqchip/irq-gic-v3-its.c              | 177 ++++-
-> >  include/linux/irqchip/arm-gic-v3.h            |  36 +
-> >  14 files changed, 1126 insertions(+), 31 deletions(-)
-> >  create mode 100644 arch/arm64/kvm/hyp/include/nvhe/its_emulate.h
-> >  create mode 100644 arch/arm64/kvm/hyp/nvhe/its_emulate.c
-> > 
-> > -- 
-> > 2.53.0.473.g4a7958ca14-goog
-> > 
+Thanks,
+Alex
+
+On Fri, Feb 27, 2026 at 09:21:34PM +0000, Will Deacon wrote:
+> The nVHE world-switch code relies on zeroing PMSCR_EL1 to disable
+> profiling data generation in guest context when SPE is in use by the
+> host.
+> 
+> Unfortunately, this may leave PMBLIMITR_EL1.E set and consequently we
+> can end up running in guest/hypervisor context with the Profiling Buffer
+> enabled. The current "known issues" document for Rev M.a of the Arm ARM
+> states that this can lead to speculative, out-of-context translations:
+> 
+>   | 2.18 D23136:
+>   |
+>   | When the Profiling Buffer is enabled, profiling is not stopped, and
+>   | Discard mode is not enabled, the Statistical Profiling Unit might
+>   | cause speculative translations for the owning translation regime,
+>   | including when the owning translation regime is out-of-context.
+> 
+> In a similar fashion to TRBE, ensure that the Profiling Buffer is
+> disabled during the nVHE world switch before we start messing with the
+> stage-2 MMU and trap configuration.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: James Clark <james.clark@linaro.org>
+> Cc: Leo Yan <leo.yan@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Fixes: f85279b4bd48 ("arm64: KVM: Save/restore the host SPE state when entering/leaving a VM")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h  |  1 +
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++----------
+>  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+>  3 files changed, 24 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1532ad2b2ec2..d527c77977dd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -768,6 +768,7 @@ struct kvm_host_data {
+>  		struct kvm_guest_debug_arch regs;
+>  		/* Statistical profiling extension */
+>  		u64 pmscr_el1;
+> +		u64 pmblimitr_el1;
+>  		/* Self-hosted trace */
+>  		u64 trfcr_el1;
+>  		u64 trblimitr_el1;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 3dbdee1148d3..75158a9cd06a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -14,20 +14,20 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  
+> -static void __debug_save_spe(u64 *pmscr_el1)
+> +static void __debug_save_spe(void)
+>  {
+> -	u64 reg;
+> +	u64 *pmscr_el1, *pmblimitr_el1;
+>  
+> -	/* Clear pmscr in case of early return */
+> -	*pmscr_el1 = 0;
+> +	pmscr_el1 = host_data_ptr(host_debug_state.pmscr_el1);
+> +	pmblimitr_el1 = host_data_ptr(host_debug_state.pmblimitr_el1);
+>  
+>  	/*
+>  	 * At this point, we know that this CPU implements
+>  	 * SPE and is available to the host.
+>  	 * Check if the host is actually using it ?
+>  	 */
+> -	reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> -	if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> +	*pmblimitr_el1 = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> +	if (!(*pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>  		return;
+>  
+>  	/* Yes; save the control register and disable data generation */
+> @@ -37,18 +37,29 @@ static void __debug_save_spe(u64 *pmscr_el1)
+>  
+>  	/* Now drain all buffered data to memory */
+>  	psb_csync();
+> +	dsb(nsh);
+> +
+> +	/* And disable the profiling buffer */
+> +	write_sysreg_s(0, SYS_PMBLIMITR_EL1);
+> +	isb();
+>  }
+>  
+> -static void __debug_restore_spe(u64 pmscr_el1)
+> +static void __debug_restore_spe(void)
+>  {
+> -	if (!pmscr_el1)
+> +	u64 pmblimitr_el1 = *host_data_ptr(host_debug_state.pmblimitr_el1);
+> +
+> +	if (!(pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>  		return;
+>  
+>  	/* The host page table is installed, but not yet synchronised */
+>  	isb();
+>  
+> +	/* Re-enable the profiling buffer. */
+> +	write_sysreg_s(pmblimitr_el1, SYS_PMBLIMITR_EL1);
+> +	isb();
+> +
+>  	/* Re-enable data generation */
+> -	write_sysreg_el1(pmscr_el1, SYS_PMSCR);
+> +	write_sysreg_el1(*host_data_ptr(host_debug_state.pmscr_el1), SYS_PMSCR);
+>  }
+>  
+>  static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+> @@ -177,7 +188,7 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>  	/* Disable and flush SPE data generation */
+>  	if (host_data_test_flag(HAS_SPE))
+> -		__debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
+> +		__debug_save_spe();
+>  
+>  	/* Disable BRBE branch records */
+>  	if (host_data_test_flag(HAS_BRBE))
+> @@ -195,7 +206,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>  void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>  	if (host_data_test_flag(HAS_SPE))
+> -		__debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
+> +		__debug_restore_spe();
+>  	if (host_data_test_flag(HAS_BRBE))
+>  		__debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
+>  	if (__trace_needs_switch())
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index f00688e69d88..9b6e87dac3b9 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -278,7 +278,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	 * We're about to restore some new MMU state. Make sure
+>  	 * ongoing page-table walks that have started before we
+>  	 * trapped to EL2 have completed. This also synchronises the
+> -	 * above disabling of BRBE and SPE.
+> +	 * above disabling of BRBE.
+>  	 *
+>  	 * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
+>  	 * rule R_LFHQG and subsequent information statements.
+> -- 
+> 2.53.0.473.g4a7958ca14-goog
+> 
