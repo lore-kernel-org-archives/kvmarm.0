@@ -1,85 +1,75 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7123CFF77
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 11:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF7F36166B;
+	Wed, 25 Mar 2026 11:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774438885; cv=none; b=GAPSLZUkaqp20hS48TE4WtaAxaBc/cmXQLqs1NG6ikoKwh3LCU77lfKRTTTZszwT87UWT2Ix1miMFDQx/x2xI5nmDa4ieT6HS7ZKh43gL67vKnPt24d1X9XdLBeHupmjDFN285f9AsIagZA1xZYdr5gYEPXEh/vHyJS5AyyGeEw=
+	t=1774439192; cv=none; b=GQ5m1iCr+PvUbY7Nnt25/tjKNYhpveHy7NhpGss/pzLh1tGi+FRcX8E64jh29oUtJ8d4IL3nhl0+BlwSYwdEsqDw9f499ogH4pS23RrpjG9ZLIjNCmRlVTSOqY4g7V7PeMEoQE+Gpx8U7rFsEQLLrg1riLtp5DpXeGl1MxxUE0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774438885; c=relaxed/simple;
-	bh=MpcjsemM3LmMcoHooTMoaxadZdP5gIT5DsFtteobzUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TJ+Dne7OeK8xYHEqKuFF3MlG8hlgjVUNH8AI9d4y9pUpdJotiUN/W6LPuev/6cJhIMGDoN0ZJQmwRTKJ0U97KK3y7G+HFuv540xkxaIBYxGocmXGflHDUksGp/J9XcCu6BGGKvge2HpmmwL2g7rNNRS31PFdeynlEnw8LrMtKvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hezOppcj; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1774439192; c=relaxed/simple;
+	bh=UXUUhS3MAESFwPxbH9V2xQaAycdYVm3Q/qrCpTgLq2M=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mp9L/wVVbr5HXJ29w47XDj7P1czokdlvBrN4TVFpoCNaQsGuTsKq72jaylHm1TwL+CW9hHzteZbZM+bhWGOkGHopBqFadmpVdpp18Xzyy8nWy8UXbPr4IH+jhqrOXhnN1326VrjMFQwNZKpl31tNwat/Y+DuxzHyCiXv5fr5PpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQRqDgvc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hezOppcj"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-486fb990b9eso73495e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 04:41:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774438882; x=1775043682; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cs9jWxbOU9zeEIpB1f4ZXLcUS7XMeoF1APCchnD0TKU=;
-        b=hezOppcj9D5WMzVkZyG4QmEtBtZTYDzNt756HzoEalPc72CI9zpu5m7K1x++kYEVw4
-         IlcYgFNKT+mo2BUb+DWhFLVX7SQpCfK9Y84uv3qRygaTu1q68yJWdDj5o2iEjok5rirz
-         D0f7UMeEhnYORsTOWw7I5s9krP7VjzyKPkAzwHFPYNOTnLf2EXxf17Vu3Eb983aOgPyj
-         Q2Gl2yQjW5Fklad6J2BaEp3opUfYERzRqUcZOLdDDONEVCoyaPjld3YxowDq/sPdo23n
-         dMDApYTe3iCTKt0tvCIKppPRbPeY46Q08uzztdTha10HaoTmvRKctbVs3U2jbmohwf61
-         SkIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774438882; x=1775043682;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cs9jWxbOU9zeEIpB1f4ZXLcUS7XMeoF1APCchnD0TKU=;
-        b=DVD2qlEMSQUA/F9NIZ/lNAH03v0K5jMCZRzmoHmAy4BCxCEzMSXzvXuS7fK7sf0MGb
-         Fjglj3ebjITjB91+hXEVW/yME2/qcMnLJjWI0U1Q/lhrZWNEyOI1k7cG3EWQyTVmXne0
-         Q3nSY8Aq3dI7RNGImJPFm0HJKSJHXBeQJPEbubqh03SXEZwANZF2HQck2LYvHyOJtNYq
-         DSuQhqXrZaJXFVRjgPYULLtTZTeRORtQbzomQkHUfvi9Z2AMu/jlho6ukkaH8Ica0CL0
-         u7eRrdnKIqJ7ZufQC5YDxaz7FA1tdQx8Bho5GwqrxhhHKaZQIU8MOVk7aBwXys8Cs90W
-         lo0w==
-X-Gm-Message-State: AOJu0Ywh4NwNG4bOSKfHYP/SIx+TgiN3H9ft1JCmdmorzAjIvzZ17s+m
-	rhkKWIj6qU8JL9pun088VtBJeLKMetrYMqRiwZQj+FwokBwEopXRgpCz6kn6YJMDVQ==
-X-Gm-Gg: ATEYQzwAkspSOqIDb7AClhlJcN+sTCjZM9HoPzIj/CK/sAlIev2TFA8UO932stVUP8Q
-	90Pjwf1lvLyJ9wvssYJ5NEomVjDGboiZu7/oYcZEtTMuH5H48sMX/6qNtU22IfbKiw0X0uZ4znk
-	QotD5LHDQ+JnlZmBDyzyOpsYnjfxW8nKIV8hdx2HHMJxkmipr4cP69QlBi99lV3TDtGB81mJhuS
-	6KZyy2kVYoIBF+XoKlBLOa/3UF7P5afNGAzDhG03mqOHFZDyMvjwZbf347C2GQYBSZFNGF8neMO
-	K0G8ZrkA6dOI/0E2kYPstBkZnUTlhX1kq5SOHSx6xJti7/ZgKT8/wqaF7W/BIxvnOLFSBI0mOKw
-	8Emto0H4S5n4DZCBY/SOHr89VMsqeaLIkwjMbczJn5+Ojp34evOCsRHUO/cnHQevImvWFzI5oGT
-	esHGXv5uvlZ6TXzAO9Euzo6AEKah9YeybJRdqstFuXOKnGmjsl8ejLKITwO05ClPhfwOs=
-X-Received: by 2002:a05:600c:17d6:b0:480:683f:743d with SMTP id 5b1f17b1804b1-48716828baamr534525e9.14.1774438881656;
-        Wed, 25 Mar 2026 04:41:21 -0700 (PDT)
-Received: from google.com (209.13.205.35.bc.googleusercontent.com. [35.205.13.209])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b644ae37dsm48451320f8f.2.2026.03.25.04.41.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 04:41:21 -0700 (PDT)
-Date: Wed, 25 Mar 2026 11:41:17 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Vincent Donnefort <vdonnefort@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com,
-	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
-	tabba@google.com, will@kernel.org, yuzenghui@huawei.com
-Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with
- imm16 != 0
-Message-ID: <acPJ3Z9hDKc0Sm2t@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQRqDgvc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EE37C2BCB2;
+	Wed, 25 Mar 2026 11:46:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774439192;
+	bh=UXUUhS3MAESFwPxbH9V2xQaAycdYVm3Q/qrCpTgLq2M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QQRqDgvcIFv1UYT2Xy68ZNtAj7Z2Zrat6Qx61hsA4BB4RnV6OfFu36FPZz9at23A4
+	 LyikZEwfeSGfASsfEdUgutelVYTSdSOJeEyLf60e03ftqtQkKzA36ctXesgR+dw84Y
+	 UUC4Cbie4i5C5zzHHo52Kgf0KZZDLmTB/eUluu1ASoA3w8Zbjr0l0ud6+2iQNhxLKf
+	 MHoD+viNrGserUMI4eqCd2e3KnTnil2/HpIDpyW/VVg6K4PIQ1XdLD13TFkSA5y0t9
+	 m4RAPWeybqob9aQMfs7XhBvYb5kgTeKsigBh1nkEf+KOpU2j5mftnpQ+SCciJCbgm7
+	 I+B2/GKESSz7A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w5Mgv-00000005XCO-3bKt;
+	Wed, 25 Mar 2026 11:46:29 +0000
+Date: Wed, 25 Mar 2026 11:46:29 +0000
+Message-ID: <86ldfg3ze2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sebastian Ene <sebastianene@google.com>, Vincent Donnefort <vdonnefort@google.com>
+Cc: 	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	mark.rutland@arm.com,
+	oupton@kernel.org,
+	suzuki.poulose@arm.com,
+	tabba@google.com,
+	will@kernel.org,
+	yuzenghui@huawei.com
+Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with imm16 != 0
+In-Reply-To: <acPIdoA8oc7T8wKX@google.com>
 References: <20260325113138.4171430-1-sebastianene@google.com>
- <acPIdoA8oc7T8wKX@google.com>
+	<acPIdoA8oc7T8wKX@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acPIdoA8oc7T8wKX@google.com>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sebastianene@google.com, vdonnefort@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 25, 2026 at 11:35:18AM +0000, Vincent Donnefort wrote:
+On Wed, 25 Mar 2026 11:35:18 +0000,
+Vincent Donnefort <vdonnefort@google.com> wrote:
+> 
 > On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
 > > The ARM Service Calling Convention (SMCCC) specifies that the function
 > > identifier and parameters should be passed in registers, leaving the
@@ -123,14 +113,15 @@ On Wed, Mar 25, 2026 at 11:35:18AM +0000, Vincent Donnefort wrote:
 > I wonder if it isn't better to move that into handle_host_smc() as this is part
 > of how we handle the SMC after all? (and it calls that kvm_skip_host_instr()
 > already)
-> 
 
-I was thinking of doing that as well but I prefer this since we don't
-have to look again at the esr in the callee. 
+Yes, that'd be vastly better.
 
-> >  		handle_host_smc(host_ctxt);
-> >  		break;
-> >  	case ESR_ELx_EC_IABT_LOW:
-> > -- 
-> > 2.53.0.1018.g2bb0e51243-goog
-> > 
+It also begs the question: if you don't want to handle SMCs with a
+non-zero immediate, why is it OK to do it for HVCs?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
