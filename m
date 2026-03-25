@@ -1,236 +1,199 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598D82066DE
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 00:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BC02D5950
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 04:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774399071; cv=none; b=euafo1pvocL6IrpOKjAvVpfWoaYPjvJC3i7j82frSpASOUj3AcIAPfO0emGeRRXbjO94/O58K2447gv74vuVB5NOpxj+VPe1K/uKP6FLlr/B2UcQZ9oEP8FnQwGyMaLxObUOKH6bVx7FV2X8doj6e5WspKyvAPpIrbTdun56QnI=
+	t=1774411655; cv=none; b=CJh/6rl7iPyyY9GW0J7UvlcjZLOdI8HwvenMUHyUitcSf5PcmHmzrFM07iOs+qzdaOq+1NpE4tMCb6TxmYjEx01Fqx4YtaY1+hCVR/0HXg9yEl7AGntwzIcw8M1XS86Bag0kf8f/1b3gSQzZUgCYp6DP7iMs38EpzGeUDno47vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774399071; c=relaxed/simple;
-	bh=Ia+vilw3zsqeIzVE3dF4KM+CNyzCGCU+jhvm1P5T5B8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U43UuqysOhDEn+V6C89VYDx/HPaAMAc3mp6w1tjsR6n+EWcXD/SP/dcY13EeR5IY9AdhLlyjcC3j8YYgy3eUB6ocJIcb2fYMRHdkMUZrhwy/uTDjy24XIzErriyHjwjz8dLccO7wiB3Bqwx5bg6KEguOZ7WbrdxJRXsouckLiEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=txQiWite; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1774411655; c=relaxed/simple;
+	bh=gtXzY3UzOa0u/JZYAGdbeFTboh1lX32MreW71F1IG5Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IxTE2B0vMp8EGVBSSBmhRJE1UB+vJM+IyAuAPhxcXVQpFJ4nAn9oygg3vbiX6OgMiLHXrLxC1U2f0dBKP2NZTE2lR2jmzYTHjf+o89oe0+UDjMjlRegT0ClBioVRHAZSfHUJrlgRLnn/GZSgZ2AzGG0XNh7xF0e4abCU9/ZaS20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eIoOYQcj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="txQiWite"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D55991C14;
-	Tue, 24 Mar 2026 17:37:43 -0700 (PDT)
-Received: from workstation-e142269.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A06123FE53;
-	Tue, 24 Mar 2026 17:37:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774399069; bh=Ia+vilw3zsqeIzVE3dF4KM+CNyzCGCU+jhvm1P5T5B8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=txQiWiter+YQWq+0d+dLUs3Ut9UQP5DnpuSantdQEso5kSTyrcU3ZGUtb7/qQNTDt
-	 xM0HIdfGUI0F6wcMwho7heLm2gW0zKWpIZ9c/FL632wHWG2xfymBxiYUL4LydUZBus
-	 YuNN67lZ9og1GYkvFu+EU05KvMY+UJ0ZfLyXxH+k=
-From: Wei-Lin Chang <weilin.chang@arm.com>
-To: kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oupton@kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>
-Subject: [PATCH 3/3] KVM: arm64: selftests: Enable stage-2 in NV preparation functions
-Date: Wed, 25 Mar 2026 00:36:20 +0000
-Message-ID: <20260325003620.2214766-4-weilin.chang@arm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260325003620.2214766-1-weilin.chang@arm.com>
-References: <20260325003620.2214766-1-weilin.chang@arm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIoOYQcj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1774411653;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WgjWcQoj7oLaeFNKzaIEePhWh+sZwFHeBhNTOW06Lw4=;
+	b=eIoOYQcjQ60+p8IL2yg+tkAFCGg5sc4KfyIMjimEOYPH8ypUms/NkFUYTGG9sWVlQQUhD3
+	nfPhxh50IOKB9jQy06Q/UU818e65pDCZlXloCJ7usWNYVYpJJatJEduuiKaWU1Rasj+COb
+	TVJpWm6GVvZ9bksDDeuCpsxFUcP1Ca0=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-648-NTxsWCPTO2KocKfaBdhqcg-1; Wed, 25 Mar 2026 00:07:31 -0400
+X-MC-Unique: NTxsWCPTO2KocKfaBdhqcg-1
+X-Mimecast-MFC-AGG-ID: NTxsWCPTO2KocKfaBdhqcg_1774411651
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-82a82f78a20so21544670b3a.1
+        for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 21:07:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774411650; x=1775016450;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WgjWcQoj7oLaeFNKzaIEePhWh+sZwFHeBhNTOW06Lw4=;
+        b=NfiE4Wssz3vMHR6sotzQ0D10TNDSkxd7/DDu30RjB4qyPxh8UCGbugGgeRzd6aR5Fc
+         rX2SQtO7XXKIDfBi36zACl6FBkKMWJmwO6wgM3WCp3W/SbA3HJcv2u2cWm30UrcErP7k
+         qw7hDFzzyGO/AR2O1ww14hR3anl8IP2EfI4SG1YT0NcBtblNf1uqkfKzR7hqS+QMP/gt
+         sgWapeXN7L9W/Jnw4Z+xp2sBScsQ38p+Q9CLuC6dA/wGQRa10BjsXpSbPPNCQJJdFz5o
+         bBbsBNCc1geNYvoNcgJM27h3K4tO3E3p63zTsrEmUIzW7xi7tIABzn+SBcKwW9NRsKs8
+         DvcA==
+X-Forwarded-Encrypted: i=1; AJvYcCV6hpm9G2fk5hxRGbEI2SzY8a5wExwQwfpXQ8wHX6sUlHpviB5J9uQqfkkdIPS0EBUPbOHLT+4=@lists.linux.dev
+X-Gm-Message-State: AOJu0YxYrBgKC6br6hDE1z7GI4BNvxfEAUpA+Fwu0lWUMwxooll1RQ+m
+	98nbSGrVjXvUPjhEwlzpp2UvKrI0KSa+twOf8CJVAiCMQpGSut/w2nXjpVRUHOZ3enVpLuGjo2v
+	ut5+FqaBCSh+ooQwvUtjhrHCaiOu/CeFa7R15sESDBFMDK2cxQrgUdCqpRw==
+X-Gm-Gg: ATEYQzxr5giPTN8HR4EmjX/4g1UuAmSCC7bx0AAG/2WQzciMpql4w8LI+sJdLVr4lru
+	Ah2aDZH5KlRNM5fzIV6MXj9p2eHB1TFwaxeLXFD1WKFNvHaYxavuwPBGHPWQWe6p8jXAdsqwQQx
+	t4AYdSFm2ujVXVLE93wyPT+iJSHkat2PuvXT9QdzwvPheWmtjWxDIbP6gAKZHAXV/as/H6uHL+S
+	6e3kxCAZj1XureYNovdbeFgFdH1pBhVm9v6he6CeFLxSxihZ3kSAe4Il+RkyUAO3YMu69oMQqcH
+	K73RU9e6RnqgI4h7vHFOa7y/yhu+B7Xhb+2iiYUK55qrhh385fXXsMdG/fzYYdd5tGpgwFrLCr0
+	iXsicQStMLC+YT0uKajV/DvdW2j9my1Xfi3mA0ECcIFlJbvLjI4lxPwvu4vwk66Zh
+X-Received: by 2002:a05:6a00:298e:b0:81e:d7c3:2f3a with SMTP id d2e1a72fcca58-82c6e0d1e6emr1790885b3a.46.1774411650508;
+        Tue, 24 Mar 2026 21:07:30 -0700 (PDT)
+X-Received: by 2002:a05:6a00:298e:b0:81e:d7c3:2f3a with SMTP id d2e1a72fcca58-82c6e0d1e6emr1790860b3a.46.1774411650026;
+        Tue, 24 Mar 2026 21:07:30 -0700 (PDT)
+Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82c38565096sm8738528b3a.51.2026.03.24.21.07.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Mar 2026 21:07:29 -0700 (PDT)
+Message-ID: <779079e1-7193-46e9-b18c-9ab5e69bb077@redhat.com>
+Date: Wed, 25 Mar 2026 14:07:17 +1000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <20260318155413.793430-1-steven.price@arm.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: lzDzSQzSIj5g27H-akwBye4qUAKje8ZLrOehf_8FMz4_1774411651
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Introduce library functions for setting up guest stage-2 page tables,
-then use that to give L2 an identity mapped stage-2 and enable it.
+Hi Steven,
 
-The translation and stage-2 page table built is simple, start level 0,
-4 levels, 4KB granules, normal cachable, 48-bit IA, 40-bit OA.
+On 3/19/26 1:53 AM, Steven Price wrote:
+> 
+> This series is based on v7.0-rc1. It is also available as a git
+> repository:
+> 
+> https://gitlab.arm.com/linux-arm/linux-cca cca-host/v13
+> 
+> Work in progress changes for kvmtool are available from the git
+> repository below:
+> 
+> https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v11
+> 
 
-The nested page table code is adapted from lib/x86/vmx.c.
+Could you please share if we have a working qemu repository on top of this
+(v13) series? The previous qemu repository [1] seems out of dated for long
+time. I heard Jean won't be able to continue his efforts on QEMU part, who
+is going to pick it up in this case.
 
-Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
----
- .../selftests/kvm/include/arm64/nested.h      |  7 ++
- .../selftests/kvm/include/arm64/processor.h   |  9 ++
- .../testing/selftests/kvm/lib/arm64/nested.c  | 97 ++++++++++++++++++-
- 3 files changed, 111 insertions(+), 2 deletions(-)
+[1] https://git.codelinaro.org/linaro/dcap/qemu.git    (branch: cca/latest)
 
-diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
-index 739ff2ee0161..0be10a775e48 100644
---- a/tools/testing/selftests/kvm/include/arm64/nested.h
-+++ b/tools/testing/selftests/kvm/include/arm64/nested.h
-@@ -6,6 +6,13 @@
- #ifndef SELFTEST_KVM_NESTED_H
- #define SELFTEST_KVM_NESTED_H
- 
-+uint64_t get_l1_vtcr(void);
-+
-+void nested_map(struct kvm_vm *vm, vm_paddr_t guest_pgd,
-+		uint64_t nested_paddr, uint64_t paddr, uint64_t size);
-+void nested_map_memslot(struct kvm_vm *vm, vm_paddr_t guest_pgd,
-+			uint32_t memslot);
-+
- void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
- void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
- void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc);
-diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
-index ac97a1c436fc..5de2e932d95a 100644
---- a/tools/testing/selftests/kvm/include/arm64/processor.h
-+++ b/tools/testing/selftests/kvm/include/arm64/processor.h
-@@ -104,6 +104,15 @@
- #define TCR_HA			(UL(1) << 39)
- #define TCR_DS			(UL(1) << 59)
- 
-+/* VTCR_EL2 specific flags */
-+#define VTCR_EL2_T0SZ_BITS(x)	((UL(64) - (x)) << VTCR_EL2_T0SZ_SHIFT)
-+
-+#define VTCR_EL2_SL0_LV0_4K	(UL(2) << VTCR_EL2_SL0_SHIFT)
-+#define VTCR_EL2_SL0_LV1_4K	(UL(1) << VTCR_EL2_SL0_SHIFT)
-+#define VTCR_EL2_SL0_LV2_4K	(UL(0) << VTCR_EL2_SL0_SHIFT)
-+
-+#define VTCR_EL2_PS_40_BITS	(UL(2) << VTCR_EL2_PS_SHIFT)
-+
- /*
-  * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
-  */
-diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
-index 111d02f44cfe..910f8cd30f96 100644
---- a/tools/testing/selftests/kvm/lib/arm64/nested.c
-+++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
-@@ -1,8 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- /*
-- * ARM64 Nested virtualization helpers
-+ * ARM64 Nested virtualization helpers, nested page table code adapted from
-+ * ../x86/vmx.c.
-  */
- 
-+#include <linux/sizes.h>
-+
- #include "kvm_util.h"
- #include "nested.h"
- #include "processor.h"
-@@ -18,6 +21,87 @@ static void hvc_handler(struct ex_regs *regs)
- 	regs->pc = (u64)after_hvc;
- }
- 
-+uint64_t get_l1_vtcr(void)
-+{
-+	return VTCR_EL2_PS_40_BITS | VTCR_EL2_TG0_4K | VTCR_EL2_ORGN0_WBWA |
-+	       VTCR_EL2_IRGN0_WBWA | VTCR_EL2_SL0_LV0_4K | VTCR_EL2_T0SZ_BITS(48);
-+}
-+
-+static void __nested_pg_map(struct kvm_vm *vm, uint64_t guest_pgd,
-+		     uint64_t nested_paddr, uint64_t paddr, uint64_t flags)
-+{
-+	uint8_t attr_idx = flags & (PTE_ATTRINDX_MASK >> PTE_ATTRINDX_SHIFT);
-+	uint64_t pg_attr;
-+	uint64_t *ptep;
-+
-+	TEST_ASSERT((nested_paddr % vm->page_size) == 0,
-+		"L2 IPA not on page boundary,\n"
-+		"  nested_paddr: 0x%lx vm->page_size: 0x%x", nested_paddr, vm->page_size);
-+	TEST_ASSERT((paddr % vm->page_size) == 0,
-+		"Guest physical address not on page boundary,\n"
-+		"  paddr: 0x%lx vm->page_size: 0x%x", paddr, vm->page_size);
-+	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
-+		"Physical address beyond maximum supported,\n"
-+		"  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
-+		paddr, vm->max_gfn, vm->page_size);
-+
-+	ptep = addr_gpa2hva(vm, guest_pgd) + ((nested_paddr >> 39) & 0x1ffu) * 8;
-+	if (!*ptep)
-+		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PGD_TYPE_TABLE | PTE_VALID;
-+	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 30) & 0x1ffu) * 8;
-+	if (!*ptep)
-+		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PUD_TYPE_TABLE | PTE_VALID;
-+	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 21) & 0x1ffu) * 8;
-+	if (!*ptep)
-+		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PMD_TYPE_TABLE | PTE_VALID;
-+	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 12) & 0x1ffu) * 8;
-+
-+	pg_attr = PTE_AF | PTE_ATTRINDX(attr_idx) | PTE_TYPE_PAGE | PTE_VALID;
-+	pg_attr |= PTE_SHARED;
-+
-+	*ptep = (paddr & GENMASK(47, 12)) | pg_attr;
-+}
-+
-+void nested_map(struct kvm_vm *vm, vm_paddr_t guest_pgd,
-+		uint64_t nested_paddr, uint64_t paddr, uint64_t size)
-+{
-+	size_t npages = size / SZ_4K;
-+
-+	TEST_ASSERT(nested_paddr + size > nested_paddr, "Vaddr overflow");
-+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
-+
-+	while (npages--) {
-+		__nested_pg_map(vm, guest_pgd, nested_paddr, paddr, MT_NORMAL);
-+		nested_paddr += SZ_4K;
-+		paddr += SZ_4K;
-+	}
-+}
-+
-+/*
-+ * Prepare an identity shadow page table that maps all the
-+ * physical pages in VM.
-+ */
-+void nested_map_memslot(struct kvm_vm *vm, vm_paddr_t guest_pgd,
-+			uint32_t memslot)
-+{
-+	sparsebit_idx_t i, last;
-+	struct userspace_mem_region *region =
-+		memslot2region(vm, memslot);
-+
-+	i = (region->region.guest_phys_addr >> vm->page_shift) - 1;
-+	last = i + (region->region.memory_size >> vm->page_shift);
-+	for (;;) {
-+		i = sparsebit_next_clear(region->unused_phy_pages, i);
-+		if (i > last)
-+			break;
-+
-+		nested_map(vm, guest_pgd,
-+			   (uint64_t)i << vm->page_shift,
-+			   (uint64_t)i << vm->page_shift,
-+			   1 << vm->page_shift);
-+	}
-+}
-+
- void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- {
- 	size_t l2_stack_size;
-@@ -32,7 +116,16 @@ void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 
- void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- {
--	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_RW);
-+	vm_paddr_t guest_pgd;
-+
-+	guest_pgd = vm_phy_pages_alloc(vm, 1,
-+				       KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-+				       vm->memslots[MEM_REGION_PT]);
-+	nested_map_memslot(vm, guest_pgd, 0);
-+
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_RW | HCR_EL2_VM);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTTBR_EL2), guest_pgd);
-+	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_VTCR_EL2), get_l1_vtcr());
- }
- 
- void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc)
--- 
-2.43.0
+> Note that the kvmtool code has been tidied up (thanks to Suzuki) and
+> this involves a minor change in flags. The "--restricted_mem" flag is no
+> longer recognised (or necessary).
+> 
+> The TF-RMM has not yet merged the RMMv2.0 support, so you will need to
+> use the following branch:
+> 
+> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc
+> 
+
+I'm seeing error to initialize RMM with the suggested RMM branch (topics/rmm-v2.0-poc)
+and the upstream TF-A [1]. It seems the problem is compatible issue in the
+RMM-EL3 interface. RMM requires verion 2.0 while TF-A only supports 0.8. So
+I guess I must be using a wrong TF-A repository. Could you please share which
+TF-A repository you use for testing?
+
+[1] git@github.com:ARM-software/arm-trusted-firmware.git    (branch: master)
+
+Booting logs
+=============
+NOTICE:  Booting Trusted Firmware
+NOTICE:  BL1: v2.14.0(debug):67edb4f8e
+NOTICE:  BL1: Built : 00:01:39, Mar 25 2026
+INFO:    BL1: RAM 0xe0ee000 - 0xe0f7000
+INFO:    BL1: Loading BL2
+INFO:    Loading image id=1 at address 0xe05b000
+INFO:    Image id=1 loaded: 0xe05b000 - 0xe0642bc
+NOTICE:  BL1: Booting BL2
+INFO:    Entry point address = 0xe05b000
+INFO:    SPSR = 0x3cd
+NOTICE:  BL2: v2.14.0(debug):67edb4f8e
+NOTICE:  BL2: Built : 00:01:39, Mar 25 2026
+INFO:    BL2: Doing platform setup
+INFO:    Reserved RMM memory [0x40100000, 0x418fffff] in Device tree
+INFO:    BL2: Loading image id 3
+INFO:    Loading image id=3 at address 0xe090000
+INFO:    Image id=3 loaded: 0xe090000 - 0xe0a292b
+INFO:    BL2: Loading image id 35
+INFO:    Loading image id=35 at address 0x40100000
+INFO:    Image id=35 loaded: 0x40100000 - 0x401a11e0
+INFO:    BL2: Loading image id 5
+INFO:    Loading image id=5 at address 0x60000000
+INFO:    Image id=5 loaded: 0x60000000 - 0x60200000
+NOTICE:  BL2: Booting BL31
+INFO:    Entry point address = 0xe090000
+INFO:    SPSR = 0x3cd
+INFO:    GPT: Boot Configuration
+INFO:      PPS/T:     0x2/40
+INFO:      PGS/P:     0x0/12
+INFO:      L0GPTSZ/S: 0x0/30
+INFO:      PAS count: 6
+INFO:      L0 base:   0xedfe000
+INFO:    Enabling Granule Protection Checks
+NOTICE:  BL31: v2.14.0(debug):67edb4f8e
+NOTICE:  BL31: Built : 00:01:39, Mar 25 2026
+INFO:    GICv3 without legacy support detected.
+INFO:    ARM GICv3 driver initialized in EL3
+INFO:    Maximum SPI INTID supported: 287
+INFO:    BL31: Initializing runtime services
+INFO:    RMM setup done.
+INFO:    BL31: Initializing RMM
+INFO:    RMM init start.
+ERROR:   RMM init failed: -2                           <<<< Error raised by RMM here
+WARNING: BL31: RMM initialization failed
+INFO:    BL31: Preparing for EL3 exit to normal world
+INFO:    Entry point address = 0x60000000
+INFO:    SPSR = 0x3c9
+UEFI firmware (version  built at 19:33:51 on Mar  3 2026)
+
+
+Thanks,
+Gavin
+
+
 
