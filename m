@@ -1,42 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF7F36166B;
-	Wed, 25 Mar 2026 11:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945A3285041;
+	Wed, 25 Mar 2026 11:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774439192; cv=none; b=GQ5m1iCr+PvUbY7Nnt25/tjKNYhpveHy7NhpGss/pzLh1tGi+FRcX8E64jh29oUtJ8d4IL3nhl0+BlwSYwdEsqDw9f499ogH4pS23RrpjG9ZLIjNCmRlVTSOqY4g7V7PeMEoQE+Gpx8U7rFsEQLLrg1riLtp5DpXeGl1MxxUE0s=
+	t=1774439935; cv=none; b=WHHP27k1SZg6BPllWlvrKJiW64OBrQxsfeINVr/sP1B0MEqx7hRV9YBwL5FVHWStDDoCFDWznfIFfQwZ8Q3kC7jtrmQwxgwiKsjbi8bDXlutyNbLZwGkuPn3erhBSdpTXmaM5sdk6uehdi5ll27SO02yytuYyrA237k8esTdxDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774439192; c=relaxed/simple;
-	bh=UXUUhS3MAESFwPxbH9V2xQaAycdYVm3Q/qrCpTgLq2M=;
+	s=arc-20240116; t=1774439935; c=relaxed/simple;
+	bh=6luj6doPeND31Eisbvd/5/okrRnTF7y5LhkTtTOiI2k=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mp9L/wVVbr5HXJ29w47XDj7P1czokdlvBrN4TVFpoCNaQsGuTsKq72jaylHm1TwL+CW9hHzteZbZM+bhWGOkGHopBqFadmpVdpp18Xzyy8nWy8UXbPr4IH+jhqrOXhnN1326VrjMFQwNZKpl31tNwat/Y+DuxzHyCiXv5fr5PpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQRqDgvc; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=KeXXSOi+MqYaiM0GExh+onEs2C3qpv7ON7E6jFtpZd8/8vrvTinDbe5/ILGJMtO67lq/AULrAcwWYNA7/b8C+JRsomR4TfJ1lYLUiOeQe9jJJV2eRoGBuNi7feJudKuY53IkL8rYFkrTNN2MKEhrqKucXBGkC26Ukj/e+ZThIB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K0cWtlId; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQRqDgvc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EE37C2BCB2;
-	Wed, 25 Mar 2026 11:46:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K0cWtlId"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AA1FC4CEF7;
+	Wed, 25 Mar 2026 11:58:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774439192;
-	bh=UXUUhS3MAESFwPxbH9V2xQaAycdYVm3Q/qrCpTgLq2M=;
+	s=k20201202; t=1774439935;
+	bh=6luj6doPeND31Eisbvd/5/okrRnTF7y5LhkTtTOiI2k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QQRqDgvcIFv1UYT2Xy68ZNtAj7Z2Zrat6Qx61hsA4BB4RnV6OfFu36FPZz9at23A4
-	 LyikZEwfeSGfASsfEdUgutelVYTSdSOJeEyLf60e03ftqtQkKzA36ctXesgR+dw84Y
-	 UUC4Cbie4i5C5zzHHo52Kgf0KZZDLmTB/eUluu1ASoA3w8Zbjr0l0ud6+2iQNhxLKf
-	 MHoD+viNrGserUMI4eqCd2e3KnTnil2/HpIDpyW/VVg6K4PIQ1XdLD13TFkSA5y0t9
-	 m4RAPWeybqob9aQMfs7XhBvYb5kgTeKsigBh1nkEf+KOpU2j5mftnpQ+SCciJCbgm7
-	 I+B2/GKESSz7A==
+	b=K0cWtlIdmFEgXNXSOUbMRLBPCs8rvJ3FeGENlI80z08J96fqXXaAbtvM5jOXItpFs
+	 rbLzuF9eLxQ+3R4YNiUsveh/rS/etU/GIoq6b83PoB68ckYRg0HTwHePWWTCD+8dCP
+	 qND4OgT6xsJsYzg8khnMBC2aLCQ85ONZgkhMS08tvQrgSwzlzkc/msN2+BbETiWfA0
+	 z+UmGLlBG87n5Dz1sAs6Niow+KyWqhTYBA1GLdOBAwMGNCMhcLLmzB2mcoXXJS2NF2
+	 e2pp5riU/raokH5LwprtO78mjfjQlrtwDZ2OfejIlfJk5U0g+rEEKIEJ/Olr5xVWKG
+	 6UISpo4V7rhTw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w5Mgv-00000005XCO-3bKt;
-	Wed, 25 Mar 2026 11:46:29 +0000
-Date: Wed, 25 Mar 2026 11:46:29 +0000
-Message-ID: <86ldfg3ze2.wl-maz@kernel.org>
+	id 1w5Msu-00000005XSb-3bKb;
+	Wed, 25 Mar 2026 11:58:52 +0000
+Date: Wed, 25 Mar 2026 11:58:52 +0000
+Message-ID: <86jyv03ytf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>, Vincent Donnefort <vdonnefort@google.com>
-Cc: 	kvmarm@lists.linux.dev,
+To: Sebastian Ene <sebastianene@google.com>
+Cc: Vincent Donnefort <vdonnefort@google.com>,
+	kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	android-kvm@google.com,
@@ -49,9 +50,10 @@ Cc: 	kvmarm@lists.linux.dev,
 	will@kernel.org,
 	yuzenghui@huawei.com
 Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with imm16 != 0
-In-Reply-To: <acPIdoA8oc7T8wKX@google.com>
+In-Reply-To: <acPJ3Z9hDKc0Sm2t@google.com>
 References: <20260325113138.4171430-1-sebastianene@google.com>
 	<acPIdoA8oc7T8wKX@google.com>
+	<acPJ3Z9hDKc0Sm2t@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,59 +69,65 @@ X-SA-Exim-Rcpt-To: sebastianene@google.com, vdonnefort@google.com, kvmarm@lists.
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 25 Mar 2026 11:35:18 +0000,
-Vincent Donnefort <vdonnefort@google.com> wrote:
+On Wed, 25 Mar 2026 11:41:17 +0000,
+Sebastian Ene <sebastianene@google.com> wrote:
 > 
-> On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
-> > The ARM Service Calling Convention (SMCCC) specifies that the function
-> > identifier and parameters should be passed in registers, leaving the
-> > 16-bit immediate field of the SMC instruction un-handled.
-> > Currently, our pKVM handler ignores the immediate value, which could lead
-> > to non-compliant software relying on implementation-defined behavior.
-> > Enforce the host kernel running under pKVM to use an immediate value
-> > of 0 by decoding the ISS from the ESR_EL2 and return a not supported
-> > error code back to the caller.
+> On Wed, Mar 25, 2026 at 11:35:18AM +0000, Vincent Donnefort wrote:
+> > On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
+> > > The ARM Service Calling Convention (SMCCC) specifies that the function
+> > > identifier and parameters should be passed in registers, leaving the
+> > > 16-bit immediate field of the SMC instruction un-handled.
+> > > Currently, our pKVM handler ignores the immediate value, which could lead
+> > > to non-compliant software relying on implementation-defined behavior.
+> > > Enforce the host kernel running under pKVM to use an immediate value
+> > > of 0 by decoding the ISS from the ESR_EL2 and return a not supported
+> > > error code back to the caller.
+> > > 
+> > > Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> > > ---
+> > > v1 -> v2:
+> > > 
+> > >  - Dropped injecting an UNDEF and return an error instead
+> > >    (SMCCC_RET_NOT_SUPPORTED)
+> > >  - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
+> > >  - Updated the title of the commit message from:
+> > >    "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
+> > >     smc with imm16 != 0
 > > 
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> > v1 -> v2:
+> > > ---
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 ++++++
+> > >  1 file changed, 6 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > index e7790097db93..4ffe30fd8707 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+> > > @@ -762,6 +762,12 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
+> > >  		handle_host_hcall(host_ctxt);
+> > >  		break;
+> > >  	case ESR_ELx_EC_SMC64:
+> > > +		if (ESR_ELx_xVC_IMM_MASK & esr) {
+> > > +			cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
+> > > +			kvm_skip_host_instr();
+> > > +			break;
+> > > +		}
+> > > +
 > > 
-> >  - Dropped injecting an UNDEF and return an error instead
-> >    (SMCCC_RET_NOT_SUPPORTED)
-> >  - Used the mask ESR_ELx_xVC_IMM_MASK instead of masking with U16_MAX
-> >  - Updated the title of the commit message from:
-> >    "[PATCH] KVM: arm64: Inject UNDEF when host is executing an
-> >     smc with imm16 != 0
+> > I wonder if it isn't better to move that into handle_host_smc() as this is part
+> > of how we handle the SMC after all? (and it calls that kvm_skip_host_instr()
+> > already)
+> > 
 > 
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index e7790097db93..4ffe30fd8707 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -762,6 +762,12 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
-> >  		handle_host_hcall(host_ctxt);
-> >  		break;
-> >  	case ESR_ELx_EC_SMC64:
-> > +		if (ESR_ELx_xVC_IMM_MASK & esr) {
-> > +			cpu_reg(host_ctxt, 0) = SMCCC_RET_NOT_SUPPORTED;
-> > +			kvm_skip_host_instr();
-> > +			break;
-> > +		}
-> > +
-> 
-> I wonder if it isn't better to move that into handle_host_smc() as this is part
-> of how we handle the SMC after all? (and it calls that kvm_skip_host_instr()
-> already)
+> I was thinking of doing that as well but I prefer this since we don't
+> have to look again at the esr in the callee.
 
-Yes, that'd be vastly better.
+I don't see that obtaining ESR_EL2 is that hard or expensive. Given
+that everything is in the same compilation unit, the compiler will
+probably optimise it.
 
-It also begs the question: if you don't want to handle SMCs with a
-non-zero immediate, why is it OK to do it for HVCs?
-
-Thanks,
+But if I have to state the obvious: you are *handling* an SMC
+instruction. Surely handle_host_smc() is the correct spot for that
+job?
 
 	M.
 
