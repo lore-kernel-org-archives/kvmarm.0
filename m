@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8E63009EE;
-	Wed, 25 Mar 2026 09:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5323502A4;
+	Wed, 25 Mar 2026 09:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774429430; cv=none; b=F3O5MD4B05+3UWs6Fky2xbC5XdkySeLqz8CyddLJF+xdk+Q0D7+/sFu4zfLvkzGlg6pP6qIpCtGyVC3l0oxqzGrBJHRa7m+WjMEUvz1UXCTGsP4ZSbK+lKBzdSzGMiKBbZ61Y1RCwTx/bcV6BCjhmSesafKdDPm0zxzNGDnVTYU=
+	t=1774430303; cv=none; b=CCYplBmCacgPkiDkqViv7Xttn9uFChhrgOHqZql86n+B7PMZ0mm9HodLhD+Guhle9FlSd6BAZh13dH8m/69IqP8gHfUie1974vYFUpy0vPUNJSdcrfihBQtXaGJrMpcW7uRmUz29wcoLy6/r4lnm5TzKDmBRDArGmq5wDoht7go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774429430; c=relaxed/simple;
-	bh=w/GTjS8YC8uH+Sy4A1EDV8UGyt/H8PZtAnk1cljNo8w=;
+	s=arc-20240116; t=1774430303; c=relaxed/simple;
+	bh=0i4abdRDleJm92gWlAzYDCiaX3cyuhdf9fdZTk6kWlI=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V8m2+w1/2n/gLPP7U78UyRjRHp1p7mkDRl3UkWewqrJs9bc5DtbFXbA23Dttat/lXZByS+Rxl9AX8hP2fku8ezIaNlhJAaAVv/8L6Eu8QJqd77vfefMjNpECMAmQevVoy2PVmoWwtrwsHOb6ais2oLLocpwLB12w1Rka8x2iZTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fLn3NICR; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=M2Ri5iFBz8TZptumPpjb+kw/Ndf8q/LAjIYfCQfIP5jplDsZHYgj2D8TAkaWvIHahjBGugg4/g3fa44gpcV/hUBEbgQQr4S+Hc6DO31GoJ6RJGsrTpg8fckT0vmeNBJBVsJiqUzchw8eiExAMXqjXyPdxvg1IGjCMkTZB8eF2+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8bgt+aS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fLn3NICR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C50B2C4CEF7;
-	Wed, 25 Mar 2026 09:03:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8bgt+aS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD2D2C4CEF7;
+	Wed, 25 Mar 2026 09:18:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774429430;
-	bh=w/GTjS8YC8uH+Sy4A1EDV8UGyt/H8PZtAnk1cljNo8w=;
+	s=k20201202; t=1774430302;
+	bh=0i4abdRDleJm92gWlAzYDCiaX3cyuhdf9fdZTk6kWlI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fLn3NICRRfLAwA8fdLwt9a3S1jWOlTsyhgvm9TKxtZQRkOTPn8eHM0Xie9VDcCkZ/
-	 8GJrVhP3m4gxmWaHeYlqNHI+OKhIvY/oJIVcpXXModAzVFaBKxCcb5IdkMSHsXYcg8
-	 XO313s7oi20EAwUjxewUYW3Wta5AzC082RHyrjwFrm+YIr98GK8PK9KLX9+mDX3XC4
-	 vGyt6W2oHGh8pDpJDbHCyrvtvQTgvJx8WHlZqYIYMiRGk3+fPTmKI2yMJ3yNGO6Oj+
-	 NzaBbOgn605Hf2tAPp7Y+JBWc7/JLkhdGfhSc8tn0x/LKgFlIWJt4A7uE6w4llufPk
-	 RTldLE+GWj4pg==
+	b=C8bgt+aSaIBXurlz5x1xUUO0IvckVpM/oUBKrmOjwTSFa4Upl8Rl75127DwiSs34h
+	 ilQByYAjum0+9FBVmUCpYMER9HvMEMj/l8TuZEKFeEvLGtYiLyGpO/NvGeCtrk3lvK
+	 nBQ0de7bobdfILJK6idX5Qtsugmm5AdRNqsRjxdrov8goDeBdeAGQ7eT/KOc+914Gb
+	 Zm1uGMp1Qw3j7yTt8OY22nB+2l5bfvNPhGo5TVkka6vulOSM15QpPydA+D9BqAk2F/
+	 prdYYlP1tIgNzVPXy5Pk7N/UXjdOSYvj39EaUT1aYBH8FWOmFlIZywZjxG6jFxWFyZ
+	 ErPTweqjgwY0Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <maz@kernel.org>)
-	id 1w5K9T-00000005Trk-21XU;
-	Wed, 25 Mar 2026 09:03:47 +0000
-Date: Wed, 25 Mar 2026 09:03:47 +0000
-Message-ID: <86o6kc46x8.wl-maz@kernel.org>
+	id 1w5KNY-00000005U8U-2Vxu;
+	Wed, 25 Mar 2026 09:18:20 +0000
+Date: Wed, 25 Mar 2026 09:18:20 +0000
+Message-ID: <86mrzw468z.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Wei-Lin Chang <weilin.chang@arm.com>
 Cc: kvm@vger.kernel.org,
@@ -49,10 +49,10 @@ Cc: kvm@vger.kernel.org,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Catalin Marinas <catalin.marinas@arm.com>,
 	Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 1/3] KVM: arm64: selftests: Add library functions for NV
-In-Reply-To: <20260325003620.2214766-2-weilin.chang@arm.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: selftests: Enable stage-2 in NV preparation functions
+In-Reply-To: <20260325003620.2214766-4-weilin.chang@arm.com>
 References: <20260325003620.2214766-1-weilin.chang@arm.com>
-	<20260325003620.2214766-2-weilin.chang@arm.com>
+	<20260325003620.2214766-4-weilin.chang@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -68,183 +68,136 @@ X-SA-Exim-Rcpt-To: weilin.chang@arm.com, kvm@vger.kernel.org, linux-kselftest@vg
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, 25 Mar 2026 00:36:18 +0000,
+On Wed, 25 Mar 2026 00:36:20 +0000,
 Wei-Lin Chang <weilin.chang@arm.com> wrote:
 > 
-> The API is designed for userspace to first call prepare_{l2_stack,
-> hyp_state, eret_destination, nested_sync_handler}, with a function
-> supplied to prepare_eret_destination() to be run in L2. Then run_l2()
-> can be called in L1 to run the given function in L2.
+> Introduce library functions for setting up guest stage-2 page tables,
+> then use that to give L2 an identity mapped stage-2 and enable it.
+> 
+> The translation and stage-2 page table built is simple, start level 0,
+> 4 levels, 4KB granules, normal cachable, 48-bit IA, 40-bit OA.
+
+That's a no go. The most common NV-capable out there can realistically
+only do 16kB at S2, and is limited to 36bit IPA. We can't really
+afford to say "too bad" and leave the main development platform behind.
+
+> 
+> The nested page table code is adapted from lib/x86/vmx.c.
+
+I guess this starting point is the main issue.
+
 > 
 > Signed-off-by: Wei-Lin Chang <weilin.chang@arm.com>
 > ---
->  tools/testing/selftests/kvm/Makefile.kvm      |  2 +
->  .../selftests/kvm/include/arm64/nested.h      | 18 ++++++
->  .../testing/selftests/kvm/lib/arm64/nested.c  | 61 +++++++++++++++++++
->  .../selftests/kvm/lib/arm64/nested_asm.S      | 35 +++++++++++
->  4 files changed, 116 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/arm64/nested.h
->  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested.c
->  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested_asm.S
+>  .../selftests/kvm/include/arm64/nested.h      |  7 ++
+>  .../selftests/kvm/include/arm64/processor.h   |  9 ++
+>  .../testing/selftests/kvm/lib/arm64/nested.c  | 97 ++++++++++++++++++-
+>  3 files changed, 111 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile.kvm b/tools/testing/selftests/kvm/Makefile.kvm
-> index 98da9fa4b8b7..5e681e8e0cd7 100644
-> --- a/tools/testing/selftests/kvm/Makefile.kvm
-> +++ b/tools/testing/selftests/kvm/Makefile.kvm
-> @@ -34,6 +34,8 @@ LIBKVM_arm64 += lib/arm64/gic.c
->  LIBKVM_arm64 += lib/arm64/gic_v3.c
->  LIBKVM_arm64 += lib/arm64/gic_v3_its.c
->  LIBKVM_arm64 += lib/arm64/handlers.S
-> +LIBKVM_arm64 += lib/arm64/nested.c
-> +LIBKVM_arm64 += lib/arm64/nested_asm.S
->  LIBKVM_arm64 += lib/arm64/processor.c
->  LIBKVM_arm64 += lib/arm64/spinlock.c
->  LIBKVM_arm64 += lib/arm64/ucall.c
 > diff --git a/tools/testing/selftests/kvm/include/arm64/nested.h b/tools/testing/selftests/kvm/include/arm64/nested.h
-> new file mode 100644
-> index 000000000000..739ff2ee0161
-> --- /dev/null
+> index 739ff2ee0161..0be10a775e48 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/nested.h
 > +++ b/tools/testing/selftests/kvm/include/arm64/nested.h
-> @@ -0,0 +1,18 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * ARM64 Nested virtualization defines
-> + */
+> @@ -6,6 +6,13 @@
+>  #ifndef SELFTEST_KVM_NESTED_H
+>  #define SELFTEST_KVM_NESTED_H
+>  
+> +uint64_t get_l1_vtcr(void);
 > +
-> +#ifndef SELFTEST_KVM_NESTED_H
-> +#define SELFTEST_KVM_NESTED_H
+> +void nested_map(struct kvm_vm *vm, vm_paddr_t guest_pgd,
+> +		uint64_t nested_paddr, uint64_t paddr, uint64_t size);
+> +void nested_map_memslot(struct kvm_vm *vm, vm_paddr_t guest_pgd,
+> +			uint32_t memslot);
 > +
-> +void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
-> +void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
-> +void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc);
-> +void prepare_nested_sync_handler(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+>  void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+>  void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu);
+>  void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc);
+> diff --git a/tools/testing/selftests/kvm/include/arm64/processor.h b/tools/testing/selftests/kvm/include/arm64/processor.h
+> index ac97a1c436fc..5de2e932d95a 100644
+> --- a/tools/testing/selftests/kvm/include/arm64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/arm64/processor.h
+> @@ -104,6 +104,15 @@
+>  #define TCR_HA			(UL(1) << 39)
+>  #define TCR_DS			(UL(1) << 59)
+>  
+> +/* VTCR_EL2 specific flags */
+> +#define VTCR_EL2_T0SZ_BITS(x)	((UL(64) - (x)) << VTCR_EL2_T0SZ_SHIFT)
 > +
-> +void run_l2(void);
-> +void after_hvc(void);
-> +void do_hvc(void);
+> +#define VTCR_EL2_SL0_LV0_4K	(UL(2) << VTCR_EL2_SL0_SHIFT)
+> +#define VTCR_EL2_SL0_LV1_4K	(UL(1) << VTCR_EL2_SL0_SHIFT)
+> +#define VTCR_EL2_SL0_LV2_4K	(UL(0) << VTCR_EL2_SL0_SHIFT)
 > +
-> +#endif /* SELFTEST_KVM_NESTED_H */
+> +#define VTCR_EL2_PS_40_BITS	(UL(2) << VTCR_EL2_PS_SHIFT)
+> +
+>  /*
+>   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+>   */
 > diff --git a/tools/testing/selftests/kvm/lib/arm64/nested.c b/tools/testing/selftests/kvm/lib/arm64/nested.c
-> new file mode 100644
-> index 000000000000..111d02f44cfe
-> --- /dev/null
+> index 111d02f44cfe..910f8cd30f96 100644
+> --- a/tools/testing/selftests/kvm/lib/arm64/nested.c
 > +++ b/tools/testing/selftests/kvm/lib/arm64/nested.c
-> @@ -0,0 +1,61 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM64 Nested virtualization helpers
-> + */
+> @@ -1,8 +1,11 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /*
+> - * ARM64 Nested virtualization helpers
+> + * ARM64 Nested virtualization helpers, nested page table code adapted from
+> + * ../x86/vmx.c.
+>   */
+>  
+> +#include <linux/sizes.h>
 > +
-> +#include "kvm_util.h"
-> +#include "nested.h"
-> +#include "processor.h"
-> +#include "test_util.h"
-> +
-> +#include <asm/sysreg.h>
-> +
-> +static void hvc_handler(struct ex_regs *regs)
+>  #include "kvm_util.h"
+>  #include "nested.h"
+>  #include "processor.h"
+> @@ -18,6 +21,87 @@ static void hvc_handler(struct ex_regs *regs)
+>  	regs->pc = (u64)after_hvc;
+>  }
+>  
+> +uint64_t get_l1_vtcr(void)
 > +{
-> +	GUEST_ASSERT_EQ(get_current_el(), 2);
-> +	GUEST_PRINTF("hvc handler\n");
-> +	regs->pstate = PSR_MODE_EL2h | PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT;
-> +	regs->pc = (u64)after_hvc;
-> +}
-> +
-> +void prepare_l2_stack(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-> +{
-> +	size_t l2_stack_size;
-> +	uint64_t l2_stack_paddr;
-> +
-> +	l2_stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
-> +					 vm->page_size;
+> +	return VTCR_EL2_PS_40_BITS | VTCR_EL2_TG0_4K | VTCR_EL2_ORGN0_WBWA |
+> +	       VTCR_EL2_IRGN0_WBWA | VTCR_EL2_SL0_LV0_4K | VTCR_EL2_T0SZ_BITS(48);
 
-Please use symbolic constants. Also, this looks wrong if the default
-stack size is 32k and the page size is 16k. You probably want to
-express a stack size directly, rather than a number of pages.
-
-> +	l2_stack_paddr = __vm_phy_pages_alloc(vm, l2_stack_size / vm->page_size,
-> +					      0, 0, false);
-> +	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), l2_stack_paddr + l2_stack_size);
-> +}
-> +
-> +void prepare_hyp_state(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_HCR_EL2), HCR_EL2_RW);
-
-Surely the E2H value matters. Or are you planning to only run this on
-configuration that hardcode E2H==0? That'd be pretty limiting.
+Irk. See above.
 
 > +}
 > +
-> +void prepare_eret_destination(struct kvm_vm *vm, struct kvm_vcpu *vcpu, void *l2_pc)
+> +static void __nested_pg_map(struct kvm_vm *vm, uint64_t guest_pgd,
+> +		     uint64_t nested_paddr, uint64_t paddr, uint64_t flags)
 > +{
-> +	vm_paddr_t do_hvc_paddr = addr_gva2gpa(vm, (vm_vaddr_t)do_hvc);
-> +	vm_paddr_t l2_pc_paddr = addr_gva2gpa(vm, (vm_vaddr_t)l2_pc);
+> +	uint8_t attr_idx = flags & (PTE_ATTRINDX_MASK >> PTE_ATTRINDX_SHIFT);
+> +	uint64_t pg_attr;
+> +	uint64_t *ptep;
 > +
-> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_SPSR_EL2), PSR_MODE_EL1h |
-> +							    PSR_D_BIT     |
-> +							    PSR_A_BIT     |
-> +							    PSR_I_BIT     |
-> +							    PSR_F_BIT);
-> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_ELR_EL2), l2_pc_paddr);
-> +	/* HACK: use TPIDR_EL2 to pass address, see run_l2() in nested_asm.S */
-> +	vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(SYS_TPIDR_EL2), do_hvc_paddr);
-> +}
+> +	TEST_ASSERT((nested_paddr % vm->page_size) == 0,
+> +		"L2 IPA not on page boundary,\n"
+> +		"  nested_paddr: 0x%lx vm->page_size: 0x%x", nested_paddr, vm->page_size);
+> +	TEST_ASSERT((paddr % vm->page_size) == 0,
+> +		"Guest physical address not on page boundary,\n"
+> +		"  paddr: 0x%lx vm->page_size: 0x%x", paddr, vm->page_size);
+> +	TEST_ASSERT((paddr >> vm->page_shift) <= vm->max_gfn,
+> +		"Physical address beyond maximum supported,\n"
+> +		"  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+> +		paddr, vm->max_gfn, vm->page_size);
 > +
-> +void prepare_nested_sync_handler(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
-> +{
-> +	if (!vm->handlers) {
-> +		vm_init_descriptor_tables(vm);
-> +		vcpu_init_descriptor_tables(vcpu);
-> +	}
-> +	vm_install_sync_handler(vm, VECTOR_SYNC_LOWER_64,
-> +				ESR_ELx_EC_HVC64, hvc_handler);
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/arm64/nested_asm.S b/tools/testing/selftests/kvm/lib/arm64/nested_asm.S
-> new file mode 100644
-> index 000000000000..4ecf2d510a6f
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/arm64/nested_asm.S
-> @@ -0,0 +1,35 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * ARM64 Nested virtualization assembly helpers
-> + */
+> +	ptep = addr_gpa2hva(vm, guest_pgd) + ((nested_paddr >> 39) & 0x1ffu) * 8;
+> +	if (!*ptep)
+> +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PGD_TYPE_TABLE | PTE_VALID;
+> +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 30) & 0x1ffu) * 8;
+> +	if (!*ptep)
+> +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PUD_TYPE_TABLE | PTE_VALID;
+> +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 21) & 0x1ffu) * 8;
+> +	if (!*ptep)
+> +		*ptep = (vm_alloc_page_table(vm) & GENMASK(47, 12)) | PMD_TYPE_TABLE | PTE_VALID;
+> +	ptep = addr_gpa2hva(vm, *ptep & GENMASK(47, 12)) + ((nested_paddr >> 12) & 0x1ffu) * 8;
 > +
-> +.globl run_l2
-> +.globl after_hvc
-> +.globl do_hvc
-> +run_l2:
-> +	/*
-> +	 * At this point TPIDR_EL2 will contain the gpa of do_hvc from
-> +	 * prepare_eret_destination(). gpa of do_hvc have to be passed in
-> +	 * because we want L2 to issue an hvc after it returns from the user
-> +	 * passed function. In order for that to happen the lr must be
-> +	 * controlled, which at this point holds the value of the address of
-> +	 * the next instruction after this run_l2() call, which is not useful
-> +	 * for L2. Additionally, L1 can't translate gva into gpa, so we can't
-> +	 * calculate it here.
-> +	 *
-> +	 * So first save lr, then move TPIDR_EL2 to lr so when the user supplied
-> +	 * L2 function returns, L2 jumps to do_hvc and let the L1 hvc handler
-> +	 * take control. This implies we expect the L2 code to preserve lr and
-> +	 * calls a regular ret in the end, which is true for normal C functions.
-> +	 * The hvc handler will jump back to after_hvc when finished, and lr
-> +	 * will be restored and we can return run_l2().
-> +	 */
-> +	stp	x29, lr, [sp, #-16]!
-> +	mrs	x0, tpidr_el2
-> +	mov	lr, x0
-> +	eret
-> +after_hvc:
-> +	ldp	x29, lr, [sp], #16
-> +	ret
-> +do_hvc:
-> +	hvc #0
+> +	pg_attr = PTE_AF | PTE_ATTRINDX(attr_idx) | PTE_TYPE_PAGE | PTE_VALID;
+> +	pg_attr |= PTE_SHARED;
+> +
+> +	*ptep = (paddr & GENMASK(47, 12)) | pg_attr;
 
-This probably works for a single instruction L2 guest, but not having
-any save/restore of the L2 context makes it hard to build anything on
-top of this.
+Please use named constants, and write a page table generator that is
+independent of page, IA and OA sizes, as advertised to the guest.
 
 Thanks,
 
