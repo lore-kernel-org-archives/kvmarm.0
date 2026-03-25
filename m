@@ -1,101 +1,112 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E2514884C
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 13:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4419A27FD6D;
+	Wed, 25 Mar 2026 14:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774445644; cv=none; b=TeCn8PEtPd42L6mPAxcQKdkuvjPvBm0tQCglUyRrgYJf8UICnWGNTpU2oQMQovFXFCYgr2JJuu+biUcQrRK3PbukUYYFhomP1FYZ8f/7xD1XJbbiz9tTFZK6FISQr9wJY+9Fi4KwMwjqPY+9guuKUIxONKCZQTT6Ci9XnOL4uLI=
+	t=1774449206; cv=none; b=WmIN0t3o7951ktl9Tx01I7BHOJ8zkSCNkK3jJ20tJhpoxqQDMWtF6vXvwl1GfAzrT1xXIR/BJY42HXpW/KeQD4uYzrblt6bOCYJYB1xcCQfm7aQEcsxVLlNhVnchqwHjueqnucWqvUaY/K7lOU8P0sfhQdKLqk0J9n1ydGaC4cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774445644; c=relaxed/simple;
-	bh=lZ4CBq7Ixdqscjj9OP02TD8QGkO3fkLUcmUe5Ywrwt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K6kN2AWdIzA+9eIzNt8Iu4xyo4RfCnkZ5glqj59nzRhd6iMOLoB+hJoYOtfEk1iQ4VD2UUeMbBkExbfWfrKqBFtHPWyBWhqIHUgdQzC91px6uJtjaRab9YI+Or+5E4BJ7FPUMtJU0JxUXLuAviADpDp/xJo5Du+ixZrXnImWgAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=fSp6CPlk; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+	s=arc-20240116; t=1774449206; c=relaxed/simple;
+	bh=G4GBk+XM2N6la17JMHNsqGyO7EwPRwOUaGJIyT4vjC8=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lm60wX5J/DEQ3vWgJxY0niMDJzckGEoSi9OGMH1WjVVQOWcSTjMqIm8mEqEJTO7dj6MxGoj5AHEGiAh3HK5N/YDHE16qO7wdBSy2nyDXqsG/x7fGqUW4cCqgq69QkLAKr2/siPuL1FEt7qQC90Ct4KFaF7cAu/av0wZ2tvHsIKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMedPZbs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="fSp6CPlk"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C95A61CDD;
-	Wed, 25 Mar 2026 06:33:55 -0700 (PDT)
-Received: from J2N7QTR9R3 (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BC673F836;
-	Wed, 25 Mar 2026 06:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774445641; bh=lZ4CBq7Ixdqscjj9OP02TD8QGkO3fkLUcmUe5Ywrwt8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fSp6CPlksiz56QNHDFrh7jhkmfSfbX6IKMXHufXvfnVp24CrQ7HiXg5BrUJVfCq2p
-	 C2jM8duFHGe0Hq5IbJDz7RsS0VPQcfcZxGGkHi2BVCfs6ubfHyiWbBVqXAnmz82dWS
-	 R78gyDj6te/Vl3XUc7Etkv5pGG/fsSGtIE14Y1Rk=
-Date: Wed, 25 Mar 2026 13:33:56 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Sebastian Ene <sebastianene@google.com>,
-	Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com,
-	oupton@kernel.org, suzuki.poulose@arm.com, tabba@google.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMedPZbs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1177BC4CEF7;
+	Wed, 25 Mar 2026 14:33:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774449206;
+	bh=G4GBk+XM2N6la17JMHNsqGyO7EwPRwOUaGJIyT4vjC8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JMedPZbsxffQ9XcfGQbMzHiA3QMR/kVJabk4N5ZtFQSPoyBMcS4Y2EGgIGInLasGk
+	 SFBGJzcwvaFas1fl2AXQTZBYB0JmKjs4X6wjVmvfpybPfKFO+r0GH7yc1gEGZy4CD6
+	 yRAM6JQvc6+kotvbFy/x8qvEVQYDJUcjxu6Y2rvYkg/SisuJtxsftn5xlx9dv46QoJ
+	 gfHRy7+xF1m/EpMU0GwIALHu3gQChe/cIfLSx5NcvOw9rCETBttpg19J1Et/Sb+3gW
+	 HhyWAmUacL4OK9b8JbF3KD30KUXbGkBibnm1KpXjsg5/8eyrKiJLOEwWujiFmQ0MTy
+	 vHnfftML0LgRg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <maz@kernel.org>)
+	id 1w5PIR-00000005arH-41VF;
+	Wed, 25 Mar 2026 14:33:24 +0000
+Date: Wed, 25 Mar 2026 14:33:23 +0000
+Message-ID: <86h5q43rnw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Sebastian Ene <sebastianene@google.com>,
+	kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	android-kvm@google.com,
+	catalin.marinas@arm.com,
+	joey.gouly@arm.com,
+	oupton@kernel.org,
+	suzuki.poulose@arm.com,
+	tabba@google.com,
+	vdonnefort@google.com,
+	will@kernel.org,
 	yuzenghui@huawei.com
-Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with
- imm16 != 0
-Message-ID: <acPkROffwAsuqsuX@J2N7QTR9R3>
+Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with imm16 != 0
+In-Reply-To: <acPi5V0DgGcgHNGO@J2N7QTR9R3>
 References: <20260325113138.4171430-1-sebastianene@google.com>
- <acPIdoA8oc7T8wKX@google.com>
- <86ldfg3ze2.wl-maz@kernel.org>
- <acPRIk7_dH5Erul8@willie-the-truck>
+	<acPi5V0DgGcgHNGO@J2N7QTR9R3>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acPRIk7_dH5Erul8@willie-the-truck>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: mark.rutland@arm.com, sebastianene@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, tabba@google.com, vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Wed, Mar 25, 2026 at 12:12:18PM +0000, Will Deacon wrote:
-> On Wed, Mar 25, 2026 at 11:46:29AM +0000, Marc Zyngier wrote:
-> > On Wed, 25 Mar 2026 11:35:18 +0000,
-> > Vincent Donnefort <vdonnefort@google.com> wrote:
-> > > 
-> > > On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
-> > > > The ARM Service Calling Convention (SMCCC) specifies that the function
-> > > > identifier and parameters should be passed in registers, leaving the
-> > > > 16-bit immediate field of the SMC instruction un-handled.
-> > > > Currently, our pKVM handler ignores the immediate value, which could lead
-> > > > to non-compliant software relying on implementation-defined behavior.
-> > > > Enforce the host kernel running under pKVM to use an immediate value
-> > > > of 0 by decoding the ISS from the ESR_EL2 and return a not supported
-> > > > error code back to the caller.
+On Wed, 25 Mar 2026 13:28:05 +0000,
+Mark Rutland <mark.rutland@arm.com> wrote:
+>=20
+> On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
+> > The ARM Service Calling Convention (SMCCC) specifies that the function
+> > identifier and parameters should be passed in registers, leaving the
+> > 16-bit immediate field of the SMC instruction un-handled.
+>=20
+> That's not quite right; the SMCCC spec says callers must use immediate
+> 0.
+>=20
+> See https://developer.arm.com/documentation/den0028/h/ section 2.10
+> ("SME and HVC immediate value"), which says:
+>=20
+> | =E2=80=A2 For all compliant calls, an SMC or HVC immediate value of zer=
+o must be
+> |   used.
+> | =E2=80=A2 Nonzero immediate values in SMC instructions are reserved.
+> | =E2=80=A2 Nonzero immediate values in HVC instructions are designated f=
+or use by
+> |   hypervisor vendors.
+>=20
+> > Currently, our pKVM handler ignores the immediate value, which could le=
+ad
+> > to non-compliant software relying on implementation-defined behavior.
+> > Enforce the host kernel running under pKVM to use an immediate value
+> > of 0 by decoding the ISS from the ESR_EL2 and return a not supported
+> > error code back to the caller.
+>=20
+> From my PoV, it'd be fine to turn a non-zero immediate into an UNDEF:
 
-> > It also begs the question: if you don't want to handle SMCs with a
-> > non-zero immediate, why is it OK to do it for HVCs?
-> 
-> I suppose the difference is that the HVC API is a private interface
-> between EL2 and the host. As it stands, EL2 ignores the immediate but we
-> don't have a way to know how EL3 responds to the immediate for an SMC.
-> 
-> When proxying an SMC from the host, EL2 therefore has three choices:
-> 
->   1. Ignore the immediate from the host and always use zero when talking
->      to EL3. That's the current behaviour, but it could theoretically
->      lead to problems if EL3 is using the immediate for something.
-> 
->   2. Propagate the immediate from the host. That should work, but it's
->      a bit involved.
-> 
->   3. Reject non-zero immediates (this patch).
+I disagree. If SMC can be handled at all, then it cannot UNDEF based
+on the immediate -- the is no provision for that in the architecture.
+If it can UNDEF, then it must UNDEF always (as if SCR_EL3.SMD =3D=3D 1).
 
-I think (3) is the only safe option. As described in:
+Thanks,
 
-  https://lore.kernel.org/linux-arm-kernel/acPi5V0DgGcgHNGO@J2N7QTR9R3/
+	M.
 
-... regardless of the the conduit (HVS/SMC) used, a non-zero immediate
-is NOT a legitimate SMCCC call. (1) is not safe, becuase it could change
-the semantic of the call, and (2) is not safe because the calling
-convention could differ (and e.g. things might be clobbered that we
-don't expect).
-
-We know that the host *SHOULD* use a zero immediate, and so anything
-else represents a bug that we will want to catch.
-
-Mark.
+--=20
+Without deviation from the norm, progress is not possible.
