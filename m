@@ -1,78 +1,60 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945A3285041;
-	Wed, 25 Mar 2026 11:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B2A3D1CD4;
+	Wed, 25 Mar 2026 12:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774439935; cv=none; b=WHHP27k1SZg6BPllWlvrKJiW64OBrQxsfeINVr/sP1B0MEqx7hRV9YBwL5FVHWStDDoCFDWznfIFfQwZ8Q3kC7jtrmQwxgwiKsjbi8bDXlutyNbLZwGkuPn3erhBSdpTXmaM5sdk6uehdi5ll27SO02yytuYyrA237k8esTdxDo=
+	t=1774440745; cv=none; b=Rb0VH7rcFdR73cIPTa7lNY9sdZIT5FXJ8+Ss2WC3WGAut9/bDfKr5W16j91hKoMHWjfzLIk4Yqi4hiZXp6bq3zt2FnpPTc+58uJSg/bY+uKGil7LHKAwkU4G15gvKdiyeJYqHO6yr+PQRd4J4zhWsG96xkhdxszIvdKBO7ieTLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774439935; c=relaxed/simple;
-	bh=6luj6doPeND31Eisbvd/5/okrRnTF7y5LhkTtTOiI2k=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KeXXSOi+MqYaiM0GExh+onEs2C3qpv7ON7E6jFtpZd8/8vrvTinDbe5/ILGJMtO67lq/AULrAcwWYNA7/b8C+JRsomR4TfJ1lYLUiOeQe9jJJV2eRoGBuNi7feJudKuY53IkL8rYFkrTNN2MKEhrqKucXBGkC26Ukj/e+ZThIB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K0cWtlId; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774440745; c=relaxed/simple;
+	bh=sYgpxGo9jlZL6+m+mVfdS9j37scj2obQEFdntrcJch8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y6hm1Pypw5qghaUj3coF4+qYwjgjkCA/Y/QDpvSaK5xreP8+rojAfQgrQ+BkijXh6H7zS1a88WOudc7EN3iw2t9rIpM9Lg1RW0vNuCOY/GxW5slguQpSTCPtxEPT18L+WqVt5K+Id1MVY4DkCvUurHAgaN1lkC3FyHQSNISA808=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I3O/muHj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K0cWtlId"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AA1FC4CEF7;
-	Wed, 25 Mar 2026 11:58:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3O/muHj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0081BC4CEF7;
+	Wed, 25 Mar 2026 12:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774439935;
-	bh=6luj6doPeND31Eisbvd/5/okrRnTF7y5LhkTtTOiI2k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K0cWtlIdmFEgXNXSOUbMRLBPCs8rvJ3FeGENlI80z08J96fqXXaAbtvM5jOXItpFs
-	 rbLzuF9eLxQ+3R4YNiUsveh/rS/etU/GIoq6b83PoB68ckYRg0HTwHePWWTCD+8dCP
-	 qND4OgT6xsJsYzg8khnMBC2aLCQ85ONZgkhMS08tvQrgSwzlzkc/msN2+BbETiWfA0
-	 z+UmGLlBG87n5Dz1sAs6Niow+KyWqhTYBA1GLdOBAwMGNCMhcLLmzB2mcoXXJS2NF2
-	 e2pp5riU/raokH5LwprtO78mjfjQlrtwDZ2OfejIlfJk5U0g+rEEKIEJ/Olr5xVWKG
-	 6UISpo4V7rhTw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <maz@kernel.org>)
-	id 1w5Msu-00000005XSb-3bKb;
-	Wed, 25 Mar 2026 11:58:52 +0000
-Date: Wed, 25 Mar 2026 11:58:52 +0000
-Message-ID: <86jyv03ytf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Cc: Vincent Donnefort <vdonnefort@google.com>,
-	kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	android-kvm@google.com,
-	catalin.marinas@arm.com,
-	joey.gouly@arm.com,
-	mark.rutland@arm.com,
-	oupton@kernel.org,
-	suzuki.poulose@arm.com,
-	tabba@google.com,
-	will@kernel.org,
-	yuzenghui@huawei.com
-Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with imm16 != 0
-In-Reply-To: <acPJ3Z9hDKc0Sm2t@google.com>
+	s=k20201202; t=1774440744;
+	bh=sYgpxGo9jlZL6+m+mVfdS9j37scj2obQEFdntrcJch8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I3O/muHj/Xwt3972sYtMJ7nPAOkaplNPL/3Wt7AwEbjEr04PKKok1RbUHC2prnPFa
+	 l+nMKtH/HqKnfQoXRmM3Ky84bbRoyA23j+R85bm8l/9imKsm5qtVGlxkXvYlWzIKWI
+	 4iXtzknXFu6DzN6tOqIWjCkYs6vqNN5kjg6/qIO1oTspSHpgRs9KdRiTsjiyOOgVoi
+	 aq9FQMPbKrxF1nYuJvQzhDXBVOJtrDCStpOdkqrzVkbEtVPv1KJe5+cQuf68BFQQXq
+	 EHll6LfHnlxLjeS0Yyjn+ho2SmkMq/CdYhOcop/R95aG4WtBm4X/Pwe3nnIRyIHxI0
+	 PhvkPvp2nQtTQ==
+Date: Wed, 25 Mar 2026 12:12:18 +0000
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: Sebastian Ene <sebastianene@google.com>,
+	Vincent Donnefort <vdonnefort@google.com>, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com,
+	mark.rutland@arm.com, oupton@kernel.org, suzuki.poulose@arm.com,
+	tabba@google.com, yuzenghui@huawei.com
+Subject: Re: [PATCH v2] KVM: arm64: Prevent the host from using an smc with
+ imm16 != 0
+Message-ID: <acPRIk7_dH5Erul8@willie-the-truck>
 References: <20260325113138.4171430-1-sebastianene@google.com>
-	<acPIdoA8oc7T8wKX@google.com>
-	<acPJ3Z9hDKc0Sm2t@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/30.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <acPIdoA8oc7T8wKX@google.com>
+ <86ldfg3ze2.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, vdonnefort@google.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, android-kvm@google.com, catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com, oupton@kernel.org, suzuki.poulose@arm.com, tabba@google.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86ldfg3ze2.wl-maz@kernel.org>
 
-On Wed, 25 Mar 2026 11:41:17 +0000,
-Sebastian Ene <sebastianene@google.com> wrote:
-> 
-> On Wed, Mar 25, 2026 at 11:35:18AM +0000, Vincent Donnefort wrote:
+On Wed, Mar 25, 2026 at 11:46:29AM +0000, Marc Zyngier wrote:
+> On Wed, 25 Mar 2026 11:35:18 +0000,
+> Vincent Donnefort <vdonnefort@google.com> wrote:
+> > 
 > > On Wed, Mar 25, 2026 at 11:31:38AM +0000, Sebastian Ene wrote:
 > > > The ARM Service Calling Convention (SMCCC) specifies that the function
 > > > identifier and parameters should be passed in registers, leaving the
@@ -116,20 +98,25 @@ Sebastian Ene <sebastianene@google.com> wrote:
 > > I wonder if it isn't better to move that into handle_host_smc() as this is part
 > > of how we handle the SMC after all? (and it calls that kvm_skip_host_instr()
 > > already)
-> > 
 > 
-> I was thinking of doing that as well but I prefer this since we don't
-> have to look again at the esr in the callee.
+> Yes, that'd be vastly better.
+> 
+> It also begs the question: if you don't want to handle SMCs with a
+> non-zero immediate, why is it OK to do it for HVCs?
 
-I don't see that obtaining ESR_EL2 is that hard or expensive. Given
-that everything is in the same compilation unit, the compiler will
-probably optimise it.
+I suppose the difference is that the HVC API is a private interface
+between EL2 and the host. As it stands, EL2 ignores the immediate but we
+don't have a way to know how EL3 responds to the immediate for an SMC.
 
-But if I have to state the obvious: you are *handling* an SMC
-instruction. Surely handle_host_smc() is the correct spot for that
-job?
+When proxying an SMC from the host, EL2 therefore has three choices:
 
-	M.
+  1. Ignore the immediate from the host and always use zero when talking
+     to EL3. That's the current behaviour, but it could theoretically
+     lead to problems if EL3 is using the immediate for something.
 
--- 
-Without deviation from the norm, progress is not possible.
+  2. Propagate the immediate from the host. That should work, but it's
+     a bit involved.
+
+  3. Reject non-zero immediates (this patch).
+
+Will
