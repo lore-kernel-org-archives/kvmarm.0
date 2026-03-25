@@ -1,91 +1,91 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA00350A33
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 19:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278FA350A33
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 19:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774466893; cv=pass; b=ZU3mWkTrOze4KGzCq8k9i6S6pQD6Ipb2HxbiVhPkDDtJU0rnQay2keqifc+NbCN6vL73FKWWsY6TEcZ6sDByuHa0s5syoCDB4SL/btTVRnsQ9RslWeHLvcwbg5607XT8MGFcOtJzZctpAaEOPIDtXMsqA9KrEJLIYbJCl6vMtvw=
+	t=1774466926; cv=pass; b=oWDxBaqvXe/18QH1cVEdPvVgbv5QCFPTC9EHmmschDMTP32/UUtn2JfJI3Z3dAA5I59jrj61qkw6+ubrAfKF4WPRCIFNmI0bvmMedWXFX0HkH1CbcIFKg0/sOKuCgnk7xMYjF4Niu80tk8moWWyn8/uR5T5WHfKV55+gLXfT5C8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774466893; c=relaxed/simple;
-	bh=8fqbfHwieLaxs2OhvQdTi8NOCEP5wPpiqcjlhSGkQZE=;
+	s=arc-20240116; t=1774466926; c=relaxed/simple;
+	bh=/WySRYOuiTv5rUv0pSIXbsX/HBb642mo9mU23avTJ2Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qUDIy/OgPeREe7Oq+gyuPecYM07amBGp0m80duEPgRLQuuBLpEPpkBvHp3+gltz8vJI/rKB+JpaIcNuHcQb19wb08On3qbSRbu2rwjTMt5wuthSanVib0nXK4UJdSWKJWeAYK6GpcGdAJi6Ju0ZclWaclL+Zi8KSMXzHgXtN41o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PdvipEz+; arc=pass smtp.client-ip=209.85.160.172
+	 To:Cc:Content-Type; b=T5A107rVNmAL8oMoJgZ1FsMQvuMrqK7d5NpzmAlNC9iPUw23HJBFvzEb1cCBEB9Sr1JWiUn/RR4r9dkF7puRqEr0FBP49y0HiAiLMFgaE67rcfiv2QPO3bogD75rHZvjHHKXU1uZ18UMg4sMgWSKn86yF4egsjMQuOADS5BtH2U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IrfK5mhi; arc=pass smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PdvipEz+"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5091ed02c54so11481cf.1
-        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 12:28:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774466890; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IrfK5mhi"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-50b6c45781aso137541cf.0
+        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 12:28:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774466924; cv=none;
         d=google.com; s=arc-20240605;
-        b=EEKPFQ8UoxNCs17Xzpp8OH3NcZHUXQ+orp28Fx4zPU8+/6rjr+qBLbqe+WWJ1ZOoCA
-         dW1/4CGau3QYthufL1NYQNrEvk5DgO0VUeT1uozBZWwL71uHI5X46R1u7CkuYV8yDD8c
-         RgANKmWu4z6z1R+rrHwtQ/OgGvAsMJ144pjTOZb0GkwNpoCT1+IvzN8133O1OcsCsKZF
-         LM3tlEKR8a5aDcBZLgZ+420OZDiR0y9WH81J/3p6FPjs9d34vnSQBQAbXSc214yB1FN7
-         uPBiNfUbYH1A+9wVyWDW20RgoQKhY18lu3PuQWlYNwlIwrtNdvdg8JPbGv5RGJnGB13f
-         WucQ==
+        b=V6tJpsKeLEMvAZQhQgWS3y6rznFUNXtLunlFoOpUMLun7jGsBI3LAjuNXkhX4IzyY+
+         g5iBhCX9Ga5GP0x9T433c2E6NIr4UKTkVcRK0hhEHcI6FDpPHyDnm77YChZRnkKhO7QE
+         VsZaY/iIfBWf5ofU2t7J7J83qrzAMG62KO+CmEN4D0a0uejExmovZ/wmdJFBVrhoxale
+         19K+ZOUDuSPF1wfcsdg1y4jYqAqHe+fiN7ItT/lQIUD+mp7Ek9UyiBayC5bjQ7645fDI
+         nRjdZ8bG9UiMDQTPBr2aMAyB3AGAnBKGUq0/GyOO6hpektj8F6cqI1SDtIMbBshmsm4M
+         GrOg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
+        bh=wIokNmwGM3kd/1AiAW2m0XTptRlPEYAfbrhHNMyEeRg=;
         fh=WXifrakrhHpMKuV+YM1LZ/K83mZPglPFmcpcPxsJbCI=;
-        b=Y/CMca7ef3vKEb6T0cJGxwLHdCYI2Gmh10L3yjHTvMCDur2MWcvZdCX0qJ6zHF0jKw
-         SfyVZvAFK7fUISMUQfkdqZHXclptDO8CnSZrVklCDn737WD+suFdHxJhhxRb01+Y6n5l
-         sjB3Dwh1USAQlcQvsVEjLPXi6c0iuroEITtDHJNGo4BbDZyHZIqXzTeFqQNFehRb9yKz
-         v67vKJF25750Sbq41EWalcSd/d3OebJAldT+dwisuJuGdRGlInIPsP7p2VdN+UP61W8c
-         7+YUkqCQw7YMhYvjJJB36zxfj0O54yjBes9hwvUEfjf9JKtQNMr6HTSfyLFbzkvBgt77
-         rvMw==;
+        b=WfbHmZwfRTTGboUA79hvNLXWfMra5bD4BeSYi+QAGF8hyBu8/VrWJIuWF0JVEYpc4u
+         JJJ7387kgJO4o3RRxl0v+YYOt72JKxHVapMICczoTyAlPtw1ee4ABhbxH3WeNCWs54I+
+         I8/GThvQj4mk15dujBzWj4Dr21qHUoqfOcD6iWD9t/CayQ7OS3c40PUIUk6yNXiLWl5x
+         2/nGvqIBv1Wvq65QFSdE4aPzCJJVzL2lbJgZ1rD9iy/FrE+c+c7zXWrURjhYmN9cXmSG
+         byXcCZbi2p1zT6BL1sPHi/QRqwfreZrxyqEUQ04EdepycQ9dwJr2WRPhDGPTfjWD9d2D
+         GT1Q==;
         darn=lists.linux.dev
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774466890; x=1775071690; darn=lists.linux.dev;
+        d=google.com; s=20251104; t=1774466924; x=1775071724; darn=lists.linux.dev;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
-        b=PdvipEz+nWWzD8UOVhA+QxOt4W0xxyjUP6sIJwNhp+vM2zgWZkKvsuuK+tmujbnU4j
-         ZeaB43DQ7TLuBVc73VMNr639Aq601hf6VYExYY8+WIpAmOyuCRP+8ZOD+XvM7nmOGFsU
-         ayq7ttplNzcCIORL4vPNow75gl1p+bsP7Q7wGJ8xDmkGgp7d4qZBT8sxrADZtPzvd13S
-         zzFvv1qup45SCoUx4O+97Vr6Al4knCjTFApToo+FiqEqpTkb7bL5Mir1A7iFeOXYsjbB
-         s2IYHf55cXH562r0cTmIXya4J8tYoYSQmyFo9uRhSOnHzVgR/z4sBo3szFlTMMQ08+sJ
-         ueeQ==
+        bh=wIokNmwGM3kd/1AiAW2m0XTptRlPEYAfbrhHNMyEeRg=;
+        b=IrfK5mhio6r0/IuCpN5GAgdFtstESTRRSbnQTlnTzsJrcYtqapvlVF643KwB6TljqK
+         du8NpR0d9OGQQ4lx10B23Dio/03wt6TBtyvT2XFy6N8YWpxT6z9UuYFPXpTMi83RxA5b
+         75iLxOSlu6/L2CNqo6fZD8CH8/oYo+Zw5434Nu26ul6SzmDNzcBLmMXilNJbY5YQZuyZ
+         9vbDycTlIAS2pKzyWRMGavhqJucWrJYARcT7QLbeD29ndw2iKibe68//fHYVyzBAeZom
+         WrrwiwrqvNDopJtr2Nm9ye0eUhR7heITc6lgZKZBQEM9oFVEX2xxKcDY2M6qCoJS2pOw
+         Meag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774466890; x=1775071690;
+        d=1e100.net; s=20251104; t=1774466924; x=1775071724;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
-        b=d5HuUivXkocBdBec0Lw/RSVVv7U7OzMbxH/W/9VZw/TSVWdQZRc1HXZhNOoVxwVcbz
-         X3UYt3O9hKbSjVlwy6CRILstNMM4EdcmUL/HyB8cZ2Spr/lWu6aORox/+mRNg/3wDZTR
-         T3f6U4/cVXuOpW10PNbbZzRJxmG8chem61cJFsIfhtZna0UyMSoR6x9tYij2Vwcdp16I
-         19SDjI3kzAj71t6OKiALnCj4FOSuFg4C70ni8HF0ny0Anoy+JSdwYwMlvDM6USKPfuhj
-         JD3l+Y9kV+XKYIUMOSHW5P94wIfla484AXzCazL63HPsGQpcL1NOBx23YvT8h54bHwC+
-         +zRw==
-X-Gm-Message-State: AOJu0Yyvt4/yQkjmpRLXcbbRjxEtP9UTTW52/FImncqhOxUQpvk6zZtj
-	AU+MvjTYlph3DG/ojVXFNJeEBhr2MsOaEURrI1kXesc7RQtuIbIs4G9VOMtdVT7Xgq4zAZeQUzS
-	dcET15lWizi1TCDC8s7COMGEt/cO8pq79xMlB/dQ5
-X-Gm-Gg: ATEYQzwB7m4pC9k0P4G54Xk07t75aNp5Z+r9J+FiK6BcBBl9fdyfQxBpFN460g5Qf2e
-	Q/WdrknvjQCJY63NH2D1eYW81GBb5spdnl0f12pGrNw3SEDYCtZriAxZ18AShTTAkGjMmawD4S5
-	+OnlInSZ7VWxihKH6dsOZ9X/ZWmTzhvRINW2NyjTtaUZclZEXYHth8HN4/f4v0tTL60svDSb+47
-	g4VILxVERMg4p9EPUkRt+2KDHUzeNWKpyyrMnIsUkSpby72gEvnSjwbWUSM6RnRXekUfQzK4GsT
-	l2D34CTl
-X-Received: by 2002:a05:622a:a950:b0:509:21ff:cd49 with SMTP id
- d75a77b69052e-50b93a03cafmr822391cf.4.1774466890075; Wed, 25 Mar 2026
- 12:28:10 -0700 (PDT)
+        bh=wIokNmwGM3kd/1AiAW2m0XTptRlPEYAfbrhHNMyEeRg=;
+        b=na1EIZ9I5OrEECLaYNvEuNMkKuqCJBBgjElubh/6yjkP4q7YKRPTH9+WT0e1f6xeS/
+         wzGTgqTI6RwbP1Baei6C5PdZhgK2t9ta44HWOcRqkNiGnl+6LzTdo7CX6pCL2irUc1ls
+         KhsMLr14yRvxXM9OhOywGA7ihhD5Ecc3iLffX/WbT3C2kECrpdkqYpffd4H+/nWBeLhU
+         bvFiw/O7XLId463aJmBhwG3UYUP1jCeUYMJJug+lAHTFO6BxAc7tUyLV0AuD9YSKe7Tm
+         hTKC/D++ok7A8wk3o1kw/jmo82PTVbRO2RZGQ22+ZJHWOSBcaGlSiP/ZiNnvd44K4Ddo
+         C52A==
+X-Gm-Message-State: AOJu0YyG2kh7XhJ9H5rHoI5c5WBq1gjHBaPRp1INOtcFmpIuxulRHwdA
+	XELY4pQfnOt+otdy9flcN2Ngs46Gd6trHMml0Vf1qwgibdoIzDovULyAqfTYi75u7I1SBCIyunz
+	mAsUtvqMWBhoxLrOzNTGE0ME/W75Swtc1L8UQ9m/X
+X-Gm-Gg: ATEYQzx133EonOwRX8vfmGOMYoQxU+8QxBsgpLSfNsysx1+zP8gDwBxlRItqUIu/guJ
+	lLjI5UV3TAYi+suuc/7xN6nuWx8B/i4dlV82/37UpqG0v28Z5cYwsNYeJbPwgFdX+Ae8SmHBt/V
+	aM+vna6vu0Xvx1rd1zG245CIXhD4C2gWIblUj8NtvK+HjFb7nw9n/5W+pCsJeIOhapEkN/Po5Qv
+	Qkq/QxGnECbOX2A2zcCNa1ik2shdjw3lUGkeaZr0DYzd+33VcaMoeGaB0PQP+M/5OfxdY3gWn42
+	aLNAIxng
+X-Received: by 2002:a05:622a:15c7:b0:509:371:f2ab with SMTP id
+ d75a77b69052e-50b93b7ed1dmr1169981cf.16.1774466923434; Wed, 25 Mar 2026
+ 12:28:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-References: <20260227212136.7660-1-will@kernel.org> <20260227212136.7660-2-will@kernel.org>
-In-Reply-To: <20260227212136.7660-2-will@kernel.org>
+References: <20260227212136.7660-1-will@kernel.org> <20260227212136.7660-3-will@kernel.org>
+In-Reply-To: <20260227212136.7660-3-will@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Wed, 25 Mar 2026 19:27:32 +0000
-X-Gm-Features: AQROBzBtSgn9cQ7N1iYo4S0niMNCLJ309hN3EBlrhv7VQmdymp5sBSZavqCW-tE
-Message-ID: <CA+EHjTxcc2FArmi1hu17LW3BHUZ5zTnqbaQP0kbV39HXZfp9+Q@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: arm64: Disable TRBE Trace Buffer Unit when
+Date: Wed, 25 Mar 2026 19:28:06 +0000
+X-Gm-Features: AQROBzCdbyLPa1JZSjpKKNOftTCsN0s4jT6rOyJ633tQAAZ1oZqbJolcz5MXyP8
+Message-ID: <CA+EHjTxM7Mju1Z8+=oshpESJ59=QVdezL7CY2AhKGnvYOtUXMw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: arm64: Disable SPE Profiling Buffer when
  running in guest context
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com, 
@@ -95,33 +95,27 @@ Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com,
 	Yabin Cui <yabinc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Will,
-
-Now that I have backported this to various Android versions....
-
 On Fri, 27 Feb 2026 at 21:22, Will Deacon <will@kernel.org> wrote:
 >
-> The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
-> generation in guest context when self-hosted TRBE is in use by the host.
+> The nVHE world-switch code relies on zeroing PMSCR_EL1 to disable
+> profiling data generation in guest context when SPE is in use by the
+> host.
 >
-> Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
-> TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
-> per R_YCHKJ the Trace Buffer Unit will still be enabled if
-> TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
-> Trace Buffer Unit can perform address translation for the "owning
-> exception level" even when it is out of context.
+> Unfortunately, this may leave PMBLIMITR_EL1.E set and consequently we
+> can end up running in guest/hypervisor context with the Profiling Buffer
+> enabled. The current "known issues" document for Rev M.a of the Arm ARM
+> states that this can lead to speculative, out-of-context translations:
 >
-> Consequently, we can end up in a state where TRBE performs speculative
-> page-table walks for a host VA/IPA in guest/hypervisor context depending
-> on the value of MDCR_EL2.E2TB, which changes over world-switch. The
-> potential result appears to be a heady mixture of SErrors, data
-> corruption and hardware lockups.
+>   | 2.18 D23136:
+>   |
+>   | When the Profiling Buffer is enabled, profiling is not stopped, and
+>   | Discard mode is not enabled, the Statistical Profiling Unit might
+>   | cause speculative translations for the owning translation regime,
+>   | including when the owning translation regime is out-of-context.
 >
-> Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
-> draining the buffer, restoring the register on return to the host. This
-> unfortunately means we need to tackle CPU errata #2064142 and #2038923
-> which add additional synchronisation requirements around manipulations
-> of the limit register. Hopefully this doesn't need to be fast.
+> In a similar fashion to TRBE, ensure that the Profiling Buffer is
+> disabled during the nVHE world switch before we start messing with the
+> stage-2 MMU and trap configuration.
 >
 > Cc: Marc Zyngier <maz@kernel.org>
 > Cc: Oliver Upton <oupton@kernel.org>
@@ -130,59 +124,8 @@ On Fri, 27 Feb 2026 at 21:22, Will Deacon <will@kernel.org> wrote:
 > Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Cc: Fuad Tabba <tabba@google.com>
 > Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-> Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+> Fixes: f85279b4bd48 ("arm64: KVM: Save/restore the host SPE state when entering/leaving a VM")
 > Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_host.h  |  1 +
->  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 73 ++++++++++++++++++++++++++----
->  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
->  3 files changed, 66 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 5d5a3bbdb95e..1532ad2b2ec2 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -770,6 +770,7 @@ struct kvm_host_data {
->                 u64 pmscr_el1;
->                 /* Self-hosted trace */
->                 u64 trfcr_el1;
-> +               u64 trblimitr_el1;
->                 /* Values of trap registers for the host before guest entry. */
->                 u64 mdcr_el2;
->                 u64 brbcr_el1;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> index 2a1c0f49792b..3dbdee1148d3 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
-> @@ -57,12 +57,56 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
->         write_sysreg_el1(new_trfcr, SYS_TRFCR);
->  }
->
-> -static bool __trace_needs_drain(void)
-> +static void __trace_drain_and_disable(void)
->  {
-> -       if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
-> -               return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
-> +       u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
->
-> -       return host_data_test_flag(TRBE_ENABLED);
-> +       *trblimitr_el1 = 0;
-> +
-> +       if (is_protected_kvm_enabled()) {
-> +               if (!host_data_test_flag(HAS_TRBE))
-> +                       return;
-> +       } else {
-> +               if (!host_data_test_flag(TRBE_ENABLED))
-> +                       return;
-> +       }
-
-Can we simplify this? e.g.,
-
-+      bool needs_drain = is_protected_kvm_enabled() ?
-host_data_test_flag(HAS_TRBE) : host_data_test_flag(TRBE_ENABLED);
-....
-
-That said:
 
 Tested-by: Fuad Tabba <tabba@google.com>
 Reviewed-by: Fuad Tabba <tabba@google.com>
@@ -190,88 +133,116 @@ Reviewed-by: Fuad Tabba <tabba@google.com>
 Cheers,
 /fuad
 
-> +
-> +       *trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
-> +       if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
-> +               /*
-> +                * The host has enabled the Trace Buffer Unit so we have
-> +                * to beat the CPU with a stick until it stops accessing
-> +                * memory.
-> +                */
-> +
-> +               /* First, ensure that our prior write to TRFCR has stuck. */
-> +               isb();
-> +
-> +               /* Now synchronise with the trace and drain the buffer. */
-> +               tsb_csync();
-> +               dsb(nsh);
-> +
-> +               /*
-> +                * With no more trace being generated, we can disable the
-> +                * Trace Buffer Unit.
-> +                */
-> +               write_sysreg_s(0, SYS_TRBLIMITR_EL1);
-> +               if (cpus_have_final_cap(ARM64_WORKAROUND_2064142)) {
-> +                       /*
-> +                        * Some CPUs are so good, we have to drain 'em
-> +                        * twice.
-> +                        */
-> +                       tsb_csync();
-> +                       dsb(nsh);
-> +               }
-> +
-> +               /*
-> +                * Ensure that the Trace Buffer Unit is disabled before
-> +                * we start mucking with the stage-2 and trap
-> +                * configuration.
-> +                */
-> +               isb();
-> +       }
->  }
+> ---
+>  arch/arm64/include/asm/kvm_host.h  |  1 +
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 33 ++++++++++++++++++++----------
+>  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+>  3 files changed, 24 insertions(+), 12 deletions(-)
 >
->  static bool __trace_needs_switch(void)
-> @@ -79,15 +123,26 @@ static void __trace_switch_to_guest(void)
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 1532ad2b2ec2..d527c77977dd 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -768,6 +768,7 @@ struct kvm_host_data {
+>                 struct kvm_guest_debug_arch regs;
+>                 /* Statistical profiling extension */
+>                 u64 pmscr_el1;
+> +               u64 pmblimitr_el1;
+>                 /* Self-hosted trace */
+>                 u64 trfcr_el1;
+>                 u64 trblimitr_el1;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 3dbdee1148d3..75158a9cd06a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -14,20 +14,20 @@
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
 >
->         __trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
->                           *host_data_ptr(trfcr_while_in_guest));
-> -
-> -       if (__trace_needs_drain()) {
-> -               isb();
-> -               tsb_csync();
-> -       }
-> +       __trace_drain_and_disable();
->  }
->
->  static void __trace_switch_to_host(void)
+> -static void __debug_save_spe(u64 *pmscr_el1)
+> +static void __debug_save_spe(void)
 >  {
-> +       u64 trblimitr_el1 = *host_data_ptr(host_debug_state.trblimitr_el1);
+> -       u64 reg;
+> +       u64 *pmscr_el1, *pmblimitr_el1;
+>
+> -       /* Clear pmscr in case of early return */
+> -       *pmscr_el1 = 0;
+> +       pmscr_el1 = host_data_ptr(host_debug_state.pmscr_el1);
+> +       pmblimitr_el1 = host_data_ptr(host_debug_state.pmblimitr_el1);
+>
+>         /*
+>          * At this point, we know that this CPU implements
+>          * SPE and is available to the host.
+>          * Check if the host is actually using it ?
+>          */
+> -       reg = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> -       if (!(reg & BIT(PMBLIMITR_EL1_E_SHIFT)))
+> +       *pmblimitr_el1 = read_sysreg_s(SYS_PMBLIMITR_EL1);
+> +       if (!(*pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>                 return;
+>
+>         /* Yes; save the control register and disable data generation */
+> @@ -37,18 +37,29 @@ static void __debug_save_spe(u64 *pmscr_el1)
+>
+>         /* Now drain all buffered data to memory */
+>         psb_csync();
+> +       dsb(nsh);
 > +
-> +       if (trblimitr_el1 & TRBLIMITR_EL1_E) {
-> +               /* Re-enable the Trace Buffer Unit for the host. */
-> +               write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
-> +               isb();
-> +               if (cpus_have_final_cap(ARM64_WORKAROUND_2038923)) {
-> +                       /*
-> +                        * Make sure the unit is re-enabled before we
-> +                        * poke TRFCR.
-> +                        */
-> +                       isb();
-> +               }
-> +       }
-> +
->         __trace_do_switch(host_data_ptr(trfcr_while_in_guest),
->                           *host_data_ptr(host_debug_state.trfcr_el1));
+> +       /* And disable the profiling buffer */
+> +       write_sysreg_s(0, SYS_PMBLIMITR_EL1);
+> +       isb();
 >  }
+>
+> -static void __debug_restore_spe(u64 pmscr_el1)
+> +static void __debug_restore_spe(void)
+>  {
+> -       if (!pmscr_el1)
+> +       u64 pmblimitr_el1 = *host_data_ptr(host_debug_state.pmblimitr_el1);
+> +
+> +       if (!(pmblimitr_el1 & BIT(PMBLIMITR_EL1_E_SHIFT)))
+>                 return;
+>
+>         /* The host page table is installed, but not yet synchronised */
+>         isb();
+>
+> +       /* Re-enable the profiling buffer. */
+> +       write_sysreg_s(pmblimitr_el1, SYS_PMBLIMITR_EL1);
+> +       isb();
+> +
+>         /* Re-enable data generation */
+> -       write_sysreg_el1(pmscr_el1, SYS_PMSCR);
+> +       write_sysreg_el1(*host_data_ptr(host_debug_state.pmscr_el1), SYS_PMSCR);
+>  }
+>
+>  static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+> @@ -177,7 +188,7 @@ void __debug_save_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>         /* Disable and flush SPE data generation */
+>         if (host_data_test_flag(HAS_SPE))
+> -               __debug_save_spe(host_data_ptr(host_debug_state.pmscr_el1));
+> +               __debug_save_spe();
+>
+>         /* Disable BRBE branch records */
+>         if (host_data_test_flag(HAS_BRBE))
+> @@ -195,7 +206,7 @@ void __debug_switch_to_guest(struct kvm_vcpu *vcpu)
+>  void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu)
+>  {
+>         if (host_data_test_flag(HAS_SPE))
+> -               __debug_restore_spe(*host_data_ptr(host_debug_state.pmscr_el1));
+> +               __debug_restore_spe();
+>         if (host_data_test_flag(HAS_BRBE))
+>                 __debug_restore_brbe(*host_data_ptr(host_debug_state.brbcr_el1));
+>         if (__trace_needs_switch())
 > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 779089e42681..f00688e69d88 100644
+> index f00688e69d88..9b6e87dac3b9 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
 > @@ -278,7 +278,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 >          * We're about to restore some new MMU state. Make sure
 >          * ongoing page-table walks that have started before we
 >          * trapped to EL2 have completed. This also synchronises the
-> -        * above disabling of BRBE, SPE and TRBE.
-> +        * above disabling of BRBE and SPE.
+> -        * above disabling of BRBE and SPE.
+> +        * above disabling of BRBE.
 >          *
 >          * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
 >          * rule R_LFHQG and subsequent information statements.
