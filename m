@@ -1,156 +1,143 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa10.hc1455-7.c3s2.iphmx.com (esa10.hc1455-7.c3s2.iphmx.com [139.138.36.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E658352C29
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 06:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32B1366067
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774420689; cv=none; b=HkxH+gtEPekSG5h2OSsqDh+wbhEJW1K61kDdfDfWxSY4EpulwZtrRjzs2OC68q8c86i0V28lXKoBmv3nui1O5fMuhJh4YV1KBKsatZsv/w4Il7TSuKrgul/1yuAWkaAKPs9m8Y3J4bnd7RyK8aTMo0k3u6h7+Qf9FvDnMRf5+oY=
+	t=1774425720; cv=none; b=Qr1F/0oIzAc8tG/DbMHOZwhxQnwdiWkVVRAEFiMNoLgyJvKgICcTQ+Vvepqay05TsrK4JwmMm9C9Vhq+teS/FLv3AeUibJOYzevwsioZHCxjB9O25kUb1ineJGqmBKUVHrJ5TfzsmSBpzfPSmU8GiIjaT/HSWDgYaF851qSRDDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774420689; c=relaxed/simple;
-	bh=yZtfD8ZbhUWOVtqgdCaXlBQFYIVZsgKdxdefJ6np6Dc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H5zJdXAi6ZaIwcLON9AXEW+NVW9N5hlHe/DMyiIcEF0H+CQ+iXMLRMslKVeb4LUZjLy4r8VQXzsFpiD4nNyDWfUbGJBUMfhVtRC/wAKOQf5crJglhPp+R7IgBbChjCemM+KA3VfvJtYSOlYi8JKRehozYfibjxLMm6gZx+o64zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A4Ma5kI+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1774425720; c=relaxed/simple;
+	bh=VlBxR/SzYAHrqVgrVE6UN8eEpY06CR6hnRPY1BAcTpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yvue6IsG/+bDp9s3C/NZAbDozWOcvg7ZuxUtLLZaKhNLP7YDjTI+/asF2QG6OpZDNUdr+x5D89ZwNMVz7taBCSwbP3q9UZC8CAjzWHQVx1ybLRM2jNnNlb1AihdL1Zgnd+3CsNriO3krHvFvgtv7xs7QUeOJqnljLAV0qCisxSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=Ph+hHuz/; arc=none smtp.client-ip=139.138.36.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4Ma5kI+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774420687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pf2aP5j0cWMrde9xV40F9uxk8K2GUvZ19JNXNz1B5Hc=;
-	b=A4Ma5kI+gUClzeqlpsBX4FPv0i3UO0xYGl6lF2osBMwAwntWpiO61kmHAbvtT/3IhkHFuA
-	6X9e+LKSxziH7SIPLU7rxqf66vK2/xb69uG12Kt/LJIMOnDfzzHO5niYwlh5Y0s6El7c3B
-	qKv1r58fBTpun3OaW3HWkEBZdvlIuZw=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-370-fRyifdxwN5e2IOPgCCz5KA-1; Wed, 25 Mar 2026 02:38:05 -0400
-X-MC-Unique: fRyifdxwN5e2IOPgCCz5KA-1
-X-Mimecast-MFC-AGG-ID: fRyifdxwN5e2IOPgCCz5KA_1774420685
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-82c71a8969eso255770b3a.1
-        for <kvmarm@lists.linux.dev>; Tue, 24 Mar 2026 23:38:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774420685; x=1775025485;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pf2aP5j0cWMrde9xV40F9uxk8K2GUvZ19JNXNz1B5Hc=;
-        b=APcurtmNY4AaPHEgYyNQ+EKNT56pqk9yU4mCNP1jc54eRkvzDYOCUUxv6cv+SNZLiO
-         eL60ZD2zzcllbPcfcuHHCuxXPjuGeXf7N0/U35XhI4/mCSpDPS9tg+frgurfuZ8m0z9J
-         im/mmv06nb+pSb+8Voq+Y7YmFszfoZEfLIcY1+ZJRFj9XbUC9xMwsBmCOjTCU4nPhZ6Q
-         sX6/BwQYfKNxumPqt20ZGqRBqtSfQ0n/EeTBVl/XHBKhX+sGIFIi1ZxNB/BnZV74jUcp
-         GmyzCdJASRpW0PSsnytdM19VyLDqNqh8bHhs3psZ9RK4oPPn9D7KrnuNVyZPsi8Gqjhi
-         QbKA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5qnQ0oeEDNsYWtDjcii7dGdKLuDutleuh75xxpqEB+nfNMa38q4nUDhoBv+qKZ6hbNaFLwfE=@lists.linux.dev
-X-Gm-Message-State: AOJu0YwSB2hgpFwbx6ZFjOet8MlRR7DPhX+BoV8AbDpHDinFfP+zI6L8
-	QOVjZzzV64xqHM0R7iRZ5BRP+rJCr3a4v2O1iYBg57IpUDUr/qqMU68TVdUN3i+3HZbdQ1Duoqw
-	3GP2s19PTArer+YUE99JSWL40JLOjrM/kmZYWbMh270tThVjPO/DCNKSDsg==
-X-Gm-Gg: ATEYQzz+OgYLBLudo2REhWcSk18BCZY+W7IhCFtRCoh8MNT89hM9bCct1EZFoUbEi9D
-	HKntsLJaoBDlGMSKQW6CLRE9fn8Ed2abrZVvvigSZVfLcKMDSNIv4htTajp+EVjFYjG7QdISFdv
-	ZBOdG5QKbuImpt87pF7TG6ZhTsCiKl8fvbcS9EzkOo7MYp2mhs8kLta6ITOOKdHMUjzRJPpclkV
-	XXyYSCTAyBEYFocrGNqAQ40WOVZ4Hn6f0p3qtybMFixPl6+HVPhs5ErQM2lx2NfZ2iUCQJ3/Yur
-	KfWzfnNawBR/KL7HGK4njlvt8aNFJxTCN3bEPwjVTANyGlMoQf3iExSdVukYEXM85RbxAhh6s5i
-	LzOBTBeVHh+TZHinXj7nCgpbQy5s05QH2ZYFq1NBCnF0YVhZHEe3epulmTPqsCJW5
-X-Received: by 2002:a05:6a00:1f0d:b0:829:8041:83f with SMTP id d2e1a72fcca58-82c6ded62f5mr2295340b3a.7.1774420684571;
-        Tue, 24 Mar 2026 23:38:04 -0700 (PDT)
-X-Received: by 2002:a05:6a00:1f0d:b0:829:8041:83f with SMTP id d2e1a72fcca58-82c6ded62f5mr2295316b3a.7.1774420684086;
-        Tue, 24 Mar 2026 23:38:04 -0700 (PDT)
-Received: from [192.168.68.51] (n175-34-8-244.mrk21.qld.optusnet.com.au. [175.34.8.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b03bbf0c2sm17111626b3a.15.2026.03.24.23.37.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Mar 2026 23:38:03 -0700 (PDT)
-Message-ID: <0b7121e7-3c74-4303-a200-01d2b7c535ce@redhat.com>
-Date: Wed, 25 Mar 2026 16:37:52 +1000
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="Ph+hHuz/"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1774425717; x=1805961717;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VlBxR/SzYAHrqVgrVE6UN8eEpY06CR6hnRPY1BAcTpo=;
+  b=Ph+hHuz/nZjJ0NqtPBiGutYR9dUWNmCUb2ZhpAMXbhn+7WXVudZz92Mv
+   SynZORhKK87mqhkiSzC19kC86+4aWByig7R+cQ113/mTVKosD+hDC1eOb
+   1ew7bNYxZdEdNrmhyabRyVO/AL+0OFeocciEEc//gY0mcWH2W3DYUr19A
+   Z8jzyzsPAJBzOOsfU6kYOvpU5rwrAp/kJC3gxeJnn3ixBTYjFwknvCV9L
+   bnSGtJr9lA6XJS2USyp8NNLoK3pDWJmBOCS+7S1ghbGYBrWu3UNVv9EDu
+   KAqrsghWnm4aPnAtsiLAt656/WJl7GdaDZ90rJhQheqlMZhwiL/OVKLoP
+   w==;
+X-CSE-ConnectionGUID: PCNhnxPhSgKECBgONalvCQ==
+X-CSE-MsgGUID: Bq6ha/7DQBqfZSa2X5ikpg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="222015061"
+X-IronPort-AV: E=Sophos;i="6.23,139,1770562800"; 
+   d="scan'208";a="222015061"
+Received: from gmgwuk01.global.fujitsu.com ([172.187.114.235])
+  by esa10.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2026 17:00:47 +0900
+Received: from az2uksmgm2.o.css.fujitsu.com (unknown [10.151.22.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by gmgwuk01.global.fujitsu.com (Postfix) with ESMTPS id 705DB1002803
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:00:47 +0000 (UTC)
+Received: from az2nlsmom3.fujitsu.com (az2nlsmom3.o.css.fujitsu.com [10.150.26.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2uksmgm2.o.css.fujitsu.com (Postfix) with ESMTPS id 2909A1809C30
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 08:00:47 +0000 (UTC)
+Received: from sm-arm-grace07 (sm-x86-stp01.soft.fujitsu.com [10.124.178.20])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by az2nlsmom3.fujitsu.com (Postfix) with ESMTPS id 53168101BB54;
+	Wed, 25 Mar 2026 08:00:41 +0000 (UTC)
+Date: Wed, 25 Mar 2026 17:00:37 +0900
+From: Itaru Kitayama <itaru.kitayama@fujitsu.com>
+To: Wei-Lin Chang <weilin.chang@arm.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oupton@kernel.org>, Joey Gouly <joey.gouly@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 0/3] KVM: arm64: selftests: Basic nested guest support
+Message-ID: <acOWJT39NGrmfSbQ@sm-arm-grace07>
+References: <20260325003620.2214766-1-weilin.chang@arm.com>
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
-To: Steven Price <steven.price@arm.com>,
- Mathieu Poirier <mathieu.poirier@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
- <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
- Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
-References: <20260318155413.793430-1-steven.price@arm.com>
- <abyAbPIkDn2bGZwd@p14s> <37bc1222-6fc7-48f0-94d3-6eaac420aa55@arm.com>
-From: Gavin Shan <gshan@redhat.com>
-In-Reply-To: <37bc1222-6fc7-48f0-94d3-6eaac420aa55@arm.com>
-X-Mimecast-Spam-Score: 0
-X-Mimecast-MFC-PROC-ID: euN2Sv8k_PK9fyAx38BWR1Vn6Q33YoTDPfZl9M7aWpk_1774420685
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260325003620.2214766-1-weilin.chang@arm.com>
 
-Hi Steven,
+Hi Wei Lin,
 
-On 3/21/26 2:45 AM, Steven Price wrote:
-> On 19/03/2026 23:02, Mathieu Poirier wrote:
-
-[...]
-
->>>
->>> The TF-RMM has not yet merged the RMMv2.0 support, so you will need to
->>> use the following branch:
->>>
->>> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc
->>
->> This RMM version is expecting a RMM EL3 interface version of at least 2.0.  Do
->> you have a TF-A to use with it?
+On Wed, Mar 25, 2026 at 12:36:17AM +0000, Wei-Lin Chang wrote:
+> Hi,
 > 
-> You should be able to use the 'master' branch of the TF-A repository.
-> For now you need to set RMM_V1_COMPAT=0 to enable 2.0 support.
+> This series adds basic support for running nested guests (L2) in
+> kselftest. The first patch adds library functions. While designing the
+> APIs for userspace, I referenced Joey's approach for kvm-unit-tests [1].
+> In summary, four preparatory functions are provided for userspace to
+> set up state to run an L2 in EL1:
 > 
+>  - prepare_l2_stack()            <- sets up stack for L2
+>  - prepare_hyp_state()           <- sets up vEL2 registers
+>  - prepare_eret_destination()    <- userspace passes a function pointer
+>                                     for L2 to run
+>  - prepare_nested_sync_handler() <- sets up hvc handler in order to
+>                                     regain control after L2's hvc
+> 
+> After calling those functions, userspace can vcpu_run(), and when
+> run_l2() is called within the guest, the supplied function will be run
+> in L2, with the control flow managed by the library code in nested.c and
+> nested_asm.S. After running the L2 function, run_l2() will automatically
+> return. Note that the L2 function supplied by the user does not have to
+> call hvc.
+> 
+> Patch 2 demonstrates usage of the APIs introduced above, with a simple
+> L1 -> L2 -> L1 sequence, with an empty L2 function.
+> 
+> Patch 3 enhances the library functions by setting up L2 -> L1 stage-2
+> translation. Currently the translation is simple, with start level 0, 4
+> levels, 4KB granules, normal cachable, 48-bit IA, 40-bit OA.
+> 
+> [1]: https://lore.kernel.org/kvmarm/20260306142656.2775185-1-joey.gouly@arm.com/
 
-In upstream TF-A repository [1], I don't see the config option 'RMM_V1_COMPAT'.
-would it be something else?
-
-[1] git@github.com:ARM-software/arm-trusted-firmware.git    (branch: master)
-
-I use the following command to build TF-A image. The RMM-EL3 compatible issue is
-still seen.
-
-     TFA_PATH=$PWD
-     EDK2_IMAGE=${TFA_PATH}/../edk2/Build/ArmVirtQemuKernel-AARCH64/RELEASE_GCC5/FV/QEMU_EFI.fd
-     RMM_IMAGE=${TFA_PATH}/../tf-rmm/build-qemu/Debug/rmm.img
-     
-     make CROSS_COMPILE=aarch64-none-elf-                               \
-          PLAT=qemu ENABLE_RME=1 RMM_V1_COMPAT=0 DEBUG=1 LOG_LEVEL=40   \
-          QEMU_USE_GIC_DRIVER=QEMU_GICV3                                \
-          BL33=${EDK2_IMAGE} RMM=${RMM_IMAGE}                           \
-          -j 8 all fip
-
-Booting messages
-================
-INFO:    BL31: Initializing runtime services
-INFO:    RMM setup done.
-INFO:    BL31: Initializing RMM
-INFO:    RMM init start.
-ERROR:   RMM init failed: -2
-WARNING: BL31: RMM initialization failed
+Look like this selftest assumes nested guest's MMU is disabled (L2 IPA
+to L1 IPA to PA), but I couldn's find the explicit SCTLR.M bit operation in this
+series, how do you make sure it is always off?
 
 Thanks,
-Gavin
+Itaru.
 
-
-
+> 
+> Wei-Lin Chang (3):
+>   KVM: arm64: selftests: Add library functions for NV
+>   KVM: arm64: sefltests: Add basic NV selftest
+>   KVM: arm64: selftests: Enable stage-2 in NV preparation functions
+> 
+>  tools/testing/selftests/kvm/Makefile.kvm      |   3 +
+>  .../selftests/kvm/arm64/hello_nested.c        |  65 ++++++++
+>  .../selftests/kvm/include/arm64/nested.h      |  25 +++
+>  .../selftests/kvm/include/arm64/processor.h   |   9 +
+>  .../testing/selftests/kvm/lib/arm64/nested.c  | 154 ++++++++++++++++++
+>  .../selftests/kvm/lib/arm64/nested_asm.S      |  35 ++++
+>  6 files changed, 291 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/arm64/hello_nested.c
+>  create mode 100644 tools/testing/selftests/kvm/include/arm64/nested.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested.c
+>  create mode 100644 tools/testing/selftests/kvm/lib/arm64/nested_asm.S
+> 
+> -- 
+> 2.43.0
+> 
