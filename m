@@ -1,148 +1,199 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C6356A37
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 10:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9713B6BE6;
+	Wed, 25 Mar 2026 10:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774432885; cv=none; b=bIg6oZ8uQx45Y61M7qf+m4cJlEGXif8D3zBmQrTJiUQBGTCiZCwnvN10W2LOA8I8C6o5lpVAlNXAadjo14E/2YYR18HZaa+3NempgucuBYnjNtPmIc1Nc6XGhgy6PaN/tJRa/qyBQbP7TKhTvAvbpk8oVGzJbhUrNqPQJwnUTFI=
+	t=1774433895; cv=none; b=DfvBikOdC4ovdv9t/OP4c1ivJLV72hUrq9PnyncI3P2VN4g0SSfgslKWVqs/tkx7mJG0oEdytk7z+1//OFSthpnb5Ufnd8CizHuh0c112L0abx3TS+a+PYRFkqFvTIVzQrcJaqXKMKcY/rzkoijYPHJivkkM/W0r4Jo2qv/7RmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774432885; c=relaxed/simple;
-	bh=zOWMXr61Cd5SZ+pQnysmLC4XfB2AfL19f1vOZp8DcQs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J5zluyRPd6puE9E8+s9oKNwsMkg5FkcgOfvW94JgNaHfQmTo+IkTEL3h6tum0u2JnpG5XgrdMcSCVt72TvFBzHJLslpYo3IGNUUIUmV0jY0vtLtNZC74Dp4eH70pIZdLMYasRnkYwad4LP2KsAeXfxSg1yisfICEyZLKPGPLeko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eOnuZ8Zh; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1774433895; c=relaxed/simple;
+	bh=LC/v5hyd/W73lE56Dbp7kdnqaJWcyniIrrWkSFekdKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iuDWLH52oYVFx5ze+0tQbdAID4jg4ChmWAEZ1vvQQbkB1PKGWsC57n47b+A5hmXP1VlpRqC2nZJa9GXVLLwgMyBt4PNxs51EJg9ig+qCVtPKRVvdSuGa34oXW0pzR9YOZHCIRMFc/g6WK6le9qbuRdNzwl2Z0nTAiLBlGjbDY10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=Biqyx7ZN; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eOnuZ8Zh"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-486fb990b9eso67365e9.0
-        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 03:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1774432883; x=1775037683; darn=lists.linux.dev;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VowsU1O7wvsqczMyYwJOpf4xbvaSsqz6CRDVGEe5gCQ=;
-        b=eOnuZ8Zhq2cR9B07ZVFgOAan6gs/dS4lTH+AWXrGlBuYxjrn7zpqyCVQOVhEt5lec4
-         /dqXLIrvMYLL3p3QPuFxiLRwzsltL4jFdh/ltWQY++zNw6C9plAQC+SfnGLr4OTs2tJq
-         1a5tOxbdaFc4L5ye9h7rsaNaUrcnAJpz1RJNfaEifivJyuQtPOmeVR18nqj1BptTS/oB
-         xes5ZjFhRbAxAtqKOHkyGIC1KHdArSESIAzCXcPOpnv26x8Q0WOfCg8VLIQi7cGLc0Sw
-         /4hP8AxbyKTQMk5/WlHetIzKw5ZAYWL/yHKBTw3gL4P9D6RSyyWDXtVyTSDyCRBzAFGD
-         E9Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774432883; x=1775037683;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VowsU1O7wvsqczMyYwJOpf4xbvaSsqz6CRDVGEe5gCQ=;
-        b=OeT/N7ee+JhLorDwAsuAW3FR3BmLcAPBolF5mLBWnCtCydxLRnChgMjgf0L5f/+YcD
-         DGkxhRFqylb+OVkDBiPCJW3fjM+VKkhZ+j1I/v/Zp1T8/uaHelUj4zUdmOvaOkH38PsA
-         8YnfGDP+VhgMtK6hANm93tLsucO69ImhsTkN2wq9JzFALjj1PFe4mYT4Pg+m/eObztxx
-         ukaByeq0q2dswxz0LyUP4nPW1pNti3NY4b2cLGr6Z4J4SB3XuUjk4rgaxLq94Vtb0R1l
-         /Ow7mrNXbAOMI0aO3Rlv88E1FdBR7CL9TgazhmXVHcRgTs+SCO38xKouRnRCuSEq82oQ
-         tybg==
-X-Gm-Message-State: AOJu0YxEeooZv2ZyMJnDeRFz0AcopFBbIhn8Y/GQuTIWlrl/cOFEt+z/
-	LXv91t84IpUgmXyozNsSBmA0F0hAbU7KlRrrN2iXLDAfVMLB204KzrtToms5xxAieQ==
-X-Gm-Gg: ATEYQzxfQsvh3Fcnmz3xL7YYEwPmEWYb47EwcohHew7WPAxqrK5CAd8wKldsZq8Uilz
-	C7nhuPv6FIbPizNPzshH72GHdsb3KEGt8yWrFib92L2xbF9lFxzAzebG1j1xE9a4BvJmj0hfn33
-	oLlvS0LRNmmk1yYmAz66MYdCciqS8L/jmDmcypbh4VbnO05c4XHt+d8umIJAc9SPj/tB1nGlw5l
-	ZbRWClBtqUbRI2BG3qVOkj4uTinSwA2/dyapQiTyGI1QNmfcuFkohaTn4LNqJv834ZPuvYYV/PO
-	8g2Gjfg/RMgcGGmCXMsgeKFYzJK8F/Y323klsLnkA9OhYnthXorYYTUT9YTgN1NlEvT28mtyCyL
-	HcDRdxYUHPORt75DmTkvrX3OB4KF59KZLmUPcBUg+OGaPWtkHU2+r8W+ERECtdHmy00sqCpiGzu
-	BQZYFd/16ZJZhYyvKX6ELuEZLeT4m57AK5Ld6UDGGB3tkY37RxpskIA0pJDDBjso/fg4A=
-X-Received: by 2002:a05:600c:41c3:b0:480:4a7b:228 with SMTP id 5b1f17b1804b1-4871781da4cmr373535e9.1.1774432882386;
-        Wed, 25 Mar 2026 03:01:22 -0700 (PDT)
-Received: from google.com (209.13.205.35.bc.googleusercontent.com. [35.205.13.209])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48711702191sm115863335e9.5.2026.03.25.03.01.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Mar 2026 03:01:21 -0700 (PDT)
-Date: Wed, 25 Mar 2026 10:01:15 +0000
-From: Sebastian Ene <sebastianene@google.com>
-To: Fuad Tabba <tabba@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, android-kvm@google.com,
-	catalin.marinas@arm.com, joey.gouly@arm.com, mark.rutland@arm.com,
-	maz@kernel.org, oupton@kernel.org, suzuki.poulose@arm.com,
-	vdonnefort@google.com, will@kernel.org, yuzenghui@huawei.com
-Subject: Re: [PATCH] KVM: arm64: Inject UNDEF when host is executing an smc
- with imm16 != 0
-Message-ID: <acOya6ZtAAbyOUfj@google.com>
-References: <20260324135728.3532400-1-sebastianene@google.com>
- <CA+EHjTycaE363WXD1f9ztYv9cTe9xeo-3FQ2Ep0aVO4592XGtQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="Biqyx7ZN"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3619316F2;
+	Wed, 25 Mar 2026 03:18:03 -0700 (PDT)
+Received: from [10.57.19.213] (unknown [10.57.19.213])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4488B3F836;
+	Wed, 25 Mar 2026 03:18:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1774433889; bh=LC/v5hyd/W73lE56Dbp7kdnqaJWcyniIrrWkSFekdKI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Biqyx7ZNA8b96Qa8f6Ai6NrC0kDDpV4XPbO+NJ3K8yhCVck8MOhtOhe6VouMYJVXf
+	 +eN2oXcGyf9PZ+tH3zeyyzoKc5ERU6KBOnCBb+3Ud3vqznCeWc/Yalr+o1VhZddjYW
+	 I0bunVmnqB1aTrHuI1qus9pqdkVzezI8aSIvwLa4=
+Message-ID: <9247d9ea-64b4-4e8e-81f8-3c8e00750acf@arm.com>
+Date: Wed, 25 Mar 2026 10:16:33 +0000
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTycaE363WXD1f9ztYv9cTe9xeo-3FQ2Ep0aVO4592XGtQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 00/48] arm64: Support for Arm CCA in KVM
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Shanker Donthineni <sdonthineni@nvidia.com>, Alper Gun
+ <alpergun@google.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>,
+ Emi Kisanuki <fj0570is@fujitsu.com>, Vishal Annapurve <vannapurve@google.com>
+References: <20260318155413.793430-1-steven.price@arm.com>
+ <abyAbPIkDn2bGZwd@p14s> <37bc1222-6fc7-48f0-94d3-6eaac420aa55@arm.com>
+ <0b7121e7-3c74-4303-a200-01d2b7c535ce@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <0b7121e7-3c74-4303-a200-01d2b7c535ce@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 24, 2026 at 03:13:51PM +0000, Fuad Tabba wrote:
+Hi Gavin
 
-Hi Fuad,
+Steven is on holidays, so I am jumping in here.
 
-> Hi Seb,
+On 25/03/2026 06:37, Gavin Shan wrote:
+> Hi Steven,
 > 
-> On Tue, 24 Mar 2026 at 13:57, Sebastian Ene <sebastianene@google.com> wrote:
-> >
-> > The ARM Service Calling Convention (SMCCC) specifies that the function
-> > identifier and parameters should be passed in registers, leaving the
-> > 16-bit immediate field of the SMC instruction un-handled.
-> > Currently, our pKVM handler ignores the immediate value, which could lead
-> > to non-compliant software relying on implementation-defined behavior.
-> > Enforce the host kernel running under pKVM to use an immediate value
-> > of 0 by decoding the ISS from the ESR_EL2 and inject an undefined
-> > instruction exception back to the caller.
-> >
-> > Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > index e7790097db93..ff6a90a4a4c7 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-> > @@ -756,13 +756,18 @@ static bool handle_host_mte(u64 esr)
-> >  void handle_trap(struct kvm_cpu_context *host_ctxt)
-> >  {
-> >         u64 esr = read_sysreg_el2(SYS_ESR);
-> > +       u16 imm16;
-> >
-> >         switch (ESR_ELx_EC(esr)) {
-> >         case ESR_ELx_EC_HVC64:
-> >                 handle_host_hcall(host_ctxt);
-> >                 break;
-> >         case ESR_ELx_EC_SMC64:
-> > -               handle_host_smc(host_ctxt);
-> > +               imm16 = esr & U16_MAX;
-> > +               if (!imm16)
+> On 3/21/26 2:45 AM, Steven Price wrote:
+>> On 19/03/2026 23:02, Mathieu Poirier wrote:
 > 
-> Do we need to introduce a new variable for this? This isn't easier to read than:
-> +               if (!(esr & U16_MAX))
+> [...]
 > 
-> Also, we have a mask for this: ESR_ELx_xVC_IMM_MASK , please use that instead
+>>>>
+>>>> The TF-RMM has not yet merged the RMMv2.0 support, so you will need to
+>>>> use the following branch:
+>>>>
+>>>> https://git.trustedfirmware.org/TF-RMM/tf-rmm.git topics/rmm-v2.0-poc
+>>>
+>>> This RMM version is expecting a RMM EL3 interface version of at least 
+>>> 2.0.  Do
+>>> you have a TF-A to use with it?
+>>
+>> You should be able to use the 'master' branch of the TF-A repository.
+>> For now you need to set RMM_V1_COMPAT=0 to enable 2.0 support.
+>>
+> 
+> In upstream TF-A repository [1], I don't see the config option 
+> 'RMM_V1_COMPAT'.
+> would it be something else?
+> 
+> [1] git@github.com:ARM-software/arm-trusted-firmware.git    (branch: 
+> master)
+> 
+
+suzuki@ewhatever:trusted-firmware-a$ git grep RMM_V1_COMPAT
+Makefile:       RMM_V1_COMPAT \
+Makefile:       RMM_V1_COMPAT \
+docs/getting_started/build-options.rst:-  ``RMM_V1_COMPAT``: Boolean 
+flag to enable support for RMM v1.x compatibility
+include/services/rmmd_svc.h:#if RMM_V1_COMPAT
+include/services/rmmd_svc.h:#endif /* RMM_V1_COMPAT */
+make_helpers/defaults.mk:RMM_V1_COMPAT                  := 1
+services/std_svc/rmmd/rmmd_main.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_main.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_main.c:#if !RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_main.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_main.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_main.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_rmm_lfa.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_rmm_lfa.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_rmm_lfa.c:#if RMM_V1_COMPAT
+services/std_svc/rmmd/rmmd_rmm_lfa.c:#if RMM_V1_COMPAT
+suzuki@ewhatever:trusted-firmware-a$ git log --oneline -1
+8dae0862c (HEAD, origin/master, origin/integration, origin/HEAD) Merge 
+changes from topic "qti_lemans_evk" into integration
+suzuki@ewhatever:trusted-firmware-a$ git remote get-url origin
+https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
 
 
-I will drop that variable and use the ESR_ELx_xVC_IMM_MASK as you pointed out.
+
+> I use the following command to build TF-A image. The RMM-EL3 compatible 
+> issue is
+> still seen.
+> 
+>      TFA_PATH=$PWD
+>      EDK2_IMAGE=${TFA_PATH}/../edk2/Build/ArmVirtQemuKernel-AARCH64/ 
+> RELEASE_GCC5/FV/QEMU_EFI.fd
+>      RMM_IMAGE=${TFA_PATH}/../tf-rmm/build-qemu/Debug/rmm.img
+>      make CROSS_COMPILE=aarch64-none-elf-                               \
+>           PLAT=qemu ENABLE_RME=1 RMM_V1_COMPAT=0 DEBUG=1 LOG_LEVEL=40   \
+>           QEMU_USE_GIC_DRIVER=QEMU_GICV3                                \
+>           BL33=${EDK2_IMAGE} RMM=${RMM_IMAGE}                           \
+>           -j 8 all fip
+> 
+
+
+
+
+> Booting messages
+> ================
+> INFO:    BL31: Initializing runtime services
+> INFO:    RMM setup done.
+> INFO:    BL31: Initializing RMM
+> INFO:    RMM init start.
+> ERROR:   RMM init failed: -2
+> WARNING: BL31: RMM initialization failed
+
+This is definitely the TF-A RMM incompatibility.
+
+Btw, the shrinkwrap overlay configs in tf-RMM repository should work.
+But unfortunately the Linux/kvmtool repositories are pointing to
+internal repositories. The following patch should fix it and get
+it all working. I am working with the tf-rmm team to fix this.
+
+
+
+--8>--
+
+diff --git a/tools/shrinkwrap/configs/cca.yaml 
+b/tools/shrinkwrap/configs/cca.yaml
+index 1c0455ba..0d70a582 100644
+--- a/tools/shrinkwrap/configs/cca.yaml
++++ b/tools/shrinkwrap/configs/cca.yaml
+@@ -25,8 +25,8 @@ build:
+
+    linux:
+      repo:
+-      remote: https://gitlab.geo.arm.com/software/linux-arm/fkvm.git
+-      revision: stepri01/cca/v13-wip+sro
++      remote: https://gitlab.arm.com/linux-arm/linux-cca
++      revision: cca-host/v13
+      prebuild:
+        - ./scripts/config --file ${param:builddir}/.config --enable 
+CONFIG_PCI_TSM
+        - ./scripts/config --file ${param:builddir}/.config --enable 
+CONFIG_PCI_DOE
+@@ -50,5 +50,5 @@ build:
+          remote: https://git.kernel.org/pub/scm/utils/dtc/dtc.git
+          revision: v1.7.2
+        kvmtool:
+-        remote: https://gitlab.geo.arm.com/software/linux-arm/fkvmtool.git
+-        revision: stepri01/cca/v13-wip
++        remote: https://gitlab.arm.com/linux-arm/kvmtool-cca
++        revision: cca/v11
+
+
+
+Kind regards
+Suzuki
+
 
 > 
-> Cheers,
-> /fuad
+> Thanks,
+> Gavin
 > 
 > 
 > 
-> > +                       handle_host_smc(host_ctxt);
-> > +               else
-> > +                       inject_undef64();
-> >                 break;
-> >         case ESR_ELx_EC_IABT_LOW:
-> >         case ESR_ELx_EC_DABT_LOW:
-> > --
-> > 2.53.0.983.g0bb29b3bc5-goog
-> >
 
-Thanks,
-Sebastian
