@@ -1,118 +1,280 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315453242D8
-	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 18:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774462836; cv=none; b=Gr4N9Ed38HjvgDssgSwfpQnnPHxoHis0RQMCEI0D6VKNhLvx90s5+oXA86in3EHx3mbC6Zhr9rYgUS/sYxZ9CjKl+ICy700S3sLJlOfuYK5xvzUNViUqdxalpqQxCkpTKakugRf7BzYmuAp2MkEGwpu7SH672CX44zQ+aSECmsc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774462836; c=relaxed/simple;
-	bh=j2/es1QhPhuq51aj/X0brAWozFW8cVd/nUY1rJQCm28=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=kqGc57pVFGQ2Te7e3uJPPn1YJCjYQxM8rZnGK8TOaCBevh4u5OStZ1WCfW10YNwAydHVbZhSCTNuGQGFGGRfDG/KTYrfff/GwlVs/xaC4ZyPTdzz04Z/CLKhXLlNGz7RtcN1uFLNjozDLwX6m7uiXMPIST1pLgvS11ZwJ9FE/b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=RnRqlju/; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA00350A33
+	for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 19:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.172
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774466893; cv=pass; b=ZU3mWkTrOze4KGzCq8k9i6S6pQD6Ipb2HxbiVhPkDDtJU0rnQay2keqifc+NbCN6vL73FKWWsY6TEcZ6sDByuHa0s5syoCDB4SL/btTVRnsQ9RslWeHLvcwbg5607XT8MGFcOtJzZctpAaEOPIDtXMsqA9KrEJLIYbJCl6vMtvw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774466893; c=relaxed/simple;
+	bh=8fqbfHwieLaxs2OhvQdTi8NOCEP5wPpiqcjlhSGkQZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qUDIy/OgPeREe7Oq+gyuPecYM07amBGp0m80duEPgRLQuuBLpEPpkBvHp3+gltz8vJI/rKB+JpaIcNuHcQb19wb08On3qbSRbu2rwjTMt5wuthSanVib0nXK4UJdSWKJWeAYK6GpcGdAJi6Ju0ZclWaclL+Zi8KSMXzHgXtN41o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PdvipEz+; arc=pass smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="RnRqlju/"
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0CC51F02;
-	Wed, 25 Mar 2026 11:20:26 -0700 (PDT)
-Received: from devkitleo.cambridge.arm.com (devkitleo.cambridge.arm.com [10.1.196.90])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 687383F836;
-	Wed, 25 Mar 2026 11:20:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
-	t=1774462832; bh=j2/es1QhPhuq51aj/X0brAWozFW8cVd/nUY1rJQCm28=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RnRqlju//v+l8+03/0wteCA6R1iCsC1AxpJi6NyA/fWzpmNollbBo80IOtBxUXBxZ
-	 G5EG2hgtu/qJ5SgLsJ9eud5ObOxoheQ95D/hyREnHIaEvJHzxuqvDMmezCC/dm26sj
-	 AWDLdr/3IUF3rzLY+0m1k9SAPvra5hVsUBx3KeD0=
-From: Leonardo Bras <leo.bras@arm.com>
-To: Tian Zheng <zhengtian10@huawei.com>
-Cc: Leonardo Bras <leo.bras@arm.com>,
-	maz@kernel.org,
-	oupton@kernel.org,
-	catalin.marinas@arm.com,
-	corbet@lwn.net,
-	pbonzini@redhat.com,
-	will@kernel.org,
-	yuzenghui@huawei.com,
-	wangzhou1@hisilicon.com,
-	liuyonglong@huawei.com,
-	Jonathan.Cameron@huawei.com,
-	yezhenyu2@huawei.com,
-	linuxarm@huawei.com,
-	joey.gouly@arm.com,
-	kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	suzuki.poulose@arm.com
-Subject: [PATCH] arm64/kvm: Enable eager hugepage splitting if HDBSS is available
-Date: Wed, 25 Mar 2026 18:20:27 +0000
-Message-ID: <acQna2hLwdr1juTN@devkitleo>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <acQj5grOdZT8LUGp@devkitleo>
-References: <20260225040421.2683931-1-zhengtian10@huawei.com> <20260225040421.2683931-5-zhengtian10@huawei.com> <acQj5grOdZT8LUGp@devkitleo>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PdvipEz+"
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-5091ed02c54so11481cf.1
+        for <kvmarm@lists.linux.dev>; Wed, 25 Mar 2026 12:28:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1774466890; cv=none;
+        d=google.com; s=arc-20240605;
+        b=EEKPFQ8UoxNCs17Xzpp8OH3NcZHUXQ+orp28Fx4zPU8+/6rjr+qBLbqe+WWJ1ZOoCA
+         dW1/4CGau3QYthufL1NYQNrEvk5DgO0VUeT1uozBZWwL71uHI5X46R1u7CkuYV8yDD8c
+         RgANKmWu4z6z1R+rrHwtQ/OgGvAsMJ144pjTOZb0GkwNpoCT1+IvzN8133O1OcsCsKZF
+         LM3tlEKR8a5aDcBZLgZ+420OZDiR0y9WH81J/3p6FPjs9d34vnSQBQAbXSc214yB1FN7
+         uPBiNfUbYH1A+9wVyWDW20RgoQKhY18lu3PuQWlYNwlIwrtNdvdg8JPbGv5RGJnGB13f
+         WucQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
+        fh=WXifrakrhHpMKuV+YM1LZ/K83mZPglPFmcpcPxsJbCI=;
+        b=Y/CMca7ef3vKEb6T0cJGxwLHdCYI2Gmh10L3yjHTvMCDur2MWcvZdCX0qJ6zHF0jKw
+         SfyVZvAFK7fUISMUQfkdqZHXclptDO8CnSZrVklCDn737WD+suFdHxJhhxRb01+Y6n5l
+         sjB3Dwh1USAQlcQvsVEjLPXi6c0iuroEITtDHJNGo4BbDZyHZIqXzTeFqQNFehRb9yKz
+         v67vKJF25750Sbq41EWalcSd/d3OebJAldT+dwisuJuGdRGlInIPsP7p2VdN+UP61W8c
+         7+YUkqCQw7YMhYvjJJB36zxfj0O54yjBes9hwvUEfjf9JKtQNMr6HTSfyLFbzkvBgt77
+         rvMw==;
+        darn=lists.linux.dev
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774466890; x=1775071690; darn=lists.linux.dev;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
+        b=PdvipEz+nWWzD8UOVhA+QxOt4W0xxyjUP6sIJwNhp+vM2zgWZkKvsuuK+tmujbnU4j
+         ZeaB43DQ7TLuBVc73VMNr639Aq601hf6VYExYY8+WIpAmOyuCRP+8ZOD+XvM7nmOGFsU
+         ayq7ttplNzcCIORL4vPNow75gl1p+bsP7Q7wGJ8xDmkGgp7d4qZBT8sxrADZtPzvd13S
+         zzFvv1qup45SCoUx4O+97Vr6Al4knCjTFApToo+FiqEqpTkb7bL5Mir1A7iFeOXYsjbB
+         s2IYHf55cXH562r0cTmIXya4J8tYoYSQmyFo9uRhSOnHzVgR/z4sBo3szFlTMMQ08+sJ
+         ueeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774466890; x=1775071690;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3jXRKuQ+zscB32uOukv3fqFuaunkYR2fmb+32Ylt9Zk=;
+        b=d5HuUivXkocBdBec0Lw/RSVVv7U7OzMbxH/W/9VZw/TSVWdQZRc1HXZhNOoVxwVcbz
+         X3UYt3O9hKbSjVlwy6CRILstNMM4EdcmUL/HyB8cZ2Spr/lWu6aORox/+mRNg/3wDZTR
+         T3f6U4/cVXuOpW10PNbbZzRJxmG8chem61cJFsIfhtZna0UyMSoR6x9tYij2Vwcdp16I
+         19SDjI3kzAj71t6OKiALnCj4FOSuFg4C70ni8HF0ny0Anoy+JSdwYwMlvDM6USKPfuhj
+         JD3l+Y9kV+XKYIUMOSHW5P94wIfla484AXzCazL63HPsGQpcL1NOBx23YvT8h54bHwC+
+         +zRw==
+X-Gm-Message-State: AOJu0Yyvt4/yQkjmpRLXcbbRjxEtP9UTTW52/FImncqhOxUQpvk6zZtj
+	AU+MvjTYlph3DG/ojVXFNJeEBhr2MsOaEURrI1kXesc7RQtuIbIs4G9VOMtdVT7Xgq4zAZeQUzS
+	dcET15lWizi1TCDC8s7COMGEt/cO8pq79xMlB/dQ5
+X-Gm-Gg: ATEYQzwB7m4pC9k0P4G54Xk07t75aNp5Z+r9J+FiK6BcBBl9fdyfQxBpFN460g5Qf2e
+	Q/WdrknvjQCJY63NH2D1eYW81GBb5spdnl0f12pGrNw3SEDYCtZriAxZ18AShTTAkGjMmawD4S5
+	+OnlInSZ7VWxihKH6dsOZ9X/ZWmTzhvRINW2NyjTtaUZclZEXYHth8HN4/f4v0tTL60svDSb+47
+	g4VILxVERMg4p9EPUkRt+2KDHUzeNWKpyyrMnIsUkSpby72gEvnSjwbWUSM6RnRXekUfQzK4GsT
+	l2D34CTl
+X-Received: by 2002:a05:622a:a950:b0:509:21ff:cd49 with SMTP id
+ d75a77b69052e-50b93a03cafmr822391cf.4.1774466890075; Wed, 25 Mar 2026
+ 12:28:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvmarm@lists.linux.dev
 List-Id: <kvmarm.lists.linux.dev>
 List-Subscribe: <mailto:kvmarm+subscribe@lists.linux.dev>
 List-Unsubscribe: <mailto:kvmarm+unsubscribe@lists.linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+References: <20260227212136.7660-1-will@kernel.org> <20260227212136.7660-2-will@kernel.org>
+In-Reply-To: <20260227212136.7660-2-will@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 25 Mar 2026 19:27:32 +0000
+X-Gm-Features: AQROBzBtSgn9cQ7N1iYo4S0niMNCLJ309hN3EBlrhv7VQmdymp5sBSZavqCW-tE
+Message-ID: <CA+EHjTxcc2FArmi1hu17LW3BHUZ5zTnqbaQP0kbV39HXZfp9+Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Disable TRBE Trace Buffer Unit when
+ running in guest context
+To: Will Deacon <will@kernel.org>
+Cc: kvmarm@lists.linux.dev, mark.rutland@arm.com, 
+	linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oupton@kernel.org>, James Clark <james.clark@linaro.org>, Leo Yan <leo.yan@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Yabin Cui <yabinc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-FEAT_HDBSS speeds up guest memory dirty tracking by avoiding a page fault
-and saving the entry in a tracking structure.
+Hi Will,
 
-That may be a problem when we have guest memory backed by hugepages or
-transparent huge pages, as it's not possible to do on-demand hugepage
-splitting, relying only on eager hugepage splitting.
+Now that I have backported this to various Android versions....
 
-So, at stage2 initialization, enable eager hugepage splitting with
-chunk = PAGE_SIZE if the system supports HDBSS.
+On Fri, 27 Feb 2026 at 21:22, Will Deacon <will@kernel.org> wrote:
+>
+> The nVHE world-switch code relies on zeroing TRFCR_EL1 to disable trace
+> generation in guest context when self-hosted TRBE is in use by the host.
+>
+> Per D3.2.1 ("Controls to prohibit trace at Exception levels"), clearing
+> TRFCR_EL1 means that trace generation is prohibited at EL1 and EL0 but
+> per R_YCHKJ the Trace Buffer Unit will still be enabled if
+> TRBLIMITR_EL1.E is set. R_SJFRQ goes on to state that, when enabled, the
+> Trace Buffer Unit can perform address translation for the "owning
+> exception level" even when it is out of context.
+>
+> Consequently, we can end up in a state where TRBE performs speculative
+> page-table walks for a host VA/IPA in guest/hypervisor context depending
+> on the value of MDCR_EL2.E2TB, which changes over world-switch. The
+> potential result appears to be a heady mixture of SErrors, data
+> corruption and hardware lockups.
+>
+> Extend the TRBE world-switch code to clear TRBLIMITR_EL1.E after
+> draining the buffer, restoring the register on return to the host. This
+> unfortunately means we need to tackle CPU errata #2064142 and #2038923
+> which add additional synchronisation requirements around manipulations
+> of the limit register. Hopefully this doesn't need to be fast.
+>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Oliver Upton <oupton@kernel.org>
+> Cc: James Clark <james.clark@linaro.org>
+> Cc: Leo Yan <leo.yan@arm.com>
+> Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Cc: Fuad Tabba <tabba@google.com>
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Fixes: a1319260bf62 ("arm64: KVM: Enable access to TRBE support for host")
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h  |  1 +
+>  arch/arm64/kvm/hyp/nvhe/debug-sr.c | 73 ++++++++++++++++++++++++++----
+>  arch/arm64/kvm/hyp/nvhe/switch.c   |  2 +-
+>  3 files changed, 66 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 5d5a3bbdb95e..1532ad2b2ec2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -770,6 +770,7 @@ struct kvm_host_data {
+>                 u64 pmscr_el1;
+>                 /* Self-hosted trace */
+>                 u64 trfcr_el1;
+> +               u64 trblimitr_el1;
+>                 /* Values of trap registers for the host before guest entry. */
+>                 u64 mdcr_el2;
+>                 u64 brbcr_el1;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/debug-sr.c b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> index 2a1c0f49792b..3dbdee1148d3 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/debug-sr.c
+> @@ -57,12 +57,56 @@ static void __trace_do_switch(u64 *saved_trfcr, u64 new_trfcr)
+>         write_sysreg_el1(new_trfcr, SYS_TRFCR);
+>  }
+>
+> -static bool __trace_needs_drain(void)
+> +static void __trace_drain_and_disable(void)
+>  {
+> -       if (is_protected_kvm_enabled() && host_data_test_flag(HAS_TRBE))
+> -               return read_sysreg_s(SYS_TRBLIMITR_EL1) & TRBLIMITR_EL1_E;
+> +       u64 *trblimitr_el1 = host_data_ptr(host_debug_state.trblimitr_el1);
+>
+> -       return host_data_test_flag(TRBE_ENABLED);
+> +       *trblimitr_el1 = 0;
+> +
+> +       if (is_protected_kvm_enabled()) {
+> +               if (!host_data_test_flag(HAS_TRBE))
+> +                       return;
+> +       } else {
+> +               if (!host_data_test_flag(TRBE_ENABLED))
+> +                       return;
+> +       }
 
-Signed-off-by: Leonardo Bras <leo.bras@arm.com>
----
- arch/arm64/kvm/mmu.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Can we simplify this? e.g.,
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 070a01e53fcb..bdfa72b7c073 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -993,22 +993,26 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 
- 	mmu->last_vcpu_ran = alloc_percpu(typeof(*mmu->last_vcpu_ran));
- 	if (!mmu->last_vcpu_ran) {
- 		err = -ENOMEM;
- 		goto out_destroy_pgtable;
- 	}
- 
- 	for_each_possible_cpu(cpu)
- 		*per_cpu_ptr(mmu->last_vcpu_ran, cpu) = -1;
- 
--	 /* The eager page splitting is disabled by default */
--	mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-+	 /* The eager page splitting is disabled by default if system has no HDBSS */
-+	if (system_supports_hacdbs())
-+		mmu->split_page_chunk_size = PAGE_SIZE;
-+	else
-+		mmu->split_page_chunk_size = KVM_ARM_EAGER_SPLIT_CHUNK_SIZE_DEFAULT;
-+
- 	mmu->split_page_cache.gfp_zero = __GFP_ZERO;
- 
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 
- 	if (kvm_is_nested_s2_mmu(kvm, mmu))
- 		kvm_init_nested_s2_mmu(mmu);
- 
- 	return 0;
- 
- out_destroy_pgtable:
--- 
-2.53.0
++      bool needs_drain = is_protected_kvm_enabled() ?
+host_data_test_flag(HAS_TRBE) : host_data_test_flag(TRBE_ENABLED);
+....
 
+That said:
+
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+> +
+> +       *trblimitr_el1 = read_sysreg_s(SYS_TRBLIMITR_EL1);
+> +       if (*trblimitr_el1 & TRBLIMITR_EL1_E) {
+> +               /*
+> +                * The host has enabled the Trace Buffer Unit so we have
+> +                * to beat the CPU with a stick until it stops accessing
+> +                * memory.
+> +                */
+> +
+> +               /* First, ensure that our prior write to TRFCR has stuck. */
+> +               isb();
+> +
+> +               /* Now synchronise with the trace and drain the buffer. */
+> +               tsb_csync();
+> +               dsb(nsh);
+> +
+> +               /*
+> +                * With no more trace being generated, we can disable the
+> +                * Trace Buffer Unit.
+> +                */
+> +               write_sysreg_s(0, SYS_TRBLIMITR_EL1);
+> +               if (cpus_have_final_cap(ARM64_WORKAROUND_2064142)) {
+> +                       /*
+> +                        * Some CPUs are so good, we have to drain 'em
+> +                        * twice.
+> +                        */
+> +                       tsb_csync();
+> +                       dsb(nsh);
+> +               }
+> +
+> +               /*
+> +                * Ensure that the Trace Buffer Unit is disabled before
+> +                * we start mucking with the stage-2 and trap
+> +                * configuration.
+> +                */
+> +               isb();
+> +       }
+>  }
+>
+>  static bool __trace_needs_switch(void)
+> @@ -79,15 +123,26 @@ static void __trace_switch_to_guest(void)
+>
+>         __trace_do_switch(host_data_ptr(host_debug_state.trfcr_el1),
+>                           *host_data_ptr(trfcr_while_in_guest));
+> -
+> -       if (__trace_needs_drain()) {
+> -               isb();
+> -               tsb_csync();
+> -       }
+> +       __trace_drain_and_disable();
+>  }
+>
+>  static void __trace_switch_to_host(void)
+>  {
+> +       u64 trblimitr_el1 = *host_data_ptr(host_debug_state.trblimitr_el1);
+> +
+> +       if (trblimitr_el1 & TRBLIMITR_EL1_E) {
+> +               /* Re-enable the Trace Buffer Unit for the host. */
+> +               write_sysreg_s(trblimitr_el1, SYS_TRBLIMITR_EL1);
+> +               isb();
+> +               if (cpus_have_final_cap(ARM64_WORKAROUND_2038923)) {
+> +                       /*
+> +                        * Make sure the unit is re-enabled before we
+> +                        * poke TRFCR.
+> +                        */
+> +                       isb();
+> +               }
+> +       }
+> +
+>         __trace_do_switch(host_data_ptr(trfcr_while_in_guest),
+>                           *host_data_ptr(host_debug_state.trfcr_el1));
+>  }
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 779089e42681..f00688e69d88 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -278,7 +278,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>          * We're about to restore some new MMU state. Make sure
+>          * ongoing page-table walks that have started before we
+>          * trapped to EL2 have completed. This also synchronises the
+> -        * above disabling of BRBE, SPE and TRBE.
+> +        * above disabling of BRBE and SPE.
+>          *
+>          * See DDI0487I.a D8.1.5 "Out-of-context translation regimes",
+>          * rule R_LFHQG and subsequent information statements.
+> --
+> 2.53.0.473.g4a7958ca14-goog
+>
